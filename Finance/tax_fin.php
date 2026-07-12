@@ -27,12 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tax_code'])) {
     $rate = round(floatval($_POST['rate'] ?? 0), 2);
     $type = isset($tax_types[$_POST['tax_type'] ?? '']) ? $_POST['tax_type'] : 'both';
     if ($code === '' || $name === '') { header("Location: tax_fin.php?msg=بيانات+الرمز+غير+مكتملة+❌"); exit(); }
-    $sql = "INSERT INTO fin_tax_codes (company_id, code, name, rate, tax_type, created_by) VALUES (?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'issdsi', $company_id, $code, $name, $rate, $type, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: tax_fin.php?msg=رمز+الضريبة+مكرر+❌"); exit(); }
-        mysqli_stmt_close($stmt);
+    try {
+        fin_gate($is_super_admin)->insert('fin_tax_codes', array(
+            'code' => $code, 'name' => $name, 'rate' => $rate, 'tax_type' => $type, 'created_by' => $current_user_id,
+        ));
+    } catch (\App\Core\TenantGateException $e) {
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: tax_fin.php?msg=رمز+الضريبة+مكرر+❌"); exit(); }
+        error_log('fin_tax_codes insert refused: ' . $e->getMessage());
+        header("Location: tax_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
     header("Location: tax_fin.php?msg=تمت+إضافة+رمز+الضريبة+✅"); exit();
 }
@@ -47,33 +49,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     $ref = trim($_POST['source_ref'] ?? '');
     $period = trim($_POST['period_ref'] ?? '') ?: date('Y-m');
     if ($base <= 0) { header("Location: tax_fin.php?msg=الوعاء+غير+صحيح+❌"); exit(); }
-    $sql = "INSERT INTO fin_tax_transactions (company_id, tax_code_id, direction, base_amount, tax_rate, source_ref, period_ref, created_by)
-            VALUES (?,?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iisddssi', $company_id, $tcid, $dir, $base, $rate, $ref, $period, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_tax_transactions', array(
+        'tax_code_id' => $tcid, 'direction' => $dir, 'base_amount' => $base, 'tax_rate' => $rate,
+        'source_ref' => $ref, 'period_ref' => $period, 'created_by' => $current_user_id,
+    ));
     header("Location: tax_fin.php?msg=تمت+إضافة+الحركة+الضريبية+✅"); exit();
 }
 
 if (isset($_GET['del_code'])) {
     if (!$can_delete) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['del_code']);
-    mysqli_query($conn, "UPDATE fin_tax_codes SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_tax_codes', $d);
     header("Location: tax_fin.php?msg=تم+حذف+الرمز+✅"); exit();
 }
 if (isset($_GET['del_tx'])) {
     if (!$can_delete) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['del_tx']);
-    mysqli_query($conn, "UPDATE fin_tax_transactions SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_tax_transactions', $d);
     header("Location: tax_fin.php?msg=تم+حذف+الحركة+✅"); exit();
 }
 
 // إقرار الضريبة للفترة المختارة (افتراضي: الشهر الحالي)
 $sel_period = isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', $_GET['period']) ? $_GET['period'] : date('Y-m');
-$pw = $is_super_admin ? "company_id > 0" : "company_id = " . intval($company_id);
-$out_tax = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(tax_amount),0) v FROM fin_tax_transactions WHERE $pw AND COALESCE(is_deleted,0)=0 AND direction='output' AND period_ref='$sel_period'")->fetch_assoc()['v'] ?? 0);
-$in_tax  = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(tax_amount),0) v FROM fin_tax_transactions WHERE $pw AND COALESCE(is_deleted,0)=0 AND direction='input' AND period_ref='$sel_period'")->fetch_assoc()['v'] ?? 0);
+$tax_ssum = function ($dir) use ($is_super_admin, $sel_period) {
+    $r = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('t' => 'fin_tax_transactions')),
+        "SELECT COALESCE(SUM(t.tax_amount),0) v FROM fin_tax_transactions t WHERE {TENANT_SCOPE}
+         AND COALESCE(t.is_deleted,0)=0 AND t.direction=? AND t.period_ref=?", array($dir, $sel_period));
+    return $r ? (float) $r[0]['v'] : 0.0;
+};
+$out_tax = $tax_ssum('output');
+$in_tax  = $tax_ssum('input');
 $net_tax = $out_tax - $in_tax;
 
 $page_title = 'إيكوبيشن | الضرائب';
@@ -136,8 +141,10 @@ include '../insidebar.php';
             <div class="form-group"><label>النوع</label><select name="direction"><option value="output">مخرجات (مبيعات)</option><option value="input">مدخلات (مشتريات)</option></select></div>
             <div class="form-group"><label>رمز الضريبة</label>
                 <select name="tax_code_id" id="tx_code"><option value="">— بلا —</option>
-                <?php $cq = mysqli_query($conn, "SELECT id, CONCAT(code,' (',rate,'%)') AS label, rate FROM fin_tax_codes WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 AND active=1 ORDER BY code");
-                $rates = array(); if ($cq) { while ($x = mysqli_fetch_assoc($cq)) { echo "<option value='" . intval($x['id']) . "' data-rate='" . htmlspecialchars($x['rate']) . "'>" . htmlspecialchars($x['label']) . "</option>"; } } ?>
+                <?php $code_opts = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('t' => 'fin_tax_codes')),
+                    "SELECT t.id, CONCAT(t.code,' (',t.rate,'%)') AS label, t.rate FROM fin_tax_codes t
+                     WHERE {TENANT_SCOPE} AND COALESCE(t.is_deleted,0)=0 AND t.active=1 ORDER BY t.code");
+                foreach ($code_opts as $x) { echo "<option value='" . intval($x['id']) . "' data-rate='" . htmlspecialchars($x['rate']) . "'>" . htmlspecialchars($x['label']) . "</option>"; } ?>
                 </select></div>
             <div class="form-group"><label>الوعاء الضريبي <span class="required">*</span></label><input type="number" step="0.01" min="0" name="base_amount" required></div>
             <div class="form-group"><label>النسبة %</label><input type="number" step="0.01" name="tax_rate" id="tx_rate" value="15"></div>
@@ -156,9 +163,11 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>الرمز</th><th>الوعاء</th><th>النسبة</th><th>الضريبة</th><th>المرجع</th><th>الفترة</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT t.*, c.code AS code FROM fin_tax_transactions t LEFT JOIN fin_tax_codes c ON c.id=t.tax_code_id
-                        WHERE t.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . " AND COALESCE(t.is_deleted,0)=0 ORDER BY t.id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $tx_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('t' => 'fin_tax_transactions'), 'enrich' => array('c' => 'fin_tax_codes')),
+                    "SELECT t.*, c.code AS code FROM fin_tax_transactions t LEFT JOIN fin_tax_codes c ON c.id=t.tax_code_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(t.is_deleted,0)=0 ORDER BY t.id DESC");
+                { foreach ($tx_rows as $row) {
                     $dir = $row['direction'] === 'input' ? 'مدخلات' : 'مخرجات';
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) echo "<a href='?del_tx=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
