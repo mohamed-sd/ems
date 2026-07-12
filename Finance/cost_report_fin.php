@@ -25,7 +25,7 @@ $cost_types = fin_cost_types();
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: cost_report_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_cost_records SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_cost_records', $d);
     header("Location: cost_report_fin.php?msg=تم+حذف+سجلّ+التكلفة+✅"); exit();
 }
 
@@ -42,13 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
     $revenue    = ($_POST['revenue'] ?? '') === '' ? null : round(floatval($_POST['revenue']), 2);
     if (!isset($cost_types[$cost_type]) || $total_cost < 0) { header("Location: cost_report_fin.php?msg=بيانات+غير+صحيحة+❌"); exit(); }
 
-    $sql = "INSERT INTO fin_cost_records (company_id, cost_type, equipment_id, project_id, period_ref, qty, unit, unit_cost, total_cost, revenue, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        $period = date('Y-m');
-        mysqli_stmt_bind_param($stmt, 'isiisdsdddi', $company_id, $cost_type, $equip_id, $project_id, $period, $qty, $unit, $unit_cost, $total_cost, $revenue, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_cost_records', array(
+        'cost_type' => $cost_type, 'equipment_id' => $equip_id, 'project_id' => $project_id,
+        'period_ref' => date('Y-m'), 'qty' => $qty, 'unit' => $unit, 'unit_cost' => $unit_cost,
+        'total_cost' => $total_cost, 'revenue' => $revenue, 'created_by' => $current_user_id,
+    ));
     header("Location: cost_report_fin.php?msg=تمت+إضافة+سجلّ+التكلفة+✅"); exit();
 }
 
@@ -91,16 +89,17 @@ include '../insidebar.php';
                 <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>هامش %</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_c = fin_scope('cr.company_id', $is_super_admin, $company_id);
-                $psql = "SELECT p.name AS project_name,
-                                COALESCE(SUM(cr.total_cost),0) AS tc,
-                                COALESCE(SUM(cr.revenue),0) AS tr,
-                                COALESCE(SUM(cr.revenue),0) - COALESCE(SUM(cr.total_cost),0) AS profit
-                         FROM fin_cost_records cr
-                         LEFT JOIN project p ON p.id = cr.project_id
-                         WHERE $scope_c AND COALESCE(cr.is_deleted,0)=0
-                         GROUP BY cr.project_id, p.name ORDER BY profit DESC";
-                if ($pr = mysqli_query($conn, $psql)) { while ($row = mysqli_fetch_assoc($pr)) {
+                $prof_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('cr' => 'fin_cost_records'), 'enrich' => array('p' => 'project')),
+                    "SELECT p.name AS project_name,
+                            COALESCE(SUM(cr.total_cost),0) AS tc,
+                            COALESCE(SUM(cr.revenue),0) AS tr,
+                            COALESCE(SUM(cr.revenue),0) - COALESCE(SUM(cr.total_cost),0) AS profit
+                     FROM fin_cost_records cr
+                     LEFT JOIN project p ON p.id = cr.project_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(cr.is_deleted,0)=0
+                     GROUP BY cr.project_id, p.name ORDER BY profit DESC");
+                { foreach ($prof_rows as $row) {
                     $tc = (float)$row['tc']; $tr = (float)$row['tr']; $pf = (float)$row['profit'];
                     $margin = $tr > 0 ? ($pf / $tr * 100) : 0;
                     $tone = $pf > 0 ? 'success' : ($pf < 0 ? 'danger' : 'secondary');
@@ -123,10 +122,12 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>المشروع</th><th>الكمية</th><th>تكلفة الوحدة</th><th>إجمالي التكلفة</th><th>الإيراد</th><th>الربحية</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT cr.*, p.name AS project_name FROM fin_cost_records cr
-                        LEFT JOIN project p ON p.id = cr.project_id
-                        WHERE $scope_c AND COALESCE(cr.is_deleted,0)=0 ORDER BY cr.id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $cost_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('cr' => 'fin_cost_records'), 'enrich' => array('p' => 'project')),
+                    "SELECT cr.*, p.name AS project_name FROM fin_cost_records cr
+                     LEFT JOIN project p ON p.id = cr.project_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(cr.is_deleted,0)=0 ORDER BY cr.id DESC");
+                { foreach ($cost_rows as $row) {
                     $pf = (float)$row['profit']; $tone = $pf > 0 ? 'success' : ($pf < 0 ? 'danger' : 'secondary');
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) { echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>"; }
