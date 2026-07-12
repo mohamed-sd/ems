@@ -41,17 +41,20 @@ $categories     = fin_budget_categories();
 if (isset($_GET['approve_id'])) {
     if (!$can_edit) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
     $aid = intval($_GET['approve_id']);
-    mysqli_query($conn, "UPDATE fin_budgets SET state='approved', approved_by=$current_user_id
-                         WHERE id=$aid AND company_id=$company_id AND state IN('draft','submitted')");
+    fin_gate($is_super_admin)->update('fin_budgets',
+        array('state' => 'approved', 'approved_by' => $current_user_id),
+        array('id' => $aid), "state IN('draft','submitted')");
     header("Location: budget_form_fin.php?msg=تم+اعتماد+الميزانية+(مرجع+حاكم)+✅"); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    // حذف ناعم مشروط بالمسودة (عبر update لحفظ شرط state='draft' الأصلي — softDelete بلا شرط)
     $did = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_budgets SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id
-                         WHERE id=$did AND company_id=$company_id AND state='draft'");
+    fin_gate($is_super_admin)->update('fin_budgets',
+        array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
+        array('id' => $did), "state='draft'");
     header("Location: budget_form_fin.php?msg=تم+حذف+الميزانية+بنجاح+✅"); exit();
 }
 
@@ -85,26 +88,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
     if (count($lines) < 1) { header("Location: budget_form_fin.php?msg=الميزانية+تحتاج+بنداً+واحداً+فأكثر+❌"); exit(); }
 
     $budget_no = fin_gen_code($conn, 'fin_budgets', 'FIN-BG', $company_id);
-    $sql = "INSERT INTO fin_budgets (company_id, budget_no, dept_module, period_type, fiscal_year, period_no,
-            total_revenue, total_expense, note, state, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?, 'draft', ?)";
-    $budget_id = 0;
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssiiddsi', $company_id, $budget_no, $dept, $ptype, $fyear, $pno, $t_rev, $t_exp, $note, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: budget_form_fin.php?msg=ميزانية+هذه+الفترة+موجودة+مسبقاً+❌"); exit(); }
-        $budget_id = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
-    }
-    if ($budget_id > 0) {
-        $ls = mysqli_prepare($conn, "INSERT INTO fin_budget_lines (company_id, budget_id, line_kind, category, planned_amount) VALUES (?,?,?,?,?)");
-        if ($ls) {
+    // الرأس + البنود زوجٌ مترابط ذرّيًا (رأسٌ بلا بنود = ميزانية مكسورة) — معاملة
+    // مُدارة §9: الأصل كتابتان غير معاملتين؛ تقوية مسار الفشل فقط، السعيد مطابق
+    try {
+        fin_gate($is_super_admin)->runInTransaction(function ($g) use ($budget_no, $dept, $ptype, $fyear, $pno, $t_rev, $t_exp, $note, $current_user_id, $lines) {
+            $budget_id = $g->insert('fin_budgets', array(
+                'budget_no' => $budget_no, 'dept_module' => $dept, 'period_type' => $ptype,
+                'fiscal_year' => $fyear, 'period_no' => $pno, 'total_revenue' => $t_rev,
+                'total_expense' => $t_exp, 'note' => $note, 'state' => 'draft', 'created_by' => $current_user_id,
+            ));
             foreach ($lines as $ln) {
-                mysqli_stmt_bind_param($ls, 'iissd', $company_id, $budget_id, $ln['k'], $ln['c'], $ln['p']);
-                mysqli_stmt_execute($ls);
+                $g->insert('fin_budget_lines', array(
+                    'budget_id' => $budget_id, 'line_kind' => $ln['k'], 'category' => $ln['c'], 'planned_amount' => $ln['p'],
+                ));
             }
-            mysqli_stmt_close($ls);
-        }
+        }, 'budget_form save head+lines');
+    } catch (\App\Core\TenantGateException $e) {
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: budget_form_fin.php?msg=ميزانية+هذه+الفترة+موجودة+مسبقاً+❌"); exit(); }
+        error_log('budget save refused: ' . $e->getMessage());
+        header("Location: budget_form_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
     header("Location: budget_form_fin.php?msg=تم+حفظ+الميزانية+بنجاح+✅"); exit();
 }
@@ -186,10 +188,8 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $scope_b = fin_scope('company_id', $is_super_admin, $company_id);
-                    $sql = "SELECT * FROM fin_budgets WHERE $scope_b AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $budget_rows = fin_gate($is_super_admin)->select('fin_budgets', array('orderBy' => 'id DESC'));
+                    { foreach ($budget_rows as $row) {
                         $st = (string)$row['state'];
                         $st_tone = in_array($st, array('approved','active')) ? 'success' : ($st === 'closed' ? 'dark' : 'secondary');
                         echo "<tr>";
@@ -223,12 +223,13 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $vsql = "SELECT l.*, b.budget_no FROM fin_budget_lines l
-                             JOIN fin_budgets b ON b.id = l.budget_id
-                             WHERE l.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . "
-                               AND COALESCE(b.is_deleted,0)=0 ORDER BY l.id DESC";
-                    $vr = mysqli_query($conn, $vsql);
-                    if ($vr) { while ($l = mysqli_fetch_assoc($vr)) {
+                    // تكافؤ INNER→LEFT + b.id IS NOT NULL (نمط F1 المُثبَت)
+                    $var_rows = fin_gate($is_super_admin)->scopedQuery(
+                        array('scope' => array('l' => 'fin_budget_lines'), 'enrich' => array('b' => 'fin_budgets')),
+                        "SELECT l.*, b.budget_no FROM fin_budget_lines l
+                         LEFT JOIN fin_budgets b ON b.id = l.budget_id
+                         WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND COALESCE(b.is_deleted,0)=0 ORDER BY l.id DESC");
+                    { foreach ($var_rows as $l) {
                         $var = (float)$l['variance'];
                         $kind = $l['line_kind'] === 'revenue' ? 'إيراد' : 'مصروف';
                         // للمصروف: تجاوز (فعلي>مخطّط) = خطر. للإيراد: نقص (فعلي<مخطّط) = خطر.
