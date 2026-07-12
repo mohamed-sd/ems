@@ -28,23 +28,27 @@ if (isset($_GET['settle_supplier'])) {
     if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { header("Location: dues_fin.php?msg=التسوية+تخصّ+أمين+الخزينة+فقط+❌"); exit(); } // فصل الواجبات
     $sid = intval($_GET['settle_supplier']);
     $net = fin_supplier_net($conn, $company_id, $sid);
-    mysqli_query($conn, "UPDATE fin_dues SET settlement_state='settled'
-                         WHERE company_id=$company_id AND party_type='supplier' AND party_ref=$sid
-                           AND settlement_state='pending' AND COALESCE(is_deleted,0)=0");
+    fin_gate($is_super_admin)->update('fin_dues',
+        array('settlement_state' => 'settled'),
+        array('party_type' => 'supplier', 'party_ref' => $sid),
+        "settlement_state='pending' AND COALESCE(is_deleted,0)=0");
     header("Location: dues_fin.php?msg=تمت+تسوية+المورد+(صافي=" . number_format($net, 2) . ")+✅"); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_due'])) {
     if (!$can_delete) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    // حذف ناعم مشروط (غير المصروف فقط) — عبر update حفظًا لشرط الأصل
     $d = intval($_GET['delete_due']);
-    mysqli_query($conn, "UPDATE fin_dues SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id AND settlement_state<>'paid'");
+    fin_gate($is_super_admin)->update('fin_dues',
+        array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
+        array('id' => $d), "settlement_state<>'paid'");
     header("Location: dues_fin.php?msg=تم+حذف+المستحق+✅"); exit();
 }
 if (isset($_GET['delete_recv'])) {
     if (!$can_delete) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_recv']);
-    mysqli_query($conn, "UPDATE fin_receivables SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_receivables', $d);
     header("Location: dues_fin.php?msg=تم+حذف+الذمّة+✅"); exit();
 }
 
@@ -59,11 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
     if ($party_ref <= 0 || !isset($due_types[$due_type]) || $amount <= 0) {
         header("Location: dues_fin.php?msg=بيانات+غير+صحيحة+(طرف/نوع/مبلغ)+❌"); exit();
     }
-    $sql = "INSERT INTO fin_dues (company_id, party_type, party_ref, due_type, direction, amount, created_by) VALUES (?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isissdi', $company_id, $party_type, $party_ref, $due_type, $direction, $amount, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_dues', array(
+        'party_type' => $party_type, 'party_ref' => $party_ref, 'due_type' => $due_type,
+        'direction' => $direction, 'amount' => $amount, 'created_by' => $current_user_id,
+    ));
     header("Location: dues_fin.php?msg=تمت+إضافة+المستحق+✅"); exit();
 }
 
@@ -76,11 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     $amount   = round(floatval($_POST['r_amount'] ?? 0), 2);
     $due_date = trim($_POST['due_date'] ?? '') ?: null;
     if ($cust <= 0 || $amount <= 0) { header("Location: dues_fin.php?msg=بيانات+الذمّة+غير+صحيحة+❌"); exit(); }
-    $sql = "INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref, amount, due_date, state, created_by) VALUES (?,?,?,?,?,?, 'open', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iissdsi', $company_id, $cust, $doc_type, $doc_ref, $amount, $due_date, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_receivables', array(
+        'customer_entity_id' => $cust, 'doc_type' => $doc_type, 'doc_ref' => $doc_ref,
+        'amount' => $amount, 'due_date' => $due_date, 'state' => 'open', 'created_by' => $current_user_id,
+    ));
     header("Location: dues_fin.php?msg=تمت+إضافة+الذمّة+✅"); exit();
 }
 
@@ -147,13 +149,15 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الطرف</th><th>الاسم</th><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_d = fin_scope('d.company_id', $is_super_admin, $company_id);
-                $sql = "SELECT d.*, COALESCE(s.name, e.name) AS party_name
-                        FROM fin_dues d
-                        LEFT JOIN suppliers s ON (d.party_type='supplier' AND s.id=d.party_ref)
-                        LEFT JOIN employees e ON (d.party_type='employee' AND e.id=d.party_ref)
-                        WHERE $scope_d AND COALESCE(d.is_deleted,0)=0 ORDER BY d.id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $due_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('d' => 'fin_dues'),
+                          'enrich' => array('s' => 'suppliers', 'e' => 'employees')),
+                    "SELECT d.*, COALESCE(s.name, e.name) AS party_name
+                     FROM fin_dues d
+                     LEFT JOIN suppliers s ON (d.party_type='supplier' AND s.id=d.party_ref)
+                     LEFT JOIN employees e ON (d.party_type='employee' AND e.id=d.party_ref)
+                     WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 ORDER BY d.id DESC");
+                { foreach ($due_rows as $row) {
                     $ss = (string)$row['settlement_state'];
                     $ss_tone = $ss === 'paid' ? 'success' : ($ss === 'settled' ? 'primary' : 'secondary');
                     echo "<tr><td><div class='action-btns'>";
@@ -183,11 +187,12 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصّل</th><th>المتبقّي</th><th>الاستحقاق</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_r = fin_scope('r.company_id', $is_super_admin, $company_id);
-                $sql = "SELECT r.*, c.client_name FROM fin_receivables r
-                        LEFT JOIN clients c ON c.id = r.customer_entity_id
-                        WHERE $scope_r AND COALESCE(r.is_deleted,0)=0 ORDER BY r.id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $recv_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('r' => 'fin_receivables'), 'enrich' => array('c' => 'clients')),
+                    "SELECT r.*, c.client_name FROM fin_receivables r
+                     LEFT JOIN clients c ON c.id = r.customer_entity_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 ORDER BY r.id DESC");
+                { foreach ($recv_rows as $row) {
                     $overdue = ($row['due_date'] && $row['due_date'] < date('Y-m-d') && (float)$row['outstanding'] > 0);
                     $st = $overdue ? 'overdue' : (string)$row['state'];
                     $st_tone = $st === 'collected' ? 'success' : ($st === 'overdue' ? 'danger' : ($st === 'partial' ? 'primary' : 'secondary'));
