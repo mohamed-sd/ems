@@ -39,30 +39,44 @@ if (isset($_GET['post_id'])) {
     if (!fin_verify_action_token()) { header("Location: journal_form_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); } // إصلاح #2
     if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { header("Location: journal_form_fin.php?msg=الترحيل+يخصّ+المدير+المالي+فقط+❌"); exit(); } // فصل الواجبات
     $pid = intval($_GET['post_id']);
-    // اجمع السطور وتحقق من التوازن
-    $chk = mysqli_query($conn, "SELECT COUNT(*) AS n, COALESCE(SUM(debit),0) AS d, COALESCE(SUM(credit),0) AS c
-                                FROM fin_journal_lines WHERE entry_id=$pid AND company_id=$company_id");
-    $r = $chk ? mysqli_fetch_assoc($chk) : null;
+    $gate = ems_tenant_db(); // الترحيل شركة الجلسة دومًا (كالأصل company_id=$company_id)
+
+    // اجمع السطور وتحقق من التوازن (مجموع مُعزَّل عبر scopedQuery §10)
+    $chk = $gate->scopedQuery(
+        array('scope' => array('l' => 'fin_journal_lines')),
+        "SELECT COUNT(*) n, COALESCE(SUM(l.debit),0) d, COALESCE(SUM(l.credit),0) c
+         FROM fin_journal_lines l WHERE {TENANT_SCOPE} AND l.entry_id=?",
+        array($pid));
+    $r = $chk ? $chk[0] : null;
     $n = $r ? intval($r['n']) : 0; $d = $r ? (float)$r['d'] : 0; $c = $r ? (float)$r['c'] : 0;
     if ($n < 2) { header("Location: journal_form_fin.php?msg=لا+ترحيل:+القيد+يحتاج+سطرين+فأكثر+❌"); exit(); }
     if (round($d, 2) !== round($c, 2)) { header("Location: journal_form_fin.php?msg=لا+ترحيل:+القيد+غير+متوازن+(مدين≠دائن)+❌"); exit(); }
 
-    // إصلاح #3: لا ترحيل في فترة مالية مقفلة
-    $pdrow = mysqli_query($conn, "SELECT posting_date FROM fin_journal_entries WHERE id=$pid AND company_id=$company_id LIMIT 1");
-    $pdate = ($pdrow && ($pr = mysqli_fetch_assoc($pdrow))) ? $pr['posting_date'] : date('Y-m-d');
+    // إصلاح #3: لا ترحيل في فترة مالية مقفلة — نقرأ التاريخ والحدث المرتبط معًا
+    $entryRow = $gate->selectOne('fin_journal_entries', array('columns' => array('posting_date', 'event_id'), 'where' => array('id' => $pid)));
+    $pdate = $entryRow ? $entryRow['posting_date'] : date('Y-m-d');
     if (!fin_period_posting_open($conn, $company_id, $pdate)) {
         header("Location: journal_form_fin.php?msg=لا+ترحيل:+الفترة+المالية+مقفلة+لهذا+التاريخ+❌"); exit();
     }
 
-    mysqli_query($conn, "UPDATE fin_journal_entries SET state='posted', posted_by=$current_user_id, posted_at=NOW()
-                         WHERE id=$pid AND company_id=$company_id AND state='draft'");
-    // أثر الترحيل: نقل الحدث المرتبط إلى 'مقيَّد'
-    $ev = mysqli_query($conn, "SELECT event_id FROM fin_journal_entries WHERE id=$pid AND company_id=$company_id");
-    $evr = $ev ? mysqli_fetch_assoc($ev) : null;
-    if ($evr && intval($evr['event_id']) > 0) {
-        $eid = intval($evr['event_id']);
-        mysqli_query($conn, "UPDATE fin_financial_events SET state='posted', journal_entry_id=$pid
-                             WHERE id=$eid AND company_id=$company_id AND COALESCE(is_deleted,0)=0");
+    // زوجٌ كتابيٌّ مترابط (§9): ترحيل القيد (بحارس حالة draft) + نقل الحدث المرتبط
+    // إلى «مقيَّد» ذرّيًّا. حارس الحصانة (§12) يرفض تعديل حدثٍ منشورٍ على الناقل —
+    // فينكفئ الترحيل كله (rollback) بدل تباعد جذر/مشتق (المسار اليدوي بلا idempotency يمرّ).
+    try {
+        $gate->runInTransaction(function ($g) use ($pid, $entryRow, $current_user_id) {
+            $g->update('fin_journal_entries',
+                array('state' => 'posted', 'posted_by' => $current_user_id, 'posted_at' => date('Y-m-d H:i:s')),
+                array('id' => $pid), "state='draft'");
+            $eid = $entryRow ? intval($entryRow['event_id']) : 0;
+            if ($eid > 0) {
+                $g->update('fin_financial_events',
+                    array('state' => 'posted', 'journal_entry_id' => $pid),
+                    array('id' => $eid), "COALESCE(is_deleted,0)=0");
+            }
+        }, 'post journal entry + advance linked event');
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('journal post refused: ' . $e->getMessage());
+        header("Location: journal_form_fin.php?msg=لا+يجوز+ترحيل+قيدٍ+مرتبطٍ+بحدثٍ+منشورٍ+على+الناقل+❌"); exit();
     }
     // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
     $fed = fin_recalc_budget_actuals($conn, $company_id);
@@ -73,8 +87,10 @@ if (isset($_GET['post_id'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: journal_form_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $did = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_journal_entries SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id
-                         WHERE id=$did AND company_id=$company_id AND state='draft'");
+    // حذف ناعم مشروط بحالة draft → update بحارس whereRaw (softDelete بالـid فقط لا يحمل شرط الحالة)
+    ems_tenant_db()->update('fin_journal_entries',
+        array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
+        array('id' => $did), "state='draft'");
     header("Location: journal_form_fin.php?msg=تم+حذف+القيد+بنجاح+✅"); exit();
 }
 
@@ -106,25 +122,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     if (count($lines) < 2) { header("Location: journal_form_fin.php?msg=القيد+يحتاج+سطرين+صالحين+فأكثر+❌"); exit(); }
 
     $entry_no = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $company_id);
-    $sql = "INSERT INTO fin_journal_entries (company_id, entry_no, event_id, posting_date, total_debit, total_credit, memo, state, created_by)
-            VALUES (?,?,?,?,?,?,?, 'draft', ?)";
-    $entry_id = 0;
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssddsi', $company_id, $entry_no, $event_id, $posting_date, $tot_d, $tot_c, $memo, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        $entry_id = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
-    }
-    if ($entry_id > 0) {
-        $ls = mysqli_prepare($conn, "INSERT INTO fin_journal_lines (company_id, entry_id, account_id, debit, credit, memo) VALUES (?,?,?,?,?,?)");
-        if ($ls) {
-            foreach ($lines as $ln) {
-                mysqli_stmt_bind_param($ls, 'iiidds', $company_id, $entry_id, $ln['acc'], $ln['d'], $ln['c'], $ln['m']);
-                mysqli_stmt_execute($ls);
-            }
-            mysqli_stmt_close($ls);
+    // رأس + سطور = زوجٌ ذرّي (§9): إمّا القيد كاملًا أو لا شيء (لا رأسٌ بلا سطوره)
+    ems_tenant_db()->runInTransaction(function ($g) use ($entry_no, $event_id, $posting_date, $tot_d, $tot_c, $memo, $current_user_id, $lines) {
+        $entry_id = $g->insert('fin_journal_entries', array(
+            'entry_no' => $entry_no, 'event_id' => $event_id, 'posting_date' => $posting_date,
+            'total_debit' => $tot_d, 'total_credit' => $tot_c, 'memo' => $memo,
+            'state' => 'draft', 'created_by' => $current_user_id,
+        ));
+        foreach ($lines as $ln) {
+            $g->insert('fin_journal_lines', array(
+                'entry_id' => $entry_id, 'account_id' => $ln['acc'],
+                'debit' => $ln['d'], 'credit' => $ln['c'], 'memo' => $ln['m'],
+            ));
         }
-    }
+    }, 'create journal entry + lines');
     $bal = (round($tot_d, 2) === round($tot_c, 2)) ? 'متوازن' : 'غير متوازن';
     header("Location: journal_form_fin.php?msg=تم+حفظ+القيد+($bal)+✅"); exit();
 }
@@ -162,11 +173,13 @@ include '../insidebar.php';
                         <select name="event_id" id="j_event">
                             <option value="">— بلا حدث —</option>
                             <?php
-                            $evsql = "SELECT id, CONCAT(event_no,' — ',amount,' ',currency) AS label FROM fin_financial_events
-                                      WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 AND state IN('approved','audited','fin_review') ORDER BY id DESC";
-                            if ($er = mysqli_query($conn, $evsql)) { while ($e = mysqli_fetch_assoc($er)) {
-                                echo "<option value='" . intval($e['id']) . "'>" . htmlspecialchars($e['label']) . "</option>";
-                            } }
+                            // القوائم قراءةٌ عابرة للسوبر (fin_gate) — التسمية تُركَّب PHP-side
+                            $ev_opts = fin_gate($is_super_admin)->select('fin_financial_events', array(
+                                'whereRaw' => "state IN('approved','audited','fin_review')",
+                                'orderBy'  => 'id DESC'));
+                            foreach ($ev_opts as $e) {
+                                echo "<option value='" . intval($e['id']) . "'>" . htmlspecialchars($e['event_no'] . ' — ' . $e['amount'] . ' ' . $e['currency']) . "</option>";
+                            }
                             ?>
                         </select>
                     </div>
@@ -207,10 +220,8 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $scope_j = fin_scope('company_id', $is_super_admin, $company_id);
-                    $sql = "SELECT * FROM fin_journal_entries WHERE $scope_j AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $entries = fin_gate($is_super_admin)->select('fin_journal_entries', array('orderBy' => 'id DESC'));
+                    foreach ($entries as $row) {
                         $balanced = (round((float)$row['total_debit'], 2) === round((float)$row['total_credit'], 2));
                         $st = (string)$row['state'];
                         $st_label = $st === 'posted' ? 'مرحَّل' : ($st === 'reversed' ? 'معكوس' : 'مسودة');
@@ -232,7 +243,7 @@ include '../insidebar.php';
                         echo "<td>" . htmlspecialchars((string)($row['memo'] ?? '')) . "</td>";
                         echo "<td><span class='badge badge-" . $st_tone . "'>" . htmlspecialchars($st_label) . "</span></td>";
                         echo "</tr>";
-                    } }
+                    }
                     ?>
                 </tbody>
             </table>
