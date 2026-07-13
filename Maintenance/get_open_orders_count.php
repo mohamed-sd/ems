@@ -19,18 +19,9 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 
 $count = 0;
 if ($company_id > 0) {
-    $sql = "SELECT COUNT(*) AS c FROM mnt_order
-            WHERE company_id = ? AND is_auto = 1
-              AND state IN ('بلاغ', 'تنفيذ', 'فحص') AND COALESCE(is_deleted, 0) = 0";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'i', $company_id);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        if ($res && ($row = mysqli_fetch_assoc($res))) {
-            $count = intval($row['c']);
-        }
-        mysqli_stmt_close($stmt);
-    }
+    // عبر البوابة: العزل بالشركة يُحقن؛ is_deleted مستبعَد تلقائيًّا (mnt_order soft)
+    $count = ems_tenant_db()->count('mnt_order', array(
+        'whereRaw' => "is_auto = 1 AND state IN ('بلاغ', 'تنفيذ', 'فحص')"));
 }
 
 // إيقاف أي output buffers قبل إرجاع JSON (نمط chats/get_unread_count.php).
