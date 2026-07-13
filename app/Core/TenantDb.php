@@ -297,6 +297,69 @@ class TenantDb
     }
 
     /**
+     * حذف صفِّ ابنٍ واحد صلبًا — deleteChild (توأم replaceChildren لصفٍّ مفرد · 2026-07-13)
+     * ───────────────────────────────────────────────────────────────────────
+     * لجداول السطور التزايُدية (soft=false) التي تُحرَّر صفًّا صفًّا لا استبدالًا كاملًا
+     * (مهام الخطة الوقائية، عمالة/قطع أمر الصيانة، سطور الفحص). الحذف مقيَّدٌ بنطاقٍ
+     * مزدوجٍ إلزامي — الشركة **و** الأبِ المملوكِ المتحقَّق (لا يكفي أحدهما) — تمامًا
+     * كـreplaceChildren؛ لكن على صفٍّ واحد بمعرّفه (لا استبدال، فلا تتغيّر معرّفات
+     * الأشقّاء). عبارةٌ ذرّية واحدة (تشارك معاملة المستدعي إن كان داخل runInTransaction).
+     * كل استدعاءٍ يُسجَّل (أثرٌ إلزامي — يحذف بيانات). ليست بديلًا عن softDelete: سجلات
+     * الأعمال تُؤرشَف، وهذه لأسطر التفاصيل الصلبة حصرًا.
+     *
+     * @param string $childTable  جدول الأبناء (مستأجَر بcompany_id)
+     * @param int    $childId
+     * @param string $parentTable جدول الأب (تُتحقق ملكيته لشركة السياق)
+     * @param int    $parentId
+     * @param string $parentCol   عمود إشارة الابن لأبيه
+     * @return int عدد الصفوف المحذوفة (0 إن لم يطابق النطاق المزدوج)
+     */
+    public function deleteChild($childTable, $childId, $parentTable, $parentId, $parentCol, $note = '')
+    {
+        $childId = intval($childId);
+        $parentId = intval($parentId);
+        $this->assertIdent($parentCol);
+        $cDef = $this->requireTable($childTable, true); // strict — لا عبور مراقبةٍ للحذف أبدًا
+        $pDef = $this->requireTable($parentTable, true);
+        if ($cDef['type'] !== TenantRegistry::T_TENANT || $pDef['type'] !== TenantRegistry::T_TENANT) {
+            $this->deny('deleteChild requires tenant-scoped parent and child', $parentTable . '/' . $childTable);
+        }
+        $this->requireTenant($parentTable);
+        $cid = $this->ctx->companyId();
+
+        // النطاق 1: الأب مملوكٌ لشركة السياق (تحقُّق صريح — يُرفض غير المملوك)
+        $owned = $this->selectOne($parentTable, array('columns' => array('id'), 'where' => array('id' => $parentId), 'includeDeleted' => true));
+        if ($owned === null) {
+            $this->deny('deleteChild: parent not owned by tenant', $parentTable . '#' . $parentId);
+        }
+
+        // النطاق 2: حذف الابن بالشروط الثلاثة معًا إلزامًا (الصف + الأب + الشركة)
+        $stmt = $this->conn->prepare(
+            'DELETE FROM `' . $childTable . '` WHERE `id` = ? AND `' . $parentCol . '` = ? AND `company_id` = ?'
+        );
+        if (!$stmt) {
+            throw new TenantGateException('deleteChild prepare failed: ' . $this->conn->error);
+        }
+        $stmt->bind_param('iii', $childId, $parentId, $cid);
+        if (!$stmt->execute()) {
+            $err = $stmt->error;
+            $stmt->close();
+            throw new TenantGateException('deleteChild delete failed: ' . $err);
+        }
+        $deleted = $stmt->affected_rows;
+        $stmt->close();
+
+        if (function_exists('log_security_event')) {
+            log_security_event('tenant_gate_delete_child',
+                $childTable . '#' . $childId . ' of ' . $parentTable . '#' . $parentId
+                . ' deleted=' . $deleted
+                . ' | user=' . $this->ctx->userId() . ' company=' . $cid
+                . ($note !== '' ? ' note=' . substr($note, 0, 120) : ''));
+        }
+        return (int) $deleted;
+    }
+
+    /**
      * الاستعلام المركّب المعزول — scopedQuery (K9-D · قرار المستخدم ب · 2026-07-08)
      * ───────────────────────────────────────────────────────────────────────
      * للقراءات التجميعية/المركّبة (GROUP BY/JOINs) التي تتجاوز CRUD والترطيب:
