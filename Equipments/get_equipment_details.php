@@ -79,19 +79,25 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $equipment_id = intval($_GET['id']);
 
-$company_scope = ($equipments_has_company_id && $current_company_id > 0)
-    ? " AND e.company_id = $current_company_id"
-    : "";
+// بوابة العزل — نقطة JSON بلا تمييز سوبر أصلًا (الأصل يعزل كلَّ مَن له شركة>0)؛
+// البوابة تعزل بشركة السياق وتُغلق مغلقًا عند غيابها (أشدّ من الأصل الذي كان يمرّر).
+$det_gate = ems_tenant_db();
 
-// جلب جميع بيانات المعدة
+// جلب جميع بيانات المعدة (العزل عبر {TENANT_SCOPE}؛ et كتالوج عام لا يُعلَن)
 $fleet_model_select = $equipments_has_model_id
     ? ", fm.code AS fleet_model_code, fm.model_name AS fleet_model_name"
     : "";
 $fleet_model_join = $equipments_has_model_id
     ? " LEFT JOIN fleet_model fm ON fm.id = e.model_id"
     : "";
+$det_enrich = array('s' => 'suppliers');
+if ($equipments_has_model_id) { $det_enrich['fm'] = 'fleet_model'; }
 
-$query = "
+try {
+    $det_rows = $det_gate->scopedQuery(array(
+        'scope'  => array('e' => 'equipments'),
+        'enrich' => $det_enrich,
+    ), "
     SELECT
         e.*,
         et.type AS equipment_type_name,
@@ -99,21 +105,18 @@ $query = "
     FROM equipments e
     LEFT JOIN suppliers s ON e.suppliers = s.id
     LEFT JOIN equipments_types et ON et.id = e.type$fleet_model_join
-    WHERE e.id = $equipment_id $company_scope
+    WHERE {TENANT_SCOPE} AND e.id = ?
     LIMIT 1
-";
-
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
+", array($equipment_id));
+} catch (\Throwable $t) {
     die(json_encode(['success' => false, 'message' => 'خطأ في الاستعلام']));
 }
 
-if (mysqli_num_rows($result) === 0) {
+if (empty($det_rows)) {
     die(json_encode(['success' => false, 'message' => 'المعدة غير موجودة']));
 }
 
-$equipment = mysqli_fetch_assoc($result);
+$equipment = $det_rows[0];
 $equipment['project_name'] = '';
 $equipment['mine_name'] = '';
 
@@ -128,21 +131,35 @@ if (($operations_project_col !== '' || $operations_has_mine_id) && db_table_has_
     }
 
     if (!empty($opsSelect)) {
-        $opsQuery = "SELECT " . implode(', ', $opsSelect) . " FROM operations o WHERE o.equipment = $equipment_id";
-        if ($operations_has_status) {
-            $opsQuery .= " AND o.status = '1'";
-        }
-        $opsQuery .= " ORDER BY o.id DESC LIMIT 1";
-
-        $opsResult = mysqli_query($conn, $opsQuery);
-        if ($opsResult && mysqli_num_rows($opsResult) > 0) {
-            $opsRow = mysqli_fetch_assoc($opsResult);
+        // آخر تشغيلٍ للمعدة — معزولًا (الأصل كان بلا عزل شركةٍ هنا: تسرّبٌ كامن أُغلق).
+        // أعمدة البوابة معرِّفاتٌ صرفة، فتُجلَب بأسمائها وتُسمّى op_* في PHP.
+        $ops_cols = array();
+        if ($operations_project_col !== '') { $ops_cols[] = $operations_project_col; }
+        if ($operations_has_mine_id) { $ops_cols[] = 'mine_id'; }
+        $ops_where = "equipment = ?";
+        if ($operations_has_status) { $ops_where .= " AND status = '1'"; }
+        $opsRowRaw = $det_gate->selectOne('operations', array(
+            'columns'  => $ops_cols,
+            'whereRaw' => $ops_where,
+            'params'   => array($equipment_id),
+            'orderBy'  => 'id DESC',
+        ));
+        if ($opsRowRaw !== null) {
+            $opsRow = array();
+            if ($operations_project_col !== '' && array_key_exists($operations_project_col, $opsRowRaw)) {
+                $opsRow['op_project_id'] = $opsRowRaw[$operations_project_col];
+            }
+            if ($operations_has_mine_id && array_key_exists('mine_id', $opsRowRaw)) {
+                $opsRow['op_mine_id'] = $opsRowRaw['mine_id'];
+            }
 
             $opProjectId = isset($opsRow['op_project_id']) ? intval($opsRow['op_project_id']) : 0;
             if ($opProjectId > 0) {
-                $pResult = mysqli_query($conn, "SELECT name FROM project WHERE id = $opProjectId LIMIT 1");
-                if ($pResult && mysqli_num_rows($pResult) > 0) {
-                    $pRow = mysqli_fetch_assoc($pResult);
+                $pRow = $det_gate->selectOne('project', array(
+                    'columns' => array('name'),
+                    'where'   => array('id' => $opProjectId),
+                ));
+                if ($pRow !== null) {
                     $equipment['project_name'] = isset($pRow['name']) ? $pRow['name'] : '';
                 }
             }
@@ -151,11 +168,17 @@ if (($operations_project_col !== '' || $operations_has_mine_id) && db_table_has_
             if ($opMineId > 0) {
                 $mineNameCol = $mines_has_mine_name ? 'mine_name' : ($mines_has_name ? 'name' : '');
                 if ($mineNameCol !== '') {
-                    $mResult = mysqli_query($conn, "SELECT $mineNameCol AS mine_name FROM mines WHERE id = $opMineId LIMIT 1");
-                    if ($mResult && mysqli_num_rows($mResult) > 0) {
-                        $mRow = mysqli_fetch_assoc($mResult);
-                        $equipment['mine_name'] = isset($mRow['mine_name']) ? $mRow['mine_name'] : '';
-                    }
+                    // فرعٌ خاملٌ عمليًّا (جدول mines محذوف فتفشل فحوص الأعمدة أعلاه)؛
+                    // إن عاد الجدول يومًا فغير المسجَّل في العقد يُرفَض مغلقًا (try تحفظ الـJSON).
+                    try {
+                        $mRow = $det_gate->selectOne('mines', array(
+                            'columns' => array($mineNameCol),
+                            'where'   => array('id' => $opMineId),
+                        ));
+                        if ($mRow !== null) {
+                            $equipment['mine_name'] = isset($mRow[$mineNameCol]) ? $mRow[$mineNameCol] : '';
+                        }
+                    } catch (\Throwable $t) { /* غير مسجَّل بالعقد = يبقى الاسم فارغًا */ }
                 }
             }
         }
@@ -180,17 +203,22 @@ $equipment['docs_soon'] = 0;
 $equipment['docs_critical_expired'] = 0;
 if (db_table_has_column($conn, 'fleet_equipment_compliance', 'id')) {
     $today = date('Y-m-d');
-    $cscope = ($equipments_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
-    $cq = mysqli_query($conn, "SELECT
-            SUM(expiry_date IS NOT NULL AND expiry_date <> '0000-00-00' AND expiry_date < '$today') AS expired,
-            SUM(expiry_date IS NOT NULL AND expiry_date >= '$today' AND expiry_date <= DATE_ADD('$today', INTERVAL 30 DAY)) AS soon,
-            SUM(expiry_date IS NOT NULL AND expiry_date <> '0000-00-00' AND expiry_date < '$today' AND is_critical = 1) AS crit
-        FROM fleet_equipment_compliance WHERE equipment_id = $equipment_id AND is_deleted = 0$cscope");
-    if ($cq && ($cr = mysqli_fetch_assoc($cq))) {
-        $equipment['docs_expired'] = intval($cr['expired']);
-        $equipment['docs_soon'] = intval($cr['soon']);
-        $equipment['docs_critical_expired'] = intval($cr['crit']);
-    }
+    // تجميعٌ (SUM تعبيرية) عبر scopedQuery — العزل مسؤولية البوابة، والتواريخ معاملات.
+    try {
+        $cRows = $det_gate->scopedQuery(array(
+            'scope' => array('fec' => 'fleet_equipment_compliance'),
+        ), "SELECT
+            SUM(fec.expiry_date IS NOT NULL AND fec.expiry_date <> '0000-00-00' AND fec.expiry_date < ?) AS expired,
+            SUM(fec.expiry_date IS NOT NULL AND fec.expiry_date >= ? AND fec.expiry_date <= DATE_ADD(?, INTERVAL 30 DAY)) AS soon,
+            SUM(fec.expiry_date IS NOT NULL AND fec.expiry_date <> '0000-00-00' AND fec.expiry_date < ? AND fec.is_critical = 1) AS crit
+        FROM fleet_equipment_compliance fec WHERE {TENANT_SCOPE} AND fec.equipment_id = ? AND fec.is_deleted = 0",
+            array($today, $today, $today, $today, $equipment_id));
+        if (!empty($cRows)) {
+            $equipment['docs_expired'] = intval($cRows[0]['expired']);
+            $equipment['docs_soon'] = intval($cRows[0]['soon']);
+            $equipment['docs_critical_expired'] = intval($cRows[0]['crit']);
+        }
+    } catch (\Throwable $t) { /* تبقى الأصفار الافتراضية */ }
 }
 
 echo json_encode([
