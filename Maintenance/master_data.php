@@ -68,23 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     }
 
     if ($is_editing) {
-        // التحديث مقيّد بالشركة (لا تعدّل صفّ شركة أخرى)
-        $sql = "UPDATE mnt_lookup SET type = ?, name = ?, extra = ?
-                 WHERE id = ? AND company_id = ? AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'sssii', $type, $name, $extra, $id, $company_id);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-        }
+        // التحديث عبر البوابة — العزل بالشركة يُحقن تلقائيًّا؛ حارس is_deleted عبر whereRaw
+        ems_tenant_db()->update('mnt_lookup',
+            array('type' => $type, 'name' => $name, 'extra' => $extra),
+            array('id' => $id), "COALESCE(is_deleted,0)=0");
         header("Location: master_data.php?msg=تم+تعديل+العنصر+بنجاح+✅"); exit();
     } else {
-        $sql = "INSERT INTO mnt_lookup (company_id, type, name, extra, created_by)
-                VALUES (?, ?, ?, ?, ?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'isssi', $company_id, $type, $name, $extra, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-        }
+        ems_tenant_db()->insert('mnt_lookup', array(
+            'type' => $type, 'name' => $name, 'extra' => $extra, 'created_by' => $current_user_id));
         header("Location: master_data.php?msg=تمت+إضافة+العنصر+بنجاح+✅"); exit();
     }
 }
@@ -97,13 +88,7 @@ if (isset($_GET['delete_id'])) {
         header("Location: master_data.php?msg=لا+توجد+صلاحية+حذف+❌"); exit();
     }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE mnt_lookup SET is_deleted = 1, deleted_at = NOW(), deleted_by = ?
-             WHERE id = ? AND company_id = ?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->softDelete('mnt_lookup', $delete_id); // حذف ناعم معزول بالشركة تلقائيًّا
     header("Location: master_data.php?msg=تم+حذف+العنصر+بنجاح+✅"); exit();
 }
 
@@ -198,11 +183,12 @@ include '../insidebar.php';
                     </thead>
                     <tbody>
                         <?php
-                        $sql = "SELECT id, type, name, extra FROM mnt_lookup
-                                 WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0
-                                 ORDER BY type ASC, name ASC";
-                        $result = mysqli_query($conn, $sql);
-                        if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                        // العرض عبر البوابة (super→كل الشركات via forAllTenants، يوافق 1=1)
+                        $mnt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('maintenance master super view') : ems_tenant_db();
+                        $rows = $mnt_gate->select('mnt_lookup', array(
+                            'columns' => array('id', 'type', 'name', 'extra'),
+                            'orderBy' => 'type ASC, name ASC'));
+                        foreach ($rows as $row) {
                             $data_attrs =
                                 "data-id='" . intval($row['id']) . "' " .
                                 "data-type='" . htmlspecialchars((string) $row['type'], ENT_QUOTES) . "' " .
@@ -222,7 +208,7 @@ include '../insidebar.php';
                             echo "<td>" . htmlspecialchars((string) $row['name']) . "</td>";
                             echo "<td>" . htmlspecialchars((string) ($row['extra'] ?? '')) . "</td>";
                             echo "</tr>";
-                        } }
+                        }
                         ?>
                     </tbody>
                 </table>
