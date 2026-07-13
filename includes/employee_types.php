@@ -31,6 +31,15 @@ if (!function_exists('ems_save_employee_extra')) {
      *
      * @param string $scope_sql قيد إضافي مثل " AND company_id = 5" أو ''.
      */
+    /** بوابةُ مساعدي الموظفين — تُشتق من الجلسة (نمط contract_children_gate). */
+    function ems_employee_helper_gate()
+    {
+        $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+        return ($role === '-1')
+            ? ems_tenant_db()->forAllTenants('employee helpers super')
+            : ems_tenant_db();
+    }
+
     function ems_save_employee_extra($conn, $emp_id, $scope_sql = '')
     {
         $emp_id = intval($emp_id);
@@ -41,29 +50,23 @@ if (!function_exists('ems_save_employee_extra')) {
             'emergency_contact_name', 'emergency_contact_relation', 'emergency_contact_phone',
             'medical_report_path',
         ];
-        $sets = [];
-        $types = '';
-        $vals = [];
+        // مصفوفة قيمٍ أصلية (NULL حقيقي للفارغ) — التوقيع محفوظ و$scope_sql لم يعد
+        // مصدرَ العزل (البوابة تحقنه)
+        $data = [];
         foreach ($cols as $col) {
             if (!db_table_has_column($conn, 'employees', $col)) continue;
             if (!isset($_POST[$col])) continue;
             $raw = trim((string) $_POST[$col]);
             if ($col === 'employee_type' && $raw === '') $raw = 'سائق/مشغّل';
-            $sets[] = "`$col` = ?";
-            $types .= 's';
-            $vals[] = ($raw === '') ? null : $raw;
+            $data[$col] = ($raw === '') ? null : $raw;
         }
-        if (empty($sets)) return;
+        if (empty($data)) return;
 
-        $sql = "UPDATE employees SET " . implode(', ', $sets) . " WHERE id = ?" . $scope_sql;
-        $types .= 'i';
-        $vals[] = $emp_id;
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) return;
-        $bind = [$types];
-        for ($i = 0; $i < count($vals); $i++) $bind[] = &$vals[$i];
-        call_user_func_array([$stmt, 'bind_param'], $bind);
-        $stmt->execute();
+        try {
+            ems_employee_helper_gate()->update('employees', $data, ['id' => $emp_id]);
+        } catch (\Throwable $e) {
+            // كالأصل: فشل الحفظ الإضافي لا يقطع حفظ الموظف الرئيس
+        }
     }
 }
 
@@ -82,11 +85,16 @@ if (!function_exists('ems_sync_equipment_operator')) {
         if ($emp_id <= 0) return;
         if (!db_table_has_column($conn, 'equipment_operators', 'employee_id')) return; // الطبقة غير مطبَّقة
 
-        $res = @mysqli_query($conn, "SELECT id, company_id, employee_type, employee_role_id, license_number, license_type, license_grade, license_issuer,
-                   license_issue_date, license_expiry_date, license_photo, specialized_equipment, medical_report_path,
-                   job_title_id FROM employees WHERE id = $emp_id" . $scope_sql . " LIMIT 1");
-        if (!$res) return;
-        $e = mysqli_fetch_assoc($res);
+        try {
+            $gate = ems_employee_helper_gate();
+            $e = $gate->selectOne('employees', [
+                'columns' => ['id', 'company_id', 'employee_type', 'employee_role_id', 'license_number', 'license_type', 'license_grade', 'license_issuer',
+                    'license_issue_date', 'license_expiry_date', 'license_photo', 'specialized_equipment', 'medical_report_path', 'job_title_id'],
+                'where'   => ['id' => $emp_id],
+            ]);
+        } catch (\Throwable $t) {
+            return;
+        }
         if (!$e) return;
 
         // قاعدة الإسناد التلقائي لجدول المشغّلين: الموظف بدور «سائق/مشغّل» فقط.
@@ -95,11 +103,11 @@ if (!function_exists('ems_sync_equipment_operator')) {
         // (employee_type) تشغيلياً أو كانت لديه رخصة. عند غياب المسمّى نستند إلى الدور ثم النوع.
         $is_operator = false;
         if (!empty($e['job_title_id'])) {
-            $jq = @mysqli_query($conn, "SELECT is_operator FROM job_titles WHERE id = " . intval($e['job_title_id']) . " LIMIT 1");
-            if ($jq && ($jr = mysqli_fetch_assoc($jq))) $is_operator = intval($jr['is_operator']) === 1;
+            $jr = $gate->selectOne('job_titles', ['columns' => ['is_operator'], 'where' => ['id' => intval($e['job_title_id'])]]);
+            if ($jr) $is_operator = intval($jr['is_operator']) === 1;
         } elseif (!empty($e['employee_role_id'])) {
-            $rq = @mysqli_query($conn, "SELECT name FROM employee_roles WHERE id = " . intval($e['employee_role_id']) . " LIMIT 1");
-            if ($rq && ($rr = mysqli_fetch_assoc($rq))) {
+            $rr = $gate->selectOne('employee_roles', ['columns' => ['name'], 'where' => ['id' => intval($e['employee_role_id'])]]);
+            if ($rr) {
                 $rn = (string) $rr['name'];
                 $is_operator = (mb_strpos($rn, 'سائق') !== false) || (mb_strpos($rn, 'مشغّل') !== false) || (mb_strpos($rn, 'مشغل') !== false);
             }
@@ -108,40 +116,46 @@ if (!function_exists('ems_sync_equipment_operator')) {
         }
 
         if (!$is_operator) {
-            // ليس سائقاً/مشغّلاً (أو جرى تحويله إلى مسمّى غير تشغيليّ): أزِل أيّ سجل مشغّل
-            // قائم له حتى لا يبقى عالقاً في جدول المشغّلين، ثم لا تُنشئ سجلاً جديداً.
-            if ($ds = $conn->prepare("DELETE FROM equipment_operators WHERE employee_id = ?")) {
-                $ds->bind_param('i', $emp_id);
-                $ds->execute();
-                $ds->close();
-            }
+            // ليس سائقاً/مشغّلاً: أزِل سجل المشغّل القائم — حذفٌ صلبٌ عبر deleteChild
+            // (النطاق المزدوج: الشركة + الموظف الأب المملوك المتحقَّق).
+            try {
+                $op = $gate->selectOne('equipment_operators', ['columns' => ['id'], 'where' => ['employee_id' => $emp_id]]);
+                if ($op) {
+                    $gate->deleteChild('equipment_operators', intval($op['id']), 'employees', $emp_id, 'employee_id', 'operator unsync');
+                }
+            } catch (\Throwable $t) { /* لا سجل/غير مملوك → لا شيء */ }
             return;
         }
 
-        $sql = "INSERT INTO equipment_operators
-                  (company_id, employee_id, license_number, license_type, license_grade, license_issuer,
-                   license_issue_date, license_expiry_date, license_photo, operating_categories, medical_report_path, status)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,1)
-                ON DUPLICATE KEY UPDATE
-                  license_number=VALUES(license_number), license_type=VALUES(license_type), license_grade=VALUES(license_grade),
-                  license_issuer=VALUES(license_issuer), license_issue_date=VALUES(license_issue_date),
-                  license_expiry_date=VALUES(license_expiry_date), license_photo=VALUES(license_photo),
-                  operating_categories=VALUES(operating_categories), medical_report_path=VALUES(medical_report_path)";
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) return;
-        $cid    = ($e['company_id'] !== null) ? intval($e['company_id']) : null;
-        $lnum   = $e['license_number'];
-        $ltype  = $e['license_type'];
-        $lgrade = $e['license_grade'];
-        $liss   = $e['license_issuer'];
-        $lid    = $e['license_issue_date'] ?: null;
-        $lexp   = $e['license_expiry_date'] ?: null;
-        $lphoto = $e['license_photo'];
-        $opcat  = $e['specialized_equipment'];
-        $med    = $e['medical_report_path'];
-        $stmt->bind_param('iisssssssss', $cid, $emp_id, $lnum, $ltype, $lgrade, $liss, $lid, $lexp, $lphoto, $opcat, $med);
-        $stmt->execute();
-        $stmt->close();
+        // ترقية upsert (كان ON DUPLICATE KEY): employee_id مفتاحٌ فريد — قراءةٌ ثم
+        // تحديث/إدراج عبر البوابة. غير السوبر: الشركة تُحقن؛ السوبر: شركة الموظف صراحةً.
+        $op_data = [
+            'license_number'      => $e['license_number'],
+            'license_type'        => $e['license_type'],
+            'license_grade'       => $e['license_grade'],
+            'license_issuer'      => $e['license_issuer'],
+            'license_issue_date'  => $e['license_issue_date'] ?: null,
+            'license_expiry_date' => $e['license_expiry_date'] ?: null,
+            'license_photo'       => $e['license_photo'],
+            'operating_categories' => $e['specialized_equipment'],
+            'medical_report_path' => $e['medical_report_path'],
+        ];
+        try {
+            $existing = $gate->selectOne('equipment_operators', ['columns' => ['id'], 'where' => ['employee_id' => $emp_id]]);
+            if ($existing) {
+                $gate->update('equipment_operators', $op_data, ['id' => intval($existing['id'])]);
+            } else {
+                $op_data['employee_id'] = $emp_id;
+                $op_data['status'] = 1;
+                $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+                if ($role === '-1' && $e['company_id'] !== null) {
+                    $op_data['company_id'] = intval($e['company_id']);
+                }
+                $gate->insert('equipment_operators', $op_data);
+            }
+        } catch (\Throwable $t) {
+            // كالأصل: فشل المزامنة لا يقطع حفظ الموظف
+        }
     }
 }
 

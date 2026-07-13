@@ -31,24 +31,9 @@ if (!$is_super_admin && !$drivers_has_company) {
     die('لا يمكن تطبيق العزل التام للموظفين لأن عمود company_id غير متاح في جدول الموظفين.');
 }
 
-$driver_scope_where = "id = %d";
-if (!$is_super_admin) {
-    if ($drivers_has_company) {
-        $driver_scope_where .= " AND company_id = $company_id";
-    } else {
-        $driver_scope_where .= " AND EXISTS (
-            SELECT 1
-            FROM drivercontracts dsc
-            INNER JOIN project sp ON sp.id = dsc.project_id
-            INNER JOIN users su ON su.id = sp.created_by
-            WHERE dsc.employee_id = employees.id
-              AND su.company_id = $company_id
-        )";
-    }
-}
-
-$driver_insert_col = (!$is_super_admin && $drivers_has_company) ? ", company_id" : "";
-$driver_insert_val = (!$is_super_admin && $drivers_has_company) ? ", '$company_id'" : "";
+// بوابة العزل — تستبدل سُلَّم النطاق اليدوي (وفيه احتياطي created_by القديم عبر
+// drivercontracts/project/users). employees لها company_id مقيسةً فالعزل مباشر.
+$emp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('employees super view') : ems_tenant_db();
 
 // ════════════════════════════════════════════════════════════════════════════
 // ðŸ” التحقق من صلاحيات المستخدم
@@ -82,169 +67,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     }
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
-    // 1. المعلومات الأساسية والتعريفية
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $employee_code = mysqli_real_escape_string($conn, trim($_POST['employee_code']));
-    $nickname = mysqli_real_escape_string($conn, trim($_POST['nickname']));
+    // قيمٌ خام للبوابة (النمط المُثبَت) — الربط بالمعاملات يتكفّل بالهروب، والفوارغ
+    // القابلة للإلغاء NULL حقيقيّ. حقول الرخصة لم تعد تُكتب من هنا (صفحة المشغّلين).
+    $employee_code = trim($_POST['employee_code']);
+    $data = array(
+        'name'                   => trim($_POST['name']),
+        'employee_code'          => $employee_code,
+        'nickname'               => trim($_POST['nickname']),
+        'identity_type'          => $_POST['identity_type'],
+        'identity_number'        => trim($_POST['identity_number']),
+        'identity_expiry_date'   => !empty($_POST['identity_expiry_date']) ? $_POST['identity_expiry_date'] : null,
+        'employee_photo'         => trim(isset($_POST['employee_photo']) ? $_POST['employee_photo'] : ''),
+        'identity_photo'         => trim(isset($_POST['identity_photo']) ? $_POST['identity_photo'] : ''),
+        'years_in_field'         => !empty($_POST['years_in_field']) ? intval($_POST['years_in_field']) : null,
+        'years_on_equipment'     => !empty($_POST['years_on_equipment']) ? intval($_POST['years_on_equipment']) : null,
+        'skill_level'            => $_POST['skill_level'],
+        'certificates'           => trim($_POST['certificates']),
+        'owner_supervisor'       => trim($_POST['owner_supervisor']),
+        'supplier_id'            => !empty($_POST['supplier_id']) ? intval($_POST['supplier_id']) : null,
+        'project_id'             => !empty($_POST['project_id']) ? intval($_POST['project_id']) : null,
+        'employment_affiliation' => $_POST['employment_affiliation'],
+        'salary_type'            => $_POST['salary_type'],
+        'monthly_salary'         => !empty($_POST['monthly_salary']) ? floatval($_POST['monthly_salary']) : null,
+        'email'                  => trim($_POST['email']),
+        'phone'                  => trim($_POST['phone']),
+        'phone_alternative'      => trim($_POST['phone_alternative']),
+        'address'                => trim($_POST['address']),
+        'performance_rating'     => $_POST['performance_rating'],
+        'behavior_record'        => $_POST['behavior_record'],
+        'accident_record'        => $_POST['accident_record'],
+        'health_status'          => $_POST['health_status'],
+        'health_issues'          => trim($_POST['health_issues']),
+        'vaccinations_status'    => $_POST['vaccinations_status'],
+        'previous_employer'      => trim($_POST['previous_employer']),
+        'employment_duration'    => trim($_POST['employment_duration']),
+        'reference_contact'      => trim($_POST['reference_contact']),
+        'general_notes'          => trim($_POST['general_notes']),
+        'employee_status'        => $_POST['employee_status'],
+        'start_date'             => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
+        'status'                 => $_POST['status'],
+    );
 
-    // 2. بيانات الهوية والتوثيق
-    $identity_type = mysqli_real_escape_string($conn, $_POST['identity_type']);
-    $identity_number = mysqli_real_escape_string($conn, trim($_POST['identity_number']));
-    $identity_expiry_date = !empty($_POST['identity_expiry_date']) ? mysqli_real_escape_string($conn, $_POST['identity_expiry_date']) : NULL;
-    $employee_photo = mysqli_real_escape_string($conn, trim(isset($_POST['employee_photo']) ? $_POST['employee_photo'] : ''));
-    $identity_photo = mysqli_real_escape_string($conn, trim(isset($_POST['identity_photo']) ? $_POST['identity_photo'] : ''));
-
-    // 3. رخصة القيادة والمعدات المتخصّصة — نُقِلت إدارتها إلى صفحة «السائقون والمشغّلون»
-    //    (لم تَعُد تُكتب من شاشة الموظفين؛ تبقى المتغيرات محميةً تجنّباً لتحذيرات المفاتيح غير المعرّفة).
-    $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
-    $license_type = mysqli_real_escape_string($conn, $_POST['license_type'] ?? '');
-    $license_expiry_date = !empty($_POST['license_expiry_date']) ? mysqli_real_escape_string($conn, $_POST['license_expiry_date']) : NULL;
-    $license_issuer = mysqli_real_escape_string($conn, trim($_POST['license_issuer'] ?? ''));
-
-    // 4. التخصص والمهارات
-    $specialized_equipment = isset($_POST['specialized_equipment']) ? implode(', ', $_POST['specialized_equipment']) : '';
-    $specialized_equipment = mysqli_real_escape_string($conn, $specialized_equipment);
-
-    // 5. سنوات الخبرة والكفاءة
-    $years_in_field = !empty($_POST['years_in_field']) ? intval($_POST['years_in_field']) : NULL;
-    $years_on_equipment = !empty($_POST['years_on_equipment']) ? intval($_POST['years_on_equipment']) : NULL;
-    $skill_level = mysqli_real_escape_string($conn, $_POST['skill_level']);
-    $certificates = mysqli_real_escape_string($conn, trim($_POST['certificates']));
-
-    // 6. علاقة العمل والتبعية
-    $owner_supervisor = mysqli_real_escape_string($conn, trim($_POST['owner_supervisor']));
-    $supplier_id = !empty($_POST['supplier_id']) ? intval($_POST['supplier_id']) : NULL;
-    $project_id = !empty($_POST['project_id']) ? intval($_POST['project_id']) : NULL;
-    $employment_affiliation = mysqli_real_escape_string($conn, $_POST['employment_affiliation']);
-    $salary_type = mysqli_real_escape_string($conn, $_POST['salary_type']);
-    $monthly_salary = !empty($_POST['monthly_salary']) ? floatval($_POST['monthly_salary']) : NULL;
-
-    // 7. البيانات التواصلية
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $phone_alternative = mysqli_real_escape_string($conn, trim($_POST['phone_alternative']));
-    $address = mysqli_real_escape_string($conn, trim($_POST['address']));
-
-    // 8. تقييم الأداء والسلوك
-    $performance_rating = mysqli_real_escape_string($conn, $_POST['performance_rating']);
-    $behavior_record = mysqli_real_escape_string($conn, $_POST['behavior_record']);
-    $accident_record = mysqli_real_escape_string($conn, $_POST['accident_record']);
-
-    // 9. الصحة والسلامة
-    $health_status = mysqli_real_escape_string($conn, $_POST['health_status']);
-    $health_issues = mysqli_real_escape_string($conn, trim($_POST['health_issues']));
-    $vaccinations_status = mysqli_real_escape_string($conn, $_POST['vaccinations_status']);
-
-    // 10. المراجع والسجل
-    $previous_employer = mysqli_real_escape_string($conn, trim($_POST['previous_employer']));
-    $employment_duration = mysqli_real_escape_string($conn, trim($_POST['employment_duration']));
-    $reference_contact = mysqli_real_escape_string($conn, trim($_POST['reference_contact']));
-    $general_notes = mysqli_real_escape_string($conn, trim($_POST['general_notes']));
-
-    // 11. الحالة والتفعيل
-    $employee_status = mysqli_real_escape_string($conn, $_POST['employee_status']);
-    $start_date = !empty($_POST['start_date']) ? mysqli_real_escape_string($conn, $_POST['start_date']) : NULL;
-    $status = mysqli_real_escape_string($conn, $_POST['status']);
-
-    if ($id > 0) {
-        // التحقق من فرادة كود المشغل على مستوى الشركة (عند التعديل)
-        if (!empty($employee_code)) {
-            $code_company_scope = $drivers_has_company ? " AND company_id = $company_id" : "";
-            $code_check_edit = mysqli_query($conn, "SELECT id FROM employees WHERE employee_code = '$employee_code' AND id != $id$code_company_scope LIMIT 1");
-            if ($code_check_edit && mysqli_num_rows($code_check_edit) > 0) {
-                header("Location: employees.php?msg=كود+المشغل+موجود+مسبقاً+❌");
-                exit;
-            }
-        }
-        // تحديث
-        $identity_expiry_sql = $identity_expiry_date ? "'$identity_expiry_date'" : "NULL";
-        $license_expiry_sql = $license_expiry_date ? "'$license_expiry_date'" : "NULL";
-        $start_date_sql = $start_date ? "'$start_date'" : "NULL";
-        $years_in_field_sql = $years_in_field !== NULL ? $years_in_field : "NULL";
-        $years_on_equipment_sql = $years_on_equipment !== NULL ? $years_on_equipment : "NULL";
-        $supplier_id_sql = $supplier_id !== NULL ? $supplier_id : "NULL";
-        $project_id_sql = $project_id !== NULL ? $project_id : "NULL";
-        $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
-
-        $scope_where = sprintf($driver_scope_where, $id);
-        $update_query = "UPDATE employees SET
-            name='$name', employee_code='$employee_code', nickname='$nickname',
-            identity_type='$identity_type', identity_number='$identity_number', identity_expiry_date=$identity_expiry_sql,
-            employee_photo='$employee_photo', identity_photo='$identity_photo',
-            years_in_field=$years_in_field_sql, years_on_equipment=$years_on_equipment_sql, skill_level='$skill_level', certificates='$certificates',
-            owner_supervisor='$owner_supervisor', supplier_id=$supplier_id_sql, project_id=$project_id_sql, employment_affiliation='$employment_affiliation',
-            salary_type='$salary_type', monthly_salary=$monthly_salary_sql,
-            email='$email', phone='$phone', phone_alternative='$phone_alternative', address='$address',
-            performance_rating='$performance_rating', behavior_record='$behavior_record', accident_record='$accident_record',
-            health_status='$health_status', health_issues='$health_issues', vaccinations_status='$vaccinations_status',
-            previous_employer='$previous_employer', employment_duration='$employment_duration', reference_contact='$reference_contact', general_notes='$general_notes',
-            employee_status='$employee_status', start_date=$start_date_sql, status='$status'
-            WHERE $scope_where";
-
-        if (mysqli_query($conn, $update_query)) {
-            $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
-            ems_save_employee_extra($conn, $id, $emp_scope); // employee_type + المسمى/الدور + الحقول العامة (بلا حقول الرخصة)
-            ems_sync_equipment_operator($conn, $id, $emp_scope); // إنشاء/تحديث سجل المشغّل تلقائياً إن كان سائقاً/مشغّلاً
-            header("Location: employees.php?msg=تم+تعديل+الموظف+بنجاح+✅");
+    // التحقق من فرادة كود المشغل على مستوى الشركة (البوابة تعزل تلقائيًّا)
+    if (!empty($employee_code)) {
+        $dupWhere  = "employee_code = ?";
+        $dupParams = array($employee_code);
+        if ($id > 0) { $dupWhere .= " AND id != ?"; $dupParams[] = $id; }
+        $dup = $emp_gate->selectOne('employees', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
+        if ($dup) {
+            header("Location: employees.php?msg=كود+المشغل+موجود+مسبقاً+❌");
             exit;
+        }
+    }
+
+    try {
+        if ($id > 0) {
+            // تحديث معزول بالشركة عبر البوابة
+            $emp_gate->update('employees', $data, array('id' => $id));
+            $saved_emp_id = $id;
+            $ok_msg = "تم+تعديل+الموظف+بنجاح+✅";
         } else {
-            header("Location: employees.php?msg=حدث+خطأ+أثناء+التعديل+❌: " . mysqli_error($conn));
-            exit;
+            // إضافة (company_id تُحقن آليًّا)
+            $saved_emp_id = (int) $emp_gate->insert('employees', $data);
+            $ok_msg = "تم+إضافة+الموظف+بنجاح+✅";
         }
-    } else {
-        // إضافة
-        $identity_expiry_sql = $identity_expiry_date ? "'$identity_expiry_date'" : "NULL";
-        $license_expiry_sql = $license_expiry_date ? "'$license_expiry_date'" : "NULL";
-        $start_date_sql = $start_date ? "'$start_date'" : "NULL";
-        $years_in_field_sql = $years_in_field !== NULL ? $years_in_field : "NULL";
-        $years_on_equipment_sql = $years_on_equipment !== NULL ? $years_on_equipment : "NULL";
-        $supplier_id_sql = $supplier_id !== NULL ? $supplier_id : "NULL";
-        $project_id_sql = $project_id !== NULL ? $project_id : "NULL";
-        $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
-
-        // التحقق من فرادة كود المشغل على مستوى الشركة (عند الإضافة)
-        if (!empty($employee_code)) {
-            $code_company_scope = $drivers_has_company ? " AND company_id = $company_id" : "";
-            $code_check_insert = mysqli_query($conn, "SELECT id FROM employees WHERE employee_code = '$employee_code'$code_company_scope LIMIT 1");
-            if ($code_check_insert && mysqli_num_rows($code_check_insert) > 0) {
-                header("Location: employees.php?msg=كود+المشغل+موجود+مسبقاً+❌");
-                exit;
-            }
-        }
-
-        $insert_query = "INSERT INTO employees (
-            name, employee_code, nickname,
-            identity_type, identity_number, identity_expiry_date, employee_photo, identity_photo,
-            years_in_field, years_on_equipment, skill_level, certificates,
-            owner_supervisor, supplier_id, project_id, employment_affiliation, salary_type, monthly_salary,
-            email, phone, phone_alternative, address,
-            performance_rating, behavior_record, accident_record,
-            health_status, health_issues, vaccinations_status,
-            previous_employer, employment_duration, reference_contact, general_notes,
-            employee_status, start_date, status$driver_insert_col
-        ) VALUES (
-            '$name', '$employee_code', '$nickname',
-            '$identity_type', '$identity_number', $identity_expiry_sql, '$employee_photo', '$identity_photo',
-            $years_in_field_sql, $years_on_equipment_sql, '$skill_level', '$certificates',
-            '$owner_supervisor', $supplier_id_sql, $project_id_sql, '$employment_affiliation', '$salary_type', $monthly_salary_sql,
-            '$email', '$phone', '$phone_alternative', '$address',
-            '$performance_rating', '$behavior_record', '$accident_record',
-            '$health_status', '$health_issues', '$vaccinations_status',
-            '$previous_employer', '$employment_duration', '$reference_contact', '$general_notes',
-            '$employee_status', $start_date_sql, '$status'$driver_insert_val
-        )";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
-            $new_emp_id = mysqli_insert_id($conn);
-            ems_save_employee_extra($conn, $new_emp_id, $emp_scope); // employee_type + المسمى/الدور + الحقول العامة (بلا حقول الرخصة)
-            ems_sync_equipment_operator($conn, $new_emp_id, $emp_scope); // إنشاء سجل المشغّل تلقائياً إن كان سائقاً/مشغّلاً
-            header("Location: employees.php?msg=تم+إضافة+الموظف+بنجاح+✅");
-            exit;
-        } else {
-            header("Location: employees.php?msg=حدث+خطأ+أثناء+الإضافة+❌: " . mysqli_error($conn));
-            exit;
-        }
+        $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
+        ems_save_employee_extra($conn, $saved_emp_id, $emp_scope); // employee_type + المسمى/الدور + الحقول العامة (بلا حقول الرخصة)
+        ems_sync_equipment_operator($conn, $saved_emp_id, $emp_scope); // إنشاء/تحديث سجل المشغّل تلقائياً إن كان سائقاً/مشغّلاً
+        header("Location: employees.php?msg=$ok_msg");
+        exit;
+    } catch (\Throwable $e) {
+        header("Location: employees.php?msg=" . urlencode("حدث خطأ أثناء الحفظ ❌: " . $e->getMessage()));
+        exit;
     }
 }
 
@@ -260,34 +154,31 @@ if (isset($_GET['delete_id'])) {
         exit();
     }
 
-    $scope_where = sprintf($driver_scope_where, $delete_id);
+    // حارسا الحذف — معزولان عبر البوابة (كانا بلا عزل شركةٍ أصلًا: تسرّبٌ كامنٌ أُغلق)
     $active_contracts = 0;
     $active_equipment_assignments = 0;
-
-    $contracts_sql = "SELECT COUNT(*) AS total FROM drivercontracts WHERE employee_id = $delete_id AND status = 1";
-    $contracts_result = mysqli_query($conn, $contracts_sql);
-    if ($contracts_result) {
-        $contracts_row = mysqli_fetch_assoc($contracts_result);
-        $active_contracts = intval($contracts_row['total']);
-    }
-
-    $assignments_sql = "SELECT COUNT(*) AS total FROM equipment_drivers WHERE employee_id = $delete_id AND status = 1";
-    $assignments_result = mysqli_query($conn, $assignments_sql);
-    if ($assignments_result) {
-        $assignments_row = mysqli_fetch_assoc($assignments_result);
-        $active_equipment_assignments = intval($assignments_row['total']);
-    }
+    try {
+        $active_contracts = $emp_gate->count('drivercontracts', array(
+            'whereRaw' => 'employee_id = ? AND status = 1', 'params' => array($delete_id),
+        ));
+        $active_equipment_assignments = $emp_gate->count('equipment_drivers', array(
+            'whereRaw' => 'employee_id = ? AND status = 1', 'params' => array($delete_id),
+        ));
+    } catch (\Throwable $e) { /* سياق ناقص → يحسمه deleteRow أدناه (0 صفوف) */ }
 
     if ($active_contracts > 0 || $active_equipment_assignments > 0) {
         header("Location: employees.php?msg=لا+يمكن+حذف+المشغل+لارتباطه+بعقود+أو+تشغيل+نشط+❌");
         exit();
     }
 
-    $delete_sql = "DELETE FROM employees WHERE $scope_where";
-    if (mysqli_query($conn, $delete_sql) && mysqli_affected_rows($conn) > 0) {
-        header("Location: employees.php?msg=تم+حذف+المشغل+بنجاح+✅");
-        exit();
-    }
+    // حذفٌ صلبٌ كالأصل عبر قناة deleteRow (القدرة الثامنة): كيانٌ بلا أبٍ إلزاميّ —
+    // مقيَّدٌ بشركة السياق ومُسجَّل (البوابة ترفض DELETE الخام).
+    try {
+        if ($emp_gate->deleteRow('employees', $delete_id, 'employees screen delete') > 0) {
+            header("Location: employees.php?msg=تم+حذف+المشغل+بنجاح+✅");
+            exit();
+        }
+    } catch (\Throwable $e) { /* يسقط لرسالة التعذّر */ }
 
     header("Location: employees.php?msg=تعذر+حذف+المشغل+أو+أنه+خارج+نطاق+الشركة+❌");
     exit();
@@ -583,9 +474,8 @@ include('../insidebar.php');
                                 <select name="job_title_id" id="job_title_id">
                                     <option value="">— اختر المسمى الوظيفي —</option>
                                     <?php
-                                    $__jt_where = $is_super_admin ? "status=1" : "status=1 AND (company_id IS NULL OR company_id=" . intval($company_id) . ")";
-                                    $__jtq = mysqli_query($conn, "SELECT id, name FROM job_titles WHERE $__jt_where ORDER BY sort_order, name");
-                                    if ($__jtq) while ($__jt = mysqli_fetch_assoc($__jtq)) {
+                                    // مسمّيات الشركة عبر البوابة (بعد تعبئة M6 يكافئ نمطَ «NULL أو شركتي» القديم)
+                                    foreach ($emp_gate->select('job_titles', array('columns' => array('id', 'name'), 'whereRaw' => 'status = 1', 'orderBy' => 'sort_order, name')) as $__jt) {
                                         echo '<option value="' . intval($__jt['id']) . '">' . htmlspecialchars($__jt['name'], ENT_QUOTES, 'UTF-8') . '</option>';
                                     } ?>
                                 </select>
@@ -597,9 +487,8 @@ include('../insidebar.php');
                                 <select name="employee_role_id" id="employee_role_id">
                                     <option value="">— اختر الدور —</option>
                                     <?php
-                                    $__er_where = $is_super_admin ? "status=1" : "status=1 AND (company_id IS NULL OR company_id=" . intval($company_id) . ")";
-                                    $__erq = mysqli_query($conn, "SELECT id, name FROM employee_roles WHERE $__er_where ORDER BY sort_order, name");
-                                    if ($__erq) while ($__er = mysqli_fetch_assoc($__erq)) {
+                                    // أدوار الشركة عبر البوابة (بعد M6)
+                                    foreach ($emp_gate->select('employee_roles', array('columns' => array('id', 'name'), 'whereRaw' => 'status = 1', 'orderBy' => 'sort_order, name')) as $__er) {
                                         echo '<option value="' . intval($__er['id']) . '">' . htmlspecialchars($__er['name'], ENT_QUOTES, 'UTF-8') . '</option>';
                                     } ?>
                                 </select>
@@ -755,15 +644,10 @@ include('../insidebar.php');
                                 <select name="supplier_id" id="supplier_id">
                                     <option value="">-- اختر المورد --</option>
                                     <?php
-                                    $supplier_scope_sql = "1=1";
-                                    if (!$is_super_admin && $suppliers_has_company) {
-                                        $supplier_scope_sql = "company_id = $company_id";
+                                    // موردو الشركة عبر البوابة
+                                    foreach ($emp_gate->select('suppliers', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC')) as $supplier) {
+                                        echo "<option value='" . intval($supplier['id']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
                                     }
-                                    $suppliers_query = "SELECT id, name FROM suppliers WHERE $supplier_scope_sql ORDER BY name";
-                                    $suppliers_result = mysqli_query($conn, $suppliers_query);
-                                    if ($suppliers_result) { while ($supplier = mysqli_fetch_assoc($suppliers_result)) {
-                                        echo "<option value='" . $supplier['id'] . "'>" . htmlspecialchars($supplier['name']) . "</option>";
-                                    } }
                                     ?>
                                 </select>
                             </div>
@@ -772,13 +656,9 @@ include('../insidebar.php');
                                 <select name="project_id" id="project_id">
                                     <option value="">-- اختر المشروع --</option>
                                     <?php
-                                    $project_scope_sql = "1=1";
-                                    if (!$is_super_admin) {
-                                        $project_scope_sql = "company_id = $company_id";
-                                    }
-                                    $projects_query = "SELECT id, name, project_code FROM project WHERE $project_scope_sql AND status = 1 ORDER BY name";
-                                    $projects_result = mysqli_query($conn, $projects_query);
-                                    if ($projects_result) { while ($project = mysqli_fetch_assoc($projects_result)) {
+                                    // مشاريع الشركة عبر البوابة
+                                    $emp_projects = $emp_gate->select('project', array('columns' => array('id', 'name', 'project_code'), 'whereRaw' => 'status = 1', 'orderBy' => 'name ASC'));
+                                    { foreach ($emp_projects as $project) {
                                         $project_display = htmlspecialchars($project['name']);
                                         if (!empty($project['project_code'])) {
                                             $project_display .= " (" . htmlspecialchars($project['project_code']) . ")";
@@ -1099,41 +979,24 @@ include('../insidebar.php');
                 </thead>
                 <tbody>
                     <?php
-                    // جلب المشغلين مع البيانات الإضافية
-                    $drivers_scope_sql = "1=1";
-                    if (!$is_super_admin) {
-                        if ($drivers_has_company) {
-                            $drivers_scope_sql = "d.company_id = $company_id";
-                        } else {
-                            $drivers_scope_sql = "EXISTS (
-                                SELECT 1
-                                FROM drivercontracts dsc
-                                INNER JOIN project sp ON sp.id = dsc.project_id
-                                INNER JOIN users su ON su.id = sp.created_by
-                                WHERE dsc.employee_id = d.id
-                                  AND su.company_id = $company_id
-                            )";
-                        }
-                    }
-
-                    $drivercontracts_scope_sql = (!$is_super_admin && $drivercontracts_has_company)
-                        ? " AND drivercontracts.company_id = $company_id"
-                        : "";
-
-                    $query = "SELECT d.*, s.name as supplier_name, p.name as project_name, p.project_code,
+                    // جلب المشغلين مع البيانات الإضافية — العزل عبر {TENANT_SCOPE}
+                    // (سُلَّم created_by الاحتياطي أُزيل؛ عدّاد العقود الفرعي يُعلَن جدولُه)
+                    $emp_rows = $emp_gate->scopedQuery(array(
+                        'scope'  => array('d' => 'employees'),
+                        'enrich' => array('s' => 'suppliers', 'p' => 'project', 'jt' => 'job_titles', 'er' => 'employee_roles', 'drivercontracts' => 'drivercontracts'),
+                    ), "SELECT d.*, s.name as supplier_name, p.name as project_name, p.project_code,
                              jt.name AS job_title_name, er.name AS employee_role_name,
-                             (SELECT COUNT(*) FROM drivercontracts WHERE employee_id = d.id$drivercontracts_scope_sql) as numcontracts
+                             (SELECT COUNT(*) FROM drivercontracts WHERE employee_id = d.id) as numcontracts
                              FROM employees d
                              LEFT JOIN suppliers s ON d.supplier_id = s.id
                              LEFT JOIN project p ON d.project_id = p.id
                              LEFT JOIN job_titles jt ON jt.id = d.job_title_id
                              LEFT JOIN employee_roles er ON er.id = d.employee_role_id
-                             WHERE $drivers_scope_sql
-                             ORDER BY d.id DESC";
-                    $result = mysqli_query($conn, $query);
+                             WHERE {TENANT_SCOPE}
+                             ORDER BY d.id DESC", array());
                     $i = 1;
 
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    { foreach ($emp_rows as $row) {
                         $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
                         $driver_name_cell = "<a class='client-name-link' href='employee_profile.php?id=" . intval($row['id']) . "'><strong>" . htmlspecialchars($row['name']) . "</strong></a>";
                         if (intval($row['numcontracts']) === 0) {
