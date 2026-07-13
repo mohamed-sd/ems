@@ -29,40 +29,40 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 $company_val   = $is_super_admin ? null : $company_id;
 $company_scope = $is_super_admin ? '' : " AND company_id = $company_id";
+// بوابة الوحدة: super → forAllTenants (يوافق company_scope='')؛ غير super → سياق الجلسة
+$dep_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('fleet depreciation super') : ems_tenant_db();
 
 $has_model_table = function_exists('db_table_has_column') ? db_table_has_column($conn, 'fleet_model', 'id') : true;
 
 /** أثر تدقيقي: يحفظ لقطة قبل/بعد كل تغيير */
 function dep_audit($conn, $profile_id, $company_val, $action, $old, $new, $changed_by, $note = null)
 {
-    $st = $conn->prepare("INSERT INTO fleet_depreciation_profile_audit (profile_id, company_id, action, changed_by, old_data, new_data, note) VALUES (?,?,?,?,?,?,?)");
-    if (!$st) return;
     $oj = ($old !== null) ? json_encode($old, JSON_UNESCAPED_UNICODE) : null;
     $nj = ($new !== null) ? json_encode($new, JSON_UNESCAPED_UNICODE) : null;
-    $st->bind_param("iisisss", $profile_id, $company_val, $action, $changed_by, $oj, $nj, $note);
-    $st->execute();
+    // company_id يُحقنه البوابة (super = crossTenant). audit soft=false — أثر تدقيقي best-effort كالأصل.
+    $g = ($company_val === null) ? ems_tenant_db()->forAllTenants('dep audit super') : ems_tenant_db();
+    try {
+        $g->insert('fleet_depreciation_profile_audit', array(
+            'profile_id' => $profile_id, 'action' => $action, 'changed_by' => $changed_by,
+            'old_data' => $oj, 'new_data' => $nj, 'note' => $note));
+    } catch (\Throwable $t) { /* بلا فحص كالأصل */ }
 }
 
-/** توليد كود تسلسلي تلقائي DEP-### ضمن الشركة */
+/** توليد كود تسلسلي تلقائي DEP-### ضمن الشركة (includeDeleted — يوافق الأصل بلا فلتر حذف) */
 function dep_next_code($conn, $is_super, $company_id)
 {
-    $where = $is_super ? "1=1" : ("company_id = " . intval($company_id));
-    $res = mysqli_query($conn, "SELECT code FROM fleet_depreciation_profile WHERE $where AND code REGEXP '^DEP-[0-9]+$'");
+    $g = $is_super ? ems_tenant_db()->forAllTenants('dep code super') : ems_tenant_db();
+    $rows = $g->select('fleet_depreciation_profile', array('columns' => array('code'), 'whereRaw' => "code REGEXP '^DEP-[0-9]+$'", 'includeDeleted' => true));
     $max = 0;
-    if ($res) while ($r = mysqli_fetch_assoc($res)) {
-        $n = intval(substr($r['code'], 4));
-        if ($n > $max) $max = $n;
-    }
+    foreach ($rows as $r) { $n = intval(substr($r['code'], 4)); if ($n > $max) $max = $n; }
     return 'DEP-' . str_pad($max + 1, 3, '0', STR_PAD_LEFT);
 }
 
-/** قراءة صف ملف ضمن نطاق الشركة */
+/** قراءة صف ملف ضمن نطاق الشركة (company_scope==='' ⇒ super) */
 function dep_fetch($conn, $id, $company_scope)
 {
-    $st = $conn->prepare("SELECT * FROM fleet_depreciation_profile WHERE id = ? AND is_deleted = 0" . $company_scope);
-    $st->bind_param("i", $id);
-    $st->execute();
-    return $st->get_result()->fetch_assoc();
+    $g = ($company_scope === '') ? ems_tenant_db()->forAllTenants('dep fetch super') : ems_tenant_db();
+    return $g->selectOne('fleet_depreciation_profile', array('where' => array('id' => intval($id))));
 }
 
 $errors = [];
@@ -77,9 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     $del_id = (int) $_POST['delete_id'];
     $old = dep_fetch($conn, $del_id, $company_scope);
     if ($old) {
-        $st = $conn->prepare("UPDATE fleet_depreciation_profile SET is_deleted = 1 WHERE id = ?" . $company_scope);
-        $st->bind_param("i", $del_id);
-        $st->execute();
+        // حذف ناعم (is_deleted=1 فقط كالأصل، بلا deleted_at/by)
+        $dep_gate->update('fleet_depreciation_profile', array('is_deleted' => 1), array('id' => $del_id));
         dep_audit($conn, $del_id, $company_val, 'disabled', $old, null, $user_id, 'تعطيل ناعم');
     }
     header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('🗑️ تم تعطيل الملف'));
@@ -95,9 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     $app_id = (int) $_POST['approve_id'];
     $old = dep_fetch($conn, $app_id, $company_scope);
     if ($old && $old['state'] !== 'approved') {
-        $st = $conn->prepare("UPDATE fleet_depreciation_profile SET state = 'approved', approved_by = ?, approved_at = NOW() WHERE id = ? AND state = 'draft'" . $company_scope);
-        $st->bind_param("ii", $user_id, $app_id);
-        $st->execute();
+        $dep_gate->update('fleet_depreciation_profile',
+            array('state' => 'approved', 'approved_by' => $user_id, 'approved_at' => date('Y-m-d H:i:s')),
+            array('id' => $app_id), "state = 'draft'");
         $new = dep_fetch($conn, $app_id, $company_scope);
         dep_audit($conn, $app_id, $company_val, 'approved', $old, $new, $user_id, 'اعتماد الملف');
         header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('✅ تم اعتماد الملف'));
@@ -136,10 +135,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         if ($edit_id > 0) {
-            $sql = "UPDATE fleet_depreciation_profile SET asset_category=?, brand=?, model_id=?, method=?, useful_life=?, salvage_pct=?, notes=? WHERE id=? AND is_deleted=0" . $company_scope;
-            $st = $conn->prepare($sql);
-            $st->bind_param("ssisddsi", $asset_category, $brand, $model_id, $method, $useful_life, $salvage_pct, $notes, $edit_id);
-            $st->execute();
+            $dep_gate->update('fleet_depreciation_profile', array(
+                'asset_category' => $asset_category, 'brand' => $brand, 'model_id' => $model_id, 'method' => $method,
+                'useful_life' => $useful_life, 'salvage_pct' => $salvage_pct, 'notes' => $notes,
+            ), array('id' => $edit_id), "is_deleted = 0");
             $new_row = dep_fetch($conn, $edit_id, $company_scope);
             // أثر تدقيقي بأثر مستقبلي: لا حذف صامت للقيمة القديمة
             dep_audit($conn, $edit_id, $company_val, 'updated', $old_row, $new_row, $user_id, 'تعديل يسري مستقبلاً فقط');
@@ -147,11 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         } else {
             $code = dep_next_code($conn, $is_super_admin, $company_id);
-            $sql = "INSERT INTO fleet_depreciation_profile (company_id, code, asset_category, brand, model_id, method, useful_life, salvage_pct, notes, state, created_by) VALUES (?,?,?,?,?,?,?,?,?,'draft',?)";
-            $st = $conn->prepare($sql);
-            $st->bind_param("isssisddsi", $company_val, $code, $asset_category, $brand, $model_id, $method, $useful_life, $salvage_pct, $notes, $user_id);
-            $st->execute();
-            $new_id = $st->insert_id;
+            $new_id = $dep_gate->insert('fleet_depreciation_profile', array(
+                'code' => $code, 'asset_category' => $asset_category, 'brand' => $brand, 'model_id' => $model_id,
+                'method' => $method, 'useful_life' => $useful_life, 'salvage_pct' => $salvage_pct, 'notes' => $notes,
+                'state' => 'draft', 'created_by' => $user_id)); // company_id يُحقن بالبوابة
             $new_row = dep_fetch($conn, $new_id, $company_scope);
             dep_audit($conn, $new_id, $company_val, 'created', null, $new_row, $user_id, 'إنشاء ملف (مسودة)');
             header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('✅ تم إضافة الملف (مسودة)'));
@@ -169,8 +167,8 @@ if (isset($_GET['edit_id'])) {
 // ── قائمة الموديلات (لربط اختياري داخل الملف) ────────────────────────
 $models = [];
 if ($has_model_table) {
-    $rm = @mysqli_query($conn, "SELECT id, code, model_name FROM fleet_model WHERE is_deleted = 0" . $company_scope . " ORDER BY code ASC");
-    if ($rm) while ($r = $rm->fetch_assoc()) { $models[] = $r; }
+    // fleet_model soft=true فالبوابة تستبعد is_deleted تلقائيًّا (يوافق الأصل)
+    $models = $dep_gate->select('fleet_model', array('columns' => array('id', 'code', 'model_name'), 'orderBy' => 'code ASC'));
 }
 
 $page_title = "إيكوبيشن | ملف الإهلاك المالي";
@@ -322,15 +320,16 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     </thead>
                     <tbody>
                         <?php
-                        $listSql =
+                        // القائمة عبر scopedQuery §10: عزل على p + إثراء LEFT بالموديل
+                        $dep_list = $dep_gate->scopedQuery(
+                            array('scope' => array('p' => 'fleet_depreciation_profile'), 'enrich' => array('fm' => 'fleet_model')),
                             "SELECT p.*, fm.code AS model_code, fm.model_name AS model_name
-                             FROM fleet_depreciation_profile p
-                             LEFT JOIN fleet_model fm ON fm.id = p.model_id
-                             WHERE p.is_deleted = 0" . ($is_super_admin ? '' : " AND p.company_id = $company_id") . "
-                             ORDER BY p.id DESC";
-                        $list = @mysqli_query($conn, $listSql);
+                               FROM fleet_depreciation_profile p
+                               LEFT JOIN fleet_model fm ON fm.id = p.model_id
+                              WHERE {TENANT_SCOPE} AND p.is_deleted = 0
+                              ORDER BY p.id DESC");
                         $i = 1;
-                        if ($list) while ($row = $list->fetch_assoc()):
+                        foreach ($dep_list as $row):
                             $unit = $row['method'] === 'sl' ? 'سنة' : 'ساعة';
                             $brand_model = trim(($row['brand'] ?? '') . (!empty($row['model_code']) ? (($row['brand'] ? ' / ' : '') . $row['model_code']) : ''));
                             ?>
@@ -371,7 +370,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                         : "<span class='status-inactive'>مسودة</span>"; ?>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
