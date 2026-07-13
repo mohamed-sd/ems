@@ -31,6 +31,9 @@ $company_val   = $is_super_admin ? null : $company_id;
 // قيد نطاق الشركة للاستعلامات النصّية (company_id دائماً intval)
 $company_scope = $is_super_admin ? '' : " AND company_id = $company_id";
 
+// بوابة العزل (نفس نمط equipments.php): غيرُ السوبر → شركته؛ السوبر → forAllTenants مُسجَّل.
+$fm_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('fleet_models super view') : ems_tenant_db();
+
 // ── قوائم ثابتة (Static dropdowns حسب المتطلّب) ──────────────────────
 $operating_categories = ['حفر', 'تحميل', 'نقل', 'تمهيد وتسوية', 'دك وضغط', 'خدمات مساندة', 'توليد طاقة', 'رفع', 'أخرى'];
 $fuel_types           = ['ديزل', 'بنزين', 'كهرباء', 'هجين', 'غاز', 'أخرى'];
@@ -88,10 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
         exit();
     }
     $del_id = (int) $_POST['delete_id'];
-    $sql = "UPDATE fleet_model SET is_deleted = 1, status = 'inactive' WHERE id = ?" . $company_scope;
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $del_id);
-    $stmt->execute();
+    // حذفٌ ناعمٌ معزولٌ بالشركة عبر البوابة (is_deleted=1 + status=inactive معًا كالأصل)
+    try {
+        $fm_gate->update('fleet_model', array('is_deleted' => 1, 'status' => 'inactive'), array('id' => $del_id));
+    } catch (\Throwable $e) { /* غير مملوك/سوبر بلا سياق → لا تغيير */ }
     header('Location: fleet_models.php?msg=' . urlencode('🗑️ تم حذف الموديل (تعطيل ناعم)'));
     exit();
 }
@@ -115,63 +118,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($code === '')       $errors[] = 'كود الموديل مطلوب';
     if ($model_name === '') $errors[] = 'اسم الموديل مطلوب';
 
-    // تحقّق تفرّد الكود داخل الشركة
+    // تحقّق تفرّد الكود داخل الشركة (البوابة تعزل + تستثني المحذوف)
     if (empty($errors)) {
-        $dupSql = "SELECT id FROM fleet_model WHERE code = ? AND is_deleted = 0" . $company_scope;
-        if ($edit_id > 0) $dupSql .= " AND id <> " . $edit_id;
-        $dupSt = $conn->prepare($dupSql);
-        $dupSt->bind_param("s", $code);
-        $dupSt->execute();
-        if ($dupSt->get_result()->fetch_assoc()) {
+        $dupWhere  = "code = ?";
+        $dupParams = array($code);
+        if ($edit_id > 0) { $dupWhere .= " AND id <> ?"; $dupParams[] = $edit_id; }
+        $dup = $fm_gate->selectOne('fleet_model', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
+        if ($dup) {
             $errors[] = 'كود الموديل مستخدم مسبقاً في شركتك';
         }
     }
 
-    // التحقّق من ملكية السجل عند التعديل
+    // التحقّق من ملكية السجل عند التعديل (البوابة تعزل بالشركة)
     if (empty($errors) && $edit_id > 0) {
-        $own = $conn->prepare("SELECT id FROM fleet_model WHERE id = ? AND is_deleted = 0" . $company_scope);
-        $own->bind_param("i", $edit_id);
-        $own->execute();
-        if (!$own->get_result()->fetch_assoc()) {
+        $own = $fm_gate->selectOne('fleet_model', array('columns' => array('id'), 'where' => array('id' => $edit_id)));
+        if (!$own) {
             $errors[] = 'الموديل غير موجود أو لا يخصّ شركتك';
         }
     }
 
     if (empty($errors)) {
-        if ($edit_id > 0) {
-            $sql = "UPDATE fleet_model SET code=?, manufacturer=?, model_name=?, equipment_type_id=?, operating_category=?, fuel_type=?, std_capacity=?, std_capacity_uom=?, tech_reference=?, default_supplier_name=?, status=? WHERE id=? AND is_deleted=0" . $company_scope;
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param(
-                "sssissdssssi",
-                $code, $manufacturer, $model_name, $equipment_type_id, $operating_category,
-                $fuel_type, $std_capacity, $std_capacity_uom, $tech_reference, $default_supplier_name,
-                $status, $edit_id
+        try {
+            // بيانات الموديل (بلا company_id — تُحقن آليًّا عند الإدراج عبر البوابة)
+            $model_data = array(
+                'code'                  => $code,
+                'manufacturer'          => $manufacturer,
+                'model_name'            => $model_name,
+                'equipment_type_id'     => $equipment_type_id,
+                'operating_category'    => $operating_category,
+                'fuel_type'             => $fuel_type,
+                'std_capacity'          => $std_capacity,
+                'std_capacity_uom'      => $std_capacity_uom,
+                'tech_reference'        => $tech_reference,
+                'default_supplier_name' => $default_supplier_name,
+                'status'                => $status,
             );
-            $stmt->execute();
-            $model_id = $edit_id;
-        } else {
-            $sql = "INSERT INTO fleet_model (company_id, code, manufacturer, model_name, equipment_type_id, operating_category, fuel_type, std_capacity, std_capacity_uom, tech_reference, default_supplier_name, status, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param(
-                "isssissdssssi",
-                $company_val, $code, $manufacturer, $model_name, $equipment_type_id, $operating_category,
-                $fuel_type, $std_capacity, $std_capacity_uom, $tech_reference, $default_supplier_name,
-                $status, $user_id
-            );
-            $stmt->execute();
-            $model_id = $stmt->insert_id;
-        }
+            if ($edit_id > 0) {
+                $fm_gate->update('fleet_model', $model_data, array('id' => $edit_id));
+                $model_id = $edit_id;
+            } else {
+                $model_data['created_by'] = $user_id;
+                $model_id = (int) $fm_gate->insert('fleet_model', $model_data);
+            }
 
-        // ── سطور المواصفات: حذف القديم ثم إعادة الإدراج ──
-        if (!empty($model_id)) {
-            $delSpec = $conn->prepare("DELETE FROM fleet_model_service_spec WHERE model_id = ?");
-            $delSpec->bind_param("i", $model_id);
-            $delSpec->execute();
-
-            $items = isset($_POST['spec_item_type']) && is_array($_POST['spec_item_type']) ? $_POST['spec_item_type'] : [];
-            $n = count($items);
-            if ($n > 0) {
-                $insSpec = $conn->prepare("INSERT INTO fleet_model_service_spec (model_id, company_id, item_type, recommended_ref, qty, uom, alt_ref, photo_path, note) VALUES (?,?,?,?,?,?,?,?,?)");
+            // ── سطور المواصفات: استبدالٌ كامل ذرّيّ (replaceChildren = حذف القديم + إدراج
+            //    الجديد في معاملة واحدة، بنطاقٍ مزدوج: الشركة + الموديل المملوك المتحقَّق) ──
+            if (!empty($model_id)) {
+                $items = isset($_POST['spec_item_type']) && is_array($_POST['spec_item_type']) ? $_POST['spec_item_type'] : [];
+                $n = count($items);
+                $spec_rows = array();
                 for ($i = 0; $i < $n; $i++) {
                     $it    = trim($items[$i] ?? '');
                     $rref  = trim($_POST['spec_recommended_ref'][$i] ?? '');
@@ -186,22 +181,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($it === '' && $rref === '' && $qtyR === null && $uomR === '' && $aref === '' && $noteR === '' && !$photo) {
                         continue;
                     }
-                    $insSpec->bind_param("iissdssss", $model_id, $company_val, $it, $rref, $qtyR, $uomR, $aref, $photo, $noteR);
-                    $insSpec->execute();
+                    // بلا model_id (يضبطه replaceChildren) وبلا company_id (يُحقن بالإدراج)
+                    $spec_rows[] = array(
+                        'item_type'       => $it,
+                        'recommended_ref' => $rref,
+                        'qty'             => $qtyR,
+                        'uom'             => $uomR,
+                        'alt_ref'         => $aref,
+                        'photo_path'      => $photo,
+                        'note'            => $noteR,
+                    );
+                }
+                $fm_gate->replaceChildren('fleet_model', $model_id, 'fleet_model_service_spec', 'model_id', $spec_rows, 'fleet_models specs');
+
+                // ── ربط ملف الافتراضات المالية (إضافي وآمن) ──
+                if (db_table_has_column($conn, 'fleet_model', 'depreciation_profile_id')) {
+                    $dep_id = (isset($_POST['depreciation_profile_id']) && $_POST['depreciation_profile_id'] !== '') ? (int) $_POST['depreciation_profile_id'] : null;
+                    $fm_gate->update('fleet_model', array('depreciation_profile_id' => $dep_id), array('id' => $model_id));
                 }
             }
 
-            // ── ربط ملف الافتراضات المالية (إضافي وآمن) ──
-            if (db_table_has_column($conn, 'fleet_model', 'depreciation_profile_id')) {
-                $dep_id = (isset($_POST['depreciation_profile_id']) && $_POST['depreciation_profile_id'] !== '') ? (int) $_POST['depreciation_profile_id'] : null;
-                $du = $conn->prepare("UPDATE fleet_model SET depreciation_profile_id = ? WHERE id = ?" . ($is_super_admin ? '' : " AND company_id = $company_id"));
-                $du->bind_param("ii", $dep_id, $model_id);
-                $du->execute();
-            }
+            header('Location: fleet_models.php?msg=' . urlencode($edit_id > 0 ? '✅ تم تحديث الموديل' : '✅ تم إضافة الموديل'));
+            exit();
+        } catch (\Throwable $e) {
+            $errors[] = 'تعذّر الحفظ: ' . $e->getMessage();
         }
-
-        header('Location: fleet_models.php?msg=' . urlencode($edit_id > 0 ? '✅ تم تحديث الموديل' : '✅ تم إضافة الموديل'));
-        exit();
     }
 }
 
@@ -210,43 +214,51 @@ $editData  = null;
 $editSpecs = [];
 if (isset($_GET['edit_id'])) {
     $eid = (int) $_GET['edit_id'];
-    $st = $conn->prepare("SELECT * FROM fleet_model WHERE id = ? AND is_deleted = 0" . $company_scope);
-    $st->bind_param("i", $eid);
-    $st->execute();
-    $editData = $st->get_result()->fetch_assoc();
+    // جلبٌ معزولٌ بالشركة (البوابة تستثني المحذوف تلقائيًّا)
+    $editData = $fm_gate->selectOne('fleet_model', array('where' => array('id' => $eid)));
 
     if ($editData) {
-        $ss = $conn->prepare("SELECT * FROM fleet_model_service_spec WHERE model_id = ? ORDER BY id ASC");
-        $ss->bind_param("i", $editData['id']);
-        $ss->execute();
-        $rs = $ss->get_result();
-        while ($r = $rs->fetch_assoc()) { $editSpecs[] = $r; }
+        // سطور المواصفات للموديل (ابنٌ مستأجَر — معزولٌ بالشركة)
+        $editSpecs = $fm_gate->select('fleet_model_service_spec', array(
+            'where'   => array('model_id' => $editData['id']),
+            'orderBy' => 'id ASC',
+        ));
     }
 }
 
 // ── القوائم المنسدلة (أنواع المعدات / الموردون / المصنّعون) ───────────
-$equipment_types = [];
-$rt = $conn->query("SELECT id, type FROM equipments_types WHERE status = 'active' ORDER BY type ASC");
-if ($rt) while ($r = $rt->fetch_assoc()) { $equipment_types[] = $r; }
+// أنواع المعدات — كتالوج عام (T_GLOBAL) عبر البوابة
+$equipment_types = $fm_gate->select('equipments_types', array(
+    'columns'  => array('id', 'type'),
+    'whereRaw' => "status = 'active'",
+    'orderBy'  => 'type ASC',
+));
 
 // المورد الافتراضي صار إدخالاً يدوياً حرّاً (غير مربوط بجدول الموردين) — لا حاجة لجلب الموردين.
 
-// مصنّعون مقترحون (datalist): من الموديلات + المعدات
-$manufacturers = [];
-$rm = $conn->query(
-    "SELECT DISTINCT manufacturer FROM fleet_model WHERE manufacturer IS NOT NULL AND manufacturer <> '' AND is_deleted = 0" . $company_scope .
-    " UNION SELECT DISTINCT manufacturer FROM equipments WHERE manufacturer IS NOT NULL AND manufacturer <> ''" . $company_scope .
-    " ORDER BY manufacturer ASC"
-);
-if ($rm) while ($r = $rm->fetch_assoc()) { $manufacturers[] = $r['manufacturer']; }
+// مصنّعون مقترحون (datalist): من الموديلات + المعدات — استدعاءان معزولان ثم دمجٌ في PHP
+// (البوابة تمنع UNION؛ العزل مسؤوليتها). fleet_model يستثني المحذوف تلقائيًّا (soft).
+$mfr_set = array();
+foreach ($fm_gate->select('fleet_model', array('columns' => array('manufacturer'), 'whereRaw' => "manufacturer IS NOT NULL AND manufacturer <> ''")) as $r) {
+    $mfr_set[$r['manufacturer']] = true;
+}
+foreach ($fm_gate->select('equipments', array('columns' => array('manufacturer'), 'whereRaw' => "manufacturer IS NOT NULL AND manufacturer <> ''")) as $r) {
+    $mfr_set[$r['manufacturer']] = true;
+}
+$manufacturers = array_keys($mfr_set);
+sort($manufacturers, SORT_STRING);
 
 // ملفات الافتراضات المالية المعتمدة (للربط) — إن كان الجدول/العمود متاحاً
 $dep_profiles    = [];
 $has_dep_profile = db_table_has_column($conn, 'fleet_model', 'depreciation_profile_id')
     && db_table_has_column($conn, 'fleet_depreciation_profile', 'id');
 if ($has_dep_profile) {
-    $rdp = @mysqli_query($conn, "SELECT id, code, asset_category FROM fleet_depreciation_profile WHERE is_deleted = 0 AND state = 'approved'" . $company_scope . " ORDER BY code ASC");
-    if ($rdp) while ($r = $rdp->fetch_assoc()) { $dep_profiles[] = $r; }
+    // ملفات إهلاكٍ معتمدة، معزولةً بالشركة (البوابة تستثني المحذوف تلقائيًّا)
+    $dep_profiles = $fm_gate->select('fleet_depreciation_profile', array(
+        'columns'  => array('id', 'code', 'asset_category'),
+        'whereRaw' => "state = 'approved'",
+        'orderBy'  => 'code ASC',
+    ));
 }
 
 $page_title = "إيكوبيشن | سجل النوع والموديل";
@@ -528,6 +540,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </thead>
                     <tbody>
                         <?php
+                        // القائمة معزولةً عبر البوابة: النطاق fm؛ إثراء dp (T_TENANT، LEFT) +
+                        // العدّاد الفرعيّ على equipments (يُعلَن كي لا يُرفض جدولٌ مستأجرٌ غير معلَن؛
+                        // et كتالوجٌ عامّ لا يحتاج إعلانًا). is_deleted تُبقى صراحةً كالأصل.
                         $dep_select = $has_dep_profile ? ", dp.code AS dep_code, dp.asset_category AS dep_category" : "";
                         $dep_join   = $has_dep_profile ? " LEFT JOIN fleet_depreciation_profile dp ON dp.id = fm.depreciation_profile_id" : "";
                         $listSql =
@@ -535,23 +550,30 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                     (SELECT COUNT(*) FROM equipments eq WHERE eq.model_id = fm.id) AS unit_count
                              FROM fleet_model fm
                              LEFT JOIN equipments_types et ON et.id = fm.equipment_type_id" . $dep_join . "
-                             WHERE fm.is_deleted = 0" . ($is_super_admin ? '' : " AND fm.company_id = $company_id") . "
+                             WHERE {TENANT_SCOPE} AND fm.is_deleted = 0
                              ORDER BY fm.id DESC";
-                        $list = $conn->query($listSql);
+                        $list = $fm_gate->scopedQuery(array(
+                            'scope'  => array('fm' => 'fleet_model'),
+                            'enrich' => array('dp' => 'fleet_depreciation_profile', 'eq' => 'equipments'),
+                        ), $listSql, array());
 
-                        // سطور المواصفات لكل الموديلات المعروضة (لنافذة العرض)
+                        // سطور المواصفات لكل الموديلات المعروضة (لنافذة العرض) — النطاق s، إثراء fm
                         $specsByModel = [];
-                        $specRes = $conn->query(
+                        $specRes = $fm_gate->scopedQuery(array(
+                            'scope'  => array('s' => 'fleet_model_service_spec'),
+                            'enrich' => array('fm' => 'fleet_model'),
+                        ),
                             "SELECT s.* FROM fleet_model_service_spec s
-                             JOIN fleet_model fm ON fm.id = s.model_id
-                             WHERE fm.is_deleted = 0" . ($is_super_admin ? '' : " AND fm.company_id = $company_id") . "
-                             ORDER BY s.model_id ASC, s.id ASC"
+                             LEFT JOIN fleet_model fm ON fm.id = s.model_id
+                             WHERE {TENANT_SCOPE} AND fm.id IS NOT NULL AND fm.is_deleted = 0
+                             ORDER BY s.model_id ASC, s.id ASC",
+                            array()
                         );
-                        if ($specRes) while ($sp = $specRes->fetch_assoc()) { $specsByModel[(int) $sp['model_id']][] = $sp; }
+                        foreach ($specRes as $sp) { $specsByModel[(int) $sp['model_id']][] = $sp; }
 
                         $modelInfo = [];
                         $i = 1;
-                        if ($list) while ($row = $list->fetch_assoc()):
+                        foreach ($list as $row):
                             $modelInfo[(int) $row['id']] = [
                                 'code'               => $row['code'],
                                 'manufacturer'       => $row['manufacturer'],
@@ -603,7 +625,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                         : "<span class='status-inactive'>غير نشط</span>"; ?>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
