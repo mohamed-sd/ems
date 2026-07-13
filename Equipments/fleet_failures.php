@@ -49,13 +49,9 @@ include '../insidebar.php';
 
 <?php
 
-// استعلام البيانات مع ربط الجداول
+// استعلام البيانات مع ربط الجداول — العزل بالشركة يُحقنه {TENANT_SCOPE} عبر البوابة
+$ff_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('fleet failures super view') : ems_tenant_db();
 $where_conditions = ["tfh.status = 1"];
-
-// فلتر الشركة للمستخدمين غير المدراء العامين
-if (!$is_super_admin && $company_id > 0) {
-    $where_conditions[] = "tfh.company_id = " . $company_id;
-}
 
 // فلاتر البحث
 $filter_equipment_type = isset($_GET['equipment_type']) ? intval($_GET['equipment_type']) : 0;
@@ -104,63 +100,41 @@ if ($filter_project_id > 0) {
 
 $where_clause = implode(" AND ", $where_conditions);
 
-$query = "
-    SELECT
-        tfh.*,
-        e.code AS equipment_code,
-        e.name AS equipment_name,
-        s.name AS supplier_name,
-        p.name AS project_name,
-        op.id AS operation_id,
-        t.date AS timesheet_actual_date,
-        t.shift AS timesheet_shift
-    FROM timesheet_failure_hours tfh
-    LEFT JOIN equipments e ON tfh.equipment_id = e.id
-    LEFT JOIN suppliers s ON e.suppliers = s.id
-    LEFT JOIN operations op ON tfh.operation_id = op.id
-    LEFT JOIN project p ON op.$ops_project_col = p.id
-    LEFT JOIN timesheet t ON tfh.timesheet_id = t.id
-    WHERE $where_clause
-    ORDER BY tfh.timesheet_date DESC, tfh.id DESC
-    $limit_clause
-";
-
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
-    die("خطأ في الاستعلام: " . mysqli_error($conn));
-}
+$failure_rows = $ff_gate->scopedQuery(
+    array('scope' => array('tfh' => 'timesheet_failure_hours'),
+          'enrich' => array('e' => 'equipments', 's' => 'suppliers', 'op' => 'operations', 'p' => 'project', 't' => 'timesheet')),
+    "SELECT tfh.*, e.code AS equipment_code, e.name AS equipment_name, s.name AS supplier_name,
+            p.name AS project_name, op.id AS operation_id, t.date AS timesheet_actual_date, t.shift AS timesheet_shift
+     FROM timesheet_failure_hours tfh
+     LEFT JOIN equipments e ON tfh.equipment_id = e.id
+     LEFT JOIN suppliers s ON e.suppliers = s.id
+     LEFT JOIN operations op ON tfh.operation_id = op.id
+     LEFT JOIN project p ON op.$ops_project_col = p.id
+     LEFT JOIN timesheet t ON tfh.timesheet_id = t.id
+     WHERE {TENANT_SCOPE} AND $where_clause
+     ORDER BY tfh.timesheet_date DESC, tfh.id DESC
+     $limit_clause");
 
 // الحصول على قوائم الفلاتر
 $suppliers_has_company = (function_exists('db_table_has_column') && db_table_has_column($conn, 'suppliers', 'company_id'));
 
-$projects_query = "SELECT DISTINCT p.id, p.name FROM project p
-                   INNER JOIN operations op ON p.id = op.$ops_project_col
-                   INNER JOIN timesheet_failure_hours tfh ON op.id = tfh.operation_id
-                   WHERE p.status = 1";
-if (!$is_super_admin && $company_id > 0) {
-    $projects_query .= " AND tfh.company_id = " . $company_id;
-}
-$projects_query .= " ORDER BY p.name";
-$projects_result = mysqli_query($conn, $projects_query);
+// قوائم الفلاتر — العزل بالشركة عبر {TENANT_SCOPE} على tfh (المستأجَر)
+$projects_rows = $ff_gate->scopedQuery(
+    array('scope' => array('tfh' => 'timesheet_failure_hours'), 'enrich' => array('op' => 'operations', 'p' => 'project')),
+    "SELECT DISTINCT p.id, p.name FROM timesheet_failure_hours tfh
+       LEFT JOIN operations op ON op.id = tfh.operation_id
+       LEFT JOIN project p ON p.id = op.$ops_project_col
+      WHERE {TENANT_SCOPE} AND op.id IS NOT NULL AND p.id IS NOT NULL AND p.status = 1 ORDER BY p.name");
 
-$main_categories_query = "SELECT DISTINCT main_category_code, main_category_name
-                          FROM timesheet_failure_hours
-                          WHERE status = 1";
-if (!$is_super_admin && $company_id > 0) {
-    $main_categories_query .= " AND company_id = " . $company_id;
-}
-$main_categories_query .= " ORDER BY main_category_name";
-$main_categories_result = mysqli_query($conn, $main_categories_query);
+$main_categories_rows = $ff_gate->scopedQuery(
+    array('scope' => array('tfh' => 'timesheet_failure_hours')),
+    "SELECT DISTINCT tfh.main_category_code, tfh.main_category_name FROM timesheet_failure_hours tfh
+      WHERE {TENANT_SCOPE} AND tfh.status = 1 ORDER BY tfh.main_category_name");
 
-$event_types_query = "SELECT DISTINCT event_type_code, event_type_name
-                      FROM timesheet_failure_hours
-                      WHERE status = 1";
-if (!$is_super_admin && $company_id > 0) {
-    $event_types_query .= " AND company_id = " . $company_id;
-}
-$event_types_query .= " ORDER BY event_type_name";
-$event_types_result = mysqli_query($conn, $event_types_query);
+$event_types_rows = $ff_gate->scopedQuery(
+    array('scope' => array('tfh' => 'timesheet_failure_hours')),
+    "SELECT DISTINCT tfh.event_type_code, tfh.event_type_name FROM timesheet_failure_hours tfh
+      WHERE {TENANT_SCOPE} AND tfh.status = 1 ORDER BY tfh.event_type_name");
 ?>
 
 <div class="main failures-page fleet-failures-main">
@@ -208,16 +182,14 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                         <select name="project_id" class="form-select">
                             <option value="">-- الكل --</option>
                             <?php
-                            if ($projects_result && mysqli_num_rows($projects_result) > 0):
-                                while ($proj = mysqli_fetch_assoc($projects_result)):
+                            foreach ($projects_rows as $proj):
                                     ?>
                                     <option value="<?php echo $proj['id']; ?>"
                                         <?php echo ($filter_project_id == $proj['id']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($proj['name']); ?>
                                     </option>
                                     <?php
-                                endwhile;
-                            endif;
+                                endforeach;
                             ?>
                         </select>
                     </div>
@@ -227,16 +199,14 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                         <select name="event_type" class="form-select">
                             <option value="">-- الكل --</option>
                             <?php
-                            if ($event_types_result && mysqli_num_rows($event_types_result) > 0):
-                                while ($et = mysqli_fetch_assoc($event_types_result)):
+                            foreach ($event_types_rows as $et):
                                     ?>
                                     <option value="<?php echo $et['event_type_code']; ?>"
                                         <?php echo ($filter_event_type == $et['event_type_code']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($et['event_type_name']); ?>
                                     </option>
                                     <?php
-                                endwhile;
-                            endif;
+                                endforeach;
                             ?>
                         </select>
                     </div>
@@ -246,16 +216,14 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                         <select name="main_category" class="form-select">
                             <option value="">-- الكل --</option>
                             <?php
-                            if ($main_categories_result && mysqli_num_rows($main_categories_result) > 0):
-                                while ($mc = mysqli_fetch_assoc($main_categories_result)):
+                            foreach ($main_categories_rows as $mc):
                                     ?>
                                     <option value="<?php echo $mc['main_category_code']; ?>"
                                         <?php echo ($filter_main_category == $mc['main_category_code']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($mc['main_category_name']); ?>
                                     </option>
                                     <?php
-                                endwhile;
-                            endif;
+                                endforeach;
                             ?>
                         </select>
                     </div>
@@ -289,19 +257,16 @@ $event_types_result = mysqli_query($conn, $event_types_query);
 
     <div class="row mb-3">
         <?php
-        mysqli_data_seek($result, 0);
-        $total_failures = mysqli_num_rows($result);
+        $total_failures = count($failure_rows);
         $equipment_types_count = [];
 
-        while ($row = mysqli_fetch_assoc($result)) {
+        foreach ($failure_rows as $row) {
             $eq_type = $row['equipment_type'];
             if (!isset($equipment_types_count[$eq_type])) {
                 $equipment_types_count[$eq_type] = 0;
             }
             $equipment_types_count[$eq_type]++;
         }
-
-        mysqli_data_seek($result, 0);
 
         $equipment_type_names = [1 => 'حفار', 2 => 'قلاب', 3 => 'خرامة'];
         ?>
@@ -363,9 +328,8 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                     <tbody>
                         <?php
                         $counter = 1;
-                        if (mysqli_num_rows($result) > 0):
-                            mysqli_data_seek($result, 0);
-                            while ($row = mysqli_fetch_assoc($result)):
+                        if (count($failure_rows) > 0):
+                            foreach ($failure_rows as $row):
                                 $equipment_type_name = $equipment_type_names[$row['equipment_type']] ?? 'غير محدد';
                                 ?>
                                 <tr>
@@ -383,7 +347,7 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                                     <td><?php echo htmlspecialchars($row['timesheet_shift'] ?? '-'); ?></td>
                                 </tr>
                                 <?php
-                            endwhile;
+                            endforeach;
                         else:
                             ?>
                             <tr>
