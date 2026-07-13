@@ -22,8 +22,10 @@ $operations_project_col = db_table_has_column($conn, 'operations', 'project_id')
 // company isolation (SaaS)
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $current_user_id    = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-$equipment_company_filter = ($equipment_has_company_id && $current_company_id > 0) ? " AND m.company_id = $current_company_id" : "";
-$equipment_company_filter_plain = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+
+// بوابة العزل — الشاشة بلا مفهوم سوبر أصلًا (كل مستخدميها بشركة>0)؛ البوابة تعزل
+// بشركة السياق وتُغلق مغلقًا عند غيابها (أشدّ من شرط >0 القديم الذي كان يمرّر).
+$fleet_gate = ems_tenant_db();
 
 if (!function_exists('normalize_equipment_availability_state')) {
     function normalize_equipment_availability_state($availability_state, $availability_status)
@@ -95,19 +97,35 @@ if (isset($_GET['delete_id'])) {
     }
     $delete_id = intval($_GET['delete_id']);
 
-    // التحقق من عدم استخدام المعدة في عمليات نشطة
-    $check_ops = mysqli_query($conn, "SELECT COUNT(*) as count FROM operations WHERE equipment = $delete_id AND status = '1'");
-    $ops_count = $check_ops ? (mysqli_fetch_assoc($check_ops)['count'] ?? 0) : 0;
+    // التحقق من عدم استخدام المعدة في عمليات نشطة (معزولًا عبر البوابة)
+    $ops_count = 0;
+    try {
+        $ops_count = $fleet_gate->count('operations', array(
+            'whereRaw' => "equipment = ? AND status = '1'",
+            'params'   => array($delete_id),
+        ));
+    } catch (\Throwable $e) { /* سياق ناقص → يُعامل كصفر ويحسمه فحص الملكية أدناه */ }
 
     if ($ops_count > 0) {
         header("Location: equipments_fleet.php?msg=لا+يمكن+حذف+المعدة+لأنها+بصدد+التشغيل+حالياً+❌");
         exit();
     }
 
-    if (mysqli_query($conn, "DELETE FROM equipments WHERE id = $delete_id $equipment_company_filter_plain")) {
+    // حذفٌ صلبٌ كالأصل عبر قناة deleteChild (النطاق المزدوج: الشركة + المورّد الأب
+    // المملوك المتحقَّق) — البوابة ترفض DELETE الخام، وequipments بلا حذفٍ ناعم.
+    try {
+        $del_row = $fleet_gate->selectOne('equipments', array(
+            'columns' => array('id', 'suppliers'),
+            'where'   => array('id' => $delete_id),
+        ));
+        if ($del_row === null) {
+            header("Location: equipments_fleet.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+            exit();
+        }
+        $fleet_gate->deleteChild('equipments', $delete_id, 'suppliers', intval($del_row['suppliers']), 'suppliers', 'fleet hard delete');
         header("Location: equipments_fleet.php?msg=تم+حذف+المعدة+بنجاح+✅");
         exit();
-    } else {
+    } catch (\Throwable $e) {
         header("Location: equipments_fleet.php?msg=حدث+خطأ+أثناء+الحذف+❌");
         exit();
     }
@@ -162,17 +180,19 @@ if ($is_role10) {
 
 $selected_project = null;
 if ($selected_project_id > 0) {
-    $project_check_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = '1'";
-    $project_check_result = mysqli_query($conn, $project_check_query);
-    if ($project_check_result && mysqli_num_rows($project_check_result) > 0) {
-        $selected_project = mysqli_fetch_assoc($project_check_result);
-    } else {
+    // فحص المشروع المختار — كان بلا عزل شركةٍ أصلًا (تسرّبٌ كامنٌ أُغلق بالبوابة)
+    $selected_project = $fleet_gate->selectOne('project', array(
+        'columns'  => array('id', 'name', 'project_code'),
+        'whereRaw' => "id = ? AND status = '1'",
+        'params'   => array($selected_project_id),
+    ));
+    if ($selected_project === null) {
         unset($_SESSION['equipments_project_id']);
         $selected_project_id = 0;
     }
 }
 
-$projects_result = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
+// (أُزيل استعلام قائمة المشاريع الميت — نتيجته لا تُقرأ في أي موضع.)
 
 $page_title = "إدارة المعدات";
 include("../inheader.php");
@@ -200,92 +220,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         goto skip_save;
     }
 
-    // الحقول الأساسية
-    $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
-    $code = mysqli_real_escape_string($conn, trim($_POST['code']));
-    $type = mysqli_real_escape_string($conn, $_POST['type']);
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $status = isset($_POST['status']) ? intval($_POST['status']) : 0;
+    // قيمٌ خام للبوابة (نمط equipments.php المُثبَت) — الربط بالمعاملات يتكفّل بالهروب،
+    // والحقول الفارغة القابلة للإلغاء NULL حقيقيّ. دوال التطبيع تُطبَّق على الخام.
+    $suppliers = isset($_POST['suppliers']) ? $_POST['suppliers'] : '';
+    $type      = isset($_POST['type']) ? $_POST['type'] : '';
+    $status    = isset($_POST['status']) ? intval($_POST['status']) : 0;
+    $model_id  = (isset($_POST['model_id']) && $_POST['model_id'] !== '') ? intval($_POST['model_id']) : 0;
 
-    // المعلومات الأساسية والتعريفية
-    $serial_number = mysqli_real_escape_string($conn, trim($_POST['serial_number'] ?? ''));
-    $chassis_number = mysqli_real_escape_string($conn, trim($_POST['chassis_number'] ?? ''));
-    $machine_number = mysqli_real_escape_string($conn, trim($_POST['machine_number'] ?? ''));
+    $S  = function ($k) { return trim($_POST[$k] ?? ''); };
+    $D  = function ($k, $def) { return isset($_POST[$k]) ? $_POST[$k] : $def; };
+    $Ni = function ($k) { return !empty($_POST[$k]) ? intval($_POST[$k]) : null; };
+    $Nf = function ($k) { return !empty($_POST[$k]) ? floatval($_POST[$k]) : null; };
+    $Nd = function ($k) { return !empty($_POST[$k]) ? $_POST[$k] : null; };
 
-    // بيانات الصنع والموديل
-    $manufacturer = mysqli_real_escape_string($conn, trim($_POST['manufacturer'] ?? ''));
-    $model = mysqli_real_escape_string($conn, trim($_POST['model'] ?? ''));
-    // الموديل المرجعي من سجل النوع والموديل (fleet_model) — اختياري
-    $model_id = (isset($_POST['model_id']) && $_POST['model_id'] !== '') ? intval($_POST['model_id']) : 0;
-    $manufacturing_year = !empty($_POST['manufacturing_year']) ? intval($_POST['manufacturing_year']) : 'NULL';
-    $import_year = !empty($_POST['import_year']) ? intval($_POST['import_year']) : 'NULL';
-
-    // الحالة الفنية والمواصفات
-    $equipment_condition = mysqli_real_escape_string($conn, $_POST['equipment_condition'] ?? 'في حالة جيدة');
-    $operating_hours = !empty($_POST['operating_hours']) ? intval($_POST['operating_hours']) : 'NULL';
-    $engine_condition = mysqli_real_escape_string($conn, $_POST['engine_condition'] ?? 'جيدة');
-    $tires_condition = mysqli_real_escape_string($conn, $_POST['tires_condition'] ?? 'N/A');
-
-    // بيانات الملكية
-    $actual_owner_name = mysqli_real_escape_string($conn, trim($_POST['actual_owner_name'] ?? ''));
-    $owner_type = mysqli_real_escape_string($conn, $_POST['owner_type'] ?? '');
-    $owner_phone = mysqli_real_escape_string($conn, trim($_POST['owner_phone'] ?? ''));
-    $owner_supplier_relation = mysqli_real_escape_string($conn, $_POST['owner_supplier_relation'] ?? '');
-
-    // الوثائق والتسجيلات
-    $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
-    $license_authority = mysqli_real_escape_string($conn, trim($_POST['license_authority'] ?? ''));
-    $document_type = mysqli_real_escape_string($conn, trim($_POST['document_type'] ?? ''));
-    $license_expiry_date = !empty($_POST['license_expiry_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['license_expiry_date']) . "'" : 'NULL';
-    $inspection_certificate_number = mysqli_real_escape_string($conn, trim($_POST['inspection_certificate_number'] ?? ''));
-    $last_inspection_date = !empty($_POST['last_inspection_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_inspection_date']) . "'" : 'NULL';
-
-    // الموقع والتوفر
-    $current_location = mysqli_real_escape_string($conn, trim($_POST['current_location'] ?? ''));
-    $site_supervisor_name = mysqli_real_escape_string($conn, trim($_POST['site_supervisor_name'] ?? ''));
-    $site_supervisor_contact = mysqli_real_escape_string($conn, trim($_POST['site_supervisor_contact'] ?? ''));
-    $availability_state_input = $_POST['availability_state'] ?? '';
+    $availability_state_input  = $_POST['availability_state'] ?? '';
     $availability_status_input = $_POST['availability_status'] ?? '';
-    $availability_state = mysqli_real_escape_string($conn, normalize_equipment_availability_state($availability_state_input, $availability_status_input));
-    $availability_status = mysqli_real_escape_string($conn, normalize_equipment_availability_status($availability_state_input, $availability_status_input));
+    $availability_state  = normalize_equipment_availability_state($availability_state_input, $availability_status_input);
+    $availability_status = normalize_equipment_availability_status($availability_state_input, $availability_status_input);
 
-    // البيانات المالية والقيمة
-    $estimated_value = !empty($_POST['estimated_value']) ? floatval($_POST['estimated_value']) : 'NULL';
-    $daily_rental_price = !empty($_POST['daily_rental_price']) ? floatval($_POST['daily_rental_price']) : 'NULL';
-    $monthly_rental_price = !empty($_POST['monthly_rental_price']) ? floatval($_POST['monthly_rental_price']) : 'NULL';
-    $insurance_status = mysqli_real_escape_string($conn, $_POST['insurance_status'] ?? '');
-
-    // ملاحظات وسجل الصيانة
-    $general_notes = mysqli_real_escape_string($conn, trim($_POST['general_notes'] ?? ''));
-    $last_maintenance_date = !empty($_POST['last_maintenance_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_maintenance_date']) . "'" : 'NULL';
+    $data = array(
+        'suppliers'                     => $suppliers,
+        'code'                          => $S('code'),
+        'type'                          => $type,
+        'name'                          => $S('name'),
+        'status'                        => $status,
+        'serial_number'                 => $S('serial_number'),
+        'chassis_number'                => $S('chassis_number'),
+        'manufacturer'                  => $S('manufacturer'),
+        'model'                         => $S('model'),
+        'manufacturing_year'            => $Ni('manufacturing_year'),
+        'import_year'                   => $Ni('import_year'),
+        'equipment_condition'           => $D('equipment_condition', 'في حالة جيدة'),
+        'operating_hours'               => $Ni('operating_hours'),
+        'engine_condition'              => $D('engine_condition', 'جيدة'),
+        'tires_condition'               => $D('tires_condition', 'N/A'),
+        'actual_owner_name'             => $S('actual_owner_name'),
+        'owner_type'                    => $D('owner_type', ''),
+        'owner_phone'                   => $S('owner_phone'),
+        'owner_supplier_relation'       => $D('owner_supplier_relation', ''),
+        'license_number'                => $S('license_number'),
+        'license_authority'             => $S('license_authority'),
+        'license_expiry_date'           => $Nd('license_expiry_date'),
+        'inspection_certificate_number' => $S('inspection_certificate_number'),
+        'last_inspection_date'          => $Nd('last_inspection_date'),
+        'current_location'              => $S('current_location'),
+        'availability_status'           => $availability_status,
+        'estimated_value'               => $Nf('estimated_value'),
+        'daily_rental_price'            => $Nf('daily_rental_price'),
+        'monthly_rental_price'          => $Nf('monthly_rental_price'),
+        'insurance_status'              => $D('insurance_status', ''),
+        'general_notes'                 => $S('general_notes'),
+        'last_maintenance_date'         => $Nd('last_maintenance_date'),
+    );
+    if ($equipment_has_machine_number)          { $data['machine_number'] = $S('machine_number'); }
+    if ($equipment_has_document_type)           { $data['document_type'] = $S('document_type'); }
+    if ($equipment_has_site_supervisor_name)    { $data['site_supervisor_name'] = $S('site_supervisor_name'); }
+    if ($equipment_has_site_supervisor_contact) { $data['site_supervisor_contact'] = $S('site_supervisor_contact'); }
+    if ($equipment_has_availability_state)      { $data['availability_state'] = $availability_state; }
+    if ($equipment_has_model_id)                { $data['model_id'] = $model_id > 0 ? $model_id : null; }
 
 
 
     // التحقق من عدم تجاوز العدد المتعاقد عليه (فقط عند الإضافة)
     if ($edit_id == 0 && $suppliers && $type) {
-        // الحصول على عدد المعدات المتعاقد عليها لهذا المورد ونوع المعدة
-        $supplier_contract_query = "SELECT sc.id, sce.equip_count
-                                   FROM supplierscontracts sc
-                                   JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
-                                   WHERE sc.supplier_id = $suppliers
-                                   AND sce.equip_type = '$type'
-                                   AND sc.status = 1
-                                   LIMIT 1";
-        $supplier_contract_result = mysqli_query($conn, $supplier_contract_query);
+        // عقد المورّد لهذا النوع (معزولًا) — نفس نمط equipments.php المُثبَت
+        $contract_rows = $fleet_gate->scopedQuery(array(
+            'scope'  => array('sc' => 'supplierscontracts'),
+            'enrich' => array('sce' => 'suppliercontractequipments'),
+        ),
+            "SELECT sc.id, sce.equip_count
+               FROM supplierscontracts sc
+               LEFT JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
+              WHERE {TENANT_SCOPE}
+                AND sc.supplier_id = ?
+                AND sce.equip_type = ?
+                AND sc.status = 1
+                AND sce.id IS NOT NULL
+              LIMIT 1",
+            array($suppliers, $type)
+        );
 
-        if ($supplier_contract_result && mysqli_num_rows($supplier_contract_result) > 0) {
-            $supplier_contract = mysqli_fetch_assoc($supplier_contract_result);
-            $contracted_count = intval($supplier_contract['equip_count']);
+        if (!empty($contract_rows)) {
+            $contracted_count = intval($contract_rows[0]['equip_count']);
 
-            // حساب عدد المعدات المضافة حالياً
-            $added_count_query = "SELECT COUNT(*) as added_count
-                                 FROM equipments
-                                 WHERE suppliers = $suppliers
-                                 AND type = '$type'
-                                 AND status = 1";
-            $added_count_result = mysqli_query($conn, $added_count_query);
-            $added_count_row = $added_count_result ? mysqli_fetch_assoc($added_count_result) : null;
-            $current_added = intval($added_count_row['added_count'] ?? 0);
+            // عدد المعدات المضافة حاليًا (معزولًا عبر البوابة)
+            $current_added = $fleet_gate->count('equipments', array(
+                'whereRaw' => "suppliers = ? AND type = ? AND status = 1",
+                'params'   => array($suppliers, $type),
+            ));
 
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
@@ -295,195 +317,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         }
     }
 
-    $equipment_save_fields = [
-        "suppliers='$suppliers'",
-        "code='$code'",
-        "type='$type'",
-        "name='$name'",
-        "status=$status",
-        "serial_number='$serial_number'",
-        "chassis_number='$chassis_number'",
-        "manufacturer='$manufacturer'",
-        "model='$model'",
-        "manufacturing_year=$manufacturing_year",
-        "import_year=$import_year",
-        "equipment_condition='$equipment_condition'",
-        "operating_hours=$operating_hours",
-        "engine_condition='$engine_condition'",
-        "tires_condition='$tires_condition'",
-        "actual_owner_name='$actual_owner_name'",
-        "owner_type='$owner_type'",
-        "owner_phone='$owner_phone'",
-        "owner_supplier_relation='$owner_supplier_relation'",
-        "license_number='$license_number'",
-        "license_authority='$license_authority'",
-        "license_expiry_date=$license_expiry_date",
-        "inspection_certificate_number='$inspection_certificate_number'",
-        "last_inspection_date=$last_inspection_date",
-        "current_location='$current_location'",
-        "availability_status='$availability_status'",
-        "estimated_value=$estimated_value",
-        "daily_rental_price=$daily_rental_price",
-        "monthly_rental_price=$monthly_rental_price",
-        "insurance_status='$insurance_status'",
-        "general_notes='$general_notes'",
-        "last_maintenance_date=$last_maintenance_date"
-    ];
-
-    if ($equipment_has_machine_number) {
-        $equipment_save_fields[] = "machine_number='$machine_number'";
-    }
-    if ($equipment_has_document_type) {
-        $equipment_save_fields[] = "document_type='$document_type'";
-    }
-    if ($equipment_has_site_supervisor_name) {
-        $equipment_save_fields[] = "site_supervisor_name='$site_supervisor_name'";
-    }
-    if ($equipment_has_site_supervisor_contact) {
-        $equipment_save_fields[] = "site_supervisor_contact='$site_supervisor_contact'";
-    }
-    if ($equipment_has_availability_state) {
-        $equipment_save_fields[] = "availability_state='$availability_state'";
-    }
-    if ($equipment_has_model_id) {
-        $equipment_save_fields[] = "model_id=" . ($model_id > 0 ? $model_id : 'NULL');
-    }
-
     if ($edit_id > 0) {
-        // التحقق: إذا كانت المعدة تعمل في مشروع نشط، لا يُسمح بتغيير الحالة
-        $old_status_res = mysqli_query($conn, "SELECT status FROM equipments WHERE id = $edit_id LIMIT 1");
-        $old_status_row = $old_status_res ? mysqli_fetch_assoc($old_status_res) : null;
-        $old_status = $old_status_row ? intval($old_status_row['status']) : -1;
+        // التحقق: إذا كانت المعدة تعمل في مشروع نشط، لا يُسمح بتغيير الحالة (معزولًا)
+        $old_row = $fleet_gate->selectOne('equipments', array('columns' => array('status'), 'where' => array('id' => $edit_id)));
+        $old_status = $old_row !== null ? intval($old_row['status']) : -1;
 
         if ($old_status !== $status) {
-            $active_ops = mysqli_query($conn, "SELECT COUNT(*) as cnt FROM operations WHERE equipment = $edit_id AND status = '1'");
-            $active_ops_row = $active_ops ? mysqli_fetch_assoc($active_ops) : null;
-            if ($active_ops_row && intval($active_ops_row['cnt']) > 0) {
+            $active_cnt = $fleet_gate->count('operations', array(
+                'whereRaw' => "equipment = ? AND status = '1'",
+                'params'   => array($edit_id),
+            ));
+            if ($active_cnt > 0) {
                 $success_msg = "❌ لا يمكن تغيير حالة المعدة وهي تعمل في مشروع نشط";
                 goto skip_save;
             }
         }
-
-        // تعديل
-        $company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id='$current_company_id'" : "";
-        $sql = "UPDATE equipments SET\n                    " . implode(",\n                    ", $equipment_save_fields) . "\n                WHERE id='$edit_id'$company_where";
-        $msg = "تم+تعديل+المعدة+بنجاح+✅";
-    } else {
-        // إضافة
-        $insert_columns = [
-            'suppliers',
-            'code',
-            'type',
-            'name',
-            'status',
-            'serial_number',
-            'chassis_number',
-            'manufacturer',
-            'model',
-            'manufacturing_year',
-            'import_year',
-            'equipment_condition',
-            'operating_hours',
-            'engine_condition',
-            'tires_condition',
-            'actual_owner_name',
-            'owner_type',
-            'owner_phone',
-            'owner_supplier_relation',
-            'license_number',
-            'license_authority',
-            'license_expiry_date',
-            'inspection_certificate_number',
-            'last_inspection_date',
-            'current_location',
-            'availability_status',
-            'estimated_value',
-            'daily_rental_price',
-            'monthly_rental_price',
-            'insurance_status',
-            'general_notes',
-            'last_maintenance_date'
-        ];
-        $insert_values = [
-            "'$suppliers'",
-            "'$code'",
-            "'$type'",
-            "'$name'",
-            "$status",
-            "'$serial_number'",
-            "'$chassis_number'",
-            "'$manufacturer'",
-            "'$model'",
-            "$manufacturing_year",
-            "$import_year",
-            "'$equipment_condition'",
-            "$operating_hours",
-            "'$engine_condition'",
-            "'$tires_condition'",
-            "'$actual_owner_name'",
-            "'$owner_type'",
-            "'$owner_phone'",
-            "'$owner_supplier_relation'",
-            "'$license_number'",
-            "'$license_authority'",
-            "$license_expiry_date",
-            "'$inspection_certificate_number'",
-            "$last_inspection_date",
-            "'$current_location'",
-            "'$availability_status'",
-            "$estimated_value",
-            "$daily_rental_price",
-            "$monthly_rental_price",
-            "'$insurance_status'",
-            "'$general_notes'",
-            "$last_maintenance_date"
-        ];
-
-        if ($equipment_has_machine_number) {
-            $insert_columns[] = 'machine_number';
-            $insert_values[] = "'$machine_number'";
-        }
-        if ($equipment_has_document_type) {
-            $insert_columns[] = 'document_type';
-            $insert_values[] = "'$document_type'";
-        }
-        if ($equipment_has_site_supervisor_name) {
-            $insert_columns[] = 'site_supervisor_name';
-            $insert_values[] = "'$site_supervisor_name'";
-        }
-        if ($equipment_has_site_supervisor_contact) {
-            $insert_columns[] = 'site_supervisor_contact';
-            $insert_values[] = "'$site_supervisor_contact'";
-        }
-        if ($equipment_has_availability_state) {
-            $insert_columns[] = 'availability_state';
-            $insert_values[] = "'$availability_state'";
-        }
-        if ($equipment_has_company_id && $current_company_id > 0) {
-            $insert_columns[] = 'company_id';
-            $insert_values[] = "'$current_company_id'";
-        }
-        if ($equipment_has_model_id) {
-            $insert_columns[] = 'model_id';
-            $insert_values[] = ($model_id > 0 ? $model_id : 'NULL');
-        }
-        // تتبّع الإضافة (منشئ المعدة + تاريخ الإضافة) — لسجل «تحركات الآلية».
-        if (db_table_has_column($conn, 'equipments', 'created_by') && $current_user_id > 0) {
-            $insert_columns[] = 'created_by';
-            $insert_values[]  = intval($current_user_id);
-        }
-        if (db_table_has_column($conn, 'equipments', 'created_at')) {
-            $insert_columns[] = 'created_at';
-            $insert_values[]  = 'NOW()';
-        }
-
-        $sql = "INSERT INTO equipments (" . implode(', ', $insert_columns) . ") VALUES (" . implode(', ', $insert_values) . ")";
-        $msg = "تمت+إضافة+المعدة+بنجاح+✅";
     }
 
-    if (mysqli_query($conn, $sql)) {
-        // حفظ حقول كرت المعدة (الهوية/العدّاد) — إضافي وآمن
-        $card_eq_id = ($edit_id > 0) ? $edit_id : intval(mysqli_insert_id($conn));
+    try {
+        // الإدراج/التعديل عبر البوابة: تُحقن company_id آليًّا وتُعزَل الكتابة بالشركة.
+        if ($edit_id > 0) {
+            $fleet_gate->update('equipments', $data, array('id' => $edit_id));
+            $card_eq_id = $edit_id;
+            $msg = "تم+تعديل+المعدة+بنجاح+✅";
+        } else {
+            // تتبّع الإضافة (منشئ المعدة + تاريخ الإضافة) — NOW() → توقيت PHP (نمط الهجرة)
+            if (db_table_has_column($conn, 'equipments', 'created_by') && $current_user_id > 0) {
+                $data['created_by'] = $current_user_id;
+            }
+            if (db_table_has_column($conn, 'equipments', 'created_at')) {
+                $data['created_at'] = date('Y-m-d H:i:s');
+            }
+            $card_eq_id = (int) $fleet_gate->insert('equipments', $data);
+            $msg = "تمت+إضافة+المعدة+بنجاح+✅";
+        }
+
         // سجل «إضافة للنظام» — فقط عند الإضافة الفعلية (لا التعديل).
         if ($edit_id <= 0 && $card_eq_id > 0) {
             require_once __DIR__ . '/../includes/equipment_log_helper.php';
@@ -492,14 +360,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             if ($current_user_id > 0)    { $log_opts['user_id'] = $current_user_id; }
             log_equipment_event($conn, $card_eq_id, 'إضافة للنظام', $log_opts);
         }
+        // حفظ حقول كرت المعدة (الهوية/العدّاد) — إضافي وآمن
         $card_scope = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
         if (function_exists('ems_save_equipment_card_fields')) {
             ems_save_equipment_card_fields($conn, $card_eq_id, ($edit_id <= 0), $card_scope);
         }
         header("Location: equipments_fleet.php?msg=$msg");
         exit;
-    } else {
-        $success_msg = "خطأ في الحفظ: " . mysqli_error($conn);
+    } catch (\Throwable $e) {
+        $success_msg = "خطأ في الحفظ: " . $e->getMessage();
     }
 
     skip_save:
@@ -509,10 +378,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
 $editData = [];
 if (isset($_GET['edit']) && $can_edit) {
     $editId = intval($_GET['edit']);
-    $edit_company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id='$current_company_id'" : "";
-    $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'$edit_company_where");
-    if ($res && mysqli_num_rows($res) > 0) {
-        $editData = mysqli_fetch_assoc($res);
+    // جلب المعدة للتعديل ضمن نطاق العزل
+    $row = $fleet_gate->selectOne('equipments', array('where' => array('id' => $editId)));
+    if ($row !== null) {
+        $editData = $row;
     }
 }
 
@@ -539,34 +408,31 @@ $fleet_maintenance_count = 0;
 $fleet_reserved_count = 0;
 $fleet_active_ops_count = 0;
 
-$fleet_company_where_plain = ($equipment_has_company_id && $current_company_id > 0)
-    ? " WHERE company_id = $current_company_id"
-    : "";
-
-$_ftc_res = mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments$fleet_company_where_plain");
-$fleet_total_count = intval($_ftc_res ? (mysqli_fetch_assoc($_ftc_res)['t'] ?? 0) : 0);
+// عدّادات الأسطول الخمسة — معزولةً عبر البوابة (count/scopedQuery)
+$fleet_total_count = $fleet_gate->count('equipments');
 
 if ($equipment_has_availability_state) {
-    $fleet_available_sql = "SELECT COUNT(*) AS t FROM equipments
-        WHERE (
+    $fleet_available_where = "(
             availability_state = 'متوفرة'
             OR ((availability_state IS NULL OR availability_state = '')
                 AND (availability_status IS NULL OR availability_status = '' OR availability_status IN ('متاحة للعمل','قيد الاستخدام')))
-        )" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '');
+        )";
 } else {
-    $fleet_available_sql = "SELECT COUNT(*) AS t FROM equipments
-        WHERE (availability_status IS NULL OR availability_status = '' OR availability_status IN ('متاحة للعمل','قيد الاستخدام'))" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '');
+    $fleet_available_where = "(availability_status IS NULL OR availability_status = '' OR availability_status IN ('متاحة للعمل','قيد الاستخدام'))";
 }
-
-$_fac_res = mysqli_query($conn, $fleet_available_sql);
-$fleet_available_count = intval($_fac_res ? (mysqli_fetch_assoc($_fac_res)['t'] ?? 0) : 0);
+$fleet_available_count = $fleet_gate->count('equipments', array('whereRaw' => $fleet_available_where));
 $fleet_unavailable_count = max(0, $fleet_total_count - $fleet_available_count);
-$_fmc_res = mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 1" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : ''));
-$fleet_maintenance_count = intval($_fmc_res ? (mysqli_fetch_assoc($_fmc_res)['t'] ?? 0) : 0);
-$_frc_res = mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 2" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : ''));
-$fleet_reserved_count = intval($_frc_res ? (mysqli_fetch_assoc($_frc_res)['t'] ?? 0) : 0);
-$_faoc_res = mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS t FROM operations o JOIN equipments m ON m.id = o.equipment WHERE o.status = '1'$equipment_company_filter");
-$fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t'] ?? 0) : 0);
+$fleet_maintenance_count = $fleet_gate->count('equipments', array('whereRaw' => 'status = 1'));
+$fleet_reserved_count = $fleet_gate->count('equipments', array('whereRaw' => 'status = 2'));
+// «قيد التشغيل»: JOIN الداخلي على equipments → LEFT + IS NOT NULL (عقد الإثراء)
+$_faoc_rows = $fleet_gate->scopedQuery(array(
+    'scope'  => array('o' => 'operations'),
+    'enrich' => array('m' => 'equipments'),
+), "SELECT COUNT(DISTINCT o.equipment) AS t
+      FROM operations o
+      LEFT JOIN equipments m ON m.id = o.equipment
+     WHERE {TENANT_SCOPE} AND o.status = '1' AND m.id IS NOT NULL", array());
+$fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 ?>
 
 <style>
@@ -719,12 +585,15 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                             <select name="suppliers" id="suppliers" required>
                                 <option value="">-- اختر المورد --</option>
                                 <?php
-                                $supplier_company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
-                                $supplier_query = "SELECT id, name FROM suppliers WHERE status = 1$supplier_company_where ORDER BY name";
-                                $supplier_result = mysqli_query($conn, $supplier_query);
-                                if ($supplier_result) while ($supplier = mysqli_fetch_assoc($supplier_result)) {
+                                // موردو الشركة عبر البوابة
+                                $supplier_rows = $fleet_gate->select('suppliers', array(
+                                    'columns'  => array('id', 'name'),
+                                    'whereRaw' => "status = 1",
+                                    'orderBy'  => 'name ASC',
+                                ));
+                                foreach ($supplier_rows as $supplier) {
                                     $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
-                                    echo "<option value='{$supplier['id']}' $selected>{$supplier['name']}</option>";
+                                    echo "<option value='" . intval($supplier['id']) . "' $selected>" . htmlspecialchars($supplier['name']) . "</option>";
                                 }
                                 ?>
                             </select>
@@ -748,13 +617,15 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                             <select name="type" id="type" required>
                                 <option value="">-- حدد نوع المعدة --</option>
                                 <?php
-                                $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                                $type_result = mysqli_query($conn, $type_query);
-                                if ($type_result) {
-                                    while ($type_row = mysqli_fetch_assoc($type_result)) {
-                                        $selected = (!empty($editData) && $editData['type'] == $type_row['id']) ? 'selected' : '';
-                                        echo "<option value='" . intval($type_row['id']) . "' $selected>" . htmlspecialchars($type_row['type']) . "</option>";
-                                    }
+                                // أنواع المعدات — كتالوج عام (managed) عبر البوابة
+                                $type_rows = $fleet_gate->select('equipments_types', array(
+                                    'columns'  => array('id', 'type'),
+                                    'whereRaw' => "status = 1",
+                                    'orderBy'  => 'type ASC',
+                                ));
+                                foreach ($type_rows as $type_row) {
+                                    $selected = (!empty($editData) && $editData['type'] == $type_row['id']) ? 'selected' : '';
+                                    echo "<option value='" . intval($type_row['id']) . "' $selected>" . htmlspecialchars($type_row['type']) . "</option>";
                                 }
                                 ?>
                             </select>
@@ -822,20 +693,22 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                             <select name="model_id" id="model_id">
                                 <option value="">-- اختر من السجل (اختياري) --</option>
                                 <?php
-                                $fm_scope = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
-                                $fm_q = @mysqli_query($conn, "SELECT id, code, model_name, manufacturer, equipment_type_id, operating_category FROM fleet_model WHERE is_deleted = 0 AND status = 'active'$fm_scope ORDER BY code ASC");
+                                // سجل النوع والموديل عبر البوابة (soft: تستثني المحذوف تلقائيًّا)
+                                $fm_rows = $fleet_gate->select('fleet_model', array(
+                                    'columns'  => array('id', 'code', 'model_name', 'manufacturer', 'equipment_type_id', 'operating_category'),
+                                    'whereRaw' => "status = 'active'",
+                                    'orderBy'  => 'code ASC',
+                                ));
                                 $cur_model_id = isset($editData['model_id']) ? intval($editData['model_id']) : 0;
-                                if ($fm_q) {
-                                    while ($fm_row = mysqli_fetch_assoc($fm_q)) {
-                                        $sel = ($cur_model_id === intval($fm_row['id'])) ? 'selected' : '';
-                                        $label = $fm_row['code'] . ' — ' . $fm_row['model_name'];
-                                        echo "<option value='" . intval($fm_row['id']) . "' $sel"
-                                            . " data-type='" . intval($fm_row['equipment_type_id']) . "'"
-                                            . " data-manufacturer='" . htmlspecialchars($fm_row['manufacturer'] ?? '', ENT_QUOTES) . "'"
-                                            . " data-model='" . htmlspecialchars($fm_row['model_name'] ?? '', ENT_QUOTES) . "'"
-                                            . " data-category='" . htmlspecialchars($fm_row['operating_category'] ?? '', ENT_QUOTES) . "'>"
-                                            . htmlspecialchars($label) . "</option>";
-                                    }
+                                foreach ($fm_rows as $fm_row) {
+                                    $sel = ($cur_model_id === intval($fm_row['id'])) ? 'selected' : '';
+                                    $label = $fm_row['code'] . ' — ' . $fm_row['model_name'];
+                                    echo "<option value='" . intval($fm_row['id']) . "' $sel"
+                                        . " data-type='" . intval($fm_row['equipment_type_id']) . "'"
+                                        . " data-manufacturer='" . htmlspecialchars($fm_row['manufacturer'] ?? '', ENT_QUOTES) . "'"
+                                        . " data-model='" . htmlspecialchars($fm_row['model_name'] ?? '', ENT_QUOTES) . "'"
+                                        . " data-category='" . htmlspecialchars($fm_row['operating_category'] ?? '', ENT_QUOTES) . "'>"
+                                        . htmlspecialchars($label) . "</option>";
                                 }
                                 ?>
                             </select>
@@ -1288,10 +1161,13 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <select id="filterSupplier" class="filter-select">
                             <option value="">— جميع الموردين —</option>
                             <?php
-                            $supplier_company_filter_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
-                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE status = 1$supplier_company_filter_where ORDER BY name";
-                            $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
-                            if ($supplier_filter_result) while ($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
+                            // فلتر الموردين — نفس مصدر البوابة المعزول
+                            $supplier_filter_rows = $fleet_gate->select('suppliers', array(
+                                'columns'  => array('id', 'name'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'name ASC',
+                            ));
+                            foreach ($supplier_filter_rows as $supplier) {
                                 echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
                             }
                             ?>
@@ -1303,9 +1179,13 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <select id="filterType" class="filter-select">
                             <option value="">— جميع الأنواع —</option>
                             <?php
-                            $type_filter_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                            $type_filter_result = mysqli_query($conn, $type_filter_query);
-                            if ($type_filter_result) while ($type_row = mysqli_fetch_assoc($type_filter_result)) {
+                            // فلتر الأنواع — كتالوج عام عبر البوابة
+                            $type_filter_rows = $fleet_gate->select('equipments_types', array(
+                                'columns'  => array('id', 'type'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'type ASC',
+                            ));
+                            foreach ($type_filter_rows as $type_row) {
                                 echo "<option value='" . htmlspecialchars($type_row['type']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
                             }
                             ?>
@@ -1391,7 +1271,9 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         $card_state_select = db_table_has_column($conn, 'equipments', 'card_state')
                             ? "m.card_state,"
                             : "'active' AS card_state,";
-                        $query2 = "
+                        // العزل عبر {TENANT_SCOPE}؛ JOIN المورّد الداخلي → LEFT + s.id IS NOT NULL؛
+                        // et كتالوجٌ عامّ لا يُعلَن
+                        $list_sql = "
                         SELECT
                             m.id,
                             s.name AS supplier_name,
@@ -1412,7 +1294,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
-                        JOIN suppliers s ON m.suppliers = s.id
+                        LEFT JOIN suppliers s ON m.suppliers = s.id
                         LEFT JOIN equipments_types et ON m.type = et.id
                         LEFT JOIN operations o
                             ON o.equipment = m.id
@@ -1422,12 +1304,15 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         LEFT JOIN employees d
                             ON d.id = ed.employee_id
                             AND ed.status = '1'
-                        WHERE 1=1 $equipment_company_filter
+                        WHERE {TENANT_SCOPE} AND s.id IS NOT NULL
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
-                        $result = mysqli_query($conn, $query2);
-                        if ($result) while ($row = mysqli_fetch_assoc($result)) {
+                        $fleet_rows = $fleet_gate->scopedQuery(array(
+                            'scope'  => array('m' => 'equipments'),
+                            'enrich' => array('s' => 'suppliers', 'o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees'),
+                        ), $list_sql, array());
+                        foreach ($fleet_rows as $row) {
 
 
                             echo "<tr>";
@@ -1488,11 +1373,13 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                             // تفاصيل إضافية بجانب الكود
                             $name_display = "";
 
-                            // المشروع النشط
+                            // المشروع النشط (كان بلا عزل شركةٍ — أُغلق بالبوابة)
                             if (!empty($row['project_id'])) {
-                                $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . intval($row['project_id']) . "'");
-                                if ($p_res && mysqli_num_rows($p_res) > 0) {
-                                    $p = mysqli_fetch_assoc($p_res);
+                                $p = $fleet_gate->selectOne('project', array(
+                                    'columns' => array('name'),
+                                    'where'   => array('id' => intval($row['project_id'])),
+                                ));
+                                if ($p !== null) {
                                     $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
                                 }
                             }
