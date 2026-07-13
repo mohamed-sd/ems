@@ -26,46 +26,20 @@ $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['rol
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
-// فحص وجود عمود company_id
-$drivers_has_company = false;
-$check_column = mysqli_query($conn, "SHOW COLUMNS FROM employees LIKE 'company_id'");
-if ($check_column && mysqli_num_rows($check_column) > 0) {
-    $drivers_has_company = true;
-}
-
-// بناء شرط WHERE مع عزل البيانات
-$where_clause = "id = $employee_id";
-if (!$is_super_admin) {
-    if ($drivers_has_company) {
-        $where_clause .= " AND company_id = $company_id";
-    } else {
-        // إذا لم يكن هناك company_id في الجدول، استخدم الطريقة البديلة
-        $where_clause .= " AND EXISTS (
-            SELECT 1
-            FROM drivercontracts dsc
-            INNER JOIN project sp ON sp.id = dsc.project_id
-            INNER JOIN users su ON su.id = sp.created_by
-            WHERE dsc.employee_id = employees.id
-              AND su.company_id = $company_id
-        )";
-    }
-}
-
-$query = "SELECT * FROM employees WHERE $where_clause LIMIT 1";
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
-    // خطأ في الاستعلام
+// العزل عبر البوابة — يستبدل فحص العمود وسُلَّم created_by الاحتياطي
+$emp_data_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('employee data super view') : ems_tenant_db();
+try {
+    $driver = $emp_data_gate->selectOne('employees', array('where' => array('id' => $employee_id)));
+} catch (\Throwable $t) {
     ob_end_clean();
     header('Content-Type: application/json; charset=utf-8');
     die(json_encode([
         'success' => false,
-        'message' => 'خطأ في قاعدة البيانات: ' . mysqli_error($conn)
+        'message' => 'خطأ في قاعدة البيانات'
     ], JSON_UNESCAPED_UNICODE));
 }
 
-if (mysqli_num_rows($result) > 0) {
-    $driver = mysqli_fetch_assoc($result);
+if ($driver !== null) {
 
     // تنظيف output buffer وطباعة JSON فقط
     ob_end_clean();

@@ -10,10 +10,17 @@ require_once '../includes/driver_contract_dates.php';
 
 $employee_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $driver = null;
+// العزل عبر البوابة (كانت القراءتان بلا عزل شركةٍ — تسرّبٌ كامنٌ أُغلق)
+$role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$hist_gate = ($role === '-1') ? ems_tenant_db()->forAllTenants('driver history super') : ems_tenant_db();
 if ($employee_id > 0) {
-    $driver_result = mysqli_query($conn, "SELECT id, name, phone, status FROM employees WHERE id = $employee_id");
-    if ($driver_result && mysqli_num_rows($driver_result) > 0) {
-        $driver = mysqli_fetch_assoc($driver_result);
+    try {
+        $driver = $hist_gate->selectOne('employees', array(
+            'columns' => array('id', 'name', 'phone', 'status'),
+            'where'   => array('id' => $employee_id),
+        ));
+    } catch (\Throwable $t) {
+        $driver = null;
     }
 }
 
@@ -98,10 +105,23 @@ include("../insidebar.php");
                         WHERE ed.employee_id = $employee_id
                         ORDER BY ed.id DESC
                     ";
-                    $history_result = mysqli_query($conn, $history_query);
+                    // JOIN المعدات الداخلي → LEFT + e.id IS NOT NULL (عقد الإثراء)
+                    $history_query = str_replace(
+                        array('JOIN equipments e ON', "WHERE ed.employee_id = $employee_id"),
+                        array('LEFT JOIN equipments e ON', "WHERE {TENANT_SCOPE} AND e.id IS NOT NULL AND ed.employee_id = ?"),
+                        $history_query
+                    );
+                    try {
+                        $history_rows = $hist_gate->scopedQuery(array(
+                            'scope'  => array('ed' => 'equipment_drivers'),
+                            'enrich' => array('e' => 'equipments', 's' => 'suppliers'),
+                        ), $history_query, array($employee_id));
+                    } catch (\Throwable $t) {
+                        $history_rows = array();
+                    }
                     $i = 1;
-                    if ($history_result && mysqli_num_rows($history_result) > 0) {
-                        while ($row = mysqli_fetch_assoc($history_result)) {
+                    if (!empty($history_rows)) {
+                        foreach ($history_rows as $row) {
                             $is_current = ($row['status'] == '1');
                             $row_class = $is_current ? 'current-assignment' : '';
                             $status_text = $is_current ? 'يعمل حاليا' : 'سابق';
@@ -123,7 +143,7 @@ include("../insidebar.php");
                     ?>
                 </tbody>
             </table>
-            <?php if (!$history_result || mysqli_num_rows($history_result) === 0) { ?>
+            <?php if (empty($history_rows)) { ?>
                 <div style="margin-top: 1rem; color: #6c757d;">لا يوجد سجل قيادة للشاحنات لهذا السائق.</div>
             <?php } ?>
         </div>

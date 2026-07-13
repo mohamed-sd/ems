@@ -42,22 +42,26 @@ require_once '../config.php'; // require_once يمنع إعادة تضمين con
 
 $contract_id = intval($_GET['id']);
 
-$sql = "SELECT 
-            id, employee_id, contract_signing_date, grace_period_days, contract_duration_months, 
-            actual_start, actual_end, transportation, accommodation, place_for_living, 
-            workshop, equip_type, equip_size, equip_count, equip_target_per_month, 
-            equip_total_month, equip_total_contract, mach_type, mach_size, mach_count, 
-            mach_target_per_month, mach_total_month, mach_total_contract, 
-            hours_monthly_target, forecasted_contracted_hours, created_at, updated_at ,
-            daily_work_hours , daily_operators ,first_party ,second_party , witness_one , 
-            witness_two,project_id
-        FROM drivercontracts
-        WHERE id = $contract_id
-        LIMIT 1";
+// عقد السائق معزولًا عبر البوابة (كان بلا عزل شركةٍ — تسرّبٌ كامنٌ أُغلق)
+$role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$sce_gate = ($role === '-1') ? ems_tenant_db()->forAllTenants('driver contract super view') : ems_tenant_db();
+try {
+    $sce_row = $sce_gate->selectOne('drivercontracts', array(
+        'columns' => array('id', 'employee_id', 'contract_signing_date', 'grace_period_days', 'contract_duration_months',
+            'actual_start', 'actual_end', 'transportation', 'accommodation', 'place_for_living',
+            'workshop', 'equip_type', 'equip_size', 'equip_count', 'equip_target_per_month',
+            'equip_total_month', 'equip_total_contract', 'mach_type', 'mach_size', 'mach_count',
+            'mach_target_per_month', 'mach_total_month', 'mach_total_contract',
+            'hours_monthly_target', 'forecasted_contracted_hours', 'created_at', 'updated_at',
+            'daily_work_hours', 'daily_operators', 'first_party', 'second_party', 'witness_one',
+            'witness_two', 'project_id'),
+        'where'   => array('id' => $contract_id),
+    ));
+} catch (\Throwable $t) {
+    $sce_row = null;
+}
 
-$result = mysqli_query($conn, $sql);
-
-if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+if ($sce_row !== null) { foreach (array($sce_row) as $row) {
 ?>
     <div class="report">
         <div class="row">

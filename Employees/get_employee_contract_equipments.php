@@ -12,13 +12,17 @@ include '../config.php';
 if (isset($_POST['contract_id'])) {
   $contract_id = intval($_POST['contract_id']);
 
-  $query = "SELECT * FROM drivercontractequipments WHERE contract_id = $contract_id ORDER BY id ASC";
-  $result = mysqli_query($conn, $query);
-
-  $equipments = [];
-  if ($result) { while ($row = mysqli_fetch_assoc($result)) {
-    $equipments[] = $row;
-  } }
+  // معزولةً عبر البوابة (كانت بلا عزل شركةٍ — تسرّبٌ كامنٌ أُغلق)
+  $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+  $gate = ($role === '-1') ? ems_tenant_db()->forAllTenants('dce super') : ems_tenant_db();
+  try {
+    $equipments = $gate->select('drivercontractequipments', array(
+      'where'   => array('contract_id' => $contract_id),
+      'orderBy' => 'id ASC',
+    ));
+  } catch (\Throwable $t) {
+    $equipments = [];
+  }
 
   header('Content-Type: application/json');
   echo json_encode($equipments);
