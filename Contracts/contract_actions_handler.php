@@ -18,26 +18,13 @@ if (!$is_super_admin && $company_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'لا يمكن تحديد الشركة الحالية']));
 }
 
-function contractTenantScopeSql($conn, $is_super_admin, $company_id, $alias)
+// بوابة العزل — تستبدل contractTenantScopeSql القديم (وفيه احتياطي project/users).
+function contract_actions_gate()
 {
-    if ($is_super_admin) {
-        return '1=1';
-    }
-
-    $safe_company_id = intval($company_id);
-    $a = $alias !== '' ? $alias . '.' : '';
-
-    if (db_table_has_column($conn, 'contracts', 'company_id')) {
-        return $a . "company_id = " . $safe_company_id;
-    }
-
-    return "EXISTS (
-        SELECT 1
-        FROM project p
-        JOIN users u ON u.project_id = p.id
-        WHERE p.id = " . $a . "project_id
-          AND u.company_id = " . $safe_company_id . "
-    )";
+    $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    return ($role === '-1')
+        ? ems_tenant_db()->forAllTenants('contract actions super')
+        : ems_tenant_db();
 }
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
@@ -49,83 +36,48 @@ if (!$contract_id) {
 }
 
 function getContractData($contract_id, $conn, $is_super_admin, $company_id) {
-    $tenant_scope = contractTenantScopeSql($conn, $is_super_admin, $company_id, 'c');
-    $query = "SELECT c.* FROM contracts c WHERE c.id = $contract_id AND $tenant_scope LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    return $result ? mysqli_fetch_assoc($result) : null;
+    // التوقيع محفوظ؛ العزل عبر البوابة (وتستثني المحذوف ناعمًا — العقود المؤرشفة
+    // لم تعد قابلةً لإجراءات دورة الحياة، وهو الأصحّ دلاليًّا).
+    try {
+        return contract_actions_gate()->selectOne('contracts', array(
+            'where' => array('id' => intval($contract_id)),
+        ));
+    } catch (\Throwable $e) {
+        return null;
+    }
 }
 
 function addContractNote($contract_id, $note, $user_id, $conn) {
-    $note_esc = mysqli_real_escape_string($conn, $note);
-    $sql = "INSERT INTO contract_notes (contract_id, note, user_id, created_at) VALUES ($contract_id, '$note_esc', $user_id, NOW())";
-    return mysqli_query($conn, $sql);
+    // إدراجٌ عبر البوابة (company_id تُحقن آليًّا؛ NOW() → توقيت PHP)
+    try {
+        contract_actions_gate()->insert('contract_notes', array(
+            'contract_id' => intval($contract_id),
+            'note'        => $note,
+            'user_id'     => intval($user_id),
+            'created_at'  => date('Y-m-d H:i:s'),
+        ));
+        return true;
+    } catch (\Throwable $e) {
+        return false;
+    }
 }
 
 function executeOperations($operations, $conn) {
-    mysqli_begin_transaction($conn);
-
+    // معاملةٌ مُدارة عبر البوابة: كل عمليةٍ داخلها تمرّ بحُرّاس العزل كاملةً،
+    // وأي فشلٍ = تراجعُ الكل (الذرّية كالأصل، والعزل مكسبٌ جديد).
     try {
-        foreach ($operations as $op) {
-            if ($op['db_action'] === 'update') {
-                $table = $op['table'];
-                $data = $op['data'];
-                $where = $op['where'];
-
-                $set_parts = [];
-                foreach ($data as $key => $value) {
-                    if ($value === null) {
-                        $set_parts[] = "$key = NULL";
-                    } elseif (is_numeric($value)) {
-                        $set_parts[] = "$key = $value";
-                    } else {
-                        $value_esc = mysqli_real_escape_string($conn, $value);
-                        $set_parts[] = "$key = '$value_esc'";
-                    }
-                }
-                $set_clause = implode(', ', $set_parts);
-
-                $where_parts = [];
-                foreach ($where as $key => $value) {
-                    $where_parts[] = "$key = $value";
-                }
-                $where_clause = implode(' AND ', $where_parts);
-
-                $sql = "UPDATE $table SET $set_clause WHERE $where_clause";
-                if (!mysqli_query($conn, $sql)) {
-                    throw new Exception('فشل في تحديث البيانات: ' . mysqli_error($conn));
-                }
-            } elseif ($op['db_action'] === 'insert') {
-                $table = $op['table'];
-                $data = $op['data'];
-
-                $columns = [];
-                $values = [];
-                foreach ($data as $key => $value) {
-                    $columns[] = $key;
-                    if ($value === null) {
-                        $values[] = 'NULL';
-                    } elseif (is_numeric($value)) {
-                        $values[] = $value;
-                    } else {
-                        $value_esc = mysqli_real_escape_string($conn, $value);
-                        $values[] = "'$value_esc'";
-                    }
-                }
-                $columns_clause = implode(', ', $columns);
-                $values_clause = implode(', ', $values);
-
-                $sql = "INSERT INTO $table ($columns_clause) VALUES ($values_clause)";
-                if (!mysqli_query($conn, $sql)) {
-                    throw new Exception('فشل في إضافة البيانات: ' . mysqli_error($conn));
+        contract_actions_gate()->runInTransaction(function ($gate) use ($operations) {
+            foreach ($operations as $op) {
+                if ($op['db_action'] === 'update') {
+                    $gate->update($op['table'], $op['data'], $op['where']);
+                } elseif ($op['db_action'] === 'insert') {
+                    $gate->insert($op['table'], $op['data']);
                 }
             }
-        }
-
-        mysqli_commit($conn);
+        }, 'contract actions batch');
         return ['success' => true, 'message' => 'تم تنفيذ العملية بنجاح'];
-    } catch (Exception $e) {
-        mysqli_rollback($conn);
-        return ['success' => false, 'message' => $e->getMessage()];
+    } catch (\Throwable $e) {
+        return ['success' => false, 'message' => 'فشل في تنفيذ العملية: ' . $e->getMessage()];
     }
 }
 
@@ -448,13 +400,18 @@ else if ($action === 'merge') {
     ];
 
     $copied_equipments = 0;
-    $equipments_query = "SELECT equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract
-                         FROM contractequipments
-                         WHERE contract_id = $merge_with_id";
-    $equipments_result = mysqli_query($conn, $equipments_query);
+    // سطور معدات العقد المدموج — معزولةً عبر البوابة (تستفيد من تعبئة M4)
+    try {
+        $merge_equip_rows = contract_actions_gate()->select('contractequipments', array(
+            'columns' => array('equip_type', 'equip_size', 'equip_count', 'shift_hours', 'equip_total_month', 'equip_total_contract'),
+            'where'   => array('contract_id' => $merge_with_id),
+        ));
+    } catch (\Throwable $e) {
+        $merge_equip_rows = array();
+    }
 
-    if ($equipments_result && mysqli_num_rows($equipments_result) > 0) {
-        while ($equip = mysqli_fetch_assoc($equipments_result)) {
+    if (!empty($merge_equip_rows)) {
+        foreach ($merge_equip_rows as $equip) {
             $operations[] = [
                 'db_action' => 'insert',
                 'table' => 'contractequipments',
