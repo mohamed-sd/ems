@@ -6,10 +6,12 @@
 >   - **`deleteChild`** (السادسة، commit 634daba): حذف صفِّ ابنٍ واحد **صلبًا** بنطاق مزدوج (الشركة + الأب المملوك) — لجداول السطور التزايُدية `soft=false` (مهام الخطة، عمالة/قطع الأمر، سطور الفحص). تحقُّق 4/4.
 >   - **`T_CATALOG`** (السابعة، commit f6a4cd6): نوعٌ لكتالوجٍ مشترك (صفوف عامّة NULL + صفوف كل شركة، مثل `mnt_inspection_template`) — قراءة «عامّ أو مِلكي»، كتابة تعديلية «مِلكي حصرًا»، إدراج يُحقن الشركة، وابن الكتالوج يُعزل عبر أبيه «عامّ أو مِلكي». إضافةٌ محضة (الأنواع القائمة بايتيًّا بلا تغيير). تحقُّق 5/5.
 >   - **كلتاهما: الحزمة 123/123 صفر انحدار.**
-> - ✅ **الصيانة 3/9**: `master_data` (d4c0575) · `breakdowns` (965974d، إصدار أمر = زوج ذرّي §9 + scopedQuery للقائمتين) · `preventive_plans` (c17c803، أول مستهلك deleteChild + scopedQuery). لكلٍّ T3=0 + golden مطابق بايتيًّا (25978/100213/32665) + إثبات حي مستقل (u19) + commit.
-> - ⬜ **المتبقّي من الصيانة (المفتوح الآن بالقدرتين)**:
->   - `inspections` (54 خام) — **مفتوح**: القوالب T_CATALOG (قراءة عامّ+مِلكي) · سطور القالب ابن-كتالوج · سطور الفحص deleteChild (بحارس `is_template=0` قبليّ) · **الإكمال يكتب كرت المعدة عبر `mnt_apply_inspection_to_equipment` (المحور المزدوج availability/equipment_health)** — يُحفَظ سلوكه.
->   - `orders` (69، god-file، **محور الحالة المزدوج**، عمالة/قطع→deleteChild) · `mnt_helpers` (115، **مشترك، أخيرًا**؛ `mnt_next_code` يستدعيه `movement/movement_operations.php:524` خارجيًّا فتُحفَظ توقيعاته) · `get_open_orders_count` (6، AJAX). الملفان `get_project_equipment`/`get_breakdown_count` بلا خام.
+> - ✅ **الصيانة 4/9**: `master_data` (d4c0575) · `breakdowns` (965974d، إصدار أمر = زوج ذرّي §9) · `preventive_plans` (c17c803، أول deleteChild) · **`inspections`** (80c2d32، **أكبر/أعقد شاشة، أول T_CATALOG**: بذر 13 سطرًا من قالب · حارس is_template في الحذف · **الإكمال يكتب كرت المعدة بالمحور المزدوج** — مُثبَت حيًّا جيدة/ممتازة). لكلٍّ T3=0 + golden مطابق بايتيًّا (25978/100213/32665/73323) + إثبات حي مستقل (u19) + commit.
+> - ✅ **تجربة تكامل عامة (2026-07-13)**: المالية 21/21 + الصيانة 3/3 HTTP 200 صفر fatal · الحزم 123 عزل + 66 أرصفة · الناقل ثابت {ev=10,cursor=141} · عزل حيّ مقيس (شركة 4 صفر صفٍّ لغيرها عبر 5 جداول + T_CATALOG عامّ+مِلكي).
+> - ⬜ **المتبقّي من الصيانة (3)**:
+>   - `orders` (69، **god-file، محور الحالة المزدوج** availability_status↔equipment_health، auto-return عند الإغلاق، عمالة/قطع→deleteChild أو replaceChildren) — الأدقّ، بعناية.
+>   - `mnt_helpers` (115، **مشترك، أخيرًا**؛ فيه `mnt_apply_inspection_to_equipment` المحور المزدوج + `mnt_next_code` يستدعيه `movement/movement_operations.php:524` خارجيًّا فتُحفَظ توقيعاته).
+>   - `get_open_orders_count` (6، AJAX badge). الملفان `get_project_equipment`/`get_breakdown_count` بلا خام.
 > - **مستخدم اختبار الصيانة**: u19 (دور 13 «ادارة الصيانة»، شركة 4). **CSRF**: الصيانة ليست في `CSRF_ENFORCE_PATHS` بعد (تُضاف عند إغلاق الوحدة).
 > - **الكاتب العابر الموثَّق**: `movement/movement_operations.php:524` يستدعي `mnt_next_code($conn,'mnt_order','MNT',$company_id)` (يفتح أمر صيانة آليًّا) — توقيع `mnt_next_code` يبقى ثابتًا عند هجرة mnt_helpers.
 >
