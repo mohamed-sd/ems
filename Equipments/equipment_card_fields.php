@@ -59,50 +59,31 @@ if (!function_exists('ems_save_equipment_card_fields')) {
         $equipment_id = intval($equipment_id);
         if ($equipment_id <= 0) return;
 
-        $sets = [];
-        $types = '';
-        $vals = [];
-
+        // بيانات الكرت بقيمٍ أصلية (NULL حقيقي للفارغ) — الهروب مسؤولية ربط البوابة
+        $data = [];
         foreach (ems_equipment_card_columns_map() as $col => $t) {
             if (!db_table_has_column($conn, 'equipments', $col)) continue;
             $raw = isset($_POST[$col]) ? trim((string) $_POST[$col]) : '';
-            if ($t === 'd') {
-                $v = ($raw === '') ? null : (float) $raw;
-                $types .= 'd';
-            } elseif ($t === 'date') {
-                $v = ($raw === '') ? null : $raw;
-                $types .= 's';
-            } else {
-                $v = ($raw === '') ? null : $raw;
-                $types .= 's';
-            }
-            $sets[] = "`$col` = ?";
-            $vals[] = $v;
+            $data[$col] = ($raw === '') ? null : ($t === 'd' ? (float) $raw : $raw);
         }
 
         // الكرت الجديد يُنشأ كمسودة (الحوكمة الخفيفة)
         if ($is_new && db_table_has_column($conn, 'equipments', 'card_state')) {
-            $sets[] = "`card_state` = ?";
-            $types .= 's';
-            $vals[] = 'draft';
+            $data['card_state'] = 'draft';
         }
 
-        if (empty($sets)) return;
+        if (empty($data)) return;
 
-        $sql = "UPDATE equipments SET " . implode(', ', $sets) . " WHERE id = ?" . $scope_sql;
-        $types .= 'i';
-        $vals[] = $equipment_id;
-
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) return;
-
-        $bind = [];
-        $bind[] = $types;
-        for ($k = 0; $k < count($vals); $k++) {
-            $bind[] = &$vals[$k];
+        // اشتقاق البوابة من دلالة $scope_sql المحفوظة للتوافق (نمط dep_fetch):
+        // '' = مسارٌ عابرٌ (سوبر) — وإلا فمعزولٌ بشركة السياق (البوابة تحقن القيد).
+        try {
+            $card_gate = ($scope_sql === '')
+                ? ems_tenant_db()->forAllTenants('equipment card fields save')
+                : ems_tenant_db();
+            $card_gate->update('equipments', $data, ['id' => $equipment_id]);
+        } catch (\Throwable $e) {
+            // كالأصل: فشل الحفظ الإضافي لا يقطع حفظ المعدة الرئيس
         }
-        call_user_func_array([$stmt, 'bind_param'], $bind);
-        $stmt->execute();
     }
 }
 

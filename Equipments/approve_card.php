@@ -39,17 +39,16 @@ $user_id        = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id'
 $equipment_id = isset($_POST['equipment_id']) ? intval($_POST['equipment_id']) : 0;
 
 if ($equipment_id > 0 && db_table_has_column($conn, 'equipments', 'card_state')) {
-    $scope = '';
-    if (!$is_super_admin && db_table_has_column($conn, 'equipments', 'company_id') && $company_id > 0) {
-        $scope = " AND company_id = " . $company_id;
-    }
-    $sql = "UPDATE equipments SET card_state = 'active', card_approved_by = ?, card_approved_at = NOW()
-            WHERE id = ? AND card_state <> 'active'" . $scope;
-    $stmt = $conn->prepare($sql);
-    if ($stmt) {
-        $stmt->bind_param("ii", $user_id, $equipment_id);
-        $stmt->execute();
-    }
+    // اعتمادٌ معزولٌ عبر البوابة (غير السوبر → شركته؛ السوبر → عابرٌ مُسجَّل).
+    // حارس الحالة card_state <> 'active' محفوظ؛ NOW() → توقيت PHP (نمط الهجرة).
+    $card_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('approve card super') : ems_tenant_db();
+    try {
+        $card_gate->update('equipments', array(
+            'card_state'       => 'active',
+            'card_approved_by' => $user_id,
+            'card_approved_at' => date('Y-m-d H:i:s'),
+        ), array('id' => $equipment_id), "card_state <> 'active'");
+    } catch (\Throwable $e) { /* غير مملوك/سياق ناقص → لا تغيير، والرسالة كالأصل */ }
     header('Location: ' . $return_url . $sep . 'msg=' . urlencode('✅ تم اعتماد الكرت'));
     exit();
 }

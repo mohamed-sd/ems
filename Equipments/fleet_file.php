@@ -26,15 +26,22 @@ if (!$path || strpos($path, $dir) !== 0 || !is_file($path)) {
 $rel = 'storage/fleet/' . $f;
 
 // عزل الشركة: يجب أن يكون الملف مرجوعاً من سجلّ يخصّ شركة المستخدم
+// (البوابة تحقن قيد الشركة تلقائيًّا؛ includeDeleted يطابق الأصل الذي لا يستثني المحذوف)
 if (!$is_super) {
     $owned = false;
+    $file_gate = ems_tenant_db();
     foreach (['fleet_equipment_compliance', 'fleet_equipment_protection'] as $tbl) {
-        $stmt = $conn->prepare("SELECT 1 FROM `$tbl` WHERE company_id = ? AND attachment_path = ? LIMIT 1");
-        if ($stmt) {
-            $stmt->bind_param("is", $company_id, $rel);
-            $stmt->execute();
-            if ($stmt->get_result()->fetch_row()) { $owned = true; break; }
+        try {
+            $hit = $file_gate->selectOne($tbl, array(
+                'columns'        => array('id'),
+                'whereRaw'       => 'attachment_path = ?',
+                'params'         => array($rel),
+                'includeDeleted' => true,
+            ));
+        } catch (\Throwable $t) {
+            $hit = null;
         }
+        if ($hit) { $owned = true; break; }
     }
     if (!$owned) {
         http_response_code(403);

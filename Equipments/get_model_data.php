@@ -31,26 +31,23 @@ if (!function_exists('db_table_has_column') || !db_table_has_column($conn, 'flee
     exit();
 }
 
-$scope = '';
-if (!$is_super_admin && db_table_has_column($conn, 'fleet_model', 'company_id') && $company_id > 0) {
-    $scope = " AND fm.company_id = " . $company_id;
-}
-
-$sql = "SELECT fm.id, fm.equipment_type_id, fm.manufacturer, fm.model_name,
+// العزل عبر البوابة (غير السوبر → شركته؛ السوبر → عابرٌ مُسجَّل)؛ et كتالوج عام
+$md_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('model data super view') : ems_tenant_db();
+try {
+    $md_rows = $md_gate->scopedQuery(array(
+        'scope' => array('fm' => 'fleet_model'),
+    ), "SELECT fm.id, fm.equipment_type_id, fm.manufacturer, fm.model_name,
                fm.operating_category, fm.std_capacity, fm.std_capacity_uom,
                et.type AS type_name
         FROM fleet_model fm
         LEFT JOIN equipments_types et ON et.id = fm.equipment_type_id
-        WHERE fm.id = ? AND fm.is_deleted = 0" . $scope . "
-        LIMIT 1";
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
+        WHERE {TENANT_SCOPE} AND fm.id = ? AND fm.is_deleted = 0
+        LIMIT 1", array($model_id));
+} catch (\Throwable $t) {
     echo json_encode(['success' => false, 'message' => 'تعذّر الاستعلام']);
     exit();
 }
-$stmt->bind_param("i", $model_id);
-$stmt->execute();
-$row = $stmt->get_result()->fetch_assoc();
+$row = empty($md_rows) ? null : $md_rows[0];
 
 if (!$row) {
     echo json_encode(['success' => false, 'message' => 'الموديل غير موجود']);
