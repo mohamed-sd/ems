@@ -23,9 +23,8 @@ $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المشغلين+❌"); exit(); }
 
-$emp_scope     = $is_super_admin ? "" : " AND e.company_id = " . intval($company_id) . " ";
-$op_scope      = $is_super_admin ? "" : " AND o.company_id = " . intval($company_id) . " ";
-$update_scope  = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
+// بوابة العزل — تستبدل نطاقات e/o/update اليدوية الثلاثة
+$op_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('equipment operators super') : ems_tenant_db();
 
 function ems_license_validity($expiry) {
     if (empty($expiry) || $expiry === '0000-00-00') return ['دائم', 'status-active'];
@@ -37,17 +36,26 @@ function ems_license_validity($expiry) {
     return ($e <= $thr) ? ['قارب الانتهاء', 'status-warning'] : ['ساري', 'status-active'];
 }
 
-/** مزامنة بيانات الرخصة إلى سجل الموظف (المرآة القديمة التي تقرأها الشاشات الأخرى). */
+/** مزامنة بيانات الرخصة إلى سجل الموظف (المرآة القديمة التي تقرأها الشاشات الأخرى).
+ *  COALESCE(?, col) القديم = «لا تغيّر العمود عند NULL» → إسقاط العمود من التحديث. */
 function ems_op_sync_employee($conn, $emp_id, $vals, $scope) {
     $emp_id = intval($emp_id); if ($emp_id <= 0) return;
-    $stmt = $conn->prepare("UPDATE employees SET
-        license_number=?, license_type=?, license_expiry_date=?, license_issuer=?,
-        license_issue_date=?, license_grade=?, specialized_equipment=COALESCE(?, specialized_equipment)
-        WHERE id=?" . $scope);
-    if (!$stmt) return;
-    $stmt->bind_param('sssssssi',
-        $vals['lnum'], $vals['ltype'], $vals['lexp'], $vals['liss'], $vals['lid'], $vals['lgrade'], $vals['opcat'], $emp_id);
-    $stmt->execute(); $stmt->close();
+    $data = array(
+        'license_number'      => $vals['lnum'],
+        'license_type'        => $vals['ltype'],
+        'license_expiry_date' => $vals['lexp'],
+        'license_issuer'      => $vals['liss'],
+        'license_issue_date'  => $vals['lid'],
+        'license_grade'       => $vals['lgrade'],
+    );
+    if ($vals['opcat'] !== null) {
+        $data['specialized_equipment'] = $vals['opcat'];
+    }
+    try {
+        $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+        $gate = ($role === '-1') ? ems_tenant_db()->forAllTenants('operator mirror sync') : ems_tenant_db();
+        $gate->update('employees', $data, array('id' => $emp_id));
+    } catch (\Throwable $e) { /* المرآة إضافية — فشلها لا يقطع الحفظ */ }
 }
 
 // ── إضافة / تعديل ─────────────────────────────────────────────────────────────
@@ -65,33 +73,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = isset($_POST['status']) ? intval($_POST['status']) : 1;
     $sync = ['lnum' => $lnum, 'ltype' => $ltype, 'lexp' => $lexp, 'liss' => $liss, 'lid' => $lid, 'lgrade' => $lgrade, 'opcat' => $opcat];
 
+    $op_data = array(
+        'license_number' => $lnum, 'license_type' => $ltype, 'license_grade' => $lgrade,
+        'license_issuer' => $liss, 'license_issue_date' => $lid, 'license_expiry_date' => $lexp,
+        'operating_categories' => $opcat, 'driving_authorizations' => $drv,
+        'status' => $status, 'notes' => $notes,
+    );
     if (!$is_editing) {
         if ($employee_id <= 0) { header("Location: equipment_operators.php?msg=يجب+اختيار+موظف+❌"); exit(); }
-        // امنع التكرار (employee_id فريد) + تأكّد أن الموظف ضمن الشركة
-        $chk = $conn->prepare("SELECT o.id FROM equipment_operators o WHERE o.employee_id = ? LIMIT 1");
-        $chk->bind_param('i', $employee_id); $chk->execute();
-        if ($chk->get_result()->fetch_assoc()) { $chk->close(); header("Location: equipment_operators.php?msg=هذا+الموظف+مسجّلٌ+مشغّلاً+مسبقاً+❌"); exit(); }
-        $chk->close();
-        $cid = $is_super_admin ? null : $company_id;
-        $stmt = $conn->prepare("INSERT INTO equipment_operators
-            (company_id, employee_id, license_number, license_type, license_grade, license_issuer,
-             license_issue_date, license_expiry_date, operating_categories, driving_authorizations, status, notes)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param('iissssssssis', $cid, $employee_id, $lnum, $ltype, $lgrade, $liss, $lid, $lexp, $opcat, $drv, $status, $notes);
-        $ok = $stmt->execute(); $stmt->close();
-        if ($ok) ems_op_sync_employee($conn, $employee_id, $sync, $update_scope);
+        // امنع التكرار (employee_id فريد) — معزولًا بالشركة
+        $dup = $op_gate->selectOne('equipment_operators', array('columns' => array('id'), 'where' => array('employee_id' => $employee_id)));
+        if ($dup) { header("Location: equipment_operators.php?msg=هذا+الموظف+مسجّلٌ+مشغّلاً+مسبقاً+❌"); exit(); }
+        $ok = false;
+        try {
+            $op_data['employee_id'] = $employee_id;
+            $ok = ((int) $op_gate->insert('equipment_operators', $op_data)) > 0;
+        } catch (\Throwable $e) { $ok = false; }
+        if ($ok) ems_op_sync_employee($conn, $employee_id, $sync, '');
         header("Location: equipment_operators.php?msg=" . ($ok ? "✅+تم+تسجيل+المشغّل" : "❌+تعذّر+الحفظ")); exit();
     } else {
-        $stmt = $conn->prepare("UPDATE equipment_operators SET
-            license_number=?, license_type=?, license_grade=?, license_issuer=?, license_issue_date=?,
-            license_expiry_date=?, operating_categories=?, driving_authorizations=?, status=?, notes=?
-            WHERE id=?" . $update_scope);
-        $stmt->bind_param('ssssssssisi', $lnum, $ltype, $lgrade, $liss, $lid, $lexp, $opcat, $drv, $status, $notes, $id);
-        $ok = $stmt->execute(); $stmt->close();
-        // اجلب employee_id للمزامنة
-        $eg = $conn->prepare("SELECT employee_id FROM equipment_operators WHERE id = ? LIMIT 1");
-        $eg->bind_param('i', $id); $eg->execute(); $erow = $eg->get_result()->fetch_assoc(); $eg->close();
-        if ($ok && $erow) ems_op_sync_employee($conn, intval($erow['employee_id']), $sync, $update_scope);
+        $ok = false;
+        try {
+            $op_gate->update('equipment_operators', $op_data, array('id' => $id));
+            $ok = true;
+        } catch (\Throwable $e) { $ok = false; }
+        // اجلب employee_id للمزامنة (معزولًا)
+        $erow = $op_gate->selectOne('equipment_operators', array('columns' => array('employee_id'), 'where' => array('id' => $id)));
+        if ($ok && $erow) ems_op_sync_employee($conn, intval($erow['employee_id']), $sync, '');
         header("Location: equipment_operators.php?edit=" . $id . "&msg=" . ($ok ? "✅+تم+تحديث+بيانات+المشغّل" : "❌+تعذّر+التحديث")); exit();
     }
 }
@@ -100,30 +108,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: equipment_operators.php?msg=لا+صلاحية+حذف+❌"); exit(); }
     $id = (int) $_GET['delete_id'];
-    $stmt = $conn->prepare("DELETE FROM equipment_operators WHERE id = ?" . $update_scope);
-    $stmt->bind_param('i', $id); $ok = $stmt->execute(); $stmt->close();
+    // حذفٌ صلبٌ عبر deleteChild (الشركة + الموظف الأب المملوك المتحقَّق)
+    $ok = false;
+    try {
+        $row = $op_gate->selectOne('equipment_operators', array('columns' => array('id', 'employee_id'), 'where' => array('id' => $id)));
+        if ($row) {
+            $ok = $op_gate->deleteChild('equipment_operators', $id, 'employees', intval($row['employee_id']), 'employee_id', 'operator delete') > 0;
+        }
+    } catch (\Throwable $e) { $ok = false; }
     header("Location: equipment_operators.php?msg=" . ($ok ? "✅+تم+حذف+سجل+المشغّل" : "❌+تعذّر+الحذف")); exit();
 }
 
 // ── تحميل صفٍّ للتعديل ─────────────────────────────────────────────────────────
 $edit = null; $edit_id = intval($_GET['edit'] ?? 0);
 if ($edit_id > 0) {
-    $stmt = $conn->prepare("SELECT o.*, e.name AS emp_name FROM equipment_operators o
+    $edit_rows = $op_gate->scopedQuery(array(
+        'scope'  => array('o' => 'equipment_operators'),
+        'enrich' => array('e' => 'employees'),
+    ), "SELECT o.*, e.name AS emp_name FROM equipment_operators o
             LEFT JOIN employees e ON e.id = o.employee_id
-            WHERE o.id = ?" . ($is_super_admin ? "" : " AND o.company_id = " . intval($company_id)) . " LIMIT 1");
-    $stmt->bind_param('i', $edit_id); $stmt->execute(); $edit = $stmt->get_result()->fetch_assoc(); $stmt->close();
+            WHERE {TENANT_SCOPE} AND o.id = ? LIMIT 1", array($edit_id));
+    $edit = $edit_rows[0] ?? null;
 }
 
 // كل موظفي الشركة: غير المسجّلين كمشغّلين أولاً (للإضافة)، والمسجّلون يُنقلون للتعديل.
 $avail = [];
 if ($can_add && !$edit) {
-    $q = mysqli_query($conn, "SELECT e.id, e.name, COALESCE(jt.name, e.employee_type) AS title,
+    $avail = $op_gate->scopedQuery(array(
+        'scope'  => array('e' => 'employees'),
+        'enrich' => array('jt' => 'job_titles', 'o' => 'equipment_operators'),
+    ), "SELECT e.id, e.name, COALESCE(jt.name, e.employee_type) AS title,
             (SELECT o.id FROM equipment_operators o WHERE o.employee_id = e.id LIMIT 1) AS op_id
             FROM employees e LEFT JOIN job_titles jt ON jt.id = e.job_title_id
-            WHERE 1=1 $emp_scope
+            WHERE {TENANT_SCOPE}
             ORDER BY (SELECT COUNT(*) FROM equipment_operators o WHERE o.employee_id = e.id) ASC,
-                     COALESCE(jt.is_operator,0) DESC, e.name");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) $avail[] = $r;
+                     COALESCE(jt.is_operator,0) DESC, e.name", array());
 }
 
 $page_title = "إيكوبيشن | السائقون والمشغّلون";
@@ -197,14 +216,17 @@ include '../insidebar.php';
             </thead>
             <tbody>
             <?php
-            $sql = "SELECT o.*, e.name AS emp_name, COALESCE(jt.name, e.employee_type) AS title
+            // القائمة معزولةً عبر البوابة
+            $op_rows = $op_gate->scopedQuery(array(
+                'scope'  => array('o' => 'equipment_operators'),
+                'enrich' => array('e' => 'employees', 'jt' => 'job_titles'),
+            ), "SELECT o.*, e.name AS emp_name, COALESCE(jt.name, e.employee_type) AS title
                     FROM equipment_operators o
                     LEFT JOIN employees e ON e.id = o.employee_id
                     LEFT JOIN job_titles jt ON jt.id = e.job_title_id
-                    WHERE 1=1 $op_scope ORDER BY o.id DESC";
-            $res = mysqli_query($conn, $sql);
+                    WHERE {TENANT_SCOPE} ORDER BY o.id DESC", array());
             $i = 1;
-            if ($res) { while ($row = mysqli_fetch_assoc($res)):
+            { foreach ($op_rows as $row):
                 list($vtext, $vclass) = ems_license_validity($row['license_expiry_date']);
             ?>
                 <tr>
@@ -221,8 +243,8 @@ include '../insidebar.php';
                     <td><span class="status-pill <?= $vclass ?>"><?= $vtext ?></span></td>
                     <td><?= intval($row['status']) ? '<span class="status-pill status-active">نشط</span>' : '<span class="status-pill status-inactive">غير نشط</span>' ?></td>
                 </tr>
-            <?php endwhile; }
-            if (!$res || $i === 1): ?>
+            <?php endforeach; }
+            if (empty($op_rows)): ?>
                 <tr><td colspan="9" style="text-align:center;color:#888;padding:18px;">لا يوجد مشغّلون مسجّلون بعد.</td></tr>
             <?php endif; ?>
             </tbody>
