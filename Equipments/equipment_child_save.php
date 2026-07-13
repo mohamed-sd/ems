@@ -39,16 +39,14 @@ if (empty($perm['can_edit'])) {
     fleet_redirect($equipment_id, $anchor, '❌ لا توجد صلاحية');
 }
 
-// عزل الشركة: التأكد أن المعدة تخصّ شركة المستخدم
-if ($is_super) {
-    $eq = $conn->prepare("SELECT company_id FROM equipments WHERE id = ?");
-    $eq->bind_param("i", $equipment_id);
-} else {
-    $eq = $conn->prepare("SELECT company_id FROM equipments WHERE id = ? AND company_id = ?");
-    $eq->bind_param("ii", $equipment_id, $company_id);
-}
-$eq->execute();
-$eqRow = $eq->get_result()->fetch_assoc();
+// بوابة العزل: غيرُ السوبر → شركتُه؛ السوبر → عابرٌ مُسجَّل (يكتب لشركة المعدة نفسها)
+$child_gate = $is_super ? ems_tenant_db()->forAllTenants('equipment_child_save super') : ems_tenant_db();
+
+// عزل الشركة: التأكد أن المعدة تخصّ شركة المستخدم (البوابة تعزل تلقائيًّا)
+$eqRow = $child_gate->selectOne('equipments', array(
+    'columns' => array('company_id'),
+    'where'   => array('id' => $equipment_id),
+));
 if (!$eqRow) {
     fleet_redirect($equipment_id, $anchor, '❌ المعدة غير موجودة أو خارج نطاق شركتك');
 }
@@ -71,10 +69,12 @@ if ($action === 'delete') {
         fleet_redirect($equipment_id, $anchor, '❌ سجل التاريخ للإضافة فقط');
     }
     $row_id = isset($_POST['row_id']) ? intval($_POST['row_id']) : 0;
-    $scope = $is_super ? '' : ' AND company_id = ' . intval($company_id);
-    $st = $conn->prepare("UPDATE `$table` SET is_deleted = 1 WHERE id = ? AND equipment_id = ?" . $scope);
-    $st->bind_param("ii", $row_id, $equipment_id);
-    $st->execute();
+    // حذفٌ ناعمٌ معزول: id + equipment_id (+ الشركة تُحقن للبوابة لغير السوبر)
+    try {
+        $child_gate->update($table, array('is_deleted' => 1), array('id' => $row_id, 'equipment_id' => $equipment_id));
+    } catch (\Throwable $e) {
+        fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحذف');
+    }
     fleet_redirect($equipment_id, $anchor, '🗑️ تم الحذف');
 }
 
@@ -114,9 +114,20 @@ if ($entity === 'compliance') {
     $expiry = $D('expiry_date');
     $is_critical = !empty($_POST['is_critical']) ? 1 : 0;
     $att = fleet_upload_attachment('attachment');
-    $st = $conn->prepare("INSERT INTO fleet_equipment_compliance (company_id, equipment_id, doc_type, reference, issue_date, expiry_date, is_critical, attachment_path, created_by) VALUES (?,?,?,?,?,?,?,?,?)");
-    $st->bind_param("iissssisi", $company_val, $equipment_id, $doc_type, $reference, $issue, $expiry, $is_critical, $att, $user_id);
-    $st->execute();
+    // الإدراج عبر البوابة: غيرُ السوبر تُحقن شركته آليًّا؛ السوبر يمرّر شركة المعدة صراحةً
+    $row = array(
+        'equipment_id'    => $equipment_id,
+        'doc_type'        => $doc_type,
+        'reference'       => $reference,
+        'issue_date'      => $issue,
+        'expiry_date'     => $expiry,
+        'is_critical'     => $is_critical,
+        'attachment_path' => $att,
+        'created_by'      => $user_id,
+    );
+    if ($is_super) { $row['company_id'] = $company_val; }
+    try { $child_gate->insert('fleet_equipment_compliance', $row); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم إضافة الوثيقة');
 }
 
@@ -131,9 +142,22 @@ if ($entity === 'protection') {
     $partner_name = $D('partner_name'); // المنفّذ/المورد: إدخال يدوي حرّ (غير مربوط بجدول الموردين)
     $compliance = $I('compliance_id');
     $att = fleet_upload_attachment('attachment');
-    $st = $conn->prepare("INSERT INTO fleet_equipment_protection (company_id, equipment_id, protection_type, description, start_date, cost, state, renewal_date, partner_name, compliance_id, attachment_path, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
-    $st->bind_param("iisssdsssisi", $company_val, $equipment_id, $ptype, $desc, $start, $cost, $state, $renewal, $partner_name, $compliance, $att, $user_id);
-    $st->execute();
+    $row = array(
+        'equipment_id'    => $equipment_id,
+        'protection_type' => $ptype,
+        'description'     => $desc,
+        'start_date'      => $start,
+        'cost'            => $cost,
+        'state'           => $state,
+        'renewal_date'    => $renewal,
+        'partner_name'    => $partner_name,
+        'compliance_id'   => $compliance,
+        'attachment_path' => $att,
+        'created_by'      => $user_id,
+    );
+    if ($is_super) { $row['company_id'] = $company_val; }
+    try { $child_gate->insert('fleet_equipment_protection', $row); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم إضافة تجهيز الحماية');
 }
 
@@ -143,9 +167,17 @@ if ($entity === 'component') {
     $serial = $D('serial_no');
     $install = $D('install_date');
     $is_current = !empty($_POST['is_current']) ? 1 : 0;
-    $st = $conn->prepare("INSERT INTO fleet_equipment_component (company_id, equipment_id, component_type, serial_no, install_date, is_current, created_by) VALUES (?,?,?,?,?,?,?)");
-    $st->bind_param("iisssii", $company_val, $equipment_id, $ctype, $serial, $install, $is_current, $user_id);
-    $st->execute();
+    $row = array(
+        'equipment_id'   => $equipment_id,
+        'component_type' => $ctype,
+        'serial_no'      => $serial,
+        'install_date'   => $install,
+        'is_current'     => $is_current,
+        'created_by'     => $user_id,
+    );
+    if ($is_super) { $row['company_id'] = $company_val; }
+    try { $child_gate->insert('fleet_equipment_component', $row); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم إضافة المكوّن');
 }
 
@@ -159,9 +191,19 @@ if ($entity === 'history') {
     $site = $D('site_id');
     $inout = $D('in_out_date');
     $note = $D('note');
-    $st = $conn->prepare("INSERT INTO fleet_equipment_history (company_id, equipment_id, event_date, event_type, project_id, site_id, in_out_date, note, created_by) VALUES (?,?,?,?,?,?,?,?,?)");
-    $st->bind_param("iississsi", $company_val, $equipment_id, $event_dt, $event_type, $project, $site, $inout, $note, $user_id);
-    $st->execute();
+    $row = array(
+        'equipment_id' => $equipment_id,
+        'event_date'   => $event_dt,
+        'event_type'   => $event_type,
+        'project_id'   => $project,
+        'site_id'      => $site,
+        'in_out_date'  => $inout,
+        'note'         => $note,
+        'created_by'   => $user_id,
+    );
+    if ($is_super) { $row['company_id'] = $company_val; }
+    try { $child_gate->insert('fleet_equipment_history', $row); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم تسجيل الحدث');
 }
 
