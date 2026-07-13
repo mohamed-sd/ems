@@ -27,20 +27,8 @@ if (!$is_super_admin && $company_id <= 0) {
     die('لا يمكن تحديد الشركة الحالية');
 }
 
-$contracts_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if (db_table_has_column($conn, 'contracts', 'company_id')) {
-        $contracts_scope_sql = 'c.company_id = ' . $company_id;
-    } else {
-        $contracts_scope_sql = "EXISTS (
-            SELECT 1
-            FROM project sp
-            JOIN users su ON su.project_id = sp.id
-            WHERE sp.id = c.project_id
-              AND su.company_id = " . $company_id . "
-        )";
-    }
-}
+// بوابة العزل — تستبدل سُلَّم النطاق اليدوي (contracts لها company_id مقيسةً)
+$details_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract details super view') : ems_tenant_db();
 
 $page_title = 'الإيكوبيشن | تفاصيل العقد';
 include '../inheader.php';
@@ -106,18 +94,20 @@ include '../insidebar.php';
 
         <?php
 
+        // خريطة الأنواع — كتالوج عام عبر البوابة
         $equipmentTypeMap = [];
-        $equipmentTypesQuery = "SELECT id, type FROM equipments_types ORDER BY type ASC";
-        $equipmentTypesResult = mysqli_query($conn, $equipmentTypesQuery);
-        if ($equipmentTypesResult) {
-            while ($typeRow = mysqli_fetch_assoc($equipmentTypesResult)) {
-                $equipmentTypeMap[(int) $typeRow['id']] = $typeRow['type'];
-            }
+        foreach ($details_gate->select('equipments_types', array('columns' => array('id', 'type'), 'orderBy' => 'type ASC')) as $typeRow) {
+            $equipmentTypeMap[(int) $typeRow['id']] = $typeRow['type'];
         }
 
         $contract_id = intval($_GET['id']);
 
-        $sql = "SELECT
+        // العقد معزولًا عبر البوابة ({TENANT_SCOPE})
+        try {
+            $detail_rows = $details_gate->scopedQuery(array(
+                'scope'  => array('c' => 'contracts'),
+                'enrich' => array('p' => 'project'),
+            ), "SELECT
             c.id, c.project_id, c.contract_signing_date, c.grace_period_days, c.contract_duration_months, c.contract_duration_days,
             c.actual_start, c.actual_end, c.transportation, c.accommodation, c.place_for_living,
             c.workshop, c.hours_monthly_target, c.forecasted_contracted_hours, c.created_at, c.updated_at,
@@ -128,20 +118,17 @@ include '../insidebar.php';
             p.name AS project_name
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        WHERE c.id = $contract_id AND $contracts_scope_sql
-        LIMIT 1";
-
-        $result = mysqli_query($conn, $sql);
-
-        if (!$result) {
-            die("خطأ في الاستعلام: " . mysqli_error($conn));
+        WHERE {TENANT_SCOPE} AND c.id = ?
+        LIMIT 1", array($contract_id));
+        } catch (\Throwable $t) {
+            die("خطأ في الاستعلام");
         }
 
-        if (mysqli_num_rows($result) === 0) {
+        if (empty($detail_rows)) {
             die('العقد غير موجود أو خارج نطاق الشركة');
         }
 
-        while ($row = mysqli_fetch_assoc($result)) {
+        foreach ($detail_rows as $row) {
 
             $today = new DateTime();
             $actual_end_date = new DateTime($row['actual_end']);
@@ -584,17 +571,25 @@ include '../insidebar.php';
                     </thead>
                     <tbody>
                         <?php
-                        $notes_query = "SELECT cn.*, u.name as user_name
+                        // ملاحظات العقد معزولةً (النطاق cn بعد تعبئة M5؛ JOIN العقد الداخلي
+                        // → LEFT + c.id IS NOT NULL؛ إثراء users LEFT)
+                        try {
+                            $notes_rows = $details_gate->scopedQuery(array(
+                                'scope'  => array('cn' => 'contract_notes'),
+                                'enrich' => array('u' => 'users', 'c' => 'contracts'),
+                            ), "SELECT cn.*, u.name as user_name
                                     FROM contract_notes cn
                                     LEFT JOIN users u ON cn.user_id = u.id
-                                    JOIN contracts c ON c.id = cn.contract_id
-                                    WHERE cn.contract_id = $contract_id AND $contracts_scope_sql
-                                    ORDER BY cn.created_at DESC";
-                        $notes_result = mysqli_query($conn, $notes_query);
+                                    LEFT JOIN contracts c ON c.id = cn.contract_id
+                                    WHERE {TENANT_SCOPE} AND cn.contract_id = ? AND c.id IS NOT NULL
+                                    ORDER BY cn.created_at DESC", array($contract_id));
+                        } catch (\Throwable $t) {
+                            $notes_rows = array();
+                        }
 
-                        if ($notes_result && mysqli_num_rows($notes_result) > 0) {
+                        if (!empty($notes_rows)) {
                             $j = 1;
-                            while ($note = mysqli_fetch_assoc($notes_result)) {
+                            foreach ($notes_rows as $note) {
                                 $note_text = htmlspecialchars($note['note']);
                                 $action_icon = '<i class="fas fa-sticky-note"></i>';
                                 $action_badge = 'info';
@@ -956,15 +951,22 @@ include '../insidebar.php';
                         <select id="mergeWithId" class="form-select">
                             <option value="">-- اختر عقد --</option>
                             <?php
-                            $merge_query = "SELECT c.id, c.contract_signing_date, p.name AS project_name
+                            // عقود المشروع المرشّحة للدمج — معزولةً عبر البوابة
+                            try {
+                                $merge_rows = $details_gate->scopedQuery(array(
+                                    'scope'  => array('c' => 'contracts'),
+                                    'enrich' => array('p' => 'project'),
+                                ), "SELECT c.id, c.contract_signing_date, p.name AS project_name
                                             FROM contracts c
                                             LEFT JOIN project p ON c.project_id = p.id
-                                            WHERE c.project_id = $contract_project_id AND c.id != $contract_id AND $contracts_scope_sql
-                                            ORDER BY c.id DESC";
-                            $merge_result = mysqli_query($conn, $merge_query);
-                            if ($merge_result) { while ($m_row = mysqli_fetch_assoc($merge_result)) {
+                                            WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.id != ?
+                                            ORDER BY c.id DESC", array($contract_project_id, $contract_id));
+                            } catch (\Throwable $t) {
+                                $merge_rows = array();
+                            }
+                            foreach ($merge_rows as $m_row) {
                                 echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
-                            } }
+                            }
                             ?>
                         </select>
                     </div>

@@ -18,9 +18,15 @@ if ($contract_id <= 0) {
 }
 
 function getContractForDetailsUpdate($contract_id, $conn) {
-    $query = "SELECT * FROM contracts WHERE id = $contract_id LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    return $result ? mysqli_fetch_assoc($result) : null;
+    // كان بلا عزل شركةٍ إطلاقًا (تسرّبٌ كامنٌ أُغلق بالبوابة). ملاحظة حدود: بيانات
+    // الطلب (new_data المُهرَّبة) تُسلَّم لمحرك الاعتمادات المقدّس كما هي — لا تُمَسّ دلالتها.
+    $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    try {
+        $gate = ($role === '-1') ? ems_tenant_db()->forAllTenants('contract details update super') : ems_tenant_db();
+        return $gate->selectOne('contracts', array('where' => array('id' => intval($contract_id))));
+    } catch (\Throwable $e) {
+        return null;
+    }
 }
 
 function submitContractDetailsApproval($contract_id, $action, $new_data, $old_data, $note, $user_id, $conn) {

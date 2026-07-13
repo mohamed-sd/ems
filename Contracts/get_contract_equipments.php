@@ -20,19 +20,24 @@ if (!$contract_id) {
     exit();
 }
 
-// عزل الشركة: تأكّد أن العقد الأب يتبع شركة المستخدم قبل إرجاع معداته (المدير الأعلى -1 معفى).
+// عزل الشركة عبر البوابة: العقد الأب أولًا ثم سطوره (المدير الأعلى -1 عابرٌ مُسجَّل).
 $_is_super = (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1');
-$_cid = intval($_SESSION['user']['company_id'] ?? 0);
-if (!$_is_super && db_table_has_column($conn, 'contracts', 'company_id')) {
-    $_own = mysqli_query($conn, "SELECT 1 FROM contracts WHERE id = $contract_id AND company_id = $_cid LIMIT 1");
-    if (!$_own || !mysqli_num_rows($_own)) {
-        echo json_encode(['success' => false, 'message' => 'خارج نطاق الشركة']);
-        exit();
-    }
+$gce_gate = $_is_super ? ems_tenant_db()->forAllTenants('contract equipments super view') : ems_tenant_db();
+try {
+    $_own = $gce_gate->selectOne('contracts', array('columns' => array('id'), 'where' => array('id' => $contract_id), 'includeDeleted' => true));
+} catch (\Throwable $t) {
+    $_own = null;
+}
+if ($_own === null) {
+    echo json_encode(['success' => false, 'message' => 'خارج نطاق الشركة']);
+    exit();
 }
 
-// جلب معدات العقد مع جميع الحقول المطلوبة
-$sql = "SELECT
+// جلب معدات العقد مع جميع الحقول المطلوبة (النطاق ce بعد تعبئة M4؛ et كتالوج عام)
+try {
+    $gce_rows = $gce_gate->scopedQuery(array(
+        'scope' => array('ce' => 'contractequipments'),
+    ), "SELECT
     ce.equip_type,
     et.type AS equip_type_name,
     ce.equip_size,
@@ -43,18 +48,15 @@ $sql = "SELECT
     ce.equip_monthly_target
 FROM contractequipments ce
 LEFT JOIN equipments_types et ON ce.equip_type = et.id
-WHERE ce.contract_id = $contract_id
-ORDER BY ce.id ASC";
-
-$result = mysqli_query($conn, $sql);
-
-if (!$result) {
-    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . mysqli_error($conn)]);
+WHERE {TENANT_SCOPE} AND ce.contract_id = ?
+ORDER BY ce.id ASC", array($contract_id));
+} catch (\Throwable $t) {
+    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام']);
     exit();
 }
 
 $equipments = [];
-while ($row = mysqli_fetch_assoc($result)) {
+foreach ($gce_rows as $row) {
     // التأكد من وجود جميع الحقول مع قيم افتراضية
     $equipments[] = [
         'equip_type' => $row['equip_type'] ?? '',
