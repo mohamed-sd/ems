@@ -1,6 +1,18 @@
 # MIGRATION_PROGRESS — سجلّ تقدّم الهجرة المعمارية (Checkpoint & Resume)
 
-> ## 🔖 نقطة الاستئناف (حُدِّثت 2026-07-13 ليلًا — ✅ **وحدة العقود مُغلقة 7/7** بعد المعدات 17/18)
+> ## 🔖 نقطة الاستئناف (حُدِّثت 2026-07-13 ليلًا⁺ — 🔧 **وحدة الموظفين مفتوحة: الأساسات جاهزة** بعد إغلاق العقود 7/7)
+> **وحدة الموظفين (14 ملفًا/77 خامًّا؛ المؤجَّل الوحيد `employee_profile` يقرأ timesheet — كنظيره في المعدات):**
+> - ✅ **أساسات الوحدة منجزة (commit c7cfdbc)**: (1) **القدرة الثامنة `deleteRow`** — حذفٌ صلبٌ لكيانٍ مستأجَرٍ بلا أبٍ إلزاميّ (employees: supplier_id/project_id اختياريان فلا يصلح deleteChild)؛ مقيَّد بالشركة، strict، يُرفَض للناعم ولغير T_TENANT، مُسجَّل؛ تحقُّق 4/4 + الحزمة 123/123. (2) **ترحيل M6**: تعبئة company_id لـjob_titles(16)/employee_roles(8) — كانا NULL شاملًا (T_TENANT بالعقد؛ فحصٌ استباقي بنمط M4/M5؛ down محليّ).
+> - **🔬 تحليل `employees.php` جاهز (1470 سطرًا، 12 خامًّا)**: بوابة `$emp_gate` (سوبر→forAllTenants). المواضع: فحصا فرادة الكود (153/208)→selectOne · حفظ 35 عمودًا (save 170/insert 215، القيم مُهرَّبة والفوارغ 'NULL' نصًّا)→مصفوفة خام بNULL حقيقي→update/insert · حارسا الحذف (عقود drivercontracts 267 + إسنادات equipment_drivers 274 **بلا عزلٍ أصلًا**)→count · **الحذف الصلب (286)→`deleteRow`** · قوائم job_titles/employee_roles (587/601، بنمط «NULL أو شركتي» — بعد M6 تكافئ select البوابة) · موردون/مشاريع (763/780)→select · القائمة الرئيسة (1133: employees d + LEFT suppliers/project/job_titles/employee_roles + عدّاد drivercontracts فرعي — كلها تُعلَن)→scopedQuery مع سُلَّم created_by ميت يُزال.
+> - **🔬 المساعد المقترن `includes/employee_types.php` (6 خام)** — يُهاجَر مع الشاشة (يستدعيه save):
+>   - `ems_save_employee_extra` (prepare ديناميكي 61)→مصفوفة+update عبر بوابةٍ مشتقةٍ من الجلسة (نمط contract_children_gate).
+>   - `ems_sync_equipment_operator`: قراءة الموظف (85)→selectOne · فحصا job_titles/employee_roles (98/101)→selectOne · حذف سجل المشغّل (113)→**deleteChild** عبر employees (employee_id) بعد جلب id · **الترقية upsert (121 ON DUPLICATE KEY)→selectOne ثم insert/update** (employee_id مفتاح فريد؛ غير السوبر: بلا company_id تُحقن؛ السوبر crossTenant: شركة الموظف صراحةً).
+>   - `ems_operation_types_in_sql` **لا يُمَسّ** (باني شظيةِ شرطٍ لمستدعين منهم timesheet المقدّس؛ لا تنفيذ فيه).
+> - **مستخدم اختبار الوحدة**: الموديول Employees/employees.php — تحقّق من أدوار can_view/add/edit/del أولًا (درس equipments_drivers/contracts: دور 1 قد يكون view فقط؛ المالك دور 4 «الموارد» = u7). **golden بمنهجية opcache الآمنة (≥4s) + مقارنة الأجسام.**
+> - **بيانات الوحدة (مفحوصة استباقيًّا)**: employees 56×co4+1×co1 (بذرة شرعية كنمط الإهلاك) · equipment_operators 29×co4 ✓ · worker_* المستعملة co4 ✓ · drivercontracts فارغ (T3 لأغراض العدّ فقط).
+> - ⬜ **بقية الوحدة (12 ملفًا بعد الشاشة)**: employee_contract_actions_handler(11، توأم contract_actions — نفس نمط runInTransaction) · equipment_operators(9) · job_titles(6) · employee_roles(6) · employee_contracts(6) · employee_contracts_details(4) · get_project_hours(3) · get_employee_data(2) · employee_equipment_history(2) · showcontractemployee(1) · get_mine_contracts(1، **نفس نسخة mines الميتة — رسالة صادقة كنظيرتها**) · get_employee_contract_equipments(1).
+>
+> ## 🔖 (سابقة) — ✅ وحدة العقود مُغلقة 7/7 (2026-07-13 ليلًا)
 > **المرحلة 3: المالية ✅ 23/23 · الصيانة ✅ 9/9 · المعدات ✅ 17/18 · العقود ✅ 7/7. التالي: Employees (المؤجَّلان معها/بعدها: equipment_profile وemployee_profile — كلاهما يقرأ timesheet) ثم Timesheet ختامًا.**
 > - ✅ **وحدة العقود 7/7 (T3=0 للوحدة، أربعة commits)**:
 >   - `contracts.php` + `contractequipments_handler` (1057d8a): الحفظ 29 حقلًا insert/update (**أُغلق سطحُ حقنٍ — التعديل كان يُضمِّن POST نصًّا**) · سطور المعدات **replaceChildren** · حذفٌ ناعمٌ كامل الأعمدة · golden **94749==94749** · إثبات 7/7 (u6؛ درسُ صلاحيات: دور 1 view فقط).
