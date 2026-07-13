@@ -106,7 +106,9 @@ class TenantDb
         $def = $this->requireTable($table);
         $this->assertWritable($table, $def);
 
-        if ($def['type'] === TenantRegistry::T_TENANT) {
+        if ($def['type'] === TenantRegistry::T_TENANT || $def['type'] === TenantRegistry::T_CATALOG) {
+            // كتالوج: الإدراج عبر البوابة يُنشئ صفَّ شركة السياق (لا صفًّا عامًّا — الصفوف
+            // العامّة تُبذَر بالترحيل/المدير الأعلى)، فيُحقن company_id كـT_TENANT تمامًا.
             if (array_key_exists('company_id', $data)
                 && intval($data['company_id']) !== $this->ctx->companyId()
                 && !$this->crossTenant) {
@@ -607,13 +609,30 @@ class TenantDb
                     $conds[] = '`' . $table . '`.`company_id` = ?';
                     $params[] = $this->ctx->companyId();
                 }
+            } elseif ($def['type'] === TenantRegistry::T_CATALOG) {
+                // كتالوج مشترك: القراءة «العامّ (NULL) أو مِلكي»؛ الكتابة التعديلية
+                // (__strictTenant) «مِلكي حصرًا» — فلا تُعدَّل/تُحذَف الصفوف العامّة.
+                if ($this->tenantScopeRequired($table, $opts)) {
+                    if (empty($opts['__strictTenant'])) {
+                        $conds[] = '(`' . $table . '`.`company_id` IS NULL OR `' . $table . '`.`company_id` = ?)';
+                    } else {
+                        $conds[] = '`' . $table . '`.`company_id` = ?';
+                    }
+                    $params[] = $this->ctx->companyId();
+                }
             } elseif ($def['type'] === TenantRegistry::T_CHILD) {
                 if ($this->tenantScopeRequired($table, $opts)) {
                     $parent = $def['parent'];
                     $fk = $def['fk'];
                     $this->assertIdent($parent);
                     $this->assertIdent($fk);
-                    $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND __p.`company_id` = ?)';
+                    // إن كان الأب كتالوجًا: العزل عبره «عامّ أو مِلكي» قراءةً (الكتابة strict = مِلكي).
+                    $pDef = TenantRegistry::get($parent);
+                    if ($pDef !== null && $pDef['type'] === TenantRegistry::T_CATALOG && empty($opts['__strictTenant'])) {
+                        $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND (__p.`company_id` IS NULL OR __p.`company_id` = ?))';
+                    } else {
+                        $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND __p.`company_id` = ?)';
+                    }
                     $params[] = $this->ctx->companyId();
                 }
             }

@@ -8,7 +8,11 @@
  *
  * الفئات:
  *   T_TENANT     بيانات مستأجرٍ (يحمل company_id) — يُحقن العزل قراءةً وكتابة.
- *   T_CHILD      ابنٌ بلا company_id — يُعزل عبر أبيه (EXISTS على الأب).
+ *   T_CHILD      ابنٌ بلا company_id — يُعزل عبر أبيه (EXISTS على الأب). إن كان
+ *                الأب T_CATALOG فالعزل عبره «عامّ أو مِلكي» (قراءةً).
+ *   T_CATALOG    كتالوجٌ مشترك: صفوفٌ عامّة (company_id=NULL للجميع) + صفوف كل
+ *                شركة. القراءة «العامّ أو مِلكي»؛ الكتابة التعديلية «مِلكي حصرًا»
+ *                (لا تُعدَّل/تُحذَف الصفوف العامّة)؛ الإدراج يُحقن شركة السياق.
  *   T_GLOBAL     مرجع نظامٍ عام — قراءته متاحة، كتابته للمدير الأعلى فقط.
  *   T_RESTRICTED جداول منصةٍ/محرّكاتٍ لم تُهاجَر بعد — البوابة ترفضها كليًا
  *                حتى يُعرَّف عقدها مع هجرة وحدتها (fail-closed).
@@ -27,6 +31,7 @@ class TenantRegistry
 {
     const T_TENANT = 'tenant';
     const T_CHILD = 'child';
+    const T_CATALOG = 'catalog';
     const T_GLOBAL = 'global';
     const T_RESTRICTED = 'restricted';
 
@@ -97,7 +102,7 @@ class TenantRegistry
         'mnt_breakdown' => array('type' => self::T_TENANT, 'soft' => true),
         'mnt_inspection' => array('type' => self::T_TENANT, 'soft' => true),
         'mnt_inspection_line' => array('type' => self::T_TENANT, 'soft' => false),
-        'mnt_inspection_template' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_inspection_template' => array('type' => self::T_CATALOG, 'soft' => false),
         'mnt_lookup' => array('type' => self::T_TENANT, 'soft' => true),
         'mnt_order' => array('type' => self::T_TENANT, 'soft' => true),
         'mnt_order_labor' => array('type' => self::T_TENANT, 'soft' => false),
