@@ -209,6 +209,63 @@ class TenantDb
     }
 
     /**
+     * حذف صفِّ كيانٍ مستأجَرٍ بلا أبٍ إلزاميّ — deleteRow (القدرة الثامنة · 2026-07-13)
+     * ───────────────────────────────────────────────────────────────────────
+     * توأم deleteChild للكيانات العليا التي لا أبَ إلزاميًّا لها (مثل employees:
+     * supplier_id/project_id كلاهما اختياري فلا يصلح نطاقًا مزدوجًا). الحذف صلبٌ
+     * على صفٍّ واحدٍ بمعرّفه، مقيَّدٌ **بشركة السياق إلزامًا** (نفس ضمانة عزل
+     * update/softDelete)، strict (لا عبور مراقبة)، ويُرفَض حيث يتوفر حذفٌ ناعم
+     * (سجلّات الأعمال تُؤرشَف — هذه للكيانات الصلبة حصرًا كالأصل التاريخي).
+     * كل استدعاءٍ يُسجَّل (أثرٌ إلزامي — يحذف بيانات). للسوبر (crossTenant):
+     * الحذف بالمعرّف وحده — عابرٌ مُسجَّل كسلوك الأصل.
+     *
+     * @return int عدد الصفوف المحذوفة (0 إن لم يطابق النطاق)
+     */
+    public function deleteRow($table, $id, $note = '')
+    {
+        $id = intval($id);
+        $def = $this->requireTable($table, true /* strict — لا عبور مراقبةٍ للحذف أبدًا */);
+        if (!empty($def['soft'])) {
+            $this->deny('deleteRow refused (table has soft delete — use softDelete)', $table);
+        }
+        if ($def['type'] !== TenantRegistry::T_TENANT) {
+            $this->deny('deleteRow requires a tenant-scoped table', $table . ':' . $def['type']);
+        }
+
+        if ($this->crossTenant) {
+            $stmt = $this->conn->prepare('DELETE FROM `' . $table . '` WHERE `id` = ?');
+            if (!$stmt) {
+                throw new TenantGateException('deleteRow prepare failed: ' . $this->conn->error);
+            }
+            $stmt->bind_param('i', $id);
+        } else {
+            $this->requireTenant($table);
+            $cid = $this->ctx->companyId();
+            $stmt = $this->conn->prepare('DELETE FROM `' . $table . '` WHERE `id` = ? AND `company_id` = ?');
+            if (!$stmt) {
+                throw new TenantGateException('deleteRow prepare failed: ' . $this->conn->error);
+            }
+            $stmt->bind_param('ii', $id, $cid);
+        }
+        if (!$stmt->execute()) {
+            $err = $stmt->error;
+            $stmt->close();
+            throw new TenantGateException('deleteRow delete failed: ' . $err);
+        }
+        $deleted = $stmt->affected_rows;
+        $stmt->close();
+
+        if (function_exists('log_security_event')) {
+            log_security_event('tenant_gate_delete_row',
+                $table . '#' . $id . ' deleted=' . $deleted
+                . ' | user=' . $this->ctx->userId() . ' company=' . $this->ctx->companyId()
+                . ($this->crossTenant ? ' cross=1' : '')
+                . ($note !== '' ? ' note=' . substr($note, 0, 120) : ''));
+        }
+        return (int) $deleted;
+    }
+
+    /**
      * قناة إعادة كتابة الأبناء — replaceChildren (K9-M1 · قرار المستخدم جـ 2026-07-08)
      * ───────────────────────────────────────────────────────────────────────
      * قناة استثنائية معرَّفة بدقة لنمط «الاستبدال الكامل» التقني (تحرير أبٍ
