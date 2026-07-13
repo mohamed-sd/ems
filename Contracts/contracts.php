@@ -15,7 +15,6 @@ if (!headers_sent()) {
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 $project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
 $mines_has_company_id = db_table_has_column($conn, 'mines', 'company_id');
 $mines_has_is_deleted = db_table_has_column($conn, 'mines', 'is_deleted');
@@ -76,30 +75,10 @@ if ($project_id > 0) {
   $filter_project_id = $project_id;
 }
 
-$contract_scope_sql = "1=1";
-if (!$is_super_admin) {
-  if ($contracts_has_company) {
-    $contract_scope_sql = "c.company_id = $company_id";
-  } else {
-    $company_scope_or = array();
-    if ($project_has_company_id) {
-      $company_scope_or[] = "sp.company_id = $company_id";
-    }
-    $company_scope_or[] = "su.company_id = $company_id";
-    $company_scope_or[] = "scu.company_id = $company_id";
-
-    $contract_scope_sql = "EXISTS (
-      SELECT 1
-      FROM project sp
-      LEFT JOIN users su ON su.id = sp.created_by
-      LEFT JOIN clients sc ON sc.id = sp.$project_client_column
-      LEFT JOIN users scu ON scu.id = sc.created_by
-      WHERE sp.id = c.project_id
-        AND (" . implode(' OR ', $company_scope_or) . ")
-    )";
-  }
-}
-$contract_scope_sql .= " AND $contract_not_deleted_sql";
+// بوابة العزل — تستبدل سُلَّمَ النطاق اليدوي (وفيه احتياطي created_by القديم):
+// contracts لها company_id مقيسةً فالعزل مباشرٌ عبر البوابة؛ فلترُ غير المحذوف
+// يبقى صريحًا في الاستعلامات (scopedQuery لا يضيف فلاتر الحذف الناعم بنفسه).
+$contracts_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contracts super view') : ems_tenant_db();
 
 // ════════════════════════════════════════════════════════════════════════════
 //  التحقق من صلاحيات المستخدم
@@ -116,14 +95,12 @@ if (!$can_view) {
   exit();
 }
 
-$equipmentTypes = [];
-$equipmentTypesQuery = "SELECT id, type FROM equipments_types WHERE status = 'active' ORDER BY type ASC";
-$equipmentTypesResult = mysqli_query($conn, $equipmentTypesQuery);
-if ($equipmentTypesResult) {
-  while ($row = mysqli_fetch_assoc($equipmentTypesResult)) {
-    $equipmentTypes[] = $row;
-  }
-}
+// أنواع المعدات — كتالوج عام (managed) عبر البوابة
+$equipmentTypes = $contracts_gate->select('equipments_types', array(
+  'columns'  => array('id', 'type'),
+  'whereRaw' => "status = 'active'",
+  'orderBy'  => 'type ASC',
+));
 
 $equipmentTypeOptionsHtml = '<option value="">— اختر —</option>';
 foreach ($equipmentTypes as $equipmentType) {
@@ -132,37 +109,17 @@ foreach ($equipmentTypes as $equipmentType) {
   $equipmentTypeOptionsHtml .= '<option value="' . $typeId . '">' . $typeName . '</option>';
 }
 
-$project_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if ($project_has_company_id) {
-    $project_scope_sql = 'p.company_id = ' . $company_id;
-  } else {
-    $project_scope_sql = "EXISTS (
-      SELECT 1
-      FROM users su
-      WHERE su.project_id = p.id
-        AND su.company_id = " . $company_id . "
-    )";
-  }
-}
+// مشاريع الشركة (نموذج الإضافة + الفلتر) — معزولةً عبر البوابة (سُلَّم النطاق القديم أُزيل)
+$form_projects = $contracts_gate->select('project', array(
+  'columns'  => array('id', 'name'),
+  'whereRaw' => 'status = 1',
+  'orderBy'  => 'name ASC',
+));
 
-$form_projects = array();
-$form_projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
-$form_projects_result = mysqli_query($conn, $form_projects_query);
-if ($form_projects_result) {
-  while ($project_row = mysqli_fetch_assoc($form_projects_result)) {
-    $form_projects[] = $project_row;
-  }
-}
-
-// جلب قائمة المشاريع للفلتر من جدول المشاريع مباشرة
+// جلب قائمة المشاريع للفلتر من جدول المشاريع مباشرة (نفس مصدر النموذج)
 $projects_filter_options = array();
-$projects_filter_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
-$projects_filter_result = mysqli_query($conn, $projects_filter_query);
-if ($projects_filter_result) {
-  while ($project_filter_row = mysqli_fetch_assoc($projects_filter_result)) {
-    $projects_filter_options[intval($project_filter_row['id'])] = $project_filter_row['name'];
-  }
+foreach ($form_projects as $project_filter_row) {
+  $projects_filter_options[intval($project_filter_row['id'])] = $project_filter_row['name'];
 }
 
 // (تم إزالة فلتر المناجم - العقود ترتبط مباشرة بالمشروع)
@@ -772,23 +729,21 @@ include('../insidebar.php');
                 exit;
               }
 
-              $delete_scope = (!$is_super_admin && $contracts_has_company)
-                ? " AND company_id = $company_id"
-                : "";
-
-              $delete_set = array("status = '0'");
+              // حذفٌ ناعمٌ معزولٌ عبر البوابة (status='0' + أعمدة الحذف؛ NOW() → توقيت PHP)
+              $delete_set = array('status' => '0');
               if ($contracts_has_is_deleted) {
-                $delete_set[] = "is_deleted = 1";
+                $delete_set['is_deleted'] = 1;
               }
               if ($contracts_has_deleted_at) {
-                $delete_set[] = "deleted_at = NOW()";
+                $delete_set['deleted_at'] = date('Y-m-d H:i:s');
               }
               if ($contracts_has_deleted_by) {
-                $delete_set[] = "deleted_by = " . intval(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
+                $delete_set['deleted_by'] = intval(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
               }
 
-              $delete_sql = "UPDATE contracts SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND $contract_not_deleted_plain_sql$delete_scope";
-              mysqli_query($conn, $delete_sql);
+              try {
+                $contracts_gate->update('contracts', $delete_set, array('id' => $delete_id), $contract_not_deleted_plain_sql);
+              } catch (\Throwable $e) { /* غير مملوك/سياق ناقص → لا تغيير */ }
               echo "<script>window.location.href='contracts.php';</script>";
               exit;
             }
@@ -806,23 +761,12 @@ include('../insidebar.php');
               $posted_project_id = intval($_POST['project_id']);
 
               if (!$is_super_admin && $posted_project_id > 0) {
-                $project_scope_check_or = array();
-                if ($project_has_company_id) {
-                  $project_scope_check_or[] = "p.company_id = $company_id";
-                }
-                $project_scope_check_or[] = "su.company_id = $company_id";
-                $project_scope_check_or[] = "scu.company_id = $company_id";
-
-                $project_scope_query = "SELECT p.id
-                  FROM project p
-                  LEFT JOIN users su ON su.id = p.created_by
-                  LEFT JOIN clients sc ON sc.id = p.$project_client_column
-                  LEFT JOIN users scu ON scu.id = sc.created_by
-                  WHERE p.id = $posted_project_id
-                    AND (" . implode(' OR ', $project_scope_check_or) . ")
-                  LIMIT 1";
-                $project_scope_result = mysqli_query($conn, $project_scope_query);
-                if (!$project_scope_result || mysqli_num_rows($project_scope_result) === 0) {
+                // فحص ملكية المشروع ضمن نطاق العزل (يستبدل سُلَّم created_by القديم)
+                $owned_project = $contracts_gate->selectOne('project', array(
+                  'columns' => array('id'),
+                  'where'   => array('id' => $posted_project_id),
+                ));
+                if ($owned_project === null) {
                   echo "<script>alert('❌ لا يمكنك الوصول إلى هذا المشروع'); window.location.href='contracts.php';</script>";
                   exit;
                 }
@@ -873,12 +817,7 @@ include('../insidebar.php');
               $witness_one = $_POST['witness_one'];
               $witness_two = $_POST['witness_two'];
 
-              // الحقول المالية الجديدة
-              $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
-              $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
-              $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
-              $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
-              $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
+              // (الحقول المالية تُقرأ خامًا داخل مصفوفة البيانات أدناه — الهروب مسؤولية البوابة)
 
               // الحقول الإضافية للعقد
               $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
@@ -888,71 +827,58 @@ include('../insidebar.php');
               $total_contract_units = isset($_POST['total_contract']) ? intval($_POST['total_contract']) : 0;
 
 
-              if ($id > 0) {
-                // تعديل
-                $contract_update_scope = (!$is_super_admin && $contracts_has_company)
-                  ? " AND company_id = $company_id"
-                  : "";
-                $sql = "UPDATE contracts SET
-            contract_signing_date='$contract_signing_date',
-            grace_period_days='$grace_period_days',
-            contract_duration_days='$contract_duration_days',
-            contract_duration_months='$contract_duration_months',
-            equip_shifts_contract='$equip_shifts_contract',
-            shift_contract='$shift_contract',
-            equip_total_contract_daily='$equip_total_contract_daily',
-            total_contract_permonth='$total_contract_permonth',
-            total_contract_units='$total_contract_units',
-            actual_start='$actual_start',
-            actual_end='$actual_end',
-            transportation='$transportation',
-            accommodation='$accommodation',
-            place_for_living='$place_for_living',
-            workshop='$workshop',
-            hours_monthly_target='$hours_monthly_target',
-            forecasted_contracted_hours='$forecasted_contracted_hours',
-            daily_work_hours='$daily_work_hours',
-            daily_operators='$daily_operators',
-            first_party='$first_party',
-            second_party='$second_party',
-            witness_one='$witness_one',
-            witness_two='$witness_two',
-            price_currency_contract='$price_currency_contract',
-            paid_contract='$paid_contract',
-            payment_time='$payment_time',
-            guarantees='$guarantees',
-            payment_date='$payment_date'
-          WHERE id=$id AND $contract_not_deleted_plain_sql$contract_update_scope";
-              } else {
-                // إضافة
-                $contract_insert_company_id = ($contracts_has_company && $company_id > 0) ? $company_id : 0;
-                $contract_insert_col = ($contracts_has_company && $contract_insert_company_id > 0) ? ", company_id" : "";
-                $contract_insert_val = ($contracts_has_company && $contract_insert_company_id > 0) ? ", '$contract_insert_company_id'" : "";
-                $sql = "INSERT INTO contracts (
-            contract_signing_date, project_id, grace_period_days, contract_duration_days, contract_duration_months,
-            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
-            actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
-            hours_monthly_target, forecasted_contracted_hours,
-            daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
-            price_currency_contract, paid_contract, payment_time, guarantees, payment_date$contract_insert_col
-        ) VALUES (
-            '$contract_signing_date', '$posted_project_id','$grace_period_days', '$contract_duration_days', '$contract_duration_months',
-            '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
-            '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
-            '$hours_monthly_target','$forecasted_contracted_hours',
-            '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
-            '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'$contract_insert_val
-        )";
+              // بيانات العقد بقيمٍ خام (الربط بالمعاملات يتكفّل بالهروب — كان التعديل
+              // يُضمِّن POST مباشرةً في النص!). company_id تُحقن آليًّا عند الإدراج.
+              $contract_data = array(
+                'contract_signing_date'       => $contract_signing_date,
+                'grace_period_days'           => $grace_period_days,
+                'contract_duration_days'      => $contract_duration_days,
+                'contract_duration_months'    => $contract_duration_months,
+                'equip_shifts_contract'       => $equip_shifts_contract,
+                'shift_contract'              => $shift_contract,
+                'equip_total_contract_daily'  => $equip_total_contract_daily,
+                'total_contract_permonth'     => $total_contract_permonth,
+                'total_contract_units'        => $total_contract_units,
+                'actual_start'                => $actual_start,
+                'actual_end'                  => $actual_end,
+                'transportation'              => $transportation,
+                'accommodation'               => $accommodation,
+                'place_for_living'            => $place_for_living,
+                'workshop'                    => $workshop,
+                'hours_monthly_target'        => $hours_monthly_target,
+                'forecasted_contracted_hours' => $forecasted_contracted_hours,
+                'daily_work_hours'            => $daily_work_hours,
+                'daily_operators'             => $daily_operators,
+                'first_party'                 => $first_party,
+                'second_party'                => $second_party,
+                'witness_one'                 => $witness_one,
+                'witness_two'                 => $witness_two,
+                'price_currency_contract'     => isset($_POST['price_currency_contract']) ? $_POST['price_currency_contract'] : '',
+                'paid_contract'               => isset($_POST['paid_contract']) ? $_POST['paid_contract'] : '',
+                'payment_time'                => isset($_POST['payment_time']) ? $_POST['payment_time'] : '',
+                'guarantees'                  => isset($_POST['guarantees']) ? $_POST['guarantees'] : '',
+                'payment_date'                => isset($_POST['payment_date']) ? $_POST['payment_date'] : '',
+              );
+
+              $result = false;
+              $contract_id = 0;
+              try {
+                if ($id > 0) {
+                  // تعديل (project_id لا يتغيّر كالأصل؛ فلترُ غير المحذوف صريح)
+                  $contracts_gate->update('contracts', $contract_data, array('id' => $id), $contract_not_deleted_plain_sql);
+                  $contract_id = $id;
+                  $result = true;
+                } else {
+                  // إضافة
+                  $contract_data['project_id'] = $posted_project_id;
+                  $contract_id = (int) $contracts_gate->insert('contracts', $contract_data);
+                  $result = $contract_id > 0;
+                }
+              } catch (\Throwable $e) {
+                $result = false;
               }
-              $result = mysqli_query($conn, $sql);
 
               if ($result) {
-                // الحصول على معرف العقد المُضاف حديثاً أو معرف العقد المُحدّث
-                if ($id > 0) {
-                  $contract_id = $id;
-                } else {
-                  $contract_id = mysqli_insert_id($conn);
-                }
 
                 // جمع بيانات المعدات من الفورم
                 $equipment_array = [];
@@ -1005,24 +931,28 @@ include('../insidebar.php');
               exit;
             }
 
-            // جلب العقود مع بيانات المنجم والمشروع
-            $contracts_where_parts = array($contract_scope_sql);
+            // جلب العقود مع بيانات المشروع — معزولةً عبر البوابة ({TENANT_SCOPE})،
+            // وفلترُ غير المحذوف صريح (scopedQuery لا يضيف فلاتر الحذف الناعم)
+            $contracts_extra  = " AND $contract_not_deleted_sql";
+            $contracts_params = array();
             if ($filter_project_id > 0) {
-              $contracts_where_parts[] = "c.project_id = '$filter_project_id'";
+              $contracts_extra .= " AND c.project_id = ?";
+              $contracts_params[] = $filter_project_id;
             }
-            $contracts_where_sql = implode(' AND ', $contracts_where_parts);
 
-            $query = "SELECT c.*, p.name AS project_name, p.id AS project_id_val
+            $contract_rows = $contracts_gate->scopedQuery(array(
+              'scope'  => array('c' => 'contracts'),
+              'enrich' => array('p' => 'project'),
+            ), "SELECT c.*, p.name AS project_name, p.id AS project_id_val
                       FROM `contracts` c
                       LEFT JOIN project p ON c.project_id = p.id
-                      WHERE $contracts_where_sql
-                      ORDER BY c.id DESC";
-            $result = mysqli_query($conn, $query);
+                      WHERE {TENANT_SCOPE}$contracts_extra
+                      ORDER BY c.id DESC", $contracts_params);
             $i = 1;
 
 
-            if ($result) {
-              while ($row = mysqli_fetch_assoc($result)) {
+            {
+              foreach ($contract_rows as $row) {
 
                 // عرض حالة العقد من status
                 $contractStatus = isset($row['status']) ? $row['status'] : 1;
