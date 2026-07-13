@@ -30,12 +30,8 @@ if (isset($_GET['delete_id'])) {
 /* جلب بيانات التعديل */
 $editData = null;
 if (isset($_GET['edit_id'])) {
-    $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT * FROM equipments_types WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $editData_res = $stmt->get_result();
-    $editData = $editData_res ? $editData_res->fetch_assoc() : null;
+    // كتالوج عامّ مُدار (managed) — قراءة عبر البوابة (بلا عزل شركة)
+    $editData = ems_tenant_db()->selectOne('equipments_types', array('where' => array('id' => (int) $_GET['edit_id'])));
 }
 
 /* إضافة / تعديل */
@@ -44,20 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = trim($_POST['type']);
     $status = $_POST['status'];
 
+    // كتابة الكتالوج العامّ المُدار عبر البوابة (تحكمها صلاحية الصفحة أعلاه)
+    $data = array('form' => $form, 'type' => $type, 'status' => $status);
     if (!empty($_POST['edit_id'])) {
-        $id = (int) $_POST['edit_id'];
-        $stmt = $conn->prepare(
-            "UPDATE equipments_types SET form = ?, type = ?, status = ? WHERE id = ?"
-        );
-        $stmt->bind_param("sssi", $form, $type, $status, $id);
+        ems_tenant_db()->update('equipments_types', $data, array('id' => (int) $_POST['edit_id']));
     } else {
-        $stmt = $conn->prepare(
-            "INSERT INTO equipments_types (form, type, status) VALUES (?, ?, ?)"
-        );
-        $stmt->bind_param("sss", $form, $type, $status);
+        ems_tenant_db()->insert('equipments_types', $data);
     }
-
-    $stmt->execute();
     header("Location: equipments_types.php");
     exit;
 }
@@ -181,9 +170,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <tbody>
 
                         <?php
-                        $result = $conn->query("SELECT * FROM equipments_types");
+                        $eq_types = ems_tenant_db()->select('equipments_types');
                         $i = 1;
-                        if ($result) while ($row = $result->fetch_assoc()):
+                        foreach ($eq_types as $row):
                             ?>
                             <tr>
                                 <td><?= $i++; ?></td>
@@ -228,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
 
                     </tbody>
                 </table>
