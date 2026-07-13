@@ -15,54 +15,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
     $project_contract_id = intval($_POST['project_contract_id']); // معرف العقد من جدول contracts
     $driver_contract_id = isset($_POST['driver_contract_id']) ? intval($_POST['driver_contract_id']) : 0;
 
+    // العزل عبر البوابة — القراءات الثلاث كانت بلا عزل شركةٍ إطلاقًا (تسرّبٌ كامنٌ أُغلق)
+    $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    $gph_gate = ($role === '-1') ? ems_tenant_db()->forAllTenants('project hours super') : ems_tenant_db();
+
     // جلب إجمالي ساعات العقد المحدد من جدول contracts
-    $contract_query = "SELECT
-        c.forecasted_contracted_hours as contract_total_hours,
-        c.project_id
-        FROM contracts c
-        WHERE c.id = $project_contract_id
-        LIMIT 1";
-    $contract_result = mysqli_query($conn, $contract_query);
-    $contract_data = $contract_result ? mysqli_fetch_assoc($contract_result) : null;
+    try {
+        $contract_data = $gph_gate->selectOne('contracts', array(
+            'columns' => array('forecasted_contracted_hours', 'project_id'),
+            'where'   => array('id' => $project_contract_id),
+        ));
+    } catch (\Throwable $t) {
+        $contract_data = null;
+    }
 
     if (!$contract_data) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
 
-    // جلب تفصيل ساعات المعدات حسب النوع للعقد المحدد
-    $equipment_details_query = "SELECT
-        equip_type,
-        COALESCE(SUM(equip_total_contract), 0) as total_hours,
-        COUNT(DISTINCT id) as equipment_count
-        FROM contractequipments
-        WHERE contract_id = $project_contract_id
-        GROUP BY equip_type
-        ORDER BY equip_type";
-    $equipment_result = mysqli_query($conn, $equipment_details_query);
+    // تفصيل ساعات المعدات حسب النوع (تجميع scopedQuery — بعد تعبئة M4)
     $equipment_breakdown = [];
-    if ($equipment_result) { while ($row = mysqli_fetch_assoc($equipment_result)) {
+    try {
+        $eq_rows = $gph_gate->scopedQuery(array(
+            'scope' => array('ce' => 'contractequipments'),
+        ), "SELECT
+        ce.equip_type,
+        COALESCE(SUM(ce.equip_total_contract), 0) as total_hours,
+        COUNT(DISTINCT ce.id) as equipment_count
+        FROM contractequipments ce
+        WHERE {TENANT_SCOPE} AND ce.contract_id = ?
+        GROUP BY ce.equip_type
+        ORDER BY ce.equip_type", array($project_contract_id));
+    } catch (\Throwable $t) {
+        $eq_rows = array();
+    }
+    foreach ($eq_rows as $row) {
         $equipment_breakdown[] = [
             'type' => $row['equip_type'],
             'hours' => floatval($row['total_hours']),
             'count' => intval($row['equipment_count'])
         ];
-    } }
-
-    // جلب مجموع ساعات عقود السائقين لهذا العقد المحدد (باستثناء العقد الحالي عند التعديل)
-    $drivers_query = "SELECT
-        COALESCE(SUM(forecasted_contracted_hours), 0) as drivers_contracted_hours
-        FROM drivercontracts
-        WHERE project_contract_id = $project_contract_id";
-
-    // استثناء عقد السائق الحالي عند التعديل
-    if ($driver_contract_id > 0) {
-        $drivers_query .= " AND id != $driver_contract_id";
     }
 
-    $drivers_result = mysqli_query($conn, $drivers_query);
-    $drivers_data = $drivers_result ? mysqli_fetch_assoc($drivers_result) : null;
+    // مجموع ساعات عقود السائقين (باستثناء العقد الحالي عند التعديل)
+    $drv_extra = ''; $drv_params = array($project_contract_id);
+    if ($driver_contract_id > 0) {
+        $drv_extra = " AND dc.id != ?";
+        $drv_params[] = $driver_contract_id;
+    }
+    try {
+        $drv_rows = $gph_gate->scopedQuery(array(
+            'scope' => array('dc' => 'drivercontracts'),
+        ), "SELECT COALESCE(SUM(dc.forecasted_contracted_hours), 0) as drivers_contracted_hours
+        FROM drivercontracts dc
+        WHERE {TENANT_SCOPE} AND dc.project_contract_id = ?$drv_extra", $drv_params);
+    } catch (\Throwable $t) {
+        $drv_rows = array(array('drivers_contracted_hours' => 0));
+    }
+    $drivers_data = $drv_rows[0] ?? array('drivers_contracted_hours' => 0);
 
-    $contract_hours = floatval($contract_data['contract_total_hours']);
+    $contract_hours = floatval($contract_data['forecasted_contracted_hours']);
     $drivers_hours = floatval($drivers_data['drivers_contracted_hours']);
     $remaining = $contract_hours - $drivers_hours;
 

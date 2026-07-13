@@ -28,48 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['employee_id']) && !e
   }
 }
 
-$drivers_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'employees', 'company_id')) {
-    $drivers_scope_sql = 'd.company_id = ' . $company_id;
-  } else {
-    $drivers_scope_sql = "EXISTS (
-      SELECT 1
-      FROM users du
-      WHERE du.project_id = d.project
-        AND du.company_id = " . $company_id . "
-    )";
-  }
-}
-
-$driver_contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'drivercontracts', 'company_id')) {
-    $driver_contract_scope_sql = 'sc.company_id = ' . $company_id;
-  } else {
-    $driver_contract_scope_sql = "EXISTS (
-      SELECT 1
-      FROM project p
-      JOIN users du ON du.project_id = p.id
-      WHERE p.id = sc.project_id
-        AND du.company_id = " . $company_id . "
-    )";
-  }
-}
-
-$project_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'project', 'company_id')) {
-    $project_scope_sql = 'p.company_id = ' . $company_id;
-  } else {
-    $project_scope_sql = "EXISTS (
-      SELECT 1
-      FROM users du
-      WHERE du.project_id = p.id
-        AND du.company_id = " . $company_id . "
-    )";
-  }
-}
+// بوابة العزل — تستبدل سلالمَ النطاق اليدوية الثلاث (employees/drivercontracts/project)
+$dc_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('driver contracts super') : ems_tenant_db();
 
 // التحقق من وجود معرف السائق
 if (!isset($_GET['id'])) {
@@ -79,9 +39,9 @@ if (!isset($_GET['id'])) {
 
 $employee_id = intval($_GET['id']);
 
-$driver_check_sql = "SELECT d.id FROM employees d WHERE d.id = $employee_id AND $drivers_scope_sql LIMIT 1";
-$driver_check_result = mysqli_query($conn, $driver_check_sql);
-if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
+// فحص ملكية السائق ضمن نطاق العزل
+$driver_owned = $dc_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_id)));
+if ($driver_owned === null) {
   header('Location: employees.php');
   exit();
 }
@@ -153,11 +113,10 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 <select name="project_id" id="project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php
-                  $projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
-                  $projects_result = mysqli_query($conn, $projects_query);
-                  if ($projects_result) { while ($project = mysqli_fetch_assoc($projects_result)) {
-                    echo "<option value='" . $project['id'] . "'>" . $project['name'] . "</option>";
-                  } }
+                  // مشاريع الشركة عبر البوابة
+                  foreach ($dc_gate->select('project', array('columns' => array('id', 'name'), 'whereRaw' => 'status = 1', 'orderBy' => 'name ASC')) as $project) {
+                    echo "<option value='" . intval($project['id']) . "'>" . htmlspecialchars($project['name']) . "</option>";
+                  }
                   ?>
                 </select>
               </div>
@@ -726,12 +685,12 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               $project_contract_id = intval($_POST['project_contract_id']);
 
 
-              $contract_signing_date = mysqli_real_escape_string($conn, $_POST['contract_signing_date']);
+              $contract_signing_date = $_POST['contract_signing_date'];
               $grace_period_days = intval($_POST['grace_period_days']);
 
               // حساب مدة العقد بالأيام من تاريخ البداية والنهاية
-              $actual_start = mysqli_real_escape_string($conn, $_POST['actual_start']);
-              $actual_end = mysqli_real_escape_string($conn, $_POST['actual_end']);
+              $actual_start = $_POST['actual_start'];
+              $actual_end = $_POST['actual_end'];
 
               // حساب عدد الأيام من تاريخ البداية إلى تاريخ الانتهاء (شامل يوم البداية ويوم النهاية)
               if (!empty($actual_start) && !empty($actual_end)) {
@@ -744,27 +703,28 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 $contract_duration_days = 0;
               }
 
-              $transportation = mysqli_real_escape_string($conn, $_POST['transportation']);
-              $accommodation = mysqli_real_escape_string($conn, $_POST['accommodation']);
-              $place_for_living = mysqli_real_escape_string($conn, $_POST['place_for_living']);
-              $workshop = mysqli_real_escape_string($conn, $_POST['workshop']);
+              // قيمٌ خام للبوابة (الربط بالمعاملات يتكفّل بالهروب)
+              $transportation = $_POST['transportation'];
+              $accommodation = $_POST['accommodation'];
+              $place_for_living = $_POST['place_for_living'];
+              $workshop = $_POST['workshop'];
 
               $hours_monthly_target = floatval($_POST['hours_monthly_target']);
               $forecasted_contracted_hours = floatval($_POST['forecasted_contracted_hours']);
 
               $daily_work_hours = floatval($_POST['daily_work_hours']);
               $daily_operators = intval($_POST['daily_operators']);
-              $first_party = mysqli_real_escape_string($conn, $_POST['first_party']);
-              $second_party = mysqli_real_escape_string($conn, $_POST['second_party']);
-              $witness_one = mysqli_real_escape_string($conn, $_POST['witness_one']);
-              $witness_two = mysqli_real_escape_string($conn, $_POST['witness_two']);
+              $first_party = $_POST['first_party'];
+              $second_party = $_POST['second_party'];
+              $witness_one = $_POST['witness_one'];
+              $witness_two = $_POST['witness_two'];
 
               // الحقول المالية الجديدة
-              $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
-              $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
-              $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
-              $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
-              $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
+              $price_currency_contract = isset($_POST['price_currency_contract']) ? $_POST['price_currency_contract'] : '';
+              $paid_contract = isset($_POST['paid_contract']) ? $_POST['paid_contract'] : '';
+              $payment_time = isset($_POST['payment_time']) ? $_POST['payment_time'] : '';
+              $guarantees = isset($_POST['guarantees']) ? $_POST['guarantees'] : '';
+              $payment_date = isset($_POST['payment_date']) ? $_POST['payment_date'] : '';
 
               // الحقول الإضافية للعقد
               $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
@@ -778,75 +738,56 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 die('بيانات السائق غير متطابقة');
               }
 
-              if ($id > 0) {
-                // تعديل
-                $sql = "UPDATE drivercontracts sc SET
-            project_id='$project_id',
-            project_contract_id='$project_contract_id',
-            contract_signing_date='$contract_signing_date',
-            grace_period_days='$grace_period_days',
-            contract_duration_days='$contract_duration_days',
-            equip_shifts_contract='$equip_shifts_contract',
-            shift_contract='$shift_contract',
-            equip_total_contract_daily='$equip_total_contract_daily',
-            total_contract_permonth='$total_contract_permonth',
-            total_contract_units='$total_contract_units',
-            actual_start='$actual_start',
-            actual_end='$actual_end',
-            transportation='$transportation',
-            accommodation='$accommodation',
-            place_for_living='$place_for_living',
-            workshop='$workshop',
-            hours_monthly_target='$hours_monthly_target',
-            forecasted_contracted_hours='$forecasted_contracted_hours',
-            daily_work_hours='$daily_work_hours',
-            daily_operators='$daily_operators',
-            first_party='$first_party',
-            second_party='$second_party',
-            witness_one='$witness_one',
-            witness_two='$witness_two',
-            price_currency_contract='$price_currency_contract',
-            paid_contract='$paid_contract',
-            payment_time='$payment_time',
-            guarantees='$guarantees',
-            payment_date='$payment_date'
-          WHERE sc.id=$id AND sc.employee_id=$employee_id AND $driver_contract_scope_sql";
-              } else {
-                // إضافة
-                $insert_columns = "employee_id, project_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
-            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
-            actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
-            hours_monthly_target, forecasted_contracted_hours,
-            daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
-            price_currency_contract, paid_contract, payment_time, guarantees, payment_date";
+              // بيانات العقد بقيمٍ خام — insert/update عبر البوابة (حقن الشركة آليًّا)
+              $dc_data = array(
+                'project_id'                  => $project_id,
+                'project_contract_id'         => $project_contract_id,
+                'contract_signing_date'       => $contract_signing_date,
+                'grace_period_days'           => $grace_period_days,
+                'contract_duration_days'      => $contract_duration_days,
+                'equip_shifts_contract'       => $equip_shifts_contract,
+                'shift_contract'              => $shift_contract,
+                'equip_total_contract_daily'  => $equip_total_contract_daily,
+                'total_contract_permonth'     => $total_contract_permonth,
+                'total_contract_units'        => $total_contract_units,
+                'actual_start'                => $actual_start,
+                'actual_end'                  => $actual_end,
+                'transportation'              => $transportation,
+                'accommodation'               => $accommodation,
+                'place_for_living'            => $place_for_living,
+                'workshop'                    => $workshop,
+                'hours_monthly_target'        => $hours_monthly_target,
+                'forecasted_contracted_hours' => $forecasted_contracted_hours,
+                'daily_work_hours'            => $daily_work_hours,
+                'daily_operators'             => $daily_operators,
+                'first_party'                 => $first_party,
+                'second_party'                => $second_party,
+                'witness_one'                 => $witness_one,
+                'witness_two'                 => $witness_two,
+                'price_currency_contract'     => $price_currency_contract,
+                'paid_contract'               => $paid_contract,
+                'payment_time'                => $payment_time,
+                'guarantees'                  => $guarantees,
+                'payment_date'                => $payment_date,
+              );
 
-                $insert_values = "'$driver_id_post', '$project_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
-            '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
-            '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
-            '$hours_monthly_target','$forecasted_contracted_hours',
-            '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
-            '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'";
-
-                if (!$is_super_admin && db_table_has_column($conn, 'drivercontracts', 'company_id')) {
-                  $insert_columns .= ', company_id';
-                  $insert_values .= ', ' . $company_id;
+              $result = false; $contract_id = 0;
+              try {
+                if ($id > 0) {
+                  // تعديل — حارس employee_id محفوظ ضمن الشرط
+                  $dc_gate->update('drivercontracts', $dc_data, array('id' => $id), 'employee_id = ?', array($employee_id));
+                  $contract_id = $id;
+                  $result = true;
+                } else {
+                  $dc_data['employee_id'] = $driver_id_post;
+                  $contract_id = (int) $dc_gate->insert('drivercontracts', $dc_data);
+                  $result = $contract_id > 0;
                 }
-
-                $sql = "INSERT INTO drivercontracts (
-            $insert_columns
-          ) VALUES (
-            $insert_values
-          )";
+              } catch (\Throwable $e) {
+                $result = false;
               }
-              $result = mysqli_query($conn, $sql);
 
               if ($result) {
-                // الحصول على معرف العقد المُضاف حديثاً أو معرف العقد المُحدّث
-                if ($id > 0) {
-                  $contract_id = $id;
-                } else {
-                  $contract_id = mysqli_insert_id($conn);
-                }
 
                 // جمع بيانات المعدات من الفورم
                 $equipment_array = [];
@@ -862,24 +803,25 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 // جمع البيانات من جميع الأقسام
                 for ($i = 1; $i <= $max_index; $i++) {
                   if (isset($_POST["equip_type_$i"]) && !empty($_POST["equip_type_$i"])) {
+                    // قيمٌ خام — الهروب مسؤولية ربط البوابة (لا هروب مزدوج)
                     $equipment_array[] = [
-                      'equip_type' => mysqli_real_escape_string($conn, $_POST["equip_type_$i"]),
+                      'equip_type' => $_POST["equip_type_$i"],
                       'equip_size' => isset($_POST["equip_size_$i"]) ? intval($_POST["equip_size_$i"]) : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? intval($_POST["equip_count_$i"]) : 0,
                       'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
                       'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? intval($_POST["equip_shifts_$i"]) : 0,
-                      'equip_unit' => isset($_POST["equip_unit_$i"]) ? mysqli_real_escape_string($conn, $_POST["equip_unit_$i"]) : '',
-                      'shift1_start' => isset($_POST["shift1_start_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift1_start_$i"]) : '',
-                      'shift1_end' => isset($_POST["shift1_end_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift1_end_$i"]) : '',
-                      'shift2_start' => isset($_POST["shift2_start_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift2_start_$i"]) : '',
-                      'shift2_end' => isset($_POST["shift2_end_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift2_end_$i"]) : '',
+                      'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
+                      'shift1_start' => isset($_POST["shift1_start_$i"]) ? $_POST["shift1_start_$i"] : '',
+                      'shift1_end' => isset($_POST["shift1_end_$i"]) ? $_POST["shift1_end_$i"] : '',
+                      'shift2_start' => isset($_POST["shift2_start_$i"]) ? $_POST["shift2_start_$i"] : '',
+                      'shift2_end' => isset($_POST["shift2_end_$i"]) ? $_POST["shift2_end_$i"] : '',
                       'shift_hours' => isset($_POST["shift_hours_$i"]) ? floatval($_POST["shift_hours_$i"]) : 0,
                       'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? floatval($_POST["equip_total_month_$i"]) : 0,
                       'equip_monthly_target' => isset($_POST["equip_target_per_month_$i"]) ? floatval($_POST["equip_target_per_month_$i"]) : 0,
                       'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? floatval($_POST["equip_total_contract_$i"]) : 0,
                       'equip_price' => isset($_POST["equip_price_$i"]) ? floatval($_POST["equip_price_$i"]) : 0,
-                      'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? mysqli_real_escape_string($conn, $_POST["equip_price_currency_$i"]) : '',
+                      'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? $_POST["equip_price_currency_$i"] : '',
                       'equip_operators' => isset($_POST["equip_operators_$i"]) ? intval($_POST["equip_operators_$i"]) : 0,
                       'equip_supervisors' => isset($_POST["equip_supervisors_$i"]) ? intval($_POST["equip_supervisors_$i"]) : 0,
                       'equip_technicians' => isset($_POST["equip_technicians_$i"]) ? intval($_POST["equip_technicians_$i"]) : 0,
@@ -888,37 +830,17 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                   }
                 }
 
-                // إضافة بيانات المعدات الجديدة
+                // استبدال سطور المعدات ذرّيًّا عبر replaceChildren (الشركة + العقد الأب
+                // المملوك المتحقَّق) — يستبدل DELETE+INSERT الخام
                 if (!empty($equipment_array)) {
-                  // حذف المعدات القديمة أولاً
-                  $delete_sql = "DELETE dce
-                                 FROM drivercontractequipments dce
-                                 JOIN drivercontracts sc ON sc.id = dce.contract_id
-                                 WHERE dce.contract_id = $contract_id
-                                   AND sc.employee_id = $employee_id
-                                   AND $driver_contract_scope_sql";
-                  mysqli_query($conn, $delete_sql);
-
-                  // إضافة المعدات الجديدة
+                  $dce_rows = array();
                   foreach ($equipment_array as $equip) {
-                    $insert_equip_sql = "INSERT INTO drivercontractequipments (
-                      contract_id, equip_type, equip_size, equip_count, equip_count_basic, equip_count_backup, equip_shifts, equip_unit,
-                      shift1_start, shift1_end, shift2_start, shift2_end, shift_hours,
-                      equip_total_month, equip_monthly_target, equip_total_contract,
-                      equip_price, equip_price_currency, equip_operators, equip_supervisors,
-                      equip_technicians, equip_assistants
-                    ) VALUES (
-                      $contract_id, '{$equip['equip_type']}', {$equip['equip_size']}, {$equip['equip_count']},
-                      {$equip['equip_count_basic']}, {$equip['equip_count_backup']},
-                      {$equip['equip_shifts']}, '{$equip['equip_unit']}', '{$equip['shift1_start']}',
-                      '{$equip['shift1_end']}', '{$equip['shift2_start']}', '{$equip['shift2_end']}',
-                      {$equip['shift_hours']}, {$equip['equip_total_month']}, {$equip['equip_monthly_target']},
-                      {$equip['equip_total_contract']}, {$equip['equip_price']}, '{$equip['equip_price_currency']}',
-                      {$equip['equip_operators']}, {$equip['equip_supervisors']}, {$equip['equip_technicians']},
-                      {$equip['equip_assistants']}
-                    )";
-                    mysqli_query($conn, $insert_equip_sql);
+                    unset($equip['contract_id']); // يضبطه replaceChildren بعد التحقق
+                    $dce_rows[] = $equip;
                   }
+                  try {
+                    $dc_gate->replaceChildren('drivercontracts', $contract_id, 'drivercontractequipments', 'contract_id', $dce_rows, 'driver contract equipments');
+                  } catch (\Throwable $e) { /* فشل الاستبدال لا يقطع الحفظ الرئيس (كالأصل) */ }
                 }
               }
 
@@ -926,20 +848,22 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               exit;
             }
 
-            // جلب العقود للسائق
-            $query = "SELECT sc.*,
+            // جلب العقود للسائق — معزولةً عبر البوابة
+            $dc_rows = $dc_gate->scopedQuery(array(
+                'scope'  => array('sc' => 'drivercontracts'),
+                'enrich' => array('op' => 'project'),
+            ), "SELECT sc.*,
                       op.name AS project_name
                       FROM drivercontracts sc
                       LEFT JOIN project op ON sc.project_id = op.id
-                      WHERE sc.employee_id = $employee_id AND $driver_contract_scope_sql
-                      ORDER BY sc.id DESC";
-            $result = mysqli_query($conn, $query);
+                      WHERE {TENANT_SCOPE} AND sc.employee_id = ?
+                      ORDER BY sc.id DESC", array($employee_id));
             $i = 1;
 
             // مساعد تهريب قصير لمنع XSS المخزَّن في كل قيمة تُطبع في HTML (خلايا وسمات).
             $h = function ($v) { return htmlspecialchars((string) ($v ?? ''), ENT_QUOTES, 'UTF-8'); };
 
-            if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+            { foreach ($dc_rows as $row) {
 
               // عرض حالة العقد من status
               $contractStatus = isset($row['status']) ? $row['status'] : 1;
