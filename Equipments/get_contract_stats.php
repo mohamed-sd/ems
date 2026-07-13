@@ -21,60 +21,10 @@ if (!$is_super_admin && $company_id <= 0) {
     exit;
 }
 
-$contracts_has_company = db_table_has_column($conn, 'contracts', 'company_id');
-$supplierscontracts_has_company = db_table_has_column($conn, 'supplierscontracts', 'company_id');
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
-
-$project_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($project_has_company) {
-        $project_scope_sql = "p.company_id = $company_id";
-    } else {
-        $project_scope_sql = "(
-            EXISTS (SELECT 1 FROM users su WHERE su.id = p.created_by AND su.company_id = $company_id)
-            OR EXISTS (
-                SELECT 1
-                FROM clients sc
-                JOIN users scu ON scu.id = sc.created_by
-                WHERE sc.id = p.company_client_id AND scu.company_id = $company_id
-            )
-        )";
-    }
-}
-
-$contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($contracts_has_company) {
-        $contract_scope_sql = "c.company_id = $company_id";
-    } else {
-        $contract_scope_sql = $project_scope_sql;
-    }
-}
-
-$supplier_contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($supplierscontracts_has_company) {
-        $supplier_contract_scope_sql = "sc.company_id = $company_id";
-    } elseif ($project_has_company) {
-        $supplier_contract_scope_sql = "EXISTS (SELECT 1 FROM project sp WHERE sp.id = sc.project_id AND sp.company_id = $company_id)";
-    } else {
-        $supplier_contract_scope_sql = "EXISTS (
-            SELECT 1
-            FROM project sp
-            WHERE sp.id = sc.project_id
-              AND (
-                  EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
-                  OR EXISTS (
-                      SELECT 1
-                      FROM clients sc2
-                      JOIN users scu ON scu.id = sc2.created_by
-                      WHERE sc2.id = sp.company_client_id AND scu.company_id = $company_id
-                  )
-              )
-        )";
-    }
-}
+// بوابة العزل — تستبدل سلالمَ النطاق اليدوية الثلاث (وفيها احتياطي created_by الميت:
+// يشير لعمود project.company_client_id غير الموجود). contracts/supplierscontracts
+// لها company_id مقيسةً، فالعزل مباشرٌ عبر البوابة.
+$stats_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract stats super view') : ems_tenant_db();
 
 $contract_id = isset($_GET['contract_id']) ? intval($_GET['contract_id']) : 0;
 
@@ -83,32 +33,40 @@ if ($contract_id <= 0) {
     exit;
 }
 
-// جلب بيانات العقد مع عدد المعدات من contractequipments
-$contract_query = "SELECT c.*, p.name as project_name,
+// جلب بيانات العقد مع عدد المعدات من contractequipments (معزولًا عبر البوابة؛
+// جداول الاستعلامات الفرعية تُعلَن إثراءً)
+try {
+    $contract_rows = $stats_gate->scopedQuery(array(
+        'scope'  => array('c' => 'contracts'),
+        'enrich' => array('p' => 'project', 'ce' => 'contractequipments'),
+    ), "SELECT c.*, p.name as project_name,
                    (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count,
                    (SELECT COALESCE(SUM(ce.equip_count_basic), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_basic,
                    (SELECT COALESCE(SUM(ce.equip_count_backup), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_backup
                    FROM contracts c
                    LEFT JOIN project p ON c.project_id = p.id
-                                     WHERE c.id = $contract_id
-                                         AND $contract_scope_sql";
-$contract_result = mysqli_query($conn, $contract_query);
-
-if (!$contract_result) {
-    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . mysqli_error($conn)]);
+                                     WHERE {TENANT_SCOPE}
+                                         AND c.id = ?",
+        array($contract_id));
+} catch (\Throwable $t) {
+    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام']);
     exit;
 }
 
-if (mysqli_num_rows($contract_result) == 0) {
+if (empty($contract_rows)) {
     echo json_encode(['success' => false, 'message' => 'العقد غير موجود']);
     exit;
 }
 
-$contract = mysqli_fetch_assoc($contract_result);
+$contract = $contract_rows[0];
 $project_id = intval($contract['project_id']);
 
-// جلب عقود الموردين المرتبطة بنفس المشروع مع عدد المعدات
-$suppliers_query = "SELECT
+// جلب عقود الموردين المرتبطة بنفس المشروع مع عدد المعدات (معزولًا عبر البوابة)
+try {
+    $supplier_rows = $stats_gate->scopedQuery(array(
+        'scope'  => array('sc' => 'supplierscontracts'),
+        'enrich' => array('s' => 'suppliers', 'sce' => 'suppliercontractequipments'),
+    ), "SELECT
     sc.id,
     sc.supplier_id,
     s.name as supplier_name,
@@ -118,45 +76,66 @@ $suppliers_query = "SELECT
     (SELECT COALESCE(SUM(sce.equip_count_backup), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_backup
 FROM supplierscontracts sc
 LEFT JOIN suppliers s ON sc.supplier_id = s.id
-WHERE sc.project_id = $project_id AND sc.status = 1
-    AND $supplier_contract_scope_sql
-ORDER BY s.name";
-
-$suppliers_result = mysqli_query($conn, $suppliers_query);
+WHERE {TENANT_SCOPE}
+    AND sc.project_id = ? AND sc.status = 1
+ORDER BY s.name",
+        array($project_id));
+} catch (\Throwable $t) {
+    $supplier_rows = array();
+}
 $suppliers = [];
 $total_supplier_hours = 0;
 $total_supplier_equipment = 0;
 
-if ($suppliers_result) {
-    while ($row = mysqli_fetch_assoc($suppliers_result)) {
-        // جلب تفاصيل المعدات لهذا المورد
-        $equip_details_query = "SELECT
+if (!empty($supplier_rows)) {
+    foreach ($supplier_rows as $row) {
+        // تفاصيل معدات عقد المورد (تجميعٌ) — **العزل عبر الأب** (sc) لا السطور:
+        // sce.company_id كانت NULL تاريخيًّا (تُعبَّأ بترحيل M4)، والأب مقيسٌ بالشركة،
+        // فالنطاق على العقد الأمّ يعزل صحًّا مهما كانت حال السطور. et كتالوج عام.
+        try {
+            $equip_details_rows = $stats_gate->scopedQuery(array(
+                'scope'  => array('sc' => 'supplierscontracts'),
+                'enrich' => array('sce' => 'suppliercontractequipments'),
+            ), "SELECT
                                         et.type as type_name,
                                         sce.equip_type,
                                         SUM(sce.equip_count) as total_count,
                                         SUM(sce.equip_count_basic) as total_count_basic,
                                         SUM(sce.equip_count_backup) as total_count_backup,
                                         SUM(sce.equip_total_contract) as total_hours
-                                 FROM suppliercontractequipments sce
+                                 FROM supplierscontracts sc
+                                 LEFT JOIN suppliercontractequipments sce ON sce.contract_id = sc.id
                                  LEFT JOIN equipments_types et ON sce.equip_type = et.id
-                                 WHERE sce.contract_id = " . $row['id'] . "
-                                 GROUP BY sce.equip_type, et.type";
-        $equip_details_result = mysqli_query($conn, $equip_details_query);
+                                 WHERE {TENANT_SCOPE} AND sc.id = ? AND sce.id IS NOT NULL
+                                 GROUP BY sce.equip_type, et.type",
+                array($row['id']));
+        } catch (\Throwable $t) {
+            $equip_details_rows = array();
+        }
 
         $equipment_breakdown = [];
 
-        if ($equip_details_result) while ($equip = mysqli_fetch_assoc($equip_details_result)) {
-            // حساب عدد الآليات المشغّلة فعليًا من جدول operations
-                        $operating_count_query = "SELECT COUNT(DISTINCT o.equipment) as operating_count
+        foreach ($equip_details_rows as $equip) {
+            // عدد الآليات المشغّلة فعليًا — JOIN الداخلي على equipments → LEFT + شرط
+            // e.id IS NOT NULL (عقد الإثراء)، والعزل عبر الرمز يغني عن o.company_id اليدوي
+            try {
+                $op_rows = $stats_gate->scopedQuery(array(
+                    'scope'  => array('o' => 'operations'),
+                    'enrich' => array('e' => 'equipments'),
+                ), "SELECT COUNT(DISTINCT o.equipment) as operating_count
                                       FROM operations o
-                                      JOIN equipments e ON o.equipment = e.id
-                                      WHERE e.suppliers = " . $row['supplier_id'] . "
-                                        AND e.type = " . intval($equip['equip_type']) . "
-                                        AND o.project_id = $project_id
-                                                                                AND o.status = 1" . ((!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "");
-            $operating_result = mysqli_query($conn, $operating_count_query);
-            $operating_row = $operating_result ? mysqli_fetch_assoc($operating_result) : null;
-            $operating_count = intval($operating_row['operating_count'] ?? 0);
+                                      LEFT JOIN equipments e ON o.equipment = e.id
+                                      WHERE {TENANT_SCOPE}
+                                        AND e.id IS NOT NULL
+                                        AND e.suppliers = ?
+                                        AND e.type = ?
+                                        AND o.project_id = ?
+                                        AND o.status = 1",
+                    array($row['supplier_id'], intval($equip['equip_type']), $project_id));
+            } catch (\Throwable $t) {
+                $op_rows = array();
+            }
+            $operating_count = intval($op_rows[0]['operating_count'] ?? 0);
 
             $contracted_count = intval($equip['total_count']);
             $remaining_count = max(0, $contracted_count - $operating_count);

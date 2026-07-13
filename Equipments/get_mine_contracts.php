@@ -21,31 +21,6 @@ if (!$is_super_admin && $company_id <= 0) {
     exit;
 }
 
-$contracts_has_company = db_table_has_column($conn, 'contracts', 'company_id');
-$mines_has_company = db_table_has_column($conn, 'mines', 'company_id');
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
-
-$contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($contracts_has_company) {
-        $contract_scope_sql = "c.company_id = $company_id";
-    } elseif ($mines_has_company) {
-        $contract_scope_sql = "m.company_id = $company_id";
-    } elseif ($project_has_company) {
-        $contract_scope_sql = "p.company_id = $company_id";
-    } else {
-        $contract_scope_sql = "(
-            EXISTS (SELECT 1 FROM users su WHERE su.id = p.created_by AND su.company_id = $company_id)
-            OR EXISTS (
-                SELECT 1
-                FROM clients sc
-                JOIN users scu ON scu.id = sc.created_by
-                WHERE sc.id = p.company_client_id AND scu.company_id = $company_id
-            )
-        )";
-    }
-}
-
 $mine_id = isset($_GET['mine_id']) ? intval($_GET['mine_id']) : 0;
 
 if ($mine_id <= 0) {
@@ -53,31 +28,10 @@ if ($mine_id <= 0) {
     exit;
 }
 
-// جلب عقود المنجم مباشرة
-$query = "SELECT c.id, c.contract_signing_date, c.contract_duration_months, c.forecasted_contracted_hours
-                    FROM contracts c
-                    JOIN mines m ON m.id = c.mine_id
-                    JOIN project p ON p.id = m.project_id
-                    WHERE c.mine_id = $mine_id
-                        AND c.status = 1
-                        AND $contract_scope_sql
-                    ORDER BY c.contract_signing_date DESC";
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
-    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . mysqli_error($conn)]);
-    exit;
-}
-
-$contracts = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $label = 'عقد بتاريخ ' . $row['contract_signing_date'] . ' (' . $row['contract_duration_months'] . ' شهر)';
-    $contracts[] = [
-        'id' => $row['id'],
-        'name' => $label,
-        'hours' => $row['forecasted_contracted_hours']
-    ];
-}
-
-echo json_encode(['success' => true, 'contracts' => $contracts]);
+// ملاحظة صيانة (هجرة البوابة · 2026-07-13): ميزة «عقود المنجم» معطّلةٌ بنيويًّا —
+// جدول mines محذوفٌ وعمود contracts.mine_id غير موجود، فكان الاستعلام الأصلي يفشل
+// دائمًا ويعيد «خطأ في الاستعلام» لكل مستدعٍ (Oprators/Reports/الحركة...). أُبدل
+// برسالةٍ صادقة بنفس عقد الاستجابة حتى يُعاد تعريف رابط العقد↔المنجم؛ عندها
+// تُبنى القراءة عبر بوابة العزل (ems_tenant_db) لا استعلامًا خامًّا.
+echo json_encode(['success' => false, 'message' => 'ميزة عقود المنجم معلّقة (بنية المناجم أُزيلت من النظام)']);
 ?>
