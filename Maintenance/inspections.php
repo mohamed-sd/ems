@@ -25,8 +25,6 @@ $can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
 $can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
 if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التفتيش+❌"); exit(); }
 
-$company_scope_sql = $is_super_admin ? "1=1" : "i.company_id = " . intval($company_id);
-
 // ── الحالات وقوائم القيم ───────────────────────────────────────────────
 $states     = array('جديد', 'مجدول', 'قيد التنفيذ', 'مكتمل', 'مغلق');
 $conditions = array('ممتازة', 'جيدة', 'متوسطة', 'ضعيفة', 'حرجة');
@@ -79,32 +77,24 @@ function mnt_line_applies($applies_to, $eq_cat_norm) {
 $templates = array();
 $templates_by_id = array();
 if (db_table_has_column($conn, 'mnt_inspection_template', 'id')) {
-    $tscope = $is_super_admin ? "company_id IS NULL" : "(company_id IS NULL OR company_id = " . intval($company_id) . ")";
-    if ($tr = mysqli_query($conn, "SELECT id, type_code, name, inspection_type, header_type, condition_scale
-                                      FROM mnt_inspection_template
-                                     WHERE $tscope AND is_active = 1 ORDER BY sort_order, id")) {
-        while ($t = mysqli_fetch_assoc($tr)) {
-            $templates[$t['inspection_type']] = $t;
-            $templates_by_id[intval($t['id'])] = $t;
-        }
+    // كتالوج مشترك (T_CATALOG): البوابة تحقن «العامّ (NULL) أو مِلكي» تلقائيًّا
+    $tpl_rows = ems_tenant_db()->select('mnt_inspection_template', array(
+        'columns'  => array('id', 'type_code', 'name', 'inspection_type', 'header_type', 'condition_scale'),
+        'whereRaw' => "is_active = 1", 'orderBy' => 'sort_order, id'));
+    foreach ($tpl_rows as $t) {
+        $templates[$t['inspection_type']] = $t;
+        $templates_by_id[intval($t['id'])] = $t;
     }
 }
 $legacy_types = array('دوري', 'زيارة ميدانية', 'استلام', 'بعد حادث');
 $valid_types  = array_values(array_unique(array_merge(array_keys($templates), $legacy_types)));
 
 function mnt_fetch_inspection($conn, $id, $company_id, $is_super_admin) {
-    $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-    $res = mysqli_query($conn, "SELECT * FROM mnt_inspection WHERE id = " . intval($id) . " AND COALESCE(is_deleted,0)=0" . $scope . " LIMIT 1");
-    return $res ? mysqli_fetch_assoc($res) : null;
+    $g = $is_super_admin ? ems_tenant_db()->forAllTenants('inspection super view') : ems_tenant_db();
+    return $g->selectOne('mnt_inspection', array('where' => array('id' => intval($id))));
 }
 function mnt_ins_line_count($conn, $iid, $company_id) {
-    $c = 0;
-    if ($cs = mysqli_prepare($conn, "SELECT COUNT(*) c FROM mnt_inspection_line WHERE inspection_id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($cs, 'ii', $iid, $company_id); mysqli_stmt_execute($cs);
-        $cr = mysqli_stmt_get_result($cs); if ($cr && ($x = mysqli_fetch_assoc($cr))) { $c = intval($x['c']); }
-        mysqli_stmt_close($cs);
-    }
-    return $c;
+    return ems_tenant_db()->count('mnt_inspection_line', array('where' => array('inspection_id' => intval($iid))));
 }
 function mnt_ins_json($data) {
     while (ob_get_level()) { ob_end_clean(); }
@@ -116,34 +106,32 @@ function mnt_equipment_category_norm($conn, $equipment_id, $company_id) {
     $equipment_id = intval($equipment_id);
     if ($equipment_id <= 0) return '';
     $cat = '';
-    $q = mysqli_query($conn, "SELECT et.type AS cat
-                                FROM equipments e
-                                LEFT JOIN equipments_types et ON et.id = e.type
-                               WHERE e.id = $equipment_id LIMIT 1");
-    if ($q && ($r = mysqli_fetch_assoc($q))) { $cat = (string) ($r['cat'] ?? ''); }
+    // عزل على e (المعدة لشركة السياق) + إثراء LEFT بنوعها (عامّ)
+    $rows = ems_tenant_db()->scopedQuery(
+        array('scope' => array('e' => 'equipments')),
+        "SELECT et.type AS cat FROM equipments e LEFT JOIN equipments_types et ON et.id = e.type
+         WHERE {TENANT_SCOPE} AND e.id = ? LIMIT 1", array($equipment_id));
+    if (!empty($rows)) { $cat = (string) ($rows[0]['cat'] ?? ''); }
     return mnt_norm_cat($cat);
 }
 function mnt_seed_lines_from_template($conn, $iid, $company_id, $template_id, $equipment_id, $header_type, $default_state = '') {
     $template_id = intval($template_id);
     if ($template_id <= 0) return 0;
     $eq_cat = ($header_type === 'equipment') ? mnt_equipment_category_norm($conn, $equipment_id, $company_id) : '';
-    $q = mysqli_query($conn, "SELECT id, section, seq, item, applies_to, check_method, reference_limit
-                                FROM mnt_inspection_template_line
-                               WHERE template_id = $template_id ORDER BY seq, id");
-    if (!$q) return 0;
+    // سطور القالب: ابن كتالوج (يُعزل عبر أبيه «عامّ أو مِلكي»)
+    $tlines = ems_tenant_db()->select('mnt_inspection_template_line', array(
+        'columns' => array('id', 'section', 'seq', 'item', 'applies_to', 'check_method', 'reference_limit'),
+        'where'   => array('template_id' => $template_id), 'orderBy' => 'seq, id'));
     $n = 0;
-    $stmt = mysqli_prepare($conn, "INSERT INTO mnt_inspection_line
-            (company_id, inspection_id, template_line_id, component, section, applies_to, check_method, measured_value, note, seq, condition_state, recommendation, is_template)
-            VALUES (?,?,?,?,?,?,?,'','',?,?,'',1)");
-    if (!$stmt) return 0;
-    while ($l = mysqli_fetch_assoc($q)) {
+    foreach ($tlines as $l) {
         if (!mnt_line_applies($l['applies_to'], $eq_cat)) continue;
-        $tlid = intval($l['id']); $seq = intval($l['seq']);
-        mysqli_stmt_bind_param($stmt, 'iiissssis', $company_id, $iid, $tlid,
-            $l['item'], $l['section'], $l['applies_to'], $l['check_method'], $seq, $default_state);
-        mysqli_stmt_execute($stmt); $n++;
+        ems_tenant_db()->insert('mnt_inspection_line', array(
+            'inspection_id' => $iid, 'template_line_id' => intval($l['id']),
+            'component' => $l['item'], 'section' => $l['section'], 'applies_to' => $l['applies_to'],
+            'check_method' => $l['check_method'], 'measured_value' => '', 'note' => '',
+            'seq' => intval($l['seq']), 'condition_state' => $default_state, 'recommendation' => '', 'is_template' => 1));
+        $n++;
     }
-    mysqli_stmt_close($stmt);
     return $n;
 }
 
@@ -163,14 +151,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
         $mv   = trim($_POST['measured_value'] ?? '');
         $note = trim($_POST['note'] ?? '');
         $rec  = trim($_POST['recommendation'] ?? '');
-        $lineId = 0;
-        if ($stmt = mysqli_prepare($conn, "INSERT INTO mnt_inspection_line
-                (company_id, inspection_id, component, section, applies_to, check_method, measured_value, note, condition_state, recommendation, is_template)
-                VALUES (?,?,?,?, 'عام','', ?,?,?,?, 0)")) {
-            $section = 'بنود إضافية';
-            mysqli_stmt_bind_param($stmt, 'iissssss', $company_id, $iid, $component, $section, $mv, $note, $cond, $rec);
-            mysqli_stmt_execute($stmt); $lineId = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-        }
+        $lineId = ems_tenant_db()->insert('mnt_inspection_line', array(
+            'inspection_id' => $iid, 'component' => $component, 'section' => 'بنود إضافية',
+            'applies_to' => 'عام', 'check_method' => '', 'measured_value' => $mv, 'note' => $note,
+            'condition_state' => $cond, 'recommendation' => $rec, 'is_template' => 0));
         mnt_ins_json(array('success' => true,
             'line' => array('id' => $lineId, 'component' => $component, 'condition_state' => $cond,
                             'measured_value' => $mv, 'note' => $note, 'recommendation' => $rec),
@@ -179,9 +163,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
 
     if ($_POST['action'] === 'del_line') {
         $lid = intval($_POST['line_id'] ?? 0);
-        if ($stmt = mysqli_prepare($conn, "DELETE FROM mnt_inspection_line WHERE id=? AND inspection_id=? AND company_id=? AND is_template=0")) {
-            mysqli_stmt_bind_param($stmt, 'iii', $lid, $iid, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        // حذف بندٍ يدويٍّ فقط (is_template=0): تحقّق قبليّ ثم deleteChild (نطاق مزدوج)
+        $ln = ems_tenant_db()->selectOne('mnt_inspection_line', array('columns' => array('is_template'), 'where' => array('id' => $lid, 'inspection_id' => $iid)));
+        if ($ln && intval($ln['is_template']) === 0) {
+            ems_tenant_db()->deleteChild('mnt_inspection_line', $lid, 'mnt_inspection', $iid, 'inspection_id', 'inspection line delete (ajax)');
         }
         mnt_ins_json(array('success' => true, 'count' => mnt_ins_line_count($conn, $iid, $company_id)));
     }
@@ -205,13 +190,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_i
     $template_id    = $tpl ? intval($tpl['id']) : null;
 
     $code = mnt_next_code($conn, 'mnt_inspection', 'INS', $company_id);
-    $new_id = 0;
-    $sql = "INSERT INTO mnt_inspection (company_id, code, inspection_type, template_id, equipment_id, supplier_id, external_equipment, project_id, inspector_id, scheduled_date, state, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'جديد', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'issiiisiisi', $company_id, $code, $inspection_type, $template_id, $equipment_id, $supplier_id, $external_eq, $project_id, $inspector_id, $scheduled_date, $current_user_id);
-        mysqli_stmt_execute($stmt); $new_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-    }
+    $new_id = ems_tenant_db()->insert('mnt_inspection', array(
+        'code' => $code, 'inspection_type' => $inspection_type, 'template_id' => $template_id,
+        'equipment_id' => $equipment_id, 'supplier_id' => $supplier_id, 'external_equipment' => $external_eq,
+        'project_id' => $project_id, 'inspector_id' => $inspector_id, 'scheduled_date' => $scheduled_date,
+        'state' => 'جديد', 'created_by' => $current_user_id));
     if ($new_id && $template_id) {
         $seed_kind  = mnt_form_kind($tpl ? $tpl['type_code'] : '', $ASSESSMENT_CODES);
         $seed_scale = $tpl ? $tpl['condition_scale'] : 'default';
@@ -247,53 +230,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $notes = trim($_POST['notes'] ?? '');
     $requested_state = in_array($_POST['state'] ?? '', $states, true) ? $_POST['state'] : $ins['state'];
 
-    // (أ) حفظ بنود الفحص المؤكَّدة
+    // (أ) حفظ بنود الفحص المؤكَّدة — تحديثٌ معزولٌ لكل سطر (البوابة تحقن company_id)
     if (!$locked && isset($_POST['line']) && is_array($_POST['line'])) {
-        $up = mysqli_prepare($conn, "UPDATE mnt_inspection_line SET condition_state=?, measured_value=?, note=?, recommendation=? WHERE id=? AND inspection_id=? AND company_id=?");
-        if ($up) {
-            foreach ($_POST['line'] as $lid => $ld) {
-                $lid = intval($lid);
-                $cs  = isset($ld['condition_state']) ? trim($ld['condition_state']) : '';
-                $mv  = isset($ld['measured_value']) ? trim($ld['measured_value']) : '';
-                $nt  = isset($ld['note']) ? trim($ld['note']) : '';
-                $rc  = isset($ld['recommendation']) ? trim($ld['recommendation']) : '';
-                mysqli_stmt_bind_param($up, 'ssssiii', $cs, $mv, $nt, $rc, $lid, $iid, $company_id);
-                mysqli_stmt_execute($up);
-            }
-            mysqli_stmt_close($up);
+        foreach ($_POST['line'] as $lid => $ld) {
+            $lid = intval($lid);
+            ems_tenant_db()->update('mnt_inspection_line', array(
+                'condition_state' => isset($ld['condition_state']) ? trim($ld['condition_state']) : '',
+                'measured_value'  => isset($ld['measured_value']) ? trim($ld['measured_value']) : '',
+                'note'            => isset($ld['note']) ? trim($ld['note']) : '',
+                'recommendation'  => isset($ld['recommendation']) ? trim($ld['recommendation']) : '',
+            ), array('id' => $lid, 'inspection_id' => $iid));
         }
     }
 
-    // (ب) حساب الدرجة والعدّادات من البنود الفعلية
+    // (ب) حساب الدرجة والعدّادات من البنود الفعلية (قراءة معزولة)
     $good = $applicable = $critical = 0;
-    if ($lr = mysqli_query($conn, "SELECT condition_state FROM mnt_inspection_line WHERE inspection_id=" . intval($iid) . " AND company_id=" . intval($company_id))) {
-        while ($lx = mysqli_fetch_assoc($lr)) {
-            $cs = trim((string) $lx['condition_state']);
-            if ($cs === '' || in_array($cs, $NA_STATES, true)) continue;
-            $applicable++;
-            if (in_array($cs, $GOOD_STATES, true)) $good++;
-            if (in_array($cs, $CRIT_STATES, true)) $critical++;
-        }
+    $score_lines = ems_tenant_db()->select('mnt_inspection_line', array('columns' => array('condition_state'), 'where' => array('inspection_id' => intval($iid))));
+    foreach ($score_lines as $lx) {
+        $cs = trim((string) $lx['condition_state']);
+        if ($cs === '' || in_array($cs, $NA_STATES, true)) continue;
+        $applicable++;
+        if (in_array($cs, $GOOD_STATES, true)) $good++;
+        if (in_array($cs, $CRIT_STATES, true)) $critical++;
     }
     $score = $applicable > 0 ? intval(round(100 * $good / $applicable)) : null;
 
     $completing_now = ($requested_state === 'مكتمل' && $ins['state'] !== 'مكتمل');
 
-    $sql = "UPDATE mnt_inspection SET
-                inspection_type=?, equipment_id=?, supplier_id=?, external_equipment=?, project_id=?, inspector_id=?, scheduled_date=?,
-                score=?, overall_result=?, tech_readiness_state=?, equipment_condition=?, engine_condition=?,
-                notes=?, state=?"
-            . ($completing_now ? ", completed_at=NOW()" : "")
-            . " WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // s i i s i i | s | i | s s s s s s | i i  = 16
-        $tp = 'siisii' . 's' . 'i' . 'ssssss' . 'ii';
-        mysqli_stmt_bind_param($stmt, $tp,
-            $inspection_type, $equipment_id, $supplier_id, $external_eq, $project_id, $inspector_id, $scheduled_date,
-            $score, $overall_result, $tech_readiness, $equipment_condition, $engine_condition,
-            $notes, $requested_state, $iid, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    // تحديث رأس التفتيش عبر البوابة؛ completed_at عند الإكمال (NOW → PHP-side قيمة حرفية)
+    $ins_data = array(
+        'inspection_type' => $inspection_type, 'equipment_id' => $equipment_id, 'supplier_id' => $supplier_id,
+        'external_equipment' => $external_eq, 'project_id' => $project_id, 'inspector_id' => $inspector_id,
+        'scheduled_date' => $scheduled_date, 'score' => $score, 'overall_result' => $overall_result,
+        'tech_readiness_state' => $tech_readiness, 'equipment_condition' => $equipment_condition,
+        'engine_condition' => $engine_condition, 'notes' => $notes, 'state' => $requested_state);
+    if ($completing_now) { $ins_data['completed_at'] = date('Y-m-d H:i:s'); }
+    ems_tenant_db()->update('mnt_inspection', $ins_data, array('id' => $iid));
 
     if ($completing_now && $equipment_id) {
         mnt_apply_inspection_to_equipment($conn, $equipment_id, $company_id, $equipment_condition, $engine_condition);
@@ -314,9 +286,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_l
         $component = trim($_POST['component'] ?? '');
         $cond = trim($_POST['condition_state'] ?? '');
         $rec = trim($_POST['recommendation'] ?? '');
-        if ($component !== '' && ($stmt = mysqli_prepare($conn, "INSERT INTO mnt_inspection_line (company_id, inspection_id, component, section, applies_to, condition_state, recommendation, is_template) VALUES (?,?,?, 'بنود إضافية','عام', ?,?, 0)"))) {
-            mysqli_stmt_bind_param($stmt, 'iisss', $company_id, $iid, $component, $cond, $rec);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        if ($component !== '') {
+            ems_tenant_db()->insert('mnt_inspection_line', array(
+                'inspection_id' => $iid, 'component' => $component, 'section' => 'بنود إضافية',
+                'applies_to' => 'عام', 'condition_state' => $cond, 'recommendation' => $rec, 'is_template' => 0));
         }
     }
     header("Location: inspections.php?id=" . intval($iid) . "&msg=تمت+إضافة+البند+✅"); exit();
@@ -328,9 +301,10 @@ if (isset($_GET['del_line'], $_GET['inspection_id'])) {
         if ($ins_lock && ($ins_lock['state'] === 'مكتمل' || $ins_lock['state'] === 'مغلق')) {
             header("Location: inspections.php?id=" . $iid . "&msg=" . urlencode('لا يمكن حذف بنود تفتيش مكتمل/مغلق ❌')); exit();
         }
-        if ($stmt = mysqli_prepare($conn, "DELETE FROM mnt_inspection_line WHERE id=? AND inspection_id=? AND company_id=? AND is_template=0")) {
-            mysqli_stmt_bind_param($stmt, 'iii', $lid, $iid, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        // حذف بندٍ يدويٍّ فقط (is_template=0): تحقّق قبليّ ثم deleteChild
+        $ln = ems_tenant_db()->selectOne('mnt_inspection_line', array('columns' => array('is_template'), 'where' => array('id' => $lid, 'inspection_id' => $iid)));
+        if ($ln && intval($ln['is_template']) === 0) {
+            ems_tenant_db()->deleteChild('mnt_inspection_line', $lid, 'mnt_inspection', $iid, 'inspection_id', 'inspection line delete');
         }
         header("Location: inspections.php?id=" . $iid . "&msg=تم+حذف+البند+✅"); exit();
     }
@@ -340,10 +314,7 @@ if (isset($_GET['del_line'], $_GET['inspection_id'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: inspections.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $did = intval($_GET['delete_id']);
-    if ($stmt = mysqli_prepare($conn, "UPDATE mnt_inspection SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $did, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->softDelete('mnt_inspection', $did); // حذف ناعم معزول بالشركة تلقائيًّا
     header("Location: inspections.php?msg=تم+حذف+التفتيش+✅"); exit();
 }
 
@@ -352,12 +323,13 @@ $ins = $edit_id > 0 ? mnt_fetch_inspection($conn, $edit_id, $company_id, $is_sup
 
 $equipments = array(); $projects = array(); $users_list = array(); $suppliers = array();
 if ($ins || $edit_id === 0) {
-    $cscope = $is_super_admin ? "1=1" : "company_id = " . intval($company_id);
-    if ($r = mysqli_query($conn, "SELECT id, name, code FROM equipments WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $equipments[] = $x; }
-    if ($r = mysqli_query($conn, "SELECT id, name FROM project WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $projects[] = $x; }
-    if ($r = mysqli_query($conn, "SELECT id, name FROM users WHERE $cscope AND is_deleted=0 ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $users_list[] = $x; }
+    $mnt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('inspections dropdowns super view') : ems_tenant_db();
+    // equipments/suppliers بلا فلتر is_deleted في الأصل ⇒ includeDeleted للمطابقة؛ users بفلتر صريح
+    $equipments = $mnt_gate->select('equipments', array('columns' => array('id', 'name', 'code'), 'orderBy' => 'name'));
+    $projects   = $mnt_gate->select('project', array('columns' => array('id', 'name'), 'orderBy' => 'name', 'includeDeleted' => true));
+    $users_list = $mnt_gate->select('users', array('columns' => array('id', 'name'), 'whereRaw' => "is_deleted=0", 'orderBy' => 'name'));
     if (db_table_has_column($conn, 'suppliers', 'id')) {
-        if ($r = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $suppliers[] = $x; }
+        $suppliers = $mnt_gate->select('suppliers', array('columns' => array('id', 'name'), 'orderBy' => 'name', 'includeDeleted' => true));
     }
 }
 
@@ -398,14 +370,13 @@ function mnt_seg_kind($c) {
     $kind        = mnt_form_kind($tpl ? $tpl['type_code'] : '', $ASSESSMENT_CODES);
     $is_assess   = ($kind === 'assessment');
 
-    $lines = array();
-    if ($s = mysqli_prepare($conn, "SELECT l.id, l.component, l.section, l.applies_to, l.check_method, l.measured_value, l.note, l.condition_state, l.recommendation, l.is_template, l.seq, tl.reference_limit AS ref_hint
-                                       FROM mnt_inspection_line l
-                                       LEFT JOIN mnt_inspection_template_line tl ON tl.id = l.template_line_id
-                                      WHERE l.inspection_id=? AND l.company_id=? ORDER BY l.is_template DESC, l.seq, l.id")) {
-        mysqli_stmt_bind_param($s, 'ii', $edit_id, $company_id); mysqli_stmt_execute($s);
-        $rr = mysqli_stmt_get_result($s); while ($rr && $x = mysqli_fetch_assoc($rr)) $lines[] = $x; mysqli_stmt_close($s);
-    }
+    // سطور التفتيش عبر scopedQuery (§10): عزل على l + إثراء LEFT بتلميح القالب (ابن كتالوج)
+    $lines = ems_tenant_db()->scopedQuery(
+        array('scope' => array('l' => 'mnt_inspection_line'), 'enrich' => array('tl' => 'mnt_inspection_template_line')),
+        "SELECT l.id, l.component, l.section, l.applies_to, l.check_method, l.measured_value, l.note, l.condition_state, l.recommendation, l.is_template, l.seq, tl.reference_limit AS ref_hint
+         FROM mnt_inspection_line l
+         LEFT JOIN mnt_inspection_template_line tl ON tl.id = l.template_line_id
+         WHERE {TENANT_SCOPE} AND l.inspection_id=? ORDER BY l.is_template DESC, l.seq, l.id", array($edit_id));
     $cnt_good = $cnt_note = $cnt_crit = $cnt_na = $cnt_app = 0;
     foreach ($lines as $l) {
         $cs = trim((string) $l['condition_state']);
@@ -705,20 +676,24 @@ function mnt_seg_kind($c) {
                 <thead><tr><th>الإجراءات</th><th>المرجع</th><th>النوع</th><th>المعدة/الجهة</th><th>الفاحص</th><th>التاريخ</th><th>الدرجة</th><th>الحالة</th></tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
-                                   i.score, i.overall_result, i.tech_readiness_state,
-                                   i.equipment_condition, i.engine_condition, i.notes, i.state, i.external_equipment,
-                                   e.name AS equipment_name, p.name AS project_name, u.name AS inspector_name, sp.name AS supplier_name
-                              FROM mnt_inspection i
-                              LEFT JOIN equipments e ON e.id = i.equipment_id
-                              LEFT JOIN project p    ON p.id = i.project_id
-                              LEFT JOIN users u ON u.id = i.inspector_id
-                              LEFT JOIN suppliers sp ON sp.id = i.supplier_id
-                             WHERE $company_scope_sql AND COALESCE(i.is_deleted,0)=0
-                             ORDER BY i.id DESC";
+                    // قائمة التفتيش عبر scopedQuery (§10): عزل على i + إثراء LEFT للأبعاد
+                    $insp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('inspections list super view') : ems_tenant_db();
+                    $insp_rows = $insp_gate->scopedQuery(
+                        array('scope' => array('i' => 'mnt_inspection'),
+                              'enrich' => array('e' => 'equipments', 'p' => 'project', 'u' => 'users', 'sp' => 'suppliers')),
+                        "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
+                                i.score, i.overall_result, i.tech_readiness_state,
+                                i.equipment_condition, i.engine_condition, i.notes, i.state, i.external_equipment,
+                                e.name AS equipment_name, p.name AS project_name, u.name AS inspector_name, sp.name AS supplier_name
+                           FROM mnt_inspection i
+                           LEFT JOIN equipments e ON e.id = i.equipment_id
+                           LEFT JOIN project p    ON p.id = i.project_id
+                           LEFT JOIN users u ON u.id = i.inspector_id
+                           LEFT JOIN suppliers sp ON sp.id = i.supplier_id
+                          WHERE {TENANT_SCOPE} AND COALESCE(i.is_deleted,0)=0
+                          ORDER BY i.id DESC");
                     $insp_ids = array();
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    foreach ($insp_rows as $row) {
                         $insp_ids[] = intval($row['id']);
                         $st = (string) $row['state'];
                         $subject = $row['equipment_name'] ?: ($row['supplier_name'] ?: ($row['external_equipment'] ?: '-'));
@@ -752,7 +727,7 @@ function mnt_seg_kind($c) {
                         echo "<td>" . ($row['score'] !== null && $row['score'] !== '' ? intval($row['score']) . '%' : '-') . "</td>";
                         echo "<td><span class='action-btn'>" . htmlspecialchars((string) $row['state']) . "</span></td>";
                         echo "</tr>";
-                    } }
+                    }
                     ?>
                 </tbody>
             </table>
@@ -762,22 +737,19 @@ function mnt_seg_kind($c) {
     $mnt_insp_lines_map = array();
     if (!empty($insp_ids)) {
         $ids_csv = implode(',', array_map('intval', $insp_ids));
-        $cid     = intval($company_id);
-        $lq = "SELECT inspection_id, component, condition_state, measured_value, note, recommendation
-                 FROM mnt_inspection_line
-                WHERE inspection_id IN ($ids_csv) AND company_id = $cid
-                ORDER BY is_template DESC, seq, id";
-        if ($lr = mysqli_query($conn, $lq)) {
-            while ($x = mysqli_fetch_assoc($lr)) {
-                $iid = intval($x['inspection_id']);
-                $mnt_insp_lines_map[$iid][] = array(
-                    (string) $x['component'],
-                    (string) ($x['condition_state'] ?? ''),
-                    (string) ($x['measured_value'] ?? ''),
-                    (string) ($x['note'] ?? ''),
-                    (string) ($x['recommendation'] ?? '')
-                );
-            }
+        // سطور كل عمليات التفتيش المعروضة (عزل بالشركة عبر البوابة؛ IN بمعرّفات مُصفّاة intval)
+        $map_lines = ems_tenant_db()->select('mnt_inspection_line', array(
+            'columns'  => array('inspection_id', 'component', 'condition_state', 'measured_value', 'note', 'recommendation'),
+            'whereRaw' => "inspection_id IN ($ids_csv)", 'orderBy' => 'is_template DESC, seq, id'));
+        foreach ($map_lines as $x) {
+            $iid = intval($x['inspection_id']);
+            $mnt_insp_lines_map[$iid][] = array(
+                (string) $x['component'],
+                (string) ($x['condition_state'] ?? ''),
+                (string) ($x['measured_value'] ?? ''),
+                (string) ($x['note'] ?? ''),
+                (string) ($x['recommendation'] ?? '')
+            );
         }
     }
     echo '<script>window.MNT_INSP_LINES = ' . json_encode($mnt_insp_lines_map, JSON_UNESCAPED_UNICODE) . ';</script>';
