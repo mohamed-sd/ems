@@ -5,9 +5,9 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 $page_title = "إيكوبيشن | اختيار المشروع";
+include '../config.php'; // config أولًا (يعرّف $conn/البوابة) — كان بعد الترويسة فيُفشِلها (500 قائم)
 include("../inheader.php");
 include("../insidebar.php");
-include '../config.php';
 ?>
 
 <style>
@@ -227,16 +227,16 @@ include '../config.php';
 
     <div class="projects-grid">
         <?php
-        $query = "SELECT p.*, 
-                  (SELECT COUNT(*) FROM equipments e WHERE e.project_id = p.id AND e.status = 1) as equipments_count,
-                  (SELECT COUNT(*) FROM mines m WHERE m.project_id = p.id AND m.status = 1) as mines_count
-                  FROM project p 
-                  WHERE p.status = '1' 
-                  ORDER BY p.name ASC";
-        $result = mysqli_query($conn, $query);
+        // المشاريع النشطة معزولةً بالشركة عبر البوابة (يُصلح تسرّبًا كامنًا).
+        // ملاحظة صيانة: عدّادا «المعدات/المناجم» كانا يعتمدان على schema غير موجود
+        // (جدول mines محذوف + عمود equipments.project_id غير موجود) فيُفشِلان الاستعلام
+        // (HTTP 500 قبل الهجرة). صُفِّرا حتى يُعاد تعريف رابط المعدة↔المشروع (عبر operations).
+        $projects = ems_tenant_db()->select('project', array('whereRaw' => "status = '1'", 'orderBy' => 'name ASC'));
 
-        if ($result && mysqli_num_rows($result) > 0) {
-            while ($project = mysqli_fetch_assoc($result)) {
+        if (!empty($projects)) {
+            foreach ($projects as $project) {
+                $project['equipments_count'] = 0;
+                $project['mines_count'] = 0;
                 ?>
                 <a href="equipments.php?project_id=<?php echo $project['id']; ?>" class="project-card">
                     <div class="project-icon">
