@@ -34,22 +34,13 @@ if (!defined('MNT_HELPERS_LOADED')) {
             return $prefix . '-' . date('Y') . '-0001';
         }
 
-        $company_id = intval($company_id);
         $year = date('Y');
 
-        // العدّاد = أعلى تسلسل لنفس البادئة/السنة/الشركة + 1 (تطبيق داخلي قليل التزامن).
+        // العدّاد = عدّ كل الأكواد لنفس البادئة/السنة/الشركة + 1. includeDeleted لمطابقة
+        // الأصل (بلا فلتر is_deleted) — المؤرشَف يشغل رقمه فلا يتكرّر الكود.
         $like = $prefix . '-' . $year . '-%';
-        $sql = "SELECT COUNT(*) AS c FROM `$table` WHERE company_id = ? AND code LIKE ?";
-        $next = 1;
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'is', $company_id, $like);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            if ($res && ($row = mysqli_fetch_assoc($res))) {
-                $next = intval($row['c']) + 1;
-            }
-            mysqli_stmt_close($stmt);
-        }
+        $c = ems_tenant_db()->count($table, array('whereRaw' => 'code LIKE ?', 'params' => array($like), 'includeDeleted' => true));
+        $next = $c + 1;
 
         return $prefix . '-' . $year . '-' . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
@@ -69,23 +60,13 @@ if (!defined('MNT_HELPERS_LOADED')) {
             return 0;
         }
 
-        // فقط التشغيل الساري (status = 1) لهذه المعدة وداخل نفس الشركة.
-        $sql = "UPDATE operations
-                   SET equipment_health = 'معطلة',
-                       health_reason     = 'صيانة',
-                       health_updated_at = NOW(),
-                       health_updated_by = ?
-                 WHERE equipment = ?
-                   AND status = 1
-                   AND (company_id = ? OR company_id IS NULL)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iii', $user_id, $equipment_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $affected = mysqli_stmt_affected_rows($stmt);
-            mysqli_stmt_close($stmt);
-            return max(0, (int) $affected);
-        }
-        return 0;
+        // فقط التشغيل الساري (status=1) لهذه المعدة — العزل بالشركة يُحقن (صفر operations
+        // بـNULL فالعزل الصارم مطابق للـOR-NULL الدفاعي). NOW → PHP-side.
+        $affected = ems_tenant_db()->update('operations', array(
+            'equipment_health' => 'معطلة', 'health_reason' => 'صيانة',
+            'health_updated_at' => date('Y-m-d H:i:s'), 'health_updated_by' => $user_id,
+        ), array(), "equipment = ? AND status = 1", array($equipment_id));
+        return max(0, (int) $affected);
     }
 
     /**
@@ -101,22 +82,12 @@ if (!defined('MNT_HELPERS_LOADED')) {
             return 0;
         }
 
-        $sql = "UPDATE operations
-                   SET equipment_health = 'سليمة',
-                       health_reason     = NULL,
-                       health_updated_at = NOW(),
-                       health_updated_by = ?
-                 WHERE equipment = ?
-                   AND equipment_health = 'معطلة'
-                   AND (company_id = ? OR company_id IS NULL)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iii', $user_id, $equipment_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $affected = mysqli_stmt_affected_rows($stmt);
-            mysqli_stmt_close($stmt);
-            return max(0, (int) $affected);
-        }
-        return 0;
+        // نعيد فقط ما وضعناه معطلة (العزل بالشركة يُحقن). NOW → PHP-side؛ health_reason=NULL.
+        $affected = ems_tenant_db()->update('operations', array(
+            'equipment_health' => 'سليمة', 'health_reason' => null,
+            'health_updated_at' => date('Y-m-d H:i:s'), 'health_updated_by' => $user_id,
+        ), array(), "equipment = ? AND equipment_health = 'معطلة'", array($equipment_id));
+        return max(0, (int) $affected);
     }
 
     /**
@@ -139,68 +110,51 @@ if (!defined('MNT_HELPERS_LOADED')) {
             ? db_table_has_column($conn, 'equipments', 'last_maintenance_date')
             : false;
 
-        $sets = array("availability_status = 'متاحة للعمل'");
-        if ($has_state) {
-            $sets[] = "availability_state = 'متوفرة'";
-        }
-        if ($has_last) {
-            $sets[] = "last_maintenance_date = CURDATE()";
-        }
+        $gate = ems_tenant_db();
+        $data = array('availability_status' => 'متاحة للعمل');
+        if ($has_state) { $data['availability_state'] = 'متوفرة'; }
+        if ($has_last)  { $data['last_maintenance_date'] = date('Y-m-d'); } // CURDATE → PHP-side
+        try {
+            $gate->update('equipments', $data, array('id' => $equipment_id)); // العزل بالشركة يُحقن
+            $ok = true;
+        } catch (\App\Core\TenantGateException $e) { $ok = false; }
 
-        $sql = "UPDATE equipments SET " . implode(', ', $sets)
-             . " WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'ii', $equipment_id, $company_id);
-            $ok = mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-
-            // استعادة الدور التشغيلي السابق (أساسي/احتياطي) لتشغيلات هذه المعدة التي حُوّلت فئتها إلى «متعطل»
-            // عند تحويلها للصيانة من شاشة الحركة — لتعود تلقائياً لجدول دورها (وتعود للتايم‌شيت إن كانت أساسية).
-            if (function_exists('db_table_has_column')
-                && db_table_has_column($conn, 'operations', 'prev_equipment_category')) {
-                $op_scope = '';
-                if (db_table_has_column($conn, 'operations', 'company_id')) {
-                    $op_scope = " AND (company_id = " . intval($company_id) . " OR company_id IS NULL)";
+        // استعادة الدور التشغيلي السابق (أساسي/احتياطي) — تعبير COALESCE يُحسب PHP-side لكل صف (best-effort)
+        if (function_exists('db_table_has_column')
+            && db_table_has_column($conn, 'operations', 'prev_equipment_category')) {
+            try {
+                $ops = $gate->select('operations', array('columns' => array('id', 'prev_equipment_category'),
+                    'whereRaw' => "equipment = ? AND equipment_category = 'متعطل'", 'params' => array($equipment_id)));
+                foreach ($ops as $op) {
+                    $newCat = ($op['prev_equipment_category'] !== null && $op['prev_equipment_category'] !== '') ? $op['prev_equipment_category'] : 'أساسي';
+                    $gate->update('operations', array('equipment_category' => $newCat, 'prev_equipment_category' => null), array('id' => intval($op['id'])));
                 }
-                @mysqli_query($conn, "UPDATE operations
-                                         SET equipment_category = COALESCE(NULLIF(prev_equipment_category, ''), 'أساسي'),
-                                             prev_equipment_category = NULL
-                                       WHERE equipment = " . intval($equipment_id) . "
-                                         AND equipment_category = 'متعطل'
-                                         $op_scope");
-            }
+            } catch (\Throwable $t) { /* best-effort كالأصل (@) */ }
+        }
 
-            // إعادة الحالة التشغيلية «معطلة» → «جاهزة» للتشغيل الساري لهذه المعدة عند إغلاق/إلغاء أمر الصيانة
-            // (النموذج الجديد: op_state يُدار من الحركة، ويعود «جاهزة» تلقائياً بعد الإصلاح).
-            if (function_exists('db_table_has_column')
-                && db_table_has_column($conn, 'operations', 'op_state')) {
-                $op_scope2 = '';
-                if (db_table_has_column($conn, 'operations', 'company_id')) {
-                    $op_scope2 = " AND (company_id = " . intval($company_id) . " OR company_id IS NULL)";
+        // إعادة الحالة التشغيلية «معطلة» → «جاهزة» للتشغيل الساري عند الإغلاق/الإلغاء
+        if (function_exists('db_table_has_column')
+            && db_table_has_column($conn, 'operations', 'op_state')) {
+            $aff = 0;
+            try {
+                $aff = $gate->update('operations', array('op_state' => 'جاهزة'), array(),
+                    "equipment = ? AND status = 1 AND op_state = 'معطلة'", array($equipment_id));
+            } catch (\Throwable $t) { /* best-effort */ }
+
+            // سجل «عودة من الصيانة» فقط إن تغيّرت الحالة فعليًا (معطلة → جاهزة).
+            if ($aff > 0) {
+                if (!function_exists('log_equipment_event') && file_exists(__DIR__ . '/../includes/equipment_log_helper.php')) {
+                    require_once __DIR__ . '/../includes/equipment_log_helper.php';
                 }
-                @mysqli_query($conn, "UPDATE operations
-                                         SET op_state = 'جاهزة'
-                                       WHERE equipment = " . intval($equipment_id) . "
-                                         AND status = 1
-                                         AND op_state = 'معطلة'
-                                         $op_scope2");
-
-                // سجل «عودة من الصيانة» في سجل تحركات الآلية — فقط إن تغيّرت الحالة فعليًا (معطلة → جاهزة).
-                if (mysqli_affected_rows($conn) > 0) {
-                    if (!function_exists('log_equipment_event') && file_exists(__DIR__ . '/../includes/equipment_log_helper.php')) {
-                        require_once __DIR__ . '/../includes/equipment_log_helper.php';
-                    }
-                    if (function_exists('log_equipment_event')) {
-                        $log_opts = ['to' => 'جاهزة'];
-                        if (intval($company_id) > 0) { $log_opts['company_id'] = intval($company_id); }
-                        log_equipment_event($conn, intval($equipment_id), 'عودة من الصيانة', $log_opts);
-                    }
+                if (function_exists('log_equipment_event')) {
+                    $log_opts = ['to' => 'جاهزة'];
+                    if (intval($company_id) > 0) { $log_opts['company_id'] = intval($company_id); }
+                    log_equipment_event($conn, intval($equipment_id), 'عودة من الصيانة', $log_opts);
                 }
             }
-
-            return (bool) $ok;
         }
-        return false;
+
+        return (bool) $ok;
     }
 
     /**
@@ -218,36 +172,22 @@ if (!defined('MNT_HELPERS_LOADED')) {
         $has_eq_cond = function_exists('db_table_has_column') ? db_table_has_column($conn, 'equipments', 'equipment_condition') : false;
         $has_en_cond = function_exists('db_table_has_column') ? db_table_has_column($conn, 'equipments', 'engine_condition') : false;
 
-        $sets = array();
-        $types = '';
-        $vals = array();
+        $data = array();
         if ($has_eq_cond && $equipment_condition !== null && $equipment_condition !== '') {
-            $sets[] = 'equipment_condition = ?';
-            $types .= 's';
-            $vals[] = $equipment_condition;
+            $data['equipment_condition'] = $equipment_condition;
         }
         if ($has_en_cond && $engine_condition !== null && $engine_condition !== '') {
-            $sets[] = 'engine_condition = ?';
-            $types .= 's';
-            $vals[] = $engine_condition;
+            $data['engine_condition'] = $engine_condition;
         }
-        if (empty($sets)) {
+        if (empty($data)) {
             return false;
         }
-
-        $sql = "UPDATE equipments SET " . implode(', ', $sets)
-             . " WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1";
-        $types .= 'ii';
-        $vals[] = $equipment_id;
-        $vals[] = $company_id;
-
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, $types, ...$vals);
-            $ok = mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-            return (bool) $ok;
+        try {
+            ems_tenant_db()->update('equipments', $data, array('id' => $equipment_id)); // العزل بالشركة يُحقن
+            return true;
+        } catch (\App\Core\TenantGateException $e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -262,42 +202,25 @@ if (!defined('MNT_HELPERS_LOADED')) {
             return false;
         }
 
-        $labor = 0.0;
-        $parts = 0.0;
-
-        if ($stmt = mysqli_prepare($conn, "SELECT COALESCE(SUM(cost),0) AS s FROM mnt_order_labor WHERE order_id = ? AND company_id = ?")) {
-            mysqli_stmt_bind_param($stmt, 'ii', $order_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            if ($res && ($r = mysqli_fetch_assoc($res))) { $labor = floatval($r['s']); }
-            mysqli_stmt_close($stmt);
-        }
-        if ($stmt = mysqli_prepare($conn, "SELECT COALESCE(SUM(subtotal),0) AS s FROM mnt_order_part WHERE order_id = ? AND company_id = ?")) {
-            mysqli_stmt_bind_param($stmt, 'ii', $order_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            if ($res && ($r = mysqli_fetch_assoc($res))) { $parts = floatval($r['s']); }
-            mysqli_stmt_close($stmt);
-        }
-
-        // external_cost يُدخل يدوياً على الأمر؛ نقرؤه لإدراجه في total_cost.
-        $external = 0.0;
-        if ($stmt = mysqli_prepare($conn, "SELECT COALESCE(external_cost,0) AS e FROM mnt_order WHERE id = ? AND company_id = ?")) {
-            mysqli_stmt_bind_param($stmt, 'ii', $order_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            if ($res && ($r = mysqli_fetch_assoc($res))) { $external = floatval($r['e']); }
-            mysqli_stmt_close($stmt);
-        }
+        $gate = ems_tenant_db();
+        // مجاميع مُعزّلة عبر scopedQuery (§10)
+        $lr = $gate->scopedQuery(array('scope' => array('l' => 'mnt_order_labor')),
+            "SELECT COALESCE(SUM(l.cost),0) AS s FROM mnt_order_labor l WHERE {TENANT_SCOPE} AND l.order_id = ?", array($order_id));
+        $labor = $lr ? (float) $lr[0]['s'] : 0.0;
+        $pr = $gate->scopedQuery(array('scope' => array('p' => 'mnt_order_part')),
+            "SELECT COALESCE(SUM(p.subtotal),0) AS s FROM mnt_order_part p WHERE {TENANT_SCOPE} AND p.order_id = ?", array($order_id));
+        $parts = $pr ? (float) $pr[0]['s'] : 0.0;
+        // external_cost يُدخل يدوياً على الأمر
+        $ord = $gate->selectOne('mnt_order', array('columns' => array('external_cost'), 'where' => array('id' => $order_id)));
+        $external = $ord ? (float) $ord['external_cost'] : 0.0;
 
         $total = $labor + $parts + $external;
-        if ($stmt = mysqli_prepare($conn, "UPDATE mnt_order SET labor_cost = ?, parts_cost = ?, total_cost = ? WHERE id = ? AND company_id = ?")) {
-            mysqli_stmt_bind_param($stmt, 'dddii', $labor, $parts, $total, $order_id, $company_id);
-            $ok = mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-            return (bool) $ok;
+        try {
+            $gate->update('mnt_order', array('labor_cost' => $labor, 'parts_cost' => $parts, 'total_cost' => $total), array('id' => $order_id));
+            return true;
+        } catch (\App\Core\TenantGateException $e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -312,53 +235,38 @@ if (!defined('MNT_HELPERS_LOADED')) {
             return false;
         }
 
-        $plan = null;
-        if ($stmt = mysqli_prepare($conn, "SELECT trigger_basis, interval_value, equipment_id FROM mnt_plan WHERE id = ? AND company_id = ? LIMIT 1")) {
-            mysqli_stmt_bind_param($stmt, 'ii', $plan_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            $plan = $res ? mysqli_fetch_assoc($res) : null;
-            mysqli_stmt_close($stmt);
-        }
+        $gate = ems_tenant_db();
+        $plan = $gate->selectOne('mnt_plan', array('columns' => array('trigger_basis', 'interval_value', 'equipment_id'), 'where' => array('id' => $plan_id)));
         if (!$plan) {
             return false;
         }
 
         $interval = intval($plan['interval_value']);
-        if (trim((string) $plan['trigger_basis']) === 'زمن') {
-            $sql = "UPDATE mnt_plan
-                       SET last_done_date = CURDATE(),
-                           next_due_date  = DATE_ADD(CURDATE(), INTERVAL ? DAY)
-                     WHERE id = ? AND company_id = ?";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'iii', $interval, $plan_id, $company_id);
-                $ok = mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-                return (bool) $ok;
-            }
-        } else {
-            // ساعات: العدّاد الحالي من التايم‌شيت إن لم يُمرّر صراحةً (بدل افتراض صفر).
-            if ($current_meter !== null) {
-                $meter = floatval($current_meter);
-            } elseif (intval($plan['equipment_id'] ?? 0) > 0) {
-                $meter = mnt_equipment_actual_hours($conn, intval($plan['equipment_id']), $company_id);
+        $today = date('Y-m-d');
+        try {
+            if (trim((string) $plan['trigger_basis']) === 'زمن') {
+                // DATE_ADD(CURDATE(), INTERVAL ? DAY) → PHP-side
+                $gate->update('mnt_plan', array(
+                    'last_done_date' => $today,
+                    'next_due_date'  => date('Y-m-d', strtotime('+' . $interval . ' day')),
+                ), array('id' => $plan_id));
             } else {
-                $meter = 0.0;
+                // ساعات: العدّاد الحالي من التايم‌شيت إن لم يُمرّر صراحةً (بدل افتراض صفر).
+                if ($current_meter !== null) {
+                    $meter = floatval($current_meter);
+                } elseif (intval($plan['equipment_id'] ?? 0) > 0) {
+                    $meter = mnt_equipment_actual_hours($conn, intval($plan['equipment_id']), $company_id);
+                } else {
+                    $meter = 0.0;
+                }
+                $gate->update('mnt_plan', array(
+                    'last_done_date'  => $today, 'last_done_meter' => $meter, 'next_due_meter' => $meter + $interval,
+                ), array('id' => $plan_id));
             }
-            $next_meter = $meter + $interval;
-            $sql = "UPDATE mnt_plan
-                       SET last_done_date  = CURDATE(),
-                           last_done_meter = ?,
-                           next_due_meter  = ?
-                     WHERE id = ? AND company_id = ?";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'ddii', $meter, $next_meter, $plan_id, $company_id);
-                $ok = mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-                return (bool) $ok;
-            }
+            return true;
+        } catch (\App\Core\TenantGateException $e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -374,20 +282,14 @@ if (!defined('MNT_HELPERS_LOADED')) {
             return 0.0;
         }
 
-        $hours = 0.0;
-        $sql = "SELECT COALESCE(SUM(t.operator_hours),0) AS h
-                  FROM timesheet t
-                  INNER JOIN operations o ON o.id = t.operator
-                 WHERE o.equipment = ?
-                   AND (t.company_id = ? OR t.company_id IS NULL)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'ii', $equipment_id, $company_id);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            if ($res && ($r = mysqli_fetch_assoc($res))) { $hours = floatval($r['h']); }
-            mysqli_stmt_close($stmt);
-        }
-        return $hours;
+        // عزل على t (التايم‌شيت) + إثراء LEFT بـoperations؛ INNER→LEFT+o.equipment=? مكافئ
+        // (شرط o.equipment=? يستبعد صفوف o=NULL). صفر timesheet بـNULL فالعزل الصارم مطابق.
+        $rows = ems_tenant_db()->scopedQuery(
+            array('scope' => array('t' => 'timesheet'), 'enrich' => array('o' => 'operations')),
+            "SELECT COALESCE(SUM(t.operator_hours),0) AS h
+               FROM timesheet t LEFT JOIN operations o ON o.id = t.operator
+              WHERE {TENANT_SCOPE} AND o.equipment = ?", array($equipment_id));
+        return $rows ? (float) $rows[0]['h'] : 0.0;
     }
 
     /**
@@ -396,20 +298,12 @@ if (!defined('MNT_HELPERS_LOADED')) {
      */
     function mnt_lookup_options($conn, $company_id, $type)
     {
-        $company_id = intval($company_id);
         $out = array();
-        $sql = "SELECT id, name FROM mnt_lookup
-                 WHERE company_id = ? AND type = ? AND COALESCE(is_deleted,0)=0 AND COALESCE(is_active,1)=1
-                 ORDER BY name ASC";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'is', $company_id, $type);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            while ($res && ($r = mysqli_fetch_assoc($res))) {
-                $out[intval($r['id'])] = $r['name'];
-            }
-            mysqli_stmt_close($stmt);
-        }
+        // mnt_lookup soft=true فالبوابة تستبعد is_deleted تلقائيًّا (يوافق COALESCE(is_deleted,0)=0)
+        $rows = ems_tenant_db()->select('mnt_lookup', array(
+            'columns' => array('id', 'name'),
+            'where' => array('type' => $type), 'whereRaw' => "COALESCE(is_active,1)=1", 'orderBy' => 'name ASC'));
+        foreach ($rows as $r) { $out[intval($r['id'])] = $r['name']; }
         return $out;
     }
 
@@ -422,33 +316,13 @@ if (!defined('MNT_HELPERS_LOADED')) {
         if ($company_id <= 0) {
             return 0;
         }
-        $count = 0;
         // عند تمرير الدور وتوفّر عمود التوجيه: نعدّ «الواردة إلى دوري الجديدة» فقط.
+        // mnt_breakdown soft=true فالبوابة تستبعد is_deleted تلقائيًّا (يوافق الأصل).
         $use_role = ($target_role !== null && $target_role !== '' && function_exists('db_table_has_column')
             && db_table_has_column($conn, 'mnt_breakdown', 'target_role'));
-        if ($use_role) {
-            $sql = "SELECT COUNT(*) AS c FROM mnt_breakdown
-                     WHERE company_id = ? AND target_role = ? AND state = 'جديد' AND COALESCE(is_deleted,0)=0";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                $tr = intval($target_role);
-                mysqli_stmt_bind_param($stmt, 'ii', $company_id, $tr);
-                mysqli_stmt_execute($stmt);
-                $res = mysqli_stmt_get_result($stmt);
-                if ($res && ($r = mysqli_fetch_assoc($res))) { $count = intval($r['c']); }
-                mysqli_stmt_close($stmt);
-            }
-            return $count;
-        }
-        $sql = "SELECT COUNT(*) AS c FROM mnt_breakdown
-                 WHERE company_id = ? AND state = 'جديد' AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'i', $company_id);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            if ($res && ($r = mysqli_fetch_assoc($res))) { $count = intval($r['c']); }
-            mysqli_stmt_close($stmt);
-        }
-        return $count;
+        $where = array('state' => 'جديد');
+        if ($use_role) { $where['target_role'] = intval($target_role); }
+        return ems_tenant_db()->count('mnt_breakdown', array('where' => $where));
     }
 
     /**
@@ -464,18 +338,13 @@ if (!defined('MNT_HELPERS_LOADED')) {
         if ($role === -1) {
             return true; // السوبر أدمن يرى كل شيء
         }
-        $is = false;
-        $sql = "SELECT 1 FROM modules m
-                  JOIN role_permissions rp ON rp.module_id = m.id
-                 WHERE rp.role_id = ? AND m.code = 'Maintenance/orders.php' AND rp.can_view = 1 LIMIT 1";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'i', $role);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            $is = ($res && mysqli_num_rows($res) > 0);
-            mysqli_stmt_close($stmt);
-        }
-        return $is;
+        // modules + role_permissions جدولان عامّان (RBAC) — قراءتان عبر البوابة تُدمجان
+        // في PHP (لا JOIN عالميّ في البوابة؛ لا عزل شركة على العالمي).
+        $gate = ems_tenant_db();
+        $mod = $gate->selectOne('modules', array('columns' => array('id'), 'where' => array('code' => 'Maintenance/orders.php')));
+        if (!$mod) { return false; }
+        return $gate->count('role_permissions', array('where' => array(
+            'role_id' => $role, 'module_id' => intval($mod['id']), 'can_view' => 1))) > 0;
     }
 
     /**
@@ -502,30 +371,22 @@ if (!defined('MNT_HELPERS_LOADED')) {
             // «تحت الصيانة» يُحدَّد عبر availability_status (الحالة الفعلية المعتمدة في كل النظام)،
             // وليس عبر العمود العام status (= علم «صف نشط» = 1 لكل معدة فعّالة). الاعتماد على status
             // كان يُظهر كل المعدات النشطة في القائمة ويمنع اختفاءها بعد إغلاق أمر الصيانة.
-            $sql = "SELECT DISTINCT e.id, e.name, e.code
-                      FROM equipments e
-                      INNER JOIN operations o ON o.equipment = e.id AND o.project_id = ?
-                     WHERE (e.company_id = ? OR e.company_id IS NULL)
-                       AND e.availability_status IN ('تحت الصيانة', 'موقوفة للصيانة')
-                     ORDER BY e.name";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'ii', $project_id, $company_id);
-                mysqli_stmt_execute($stmt);
-                $res = mysqli_stmt_get_result($stmt);
-                while ($res && ($r = mysqli_fetch_assoc($res))) { $out[] = $r; $seen[intval($r['id'])] = true; }
-                mysqli_stmt_close($stmt);
-            }
+            // عزل على e + إثراء LEFT بـoperations؛ INNER→LEFT+o.id IS NOT NULL مكافئ
+            $rows = ems_tenant_db()->scopedQuery(
+                array('scope' => array('e' => 'equipments'), 'enrich' => array('o' => 'operations')),
+                "SELECT DISTINCT e.id, e.name, e.code
+                   FROM equipments e
+                   LEFT JOIN operations o ON o.equipment = e.id AND o.project_id = ?
+                  WHERE {TENANT_SCOPE} AND o.id IS NOT NULL
+                    AND e.availability_status IN ('تحت الصيانة', 'موقوفة للصيانة')
+                  ORDER BY e.name", array($project_id));
+            foreach ($rows as $r) { $out[] = $r; $seen[intval($r['id'])] = true; }
         }
 
         // ضمان ظهور المعدة المختارة حالياً في فورم التحرير (حتى لو لم تَعُد «تحت الصيانة»).
         if ($include_id > 0 && empty($seen[$include_id])) {
-            if ($stmt = mysqli_prepare($conn, "SELECT id, name, code FROM equipments WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1")) {
-                mysqli_stmt_bind_param($stmt, 'ii', $include_id, $company_id);
-                mysqli_stmt_execute($stmt);
-                $res = mysqli_stmt_get_result($stmt);
-                if ($res && ($r = mysqli_fetch_assoc($res))) { array_unshift($out, $r); }
-                mysqli_stmt_close($stmt);
-            }
+            $r = ems_tenant_db()->selectOne('equipments', array('columns' => array('id', 'name', 'code'), 'where' => array('id' => $include_id)));
+            if ($r) { array_unshift($out, $r); }
         }
 
         return $out;
@@ -546,29 +407,21 @@ if (!defined('MNT_HELPERS_LOADED')) {
         $seen = array();
 
         if ($project_id > 0) {
-            $sql = "SELECT DISTINCT e.id, e.name, e.code
-                      FROM equipments e
-                      INNER JOIN operations o ON o.equipment = e.id AND o.project_id = ?
-                     WHERE (e.company_id = ? OR e.company_id IS NULL)
-                     ORDER BY e.name";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'ii', $project_id, $company_id);
-                mysqli_stmt_execute($stmt);
-                $res = mysqli_stmt_get_result($stmt);
-                while ($res && ($r = mysqli_fetch_assoc($res))) { $out[] = $r; $seen[intval($r['id'])] = true; }
-                mysqli_stmt_close($stmt);
-            }
+            // عزل على e + إثراء LEFT بـoperations (أي حالة إتاحة)؛ INNER→LEFT+o.id IS NOT NULL
+            $rows = ems_tenant_db()->scopedQuery(
+                array('scope' => array('e' => 'equipments'), 'enrich' => array('o' => 'operations')),
+                "SELECT DISTINCT e.id, e.name, e.code
+                   FROM equipments e
+                   LEFT JOIN operations o ON o.equipment = e.id AND o.project_id = ?
+                  WHERE {TENANT_SCOPE} AND o.id IS NOT NULL
+                  ORDER BY e.name", array($project_id));
+            foreach ($rows as $r) { $out[] = $r; $seen[intval($r['id'])] = true; }
         }
 
         // ضمان ظهور المعدة المختارة حالياً في فورم التحرير.
         if ($include_id > 0 && empty($seen[$include_id])) {
-            if ($stmt = mysqli_prepare($conn, "SELECT id, name, code FROM equipments WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1")) {
-                mysqli_stmt_bind_param($stmt, 'ii', $include_id, $company_id);
-                mysqli_stmt_execute($stmt);
-                $res = mysqli_stmt_get_result($stmt);
-                if ($res && ($r = mysqli_fetch_assoc($res))) { array_unshift($out, $r); }
-                mysqli_stmt_close($stmt);
-            }
+            $r = ems_tenant_db()->selectOne('equipments', array('columns' => array('id', 'name', 'code'), 'where' => array('id' => $include_id)));
+            if ($r) { array_unshift($out, $r); }
         }
 
         return $out;
