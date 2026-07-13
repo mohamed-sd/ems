@@ -14,20 +14,8 @@ if (!$is_super_admin && $company_id <= 0) {
     die('لا يمكن تحديد الشركة الحالية');
 }
 
-$driver_contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if (db_table_has_column($conn, 'drivercontracts', 'company_id')) {
-        $driver_contract_scope_sql = 'sc.company_id = ' . $company_id;
-    } else {
-        $driver_contract_scope_sql = "EXISTS (
-            SELECT 1
-            FROM project p
-            JOIN users su ON su.project_id = p.id
-            WHERE p.id = sc.project_id
-              AND su.company_id = " . $company_id . "
-        )";
-    }
-}
+// بوابة العزل — تستبدل سُلَّم النطاق اليدوي (وفيه احتياطي project/users القديم)
+$dcd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('driver contract details super') : ems_tenant_db();
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -445,20 +433,23 @@ $sql = "SELECT
         LEFT JOIN employees s ON sc.employee_id = s.id
         LEFT JOIN project op ON sc.project_id = op.id
         LEFT JOIN contracts c ON sc.project_contract_id = c.id
-        WHERE sc.id = $contract_id AND $driver_contract_scope_sql
+        WHERE {TENANT_SCOPE} AND sc.id = ?
         LIMIT 1";
 
-$result = mysqli_query($conn, $sql);
-
-if (!$result) {
-    die("خطأ في الاستعلام: " . mysqli_error($conn));
+try {
+    $dcd_rows = $dcd_gate->scopedQuery(array(
+        'scope'  => array('sc' => 'drivercontracts'),
+        'enrich' => array('s' => 'employees', 'op' => 'project', 'c' => 'contracts'),
+    ), $sql, array($contract_id));
+} catch (\Throwable $t) {
+    die("خطأ في الاستعلام");
 }
 
-if (mysqli_num_rows($result) === 0) {
+if (empty($dcd_rows)) {
     die('العقد غير موجود أو خارج نطاق الشركة');
 }
 
-while ($row = mysqli_fetch_assoc($result)) {
+foreach ($dcd_rows as $row) {
 
     // حساب المدة المتبقية من العقد باعتماد تاريخ اليوم وتاريخ الانتهاء
     $today = new DateTime();
@@ -802,19 +793,15 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 // Function to get driver contract equipments
                 if (!function_exists('getdriverContractEquipments')) {
                     function getdriverContractEquipments($contract_id, $conn) {
-                        global $driver_contract_scope_sql;
-                        $equipments = [];
-                        $query = "SELECT dce.*
-                                  FROM drivercontractequipments dce
-                                  JOIN drivercontracts sc ON sc.id = dce.contract_id
-                                  WHERE dce.contract_id = " . intval($contract_id) . " AND $driver_contract_scope_sql";
-                        $result = mysqli_query($conn, $query);
-                        if ($result) {
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $equipments[] = $row;
-                            }
+                        global $dcd_gate;
+                        try {
+                            return $dcd_gate->select('drivercontractequipments', array(
+                                'where'   => array('contract_id' => intval($contract_id)),
+                                'orderBy' => 'id ASC',
+                            ));
+                        } catch (\Throwable $t) {
+                            return [];
                         }
-                        return $equipments;
                     }
                 }
 
@@ -897,16 +884,23 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </thead>
                 <tbody>
                     <?php
-                    $notes_query = "SELECT n.*
+                    // الملاحظات معزولةً (النطاق n؛ JOIN العقد الداخلي → LEFT + IS NOT NULL)
+                    try {
+                        $notes_rows = $dcd_gate->scopedQuery(array(
+                            'scope'  => array('n' => 'driver_contract_notes'),
+                            'enrich' => array('sc' => 'drivercontracts'),
+                        ), "SELECT n.*
                                     FROM driver_contract_notes n
-                                    JOIN drivercontracts sc ON sc.id = n.contract_id
-                                    WHERE n.contract_id = $contract_id AND $driver_contract_scope_sql
-                                    ORDER BY created_at DESC";
-                    $notes_result = mysqli_query($conn, $notes_query);
+                                    LEFT JOIN drivercontracts sc ON sc.id = n.contract_id
+                                    WHERE {TENANT_SCOPE} AND n.contract_id = ? AND sc.id IS NOT NULL
+                                    ORDER BY n.created_at DESC", array($contract_id));
+                    } catch (\Throwable $t) {
+                        $notes_rows = array();
+                    }
 
-                    if ($notes_result && mysqli_num_rows($notes_result) > 0) {
+                    if (!empty($notes_rows)) {
                         $j = 1;
-                        while ($note = mysqli_fetch_assoc($notes_result)) {
+                        foreach ($notes_rows as $note) {
                             // تحديد نوع الإجراء من النص
                             $note_text = htmlspecialchars($note['note']);
                             $action_icon = '<i class="fas fa-sticky-note"></i>';
@@ -1302,11 +1296,17 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <select id="mergeWithId" class="form-select">
                         <option value="">-- اختر عقد --</option>
                         <?php
-                        $merge_query = "SELECT sc.id, sc.contract_signing_date FROM drivercontracts sc WHERE sc.employee_id = $employee_id AND sc.project_id = $project_id AND sc.id != $contract_id AND $driver_contract_scope_sql ORDER BY sc.id DESC";
-                        $merge_result = mysqli_query($conn, $merge_query);
-                        if ($merge_result) { while ($m_row = mysqli_fetch_assoc($merge_result)) {
+                        // مرشّحو الدمج معزولين عبر البوابة
+                        try {
+                            $merge_rows = $dcd_gate->scopedQuery(array(
+                                'scope' => array('sc' => 'drivercontracts'),
+                            ), "SELECT sc.id, sc.contract_signing_date FROM drivercontracts sc WHERE {TENANT_SCOPE} AND sc.employee_id = ? AND sc.project_id = ? AND sc.id != ? ORDER BY sc.id DESC", array($employee_id, $project_id, $contract_id));
+                        } catch (\Throwable $t) {
+                            $merge_rows = array();
+                        }
+                        foreach ($merge_rows as $m_row) {
                             echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
-                        } }
+                        }
                         ?>
                     </select>
                 </div>

@@ -22,26 +22,25 @@ if (!$is_super_admin && $company_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'لا يمكن تحديد الشركة الحالية']));
 }
 
-function driverContractTenantScopeSql($conn, $is_super_admin, $company_id, $alias)
+// بوابة العزل — تستبدل driverContractTenantScopeSql (وسُلَّم project/users الاحتياطي)
+function dca_gate()
 {
-    if ($is_super_admin) {
-        return '1=1';
+    $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    return ($role === '-1')
+        ? ems_tenant_db()->forAllTenants('driver contract actions super')
+        : ems_tenant_db();
+}
+
+/** تحديث عقد السائق معزولًا (NOW() → توقيت PHP). يعيد true/false. */
+function dca_update($contract_id, array $data)
+{
+    $data['updated_at'] = date('Y-m-d H:i:s');
+    try {
+        dca_gate()->update('drivercontracts', $data, array('id' => intval($contract_id)));
+        return true;
+    } catch (\Throwable $e) {
+        return false;
     }
-
-    $safe_company_id = intval($company_id);
-    $a = $alias !== '' ? $alias . '.' : '';
-
-    if (db_table_has_column($conn, 'drivercontracts', 'company_id')) {
-        return $a . "company_id = " . $safe_company_id;
-    }
-
-    return "EXISTS (
-        SELECT 1
-        FROM project p
-        JOIN users u ON u.project_id = p.id
-        WHERE p.id = " . $a . "project_id
-          AND u.company_id = " . $safe_company_id . "
-    )";
 }
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
@@ -51,19 +50,27 @@ if (!$contract_id) {
     die(json_encode(['success' => false, 'message' => 'معرف العقد غير صحيح']));
 }
 
-// دالة للحصول على بيانات العقد
+// دالة للحصول على بيانات العقد (التوقيع محفوظ)
 function getContractData($contract_id, $conn, $is_super_admin, $company_id) {
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "SELECT dc.* FROM drivercontracts dc WHERE dc.id = $contract_id AND $tenant_scope LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    return $result ? mysqli_fetch_assoc($result) : null;
+    try {
+        return dca_gate()->selectOne('drivercontracts', array('where' => array('id' => intval($contract_id))));
+    } catch (\Throwable $e) {
+        return null;
+    }
 }
 
-// دالة لإضافة ملاحظة
+// دالة لإضافة ملاحظة (حقن الشركة آليًّا؛ القيم خام — الربط يتكفّل بالهروب)
 function addNote($contract_id, $note, $conn) {
-    $note = mysqli_real_escape_string($conn, $note);
-    $query = "INSERT INTO driver_contract_notes (contract_id, note, created_at) VALUES ($contract_id, '$note', NOW())";
-    return mysqli_query($conn, $query);
+    try {
+        dca_gate()->insert('driver_contract_notes', array(
+            'contract_id' => intval($contract_id),
+            'note'        => $note,
+            'created_at'  => date('Y-m-d H:i:s'),
+        ));
+        return true;
+    } catch (\Throwable $e) {
+        return false;
+    }
 }
 
 $current_contract_scope = getContractData($contract_id, $conn, $is_super_admin, $company_id);
@@ -94,9 +101,6 @@ if ($action === 'renewal') {
         die(json_encode(['success' => false, 'message' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء']));
     }
 
-    $new_start_date = mysqli_real_escape_string($conn, $new_start_date);
-    $new_end_date = mysqli_real_escape_string($conn, $new_end_date);
-
     // حساب المدة بالشهور
     $start = new DateTime($new_start_date);
     $end = new DateTime($new_end_date);
@@ -108,19 +112,14 @@ if ($action === 'renewal') {
         $contract_duration_days = $interval->days;
     }
 
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "UPDATE drivercontracts dc SET
-        actual_start = '$new_start_date',
-        actual_end = '$new_end_date',
-        contract_duration_months = $months,
-        contract_duration_days = $contract_duration_days,
-        status = 1,
-        updated_at = NOW()
-    WHERE dc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    if (dca_update($contract_id, array(
+        'actual_start' => $new_start_date,
+        'actual_end' => $new_end_date,
+        'contract_duration_months' => $months,
+        'contract_duration_days' => $contract_duration_days,
+        'status' => 1,
+    ))) {
         $note_text = "تم تجديد العقد من $new_start_date إلى $new_end_date (مدة: $months شهور / $contract_duration_days يوم)";
-        $note_text = mysqli_real_escape_string($conn, $note_text);
         addNote($contract_id, $note_text, $conn);
         echo json_encode(['success' => true, 'message' => 'تم تجديد العقد بنجاح']);
     } else {
@@ -158,19 +157,11 @@ else if ($action === 'settlement') {
     }
 
     $settlement_type_ar = ($settlement_type === 'increase') ? 'زيادة' : 'نقصان';
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "UPDATE drivercontracts dc SET
-        forecasted_contracted_hours = $new_hours,
-        updated_at = NOW()
-    WHERE dc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    if (dca_update($contract_id, array('forecasted_contracted_hours' => $new_hours))) {
         $note = "تم تسوية العقد: $settlement_type_ar $settlement_hours ساعة";
         if (!empty($settlement_reason)) {
-            $settlement_reason = mysqli_real_escape_string($conn, $settlement_reason);
             $note .= " - السبب: $settlement_reason";
         }
-        $note = mysqli_real_escape_string($conn, $note);
         addNote($contract_id, $note, $conn);
         echo json_encode(['success' => true, 'message' => 'تم تسوية العقد بنجاح - الساعات الجديدة: ' . $new_hours]);
     } else {
@@ -195,24 +186,12 @@ else if ($action === 'pause') {
         }
     }
 
-    $pause_reason = mysqli_real_escape_string($conn, $pause_reason);
-    $pause_date = mysqli_real_escape_string($conn, $pause_date);
-
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "UPDATE drivercontracts dc SET
-        status = 0,
-        pause_reason = '$pause_reason',
-        pause_date = '$pause_date',
-        updated_at = NOW()
-    WHERE dc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    if (dca_update($contract_id, array('status' => 0, 'pause_reason' => $pause_reason, 'pause_date' => $pause_date))) {
         $note = "تم إيقاف العقد بتاريخ $pause_date - السبب: $pause_reason";
-        $note = mysqli_real_escape_string($conn, $note);
         addNote($contract_id, $note, $conn);
         echo json_encode(['success' => true, 'message' => 'تم إيقاف العقد بنجاح']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
     }
 }
 
@@ -231,31 +210,22 @@ else if ($action === 'resume') {
         }
     }
 
-    $resume_reason = mysqli_real_escape_string($conn, $resume_reason);
-    $resume_date = mysqli_real_escape_string($conn, $resume_date);
-
-    // حساب التاريخ الجديد للانتهاء بناءً على الخيار المحدد
-    $new_end_date_sql = '';
+    // حساب تاريخ الانتهاء الجديد في PHP (كان DATE_ADD/DATE_SUB) من قراءةٍ معزولة
+    $resume_data = array('status' => 1, 'pause_reason' => null, 'resume_date' => $resume_date);
     if ($pause_days > 0) {
-        if ($pause_handling === 'extend') {
-            // إضافة أيام الإيقاف إلى تاريخ الانتهاء (تمديد العقد)
-            $new_end_date_sql = ", actual_end = DATE_ADD(actual_end, INTERVAL $pause_days DAY)";
-        } else if ($pause_handling === 'deduct') {
-            // خصم أيام الإيقاف من تاريخ الانتهاء (تقليل مدة العقد)
-            $new_end_date_sql = ", actual_end = DATE_SUB(actual_end, INTERVAL $pause_days DAY)";
+        $fresh = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+        if ($fresh && !empty($fresh['actual_end'])) {
+            $endObj = new DateTime($fresh['actual_end']);
+            if ($pause_handling === 'extend') {
+                $endObj->modify('+' . $pause_days . ' day');
+            } elseif ($pause_handling === 'deduct') {
+                $endObj->modify('-' . $pause_days . ' day');
+            }
+            $resume_data['actual_end'] = $endObj->format('Y-m-d');
         }
     }
 
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "UPDATE drivercontracts dc SET
-        status = 1,
-        pause_reason = NULL,
-        resume_date = '$resume_date',
-        updated_at = NOW()
-        $new_end_date_sql
-    WHERE dc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    if (dca_update($contract_id, $resume_data)) {
         $note = "تم استئناف العقد بتاريخ $resume_date";
         if ($pause_days > 0) {
             $note .= " - مدة الإيقاف: $pause_days يوم";
@@ -268,11 +238,10 @@ else if ($action === 'resume') {
         if (!empty($resume_reason)) {
             $note .= " - الملاحظات: $resume_reason";
         }
-        $note = mysqli_real_escape_string($conn, $note);
         addNote($contract_id, $note, $conn);
         echo json_encode(['success' => true, 'message' => 'تم استئناف العقد بنجاح']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
     }
 }
 
@@ -296,27 +265,17 @@ else if ($action === 'terminate') {
         ? $contract_before_termination['actual_end']
         : 'غير محدد';
 
-    $termination_reason = mysqli_real_escape_string($conn, $termination_reason);
     $termination_type_ar = ($termination_type === 'amicable') ? 'رضائي' : 'بسبب التعسر';
     $termination_date = date('Y-m-d');
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "UPDATE drivercontracts dc SET
-        status = 0,
-        termination_type = '$termination_type',
-        termination_reason = '$termination_reason',
-        updated_at = NOW()
-    WHERE dc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    if (dca_update($contract_id, array('status' => 0, 'termination_type' => $termination_type, 'termination_reason' => $termination_reason))) {
         $note = "تم إنهاء العقد ($termination_type_ar) بتاريخ $termination_date - تاريخ الانتهاء السابق: $old_end_date";
         if (!empty($termination_reason)) {
             $note .= " - السبب: $termination_reason";
         }
-        $note = mysqli_real_escape_string($conn, $note);
         addNote($contract_id, $note, $conn);
         echo json_encode(['success' => true, 'message' => 'تم إنهاء العقد بنجاح']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
     }
 }
 
@@ -350,49 +309,26 @@ else if ($action === 'merge') {
     $merge_hours = intval($contract_to_merge['forecasted_contracted_hours']);
     $merged_hours = $current_hours + $merge_hours;
 
-    // تحديث العقد الحالي بالبيانات المدمجة
-    $tenant_scope = driverContractTenantScopeSql($conn, $is_super_admin, $company_id, 'dc');
-    $query = "UPDATE drivercontracts dc SET
-        forecasted_contracted_hours = $merged_hours,
-        merged_with = $merge_with_id,
-        updated_at = NOW()
-    WHERE dc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
-        // عداد للمعدات المنسوخة
+    // تحديث العقد الحالي بالبيانات المدمجة (معزولًا)
+    if (dca_update($contract_id, array('forecasted_contracted_hours' => $merged_hours, 'merged_with' => $merge_with_id))) {
+        // نسخ معدات العقد المدموج إلى العقد الحالي (قراءةٌ وإدراجٌ عبر البوابة —
+        // company_id تُحقن آليًّا لكل سطرٍ منسوخ)
         $copied_equipments = 0;
-
-        // نسخ معدات العقد المدموج إلى العقد الحالي
-        $get_equipments_query = "SELECT equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract FROM drivercontractequipments WHERE contract_id = $merge_with_id";
-        $equipments_result = mysqli_query($conn, $get_equipments_query);
-
-        if ($equipments_result && mysqli_num_rows($equipments_result) > 0) {
-            while ($equip = mysqli_fetch_assoc($equipments_result)) {
-                // إدراج المعدة في العقد الحالي
-                $equip_type = mysqli_real_escape_string($conn, $equip['equip_type']);
-                $equip_size = intval($equip['equip_size']);
-                $equip_count = intval($equip['equip_count']);
-                $shift_hours = intval($equip['shift_hours']);
-                $equip_total_month = intval($equip['equip_total_month']);
-                $equip_total_contract = intval($equip['equip_total_contract']);
-
-                $insert_equip_query = "INSERT INTO drivercontractequipments (contract_id, equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract)
-                    VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $shift_hours, $equip_total_month, $equip_total_contract)";
-
-                if (mysqli_query($conn, $insert_equip_query)) {
-                    $copied_equipments++;
-                }
+        try {
+            $gate = dca_gate();
+            $merge_rows = $gate->select('drivercontractequipments', array(
+                'columns' => array('equip_type', 'equip_size', 'equip_count', 'shift_hours', 'equip_total_month', 'equip_total_contract'),
+                'where'   => array('contract_id' => $merge_with_id),
+            ));
+            foreach ($merge_rows as $equip) {
+                $equip['contract_id'] = $contract_id;
+                $gate->insert('drivercontractequipments', $equip);
+                $copied_equipments++;
             }
-        }
+        } catch (\Throwable $e) { /* النسخ إضافي — فشله يُسجَّل أدناه ضمنيًّا بعدّاد 0 */ }
 
         // تحويل العقد المدموج إلى غير ساري (status = 0)
-        $update_merged_contract = "UPDATE drivercontracts dc SET
-            status = 0,
-            updated_at = NOW()
-        WHERE dc.id = $merge_with_id AND $tenant_scope";
-
-        if (!mysqli_query($conn, $update_merged_contract)) {
-            // في حالة فشل تحديث الحالة، نسجل ذلك في الملاحظات
+        if (!dca_update($merge_with_id, array('status' => 0))) {
             $error_note = "تحذير: فشل تحديث حالة العقد المدموج إلى غير ساري";
             addNote($contract_id, $error_note, $conn);
         }
@@ -402,12 +338,10 @@ else if ($action === 'merge') {
         if ($copied_equipments > 0) {
             $merge_note_1 .= " - تم نسخ $copied_equipments معدة";
         }
-        $merge_note_1 = mysqli_real_escape_string($conn, $merge_note_1);
         addNote($contract_id, $merge_note_1, $conn);
 
         // إضافة ملاحظة للعقد المدموج
         $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id - تم تحويل العقد إلى غير ساري";
-        $merge_note_2 = mysqli_real_escape_string($conn, $merge_note_2);
         addNote($merge_with_id, $merge_note_2, $conn);
 
         $success_message = 'تم دمج العقود بنجاح';
@@ -418,13 +352,13 @@ else if ($action === 'merge') {
 
         echo json_encode(['success' => true, 'message' => $success_message]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود: ' . mysqli_error($conn)]);
+        echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود']);
     }
 }
 
 // 7. انتهاء العقد
 elseif ($action === 'complete') {
-    $complete_note = isset($_POST['complete_note']) ? mysqli_real_escape_string($conn, $_POST['complete_note']) : '';
+    $complete_note = isset($_POST['complete_note']) ? $_POST['complete_note'] : '';
 
     if (empty($complete_note)) {
         die(json_encode(['success' => false, 'message' => 'الرجاء إدخال ملاحظات الانتهاء']));
