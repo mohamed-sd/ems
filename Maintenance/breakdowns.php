@@ -51,15 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'issue
     }
     $bid = intval($_POST['breakdown_id'] ?? 0);
 
-    // جلب البلاغ (مقيّد بالشركة وغير محوّل مسبقاً)
-    $brk = null;
-    if ($stmt = mysqli_prepare($conn, "SELECT id, equipment_id, project_id, failure_code_id, order_id, state FROM mnt_breakdown WHERE id = ? AND company_id = ? AND COALESCE(is_deleted,0)=0 LIMIT 1")) {
-        mysqli_stmt_bind_param($stmt, 'ii', $bid, $company_id);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        $brk = $res ? mysqli_fetch_assoc($res) : null;
-        mysqli_stmt_close($stmt);
-    }
+    // جلب البلاغ عبر البوابة (العزل بالشركة يُحقن؛ is_deleted مستبعَد تلقائيًّا)
+    $brk = ems_tenant_db()->selectOne('mnt_breakdown', array(
+        'columns' => array('id', 'equipment_id', 'project_id', 'failure_code_id', 'order_id', 'state'),
+        'where'   => array('id' => $bid)));
     if (!$brk) {
         header("Location: breakdowns.php?msg=البلاغ+غير+موجود+❌"); exit();
     }
@@ -76,22 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'issue
     $pr   = $brk['project_id'] !== null ? intval($brk['project_id']) : null;
     $fc   = $brk['failure_code_id'] !== null ? intval($brk['failure_code_id']) : null;
 
+    // زوجٌ كتابيٌّ مترابط (§9): إنشاء الأمر + ربط البلاغ به وتحويل حالته ذرّيًّا
     $new_order_id = 0;
-    $sql = "INSERT INTO mnt_order (company_id, code, breakdown_id, equipment_id, project_id, source, failure_code_id, state, created_by)
-            VALUES (?, ?, ?, ?, ?, 'بلاغ', ?, 'بلاغ', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isiiiii', $company_id, $code, $bid, $eq, $pr, $fc, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        $new_order_id = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
-    }
-
-    // ربط البلاغ بالأمر + تحويل حالته
-    if ($new_order_id > 0 && ($stmt = mysqli_prepare($conn, "UPDATE mnt_breakdown SET order_id = ?, state = 'محوّل' WHERE id = ? AND company_id = ?"))) {
-        mysqli_stmt_bind_param($stmt, 'iii', $new_order_id, $bid, $company_id);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->runInTransaction(function ($g) use (&$new_order_id, $code, $bid, $eq, $pr, $fc, $current_user_id) {
+        $new_order_id = $g->insert('mnt_order', array(
+            'code' => $code, 'breakdown_id' => $bid, 'equipment_id' => $eq, 'project_id' => $pr,
+            'source' => 'بلاغ', 'failure_code_id' => $fc, 'state' => 'بلاغ', 'created_by' => $current_user_id));
+        $g->update('mnt_breakdown', array('order_id' => $new_order_id, 'state' => 'محوّل'), array('id' => $bid));
+    }, 'issue maintenance order from breakdown');
 
     header("Location: orders.php?id=" . intval($new_order_id) . "&msg=تم+إصدار+أمر+صيانة+من+البلاغ+✅"); exit();
 }
@@ -102,11 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'issue
 if (isset($_GET['close_id'])) {
     if (!$is_maintenance) { header("Location: breakdowns.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $cid = intval($_GET['close_id']);
-    if ($stmt = mysqli_prepare($conn, "UPDATE mnt_breakdown SET state = 'مغلق' WHERE id = ? AND company_id = ? AND COALESCE(is_deleted,0)=0")) {
-        mysqli_stmt_bind_param($stmt, 'ii', $cid, $company_id);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->update('mnt_breakdown', array('state' => 'مغلق'),
+        array('id' => $cid), "COALESCE(is_deleted,0)=0");
     header("Location: breakdowns.php?msg=تم+إغلاق+البلاغ+✅"); exit();
 }
 
@@ -116,11 +100,7 @@ if (isset($_GET['close_id'])) {
 if (isset($_GET['delete_id'])) {
     if (!$is_maintenance) { header("Location: breakdowns.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $did = intval($_GET['delete_id']);
-    if ($stmt = mysqli_prepare($conn, "UPDATE mnt_breakdown SET is_deleted = 1, deleted_at = NOW(), deleted_by = ? WHERE id = ? AND company_id = ?")) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $did, $company_id);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->softDelete('mnt_breakdown', $did); // حذف ناعم معزول بالشركة تلقائيًّا
     header("Location: breakdowns.php?msg=تم+حذف+البلاغ+✅"); exit();
 }
 
@@ -169,42 +149,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['description'])) {
 
     $code = mnt_next_code($conn, 'mnt_breakdown', 'BR', $company_id);
 
-    $sql = "INSERT INTO mnt_breakdown
-            (company_id, code, equipment_id, project_id, reported_by, reporter_dept, target_role, report_datetime,
-             failure_code_id, severity, is_stopped, description, attachment, state, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'جديد', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // الترتيب: company_id,i code,s equipment_id,i project_id,i reported_by,i reporter_dept,s
-        // target_role,i report_datetime,s failure_code_id,i severity,s is_stopped,i description,s
-        // attachment,s created_by,i  ⇒ "isiiisisisissi"
-        mysqli_stmt_bind_param(
-            $stmt, 'isiiisisisissi',
-            $company_id, $code, $equipment_id, $project_id, $current_user_id, $reporter_dept, $target_role, $report_dt,
-            $failure_code, $severity, $is_stopped, $description, $attachment, $current_user_id
-        );
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->insert('mnt_breakdown', array(
+        'code' => $code, 'equipment_id' => $equipment_id, 'project_id' => $project_id,
+        'reported_by' => $current_user_id, 'reporter_dept' => $reporter_dept, 'target_role' => $target_role,
+        'report_datetime' => $report_dt, 'failure_code_id' => $failure_code, 'severity' => $severity,
+        'is_stopped' => $is_stopped, 'description' => $description, 'attachment' => $attachment,
+        'state' => 'جديد', 'created_by' => $current_user_id));
     header("Location: breakdowns.php?msg=تم+تسجيل+البلاغ+بنجاح+✅"); exit();
 }
 
-// ── بيانات القوائم المنسدلة (مقيّدة بالشركة حيث ينطبق) ──
-$equipments = array();
-$eq_sql = "SELECT id, name, code FROM equipments WHERE " . ($is_super_admin ? "1=1" : "company_id = " . intval($company_id)) . " ORDER BY name ASC";
-if ($r = mysqli_query($conn, $eq_sql)) { while ($row = mysqli_fetch_assoc($r)) { $equipments[] = $row; } }
+// ── بيانات القوائم المنسدلة (عبر البوابة؛ super→كل الشركات via forAllTenants) ──
+$mnt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('maintenance breakdowns super view') : ems_tenant_db();
 
-$projects = array();
-$pr_sql = "SELECT id, name FROM project WHERE " . ($is_super_admin ? "1=1" : "company_id = " . intval($company_id)) . " ORDER BY name ASC";
-if ($r = mysqli_query($conn, $pr_sql)) { while ($row = mysqli_fetch_assoc($r)) { $projects[] = $row; } }
-
-$failure_codes = array();
-$fc_sql = "SELECT id, full_code, failure_detail, main_category_name FROM failure_codes WHERE status = 1 ORDER BY full_code ASC";
-if ($r = mysqli_query($conn, $fc_sql)) { while ($row = mysqli_fetch_assoc($r)) { $failure_codes[] = $row; } }
-
-// الأقسام/الأدوار المتاحة للتوجيه (تصنيف عام؛ العزل يضمنه نطاق الشركة على البلاغات).
-$roles_list = array();
-$roles_sql = "SELECT id, name FROM roles WHERE (status = '1' OR status = 1) AND id <> -1 ORDER BY name ASC";
-if ($r = mysqli_query($conn, $roles_sql)) { while ($row = mysqli_fetch_assoc($r)) { $roles_list[] = $row; } }
+// equipments بلا soft (لا فلتر حذف)؛ project بلا فلتر is_deleted في الأصل ⇒ includeDeleted للمطابقة
+$equipments = $mnt_gate->select('equipments', array('columns' => array('id', 'name', 'code'), 'orderBy' => 'name ASC'));
+$projects   = $mnt_gate->select('project', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC', 'includeDeleted' => true));
+// failure_codes/roles عامّان (لا عزل شركة)
+$failure_codes = $mnt_gate->select('failure_codes', array(
+    'columns' => array('id', 'full_code', 'failure_detail', 'main_category_name'),
+    'where' => array('status' => 1), 'orderBy' => 'full_code ASC'));
+$roles_list = $mnt_gate->select('roles', array(
+    'columns' => array('id', 'name'), 'whereRaw' => "(status = '1' OR status = 1) AND id <> -1", 'orderBy' => 'name ASC'));
 
 $page_title = 'إيكوبيشن | البلاغات';
 include '../inheader.php';
@@ -362,22 +327,22 @@ include '../insidebar.php';
         echo "</tr>";
     };
 
-    // ══ جلب البلاغات: «بلاغاتي» (أنا المُبلِّغ) و«الواردة إليّ» (target_role = دوري) ══
-    $bk_select = "SELECT b.id, b.code, b.severity, b.is_stopped, b.report_datetime, b.state, b.order_id,
-                         e.name AS equipment_name, p.name AS project_name, b.description, b.reporter_dept,
-                         r.name AS target_role_name, u.name AS reporter_name
-                    FROM mnt_breakdown b
-                    LEFT JOIN equipments e ON e.id = b.equipment_id
-                    LEFT JOIN project p ON p.id = b.project_id
-                    LEFT JOIN roles r ON r.id = b.target_role
-                    LEFT JOIN users u ON u.id = b.reported_by
-                   WHERE $company_scope_sql AND COALESCE(b.is_deleted,0)=0 ";
-    $mine_rows = array();
-    $in_rows   = array();
-    $mine_q = mysqli_query($conn, $bk_select . " AND b.reported_by = " . intval($current_user_id) . " ORDER BY b.id DESC");
-    if ($mine_q) { while ($row = mysqli_fetch_assoc($mine_q)) { $mine_rows[] = $row; } }
-    $in_q = mysqli_query($conn, $bk_select . " AND b.target_role = " . $current_role_int . " ORDER BY b.id DESC");
-    if ($in_q) { while ($row = mysqli_fetch_assoc($in_q)) { $in_rows[] = $row; } }
+    // ══ جلب البلاغات عبر scopedQuery (§10): العزل على b؛ إثراء LEFT للأبعاد ══
+    // (roles/failure عامّان لا يُعلَنان؛ equipments/project/users مستأجرون في enrich)
+    $bk_decl = array(
+        'scope'  => array('b' => 'mnt_breakdown'),
+        'enrich' => array('e' => 'equipments', 'p' => 'project', 'u' => 'users'));
+    $bk_sql = "SELECT b.id, b.code, b.severity, b.is_stopped, b.report_datetime, b.state, b.order_id,
+                      e.name AS equipment_name, p.name AS project_name, b.description, b.reporter_dept,
+                      r.name AS target_role_name, u.name AS reporter_name
+                 FROM mnt_breakdown b
+                 LEFT JOIN equipments e ON e.id = b.equipment_id
+                 LEFT JOIN project p ON p.id = b.project_id
+                 LEFT JOIN roles r ON r.id = b.target_role
+                 LEFT JOIN users u ON u.id = b.reported_by
+                WHERE {TENANT_SCOPE} AND COALESCE(b.is_deleted,0)=0 ";
+    $mine_rows = $mnt_gate->scopedQuery($bk_decl, $bk_sql . " AND b.reported_by = ? ORDER BY b.id DESC", array($current_user_id));
+    $in_rows   = $mnt_gate->scopedQuery($bk_decl, $bk_sql . " AND b.target_role = ? ORDER BY b.id DESC", array($current_role_int));
     ?>
 
     <!-- ══ تبويبان: بلاغاتي / الواردة إليّ ══ -->
