@@ -156,9 +156,18 @@ $list_rows = $fc_gate->select('failure_codes', array(
 ));
 $total_count = count($list_rows);
 
-// قوائم التصفية (قيم مميّزة)
-$evt_list_rows = $fc_gate->select('failure_codes', array('columns' => array('DISTINCT event_type_code', 'event_type_name'), 'whereRaw' => "status = 1", 'orderBy' => 'event_type_code'));
-$mc_list_rows  = $fc_gate->select('failure_codes', array('columns' => array('DISTINCT main_category_code', 'main_category_name'), 'whereRaw' => "status = 1", 'orderBy' => 'main_category_code'));
+// قوائم التصفية (قيم مميّزة) — أعمدة البوابة معرِّفاتٌ صرفة (لا تعابير مثل DISTINCT)،
+// فتُجلَب الأزواج ثم تُميَّز في PHP (نفس نتيجة SELECT DISTINCT .. ORDER BY code).
+$evt_list_rows = array();
+foreach ($fc_gate->select('failure_codes', array('columns' => array('event_type_code', 'event_type_name'), 'whereRaw' => "status = 1", 'orderBy' => 'event_type_code')) as $r) {
+    $evt_list_rows[$r['event_type_code'] . '|' . $r['event_type_name']] = $r;
+}
+$evt_list_rows = array_values($evt_list_rows);
+$mc_list_rows = array();
+foreach ($fc_gate->select('failure_codes', array('columns' => array('main_category_code', 'main_category_name'), 'whereRaw' => "status = 1", 'orderBy' => 'main_category_code')) as $r) {
+    $mc_list_rows[$r['main_category_code'] . '|' . $r['main_category_name']] = $r;
+}
+$mc_list_rows = array_values($mc_list_rows);
 
 include '../inheader.php';
 include '../insidebar.php';
