@@ -1,7 +1,12 @@
 # MIGRATION_PROGRESS — سجلّ تقدّم الهجرة المعمارية (Checkpoint & Resume)
 
-> ## 🔖 نقطة الاستئناف (حُدِّثت 2026-07-13 مساءً — ✅ **وحدة المعدات مُغلقة 17/18** · المؤجَّل الوحيد equipment_profile)
-> **المرحلة 3 · الوحدة الثالثة (المعدات) — ✅ مكتملة عدا ملفٍّ مؤجَّلٍ واحد.** (المالية ✅ 23/23 · الصيانة ✅ 9/9.)
+> ## 🔖 نقطة الاستئناف (حُدِّثت 2026-07-13 ليلًا — ✅ **وحدة العقود مُغلقة 7/7** بعد المعدات 17/18)
+> **المرحلة 3: المالية ✅ 23/23 · الصيانة ✅ 9/9 · المعدات ✅ 17/18 · العقود ✅ 7/7. التالي: Employees (المؤجَّلان معها/بعدها: equipment_profile وemployee_profile — كلاهما يقرأ timesheet) ثم Timesheet ختامًا.**
+> - ✅ **وحدة العقود 7/7 (T3=0 للوحدة، أربعة commits)**:
+>   - `contracts.php` + `contractequipments_handler` (1057d8a): الحفظ 29 حقلًا insert/update (**أُغلق سطحُ حقنٍ — التعديل كان يُضمِّن POST نصًّا**) · سطور المعدات **replaceChildren** · حذفٌ ناعمٌ كامل الأعمدة · golden **94749==94749** · إثبات 7/7 (u6؛ درسُ صلاحيات: دور 1 view فقط).
+>   - `contract_actions_handler` (fd80444): الإجراءات السبعة عبر **runInTransaction** (منفّذ العمليات الخام → بوابة بحُرّاسها داخل معاملةٍ ذرّية) · الملاحظات تُدرَج بشركةٍ محقونة · إثبات 7/7 (تجديد/تسوية/إيقاف/استئناف بتمديد/دمج بنسخ سطرٍ محقون الشركة/رفض الأجنبي).
+>   - `contracts_details` + `get_contract_equipments` + `update_contract_details` + **M5** (c483c47): golden 96112==96112 · MATCH بالأنماط · **تسرّبان كامنان أُغلقا** (تحديث التفاصيل بلا عزلٍ إطلاقًا؛ ملاحظات بلا شركة → M5 يعبّئها من العقد الأب) · **حدود القداسة محفوظة**: بيانات الاعتمادات تُسلَّم للمحرك المقدّس بلا مساس.
+> - **(الوحدة السابقة) المعدات ✅ 17/18** — المؤجَّل الوحيد `equipment_profile` (يقرأ timesheet).
 > - ✅ **17/18 مُهاجَرة، صفر خام في كلٍّ منها**: `equipments_types` · `select_project` (أُصلح 500) · `fleet_failures` · `fleet_depreciation_profiles` · `equipments.php` (الكيان، 6e8a398) · `fleet_models` (5eb1869) · `manage_failure_codes` (76544c8+1416dd9) · `equipments_drivers` (5ab1546) · `equipment_child_save` (9a468f7) · `get_equipment_details` (be47e3d) · `get_contract_stats`+`get_mine_contracts`+**ترحيل M4** (d8b43b1) · الأربعة الصغيرة `get_model_data`/`approve_card`/`fleet_file`/`equipment_card_fields` (c558b01) · **`equipments_fleet` الكبرى** (f1c7d5f، 22→0).
 > - ⬜ **المؤجَّل الوحيد**: `equipment_profile.php` (18 خام) — **يقرأ `timesheet` المقدّس** → يُهاجَر قرب هجرة الجداول الزمنية (الأخيرة بالبروتوكول).
 > - **معالم الملفات الأخيرة**:
