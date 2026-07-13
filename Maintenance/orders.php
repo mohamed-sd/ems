@@ -41,8 +41,6 @@ if (!$can_view) {
     exit();
 }
 
-$company_scope_sql = $is_super_admin ? "1=1" : "o.company_id = " . intval($company_id);
-
 $states       = array('بلاغ', 'تنفيذ', 'فحص', 'إغلاق', 'ملغى');
 $active_states = array('بلاغ', 'تنفيذ', 'فحص');
 $sources      = array('بلاغ', 'وقائي', 'تفتيش');
@@ -53,24 +51,18 @@ $maint_types  = array('إصلاح عطل', 'صيانة وقائية', 'فحص ف
 // ── دالة جلب أمر مقيّد بالشركة ──
 function mnt_fetch_order($conn, $id, $company_id, $is_super_admin)
 {
-    $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-    $sql = "SELECT * FROM mnt_order WHERE id = " . intval($id) . " AND COALESCE(is_deleted,0)=0" . $scope . " LIMIT 1";
-    $res = mysqli_query($conn, $sql);
-    return $res ? mysqli_fetch_assoc($res) : null;
+    $g = $is_super_admin ? ems_tenant_db()->forAllTenants('order super view') : ems_tenant_db();
+    return $g->selectOne('mnt_order', array('where' => array('id' => intval($id))));
 }
 
 // ── مجاميع تكاليف أمر (لردود AJAX) ──
 function mnt_order_totals($conn, $oid, $company_id)
 {
     $out = array('labor' => 0.0, 'parts' => 0.0, 'external' => 0.0, 'total' => 0.0);
-    if ($s = mysqli_prepare($conn, "SELECT labor_cost, parts_cost, external_cost, total_cost FROM mnt_order WHERE id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($s, 'ii', $oid, $company_id);
-        mysqli_stmt_execute($s);
-        $r = mysqli_stmt_get_result($s);
-        if ($r && ($a = mysqli_fetch_assoc($r))) {
-            $out = array('labor' => (float) $a['labor_cost'], 'parts' => (float) $a['parts_cost'], 'external' => (float) $a['external_cost'], 'total' => (float) $a['total_cost']);
-        }
-        mysqli_stmt_close($s);
+    $a = ems_tenant_db()->selectOne('mnt_order', array(
+        'columns' => array('labor_cost', 'parts_cost', 'external_cost', 'total_cost'), 'where' => array('id' => intval($oid))));
+    if ($a) {
+        $out = array('labor' => (float) $a['labor_cost'], 'parts' => (float) $a['parts_cost'], 'external' => (float) $a['external_cost'], 'total' => (float) $a['total_cost']);
     }
     return $out;
 }
@@ -90,16 +82,17 @@ function mnt_employee_role_name($conn, $employee_id, $company_id, $is_super_admi
 {
     $employee_id = intval($employee_id);
     if ($employee_id <= 0) return array('name' => '', 'role' => '');
-    $scope = $is_super_admin ? '' : ' AND (e.company_id = ' . intval($company_id) . ' OR e.company_id IS NULL)';
-    $sql = "SELECT e.name,
-                   COALESCE(NULLIF(er.name,''), NULLIF(jt.name,''), NULLIF(e.employee_type,'')) AS role
-              FROM employees e
-              LEFT JOIN employee_roles er ON er.id = e.employee_role_id
-              LEFT JOIN job_titles jt ON jt.id = e.job_title_id
-             WHERE e.id = " . $employee_id . $scope . " LIMIT 1";
-    $res = mysqli_query($conn, $sql);
-    if ($res && ($x = mysqli_fetch_assoc($res))) {
-        return array('name' => (string) $x['name'], 'role' => (string) ($x['role'] ?? ''));
+    // عزل على e (موظف شركة السياق؛ صفر موظف بـNULL فالعزل الصارم مطابق) + إثراء LEFT للدور
+    $g = $is_super_admin ? ems_tenant_db()->forAllTenants('order employee lookup super') : ems_tenant_db();
+    $rows = $g->scopedQuery(
+        array('scope' => array('e' => 'employees'), 'enrich' => array('er' => 'employee_roles', 'jt' => 'job_titles')),
+        "SELECT e.name, COALESCE(NULLIF(er.name,''), NULLIF(jt.name,''), NULLIF(e.employee_type,'')) AS role
+           FROM employees e
+           LEFT JOIN employee_roles er ON er.id = e.employee_role_id
+           LEFT JOIN job_titles jt ON jt.id = e.job_title_id
+          WHERE {TENANT_SCOPE} AND e.id = ? LIMIT 1", array($employee_id));
+    if (!empty($rows)) {
+        return array('name' => (string) $rows[0]['name'], 'role' => (string) ($rows[0]['role'] ?? ''));
     }
     return array('name' => '', 'role' => '');
 }
@@ -131,11 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
         $hours = floatval($_POST['hours'] ?? 0);
         $rate  = floatval($_POST['hourly_rate'] ?? 0);
         $cost  = $hours * $rate;
-        $lineId = 0;
-        if ($s = mysqli_prepare($conn, "INSERT INTO mnt_order_labor (company_id, order_id, employee_id, role, hours, hourly_rate, cost) VALUES (?,?,?,?,?,?,?)")) {
-            mysqli_stmt_bind_param($s, 'iiisddd', $company_id, $oid, $employee_id, $role, $hours, $rate, $cost);
-            mysqli_stmt_execute($s); $lineId = mysqli_insert_id($conn); mysqli_stmt_close($s);
-        }
+        $lineId = ems_tenant_db()->insert('mnt_order_labor', array(
+            'order_id' => $oid, 'employee_id' => $employee_id, 'role' => $role,
+            'hours' => $hours, 'hourly_rate' => $rate, 'cost' => $cost));
         mnt_recalc_order_totals($conn, $oid, $company_id);
         mnt_json(array('success' => true, 'line' => array('id' => $lineId, 'emp' => $emp, 'role' => $role, 'hours' => $hours, 'hourly_rate' => $rate, 'cost' => $cost), 'totals' => mnt_order_totals($conn, $oid, $company_id)));
     }
@@ -148,11 +139,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
         $unit = floatval($_POST['unit_cost'] ?? 0);
         $subtotal = $qty * $unit;
         $is_major = isset($_POST['is_major_component']) ? 1 : 0;
-        $lineId = 0;
-        if ($s = mysqli_prepare($conn, "INSERT INTO mnt_order_part (company_id, order_id, part_name, category, quantity, unit_cost, subtotal, is_major_component) VALUES (?,?,?,?,?,?,?,?)")) {
-            mysqli_stmt_bind_param($s, 'iissdddi', $company_id, $oid, $part_name, $category, $qty, $unit, $subtotal, $is_major);
-            mysqli_stmt_execute($s); $lineId = mysqli_insert_id($conn); mysqli_stmt_close($s);
-        }
+        $lineId = ems_tenant_db()->insert('mnt_order_part', array(
+            'order_id' => $oid, 'part_name' => $part_name, 'category' => $category, 'quantity' => $qty,
+            'unit_cost' => $unit, 'subtotal' => $subtotal, 'is_major_component' => $is_major));
         mnt_recalc_order_totals($conn, $oid, $company_id);
         mnt_json(array('success' => true, 'line' => array('id' => $lineId, 'part_name' => $part_name, 'category' => $category, 'quantity' => $qty, 'unit_cost' => $unit, 'subtotal' => $subtotal, 'is_major' => $is_major), 'totals' => mnt_order_totals($conn, $oid, $company_id)));
     }
@@ -160,10 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
     if ($act === 'del_labor' || $act === 'del_part') {
         $lid = intval($_POST['line_id'] ?? 0);
         $tbl = ($act === 'del_labor') ? 'mnt_order_labor' : 'mnt_order_part';
-        if ($s = mysqli_prepare($conn, "DELETE FROM `$tbl` WHERE id=? AND order_id=? AND company_id=?")) {
-            mysqli_stmt_bind_param($s, 'iii', $lid, $oid, $company_id);
-            mysqli_stmt_execute($s); mysqli_stmt_close($s);
-        }
+        // حذف سطرٍ صلبٍ عبر deleteChild (نطاق مزدوج: الشركة + الأمر المملوك)
+        ems_tenant_db()->deleteChild($tbl, $lid, 'mnt_order', $oid, 'order_id', 'order line delete (ajax)');
         mnt_recalc_order_totals($conn, $oid, $company_id);
         mnt_json(array('success' => true, 'totals' => mnt_order_totals($conn, $oid, $company_id)));
     }
@@ -184,16 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_o
     $cost_party   = in_array($_POST['cost_party'] ?? '', $cost_parties, true) ? $_POST['cost_party'] : null;
 
     $code = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
-    $new_id = 0;
-    $sql = "INSERT INTO mnt_order (company_id, code, equipment_id, project_id, source, maint_type, priority, cost_party, state, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'بلاغ', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // company_id,i code,s equipment,i project,i source,s maint_type,s priority,s cost_party,s created_by,i
-        mysqli_stmt_bind_param($stmt, 'isiissssi', $company_id, $code, $equipment_id, $project_id, $source, $maint_type, $priority, $cost_party, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        $new_id = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
-    }
+    $new_id = ems_tenant_db()->insert('mnt_order', array(
+        'code' => $code, 'equipment_id' => $equipment_id, 'project_id' => $project_id, 'source' => $source,
+        'maint_type' => $maint_type, 'priority' => $priority, 'cost_party' => $cost_party,
+        'state' => 'بلاغ', 'created_by' => $current_user_id));
     header("Location: orders.php?id=" . intval($new_id) . "&msg=تم+إنشاء+أمر+صيانة+✅"); exit();
 }
 
@@ -236,14 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
 
     // التحقق أن المعدة المختارة تتبع شركة المستخدم (منع ربط معدة شركة أخرى)
     if ($equipment_id !== null && !$is_super_admin) {
-        $eq_ok = false;
-        if ($eq_vstmt = mysqli_prepare($conn, "SELECT 1 FROM equipments WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1")) {
-            mysqli_stmt_bind_param($eq_vstmt, 'ii', $equipment_id, $company_id);
-            mysqli_stmt_execute($eq_vstmt);
-            $eq_vres = mysqli_stmt_get_result($eq_vstmt);
-            $eq_ok = ($eq_vres && mysqli_num_rows($eq_vres) > 0);
-            mysqli_stmt_close($eq_vstmt);
-        }
+        // عبر البوابة: العزل بالشركة يُحقن؛ صفر معدة بـNULL فالعزل الصارم مطابق
+        $eq_ok = ems_tenant_db()->count('equipments', array('where' => array('id' => $equipment_id))) > 0;
         if (!$eq_ok) {
             header("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('المعدة المختارة لا تتبع شركتك ❌'));
             exit();
@@ -262,28 +237,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $was_closed = ($order['state'] === 'إغلاق');
     $closing_now = ($effective_state === 'إغلاق' && !$was_closed);
 
-    $sql = "UPDATE mnt_order SET
-                equipment_id = ?, project_id = ?, source = ?, maint_type = ?, priority = ?,
-                cost_party = ?, vendor_id = ?, workshop = ?, technician_id = ?, supervisor_id = ?,
-                failure_code_id = ?, diagnosis = ?, root_cause_id = ?, actions_taken = ?,
-                work_start = ?, work_end = ?, downtime_hours = ?, external_cost = ?,
-                inspection_result = ?, state = ?"
-            . ($closing_now ? ", closed_at = NOW(), closed_by = " . intval($current_user_id) : "")
-            . " WHERE id = ? AND company_id = ?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        $types = 'iisss' . 'sisii' . 'isis' . 'ssdd' . 'ss' . 'ii';
-        mysqli_stmt_bind_param(
-            $stmt, $types,
-            $equipment_id, $project_id, $source, $maint_type, $priority,
-            $cost_party, $vendor_id, $workshop, $technician_id, $supervisor_id,
-            $failure_code, $diagnosis, $root_cause_id, $actions_taken,
-            $work_start, $work_end, $downtime, $external_cost,
-            $inspection_result, $effective_state,
-            $oid, $company_id
-        );
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-    }
+    $ord_data = array(
+        'equipment_id' => $equipment_id, 'project_id' => $project_id, 'source' => $source,
+        'maint_type' => $maint_type, 'priority' => $priority, 'cost_party' => $cost_party,
+        'vendor_id' => $vendor_id, 'workshop' => $workshop, 'technician_id' => $technician_id,
+        'supervisor_id' => $supervisor_id, 'failure_code_id' => $failure_code, 'diagnosis' => $diagnosis,
+        'root_cause_id' => $root_cause_id, 'actions_taken' => $actions_taken, 'work_start' => $work_start,
+        'work_end' => $work_end, 'downtime_hours' => $downtime, 'external_cost' => $external_cost,
+        'inspection_result' => $inspection_result, 'state' => $effective_state);
+    if ($closing_now) { $ord_data['closed_at'] = date('Y-m-d H:i:s'); $ord_data['closed_by'] = intval($current_user_id); }
+    ems_tenant_db()->update('mnt_order', $ord_data, array('id' => $oid));
 
     mnt_recalc_order_totals($conn, $oid, $company_id);
 
@@ -305,12 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             mnt_reschedule_plan($conn, intval($order['plan_id']), $company_id, $meter);
         }
         if (!empty($order['breakdown_id'])) {
-            if ($s2 = mysqli_prepare($conn, "UPDATE mnt_breakdown SET state='مغلق' WHERE id=? AND company_id=?")) {
-                $bid = intval($order['breakdown_id']);
-                mysqli_stmt_bind_param($s2, 'ii', $bid, $company_id);
-                mysqli_stmt_execute($s2);
-                mysqli_stmt_close($s2);
-            }
+            ems_tenant_db()->update('mnt_breakdown', array('state' => 'مغلق'), array('id' => intval($order['breakdown_id'])));
         }
     }
     if ($effective_state === 'ملغى' && $equipment_id) {
@@ -340,17 +298,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action'] ?? '', ar
                 $info = mnt_employee_role_name($conn, $employee_id, intval($order['company_id']), $is_super_admin);
                 if ($employee_id > 0 && $info['name'] !== '') {
                     $role = $info['role']; $hours = floatval($_POST['hours'] ?? 0); $rate = floatval($_POST['hourly_rate'] ?? 0); $cost = $hours * $rate;
-                    if ($s = mysqli_prepare($conn, "INSERT INTO mnt_order_labor (company_id, order_id, employee_id, role, hours, hourly_rate, cost) VALUES (?,?,?,?,?,?,?)")) {
-                        mysqli_stmt_bind_param($s, 'iiisddd', $company_id, $oid, $employee_id, $role, $hours, $rate, $cost);
-                        mysqli_stmt_execute($s); mysqli_stmt_close($s);
-                    }
+                    ems_tenant_db()->insert('mnt_order_labor', array(
+                        'order_id' => $oid, 'employee_id' => $employee_id, 'role' => $role,
+                        'hours' => $hours, 'hourly_rate' => $rate, 'cost' => $cost));
                 }
             } else {
                 $part_name = trim($_POST['part_name'] ?? ''); $category = trim($_POST['category'] ?? '');
                 $qty = floatval($_POST['quantity'] ?? 1); $unit = floatval($_POST['unit_cost'] ?? 0); $subtotal = $qty * $unit; $is_major = isset($_POST['is_major_component']) ? 1 : 0;
-                if ($part_name !== '' && ($s = mysqli_prepare($conn, "INSERT INTO mnt_order_part (company_id, order_id, part_name, category, quantity, unit_cost, subtotal, is_major_component) VALUES (?,?,?,?,?,?,?,?)"))) {
-                    mysqli_stmt_bind_param($s, 'iissdddi', $company_id, $oid, $part_name, $category, $qty, $unit, $subtotal, $is_major);
-                    mysqli_stmt_execute($s); mysqli_stmt_close($s);
+                if ($part_name !== '') {
+                    ems_tenant_db()->insert('mnt_order_part', array(
+                        'order_id' => $oid, 'part_name' => $part_name, 'category' => $category, 'quantity' => $qty,
+                        'unit_cost' => $unit, 'subtotal' => $subtotal, 'is_major_component' => $is_major));
                 }
             }
             mnt_recalc_order_totals($conn, $oid, $company_id);
@@ -360,17 +318,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action'] ?? '', ar
 }
 if (isset($_GET['del_labor'], $_GET['order_id']) && $can_edit) {
     $lid = intval($_GET['del_labor']); $oid = intval($_GET['order_id']);
-    if ($stmt = mysqli_prepare($conn, "DELETE FROM mnt_order_labor WHERE id=? AND order_id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($stmt, 'iii', $lid, $oid, $company_id); mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->deleteChild('mnt_order_labor', $lid, 'mnt_order', $oid, 'order_id', 'order labor delete');
     mnt_recalc_order_totals($conn, $oid, $company_id);
     header("Location: orders.php?id=" . $oid); exit();
 }
 if (isset($_GET['del_part'], $_GET['order_id']) && $can_edit) {
     $pid = intval($_GET['del_part']); $oid = intval($_GET['order_id']);
-    if ($stmt = mysqli_prepare($conn, "DELETE FROM mnt_order_part WHERE id=? AND order_id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($stmt, 'iii', $pid, $oid, $company_id); mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->deleteChild('mnt_order_part', $pid, 'mnt_order', $oid, 'order_id', 'order part delete');
     mnt_recalc_order_totals($conn, $oid, $company_id);
     header("Location: orders.php?id=" . $oid); exit();
 }
@@ -379,10 +333,7 @@ if (isset($_GET['del_part'], $_GET['order_id']) && $can_edit) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: orders.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $did = intval($_GET['delete_id']);
-    if ($stmt = mysqli_prepare($conn, "UPDATE mnt_order SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $did, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->softDelete('mnt_order', $did); // حذف ناعم معزول بالشركة تلقائيًّا
     header("Location: orders.php?msg=تم+حذف+الأمر+✅"); exit();
 }
 
@@ -395,15 +346,13 @@ $order = $edit_id > 0 ? mnt_fetch_order($conn, $edit_id, $company_id, $is_super_
 $equipments = array(); $projects = array(); $vendors = array(); $users_list = array(); $employees_list = array();
 $root_causes = array(); $failure_codes = array();
 if ($order || $edit_id === 0) {
-    $cscope = $is_super_admin ? "1=1" : "company_id = " . intval($company_id);
-    if ($r = mysqli_query($conn, "SELECT id, name, code FROM equipments WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $equipments[] = $x; }
-    if ($r = mysqli_query($conn, "SELECT id, name FROM project WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $projects[] = $x; }
-    if ($r = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE $cscope AND COALESCE(is_deleted,0)=0 ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $vendors[] = $x; }
-    if ($r = mysqli_query($conn, "SELECT id, name FROM users WHERE $cscope AND is_deleted=0 ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $users_list[] = $x; }
-    // الموظفون لأسطر العمالة: الفنيون/المساندون فقط — نستبعد السائقين/المشغّلين، فعمالة
-    // الصيانة ليست مشغّلي المعدات. نفس قاعدة تحديد المشغّل المعتمدة (المسمّى is_operator
-    // حاسمٌ متى وُجد، وإلا اسم الدور، وإلا نوع الموظف القديم)، مع عكسها (NOT).
-    $emp_scope = $is_super_admin ? "1=1" : "(e.company_id = " . intval($company_id) . " OR e.company_id IS NULL)";
+    $mnt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('orders dropdowns super view') : ems_tenant_db();
+    // project/equipments بلا فلتر is_deleted في الأصل ⇒ includeDeleted للمطابقة (equipments soft=false أصلًا)
+    $equipments = $mnt_gate->select('equipments', array('columns' => array('id', 'name', 'code'), 'orderBy' => 'name'));
+    $projects   = $mnt_gate->select('project', array('columns' => array('id', 'name'), 'orderBy' => 'name', 'includeDeleted' => true));
+    $vendors    = $mnt_gate->select('suppliers', array('columns' => array('id', 'name'), 'orderBy' => 'name'));
+    $users_list = $mnt_gate->select('users', array('columns' => array('id', 'name'), 'whereRaw' => "is_deleted=0", 'orderBy' => 'name'));
+    // الموظفون لأسطر العمالة: الفنيون/المساندون فقط — نستبعد السائقين/المشغّلين (NOT-operator)
     $op_types_in = "''";
     if (function_exists('ems_operation_employee_types')) {
         $op_types_in = implode(',', array_map(function ($t) use ($conn) {
@@ -415,16 +364,17 @@ if ($order || $edit_id === 0) {
         OR (e.job_title_id IS NULL AND e.employee_role_id IS NOT NULL AND (er.name LIKE '%سائق%' OR er.name LIKE '%مشغّل%' OR er.name LIKE '%مشغل%'))
         OR (e.job_title_id IS NULL AND e.employee_role_id IS NULL AND e.employee_type IN ($op_types_in))
     )";
-    $emp_sql = "SELECT e.id, e.name,
-                       COALESCE(NULLIF(er.name,''), NULLIF(jt.name,''), NULLIF(e.employee_type,'')) AS role
-                  FROM employees e
-                  LEFT JOIN employee_roles er ON er.id = e.employee_role_id
-                  LEFT JOIN job_titles jt ON jt.id = e.job_title_id
-                 WHERE $emp_scope AND COALESCE(e.status,1)=1 AND $not_operator_sql
-                 ORDER BY e.name";
-    if ($r = mysqli_query($conn, $emp_sql)) { while ($x = mysqli_fetch_assoc($r)) $employees_list[] = $x; }
+    // عزل على e + إثراء LEFT بالدور/المسمّى (صفر موظف بـNULL فالعزل الصارم مطابق للـOR-NULL)
+    $employees_list = $mnt_gate->scopedQuery(
+        array('scope' => array('e' => 'employees'), 'enrich' => array('er' => 'employee_roles', 'jt' => 'job_titles')),
+        "SELECT e.id, e.name, COALESCE(NULLIF(er.name,''), NULLIF(jt.name,''), NULLIF(e.employee_type,'')) AS role
+           FROM employees e
+           LEFT JOIN employee_roles er ON er.id = e.employee_role_id
+           LEFT JOIN job_titles jt ON jt.id = e.job_title_id
+          WHERE {TENANT_SCOPE} AND COALESCE(e.status,1)=1 AND $not_operator_sql
+          ORDER BY e.name");
     $root_causes = mnt_lookup_options($conn, $company_id, 'سبب عطل');
-    if ($r = mysqli_query($conn, "SELECT id, full_code, failure_detail FROM failure_codes WHERE status=1 ORDER BY full_code")) { while ($x = mysqli_fetch_assoc($r)) $failure_codes[] = $x; }
+    $failure_codes = $mnt_gate->select('failure_codes', array('columns' => array('id', 'full_code', 'failure_detail'), 'where' => array('status' => 1), 'orderBy' => 'full_code'));
 }
 
 // خيارات المعدة لفورم التحرير: معدات «تحت الصيانة» لمشروع الأمر + المعدة الحالية دائماً (تُعرض حسب المشروع).
@@ -459,15 +409,15 @@ function mnt_state_class($st) {
     <?php endif; ?>
 
 <?php if ($order): // ═══════════════════════════ صفحة تحرير أمر ═══════════════════════════
-    $labor_rows = array(); $part_rows = array();
-    if ($s = mysqli_prepare($conn, "SELECT l.id, l.role, l.hours, l.hourly_rate, l.cost, u.name AS emp FROM mnt_order_labor l LEFT JOIN employees u ON u.id=l.employee_id WHERE l.order_id=? AND l.company_id=? ORDER BY l.id")) {
-        mysqli_stmt_bind_param($s, 'ii', $edit_id, $company_id); mysqli_stmt_execute($s);
-        $rr = mysqli_stmt_get_result($s); while ($rr && $x = mysqli_fetch_assoc($rr)) $labor_rows[] = $x; mysqli_stmt_close($s);
-    }
-    if ($s = mysqli_prepare($conn, "SELECT id, part_name, category, quantity, unit_cost, subtotal, is_major_component FROM mnt_order_part WHERE order_id=? AND company_id=? ORDER BY id")) {
-        mysqli_stmt_bind_param($s, 'ii', $edit_id, $company_id); mysqli_stmt_execute($s);
-        $rr = mysqli_stmt_get_result($s); while ($rr && $x = mysqli_fetch_assoc($rr)) $part_rows[] = $x; mysqli_stmt_close($s);
-    }
+    // أسطر العمالة (إثراء LEFT باسم الموظف) والقطع — عبر البوابة
+    $labor_rows = ems_tenant_db()->scopedQuery(
+        array('scope' => array('l' => 'mnt_order_labor'), 'enrich' => array('u' => 'employees')),
+        "SELECT l.id, l.role, l.hours, l.hourly_rate, l.cost, u.name AS emp
+           FROM mnt_order_labor l LEFT JOIN employees u ON u.id=l.employee_id
+          WHERE {TENANT_SCOPE} AND l.order_id=? ORDER BY l.id", array($edit_id));
+    $part_rows = ems_tenant_db()->select('mnt_order_part', array(
+        'columns' => array('id', 'part_name', 'category', 'quantity', 'unit_cost', 'subtotal', 'is_major_component'),
+        'where' => array('order_id' => $edit_id), 'orderBy' => 'id'));
     $st = (string) $order['state'];
     $st_locked = ($st === 'إغلاق' || $st === 'ملغى');
 ?>
@@ -744,9 +694,11 @@ function mnt_state_class($st) {
 <?php else: // ═══════════════════════════ قائمة الأوامر ═══════════════════════════
     // إحصائيات
     $stats = array('total' => 0, 'open' => 0, 'closed' => 0, 'cost' => 0);
-    if ($sq = mysqli_query($conn, "SELECT COUNT(*) total, SUM(state IN ('بلاغ','تنفيذ','فحص')) open_c, SUM(state='إغلاق') closed_c, COALESCE(SUM(total_cost),0) cost FROM mnt_order o WHERE $company_scope_sql AND COALESCE(o.is_deleted,0)=0")) {
-        if ($sr = mysqli_fetch_assoc($sq)) { $stats = array('total' => intval($sr['total']), 'open' => intval($sr['open_c']), 'closed' => intval($sr['closed_c']), 'cost' => floatval($sr['cost'])); }
-    }
+    $stat_rows = ($is_super_admin ? ems_tenant_db()->forAllTenants('orders stats super') : ems_tenant_db())->scopedQuery(
+        array('scope' => array('o' => 'mnt_order')),
+        "SELECT COUNT(*) total, SUM(state IN ('بلاغ','تنفيذ','فحص')) open_c, SUM(state='إغلاق') closed_c, COALESCE(SUM(total_cost),0) cost
+           FROM mnt_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0");
+    if (!empty($stat_rows)) { $sr = $stat_rows[0]; $stats = array('total' => intval($sr['total']), 'open' => intval($sr['open_c']), 'closed' => intval($sr['closed_c']), 'cost' => floatval($sr['cost'])); }
 
     $header_title  = 'أوامر الصيانة';
     $header_icon   = 'fa fa-wrench';
@@ -824,22 +776,28 @@ function mnt_state_class($st) {
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT o.*, e.name AS eq_name, e.code AS eq_code, p.name AS proj_name,
-                                   s.name AS vendor_name, ut.name AS tech_name, us.name AS sup_name,
-                                   lk.name AS root_name, fc.full_code, fc.failure_detail
-                              FROM mnt_order o
-                              LEFT JOIN equipments e ON e.id = o.equipment_id
-                              LEFT JOIN project p ON p.id = o.project_id
-                              LEFT JOIN suppliers s ON s.id = o.vendor_id
-                              LEFT JOIN users ut ON ut.id = o.technician_id
-                              LEFT JOIN users us ON us.id = o.supervisor_id
-                              LEFT JOIN mnt_lookup lk ON lk.id = o.root_cause_id
-                              LEFT JOIN failure_codes fc ON fc.id = o.failure_code_id
-                             WHERE $company_scope_sql AND COALESCE(o.is_deleted,0)=0
-                             ORDER BY o.id DESC";
+                    // قائمة الأوامر عبر scopedQuery (§10): عزل على o + إثراء LEFT للأبعاد
+                    // (users مرّتين ut/us؛ mnt_lookup/failure عامّان في الإثراء)
+                    $list_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('orders list super view') : ems_tenant_db();
+                    $order_rows = $list_gate->scopedQuery(
+                        array('scope' => array('o' => 'mnt_order'),
+                              'enrich' => array('e' => 'equipments', 'p' => 'project', 's' => 'suppliers',
+                                                'ut' => 'users', 'us' => 'users', 'lk' => 'mnt_lookup')),
+                        "SELECT o.*, e.name AS eq_name, e.code AS eq_code, p.name AS proj_name,
+                                s.name AS vendor_name, ut.name AS tech_name, us.name AS sup_name,
+                                lk.name AS root_name, fc.full_code, fc.failure_detail
+                           FROM mnt_order o
+                           LEFT JOIN equipments e ON e.id = o.equipment_id
+                           LEFT JOIN project p ON p.id = o.project_id
+                           LEFT JOIN suppliers s ON s.id = o.vendor_id
+                           LEFT JOIN users ut ON ut.id = o.technician_id
+                           LEFT JOIN users us ON us.id = o.supervisor_id
+                           LEFT JOIN mnt_lookup lk ON lk.id = o.root_cause_id
+                           LEFT JOIN failure_codes fc ON fc.id = o.failure_code_id
+                          WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0
+                          ORDER BY o.id DESC");
                     $order_ids = array();
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    foreach ($order_rows as $row) {
                         $order_ids[] = intval($row['id']);
                         $st = (string) $row['state'];
                         $failure = trim(((string) ($row['full_code'] ?? '')) . ' ' . ((string) ($row['failure_detail'] ?? '')));
@@ -888,7 +846,7 @@ function mnt_state_class($st) {
                         echo "<td>" . number_format((float) $row['total_cost'], 2) . "</td>";
                         echo "<td><span class='" . mnt_state_class($st) . "'>" . htmlspecialchars($st) . "</span></td>";
                         echo "</tr>";
-                    } }
+                    }
                     ?>
                 </tbody>
             </table>
@@ -900,40 +858,35 @@ function mnt_state_class($st) {
     $mnt_parts_map = array();
     if (!empty($order_ids)) {
         $ids_csv = implode(',', array_map('intval', $order_ids));
-        $cid     = intval($company_id);
-
-        $lq = "SELECT l.order_id, u.name AS emp, l.role, l.hours, l.hourly_rate, l.cost
-                 FROM mnt_order_labor l LEFT JOIN employees u ON u.id = l.employee_id
-                WHERE l.order_id IN ($ids_csv) AND l.company_id = $cid
-                ORDER BY l.id";
-        if ($lr = mysqli_query($conn, $lq)) {
-            while ($x = mysqli_fetch_assoc($lr)) {
-                $oid = intval($x['order_id']);
-                $mnt_labor_map[$oid][] = array(
-                    ($x['emp'] !== null && $x['emp'] !== '') ? $x['emp'] : '—',
-                    (string) $x['hours'],
-                    number_format((float) $x['hourly_rate'], 2),
-                    number_format((float) $x['cost'], 2)
-                );
-            }
+        // خرائط الأسطر (عزل بالشركة عبر البوابة؛ IN بمعرّفات مُصفّاة intval)
+        $labor_map_rows = $list_gate->scopedQuery(
+            array('scope' => array('l' => 'mnt_order_labor'), 'enrich' => array('u' => 'employees')),
+            "SELECT l.order_id, u.name AS emp, l.role, l.hours, l.hourly_rate, l.cost
+               FROM mnt_order_labor l LEFT JOIN employees u ON u.id = l.employee_id
+              WHERE {TENANT_SCOPE} AND l.order_id IN ($ids_csv) ORDER BY l.id");
+        foreach ($labor_map_rows as $x) {
+            $oid = intval($x['order_id']);
+            $mnt_labor_map[$oid][] = array(
+                ($x['emp'] !== null && $x['emp'] !== '') ? $x['emp'] : '—',
+                (string) $x['hours'],
+                number_format((float) $x['hourly_rate'], 2),
+                number_format((float) $x['cost'], 2)
+            );
         }
 
-        $pq = "SELECT order_id, part_name, category, quantity, unit_cost, subtotal, is_major_component
-                 FROM mnt_order_part
-                WHERE order_id IN ($ids_csv) AND company_id = $cid
-                ORDER BY id";
-        if ($pr = mysqli_query($conn, $pq)) {
-            while ($x = mysqli_fetch_assoc($pr)) {
-                $oid = intval($x['order_id']);
-                $mnt_parts_map[$oid][] = array(
-                    (string) $x['part_name'],
-                    (string) ($x['category'] ?? ''),
-                    (string) $x['quantity'],
-                    number_format((float) $x['unit_cost'], 2),
-                    number_format((float) $x['subtotal'], 2),
-                    intval($x['is_major_component']) ? 'نعم' : 'لا'
-                );
-            }
+        $part_map_rows = $list_gate->select('mnt_order_part', array(
+            'columns'  => array('order_id', 'part_name', 'category', 'quantity', 'unit_cost', 'subtotal', 'is_major_component'),
+            'whereRaw' => "order_id IN ($ids_csv)", 'orderBy' => 'id'));
+        foreach ($part_map_rows as $x) {
+            $oid = intval($x['order_id']);
+            $mnt_parts_map[$oid][] = array(
+                (string) $x['part_name'],
+                (string) ($x['category'] ?? ''),
+                (string) $x['quantity'],
+                number_format((float) $x['unit_cost'], 2),
+                number_format((float) $x['subtotal'], 2),
+                intval($x['is_major_component']) ? 'نعم' : 'لا'
+            );
         }
     }
     echo '<script>window.MNT_ORDER_LINES = '
