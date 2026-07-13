@@ -22,8 +22,9 @@ $can_delete = $page_permissions['can_delete'];
 
 $page_title = "إدارة أكواد الأعطال";
 
-// ── مساعد تعقيم الإدخال
-function esc($conn, $v) { return mysqli_real_escape_string($conn, trim($v)); }
+// بوابة العزل — failure_codes كتالوجٌ عامٌّ (T_GLOBAL) مُدار (managed): يُقرأ للجميع،
+// ويُكتب بحوكمة صلاحيّة الصفحة (لا company_id — كتالوج مشترك بين كل الشركات).
+$fc_gate = ems_tenant_db();
 
 $success_msg = '';
 $error_msg   = '';
@@ -38,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_delete) { $error_msg = "❌ لا توجد صلاحية حذف"; goto done; }
         $del_id = intval($_POST['del_id']);
         if ($del_id > 0) {
-            mysqli_query($conn, "UPDATE failure_codes SET status = 0 WHERE id = $del_id");
+            // تعطيل ناعم (status=0) عبر البوابة — كتابةٌ محكومة بالـmanaged
+            try { $fc_gate->update('failure_codes', array('status' => 0), array('id' => $del_id)); } catch (\Throwable $e) {}
             header("Location: manage_failure_codes.php?msg=" . urlencode("تم حذف الكود بنجاح ✅"));
             exit();
         }
@@ -49,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'restore') {
         $res_id = intval($_POST['res_id']);
         if ($res_id > 0) {
-            mysqli_query($conn, "UPDATE failure_codes SET status = 1 WHERE id = $res_id");
+            try { $fc_gate->update('failure_codes', array('status' => 1), array('id' => $res_id)); } catch (\Throwable $e) {}
             header("Location: manage_failure_codes.php?msg=" . urlencode("تم استعادة الكود ✅"));
             exit();
         }
@@ -59,15 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // إضافة / تعديل
     if (!$can_add) { $error_msg = "❌ لا توجد صلاحية"; goto done; }
 
+    // قيمٌ خام للبوابة (الربط بالمعاملات يتكفّل بالهروب؛ trim/strtoupper كالأصل)
     $edit_id          = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
     $equipment_type   = intval($_POST['equipment_type']);
-    $event_type_code  = strtoupper(esc($conn, $_POST['event_type_code']));
-    $event_type_name  = esc($conn, $_POST['event_type_name']);
-    $main_cat_code    = strtoupper(esc($conn, $_POST['main_category_code']));
-    $main_cat_name    = esc($conn, $_POST['main_category_name']);
-    $sub_category     = esc($conn, $_POST['sub_category']);
-    $failure_detail   = esc($conn, $_POST['failure_detail']);
-    $full_code        = strtoupper(esc($conn, $_POST['full_code']));
+    $event_type_code  = strtoupper(trim($_POST['event_type_code'] ?? ''));
+    $event_type_name  = trim($_POST['event_type_name'] ?? '');
+    $main_cat_code    = strtoupper(trim($_POST['main_category_code'] ?? ''));
+    $main_cat_name    = trim($_POST['main_category_name'] ?? '');
+    $sub_category     = trim($_POST['sub_category'] ?? '');
+    $failure_detail   = trim($_POST['failure_detail'] ?? '');
+    $full_code        = strtoupper(trim($_POST['full_code'] ?? ''));
     $status           = intval($_POST['status']);
 
     if ($equipment_type < 1 || empty($event_type_code) || empty($event_type_name)
@@ -77,42 +80,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         goto done;
     }
 
-    // التحقق من تكرار full_code
-    $dup_where = $edit_id > 0 ? " AND id != $edit_id" : '';
-    $dup = mysqli_query($conn, "SELECT id FROM failure_codes WHERE full_code = '$full_code'$dup_where LIMIT 1");
-    if ($dup && mysqli_num_rows($dup) > 0) {
+    // التحقق من تكرار full_code (كتالوجٌ عامّ — البحث بلا عزل شركة، بمعاملات مرتبطة)
+    $dupWhere  = "full_code = ?";
+    $dupParams = array($full_code);
+    if ($edit_id > 0) { $dupWhere .= " AND id != ?"; $dupParams[] = $edit_id; }
+    $dup = $fc_gate->selectOne('failure_codes', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
+    if ($dup) {
         $error_msg = "⚠️ الكود الكامل '$full_code' موجود مسبقاً";
         goto done;
     }
 
-    if ($edit_id > 0) {
-        $sql = "UPDATE failure_codes SET
-                    equipment_type   = $equipment_type,
-                    event_type_code  = '$event_type_code',
-                    event_type_name  = '$event_type_name',
-                    main_category_code = '$main_cat_code',
-                    main_category_name = '$main_cat_name',
-                    sub_category     = '$sub_category',
-                    failure_detail   = '$failure_detail',
-                    full_code        = '$full_code',
-                    status           = $status
-                WHERE id = $edit_id";
-        $msg_ok = "تم تعديل الكود بنجاح ✅";
-    } else {
-        $sql = "INSERT INTO failure_codes
-                    (equipment_type, event_type_code, event_type_name, main_category_code,
-                     main_category_name, sub_category, failure_detail, full_code, status)
-                VALUES
-                    ($equipment_type, '$event_type_code', '$event_type_name', '$main_cat_code',
-                     '$main_cat_name', '$sub_category', '$failure_detail', '$full_code', $status)";
-        $msg_ok = "تم إضافة الكود بنجاح ✅";
-    }
-
-    if (mysqli_query($conn, $sql)) {
+    // بيانات الكود (كتالوج عام managed — بلا company_id)
+    $fc_data = array(
+        'equipment_type'     => $equipment_type,
+        'event_type_code'    => $event_type_code,
+        'event_type_name'    => $event_type_name,
+        'main_category_code' => $main_cat_code,
+        'main_category_name' => $main_cat_name,
+        'sub_category'       => $sub_category,
+        'failure_detail'     => $failure_detail,
+        'full_code'          => $full_code,
+        'status'             => $status,
+    );
+    try {
+        if ($edit_id > 0) {
+            $fc_gate->update('failure_codes', $fc_data, array('id' => $edit_id));
+            $msg_ok = "تم تعديل الكود بنجاح ✅";
+        } else {
+            $fc_gate->insert('failure_codes', $fc_data);
+            $msg_ok = "تم إضافة الكود بنجاح ✅";
+        }
         header("Location: manage_failure_codes.php?msg=" . urlencode($msg_ok));
         exit();
-    } else {
-        $error_msg = "خطأ في الحفظ: " . mysqli_error($conn);
+    } catch (\Throwable $e) {
+        $error_msg = "خطأ في الحفظ: " . $e->getMessage();
     }
 }
 
@@ -125,32 +126,39 @@ if (isset($_GET['msg'])) { $success_msg = htmlspecialchars($_GET['msg']); }
 $edit_data = null;
 $edit_id_get = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
 if ($edit_id_get > 0 && $can_edit) {
-    $er = mysqli_query($conn, "SELECT * FROM failure_codes WHERE id = $edit_id_get LIMIT 1");
-    if ($er) $edit_data = mysqli_fetch_assoc($er);
+    $edit_data = $fc_gate->selectOne('failure_codes', array('where' => array('id' => $edit_id_get)));
 }
 
 // فلاتر جانبية لبناء قوائم الـ select في الفورم
 $eq_type_names = [1 => 'حفار (Excavator)', 2 => 'قلاب (Dump Truck)', 3 => 'خرامة (Drill)'];
 
 // بيانات الجدول
-$filter_eq   = isset($_GET['f_eq'])   ? intval($_GET['f_eq'])                       : 0;
-$filter_evt  = isset($_GET['f_evt'])  ? esc($conn, $_GET['f_evt'])                  : '';
-$filter_mc   = isset($_GET['f_mc'])   ? esc($conn, $_GET['f_mc'])                   : '';
-$filter_stat = isset($_GET['f_stat']) ? intval($_GET['f_stat'])                     : 1; // افتراضي: نشط
+$filter_eq   = isset($_GET['f_eq'])   ? intval($_GET['f_eq'])   : 0;
+$filter_evt  = isset($_GET['f_evt'])  ? trim($_GET['f_evt'])    : '';
+$filter_mc   = isset($_GET['f_mc'])   ? trim($_GET['f_mc'])     : '';
+$filter_stat = isset($_GET['f_stat']) ? intval($_GET['f_stat']) : 1; // افتراضي: نشط
 
-$where = [];
-$where[] = $filter_stat >= 0 ? "status = $filter_stat" : "1=1";
-if ($filter_eq  > 0)       $where[] = "equipment_type = $filter_eq";
-if (!empty($filter_evt))   $where[] = "event_type_code = '$filter_evt'";
-if (!empty($filter_mc))    $where[] = "main_category_code = '$filter_mc'";
-$where_sql = implode(' AND ', $where);
+// شروط الفلترة بمعاملات مرتبطة (لا حقن)
+$fc_where  = [];
+$fc_params = [];
+$fc_where[] = $filter_stat >= 0 ? "status = ?" : "1=1";
+if ($filter_stat >= 0)   { $fc_params[] = $filter_stat; }
+if ($filter_eq  > 0)     { $fc_where[] = "equipment_type = ?";     $fc_params[] = $filter_eq; }
+if (!empty($filter_evt)) { $fc_where[] = "event_type_code = ?";    $fc_params[] = $filter_evt; }
+if (!empty($filter_mc))  { $fc_where[] = "main_category_code = ?"; $fc_params[] = $filter_mc; }
+$where_sql = implode(' AND ', $fc_where);
 
-$list_result = mysqli_query($conn, "SELECT * FROM failure_codes WHERE $where_sql ORDER BY equipment_type, event_type_code, main_category_code, full_code");
-$total_count = $list_result ? mysqli_num_rows($list_result) : 0;
+// كتالوجٌ عامٌّ عبر البوابة (بلا عزل شركة — مشترك بين كل الشركات)
+$list_rows = $fc_gate->select('failure_codes', array(
+    'whereRaw' => $where_sql,
+    'params'   => $fc_params,
+    'orderBy'  => 'equipment_type, event_type_code, main_category_code, full_code',
+));
+$total_count = count($list_rows);
 
-// قوائم التصفية
-$evt_list = mysqli_query($conn, "SELECT DISTINCT event_type_code, event_type_name FROM failure_codes WHERE status = 1 ORDER BY event_type_code");
-$mc_list  = mysqli_query($conn, "SELECT DISTINCT main_category_code, main_category_name FROM failure_codes WHERE status = 1 ORDER BY main_category_code");
+// قوائم التصفية (قيم مميّزة)
+$evt_list_rows = $fc_gate->select('failure_codes', array('columns' => array('DISTINCT event_type_code', 'event_type_name'), 'whereRaw' => "status = 1", 'orderBy' => 'event_type_code'));
+$mc_list_rows  = $fc_gate->select('failure_codes', array('columns' => array('DISTINCT main_category_code', 'main_category_name'), 'whereRaw' => "status = 1", 'orderBy' => 'main_category_code'));
 
 include '../inheader.php';
 include '../insidebar.php';
@@ -158,16 +166,11 @@ include '../insidebar.php';
 
 <?php
 // ── حساب إحصائيات سريعة
-$_st_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes");
-$stat_total  = $_st_res ? (mysqli_fetch_assoc($_st_res)['c'] ?? null) : null;
-$_sa_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE status=1");
-$stat_active = $_sa_res ? (mysqli_fetch_assoc($_sa_res)['c'] ?? null) : null;
-$_se1_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=1 AND status=1");
-$stat_eq1    = $_se1_res ? (mysqli_fetch_assoc($_se1_res)['c'] ?? null) : null;
-$_se2_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=2 AND status=1");
-$stat_eq2    = $_se2_res ? (mysqli_fetch_assoc($_se2_res)['c'] ?? null) : null;
-$_se3_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=3 AND status=1");
-$stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
+$stat_total  = $fc_gate->count('failure_codes');
+$stat_active = $fc_gate->count('failure_codes', array('whereRaw' => "status = 1"));
+$stat_eq1    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_type = 1 AND status = 1"));
+$stat_eq2    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_type = 2 AND status = 1"));
+$stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_type = 3 AND status = 1"));
 ?>
 
 <div class="main fc-page ems-unified-page-shell">
@@ -362,24 +365,24 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
                     <label class="fc-filter-label">نوع الحدث</label>
                     <select name="f_evt" onchange="this.form.submit()">
                         <option value="">-- الكل --</option>
-                        <?php if ($evt_list): while ($e = mysqli_fetch_assoc($evt_list)): ?>
+                        <?php foreach ($evt_list_rows as $e): ?>
                             <option value="<?= htmlspecialchars($e['event_type_code']) ?>"
                                 <?= $filter_evt === $e['event_type_code'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($e['event_type_code'] . ' — ' . $e['event_type_name']) ?>
                             </option>
-                        <?php endwhile; endif; ?>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div>
                     <label class="fc-filter-label">الفئة الرئيسية</label>
                     <select name="f_mc" onchange="this.form.submit()">
                         <option value="">-- الكل --</option>
-                        <?php if ($mc_list): while ($m = mysqli_fetch_assoc($mc_list)): ?>
+                        <?php foreach ($mc_list_rows as $m): ?>
                             <option value="<?= htmlspecialchars($m['main_category_code']) ?>"
                                 <?= $filter_mc === $m['main_category_code'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($m['main_category_code'] . ' — ' . $m['main_category_name']) ?>
                             </option>
-                        <?php endwhile; endif; ?>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <?php if ($filter_eq || $filter_evt || $filter_mc): ?>
@@ -419,8 +422,8 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
                         3 => '<span class="badge-eq-3"><i class="fas fa-cogs"></i> خرامة</span>',
                     ];
                     $i = 1;
-                    if ($list_result && mysqli_num_rows($list_result) > 0):
-                        while ($row = mysqli_fetch_assoc($list_result)):
+                    if (!empty($list_rows)):
+                        foreach ($list_rows as $row):
                             $is_active = $row['status'] == 1;
                     ?>
                         <tr>
@@ -466,7 +469,7 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
                                 </div>
                             </td>
                         </tr>
-                    <?php endwhile; else: ?>
+                    <?php endforeach; else: ?>
                         <tr><td colspan="11" class="text-center py-4">لا توجد أكواد للعرض</td></tr>
                     <?php endif; ?>
                     </tbody>
