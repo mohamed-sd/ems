@@ -30,19 +30,13 @@ $trigger_bases = array('ساعات', 'زمن');
 $states = array('نشطة', 'متوقفة');
 
 function mnt_fetch_plan($conn, $id, $company_id, $is_super_admin) {
-    $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-    $res = mysqli_query($conn, "SELECT * FROM mnt_plan WHERE id = " . intval($id) . " AND COALESCE(is_deleted,0)=0" . $scope . " LIMIT 1");
-    return $res ? mysqli_fetch_assoc($res) : null;
+    // عبر البوابة: العزل بالشركة يُحقن؛ super→كل الشركات؛ is_deleted مستبعَد تلقائيًّا
+    $g = $is_super_admin ? ems_tenant_db()->forAllTenants('preventive plan super view') : ems_tenant_db();
+    return $g->selectOne('mnt_plan', array('where' => array('id' => intval($id))));
 }
 
 function mnt_pl_task_count($conn, $pid, $company_id) {
-    $c = 0;
-    if ($cs = mysqli_prepare($conn, "SELECT COUNT(*) c FROM mnt_plan_task WHERE plan_id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($cs, 'ii', $pid, $company_id); mysqli_stmt_execute($cs);
-        $cr = mysqli_stmt_get_result($cs); if ($cr && ($x = mysqli_fetch_assoc($cr))) { $c = intval($x['c']); }
-        mysqli_stmt_close($cs);
-    }
-    return $c;
+    return ems_tenant_db()->count('mnt_plan_task', array('where' => array('plan_id' => intval($pid))));
 }
 function mnt_pl_json($data) {
     while (ob_get_level()) { ob_end_clean(); }
@@ -65,26 +59,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
         $task_type = !empty($_POST['task_type']) ? intval($_POST['task_type']) : null;
         $component = trim($_POST['component'] ?? '');
         $est_hours = floatval($_POST['est_hours'] ?? 0);
-        $taskId = 0;
-        if ($stmt = mysqli_prepare($conn, "INSERT INTO mnt_plan_task (company_id, plan_id, name, task_type, component, est_hours) VALUES (?,?,?,?,?,?)")) {
-            mysqli_stmt_bind_param($stmt, 'iisisd', $company_id, $pid, $name, $task_type, $component, $est_hours);
-            mysqli_stmt_execute($stmt); $taskId = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-        }
+        $taskId = ems_tenant_db()->insert('mnt_plan_task', array(
+            'plan_id' => $pid, 'name' => $name, 'task_type' => $task_type,
+            'component' => $component, 'est_hours' => $est_hours));
         $type_name = '';
-        if ($task_type && ($ts = mysqli_prepare($conn, "SELECT name FROM mnt_lookup WHERE id=? AND company_id=?"))) {
-            mysqli_stmt_bind_param($ts, 'ii', $task_type, $company_id); mysqli_stmt_execute($ts);
-            $tr = mysqli_stmt_get_result($ts); if ($tr && ($x = mysqli_fetch_assoc($tr))) { $type_name = $x['name']; }
-            mysqli_stmt_close($ts);
+        if ($task_type) {
+            $lk = ems_tenant_db()->selectOne('mnt_lookup', array('columns' => array('name'), 'where' => array('id' => $task_type)));
+            $type_name = $lk ? $lk['name'] : '';
         }
         mnt_pl_json(array('success' => true, 'task' => array('id' => $taskId, 'name' => $name, 'type_name' => $type_name, 'component' => $component, 'est_hours' => $est_hours), 'count' => mnt_pl_task_count($conn, $pid, $company_id)));
     }
 
     if ($_POST['action'] === 'del_task') {
         $tid = intval($_POST['task_id'] ?? 0);
-        if ($stmt = mysqli_prepare($conn, "DELETE FROM mnt_plan_task WHERE id=? AND plan_id=? AND company_id=?")) {
-            mysqli_stmt_bind_param($stmt, 'iii', $tid, $pid, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
+        // حذف صلبٌ لصفٍّ واحد عبر deleteChild (نطاق مزدوج: الشركة + الأب المملوك)
+        ems_tenant_db()->deleteChild('mnt_plan_task', $tid, 'mnt_plan', $pid, 'plan_id', 'plan task delete (ajax)');
         mnt_pl_json(array('success' => true, 'count' => mnt_pl_task_count($conn, $pid, $company_id)));
     }
 }
@@ -116,17 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_p
     }
 
     $code = mnt_next_code($conn, 'mnt_plan', 'PLN', $company_id);
-    $new_id = 0;
-    $sql = "INSERT INTO mnt_plan (company_id, code, name, equipment_id, category_id, trigger_basis, interval_value, last_done_date, last_done_meter, next_due_date, next_due_meter, state, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'نشطة', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // i s s i i s i s d s d i
-        $tp = 'issiis' . 'isdsd' . 'i';
-        mysqli_stmt_bind_param($stmt, $tp,
-            $company_id, $code, $name, $equipment_id, $category_id, $trigger_basis, $interval_value,
-            $last_done_date, $last_done_meter, $next_due_date, $next_due_meter, $current_user_id);
-        mysqli_stmt_execute($stmt); $new_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-    }
+    $new_id = ems_tenant_db()->insert('mnt_plan', array(
+        'code' => $code, 'name' => $name, 'equipment_id' => $equipment_id, 'category_id' => $category_id,
+        'trigger_basis' => $trigger_basis, 'interval_value' => $interval_value,
+        'last_done_date' => $last_done_date, 'last_done_meter' => $last_done_meter,
+        'next_due_date' => $next_due_date, 'next_due_meter' => $next_due_meter,
+        'state' => 'نشطة', 'created_by' => $current_user_id));
     header("Location: preventive_plans.php?id=" . intval($new_id) . "&msg=تم+إنشاء+الخطة+✅"); exit();
 }
 
@@ -152,18 +136,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
 
     if ($name === '') { $name = 'خطة بلا اسم'; }
 
-    $sql = "UPDATE mnt_plan SET name=?, scope=?, equipment_id=?, category_id=?, trigger_basis=?,
-                interval_value=?, tolerance=?, last_done_date=?, last_done_meter=?, next_due_date=?, next_due_meter=?, state=?
-             WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // s s i i s | i i s d s | d s | i i
-        $tp = 'ssiis' . 'iisds' . 'ds' . 'ii';
-        mysqli_stmt_bind_param($stmt, $tp,
-            $name, $scope, $equipment_id, $category_id, $trigger_basis,
-            $interval_value, $tolerance, $last_done_date, $last_done_meter, $next_due_date, $next_due_meter, $state,
-            $pid, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->update('mnt_plan', array(
+        'name' => $name, 'scope' => $scope, 'equipment_id' => $equipment_id, 'category_id' => $category_id,
+        'trigger_basis' => $trigger_basis, 'interval_value' => $interval_value, 'tolerance' => $tolerance,
+        'last_done_date' => $last_done_date, 'last_done_meter' => $last_done_meter,
+        'next_due_date' => $next_due_date, 'next_due_meter' => $next_due_meter, 'state' => $state,
+    ), array('id' => $pid));
     header("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تم+حفظ+الخطة+✅"); exit();
 }
 
@@ -177,9 +155,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_t
         $task_type = !empty($_POST['task_type']) ? intval($_POST['task_type']) : null;
         $component = trim($_POST['component'] ?? '');
         $est_hours = floatval($_POST['est_hours'] ?? 0);
-        if ($name !== '' && ($stmt = mysqli_prepare($conn, "INSERT INTO mnt_plan_task (company_id, plan_id, name, task_type, component, est_hours) VALUES (?,?,?,?,?,?)"))) {
-            mysqli_stmt_bind_param($stmt, 'iisisd', $company_id, $pid, $name, $task_type, $component, $est_hours);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        if ($name !== '') {
+            ems_tenant_db()->insert('mnt_plan_task', array(
+                'plan_id' => $pid, 'name' => $name, 'task_type' => $task_type,
+                'component' => $component, 'est_hours' => $est_hours));
         }
     }
     header("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تمت+إضافة+المهمة+✅"); exit();
@@ -187,10 +166,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_t
 if (isset($_GET['del_task'], $_GET['plan_id'])) {
     if ($can_edit) {
         $tid = intval($_GET['del_task']); $pid = intval($_GET['plan_id']);
-        if ($stmt = mysqli_prepare($conn, "DELETE FROM mnt_plan_task WHERE id=? AND plan_id=? AND company_id=?")) {
-            mysqli_stmt_bind_param($stmt, 'iii', $tid, $pid, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
+        // حذف صلبٌ لصفٍّ واحد عبر deleteChild (نطاق مزدوج: الشركة + الأب المملوك)
+        ems_tenant_db()->deleteChild('mnt_plan_task', $tid, 'mnt_plan', $pid, 'plan_id', 'plan task delete');
         header("Location: preventive_plans.php?id=" . $pid . "&msg=تم+حذف+المهمة+✅"); exit();
     }
 }
@@ -203,13 +180,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
     if (!$plan) { header("Location: preventive_plans.php?msg=الخطة+غير+موجودة+❌"); exit(); }
     $code = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
     $eq = $plan['equipment_id'] !== null ? intval($plan['equipment_id']) : null;
-    $new_id = 0;
-    $sql = "INSERT INTO mnt_order (company_id, code, plan_id, equipment_id, source, maint_type, state, created_by)
-            VALUES (?, ?, ?, ?, 'وقائي', 'صيانة وقائية', 'بلاغ', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isiii', $company_id, $code, $pid, $eq, $current_user_id);
-        mysqli_stmt_execute($stmt); $new_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-    }
+    $new_id = ems_tenant_db()->insert('mnt_order', array(
+        'code' => $code, 'plan_id' => $pid, 'equipment_id' => $eq,
+        'source' => 'وقائي', 'maint_type' => 'صيانة وقائية', 'state' => 'بلاغ', 'created_by' => $current_user_id));
     header("Location: orders.php?id=" . intval($new_id) . "&msg=تم+توليد+أمر+وقائي+من+الخطة+✅"); exit();
 }
 
@@ -217,10 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $did = intval($_GET['delete_id']);
-    if ($stmt = mysqli_prepare($conn, "UPDATE mnt_plan SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?")) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $did, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    ems_tenant_db()->softDelete('mnt_plan', $did); // حذف ناعم معزول بالشركة تلقائيًّا
     header("Location: preventive_plans.php?msg=تم+حذف+الخطة+✅"); exit();
 }
 
@@ -229,9 +199,10 @@ $plan = $edit_id > 0 ? mnt_fetch_plan($conn, $edit_id, $company_id, $is_super_ad
 
 $equipments = array(); $categories = array(); $task_types = array();
 if ($plan || $edit_id === 0) {
-    $cscope = $is_super_admin ? "1=1" : "company_id = " . intval($company_id);
-    if ($r = mysqli_query($conn, "SELECT id, name, code FROM equipments WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $equipments[] = $x; }
-    if ($r = mysqli_query($conn, "SELECT id, type FROM equipments_types WHERE status='active' ORDER BY type")) { while ($x = mysqli_fetch_assoc($r)) $categories[] = $x; }
+    $mnt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('preventive plans super view') : ems_tenant_db();
+    $equipments = $mnt_gate->select('equipments', array('columns' => array('id', 'name', 'code'), 'orderBy' => 'name'));
+    // equipments_types عامّ (لا عزل شركة)
+    $categories = $mnt_gate->select('equipments_types', array('columns' => array('id', 'type'), 'where' => array('status' => 'active'), 'orderBy' => 'type'));
     $task_types = mnt_lookup_options($conn, $company_id, 'نوع مهمة');
 }
 
@@ -253,11 +224,12 @@ function mnt_opt($value, $label, $selected) {
     <?php endif; ?>
 
 <?php if ($plan): // ── تحرير خطة ──
-    $tasks = array();
-    if ($s = mysqli_prepare($conn, "SELECT t.id, t.name, t.component, t.est_hours, lk.name AS task_type_name FROM mnt_plan_task t LEFT JOIN mnt_lookup lk ON lk.id=t.task_type WHERE t.plan_id=? AND t.company_id=? ORDER BY t.id")) {
-        mysqli_stmt_bind_param($s, 'ii', $edit_id, $company_id); mysqli_stmt_execute($s);
-        $rr = mysqli_stmt_get_result($s); while ($rr && $x = mysqli_fetch_assoc($rr)) $tasks[] = $x; mysqli_stmt_close($s);
-    }
+    // مهام الخطة عبر scopedQuery (§10): عزل على t + إثراء LEFT بأسماء الأنواع
+    $tasks = ($is_super_admin ? ems_tenant_db()->forAllTenants('plan tasks super view') : ems_tenant_db())->scopedQuery(
+        array('scope' => array('t' => 'mnt_plan_task'), 'enrich' => array('lk' => 'mnt_lookup')),
+        "SELECT t.id, t.name, t.component, t.est_hours, lk.name AS task_type_name
+         FROM mnt_plan_task t LEFT JOIN mnt_lookup lk ON lk.id=t.task_type
+         WHERE {TENANT_SCOPE} AND t.plan_id=? ORDER BY t.id", array($edit_id));
     // العدّاد الحالي من التايم‌شيت
     $current_meter = $plan['equipment_id'] ? mnt_equipment_actual_hours($conn, intval($plan['equipment_id']), $company_id) : 0;
 ?>
@@ -404,14 +376,14 @@ function mnt_opt($value, $label, $selected) {
     </form>
     <?php endif; ?>
 <?php
-    // جلب الخطط النشطة وحساب الاستحقاق
-    $rows = array();
-    $sql = "SELECT pl.*, e.name AS equipment_name, ct.type AS category_name FROM mnt_plan pl
-             LEFT JOIN equipments e ON e.id = pl.equipment_id
-             LEFT JOIN equipments_types ct ON ct.id = pl.category_id
-            WHERE $company_scope_sql AND COALESCE(pl.is_deleted,0)=0
-            ORDER BY pl.id DESC";
-    if ($res = mysqli_query($conn, $sql)) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
+    // جلب الخطط النشطة عبر scopedQuery (§10): عزل على pl + إثراء LEFT (equipments_types عامّ)
+    $rows = ($is_super_admin ? ems_tenant_db()->forAllTenants('preventive plans list super') : ems_tenant_db())->scopedQuery(
+        array('scope' => array('pl' => 'mnt_plan'), 'enrich' => array('e' => 'equipments')),
+        "SELECT pl.*, e.name AS equipment_name, ct.type AS category_name FROM mnt_plan pl
+         LEFT JOIN equipments e ON e.id = pl.equipment_id
+         LEFT JOIN equipments_types ct ON ct.id = pl.category_id
+         WHERE {TENANT_SCOPE} AND COALESCE(pl.is_deleted,0)=0
+         ORDER BY pl.id DESC");
 
     $today = date('Y-m-d');
     $due_rows = array();
