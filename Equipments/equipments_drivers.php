@@ -65,34 +65,17 @@ if (!$equipments_has_company) {
     $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
 }
 
-if ($equipments_has_company && $suppliers_has_company) {
-    @mysqli_query(
-        $conn,
-        "UPDATE equipments m
-         INNER JOIN suppliers s ON s.id = m.suppliers
-         SET m.company_id = s.company_id
-         WHERE (m.company_id IS NULL OR m.company_id = 0)
-           AND s.company_id IS NOT NULL
-           AND s.company_id > 0"
-    );
-}
+// ملاحظة عزل (هجرة البوابة · 2026-07-13): كان هنا UPDATE عابرٌ للشركات يملأ
+// equipments.company_id من المورّد عند كل تحميل صفحة (نسخة من equipments.php).
+// أُزيل للسبب نفسه: العمود مملوءٌ كليًّا ويُحقَن آليًّا عند الإدراج عبر البوابة.
 
 if (!$is_super_admin && !$equipments_has_company) {
     die('تعذر تفعيل عزل الشركات لجدول المعدات');
 }
 
-$project_scope_sql = "1=1";
-if (!$is_super_admin) {
-    $project_scope_sql = "(
-        EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $company_id)
-        OR EXISTS (
-            SELECT 1
-            FROM clients sc
-            INNER JOIN users scu ON scu.id = sc.created_by
-            WHERE sc.id = project.company_client_id AND scu.company_id = $company_id
-        )
-    )";
-}
+// بوابة العزل لهذه الشاشة (نفس نمط equipments.php): غيرُ السوبر → شركتُه؛
+// السوبر → عرضٌ عابرٌ مُسجَّل.
+$eq_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('equipments_drivers super view') : ems_tenant_db();
 
 // ════════════════════════════════════════════════════════════════════════════
 // 🔐 التحقق من صلاحيات المستخدم
@@ -158,17 +141,19 @@ if ($is_role10) {
 
 $selected_project = null;
 if ($selected_project_id > 0) {
-    $project_check_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = '1' AND $project_scope_sql";
-    $project_check_result = mysqli_query($conn, $project_check_query);
-    if ($project_check_result && mysqli_num_rows($project_check_result) > 0) {
-        $selected_project = mysqli_fetch_assoc($project_check_result);
-    } else {
+    // فحص ملكية المشروع المختار ضمن نطاق العزل (كان احتياطي created_by المكسور)
+    $selected_project = $eq_gate->selectOne('project', array(
+        'columns'  => array('id', 'name', 'project_code'),
+        'whereRaw' => "id = ? AND status = '1'",
+        'params'   => array($selected_project_id),
+    ));
+    if ($selected_project === null) {
         unset($_SESSION['equipments_project_id']);
         $selected_project_id = 0;
     }
 }
 
-$projects_result = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' AND $project_scope_sql ORDER BY name");
+// (أُزيل استعلام قائمة المشاريع الميت — نتيجته لم تكن تُقرأ في أي موضع.)
 
 $page_title = "إدارة المعدات";
 include("../inheader.php");
@@ -199,85 +184,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         goto skip_save;
     }
     
-    // الحقول الأساسية
-    $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
-    $code      = mysqli_real_escape_string($conn, trim($_POST['code']));
-    $type      = mysqli_real_escape_string($conn, $_POST['type']);
-    $name      = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $status    = mysqli_real_escape_string($conn, $_POST['status']);
+    // قيمٌ خام للبوابة (نفس نمط equipments.php) — الربط بالمعاملات يتكفّل بالهروب،
+    // والحقول الفارغة القابلة للإلغاء تُمرَّر NULL حقيقيًّا لا نصًّا 'NULL'.
     $edit_id   = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
-    
-    // المعلومات الأساسية والتعريفية
-    $serial_number = mysqli_real_escape_string($conn, trim($_POST['serial_number'] ?? ''));
-    $chassis_number = mysqli_real_escape_string($conn, trim($_POST['chassis_number'] ?? ''));
-    
-    // بيانات الصنع والموديل
-    $manufacturer = mysqli_real_escape_string($conn, trim($_POST['manufacturer'] ?? ''));
-    $model = mysqli_real_escape_string($conn, trim($_POST['model'] ?? ''));
-    $manufacturing_year = !empty($_POST['manufacturing_year']) ? intval($_POST['manufacturing_year']) : 'NULL';
-    $import_year = !empty($_POST['import_year']) ? intval($_POST['import_year']) : 'NULL';
-    
-    // الحالة الفنية والمواصفات
-    $equipment_condition = mysqli_real_escape_string($conn, $_POST['equipment_condition'] ?? 'في حالة جيدة');
-    $operating_hours = !empty($_POST['operating_hours']) ? intval($_POST['operating_hours']) : 'NULL';
-    $engine_condition = mysqli_real_escape_string($conn, $_POST['engine_condition'] ?? 'جيدة');
-    $tires_condition = mysqli_real_escape_string($conn, $_POST['tires_condition'] ?? 'N/A');
-    
-    // بيانات الملكية
-    $actual_owner_name = mysqli_real_escape_string($conn, trim($_POST['actual_owner_name'] ?? ''));
-    $owner_type = mysqli_real_escape_string($conn, $_POST['owner_type'] ?? '');
-    $owner_phone = mysqli_real_escape_string($conn, trim($_POST['owner_phone'] ?? ''));
-    $owner_supplier_relation = mysqli_real_escape_string($conn, $_POST['owner_supplier_relation'] ?? '');
-    
-    // الوثائق والتسجيلات
-    $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
-    $license_authority = mysqli_real_escape_string($conn, trim($_POST['license_authority'] ?? ''));
-    $license_expiry_date = !empty($_POST['license_expiry_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['license_expiry_date']) . "'" : 'NULL';
-    $inspection_certificate_number = mysqli_real_escape_string($conn, trim($_POST['inspection_certificate_number'] ?? ''));
-    $last_inspection_date = !empty($_POST['last_inspection_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_inspection_date']) . "'" : 'NULL';
-    
-    // الموقع والتوفر
-    $current_location = mysqli_real_escape_string($conn, trim($_POST['current_location'] ?? ''));
-    $availability_status = mysqli_real_escape_string($conn, $_POST['availability_status'] ?? 'متاحة للعمل');
-    
-    // البيانات المالية والقيمة
-    $estimated_value = !empty($_POST['estimated_value']) ? floatval($_POST['estimated_value']) : 'NULL';
-    $daily_rental_price = !empty($_POST['daily_rental_price']) ? floatval($_POST['daily_rental_price']) : 'NULL';
-    $monthly_rental_price = !empty($_POST['monthly_rental_price']) ? floatval($_POST['monthly_rental_price']) : 'NULL';
-    $insurance_status = mysqli_real_escape_string($conn, $_POST['insurance_status'] ?? '');
-    
-    // ملاحظات وسجل الصيانة
-    $general_notes = mysqli_real_escape_string($conn, trim($_POST['general_notes'] ?? ''));
-    $last_maintenance_date = !empty($_POST['last_maintenance_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_maintenance_date']) . "'" : 'NULL';
+    $suppliers = isset($_POST['suppliers']) ? $_POST['suppliers'] : '';   // يُستعمل أيضًا في فحص العقد
+    $type      = isset($_POST['type']) ? $_POST['type'] : '';
+
+    $S  = function ($k) { return trim($_POST[$k] ?? ''); };
+    $D  = function ($k, $def) { return isset($_POST[$k]) ? $_POST[$k] : $def; };
+    $Ni = function ($k) { return !empty($_POST[$k]) ? intval($_POST[$k]) : null; };
+    $Nf = function ($k) { return !empty($_POST[$k]) ? floatval($_POST[$k]) : null; };
+    $Nd = function ($k) { return !empty($_POST[$k]) ? $_POST[$k] : null; };
+
+    $data = array(
+        'suppliers'                     => $suppliers,
+        'code'                          => $S('code'),
+        'type'                          => $type,
+        'name'                          => $S('name'),
+        'status'                        => $D('status', ''),
+        'serial_number'                 => $S('serial_number'),
+        'chassis_number'                => $S('chassis_number'),
+        'manufacturer'                  => $S('manufacturer'),
+        'model'                         => $S('model'),
+        'manufacturing_year'            => $Ni('manufacturing_year'),
+        'import_year'                   => $Ni('import_year'),
+        'equipment_condition'           => $D('equipment_condition', 'في حالة جيدة'),
+        'operating_hours'               => $Ni('operating_hours'),
+        'engine_condition'              => $D('engine_condition', 'جيدة'),
+        'tires_condition'               => $D('tires_condition', 'N/A'),
+        'actual_owner_name'             => $S('actual_owner_name'),
+        'owner_type'                    => $D('owner_type', ''),
+        'owner_phone'                   => $S('owner_phone'),
+        'owner_supplier_relation'       => $D('owner_supplier_relation', ''),
+        'license_number'                => $S('license_number'),
+        'license_authority'             => $S('license_authority'),
+        'license_expiry_date'           => $Nd('license_expiry_date'),
+        'inspection_certificate_number' => $S('inspection_certificate_number'),
+        'last_inspection_date'          => $Nd('last_inspection_date'),
+        'current_location'              => $S('current_location'),
+        'availability_status'           => $D('availability_status', 'متاحة للعمل'),
+        'estimated_value'               => $Nf('estimated_value'),
+        'daily_rental_price'            => $Nf('daily_rental_price'),
+        'monthly_rental_price'          => $Nf('monthly_rental_price'),
+        'insurance_status'              => $D('insurance_status', ''),
+        'general_notes'                 => $S('general_notes'),
+        'last_maintenance_date'         => $Nd('last_maintenance_date'),
+    );
 
 
 
     // التحقق من عدم تجاوز العدد المتعاقد عليه (فقط عند الإضافة)
     if ($edit_id == 0  && $suppliers && $type) {
-        // الحصول على عدد المعدات المتعاقد عليها لهذا المورد ونوع المعدة
-        $supplier_contract_query = "SELECT sc.id, sce.equip_count
-                                   FROM supplierscontracts sc
-                                   JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
-                                   WHERE sc.supplier_id = $suppliers 
-                                   AND sce.equip_type = '$type'
-                                   AND sc.status = 1
-                                   LIMIT 1";
-        $supplier_contract_result = mysqli_query($conn, $supplier_contract_query);
-        
-        if ($supplier_contract_result && mysqli_num_rows($supplier_contract_result) > 0) {
-            $supplier_contract = mysqli_fetch_assoc($supplier_contract_result);
-            $contracted_count = intval($supplier_contract['equip_count']);
-            
-            // حساب عدد المعدات المضافة حالياً
-            $added_count_query = "SELECT COUNT(*) as added_count 
-                                 FROM equipments 
-                                 WHERE suppliers = $suppliers 
-                                 AND type = '$type'
-                                 AND status = 1";
-            $added_count_result = mysqli_query($conn, $added_count_query);
-            $added_count_row = $added_count_result ? mysqli_fetch_assoc($added_count_result) : null;
-            $current_added = intval($added_count_row['added_count'] ?? 0);
-            
+        // عقد المورّد لهذا النوع (معزولًا) — نفس نمط equipments.php
+        $contract_rows = $eq_gate->scopedQuery(array(
+            'scope'  => array('sc' => 'supplierscontracts'),
+            'enrich' => array('sce' => 'suppliercontractequipments'),
+        ),
+            "SELECT sc.id, sce.equip_count
+               FROM supplierscontracts sc
+               LEFT JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
+              WHERE {TENANT_SCOPE}
+                AND sc.supplier_id = ?
+                AND sce.equip_type = ?
+                AND sc.status = 1
+                AND sce.id IS NOT NULL
+              LIMIT 1",
+            array($suppliers, $type)
+        );
+
+        if (!empty($contract_rows)) {
+            $contracted_count = intval($contract_rows[0]['equip_count']);
+
+            // عدد المعدات المضافة حاليًا لنفس المورّد والنوع (معزولًا عبر البوابة)
+            $current_added = $eq_gate->count('equipments', array(
+                'whereRaw' => "suppliers = ? AND type = ? AND status = 1",
+                'params'   => array($suppliers, $type),
+            ));
+
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
                 $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
@@ -286,79 +269,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         }
     }
 
-    if ($edit_id > 0) {
-        // تعديل
-        $scope_update = ($is_super_admin || !$equipments_has_company) ? "" : " AND company_id = $company_id";
-        $sql = "UPDATE equipments 
-                SET  
-                    suppliers='$suppliers', 
-                    code='$code', 
-                    type='$type', 
-                    name='$name', 
-                    status='$status',
-                    serial_number='$serial_number',
-                    chassis_number='$chassis_number',
-                    manufacturer='$manufacturer',
-                    model='$model',
-                    manufacturing_year=$manufacturing_year,
-                    import_year=$import_year,
-                    equipment_condition='$equipment_condition',
-                    operating_hours=$operating_hours,
-                    engine_condition='$engine_condition',
-                    tires_condition='$tires_condition',
-                    actual_owner_name='$actual_owner_name',
-                    owner_type='$owner_type',
-                    owner_phone='$owner_phone',
-                    owner_supplier_relation='$owner_supplier_relation',
-                    license_number='$license_number',
-                    license_authority='$license_authority',
-                    license_expiry_date=$license_expiry_date,
-                    inspection_certificate_number='$inspection_certificate_number',
-                    last_inspection_date=$last_inspection_date,
-                    current_location='$current_location',
-                    availability_status='$availability_status',
-                    estimated_value=$estimated_value,
-                    daily_rental_price=$daily_rental_price,
-                    monthly_rental_price=$monthly_rental_price,
-                    insurance_status='$insurance_status',
-                    general_notes='$general_notes',
-                    last_maintenance_date=$last_maintenance_date
-                WHERE id='$edit_id'$scope_update";
-        $msg = "تم+تعديل+المعدة+بنجاح+✅";
-    } else {
-        // إضافة
-        $insert_company_col = (!$is_super_admin && $equipments_has_company) ? ", company_id" : "";
-        $insert_company_val = (!$is_super_admin && $equipments_has_company) ? ", '$company_id'" : "";
-        $sql = "INSERT INTO equipments 
-                (suppliers, code, type, name, status, serial_number, chassis_number, 
-                 manufacturer, model, manufacturing_year, import_year, 
-                 equipment_condition, operating_hours, engine_condition, tires_condition,
-                 actual_owner_name, owner_type, owner_phone, owner_supplier_relation,
-                 license_number, license_authority, license_expiry_date, 
-                 inspection_certificate_number, last_inspection_date,
-                 current_location, availability_status,
-                 estimated_value, daily_rental_price, monthly_rental_price, insurance_status,
-             general_notes, last_maintenance_date$insert_company_col) 
-                VALUES 
-                ('$suppliers', '$code', '$type', '$name', '$status', '$serial_number', '$chassis_number',
-                 '$manufacturer', '$model', $manufacturing_year, $import_year,
-                 '$equipment_condition', $operating_hours, '$engine_condition', '$tires_condition',
-                 '$actual_owner_name', '$owner_type', '$owner_phone', '$owner_supplier_relation',
-                 '$license_number', '$license_authority', $license_expiry_date,
-                 '$inspection_certificate_number', $last_inspection_date,
-                 '$current_location', '$availability_status',
-                 $estimated_value, $daily_rental_price, $monthly_rental_price, '$insurance_status',
-             '$general_notes', $last_maintenance_date$insert_company_val)";
-        $msg = "تمت+إضافة+المعدة+بنجاح+✅";
-    }
-
-    if (mysqli_query($conn, $sql)) {
+    try {
+        // الإدراج/التعديل عبر البوابة (نفس نمط equipments.php): تُحقن company_id آليًّا
+        // وتُعزَل الكتابة بالشركة؛ الوجهة equipments.php كسلوك الأصل.
+        if ($edit_id > 0) {
+            $eq_gate->update('equipments', $data, array('id' => $edit_id));
+            $msg = "تم+تعديل+المعدة+بنجاح+✅";
+        } else {
+            $eq_gate->insert('equipments', $data);
+            $msg = "تمت+إضافة+المعدة+بنجاح+✅";
+        }
         header("Location: equipments.php?msg=$msg");
         exit;
-    } else {
-        $success_msg = "خطأ في الحفظ: " . mysqli_error($conn);
+    } catch (\Throwable $e) {
+        $success_msg = "خطأ في الحفظ: " . $e->getMessage();
     }
-    
+
     skip_save:
 }
 
@@ -368,10 +294,10 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     $success_msg = "❌ ليس لديك صلاحية لتعديل المعدات";
 } elseif (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     $editId = intval($_GET['edit']);
-    $scope_edit = ($is_super_admin || !$equipments_has_company) ? "" : " AND company_id = $company_id";
-    $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'$scope_edit");
-    if ($res && mysqli_num_rows($res) > 0) {
-        $editData = mysqli_fetch_assoc($res);
+    // جلب المعدة للتعديل ضمن نطاق العزل (السوبر: أيّ معدة)
+    $row = $eq_gate->selectOne('equipments', array('where' => array('id' => $editId)));
+    if ($row !== null) {
+        $editData = $row;
     }
 }
 ?>
@@ -436,15 +362,15 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <select name="suppliers" id="suppliers" required>
                             <option value="">-- اختر المورد --</option>
                             <?php
-                            $supplier_scope_sql = "status = 1";
-                            if (!$is_super_admin && $suppliers_has_company) {
-                                $supplier_scope_sql .= " AND company_id = $company_id";
-                            }
-                            $supplier_query = "SELECT id, name FROM suppliers WHERE $supplier_scope_sql ORDER BY name";
-                            $supplier_result = mysqli_query($conn, $supplier_query);
-                            if ($supplier_result) while($supplier = mysqli_fetch_assoc($supplier_result)) {
+                            // موردو الشركة (السوبر: الكل) عبر البوابة
+                            $supplier_rows = $eq_gate->select('suppliers', array(
+                                'columns'  => array('id', 'name'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'name ASC',
+                            ));
+                            foreach ($supplier_rows as $supplier) {
                                 $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
-                                echo "<option value='{$supplier['id']}' $selected>{$supplier['name']}</option>";
+                                echo "<option value='" . intval($supplier['id']) . "' $selected>" . htmlspecialchars($supplier['name']) . "</option>";
                             }
                             ?>
                         </select>
@@ -467,13 +393,15 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <select name="type" id="type" required>
                             <option value="">-- حدد نوع المعدة --</option>
                             <?php
-                            $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                            $type_result = mysqli_query($conn, $type_query);
-                            if ($type_result) {
-                                while($type_row = mysqli_fetch_assoc($type_result)) {
-                                    $selected = (!empty($editData) && $editData['type'] == $type_row['id']) ? 'selected' : '';
-                                    echo "<option value='" . intval($type_row['id']) . "' $selected>" . htmlspecialchars($type_row['type']) . "</option>";
-                                }
+                            // أنواع المعدات — كتالوج عام (managed) عبر البوابة
+                            $type_rows = $eq_gate->select('equipments_types', array(
+                                'columns'  => array('id', 'type'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'type ASC',
+                            ));
+                            foreach ($type_rows as $type_row) {
+                                $selected = (!empty($editData) && $editData['type'] == $type_row['id']) ? 'selected' : '';
+                                echo "<option value='" . intval($type_row['id']) . "' $selected>" . htmlspecialchars($type_row['type']) . "</option>";
                             }
                             ?>
                         </select>
@@ -878,13 +806,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <select id="filterSupplier" class="filter-select">
                             <option value="">— جميع الموردين —</option>
                             <?php
-                            $supplier_filter_scope_sql = "status = 1";
-                            if (!$is_super_admin && $suppliers_has_company) {
-                                $supplier_filter_scope_sql .= " AND company_id = $company_id";
-                            }
-                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE $supplier_filter_scope_sql ORDER BY name";
-                            $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
-                            if ($supplier_filter_result) while($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
+                            // فلتر الموردين — نفس مصدر البوابة المعزول
+                            $supplier_filter_rows = $eq_gate->select('suppliers', array(
+                                'columns'  => array('id', 'name'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'name ASC',
+                            ));
+                            foreach ($supplier_filter_rows as $supplier) {
                                 echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
                             }
                             ?>
@@ -896,9 +824,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <select id="filterType" class="filter-select">
                             <option value="">— جميع الأنواع —</option>
                             <?php
-                            $type_filter_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                            $type_filter_result = mysqli_query($conn, $type_filter_query);
-                            if ($type_filter_result) while($type_row = mysqli_fetch_assoc($type_filter_result)) {
+                            // فلتر الأنواع — كتالوج عام عبر البوابة
+                            $type_filter_rows = $eq_gate->select('equipments_types', array(
+                                'columns'  => array('id', 'type'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'type ASC',
+                            ));
+                            foreach ($type_filter_rows as $type_row) {
                                 echo "<option value='" . htmlspecialchars($type_row['type']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
                             }
                             ?>
@@ -978,23 +910,23 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 </thead>
                 <tbody>
                     <?php
-                    $equipment_scope_where = "1=1";
-                    if (!$is_super_admin) {
-                        $equipment_scope_where = "m.company_id = $company_id";
-                    } elseif ($selected_project_id > 0) {
-                        $equipment_scope_where = "EXISTS (
-                            SELECT 1 FROM operations so
-                            WHERE so.equipment = m.id AND so.project_id = $selected_project_id
-                        )";
+                    // العزل مسؤولية البوابة عبر {TENANT_SCOPE} (نفس نمط equipments.php):
+                    // JOIN المورّد الداخلي → LEFT + s.id IS NOT NULL؛ فلترُ مشروع السوبر
+                    // يُلحَق بعد الرمز عبر EXISTS على operations (المعلَنة إثراءً).
+                    $list_extra  = " AND s.id IS NOT NULL";
+                    $list_params = array();
+                    if ($is_super_admin && $selected_project_id > 0) {
+                        $list_extra .= " AND EXISTS (SELECT 1 FROM operations so WHERE so.equipment = m.id AND so.project_id = ?)";
+                        $list_params[] = $selected_project_id;
                     }
 
-                    $query2 = "
-                        SELECT 
-                            m.id, 
-                            s.name AS supplier_name, 
-                            m.type, 
-                            m.code, 
-                            m.name, 
+                    $list_sql = "
+                        SELECT
+                            m.id,
+                            s.name AS supplier_name,
+                            m.type,
+                            m.code,
+                            m.name,
                             m.status,
                             m.serial_number,
                             m.model,
@@ -1003,26 +935,29 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             m.actual_owner_name,
                             m.availability_status,
                             " . ($equipment_has_availability_state ? "m.availability_state," : "NULL AS availability_state,") . "
-                            o.project_id, 
+                            o.project_id,
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
-                        JOIN suppliers s ON m.suppliers = s.id
-                        LEFT JOIN operations o 
-                            ON o.equipment = m.id 
+                        LEFT JOIN suppliers s ON m.suppliers = s.id
+                        LEFT JOIN operations o
+                            ON o.equipment = m.id
                             AND o.status = '1'
-                        LEFT JOIN equipment_drivers ed 
+                        LEFT JOIN equipment_drivers ed
                             ON ed.equipment_id = m.id
-                        LEFT JOIN employees d 
-                            ON d.id = ed.employee_id 
+                        LEFT JOIN employees d
+                            ON d.id = ed.employee_id
                             AND ed.status = '1'
-                        WHERE $equipment_scope_where
+                        WHERE {TENANT_SCOPE}$list_extra
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
-                    $result = mysqli_query($conn, $query2);
+                    $rows = $eq_gate->scopedQuery(array(
+                        'scope'  => array('m' => 'equipments'),
+                        'enrich' => array('s' => 'suppliers', 'o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees'),
+                    ), $list_sql, $list_params);
                     $i = 1;
-                    if ($result) while ($row = mysqli_fetch_assoc($result)) {
+                    foreach ($rows as $row) {
                         echo "<tr>";
                         echo "<td><strong>" . $i++ . "</strong></td>";
                         echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
@@ -1044,9 +979,11 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         
                         // المشروع النشط
                         if (!empty($row['project'])) {
-                            $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . $row['project'] . "'");
-                            if ($p_res && mysqli_num_rows($p_res) > 0) {
-                                $p = mysqli_fetch_assoc($p_res);
+                            $p = $eq_gate->selectOne('project', array(
+                                'columns' => array('name'),
+                                'where'   => array('id' => $row['project']),
+                            ));
+                            if ($p !== null) {
                                 $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
                             }
                         }
