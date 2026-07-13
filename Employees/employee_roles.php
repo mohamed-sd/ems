@@ -25,8 +25,8 @@ $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+أدوار+الموظفين+❌"); exit(); }
 
-$new_company_id = $is_super_admin ? null : $company_id;
-$manage_scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id) . " ";
+// بوابة العزل — بعد M6 نمط «عامّ أو مِلكي» يكافئ عزل البوابة (توأم job_titles)
+$er_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('employee roles super manage') : ems_tenant_db();
 
 // ── إضافة / تعديل ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,22 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($name === '') {
         $error_msg = 'اسم الدور مطلوب ❌';
     } else {
-        if ($id > 0) {
-            if (!$can_edit) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-            $stmt = $conn->prepare("UPDATE employee_roles SET name=?, description=?, status=?, sort_order=? WHERE id=? $manage_scope");
-            $stmt->bind_param('ssiii', $name, $desc, $status, $sort_order, $id);
-        } else {
-            if (!$can_add) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-            $stmt = $conn->prepare("INSERT INTO employee_roles (company_id, name, description, status, sort_order) VALUES (?,?,?,?,?)");
-            $stmt->bind_param('issii', $new_company_id, $name, $desc, $status, $sort_order);
-        }
-        if ($stmt->execute()) {
+        $er_data = array('name' => $name, 'description' => $desc, 'status' => $status, 'sort_order' => $sort_order);
+        try {
+            if ($id > 0) {
+                if (!$can_edit) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+                $er_gate->update('employee_roles', $er_data, array('id' => $id));
+            } else {
+                if (!$can_add) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+                $er_gate->insert('employee_roles', $er_data);
+            }
             header("Location: employee_roles.php?msg=✅+تم+حفظ+الدور+بنجاح"); exit();
-        } else {
-            $dup = (strpos($conn->error, 'Duplicate') !== false);
-            $error_msg = $dup ? 'هذا الدور موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($conn->error) . ' ❌');
+        } catch (\Throwable $e) {
+            $dup = (strpos($e->getMessage(), 'Duplicate') !== false);
+            $error_msg = $dup ? 'هذا الدور موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($e->getMessage()) . ' ❌');
         }
-        $stmt->close();
     }
 }
 
@@ -63,16 +61,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $id = (int) $_GET['delete_id'];
-    $chk = $conn->prepare("SELECT COUNT(*) c FROM employees WHERE employee_role_id = ?");
-    $chk->bind_param('i', $id); $chk->execute();
-    $used = (int) $chk->get_result()->fetch_assoc()['c']; $chk->close();
+    // حارس الاستخدام معزول، والحذف الصلب عبر deleteRow
+    $used = 0; $ok = false;
+    try {
+        $used = $er_gate->count('employees', array('where' => array('employee_role_id' => $id)));
+        if ($used === 0) {
+            $ok = $er_gate->deleteRow('employee_roles', $id, 'employee role delete') > 0;
+        }
+    } catch (\Throwable $e) { /* غير مملوك → تعذّر */ }
     if ($used > 0) {
         header("Location: employee_roles.php?msg=لا+يمكن+حذف+دورٍ+مستخدمٍ+من+قِبل+$used+موظف+❌");
     } else {
-        $stmt = $conn->prepare("DELETE FROM employee_roles WHERE id = ? $manage_scope");
-        $stmt->bind_param('i', $id);
-        $ok = $stmt->execute(); $stmt->close();
-        header("Location: employee_roles.php?msg=" . ($ok ? "✅+تم+حذف+الدور" : "تعذّر+الحذف+(قد+يكون+دوراً+عامّاً)+❌"));
+        header("Location: employee_roles.php?msg=" . ($ok ? "✅+تم+حذف+الدور" : "تعذّر+الحذف+(خارج+نطاق+شركتك)+❌"));
     }
     exit();
 }
@@ -81,9 +81,10 @@ if (isset($_GET['delete_id'])) {
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT id, company_id, name, description, status, sort_order FROM employee_roles WHERE id = ?");
-    $stmt->bind_param('i', $id); $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc(); $stmt->close();
+    $editData = $er_gate->selectOne('employee_roles', array(
+        'columns' => array('id', 'company_id', 'name', 'description', 'status', 'sort_order'),
+        'where'   => array('id' => $id),
+    ));
 }
 
 $page_title = "إيكوبيشن | أدوار الموظفين";
@@ -155,12 +156,14 @@ include '../insidebar.php';
             </thead>
             <tbody>
             <?php
-            $where = $is_super_admin ? "1=1" : "(er.company_id IS NULL OR er.company_id = " . intval($company_id) . ")";
-            $sql = "SELECT er.*, (SELECT COUNT(*) FROM employees e WHERE e.employee_role_id = er.id) AS used_count
-                    FROM employee_roles er WHERE $where ORDER BY er.sort_order, er.name";
-            $res = mysqli_query($conn, $sql);
+            // القائمة معزولةً عبر البوابة (بعد M6)
+            $er_rows = $er_gate->scopedQuery(array(
+                'scope'  => array('er' => 'employee_roles'),
+                'enrich' => array('e' => 'employees'),
+            ), "SELECT er.*, (SELECT COUNT(*) FROM employees e WHERE e.employee_role_id = er.id) AS used_count
+                    FROM employee_roles er WHERE {TENANT_SCOPE} ORDER BY er.sort_order, er.name", array());
             $i = 1;
-            if ($res) { while ($row = mysqli_fetch_assoc($res)):
+            { foreach ($er_rows as $row):
                 $is_global  = ($row['company_id'] === null);
                 $can_manage = $is_super_admin || (!$is_global && intval($row['company_id']) === $company_id);
             ?>
@@ -183,8 +186,8 @@ include '../insidebar.php';
                     <td><?= $is_global ? '<span class="status-pill status-warning">عامّ</span>' : '<span class="status-pill status-active">الشركة</span>' ?></td>
                     <td><?= intval($row['status']) ? '<span class="status-pill status-active">نشط</span>' : '<span class="status-pill status-inactive">غير نشط</span>' ?></td>
                 </tr>
-            <?php endwhile; }
-            if (!$res || $i === 1): ?>
+            <?php endforeach; }
+            if (empty($er_rows)): ?>
                 <tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">لا توجد أدوار بعد.</td></tr>
             <?php endif; ?>
             </tbody>

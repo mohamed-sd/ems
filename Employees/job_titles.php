@@ -24,10 +24,9 @@ $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المسميات+الوظيفية+❌"); exit(); }
 
-// صفّ الشركة لإسناده عند الإضافة (NULL للمشرف العام = مسمّى عامّ)
-$new_company_id = $is_super_admin ? null : $company_id;
-// شرط قابلية الإدارة (تعديل/حذف): المشرف العام يدير الكل؛ الشركة تدير صفوفها فقط (لا تلمس العامّ)
-$manage_scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id) . " ";
+// بوابة العزل — بعد تعبئة M6 لا صفوف عامّة (NULL)، فنمط «عامّ أو مِلكي» القديم
+// يكافئ عزل البوابة المباشر. السوبر → عابرٌ مُسجَّل يدير الكل.
+$jt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('job titles super manage') : ems_tenant_db();
 
 // ── إضافة / تعديل ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,22 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($name === '') {
         $error_msg = 'اسم المسمى الوظيفي مطلوب ❌';
     } else {
-        if ($id > 0) {
-            if (!$can_edit) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-            $stmt = $conn->prepare("UPDATE job_titles SET name=?, description=?, is_operator=?, status=?, sort_order=? WHERE id=? $manage_scope");
-            $stmt->bind_param('ssiiii', $name, $desc, $is_operator, $status, $sort_order, $id);
-        } else {
-            if (!$can_add) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-            $stmt = $conn->prepare("INSERT INTO job_titles (company_id, name, description, is_operator, status, sort_order) VALUES (?,?,?,?,?,?)");
-            $stmt->bind_param('issiii', $new_company_id, $name, $desc, $is_operator, $status, $sort_order);
-        }
-        if ($stmt->execute()) {
+        $jt_data = array('name' => $name, 'description' => $desc, 'is_operator' => $is_operator, 'status' => $status, 'sort_order' => $sort_order);
+        try {
+            if ($id > 0) {
+                if (!$can_edit) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+                $jt_gate->update('job_titles', $jt_data, array('id' => $id));
+            } else {
+                if (!$can_add) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+                $jt_gate->insert('job_titles', $jt_data);
+            }
             header("Location: job_titles.php?msg=✅+تم+حفظ+المسمى+الوظيفي+بنجاح"); exit();
-        } else {
-            $dup = (strpos($conn->error, 'Duplicate') !== false);
-            $error_msg = $dup ? 'هذا المسمى موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($conn->error) . ' ❌');
+        } catch (\Throwable $e) {
+            $dup = (strpos($e->getMessage(), 'Duplicate') !== false);
+            $error_msg = $dup ? 'هذا المسمى موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($e->getMessage()) . ' ❌');
         }
-        $stmt->close();
     }
 }
 
@@ -65,16 +62,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $id = (int) $_GET['delete_id'];
-    $chk = $conn->prepare("SELECT COUNT(*) c FROM employees WHERE job_title_id = ?");
-    $chk->bind_param('i', $id); $chk->execute();
-    $used = (int) $chk->get_result()->fetch_assoc()['c']; $chk->close();
+    // حارس الاستخدام معزولٌ بالشركة، والحذف الصلب عبر deleteRow (كيانٌ بلا أبٍ إلزاميّ)
+    $used = 0; $ok = false;
+    try {
+        $used = $jt_gate->count('employees', array('where' => array('job_title_id' => $id)));
+        if ($used === 0) {
+            $ok = $jt_gate->deleteRow('job_titles', $id, 'job title delete') > 0;
+        }
+    } catch (\Throwable $e) { /* غير مملوك/سياق ناقص → تعذّر */ }
     if ($used > 0) {
         header("Location: job_titles.php?msg=لا+يمكن+حذف+مسمى+مستخدمٍ+من+قِبل+$used+موظف+❌");
     } else {
-        $stmt = $conn->prepare("DELETE FROM job_titles WHERE id = ? $manage_scope");
-        $stmt->bind_param('i', $id);
-        $ok = $stmt->execute(); $stmt->close();
-        header("Location: job_titles.php?msg=" . ($ok ? "✅+تم+حذف+المسمى+الوظيفي" : "تعذّر+الحذف+(قد+يكون+مسمّى+عامّاً)+❌"));
+        header("Location: job_titles.php?msg=" . ($ok ? "✅+تم+حذف+المسمى+الوظيفي" : "تعذّر+الحذف+(خارج+نطاق+شركتك)+❌"));
     }
     exit();
 }
@@ -83,9 +82,11 @@ if (isset($_GET['delete_id'])) {
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT id, company_id, name, description, is_operator, status, sort_order FROM job_titles WHERE id = ?");
-    $stmt->bind_param('i', $id); $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc(); $stmt->close();
+    // معزولٌ بالشركة (كان الجلب بلا نطاق — أشدّ الآن، والكتابة كانت أصلًا محكومة)
+    $editData = $jt_gate->selectOne('job_titles', array(
+        'columns' => array('id', 'company_id', 'name', 'description', 'is_operator', 'status', 'sort_order'),
+        'where'   => array('id' => $id),
+    ));
 }
 
 $page_title = "إيكوبيشن | المسميات الوظيفية";
@@ -157,12 +158,14 @@ include '../insidebar.php';
             </thead>
             <tbody>
             <?php
-            $where = $is_super_admin ? "1=1" : "(jt.company_id IS NULL OR jt.company_id = " . intval($company_id) . ")";
-            $sql = "SELECT jt.*, (SELECT COUNT(*) FROM employees e WHERE e.job_title_id = jt.id) AS used_count
-                    FROM job_titles jt WHERE $where ORDER BY jt.sort_order, jt.name";
-            $res = mysqli_query($conn, $sql);
+            // القائمة معزولةً عبر البوابة (بعد M6 يكافئ نمطَ «عامّ أو مِلكي»)
+            $jt_rows = $jt_gate->scopedQuery(array(
+                'scope'  => array('jt' => 'job_titles'),
+                'enrich' => array('e' => 'employees'),
+            ), "SELECT jt.*, (SELECT COUNT(*) FROM employees e WHERE e.job_title_id = jt.id) AS used_count
+                    FROM job_titles jt WHERE {TENANT_SCOPE} ORDER BY jt.sort_order, jt.name", array());
             $i = 1;
-            if ($res) { while ($row = mysqli_fetch_assoc($res)):
+            { foreach ($jt_rows as $row):
                 $is_global   = ($row['company_id'] === null);
                 $can_manage  = $is_super_admin || (!$is_global && intval($row['company_id']) === $company_id);
             ?>
@@ -186,8 +189,8 @@ include '../insidebar.php';
                     <td><?= $is_global ? '<span class="status-pill status-warning">عامّ</span>' : '<span class="status-pill status-active">الشركة</span>' ?></td>
                     <td><?= intval($row['status']) ? '<span class="status-pill status-active">نشط</span>' : '<span class="status-pill status-inactive">غير نشط</span>' ?></td>
                 </tr>
-            <?php endwhile; }
-            if (!$res || $i === 1): ?>
+            <?php endforeach; }
+            if (empty($jt_rows)): ?>
                 <tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد مسمّيات بعد.</td></tr>
             <?php endif; ?>
             </tbody>
