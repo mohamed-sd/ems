@@ -175,8 +175,8 @@ class TenantRegistry
         'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
         'role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
         'report_role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
-        'equipments_types' => array('type' => self::T_GLOBAL, 'soft' => false),
-        'failure_codes' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'equipments_types' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
+        'failure_codes' => array('type' => self::T_GLOBAL, 'managed' => true, 'soft' => false),
         'admin_subscription_plans' => array('type' => self::T_GLOBAL, 'soft' => false),
 
         // ── منصة/محرّكات لم تُهاجَر — مرفوضة عبر البوابة حتى تعريف عقدها ────

@@ -766,6 +766,13 @@ class TenantDb
             return; // إدراجٌ عابرٌ مُسجَّل (سلوك ما قبل الهجرة) — التعديل لا يصل هنا (strict)
         }
         if ($def['type'] === TenantRegistry::T_GLOBAL && !$this->ctx->isSuperAdmin()) {
+            // كتالوجٌ عامٌّ مُدار من التطبيق (managed): يديره مستخدمو الأدوار المخوَّلة
+            // (كأنواع المعدات/تصنيف الأعطال) بحُكم صلاحية الصفحة — لا عزل شركة (عامّ محض،
+            // بلا company_id)، فالكتابة مسموحة والحوكمة على الشاشة. أما المراجع المجمَّدة
+            // (roles/modules/RBAC) فتبقى للسوبر حصرًا.
+            if (!empty($def['managed'])) {
+                return;
+            }
             $this->deny('write to global reference refused', $table);
         }
     }
