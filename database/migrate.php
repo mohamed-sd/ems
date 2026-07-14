@@ -228,6 +228,79 @@ function migrate_run_php_file($path)
     return $code === 0 ? '' : ('رمز خروج غير صفري: ' . $code);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// سور الجداول الجديدة (REV-08 · البند 4 — صمّام وقاية):
+// لا ترحيلَ يُنشئ جدول أساسٍ جديدًا بلا company_id إلا إذا كان مصنَّفًا مسبقًا
+// في عقد TenantRegistry تصنيفًا غيرَ مستأجَرٍ (عالميّ/ابن/كتالوج/مقيَّد) —
+// وإلا يُحجَب الترحيل: تُسقَط الجداول المخالفة المُنشأة للتوّ (تراجُع الإنشاء)،
+// ويُسجَّل الملف فاشلًا، ويتوقف التنفيذ. يعمل لكل ملفٍّ على حدة (عزو دقيق).
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** قائمة جداول الأساس الحالية (BASE TABLE فقط — الـViews معفاة بطبيعتها). */
+function migrate_wall_tables(mysqli $conn)
+{
+    $out = array();
+    $res = $conn->query("SELECT TABLE_NAME FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'");
+    if ($res) {
+        while ($r = $res->fetch_row()) { $out[] = $r[0]; }
+    }
+    return $out;
+}
+
+/** هل يحمل الجدول عمود company_id؟ */
+function migrate_wall_has_company(mysqli $conn, $table)
+{
+    $t = $conn->real_escape_string($table);
+    $res = $conn->query("SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{$t}' AND COLUMN_NAME = 'company_id'");
+    return $res && $res->num_rows > 0;
+}
+
+/** هل الجدول معفًى بالتصميم (مصنَّف مسبقًا في العقد تصنيفًا غير مستأجَر)؟ */
+function migrate_wall_exempt($table)
+{
+    static $loaded = false;
+    if (!$loaded) {
+        require_once dirname(__DIR__) . '/app/Core/TenantRegistry.php';
+        $loaded = true;
+    }
+    $def = \App\Core\TenantRegistry::get(strtolower($table));
+    if ($def === null) {
+        return false; // غير مسجَّل في العقد = غير معفًى (السور يطالبه بcompany_id)
+    }
+    return in_array($def['type'], array(
+        \App\Core\TenantRegistry::T_GLOBAL,
+        \App\Core\TenantRegistry::T_CHILD,      // معزولٌ بأبيه بالتصميم
+        \App\Core\TenantRegistry::T_CATALOG,    // صفوفه العامّة NULL مقصودة
+        \App\Core\TenantRegistry::T_RESTRICTED,
+    ), true);
+}
+
+/**
+ * فحص السور بعد تنفيذ ملفٍّ واحد. يعيد '' عند السلامة، أو نص الخرق بعد
+ * إسقاط الجداول المخالفة المُنشأة للتوّ (تراجُعُ إنشائها).
+ */
+function migrate_wall_check(mysqli $conn, array $tablesBefore)
+{
+    $created = array_diff(migrate_wall_tables($conn), $tablesBefore);
+    $blocked = array();
+    foreach ($created as $t) {
+        if (!migrate_wall_exempt($t) && !migrate_wall_has_company($conn, $t)) {
+            $blocked[] = $t;
+        }
+    }
+    if (empty($blocked)) {
+        return '';
+    }
+    foreach ($blocked as $t) {
+        $conn->query('DROP TABLE IF EXISTS `' . str_replace('`', '``', $t) . '`');
+    }
+    return "MIGRATION BLOCKED: جدول(جداول) جديدة بلا company_id وغير مصنَّفة عالميًّا/ابنًا في العقد: "
+         . implode(', ', $blocked)
+         . " — أُسقطت. أضف company_id (+backfill+فهرس) أو سجِّل التصنيف في TenantRegistry أولًا.";
+}
+
 /** لقطة مخطّطٍ كاملة (جداول + Views) إلى ملف SQL موثَّق الترويسة. */
 function migrate_export_schema(mysqli $conn, $prefix)
 {
@@ -403,10 +476,16 @@ function cmd_up(mysqli $conn, $dryRun)
         $sum = sha1_file($path);
         echo "تطبيق {$f} ...\n";
         $t0 = microtime(true);
+        $tablesBefore = migrate_wall_tables($conn); // سور REV-08 §4: لقطة الجداول قبل الملف
 
         $errText = (substr($f, -4) === '.php')
             ? migrate_run_php_file($path)
             : migrate_run_sql_file($conn, $path);
+
+        // سور الجداول الجديدة: نجاح التنفيذ لا يكفي — الجدول الأعمى يُسقَط ويُحجَب الملف
+        if ($errText === '') {
+            $errText = migrate_wall_check($conn, $tablesBefore);
+        }
 
         $ms = (int) round((microtime(true) - $t0) * 1000);
 
