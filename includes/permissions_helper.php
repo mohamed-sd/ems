@@ -466,6 +466,58 @@ function get_current_page_permissions($conn, $script_path = null) {
  * @param string $redirect_path
  * @return void
  */
+/**
+ * REV-08 §5 — صمّام Fail-Closed للشاشات غير المسجَّلة (id===null).
+ * يُطابق مسار السكربت الكامل ضدّ قائمتَي بادئاتٍ من .env:
+ *   EMS_FAILCLOSED_ENFORCE_PREFIXES  → 403 + UNREGISTERED_SCREEN_DENY (حجبٌ صريح)
+ *   EMS_FAILCLOSED_MONITOR_PREFIXES  → UNREGISTERED_SCREEN_WOULD_DENY (رصدٌ بلا حجب)
+ * المطابقة substring (تحصينٌ ضد بادئة التطبيق الأساس مثل /ems/…). الإنفاذ فارغٌ
+ * افتراضًا ⇒ مطابقٌ تمامًا للسلوك السابق (شفافية). الرصد يجرد الشاشات المسجَّلة
+ * بكودٍ قصيرٍ لا بالمسار (تُحَلّ عبر check_page_permissions لا عبر المسار) قبل أيّ
+ * إنفاذ. النواة القديمة غير المطابِقة تبقى شفافة؛ المهلة تُرفَق في سطر الرصد.
+ * الاستدعاء من مُنفِّذ عرض الصفحة وحده (شاشات السايدبار) — النقاط والمساعدون
+ * لا يُضمّنون insidebar فلا يبلغون هذا الصمّام أصلًا.
+ */
+function ems_failclosed_screen_guard($script_name) {
+    $script = strtolower(str_replace('\\', '/', (string) $script_name));
+    if ($script === '') {
+        return;
+    }
+
+    $matchPrefix = function ($envKey) use ($script) {
+        $raw = function_exists('ems_env') ? (string) ems_env($envKey, '') : '';
+        foreach (explode(',', $raw) as $p) {
+            $p = strtolower(trim($p));
+            if ($p !== '' && strpos($script, $p) !== false) {
+                return $p;
+            }
+        }
+        return null;
+    };
+
+    // (أ) إنفاذ — شاشةٌ غير مسجَّلةٍ تحت بادئةٍ مُهاجَرة: 403 محجوبٌ مُسجَّل.
+    $p = $matchPrefix('EMS_FAILCLOSED_ENFORCE_PREFIXES');
+    if ($p !== null) {
+        if (function_exists('log_security_event')) {
+            log_security_event('UNREGISTERED_SCREEN_DENY',
+                'path=' . $script . ' prefix=' . $p
+                . ' role=' . (isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0));
+        }
+        http_response_code(403);
+        header('Content-Type: application/json; charset=UTF-8');
+        exit(json_encode(array('error' => 'unregistered_screen', 'path' => $script), JSON_UNESCAPED_UNICODE));
+    }
+
+    // (ب) رصد — تسجيلٌ بلا حجب (جرد ما قبل الإنفاذ للشاشات المسجَّلة بكودٍ قصير).
+    $p = $matchPrefix('EMS_FAILCLOSED_MONITOR_PREFIXES');
+    if ($p !== null && function_exists('log_security_event')) {
+        $deadline = function_exists('ems_env') ? (string) ems_env('EMS_LEGACY_TRANSPARENCY_DEADLINE', '') : '';
+        log_security_event('UNREGISTERED_SCREEN_WOULD_DENY',
+            'path=' . $script . ' prefix=' . $p . ' (monitor'
+            . ($deadline !== '' ? '; deadline=' . $deadline : '') . ')');
+    }
+}
+
 function enforce_current_page_view_permission($conn, $redirect_path = '../main/dashboard.php') {
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['role'])) {
         return;
@@ -515,6 +567,12 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
     }
 
     $current = get_current_page_permissions($conn);
+
+    // REV-08 §5 — الشاشة لا تُحَلّ إلى موديول: صمّام Fail-Closed (إنفاذٌ/رصدٌ حسب البادئة).
+    if ($current['id'] === null) {
+        ems_failclosed_screen_guard($script_name);
+    }
+
     if ($current['id'] !== null && !$current['can_view']) {
         header('Location: ' . $redirect_path . '?msg=' . urlencode('لا توجد صلاحية عرض لهذه الصفحة ❌'));
         exit();
