@@ -23,6 +23,10 @@ mysqli_report(MYSQLI_REPORT_OFF);
 
 require_once dirname(__DIR__) . '/config.php'; // $conn (التطبيق) + ems_env + الخطّاف
 require_once dirname(__DIR__) . '/includes/timesheet_event_hook.php';
+require_once dirname(__DIR__) . '/app/Core/ServerId.php';
+require_once dirname(__DIR__) . '/app/Core/EventValidationException.php';
+require_once dirname(__DIR__) . '/app/Core/EventPublisher.php';
+require_once dirname(__DIR__) . '/app/Core/EventDispatcher.php';
 
 $hooks = (string) ems_env('EMS_EVENT_HOOKS', 'off');
 if ($hooks !== 'publish') {
@@ -47,6 +51,9 @@ $cleanup = function () use ($root, &$tsId, $ledgerBefore) {
         $mx = (int) $root->query("SELECT COALESCE(MAX(id),0) FROM fin_financial_events")->fetch_row()[0];
         $root->query("ALTER TABLE fin_financial_events AUTO_INCREMENT = " . ($mx + 1));
     }
+    // مستهلك التسليم الرمّي (المرحلة 4) — صفّه وتسليماته حصرًا؛ مستهلك المالية لا يُمَسّ
+    $root->query("DELETE FROM ems_event_consumers  WHERE consumer = 'zz_proof_probe'");
+    $root->query("DELETE FROM ems_event_deliveries WHERE consumer = 'zz_proof_probe'");
     $after = (int) $root->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0];
     echo "تنظيف: الدفتر عاد إلى {$after} (المتوقع {$ledgerBefore}) " . ($after === $ledgerBefore ? "✓" : "✗ !!") . "\n";
 };
@@ -61,6 +68,8 @@ $stmt->execute();
 $tsId = (int) $root->insert_id;
 $stmt->close();
 echo "بذر ساعةٍ تجريبيّة: timesheet #{$tsId} (شركة {$COMPANY}، executed=8)\n\n";
+
+$maxBefore = (int) $root->query("SELECT COALESCE(MAX(id),0) FROM fin_financial_events")->fetch_row()[0];
 
 // ── (1) الاعتماد الأصلي: الجيل 1 (8 ساعات) ──
 ems_timesheet_event_hook($conn, $tsId, 1, 1);
@@ -86,13 +95,34 @@ $correctedValue = in_array(8.0, $qtys, true) && in_array(6.0, $qtys, true);
 echo "الأحداث المنشورة لهذه الساعة: {$n} (المتوقع 2)\n";
 foreach ($rows as $r) { echo "  - {$r['idempotency_key']}  quantity={$r['quantity']}\n"; }
 
-$pass = ($n === 2) && $distinctKeys && $hasA1 && $hasA2 && $correctedValue;
+// ── (4) التسليم: مستهلكٌ رمّيٌّ عبر الموزّع الحقيقي يستلم الجيلين (سطرا التسليم) ──
+// يبدأ من MAX(id) قبل البذر فلا يستلم إلا حدثَي البرهان؛ لا ينشر مشتقًّا (يرصد فقط)،
+// ومستهلك المالية الحيّ لا يُلمَس (معالجه غير مسجَّلٍ في هذه العملية أصلًا).
+echo "\nالتسليم عبر EventDispatcher (مستهلك رمّي zz_proof_probe من المؤشّر {$maxBefore}):\n";
+$delivered = array();
+$dispatcher = new \App\Core\EventDispatcher($conn);
+$dispatcher->register('zz_proof_probe', function (array $event, \mysqli $c) use (&$delivered, $tsId) {
+    if ($event['event_key'] === 'equipment.hour_logged' && intval($event['entity_id']) === $tsId) {
+        $delivered[] = $event['idempotency_key'];
+        echo "  تسليم → {$event['idempotency_key']}  quantity={$event['quantity']}\n";
+    }
+}, $maxBefore);
+$stats = $dispatcher->runOnce();
+foreach ($stats as $cName => $s) {
+    echo "  [dispatcher] {$cName}: processed={$s['processed']} failed={$s['failed']} dead_lettered={$s['dead_lettered']} cursor={$s['cursor']}\n";
+}
+$deliveredBoth = (count($delivered) === 2)
+    && in_array("equipment.hour_logged:timesheet:{$tsId}:a1", $delivered, true)
+    && in_array("equipment.hour_logged:timesheet:{$tsId}:a2", $delivered, true);
+
+$pass = ($n === 2) && $distinctKeys && $hasA1 && $hasA2 && $correctedValue && $deliveredBoth;
 echo "\n";
 echo "  الجيلان مستقلّان (a1 + a2)          " . (($hasA1 && $hasA2) ? "✓" : "✗") . "\n";
 echo "  إعادةُ إرسال الجيل 1 أُهمِلت (n=2 لا 3) " . ($n === 2 ? "✓" : "✗") . "\n";
 echo "  التصحيح حمل القيمة الجديدة (8 و6)     " . ($correctedValue ? "✓" : "✗") . "\n";
+echo "  الموزّع سلّم الجيلين لمستهلكٍ مشترِك    " . ($deliveredBoth ? "✓" : "✗") . "\n";
 echo "\n" . ($pass
-    ? "PASS: حدثان مستقلّان، والتكرار مُهمَل، والتصحيح لم يُبتلَع وحمل قيمته الجديدة\n"
-    : "FAIL: n={$n} — التصحيح ابتُلع أو التكرار مرّ أو القيمة لم تتحدّث\n");
+    ? "PASS: حدثان مستقلّان، والتكرار مُهمَل، والتصحيح لم يُبتلَع وحمل قيمته الجديدة، وسُلِّما معًا\n"
+    : "FAIL: n={$n} delivered=" . count($delivered) . " — التصحيح ابتُلع أو التكرار مرّ أو القيمة/التسليم اختلّ\n");
 
 exit($pass ? 0 : 1);
