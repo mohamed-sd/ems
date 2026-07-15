@@ -169,6 +169,13 @@ class TenantRegistry
             'parent' => 'worker_evaluation', 'fk' => 'evaluation_id'),
         'mnt_inspection_template_line' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'mnt_inspection_template', 'fk' => 'template_id'),
+        // Views القوى العاملة المحسوبة (بلا عمود company_id): مفتاحها employee_id
+        // فتُعزَل عبر الأب employees كأي ابنٍ (EXISTS على الأب المملوك). قراءةٌ عمليًا —
+        // أي كتابةٍ فيها يرفضها MySQL نفسه (views تجميعية غير قابلة للتحديث).
+        'v_worker_worklog' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'employees', 'fk' => 'employee_id'),
+        'v_worker_presence' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'employees', 'fk' => 'employee_id'),
 
         // ── مراجع نظامٍ عامة (قراءة للجميع، كتابة للمدير الأعلى) ────────────
         'roles' => array('type' => self::T_GLOBAL, 'soft' => false),

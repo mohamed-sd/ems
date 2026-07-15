@@ -380,7 +380,14 @@ class TenantDb
         $this->assertIdent($parentCol);
         $cDef = $this->requireTable($childTable, true); // strict — لا عبور مراقبةٍ للحذف أبدًا
         $pDef = $this->requireTable($parentTable, true);
-        if ($cDef['type'] !== TenantRegistry::T_TENANT || $pDef['type'] !== TenantRegistry::T_TENANT) {
+        // ابنٌ مستأجَر بعمود company_id (الأصل)، أو ابنٌ مصنَّف T_CHILD بلا العمود (دفعة ج:
+        // worker_settlement_line/worker_evaluation_kpi): يُقبل الثاني فقط إن طابق أبوه
+        // ومفتاحُه المسجَّلين في السجل حرفيًا — فلا يُنتحَل أبٌ غير أبيه التعاقدي.
+        $childless = ($cDef['type'] === TenantRegistry::T_CHILD
+            && isset($cDef['parent'], $cDef['fk'])
+            && $cDef['parent'] === $parentTable && $cDef['fk'] === $parentCol);
+        if (($cDef['type'] !== TenantRegistry::T_TENANT && !$childless)
+            || $pDef['type'] !== TenantRegistry::T_TENANT) {
             $this->deny('deleteChild requires tenant-scoped parent and child', $parentTable . '/' . $childTable);
         }
         $this->requireTenant($parentTable);
@@ -392,14 +399,25 @@ class TenantDb
             $this->deny('deleteChild: parent not owned by tenant', $parentTable . '#' . $parentId);
         }
 
-        // النطاق 2: حذف الابن بالشروط الثلاثة معًا إلزامًا (الصف + الأب + الشركة)
-        $stmt = $this->conn->prepare(
-            'DELETE FROM `' . $childTable . '` WHERE `id` = ? AND `' . $parentCol . '` = ? AND `company_id` = ?'
-        );
+        // النطاق 2: حذف الابن بالشروط الثلاثة معًا إلزامًا (الصف + الأب + الشركة).
+        // ابن T_CHILD بلا عمود company_id: شرطُ الشركة مستوفًى عبر الأب المملوك المتحقَّق أعلاه.
+        if ($childless) {
+            $stmt = $this->conn->prepare(
+                'DELETE FROM `' . $childTable . '` WHERE `id` = ? AND `' . $parentCol . '` = ?'
+            );
+        } else {
+            $stmt = $this->conn->prepare(
+                'DELETE FROM `' . $childTable . '` WHERE `id` = ? AND `' . $parentCol . '` = ? AND `company_id` = ?'
+            );
+        }
         if (!$stmt) {
             throw new TenantGateException('deleteChild prepare failed: ' . $this->conn->error);
         }
-        $stmt->bind_param('iii', $childId, $parentId, $cid);
+        if ($childless) {
+            $stmt->bind_param('ii', $childId, $parentId);
+        } else {
+            $stmt->bind_param('iii', $childId, $parentId, $cid);
+        }
         if (!$stmt->execute()) {
             $err = $stmt->error;
             $stmt->close();
