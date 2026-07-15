@@ -38,93 +38,12 @@ if ($company_id <= 0) {
     exit();
 }
 
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
-$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
-$clients_has_company_id = db_table_has_column($conn, 'clients', 'company_id');
-$project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');
-$project_has_deleted_at = db_table_has_column($conn, 'project', 'deleted_at');
-$project_has_deleted_by = db_table_has_column($conn, 'project', 'deleted_by');
-$clients_has_is_deleted = db_table_has_column($conn, 'clients', 'is_deleted');
-$clients_has_deleted_at = db_table_has_column($conn, 'clients', 'deleted_at');
-$mines_has_is_deleted = db_table_has_column($conn, 'mines', 'is_deleted');
-$mines_has_deleted_at = db_table_has_column($conn, 'mines', 'deleted_at');
-
-if (!$project_has_is_deleted || !$project_has_deleted_at || !$project_has_deleted_by) {
-    $alter_parts = array();
-    if (!$project_has_is_deleted) {
-        $alter_parts[] = "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0";
-    }
-    if (!$project_has_deleted_at) {
-        $alter_parts[] = "ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL";
-    }
-    if (!$project_has_deleted_by) {
-        $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
-    }
-    if (!empty($alter_parts)) {
-        ems_runtime_ddl($conn, "ALTER TABLE project " . implode(', ', $alter_parts), 'Projects/projects.php');
-    }
-
-    $project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');
-    $project_has_deleted_at = db_table_has_column($conn, 'project', 'deleted_at');
-    $project_has_deleted_by = db_table_has_column($conn, 'project', 'deleted_by');
-}
-
-$project_not_deleted_sql = '1=1';
-if ($project_has_is_deleted) {
-    $project_not_deleted_sql = 'op.is_deleted = 0';
-} elseif ($project_has_deleted_at) {
-    $project_not_deleted_sql = 'op.deleted_at IS NULL';
-}
-
-$project_not_deleted_plain_sql = '1=1';
-if ($project_has_is_deleted) {
-    $project_not_deleted_plain_sql = 'is_deleted = 0';
-} elseif ($project_has_deleted_at) {
-    $project_not_deleted_plain_sql = 'deleted_at IS NULL';
-}
-
-$client_not_deleted_sql = '1=1';
-if ($clients_has_is_deleted) {
-    $client_not_deleted_sql = 'c.is_deleted = 0';
-} elseif ($clients_has_deleted_at) {
-    $client_not_deleted_sql = 'c.deleted_at IS NULL';
-}
-
-$mines_not_deleted_sql = '1=1';
-if ($mines_has_is_deleted) {
-    $mines_not_deleted_sql = 'm.is_deleted = 0';
-} elseif ($mines_has_deleted_at) {
-    $mines_not_deleted_sql = 'm.deleted_at IS NULL';
-}
-
-$project_scope_sql = $project_has_company_id
-    ? "op.company_id = $company_id"
-    : "(
-        EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = op.created_by AND scope_u.company_id = $company_id)
-        OR EXISTS (
-            SELECT 1
-            FROM clients scope_c
-            INNER JOIN users scope_uc ON scope_uc.id = scope_c.created_by
-            WHERE scope_c.id = op.$project_client_column AND scope_uc.company_id = $company_id
-        )
-    )";
-
-$project_scope_plain_sql = $project_has_company_id
-    ? "company_id = $company_id"
-    : "(
-        EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = project.created_by AND scope_u.company_id = $company_id)
-        OR EXISTS (
-            SELECT 1
-            FROM clients scope_c
-            INNER JOIN users scope_uc ON scope_uc.id = scope_c.created_by
-            WHERE scope_c.id = project.$project_client_column AND scope_uc.company_id = $company_id
-        )
-    )";
-
-$client_scope_sql = $clients_has_company_id
-    ? "c.company_id = $company_id"
-    : "EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = c.created_by AND scope_u.company_id = $company_id)";
-$client_scope_sql .= " AND $client_not_deleted_sql";
+// أعمدة project (client_id/company_id/is_deleted/deleted_at/deleted_by) وclients (company_id/
+// is_deleted) قائمةٌ كلها منذ ترحيلها — سقطت فحوص db_table_has_column والهجرة الذاتية
+// (نمط ems_runtime_ddl الساقط)، وسقط معها بديلا النطاق عبر created_by (كانا لغياب company_id)
+// وأسطر mines (الجدول غير موجود في القاعدة أصلًا). العزل كله عبر بوابة المستأجر الآن.
+$project_client_column = 'client_id';
+$prj_gate = ems_tenant_db();
 
 function projects_redirect_with_msg($msg)
 {
@@ -168,35 +87,26 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
     $delete_id = intval($_GET['delete_id']);
 
     $old_project = null;
-    $old_res = mysqli_query($conn, "SELECT op.* FROM project op WHERE op.id = $delete_id AND $project_scope_sql AND $project_not_deleted_sql LIMIT 1");
-    if ($old_res) {
-        $old_project = mysqli_fetch_assoc($old_res);
-    }
+    try {
+        $prj_old_rows = $prj_gate->scopedQuery(array('scope' => array('op' => 'project')),
+            "SELECT op.* FROM project op WHERE op.id = ? AND {TENANT_SCOPE} AND op.is_deleted = 0 LIMIT 1",
+            array($delete_id));
+        $old_project = !empty($prj_old_rows) ? $prj_old_rows[0] : null;
+    } catch (\Throwable $t) { error_log('projects.php delete precheck: ' . $t->getMessage()); }
 
     if (!$old_project) {
         projects_redirect_with_msg('المشروع غير موجود أو لا يتبع لشركتك ❌');
     }
 
-    if (!$project_has_is_deleted && !$project_has_deleted_at) {
-        projects_redirect_with_msg('تعذر تفعيل الحذف الناعم للمشاريع حالياً ❌');
-    }
-
-    $delete_set = array("status = '0'");
-    if ($project_has_is_deleted) {
-        $delete_set[] = "is_deleted = 1";
-    }
-    if ($project_has_deleted_at) {
-        $delete_set[] = "deleted_at = NOW()";
-    }
-    if ($project_has_deleted_by) {
-        $deleted_by = approval_get_user_id();
-        $delete_set[] = "deleted_by = " . intval($deleted_by);
-    }
-
-    $delete_query = "UPDATE project SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND $project_scope_plain_sql AND $project_not_deleted_plain_sql";
-    if (mysqli_query($conn, $delete_query)) {
+    // الأصل: status='0' + is_deleted/deleted_at/deleted_by معًا — عبر البوابة: تحديث الحالة
+    // ثم softDelete (يختم الأعمدة الثلاثة من سياق الجلسة نفسها).
+    try {
+        $prj_gate->update('project', array('status' => '0'), array('id' => $delete_id, 'is_deleted' => 0));
+        $prj_gate->softDelete('project', $delete_id);
         log_security_event('PROJECT_SOFT_DELETED', "Soft deleted project ID: $delete_id");
         projects_redirect_with_msg('تم حذف المشروع (حذف ناعم) بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('projects.php delete: ' . $t->getMessage());
     }
 
     projects_redirect_with_msg('حدث خطأ أثناء حذف المشروع ❌');
@@ -241,17 +151,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     // جلب اسم العميل إذا تم اختياره
     $client = '';
     if ($client_id > 0) {
-        $stmt = query_safe(
-            "SELECT c.client_name FROM clients c WHERE c.id = ? AND $client_scope_sql",
-            [$client_id],
-            'i'
-        );
-        if ($stmt) {
-            $stmt_result = mysqli_stmt_get_result($stmt);
-            if ($stmt_result && ($client_row = mysqli_fetch_assoc($stmt_result))) {
-                $client = sanitize_input($client_row['client_name']);
+        try {
+            $prj_cli_rows = $prj_gate->scopedQuery(array('scope' => array('c' => 'clients')),
+                "SELECT c.client_name FROM clients c WHERE c.id = ? AND {TENANT_SCOPE} AND c.is_deleted = 0",
+                array($client_id));
+            if (!empty($prj_cli_rows)) {
+                $client = sanitize_input($prj_cli_rows[0]['client_name']);
             }
-        }
+        } catch (\Throwable $t) { error_log('projects.php client lookup: ' . $t->getMessage()); }
 
         if ($client === '') {
             projects_redirect_with_msg('العميل المحدد لا يتبع لشركتك ❌');
@@ -267,93 +174,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
     if ($id > 0) {
         $old_project = null;
-        $old_res = mysqli_query($conn, "SELECT op.* FROM project op WHERE op.id = $id AND $project_scope_sql AND $project_not_deleted_sql LIMIT 1");
-        if ($old_res) {
-            $old_project = mysqli_fetch_assoc($old_res);
-        }
+        try {
+            $prj_old_rows = $prj_gate->scopedQuery(array('scope' => array('op' => 'project')),
+                "SELECT op.* FROM project op WHERE op.id = ? AND {TENANT_SCOPE} AND op.is_deleted = 0 LIMIT 1",
+                array($id));
+            $old_project = !empty($prj_old_rows) ? $prj_old_rows[0] : null;
+        } catch (\Throwable $t) { error_log('projects.php update precheck: ' . $t->getMessage()); }
 
         if (!$old_project) {
             projects_redirect_with_msg('المشروع غير موجود أو لا يتبع لشركتك ❌');
         }
 
-        $update_sql = "UPDATE project SET
-            $project_client_column = ?,
-            name = ?,
-            client = ?,
-            location = ?,
-            project_code = ?,
-            mine_code = ?,
-            category = ?,
-            sub_sector = ?,
-            state = ?,
-            region = ?,
-            nearest_market = ?,
-            latitude = ?,
-            longitude = ?,
-            total = ?,
-            status = ?,
-            updated_at = NOW()";
-
-        $update_values = array(
-            $client_id,
-            $name,
-            $client,
-            $location,
-            $project_code,
-            $mine_code,
-            $category,
-            $sub_sector,
-            $state,
-            $region,
-            $nearest_market,
-            $latitude,
-            $longitude,
-            $total,
-            $status
-        );
-        $update_types = 'issssssssssssds';
-
-        if ($project_has_company_id) {
-            $update_sql .= ", company_id = ?";
-            $update_values[] = $company_id;
-            $update_types .= 'i';
+        // (كان الأصل يعيد كتابة company_id بقيمة الجلسة نفسها — الصف معزولٌ عبر البوابة
+        // أصلًا فالإعادة لغوٌ، وتمريره في بيانات التحديث يُرفض تعاقديًا كتزوير هوية)
+        $executed = false;
+        $error_message = '';
+        try {
+            $prj_gate->update('project', array(
+                $project_client_column => $client_id,
+                'name' => $name,
+                'client' => $client,
+                'location' => $location,
+                'project_code' => $project_code,
+                'mine_code' => $mine_code,
+                'category' => $category,
+                'sub_sector' => $sub_sector,
+                'state' => $state,
+                'region' => $region,
+                'nearest_market' => $nearest_market,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'total' => $total,
+                'status' => $status,
+                'updated_at' => date('Y-m-d H:i:s'),
+            ), array('id' => $id, 'is_deleted' => 0));
+            $executed = true;
+        } catch (\Throwable $t) {
+            $error_message = $t->getMessage();
+            error_log('projects.php update: ' . $error_message);
         }
 
-        $update_sql .= " WHERE id = ? AND $project_scope_plain_sql AND $project_not_deleted_plain_sql";
-        $update_values[] = $id;
-        $update_types .= 'i';
-
-        $stmt = mysqli_prepare($conn, $update_sql);
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, $update_types, ...$update_values);
-            $executed = mysqli_stmt_execute($stmt);
-        } else {
-            $executed = false;
-        }
-
-        if ($stmt && $executed) {
+        if ($executed) {
             log_security_event('PROJECT_UPDATED', "Updated project: $name (ID: $id)");
             projects_redirect_with_msg('تم تعديل المشروع بنجاح ✅');
         }
 
-        $error_message = $stmt ? mysqli_stmt_error($stmt) : mysqli_error($conn);
         projects_redirect_with_msg('حدث خطأ أثناء تعديل المشروع ❌' . (!empty($error_message) ? ' - ' . $error_message : ''));
     } else {
-        // إضافة مع Prepared Statement
-        $insert_columns = "$project_client_column, name, client, location, project_code, mine_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by";
-        $insert_values = array($client_id, $name, $client, $location, $project_code, $mine_code, $category, $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $created_by);
+        // إضافة عبر البوابة (company_id تحقنه من سياق الجلسة، وcreate_at بتاريخ PHP بدل NOW)
+        $inserted = false;
+        try {
+            $prj_gate->insert('project', array(
+                $project_client_column => $client_id,
+                'name' => $name,
+                'client' => $client,
+                'location' => $location,
+                'project_code' => $project_code,
+                'mine_code' => $mine_code,
+                'category' => $category,
+                'sub_sector' => $sub_sector,
+                'state' => $state,
+                'region' => $region,
+                'nearest_market' => $nearest_market,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'total' => $total,
+                'status' => $status,
+                'created_by' => $created_by,
+                'create_at' => date('Y-m-d H:i:s'),
+            ));
+            $inserted = true;
+        } catch (\Throwable $t) { error_log('projects.php insert: ' . $t->getMessage()); }
 
-        if ($project_has_company_id) {
-            $insert_columns .= ", company_id";
-            $insert_values[] = $company_id;
-        }
-
-        $placeholders = implode(', ', array_fill(0, count($insert_values), '?'));
-        $insert_sql = "INSERT INTO project ($insert_columns, create_at) VALUES ($placeholders, NOW())";
-
-        $stmt = query_safe($insert_sql, $insert_values);
-
-        if ($stmt) {
+        if ($inserted) {
             log_security_event('PROJECT_CREATED', "Created project: $name");
             projects_redirect_with_msg('تم إضافة المشروع بنجاح ✅');
         } else {
@@ -372,38 +265,39 @@ $projects_with_contracts_count = 0;
 $projects_active_contracts_count = 0;
 
 $project_active_status_case_sql = "(status = 1 OR status = '1' OR TRIM(status) = 'نشط' OR TRIM(LOWER(status)) = 'active' OR TRIM(LOWER(status)) = 'true')";
-$project_scope_stats_sql = str_replace('op.', 'p.', $project_scope_sql);
-$project_not_deleted_stats_sql = str_replace('op.', 'p.', $project_not_deleted_sql);
 
-$projects_stats_query = "SELECT
+try {
+    $prj_stats = $prj_gate->scopedQuery(array('scope' => array('p' => 'project')),
+        "SELECT
         COUNT(*) AS total_projects,
         SUM(CASE WHEN $project_active_status_case_sql THEN 1 ELSE 0 END) AS active_projects
     FROM project p
-    WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql";
-$projects_stats_result = mysqli_query($conn, $projects_stats_query);
-if ($projects_stats_result && ($projects_stats_row = mysqli_fetch_assoc($projects_stats_result))) {
-    $projects_total_count = intval($projects_stats_row['total_projects']);
-    $projects_active_count = intval($projects_stats_row['active_projects']);
-}
+    WHERE {TENANT_SCOPE} AND p.is_deleted = 0");
+    if (!empty($prj_stats)) {
+        $projects_total_count = intval($prj_stats[0]['total_projects']);
+        $projects_active_count = intval($prj_stats[0]['active_projects']);
+    }
+} catch (\Throwable $t) { error_log('projects.php stats: ' . $t->getMessage()); }
 $projects_inactive_count = max(0, $projects_total_count - $projects_active_count);
 
-$projects_with_contracts_query = "SELECT COUNT(DISTINCT c.project_id) AS projects_with_contracts
+try {
+    $prj_wc = $prj_gate->scopedQuery(array('scope' => array('c' => 'contracts', 'p' => 'project')),
+        "SELECT COUNT(DISTINCT c.project_id) AS projects_with_contracts
     FROM contracts c
     INNER JOIN project p ON p.id = c.project_id
-    WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql AND c.status = 1";
-$projects_with_contracts_result = mysqli_query($conn, $projects_with_contracts_query);
-if ($projects_with_contracts_result && ($projects_with_contracts_row = mysqli_fetch_assoc($projects_with_contracts_result))) {
-    $projects_with_contracts_count = intval($projects_with_contracts_row['projects_with_contracts']);
-}
-
-$projects_active_contracts_query = "SELECT COUNT(*) AS total_active_contracts
+    WHERE {TENANT_SCOPE} AND p.is_deleted = 0 AND c.status = 1");
+    if (!empty($prj_wc)) {
+        $projects_with_contracts_count = intval($prj_wc[0]['projects_with_contracts']);
+    }
+    $prj_ac = $prj_gate->scopedQuery(array('scope' => array('c' => 'contracts', 'p' => 'project')),
+        "SELECT COUNT(*) AS total_active_contracts
     FROM contracts c
     INNER JOIN project p ON p.id = c.project_id
-    WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql AND c.status = 1";
-$projects_active_contracts_result = mysqli_query($conn, $projects_active_contracts_query);
-if ($projects_active_contracts_result && ($projects_active_contracts_row = mysqli_fetch_assoc($projects_active_contracts_result))) {
-    $projects_active_contracts_count = intval($projects_active_contracts_row['total_active_contracts']);
-}
+    WHERE {TENANT_SCOPE} AND p.is_deleted = 0 AND c.status = 1");
+    if (!empty($prj_ac)) {
+        $projects_active_contracts_count = intval($prj_ac[0]['total_active_contracts']);
+    }
+} catch (\Throwable $t) { error_log('projects.php contract stats: ' . $t->getMessage()); }
 ?>
 
 
@@ -514,11 +408,13 @@ include('../insidebar.php');
                         <select name="client_id" id="client_id" required>
                             <option value="">-- اختر العميل --</option>
                             <?php
-                            $clients_query = mysqli_query($conn, "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE c.status = 'نشط' AND $client_scope_sql ORDER BY c.client_name ASC");
-                            if ($clients_query) {
-                                while ($cli = mysqli_fetch_assoc($clients_query)) {
-                                    echo "<option value='" . intval($cli['id']) . "'>[" . e($cli['client_code']) . "] " . e($cli['client_name']) . "</option>";
-                                }
+                            $clients_query = array();
+                            try {
+                                $clients_query = $prj_gate->scopedQuery(array('scope' => array('c' => 'clients')),
+                                    "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE c.status = 'نشط' AND {TENANT_SCOPE} AND c.is_deleted = 0 ORDER BY c.client_name ASC");
+                            } catch (\Throwable $t) { error_log('projects.php clients options: ' . $t->getMessage()); }
+                            foreach ($clients_query as $cli) {
+                                echo "<option value='" . intval($cli['id']) . "'>[" . e($cli['client_code']) . "] " . e($cli['client_name']) . "</option>";
                             }
                             ?>
                         </select>
@@ -610,36 +506,44 @@ include('../insidebar.php');
                     <tbody>
                         <?php
                         // جلب جميع المشاريع من جدول project
-
-                        $where_clauses = array($project_scope_sql, $project_not_deleted_sql);
-
+                        // (عدّادا العقود والموردين كانا استعلامين مرتبطين لكل صف؛ INNER JOIN داخل
+                        // استعلامٍ مرتبط لا يجوز إثراءً في البوابة — أُعيدت هيكلتهما استعلامين
+                        // مجمَّعين معزولين ثم دمجًا في PHP بنفس القيم حرفيًا.)
+                        $prj_list_filter = '';
+                        $prj_list_params = array();
                         if (isset($_GET['client_id']) && is_numeric($_GET['client_id'])) {
                             $client_id = intval($_GET['client_id']);
-                            $where_clauses[] = "op.$project_client_column = $client_id";
+                            $prj_list_filter = " AND op.`$project_client_column` = ?";
+                            $prj_list_params[] = $client_id;
                         }
 
-                        $client_filter = ' WHERE ' . implode(' AND ', $where_clauses);
-
-                        // جلب جميع المشاريع من جدول project مع البيانات المدخولة يدويًا
-                        $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`,
+                        $result = array();
+                        $prj_cmap = array();
+                        $prj_smap = array();
+                        try {
+                            $result = $prj_gate->scopedQuery(array('scope' => array('op' => 'project'), 'enrich' => array('cc' => 'clients')),
+                                "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`,
                       op.`project_code`, op.`mine_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`,
                                             op.`nearest_market`, op.`latitude`, op.`longitude`, op.`$project_client_column` AS `client_id`,
-                      cc.`client_name`,
-                      (SELECT COUNT(*)
-                       FROM contracts c
-                       WHERE c.project_id = op.id AND c.status = 1) as 'contracts',
-                      (SELECT COUNT(DISTINCT pm.suppliers)
-                          FROM equipments pm
-                          JOIN operations m ON pm.id = m.equipment
-                          WHERE m.project_id = op.id) as 'total_suppliers'
+                      cc.`client_name`
                       FROM project op
                           LEFT JOIN clients cc ON op.$project_client_column = cc.id
-                      $client_filter
-                      ORDER BY op.id DESC";
-
-                        $result = mysqli_query($conn, $query);
+                      WHERE {TENANT_SCOPE} AND op.is_deleted = 0$prj_list_filter
+                      ORDER BY op.id DESC", $prj_list_params);
+                            $prj_crows = $prj_gate->scopedQuery(array('scope' => array('c' => 'contracts')),
+                                "SELECT c.project_id AS pid, COUNT(*) AS n FROM contracts c WHERE c.status = 1 AND {TENANT_SCOPE} GROUP BY c.project_id");
+                            foreach ($prj_crows as $prj_cr) { $prj_cmap[intval($prj_cr['pid'])] = intval($prj_cr['n']); }
+                            $prj_srows = $prj_gate->scopedQuery(array('scope' => array('pm' => 'equipments', 'm' => 'operations')),
+                                "SELECT m.project_id AS pid, COUNT(DISTINCT pm.suppliers) AS n
+                          FROM equipments pm
+                          JOIN operations m ON pm.id = m.equipment
+                          WHERE 1=1 AND {TENANT_SCOPE} GROUP BY m.project_id");
+                            foreach ($prj_srows as $prj_sr) { $prj_smap[intval($prj_sr['pid'])] = intval($prj_sr['n']); }
+                        } catch (\Throwable $t) { error_log('projects.php list: ' . $t->getMessage()); }
                         if ($result) {
-                            while ($row = mysqli_fetch_assoc($result)) {
+                            foreach ($result as $row) {
+                                $row['contracts'] = isset($prj_cmap[intval($row['id'])]) ? $prj_cmap[intval($row['id'])] : 0;
+                                $row['total_suppliers'] = isset($prj_smap[intval($row['id'])]) ? $prj_smap[intval($row['id'])] : 0;
                                 $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
                                 // تنبيه: المشروع ليس لديه عقد ساري (status = 1) — بنفس نمط تنبيه العملاء بلا مشاريع
                                 if (intval($row['contracts']) === 0) {

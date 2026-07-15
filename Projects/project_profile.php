@@ -23,28 +23,20 @@ if ($project_id <= 0) {
     exit();
 }
 
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
-$project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');
-$project_has_deleted_at = db_table_has_column($conn, 'project', 'deleted_at');
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : (db_table_has_column($conn, 'project', 'company_client_id') ? 'company_client_id' : 'client_id');
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق شركة).
+// (سقطت فحوص db_table_has_column بسقوط الهجرات الذاتية: company_id/is_deleted/client_id أعمدةٌ قائمة)
+$pp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('project profile super') : ems_tenant_db();
 
-$scope = "p.id = $project_id";
-if (!$is_super_admin && $project_has_company) {
-    $scope .= " AND p.company_id = $company_id";
-}
-if ($project_has_is_deleted) {
-    $scope .= " AND COALESCE(p.is_deleted,0)=0";
-} elseif ($project_has_deleted_at) {
-    $scope .= " AND p.deleted_at IS NULL";
-}
-
-$project_query = "SELECT p.*, c.client_name
+$project = null;
+try {
+    $pp_rows = $pp_gate->scopedQuery(array('scope' => array('p' => 'project'), 'enrich' => array('c' => 'clients')),
+        "SELECT p.*, c.client_name
                   FROM project p
-                  LEFT JOIN clients c ON c.id = p.$project_client_column
-                  WHERE $scope
-                  LIMIT 1";
-$project_result = mysqli_query($conn, $project_query);
-$project = ($project_result && mysqli_num_rows($project_result) > 0) ? mysqli_fetch_assoc($project_result) : null;
+                  LEFT JOIN clients c ON c.id = p.client_id
+                  WHERE p.id = ? AND COALESCE(p.is_deleted,0)=0 AND {TENANT_SCOPE}
+                  LIMIT 1", array($project_id));
+    $project = !empty($pp_rows) ? $pp_rows[0] : null;
+} catch (\Throwable $t) { error_log('project_profile.php load: ' . $t->getMessage()); }
 
 if (!$project) {
     header('Location: projects.php?msg=المشروع+غير+موجود+او+خارج+نطاق+الشركة+❌');
@@ -57,47 +49,45 @@ $suppliers_count = 0;
 $equipments_count = 0;
 $drivers_count = 0;
 $timesheet_hours = 0;
+// جدول mines غير موجود في القاعدة أصلًا (الاستعلام القديم كان يفشل بصمت والعدّاد يبقى 0)
 $mines_count = 0;
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM contracts WHERE project_id = $project_id");
-if ($r) {
-    $contracts_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM contracts WHERE project_id = $project_id AND status = 1");
-if ($r) {
-    $active_contracts = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT e.suppliers) AS c
+try {
+    $r = $pp_gate->scopedQuery(array('scope' => array('contracts' => 'contracts')),
+        "SELECT COUNT(*) AS c FROM contracts WHERE project_id = ? AND {TENANT_SCOPE}", array($project_id));
+    if ($r) { $contracts_count = intval($r[0]['c']); }
+    $r = $pp_gate->scopedQuery(array('scope' => array('contracts' => 'contracts')),
+        "SELECT COUNT(*) AS c FROM contracts WHERE project_id = ? AND status = 1 AND {TENANT_SCOPE}", array($project_id));
+    if ($r) { $active_contracts = intval($r[0]['c']); }
+    $r = $pp_gate->scopedQuery(array('scope' => array('o' => 'operations', 'e' => 'equipments')),
+        "SELECT COUNT(DISTINCT e.suppliers) AS c
                          FROM operations o
                          INNER JOIN equipments e ON e.id = o.equipment
-                         WHERE o.project_id = $project_id");
-if ($r) {
-    $suppliers_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS c FROM operations o WHERE o.project_id = $project_id");
-if ($r) {
-    $equipments_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS c
+                         WHERE o.project_id = ? AND {TENANT_SCOPE}", array($project_id));
+    if ($r) { $suppliers_count = intval($r[0]['c']); }
+    $r = $pp_gate->scopedQuery(array('scope' => array('o' => 'operations')),
+        "SELECT COUNT(DISTINCT o.equipment) AS c FROM operations o WHERE o.project_id = ? AND {TENANT_SCOPE}", array($project_id));
+    if ($r) { $equipments_count = intval($r[0]['c']); }
+    $r = $pp_gate->scopedQuery(array('scope' => array('o' => 'operations', 'ed' => 'equipment_drivers')),
+        "SELECT COUNT(DISTINCT ed.employee_id) AS c
                          FROM operations o
                          INNER JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
-                         WHERE o.project_id = $project_id AND ed.status = 1");
-if ($r) {
-    $drivers_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours),0) AS c
+                         WHERE o.project_id = ? AND ed.status = 1 AND {TENANT_SCOPE}", array($project_id));
+    if ($r) { $drivers_count = intval($r[0]['c']); }
+    $r = $pp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations')),
+        "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours),0) AS c
                          FROM timesheet t
                          INNER JOIN operations o ON o.id = t.operator
-                         WHERE o.project_id = $project_id AND t.status = 1");
-if ($r) {
-    $timesheet_hours = floatval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM mines WHERE project_id = $project_id AND status = 1");
-if ($r) {
-    $mines_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+                         WHERE o.project_id = ? AND t.status = 1 AND {TENANT_SCOPE}", array($project_id));
+    if ($r) { $timesheet_hours = floatval($r[0]['c']); }
+} catch (\Throwable $t) { error_log('project_profile.php kpis: ' . $t->getMessage()); }
 
-$suppliers_breakdown = mysqli_query($conn, "SELECT
+$suppliers_breakdown = array();
+try {
+    $suppliers_breakdown = $pp_gate->scopedQuery(array(
+        'scope' => array('o' => 'operations', 'e' => 'equipments', 's' => 'suppliers'),
+        'enrich' => array('t' => 'timesheet')),
+        "SELECT
                                 s.id,
                                 s.name,
                                 COUNT(DISTINCT o.equipment) AS equipments_count,
@@ -106,10 +96,11 @@ $suppliers_breakdown = mysqli_query($conn, "SELECT
                             INNER JOIN equipments e ON e.id = o.equipment
                             INNER JOIN suppliers s ON s.id = e.suppliers
                             LEFT JOIN timesheet t ON t.operator = o.id AND t.status = 1
-                            WHERE o.project_id = $project_id
+                            WHERE o.project_id = ? AND {TENANT_SCOPE}
                             GROUP BY s.id, s.name
                             ORDER BY hours_sum DESC
-                            LIMIT 10");
+                            LIMIT 10", array($project_id));
+} catch (\Throwable $t) { error_log('project_profile.php breakdown: ' . $t->getMessage()); }
 
 $page_title = 'إيكوبيشن | بطاقة المشروع';
 include '../inheader.php';
@@ -167,13 +158,13 @@ include '../insidebar.php';
             <table id="projectSuppliersTable" class="display" style="width:100%;">
                 <thead><tr><th>المورد</th><th>عدد المعدات</th><th>الساعات</th></tr></thead>
                 <tbody>
-                    <?php if ($suppliers_breakdown): while ($row = mysqli_fetch_assoc($suppliers_breakdown)): ?>
+                    <?php if ($suppliers_breakdown): foreach ($suppliers_breakdown as $row): ?>
                         <tr>
                             <td><a href="../Suppliers/supplier_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
                             <td><?php echo intval($row['equipments_count']); ?></td>
                             <td><?php echo number_format($row['hours_sum'], 0); ?></td>
                         </tr>
-                    <?php endwhile; endif; ?>
+                    <?php endforeach; endif; ?>
                 </tbody>
             </table>
         </div>
