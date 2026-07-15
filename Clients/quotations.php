@@ -44,10 +44,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "q.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "q.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$quo_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['quo_csrf_token'])) {
@@ -64,17 +62,29 @@ $next_quo_code = 'QUO-0001';
 $last_code_sql = "SELECT quotation_code FROM quotations
                   WHERE quotation_code REGEXP '^QUO-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(quotation_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['quotation_code'], 4));
+try {
+    $last_code_rows = $quo_gate->scopedQuery(array(
+        'scope' => array('q' => 'quotations'),
+    ), "SELECT q.quotation_code FROM quotations q
+        WHERE {TENANT_SCOPE} AND q.quotation_code REGEXP '^QUO-[0-9]+$' AND q.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(q.quotation_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['quotation_code'], 4));
     $next_quo_code = 'QUO-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة العروض
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/quotations.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة العروض (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $quo_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/quotations.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -127,84 +137,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['quotation_code'])) {
         quo_redirect_with_msg('حالة العرض غير صالحة ❌');
     }
 
-    // العميل — التحقق من النطاق (إن حُدِّد)
+    // العميل — التحقق من النطاق (إن حُدِّد) عبر البوابة
     $client_id_in = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
     if ($client_id_in > 0) {
-        $cchk = mysqli_query($conn, "SELECT id FROM clients WHERE id = $client_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$cchk || mysqli_num_rows($cchk) === 0) {
+        try {
+            $cchk = $quo_gate->selectOne('clients', array(
+                'columns' => array('id'), 'where' => array('id' => $client_id_in),
+            ));
+        } catch (\Throwable $t) { $cchk = null; }
+        if (!$cchk) {
             quo_redirect_with_msg('العميل غير موجود أو خارج نطاق شركتك ❌');
         }
     }
-    $client_id_sql = $client_id_in > 0 ? "'$client_id_in'" : 'NULL';
+    $client_id_val = $client_id_in > 0 ? $client_id_in : null;
 
-    // الفرصة المصدر — التحقق من النطاق (إن حُدِّدت)
+    // الفرصة المصدر — التحقق من النطاق (إن حُدِّدت) عبر البوابة
     $opp_id_in = isset($_POST['opportunity_id']) ? intval($_POST['opportunity_id']) : 0;
     if ($opp_id_in > 0) {
-        $ochk = mysqli_query($conn, "SELECT id FROM opportunities WHERE id = $opp_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$ochk || mysqli_num_rows($ochk) === 0) {
+        try {
+            $ochk = $quo_gate->selectOne('opportunities', array(
+                'columns' => array('id'), 'where' => array('id' => $opp_id_in),
+            ));
+        } catch (\Throwable $t) { $ochk = null; }
+        if (!$ochk) {
             quo_redirect_with_msg('الفرصة المصدر غير موجودة أو خارج نطاق شركتك ❌');
         }
     }
-    $opp_id_sql = $opp_id_in > 0 ? "'$opp_id_in'" : 'NULL';
+    $opp_id_val = $opp_id_in > 0 ? $opp_id_in : null;
 
-    // تنظيف بقية الحقول
-    $quotation_code = mysqli_real_escape_string($conn, $quo_code_raw);
-    $currency       = mysqli_real_escape_string($conn, $currency_raw);
-    $state          = mysqli_real_escape_string($conn, $state_raw);
-    $payment_terms  = mysqli_real_escape_string($conn, isset($_POST['payment_terms']) ? trim($_POST['payment_terms']) : '');
-    $notes          = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
-    $amount_total   = isset($_POST['amount_total']) ? (float) $_POST['amount_total'] : 0;
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $payment_terms_raw = isset($_POST['payment_terms']) ? trim($_POST['payment_terms']) : '';
+    $notes_raw         = isset($_POST['notes']) ? trim($_POST['notes']) : '';
+    $amount_total      = isset($_POST['amount_total']) ? (float) $_POST['amount_total'] : 0;
     if ($amount_total < 0) $amount_total = 0;
-    $vdate_raw      = isset($_POST['validity_date']) ? trim($_POST['validity_date']) : '';
-    $vdate_sql      = preg_match('/^\d{4}-\d{2}-\d{2}$/', $vdate_raw) ? "'$vdate_raw'" : 'NULL';
-    $created_by     = intval($_SESSION['user']['id']);
+    $vdate_raw = isset($_POST['validity_date']) ? trim($_POST['validity_date']) : '';
+    $vdate_val = preg_match('/^\d{4}-\d{2}-\d{2}$/', $vdate_raw) ? $vdate_raw : null;
+    $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM quotations WHERE id = $quo_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $quo_gate->selectOne('quotations', array(
+                'columns' => array('id'), 'where' => array('id' => $quo_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             quo_redirect_with_msg('لا يمكنك تعديل عرض لا يتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM quotations WHERE quotation_code = '$quotation_code' AND id != $quo_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $quo_gate->scopedQuery(array(
+                'scope' => array('q' => 'quotations'),
+            ), "SELECT q.id FROM quotations q
+                WHERE {TENANT_SCOPE} AND q.quotation_code = ? AND q.id != ? AND q.is_deleted = 0",
+                array($quo_code_raw, $quo_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             quo_redirect_with_msg('كود العرض موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE quotations SET
-            quotation_code = '$quotation_code', client_id = $client_id_sql, opportunity_id = $opp_id_sql,
-            currency = '$currency', amount_total = $amount_total, validity_date = $vdate_sql,
-            payment_terms = '$payment_terms', state = '$state', notes = '$notes'
-            WHERE id = $quo_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $quo_gate->update('quotations', array(
+                'quotation_code' => $quo_code_raw,
+                'client_id'      => $client_id_val,
+                'opportunity_id' => $opp_id_val,
+                'currency'       => $currency_raw,
+                'amount_total'   => $amount_total,
+                'validity_date'  => $vdate_val,
+                'payment_terms'  => $payment_terms_raw,
+                'state'          => $state_raw,
+                'notes'          => $notes_raw,
+            ), array('id' => $quo_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('quotations', 'quotations', $quo_id, null, ['quotation_code' => $quo_code_raw]);
             }
             quo_redirect_with_msg('تم تعديل العرض بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('quotations.php update failed: ' . $t->getMessage());
+            quo_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('quotations.php update failed: ' . mysqli_error($conn));
-        quo_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM quotations WHERE quotation_code = '$quotation_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $quo_gate->scopedQuery(array(
+                'scope' => array('q' => 'quotations'),
+            ), "SELECT q.id FROM quotations q
+                WHERE {TENANT_SCOPE} AND q.quotation_code = ? AND q.is_deleted = 0",
+                array($quo_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             quo_redirect_with_msg('كود العرض موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO quotations
-            (company_id, quotation_code, client_id, opportunity_id, currency, amount_total, validity_date,
-             payment_terms, state, notes, created_by)
-            VALUES
-            ('$company_id', '$quotation_code', $client_id_sql, $opp_id_sql, '$currency', $amount_total, $vdate_sql,
-             '$payment_terms', '$state', '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $quo_gate->insert('quotations', array(
+                'quotation_code' => $quo_code_raw,
+                'client_id'      => $client_id_val,
+                'opportunity_id' => $opp_id_val,
+                'currency'       => $currency_raw,
+                'amount_total'   => $amount_total,
+                'validity_date'  => $vdate_val,
+                'payment_terms'  => $payment_terms_raw,
+                'state'          => $state_raw,
+                'notes'          => $notes_raw,
+                'created_by'     => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('quotations', 'quotations', $new_id, ['quotation_code' => $quo_code_raw]);
             }
             quo_redirect_with_msg('تم إضافة العرض بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('quotations.php insert failed: ' . $t->getMessage());
+            quo_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('quotations.php insert failed: ' . mysqli_error($conn));
-        quo_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -221,33 +263,42 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($quo_csrf_token, $delete_csrf)) {
         quo_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM quotations WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $quo_gate->selectOne('quotations', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         quo_redirect_with_msg('لا يمكنك حذف عرض لا يتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE quotations SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $quo_gate->softDelete('quotations', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('quotations', 'quotations', $delete_id);
         }
         quo_redirect_with_msg('تم حذف العرض بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('quotations.php soft delete failed: ' . $t->getMessage());
+        quo_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('quotations.php soft delete failed: ' . mysqli_error($conn));
-    quo_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// قوائم السجلات المرتبطة (ضمن نطاق الشركة)
+// قوائم السجلات المرتبطة (ضمن نطاق الشركة — العزل عبر البوابة)
 // ══════════════════════════════════════════════════════════════════════════════
-$clients_options = array();
-$cl_res = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE company_id = $company_id AND is_deleted = 0 ORDER BY client_name ASC");
-if ($cl_res) { while ($cl = mysqli_fetch_assoc($cl_res)) { $clients_options[] = $cl; } }
+try {
+    $clients_options = $quo_gate->select('clients', array(
+        'columns' => array('id', 'client_code', 'client_name'),
+        'orderBy' => 'client_name ASC',
+    ));
+} catch (\Throwable $t) { $clients_options = array(); }
 
-$opp_options = array();
-$op_res = mysqli_query($conn, "SELECT id, opp_code, title FROM opportunities WHERE company_id = $company_id AND is_deleted = 0 ORDER BY id DESC");
-if ($op_res) { while ($op = mysqli_fetch_assoc($op_res)) { $opp_options[] = $op; } }
+try {
+    $opp_options = $quo_gate->select('opportunities', array(
+        'columns' => array('id', 'opp_code', 'title'),
+        'orderBy' => 'id DESC',
+    ));
+} catch (\Throwable $t) { $opp_options = array(); }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // جلب العروض + الإحصائيات
@@ -258,22 +309,26 @@ $stat_offered = 0;
 $stat_accepted = 0;
 $stat_amount = 0.0;
 
-$q = "SELECT q.*, u.name AS creator_name, c.client_name AS client_name, o.title AS opp_title
-      FROM quotations q
-      LEFT JOIN users u ON u.id = q.created_by
-      LEFT JOIN clients c ON c.id = q.client_id
-      LEFT JOIN opportunities o ON o.id = q.opportunity_id
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY q.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        $rows[] = $row;
-        $stat_total++;
-        if ($row['state'] === 'مقدم') $stat_offered++;
-        if ($row['state'] === 'مقبول') $stat_accepted++;
-        $stat_amount += (float) $row['amount_total'];
-    }
+try {
+    $quo_list = $quo_gate->scopedQuery(array(
+        'scope'  => array('q' => 'quotations'),
+        'enrich' => array('u' => 'users', 'c' => 'clients', 'o' => 'opportunities'), // أسماء عرضية — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT q.*, u.name AS creator_name, c.client_name AS client_name, o.title AS opp_title
+        FROM quotations q
+        LEFT JOIN users u ON u.id = q.created_by
+        LEFT JOIN clients c ON c.id = q.client_id
+        LEFT JOIN opportunities o ON o.id = q.opportunity_id
+        WHERE {TENANT_SCOPE} AND q.is_deleted = 0
+        ORDER BY q.id DESC");
+} catch (\Throwable $t) {
+    $quo_list = array();
+}
+foreach ($quo_list as $row) {
+    $rows[] = $row;
+    $stat_total++;
+    if ($row['state'] === 'مقدم') $stat_offered++;
+    if ($row['state'] === 'مقبول') $stat_accepted++;
+    $stat_amount += (float) $row['amount_total'];
 }
 
 $page_title = "العروض";

@@ -38,10 +38,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "a.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "a.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$act_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['act_csrf_token'])) {
@@ -62,17 +60,29 @@ $next_act_code = 'ACT-0001';
 $last_code_sql = "SELECT activity_code FROM activities
                   WHERE activity_code REGEXP '^ACT-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(activity_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['activity_code'], 4));
+try {
+    $last_code_rows = $act_gate->scopedQuery(array(
+        'scope' => array('a' => 'activities'),
+    ), "SELECT a.activity_code FROM activities a
+        WHERE {TENANT_SCOPE} AND a.activity_code REGEXP '^ACT-[0-9]+$' AND a.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(a.activity_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['activity_code'], 4));
     $next_act_code = 'ACT-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة الأنشطة
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/activities.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة الأنشطة (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $act_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/activities.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -125,90 +135,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['activity_type'])) {
         $entity_type_raw = 'client';
     }
 
-    // السجل المرتبط — التحقق من النطاق حسب النوع (إن حُدِّد)
+    // السجل المرتبط — التحقق من النطاق حسب النوع (إن حُدِّد) عبر البوابة
     $entity_id_in = isset($_POST['entity_id']) ? intval($_POST['entity_id']) : 0;
     if ($entity_id_in > 0) {
-        if ($entity_type_raw === 'client') {
-            $chk = mysqli_query($conn, "SELECT id FROM clients WHERE id = $entity_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        } elseif ($entity_type_raw === 'opportunity') {
-            $chk = mysqli_query($conn, "SELECT id FROM opportunities WHERE id = $entity_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        } else {
-            $chk = mysqli_query($conn, "SELECT id FROM contracts WHERE id = $entity_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        }
-        if (!$chk || mysqli_num_rows($chk) === 0) {
+        $entity_table = ($entity_type_raw === 'client') ? 'clients'
+                      : (($entity_type_raw === 'opportunity') ? 'opportunities' : 'contracts');
+        try {
+            $chk = $act_gate->selectOne($entity_table, array(
+                'columns' => array('id'), 'where' => array('id' => $entity_id_in),
+            ));
+        } catch (\Throwable $t) { $chk = null; }
+        if (!$chk) {
             act_redirect_with_msg('السجل المرتبط غير موجود أو خارج نطاق شركتك ❌');
         }
     }
-    $entity_id_sql = $entity_id_in > 0 ? "'$entity_id_in'" : 'NULL';
+    $entity_id_val = $entity_id_in > 0 ? $entity_id_in : null;
 
-    // المستخدم المسؤول (إن حُدِّد) ضمن الشركة
+    // المستخدم المسؤول (إن حُدِّد) ضمن الشركة — الأصل بلا فلتر حذفٍ ناعم
     $assigned_in = isset($_POST['assigned_user_id']) ? intval($_POST['assigned_user_id']) : 0;
     if ($assigned_in > 0) {
-        $uchk = mysqli_query($conn, "SELECT id FROM users WHERE id = $assigned_in AND company_id = $company_id LIMIT 1");
-        if (!$uchk || mysqli_num_rows($uchk) === 0) {
+        try {
+            $uchk = $act_gate->selectOne('users', array(
+                'columns' => array('id'), 'where' => array('id' => $assigned_in),
+                'includeDeleted' => true,
+            ));
+        } catch (\Throwable $t) { $uchk = null; }
+        if (!$uchk) {
             $assigned_in = 0;
         }
     }
-    $assigned_sql = $assigned_in > 0 ? "'$assigned_in'" : 'NULL';
+    $assigned_val = $assigned_in > 0 ? $assigned_in : null;
 
-    // تنظيف بقية الحقول
-    $activity_code = mysqli_real_escape_string($conn, $act_code_raw);
-    $activity_type = mysqli_real_escape_string($conn, $type_raw);
-    $entity_type   = mysqli_real_escape_string($conn, $entity_type_raw);
-    $subject       = mysqli_real_escape_string($conn, isset($_POST['subject']) ? trim($_POST['subject']) : '');
-    $outcome       = mysqli_real_escape_string($conn, isset($_POST['outcome']) ? trim($_POST['outcome']) : '');
-    $notes         = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $subject_raw = isset($_POST['subject']) ? trim($_POST['subject']) : '';
+    $outcome_raw = isset($_POST['outcome']) ? trim($_POST['outcome']) : '';
+    $notes_raw   = isset($_POST['notes']) ? trim($_POST['notes']) : '';
     $is_negotiation = (isset($_POST['is_negotiation']) && $_POST['is_negotiation'] == '1') ? 1 : 0;
-    $adate_raw     = isset($_POST['activity_date']) ? trim($_POST['activity_date']) : '';
-    $adate_sql     = preg_match('/^\d{4}-\d{2}-\d{2}$/', $adate_raw) ? "'$adate_raw'" : 'NULL';
-    $created_by    = intval($_SESSION['user']['id']);
+    $adate_raw = isset($_POST['activity_date']) ? trim($_POST['activity_date']) : '';
+    $adate_val = preg_match('/^\d{4}-\d{2}-\d{2}$/', $adate_raw) ? $adate_raw : null;
+    $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM activities WHERE id = $act_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $act_gate->selectOne('activities', array(
+                'columns' => array('id'), 'where' => array('id' => $act_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             act_redirect_with_msg('لا يمكنك تعديل نشاط لا يتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM activities WHERE activity_code = '$activity_code' AND id != $act_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $act_gate->scopedQuery(array(
+                'scope' => array('a' => 'activities'),
+            ), "SELECT a.id FROM activities a
+                WHERE {TENANT_SCOPE} AND a.activity_code = ? AND a.id != ? AND a.is_deleted = 0",
+                array($act_code_raw, $act_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             act_redirect_with_msg('كود النشاط موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE activities SET
-            activity_code = '$activity_code', activity_type = '$activity_type', entity_type = '$entity_type',
-            entity_id = $entity_id_sql, subject = '$subject', activity_date = $adate_sql,
-            assigned_user_id = $assigned_sql, outcome = '$outcome', is_negotiation = $is_negotiation, notes = '$notes'
-            WHERE id = $act_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $act_gate->update('activities', array(
+                'activity_code'    => $act_code_raw,
+                'activity_type'    => $type_raw,
+                'entity_type'      => $entity_type_raw,
+                'entity_id'        => $entity_id_val,
+                'subject'          => $subject_raw,
+                'activity_date'    => $adate_val,
+                'assigned_user_id' => $assigned_val,
+                'outcome'          => $outcome_raw,
+                'is_negotiation'   => $is_negotiation,
+                'notes'            => $notes_raw,
+            ), array('id' => $act_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('activities', 'activities', $act_id, null, ['activity_code' => $act_code_raw]);
             }
             act_redirect_with_msg('تم تعديل النشاط بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('activities.php update failed: ' . $t->getMessage());
+            act_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('activities.php update failed: ' . mysqli_error($conn));
-        act_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM activities WHERE activity_code = '$activity_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $act_gate->scopedQuery(array(
+                'scope' => array('a' => 'activities'),
+            ), "SELECT a.id FROM activities a
+                WHERE {TENANT_SCOPE} AND a.activity_code = ? AND a.is_deleted = 0",
+                array($act_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             act_redirect_with_msg('كود النشاط موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO activities
-            (company_id, activity_code, activity_type, entity_type, entity_id, subject, activity_date,
-             assigned_user_id, outcome, is_negotiation, notes, created_by)
-            VALUES
-            ('$company_id', '$activity_code', '$activity_type', '$entity_type', $entity_id_sql, '$subject', $adate_sql,
-             $assigned_sql, '$outcome', $is_negotiation, '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $act_gate->insert('activities', array(
+                'activity_code'    => $act_code_raw,
+                'activity_type'    => $type_raw,
+                'entity_type'      => $entity_type_raw,
+                'entity_id'        => $entity_id_val,
+                'subject'          => $subject_raw,
+                'activity_date'    => $adate_val,
+                'assigned_user_id' => $assigned_val,
+                'outcome'          => $outcome_raw,
+                'is_negotiation'   => $is_negotiation,
+                'notes'            => $notes_raw,
+                'created_by'       => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('activities', 'activities', $new_id, ['activity_code' => $act_code_raw]);
             }
             act_redirect_with_msg('تم إضافة النشاط بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('activities.php insert failed: ' . $t->getMessage());
+            act_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('activities.php insert failed: ' . mysqli_error($conn));
-        act_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -225,41 +266,62 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($act_csrf_token, $delete_csrf)) {
         act_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM activities WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $act_gate->selectOne('activities', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         act_redirect_with_msg('لا يمكنك حذف نشاط لا يتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE activities SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $act_gate->softDelete('activities', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('activities', 'activities', $delete_id);
         }
         act_redirect_with_msg('تم حذف النشاط بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('activities.php soft delete failed: ' . $t->getMessage());
+        act_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('activities.php soft delete failed: ' . mysqli_error($conn));
-    act_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// قوائم السجلات المرتبطة (ضمن نطاق الشركة)
+// قوائم السجلات المرتبطة (ضمن نطاق الشركة — العزل عبر البوابة)
 // ══════════════════════════════════════════════════════════════════════════════
-$clients_options = array();
-$cl_res = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE company_id = $company_id AND is_deleted = 0 ORDER BY client_name ASC");
-if ($cl_res) { while ($cl = mysqli_fetch_assoc($cl_res)) { $clients_options[] = $cl; } }
+try {
+    $clients_options = $act_gate->select('clients', array(
+        'columns' => array('id', 'client_code', 'client_name'),
+        'orderBy' => 'client_name ASC',
+    ));
+} catch (\Throwable $t) { $clients_options = array(); }
 
-$opp_options = array();
-$op_res = mysqli_query($conn, "SELECT id, opp_code, title FROM opportunities WHERE company_id = $company_id AND is_deleted = 0 ORDER BY id DESC");
-if ($op_res) { while ($op = mysqli_fetch_assoc($op_res)) { $opp_options[] = $op; } }
+try {
+    $opp_options = $act_gate->select('opportunities', array(
+        'columns' => array('id', 'opp_code', 'title'),
+        'orderBy' => 'id DESC',
+    ));
+} catch (\Throwable $t) { $opp_options = array(); }
 
-$contract_options = array();
-$ct_res = mysqli_query($conn, "SELECT c.id, p.name AS project_name FROM contracts c LEFT JOIN project p ON p.id = c.project_id WHERE c.company_id = $company_id AND c.is_deleted = 0 ORDER BY c.id DESC");
-if ($ct_res) { while ($ct = mysqli_fetch_assoc($ct_res)) { $contract_options[] = $ct; } }
+try {
+    $contract_options = $act_gate->scopedQuery(array(
+        'scope'  => array('c' => 'contracts'),
+        'enrich' => array('p' => 'project'), // اسم المشروع — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT c.id, p.name AS project_name FROM contracts c
+        LEFT JOIN project p ON p.id = c.project_id
+        WHERE {TENANT_SCOPE} AND c.is_deleted = 0 ORDER BY c.id DESC");
+} catch (\Throwable $t) { $contract_options = array(); }
 
 $users_options = array();
-$us_res = mysqli_query($conn, "SELECT id, name FROM users WHERE company_id = $company_id ORDER BY name ASC");
-if ($us_res) { while ($us = mysqli_fetch_assoc($us_res)) { $users_options[intval($us['id'])] = $us['name']; } }
+try {
+    // الأصل بلا فلتر حذفٍ ناعم على المستخدمين — includeDeleted يحفظ السلوك حرفيًّا
+    $us_rows = $act_gate->select('users', array(
+        'columns' => array('id', 'name'),
+        'orderBy' => 'name ASC',
+        'includeDeleted' => true,
+    ));
+} catch (\Throwable $t) { $us_rows = array(); }
+foreach ($us_rows as $us) { $users_options[intval($us['id'])] = $us['name']; }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // جلب الأنشطة + الإحصائيات
@@ -271,41 +333,49 @@ $stat_month = 0;
 $stat_week = 0;
 $today = new DateTime('today');
 
-$q = "SELECT a.*, u.name AS creator_name, au.name AS assigned_name
-      FROM activities a
-      LEFT JOIN users u ON u.id = a.created_by
-      LEFT JOIN users au ON au.id = a.assigned_user_id
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY a.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        // اسم السجل المرتبط
-        $linked = '';
-        if (!empty($row['entity_id'])) {
-            $eid = intval($row['entity_id']);
-            if ($row['entity_type'] === 'client') {
-                $lr = mysqli_query($conn, "SELECT client_name FROM clients WHERE id = $eid LIMIT 1");
-                $linked = ($lr && $lo = mysqli_fetch_assoc($lr)) ? $lo['client_name'] : '';
-            } elseif ($row['entity_type'] === 'opportunity') {
-                $lr = mysqli_query($conn, "SELECT title FROM opportunities WHERE id = $eid LIMIT 1");
-                $linked = ($lr && $lo = mysqli_fetch_assoc($lr)) ? $lo['title'] : '';
-            } else {
-                $linked = 'عقد #' . $eid;
-            }
+// أسماء السجلات المرتبطة كانت حلقة N+1 بمعرّفٍ فقط (بلا نطاقٍ ولا فلتر حذف) —
+// كوفئت بإثراء LEFT JOIN داخل الاستعلام نفسه: نفس الدلالة حرفيًّا وبلا N+1.
+try {
+    $act_list = $act_gate->scopedQuery(array(
+        'scope'  => array('a' => 'activities'),
+        'enrich' => array('u' => 'users', 'au' => 'users', 'lc' => 'clients', 'lo' => 'opportunities'),
+    ), "SELECT a.*, u.name AS creator_name, au.name AS assigned_name,
+               lc.client_name AS linked_client_name, lo.title AS linked_opp_title
+        FROM activities a
+        LEFT JOIN users u ON u.id = a.created_by
+        LEFT JOIN users au ON au.id = a.assigned_user_id
+        LEFT JOIN clients lc ON a.entity_type = 'client' AND lc.id = a.entity_id
+        LEFT JOIN opportunities lo ON a.entity_type = 'opportunity' AND lo.id = a.entity_id
+        WHERE {TENANT_SCOPE} AND a.is_deleted = 0
+        ORDER BY a.id DESC");
+} catch (\Throwable $t) {
+    $act_list = array();
+}
+foreach ($act_list as $row) {
+    // اسم السجل المرتبط (نفس منطق الأصل: غياب السجل = نص فارغ)
+    $linked = '';
+    if (!empty($row['entity_id'])) {
+        $eid = intval($row['entity_id']);
+        if ($row['entity_type'] === 'client') {
+            $linked = ($row['linked_client_name'] !== null) ? $row['linked_client_name'] : '';
+        } elseif ($row['entity_type'] === 'opportunity') {
+            $linked = ($row['linked_opp_title'] !== null) ? $row['linked_opp_title'] : '';
+        } else {
+            $linked = 'عقد #' . $eid;
         }
-        $row['linked_label'] = $linked;
-        $rows[] = $row;
+    }
+    unset($row['linked_client_name'], $row['linked_opp_title']);
+    $row['linked_label'] = $linked;
+    $rows[] = $row;
 
-        $stat_total++;
-        if ((int) $row['is_negotiation'] === 1) $stat_negotiation++;
-        if (!empty($row['activity_date'])) {
-            $d = DateTime::createFromFormat('Y-m-d', $row['activity_date']);
-            if ($d) {
-                $diff = (int) $today->diff($d)->format('%r%a');
-                if ($d->format('Y-m') === $today->format('Y-m')) $stat_month++;
-                if ($diff <= 0 && $diff >= -7) $stat_week++;
-            }
+    $stat_total++;
+    if ((int) $row['is_negotiation'] === 1) $stat_negotiation++;
+    if (!empty($row['activity_date'])) {
+        $d = DateTime::createFromFormat('Y-m-d', $row['activity_date']);
+        if ($d) {
+            $diff = (int) $today->diff($d)->format('%r%a');
+            if ($d->format('Y-m') === $today->format('Y-m')) $stat_month++;
+            if ($diff <= 0 && $diff >= -7) $stat_week++;
         }
     }
 }

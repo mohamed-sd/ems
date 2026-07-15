@@ -47,10 +47,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "p.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "p.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$prod_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['prod_csrf_token'])) {
@@ -72,17 +70,29 @@ $next_prod_code = 'PRD-0001';
 $last_code_sql = "SELECT product_code FROM products
                   WHERE product_code REGEXP '^PRD-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(product_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['product_code'], 4));
+try {
+    $last_code_rows = $prod_gate->scopedQuery(array(
+        'scope' => array('p' => 'products'),
+    ), "SELECT p.product_code FROM products p
+        WHERE {TENANT_SCOPE} AND p.product_code REGEXP '^PRD-[0-9]+$' AND p.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(p.product_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['product_code'], 4));
     $next_prod_code = 'PRD-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة المنتجات والخدمات
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/products.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة المنتجات والخدمات (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $prod_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/products.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -148,67 +158,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     if ($rev_raw !== '' && !isset($PROD_REVENUE_MODELS[$rev_raw])) {
         prod_redirect_with_msg('نموذج الإيراد غير صالح ❌');
     }
-    $rev_sql = $rev_raw !== '' ? "'" . mysqli_real_escape_string($conn, $rev_raw) . "'" : 'NULL';
+    $rev_val = ($rev_raw !== '') ? $rev_raw : null;
 
     // السعر المرجعي
     $price_raw = isset($_POST['standard_price']) ? trim($_POST['standard_price']) : '';
-    $price_sql = ($price_raw === '') ? '0' : "'" . (float) $price_raw . "'";
+    $price_val = ($price_raw === '') ? 0 : (float) $price_raw;
 
-    // تنظيف بقية الحقول
-    $product_code = mysqli_real_escape_string($conn, $prod_code_raw);
-    $name         = mysqli_real_escape_string($conn, $name_raw);
-    $product_type = mysqli_real_escape_string($conn, $type_raw);
-    $currency     = mysqli_real_escape_string($conn, $currency_raw);
-    $default_uom  = mysqli_real_escape_string($conn, isset($_POST['default_uom']) ? trim($_POST['default_uom']) : '');
-    $description  = mysqli_real_escape_string($conn, isset($_POST['description']) ? trim($_POST['description']) : '');
-    $created_by   = intval($_SESSION['user']['id']);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $default_uom_raw = isset($_POST['default_uom']) ? trim($_POST['default_uom']) : '';
+    $description_raw = isset($_POST['description']) ? trim($_POST['description']) : '';
+    $created_by      = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM products WHERE id = $prod_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $prod_gate->selectOne('products', array(
+                'columns' => array('id'), 'where' => array('id' => $prod_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             prod_redirect_with_msg('لا يمكنك تعديل منتج لا يتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM products WHERE product_code = '$product_code' AND id != $prod_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $prod_gate->scopedQuery(array(
+                'scope' => array('p' => 'products'),
+            ), "SELECT p.id FROM products p
+                WHERE {TENANT_SCOPE} AND p.product_code = ? AND p.id != ? AND p.is_deleted = 0",
+                array($prod_code_raw, $prod_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             prod_redirect_with_msg('كود المنتج موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE products SET
-            product_code = '$product_code', name = '$name', product_type = '$product_type',
-            revenue_model = $rev_sql, default_uom = '$default_uom', standard_price = $price_sql,
-            currency = '$currency', description = '$description'
-            WHERE id = $prod_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $prod_gate->update('products', array(
+                'product_code'   => $prod_code_raw,
+                'name'           => $name_raw,
+                'product_type'   => $type_raw,
+                'revenue_model'  => $rev_val,
+                'default_uom'    => $default_uom_raw,
+                'standard_price' => $price_val,
+                'currency'       => $currency_raw,
+                'description'    => $description_raw,
+            ), array('id' => $prod_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('products', 'products', $prod_id, null, ['product_code' => $prod_code_raw]);
             }
             prod_redirect_with_msg('تم تعديل المنتج بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('products.php update failed: ' . $t->getMessage());
+            prod_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('products.php update failed: ' . mysqli_error($conn));
-        prod_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM products WHERE product_code = '$product_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $prod_gate->scopedQuery(array(
+                'scope' => array('p' => 'products'),
+            ), "SELECT p.id FROM products p
+                WHERE {TENANT_SCOPE} AND p.product_code = ? AND p.is_deleted = 0",
+                array($prod_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             prod_redirect_with_msg('كود المنتج موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO products
-            (company_id, product_code, name, product_type, revenue_model, default_uom,
-             standard_price, currency, description, created_by)
-            VALUES
-            ('$company_id', '$product_code', '$name', '$product_type', $rev_sql, '$default_uom',
-             $price_sql, '$currency', '$description', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $prod_gate->insert('products', array(
+                'product_code'   => $prod_code_raw,
+                'name'           => $name_raw,
+                'product_type'   => $type_raw,
+                'revenue_model'  => $rev_val,
+                'default_uom'    => $default_uom_raw,
+                'standard_price' => $price_val,
+                'currency'       => $currency_raw,
+                'description'    => $description_raw,
+                'created_by'     => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('products', 'products', $new_id, ['product_code' => $prod_code_raw]);
             }
             prod_redirect_with_msg('تم إضافة المنتج بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('products.php insert failed: ' . $t->getMessage());
+            prod_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('products.php insert failed: ' . mysqli_error($conn));
-        prod_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -225,21 +256,24 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($prod_csrf_token, $delete_csrf)) {
         prod_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM products WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $prod_gate->selectOne('products', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         prod_redirect_with_msg('لا يمكنك حذف منتج لا يتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE products SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $prod_gate->softDelete('products', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('products', 'products', $delete_id);
         }
         prod_redirect_with_msg('تم حذف المنتج بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('products.php soft delete failed: ' . $t->getMessage());
+        prod_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('products.php soft delete failed: ' . mysqli_error($conn));
-    prod_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -251,20 +285,24 @@ $stat_services = 0;
 $stat_hourly = 0;
 $stat_ton = 0;
 
-$q = "SELECT p.*, u.name AS creator_name
-      FROM products p
-      LEFT JOIN users u ON u.id = p.created_by
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY p.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        $rows[] = $row;
-        $stat_total++;
-        if ($row['product_type'] === 'خدمة') $stat_services++;
-        if ($row['revenue_model'] === 'hourly') $stat_hourly++;
-        elseif ($row['revenue_model'] === 'ton') $stat_ton++;
-    }
+try {
+    $prod_list = $prod_gate->scopedQuery(array(
+        'scope'  => array('p' => 'products'),
+        'enrich' => array('u' => 'users'), // إثراء اسم المُنشئ — LEFT JOIN بلا تنطيق (سلوك الأصل)
+    ), "SELECT p.*, u.name AS creator_name
+        FROM products p
+        LEFT JOIN users u ON u.id = p.created_by
+        WHERE {TENANT_SCOPE} AND p.is_deleted = 0
+        ORDER BY p.id DESC");
+} catch (\Throwable $t) {
+    $prod_list = array();
+}
+foreach ($prod_list as $row) {
+    $rows[] = $row;
+    $stat_total++;
+    if ($row['product_type'] === 'خدمة') $stat_services++;
+    if ($row['revenue_model'] === 'hourly') $stat_hourly++;
+    elseif ($row['revenue_model'] === 'ton') $stat_ton++;
 }
 
 $page_title = "المنتجات والخدمات";

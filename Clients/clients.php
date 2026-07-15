@@ -74,48 +74,6 @@ ob_start('clients_fix_mojibake_output');
 // دوال مساعدة
 // ══════════════════════════════════════════════════════════════════════════════
 
-if (!function_exists('clients_table_has_column')) {
-    // التحقق من وجود عمود في جدول معين
-    function clients_table_has_column($conn, $tableName, $columnName)
-    {
-        $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
-        $safeCol = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
-        $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($conn, $safeCol) . "'";
-        $res = @mysqli_query($conn, $sql);
-
-        return $res && mysqli_num_rows($res) > 0;
-    }
-}
-
-if (!function_exists('clients_build_scope_sql')) {
-    // بناء شرط نطاق الشركة للاستعلامات
-    function clients_build_scope_sql($company_id, $clients_has_company_id, $alias)
-    {
-        $prefix = $alias !== '' ? $alias . '.' : '';
-        if ($clients_has_company_id) {
-            return $prefix . "company_id = $company_id";
-        }
-
-        return "EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = " . $prefix . "created_by AND scope_u.company_id = $company_id)";
-    }
-}
-
-if (!function_exists('clients_not_deleted_sql')) {
-    // بناء شرط السجلات غير المحذوفة
-    function clients_not_deleted_sql($alias, $has_is_deleted, $has_deleted_at)
-    {
-        $prefix = $alias !== '' ? $alias . '.' : '';
-        if ($has_is_deleted) {
-            return $prefix . "is_deleted = 0";
-        }
-        if ($has_deleted_at) {
-            return $prefix . "deleted_at IS NULL";
-        }
-
-        return "1=1";
-    }
-}
-
 if (!function_exists('clients_e')) {
     // تنظيف المخرجات لمنع XSS
     function clients_e($value)
@@ -143,61 +101,16 @@ if ($company_id <= 0) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// فحص أعمدة الجدول وإضافة الأعمدة المفقودة تلقائياً
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15)
+// كشفُ الأعمدة القديم والـDDL وقت التشغيل أُسقطا: أعمدة العزل والحذف الناعم على
+// clients/project مضمونةٌ بالترحيلات وسجل البوابة (وDDL التشغيل مجمَّد أصلًا)،
+// وعمود ربط المشروع الفعلي هو client_id (company_client_id غير موجود — مقيس).
+// شرط الشركة صار مسؤولية {TENANT_SCOPE}؛ الاستعلامات الفرعية المترابطة على
+// project تُقيَّد بمراسلة cc.id المُنطَّق (سلامة FK داخل الشركة الواحدة).
 // ══════════════════════════════════════════════════════════════════════════════
-$clients_has_company_id = clients_table_has_column($conn, 'clients', 'company_id');
-$clients_has_is_deleted = clients_table_has_column($conn, 'clients', 'is_deleted');
-$clients_has_deleted_at = clients_table_has_column($conn, 'clients', 'deleted_at');
-$clients_has_deleted_by = clients_table_has_column($conn, 'clients', 'deleted_by');
+$clients_gate = ems_tenant_db();
 
-$project_has_client_id = clients_table_has_column($conn, 'project', 'client_id');
-$project_has_company_client_id = clients_table_has_column($conn, 'project', 'company_client_id');
-$project_has_company_id = clients_table_has_column($conn, 'project', 'company_id');
-$project_has_is_deleted = clients_table_has_column($conn, 'project', 'is_deleted');
-$project_has_deleted_at = clients_table_has_column($conn, 'project', 'deleted_at');
-
-$operations_has_company_id = clients_table_has_column($conn, 'operations', 'company_id');
-$equipment_drivers_has_company_id = clients_table_has_column($conn, 'equipment_drivers', 'company_id');
-
-$project_client_link_column = '';
-if ($project_has_company_client_id) {
-    $project_client_link_column = 'company_client_id';
-} elseif ($project_has_client_id) {
-    $project_client_link_column = 'client_id';
-}
-
-if (!$clients_has_is_deleted || !$clients_has_deleted_at || !$clients_has_deleted_by) {
-    $alter_parts = array();
-    if (!$clients_has_is_deleted) {
-        $alter_parts[] = "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0";
-    }
-    if (!$clients_has_deleted_at) {
-        $alter_parts[] = "ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL";
-    }
-    if (!$clients_has_deleted_by) {
-        $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
-    }
-
-    if (!empty($alter_parts)) {
-        ems_runtime_ddl($conn, "ALTER TABLE clients " . implode(', ', $alter_parts), 'Clients/clients.php');
-    }
-
-    // إعادة الفحص بعد التعديل
-    $clients_has_is_deleted = clients_table_has_column($conn, 'clients', 'is_deleted');
-    $clients_has_deleted_at = clients_table_has_column($conn, 'clients', 'deleted_at');
-    $clients_has_deleted_by = clients_table_has_column($conn, 'clients', 'deleted_by');
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// بناء شروط SQL للنطاق والحذف الناعم
-// ══════════════════════════════════════════════════════════════════════════════
-$scope_clients_sql = clients_build_scope_sql($company_id, $clients_has_company_id, 'cc');
-$scope_clients_update_sql = clients_build_scope_sql($company_id, $clients_has_company_id, '');
-$not_deleted_cc_sql = clients_not_deleted_sql('cc', $clients_has_is_deleted, $clients_has_deleted_at);
-$not_deleted_plain_sql = clients_not_deleted_sql('', $clients_has_is_deleted, $clients_has_deleted_at);
-
-$scope_project_sql = clients_build_scope_sql($company_id, $project_has_company_id, 'p');
-$not_deleted_project_sql = clients_not_deleted_sql('p', $project_has_is_deleted, $project_has_deleted_at);
+$project_client_link_column = 'client_id';
 $project_active_status_sql = "(
     p.status = 1
     OR p.status = '1'
@@ -206,46 +119,37 @@ $project_active_status_sql = "(
     OR TRIM(LOWER(p.status)) = 'true'
 )";
 
-$projects_count_select_sql = '0';
-$projects_active_count_select_sql = '0';
-$projects_inactive_count_select_sql = '0';
-if ($project_client_link_column !== '') {
-    $projects_count_select_sql = "(
-        SELECT COUNT(*)
-        FROM project p
-        WHERE p.$project_client_link_column = cc.id
-          AND $scope_project_sql
-          AND $not_deleted_project_sql
-    )";
+$projects_count_select_sql = "(
+    SELECT COUNT(*)
+    FROM project p
+    WHERE p.client_id = cc.id
+      AND p.is_deleted = 0
+)";
 
-    $projects_active_count_select_sql = "(
+$projects_active_count_select_sql = "(
+    SELECT COUNT(*)
+    FROM project p
+    WHERE p.client_id = cc.id
+      AND p.is_deleted = 0
+      AND $project_active_status_sql
+)";
+
+$projects_inactive_count_select_sql = "(
+    (
         SELECT COUNT(*)
         FROM project p
-        WHERE p.$project_client_link_column = cc.id
-          AND $scope_project_sql
-          AND $not_deleted_project_sql
+        WHERE p.client_id = cc.id
+          AND p.is_deleted = 0
+    )
+    -
+    (
+        SELECT COUNT(*)
+        FROM project p
+        WHERE p.client_id = cc.id
+          AND p.is_deleted = 0
           AND $project_active_status_sql
-    )";
-
-    $projects_inactive_count_select_sql = "(
-        (
-            SELECT COUNT(*)
-            FROM project p
-            WHERE p.$project_client_link_column = cc.id
-              AND $scope_project_sql
-              AND $not_deleted_project_sql
-        )
-        -
-        (
-            SELECT COUNT(*)
-            FROM project p
-            WHERE p.$project_client_link_column = cc.id
-              AND $scope_project_sql
-              AND $not_deleted_project_sql
-              AND $project_active_status_sql
-        )
-    )";
-}
+    )
+)";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // توليد رمز CSRF لحماية النماذج
@@ -261,18 +165,18 @@ $clients_csrf_token = $_SESSION['clients_csrf_token'];
 // هذا للعرض فقط ولا يُخزَّن في قاعدة البيانات
 // ══════════════════════════════════════════════════════════════════════════════
 $next_client_code = 'CLT-0001'; // القيمة الافتراضية
-$last_code_scope = $clients_has_company_id ? "AND company_id = $company_id" : '';
-$last_code_deleted = $clients_has_is_deleted ? "AND is_deleted = 0" : ($clients_has_deleted_at ? "AND deleted_at IS NULL" : "");
-$last_code_sql = "SELECT client_code FROM clients
-                  WHERE client_code REGEXP '^CLT-[0-9]+$'
-                  $last_code_scope
-                  $last_code_deleted
-                  ORDER BY CAST(SUBSTRING(client_code, 5) AS UNSIGNED) DESC
-                  LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['client_code'], 4)); // بعد "CLT-"
+try {
+    $last_code_rows = $clients_gate->scopedQuery(array(
+        'scope' => array('cc' => 'clients'),
+    ), "SELECT cc.client_code FROM clients cc
+        WHERE {TENANT_SCOPE} AND cc.client_code REGEXP '^CLT-[0-9]+$' AND cc.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(cc.client_code, 5) AS UNSIGNED) DESC
+        LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['client_code'], 4)); // بعد "CLT-"
     $next_num = $last_num + 1;
     $next_client_code = 'CLT-' . str_pad($next_num, 4, '0', STR_PAD_LEFT);
 }
@@ -281,15 +185,16 @@ if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
 // ðŸ” التحقق من صلاحيات المستخدم على وحدة العملاء
 // ══════════════════════════════════════════════════════════════════════════════
 
-// الحصول على معرف وحدة العملاء من جدول modules
-$module_query = "SELECT id FROM modules
-                      WHERE code = 'Clients/clients.php'
-                          OR code = 'clients'
-                          OR code LIKE '%clients.php%'
-                          OR name LIKE '%عملاء%'
-                      LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// الحصول على معرف وحدة العملاء من جدول modules (جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $clients_gate->selectOne('modules', array(
+        'columns'  => array('id'),
+        'whereRaw' => "(code = ? OR code = ? OR code LIKE ? OR name LIKE ?)",
+        'params'   => array('Clients/clients.php', 'clients', '%clients.php%', '%عملاء%'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 // تحديد صلاحيات المستخدم على هذه الوحدة
@@ -345,72 +250,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         clients_redirect_with_msg('حالة العميل غير صالحة ❌');
     }
 
-    // تنظيف البيانات المدخلة
-    $client_code = mysqli_real_escape_string($conn, $client_code_raw);
-    $client_name = mysqli_real_escape_string($conn, trim($_POST['client_name']));
-    $entity_type = mysqli_real_escape_string($conn, trim($_POST['entity_type']));
-    $sector_category = mysqli_real_escape_string($conn, trim($_POST['sector_category']));
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $whatsapp = mysqli_real_escape_string($conn, trim($_POST['whatsapp']));
-    $status = mysqli_real_escape_string($conn, $status_raw);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $client_name_raw = trim($_POST['client_name']);
+    $entity_type_raw = trim($_POST['entity_type']);
+    $sector_category_raw = trim($_POST['sector_category']);
+    $phone_raw = trim($_POST['phone']);
+    $email_raw = trim($_POST['email']);
+    $whatsapp_raw = trim($_POST['whatsapp']);
     $created_by = intval($_SESSION['user']['id']);
 
     if ($client_id > 0) {
         // ── تعديل عميل موجود ────────────────────────────────────────────────
 
-        // التحقق من ملكية العميل للشركة الحالية
-        $owner_check_query = "SELECT cc.id FROM clients cc WHERE cc.id = $client_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1";
-        $owner_check_result = mysqli_query($conn, $owner_check_query);
-        if (!$owner_check_result || mysqli_num_rows($owner_check_result) === 0) {
+        // التحقق من ملكية العميل للشركة الحالية (العزل عبر البوابة)
+        try {
+            $owner_check = $clients_gate->selectOne('clients', array(
+                'columns' => array('id'), 'where' => array('id' => $client_id),
+            ));
+        } catch (\Throwable $t) { $owner_check = null; }
+        if (!$owner_check) {
             clients_redirect_with_msg('لا يمكنك تعديل عميل لا يتبع لشركتك ❌');
         }
 
         // التحقق من عدم تكرار كود العميل
-        $check_query = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND cc.id != $client_id AND $scope_clients_sql AND $not_deleted_cc_sql";
-        $check_result = mysqli_query($conn, $check_query);
-
-        if ($check_result && mysqli_num_rows($check_result) > 0) {
+        try {
+            $dup = $clients_gate->scopedQuery(array(
+                'scope' => array('cc' => 'clients'),
+            ), "SELECT cc.id FROM clients cc
+                WHERE {TENANT_SCOPE} AND cc.client_code = ? AND cc.id != ? AND cc.is_deleted = 0",
+                array($client_code_raw, $client_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE clients SET
-            client_code      = '$client_code',
-            client_name      = '$client_name',
-            entity_type      = '$entity_type',
-            sector_category  = '$sector_category',
-            phone            = '$phone',
-            email            = '$email',
-            whatsapp         = '$whatsapp',
-            status           = '$status'
-            WHERE id = $client_id AND $scope_clients_update_sql AND $not_deleted_plain_sql";
-
-        // إذا كان عمود company_id موجوداً، أضفه للتحديث
-        if ($clients_has_company_id) {
-            $update_query = "UPDATE clients SET
-            client_code      = '$client_code',
-            client_name      = '$client_name',
-            entity_type      = '$entity_type',
-            sector_category  = '$sector_category',
-            phone            = '$phone',
-            email            = '$email',
-            whatsapp         = '$whatsapp',
-            status           = '$status',
-            company_id       = '$company_id'
-            WHERE id = $client_id AND $scope_clients_update_sql AND $not_deleted_plain_sql";
-        }
-
-        if (mysqli_query($conn, $update_query)) {
+        // (إعادة ختم company_id في الأصل كانت لا-عمل بنفس القيمة — البوابة تمنع
+        //  تمريره في التعديل أصلًا وتضمن بقاءه بشرط النطاق)
+        try {
+            $clients_gate->update('clients', array(
+                'client_code'     => $client_code_raw,
+                'client_name'     => $client_name_raw,
+                'entity_type'     => $entity_type_raw,
+                'sector_category' => $sector_category_raw,
+                'phone'           => $phone_raw,
+                'email'           => $email_raw,
+                'whatsapp'        => $whatsapp_raw,
+                'status'          => $status_raw,
+            ), array('id' => $client_id), 'is_deleted = 0');
             \App\Services\ActivityLogService::logUpdate(
                 'clients',
                 'clients',
                 $client_id,
                 null,
-                ['client_code' => $client_code_raw, 'client_name' => trim($_POST['client_name'])]
+                ['client_code' => $client_code_raw, 'client_name' => $client_name_raw]
             );
             clients_redirect_with_msg('تم تعديل العميل بنجاح ✅');
-        } else {
-            error_log('clients.php update failed: ' . mysqli_error($conn));
+        } catch (\Throwable $t) {
+            error_log('clients.php update failed: ' . $t->getMessage());
             clients_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
 
@@ -418,37 +314,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         // ── إضافة عميل جديد ─────────────────────────────────────────────────
 
         // التحقق من عدم تكرار كود العميل
-        $check_query = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND $scope_clients_sql AND $not_deleted_cc_sql";
-        $check_result = mysqli_query($conn, $check_query);
-
-        if ($check_result && mysqli_num_rows($check_result) > 0) {
+        try {
+            $dup = $clients_gate->scopedQuery(array(
+                'scope' => array('cc' => 'clients'),
+            ), "SELECT cc.id FROM clients cc
+                WHERE {TENANT_SCOPE} AND cc.client_code = ? AND cc.is_deleted = 0",
+                array($client_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO clients
-            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by)
-            VALUES
-            ('$client_code', '$client_name', '$entity_type', '$sector_category', '$phone', '$email', '$whatsapp', '$status', '$created_by')";
-
-        // إذا كان عمود company_id موجوداً، أضفه للإدراج
-        if ($clients_has_company_id) {
-            $insert_query = "INSERT INTO clients
-            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by, company_id)
-            VALUES
-            ('$client_code', '$client_name', '$entity_type', '$sector_category', '$phone', '$email', '$whatsapp', '$status', '$created_by', '$company_id')";
-        }
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_client_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_client_id = (int) $clients_gate->insert('clients', array(
+                'client_code'     => $client_code_raw,
+                'client_name'     => $client_name_raw,
+                'entity_type'     => $entity_type_raw,
+                'sector_category' => $sector_category_raw,
+                'phone'           => $phone_raw,
+                'email'           => $email_raw,
+                'whatsapp'        => $whatsapp_raw,
+                'status'          => $status_raw,
+                'created_by'      => $created_by,
+            ));
             \App\Services\ActivityLogService::logCreate(
                 'clients',
                 'clients',
                 $new_client_id,
-                ['client_code' => $client_code_raw, 'client_name' => trim($_POST['client_name'])]
+                ['client_code' => $client_code_raw, 'client_name' => $client_name_raw]
             );
             clients_redirect_with_msg('تم إضافة العميل بنجاح ✅');
-        } else {
-            error_log('clients.php insert failed: ' . mysqli_error($conn));
+        } catch (\Throwable $t) {
+            error_log('clients.php insert failed: ' . $t->getMessage());
             clients_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
     }
@@ -466,52 +363,39 @@ if (isset($_GET['delete_id'])) {
         clients_redirect_with_msg('لا توجد صلاحية حذف العملاء ❌');
     }
 
-    if (!$clients_has_is_deleted && !$clients_has_deleted_at) {
-        clients_redirect_with_msg('تعذر تفعيل الحذف الناعم حالياً. راجع صلاحيات قاعدة البيانات ❌');
-    }
-
     // التحقق من رمز CSRF
     if (empty($delete_csrf) || !hash_equals($clients_csrf_token, $delete_csrf)) {
         clients_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
 
-    // التحقق من أن العميل تابع لشركة المستخدم
-    $can_delete_scope_result = mysqli_query($conn, "SELECT cc.id FROM clients cc WHERE cc.id = $delete_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1");
-    if (!$can_delete_scope_result || mysqli_num_rows($can_delete_scope_result) === 0) {
+    // التحقق من أن العميل تابع لشركة المستخدم (العزل عبر البوابة)
+    try {
+        $can_delete_scope = $clients_gate->selectOne('clients', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $can_delete_scope = null; }
+    if (!$can_delete_scope) {
         clients_redirect_with_msg('لا يمكنك حذف عميل لا يتبع لشركتك ❌');
     }
 
-    // بناء استعلام الحذف الناعم
-    $delete_set = array("status = 'متوقف'");
-    if ($clients_has_is_deleted) {
-        $delete_set[] = "is_deleted = 1";
-    }
-    if ($clients_has_deleted_at) {
-        $delete_set[] = "deleted_at = NOW()";
-    }
-    if ($clients_has_deleted_by) {
-        $deleted_by = intval($_SESSION['user']['id']);
-        $delete_set[] = "deleted_by = $deleted_by";
-    }
-
-    $soft_delete_query = "UPDATE clients SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND $scope_clients_update_sql";
-    if ($clients_has_is_deleted) {
-        $soft_delete_query .= " AND is_deleted = 0";
-    } elseif ($clients_has_deleted_at) {
-        $soft_delete_query .= " AND deleted_at IS NULL";
-    }
-
-    if (mysqli_query($conn, $soft_delete_query)) {
+    // الحذف الناعم مع تعطيل الحالة (سلوك الأصل: status='متوقف' + أعمدة الحذف الثلاثة)
+    try {
+        $clients_gate->update('clients', array(
+            'status'     => 'متوقف',
+            'is_deleted' => 1,
+            'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_by' => intval($_SESSION['user']['id']),
+        ), array('id' => $delete_id), 'is_deleted = 0');
         \App\Services\ActivityLogService::logDelete(
             'clients',
             'clients',
             $delete_id
         );
         clients_redirect_with_msg('تم حذف العميل بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('clients.php soft delete failed: ' . $t->getMessage());
+        clients_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-
-    error_log('clients.php soft delete failed: ' . mysqli_error($conn));
-    clients_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
@@ -523,22 +407,24 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
         exit();
     }
 
-    $client_check_query = "SELECT cc.id FROM clients cc WHERE cc.id = $client_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1";
-    $client_check_res = mysqli_query($conn, $client_check_query);
-    if (!$client_check_res || mysqli_num_rows($client_check_res) === 0) {
+    try {
+        $client_check = $clients_gate->selectOne('clients', array(
+            'columns' => array('id'), 'where' => array('id' => $client_id),
+        ));
+    } catch (\Throwable $t) { $client_check = null; }
+    if (!$client_check) {
         echo json_encode(array('success' => false, 'message' => 'العميل غير موجود أو خارج نطاق الشركة'));
         exit();
     }
 
-    if ($project_client_link_column === '') {
-        echo json_encode(array('success' => true, 'projects' => array()));
-        exit();
-    }
-
-    $operations_company_filter = $operations_has_company_id ? " AND o.company_id = $company_id" : '';
-    $equipment_drivers_company_filter = $equipment_drivers_has_company_id ? " AND ed.company_id = $company_id" : '';
-
-    $projects_query = "
+    // الاستعلامات الفرعية المترابطة على operations/equipment_drivers تُقيَّد بمراسلة
+    // p.id المُنطَّق عبر {TENANT_SCOPE} (سلامة FK داخل الشركة)؛ إعلانهما enrich،
+    // وJOIN المشغّلين صار LEFT (مكافئ حرفيًّا مع شرط employee_id IS NOT NULL القائم).
+    try {
+        $projects_rows = $clients_gate->scopedQuery(array(
+            'scope'  => array('p' => 'project'),
+            'enrich' => array('o' => 'operations', 'ed' => 'equipment_drivers'),
+        ), "
         SELECT
             p.id,
             p.name,
@@ -551,7 +437,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
                 END)
                 FROM operations o
                 WHERE o.project_id = p.id
-                  $operations_company_filter
             ) AS suppliers_count,
             (
                 SELECT COUNT(DISTINCT o.equipment)
@@ -560,7 +445,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
                   AND o.equipment IS NOT NULL
                   AND o.equipment <> ''
                   AND o.equipment <> '0'
-                  $operations_company_filter
             ) AS equipments_total,
             (
                 SELECT COUNT(DISTINCT o.equipment)
@@ -570,42 +454,35 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
                   AND o.equipment IS NOT NULL
                   AND o.equipment <> ''
                   AND o.equipment <> '0'
-                  $operations_company_filter
             ) AS equipments_working,
             (
                 SELECT COUNT(DISTINCT ed.employee_id)
                 FROM operations o
-                JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+                LEFT JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
                 WHERE o.project_id = p.id
                   AND ed.employee_id IS NOT NULL
-                  $operations_company_filter
-                  $equipment_drivers_company_filter
             ) AS operators_total,
             (
                 SELECT COUNT(DISTINCT ed.employee_id)
                 FROM operations o
-                JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+                LEFT JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
                 WHERE o.project_id = p.id
                   AND ed.status = 1
                   AND ed.employee_id IS NOT NULL
-                  $operations_company_filter
-                  $equipment_drivers_company_filter
             ) AS operators_working
         FROM project p
-        WHERE p.$project_client_link_column = $client_id
-          AND $scope_project_sql
-          AND $not_deleted_project_sql
+        WHERE {TENANT_SCOPE}
+          AND p.client_id = ?
+          AND p.is_deleted = 0
         ORDER BY p.id DESC
-    ";
-
-    $projects_result = mysqli_query($conn, $projects_query);
-    if (!$projects_result) {
+        ", array($client_id));
+    } catch (\Throwable $t) {
         echo json_encode(array('success' => false, 'message' => 'تعذر تحميل بيانات المشاريع'));
         exit();
     }
 
     $projects = array();
-    while ($project_row = mysqli_fetch_assoc($projects_result)) {
+    foreach ($projects_rows as $project_row) {
         $equipments_total = intval($project_row['equipments_total']);
         $equipments_working = intval($project_row['equipments_working']);
         $operators_total = intval($project_row['operators_total']);
@@ -644,18 +521,26 @@ $clients_without_projects = 0;
 
 $sector_counts = array();
 
-$clients_query = "SELECT cc.*, u.name as creator_name,
-                         $projects_count_select_sql AS projects_count,
-                         $projects_active_count_select_sql AS projects_active_count,
-                         $projects_inactive_count_select_sql AS projects_inactive_count
-                  FROM clients cc
-                  LEFT JOIN users u ON cc.created_by = u.id
-                  WHERE $scope_clients_sql AND $not_deleted_cc_sql
-                  ORDER BY cc.id DESC";
-$clients_result = mysqli_query($conn, $clients_query);
+// عدّادات المشاريع استعلاماتٌ فرعيةٌ مترابطة على cc.id المُنطَّق — project تُعلن
+// enrich (إعلانٌ بلا تنطيقٍ إضافي: المراسلة تضمن العزل بسلامة FK داخل الشركة).
+try {
+    $clients_list = $clients_gate->scopedQuery(array(
+        'scope'  => array('cc' => 'clients'),
+        'enrich' => array('u' => 'users', 'p' => 'project'),
+    ), "SELECT cc.*, u.name as creator_name,
+               $projects_count_select_sql AS projects_count,
+               $projects_active_count_select_sql AS projects_active_count,
+               $projects_inactive_count_select_sql AS projects_inactive_count
+        FROM clients cc
+        LEFT JOIN users u ON cc.created_by = u.id
+        WHERE {TENANT_SCOPE} AND cc.is_deleted = 0
+        ORDER BY cc.id DESC");
+} catch (\Throwable $t) {
+    $clients_list = array();
+}
 
-if ($clients_result) {
-    while ($row = mysqli_fetch_assoc($clients_result)) {
+foreach ($clients_list as $row) {
+    {
         $clients_rows[] = $row;
 
         $clients_total_count++;

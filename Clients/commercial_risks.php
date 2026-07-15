@@ -38,10 +38,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "r.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "r.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$risk_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['risk_csrf_token'])) {
@@ -63,17 +61,29 @@ $next_risk_code = 'RSK-0001';
 $last_code_sql = "SELECT risk_code FROM commercial_risks
                   WHERE risk_code REGEXP '^RSK-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(risk_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['risk_code'], 4));
+try {
+    $last_code_rows = $risk_gate->scopedQuery(array(
+        'scope' => array('r' => 'commercial_risks'),
+    ), "SELECT r.risk_code FROM commercial_risks r
+        WHERE {TENANT_SCOPE} AND r.risk_code REGEXP '^RSK-[0-9]+$' AND r.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(r.risk_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['risk_code'], 4));
     $next_risk_code = 'RSK-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة المخاطر التجارية
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/commercial_risks.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة المخاطر التجارية (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $risk_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/commercial_risks.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -140,87 +150,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['risk_type'])) {
         $entity_type_raw = 'opportunity';
     }
 
-    // السجل المرتبط — التحقق من النطاق حسب النوع (إن حُدِّد)
+    // السجل المرتبط — التحقق من النطاق حسب النوع (إن حُدِّد) عبر البوابة
     $entity_id_in = isset($_POST['entity_id']) ? intval($_POST['entity_id']) : 0;
     if ($entity_id_in > 0) {
-        if ($entity_type_raw === 'opportunity') {
-            $chk = mysqli_query($conn, "SELECT id FROM opportunities WHERE id = $entity_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        } else {
-            $chk = mysqli_query($conn, "SELECT id FROM contracts WHERE id = $entity_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        }
-        if (!$chk || mysqli_num_rows($chk) === 0) {
+        $entity_table = ($entity_type_raw === 'opportunity') ? 'opportunities' : 'contracts';
+        try {
+            $chk = $risk_gate->selectOne($entity_table, array(
+                'columns' => array('id'), 'where' => array('id' => $entity_id_in),
+            ));
+        } catch (\Throwable $t) { $chk = null; }
+        if (!$chk) {
             risk_redirect_with_msg('السجل المرتبط غير موجود أو خارج نطاق شركتك ❌');
         }
     }
-    $entity_id_sql = $entity_id_in > 0 ? "'$entity_id_in'" : 'NULL';
+    $entity_id_val = $entity_id_in > 0 ? $entity_id_in : null;
 
-    // المستخدم المسؤول (إن حُدِّد) ضمن الشركة
+    // المستخدم المسؤول (إن حُدِّد) ضمن الشركة — الأصل بلا فلتر حذفٍ ناعم
     $owner_in = isset($_POST['owner_user_id']) ? intval($_POST['owner_user_id']) : 0;
     if ($owner_in > 0) {
-        $uchk = mysqli_query($conn, "SELECT id FROM users WHERE id = $owner_in AND company_id = $company_id LIMIT 1");
-        if (!$uchk || mysqli_num_rows($uchk) === 0) {
+        try {
+            $uchk = $risk_gate->selectOne('users', array(
+                'columns' => array('id'), 'where' => array('id' => $owner_in),
+                'includeDeleted' => true,
+            ));
+        } catch (\Throwable $t) { $uchk = null; }
+        if (!$uchk) {
             $owner_in = 0;
         }
     }
-    $owner_sql = $owner_in > 0 ? "'$owner_in'" : 'NULL';
+    $owner_val = $owner_in > 0 ? $owner_in : null;
 
-    // تنظيف بقية الحقول
-    $risk_code   = mysqli_real_escape_string($conn, $risk_code_raw);
-    $name        = mysqli_real_escape_string($conn, $name_raw);
-    $risk_type   = mysqli_real_escape_string($conn, $type_raw);
-    $severity    = mysqli_real_escape_string($conn, $severity_raw);
-    $state       = mysqli_real_escape_string($conn, $state_raw);
-    $entity_type = mysqli_real_escape_string($conn, $entity_type_raw);
-    $mitigation  = mysqli_real_escape_string($conn, isset($_POST['mitigation']) ? trim($_POST['mitigation']) : '');
-    $notes       = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
-    $created_by  = intval($_SESSION['user']['id']);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $mitigation_raw = isset($_POST['mitigation']) ? trim($_POST['mitigation']) : '';
+    $notes_raw      = isset($_POST['notes']) ? trim($_POST['notes']) : '';
+    $created_by     = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM commercial_risks WHERE id = $risk_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $risk_gate->selectOne('commercial_risks', array(
+                'columns' => array('id'), 'where' => array('id' => $risk_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             risk_redirect_with_msg('لا يمكنك تعديل خطر لا يتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM commercial_risks WHERE risk_code = '$risk_code' AND id != $risk_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $risk_gate->scopedQuery(array(
+                'scope' => array('r' => 'commercial_risks'),
+            ), "SELECT r.id FROM commercial_risks r
+                WHERE {TENANT_SCOPE} AND r.risk_code = ? AND r.id != ? AND r.is_deleted = 0",
+                array($risk_code_raw, $risk_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             risk_redirect_with_msg('كود الخطر موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE commercial_risks SET
-            risk_code = '$risk_code', name = '$name', risk_type = '$risk_type', severity = '$severity',
-            mitigation = '$mitigation', owner_user_id = $owner_sql, state = '$state',
-            entity_type = '$entity_type', entity_id = $entity_id_sql, notes = '$notes'
-            WHERE id = $risk_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $risk_gate->update('commercial_risks', array(
+                'risk_code'     => $risk_code_raw,
+                'name'          => $name_raw,
+                'risk_type'     => $type_raw,
+                'severity'      => $severity_raw,
+                'mitigation'    => $mitigation_raw,
+                'owner_user_id' => $owner_val,
+                'state'         => $state_raw,
+                'entity_type'   => $entity_type_raw,
+                'entity_id'     => $entity_id_val,
+                'notes'         => $notes_raw,
+            ), array('id' => $risk_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('commercial_risks', 'commercial_risks', $risk_id, null, ['risk_code' => $risk_code_raw]);
             }
             risk_redirect_with_msg('تم تعديل الخطر بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('commercial_risks.php update failed: ' . $t->getMessage());
+            risk_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('commercial_risks.php update failed: ' . mysqli_error($conn));
-        risk_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM commercial_risks WHERE risk_code = '$risk_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $risk_gate->scopedQuery(array(
+                'scope' => array('r' => 'commercial_risks'),
+            ), "SELECT r.id FROM commercial_risks r
+                WHERE {TENANT_SCOPE} AND r.risk_code = ? AND r.is_deleted = 0",
+                array($risk_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             risk_redirect_with_msg('كود الخطر موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO commercial_risks
-            (company_id, risk_code, name, risk_type, severity, mitigation, owner_user_id, state,
-             entity_type, entity_id, notes, created_by)
-            VALUES
-            ('$company_id', '$risk_code', '$name', '$risk_type', '$severity', '$mitigation', $owner_sql, '$state',
-             '$entity_type', $entity_id_sql, '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $risk_gate->insert('commercial_risks', array(
+                'risk_code'     => $risk_code_raw,
+                'name'          => $name_raw,
+                'risk_type'     => $type_raw,
+                'severity'      => $severity_raw,
+                'mitigation'    => $mitigation_raw,
+                'owner_user_id' => $owner_val,
+                'state'         => $state_raw,
+                'entity_type'   => $entity_type_raw,
+                'entity_id'     => $entity_id_val,
+                'notes'         => $notes_raw,
+                'created_by'    => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('commercial_risks', 'commercial_risks', $new_id, ['risk_code' => $risk_code_raw]);
             }
             risk_redirect_with_msg('تم إضافة الخطر بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('commercial_risks.php insert failed: ' . $t->getMessage());
+            risk_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('commercial_risks.php insert failed: ' . mysqli_error($conn));
-        risk_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -237,37 +276,55 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($risk_csrf_token, $delete_csrf)) {
         risk_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM commercial_risks WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $risk_gate->selectOne('commercial_risks', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         risk_redirect_with_msg('لا يمكنك حذف خطر لا يتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE commercial_risks SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $risk_gate->softDelete('commercial_risks', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('commercial_risks', 'commercial_risks', $delete_id);
         }
         risk_redirect_with_msg('تم حذف الخطر بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('commercial_risks.php soft delete failed: ' . $t->getMessage());
+        risk_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('commercial_risks.php soft delete failed: ' . mysqli_error($conn));
-    risk_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// قوائم السجلات المرتبطة (ضمن نطاق الشركة)
+// قوائم السجلات المرتبطة (ضمن نطاق الشركة — العزل عبر البوابة)
 // ══════════════════════════════════════════════════════════════════════════════
-$opp_options = array();
-$op_res = mysqli_query($conn, "SELECT id, opp_code, title FROM opportunities WHERE company_id = $company_id AND is_deleted = 0 ORDER BY id DESC");
-if ($op_res) { while ($op = mysqli_fetch_assoc($op_res)) { $opp_options[] = $op; } }
+try {
+    $opp_options = $risk_gate->select('opportunities', array(
+        'columns' => array('id', 'opp_code', 'title'),
+        'orderBy' => 'id DESC',
+    ));
+} catch (\Throwable $t) { $opp_options = array(); }
 
-$contract_options = array();
-$ct_res = mysqli_query($conn, "SELECT c.id, p.name AS project_name FROM contracts c LEFT JOIN project p ON p.id = c.project_id WHERE c.company_id = $company_id AND c.is_deleted = 0 ORDER BY c.id DESC");
-if ($ct_res) { while ($ct = mysqli_fetch_assoc($ct_res)) { $contract_options[] = $ct; } }
+try {
+    $contract_options = $risk_gate->scopedQuery(array(
+        'scope'  => array('c' => 'contracts'),
+        'enrich' => array('p' => 'project'), // اسم المشروع — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT c.id, p.name AS project_name FROM contracts c
+        LEFT JOIN project p ON p.id = c.project_id
+        WHERE {TENANT_SCOPE} AND c.is_deleted = 0 ORDER BY c.id DESC");
+} catch (\Throwable $t) { $contract_options = array(); }
 
 $users_options = array();
-$us_res = mysqli_query($conn, "SELECT id, name FROM users WHERE company_id = $company_id ORDER BY name ASC");
-if ($us_res) { while ($us = mysqli_fetch_assoc($us_res)) { $users_options[intval($us['id'])] = $us['name']; } }
+try {
+    // الأصل بلا فلتر حذفٍ ناعم على المستخدمين — includeDeleted يحفظ السلوك حرفيًّا
+    $us_rows = $risk_gate->select('users', array(
+        'columns' => array('id', 'name'),
+        'orderBy' => 'name ASC',
+        'includeDeleted' => true,
+    ));
+} catch (\Throwable $t) { $us_rows = array(); }
+foreach ($us_rows as $us) { $users_options[intval($us['id'])] = $us['name']; }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // جلب المخاطر + الإحصائيات
@@ -278,34 +335,42 @@ $stat_open = 0;
 $stat_high = 0;
 $stat_closed = 0;
 
-$q = "SELECT r.*, u.name AS creator_name, ou.name AS owner_name
-      FROM commercial_risks r
-      LEFT JOIN users u ON u.id = r.created_by
-      LEFT JOIN users ou ON ou.id = r.owner_user_id
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY r.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        // اسم السجل المرتبط
-        $linked = '';
-        if (!empty($row['entity_id'])) {
-            $eid = intval($row['entity_id']);
-            if ($row['entity_type'] === 'opportunity') {
-                $lr = mysqli_query($conn, "SELECT title FROM opportunities WHERE id = $eid LIMIT 1");
-                $linked = ($lr && $lo = mysqli_fetch_assoc($lr)) ? $lo['title'] : '';
-            } else {
-                $linked = 'عقد #' . $eid;
-            }
+// أسماء السجلات المرتبطة كانت حلقة N+1 بمعرّفٍ فقط (بلا نطاقٍ ولا فلتر حذف) —
+// كوفئت بإثراء LEFT JOIN داخل الاستعلام نفسه: نفس الدلالة حرفيًّا وبلا N+1.
+try {
+    $risk_list = $risk_gate->scopedQuery(array(
+        'scope'  => array('r' => 'commercial_risks'),
+        'enrich' => array('u' => 'users', 'ou' => 'users', 'lo' => 'opportunities'),
+    ), "SELECT r.*, u.name AS creator_name, ou.name AS owner_name,
+               lo.title AS linked_opp_title
+        FROM commercial_risks r
+        LEFT JOIN users u ON u.id = r.created_by
+        LEFT JOIN users ou ON ou.id = r.owner_user_id
+        LEFT JOIN opportunities lo ON r.entity_type = 'opportunity' AND lo.id = r.entity_id
+        WHERE {TENANT_SCOPE} AND r.is_deleted = 0
+        ORDER BY r.id DESC");
+} catch (\Throwable $t) {
+    $risk_list = array();
+}
+foreach ($risk_list as $row) {
+    // اسم السجل المرتبط (نفس منطق الأصل: غياب السجل = نص فارغ)
+    $linked = '';
+    if (!empty($row['entity_id'])) {
+        $eid = intval($row['entity_id']);
+        if ($row['entity_type'] === 'opportunity') {
+            $linked = ($row['linked_opp_title'] !== null) ? $row['linked_opp_title'] : '';
+        } else {
+            $linked = 'عقد #' . $eid;
         }
-        $row['linked_label'] = $linked;
-        $rows[] = $row;
-
-        $stat_total++;
-        if ($row['state'] === 'مفتوح') $stat_open++;
-        if ($row['severity'] === 'عالية') $stat_high++;
-        if ($row['state'] === 'مغلق') $stat_closed++;
     }
+    unset($row['linked_opp_title']);
+    $row['linked_label'] = $linked;
+    $rows[] = $row;
+
+    $stat_total++;
+    if ($row['state'] === 'مفتوح') $stat_open++;
+    if ($row['severity'] === 'عالية') $stat_high++;
+    if ($row['state'] === 'مغلق') $stat_closed++;
 }
 
 $page_title = "المخاطر التجارية";

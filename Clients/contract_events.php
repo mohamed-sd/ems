@@ -38,10 +38,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "e.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "e.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$evt_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['evt_csrf_token'])) {
@@ -59,17 +57,29 @@ $next_evt_code = 'EVT-0001';
 $last_code_sql = "SELECT event_code FROM contract_events
                   WHERE event_code REGEXP '^EVT-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(event_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['event_code'], 4));
+try {
+    $last_code_rows = $evt_gate->scopedQuery(array(
+        'scope' => array('e' => 'contract_events'),
+    ), "SELECT e.event_code FROM contract_events e
+        WHERE {TENANT_SCOPE} AND e.event_code REGEXP '^EVT-[0-9]+$' AND e.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(e.event_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['event_code'], 4));
     $next_evt_code = 'EVT-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة سجل الأحداث التعاقدية
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/contract_events.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة سجل الأحداث التعاقدية (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $evt_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/contract_events.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -126,82 +136,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_code'])) {
         evt_redirect_with_msg('قيمة الحالة غير صالحة ❌');
     }
 
-    // العقد المرتبط — التحقق من النطاق (إن حُدِّد)
+    // العقد المرتبط — التحقق من النطاق (إن حُدِّد) عبر البوابة
     $contract_in = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;
     if ($contract_in > 0) {
-        $cchk = mysqli_query($conn, "SELECT id FROM contracts WHERE id = $contract_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$cchk || mysqli_num_rows($cchk) === 0) {
+        try {
+            $cchk = $evt_gate->selectOne('contracts', array(
+                'columns' => array('id'), 'where' => array('id' => $contract_in),
+            ));
+        } catch (\Throwable $t) { $cchk = null; }
+        if (!$cchk) {
             evt_redirect_with_msg('العقد المرتبط غير موجود أو خارج نطاق شركتك ❌');
         }
     }
-    $contract_sql = $contract_in > 0 ? "'$contract_in'" : 'NULL';
+    $contract_val = $contract_in > 0 ? $contract_in : null;
 
     // تاريخ الحدث — DATETIME (نقبل صيغة datetime-local ونحوّلها)
     $edate_raw = isset($_POST['event_date']) ? trim($_POST['event_date']) : '';
-    $edate_sql = 'NULL';
+    $edate_val = null;
     if ($edate_raw !== '') {
         if (preg_match('/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2})?$/', $edate_raw)) {
             $edate_norm = str_replace('T', ' ', $edate_raw);
             if (strlen($edate_norm) === 16) {
                 $edate_norm .= ':00';
             }
-            $edate_sql = "'" . mysqli_real_escape_string($conn, $edate_norm) . "'";
+            $edate_val = $edate_norm;
         }
     }
 
-    // تنظيف بقية الحقول
-    $event_code   = mysqli_real_escape_string($conn, $evt_code_raw);
-    $event_type   = mysqli_real_escape_string($conn, $type_raw);
-    $party        = $party_raw !== '' ? mysqli_real_escape_string($conn, $party_raw) : '';
-    $party_sql    = $party_raw !== '' ? "'$party'" : 'NULL';
-    $state        = mysqli_real_escape_string($conn, $state_raw);
-    $description  = mysqli_real_escape_string($conn, isset($_POST['description']) ? trim($_POST['description']) : '');
-    $created_by   = intval($_SESSION['user']['id']);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $party_val       = $party_raw !== '' ? $party_raw : null;
+    $description_raw = isset($_POST['description']) ? trim($_POST['description']) : '';
+    $created_by      = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM contract_events WHERE id = $evt_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $evt_gate->selectOne('contract_events', array(
+                'columns' => array('id'), 'where' => array('id' => $evt_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             evt_redirect_with_msg('لا يمكنك تعديل حدث لا يتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM contract_events WHERE event_code = '$event_code' AND id != $evt_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $evt_gate->scopedQuery(array(
+                'scope' => array('e' => 'contract_events'),
+            ), "SELECT e.id FROM contract_events e
+                WHERE {TENANT_SCOPE} AND e.event_code = ? AND e.id != ? AND e.is_deleted = 0",
+                array($evt_code_raw, $evt_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             evt_redirect_with_msg('كود الحدث موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE contract_events SET
-            event_code = '$event_code', contract_id = $contract_sql, event_date = $edate_sql,
-            event_type = '$event_type', party = $party_sql, description = '$description',
-            state = '$state'
-            WHERE id = $evt_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $evt_gate->update('contract_events', array(
+                'event_code'  => $evt_code_raw,
+                'contract_id' => $contract_val,
+                'event_date'  => $edate_val,
+                'event_type'  => $type_raw,
+                'party'       => $party_val,
+                'description' => $description_raw,
+                'state'       => $state_raw,
+            ), array('id' => $evt_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('contract_events', 'contract_events', $evt_id, null, ['event_code' => $evt_code_raw]);
             }
             evt_redirect_with_msg('تم تعديل الحدث بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('contract_events.php update failed: ' . $t->getMessage());
+            evt_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('contract_events.php update failed: ' . mysqli_error($conn));
-        evt_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM contract_events WHERE event_code = '$event_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $evt_gate->scopedQuery(array(
+                'scope' => array('e' => 'contract_events'),
+            ), "SELECT e.id FROM contract_events e
+                WHERE {TENANT_SCOPE} AND e.event_code = ? AND e.is_deleted = 0",
+                array($evt_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             evt_redirect_with_msg('كود الحدث موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO contract_events
-            (company_id, event_code, contract_id, event_date, event_type, party, description, state, created_by)
-            VALUES
-            ('$company_id', '$event_code', $contract_sql, $edate_sql, '$event_type', $party_sql, '$description', '$state', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $evt_gate->insert('contract_events', array(
+                'event_code'  => $evt_code_raw,
+                'contract_id' => $contract_val,
+                'event_date'  => $edate_val,
+                'event_type'  => $type_raw,
+                'party'       => $party_val,
+                'description' => $description_raw,
+                'state'       => $state_raw,
+                'created_by'  => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('contract_events', 'contract_events', $new_id, ['event_code' => $evt_code_raw]);
             }
             evt_redirect_with_msg('تم إضافة الحدث بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('contract_events.php insert failed: ' . $t->getMessage());
+            evt_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('contract_events.php insert failed: ' . mysqli_error($conn));
-        evt_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -218,29 +253,37 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($evt_csrf_token, $delete_csrf)) {
         evt_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM contract_events WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $evt_gate->selectOne('contract_events', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         evt_redirect_with_msg('لا يمكنك حذف حدث لا يتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE contract_events SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $evt_gate->softDelete('contract_events', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('contract_events', 'contract_events', $delete_id);
         }
         evt_redirect_with_msg('تم حذف الحدث بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('contract_events.php soft delete failed: ' . $t->getMessage());
+        evt_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('contract_events.php soft delete failed: ' . mysqli_error($conn));
-    evt_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// قوائم الاختيار (ضمن نطاق الشركة)
+// قوائم الاختيار (ضمن نطاق الشركة — العزل عبر البوابة)
 // ══════════════════════════════════════════════════════════════════════════════
-$contract_options = array();
-$ct_res = mysqli_query($conn, "SELECT c.id, p.name AS project_name FROM contracts c LEFT JOIN project p ON p.id = c.project_id WHERE c.company_id = $company_id AND c.is_deleted = 0 ORDER BY c.id DESC");
-if ($ct_res) { while ($ct = mysqli_fetch_assoc($ct_res)) { $contract_options[] = $ct; } }
+try {
+    $contract_options = $evt_gate->scopedQuery(array(
+        'scope'  => array('c' => 'contracts'),
+        'enrich' => array('p' => 'project'), // اسم المشروع — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT c.id, p.name AS project_name FROM contracts c
+        LEFT JOIN project p ON p.id = c.project_id
+        WHERE {TENANT_SCOPE} AND c.is_deleted = 0 ORDER BY c.id DESC");
+} catch (\Throwable $t) { $contract_options = array(); }
 
 // خريطة سريعة لعرض العقد (label = "عقد #{id} - {project_name}")
 $contracts_map = array();
@@ -259,20 +302,24 @@ $stat_open = 0;
 $stat_progress = 0;
 $stat_closed = 0;
 
-$q = "SELECT e.*, u.name AS creator_name
-      FROM contract_events e
-      LEFT JOIN users u ON u.id = e.created_by
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY e.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        $rows[] = $row;
-        $stat_total++;
-        if ($row['state'] === 'مفتوح') $stat_open++;
-        if ($row['state'] === 'قيد المتابعة') $stat_progress++;
-        if ($row['state'] === 'مغلق') $stat_closed++;
-    }
+try {
+    $evt_list = $evt_gate->scopedQuery(array(
+        'scope'  => array('e' => 'contract_events'),
+        'enrich' => array('u' => 'users'), // إثراء اسم المُنشئ — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT e.*, u.name AS creator_name
+        FROM contract_events e
+        LEFT JOIN users u ON u.id = e.created_by
+        WHERE {TENANT_SCOPE} AND e.is_deleted = 0
+        ORDER BY e.id DESC");
+} catch (\Throwable $t) {
+    $evt_list = array();
+}
+foreach ($evt_list as $row) {
+    $rows[] = $row;
+    $stat_total++;
+    if ($row['state'] === 'مفتوح') $stat_open++;
+    if ($row['state'] === 'قيد المتابعة') $stat_progress++;
+    if ($row['state'] === 'مغلق') $stat_closed++;
 }
 
 $page_title = "سجل الأحداث التعاقدية";

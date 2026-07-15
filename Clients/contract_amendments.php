@@ -47,10 +47,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "a.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "a.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$amd_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['amd_csrf_token'])) {
@@ -66,17 +64,29 @@ $next_amd_code = 'AMD-0001';
 $last_code_sql = "SELECT amendment_code FROM contract_amendments
                   WHERE amendment_code REGEXP '^AMD-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(amendment_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['amendment_code'], 4));
+try {
+    $last_code_rows = $amd_gate->scopedQuery(array(
+        'scope' => array('a' => 'contract_amendments'),
+    ), "SELECT a.amendment_code FROM contract_amendments a
+        WHERE {TENANT_SCOPE} AND a.amendment_code REGEXP '^AMD-[0-9]+$' AND a.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(a.amendment_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['amendment_code'], 4));
     $next_amd_code = 'AMD-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة الملاحق والتجديدات
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/contract_amendments.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة الملاحق والتجديدات (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $amd_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/contract_amendments.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -125,93 +135,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amendment_code'])) {
         amd_redirect_with_msg('نوع التعديل غير صالح ❌');
     }
 
-    // العقد المرتبط — التحقق من النطاق (إن حُدِّد)
+    // العقد المرتبط — التحقق من النطاق (إن حُدِّد) عبر البوابة
     $contract_in = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;
     if ($contract_in > 0) {
-        $cchk = mysqli_query($conn, "SELECT id FROM contracts WHERE id = $contract_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$cchk || mysqli_num_rows($cchk) === 0) {
+        try {
+            $cchk = $amd_gate->selectOne('contracts', array(
+                'columns' => array('id'), 'where' => array('id' => $contract_in),
+            ));
+        } catch (\Throwable $t) { $cchk = null; }
+        if (!$cchk) {
             amd_redirect_with_msg('العقد المرتبط غير موجود أو خارج نطاق شركتك ❌');
         }
     }
-    $contract_sql = $contract_in > 0 ? "'$contract_in'" : 'NULL';
+    $contract_val = $contract_in > 0 ? $contract_in : null;
 
-    // الجهة الطالبة — التحقق من النطاق (إن حُدِّدت)
+    // الجهة الطالبة — التحقق من النطاق (إن حُدِّدت) — الأصل بلا فلتر حذفٍ ناعم
     $requested_by_in = isset($_POST['requested_by']) ? intval($_POST['requested_by']) : 0;
     if ($requested_by_in > 0) {
-        $rchk = mysqli_query($conn, "SELECT id FROM users WHERE id = $requested_by_in AND company_id = $company_id LIMIT 1");
-        if (!$rchk || mysqli_num_rows($rchk) === 0) {
+        try {
+            $rchk = $amd_gate->selectOne('users', array(
+                'columns' => array('id'), 'where' => array('id' => $requested_by_in),
+                'includeDeleted' => true,
+            ));
+        } catch (\Throwable $t) { $rchk = null; }
+        if (!$rchk) {
             amd_redirect_with_msg('الجهة الطالبة غير موجودة أو خارج نطاق شركتك ❌');
         }
     }
-    $requested_by_sql = $requested_by_in > 0 ? "'$requested_by_in'" : 'NULL';
+    $requested_by_val = $requested_by_in > 0 ? $requested_by_in : null;
 
     // الأثر الرقمي — NULL إن فراغ
     $effect_price_raw = isset($_POST['effect_price']) ? trim($_POST['effect_price']) : '';
-    $effect_price_sql = $effect_price_raw === '' ? 'NULL' : "'" . (float) $effect_price_raw . "'";
+    $effect_price_val = $effect_price_raw === '' ? null : (float) $effect_price_raw;
     $effect_qty_raw   = isset($_POST['effect_qty']) ? trim($_POST['effect_qty']) : '';
-    $effect_qty_sql   = $effect_qty_raw === '' ? 'NULL' : "'" . (float) $effect_qty_raw . "'";
+    $effect_qty_val   = $effect_qty_raw === '' ? null : (float) $effect_qty_raw;
     $effect_dur_raw   = isset($_POST['effect_duration']) ? trim($_POST['effect_duration']) : '';
-    $effect_dur_sql   = $effect_dur_raw === '' ? 'NULL' : "'" . (int) $effect_dur_raw . "'";
+    $effect_dur_val   = $effect_dur_raw === '' ? null : (int) $effect_dur_raw;
 
-    // تنظيف بقية الحقول
-    $amendment_code = mysqli_real_escape_string($conn, $amd_code_raw);
-    $amend_type     = mysqli_real_escape_string($conn, $amend_type_raw);
-    $reason         = mysqli_real_escape_string($conn, isset($_POST['reason']) ? trim($_POST['reason']) : '');
-    $old_value      = mysqli_real_escape_string($conn, isset($_POST['old_value']) ? trim($_POST['old_value']) : '');
-    $new_value      = mysqli_real_escape_string($conn, isset($_POST['new_value']) ? trim($_POST['new_value']) : '');
-    $effect_summary = mysqli_real_escape_string($conn, isset($_POST['effect_summary']) ? trim($_POST['effect_summary']) : '');
-    $adate_raw      = isset($_POST['amend_date']) ? trim($_POST['amend_date']) : '';
-    $adate_sql      = preg_match('/^\d{4}-\d{2}-\d{2}$/', $adate_raw) ? "'$adate_raw'" : 'NULL';
-    $created_by     = intval($_SESSION['user']['id']);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $reason_raw         = isset($_POST['reason']) ? trim($_POST['reason']) : '';
+    $old_value_raw      = isset($_POST['old_value']) ? trim($_POST['old_value']) : '';
+    $new_value_raw      = isset($_POST['new_value']) ? trim($_POST['new_value']) : '';
+    $effect_summary_raw = isset($_POST['effect_summary']) ? trim($_POST['effect_summary']) : '';
+    $adate_raw = isset($_POST['amend_date']) ? trim($_POST['amend_date']) : '';
+    $adate_val = preg_match('/^\d{4}-\d{2}-\d{2}$/', $adate_raw) ? $adate_raw : null;
+    $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM contract_amendments WHERE id = $amd_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $amd_gate->selectOne('contract_amendments', array(
+                'columns' => array('id'), 'where' => array('id' => $amd_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             amd_redirect_with_msg('لا يمكنك تعديل ملحق لا يتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM contract_amendments WHERE amendment_code = '$amendment_code' AND id != $amd_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $amd_gate->scopedQuery(array(
+                'scope' => array('a' => 'contract_amendments'),
+            ), "SELECT a.id FROM contract_amendments a
+                WHERE {TENANT_SCOPE} AND a.amendment_code = ? AND a.id != ? AND a.is_deleted = 0",
+                array($amd_code_raw, $amd_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             amd_redirect_with_msg('كود الملحق موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE contract_amendments SET
-            amendment_code = '$amendment_code', contract_id = $contract_sql, amend_type = '$amend_type',
-            amend_date = $adate_sql, requested_by = $requested_by_sql, reason = '$reason',
-            old_value = '$old_value', new_value = '$new_value',
-            effect_price = $effect_price_sql, effect_qty = $effect_qty_sql, effect_duration = $effect_dur_sql,
-            effect_summary = '$effect_summary'
-            WHERE id = $amd_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $amd_gate->update('contract_amendments', array(
+                'amendment_code'  => $amd_code_raw,
+                'contract_id'     => $contract_val,
+                'amend_type'      => $amend_type_raw,
+                'amend_date'      => $adate_val,
+                'requested_by'    => $requested_by_val,
+                'reason'          => $reason_raw,
+                'old_value'       => $old_value_raw,
+                'new_value'       => $new_value_raw,
+                'effect_price'    => $effect_price_val,
+                'effect_qty'      => $effect_qty_val,
+                'effect_duration' => $effect_dur_val,
+                'effect_summary'  => $effect_summary_raw,
+            ), array('id' => $amd_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('contract_amendments', 'contract_amendments', $amd_id, null, ['amendment_code' => $amd_code_raw]);
             }
             amd_redirect_with_msg('تم تعديل الملحق بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('contract_amendments.php update failed: ' . $t->getMessage());
+            amd_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('contract_amendments.php update failed: ' . mysqli_error($conn));
-        amd_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM contract_amendments WHERE amendment_code = '$amendment_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $amd_gate->scopedQuery(array(
+                'scope' => array('a' => 'contract_amendments'),
+            ), "SELECT a.id FROM contract_amendments a
+                WHERE {TENANT_SCOPE} AND a.amendment_code = ? AND a.is_deleted = 0",
+                array($amd_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             amd_redirect_with_msg('كود الملحق موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO contract_amendments
-            (company_id, amendment_code, contract_id, amend_type, amend_date, requested_by, reason,
-             old_value, new_value, effect_price, effect_qty, effect_duration, effect_summary, created_by)
-            VALUES
-            ('$company_id', '$amendment_code', $contract_sql, '$amend_type', $adate_sql, $requested_by_sql, '$reason',
-             '$old_value', '$new_value', $effect_price_sql, $effect_qty_sql, $effect_dur_sql, '$effect_summary', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $amd_gate->insert('contract_amendments', array(
+                'amendment_code'  => $amd_code_raw,
+                'contract_id'     => $contract_val,
+                'amend_type'      => $amend_type_raw,
+                'amend_date'      => $adate_val,
+                'requested_by'    => $requested_by_val,
+                'reason'          => $reason_raw,
+                'old_value'       => $old_value_raw,
+                'new_value'       => $new_value_raw,
+                'effect_price'    => $effect_price_val,
+                'effect_qty'      => $effect_qty_val,
+                'effect_duration' => $effect_dur_val,
+                'effect_summary'  => $effect_summary_raw,
+                'created_by'      => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('contract_amendments', 'contract_amendments', $new_id, ['amendment_code' => $amd_code_raw]);
             }
             amd_redirect_with_msg('تم إضافة الملحق بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('contract_amendments.php insert failed: ' . $t->getMessage());
+            amd_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('contract_amendments.php insert failed: ' . mysqli_error($conn));
-        amd_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -228,51 +276,61 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($amd_csrf_token, $delete_csrf)) {
         amd_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM contract_amendments WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $amd_gate->selectOne('contract_amendments', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         amd_redirect_with_msg('لا يمكنك حذف ملحق لا يتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE contract_amendments SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $amd_gate->softDelete('contract_amendments', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('contract_amendments', 'contract_amendments', $delete_id);
         }
         amd_redirect_with_msg('تم حذف الملحق بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('contract_amendments.php soft delete failed: ' . $t->getMessage());
+        amd_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('contract_amendments.php soft delete failed: ' . mysqli_error($conn));
-    amd_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// قوائم الاختيار (ضمن نطاق الشركة)
+// قوائم الاختيار (ضمن نطاق الشركة — العزل عبر البوابة)
 // ══════════════════════════════════════════════════════════════════════════════
 $contract_options = array();
 $contracts_map = array();
-$c_res = mysqli_query($conn, "SELECT c.id, p.name AS project_name
-                              FROM contracts c
-                              LEFT JOIN project p ON p.id = c.project_id
-                              WHERE c.company_id = $company_id AND c.is_deleted = 0
-                              ORDER BY c.id DESC");
-if ($c_res) {
-    while ($c = mysqli_fetch_assoc($c_res)) {
-        $cid = intval($c['id']);
-        $label = 'عقد #' . $cid . ' - ' . (string) $c['project_name'];
-        $contract_options[] = array('id' => $cid, 'label' => $label);
-        $contracts_map[$cid] = $label;
-    }
+try {
+    $c_rows = $amd_gate->scopedQuery(array(
+        'scope'  => array('c' => 'contracts'),
+        'enrich' => array('p' => 'project'), // اسم المشروع — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT c.id, p.name AS project_name
+        FROM contracts c
+        LEFT JOIN project p ON p.id = c.project_id
+        WHERE {TENANT_SCOPE} AND c.is_deleted = 0
+        ORDER BY c.id DESC");
+} catch (\Throwable $t) { $c_rows = array(); }
+foreach ($c_rows as $c) {
+    $cid = intval($c['id']);
+    $label = 'عقد #' . $cid . ' - ' . (string) $c['project_name'];
+    $contract_options[] = array('id' => $cid, 'label' => $label);
+    $contracts_map[$cid] = $label;
 }
 
 $user_options = array();
 $users_map = array();
-$u_res = mysqli_query($conn, "SELECT id, name FROM users WHERE company_id = $company_id");
-if ($u_res) {
-    while ($u = mysqli_fetch_assoc($u_res)) {
-        $uid = intval($u['id']);
-        $user_options[] = array('id' => $uid, 'name' => $u['name']);
-        $users_map[$uid] = $u['name'];
-    }
+try {
+    // الأصل بلا فلتر حذفٍ ناعم على المستخدمين — includeDeleted يحفظ السلوك حرفيًّا
+    $u_rows = $amd_gate->select('users', array(
+        'columns' => array('id', 'name'),
+        'includeDeleted' => true,
+    ));
+} catch (\Throwable $t) { $u_rows = array(); }
+foreach ($u_rows as $u) {
+    $uid = intval($u['id']);
+    $user_options[] = array('id' => $uid, 'name' => $u['name']);
+    $users_map[$uid] = $u['name'];
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -284,20 +342,24 @@ $stat_renew = 0;
 $stat_extend = 0;
 $stat_price = 0;
 
-$q = "SELECT a.*, u.name AS creator_name
-      FROM contract_amendments a
-      LEFT JOIN users u ON u.id = a.created_by
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY a.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
+try {
+    $amd_list = $amd_gate->scopedQuery(array(
+        'scope'  => array('a' => 'contract_amendments'),
+        'enrich' => array('u' => 'users'), // إثراء اسم المُنشئ — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT a.*, u.name AS creator_name
+        FROM contract_amendments a
+        LEFT JOIN users u ON u.id = a.created_by
+        WHERE {TENANT_SCOPE} AND a.is_deleted = 0
+        ORDER BY a.id DESC");
+} catch (\Throwable $t) {
+    $amd_list = array();
+}
+foreach ($amd_list as $row) {
         $rows[] = $row;
         $stat_total++;
         if ($row['amend_type'] === 'تجديد') $stat_renew++;
         if ($row['amend_type'] === 'تمديد') $stat_extend++;
         if ($row['amend_type'] === 'تغيير أسعار') $stat_price++;
-    }
 }
 
 $page_title = "الملاحق والتجديدات";

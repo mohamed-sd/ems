@@ -47,10 +47,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "p.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "p.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$pl_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['pl_csrf_token'])) {
@@ -71,17 +69,29 @@ $next_pl_code = 'PL-0001';
 $last_code_sql = "SELECT pricelist_code FROM pricelists
                   WHERE pricelist_code REGEXP '^PL-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(pricelist_code, 4) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['pricelist_code'], 3));
+try {
+    $last_code_rows = $pl_gate->scopedQuery(array(
+        'scope' => array('p' => 'pricelists'),
+    ), "SELECT p.pricelist_code FROM pricelists p
+        WHERE {TENANT_SCOPE} AND p.pricelist_code REGEXP '^PL-[0-9]+$' AND p.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(p.pricelist_code, 4) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['pricelist_code'], 3));
     $next_pl_code = 'PL-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة قوائم الأسعار
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/pricelists.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة قوائم الأسعار (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $pl_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/pricelists.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -141,75 +151,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     if ($rev_raw !== '' && !isset($PL_REVENUE_MODELS[$rev_raw])) {
         pl_redirect_with_msg('نموذج التسعير غير صالح ❌');
     }
-    $rev_sql = $rev_raw !== '' ? "'" . mysqli_real_escape_string($conn, $rev_raw) . "'" : 'NULL';
+    $rev_val = ($rev_raw !== '') ? $rev_raw : null;
 
     // السعر الأساس
     $base_price_raw = isset($_POST['base_price']) ? trim($_POST['base_price']) : '';
-    $base_price_sql = ($base_price_raw === '') ? '0' : "'" . (float) $base_price_raw . "'";
+    $base_price_val = ($base_price_raw === '') ? 0 : (float) $base_price_raw;
 
     // المعاملات الرقمية — NULL إن تُركت فارغة، وإلا float
     $factor_cols = array('distance_factor', 'shift_factor', 'volume_factor', 'duration_factor');
-    $factor_sql = array();
+    $factor_val = array();
     foreach ($factor_cols as $fc) {
         $val = isset($_POST[$fc]) ? trim($_POST[$fc]) : '';
-        $factor_sql[$fc] = ($val === '') ? 'NULL' : "'" . (float) $val . "'";
+        $factor_val[$fc] = ($val === '') ? null : (float) $val;
     }
 
-    // تنظيف بقية الحقول
-    $pricelist_code = mysqli_real_escape_string($conn, $pl_code_raw);
-    $name           = mysqli_real_escape_string($conn, $name_raw);
-    $currency       = mysqli_real_escape_string($conn, $currency_raw);
-    $notes          = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
-    $created_by     = intval($_SESSION['user']['id']);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $notes_raw  = isset($_POST['notes']) ? trim($_POST['notes']) : '';
+    $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM pricelists WHERE id = $pl_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $pl_gate->selectOne('pricelists', array(
+                'columns' => array('id'), 'where' => array('id' => $pl_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             pl_redirect_with_msg('لا يمكنك تعديل قائمة أسعار لا تتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM pricelists WHERE pricelist_code = '$pricelist_code' AND id != $pl_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $pl_gate->scopedQuery(array(
+                'scope' => array('p' => 'pricelists'),
+            ), "SELECT p.id FROM pricelists p
+                WHERE {TENANT_SCOPE} AND p.pricelist_code = ? AND p.id != ? AND p.is_deleted = 0",
+                array($pl_code_raw, $pl_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             pl_redirect_with_msg('كود قائمة الأسعار موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE pricelists SET
-            pricelist_code = '$pricelist_code', name = '$name', currency = '$currency',
-            revenue_model = $rev_sql, base_price = $base_price_sql,
-            distance_factor = {$factor_sql['distance_factor']}, shift_factor = {$factor_sql['shift_factor']},
-            volume_factor = {$factor_sql['volume_factor']}, duration_factor = {$factor_sql['duration_factor']},
-            notes = '$notes'
-            WHERE id = $pl_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $pl_gate->update('pricelists', array(
+                'pricelist_code'  => $pl_code_raw,
+                'name'            => $name_raw,
+                'currency'        => $currency_raw,
+                'revenue_model'   => $rev_val,
+                'base_price'      => $base_price_val,
+                'distance_factor' => $factor_val['distance_factor'],
+                'shift_factor'    => $factor_val['shift_factor'],
+                'volume_factor'   => $factor_val['volume_factor'],
+                'duration_factor' => $factor_val['duration_factor'],
+                'notes'           => $notes_raw,
+            ), array('id' => $pl_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('pricelists', 'pricelists', $pl_id, null, ['pricelist_code' => $pl_code_raw]);
             }
             pl_redirect_with_msg('تم تعديل قائمة الأسعار بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('pricelists.php update failed: ' . $t->getMessage());
+            pl_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('pricelists.php update failed: ' . mysqli_error($conn));
-        pl_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM pricelists WHERE pricelist_code = '$pricelist_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $pl_gate->scopedQuery(array(
+                'scope' => array('p' => 'pricelists'),
+            ), "SELECT p.id FROM pricelists p
+                WHERE {TENANT_SCOPE} AND p.pricelist_code = ? AND p.is_deleted = 0",
+                array($pl_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             pl_redirect_with_msg('كود قائمة الأسعار موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO pricelists
-            (company_id, pricelist_code, name, currency, revenue_model, base_price,
-             distance_factor, shift_factor, volume_factor, duration_factor, notes, created_by)
-            VALUES
-            ('$company_id', '$pricelist_code', '$name', '$currency', $rev_sql, $base_price_sql,
-             {$factor_sql['distance_factor']}, {$factor_sql['shift_factor']}, {$factor_sql['volume_factor']}, {$factor_sql['duration_factor']}, '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $pl_gate->insert('pricelists', array(
+                'pricelist_code'  => $pl_code_raw,
+                'name'            => $name_raw,
+                'currency'        => $currency_raw,
+                'revenue_model'   => $rev_val,
+                'base_price'      => $base_price_val,
+                'distance_factor' => $factor_val['distance_factor'],
+                'shift_factor'    => $factor_val['shift_factor'],
+                'volume_factor'   => $factor_val['volume_factor'],
+                'duration_factor' => $factor_val['duration_factor'],
+                'notes'           => $notes_raw,
+                'created_by'      => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('pricelists', 'pricelists', $new_id, ['pricelist_code' => $pl_code_raw]);
             }
             pl_redirect_with_msg('تم إضافة قائمة الأسعار بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('pricelists.php insert failed: ' . $t->getMessage());
+            pl_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('pricelists.php insert failed: ' . mysqli_error($conn));
-        pl_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -226,21 +260,24 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($pl_csrf_token, $delete_csrf)) {
         pl_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM pricelists WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $pl_gate->selectOne('pricelists', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         pl_redirect_with_msg('لا يمكنك حذف قائمة أسعار لا تتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE pricelists SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $pl_gate->softDelete('pricelists', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('pricelists', 'pricelists', $delete_id);
         }
         pl_redirect_with_msg('تم حذف قائمة الأسعار بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('pricelists.php soft delete failed: ' . $t->getMessage());
+        pl_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('pricelists.php soft delete failed: ' . mysqli_error($conn));
-    pl_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -252,20 +289,24 @@ $stat_hourly = 0;
 $stat_ton = 0;
 $stat_meter = 0;
 
-$q = "SELECT p.*, u.name AS creator_name
-      FROM pricelists p
-      LEFT JOIN users u ON u.id = p.created_by
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY p.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        $rows[] = $row;
-        $stat_total++;
-        if ($row['revenue_model'] === 'hourly') $stat_hourly++;
-        elseif ($row['revenue_model'] === 'ton') $stat_ton++;
-        elseif ($row['revenue_model'] === 'meter') $stat_meter++;
-    }
+try {
+    $pl_list = $pl_gate->scopedQuery(array(
+        'scope'  => array('p' => 'pricelists'),
+        'enrich' => array('u' => 'users'), // إثراء اسم المُنشئ — LEFT JOIN بلا تنطيق (سلوك الأصل)
+    ), "SELECT p.*, u.name AS creator_name
+        FROM pricelists p
+        LEFT JOIN users u ON u.id = p.created_by
+        WHERE {TENANT_SCOPE} AND p.is_deleted = 0
+        ORDER BY p.id DESC");
+} catch (\Throwable $t) {
+    $pl_list = array();
+}
+foreach ($pl_list as $row) {
+    $rows[] = $row;
+    $stat_total++;
+    if ($row['revenue_model'] === 'hourly') $stat_hourly++;
+    elseif ($row['revenue_model'] === 'ton') $stat_ton++;
+    elseif ($row['revenue_model'] === 'meter') $stat_meter++;
 }
 
 $page_title = "نماذج التسعير";

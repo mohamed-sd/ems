@@ -38,10 +38,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "u2.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "u2.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$uom_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['uom_csrf_token'])) {
@@ -54,20 +52,29 @@ $UOM_CATEGORIES = array('زمن', 'وزن', 'طول', 'حجم', 'عدد');
 
 // توليد الكود المقترح التالي (UOM-NNNN) — للعرض فقط
 $next_uom_code = 'UOM-0001';
-$last_code_sql = "SELECT uom_code FROM units_of_measure
-                  WHERE uom_code REGEXP '^UOM-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
-                  ORDER BY CAST(SUBSTRING(uom_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['uom_code'], 4));
+try {
+    $last_code_rows = $uom_gate->scopedQuery(array(
+        'scope' => array('u2' => 'units_of_measure'),
+    ), "SELECT u2.uom_code FROM units_of_measure u2
+        WHERE {TENANT_SCOPE} AND u2.uom_code REGEXP '^UOM-[0-9]+$' AND u2.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(u2.uom_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['uom_code'], 4));
     $next_uom_code = 'UOM-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة وحدات القياس
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/units_of_measure.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة وحدات القياس (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $uom_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/units_of_measure.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -124,59 +131,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     // معامل التحويل — float (افتراضي 1 إن تُرك فارغاً)
     $factor_raw = isset($_POST['factor']) ? trim($_POST['factor']) : '';
-    $factor_sql = ($factor_raw === '') ? "'1'" : "'" . (float) $factor_raw . "'";
+    $factor_val = ($factor_raw === '') ? 1.0 : (float) $factor_raw;
 
-    // تنظيف بقية الحقول
-    $uom_code   = mysqli_real_escape_string($conn, $uom_code_raw);
-    $name       = mysqli_real_escape_string($conn, $name_raw);
-    $symbol     = mysqli_real_escape_string($conn, isset($_POST['symbol']) ? trim($_POST['symbol']) : '');
-    $category   = mysqli_real_escape_string($conn, $category_raw);
-    $notes      = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $symbol_raw = isset($_POST['symbol']) ? trim($_POST['symbol']) : '';
+    $notes_raw  = isset($_POST['notes']) ? trim($_POST['notes']) : '';
     $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM units_of_measure WHERE id = $uom_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $uom_gate->selectOne('units_of_measure', array(
+                'columns' => array('id'), 'where' => array('id' => $uom_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             uom_redirect_with_msg('لا يمكنك تعديل وحدة قياس لا تتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM units_of_measure WHERE uom_code = '$uom_code' AND id != $uom_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $uom_gate->scopedQuery(array(
+                'scope' => array('u2' => 'units_of_measure'),
+            ), "SELECT u2.id FROM units_of_measure u2
+                WHERE {TENANT_SCOPE} AND u2.uom_code = ? AND u2.id != ? AND u2.is_deleted = 0",
+                array($uom_code_raw, $uom_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             uom_redirect_with_msg('كود الوحدة موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE units_of_measure SET
-            uom_code = '$uom_code', name = '$name', symbol = '$symbol',
-            category = '$category', factor = $factor_sql, notes = '$notes'
-            WHERE id = $uom_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $uom_gate->update('units_of_measure', array(
+                'uom_code' => $uom_code_raw,
+                'name'     => $name_raw,
+                'symbol'   => $symbol_raw,
+                'category' => $category_raw,
+                'factor'   => $factor_val,
+                'notes'    => $notes_raw,
+            ), array('id' => $uom_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('units_of_measure', 'units_of_measure', $uom_id, null, ['uom_code' => $uom_code_raw]);
             }
             uom_redirect_with_msg('تم تعديل وحدة القياس بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('units_of_measure.php update failed: ' . $t->getMessage());
+            uom_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('units_of_measure.php update failed: ' . mysqli_error($conn));
-        uom_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM units_of_measure WHERE uom_code = '$uom_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $uom_gate->scopedQuery(array(
+                'scope' => array('u2' => 'units_of_measure'),
+            ), "SELECT u2.id FROM units_of_measure u2
+                WHERE {TENANT_SCOPE} AND u2.uom_code = ? AND u2.is_deleted = 0",
+                array($uom_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             uom_redirect_with_msg('كود الوحدة موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO units_of_measure
-            (company_id, uom_code, name, symbol, category, factor, notes, created_by)
-            VALUES
-            ('$company_id', '$uom_code', '$name', '$symbol', '$category', $factor_sql, '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $uom_gate->insert('units_of_measure', array(
+                'uom_code'   => $uom_code_raw,
+                'name'       => $name_raw,
+                'symbol'     => $symbol_raw,
+                'category'   => $category_raw,
+                'factor'     => $factor_val,
+                'notes'      => $notes_raw,
+                'created_by' => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('units_of_measure', 'units_of_measure', $new_id, ['uom_code' => $uom_code_raw]);
             }
             uom_redirect_with_msg('تم إضافة وحدة القياس بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('units_of_measure.php insert failed: ' . $t->getMessage());
+            uom_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('units_of_measure.php insert failed: ' . mysqli_error($conn));
-        uom_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -193,21 +221,24 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($uom_csrf_token, $delete_csrf)) {
         uom_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM units_of_measure WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $uom_gate->selectOne('units_of_measure', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         uom_redirect_with_msg('لا يمكنك حذف وحدة قياس لا تتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE units_of_measure SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $uom_gate->softDelete('units_of_measure', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('units_of_measure', 'units_of_measure', $delete_id);
         }
         uom_redirect_with_msg('تم حذف وحدة القياس بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('units_of_measure.php soft delete failed: ' . $t->getMessage());
+        uom_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('units_of_measure.php soft delete failed: ' . mysqli_error($conn));
-    uom_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -219,20 +250,24 @@ $stat_time = 0;
 $stat_weight = 0;
 $stat_length = 0;
 
-$q = "SELECT u2.*, u.name AS creator_name
-      FROM units_of_measure u2
-      LEFT JOIN users u ON u.id = u2.created_by
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY u2.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        $rows[] = $row;
-        $stat_total++;
-        if ($row['category'] === 'زمن') $stat_time++;
-        elseif ($row['category'] === 'وزن') $stat_weight++;
-        elseif ($row['category'] === 'طول') $stat_length++;
-    }
+try {
+    $uom_list = $uom_gate->scopedQuery(array(
+        'scope'  => array('u2' => 'units_of_measure'),
+        'enrich' => array('u' => 'users'), // إثراء اسم المُنشئ — LEFT JOIN بلا تنطيق (سلوك الأصل)
+    ), "SELECT u2.*, u.name AS creator_name
+        FROM units_of_measure u2
+        LEFT JOIN users u ON u.id = u2.created_by
+        WHERE {TENANT_SCOPE} AND u2.is_deleted = 0
+        ORDER BY u2.id DESC");
+} catch (\Throwable $t) {
+    $uom_list = array();
+}
+foreach ($uom_list as $row) {
+    $rows[] = $row;
+    $stat_total++;
+    if ($row['category'] === 'زمن') $stat_time++;
+    elseif ($row['category'] === 'وزن') $stat_weight++;
+    elseif ($row['category'] === 'طول') $stat_length++;
 }
 
 $page_title = "وحدات القياس";

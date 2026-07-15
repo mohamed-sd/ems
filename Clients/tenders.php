@@ -38,10 +38,8 @@ if ($company_id <= 0) {
     exit();
 }
 
-// شروط النطاق والحذف الناعم
-$scope_sql        = "t.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "t.is_deleted = 0";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
+$tnd_gate = ems_tenant_db();
 
 // رمز CSRF
 if (empty($_SESSION['tnd_csrf_token'])) {
@@ -58,17 +56,29 @@ $next_tnd_code = 'TND-0001';
 $last_code_sql = "SELECT tender_code FROM tenders
                   WHERE tender_code REGEXP '^TND-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
                   ORDER BY CAST(SUBSTRING(tender_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['tender_code'], 4));
+try {
+    $last_code_rows = $tnd_gate->scopedQuery(array(
+        'scope' => array('t' => 'tenders'),
+    ), "SELECT t.tender_code FROM tenders t
+        WHERE {TENANT_SCOPE} AND t.tender_code REGEXP '^TND-[0-9]+$' AND t.is_deleted = 0
+        ORDER BY CAST(SUBSTRING(t.tender_code, 5) AS UNSIGNED) DESC LIMIT 1");
+} catch (\Throwable $t) {
+    $last_code_rows = array();
+}
+if (!empty($last_code_rows)) {
+    $last_num = intval(substr($last_code_rows[0]['tender_code'], 4));
     $next_tnd_code = 'TND-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
-// صلاحيات المستخدم على وحدة المناقصات
-$module_query = "SELECT id FROM modules WHERE code = 'Clients/tenders.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// صلاحيات المستخدم على وحدة المناقصات (modules جدول عام — قراءة عبر البوابة)
+try {
+    $module_info = $tnd_gate->selectOne('modules', array(
+        'columns' => array('id'),
+        'where'   => array('code' => 'Clients/tenders.php'),
+    ));
+} catch (\Throwable $t) {
+    $module_info = null;
+}
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -127,84 +137,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tender_code'])) {
         tnd_redirect_with_msg('قيمة النتيجة غير صالحة ❌');
     }
 
-    // الجهة الطارحة — التحقق من النطاق (إن حُدِّدت)
+    // الجهة الطارحة — التحقق من النطاق (إن حُدِّدت) عبر البوابة
     $authority_in = isset($_POST['authority_id']) ? intval($_POST['authority_id']) : 0;
     if ($authority_in > 0) {
-        $achk = mysqli_query($conn, "SELECT id FROM clients WHERE id = $authority_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$achk || mysqli_num_rows($achk) === 0) {
+        try {
+            $achk = $tnd_gate->selectOne('clients', array(
+                'columns' => array('id'), 'where' => array('id' => $authority_in),
+            ));
+        } catch (\Throwable $t) { $achk = null; }
+        if (!$achk) {
             tnd_redirect_with_msg('الجهة الطارحة غير موجودة أو خارج نطاق شركتك ❌');
         }
     }
-    $authority_sql = $authority_in > 0 ? "'$authority_in'" : 'NULL';
+    $authority_val = $authority_in > 0 ? $authority_in : null;
 
-    // الفرصة المرتبطة — التحقق من النطاق (إن حُدِّدت)
+    // الفرصة المرتبطة — التحقق من النطاق (إن حُدِّدت) عبر البوابة
     $opportunity_in = isset($_POST['opportunity_id']) ? intval($_POST['opportunity_id']) : 0;
     if ($opportunity_in > 0) {
-        $ochk = mysqli_query($conn, "SELECT id FROM opportunities WHERE id = $opportunity_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$ochk || mysqli_num_rows($ochk) === 0) {
+        try {
+            $ochk = $tnd_gate->selectOne('opportunities', array(
+                'columns' => array('id'), 'where' => array('id' => $opportunity_in),
+            ));
+        } catch (\Throwable $t) { $ochk = null; }
+        if (!$ochk) {
             tnd_redirect_with_msg('الفرصة المرتبطة غير موجودة أو خارج نطاق شركتك ❌');
         }
     }
-    $opportunity_sql = $opportunity_in > 0 ? "'$opportunity_in'" : 'NULL';
+    $opportunity_val = $opportunity_in > 0 ? $opportunity_in : null;
 
-    // تنظيف بقية الحقول
-    $tender_code   = mysqli_real_escape_string($conn, $tnd_code_raw);
-    $name          = mysqli_real_escape_string($conn, $name_raw);
-    $participation = mysqli_real_escape_string($conn, $participation_raw);
-    $result        = mysqli_real_escape_string($conn, $result_raw);
-    $result_reason = mysqli_real_escape_string($conn, isset($_POST['result_reason']) ? trim($_POST['result_reason']) : '');
-    $notes         = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
-    $cdate_raw     = isset($_POST['closing_date']) ? trim($_POST['closing_date']) : '';
-    $cdate_sql     = preg_match('/^\d{4}-\d{2}-\d{2}$/', $cdate_raw) ? "'$cdate_raw'" : 'NULL';
-    $created_by    = intval($_SESSION['user']['id']);
+    // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+    $result_reason_raw = isset($_POST['result_reason']) ? trim($_POST['result_reason']) : '';
+    $notes_raw         = isset($_POST['notes']) ? trim($_POST['notes']) : '';
+    $cdate_raw = isset($_POST['closing_date']) ? trim($_POST['closing_date']) : '';
+    $cdate_val = preg_match('/^\d{4}-\d{2}-\d{2}$/', $cdate_raw) ? $cdate_raw : null;
+    $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
-        $owner = mysqli_query($conn, "SELECT id FROM tenders WHERE id = $tnd_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
+        try {
+            $owner = $tnd_gate->selectOne('tenders', array(
+                'columns' => array('id'), 'where' => array('id' => $tnd_id),
+            ));
+        } catch (\Throwable $t) { $owner = null; }
+        if (!$owner) {
             tnd_redirect_with_msg('لا يمكنك تعديل مناقصة لا تتبع لشركتك ❌');
         }
-        $dup = mysqli_query($conn, "SELECT id FROM tenders WHERE tender_code = '$tender_code' AND id != $tnd_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $tnd_gate->scopedQuery(array(
+                'scope' => array('t' => 'tenders'),
+            ), "SELECT t.id FROM tenders t
+                WHERE {TENANT_SCOPE} AND t.tender_code = ? AND t.id != ? AND t.is_deleted = 0",
+                array($tnd_code_raw, $tnd_id));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             tnd_redirect_with_msg('كود المناقصة موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE tenders SET
-            tender_code = '$tender_code', name = '$name', authority_id = $authority_sql,
-            opportunity_id = $opportunity_sql, closing_date = $cdate_sql,
-            participation_state = '$participation', result = '$result',
-            result_reason = '$result_reason', notes = '$notes'
-            WHERE id = $tnd_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+        try {
+            $tnd_gate->update('tenders', array(
+                'tender_code'         => $tnd_code_raw,
+                'name'                => $name_raw,
+                'authority_id'        => $authority_val,
+                'opportunity_id'      => $opportunity_val,
+                'closing_date'        => $cdate_val,
+                'participation_state' => $participation_raw,
+                'result'              => $result_raw,
+                'result_reason'       => $result_reason_raw,
+                'notes'               => $notes_raw,
+            ), array('id' => $tnd_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('tenders', 'tenders', $tnd_id, null, ['tender_code' => $tnd_code_raw]);
             }
             tnd_redirect_with_msg('تم تعديل المناقصة بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('tenders.php update failed: ' . $t->getMessage());
+            tnd_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
-        error_log('tenders.php update failed: ' . mysqli_error($conn));
-        tnd_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
     } else {
-        $dup = mysqli_query($conn, "SELECT id FROM tenders WHERE tender_code = '$tender_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
+        try {
+            $dup = $tnd_gate->scopedQuery(array(
+                'scope' => array('t' => 'tenders'),
+            ), "SELECT t.id FROM tenders t
+                WHERE {TENANT_SCOPE} AND t.tender_code = ? AND t.is_deleted = 0",
+                array($tnd_code_raw));
+        } catch (\Throwable $t) { $dup = array(); }
+        if (!empty($dup)) {
             tnd_redirect_with_msg('كود المناقصة موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO tenders
-            (company_id, tender_code, name, authority_id, opportunity_id, closing_date,
-             participation_state, result, result_reason, notes, created_by)
-            VALUES
-            ('$company_id', '$tender_code', '$name', $authority_sql, $opportunity_sql, $cdate_sql,
-             '$participation', '$result', '$result_reason', '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        try {
+            $new_id = (int) $tnd_gate->insert('tenders', array(
+                'tender_code'         => $tnd_code_raw,
+                'name'                => $name_raw,
+                'authority_id'        => $authority_val,
+                'opportunity_id'      => $opportunity_val,
+                'closing_date'        => $cdate_val,
+                'participation_state' => $participation_raw,
+                'result'              => $result_raw,
+                'result_reason'       => $result_reason_raw,
+                'notes'               => $notes_raw,
+                'created_by'          => $created_by,
+            ));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('tenders', 'tenders', $new_id, ['tender_code' => $tnd_code_raw]);
             }
             tnd_redirect_with_msg('تم إضافة المناقصة بنجاح ✅');
+        } catch (\Throwable $t) {
+            error_log('tenders.php insert failed: ' . $t->getMessage());
+            tnd_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
-        error_log('tenders.php insert failed: ' . mysqli_error($conn));
-        tnd_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -221,33 +261,42 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($tnd_csrf_token, $delete_csrf)) {
         tnd_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM tenders WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    try {
+        $chk = $tnd_gate->selectOne('tenders', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $chk = null; }
+    if (!$chk) {
         tnd_redirect_with_msg('لا يمكنك حذف مناقصة لا تتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE tenders SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        $tnd_gate->softDelete('tenders', $delete_id); // يختم deleted_at/deleted_by من السياق
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('tenders', 'tenders', $delete_id);
         }
         tnd_redirect_with_msg('تم حذف المناقصة بنجاح ✅');
+    } catch (\Throwable $t) {
+        error_log('tenders.php soft delete failed: ' . $t->getMessage());
+        tnd_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('tenders.php soft delete failed: ' . mysqli_error($conn));
-    tnd_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// قوائم الاختيار (ضمن نطاق الشركة)
+// قوائم الاختيار (ضمن نطاق الشركة — العزل عبر البوابة)
 // ══════════════════════════════════════════════════════════════════════════════
-$authority_options = array();
-$au_res = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE company_id = $company_id AND is_deleted = 0 ORDER BY client_name ASC");
-if ($au_res) { while ($au = mysqli_fetch_assoc($au_res)) { $authority_options[] = $au; } }
+try {
+    $authority_options = $tnd_gate->select('clients', array(
+        'columns' => array('id', 'client_code', 'client_name'),
+        'orderBy' => 'client_name ASC',
+    ));
+} catch (\Throwable $t) { $authority_options = array(); }
 
-$opp_options = array();
-$op_res = mysqli_query($conn, "SELECT id, opp_code, title FROM opportunities WHERE company_id = $company_id AND is_deleted = 0 ORDER BY id DESC");
-if ($op_res) { while ($op = mysqli_fetch_assoc($op_res)) { $opp_options[] = $op; } }
+try {
+    $opp_options = $tnd_gate->select('opportunities', array(
+        'columns' => array('id', 'opp_code', 'title'),
+        'orderBy' => 'id DESC',
+    ));
+} catch (\Throwable $t) { $opp_options = array(); }
 
 // خرائط سريعة للأسماء
 $authority_names = array();
@@ -264,22 +313,26 @@ $stat_submitted = 0;
 $stat_won = 0;
 $stat_evaluating = 0;
 
-$q = "SELECT t.*, u.name AS creator_name, c.client_name AS authority_name, o.title AS opportunity_title
-      FROM tenders t
-      LEFT JOIN users u ON u.id = t.created_by
-      LEFT JOIN clients c ON c.id = t.authority_id
-      LEFT JOIN opportunities o ON o.id = t.opportunity_id
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY t.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
-        $rows[] = $row;
-        $stat_total++;
-        if ($row['participation_state'] === 'مقدمة') $stat_submitted++;
-        if ($row['result'] === 'فوز') $stat_won++;
-        if ($row['result'] === 'قيد التقييم') $stat_evaluating++;
-    }
+try {
+    $tnd_list = $tnd_gate->scopedQuery(array(
+        'scope'  => array('t' => 'tenders'),
+        'enrich' => array('u' => 'users', 'c' => 'clients', 'o' => 'opportunities'), // أسماء عرضية — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT t.*, u.name AS creator_name, c.client_name AS authority_name, o.title AS opportunity_title
+        FROM tenders t
+        LEFT JOIN users u ON u.id = t.created_by
+        LEFT JOIN clients c ON c.id = t.authority_id
+        LEFT JOIN opportunities o ON o.id = t.opportunity_id
+        WHERE {TENANT_SCOPE} AND t.is_deleted = 0
+        ORDER BY t.id DESC");
+} catch (\Throwable $t) {
+    $tnd_list = array();
+}
+foreach ($tnd_list as $row) {
+    $rows[] = $row;
+    $stat_total++;
+    if ($row['participation_state'] === 'مقدمة') $stat_submitted++;
+    if ($row['result'] === 'فوز') $stat_won++;
+    if ($row['result'] === 'قيد التقييم') $stat_evaluating++;
 }
 
 $page_title = "المناقصات";

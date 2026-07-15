@@ -23,46 +23,30 @@ if ($client_id <= 0) {
     exit();
 }
 
-$clients_has_company = db_table_has_column($conn, 'clients', 'company_id');
-$clients_has_is_deleted = db_table_has_column($conn, 'clients', 'is_deleted');
-$clients_has_deleted_at = db_table_has_column($conn, 'clients', 'deleted_at');
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
-$project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');
-$project_has_deleted_at = db_table_has_column($conn, 'project', 'deleted_at');
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : (db_table_has_column($conn, 'project', 'company_client_id') ? 'company_client_id' : 'client_id');
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): تنطيق الشركة والحذف الناعم مسؤولية
+// البوابة — كشفُ الأعمدة القديم أُسقط (السجل يضمن clients/project بأعمدة العزل)،
+// والسوبر يمرّ عبر forAllTenants المسجَّل (نفس سلوك الأصل: بلا تنطيق شركة).
+$cp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('client profile super') : ems_tenant_db();
 
-$client_scope_sql = "c.id = $client_id";
-if (!$is_super_admin && $clients_has_company) {
-    $client_scope_sql .= " AND c.company_id = $company_id";
-}
-if ($clients_has_is_deleted) {
-    $client_scope_sql .= " AND COALESCE(c.is_deleted,0)=0";
-} elseif ($clients_has_deleted_at) {
-    $client_scope_sql .= " AND c.deleted_at IS NULL";
-}
-
-$client_query = "SELECT c.*, u.name AS creator_name
-                 FROM clients c
-                 LEFT JOIN users u ON u.id = c.created_by
-                 WHERE $client_scope_sql
-                 LIMIT 1";
-$client_result = mysqli_query($conn, $client_query);
-$client = ($client_result && mysqli_num_rows($client_result) > 0) ? mysqli_fetch_assoc($client_result) : null;
+try {
+    $client_rows = $cp_gate->scopedQuery(array(
+        'scope'  => array('c' => 'clients'),
+        'enrich' => array('u' => 'users'),
+    ), "SELECT c.*, u.name AS creator_name
+        FROM clients c
+        LEFT JOIN users u ON u.id = c.created_by
+        WHERE {TENANT_SCOPE} AND c.id = ? AND COALESCE(c.is_deleted,0)=0
+        LIMIT 1", array($client_id));
+} catch (\Throwable $t) { $client_rows = array(); }
+$client = !empty($client_rows) ? $client_rows[0] : null;
 
 if (!$client) {
     header("Location: clients.php?msg=العميل+غير+موجود+او+خارج+نطاق+الشركة+❌");
     exit();
 }
 
-$project_scope = "p.$project_client_column = $client_id";
-if (!$is_super_admin && $project_has_company) {
-    $project_scope .= " AND p.company_id = $company_id";
-}
-if ($project_has_is_deleted) {
-    $project_scope .= " AND COALESCE(p.is_deleted,0)=0";
-} elseif ($project_has_deleted_at) {
-    $project_scope .= " AND p.deleted_at IS NULL";
-}
+// شرط مشاريع العميل (بلا شرط شركةٍ يدوي — {TENANT_SCOPE} يتكفّل به)
+$project_cond = "p.client_id = ? AND COALESCE(p.is_deleted,0)=0";
 
 $projects_total = 0;
 $projects_active = 0;
@@ -72,74 +56,76 @@ $equipments_count = 0;
 $drivers_count = 0;
 $total_hours = 0;
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM project p WHERE $project_scope");
-if ($r) {
-    $projects_total = intval(mysqli_fetch_assoc($r)['c']);
-}
+$cp_agg = function (array $decl, $sql, array $params) use ($cp_gate) {
+    try {
+        $rows = $cp_gate->scopedQuery($decl, $sql, $params);
+        return !empty($rows) ? $rows[0]['c'] : 0;
+    } catch (\Throwable $t) {
+        return 0;
+    }
+};
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM project p WHERE $project_scope AND p.status = 1");
-if ($r) {
-    $projects_active = intval(mysqli_fetch_assoc($r)['c']);
-}
+$projects_total = intval($cp_agg(array('scope' => array('p' => 'project')),
+    "SELECT COUNT(*) AS c FROM project p WHERE {TENANT_SCOPE} AND $project_cond", array($client_id)));
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c
-                         FROM contracts ct
-                         INNER JOIN project p ON p.id = ct.project_id
-                         WHERE $project_scope AND ct.status = 1");
-if ($r) {
-    $contracts_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$projects_active = intval($cp_agg(array('scope' => array('p' => 'project')),
+    "SELECT COUNT(*) AS c FROM project p WHERE {TENANT_SCOPE} AND $project_cond AND p.status = 1", array($client_id)));
 
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT e.suppliers) AS c
-                         FROM operations o
-                         INNER JOIN project p ON p.id = o.project_id
-                         INNER JOIN equipments e ON e.id = o.equipment
-                         WHERE $project_scope");
-if ($r) {
-    $suppliers_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$contracts_count = intval($cp_agg(array('scope' => array('ct' => 'contracts', 'p' => 'project')),
+    "SELECT COUNT(*) AS c
+     FROM contracts ct
+     INNER JOIN project p ON p.id = ct.project_id
+     WHERE {TENANT_SCOPE} AND $project_cond AND ct.status = 1", array($client_id)));
 
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS c
-                         FROM operations o
-                         INNER JOIN project p ON p.id = o.project_id
-                         WHERE $project_scope");
-if ($r) {
-    $equipments_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$suppliers_count = intval($cp_agg(array('scope' => array('o' => 'operations', 'p' => 'project', 'e' => 'equipments')),
+    "SELECT COUNT(DISTINCT e.suppliers) AS c
+     FROM operations o
+     INNER JOIN project p ON p.id = o.project_id
+     INNER JOIN equipments e ON e.id = o.equipment
+     WHERE {TENANT_SCOPE} AND $project_cond", array($client_id)));
 
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS c
-                         FROM operations o
-                         INNER JOIN project p ON p.id = o.project_id
-                         INNER JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
-                         WHERE $project_scope AND ed.status = 1");
-if ($r) {
-    $drivers_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$equipments_count = intval($cp_agg(array('scope' => array('o' => 'operations', 'p' => 'project')),
+    "SELECT COUNT(DISTINCT o.equipment) AS c
+     FROM operations o
+     INNER JOIN project p ON p.id = o.project_id
+     WHERE {TENANT_SCOPE} AND $project_cond", array($client_id)));
 
-$r = mysqli_query($conn, "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS c
-                         FROM timesheet t
-                         INNER JOIN operations o ON o.id = t.operator
-                         INNER JOIN project p ON p.id = o.project_id
-                         WHERE $project_scope AND t.status = 1");
-if ($r) {
-    $total_hours = floatval(mysqli_fetch_assoc($r)['c']);
-}
+$drivers_count = intval($cp_agg(array('scope' => array('o' => 'operations', 'p' => 'project', 'ed' => 'equipment_drivers')),
+    "SELECT COUNT(DISTINCT ed.employee_id) AS c
+     FROM operations o
+     INNER JOIN project p ON p.id = o.project_id
+     INNER JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+     WHERE {TENANT_SCOPE} AND $project_cond AND ed.status = 1", array($client_id)));
 
-$projects_breakdown = mysqli_query($conn, "SELECT
-                            p.id,
-                            p.name,
-                            p.project_code,
-                            COUNT(DISTINCT o.equipment) AS equipments_count,
-                            COUNT(DISTINCT e.suppliers) AS suppliers_count,
-                            IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS hours_sum
-                          FROM project p
-                          LEFT JOIN operations o ON o.project_id = p.id
-                          LEFT JOIN equipments e ON e.id = o.equipment
-                          LEFT JOIN timesheet t ON t.operator = o.id AND t.status = 1
-                          WHERE $project_scope
-                          GROUP BY p.id, p.name, p.project_code
-                          ORDER BY hours_sum DESC
-                          LIMIT 10");
+$total_hours = floatval($cp_agg(array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'p' => 'project')),
+    "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS c
+     FROM timesheet t
+     INNER JOIN operations o ON o.id = t.operator
+     INNER JOIN project p ON p.id = o.project_id
+     WHERE {TENANT_SCOPE} AND $project_cond AND t.status = 1", array($client_id)));
+
+try {
+    $projects_breakdown = $cp_gate->scopedQuery(array(
+        'scope'  => array('p' => 'project'),
+        'enrich' => array('o' => 'operations', 'e' => 'equipments', 't' => 'timesheet'),
+    ), "SELECT
+            p.id,
+            p.name,
+            p.project_code,
+            COUNT(DISTINCT o.equipment) AS equipments_count,
+            COUNT(DISTINCT e.suppliers) AS suppliers_count,
+            IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS hours_sum
+        FROM project p
+        LEFT JOIN operations o ON o.project_id = p.id
+        LEFT JOIN equipments e ON e.id = o.equipment
+        LEFT JOIN timesheet t ON t.operator = o.id AND t.status = 1
+        WHERE {TENANT_SCOPE} AND $project_cond
+        GROUP BY p.id, p.name, p.project_code
+        ORDER BY hours_sum DESC
+        LIMIT 10", array($client_id));
+} catch (\Throwable $t) {
+    $projects_breakdown = array();
+}
 
 $page_title = 'إيكوبيشن | بطاقة العميل';
 include '../inheader.php';
@@ -240,7 +226,7 @@ include '../insidebar.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if ($projects_breakdown): while ($row = mysqli_fetch_assoc($projects_breakdown)): ?>
+                        <?php foreach ($projects_breakdown as $row): ?>
                             <tr>
                                 <td><a href="../Projects/project_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
                                 <td><?php echo htmlspecialchars($row['project_code'] ?: '-'); ?></td>
@@ -248,7 +234,7 @@ include '../insidebar.php';
                                 <td><?php echo intval($row['suppliers_count']); ?></td>
                                 <td><?php echo number_format($row['hours_sum'], 0); ?></td>
                             </tr>
-                        <?php endwhile; endif; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
