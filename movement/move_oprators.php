@@ -52,62 +52,16 @@ $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['r
 $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
-$project_client_column  = db_table_has_column($conn, 'project', 'client_id')
-                          ? 'client_id' : 'company_client_id';
-$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
-
 if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
     exit();
 }
 
-// ── التحقق من وجود أعمدة operations وإضافتها تلقائياً ──────
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-if (!$operations_has_company) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN company_id INT NULL AFTER project_id", 'movement/move_oprators.php');
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD INDEX idx_operations_company_id (company_id)", 'movement/move_oprators.php');
-    $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-}
-
-$operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
-if (!$operations_has_shift_type) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours", 'movement/move_oprators.php');
-    $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
-}
-
-// الساعات اليومية المستهدفة للآلية (مرجع المقارنة منفّذ/مستهدف) — ترحيل ذاتي محمي
-$operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
-if (!$operations_has_target) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours", 'movement/move_oprators.php');
-    $operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
-}
-
-if (!$is_super_admin && !$operations_has_company) {
-    die('لا يمكن تطبيق عزل الشركات في شاشة التشغيل لأن عمود company_id غير متاح في جدول operations.');
-}
-
-// ── نطاق الفلتر حسب الشركة ─────────────────────────────────
-// نستخدم placeholder بدلاً من دمج القيمة مباشرة في النص
-// لكن هذا المتغير يُستخدم فقط في استعلامات تستخدم Prepared Statements
-// لذا نحتفظ به كـ boolean flag ونمرر $company_id دائماً عبر bind_param
-$apply_company_filter = (!$is_super_admin && $operations_has_company);
-
-// ── نطاق مشاريع الشركة ─────────────────────────────────────
-$project_scope_sql = "1=1";
-if (!$is_super_admin) {
-    if ($project_has_company_id) {
-        $project_scope_sql = "project.company_id = " . intval($company_id);
-    } else {
-        $project_scope_sql = "(
-            EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = " . intval($company_id) . ")
-            OR EXISTS (
-                SELECT 1 FROM clients sc
-                INNER JOIN users scu ON scu.id = sc.created_by
-                WHERE sc.id = project.$project_client_column AND scu.company_id = " . intval($company_id) . "
-            )
-        )";
-    }
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة والترحيلات الذاتية
+// وقتَ التشغيل وبُناة النطاق البديلة أُسقطوا كلّهم — الأعمدة مضمونةٌ بالترحيلات
+// (لقطة catch-up)، {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر عبر
+// forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق شركة).
+$mvo_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('move oprators super') : ems_tenant_db();
 
 // ── الصلاحيات ───────────────────────────────────────────────
 $page_permissions = check_page_permissions($conn, 'movement/move_oprators.php');
@@ -149,30 +103,25 @@ if ($selected_project_id === 0) {
     exit();
 }
 
-// ── جلب بيانات المشروع ─────────────────────────────────────
-$proj_stmt = $conn->prepare(
-    "SELECT id, name, project_code, location
-     FROM project
-     WHERE id = ? AND status = 1 AND $project_scope_sql"
-);
-$proj_stmt->bind_param('i', $selected_project_id);
-$proj_stmt->execute();
-$project_result = $proj_stmt->get_result();
-
-if (!$project_result) {
+// ── جلب بيانات المشروع (العزل عبر البوابة) ──────────────────
+try {
+    $project_rows = $mvo_gate->scopedQuery(array(
+        'scope' => array('project' => 'project'),
+    ), "SELECT id, name, project_code, location
+        FROM project
+        WHERE {TENANT_SCOPE} AND id = ? AND status = 1", array($selected_project_id));
+} catch (\Throwable $t) {
     echo "<script>alert('❌ خطأ في تحميل بيانات المشروع'); window.location.href='select_project.php';</script>";
     exit();
 }
 
-if (mysqli_num_rows($project_result) > 0) {
-    $selected_project = $project_result->fetch_assoc();
+if (!empty($project_rows)) {
+    $selected_project = $project_rows[0];
 } else {
     unset($_SESSION['operations_project_id']);
     echo "<script>alert('❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
     exit();
 }
-
-$proj_stmt->close();
 
 // ═══════════════════════════════════════════════════════════
 // 2. معالجة طلبات POST — كل حالة في دالة منفصلة
@@ -193,7 +142,7 @@ function redirect_to_page(string $msg = '', bool $success = true): void
 // ── تغيير حالة التشغيل ─────────────────────────────────────
 function handle_change_status(): void
 {
-    global $conn, $can_edit, $selected_project_id, $apply_company_filter, $company_id;
+    global $mvo_gate, $can_edit, $selected_project_id;
 
     validate_csrf();
 
@@ -208,48 +157,35 @@ function handle_change_status(): void
         redirect_to_page('بيانات غير صحيحة لتحديث الحالة', false);
     }
 
-    // إذا كان الطلب لتفعيل السجل تحقق من عدم وجود تعارض
+    // إذا كان الطلب لتفعيل السجل تحقق من عدم وجود تعارض (العزل عبر البوابة)
     if ($new_status === 1) {
-        $eq_stmt = $conn->prepare("SELECT equipment FROM operations WHERE id = ? LIMIT 1");
-        $eq_stmt->bind_param('i', $operation_id);
-        $eq_stmt->execute();
-        $eq_res = $eq_stmt->get_result();
-        $eq_row = $eq_res ? $eq_res->fetch_assoc() : null;
-        $eq_stmt->close();
+        try {
+            $eq_row = $mvo_gate->selectOne('operations', array(
+                'columns' => array('equipment'), 'where' => array('id' => $operation_id),
+            ));
+        } catch (\Throwable $t) { $eq_row = null; }
 
         if (!$eq_row || intval($eq_row['equipment']) <= 0) {
             redirect_to_page('لا يمكن تحديد الآلية المرتبطة بهذا السجل', false);
         }
 
         $eq_id = intval($eq_row['equipment']);
-        $conflict_stmt = $conn->prepare(
-            "SELECT id FROM operations WHERE equipment = ? AND status = 1 AND id != ? LIMIT 1"
-        );
-        $conflict_stmt->bind_param('ii', $eq_id, $operation_id);
-        $conflict_stmt->execute();
-        $conflict_res = $conflict_stmt->get_result();
-        $conflict_count = $conflict_res ? $conflict_res->num_rows : 0;
-        $conflict_stmt->close();
+        try {
+            $conflict_rows = $mvo_gate->scopedQuery(array(
+                'scope' => array('operations' => 'operations'),
+            ), "SELECT id FROM operations WHERE {TENANT_SCOPE} AND equipment = ? AND status = 1 AND id != ? LIMIT 1",
+                array($eq_id, $operation_id));
+        } catch (\Throwable $t) { $conflict_rows = array(); }
 
-        if ($conflict_count > 0) {
+        if (!empty($conflict_rows)) {
             redirect_to_page('لا يمكن إعادة تشغيل المعدة وهي تعمل بالفعل في سجل آخر', false);
         }
     }
 
-    if ($apply_company_filter) {
-        $upd_stmt = $conn->prepare(
-            "UPDATE operations SET status = ? WHERE id = ? AND project_id = ? AND company_id = ?"
-        );
-        $upd_stmt->bind_param('iiii', $new_status, $operation_id, $selected_project_id, $company_id);
-    } else {
-        $upd_stmt = $conn->prepare(
-            "UPDATE operations SET status = ? WHERE id = ? AND project_id = ?"
-        );
-        $upd_stmt->bind_param('iii', $new_status, $operation_id, $selected_project_id);
-    }
-
-    $upd_stmt->execute();
-    $upd_stmt->close();
+    try {
+        $mvo_gate->update('operations', array('status' => $new_status),
+            array('id' => $operation_id, 'project_id' => $selected_project_id));
+    } catch (\Throwable $t) {}
 
     redirect_to_page('تم تحديث الحالة بنجاح');
 }
@@ -257,7 +193,7 @@ function handle_change_status(): void
 // ── طلب إيقاف آلية عبر نظام الموافقات ────────────────────
 function handle_request_equipment_stop(): void
 {
-    global $conn, $can_edit, $is_role10, $selected_project_id, $apply_company_filter, $company_id;
+    global $conn, $mvo_gate, $can_edit, $is_role10, $selected_project_id;
 
     validate_csrf();
 
@@ -275,32 +211,18 @@ function handle_request_equipment_stop(): void
         redirect_to_page('بيانات غير صحيحة', false);
     }
 
-    if ($apply_company_filter) {
-        $op_stmt = $conn->prepare(
-            "SELECT o.id, o.equipment, o.status, e.code AS equipment_code,
-                    e.name AS equipment_name, e.availability_status
-             FROM operations o
-             LEFT JOIN equipments e ON o.equipment = e.id
-             WHERE o.id = ? AND o.project_id = ? AND o.company_id = ?
-             LIMIT 1"
-        );
-        $op_stmt->bind_param('iii', $operation_id, $selected_project_id, $company_id);
-    } else {
-        $op_stmt = $conn->prepare(
-            "SELECT o.id, o.equipment, o.status, e.code AS equipment_code,
-                    e.name AS equipment_name, e.availability_status
-             FROM operations o
-             LEFT JOIN equipments e ON o.equipment = e.id
-             WHERE o.id = ? AND o.project_id = ?
-             LIMIT 1"
-        );
-        $op_stmt->bind_param('ii', $operation_id, $selected_project_id);
-    }
-
-    $op_stmt->execute();
-    $op_res = $op_stmt->get_result();
-    $op_row = $op_res ? $op_res->fetch_assoc() : null;
-    $op_stmt->close();
+    try {
+        $op_rows = $mvo_gate->scopedQuery(array(
+            'scope'  => array('o' => 'operations'),
+            'enrich' => array('e' => 'equipments'),
+        ), "SELECT o.id, o.equipment, o.status, e.code AS equipment_code,
+                e.name AS equipment_name, e.availability_status
+            FROM operations o
+            LEFT JOIN equipments e ON o.equipment = e.id
+            WHERE {TENANT_SCOPE} AND o.id = ? AND o.project_id = ?
+            LIMIT 1", array($operation_id, $selected_project_id));
+    } catch (\Throwable $t) { $op_rows = array(); }
+    $op_row = !empty($op_rows) ? $op_rows[0] : null;
 
     if (!$op_row) {
         redirect_to_page('عملية التشغيل غير موجودة', false);
@@ -313,6 +235,8 @@ function handle_request_equipment_stop(): void
 
     $reason_text = $request_reason !== '' ? $request_reason : 'طلب إيقاف آلية من شاشة التشغيل';
 
+    // [مُستثنى موثَّق — عائلة الاعتمادات] approval_workflow_rules مصنَّفة restricted
+    // في العقد (بانتظار هجرة وحدة الاعتمادات أخيرًا مع الدوام) — تبقى العبارة خامًا.
     mysqli_query(
         $conn,
         "INSERT IGNORE INTO approval_workflow_rules
@@ -362,7 +286,7 @@ function handle_request_equipment_stop(): void
 // ── إنهاء الخدمة ───────────────────────────────────────────
 function handle_end_service(): void
 {
-    global $conn, $can_edit, $is_role10, $selected_project_id, $apply_company_filter, $company_id;
+    global $mvo_gate, $can_edit, $is_role10, $selected_project_id;
 
     validate_csrf();
 
@@ -383,23 +307,14 @@ function handle_end_service(): void
         redirect_to_page('يرجى إدخال جميع البيانات المطلوبة بصيغة صحيحة', false);
     }
 
-    // جلب تاريخ البداية لحساب الأيام
+    // جلب تاريخ البداية لحساب الأيام (العزل عبر البوابة)
     $days_value = null;
-    if ($apply_company_filter) {
-        $start_stmt = $conn->prepare(
-            "SELECT `start` FROM operations WHERE id = ? AND project_id = ? AND company_id = ?"
-        );
-        $start_stmt->bind_param('iii', $operation_id, $selected_project_id, $company_id);
-    } else {
-        $start_stmt = $conn->prepare(
-            "SELECT `start` FROM operations WHERE id = ? AND project_id = ?"
-        );
-        $start_stmt->bind_param('ii', $operation_id, $selected_project_id);
-    }
-    $start_stmt->execute();
-    $start_res = $start_stmt->get_result();
-    $start_row = $start_res ? $start_res->fetch_assoc() : null;
-    $start_stmt->close();
+    try {
+        $start_row = $mvo_gate->selectOne('operations', array(
+            'columns' => array('start'),
+            'where'   => array('id' => $operation_id, 'project_id' => $selected_project_id),
+        ));
+    } catch (\Throwable $t) { $start_row = null; }
 
     if ($start_row && !empty($start_row['start'])) {
         $start_dt = DateTime::createFromFormat('Y-m-d', $start_row['start']);
@@ -408,24 +323,14 @@ function handle_end_service(): void
         }
     }
 
-    if ($apply_company_filter) {
-        $upd_stmt = $conn->prepare(
-            "UPDATE operations
-             SET status = 0, `end` = ?, reason = ?, days = ?
-             WHERE id = ? AND project_id = ? AND company_id = ?"
-        );
-        $upd_stmt->bind_param('ssiiii', $end_date, $reason, $days_value, $operation_id, $selected_project_id, $company_id);
-    } else {
-        $upd_stmt = $conn->prepare(
-            "UPDATE operations
-             SET status = 0, `end` = ?, reason = ?, days = ?
-             WHERE id = ? AND project_id = ?"
-        );
-        $upd_stmt->bind_param('ssiii', $end_date, $reason, $days_value, $operation_id, $selected_project_id);
-    }
-
-    $upd_stmt->execute();
-    $upd_stmt->close();
+    try {
+        $mvo_gate->update('operations', array(
+            'status' => 0,
+            'end'    => $end_date,
+            'reason' => $reason,
+            'days'   => $days_value,
+        ), array('id' => $operation_id, 'project_id' => $selected_project_id));
+    } catch (\Throwable $t) {}
 
     redirect_to_page('تم إنهاء الخدمة بنجاح');
 }
@@ -433,8 +338,7 @@ function handle_end_service(): void
 // ── حفظ / تعديل عملية تشغيل ───────────────────────────────
 function handle_save_operation(): void
 {
-    global $conn, $can_add, $can_edit, $selected_project_id,
-           $apply_company_filter, $company_id, $operations_has_shift_type;
+    global $mvo_gate, $can_add, $can_edit, $selected_project_id;
 
     validate_csrf();
 
@@ -489,101 +393,50 @@ function handle_save_operation(): void
         redirect_to_page('فئة المعدة غير صحيحة', false);
     }
 
-    // التحقق من تعارض سجل ساري آخر لنفس المعدة
+    // التحقق من تعارض سجل ساري آخر لنفس المعدة (العزل عبر البوابة)
     if ($status === 1 && $equipment > 0) {
-        $exclude_sql = $operation_id > 0 ? " AND id != $operation_id" : "";
-        $conflict_stmt = $conn->prepare(
-            "SELECT id FROM operations WHERE equipment = ? AND status = 1 $exclude_sql LIMIT 1"
-        );
-        $conflict_stmt->bind_param('i', $equipment);
-        $conflict_stmt->execute();
-        $conflict_res = $conflict_stmt->get_result();
-        $conflict_count = $conflict_res ? $conflict_res->num_rows : 0;
-        $conflict_stmt->close();
+        $exclude_sql = $operation_id > 0 ? " AND id != ?" : "";
+        $conflict_params = array($equipment);
+        if ($operation_id > 0) { $conflict_params[] = $operation_id; }
+        try {
+            $conflict_rows = $mvo_gate->scopedQuery(array(
+                'scope' => array('operations' => 'operations'),
+            ), "SELECT id FROM operations WHERE {TENANT_SCOPE} AND equipment = ? AND status = 1$exclude_sql LIMIT 1", $conflict_params);
+        } catch (\Throwable $t) { $conflict_rows = array(); }
 
-        if ($conflict_count > 0) {
+        if (!empty($conflict_rows)) {
             redirect_to_page('لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر', false);
         }
     }
 
+    $op_fields = array(
+        'equipment'             => $equipment,
+        'equipment_type'        => $equipment_type,
+        'equipment_category'    => $equipment_category,
+        'contract_id'           => $contract_id,
+        'supplier_id'           => $supplier_id,
+        'start'                 => $start,
+        'end'                   => $end,
+        'total_equipment_hours' => $total_equip_hours,
+        'shift_hours'           => $shift_hours,
+        'target_daily_hours'    => $target_daily_hours,
+        'shift_type'            => $shift_type,
+        'status'                => $status,
+    );
+
     // تعديل سجل موجود
     if ($operation_id > 0) {
-        if ($apply_company_filter) {
-            $stmt = $conn->prepare(
-                "UPDATE operations SET
-                    equipment = ?, equipment_type = ?, equipment_category = ?,
-                    contract_id = ?, supplier_id = ?,
-                    start = ?, end = ?,
-                    total_equipment_hours = ?, shift_hours = ?, target_daily_hours = ?,
-                    shift_type = ?, status = ?
-                 WHERE id = ? AND project_id = ? AND company_id = ?"
-            );
-            $stmt->bind_param(
-                'iisiissdddsiiii',
-                $equipment, $equipment_type, $equipment_category,
-                $contract_id, $supplier_id,
-                $start, $end,
-                $total_equip_hours, $shift_hours, $target_daily_hours,
-                $shift_type, $status,
-                $operation_id, $selected_project_id, $company_id
-            );
-        } else {
-            $stmt = $conn->prepare(
-                "UPDATE operations SET
-                    equipment = ?, equipment_type = ?, equipment_category = ?,
-                    contract_id = ?, supplier_id = ?,
-                    start = ?, end = ?,
-                    total_equipment_hours = ?, shift_hours = ?, target_daily_hours = ?,
-                    shift_type = ?, status = ?
-                 WHERE id = ? AND project_id = ?"
-            );
-            $stmt->bind_param(
-                'iisiissdddsiii',
-                $equipment, $equipment_type, $equipment_category,
-                $contract_id, $supplier_id,
-                $start, $end,
-                $total_equip_hours, $shift_hours, $target_daily_hours,
-                $shift_type, $status,
-                $operation_id, $selected_project_id
-            );
-        }
-        $stmt->execute();
-        $stmt->close();
+        try {
+            $mvo_gate->update('operations', $op_fields,
+                array('id' => $operation_id, 'project_id' => $selected_project_id));
+        } catch (\Throwable $t) {}
         redirect_to_page('تم التحديث بنجاح');
     }
 
-    // إضافة سجل جديد
-    if ($apply_company_filter) {
-        $stmt = $conn->prepare(
-            "INSERT INTO operations
-                (equipment, equipment_type, equipment_category, project_id,
-                 contract_id, supplier_id, start, end, days,
-                 total_equipment_hours, shift_hours, target_daily_hours, shift_type, status, company_id)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)"
-        );
-        $stmt->bind_param(
-            'iisiiissdddsii',
-            $equipment, $equipment_type, $equipment_category, $selected_project_id,
-            $contract_id, $supplier_id, $start, $end,
-            $total_equip_hours, $shift_hours, $target_daily_hours, $shift_type, $status, $company_id
-        );
-    } else {
-        $stmt = $conn->prepare(
-            "INSERT INTO operations
-                (equipment, equipment_type, equipment_category, project_id,
-                 contract_id, supplier_id, start, end, days,
-                 total_equipment_hours, shift_hours, target_daily_hours, shift_type, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)"
-        );
-        $stmt->bind_param(
-            'iisiiissdddsi',
-            $equipment, $equipment_type, $equipment_category, $selected_project_id,
-            $contract_id, $supplier_id, $start, $end,
-            $total_equip_hours, $shift_hours, $target_daily_hours, $shift_type, $status
-        );
-    }
-    $stmt->execute();
-    $stmt->close();
+    // إضافة سجل جديد (company_id تحقنه البوابة)
+    try {
+        $mvo_gate->insert('operations', array('project_id' => $selected_project_id, 'days' => 0) + $op_fields);
+    } catch (\Throwable $t) {}
 
     redirect_to_page('تم الحفظ بنجاح');
 }
@@ -591,7 +444,7 @@ function handle_save_operation(): void
 // ── حذف تشغيل ──────────────────────────────────────────────
 function handle_delete(): void
 {
-    global $conn, $can_delete, $selected_project_id, $apply_company_filter, $company_id;
+    global $mvo_gate, $can_delete, $selected_project_id;
 
     if (!$can_delete) {
         redirect_to_page('لا توجد صلاحية حذف التشغيل', false);
@@ -604,21 +457,17 @@ function handle_delete(): void
 
     // طلب GET للحذف — نتحقق من token منفصل في رابط الحذف
     // (في بيئة الإنتاج يفضل تحويل الحذف إلى POST + CSRF)
-    if ($apply_company_filter) {
-        $del_stmt = $conn->prepare(
-            "DELETE FROM operations WHERE id = ? AND project_id = ? AND company_id = ?"
-        );
-        $del_stmt->bind_param('iii', $delete_id, $selected_project_id, $company_id);
-    } else {
-        $del_stmt = $conn->prepare(
-            "DELETE FROM operations WHERE id = ? AND project_id = ?"
-        );
-        $del_stmt->bind_param('ii', $delete_id, $selected_project_id);
-    }
-
-    $del_stmt->execute();
-    $affected = $del_stmt->affected_rows;
-    $del_stmt->close();
+    // حذفٌ صلب عبر قناة deleteRow (فحص المشروع مسبقًا — سلوك الأصل: عدم التطابق = 0 صف)
+    $affected = 0;
+    try {
+        $del_own = $mvo_gate->selectOne('operations', array(
+            'columns' => array('id'),
+            'where'   => array('id' => $delete_id, 'project_id' => $selected_project_id),
+        ));
+        if ($del_own) {
+            $affected = $mvo_gate->deleteRow('operations', $delete_id, 'حذف تشغيل من شاشة الحركة');
+        }
+    } catch (\Throwable $t) { $affected = 0; }
 
     if ($affected > 0) {
         redirect_to_page('تم حذف التشغيل بنجاح');
@@ -645,9 +494,12 @@ if (isset($_GET['delete_id'])) {
 // 3. جلب بيانات الجدول (استعلام موحد يحل مشكلة N+1)
 // ═══════════════════════════════════════════════════════════
 
-$company_join_sql = $apply_company_filter ? " AND o.company_id = " . intval($company_id) : "";
-
-$operations_query = "
+try {
+    $operations_rows = $mvo_gate->scopedQuery(array(
+        'scope'  => array('o' => 'operations'),
+        'enrich' => array('e' => 'equipments', 'p' => 'project', 's' => 'suppliers',
+                          'c' => 'contracts', 'ed' => 'equipment_drivers', 'd' => 'employees'),
+    ), "
     SELECT
         o.id,
         o.equipment,
@@ -680,23 +532,11 @@ $operations_query = "
     LEFT JOIN contracts c          ON o.contract_id    = c.id
     LEFT JOIN equipment_drivers ed ON o.equipment      = ed.equipment_id
     LEFT JOIN employees d            ON ed.employee_id     = d.id
-    WHERE o.project_id = ? $company_join_sql
+    WHERE {TENANT_SCOPE} AND o.project_id = ?
     GROUP BY o.id
     ORDER BY o.id DESC
-";
-
-$ops_stmt = $conn->prepare($operations_query);
-$ops_stmt->bind_param('i', $selected_project_id);
-$ops_stmt->execute();
-$operations_result = $ops_stmt->get_result();
-$ops_stmt->close();
-
-$operations_rows = [];
-if ($operations_result) {
-    while ($op_row = $operations_result->fetch_assoc()) {
-        $operations_rows[] = $op_row;
-    }
-}
+", array($selected_project_id));
+} catch (\Throwable $t) { $operations_rows = array(); }
 
 $operations_rows_day = [];
 $operations_rows_night = [];
@@ -710,11 +550,14 @@ foreach ($operations_rows as $op_row) {
     }
 }
 
-// جلب أنواع المعدات للقائمة المنسدلة
-$type_result = mysqli_query(
-    $conn,
-    "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type"
-);
+// جلب أنواع المعدات للقائمة المنسدلة (جدول عام — قراءة عبر البوابة)
+try {
+    $type_rows = $mvo_gate->select('equipments_types', array(
+        'columns' => array('id', 'type'),
+        'where'   => array('status' => 1),
+        'orderBy' => 'type',
+    ));
+} catch (\Throwable $t) { $type_rows = array(); }
 
 // ═══════════════════════════════════════════════════════════
 // 4. دوال مساعدة لعرض الوردية
@@ -970,11 +813,11 @@ function get_shift_info(string $code): array
 
                         <select name="type" id="type" required>
                             <option value="">-- حدد نوع المعدة --</option>
-                            <?php if ($type_result): while ($type_row = mysqli_fetch_assoc($type_result)): ?>
+                            <?php foreach ($type_rows as $type_row): ?>
                             <option value="<?= intval($type_row['id']) ?>">
                                 <?= htmlspecialchars($type_row['type'], ENT_QUOTES, 'UTF-8') ?>
                             </option>
-                            <?php endwhile; endif; ?>
+                            <?php endforeach; ?>
                         </select>
 
                         <select name="equipment" id="equipment" required>

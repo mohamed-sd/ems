@@ -14,40 +14,16 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 
 // (mine filtering removed - operations filter by project_id directly)
 $is_movement_manager = ($current_role === '6');
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
-$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
-$drivers_has_status = db_table_has_column($conn, 'employees', 'status');
 
 if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
     exit();
 }
 
-if (!$equipment_drivers_has_shift_type) {
-    ems_runtime_ddl($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date", 'movement/project_drivers.php');
-    $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-}
-
-$project_scope_sql = "1=1";
-if (!$is_super_admin) {
-    if ($project_has_company_id) {
-        $project_scope_sql = "project.company_id = $company_id";
-    } else {
-        $project_scope_sql = "(
-            EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $company_id)
-            OR EXISTS (
-                SELECT 1
-                FROM clients sc
-                INNER JOIN users scu ON scu.id = sc.created_by
-                WHERE sc.id = project.$project_client_column AND scu.company_id = $company_id
-            )
-        )";
-    }
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة والترحيل الذاتي
+// (shift_type) وبُناة النطاق البديلة أُسقطوا — الأعمدة مضمونة بالترحيلات،
+// {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر عبر forAllTenants المسجَّل.
+$pd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('project drivers super') : ems_tenant_db();
 
 // صلاحيات الصفحة: نفس نمط شاشة التشغيل
 $page_permissions = check_page_permissions($conn, 'movement/project_drivers.php');
@@ -77,22 +53,24 @@ if ($selected_project_id <= 0) {
     exit();
 }
 
-$project_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = 1 AND $project_scope_sql";
-$project_result = mysqli_query($conn, $project_query);
-if (!$project_result || mysqli_num_rows($project_result) === 0) {
+try {
+    $project_rows = $pd_gate->scopedQuery(array(
+        'scope' => array('project' => 'project'),
+    ), "SELECT id, name, project_code FROM project WHERE {TENANT_SCOPE} AND id = ? AND status = 1", array($selected_project_id));
+} catch (\Throwable $t) { $project_rows = array(); }
+if (empty($project_rows)) {
     unset($_SESSION['operations_project_id']);
     echo "<script>alert('❌ المشروع غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
     exit();
 }
-$selected_project = mysqli_fetch_assoc($project_result);
+$selected_project = $project_rows[0];
 
-$operations_company_scope = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
-$ed_company_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND ed.company_id = $company_id" : "";
-$driver_company_scope = (!$is_super_admin && $drivers_has_company) ? " AND d.company_id = $company_id" : "";
-$driver_status_scope = $drivers_has_status ? " AND d.status = 1" : "";
-
-// (mine filter removed - operations filtered by project_id only)
-$ops_mine_filter = "";
+// شرط ارتباط سجل التشغيل بالمشروع (بلا شرط شركةٍ يدوي — البوابة تتكفّل به)
+$pd_exists_ops = " AND EXISTS (
+        SELECT 1 FROM operations o
+        WHERE o.equipment = equipment_drivers.equipment_id
+          AND o.project_id = $selected_project_id
+    )";
 
 $msg = '';
 $is_success = true;
@@ -141,103 +119,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $msg = 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية ❌';
                 $is_success = false;
             } else {
-                mysqli_begin_transaction($conn);
+                $inserted_count = 0;
+                $skipped_count = 0;
                 try {
-                    $equipment_check_sql = "SELECT 1 FROM operations o
-                                            WHERE o.equipment = $equipment_id
-                                              AND o.project_id = $selected_project_id
-                                              $operations_company_scope
-                                              $ops_mine_filter
-                                            LIMIT 1";
-                    $equipment_check_res = mysqli_query($conn, $equipment_check_sql);
-                    if (!$equipment_check_res || mysqli_num_rows($equipment_check_res) === 0) {
-                        throw new Exception('الآلية المختارة ليست ضمن المشروع الحالي');
-                    }
-
-                    $inserted_count = 0;
-                    $skipped_count = 0;
-                    foreach ($normalized_driver_ids as $employee_id) {
-                        $driver_check_sql = "SELECT d.id FROM employees d
-                                             WHERE d.id = $employee_id
-                                               $driver_company_scope
-                                               $driver_status_scope
-                                             LIMIT 1";
-                        $driver_check_res = mysqli_query($conn, $driver_check_sql);
-                        if (!$driver_check_res || mysqli_num_rows($driver_check_res) === 0) {
-                            $skipped_count++;
-                            continue;
+                    $pd_gate->runInTransaction(function ($g) use ($equipment_id, $selected_project_id, $normalized_driver_ids, $auto_replace, $start_date, $end_date, $shift_type, &$inserted_count, &$skipped_count) {
+                        $equipment_check = $g->scopedQuery(array(
+                            'scope' => array('o' => 'operations'),
+                        ), "SELECT 1 AS x FROM operations o
+                            WHERE {TENANT_SCOPE} AND o.equipment = ? AND o.project_id = ? LIMIT 1",
+                            array($equipment_id, $selected_project_id));
+                        if (empty($equipment_check)) {
+                            throw new \Exception('الآلية المختارة ليست ضمن المشروع الحالي');
                         }
 
-                        $active_any_sql = "SELECT ed.id, ed.equipment_id
-                                           FROM equipment_drivers ed
-                                           WHERE ed.employee_id = $employee_id
-                                             AND ed.status = 1
-                                             $ed_company_scope
-                                             AND EXISTS (
-                                                 SELECT 1
-                                                 FROM operations o
-                                                 WHERE o.equipment = ed.equipment_id
-                                                   AND o.project_id = $selected_project_id
-                                                   $operations_company_scope
-                                                   $ops_mine_filter
-                                             )
-                                           LIMIT 1";
-                        $active_any_res = mysqli_query($conn, $active_any_sql);
-                        $active_any_row = ($active_any_res && mysqli_num_rows($active_any_res) > 0) ? mysqli_fetch_assoc($active_any_res) : null;
-
-                        if ($active_any_row) {
-                            $current_equipment_id = intval($active_any_row['equipment_id']);
-                            if ($current_equipment_id == $equipment_id) {
+                        foreach ($normalized_driver_ids as $employee_id) {
+                            $driver_check = $g->selectOne('employees', array(
+                                'columns'  => array('id'),
+                                'where'    => array('id' => $employee_id),
+                                'whereRaw' => 'status = 1',
+                            ));
+                            if (!$driver_check) {
                                 $skipped_count++;
                                 continue;
                             }
 
-                            if ($auto_replace === 1) {
-                                $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-                                $close_sql = "UPDATE equipment_drivers
-                                              SET status = 0, end_date = '$start_date'
-                                              WHERE employee_id = $employee_id AND status = 1$update_scope
-                                                AND EXISTS (
-                                                    SELECT 1
-                                                    FROM operations o
-                                                    WHERE o.equipment = equipment_drivers.equipment_id
-                                                      AND o.project_id = $selected_project_id
-                                                      $operations_company_scope
-                                                      $ops_mine_filter
-                                                )";
-                                mysqli_query($conn, $close_sql);
-                            } else {
-                                $skipped_count++;
-                                continue;
+                            $active_any = $g->scopedQuery(array(
+                                'scope' => array('ed' => 'equipment_drivers'),
+                                'enrich' => array('operations' => 'operations'),
+                            ), "SELECT ed.id, ed.equipment_id
+                                FROM equipment_drivers ed
+                                WHERE {TENANT_SCOPE} AND ed.employee_id = ?
+                                  AND ed.status = 1
+                                  AND EXISTS (
+                                      SELECT 1 FROM operations o
+                                      WHERE o.equipment = ed.equipment_id
+                                        AND o.project_id = ?
+                                  )
+                                LIMIT 1", array($employee_id, $selected_project_id));
+                            $active_any_row = !empty($active_any) ? $active_any[0] : null;
+
+                            if ($active_any_row) {
+                                $current_equipment_id = intval($active_any_row['equipment_id']);
+                                if ($current_equipment_id == $equipment_id) {
+                                    $skipped_count++;
+                                    continue;
+                                }
+
+                                if ($auto_replace === 1) {
+                                    $g->update('equipment_drivers',
+                                        array('status' => 0, 'end_date' => $start_date),
+                                        array('employee_id' => $employee_id),
+                                        "status = 1 AND EXISTS (
+                                            SELECT 1 FROM operations o
+                                            WHERE o.equipment = equipment_drivers.equipment_id
+                                              AND o.project_id = " . intval($selected_project_id) . "
+                                        )");
+                                } else {
+                                    $skipped_count++;
+                                    continue;
+                                }
                             }
+
+                            $g->insert('equipment_drivers', array(
+                                'equipment_id' => $equipment_id,
+                                'employee_id'  => $employee_id,
+                                'start_date'   => $start_date,
+                                'end_date'     => $end_date !== '' ? $end_date : '2099-12-31',
+                                'status'       => 1,
+                                'shift_type'   => $shift_type,
+                            ));
+                            $inserted_count++;
                         }
 
-                        $insert_company_col = (!$is_super_admin && $equipment_drivers_has_company) ? ", company_id" : "";
-                        $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
-                        $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
-                        $insert_shift_val = $equipment_drivers_has_shift_type ? ", '$shift_type'" : "";
-                        $end_sql = $end_date !== '' ? "'" . mysqli_real_escape_string($conn, $end_date) . "'" : "'2099-12-31'";
-                        $insert_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                       VALUES ($equipment_id, $employee_id, '$start_date', $end_sql, 1$insert_shift_val$insert_company_val)";
-
-                        if (!mysqli_query($conn, $insert_sql)) {
-                            throw new Exception('فشل إضافة تشغيل أحد السائقين');
+                        if ($inserted_count === 0) {
+                            throw new \Exception('لم يتم إضافة أي سائق. تحقق من الحالة الحالية للسائقين');
                         }
-                        $inserted_count++;
-                    }
+                    }, 'إضافة تشغيل سائقين لمشروع');
 
-                    if ($inserted_count === 0) {
-                        throw new Exception('لم يتم إضافة أي سائق. تحقق من الحالة الحالية للسائقين');
-                    }
-
-                    mysqli_commit($conn);
                     $msg = "تمت إضافة $inserted_count سائق بنجاح ✅";
                     if ($skipped_count > 0) {
                         $msg .= " (تم تخطي $skipped_count)";
                     }
                     $is_success = true;
-                } catch (Exception $ex) {
-                    mysqli_rollback($conn);
+                } catch (\Throwable $ex) {
                     $msg = $ex->getMessage() . ' ❌';
                     $is_success = false;
                 }
@@ -262,22 +226,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $msg = 'بيانات إدارة السائقين غير صحيحة ❌';
                 $is_success = false;
             } else {
-                mysqli_begin_transaction($conn);
+                $processed_stop = 0;
+                $processed_move = 0;
+                $processed_date_update = 0;
+                $added_count = 0;
+                $skipped_count = 0;
                 try {
-                    $equipment_check_sql = "SELECT 1 FROM operations o
-                                            WHERE o.equipment = $equipment_id
-                                              AND o.project_id = $selected_project_id
-                                              $operations_company_scope
-                                              $ops_mine_filter
-                                            LIMIT 1";
-                    $equipment_check_res = mysqli_query($conn, $equipment_check_sql);
-                    if (!$equipment_check_res || mysqli_num_rows($equipment_check_res) === 0) {
-                        throw new Exception('الآلية غير متاحة داخل المشروع الحالي');
+                    $pd_gate->runInTransaction(function ($g) use ($equipment_id, $selected_project_id, $existing_action, $existing_start_date, $existing_end_date, $move_to_equipment, $add_driver_ids, $add_shift_type, $auto_replace_manage, $effective_date, $allowed_shift_types, &$processed_stop, &$processed_move, &$processed_date_update, &$added_count, &$skipped_count) {
+                    $equipment_check = $g->scopedQuery(array(
+                        'scope' => array('o' => 'operations'),
+                    ), "SELECT 1 AS x FROM operations o
+                        WHERE {TENANT_SCOPE} AND o.equipment = ? AND o.project_id = ? LIMIT 1",
+                        array($equipment_id, $selected_project_id));
+                    if (empty($equipment_check)) {
+                        throw new \Exception('الآلية غير متاحة داخل المشروع الحالي');
                     }
 
-                    $processed_stop = 0;
-                    $processed_move = 0;
-                    $processed_date_update = 0;
                     foreach ($existing_action as $relation_id_raw => $action_value_raw) {
                         $relation_id = intval($relation_id_raw);
                         $action_value = trim((string) $action_value_raw);
@@ -285,18 +249,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             continue;
                         }
 
-                        $rel_sql = "SELECT ed.id, ed.employee_id, ed.equipment_id, ed.status, ed.shift_type
-                                    FROM equipment_drivers ed
-                                    WHERE ed.id = $relation_id
-                                      AND ed.equipment_id = $equipment_id
-                                      AND ed.status = 1
-                                      $ed_company_scope
-                                    LIMIT 1";
-                        $rel_res = mysqli_query($conn, $rel_sql);
-                        if (!$rel_res || mysqli_num_rows($rel_res) === 0) {
+                        $rel_row = $g->selectOne('equipment_drivers', array(
+                            'columns'  => array('id', 'employee_id', 'equipment_id', 'status', 'shift_type'),
+                            'where'    => array('id' => $relation_id, 'equipment_id' => $equipment_id),
+                            'whereRaw' => 'status = 1',
+                        ));
+                        if (!$rel_row) {
                             continue;
                         }
-                        $rel_row = mysqli_fetch_assoc($rel_res);
                         $employee_id = intval($rel_row['employee_id']);
                         $shift_type_existing = isset($rel_row['shift_type']) ? strval($rel_row['shift_type']) : 'B';
                         $current_start = isset($rel_row['start_date']) ? $rel_row['start_date'] : date('Y-m-d');
@@ -327,26 +287,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                         if ($action_value === 'keep') {
                             $target_end = $normalized_row_end !== '' ? $normalized_row_end : '2099-12-31';
-                            $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-                            $update_dates_sql = "UPDATE equipment_drivers
-                                                 SET start_date = '$row_start', end_date = '$target_end'
-                                                 WHERE id = $relation_id AND status = 1$update_scope";
-                            if (mysqli_query($conn, $update_dates_sql)) {
+                            try {
+                                $g->update('equipment_drivers',
+                                    array('start_date' => $row_start, 'end_date' => $target_end),
+                                    array('id' => $relation_id), 'status = 1');
                                 $processed_date_update++;
-                            }
+                            } catch (\Throwable $t) {}
                             continue;
                         }
 
                         $close_date = $normalized_row_end !== '' ? $normalized_row_end : $effective_date;
                         if (strtotime($close_date) < strtotime($row_start)) {
-                            throw new Exception('تاريخ الإيقاف/النقل لا يمكن أن يكون قبل تاريخ البداية');
+                            throw new \Exception('تاريخ الإيقاف/النقل لا يمكن أن يكون قبل تاريخ البداية');
                         }
 
-                        $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-                        $close_sql = "UPDATE equipment_drivers
-                                      SET status = 0, end_date = '$close_date'
-                                      WHERE id = $relation_id AND status = 1$update_scope";
-                        mysqli_query($conn, $close_sql);
+                        $g->update('equipment_drivers',
+                            array('status' => 0, 'end_date' => $close_date),
+                            array('id' => $relation_id), 'status = 1');
 
                         if ($action_value === 'remove') {
                             $processed_stop++;
@@ -358,30 +315,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             continue;
                         }
 
-                        $target_check_sql = "SELECT 1 FROM operations o
-                                             WHERE o.equipment = $target_equipment_id
-                                               AND o.project_id = $selected_project_id
-                                               $operations_company_scope
-                                               $ops_mine_filter
-                                             LIMIT 1";
-                        $target_check_res = mysqli_query($conn, $target_check_sql);
-                        if (!$target_check_res || mysqli_num_rows($target_check_res) === 0) {
+                        $target_check = $g->scopedQuery(array(
+                            'scope' => array('o' => 'operations'),
+                        ), "SELECT 1 AS x FROM operations o
+                            WHERE {TENANT_SCOPE} AND o.equipment = ? AND o.project_id = ? LIMIT 1",
+                            array($target_equipment_id, $selected_project_id));
+                        if (empty($target_check)) {
                             continue;
                         }
 
-                        $insert_company_col = (!$is_super_admin && $equipment_drivers_has_company) ? ", company_id" : "";
-                        $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
-                        $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
-                        $insert_shift_val = $equipment_drivers_has_shift_type ? ", '" . mysqli_real_escape_string($conn, $shift_type_existing) . "'" : "";
-                        $insert_move_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                            VALUES ($target_equipment_id, $employee_id, '$close_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
-                        if (mysqli_query($conn, $insert_move_sql)) {
+                        try {
+                            $g->insert('equipment_drivers', array(
+                                'equipment_id' => $target_equipment_id,
+                                'employee_id'  => $employee_id,
+                                'start_date'   => $close_date,
+                                'end_date'     => '2099-12-31',
+                                'status'       => 1,
+                                'shift_type'   => $shift_type_existing,
+                            ));
                             $processed_move++;
-                        }
+                        } catch (\Throwable $t) {}
                     }
 
-                    $added_count = 0;
-                    $skipped_count = 0;
                     $normalized_new_driver_ids = [];
                     foreach ($add_driver_ids as $driver_id_raw) {
                         $employee_id = intval($driver_id_raw);
@@ -392,33 +347,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $normalized_new_driver_ids = array_values(array_unique($normalized_new_driver_ids));
 
                     foreach ($normalized_new_driver_ids as $employee_id) {
-                        $driver_check_sql = "SELECT d.id FROM employees d
-                                             WHERE d.id = $employee_id
-                                               $driver_company_scope
-                                               $driver_status_scope
-                                             LIMIT 1";
-                        $driver_check_res = mysqli_query($conn, $driver_check_sql);
-                        if (!$driver_check_res || mysqli_num_rows($driver_check_res) === 0) {
+                        $driver_check = $g->selectOne('employees', array(
+                            'columns'  => array('id'),
+                            'where'    => array('id' => $employee_id),
+                            'whereRaw' => 'status = 1',
+                        ));
+                        if (!$driver_check) {
                             $skipped_count++;
                             continue;
                         }
 
-                        $active_any_sql = "SELECT ed.id, ed.equipment_id
-                                           FROM equipment_drivers ed
-                                           WHERE ed.employee_id = $employee_id
-                                             AND ed.status = 1
-                                             $ed_company_scope
-                                             AND EXISTS (
-                                                 SELECT 1
-                                                 FROM operations o
-                                                 WHERE o.equipment = ed.equipment_id
-                                                   AND o.project_id = $selected_project_id
-                                                   $operations_company_scope
-                                                   $ops_mine_filter
-                                             )
-                                           LIMIT 1";
-                        $active_any_res = mysqli_query($conn, $active_any_sql);
-                        $active_any_row = ($active_any_res && mysqli_num_rows($active_any_res) > 0) ? mysqli_fetch_assoc($active_any_res) : null;
+                        $active_any = $g->scopedQuery(array(
+                            'scope' => array('ed' => 'equipment_drivers'),
+                            'enrich' => array('operations' => 'operations'),
+                        ), "SELECT ed.id, ed.equipment_id
+                            FROM equipment_drivers ed
+                            WHERE {TENANT_SCOPE} AND ed.employee_id = ?
+                              AND ed.status = 1
+                              AND EXISTS (
+                                  SELECT 1 FROM operations o
+                                  WHERE o.equipment = ed.equipment_id
+                                    AND o.project_id = ?
+                              )
+                            LIMIT 1", array($employee_id, $selected_project_id));
+                        $active_any_row = !empty($active_any) ? $active_any[0] : null;
 
                         if ($active_any_row) {
                             $current_equipment_id = intval($active_any_row['equipment_id']);
@@ -428,45 +380,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             }
 
                             if ($auto_replace_manage === 1) {
-                                $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-                                $close_sql = "UPDATE equipment_drivers
-                                              SET status = 0, end_date = '$effective_date'
-                                              WHERE employee_id = $employee_id AND status = 1$update_scope
-                                                AND EXISTS (
-                                                    SELECT 1
-                                                    FROM operations o
-                                                    WHERE o.equipment = equipment_drivers.equipment_id
-                                                      AND o.project_id = $selected_project_id
-                                                      $operations_company_scope
-                                                      $ops_mine_filter
-                                                )";
-                                mysqli_query($conn, $close_sql);
+                                $g->update('equipment_drivers',
+                                    array('status' => 0, 'end_date' => $effective_date),
+                                    array('employee_id' => $employee_id),
+                                    "status = 1 AND EXISTS (
+                                        SELECT 1 FROM operations o
+                                        WHERE o.equipment = equipment_drivers.equipment_id
+                                          AND o.project_id = " . intval($selected_project_id) . "
+                                    )");
                             } else {
                                 $skipped_count++;
                                 continue;
                             }
                         }
 
-                        $insert_company_col = (!$is_super_admin && $equipment_drivers_has_company) ? ", company_id" : "";
-                        $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
-                        $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
-                        $insert_shift_val = $equipment_drivers_has_shift_type ? ", '$add_shift_type'" : "";
-                        $insert_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                       VALUES ($equipment_id, $employee_id, '$effective_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
-                        if (mysqli_query($conn, $insert_sql)) {
+                        try {
+                            $g->insert('equipment_drivers', array(
+                                'equipment_id' => $equipment_id,
+                                'employee_id'  => $employee_id,
+                                'start_date'   => $effective_date,
+                                'end_date'     => '2099-12-31',
+                                'status'       => 1,
+                                'shift_type'   => $add_shift_type,
+                            ));
                             $added_count++;
-                        }
+                        } catch (\Throwable $t) {}
                     }
+                    }, 'إدارة توزيع سائقي آلية');
 
-                    mysqli_commit($conn);
                     $msg = "تم تحديث التوزيع بنجاح ✅ (تعديل تواريخ: $processed_date_update | إيقاف: $processed_stop | نقل: $processed_move | إضافة: $added_count";
                     if ($skipped_count > 0) {
                         $msg .= " | تخطي: $skipped_count";
                     }
                     $msg .= ")";
                     $is_success = true;
-                } catch (Exception $ex) {
-                    mysqli_rollback($conn);
+                } catch (\Throwable $ex) {
                     $msg = $ex->getMessage() . ' ❌';
                     $is_success = false;
                 }
@@ -476,29 +424,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $msg = 'بيانات غير صحيحة ❌';
                 $is_success = false;
             } else {
-                $check_sql = "SELECT ed.id FROM equipment_drivers ed
-                              WHERE ed.id = $relation_id
-                                AND ed.status = 1
-                                $ed_company_scope
-                                AND EXISTS (
-                                    SELECT 1 FROM operations o
-                                    WHERE o.equipment = ed.equipment_id
-                                      AND o.project_id = $selected_project_id
-                                      $operations_company_scope
-                                      $ops_mine_filter
-                                )
-                              LIMIT 1";
-                $check_res = mysqli_query($conn, $check_sql);
+                try {
+                    $check_rows = $pd_gate->scopedQuery(array(
+                        'scope' => array('ed' => 'equipment_drivers'),
+                        'enrich' => array('operations' => 'operations'),
+                    ), "SELECT ed.id FROM equipment_drivers ed
+                        WHERE {TENANT_SCOPE} AND ed.id = ?
+                          AND ed.status = 1
+                          AND EXISTS (
+                              SELECT 1 FROM operations o
+                              WHERE o.equipment = ed.equipment_id
+                                AND o.project_id = ?
+                          )
+                        LIMIT 1", array($relation_id, $selected_project_id));
+                } catch (\Throwable $t) { $check_rows = array(); }
 
-                if (!$check_res || mysqli_num_rows($check_res) === 0) {
+                if (empty($check_rows)) {
                     $msg = 'السجل غير موجود أو خارج نطاق المشروع ❌';
                     $is_success = false;
                 } else {
-                    $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-                    $update_sql = "UPDATE equipment_drivers
-                                   SET status = 0, end_date = CURDATE()
-                                   WHERE id = $relation_id AND status = 1$update_scope";
-                    if (mysqli_query($conn, $update_sql) && mysqli_affected_rows($conn) > 0) {
+                    try {
+                        $affected = $pd_gate->update('equipment_drivers',
+                            array('status' => 0, 'end_date' => date('Y-m-d')),
+                            array('id' => $relation_id), 'status = 1');
+                    } catch (\Throwable $t) { $affected = 0; }
+                    if ($affected > 0) {
                         $msg = 'تم إيقاف السائق بنجاح ✅';
                         $is_success = true;
                     } else {
@@ -518,93 +468,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $msg = 'بيانات النقل غير صحيحة ❌';
                 $is_success = false;
             } else {
-                mysqli_begin_transaction($conn);
                 try {
-                    $rel_sql = "SELECT ed.id, ed.employee_id, ed.equipment_id, ed.status
-                                                                , ed.shift_type
-                                FROM equipment_drivers ed
-                                WHERE ed.id = $relation_id
-                                  $ed_company_scope
-                                  AND EXISTS (
-                                      SELECT 1 FROM operations o
-                                      WHERE o.equipment = ed.equipment_id
-                                        AND o.project_id = $selected_project_id
-                                        $operations_company_scope
-                                        $ops_mine_filter
-                                  )
-                                LIMIT 1";
-                    $rel_res = mysqli_query($conn, $rel_sql);
-                    if (!$rel_res || mysqli_num_rows($rel_res) === 0) {
-                        throw new Exception('السجل المراد نقله غير موجود داخل المشروع');
-                    }
+                    $pd_gate->runInTransaction(function ($g) use ($relation_id, $new_equipment_id, $move_start_date, $selected_project_id) {
+                        $rel_rows = $g->scopedQuery(array(
+                            'scope' => array('ed' => 'equipment_drivers'),
+                            'enrich' => array('operations' => 'operations'),
+                        ), "SELECT ed.id, ed.employee_id, ed.equipment_id, ed.status, ed.shift_type
+                            FROM equipment_drivers ed
+                            WHERE {TENANT_SCOPE} AND ed.id = ?
+                              AND EXISTS (
+                                  SELECT 1 FROM operations o
+                                  WHERE o.equipment = ed.equipment_id
+                                    AND o.project_id = ?
+                              )
+                            LIMIT 1", array($relation_id, $selected_project_id));
+                        if (empty($rel_rows)) {
+                            throw new \Exception('السجل المراد نقله غير موجود داخل المشروع');
+                        }
 
-                    $rel_row = mysqli_fetch_assoc($rel_res);
-                    $employee_id = intval($rel_row['employee_id']);
-                    $old_equipment_id = intval($rel_row['equipment_id']);
-                    $old_status = intval($rel_row['status']);
+                        $rel_row = $rel_rows[0];
+                        $employee_id = intval($rel_row['employee_id']);
+                        $old_equipment_id = intval($rel_row['equipment_id']);
+                        $old_status = intval($rel_row['status']);
 
-                    if ($old_equipment_id === $new_equipment_id) {
-                        throw new Exception('الآلية الجديدة هي نفسها الآلية الحالية');
-                    }
+                        if ($old_equipment_id === $new_equipment_id) {
+                            throw new \Exception('الآلية الجديدة هي نفسها الآلية الحالية');
+                        }
 
-                    $equip_check_sql = "SELECT 1 FROM operations o
-                                       WHERE o.equipment = $new_equipment_id
-                                         AND o.project_id = $selected_project_id
-                                         $operations_company_scope
-                                         $ops_mine_filter
-                                       LIMIT 1";
-                    $equip_check_res = mysqli_query($conn, $equip_check_sql);
-                    if (!$equip_check_res || mysqli_num_rows($equip_check_res) === 0) {
-                        throw new Exception('الآلية الجديدة ليست ضمن المشروع المحدد');
-                    }
+                        $equip_check = $g->scopedQuery(array(
+                            'scope' => array('o' => 'operations'),
+                        ), "SELECT 1 AS x FROM operations o
+                            WHERE {TENANT_SCOPE} AND o.equipment = ? AND o.project_id = ? LIMIT 1",
+                            array($new_equipment_id, $selected_project_id));
+                        if (empty($equip_check)) {
+                            throw new \Exception('الآلية الجديدة ليست ضمن المشروع المحدد');
+                        }
 
-                    if ($old_status === 1) {
-                        $stop_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-                        $stop_sql = "UPDATE equipment_drivers
-                                     SET status = 0, end_date = '$move_start_date'
-                                     WHERE id = $relation_id AND status = 1$stop_scope";
-                        mysqli_query($conn, $stop_sql);
-                    }
+                        if ($old_status === 1) {
+                            $g->update('equipment_drivers',
+                                array('status' => 0, 'end_date' => $move_start_date),
+                                array('id' => $relation_id), 'status = 1');
+                        }
 
-                    $active_check_sql = "SELECT ed.id
-                                         FROM equipment_drivers ed
-                                         WHERE ed.employee_id = $employee_id
-                                           AND ed.status = 1
-                                           $ed_company_scope
-                                           AND EXISTS (
-                                               SELECT 1 FROM operations o
-                                               WHERE o.equipment = ed.equipment_id
-                                                 AND o.project_id = $selected_project_id
-                                                 $operations_company_scope
-                                                 $ops_mine_filter
-                                           )
-                                         LIMIT 1";
-                    $active_check_res = mysqli_query($conn, $active_check_sql);
-                    if ($active_check_res && mysqli_num_rows($active_check_res) > 0) {
-                        throw new Exception('السائق يعمل حالياً على آلية أخرى داخل المشروع');
-                    }
+                        $active_check = $g->scopedQuery(array(
+                            'scope' => array('ed' => 'equipment_drivers'),
+                            'enrich' => array('operations' => 'operations'),
+                        ), "SELECT ed.id
+                            FROM equipment_drivers ed
+                            WHERE {TENANT_SCOPE} AND ed.employee_id = ?
+                              AND ed.status = 1
+                              AND EXISTS (
+                                  SELECT 1 FROM operations o
+                                  WHERE o.equipment = ed.equipment_id
+                                    AND o.project_id = ?
+                              )
+                            LIMIT 1", array($employee_id, $selected_project_id));
+                        if (!empty($active_check)) {
+                            throw new \Exception('السائق يعمل حالياً على آلية أخرى داخل المشروع');
+                        }
 
-                    $insert_company_col = (!$is_super_admin && $equipment_drivers_has_company) ? ", company_id" : "";
-                    $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
-                    $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
-                    $existing_shift_type = isset($rel_row['shift_type']) ? strval($rel_row['shift_type']) : 'B';
-                    if (!in_array($existing_shift_type, array('D', 'N', 'B'), true)) {
-                        $existing_shift_type = 'B';
-                    }
-                    $insert_shift_val = $equipment_drivers_has_shift_type ? ", '" . mysqli_real_escape_string($conn, $existing_shift_type) . "'" : "";
-                    $insert_sql = "INSERT INTO equipment_drivers
-                                   (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                   VALUES ($new_equipment_id, $employee_id, '$move_start_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
+                        $existing_shift_type = isset($rel_row['shift_type']) ? strval($rel_row['shift_type']) : 'B';
+                        if (!in_array($existing_shift_type, array('D', 'N', 'B'), true)) {
+                            $existing_shift_type = 'B';
+                        }
+                        $g->insert('equipment_drivers', array(
+                            'equipment_id' => $new_equipment_id,
+                            'employee_id'  => $employee_id,
+                            'start_date'   => $move_start_date,
+                            'end_date'     => '2099-12-31',
+                            'status'       => 1,
+                            'shift_type'   => $existing_shift_type,
+                        ));
+                    }, 'نقل سائق بين آليتي مشروع');
 
-                    if (!mysqli_query($conn, $insert_sql)) {
-                        throw new Exception('فشل تسجيل تشغيل السائق على الآلية الجديدة');
-                    }
-
-                    mysqli_commit($conn);
                     $msg = 'تم نقل السائق وتشغيله على الآلية الجديدة ✅';
                     $is_success = true;
-                } catch (Exception $ex) {
-                    mysqli_rollback($conn);
+                } catch (\Throwable $ex) {
                     $msg = $ex->getMessage() . ' ❌';
                     $is_success = false;
                 }
@@ -613,106 +552,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-$equipments_sql = "SELECT DISTINCT e.id, e.code, e.name
-                   FROM operations o
-                   INNER JOIN equipments e ON e.id = o.equipment
-                   WHERE o.project_id = $selected_project_id
-                     AND o.status <> 0
-                     $operations_company_scope
-                     $ops_mine_filter
-                   ORDER BY e.code ASC, e.name ASC";
-$equipments_result = mysqli_query($conn, $equipments_sql);
-$project_equipments = [];
-if ($equipments_result) {
-    while ($eq = mysqli_fetch_assoc($equipments_result)) {
-        $project_equipments[] = $eq;
-    }
-}
+try {
+    $project_equipments = $pd_gate->scopedQuery(array(
+        'scope' => array('o' => 'operations', 'e' => 'equipments'),
+    ), "SELECT DISTINCT e.id, e.code, e.name
+        FROM operations o
+        INNER JOIN equipments e ON e.id = o.equipment
+        WHERE {TENANT_SCOPE} AND o.project_id = ?
+          AND o.status <> 0
+        ORDER BY e.code ASC, e.name ASC", array($selected_project_id));
+} catch (\Throwable $t) { $project_equipments = array(); }
 
-$available_drivers_sql = "SELECT d.id, d.name, d.phone
-                          FROM employees d
-                          WHERE 1=1
-                            $driver_company_scope
-                            $driver_status_scope" . ems_operation_types_in_sql($conn, 'd') . "
-                            AND NOT EXISTS (
-                                SELECT 1
-                                FROM equipment_drivers ed
-                                INNER JOIN operations o ON o.equipment = ed.equipment_id
-                                WHERE ed.employee_id = d.id
-                                  AND ed.status = 1
-                                  AND o.project_id = $selected_project_id
-                                  $operations_company_scope
-                                  $ed_company_scope
-                            )
-                          ORDER BY d.name ASC";
-$available_drivers_result = mysqli_query($conn, $available_drivers_sql);
-$available_drivers = [];
-if ($available_drivers_result) {
-    while ($drv = mysqli_fetch_assoc($available_drivers_result)) {
-        $available_drivers[] = $drv;
-    }
-}
+// خطوتان مُنطَّقتان بدل NOT EXISTS ذي الـINNER JOIN (قاعدة enrich = LEFT حصرًا):
+// (1) المنشغلون في المشروع بعزلٍ كامل (ed+o)، (2) استثناؤهم بمعاملات — دلالة الأصل حرفيًّا.
+$pd_busy_ids = array();
+try {
+    $busy_rows = $pd_gate->scopedQuery(array(
+        'scope' => array('ed' => 'equipment_drivers', 'o' => 'operations'),
+    ), "SELECT DISTINCT ed.employee_id
+        FROM equipment_drivers ed
+        INNER JOIN operations o ON o.equipment = ed.equipment_id
+        WHERE {TENANT_SCOPE} AND ed.status = 1 AND o.project_id = ?", array($selected_project_id));
+    foreach ($busy_rows as $br) { $pd_busy_ids[] = intval($br['employee_id']); }
+} catch (\Throwable $t) { $pd_busy_ids = array(); }
 
-$active_assignments_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
-                                  ed.shift_type, d.name AS driver_name, d.phone AS driver_phone
-                           FROM equipment_drivers ed
-                           INNER JOIN employees d ON d.id = ed.employee_id
-                           WHERE ed.status = 1
-                             $ed_company_scope
-                             AND EXISTS (
-                                 SELECT 1
-                                 FROM operations o
-                                 WHERE o.equipment = ed.equipment_id
-                                   AND o.project_id = $selected_project_id
-                                   $operations_company_scope
-                                   $ops_mine_filter
-                             )
-                           ORDER BY ed.id DESC";
-$active_assignments_res = mysqli_query($conn, $active_assignments_sql);
+$avail_extra = ''; $avail_params = array();
+if (!empty($pd_busy_ids)) {
+    $avail_extra = " AND d.id NOT IN (" . implode(',', array_fill(0, count($pd_busy_ids), '?')) . ")";
+    $avail_params = $pd_busy_ids;
+}
+try {
+    $available_drivers = $pd_gate->scopedQuery(array(
+        'scope' => array('d' => 'employees'),
+    ), "SELECT d.id, d.name, d.phone
+        FROM employees d
+        WHERE {TENANT_SCOPE}
+          AND d.status = 1" . ems_operation_types_in_sql($conn, 'd') . "$avail_extra
+        ORDER BY d.name ASC", $avail_params);
+} catch (\Throwable $t) { $available_drivers = array(); }
+
+try {
+    $active_assignments_rows = $pd_gate->scopedQuery(array(
+        'scope' => array('ed' => 'equipment_drivers', 'd' => 'employees'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
+               ed.shift_type, d.name AS driver_name, d.phone AS driver_phone
+        FROM equipment_drivers ed
+        INNER JOIN employees d ON d.id = ed.employee_id
+        WHERE {TENANT_SCOPE} AND ed.status = 1
+          AND EXISTS (
+              SELECT 1
+              FROM operations o
+              WHERE o.equipment = ed.equipment_id
+                AND o.project_id = ?
+          )
+        ORDER BY ed.id DESC", array($selected_project_id));
+} catch (\Throwable $t) { $active_assignments_rows = array(); }
 
 $drivers_by_equipment = [];
-if ($active_assignments_res) {
-    while ($driver_row = mysqli_fetch_assoc($active_assignments_res)) {
-        $eq_id = intval($driver_row['equipment_id']);
-        if (!isset($drivers_by_equipment[$eq_id])) {
-            $drivers_by_equipment[$eq_id] = [];
-        }
-        $drivers_by_equipment[$eq_id][] = $driver_row;
+foreach ($active_assignments_rows as $driver_row) {
+    $eq_id = intval($driver_row['equipment_id']);
+    if (!isset($drivers_by_equipment[$eq_id])) {
+        $drivers_by_equipment[$eq_id] = [];
     }
+    $drivers_by_equipment[$eq_id][] = $driver_row;
 }
 
-$all_project_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone
-                            FROM employees d
-                            WHERE 1=1
-                              $driver_company_scope
-                              $driver_status_scope" . ems_operation_types_in_sql($conn, 'd') . "
-                            ORDER BY d.name ASC";
-$all_project_drivers_res = mysqli_query($conn, $all_project_drivers_sql);
-$all_project_drivers = [];
-if ($all_project_drivers_res) {
-    while ($drv = mysqli_fetch_assoc($all_project_drivers_res)) {
-        $all_project_drivers[] = $drv;
-    }
-}
+try {
+    $all_project_drivers = $pd_gate->scopedQuery(array(
+        'scope' => array('d' => 'employees'),
+    ), "SELECT DISTINCT d.id, d.name, d.phone
+        FROM employees d
+        WHERE {TENANT_SCOPE}
+          AND d.status = 1" . ems_operation_types_in_sql($conn, 'd') . "
+        ORDER BY d.name ASC");
+} catch (\Throwable $t) { $all_project_drivers = array(); }
 
-$drivers_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
-                       ed.shift_type,
-                       e.code AS equipment_code, e.name AS equipment_name,
-                       d.name AS driver_name, d.phone AS driver_phone
-                FROM equipment_drivers ed
-                INNER JOIN equipments e ON e.id = ed.equipment_id
-                INNER JOIN employees d ON d.id = ed.employee_id
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM operations o
-                    WHERE o.equipment = ed.equipment_id
-                      AND o.project_id = $selected_project_id
-                      $operations_company_scope
-                      $ops_mine_filter
-                )
-                $ed_company_scope
-                ORDER BY ed.status DESC, ed.id DESC";
-$drivers_result = mysqli_query($conn, $drivers_sql);
+try {
+    $drivers_rows = $pd_gate->scopedQuery(array(
+        'scope'  => array('ed' => 'equipment_drivers', 'e' => 'equipments', 'd' => 'employees'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
+               ed.shift_type,
+               e.code AS equipment_code, e.name AS equipment_name,
+               d.name AS driver_name, d.phone AS driver_phone
+        FROM equipment_drivers ed
+        INNER JOIN equipments e ON e.id = ed.equipment_id
+        INNER JOIN employees d ON d.id = ed.employee_id
+        WHERE {TENANT_SCOPE} AND EXISTS (
+            SELECT 1
+            FROM operations o
+            WHERE o.equipment = ed.equipment_id
+              AND o.project_id = ?
+        )
+        ORDER BY ed.status DESC, ed.id DESC", array($selected_project_id));
+} catch (\Throwable $t) { $drivers_rows = array(); }
 
 if (!function_exists('get_shift_type_label')) {
     function get_shift_type_label($value)

@@ -19,48 +19,12 @@ if (!$is_super_admin && $company_id <= 0) {
     exit();
 }
 
-// الأعمدة الاختيارية
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
-$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
-$drivers_has_status = db_table_has_column($conn, 'employees', 'status');
-$drivers_has_project_id = db_table_has_column($conn, 'employees', 'project_id');
-$equipments_has_lat = db_table_has_column($conn, 'equipments', 'latitude');
-$equipments_has_lng = db_table_has_column($conn, 'equipments', 'longitude');
-$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
-$equipments_has_availability_status = db_table_has_column($conn, 'equipments', 'availability_status');
-$equipments_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
-$project_has_lat = db_table_has_column($conn, 'project', 'latitude');
-$project_has_lng = db_table_has_column($conn, 'project', 'longitude');
-
-if (!$operations_has_shift_type) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours", 'movement/movement_operations.php');
-    $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
-}
-// الساعات اليومية المستهدفة — ترحيل ذاتي محمي
-if (!db_table_has_column($conn, 'operations', 'target_daily_hours')) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours", 'movement/movement_operations.php');
-}
-if (!$equipment_drivers_has_shift_type) {
-    ems_runtime_ddl($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date", 'movement/movement_operations.php');
-    $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-}
-// عمود حفظ الدور السابق (أساسي/احتياطي) قبل تحويل الفئة إلى «متعطل» — لاستعادته بعد إصلاح الصيانة.
-$operations_has_prev_category = db_table_has_column($conn, 'operations', 'prev_equipment_category');
-if (!$operations_has_prev_category) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN prev_equipment_category VARCHAR(20) NULL DEFAULT NULL AFTER equipment_category", 'movement/movement_operations.php');
-    $operations_has_prev_category = db_table_has_column($conn, 'operations', 'prev_equipment_category');
-}
-// عمود الحالة التشغيلية (تعمل/جاهزة/معطلة) — يُدار من صفحة الحركة فقط، منفصل عن الدور (أساسي/احتياطي).
-$operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
-if (!$operations_has_op_state) {
-    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN op_state ENUM('تعمل','جاهزة','معطلة') NOT NULL DEFAULT 'جاهزة' AFTER status", 'movement/movement_operations.php');
-    $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة والترحيلات الذاتية
+// وقتَ التشغيل أُسقطوا — الأعمدة (shift_type/target_daily_hours/prev_equipment_category/
+// op_state/availability_status/availability_state...) مضمونةٌ بالترحيلات (لقطة catch-up)،
+// وإحداثيات المعدات (latitude/longitude) غير موجودة أصلًا فتبقى NULL AS كسلوك الأصل
+// الفعلي. {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر عبر forAllTenants المسجَّل.
+$mvp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('movement operations super') : ems_tenant_db();
 
 // الصلاحيات
 $ops_perm = check_page_permissions($conn, 'movement/move_oprators.php');
@@ -74,23 +38,7 @@ if (!$can_view) {
     exit();
 }
 
-// نطاق المشروع
-$project_scope_sql = "1=1";
-if (!$is_super_admin) {
-    if ($project_has_company_id) {
-        $project_scope_sql = "project.company_id = $company_id";
-    } else {
-        $project_scope_sql = "(
-            EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $company_id)
-            OR EXISTS (
-                SELECT 1
-                FROM clients sc
-                INNER JOIN users scu ON scu.id = sc.created_by
-                WHERE sc.id = project.$project_client_column AND scu.company_id = $company_id
-            )
-        )";
-    }
-}
+// نطاق المشروع — عبر البوابة ({TENANT_SCOPE})
 
 // اختيار المشروع
 $session_user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
@@ -110,24 +58,18 @@ if ($selected_project_id <= 0) {
     exit();
 }
 
-$project_lat_select = $project_has_lat ? 'project.latitude AS latitude' : 'NULL AS latitude';
-$project_lng_select = $project_has_lng ? 'project.longitude AS longitude' : 'NULL AS longitude';
-$project_query = "SELECT id, name, project_code, $project_lat_select, $project_lng_select FROM project WHERE id = $selected_project_id AND status = 1 AND $project_scope_sql";
-$project_result = mysqli_query($conn, $project_query);
-if (!$project_result || mysqli_num_rows($project_result) === 0) {
+try {
+    $project_rows = $mvp_gate->scopedQuery(array(
+        'scope' => array('project' => 'project'),
+    ), "SELECT id, name, project_code, project.latitude AS latitude, project.longitude AS longitude
+        FROM project WHERE {TENANT_SCOPE} AND id = ? AND status = 1", array($selected_project_id));
+} catch (\Throwable $t) { $project_rows = array(); }
+if (empty($project_rows)) {
     unset($_SESSION['operations_project_id']);
     echo "<script>alert('❌ المشروع غير متاح'); window.location.href='../main/dashboard.php';</script>";
     exit();
 }
-$selected_project = mysqli_fetch_assoc($project_result);
-
-// نطاق الشركة
-$operations_company_scope = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
-$operations_company_scope_inline = (!$is_super_admin && $operations_has_company) ? " AND company_id = $company_id" : "";
-$ed_company_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND ed.company_id = $company_id" : "";
-$ed_company_scope_inline = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
-$driver_company_scope = (!$is_super_admin && $drivers_has_company) ? " AND d.company_id = $company_id" : "";
-$driver_status_scope = $drivers_has_status ? " AND d.status = 1" : "";
+$selected_project = $project_rows[0];
 
 $msg = '';
 $is_success = true;
@@ -151,12 +93,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                 // اقرأ القيم الحالية قبل التحديث (لتسجيل التغيّر الفعلي ومعرفة المعدة).
                 $old_shift = null; $old_status = null; $log_equipment = 0;
-                if ($pre = mysqli_query($conn, "SELECT equipment, shift_type, status FROM operations WHERE id = $op_id AND project_id = $selected_project_id$operations_company_scope_inline LIMIT 1")) {
-                    if ($pre_row = mysqli_fetch_assoc($pre)) {
-                        $log_equipment = intval($pre_row['equipment']);
-                        $old_shift     = (string)$pre_row['shift_type'];
-                        $old_status    = intval($pre_row['status']);
-                    }
+                try {
+                    $pre_row = $mvp_gate->selectOne('operations', array(
+                        'columns' => array('equipment', 'shift_type', 'status'),
+                        'where'   => array('id' => $op_id, 'project_id' => $selected_project_id),
+                    ));
+                } catch (\Throwable $t) { $pre_row = null; }
+                if ($pre_row) {
+                    $log_equipment = intval($pre_row['equipment']);
+                    $old_shift     = (string)$pre_row['shift_type'];
+                    $old_status    = intval($pre_row['status']);
                 }
 
                 // الدور (أساسي/احتياطي) لا يُكتب من هذه الشاشة إطلاقاً — يُدار من شاشة التشغيل فقط.
@@ -188,24 +134,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     throw new Exception('تاريخ النهاية يجب أن يكون بعد البداية');
                 }
 
-                $shift_sql = mysqli_real_escape_string($conn, $shift_type);
-
-                $set_parts = [
-                    "shift_type = '$shift_sql'",
-                    "status = $status",
-                ];
+                $op_fields = array(
+                    'shift_type' => $shift_type,
+                    'status'     => $status,
+                );
                 if ($start !== '') {
-                    $set_parts[] = "start = '" . mysqli_real_escape_string($conn, $start) . "'";
+                    $op_fields['start'] = $start;
                 }
                 if ($end !== '') {
-                    $set_parts[] = "end = '" . mysqli_real_escape_string($conn, $end) . "'";
+                    $op_fields['end'] = $end;
                 }
-                $set_clause = implode(', ', $set_parts);
 
-                $update_sql = "UPDATE operations
-                               SET $set_clause
-                               WHERE id = $op_id AND project_id = $selected_project_id$operations_company_scope_inline";
-                if (!mysqli_query($conn, $update_sql)) {
+                try {
+                    $mvp_gate->update('operations', $op_fields,
+                        array('id' => $op_id, 'project_id' => $selected_project_id));
+                } catch (\Throwable $t) {
                     throw new Exception('خطأ في تحديث التشغيل');
                 }
 
@@ -276,18 +219,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     throw new Exception('تاريخ النهاية يجب أن يكون بعد البداية');
                 }
 
-                $shift_sql = mysqli_real_escape_string($conn, $shift_type);
-                $start_save = $start_date !== '' ? mysqli_real_escape_string($conn, $start_date) : date('Y-m-d');
-                $end_save = $end_date !== '' ? mysqli_real_escape_string($conn, $end_date) : '2099-12-31';
+                $start_save = $start_date !== '' ? $start_date : date('Y-m-d');
+                $end_save = $end_date !== '' ? $end_date : '2099-12-31';
 
-                $update_shift_col = $equipment_drivers_has_shift_type ? ", shift_type = '$shift_sql'" : "";
-                $driver_update_sql = "UPDATE equipment_drivers
-                                      SET start_date = '$start_save',
-                                          end_date = '$end_save',
-                                          status = $status
-                                          $update_shift_col
-                                      WHERE id = $rel_id$ed_company_scope_inline";
-                if (!mysqli_query($conn, $driver_update_sql)) {
+                try {
+                    $mvp_gate->update('equipment_drivers', array(
+                        'start_date' => $start_save,
+                        'end_date'   => $end_save,
+                        'status'     => $status,
+                        'shift_type' => $shift_type,
+                    ), array('id' => $rel_id));
+                } catch (\Throwable $t) {
                     throw new Exception('خطأ في تحديث السائق');
                 }
 
@@ -350,9 +292,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     throw new Exception('تاريخ النهاية يجب أن يكون بعد البداية');
                 }
 
-                // التحقق من عدم وجود تشغيل ساري للمعدة نفسها
-                $conflict_check = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $equipment AND status = 1 LIMIT 1");
-                if ($conflict_check && mysqli_num_rows($conflict_check) > 0) {
+                // التحقق من عدم وجود تشغيل ساري للمعدة نفسها (العزل عبر البوابة)
+                try {
+                    $conflict_check = $mvp_gate->selectOne('operations', array(
+                        'columns'  => array('id'),
+                        'where'    => array('equipment' => $equipment),
+                        'whereRaw' => 'status = 1',
+                    ));
+                } catch (\Throwable $t) { $conflict_check = null; }
+                if ($conflict_check) {
                     throw new Exception('المعدة تعمل بالفعل في تشغيل ساري آخر');
                 }
 
@@ -365,17 +313,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     ? floatval($_POST['target_daily_hours'])
                     : (($equipment_category === 'احتياطي') ? 0.0 : ($shift_hours * ($shift_type === 'B' ? 2 : 1)));
 
-                $category_sql = mysqli_real_escape_string($conn, $equipment_category);
-                $shift_sql = mysqli_real_escape_string($conn, $shift_type);
-                $start_sql = mysqli_real_escape_string($conn, $start);
-                $end_sql = mysqli_real_escape_string($conn, $end);
-
-                $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
-                $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", $company_id" : "";
-
-                $insert_sql = "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, target_daily_hours, shift_type, status$insert_company_col)
-                               VALUES ($equipment, $equipment_type, '$category_sql', $selected_project_id, $contract_id, $supplier_id, '$start_sql', '$end_sql', 0, $total_equipment_hours, $shift_hours, $target_daily_hours, '$shift_sql', $status$insert_company_val)";
-                if (!mysqli_query($conn, $insert_sql)) {
+                try {
+                    $mvp_gate->insert('operations', array(
+                        'equipment'             => $equipment,
+                        'equipment_type'        => $equipment_type,
+                        'equipment_category'    => $equipment_category,
+                        'project_id'            => $selected_project_id,
+                        'contract_id'           => $contract_id,
+                        'supplier_id'           => $supplier_id,
+                        'start'                 => $start,
+                        'end'                   => $end,
+                        'days'                  => 0,
+                        'total_equipment_hours' => $total_equipment_hours,
+                        'shift_hours'           => $shift_hours,
+                        'target_daily_hours'    => $target_daily_hours,
+                        'shift_type'            => $shift_type,
+                        'status'                => $status,
+                    ));
+                } catch (\Throwable $t) {
                     throw new Exception('خطأ في إضافة التشغيل الجديد');
                 }
 
@@ -415,27 +370,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $start_date = isset($_POST['start_date']) ? trim((string)$_POST['start_date']) : date('Y-m-d');
                 $end_date = isset($_POST['end_date']) ? trim((string)$_POST['end_date']) : '2099-12-31';
 
-                // التحقق من وجود معدة في التشغيلات النشطة
-                $eq_check = mysqli_query($conn, "SELECT 1 FROM operations WHERE equipment = $equipment_id AND project_id = $selected_project_id AND status = 1 LIMIT 1");
-                if (!$eq_check || mysqli_num_rows($eq_check) === 0) {
+                // التحقق من وجود معدة في التشغيلات النشطة (العزل عبر البوابة)
+                try {
+                    $eq_check = $mvp_gate->selectOne('operations', array(
+                        'columns'  => array('id'),
+                        'where'    => array('equipment' => $equipment_id, 'project_id' => $selected_project_id),
+                        'whereRaw' => 'status = 1',
+                    ));
+                } catch (\Throwable $t) { $eq_check = null; }
+                if (!$eq_check) {
                     throw new Exception('المعدة المختارة غير مشغّلة في مشروع ساري');
                 }
 
-                $shift_sql = mysqli_real_escape_string($conn, $shift_type);
-                $start_save = mysqli_real_escape_string($conn, $start_date);
-                $end_save = mysqli_real_escape_string($conn, $end_date);
-
                 // إنهاء التعيينات السابقة النشطة للسائق
-                mysqli_query($conn, "UPDATE equipment_drivers SET status = 0, end_date = '$start_save' WHERE employee_id = $employee_id AND status = 1$ed_company_scope_inline");
+                try {
+                    $mvp_gate->update('equipment_drivers',
+                        array('status' => 0, 'end_date' => $start_date),
+                        array('employee_id' => $employee_id), 'status = 1');
+                } catch (\Throwable $t) {}
 
-                $insert_company_col = (!$is_super_admin && $equipment_drivers_has_company) ? ", company_id" : "";
-                $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
-                $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
-                $insert_shift_val = $equipment_drivers_has_shift_type ? ", '$shift_sql'" : "";
-
-                $insert_driver_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                      VALUES ($equipment_id, $employee_id, '$start_save', '$end_save', 1$insert_shift_val$insert_company_val)";
-                if (!mysqli_query($conn, $insert_driver_sql)) {
+                try {
+                    $mvp_gate->insert('equipment_drivers', array(
+                        'equipment_id' => $equipment_id,
+                        'employee_id'  => $employee_id,
+                        'start_date'   => $start_date,
+                        'end_date'     => $end_date,
+                        'status'       => 1,
+                        'shift_type'   => $shift_type,
+                    ));
+                } catch (\Throwable $t) {
                     throw new Exception('خطأ في إضافة السائق');
                 }
 
@@ -467,34 +430,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if ($equipment_id <= 0) {
                     throw new Exception('معرّف المعدة غير صحيح');
                 }
-                if (!$equipments_has_availability_status) {
-                    throw new Exception('عمود حالة التوفر غير متاح في جدول المعدات');
-                }
-
-                // التأكد أن المعدة مرتبطة بتشغيل في هذا المشروع (وضمن نطاق الشركة)
-                $check_sql = "SELECT 1 FROM operations
-                              WHERE equipment = $equipment_id
-                                AND project_id = $selected_project_id
-                                $operations_company_scope_inline
-                              LIMIT 1";
-                $check_res = mysqli_query($conn, $check_sql);
-                if (!$check_res || mysqli_num_rows($check_res) === 0) {
+                // التأكد أن المعدة مرتبطة بتشغيل في هذا المشروع (العزل عبر البوابة)
+                try {
+                    $check_row = $mvp_gate->selectOne('operations', array(
+                        'columns' => array('id'),
+                        'where'   => array('equipment' => $equipment_id, 'project_id' => $selected_project_id),
+                    ));
+                } catch (\Throwable $t) { $check_row = null; }
+                if (!$check_row) {
                     throw new Exception('المعدة غير مرتبطة بهذا المشروع');
                 }
 
-                $maint_sets = ["availability_status = 'تحت الصيانة'"];
-                if ($equipments_has_availability_state) {
-                    $maint_sets[] = "availability_state = 'غير متوفرة'";
-                }
-                $equip_company_scope = (!$is_super_admin && $equipments_has_company)
-                    ? " AND (company_id = $company_id OR company_id IS NULL)"
-                    : "";
-
-                $maint_sql = "UPDATE equipments
-                                 SET " . implode(', ', $maint_sets) . "
-                               WHERE id = $equipment_id$equip_company_scope
-                               LIMIT 1";
-                if (!mysqli_query($conn, $maint_sql)) {
+                // (شرط الأصل «company IS NULL» زال — كل المعدات معبّأة company_id، مقيس)
+                try {
+                    $mvp_gate->update('equipments', array(
+                        'availability_status' => 'تحت الصيانة',
+                        'availability_state'  => 'غير متوفرة',
+                    ), array('id' => $equipment_id));
+                } catch (\Throwable $t) {
                     throw new Exception('خطأ في تحويل المعدة إلى وضع الصيانة');
                 }
 
@@ -502,49 +455,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 // الدور (أساسي/احتياطي) لا يُمسّ — الحالة منفصلة عن الدور.
                 require_once __DIR__ . '/../Maintenance/mnt_helpers.php';
                 $maint_state_changed = false;
-                mysqli_begin_transaction($conn);
                 try {
-                    if (!empty($operations_has_op_state)) {
-                        if (!mysqli_query($conn, "UPDATE operations SET op_state = 'معطلة'
-                                                  WHERE equipment = $equipment_id
-                                                    AND project_id = $selected_project_id
-                                                    AND status = 1
-                                                    $operations_company_scope_inline")) {
-                            throw new Exception('خطأ في تحديث حالة التشغيل');
+                    $mvp_gate->runInTransaction(function ($g) use ($equipment_id, $selected_project_id, $company_id, $current_user_id, $conn, &$maint_state_changed) {
+                        try {
+                            $affected = $g->update('operations',
+                                array('op_state' => 'معطلة'),
+                                array('equipment' => $equipment_id, 'project_id' => $selected_project_id),
+                                'status = 1');
+                        } catch (\Throwable $t) {
+                            throw new \Exception('خطأ في تحديث حالة التشغيل');
                         }
-                        $maint_state_changed = (mysqli_affected_rows($conn) > 0);
-                    }
+                        $maint_state_changed = ($affected > 0);
 
-                    // منع التكرار: لا نفتح أمرًا تلقائيًا ثانيًا لمعدة لها أمر تلقائي مفتوح بالفعل.
-                    if ($company_id > 0) {
-                        $dup = mysqli_query($conn, "SELECT 1 FROM mnt_order
-                            WHERE equipment_id = $equipment_id AND project_id = $selected_project_id AND company_id = $company_id
-                              AND is_auto = 1 AND state IN ('بلاغ','تنفيذ','فحص') AND COALESCE(is_deleted,0)=0 LIMIT 1");
-                        if (!$dup || mysqli_num_rows($dup) === 0) {
-                            $auto_code  = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
-                            $auto_src   = 'بلاغ';   // المصدر الدلالي
-                            $auto_state = 'بلاغ';   // الحالة الابتدائية (مفتوح)
-                            if ($ins = mysqli_prepare($conn,
-                                "INSERT INTO mnt_order (company_id, code, equipment_id, project_id, source, is_auto, state, created_by)
-                                 VALUES (?, ?, ?, ?, ?, 1, ?, ?)")) {
-                                mysqli_stmt_bind_param($ins, 'isiissi',
-                                    $company_id, $auto_code, $equipment_id, $selected_project_id, $auto_src, $auto_state, $current_user_id);
-                                mysqli_stmt_execute($ins);
-                                mysqli_stmt_close($ins);
+                        // منع التكرار: لا نفتح أمرًا تلقائيًا ثانيًا لمعدة لها أمر تلقائي مفتوح بالفعل.
+                        if ($company_id > 0) {
+                            $dup = $g->scopedQuery(array(
+                                'scope' => array('mnt_order' => 'mnt_order'),
+                            ), "SELECT 1 AS x FROM mnt_order
+                                WHERE {TENANT_SCOPE} AND equipment_id = ? AND project_id = ?
+                                  AND is_auto = 1 AND state IN ('بلاغ','تنفيذ','فحص') LIMIT 1",
+                                array($equipment_id, $selected_project_id));
+                            if (empty($dup)) {
+                                $auto_code  = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
+                                $auto_src   = 'بلاغ';   // المصدر الدلالي
+                                $auto_state = 'بلاغ';   // الحالة الابتدائية (مفتوح)
+                                $g->insert('mnt_order', array(
+                                    'code'         => $auto_code,
+                                    'equipment_id' => $equipment_id,
+                                    'project_id'   => $selected_project_id,
+                                    'source'       => $auto_src,
+                                    'is_auto'      => 1,
+                                    'state'        => $auto_state,
+                                    'created_by'   => $current_user_id,
+                                ));
                             }
                         }
-                    }
 
-                    // سجل «إسناد للصيانة» — فقط إن تغيّرت الحالة فعليًا إلى «معطلة».
-                    if ($maint_state_changed) {
-                        $log_opts = ['to' => 'معطلة', 'project_id' => $selected_project_id];
-                        if ($company_id > 0) { $log_opts['company_id'] = $company_id; }
-                        log_equipment_event($conn, $equipment_id, 'إسناد للصيانة', $log_opts);
-                    }
-                    mysqli_commit($conn);
-                } catch (Exception $txEx) {
-                    mysqli_rollback($conn);
-                    throw $txEx;
+                        // سجل «إسناد للصيانة» — فقط إن تغيّرت الحالة فعليًا إلى «معطلة».
+                        if ($maint_state_changed) {
+                            $log_opts = ['to' => 'معطلة', 'project_id' => $selected_project_id];
+                            if ($company_id > 0) { $log_opts['company_id'] = $company_id; }
+                            log_equipment_event($conn, $equipment_id, 'إسناد للصيانة', $log_opts);
+                        }
+                    }, 'إسناد آلية للصيانة مع أمرٍ تلقائي');
+                } catch (\Throwable $txEx) {
+                    throw new Exception($txEx->getMessage());
                 }
 
                 if (isset($_POST['json']) && $_POST['json'] === '1') {
@@ -577,32 +532,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if ($new_state === null) {
                     throw new Exception('حالة غير صالحة (يُسمح بـ «تعمل» أو «جاهزة» فقط)');
                 }
-                if (empty($operations_has_op_state)) {
-                    throw new Exception('عمود الحالة غير متاح');
-                }
-
                 // اقرأ الحالة الحالية والمعدة قبل التحديث (لتسجيل التغيّر الفعلي).
                 $old_op_state = null; $sos_equipment = 0;
-                if ($sos_pre = mysqli_query($conn, "SELECT equipment, op_state FROM operations WHERE id = $op_id AND project_id = $selected_project_id$operations_company_scope_inline LIMIT 1")) {
-                    if ($sos_row = mysqli_fetch_assoc($sos_pre)) {
-                        $sos_equipment = intval($sos_row['equipment']);
-                        $old_op_state  = (string)$sos_row['op_state'];
-                    }
+                try {
+                    $sos_row = $mvp_gate->selectOne('operations', array(
+                        'columns' => array('equipment', 'op_state'),
+                        'where'   => array('id' => $op_id, 'project_id' => $selected_project_id),
+                    ));
+                } catch (\Throwable $t) { $sos_row = null; }
+                if ($sos_row) {
+                    $sos_equipment = intval($sos_row['equipment']);
+                    $old_op_state  = (string)$sos_row['op_state'];
                 }
 
-                $scope_company = (!$is_super_admin && $operations_has_company);
-                $sql = "UPDATE operations SET op_state = ? WHERE id = ? AND project_id = ? AND status = 1"
-                     . ($scope_company ? " AND company_id = ?" : "");
-                if (!($stmt = mysqli_prepare($conn, $sql))) {
+                try {
+                    $mvp_gate->update('operations',
+                        array('op_state' => $new_state),
+                        array('id' => $op_id, 'project_id' => $selected_project_id),
+                        'status = 1');
+                } catch (\Throwable $t) {
                     throw new Exception('تعذّر تجهيز الاستعلام');
                 }
-                if ($scope_company) {
-                    mysqli_stmt_bind_param($stmt, 'siii', $new_state, $op_id, $selected_project_id, $company_id);
-                } else {
-                    mysqli_stmt_bind_param($stmt, 'sii', $new_state, $op_id, $selected_project_id);
-                }
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
 
                 // سجل «تغيير حالة» عند التغيّر الفعلي فقط.
                 if ($sos_equipment > 0 && $old_op_state !== null && $old_op_state !== $new_state) {
@@ -634,34 +584,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// جلب البيانات
-$equip_lat_select = $equipments_has_lat ? 'e.latitude AS latitude' : 'NULL AS latitude';
-$equip_lng_select = $equipments_has_lng ? 'e.longitude AS longitude' : 'NULL AS longitude';
-$op_state_select  = $operations_has_op_state ? 'o.op_state' : "'جاهزة' AS op_state";
-
-$operations_sql = "SELECT o.id, o.equipment, o.equipment_category, o.start, o.end, o.shift_type, o.status,
-                          $op_state_select,
-                          o.total_equipment_hours, o.shift_hours,
-                          e.code AS equipment_code, e.name AS equipment_name,
-                          e.availability_status AS equipment_availability_status,
-                          et.type AS equipment_type_name,
-                          s.name AS supplier_name,
-                          $equip_lat_select,
-                          $equip_lng_select
-                   FROM operations o
-                   LEFT JOIN equipments e ON e.id = o.equipment
-                   LEFT JOIN equipments_types et ON et.id = e.type
-                   LEFT JOIN suppliers s ON s.id = o.supplier_id
-                   WHERE o.project_id = $selected_project_id
-                     $operations_company_scope
-                   ORDER BY o.status DESC, o.id DESC";
-$operations_res = mysqli_query($conn, $operations_sql);
-$operations_rows = [];
-if ($operations_res) {
-    while ($r = mysqli_fetch_assoc($operations_res)) {
-        $operations_rows[] = $r;
-    }
-}
+// جلب البيانات (إحداثيات المعدات غير موجودة أصلًا — NULL AS كسلوك الأصل الفعلي)
+try {
+    $operations_rows = $mvp_gate->scopedQuery(array(
+        'scope'  => array('o' => 'operations'),
+        'enrich' => array('e' => 'equipments', 's' => 'suppliers'),
+    ), "SELECT o.id, o.equipment, o.equipment_category, o.start, o.end, o.shift_type, o.status,
+              o.op_state,
+              o.total_equipment_hours, o.shift_hours,
+              e.code AS equipment_code, e.name AS equipment_name,
+              e.availability_status AS equipment_availability_status,
+              et.type AS equipment_type_name,
+              s.name AS supplier_name,
+              NULL AS latitude,
+              NULL AS longitude
+       FROM operations o
+       LEFT JOIN equipments e ON e.id = o.equipment
+       LEFT JOIN equipments_types et ON et.id = e.type
+       LEFT JOIN suppliers s ON s.id = o.supplier_id
+       WHERE {TENANT_SCOPE} AND o.project_id = ?
+       ORDER BY o.status DESC, o.id DESC", array($selected_project_id));
+} catch (\Throwable $t) { $operations_rows = array(); }
 
 $operations_rows_day = [];
 $operations_rows_night = [];
@@ -675,28 +618,24 @@ foreach ($operations_rows as $op_row) {
     }
 }
 
-$drivers_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
-                       " . ($equipment_drivers_has_shift_type ? "ed.shift_type" : "'B' AS shift_type") . ",
-                       d.name AS driver_name, d.phone AS driver_phone,
-                       e.code AS equipment_code, e.name AS equipment_name
-                FROM equipment_drivers ed
-                INNER JOIN employees d ON d.id = ed.employee_id
-                INNER JOIN equipments e ON e.id = ed.equipment_id
-                WHERE EXISTS (
-                    SELECT 1 FROM operations o
-                    WHERE o.equipment = ed.equipment_id
-                      AND o.project_id = $selected_project_id
-                      $operations_company_scope
-                )
-                $ed_company_scope
-                ORDER BY ed.status DESC, ed.id DESC";
-$drivers_res = mysqli_query($conn, $drivers_sql);
-$drivers_rows = [];
-if ($drivers_res) {
-    while ($d = mysqli_fetch_assoc($drivers_res)) {
-        $drivers_rows[] = $d;
-    }
-}
+try {
+    $drivers_rows = $mvp_gate->scopedQuery(array(
+        'scope'  => array('ed' => 'equipment_drivers', 'd' => 'employees', 'e' => 'equipments'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
+               ed.shift_type,
+               d.name AS driver_name, d.phone AS driver_phone,
+               e.code AS equipment_code, e.name AS equipment_name
+        FROM equipment_drivers ed
+        INNER JOIN employees d ON d.id = ed.employee_id
+        INNER JOIN equipments e ON e.id = ed.equipment_id
+        WHERE {TENANT_SCOPE} AND EXISTS (
+            SELECT 1 FROM operations o
+            WHERE o.equipment = ed.equipment_id
+              AND o.project_id = ?
+        )
+        ORDER BY ed.status DESC, ed.id DESC", array($selected_project_id));
+} catch (\Throwable $t) { $drivers_rows = array(); }
 
 // تجميع السائقين حسب equipment_id للعرض المدمج داخل جداول التشغيل
 $drivers_by_equipment = [];
@@ -727,93 +666,71 @@ foreach ($drivers_rows as $drv_item) {
     $active_drivers_count_by_eq[$eid] = ($active_drivers_count_by_eq[$eid] ?? 0) + 1;
 }
 
-// جلب جميع السائقين والمعدات (فقط المرتبطين بالمشروع المحدد)
-$driver_project_scope = "";
-if ($drivers_has_project_id) {
-    $driver_project_scope = " AND (d.project_id = $selected_project_id OR d.project_id IS NULL)";
-}
-
 // قائمة المرشّحين لإسناد قيادة المعدّة: موظفون مسجَّلون كسائقين/مشغّلين فقط — أي لهم سجلٌ
 // نشطٌ في equipment_operators (المرجع المعتمد، راجع Employees/equipment_operators.php:
-// «جميع السائقين موظفون وليس كل الموظفين سائقين»). حارس توافق رجعي: إن غاب الجدول نعود
-// لفلتر أنواع التشغيل القديم (employee_type) فلا تظهر القائمة فارغة.
-if (db_table_has_column($conn, 'equipment_operators', 'employee_id')) {
-    $eo_status_clause = db_table_has_column($conn, 'equipment_operators', 'status') ? " AND eo.status = 1" : "";
-    $driver_operator_filter = " AND EXISTS (SELECT 1 FROM equipment_operators eo WHERE eo.employee_id = d.id$eo_status_clause)";
-} else {
-    $driver_operator_filter = ems_operation_types_in_sql($conn, 'd');
-}
-$all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone
-                    FROM employees d
-                    WHERE 1=1
-                      $driver_company_scope
-                      $driver_status_scope
-                      $driver_project_scope
-                      $driver_operator_filter
-                    ORDER BY d.name ASC";
-$all_drivers_res = mysqli_query($conn, $all_drivers_sql);
-$all_drivers = [];
-if ($all_drivers_res) {
-    while ($drv = mysqli_fetch_assoc($all_drivers_res)) {
-        $all_drivers[] = $drv;
-    }
-}
+// «جميع السائقين موظفون وليس كل الموظفين سائقين»). الجدول قائمٌ (حارس التوافق زال).
+try {
+    $all_drivers = $mvp_gate->scopedQuery(array(
+        'scope'  => array('d' => 'employees'),
+        'enrich' => array('equipment_operators' => 'equipment_operators'),
+    ), "SELECT DISTINCT d.id, d.name, d.phone
+        FROM employees d
+        WHERE {TENANT_SCOPE}
+          AND d.status = 1
+          AND (d.project_id = ? OR d.project_id IS NULL)
+          AND EXISTS (SELECT 1 FROM equipment_operators eo WHERE eo.employee_id = d.id AND eo.status = 1)
+        ORDER BY d.name ASC", array($selected_project_id));
+} catch (\Throwable $t) { $all_drivers = array(); }
 
 // السائقون الذين لديهم تعيين ساري حالياً — يُستثنون من قوائم الإضافة
 $active_driver_ids = [];
-$active_drv_res = mysqli_query($conn, "SELECT DISTINCT employee_id FROM equipment_drivers WHERE status = 1$ed_company_scope_inline");
-if ($active_drv_res) {
-    while ($adr = mysqli_fetch_assoc($active_drv_res)) {
-        $active_driver_ids[] = intval($adr['employee_id']);
-    }
+try {
+    $adr_rows = $mvp_gate->scopedQuery(array(
+        'scope' => array('equipment_drivers' => 'equipment_drivers'),
+    ), "SELECT DISTINCT employee_id FROM equipment_drivers WHERE {TENANT_SCOPE} AND status = 1");
+} catch (\Throwable $t) { $adr_rows = array(); }
+foreach ($adr_rows as $adr) {
+    $active_driver_ids[] = intval($adr['employee_id']);
 }
 
-$all_equipment_sql = "SELECT DISTINCT e.id, e.code, e.name
-                      FROM equipments e
-                      WHERE EXISTS (
-                        SELECT 1 FROM operations o
-                        WHERE o.equipment = e.id
-                          AND o.project_id = $selected_project_id
-                          $operations_company_scope_inline
-                      )
-                      ORDER BY e.code ASC";
-$all_equipment_res = mysqli_query($conn, $all_equipment_sql);
-$all_equipment = [];
-if ($all_equipment_res) {
-    while ($eq = mysqli_fetch_assoc($all_equipment_res)) {
-        $all_equipment[] = $eq;
-    }
-}
+try {
+    $all_equipment = $mvp_gate->scopedQuery(array(
+        'scope'  => array('e' => 'equipments'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT DISTINCT e.id, e.code, e.name
+        FROM equipments e
+        WHERE {TENANT_SCOPE} AND EXISTS (
+          SELECT 1 FROM operations o
+          WHERE o.equipment = e.id
+            AND o.project_id = ?
+        )
+        ORDER BY e.code ASC", array($selected_project_id));
+} catch (\Throwable $t) { $all_equipment = array(); }
 
 // جلب العقود والموردين
-$all_contracts_sql = "SELECT DISTINCT c.id, c.contract_signing_date, c.id as contract_id
-                      FROM contracts c
-                      WHERE c.project_id = $selected_project_id
-                        AND c.status = 1
-                      ORDER BY c.contract_signing_date DESC";
-$all_contracts_res = mysqli_query($conn, $all_contracts_sql);
-$all_contracts = [];
-if ($all_contracts_res) {
-    while ($ct = mysqli_fetch_assoc($all_contracts_res)) {
-        $all_contracts[] = $ct;
-    }
-}
+try {
+    $all_contracts = $mvp_gate->scopedQuery(array(
+        'scope' => array('c' => 'contracts'),
+    ), "SELECT DISTINCT c.id, c.contract_signing_date, c.id as contract_id
+        FROM contracts c
+        WHERE {TENANT_SCOPE} AND c.project_id = ?
+          AND c.status = 1
+        ORDER BY c.contract_signing_date DESC", array($selected_project_id));
+} catch (\Throwable $t) { $all_contracts = array(); }
 
-$all_suppliers_sql = "SELECT DISTINCT s.id, s.name
-                      FROM suppliers s
-                      WHERE EXISTS (
-                        SELECT 1 FROM operations o
-                        WHERE o.supplier_id = s.id
-                          AND o.project_id = $selected_project_id
-                      )
-                      ORDER BY s.name ASC";
-$all_suppliers_res = mysqli_query($conn, $all_suppliers_sql);
-$all_suppliers = [];
-if ($all_suppliers_res) {
-    while ($sup = mysqli_fetch_assoc($all_suppliers_res)) {
-        $all_suppliers[] = $sup;
-    }
-}
+try {
+    $all_suppliers = $mvp_gate->scopedQuery(array(
+        'scope'  => array('s' => 'suppliers'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT DISTINCT s.id, s.name
+        FROM suppliers s
+        WHERE {TENANT_SCOPE} AND EXISTS (
+          SELECT 1 FROM operations o
+          WHERE o.supplier_id = s.id
+            AND o.project_id = ?
+        )
+        ORDER BY s.name ASC", array($selected_project_id));
+} catch (\Throwable $t) { $all_suppliers = array(); }
 
 // خريطة
 $map_rows = [];
