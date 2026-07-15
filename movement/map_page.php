@@ -15,13 +15,16 @@ include '../includes/permissions_helper.php';
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة");
     exit();
 }
+
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة وبُناة النطاق
+// أُسقطوا — {TENANT_SCOPE} والبوابة مسؤولا النطاق (قراءة الدوام عبر البوابة
+// بسابقة الصيانة)، والسوبر عبر forAllTenants المسجَّل.
+$map_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('map page super') : ems_tenant_db();
 
 // تحديد المشروع الحالي من الجلسة
 $session_user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
@@ -37,21 +40,16 @@ if (isset($_GET['project_id']) && intval($_GET['project_id']) > 0) {
     $_SESSION['operations_project_id'] = $selected_project_id;
 }
 
-$project_scope_sql = "1=1";
-if (!$is_super_admin) {
-    if ($project_has_company_id) {
-        $project_scope_sql = "p.company_id = $company_id";
-    } else {
-        $project_scope_sql = "1=1";
-    }
-}
-
-// جلب بيانات المشروع
+// جلب بيانات المشروع (العزل عبر البوابة)
 $selected_project = null;
 if ($selected_project_id > 0) {
-    $pq = mysqli_query($conn, "SELECT * FROM project p WHERE p.id = $selected_project_id AND p.status = 1 AND p.is_deleted = 0 AND $project_scope_sql");
-    if ($pq && mysqli_num_rows($pq) > 0) {
-        $selected_project = mysqli_fetch_assoc($pq);
+    try {
+        $pq_rows = $map_gate->scopedQuery(array(
+            'scope' => array('p' => 'project'),
+        ), "SELECT * FROM project p WHERE {TENANT_SCOPE} AND p.id = ? AND p.status = 1 AND p.is_deleted = 0", array($selected_project_id));
+    } catch (\Throwable $t) { $pq_rows = array(); }
+    if (!empty($pq_rows)) {
+        $selected_project = $pq_rows[0];
     }
 }
 
@@ -63,10 +61,11 @@ if (!$selected_project) {
 // ============================================================
 // جلب المعدات (الشاحنات) للمشروع — مجمّعة حسب المورد
 // ============================================================
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$ops_company_clause = ($operations_has_company && !$is_super_admin) ? " AND o.company_id = $company_id" : "";
-
-$ops_q = mysqli_query($conn, "
+try {
+    $ops_rows = $map_gate->scopedQuery(array(
+        'scope'  => array('o' => 'operations', 'e' => 'equipments'),
+        'enrich' => array('s' => 'suppliers'),
+    ), "
     SELECT o.id AS op_id, o.status AS op_status,
            o.start, o.end, o.equipment_category,
            e.id AS eq_id, e.code AS eq_code, e.name AS eq_name,
@@ -81,17 +80,17 @@ $ops_q = mysqli_query($conn, "
     JOIN equipments e ON o.equipment = e.id
     LEFT JOIN equipments_types et ON CAST(e.type AS UNSIGNED) = et.id
     LEFT JOIN suppliers s ON CAST(o.supplier_id AS UNSIGNED) = s.id
-    WHERE CAST(o.project_id AS UNSIGNED) = $selected_project_id
+    WHERE {TENANT_SCOPE} AND CAST(o.project_id AS UNSIGNED) = ?
       AND o.status = 1
-      $ops_company_clause
     ORDER BY supplier_name ASC, e.code ASC
-");
+", array($selected_project_id));
+} catch (\Throwable $t) { $ops_rows = array(); }
 
 // تجميع المعدات حسب المورد
 $suppliers_data = [];
 
-if ($ops_q) {
-    while ($op = mysqli_fetch_assoc($ops_q)) {
+{
+    foreach ($ops_rows as $op) {
         $sup_id   = intval($op['supplier_id']);
         $sup_name = $op['supplier_name'];
         $avail    = $op['availability_status'] ?? '';
@@ -113,9 +112,6 @@ if ($ops_q) {
 // ============================================================
 // جلب المشغلين لكل معدة
 // ============================================================
-$eq_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$drivers_company_clause = ($eq_drivers_has_company && !$is_super_admin) ? " AND ed.company_id = $company_id" : "";
-
 $all_eq_ids = [];
 foreach ($suppliers_data as $sup) {
     foreach ($sup['equipments'] as $op) {
@@ -124,8 +120,12 @@ foreach ($suppliers_data as $sup) {
 }
 
 if (!empty($all_eq_ids)) {
-    $eq_ids_str = implode(',', array_unique($all_eq_ids));
-    $drv_q = mysqli_query($conn, "
+    $eq_ids_uni = array_map('intval', array_unique($all_eq_ids));
+    $eq_marks = implode(',', array_fill(0, count($eq_ids_uni), '?'));
+    try {
+        $drv_rows = $map_gate->scopedQuery(array(
+            'scope' => array('ed' => 'equipment_drivers', 'd' => 'employees'),
+        ), "
         SELECT ed.equipment_id, ed.start_date, ed.end_date,
                d.id AS employee_id, d.name AS driver_name, d.employee_code,
                d.phone, d.skill_level, d.license_type, d.years_in_field,
@@ -133,20 +133,18 @@ if (!empty($all_eq_ids)) {
                d.specialized_equipment
         FROM equipment_drivers ed
         JOIN employees d ON ed.employee_id = d.id
-        WHERE ed.equipment_id IN ($eq_ids_str)
+        WHERE {TENANT_SCOPE} AND ed.equipment_id IN ($eq_marks)
           AND ed.status = 1
           AND d.status = 1
-          $drivers_company_clause
         ORDER BY ed.equipment_id ASC, d.name ASC
-    ");
+    ", $eq_ids_uni);
+    } catch (\Throwable $t) { $drv_rows = array(); }
 
     $eq_drivers_map = [];
-    if ($drv_q) {
-        while ($dr = mysqli_fetch_assoc($drv_q)) {
+    foreach ($drv_rows as $dr) {
             $eq_id = intval($dr['equipment_id']);
             if (!isset($eq_drivers_map[$eq_id])) $eq_drivers_map[$eq_id] = [];
             $eq_drivers_map[$eq_id][] = $dr;
-        }
     }
 
     foreach ($suppliers_data as $sup_id => &$sup) {
@@ -162,9 +160,6 @@ if (!empty($all_eq_ids)) {
 // ============================================================
 // جلب ساعات التشغيل من التايم شيت
 // ============================================================
-$ts_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
-$ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $company_id" : "";
-
 $all_op_ids_ts = [];
 foreach ($suppliers_data as $sup_id => &$sup) {
     foreach ($sup['equipments'] as $op_id => &$op) {
@@ -177,20 +172,25 @@ foreach ($suppliers_data as $sup_id => &$sup) {
 unset($sup);
 
 if (!empty($all_op_ids_ts)) {
-    $op_ids_ts_str = implode(',', array_unique($all_op_ids_ts));
-    $ts_q = mysqli_query($conn, "
+    $op_ids_uni = array_map('intval', array_unique($all_op_ids_ts));
+    $op_marks = implode(',', array_fill(0, count($op_ids_uni), '?'));
+    // قراءة الدوام عبر البوابة (سابقة الصيانة — قراءةٌ لا تمسّ مسار الاعتماد)
+    try {
+        $ts_rows = $map_gate->scopedQuery(array(
+            'scope' => array('t' => 'timesheet'),
+        ), "
         SELECT CAST(t.operator AS UNSIGNED) AS op_id,
                SUM(t.total_work_hours) AS total_hours,
                SUM(CASE WHEN t.date = CURDATE() THEN t.total_work_hours ELSE 0 END) AS today_hours
         FROM timesheet t
-        WHERE CAST(t.operator AS UNSIGNED) IN ($op_ids_ts_str)
+        WHERE {TENANT_SCOPE} AND CAST(t.operator AS UNSIGNED) IN ($op_marks)
           AND t.status = 1
-          $ts_company_clause
         GROUP BY t.operator
-    ");
-    if ($ts_q) {
+    ", $op_ids_uni);
+    } catch (\Throwable $t) { $ts_rows = array(); }
+    if (!empty($ts_rows)) {
         $ts_map = [];
-        while ($ts_row = mysqli_fetch_assoc($ts_q)) {
+        foreach ($ts_rows as $ts_row) {
             $ts_map[intval($ts_row['op_id'])] = [
                 'total' => floatval($ts_row['total_hours']),
                 'today' => floatval($ts_row['today_hours']),
@@ -213,19 +213,24 @@ if (!empty($all_op_ids_ts)) {
 // إحصائيات إجمالية
 // ============================================================
 $projectId = intval($selected_project_id);
-if (!function_exists('dashboard_scalar')) {
-    function dashboard_scalar($conn, $sql, $col = 't') {
-        $q = mysqli_query($conn, $sql);
-        if ($q && $row = mysqli_fetch_assoc($q)) {
-            return isset($row[$col]) ? intval($row[$col]) : 0;
-        }
-        return 0;
-    }
-}
 
 $total_suppliers = count($suppliers_data);
-$totEq = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM `equipments` WHERE id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = '$projectId');", 't');
-$wrkEq = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM `equipments` WHERE id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = '$projectId' AND operations.status='1');", 't');
+// عدّادا المعدات — العزل عبر البوابة (قائمة operations الداخلية تُعلن enrich بدلالة الأصل)
+$totEq = 0; $wrkEq = 0;
+try {
+    $r = $map_gate->scopedQuery(array(
+        'scope'  => array('equipments' => 'equipments'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT COUNT(*) AS t FROM `equipments` WHERE {TENANT_SCOPE} AND id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = ?)", array($projectId));
+    $totEq = !empty($r) ? intval($r[0]['t']) : 0;
+} catch (\Throwable $t) {}
+try {
+    $r = $map_gate->scopedQuery(array(
+        'scope'  => array('equipments' => 'equipments'),
+        'enrich' => array('operations' => 'operations'),
+    ), "SELECT COUNT(*) AS t FROM `equipments` WHERE {TENANT_SCOPE} AND id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = ? AND operations.status='1')", array($projectId));
+    $wrkEq = !empty($r) ? intval($r[0]['t']) : 0;
+} catch (\Throwable $t) {}
 $stoppedEq = $totEq - $wrkEq;
 
 $total_operators = 0;

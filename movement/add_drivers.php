@@ -15,60 +15,23 @@ if (!$is_super_admin && $company_id <= 0) {
     die('معرّف الشركة غير متوفر');
 }
 
-$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
-$drivers_has_supplier = db_table_has_column($conn, 'employees', 'supplier_id');
-$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
-
-$equipment_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($equipments_has_company) {
-        $equipment_scope_sql = "e.company_id = $company_id";
-    } else {
-        $equipment_scope_sql = "EXISTS (
-            SELECT 1
-            FROM operations so
-            JOIN project sp ON sp.id = so.project_id
-            WHERE so.equipment = e.id
-              AND (
-                  EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
-                  OR EXISTS (
-                      SELECT 1
-                      FROM clients sc
-                      JOIN users scu ON scu.id = sc.created_by
-                      WHERE sc.id = sp.company_client_id AND scu.company_id = $company_id
-                  )
-              )
-        )";
-    }
-}
-
-$driver_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($drivers_has_company) {
-        $driver_scope_sql = "d.company_id = $company_id";
-    } elseif ($drivers_has_supplier && $suppliers_has_company) {
-        $driver_scope_sql = "EXISTS (
-            SELECT 1
-            FROM suppliers ds
-            WHERE ds.id = d.supplier_id
-              AND ds.company_id = $company_id
-        )";
-    } else {
-        $driver_scope_sql = "0=1";
-    }
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة الخمسة وبُناة
+// النطاق البديلة أُسقطوا — {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر مسجَّل.
+$adr_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('add drivers super') : ems_tenant_db();
 
 $equipment_id = intval($_GET['equipment_id']);
 
 // جلب معلومات المعدة
-$equipment_query = "SELECT e.*, s.name as supplier_name
-                    FROM equipments e
-                    LEFT JOIN suppliers s ON e.suppliers = s.id
-                    WHERE e.id = $equipment_id AND $equipment_scope_sql";
-$equipment_result = mysqli_query($conn, $equipment_query);
-$equipment = $equipment_result ? mysqli_fetch_assoc($equipment_result) : null;
+try {
+    $equipment_rows = $adr_gate->scopedQuery(array(
+        'scope'  => array('e' => 'equipments'),
+        'enrich' => array('s' => 'suppliers'),
+    ), "SELECT e.*, s.name as supplier_name
+        FROM equipments e
+        LEFT JOIN suppliers s ON e.suppliers = s.id
+        WHERE {TENANT_SCOPE} AND e.id = ?", array($equipment_id));
+} catch (\Throwable $t) { $equipment_rows = array(); }
+$equipment = !empty($equipment_rows) ? $equipment_rows[0] : null;
 if (!$equipment) {
     die('المعدة غير موجودة أو خارج نطاق الشركة');
 }
@@ -76,16 +39,17 @@ if (!$equipment) {
 // جلب المشغلين المرتبطين مسبقًا
 $current = [];
 $linked = [];
-$res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_type, d.id AS employee_id, d.name, d.phone, ed.status
-                             FROM equipment_drivers ed
-                             JOIN employees d ON ed.employee_id = d.id
-                                                         WHERE ed.equipment_id = $equipment_id
-                                                             AND $driver_scope_sql" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND ed.company_id = $company_id"));
-if ($res) {
-    while ($r = mysqli_fetch_assoc($res)) {
-        $current[] = $r['employee_id'];
-        $linked[] = $r;
-    }
+try {
+    $linked_rows = $adr_gate->scopedQuery(array(
+        'scope' => array('ed' => 'equipment_drivers', 'd' => 'employees'),
+    ), "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_type, d.id AS employee_id, d.name, d.phone, ed.status
+        FROM equipment_drivers ed
+        JOIN employees d ON ed.employee_id = d.id
+        WHERE {TENANT_SCOPE} AND ed.equipment_id = ?", array($equipment_id));
+} catch (\Throwable $t) { $linked_rows = array(); }
+foreach ($linked_rows as $r) {
+    $current[] = $r['employee_id'];
+    $linked[] = $r;
 }
 
 $page_title = "إيكوبيشن | إدارة مشغلي المعدة";
@@ -1050,18 +1014,25 @@ include("../inheader.php");
 
                         <div class="drivers-grid" id="driversGrid">
                             <?php
-                            $drivers = mysqli_query($conn, "SELECT d.id, d.name, d.phone
-                                                            FROM employees d
-                                                            WHERE d.id NOT IN (
-                                                                SELECT employee_id
-                                                                FROM equipment_drivers
-                                                                WHERE status = 1" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id") . "
-                                                            ) AND d.status = 1
-                                                            AND $driver_scope_sql" . ems_operation_types_in_sql($conn, 'd') . "
-                                                            ORDER BY d.name");
+                            // قائمة الاستثناء (المشغلون المرتبطون) غير مترابطة —
+                            // equipment_drivers تُعلن enrich بدلالة الأصل (الشرط الداخلي
+                            // للشركة كان اختياريًّا؛ الروابط داخل الشركة بسلامة FK).
+                            try {
+                                $drivers_rows = $adr_gate->scopedQuery(array(
+                                    'scope'  => array('d' => 'employees'),
+                                    'enrich' => array('equipment_drivers' => 'equipment_drivers'),
+                                ), "SELECT d.id, d.name, d.phone
+                                    FROM employees d
+                                    WHERE {TENANT_SCOPE} AND d.id NOT IN (
+                                        SELECT employee_id
+                                        FROM equipment_drivers
+                                        WHERE status = 1
+                                    ) AND d.status = 1" . ems_operation_types_in_sql($conn, 'd') . "
+                                    ORDER BY d.name");
+                            } catch (\Throwable $t) { $drivers_rows = array(); }
 
-                            if ($drivers && mysqli_num_rows($drivers) > 0) {
-                                while ($d = mysqli_fetch_assoc($drivers)) {
+                            if (!empty($drivers_rows)) {
+                                foreach ($drivers_rows as $d) {
                                     $driverName = htmlspecialchars($d['name']);
                                     $driverPhone = htmlspecialchars($d['phone'] ?: 'لا يوجد');
                                     $driverInitial = mb_substr($driverName, 0, 1);

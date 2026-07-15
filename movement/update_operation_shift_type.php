@@ -47,7 +47,7 @@ if (!isset($_POST['operation_id']) || !isset($_POST['shift_type'])) {
 }
 
 $operation_id = intval($_POST['operation_id']);
-$shift_type = mysqli_real_escape_string($conn, trim($_POST['shift_type']));
+$shift_type = trim($_POST['shift_type']);
 
 // Validate operation_id
 if ($operation_id <= 0) {
@@ -84,15 +84,18 @@ if (!can_update('operations')) {
 // 3. Verify Operation Exists & Belongs to Company
 // ═══════════════════════════════════════════════════════════════
 
-$check_sql = "SELECT id FROM operations
-              WHERE id = $operation_id
-              AND company_id = $company_id
-              AND status = 1
-              LIMIT 1";
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): شرط الشركة اليدوي زال —
+// البوابة تحقنه؛ وفرع audit_log الميّت أُسقط (الجدول غير موجود — لم يكن يُنفَّذ).
+$uost_gate = ems_tenant_db();
+try {
+    $check_row = $uost_gate->selectOne('operations', array(
+        'columns'  => array('id'),
+        'where'    => array('id' => $operation_id),
+        'whereRaw' => 'status = 1',
+    ));
+} catch (\Throwable $t) { $check_row = null; }
 
-$check_result = mysqli_query($conn, $check_sql);
-
-if (!$check_result || mysqli_num_rows($check_result) === 0) {
+if (!$check_row) {
     die(json_encode([
         'success' => false,
         'message' => 'التشغيل غير موجود أو ليس لديك صلاحية الوصول إليه'
@@ -103,57 +106,15 @@ if (!$check_result || mysqli_num_rows($check_result) === 0) {
 // 4. Update Shift Type
 // ═══════════════════════════════════════════════════════════════
 
-$update_sql = "UPDATE operations
-               SET shift_type = '$shift_type'
-               WHERE id = $operation_id
-               AND company_id = $company_id
-               AND status = 1";
-
-$update_result = mysqli_query($conn, $update_sql);
-
-if (!$update_result) {
+try {
+    $uost_gate->update('operations',
+        array('shift_type' => $shift_type),
+        array('id' => $operation_id), 'status = 1');
+} catch (\Throwable $t) {
     die(json_encode([
         'success' => false,
-        'message' => 'فشل التحديث: ' . mysqli_error($conn)
+        'message' => 'فشل التحديث: ' . $t->getMessage()
     ]));
-}
-
-// ═══════════════════════════════════════════════════════════════
-// 5. Audit Log (Optional - if audit_log table exists)
-// ═══════════════════════════════════════════════════════════════
-
-// Helper function to check if table and column exist
-if (!function_exists('db_table_has_column')) {
-    function db_table_has_column($conn, $table, $column) {
-        $check = mysqli_query($conn, "SHOW COLUMNS FROM `$table` LIKE '$column'");
-        return $check && mysqli_num_rows($check) > 0;
-    }
-}
-
-// Log to audit_log if table exists
-$audit_table_check = mysqli_query($conn, "SHOW TABLES LIKE 'audit_log'");
-if ($audit_table_check && mysqli_num_rows($audit_table_check) > 0) {
-
-    $shift_labels = [
-        'D' => 'نهاري فقط',
-        'N' => 'ليلي فقط',
-        'B' => 'نهاري + ليلي'
-    ];
-
-    $shift_label = isset($shift_labels[$shift_type]) ? $shift_labels[$shift_type] : $shift_type;
-
-    $audit_action = "تم تعديل نظام الوردية للتشغيل رقم $operation_id";
-    $audit_details = "نظام الوردية الجديد: $shift_label ($shift_type)";
-    $audit_details = mysqli_real_escape_string($conn, $audit_details);
-    $audit_action = mysqli_real_escape_string($conn, $audit_action);
-
-    $audit_sql = "INSERT INTO audit_log
-                  (user_id, action, details, created_at, company_id)
-                  VALUES
-                  ($user_id, '$audit_action', '$audit_details', NOW(), $company_id)";
-
-    mysqli_query($conn, $audit_sql);
-    // Ignore audit log errors (non-critical)
 }
 
 // ═══════════════════════════════════════════════════════════════

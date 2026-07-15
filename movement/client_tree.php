@@ -31,14 +31,10 @@ if (empty($perms['can_view'])) {
 
 $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
 
-// ── أعلام العزل (توافق رجعي) ──
-$clients_has_company = db_table_has_column($conn, 'clients', 'company_id');
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
-$ops_has_company     = db_table_has_column($conn, 'operations', 'company_id');
-$ed_has_company      = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$ts_has_company      = db_table_has_column($conn, 'timesheet', 'company_id');
-
-$scope_company = (!$is_super_admin) ? $company_id : 0;
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): أعلام التوافق الرجعي أُسقطت —
+// {TENANT_SCOPE} والبوابة مسؤولا النطاق (قراءة الدوام عبر البوابة بسابقة الصيانة)،
+// والسوبر عبر forAllTenants المسجَّل.
+$ct_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('client tree super') : ems_tenant_db();
 
 // ── الأدوار المقيّدة بمشروع (مثل مدير الموقع) — نطاقها فقط ──
 $session_user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
@@ -78,12 +74,14 @@ $is_stopped = function ($avail) use ($EMS_STOPPED_AVAIL) {
 // 1) العملاء (جذور) — مع عزل الشركة
 // ============================================================
 $clients = [];
-$cl_where = "1=1";
-if ($clients_has_company && !$is_super_admin) $cl_where .= " AND c.company_id = $scope_company";
-if (db_table_has_column($conn, 'clients', 'is_deleted')) $cl_where .= " AND c.is_deleted = 0";
-if ($client_filter > 0) $cl_where .= " AND c.id = $client_filter";
-$cq = mysqli_query($conn, "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE $cl_where ORDER BY c.client_name ASC");
-if ($cq) while ($r = mysqli_fetch_assoc($cq)) {
+$cl_extra = " AND c.is_deleted = 0"; $cl_params = array();
+if ($client_filter > 0) { $cl_extra .= " AND c.id = ?"; $cl_params[] = $client_filter; }
+try {
+    $cq_rows = $ct_gate->scopedQuery(array(
+        'scope' => array('c' => 'clients'),
+    ), "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE {TENANT_SCOPE}$cl_extra ORDER BY c.client_name ASC", $cl_params);
+} catch (\Throwable $t) { $cq_rows = array(); }
+foreach ($cq_rows as $r) {
     $clients[(int) $r['id']] = ['id' => (int) $r['id'], 'code' => $r['client_code'], 'name' => $r['client_name'], 'projects' => []];
 }
 
@@ -91,12 +89,14 @@ if ($cq) while ($r = mysqli_fetch_assoc($cq)) {
 // 2) المشاريع تحت كل عميل — عزل الشركة + نطاق الدور المقيّد
 // ============================================================
 $project_to_client = [];
-$pr_where = "p.status = 1";
-if (db_table_has_column($conn, 'project', 'is_deleted')) $pr_where .= " AND p.is_deleted = 0";
-if ($project_has_company && !$is_super_admin) $pr_where .= " AND p.company_id = $scope_company";
-if ($session_user_project_id > 0) $pr_where .= " AND p.id = $session_user_project_id"; // دور مقيّد بمشروع
-$pq = mysqli_query($conn, "SELECT p.id, p.name, p.project_code, p.location, p.client_id FROM project p WHERE $pr_where ORDER BY p.name ASC");
-if ($pq) while ($r = mysqli_fetch_assoc($pq)) {
+$pr_extra = " AND p.status = 1 AND p.is_deleted = 0"; $pr_params = array();
+if ($session_user_project_id > 0) { $pr_extra .= " AND p.id = ?"; $pr_params[] = $session_user_project_id; } // دور مقيّد بمشروع
+try {
+    $pq_rows = $ct_gate->scopedQuery(array(
+        'scope' => array('p' => 'project'),
+    ), "SELECT p.id, p.name, p.project_code, p.location, p.client_id FROM project p WHERE {TENANT_SCOPE}$pr_extra ORDER BY p.name ASC", $pr_params);
+} catch (\Throwable $t) { $pq_rows = array(); }
+foreach ($pq_rows as $r) {
     $cid = (int) $r['client_id'];
     if (!isset($clients[$cid])) continue; // المشروع لعميل خارج النطاق
     $pid = (int) $r['id'];
@@ -123,23 +123,25 @@ $proj_sup_eq = []; // pid => sid => [eq_id => true]  (معدّات المورد 
 $op_ids = [];
 $op_meta = []; // op_id => ['target'=>الهدف اليومي, 'start'=>, 'end'=>]  (لحساب الساعات المستهدفة للفترة)
 if (!empty($project_ids)) {
-    $pids_str = implode(',', array_map('intval', $project_ids));
-    $ops_company_clause = ($ops_has_company && !$is_super_admin) ? " AND o.company_id = $scope_company" : "";
-    $ops_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
-    $ops_target_sel = $ops_has_target ? "o.target_daily_hours AS target_daily," : "NULL AS target_daily,";
-    $ops_q = mysqli_query($conn, "
+    $pids = array_map('intval', $project_ids);
+    $pids_marks = implode(',', array_fill(0, count($pids), '?'));
+    try {
+        $ops_q_rows = $ct_gate->scopedQuery(array(
+            'scope'  => array('o' => 'operations'),
+            'enrich' => array('s' => 'suppliers'),
+        ), "
         SELECT o.id AS op_id, CAST(o.project_id AS UNSIGNED) AS project_id,
                CAST(o.equipment AS UNSIGNED) AS eq_id,
-               o.start AS op_start, o.end AS op_end, $ops_target_sel
+               o.start AS op_start, o.end AS op_end, o.target_daily_hours AS target_daily,
                COALESCE(s.id,0) AS supplier_id, COALESCE(s.name,'بدون مورد') AS supplier_name,
                COALESCE(s.supplier_code,'') AS supplier_code
         FROM operations o
         LEFT JOIN suppliers s ON CAST(o.supplier_id AS UNSIGNED) = s.id
-        WHERE CAST(o.project_id AS UNSIGNED) IN ($pids_str)
+        WHERE {TENANT_SCOPE} AND CAST(o.project_id AS UNSIGNED) IN ($pids_marks)
           AND o.status = 1
-          $ops_company_clause
-    ");
-    if ($ops_q) while ($op = mysqli_fetch_assoc($ops_q)) {
+    ", $pids);
+    } catch (\Throwable $t) { $ops_q_rows = array(); }
+    foreach ($ops_q_rows as $op) {
         $pid = (int) $op['project_id'];
         if (!isset($project_to_client[$pid])) continue;
         $cid = $project_to_client[$pid];
@@ -172,20 +174,21 @@ if (!empty($project_ids)) {
 //     واحتسابهم حتى إن لم تُسجَّل لهم عمليات بعد (كانت تُعطي 0 دائماً).
 // ============================================================
 if (!empty($project_ids)) {
-    $pids_str = implode(',', array_map('intval', $project_ids));
+    $pids = array_map('intval', $project_ids);
+    $pids_marks = implode(',', array_fill(0, count($pids), '?'));
 
     // خريطة: عقد المشروع → المشروع (لربط عقد المورد بعقد المشروع)
     // + تجميع «إجمالي ساعات العقد» (forecasted_contracted_hours) لكل مشروع — الساعات المتفق عليها.
     $contract_to_project = [];
-    $ct_company_clause = (db_table_has_column($conn, 'contracts', 'company_id') && !$is_super_admin) ? " AND ct.company_id = $scope_company" : "";
-    $ct_deleted_clause = db_table_has_column($conn, 'contracts', 'is_deleted') ? " AND ct.is_deleted = 0" : "";
-    $ct_has_status     = db_table_has_column($conn, 'contracts', 'status');
-    $ct_status_sel     = $ct_has_status ? "ct.status AS ct_status," : "1 AS ct_status,";
-    $ct_q = mysqli_query($conn, "SELECT ct.id, CAST(ct.project_id AS UNSIGNED) AS project_id, $ct_status_sel
-                                        COALESCE(ct.forecasted_contracted_hours,0) AS contracted_hours
-                                 FROM contracts ct
-                                 WHERE CAST(ct.project_id AS UNSIGNED) IN ($pids_str) $ct_company_clause $ct_deleted_clause");
-    if ($ct_q) while ($ct = mysqli_fetch_assoc($ct_q)) {
+    try {
+        $ct_q_rows = $ct_gate->scopedQuery(array(
+            'scope' => array('ct' => 'contracts'),
+        ), "SELECT ct.id, CAST(ct.project_id AS UNSIGNED) AS project_id, ct.status AS ct_status,
+                COALESCE(ct.forecasted_contracted_hours,0) AS contracted_hours
+            FROM contracts ct
+            WHERE {TENANT_SCOPE} AND CAST(ct.project_id AS UNSIGNED) IN ($pids_marks) AND ct.is_deleted = 0", $pids);
+    } catch (\Throwable $t) { $ct_q_rows = array(); }
+    foreach ($ct_q_rows as $ct) {
         $contract_to_project[(int) $ct['id']] = (int) $ct['project_id'];
         // إجمالي الساعات المتفق عليها يُحتسب من العقود السارية فقط (status=1)
         if ((int) $ct['ct_status'] === 1) {
@@ -194,10 +197,14 @@ if (!empty($project_ids)) {
             $proj_contract_hours[$cpid] += (float) $ct['contracted_hours'];
         }
     }
-    $contract_ids_str = !empty($contract_to_project) ? implode(',', array_map('intval', array_keys($contract_to_project))) : '0';
+    $contract_ids = !empty($contract_to_project) ? array_map('intval', array_keys($contract_to_project)) : array(0);
+    $ctids_marks = implode(',', array_fill(0, count($contract_ids), '?'));
 
-    $sc_company_clause = (db_table_has_column($conn, 'supplierscontracts', 'company_id') && !$is_super_admin) ? " AND sc.company_id = $scope_company" : "";
-    $sc_q = mysqli_query($conn, "
+    try {
+        $sc_q_rows = $ct_gate->scopedQuery(array(
+            'scope'  => array('sc' => 'supplierscontracts'),
+            'enrich' => array('s' => 'suppliers'),
+        ), "
         SELECT sc.supplier_id,
                CAST(sc.project_id AS UNSIGNED) AS project_id,
                sc.project_contract_id,
@@ -206,11 +213,11 @@ if (!empty($project_ids)) {
                COALESCE(s.supplier_code,'') AS supplier_code
         FROM supplierscontracts sc
         LEFT JOIN suppliers s ON s.id = sc.supplier_id
-        WHERE sc.status = 1 AND sc.supplier_id IS NOT NULL AND sc.supplier_id > 0
-          AND ( CAST(sc.project_id AS UNSIGNED) IN ($pids_str) OR sc.project_contract_id IN ($contract_ids_str) )
-          $sc_company_clause
-    ");
-    if ($sc_q) while ($sc = mysqli_fetch_assoc($sc_q)) {
+        WHERE {TENANT_SCOPE} AND sc.status = 1 AND sc.supplier_id IS NOT NULL AND sc.supplier_id > 0
+          AND ( CAST(sc.project_id AS UNSIGNED) IN ($pids_marks) OR sc.project_contract_id IN ($ctids_marks) )
+    ", array_merge($pids, $contract_ids));
+    } catch (\Throwable $t) { $sc_q_rows = array(); }
+    foreach ($sc_q_rows as $sc) {
         // حدّد المشروع: مباشرةً من project_id، وإلا عبر عقد المشروع المرتبط
         $pid = (int) $sc['project_id'];
         if (!isset($project_to_client[$pid]) && !empty($sc['project_contract_id']) && isset($contract_to_project[(int) $sc['project_contract_id']])) {
@@ -235,19 +242,23 @@ if (!empty($project_ids)) {
 // ============================================================
 $op_hours = [];
 if (!empty($op_ids)) {
-    $op_ids_str = implode(',', array_map('intval', array_keys($op_ids)));
-    $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $scope_company" : "";
-    $ts_q = mysqli_query($conn, "
+    $opids = array_map('intval', array_keys($op_ids));
+    $opids_marks = implode(',', array_fill(0, count($opids), '?'));
+    try {
+        $ts_q_rows = $ct_gate->scopedQuery(array(
+            'scope' => array('t' => 'timesheet'),
+        ), "
         SELECT CAST(t.operator AS UNSIGNED) AS op_id,
                SUM(t.total_work_hours) AS total_hours,
                SUM(CASE WHEN t.date = CURDATE() THEN t.total_work_hours ELSE 0 END) AS today_hours
         FROM timesheet t
-        WHERE CAST(t.operator AS UNSIGNED) IN ($op_ids_str)
+        WHERE {TENANT_SCOPE} AND CAST(t.operator AS UNSIGNED) IN ($opids_marks)
           AND t.status = 1
-          $ts_company_clause $ts_date_clause
+          $ts_date_clause
         GROUP BY t.operator
-    ");
-    if ($ts_q) while ($r = mysqli_fetch_assoc($ts_q)) {
+    ", $opids);
+    } catch (\Throwable $t) { $ts_q_rows = array(); }
+    foreach ($ts_q_rows as $r) {
         $op_hours[(int) $r['op_id']] = ['total' => (float) $r['total_hours'], 'today' => (float) $r['today_hours']];
     }
 }
@@ -261,19 +272,23 @@ foreach ($eq_to_ops as $hk => $ops) {
 // ── ساعات عمل المشغّل من التايم شيت (operator_hours) — مفتاح: عملية (operator=operations.id) + موظف (employee_id) ──
 $op_emp_hours = []; // op_id => [emp_id => operator_hours (للفترة)]
 if (!empty($op_ids)) {
-    $op_ids_str = implode(',', array_map('intval', array_keys($op_ids)));
-    $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $scope_company" : "";
-    $oeh_q = mysqli_query($conn, "
+    $opids = array_map('intval', array_keys($op_ids));
+    $opids_marks = implode(',', array_fill(0, count($opids), '?'));
+    try {
+        $oeh_q_rows = $ct_gate->scopedQuery(array(
+            'scope' => array('t' => 'timesheet'),
+        ), "
         SELECT CAST(t.operator AS UNSIGNED) AS op_id,
                CAST(t.employee_id AS UNSIGNED) AS emp_id,
                SUM(t.operator_hours) AS oh
         FROM timesheet t
-        WHERE CAST(t.operator AS UNSIGNED) IN ($op_ids_str)
+        WHERE {TENANT_SCOPE} AND CAST(t.operator AS UNSIGNED) IN ($opids_marks)
           AND t.status = 1
-          $ts_company_clause $ts_date_clause
+          $ts_date_clause
         GROUP BY t.operator, t.employee_id
-    ");
-    if ($oeh_q) while ($r = mysqli_fetch_assoc($oeh_q)) {
+    ", $opids);
+    } catch (\Throwable $t) { $oeh_q_rows = array(); }
+    foreach ($oeh_q_rows as $r) {
         $op_emp_hours[(int) $r['op_id']][(int) $r['emp_id']] = (float) $r['oh'];
     }
 }
@@ -291,17 +306,20 @@ foreach ($eq_to_ops as $hk => $ops) {
 //    مستقلّة عن فلتر الفترة لأن العقد إجمالي تراكمي. تُجمَّع لكل مشروع عبر عملياته.
 $op_hours_all = []; // op_id => إجمالي الساعات التراكمي
 if (!empty($op_ids)) {
-    $op_ids_str = implode(',', array_map('intval', array_keys($op_ids)));
-    $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $scope_company" : "";
-    $ts_all_q = mysqli_query($conn, "
+    $opids = array_map('intval', array_keys($op_ids));
+    $opids_marks = implode(',', array_fill(0, count($opids), '?'));
+    try {
+        $ts_all_rows = $ct_gate->scopedQuery(array(
+            'scope' => array('t' => 'timesheet'),
+        ), "
         SELECT CAST(t.operator AS UNSIGNED) AS op_id, SUM(t.total_work_hours) AS total_hours
         FROM timesheet t
-        WHERE CAST(t.operator AS UNSIGNED) IN ($op_ids_str)
+        WHERE {TENANT_SCOPE} AND CAST(t.operator AS UNSIGNED) IN ($opids_marks)
           AND t.status = 1
-          $ts_company_clause
         GROUP BY t.operator
-    ");
-    if ($ts_all_q) while ($r = mysqli_fetch_assoc($ts_all_q)) {
+    ", $opids);
+    } catch (\Throwable $t) { $ts_all_rows = array(); }
+    foreach ($ts_all_rows as $r) {
         $op_hours_all[(int) $r['op_id']] = (float) $r['total_hours'];
     }
 }
@@ -374,17 +392,20 @@ foreach ($proj_sup_eq as $pid => $sups) {
 }
 $eq_details = []; // eq_id => ['eq_code','type_name','avail']
 if (!empty($needed_eq_ids)) {
-    $eqids_str = implode(',', array_map('intval', array_keys($needed_eq_ids)));
-    $eq_company_clause = (db_table_has_column($conn, 'equipments', 'company_id') && !$is_super_admin) ? " AND e.company_id = $scope_company" : "";
-    $eq_q = mysqli_query($conn, "
+    $eqids = array_map('intval', array_keys($needed_eq_ids));
+    $eqids_marks = implode(',', array_fill(0, count($eqids), '?'));
+    try {
+        $eq_q_rows = $ct_gate->scopedQuery(array(
+            'scope' => array('e' => 'equipments'),
+        ), "
         SELECT e.id AS eq_id, e.code AS eq_code,
                e.availability_status AS avail, COALESCE(et.type,'') AS type_name
         FROM equipments e
         LEFT JOIN equipments_types et ON CAST(e.type AS UNSIGNED) = et.id
-        WHERE e.id IN ($eqids_str)
-          $eq_company_clause
-    ");
-    if ($eq_q) while ($eq = mysqli_fetch_assoc($eq_q)) { $eq_details[(int) $eq['eq_id']] = $eq; }
+        WHERE {TENANT_SCOPE} AND e.id IN ($eqids_marks)
+    ", $eqids);
+    } catch (\Throwable $t) { $eq_q_rows = array(); }
+    foreach ($eq_q_rows as $eq) { $eq_details[(int) $eq['eq_id']] = $eq; }
 }
 foreach ($clients as $cid => &$cl) {
     foreach ($cl['projects'] as $pid => &$pr) {
@@ -421,19 +442,22 @@ unset($cl);
 // ============================================================
 $eq_operators = [];
 if (!empty($eq_ids)) {
-    $eq_ids_str = implode(',', array_map('intval', array_keys($eq_ids)));
-    $ed_company_clause = ($ed_has_company && !$is_super_admin) ? " AND ed.company_id = $scope_company" : "";
-    $drv_q = mysqli_query($conn, "
+    $eqids2 = array_map('intval', array_keys($eq_ids));
+    $eqids2_marks = implode(',', array_fill(0, count($eqids2), '?'));
+    try {
+        $drv_q_rows = $ct_gate->scopedQuery(array(
+            'scope' => array('ed' => 'equipment_drivers', 'd' => 'employees'),
+        ), "
         SELECT ed.equipment_id, ed.shift_type,
                d.id AS emp_id, d.name AS emp_name, d.employee_code, d.phone
         FROM equipment_drivers ed
         JOIN employees d ON ed.employee_id = d.id
-        WHERE ed.equipment_id IN ($eq_ids_str)
+        WHERE {TENANT_SCOPE} AND ed.equipment_id IN ($eqids2_marks)
           AND ed.status = 1 AND d.status = 1
-          $ed_company_clause
         ORDER BY ed.equipment_id ASC, d.name ASC
-    ");
-    if ($drv_q) while ($dr = mysqli_fetch_assoc($drv_q)) {
+    ", $eqids2);
+    } catch (\Throwable $t) { $drv_q_rows = array(); }
+    foreach ($drv_q_rows as $dr) {
         $eq_operators[(int) $dr['equipment_id']][] = $dr;
     }
 }

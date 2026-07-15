@@ -43,96 +43,47 @@ if (!in_array($shift_type, $allowed_shift_types, true)) {
     exit();
 }
 
-// التحقق من وجود عمود shift_type في جدول equipment_drivers
-$equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-if (!$equipment_drivers_has_shift_type) {
-    echo json_encode(['success' => false, 'message' => 'نظام الوردية غير مدعوم في قاعدة البيانات']);
-    exit();
-}
-
-// التحقق من وجود عمود company_id في equipment_drivers
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-
-// بناء الاستعلام للتحقق من الصلاحية
-$company_scope = '';
-if (!$is_super_admin && $equipment_drivers_has_company) {
-    $company_scope = " AND company_id = $company_id";
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشف الأعمدة أُسقط (shift_type/
+// company_id مضمونان بالترحيلات)، وفرع audit_log الميّت أُسقط (الجدول غير موجود —
+// كان الفرع لا يُنفَّذ إطلاقًا). السوبر عبر forAllTenants المسجَّل (سلوك الأصل).
+$ust_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('shift type update super') : ems_tenant_db();
 
 // التحقق من وجود السجل والصلاحية
-$check_sql = "SELECT id, shift_type FROM equipment_drivers
-              WHERE id = $relation_id
-              AND status = 1
-              $company_scope
-              LIMIT 1";
+try {
+    $check_row = $ust_gate->selectOne('equipment_drivers', array(
+        'columns'  => array('id', 'shift_type'),
+        'where'    => array('id' => $relation_id),
+        'whereRaw' => 'status = 1',
+    ));
+} catch (\Throwable $t) { $check_row = null; }
 
-$check_result = mysqli_query($conn, $check_sql);
-
-if (!$check_result || mysqli_num_rows($check_result) === 0) {
+if (!$check_row) {
     echo json_encode(['success' => false, 'message' => 'السجل غير موجود أو ليس لديك صلاحية للتعديل']);
     exit();
 }
 
 // تحديث نظام الوردية
-$shift_type_escaped = mysqli_real_escape_string($conn, $shift_type);
-$update_sql = "UPDATE equipment_drivers
-               SET shift_type = '$shift_type_escaped'
-               WHERE id = $relation_id
-               AND status = 1
-               $company_scope";
+try {
+    $affected = $ust_gate->update('equipment_drivers',
+        array('shift_type' => $shift_type),
+        array('id' => $relation_id), 'status = 1');
+} catch (\Throwable $t) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'فشل التحديث: ' . $t->getMessage()
+    ]);
+    mysqli_close($conn);
+    exit();
+}
 
-$update_result = mysqli_query($conn, $update_sql);
-
-if ($update_result && mysqli_affected_rows($conn) > 0) {
-    // تسجيل العملية في سجل التدقيق (إذا كان موجوداً)
-    $user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-    $user_name = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : 'غير معروف';
-
-    // الحصول على اسم السائق لتسجيل التغيير
-    $driver_info_sql = "SELECT d.name, e.code, e.name as equipment_name
-                        FROM equipment_drivers ed
-                        JOIN employees d ON ed.employee_id = d.id
-                        JOIN equipments e ON ed.equipment_id = e.id
-                        WHERE ed.id = $relation_id
-                        LIMIT 1";
-    $driver_info_result = mysqli_query($conn, $driver_info_sql);
-
-    if ($driver_info_result && mysqli_num_rows($driver_info_result) > 0) {
-        $driver_info = mysqli_fetch_assoc($driver_info_result);
-        $driver_name = $driver_info['name'];
-        $equipment_code = $driver_info['code'];
-        $equipment_name = $driver_info['equipment_name'];
-
-        $shift_labels = [
-            'D' => 'نهاري فقط',
-            'N' => 'ليلي فقط',
-            'B' => 'نهاري + ليلي'
-        ];
-        $shift_label = isset($shift_labels[$shift_type]) ? $shift_labels[$shift_type] : $shift_type;
-
-        // يمكن تسجيل هذا التغيير في جدول audit_log إذا كان موجوداً
-        if (db_table_has_column($conn, 'audit_log', 'id')) {
-            $log_message = "تم تعديل نظام الوردية للسائق $driver_name على المعدة $equipment_code - $equipment_name إلى: $shift_label";
-            $log_message_escaped = mysqli_real_escape_string($conn, $log_message);
-
-            $audit_sql = "INSERT INTO audit_log (user_id, user_name, action, details, created_at)
-                          VALUES ($user_id, '" . mysqli_real_escape_string($conn, $user_name) . "', 'update_shift_type', '$log_message_escaped', NOW())";
-            mysqli_query($conn, $audit_sql);
-        }
-    }
-
+if ($affected > 0) {
     echo json_encode([
         'success' => true,
         'message' => 'تم تحديث نظام الوردية بنجاح',
         'shift_type' => $shift_type
     ]);
-} elseif (mysqli_affected_rows($conn) === 0) {
-    echo json_encode(['success' => true, 'message' => 'لم يتم إجراء أي تغيير (القيمة نفسها)']);
 } else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'فشل التحديث: ' . mysqli_error($conn)
-    ]);
+    echo json_encode(['success' => true, 'message' => 'لم يتم إجراء أي تغيير (القيمة نفسها)']);
 }
 
 mysqli_close($conn);

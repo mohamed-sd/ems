@@ -18,8 +18,9 @@ if (!$is_super_admin && $company_id <= 0) {
     exit;
 }
 
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشف الأعمدة وبُناة النطاق
+// البديلة أُسقطوا — {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر مسجَّل.
+$ded_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('equipment driver toggle super') : ems_tenant_db();
 
 if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
     $id = intval($_GET['id']);
@@ -28,43 +29,22 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
     $is_role10 = ($user_role == "10");
 
     // الحصول على بيانات الربط الحالي
-    $scope_sql = '1=1';
-    if (!$is_super_admin) {
-        if ($equipment_drivers_has_company) {
-            $scope_sql = "ed.company_id = $company_id";
-        } elseif ($equipments_has_company) {
-            $scope_sql = "e.company_id = $company_id";
-        } else {
-            $scope_sql = "EXISTS (
-                SELECT 1
-                FROM operations so
-                JOIN project sp ON sp.id = so.project_id
-                WHERE so.equipment = e.id
-                  AND (
-                      EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
-                      OR EXISTS (
-                          SELECT 1
-                          FROM clients sc
-                          JOIN users scu ON scu.id = sc.created_by
-                          WHERE sc.id = sp.company_client_id AND scu.company_id = $company_id
-                      )
-                  )
-            )";
-        }
-    }
+    try {
+        $ded_rows = $ded_gate->scopedQuery(array(
+            'scope' => array('ed' => 'equipment_drivers', 'd' => 'employees', 'e' => 'equipments'),
+        ), "SELECT ed.*, d.name AS driver_name, e.code AS equipment_code, e.name AS equipment_name
+            FROM equipment_drivers ed
+            JOIN employees d ON ed.employee_id = d.id
+            JOIN equipments e ON ed.equipment_id = e.id
+            WHERE {TENANT_SCOPE} AND ed.id = ?", array($id));
+    } catch (\Throwable $t) { $ded_rows = array(); }
 
-    $res = mysqli_query($conn, "SELECT ed.*, d.name AS driver_name, e.code AS equipment_code, e.name AS equipment_name 
-                                 FROM equipment_drivers ed
-                                 JOIN employees d ON ed.employee_id = d.id
-                                 JOIN equipments e ON ed.equipment_id = e.id
-                                 WHERE ed.id=$id AND $scope_sql");
-    
-    if (!$res || mysqli_num_rows($res) === 0) {
+    if (empty($ded_rows)) {
         echo "<script>alert('❌ الربط غير موجود'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
         exit;
     }
-    
-    $row = mysqli_fetch_assoc($res);
+
+    $row = $ded_rows[0];
     $current_status = intval($row['status']);
     $new_status = ($current_status == 1) ? 0 : 1;
     $employee_id = intval($row['employee_id']);
@@ -78,6 +58,8 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
         $action_ar = ($new_status == 0) ? 'إيقاف' : 'تشغيل';
         
         // ضمان وجود قاعدة الموافقة (مدير المشغلين)
+        // [مُستثنى موثَّق — عائلة الاعتمادات] approval_workflow_rules مصنَّفة restricted
+        // في العقد (بانتظار هجرة وحدة الاعتمادات أخيرًا مع الدوام) — تبقى العبارة خامًا.
         mysqli_query(
             $conn,
             "INSERT IGNORE INTO approval_workflow_rules (entity_type, action, role_required, step_order, is_active, created_at)
@@ -131,14 +113,20 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
         exit;
     }
 
-    // المستخدمون الآخرون: تغيير الحالة مباشرة
-    $update_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
+    // المستخدمون الآخرون: تغيير الحالة مباشرة (النطاق عبر البوابة)
     // عند الإيقاف: سجّل تاريخ اليوم كنهاية فعلية للعمل إن كانت النهاية مفتوحة
-    if ($new_status == 0 && ems_is_open_end_date(isset($row['end_date']) ? $row['end_date'] : null)) {
-        $today = date('Y-m-d');
-        mysqli_query($conn, "UPDATE equipment_drivers SET status=0, end_date='$today' WHERE id=$id$update_scope");
-    } else {
-        mysqli_query($conn, "UPDATE equipment_drivers SET status=$new_status WHERE id=$id$update_scope");
+    try {
+        if ($new_status == 0 && ems_is_open_end_date(isset($row['end_date']) ? $row['end_date'] : null)) {
+            $ded_gate->update('equipment_drivers',
+                array('status' => 0, 'end_date' => date('Y-m-d')),
+                array('id' => $id));
+        } else {
+            $ded_gate->update('equipment_drivers',
+                array('status' => $new_status),
+                array('id' => $id));
+        }
+    } catch (\Throwable $t) {
+        error_log('delete_equipment_driver.php update failed: ' . $t->getMessage());
     }
     header("Location: add_drivers.php?equipment_id=$equipment_id");
     exit;

@@ -18,51 +18,9 @@ if (!$is_super_admin && $company_id <= 0) {
     exit;
 }
 
-$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
-$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
-$drivers_has_supplier = db_table_has_column($conn, 'employees', 'supplier_id');
-$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-
-$equipment_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($equipments_has_company) {
-        $equipment_scope_sql = "e.company_id = $company_id";
-    } else {
-        $equipment_scope_sql = "EXISTS (
-            SELECT 1
-            FROM operations so
-            JOIN project sp ON sp.id = so.project_id
-            WHERE so.equipment = e.id
-              AND (
-                  EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
-                  OR EXISTS (
-                      SELECT 1
-                      FROM clients sc
-                      JOIN users scu ON scu.id = sc.created_by
-                      WHERE sc.id = sp.company_client_id AND scu.company_id = $company_id
-                  )
-              )
-        )";
-    }
-}
-
-$driver_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($drivers_has_company) {
-        $driver_scope_sql = "d.company_id = $company_id";
-    } elseif ($drivers_has_supplier && $suppliers_has_company) {
-        $driver_scope_sql = "EXISTS (
-            SELECT 1
-            FROM suppliers ds
-            WHERE ds.id = d.supplier_id
-              AND ds.company_id = $company_id
-        )";
-    } else {
-        $driver_scope_sql = "0=1";
-    }
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة الستة وبُناة
+// النطاق البديلة أُسقطوا — {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر مسجَّل.
+$sed_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('save equipment drivers super') : ems_tenant_db();
 
 if (isset($_POST['equipment_id'])) {
     $equipment_id = intval($_POST['equipment_id']);
@@ -93,9 +51,13 @@ if (isset($_POST['equipment_id'])) {
     // ملاحظة: تواريخ بداية/نهاية التشغيل لم تعد تؤخذ من الفورم، بل تُشتق آلياً
     // لكل سائق من عقده الساري (راجع includes/driver_contract_dates.php).
 
-    // جلب معلومات الآلية
-    $equipment_res = mysqli_query($conn, "SELECT e.code, e.name FROM equipments e WHERE e.id = $equipment_id AND $equipment_scope_sql LIMIT 1");
-    $equipment_info = $equipment_res ? mysqli_fetch_assoc($equipment_res) : null;
+    // جلب معلومات الآلية (العزل عبر البوابة)
+    try {
+        $equipment_info = $sed_gate->selectOne('equipments', array(
+            'columns' => array('code', 'name'),
+            'where'   => array('id' => $equipment_id),
+        ));
+    } catch (\Throwable $t) { $equipment_info = null; }
     if (!$equipment_info) {
         echo "❌ الآلية غير موجودة أو خارج نطاق الشركة.";
         exit;
@@ -106,6 +68,8 @@ if (isset($_POST['equipment_id'])) {
     // إذا كان مدير الحركة والتشغيل (role 10)، إنشاء طلب موافقة
     if ($is_role10) {
         // ضمان وجود قاعدة الموافقة (مدير المشغلين)
+        // [مُستثنى موثَّق — عائلة الاعتمادات] approval_workflow_rules مصنَّفة restricted
+        // في العقد (بانتظار هجرة وحدة الاعتمادات أخيرًا مع الدوام) — تبقى العبارة خامًا.
         mysqli_query(
             $conn,
             "INSERT IGNORE INTO approval_workflow_rules (entity_type, action, role_required, step_order, is_active, created_at)
@@ -119,16 +83,25 @@ if (isset($_POST['equipment_id'])) {
         foreach ($drivers as $employee_id) {
             $employee_id = intval($employee_id);
 
-            // التحقق من عدم وجود ربط نشط بالفعل
-            $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
-            $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND employee_id=$employee_id AND status=1$check_scope");
-            if ($check && mysqli_num_rows($check) > 0) {
+            // التحقق من عدم وجود ربط نشط بالفعل (العزل عبر البوابة)
+            try {
+                $check = $sed_gate->selectOne('equipment_drivers', array(
+                    'columns'  => array('id'),
+                    'where'    => array('equipment_id' => $equipment_id, 'employee_id' => $employee_id),
+                    'whereRaw' => 'status = 1',
+                ));
+            } catch (\Throwable $t) { $check = null; }
+            if ($check) {
                 continue;
             }
 
             // جلب معلومات السائق
-            $driver_res = mysqli_query($conn, "SELECT d.name, d.phone FROM employees d WHERE d.id = $employee_id AND $driver_scope_sql LIMIT 1");
-            $driver_info = $driver_res ? mysqli_fetch_assoc($driver_res) : null;
+            try {
+                $driver_info = $sed_gate->selectOne('employees', array(
+                    'columns' => array('name', 'phone'),
+                    'where'   => array('id' => $employee_id),
+                ));
+            } catch (\Throwable $t) { $driver_info = null; }
             if (!$driver_info) {
                 $error_messages[] = "السائق #$employee_id خارج النطاق";
                 continue;
@@ -170,10 +143,6 @@ if (isset($_POST['equipment_id'])) {
                 ]
             ];
 
-            if (!$equipment_drivers_has_shift_type) {
-                unset($payload['operations'][0]['data']['shift_type']);
-            }
-
             $approval_result = approval_create_request(
                 'driver',
                 $employee_id,
@@ -206,25 +175,33 @@ if (isset($_POST['equipment_id'])) {
         exit;
     }
 
-    // المستخدمون الآخرون: إضافة مباشرة
+    // المستخدمون الآخرون: إضافة مباشرة (الكتابة عبر البوابة حصرًا)
     foreach ($drivers as $employee_id) {
         $employee_id = intval($employee_id);
 
         // اشتقاق التواريخ من عقد السائق الساري (وليس من الفورم)
         $dates = ems_resolve_equipment_driver_dates($conn, $employee_id, $company_id, $is_super_admin);
-        $start_sql = "'" . mysqli_real_escape_string($conn, $dates['start']) . "'";
-        $end_sql = "'" . mysqli_real_escape_string($conn, $dates['end']) . "'";
 
         // التحقق من عدم وجود ربط نشط بالفعل
-        $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
-        $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND employee_id=$employee_id AND status=1$check_scope");
-        if ($check && mysqli_num_rows($check) > 0) {
+        try {
+            $check = $sed_gate->selectOne('equipment_drivers', array(
+                'columns'  => array('id'),
+                'where'    => array('equipment_id' => $equipment_id, 'employee_id' => $employee_id),
+                'whereRaw' => 'status = 1',
+            ));
+        } catch (\Throwable $t) { $check = null; }
+        if ($check) {
             continue;
         }
 
-        $active_any = mysqli_query($conn, "SELECT id, equipment_id FROM equipment_drivers WHERE employee_id=$employee_id AND status=1$check_scope LIMIT 1");
-        if ($active_any && mysqli_num_rows($active_any) > 0) {
-            $active_row = mysqli_fetch_assoc($active_any);
+        try {
+            $active_row = $sed_gate->selectOne('equipment_drivers', array(
+                'columns'  => array('id', 'equipment_id'),
+                'where'    => array('employee_id' => $employee_id),
+                'whereRaw' => 'status = 1',
+            ));
+        } catch (\Throwable $t) { $active_row = null; }
+        if ($active_row) {
             $active_equipment_id = isset($active_row['equipment_id']) ? intval($active_row['equipment_id']) : 0;
 
             if ($active_equipment_id === $equipment_id) {
@@ -232,30 +209,39 @@ if (isset($_POST['equipment_id'])) {
             }
 
             if ($auto_replace === 1) {
-                mysqli_query(
-                    $conn,
-                    "UPDATE equipment_drivers SET status=0, end_date=$start_sql WHERE employee_id=$employee_id AND status=1$check_scope"
-                );
+                try {
+                    $sed_gate->update('equipment_drivers',
+                        array('status' => 0, 'end_date' => $dates['start']),
+                        array('employee_id' => $employee_id), 'status = 1');
+                } catch (\Throwable $t) {
+                    error_log('save_equipment_drivers.php auto-replace failed: ' . $t->getMessage());
+                }
             } else {
                 continue;
             }
         }
 
-        $driver_res = mysqli_query($conn, "SELECT d.id FROM employees d WHERE d.id = $employee_id AND $driver_scope_sql LIMIT 1");
-        if (!$driver_res || mysqli_num_rows($driver_res) === 0) {
+        try {
+            $driver_ok = $sed_gate->selectOne('employees', array(
+                'columns' => array('id'), 'where' => array('id' => $employee_id),
+            ));
+        } catch (\Throwable $t) { $driver_ok = null; }
+        if (!$driver_ok) {
             continue;
         }
 
-        $insert_company_col = ($is_super_admin || !$equipment_drivers_has_company) ? "" : ", company_id";
-        $insert_company_val = ($is_super_admin || !$equipment_drivers_has_company) ? "" : ", $company_id";
-        $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
-        $insert_shift_val = $equipment_drivers_has_shift_type ? ", '" . mysqli_real_escape_string($conn, $shift_type) . "'" : "";
-
-        mysqli_query(
-            $conn,
-            "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-             VALUES ($equipment_id, $employee_id, $start_sql, $end_sql, 1$insert_shift_val$insert_company_val)"
-        );
+        try {
+            $sed_gate->insert('equipment_drivers', array(
+                'equipment_id' => $equipment_id,
+                'employee_id'  => $employee_id,
+                'start_date'   => $dates['start'],
+                'end_date'     => $dates['end'],
+                'status'       => 1,
+                'shift_type'   => $shift_type,
+            ));
+        } catch (\Throwable $t) {
+            error_log('save_equipment_drivers.php insert failed: ' . $t->getMessage());
+        }
     }
 
     echo "✅ تم تحديث السائقين للآلية.";
