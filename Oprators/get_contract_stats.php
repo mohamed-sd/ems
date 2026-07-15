@@ -22,24 +22,31 @@ if ($contract_id <= 0) {
     exit;
 }
 
-$contract_query = "SELECT c.*, p.name as project_name,
-                   (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count
-                   FROM contracts c
-                   LEFT JOIN project p ON c.project_id = p.id
-                   WHERE c.id = $contract_id";
-$contract_result = mysqli_query($conn, $contract_query);
+// العزل عبر البوابة (K9 · هجرة 2026-07-15): كل قراءات النقطة كانت بمعرّفاتٍ فقط
+// بلا عزل شركةٍ إطلاقًا (تسرّبٌ كامنٌ أُغلق) — السوبر عبر forAllTenants المسجَّل.
+$gst_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$gst_gate = ($gst_role === '-1') ? ems_tenant_db()->forAllTenants('contract stats super') : ems_tenant_db();
 
-if (!$contract_result) {
-    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . mysqli_error($conn)]);
+try {
+    $contract_rows = $gst_gate->scopedQuery(array(
+        'scope'  => array('c' => 'contracts'),
+        'enrich' => array('p' => 'project', 'ce' => 'contractequipments'),
+    ), "SELECT c.*, p.name as project_name,
+        (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count
+        FROM contracts c
+        LEFT JOIN project p ON c.project_id = p.id
+        WHERE {TENANT_SCOPE} AND c.id = ?", array($contract_id));
+} catch (\Throwable $t) {
+    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . $t->getMessage()]);
     exit;
 }
 
-if (mysqli_num_rows($contract_result) == 0) {
+if (empty($contract_rows)) {
     echo json_encode(['success' => false, 'message' => 'العقد غير موجود']);
     exit;
 }
 
-$contract = mysqli_fetch_assoc($contract_result);
+$contract = $contract_rows[0];
 $project_id = intval($contract['project_id']);
 
 // أساس احتساب الهدف: أيام العقد الفعلية. الهدف اليومي = نصيب الآلية ÷ الأيام، والشهري = اليومي × 30.
@@ -54,73 +61,81 @@ if ($is_role10) {
     }
 }
 
-$active_equipment_query = "SELECT COUNT(*) as active_count
-                          FROM operations o
-                          WHERE o.status = 1
-                          AND o.contract_id = $contract_id";
-$active_equipment_result = mysqli_query($conn, $active_equipment_query);
-$active_equipment_count = 0;
-if ($active_equipment_result && mysqli_num_rows($active_equipment_result) > 0) {
-    $active_equipment_row = mysqli_fetch_assoc($active_equipment_result);
-    $active_equipment_count = intval($active_equipment_row['active_count']);
-}
+try {
+    $active_rows = $gst_gate->scopedQuery(array(
+        'scope' => array('o' => 'operations'),
+    ), "SELECT COUNT(*) as active_count
+        FROM operations o
+        WHERE {TENANT_SCOPE} AND o.status = 1 AND o.contract_id = ?", array($contract_id));
+} catch (\Throwable $t) { $active_rows = array(); }
+$active_equipment_count = !empty($active_rows) ? intval($active_rows[0]['active_count']) : 0;
 
-$suppliers_query = "SELECT
-    sc.id,
-    sc.supplier_id,
-    s.name as supplier_name,
-    sc.forecasted_contracted_hours,
-    (SELECT COALESCE(SUM(sce.equip_count), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count,
-    (SELECT COALESCE(SUM(sce.equip_count_basic), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_basic,
-    (SELECT COALESCE(SUM(sce.equip_count_backup), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_backup
-FROM supplierscontracts sc
-LEFT JOIN suppliers s ON sc.supplier_id = s.id
-WHERE sc.project_id = $project_id AND sc.status = 1
-ORDER BY s.name";
-
-$suppliers_result = mysqli_query($conn, $suppliers_query);
+try {
+    $suppliers_rows = $gst_gate->scopedQuery(array(
+        'scope'  => array('sc' => 'supplierscontracts'),
+        'enrich' => array('s' => 'suppliers', 'sce' => 'suppliercontractequipments'),
+    ), "SELECT
+        sc.id,
+        sc.supplier_id,
+        s.name as supplier_name,
+        sc.forecasted_contracted_hours,
+        (SELECT COALESCE(SUM(sce.equip_count), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count,
+        (SELECT COALESCE(SUM(sce.equip_count_basic), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_basic,
+        (SELECT COALESCE(SUM(sce.equip_count_backup), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_backup
+    FROM supplierscontracts sc
+    LEFT JOIN suppliers s ON sc.supplier_id = s.id
+    WHERE {TENANT_SCOPE} AND sc.project_id = ? AND sc.status = 1
+    ORDER BY s.name", array($project_id));
+} catch (\Throwable $t) { $suppliers_rows = array(); }
 $suppliers = [];
 $total_supplier_hours = 0;
 $total_supplier_equipment = 0;
 $total_contract_primary = 0; // إجمالي الآليات الأساسية في العقد (المقسوم عليه للهدف العام)
 
-if ($suppliers_result) {
-    while ($row = mysqli_fetch_assoc($suppliers_result)) {
-        $equip_details_query = "SELECT
-                                        et.type as type_name,
-                                        sce.equip_type,
-                                        SUM(sce.equip_count) as total_count,
-                                        SUM(sce.equip_count_basic) as total_basic,
-                                        SUM(sce.equip_count_backup) as total_backup,
-                                        SUM(sce.equip_total_contract) as total_hours
-                                 FROM suppliercontractequipments sce
-                                 LEFT JOIN equipments_types et ON sce.equip_type = et.id
-                                 WHERE sce.contract_id = " . $row['id'] . "
-                                 GROUP BY sce.equip_type, et.type";
-        $equip_details_result = mysqli_query($conn, $equip_details_query);
+{
+    foreach ($suppliers_rows as $row) {
+        try {
+            $equip_details_rows = $gst_gate->scopedQuery(array(
+                'scope' => array('sce' => 'suppliercontractequipments'),
+            ), "SELECT
+                    et.type as type_name,
+                    sce.equip_type,
+                    SUM(sce.equip_count) as total_count,
+                    SUM(sce.equip_count_basic) as total_basic,
+                    SUM(sce.equip_count_backup) as total_backup,
+                    SUM(sce.equip_total_contract) as total_hours
+                FROM suppliercontractequipments sce
+                LEFT JOIN equipments_types et ON sce.equip_type = et.id
+                WHERE {TENANT_SCOPE} AND sce.contract_id = ?
+                GROUP BY sce.equip_type, et.type", array(intval($row['id'])));
+        } catch (\Throwable $t) { $equip_details_rows = array(); }
 
         $equipment_breakdown = [];
         $total_added_to_operations = 0;
         $contracted_type_ids = [];
 
-        if ($equip_details_result) { while ($equip = mysqli_fetch_assoc($equip_details_result)) {
+        { foreach ($equip_details_rows as $equip) {
             $equip_type_id = intval($equip['equip_type']);
             $contracted_count = intval($equip['total_count']);
             $contracted_type_ids[$equip_type_id] = true;
 
             // إصلاح العدّ المزدوج: نطابق كل عملية بـ«نوع فعّال واحد» (النوع المخزّن إن وُجد،
             // وإلا نوع المعدة الفعلي) بدل (OR) التي كانت تحسب العملية الواحدة في نوعين.
-            $added_query = "SELECT COUNT(*) as added_count
-                           FROM operations o
-                           LEFT JOIN equipments e ON o.equipment = e.id
-                           WHERE o.status = 1
-                           AND o.project_id = $project_id
-                           AND o.supplier_id = " . intval($row['supplier_id']) . "
-                           AND (CASE WHEN CAST(o.equipment_type AS UNSIGNED) > 0
-                                     THEN CAST(o.equipment_type AS UNSIGNED) ELSE e.type END) = $equip_type_id";
-            $added_result = mysqli_query($conn, $added_query);
-            $added_row = $added_result ? mysqli_fetch_assoc($added_result) : null;
-            $added_count = intval($added_row['added_count'] ?? 0);
+            try {
+                $added_rows = $gst_gate->scopedQuery(array(
+                    'scope'  => array('o' => 'operations'),
+                    'enrich' => array('e' => 'equipments'),
+                ), "SELECT COUNT(*) as added_count
+                    FROM operations o
+                    LEFT JOIN equipments e ON o.equipment = e.id
+                    WHERE {TENANT_SCOPE} AND o.status = 1
+                    AND o.project_id = ?
+                    AND o.supplier_id = ?
+                    AND (CASE WHEN CAST(o.equipment_type AS UNSIGNED) > 0
+                              THEN CAST(o.equipment_type AS UNSIGNED) ELSE e.type END) = ?",
+                    array($project_id, intval($row['supplier_id']), $equip_type_id));
+            } catch (\Throwable $t) { $added_rows = array(); }
+            $added_count = !empty($added_rows) ? intval($added_rows[0]['added_count'] ?? 0) : 0;
             $total_added_to_operations += $added_count;
 
             // لا نُصفّر المتبقي السالب — نُبقيه ليكشف التجاوز (overage موجب عند المضاف > المتعاقد).
@@ -152,28 +167,36 @@ if ($suppliers_result) {
         } }
 
         // أنواع مُضافة «خارج العقد»: تُعرض لتظهر كل المعدات المضافة للمورّد (متعاقد=0، تجاوز=المضاف).
-        $extra_query = "SELECT
-                            (CASE WHEN CAST(o.equipment_type AS UNSIGNED) > 0
-                                  THEN CAST(o.equipment_type AS UNSIGNED) ELSE e.type END) AS eff_type,
-                            COUNT(*) AS added_count
-                        FROM operations o
-                        LEFT JOIN equipments e ON o.equipment = e.id
-                        WHERE o.status = 1
-                          AND o.project_id = $project_id
-                          AND o.supplier_id = " . intval($row['supplier_id']) . "
-                        GROUP BY eff_type";
-        $extra_result = mysqli_query($conn, $extra_query);
-        if ($extra_result) {
-            while ($ex = mysqli_fetch_assoc($extra_result)) {
+        try {
+            $extra_rows = $gst_gate->scopedQuery(array(
+                'scope'  => array('o' => 'operations'),
+                'enrich' => array('e' => 'equipments'),
+            ), "SELECT
+                    (CASE WHEN CAST(o.equipment_type AS UNSIGNED) > 0
+                          THEN CAST(o.equipment_type AS UNSIGNED) ELSE e.type END) AS eff_type,
+                    COUNT(*) AS added_count
+                FROM operations o
+                LEFT JOIN equipments e ON o.equipment = e.id
+                WHERE {TENANT_SCOPE} AND o.status = 1
+                  AND o.project_id = ?
+                  AND o.supplier_id = ?
+                GROUP BY eff_type", array($project_id, intval($row['supplier_id'])));
+        } catch (\Throwable $t) { $extra_rows = array(); }
+        {
+            foreach ($extra_rows as $ex) {
                 $ex_type = intval($ex['eff_type']);
                 if ($ex_type <= 0 || isset($contracted_type_ids[$ex_type])) {
                     continue; // ضمن العقد (مُحتسب سلفاً) أو نوع غير صالح
                 }
                 $ex_added = intval($ex['added_count']);
                 $tn = '';
-                $tn_res = mysqli_query($conn, "SELECT type FROM equipments_types WHERE id = $ex_type LIMIT 1");
-                if ($tn_res && mysqli_num_rows($tn_res) > 0) {
-                    $tn = mysqli_fetch_assoc($tn_res)['type'];
+                try {
+                    $tn_row = $gst_gate->selectOne('equipments_types', array(
+                        'columns' => array('type'), 'where' => array('id' => $ex_type),
+                    ));
+                } catch (\Throwable $t) { $tn_row = null; }
+                if ($tn_row) {
+                    $tn = $tn_row['type'];
                 }
                 $total_added_to_operations += $ex_added; // يدخل في إجمالي المضاف للمورّد
                 $equipment_breakdown[] = [

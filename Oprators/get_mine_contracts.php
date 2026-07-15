@@ -15,39 +15,36 @@ $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "1
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['project_id']) || isset($_POST['mine_id']))) {
-    // support both project_id (new) and mine_id (legacy)
+    // project_id مباشرةً؛ مسار mine_id القديم ميّتٌ بنيويًّا (جدول mines أُزيل —
+    // سلوك الأصل الفعلي: فشل الاستعلام بصمت ⇒ project_id=0) ويُحفَظ حرفيًّا.
     $project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
-    if ($project_id <= 0 && isset($_POST['mine_id'])) {
-        // legacy: look up project_id from mine
-        $mine_legacy = intval($_POST['mine_id']);
-        $m_q = mysqli_query($conn, "SELECT project_id FROM mines WHERE id = $mine_legacy LIMIT 1");
-        if ($m_q && mysqli_num_rows($m_q) > 0) {
-            $project_id = intval(mysqli_fetch_assoc($m_q)['project_id']);
-        }
-    }
 
-    $contract_filter = '';
+    $contract_filter = ''; $gmc_params = array($project_id);
     if ($is_role10 && $user_contract_id > 0) {
-        $contract_filter = " AND c.id = $user_contract_id";
+        $contract_filter = " AND c.id = ?";
+        $gmc_params[] = $user_contract_id;
     }
 
-        $contracts_query = "SELECT
+    // العزل عبر البوابة (الأصل كان بلا عزل شركةٍ إطلاقًا) — السوبر عبر forAllTenants
+    $gmc_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    $gmc_gate = ($gmc_role === '-1') ? ems_tenant_db()->forAllTenants('oprators mine contracts super') : ems_tenant_db();
+    try {
+        $contracts_rows = $gmc_gate->scopedQuery(array(
+            'scope' => array('c' => 'contracts'),
+        ), "SELECT
             c.id,
             DATE_FORMAT(c.actual_start, '%Y/%m/%d') AS start_display,
             DATE_FORMAT(c.actual_end, '%Y-%m-%d') AS end_date,
             c.forecasted_contracted_hours
         FROM contracts c
-        WHERE c.project_id = $project_id AND c.status = 1$contract_filter
-        ORDER BY c.actual_start DESC";
-
-    $result = mysqli_query($conn, $contracts_query);
-
-    if (!$result) {
+        WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.status = 1$contract_filter
+        ORDER BY c.actual_start DESC", $gmc_params);
+    } catch (\Throwable $t) {
         die(json_encode(['success' => false, 'message' => 'خطأ في جلب العقود']));
     }
 
     $contracts = [];
-    while ($row = mysqli_fetch_assoc($result)) {
+    foreach ($contracts_rows as $row) {
         $display = 'عقد رقم ' . $row['id'] . ' - ' . $row['start_display'] . ' - ' . $row['forecasted_contracted_hours'] . ' ساعة';
         $contracts[] = [
             'id' => intval($row['id']),

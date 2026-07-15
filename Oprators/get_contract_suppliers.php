@@ -15,13 +15,10 @@ $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "1
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
-$current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$suppliers_has_company_id = db_table_has_column($conn, 'suppliers', 'company_id');
 
-// شرط عزل الشركة
-$supplier_company_where = (!$is_super_admin && $suppliers_has_company_id && $current_company_id > 0)
-    ? " AND s.company_id = $current_company_id"
-    : "";
+// العزل عبر البوابة (K9 · هجرة 2026-07-15) — السوبر عبر forAllTenants المسجَّل؛
+// فحص العقد كان بمعرّفٍ فقط بلا عزل شركة (تسرّبٌ كامنٌ أُغلق).
+$gcs_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract suppliers super') : ems_tenant_db();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contract_id'])) {
     $contract_id = intval($_POST['contract_id']);
@@ -30,26 +27,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contract_id'])) {
         die(json_encode(['success' => false, 'message' => 'لا توجد صلاحية لهذا العقد']));
     }
 
-    $contract_check = mysqli_query($conn, "SELECT id FROM contracts WHERE id = $contract_id AND status = 1");
-    if (!$contract_check || mysqli_num_rows($contract_check) === 0) {
+    try {
+        $contract_check = $gcs_gate->scopedQuery(array(
+            'scope' => array('c' => 'contracts'),
+        ), "SELECT c.id FROM contracts c WHERE {TENANT_SCOPE} AND c.id = ? AND c.status = 1", array($contract_id));
+    } catch (\Throwable $t) { $contract_check = array(); }
+    if (empty($contract_check)) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
 
-    $suppliers_query = "SELECT DISTINCT s.id, s.name
-                        FROM suppliers s
-                        INNER JOIN supplierscontracts sc ON sc.supplier_id = s.id
-                        WHERE sc.project_contract_id = $contract_id AND s.status = 1
-                        $supplier_company_where
-                        ORDER BY s.name ASC";
-
-    $result = mysqli_query($conn, $suppliers_query);
-
-    if (!$result) {
+    try {
+        $suppliers_rows = $gcs_gate->scopedQuery(array(
+            'scope' => array('s' => 'suppliers', 'sc' => 'supplierscontracts'),
+        ), "SELECT DISTINCT s.id, s.name
+            FROM suppliers s
+            INNER JOIN supplierscontracts sc ON sc.supplier_id = s.id
+            WHERE {TENANT_SCOPE} AND sc.project_contract_id = ? AND s.status = 1
+            ORDER BY s.name ASC", array($contract_id));
+    } catch (\Throwable $t) {
         die(json_encode(['success' => false, 'message' => 'خطأ في جلب الموردين']));
     }
 
     $suppliers = [];
-    while ($row = mysqli_fetch_assoc($result)) {
+    foreach ($suppliers_rows as $row) {
         $suppliers[] = [
             'id' => intval($row['id']),
             'name' => $row['name']

@@ -239,102 +239,55 @@ include("../insidebar.php");
         $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
         $user_project_id = $is_role10 ? intval($_SESSION['user']['project_id'] ?? 0) : 0;
 
-        $project_scope_sql = '1=1';
-        $project_has_company_id = function_exists('db_table_has_column') ? db_table_has_column($conn, 'project', 'company_id') : false;
+        // العزل عبر البوابة (K9 · هجرة 2026-07-15): كشف الأعمدة أُسقط — الأعمدة
+        // الفعلية مقيسة (project.company_id/operations.project_id/contracts.project_id
+        // موجودة؛ بنية mines أُزيلت من النظام فعدّادها صفرٌ دائمًا كسلوك الأصل الفعلي).
+        $sp_gate = ems_tenant_db();
+        $sp_failed = false;
+        $sp_rows = array();
         if ($company_id > 0) {
-            if ($project_has_company_id) {
-                $project_scope_sql .= " AND p.company_id = $company_id";
-            } else {
-                $project_client_column = (function_exists('db_table_has_column') && db_table_has_column($conn, 'project', 'client_id'))
-                    ? 'client_id'
-                    : 'company_client_id';
-                $project_scope_sql .= " AND (
-                    EXISTS (SELECT 1 FROM users su WHERE su.id = p.created_by AND su.company_id = $company_id)
-                    OR EXISTS (
-                        SELECT 1
-                        FROM clients sc
-                        INNER JOIN users scu ON scu.id = sc.created_by
-                        WHERE sc.id = p.$project_client_column AND scu.company_id = $company_id
-                    )
-                )";
+            $sp_extra = ''; $sp_params = array();
+            if ($is_role10 && $user_project_id > 0) {
+                $sp_extra = " AND p.id = ?";
+                $sp_params[] = $user_project_id;
             }
-        } else {
-            // بدون company_id في الجلسة لا نعرض أي مشاريع لمنع تسرب بيانات بين الشركات
-            $project_scope_sql .= ' AND 0 = 1';
-        }
-        if ($is_role10 && $user_project_id > 0) {
-            $project_scope_sql .= " AND p.id = $user_project_id";
-        }
-
-        $query = "SELECT p.id, p.name, p.project_code, p.location
-                  FROM project p
-                  WHERE p.status = 1 AND $project_scope_sql
-                  ORDER BY p.name ASC";
-
-        $result = mysqli_query($conn, $query);
-
-        $has_mines_project_id_col = function_exists('db_table_has_column') ? db_table_has_column($conn, 'mines', 'project_id') : false;
-        $operations_project_col = null;
-        if (function_exists('db_table_has_column')) {
-            if (db_table_has_column($conn, 'operations', 'project_id')) {
-                $operations_project_col = 'project_id';
-            } elseif (db_table_has_column($conn, 'operations', 'project')) {
-                $operations_project_col = 'project';
+            try {
+                $sp_rows = $sp_gate->scopedQuery(array(
+                    'scope' => array('p' => 'project'),
+                ), "SELECT p.id, p.name, p.project_code, p.location
+                    FROM project p
+                    WHERE {TENANT_SCOPE} AND p.status = 1$sp_extra
+                    ORDER BY p.name ASC", $sp_params);
+            } catch (\Throwable $t) {
+                $sp_failed = true;
             }
         }
+        // بدون company_id في الجلسة لا نعرض أي مشاريع لمنع تسرب بيانات بين الشركات
 
-        $contracts_project_col = null;
-        $contracts_has_mine_id = function_exists('db_table_has_column') ? db_table_has_column($conn, 'contracts', 'mine_id') : false;
-        if (function_exists('db_table_has_column')) {
-            if (db_table_has_column($conn, 'contracts', 'project_id')) {
-                $contracts_project_col = 'project_id';
-            } elseif (db_table_has_column($conn, 'contracts', 'project')) {
-                $contracts_project_col = 'project';
-            }
-        }
-
-        if ($result && mysqli_num_rows($result) > 0) {
-            while ($project = mysqli_fetch_assoc($result)) {
+        if (!empty($sp_rows)) {
+            foreach ($sp_rows as $project) {
                 $project_id = intval($project['id']);
                 $project_name = htmlspecialchars($project['name']);
                 $project_code = htmlspecialchars($project['project_code']);
                 $location = htmlspecialchars($project['location']);
 
-                $mines_count = 0;
-                if ($has_mines_project_id_col) {
-                    $mines_q = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM mines WHERE project_id = $project_id AND status = 1");
-                    if ($mines_q) {
-                        $mines_row = mysqli_fetch_assoc($mines_q);
-                        $mines_count = intval($mines_row['cnt'] ?? 0);
-                    }
-                }
+                $mines_count = 0; // بنية المناجم أُزيلت — سلوك الأصل الفعلي: صفر دائمًا
 
                 $operations_count = 0;
-                if (!empty($operations_project_col)) {
-                    $operations_q = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM operations WHERE $operations_project_col = $project_id AND status = 1");
-                    if ($operations_q) {
-                        $operations_row = mysqli_fetch_assoc($operations_q);
-                        $operations_count = intval($operations_row['cnt'] ?? 0);
-                    }
-                }
+                try {
+                    $op_rows = $sp_gate->scopedQuery(array(
+                        'scope' => array('operations' => 'operations'),
+                    ), "SELECT COUNT(*) AS cnt FROM operations WHERE {TENANT_SCOPE} AND project_id = ? AND status = 1", array($project_id));
+                    $operations_count = !empty($op_rows) ? intval($op_rows[0]['cnt'] ?? 0) : 0;
+                } catch (\Throwable $t) {}
 
                 $contracts_count = 0;
-                if (!empty($contracts_project_col)) {
-                    $contracts_q = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM contracts WHERE $contracts_project_col = $project_id AND status = 1");
-                    if ($contracts_q) {
-                        $contracts_row = mysqli_fetch_assoc($contracts_q);
-                        $contracts_count = intval($contracts_row['cnt'] ?? 0);
-                    }
-                } elseif ($contracts_has_mine_id && $has_mines_project_id_col) {
-                    $contracts_q = mysqli_query($conn, "SELECT COUNT(*) AS cnt
-                                                      FROM contracts c
-                                                      INNER JOIN mines m ON c.mine_id = m.id
-                                                      WHERE m.project_id = $project_id AND c.status = 1");
-                    if ($contracts_q) {
-                        $contracts_row = mysqli_fetch_assoc($contracts_q);
-                        $contracts_count = intval($contracts_row['cnt'] ?? 0);
-                    }
-                }
+                try {
+                    $ct_rows = $sp_gate->scopedQuery(array(
+                        'scope' => array('contracts' => 'contracts'),
+                    ), "SELECT COUNT(*) AS cnt FROM contracts WHERE {TENANT_SCOPE} AND project_id = ? AND status = 1", array($project_id));
+                    $contracts_count = !empty($ct_rows) ? intval($ct_rows[0]['cnt'] ?? 0) : 0;
+                } catch (\Throwable $t) {}
 
                 echo '<a href="oprators.php?project_id=' . $project_id . '" class="project-card">';
                 echo '  <div class="project-icon">';
@@ -376,18 +329,16 @@ include("../insidebar.php");
                 echo '          <div class="stat-label">عقود نشطة</div>';
                 echo '      </div>';
 
-                // حساب عدد المعدات المشغلة
+                // حساب عدد المعدات المشغلة (العزل عبر البوابة)
                 $equip_count = 0;
-                if (!empty($operations_project_col)) {
-                    $equip_query = "SELECT COUNT(DISTINCT equipment) AS equip_count
-                                   FROM operations
-                                   WHERE $operations_project_col = $project_id AND status = 1";
-                    $equip_result = mysqli_query($conn, $equip_query);
-                    if ($equip_result) {
-                        $equip_row = mysqli_fetch_assoc($equip_result);
-                        $equip_count = intval($equip_row['equip_count'] ?? 0);
-                    }
-                }
+                try {
+                    $eqc_rows = $sp_gate->scopedQuery(array(
+                        'scope' => array('operations' => 'operations'),
+                    ), "SELECT COUNT(DISTINCT equipment) AS equip_count
+                        FROM operations
+                        WHERE {TENANT_SCOPE} AND project_id = ? AND status = 1", array($project_id));
+                    $equip_count = !empty($eqc_rows) ? intval($eqc_rows[0]['equip_count'] ?? 0) : 0;
+                } catch (\Throwable $t) {}
 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $equip_count . '</div>';
@@ -400,7 +351,7 @@ include("../insidebar.php");
         } else {
             echo '<div class="no-projects">';
             echo '  <i class="fas fa-folder-open"></i>';
-            if (!$result) {
+            if ($sp_failed) {
                 echo '  <p>تعذر تحميل المشاريع حالياً. يرجى مراجعة إعدادات قاعدة البيانات.</p>';
             } else {
                 echo '  <p>لا توجد مشاريع متاحة حالياً</p>';
