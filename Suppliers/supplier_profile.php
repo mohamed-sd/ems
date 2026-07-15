@@ -23,30 +23,22 @@ if ($supplier_id <= 0) {
     exit();
 }
 
-$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
-$supplierscontracts_has_company = db_table_has_column($conn, 'supplierscontracts', 'company_id');
-$suppliers_has_is_deleted = db_table_has_column($conn, 'suppliers', 'is_deleted');
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشف الأعمدة أُسقط (مضمونة
+// بالسجل)، والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق شركة).
+$spf_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier profile super') : ems_tenant_db();
 
-$scope = "s.id = $supplier_id";
-if (!$is_super_admin && $suppliers_has_company) {
-    $scope .= " AND s.company_id = $company_id";
-}
-if ($suppliers_has_is_deleted) {
-    $scope .= " AND COALESCE(s.is_deleted,0)=0";
-}
-
-$supplier_query = "SELECT s.* FROM suppliers s WHERE $scope LIMIT 1";
-$supplier_result = mysqli_query($conn, $supplier_query);
-$supplier = ($supplier_result && mysqli_num_rows($supplier_result) > 0) ? mysqli_fetch_assoc($supplier_result) : null;
+try {
+    $supplier_rows = $spf_gate->scopedQuery(array(
+        'scope' => array('s' => 'suppliers'),
+    ), "SELECT s.* FROM suppliers s
+        WHERE {TENANT_SCOPE} AND s.id = ? AND COALESCE(s.is_deleted,0)=0
+        LIMIT 1", array($supplier_id));
+} catch (\Throwable $t) { $supplier_rows = array(); }
+$supplier = !empty($supplier_rows) ? $supplier_rows[0] : null;
 
 if (!$supplier) {
     header("Location: suppliers.php?msg=المورد+غير+موجود+او+خارج+نطاق+الشركة+❌");
     exit();
-}
-
-$contracts_scope = "sc.supplier_id = $supplier_id";
-if (!$is_super_admin && $supplierscontracts_has_company) {
-    $contracts_scope .= " AND sc.company_id = $company_id";
 }
 
 $equipments_count = 0;
@@ -56,61 +48,68 @@ $projects_count = 0;
 $total_hours = 0;
 $timesheet_hours = 0;
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM equipments e WHERE e.suppliers = $supplier_id");
-if ($r) {
-    $equipments_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$spf_agg = function (array $decl, $sql, array $params) use ($spf_gate) {
+    try {
+        $rows = $spf_gate->scopedQuery($decl, $sql, $params);
+        return !empty($rows) ? $rows[0]['c'] : 0;
+    } catch (\Throwable $t) {
+        return 0;
+    }
+};
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM supplierscontracts sc WHERE $contracts_scope");
-if ($r) {
-    $contracts_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$equipments_count = intval($spf_agg(array('scope' => array('e' => 'equipments')),
+    "SELECT COUNT(*) AS c FROM equipments e WHERE {TENANT_SCOPE} AND e.suppliers = ?", array($supplier_id)));
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM supplierscontracts sc WHERE $contracts_scope AND sc.status = 1");
-if ($r) {
-    $active_contracts = intval(mysqli_fetch_assoc($r)['c']);
-}
+$contracts_count = intval($spf_agg(array('scope' => array('sc' => 'supplierscontracts')),
+    "SELECT COUNT(*) AS c FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.supplier_id = ?", array($supplier_id)));
 
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT sc.project_id) AS c FROM supplierscontracts sc WHERE $contracts_scope");
-if ($r) {
-    $projects_count = intval(mysqli_fetch_assoc($r)['c']);
-}
+$active_contracts = intval($spf_agg(array('scope' => array('sc' => 'supplierscontracts')),
+    "SELECT COUNT(*) AS c FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.supplier_id = ? AND sc.status = 1", array($supplier_id)));
 
-$r = mysqli_query($conn, "SELECT IFNULL(SUM(sc.forecasted_contracted_hours),0) AS c FROM supplierscontracts sc WHERE $contracts_scope");
-if ($r) {
-    $total_hours = floatval(mysqli_fetch_assoc($r)['c']);
-}
+$projects_count = intval($spf_agg(array('scope' => array('sc' => 'supplierscontracts')),
+    "SELECT COUNT(DISTINCT sc.project_id) AS c FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.supplier_id = ?", array($supplier_id)));
 
-$r = mysqli_query($conn, "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours),0) AS c
-                         FROM timesheet t
-                         INNER JOIN operations o ON o.id = t.operator
-                         INNER JOIN equipments e ON e.id = o.equipment
-                         WHERE e.suppliers = $supplier_id AND t.status = 1");
-if ($r) {
-    $timesheet_hours = floatval(mysqli_fetch_assoc($r)['c']);
-}
+$total_hours = floatval($spf_agg(array('scope' => array('sc' => 'supplierscontracts')),
+    "SELECT IFNULL(SUM(sc.forecasted_contracted_hours),0) AS c FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.supplier_id = ?", array($supplier_id)));
 
-$equipments_breakdown = mysqli_query($conn, "SELECT
-                                e.id,
-                                e.name,
-                                e.code,
-                                IFNULL(SUM(t.operator_hours + t.operator_standby_hours),0) AS hours_sum,
-                                COUNT(DISTINCT o.project_id) AS projects_count
-                             FROM equipments e
-                             LEFT JOIN operations o ON o.equipment = e.id
-                             LEFT JOIN timesheet t ON t.operator = o.id AND t.status = 1
-                             WHERE e.suppliers = $supplier_id
-                             GROUP BY e.id, e.name, e.code
-                             ORDER BY hours_sum DESC
-                             LIMIT 10");
+$timesheet_hours = floatval($spf_agg(array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments')),
+    "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours),0) AS c
+     FROM timesheet t
+     INNER JOIN operations o ON o.id = t.operator
+     INNER JOIN equipments e ON e.id = o.equipment
+     WHERE {TENANT_SCOPE} AND e.suppliers = ? AND t.status = 1", array($supplier_id)));
 
-$contracts_list = mysqli_query($conn, "SELECT sc.id, sc.contract_signing_date, sc.actual_end, sc.status, sc.hours_monthly_target, sc.forecasted_contracted_hours,
-                                        p.name AS project_name
-                                       FROM supplierscontracts sc
-                                       LEFT JOIN project p ON p.id = sc.project_id
-                                       WHERE $contracts_scope
-                                       ORDER BY sc.id DESC
-                                       LIMIT 10");
+try {
+    $equipments_breakdown = $spf_gate->scopedQuery(array(
+        'scope'  => array('e' => 'equipments'),
+        'enrich' => array('o' => 'operations', 't' => 'timesheet'),
+    ), "SELECT
+            e.id,
+            e.name,
+            e.code,
+            IFNULL(SUM(t.operator_hours + t.operator_standby_hours),0) AS hours_sum,
+            COUNT(DISTINCT o.project_id) AS projects_count
+        FROM equipments e
+        LEFT JOIN operations o ON o.equipment = e.id
+        LEFT JOIN timesheet t ON t.operator = o.id AND t.status = 1
+        WHERE {TENANT_SCOPE} AND e.suppliers = ?
+        GROUP BY e.id, e.name, e.code
+        ORDER BY hours_sum DESC
+        LIMIT 10", array($supplier_id));
+} catch (\Throwable $t) { $equipments_breakdown = array(); }
+
+try {
+    $contracts_list = $spf_gate->scopedQuery(array(
+        'scope'  => array('sc' => 'supplierscontracts'),
+        'enrich' => array('p' => 'project'), // اسم المشروع — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT sc.id, sc.contract_signing_date, sc.actual_end, sc.status, sc.hours_monthly_target, sc.forecasted_contracted_hours,
+            p.name AS project_name
+        FROM supplierscontracts sc
+        LEFT JOIN project p ON p.id = sc.project_id
+        WHERE {TENANT_SCOPE} AND sc.supplier_id = ?
+        ORDER BY sc.id DESC
+        LIMIT 10", array($supplier_id));
+} catch (\Throwable $t) { $contracts_list = array(); }
 
 $page_title = 'إيكوبيشن | بطاقة المورد';
 include '../inheader.php';
@@ -161,14 +160,14 @@ include '../insidebar.php';
             <table id="supplierEquipmentsTable" class="display" style="width:100%;">
                 <thead><tr><th>المعدة</th><th>الكود</th><th>عدد المشاريع</th><th>الساعات</th></tr></thead>
                 <tbody>
-                    <?php if ($equipments_breakdown): while ($row = mysqli_fetch_assoc($equipments_breakdown)): ?>
+                    <?php foreach ($equipments_breakdown as $row): ?>
                         <tr>
                             <td><a href="../Equipments/equipment_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
                             <td><?php echo htmlspecialchars($row['code']); ?></td>
                             <td><?php echo intval($row['projects_count']); ?></td>
                             <td><?php echo number_format($row['hours_sum'], 0); ?></td>
                         </tr>
-                    <?php endwhile; endif; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -180,7 +179,7 @@ include '../insidebar.php';
             <table id="supplierContractsTable" class="display" style="width:100%;">
                 <thead><tr><th>المشروع</th><th>تاريخ التوقيع</th><th>مستهدف شهري</th><th>إجمالي ساعات</th><th>الحالة</th></tr></thead>
                 <tbody>
-                    <?php if ($contracts_list): while ($row = mysqli_fetch_assoc($contracts_list)): ?>
+                    <?php foreach ($contracts_list as $row): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($row['project_name'] ?: 'غير محدد'); ?></td>
                             <td><?php echo htmlspecialchars($row['contract_signing_date']); ?></td>
@@ -188,7 +187,7 @@ include '../insidebar.php';
                             <td><?php echo number_format($row['forecasted_contracted_hours']); ?></td>
                             <td><?php echo (intval($row['status']) === 1) ? 'ساري' : 'منتهي'; ?></td>
                         </tr>
-                    <?php endwhile; endif; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

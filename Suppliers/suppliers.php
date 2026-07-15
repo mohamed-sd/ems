@@ -17,69 +17,12 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// فحص أعمدة الجداول
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15)
+// كشفُ الأعمدة والـDDL وقت التشغيل أُسقطا (أعمدة العزل والحذف الناعم مضمونة
+// بالترحيلات والسجل)؛ بُناة شروط النطاق البديلة زالت — {TENANT_SCOPE} والبوابة
+// مسؤولا النطاق، والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 // ══════════════════════════════════════════════════════════════════════════════
-$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
-$supplierscontracts_has_company = db_table_has_column($conn, 'supplierscontracts', 'company_id');
-
-$suppliers_has_is_deleted = db_table_has_column($conn, 'suppliers', 'is_deleted');
-$suppliers_has_deleted_at = db_table_has_column($conn, 'suppliers', 'deleted_at');
-$suppliers_has_deleted_by = db_table_has_column($conn, 'suppliers', 'deleted_by');
-
-if (!$suppliers_has_is_deleted) {
-    ems_runtime_ddl($conn, "ALTER TABLE suppliers ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0", 'Suppliers/suppliers.php');
-}
-if (!$suppliers_has_deleted_at) {
-    ems_runtime_ddl($conn, "ALTER TABLE suppliers ADD COLUMN deleted_at DATETIME NULL", 'Suppliers/suppliers.php');
-}
-if (!$suppliers_has_deleted_by) {
-    ems_runtime_ddl($conn, "ALTER TABLE suppliers ADD COLUMN deleted_by INT NULL", 'Suppliers/suppliers.php');
-}
-
-$suppliers_has_is_deleted = db_table_has_column($conn, 'suppliers', 'is_deleted');
-$suppliers_not_deleted_sql = $suppliers_has_is_deleted ? "COALESCE(is_deleted,0)=0" : "1=1";
-$suppliers_not_deleted_s_sql = str_replace('is_deleted', 's.is_deleted', $suppliers_not_deleted_sql);
-
-$supplier_scope_list_sql = "1=1";
-if (!$is_super_admin) {
-    if ($suppliers_has_company) {
-        $supplier_scope_list_sql = "s.company_id = $company_id";
-    } else {
-        $supplier_scope_list_sql = "EXISTS (
-            SELECT 1
-            FROM supplierscontracts ssc
-            INNER JOIN project sp ON sp.id = ssc.project_id
-            INNER JOIN users su ON su.id = sp.created_by
-            WHERE ssc.supplier_id = s.id
-              AND su.company_id = $company_id
-        )";
-    }
-}
-
-// بناء أعمدة وقيم INSERT الخاصة بنطاق الشركة
-$supplier_scope_insert_col = (!$is_super_admin && $suppliers_has_company)
-    ? ", company_id"
-    : "";
-$supplier_scope_insert_val = (!$is_super_admin && $suppliers_has_company)
-    ? ", '$company_id'"
-    : "";
-
-// بناء شرط WHERE الخاص بنطاق الشركة للتحديث والحذف
-$supplier_scope_update_where = "id = %d AND $suppliers_not_deleted_sql";
-if (!$is_super_admin) {
-    if ($suppliers_has_company) {
-        $supplier_scope_update_where .= " AND company_id = $company_id";
-    } else {
-        $supplier_scope_update_where .= " AND EXISTS (
-            SELECT 1
-            FROM supplierscontracts ssc
-            INNER JOIN project sp ON sp.id = ssc.project_id
-            INNER JOIN users su ON su.id = sp.created_by
-            WHERE ssc.supplier_id = suppliers.id
-              AND su.company_id = $company_id
-        )";
-    }
-}
+$sup_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('suppliers screen super') : ems_tenant_db();
 
 // ══════════════════════════════════════════════════════════════════════════════
 // 🔐 التحقق من صلاحيات المستخدم
@@ -113,45 +56,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         exit();
     }
 
-    // ── المعلومات الأساسية ────────────────────────────────────────────────────
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $supplier_code = mysqli_real_escape_string($conn, trim($_POST['supplier_code']));
-    $supplier_type = mysqli_real_escape_string($conn, $_POST['supplier_type']);
-    $dealing_nature = mysqli_real_escape_string($conn, $_POST['dealing_nature']);
+    // ── القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي) ──────────
+    $name = trim($_POST['name']);
+    $supplier_code = trim($_POST['supplier_code']);
+    $supplier_type = $_POST['supplier_type'];
+    $dealing_nature = $_POST['dealing_nature'];
     $equipment_types = isset($_POST['equipment_types']) ? implode(', ', $_POST['equipment_types']) : '';
-    $equipment_types = mysqli_real_escape_string($conn, $equipment_types);
 
     // ── البيانات القانونية ────────────────────────────────────────────────────
-    $commercial_registration = mysqli_real_escape_string($conn, trim($_POST['commercial_registration']));
-    $identity_type = mysqli_real_escape_string($conn, $_POST['identity_type']);
-    $identity_number = mysqli_real_escape_string($conn, trim($_POST['identity_number']));
-    $identity_expiry_date = !empty($_POST['identity_expiry_date'])
-        ? mysqli_real_escape_string($conn, $_POST['identity_expiry_date'])
-        : null;
+    $commercial_registration = trim($_POST['commercial_registration']);
+    $identity_type = $_POST['identity_type'];
+    $identity_number = trim($_POST['identity_number']);
+    $identity_expiry_date = !empty($_POST['identity_expiry_date']) ? $_POST['identity_expiry_date'] : null;
 
     // ── البيانات التواصلية ────────────────────────────────────────────────────
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $phone_alternative = mysqli_real_escape_string($conn, trim($_POST['phone_alternative']));
-    $full_address = mysqli_real_escape_string($conn, trim($_POST['full_address']));
-    $contact_person_name = mysqli_real_escape_string($conn, trim($_POST['contact_person_name']));
-    $contact_person_phone = mysqli_real_escape_string($conn, trim($_POST['contact_person_phone']));
-    $financial_registration_status = mysqli_real_escape_string($conn, $_POST['financial_registration_status']);
-    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
+    $phone_alternative = trim($_POST['phone_alternative']);
+    $full_address = trim($_POST['full_address']);
+    $contact_person_name = trim($_POST['contact_person_name']);
+    $contact_person_phone = trim($_POST['contact_person_phone']);
+    $financial_registration_status = $_POST['financial_registration_status'];
+    $status = $_POST['status'];
 
     if ($supplier_code !== '') {
-        $duplicate_query = "SELECT s.id
-                            FROM suppliers s
-                            WHERE s.supplier_code = '$supplier_code'
-                              AND $suppliers_not_deleted_s_sql
-                              AND $supplier_scope_list_sql";
-        if ($id > 0) {
-            $duplicate_query .= " AND s.id != $id";
-        }
-        $duplicate_query .= " LIMIT 1";
-
-        $duplicate_result = mysqli_query($conn, $duplicate_query);
-        if ($duplicate_result && mysqli_num_rows($duplicate_result) > 0) {
+        $dup_extra = ''; $dup_params = array($supplier_code);
+        if ($id > 0) { $dup_extra = " AND s.id != ?"; $dup_params[] = $id; }
+        try {
+            $duplicate_rows = $sup_gate->scopedQuery(array(
+                'scope' => array('s' => 'suppliers'),
+            ), "SELECT s.id FROM suppliers s
+                WHERE {TENANT_SCOPE} AND s.supplier_code = ? AND COALESCE(s.is_deleted,0)=0$dup_extra
+                LIMIT 1", $dup_params);
+        } catch (\Throwable $t) { $duplicate_rows = array(); }
+        if (!empty($duplicate_rows)) {
             $error_msg = ($id > 0)
                 ? "كود+المورد+موجود+مسبقاً+داخل+الشركة+❌"
                 : "لا+يمكن+إضافة+مورد+بنفس+الكود+داخل+الشركة+❌";
@@ -160,46 +98,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         }
     }
 
-    $identity_expiry_sql = $identity_expiry_date ? "'$identity_expiry_date'" : "NULL";
+    $supplier_fields = array(
+        'name'                          => $name,
+        'supplier_code'                 => $supplier_code,
+        'supplier_type'                 => $supplier_type,
+        'dealing_nature'                => $dealing_nature,
+        'equipment_types'               => $equipment_types,
+        'commercial_registration'       => $commercial_registration,
+        'identity_type'                 => $identity_type,
+        'identity_number'               => $identity_number,
+        'identity_expiry_date'          => $identity_expiry_date,
+        'email'                         => $email,
+        'phone'                         => $phone,
+        'phone_alternative'             => $phone_alternative,
+        'full_address'                  => $full_address,
+        'contact_person_name'           => $contact_person_name,
+        'contact_person_phone'          => $contact_person_phone,
+        'financial_registration_status' => $financial_registration_status,
+        'status'                        => $status,
+    );
 
     if ($id > 0) {
-        // ── تحديث مورد موجود ──────────────────────────────────────────────────
-        $scope_where = sprintf($supplier_scope_update_where, $id);
-        $sql = "UPDATE suppliers SET
-            name                         = '$name',
-            supplier_code                = '$supplier_code',
-            supplier_type                = '$supplier_type',
-            dealing_nature               = '$dealing_nature',
-            equipment_types              = '$equipment_types',
-            commercial_registration      = '$commercial_registration',
-            identity_type                = '$identity_type',
-            identity_number              = '$identity_number',
-            identity_expiry_date         = $identity_expiry_sql,
-            email                        = '$email',
-            phone                        = '$phone',
-            phone_alternative            = '$phone_alternative',
-            full_address                 = '$full_address',
-            contact_person_name          = '$contact_person_name',
-            contact_person_phone         = '$contact_person_phone',
-            financial_registration_status = '$financial_registration_status',
-            status                       = '$status'
-            WHERE $scope_where";
-        mysqli_query($conn, $sql);
+        // ── تحديث مورد موجود (النطاق + عدم الحذف عبر البوابة) ────────────────
+        try {
+            $sup_gate->update('suppliers', $supplier_fields, array('id' => $id), 'COALESCE(is_deleted,0)=0');
+        } catch (\Throwable $t) {
+            error_log('suppliers.php update failed: ' . $t->getMessage());
+        }
         header("Location: suppliers.php?msg=تم+تعديل+المورد+بنجاح+✅");
         exit;
     } else {
-        // ── إضافة مورد جديد ───────────────────────────────────────────────────
-        $sql = "INSERT INTO suppliers
-            (name, supplier_code, supplier_type, dealing_nature, equipment_types,
-             commercial_registration, identity_type, identity_number, identity_expiry_date,
-             email, phone, phone_alternative, full_address, contact_person_name,
-             contact_person_phone, financial_registration_status, status$supplier_scope_insert_col)
-            VALUES
-            ('$name', '$supplier_code', '$supplier_type', '$dealing_nature', '$equipment_types',
-             '$commercial_registration', '$identity_type', '$identity_number', $identity_expiry_sql,
-             '$email', '$phone', '$phone_alternative', '$full_address', '$contact_person_name',
-             '$contact_person_phone', '$financial_registration_status', '$status'$supplier_scope_insert_val)";
-        mysqli_query($conn, $sql);
+        // ── إضافة مورد جديد (company_id تحقنه البوابة) ────────────────────────
+        try {
+            $sup_gate->insert('suppliers', $supplier_fields);
+        } catch (\Throwable $t) {
+            error_log('suppliers.php insert failed: ' . $t->getMessage());
+        }
         header("Location: suppliers.php?msg=تمت+إضافة+المورد+بنجاح+✅");
         exit;
     }
@@ -218,38 +152,42 @@ if (isset($_GET['delete_id'])) {
         exit();
     }
 
-    // التحقق من أن المورد تابع لشركة المستخدم
-    $scope_where = sprintf($supplier_scope_update_where, $delete_id);
-    $scope_check_query = "SELECT id FROM suppliers WHERE $scope_where LIMIT 1";
-    $scope_check_result = mysqli_query($conn, $scope_check_query);
-    if (!$scope_check_result || mysqli_num_rows($scope_check_result) === 0) {
+    // التحقق من أن المورد تابع لشركة المستخدم (العزل عبر البوابة)
+    try {
+        $scope_check = $sup_gate->selectOne('suppliers', array(
+            'columns' => array('id'), 'where' => array('id' => $delete_id),
+        ));
+    } catch (\Throwable $t) { $scope_check = null; }
+    if (!$scope_check) {
         header("Location: suppliers.php?msg=لا+يمكن+حذف+مورد+لا+يتبع+لشركتك+❌");
         exit();
     }
 
-    // التحقق من وجود معدات أو عقود مرتبطة
-    $check_equip = mysqli_query($conn, "SELECT COUNT(*) as count FROM equipments WHERE suppliers = $delete_id");
-    $equip_count = $check_equip ? (mysqli_fetch_assoc($check_equip)['count'] ?? 0) : 0;
-
-    $check_contracts = mysqli_query($conn, "SELECT COUNT(*) as count FROM supplierscontracts WHERE supplier_id = $delete_id");
-    $contracts_count = $check_contracts ? (mysqli_fetch_assoc($check_contracts)['count'] ?? 0) : 0;
+    // التحقق من وجود معدات أو عقود مرتبطة (count عبر البوابة)
+    try {
+        $equip_count = $sup_gate->count('equipments', array('where' => array('suppliers' => $delete_id)));
+    } catch (\Throwable $t) { $equip_count = 0; }
+    try {
+        $contracts_count = $sup_gate->count('supplierscontracts', array('where' => array('supplier_id' => $delete_id)));
+    } catch (\Throwable $t) { $contracts_count = 0; }
 
     if ($equip_count > 0 || $contracts_count > 0) {
         header("Location: suppliers.php?msg=لا+يمكن+حذف+المورد+لأنه+مرتبط+بمعدات+أو+عقود+موجودة+❌");
         exit();
     }
 
-    $delete_query = "UPDATE suppliers
-                     SET is_deleted = 1,
-                         deleted_at = NOW(),
-                         deleted_by = $current_user_id,
-                         status = 0,
-                         updated_at = NOW()
-                     WHERE $scope_where";
-    if (mysqli_query($conn, $delete_query)) {
+    // الحذف الناعم مع تعطيل الحالة (سلوك الأصل: status=0 + updated_at + ثلاثية الحذف)
+    try {
+        $sup_gate->update('suppliers', array(
+            'is_deleted' => 1,
+            'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_by' => $current_user_id,
+            'status'     => 0,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ), array('id' => $delete_id), 'COALESCE(is_deleted,0)=0');
         header("Location: suppliers.php?msg=تم+حذف+المورد+بنجاح+✅");
         exit();
-    } else {
+    } catch (\Throwable $t) {
         header("Location: suppliers.php?msg=حدث+خطأ+أثناء+الحذف+❌");
         exit();
     }
@@ -265,39 +203,39 @@ $suppliers_with_contracts_count = 0;
 $suppliers_contracts_total = 0;
 $suppliers_hours_total = 0;
 
-$supplier_scope_stats_sql = $supplier_scope_list_sql;
 $supplier_status_active_sql = "(s.status = 1 OR s.status = '1' OR TRIM(s.status) = 'نشط' OR TRIM(LOWER(s.status)) = 'active' OR TRIM(LOWER(s.status)) = 'true')";
 
-$suppliers_stats_query = "SELECT
-    COUNT(*) AS total_suppliers,
-    SUM(CASE WHEN $supplier_status_active_sql THEN 1 ELSE 0 END) AS active_suppliers
-  FROM suppliers s
-  WHERE $supplier_scope_stats_sql AND ($suppliers_not_deleted_s_sql)";
-$suppliers_stats_result = mysqli_query($conn, $suppliers_stats_query);
-if ($suppliers_stats_result && ($suppliers_stats_row = mysqli_fetch_assoc($suppliers_stats_result))) {
-    $suppliers_total_count = intval($suppliers_stats_row['total_suppliers']);
-    $suppliers_active_count = intval($suppliers_stats_row['active_suppliers']);
+try {
+    $stats_rows = $sup_gate->scopedQuery(array(
+        'scope' => array('s' => 'suppliers'),
+    ), "SELECT
+        COUNT(*) AS total_suppliers,
+        SUM(CASE WHEN $supplier_status_active_sql THEN 1 ELSE 0 END) AS active_suppliers
+      FROM suppliers s
+      WHERE {TENANT_SCOPE} AND (COALESCE(s.is_deleted,0)=0)");
+} catch (\Throwable $t) { $stats_rows = array(); }
+if (!empty($stats_rows)) {
+    $suppliers_total_count = intval($stats_rows[0]['total_suppliers']);
+    $suppliers_active_count = intval($stats_rows[0]['active_suppliers']);
 }
 $suppliers_inactive_count = max(0, $suppliers_total_count - $suppliers_active_count);
 
-$suppliers_contracts_scope = (!$is_super_admin && $supplierscontracts_has_company)
-    ? "ssc.company_id = $company_id"
-    : "1=1";
-
-$suppliers_contracts_stats_query = "SELECT
-    COUNT(*) AS total_contracts,
-    COUNT(DISTINCT ssc.supplier_id) AS suppliers_with_contracts,
-    COALESCE(SUM(ssc.forecasted_contracted_hours), 0) AS total_contracted_hours
-  FROM supplierscontracts ssc
-  INNER JOIN suppliers s ON s.id = ssc.supplier_id
-  WHERE $suppliers_contracts_scope
-    AND $supplier_scope_stats_sql
-    AND ($suppliers_not_deleted_s_sql)";
-$suppliers_contracts_stats_result = mysqli_query($conn, $suppliers_contracts_stats_query);
-if ($suppliers_contracts_stats_result && ($suppliers_contracts_stats_row = mysqli_fetch_assoc($suppliers_contracts_stats_result))) {
-    $suppliers_contracts_total = intval($suppliers_contracts_stats_row['total_contracts']);
-    $suppliers_with_contracts_count = intval($suppliers_contracts_stats_row['suppliers_with_contracts']);
-    $suppliers_hours_total = floatval($suppliers_contracts_stats_row['total_contracted_hours']);
+try {
+    $cstats_rows = $sup_gate->scopedQuery(array(
+        'scope' => array('ssc' => 'supplierscontracts', 's' => 'suppliers'),
+    ), "SELECT
+        COUNT(*) AS total_contracts,
+        COUNT(DISTINCT ssc.supplier_id) AS suppliers_with_contracts,
+        COALESCE(SUM(ssc.forecasted_contracted_hours), 0) AS total_contracted_hours
+      FROM supplierscontracts ssc
+      INNER JOIN suppliers s ON s.id = ssc.supplier_id
+      WHERE {TENANT_SCOPE}
+        AND (COALESCE(s.is_deleted,0)=0)");
+} catch (\Throwable $t) { $cstats_rows = array(); }
+if (!empty($cstats_rows)) {
+    $suppliers_contracts_total = intval($cstats_rows[0]['total_contracts']);
+    $suppliers_with_contracts_count = intval($cstats_rows[0]['suppliers_with_contracts']);
+    $suppliers_hours_total = floatval($cstats_rows[0]['total_contracted_hours']);
 }
 ?>
 <?php
@@ -571,37 +509,23 @@ include '../insidebar.php';
                     </thead>
                     <tbody>
                         <?php
-                        // ── بناء شرط نطاق الشركة للاستعلام ──────────────────
-                        $supplier_scope_sql = "1=1";
-                        if (!$is_super_admin) {
-                            if ($suppliers_has_company) {
-                                $supplier_scope_sql = "s.company_id = $company_id";
-                            } else {
-                                $supplier_scope_sql = "EXISTS (
-                                    SELECT 1
-                                    FROM supplierscontracts ssc
-                                    INNER JOIN project sp ON sp.id = ssc.project_id
-                                    INNER JOIN users su ON su.id = sp.created_by
-                                    WHERE ssc.supplier_id = s.id
-                                      AND su.company_id = $company_id
-                                )";
-                            }
-                        }
-
-                        $contracts_count_scope = (!$is_super_admin && $supplierscontracts_has_company)
-                            ? " AND supplierscontracts.company_id = $company_id"
-                            : "";
-
-                        // جلب الموردين مع إجمالي الساعات وعدد العقود والمعدات
-                        $query = "SELECT s.*,
-                          (SELECT COUNT(*) FROM equipments        WHERE equipments.suppliers        = s.id)                           AS 'equipments',
-                          (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = s.id$contracts_count_scope) AS 'num_contracts',
-                          (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = s.id$contracts_count_scope) AS 'total_hours'
-                          FROM suppliers s
-                                                    WHERE $supplier_scope_sql AND ($suppliers_not_deleted_s_sql)
-                          ORDER BY s.id DESC";
-                        $result = mysqli_query($conn, $query);
-                        if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                        // جلب الموردين مع إجمالي الساعات وعدد العقود والمعدات —
+                        // العزل عبر {TENANT_SCOPE}؛ العدّادات المترابطة تُقيَّد
+                        // بمراسلة s.id المُنطَّق (equipments/supplierscontracts
+                        // تُعلنان enrich — إعلانٌ بلا تنطيقٍ إضافي، سلامة FK).
+                        try {
+                            $suppliers_rows = $sup_gate->scopedQuery(array(
+                                'scope'  => array('s' => 'suppliers'),
+                                'enrich' => array('equipments' => 'equipments', 'supplierscontracts' => 'supplierscontracts'),
+                            ), "SELECT s.*,
+                              (SELECT COUNT(*) FROM equipments        WHERE equipments.suppliers        = s.id) AS 'equipments',
+                              (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = s.id) AS 'num_contracts',
+                              (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = s.id) AS 'total_hours'
+                              FROM suppliers s
+                              WHERE {TENANT_SCOPE} AND (COALESCE(s.is_deleted,0)=0)
+                              ORDER BY s.id DESC");
+                        } catch (\Throwable $t) { $suppliers_rows = array(); }
+                        foreach ($suppliers_rows as $row) {
                             $supplier_name_cell = "<a class='client-name-link' href='supplier_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name']) . "</a>";
                             if (intval($row['num_contracts']) === 0) {
                                 $supplier_name_cell .= " <span class='link-alert-chip' title='المورد ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
@@ -657,7 +581,7 @@ include '../insidebar.php';
                             }
 
                             echo "</tr>";
-                        } }
+                        }
                         ?>
                     </tbody>
                 </table>

@@ -12,28 +12,28 @@ include '../config.php';
 if (isset($_POST['contract_id']) || isset($_GET['contract_id'])) {
   $contract_id = intval(isset($_POST['contract_id']) ? $_POST['contract_id'] : $_GET['contract_id']);
 
-  // عزل الشركة: تأكّد أن عقد المورد الأب يتبع شركة المستخدم قبل إرجاع معداته (المدير الأعلى -1 معفى).
+  // عزل الشركة عبر البوابة: عقد المورد الأب يجب أن يتبع شركة المستخدم (السوبر -1 عبر forAllTenants المسجَّل)
   $_is_super = (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1');
-  $_cid = intval($_SESSION['user']['company_id'] ?? 0);
-  if (!$_is_super && db_table_has_column($conn, 'supplierscontracts', 'company_id')) {
-    $_own = mysqli_query($conn, "SELECT 1 FROM supplierscontracts WHERE id = $contract_id AND company_id = $_cid LIMIT 1");
-    if (!$_own || !mysqli_num_rows($_own)) {
-      header('Content-Type: application/json');
-      die(json_encode([]));
-    }
+  $sce_gate = $_is_super ? ems_tenant_db()->forAllTenants('supplier contract equipments super') : ems_tenant_db();
+  try {
+    $_own = $sce_gate->selectOne('supplierscontracts', array(
+      'columns' => array('id'), 'where' => array('id' => $contract_id),
+    ));
+  } catch (\Throwable $t) { $_own = null; }
+  if (!$_own) {
+    header('Content-Type: application/json');
+    die(json_encode([]));
   }
 
-  $query = "SELECT sce.*, et.type AS equipment_type_name
-            FROM suppliercontractequipments sce
-            LEFT JOIN equipments_types et ON sce.equip_type = et.id
-            WHERE sce.contract_id = $contract_id
-            ORDER BY sce.id ASC";
-  $result = mysqli_query($conn, $query);
-
-  $equipments = [];
-  if ($result) { while ($row = mysqli_fetch_assoc($result)) {
-    $equipments[] = $row;
-  } }
+  try {
+    $equipments = $sce_gate->scopedQuery(array(
+      'scope' => array('sce' => 'suppliercontractequipments'),
+    ), "SELECT sce.*, et.type AS equipment_type_name
+        FROM suppliercontractequipments sce
+        LEFT JOIN equipments_types et ON sce.equip_type = et.id
+        WHERE {TENANT_SCOPE} AND sce.contract_id = ?
+        ORDER BY sce.id ASC", array($contract_id));
+  } catch (\Throwable $t) { $equipments = []; }
 
   header('Content-Type: application/json');
   echo json_encode($equipments);

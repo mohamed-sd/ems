@@ -26,57 +26,17 @@ if (!$is_super_admin && $company_id <= 0) {
   die('لا يمكن تحديد الشركة الحالية');
 }
 
-$suppliers_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'suppliers', 'company_id')) {
-    $suppliers_scope_sql = 's.company_id = ' . $company_id;
-  } else {
-    $suppliers_scope_sql = "EXISTS (
-      SELECT 1
-      FROM users su
-      WHERE su.project_id = s.project
-        AND su.company_id = " . $company_id . "
-    )";
-  }
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): بُناة شروط النطاق البديلة
+// وكشف الأعمدة أُسقطوا — {TENANT_SCOPE} والبوابة مسؤولا النطاق، والسوبر عبر
+// forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق شركة).
+$scg = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contracts super') : ems_tenant_db();
 
-$supplier_contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'supplierscontracts', 'company_id')) {
-    $supplier_contract_scope_sql = 'sc.company_id = ' . $company_id;
-  } else {
-    $supplier_contract_scope_sql = "EXISTS (
-      SELECT 1
-      FROM project p
-      JOIN users su ON su.project_id = p.id
-      WHERE p.id = sc.project_id
-        AND su.company_id = " . $company_id . "
-    )";
-  }
-}
-
-$project_scope_sql = '1=1';
-if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'project', 'company_id')) {
-    $project_scope_sql = 'p.company_id = ' . $company_id;
-  } else {
-    $project_scope_sql = "EXISTS (
-      SELECT 1
-      FROM users su
-      WHERE su.project_id = p.id
-        AND su.company_id = " . $company_id . "
-    )";
-  }
-}
-
-$equipmentTypes = [];
-$equipmentTypesQuery = "SELECT id, type FROM equipments_types ORDER BY type ASC";
-$equipmentTypesResult = mysqli_query($conn, $equipmentTypesQuery);
-if ($equipmentTypesResult) {
-  while ($row = mysqli_fetch_assoc($equipmentTypesResult)) {
-    $equipmentTypes[] = $row;
-  }
-}
+try {
+  $equipmentTypes = $scg->select('equipments_types', array(
+    'columns' => array('id', 'type'),
+    'orderBy' => 'type ASC',
+  ));
+} catch (\Throwable $t) { $equipmentTypes = []; }
 
 $equipmentTypeOptionsHtml = '<option value="">— اختر —</option>';
 foreach ($equipmentTypes as $equipmentType) {
@@ -85,17 +45,14 @@ foreach ($equipmentTypes as $equipmentType) {
   $equipmentTypeOptionsHtml .= '<option value="' . $typeId . '">' . $typeName . '</option>';
 }
 
-$active_suppliers_options = array();
-$active_suppliers_query = "SELECT s.id, s.name
-                           FROM suppliers s
-                           WHERE s.status = 1 AND $suppliers_scope_sql
-                           ORDER BY s.name ASC";
-$active_suppliers_result = mysqli_query($conn, $active_suppliers_query);
-if ($active_suppliers_result) {
-  while ($supplier_row = mysqli_fetch_assoc($active_suppliers_result)) {
-    $active_suppliers_options[] = $supplier_row;
-  }
-}
+try {
+  $active_suppliers_options = $scg->scopedQuery(array(
+    'scope' => array('s' => 'suppliers'),
+  ), "SELECT s.id, s.name
+      FROM suppliers s
+      WHERE {TENANT_SCOPE} AND s.status = 1
+      ORDER BY s.name ASC");
+} catch (\Throwable $t) { $active_suppliers_options = array(); }
 
 $supplier_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $has_supplier_filter = ($supplier_id > 0);
@@ -106,31 +63,40 @@ if ($has_supplier_filter) {
 }
 
 if ($has_supplier_filter) {
-  $supplier_check_sql = "SELECT s.id FROM suppliers s WHERE s.id = $supplier_id AND $suppliers_scope_sql LIMIT 1";
-  $supplier_check_result = mysqli_query($conn, $supplier_check_sql);
-  if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
+  // فحص ملكية المورد — الأصل بلا فلتر حذفٍ ناعم (includeDeleted يحفظ السلوك حرفيًّا)
+  try {
+    $supplier_check = $scg->selectOne('suppliers', array(
+      'columns' => array('id'), 'where' => array('id' => $supplier_id),
+      'includeDeleted' => true,
+    ));
+  } catch (\Throwable $t) { $supplier_check = null; }
+  if (!$supplier_check) {
     header('Location: suppliers.php');
     exit();
   }
 }
 
 $suppliers_filter_options = array();
-$suppliers_filter_query = "SELECT DISTINCT s.id, s.name FROM supplierscontracts sc JOIN suppliers s ON sc.supplier_id = s.id WHERE $supplier_contract_scope_sql ORDER BY s.name ASC";
-$suppliers_filter_result = mysqli_query($conn, $suppliers_filter_query);
-if ($suppliers_filter_result) {
-  while ($sf_row = mysqli_fetch_assoc($suppliers_filter_result)) {
-    $suppliers_filter_options[intval($sf_row['id'])] = $sf_row['name'];
-  }
+try {
+  $sf_rows = $scg->scopedQuery(array(
+    'scope' => array('sc' => 'supplierscontracts', 's' => 'suppliers'),
+  ), "SELECT DISTINCT s.id, s.name FROM supplierscontracts sc
+      JOIN suppliers s ON sc.supplier_id = s.id
+      WHERE {TENANT_SCOPE} ORDER BY s.name ASC");
+} catch (\Throwable $t) { $sf_rows = array(); }
+foreach ($sf_rows as $sf_row) {
+  $suppliers_filter_options[intval($sf_row['id'])] = $sf_row['name'];
 }
 
 // جلب قائمة المشاريع للفلتر من جدول المشاريع مباشرة
 $projects_filter_options = array();
-$projects_filter_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
-$projects_filter_result = mysqli_query($conn, $projects_filter_query);
-if ($projects_filter_result) {
-  while ($project_filter_row = mysqli_fetch_assoc($projects_filter_result)) {
-    $projects_filter_options[intval($project_filter_row['id'])] = $project_filter_row['name'];
-  }
+try {
+  $pf_rows = $scg->scopedQuery(array(
+    'scope' => array('p' => 'project'),
+  ), "SELECT p.id, p.name FROM project p WHERE {TENANT_SCOPE} AND p.status = 1 ORDER BY p.name ASC");
+} catch (\Throwable $t) { $pf_rows = array(); }
+foreach ($pf_rows as $project_filter_row) {
+  $projects_filter_options[intval($project_filter_row['id'])] = $project_filter_row['name'];
 }
 
 // (mine filter removed - contracts link directly to project)
@@ -143,51 +109,31 @@ if (isset($_GET['delete_id'])) {
 
   $delete_id = intval($_GET['delete_id']);
   if ($delete_id > 0) {
-    mysqli_begin_transaction($conn);
-    $delete_ok = true;
-
-    $delete_equipments_sql = "DELETE sce
-                              FROM suppliercontractequipments sce
-                              JOIN supplierscontracts sc ON sc.id = sce.contract_id
-                              WHERE sc.id = $delete_id
-                                AND sc.supplier_id = $supplier_id
-                                AND $supplier_contract_scope_sql";
-    if (!mysqli_query($conn, $delete_equipments_sql)) {
-      $delete_ok = false;
-    }
-
-    if ($delete_ok) {
-      $delete_notes_sql = "DELETE n
-                           FROM supplier_contract_notes n
-                           JOIN supplierscontracts sc ON sc.id = n.contract_id
-                           WHERE sc.id = $delete_id
-                             AND sc.supplier_id = $supplier_id
-                             AND $supplier_contract_scope_sql";
-      if (!mysqli_query($conn, $delete_notes_sql)) {
-        $delete_ok = false;
+    // الحذف الصلب المتسلسل عبر قنوات البوابة الذرّية (المعدات ← الملاحظات ← العقد)
+    // بشرط الأصل: العقد يخصّ موردَ الرابط وشركةَ السياق (فحصٌ مسبقٌ صريح).
+    try {
+      $del_own = $scg->selectOne('supplierscontracts', array(
+        'columns' => array('id'),
+        'where'   => array('id' => $delete_id, 'supplier_id' => $supplier_id),
+      ));
+      if (!$del_own) {
+        throw new \RuntimeException('out of scope');
       }
-    }
-
-    if ($delete_ok) {
-      $delete_contract_sql = "DELETE sc
-                              FROM supplierscontracts sc
-                              WHERE sc.id = $delete_id
-                                AND sc.supplier_id = $supplier_id
-                                AND $supplier_contract_scope_sql";
-      if (!mysqli_query($conn, $delete_contract_sql) || mysqli_affected_rows($conn) <= 0) {
-        $delete_ok = false;
-      }
-    }
-
-    if ($delete_ok) {
-      mysqli_commit($conn);
+      $scg->runInTransaction(function ($g) use ($delete_id) {
+        // صفوفٌ فارغة = مسحُ كل الأبناء (ملكية الأب تُفحص داخل القناة)
+        $g->replaceChildren('supplierscontracts', $delete_id, 'suppliercontractequipments', 'contract_id', array(), 'حذف عقد مورد: مسح معداته');
+        $g->replaceChildren('supplierscontracts', $delete_id, 'supplier_contract_notes', 'contract_id', array(), 'حذف عقد مورد: مسح ملاحظاته');
+        $n = $g->deleteRow('supplierscontracts', $delete_id, 'حذف عقد مورد من شاشة العقود');
+        if ($n <= 0) {
+          throw new \RuntimeException('contract delete matched 0 rows');
+        }
+      }, 'حذف عقد مورد متسلسل');
       header("Location: supplierscontracts.php?id=$supplier_id&msg=تم+حذف+العقد+بنجاح+✅");
       exit();
+    } catch (\Throwable $t) {
+      header("Location: supplierscontracts.php?id=$supplier_id&msg=تعذر+حذف+العقد+أو+أنه+خارج+النطاق+❌");
+      exit();
     }
-
-    mysqli_rollback($conn);
-    header("Location: supplierscontracts.php?id=$supplier_id&msg=تعذر+حذف+العقد+أو+أنه+خارج+النطاق+❌");
-    exit();
   }
 
   header("Location: supplierscontracts.php?id=$supplier_id&msg=معرف+العقد+غير+صحيح+❌");
@@ -262,12 +208,13 @@ include('../insidebar.php');
                     <option value="">— اختر المشروع —</option>
                     <?php
 
-                    $projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
-                    $projects_result = mysqli_query($conn, $projects_query);
-                    if ($projects_result) {
-                      while ($project = mysqli_fetch_assoc($projects_result)) {
-                        echo "<option value='" . $project['id'] . "'>" . $project['name'] . "</option>";
-                      }
+                    try {
+                      $form_projects = $scg->scopedQuery(array(
+                        'scope' => array('p' => 'project'),
+                      ), "SELECT p.id, p.name FROM project p WHERE {TENANT_SCOPE} AND p.status = 1 ORDER BY p.name ASC");
+                    } catch (\Throwable $t) { $form_projects = array(); }
+                    foreach ($form_projects as $project) {
+                      echo "<option value='" . $project['id'] . "'>" . $project['name'] . "</option>";
                     }
                     ?>
                   </select>
@@ -880,12 +827,13 @@ include('../insidebar.php');
             $project_contract_id = intval($_POST['project_contract_id']);
 
 
-            $contract_signing_date = mysqli_real_escape_string($conn, $_POST['contract_signing_date']);
+            // القيم تُمرَّر خامًا — البوابة prepared بالكامل (لا escape يدوي)
+            $contract_signing_date = $_POST['contract_signing_date'];
             $grace_period_days = intval($_POST['grace_period_days']);
 
             // حساب مدة العقد بالأيام من تاريخ البداية والنهاية
-            $actual_start = mysqli_real_escape_string($conn, $_POST['actual_start']);
-            $actual_end = mysqli_real_escape_string($conn, $_POST['actual_end']);
+            $actual_start = $_POST['actual_start'];
+            $actual_end = $_POST['actual_end'];
 
             // حساب عدد الأيام من تاريخ البداية إلى تاريخ الانتهاء (شامل يوم البداية ويوم النهاية)
             if (!empty($actual_start) && !empty($actual_end)) {
@@ -901,27 +849,27 @@ include('../insidebar.php');
               $contract_duration_months = 0;
             }
 
-            $transportation = mysqli_real_escape_string($conn, $_POST['transportation']);
-            $accommodation = mysqli_real_escape_string($conn, $_POST['accommodation']);
-            $place_for_living = mysqli_real_escape_string($conn, $_POST['place_for_living']);
-            $workshop = mysqli_real_escape_string($conn, $_POST['workshop']);
+            $transportation = $_POST['transportation'];
+            $accommodation = $_POST['accommodation'];
+            $place_for_living = $_POST['place_for_living'];
+            $workshop = $_POST['workshop'];
 
             $hours_monthly_target = floatval($_POST['hours_monthly_target']);
             $forecasted_contracted_hours = floatval($_POST['forecasted_contracted_hours']);
 
             $daily_work_hours = floatval($_POST['daily_work_hours']);
             $daily_operators = intval($_POST['daily_operators']);
-            $first_party = mysqli_real_escape_string($conn, $_POST['first_party']);
-            $second_party = mysqli_real_escape_string($conn, $_POST['second_party']);
-            $witness_one = mysqli_real_escape_string($conn, $_POST['witness_one']);
-            $witness_two = mysqli_real_escape_string($conn, $_POST['witness_two']);
+            $first_party = $_POST['first_party'];
+            $second_party = $_POST['second_party'];
+            $witness_one = $_POST['witness_one'];
+            $witness_two = $_POST['witness_two'];
 
             // الحقول المالية الجديدة
-            $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
-            $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
-            $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
-            $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
-            $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
+            $price_currency_contract = isset($_POST['price_currency_contract']) ? $_POST['price_currency_contract'] : '';
+            $paid_contract = isset($_POST['paid_contract']) ? $_POST['paid_contract'] : '';
+            $payment_time = isset($_POST['payment_time']) ? $_POST['payment_time'] : '';
+            $guarantees = isset($_POST['guarantees']) ? $_POST['guarantees'] : '';
+            $payment_date = isset($_POST['payment_date']) ? $_POST['payment_date'] : '';
 
             // الحقول الإضافية للعقد
             $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
@@ -935,76 +883,60 @@ include('../insidebar.php');
               die('بيانات المورد غير متطابقة');
             }
 
-            if ($id > 0) {
-              // تعديل
-              $sql = "UPDATE supplierscontracts sc SET
-            project_id='$project_id',
-            project_contract_id='$project_contract_id',
-            contract_signing_date='$contract_signing_date',
-            grace_period_days='$grace_period_days',
-            contract_duration_days='$contract_duration_days',
-            contract_duration_months='$contract_duration_months',
-            equip_shifts_contract='$equip_shifts_contract',
-            shift_contract='$shift_contract',
-            equip_total_contract_daily='$equip_total_contract_daily',
-            total_contract_permonth='$total_contract_permonth',
-            total_contract_units='$total_contract_units',
-            actual_start='$actual_start',
-            actual_end='$actual_end',
-            transportation='$transportation',
-            accommodation='$accommodation',
-            place_for_living='$place_for_living',
-            workshop='$workshop',
-            hours_monthly_target='$hours_monthly_target',
-            forecasted_contracted_hours='$forecasted_contracted_hours',
-            daily_work_hours='$daily_work_hours',
-            daily_operators='$daily_operators',
-            first_party='$first_party',
-            second_party='$second_party',
-            witness_one='$witness_one',
-            witness_two='$witness_two',
-            price_currency_contract='$price_currency_contract',
-            paid_contract='$paid_contract',
-            payment_time='$payment_time',
-            guarantees='$guarantees',
-            payment_date='$payment_date'
-          WHERE sc.id=$id AND sc.supplier_id=$supplier_id_post AND $supplier_contract_scope_sql";
-            } else {
-              // إضافة
-              $insert_columns = "supplier_id, project_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days, contract_duration_months,
-            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
-            actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
-            hours_monthly_target, forecasted_contracted_hours,
-            daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
-            price_currency_contract, paid_contract, payment_time, guarantees, payment_date";
+            // حقول العقد الموحّدة (تحديثًا وإدراجًا) — الكتابة عبر البوابة حصرًا
+            $contract_fields = array(
+              'project_id'                  => $project_id,
+              'project_contract_id'         => $project_contract_id,
+              'contract_signing_date'       => $contract_signing_date,
+              'grace_period_days'           => $grace_period_days,
+              'contract_duration_days'      => $contract_duration_days,
+              'contract_duration_months'    => $contract_duration_months,
+              'equip_shifts_contract'       => $equip_shifts_contract,
+              'shift_contract'              => $shift_contract,
+              'equip_total_contract_daily'  => $equip_total_contract_daily,
+              'total_contract_permonth'     => $total_contract_permonth,
+              'total_contract_units'        => $total_contract_units,
+              'actual_start'                => $actual_start,
+              'actual_end'                  => $actual_end,
+              'transportation'              => $transportation,
+              'accommodation'               => $accommodation,
+              'place_for_living'            => $place_for_living,
+              'workshop'                    => $workshop,
+              'hours_monthly_target'        => $hours_monthly_target,
+              'forecasted_contracted_hours' => $forecasted_contracted_hours,
+              'daily_work_hours'            => $daily_work_hours,
+              'daily_operators'             => $daily_operators,
+              'first_party'                 => $first_party,
+              'second_party'                => $second_party,
+              'witness_one'                 => $witness_one,
+              'witness_two'                 => $witness_two,
+              'price_currency_contract'     => $price_currency_contract,
+              'paid_contract'               => $paid_contract,
+              'payment_time'                => $payment_time,
+              'guarantees'                  => $guarantees,
+              'payment_date'                => $payment_date,
+            );
 
-              $insert_values = "'$supplier_id_post', '$project_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days', '$contract_duration_months',
-            '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
-            '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
-            '$hours_monthly_target','$forecasted_contracted_hours',
-            '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
-            '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'";
-
-              if (!$is_super_admin && db_table_has_column($conn, 'supplierscontracts', 'company_id')) {
-                $insert_columns .= ', company_id';
-                $insert_values .= ', ' . $company_id;
-              }
-
-              $sql = "INSERT INTO supplierscontracts (
-            $insert_columns
-          ) VALUES (
-            $insert_values
-          )";
-            }
-            $result = mysqli_query($conn, $sql);
-
-            if ($result) {
-              // الحصول على معرف العقد المُضاف حديثاً أو معرف العقد المُحدّث
+            $result = false;
+            $contract_id = 0;
+            try {
               if ($id > 0) {
+                // تعديل — بشرط الأصل (العقد يخصّ المورد المرسَل) والنطاق عبر البوابة
+                $scg->update('supplierscontracts', $contract_fields,
+                  array('id' => $id, 'supplier_id' => $supplier_id_post));
                 $contract_id = $id;
               } else {
-                $contract_id = mysqli_insert_id($conn);
+                // إضافة — company_id تحقنه البوابة
+                $insert_fields = array('supplier_id' => $supplier_id_post) + $contract_fields;
+                $contract_id = (int) $scg->insert('supplierscontracts', $insert_fields);
               }
+              $result = true;
+            } catch (\Throwable $t) {
+              error_log('supplierscontracts.php save failed: ' . $t->getMessage());
+              $result = false;
+            }
+
+            if ($result) {
 
               // جمع بيانات المعدات من الفورم
               $equipment_array = [];
@@ -1027,17 +959,17 @@ include('../insidebar.php');
                     'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
                     'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
                     'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? intval($_POST["equip_shifts_$i"]) : 0,
-                    'equip_unit' => isset($_POST["equip_unit_$i"]) ? mysqli_real_escape_string($conn, $_POST["equip_unit_$i"]) : '',
-                    'shift1_start' => isset($_POST["shift1_start_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift1_start_$i"]) : '',
-                    'shift1_end' => isset($_POST["shift1_end_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift1_end_$i"]) : '',
-                    'shift2_start' => isset($_POST["shift2_start_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift2_start_$i"]) : '',
-                    'shift2_end' => isset($_POST["shift2_end_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift2_end_$i"]) : '',
+                    'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
+                    'shift1_start' => isset($_POST["shift1_start_$i"]) ? $_POST["shift1_start_$i"] : '',
+                    'shift1_end' => isset($_POST["shift1_end_$i"]) ? $_POST["shift1_end_$i"] : '',
+                    'shift2_start' => isset($_POST["shift2_start_$i"]) ? $_POST["shift2_start_$i"] : '',
+                    'shift2_end' => isset($_POST["shift2_end_$i"]) ? $_POST["shift2_end_$i"] : '',
                     'shift_hours' => isset($_POST["shift_hours_$i"]) ? floatval($_POST["shift_hours_$i"]) : 0,
                     'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? floatval($_POST["equip_total_month_$i"]) : 0,
                     'equip_monthly_target' => isset($_POST["equip_target_per_month_$i"]) ? floatval($_POST["equip_target_per_month_$i"]) : 0,
                     'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? floatval($_POST["equip_total_contract_$i"]) : 0,
                     'equip_price' => isset($_POST["equip_price_$i"]) ? floatval($_POST["equip_price_$i"]) : 0,
-                    'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? mysqli_real_escape_string($conn, $_POST["equip_price_currency_$i"]) : '',
+                    'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? $_POST["equip_price_currency_$i"] : '',
                     'equip_operators' => isset($_POST["equip_operators_$i"]) ? intval($_POST["equip_operators_$i"]) : 0,
                     'equip_supervisors' => isset($_POST["equip_supervisors_$i"]) ? intval($_POST["equip_supervisors_$i"]) : 0,
                     'equip_technicians' => isset($_POST["equip_technicians_$i"]) ? intval($_POST["equip_technicians_$i"]) : 0,
@@ -1046,35 +978,15 @@ include('../insidebar.php');
                 }
               }
 
-              // إضافة بيانات المعدات الجديدة
+              // إضافة بيانات المعدات الجديدة — استبدال الأبناء الذرّي عبر البوابة
+              // (سلوك الأصل: لا مساس بالأبناء القدامى إن لم تُرسل معدات جديدة)
               if (!empty($equipment_array)) {
-                // حذف المعدات القديمة أولاً
-                $delete_sql = "DELETE sce
-                                 FROM suppliercontractequipments sce
-                                 JOIN supplierscontracts sc ON sc.id = sce.contract_id
-                                 WHERE sce.contract_id = $contract_id
-                                   AND sc.supplier_id = $supplier_id_post
-                                   AND $supplier_contract_scope_sql";
-                mysqli_query($conn, $delete_sql);
-
-                // إضافة المعدات الجديدة
-                foreach ($equipment_array as $equip) {
-                  $insert_equip_sql = "INSERT INTO suppliercontractequipments (
-                      contract_id, equip_type, equip_size, equip_count, equip_count_basic, equip_count_backup, equip_shifts, equip_unit,
-                      shift1_start, shift1_end, shift2_start, shift2_end, shift_hours,
-                      equip_total_month, equip_monthly_target, equip_total_contract,
-                      equip_price, equip_price_currency, equip_operators, equip_supervisors,
-                      equip_technicians, equip_assistants
-                    ) VALUES (
-                      $contract_id, {$equip['equip_type']}, {$equip['equip_size']}, {$equip['equip_count']},
-                      {$equip['equip_count_basic']}, {$equip['equip_count_backup']}, {$equip['equip_shifts']}, '{$equip['equip_unit']}', '{$equip['shift1_start']}',
-                      '{$equip['shift1_end']}', '{$equip['shift2_start']}', '{$equip['shift2_end']}',
-                      {$equip['shift_hours']}, {$equip['equip_total_month']}, {$equip['equip_monthly_target']},
-                      {$equip['equip_total_contract']}, {$equip['equip_price']}, '{$equip['equip_price_currency']}',
-                      {$equip['equip_operators']}, {$equip['equip_supervisors']}, {$equip['equip_technicians']},
-                      {$equip['equip_assistants']}
-                    )";
-                  mysqli_query($conn, $insert_equip_sql);
+                try {
+                  $scg->replaceChildren('supplierscontracts', $contract_id,
+                    'suppliercontractequipments', 'contract_id', $equipment_array,
+                    'حفظ عقد مورد: استبدال معداته');
+                } catch (\Throwable $t) {
+                  error_log('supplierscontracts.php children replace failed: ' . $t->getMessage());
                 }
               }
             }
@@ -1083,32 +995,35 @@ include('../insidebar.php');
             exit;
           }
 
-          // جلب عقود الموردين مع فلترة المورد/المشروع
-          $supplier_contract_filter_parts = array($supplier_contract_scope_sql);
+          // جلب عقود الموردين مع فلترة المورد/المشروع — العزل عبر البوابة
+          $scl_extra = ''; $scl_params = array();
           if ($has_supplier_filter) {
-            $supplier_contract_filter_parts[] = "sc.supplier_id = $supplier_id";
+            $scl_extra .= " AND sc.supplier_id = ?"; $scl_params[] = $supplier_id;
           } elseif ($filter_supplier_id > 0) {
-            $supplier_contract_filter_parts[] = "sc.supplier_id = $filter_supplier_id";
+            $scl_extra .= " AND sc.supplier_id = ?"; $scl_params[] = $filter_supplier_id;
           }
           if ($filter_project_id > 0) {
-            $supplier_contract_filter_parts[] = "sc.project_id = $filter_project_id";
+            $scl_extra .= " AND sc.project_id = ?"; $scl_params[] = $filter_project_id;
           }
-          $supplier_contract_filter_sql = implode(' AND ', $supplier_contract_filter_parts);
 
-          $query = "SELECT sc.*,
-                      s.name AS supplier_name,
-                      op.name AS project_name
-                      FROM supplierscontracts sc
-                      LEFT JOIN suppliers s ON sc.supplier_id = s.id
-                      LEFT JOIN project op ON sc.project_id = op.id
-                      WHERE $supplier_contract_filter_sql
-                      ORDER BY sc.id DESC";
-          $result = mysqli_query($conn, $query);
+          try {
+            $contracts_rows = $scg->scopedQuery(array(
+              'scope'  => array('sc' => 'supplierscontracts'),
+              'enrich' => array('s' => 'suppliers', 'op' => 'project'), // أسماء عرضية — LEFT بلا تنطيق (سلوك الأصل)
+            ), "SELECT sc.*,
+                  s.name AS supplier_name,
+                  op.name AS project_name
+                  FROM supplierscontracts sc
+                  LEFT JOIN suppliers s ON sc.supplier_id = s.id
+                  LEFT JOIN project op ON sc.project_id = op.id
+                  WHERE {TENANT_SCOPE}$scl_extra
+                  ORDER BY sc.id DESC", $scl_params);
+          } catch (\Throwable $t) { $contracts_rows = array(); }
           $i = 1;
 
 
-          if ($result) {
-            while ($row = mysqli_fetch_assoc($result)) {
+          {
+            foreach ($contracts_rows as $row) {
 
               // عرض حالة العقد من status
               $contractStatus = isset($row['status']) ? $row['status'] : 1;

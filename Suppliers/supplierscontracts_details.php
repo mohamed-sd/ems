@@ -26,20 +26,8 @@ if (!$is_super_admin && $company_id <= 0) {
     die('لا يمكن تحديد الشركة الحالية');
 }
 
-$supplier_contract_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if (db_table_has_column($conn, 'supplierscontracts', 'company_id')) {
-        $supplier_contract_scope_sql = 'sc.company_id = ' . $company_id;
-    } else {
-        $supplier_contract_scope_sql = "EXISTS (
-            SELECT 1
-            FROM project p
-            JOIN users su ON su.project_id = p.id
-            WHERE p.id = sc.project_id
-              AND su.company_id = " . $company_id . "
-        )";
-    }
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — السوبر عبر forAllTenants المسجَّل
+$scd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contract details super') : ems_tenant_db();
 
 $page_title = 'الإيكوبيشن | تفاصيل عقد المورد';
 include '../inheader.php';
@@ -107,7 +95,11 @@ include '../insidebar.php';
 
 $contract_id = intval($_GET['id']);
 
-$sql = "SELECT
+try {
+    $scd_rows = $scd_gate->scopedQuery(array(
+        'scope'  => array('sc' => 'supplierscontracts'),
+        'enrich' => array('s' => 'suppliers', 'op' => 'project', 'c' => 'contracts'), // أسماء عرضية — LEFT بلا تنطيق (سلوك الأصل)
+    ), "SELECT
             sc.id, sc.supplier_id, sc.project_id, sc.project_contract_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months, sc.contract_duration_days,
             sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living,
             sc.workshop, sc.hours_monthly_target, sc.forecasted_contracted_hours, sc.created_at, sc.updated_at,
@@ -121,20 +113,17 @@ $sql = "SELECT
         LEFT JOIN suppliers s ON sc.supplier_id = s.id
         LEFT JOIN project op ON sc.project_id = op.id
         LEFT JOIN contracts c ON sc.project_contract_id = c.id
-        WHERE sc.id = $contract_id AND $supplier_contract_scope_sql
-        LIMIT 1";
-
-$result = mysqli_query($conn, $sql);
-
-if (!$result) {
-    die("خطأ في الاستعلام: " . mysqli_error($conn));
+        WHERE {TENANT_SCOPE} AND sc.id = ?
+        LIMIT 1", array($contract_id));
+} catch (\Throwable $t) {
+    die("خطأ في الاستعلام: " . $t->getMessage());
 }
 
-if (mysqli_num_rows($result) === 0) {
+if (empty($scd_rows)) {
     die('العقد غير موجود أو خارج نطاق الشركة');
 }
 
-while ($row = mysqli_fetch_assoc($result)) {
+foreach ($scd_rows as $row) {
 
     // حساب المدة المتبقية من العقد باعتماد تاريخ اليوم وتاريخ الانتهاء
     $today = new DateTime();
@@ -502,27 +491,24 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             </thead>
             <tbody>
                 <?php
-                // Function to get supplier contract equipments
+                // Function to get supplier contract equipments — العزل عبر البوابة
                 if (!function_exists('getSupplierContractEquipments')) {
-                    function getSupplierContractEquipments($contract_id, $conn) {
-                        global $supplier_contract_scope_sql;
-                        $equipments = [];
-                        $query = "SELECT sce.*, et.type AS equipment_type_name
-                                  FROM suppliercontractequipments sce
-                                  JOIN supplierscontracts sc ON sc.id = sce.contract_id
-                                  LEFT JOIN equipments_types et ON sce.equip_type = et.id
-                                  WHERE sce.contract_id = " . intval($contract_id) . " AND $supplier_contract_scope_sql";
-                        $result = mysqli_query($conn, $query);
-                        if ($result) {
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $equipments[] = $row;
-                            }
+                    function getSupplierContractEquipments($contract_id, $gate) {
+                        try {
+                            return $gate->scopedQuery(array(
+                                'scope' => array('sce' => 'suppliercontractequipments', 'sc' => 'supplierscontracts'),
+                            ), "SELECT sce.*, et.type AS equipment_type_name
+                                FROM suppliercontractequipments sce
+                                JOIN supplierscontracts sc ON sc.id = sce.contract_id
+                                LEFT JOIN equipments_types et ON sce.equip_type = et.id
+                                WHERE {TENANT_SCOPE} AND sce.contract_id = ?", array(intval($contract_id)));
+                        } catch (\Throwable $t) {
+                            return [];
                         }
-                        return $equipments;
                     }
                 }
 
-                $equipments = getSupplierContractEquipments($contract_id, $conn);
+                $equipments = getSupplierContractEquipments($contract_id, $scd_gate);
 
                 if (!empty($equipments)) {
                     $i = 1;
@@ -547,7 +533,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         echo "<td>" . $equip['equip_assistants'] . "</td>";
                         if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                             // التحقق من هل هذه المعدة من العقد المدموج أم لا
-                            $merged_equipments = getSupplierContractEquipments(intval($row['merged_with']), $conn);
+                            $merged_equipments = getSupplierContractEquipments(intval($row['merged_with']), $scd_gate);
                             $is_from_merged = false;
                             foreach ($merged_equipments as $m_equip) {
                                 if ($m_equip['equip_type'] == $equip['equip_type'] &&
@@ -603,16 +589,22 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </thead>
                 <tbody>
                     <?php
-                    $notes_query = "SELECT n.*
-                                    FROM supplier_contract_notes n
-                                    JOIN supplierscontracts sc ON sc.id = n.contract_id
-                                    WHERE n.contract_id = $contract_id AND $supplier_contract_scope_sql
-                                    ORDER BY created_at DESC";
-                    $notes_result = mysqli_query($conn, $notes_query);
+                    // النطاق عبر الأب (sc) حصرًا كدلالة الأصل — صفوف الملاحظات القديمة
+                    // لم تُعبَّأ company_id بعد (مرشَّح تعبئة M7)، وتنطيقها المباشر يخفيها.
+                    try {
+                        $notes_rows = $scd_gate->scopedQuery(array(
+                            'scope'  => array('sc' => 'supplierscontracts'),
+                            'enrich' => array('n' => 'supplier_contract_notes'),
+                        ), "SELECT n.*
+                            FROM supplier_contract_notes n
+                            JOIN supplierscontracts sc ON sc.id = n.contract_id
+                            WHERE {TENANT_SCOPE} AND n.contract_id = ?
+                            ORDER BY created_at DESC", array($contract_id));
+                    } catch (\Throwable $t) { $notes_rows = array(); }
 
-                    if ($notes_result && mysqli_num_rows($notes_result) > 0) {
+                    if (!empty($notes_rows)) {
                         $j = 1;
-                        while ($note = mysqli_fetch_assoc($notes_result)) {
+                        foreach ($notes_rows as $note) {
                             // تحديد نوع الإجراء من النص
                             $note_text = htmlspecialchars($note['note']);
                             $action_icon = '<i class="fas fa-sticky-note"></i>';
@@ -1008,11 +1000,16 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <select id="mergeWithId" class="form-select">
                         <option value="">-- اختر عقد --</option>
                         <?php
-                        $merge_query = "SELECT sc.id, sc.contract_signing_date FROM supplierscontracts sc WHERE sc.supplier_id = $supplier_id AND sc.project_id = $project_id AND sc.id != $contract_id AND $supplier_contract_scope_sql ORDER BY sc.id DESC";
-                        $merge_result = mysqli_query($conn, $merge_query);
-                        if ($merge_result) { while ($m_row = mysqli_fetch_assoc($merge_result)) {
+                        try {
+                            $merge_rows = $scd_gate->scopedQuery(array(
+                                'scope' => array('sc' => 'supplierscontracts'),
+                            ), "SELECT sc.id, sc.contract_signing_date FROM supplierscontracts sc
+                                WHERE {TENANT_SCOPE} AND sc.supplier_id = ? AND sc.project_id = ? AND sc.id != ?
+                                ORDER BY sc.id DESC", array($supplier_id, $project_id, $contract_id));
+                        } catch (\Throwable $t) { $merge_rows = array(); }
+                        foreach ($merge_rows as $m_row) {
                             echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
-                        } }
+                        }
                         ?>
                     </select>
                 </div>
@@ -1039,7 +1036,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $current_equipments = getSupplierContractEquipments($contract_id, $conn);
+                                    $current_equipments = getSupplierContractEquipments($contract_id, $scd_gate);
                                     if (!empty($current_equipments)) {
                                         foreach ($current_equipments as $equip) {
                                             echo "<tr>";

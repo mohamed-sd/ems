@@ -41,22 +41,25 @@ include '../config.php';
 
 $contract_id = intval($_GET['id']);
 
-$sql = "SELECT 
-            id, supplier_id, contract_signing_date, grace_period_days, contract_duration_months, 
-            actual_start, actual_end, transportation, accommodation, place_for_living, 
-            workshop, equip_type, equip_size, equip_count, equip_target_per_month, 
-            equip_total_month, equip_total_contract, mach_type, mach_size, mach_count, 
-            mach_target_per_month, mach_total_month, mach_total_contract, 
-            hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
-            daily_work_hours, daily_operators, first_party, second_party, 
-            witness_one, witness_two, project_id
-        FROM supplierscontracts
-        WHERE id = $contract_id
-        LIMIT 1";
+// العزل عبر البوابة (الأصل كان بمعرّفٍ فقط — بلا عزل شركة)
+try {
+    $scs_rows = ems_tenant_db()->scopedQuery(array(
+        'scope' => array('sc' => 'supplierscontracts'),
+    ), "SELECT
+            sc.id, sc.supplier_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months,
+            sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living,
+            sc.workshop, sc.equip_type, sc.equip_size, sc.equip_count, sc.equip_target_per_month,
+            sc.equip_total_month, sc.equip_total_contract, sc.mach_type, sc.mach_size, sc.mach_count,
+            sc.mach_target_per_month, sc.mach_total_month, sc.mach_total_contract,
+            sc.hours_monthly_target, sc.forecasted_contracted_hours, sc.created_at, sc.updated_at,
+            sc.daily_work_hours, sc.daily_operators, sc.first_party, sc.second_party,
+            sc.witness_one, sc.witness_two, sc.project_id
+        FROM supplierscontracts sc
+        WHERE {TENANT_SCOPE} AND sc.id = ?
+        LIMIT 1", array($contract_id));
+} catch (\Throwable $t) { $scs_rows = array(); }
 
-$result = mysqli_query($conn, $sql);
-
-if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+foreach ($scs_rows as $row) {
 ?>
     <div class="report">
 
@@ -130,7 +133,7 @@ if ($result) { while ($row = mysqli_fetch_assoc($result)) {
         </div>
 
     </div>
-<?php } } ?>
+<?php } ?>
 
 
     <br/><br/><br/>

@@ -12,14 +12,11 @@ include '../config.php';
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Accept project_id directly; legacy mine_id fallback: look up project from mines table
+    // project_id مباشرةً؛ مسار mine_id القديم ميّتٌ بنيويًّا (جدول mines أُزيل من
+    // النظام — سلوك الأصل الفعلي: فشل الاستعلام بصمت ⇒ project_id=0 ⇒
+    // «Invalid request») ويُحفَظ حرفيًّا هنا دون استعلامٍ على جدولٍ غير موجود.
     if (isset($_POST['project_id']) && intval($_POST['project_id']) > 0) {
         $project_id = intval($_POST['project_id']);
-    } elseif (isset($_POST['mine_id']) && intval($_POST['mine_id']) > 0) {
-        $mine_id = intval($_POST['mine_id']);
-        $fallback = mysqli_query($conn, "SELECT project_id FROM mines WHERE id = $mine_id LIMIT 1");
-        $fallback_row = $fallback ? mysqli_fetch_assoc($fallback) : null;
-        $project_id = $fallback_row ? intval($fallback_row['project_id']) : 0;
     } else {
         $project_id = 0;
     }
@@ -29,23 +26,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // جلب عقود المشروع المحدد
-    $contracts_query = "SELECT
-        c.id,
-        CONCAT('عقد رقم ', c.id, ' - ', DATE_FORMAT(c.actual_start, '%Y/%m/%d'), ' - ', c.forecasted_contracted_hours, ' ساعة') as display_name,
-        c.forecasted_contracted_hours
-        FROM contracts c
-        WHERE c.project_id = $project_id AND c.status = 1
-        ORDER BY c.actual_start DESC";
-
-    $result = mysqli_query($conn, $contracts_query);
-
-    if (!$result) {
+    // جلب عقود المشروع المحدد — العزل عبر البوابة (الأصل كان بلا عزل شركةٍ إطلاقًا)
+    $gmc_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    $gmc_gate = ($gmc_role === '-1') ? ems_tenant_db()->forAllTenants('mine contracts super') : ems_tenant_db();
+    try {
+        $contracts_rows = $gmc_gate->scopedQuery(array(
+            'scope' => array('c' => 'contracts'),
+        ), "SELECT
+            c.id,
+            CONCAT('عقد رقم ', c.id, ' - ', DATE_FORMAT(c.actual_start, '%Y/%m/%d'), ' - ', c.forecasted_contracted_hours, ' ساعة') as display_name,
+            c.forecasted_contracted_hours
+            FROM contracts c
+            WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.status = 1
+            ORDER BY c.actual_start DESC", array($project_id));
+    } catch (\Throwable $t) {
         die(json_encode(['success' => false, 'message' => 'خطأ في جلب العقود']));
     }
 
     $contracts = [];
-    while ($row = mysqli_fetch_assoc($result)) {
+    foreach ($contracts_rows as $row) {
         $contracts[] = [
             'id' => intval($row['id']),
             'display_name' => $row['display_name'],

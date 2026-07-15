@@ -22,27 +22,9 @@ if (!$is_super_admin && $company_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'لا يمكن تحديد الشركة الحالية']));
 }
 
-function supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, $alias)
-{
-    if ($is_super_admin) {
-        return '1=1';
-    }
-
-    $safe_company_id = intval($company_id);
-    $a = $alias !== '' ? $alias . '.' : '';
-
-    if (db_table_has_column($conn, 'supplierscontracts', 'company_id')) {
-        return $a . "company_id = " . $safe_company_id;
-    }
-
-    return "EXISTS (
-        SELECT 1
-        FROM project p
-        JOIN users u ON u.project_id = p.id
-        WHERE p.id = " . $a . "project_id
-          AND u.company_id = " . $safe_company_id . "
-    )";
-}
+// العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): بُناة شروط النطاق أُسقطوا —
+// البوابة مسؤولة النطاق، والسوبر عبر forAllTenants المسجَّل (سلوك الأصل).
+$sch_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contract actions super') : ems_tenant_db();
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 $contract_id = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;
@@ -51,22 +33,32 @@ if (!$contract_id) {
     die(json_encode(['success' => false, 'message' => 'معرف العقد غير صحيح']));
 }
 
-// دالة للحصول على بيانات العقد
-function getContractData($contract_id, $conn, $is_super_admin, $company_id) {
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "SELECT sc.* FROM supplierscontracts sc WHERE sc.id = $contract_id AND $tenant_scope LIMIT 1";
-    $result = mysqli_query($conn, $query);
-    return $result ? mysqli_fetch_assoc($result) : null;
+// دالة للحصول على بيانات العقد (النطاق عبر البوابة)
+function getContractData($contract_id, $gate) {
+    try {
+        return $gate->selectOne('supplierscontracts', array(
+            'where' => array('id' => intval($contract_id)),
+        ));
+    } catch (\Throwable $t) {
+        return null;
+    }
 }
 
-// دالة لإضافة ملاحظة
-function addNote($contract_id, $note, $conn) {
-    $note = mysqli_real_escape_string($conn, $note);
-    $query = "INSERT INTO supplier_contract_notes (contract_id, note, created_at) VALUES ($contract_id, '$note', NOW())";
-    return mysqli_query($conn, $query);
+// دالة لإضافة ملاحظة (company_id تختمه البوابة للصفوف الجديدة)
+function addNote($contract_id, $note, $gate) {
+    try {
+        $gate->insert('supplier_contract_notes', array(
+            'contract_id' => intval($contract_id),
+            'note'        => $note,
+            'created_at'  => date('Y-m-d H:i:s'),
+        ));
+        return true;
+    } catch (\Throwable $t) {
+        return false;
+    }
 }
 
-$current_contract_scope = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+$current_contract_scope = getContractData($contract_id, $sch_gate);
 if (!$current_contract_scope) {
     die(json_encode(['success' => false, 'message' => 'العقد غير موجود أو خارج نطاق الشركة']));
 }
@@ -94,9 +86,6 @@ if ($action === 'renewal') {
         die(json_encode(['success' => false, 'message' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء']));
     }
 
-    $new_start_date = mysqli_real_escape_string($conn, $new_start_date);
-    $new_end_date = mysqli_real_escape_string($conn, $new_end_date);
-
     // حساب المدة بالشهور
     $start = new DateTime($new_start_date);
     $end = new DateTime($new_end_date);
@@ -108,22 +97,19 @@ if ($action === 'renewal') {
         $contract_duration_days = $interval->days;
     }
 
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "UPDATE supplierscontracts sc SET
-        actual_start = '$new_start_date',
-        actual_end = '$new_end_date',
-        contract_duration_months = $months,
-        contract_duration_days = $contract_duration_days,
-        status = 1,
-        updated_at = NOW()
-    WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    try {
+        $sch_gate->update('supplierscontracts', array(
+            'actual_start'             => $new_start_date,
+            'actual_end'               => $new_end_date,
+            'contract_duration_months' => $months,
+            'contract_duration_days'   => $contract_duration_days,
+            'status'                   => 1,
+            'updated_at'               => date('Y-m-d H:i:s'),
+        ), array('id' => $contract_id));
         $note_text = "تم تجديد العقد من $new_start_date إلى $new_end_date (مدة: $months شهور / $contract_duration_days يوم)";
-        $note_text = mysqli_real_escape_string($conn, $note_text);
-        addNote($contract_id, $note_text, $conn);
+        addNote($contract_id, $note_text, $sch_gate);
         echo json_encode(['success' => true, 'message' => 'تم تجديد العقد بنجاح']);
-    } else {
+    } catch (\Throwable $t) {
         echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
     }
 }
@@ -143,7 +129,7 @@ else if ($action === 'settlement') {
         die(json_encode(['success' => false, 'message' => 'نوع التسوية غير صحيح']));
     }
 
-    $contract = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+    $contract = getContractData($contract_id, $sch_gate);
     if (!$contract) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
@@ -158,22 +144,18 @@ else if ($action === 'settlement') {
     }
 
     $settlement_type_ar = ($settlement_type === 'increase') ? 'زيادة' : 'نقصان';
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "UPDATE supplierscontracts sc SET
-        forecasted_contracted_hours = $new_hours,
-        updated_at = NOW()
-    WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    try {
+        $sch_gate->update('supplierscontracts', array(
+            'forecasted_contracted_hours' => $new_hours,
+            'updated_at'                  => date('Y-m-d H:i:s'),
+        ), array('id' => $contract_id));
         $note = "تم تسوية العقد: $settlement_type_ar $settlement_hours ساعة";
         if (!empty($settlement_reason)) {
-            $settlement_reason = mysqli_real_escape_string($conn, $settlement_reason);
             $note .= " - السبب: $settlement_reason";
         }
-        $note = mysqli_real_escape_string($conn, $note);
-        addNote($contract_id, $note, $conn);
+        addNote($contract_id, $note, $sch_gate);
         echo json_encode(['success' => true, 'message' => 'تم تسوية العقد بنجاح - الساعات الجديدة: ' . $new_hours]);
-    } else {
+    } catch (\Throwable $t) {
         echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
     }
 }
@@ -195,24 +177,18 @@ else if ($action === 'pause') {
         }
     }
 
-    $pause_reason = mysqli_real_escape_string($conn, $pause_reason);
-    $pause_date = mysqli_real_escape_string($conn, $pause_date);
-
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "UPDATE supplierscontracts sc SET
-        status = 0,
-        pause_reason = '$pause_reason',
-        pause_date = '$pause_date',
-        updated_at = NOW()
-    WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    try {
+        $sch_gate->update('supplierscontracts', array(
+            'status'       => 0,
+            'pause_reason' => $pause_reason,
+            'pause_date'   => $pause_date,
+            'updated_at'   => date('Y-m-d H:i:s'),
+        ), array('id' => $contract_id));
         $note = "تم إيقاف العقد بتاريخ $pause_date - السبب: $pause_reason";
-        $note = mysqli_real_escape_string($conn, $note);
-        addNote($contract_id, $note, $conn);
+        addNote($contract_id, $note, $sch_gate);
         echo json_encode(['success' => true, 'message' => 'تم إيقاف العقد بنجاح']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+    } catch (\Throwable $t) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . $t->getMessage()]);
     }
 }
 
@@ -231,31 +207,27 @@ else if ($action === 'resume') {
         }
     }
 
-    $resume_reason = mysqli_real_escape_string($conn, $resume_reason);
-    $resume_date = mysqli_real_escape_string($conn, $resume_date);
-
-    // حساب التاريخ الجديد للانتهاء بناءً على الخيار المحدد
-    $new_end_date_sql = '';
-    if ($pause_days > 0) {
-        if ($pause_handling === 'extend') {
-            // إضافة أيام الإيقاف إلى تاريخ الانتهاء (تمديد العقد)
-            $new_end_date_sql = ", actual_end = DATE_ADD(actual_end, INTERVAL $pause_days DAY)";
-        } else if ($pause_handling === 'deduct') {
-            // خصم أيام الإيقاف من تاريخ الانتهاء (تقليل مدة العقد)
-            $new_end_date_sql = ", actual_end = DATE_SUB(actual_end, INTERVAL $pause_days DAY)";
+    // حساب تاريخ الانتهاء الجديد في PHP (كان DATE_ADD/DATE_SUB في SQL —
+    // البوابة prepared بقيمٍ لا تعابير، والحساب مكافئ حرفيًّا على عمود DATE)
+    $resume_fields = array(
+        'status'       => 1,
+        'pause_reason' => null,
+        'resume_date'  => $resume_date,
+        'updated_at'   => date('Y-m-d H:i:s'),
+    );
+    if ($pause_days > 0 && in_array($pause_handling, array('extend', 'deduct'), true)
+        && !empty($current_contract_scope['actual_end'])) {
+        try {
+            $end_dt = new DateTime($current_contract_scope['actual_end']);
+            $end_dt->modify(($pause_handling === 'extend' ? '+' : '-') . $pause_days . ' day');
+            $resume_fields['actual_end'] = $end_dt->format('Y-m-d');
+        } catch (\Throwable $t) {
+            // تاريخ انتهاءٍ غير صالح — سلوك الأصل: يمضي التحديث بلا تعديل actual_end
         }
     }
 
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "UPDATE supplierscontracts sc SET
-        status = 1,
-        pause_reason = NULL,
-        resume_date = '$resume_date',
-        updated_at = NOW()
-        $new_end_date_sql
-    WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    try {
+        $sch_gate->update('supplierscontracts', $resume_fields, array('id' => $contract_id));
         $note = "تم استئناف العقد بتاريخ $resume_date";
         if ($pause_days > 0) {
             $note .= " - مدة الإيقاف: $pause_days يوم";
@@ -268,11 +240,10 @@ else if ($action === 'resume') {
         if (!empty($resume_reason)) {
             $note .= " - الملاحظات: $resume_reason";
         }
-        $note = mysqli_real_escape_string($conn, $note);
-        addNote($contract_id, $note, $conn);
+        addNote($contract_id, $note, $sch_gate);
         echo json_encode(['success' => true, 'message' => 'تم استئناف العقد بنجاح']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+    } catch (\Throwable $t) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . $t->getMessage()]);
     }
 }
 
@@ -291,32 +262,28 @@ else if ($action === 'terminate') {
     }
 
     // الاحتفاظ بتاريخ الانتهاء الحالي قبل التحديث
-    $contract_before_termination = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+    $contract_before_termination = getContractData($contract_id, $sch_gate);
     $old_end_date = ($contract_before_termination && !empty($contract_before_termination['actual_end']))
         ? $contract_before_termination['actual_end']
         : 'غير محدد';
 
-    $termination_reason = mysqli_real_escape_string($conn, $termination_reason);
     $termination_type_ar = ($termination_type === 'amicable') ? 'رضائي' : 'بسبب التعسر';
     $termination_date = date('Y-m-d');
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "UPDATE supplierscontracts sc SET
-        status = 0,
-        termination_type = '$termination_type',
-        termination_reason = '$termination_reason',
-        updated_at = NOW()
-    WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
+    try {
+        $sch_gate->update('supplierscontracts', array(
+            'status'             => 0,
+            'termination_type'   => $termination_type,
+            'termination_reason' => $termination_reason,
+            'updated_at'         => date('Y-m-d H:i:s'),
+        ), array('id' => $contract_id));
         $note = "تم إنهاء العقد ($termination_type_ar) بتاريخ $termination_date - تاريخ الانتهاء السابق: $old_end_date";
         if (!empty($termination_reason)) {
             $note .= " - السبب: $termination_reason";
         }
-        $note = mysqli_real_escape_string($conn, $note);
-        addNote($contract_id, $note, $conn);
+        addNote($contract_id, $note, $sch_gate);
         echo json_encode(['success' => true, 'message' => 'تم إنهاء العقد بنجاح']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+    } catch (\Throwable $t) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . $t->getMessage()]);
     }
 }
 
@@ -329,13 +296,13 @@ else if ($action === 'merge') {
     }
 
     // الحصول على بيانات العقد المراد الدمج معه
-    $contract_to_merge = getContractData($merge_with_id, $conn, $is_super_admin, $company_id);
+    $contract_to_merge = getContractData($merge_with_id, $sch_gate);
     if (!$contract_to_merge) {
         die(json_encode(['success' => false, 'message' => 'العقد المختار غير موجود']));
     }
 
     // الحصول على بيانات العقد الحالي
-    $current_contract = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+    $current_contract = getContractData($contract_id, $sch_gate);
     if (!$current_contract) {
         die(json_encode(['success' => false, 'message' => 'العقد الحالي غير موجود']));
     }
@@ -351,105 +318,103 @@ else if ($action === 'merge') {
     $merged_hours = $current_hours + $merge_hours;
 
     // تحديث العقد الحالي بالبيانات المدمجة
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $query = "UPDATE supplierscontracts sc SET
-        forecasted_contracted_hours = $merged_hours,
-        merged_with = $merge_with_id,
-        updated_at = NOW()
-    WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (mysqli_query($conn, $query)) {
-        // عداد للمعدات المنسوخة
-        $copied_equipments = 0;
-
-        // نسخ معدات العقد المدموج إلى العقد الحالي
-        $get_equipments_query = "SELECT equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract FROM suppliercontractequipments WHERE contract_id = $merge_with_id";
-        $equipments_result = mysqli_query($conn, $get_equipments_query);
-
-        if ($equipments_result && mysqli_num_rows($equipments_result) > 0) {
-            while ($equip = mysqli_fetch_assoc($equipments_result)) {
-                // إدراج المعدة في العقد الحالي
-                $equip_type = mysqli_real_escape_string($conn, $equip['equip_type']);
-                $equip_size = intval($equip['equip_size']);
-                $equip_count = intval($equip['equip_count']);
-                $shift_hours = intval($equip['shift_hours']);
-                $equip_total_month = intval($equip['equip_total_month']);
-                $equip_total_contract = intval($equip['equip_total_contract']);
-
-                $insert_equip_query = "INSERT INTO suppliercontractequipments (contract_id, equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract)
-                    VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $shift_hours, $equip_total_month, $equip_total_contract)";
-
-                if (mysqli_query($conn, $insert_equip_query)) {
-                    $copied_equipments++;
-                }
-            }
-        }
-
-        // تحويل العقد المدموج إلى غير ساري (status = 0)
-        $update_merged_contract = "UPDATE supplierscontracts sc SET
-            status = 0,
-            updated_at = NOW()
-        WHERE sc.id = $merge_with_id AND $tenant_scope";
-
-        if (!mysqli_query($conn, $update_merged_contract)) {
-            // في حالة فشل تحديث الحالة، نسجل ذلك في الملاحظات
-            $error_note = "تحذير: فشل تحديث حالة العقد المدموج إلى غير ساري";
-            addNote($contract_id, $error_note, $conn);
-        }
-
-        // إضافة ملاحظة للعقد الحالي
-        $merge_note_1 = "تم دمج العقد مع العقد رقم $merge_with_id - إجمالي الساعات: $merged_hours (العقد الحالي: $current_hours + العقد المدموج: $merge_hours)";
-        if ($copied_equipments > 0) {
-            $merge_note_1 .= " - تم نسخ $copied_equipments معدة";
-        }
-        $merge_note_1 = mysqli_real_escape_string($conn, $merge_note_1);
-        addNote($contract_id, $merge_note_1, $conn);
-
-        // إضافة ملاحظة للعقد المدموج
-        $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id - تم تحويل العقد إلى غير ساري";
-        $merge_note_2 = mysqli_real_escape_string($conn, $merge_note_2);
-        addNote($merge_with_id, $merge_note_2, $conn);
-
-        $success_message = 'تم دمج العقود بنجاح';
-        if ($copied_equipments > 0) {
-            $success_message .= " - تم نسخ $copied_equipments معدة";
-        }
-        $success_message .= " - إجمالي الساعات: $merged_hours";
-
-        echo json_encode(['success' => true, 'message' => $success_message]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود: ' . mysqli_error($conn)]);
+    try {
+        $sch_gate->update('supplierscontracts', array(
+            'forecasted_contracted_hours' => $merged_hours,
+            'merged_with'                 => $merge_with_id,
+            'updated_at'                  => date('Y-m-d H:i:s'),
+        ), array('id' => $contract_id));
+    } catch (\Throwable $t) {
+        die(json_encode(['success' => false, 'message' => 'خطأ في دمج العقود: ' . $t->getMessage()]));
     }
+
+    // عداد للمعدات المنسوخة
+    $copied_equipments = 0;
+
+    // نسخ معدات العقد المدموج إلى العقد الحالي (قراءةً وكتابةً عبر البوابة)
+    try {
+        $merge_equip_rows = $sch_gate->scopedQuery(array(
+            'scope' => array('sce' => 'suppliercontractequipments'),
+        ), "SELECT sce.equip_type, sce.equip_size, sce.equip_count, sce.shift_hours, sce.equip_total_month, sce.equip_total_contract
+            FROM suppliercontractequipments sce
+            WHERE {TENANT_SCOPE} AND sce.contract_id = ?", array($merge_with_id));
+    } catch (\Throwable $t) { $merge_equip_rows = array(); }
+
+    foreach ($merge_equip_rows as $equip) {
+        try {
+            $sch_gate->insert('suppliercontractequipments', array(
+                'contract_id'          => $contract_id,
+                'equip_type'           => $equip['equip_type'],
+                'equip_size'           => intval($equip['equip_size']),
+                'equip_count'          => intval($equip['equip_count']),
+                'shift_hours'          => intval($equip['shift_hours']),
+                'equip_total_month'    => intval($equip['equip_total_month']),
+                'equip_total_contract' => intval($equip['equip_total_contract']),
+            ));
+            $copied_equipments++;
+        } catch (\Throwable $t) {
+            // سلوك الأصل: فشل نسخ معدةٍ لا يوقف الدمج — تُحتسب المنسوخة فقط
+        }
+    }
+
+    // تحويل العقد المدموج إلى غير ساري (status = 0)
+    try {
+        $sch_gate->update('supplierscontracts', array(
+            'status'     => 0,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ), array('id' => $merge_with_id));
+    } catch (\Throwable $t) {
+        // في حالة فشل تحديث الحالة، نسجل ذلك في الملاحظات
+        $error_note = "تحذير: فشل تحديث حالة العقد المدموج إلى غير ساري";
+        addNote($contract_id, $error_note, $sch_gate);
+    }
+
+    // إضافة ملاحظة للعقد الحالي
+    $merge_note_1 = "تم دمج العقد مع العقد رقم $merge_with_id - إجمالي الساعات: $merged_hours (العقد الحالي: $current_hours + العقد المدموج: $merge_hours)";
+    if ($copied_equipments > 0) {
+        $merge_note_1 .= " - تم نسخ $copied_equipments معدة";
+    }
+    addNote($contract_id, $merge_note_1, $sch_gate);
+
+    // إضافة ملاحظة للعقد المدموج
+    $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id - تم تحويل العقد إلى غير ساري";
+    addNote($merge_with_id, $merge_note_2, $sch_gate);
+
+    $success_message = 'تم دمج العقود بنجاح';
+    if ($copied_equipments > 0) {
+        $success_message .= " - تم نسخ $copied_equipments معدة";
+    }
+    $success_message .= " - إجمالي الساعات: $merged_hours";
+
+    echo json_encode(['success' => true, 'message' => $success_message]);
 }
 
 // 7. انتهاء العقد
 elseif ($action === 'complete') {
-    $complete_note = isset($_POST['complete_note']) ? mysqli_real_escape_string($conn, $_POST['complete_note']) : '';
+    $complete_note = isset($_POST['complete_note']) ? $_POST['complete_note'] : '';
 
     if (empty($complete_note)) {
         die(json_encode(['success' => false, 'message' => 'الرجاء إدخال ملاحظات الانتهاء']));
     }
 
-    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
-    $status_update_parts = array(
-        "status = 0",
-        "updated_at = NOW()"
+    $complete_fields = array(
+        'status'     => 0,
+        'updated_at' => date('Y-m-d H:i:s'),
     );
-
     if (db_table_has_column($conn, 'supplierscontracts', 'contract_status')) {
-        $status_update_parts[] = "contract_status = 'completed'";
+        $complete_fields['contract_status'] = 'completed';
     }
 
-    $complete_update_query = "UPDATE supplierscontracts sc SET " . implode(', ', $status_update_parts) . " WHERE sc.id = $contract_id AND $tenant_scope";
-
-    if (!mysqli_query($conn, $complete_update_query)) {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث حالة العقد: ' . mysqli_error($conn)]);
+    try {
+        $sch_gate->update('supplierscontracts', $complete_fields, array('id' => $contract_id));
+    } catch (\Throwable $t) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث حالة العقد: ' . $t->getMessage()]);
         exit;
     }
 
     // إضافة الملاحظة في جدول supplier_contract_notes
     $note_text = "تم إنهاء العقد وتحويل حالته إلى غير ساري: " . $complete_note;
-    if (addNote($contract_id, $note_text, $conn)) {
+    if (addNote($contract_id, $note_text, $sch_gate)) {
         echo json_encode(['success' => true, 'message' => 'تم تسجيل انتهاء العقد وتحديث حالته بنجاح']);
     } else {
         echo json_encode(['success' => true, 'message' => 'تم تحديث حالة العقد إلى غير ساري، لكن تعذر حفظ الملاحظة']);

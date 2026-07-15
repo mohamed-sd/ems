@@ -51,12 +51,19 @@ if (!isset($_SESSION['user'])) {
 
         $project = intval($_GET['id']);
 
-        $select = mysqli_query($conn, "SELECT * ,
-                      (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments',
-                      (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'num_contracts',
-                      (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'total_hours'
-                      FROM `suppliers` WHERE `id` = $project ORDER BY id DESC");
-        if ($select) { while ($row = mysqli_fetch_array($select)) {
+        // العزل عبر البوابة؛ العدّادات المترابطة تُقيَّد بمراسلة suppliers.id المُنطَّق
+        // (equipments/supplierscontracts تُعلنان enrich — إعلانٌ بلا تنطيقٍ إضافي، سلوك الأصل)
+        try {
+            $sup_rows = ems_tenant_db()->scopedQuery(array(
+                'scope'  => array('suppliers' => 'suppliers'),
+                'enrich' => array('equipments' => 'equipments', 'supplierscontracts' => 'supplierscontracts'),
+            ), "SELECT * ,
+                  (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments',
+                  (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'num_contracts',
+                  (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'total_hours'
+                  FROM `suppliers` WHERE {TENANT_SCOPE} AND `id` = ? ORDER BY id DESC", array($project));
+        } catch (\Throwable $t) { $sup_rows = array(); }
+        foreach ($sup_rows as $row) {
             ?>
             <div class="report">
                 <div class="row">
@@ -75,7 +82,7 @@ if (!isset($_SESSION['user'])) {
                 </div>
             </div>
             <?php
-        } } // end while loop
+        } // end loop
         ?>
 
 
@@ -98,11 +105,14 @@ if (!isset($_SESSION['user'])) {
             <tbody>
                 <?php
 
-                // جلب المشاريع
-                $query = "SELECT `id`, `code`, `type`, `name`, `status` FROM `equipments` where suppliers = $project ORDER BY id DESC";
-                $result = mysqli_query($conn, $query);
+                // جلب آليات المورد — العزل عبر البوابة
+                try {
+                    $eq_rows = ems_tenant_db()->scopedQuery(array(
+                        'scope' => array('equipments' => 'equipments'),
+                    ), "SELECT `id`, `code`, `type`, `name`, `status` FROM `equipments` WHERE {TENANT_SCOPE} AND suppliers = ? ORDER BY id DESC", array($project));
+                } catch (\Throwable $t) { $eq_rows = array(); }
                 $i = 1;
-                if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                foreach ($eq_rows as $row) {
                     echo "<tr>";
                     echo "<td>" . $i++ . "</td>";
                     echo "<td>" . $row['code'] . "</td>";
@@ -115,7 +125,7 @@ if (!isset($_SESSION['user'])) {
                     //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
                     //       </td>";
                     echo "</tr>";
-                } }
+                }
                 ?>
             </tbody>
         </table>
@@ -141,14 +151,18 @@ if (!isset($_SESSION['user'])) {
                 <?php
                 include '../config.php';
 
-                $query = "SELECT sc.*, op.name as project_name 
-                          FROM `supplierscontracts` sc
-                          LEFT JOIN project op ON sc.project_id = op.id
-                          WHERE sc.supplier_id = '$project' 
-                          ORDER BY sc.id DESC";
-                $result = mysqli_query($conn, $query);
+                try {
+                    $sc_rows = ems_tenant_db()->scopedQuery(array(
+                        'scope'  => array('sc' => 'supplierscontracts'),
+                        'enrich' => array('op' => 'project'), // اسم المشروع — LEFT بلا تنطيق (سلوك الأصل)
+                    ), "SELECT sc.*, op.name as project_name
+                        FROM `supplierscontracts` sc
+                        LEFT JOIN project op ON sc.project_id = op.id
+                        WHERE {TENANT_SCOPE} AND sc.supplier_id = ?
+                        ORDER BY sc.id DESC", array($project));
+                } catch (\Throwable $t) { $sc_rows = array(); }
                 $i = 1;
-                if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                foreach ($sc_rows as $row) {
                      $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
                     <font color='red'>منتهي</font>";
 
@@ -165,7 +179,7 @@ if (!isset($_SESSION['user'])) {
                     //       </td>";
                     echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a></td>";
                     echo "</tr>";
-                } }
+                }
                 ?>
             </tbody>
         </table>
