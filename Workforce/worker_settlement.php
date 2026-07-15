@@ -14,8 +14,8 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $pp = check_page_permissions($conn, 'Workforce/worker_settlement.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-$scope_sql=$is_super_admin?"":" AND ws.company_id = ".intval($company_id)." ";
-$wp_scope =$is_super_admin?"":" AND wp.company_id = ".intval($company_id)." ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$ws_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker settlement super') : ems_tenant_db();
 $STATES=['محتسب','معتمد','مدفوع'];
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
@@ -32,19 +32,22 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $notes=trim($_POST['notes']??''); $notes=$notes!==''?$notes:null;
     if (!$is_editing) {
         if ($worker_id<=0) { header("Location: worker_settlement.php?msg=يجب+اختيار+عامل+❌"); exit(); }
-        $cid=$is_super_admin?null:$company_id;
-        $st=$conn->prepare("INSERT INTO worker_settlement (company_id,employee_id,worker_contract_id,source_type,settlement_party,settlement_basis,net_amount,net_finance_note,state,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-        // types(11): company i,worker i,contract i,source s,party s,basis s,net d,netnote s,state s,notes s,by i
         $nid=0;
-        if($st){ $st->bind_param('iiisssdsssi',$cid,$worker_id,$contract_id,$source,$party,$basis,$net,$net_note,$state,$notes,$user_id);
-        $st->execute(); $nid=$st->insert_id; $st->close(); }
+        try {
+            // company_id تحقنه البوابة من سياق الجلسة، وتعيد المعرّف الوليد
+            $nid = intval($ws_gate->insert('worker_settlement', array(
+                'employee_id' => $worker_id, 'worker_contract_id' => $contract_id, 'source_type' => $source,
+                'settlement_party' => $party, 'settlement_basis' => $basis, 'net_amount' => $net,
+                'net_finance_note' => $net_note, 'state' => $state, 'notes' => $notes, 'created_by' => $user_id)));
+        } catch (\Throwable $t) { error_log('worker_settlement.php insert: ' . $t->getMessage()); }
         header("Location: worker_settlement.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
     } else {
-        $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-        $st=$conn->prepare("UPDATE worker_settlement SET worker_contract_id=?,source_type=?,settlement_party=?,settlement_basis=?,net_amount=?,net_finance_note=?,state=?,notes=? WHERE id=? $sc");
-        // types(9): contract i,source s,party s,basis s,net d,netnote s,state s,notes s,id i
-        if($st){ $st->bind_param('isssdsssi',$contract_id,$source,$party,$basis,$net,$net_note,$state,$notes,$id);
-        $st->execute(); $st->close(); }
+        try {
+            $ws_gate->update('worker_settlement', array(
+                'worker_contract_id' => $contract_id, 'source_type' => $source, 'settlement_party' => $party,
+                'settlement_basis' => $basis, 'net_amount' => $net, 'net_finance_note' => $net_note,
+                'state' => $state, 'notes' => $notes), array('id' => $id));
+        } catch (\Throwable $t) { error_log('worker_settlement.php update: ' . $t->getMessage()); }
         header("Location: worker_settlement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
@@ -54,32 +57,53 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_line' &
     if ($sid>0) {
         // تأكّد أن التسوية الأب تتبع شركة المستخدم قبل الإدراج (worker_settlement_line بلا company_id)
         $owned=$is_super_admin;
-        if (!$is_super_admin) { $chk=$conn->prepare("SELECT 1 FROM worker_settlement WHERE id=? AND company_id=? LIMIT 1"); $chk->bind_param('ii',$sid,$company_id); $chk->execute(); $owned=(bool)$chk->get_result()->fetch_row(); $chk->close(); }
+        if (!$is_super_admin) {
+            try { $owned = ($ws_gate->selectOne('worker_settlement', array('columns'=>array('id'), 'where'=>array('id'=>$sid))) !== null); }
+            catch (\Throwable $t) { $owned = false; error_log('worker_settlement.php add_line own: ' . $t->getMessage()); }
+        }
         if (!$owned) { header("Location: worker_settlement.php?msg=التسوية+خارج+نطاق+الشركة+❌"); exit(); }
-        $st=$conn->prepare("INSERT INTO worker_settlement_line (settlement_id,line_type,description,amount) VALUES (?,?,?,?)");
-        if($st){ $st->bind_param('issd',$sid,$lt,$desc,$amt); $st->execute(); $st->close(); }
+        try {
+            // ابن T_CHILD: البوابة تتحقق من ملكية الأب (settlement_id) قبل الإدراج
+            $ws_gate->insert('worker_settlement_line', array(
+                'settlement_id' => $sid, 'line_type' => $lt, 'description' => $desc, 'amount' => $amt));
+        } catch (\Throwable $t) { error_log('worker_settlement.php add_line: ' . $t->getMessage()); }
     }
     header("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حفظ+البند"); exit();
 }
 if (($_GET['del_line']??'')!=='' && $can_delete) { $lid=intval($_GET['del_line']); $sid=intval($_GET['edit']??0);
-    // عزل الشركة عبر التسوية الأب (worker_settlement_line بلا company_id) — المدير الأعلى -1 معفى
-    if ($is_super_admin) { $st=$conn->prepare("DELETE FROM worker_settlement_line WHERE id=?"); $st->bind_param('i',$lid); }
-    else { $st=$conn->prepare("DELETE l FROM worker_settlement_line l JOIN worker_settlement ws ON ws.id=l.settlement_id WHERE l.id=? AND ws.company_id=?"); $st->bind_param('ii',$lid,$company_id); }
-    $st->execute(); $st->close();
+    // عزل الشركة عبر التسوية الأب (worker_settlement_line بلا company_id): يُستحضَر أبو
+    // السطر الحقيقي عبر البوابة (المعزول بالأب) ثم يُحذف بقيد الأب+الملكية (deleteChild).
+    try {
+        $ws_line = $ws_gate->selectOne('worker_settlement_line', array('where' => array('id' => $lid)));
+        if ($ws_line !== null) {
+            $ws_gate->deleteChild('worker_settlement_line', $lid,
+                'worker_settlement', intval($ws_line['settlement_id']), 'settlement_id', 'settlement line delete');
+        }
+    } catch (\Throwable $t) { error_log('worker_settlement.php del_line: ' . $t->getMessage()); }
     header("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حذف+البند"); exit(); }
-if (($_GET['delete']??'')!=='' && $can_delete) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id); $d=intval($_GET['delete']);
-    $st=$conn->prepare("DELETE FROM worker_settlement WHERE id=? $sc"); $st->bind_param('i',$d); $st->execute(); $st->close();
+if (($_GET['delete']??'')!=='' && $can_delete) { $d=intval($_GET['delete']);
+    try { $ws_gate->deleteRow('worker_settlement', $d, 'settlement delete'); }
+    catch (\Throwable $t) { error_log('worker_settlement.php delete: ' . $t->getMessage()); }
     header("Location: worker_settlement.php?msg=✅+تم+الحذف"); exit(); }
 
 $edit=null; $lines=[]; $edit_id=intval($_GET['edit']??0);
 if ($edit_id>0) {
-    $sc=$is_super_admin?"":" AND ws.company_id = ".intval($company_id);
-    $st=$conn->prepare("SELECT ws.*, e.name AS wname FROM worker_settlement ws LEFT JOIN employees e ON e.id=ws.employee_id WHERE ws.id=? $sc LIMIT 1");
-    $st->bind_param('i',$edit_id); $st->execute(); $edit=$st->get_result()->fetch_assoc(); $st->close();
-    if ($edit) { $lq=mysqli_query($conn,"SELECT * FROM worker_settlement_line WHERE settlement_id=".intval($edit_id)." ORDER BY id"); if($lq){while($l=mysqli_fetch_assoc($lq)){$lines[]=$l;}} }
+    try {
+        $ws_edit_rows = $ws_gate->scopedQuery(array('scope'=>array('ws'=>'worker_settlement'), 'enrich'=>array('e'=>'employees')),
+            "SELECT ws.*, e.name AS wname FROM worker_settlement ws LEFT JOIN employees e ON e.id=ws.employee_id WHERE ws.id=? AND {TENANT_SCOPE} LIMIT 1",
+            array($edit_id));
+        $edit = !empty($ws_edit_rows) ? $ws_edit_rows[0] : null;
+        if ($edit) {
+            $lines = $ws_gate->select('worker_settlement_line', array('where' => array('settlement_id' => $edit_id), 'orderBy' => 'id'));
+        }
+    } catch (\Throwable $t) { error_log('worker_settlement.php edit: ' . $t->getMessage()); }
 }
-$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 $wp_scope ORDER BY wp.name");
-if($wq){while($w=mysqli_fetch_assoc($wq)){$workers[$w['id']]=$w['name'];}}
+$workers=[];
+try {
+    $ws_workers = $ws_gate->scopedQuery(array('scope'=>array('wp'=>'employees')),
+        "SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wp.name");
+    foreach($ws_workers as $w){$workers[$w['id']]=$w['name'];}
+} catch (\Throwable $t) { error_log('worker_settlement.php workers: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | تسوية العاملين"; include '../inheader.php'; include '../insidebar.php';
 ?>
@@ -129,8 +153,12 @@ $page_title="إيكوبيشن | تسوية العاملين"; include '../inhead
 
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>المصدر</th><th>الأساس</th><th>الصافي</th><th>الحالة</th></tr></thead><tbody>
-        <?php $list=mysqli_query($conn,"SELECT ws.*, e.name AS wname FROM worker_settlement ws LEFT JOIN employees e ON e.id=ws.employee_id WHERE 1=1 $scope_sql ORDER BY ws.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++; $sc=($r['state']==='مدفوع')?'status-active':(($r['state']==='معتمد')?'status-warning':'status-inactive');
+        <?php $list = array();
+        try {
+            $list = $ws_gate->scopedQuery(array('scope'=>array('ws'=>'worker_settlement'), 'enrich'=>array('e'=>'employees')),
+                "SELECT ws.*, e.name AS wname FROM worker_settlement ws LEFT JOIN employees e ON e.id=ws.employee_id WHERE 1=1 AND {TENANT_SCOPE} ORDER BY ws.id DESC");
+        } catch (\Throwable $t) { error_log('worker_settlement.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++; $sc=($r['state']==='مدفوع')?'status-active':(($r['state']==='معتمد')?'status-warning':'status-inactive');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل التسوية', 'fas fa-hand-holding-dollar', [
                 ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
                 ems_wf_field('المصدر', $r['source_type'] ?: '-', 'fas fa-sitemap'),
@@ -151,7 +179,7 @@ $page_title="إيكوبيشن | تسوية العاملين"; include '../inhead
             <td><?= htmlspecialchars($r['source_type'] ?: '-') ?></td><td><?= htmlspecialchars($r['settlement_basis'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['net_amount'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">لا توجد تسوياتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">لا توجد تسوياتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

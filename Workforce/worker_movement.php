@@ -14,8 +14,8 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $pp = check_page_permissions($conn, 'Workforce/worker_movement.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-$scope_sql=$is_super_admin?"":" AND m.company_id = ".intval($company_id)." ";
-$wp_scope =$is_super_admin?"":" AND wp.company_id = ".intval($company_id)." ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$wm_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker movement super') : ems_tenant_db();
 
 $STATES=['مسودة','أمرٌ صادر','في الطريق','وصل','مستلَم بالموقع','جاهزٌ للعمل','ملغى'];
 $DIRECTIONS=['التحاق أول','عودة من إجازة','مغادرة لإجازة/مأمورية','نقل بين مشاريع','مغادرة نهائية'];
@@ -49,49 +49,55 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save' && $c
     if(!in_array($state,$STATES,true)) $state=$STATES[0];
     $notes=trim($_POST['notes']??''); $notes=$notes!==''?$notes:null;
     if ($worker_id>0) {
-        $cid=$is_super_admin?null:$company_id;
-        // بنّاء ديناميكي (عمود => [قيمة, نوع]) يتجنّب أخطاء سلسلة الأنواع، ومحمي للأعمدة الجديدة.
-        $fields=[
-            'company_id'=>[$cid,'i'],'employee_id'=>[$worker_id,'i'],'direction'=>[$direction,'s'],
-            'origin'=>[$origin,'s'],'origin_state'=>[$origin_state,'s'],'origin_city'=>[$origin_city,'s'],
-            'destination_project_id'=>[$dest_proj,'i'],'destination_state'=>[$dest_state,'s'],'destination_city'=>[$dest_city,'s'],
-            'transport_mode'=>[$transport,'s'],'departure_date'=>[$dep,'s'],'expected_arrival'=>[$exp,'s'],'actual_arrival'=>[$act,'s'],
-            'received_by'=>[$received_by,'i'],'housing_unit_id'=>[$housing,'i'],'site_zone'=>[$site_zone,'s'],
-            'safety_kit_received'=>[$safety,'i'],'custody_received'=>[$custody,'i'],'ready_date'=>[$ready,'s'],
-            'transfer_type'=>[$transfer_type,'s'],'from_project_id'=>[$from_proj,'i'],'to_project_id'=>[$to_proj,'i'],
-            'state'=>[$state,'s'],'notes'=>[$notes,'s'],'created_by'=>[$user_id,'i'],
-        ];
-        foreach (['origin_state','origin_city','destination_state','destination_city'] as $nc) {
-            if (!db_table_has_column($conn,'worker_movement',$nc)) unset($fields[$nc]);
-        }
-        $cols=array_keys($fields); $ph=implode(',',array_fill(0,count($cols),'?'));
-        $types=''; $vals=[]; foreach($fields as $f){ $types.=$f[1]; $vals[]=$f[0]; }
-        $st=$conn->prepare("INSERT INTO worker_movement (`".implode('`,`',$cols)."`) VALUES ($ph)");
-        if ($st) { $bind=[$types]; for($k=0;$k<count($vals);$k++)$bind[]=&$vals[$k]; call_user_func_array([$st,'bind_param'],$bind); $st->execute(); $st->close(); }
+        // أعمدة الولاية/المدينة الأربعة قائمة منذ ترحيلها (سقط فحص db_table_has_column
+        // بسقوط الهجرات الذاتية) — والقيمة الفعلية تُمرَّر كلها للبوابة، وcompany_id تحقنه هي.
+        try {
+            $wm_gate->insert('worker_movement', array(
+                'employee_id' => $worker_id, 'direction' => $direction,
+                'origin' => $origin, 'origin_state' => $origin_state, 'origin_city' => $origin_city,
+                'destination_project_id' => $dest_proj, 'destination_state' => $dest_state, 'destination_city' => $dest_city,
+                'transport_mode' => $transport, 'departure_date' => $dep, 'expected_arrival' => $exp, 'actual_arrival' => $act,
+                'received_by' => $received_by, 'housing_unit_id' => $housing, 'site_zone' => $site_zone,
+                'safety_kit_received' => $safety, 'custody_received' => $custody, 'ready_date' => $ready,
+                'transfer_type' => $transfer_type, 'from_project_id' => $from_proj, 'to_project_id' => $to_proj,
+                'state' => $state, 'notes' => $notes, 'created_by' => $user_id));
+        } catch (\Throwable $t) { error_log('worker_movement.php insert: ' . $t->getMessage()); }
     }
     header("Location: worker_movement.php?msg=✅+تم+الحفظ"); exit();
 }
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='set_state' && $can_edit) {
     $id=intval($_POST['id']??0); $ns=trim($_POST['new_state']??'');
     if ($id>0 && in_array($ns,$STATES,true)) {
-        $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-        $st=$conn->prepare("UPDATE worker_movement SET state=? WHERE id=? $sc"); if($st){ $st->bind_param('si',$ns,$id); $st->execute(); $st->close(); }
+        try { $wm_gate->update('worker_movement', array('state' => $ns), array('id' => $id)); }
+        catch (\Throwable $t) { error_log('worker_movement.php set_state: ' . $t->getMessage()); }
     }
     header("Location: worker_movement.php?msg=✅+تم+تحديث+الحالة"); exit();
 }
 if (($_GET['delete']??'')!=='' && $can_delete) {
-    $sc=$is_super_admin?"":" AND company_id = ".intval($company_id); $d=intval($_GET['delete']);
-    $st=$conn->prepare("DELETE FROM worker_movement WHERE id=? $sc"); $st->bind_param('i',$d); $st->execute(); $st->close();
+    $d=intval($_GET['delete']);
+    try { $wm_gate->deleteRow('worker_movement', $d, 'worker movement delete'); }
+    catch (\Throwable $t) { error_log('worker_movement.php delete: ' . $t->getMessage()); }
     header("Location: worker_movement.php?msg=✅+تم+الحذف"); exit();
 }
 
-$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 $wp_scope ORDER BY wp.name");
-if($wq){while($w=mysqli_fetch_assoc($wq)){$workers[$w['id']]=$w['name'];}}
-$proj_scope = $is_super_admin ? "" : " WHERE company_id = ".intval($company_id);
-$projects=[]; $pq=mysqli_query($conn,"SELECT id,name FROM project $proj_scope ORDER BY id DESC LIMIT 500");
-if($pq){while($p=mysqli_fetch_assoc($pq)){$projects[$p['id']]=$p['name'];}}
-$housing=[]; $hq=mysqli_query($conn,"SELECT id,name FROM housing_unit WHERE 1=1".($is_super_admin?"":" AND company_id = ".intval($company_id))." ORDER BY name");
-if($hq){while($h=mysqli_fetch_assoc($hq)){$housing[$h['id']]=$h['name'];}}
+$workers=[];
+try {
+    $wm_workers = $wm_gate->scopedQuery(array('scope'=>array('wp'=>'employees')),
+        "SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wp.name");
+    foreach($wm_workers as $w){$workers[$w['id']]=$w['name'];}
+} catch (\Throwable $t) { error_log('worker_movement.php workers: ' . $t->getMessage()); }
+$projects=[];
+try {
+    $wm_projects = $wm_gate->scopedQuery(array('scope'=>array('project'=>'project')),
+        "SELECT id,name FROM project WHERE 1=1 AND {TENANT_SCOPE} ORDER BY id DESC LIMIT 500");
+    foreach($wm_projects as $p){$projects[$p['id']]=$p['name'];}
+} catch (\Throwable $t) { error_log('worker_movement.php projects: ' . $t->getMessage()); }
+$housing=[];
+try {
+    $wm_housing = $wm_gate->scopedQuery(array('scope'=>array('housing_unit'=>'housing_unit')),
+        "SELECT id,name FROM housing_unit WHERE 1=1 AND {TENANT_SCOPE} ORDER BY name");
+    foreach($wm_housing as $h){$housing[$h['id']]=$h['name'];}
+} catch (\Throwable $t) { error_log('worker_movement.php housing: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | التحرّك والنقل"; include '../inheader.php'; include '../insidebar.php';
 ?>
@@ -143,11 +149,15 @@ $page_title="إيكوبيشن | التحرّك والنقل"; include '../inhead
     </form>
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>الحركة</th><th>الوجهة</th><th>الوصول الفعلي</th><th>زمن الرحلة</th><th>الحالة</th></tr></thead><tbody>
-        <?php $list=mysqli_query($conn,"SELECT m.*, e.name AS wname, p.name AS pname,
+        <?php $list = array();
+        try {
+            $list = $wm_gate->scopedQuery(array('scope'=>array('m'=>'worker_movement'), 'enrich'=>array('e'=>'employees','p'=>'project')),
+                "SELECT m.*, e.name AS wname, p.name AS pname,
             DATEDIFF(m.actual_arrival, m.departure_date) AS trip_days
             FROM worker_movement m LEFT JOIN employees e ON e.id=m.employee_id
-            LEFT JOIN project p ON p.id=m.destination_project_id WHERE 1=1 $scope_sql ORDER BY m.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++;
+            LEFT JOIN project p ON p.id=m.destination_project_id WHERE 1=1 AND {TENANT_SCOPE} ORDER BY m.id DESC");
+        } catch (\Throwable $t) { error_log('worker_movement.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++;
             $sc=($r['state']==='جاهزٌ للعمل'||$r['state']==='مستلَم بالموقع')?'status-active':(($r['state']==='ملغى')?'status-inactive':'status-warning');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل أمر التحرّك/النقل', 'fas fa-route', [
                 ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
@@ -181,7 +191,7 @@ $page_title="إيكوبيشن | التحرّك والنقل"; include '../inhead
             <td><?= htmlspecialchars($r['actual_arrival'] ?: '-') ?></td>
             <td><?= ($r['trip_days']!==null && $r['trip_days']!=='') ? (intval($r['trip_days']).' يوم') : '-' ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد أوامرٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد أوامرٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

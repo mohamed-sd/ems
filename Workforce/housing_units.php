@@ -13,8 +13,8 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $pp = check_page_permissions($conn, 'Workforce/housing_units.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-// مؤهَّل بـ h. لأن استعلام القائمة يضمّ project (وكلاهما يملك company_id) → يمنع خطأ ambiguous.
-$scope = $is_super_admin ? "" : " AND h.company_id = " . intval($company_id) . " ";
+// العزل عبر بوابة المستأجر (TenantDb) — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$hu_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('housing units super') : ems_tenant_db();
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='save' && ($can_add || $can_edit)) {
     $id = intval($_POST['id'] ?? 0);
@@ -25,30 +25,36 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='save' && 
     $notes = trim($_POST['notes'] ?? '');
     if ($name !== '') {
         if ($id > 0 && $can_edit) {
-            $sc = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-            $st = $conn->prepare("UPDATE housing_unit SET name=?, project_id=?, capacity=?, location=?, notes=? WHERE id=? $sc");
-            $st->bind_param('siissi', $name, $project_id, $capacity, $location, $notes, $id);
-            $st->execute(); $st->close();
+            try {
+                $hu_gate->update('housing_unit',
+                    array('name' => $name, 'project_id' => $project_id, 'capacity' => $capacity,
+                          'location' => $location, 'notes' => $notes),
+                    array('id' => $id));
+            } catch (\Throwable $t) { error_log('housing_units.php update: ' . $t->getMessage()); }
         } elseif ($can_add) {
-            $cid = $is_super_admin ? null : $company_id;
-            $st = $conn->prepare("INSERT INTO housing_unit (company_id,name,project_id,capacity,location,notes) VALUES (?,?,?,?,?,?)");
-            $st->bind_param('isiiss', $cid, $name, $project_id, $capacity, $location, $notes);
-            $st->execute(); $st->close();
+            try {
+                // company_id تحقنه البوابة من سياق الجلسة
+                $hu_gate->insert('housing_unit',
+                    array('name' => $name, 'project_id' => $project_id, 'capacity' => $capacity,
+                          'location' => $location, 'notes' => $notes));
+            } catch (\Throwable $t) { error_log('housing_units.php insert: ' . $t->getMessage()); }
         }
     }
     header("Location: housing_units.php?msg=✅+تم+الحفظ"); exit();
 }
 if (($_GET['delete'] ?? '') !== '' && $can_delete) {
-    $sc = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-    $st = $conn->prepare("DELETE FROM housing_unit WHERE id=? $sc"); $d=intval($_GET['delete']);
-    $st->bind_param('i',$d); $st->execute(); $st->close();
+    $d=intval($_GET['delete']);
+    try { $hu_gate->deleteRow('housing_unit', $d, 'housing unit delete'); }
+    catch (\Throwable $t) { error_log('housing_units.php delete: ' . $t->getMessage()); }
     header("Location: housing_units.php?msg=✅+تم+الحذف"); exit();
 }
 
 $projects = [];
-$proj_scope = $is_super_admin ? "" : " WHERE company_id = " . intval($company_id);
-$pq = mysqli_query($conn, "SELECT id, name FROM project $proj_scope ORDER BY id DESC LIMIT 500");
-if ($pq) { while ($p = mysqli_fetch_assoc($pq)) { $projects[$p['id']] = $p['name']; } }
+try {
+    $hu_proj_rows = $hu_gate->scopedQuery(array('scope' => array('project' => 'project')),
+        "SELECT id, name FROM project WHERE 1=1 AND {TENANT_SCOPE} ORDER BY id DESC LIMIT 500");
+    foreach ($hu_proj_rows as $p) { $projects[$p['id']] = $p['name']; }
+} catch (\Throwable $t) { error_log('housing_units.php projects: ' . $t->getMessage()); }
 
 $page_title = "إيكوبيشن | وحدات السكن";
 include '../inheader.php';
@@ -76,8 +82,12 @@ include '../insidebar.php';
     </form>
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>الاسم</th><th>المشروع</th><th>السعة</th><th>الموقع</th></tr></thead><tbody>
-        <?php $list=mysqli_query($conn,"SELECT h.*, p.name AS pname FROM housing_unit h LEFT JOIN project p ON p.id=h.project_id WHERE 1=1 $scope ORDER BY h.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++;
+        <?php $list = array();
+        try {
+            $list = $hu_gate->scopedQuery(array('scope' => array('h' => 'housing_unit'), 'enrich' => array('p' => 'project')),
+                "SELECT h.*, p.name AS pname FROM housing_unit h LEFT JOIN project p ON p.id=h.project_id WHERE 1=1 AND {TENANT_SCOPE} ORDER BY h.id DESC");
+        } catch (\Throwable $t) { error_log('housing_units.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++;
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل وحدة السكن', 'fas fa-building', [
                 ems_wf_field('الاسم', $r['name'], 'fas fa-signature', ['size' => 'lg']),
                 ems_wf_field('المشروع', $r['pname'] ?: '-', 'fas fa-folder-open'),
@@ -99,7 +109,7 @@ include '../insidebar.php';
             </div></td>
             <td><strong><?= htmlspecialchars($r['name']) ?></strong></td><td><?= htmlspecialchars($r['pname'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['capacity'] ?: '-') ?></td><td><?= htmlspecialchars($r['location'] ?: '-') ?></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="5" style="text-align:center;color:#888;padding:18px;">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="5" style="text-align:center;color:#888;padding:18px;">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

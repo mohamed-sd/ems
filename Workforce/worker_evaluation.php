@@ -15,33 +15,31 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $pp = check_page_permissions($conn, 'Workforce/worker_evaluation.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-$scope_sql=$is_super_admin?"":" AND ev.company_id = ".intval($company_id)." ";
-$wp_scope =$is_super_admin?"":" AND wp.company_id = ".intval($company_id)." ";
-$company_scope_sql=$is_super_admin?"":" AND company_id = ".intval($company_id)." ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$ev_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker evaluation super') : ems_tenant_db();
 $STATES=['مسودة','معتمد','مرحّل'];
 
 // الدرجة الموزونة من بنود المؤشّرات: Σ(وزن×درجة)/Σ(وزن). إن انعدمت الأوزان فمتوسطٌ بسيط. null إن لا بنود.
-function ems_eval_weighted_score($conn, $eval_id) {
+// (البنود ابن T_CHILD — البوابة تعزلها عبر التقييم الأب المملوك)
+function ems_eval_weighted_score($g, $eval_id) {
     $eval_id=(int)$eval_id; if ($eval_id<=0) return null;
-    $q=$conn->prepare("SELECT weight, score FROM worker_evaluation_kpi WHERE evaluation_id=?");
-    if (!$q) return null;
-    $q->bind_param('i',$eval_id); $q->execute(); $res=$q->get_result();
+    try { $rows = $g->select('worker_evaluation_kpi', array('columns'=>array('weight','score'), 'where'=>array('evaluation_id'=>$eval_id))); }
+    catch (\Throwable $t) { return null; }
     $sumW=0.0; $sumWS=0.0; $sumS=0.0; $n=0;
-    while ($l=$res->fetch_assoc()) {
+    foreach ($rows as $l) {
         if ($l['score']===null || $l['score']==='') continue;
         $w=floatval($l['weight']); $s=floatval($l['score']);
         $n++; $sumS+=$s; $sumW+=$w; $sumWS+=$w*$s;
     }
-    $q->close();
     if ($n===0) return null;
     return ($sumW>0) ? round($sumWS/$sumW,2) : round($sumS/$n,2);
 }
 // يعيد احتساب الدرجة من البنود ويخزّنها في worker_evaluation (إن وُجدت بنود).
-function ems_eval_recompute_store($conn,$eval_id,$company_scope_sql) {
-    $ws = ems_eval_weighted_score($conn,$eval_id);
+function ems_eval_recompute_store($g,$eval_id) {
+    $ws = ems_eval_weighted_score($g,$eval_id);
     if ($ws!==null) {
-        $st=$conn->prepare("UPDATE worker_evaluation SET score=? WHERE id=? $company_scope_sql");
-        if ($st) { $st->bind_param('di',$ws,$eval_id); $st->execute(); $st->close(); }
+        try { $g->update('worker_evaluation', array('score' => $ws), array('id' => intval($eval_id))); }
+        catch (\Throwable $t) { error_log('worker_evaluation.php recompute: ' . $t->getMessage()); }
     }
     return $ws;
 }
@@ -68,26 +66,29 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
 
     if (!$is_editing) {
         if ($worker_id<=0) { header("Location: worker_evaluation.php?msg=يجب+اختيار+عامل+❌"); exit(); }
-        $cid=$is_super_admin?null:$company_id;
-        $st=$conn->prepare("INSERT INTO worker_evaluation
-            (company_id,employee_id,period,score,incentive_penalty_type,amount,amount_finance_note,operating_hours,attendance_rate,productivity,misuse_faults,fuel_consumption,safety_score,state,notes,created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        // types(16): company i,worker i,period s,score d,iptype s,amount d,amtnote s,ophours d,att d,prod d,misuse i,fuel d,safety d,state s,notes s,by i
         $nid=0;
-        if($st){ $st->bind_param('iisdsdsdddiddssi',
-            $cid,$worker_id,$period,$score,$ip_type,$amount,$amt_note,$op_hours,$att,$prod,$misuse,$fuel,$safety,$state,$notes,$user_id);
-        $st->execute(); $nid=$st->insert_id; $st->close(); }
+        try {
+            // company_id تحقنه البوابة من سياق الجلسة، وتعيد المعرّف الوليد
+            $nid = intval($ev_gate->insert('worker_evaluation', array(
+                'employee_id' => $worker_id, 'period' => $period, 'score' => $score,
+                'incentive_penalty_type' => $ip_type, 'amount' => $amount, 'amount_finance_note' => $amt_note,
+                'operating_hours' => $op_hours, 'attendance_rate' => $att, 'productivity' => $prod,
+                'misuse_faults' => $misuse, 'fuel_consumption' => $fuel, 'safety_score' => $safety,
+                'state' => $state, 'notes' => $notes, 'created_by' => $user_id)));
+        } catch (\Throwable $t) { error_log('worker_evaluation.php insert: ' . $t->getMessage()); }
         // فتح وضع التعديل ليظهر لوح بنود المؤشّرات.
         header("Location: worker_evaluation.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
     } else {
-        $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-        $st=$conn->prepare("UPDATE worker_evaluation SET period=?,score=?,incentive_penalty_type=?,amount=?,amount_finance_note=?,operating_hours=?,attendance_rate=?,productivity=?,misuse_faults=?,fuel_consumption=?,safety_score=?,state=?,notes=? WHERE id=? $sc");
-        // types(14): period s,score d,iptype s,amount d,amtnote s,ophours d,att d,prod d,misuse i,fuel d,safety d,state s,notes s,id i
-        if($st){ $st->bind_param('sdsdsdddiddssi',
-            $period,$score,$ip_type,$amount,$amt_note,$op_hours,$att,$prod,$misuse,$fuel,$safety,$state,$notes,$id);
-        $st->execute(); $st->close(); }
+        try {
+            $ev_gate->update('worker_evaluation', array(
+                'period' => $period, 'score' => $score, 'incentive_penalty_type' => $ip_type,
+                'amount' => $amount, 'amount_finance_note' => $amt_note, 'operating_hours' => $op_hours,
+                'attendance_rate' => $att, 'productivity' => $prod, 'misuse_faults' => $misuse,
+                'fuel_consumption' => $fuel, 'safety_score' => $safety, 'state' => $state,
+                'notes' => $notes), array('id' => $id));
+        } catch (\Throwable $t) { error_log('worker_evaluation.php update: ' . $t->getMessage()); }
         // إن وُجدت بنود مؤشّرات، تتقدّم الدرجة المحسوبة على المدخلة يدوياً.
-        ems_eval_recompute_store($conn,$id,$company_scope_sql);
+        ems_eval_recompute_store($ev_gate,$id);
         header("Location: worker_evaluation.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
@@ -100,48 +101,66 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_kpi' &&
     $kscore=$_POST['kpi_score']!==''?floatval($_POST['kpi_score']):null;
     $knote=trim($_POST['kpi_note']??''); $knote=$knote!==''?$knote:null;
     // تحقّق أنّ التقييم ضمن نطاق الشركة قبل الإضافة.
-    $own=0; $g=$conn->prepare("SELECT id FROM worker_evaluation WHERE id=? $company_scope_sql LIMIT 1");
-    if ($g){ $g->bind_param('i',$eid); $g->execute(); $own=$g->get_result()->num_rows; $g->close(); }
+    $own=0;
+    try { $own = ($ev_gate->selectOne('worker_evaluation', array('columns'=>array('id'), 'where'=>array('id'=>$eid))) !== null) ? 1 : 0; }
+    catch (\Throwable $t) { $own=0; error_log('worker_evaluation.php add_kpi own: ' . $t->getMessage()); }
     if ($eid>0 && $own>0 && $kpi_name!=='') {
-        $st=$conn->prepare("INSERT INTO worker_evaluation_kpi (evaluation_id,kpi_name,weight,score,notes) VALUES (?,?,?,?,?)");
-        if($st){ $st->bind_param('isdds',$eid,$kpi_name,$weight,$kscore,$knote); $st->execute(); $st->close(); }
-        ems_eval_recompute_store($conn,$eid,$company_scope_sql);
+        try {
+            // ابن T_CHILD: البوابة تتحقق من ملكية الأب (evaluation_id) قبل الإدراج
+            $ev_gate->insert('worker_evaluation_kpi', array(
+                'evaluation_id' => $eid, 'kpi_name' => $kpi_name, 'weight' => $weight,
+                'score' => $kscore, 'notes' => $knote));
+        } catch (\Throwable $t) { error_log('worker_evaluation.php add_kpi: ' . $t->getMessage()); }
+        ems_eval_recompute_store($ev_gate,$eid);
     }
     header("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حفظ+البند"); exit();
 }
 if (($_GET['del_kpi']??'')!=='' && $can_delete) {
     $kid=intval($_GET['del_kpi']); $eid=intval($_GET['edit']??0);
-    // احذف البند فقط إن كان تقييمه ضمن نطاق الشركة.
-    $own=0; $g=$conn->prepare("SELECT ev.id FROM worker_evaluation ev JOIN worker_evaluation_kpi k ON k.evaluation_id=ev.id WHERE k.id=? $scope_sql LIMIT 1");
-    if ($g){ $g->bind_param('i',$kid); $g->execute(); $own=$g->get_result()->num_rows; $g->close(); }
-    if ($own>0) {
-        $st=$conn->prepare("DELETE FROM worker_evaluation_kpi WHERE id=?"); $st->bind_param('i',$kid); $st->execute(); $st->close();
-        if ($eid>0) ems_eval_recompute_store($conn,$eid,$company_scope_sql);
-    }
+    // احذف البند فقط إن كان تقييمه ضمن نطاق الشركة: يُستحضَر البند عبر البوابة (المعزول
+    // بالأب) ثم يُحذف بقيد الأب+الملكية (deleteChild).
+    try {
+        $ev_kline = $ev_gate->selectOne('worker_evaluation_kpi', array('where' => array('id' => $kid)));
+        if ($ev_kline !== null) {
+            $ev_gate->deleteChild('worker_evaluation_kpi', $kid,
+                'worker_evaluation', intval($ev_kline['evaluation_id']), 'evaluation_id', 'evaluation kpi delete');
+            if ($eid>0) ems_eval_recompute_store($ev_gate,$eid);
+        }
+    } catch (\Throwable $t) { error_log('worker_evaluation.php del_kpi: ' . $t->getMessage()); }
     header("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حذف+البند"); exit();
 }
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='set_state' && $can_edit) {
     $id=intval($_POST['id']??0); $ns=trim($_POST['new_state']??'');
-    if ($id>0 && in_array($ns,$STATES,true)) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-        $st=$conn->prepare("UPDATE worker_evaluation SET state=? WHERE id=? $sc"); $st->bind_param('si',$ns,$id); $st->execute(); $st->close(); }
+    if ($id>0 && in_array($ns,$STATES,true)) {
+        try { $ev_gate->update('worker_evaluation', array('state' => $ns), array('id' => $id)); }
+        catch (\Throwable $t) { error_log('worker_evaluation.php set_state: ' . $t->getMessage()); }
+    }
     header("Location: worker_evaluation.php?msg=✅+تم+تحديث+الحالة"); exit();
 }
-if (($_GET['delete']??'')!=='' && $can_delete) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id); $d=intval($_GET['delete']);
-    $st=$conn->prepare("DELETE FROM worker_evaluation WHERE id=? $sc"); $st->bind_param('i',$d); $st->execute(); $st->close();
+if (($_GET['delete']??'')!=='' && $can_delete) { $d=intval($_GET['delete']);
+    try { $ev_gate->deleteRow('worker_evaluation', $d, 'evaluation delete'); }
+    catch (\Throwable $t) { error_log('worker_evaluation.php delete: ' . $t->getMessage()); }
     header("Location: worker_evaluation.php?msg=✅+تم+الحذف"); exit(); }
 
 // ── تحميل تقييمٍ للتعديل + بنوده ──────────────────────────────────────────────────
 $edit=null; $kpis=[]; $edit_id=intval($_GET['edit']??0);
 if ($edit_id>0) {
-    $sc=$is_super_admin?"":" AND ev.company_id = ".intval($company_id);
-    $st=$conn->prepare("SELECT ev.*, e.name AS wname FROM worker_evaluation ev LEFT JOIN employees e ON e.id=ev.employee_id WHERE ev.id=? $sc LIMIT 1");
-    $st->bind_param('i',$edit_id); $st->execute(); $edit=$st->get_result()->fetch_assoc(); $st->close();
-    if ($edit) { $kq=mysqli_query($conn,"SELECT * FROM worker_evaluation_kpi WHERE evaluation_id=".intval($edit_id)." ORDER BY id"); if($kq){while($k=mysqli_fetch_assoc($kq)){$kpis[]=$k;}} }
+    try {
+        $ev_edit_rows = $ev_gate->scopedQuery(array('scope'=>array('ev'=>'worker_evaluation'), 'enrich'=>array('e'=>'employees')),
+            "SELECT ev.*, e.name AS wname FROM worker_evaluation ev LEFT JOIN employees e ON e.id=ev.employee_id WHERE ev.id=? AND {TENANT_SCOPE} LIMIT 1",
+            array($edit_id));
+        $edit = !empty($ev_edit_rows) ? $ev_edit_rows[0] : null;
+        if ($edit) { $kpis = $ev_gate->select('worker_evaluation_kpi', array('where' => array('evaluation_id' => $edit_id), 'orderBy' => 'id')); }
+    } catch (\Throwable $t) { error_log('worker_evaluation.php edit: ' . $t->getMessage()); }
 }
 
-$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 $wp_scope ORDER BY wp.name");
-if($wq){while($w=mysqli_fetch_assoc($wq)){$workers[$w['id']]=$w['name'];}}
+$workers=[];
+try {
+    $ev_workers = $ev_gate->scopedQuery(array('scope'=>array('wp'=>'employees')),
+        "SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wp.name");
+    foreach($ev_workers as $w){$workers[$w['id']]=$w['name'];}
+} catch (\Throwable $t) { error_log('worker_evaluation.php workers: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | تقييم العاملين"; include '../inheader.php'; include '../insidebar.php';
 ?>
@@ -176,7 +195,7 @@ $page_title="إيكوبيشن | تقييم العاملين"; include '../inhead
     </form>
 
     <?php if ($edit):
-        $computed = ems_eval_weighted_score($conn, intval($edit['id']));
+        $computed = ems_eval_weighted_score($ev_gate, intval($edit['id']));
         $sumW=0; foreach($kpis as $k){ $sumW += floatval($k['weight']); } ?>
     <div class="allforms" style="display:block;">
         <div class="card-header"><h5><i class="fas fa-list-check"></i> بنود مؤشّرات الأداء (KPI) — الدرجة الموزونة المحسوبة:
@@ -205,10 +224,14 @@ $page_title="إيكوبيشن | تقييم العاملين"; include '../inhead
 
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>الفترة</th><th>الدرجة</th><th>النوع</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>
-        <?php $list=mysqli_query($conn,"SELECT ev.*, e.name AS wname FROM worker_evaluation ev
+        <?php $list = array();
+        try {
+            $list = $ev_gate->scopedQuery(array('scope'=>array('ev'=>'worker_evaluation'), 'enrich'=>array('e'=>'employees')),
+                "SELECT ev.*, e.name AS wname FROM worker_evaluation ev
             LEFT JOIN employees e ON e.id=ev.employee_id
-            WHERE 1=1 $scope_sql ORDER BY ev.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++;
+            WHERE 1=1 AND {TENANT_SCOPE} ORDER BY ev.id DESC");
+        } catch (\Throwable $t) { error_log('worker_evaluation.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++;
             $sc=($r['state']==='مرحّل')?'status-active':(($r['state']==='معتمد')?'status-warning':'status-inactive');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل التقييم', 'fas fa-star-half-stroke', [
                 ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
@@ -239,7 +262,7 @@ $page_title="إيكوبيشن | تقييم العاملين"; include '../inhead
             <td><span class="badge badge-info"><?= htmlspecialchars($r['incentive_penalty_type']) ?></span></td>
             <td><?= htmlspecialchars($r['amount'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد تقييماتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد تقييماتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

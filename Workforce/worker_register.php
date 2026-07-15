@@ -39,8 +39,8 @@ if (!$can_view) {
     exit();
 }
 
-$company_scope_sql = $is_super_admin ? "" : " AND wp.company_id = " . intval($company_id) . " ";
-$emp_company_sql   = $is_super_admin ? "" : " AND e.company_id = " . intval($company_id) . " ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$reg_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker register super') : ems_tenant_db();
 
 // ════════════════════════════════════════════════════════════════════════════
 // معالجة الإرسال (قبل أي إخراج HTML)
@@ -72,40 +72,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // تحقق: الفئة ضمن المعتمدة، والحالة ضمن آلة الحالة
         if (!in_array($worker_category, ems_worker_categories(), true)) { $worker_category = 'مشغّل/سائق'; }
 
-        $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
         $fit = $fitness !== '' ? $fitness : null;
         $jg  = $job_grade !== '' ? $job_grade : null;
         $fc  = $fitness_cond !== '' ? $fitness_cond : null;
 
         if (!$is_editing) {
             // الموظف هو العامل: التصنيف = رفع علم is_workforce على سجل الموظف القائم
+            // (فحص التكرار عبر البوابة = ضمن الشركة — موظف شركةٍ أخرى ليس شأن هذه الشاشة)
             if ($employee_id <= 0) { header("Location: worker_register.php?msg=يجب+اختيار+موظف+❌"); exit(); }
-            $chk = $conn->prepare("SELECT id FROM employees WHERE id = ? AND is_workforce = 1 LIMIT 1");
-            $chk->bind_param('i', $employee_id);
-            $chk->execute();
-            if ($chk->get_result()->fetch_assoc()) { $chk->close(); header("Location: worker_register.php?msg=الموظف+مصنّفٌ+عاملاً+مسبقاً+❌"); exit(); }
-            $chk->close();
+            $reg_dup = null;
+            try { $reg_dup = $reg_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_id, 'is_workforce' => 1))); }
+            catch (\Throwable $t) { error_log('worker_register.php dup check: ' . $t->getMessage()); }
+            if ($reg_dup !== null) { header("Location: worker_register.php?msg=الموظف+مصنّفٌ+عاملاً+مسبقاً+❌"); exit(); }
             $target_id = $employee_id;
         } else {
             $target_id = $id;
         }
 
         // التصنيف/التعديل = تحديث أعمدة القوى العاملة مباشرةً على سجل الموظف (employees هو المصدر الوحيد)
-        $sql = "UPDATE employees SET
-                    is_workforce = 1, worker_code = ?, worker_category = ?, source_type = ?, workforce_class = ?,
-                    job_grade = ?, workforce_state = ?, medical_fitness_status = ?, fitness_conditions = ?,
-                    primary_backup_id = ?, is_replaceable = ?, supplier_id = COALESCE(?, supplier_id),
-                    general_notes = ?
-                WHERE id = ? $scope";
-        $stmt = $conn->prepare($sql);
-        // أنواع: code,cat,source,class,grade,state,fitness,cond (8×s) backup(i) replaceable(i) supplier(i) notes(s) id(i)
-        $stmt->bind_param(
-            'ssssssssiiisi',
-            $code, $worker_category, $source_type, $workforce_class, $jg, $state, $fit, $fc,
-            $primary_backup, $is_replaceable, $supplier_id, $notes, $target_id
+        $reg_fields = array(
+            'is_workforce' => 1, 'worker_code' => $code, 'worker_category' => $worker_category,
+            'source_type' => $source_type, 'workforce_class' => $workforce_class, 'job_grade' => $jg,
+            'workforce_state' => $state, 'medical_fitness_status' => $fit, 'fitness_conditions' => $fc,
+            'primary_backup_id' => $primary_backup, 'is_replaceable' => $is_replaceable,
+            'general_notes' => $notes,
         );
-        $ok = $stmt->execute();
-        $stmt->close();
+        // الأصل: supplier_id = COALESCE(?, supplier_id) — عند null تبقى القيمة القائمة، فلا يُرسل العمود
+        if ($supplier_id !== null) { $reg_fields['supplier_id'] = $supplier_id; }
+        $ok = false;
+        try { $reg_gate->update('employees', $reg_fields, array('id' => $target_id)); $ok = true; }
+        catch (\Throwable $t) { error_log('worker_register.php save: ' . $t->getMessage()); }
         if ($is_editing) {
             header("Location: worker_register.php?edit=" . $target_id . "&msg=" . ($ok ? "✅+تم+تحديث+بيانات+العامل" : "❌+تعذّر+التحديث"));
         } else {
@@ -130,24 +126,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $decision    = trim($_POST['decision_ref'] ?? '');
 
         if ($worker_id > 0 && $title !== '') {
-            $cid = $is_super_admin ? null : $company_id;
             $ac  = $acc_cat !== '' ? $acc_cat : null;
             $pf  = $prof !== '' ? $prof : null;
             $eq  = $equip_type !== '' ? $equip_type : null;
             $iss = $issuer !== '' ? $issuer : null;
             $dec = $decision !== '' ? $decision : null;
-            $sql = "INSERT INTO worker_qualification
-                    (company_id, employee_id, record_type, title, issuer, equipment_type, issue_date, expiry_date,
-                     accreditation_category, proficiency_level, is_critical, alert_lead_days, decision_ref, created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param(
-                'iissssssssiisi',
-                $cid, $worker_id, $record_type, $title, $iss, $eq, $issue_date, $expiry_date,
-                $ac, $pf, $is_critical, $alert_days, $dec, $user_id
-            );
-            $stmt->execute();
-            $stmt->close();
+            try {
+                // company_id تحقنه البوابة من سياق الجلسة
+                $reg_gate->insert('worker_qualification', array(
+                    'employee_id' => $worker_id, 'record_type' => $record_type, 'title' => $title,
+                    'issuer' => $iss, 'equipment_type' => $eq, 'issue_date' => $issue_date,
+                    'expiry_date' => $expiry_date, 'accreditation_category' => $ac,
+                    'proficiency_level' => $pf, 'is_critical' => $is_critical,
+                    'alert_lead_days' => $alert_days, 'decision_ref' => $dec, 'created_by' => $user_id));
+            } catch (\Throwable $t) { error_log('worker_register.php qual insert: ' . $t->getMessage()); }
         }
         header("Location: worker_register.php?edit=" . $worker_id . "&tab=quals&msg=✅+تم+حفظ+الاعتماد");
         exit();
@@ -157,11 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete_qualification' && $can_delete) {
         $qid       = intval($_POST['qid'] ?? 0);
         $worker_id = intval($_POST['worker_id'] ?? 0);
-        $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-        $stmt = $conn->prepare("DELETE FROM worker_qualification WHERE id = ? $scope");
-        $stmt->bind_param('i', $qid);
-        $stmt->execute();
-        $stmt->close();
+        try { $reg_gate->deleteRow('worker_qualification', $qid, 'qualification delete'); }
+        catch (\Throwable $t) { error_log('worker_register.php qual delete: ' . $t->getMessage()); }
         header("Location: worker_register.php?edit=" . $worker_id . "&tab=quals&msg=✅+تم+حذف+الاعتماد");
         exit();
     }
@@ -172,17 +161,15 @@ $edit_worker = null;
 $edit_quals  = [];
 $edit_id = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
 if ($edit_id > 0) {
-    $scope = $is_super_admin ? "" : " AND e.company_id = " . intval($company_id);
-    $stmt = $conn->prepare(
-        "SELECT e.*, e.name AS employee_name, e.employee_code AS emp_code,
+    try {
+        $reg_edit_rows = $reg_gate->scopedQuery(array('scope' => array('e' => 'employees')),
+            "SELECT e.*, e.name AS employee_name, e.employee_code AS emp_code,
                 e.worker_code AS code, e.workforce_state AS state, e.general_notes AS notes
          FROM employees e
-         WHERE e.id = ? AND e.is_workforce = 1 $scope LIMIT 1"
-    );
-    $stmt->bind_param('i', $edit_id);
-    $stmt->execute();
-    $edit_worker = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+         WHERE e.id = ? AND e.is_workforce = 1 AND {TENANT_SCOPE} LIMIT 1",
+            array($edit_id));
+        $edit_worker = !empty($reg_edit_rows) ? $reg_edit_rows[0] : null;
+    } catch (\Throwable $t) { $edit_worker = null; error_log('worker_register.php edit: ' . $t->getMessage()); }
     if ($edit_worker) {
         $edit_quals = ems_worker_accreditations($conn, $edit_id);
     }
@@ -216,20 +203,28 @@ include '../insidebar.php';
     <?php
     // قائمة العمال المتاحين كبدائل (نفس الشركة)
     $backup_options = [];
-    $bq = mysqli_query($conn, "SELECT wp.id, wp.name AS name FROM employees wp WHERE wp.is_workforce = 1 $company_scope_sql ORDER BY wp.name");
-    if ($bq) { while ($b = mysqli_fetch_assoc($bq)) { $backup_options[$b['id']] = $b['name']; } }
+    try {
+        $reg_backups = $reg_gate->scopedQuery(array('scope' => array('wp' => 'employees')),
+            "SELECT wp.id, wp.name AS name FROM employees wp WHERE wp.is_workforce = 1 AND {TENANT_SCOPE} ORDER BY wp.name");
+        foreach ($reg_backups as $b) { $backup_options[$b['id']] = $b['name']; }
+    } catch (\Throwable $t) { error_log('worker_register.php backups: ' . $t->getMessage()); }
 
     // قائمة الموردين
     $supplier_options = [];
-    $sq = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE 1=1" . ($is_super_admin ? "" : " AND company_id = " . intval($company_id)) . " ORDER BY name");
-    if ($sq) { while ($s = mysqli_fetch_assoc($sq)) { $supplier_options[$s['id']] = $s['name']; } }
+    try {
+        $reg_suppliers = $reg_gate->scopedQuery(array('scope' => array('suppliers' => 'suppliers')),
+            "SELECT id, name FROM suppliers WHERE 1=1 AND {TENANT_SCOPE} ORDER BY name");
+        foreach ($reg_suppliers as $s) { $supplier_options[$s['id']] = $s['name']; }
+    } catch (\Throwable $t) { error_log('worker_register.php suppliers: ' . $t->getMessage()); }
 
     // موظفون غير مصنّفين بعد (للإضافة) — مع نوعهم للاقتراح الآلي للفئة
     $unclassified = [];
     if ($can_add && !$edit_worker) {
-        $uq = mysqli_query($conn, "SELECT e.id, e.name, e.employee_type FROM employees e
-                                   WHERE COALESCE(e.is_workforce,0) = 0 $emp_company_sql ORDER BY e.name");
-        if ($uq) { while ($u = mysqli_fetch_assoc($uq)) { $unclassified[] = $u; } }
+        try {
+            $unclassified = $reg_gate->scopedQuery(array('scope' => array('e' => 'employees')),
+                "SELECT e.id, e.name, e.employee_type FROM employees e
+                                   WHERE COALESCE(e.is_workforce,0) = 0 AND {TENANT_SCOPE} ORDER BY e.name");
+        } catch (\Throwable $t) { error_log('worker_register.php unclassified: ' . $t->getMessage()); }
     }
     $show_form = ($edit_worker !== null) || !empty($_GET['add']);
     ?>
@@ -429,16 +424,22 @@ include '../insidebar.php';
             </thead>
             <tbody>
             <?php
-            $list_sql = "SELECT wp.*, wp.name AS employee_name, wp.employee_code AS emp_code,
+            // عدّادا الاعتمادات استعلامان مرتبطان على worker_qualification داخل SELECT —
+            // تُعلَن إثراءً (لا شرط لها) وعزلها الفعلي عبر مفاتيح صفوف wp المعزولة.
+            $res = array();
+            try {
+                $res = $reg_gate->scopedQuery(array('scope' => array('wp' => 'employees'), 'enrich' => array('q' => 'worker_qualification')),
+                    "SELECT wp.*, wp.name AS employee_name, wp.employee_code AS emp_code,
                                 wp.worker_code AS code, wp.workforce_state AS state, wp.general_notes AS notes,
                                 (SELECT COUNT(*) FROM worker_qualification q WHERE q.employee_id = wp.id) AS quals_count,
-                                (SELECT COUNT(*) FROM worker_qualification q WHERE q.employee_id = wp.id AND q.is_critical = 1 AND q.expiry_date IS NOT NULL AND q.expiry_date < CURDATE()) AS expired_critical
+                                (SELECT COUNT(*) FROM worker_qualification q WHERE q.employee_id = wp.id AND q.is_critical = 1 AND q.expiry_date IS NOT NULL AND q.expiry_date < ?) AS expired_critical
                          FROM employees wp
-                         WHERE wp.is_workforce = 1 $company_scope_sql
-                         ORDER BY wp.id DESC";
-            $res = mysqli_query($conn, $list_sql);
+                         WHERE wp.is_workforce = 1 AND {TENANT_SCOPE}
+                         ORDER BY wp.id DESC",
+                    array(date('Y-m-d')));
+            } catch (\Throwable $t) { error_log('worker_register.php list: ' . $t->getMessage()); }
             $i = 1; $WF_VIEW = [];
-            if ($res) { while ($row = mysqli_fetch_assoc($res)):
+            if ($res) { foreach ($res as $row):
                 $stateClass = ($row['state'] === 'منتهٍ') ? 'status-inactive' : (($row['state'] === 'مخصّص') ? 'status-active' : 'status-warning');
                 $WF_VIEW[$row['id']] = ems_wf_view_payload('تفاصيل العامل التشغيلي', 'fas fa-people-group', [
                     ems_wf_field('الكود', $row['code'] ?: ('W-' . $row['id']), 'fas fa-barcode'),
@@ -476,7 +477,7 @@ include '../insidebar.php';
                         <?php if (intval($row['expired_critical']) > 0): ?><span class="link-alert-chip" title="اعتماد حرج منتهٍ"><i class="fas fa-exclamation-triangle"></i></span><?php endif; ?>
                     </td>
                 </tr>
-            <?php endwhile; }
+            <?php endforeach; }
             if (!$res || $i === 1): ?>
                 <tr><td colspan="11" style="text-align:center;color:#888;padding:18px;">لا يوجد عمالٌ مصنّفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
             <?php endif; ?>

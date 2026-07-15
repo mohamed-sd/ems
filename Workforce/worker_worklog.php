@@ -15,7 +15,8 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 
 $pp = check_page_permissions($conn, 'Workforce/worker_worklog.php');
 if (!$pp['can_view']) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-$scope_sql = $is_super_admin ? "" : " AND wp.company_id = ".intval($company_id)." ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$wl_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker worklog super') : ems_tenant_db();
 
 // محرّكا الأحداث والتناوب (نقطة الحقيقة الواحدة): حوافز/جزاءات معتمدة + من اقترب تدويره.
 $company_scope = $is_super_admin ? null : $company_id;
@@ -30,12 +31,23 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
     include('../includes/page_header.php'); ?>
 
     <?php
-    // مؤشّرات سريعة
+    // مؤشّرات سريعة (كل استعلامٍ معزولٌ عبر البوابة؛ CURDATE() → تاريخ PHP لخلوّ نص البوابة من دوالّ زمن الخادم)
     $kpi = ['workers'=>0,'allocated'=>0,'on_leave'=>0,'expired_critical'=>0];
-    $q1=mysqli_query($conn,"SELECT COUNT(*) c FROM employees wp WHERE 1=1 $scope_sql"); if($q1){$kpi['workers']=intval(mysqli_fetch_assoc($q1)['c']);}
-    $q2=mysqli_query($conn,"SELECT COUNT(DISTINCT a.employee_id) c FROM equipment_drivers a JOIN employees wp ON wp.id=a.employee_id WHERE a.status=1 $scope_sql"); if($q2){$kpi['allocated']=intval(mysqli_fetch_assoc($q2)['c']);}
-    $q3=mysqli_query($conn,"SELECT COUNT(DISTINCT la.employee_id) c FROM worker_leave_absence la JOIN employees wp ON wp.id=la.employee_id WHERE la.state IN ('معتمد','مفتوح','مُغطًّى') $scope_sql"); if($q3){$kpi['on_leave']=intval(mysqli_fetch_assoc($q3)['c']);}
-    $q4=mysqli_query($conn,"SELECT COUNT(DISTINCT q.employee_id) c FROM worker_qualification q JOIN employees wp ON wp.id=q.employee_id WHERE q.is_critical=1 AND q.expiry_date IS NOT NULL AND q.expiry_date < CURDATE() $scope_sql"); if($q4){$kpi['expired_critical']=intval(mysqli_fetch_assoc($q4)['c']);}
+    try {
+        $q1=$wl_gate->scopedQuery(array('scope'=>array('wp'=>'employees')),
+            "SELECT COUNT(*) c FROM employees wp WHERE 1=1 AND {TENANT_SCOPE}");
+        if($q1){$kpi['workers']=intval($q1[0]['c']);}
+        $q2=$wl_gate->scopedQuery(array('scope'=>array('a'=>'equipment_drivers','wp'=>'employees')),
+            "SELECT COUNT(DISTINCT a.employee_id) c FROM equipment_drivers a JOIN employees wp ON wp.id=a.employee_id WHERE a.status=1 AND {TENANT_SCOPE}");
+        if($q2){$kpi['allocated']=intval($q2[0]['c']);}
+        $q3=$wl_gate->scopedQuery(array('scope'=>array('la'=>'worker_leave_absence','wp'=>'employees')),
+            "SELECT COUNT(DISTINCT la.employee_id) c FROM worker_leave_absence la JOIN employees wp ON wp.id=la.employee_id WHERE la.state IN ('معتمد','مفتوح','مُغطًّى') AND {TENANT_SCOPE}");
+        if($q3){$kpi['on_leave']=intval($q3[0]['c']);}
+        $q4=$wl_gate->scopedQuery(array('scope'=>array('q'=>'worker_qualification','wp'=>'employees')),
+            "SELECT COUNT(DISTINCT q.employee_id) c FROM worker_qualification q JOIN employees wp ON wp.id=q.employee_id WHERE q.is_critical=1 AND q.expiry_date IS NOT NULL AND q.expiry_date < ? AND {TENANT_SCOPE}",
+            array(date('Y-m-d')));
+        if($q4){$kpi['expired_critical']=intval($q4[0]['c']);}
+    } catch (\Throwable $t) { error_log('worker_worklog.php kpi: ' . $t->getMessage()); }
     ?>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:14px 0;">
         <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['workers'] ?></div><div>الموظفون</div></div>
@@ -65,13 +77,20 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
     <div class="table-wrap"><table class="data-table" style="width:100%;">
         <thead><tr><th>عرض</th><th>#</th><th>الموظف</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهَّلة</th><th>إجازات/غياب</th><th>تحرّكات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th></tr></thead><tbody>
         <?php
-        $sql="SELECT wl.*, pr.presence_state
-              FROM v_worker_worklog wl
-              JOIN employees wp ON wp.id = wl.employee_id
-              LEFT JOIN v_worker_presence pr ON pr.employee_id = wl.employee_id
-              WHERE 1=1 $scope_sql ORDER BY wl.employee_id DESC";
-        $list=mysqli_query($conn,$sql); $i=1; $WF_VIEW = [];
-        if($list){ while($r=mysqli_fetch_assoc($list)):
+        // الـViews مسجَّلتان T_CHILD (الأب employees) — select() يعزلهما بـEXISTS على الأب
+        // المملوك، وهو عين ما كان يفعله JOIN employees في الأصل. الدمج (presence) في PHP.
+        $list = array();
+        try {
+            $list = $wl_gate->select('v_worker_worklog', array('orderBy' => 'employee_id DESC'));
+            $wl_presence = $wl_gate->select('v_worker_presence', array());
+            $wl_pr_map = array();
+            foreach ($wl_presence as $wl_pr) { $wl_pr_map[$wl_pr['employee_id']] = $wl_pr['presence_state']; }
+            foreach ($list as $wl_k => $wl_row) {
+                $list[$wl_k]['presence_state'] = isset($wl_pr_map[$wl_row['employee_id']]) ? $wl_pr_map[$wl_row['employee_id']] : null;
+            }
+        } catch (\Throwable $t) { error_log('worker_worklog.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = [];
+        if($list){ foreach($list as $r):
             $ev0 = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0];
             $WF_VIEW[$r['employee_id']] = ems_wf_view_payload('سجل الموظف التشغيلي المجمّع', 'fas fa-clock-rotate-left', [
                 ems_wf_field('الموظف', $r['worker_name'] ?: '-', 'fas fa-user', ['size' => 'lg']),
@@ -96,7 +115,7 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
             $ev = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0]; ?>
             <td><?= intval($r['evaluation_count']) ?></td><td><?= number_format(floatval($ev['incentive']),2) ?></td>
             <td><?= number_format(floatval($ev['penalty']),2) ?></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="13" style="text-align:center;color:#888;padding:18px;">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" style="text-align:center;color:#888;padding:18px;">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

@@ -15,8 +15,8 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $pp = check_page_permissions($conn, 'Workforce/worker_leave_absence.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-$scope_sql = $is_super_admin ? "" : " AND la.company_id = " . intval($company_id) . " ";
-$wp_scope  = $is_super_admin ? "" : " AND wp.company_id = " . intval($company_id) . " ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$la_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker leave absence super') : ems_tenant_db();
 
 $STATES = ['مطلوب','معتمد','مفتوح','مُغطًّى','منتهٍ','مغلق'];
 
@@ -38,34 +38,39 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='save' && 
     if ($worker_id>0 && $event_type!=='') {
         // محرّك التغطية: عند خروج العامل بلا بديلٍ محدَّد، نقترح أنسب بديلٍ متاح.
         if ($substitute===null) { $substitute = ems_coverage_best_id($conn, $worker_id); }
-        $cid=$is_super_admin?null:$company_id;
-        $st=$conn->prepare("INSERT INTO worker_leave_absence
-            (company_id,employee_id,event_class,event_type,date_from,date_to,substitute_id,rotation_pattern,next_due_date,coverage_impact,outcome,state,reason,notes,created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        // types: company i, worker i, class s, type s, from s, to s, sub i, rot s, due s, cov s, out s, state s, reason s, notes s, by i
-        if($st){ $st->bind_param('iissssisssssssi',
-            $cid,$worker_id,$event_class,$event_type,$date_from,$date_to,$substitute,$rotation,$next_due,$coverage,$outcome,$state,$reason,$notes,$user_id);
-        $st->execute(); $st->close(); }
+        try {
+            // company_id تحقنه البوابة من سياق الجلسة
+            $la_gate->insert('worker_leave_absence', array(
+                'employee_id' => $worker_id, 'event_class' => $event_class, 'event_type' => $event_type,
+                'date_from' => $date_from, 'date_to' => $date_to, 'substitute_id' => $substitute,
+                'rotation_pattern' => $rotation, 'next_due_date' => $next_due, 'coverage_impact' => $coverage,
+                'outcome' => $outcome, 'state' => $state, 'reason' => $reason, 'notes' => $notes,
+                'created_by' => $user_id));
+        } catch (\Throwable $t) { error_log('worker_leave_absence.php insert: ' . $t->getMessage()); }
     }
     header("Location: worker_leave_absence.php?msg=✅+تم+الحفظ"); exit();
 }
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='set_state' && $can_edit) {
     $id=intval($_POST['id']??0); $ns=trim($_POST['new_state']??'');
     if ($id>0 && in_array($ns,$STATES,true)) {
-        $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-        $st=$conn->prepare("UPDATE worker_leave_absence SET state=? WHERE id=? $sc");
-        if($st){ $st->bind_param('si',$ns,$id); $st->execute(); $st->close(); }
+        try { $la_gate->update('worker_leave_absence', array('state' => $ns), array('id' => $id)); }
+        catch (\Throwable $t) { error_log('worker_leave_absence.php set_state: ' . $t->getMessage()); }
     }
     header("Location: worker_leave_absence.php?msg=✅+تم+تحديث+الحالة"); exit();
 }
 if (($_GET['delete']??'')!=='' && $can_delete) {
-    $sc=$is_super_admin?"":" AND company_id = ".intval($company_id); $d=intval($_GET['delete']);
-    $st=$conn->prepare("DELETE FROM worker_leave_absence WHERE id=? $sc"); $st->bind_param('i',$d); $st->execute(); $st->close();
+    $d=intval($_GET['delete']);
+    try { $la_gate->deleteRow('worker_leave_absence', $d, 'leave absence delete'); }
+    catch (\Throwable $t) { error_log('worker_leave_absence.php delete: ' . $t->getMessage()); }
     header("Location: worker_leave_absence.php?msg=✅+تم+الحذف"); exit();
 }
 
-$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 $wp_scope ORDER BY wp.name");
-if($wq){while($w=mysqli_fetch_assoc($wq)){$workers[$w['id']]=$w['name'];}}
+$workers=[];
+try {
+    $la_workers = $la_gate->scopedQuery(array('scope'=>array('wp'=>'employees')),
+        "SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wp.name");
+    foreach($la_workers as $w){$workers[$w['id']]=$w['name'];}
+} catch (\Throwable $t) { error_log('worker_leave_absence.php workers: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | الإجازات والغياب"; include '../inheader.php'; include '../insidebar.php';
 ?>
@@ -100,12 +105,16 @@ $page_title="إيكوبيشن | الإجازات والغياب"; include '../in
     </form>
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>التصنيف</th><th>النوع</th><th>من</th><th>إلى</th><th>البديل</th><th>الحالة</th></tr></thead><tbody>
-        <?php $list=mysqli_query($conn,"SELECT la.*, e.name AS wname, e2.name AS sname
+        <?php $list = array();
+        try {
+            $list = $la_gate->scopedQuery(array('scope'=>array('la'=>'worker_leave_absence'), 'enrich'=>array('e'=>'employees','e2'=>'employees')),
+                "SELECT la.*, e.name AS wname, e2.name AS sname
             FROM worker_leave_absence la
             LEFT JOIN employees e ON e.id=la.employee_id
             LEFT JOIN employees e2 ON e2.id=la.substitute_id
-            WHERE 1=1 $scope_sql ORDER BY la.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++;
+            WHERE 1=1 AND {TENANT_SCOPE} ORDER BY la.id DESC");
+        } catch (\Throwable $t) { error_log('worker_leave_absence.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++;
             $sc=($r['state']==='مغلق'||$r['state']==='منتهٍ')?'status-inactive':(($r['state']==='مُغطًّى'||$r['state']==='معتمد')?'status-active':'status-warning');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل الإجازة/الغياب', 'fas fa-plane-departure', [
                 ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
@@ -133,7 +142,7 @@ $page_title="إيكوبيشن | الإجازات والغياب"; include '../in
             <td><?= htmlspecialchars($r['date_from'] ?: '-') ?></td><td><?= htmlspecialchars($r['date_to'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['sname'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="9" style="text-align:center;color:#888;padding:18px;">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="9" style="text-align:center;color:#888;padding:18px;">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

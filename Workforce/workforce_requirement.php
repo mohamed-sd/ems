@@ -16,7 +16,8 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $pp = check_page_permissions($conn, 'Workforce/workforce_requirement.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-$scope_sql=$is_super_admin?"":" AND wr.company_id = ".intval($company_id)." ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$wr_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('workforce requirement super') : ems_tenant_db();
 $PRIORITY=['عادية','عالية','حرجة']; $STAGES=['مفتوح','استقطاب','ترشيح واعتماد','تعاقد','تحرّك','مُلبّى'];
 
 function ems_req_derive($required,$available){
@@ -47,30 +48,44 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $candidates=trim($_POST['candidates_note']??''); $candidates=$candidates!==''?$candidates:null;
     $notes=trim($_POST['notes']??''); $notes=$notes!==''?$notes:null;
     if (!$is_editing) {
-        $cid=$is_super_admin?null:$company_id;
-        $st=$conn->prepare("INSERT INTO workforce_requirement (company_id,project_id,worker_category,required_qty,available_qty,shortage_qty,surplus_qty,is_critical,priority,need_date,fulfillment_stage,state,candidates_note,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        // types(15): company i,project i,cat s,req i,avail i,short i,surp i,crit i,prio s,need s,stage s,state s,cands s,notes s,by i
-        if($st){ $st->bind_param('iisiiiiissssssi',$cid,$project_id,$category,$required,$available,$shortage,$surplus,$is_critical,$priority,$need_date,$stage,$state,$candidates,$notes,$user_id);
-        $st->execute(); $st->close(); }
+        try {
+            // company_id تحقنه البوابة من سياق الجلسة
+            $wr_gate->insert('workforce_requirement', array(
+                'project_id' => $project_id, 'worker_category' => $category, 'required_qty' => $required,
+                'available_qty' => $available, 'shortage_qty' => $shortage, 'surplus_qty' => $surplus,
+                'is_critical' => $is_critical, 'priority' => $priority, 'need_date' => $need_date,
+                'fulfillment_stage' => $stage, 'state' => $state, 'candidates_note' => $candidates,
+                'notes' => $notes, 'created_by' => $user_id));
+        } catch (\Throwable $t) { error_log('workforce_requirement.php insert: ' . $t->getMessage()); }
         header("Location: workforce_requirement.php?msg=✅+تم+الحفظ"); exit();
     } else {
-        $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-        $st=$conn->prepare("UPDATE workforce_requirement SET project_id=?,worker_category=?,required_qty=?,available_qty=?,shortage_qty=?,surplus_qty=?,is_critical=?,priority=?,need_date=?,fulfillment_stage=?,state=?,candidates_note=?,notes=? WHERE id=? $sc");
-        // types(14): project i,cat s,req i,avail i,short i,surp i,crit i,prio s,need s,stage s,state s,cands s,notes s,id i
-        if($st){ $st->bind_param('isiiiiissssssi',$project_id,$category,$required,$available,$shortage,$surplus,$is_critical,$priority,$need_date,$stage,$state,$candidates,$notes,$id);
-        $st->execute(); $st->close(); }
+        try {
+            $wr_gate->update('workforce_requirement', array(
+                'project_id' => $project_id, 'worker_category' => $category, 'required_qty' => $required,
+                'available_qty' => $available, 'shortage_qty' => $shortage, 'surplus_qty' => $surplus,
+                'is_critical' => $is_critical, 'priority' => $priority, 'need_date' => $need_date,
+                'fulfillment_stage' => $stage, 'state' => $state, 'candidates_note' => $candidates,
+                'notes' => $notes), array('id' => $id));
+        } catch (\Throwable $t) { error_log('workforce_requirement.php update: ' . $t->getMessage()); }
         header("Location: workforce_requirement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
-if (($_GET['delete']??'')!=='' && $can_delete) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id); $d=intval($_GET['delete']);
-    $st=$conn->prepare("DELETE FROM workforce_requirement WHERE id=? $sc"); $st->bind_param('i',$d); $st->execute(); $st->close();
+if (($_GET['delete']??'')!=='' && $can_delete) { $d=intval($_GET['delete']);
+    try { $wr_gate->deleteRow('workforce_requirement', $d, 'workforce requirement delete'); }
+    catch (\Throwable $t) { error_log('workforce_requirement.php delete: ' . $t->getMessage()); }
     header("Location: workforce_requirement.php?msg=✅+تم+الحذف"); exit(); }
 
 $edit=null; $edit_id=intval($_GET['edit']??0);
-if ($edit_id>0) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
-    $st=$conn->prepare("SELECT * FROM workforce_requirement WHERE id=? $sc LIMIT 1"); $st->bind_param('i',$edit_id); $st->execute(); $edit=$st->get_result()->fetch_assoc(); $st->close(); }
-$proj_scope = $is_super_admin ? "" : " WHERE company_id = ".intval($company_id);
-$projects=[]; $pq=mysqli_query($conn,"SELECT id,name FROM project $proj_scope ORDER BY id DESC LIMIT 500"); if($pq){while($p=mysqli_fetch_assoc($pq)){$projects[$p['id']]=$p['name'];}}
+if ($edit_id>0) {
+    try { $edit = $wr_gate->selectOne('workforce_requirement', array('where' => array('id' => $edit_id))); }
+    catch (\Throwable $t) { $edit = null; error_log('workforce_requirement.php edit: ' . $t->getMessage()); }
+}
+$projects=[];
+try {
+    $wr_projects = $wr_gate->scopedQuery(array('scope'=>array('project'=>'project')),
+        "SELECT id,name FROM project WHERE 1=1 AND {TENANT_SCOPE} ORDER BY id DESC LIMIT 500");
+    foreach($wr_projects as $p){$projects[$p['id']]=$p['name'];}
+} catch (\Throwable $t) { error_log('workforce_requirement.php projects: ' . $t->getMessage()); }
 
 // معاينةٌ للمتوفّر المحسوب آلياً (PlanningService) للسجل قيد التعديل — للعرض فقط.
 $auto_preview=null;
@@ -111,8 +126,12 @@ $page_title="إيكوبيشن | الاحتياج والتخطيط"; include '../
     </form>
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>المشروع</th><th>الفئة</th><th>مطلوب</th><th>متوفّر</th><th>عجز</th><th>فائض</th><th>الأولوية</th><th>المرحلة</th><th>الحالة</th></tr></thead><tbody>
-        <?php $list=mysqli_query($conn,"SELECT wr.*, p.name AS pname FROM workforce_requirement wr LEFT JOIN project p ON p.id=wr.project_id WHERE 1=1 $scope_sql ORDER BY wr.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++; $sc=($r['state']==='عجز')?'status-inactive':(($r['state']==='فائض')?'status-warning':'status-active');
+        <?php $list = array();
+        try {
+            $list = $wr_gate->scopedQuery(array('scope'=>array('wr'=>'workforce_requirement'), 'enrich'=>array('p'=>'project')),
+                "SELECT wr.*, p.name AS pname FROM workforce_requirement wr LEFT JOIN project p ON p.id=wr.project_id WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wr.id DESC");
+        } catch (\Throwable $t) { error_log('workforce_requirement.php list: ' . $t->getMessage()); }
+        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++; $sc=($r['state']==='عجز')?'status-inactive':(($r['state']==='فائض')?'status-warning':'status-active');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل الاحتياج', 'fas fa-clipboard-list', [
                 ems_wf_field('المشروع', $r['pname'] ?: '-', 'fas fa-folder-open', ['size' => 'lg']),
                 ems_wf_field('الفئة', $r['worker_category'], 'fas fa-layer-group'),
@@ -138,7 +157,7 @@ $page_title="إيكوبيشن | الاحتياج والتخطيط"; include '../
             <td><?= intval($r['shortage_qty']) ?><?= intval($r['is_critical'])?' ⚠️':'' ?></td><td><?= intval($r['surplus_qty']) ?></td>
             <td><?= htmlspecialchars($r['priority']) ?></td><td><?= htmlspecialchars($r['fulfillment_stage']) ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="10" style="text-align:center;color:#888;padding:18px;">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="10" style="text-align:center;color:#888;padding:18px;">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

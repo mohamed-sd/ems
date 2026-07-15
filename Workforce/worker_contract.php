@@ -23,7 +23,8 @@ $can_view = $page_permissions['can_view']; $can_add = $page_permissions['can_add
 $can_edit = $page_permissions['can_edit']; $can_delete = $page_permissions['can_delete'];
 if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+العقود+❌"); exit(); }
 
-$scope_sql = $is_super_admin ? "" : " AND wc.company_id = " . intval($company_id) . " ";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$wc_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker contract super') : ems_tenant_db();
 
 $CONTRACT_TYPES = ['سنوي','غير محدّد','مشروع','موسمي','مؤقت','بالساعة','بالإنتاج','استشاري/إشرافي','احتياطي','تغطية مؤقتة','تجاري مؤقت'];
 $WAGE_METHODS   = ['شهري','بالساعة','بالوردية/اليوم','بالإنتاج','مقطوع'];
@@ -67,45 +68,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
 
     if (!$is_editing) {
         if ($worker_id <= 0) { header("Location: worker_contract.php?msg=يجب+اختيار+عامل+❌"); exit(); }
-        $cid = $is_super_admin ? null : $company_id;
-        $sql = "INSERT INTO worker_contract
-                (company_id, employee_id, code, contract_type, wage, wage_finance_note, wage_method, date_start, date_end,
-                 state, rotation_pattern, work_days, leave_days, next_rotation_date, monthly_hours_base, fixed_wage_ratio,
-                 billable_downtime, allow_housing, allow_food, allow_site, allow_transport, allow_finance_note, termination_terms, created_by)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        $stmt = $conn->prepare($sql);
-        // types: company i, worker i, code s, type s, wage d, wagenote s, method s, dstart s, dend s,
-        //        state s, rot s, workdays i, leavedays i, nextrot s, mhb i, fwr d, bdt s,
-        //        house d, food d, site d, trans d, anote s, term s, createdby i
         $ok = false;
-        if($stmt){ $stmt->bind_param(
-            'iissdssssssiisidsddddssi',
-            $cid, $worker_id, $code, $contract_type, $wage, $wage_note, $wage_method, $date_start, $date_end,
-            $state, $rotation, $work_days, $leave_days, $next_rot, $mhb, $fwr, $bdtv,
-            $a_house, $a_food, $a_site, $a_trans, $a_note, $term, $user_id
-        );
-        $ok = $stmt->execute(); $stmt->close(); }
+        try {
+            // company_id تحقنه البوابة من سياق الجلسة
+            $wc_gate->insert('worker_contract', array(
+                'employee_id' => $worker_id, 'code' => $code, 'contract_type' => $contract_type,
+                'wage' => $wage, 'wage_finance_note' => $wage_note, 'wage_method' => $wage_method,
+                'date_start' => $date_start, 'date_end' => $date_end, 'state' => $state,
+                'rotation_pattern' => $rotation, 'work_days' => $work_days, 'leave_days' => $leave_days,
+                'next_rotation_date' => $next_rot, 'monthly_hours_base' => $mhb, 'fixed_wage_ratio' => $fwr,
+                'billable_downtime' => $bdtv, 'allow_housing' => $a_house, 'allow_food' => $a_food,
+                'allow_site' => $a_site, 'allow_transport' => $a_trans, 'allow_finance_note' => $a_note,
+                'termination_terms' => $term, 'created_by' => $user_id));
+            $ok = true;
+        } catch (\Throwable $t) { error_log('worker_contract.php insert: ' . $t->getMessage()); }
         header("Location: worker_contract.php?msg=" . ($ok ? "✅+تم+حفظ+العقد" : "❌+تعذّر+الحفظ"));
         exit();
     } else {
-        $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-        $sql = "UPDATE worker_contract SET
-                  code=?, contract_type=?, wage=?, wage_finance_note=?, wage_method=?, date_start=?, date_end=?,
-                  state=?, rotation_pattern=?, work_days=?, leave_days=?, next_rotation_date=?, monthly_hours_base=?,
-                  fixed_wage_ratio=?, billable_downtime=?, allow_housing=?, allow_food=?, allow_site=?, allow_transport=?,
-                  allow_finance_note=?, termination_terms=?
-                WHERE id=? $scope";
-        $stmt = $conn->prepare($sql);
-        // types: code s, type s, wage d, wnote s, method s, dstart s, dend s, state s, rot s,
-        //        workdays i, leavedays i, nextrot s, mhb i, fwr d, bdt s, house d, food d, site d, trans d, anote s, term s, id i
         $ok = false;
-        if($stmt){ $stmt->bind_param(
-            'ssdssssssiisidsddddssi',
-            $code, $contract_type, $wage, $wage_note, $wage_method, $date_start, $date_end, $state, $rotation,
-            $work_days, $leave_days, $next_rot, $mhb, $fwr, $bdtv, $a_house, $a_food, $a_site, $a_trans,
-            $a_note, $term, $id
-        );
-        $ok = $stmt->execute(); $stmt->close(); }
+        try {
+            $wc_gate->update('worker_contract', array(
+                'code' => $code, 'contract_type' => $contract_type, 'wage' => $wage,
+                'wage_finance_note' => $wage_note, 'wage_method' => $wage_method,
+                'date_start' => $date_start, 'date_end' => $date_end, 'state' => $state,
+                'rotation_pattern' => $rotation, 'work_days' => $work_days, 'leave_days' => $leave_days,
+                'next_rotation_date' => $next_rot, 'monthly_hours_base' => $mhb, 'fixed_wage_ratio' => $fwr,
+                'billable_downtime' => $bdtv, 'allow_housing' => $a_house, 'allow_food' => $a_food,
+                'allow_site' => $a_site, 'allow_transport' => $a_trans, 'allow_finance_note' => $a_note,
+                'termination_terms' => $term), array('id' => $id));
+            $ok = true;
+        } catch (\Throwable $t) { error_log('worker_contract.php update: ' . $t->getMessage()); }
         header("Location: worker_contract.php?edit=" . $id . "&msg=" . ($ok ? "✅+تم+التحديث" : "❌+تعذّر+التحديث"));
         exit();
     }
@@ -113,25 +105,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
 
 if (($_GET['delete'] ?? '') !== '' && $can_delete) {
     $del = intval($_GET['delete']);
-    $scope = $is_super_admin ? "" : " AND company_id = " . intval($company_id);
-    $stmt = $conn->prepare("DELETE FROM worker_contract WHERE id = ? $scope");
-    $stmt->bind_param('i', $del); $stmt->execute(); $stmt->close();
+    try { $wc_gate->deleteRow('worker_contract', $del, 'worker contract delete'); }
+    catch (\Throwable $t) { error_log('worker_contract.php delete: ' . $t->getMessage()); }
     header("Location: worker_contract.php?msg=✅+تم+الحذف"); exit();
 }
 
 // ── تحميل عقدٍ للتعديل ─────────────────────────────────────────────────────────
 $edit = null; $edit_id = intval($_GET['edit'] ?? 0);
 if ($edit_id > 0) {
-    $sc = $is_super_admin ? "" : " AND wc.company_id = " . intval($company_id);
-    $stmt = $conn->prepare("SELECT wc.* FROM worker_contract wc WHERE wc.id = ? $sc LIMIT 1");
-    $stmt->bind_param('i', $edit_id); $stmt->execute();
-    $edit = $stmt->get_result()->fetch_assoc(); $stmt->close();
+    try { $edit = $wc_gate->selectOne('worker_contract', array('where' => array('id' => $edit_id))); }
+    catch (\Throwable $t) { $edit = null; error_log('worker_contract.php edit: ' . $t->getMessage()); }
 }
 
 // قائمة العمال للاختيار
 $workers = [];
-$wq = mysqli_query($conn, "SELECT wp.id, wp.name AS name FROM employees wp WHERE 1=1" . ($is_super_admin ? "" : " AND wp.company_id = " . intval($company_id)) . " ORDER BY wp.name");
-if ($wq) { while ($w = mysqli_fetch_assoc($wq)) { $workers[$w['id']] = $w['name']; } }
+try {
+    $wc_workers = $wc_gate->scopedQuery(array('scope' => array('wp' => 'employees')),
+        "SELECT wp.id, wp.name AS name FROM employees wp WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wp.name");
+    foreach ($wc_workers as $w) { $workers[$w['id']] = $w['name']; }
+} catch (\Throwable $t) { error_log('worker_contract.php workers: ' . $t->getMessage()); }
 
 $page_title = "إيكوبيشن | عقود العاملين";
 include '../inheader.php';
@@ -196,10 +188,14 @@ include '../insidebar.php';
             <thead><tr><th>إجراءات</th><th>#</th><th>الكود</th><th>الموظف</th><th>النوع</th><th>طريقة الأجر</th><th>التناوب</th><th>بداية</th><th>نهاية</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php
-            $list = mysqli_query($conn, "SELECT wc.*, e.name AS wname FROM worker_contract wc
+            $list = array();
+            try {
+                $list = $wc_gate->scopedQuery(array('scope' => array('wc' => 'worker_contract'), 'enrich' => array('e' => 'employees')),
+                    "SELECT wc.*, e.name AS wname FROM worker_contract wc
                     LEFT JOIN employees e ON e.id = wc.employee_id
-                    WHERE 1=1 $scope_sql ORDER BY wc.id DESC");
-            $i=1; $WF_VIEW = []; if ($list) { while ($r = mysqli_fetch_assoc($list)):
+                    WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wc.id DESC");
+            } catch (\Throwable $t) { error_log('worker_contract.php list: ' . $t->getMessage()); }
+            $i=1; $WF_VIEW = []; if ($list) { foreach ($list as $r):
                 $sc = ($r['state']==='نافذ')?'status-active':(($r['state']==='منتهٍ')?'status-inactive':'status-warning');
                 $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل عقد العامل', 'fas fa-file-signature', [
                     ems_wf_field('الكود', $r['code'] ?: ('C-' . $r['id']), 'fas fa-barcode'),
@@ -238,7 +234,7 @@ include '../insidebar.php';
                     <td><?= htmlspecialchars($r['date_end'] ?: '-') ?></td>
                     <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td>
                 </tr>
-            <?php endwhile; } if (!$list || $i===1): ?>
+            <?php endforeach; } if (!$list || $i===1): ?>
                 <tr><td colspan="10" style="text-align:center;color:#888;padding:18px;">لا توجد عقودٌ بعد.</td></tr>
             <?php endif; ?>
             </tbody>
