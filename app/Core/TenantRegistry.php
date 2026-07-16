@@ -80,6 +80,14 @@ class TenantRegistry
         // القيود اليدوية (idempotency_key = NULL) تبقى قابلةً للإدارة.
         'fin_financial_events' => array('type' => self::T_TENANT, 'soft' => true, 'immutable_key' => 'idempotency_key'),
         'fin_financial_periods' => array('type' => self::T_TENANT, 'soft' => false),
+        // ── بوابة الطلب المالي D05 (المرحلتان 1+2 · 2026-07-16) — أرشفةٌ لا حذف (soft=false
+        // بالتصميم: الحالات الست عشرة تملك دورة الحياة، وسجلّ الطلب إلحاقيٌّ لا يُمحى) ──
+        'fin_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_request_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_request_documents' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_request_events' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_event_links' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_internal_allocations' => array('type' => self::T_TENANT, 'soft' => true),
