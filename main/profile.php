@@ -15,24 +15,18 @@ if (!headers_sent()) {
 $session_user = $_SESSION['user'];
 $user_id = isset($session_user['id']) ? intval($session_user['id']) : 0;
 
-// ── جلب أحدث بيانات المستخدم من قاعدة البيانات ──
+// ── جلب أحدث بيانات المستخدم من قاعدة البيانات (عبر البوابة؛ includeDeleted كسلوك الأصل) ──
+$pr_gate = (strval($_SESSION['user']['role'] ?? '') === '-1')
+    ? ems_tenant_db()->forAllTenants('profile super') : ems_tenant_db();
 $user = $session_user;
 if ($user_id > 0) {
-    $stmt = mysqli_prepare(
-        $conn,
-        "SELECT id, name, username, email, phone, role, role_id, status, project_id, company_id,
-                created_at, updated_at, last_login_at
-         FROM users WHERE id = ? LIMIT 1"
-    );
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, 'i', $user_id);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        if ($res && ($row = mysqli_fetch_assoc($res))) {
-            $user = array_merge($session_user, $row);
-        }
-        mysqli_stmt_close($stmt);
-    }
+    try {
+        $row = $pr_gate->selectOne('users', array(
+            'columns' => array('id', 'name', 'username', 'email', 'phone', 'role', 'role_id', 'status',
+                'project_id', 'company_id', 'created_at', 'updated_at', 'last_login_at'),
+            'where' => array('id' => $user_id), 'includeDeleted' => true));
+        if ($row) { $user = array_merge($session_user, $row); }
+    } catch (\Throwable $t) { error_log('profile.php user: ' . $t->getMessage()); }
 }
 
 // ── اسم الدور ──
@@ -40,15 +34,10 @@ $role_text = 'مستخدم';
 $role_value = isset($user['role']) ? strval($user['role']) : '';
 if ($role_value !== '') {
     $role_id_int = intval($role_value);
-    if ($rstmt = mysqli_prepare($conn, 'SELECT name FROM roles WHERE id = ? LIMIT 1')) {
-        mysqli_stmt_bind_param($rstmt, 'i', $role_id_int);
-        mysqli_stmt_execute($rstmt);
-        $rres = mysqli_stmt_get_result($rstmt);
-        if ($rres && ($rrow = mysqli_fetch_assoc($rres)) && trim($rrow['name']) !== '') {
-            $role_text = $rrow['name'];
-        }
-        mysqli_stmt_close($rstmt);
-    }
+    try {
+        $rrow = $pr_gate->selectOne('roles', array('columns' => array('name'), 'where' => array('id' => $role_id_int)));
+        if ($rrow && trim($rrow['name']) !== '') { $role_text = $rrow['name']; }
+    } catch (\Throwable $t) { error_log('profile.php role: ' . $t->getMessage()); }
 }
 if ($role_value === '-1') {
     $role_text = 'الإدارة العليا';
@@ -58,21 +47,20 @@ if ($role_value === '-1') {
 $project_text = '';
 $project_id_val = isset($user['project_id']) ? intval($user['project_id']) : 0;
 if ($project_id_val > 0) {
-    if ($pstmt = mysqli_prepare($conn, 'SELECT name FROM project WHERE id = ? LIMIT 1')) {
-        mysqli_stmt_bind_param($pstmt, 'i', $project_id_val);
-        mysqli_stmt_execute($pstmt);
-        $pres = mysqli_stmt_get_result($pstmt);
-        if ($pres && ($prow = mysqli_fetch_assoc($pres))) {
-            $project_text = $prow['name'];
-        }
-        mysqli_stmt_close($pstmt);
-    }
+    try {
+        $prow = $pr_gate->selectOne('project', array('columns' => array('name'),
+            'where' => array('id' => $project_id_val), 'includeDeleted' => true));
+        if ($prow) { $project_text = $prow['name']; }
+    } catch (\Throwable $t) { error_log('profile.php project: ' . $t->getMessage()); }
 }
 
 // ── اسم الشركة ──
 $company_text = '';
 $company_id_val = isset($user['company_id']) ? intval($user['company_id']) : 0;
 if ($company_id_val > 0) {
+    // [مُستثنى موثَّق — قراءة اسم شركة الجلسة] admin_companies جدول منصّةٍ مقيَّد تعاقديًا
+    // (T_RESTRICTED بانتظار عقد دفعة المزوّد admin/)، والمقروء هنا اسمُ عرض شركةِ
+    // المستخدم نفسه بمعرّف جلسته — تبقى القراءة خامًا حتى تُعرَّف قناة المنصّة.
     if ($cstmt = mysqli_prepare($conn, 'SELECT company_name, name FROM admin_companies WHERE id = ? LIMIT 1')) {
         mysqli_stmt_bind_param($cstmt, 'i', $company_id_val);
         mysqli_stmt_execute($cstmt);
@@ -98,21 +86,19 @@ $act_days_labels = array();   // last 14 days labels
 $act_days_values = array();   // last 14 days counts
 $last_activity_ip = '';
 
-$has_activity_table = false;
-if ($user_id > 0) {
-    $tbl_res = @mysqli_query($conn, "SHOW TABLES LIKE 'activity_logs'");
-    $has_activity_table = ($tbl_res && mysqli_num_rows($tbl_res) > 0);
-}
+// جدول activity_logs قائم ومسجَّل في البوابة — سقط فحص SHOW TABLES الذاتي
+$has_activity_table = ($user_id > 0);
 
 if ($has_activity_table) {
     $activity_available = true;
-
-    // إجمالي النشاط + توزيع الأنواع
-    if ($s = mysqli_prepare($conn, "SELECT action_type, COUNT(*) c FROM activity_logs WHERE user_id = ? GROUP BY action_type ORDER BY c DESC")) {
-        mysqli_stmt_bind_param($s, 'i', $user_id);
-        mysqli_stmt_execute($s);
-        $r = mysqli_stmt_get_result($s);
-        while ($r && ($row = mysqli_fetch_assoc($r))) {
+    $day_counts = array();
+    // (قراءات ذاتية بمعرّف مستخدم الجلسة عبر البوابة؛ CURRENT_DATE → تاريخ PHP معاملًا)
+    try {
+        // إجمالي النشاط + توزيع الأنواع
+        $pr_rows = $pr_gate->scopedQuery(array('scope' => array('al' => 'activity_logs')),
+            "SELECT al.action_type, COUNT(*) c FROM activity_logs al WHERE al.user_id = ? AND {TENANT_SCOPE} GROUP BY al.action_type ORDER BY c DESC",
+            array($user_id));
+        foreach ($pr_rows as $row) {
             $type = $row['action_type'] !== null && $row['action_type'] !== '' ? $row['action_type'] : 'other';
             $cnt  = intval($row['c']);
             $act_by_type[$type] = $cnt;
@@ -125,60 +111,44 @@ if ($has_activity_table) {
                 $act_updates += $cnt;
             }
         }
-        mysqli_stmt_close($s);
-    }
 
-    // نشاط اليوم
-    if ($s = mysqli_prepare($conn, "SELECT COUNT(*) c FROM activity_logs WHERE user_id = ? AND DATE(created_at) = CURRENT_DATE")) {
-        mysqli_stmt_bind_param($s, 'i', $user_id);
-        mysqli_stmt_execute($s);
-        $r = mysqli_stmt_get_result($s);
-        if ($r && ($row = mysqli_fetch_assoc($r))) {
-            $act_today = intval($row['c']);
-        }
-        mysqli_stmt_close($s);
-    }
+        // نشاط اليوم
+        $pr_rows = $pr_gate->scopedQuery(array('scope' => array('al' => 'activity_logs')),
+            "SELECT COUNT(*) c FROM activity_logs al WHERE al.user_id = ? AND DATE(al.created_at) = ? AND {TENANT_SCOPE}",
+            array($user_id, date('Y-m-d')));
+        if (!empty($pr_rows)) { $act_today = intval($pr_rows[0]['c']); }
 
-    // أكثر الشاشات استخداماً
-    if ($s = mysqli_prepare($conn, "SELECT COALESCE(NULLIF(screen_name,''), NULLIF(module_name,''), 'غير معروف') s, COUNT(*) c FROM activity_logs WHERE user_id = ? GROUP BY s ORDER BY c DESC LIMIT 6")) {
-        mysqli_stmt_bind_param($s, 'i', $user_id);
-        mysqli_stmt_execute($s);
-        $r = mysqli_stmt_get_result($s);
-        while ($r && ($row = mysqli_fetch_assoc($r))) {
+        // أكثر الشاشات استخداماً
+        $pr_rows = $pr_gate->scopedQuery(array('scope' => array('al' => 'activity_logs')),
+            "SELECT COALESCE(NULLIF(al.screen_name,''), NULLIF(al.module_name,''), 'غير معروف') s, COUNT(*) c FROM activity_logs al WHERE al.user_id = ? AND {TENANT_SCOPE} GROUP BY s ORDER BY c DESC LIMIT 6",
+            array($user_id));
+        foreach ($pr_rows as $row) {
             $act_top_screens[] = array('name' => $row['s'], 'count' => intval($row['c']));
         }
-        mysqli_stmt_close($s);
-    }
 
-    // النشاط خلال آخر 14 يوماً
-    $day_counts = array();
-    if ($s = mysqli_prepare($conn, "SELECT DATE(created_at) d, COUNT(*) c FROM activity_logs WHERE user_id = ? AND created_at >= (CURRENT_DATE - INTERVAL 13 DAY) GROUP BY DATE(created_at)")) {
-        mysqli_stmt_bind_param($s, 'i', $user_id);
-        mysqli_stmt_execute($s);
-        $r = mysqli_stmt_get_result($s);
-        while ($r && ($row = mysqli_fetch_assoc($r))) {
+        // النشاط خلال آخر 14 يوماً
+        $pr_rows = $pr_gate->scopedQuery(array('scope' => array('al' => 'activity_logs')),
+            "SELECT DATE(al.created_at) d, COUNT(*) c FROM activity_logs al WHERE al.user_id = ? AND al.created_at >= ? AND {TENANT_SCOPE} GROUP BY DATE(al.created_at)",
+            array($user_id, date('Y-m-d', strtotime('-13 day'))));
+        foreach ($pr_rows as $row) {
             $day_counts[$row['d']] = intval($row['c']);
         }
-        mysqli_stmt_close($s);
-    }
-    for ($d = 13; $d >= 0; $d--) {
-        $key = date('Y-m-d', strtotime("-$d day"));
-        $act_days_labels[] = date('m-d', strtotime($key));
-        $act_days_values[] = isset($day_counts[$key]) ? $day_counts[$key] : 0;
-    }
 
-    // آخر الأنشطة
-    if ($s = mysqli_prepare($conn, "SELECT action_type, screen_name, module_name, ip_address, created_at FROM activity_logs WHERE user_id = ? ORDER BY id DESC LIMIT 12")) {
-        mysqli_stmt_bind_param($s, 'i', $user_id);
-        mysqli_stmt_execute($s);
-        $r = mysqli_stmt_get_result($s);
-        while ($r && ($row = mysqli_fetch_assoc($r))) {
+        // آخر الأنشطة
+        $pr_rows = $pr_gate->scopedQuery(array('scope' => array('al' => 'activity_logs')),
+            "SELECT al.action_type, al.screen_name, al.module_name, al.ip_address, al.created_at FROM activity_logs al WHERE al.user_id = ? AND {TENANT_SCOPE} ORDER BY al.id DESC LIMIT 12",
+            array($user_id));
+        foreach ($pr_rows as $row) {
             $act_recent[] = $row;
             if ($last_activity_ip === '' && !empty($row['ip_address'])) {
                 $last_activity_ip = $row['ip_address'];
             }
         }
-        mysqli_stmt_close($s);
+    } catch (\Throwable $t) { error_log('profile.php activity: ' . $t->getMessage()); }
+    for ($d = 13; $d >= 0; $d--) {
+        $key = date('Y-m-d', strtotime("-$d day"));
+        $act_days_labels[] = date('m-d', strtotime($key));
+        $act_days_values[] = isset($day_counts[$key]) ? $day_counts[$key] : 0;
     }
 }
 

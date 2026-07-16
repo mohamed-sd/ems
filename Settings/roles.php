@@ -7,14 +7,15 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
-/* جلب بيانات التعديل */
+/* جلب بيانات التعديل (roles مرجع عام T_GLOBAL — قراءته عبر البوابة متاحة بلا نطاق) */
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT `id`, `name`, `parent_role_id`, `level`, `status`, `created_at` FROM `roles` WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc();
+    try {
+        $editData = ems_tenant_db()->selectOne('roles', array(
+            'columns' => array('id', 'name', 'parent_role_id', 'level', 'status', 'created_at'),
+            'where' => array('id' => $id)));
+    } catch (\Throwable $t) { $editData = null; error_log('roles.php edit: ' . $t->getMessage()); }
 }
 
 /* إضافة / تعديل */
@@ -28,6 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name)) {
         $error_msg = 'اسم الصلاحية مطلوب ❌';
     } else {
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] roles مرجعٌ عام جمَّد عقدُ البوابة كتابته على
+        // المدير الأعلى حصرًا (assertWritable)، بينما الشاشة الحالية تتيحه لمديري الشركات
+        // (ثغرة UAT §15 المفتوحة). حفاظًا على السلوك حرفيًا تبقى الكتابة خامًا بانتظار
+        // قرار التحصين الأمني — عندها تُنقَل للبوابة أو تُحصَر بالسوبر.
         if (!empty($_POST['edit_id'])) {
             // تعديل
             $id = (int) $_POST['edit_id'];
@@ -55,15 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* حذف */
 if (isset($_GET['delete_id'])) {
     $id = (int) $_GET['delete_id'];
-    // التحقق من عدم استخدام هذا الدور كدور أب
-    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM `roles` WHERE `parent_role_id` = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
+    // التحقق من عدم استخدام هذا الدور كدور أب (قراءة عبر البوابة)
+    $children_count = 0;
+    try { $children_count = intval(ems_tenant_db()->count('roles', array('where' => array('parent_role_id' => $id)))); }
+    catch (\Throwable $t) { error_log('roles.php delete check: ' . $t->getMessage()); }
 
-    if ($result['count'] > 0) {
+    if ($children_count > 0) {
         header("Location: roles.php?msg=لا+يمكن+حذف+هذا+الدور+لأنه+يمتلك+أدوار+فرعية+❌");
     } else {
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] كما في الحفظ أعلاه: الحذف يبقى خامًا
+        // بانتظار قرار التحصين (deleteRow تعاقديًا لجداول المستأجر لا المراجع العامة).
         $stmt = $conn->prepare("DELETE FROM `roles` WHERE `id` = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
@@ -75,10 +81,14 @@ if (isset($_GET['delete_id'])) {
     exit;
 }
 
-// جلب جميع الأدوار الرئيسية (بدون دور أب)
-$stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` WHERE `parent_role_id` IS NULL ORDER BY `name`");
-$stmt->execute();
-$parent_roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// جلب جميع الأدوار الرئيسية (بدون دور أب) — قراءة مرجعٍ عام عبر البوابة
+$parent_roles = array();
+try {
+    $parent_roles = ems_tenant_db()->select('roles', array(
+        'columns' => array('id', 'name'),
+        'where' => array('parent_role_id' => null),
+        'orderBy' => 'name'));
+} catch (\Throwable $t) { error_log('roles.php parents: ' . $t->getMessage()); }
 
 $page_title = "إدارة الصلاحيات";
 include("../inheader.php");
@@ -205,25 +215,24 @@ include('../insidebar.php');
                     </thead>
                     <tbody>
                         <?php
-                        $result = $conn->query("
-                            SELECT 
-                                r.`id`, 
-                                r.`name`, 
-                                r.`parent_role_id`, 
-                                r.`level`, 
-                                r.`status`, 
-                                r.`created_at`,
-                                p.`name` AS parent_name
-                            FROM `roles` r
-                            LEFT JOIN `roles` p ON r.`parent_role_id` = p.`id`
-                            ORDER BY r.`level`, r.`parent_role_id`, r.`name`
-                        ");
+                        // قراءة المرجع العام عبر البوابة؛ اسم الأب يُشتق من خريطة id→name
+                        // بدل self-JOIN (scopedQuery يشترط جدول نطاقٍ مستأجرًا وهذا عامّ محض).
+                        $result = array();
+                        try {
+                            $result = ems_tenant_db()->select('roles', array(
+                                'columns' => array('id', 'name', 'parent_role_id', 'level', 'status', 'created_at'),
+                                'orderBy' => 'level, parent_role_id, name'));
+                        } catch (\Throwable $t) { $result = false; error_log('roles.php list: ' . $t->getMessage()); }
 
-                        if (!$result) {
+                        if ($result === false) {
                             echo '<tr><td colspan="7" class="text-center text-danger">خطأ في جلب البيانات: ' . htmlspecialchars($conn->error) . '</td></tr>';
                         } else {
+                            $roles_name_map = array();
+                            foreach ($result as $rn) { $roles_name_map[intval($rn['id'])] = $rn['name']; }
                             $i = 1;
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($result as $row):
+                                $row['parent_name'] = ($row['parent_role_id'] !== null && isset($roles_name_map[intval($row['parent_role_id'])]))
+                                    ? $roles_name_map[intval($row['parent_role_id'])] : null;
                                 $status_badge = $row['status'] == 1
                                     ? '<span class="status-active"><i class="fas fa-check-circle"></i> نشط</span>'
                                     : '<span class="status-inactive"><i class="fas fa-times-circle"></i> غير نشط</span>';
@@ -279,7 +288,7 @@ include('../insidebar.php');
                                     </td>
                                 </tr>
                             <?php
-                            endwhile;
+                            endforeach;
                         }
                         ?>
                     </tbody>

@@ -6,37 +6,19 @@ include '../includes/sessions.php';
 include '../config.php';
 
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$users_has_company_id = db_table_has_column($conn, 'users', 'company_id');
+// أعمدة users (company_id/is_deleted/deleted_at/deleted_by/status/employee_id) قائمة
+// بالترحيلات — سقطت فحوص db_table_has_column والهجرات الذاتية (نمط ems_runtime_ddl الساقط).
+$users_has_status = true;
+$users_has_employee_id = true; // رابط الحساب↔الموظف (الخيار ب)
+$users_not_deleted_sql = "(COALESCE(is_deleted,0)=0)";
 
-// تجهيز أعمدة الحذف الناعم إن لم تكن موجودة
-$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
-$users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
-$users_has_deleted_by = db_table_has_column($conn, 'users', 'deleted_by');
-$users_has_status = db_table_has_column($conn, 'users', 'status');
-$users_has_employee_id = db_table_has_column($conn, 'users', 'employee_id'); // رابط الحساب↔الموظف (الخيار ب)
-
-if (!$users_has_is_deleted) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0", 'main/users.php');
-}
-if (!$users_has_deleted_at) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL", 'main/users.php');
-}
-if (!$users_has_deleted_by) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL", 'main/users.php');
-}
-if (!$users_has_status) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active'", 'main/users.php');
-}
-
-$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
-$users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
-$users_has_status = db_table_has_column($conn, 'users', 'status');
-$users_not_deleted_sql = $users_has_is_deleted ? "(COALESCE(is_deleted,0)=0)" : "1=1";
-
-if ($users_has_company_id && $current_company_id <= 0) {
+if ($current_company_id <= 0) {
     echo "<script>alert('❌ الحساب غير مرتبط بشركة'); window.location.href='../login.php';</script>";
     exit;
 }
+
+// العزل عبر بوابة المستأجر (الشاشة تشترط شركةً للجلسة أصلًا — لا مسار سوبر)
+$us_gate = ems_tenant_db();
 
 // Endpoint محلي لجلب عقود المشروع (يُستخدم عبر Ajax من نفس الصفحة)
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
@@ -56,12 +38,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
         exit;
     }
 
-    $project_scope = $users_has_company_id ? " AND p.company_id = $current_company_id" : "";
-    $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(p.is_deleted,0)=0" : "";
-
-    $project_check_sql = "SELECT p.id FROM project p WHERE p.id = $project_id AND p.status = '1' $project_not_deleted $project_scope LIMIT 1";
-    $project_check_res = mysqli_query($conn, $project_check_sql);
-    if (!$project_check_res || mysqli_num_rows($project_check_res) === 0) {
+    $us_prj_ok = array();
+    try {
+        $us_prj_ok = $us_gate->scopedQuery(array('scope' => array('p' => 'project')),
+            "SELECT p.id FROM project p WHERE p.id = ? AND p.status = '1' AND COALESCE(p.is_deleted,0)=0 AND {TENANT_SCOPE} LIMIT 1",
+            array($project_id));
+    } catch (\Throwable $t) { error_log('users.php ajax project: ' . $t->getMessage()); }
+    if (empty($us_prj_ok)) {
         echo json_encode(['success' => true, 'contracts' => []], JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -74,24 +57,26 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
         OR TRIM(LOWER(c.status)) = 'true'
     )";
 
-    $contracts_sql = "SELECT
+    $contracts_result = false;
+    try {
+        $contracts_result = $us_gate->scopedQuery(array('scope' => array('c' => 'contracts')),
+            "SELECT
             c.id,
             c.contract_signing_date,
             c.actual_start,
             c.forecasted_contracted_hours
         FROM contracts c
-        WHERE c.project_id = $project_id
+        WHERE c.project_id = ? AND {TENANT_SCOPE}
           AND $contract_active_sql
-        ORDER BY c.actual_start DESC, c.id DESC";
-
-    $contracts_result = mysqli_query($conn, $contracts_sql);
-    if (!$contracts_result) {
+        ORDER BY c.actual_start DESC, c.id DESC", array($project_id));
+    } catch (\Throwable $t) { error_log('users.php ajax contracts: ' . $t->getMessage()); }
+    if ($contracts_result === false) {
         echo json_encode(['success' => false, 'message' => 'خطأ في جلب العقود'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
     $contracts = [];
-    while ($row = mysqli_fetch_assoc($contracts_result)) {
+    foreach ($contracts_result as $row) {
         $contracts[] = [
             'id' => intval($row['id']),
             'display_name' => 'عقد رقم ' . intval($row['id']) . ' - ' . (isset($row['actual_start']) ? $row['actual_start'] : '-') . ' - ' . floatval(isset($row['forecasted_contracted_hours']) ? $row['forecasted_contracted_hours'] : 0) . ' ساعة',
@@ -110,10 +95,15 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
 
 $roles = array();
 $roles_scope = array();
-$roles_query = "SELECT id, name, role_scope FROM roles WHERE (parent_role_id IS NULL OR parent_role_id = 0) AND status = 1 ORDER BY level ASC, id ASC";
-$roles_result = mysqli_query($conn, $roles_query);
+$roles_result = array();
+try {
+    $roles_result = $us_gate->select('roles', array(
+        'columns' => array('id', 'name', 'role_scope'),
+        'whereRaw' => '(parent_role_id IS NULL OR parent_role_id = 0) AND status = 1',
+        'orderBy' => 'level ASC, id ASC'));
+} catch (\Throwable $t) { error_log('users.php roles: ' . $t->getMessage()); }
 if ($roles_result) {
-    while ($role_row = mysqli_fetch_assoc($roles_result)) {
+    foreach ($roles_result as $role_row) {
         $role_id = isset($role_row['id']) ? (string) $role_row['id'] : '';
         $role_name = isset($role_row['name']) ? trim($role_row['name']) : '';
         $scope_value = isset($role_row['role_scope']) ? trim($role_row['role_scope']) : 'gloable';
@@ -150,14 +140,12 @@ if (empty($roles)) {
 // ════════════════════════════════════════════════════════════════════════════
 $employees_for_link = array();
 if ($users_has_employee_id) {
-    $emp_has_company = db_table_has_column($conn, 'employees', 'company_id');
-    $emp_scope = ($emp_has_company && $current_company_id > 0) ? " WHERE e.company_id = $current_company_id" : "";
-    $emp_sql = "SELECT e.id, e.name, e.phone, e.email,
+    try {
+        $us_emps = $us_gate->scopedQuery(array('scope' => array('e' => 'employees'), 'enrich' => array('u' => 'users')),
+            "SELECT e.id, e.name, e.phone, e.email,
                        (SELECT u.id FROM users u WHERE u.employee_id = e.id AND $users_not_deleted_sql LIMIT 1) AS linked_uid
-                FROM employees e $emp_scope ORDER BY e.name ASC";
-    $emp_res = mysqli_query($conn, $emp_sql);
-    if ($emp_res) {
-        while ($er = mysqli_fetch_assoc($emp_res)) {
+                FROM employees e WHERE 1=1 AND {TENANT_SCOPE} ORDER BY e.name ASC");
+        foreach ($us_emps as $er) {
             $employees_for_link[] = array(
                 'id'         => intval($er['id']),
                 'name'       => $er['name'],
@@ -166,7 +154,7 @@ if ($users_has_employee_id) {
                 'linked_uid' => ($er['linked_uid'] !== null) ? intval($er['linked_uid']) : 0,
             );
         }
-    }
+    } catch (\Throwable $t) { error_log('users.php employees: ' . $t->getMessage()); }
 }
 
 // خريطة (معرّف الموظف ⇐ الاسم) لعرض «الموظف المرتبط» في قائمة المستخدمين.
@@ -180,10 +168,11 @@ foreach ($employees_for_link as $e) {
 $prefill_employee_id = isset($_GET['employee_id']) ? intval($_GET['employee_id']) : 0;
 $prefill_edit_uid = 0;
 if ($prefill_employee_id > 0 && $users_has_employee_id) {
-    $pf_res = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $prefill_employee_id AND $users_not_deleted_sql LIMIT 1");
-    if ($pf_res && ($pf_row = mysqli_fetch_assoc($pf_res))) {
-        $prefill_edit_uid = intval($pf_row['id']);
-    }
+    try {
+        $pf_row = $us_gate->selectOne('users', array('columns' => array('id'),
+            'where' => array('employee_id' => $prefill_employee_id), 'whereRaw' => $users_not_deleted_sql));
+        if ($pf_row) { $prefill_edit_uid = intval($pf_row['id']); }
+    } catch (\Throwable $t) { error_log('users.php prefill: ' . $t->getMessage()); }
 }
 
 // حذف ناعم
@@ -191,10 +180,15 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $delete_id = intval($_GET['delete']);
     $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
-    $delete_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-    $delete_sql = "UPDATE users SET is_deleted = 1, deleted_at = NOW(), deleted_by = $current_user_id, updated_at = NOW() WHERE id = $delete_id AND role != '-1' AND $users_not_deleted_sql $delete_scope";
+    $us_deleted = 0;
+    try {
+        $us_deleted = intval($us_gate->update('users', array(
+            'is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_by' => $current_user_id, 'updated_at' => date('Y-m-d H:i:s'),
+        ), array('id' => $delete_id), "role != '-1' AND $users_not_deleted_sql"));
+    } catch (\Throwable $t) { error_log('users.php delete: ' . $t->getMessage()); }
 
-    if (@mysqli_query($conn, $delete_sql) && mysqli_affected_rows($conn) > 0) {
+    if ($us_deleted > 0) {
         echo "<script>alert('✅ تم حذف المستخدم بنجاح'); window.location.href='users.php';</script>";
     } else {
         echo "<script>alert('❌ حدث خطأ أثناء الحذف أو لا توجد صلاحية'); window.location.href='users.php';</script>";
@@ -210,22 +204,22 @@ include '../insidebar.php';
 
 // إضافة أو تعديل مستخدم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $name = $_POST['name'];
+    $username = $_POST['username'];
     $passwordRaw = isset($_POST['password']) ? trim($_POST['password']) : '';
-    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $phone = $_POST['phone'];
+    $role = $_POST['role'];
     $status_input = isset($_POST['status']) ? trim($_POST['status']) : 'active';
     $status = (in_array($status_input, array('active', '1', 1, 'نشط', 'true'), true)) ? 'active' : 'inactive';
     $selected_role_scope = 'gloable';
-    $role_lookup_sql = "SELECT role_scope FROM roles WHERE id='" . mysqli_real_escape_string($conn, $role) . "' LIMIT 1";
-    $role_lookup_result = mysqli_query($conn, $role_lookup_sql);
-    if ($role_lookup_result && mysqli_num_rows($role_lookup_result) > 0) {
-        $role_lookup_row = mysqli_fetch_assoc($role_lookup_result);
-        if (isset($role_lookup_row['role_scope']) && ($role_lookup_row['role_scope'] === 'mine' || $role_lookup_row['role_scope'] === 'project')) {
+    try {
+        $role_lookup_row = $us_gate->selectOne('roles', array('columns' => array('role_scope'),
+            'where' => array('id' => intval($role))));
+        if ($role_lookup_row && isset($role_lookup_row['role_scope'])
+            && ($role_lookup_row['role_scope'] === 'mine' || $role_lookup_row['role_scope'] === 'project')) {
             $selected_role_scope = 'project';
         }
-    }
+    } catch (\Throwable $t) { error_log('users.php role scope: ' . $t->getMessage()); }
 
     $requires_project_context = ($selected_role_scope === 'project');
     $project = ($requires_project_context && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
@@ -236,25 +230,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
     $employee_link_valid = true;
     if ($employee_link_id > 0) {
-        // (1) الموظف يجب أن يتبع شركة المستخدم الحالي
-        $emp_company_cond = (db_table_has_column($conn, 'employees', 'company_id') && $current_company_id > 0)
-            ? " AND company_id = $current_company_id" : "";
-        $emp_chk = mysqli_query($conn, "SELECT id FROM employees WHERE id = $employee_link_id $emp_company_cond LIMIT 1");
-        if (!$emp_chk || mysqli_num_rows($emp_chk) === 0) {
-            $employee_link_valid = false;
-        } else {
-            // (2) الموظف غير مرتبط بحسابٍ آخر (يستثني السجل الحالي عند التعديل)
-            $excl = $uid > 0 ? " AND id != $uid" : "";
-            $link_chk = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $employee_link_id $excl AND $users_not_deleted_sql LIMIT 1");
-            if ($link_chk && mysqli_num_rows($link_chk) > 0) {
+        try {
+            // (1) الموظف يجب أن يتبع شركة المستخدم الحالي (النطاق عبر البوابة)
+            $us_emp_chk = $us_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_link_id)));
+            if ($us_emp_chk === null) {
                 $employee_link_valid = false;
+            } else {
+                // (2) الموظف غير مرتبط بحسابٍ آخر (يستثني السجل الحالي عند التعديل)
+                $us_link_chk = $us_gate->selectOne('users', array('columns' => array('id'),
+                    'where' => array('employee_id' => $employee_link_id),
+                    'whereRaw' => ($uid > 0 ? 'id != ' . intval($uid) . ' AND ' : '') . $users_not_deleted_sql));
+                if ($us_link_chk !== null) {
+                    $employee_link_valid = false;
+                }
             }
-        }
+        } catch (\Throwable $t) { $employee_link_valid = false; error_log('users.php employee check: ' . $t->getMessage()); }
     }
-    // جملة العمود الجزئية لإعادة الاستخدام في INSERT/UPDATE
-    $sql_employee = $users_has_employee_id
-        ? ", employee_id=" . ($employee_link_id > 0 ? "'$employee_link_id'" : "NULL")
-        : "";
 
     if ($users_has_employee_id && $employee_link_id <= 0) {
         echo "<script>alert('⚠️ يجب إسناد موظف لهذا الحساب — لا يوجد حساب يعمل بلا موظف مُسنَد له');</script>";
@@ -265,37 +256,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     } elseif ($uid > 0) {
 
         // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي) - التحقق عالمي عبر جميع الشركات
-        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' AND $users_not_deleted_sql LIMIT 1");
+        // [مُستثنى موثَّق — قراءة تفرُّدٍ عالمية] اسم الدخول هوية منصّةٍ عابرة للشركات؛
+        // تنطيقها بالشركة يسمح بتصادم أسماء الدخول. تبقى خامًا بانتظار قناة القراءة
+        // العالمية في دفعة المزوّد (admin/).
+        $username_esc = mysqli_real_escape_string($conn, $username);
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username_esc' AND id != '$uid' AND $users_not_deleted_sql LIMIT 1");
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
             echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
         } else {
+            // (كان الأصل يعيد كتابة company_id بقيمة الجلسة نفسها — الصف معزول عبر البوابة
+            // أصلًا فالإعادة لغو، وتمريرها في بيانات التحديث محظور تعاقديًا)
+            $us_data = array(
+                'name' => $name, 'username' => $username, 'phone' => $phone, 'role' => $role,
+                'project_id' => $project, 'contract_id' => $contract,
+                'updated_at' => date('Y-m-d H:i:s'), 'status' => $status,
+            );
             // إذا تم إدخال كلمة مرور جديدة، نشفّرها ونحدّثها؛ وإلا لا نغيّرها
-            $sql_pass = "";
-            if ($passwordRaw !== '') {
-                $hashedPass = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_BCRYPT));
-                $sql_pass = ", password='$hashedPass'";
-            }
+            if ($passwordRaw !== '') { $us_data['password'] = password_hash($passwordRaw, PASSWORD_BCRYPT); }
+            if ($users_has_employee_id) { $us_data['employee_id'] = $employee_link_id > 0 ? $employee_link_id : null; }
 
-            $company_update = ($users_has_company_id && $current_company_id > 0) ? ", company_id='$current_company_id'" : "";
-            $update_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-
-                $sql_status = $users_has_status ? ", status='$status'" : "";
-
-                $sql = "UPDATE users
-                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', contract_id='$contract', updated_at=NOW() $sql_status $sql_pass $sql_employee
-                    $company_update
-                    WHERE id='$uid' AND $users_not_deleted_sql $update_scope";
-            if (mysqli_query($conn, $sql)) {
+            $us_upd_ok = false;
+            try { $us_gate->update('users', $us_data, array('id' => $uid), $users_not_deleted_sql); $us_upd_ok = true; }
+            catch (\Throwable $t) { error_log('users.php update: ' . $t->getMessage()); }
+            if ($us_upd_ok) {
                 echo "<script>alert('✅ تم التعديل بنجاح'); window.location.href='users.php';</script>";
             } else {
-                echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+                echo "<script>alert('❌ حدث خطأ أثناء التعديل');</script>";
             }
         }
     } else {
         // تحقق من التكرار عند الإضافة - التحقق عالمي عبر جميع الشركات
-        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND $users_not_deleted_sql LIMIT 1");
+        // [مُستثنى موثَّق — قراءة تفرُّدٍ عالمية] (انظر تعليق التعديل أعلاه)
+        $username_esc = mysqli_real_escape_string($conn, $username);
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username_esc' AND $users_not_deleted_sql LIMIT 1");
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
@@ -304,31 +299,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             if ($passwordRaw === '') {
                 echo "<script>alert('⚠️ كلمة المرور مطلوبة عند إضافة مستخدم جديد');</script>";
             } else {
-                $hashedPass = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_BCRYPT));
-
-                $insert_columns = "name, username, password, phone, role, project_id, contract_id, parent_id, created_at, updated_at";
-                $insert_values = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$contract', '0', NOW(), NOW()";
-
-                if ($users_has_status) {
-                    $insert_columns .= ", status";
-                    $insert_values .= ", '$status'";
-                }
-
-                if ($users_has_company_id && $current_company_id > 0) {
-                    $insert_columns .= ", company_id";
-                    $insert_values .= ", '$current_company_id'";
-                }
-
-                if ($users_has_employee_id) {
-                    $insert_columns .= ", employee_id";
-                    $insert_values .= $employee_link_id > 0 ? ", '$employee_link_id'" : ", NULL";
-                }
-
-                $sql = "INSERT INTO users ($insert_columns) VALUES ($insert_values)";
-                if (mysqli_query($conn, $sql)) {
+                // company_id تحقنه البوابة من سياق الجلسة
+                $us_ins_ok = false;
+                try {
+                    $us_gate->insert('users', array(
+                        'name' => $name, 'username' => $username,
+                        'password' => password_hash($passwordRaw, PASSWORD_BCRYPT), 'phone' => $phone,
+                        'role' => $role, 'project_id' => $project, 'contract_id' => $contract,
+                        'parent_id' => '0', 'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s'),
+                        'status' => $status,
+                        'employee_id' => $employee_link_id > 0 ? $employee_link_id : null,
+                    ));
+                    $us_ins_ok = true;
+                } catch (\Throwable $t) { error_log('users.php insert: ' . $t->getMessage()); }
+                if ($us_ins_ok) {
                     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
                 } else {
-                    echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+                    echo "<script>alert('❌ حدث خطأ أثناء الحفظ');</script>";
                 }
             }
         }
@@ -433,12 +420,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         <select id="project_id" name="project_id" class="form-control">
                             <option value="">-- اختر المشروع --</option>
                             <?php
-                            $project_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-                            $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
-                            $sql = "SELECT id, name, project_code FROM project WHERE status = '1' $project_not_deleted $project_scope ORDER BY name ASC";
-                            $result = mysqli_query($conn, $sql);
+                            $result = array();
+                            try {
+                                $result = $us_gate->scopedQuery(array('scope' => array('project' => 'project')),
+                                    "SELECT id, name, project_code FROM project WHERE status = '1' AND COALESCE(is_deleted,0)=0 AND {TENANT_SCOPE} ORDER BY name ASC");
+                            } catch (\Throwable $t) { error_log('users.php project options: ' . $t->getMessage()); }
                             if ($result) {
-                            while ($row = mysqli_fetch_assoc($result)) {
+                            foreach ($result as $row) {
                                 echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . " ({$row['project_code']})</option>";
                             }
                             }
@@ -521,15 +509,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </thead>
                     <tbody>
                         <?php
-                        $list_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-                        $select_status_column = $users_has_status ? "status" : "'active' AS status";
-                        $select_employee_column = $users_has_employee_id ? "employee_id" : "NULL AS employee_id";
-                        $query = "SELECT id, name, username, password, phone, role, project_id, contract_id, $select_status_column, $select_employee_column FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
-                        $result = mysqli_query($conn, $query);
+                        $result = array();
+                        try {
+                            $result = $us_gate->select('users', array(
+                                'columns' => array('id', 'name', 'username', 'password', 'phone', 'role', 'project_id', 'contract_id', 'status', 'employee_id'),
+                                'whereRaw' => "parent_id='0' AND role!='-1' AND $users_not_deleted_sql",
+                                'orderBy' => 'id DESC',
+                                'includeDeleted' => true));
+                        } catch (\Throwable $t) { error_log('users.php list: ' . $t->getMessage()); }
 
                         $i = 1;
                         if ($result) {
-                        while ($row = mysqli_fetch_assoc($result)) {
+                        foreach ($result as $row) {
                             $project_id = $row['project_id'];
                             $contract_id = $row['contract_id'];
 
@@ -539,18 +530,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             $row_role_scope = isset($roles_scope[$row_role_key]) ? $roles_scope[$row_role_key] : 'gloable';
 
                             if ($row_role_scope === 'mine' || $row_role_scope === 'project') {
-                                // جلب اسم المشروع
+                                // جلب اسم المشروع (includeDeleted حفاظًا على سلوك الأصل غير المرشِّح)
                                 if ($project_id > 0) {
-                                    $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
-                                    if ($select_project && ($project_row = mysqli_fetch_array($select_project))) {
+                                    $project_row = null;
+                                    try {
+                                        $project_row = $us_gate->selectOne('project', array('columns' => array('name', 'project_code'),
+                                            'where' => array('id' => intval($project_id)), 'includeDeleted' => true));
+                                    } catch (\Throwable $t) { error_log('users.php row project: ' . $t->getMessage()); }
+                                    if ($project_row) {
                                         $project_info = "<div class='pu-project-meta'><div class='pu-project-meta-item'><i class='fas fa-project-diagram pu-meta-icon'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
                                     }
                                 }
 
                                 // جلب تاريخ العقد
                                 if ($contract_id > 0) {
-                                    $select_contract = mysqli_query($conn, "SELECT contract_signing_date FROM `contracts` WHERE `id` = $contract_id");
-                                    if ($select_contract && ($contract_row = mysqli_fetch_array($select_contract))) {
+                                    $contract_row = null;
+                                    try {
+                                        $contract_row = $us_gate->selectOne('contracts', array('columns' => array('contract_signing_date'),
+                                            'where' => array('id' => intval($contract_id)), 'includeDeleted' => true));
+                                    } catch (\Throwable $t) { error_log('users.php row contract: ' . $t->getMessage()); }
+                                    if ($contract_row) {
                                         $project_info .= "</div><div class='pu-project-meta-item'><i class='fas fa-file-contract pu-meta-icon'></i> عقد #" . $contract_id . " - " . $contract_row['contract_signing_date'];
                                     }
                                 }

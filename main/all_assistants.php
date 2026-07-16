@@ -11,9 +11,9 @@ include '../config.php';
 include '../includes/permissions_helper.php';
 
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$users_has_company_id  = db_table_has_column($conn, 'users', 'company_id');
-$users_has_employee_id = db_table_has_column($conn, 'users', 'employee_id');
-$users_not_deleted_sql = db_table_has_column($conn, 'users', 'is_deleted') ? "(COALESCE(u.is_deleted,0)=0)" : "1=1";
+// الأعمدة (company_id/employee_id/is_deleted) قائمة بالترحيلات — سقطت فحوص db_table_has_column
+$users_has_employee_id = true;
+$users_not_deleted_sql = "(COALESCE(u.is_deleted,0)=0)";
 
 $_currentUserRole = intval($_SESSION['user']['role']);
 $is_super_admin = (strval($_SESSION['user']['role']) === '-1');
@@ -32,53 +32,66 @@ if (!$can_view) {
     header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+لهذه+الشاشة+❌"); exit;
 }
 
-$company_scope = (!$is_super_admin && $users_has_company_id) ? " AND u.company_id = $current_company_id " : "";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$aa_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('all assistants super') : ems_tenant_db();
 
 // مدراء الشركة (آباء محتملون): مستخدمون عُلويون parent_id='0' بأدوارٍ عُلوية.
 $managers = array();
-$mq = mysqli_query($conn, "SELECT u.id, u.name, u.username, u.role, ro.name AS role_name
+try {
+    $managers = $aa_gate->scopedQuery(array('scope' => array('u' => 'users')),
+        "SELECT u.id, u.name, u.username, u.role, ro.name AS role_name
     FROM users u LEFT JOIN roles ro ON ro.id = u.role
-    WHERE (u.parent_id='0' OR u.parent_id='') AND u.role <> '-1' AND $users_not_deleted_sql $company_scope
+    WHERE (u.parent_id='0' OR u.parent_id='') AND u.role <> '-1' AND $users_not_deleted_sql AND {TENANT_SCOPE}
       AND u.role IN (SELECT r.id FROM roles r WHERE (r.parent_role_id IS NULL OR r.parent_role_id=0))
     ORDER BY u.name ASC");
-if ($mq) { while ($m = mysqli_fetch_assoc($mq)) { $managers[] = $m; } }
+} catch (\Throwable $t) { error_log('all_assistants.php managers: ' . $t->getMessage()); }
 
-// كل الأدوار التابعة (المستوى الثاني) — تُرشَّح في الواجهة حسب دور المدير الأب المختار.
+// كل الأدوار التابعة (المستوى الثاني) — roles مرجع عام: قراءته عبر البوابة بلا نطاق.
 $child_roles = array();
-$cr = mysqli_query($conn, "SELECT id, name, parent_role_id FROM roles WHERE parent_role_id IS NOT NULL AND parent_role_id<>0 AND (status='1' OR status=1) ORDER BY name ASC");
-if ($cr) { while ($r = mysqli_fetch_assoc($cr)) { $child_roles[] = $r; } }
+try {
+    $child_roles = $aa_gate->select('roles', array(
+        'columns' => array('id', 'name', 'parent_role_id'),
+        'whereRaw' => "parent_role_id IS NOT NULL AND parent_role_id<>0 AND (status='1' OR status=1)",
+        'orderBy' => 'name ASC'));
+} catch (\Throwable $t) { error_log('all_assistants.php child roles: ' . $t->getMessage()); }
 
 // موظفو الشركة المتاحون للربط (+ المرتبط حالياً عند التعديل).
 $employees_for_link = array(); $emp_name_by_id = array();
 if ($users_has_employee_id) {
-    $emp_has_company = db_table_has_column($conn, 'employees', 'company_id');
-    $emp_scope = ($emp_has_company && $current_company_id > 0) ? " WHERE e.company_id = $current_company_id" : "";
-    $eq = mysqli_query($conn, "SELECT e.id, e.name, e.phone,
+    try {
+        $aa_emps = $aa_gate->scopedQuery(array('scope' => array('e' => 'employees'), 'enrich' => array('u2' => 'users')),
+            "SELECT e.id, e.name, e.phone,
             (SELECT u2.id FROM users u2 WHERE u2.employee_id=e.id AND COALESCE(u2.is_deleted,0)=0 LIMIT 1) AS linked_uid
-        FROM employees e $emp_scope ORDER BY e.name ASC");
-    if ($eq) { while ($er = mysqli_fetch_assoc($eq)) {
-        $employees_for_link[] = array('id'=>intval($er['id']),'name'=>$er['name'],'phone'=>$er['phone'],'linked_uid'=>($er['linked_uid']!==null)?intval($er['linked_uid']):0);
-        $emp_name_by_id[intval($er['id'])] = $er['name'];
-    } }
+        FROM employees e WHERE 1=1 AND {TENANT_SCOPE} ORDER BY e.name ASC");
+        foreach ($aa_emps as $er) {
+            $employees_for_link[] = array('id'=>intval($er['id']),'name'=>$er['name'],'phone'=>$er['phone'],'linked_uid'=>($er['linked_uid']!==null)?intval($er['linked_uid']):0);
+            $emp_name_by_id[intval($er['id'])] = $er['name'];
+        }
+    } catch (\Throwable $t) { error_log('all_assistants.php employees: ' . $t->getMessage()); }
 }
 
-// خريطة دور كل مدير (للتحقق أن الدور المختار ابنٌ فعلاً لدور المدير الأب).
-function aa_user_role($conn, $uid, $company_id, $is_super) {
+// خريطة دور كل مدير (للتحقق أن الدور المختار ابنٌ فعلاً لدور المدير الأب) — عبر البوابة.
+function aa_user_role($g, $uid) {
     $uid = intval($uid);
-    $sc = (!$is_super) ? " AND company_id = ".intval($company_id) : "";
-    $r = mysqli_query($conn, "SELECT role FROM users WHERE id=$uid AND COALESCE(is_deleted,0)=0 $sc LIMIT 1");
-    $row = $r ? mysqli_fetch_assoc($r) : null;
+    try {
+        $row = $g->selectOne('users', array('columns' => array('role'),
+            'where' => array('id' => $uid), 'whereRaw' => 'COALESCE(is_deleted,0)=0'));
+    } catch (\Throwable $t) { $row = null; }
     return $row ? intval($row['role']) : 0;
 }
 
 // ============ معالجة الحذف ============
 if (isset($_GET['delete']) && is_numeric($_GET['delete']) && $can_delete) {
     $did = intval($_GET['delete']);
-    $sc = (!$is_super_admin && $users_has_company_id) ? " AND company_id = $current_company_id" : "";
-    // فقط الحسابات الفرعية (لها أبٌ) — لا تمسّ المدراء الرئيسيين.
-    $del = "UPDATE users SET is_deleted=1, deleted_at=NOW(), deleted_by=".intval($_SESSION['user']['id']).", updated_at=NOW()
-            WHERE id=$did AND parent_id<>'0' AND parent_id<>'' AND role<>'-1' AND COALESCE(is_deleted,0)=0 $sc";
-    if (@mysqli_query($conn, $del) && mysqli_affected_rows($conn) > 0) {
+    // فقط الحسابات الفرعية (لها أبٌ) — لا تمسّ المدراء الرئيسيين. (النطاق عبر البوابة)
+    $aa_deleted = 0;
+    try {
+        $aa_deleted = intval($aa_gate->update('users', array(
+            'is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_by' => intval($_SESSION['user']['id']), 'updated_at' => date('Y-m-d H:i:s'),
+        ), array('id' => $did), "parent_id<>'0' AND parent_id<>'' AND role<>'-1' AND COALESCE(is_deleted,0)=0"));
+    } catch (\Throwable $t) { error_log('all_assistants.php delete: ' . $t->getMessage()); }
+    if ($aa_deleted > 0) {
         header("Location: all_assistants.php?msg=تم+حذف+المعاون+بنجاح+✅");
     } else {
         header("Location: all_assistants.php?msg=تعذّر+الحذف+أو+ليس+حساباً+فرعياً+❌");
@@ -93,57 +106,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) {
         header("Location: all_assistants.php?msg=لا+توجد+صلاحية+❌"); exit;
     }
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $username = mysqli_real_escape_string($conn, trim($_POST['username']));
+    $name = trim($_POST['name']);
+    $username = trim($_POST['username']);
     $passwordRaw = isset($_POST['password']) ? (string)$_POST['password'] : '';
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
+    $phone = trim($_POST['phone']);
     $role = intval($_POST['role'] ?? 0);
     $parent_user = intval($_POST['parent_id'] ?? 0);
     $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
 
-    // 1) المدير الأب ضمن الشركة وعُلوي
-    $parent_role = aa_user_role($conn, $parent_user, $current_company_id, $is_super_admin);
+    // 1) المدير الأب ضمن الشركة وعُلوي (النطاق عبر البوابة)
+    $parent_role = aa_user_role($aa_gate, $parent_user);
     if ($parent_user <= 0 || $parent_role <= 0) { header("Location: all_assistants.php?msg=اختر+مديراً+أباً+صالحاً+❌"); exit; }
 
-    // 2) الدور ابنٌ فعلاً لدور المدير الأب
-    $rk = mysqli_query($conn, "SELECT 1 FROM roles WHERE id=$role AND parent_role_id=$parent_role AND (status='1' OR status=1) LIMIT 1");
-    if (!$rk || mysqli_num_rows($rk) === 0) { header("Location: all_assistants.php?msg=الدور+يجب+أن+يكون+تابعاً+للمدير+الأب+❌"); exit; }
+    // 2) الدور ابنٌ فعلاً لدور المدير الأب (roles مرجع عام — قراءة عبر البوابة)
+    $aa_role_ok = null;
+    try {
+        $aa_role_ok = $aa_gate->selectOne('roles', array('columns' => array('id'),
+            'where' => array('id' => $role, 'parent_role_id' => $parent_role),
+            'whereRaw' => "(status='1' OR status=1)"));
+    } catch (\Throwable $t) { error_log('all_assistants.php role check: ' . $t->getMessage()); }
+    if ($aa_role_ok === null) { header("Location: all_assistants.php?msg=الدور+يجب+أن+يكون+تابعاً+للمدير+الأب+❌"); exit; }
 
     // 3) ربط الموظف إلزامي + تحقّق الملكية/التفرّد
     if ($users_has_employee_id && $employee_link_id <= 0) { header("Location: all_assistants.php?msg=يجب+إسناد+موظف+للحساب+❌"); exit; }
     if ($employee_link_id > 0) {
-        $emp_company_cond = (db_table_has_column($conn,'employees','company_id') && $current_company_id>0) ? " AND company_id=$current_company_id" : "";
-        $ec = mysqli_query($conn, "SELECT id FROM employees WHERE id=$employee_link_id $emp_company_cond LIMIT 1");
-        $excl = $is_editing ? " AND id != $uid" : "";
-        $lc = mysqli_query($conn, "SELECT id FROM users WHERE employee_id=$employee_link_id $excl AND COALESCE(is_deleted,0)=0 LIMIT 1");
-        if (!$ec || mysqli_num_rows($ec)===0 || ($lc && mysqli_num_rows($lc)>0)) {
+        $aa_emp_ok = null; $aa_linked = null;
+        try {
+            $aa_emp_ok = $aa_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_link_id)));
+            $aa_linked = $aa_gate->selectOne('users', array('columns' => array('id'),
+                'where' => array('employee_id' => $employee_link_id),
+                'whereRaw' => 'COALESCE(is_deleted,0)=0' . ($is_editing ? ' AND id != ' . intval($uid) : '')));
+        } catch (\Throwable $t) { error_log('all_assistants.php employee check: ' . $t->getMessage()); }
+        if ($aa_emp_ok === null || $aa_linked !== null) {
             header("Location: all_assistants.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌"); exit;
         }
     }
 
     // 4) تفرّد اسم المستخدم
+    // [مُستثنى موثَّق — قراءة تفرُّدٍ عالمية] اسم الدخول هوية منصّةٍ عابرة للشركات (كما في
+    // main/check_username_availability.php) — تنطيقها بالشركة يسمح بتصادم أسماء الدخول.
+    // تبقى خامًا بانتظار قناة القراءة العالمية في دفعة المزوّد (admin/).
+    $username_esc = mysqli_real_escape_string($conn, $username);
     $dupExcl = $is_editing ? " AND id != $uid" : "";
-    $dup = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' $dupExcl AND COALESCE(is_deleted,0)=0 LIMIT 1");
+    $dup = mysqli_query($conn, "SELECT id FROM users WHERE username='$username_esc' $dupExcl AND COALESCE(is_deleted,0)=0 LIMIT 1");
     if ($dup && mysqli_num_rows($dup) > 0) { header("Location: all_assistants.php?msg=اسم+المستخدم+موجود+مسبقاً+❌"); exit; }
 
-    $sql_employee = $users_has_employee_id ? ", employee_id=".($employee_link_id>0?"'$employee_link_id'":"NULL") : "";
-
     if ($is_editing) {
-        $sc = (!$is_super_admin && $users_has_company_id) ? " AND company_id = $current_company_id" : "";
-        $passUpd = ($passwordRaw !== '') ? ", password='".mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_DEFAULT))."'" : "";
-        $sql = "UPDATE users SET name='$name', username='$username', phone='$phone', role='$role', role_id='$role',
-                parent_id='$parent_user', updated_at=NOW() $passUpd $sql_employee
-                WHERE id=$uid AND parent_id<>'0' AND parent_id<>'' AND COALESCE(is_deleted,0)=0 $sc";
-        @mysqli_query($conn, $sql);
+        $aa_data = array(
+            'name' => $name, 'username' => $username, 'phone' => $phone,
+            'role' => $role, 'role_id' => $role, 'parent_id' => $parent_user,
+            'updated_at' => date('Y-m-d H:i:s'),
+        );
+        if ($passwordRaw !== '') { $aa_data['password'] = password_hash($passwordRaw, PASSWORD_DEFAULT); }
+        if ($users_has_employee_id) { $aa_data['employee_id'] = $employee_link_id > 0 ? $employee_link_id : null; }
+        try {
+            $aa_gate->update('users', $aa_data, array('id' => $uid),
+                "parent_id<>'0' AND parent_id<>'' AND COALESCE(is_deleted,0)=0");
+        } catch (\Throwable $t) { error_log('all_assistants.php update: ' . $t->getMessage()); }
         header("Location: all_assistants.php?msg=تم+تعديل+المعاون+بنجاح+✅"); exit;
     } else {
         if ($passwordRaw === '') { header("Location: all_assistants.php?msg=كلمة+المرور+مطلوبة+❌"); exit; }
-        $hash = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_DEFAULT));
-        $cols = "name, username, password, phone, role, role_id, parent_id, project_id, created_at, updated_at";
-        $vals = "'$name','$username','$hash','$phone','$role','$role','$parent_user','0',NOW(),NOW()";
-        if ($users_has_company_id && $current_company_id > 0) { $cols .= ", company_id"; $vals .= ", '$current_company_id'"; }
-        if ($users_has_employee_id) { $cols .= ", employee_id"; $vals .= $employee_link_id>0 ? ", '$employee_link_id'" : ", NULL"; }
-        @mysqli_query($conn, "INSERT INTO users ($cols) VALUES ($vals)");
+        // company_id تحقنه البوابة من سياق الجلسة
+        try {
+            $aa_gate->insert('users', array(
+                'name' => $name, 'username' => $username,
+                'password' => password_hash($passwordRaw, PASSWORD_DEFAULT), 'phone' => $phone,
+                'role' => $role, 'role_id' => $role, 'parent_id' => $parent_user, 'project_id' => '0',
+                'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s'),
+                'employee_id' => $employee_link_id > 0 ? $employee_link_id : null,
+            ));
+        } catch (\Throwable $t) { error_log('all_assistants.php insert: ' . $t->getMessage()); }
         header("Location: all_assistants.php?msg=تم+إضافة+المعاون+بنجاح+✅"); exit;
     }
 }
@@ -237,15 +269,19 @@ include('../insidebar.php');
             </tr></thead>
             <tbody>
             <?php
-            $list = mysqli_query($conn, "SELECT u.id, u.name, u.username, u.phone, u.role, u.employee_id, u.parent_id,
+            $list = array();
+            try {
+                $list = $aa_gate->scopedQuery(array('scope' => array('u' => 'users'), 'enrich' => array('p' => 'users')),
+                    "SELECT u.id, u.name, u.username, u.phone, u.role, u.employee_id, u.parent_id,
                         ro.name AS role_name, p.name AS parent_name
                     FROM users u
                     LEFT JOIN roles ro ON ro.id = u.role
                     LEFT JOIN users p ON p.id = u.parent_id
-                    WHERE u.parent_id <> '0' AND u.parent_id <> '' AND u.role <> '-1' AND $users_not_deleted_sql $company_scope
+                    WHERE u.parent_id <> '0' AND u.parent_id <> '' AND u.role <> '-1' AND $users_not_deleted_sql AND {TENANT_SCOPE}
                     ORDER BY u.id DESC");
+            } catch (\Throwable $t) { error_log('all_assistants.php list: ' . $t->getMessage()); }
             $i = 1;
-            if ($list) { while ($row = mysqli_fetch_assoc($list)):
+            if ($list) { foreach ($list as $row):
                 $roleText = $row['role_name'] ? htmlspecialchars($row['role_name'],ENT_QUOTES,'UTF-8') : '<span class="pu-text-muted">غير معروف</span>';
                 $eid = intval($row['employee_id']);
                 $empCell = ($eid>0 && isset($emp_name_by_id[$eid]))
@@ -273,7 +309,7 @@ include('../insidebar.php');
                         <?php endif; ?>
                     </div></td>
                 </tr>
-            <?php endwhile; } ?>
+            <?php endforeach; } ?>
             </tbody>
         </table>
     </div></div>

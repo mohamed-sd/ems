@@ -25,16 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "كلمة السر الجديدة غير متطابقة!";
 
     } else {
-        // جلب هاش كلمة السر القديمة من قاعدة البيانات (عبارة مُجهّزة)
-        $row  = null;
-        $stmt = mysqli_prepare($conn, "SELECT password FROM users WHERE id = ? LIMIT 1");
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "i", $user_id);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            $row    = $result ? mysqli_fetch_assoc($result) : null;
-            mysqli_stmt_close($stmt);
-        }
+        // جلب هاش كلمة السر القديمة عبر البوابة (نطاق الشركة آلي؛ includeDeleted
+        // حفاظًا على سلوك الأصل الذي لم يرشّح المحذوف ناعمًا لجلسةٍ حيّة)
+        $cp_gate = (strval($_SESSION['user']['role'] ?? '') === '-1')
+            ? ems_tenant_db()->forAllTenants('change password super') : ems_tenant_db();
+        $row = null;
+        try {
+            $row = $cp_gate->selectOne('users', array('columns' => array('password'),
+                'where' => array('id' => $user_id), 'includeDeleted' => true));
+        } catch (\Throwable $t) { error_log('change_password.php read: ' . $t->getMessage()); }
 
         // التحقق من كلمة السر القديمة بـ bcrypt (مطابقٌ لـ login.php)
         if (!$row || !password_verify($old_password, $row['password'])) {
@@ -42,19 +41,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // تخزين كلمة السر الجديدة مُشفّرة (bcrypt) — مطابقٌ لـ main/users.php
             $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
-            $update   = mysqli_prepare($conn, "UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?");
-            if ($update) {
-                mysqli_stmt_bind_param($update, "si", $new_hash, $user_id);
-                if (mysqli_stmt_execute($update)) {
-                    $success = "تم تغيير كلمة السر بنجاح 🎉";
-                    // تحديث الهاش في الجلسة إذا كان مخزناً
-                    if (isset($_SESSION['user']['password'])) {
-                        $_SESSION['user']['password'] = $new_hash;
-                    }
-                } else {
-                    $error = "حدث خطأ أثناء تحديث كلمة السر!";
+            $cp_ok = false;
+            try {
+                $cp_gate->update('users', array('password' => $new_hash, 'updated_at' => date('Y-m-d H:i:s')),
+                    array('id' => $user_id));
+                $cp_ok = true;
+            } catch (\Throwable $t) { error_log('change_password.php update: ' . $t->getMessage()); }
+            if ($cp_ok) {
+                $success = "تم تغيير كلمة السر بنجاح 🎉";
+                // تحديث الهاش في الجلسة إذا كان مخزناً
+                if (isset($_SESSION['user']['password'])) {
+                    $_SESSION['user']['password'] = $new_hash;
                 }
-                mysqli_stmt_close($update);
             } else {
                 $error = "حدث خطأ أثناء تحديث كلمة السر!";
             }

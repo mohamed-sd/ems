@@ -8,45 +8,30 @@ include '../config.php';
 include '../includes/permissions_helper.php';
 
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$users_has_company_id = db_table_has_column($conn, 'users', 'company_id');
+// أعمدة users (company_id/is_deleted/deleted_at/deleted_by/employee_id) قائمة بالترحيلات —
+// سقطت فحوص db_table_has_column والهجرة الذاتية (نمط ems_runtime_ddl الساقط).
+$users_not_deleted_sql = "(COALESCE(u.is_deleted,0)=0)";
+$users_has_employee_id = true; // ربط المعاون بموظف (قاعدة: لا حساب بلا موظف)
 
-$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
-$users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
-$users_has_deleted_by = db_table_has_column($conn, 'users', 'deleted_by');
-
-if (!$users_has_is_deleted) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0", 'main/project_users.php');
-}
-if (!$users_has_deleted_at) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL", 'main/project_users.php');
-}
-if (!$users_has_deleted_by) {
-    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL", 'main/project_users.php');
-}
-
-$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
-$users_not_deleted_sql = $users_has_is_deleted ? "(COALESCE(u.is_deleted,0)=0)" : "1=1";
-$users_has_employee_id = db_table_has_column($conn, 'users', 'employee_id'); // ربط المعاون بموظف (قاعدة: لا حساب بلا موظف)
-
-if ($users_has_company_id && $current_company_id <= 0) {
+if ($current_company_id <= 0) {
     header("Location: ../login.php?msg=الحساب+غير+مرتبط+بشركة+❌");
     exit();
 }
+
+// العزل عبر بوابة المستأجر (لا مسار سوبر هنا — الشاشة تشترط شركةً للجلسة أصلًا)
+$pu_gate = ems_tenant_db();
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ðŸ” التحقق من صلاحيات المستخدم على وحدة المشرفين
 // ══════════════════════════════════════════════════════════════════════════════
 $_currentUserRole = intval($_SESSION['user']['role']);
 
-// البحث عن معرف الوحدة مع مراعاة دور المستخدم الحالي
-$module_query = "SELECT id FROM modules
-                WHERE (code = 'main/project_users.php'
-                    OR code = 'project_users'
-                    OR code LIKE '%project_users%')
-                AND owner_role_id = $_currentUserRole
-                LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+// البحث عن معرف الوحدة مع مراعاة دور المستخدم الحالي (modules مرجع عام — قراءة عبر البوابة)
+$module_info = null;
+try {
+    $module_info = $pu_gate->selectOne('modules', array('columns' => array('id'),
+        'whereRaw' => "(code = 'main/project_users.php' OR code = 'project_users' OR code LIKE '%project_users%') AND owner_role_id = " . intval($_currentUserRole)));
+} catch (\Throwable $t) { error_log('project_users.php module: ' . $t->getMessage()); }
 $module_id = $module_info ? $module_info['id'] : null;
 
 // إذا لم يوجد سجل خاص بهذا الدور، افترض جميع الصلاحيات (للتوافق مع الأدوار القديمة)
@@ -73,14 +58,13 @@ if (!$can_view) {
 
 $page_title = "إيكوبيشن | المشرفون";
 
-// جلب اسم صلاحية المستخدم الحالي
+// جلب اسم صلاحية المستخدم الحالي (roles مرجع عام — قراءة عبر البوابة)
 $currentRole = $_SESSION['user']['role'];
-$roleNameQuery = "SELECT name FROM roles WHERE id = $currentRole LIMIT 1";
-$roleNameResult = mysqli_query($conn, $roleNameQuery);
 $roleName = '';
-if ($roleNameResult && $roleRow = mysqli_fetch_assoc($roleNameResult)) {
-    $roleName = htmlspecialchars($roleRow['name'], ENT_QUOTES, 'UTF-8');
-}
+try {
+    $pu_role_row = $pu_gate->selectOne('roles', array('columns' => array('name'), 'where' => array('id' => intval($currentRole))));
+    if ($pu_role_row) { $roleName = htmlspecialchars($pu_role_row['name'], ENT_QUOTES, 'UTF-8'); }
+} catch (\Throwable $t) { error_log('project_users.php role name: ' . $t->getMessage()); }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // معالجة الحذف
@@ -93,24 +77,31 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $deleteId = intval($_GET['delete']);
     $userid = $_SESSION['user']['id'];
 
-    // التحقق من أن المستخدم المراد حذفه تابع للمستخدم الحالي أو من دور تابع
-    $verifyQuery = "SELECT u.id FROM users u
-                    WHERE u.id = $deleteId
-                    " . ($users_has_company_id ? "AND u.company_id = $current_company_id" : "") . "
+    // التحقق من أن المستخدم المراد حذفه تابع للمستخدم الحالي أو من دور تابع (النطاق عبر البوابة)
+    $verifyResult = array();
+    try {
+        $verifyResult = $pu_gate->scopedQuery(array('scope' => array('u' => 'users')),
+            "SELECT u.id FROM users u
+                    WHERE u.id = ? AND {TENANT_SCOPE}
                     AND $users_not_deleted_sql
-                    AND (u.parent_id = '$userid' OR u.role IN (
+                    AND (u.parent_id = ? OR u.role IN (
                         SELECT r.id FROM roles r
-                        WHERE r.parent_role_id = {$_SESSION['user']['role']}
+                        WHERE r.parent_role_id = " . intval($_SESSION['user']['role']) . "
                         AND (r.status = '1' OR r.status = 1)
-                    ))";
+                    ))", array($deleteId, strval($userid)));
+    } catch (\Throwable $t) { error_log('project_users.php delete verify: ' . $t->getMessage()); }
 
-    $verifyResult = mysqli_query($conn, $verifyQuery);
-
-    if ($verifyResult && mysqli_num_rows($verifyResult) > 0) {
+    if (!empty($verifyResult)) {
         $deleteBy = intval($_SESSION['user']['id']);
-        $delete_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-        $deleteSQL = "UPDATE users SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleteBy, updated_at = NOW() WHERE id = $deleteId AND COALESCE(is_deleted,0)=0 $delete_scope";
-        if (mysqli_query($conn, $deleteSQL)) {
+        $pu_del_ok = false;
+        try {
+            $pu_gate->update('users', array(
+                'is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'),
+                'deleted_by' => $deleteBy, 'updated_at' => date('Y-m-d H:i:s'),
+            ), array('id' => $deleteId), 'COALESCE(is_deleted,0)=0');
+            $pu_del_ok = true;
+        } catch (\Throwable $t) { error_log('project_users.php delete: ' . $t->getMessage()); }
+        if ($pu_del_ok) {
             header("Location: project_users.php?msg=تم+حذف+المستخدم+بنجاح+✅");
             exit;
         } else {
@@ -132,38 +123,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit();
     }
     $userId = intval($_POST['user_id']);
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $username = mysqli_real_escape_string($conn, trim($_POST['username']));
+    $name = trim($_POST['name']);
+    $username = trim($_POST['username']);
     $passwordRaw = isset($_POST['password']) ? (string) $_POST['password'] : '';
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $phone = trim($_POST['phone']);
+    $role = $_POST['role'];
     // منع تصعيد الصلاحيات: الدور يجب أن يكون فعلاً من الأدوار الأبناء للمستخدم الحالي
-    // (تقييد القائمة في الواجهة وحده لا يكفي — يمكن تزوير الطلب).
+    // (تقييد القائمة في الواجهة وحده لا يكفي — يمكن تزوير الطلب). roles مرجع عام عبر البوابة.
     $role_check_id = intval($_POST['role']);
-    $role_chk = mysqli_query($conn, "SELECT 1 FROM roles
-            WHERE id = $role_check_id
-            AND parent_role_id = " . intval($_SESSION['user']['role']) . "
-            AND (status = '1' OR status = 1) LIMIT 1");
-    if (!$role_chk || mysqli_num_rows($role_chk) === 0) {
+    $pu_role_ok = null;
+    try {
+        $pu_role_ok = $pu_gate->selectOne('roles', array('columns' => array('id'),
+            'where' => array('id' => $role_check_id, 'parent_role_id' => intval($_SESSION['user']['role'])),
+            'whereRaw' => "(status = '1' OR status = 1)"));
+    } catch (\Throwable $t) { error_log('project_users.php role check: ' . $t->getMessage()); }
+    if ($pu_role_ok === null) {
         header("Location: project_users.php?msg=صلاحية+غير+مسموحة+❌");
         exit;
     }
     $userid = $_SESSION['user']['id'];
 
-    // التحقق من أن المستخدم المراد تعديله تابع للمستخدم الحالي
-    $verifyQuery = "SELECT u.id FROM users u
-                    WHERE u.id = $userId
-                    " . ($users_has_company_id ? "AND u.company_id = $current_company_id" : "") . "
+    // التحقق من أن المستخدم المراد تعديله تابع للمستخدم الحالي (النطاق عبر البوابة)
+    $verifyResult = array();
+    try {
+        $verifyResult = $pu_gate->scopedQuery(array('scope' => array('u' => 'users')),
+            "SELECT u.id FROM users u
+                    WHERE u.id = ? AND {TENANT_SCOPE}
                     AND $users_not_deleted_sql
-                    AND (u.parent_id = '$userid' OR u.role IN (
+                    AND (u.parent_id = ? OR u.role IN (
                         SELECT r.id FROM roles r
-                        WHERE r.parent_role_id = {$_SESSION['user']['role']}
+                        WHERE r.parent_role_id = " . intval($_SESSION['user']['role']) . "
                         AND (r.status = '1' OR r.status = 1)
-                    ))";
+                    ))", array($userId, strval($userid)));
+    } catch (\Throwable $t) { error_log('project_users.php edit verify: ' . $t->getMessage()); }
 
-    $verifyResult = mysqli_query($conn, $verifyQuery);
-
-    if (!$verifyResult || mysqli_num_rows($verifyResult) === 0) {
+    if (empty($verifyResult)) {
         header("Location: project_users.php?msg=ليس+لديك+صلاحية+لتعديل+هذا+المستخدم+❌");
         exit;
     }
@@ -175,42 +169,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
     if ($employee_link_id > 0) {
-        $emp_company_cond = (db_table_has_column($conn, 'employees', 'company_id') && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
-        $emp_chk  = mysqli_query($conn, "SELECT id FROM employees WHERE id = $employee_link_id $emp_company_cond LIMIT 1");
-        $link_chk = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $employee_link_id AND id != $userId AND COALESCE(is_deleted,0)=0 LIMIT 1");
-        if (!$emp_chk || mysqli_num_rows($emp_chk) === 0 || ($link_chk && mysqli_num_rows($link_chk) > 0)) {
+        $pu_emp_ok = null; $pu_linked = null;
+        try {
+            $pu_emp_ok = $pu_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_link_id)));
+            $pu_linked = $pu_gate->selectOne('users', array('columns' => array('id'),
+                'where' => array('employee_id' => $employee_link_id),
+                'whereRaw' => 'id != ' . intval($userId) . ' AND COALESCE(is_deleted,0)=0'));
+        } catch (\Throwable $t) { error_log('project_users.php employee check: ' . $t->getMessage()); }
+        if ($pu_emp_ok === null || $pu_linked !== null) {
             header("Location: project_users.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌");
             exit;
         }
     }
-    $sql_employee = $users_has_employee_id ? ", employee_id = '$employee_link_id'" : "";
 
-    // تحقق من تكرار اسم المستخدم (ما عدا المستخدم الحالي)
-    $check_query = "SELECT id FROM users WHERE username = '$username' AND id != $userId AND COALESCE(is_deleted,0)=0";
-    if ($users_has_company_id) {
-        $check_query .= " AND company_id = $current_company_id";
-    }
-    $check_result = mysqli_query($conn, $check_query);
+    // تحقق من تكرار اسم المستخدم (ما عدا المستخدم الحالي) — منطاقٌ بالشركة أصلًا (عبر البوابة)
+    $pu_dup = null;
+    try {
+        $pu_dup = $pu_gate->selectOne('users', array('columns' => array('id'),
+            'where' => array('username' => $username),
+            'whereRaw' => 'id != ' . intval($userId) . ' AND COALESCE(is_deleted,0)=0'));
+    } catch (\Throwable $t) { error_log('project_users.php dup check: ' . $t->getMessage()); }
 
-    if ($check_result && mysqli_num_rows($check_result) > 0) {
+    if ($pu_dup !== null) {
         header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
         exit;
     }
 
-    // تحديث المستخدم
-    $passwordUpdate = '';
-    if ($passwordRaw !== '') {
-        $hashedPassword = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_DEFAULT));
-        $passwordUpdate = ", password = '$hashedPassword'";
-    }
+    // تحديث المستخدم (كان الأصل يعيد كتابة company_id بقيمة الجلسة نفسها — الصف معزول
+    // عبر البوابة أصلًا فالإعادة لغو، وتمريرها في بيانات التحديث محظور تعاقديًا)
+    $pu_data = array(
+        'name' => $name, 'username' => $username, 'phone' => $phone,
+        'role' => $role, 'updated_at' => date('Y-m-d H:i:s'),
+    );
+    if ($passwordRaw !== '') { $pu_data['password'] = password_hash($passwordRaw, PASSWORD_DEFAULT); }
+    if ($users_has_employee_id) { $pu_data['employee_id'] = $employee_link_id; }
 
-    $updateSQL = "UPDATE users SET name = '$name', username = '$username', phone = '$phone', role = '$role', updated_at = NOW() $passwordUpdate $sql_employee";
-    if ($users_has_company_id && $current_company_id > 0) {
-        $updateSQL .= ", company_id = '$current_company_id'";
-    }
-    $updateSQL .= " WHERE id = $userId";
+    $pu_upd_ok = false;
+    try { $pu_gate->update('users', $pu_data, array('id' => $userId)); $pu_upd_ok = true; }
+    catch (\Throwable $t) { error_log('project_users.php update: ' . $t->getMessage()); }
 
-    if (mysqli_query($conn, $updateSQL)) {
+    if ($pu_upd_ok) {
         header("Location: project_users.php?msg=تم+تعديل+المستخدم+بنجاح+✅");
         exit;
     } else {
@@ -227,21 +225,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
         header("Location: project_users.php?msg=لا+توجد+صلاحية+إضافة+مستخدمين+جدد+❌");
         exit();
     }
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $username = mysqli_real_escape_string($conn, trim($_POST['username']));
-    // تُجزَّأ كلمة المرور الخام ثم يُهرَّب الـhash فقط (لا تُهرَّب قبل التجزئة — وإلا فشل الدخول مع الرموز الخاصة).
+    $name = trim($_POST['name']);
+    $username = trim($_POST['username']);
+    // تُجزَّأ كلمة المرور الخام (لا تُهرَّب قبل التجزئة — وإلا فشل الدخول مع الرموز الخاصة).
     $passwordRaw = isset($_POST['password']) ? (string) $_POST['password'] : '';
-    $hashedPassword = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_DEFAULT));
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $hashedPassword = password_hash($passwordRaw, PASSWORD_DEFAULT);
+    $phone = trim($_POST['phone']);
+    $role = $_POST['role'];
     // منع تصعيد الصلاحيات: الدور يجب أن يكون فعلاً من الأدوار الأبناء للمستخدم الحالي
-    // (تقييد القائمة في الواجهة وحده لا يكفي — يمكن تزوير الطلب).
+    // (تقييد القائمة في الواجهة وحده لا يكفي — يمكن تزوير الطلب). roles مرجع عام عبر البوابة.
     $role_check_id = intval($_POST['role']);
-    $role_chk = mysqli_query($conn, "SELECT 1 FROM roles
-            WHERE id = $role_check_id
-            AND parent_role_id = " . intval($_SESSION['user']['role']) . "
-            AND (status = '1' OR status = 1) LIMIT 1");
-    if (!$role_chk || mysqli_num_rows($role_chk) === 0) {
+    $pu_role_ok = null;
+    try {
+        $pu_role_ok = $pu_gate->selectOne('roles', array('columns' => array('id'),
+            'where' => array('id' => $role_check_id, 'parent_role_id' => intval($_SESSION['user']['role'])),
+            'whereRaw' => "(status = '1' OR status = 1)"));
+    } catch (\Throwable $t) { error_log('project_users.php add role check: ' . $t->getMessage()); }
+    if ($pu_role_ok === null) {
         header("Location: project_users.php?msg=صلاحية+غير+مسموحة+❌");
         exit;
     }
@@ -255,41 +255,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
         exit;
     }
     if ($employee_link_id > 0) {
-        $emp_company_cond = (db_table_has_column($conn, 'employees', 'company_id') && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
-        $emp_chk  = mysqli_query($conn, "SELECT id FROM employees WHERE id = $employee_link_id $emp_company_cond LIMIT 1");
-        $link_chk = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $employee_link_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-        if (!$emp_chk || mysqli_num_rows($emp_chk) === 0 || ($link_chk && mysqli_num_rows($link_chk) > 0)) {
+        $pu_emp_ok = null; $pu_linked = null;
+        try {
+            $pu_emp_ok = $pu_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_link_id)));
+            $pu_linked = $pu_gate->selectOne('users', array('columns' => array('id'),
+                'where' => array('employee_id' => $employee_link_id),
+                'whereRaw' => 'COALESCE(is_deleted,0)=0'));
+        } catch (\Throwable $t) { error_log('project_users.php add employee check: ' . $t->getMessage()); }
+        if ($pu_emp_ok === null || $pu_linked !== null) {
             header("Location: project_users.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌");
             exit;
         }
     }
 
-    // تحقق من تكرار اسم المستخدم
-    $check_query = "SELECT id FROM users WHERE username = '$username' AND COALESCE(is_deleted,0)=0";
-    if ($users_has_company_id) {
-        $check_query .= " AND company_id = $current_company_id";
-    }
-    $check_result = mysqli_query($conn, $check_query);
+    // تحقق من تكرار اسم المستخدم — منطاقٌ بالشركة أصلًا (عبر البوابة)
+    $pu_dup = null;
+    try {
+        $pu_dup = $pu_gate->selectOne('users', array('columns' => array('id'),
+            'where' => array('username' => $username), 'whereRaw' => 'COALESCE(is_deleted,0)=0'));
+    } catch (\Throwable $t) { error_log('project_users.php add dup check: ' . $t->getMessage()); }
 
-    if ($check_result && mysqli_num_rows($check_result) > 0) {
+    if ($pu_dup !== null) {
         header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
         exit;
     }
 
-    // إضافة مستخدم جديد
-    $insert_columns = "name, username, password, phone, role , role_id , project_id, parent_id, created_at, updated_at";
-    $insert_values = "'$name', '$username', '$hashedPassword', '$phone', '$role', '$role' , '$project', '$parent_id', NOW(), NOW()";
-    if ($users_has_company_id && $current_company_id > 0) {
-        $insert_columns .= ", company_id";
-        $insert_values .= ", '$current_company_id'";
-    }
-    if ($users_has_employee_id) {
-        $insert_columns .= ", employee_id";
-        $insert_values .= ", '$employee_link_id'";
-    }
-    $sql = "INSERT INTO users ($insert_columns) VALUES ($insert_values)";
+    // إضافة مستخدم جديد (company_id تحقنه البوابة من سياق الجلسة)
+    $pu_ins_ok = false;
+    try {
+        $pu_gate->insert('users', array(
+            'name' => $name, 'username' => $username, 'password' => $hashedPassword, 'phone' => $phone,
+            'role' => $role, 'role_id' => $role, 'project_id' => $project, 'parent_id' => $parent_id,
+            'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s'),
+            'employee_id' => $employee_link_id,
+        ));
+        $pu_ins_ok = true;
+    } catch (\Throwable $t) { error_log('project_users.php insert: ' . $t->getMessage()); }
 
-    if (mysqli_query($conn, $sql)) {
+    if ($pu_ins_ok) {
         header("Location: project_users.php?msg=تم+إضافة+المستخدم+بنجاح+✅");
         exit;
     } else {
@@ -302,14 +305,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
 $employees_for_link = array();
 $emp_name_by_id = array();
 if ($users_has_employee_id) {
-    $emp_has_company = db_table_has_column($conn, 'employees', 'company_id');
-    $emp_scope = ($emp_has_company && $current_company_id > 0) ? " WHERE e.company_id = $current_company_id" : "";
-    $emp_sql = "SELECT e.id, e.name, e.phone,
+    try {
+        $pu_emps = $pu_gate->scopedQuery(array('scope' => array('e' => 'employees'), 'enrich' => array('u2' => 'users')),
+            "SELECT e.id, e.name, e.phone,
                        (SELECT u2.id FROM users u2 WHERE u2.employee_id = e.id AND COALESCE(u2.is_deleted,0)=0 LIMIT 1) AS linked_uid
-                FROM employees e $emp_scope ORDER BY e.name ASC";
-    $emp_res = mysqli_query($conn, $emp_sql);
-    if ($emp_res) {
-        while ($er = mysqli_fetch_assoc($emp_res)) {
+                FROM employees e WHERE 1=1 AND {TENANT_SCOPE} ORDER BY e.name ASC");
+        foreach ($pu_emps as $er) {
             $employees_for_link[] = array(
                 'id'         => intval($er['id']),
                 'name'       => $er['name'],
@@ -318,7 +319,7 @@ if ($users_has_employee_id) {
             );
             $emp_name_by_id[intval($er['id'])] = $er['name'];
         }
-    }
+    } catch (\Throwable $t) { error_log('project_users.php employees: ' . $t->getMessage()); }
 }
 
 $page_title = "إيكوبيشن | المشرفون";
@@ -384,16 +385,19 @@ include('../insidebar.php');
                         <select name="role" id="role" required>
                             <option value="">-- اختر الصلاحية --</option>
                             <?php
-                            // جلب الأدوار التابعة للدور الحالي من قاعدة البيانات
+                            // جلب الأدوار التابعة للدور الحالي (roles مرجع عام — عبر البوابة)
                             $currentRole = $_SESSION['user']['role'];
-                            $rolesQuery = "SELECT id, name FROM roles
-                                           WHERE parent_role_id = $currentRole
-                                           AND (status = '1' OR status = 1)
-                                           ORDER BY id ASC";
-                            $rolesResult = mysqli_query($conn, $rolesQuery);
+                            $rolesResult = array();
+                            try {
+                                $rolesResult = $pu_gate->select('roles', array(
+                                    'columns' => array('id', 'name'),
+                                    'where' => array('parent_role_id' => intval($currentRole)),
+                                    'whereRaw' => "(status = '1' OR status = 1)",
+                                    'orderBy' => 'id ASC'));
+                            } catch (\Throwable $t) { error_log('project_users.php roles options: ' . $t->getMessage()); }
 
-                            if ($rolesResult && mysqli_num_rows($rolesResult) > 0) {
-                                while ($roleRow = mysqli_fetch_assoc($rolesResult)) {
+                            if (!empty($rolesResult)) {
+                                foreach ($rolesResult as $roleRow) {
                                     echo '<option value="' . $roleRow['id'] . '">' .
                                         htmlspecialchars($roleRow['name'], ENT_QUOTES, 'UTF-8') .
                                         '</option>';
@@ -458,23 +462,26 @@ include('../insidebar.php');
                     $userid = $_SESSION['user']['id'];
                     $currentRole = $_SESSION['user']['role'];
 
-                    $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.employee_id, u.created_at, ro.name AS role_name
+                    $result = array();
+                    try {
+                        $result = $pu_gate->scopedQuery(array('scope' => array('u' => 'users')),
+                            "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.employee_id, u.created_at, ro.name AS role_name
                              FROM users u
                              LEFT JOIN roles ro ON ro.id = u.role
-                                                  WHERE " . ($users_has_company_id ? "u.company_id = '$current_company_id' AND " : "") . "COALESCE(u.is_deleted,0)=0 AND (
-                                          u.parent_id = '$userid'
+                                                  WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND (
+                                          u.parent_id = ?
                                 OR u.role IN (
                                    SELECT r.id FROM roles r
-                                   WHERE r.parent_role_id = $currentRole
+                                   WHERE r.parent_role_id = " . intval($currentRole) . "
                                    AND (r.status = '1' OR r.status = 1)
                                 )
                                       )
-                                      ORDER BY u.id DESC";
-                    $result = mysqli_query($conn, $query);
+                                      ORDER BY u.id DESC", array(strval($userid)));
+                    } catch (\Throwable $t) { error_log('project_users.php list: ' . $t->getMessage()); }
                     $i = 1;
 
                     if ($result) {
-                    while ($row = mysqli_fetch_assoc($result)) {
+                    foreach ($result as $row) {
                         $roleText = !empty($row['role_name'])
                             ? htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8')
                             : '<span class="pu-text-muted">غير معروف</span>';

@@ -23,27 +23,21 @@ if ($user_id <= 0) {
     exit();
 }
 
-$users_has_company = db_table_has_column($conn, 'users', 'company_id');
-$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
-$clients_has_company = db_table_has_column($conn, 'clients', 'company_id');
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+// (سقطت فحوص db_table_has_column: الأعمدة company_id/is_deleted/created_by قائمة بالترحيلات)
+$up_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('user profile super') : ems_tenant_db();
 
-$scope = "u.id = $user_id";
-if (!$is_super_admin && $users_has_company) {
-    $scope .= " AND u.company_id = $company_id";
-}
-if ($users_has_is_deleted) {
-    $scope .= " AND COALESCE(u.is_deleted,0)=0";
-}
-
-$user_query = "SELECT u.*, r.name AS role_name, p.name AS project_name
+$user_data = null;
+try {
+    $up_rows = $up_gate->scopedQuery(array('scope' => array('u' => 'users'), 'enrich' => array('p' => 'project')),
+        "SELECT u.*, r.name AS role_name, p.name AS project_name
                FROM users u
                LEFT JOIN roles r ON r.id = u.role
                LEFT JOIN project p ON p.id = u.project_id
-               WHERE $scope
-               LIMIT 1";
-$user_result = mysqli_query($conn, $user_query);
-$user_data = ($user_result && mysqli_num_rows($user_result) > 0) ? mysqli_fetch_assoc($user_result) : null;
+               WHERE u.id = ? AND COALESCE(u.is_deleted,0)=0 AND {TENANT_SCOPE}
+               LIMIT 1", array($user_id));
+    $user_data = !empty($up_rows) ? $up_rows[0] : null;
+} catch (\Throwable $t) { error_log('user_profile.php load: ' . $t->getMessage()); }
 
 if (!$user_data) {
     header('Location: users.php?msg=المستخدم+غير+موجود+او+خارج+نطاق+الشركة+❌');
@@ -55,43 +49,26 @@ $clients_created = 0;
 $suppliers_created = 0;
 $last_login = !empty($user_data['last_login_at']) ? $user_data['last_login_at'] : '-';
 
-$project_creator_exists = db_table_has_column($conn, 'project', 'created_by');
-$clients_creator_exists = db_table_has_column($conn, 'clients', 'created_by');
-$suppliers_creator_exists = db_table_has_column($conn, 'suppliers', 'created_by');
+try {
+    $r = $up_gate->scopedQuery(array('scope' => array('project' => 'project')),
+        "SELECT COUNT(*) AS c FROM project WHERE created_by = ? AND {TENANT_SCOPE}", array($user_id));
+    if ($r) { $projects_created = intval($r[0]['c']); }
+    $r = $up_gate->scopedQuery(array('scope' => array('clients' => 'clients')),
+        "SELECT COUNT(*) AS c FROM clients WHERE created_by = ? AND {TENANT_SCOPE}", array($user_id));
+    if ($r) { $clients_created = intval($r[0]['c']); }
+    $r = $up_gate->scopedQuery(array('scope' => array('suppliers' => 'suppliers')),
+        "SELECT COUNT(*) AS c FROM suppliers WHERE created_by = ? AND {TENANT_SCOPE}", array($user_id));
+    if ($r) { $suppliers_created = intval($r[0]['c']); }
+} catch (\Throwable $t) { error_log('user_profile.php kpis: ' . $t->getMessage()); }
 
-if ($project_creator_exists) {
-    $project_scope = "created_by = $user_id";
-    if (!$is_super_admin && $project_has_company) {
-        $project_scope .= " AND company_id = $company_id";
-    }
-    $r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM project WHERE $project_scope");
-    if ($r) {
-        $projects_created = intval(mysqli_fetch_assoc($r)['c']);
-    }
-}
-
-if ($clients_creator_exists) {
-    $client_scope = "created_by = $user_id";
-    if (!$is_super_admin && $clients_has_company) {
-        $client_scope .= " AND company_id = $company_id";
-    }
-    $r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM clients WHERE $client_scope");
-    if ($r) {
-        $clients_created = intval(mysqli_fetch_assoc($r)['c']);
-    }
-}
-
-if ($suppliers_creator_exists) {
-    $r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM suppliers WHERE created_by = $user_id");
-    if ($r) {
-        $suppliers_created = intval(mysqli_fetch_assoc($r)['c']);
-    }
-}
-
-$project_assignments = mysqli_query($conn, "SELECT id, name, project_code, status
+$project_assignments = array();
+try {
+    $project_assignments = $up_gate->scopedQuery(array('scope' => array('project' => 'project')),
+        "SELECT id, name, project_code, status
                                            FROM project
-                                           WHERE id = " . intval($user_data['project_id']) . "
-                                           LIMIT 1");
+                                           WHERE id = ? AND {TENANT_SCOPE}
+                                           LIMIT 1", array(intval($user_data['project_id'])));
+} catch (\Throwable $t) { error_log('user_profile.php assignment: ' . $t->getMessage()); }
 
 $page_title = 'إيكوبيشن | بطاقة المستخدم';
 include '../inheader.php';
@@ -143,7 +120,7 @@ include '../insidebar.php';
             <table id="userProjectTable" class="display" style="width:100%;">
                 <thead><tr><th>اسم المشروع</th><th>كود المشروع</th><th>الحالة</th></tr></thead>
                 <tbody>
-                    <?php if ($project_assignments && mysqli_num_rows($project_assignments) > 0): $p = mysqli_fetch_assoc($project_assignments); ?>
+                    <?php if (!empty($project_assignments)): $p = $project_assignments[0]; ?>
                         <tr>
                             <td><a href="../Projects/project_profile.php?id=<?php echo intval($p['id']); ?>"><?php echo htmlspecialchars($p['name']); ?></a></td>
                             <td><?php echo htmlspecialchars($p['project_code'] ?: '-'); ?></td>

@@ -20,8 +20,7 @@ $username = isset($_POST['username']) ? trim($_POST['username']) : '';
 $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$users_has_company_id = db_table_has_column($conn, 'users', 'company_id');
-$users_not_deleted_sql = db_table_has_column($conn, 'users', 'is_deleted') ? 'COALESCE(is_deleted,0)=0' : '1=1';
+$users_not_deleted_sql = 'COALESCE(is_deleted,0)=0'; // العمود قائم بالترحيلات — سقط فحص db_table_has_column
 
 // التحقق من أن اسم المستخدم غير فارغ
 if (empty($username)) {
@@ -48,6 +47,9 @@ if ($uid > 0) {
 
 $query .= " LIMIT 1";
 
+// [مُستثنى موثَّق — قراءة تفرُّدٍ عالمية] اسم الدخول هوية منصّةٍ عابرة للشركات بدلالة
+// الأصل الصريحة أعلاه؛ بوابة العزل تعزل users بالشركة وforAllTenants للسوبر حصرًا،
+// فيبقى هذا الاستعلام الوحيد خامًا بانتظار قناة قراءةٍ عالمية في دفعة المزوّد (admin/).
 $result = mysqli_query($conn, $query);
 
 if (!$result) {

@@ -7,14 +7,8 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
-function moduleColumnExists($conn, $column_name)
-{
-    $safe_column_name = mysqli_real_escape_string($conn, $column_name);
-    $result = $conn->query("SHOW COLUMNS FROM `modules` LIKE '" . $safe_column_name . "'");
-    return $result && $result->num_rows > 0;
-}
-
-$module_has_icon_column = moduleColumnExists($conn, 'icon');
+// عمود icon قائم في modules منذ ترحيله — سقط فحص SHOW COLUMNS الذاتي (نمط الأعلام الساقط)
+$module_has_icon_column = true;
 $default_module_icon = 'fa fa-link';
 $common_sidebar_icons = array(
     array('class' => 'fa fa-link', 'label' => 'رابط عام'),
@@ -50,18 +44,15 @@ $common_sidebar_icons = array(
 // جلب role_id من URL إن وجد (للانتقال من صفحة الأدوار)
 $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 
-/* جلب بيانات التعديل */
+/* جلب بيانات التعديل (modules مرجع عام T_GLOBAL — قراءته عبر البوابة بلا نطاق) */
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $select_columns = "`id`, `name`, `code`, `owner_role_id`, `is_link`";
-    if ($module_has_icon_column) {
-        $select_columns .= ", `icon`";
-    }
-    $stmt = $conn->prepare("SELECT " . $select_columns . " FROM `modules` WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc();
+    try {
+        $editData = ems_tenant_db()->selectOne('modules', array(
+            'columns' => array('id', 'name', 'code', 'owner_role_id', 'is_link', 'icon'),
+            'where' => array('id' => $id)));
+    } catch (\Throwable $t) { $editData = null; error_log('modules.php edit: ' . $t->getMessage()); }
     if ($editData && !isset($editData['icon'])) {
         $editData['icon'] = $default_module_icon;
     }
@@ -84,6 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name) || empty($code)) {
         $error_msg = 'اسم الصفحة والكود مطلوبان ❌';
     } else {
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] modules مرجعٌ عام جمَّد عقدُ البوابة كتابته
+        // على المدير الأعلى حصرًا، والشاشة الحالية تتيحه لمديري الشركات (ثغرة UAT §15
+        // المفتوحة). حفاظًا على السلوك حرفيًا تبقى الكتابات خامًا بانتظار قرار التحصين.
         if (!empty($_POST['edit_id'])) {
             // تعديل
             $id = (int) $_POST['edit_id'];
@@ -99,14 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $id);
             }
         } else {
-            // التحقق من عدم تكرار نفس الصفحة لنفس الدور
-            $check_stmt = $conn->prepare(
-                "SELECT id FROM `modules` WHERE `code` = ? AND `owner_role_id` <=> ? LIMIT 1"
-            );
-            $check_stmt->bind_param("si", $code, $owner_role_id);
-            $check_stmt->execute();
-            $check_stmt->store_result();
-            if ($check_stmt->num_rows > 0) {
+            // التحقق من عدم تكرار نفس الصفحة لنفس الدور (قراءة عبر البوابة)
+            $md_dup = null;
+            try {
+                $md_dup = ems_tenant_db()->selectOne('modules', array('columns' => array('id'),
+                    'whereRaw' => '`code` = ? AND `owner_role_id` <=> ?',
+                    'params' => array($code, $owner_role_id)));
+            } catch (\Throwable $t) { error_log('modules.php dup check: ' . $t->getMessage()); }
+            if ($md_dup !== null) {
                 $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
             } else {
                 // إضافة
@@ -138,6 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* حذف */
 if (isset($_GET['delete_id'])) {
     $id = (int) $_GET['delete_id'];
+    // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] كما في الحفظ أعلاه: الحذف يبقى خامًا بانتظار
+    // قرار التحصين (deleteRow تعاقديًا لجداول المستأجر لا المراجع العامة).
     $stmt = $conn->prepare("DELETE FROM `modules` WHERE `id` = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
@@ -148,10 +144,12 @@ if (isset($_GET['delete_id'])) {
     exit;
 }
 
-// جلب جميع الأدوار
-$stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` ORDER BY `level`, `name`");
-$stmt->execute();
-$roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// جلب جميع الأدوار (roles مرجع عام — قراءة عبر البوابة)
+$roles = array();
+try {
+    $roles = ems_tenant_db()->select('roles', array(
+        'columns' => array('id', 'name'), 'orderBy' => 'level, name'));
+} catch (\Throwable $t) { error_log('modules.php roles: ' . $t->getMessage()); }
 
 $page_title = "إدارة الصفحات والموديولات";
 include("../inheader.php");
@@ -467,31 +465,29 @@ include('../insidebar.php');
                     </thead>
                     <tbody>
                         <?php
-                        $where = '';
+                        // قراءة المرجعين العامين عبر البوابة؛ اسم الدور يُشتق من خريطة id→name
+                        // بدل JOIN عالمي-عالمي، وicon الافتراضية تُشتق في PHP (عين COALESCE/NULLIF الأصل).
+                        $md_opts = array(
+                            'columns' => array('id', 'name', 'code', 'owner_role_id', 'is_link', 'icon'),
+                            'orderBy' => 'name');
                         if (isset($_GET['edit_id'])) {
-                                $where = "WHERE m.id = " . (int)$_GET['edit_id'];
+                            $md_opts['where'] = array('id' => (int)$_GET['edit_id']);
                         }
+                        $result = array();
+                        try { $result = ems_tenant_db()->select('modules', $md_opts); }
+                        catch (\Throwable $t) { $result = false; error_log('modules.php list: ' . $t->getMessage()); }
 
-                        $result = $conn->query("
-                            SELECT 
-                                m.`id`, 
-                                m.`name`, 
-                                m.`code`, 
-                                m.`owner_role_id`,
-                                m.`is_link`,
-                                " . ($module_has_icon_column ? "COALESCE(NULLIF(TRIM(m.`icon`), ''), '" . $default_module_icon . "')" : "'" . $default_module_icon . "'") . " AS `icon`,
-                                r.`name` AS role_name
-                            FROM `modules` m
-                            LEFT JOIN `roles` r ON m.`owner_role_id` = r.`id`
-                            $where
-                            ORDER BY m.`name`
-                        ");
-                        
-                        if (!$result) {
+                        if ($result === false) {
                             echo '<tr><td colspan="7" class="text-center text-danger">خطأ في جلب البيانات: ' . htmlspecialchars($conn->error) . '</td></tr>';
                         } else {
+                            $md_role_names = array();
+                            foreach ($roles as $md_r) { $md_role_names[intval($md_r['id'])] = $md_r['name']; }
                             $i = 1;
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($result as $row):
+                                $md_icon_trim = trim((string)$row['icon']);
+                                $row['icon'] = ($md_icon_trim !== '') ? $md_icon_trim : $default_module_icon;
+                                $row['role_name'] = ($row['owner_role_id'] !== null && isset($md_role_names[intval($row['owner_role_id'])]))
+                                    ? $md_role_names[intval($row['owner_role_id'])] : null;
                                 ?>
                                 <tr>
                                     <td><strong><?= $i++; ?></strong></td>
@@ -542,8 +538,8 @@ include('../insidebar.php');
                                         </a>
                                     </td>
                                 </tr>
-                            <?php 
-                            endwhile; 
+                            <?php
+                            endforeach;
                         }
                         ?>
                     </tbody>

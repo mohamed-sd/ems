@@ -102,6 +102,10 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'clear_logs') {
 
     try {
         // Build DELETE query scoped by role (and company for non-super-admin).
+        // [مُستثنى موثَّق — تفريغ صيانةٍ جماعي] حذفٌ جماعي بشرط الدور: لا قناة حذفٍ
+        // جماعيٍّ في البوابة (deleteRow صفٌّ واحد، وreplaceChildren للأبناء)، والأصل
+        // منطاقٌ بالشركة يدويًا لغير السوبر كما هو ظاهر — يبقى خامًا بانتظار قناة
+        // bulk-purge أو قرارٍ بحصر التفريغ بالمدير الأعلى.
         if ($is_super_admin) {
             $stmt = $conn->prepare("DELETE FROM activity_logs WHERE role_id = ?");
             $stmt->bind_param('i', $roleId);

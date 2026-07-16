@@ -27,11 +27,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$role_id || !$module_id) {
         $error_msg = 'الدور والصفحة مطلوبان ❌';
     } else {
-        $stmt = $conn->prepare("SELECT id FROM role_permissions WHERE role_id = ? AND module_id = ?");
-        $stmt->bind_param("ii", $role_id, $module_id);
-        $stmt->execute();
-        $existing = $stmt->get_result()->fetch_assoc();
+        // القراءة عبر البوابة (role_permissions مرجع عام)
+        $existing = null;
+        try {
+            $existing = ems_tenant_db()->selectOne('role_permissions', array('columns' => array('id'),
+                'where' => array('role_id' => intval($role_id), 'module_id' => intval($module_id))));
+        } catch (\Throwable $t) { error_log('role_permissions.php existing: ' . $t->getMessage()); }
 
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] role_permissions مرجعٌ عام جمَّد عقدُ البوابة
+        // كتابته على المدير الأعلى حصرًا، والشاشة الحالية تتيحه لمديري الشركات (ثغرة UAT §15
+        // المفتوحة). حفاظًا على السلوك حرفيًا تبقى كتابات هذه الشاشة الأربع خامًا بانتظار
+        // قرار التحصين الأمني — عندها تُنقَل للبوابة أو تُحصَر بالسوبر.
         if ($existing) {
             $stmt = $conn->prepare(
                 "UPDATE role_permissions SET can_view = ?, can_add = ?, can_edit = ?, can_delete = ? 
@@ -61,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$id) {
         $error_msg = 'معرف الصلاحية غير صحيح ❌';
     } else {
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] (انظر تعليق الحفظ أعلاه)
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE id = ?");
         $stmt->bind_param("i", $id);
 
@@ -79,17 +86,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$role_id) {
         $error_msg = 'الدور مطلوب ❌';
     } else {
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] (انظر تعليق الحفظ أعلاه) — الحذف والإدراج
+        // الشاملان خامان؛ قائمة الموديولات نفسها تُقرأ عبر البوابة.
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE role_id = ?");
         $stmt->bind_param("i", $role_id);
         $stmt->execute();
 
-        $modules_result = $conn->query("SELECT id FROM modules");
+        $modules_result = array();
+        try { $modules_result = ems_tenant_db()->select('modules', array('columns' => array('id'))); }
+        catch (\Throwable $t) { error_log('role_permissions.php grant modules: ' . $t->getMessage()); }
         $stmt = $conn->prepare(
-            "INSERT INTO role_permissions (role_id, module_id, can_view, can_add, can_edit, can_delete) 
+            "INSERT INTO role_permissions (role_id, module_id, can_view, can_add, can_edit, can_delete)
              VALUES (?, ?, 1, 1, 1, 1)"
         );
 
-        while ($module = $modules_result->fetch_assoc()) {
+        foreach ($modules_result as $module) {
             $module_id = $module['id'];
             $stmt->bind_param("ii", $role_id, $module_id);
             $stmt->execute();
@@ -106,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$role_id) {
         $error_msg = 'الدور مطلوب ❌';
     } else {
+        // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] (انظر تعليق الحفظ أعلاه)
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE role_id = ?");
         $stmt->bind_param("i", $role_id);
 
@@ -121,57 +133,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // ðŸ› ️ دوال مساعدة
 // ════════════════════════════════════════════════════════════════════════════
 
-function get_parent_roles($conn, $role_id) {
+function get_parent_roles($g, $role_id) {
     $parent_roles = [$role_id];
-    
-    $stmt = $conn->prepare("SELECT parent_role_id FROM roles WHERE id = ? AND parent_role_id IS NOT NULL");
-    $stmt->bind_param("i", $role_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    while ($row = $result->fetch_assoc()) {
-        if ($row['parent_role_id']) {
-            $parent_roles[] = $row['parent_role_id'];
-            $stmt2 = $conn->prepare("SELECT parent_role_id FROM roles WHERE id = ? AND parent_role_id IS NOT NULL");
-            $stmt2->bind_param("i", $row['parent_role_id']);
-            $stmt2->execute();
-            $result2 = $stmt2->get_result();
-            while ($row2 = $result2->fetch_assoc()) {
-                if ($row2['parent_role_id'] && !in_array($row2['parent_role_id'], $parent_roles)) {
-                    $parent_roles[] = $row2['parent_role_id'];
+
+    try {
+        $rows = $g->select('roles', array('columns' => array('parent_role_id'),
+            'where' => array('id' => intval($role_id)), 'whereRaw' => 'parent_role_id IS NOT NULL'));
+        foreach ($rows as $row) {
+            if ($row['parent_role_id']) {
+                $parent_roles[] = $row['parent_role_id'];
+                $rows2 = $g->select('roles', array('columns' => array('parent_role_id'),
+                    'where' => array('id' => intval($row['parent_role_id'])), 'whereRaw' => 'parent_role_id IS NOT NULL'));
+                foreach ($rows2 as $row2) {
+                    if ($row2['parent_role_id'] && !in_array($row2['parent_role_id'], $parent_roles)) {
+                        $parent_roles[] = $row2['parent_role_id'];
+                    }
                 }
             }
         }
-    }
-    
+    } catch (\Throwable $t) { error_log('role_permissions.php parents: ' . $t->getMessage()); }
+
     return $parent_roles;
 }
 
-function get_assigned_modules($conn, $role_id) {
-    $parent_roles = get_parent_roles($conn, $role_id);
-    $parent_roles_list = implode(',', $parent_roles);
-    
-    // التحقق من وجود عمود display_order
-    $has_display_order = false;
-    $check_column = $conn->query("SHOW COLUMNS FROM modules LIKE 'display_order'");
-    if ($check_column && $check_column->num_rows > 0) {
-        $has_display_order = true;
-    }
-    
-    $order_by = $has_display_order ? "m.display_order ASC, m.name ASC" : "m.name ASC";
-    
-    $query = "SELECT DISTINCT m.id, m.name, m.code 
-              FROM modules m
-              WHERE m.owner_role_id IN ({$parent_roles_list})
-              ORDER BY {$order_by}";
-    
-    $result = $conn->query($query);
+function get_assigned_modules($g, $role_id) {
+    $parent_roles = get_parent_roles($g, $role_id);
+    $parent_roles_list = implode(',', array_map('intval', $parent_roles));
+
+    // عمود display_order قائم بالترحيلات — سقط فحص SHOW COLUMNS الذاتي.
+    // (DISTINCT الأصلية لغوٌ على المفتاح الأساسي id فسقطت مع select البوابة)
     $modules = [];
-    
-    while ($module = $result->fetch_assoc()) {
-        $modules[] = $module;
-    }
-    
+    try {
+        $modules = $g->select('modules', array('columns' => array('id', 'name', 'code'),
+            'whereRaw' => "owner_role_id IN ({$parent_roles_list})",
+            'orderBy' => 'display_order ASC, name ASC'));
+    } catch (\Throwable $t) { error_log('role_permissions.php assigned: ' . $t->getMessage()); }
+
     return $modules;
 }
 
@@ -181,28 +178,43 @@ function get_assigned_modules($conn, $role_id) {
 
 $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 
-$roles_result = $conn->query("SELECT id, name FROM roles WHERE status = 1 ORDER BY name");
+$rp_gate = ems_tenant_db();
 $roles = [];
-while ($role = $roles_result->fetch_assoc()) {
-    $roles[] = $role;
-}
+try {
+    $roles = $rp_gate->select('roles', array('columns' => array('id', 'name'),
+        'where' => array('status' => 1), 'orderBy' => 'name'));
+} catch (\Throwable $t) { error_log('role_permissions.php roles: ' . $t->getMessage()); }
 
 $modules = [];
 if ($selected_role_id) {
-    $modules = get_assigned_modules($conn, $selected_role_id);
+    $modules = get_assigned_modules($rp_gate, $selected_role_id);
 }
 
-$permissions_result = $conn->query(
-    "SELECT rp.*, r.name as role_name, m.name as module_name, m.code as module_code 
-     FROM role_permissions rp
-     JOIN roles r ON rp.role_id = r.id
-     JOIN modules m ON rp.module_id = m.id
-     ORDER BY r.name, m.name"
-);
+// كان JOINًا ثلاثيًا بين مراجع عامة (rp×roles×modules) بترتيب r.name ثم m.name —
+// يُركَّب من ثلاث قراءات بوابةٍ: أدوارٌ وموديولات مرتَّبةٌ بالاسم (ترتيب MySQL نفسه)
+// ثم ضمّ INNER في PHP بالمرور دورًا-فموديولًا — فيُطابق ترتيب الأصل حتمًا.
 $all_permissions = [];
-while ($perm = $permissions_result->fetch_assoc()) {
-    $all_permissions[] = $perm;
-}
+try {
+    $rp_roles_all = $rp_gate->select('roles', array('columns' => array('id', 'name'), 'orderBy' => 'name'));
+    $rp_modules_all = $rp_gate->select('modules', array('columns' => array('id', 'name', 'code'), 'orderBy' => 'name'));
+    $rp_rows_all = $rp_gate->select('role_permissions', array());
+    $rp_by_pair = [];
+    foreach ($rp_rows_all as $rp_row) { $rp_by_pair[intval($rp_row['role_id'])][intval($rp_row['module_id'])][] = $rp_row; }
+    foreach ($rp_roles_all as $rp_r) {
+        $rp_rid = intval($rp_r['id']);
+        if (!isset($rp_by_pair[$rp_rid])) { continue; }
+        foreach ($rp_modules_all as $rp_m) {
+            $rp_mid = intval($rp_m['id']);
+            if (!isset($rp_by_pair[$rp_rid][$rp_mid])) { continue; }
+            foreach ($rp_by_pair[$rp_rid][$rp_mid] as $perm) {
+                $perm['role_name'] = $rp_r['name'];
+                $perm['module_name'] = $rp_m['name'];
+                $perm['module_code'] = $rp_m['code'];
+                $all_permissions[] = $perm;
+            }
+        }
+    }
+} catch (\Throwable $t) { error_log('role_permissions.php grid: ' . $t->getMessage()); }
 
 $permissions_map = [];
 foreach ($all_permissions as $perm) {
