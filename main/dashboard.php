@@ -17,31 +17,13 @@ $roleText = "غير معروف";
 $companyId = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $companyName = '';
 
-if (!function_exists('dashboard_has_column')) {
-  function dashboard_has_column($conn, $t, $c)
-  {
-    static $hasColumnCache = [];
-    $t = preg_replace('/[^a-zA-Z0-9_]/', '', $t);
-    $c = preg_replace('/[^a-zA-Z0-9_]/', '', $c);
-    $cacheKey = $t . ':' . $c;
-    if (array_key_exists($cacheKey, $hasColumnCache)) {
-      return $hasColumnCache[$cacheKey];
-    }
-    $r = @mysqli_query($conn, "SHOW COLUMNS FROM $t LIKE '" . mysqli_real_escape_string($conn, $c) . "'");
-    $hasColumnCache[$cacheKey] = ($r && mysqli_num_rows($r) > 0);
-    return $hasColumnCache[$cacheKey];
-  }
-}
-if (!function_exists('dashboard_scalar')) {
-  function dashboard_scalar($conn, $sql, $key)
-  {
-    $r = $conn->query($sql);
-    if (!$r)
-      return 0;
-    $row = $r->fetch_assoc();
-    return ($row && isset($row[$key])) ? $row[$key] : 0;
-  }
-}
+// العزل عبر بوابة المستأجر (K9 · جولة اللوحة المخصصة 2026-07-16): سقطت مساعِدات
+// SHOW COLUMNS/TABLES وقيَم أعلامها مثبَّتة من القاعدة (mine_id غائب عن operations،
+// وmine_id غائب عن supplierscontracts — ففروعهما ميتة)، وسقط dashboard_scalar الخام
+// لصالح نظيره البوّابي أدناه. السوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: 1=1).
+$dash_is_super = (strval($role) === '-1');
+$dash_gate = $dash_is_super ? ems_tenant_db()->forAllTenants('dashboard super') : ems_tenant_db();
+
 if (!function_exists('dashboard_two_digits')) {
   function dashboard_two_digits($value)
   {
@@ -52,87 +34,76 @@ if (!function_exists('dashboard_two_digits')) {
     return str_pad((string) $num, 2, '0', STR_PAD_LEFT);
   }
 }
-if (!function_exists('dashboard_table_exists')) {
-  function dashboard_table_exists($conn, $t)
+if (!function_exists('dashboard_gate_scalar')) {
+  /** نظير dashboard_scalar عبر البوابة: صفرٌ عند أي فشل (سلوك الأصل نفسه). */
+  function dashboard_gate_scalar($g, array $decl, $sql, array $params = array())
   {
-    static $tableCache = [];
-    $t = preg_replace('/[^a-zA-Z0-9_]/', '', $t);
-    if (isset($tableCache[$t])) {
-      return $tableCache[$t];
+    try {
+      $rows = $g->scopedQuery($decl, $sql, $params);
+      return (isset($rows[0]) && isset($rows[0]['t'])) ? $rows[0]['t'] : 0;
+    } catch (\Throwable $t) {
+      error_log('dashboard.php scalar: ' . $t->getMessage());
+      return 0;
     }
-    $r = @mysqli_query($conn, "SHOW TABLES LIKE '" . mysqli_real_escape_string($conn, $t) . "'");
-    $tableCache[$t] = ($r && mysqli_num_rows($r) > 0);
-    return $tableCache[$t];
   }
 }
 
-$projectClientColumn = dashboard_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
+$projectClientColumn = 'client_id';
 
 if ($companyId > 0) {
-  $cols = [];
-  foreach (['company_name_ar', 'company_name', 'name'] as $c)
-    if (dashboard_has_column($conn, 'admin_companies', $c))
-      $cols[] = $c;
-  if ($cols) {
-    $r = @mysqli_query($conn, "SELECT " . implode(',', $cols) . " FROM admin_companies WHERE id=$companyId LIMIT 1");
-    if ($r) {
-      $row = mysqli_fetch_assoc($r);
-      foreach ($cols as $c)
-        if (isset($row[$c]) && trim($row[$c]) !== '') {
-          $companyName = trim($row[$c]);
-          break;
-        }
-    }
+  // [مُستثنى موثَّق — قراءة اسم شركة الجلسة] admin_companies جدول منصّةٍ مقيَّد تعاقديًا
+  // (T_RESTRICTED بانتظار عقد دفعة المزوّد admin/)، والمقروء اسمُ عرض شركةِ المستخدم
+  // نفسه بمعرّف جلسته — تبقى القراءة خامًا حتى تُعرَّف قناة المنصّة (كما في profile.php).
+  $cols = ['company_name_ar', 'company_name', 'name'];
+  $r = @mysqli_query($conn, "SELECT " . implode(',', $cols) . " FROM admin_companies WHERE id=$companyId LIMIT 1");
+  if ($r) {
+    $row = mysqli_fetch_assoc($r);
+    foreach ($cols as $c)
+      if (isset($row[$c]) && trim($row[$c]) !== '') {
+        $companyName = trim($row[$c]);
+        break;
+      }
   }
 }
 
 $roleId = intval($role);
-$s = $conn->prepare("SELECT name FROM roles WHERE id=? LIMIT 1");
-if ($s) {
-  $s->bind_param("i", $roleId);
-  $s->execute();
-  if ($r = $s->get_result()) if ($rw = $r->fetch_assoc())
-    $roleText = $rw['name'];
-  $s->close();
-}
+try {
+  $dash_role_row = $dash_gate->selectOne('roles', array('columns' => array('name'), 'where' => array('id' => $roleId)));
+  if ($dash_role_row) { $roleText = $dash_role_row['name']; }
+} catch (\Throwable $t) { error_log('dashboard.php role name: ' . $t->getMessage()); }
 
 $dashboardRole = strval($role);
-$s2 = $conn->prepare("SELECT parent_role_id FROM roles WHERE id=? LIMIT 1");
-if ($s2) {
-  $s2->bind_param("i", $roleId);
-  $s2->execute();
-  if ($r = $s2->get_result()) if ($rw = $r->fetch_assoc()) {
-    $pid = intval($rw['parent_role_id'] ?? 0);
+try {
+  $dash_parent_row = $dash_gate->selectOne('roles', array('columns' => array('parent_role_id'), 'where' => array('id' => $roleId)));
+  if ($dash_parent_row) {
+    $pid = intval($dash_parent_row['parent_role_id'] ?? 0);
     if ($pid > 0)
       $dashboardRole = strval($pid);
   }
-  $s2->close();
-}
+} catch (\Throwable $t) { error_log('dashboard.php parent role: ' . $t->getMessage()); }
 
 $projectId = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
 $projectName = '';
 if ($projectId > 0) {
-  $psc = $companyId > 0
-    ? " AND (EXISTS(SELECT 1 FROM users su WHERE su.id=project.created_by AND su.company_id=$companyId) OR EXISTS(SELECT 1 FROM clients sc INNER JOIN users scu ON scu.id=sc.created_by WHERE sc.id=project.$projectClientColumn AND scu.company_id=$companyId))"
-    : "";
-  $pq = $conn->query("SELECT name FROM project WHERE id=$projectId $psc LIMIT 1");
-  if ($pq && $prow = $pq->fetch_assoc())
-    $projectName = $prow['name'];
+  // (كان النطاق سلسلة المنشئين الموروثة قبل عمود company_id — البوابة تعزل بالعمود مباشرة)
+  try {
+    $dash_prj_rows = $dash_gate->scopedQuery(array('scope' => array('project' => 'project')),
+      "SELECT name FROM project WHERE id=? AND {TENANT_SCOPE} LIMIT 1", array($projectId));
+    if (!empty($dash_prj_rows)) { $projectName = $dash_prj_rows[0]['name']; }
+  } catch (\Throwable $t) { error_log('dashboard.php project name: ' . $t->getMessage()); }
 }
 
 $dynamicLinks = getDynamicNavLinks($conn, $role);
 
 // روابط «الوصول السريع» = فقط الصفحات المؤشَّرة بـ is_quick (تُضبط من admin/permissions/modules.php).
-// دفاعياً: إن لم يوجد العمود (قواعد قديمة) نُبقي السلوك السابق (كل روابط الدور).
-$dashHasIsQuick = dashboard_has_column($conn, 'modules', 'is_quick');
+// العمود قائم بالترحيلات — سقط فحصه، والقراءة عبر البوابة (modules مرجع عام).
+$dashHasIsQuick = true;
 $dashQuickIds = [];
-if ($dashHasIsQuick) {
-  if ($qr = $conn->query("SELECT id FROM modules WHERE is_quick = 1")) {
-    while ($qq = $qr->fetch_assoc()) {
-      $dashQuickIds[(int) $qq['id']] = true;
-    }
+try {
+  foreach ($dash_gate->select('modules', array('columns' => array('id'), 'where' => array('is_quick' => 1))) as $qq) {
+    $dashQuickIds[(int) $qq['id']] = true;
   }
-}
+} catch (\Throwable $t) { error_log('dashboard.php quick links: ' . $t->getMessage()); }
 $links = [];
 foreach ($dynamicLinks as $l) {
   if ($dashHasIsQuick && empty($dashQuickIds[(int) ($l['id'] ?? 0)])) {
@@ -145,19 +116,25 @@ foreach ($dynamicLinks as $l) {
   ];
 }
 
-$sc = $companyId > 0 ? "EXISTS(SELECT 1 FROM users su WHERE su.id=clients.created_by AND su.company_id=$companyId)" : "1=1";
-$sp = $companyId > 0 ? "(EXISTS(SELECT 1 FROM users su WHERE su.id=project.created_by AND su.company_id=$companyId) OR EXISTS(SELECT 1 FROM clients sc INNER JOIN users scu ON scu.id=sc.created_by WHERE sc.id=project.$projectClientColumn AND scu.company_id=$companyId))" : "1=1";
-$so = $companyId > 0 ? "operations.project_id IN(SELECT p.id FROM project p WHERE EXISTS(SELECT 1 FROM users su WHERE su.id=p.created_by AND su.company_id=$companyId) OR EXISTS(SELECT 1 FROM clients sc INNER JOIN users scu ON scu.id=sc.created_by WHERE sc.id=p.$projectClientColumn AND scu.company_id=$companyId))" : "1=1";
+// (كانت هنا نُطُق سلسلة المنشئين الموروثة $sc/$sp/$so قبل أعمدة company_id —
+// البوابة تعزل بالعمود مباشرة، وقائمة مشاريع الشركة تُجلَب مرةً لتعويض استعلامات
+// «IN(SELECT id FROM project ...)» الفرعية بنمط قائمة المعرّفات المعتمد.)
+$dashProjectIds = array();
+try {
+  foreach ($dash_gate->select('project', array('columns' => array('id'), 'includeDeleted' => true)) as $dash_p) {
+    $dashProjectIds[] = intval($dash_p['id']);
+  }
+} catch (\Throwable $t) { error_log('dashboard.php project ids: ' . $t->getMessage()); }
+$dashProjectIdsSql = !empty($dashProjectIds) ? implode(',', $dashProjectIds) : '0';
 
-$hasMineId = dashboard_has_column($conn, 'operations', 'mine_id');
-$hasSuppId = dashboard_has_column($conn, 'operations', 'supplier_id');
-$hasAvail = dashboard_has_column($conn, 'equipments', 'availability_status');
-$hasDrvSt = dashboard_has_column($conn, 'employees', 'employee_status');
-$hasSCMine = dashboard_has_column($conn, 'supplierscontracts', 'mine_id');
-$hasSCPCId = dashboard_has_column($conn, 'supplierscontracts', 'project_contract_id');
-$contractsProjectCol = dashboard_has_column($conn, 'contracts', 'project_id') ? 'project_id' : (dashboard_has_column($conn, 'contracts', 'project') ? 'project' : 'project_id');
-$contractsHasIsDeleted = dashboard_has_column($conn, 'contracts', 'is_deleted');
-$contractsHasDeletedAt = dashboard_has_column($conn, 'contracts', 'deleted_at');
+// أعلام الأعمدة مثبَّتة من القاعدة (سقطت فحوص SHOW COLUMNS):
+$hasMineId = false;  // operations.mine_id غير موجود
+$hasSuppId = true;
+$hasAvail = true;
+$hasDrvSt = true;
+$hasSCMine = false;  // supplierscontracts.mine_id غير موجود
+$hasSCPCId = true;
+$contractsProjectCol = 'project_id';
 
 $sessionMineId = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
 $sessionContractId = isset($_SESSION['user']['contract_id']) ? intval($_SESSION['user']['contract_id']) : 0;
@@ -165,84 +142,99 @@ $sessionContractId = isset($_SESSION['user']['contract_id']) ? intval($_SESSION[
 $stats = [];
 $role6SupplierBreakdown = [];
 $role6ContextText = '';
-$opsProjectCol = dashboard_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+$opsProjectCol = 'project_id';
 
 if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
-  $c = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM clients WHERE status='نشط' AND $sc", 't');
-  $p = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM project WHERE status='1' AND $sp", 't');
-  $contractsNotDeletedSql = "1=1";
-  if ($contractsHasIsDeleted) {
-    $contractsNotDeletedSql = "c.is_deleted = 0";
-  } elseif ($contractsHasDeletedAt) {
-    $contractsNotDeletedSql = "c.deleted_at IS NULL";
-  }
-  $activeContracts = dashboard_table_exists($conn, 'contracts')
-    ? dashboard_scalar(
-      $conn,
-      "SELECT COUNT(*) AS t
+  $c = dashboard_gate_scalar($dash_gate, array('scope' => array('clients' => 'clients')),
+    "SELECT COUNT(*) AS t FROM clients WHERE status='نشط' AND {TENANT_SCOPE}");
+  $p = dashboard_gate_scalar($dash_gate, array('scope' => array('project' => 'project')),
+    "SELECT COUNT(*) AS t FROM project WHERE status='1' AND {TENANT_SCOPE}");
+  $activeContracts = dashboard_gate_scalar($dash_gate, array('scope' => array('c' => 'contracts')),
+    "SELECT COUNT(*) AS t
        FROM contracts c
        WHERE (c.status='1' OR c.status=1)
-         AND $contractsNotDeletedSql
-         AND c.$contractsProjectCol IN(SELECT id FROM project WHERE $sp)",
-      't'
-    )
-    : 0;
-  $u = $companyId > 0 ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id=$companyId AND role!='-1'", 't') : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1'", 't');
+         AND c.is_deleted = 0
+         AND {TENANT_SCOPE}
+         AND c.$contractsProjectCol IN($dashProjectIdsSql)");
+  $u = $companyId > 0
+    ? dashboard_gate_scalar($dash_gate, array('scope' => array('users' => 'users')),
+        "SELECT COUNT(*) AS t FROM users WHERE role!='-1' AND {TENANT_SCOPE}")
+    : dashboard_gate_scalar($dash_gate, array('scope' => array('users' => 'users')),
+        "SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1' AND {TENANT_SCOPE}");
   $stats = [['fa-users', $c, 'العملاء', 'or'], ['fa-project-diagram', $p, 'المشاريع', 'or'], ['fa-file-contract', $activeContracts, 'العقود النشطة', 'ok'], ['fa-user-shield', $u, 'المستخدمون', 'or']];
 } elseif ($dashboardRole == "2") {
-  $s = dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE company_id=$companyId", 't');
-  $e = dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE company_id=$companyId", 't');
-  $co = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM supplierscontracts WHERE project_id IN(SELECT id FROM project WHERE $sp)", 't');
+  $s = dashboard_gate_scalar($dash_gate, array('scope' => array('s' => 'suppliers')),
+    "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE 1=1 AND {TENANT_SCOPE}");
+  $e = dashboard_gate_scalar($dash_gate, array('scope' => array('e' => 'equipments')),
+    "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE 1=1 AND {TENANT_SCOPE}");
+  $co = dashboard_gate_scalar($dash_gate, array('scope' => array('supplierscontracts' => 'supplierscontracts')),
+    "SELECT COUNT(*) AS t FROM supplierscontracts WHERE project_id IN($dashProjectIdsSql) AND {TENANT_SCOPE}");
   $stats = [['fa-truck', $s, 'الموردون', 'or'], ['fa-tools', $e, 'الآليات', 'or'], ['fa-file-contract', $co, 'العقود', 'ok']];
 } elseif ($dashboardRole == "3") {
-  $s = dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE company_id=$companyId", 't');
-  $eq = dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE company_id=$companyId", 't');
+  $s = dashboard_gate_scalar($dash_gate, array('scope' => array('s' => 'suppliers')),
+    "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE 1=1 AND {TENANT_SCOPE}");
+  $eq = dashboard_gate_scalar($dash_gate, array('scope' => array('e' => 'equipments')),
+    "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE 1=1 AND {TENANT_SCOPE}");
   $stopListRole3 = "'معطلة','معطلة مؤقتاً','تحت الصيانة','في الصيانة','موقوفة للصيانة','متوقفة','موقوفة','مبيعة/مسحوبة'";
 
-  $ao = dashboard_scalar(
-    $conn,
+  $ao = dashboard_gate_scalar($dash_gate, array('scope' => array('e' => 'equipments')),
     "SELECT COUNT(DISTINCT e.id) AS t
      FROM equipments e
-     WHERE e.company_id=$companyId" .
-    ($hasAvail
-      ? " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopListRole3))"
-      : " AND (e.status='1' OR e.status=1)"),
-    't'
-  );
+     WHERE 1=1 AND {TENANT_SCOPE}" .
+    " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopListRole3))");
 
   $bo = max(0, intval($eq) - intval($ao));
   $stats = [['fa-tools', $eq, 'إجمالي المعدات', 'or'], ['fa-play-circle', $ao, 'تعمل الآن', 'ok'], ['fa-exclamation-triangle', $bo, 'معطلة', 'err'], ['fa-truck', $s, 'الموردون', 'or']];
 } elseif ($dashboardRole == "4") {
-  $dr = dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM employees d WHERE company_id=$companyId", 't');
-  $ad = dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM employees d JOIN equipment_drivers ed ON d.id=ed.employee_id WHERE ed.status='1' AND d.company_id=$companyId", 't');
+  $dr = dashboard_gate_scalar($dash_gate, array('scope' => array('d' => 'employees')),
+    "SELECT COUNT(DISTINCT d.id) AS t FROM employees d WHERE 1=1 AND {TENANT_SCOPE}");
+  $ad = dashboard_gate_scalar($dash_gate, array('scope' => array('d' => 'employees', 'ed' => 'equipment_drivers')),
+    "SELECT COUNT(DISTINCT d.id) AS t FROM employees d JOIN equipment_drivers ed ON d.id=ed.employee_id WHERE ed.status='1' AND {TENANT_SCOPE}");
   $stats = [['fa-id-badge', $dr, 'إجمالي المشغلين', 'or'], ['fa-user-check', $ad, 'يعملون الآن', 'ok'], ['fa-user-clock', $dr - $ad, 'خاملون', 'warn']];
 } elseif ($dashboardRole == "5") {
-  $sv = $companyId > 0 ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id=$companyId AND role IN('6','7','8','9')", 't') : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE role IN('6','7','8','9')", 't');
-  $h = dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE o.company_id=$companyId", 't');
-  $ah = dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN timesheet_approvals ta ON t.id=ta.timesheet_id AND approval_level='4' WHERE t.company_id=$companyId", 't');
+  $sv = $companyId > 0
+    ? dashboard_gate_scalar($dash_gate, array('scope' => array('users' => 'users')),
+        "SELECT COUNT(*) AS t FROM users WHERE role IN('6','7','8','9') AND {TENANT_SCOPE}")
+    : dashboard_gate_scalar($dash_gate, array('scope' => array('users' => 'users')),
+        "SELECT COUNT(*) AS t FROM users WHERE role IN('6','7','8','9') AND {TENANT_SCOPE}");
+  $h = dashboard_gate_scalar($dash_gate, array('scope' => array('t' => 'timesheet', 'o' => 'operations')),
+    "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE 1=1 AND {TENANT_SCOPE}");
+  $ah = dashboard_gate_scalar($dash_gate, array('scope' => array('t' => 'timesheet', 'ta' => 'timesheet_approvals')),
+    "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN timesheet_approvals ta ON t.id=ta.timesheet_id AND approval_level='4' WHERE 1=1 AND {TENANT_SCOPE}");
   $stats = [['fa-users-cog', $sv, 'المشرفون', 'or'], ['fa-clock', (int) $h, 'ساعات العمل', 'or'], ['fa-check-circle', (int) $ah, 'الساعات المعتمدة', 'ok']];
 } elseif ($dashboardRole == "6") {
   $pSql = $projectId > 0 ? "o.project_id='$projectId'" : "1=0";
-  $mSql = ($sessionMineId > 0 && $hasMineId) ? " AND o.mine_id='$sessionMineId'" : "";
+  // (mSql الموروث سقط: operations.mine_id غير موجود أصلًا فكان الشرط فارغًا دائمًا)
 
-  $totEq = dashboard_scalar($conn,"SELECT COUNT(*) AS t FROM `equipments` WHERE id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = '$projectId' );" , 't');
-  $wrkEq = dashboard_scalar($conn,"SELECT COUNT(*) AS t FROM `equipments` WHERE id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = '$projectId' AND operations.status='1');" , 't');
+  $totEq = dashboard_gate_scalar($dash_gate,
+    array('scope' => array('equipments' => 'equipments'), 'enrich' => array('operations' => 'operations')),
+    "SELECT COUNT(*) AS t FROM `equipments` WHERE {TENANT_SCOPE} AND id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = ? )", array($projectId));
+  $wrkEq = dashboard_gate_scalar($dash_gate,
+    array('scope' => array('equipments' => 'equipments'), 'enrich' => array('operations' => 'operations')),
+    "SELECT COUNT(*) AS t FROM `equipments` WHERE {TENANT_SCOPE} AND id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = ? AND operations.status='1')", array($projectId));
 
   $stpEq = max(0, intval($totEq) - intval($wrkEq));
 
-  $dCond = $hasDrvSt ? " AND(d.employee_status IS NULL OR d.employee_status NOT IN('موقوف','متوقف'))" : "";
-  $totOp = dashboard_scalar($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.employee_id WHERE $pSql$mSql", 't');
-  $wrkOp = dashboard_scalar($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.employee_id WHERE $pSql$mSql AND ed.status='1' AND d.status='1'$dCond", 't');
+  $dCond = " AND(d.employee_status IS NULL OR d.employee_status NOT IN('موقوف','متوقف'))";
+  $totOp = dashboard_gate_scalar($dash_gate,
+    array('scope' => array('o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees')),
+    "SELECT COUNT(DISTINCT ed.employee_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.employee_id WHERE $pSql AND {TENANT_SCOPE}");
+  $wrkOp = dashboard_gate_scalar($dash_gate,
+    array('scope' => array('o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees')),
+    "SELECT COUNT(DISTINCT ed.employee_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.employee_id WHERE $pSql AND {TENANT_SCOPE} AND ed.status='1' AND d.status='1'$dCond");
   $stpOp = max(0, intval($totOp) - intval($wrkOp));
-  $scMine = ($sessionMineId > 0 && $hasSCMine) ? " AND sc.mine_id=$sessionMineId" : "";
+  // (scMine الموروث سقط: supplierscontracts.mine_id غير موجود أصلًا)
   $scCid = ($sessionContractId > 0 && $hasSCPCId) ? " AND sc.project_contract_id=$sessionContractId" : "";
-  $supCnt = dashboard_scalar($conn, "SELECT COUNT(DISTINCT sc.supplier_id) AS t FROM supplierscontracts sc WHERE sc.status='1' AND sc.project_id=$projectId$scMine$scCid", 't');
+  $supCnt = dashboard_gate_scalar($dash_gate, array('scope' => array('sc' => 'supplierscontracts')),
+    "SELECT COUNT(DISTINCT sc.supplier_id) AS t FROM supplierscontracts sc WHERE sc.status='1' AND sc.project_id=$projectId$scCid AND {TENANT_SCOPE}");
   if ($projectId > 0 && $hasSuppId) {
-    $subq = "SELECT DISTINCT sc.supplier_id FROM supplierscontracts sc WHERE sc.status='1' AND sc.project_id=$projectId$scMine$scCid";
-    $br = $conn->query("SELECT o.supplier_id,COALESCE(s.name,CONCAT('مورد #',o.supplier_id)) AS supplier_name,COUNT(DISTINCT o.equipment) AS equipments_count FROM operations o LEFT JOIN suppliers s ON s.id=o.supplier_id WHERE $pSql$mSql AND o.supplier_id IS NOT NULL AND o.supplier_id<>'' AND o.supplier_id<>'0' AND o.supplier_id IN($subq) GROUP BY o.supplier_id,supplier_name ORDER BY equipments_count DESC,supplier_name ASC");
-    if ($br)
-      while ($row = $br->fetch_assoc())
+    try {
+      $dash_br_rows = $dash_gate->scopedQuery(
+        array('scope' => array('o' => 'operations'), 'enrich' => array('s' => 'suppliers', 'sc' => 'supplierscontracts')),
+        "SELECT o.supplier_id,COALESCE(s.name,CONCAT('مورد #',o.supplier_id)) AS supplier_name,COUNT(DISTINCT o.equipment) AS equipments_count FROM operations o LEFT JOIN suppliers s ON s.id=o.supplier_id WHERE $pSql AND {TENANT_SCOPE} AND o.supplier_id IS NOT NULL AND o.supplier_id<>'' AND o.supplier_id<>'0' AND o.supplier_id IN(SELECT DISTINCT sc.supplier_id FROM supplierscontracts sc WHERE sc.status='1' AND sc.project_id=$projectId$scCid) GROUP BY o.supplier_id,supplier_name ORDER BY equipments_count DESC,supplier_name ASC");
+      foreach ($dash_br_rows as $row)
         $role6SupplierBreakdown[] = ['supplier_name' => $row['supplier_name'], 'equipments_count' => intval($row['equipments_count'])];
+    } catch (\Throwable $t) { error_log('dashboard.php r6 breakdown: ' . $t->getMessage()); }
   }
   $stats = [
     ['fa-tools', intval($totEq), 'إجمالي الآليات', 'or'],
@@ -257,32 +249,24 @@ if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
   $projectEqScope = $projectId > 0 ? "o.project_id = $projectId" : "1=0";
   $stopListRole10 = "'معطلة','معطلة مؤقتاً','تحت الصيانة','في الصيانة','موقوفة للصيانة','متوقفة','موقوفة','مبيعة/مسحوبة'";
 
-  $eq = dashboard_scalar(
-    $conn,
+  $eq = dashboard_gate_scalar($dash_gate, array('scope' => array('o' => 'operations', 'e' => 'equipments')),
     "SELECT COUNT(DISTINCT e.id) AS t
      FROM operations o
      JOIN equipments e ON e.id = o.equipment
-     WHERE $projectEqScope
+     WHERE $projectEqScope AND {TENANT_SCOPE}
        AND o.equipment IS NOT NULL
        AND o.equipment<>''
-       AND o.equipment<>'0'",
-    't'
-  );
+       AND o.equipment<>'0'");
 
-  $ao = dashboard_scalar(
-    $conn,
+  $ao = dashboard_gate_scalar($dash_gate, array('scope' => array('o' => 'operations', 'e' => 'equipments')),
     "SELECT COUNT(DISTINCT e.id) AS t
      FROM operations o
      JOIN equipments e ON e.id = o.equipment
-     WHERE $projectEqScope
+     WHERE $projectEqScope AND {TENANT_SCOPE}
        AND o.equipment IS NOT NULL
        AND o.equipment<>''
        AND o.equipment<>'0'" .
-    ($hasAvail
-      ? " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopListRole10))"
-      : " AND (e.status='1' OR e.status=1)"),
-    't'
-  );
+    " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopListRole10))");
 
   $bo = max(0, intval($eq) - intval($ao));
   $stats = [
@@ -291,38 +275,32 @@ if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
     ['fa-exclamation-triangle', $bo, 'معطلة', 'err']
   ];
 } elseif ($dashboardRole == "17") {
-  // الإدارة المالية — محمي بفحص وجود الجدول حتى يبقى آمناً قبل/بعد أي migration مالي.
-  if (dashboard_table_exists($conn, 'fin_financial_events')) {
-    $feScope = $companyId > 0 ? "company_id=$companyId AND " : "";
-    $evTotal = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0", 't');
-    $evPend  = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0 AND state IN('dept_review','fin_review','audited')", 't');
-    $evAppr  = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0 AND state IN('approved','posted','settled')", 't');
-    $evAmt   = dashboard_scalar($conn, "SELECT COALESCE(SUM(amount),0) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0 AND state<>'rejected'", 't');
-    $stats = [
-      ['fa-file-invoice-dollar', (int) $evTotal, 'إجمالي الأحداث المالية', 'or'],
-      ['fa-hourglass-half', (int) $evPend, 'بانتظار الاعتماد', 'warn'],
-      ['fa-check-circle', (int) $evAppr, 'معتمدة/مقيدة', 'ok'],
-      ['fa-coins', number_format((float) $evAmt, 0), 'إجمالي القيمة', 'or']
-    ];
-  } else {
-    $stats = [['fa-file-invoice-dollar', 0, 'الأحداث المالية', 'or']];
-  }
+  // الإدارة المالية — الجدول قائم ومسجَّل في البوابة (سقط فحص وجوده الذاتي)،
+  // والعزل بالشركة تحقنه البوابة بدل نص company_id الموروث.
+  $dash_fe = array('scope' => array('fin_financial_events' => 'fin_financial_events'));
+  $evTotal = dashboard_gate_scalar($dash_gate, $dash_fe, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE COALESCE(is_deleted,0)=0 AND {TENANT_SCOPE}");
+  $evPend  = dashboard_gate_scalar($dash_gate, $dash_fe, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE COALESCE(is_deleted,0)=0 AND {TENANT_SCOPE} AND state IN('dept_review','fin_review','audited')");
+  $evAppr  = dashboard_gate_scalar($dash_gate, $dash_fe, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE COALESCE(is_deleted,0)=0 AND {TENANT_SCOPE} AND state IN('approved','posted','settled')");
+  $evAmt   = dashboard_gate_scalar($dash_gate, $dash_fe, "SELECT COALESCE(SUM(amount),0) AS t FROM fin_financial_events WHERE COALESCE(is_deleted,0)=0 AND {TENANT_SCOPE} AND state<>'rejected'");
+  $stats = [
+    ['fa-file-invoice-dollar', (int) $evTotal, 'إجمالي الأحداث المالية', 'or'],
+    ['fa-hourglass-half', (int) $evPend, 'بانتظار الاعتماد', 'warn'],
+    ['fa-check-circle', (int) $evAppr, 'معتمدة/مقيدة', 'ok'],
+    ['fa-coins', number_format((float) $evAmt, 0), 'إجمالي القيمة', 'or']
+  ];
 }
 
 /* ════════════════  DASHBOARD ANALYTICS  ════════════════ */
 $monthStart = date('Y-m-01');
 $monthEnd = date('Y-m-t');
+// نطاق العمليات: بالمشروع للجلسات المشروعية، وإلا فالعزل بالشركة تحقنه البوابة
+// (كان o.company_id نصًّا — وشرطُ o.id IS NOT NULL يحفظ قلب LEFT إلى INNER الذي كان
+// يحدثه شرط WHERE الموروث على o). فرع سلسلة المنشئين الموروث سقط (العمود قائم).
 $opsScope = "1=1";
 if ($projectId > 0) {
   $opsScope = "o.$opsProjectCol = " . intval($projectId);
-} elseif ($companyId > 0 && dashboard_has_column($conn, 'operations', 'company_id')) {
-  $opsScope = "o.company_id = " . intval($companyId);
 } elseif ($companyId > 0) {
-  $opsScope = "o.$opsProjectCol IN(
-      SELECT p.id FROM project p
-      WHERE EXISTS(SELECT 1 FROM users su WHERE su.id=p.created_by AND su.company_id=$companyId)
-         OR EXISTS(SELECT 1 FROM clients sc INNER JOIN users scu ON scu.id=sc.created_by WHERE sc.id=p.$projectClientColumn AND scu.company_id=$companyId)
-    )";
+  $opsScope = "o.id IS NOT NULL";
 }
 
 $stopStatuses = "'معطلة','معطلة مؤقتاً','تحت الصيانة','في الصيانة','موقوفة للصيانة','متوقفة','موقوفة','مبيعة/مسحوبة'";
@@ -330,91 +308,71 @@ $analyticsTotalEquip = 0;
 $analyticsActiveEquip = 0;
 
 if ($projectId > 0) {
-  $analyticsTotalEquip = dashboard_scalar(
-    $conn,
+  $analyticsTotalEquip = dashboard_gate_scalar($dash_gate, array('scope' => array('o' => 'operations', 'e' => 'equipments')),
     "SELECT COUNT(DISTINCT e.id) AS t
      FROM operations o
      JOIN equipments e ON e.id=o.equipment
-     WHERE $opsScope
+     WHERE $opsScope AND {TENANT_SCOPE}
        AND o.equipment IS NOT NULL
        AND o.equipment<>''
-       AND o.equipment<>'0'",
-    't'
-  );
+       AND o.equipment<>'0'");
 
-  $analyticsActiveEquip = dashboard_scalar(
-    $conn,
+  $analyticsActiveEquip = dashboard_gate_scalar($dash_gate, array('scope' => array('o' => 'operations', 'e' => 'equipments')),
     "SELECT COUNT(DISTINCT e.id) AS t
      FROM operations o
      JOIN equipments e ON e.id=o.equipment
-     WHERE $opsScope
+     WHERE $opsScope AND {TENANT_SCOPE}
        AND o.equipment IS NOT NULL
        AND o.equipment<>''
        AND o.equipment<>'0'" .
-    ($hasAvail
-      ? " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopStatuses))"
-      : " AND (e.status='1' OR e.status=1)"),
-    't'
-  );
+    " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopStatuses))");
 } else {
-  $eqScope = "1=1";
-  if ($companyId > 0 && dashboard_has_column($conn, 'equipments', 'company_id')) {
-    $eqScope = "e.company_id=" . intval($companyId);
-  }
-  $analyticsTotalEquip = dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE $eqScope", 't');
-  $analyticsActiveEquip = dashboard_scalar(
-    $conn,
-    "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE $eqScope" .
-    ($hasAvail
-      ? " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopStatuses))"
-      : " AND (e.status='1' OR e.status=1)"),
-    't'
-  );
+  $analyticsTotalEquip = dashboard_gate_scalar($dash_gate, array('scope' => array('e' => 'equipments')),
+    "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE 1=1 AND {TENANT_SCOPE}");
+  $analyticsActiveEquip = dashboard_gate_scalar($dash_gate, array('scope' => array('e' => 'equipments')),
+    "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE 1=1 AND {TENANT_SCOPE}" .
+    " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopStatuses))");
 }
 
 $analyticsInactiveEquip = max(0, intval($analyticsTotalEquip) - intval($analyticsActiveEquip));
 
-$analyticsMonthWorkHours = dashboard_scalar(
-  $conn,
+$dash_ts_decl = array('scope' => array('t' => 'timesheet'), 'enrich' => array('o' => 'operations'));
+$analyticsMonthWorkHours = dashboard_gate_scalar($dash_gate, $dash_ts_decl,
   "SELECT COALESCE(SUM(t.total_work_hours),0) AS t
    FROM timesheet t
    LEFT JOIN operations o ON o.id=t.operator
-   WHERE $opsScope
-     AND STR_TO_DATE(t.date, '%Y-%m-%d') BETWEEN '$monthStart' AND '$monthEnd'",
-  't'
-);
+   WHERE $opsScope AND {TENANT_SCOPE}
+     AND STR_TO_DATE(t.date, '%Y-%m-%d') BETWEEN '$monthStart' AND '$monthEnd'");
 
-$analyticsMonthBreakdownHours = dashboard_scalar(
-  $conn,
+$analyticsMonthBreakdownHours = dashboard_gate_scalar($dash_gate, $dash_ts_decl,
   "SELECT COALESCE(SUM(t.total_fault_hours),0) AS t
    FROM timesheet t
    LEFT JOIN operations o ON o.id=t.operator
-   WHERE $opsScope
-     AND STR_TO_DATE(t.date, '%Y-%m-%d') BETWEEN '$monthStart' AND '$monthEnd'",
-  't'
-);
+   WHERE $opsScope AND {TENANT_SCOPE}
+     AND STR_TO_DATE(t.date, '%Y-%m-%d') BETWEEN '$monthStart' AND '$monthEnd'");
 
-$analyticsBreakdownCount = dashboard_scalar(
-  $conn,
+$analyticsBreakdownCount = dashboard_gate_scalar($dash_gate, $dash_ts_decl,
   "SELECT COUNT(*) AS t
    FROM timesheet t
    LEFT JOIN operations o ON o.id=t.operator
-   WHERE $opsScope
+   WHERE $opsScope AND {TENANT_SCOPE}
      AND STR_TO_DATE(t.date, '%Y-%m-%d') BETWEEN '$monthStart' AND '$monthEnd'
-     AND IFNULL(t.total_fault_hours,0) > 0",
-  't'
-);
+     AND IFNULL(t.total_fault_hours,0) > 0");
 
 $analyticsPendingRequests = 0;
-if (dashboard_table_exists($conn, 'approval_requests')) {
+{
+  // [مُستثنى موثَّق — عائلة الاعتمادات] approval_requests مصنَّفة restricted في العقد
+  // (تُهاجَر أخيرًا مع الدوام بإذنٍ صريح) — عدّادُ المعلَّق يبقى خامًا كسابقات
+  // approval_workflow_rules؛ نطاق الشركة اليدوي الموروث (EXISTS users) قائمٌ كما هو.
+  // (شرط ar.project_id الموروث سقط: العمود غير موجود أصلًا فكان الفرع ميتًا.)
   $pendingScope = "ar.status='pending'";
-  if ($projectId > 0 && dashboard_has_column($conn, 'approval_requests', 'project_id')) {
-    $pendingScope .= " AND ar.project_id=" . intval($projectId);
-  }
-  if ($companyId > 0 && dashboard_has_column($conn, 'approval_requests', 'requested_by') && dashboard_has_column($conn, 'users', 'company_id')) {
+  if ($companyId > 0) {
     $pendingScope .= " AND EXISTS(SELECT 1 FROM users ux WHERE ux.id=ar.requested_by AND ux.company_id=" . intval($companyId) . ")";
   }
-  $analyticsPendingRequests = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM approval_requests ar WHERE $pendingScope", 't');
+  $dash_ar_res = $conn->query("SELECT COUNT(*) AS t FROM approval_requests ar WHERE $pendingScope");
+  if ($dash_ar_res && ($dash_ar_row = $dash_ar_res->fetch_assoc())) {
+    $analyticsPendingRequests = $dash_ar_row['t'];
+  }
 }
 
 $analyticsTrendLabels = [];
@@ -422,25 +380,25 @@ $analyticsTrendWork = [];
 $analyticsTrendFault = [];
 $trendMap = [];
 
-$trendRes = $conn->query(
-  "SELECT DATE_FORMAT(STR_TO_DATE(t.date, '%Y-%m-%d'), '%Y-%m-%d') AS day_key,
+$trendRes = array();
+try {
+  $trendRes = $dash_gate->scopedQuery($dash_ts_decl,
+    "SELECT DATE_FORMAT(STR_TO_DATE(t.date, '%Y-%m-%d'), '%Y-%m-%d') AS day_key,
           COALESCE(SUM(t.total_work_hours),0) AS work_sum,
           COALESCE(SUM(t.total_fault_hours),0) AS fault_sum
    FROM timesheet t
    LEFT JOIN operations o ON o.id=t.operator
-   WHERE $opsScope
+   WHERE $opsScope AND {TENANT_SCOPE}
      AND STR_TO_DATE(t.date, '%Y-%m-%d') BETWEEN '$monthStart' AND '$monthEnd'
    GROUP BY day_key
-   ORDER BY day_key ASC"
-);
+   ORDER BY day_key ASC");
+} catch (\Throwable $t) { error_log('dashboard.php trend: ' . $t->getMessage()); }
 
-if ($trendRes) {
-  while ($tr = $trendRes->fetch_assoc()) {
-    $trendMap[$tr['day_key']] = [
-      'work' => (float) $tr['work_sum'],
-      'fault' => (float) $tr['fault_sum']
-    ];
-  }
+foreach ($trendRes as $tr) {
+  $trendMap[$tr['day_key']] = [
+    'work' => (float) $tr['work_sum'],
+    'fault' => (float) $tr['fault_sum']
+  ];
 }
 
 $cursorTs = strtotime($monthStart);
