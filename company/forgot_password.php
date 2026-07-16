@@ -1,4 +1,6 @@
 <?php
+// [مُستثنى بنيويًا — استعادة كلمة سرّ قبل-الجلسة · هـ-2] طبقة الشركة، بلا جلسة.
+// انظر رأس company/auth.php والسياسة §هـ-2.
 require_once __DIR__ . '/auth.php';
 
 if (company_is_logged_in()) {

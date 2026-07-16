@@ -1,4 +1,6 @@
 <?php
+// [مُستثنى بنيويًا — طلب اشتراكٍ عامٌّ قبل-الجلسة + تزويدٌ عابر · هـ-2] طلبٌ عمومي بلا
+// هوية يكتب في admin_subscription_requests (منصّي) — عائلة المصادقة قبل-الجلسة. §هـ-2.
 require_once __DIR__ . '/auth.php';
 
 header('X-Frame-Options: DENY');

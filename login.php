@@ -43,9 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (mb_strlen($u) > 50 || mb_strlen($p) > 128) {
       $error = "بيانات الاعتماد أطول من المسموح.";
     } else {
-      $login_has_employee_link = db_table_has_column($conn, 'users', 'employee_id');
-      $login_emp_col = $login_has_employee_link ? ",employee_id" : "";
-      $stmt = mysqli_prepare($conn, "SELECT id,name,username,password,phone,role,project_id,contract_id,company_id,parent_id,created_at,updated_at$login_emp_col FROM users WHERE username=? LIMIT 1");
+      // [مُستثنى بنيويًا — مصادقة قبل-الجلسة · دفعة هـ-2] هذا الملف يجري قبل وجود أي
+      // هويةٍ مصادَق عليها؛ فبوابة المستأجر (تشترط سياق جلسة) وبوابة المزوّد (تشترط
+      // جلسة مدير أعلى) كلتاهما بنيويًا لا تخدمانه — إجبارُ البوابة هنا إما يُغلق فيكسر
+      // الدخول، أو يمنح قراءةً عابرةً لطلبٍ مجهول (ثغرة). طبقة المصادقة تسبق طبقة العزل
+      // بالتصميم؛ فقراءةُ users بالاسم لإثبات كلمة السر تبقى خامًا حتى تُعرَّف — إن لزم —
+      // قناةُ AuthService مخصصة. (العمود employee_id قائمٌ فسقط فحصه.)
+      $stmt = mysqli_prepare($conn, "SELECT id,name,username,password,phone,role,project_id,contract_id,company_id,parent_id,created_at,updated_at,employee_id FROM users WHERE username=? LIMIT 1");
       if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $u);
         mysqli_stmt_execute($stmt);
@@ -62,7 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $_SESSION['last_attempt_time'] = time();
               $error = "المستخدم غير مرتبط بشركة.";
             } else {
-              if (!$sup && $cid > 0 && db_table_has_column($conn, 'admin_companies', 'status')) {
+              // [مُستثنى بنيويًا — مصادقة قبل-الجلسة] قراءة حالة الشركة (admin_companies
+              // منصّي) للتحقق من كون شركة الداخل نشطةً — لا سياق مزوّدٍ بعد (الداخل مستأجرٌ
+              // لا مدير أعلى)، فتبقى خامًا كبقية عائلة المصادقة. (العمود status قائمٌ.)
+              if (!$sup && $cid > 0) {
                 $company_status = 'active';
                 $ss = @mysqli_prepare($conn, 'SELECT status FROM admin_companies WHERE id=? LIMIT 1');
                 if ($ss) {
@@ -84,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               }
 
               // قاعدة: لا حساب يعمل بلا موظف مُسنَد له (عدا المدير الأعلى -1).
-              if ($error === '' && !$sup && $login_has_employee_link) {
+              if ($error === '' && !$sup) {
                 $emp_link = isset($user['employee_id']) ? intval($user['employee_id']) : 0;
                 if ($emp_link <= 0) {
                   $_SESSION['login_attempts']++;

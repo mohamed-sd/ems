@@ -1,4 +1,7 @@
 <?php
+// [مُستثنى بنيويًا — استعادة كلمة سرّ قبل-الجلسة · هـ-2] إعادة تعيين الكلمة برمزٍ من
+// البريد لمستخدمٍ بلا جلسة؛ قراءة/كتابة super_admin_password_resets+super_admins
+// (منصّيّان) تسبقان أيّ هوية. السياسة §هـ-2.
 require_once __DIR__ . '/includes/auth.php';
 
 if (super_admin_is_logged_in()) {

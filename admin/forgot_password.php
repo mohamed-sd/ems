@@ -1,4 +1,7 @@
 <?php
+// [مُستثنى بنيويًا — استعادة كلمة سرّ قبل-الجلسة · هـ-2] مستخدمٌ نسي كلمته لا جلسةَ له؛
+// قراءة super_admins وكتابة super_admin_password_resets (منصّيّان) تسبقان أيّ هوية.
+// السياسة §هـ-2.
 require_once __DIR__ . '/includes/auth.php';
 
 if (super_admin_is_logged_in()) {

@@ -32,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!validate_email($email) || !validate_length($email, 5, 150) || !validate_length($password, 8, 255)) {
             $error = 'بيانات الدخول غير صحيحة.';
         } else {
+            // [مُستثنى بنيويًا — مصادقة قبل-الجلسة · هـ-2] دخول المدير الأعلى يسبق وجود
+            // جلسة super_admin التي تبنيها بوابة المزوّد نفسها — فقراءة super_admins بالبريد
+            // لإثبات كلمة السر تبقى خامًا (لا يمكن لقناةٍ أن تصادق نفسها).
             $stmt = mysqli_prepare($conn, 'SELECT id, name, email, password, is_active, last_login_at FROM super_admins WHERE email = ? LIMIT 1');
 
             if (!$stmt) {
@@ -50,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = 'هذا الحساب موقوف حالياً.';
                     log_security_event('SUPER_ADMIN_LOGIN_DISABLED', 'Disabled admin tried to login: ' . substr($email, 0, 80));
                 } else {
+                    // [مُستثنى بنيويًا — مصادقة قبل-الجلسة] ختم آخر دخولٍ يجري لحظةَ نجاح
+                    // المصادقة قبل بناء الجلسة — نفس عائلة قراءة الدخول أعلاه.
                     $updateStmt = mysqli_prepare($conn, 'UPDATE super_admins SET last_login_at = NOW() WHERE id = ?');
                     if ($updateStmt) {
                         $adminId = intval($admin['id']);
