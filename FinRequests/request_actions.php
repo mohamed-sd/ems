@@ -236,11 +236,12 @@ if (array_key_exists($action, $machine_actions)) {
         $machine = finreq_machine($conn, $routing);
         $result = $machine->apply($id, $m_action, $user_id, array('note' => $reason !== '' ? $reason : null));
 
-        // السجل الإلحاقي + الحقول المرافقة
+        // السجل الإلحاقي + الحقول المرافقة + ختم SLA للمرحلة الجديدة (قاعدة الساعة §8.1)
         $gate->runInTransaction(function ($g) use ($action, $id, $req, $reason, $S, $user_id, $result) {
             if ($action === 'submit' || $action === 'resubmit') {
                 finreq_log($g, $id, $action === 'submit' ? 'submit' : 'resubmit',
                     $reason !== '' ? $reason : 'إرسال الطلب للمراجعة', $result['from'], $result['to']);
+                finreq_stamp_sla($g, $id, 'dept_review', strval($req['need_class']));
                 // كشف التكرار التحذيري (§8.4) بعد الإرسال
                 $dup = finreq_duplicate_check($g, $req);
                 if ($dup) {
@@ -251,6 +252,7 @@ if (array_key_exists($action, $machine_actions)) {
             } elseif ($action === 'dept_approve') {
                 $g->update('fin_requests', array('decided_by' => $user_id), array('id' => $id));
                 finreq_log($g, $id, 'dept_approve', $reason !== '' ? $reason : 'اعتماد إداري — فُتح باب المالية', $result['from'], $result['to']);
+                finreq_stamp_sla($g, $id, 'acct_review', strval($req['need_class']));
             } elseif ($action === 'return_request') {
                 finreq_log($g, $id, 'return', $reason, $result['from'], $result['to']);
             } elseif ($action === 'reject') {
@@ -320,11 +322,90 @@ if ($action === 'acct_forward') {
             finreq_log($g, $id, 'publish',
                 'ولادة الحدث المالي ' . $ev_result['event_no'] . ' (id=' . $ev_result['id'] . ') بمرجع الطلب — دورة D04 بدأت',
                 null, 'event_id=' . $ev_result['id']);
+            finreq_stamp_sla($g, $id, 'finance', strval($fresh['need_class']));
         });
         finreq_redirect('accountant_desk.php', '✅ وُلد الحدث المالي ' . ($ev_result ? $ev_result['event_no'] : '') . ' بمرجع الطلب — يتابع دورته في D04 وتُشتق حالة الطلب منه');
     } catch (\Throwable $t) {
         error_log('finreq acct_forward: ' . $t->getMessage());
         finreq_redirect('accountant_desk.php?id=' . $id, '❌ تعذّرت الولادة: ' . $t->getMessage());
+    }
+}
+
+// ═══ 6) حالات الإيقاف (§8.4): إلغاء / تعليق / استئناف / دمج المكرّرات ═══
+if (in_array($action, array('cancel', 'suspend', 'resume', 'merge'), true)) {
+    $id = intval($_POST['id'] ?? 0);
+    $req = finreq_fetch($gate, $id);
+    if (!$req) { finreq_redirect($back, '❌ الطلب غير موجود'); }
+    $routing = finreq_routing_row($gate, strval($req['source_module']));
+    if (!$routing) { finreq_redirect($back, '❌ لا صفّ توجيهٍ لإدارة الطلب'); }
+    $reason = $S('reason');
+    if ($reason === '' && $action !== 'resume') {
+        finreq_redirect($back, '❌ السبب إلزاميٌّ لحالات الإيقاف (§8.4)');
+    }
+
+    try {
+        $machine = finreq_machine($conn, $routing);
+
+        if ($action === 'cancel') {
+            // مدير الإدارة قبل وصول المالية (لا حدث)، والمدير المالي بعده
+            if (!empty($req['event_id']) && !$is_super && $role !== '17') {
+                finreq_redirect($back, '❌ بعد ولادة الحدث الإلغاء للمدير المالي حصرًا — مع معالجة الأثر في D04');
+            }
+            $result = $machine->apply($id, 'cancel_pending', $user_id, array('note' => $reason));
+            $gate->runInTransaction(function ($g) use ($id, $reason, $result, $req) {
+                finreq_log($g, $id, 'cancel', $reason
+                    . (!empty($req['event_id']) ? ' — قاعدة الأثر الرجعي: عالج حدث D04 #' . intval($req['event_id']) . ' (عكس قيدٍ/تسوية)' : ''),
+                    $result['from'], $result['to']);
+            });
+            finreq_redirect($back, '⛔ أُلغي الطلب بسببٍ موثَّق' . (!empty($req['event_id']) ? ' — لا تنسَ معالجة أثره في D04' : ''));
+        }
+
+        if ($action === 'suspend') {
+            $m_action = ($req['state'] === 'pending_approval') ? 'suspend_pending' : 'suspend_review';
+            $result = $machine->apply($id, $m_action, $user_id, array('note' => $reason));
+            $gate->runInTransaction(function ($g) use ($id, $reason, $result) {
+                finreq_log($g, $id, 'suspend', $reason, $result['from'], $result['to']);
+            });
+            finreq_redirect($back, '⏸️ عُلّق الطلب بقرارٍ موثَّق — يُستأنف بمثله');
+        }
+
+        if ($action === 'resume') {
+            // الاستئناف إلى مرحلته السابقة المدوَّنة في قيد التعليق (old_value)
+            $last = $gate->select('fin_request_events', array(
+                'columns' => array('old_value'),
+                'where' => array('request_id' => $id, 'event_type' => 'suspend'),
+                'orderBy' => 'id DESC', 'limit' => 1,
+            ));
+            $target = ($last && $last[0]['old_value'] === 'pending_approval') ? 'resume_pending' : 'resume_review';
+            $result = $machine->apply($id, $target, $user_id, array('note' => $reason !== '' ? $reason : 'استئناف'));
+            $gate->runInTransaction(function ($g) use ($id, $reason, $result) {
+                finreq_log($g, $id, 'resume', $reason !== '' ? $reason : 'استئنافٌ بقرارٍ موثَّق', $result['from'], $result['to']);
+            });
+            finreq_redirect($back, '▶️ استؤنف الطلب إلى مرحلته السابقة');
+        }
+
+        if ($action === 'merge') {
+            // دمج مكرّرٍ في طلبٍ قائمٍ بمرجع merged_into_id (قرار محاسب الإدارة)
+            $target_no = $S('merge_into_no');
+            $target = $gate->selectOne('fin_requests', array('where' => array('request_no' => $target_no)));
+            if (!$target || intval($target['id']) === $id) {
+                finreq_redirect($back, '❌ حدّد رقم الطلب الأصل الصحيح للدمج');
+            }
+            if (!empty($req['event_id'])) {
+                finreq_redirect($back, '❌ لا يُدمج طلبٌ وُلد حدثه — عالج بالإلغاء ومعالجة الأثر');
+            }
+            $m_action = ($req['state'] === 'pending_approval') ? 'merge_pending' : 'merge_review';
+            $result = $machine->apply($id, $m_action, $user_id, array('note' => 'دمج في ' . $target['request_no']));
+            $gate->runInTransaction(function ($g) use ($id, $target, $reason, $result) {
+                $g->update('fin_requests', array('merged_into_id' => intval($target['id'])), array('id' => $id));
+                finreq_log($g, $id, 'merge', $reason . ' — دُمج في ' . $target['request_no'], $result['from'], $result['to']);
+                finreq_log($g, intval($target['id']), 'note', 'دُمج فيه الطلب المكرّر #' . $id);
+            });
+            finreq_redirect($back, '🔗 دُمج المكرّر في ' . $target['request_no'] . ' وأُقفل بمرجعه');
+        }
+    } catch (\Throwable $t) {
+        error_log('finreq halt ' . $action . ': ' . $t->getMessage());
+        finreq_redirect($back, '❌ ' . $t->getMessage());
     }
 }
 

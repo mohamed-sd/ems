@@ -97,13 +97,25 @@ include('../insidebar.php');
                         </div>
                     </div>
                 </form>
-                <form action="request_actions.php" method="post" style="display:flex;gap:8px;margin-top:10px;">
-                    <input type="hidden" name="action" value="return_request">
-                    <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
-                    <input type="hidden" name="back" value="accountant_desk.php">
-                    <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required style="min-width:260px;">
-                    <button type="submit" class="btn btn-outline-warning"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
-                </form>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                        <input type="hidden" name="action" value="return_request">
+                        <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
+                        <input type="hidden" name="back" value="accountant_desk.php">
+                        <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required style="min-width:240px;">
+                        <button type="submit" class="btn btn-outline-warning"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
+                    </form>
+                    <?php if (intval($r['duplicate_flag']) === 1): ?>
+                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                        <input type="hidden" name="action" value="merge">
+                        <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
+                        <input type="hidden" name="back" value="accountant_desk.php">
+                        <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required style="min-width:160px;">
+                        <input type="text" name="reason" placeholder="سبب الدمج" required style="min-width:150px;">
+                        <button type="submit" class="btn btn-outline-secondary"><i class="fa fa-code-merge"></i> دمج المكرّر</button>
+                    </form>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     <?php endforeach; if (!$rows): ?>

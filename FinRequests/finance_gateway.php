@@ -55,7 +55,13 @@ include('../insidebar.php');
     <?php
     $header_title   = 'بوابة الدخول للمالية — الطلبات الموحّدة';
     $header_icon    = 'fa fa-building-columns';
-    $header_actions = array(array('href' => 'accountant_desk.php', 'class' => 'add-btn', 'icon' => 'fa fa-calculator', 'label' => 'مكتب المحاسب'));
+    $header_actions = array(
+        array('href' => 'accountant_desk.php', 'class' => 'add-btn', 'icon' => 'fa fa-calculator', 'label' => 'مكتب المحاسب'),
+        array('href' => 'effect_map.php', 'class' => 'add-btn', 'icon' => 'fa fa-diagram-project', 'label' => 'خريطة الأثر'),
+    );
+    if ($is_super || $role === '17') {
+        $header_actions[] = array('href' => 'routing_admin.php', 'class' => 'add-btn', 'icon' => 'fa fa-route', 'label' => 'توجيه الإدارات');
+    }
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -109,7 +115,38 @@ include('../insidebar.php');
                         <td><?php echo $r['event_id'] ? ('#' . intval($r['event_id'])) : '—'; ?></td>
                         <td><?php echo intval($r['created_by']); ?></td>
                         <td><?php echo htmlspecialchars(substr($r['created_at'], 0, 10)); ?></td>
-                        <td><a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a></td>
+                        <td style="white-space:nowrap;">
+                            <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            <a href="effect_map.php?q=<?php echo urlencode($r['request_no']); ?>" class="action-btn" title="خريطة الأثر"><i class="fa fa-diagram-project"></i></a>
+                            <?php if ($is_super || $role === '17'): ?>
+                                <?php if (in_array($r['state'], array('under_review', 'pending_approval'), true)): ?>
+                                <form action="request_actions.php" method="post" style="display:inline;" onsubmit="var x=prompt('سبب التعليق (إلزامي):');if(!x)return false;this.reason.value=x;">
+                                    <input type="hidden" name="action" value="suspend">
+                                    <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
+                                    <input type="hidden" name="back" value="finance_gateway.php">
+                                    <input type="hidden" name="reason" value="">
+                                    <button type="submit" class="action-btn" title="تعليق" style="border:none;background:none;color:#c96a00;"><i class="fa fa-pause-circle"></i></button>
+                                </form>
+                                <?php endif; ?>
+                                <?php if ($r['state'] === 'suspended'): ?>
+                                <form action="request_actions.php" method="post" style="display:inline;">
+                                    <input type="hidden" name="action" value="resume">
+                                    <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
+                                    <input type="hidden" name="back" value="finance_gateway.php">
+                                    <button type="submit" class="action-btn" title="استئناف" style="border:none;background:none;color:#16a34a;"><i class="fa fa-play-circle"></i></button>
+                                </form>
+                                <?php endif; ?>
+                                <?php if ($r['state'] === 'pending_approval'): ?>
+                                <form action="request_actions.php" method="post" style="display:inline;" onsubmit="var x=prompt('سبب الإلغاء (إلزامي — وبعد الولادة تُعالَج آثاره في D04):');if(!x)return false;this.reason.value=x;">
+                                    <input type="hidden" name="action" value="cancel">
+                                    <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
+                                    <input type="hidden" name="back" value="finance_gateway.php">
+                                    <input type="hidden" name="reason" value="">
+                                    <button type="submit" class="action-btn" title="إلغاء" style="border:none;background:none;color:#dc2626;"><i class="fa fa-ban"></i></button>
+                                </form>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

@@ -103,26 +103,33 @@ function getDynamicNavLinks($conn, $roleId) {
  * @param string $basePrefix prefix for links (e.g., '../' for subdirectories)
  * @return void
  */
-function printDynamicNavLinks($links, $basePrefix = '../') {
+function printDynamicNavLinks($links, $basePrefix = '../', $badges = array()) {
     if (empty($links)) {
         return;
     }
-    
+
     foreach ($links as $link) {
         // التحقق من وجود الحقول المطلوبة
         if (!isset($link['code']) || !isset($link['name'])) {
             continue;
         }
-        
+
         $code = htmlspecialchars($link['code'], ENT_QUOTES, 'UTF-8');
         $name = htmlspecialchars($link['name'], ENT_QUOTES, 'UTF-8');
         $icon = !empty($link['icon']) ? $link['icon'] : 'fa fa-link';
         $icon = htmlspecialchars($icon, ENT_QUOTES, 'UTF-8');
-        
+
+        // شارة عدٍّ اختيارية (خريطة code → عدد) بنمط شارة اعتماد الساعات
+        $badge = '';
+        if (isset($badges[$link['code']]) && intval($badges[$link['code']]) > 0) {
+            $n = intval($badges[$link['code']]);
+            $badge = ' <span class="nav-count-badge">' . ($n > 99 ? '99+' : $n) . '</span>';
+        }
+
         // تحديد البادئة (prefix) بناءً على موقع الملف الحالي
         $href = $basePrefix . $code;
-        
-        echo '<li><a href="' . $href . '"><i class="' . $icon . '"></i> <span>' . $name . '</span></a></li>' . "\n";
+
+        echo '<li><a href="' . $href . '"><i class="' . $icon . '"></i> <span>' . $name . '</span>' . $badge . '</a></li>' . "\n";
     }
 }
 
@@ -135,9 +142,9 @@ function printDynamicNavLinks($links, $basePrefix = '../') {
  * @param string $basePrefix prefix for links
  * @return void
  */
-function renderDynamicNavigation($conn, $roleId, $basePrefix = '../') {
+function renderDynamicNavigation($conn, $roleId, $basePrefix = '../', $badges = array()) {
     $links = getDynamicNavLinks($conn, $roleId);
-    printDynamicNavLinks($links, $basePrefix);
+    printDynamicNavLinks($links, $basePrefix, $badges);
 }
 
 ?>

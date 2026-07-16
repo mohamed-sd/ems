@@ -185,8 +185,10 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
+      // (+ شارات عدّ بوابة الطلبات المالية D05 — صناديق المراجعة والمحاسب والمعاد)
       if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
-        renderDynamicNavigation($conn, $_SESSION['user']['role'], '../');
+        require_once __DIR__ . '/includes/finreq_badges.php';
+        renderDynamicNavigation($conn, $_SESSION['user']['role'], '../', ems_finreq_nav_badges($conn));
       }
       ?>
 

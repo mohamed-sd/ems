@@ -33,47 +33,47 @@ function finreq_catalog()
             'legacy_event_type' => 'expense', 'has_lines' => false,
         ),
         'advance' => array(
-            'label' => 'طلب سلفة', 'icon' => 'fa fa-hand-holding-dollar', 'active' => false,
+            'label' => 'طلب سلفة', 'icon' => 'fa fa-hand-holding-dollar', 'active' => true,
             'docs' => array('statement'), 'docs_label' => 'إقرار سلفةٍ وجدولة خصم',
             'legacy_event_type' => 'payable', 'has_lines' => false,
         ),
         'supplier_payment' => array(
-            'label' => 'طلب دفعة مورد', 'icon' => 'fa fa-truck-fast', 'active' => false,
+            'label' => 'طلب دفعة مورد', 'icon' => 'fa fa-truck-fast', 'active' => true,
             'docs' => array('statement'), 'docs_label' => 'كشف حسابٍ مسوًّى',
             'legacy_event_type' => 'payable', 'has_lines' => false,
         ),
         'employee_payment' => array(
-            'label' => 'طلب دفعة موظف', 'icon' => 'fa fa-user-check', 'active' => false,
+            'label' => 'طلب دفعة موظف', 'icon' => 'fa fa-user-check', 'active' => true,
             'docs' => array('statement'), 'docs_label' => 'كشف مستحقاتٍ معتمَد',
             'legacy_event_type' => 'payroll', 'has_lines' => false,
         ),
         'transfer' => array(
-            'label' => 'طلب تحويل', 'icon' => 'fa fa-right-left', 'active' => false,
+            'label' => 'طلب تحويل', 'icon' => 'fa fa-right-left', 'active' => true,
             'docs' => array('statement', 'other'), 'docs_label' => 'بيان الحسابين والغرض',
             'legacy_event_type' => 'settlement', 'has_lines' => false,
         ),
         'settlement' => array(
-            'label' => 'طلب تسوية', 'icon' => 'fa fa-scale-balanced', 'active' => false,
+            'label' => 'طلب تسوية', 'icon' => 'fa fa-scale-balanced', 'active' => true,
             'docs' => array('statement'), 'docs_label' => 'كشف ما له وما عليه',
             'legacy_event_type' => 'settlement', 'has_lines' => true,
         ),
         'refund' => array(
-            'label' => 'طلب استرداد', 'icon' => 'fa fa-rotate-left', 'active' => false,
+            'label' => 'طلب استرداد', 'icon' => 'fa fa-rotate-left', 'active' => true,
             'docs' => array('receipt', 'other'), 'docs_label' => 'مستند الصرف الأصلي وسببه',
             'legacy_event_type' => 'expense', 'has_lines' => false,
         ),
         'discount' => array(
-            'label' => 'طلب خصم', 'icon' => 'fa fa-percent', 'active' => false,
+            'label' => 'طلب خصم', 'icon' => 'fa fa-percent', 'active' => true,
             'docs' => array('statement', 'other'), 'docs_label' => 'مستند الاستحقاق وسبب الخصم',
             'legacy_event_type' => 'settlement', 'has_lines' => false,
         ),
         'collection' => array(
-            'label' => 'طلب تحصيل', 'icon' => 'fa fa-file-invoice-dollar', 'active' => false,
+            'label' => 'طلب تحصيل', 'icon' => 'fa fa-file-invoice-dollar', 'active' => true,
             'docs' => array('invoice'), 'docs_label' => 'فاتورة/مستخلص بمصادقة العميل',
             'legacy_event_type' => 'receivable', 'has_lines' => false,
         ),
         'other' => array(
-            'label' => 'طلب آخر', 'icon' => 'fa fa-file-lines', 'active' => false,
+            'label' => 'طلب آخر', 'icon' => 'fa fa-file-lines', 'active' => true,
             'docs' => array(), 'docs_label' => 'مستندٌ مؤيّدٌ واحدٌ على الأقل',
             'legacy_event_type' => 'enterprise', 'has_lines' => false,
         ),
@@ -225,9 +225,77 @@ function finreq_machine($conn, $routing)
             'reject_review'  => array('from' => 'under_review',     'to' => 'rejected',         'roles' => array($manager, '-1')),
             'withdraw_draft' => array('from' => 'draft',            'to' => 'withdrawn',        'roles' => $requesters),
             'withdraw_review'=> array('from' => 'under_review',     'to' => 'withdrawn',        'roles' => $requesters),
+            // حالات الإيقاف (§8.4): الإلغاء بعد الاعتماد الإداري — مدير الإدارة قبل وصول
+            // المالية والمدير المالي بعده (المعالج يميز بوجود event_id)؛ التعليق/الاستئناف
+            // بقرار المدير المالي؛ والدمج قرار محاسب الإدارة للمكرّرات.
+            'cancel_pending' => array('from' => 'pending_approval', 'to' => 'cancelled',        'roles' => array($manager, '17', '-1')),
+            'suspend_review' => array('from' => 'under_review',     'to' => 'suspended',        'roles' => array('17', '-1')),
+            'suspend_pending'=> array('from' => 'pending_approval', 'to' => 'suspended',        'roles' => array('17', '-1')),
+            'resume_review'  => array('from' => 'suspended',        'to' => 'under_review',     'roles' => array('17', '-1')),
+            'resume_pending' => array('from' => 'suspended',        'to' => 'pending_approval', 'roles' => array('17', '-1')),
+            'merge_review'   => array('from' => 'under_review',     'to' => 'merged',           'roles' => array('18', '-1')),
+            'merge_pending'  => array('from' => 'pending_approval', 'to' => 'merged',           'roles' => array('18', '-1')),
         ),
     );
     return new \App\Core\StateMachine($conn, $def);
+}
+
+/** جدول SLA (§8.1) بالساعات — 24/7 فعلية (قرار v1)؛ العمودان عاجل/طارئ من تصنيف الحاجة */
+function finreq_sla_hours($stage, $need_class)
+{
+    $table = array(
+        //                 اعتيادي · عاجل · طارئ
+        'dept_review' => array(8,  4,  4),   // مراجعة الرئيس المباشر واعتماد الإدارة (كتلة تحت المراجعة)
+        'acct_review' => array(24, 12, 4),   // مكتب محاسب الإدارة
+        'finance'     => array(48, 24, 8),   // التحقق والاعتماد المالي (D04)
+    );
+    if (!isset($table[$stage])) { return null; }
+    $idx = ($need_class === 'urgent') ? 1 : (($need_class === 'emergency') ? 2 : 0);
+    return $table[$stage][$idx];
+}
+
+/** ختم استحقاق المرحلة: المدة تلتصق بالمرحلة لا بالطلب (قاعدة الساعة §8.1) —
+ *  كل انتقالٍ يعيد ضبط sla_due_at لمالكها الجديد ويصفّر مستوى التصعيد. */
+function finreq_stamp_sla($gate, $request_id, $stage, $need_class)
+{
+    $hours = finreq_sla_hours($stage, $need_class);
+    if ($hours === null) { return; }
+    $gate->update('fin_requests', array(
+        'sla_due_at' => date('Y-m-d H:i:s', time() + $hours * 3600),
+        'escalation_level' => 0,
+    ), array('id' => intval($request_id)));
+}
+
+/** عدّادات شارات السايدبار حسب الدور: صندوق الإدارة · مكتب المحاسب · المعاد لمنشئه */
+function finreq_badge_counts($gate, $role, $user_id)
+{
+    $out = array('FinRequests/dept_inbox.php' => 0, 'FinRequests/accountant_desk.php' => 0, 'FinRequests/my_requests.php' => 0);
+    try {
+        $role = strval($role);
+        $routes = finreq_active_routing($gate);
+        $mods = array();
+        foreach ($routes as $rt) {
+            if ($role === '-1' || finreq_role_is($rt, $role, 'reviewer') || finreq_role_is($rt, $role, 'manager')) {
+                $mods[] = strval($rt['source_module']);
+            }
+        }
+        if ($mods) {
+            $ph = implode(',', array_fill(0, count($mods), '?'));
+            $out['FinRequests/dept_inbox.php'] = intval($gate->count('fin_requests', array(
+                'whereRaw' => "state = 'under_review' AND source_module IN ($ph)", 'params' => $mods,
+            )));
+        }
+        if ($role === '18' || $role === '17' || $role === '-1') {
+            $out['FinRequests/accountant_desk.php'] = intval($gate->count('fin_requests', array(
+                'whereRaw' => "state = 'pending_approval' AND event_id IS NULL", 'params' => array(),
+            )));
+        }
+        $out['FinRequests/my_requests.php'] = intval($gate->count('fin_requests', array(
+            'whereRaw' => "state = 'returned' AND (created_by = ? OR requester_id = ?)",
+            'params' => array(intval($user_id), intval($user_id)),
+        )));
+    } catch (\Throwable $t) { /* شارات فقط — لا تعطّل الواجهة */ }
+    return $out;
 }
 
 /** فحص «المستند شرط العبور» (قاعدة البوابة الصفرية — صارمة من اليوم الأول):
