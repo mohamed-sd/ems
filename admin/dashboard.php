@@ -6,25 +6,32 @@ $admin        = super_admin_current();
 $page_title   = 'لوحة التحكم';
 $current_page = 'dashboard';
 
-// ── EMS counts (always available) ──────────────────────────────────────────
-function _dash_count($conn, $sql) {
-    $r = @mysqli_query($conn, $sql);
-    if ($r && ($row = mysqli_fetch_assoc($r))) return intval($row['c']);
-    return 0;
+// ── العدّادات عبر بوابة المزوّد العابرة (هـ-1 · 2026-07-16): رؤية كل الشركات
+//    بسلوك الأصل نفسه (بلا تنطيق)، وجداول المنصّة عبر تصنيفها T_PLATFORM ──────
+$pg = ems_platform_db();
+function _dash_count($g, array $decl, $sql) {
+    try {
+        $r = $g->scopedQuery($decl, $sql);
+        return (isset($r[0]['c'])) ? intval($r[0]['c']) : 0;
+    } catch (\Throwable $t) {
+        error_log('admin/dashboard.php count: ' . $t->getMessage());
+        return 0;
+    }
 }
-$cnt_users     = _dash_count($conn, "SELECT COUNT(*) AS c FROM users");
-$cnt_projects  = _dash_count($conn, "SELECT COUNT(*) AS c FROM project WHERE status=1");
-$cnt_equip     = _dash_count($conn, "SELECT COUNT(*) AS c FROM equipments WHERE status=1");
-$cnt_suppliers = _dash_count($conn, "SELECT COUNT(*) AS c FROM suppliers WHERE status=1");
+$cnt_users     = _dash_count($pg, array('scope' => array('users' => 'users')), "SELECT COUNT(*) AS c FROM users WHERE 1=1 AND {TENANT_SCOPE}");
+$cnt_projects  = _dash_count($pg, array('scope' => array('project' => 'project')), "SELECT COUNT(*) AS c FROM project WHERE status=1 AND {TENANT_SCOPE}");
+$cnt_equip     = _dash_count($pg, array('scope' => array('equipments' => 'equipments')), "SELECT COUNT(*) AS c FROM equipments WHERE status=1 AND {TENANT_SCOPE}");
+$cnt_suppliers = _dash_count($pg, array('scope' => array('suppliers' => 'suppliers')), "SELECT COUNT(*) AS c FROM suppliers WHERE status=1 AND {TENANT_SCOPE}");
 
-// ── SaaS counts (tables may not exist yet — suppressed) ────────────────────
-$cnt_companies  = _dash_count($conn, "SELECT COUNT(*) AS c FROM admin_companies WHERE status='active'");
-$cnt_pending    = _dash_count($conn, "SELECT COUNT(*) AS c FROM admin_subscription_requests WHERE status='pending'");
+$cnt_companies  = _dash_count($pg, array('scope' => array('admin_companies' => 'admin_companies')), "SELECT COUNT(*) AS c FROM admin_companies WHERE status='active' AND {TENANT_SCOPE}");
+$cnt_pending    = _dash_count($pg, array('scope' => array('admin_subscription_requests' => 'admin_subscription_requests')), "SELECT COUNT(*) AS c FROM admin_subscription_requests WHERE status='pending' AND {TENANT_SCOPE}");
 
-// ── Recent subscription requests (stub) ────────────────────────────────────
+// ── أحدث طلبات الاشتراك (الخطط مرجع عام فلا تُعلَن) ─────────────────────────
 $recent_requests = [];
-$rr = @mysqli_query($conn, "SELECT r.*, p.plan_name FROM admin_subscription_requests r LEFT JOIN admin_subscription_plans p ON r.plan_id=p.id ORDER BY r.created_at DESC LIMIT 5");
-if ($rr) { while ($row = mysqli_fetch_assoc($rr)) $recent_requests[] = $row; }
+try {
+    $recent_requests = $pg->scopedQuery(array('scope' => array('r' => 'admin_subscription_requests')),
+        "SELECT r.*, p.plan_name FROM admin_subscription_requests r LEFT JOIN admin_subscription_plans p ON r.plan_id=p.id WHERE 1=1 AND {TENANT_SCOPE} ORDER BY r.created_at DESC LIMIT 5");
+} catch (\Throwable $t) { error_log('admin/dashboard.php recent: ' . $t->getMessage()); }
 
 require_once __DIR__ . '/includes/layout_head.php';
 ?>

@@ -12,22 +12,27 @@ $found_co  = null;
 $found_users = [];
 
 if ($lookup !== '') {
-    $esc = mysqli_real_escape_string($conn, $lookup);
-    $cq  = @mysqli_query($conn,
-        "SELECT c.*, p.plan_name FROM admin_companies c
+    // بحث الدعم عبر بوابة المزوّد العابرة (هـ-1): الشركات منصّية، والخطط مرجع عام،
+    // ومستخدمو الشركة المطلوبة عبر معاملٍ (رؤية المزوّد عابرةٌ بسلوك الأصل).
+    try {
+        $sv_pg = ems_platform_db();
+        $sv_rows = $sv_pg->scopedQuery(array('scope' => array('c' => 'admin_companies')),
+            "SELECT c.*, p.plan_name FROM admin_companies c
          LEFT JOIN admin_subscription_plans p ON c.plan_id = p.id
-         WHERE c.company_name LIKE '%$esc%' OR c.email LIKE '%$esc%'
-         LIMIT 1"
-    );
-    if ($cq) { $found_co = mysqli_fetch_assoc($cq); }
+         WHERE (c.company_name LIKE ? OR c.email LIKE ?) AND {TENANT_SCOPE}
+         LIMIT 1", array('%' . $lookup . '%', '%' . $lookup . '%'));
+        $found_co = !empty($sv_rows) ? $sv_rows[0] : null;
 
-    if ($found_co) {
-        $co_id = intval($found_co['id']);
-        $uq = @mysqli_query($conn,
-            "SELECT id, username, role, created_at FROM users WHERE company_id = $co_id ORDER BY created_at DESC"
-        );
-        if ($uq) { while ($row = mysqli_fetch_assoc($uq)) $found_users[] = $row; }
-    }
+        if ($found_co) {
+            $co_id = intval($found_co['id']);
+            // (نص company_id محظور في scopedQuery حتى للعابرة — الترشيح بالعمود عبر select)
+            $found_users = $sv_pg->select('users', array(
+                'columns' => array('id', 'username', 'role', 'created_at'),
+                'where' => array('company_id' => $co_id),
+                'orderBy' => 'created_at DESC',
+                'includeDeleted' => true));
+        }
+    } catch (\Throwable $t) { error_log('admin/support/view.php lookup: ' . $t->getMessage()); }
 }
 
 require_once dirname(__DIR__) . '/includes/layout_head.php';

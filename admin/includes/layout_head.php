@@ -12,13 +12,13 @@ if (!function_exists('e')) {
     function e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 }
 
-// Pending subscription badge (suppress error if table missing)
+// شارة الطلبات المعلقة — عبر بوابة المزوّد العابرة (هـ-1؛ الجدول منصّي T_PLATFORM)
 $_admin_pending_badge = 0;
-$_bp = @mysqli_query($conn, "SELECT COUNT(*) AS c FROM admin_subscription_requests WHERE status='pending'");
-if ($_bp) {
-    $_br = mysqli_fetch_assoc($_bp);
-    $_admin_pending_badge = intval($_br['c']);
-}
+try {
+    $_bp = ems_platform_db()->scopedQuery(array('scope' => array('asr' => 'admin_subscription_requests')),
+        "SELECT COUNT(*) AS c FROM admin_subscription_requests asr WHERE asr.status='pending' AND {TENANT_SCOPE}");
+    if (isset($_bp[0]['c'])) { $_admin_pending_badge = intval($_bp[0]['c']); }
+} catch (\Throwable $t) { error_log('admin/layout_head badge: ' . $t->getMessage()); }
 
 $_admin_nav = [
     ['slug' => 'dashboard',     'label' => 'لوحة التحكم',    'icon' => 'fa-gauge-high',        'url' => 'dashboard'],
