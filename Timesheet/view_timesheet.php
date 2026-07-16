@@ -27,17 +27,15 @@ if (!$can_view) {
     exit();
 }
 
-$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
-$timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$vts_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('view timesheet super') : ems_tenant_db();
 
 $session_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
 if ($session_project_id <= 0 && !$is_super_admin) {
-    $project_check = mysqli_query($conn, "SELECT id FROM project WHERE company_id = $company_id AND status = 1 LIMIT 1");
-    if ($project_check && mysqli_num_rows($project_check) > 0) {
-        $proj = mysqli_fetch_assoc($project_check);
-        $session_project_id = intval($proj['id']);
-    }
+    try {
+        $proj = $vts_gate->selectOne('project', array('columns' => array('id'), 'where' => array('status' => 1)));
+        if ($proj) { $session_project_id = intval($proj['id']); }
+    } catch (\Throwable $t) { error_log('view_timesheet project fallback: ' . $t->getMessage()); }
 }
 
 $filter_date = isset($_GET['filter_date']) ? mysqli_real_escape_string($conn, trim($_GET['filter_date'])) : '';
@@ -69,24 +67,9 @@ $has_filters = (
     $status_filter !== ''
 );
 
+// نطاق الشركة يُحقن عبر {TENANT_SCOPE} في كل استعلام — لا شروط يدوية بعد الآن
 $scope_where_parts = ["1=1"];
 $filter_where_parts = [];
-
-if (!$is_super_admin) {
-    if ($timesheet_has_company) {
-        $scope_where_parts[] = "t.company_id = $company_id";
-    } else {
-        $scope_where_parts[] = "EXISTS (
-            SELECT 1
-            FROM project p2
-            LEFT JOIN users su2 ON su2.id = p2.created_by
-            LEFT JOIN clients sc2 ON sc2.id = p2.$project_client_column
-            LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-            WHERE p2.id = o.$operations_project_column
-              AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
-        )";
-    }
-}
 
 if ((string) $_SESSION['user']['role'] === '6') {
     $scope_where_parts[] = "t.user_id = " . intval($_SESSION['user']['id']);
@@ -145,27 +128,51 @@ $base_from_sql = "
     FROM timesheet t
     JOIN operations o ON t.operator = o.id
     JOIN equipments e ON o.equipment = e.id
-    JOIN project p ON o.$operations_project_column = p.id
+    JOIN project p ON o.project_id = p.id
     LEFT JOIN employees d ON t.employee_id = d.id
 ";
+
+$vts_decl = array(
+    'scope'  => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 'p' => 'project'),
+    'enrich' => array('d' => 'employees'),
+);
+
+// المعاملات المُهيّأة تعيد أنواعًا أصلية (int/float) بينما الشاشة تقارن نصوصًا بصرامة (===)
+// — نعيد الصفوف نصوصًا كسلوك mysqli_query القديم حرفيًا مع إبقاء NULL كما هي.
+if (!function_exists('vts_stringify_rows')) {
+    function vts_stringify_rows($rows) {
+        foreach ($rows as $i => $r) {
+            foreach ($r as $k => $v) {
+                if ($v !== null && !is_string($v)) { $rows[$i][$k] = strval($v); }
+            }
+        }
+        return $rows;
+    }
+}
 
 $order_sql = " ORDER BY t.date DESC, t.id DESC ";
 $display_limit_sql = "";
 
 // المطلوب: تحميل آخر 1000 سجل أولاً ضمن نطاق الصلاحية ثم تطبيق الفلاتر.
+// (استعلام المعرّفات الداخلي كان منطوقًا بالشركة في الأصل — صار نداء بوابةٍ مستقلًا بنطاقه)
 $recent_1000_clause = "";
+$recent_ids_empty = false;
 if (!$export_all) {
-        $recent_1000_clause = "
-            AND t.id IN (
-                SELECT recent_ids.id
-                FROM (
-                    SELECT t.id
+    $recent_ids = array();
+    try {
+        $recent_rows = $vts_gate->scopedQuery($vts_decl,
+            "SELECT t.id
                     $base_from_sql
-                    $scope_where_sql
+                    $scope_where_sql AND {TENANT_SCOPE}
                     $order_sql
-                    LIMIT 1000
-                ) recent_ids
-            )";
+                    LIMIT 1000");
+        foreach ($recent_rows as $rr) { $recent_ids[] = intval($rr['id']); }
+    } catch (\Throwable $t) { error_log('view_timesheet recent ids: ' . $t->getMessage()); }
+    if ($recent_ids) {
+        $recent_1000_clause = " AND t.id IN (" . implode(',', $recent_ids) . ")";
+    } else {
+        $recent_ids_empty = true; // الأصل: IN على مجموعةٍ فارغة = لا صفوف
+    }
 }
 
 $stats = [
@@ -175,31 +182,19 @@ $stats = [
     'work_sum' => 0
 ];
 
-$stats_query = mysqli_query($conn, "SELECT
+if (!$recent_ids_empty) {
+    try {
+        $stats_rows = $vts_gate->scopedQuery($vts_decl, "SELECT
     IFNULL(SUM(t.executed_hours), 0) AS executed_sum,
     IFNULL(SUM(t.standby_hours), 0) AS standby_sum,
     IFNULL(SUM(t.total_fault_hours), 0) AS fault_sum,
     IFNULL(SUM(t.executed_hours + t.standby_hours), 0) AS work_sum
     $base_from_sql
     $where_sql
-    $recent_1000_clause
+    $recent_1000_clause AND {TENANT_SCOPE}
 ");
-
-if ($stats_query && mysqli_num_rows($stats_query) > 0) {
-    $stats = mysqli_fetch_assoc($stats_query);
-}
-
-$scope_where_operations = "1=1";
-if (!$is_super_admin) {
-    $scope_where_operations .= " AND EXISTS (
-        SELECT 1
-        FROM project p
-        LEFT JOIN users su ON su.id = p.created_by
-        LEFT JOIN clients sc ON sc.id = p.$project_client_column
-        LEFT JOIN users scu ON scu.id = sc.created_by
-        WHERE p.id = o.$operations_project_column
-          AND (su.company_id = $company_id OR scu.company_id = $company_id)
-    )";
+        if ($stats_rows) { $stats = $stats_rows[0]; }
+    } catch (\Throwable $t) { error_log('view_timesheet stats: ' . $t->getMessage()); }
 }
 
 // إضافة فلتر المشروع لمدير الموقع في استعلام العمليات
@@ -207,87 +202,59 @@ if (!$is_super_admin) {
 $operations = [];
 $operation_project_filter = "";
 if (!$is_super_admin && $is_site_manager && $session_project_id > 0) {
-    $operation_project_filter = " AND o.$operations_project_column = $session_project_id";
+    $operation_project_filter = " AND o.project_id = $session_project_id";
 }
 
 // Same type filter logic used in entry page (timesheet.php).
 $operation_type_filter = " AND 1=0";
+$operation_type_params = array();
 if ($equipment_type === '1' || $equipment_type === '2') {
-    $operation_type_filter = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE '$equipment_type' AND status = 'active')";
+    $operation_type_filter = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active')";
+    $operation_type_params[] = $equipment_type;
 }
 
-$operations_query = mysqli_query($conn, "SELECT
+try {
+    $operations = $vts_gate->scopedQuery(
+        array('scope' => array('o' => 'operations', 'e' => 'equipments')),
+        "SELECT
     o.id,
     e.code AS eq_code,
     e.name AS eq_name
     FROM operations o
     JOIN equipments e ON o.equipment = e.id
-    WHERE o.status = '1' AND $scope_where_operations $operation_project_filter $operation_type_filter
+    WHERE o.status = '1' $operation_project_filter $operation_type_filter AND {TENANT_SCOPE}
     ORDER BY e.code ASC, e.name ASC
-");
-if ($operations_query) {
-    while ($row = mysqli_fetch_assoc($operations_query)) {
-        $operations[] = $row;
-    }
-}
+", $operation_type_params);
+} catch (\Throwable $t) { error_log('view_timesheet operations: ' . $t->getMessage()); }
 
 $drivers = [];
 if ($operation_id > 0) {
     $equipment_id = 0;
-    $op_query = mysqli_query($conn, "SELECT o.equipment
-        FROM operations o
-        WHERE o.id = $operation_id AND $scope_where_operations
-        LIMIT 1");
-    if ($op_query && mysqli_num_rows($op_query) > 0) {
-        $op_row = mysqli_fetch_assoc($op_query);
-        $equipment_id = intval($op_row['equipment']);
-    }
+    try {
+        $op_row = $vts_gate->selectOne('operations', array('columns' => array('equipment'), 'where' => array('id' => $operation_id)));
+        if ($op_row) { $equipment_id = intval($op_row['equipment']); }
+    } catch (\Throwable $t) { error_log('view_timesheet op lookup: ' . $t->getMessage()); }
 
     if ($equipment_id > 0) {
-        $driver_sql = "SELECT d.id, d.name
+        try {
+            $drivers = $vts_gate->scopedQuery(
+                array('scope' => array('ed' => 'equipment_drivers', 'd' => 'employees')),
+                "SELECT d.id, d.name
             FROM equipment_drivers ed
             JOIN employees d ON ed.employee_id = d.id
-            WHERE ed.equipment_id = $equipment_id";
-
-        if (!$is_super_admin && db_table_has_column($conn, 'employees', 'company_id')) {
-            $driver_sql .= " AND d.company_id = $company_id";
-        } elseif (!$is_super_admin) {
-            $driver_sql .= " AND EXISTS (
-                SELECT 1
-                FROM equipment_drivers ed2
-                INNER JOIN operations o2 ON o2.equipment = ed2.equipment_id
-                INNER JOIN project p2 ON p2.id = o2.$operations_project_column
-                LEFT JOIN users su2 ON su2.id = p2.created_by
-                LEFT JOIN clients sc2 ON sc2.id = p2.$project_client_column
-                LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-                WHERE ed2.employee_id = d.id
-                  AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
-            )";
-        }
-
-        $driver_sql .= " ORDER BY d.name ASC";
-        $drivers_query = mysqli_query($conn, $driver_sql);
-        if ($drivers_query) {
-            while ($row = mysqli_fetch_assoc($drivers_query)) {
-                $drivers[] = $row;
-            }
-        }
+            WHERE ed.equipment_id = ? AND {TENANT_SCOPE} ORDER BY d.name ASC", array($equipment_id));
+        } catch (\Throwable $t) { error_log('view_timesheet drivers: ' . $t->getMessage()); }
     }
 }
 
 $projects = [];
-$projects_query = mysqli_query($conn, "SELECT DISTINCT p.id, p.name
+try {
+    $projects = $vts_gate->scopedQuery(array('scope' => array('p' => 'project')),
+        "SELECT DISTINCT p.id, p.name
     FROM project p
-    LEFT JOIN users su ON su.id = p.created_by
-    LEFT JOIN clients sc ON sc.id = p.$project_client_column
-    LEFT JOIN users scu ON scu.id = sc.created_by
-    WHERE p.status = 1" . (!$is_super_admin ? " AND (su.company_id = $company_id OR scu.company_id = $company_id)" : "") . "
+    WHERE p.status = 1 AND {TENANT_SCOPE}
     ORDER BY p.name ASC");
-if ($projects_query) {
-    while ($row = mysqli_fetch_assoc($projects_query)) {
-        $projects[] = $row;
-    }
-}
+} catch (\Throwable $t) { error_log('view_timesheet projects: ' . $t->getMessage()); }
 
 $select_sql = "SELECT
     t.id,
@@ -336,12 +303,15 @@ $select_sql = "SELECT
     COALESCE(d.name, 'غير محدد') AS driver_name
     $base_from_sql
     $where_sql
-    $recent_1000_clause
+    $recent_1000_clause AND {TENANT_SCOPE}
     $order_sql
 ";
 
 if ($export_all) {
-    $export_result = mysqli_query($conn, $select_sql);
+    $export_result = array();
+    try {
+        $export_result = vts_stringify_rows($vts_gate->scopedQuery($vts_decl, $select_sql));
+    } catch (\Throwable $t) { error_log('view_timesheet export: ' . $t->getMessage()); }
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=timesheet_filtered_export_' . date('Ymd_His') . '.csv');
 
@@ -360,7 +330,7 @@ if ($export_all) {
     ]);
 
     if ($export_result) {
-        while ($row = mysqli_fetch_assoc($export_result)) {
+        foreach ($export_result as $row) {
             $total_exec_standby = floatval($row['executed_hours']) + floatval($row['standby_hours']);
             $shift_text = $row['shift'] === 'D' ? 'صباحية' : 'مسائية';
             $equipment_type_text = $row['type'] === '1' ? 'حفار' : ($row['type'] === '2' ? 'قلاب' : ($row['type'] === '3' ? 'خرامة' : 'غير محدد'));
@@ -419,14 +389,12 @@ if ($export_all) {
     exit();
 }
 
-$result = mysqli_query($conn, $select_sql . $display_limit_sql);
-
 // Pre-fetch all rows into array + batch-load fault counts from bridge table
 $all_rows = [];
-if ($result) {
-    while ($_r = mysqli_fetch_assoc($result)) {
-        $all_rows[] = $_r;
-    }
+if (!$recent_ids_empty) {
+    try {
+        $all_rows = vts_stringify_rows($vts_gate->scopedQuery($vts_decl, $select_sql . $display_limit_sql));
+    } catch (\Throwable $t) { error_log('view_timesheet main: ' . $t->getMessage()); }
 }
 $fault_counts_map = [];
 // Pre-load recorded notes and failures for each timesheet
@@ -438,26 +406,22 @@ if (!empty($all_rows)) {
         $_ids_in = implode(',', $_ts_ids);
 
         // Load failure counts
-        $_fc_tbl = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
-        if ($_fc_tbl && $_fc_tbl->num_rows > 0) {
-            $_fc_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours WHERE timesheet_id IN ($_ids_in) AND status = 1 GROUP BY timesheet_id");
-            if ($_fc_res) {
-                while ($_fc = $_fc_res->fetch_assoc()) {
-                    $fault_counts_map[intval($_fc['timesheet_id'])] = intval($_fc['cnt']);
-                }
+        try {
+            $_fc_rows = $vts_gate->scopedQuery(array('scope' => array('f' => 'timesheet_failure_hours')),
+                "SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours f WHERE f.timesheet_id IN ($_ids_in) AND f.status = 1 AND {TENANT_SCOPE} GROUP BY timesheet_id");
+            foreach ($_fc_rows as $_fc) {
+                $fault_counts_map[intval($_fc['timesheet_id'])] = intval($_fc['cnt']);
             }
-        }
+        } catch (\Throwable $t) { error_log('view_timesheet fault counts: ' . $t->getMessage()); }
 
         // Load recorded notes
-        $_an_tbl = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
-        if ($_an_tbl && $_an_tbl->num_rows > 0) {
-            $_an_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_approval_notes WHERE timesheet_id IN ($_ids_in) AND status = 1 GROUP BY timesheet_id");
-            if ($_an_res) {
-                while ($_an = $_an_res->fetch_assoc()) {
-                    $notes_map[intval($_an['timesheet_id'])] = intval($_an['cnt']);
-                }
+        try {
+            $_an_rows = $vts_gate->scopedQuery(array('scope' => array('nn' => 'timesheet_approval_notes')),
+                "SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_approval_notes nn WHERE nn.timesheet_id IN ($_ids_in) AND nn.status = 1 AND {TENANT_SCOPE} GROUP BY timesheet_id");
+            foreach ($_an_rows as $_an) {
+                $notes_map[intval($_an['timesheet_id'])] = intval($_an['cnt']);
             }
-        }
+        } catch (\Throwable $t) { error_log('view_timesheet notes counts: ' . $t->getMessage()); }
     }
 }
 

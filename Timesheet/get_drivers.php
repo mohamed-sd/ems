@@ -9,86 +9,55 @@ include '../config.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
     while (ob_get_level()) ob_end_clean();
     exit;
 }
 
+// العزل عبر بوابة المستأجر — نطاق EXISTS القديم استُبدل بحقن company_id المباشر؛
+// والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$gdr_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet drivers endpoint super') : ems_tenant_db();
+
 if (isset($_GET['operation_id'])) {
     $operation_id = intval($_GET['operation_id']);
     $shift_type = isset($_GET['shift']) ? trim($_GET['shift']) : '';
 
-    $operation_scope = "";
-    if (!$is_super_admin) {
-        $operation_scope = " AND EXISTS (
-            SELECT 1
-            FROM project p
-            LEFT JOIN users su ON su.id = p.created_by
-                        LEFT JOIN clients sc ON sc.id = p.$project_client_column
-            LEFT JOIN users scu ON scu.id = sc.created_by
-            WHERE p.id = operations.project_id
-              AND (su.company_id = $company_id OR scu.company_id = $company_id)
-        )";
-    }
-
-    // جلب الآلية من جدول التشغيل ضمن نطاق الشركة
-    $op_res = mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id" . $operation_scope);
-    $op = $op_res ? mysqli_fetch_assoc($op_res) : null;
+    // جلب الآلية من جدول التشغيل ضمن نطاق الشركة (البوابة تحقن العزل)
+    $op = null;
+    try {
+        $op = $gdr_gate->selectOne('operations', array('columns' => array('equipment'), 'where' => array('id' => $operation_id)));
+    } catch (\Throwable $t) { error_log('get_drivers op: ' . $t->getMessage()); }
     if (!$op || !isset($op['equipment'])) {
         while (ob_get_level()) ob_end_clean();
         echo "<option value=''>-- اختر السائق --</option>";
         exit;
     }
-    $equipment_id = $op['equipment'];
+    $equipment_id = intval($op['equipment']);
 
-    $shift_filter_sql = "";
+    $gdr_filter = '';
+    $gdr_params = array($equipment_id);
     if ($shift_type === 'D' || $shift_type === 'N') {
-        $shift_filter_sql = " AND (ed.shift_type = 'B' OR ed.shift_type = '" . mysqli_real_escape_string($conn, $shift_type) . "')";
+        $gdr_filter .= " AND (ed.shift_type = 'B' OR ed.shift_type = ?) ";
+        $gdr_params[] = $shift_type;
     }
 
-    // جلب السائقين المرتبطين بهذه الآلية (النشطين فقط)
-    $sql = "SELECT d.id, d.name
+    // جلب السائقين المرتبطين بهذه الآلية (النشطين فقط) — قصرًا على أنواع الموظفين المشغّلة
+    $result = array();
+    try {
+        $result = $gdr_gate->scopedQuery(
+            array('scope' => array('ed' => 'equipment_drivers', 'd' => 'employees')),
+            "SELECT d.id, d.name
             FROM equipment_drivers ed
             JOIN employees d ON ed.employee_id = d.id
-            WHERE ed.equipment_id = $equipment_id
-              AND ed.status = 1" . $shift_filter_sql;
-
-    if (!$is_super_admin) {
-        if (db_table_has_column($conn, 'employees', 'company_id')) {
-            $sql .= " AND d.company_id = $company_id";
-        } else {
-            $sql .= " AND EXISTS (
-                SELECT 1
-                FROM equipment_drivers ed2
-                JOIN operations o2 ON o2.equipment = ed2.equipment_id
-                JOIN project p2 ON p2.id = o2.project_id
-                LEFT JOIN users su2 ON su2.id = p2.created_by
-                                LEFT JOIN clients sc2 ON sc2.id = p2.$project_client_column
-                LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-                WHERE ed2.employee_id = d.id
-                  AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
-            )";
-        }
-    }
-
-    // فلترة السائقين النشطين فقط (إن وُجد عمود status)
-    if (db_table_has_column($conn, 'employees', 'status')) {
-        $sql .= " AND d.status = 1";
-    }
-
-    // قصر القائمة على أنواع الموظفين المشغّلة للمعدات
-    $sql .= ems_operation_types_in_sql($conn, 'd');
-
-    $result = mysqli_query($conn, $sql);
+            WHERE ed.equipment_id = ?
+              AND ed.status = 1$gdr_filter AND d.status = 1" . ems_operation_types_in_sql($conn, 'd') . " AND {TENANT_SCOPE}", $gdr_params);
+    } catch (\Throwable $t) { error_log('get_drivers main: ' . $t->getMessage()); }
 
     while (ob_get_level()) ob_end_clean();
     echo "<option value=''>-- اختر السائق --</option>";
-    if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<option value='{$row['id']}'>{$row['name']}</option>";
-        }
+    foreach ($result as $row) {
+        echo "<option value='{$row['id']}'>{$row['name']}</option>";
     }
 }
 ?>

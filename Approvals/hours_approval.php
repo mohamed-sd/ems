@@ -39,33 +39,7 @@ if (!in_array($role, $allowed_roles)) {
     exit();
 }
 
-// التأكد من وجود الجداول (auto-migration)
-ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timesheet_id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `approval_level` tinyint(1) NOT NULL,
-  `approved_by` int(11) NOT NULL,
-  `approved_by_name` varchar(255) NOT NULL,
-  `approved_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_ts_level` (`timesheet_id`, `approval_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval.php');
-
-ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timesheet_id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `column_name` varchar(100) NOT NULL,
-  `column_label` varchar(255) NOT NULL,
-  `note_text` text NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `created_by_name` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval.php');
+// (أُسقط إنشاء الجداول التلقائي — الجدولان قائمان ومسجَّلان في سجل البوابة T_TENANT)
 
 // ─── خريطة الأدوار ────────────────────────────────────────────
 // النظام الهرمي الرباعي مع الألوان والأيقونات المحددة في المواصفات
@@ -81,22 +55,15 @@ $my_level   = $role_level_map[$role] ?? 0;
 $is_admin   = ($role === '-1');
 $prev_level = $my_level - 1;
 
-// ─── نطاق الشركة ─────────────────────────────────────────────
-$company_scope_ts = '';
-$company_scope_ta = '';
-if (!$is_admin && $company_id > 0) {
-    $company_scope_ts = " AND (t.company_id = $company_id OR t.company_id IS NULL)";
-    $company_scope_ta = " AND (ta.company_id = $company_id OR ta.company_id IS NULL)";
-}
-
-// ─── استعلام السجلات المعلقة (قيد الاعتماد) ────────────────
-$ops_project_col = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+// ─── نطاق الشركة: عبر بوابة المستأجر ({TENANT_SCOPE}) — فرع OR IS NULL القديم مكافئ
+// حرفيًا (صفر صفوف بلا شركة، مثبت من القاعدة)؛ والأدمن عبر forAllTenants المسجَّل.
+$ha_gate = $is_admin ? ems_tenant_db()->forAllTenants('hours approval admin') : ems_tenant_db();
 
 // ─── نطاق مدير الموقع (مشروع + منجم محدد) ────────────────────
 $site_scope_ts = '';
 if ($is_site_manager) {
     if ($session_proj > 0) {
-        $site_scope_ts .= " AND o.{$ops_project_col} = $session_proj";
+        $site_scope_ts .= " AND o.project_id = $session_proj";
     }
 }
 
@@ -127,6 +94,12 @@ if ($is_site_manager) {
     )";
 }
 
+// العزل (t) عبر {TENANT_SCOPE}؛ بقية LEFT JOIN والاستعلامات الفرعية إثراءٌ بلا تنطيق (سلوك الأصل)
+$ha_decl = array(
+    'scope'  => array('t' => 'timesheet'),
+    'enrich' => array('o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project',
+                      'd' => 'employees', 'u' => 'users', 'n' => 'timesheet_approval_notes', 'ta_l' => 'timesheet_approvals'),
+);
 $pending_sql = "
     SELECT t.*,
            d.name  AS driver_name,
@@ -143,23 +116,22 @@ $pending_sql = "
     LEFT JOIN operations    o ON o.id      = t.operator
     LEFT JOIN equipments    e ON e.id      = o.equipment
     LEFT JOIN suppliers     s ON s.id      = e.suppliers
-    LEFT JOIN project       p ON p.id      = o.$ops_project_col
+    LEFT JOIN project       p ON p.id      = o.project_id
     LEFT JOIN employees       d ON d.id      = t.employee_id
     LEFT JOIN users         u ON u.id      = t.user_id
     WHERE t.status = 1
       AND $pending_condition
-      $company_scope_ts
       $site_scope_ts
       $equip_type_where
+      AND {TENANT_SCOPE}
     ORDER BY t.date DESC, t.id DESC
     LIMIT 500
 ";
 
-$pending_result = $conn->query($pending_sql);
 $pending_rows   = [];
-if ($pending_result) {
-    while ($r = $pending_result->fetch_assoc()) $pending_rows[] = $r;
-}
+try {
+    $pending_rows = $ha_gate->scopedQuery($ha_decl, $pending_sql);
+} catch (\Throwable $t) { error_log('hours_approval pending: ' . $t->getMessage()); }
 
 // ─── السجلات المعتمدة نهائياً (آخر 100) ────────────────────
 $approved_sql = "
@@ -182,22 +154,25 @@ $approved_sql = "
     LEFT JOIN operations    o ON o.id      = t.operator
     LEFT JOIN equipments    e ON e.id      = o.equipment
     LEFT JOIN suppliers     s ON s.id      = e.suppliers
-    LEFT JOIN project       p ON p.id      = o.$ops_project_col
+    LEFT JOIN project       p ON p.id      = o.project_id
     LEFT JOIN employees       d ON d.id      = t.employee_id
     LEFT JOIN users         u ON u.id      = t.user_id
     WHERE t.status = 1
-      $company_scope_ts
       $site_scope_ts
       $equip_type_where
+      AND {TENANT_SCOPE}
     ORDER BY ta_final.approved_at DESC
     LIMIT 100
 ";
 
-$approved_result = $conn->query($approved_sql);
 $approved_rows   = [];
-if ($approved_result) {
-    while ($r = $approved_result->fetch_assoc()) $approved_rows[] = $r;
-}
+try {
+    $approved_rows = $ha_gate->scopedQuery(array(
+        'scope'  => array('t' => 'timesheet', 'ta_final' => 'timesheet_approvals'),
+        'enrich' => array('o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project',
+                          'd' => 'employees', 'u' => 'users', 'n' => 'timesheet_approval_notes'),
+    ), $approved_sql);
+} catch (\Throwable $t) { error_log('hours_approval approved: ' . $t->getMessage()); }
 
 // جلب أعداد الأعطال من جدول الأعطال لجميع السجلات دفعة واحدة
 $fault_counts_map = [];
@@ -207,16 +182,14 @@ $_all_ts_for_faults = array_merge(
 );
 $_all_ts_for_faults = array_values(array_unique(array_filter(array_map('intval', $_all_ts_for_faults))));
 if (!empty($_all_ts_for_faults)) {
-    $_fc_tbl_ha = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
-    if ($_fc_tbl_ha && $_fc_tbl_ha->num_rows > 0) {
-        $_fc_ids_ha = implode(',', $_all_ts_for_faults);
-        $_fc_res_ha = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours WHERE timesheet_id IN ($_fc_ids_ha) AND status = 1 GROUP BY timesheet_id");
-        if ($_fc_res_ha) {
-            while ($_fc_ha = $_fc_res_ha->fetch_assoc()) {
-                $fault_counts_map[intval($_fc_ha['timesheet_id'])] = intval($_fc_ha['cnt']);
-            }
+    $_fc_ids_ha = implode(',', $_all_ts_for_faults);
+    try {
+        $_fc_rows_ha = $ha_gate->scopedQuery(array('scope' => array('f' => 'timesheet_failure_hours')),
+            "SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours f WHERE f.timesheet_id IN ($_fc_ids_ha) AND f.status = 1 AND {TENANT_SCOPE} GROUP BY timesheet_id");
+        foreach ($_fc_rows_ha as $_fc_ha) {
+            $fault_counts_map[intval($_fc_ha['timesheet_id'])] = intval($_fc_ha['cnt']);
         }
-    }
+    } catch (\Throwable $t) { error_log('hours_approval fault counts: ' . $t->getMessage()); }
 }
 
 // ─── جلب تفاصيل كل مستويات الاعتماد للسجلات المعتمدة نهائياً ───
@@ -225,17 +198,16 @@ $approved_ids = array_column($approved_rows, 'id');
 $all_approval_details = []; // [timesheet_id][level] = row
 if (!empty($approved_ids)) {
     $ids_in = implode(',', array_map('intval', $approved_ids));
-    $adv_res = $conn->query(
-        "SELECT timesheet_id, approval_level, approved_by_name, approved_at
-         FROM timesheet_approvals
-         WHERE timesheet_id IN ($ids_in) AND status = 1
-         ORDER BY timesheet_id, approval_level ASC"
-    );
-    if ($adv_res) {
-        while ($adv = $adv_res->fetch_assoc()) {
+    try {
+        $adv_rows = $ha_gate->scopedQuery(array('scope' => array('ta' => 'timesheet_approvals')),
+            "SELECT timesheet_id, approval_level, approved_by_name, approved_at
+         FROM timesheet_approvals ta
+         WHERE ta.timesheet_id IN ($ids_in) AND ta.status = 1 AND {TENANT_SCOPE}
+         ORDER BY timesheet_id, approval_level ASC");
+        foreach ($adv_rows as $adv) {
             $all_approval_details[intval($adv['timesheet_id'])][intval($adv['approval_level'])] = $adv;
         }
-    }
+    } catch (\Throwable $t) { error_log('hours_approval details bulk: ' . $t->getMessage()); }
 }
 
 // ─── بيانات الفلاتر (قوائم فريدة) ───────────────────────────
@@ -595,8 +567,14 @@ include '../insidebar.php';
           // جلب تفاصيل الاعتمادات لكل سجل عند عرض مدير الموقع
           $approval_details = [];
           if ($is_site_manager) {
-              $ad_res = $conn->query("SELECT approval_level, approved_by_name, approved_at FROM timesheet_approvals WHERE timesheet_id = ".intval($row['id'])." AND status = 1 ORDER BY approval_level ASC");
-              if ($ad_res) while ($ad = $ad_res->fetch_assoc()) $approval_details[$ad['approval_level']] = $ad;
+              try {
+                  $ad_rows = $ha_gate->select('timesheet_approvals', array(
+                      'columns' => array('approval_level', 'approved_by_name', 'approved_at'),
+                      'where'   => array('timesheet_id' => intval($row['id']), 'status' => 1),
+                      'orderBy' => 'approval_level ASC',
+                  ));
+                  foreach ($ad_rows as $ad) { $approval_details[$ad['approval_level']] = $ad; }
+              } catch (\Throwable $t) { error_log('hours_approval site details: ' . $t->getMessage()); }
           }
           $_prow_equip = trim(($row['equip_code'] ?? '') . ' ' . ($row['equip_name'] ?? ''));
         ?>

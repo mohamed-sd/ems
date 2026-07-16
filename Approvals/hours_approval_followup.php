@@ -34,33 +34,7 @@ if (!in_array($role, $allowed_roles, true)) {
     exit();
 }
 
-// التأكد من وجود جداول الاعتماد والملاحظات
-ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timesheet_id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `approval_level` tinyint(1) NOT NULL,
-  `approved_by` int(11) NOT NULL,
-  `approved_by_name` varchar(255) NOT NULL,
-  `approved_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_ts_level` (`timesheet_id`, `approval_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval_followup.php');
-
-ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timesheet_id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `column_name` varchar(100) NOT NULL,
-  `column_label` varchar(255) NOT NULL,
-  `note_text` text NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `created_by_name` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval_followup.php');
+// (أُسقط إنشاء الجداول التلقائي — الجدولان قائمان ومسجَّلان في سجل البوابة T_TENANT)
 
 $is_admin = ($role === '-1');
 $is_site_manager = ($role === '5');
@@ -75,17 +49,14 @@ $level_role_name = array(
     4 => array('label' => 'مدير المشغلين', 'color' => '#5B7F1E', 'icon' => 'fa-shield-halved'),
 );
 
-$ops_project_col = ha_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
-
-$company_scope_ts = '';
-if (!$is_admin && $company_id > 0) {
-    $company_scope_ts = " AND (t.company_id = $company_id OR t.company_id IS NULL)";
-}
+// نطاق الشركة عبر بوابة المستأجر ({TENANT_SCOPE}) — فرع OR IS NULL القديم مكافئ حرفيًا
+// (صفر صفوف بلا شركة، مثبت من القاعدة)؛ والأدمن عبر forAllTenants المسجَّل.
+$haf_gate = $is_admin ? ems_tenant_db()->forAllTenants('hours approval followup admin') : ems_tenant_db();
 
 $site_scope_ts = '';
 if ($is_site_manager) {
     if ($session_proj > 0) {
-        $site_scope_ts .= " AND o.{$ops_project_col} = $session_proj";
+        $site_scope_ts .= " AND o.project_id = $session_proj";
     }
 }
 
@@ -152,24 +123,27 @@ $followup_sql = "
     LEFT JOIN operations o ON o.id = t.operator
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN suppliers s ON s.id = e.suppliers
-    LEFT JOIN project p ON p.id = o.$ops_project_col
+    LEFT JOIN project p ON p.id = o.project_id
     LEFT JOIN employees d ON d.id = t.employee_id
     WHERE t.status = 1
       AND $my_followup_where
-      $company_scope_ts
       $site_scope_ts
       $equip_type_where
+      AND {TENANT_SCOPE}
     ORDER BY COALESCE(my_approved_at, t.date) DESC, t.id DESC
     LIMIT 700
 ";
 
+// العزل (t) عبر البوابة؛ بقية LEFT JOIN والاستعلامات الفرعية إثراءٌ بلا تنطيق (سلوك الأصل)
+$haf_decl = array(
+    'scope'  => array('t' => 'timesheet'),
+    'enrich' => array('o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project',
+                      'd' => 'employees', 'n' => 'timesheet_approval_notes', 'ta_l' => 'timesheet_approvals'),
+);
 $followup_rows = array();
-$followup_result = $conn->query($followup_sql);
-if ($followup_result) {
-    while ($r = $followup_result->fetch_assoc()) {
-        $followup_rows[] = $r;
-    }
-}
+try {
+    $followup_rows = $haf_gate->scopedQuery($haf_decl, $followup_sql);
+} catch (\Throwable $t) { error_log('hours_approval_followup followup: ' . $t->getMessage()); }
 
 $final_sql = "
     SELECT t.*,
@@ -190,23 +164,24 @@ $final_sql = "
     LEFT JOIN operations o ON o.id = t.operator
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN suppliers s ON s.id = e.suppliers
-    LEFT JOIN project p ON p.id = o.$ops_project_col
+    LEFT JOIN project p ON p.id = o.project_id
     LEFT JOIN employees d ON d.id = t.employee_id
     WHERE t.status = 1
-      $company_scope_ts
       $site_scope_ts
       $equip_type_where
+      AND {TENANT_SCOPE}
     ORDER BY ta_final.approved_at DESC
     LIMIT 250
 ";
 
 $final_rows = array();
-$final_result = $conn->query($final_sql);
-if ($final_result) {
-    while ($r = $final_result->fetch_assoc()) {
-        $final_rows[] = $r;
-    }
-}
+try {
+    $final_rows = $haf_gate->scopedQuery(array(
+        'scope'  => array('t' => 'timesheet', 'ta_final' => 'timesheet_approvals'),
+        'enrich' => array('o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project',
+                          'd' => 'employees', 'n' => 'timesheet_approval_notes'),
+    ), $final_sql);
+} catch (\Throwable $t) { error_log('hours_approval_followup final: ' . $t->getMessage()); }
 
 $filter_projects = array_values(array_unique(array_filter(array_column($followup_rows, 'project_name'))));
 $filter_suppliers = array_values(array_unique(array_filter(array_column($followup_rows, 'supplier_name'))));
@@ -248,43 +223,44 @@ foreach ($final_rows   as $_r) { $_all_ts_ids[] = intval($_r['id']); }
 $_all_ts_ids = array_values(array_unique($_all_ts_ids));
 if (!empty($_all_ts_ids)) {
     $_ids_sql = implode(',', $_all_ts_ids);
-    $_app_res = $conn->query("SELECT timesheet_id, approval_level, approved_by_name, approved_at
-                               FROM timesheet_approvals
-                               WHERE timesheet_id IN ($_ids_sql) AND status = 1");
-    if ($_app_res) {
-        while ($_app_row = $_app_res->fetch_assoc()) {
+    try {
+        $_app_rows = $haf_gate->scopedQuery(array('scope' => array('ta' => 'timesheet_approvals')),
+            "SELECT timesheet_id, approval_level, approved_by_name, approved_at
+                               FROM timesheet_approvals ta
+                               WHERE ta.timesheet_id IN ($_ids_sql) AND ta.status = 1 AND {TENANT_SCOPE}");
+        foreach ($_app_rows as $_app_row) {
             $approvals_map[intval($_app_row['timesheet_id'])][intval($_app_row['approval_level'])] = array(
                 'name' => $_app_row['approved_by_name'],
                 'at'   => $_app_row['approved_at'],
             );
         }
-    }
+    } catch (\Throwable $t) { error_log('followup approvals map: ' . $t->getMessage()); }
 }
 
 // أعداد الأعطال لكل تايم شيت (جدول timesheet_failure_hours)
 $fault_counts_map_fup = array();
 $notes_counts_map_fup = array();
-$_fup_fc_check = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
-if ($_fup_fc_check && $_fup_fc_check->num_rows > 0 && !empty($_all_ts_ids)) {
+if (!empty($_all_ts_ids)) {
     $_fup_fc_ids = implode(',', $_all_ts_ids);
-    $_fup_fc_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours WHERE timesheet_id IN ($_fup_fc_ids) AND status = 1 GROUP BY timesheet_id");
-    if ($_fup_fc_res) {
-        while ($_fup_fc_row = $_fup_fc_res->fetch_assoc()) {
+    try {
+        $_fup_fc_rows = $haf_gate->scopedQuery(array('scope' => array('f' => 'timesheet_failure_hours')),
+            "SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours f WHERE f.timesheet_id IN ($_fup_fc_ids) AND f.status = 1 AND {TENANT_SCOPE} GROUP BY timesheet_id");
+        foreach ($_fup_fc_rows as $_fup_fc_row) {
             $fault_counts_map_fup[intval($_fup_fc_row['timesheet_id'])] = intval($_fup_fc_row['cnt']);
         }
-    }
+    } catch (\Throwable $t) { error_log('followup fault counts: ' . $t->getMessage()); }
 }
 
 // تحميل عدد الملاحظات المسجلة لكل تايم شيت
-$_fup_notes_check = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
-if ($_fup_notes_check && $_fup_notes_check->num_rows > 0 && !empty($_all_ts_ids)) {
+if (!empty($_all_ts_ids)) {
     $_fup_notes_ids = implode(',', $_all_ts_ids);
-    $_fup_notes_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_approval_notes WHERE timesheet_id IN ($_fup_notes_ids) AND status = 1 GROUP BY timesheet_id");
-    if ($_fup_notes_res) {
-        while ($_fup_notes_row = $_fup_notes_res->fetch_assoc()) {
+    try {
+        $_fup_notes_rows = $haf_gate->scopedQuery(array('scope' => array('nn' => 'timesheet_approval_notes')),
+            "SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_approval_notes nn WHERE nn.timesheet_id IN ($_fup_notes_ids) AND nn.status = 1 AND {TENANT_SCOPE} GROUP BY timesheet_id");
+        foreach ($_fup_notes_rows as $_fup_notes_row) {
             $notes_counts_map_fup[intval($_fup_notes_row['timesheet_id'])] = intval($_fup_notes_row['cnt']);
         }
-    }
+    } catch (\Throwable $t) { error_log('followup notes counts: ' . $t->getMessage()); }
 }
 
 // قائمة الأعمدة المتاحة للتعليق (مطابقة لشاشة الاعتماد الرئيسية)

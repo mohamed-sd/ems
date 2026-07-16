@@ -27,26 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notes = mysqli_real_escape_string($conn, $_POST['time_notes']);
     $user_id = approval_get_user_id();
 
-    $scope = "";
-    if (!$is_super_admin) {
-        if (db_table_has_column($conn, 'timesheet', 'company_id')) {
-            $scope = " AND company_id = $company_id";
-        } else {
-            $scope = " AND EXISTS (
-                SELECT 1
-                FROM operations o
-                JOIN project p ON p.id = o.project_id
-                LEFT JOIN users su ON su.id = p.created_by
-                LEFT JOIN clients sc ON sc.id = p.company_client_id
-                LEFT JOIN users scu ON scu.id = sc.created_by
-                WHERE o.id = timesheet.operator
-                  AND (su.company_id = $company_id OR scu.company_id = $company_id)
-            )";
-        }
-    }
-
-    $old_result = mysqli_query($conn, "SELECT id, status, time_notes FROM timesheet WHERE id = $id" . $scope . " LIMIT 1");
-    $old_data = $old_result ? mysqli_fetch_assoc($old_result) : null;
+    // فحص الملكية عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+    // (محرك الاعتمادات approval_create_request قناة محكومة قائمة — لا تُمسّ.)
+    $apv_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet aprovment super') : ems_tenant_db();
+    $old_data = null;
+    try {
+        $old_data = $apv_gate->selectOne('timesheet', array(
+            'columns' => array('id', 'status', 'time_notes'),
+            'where'   => array('id' => $id),
+        ));
+    } catch (\Throwable $t) { error_log('aprovment ownership: ' . $t->getMessage()); }
     if (!$old_data) {
         echo "<script>alert('البيان غير موجود');window.location.href='timesheet.php?type=$t';</script>";
         exit();

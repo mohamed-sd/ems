@@ -24,40 +24,29 @@ if ($equipment_id <= 0) {
     exit();
 }
 
-$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$eqp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('equipment profile super') : ems_tenant_db();
 
 // صلاحية اعتماد الكرت = صلاحية تعديل المعدات (دور الأسطول)
 $__pp = function_exists('check_page_permissions') ? check_page_permissions($conn, 'equipments_fleet') : ['can_edit' => true];
 $can_edit = !empty($__pp['can_edit']);
 
-$scope = "e.id = $equipment_id";
-if (!$is_super_admin && $equipments_has_company) {
-    $scope .= " AND e.company_id = $company_id";
-}
-
-$equipment_query = "SELECT e.*, s.name AS supplier_name, et.type AS equipment_type_name
+$equipment = null;
+try {
+    $eq_rows = $eqp_gate->scopedQuery(
+        array('scope' => array('e' => 'equipments'), 'enrich' => array('s' => 'suppliers')),
+        "SELECT e.*, s.name AS supplier_name, et.type AS equipment_type_name
                     FROM equipments e
                     LEFT JOIN suppliers s ON s.id = e.suppliers
                     LEFT JOIN equipments_types et ON et.id = e.type
-                    WHERE $scope
-                    LIMIT 1";
-$equipment_result = mysqli_query($conn, $equipment_query);
-$equipment = ($equipment_result && mysqli_num_rows($equipment_result) > 0) ? mysqli_fetch_assoc($equipment_result) : null;
+                    WHERE e.id = ? AND {TENANT_SCOPE}
+                    LIMIT 1", array($equipment_id));
+    $equipment = $eq_rows ? $eq_rows[0] : null;
+} catch (\Throwable $t) { error_log('equipment_profile card: ' . $t->getMessage()); }
 
 if (!$equipment) {
     header('Location: equipments.php?msg=المعدة+غير+موجودة+او+خارج+نطاق+الشركة+❌');
     exit();
-}
-
-$ops_scope = "o.equipment = $equipment_id";
-if (!$is_super_admin && $operations_has_company) {
-    $ops_scope .= " AND o.company_id = $company_id";
-}
-$ed_scope = "ed.equipment_id = $equipment_id";
-if (!$is_super_admin && $equipment_drivers_has_company) {
-    $ed_scope .= " AND ed.company_id = $company_id";
 }
 
 $operations_count = 0;
@@ -67,34 +56,36 @@ $drivers_count = 0;
 $hours_sum = 0;
 $standby_sum = 0;
 
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM operations o WHERE $ops_scope");
-if ($r) {
-    $operations_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(*) AS c FROM operations o WHERE $ops_scope AND o.status = 1");
-if ($r) {
-    $active_operations = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT o.project_id) AS c FROM operations o WHERE $ops_scope");
-if ($r) {
-    $projects_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS c FROM equipment_drivers ed WHERE $ed_scope AND ed.status = 1");
-if ($r) {
-    $drivers_count = intval(mysqli_fetch_assoc($r)['c']);
-}
-$r = mysqli_query($conn, "SELECT IFNULL(SUM(t.operator_hours),0) AS op_hours,
+try {
+    $r = $eqp_gate->scopedQuery(array('scope' => array('o' => 'operations')),
+        "SELECT COUNT(*) AS c FROM operations o WHERE o.equipment = ? AND {TENANT_SCOPE}", array($equipment_id));
+    if ($r) { $operations_count = intval($r[0]['c']); }
+    $r = $eqp_gate->scopedQuery(array('scope' => array('o' => 'operations')),
+        "SELECT COUNT(*) AS c FROM operations o WHERE o.equipment = ? AND o.status = 1 AND {TENANT_SCOPE}", array($equipment_id));
+    if ($r) { $active_operations = intval($r[0]['c']); }
+    $r = $eqp_gate->scopedQuery(array('scope' => array('o' => 'operations')),
+        "SELECT COUNT(DISTINCT o.project_id) AS c FROM operations o WHERE o.equipment = ? AND {TENANT_SCOPE}", array($equipment_id));
+    if ($r) { $projects_count = intval($r[0]['c']); }
+    $r = $eqp_gate->scopedQuery(array('scope' => array('ed' => 'equipment_drivers')),
+        "SELECT COUNT(DISTINCT ed.employee_id) AS c FROM equipment_drivers ed WHERE ed.equipment_id = ? AND ed.status = 1 AND {TENANT_SCOPE}", array($equipment_id));
+    if ($r) { $drivers_count = intval($r[0]['c']); }
+    $r = $eqp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations')),
+        "SELECT IFNULL(SUM(t.operator_hours),0) AS op_hours,
                                 IFNULL(SUM(t.operator_standby_hours),0) AS standby_hours
                          FROM timesheet t
                          INNER JOIN operations o ON o.id = t.operator
-                         WHERE $ops_scope AND t.status = 1");
-if ($r) {
-    $hours_row = mysqli_fetch_assoc($r);
-    $hours_sum = floatval($hours_row['op_hours']);
-    $standby_sum = floatval($hours_row['standby_hours']);
-}
+                         WHERE o.equipment = ? AND t.status = 1 AND {TENANT_SCOPE}", array($equipment_id));
+    if ($r) {
+        $hours_sum = floatval($r[0]['op_hours']);
+        $standby_sum = floatval($r[0]['standby_hours']);
+    }
+} catch (\Throwable $t) { error_log('equipment_profile KPIs: ' . $t->getMessage()); }
 
-$projects_list = mysqli_query($conn, "SELECT
+$projects_list = array();
+try {
+    $projects_list = $eqp_gate->scopedQuery(
+        array('scope' => array('o' => 'operations'), 'enrich' => array('p' => 'project', 't' => 'timesheet')),
+        "SELECT
                             p.id,
                             p.name,
                             p.project_code,
@@ -103,12 +94,17 @@ $projects_list = mysqli_query($conn, "SELECT
                         FROM operations o
                         LEFT JOIN project p ON p.id = o.project_id
                         LEFT JOIN timesheet t ON t.operator = o.id AND t.status = 1
-                        WHERE $ops_scope
+                        WHERE o.equipment = ? AND {TENANT_SCOPE}
                         GROUP BY p.id, p.name, p.project_code
                         ORDER BY total_hours DESC
-                        LIMIT 10");
+                        LIMIT 10", array($equipment_id));
+} catch (\Throwable $t) { error_log('equipment_profile projects: ' . $t->getMessage()); }
 
-$drivers_list = mysqli_query($conn, "SELECT
+$drivers_list = array();
+try {
+    $drivers_list = $eqp_gate->scopedQuery(
+        array('scope' => array('ed' => 'equipment_drivers', 'd' => 'employees')),
+        "SELECT
                            d.id,
                            d.name,
                            ed.start_date,
@@ -116,15 +112,15 @@ $drivers_list = mysqli_query($conn, "SELECT
                            ed.status
                         FROM equipment_drivers ed
                         INNER JOIN employees d ON d.id = ed.employee_id
-                        WHERE $ed_scope
+                        WHERE ed.equipment_id = ? AND {TENANT_SCOPE}
                         ORDER BY ed.id DESC
-                        LIMIT 10");
+                        LIMIT 10", array($equipment_id));
+} catch (\Throwable $t) { error_log('equipment_profile drivers: ' . $t->getMessage()); }
 
 // ═══════════════════════════════════════════════════════════════════
 //  كرت المعدة — جداول الأبناء (وثائق · حماية · مكوّنات · تاريخ)
 // ═══════════════════════════════════════════════════════════════════
 $can_edit_card = !empty($can_edit);
-$child_company_scope = (!$is_super_admin && $company_id > 0) ? " AND company_id = $company_id" : "";
 
 // قوائم ثابتة
 $DOC_TYPES        = ['تأمين', 'رخصة', 'شهادة فحص', 'شهادة سلامة', 'شهادة رفع', 'شهادة معايرة', 'أخرى'];
@@ -133,28 +129,27 @@ $PROTECTION_STATES = ['فعّال', 'يحتاج تجديداً', 'منتهٍ/م�
 $COMPONENT_TYPES  = ['محرك', 'هيدروليك', 'جيربوكس', 'دفرنس', 'مولّد', 'أخرى'];
 $EVENT_TYPES      = ['دخول', 'تشغيل بمشروع', 'خروج', 'ترحيل', 'صيانة', 'عطل', 'حادث/ضرر', 'تفتيش', 'إيقاف', 'إعادة تشغيل', 'تغيير مصدر', 'خروج/بيع'];
 
-// جلب السطور (مع تحقّق وجود الجداول للتوافق الرجعي)
+// جلب السطور — عبر البوابة (العزل بالحقن، وسم is_deleted يبقى شرطًا صريحًا كسلوك الأصل)
 $compliance_rows = $protection_rows = $component_rows = $history_rows = [];
-$fc_exists = db_table_has_column($conn, 'fleet_equipment_compliance', 'id');
-$fp_exists = db_table_has_column($conn, 'fleet_equipment_protection', 'id');
-$fcmp_exists = db_table_has_column($conn, 'fleet_equipment_component', 'id');
-$fh_exists = db_table_has_column($conn, 'fleet_equipment_history', 'id');
 
-if ($fc_exists) {
-    $q = mysqli_query($conn, "SELECT * FROM fleet_equipment_compliance WHERE equipment_id = $equipment_id AND is_deleted = 0$child_company_scope ORDER BY (expiry_date IS NULL), expiry_date ASC, id DESC");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) $compliance_rows[] = $r;
-}
-if ($fp_exists) {
-    $q = mysqli_query($conn, "SELECT p.* FROM fleet_equipment_protection p WHERE p.equipment_id = $equipment_id AND p.is_deleted = 0" . (!$is_super_admin && $company_id > 0 ? " AND p.company_id = $company_id" : '') . " ORDER BY p.id DESC");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) $protection_rows[] = $r;
-}
-if ($fcmp_exists) {
-    $q = mysqli_query($conn, "SELECT * FROM fleet_equipment_component WHERE equipment_id = $equipment_id AND is_deleted = 0$child_company_scope ORDER BY is_current DESC, id DESC");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) $component_rows[] = $r;
-}
-if ($fh_exists) {
-    $q = mysqli_query($conn, "SELECT h.*, pr.name AS project_name, u.name AS created_by_name FROM fleet_equipment_history h LEFT JOIN project pr ON pr.id = h.project_id LEFT JOIN users u ON u.id = h.created_by WHERE h.equipment_id = $equipment_id" . (!$is_super_admin && $company_id > 0 ? " AND h.company_id = $company_id" : '') . " ORDER BY h.event_date DESC, h.id DESC LIMIT 100");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) $history_rows[] = $r;
+try {
+    $compliance_rows = $eqp_gate->scopedQuery(array('scope' => array('fleet_equipment_compliance' => 'fleet_equipment_compliance')),
+        "SELECT * FROM fleet_equipment_compliance WHERE equipment_id = ? AND is_deleted = 0 AND {TENANT_SCOPE} ORDER BY (expiry_date IS NULL), expiry_date ASC, id DESC", array($equipment_id));
+} catch (\Throwable $t) { error_log('equipment_profile compliance: ' . $t->getMessage()); }
+try {
+    $protection_rows = $eqp_gate->scopedQuery(array('scope' => array('p' => 'fleet_equipment_protection')),
+        "SELECT p.* FROM fleet_equipment_protection p WHERE p.equipment_id = ? AND p.is_deleted = 0 AND {TENANT_SCOPE} ORDER BY p.id DESC", array($equipment_id));
+} catch (\Throwable $t) { error_log('equipment_profile protection: ' . $t->getMessage()); }
+try {
+    $component_rows = $eqp_gate->scopedQuery(array('scope' => array('fleet_equipment_component' => 'fleet_equipment_component')),
+        "SELECT * FROM fleet_equipment_component WHERE equipment_id = ? AND is_deleted = 0 AND {TENANT_SCOPE} ORDER BY is_current DESC, id DESC", array($equipment_id));
+} catch (\Throwable $t) { error_log('equipment_profile components: ' . $t->getMessage()); }
+try {
+    $history_rows = $eqp_gate->scopedQuery(
+        array('scope' => array('h' => 'fleet_equipment_history'), 'enrich' => array('pr' => 'project', 'u' => 'users')),
+        "SELECT h.*, pr.name AS project_name, u.name AS created_by_name FROM fleet_equipment_history h LEFT JOIN project pr ON pr.id = h.project_id LEFT JOIN users u ON u.id = h.created_by WHERE h.equipment_id = ? AND {TENANT_SCOPE} ORDER BY h.event_date DESC, h.id DESC LIMIT 100", array($equipment_id));
+} catch (\Throwable $t) { error_log('equipment_profile history: ' . $t->getMessage()); }
+if (true) {
 
     // الزمن المستغرق: الفارق بين كل حدث والحدث الأسبق له (الصفوف تنازلية ⇒ الأسبق هو التالي).
     if (!function_exists('ems_duration_ar')) {
@@ -199,16 +194,20 @@ $mnt_orders = array();
 $mnt_total = $mnt_closed = $mnt_failures = $mnt_open = 0;
 $mnt_downtime = 0.0; $mnt_cost = 0.0;
 $mnt_last = isset($equipment['last_maintenance_date']) ? $equipment['last_maintenance_date'] : null;
-$mnt_scope = $is_super_admin ? "" : " AND mo.company_id = $company_id";
-if (db_table_has_column($conn, 'mnt_order', 'id')) {
-    $q = mysqli_query($conn, "SELECT mo.id, mo.code, mo.source, mo.maint_type, mo.state,
+if (true) {
+    try {
+        $mnt_orders = $eqp_gate->scopedQuery(array('scope' => array('mo' => 'mnt_order')),
+            "SELECT mo.id, mo.code, mo.source, mo.maint_type, mo.state,
                                      mo.downtime_hours, mo.total_cost, mo.work_start, mo.work_end, mo.closed_at
                                 FROM mnt_order mo
-                               WHERE mo.equipment_id = $equipment_id AND COALESCE(mo.is_deleted,0)=0 $mnt_scope
-                               ORDER BY mo.id DESC LIMIT 50");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) { $mnt_orders[] = $r; }
+                               WHERE mo.equipment_id = ? AND COALESCE(mo.is_deleted,0)=0 AND {TENANT_SCOPE}
+                               ORDER BY mo.id DESC LIMIT 50", array($equipment_id));
+    } catch (\Throwable $t) { error_log('equipment_profile mnt orders: ' . $t->getMessage()); }
 
-    $agg = mysqli_query($conn, "SELECT COUNT(*) total,
+    $agg = array();
+    try {
+        $agg = $eqp_gate->scopedQuery(array('scope' => array('mo' => 'mnt_order')),
+            "SELECT COUNT(*) total,
                                        SUM(state='إغلاق') closed,
                                        SUM(state IN ('بلاغ','تنفيذ','فحص')) opened,
                                        COALESCE(SUM(downtime_hours),0) downtime,
@@ -216,8 +215,9 @@ if (db_table_has_column($conn, 'mnt_order', 'id')) {
                                        SUM(source='بلاغ') failures,
                                        MAX(closed_at) last_closed
                                   FROM mnt_order mo
-                                 WHERE mo.equipment_id = $equipment_id AND COALESCE(mo.is_deleted,0)=0 $mnt_scope");
-    if ($agg && ($a = mysqli_fetch_assoc($agg))) {
+                                 WHERE mo.equipment_id = ? AND COALESCE(mo.is_deleted,0)=0 AND {TENANT_SCOPE}", array($equipment_id));
+    } catch (\Throwable $t) { error_log('equipment_profile mnt agg: ' . $t->getMessage()); }
+    if ($agg && ($a = $agg[0])) {
         $mnt_total    = intval($a['total']);
         $mnt_closed   = intval($a['closed']);
         $mnt_open     = intval($a['opened']);
@@ -245,41 +245,52 @@ $INS_GOOD = array('سليم', 'صالح');
 $INS_NOTE = array('ملاحظة', 'ضرر طفيف', 'ضرر متوسط', 'تآكل ضمن الحد');
 $INS_CRIT = array('حرج', 'ضرر بالغ', 'يحتاج استبدال', 'يحتاج عمرة');
 $INS_NA   = array('لا ينطبق');
-if (db_table_has_column($conn, 'mnt_inspection', 'id')) {
-    $ins_scope = $is_super_admin ? "" : " AND i.company_id = $company_id";
-    $q = mysqli_query($conn, "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
+if (true) {
+    $q = array();
+    try {
+        $q = $eqp_gate->scopedQuery(
+            array('scope' => array('i' => 'mnt_inspection'), 'enrich' => array('u' => 'users', 'p' => 'project')),
+            "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
                                      i.overall_result, i.state, i.score, i.tech_readiness_state,
                                      i.equipment_condition, i.engine_condition, i.notes,
                                      u.name AS inspector_name, p.name AS project_name
                                 FROM mnt_inspection i
                                 LEFT JOIN users u ON u.id = i.inspector_id
                                 LEFT JOIN project p ON p.id = i.project_id
-                               WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0 $ins_scope
-                               ORDER BY i.id DESC LIMIT 50");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) { $ins_rows[] = $r; }
+                               WHERE i.equipment_id = ? AND COALESCE(i.is_deleted,0)=0 AND {TENANT_SCOPE}
+                               ORDER BY i.id DESC LIMIT 50", array($equipment_id));
+    } catch (\Throwable $t) { error_log('equipment_profile inspections: ' . $t->getMessage()); }
+    foreach ($q as $r) { $ins_rows[] = $r; }
 
-    $agg = mysqli_query($conn, "SELECT COUNT(*) total,
+    $agg = array();
+    try {
+        $agg = $eqp_gate->scopedQuery(array('scope' => array('i' => 'mnt_inspection')),
+            "SELECT COUNT(*) total,
                                        SUM(state IN ('مكتمل','مغلق')) done,
                                        SUM(state IN ('جديد','مجدول','قيد التنفيذ')) opened,
                                        MAX(COALESCE(completed_at, scheduled_date)) last_at
                                   FROM mnt_inspection i
-                                 WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0 $ins_scope");
-    if ($agg && ($a = mysqli_fetch_assoc($agg))) {
+                                 WHERE i.equipment_id = ? AND COALESCE(i.is_deleted,0)=0 AND {TENANT_SCOPE}", array($equipment_id));
+    } catch (\Throwable $t) { error_log('equipment_profile ins agg: ' . $t->getMessage()); }
+    if ($agg && ($a = $agg[0])) {
         $ins_total = intval($a['total']);
         $ins_done  = intval($a['done']);
         $ins_open  = intval($a['opened']);
         $ins_last  = !empty($a['last_at']) ? $a['last_at'] : null;
     }
     // ملاحظات حرجة + بنود كل تفتيش (للعرض المُفصّل في النافذة)
-    if (!empty($ins_rows) && db_table_has_column($conn, 'mnt_inspection_line', 'id')) {
+    if (!empty($ins_rows)) {
         $ins_ids_csv = implode(',', array_map(function ($r) { return intval($r['id']); }, $ins_rows));
-        $lscope = $is_super_admin ? "" : " AND l.company_id = $company_id";
-        $lq = mysqli_query($conn, "SELECT l.inspection_id, l.section, l.component, l.condition_state,
+        $lq = array();
+        try {
+            $lq = $eqp_gate->scopedQuery(array('scope' => array('l' => 'mnt_inspection_line')),
+                "SELECT l.inspection_id, l.section, l.component, l.condition_state,
                                           l.measured_value, l.note, l.recommendation
                                      FROM mnt_inspection_line l
-                                    WHERE l.inspection_id IN ($ins_ids_csv)$lscope
+                                    WHERE l.inspection_id IN ($ins_ids_csv) AND {TENANT_SCOPE}
                                     ORDER BY l.is_template DESC, l.seq, l.id");
-        if ($lq) while ($lr = mysqli_fetch_assoc($lq)) {
+        } catch (\Throwable $t) { error_log('equipment_profile ins lines: ' . $t->getMessage()); }
+        foreach ($lq as $lr) {
             $iid = intval($lr['inspection_id']);
             $cs  = (string) ($lr['condition_state'] ?? '');
             if (in_array($cs, $INS_CRIT, true)) { $ins_critical++; }
@@ -363,14 +374,17 @@ $pln_rows = array();
 $pln_total = $pln_active = $pln_due = 0;
 $pln_last = null; $pln_next = null;
 $today_str = date('Y-m-d');
-if (db_table_has_column($conn, 'mnt_plan', 'id')) {
-    $pln_scope = $is_super_admin ? "" : " AND pl.company_id = $company_id";
-    $q = mysqli_query($conn, "SELECT pl.id, pl.code, pl.name, pl.trigger_basis, pl.interval_value,
+if (true) {
+    $q = array();
+    try {
+        $q = $eqp_gate->scopedQuery(array('scope' => array('pl' => 'mnt_plan')),
+            "SELECT pl.id, pl.code, pl.name, pl.trigger_basis, pl.interval_value,
                                      pl.last_done_date, pl.last_done_meter, pl.next_due_date, pl.next_due_meter, pl.state
                                 FROM mnt_plan pl
-                               WHERE pl.equipment_id = $equipment_id AND COALESCE(pl.is_deleted,0)=0 $pln_scope
-                               ORDER BY pl.id DESC LIMIT 50");
-    if ($q) while ($r = mysqli_fetch_assoc($q)) {
+                               WHERE pl.equipment_id = ? AND COALESCE(pl.is_deleted,0)=0 AND {TENANT_SCOPE}
+                               ORDER BY pl.id DESC LIMIT 50", array($equipment_id));
+    } catch (\Throwable $t) { error_log('equipment_profile plans: ' . $t->getMessage()); }
+    foreach ($q as $r) {
         $pln_rows[] = $r;
         if ($r['state'] === 'نشطة') {
             $pln_active++;
@@ -633,14 +647,14 @@ include '../insidebar.php';
             <table id="equipmentProjectsTable" class="display" style="width:100%;">
                 <thead><tr><th>المشروع</th><th>كود المشروع</th><th>الساعات</th><th>عدد الورديات</th></tr></thead>
                 <tbody>
-                    <?php if ($projects_list): while ($row = mysqli_fetch_assoc($projects_list)): ?>
+                    <?php if ($projects_list): foreach ($projects_list as $row): ?>
                         <tr>
                             <td><?php if (!empty($row['id'])): ?><a href="../Projects/project_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a><?php else: ?>غير محدد<?php endif; ?></td>
                             <td><?php echo htmlspecialchars($row['project_code'] ?: '-'); ?></td>
                             <td><?php echo number_format($row['total_hours'], 0); ?></td>
                             <td><?php echo intval($row['shifts_count']); ?></td>
                         </tr>
-                    <?php endwhile; endif; ?>
+                    <?php endforeach; endif; ?>
                 </tbody>
             </table>
         </div>
@@ -652,14 +666,14 @@ include '../insidebar.php';
             <table id="equipmentDriversTable" class="display" style="width:100%;">
                 <thead><tr><th>المشغل</th><th>تاريخ البداية</th><th>تاريخ النهاية</th><th>الحالة</th></tr></thead>
                 <tbody>
-                    <?php if ($drivers_list): while ($row = mysqli_fetch_assoc($drivers_list)): ?>
+                    <?php if ($drivers_list): foreach ($drivers_list as $row): ?>
                         <tr>
                             <td><a href="../Employees/employee_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
                             <td><?php echo htmlspecialchars($row['start_date']); ?></td>
                             <td><?php echo htmlspecialchars(ems_format_open_end($row['end_date'])); ?></td>
                             <td><?php echo intval($row['status']) === 1 ? 'نشط' : 'متوقف'; ?></td>
                         </tr>
-                    <?php endwhile; endif; ?>
+                    <?php endforeach; endif; ?>
                 </tbody>
             </table>
         </div>

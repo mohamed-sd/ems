@@ -15,9 +15,10 @@ if (!$is_super_admin && $company_id <= 0) {
   exit();
 }
 
-$timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
-$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 $session_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
+
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$ts_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet screen super') : ems_tenant_db();
 
 if (!function_exists('normalize_timesheet_date')) {
   function normalize_timesheet_date($date_str)
@@ -88,10 +89,10 @@ if (!function_exists('parse_fault_items_json')) {
 }
 
 if (!function_exists('enrich_fault_items_from_failure_codes')) {
+  // failure_codes جدول مرجعي عالمي (T_GLOBAL) — قراءته عبر البوابة بلا تنطيق شركة
   function enrich_fault_items_from_failure_codes($conn, $equipment_type, $items)
   {
-    $has_failure_codes = db_table_has_column($conn, 'failure_codes', 'id');
-    if (!$has_failure_codes || empty($items)) {
+    if (empty($items)) {
       return $items;
     }
 
@@ -99,24 +100,28 @@ if (!function_exists('enrich_fault_items_from_failure_codes')) {
 
     foreach ($items as $i => $item) {
       $failure_code_id = isset($item['failure_code_id']) ? intval($item['failure_code_id']) : 0;
-      $full_code = mysqli_real_escape_string($conn, isset($item['full_code']) ? $item['full_code'] : '');
+      $full_code = isset($item['full_code']) ? strval($item['full_code']) : '';
 
+      $where = array('status' => 1);
       if ($failure_code_id > 0) {
-        $where = "id = $failure_code_id";
+        $where['id'] = $failure_code_id;
       } elseif ($full_code !== '') {
-        $where = "full_code = '$full_code'";
+        $where['full_code'] = $full_code;
       } else {
         continue;
       }
+      if ($equipment_type > 0) {
+        $where['equipment_type'] = $equipment_type;
+      }
 
-      $type_filter = $equipment_type > 0 ? " AND equipment_type = $equipment_type" : '';
-      $sql = "SELECT id, event_type_code, event_type_name, main_category_code, main_category_name, sub_category, failure_detail, full_code
-              FROM failure_codes
-              WHERE $where$type_filter AND status = 1
-              LIMIT 1";
-      $res = mysqli_query($conn, $sql);
-      if ($res && mysqli_num_rows($res) > 0) {
-        $row = mysqli_fetch_assoc($res);
+      $row = null;
+      try {
+        $row = ems_tenant_db()->selectOne('failure_codes', array(
+          'columns' => array('id', 'event_type_code', 'event_type_name', 'main_category_code', 'main_category_name', 'sub_category', 'failure_detail', 'full_code'),
+          'where'   => $where,
+        ));
+      } catch (\Throwable $t) { error_log('timesheet enrich fault: ' . $t->getMessage()); }
+      if ($row) {
         $items[$i]['failure_code_id'] = intval($row['id']);
         $items[$i]['event_type_code'] = $row['event_type_code'];
         $items[$i]['event_type_name'] = $row['event_type_name'];
@@ -133,30 +138,31 @@ if (!function_exists('enrich_fault_items_from_failure_codes')) {
 }
 
 if (!function_exists('save_timesheet_failure_hours')) {
-  function save_timesheet_failure_hours($conn, $timesheet_id, $operation_id, $timesheet_date, $equipment_type, $company_id, $user_id, $items)
+  // كتابة سطور الأعطال عبر البوابة ($gate) — الحذف الصلب لإعادة البناء عبر deleteRow المعلَّل،
+  // وcompany_id تحقنه البوابة (لا يُمرَّر يدويًا).
+  function save_timesheet_failure_hours($gate, $timesheet_id, $operation_id, $timesheet_date, $equipment_type, $company_id, $user_id, $items)
   {
-    $has_failures_table = db_table_has_column($conn, 'timesheet_failure_hours', 'id');
-    if (!$has_failures_table) {
-      return true;
-    }
-
     $timesheet_id = intval($timesheet_id);
     $operation_id = intval($operation_id);
     $equipment_type = intval($equipment_type);
-    $company_id = intval($company_id);
     $user_id = intval($user_id);
-    $timesheet_date = mysqli_real_escape_string($conn, (string) $timesheet_date);
+    $timesheet_date = (string) $timesheet_date;
 
     $equipment_id = 0;
     if ($operation_id > 0) {
-      $eq_res = mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id LIMIT 1");
-      if ($eq_res && mysqli_num_rows($eq_res) > 0) {
-        $eq_row = mysqli_fetch_assoc($eq_res);
-        $equipment_id = intval($eq_row['equipment']);
-      }
+      try {
+        $eq_row = $gate->selectOne('operations', array('columns' => array('equipment'), 'where' => array('id' => $operation_id)));
+        if ($eq_row) { $equipment_id = intval($eq_row['equipment']); }
+      } catch (\Throwable $t) { error_log('timesheet save faults op: ' . $t->getMessage()); }
     }
 
-    if (!mysqli_query($conn, "DELETE FROM timesheet_failure_hours WHERE timesheet_id = $timesheet_id")) {
+    try {
+      $old_rows = $gate->select('timesheet_failure_hours', array('columns' => array('id'), 'where' => array('timesheet_id' => $timesheet_id)));
+      foreach ($old_rows as $old_row) {
+        $gate->deleteRow('timesheet_failure_hours', intval($old_row['id']), 'rebuild fault lines on timesheet save');
+      }
+    } catch (\Throwable $t) {
+      error_log('timesheet save faults delete: ' . $t->getMessage());
       return false;
     }
 
@@ -170,24 +176,25 @@ if (!function_exists('save_timesheet_failure_hours')) {
         continue;
       }
 
-      $event_type_code = mysqli_real_escape_string($conn, isset($item['event_type_code']) ? $item['event_type_code'] : '');
-      $event_type_name = mysqli_real_escape_string($conn, isset($item['event_type_name']) ? $item['event_type_name'] : '');
-      $main_category_code = mysqli_real_escape_string($conn, isset($item['main_category_code']) ? $item['main_category_code'] : '');
-      $main_category_name = mysqli_real_escape_string($conn, isset($item['main_category_name']) ? $item['main_category_name'] : '');
-      $sub_category = mysqli_real_escape_string($conn, isset($item['sub_category']) ? $item['sub_category'] : '');
-      $failure_detail = mysqli_real_escape_string($conn, isset($item['failure_detail']) ? $item['failure_detail'] : '');
-      $full_code = mysqli_real_escape_string($conn, isset($item['full_code']) ? $item['full_code'] : '');
-
-      $sql = "INSERT INTO timesheet_failure_hours
-              (timesheet_id, operation_id, equipment_id, failure_code_id, equipment_type,
-               event_type_code, event_type_name, main_category_code, main_category_name,
-               sub_category, failure_detail, full_code, timesheet_date, company_id, created_by)
-              VALUES
-              ($timesheet_id, $operation_id, $equipment_id, $failure_code_id, $equipment_type,
-               '$event_type_code', '$event_type_name', '$main_category_code', '$main_category_name',
-               '$sub_category', '$failure_detail', '$full_code', '$timesheet_date', $company_id, $user_id)";
-
-      if (!mysqli_query($conn, $sql)) {
+      try {
+        $gate->insert('timesheet_failure_hours', array(
+          'timesheet_id' => $timesheet_id,
+          'operation_id' => $operation_id,
+          'equipment_id' => $equipment_id,
+          'failure_code_id' => $failure_code_id,
+          'equipment_type' => $equipment_type,
+          'event_type_code' => isset($item['event_type_code']) ? $item['event_type_code'] : '',
+          'event_type_name' => isset($item['event_type_name']) ? $item['event_type_name'] : '',
+          'main_category_code' => isset($item['main_category_code']) ? $item['main_category_code'] : '',
+          'main_category_name' => isset($item['main_category_name']) ? $item['main_category_name'] : '',
+          'sub_category' => isset($item['sub_category']) ? $item['sub_category'] : '',
+          'failure_detail' => isset($item['failure_detail']) ? $item['failure_detail'] : '',
+          'full_code' => isset($item['full_code']) ? $item['full_code'] : '',
+          'timesheet_date' => $timesheet_date,
+          'created_by' => $user_id,
+        ));
+      } catch (\Throwable $t) {
+        error_log('timesheet save faults insert: ' . $t->getMessage());
         return false;
       }
     }
@@ -202,10 +209,12 @@ if ($session_project_id <= 0) {
     // Super admin can access all projects, so we'll need to handle this differently
     $session_project_id = 0; // Will be handled with a WHERE clause
   } else {
-    // Regular user should have a project assigned, try to get one from their company
-    $project_check = mysqli_query($conn, "SELECT id FROM project WHERE company_id = $company_id AND status = 1 LIMIT 1");
-    if ($project_check && mysqli_num_rows($project_check) > 0) {
-      $proj = mysqli_fetch_assoc($project_check);
+    // Regular user should have a project assigned, try to get one from their company (عبر البوابة)
+    $proj = null;
+    try {
+      $proj = $ts_gate->selectOne('project', array('columns' => array('id'), 'where' => array('status' => 1)));
+    } catch (\Throwable $t) { error_log('timesheet project fallback: ' . $t->getMessage()); }
+    if ($proj) {
       $session_project_id = intval($proj['id']);
     } else {
       // No projects available for this company
@@ -272,10 +281,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     "user_id"
   ];
 
+  // القيم خامًا — البوابة تربطها معاملات مُهيّأة (لا تهريب يدوي بعد الآن)
   $values = [];
   foreach ($fields as $f) {
-    $val = isset($_POST[$f]) ? mysqli_real_escape_string($conn, $_POST[$f]) : '';
-    $values[$f] = $val;
+    $values[$f] = isset($_POST[$f]) ? (string)$_POST[$f] : '';
   }
 
   // Ensure date is always valid for both storage and edit form input[type=date].
@@ -284,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     echo "<script>alert('❌ تنسيق التاريخ غير صحيح');</script>";
     exit;
   }
-  $values['date'] = mysqli_real_escape_string($conn, $normalized_date);
+  $values['date'] = $normalized_date;
 
   // Parse multiple failure items from hidden JSON; fallback to legacy single fault field.
   $fault_items = parse_fault_items_json($posted_fault_items_json);
@@ -329,69 +338,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     }
   }
 
-  if ($id > 0) {
-    // UPDATE
-    $update_parts = [];
-    foreach ($fields as $f) {
-      $update_parts[] = "$f = '" . $values[$f] . "'";
-    }
-    $update_scope = "";
-    if (!$is_super_admin) {
-      if ($timesheet_has_company) {
-        $update_scope = " AND company_id = $company_id";
+  // الكتابة عبر معاملة البوابة المُدارة: سجل الدوام + إعادة بناء سطور الأعطال ذرّيًّا —
+  // البوابة تحقن company_id وتفرض ملكية الصف عند التعديل (بديل نطاق EXISTS القديم حرفيًا).
+  try {
+    $ts_gate->runInTransaction(function ($g) use ($id, $fields, $values, $fault_items) {
+      if ($id > 0) {
+        // UPDATE (الملكية تفرضها البوابة على WHERE id + company)
+        $update_data = array();
+        foreach ($fields as $f) { $update_data[$f] = $values[$f]; }
+        $g->update('timesheet', $update_data, array('id' => $id));
+        $saved_timesheet_id = $id;
       } else {
-        $update_scope = " AND EXISTS (
-          SELECT 1
-          FROM operations o
-          INNER JOIN project p ON p.id = o." . $operations_project_column . "
-          LEFT JOIN users su ON su.id = p.created_by
-          LEFT JOIN clients sc ON sc.id = p.client_id
-          LEFT JOIN users scu ON scu.id = sc.created_by
-          WHERE o.id = timesheet.operator
-            AND (su.company_id = $company_id OR scu.company_id = $company_id)
-        )";
+        // INSERT (company_id تحقنه البوابة تلقائيًا)
+        $insert_data = array();
+        foreach ($fields as $f) { $insert_data[$f] = $values[$f]; }
+        $saved_timesheet_id = intval($g->insert('timesheet', $insert_data));
       }
-    }
-    $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id" . $update_scope;
-  } else {
-    // INSERT
-    $insert_company_col = (!$is_super_admin && $timesheet_has_company) ? ",company_id" : "";
-    $insert_company_val = (!$is_super_admin && $timesheet_has_company) ? ", '" . $company_id . "'" : "";
-    $sql = "INSERT INTO timesheet (" . implode(",", $fields) . $insert_company_col . ")
-            VALUES ('" . implode("','", $values) . "'" . $insert_company_val . ")";
-  }
 
-  mysqli_begin_transaction($conn);
-  $ok = mysqli_query($conn, $sql);
-  if ($ok) {
-    $saved_timesheet_id = ($id > 0) ? $id : intval(mysqli_insert_id($conn));
-    $operation_id = isset($values['operator']) ? intval($values['operator']) : 0;
-    $equipment_type = isset($values['type']) ? intval($values['type']) : 0;
-    $created_by = isset($values['user_id']) ? intval($values['user_id']) : (isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0);
-    $saved = save_timesheet_failure_hours(
-      $conn,
-      $saved_timesheet_id,
-      $operation_id,
-      $values['date'],
-      $equipment_type,
-      $company_id,
-      $created_by,
-      $fault_items
-    );
+      $operation_id = isset($values['operator']) ? intval($values['operator']) : 0;
+      $equipment_type = isset($values['type']) ? intval($values['type']) : 0;
+      $created_by = isset($values['user_id']) ? intval($values['user_id']) : (isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0);
+      $saved = save_timesheet_failure_hours(
+        $g,
+        $saved_timesheet_id,
+        $operation_id,
+        $values['date'],
+        $equipment_type,
+        0 /* company تحقنها البوابة */,
+        $created_by,
+        $fault_items
+      );
+      if (!$saved) {
+        throw new \RuntimeException('فشل حفظ تفاصيل الأعطال المتعددة');
+      }
+    });
 
-    if (!$saved) {
-      mysqli_rollback($conn);
-      echo "<script>alert('❌ تم إلغاء الحفظ بسبب خطأ في حفظ تفاصيل الأعطال المتعددة');</script>";
-      exit;
-    }
-
-    mysqli_commit($conn);
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
     exit;
-  } else {
-    mysqli_rollback($conn);
-    echo "<script>alert('❌ خطأ في الحفظ: " . addslashes(mysqli_error($conn)) . "');</script>";
+  } catch (\Throwable $t) {
+    error_log('timesheet save: ' . $t->getMessage());
+    echo "<script>alert('❌ خطأ في الحفظ: " . addslashes($t->getMessage()) . "');</script>";
   }
 }
 
@@ -406,22 +393,13 @@ include("../inheader.php");
 include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
 $type_filter = "";
+$type_filter_params = array();
 if ($type != "") {
-  $type_filter = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE '$type' AND status = 'active') ";
+  $type_filter = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active') ";
+  $type_filter_params[] = $type;
 }
 
-$timesheet_project_scope_sql = "";
-if (!$is_super_admin) {
-  $timesheet_project_scope_sql = " AND EXISTS (
-    SELECT 1
-    FROM project p
-    LEFT JOIN users su ON su.id = p.created_by
-    LEFT JOIN clients sc ON sc.id = p.client_id
-    LEFT JOIN users scu ON scu.id = sc.created_by
-    WHERE p.id = o." . $operations_project_column . "
-      AND (su.company_id = $company_id OR scu.company_id = $company_id)
-  )";
-}
+// نطاق EXISTS القديم (شركة منشئ المشروع/العميل) استُبدل بحقن company_id عبر {TENANT_SCOPE}
 
 $today_rows = [];
 $today_filter_sql = "(DATE(t.date) = CURDATE()"
@@ -429,27 +407,11 @@ $today_filter_sql = "(DATE(t.date) = CURDATE()"
   . " OR STR_TO_DATE(t.date, '%d-%m-%Y') = CURDATE()"
   . " OR STR_TO_DATE(t.date, '%d/%m/%Y') = CURDATE())";
 
-$tenant_timesheet_filter_sql = "";
-if (!$is_super_admin) {
-  if ($timesheet_has_company) {
-    $tenant_timesheet_filter_sql = " AND t.company_id = $company_id";
-  } else {
-    $tenant_timesheet_filter_sql = " AND EXISTS (
-      SELECT 1
-      FROM project p2
-      LEFT JOIN users su2 ON su2.id = p2.created_by
-      LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
-      LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-      WHERE p2.id = o." . $operations_project_column . "
-        AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
-    )";
-  }
-}
-
 $type_sql = "";
+$today_params = array();
 if ($type !== "") {
-  $type_esc = mysqli_real_escape_string($conn, $type);
-  $type_sql = " AND t.type = '$type_esc'";
+  $type_sql = " AND t.type = ?";
+  $today_params[] = $type;
 }
 
 $role6_sql = "";
@@ -465,17 +427,16 @@ $today_rows_query = "SELECT t.id, t.shift, t.date, t.executed_hours,
                       FROM timesheet t
                       JOIN operations o ON t.operator = o.id
                       JOIN equipments e ON o.equipment = e.id
-                      JOIN project p ON o." . $operations_project_column . " = p.id
+                      JOIN project p ON o.project_id = p.id
                       JOIN employees d ON t.employee_id = d.id
-                      WHERE " . $today_filter_sql . $type_sql . $tenant_timesheet_filter_sql . $role6_sql . "
+                      WHERE " . $today_filter_sql . $type_sql . $role6_sql . " AND {TENANT_SCOPE}
                       ORDER BY t.date DESC, t.id DESC";
 
-$today_rows_result = mysqli_query($conn, $today_rows_query);
-if ($today_rows_result) {
-  while ($today_row = mysqli_fetch_assoc($today_rows_result)) {
-    $today_rows[] = $today_row;
-  }
-}
+try {
+  $today_rows = $ts_gate->scopedQuery(
+    array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 'p' => 'project', 'd' => 'employees')),
+    $today_rows_query, $today_params);
+} catch (\Throwable $t) { error_log('timesheet today rows: ' . $t->getMessage()); }
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
@@ -596,22 +557,22 @@ if ($today_rows_result) {
                 <?php
                 $project_filter = "";
                 if ($session_project_id > 0) {
-                  $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                  $project_filter = " AND o.project_id = '" . $session_project_id . "'";
                 }
-                $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                $op_res = array();
+                try {
+                  $op_res = $ts_gate->scopedQuery(
+                    array('scope' => array('o' => 'operations', 'e' => 'equipments', 'p' => 'project')),
+                    "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " $timesheet_project_scope_sql");
-
-
-
-                if ($op_res) {
-                  while ($op = mysqli_fetch_assoc($op_res)) {
-                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
-                  }
-                } else {
-                  error_log('Timesheet operators query failed (type=1): ' . mysqli_error($conn));
+                                            JOIN project p ON o.project_id = p.id
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " AND {TENANT_SCOPE}", $type_filter_params);
+                } catch (\Throwable $t) {
+                  error_log('Timesheet operators query failed (type=1): ' . $t->getMessage());
+                }
+                foreach ($op_res as $op) {
+                  echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
                 }
                 ?>
               </select>
@@ -941,22 +902,22 @@ if ($today_rows_result) {
                 <?php
                 $project_filter = "";
                 if ($session_project_id > 0) {
-                  $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                  $project_filter = " AND o.project_id = '" . $session_project_id . "'";
                 }
-                $op_res = mysqli_query($conn, "SELECT o.id, o.status, o." . $operations_project_column . " AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                $op_res = array();
+                try {
+                  $op_res = $ts_gate->scopedQuery(
+                    array('scope' => array('o' => 'operations', 'e' => 'equipments', 'p' => 'project')),
+                    "SELECT o.id, o.status, o.project_id AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " $timesheet_project_scope_sql");
-
-
-
-                if ($op_res) {
-                  while ($op = mysqli_fetch_assoc($op_res)) {
-                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
-                  }
-                } else {
-                  error_log('Timesheet operators query failed (type=2): ' . mysqli_error($conn));
+                                            JOIN project p ON o.project_id = p.id
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " AND {TENANT_SCOPE}", $type_filter_params);
+                } catch (\Throwable $t) {
+                  error_log('Timesheet operators query failed (type=2): ' . $t->getMessage());
+                }
+                foreach ($op_res as $op) {
+                  echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
                 }
                 ?>
               </select>
@@ -969,26 +930,13 @@ if ($today_rows_result) {
               <!-- <select name="employee_id"  required>
             <option value="">-- اختر السائق --</option>
             <?php
-            $driver_scope_sql = "1=1";
-            if (!$is_super_admin) {
-              if (db_table_has_column($conn, 'employees', 'company_id')) {
-                $driver_scope_sql = "company_id = $company_id";
-              } else {
-                $driver_scope_sql = "EXISTS (
-                  SELECT 1
-                  FROM equipment_drivers ed
-                  INNER JOIN operations o ON o.equipment = ed.equipment_id
-                  INNER JOIN project p ON p.id = o." . $operations_project_column . "
-                  LEFT JOIN users su ON su.id = p.created_by
-                  LEFT JOIN clients sc ON sc.id = p.client_id
-                  LEFT JOIN users scu ON scu.id = sc.created_by
-                  WHERE ed.employee_id = employees.id
-                    AND (su.company_id = $company_id OR scu.company_id = $company_id)
-                )";
-              }
-            }
-            $dr_res = mysqli_query($conn, "SELECT id, name FROM employees WHERE $driver_scope_sql" . ems_operation_types_in_sql($conn, ''));
-            while ($dr = mysqli_fetch_assoc($dr_res)) {
+            // (كتلة معطَّلة في الواجهة — الاستعلام يبقى منفَّذًا عبر البوابة حفاظًا على البايتات داخل التعليق)
+            $dr_res = array();
+            try {
+              $dr_res = $ts_gate->scopedQuery(array('scope' => array('employees' => 'employees')),
+                "SELECT id, name FROM employees WHERE 1=1" . ems_operation_types_in_sql($conn, '') . " AND {TENANT_SCOPE}");
+            } catch (\Throwable $t) { error_log('timesheet drivers list: ' . $t->getMessage()); }
+            foreach ($dr_res as $dr) {
               echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
             }
             ?>
@@ -1332,22 +1280,22 @@ if ($today_rows_result) {
                 <?php
                 $project_filter = "";
                 if ($session_project_id > 0) {
-                  $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                  $project_filter = " AND o.project_id = '" . $session_project_id . "'";
                 }
-                $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                $op_res = array();
+                try {
+                  $op_res = $ts_gate->scopedQuery(
+                    array('scope' => array('o' => 'operations', 'e' => 'equipments', 'p' => 'project')),
+                    "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " $timesheet_project_scope_sql");
-
-
-
-                if ($op_res) {
-                  while ($op = mysqli_fetch_assoc($op_res)) {
-                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
-                  }
-                } else {
-                  error_log('Timesheet operators query failed (type=3): ' . mysqli_error($conn));
+                                            JOIN project p ON o.project_id = p.id
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " AND {TENANT_SCOPE}", $type_filter_params);
+                } catch (\Throwable $t) {
+                  error_log('Timesheet operators query failed (type=3): ' . $t->getMessage());
+                }
+                foreach ($op_res as $op) {
+                  echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
                 }
                 ?>
               </select>

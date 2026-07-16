@@ -1,4 +1,12 @@
 <?php
+/**
+ * [قناة محرّك الاعتمادات المحكومة — دفعة ز · 2026-07-16]
+ * جداول approval_requests/approval_steps/approval_workflow_rules مصنّفة T_RESTRICTED في
+ * سجل البوابة: بوابة المستأجر ترفضها للشاشات، وهذا المحرّك هو قناتها الوحيدة (سابقة
+ * ناقل الأحداث ems_* ومحرّك الصيانة). المنفّذ العام approval_execute_payload يطبّق
+ * حمولاتٍ أنشأتها الشاشات بعد فحص ملكيةٍ عبر البوابة وقت الإنشاء، ولا يُنفَّذ إلا
+ * باكتمال سلسلة موافقات الأدوار — فالوصول الخام هنا داخل القناة لا خرقًا لها.
+ */
 if (!defined('APPROVAL_WORKFLOW_INCLUDED')) {
     define('APPROVAL_WORKFLOW_INCLUDED', true);
 }
@@ -597,6 +605,88 @@ if (!function_exists('approval_reject_request')) {
             approval_db_rollback($conn);
             return approval_response(false, $ex->getMessage());
         }
+    }
+}
+
+if (!function_exists('approval_build_requests_where')) {
+    /** بناء شرط قائمة الطلبات (فلتر الحالة + رؤية الدور) — داخل القناة حصرًا */
+    function approval_build_requests_where($status_filter, $user_role, $user_id, $conn) {
+        $where = "1=1";
+        if ($status_filter !== 'all') {
+            $status_esc = mysqli_real_escape_string($conn, $status_filter);
+            $where .= " AND ar.status = '$status_esc'";
+        }
+        $user_id = intval($user_id);
+        if ($user_role !== '-1') {
+            $role_esc = mysqli_real_escape_string($conn, strval($user_role));
+            $where .= " AND (
+        ar.requested_by = $user_id
+        OR EXISTS (
+            SELECT 1 FROM approval_steps aps
+            WHERE aps.request_id = ar.id
+              AND aps.status = 'pending'
+              AND (FIND_IN_SET('$role_esc', aps.role_required) > 0)
+        )
+        OR EXISTS (
+            SELECT 1 FROM approval_steps aps_done
+            WHERE aps_done.request_id = ar.id
+              AND aps_done.approved_by = $user_id
+              AND aps_done.status IN ('approved', 'rejected')
+        )
+    )";
+        }
+        return $where;
+    }
+}
+
+if (!function_exists('approval_fetch_requests_for_listing')) {
+    /** قراءة قائمة الطلبات لشاشة الاعتمادات — جداول القناة المقيّدة تُقرأ هنا لا في الشاشة */
+    function approval_fetch_requests_for_listing($status_filter, $user_role, $user_id, $conn) {
+        $where = approval_build_requests_where($status_filter, $user_role, $user_id, $conn);
+        $sql = "SELECT ar.*,
+               u.username AS requester_name,
+               aps.role_required AS pending_role,
+               aps.step_order AS pending_step
+        FROM approval_requests ar
+        LEFT JOIN users u ON u.id = ar.requested_by
+        LEFT JOIN approval_steps aps
+            ON aps.request_id = ar.id
+           AND aps.status = 'pending'
+           AND aps.step_order = (
+               SELECT MIN(s2.step_order)
+               FROM approval_steps s2
+               WHERE s2.request_id = ar.id
+                 AND s2.status = 'pending'
+           )
+        WHERE $where
+        ORDER BY ar.id DESC";
+        $result = mysqli_query($conn, $sql);
+        $rows = [];
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) { $rows[] = $row; }
+        }
+        return $rows;
+    }
+}
+
+if (!function_exists('approval_fetch_request_stats')) {
+    /** إحصاءات الطلبات بحسب الحالة لنفس نطاق الرؤية */
+    function approval_fetch_request_stats($status_filter, $user_role, $user_id, $conn) {
+        $where = approval_build_requests_where($status_filter, $user_role, $user_id, $conn);
+        $stats_sql = "SELECT
+        status,
+        COUNT(*) as count
+    FROM approval_requests ar
+    WHERE ($where)
+    GROUP BY status;";
+        $stats_result = mysqli_query($conn, $stats_sql);
+        $stats = ['pending' => 0, 'approved' => 0, 'rejected' => 0];
+        if ($stats_result) {
+            while ($stat = mysqli_fetch_assoc($stats_result)) {
+                $stats[$stat['status']] = $stat['count'];
+            }
+        }
+        return $stats;
     }
 }
 

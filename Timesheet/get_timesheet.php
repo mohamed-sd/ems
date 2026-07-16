@@ -13,12 +13,14 @@ header('Content-Type: application/json; charset=utf-8');
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
     echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;
 }
+
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$gts_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet fetch super') : ems_tenant_db();
 
 if (!isset($_GET['id'])) {
     echo json_encode([], JSON_UNESCAPED_UNICODE);
@@ -51,26 +53,10 @@ if (!function_exists('normalize_timesheet_date')) {
 }
 
 $id = intval($_GET['id']);
-$scope = "";
-if (!$is_super_admin) {
-    if (db_table_has_column($conn, 'timesheet', 'company_id')) {
-        $scope = " AND company_id = $company_id";
-    } else {
-        $scope = " AND EXISTS (
-            SELECT 1
-            FROM operations o
-            JOIN project p ON p.id = o.project_id
-            LEFT JOIN users su ON su.id = p.created_by
-                        LEFT JOIN clients sc ON sc.id = p.$project_client_column
-            LEFT JOIN users scu ON scu.id = sc.created_by
-            WHERE o.id = timesheet.operator
-              AND (su.company_id = $company_id OR scu.company_id = $company_id)
-        )";
-    }
-}
-
-$q = mysqli_query($conn, "SELECT * FROM timesheet WHERE id = $id" . $scope . " LIMIT 1");
-$row = $q ? mysqli_fetch_assoc($q) : null;
+$row = null;
+try {
+    $row = $gts_gate->selectOne('timesheet', array('where' => array('id' => $id)));
+} catch (\Throwable $t) { error_log('get_timesheet: ' . $t->getMessage()); }
 if (!$row) {
     echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;

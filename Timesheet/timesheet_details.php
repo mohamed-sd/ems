@@ -474,24 +474,15 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $project = intval($_GET['id']);
-$details_scope = "";
-if (!$is_super_admin) {
-    if (db_table_has_column($conn, 'timesheet', 'company_id')) {
-        $details_scope = " AND t.company_id = $company_id";
-    } else {
-        $details_scope = " AND EXISTS (
-            SELECT 1
-            FROM project p2
-            LEFT JOIN users su2 ON su2.id = p2.created_by
-            LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
-            LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-            WHERE p2.id = o.project_id
-              AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
-        )";
-    }
-}
 
-$sql = "SELECT  * , t.id,
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$tsdet_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet details super') : ems_tenant_db();
+
+$result = array();
+try {
+    $result = $tsdet_gate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'd' => 'employees', 'o' => 'operations', 'e' => 'equipments', 'p' => 'project')),
+        "SELECT  * , t.id,
                d.name AS driver_name,
                e.code AS equipment_name,
                e.name AS equipment_fullname,
@@ -503,32 +494,25 @@ $sql = "SELECT  * , t.id,
         JOIN operations o ON t.operator = o.id
         JOIN equipments e ON o.equipment = e.id
         JOIN project p ON o.project_id = p.id
-        WHERE t.id = $project" . $details_scope . "
-        ORDER BY t.date DESC";
-
-$result = mysqli_query($conn, $sql);
+        WHERE t.id = ? AND {TENANT_SCOPE}
+        ORDER BY t.date DESC", array($project));
+} catch (\Throwable $t) { error_log('timesheet_details main: ' . $t->getMessage()); }
 
 // Pre-load fault records from bridge table
 $ts_fault_records = [];
-$_fc_tbl_check = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
-if ($_fc_tbl_check && $_fc_tbl_check->num_rows > 0) {
-    $_fault_res2 = $conn->query("SELECT * FROM timesheet_failure_hours WHERE timesheet_id = " . intval($project) . " AND status = 1 ORDER BY id ASC");
-    if ($_fault_res2) {
-        while ($_fr = $_fault_res2->fetch_assoc()) $ts_fault_records[] = $_fr;
-    }
-}
+try {
+    $ts_fault_records = $tsdet_gate->select('timesheet_failure_hours', array(
+        'where' => array('timesheet_id' => intval($project), 'status' => 1), 'orderBy' => 'id ASC'));
+} catch (\Throwable $t) { error_log('timesheet_details faults: ' . $t->getMessage()); }
 
 // Pre-load approval notes
 $ts_approval_notes = [];
-$_an_tbl_check = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
-if ($_an_tbl_check && $_an_tbl_check->num_rows > 0) {
-    $_an_res2 = $conn->query("SELECT * FROM timesheet_approval_notes WHERE timesheet_id = " . intval($project) . " AND status = 1 ORDER BY created_at ASC");
-    if ($_an_res2) {
-        while ($_an = $_an_res2->fetch_assoc()) $ts_approval_notes[] = $_an;
-    }
-}
+try {
+    $ts_approval_notes = $tsdet_gate->select('timesheet_approval_notes', array(
+        'where' => array('timesheet_id' => intval($project), 'status' => 1), 'orderBy' => 'created_at ASC'));
+} catch (\Throwable $t) { error_log('timesheet_details notes: ' . $t->getMessage()); }
 
-if ($result) while ($row = mysqli_fetch_assoc($result)) {
+if ($result) foreach ($result as $row) {
     $shift_display = $row['shift'] == "D" ? "صباح" : "مساء";
     $shift_class   = $row['shift'] == "D" ? "day" : "night";
     $shift_icon    = $row['shift'] == "D" ? "fas fa-sun" : "fas fa-moon";

@@ -16,50 +16,8 @@ if (!in_array($status_filter, $allowed_status, true)) {
     $status_filter = 'pending';
 }
 
-$where = "1=1";
-if ($status_filter !== 'all') {
-    $status_esc = mysqli_real_escape_string($conn, $status_filter);
-    $where .= " AND ar.status = '$status_esc'";
-}
-
-if ($user_role !== '-1') {
-    $role_esc = mysqli_real_escape_string($conn, $user_role);
-    $where .= " AND (
-        ar.requested_by = $user_id
-        OR EXISTS (
-            SELECT 1 FROM approval_steps aps
-            WHERE aps.request_id = ar.id
-              AND aps.status = 'pending'
-              AND (FIND_IN_SET('$role_esc', aps.role_required) > 0)
-        )
-        OR EXISTS (
-            SELECT 1 FROM approval_steps aps_done
-            WHERE aps_done.request_id = ar.id
-              AND aps_done.approved_by = $user_id
-              AND aps_done.status IN ('approved', 'rejected')
-        )
-    )";
-}
-
-$sql = "SELECT ar.*,
-               u.username AS requester_name,
-               aps.role_required AS pending_role,
-               aps.step_order AS pending_step
-        FROM approval_requests ar
-        LEFT JOIN users u ON u.id = ar.requested_by
-        LEFT JOIN approval_steps aps
-            ON aps.request_id = ar.id
-           AND aps.status = 'pending'
-           AND aps.step_order = (
-               SELECT MIN(s2.step_order)
-               FROM approval_steps s2
-               WHERE s2.request_id = ar.id
-                 AND s2.status = 'pending'
-           )
-        WHERE $where
-        ORDER BY ar.id DESC";
-
-$result = mysqli_query($conn, $sql);
+// جداول المحرّك مقيّدة (T_RESTRICTED) — القراءة عبر دوال القناة في includes/approval_workflow.php حصرًا.
+$result = approval_fetch_requests_for_listing($status_filter, $user_role, $user_id, $conn);
 ?>
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
@@ -80,21 +38,8 @@ $result = mysqli_query($conn, $sql);
     </div>
 
     <?php
-    // احصائيات الطلبات
-    $stats_sql = "SELECT 
-        status,
-        COUNT(*) as count
-    FROM approval_requests ar
-    WHERE ($where)
-    GROUP BY status;";
-    
-    $stats_result = mysqli_query($conn, $stats_sql);
-    $stats = ['pending' => 0, 'approved' => 0, 'rejected' => 0];
-    if ($stats_result) {
-        while ($stat = mysqli_fetch_assoc($stats_result)) {
-            $stats[$stat['status']] = $stat['count'];
-        }
-    }
+    // احصائيات الطلبات — عبر قناة المحرّك
+    $stats = approval_fetch_request_stats($status_filter, $user_role, $user_id, $conn);
     $total = $stats['pending'] + $stats['approved'] + $stats['rejected'];
     ?>
 
@@ -210,7 +155,7 @@ $result = mysqli_query($conn, $sql);
                     </thead>
                     <tbody>
                     <?php if ($result): ?>
-                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                        <?php foreach ($result as $row): ?>
                             <?php
                             $can_act = false;
                             if ($row['status'] === 'pending') {
@@ -317,7 +262,7 @@ $result = mysqli_query($conn, $sql);
                                     </div>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
                             <td colspan="8" class="text-center py-4">

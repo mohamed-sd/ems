@@ -9,36 +9,22 @@ include '../config.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
 if (!$is_super_admin && $company_id <= 0) {
     while (ob_get_level()) ob_end_clean();
     die(json_encode(['error' => 'Unauthorized company context'], JSON_UNESCAPED_UNICODE));
 }
 
-$tenant_scope = "";
-if (!$is_super_admin) {
-    if (db_table_has_column($conn, 'timesheet', 'company_id')) {
-        $tenant_scope = " AND t.company_id = $company_id";
-    } else {
-        $tenant_scope = " AND EXISTS (
-            SELECT 1
-            FROM project p2
-            LEFT JOIN users su2 ON su2.id = p2.created_by
-            LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
-            LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-            WHERE p2.id = o.$operations_project_column
-              AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
-        )";
-    }
-}
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$gtd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet datatable super') : ems_tenant_db();
+$gtd_decl = array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 'p' => 'project', 'd' => 'employees'));
 
 // Get parameters from DataTable
 $draw = isset($_GET['draw']) ? intval($_GET['draw']) : 1;
 $start = isset($_GET['start']) ? intval($_GET['start']) : 0;
 $length = isset($_GET['length']) ? intval($_GET['length']) : 10;
-$search = isset($_GET['search']['value']) ? mysqli_real_escape_string($conn, $_GET['search']['value']) : '';
-$type = isset($_GET['type']) ? mysqli_real_escape_string($conn, $_GET['type']) : '';
+$search = isset($_GET['search']['value']) ? trim((string)$_GET['search']['value']) : '';
+$type = isset($_GET['type']) ? (string)$_GET['type'] : '';
 $today_only = isset($_GET['today_only']) ? $_GET['today_only'] : '0';
 $today_filter = '';
 if ($today_only === '1') {
@@ -58,58 +44,64 @@ $orderColumnIndex = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0
 $orderDir = isset($_GET['order'][0]['dir']) && $_GET['order'][0]['dir'] === 'asc' ? 'ASC' : 'DESC';
 $orderColumn = isset($columns[$orderColumnIndex]) ? $columns[$orderColumnIndex] : 't.id';
 
+// فلاتر مُمعلَمة (?) — العزل يُحقن عبر {TENANT_SCOPE}
 $type_filter = '';
+$type_params = array();
 if ($type !== '') {
-    $type_filter = " AND t.type = '$type'";
+    $type_filter = " AND t.type = ?";
+    $type_params[] = $type;
 }
 
-// Build WHERE clause
-$where = "WHERE 1=1" . $type_filter . $tenant_scope . $today_filter;
+$where = "WHERE 1=1" . $type_filter . $today_filter;
+$where_params = $type_params;
 
 if ($_SESSION['user']['role'] == "6") {
     $user_filter = $_SESSION['user']['id'];
-    $where .= " AND t.user_id = '$user_filter'";
+    $where .= " AND t.user_id = ?";
+    $where_params[] = $user_filter;
 }
 
 // Add search filter
 if (!empty($search)) {
-    $where .= " AND (e.code LIKE '%$search%'
-                OR e.name LIKE '%$search%'
-                OR d.name LIKE '%$search%'
-                OR t.date LIKE '%$search%'
-                OR p.name LIKE '%$search%')";
+    $where .= " AND (e.code LIKE ?
+                OR e.name LIKE ?
+                OR d.name LIKE ?
+                OR t.date LIKE ?
+                OR p.name LIKE ?)";
+    for ($si = 0; $si < 5; $si++) { $where_params[] = '%' . $search . '%'; }
 }
 
-// Count total records (without filtering)
-$totalQuery = "SELECT COUNT(*) as total
-               FROM timesheet t
+$gtd_joins = "FROM timesheet t
                JOIN operations o ON t.operator = o.id
                JOIN equipments e ON o.equipment = e.id
-               JOIN project p ON o.$operations_project_column = p.id
-               JOIN employees d ON t.employee_id = d.id
-               WHERE 1=1" . $type_filter . $tenant_scope . $today_filter;
+               JOIN project p ON o.project_id = p.id
+               JOIN employees d ON t.employee_id = d.id";
 
+// Count total records (without filtering)
+$total_where = "WHERE 1=1" . $type_filter . $today_filter;
+$total_params = $type_params;
 if ($_SESSION['user']['role'] == "6") {
-    $totalQuery .= " AND t.user_id = '$user_filter'";
+    $total_where .= " AND t.user_id = ?";
+    $total_params[] = $user_filter;
 }
-
-$totalResult = mysqli_query($conn, $totalQuery);
-$totalRecords = $totalResult ? (mysqli_fetch_assoc($totalResult)['total'] ?? 0) : 0;
+$totalRecords = 0;
+try {
+    $trows = $gtd_gate->scopedQuery($gtd_decl, "SELECT COUNT(*) as total $gtd_joins $total_where AND {TENANT_SCOPE}", $total_params);
+    $totalRecords = $trows ? ($trows[0]['total'] ?? 0) : 0;
+} catch (\Throwable $t) { error_log('get_timesheet_data total: ' . $t->getMessage()); }
 
 // Count filtered records
-$filteredQuery = "SELECT COUNT(*) as total
-                  FROM timesheet t
-                  JOIN operations o ON t.operator = o.id
-                  JOIN equipments e ON o.equipment = e.id
-                  JOIN project p ON o.$operations_project_column = p.id
-                  JOIN employees d ON t.employee_id = d.id
-                  $where";
-
-$filteredResult = mysqli_query($conn, $filteredQuery);
-$filteredRecords = $filteredResult ? (mysqli_fetch_assoc($filteredResult)['total'] ?? 0) : 0;
+$filteredRecords = 0;
+try {
+    $frows = $gtd_gate->scopedQuery($gtd_decl, "SELECT COUNT(*) as total $gtd_joins $where AND {TENANT_SCOPE}", $where_params);
+    $filteredRecords = $frows ? ($frows[0]['total'] ?? 0) : 0;
+} catch (\Throwable $t) { error_log('get_timesheet_data filtered: ' . $t->getMessage()); }
 
 // Fetch data
-$query = "SELECT t.id, t.shift, t.date, t.executed_hours,
+$result = null;
+try {
+    $result = $gtd_gate->scopedQuery($gtd_decl,
+        "SELECT t.id, t.shift, t.date, t.executed_hours,
           t.standby_hours, t.total_fault_hours, t.bucket_hours, t.jackhammer_hours,
           t.extra_hours, t.extra_hours_total, t.dependence_hours, t.total_work_hours,
           t.status, t.work_notes, t.hr_fault,
@@ -117,25 +109,18 @@ $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
           p.name AS project_name,
           o.id AS operation_id,
           d.name AS driver_name
-          FROM timesheet t
-          JOIN operations o ON t.operator = o.id
-          JOIN equipments e ON o.equipment = e.id
-          JOIN project p ON o.$operations_project_column = p.id
-          JOIN employees d ON t.employee_id = d.id
-          $where
+          $gtd_joins
+          $where AND {TENANT_SCOPE}
           ORDER BY $orderColumn $orderDir
-          LIMIT $start, $length";
-
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
-    die(json_encode(['error' => mysqli_error($conn)]));
+          LIMIT $start, $length", $where_params);
+} catch (\Throwable $t) {
+    die(json_encode(['error' => $t->getMessage()]));
 }
 
 $data = [];
 $i = $start + 1;
 
-while ($row = mysqli_fetch_assoc($result)) {
+foreach ($result as $row) {
     $totalwork = $row['standby_hours'] + $row['bucket_hours'] + $row['jackhammer_hours'] +
                  $row['extra_hours'] + $row['dependence_hours'];
     $totalall = $row['total_work_hours'] + $row['total_fault_hours'];

@@ -18,11 +18,8 @@ if (!$is_super_admin && $company_id <= 0) {
     exit();
 }
 
-$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
-$timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$emp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('employee profile super') : ems_tenant_db();
 
 $employee_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($employee_id <= 0) {
@@ -30,23 +27,17 @@ if ($employee_id <= 0) {
     exit();
 }
 
-$driver_scope = "d.id = $employee_id";
-if (!$is_super_admin && $drivers_has_company) {
-    $driver_scope .= " AND d.company_id = $company_id";
-}
-
-$supplier_join_scope = '';
-if (!$is_super_admin && $suppliers_has_company) {
-    $supplier_join_scope = " AND s.company_id = $company_id";
-}
-
-$driver_sql = "SELECT d.*, s.name AS supplier_name
+$driver = null;
+try {
+    $drv_rows = $emp_gate->scopedQuery(
+        array('scope' => array('d' => 'employees'), 'enrich' => array('s' => 'suppliers')),
+        "SELECT d.*, s.name AS supplier_name
                FROM employees d
-               LEFT JOIN suppliers s ON d.supplier_id = s.id$supplier_join_scope
-               WHERE $driver_scope
-               LIMIT 1";
-$driver_result = mysqli_query($conn, $driver_sql);
-$driver = ($driver_result && mysqli_num_rows($driver_result) > 0) ? mysqli_fetch_assoc($driver_result) : null;
+               LEFT JOIN suppliers s ON d.supplier_id = s.id
+               WHERE d.id = ? AND {TENANT_SCOPE}
+               LIMIT 1", array($employee_id));
+    $driver = $drv_rows ? $drv_rows[0] : null;
+} catch (\Throwable $t) { error_log('employee_profile card: ' . $t->getMessage()); }
 
 if (!$driver) {
     header("Location: employees.php?msg=السائق+غير+موجود+او+خارج+نطاق+الشركة+❌");
@@ -56,20 +47,17 @@ if (!$driver) {
 // ════════════════════════════════════════════════════════════════════════════
 // 🔗 حساب الدخول المرتبط بهذا الموظف (الخيار ب: users.employee_id)
 // ════════════════════════════════════════════════════════════════════════════
-$users_has_employee_link = db_table_has_column($conn, 'users', 'employee_id');
-$users_has_company_col   = db_table_has_column($conn, 'users', 'company_id');
-$users_has_status_col    = db_table_has_column($conn, 'users', 'status');
-$users_not_deleted_cond  = db_table_has_column($conn, 'users', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
-
-// معالج «سحب الحساب» (POST) — يجب أن يسبق أي إخراج.
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['account_action'] ?? '') === 'revoke' && $users_has_employee_link) {
+// معالج «سحب الحساب» (POST) — يجب أن يسبق أي إخراج. (فكّ الرابط وتعطيل الحساب عبر البوابة —
+// العزل وشرط الارتباط بالموظف يفرضهما where، والشركة تحقنها البوابة.)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['account_action'] ?? '') === 'revoke') {
     $target_uid = intval($_POST['target_uid'] ?? 0);
-    $revoke_scope = (!$is_super_admin && $users_has_company_col) ? " AND company_id = $company_id" : "";
-    $revoke_status = $users_has_status_col ? ", status='inactive'" : "";
-    // يفكّ الرابط ويُعطّل الحساب، شرط أن يكون مرتبطاً فعلاً بهذا الموظف وضمن نطاق الشركة.
-    $revoke_sql = "UPDATE users SET employee_id = NULL $revoke_status, updated_at = NOW()
-                   WHERE id = $target_uid AND employee_id = $employee_id $revoke_scope";
-    if (@mysqli_query($conn, $revoke_sql) && mysqli_affected_rows($conn) > 0) {
+    $revoked = 0;
+    try {
+        $revoked = $emp_gate->update('users',
+            array('employee_id' => null, 'status' => 'inactive', 'updated_at' => date('Y-m-d H:i:s')),
+            array('id' => $target_uid, 'employee_id' => $employee_id));
+    } catch (\Throwable $t) { error_log('employee_profile revoke: ' . $t->getMessage()); }
+    if ($revoked > 0) {
         header("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('✅ تم سحب الحساب من الموظف وتعطيله'));
     } else {
         header("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('❌ تعذّر سحب الحساب أو لا توجد صلاحية'));
@@ -77,44 +65,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['account_action'] ?? '') ==
     exit();
 }
 
-// جلب الحساب المرتبط (إن وُجد)
-$linked_user = null;
-if ($users_has_employee_link) {
-    $lu_res = mysqli_query($conn, "SELECT id, name, username, role, " . ($users_has_status_col ? "status" : "'active' AS status") . "
-                                   FROM users WHERE employee_id = $employee_id $users_not_deleted_cond LIMIT 1");
-    if ($lu_res && mysqli_num_rows($lu_res) > 0) {
-        $linked_user = mysqli_fetch_assoc($lu_res);
-    }
-}
+// ميزة ربط الحساب قائمة (users.employee_id عمود قائم — علم التوافق الرجعي مسطَّح)
+$users_has_employee_link = true;
 
-// خريطة أسماء الأدوار للعرض
+// جلب الحساب المرتبط (إن وُجد) — البوابة تستثني المحذوف ناعمًا (سلوك الأصل نفسه)
+$linked_user = null;
+try {
+    $linked_user = $emp_gate->selectOne('users', array(
+        'columns' => array('id', 'name', 'username', 'role', 'status'),
+        'where'   => array('employee_id' => $employee_id),
+    ));
+} catch (\Throwable $t) { error_log('employee_profile linked user: ' . $t->getMessage()); }
+
+// خريطة أسماء الأدوار للعرض (roles جدول مرجعي عالمي)
 $roles_map = array();
-$roles_map_res = mysqli_query($conn, "SELECT id, name FROM roles");
-if ($roles_map_res) {
-    while ($rm = mysqli_fetch_assoc($roles_map_res)) {
+try {
+    foreach ($emp_gate->select('roles', array('columns' => array('id', 'name'))) as $rm) {
         $roles_map[(string) $rm['id']] = $rm['name'];
     }
-}
+} catch (\Throwable $t) { error_log('employee_profile roles: ' . $t->getMessage()); }
 
 // صلاحية إدارة الحسابات = صلاحية تعديل شاشة المستخدمين
 $acc_perms = check_page_permissions($conn, 'main/users.php');
 $can_manage_accounts = !empty($acc_perms['can_edit']);
 
-$timesheet_scope = "t.employee_id = '$employee_id' AND t.status = 1";
+// النطاقات: العزل يُحقن عبر {TENANT_SCOPE} — تبقى شروط الحالة/المعرّف مُمعلَمةً
+$timesheet_scope = "t.employee_id = ? AND t.status = 1";
 $operations_scope = "o.status = 1";
-$equipment_drivers_scope = "ed.employee_id = $employee_id";
 
-if (!$is_super_admin && $timesheet_has_company) {
-    $timesheet_scope .= " AND t.company_id = $company_id";
-}
-if (!$is_super_admin && $operations_has_company) {
-    $operations_scope .= " AND o.company_id = $company_id";
-}
-if (!$is_super_admin && $equipment_drivers_has_company) {
-    $equipment_drivers_scope .= " AND ed.company_id = $company_id";
-}
-
-$stats_sql = "SELECT
+$stats = array();
+try {
+    $rows_ = $emp_gate->scopedQuery(array('scope' => array('t' => 'timesheet')),
+        "SELECT
                 COUNT(*) AS shifts_count,
                 IFNULL(SUM(t.operator_hours), 0) AS total_operator_hours,
                                 IFNULL(SUM(t.operator_standby_hours), 0) AS total_standby_hours,
@@ -122,25 +104,34 @@ $stats_sql = "SELECT
                 MIN(t.date) AS first_shift_date,
                 MAX(t.date) AS last_shift_date
               FROM timesheet t
-              WHERE $timesheet_scope";
-$stats_result = mysqli_query($conn, $stats_sql);
-$stats = ($stats_result && mysqli_num_rows($stats_result) > 0) ? mysqli_fetch_assoc($stats_result) : array();
+              WHERE $timesheet_scope AND {TENANT_SCOPE}", array($employee_id));
+    $stats = $rows_ ? $rows_[0] : array();
+} catch (\Throwable $t) { error_log('employee_profile stats: ' . $t->getMessage()); }
 
-$projects_sql = "SELECT COUNT(DISTINCT o.project_id) AS projects_count
+$projects_row = array('projects_count' => 0);
+try {
+    $rows_ = $emp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations')),
+        "SELECT COUNT(DISTINCT o.project_id) AS projects_count
                  FROM timesheet t
                  INNER JOIN operations o ON o.id = t.operator
-                 WHERE $timesheet_scope AND $operations_scope";
-$projects_result = mysqli_query($conn, $projects_sql);
-$projects_row = ($projects_result && mysqli_num_rows($projects_result) > 0) ? mysqli_fetch_assoc($projects_result) : array('projects_count' => 0);
+                 WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}", array($employee_id));
+    if ($rows_) { $projects_row = $rows_[0]; }
+} catch (\Throwable $t) { error_log('employee_profile projects count: ' . $t->getMessage()); }
 
-$equipments_count_sql = "SELECT COUNT(DISTINCT o.equipment) AS equipments_count
+$equipments_count_row = array('equipments_count' => 0);
+try {
+    $rows_ = $emp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations')),
+        "SELECT COUNT(DISTINCT o.equipment) AS equipments_count
                          FROM timesheet t
                          INNER JOIN operations o ON o.id = t.operator
-                         WHERE $timesheet_scope AND $operations_scope";
-$equipments_count_result = mysqli_query($conn, $equipments_count_sql);
-$equipments_count_row = ($equipments_count_result && mysqli_num_rows($equipments_count_result) > 0) ? mysqli_fetch_assoc($equipments_count_result) : array('equipments_count' => 0);
+                         WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}", array($employee_id));
+    if ($rows_) { $equipments_count_row = $rows_[0]; }
+} catch (\Throwable $t) { error_log('employee_profile equip count: ' . $t->getMessage()); }
 
-$top_equipment_sql = "SELECT
+$top_equipment = null;
+try {
+    $rows_ = $emp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments')),
+        "SELECT
                         e.id,
                         e.name,
                         e.code,
@@ -149,81 +140,87 @@ $top_equipment_sql = "SELECT
                       FROM timesheet t
                       INNER JOIN operations o ON o.id = t.operator
                       INNER JOIN equipments e ON e.id = o.equipment
-                      WHERE $timesheet_scope AND $operations_scope
+                      WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}
                       GROUP BY e.id, e.name, e.code
                       ORDER BY total_hours DESC
-                      LIMIT 1";
-$top_equipment_result = mysqli_query($conn, $top_equipment_sql);
-$top_equipment = ($top_equipment_result && mysqli_num_rows($top_equipment_result) > 0) ? mysqli_fetch_assoc($top_equipment_result) : null;
+                      LIMIT 1", array($employee_id));
+    $top_equipment = $rows_ ? $rows_[0] : null;
+} catch (\Throwable $t) { error_log('employee_profile top equip: ' . $t->getMessage()); }
 
-$equipment_breakdown_sql = "SELECT
+$equipment_labels = array();
+$equipment_hours = array();
+try {
+    $rows_ = $emp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments')),
+        "SELECT
                               CONCAT(IFNULL(e.name, 'بدون اسم'), ' (', IFNULL(e.code, '-'), ')') AS equipment_label,
                                                             IFNULL(SUM(t.operator_hours), 0) AS total_hours
                             FROM timesheet t
                             INNER JOIN operations o ON o.id = t.operator
                             INNER JOIN equipments e ON e.id = o.equipment
-                            WHERE $timesheet_scope AND $operations_scope
+                            WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}
                             GROUP BY e.id, e.name, e.code
                             ORDER BY total_hours DESC
-                            LIMIT 8";
-$equipment_breakdown_result = mysqli_query($conn, $equipment_breakdown_sql);
-$equipment_labels = array();
-$equipment_hours = array();
-if ($equipment_breakdown_result) {
-    while ($row = mysqli_fetch_assoc($equipment_breakdown_result)) {
+                            LIMIT 8", array($employee_id));
+    foreach ($rows_ as $row) {
         $equipment_labels[] = $row['equipment_label'];
         $equipment_hours[] = floatval($row['total_hours']);
     }
-}
+} catch (\Throwable $t) { error_log('employee_profile equip breakdown: ' . $t->getMessage()); }
 
-$monthly_sql = "SELECT
+$monthly_labels = array();
+$monthly_total = array();
+$monthly_operator = array();
+$monthly_standby = array();
+try {
+    $rows_ = $emp_gate->scopedQuery(array('scope' => array('t' => 'timesheet', 'o' => 'operations')),
+        "SELECT
                   DATE_FORMAT(STR_TO_DATE(t.date, '%Y-%m-%d'), '%Y-%m') AS ym,
                                     IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS total_hours,
                                     IFNULL(SUM(t.operator_hours), 0) AS operator_hours,
                                     IFNULL(SUM(t.operator_standby_hours), 0) AS standby_hours
                 FROM timesheet t
                 INNER JOIN operations o ON o.id = t.operator
-                WHERE $timesheet_scope AND $operations_scope
+                WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}
                 GROUP BY ym
-                ORDER BY ym";
-$monthly_result = mysqli_query($conn, $monthly_sql);
-$monthly_labels = array();
-$monthly_total = array();
-$monthly_operator = array();
-$monthly_standby = array();
-if ($monthly_result) {
-    while ($row = mysqli_fetch_assoc($monthly_result)) {
+                ORDER BY ym", array($employee_id));
+    foreach ($rows_ as $row) {
         $monthly_labels[] = $row['ym'] ? $row['ym'] : 'غير محدد';
         $monthly_total[] = floatval($row['total_hours']);
         $monthly_operator[] = floatval($row['operator_hours']);
         $monthly_standby[] = floatval($row['standby_hours']);
     }
-}
+} catch (\Throwable $t) { error_log('employee_profile monthly: ' . $t->getMessage()); }
 
-$project_breakdown_sql = "SELECT
+$project_labels = array();
+$project_hours = array();
+$project_shifts = array();
+try {
+    $rows_ = $emp_gate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'o' => 'operations'), 'enrich' => array('p' => 'project')),
+        "SELECT
                             IFNULL(p.name, 'مشروع غير محدد') AS project_name,
                                                         IFNULL(SUM(t.operator_hours), 0) AS total_hours,
                             COUNT(t.id) AS shifts_count
                           FROM timesheet t
                           INNER JOIN operations o ON o.id = t.operator
                           LEFT JOIN project p ON p.id = o.project_id
-                          WHERE $timesheet_scope AND $operations_scope
+                          WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}
                           GROUP BY p.id, p.name
                           ORDER BY total_hours DESC
-                          LIMIT 8";
-$project_breakdown_result = mysqli_query($conn, $project_breakdown_sql);
-$project_labels = array();
-$project_hours = array();
-$project_shifts = array();
-if ($project_breakdown_result) {
-    while ($row = mysqli_fetch_assoc($project_breakdown_result)) {
+                          LIMIT 8", array($employee_id));
+    foreach ($rows_ as $row) {
         $project_labels[] = $row['project_name'];
         $project_hours[] = floatval($row['total_hours']);
         $project_shifts[] = intval($row['shifts_count']);
     }
-}
+} catch (\Throwable $t) { error_log('employee_profile project breakdown: ' . $t->getMessage()); }
 
-$movement_sql = "SELECT
+$movement_result = array();
+try {
+    $movement_result = $emp_gate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'o' => 'operations'),
+              'enrich' => array('p' => 'project', 'm' => 'mines', 'e' => 'equipments')),
+        "SELECT
                    t.date,
                    t.shift,
                    t.operator_hours,
@@ -237,12 +234,16 @@ $movement_sql = "SELECT
                  LEFT JOIN project p ON p.id = o.project_id
                  LEFT JOIN mines m ON m.id = o.mine_id
                  LEFT JOIN equipments e ON e.id = o.equipment
-                 WHERE $timesheet_scope AND $operations_scope
+                 WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}
                  ORDER BY STR_TO_DATE(t.date, '%Y-%m-%d') DESC, t.id DESC
-                 LIMIT 12";
-$movement_result = mysqli_query($conn, $movement_sql);
+                 LIMIT 12", array($employee_id));
+} catch (\Throwable $t) { error_log('employee_profile movement: ' . $t->getMessage()); }
 
-$assignments_sql = "SELECT
+$assignments_result = array();
+try {
+    $assignments_result = $emp_gate->scopedQuery(
+        array('scope' => array('ed' => 'equipment_drivers'), 'enrich' => array('e' => 'equipments', 's' => 'suppliers')),
+        "SELECT
                       ed.start_date,
                       ed.end_date,
                       ed.status,
@@ -252,10 +253,10 @@ $assignments_sql = "SELECT
                     FROM equipment_drivers ed
                     LEFT JOIN equipments e ON e.id = ed.equipment_id
                     LEFT JOIN suppliers s ON s.id = e.suppliers
-                    WHERE $equipment_drivers_scope
+                    WHERE ed.employee_id = ? AND {TENANT_SCOPE}
                     ORDER BY ed.id DESC
-                    LIMIT 8";
-$assignments_result = mysqli_query($conn, $assignments_sql);
+                    LIMIT 8", array($employee_id));
+} catch (\Throwable $t) { error_log('employee_profile assignments: ' . $t->getMessage()); }
 
 $driver_status_class = (isset($driver['status']) && strval($driver['status']) === '1') ? 'active' : 'inactive';
 $driver_status_text = (isset($driver['status']) && strval($driver['status']) === '1') ? 'مفعل في النظام' : 'موقوف في النظام';
@@ -631,8 +632,8 @@ include("../insidebar.php");
         </div>
         <div class="section-body">
             <ul class="timeline-list">
-                <?php if ($movement_result && mysqli_num_rows($movement_result) > 0): ?>
-                    <?php while ($mv = mysqli_fetch_assoc($movement_result)): ?>
+                <?php if ($movement_result && count($movement_result) > 0): ?>
+                    <?php foreach ($movement_result as $mv): ?>
                         <li class="timeline-item">
                             <div class="timeline-top">
                                 <span><?php echo htmlspecialchars($mv['date'] ? $mv['date'] : '-'); ?></span>
@@ -647,7 +648,7 @@ include("../insidebar.php");
                                 استعداد: <?php echo number_format(floatval($mv['operator_standby_hours']), 2); ?>
                             </div>
                         </li>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <li class="timeline-item">لا توجد بيانات حركة داخل المشاريع لهذا السائق حتى الآن.</li>
                 <?php endif; ?>
@@ -671,8 +672,8 @@ include("../insidebar.php");
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($assignments_result && mysqli_num_rows($assignments_result) > 0): ?>
-                        <?php while ($as = mysqli_fetch_assoc($assignments_result)): ?>
+                    <?php if ($assignments_result && count($assignments_result) > 0): ?>
+                        <?php foreach ($assignments_result as $as): ?>
                             <?php $is_active_assignment = (intval($as['status']) === 1); ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($as['equipment_name'] . ' (' . $as['equipment_code'] . ')'); ?>
@@ -686,7 +687,7 @@ include("../insidebar.php");
                                     </span>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
                             <td colspan="5">لا يوجد ربط آليات مسجل لهذا السائق.</td>
