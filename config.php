@@ -548,6 +548,26 @@ function ems_tenant_db()
     return $gate;
 }
 
+/**
+ * بوابة كونسول المزوّد (دفعة هـ-0 · 2026-07-16) — عابرة الشركات من جلسة المدير
+ * الأعلى ($_SESSION['super_admin']) حصرًا، fail-closed عند غيابها (استثناء).
+ * تفتح جداول T_PLATFORM وتُبقي رفض بوابة المستأجر لها كما هو. كل إنشاءٍ يُقيَّد
+ * (tenant_gate_platform_context) ككل عبورٍ عابرٍ في العقد.
+ */
+function ems_platform_db()
+{
+    static $pgate = null;
+    if ($pgate === null) {
+        require_once __DIR__ . '/app/Core/TenantGateException.php';
+        require_once __DIR__ . '/app/Core/TenantRegistry.php';
+        require_once __DIR__ . '/app/Core/TenantContext.php';
+        require_once __DIR__ . '/app/Core/TenantDb.php';
+        global $conn;
+        $pgate = new \App\Core\TenantDb($conn, \App\Core\TenantContext::fromSuperAdminSession(), true /* crossTenant */);
+    }
+    return $pgate;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 5. Activity Log System Bootstrap
 // ═══════════════════════════════════════════════════════════════════════════

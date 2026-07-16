@@ -36,6 +36,33 @@ class TenantContext
         );
     }
 
+    /**
+     * سياق كونسول المزوّد — من جلسة المدير الأعلى المصادَق عليها حصرًا
+     * (دفعة المزوّد هـ-0 · 2026-07-16). نفس درجة ثقة fromSession (جلسة خادمية،
+     * لا هوية من العميل): يقرأ $_SESSION['super_admin'] التي لا تُبنى إلا عبر
+     * admin/login.php، ويرفض مغلقًا عند غيابها — لا سياق مزوّدٍ بلا جلسة مزوّد.
+     * الشركة صفر والدور '-1' بنيويًا (طبقة المنصّة فوق المستأجرين لا بينهم).
+     */
+    public static function fromSuperAdminSession()
+    {
+        $sa = isset($_SESSION['super_admin']) && is_array($_SESSION['super_admin']) ? $_SESSION['super_admin'] : array();
+        $said = isset($sa['id']) ? intval($sa['id']) : 0;
+        if ($said <= 0) {
+            if (function_exists('log_security_event')) {
+                log_security_event('tenant_gate_platform_context',
+                    'REFUSED (no super admin session) | script=' . (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '?'));
+            }
+            require_once __DIR__ . '/TenantGateException.php';
+            throw new TenantGateException('platform context refused: super admin session required');
+        }
+        if (function_exists('log_security_event')) {
+            log_security_event('tenant_gate_platform_context',
+                'granted | super_admin=' . $said
+                . ' script=' . (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '?'));
+        }
+        return new self(0, $said, defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1');
+    }
+
     /** حقن SAPI في الاختبارات حصرًا (محاكاة مسار ويب لاختبار رفض القناة). */
     public static $sapiOverride = null;
 

@@ -809,6 +809,14 @@ class TenantDb
             }
             $this->deny('restricted table (pending its module migration)', $table);
         }
+        if ($def['type'] === TenantRegistry::T_PLATFORM && !$this->crossTenant) {
+            // طبقة المزوّد: متاحة للبوابة العابرة (كونسول المدير الأعلى عبر
+            // ems_platform_db) حصرًا — بوابةُ المستأجر تعاملها كالمقيَّدة تمامًا.
+            if (!$strict && $this->monitorPass('platform table (provider console only)', $table)) {
+                return array('type' => self::T_MONITOR_PASS, 'soft' => !empty($def['soft']));
+            }
+            $this->deny('platform table (provider console only)', $table);
+        }
         return $def;
     }
 

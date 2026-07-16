@@ -34,6 +34,10 @@ class TenantRegistry
     const T_CATALOG = 'catalog';
     const T_GLOBAL = 'global';
     const T_RESTRICTED = 'restricted';
+    /** طبقة المزوّد (دفعة هـ-0): جداول كونسول المنصّة — الوصول عبر بوابةٍ عابرة
+     *  (crossTenant من جلسة المدير الأعلى عبر ems_platform_db حصرًا)؛ بوابةُ
+     *  المستأجر ترفضها كالمقيَّدة تمامًا (عبور مراقبةٍ مُسجَّل خارج الإنفاذ). */
+    const T_PLATFORM = 'platform';
 
     private static $tables = array(
         // ── بيانات المستأجرين (مولَّد من القاعدة الحية) ─────────────────────
@@ -186,13 +190,17 @@ class TenantRegistry
         'failure_codes' => array('type' => self::T_GLOBAL, 'managed' => true, 'soft' => false),
         'admin_subscription_plans' => array('type' => self::T_GLOBAL, 'soft' => false),
 
+        // ── طبقة المزوّد (عقد دفعة هـ-0 · 2026-07-16): كونسول المنصّة عبر
+        //    ems_platform_db حصرًا؛ بوابة المستأجر ترفضها كليًا ────────────────
+        'admin_companies' => array('type' => self::T_PLATFORM, 'soft' => false),
+        'admin_audit_log' => array('type' => self::T_PLATFORM, 'soft' => false),
+        'admin_subscription_requests' => array('type' => self::T_PLATFORM, 'soft' => false),
+        'super_admins' => array('type' => self::T_PLATFORM, 'soft' => false),
+        'super_admin_password_resets' => array('type' => self::T_PLATFORM, 'soft' => false),
+        'company_user_password_resets' => array('type' => self::T_PLATFORM, 'soft' => false),
+        'api_tokens' => array('type' => self::T_PLATFORM, 'soft' => false),
+
         // ── منصة/محرّكات لم تُهاجَر — مرفوضة عبر البوابة حتى تعريف عقدها ────
-        'admin_companies' => array('type' => self::T_RESTRICTED, 'soft' => false),
-        'admin_audit_log' => array('type' => self::T_RESTRICTED, 'soft' => false),
-        'super_admins' => array('type' => self::T_RESTRICTED, 'soft' => false),
-        'super_admin_password_resets' => array('type' => self::T_RESTRICTED, 'soft' => false),
-        'company_user_password_resets' => array('type' => self::T_RESTRICTED, 'soft' => false),
-        'api_tokens' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'schema_migrations' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'ems_sequences' => array('type' => self::T_RESTRICTED, 'soft' => false), // K8: بنية ترقيم خادمية — الوصول عبر ServerId حصرًا لا الشاشات
         'ems_event_consumers' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4: بنية الموزّع — عبر EventDispatcher حصرًا

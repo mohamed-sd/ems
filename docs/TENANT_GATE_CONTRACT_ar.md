@@ -104,6 +104,10 @@ $all = $gate->forAllTenants('لوحة إشراف المنصة');       // مدي
 
 **Views محسوبة كأبناء**: `v_worker_worklog`/`v_worker_presence` (بلا company_id، مفتاحهما `employee_id`) سُجِّلتا `T_CHILD` بأبٍ `employees` — فقراءتهما عبر `select()` تُعزَل بـ`EXISTS` على الأب المملوك، وأي كتابة فيهما يرفضها MySQL ذاته (views تجميعية).
 
+### 8-ثالثًا. طبقة المزوّد T_PLATFORM وقناة ems_platform_db (أُضيفت 2026-07-16 — دفعة هـ-0)
+
+تصنيفٌ سادس لجداول كونسول المنصّة (`admin_companies`/`admin_audit_log`/`admin_subscription_requests`/`super_admins`/`super_admin_password_resets`/`company_user_password_resets`/`api_tokens`): **بوابة المستأجر ترفضها كليًا** (عين سلوك T_RESTRICTED — رفضٌ صارم، وعبور مراقبةٍ مُسجَّل خارج الإنفاذ)، وتنفتح **حصرًا** لبوابةٍ عابرةٍ تُبنى من جلسة المدير الأعلى المصادَق عليها عبر `TenantContext::fromSuperAdminSession()` (يقرأ `$_SESSION['super_admin']` وحدها — نفس درجة ثقة fromSession، fail-closed عند غيابها، وكل إنشاءٍ يُقيَّد `tenant_gate_platform_context`) عبر الدالة الوحيدة `ems_platform_db()`. لا حقن عزلٍ على هذه الجداول (طبقةٌ فوق المستأجرين)، و`deleteRow` يبقى مرفوضًا عليها، وبنية الناقل والمحرّكات تبقى `T_RESTRICTED` حتى للمزوّد. التغطية: `tests/platform_gate_test.php` (p1–p12 + teardown = 13 تأكيدًا). السياسة الكاملة: `docs/PROVIDER_BATCH_POLICY_ar.md`.
+
 **للعمليات النطاقية المترابطة متعددة الجداول** (مثال معتمد: صرف المخزون — سطور ← حركات ← عهدة بترابط line_id الوليد): معاملة واحدة تجري داخلها عمليات بوابة متعددة بذرّية مشتركة.
 
 `runInTransaction(callable $work, $note)` حيث `$work = function(TenantDb $gate): mixed`
