@@ -17,18 +17,33 @@ $admin        = super_admin_current();
 $page_title   = 'مراقبة ناقل الأحداث';
 $current_page = 'bus-monitor';
 
+// [مُستثنى موثَّق — مراقبة بنية الناقل] جداول ems_event_* مقيَّدة تعاقديًا حتى عن بوابة
+// المزوّد (الوصول عبر محرّكاتها حصرًا)، وهذه الشاشةُ عينُ المراقب — قراءاتها الخام
+// عليها تبقى كما هي؛ أما عدّادات دفتر الأحداث (fin_financial_events) فعبر البوابة العابرة.
 function _bus_one($conn, $sql)
 {
     $r = @mysqli_query($conn, $sql);
     if ($r && ($row = mysqli_fetch_row($r))) { return $row[0]; }
     return 0;
 }
+function _bus_gate_one($g, $sql)
+{
+    try {
+        $r = $g->scopedQuery(array('scope' => array('fin_financial_events' => 'fin_financial_events')), $sql);
+        $row = isset($r[0]) ? array_values($r[0]) : null;
+        return $row ? $row[0] : 0;
+    } catch (\Throwable $t) {
+        error_log('admin/bus_monitor: ' . $t->getMessage());
+        return 0;
+    }
+}
 
 // ── مؤشرات الجذر ─────────────────────────────────────────────────────────────
-$max_event_id   = (int) _bus_one($conn, "SELECT COALESCE(MAX(id),0) FROM fin_financial_events");
-$total_events   = (int) _bus_one($conn, "SELECT COUNT(*) FROM fin_financial_events");
-$published      = (int) _bus_one($conn, "SELECT COUNT(*) FROM fin_financial_events WHERE idempotency_key IS NOT NULL");
-$reversed       = (int) _bus_one($conn, "SELECT COUNT(*) FROM fin_financial_events WHERE event_status='reversed'");
+$bm_pg = ems_platform_db();
+$max_event_id   = (int) _bus_gate_one($bm_pg, "SELECT COALESCE(MAX(id),0) FROM fin_financial_events WHERE 1=1 AND {TENANT_SCOPE}");
+$total_events   = (int) _bus_gate_one($bm_pg, "SELECT COUNT(*) FROM fin_financial_events WHERE 1=1 AND {TENANT_SCOPE}");
+$published      = (int) _bus_gate_one($bm_pg, "SELECT COUNT(*) FROM fin_financial_events WHERE idempotency_key IS NOT NULL AND {TENANT_SCOPE}");
+$reversed       = (int) _bus_gate_one($bm_pg, "SELECT COUNT(*) FROM fin_financial_events WHERE event_status='reversed' AND {TENANT_SCOPE}");
 $deliveries     = (int) _bus_one($conn, "SELECT COUNT(*) FROM ems_event_deliveries");
 $dlq            = (int) _bus_one($conn, "SELECT COUNT(*) FROM ems_event_dead_letter");
 $processed      = (int) _bus_one($conn, "SELECT COUNT(*) FROM ems_processed_events");
@@ -40,7 +55,7 @@ $cr = @mysqli_query($conn, "SELECT consumer, enabled, cursor_event_id, updated_a
 if ($cr) {
     while ($row = mysqli_fetch_assoc($cr)) {
         $cursor = (int) $row['cursor_event_id'];
-        $lag = (int) _bus_one($conn, "SELECT COUNT(*) FROM fin_financial_events WHERE id > " . $cursor);
+        $lag = (int) _bus_gate_one($bm_pg, "SELECT COUNT(*) FROM fin_financial_events WHERE id > " . $cursor . " AND {TENANT_SCOPE}");
         $row['lag'] = $lag;
         $max_lag = max($max_lag, $lag);
         $consumers[] = $row;

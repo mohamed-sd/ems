@@ -8,14 +8,20 @@ $current_page = 'permissions';
 
 include '../config.php';
 
+// كونسول المزوّد: RBAC مرجعٌ عام، وكتابته من هنا (بهوية المدير الأعلى العابرة) هي
+// الموضع الشرعي في العقد — assertWritable يسمح بها للعابرة. القراءة والكتابة عبر
+// ems_platform_db().
+$rp_pg = ems_platform_db();
+
 /* جلب بيانات التعديل */
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT `id`, `name`, `parent_role_id`, `level`, `role_scope`, `status`, `created_at` FROM `roles` WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc();
+    try {
+        $editData = $rp_pg->selectOne('roles', array(
+            'columns' => array('id', 'name', 'parent_role_id', 'level', 'role_scope', 'status', 'created_at'),
+            'where' => array('id' => $id)));
+    } catch (\Throwable $t) { $editData = null; error_log('admin/permissions/roles edit: ' . $t->getMessage()); }
 }
 
 /* إضافة / تعديل */
@@ -34,26 +40,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name)) {
         $error_msg = 'اسم الصلاحية مطلوب ❌';
     } else {
-        if (!empty($_POST['edit_id'])) {
-            // تعديل
-            $id = (int) $_POST['edit_id'];
-            $stmt = $conn->prepare(
-                "UPDATE `roles` SET `name` = ?, `parent_role_id` = ?, `level` = ?, `role_scope` = ?, `status` = ? WHERE `id` = ?"
-            );
-            $stmt->bind_param("siisii", $name, $parent_role_id, $level, $role_scope, $status, $id);
-        } else {
-            // إضافة
-            $stmt = $conn->prepare(
-                "INSERT INTO `roles` (`name`, `parent_role_id`, `level`, `role_scope`, `status`, `created_at`) VALUES (?, ?, ?, ?, ?, NOW())"
-            );
-            $stmt->bind_param("siisi", $name, $parent_role_id, $level, $role_scope, $status);
-        }
-
-        if ($stmt->execute()) {
+        try {
+            if (!empty($_POST['edit_id'])) {
+                $rp_pg->update('roles', array(
+                    'name' => $name, 'parent_role_id' => $parent_role_id, 'level' => $level,
+                    'role_scope' => $role_scope, 'status' => $status), array('id' => (int) $_POST['edit_id']));
+            } else {
+                $rp_pg->insert('roles', array(
+                    'name' => $name, 'parent_role_id' => $parent_role_id, 'level' => $level,
+                    'role_scope' => $role_scope, 'status' => $status, 'created_at' => date('Y-m-d H:i:s')));
+            }
             header("Location: roles.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
             exit;
-        } else {
-            $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
+        } catch (\Throwable $t) {
+            error_log('admin/permissions/roles save: ' . $t->getMessage());
+            $error_msg = 'حدث خطأ في الحفظ ❌';
         }
     }
 }
@@ -61,15 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* حذف */
 if (isset($_GET['delete_id'])) {
     $id = (int) $_GET['delete_id'];
-    // التحقق من عدم استخدام هذا الدور كدور أب
-    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM `roles` WHERE `parent_role_id` = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
+    // التحقق من عدم استخدام هذا الدور كدور أب (قراءة عبر البوابة)
+    $children = 0;
+    try { $children = intval($rp_pg->count('roles', array('where' => array('parent_role_id' => $id)))); }
+    catch (\Throwable $t) { error_log('admin/permissions/roles child: ' . $t->getMessage()); }
 
-    if ($result['count'] > 0) {
+    if ($children > 0) {
         header("Location: roles.php?msg=لا+يمكن+حذف+هذا+الدور+لأنه+يمتلك+أدوار+فرعية+❌");
     } else {
+        // [مُستثنى موثَّق — حذف صف مرجعٍ عام] لا قناة حذفٍ للمراجع العامة بعد (deleteRow
+        // حكرٌ على جداول المستأجر) — يبقى خامًا بهوية الكونسول المصادَق عليها.
         $stmt = $conn->prepare("DELETE FROM `roles` WHERE `id` = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
@@ -81,10 +83,12 @@ if (isset($_GET['delete_id'])) {
     exit;
 }
 
-// جلب جميع الأدوار الرئيسية (بدون دور أب)
-$stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` WHERE `parent_role_id` IS NULL ORDER BY `name`");
-$stmt->execute();
-$parent_roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// جلب جميع الأدوار الرئيسية (بدون دور أب) — عبر البوابة
+$parent_roles = array();
+try {
+    $parent_roles = $rp_pg->select('roles', array('columns' => array('id', 'name'),
+        'where' => array('parent_role_id' => null), 'orderBy' => 'name'));
+} catch (\Throwable $t) { error_log('admin/permissions/roles parents: ' . $t->getMessage()); }
 
 require_once __DIR__ . '/../includes/layout_head.php';
 ?>
@@ -374,16 +378,21 @@ require_once __DIR__ . '/../includes/layout_head.php';
                     </thead>
                     <tbody>
                         <?php
-                        $result = $conn->query("
-                            SELECT r.*, COALESCE(pr.name, 'لا يوجد') AS parent_name
-                            FROM roles r
-                            LEFT JOIN roles pr ON r.parent_role_id = pr.id
-                            ORDER BY r.id
-                        ");
-                        
+                        // اسم الأب يُشتق من خريطة id→name (self-JOIN عالمي لا يمرّ scopedQuery)
+                        $result = array();
+                        try {
+                            $result = $rp_pg->select('roles', array('orderBy' => 'id'));
+                            $rp_name_map = array();
+                            foreach ($result as $rn) { $rp_name_map[intval($rn['id'])] = $rn['name']; }
+                            foreach ($result as $rk => $rrow) {
+                                $result[$rk]['parent_name'] = ($rrow['parent_role_id'] !== null && isset($rp_name_map[intval($rrow['parent_role_id'])]))
+                                    ? $rp_name_map[intval($rrow['parent_role_id'])] : 'لا يوجد';
+                            }
+                        } catch (\Throwable $t) { error_log('admin/permissions/roles list: ' . $t->getMessage()); }
+
                         if ($result) {
                             $i = 1;
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($result as $row):
                                 ?>
                                 <tr>
                                     <td><strong><?= $i++; ?></strong></td>
@@ -426,8 +435,8 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         </a>
                                     </td>
                                 </tr>
-                            <?php 
-                            endwhile;
+                            <?php
+                            endforeach;
                         }
                         ?>
                     </tbody>

@@ -17,10 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
         $new_pw      = $_POST['new_password']      ?? '';
         $confirm_pw  = $_POST['confirm_password']  ?? '';
 
-        // Load fresh admin record
+        // Load fresh admin record (عبر بوابة المزوّد العابرة)
         $admin_id = intval($admin['id']);
-        $row_q    = mysqli_query($conn, "SELECT password FROM super_admins WHERE id = $admin_id");
-        $row      = $row_q ? mysqli_fetch_assoc($row_q) : null;
+        $row = null;
+        try {
+            $row = ems_platform_db()->selectOne('super_admins', array(
+                'columns' => array('password'), 'where' => array('id' => $admin_id)));
+        } catch (\Throwable $t) { error_log('admin/settings read: ' . $t->getMessage()); }
 
         if (!$row) {
             $msg = 'error:لم يتم العثور على الحساب';
@@ -34,16 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
             $msg = 'error:كلمة المرور الجديدة يجب أن تختلف عن الحالية';
         } else {
             $hashed = password_hash($new_pw, PASSWORD_BCRYPT);
-            $hashed_esc = mysqli_real_escape_string($conn, $hashed);
-            $upd = mysqli_query($conn, "UPDATE super_admins SET password='$hashed_esc', updated_at=NOW() WHERE id=$admin_id");
-            if ($upd) {
+            try {
+                $st_pg = ems_platform_db();
+                $st_pg->update('super_admins',
+                    array('password' => $hashed, 'updated_at' => date('Y-m-d H:i:s')),
+                    array('id' => $admin_id));
                 $msg = 'success:تم تغيير كلمة المرور بنجاح';
-                // Log to audit log
-                $ip  = mysqli_real_escape_string($conn, $_SERVER['REMOTE_ADDR'] ?? '');
-                @mysqli_query($conn, "INSERT INTO admin_audit_log (admin_id, action_type, target_name, description, ip_address)
-                    VALUES ($admin_id, 'update', 'حساب المدير', 'تغيير كلمة المرور', '$ip')");
-            } else {
-                $msg = 'error:' . mysqli_error($conn);
+                // Log to audit log (عبر البوابة)
+                try {
+                    $st_pg->insert('admin_audit_log', array(
+                        'admin_id' => $admin_id, 'action_type' => 'update', 'target_name' => 'حساب المدير',
+                        'description' => 'تغيير كلمة المرور', 'ip_address' => ($_SERVER['REMOTE_ADDR'] ?? '')));
+                } catch (\Throwable $t) { error_log('admin/settings audit: ' . $t->getMessage()); }
+            } catch (\Throwable $t) {
+                error_log('admin/settings update: ' . $t->getMessage());
+                $msg = 'error:تعذر تحديث كلمة المرور';
             }
         }
     }
@@ -52,8 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
 // ── Load full admin data ──────────────────────────────────────────────────
 $admin_id   = intval($admin['id']);
 $admin_full = null;
-$aq = mysqli_query($conn, "SELECT id, name, email, is_active, last_login_at, created_at, updated_at FROM super_admins WHERE id = $admin_id");
-if ($aq) { $admin_full = mysqli_fetch_assoc($aq); }
+try {
+    $admin_full = ems_platform_db()->selectOne('super_admins', array(
+        'columns' => array('id', 'name', 'email', 'is_active', 'last_login_at', 'created_at', 'updated_at'),
+        'where' => array('id' => $admin_id)));
+} catch (\Throwable $t) { error_log('admin/settings load: ' . $t->getMessage()); }
 
 $csrf = generate_csrf_token();
 require_once __DIR__ . '/includes/layout_head.php';

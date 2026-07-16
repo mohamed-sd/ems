@@ -40,27 +40,34 @@ $logs         = [];
 $total_count  = 0;
 $table_exists = false;
 
-$cnt_q = @mysqli_query($conn, "SELECT COUNT(*) AS c FROM admin_audit_log WHERE $where");
-if ($cnt_q) {
-    $table_exists = true;
-    $total_count  = intval(mysqli_fetch_assoc($cnt_q)['c']);
-}
-$lq = @mysqli_query($conn,
-    "SELECT l.*, a.name AS admin_name
+// عبر بوابة المزوّد العابرة (هـ-1ب) — سجل المنصّة منصّيٌ T_PLATFORM
+try {
+    $al_pg = ems_platform_db();
+    $cnt_q = $al_pg->scopedQuery(array('scope' => array('admin_audit_log' => 'admin_audit_log')),
+        "SELECT COUNT(*) AS c FROM admin_audit_log WHERE $where AND {TENANT_SCOPE}");
+    if (isset($cnt_q[0]['c'])) {
+        $table_exists = true;
+        $total_count  = intval($cnt_q[0]['c']);
+    }
+    $logs = $al_pg->scopedQuery(
+        array('scope' => array('l' => 'admin_audit_log'), 'enrich' => array('a' => 'super_admins')),
+        "SELECT l.*, a.name AS admin_name
      FROM admin_audit_log l
      LEFT JOIN super_admins a ON l.admin_id = a.id
-     WHERE $where
+     WHERE $where AND {TENANT_SCOPE}
      ORDER BY l.created_at DESC
-     LIMIT $per OFFSET $offset"
-);
-if ($lq) { while ($row = mysqli_fetch_assoc($lq)) $logs[] = $row; }
+     LIMIT $per OFFSET $offset");
+} catch (\Throwable $t) { error_log('admin/audit_log list: ' . $t->getMessage()); }
 
 $total_pages = max(1, (int)ceil($total_count / $per));
 
 // ── Action types for filter ───────────────────────────────────────────────
-$action_types_q = @mysqli_query($conn, "SELECT DISTINCT action_type FROM admin_audit_log ORDER BY action_type");
-$action_types   = [];
-if ($action_types_q) { while ($r = mysqli_fetch_assoc($action_types_q)) $action_types[] = $r['action_type']; }
+$action_types = [];
+try {
+    $al_types = $al_pg->scopedQuery(array('scope' => array('admin_audit_log' => 'admin_audit_log')),
+        "SELECT DISTINCT action_type FROM admin_audit_log WHERE 1=1 AND {TENANT_SCOPE} ORDER BY action_type");
+    foreach ($al_types as $r) { $action_types[] = $r['action_type']; }
+} catch (\Throwable $t) { error_log('admin/audit_log types: ' . $t->getMessage()); }
 
 require_once __DIR__ . '/includes/layout_head.php';
 ?>

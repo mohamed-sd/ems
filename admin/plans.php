@@ -28,26 +28,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($plan_name)) {
                 $msg = 'error:اسم الخطة مطلوب';
             } elseif ($action === 'create') {
-                $ok = @mysqli_query($conn, "INSERT INTO admin_subscription_plans
-                    (plan_name, price, max_users, max_projects, max_equipments, features, sort_order, is_active)
-                    VALUES ('$plan_name', $price, $max_users, $max_proj, $max_equip, '$features', $sort, $is_active)");
-                $msg = $ok ? 'success:تمت إضافة الخطة بنجاح' : 'error:' . mysqli_error($conn);
+                // كتابة مرجعٍ عام بهوية المدير الأعلى عبر بوابة المزوّد (الكتابة الشرعية للعقد)
+                try {
+                    ems_platform_db()->insert('admin_subscription_plans', array(
+                        'plan_name' => trim($_POST['plan_name'] ?? ''), 'price' => $price,
+                        'max_users' => $max_users, 'max_projects' => $max_proj, 'max_equipments' => $max_equip,
+                        'features' => trim($_POST['features'] ?? ''), 'sort_order' => $sort, 'is_active' => $is_active));
+                    $msg = 'success:تمت إضافة الخطة بنجاح';
+                } catch (\Throwable $t) {
+                    error_log('admin/plans create: ' . $t->getMessage());
+                    $msg = 'error:تعذر إضافة الخطة';
+                }
             } else {
                 $edit_id = intval($_POST['edit_id'] ?? 0);
-                $ok = @mysqli_query($conn, "UPDATE admin_subscription_plans SET
-                    plan_name='$plan_name', price=$price, max_users=$max_users,
-                    max_projects=$max_proj, max_equipments=$max_equip,
-                    features='$features', sort_order=$sort, is_active=$is_active
-                    WHERE id=$edit_id");
-                $msg = $ok ? 'success:تم تحديث الخطة بنجاح' : 'error:' . mysqli_error($conn);
+                try {
+                    ems_platform_db()->update('admin_subscription_plans', array(
+                        'plan_name' => trim($_POST['plan_name'] ?? ''), 'price' => $price,
+                        'max_users' => $max_users, 'max_projects' => $max_proj, 'max_equipments' => $max_equip,
+                        'features' => trim($_POST['features'] ?? ''), 'sort_order' => $sort, 'is_active' => $is_active,
+                    ), array('id' => $edit_id));
+                    $msg = 'success:تم تحديث الخطة بنجاح';
+                } catch (\Throwable $t) {
+                    error_log('admin/plans update: ' . $t->getMessage());
+                    $msg = 'error:تعذر تحديث الخطة';
+                }
             }
         } elseif ($action === 'delete') {
             $del_id = intval($_POST['del_id'] ?? 0);
+            // [مُستثنى موثَّق — حذف صف مرجعٍ عام] لا قناة حذفٍ للمراجع العامة بعد
+            // (deleteRow حكرٌ على جداول المستأجر) — كما في update_permission_quick.
             $ok = @mysqli_query($conn, "DELETE FROM admin_subscription_plans WHERE id=$del_id");
             $msg = $ok ? 'success:تم حذف الخطة' : 'error:' . mysqli_error($conn);
         } elseif ($action === 'toggle') {
             $tog_id = intval($_POST['tog_id'] ?? 0);
-            @mysqli_query($conn, "UPDATE admin_subscription_plans SET is_active = 1 - is_active WHERE id=$tog_id");
+            // كان تعبيرًا (1 - is_active) — قراءةٌ ثم كتابة العكس عبر البوابة (كونسول أحادي المشغّل)
+            try {
+                $tg = ems_platform_db();
+                $tg_row = $tg->selectOne('admin_subscription_plans', array('columns' => array('is_active'), 'where' => array('id' => $tog_id)));
+                if ($tg_row !== null) {
+                    $tg->update('admin_subscription_plans', array('is_active' => 1 - intval($tg_row['is_active'])), array('id' => $tog_id));
+                }
+            } catch (\Throwable $t) { error_log('admin/plans toggle: ' . $t->getMessage()); }
             $msg = 'success:تم تغيير الحالة';
         }
         header('Location: ' . super_admin_url('plans') . '?msg=' . urlencode($msg));
@@ -60,8 +81,12 @@ if (!empty($_GET['msg'])) { $msg = $_GET['msg']; }
 // ── Load plans ────────────────────────────────────────────────────────────
 $plans        = [];
 $table_exists = false;
-$pq = @mysqli_query($conn, "SELECT *, (SELECT COUNT(*) FROM admin_companies WHERE plan_id = p.id AND status='active') AS companies_count FROM admin_subscription_plans p ORDER BY sort_order, id");
-if ($pq) { $table_exists = true; while ($row = mysqli_fetch_assoc($pq)) $plans[] = $row; }
+try {
+    $plans = ems_platform_db()->scopedQuery(
+        array('scope' => array('p' => 'admin_subscription_plans'), 'enrich' => array('admin_companies' => 'admin_companies')),
+        "SELECT *, (SELECT COUNT(*) FROM admin_companies WHERE plan_id = p.id AND status='active') AS companies_count FROM admin_subscription_plans p WHERE 1=1 AND {TENANT_SCOPE} ORDER BY sort_order, id");
+    $table_exists = true;
+} catch (\Throwable $t) { error_log('admin/plans list: ' . $t->getMessage()); }
 
 $csrf = generate_csrf_token();
 require_once __DIR__ . '/includes/layout_head.php';

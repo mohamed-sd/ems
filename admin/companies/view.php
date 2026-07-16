@@ -11,24 +11,22 @@ if ($id <= 0) {
     super_admin_redirect('companies');
 }
 
+// الأعمدة المفحوصة قائمة كلها (مثبَّتة من القاعدة) — سقط فحص SHOW COLUMNS الذاتي
 function company_view_has_column($tableName, $columnName) {
-    $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
-    $safeCol = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
-    $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($GLOBALS['conn'], $safeCol) . "'";
-    $res = @mysqli_query($GLOBALS['conn'], $sql);
-
-    return $res && mysqli_num_rows($res) > 0;
+    return true;
 }
 
-// ── Load company ──────────────────────────────────────────────────────────
+// ── Load company (عبر بوابة المزوّد العابرة — هـ-1ب) ─────────────────────────
+$cv_pg = ems_platform_db();
 $company = null;
-$res = @mysqli_query($conn,
-    "SELECT c.*, p.plan_name, p.max_users, p.max_projects
+try {
+    $cv_rows = $cv_pg->scopedQuery(array('scope' => array('c' => 'admin_companies')),
+        "SELECT c.*, p.plan_name, p.max_users, p.max_projects
      FROM admin_companies c
      LEFT JOIN admin_subscription_plans p ON c.plan_id = p.id
-     WHERE c.id = $id"
-);
-if ($res) { $company = mysqli_fetch_assoc($res); }
+     WHERE c.id = ? AND {TENANT_SCOPE}", array($id));
+    $company = !empty($cv_rows) ? $cv_rows[0] : null;
+} catch (\Throwable $t) { error_log('admin/companies/view load: ' . $t->getMessage()); }
 if (!$company) {
     super_admin_redirect('companies');
 }
@@ -52,67 +50,37 @@ $cnt_users  = 0;
 $cnt_proj   = 0;
 $cnt_clients = 0;
 
-if (company_view_has_column('clients', 'company_id')) {
-    $cr = @mysqli_query($conn, "SELECT COUNT(*) AS c FROM clients WHERE company_id = $id");
-    if ($cr) {
-        $clientCountRow = mysqli_fetch_assoc($cr);
-        $cnt_clients = intval(isset($clientCountRow['c']) ? $clientCountRow['c'] : 0);
-    }
-}
+// عدّ العملاء بترشيح عمود الشركة (where-array — نص company_id محظور في scopedQuery)
+try {
+    $cnt_clients = intval($cv_pg->count('clients', array(
+        'where' => array('company_id' => $id), 'includeDeleted' => true)));
+} catch (\Throwable $t) { error_log('admin/companies/view clients: ' . $t->getMessage()); }
 
 // ── Users list ────────────────────────────────────────────────────────────
 $users_list = [];
-$usersSelect = 'id, username, role, created_at';
-if (company_view_has_column('users', 'name')) {
-    $usersSelect .= ', name';
-}
-if (company_view_has_column('users', 'email')) {
-    $usersSelect .= ', email';
-}
-if (company_view_has_column('users', 'status')) {
-    $usersSelect .= ', status';
-}
-$ur = @mysqli_query($conn, "SELECT $usersSelect FROM users WHERE company_id = $id ORDER BY created_at DESC LIMIT 20");
-if ($ur) {
-    while ($row = mysqli_fetch_assoc($ur)) {
-        $users_list[] = $row;
-    }
+try {
+    $users_list = $cv_pg->select('users', array(
+        'columns' => array('id', 'username', 'role', 'created_at', 'name', 'email', 'status'),
+        'where' => array('company_id' => $id),
+        'orderBy' => 'created_at DESC', 'limit' => 20, 'includeDeleted' => true));
     $cnt_users = count($users_list);
-}
+} catch (\Throwable $t) { error_log('admin/companies/view users: ' . $t->getMessage()); }
 
 $password_target_user = null;
-$password_select = 'id, username';
-if (company_view_has_column('users', 'name')) {
-    $password_select .= ', name';
-}
-if (company_view_has_column('users', 'email')) {
-    $password_select .= ', email';
-}
-
-$role_filters = array();
-if (company_view_has_column('users', 'role_id')) {
-    $role_filters[] = 'role_id = 1';
-}
-if (company_view_has_column('users', 'role')) {
-    $role_filters[] = 'role = 1';
-}
-
-$password_where = 'company_id = ' . $id;
-if (!empty($role_filters)) {
-    $password_where .= ' AND (' . implode(' OR ', $role_filters) . ')';
-}
-
-$pr = @mysqli_query($conn, "SELECT $password_select FROM users WHERE $password_where ORDER BY created_at ASC LIMIT 1");
-if ($pr) {
-    $password_target_user = mysqli_fetch_assoc($pr);
-}
-
-if (!$password_target_user) {
-    $pr_fallback = @mysqli_query($conn, "SELECT $password_select FROM users WHERE company_id = $id ORDER BY created_at ASC LIMIT 1");
-    if ($pr_fallback) {
-        $password_target_user = mysqli_fetch_assoc($pr_fallback);
+try {
+    // مالك الشركة (دور 1 بأي عمودَيه) وإلا أقدم مستخدم — عبر البوابة العابرة
+    $password_target_user = $cv_pg->selectOne('users', array(
+        'columns' => array('id', 'username', 'name', 'email'),
+        'where' => array('company_id' => $id),
+        'whereRaw' => "(role_id = 1 OR role = 1)",
+        'orderBy' => 'created_at ASC', 'includeDeleted' => true));
+    if (!$password_target_user) {
+        $password_target_user = $cv_pg->selectOne('users', array(
+            'columns' => array('id', 'username', 'name', 'email'),
+            'where' => array('company_id' => $id),
+            'orderBy' => 'created_at ASC', 'includeDeleted' => true));
     }
-}
+} catch (\Throwable $t) { error_log('admin/companies/view pwd target: ' . $t->getMessage()); }
 
 require_once dirname(__DIR__) . '/includes/layout_head.php';
 ?>
@@ -419,8 +387,11 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     <select class="form-ctrl" name="plan_id">
                         <option value="">— اختر خطة —</option>
                         <?php
-                        $plans_q = @mysqli_query($conn, "SELECT id, plan_name FROM admin_subscription_plans WHERE is_active=1 ORDER BY sort_order");
-                        if ($plans_q) while ($pl = mysqli_fetch_assoc($plans_q)) {
+                        try {
+                            $plans_q = $cv_pg->select('admin_subscription_plans', array(
+                                'columns' => array('id', 'plan_name'), 'where' => array('is_active' => 1), 'orderBy' => 'sort_order'));
+                        } catch (\Throwable $t) { $plans_q = []; error_log('admin/companies/view plans: ' . $t->getMessage()); }
+                        foreach ($plans_q as $pl) {
                             $selected = intval(isset($company['plan_id']) ? $company['plan_id'] : 0) === intval($pl['id']) ? ' selected' : '';
                             echo '<option value="' . intval($pl['id']) . '"' . $selected . '>' . e($pl['plan_name']) . '</option>';
                         }

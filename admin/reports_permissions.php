@@ -9,12 +9,11 @@ $current_page = 'report-permissions';
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../emsreports/includes/functions.php';
 
-// جلب جميع الأدوار
+// جلب جميع الأدوار (مرجع عام — عبر بوابة المزوّد)
 $roles = [];
-$rr = mysqli_query($conn, "SELECT id, name FROM roles ORDER BY id ASC");
-if ($rr) {
-    while ($row = mysqli_fetch_assoc($rr)) $roles[] = $row;
-}
+try {
+    $roles = ems_platform_db()->select('roles', array('columns' => array('id', 'name'), 'orderBy' => 'id ASC'));
+} catch (\Throwable $t) { error_log('admin/reports_permissions roles: ' . $t->getMessage()); }
 
 // كتالوج التقارير
 $catalog    = getReportsCatalog();
@@ -23,14 +22,14 @@ foreach ($catalog as $code => $info) {
     $categories[$info['category']][] = $info;
 }
 
-// جلب جميع الصلاحيات الحالية دفعة واحدة
+// جلب جميع الصلاحيات الحالية دفعة واحدة (مرجع عام — عبر البوابة)
 $perms = [];
-$pr = mysqli_query($conn, "SELECT role_id, report_code FROM report_role_permissions");
-if ($pr) {
-    while ($row = mysqli_fetch_assoc($pr)) {
+try {
+    $rp_rows = ems_platform_db()->select('report_role_permissions', array('columns' => array('role_id', 'report_code')));
+    foreach ($rp_rows as $row) {
         $perms[$row['role_id']][$row['report_code']] = true;
     }
-}
+} catch (\Throwable $t) { error_log('admin/reports_permissions perms: ' . $t->getMessage()); }
 
 // عدد التقارير الكلي
 $totalReports = count($catalog);

@@ -22,12 +22,10 @@ function super_admin_password_is_strong($password) {
 }
 
 function super_admin_active_count($conn) {
-    $res = mysqli_query($conn, "SELECT COUNT(*) AS c FROM super_admins WHERE is_active = 1");
-    if ($res && ($row = mysqli_fetch_assoc($res))) {
-        return intval($row['c']);
-    }
-
-    return 0;
+    // super_admins جدول منصّي — العدّ عبر بوابة المزوّد العابرة
+    try {
+        return intval(ems_platform_db()->count('super_admins', array('where' => array('is_active' => 1))));
+    } catch (\Throwable $t) { error_log('admin/managers active count: ' . $t->getMessage()); return 0; }
 }
 
 function super_admin_set_flash($type, $text) {
@@ -53,38 +51,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!super_admin_password_is_strong($password)) {
             super_admin_set_flash('error', 'كلمة المرور يجب أن تكون قوية (12+ حرف وتحتوي أحرف كبيرة وصغيرة وأرقام ورمز خاص).');
         } else {
-            $checkStmt = mysqli_prepare($conn, 'SELECT id FROM super_admins WHERE email = ? LIMIT 1');
-            if (!$checkStmt) {
+            // super_admins جدول منصّي — الفحص والإدراج عبر بوابة المزوّد العابرة
+            $exists = null;
+            try {
+                $mg_pg = ems_platform_db();
+                $exists = $mg_pg->selectOne('super_admins', array('columns' => array('id'), 'where' => array('email' => $email)));
+            } catch (\Throwable $t) {
+                error_log('admin/managers email check: ' . $t->getMessage());
                 super_admin_set_flash('error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
                 super_admin_redirect('managers');
             }
-
-            mysqli_stmt_bind_param($checkStmt, 's', $email);
-            mysqli_stmt_execute($checkStmt);
-            $existsResult = mysqli_stmt_get_result($checkStmt);
-            $exists = $existsResult ? mysqli_fetch_assoc($existsResult) : null;
-            mysqli_stmt_close($checkStmt);
 
             if ($exists) {
                 super_admin_set_flash('error', 'هذا البريد الإلكتروني مستخدم بالفعل.');
             } else {
                 $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-                $insertStmt = mysqli_prepare($conn, 'INSERT INTO super_admins (name, email, password, is_active) VALUES (?, ?, ?, ?)');
+                $newId = 0;
+                try {
+                    $newId = intval($mg_pg->insert('super_admins', array(
+                        'name' => $name, 'email' => $email, 'password' => $passwordHash, 'is_active' => $isActive)));
+                } catch (\Throwable $t) { error_log('admin/managers create: ' . $t->getMessage()); }
 
-                if (!$insertStmt) {
-                    super_admin_set_flash('error', 'تعذر إنشاء الحساب حالياً.');
+                if ($newId > 0) {
+                    super_admin_write_audit($actorId, 'create', 'مدير أعلى', 'إنشاء حساب مدير أعلى جديد: ' . $email, $newId);
+                    super_admin_set_flash('success', 'تم إنشاء حساب المدير بنجاح.');
                 } else {
-                    mysqli_stmt_bind_param($insertStmt, 'sssi', $name, $email, $passwordHash, $isActive);
-                    $ok = mysqli_stmt_execute($insertStmt);
-                    $newId = $ok ? intval(mysqli_insert_id($conn)) : 0;
-                    mysqli_stmt_close($insertStmt);
-
-                    if ($ok && $newId > 0) {
-                        super_admin_write_audit($actorId, 'create', 'مدير أعلى', 'إنشاء حساب مدير أعلى جديد: ' . $email, $newId);
-                        super_admin_set_flash('success', 'تم إنشاء حساب المدير بنجاح.');
-                    } else {
-                        super_admin_set_flash('error', 'فشل إنشاء الحساب.');
-                    }
+                    super_admin_set_flash('error', 'فشل إنشاء الحساب.');
                 }
             }
         }
@@ -110,17 +102,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($targetId === $actorId && $isActive !== 1) {
             super_admin_set_flash('error', 'لا يمكنك تعطيل حسابك الحالي.');
         } else {
-            $targetStmt = mysqli_prepare($conn, 'SELECT id, is_active FROM super_admins WHERE id = ? LIMIT 1');
-            if (!$targetStmt) {
+            $mg_pg = ems_platform_db();
+            $targetRow = null;
+            try {
+                $targetRow = $mg_pg->selectOne('super_admins', array('columns' => array('id', 'is_active'), 'where' => array('id' => $targetId)));
+            } catch (\Throwable $t) {
+                error_log('admin/managers target load: ' . $t->getMessage());
                 super_admin_set_flash('error', 'تعذر تحميل بيانات الحساب المطلوب.');
                 super_admin_redirect('managers');
             }
-
-            mysqli_stmt_bind_param($targetStmt, 'i', $targetId);
-            mysqli_stmt_execute($targetStmt);
-            $targetRes = mysqli_stmt_get_result($targetStmt);
-            $targetRow = $targetRes ? mysqli_fetch_assoc($targetRes) : null;
-            mysqli_stmt_close($targetStmt);
 
             if (!$targetRow) {
                 super_admin_set_flash('error', 'الحساب المطلوب غير موجود.');
@@ -133,42 +123,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 super_admin_redirect('managers');
             }
 
-            $checkStmt = mysqli_prepare($conn, 'SELECT id FROM super_admins WHERE email = ? AND id <> ? LIMIT 1');
-            if (!$checkStmt) {
+            $dup = null;
+            try {
+                $dup = $mg_pg->selectOne('super_admins', array('columns' => array('id'),
+                    'where' => array('email' => $email), 'whereRaw' => 'id <> ' . intval($targetId)));
+            } catch (\Throwable $t) {
+                error_log('admin/managers dup check: ' . $t->getMessage());
                 super_admin_set_flash('error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
                 super_admin_redirect('managers');
             }
 
-            mysqli_stmt_bind_param($checkStmt, 'si', $email, $targetId);
-            mysqli_stmt_execute($checkStmt);
-            $dupResult = mysqli_stmt_get_result($checkStmt);
-            $dup = $dupResult ? mysqli_fetch_assoc($dupResult) : null;
-            mysqli_stmt_close($checkStmt);
-
             if ($dup) {
                 super_admin_set_flash('error', 'البريد الإلكتروني مستخدم بواسطة مدير آخر.');
             } else {
-                if ($newPassword !== '') {
-                    $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
-                    $updateStmt = mysqli_prepare($conn, 'UPDATE super_admins SET name = ?, email = ?, is_active = ?, password = ?, updated_at = NOW() WHERE id = ?');
-                    mysqli_stmt_bind_param($updateStmt, 'ssisi', $name, $email, $isActive, $passwordHash, $targetId);
-                } else {
-                    $updateStmt = mysqli_prepare($conn, 'UPDATE super_admins SET name = ?, email = ?, is_active = ?, updated_at = NOW() WHERE id = ?');
-                    mysqli_stmt_bind_param($updateStmt, 'ssii', $name, $email, $isActive, $targetId);
-                }
+                $mg_data = array('name' => $name, 'email' => $email, 'is_active' => $isActive, 'updated_at' => date('Y-m-d H:i:s'));
+                if ($newPassword !== '') { $mg_data['password'] = password_hash($newPassword, PASSWORD_BCRYPT); }
+                $ok = false;
+                try { $mg_pg->update('super_admins', $mg_data, array('id' => $targetId)); $ok = true; }
+                catch (\Throwable $t) { error_log('admin/managers update: ' . $t->getMessage()); }
 
-                if (!$updateStmt) {
-                    super_admin_set_flash('error', 'تعذر تحديث الحساب حالياً.');
+                if ($ok) {
+                    super_admin_write_audit($actorId, 'update', 'مدير أعلى', 'تحديث بيانات مدير أعلى: ' . $email, $targetId);
+                    super_admin_set_flash('success', 'تم تحديث بيانات المدير بنجاح.');
                 } else {
-                    $ok = mysqli_stmt_execute($updateStmt);
-                    mysqli_stmt_close($updateStmt);
-
-                    if ($ok) {
-                        super_admin_write_audit($actorId, 'update', 'مدير أعلى', 'تحديث بيانات مدير أعلى: ' . $email, $targetId);
-                        super_admin_set_flash('success', 'تم تحديث بيانات المدير بنجاح.');
-                    } else {
-                        super_admin_set_flash('error', 'فشل تحديث بيانات المدير.');
-                    }
+                    super_admin_set_flash('error', 'فشل تحديث بيانات المدير.');
                 }
             }
         }
@@ -184,30 +162,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($targetId === $actorId) {
             super_admin_set_flash('error', 'لا يمكنك حذف حسابك الحالي.');
         } else {
-            $remainActiveStmt = mysqli_prepare($conn, 'SELECT COUNT(*) AS c FROM super_admins WHERE is_active = 1 AND id <> ?');
-            mysqli_stmt_bind_param($remainActiveStmt, 'i', $targetId);
-            mysqli_stmt_execute($remainActiveStmt);
-            $remainRes = mysqli_stmt_get_result($remainActiveStmt);
-            $remainRow = $remainRes ? mysqli_fetch_assoc($remainRes) : null;
-            mysqli_stmt_close($remainActiveStmt);
-
-            $remainingActive = $remainRow ? intval($remainRow['c']) : 0;
+            $mg_pg = ems_platform_db();
+            $remainingActive = 0;
+            try {
+                $remainingActive = intval($mg_pg->count('super_admins', array(
+                    'where' => array('is_active' => 1), 'whereRaw' => 'id <> ' . intval($targetId))));
+            } catch (\Throwable $t) { error_log('admin/managers remain: ' . $t->getMessage()); }
             if ($remainingActive <= 0) {
                 super_admin_set_flash('error', 'لا يمكن حذف آخر مدير نشط.');
                 super_admin_redirect('managers');
             }
 
             $targetEmail = '';
-            $emailStmt = mysqli_prepare($conn, 'SELECT email FROM super_admins WHERE id = ? LIMIT 1');
-            mysqli_stmt_bind_param($emailStmt, 'i', $targetId);
-            mysqli_stmt_execute($emailStmt);
-            $emailRes = mysqli_stmt_get_result($emailStmt);
-            $emailRow = $emailRes ? mysqli_fetch_assoc($emailRes) : null;
-            mysqli_stmt_close($emailStmt);
-            if ($emailRow) {
-                $targetEmail = $emailRow['email'];
-            }
+            try {
+                $mg_email_row = $mg_pg->selectOne('super_admins', array('columns' => array('email'), 'where' => array('id' => $targetId)));
+                if ($mg_email_row) { $targetEmail = $mg_email_row['email']; }
+            } catch (\Throwable $t) { error_log('admin/managers email: ' . $t->getMessage()); }
 
+            // [مُستثنى موثَّق — حذف صف منصّي] deleteRow حكرٌ تعاقديًا على جداول المستأجر؛
+            // حذف حساب المدير الأعلى يبقى خامًا بهوية الكونسول حتى قناة حذفٍ منصّية.
             $deleteStmt = mysqli_prepare($conn, 'DELETE FROM super_admins WHERE id = ? LIMIT 1');
             mysqli_stmt_bind_param($deleteStmt, 'i', $targetId);
             $ok = mysqli_stmt_execute($deleteStmt);
@@ -238,9 +211,11 @@ $per = 15;
 $offset = ($page - 1) * $per;
 
 $whereParts = array('1=1');
+$whereParams = array();
 if ($search !== '') {
-    $s = mysqli_real_escape_string($conn, $search);
-    $whereParts[] = "(name LIKE '%$s%' OR email LIKE '%$s%')";
+    $whereParts[] = "(name LIKE ? OR email LIKE ?)";
+    $whereParams[] = '%' . $search . '%';
+    $whereParams[] = '%' . $search . '%';
 }
 if ($status === 'active') {
     $whereParts[] = 'is_active = 1';
@@ -249,20 +224,20 @@ if ($status === 'active') {
 }
 $where = implode(' AND ', $whereParts);
 
+$mg_pg = ems_platform_db();
 $totalCount = 0;
-$countQ = mysqli_query($conn, "SELECT COUNT(*) AS c FROM super_admins WHERE $where");
-if ($countQ && ($countRow = mysqli_fetch_assoc($countQ))) {
-    $totalCount = intval($countRow['c']);
-}
+try {
+    $mg_cnt = $mg_pg->scopedQuery(array('scope' => array('super_admins' => 'super_admins')),
+        "SELECT COUNT(*) AS c FROM super_admins WHERE $where AND {TENANT_SCOPE}", $whereParams);
+    if (isset($mg_cnt[0]['c'])) { $totalCount = intval($mg_cnt[0]['c']); }
+} catch (\Throwable $t) { error_log('admin/managers count: ' . $t->getMessage()); }
 $totalPages = max(1, intval(ceil($totalCount / $per)));
 
 $managers = array();
-$listQ = mysqli_query($conn, "SELECT id, name, email, is_active, last_login_at, created_at FROM super_admins WHERE $where ORDER BY id DESC LIMIT $per OFFSET $offset");
-if ($listQ) {
-    while ($row = mysqli_fetch_assoc($listQ)) {
-        $managers[] = $row;
-    }
-}
+try {
+    $managers = $mg_pg->scopedQuery(array('scope' => array('super_admins' => 'super_admins')),
+        "SELECT id, name, email, is_active, last_login_at, created_at FROM super_admins WHERE $where AND {TENANT_SCOPE} ORDER BY id DESC LIMIT $per OFFSET $offset", $whereParams);
+} catch (\Throwable $t) { error_log('admin/managers list: ' . $t->getMessage()); }
 
 $csrf = generate_csrf_token();
 require_once __DIR__ . '/includes/layout_head.php';

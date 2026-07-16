@@ -6,6 +6,9 @@ super_admin_require_post_csrf();
 $admin = super_admin_current();
 $actorId = intval(isset($admin['id']) ? $admin['id'] : 0);
 
+// بوابة المزوّد العابرة — تُستعمل في كل فروع الإجراءات (create/update/activate/suspend/delete)
+$ca_pg = ems_platform_db();
+
 function companies_redirect_with_msg($target, $type, $text) {
     super_admin_redirect($target, array('msg' => $type . ':' . $text));
 }
@@ -121,47 +124,40 @@ if ($action === 'create' || $action === 'update') {
         }
     }
 
+    // القراءات التحقّقية عبر بوابة المزوّد العابرة؛ أما كتابات التزويد العابرة للطبقتين
+    // (إنشاء شركة + بذر مديرها في users، والتحديث والحذف وكلمة المرور) فتبقى خامًا
+    // بهوية الكونسول كعائلة «التزويد العابر» الموثقة (كمسار قبول الطلب في requests.php)
+    // — بنّاؤو الأعمدة الديناميكيون والمعاملات اليدوية عبر الحدّ تسبق البوابة.
     if ($planId !== null) {
-        $checkPlanStmt = mysqli_prepare($conn, 'SELECT id FROM admin_subscription_plans WHERE id = ? LIMIT 1');
-        if (!$checkPlanStmt) {
+        $planRow = null;
+        try { $planRow = $ca_pg->selectOne('admin_subscription_plans', array('columns' => array('id'), 'where' => array('id' => $planId))); }
+        catch (\Throwable $t) {
+            error_log('admin/companies/action plan: ' . $t->getMessage());
             companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من خطة الاشتراك حالياً.');
         }
-
-        mysqli_stmt_bind_param($checkPlanStmt, 'i', $planId);
-        mysqli_stmt_execute($checkPlanStmt);
-        $planRes = mysqli_stmt_get_result($checkPlanStmt);
-        $planRow = $planRes ? mysqli_fetch_assoc($planRes) : null;
-        mysqli_stmt_close($checkPlanStmt);
-
         if (!$planRow) {
             companies_redirect_with_msg($redirectTo, 'error', 'خطة الاشتراك المختارة غير موجودة.');
         }
     }
 
     if (companies_table_has_column('admin_companies', 'commercial_registration')) {
-        $regEsc = mysqli_real_escape_string($conn, $commercialRegistration);
-        $dupRegSql = "SELECT id FROM admin_companies WHERE commercial_registration = '$regEsc'";
-        if ($action === 'update') {
-            $dupRegSql .= ' AND id <> ' . intval($id);
-        }
-        $dupRegSql .= ' LIMIT 1';
-        $dupRegQ = @mysqli_query($conn, $dupRegSql);
-        if ($dupRegQ && mysqli_fetch_assoc($dupRegQ)) {
+        try {
+            $dupReg = $ca_pg->selectOne('admin_companies', array('columns' => array('id'),
+                'where' => array('commercial_registration' => $commercialRegistration),
+                'whereRaw' => ($action === 'update' ? 'id <> ' . intval($id) : '1=1')));
+        } catch (\Throwable $t) { $dupReg = null; error_log('admin/companies/action reg dup: ' . $t->getMessage()); }
+        if ($dupReg) {
             companies_redirect_with_msg($redirectTo, 'error', 'رقم السجل التجاري مستخدم مسبقاً.');
         }
     }
 
     if ($action === 'create') {
-        $dupStmt = mysqli_prepare($conn, 'SELECT id FROM admin_companies WHERE email = ? LIMIT 1');
-        if (!$dupStmt) {
+        try {
+            $dupRow = $ca_pg->selectOne('admin_companies', array('columns' => array('id'), 'where' => array('email' => $email)));
+        } catch (\Throwable $t) {
+            error_log('admin/companies/action email dup: ' . $t->getMessage());
             companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
         }
-
-        mysqli_stmt_bind_param($dupStmt, 's', $email);
-        mysqli_stmt_execute($dupStmt);
-        $dupRes = mysqli_stmt_get_result($dupStmt);
-        $dupRow = $dupRes ? mysqli_fetch_assoc($dupRes) : null;
-        mysqli_stmt_close($dupStmt);
 
         if ($dupRow) {
             companies_redirect_with_msg($redirectTo, 'error', 'هذا البريد الإلكتروني مستخدم بالفعل.');
@@ -371,16 +367,13 @@ if ($action === 'create' || $action === 'update') {
         companies_redirect_with_msg('companies', 'error', 'معرف الشركة غير صالح.');
     }
 
-    $dupStmt = mysqli_prepare($conn, 'SELECT id FROM admin_companies WHERE email = ? AND id <> ? LIMIT 1');
-    if (!$dupStmt) {
+    try {
+        $dupRow = $ca_pg->selectOne('admin_companies', array('columns' => array('id'),
+            'where' => array('email' => $email), 'whereRaw' => 'id <> ' . intval($id)));
+    } catch (\Throwable $t) {
+        error_log('admin/companies/action update dup: ' . $t->getMessage());
         companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
     }
-
-    mysqli_stmt_bind_param($dupStmt, 'si', $email, $id);
-    mysqli_stmt_execute($dupStmt);
-    $dupRes = mysqli_stmt_get_result($dupStmt);
-    $dupRow = $dupRes ? mysqli_fetch_assoc($dupRes) : null;
-    mysqli_stmt_close($dupStmt);
 
     if ($dupRow) {
         companies_redirect_with_msg($redirectTo, 'error', 'البريد الإلكتروني مستخدم لشركة أخرى.');
@@ -490,6 +483,8 @@ if ($action === 'create' || $action === 'update') {
     $sets[] = "status = '" . $statusEsc . "'";
     $sets[] = 'updated_at = NOW()';
 
+    // [مُستثنى موثَّق — تزويدٌ عابرٌ للطبقتين] تحديث الشركة ببنّاء أعمدةٍ ديناميكي متكيّف
+    // (نفس عائلة الإنشاء عبر الحدّ) — يبقى خامًا بهوية الكونسول حتى قناة تزويدٍ منصّية.
     $updateSql = 'UPDATE admin_companies SET ' . implode(', ', $sets) . ' WHERE id = ' . intval($id) . ' LIMIT 1';
     $ok = @mysqli_query($conn, $updateSql);
 
@@ -570,16 +565,16 @@ if ($id <= 0) {
 }
 
 if ($action === 'activate' || $action === 'suspend') {
+    // تغيير حالة الشركة — كتابة منصّية بحتة عبر بوابة المزوّد العابرة
     $newStatus = $action === 'activate' ? 'active' : 'suspended';
-    $statusStmt = mysqli_prepare($conn, 'UPDATE admin_companies SET status = ?, updated_at = NOW() WHERE id = ? LIMIT 1');
-
-    if (!$statusStmt) {
+    $ok = false;
+    try {
+        $ca_pg->update('admin_companies', array('status' => $newStatus, 'updated_at' => date('Y-m-d H:i:s')), array('id' => $id));
+        $ok = true;
+    } catch (\Throwable $t) {
+        error_log('admin/companies/action status: ' . $t->getMessage());
         companies_redirect_with_msg($redirectTo, 'error', 'تعذر تغيير حالة الشركة حالياً.');
     }
-
-    mysqli_stmt_bind_param($statusStmt, 'si', $newStatus, $id);
-    $ok = mysqli_stmt_execute($statusStmt);
-    mysqli_stmt_close($statusStmt);
 
     if ($ok) {
         $auditAction = $action === 'activate' ? 'activate' : 'suspend';
@@ -592,24 +587,17 @@ if ($action === 'activate' || $action === 'suspend') {
 }
 
 if ($action === 'delete') {
+    // حارس الحذف: عدّ مستخدمي الشركة بترشيح العمود (البوابة العابرة تقرأ عبر الطبقتين)
     $usersCount = 0;
-    $usersStmt = mysqli_prepare($conn, 'SELECT COUNT(*) AS c FROM users WHERE company_id = ?');
-
-    if ($usersStmt) {
-        mysqli_stmt_bind_param($usersStmt, 'i', $id);
-        mysqli_stmt_execute($usersStmt);
-        $usersRes = mysqli_stmt_get_result($usersStmt);
-        $usersRow = $usersRes ? mysqli_fetch_assoc($usersRes) : null;
-        mysqli_stmt_close($usersStmt);
-        if ($usersRow) {
-            $usersCount = intval($usersRow['c']);
-        }
-    }
+    try { $usersCount = intval($ca_pg->count('users', array('where' => array('company_id' => $id), 'includeDeleted' => true))); }
+    catch (\Throwable $t) { error_log('admin/companies/action users count: ' . $t->getMessage()); }
 
     if ($usersCount > 0) {
         companies_redirect_with_msg($redirectTo, 'error', 'لا يمكن حذف شركة مرتبطة بمستخدمين. قم بنقل/حذف المستخدمين أولاً.');
     }
 
+    // [مُستثنى موثَّق — حذف صف منصّي] deleteRow حكرٌ تعاقديًا على جداول المستأجر؛ حذف
+    // الشركة يبقى خامًا بهوية الكونسول (بعد حارس صفر-مستخدمين أعلاه) حتى قناة حذفٍ منصّية.
     $deleteStmt = mysqli_prepare($conn, 'DELETE FROM admin_companies WHERE id = ? LIMIT 1');
     if (!$deleteStmt) {
         companies_redirect_with_msg($redirectTo, 'error', 'تعذر حذف الشركة حالياً.');

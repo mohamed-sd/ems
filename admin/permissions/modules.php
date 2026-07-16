@@ -8,16 +8,14 @@ $current_page = 'permissions';
 
 include '../config.php';
 
-function moduleColumnExists($conn, $column_name) {
-    $safe_column_name = mysqli_real_escape_string($conn, $column_name);
-    $result = $conn->query("SHOW COLUMNS FROM `modules` LIKE '" . $safe_column_name . "'");
-    return $result && $result->num_rows > 0;
-}
-
-$module_has_icon_column = moduleColumnExists($conn, 'icon');
-$module_has_display_order_column = moduleColumnExists($conn, 'display_order');
-$module_has_is_quick_column = moduleColumnExists($conn, 'is_quick');
+// أعمدة icon/display_order/is_quick قائمة كلها (مثبَّتة من القاعدة) — سقط فحص SHOW COLUMNS
+$module_has_icon_column = true;
+$module_has_display_order_column = true;
+$module_has_is_quick_column = true;
 $default_module_icon = 'fa fa-link';
+// كونسول المزوّد: modules مرجعٌ عام، وكتابته من هنا (بهوية المدير الأعلى العابرة) هي
+// الموضع الشرعي في العقد. القراءة والكتابة عبر ems_platform_db().
+$mp_pg = ems_platform_db();
 $common_sidebar_icons = array(
     array('class' => 'fa fa-link', 'label' => 'رابط عام'),
     array('class' => 'fa fa-home', 'label' => 'الرئيسية'),
@@ -56,20 +54,11 @@ $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $select_columns = "`id`, `name`, `code`, `owner_role_id`, `is_link`";
-    if ($module_has_icon_column) {
-        $select_columns .= ", `icon`";
-    }
-    if ($module_has_display_order_column) {
-        $select_columns .= ", `display_order`";
-    }
-    if ($module_has_is_quick_column) {
-        $select_columns .= ", `is_quick`";
-    }
-    $stmt = $conn->prepare("SELECT " . $select_columns . " FROM `modules` WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc();
+    try {
+        $editData = $mp_pg->selectOne('modules', array(
+            'columns' => array('id', 'name', 'code', 'owner_role_id', 'is_link', 'icon', 'display_order', 'is_quick'),
+            'where' => array('id' => $id)));
+    } catch (\Throwable $t) { $editData = null; error_log('admin/permissions/modules edit: ' . $t->getMessage()); }
     if ($editData && !isset($editData['icon'])) {
         $editData['icon'] = $default_module_icon;
     }
@@ -93,81 +82,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name) || empty($code)) {
         $error_msg = 'اسم الصفحة والكود مطلوبان ❌';
     } else {
-        if (!empty($_POST['edit_id'])) {
-            // تعديل
-            $id = (int) $_POST['edit_id'];
-            if ($module_has_icon_column && $module_has_display_order_column) {
-                $stmt = $conn->prepare(
-                    "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ?, `icon` = ?, `display_order` = ? WHERE `id` = ?"
-                );
-                $stmt->bind_param("ssiisii", $name, $code, $owner_role_id, $is_link, $icon, $display_order, $id);
-            } elseif ($module_has_icon_column) {
-                $stmt = $conn->prepare(
-                    "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ?, `icon` = ? WHERE `id` = ?"
-                );
-                $stmt->bind_param("ssiisi", $name, $code, $owner_role_id, $is_link, $icon, $id);
-            } elseif ($module_has_display_order_column) {
-                $stmt = $conn->prepare(
-                    "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ?, `display_order` = ? WHERE `id` = ?"
-                );
-                $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $display_order, $id);
+        $mp_is_quick = (isset($_POST['is_quick']) && $_POST['is_quick'] == '1') ? 1 : 0;
+        try {
+            if (!empty($_POST['edit_id'])) {
+                // كتابة مرجعٍ عام بهوية المدير الأعلى العابرة (الموضع الشرعي للعقد)
+                $mp_pg->update('modules', array(
+                    'name' => $name, 'code' => $code, 'owner_role_id' => $owner_role_id,
+                    'is_link' => $is_link, 'icon' => $icon, 'display_order' => $display_order,
+                    'is_quick' => $mp_is_quick), array('id' => (int) $_POST['edit_id']));
+                header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
+                exit;
             } else {
-                $stmt = $conn->prepare(
-                    "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ? WHERE `id` = ?"
-                );
-                $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $id);
-            }
-        } else {
-            // التحقق من عدم تكرار نفس الصفحة لنفس الدور
-            $check_stmt = $conn->prepare(
-                "SELECT id FROM `modules` WHERE `code` = ? AND `owner_role_id` <=> ? LIMIT 1"
-            );
-            $check_stmt->bind_param("si", $code, $owner_role_id);
-            $check_stmt->execute();
-            $check_stmt->store_result();
-            if ($check_stmt->num_rows > 0) {
-                $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
-            } else {
-                // إضافة
-                if ($module_has_icon_column && $module_has_display_order_column) {
-                    $stmt = $conn->prepare(
-                        "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `icon`, `display_order`) VALUES (?, ?, ?, ?, ?, ?)"
-                    );
-                    $stmt->bind_param("ssiisi", $name, $code, $owner_role_id, $is_link, $icon, $display_order);
-                } elseif ($module_has_icon_column) {
-                    $stmt = $conn->prepare(
-                        "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `icon`) VALUES (?, ?, ?, ?, ?)"
-                    );
-                    $stmt->bind_param("ssiis", $name, $code, $owner_role_id, $is_link, $icon);
-                } elseif ($module_has_display_order_column) {
-                    $stmt = $conn->prepare(
-                        "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `display_order`) VALUES (?, ?, ?, ?, ?)"
-                    );
-                    $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $display_order);
+                // التحقق من عدم تكرار نفس الصفحة لنفس الدور (قراءة عبر البوابة)
+                $mp_dup = $mp_pg->selectOne('modules', array('columns' => array('id'),
+                    'whereRaw' => '`code` = ? AND `owner_role_id` <=> ?', 'params' => array($code, $owner_role_id)));
+                if ($mp_dup !== null) {
+                    $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
                 } else {
-                    $stmt = $conn->prepare(
-                        "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`) VALUES (?, ?, ?, ?)"
-                    );
-                    $stmt->bind_param("ssii", $name, $code, $owner_role_id, $is_link);
+                    $mp_pg->insert('modules', array(
+                        'name' => $name, 'code' => $code, 'owner_role_id' => $owner_role_id,
+                        'is_link' => $is_link, 'icon' => $icon, 'display_order' => $display_order,
+                        'is_quick' => $mp_is_quick));
+                    header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
+                    exit;
                 }
             }
-        }
-
-        if (!isset($error_msg) && $stmt->execute()) {
-            // is_quick (عمود اختياري): يُحدَّث بعد الحفظ الأساسي حتى لا نمسّ فروع الاستعلامات القائمة
-            if ($module_has_is_quick_column) {
-                $is_quick = (isset($_POST['is_quick']) && $_POST['is_quick'] == '1') ? 1 : 0;
-                $target_id = !empty($_POST['edit_id']) ? (int) $_POST['edit_id'] : (int) $conn->insert_id;
-                if ($target_id > 0 && ($uq = $conn->prepare("UPDATE `modules` SET `is_quick` = ? WHERE `id` = ?"))) {
-                    $uq->bind_param("ii", $is_quick, $target_id);
-                    $uq->execute();
-                    $uq->close();
-                }
-            }
-            header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
-            exit;
-        } elseif (!isset($error_msg)) {
-            $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
+        } catch (\Throwable $t) {
+            error_log('admin/permissions/modules save: ' . $t->getMessage());
+            if (!isset($error_msg)) { $error_msg = 'حدث خطأ في الحفظ ❌'; }
         }
     }
 }
@@ -175,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* حذف */
 if (isset($_GET['delete_id'])) {
     $id = (int) $_GET['delete_id'];
+    // [مُستثنى موثَّق — حذف صف مرجعٍ عام] لا قناة حذفٍ للمراجع العامة بعد
     $stmt = $conn->prepare("DELETE FROM `modules` WHERE `id` = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
@@ -185,10 +128,12 @@ if (isset($_GET['delete_id'])) {
     exit;
 }
 
-// جلب جميع الأدوار
-$stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` WHERE parent_role_id IS NULL ORDER BY `level`, `name`");
-$stmt->execute();
-$roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// جلب جميع الأدوار (عبر البوابة)
+$roles = array();
+try {
+    $roles = $mp_pg->select('roles', array('columns' => array('id', 'name'),
+        'where' => array('parent_role_id' => null), 'orderBy' => 'level, name'));
+} catch (\Throwable $t) { error_log('admin/permissions/modules roles: ' . $t->getMessage()); }
 
 require_once __DIR__ . '/../includes/layout_head.php';
 ?>
@@ -561,29 +506,27 @@ input[type="radio"] {
                     </thead>
                     <tbody>
                         <?php
-                        $order_by = $module_has_display_order_column ? "m.`display_order` ASC, m.`name` ASC" : "m.`name` ASC";
-                        $select_cols = "m.`id`, m.`name`, m.`code`, m.`owner_role_id`, m.`is_link`";
-                        if ($module_has_display_order_column) {
-                            $select_cols .= ", m.`display_order`";
-                        }
-                        if ($module_has_icon_column) {
-                            $select_cols .= ", m.`icon`";
-                        }
-                        if ($module_has_is_quick_column) {
-                            $select_cols .= ", m.`is_quick`";
-                        }
-                        $result = $conn->query("
-                            SELECT 
-                                " . $select_cols . ",
-                                r.`name` AS role_name
-                            FROM `modules` m
-                            LEFT JOIN `roles` r ON m.`owner_role_id` = r.`id`
-                            ORDER BY " . $order_by . "
-                        ");
-                        
+                        // اسم الدور يُشتق من خريطة id→name (self-JOIN عالمي لا يمرّ scopedQuery)
+                        $result = array();
+                        try {
+                            $result = $mp_pg->select('modules', array(
+                                'columns' => array('id', 'name', 'code', 'owner_role_id', 'is_link', 'display_order', 'icon', 'is_quick'),
+                                'orderBy' => 'display_order ASC, name ASC'));
+                            $mp_role_names = array();
+                            foreach ($roles as $mp_r) { $mp_role_names[intval($mp_r['id'])] = $mp_r['name']; }
+                            // خريطة كاملة من كل الأدوار (لا الرئيسية فقط) لاسم المالك
+                            foreach ($mp_pg->select('roles', array('columns' => array('id', 'name'))) as $mp_ra) {
+                                $mp_role_names[intval($mp_ra['id'])] = $mp_ra['name'];
+                            }
+                            foreach ($result as $rk => $rrow) {
+                                $result[$rk]['role_name'] = ($rrow['owner_role_id'] !== null && isset($mp_role_names[intval($rrow['owner_role_id'])]))
+                                    ? $mp_role_names[intval($rrow['owner_role_id'])] : null;
+                            }
+                        } catch (\Throwable $t) { error_log('admin/permissions/modules list: ' . $t->getMessage()); }
+
                         if ($result) {
                             $i = 1;
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($result as $row):
                                 ?>
                                 <tr>
                                     <td><strong><?= $i++; ?></strong></td>
@@ -645,8 +588,8 @@ input[type="radio"] {
                                         </a>
                                     </td>
                                 </tr>
-                            <?php 
-                            endwhile;
+                            <?php
+                            endforeach;
                         }
                         ?>
                     </tbody>

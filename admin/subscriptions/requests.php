@@ -130,6 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
         $approvalMessage = '';
 
         if ($action === 'approve') {
+            // [مُستثنى موثَّق — تزويدٌ عابرٌ للطبقتين] مسار قبول الطلب معاملةٌ ذرّية تُنشئ
+            // شركةً في admin_companies (طبقة المزوّد) ثم تبذر مديرها العام في users (طبقة
+            // المستأجر) بمعرّف الشركة الوليد، ببنّائي أعمدةٍ ديناميكيَّين متكيّفَين. هذا
+            // تزويدٌ يعبر حدّ الطبقتين بمعاملةٍ يدوية تسبق البوابة — يبقى خامًا بهوية
+            // الكونسول المصادَق عليها حتى قناة تزويدٍ منصّية مخصصة (هـ لاحقة). القراءات
+            // والعدّ خارجه مُهاجَرة عبر ems_platform_db.
             mysqli_query($conn, 'START TRANSACTION');
 
             $reqSql = "SELECT * FROM admin_subscription_requests WHERE id=$req_id AND status='pending' LIMIT 1";
@@ -456,12 +462,15 @@ $tab = in_array($tabValue, array('approved', 'rejected'), true) ? $tabValue : 'p
 
 // ── Count by status ───────────────────────────────────────────────────────
 $counts = ['pending' => 0, 'approved' => 0, 'rejected' => 0];
-$cq = @mysqli_query($conn, "SELECT status, COUNT(*) AS c FROM admin_subscription_requests GROUP BY status");
-if ($cq) { while ($row = mysqli_fetch_assoc($cq)) $counts[$row['status']] = intval($row['c']); }
+$sr_pg = ems_platform_db();
+try {
+    $sr_counts = $sr_pg->scopedQuery(array('scope' => array('admin_subscription_requests' => 'admin_subscription_requests')),
+        "SELECT status, COUNT(*) AS c FROM admin_subscription_requests WHERE 1=1 AND {TENANT_SCOPE} GROUP BY status");
+    foreach ($sr_counts as $row) { $counts[$row['status']] = intval($row['c']); }
+} catch (\Throwable $t) { error_log('admin/subscriptions counts: ' . $t->getMessage()); }
 
-// ── Fetch requests ────────────────────────────────────────────────────────
+// ── Fetch requests (super_admins منصّي فيُعلَن إثراءً؛ plans مرجع عام) ────────
 $requests = [];
-$esc_tab  = mysqli_real_escape_string($conn, $tab);
 $rq = @mysqli_query($conn,
     "SELECT r.*, p.plan_name, sa.name AS reviewer_name
      FROM admin_subscription_requests r

@@ -14,61 +14,54 @@ $page   = max(1, intval(isset($_GET['p']) ? $_GET['p'] : 1));
 $per    = 20;
 $offset = ($page - 1) * $per;
 
-function companies_page_has_column($tableName, $columnName) {
-    $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
-    $safeCol = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
-    $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($GLOBALS['conn'], $safeCol) . "'";
-    $res = @mysqli_query($GLOBALS['conn'], $sql);
+// أعمدة name/company_name قائمة في admin_companies (مثبَّتة من القاعدة) — سقط فحص SHOW COLUMNS
+$hasNameCol = true;
+$hasCompanyNameCol = true;
 
-    return $res && mysqli_num_rows($res) > 0;
-}
-
-// ── Query ─────────────────────────────────────────────────────────────────
+// ── Query (عبر بوابة المزوّد العابرة — هـ-1ب) ────────────────────────────────
+$cmp_pg = ems_platform_db();
 $companies   = [];
 $total_count = 0;
 $where_parts = ['1=1'];
-$hasNameCol = companies_page_has_column('admin_companies', 'name');
-$hasCompanyNameCol = companies_page_has_column('admin_companies', 'company_name');
+$cmp_params  = [];
 
 if ($search !== '') {
-    $s = mysqli_real_escape_string($conn, $search);
-    $searchParts = ["c.email LIKE '%$s%'"];
+    $searchParts = ["c.email LIKE ?"];
+    $cmp_params[] = '%' . $search . '%';
     if ($hasCompanyNameCol) {
-        $searchParts[] = "c.company_name LIKE '%$s%'";
+        $searchParts[] = "c.company_name LIKE ?";
+        $cmp_params[] = '%' . $search . '%';
     }
     if ($hasNameCol) {
-        $searchParts[] = "c.name LIKE '%$s%'";
+        $searchParts[] = "c.name LIKE ?";
+        $cmp_params[] = '%' . $search . '%';
     }
     $where_parts[] = "(" . implode(' OR ', $searchParts) . ")";
 }
 if (in_array($status, ['pending', 'active', 'suspended', 'cancelled'])) {
-    $st = mysqli_real_escape_string($conn, $status);
-    $where_parts[] = "c.status = '$st'";
+    // القيمة من قائمةٍ بيضاء أعلاه — حرفية آمنة
+    $where_parts[] = "c.status = '$status'";
 }
 $where = implode(' AND ', $where_parts);
 
-$cnt_q = @mysqli_query($conn, "SELECT COUNT(*) AS c FROM admin_companies c WHERE $where");
-if ($cnt_q) { $total_count = intval(mysqli_fetch_assoc($cnt_q)['c']); }
+try {
+    $cnt_q = $cmp_pg->scopedQuery(array('scope' => array('c' => 'admin_companies')),
+        "SELECT COUNT(*) AS c FROM admin_companies c WHERE $where AND {TENANT_SCOPE}", $cmp_params);
+    if (isset($cnt_q[0]['c'])) { $total_count = intval($cnt_q[0]['c']); }
+} catch (\Throwable $t) { error_log('admin/companies count: ' . $t->getMessage()); }
 
-$displayNameSelect = "c.email AS display_name";
-if ($hasNameCol && $hasCompanyNameCol) {
-    $displayNameSelect = "COALESCE(NULLIF(c.company_name, ''), c.name, c.email) AS display_name";
-} elseif ($hasCompanyNameCol) {
-    $displayNameSelect = "COALESCE(NULLIF(c.company_name, ''), c.email) AS display_name";
-} elseif ($hasNameCol) {
-    $displayNameSelect = "COALESCE(NULLIF(c.name, ''), c.email) AS display_name";
-}
+$displayNameSelect = "COALESCE(NULLIF(c.company_name, ''), c.name, c.email) AS display_name";
 
-$res = @mysqli_query($conn,
-    "SELECT c.*, p.plan_name,
+try {
+    $companies = $cmp_pg->scopedQuery(array('scope' => array('c' => 'admin_companies')),
+        "SELECT c.*, p.plan_name,
             $displayNameSelect
      FROM admin_companies c
      LEFT JOIN admin_subscription_plans p ON c.plan_id = p.id
-     WHERE $where
+     WHERE $where AND {TENANT_SCOPE}
      ORDER BY c.created_at DESC
-     LIMIT $per OFFSET $offset"
-);
-if ($res) { while ($row = mysqli_fetch_assoc($res)) $companies[] = $row; }
+     LIMIT $per OFFSET $offset", $cmp_params);
+} catch (\Throwable $t) { $companies = []; error_log('admin/companies list: ' . $t->getMessage()); }
 
 $total_pages = max(1, (int)ceil($total_count / $per));
 $csrf = generate_csrf_token();
@@ -361,8 +354,11 @@ require_once __DIR__ . '/includes/layout_head.php';
                     <select class="form-ctrl" name="plan_id">
                         <option value="">— اختر خطة —</option>
                         <?php
-                        $plans_q = @mysqli_query($conn, "SELECT id, plan_name FROM admin_subscription_plans WHERE is_active=1 ORDER BY sort_order");
-                        if ($plans_q) while ($pl = mysqli_fetch_assoc($plans_q)) {
+                        try {
+                            $plans_q = $cmp_pg->select('admin_subscription_plans', array(
+                                'columns' => array('id', 'plan_name'), 'where' => array('is_active' => 1), 'orderBy' => 'sort_order'));
+                        } catch (\Throwable $t) { $plans_q = []; error_log('admin/companies plans: ' . $t->getMessage()); }
+                        foreach ($plans_q as $pl) {
                             echo '<option value="' . intval($pl['id']) . '">' . e($pl['plan_name']) . '</option>';
                         }
                         ?>
@@ -528,8 +524,11 @@ require_once __DIR__ . '/includes/layout_head.php';
                     <select class="form-ctrl" id="editPlanId" name="plan_id">
                         <option value="">— اختر خطة —</option>
                         <?php
-                        $plans_q2 = @mysqli_query($conn, "SELECT id, plan_name FROM admin_subscription_plans WHERE is_active=1 ORDER BY sort_order");
-                        if ($plans_q2) while ($pl = mysqli_fetch_assoc($plans_q2)) {
+                        try {
+                            $plans_q2 = $cmp_pg->select('admin_subscription_plans', array(
+                                'columns' => array('id', 'plan_name'), 'where' => array('is_active' => 1), 'orderBy' => 'sort_order'));
+                        } catch (\Throwable $t) { $plans_q2 = []; error_log('admin/companies plans2: ' . $t->getMessage()); }
+                        foreach ($plans_q2 as $pl) {
                             echo '<option value="' . intval($pl['id']) . '">' . e($pl['plan_name']) . '</option>';
                         }
                         ?>
