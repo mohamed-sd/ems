@@ -227,11 +227,18 @@ function checkReportPermission($conn, $reportCode, $roleId) {
     $roleId = intval($roleId);
     // السوبر ادمن يرى كل التقارير
     if ($roleId === -1) return true;
-    $reportCode = mysqli_real_escape_string($conn, $reportCode);
-    $result = @mysqli_query($conn, "SELECT id FROM report_role_permissions WHERE role_id = $roleId AND report_code = '$reportCode' LIMIT 1");
-    // إذا الجدول غير موجود أو مديرو المشاريع (role=1) — منح الوصول
-    if (!$result) return ($roleId === 1);
-    return (mysqli_num_rows($result) > 0);
+    // جدول report_role_permissions مرجعيٌّ عالمي (T_GLOBAL) — قراءته عبر البوابة بلا تنطيق شركة.
+    try {
+        $rows = ems_tenant_db()->select('report_role_permissions', array(
+            'columns' => array('id'),
+            'where'   => array('role_id' => $roleId, 'report_code' => strval($reportCode)),
+            'limit'   => 1,
+        ));
+    } catch (\Throwable $t) {
+        // إذا الجدول غير موجود أو مديرو المشاريع (role=1) — منح الوصول (سلوك الأصل)
+        return ($roleId === 1);
+    }
+    return (count($rows) > 0);
 }
 
 /**
@@ -244,13 +251,19 @@ function getAvailableReports($conn, $roleId) {
     // السوبر ادمن يرى كل التقارير
     if ($roleId === -1) return array_values($catalog);
 
-    // جلب كل الأكواد المسموح بها لهذا الدور
-    $result = @mysqli_query($conn, "SELECT report_code FROM report_role_permissions WHERE role_id = $roleId");
-    // إذا الجدول غير موجود أو مدير مشاريع — أظهر كل التقارير
-    if (!$result) return ($roleId === 1) ? array_values($catalog) : [];
+    // جلب كل الأكواد المسموح بها لهذا الدور (جدول مرجعي عالمي عبر البوابة)
+    try {
+        $result = ems_tenant_db()->select('report_role_permissions', array(
+            'columns' => array('report_code'),
+            'where'   => array('role_id' => $roleId),
+        ));
+    } catch (\Throwable $t) {
+        // إذا الجدول غير موجود أو مدير مشاريع — أظهر كل التقارير (سلوك الأصل)
+        return ($roleId === 1) ? array_values($catalog) : [];
+    }
 
     $allowed = [];
-    while ($row = mysqli_fetch_assoc($result)) {
+    foreach ($result as $row) {
         $allowed[$row['report_code']] = true;
     }
 
@@ -334,55 +347,41 @@ function formatCurrency($value, $currency = 'دولار') {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * بناء شرط نطاق الشركة لجدول معين
- * يستخدم company_id مباشرة إذا وُجد، وإلا يرجع إلى created_by
+ * بوابة تقارير موحّدة — العزل عبر بوابة المستأجر، والسوبر عبر forAllTenants المسجَّل
+ * (سلوك الأصل: rptCompanyScope كان يعيد 1=1 للسوبر و company_id=N للمستأجر — البوابة تكافئه حرفيًا).
  */
-function rptCompanyScope($conn, $alias, $tableName, $companyId, $isSuperAdmin) {
-    if ($isSuperAdmin || $companyId <= 0) return '1=1';
-    $prefix = $alias !== '' ? $alias . '.' : '';
-    if (db_table_has_column($conn, $tableName, 'company_id')) {
-        return $prefix . 'company_id = ' . intval($companyId);
-    }
-    if ($tableName === 'project') {
-        return "EXISTS (SELECT 1 FROM users __u WHERE __u.id = {$prefix}created_by AND __u.company_id = " . intval($companyId) . ")";
-    }
-    return '1=1';
+function rptGate($isSuperAdmin) {
+    return $isSuperAdmin ? ems_tenant_db()->forAllTenants('emsreports super') : ems_tenant_db();
 }
 
 /**
  * جلب المشاريع للـ dropdown (مصفوفة بـ company)
  */
 function getProjectsForDropdown($conn, $companyId, $isSuperAdmin) {
-    $scope = rptCompanyScope($conn, 'p', 'project', $companyId, $isSuperAdmin);
-    $sql   = "SELECT p.id, p.name, p.project_code FROM project p WHERE ($scope) ORDER BY p.name ASC";
-    $res   = mysqli_query($conn, $sql);
-    $list  = [];
-    if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;
-    return $list;
+    try {
+        return rptGate($isSuperAdmin)->scopedQuery(array('scope' => array('p' => 'project')),
+            "SELECT p.id, p.name, p.project_code FROM project p WHERE 1=1 AND {TENANT_SCOPE} ORDER BY p.name ASC");
+    } catch (\Throwable $t) { error_log('emsreports projects dropdown: ' . $t->getMessage()); return []; }
 }
 
 /**
  * جلب الموردين للـ dropdown
  */
 function getSuppliersForDropdown($conn, $companyId, $isSuperAdmin) {
-    $scope = rptCompanyScope($conn, 's', 'suppliers', $companyId, $isSuperAdmin);
-    $sql   = "SELECT id, name FROM suppliers s WHERE ($scope) ORDER BY name ASC";
-    $res   = mysqli_query($conn, $sql);
-    $list  = [];
-    if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;
-    return $list;
+    try {
+        return rptGate($isSuperAdmin)->scopedQuery(array('scope' => array('s' => 'suppliers')),
+            "SELECT id, name FROM suppliers s WHERE 1=1 AND {TENANT_SCOPE} ORDER BY name ASC");
+    } catch (\Throwable $t) { error_log('emsreports suppliers dropdown: ' . $t->getMessage()); return []; }
 }
 
 /**
  * جلب المشغلين للـ dropdown
  */
 function getDriversForDropdown($conn, $companyId, $isSuperAdmin) {
-    $scope = rptCompanyScope($conn, 'd', 'employees', $companyId, $isSuperAdmin);
-    $sql   = "SELECT id, name, employee_code FROM employees d WHERE ($scope) ORDER BY name ASC";
-    $res   = mysqli_query($conn, $sql);
-    $list  = [];
-    if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;
-    return $list;
+    try {
+        return rptGate($isSuperAdmin)->scopedQuery(array('scope' => array('d' => 'employees')),
+            "SELECT id, name, employee_code FROM employees d WHERE 1=1 AND {TENANT_SCOPE} ORDER BY name ASC");
+    } catch (\Throwable $t) { error_log('emsreports drivers dropdown: ' . $t->getMessage()); return []; }
 }
 
 /**

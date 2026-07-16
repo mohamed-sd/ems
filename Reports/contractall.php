@@ -93,20 +93,29 @@ if (!isset($_SESSION['user'])) {
 <body>
     <?php include('../insidebar.php');
 
-    $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+    // العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+    $is_super = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
+    $ca_gate = $is_super ? ems_tenant_db()->forAllTenants('report super') : ems_tenant_db();
 
     $contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
-    $sql_contracts = "SELECT c.id, p.name AS project_name
+    $contracts = array();
+    try {
+        $contracts = $ca_gate->scopedQuery(
+            array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project')),
+            "SELECT c.id, p.name AS project_name
                       FROM contracts c
-                      LEFT JOIN project p ON c.project_id = p.id";
-    $contracts = mysqli_query($conn, $sql_contracts);
+                      LEFT JOIN project p ON c.project_id = p.id WHERE 1=1 AND {TENANT_SCOPE}");
+    } catch (\Throwable $t) { error_log('contractall.php sql_contracts failed: ' . $t->getMessage()); }
 
     $contract_data = $time_vs_progress = $faults = $suppliers = $equipments = $drivers = $variance = null;
 
     if ($contract_filter > 0) {
         // تفاصيل العقد
-        $sql_info = "
+        try {
+            $contract_data_rows = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project', 'o' => 'operations', 'e' => 'equipments', 't' => 'timesheet')),
+                "
         SELECT
             c.id AS contract_id,
             p.name AS project_name,
@@ -117,118 +126,128 @@ if (!isset($_SESSION['user'])) {
             IFNULL(SUM(t.executed_hours),0) AS actual_hours
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = $contract_filter
-        GROUP BY c.id, p.name";
-        $contract_data_res = mysqli_query($conn, $sql_info);
-        if ($contract_data_res) {
-            $contract_data = mysqli_fetch_assoc($contract_data_res);
-        } else {
-            error_log('contractall.php sql_info failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}
+        GROUP BY c.id, p.name", array($contract_filter));
+            $contract_data = $contract_data_rows ? $contract_data_rows[0] : null;
+        } catch (\Throwable $t) {
+            error_log('contractall.php sql_info failed: ' . $t->getMessage());
         }
 
         // الزمن مقابل الإنجاز
-        $sql_time = "
+        try {
+            $time_vs_progress_rows = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project', 'o' => 'operations', 'e' => 'equipments', 't' => 'timesheet')),
+                "
         SELECT
             (TIMESTAMPDIFF(MONTH, c.contract_signing_date, CURDATE()) / c.contract_duration_months) * 100 AS time_progress,
             (IFNULL(SUM(t.executed_hours),0) / c.forecasted_contracted_hours) * 100 AS work_progress
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = $contract_filter";
-        $time_vs_progress_res = mysqli_query($conn, $sql_time);
-        if ($time_vs_progress_res) {
-            $time_vs_progress = mysqli_fetch_assoc($time_vs_progress_res);
-        } else {
-            error_log('contractall.php sql_time failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}", array($contract_filter));
+            $time_vs_progress = $time_vs_progress_rows ? $time_vs_progress_rows[0] : null;
+        } catch (\Throwable $t) {
+            error_log('contractall.php sql_time failed: ' . $t->getMessage());
         }
 
         // الأعطال
-        $sql_faults = "
+        try {
+            $faults_rows = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project', 'o' => 'operations', 'e' => 'equipments', 't' => 'timesheet')),
+                "
         SELECT SUM(t.total_fault_hours) AS total_fault_hours
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = $contract_filter";
-        $faults_res = mysqli_query($conn, $sql_faults);
-        if ($faults_res) {
-            $faults = mysqli_fetch_assoc($faults_res);
-        } else {
-            error_log('contractall.php sql_faults failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}", array($contract_filter));
+            $faults = $faults_rows ? $faults_rows[0] : null;
+        } catch (\Throwable $t) {
+            error_log('contractall.php sql_faults failed: ' . $t->getMessage());
         }
 
         // الموردين
-        $sql_suppliers = "
+        try {
+            $suppliers = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts', 'o' => 'operations', 'e' => 'equipments', 's' => 'suppliers'), 'enrich' => array('p' => 'project', 't' => 'timesheet')),
+                "
         SELECT s.name AS supplier_name, SUM(t.executed_hours) AS total_work_hours
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        JOIN operations o ON o." . $operations_project_column . " = p.id
+        JOIN operations o ON o.project_id = p.id
         JOIN equipments e ON e.id = o.equipment
         JOIN suppliers s ON e.suppliers = s.id
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = $contract_filter
-        GROUP BY s.name";
-        $suppliers = mysqli_query($conn, $sql_suppliers);
-        if (!$suppliers) {
-            error_log('contractall.php sql_suppliers failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}
+        GROUP BY s.name", array($contract_filter));
+        } catch (\Throwable $t) {
+            $suppliers = null;
+            error_log('contractall.php sql_suppliers failed: ' . $t->getMessage());
         }
 
         // الآليات
-        $sql_equipments = "
+        try {
+            $equipments = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts', 'o' => 'operations', 'e' => 'equipments'), 'enrich' => array('p' => 'project', 't' => 'timesheet')),
+                "
         SELECT e.name AS equipment_name,
                SUM(t.executed_hours) AS work_hours,
                SUM(t.total_fault_hours) AS fault_hours
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        JOIN operations o ON o." . $operations_project_column . " = p.id
+        JOIN operations o ON o.project_id = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = $contract_filter
-        GROUP BY e.name";
-        $equipments = mysqli_query($conn, $sql_equipments);
-        if (!$equipments) {
-            error_log('contractall.php sql_equipments failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}
+        GROUP BY e.name", array($contract_filter));
+        } catch (\Throwable $t) {
+            $equipments = null;
+            error_log('contractall.php sql_equipments failed: ' . $t->getMessage());
         }
 
         // السائقين
-        $sql_drivers = "
+        try {
+            $drivers = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts', 'o' => 'operations', 'e' => 'equipments', 'd' => 'employees'), 'enrich' => array('p' => 'project', 't' => 'timesheet')),
+                "
         SELECT d.name AS driver_name, SUM(t.executed_hours) AS driver_hours
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        JOIN operations o ON o." . $operations_project_column . " = p.id
+        JOIN operations o ON o.project_id = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         JOIN employees d ON t.employee_id = d.id
-        WHERE c.id = $contract_filter
-        GROUP BY d.name";
-        $drivers = mysqli_query($conn, $sql_drivers);
-        if (!$drivers) {
-            error_log('contractall.php sql_drivers failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}
+        GROUP BY d.name", array($contract_filter));
+        } catch (\Throwable $t) {
+            $drivers = null;
+            error_log('contractall.php sql_drivers failed: ' . $t->getMessage());
         }
 
         // الانحراف
-        $sql_variance = "
+        try {
+            $variance_rows = $ca_gate->scopedQuery(
+                array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project', 'o' => 'operations', 'e' => 'equipments', 't' => 'timesheet')),
+                "
         SELECT c.forecasted_contracted_hours AS planned_hours,
                IFNULL(SUM(t.executed_hours),0) AS actual_hours,
                (IFNULL(SUM(t.executed_hours),0) - c.forecasted_contracted_hours) AS variance
         FROM contracts c
         LEFT JOIN project p ON c.project_id = p.id
-        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = $contract_filter
-        GROUP BY c.id";
-        $variance_res = mysqli_query($conn, $sql_variance);
-        if ($variance_res) {
-            $variance = mysqli_fetch_assoc($variance_res);
-        } else {
-            error_log('contractall.php sql_variance failed: ' . mysqli_error($conn));
+        WHERE c.id = ? AND {TENANT_SCOPE}
+        GROUP BY c.id", array($contract_filter));
+            $variance = $variance_rows ? $variance_rows[0] : null;
+        } catch (\Throwable $t) {
+            error_log('contractall.php sql_variance failed: ' . $t->getMessage());
         }
     }
     ?>
@@ -256,7 +275,7 @@ if (!isset($_SESSION['user'])) {
                         <label><i class="fas fa-file-contract"></i> اختر العقد</label>
                         <select name="contract">
                             <option value="">-- اختر --</option>
-                            <?php while($row = mysqli_fetch_assoc($contracts)) {
+                            <?php foreach ($contracts as $row) {
                                 $selected = ($contract_filter == $row['id']) ? "selected" : "";
                                 echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['project_name']}</option>";
                             } ?>
@@ -316,7 +335,7 @@ if (!isset($_SESSION['user'])) {
                         <tr><th>المورد</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
-                    <?php if ($suppliers) { while($row = mysqli_fetch_assoc($suppliers)) { ?>
+                    <?php if ($suppliers) { foreach ($suppliers as $row) { ?>
                         <tr>
                             <td><?= $row['supplier_name'] ?></td>
                             <td><?= $row['total_work_hours'] ?></td>
@@ -335,7 +354,7 @@ if (!isset($_SESSION['user'])) {
                         <tr><th>الآلية</th><th>ساعات العمل</th><th>ساعات الأعطال</th></tr>
                     </thead>
                     <tbody>
-                    <?php if ($equipments) { while($row = mysqli_fetch_assoc($equipments)) { ?>
+                    <?php if ($equipments) { foreach ($equipments as $row) { ?>
                         <tr>
                             <td><?= $row['equipment_name'] ?></td>
                             <td><?= $row['work_hours'] ?></td>
@@ -355,7 +374,7 @@ if (!isset($_SESSION['user'])) {
                         <tr><th>السائق</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
-                    <?php if ($drivers) { while($row = mysqli_fetch_assoc($drivers)) { ?>
+                    <?php if ($drivers) { foreach ($drivers as $row) { ?>
                         <tr>
                             <td><?= $row['driver_name'] ?></td>
                             <td><?= $row['driver_hours'] ?></td>

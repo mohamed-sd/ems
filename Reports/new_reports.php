@@ -7,29 +7,32 @@ if (!isset($_SESSION['user'])) {
 
 include("../config.php"); // ملف الاتصال بقاعدة البيانات
 
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$is_super = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
+$nr_gate = $is_super ? ems_tenant_db()->forAllTenants('report super') : ems_tenant_db();
+
 // المشاريع
-$projects_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM project");
-$projects_count = $projects_res ? (mysqli_fetch_assoc($projects_res)['c'] ?? null) : null;
+try { $projects_count = $nr_gate->count('project'); } catch (\Throwable $t) { $projects_count = null; error_log('new_reports projects: ' . $t->getMessage()); }
 
 // الموردين
-$suppliers_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM suppliers");
-$suppliers_count = $suppliers_res ? (mysqli_fetch_assoc($suppliers_res)['c'] ?? null) : null;
+try { $suppliers_count = $nr_gate->count('suppliers'); } catch (\Throwable $t) { $suppliers_count = null; error_log('new_reports suppliers: ' . $t->getMessage()); }
 
 // الآليات
-$equipments_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM equipments");
-$equipments_count = $equipments_res ? (mysqli_fetch_assoc($equipments_res)['c'] ?? null) : null;
+try { $equipments_count = $nr_gate->count('equipments'); } catch (\Throwable $t) { $equipments_count = null; error_log('new_reports equipments: ' . $t->getMessage()); }
 
 // المشغلين (drivers)
-$operators_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM employees");
-$operators_count = $operators_res ? (mysqli_fetch_assoc($operators_res)['c'] ?? null) : null;
+try { $operators_count = $nr_gate->count('employees'); } catch (\Throwable $t) { $operators_count = null; error_log('new_reports operators: ' . $t->getMessage()); }
 
 // المستخدمين
-$users_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM users");
-$users_count = $users_res ? (mysqli_fetch_assoc($users_res)['c'] ?? null) : null;
+try { $users_count = $nr_gate->count('users'); } catch (\Throwable $t) { $users_count = null; error_log('new_reports users: ' . $t->getMessage()); }
 
 // ساعات العمل (مجموع total_work_hours)
-$workhours_res = mysqli_query($conn, "SELECT SUM(total_work_hours) AS total FROM timesheet");
-$workhours_count = $workhours_res ? (mysqli_fetch_assoc($workhours_res)['total'] ?? null) : null;
+$workhours_count = null;
+try {
+    $workhours_rows = $nr_gate->scopedQuery(array('scope' => array('timesheet' => 'timesheet')),
+        "SELECT SUM(total_work_hours) AS total FROM timesheet WHERE 1=1 AND {TENANT_SCOPE}");
+    $workhours_count = $workhours_rows ? ($workhours_rows[0]['total'] ?? null) : null;
+} catch (\Throwable $t) { error_log('new_reports workhours: ' . $t->getMessage()); }
 if(!$workhours_count) $workhours_count = 0;
 ?>
 <!DOCTYPE html>

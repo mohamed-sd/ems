@@ -66,22 +66,33 @@ if (!isset($_SESSION['user'])) {
 <?php
 include('../insidebar.php');
 
-$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants (سلوك الأصل: بلا تنطيق).
+// (operations.project_id عمودٌ قائم فسقط فحصه)
+$cr_is_super = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
+$cr_gate = $cr_is_super ? ems_tenant_db()->forAllTenants('contract report super') : ems_tenant_db();
+$operations_project_column = 'project_id';
 
 $contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
-$sql_contracts = "SELECT c.id, p.name AS project_name
+// قائمة العقود (contracts نطاق، project إثراء LEFT) — الأصل بلا تنطيق = تسريب تعزله البوابة الآن.
+$contracts = array();
+try {
+    $contracts = $cr_gate->scopedQuery(array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project')),
+        "SELECT c.id, p.name AS project_name
                   FROM contracts c
-                  LEFT JOIN project p ON c.project_id = p.id";
-$contracts = mysqli_query($conn, $sql_contracts);
+                  LEFT JOIN project p ON c.project_id = p.id WHERE 1=1 AND {TENANT_SCOPE}");
+} catch (\Throwable $t) { error_log('contract_report.php contracts: ' . $t->getMessage()); }
 
 $contract_data = null;
 $monthly_stats = null;
 
 if ($contract_filter > 0) {
-    // بيانات العقد الأساسية
-    $sql_info = "
-    SELECT
+    // بيانات العقد الأساسية (contracts نطاق؛ project/operations/equipments/timesheet إثراء LEFT)
+    try {
+        $cr_info = $cr_gate->scopedQuery(
+            array('scope' => array('c' => 'contracts'),
+                  'enrich' => array('p' => 'project', 'o' => 'operations', 'e' => 'equipments', 't' => 'timesheet')),
+            "SELECT
         c.id AS contract_id,
         c.id AS contract_id,
         p.name AS project_name,
@@ -93,21 +104,20 @@ if ($contract_filter > 0) {
         (c.forecasted_contracted_hours - IFNULL(SUM(t.executed_hours),0)) AS remaining_hours
     FROM contracts c
     LEFT JOIN project p ON c.project_id = p.id
-    LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
+    LEFT JOIN operations o ON o.$operations_project_column = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
-    WHERE c.id = $contract_filter
-    GROUP BY c.id, p.name, c.contract_signing_date, c.contract_duration_months";
-    $contract_data_res = mysqli_query($conn, $sql_info);
-    if ($contract_data_res) {
-        $contract_data = mysqli_fetch_assoc($contract_data_res);
-    } else {
-        error_log('contract_report.php sql_info failed: ' . mysqli_error($conn));
-    }
+    WHERE c.id = ? AND {TENANT_SCOPE}
+    GROUP BY c.id, p.name, c.contract_signing_date, c.contract_duration_months", array($contract_filter));
+        $contract_data = !empty($cr_info) ? $cr_info[0] : null;
+    } catch (\Throwable $t) { error_log('contract_report.php sql_info: ' . $t->getMessage()); }
 
     // إحصائية شهرية
-    $sql_monthly = "
-    SELECT
+    try {
+        $monthly_stats = $cr_gate->scopedQuery(
+            array('scope' => array('c' => 'contracts'),
+                  'enrich' => array('p' => 'project', 'o' => 'operations', 'e' => 'equipments', 't' => 'timesheet')),
+            "SELECT
         YEAR(t.date) AS year,
         MONTH(t.date) AS month,
         IFNULL(SUM(t.executed_hours),0) AS executed_hours,
@@ -116,17 +126,13 @@ if ($contract_filter > 0) {
         c.hours_monthly_target
     FROM contracts c
     LEFT JOIN project p ON c.project_id = p.id
-    LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
+    LEFT JOIN operations o ON o.$operations_project_column = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
-    WHERE c.id = $contract_filter
+    WHERE c.id = ? AND {TENANT_SCOPE}
     GROUP BY YEAR(t.date), MONTH(t.date), c.hours_monthly_target
-    ORDER BY year, month";
-
-    $monthly_stats = mysqli_query($conn, $sql_monthly);
-    if (!$monthly_stats) {
-        error_log('contract_report.php sql_monthly failed: ' . mysqli_error($conn));
-    }
+    ORDER BY year, month", array($contract_filter));
+    } catch (\Throwable $t) { error_log('contract_report.php sql_monthly: ' . $t->getMessage()); }
 }
 ?>
 
@@ -153,10 +159,10 @@ if ($contract_filter > 0) {
                     <label><i class="fas fa-file-signature"></i> اختر العقد</label>
                     <select name="contract">
                         <option value="">-- اختر --</option>
-                        <?php if ($contracts) { while($row = mysqli_fetch_assoc($contracts)) {
+                        <?php foreach ($contracts as $row) {
                             $selected = ($contract_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['project_name']}</option>";
-                        } } ?>
+                        } ?>
                     </select>
                 </div>
                 <button type="submit"><i class="fa fa-eye"></i> عرض التقرير</button>
@@ -230,8 +236,7 @@ if ($contract_filter > 0) {
                         $percentages = array();
 
                         if ($monthly_stats) {
-                        mysqli_data_seek($monthly_stats, 0);
-                        while($row = mysqli_fetch_assoc($monthly_stats)) {
+                        foreach ($monthly_stats as $row) {
                             $labels[] = $row['year']."-".$row['month'];
                             $actual[] = isset($row['total_hours']) ? $row['total_hours'] : 0;
                             $target[] = isset($row['hours_monthly_target']) ? $row['hours_monthly_target'] : 0;

@@ -6,13 +6,27 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$is_super = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
+$rgate = $is_super ? ems_tenant_db()->forAllTenants('report super') : ems_tenant_db();
+
 // استقبال الفلاhتر
 $date_filter      = isset($_GET['date']) ? $_GET['date'] : '';
 $equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
 $project_filter   = isset($_GET['project']) ? $_GET['project'] : '';
 
-$sql = "
-  SELECT
+// فلاتر مُمعلَمة (?) — العزل يُحقن عبر {TENANT_SCOPE} (الأصل كان بلا تنطيق شركةٍ = تسريب تعزله البوابة الآن).
+$deliy_filter = '';
+$deliy_params = array();
+if (!empty($date_filter)) { $deliy_filter .= " AND t.`date` = ? "; $deliy_params[] = $date_filter; }
+if (!empty($equipment_filter)) { $deliy_filter .= " AND e.id = ? "; $deliy_params[] = $equipment_filter; }
+if (!empty($project_filter)) { $deliy_filter .= " AND p.id = ? "; $deliy_params[] = $project_filter; }
+
+$result = array();
+try {
+    $result = $rgate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 'd' => 'employees', 'p' => 'project')),
+        "SELECT
       p.name AS project_name,
       e.name AS equipment_name,
       d.name AS driver_name,
@@ -26,42 +40,28 @@ JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
   JOIN employees d ON t.employee_id = d.id
   JOIN project p ON o.project_id = p.id
-  WHERE 1=1
-";
+  WHERE 1=1$deliy_filter AND {TENANT_SCOPE}", $deliy_params);
+} catch (\Throwable $t) { error_log('deliy.php main: ' . $t->getMessage()); }
 
-if (!empty($date_filter)) {
-    $sql .= " AND t.`date` = '$date_filter' ";
-}
-if (!empty($equipment_filter)) {
-    $sql .= " AND e.id = '$equipment_filter' ";
-}
-if (!empty($project_filter)) {
-    $sql .= " AND p.id = '$project_filter' ";
-}
+// استعلام المجموع (الأصل يضم operations مرتين: الاسم المستعار p هو operations لا project — سلوكٌ محفوظ حرفيًّا)
+$deliy_total_filter = '';
+$deliy_total_params = array();
+if (!empty($date_filter)) { $deliy_total_filter .= " AND t.`date` = ? "; $deliy_total_params[] = $date_filter; }
+if (!empty($equipment_filter)) { $deliy_total_filter .= " AND e.id = ? "; $deliy_total_params[] = $equipment_filter; }
+if (!empty($project_filter)) { $deliy_total_filter .= " AND p.id = ? "; $deliy_total_params[] = $project_filter; }
 
-$result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . mysqli_error($conn));
-
-// استعلام المجموع
-$total_sql = "SELECT SUM(t.executed_hours) AS executed_hours
+$executed_hours = null;
+try {
+    $total_rows = $rgate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 'p' => 'operations')),
+        "SELECT SUM(t.executed_hours) AS executed_hours
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
 JOIN operations p ON o.project_id = p.id
-WHERE 1=1";
-
-if (!empty($date_filter)) {
-    $total_sql .= " AND t.`date` = '$date_filter' ";
-}
-if (!empty($equipment_filter)) {
-    $total_sql .= " AND e.id = '$equipment_filter' ";
-}
-if (!empty($project_filter)) {
-    $total_sql .= " AND p.id = '$project_filter' ";
-}
-
-$total_result = mysqli_query($conn, $total_sql) or die("خطأ في استعلام المجموع: " . mysqli_error($conn));
-$total_row    = mysqli_fetch_assoc($total_result);
-$executed_hours  = $total_row['executed_hours'];
+WHERE 1=1$deliy_total_filter AND {TENANT_SCOPE}", $deliy_total_params);
+    $executed_hours = !empty($total_rows) ? $total_rows[0]['executed_hours'] : null;
+} catch (\Throwable $t) { error_log('deliy.php total: ' . $t->getMessage()); }
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -108,9 +108,22 @@ $executed_hours  = $total_row['executed_hours'];
 					<select name="equipment">
 						<option value="">-- الكل --</option>
 						<?php
-						$eqs = mysqli_query($conn, "SELECT id, name , code FROM equipments where status = '1' AND  id IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) ");
+						// الآليات في تشغيلٍ نشط — خطوتان معزولتان (الاستعلام الفرعي على operations يُعزَل مستقلًّا عبر البوابة).
+						$eqs = array();
+						try {
+							$ops_active = $rgate->scopedQuery(array('scope' => array('operations' => 'operations')),
+								"SELECT equipment FROM operations WHERE `status` LIKE '1' AND {TENANT_SCOPE}");
+							$eq_ids = array();
+							foreach ($ops_active as $r) { if ($r['equipment'] !== null && $r['equipment'] !== '') { $eq_ids[] = intval($r['equipment']); } }
+							$eq_ids = array_values(array_unique($eq_ids));
+							if (!empty($eq_ids)) {
+								$ph = implode(',', array_fill(0, count($eq_ids), '?'));
+								$eqs = $rgate->scopedQuery(array('scope' => array('equipments' => 'equipments')),
+									"SELECT id, name , code FROM equipments where status = '1' AND  id IN ($ph) AND {TENANT_SCOPE}", $eq_ids);
+							}
+						} catch (\Throwable $t) { error_log('deliy.php equipments: ' . $t->getMessage()); }
 						if ($eqs) {
-						while($row = mysqli_fetch_assoc($eqs)){
+						foreach ($eqs as $row){
 							$selected = ($equipment_filter == $row['id']) ? "selected" : "";
 							echo "<option value='{$row['id']}' $selected>{$row['name']} - {$row['code']} </option>";
 						}
@@ -124,9 +137,13 @@ $executed_hours  = $total_row['executed_hours'];
 					<select name="project">
 						<option value="">-- الكل --</option>
 						<?php
-						$prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
+						$prj = array();
+						try {
+							$prj = $rgate->scopedQuery(array('scope' => array('project' => 'project')),
+								"SELECT id, name FROM project where status = '1' AND {TENANT_SCOPE}");
+						} catch (\Throwable $t) { error_log('deliy.php projects: ' . $t->getMessage()); }
 						if ($prj) {
-						while($row = mysqli_fetch_assoc($prj)){
+						foreach ($prj as $row){
 							$selected = ($project_filter == $row['id']) ? "selected" : "";
 							echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
 						}
@@ -160,7 +177,7 @@ $executed_hours  = $total_row['executed_hours'];
 						</tr>
 					</thead>
 					<tbody>
-					<?php while($row = mysqli_fetch_assoc($result)) { ?>
+					<?php foreach ($result as $row) { ?>
 						<tr>
 							<td><?php echo $row['project_name']; ?></td>
 							<td><?php echo $row['equipment_name']; ?></td>

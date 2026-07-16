@@ -31,33 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة'], JSON_UNESCAPED_UNICODE));
 }
 
-// التأكد من وجود الجداول
-ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timesheet_id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `approval_level` tinyint(1) NOT NULL,
-  `approved_by` int(11) NOT NULL,
-  `approved_by_name` varchar(255) NOT NULL,
-  `approved_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_ts_level` (`timesheet_id`, `approval_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval_handler.php');
-
-ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `timesheet_id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `column_name` varchar(100) NOT NULL,
-  `column_label` varchar(255) NOT NULL,
-  `note_text` text NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `created_by_name` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval_handler.php');
+// جدولا timesheet_approvals/timesheet_approval_notes قائمان ومسجَّلان في السجل —
+// سقطت الهجرتان الذاتيتان CREATE TABLE IF NOT EXISTS بسقوط نمط ems_runtime_ddl.
+// العزل عبر بوابة المستأجر. (الحدّ المقدّس: خطّاف نشر الناقل في فرع الاعتماد الرابع
+// يبقى بايت-مطابقًا — لا يُمَسّ.)
+$th_gate = ems_tenant_db();
 
 $action = isset($_POST['action']) ? trim($_POST['action']) : '';
 
@@ -107,40 +85,43 @@ if ($action === 'approve') {
     $escaped_name = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غير معروف');
 
     foreach ($ids as $ts_id) {
-        // التحقق من أن السجل ينتمي لنفس الشركة
-        $scope = ($company_id > 0) ? " AND (company_id = $company_id OR company_id IS NULL)" : '';
-        $chk = $conn->query("SELECT id FROM timesheet WHERE id = $ts_id $scope");
-        if (!$chk || $chk->num_rows === 0) { $skipped++; continue; }
+        // التحقق من أن السجل ينتمي لنفس الشركة (البوابة تعزل بالشركة؛ فرع
+        // company_id IS NULL الموروث ميتٌ — صفر صفوفٍ بلا شركةٍ قِيست).
+        try { $chk = $th_gate->selectOne('timesheet', array('columns' => array('id'), 'where' => array('id' => $ts_id))); }
+        catch (\Throwable $t) { $chk = null; error_log('hours_approval approve chk: ' . $t->getMessage()); }
+        if ($chk === null) { $skipped++; continue; }
 
         // التحقق من اعتماد المستوى السابق (ما عدا المستوى الأول)
         if ($prev_level > 0) {
-            $prev_chk = $conn->query(
-                "SELECT id FROM timesheet_approvals
-                 WHERE timesheet_id = $ts_id AND approval_level = $prev_level AND status = 1"
-            );
-            if (!$prev_chk || $prev_chk->num_rows === 0) { $skipped++; continue; }
+            try { $prev_chk = $th_gate->selectOne('timesheet_approvals', array('columns' => array('id'),
+                'where' => array('timesheet_id' => $ts_id, 'approval_level' => $prev_level, 'status' => 1))); }
+            catch (\Throwable $t) { $prev_chk = null; }
+            if ($prev_chk === null) { $skipped++; continue; }
         }
 
         // تجنب تكرار الاعتماد
-        $dup = $conn->query(
-            "SELECT id FROM timesheet_approvals
-             WHERE timesheet_id = $ts_id AND approval_level = $my_level"
-        );
-        if ($dup && $dup->num_rows > 0) { $skipped++; continue; }
+        try { $dup = $th_gate->selectOne('timesheet_approvals', array('columns' => array('id'),
+            'where' => array('timesheet_id' => $ts_id, 'approval_level' => $my_level))); }
+        catch (\Throwable $t) { $dup = null; }
+        if ($dup !== null) { $skipped++; continue; }
 
-        $ins = $conn->query(
-            "INSERT INTO timesheet_approvals
-             (timesheet_id, company_id, approval_level, approved_by, approved_by_name)
-             VALUES ($ts_id, $company_id, $my_level, $user_id, '$escaped_name')"
-        );
-        if ($ins) $approved++;
+        // إدراج الموافقة عبر البوابة (company_id تحقنه من سياق الجلسة، ويعيد المعرّف الوليد)
+        $ins_id = 0;
+        try {
+            $ins_id = intval($th_gate->insert('timesheet_approvals', array(
+                'timesheet_id' => $ts_id, 'approval_level' => $my_level,
+                'approved_by' => $user_id, 'approved_by_name' => ($_SESSION['user']['name'] ?? 'غير معروف'))));
+        } catch (\Throwable $t) { error_log('hours_approval insert: ' . $t->getMessage()); }
+        if ($ins_id > 0) $approved++;
 
         // ── K5 (ADR-10) · إضافة معزولة — لا تمسّ منطق الموافقات الأربع ──
         // تُستدعى بعد نجاح إدراج الموافقة الرابعة الأخيرة حصرًا؛ خلف علَم
         // EMS_EVENT_HOOKS (off افتراضًا = صفر أثر)؛ تبتلع كل أخطائها داخلها —
         // الاعتماد يكتمل دائمًا مهما جرى للنشر (خطة K5 §8.2 المُقرّة).
-        if ($ins && $my_level === 4) {
-            $__k5_gen = intval($conn->insert_id);
+        // [الحدّ المقدّس] المعرّف الوليد الآن من البوابة بدل $conn->insert_id، والخطّاف
+        // يُستدعى بـ$conn نفسه بلا مساس — الناقل غير مَمسوس.
+        if ($ins_id > 0 && $my_level === 4) {
+            $__k5_gen = $ins_id;
             require_once __DIR__ . '/../includes/timesheet_event_hook.php';
             ems_timesheet_event_hook($conn, $ts_id, $__k5_gen, $user_id);
         }
@@ -169,20 +150,25 @@ if ($action === 'add_note') {
         die(json_encode(['success' => false, 'message' => 'بيانات ناقصة'], JSON_UNESCAPED_UNICODE));
     }
 
-    // التحقق من أن السجل ينتمي لنفس الشركة
-    $scope = ($company_id > 0) ? " AND (company_id = $company_id OR company_id IS NULL)" : '';
-    $chk = $conn->query("SELECT id FROM timesheet WHERE id = $ts_id $scope");
-    if (!$chk || $chk->num_rows === 0) {
+    // التحقق من أن السجل ينتمي لنفس الشركة (عبر البوابة)
+    try { $chk = $th_gate->selectOne('timesheet', array('columns' => array('id'), 'where' => array('id' => $ts_id))); }
+    catch (\Throwable $t) { $chk = null; error_log('hours_approval note chk: ' . $t->getMessage()); }
+    if ($chk === null) {
         die(json_encode(['success' => false, 'message' => 'السجل غير موجود'], JSON_UNESCAPED_UNICODE));
     }
 
-    $ins = $conn->query(
-        "INSERT INTO timesheet_approval_notes
-         (timesheet_id, company_id, column_name, column_label, note_text, created_by, created_by_name)
-         VALUES ($ts_id, $company_id, '$col_name', '$col_label', '$note_text', $user_id, '$escaped_name')"
-    );
+    // القيم الخام تُمرَّر مباشرةً للبوابة (تستعمل عبارات مُجهّزة داخليًا) — company_id يُحقَن
+    $note_ok = false;
+    try {
+        $th_gate->insert('timesheet_approval_notes', array(
+            'timesheet_id' => $ts_id, 'column_name' => trim($_POST['column_name'] ?? ''),
+            'column_label' => trim($_POST['column_label'] ?? ($_POST['column_name'] ?? '')),
+            'note_text' => trim($_POST['note_text'] ?? ''),
+            'created_by' => $user_id, 'created_by_name' => ($_SESSION['user']['name'] ?? 'غير معروف')));
+        $note_ok = true;
+    } catch (\Throwable $t) { error_log('hours_approval add_note: ' . $t->getMessage()); }
 
-    if ($ins) {
+    if ($note_ok) {
         echo json_encode(['success' => true, 'message' => 'تمت إضافة الملاحظة'], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode(['success' => false, 'message' => 'فشل حفظ الملاحظة: ' . $conn->error], JSON_UNESCAPED_UNICODE);
@@ -199,22 +185,22 @@ if ($action === 'get_notes') {
         die(json_encode(['success' => false, 'message' => 'معرف غير صحيح'], JSON_UNESCAPED_UNICODE));
     }
 
-    $scope = ($company_id > 0) ? " AND (n.company_id = $company_id OR n.company_id IS NULL)" : '';
-    $res = $conn->query(
-        "SELECT n.id, n.column_label, n.note_text, n.created_by_name, n.created_at,
+    // الملاحظات (نطاق n=timesheet_approval_notes، إثراء u=users LEFT) — البوابة تعزل
+    $res = array();
+    try {
+        $res = $th_gate->scopedQuery(array('scope' => array('n' => 'timesheet_approval_notes'), 'enrich' => array('u' => 'users')),
+            "SELECT n.id, n.column_label, n.note_text, n.created_by_name, n.created_at,
                 COALESCE(u.role, '') AS created_by_role
          FROM timesheet_approval_notes n
          LEFT JOIN users u ON u.id = n.created_by
-         WHERE n.timesheet_id = $ts_id AND n.status = 1 $scope
-         ORDER BY n.created_at ASC"
-    );
+         WHERE n.timesheet_id = ? AND n.status = 1 AND {TENANT_SCOPE}
+         ORDER BY n.created_at ASC", array($ts_id));
+    } catch (\Throwable $t) { error_log('hours_approval get_notes: ' . $t->getMessage()); }
 
     $notes = [];
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-            $row['created_by_role_label'] = role_label_ar($row['created_by_role']);
-            $notes[] = $row;
-        }
+    foreach ($res as $row) {
+        $row['created_by_role_label'] = role_label_ar($row['created_by_role']);
+        $notes[] = $row;
     }
     echo json_encode(['success' => true, 'notes' => $notes], JSON_UNESCAPED_UNICODE);
     exit;
@@ -249,30 +235,36 @@ if ($action === 'reject') {
         die(json_encode(['success' => false, 'message' => 'يجب كتابة سبب الرفض'], JSON_UNESCAPED_UNICODE));
     }
 
-    // التحقق من أن السجل ينتمي لنفس الشركة
-    $scope = ($company_id > 0) ? " AND (company_id = $company_id OR company_id IS NULL)" : '';
-    $chk = $conn->query("SELECT id FROM timesheet WHERE id = $ts_id AND status = 1 $scope");
-    if (!$chk || $chk->num_rows === 0) {
+    // التحقق من أن السجل ينتمي لنفس الشركة (عبر البوابة)
+    try { $chk = $th_gate->selectOne('timesheet', array('columns' => array('id'),
+        'where' => array('id' => $ts_id, 'status' => 1))); }
+    catch (\Throwable $t) { $chk = null; error_log('hours_approval reject chk: ' . $t->getMessage()); }
+    if ($chk === null) {
         die(json_encode(['success' => false, 'message' => 'السجل غير موجود أو لا تملك صلاحية الوصول'], JSON_UNESCAPED_UNICODE));
     }
 
-    $escaped_reason = mysqli_real_escape_string($conn, $reason);
-    $escaped_name   = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غير معروف');
-    $my_level       = $role_level_map[$role];
+    $my_level = $role_level_map[$role];
 
-    // حذف جميع اعتمادات هذا السجل (إعادته إلى الصفر)
-    $del = $conn->query("DELETE FROM timesheet_approvals WHERE timesheet_id = $ts_id");
+    // حذف جميع اعتمادات هذا السجل (إعادته إلى الصفر) — عبر البوابة: جلب المعرّفات ثم
+    // deleteRow لكلٍّ (معزولٌ بالشركة، مطابقٌ سلوكيًا لحذف الكل بشرط timesheet_id).
+    $del_ok = false;
+    try {
+        $appr_ids = $th_gate->select('timesheet_approvals', array('columns' => array('id'), 'where' => array('timesheet_id' => $ts_id)));
+        foreach ($appr_ids as $ar) { $th_gate->deleteRow('timesheet_approvals', $ar['id'], 'approval reset on reject'); }
+        $del_ok = true;
+    } catch (\Throwable $t) { error_log('hours_approval reject del: ' . $t->getMessage()); }
 
-    // تسجيل سبب الرفض في جدول الملاحظات
+    // تسجيل سبب الرفض في جدول الملاحظات (عبر البوابة)
     $rej_label = 'رفض المستوى ' . $my_level . ' — ' . role_label_ar($role);
-    $ins = $conn->query(
-        "INSERT INTO timesheet_approval_notes
-         (timesheet_id, company_id, column_name, column_label, note_text, created_by, created_by_name)
-         VALUES ($ts_id, $company_id, 'rejection', '" . mysqli_real_escape_string($conn, $rej_label) . "',
-                 '$escaped_reason', $user_id, '$escaped_name')"
-    );
+    $rej_ins_ok = false;
+    try {
+        $th_gate->insert('timesheet_approval_notes', array(
+            'timesheet_id' => $ts_id, 'column_name' => 'rejection', 'column_label' => $rej_label,
+            'note_text' => $reason, 'created_by' => $user_id, 'created_by_name' => ($_SESSION['user']['name'] ?? 'غير معروف')));
+        $rej_ins_ok = true;
+    } catch (\Throwable $t) { error_log('hours_approval reject note: ' . $t->getMessage()); }
 
-    if ($del && $ins) {
+    if ($del_ok && $rej_ins_ok) {
         echo json_encode([
             'success' => true,
             'message' => 'تم رفض السجل #' . $ts_id . ' وإعادته إلى أول السلسلة'

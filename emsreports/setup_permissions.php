@@ -35,12 +35,22 @@ $r = ems_runtime_ddl($conn, $createSQL, 'emsreports/setup_permissions.php');
 $msgs = [];
 $msgs[] = $r ? '✅ الجدول جاهز (أُنشئ أو كان موجوداً)' : '❌ خطأ في إنشاء الجدول: ' . mysqli_error($conn);
 
+// البذر عبر البوابة العابرة (السكربت محروسٌ بالسوبر أعلاه؛ الجدول مرجعيٌّ عالمي T_GLOBAL —
+// كتابته مسموحة للسوبر/العابرة بعقد هـ-0). INSERT IGNORE تُكافَأ بفحصٍ-ثم-إدراج.
 $inserted = 0;
+$sp_gate = ems_tenant_db()->forAllTenants('emsreports setup — super seeding');
 foreach ($roles as $role) {
     foreach ($reports as $code) {
-        $safe = mysqli_real_escape_string($conn, $code);
-        $ir = @mysqli_query($conn, "INSERT IGNORE INTO report_role_permissions (role_id, report_code) VALUES ($role, '$safe')");
-        if ($ir && mysqli_affected_rows($conn) > 0) $inserted++;
+        try {
+            $dup = $sp_gate->selectOne('report_role_permissions', array(
+                'columns' => array('id'),
+                'where'   => array('role_id' => $role, 'report_code' => strval($code)),
+            ));
+            if ($dup === null) {
+                $sp_gate->insert('report_role_permissions', array('role_id' => $role, 'report_code' => strval($code)));
+                $inserted++;
+            }
+        } catch (\Throwable $t) { error_log('setup_permissions insert: ' . $t->getMessage()); }
     }
 }
 $msgs[] = "✅ تم إدراج $inserted صلاحية جديدة لجميع الأدوار";

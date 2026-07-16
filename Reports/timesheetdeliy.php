@@ -7,24 +7,35 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 $_ts_current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $_ts_is_super_admin = ($_ts_current_role === '-1');
-$_ts_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$_ts_suppliers_has_company_id = db_table_has_column($conn, 'suppliers', 'company_id');
-$_ts_supplier_company_where = (!$_ts_is_super_admin && $_ts_suppliers_has_company_id && $_ts_company_id > 0)
-    ? " AND company_id = '$_ts_company_id'"
-    : "";
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$tsd_gate = $_ts_is_super_admin ? ems_tenant_db()->forAllTenants('report super') : ems_tenant_db();
 
-$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
-
-    // استقبال الفلاتر
+    // استقبال الفلاتر (القيم تُمرَّر مُمعلَمةً ? — والعرض في HTML يبقى بالتهريب القديم نفسه)
     $date_filter = isset($_GET['date']) ? mysqli_real_escape_string($conn, $_GET['date']) : '';
+    $date_filter_raw = isset($_GET['date']) ? $_GET['date'] : '';
     $project_filter = isset($_GET['project']) ? intval($_GET['project']) : 0;
     $supplier_filter = isset($_GET['supplier']) ? intval($_GET['supplier']) : 0;
 
     $shift_filter = isset($_GET['shift']) ? mysqli_real_escape_string($conn, $_GET['shift']) : '';
+    $shift_filter_raw = isset($_GET['shift']) ? $_GET['shift'] : '';
     $type_filter = isset($_GET['type']) ? intval($_GET['type']) : 0;
 
+    // فلاتر مُمعلَمة — العزل يُحقن عبر {TENANT_SCOPE} (الأصل كان بلا تنطيق شركةٍ = تسريب تعزله البوابة الآن).
+    $tsd_filter = '';
+    $tsd_params = array();
+    if (!empty($date_filter)) { $tsd_filter .= " AND t.date = ? "; $tsd_params[] = $date_filter_raw; }
+    if (!empty($project_filter)) { $tsd_filter .= " AND p.id = ? "; $tsd_params[] = $project_filter; }
+    if (!empty($supplier_filter)) { $tsd_filter .= " AND s.id = ? "; $tsd_params[] = $supplier_filter; }
+    if (!empty($shift_filter)) { $tsd_filter .= " AND t.shift = ? "; $tsd_params[] = $shift_filter_raw; }
 
-    $sql = "
+    $result = array();
+    try {
+        $tsd_main_filter = $tsd_filter;
+        $tsd_main_params = $tsd_params;
+        if (!empty($type_filter)) { $tsd_main_filter .= " AND e.type = ? "; $tsd_main_params[] = $type_filter; }
+        $result = $tsd_gate->scopedQuery(
+            array('scope' => array('t' => 'timesheet', 'd' => 'employees', 'o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project')),
+            "
 SELECT
     t.id,
     t.date,
@@ -44,36 +55,18 @@ JOIN employees d ON t.employee_id = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o." . $operations_project_column . " = p.id
-WHERE 1=1
-";
-
-    if (!empty($date_filter)) {
-        $sql .= " AND t.date = '$date_filter' ";
-    }
-    if (!empty($project_filter)) {
-        $sql .= " AND p.id = '$project_filter' ";
-    }
-    if (!empty($supplier_filter)) {
-        $sql .= " AND s.id = '$supplier_filter' ";
+JOIN project p ON o.project_id = p.id
+WHERE 1=1$tsd_main_filter AND {TENANT_SCOPE} ORDER BY t.date, p.name, s.name ", $tsd_main_params);
+    } catch (\Throwable $t) {
+        error_log('timesheetdeliy.php details query failed: ' . $t->getMessage());
     }
 
-    if (!empty($shift_filter)) {
-        $sql .= " AND t.shift = '$shift_filter' ";
-    }
-
-    if (!empty($type_filter)) {
-        $sql .= " AND e.type = '$type_filter' ";
-    }
-
-    $sql .= " ORDER BY t.date, p.name, s.name ";
-    $result = mysqli_query($conn, $sql);
-    if (!$result) {
-        error_log('timesheetdeliy.php details query failed: ' . mysqli_error($conn));
-    }
-
-    // إجمالي الإحصائيات
-    $total_sql = "
+    // إجمالي الإحصائيات (الأصل بلا فلتر النوع هنا — سلوكٌ محفوظ)
+    $totals = ['executed_hours' => 0, 'total_fault' => 0, 'total_standby' => 0];
+    try {
+        $tsd_tot = $tsd_gate->scopedQuery(
+            array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project')),
+            "
 SELECT
     SUM(t.executed_hours) AS executed_hours,
     SUM(t.total_fault_hours) AS total_fault,
@@ -82,30 +75,12 @@ FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o." . $operations_project_column . " = p.id
-WHERE 1=1
-";
-
-    if (!empty($date_filter)) {
-        $total_sql .= " AND t.date = '$date_filter' ";
+JOIN project p ON o.project_id = p.id
+WHERE 1=1$tsd_filter AND {TENANT_SCOPE}", $tsd_params);
+        if ($tsd_tot) { $totals = $tsd_tot[0]; }
+    } catch (\Throwable $t) {
+        error_log('timesheetdeliy.php totals query failed: ' . $t->getMessage());
     }
-    if (!empty($project_filter)) {
-        $total_sql .= " AND p.id = '$project_filter' ";
-    }
-    if (!empty($supplier_filter)) {
-        $total_sql .= " AND s.id = '$supplier_filter' ";
-    }
-
-    if (!empty($shift_filter)) {
-        $total_sql .= " AND t.shift = '$shift_filter' ";
-    }
-
-
-$total_res = mysqli_query($conn, $total_sql);
-$totals = $total_res ? mysqli_fetch_assoc($total_res) : ['executed_hours' => 0, 'total_fault' => 0, 'total_standby' => 0];
-if (!$total_res) {
-    error_log('timesheetdeliy.php totals query failed: ' . mysqli_error($conn));
-}
 
 $page_title = "إيكوبيشن | تقرير التايم شيت اليومي";
 include("../inheader.php");
@@ -139,12 +114,13 @@ include('../insidebar.php');
                     <select name="project" class="form-select">
                         <option value="">-- الكل --</option>
                         <?php
-                        $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
-                        if ($prj) {
-                        while ($row = mysqli_fetch_assoc($prj)) {
+                        $prj = array();
+                        try {
+                            $prj = $tsd_gate->select('project', array('columns' => array('id', 'name'), 'where' => array('status' => '1')));
+                        } catch (\Throwable $t) { error_log('timesheetdeliy.php projects: ' . $t->getMessage()); }
+                        foreach ($prj as $row) {
                             $selected = ($project_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-                        }
                         }
                         ?>
                     </select>
@@ -155,12 +131,13 @@ include('../insidebar.php');
                     <select name="supplier" class="form-select">
                         <option value="">-- الكل --</option>
                         <?php
-                        $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1'$_ts_supplier_company_where ");
-                        if ($sup) {
-                        while ($row = mysqli_fetch_assoc($sup)) {
+                        $sup = array();
+                        try {
+                            $sup = $tsd_gate->select('suppliers', array('columns' => array('id', 'name'), 'where' => array('status' => '1')));
+                        } catch (\Throwable $t) { error_log('timesheetdeliy.php suppliers: ' . $t->getMessage()); }
+                        foreach ($sup as $row) {
                             $selected = ($supplier_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-                        }
                         }
                         ?>
                     </select>
@@ -234,7 +211,7 @@ include('../insidebar.php');
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($result) { while ($row = mysqli_fetch_assoc($result)) { ?>
+                    <?php if ($result) { foreach ($result as $row) { ?>
                         <tr>
                             <td><?php echo htmlspecialchars($row['date']); ?></td>
                             <td><?php echo htmlspecialchars($row['project_name']); ?></td>

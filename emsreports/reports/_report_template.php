@@ -18,22 +18,25 @@ $companyId    = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'
 $isSuperAdmin = ($roleId === -1);
 $userName     = htmlspecialchars($_SESSION['user']['name'] ?? '', ENT_QUOTES, 'UTF-8');
 
+// ─── بوابة العزل الموحّدة للتقرير (السوبر عبر forAllTenants المسجَّل — سلوك الأصل: 1=1) ───
+$rpt_gate = rptGate($isSuperAdmin);
+
 // ─── AJAX: إرجاع المعدات حسب النوع لفلتر الاسم ──────────────────────────
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1'
     && isset($_GET['action']) && $_GET['action'] === 'get_equipments_by_type') {
     header('Content-Type: application/json; charset=utf-8');
-    $sc_e = rptCompanyScope($conn, 'e', 'equipments', $companyId, $isSuperAdmin);
-    $ajaxWhere = ["($sc_e)"];
+    $ajaxWhere = ["1=1"];
     if (isset($_GET['type']) && $_GET['type'] !== '') {
         $ajaxWhere[] = "e.type=" . intval($_GET['type']);
     }
     if (isset($_GET['supplier_id']) && intval($_GET['supplier_id']) > 0) {
         $ajaxWhere[] = "e.suppliers=" . intval($_GET['supplier_id']);
     }
-    $ajaxSql = "SELECT e.id, e.name, e.code FROM equipments e WHERE " . implode(' AND ', $ajaxWhere) . " ORDER BY e.name ASC";
-    $ajaxRes = mysqli_query($conn, $ajaxSql);
     $ajaxData = [];
-    if ($ajaxRes) while ($ar = mysqli_fetch_assoc($ajaxRes)) $ajaxData[] = $ar;
+    try {
+        $ajaxData = $rpt_gate->scopedQuery(array('scope' => array('e' => 'equipments')),
+            "SELECT e.id, e.name, e.code FROM equipments e WHERE " . implode(' AND ', $ajaxWhere) . " AND {TENANT_SCOPE} ORDER BY e.name ASC");
+    } catch (\Throwable $t) { error_log('emsreports ajax equipments: ' . $t->getMessage()); }
     echo json_encode($ajaxData);
     exit;
 }
@@ -111,19 +114,7 @@ if (!function_exists('rr')) {
     function rr($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
 }
 
-// ─── نطاق الشركة لكل جدول ────────────────────────────────────────────────
-$sc = [
-    't'  => rptCompanyScope($conn, 't',  'timesheet',          $companyId, $isSuperAdmin),
-    'o'  => rptCompanyScope($conn, 'o',  'operations',         $companyId, $isSuperAdmin),
-    'p'  => rptCompanyScope($conn, 'p',  'project',            $companyId, $isSuperAdmin),
-    's'  => rptCompanyScope($conn, 's',  'suppliers',          $companyId, $isSuperAdmin),
-    'e'  => rptCompanyScope($conn, 'e',  'equipments',         $companyId, $isSuperAdmin),
-    'd'  => rptCompanyScope($conn, 'd',  'employees',            $companyId, $isSuperAdmin),
-    'c'  => rptCompanyScope($conn, 'c',  'contracts',          $companyId, $isSuperAdmin),
-    'sc' => rptCompanyScope($conn, 'sc', 'supplierscontracts', $companyId, $isSuperAdmin),
-    'dc' => rptCompanyScope($conn, 'dc', 'drivercontracts',    $companyId, $isSuperAdmin),
-    'm'  => rptCompanyScope($conn, 'm',  'mines',              $companyId, $isSuperAdmin),
-];
+// ─── نطاق الشركة: يُحقن الآن عبر {TENANT_SCOPE} في بوابة العزل ($rpt_gate) — لا شروط يدوية ───
 
 // ─── متغيرات البيانات الرئيسية ───────────────────────────────────────────
 $headers   = [];
@@ -148,7 +139,10 @@ case 'timesheet_by_driver':
 case 'supplier_timesheet':
 case 'fleet_timesheet':
 case 'drivers_timesheet': {
-    $where = ["({$sc['t']})", "({$sc['o']})"];
+    // العزل (t + o كما في الأصل) يُحقن عبر {TENANT_SCOPE}؛ بقية LEFT JOIN إثراءٌ بلا تنطيق (سلوك الأصل حرفيًا)
+    $tsDecl = array('scope'  => array('t' => 'timesheet', 'o' => 'operations'),
+                    'enrich' => array('p' => 'project', 'e' => 'equipments', 's' => 'suppliers', 'd' => 'employees'));
+    $where = ["1=1"];
     if ($fDateFrom) $where[] = "t.date >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
     if ($fDateTo)   $where[] = "t.date <= '" . mysqli_real_escape_string($conn, $fDateTo) . "'";
     if ($fProjectId  > 0) $where[] = "o.project_id = $fProjectId";
@@ -172,9 +166,9 @@ case 'drivers_timesheet': {
                LEFT JOIN operations o ON o.id = t.operator
                LEFT JOIN suppliers  s ON s.id = o.supplier_id
                LEFT JOIN employees    d ON d.id = t.employee_id
-               WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery($tsDecl, $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports ts kpi: ' . $t_->getMessage()); }
     $executedHours = floatval($kpiRow['executed_hours'] ?? 0);
     $standbyHours = floatval($kpiRow['standby_hours'] ?? 0);
     $twh = floatval($kpiRow['twh'] ?? 0);
@@ -207,7 +201,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN project    p ON p.id=o.project_id
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
                 LEFT JOIN employees    d ON d.id=t.employee_id
-                WHERE $ws GROUP BY p.id,p.name ORDER BY twh DESC";
+                WHERE $ws AND {TENANT_SCOPE} GROUP BY p.id,p.name ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_equipment','fleet_timesheet'])) {
            $headers = ['الكود','المعدة','المورد','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(e.code,'-') AS code,
@@ -226,7 +220,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN equipments e ON e.id=o.equipment
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
                 LEFT JOIN employees    d ON d.id=t.employee_id
-                WHERE $ws GROUP BY e.id ORDER BY twh DESC";
+                WHERE $ws AND {TENANT_SCOPE} GROUP BY e.id ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_driver','drivers_timesheet'])) {
            $headers = ['المشغل','المورد','عدد الورديات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(d.name,'غير محدد') AS driver_name,
@@ -243,7 +237,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN operations o ON o.id=t.operator
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
                 LEFT JOIN employees    d ON d.id=t.employee_id
-                WHERE $ws GROUP BY d.id ORDER BY twh DESC";
+                WHERE $ws AND {TENANT_SCOPE} GROUP BY d.id ORDER BY twh DESC";
     } elseif ($REPORT_CODE === 'supplier_timesheet') {
            $headers = ['المورد','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(s.name,'غير محدد') AS supplier_name,
@@ -259,7 +253,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN operations o ON o.id=t.operator
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
                 LEFT JOIN employees    d ON d.id=t.employee_id
-                WHERE $ws GROUP BY s.id ORDER BY twh DESC";
+                WHERE $ws AND {TENANT_SCOPE} GROUP BY s.id ORDER BY twh DESC";
     } else {
         // timesheet_summary / timesheet_detailed
         if ($REPORT_CODE === 'timesheet_detailed') {
@@ -297,7 +291,7 @@ case 'drivers_timesheet': {
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
                     LEFT JOIN employees    d ON d.id=t.employee_id
-                    WHERE $ws ORDER BY t.date DESC, t.id DESC";
+                    WHERE $ws AND {TENANT_SCOPE} ORDER BY t.date DESC, t.id DESC";
         } else {
             // timesheet_summary
               $headers = ['التاريخ','البداية','النهاية','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%','المشروع','المعدة','المورد','المشغل'];
@@ -321,13 +315,13 @@ case 'drivers_timesheet': {
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
                     LEFT JOIN employees    d ON d.id=t.employee_id
-                    WHERE $ws ORDER BY t.date DESC, t.id DESC";
+                    WHERE $ws AND {TENANT_SCOPE} ORDER BY t.date DESC, t.id DESC";
         }
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ في الاستعلام: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($tsDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ في الاستعلام: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     // بيانات الرسم البياني
     if (count($rows) > 0) {
@@ -391,7 +385,10 @@ case 'drivers_timesheet': {
 ───────────────────────────────────────────────────────────────────────── */
 case 'project_summary':
 case 'project_detailed': {
-    $where = ["({$sc['p']})", "p.is_deleted = 0"];
+    // العزل (p) عبر {TENANT_SCOPE}؛ الاستعلامات الفرعية المرتبطة بمفتاح p.id إثراءٌ بلا تنطيق (سلوك الأصل)
+    $prjDecl = array('scope'  => array('p' => 'project'),
+                     'enrich' => array('ct' => 'contracts', 't2' => 'timesheet', 'o2' => 'operations'));
+    $where = ["p.is_deleted = 0"];
     if ($fStatus >= 0) $where[] = "p.status = $fStatus";
     if ($fSearch !== '') {
         $safe = mysqli_real_escape_string($conn, $fSearch);
@@ -406,13 +403,23 @@ case 'project_detailed': {
                       SUM(CASE WHEN p.status=1 THEN 1 ELSE 0 END) AS active_p,
                       COUNT(DISTINCT p.state) AS states_cnt,
                       COUNT(DISTINCT p.category) AS cat_cnt
-               FROM project p WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               FROM project p WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery(array('scope' => array('p' => 'project')), $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports prj kpi: ' . $t_->getMessage()); }
 
+    // عدّ العقود: خطوتان تحفظان دلالة الأصل (نطاق المشاريع أولًا ثم عدّ عقودها)
     $totalContracts = 0;
-    $contractsSql = mysqli_query($conn, "SELECT COUNT(*) AS c FROM contracts c WHERE c.status=1 AND c.project_id IN (SELECT id FROM project p WHERE $ws)");
-    if ($contractsSql) { $cr2 = mysqli_fetch_assoc($contractsSql); $totalContracts = $cr2['c'] ?? 0; }
+    try {
+        $pidRows_ = $rpt_gate->scopedQuery(array('scope' => array('p' => 'project')),
+            "SELECT id FROM project p WHERE $ws AND {TENANT_SCOPE}");
+        $pids_ = array();
+        foreach ($pidRows_ as $pr_) { $pids_[] = intval($pr_['id']); }
+        if ($pids_) {
+            $cntRows_ = $rpt_gate->scopedQuery(array('scope' => array('c' => 'contracts')),
+                "SELECT COUNT(*) AS c FROM contracts c WHERE c.status=1 AND c.project_id IN (" . implode(',', $pids_) . ") AND {TENANT_SCOPE}");
+            $totalContracts = $cntRows_ ? ($cntRows_[0]['c'] ?? 0) : 0;
+        }
+    } catch (\Throwable $t_) { error_log('emsreports prj contracts: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-project-diagram','value'=> number_format($kpiRow['total_p']    ?? 0),'label'=>'إجمالي المشاريع','color'=>'blue'],
@@ -435,24 +442,24 @@ case 'project_detailed': {
                        CASE WHEN p.latitude IS NOT NULL AND p.longitude IS NOT NULL
                             THEN CONCAT(p.latitude,' / ',p.longitude) ELSE '—' END AS coords,
                        (SELECT COUNT(*) FROM contracts ct WHERE ct.project_id=p.id AND ct.status=1 AND ct.is_deleted=0) AS contracts_cnt,
-                       IFNULL((SELECT ROUND(SUM(t2.total_work_hours),1) FROM timesheet t2 JOIN operations o2 ON o2.id=t2.operator WHERE o2.project_id=p.id),0) AS total_wh,
-                       IFNULL((SELECT COUNT(*) FROM timesheet t3 JOIN operations o3 ON o3.id=t3.operator WHERE o3.project_id=p.id),0) AS shifts_cnt,
+                       IFNULL((SELECT ROUND(SUM(t2.total_work_hours),1) FROM timesheet t2 LEFT JOIN operations o2 ON o2.id=t2.operator WHERE o2.project_id=p.id),0) AS total_wh,
+                       IFNULL((SELECT COUNT(*) FROM timesheet t3 LEFT JOIN operations o3 ON o3.id=t3.operator WHERE o3.project_id=p.id),0) AS shifts_cnt,
                        CASE WHEN p.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt,
                        DATE_FORMAT(p.create_at,'%Y-%m-%d') AS created_date
-                FROM project p WHERE $ws ORDER BY p.status DESC, p.name ASC";
+                FROM project p WHERE $ws AND {TENANT_SCOPE} ORDER BY p.status DESC, p.name ASC";
     } else {
         $headers = ['الكود','المشروع','العميل','الموقع','ساعات العمل','الحالة'];
         $sql = "SELECT p.project_code, p.name,
                        IFNULL(p.client,'—') AS client,
                        IFNULL(p.location,'—') AS location,
-                       IFNULL((SELECT ROUND(SUM(t2.total_work_hours),1) FROM timesheet t2 JOIN operations o2 ON o2.id=t2.operator WHERE o2.project_id=p.id),0) AS total_wh,
+                       IFNULL((SELECT ROUND(SUM(t2.total_work_hours),1) FROM timesheet t2 LEFT JOIN operations o2 ON o2.id=t2.operator WHERE o2.project_id=p.id),0) AS total_wh,
                        CASE WHEN p.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt
-                FROM project p WHERE $ws ORDER BY p.status DESC, p.name ASC";
+                FROM project p WHERE $ws AND {TENANT_SCOPE} ORDER BY p.status DESC, p.name ASC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($prjDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     if (count($rows) > 1) {
         $sorted = $rows;
@@ -478,7 +485,9 @@ case 'project_detailed': {
 ───────────────────────────────────────────────────────────────────────── */
 case 'contracts_summary':
 case 'contracts_detailed': {
-    $where = ["({$sc['c']})", "c.is_deleted = 0"];
+    // العزل (c) عبر {TENANT_SCOPE}؛ project إثراء LEFT بلا تنطيق (سلوك الأصل)
+    $cDecl = array('scope' => array('c' => 'contracts'), 'enrich' => array('p' => 'project'));
+    $where = ["c.is_deleted = 0"];
     if ($fStatus >= 0)       $where[] = "c.status = $fStatus";
     if ($fProjectId > 0)     $where[] = "c.project_id = $fProjectId";
     if ($fContractStatus !== '') {
@@ -493,9 +502,9 @@ case 'contracts_detailed': {
                       SUM(CASE WHEN c.contract_status='terminated' THEN 1 ELSE 0 END) AS term_c,
                       ROUND(IFNULL(SUM(c.forecasted_contracted_hours),0),0) AS total_hrs,
                       ROUND(AVG(c.contract_duration_months),1) AS avg_dur
-               FROM contracts c LEFT JOIN project p ON p.id=c.project_id WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               FROM contracts c LEFT JOIN project p ON p.id=c.project_id WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery($cDecl, $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports contracts kpi: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-file-contract','value'=> number_format($kpiRow['total_c']  ?? 0),        'label'=>'إجمالي العقود',  'color'=>'blue'],
@@ -534,7 +543,7 @@ case 'contracts_detailed': {
                        IFNULL(c.pause_reason,'—') AS pause_reason
                 FROM contracts c
                 LEFT JOIN project p ON p.id=c.project_id
-                WHERE $ws ORDER BY c.contract_signing_date DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY c.contract_signing_date DESC";
     } else {
         $headers = ['رقم العقد','المشروع','تاريخ التوقيع','المدة (شهر)','الساعات الشهرية','الإجمالي المستهدف','الحالة'];
         $sql = "SELECT c.id,
@@ -546,12 +555,12 @@ case 'contracts_detailed': {
                        CASE WHEN c.status=1 THEN 'نشط' ELSE 'غير ساري' END AS status_txt
                 FROM contracts c
                 LEFT JOIN project p ON p.id=c.project_id
-                WHERE $ws ORDER BY c.contract_signing_date DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY c.contract_signing_date DESC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($cDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     if (count($rows) > 0) {
         $actC = intval($kpiRow['active_c'] ?? 0);
@@ -579,7 +588,10 @@ case 'contracts_detailed': {
 case 'supplier_contracts_summary':
 case 'supplier_contracts_detailed':
 case 'supplier_equipment_performance': {
-    $where = ["({$sc['sc']})"];
+    // العزل (sc) عبر {TENANT_SCOPE}؛ suppliers/project/معدات العقد إثراءٌ بلا تنطيق (سلوك الأصل)
+    $scDecl = array('scope'  => array('sc' => 'supplierscontracts'),
+                    'enrich' => array('s' => 'suppliers', 'p' => 'project', 'sce' => 'suppliercontractequipments'));
+    $where = ["1=1"];
     if ($fStatus >= 0)    $where[] = "sc.status = $fStatus";
     if ($fSupplierId > 0) $where[] = "sc.supplier_id = $fSupplierId";
     if ($fProjectId  > 0) $where[] = "sc.project_id = $fProjectId";
@@ -595,9 +607,9 @@ case 'supplier_equipment_performance': {
                       ROUND(AVG(sc.contract_duration_months),1) AS avg_dur,
                       IFNULL(SUM(sc.equip_count),0) AS total_equip,
                       IFNULL(SUM(sc.mach_count),0) AS total_mach
-               FROM supplierscontracts sc WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               FROM supplierscontracts sc WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery(array('scope' => array('sc' => 'supplierscontracts')), $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports sc kpi: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-handshake',  'value'=> number_format($kpiRow['total']      ?? 0),        'label'=>'إجمالي العقود',  'color'=>'blue'],
@@ -637,7 +649,7 @@ case 'supplier_equipment_performance': {
                 FROM supplierscontracts sc
                 LEFT JOIN suppliers s  ON s.id=sc.supplier_id
                 LEFT JOIN project   p  ON p.id=sc.project_id
-                WHERE $ws ORDER BY sc.contract_signing_date DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY sc.contract_signing_date DESC";
     } else {
         $headers = ['المورد','المشروع','تاريخ التوقيع','المدة (شهر)','المستهدف الشهري','الإجمالي المستهدف','عدد المعدات','الحالة'];
         $sql = "SELECT IFNULL(s.name,'—') AS supplier_name,
@@ -651,21 +663,23 @@ case 'supplier_equipment_performance': {
                 FROM supplierscontracts sc
                 LEFT JOIN suppliers s ON s.id=sc.supplier_id
                 LEFT JOIN project   p ON p.id=sc.project_id
-                WHERE $ws ORDER BY sc.contract_signing_date DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY sc.contract_signing_date DESC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($scDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     if (count($rows) > 0) {
         $chartSql = "SELECT IFNULL(s.name,'—') AS sn,
                             ROUND(IFNULL(SUM(sc.forecasted_contracted_hours),0),0) AS hrs
                      FROM supplierscontracts sc LEFT JOIN suppliers s ON s.id=sc.supplier_id
-                     WHERE $ws GROUP BY sc.supplier_id ORDER BY hrs DESC LIMIT 8";
-        $chartRes = mysqli_query($conn, $chartSql);
+                     WHERE $ws AND {TENANT_SCOPE} GROUP BY sc.supplier_id ORDER BY hrs DESC LIMIT 8";
+        $chartRes = array();
+        try { $chartRes = $rpt_gate->scopedQuery(array('scope' => array('sc' => 'supplierscontracts'), 'enrich' => array('s' => 'suppliers')), $chartSql); }
+        catch (\Throwable $t_) { error_log('emsreports sc chart: ' . $t_->getMessage()); }
         $cl=[]; $cv=[];
-        if ($chartRes) while ($cr=mysqli_fetch_assoc($chartRes)) { $cl[]=mb_substr($cr['sn'],0,15,'UTF-8'); $cv[]=floatval($cr['hrs']); }
+        foreach ($chartRes as $cr) { $cl[]=mb_substr($cr['sn'],0,15,'UTF-8'); $cv[]=floatval($cr['hrs']); }
         if ($cl) $chartData = ['type'=>'bar','labels'=>$cl,'datasets'=>[
             ['label'=>'الساعات المستهدفة','data'=>$cv,'color'=>'rgba(234,111,0,0.82)'],
         ],'title'=>'ساعات عقود الموردين'];
@@ -678,7 +692,10 @@ case 'supplier_equipment_performance': {
 ───────────────────────────────────────────────────────────────────────── */
 case 'fleet_equipment_summary':
 case 'fleet_equipment_detailed': {
-    $where = ["({$sc['e']})"];
+    // العزل (e) عبر {TENANT_SCOPE}؛ الموردون والاستعلامات الفرعية إثراءٌ بلا تنطيق (سلوك الأصل)
+    $flDecl = array('scope'  => array('e' => 'equipments'),
+                    'enrich' => array('s' => 'suppliers', 'o' => 'operations', 't' => 'timesheet'));
+    $where = ["1=1"];
     if ($fSupplierId > 0) $where[] = "e.suppliers = $fSupplierId";
     if ($fSearch !== '') {
         $safe = mysqli_real_escape_string($conn, $fSearch);
@@ -695,9 +712,9 @@ case 'fleet_equipment_detailed': {
                       SUM(CASE WHEN e.status=1 THEN 1 ELSE 0 END) AS active,
                       COUNT(DISTINCT e.suppliers) AS total_suppliers,
                       ROUND(IFNULL(SUM(e.operating_hours),0),0) AS total_op_hrs
-               FROM equipments e LEFT JOIN suppliers s ON s.id=e.suppliers WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               FROM equipments e LEFT JOIN suppliers s ON s.id=e.suppliers WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery(array('scope' => array('e' => 'equipments'), 'enrich' => array('s' => 'suppliers')), $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports fleet kpi: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-tractor',      'value'=> number_format($kpiRow['total']           ?? 0),'label'=>'إجمالي المعدات', 'color'=>'blue'],
@@ -725,10 +742,10 @@ case 'fleet_equipment_detailed': {
                        IFNULL(e.estimated_value,0) AS estimated_value,
                        IFNULL(e.daily_rental_price,0) AS daily_rental_price,
                        (SELECT COUNT(*) FROM operations o WHERE o.equipment=e.id) AS ops_cnt,
-                       IFNULL((SELECT ROUND(SUM(t.total_work_hours),1) FROM timesheet t JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS total_wh,
+                       IFNULL((SELECT ROUND(SUM(t.total_work_hours),1) FROM timesheet t LEFT JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS total_wh,
                        CASE WHEN e.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt
                 FROM equipments e LEFT JOIN suppliers s ON s.id=e.suppliers
-                WHERE $ws ORDER BY total_wh DESC, e.id DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY total_wh DESC, e.id DESC";
     } else {
         $headers = ['الكود','المعدة','المورد','الحالة','عدد العمليات','ساعات التشغيل'];
         $sql = "SELECT e.code,
@@ -736,14 +753,14 @@ case 'fleet_equipment_detailed': {
                        IFNULL(s.name,'—') AS supplier_name,
                        CASE WHEN e.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt,
                        (SELECT COUNT(*) FROM operations o WHERE o.equipment=e.id) AS ops_cnt,
-                       IFNULL((SELECT ROUND(SUM(t.total_work_hours),1) FROM timesheet t JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS total_wh
+                       IFNULL((SELECT ROUND(SUM(t.total_work_hours),1) FROM timesheet t LEFT JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS total_wh
                 FROM equipments e LEFT JOIN suppliers s ON s.id=e.suppliers
-                WHERE $ws ORDER BY total_wh DESC, e.id DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY total_wh DESC, e.id DESC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($flDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     if (count($rows) > 1) {
         $sorted = $rows;
@@ -764,7 +781,10 @@ case 'fleet_equipment_detailed': {
 case 'operations_summary':
 case 'operations_detailed':
 case 'fleet_operations': {
-    $where = ["({$sc['o']})"];
+    // العزل (o) عبر {TENANT_SCOPE}؛ بقية الجداول إثراء LEFT/فرعي بلا تنطيق (سلوك الأصل)
+    $opDecl = array('scope'  => array('o' => 'operations'),
+                    'enrich' => array('p' => 'project', 's' => 'suppliers', 'e' => 'equipments', 't' => 'timesheet'));
+    $where = ["1=1"];
     if ($fDateFrom)       $where[] = "o.start >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
     if ($fDateTo)         $where[] = "o.start <= '" . mysqli_real_escape_string($conn, $fDateTo)   . "'";
     if ($fStatus >= 0)    $where[] = "o.status = $fStatus";
@@ -782,9 +802,9 @@ case 'fleet_operations': {
                       ROUND(IFNULL(SUM(o.days),0),0) AS total_days
                FROM operations o
                LEFT JOIN equipments e ON e.id=o.equipment
-               WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery(array('scope' => array('o' => 'operations'), 'enrich' => array('e' => 'equipments')), $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports ops kpi: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-cogs',           'value'=> number_format($kpiRow['total']      ?? 0),        'label'=>'إجمالي العمليات', 'color'=>'blue'],
@@ -816,7 +836,7 @@ case 'fleet_operations': {
                 LEFT JOIN project    p  ON p.id=o.project_id
                 LEFT JOIN suppliers  s  ON s.id=o.supplier_id
                 LEFT JOIN equipments e  ON e.id=o.equipment
-                WHERE $ws ORDER BY o.id DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY o.id DESC";
     } else {
         $headers = ['رقم العملية','المشروع','المورد','المعدة','تاريخ البداية','تاريخ النهاية','ساعات الوردية','إجمالي الساعات','الحالة'];
         $sql = "SELECT o.id,
@@ -832,12 +852,12 @@ case 'fleet_operations': {
                 LEFT JOIN project    p ON p.id=o.project_id
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
                 LEFT JOIN equipments e ON e.id=o.equipment
-                WHERE $ws ORDER BY o.id DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY o.id DESC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($opDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     if (count($rows) > 0) {
         $actO = intval($kpiRow['active'] ?? 0);
@@ -849,10 +869,12 @@ case 'fleet_operations': {
         $chartSql2 = "SELECT IFNULL(p.name,'—') AS pn,
                              ROUND(IFNULL(SUM(o.total_equipment_hours),0),1) AS eh
                       FROM operations o LEFT JOIN project p ON p.id=o.project_id
-                      WHERE $ws GROUP BY o.project_id ORDER BY eh DESC LIMIT 8";
-        $cr2 = mysqli_query($conn, $chartSql2);
+                      WHERE $ws AND {TENANT_SCOPE} GROUP BY o.project_id ORDER BY eh DESC LIMIT 8";
+        $cr2 = array();
+        try { $cr2 = $rpt_gate->scopedQuery(array('scope' => array('o' => 'operations'), 'enrich' => array('p' => 'project', 'e' => 'equipments')), $chartSql2); }
+        catch (\Throwable $t_) { error_log('emsreports ops chart: ' . $t_->getMessage()); }
         $cl2=[]; $cv2=[];
-        if ($cr2) while ($rr2=mysqli_fetch_assoc($cr2)) { $cl2[]=mb_substr($rr2['pn'],0,14,'UTF-8'); $cv2[]=floatval($rr2['eh']); }
+        foreach ($cr2 as $rr2) { $cl2[]=mb_substr($rr2['pn'],0,14,'UTF-8'); $cv2[]=floatval($rr2['eh']); }
         if ($cl2) $chart2 = ['type'=>'bar','labels'=>$cl2,'datasets'=>[
             ['label'=>'ساعات المعدات','data'=>$cv2,'color'=>'rgba(37,99,235,0.82)'],
         ],'title'=>'ساعات المعدات حسب المشروع'];
@@ -865,7 +887,10 @@ case 'fleet_operations': {
 ───────────────────────────────────────────────────────────────────────── */
 case 'drivers_summary':
 case 'drivers_detailed': {
-    $where = ["({$sc['d']})"];
+    // العزل (d) عبر {TENANT_SCOPE}؛ الموردون والاستعلامات الفرعية إثراءٌ بلا تنطيق (سلوك الأصل)
+    $drDecl = array('scope'  => array('d' => 'employees'),
+                    'enrich' => array('s' => 'suppliers', 't' => 'timesheet'));
+    $where = ["1=1"];
     if ($fStatus >= 0)    $where[] = "d.status = $fStatus";
     if ($fSupplierId > 0) $where[] = "d.supplier_id = $fSupplierId";
     if ($fSearch !== '') {
@@ -877,9 +902,9 @@ case 'drivers_detailed': {
     $kpiSql = "SELECT COUNT(d.id) AS total,
                       SUM(CASE WHEN d.status=1 THEN 1 ELSE 0 END) AS active,
                       COUNT(DISTINCT d.supplier_id) AS total_suppliers
-               FROM employees d WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               FROM employees d WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery(array('scope' => array('d' => 'employees')), $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports drv kpi: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-id-badge',     'value'=> number_format($kpiRow['total']           ?? 0),'label'=>'إجمالي المشغلين','color'=>'blue'],
@@ -907,7 +932,7 @@ case 'drivers_detailed': {
                        IFNULL((SELECT ROUND(SUM(t.operator_standby_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS standby_wh,
                        CASE WHEN d.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt
                 FROM employees d LEFT JOIN suppliers s ON s.id=d.supplier_id
-                WHERE $ws ORDER BY total_wh DESC, d.id DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY total_wh DESC, d.id DESC";
     } else {
         $headers = ['الكود','الاسم','المورد','الهاتف','الحالة','ساعات التنفيذ','ساعات الاستعداد'];
         $sql = "SELECT d.employee_code,
@@ -918,12 +943,12 @@ case 'drivers_detailed': {
                        IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS total_wh,
                        IFNULL((SELECT ROUND(SUM(t.operator_standby_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS standby_wh
                 FROM employees d LEFT JOIN suppliers s ON s.id=d.supplier_id
-                WHERE $ws ORDER BY total_wh DESC, d.id DESC";
+                WHERE $ws AND {TENANT_SCOPE} ORDER BY total_wh DESC, d.id DESC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($drDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     $sumOperatorHours = 0;
     $sumStandbyHours  = 0;
@@ -954,7 +979,10 @@ case 'drivers_detailed': {
 }
 
 case 'drivers_contracts': {
-    $where = ["({$sc['dc']})"];
+    // العزل (dc) عبر {TENANT_SCOPE}؛ المشغل والمشروع إثراء LEFT بلا تنطيق (سلوك الأصل)
+    $dcDecl = array('scope'  => array('dc' => 'drivercontracts'),
+                    'enrich' => array('d' => 'employees', 'p' => 'project'));
+    $where = ["1=1"];
     if ($fStatus >= 0)    $where[] = "dc.status = $fStatus";
     if ($fDriverId  > 0)  $where[] = "dc.employee_id = $fDriverId";
     if ($fProjectId > 0)  $where[] = "dc.project_id = $fProjectId";
@@ -971,9 +999,9 @@ case 'drivers_contracts': {
                       ROUND(IFNULL(SUM(dc.forecasted_contracted_hours),0),0) AS total_hrs,
                       ROUND(AVG(dc.contract_duration_months),1) AS avg_dur,
                       COUNT(DISTINCT dc.employee_id) AS distinct_drivers
-               FROM drivercontracts dc WHERE $ws";
-    $kpiRes = mysqli_query($conn, $kpiSql);
-    $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+               FROM drivercontracts dc WHERE $ws AND {TENANT_SCOPE}";
+    try { $kpiRows_ = $rpt_gate->scopedQuery(array('scope' => array('dc' => 'drivercontracts')), $kpiSql); $kpiRow = $kpiRows_ ? $kpiRows_[0] : []; }
+    catch (\Throwable $t_) { $kpiRow = []; error_log('emsreports dc kpi: ' . $t_->getMessage()); }
 
     $kpi = [
         ['icon'=>'fa-file-alt',    'value'=> number_format($kpiRow['total']             ?? 0),        'label'=>'إجمالي العقود',   'color'=>'blue'],
@@ -1011,11 +1039,11 @@ case 'drivers_contracts': {
             FROM drivercontracts dc
             LEFT JOIN employees d  ON d.id=dc.employee_id
             LEFT JOIN project p  ON p.id=dc.project_id
-            WHERE $ws ORDER BY dc.contract_signing_date DESC";
+            WHERE $ws AND {TENANT_SCOPE} ORDER BY dc.contract_signing_date DESC";
             $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
+    try { $result = $rpt_gate->scopedQuery($dcDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) $rows[] = $r;
 
     if (count($rows) > 0) {
         $actC = intval($kpiRow['active'] ?? 0);
@@ -1031,8 +1059,10 @@ case 'drivers_contracts': {
    MAINTENANCE (الصيانة) — مؤشرات الصيانة لكل معدة (معزول بالشركة)
 ───────────────────────────────────────────────────────────────────────── */
 case 'maintenance_summary': {
-    $scMo  = rptCompanyScope($conn, 'mo', 'mnt_order', $companyId, $isSuperAdmin);
-    $where = ["($scMo)", "COALESCE(mo.is_deleted,0)=0"];
+    // العزل (mo) عبر {TENANT_SCOPE}؛ المعدات والاستعلام الفرعي إثراءٌ بلا تنطيق (سلوك الأصل)
+    $moDecl = array('scope'  => array('mo' => 'mnt_order'),
+                    'enrich' => array('e' => 'equipments', 't' => 'timesheet', 'o2' => 'operations'));
+    $where = ["COALESCE(mo.is_deleted,0)=0"];
     if ($fDateFrom)    $where[] = "DATE(mo.created_at) >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
     if ($fDateTo)      $where[] = "DATE(mo.created_at) <= '" . mysqli_real_escape_string($conn, $fDateTo) . "'";
     if ($fEquipId > 0) $where[] = "mo.equipment_id = $fEquipId";
@@ -1044,9 +1074,9 @@ case 'maintenance_summary': {
                       SUM(mo.source='بلاغ') failures,
                       ROUND(IFNULL(SUM(mo.downtime_hours),0),1) downtime,
                       ROUND(IFNULL(SUM(mo.total_cost),0),2) cost
-               FROM mnt_order mo WHERE $ws";
-    $kr = mysqli_query($conn, $kpiSql);
-    $ka = $kr ? mysqli_fetch_assoc($kr) : [];
+               FROM mnt_order mo WHERE $ws AND {TENANT_SCOPE}";
+    try { $krows_ = $rpt_gate->scopedQuery(array('scope' => array('mo' => 'mnt_order')), $kpiSql); $ka = $krows_ ? $krows_[0] : []; }
+    catch (\Throwable $t_) { $ka = []; error_log('emsreports mnt kpi: ' . $t_->getMessage()); }
     $kpi = [
         ['icon'=>'fa-wrench',               'value'=> number_format($ka['total']    ?? 0),          'label'=>'إجمالي الأوامر', 'color'=>'blue'],
         ['icon'=>'fa-spinner',              'value'=> number_format($ka['open_cnt'] ?? 0),          'label'=>'أوامر مفتوحة',   'color'=>'gold'],
@@ -1064,16 +1094,16 @@ case 'maintenance_summary': {
                    SUM(mo.state='إغلاق') AS closed_orders,
                    ROUND(IFNULL(SUM(mo.downtime_hours),0),1) AS downtime,
                    ROUND(IFNULL(SUM(mo.total_cost),0),2) AS cost,
-                   IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS op_hours
+                   IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t LEFT JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS op_hours
             FROM mnt_order mo
             LEFT JOIN equipments e ON e.id = mo.equipment_id
-            WHERE $ws
+            WHERE $ws AND {TENANT_SCOPE}
             GROUP BY e.id, e.code, e.name
             ORDER BY total_orders DESC";
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
-    $result = mysqli_query($conn, $sql);
-    if (!$result) die('خطأ: ' . mysqli_error($conn));
-    while ($r = mysqli_fetch_assoc($result)) {
+    try { $result = $rpt_gate->scopedQuery($moDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+    foreach ($result as $r) {
         $f  = floatval($r['failures']);
         $cl = floatval($r['closed_orders']);
         $dt = floatval($r['downtime']);
@@ -1529,20 +1559,20 @@ body {
     // جلب المعدات للقائمة المنسدلة (عمليات/تايمشيت)
     $equipsList = [];
     if ($showEquip) {
-        $equQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE ({$sc['e']}) ORDER BY e.name ASC";
+        $equQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE 1=1 AND {TENANT_SCOPE} ORDER BY e.name ASC";
         if ($fSupplierId > 0) $equQ = str_replace('ORDER BY', "AND e.suppliers=$fSupplierId ORDER BY", $equQ);
-        $equR = mysqli_query($conn, $equQ);
-        if ($equR) while ($er = mysqli_fetch_assoc($equR)) $equipsList[] = $er;
+        try { $equipsList = $rpt_gate->scopedQuery(array('scope' => array('e' => 'equipments')), $equQ); }
+        catch (\Throwable $t_) { error_log('emsreports equip filter: ' . $t_->getMessage()); }
     }
     // جلب المعدات لتقارير الأسطول (مفلترة بالنوع إن وُجد)
     $fleetEquipsList = [];
     if ($showEquipName) {
-        $feQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE ({$sc['e']})";
+        $feQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE 1=1";
         if ($fSupplierId > 0) $feQ .= " AND e.suppliers=$fSupplierId";
         if ($fCategory !== '') $feQ .= " AND e.type=" . intval($fCategory);
-        $feQ .= " ORDER BY e.name ASC";
-        $feR = mysqli_query($conn, $feQ);
-        if ($feR) while ($fer = mysqli_fetch_assoc($feR)) $fleetEquipsList[] = $fer;
+        $feQ .= " AND {TENANT_SCOPE} ORDER BY e.name ASC";
+        try { $fleetEquipsList = $rpt_gate->scopedQuery(array('scope' => array('e' => 'equipments')), $feQ); }
+        catch (\Throwable $t_) { error_log('emsreports fleet equip filter: ' . $t_->getMessage()); }
     }
     ?>
     <div class="rpt-filter fc-filter-body">
@@ -1630,17 +1660,20 @@ body {
                 <select name="category" id="equip_type_filter" class="form-select">
                     <option value="" <?php echo $fCategory === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php
+                    // شرط الشركة انتقل من ON إلى {TENANT_SCOPE} — مكافئ حرفيًا مع INNER JOIN
                     $typesQ = "SELECT et.id, et.type FROM equipments_types et
-                               INNER JOIN equipments e ON e.type = et.id AND ({$sc['e']})
-                               WHERE et.status='active'
+                               INNER JOIN equipments e ON e.type = et.id
+                               WHERE et.status='active' AND {TENANT_SCOPE}
                                GROUP BY et.id, et.type ORDER BY et.type ASC";
-                    $typesR = mysqli_query($conn, $typesQ);
-                    if ($typesR) while ($tr = mysqli_fetch_assoc($typesR)):
+                    $typesR = array();
+                    try { $typesR = $rpt_gate->scopedQuery(array('scope' => array('e' => 'equipments')), $typesQ); }
+                    catch (\Throwable $t_) { error_log('emsreports types filter: ' . $t_->getMessage()); }
+                    foreach ($typesR as $tr):
                     ?>
                     <option value="<?php echo intval($tr['id']); ?>" <?php echo $fCategory === strval($tr['id']) ? 'selected' : ''; ?>>
                         <?php echo rr($tr['type']); ?>
                     </option>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>
@@ -1665,14 +1698,16 @@ body {
                 <select name="category" class="form-select">
                     <option value="" <?php echo $fCategory === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php
-                    $catQ = "SELECT DISTINCT p.category FROM project p WHERE ({$sc['p']}) AND p.category IS NOT NULL AND p.category!='' ORDER BY p.category";
-                    $catR = mysqli_query($conn, $catQ);
-                    if ($catR) while ($cr = mysqli_fetch_assoc($catR)):
+                    $catQ = "SELECT DISTINCT p.category FROM project p WHERE p.category IS NOT NULL AND p.category!='' AND {TENANT_SCOPE} ORDER BY p.category";
+                    $catR = array();
+                    try { $catR = $rpt_gate->scopedQuery(array('scope' => array('p' => 'project')), $catQ); }
+                    catch (\Throwable $t_) { error_log('emsreports cat filter: ' . $t_->getMessage()); }
+                    foreach ($catR as $cr):
                     ?>
                     <option value="<?php echo rr($cr['category']); ?>" <?php echo $fCategory === $cr['category'] ? 'selected' : ''; ?>>
                         <?php echo rr($cr['category']); ?>
                     </option>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>

@@ -18,19 +18,25 @@ if ($project_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'معرف المشروع غير صحيح']));
 }
 
-$query = "SELECT id, contract_signing_date, actual_start, actual_end
-          FROM contracts
-          WHERE project_id = $project_id AND status = 1
-          ORDER BY contract_signing_date DESC";
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$is_super = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
+$gmc_gate = $is_super ? ems_tenant_db()->forAllTenants('report super') : ems_tenant_db();
 
-$result = mysqli_query($conn, $query);
+$result = null;
+try {
+    $result = $gmc_gate->select('contracts', array(
+        'columns' => array('id', 'contract_signing_date', 'actual_start', 'actual_end'),
+        'where'   => array('project_id' => $project_id, 'status' => 1),
+        'orderBy' => 'contract_signing_date DESC',
+    ));
+} catch (\Throwable $t) { error_log('get_mine_contracts: ' . $t->getMessage()); }
 
-if (!$result) {
-    die(json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . mysqli_error($conn)]));
+if ($result === null) {
+    die(json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: تعذّر الجلب']));
 }
 
 $contracts = [];
-while ($row = mysqli_fetch_assoc($result)) {
+foreach ($result as $row) {
     $contracts[] = [
         'id' => $row['id'],
         'contract_signing_date' => $row['contract_signing_date'],

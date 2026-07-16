@@ -8,19 +8,27 @@ include '../config.php';
 
 $_current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $_is_super_admin = ($_current_role === '-1');
-$_report_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$_suppliers_has_company_id = db_table_has_column($conn, 'suppliers', 'company_id');
-$_supplier_company_where = (!$_is_super_admin && $_suppliers_has_company_id && $_report_company_id > 0)
-    ? " AND company_id = '$_report_company_id'"
-    : "";
+// العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$rep_gate = $_is_super_admin ? ems_tenant_db()->forAllTenants('reports super') : ems_tenant_db();
 
 // أعداد صحيحة فقط — يمنع حقن SQL في الفلاتر (المعرّفات أرقام دائماً).
 $supplier_filter = isset($_GET['supplier']) ? intval($_GET['supplier']) : 0;
 $project_filter  = isset($_GET['project'])  ? intval($_GET['project'])  : 0;
 $contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
-$sql = "
-SELECT
+// الاستعلام التجميعي عبر البوابة: كل الجداول المضمومة INNER مستأجرةٌ تُعلَن نطاقًا،
+// وcontracts (LEFT) إثراءً. (الأصل بلا تنطيق شركةٍ = تسريب — البوابة تعزله الآن.)
+$rep_filter = '';
+$rep_params = array();
+if ($supplier_filter > 0) { $rep_filter .= " AND s.id = ? "; $rep_params[] = $supplier_filter; }
+if ($project_filter > 0)  { $rep_filter .= " AND p.id = ? "; $rep_params[] = $project_filter; }
+if ($contract_filter > 0) { $rep_filter .= " AND c.id = ? "; $rep_params[] = $contract_filter; }
+$result = array();
+try {
+    $result = $rep_gate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 's' => 'suppliers', 'p' => 'project'),
+              'enrich' => array('c' => 'contracts')),
+        "SELECT
     s.name AS supplier_name,
     p.name AS project_name,
     c.id AS contract_id,
@@ -32,21 +40,10 @@ JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
 JOIN project p ON o.project_id = p.id
 LEFT JOIN contracts c ON o.contract_id = c.id
-WHERE t.status = 1 AND o.status = 1
-";
-
-if ($supplier_filter > 0) {
-    $sql .= " AND s.id = $supplier_filter ";
-}
-if ($project_filter > 0) {
-    $sql .= " AND p.id = $project_filter ";
-}
-if ($contract_filter > 0) {
-    $sql .= " AND c.id = $contract_filter ";
-}
-$sql .= " GROUP BY s.id, s.name, p.id, p.name, c.id, c.contract_signing_date
-          ORDER BY p.name, s.name ";
-$result = mysqli_query($conn, $sql);
+WHERE t.status = 1 AND o.status = 1$rep_filter AND {TENANT_SCOPE}
+ GROUP BY s.id, s.name, p.id, p.name, c.id, c.contract_signing_date
+ ORDER BY p.name, s.name", $rep_params);
+} catch (\Throwable $t) { error_log('Reports/reports.php main: ' . $t->getMessage()); }
 
 $page_title = "إيكوبيشن | التقارير";
 include("../inheader.php");
@@ -93,12 +90,14 @@ include('../insidebar.php');
                     <select name="supplier" class="form-control">
                         <option value="">-- الكل --</option>
                         <?php
-                        $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1'$_supplier_company_where ORDER BY name");
-                        if ($sup) {
-                        while ($row = mysqli_fetch_assoc($sup)) {
+                        $sup = array();
+                        try {
+                            $sup = $rep_gate->scopedQuery(array('scope' => array('suppliers' => 'suppliers')),
+                                "SELECT id, name FROM suppliers WHERE status = '1' AND {TENANT_SCOPE} ORDER BY name");
+                        } catch (\Throwable $t) { error_log('Reports/reports.php suppliers: ' . $t->getMessage()); }
+                        foreach ($sup as $row) {
                             $selected = ($supplier_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-                        }
                         }
                         ?>
                     </select>
@@ -108,12 +107,14 @@ include('../insidebar.php');
                     <select name="project" id="projectSelect" class="form-control">
                         <option value="">-- الكل --</option>
                         <?php
-                        $prj = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
-                        if ($prj) {
-                        while ($row = mysqli_fetch_assoc($prj)) {
+                        $prj = array();
+                        try {
+                            $prj = $rep_gate->scopedQuery(array('scope' => array('project' => 'project')),
+                                "SELECT id, name, project_code FROM project WHERE status = '1' AND {TENANT_SCOPE} ORDER BY name");
+                        } catch (\Throwable $t) { error_log('Reports/reports.php projects: ' . $t->getMessage()); }
+                        foreach ($prj as $row) {
                             $selected = ($project_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>{$row['name']} ({$row['project_code']})</option>";
-                        }
                         }
                         ?>
                     </select>
@@ -124,12 +125,15 @@ include('../insidebar.php');
                         <option value="">-- الكل --</option>
                         <?php
                         if ($project_filter > 0) {
-                            $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE project_id = $project_filter AND status = 1 ORDER BY contract_signing_date DESC");
-                            if ($contracts) {
-                            while ($row = mysqli_fetch_assoc($contracts)) {
+                            $contracts = array();
+                            try {
+                                $contracts = $rep_gate->scopedQuery(array('scope' => array('contracts' => 'contracts')),
+                                    "SELECT id, contract_signing_date FROM contracts WHERE project_id = ? AND status = 1 AND {TENANT_SCOPE} ORDER BY contract_signing_date DESC",
+                                    array($project_filter));
+                            } catch (\Throwable $t) { error_log('Reports/reports.php contracts: ' . $t->getMessage()); }
+                            foreach ($contracts as $row) {
                                 $selected = ($contract_filter == $row['id']) ? "selected" : "";
                                 echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['contract_signing_date']}</option>";
-                            }
                             }
                         }
                         ?>
@@ -162,7 +166,7 @@ include('../insidebar.php');
                             <?php
                             $i = 1;
                             if ($result) {
-                            while ($row = mysqli_fetch_assoc($result)) {
+                            foreach ($result as $row) {
                                 $contract_display = !empty($row['contract_id']) ? 'عقد #' . $row['contract_id'] . ' - ' . $row['contract_signing_date'] : '<span class="text-muted">غير محدد</span>';
                             ?>
                                 <tr>
