@@ -188,7 +188,25 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       // (+ شارات عدّ بوابة الطلبات المالية D05 — صناديق المراجعة والمحاسب والمعاد)
       if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
         require_once __DIR__ . '/includes/finreq_badges.php';
-        renderDynamicNavigation($conn, $_SESSION['user']['role'], '../', ems_finreq_nav_badges($conn));
+        $__fr_badges = ems_finreq_nav_badges($conn);
+        renderDynamicNavigation($conn, $_SESSION['user']['role'], '../', $__fr_badges);
+
+        // بوابة الطلبات المالية (D05): الروابط تُشتق من جدول التوجيه المفعّل لا من
+        // مالك الوحدة الواحد — فيراها كل دورٍ له طريقٌ في أي إدارةٍ مفعّلة.
+        // (تُطبع مرةً واحدة: ما طبعته الروابط الديناميكية يُستثنى منعًا للتكرار.)
+        $__fr_dyn = array();
+        foreach (getDynamicNavLinks($conn, $_SESSION['user']['role']) as $__l) {
+          if (isset($__l['code'])) { $__fr_dyn[$__l['code']] = true; }
+        }
+        foreach (ems_finreq_nav_links($conn) as $__code => $__meta) {
+          if (isset($__fr_dyn[$__code])) { continue; }
+          $__n = isset($__fr_badges[$__code]) ? intval($__fr_badges[$__code]) : 0;
+          echo '<li><a href="../' . htmlspecialchars($__code, ENT_QUOTES, 'UTF-8') . '">'
+             . '<i class="' . htmlspecialchars($__meta['icon'], ENT_QUOTES, 'UTF-8') . '"></i> '
+             . '<span>' . htmlspecialchars($__meta['label'], ENT_QUOTES, 'UTF-8') . '</span>'
+             . ($__n > 0 ? ' <span class="nav-count-badge">' . ($__n > 99 ? '99+' : $__n) . '</span>' : '')
+             . '</a></li>' . "\n";
+        }
       }
       ?>
 
