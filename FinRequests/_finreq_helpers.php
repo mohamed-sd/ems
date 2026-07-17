@@ -381,6 +381,13 @@ function finreq_birth_event($conn, $gate, $request, $actor_user_id)
 function finreq_sync_state($gate, $request)
 {
     if (empty($request['event_id'])) { return $request; }
+    // حارس الحالات الختامية: المؤرشف (⑬) وقرارات الإيقاف الموثقة (§8.4) لا
+    // يقلبها الاشتقاق — الأرشفة انقضاء الدورة، والسحب/الإلغاء/الدمج/الانتهاء
+    // قراراتٌ بأسبابٍ مسجلة يمحوها القلبُ الآلي لو سمحنا به.
+    if (in_array(strval($request['state']),
+        array('archived', 'withdrawn', 'cancelled', 'merged', 'expired'), true)) {
+        return $request;
+    }
     $ev = $gate->selectOne('fin_financial_events', array(
         'columns' => array('id', 'state'),
         'where' => array('id' => intval($request['event_id'])),

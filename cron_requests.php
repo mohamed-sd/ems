@@ -214,5 +214,29 @@ while ($x = $exq->fetch_assoc()) {
     $exc_overdue++;
 }
 
+// ═══ (هـ) الأرشفة الآلية — المرحلة ⑬ (§3.3): «مغلق/مرفوض ← مؤرشف · النظام» ═══
+//        سجلٌّ محفوظٌ للاطلاع والتدقيق لا يُحذف: الطلب المنقضية دورته (مغلق أو
+//        مرفوض) الراكد 30 يومًا يُؤرشف بهوية النظام — والذاكرة المؤسسية تبقى.
+$ARCHIVE_AFTER_DAYS = 30;
+$archived_count = 0;
+$arq = $conn->query(
+    "SELECT id, company_id, request_no, state FROM fin_requests
+      WHERE state IN ('closed', 'rejected')
+        AND updated_at <= DATE_SUB(NOW(), INTERVAL {$ARCHIVE_AFTER_DAYS} DAY)"
+);
+while ($a = $arq->fetch_assoc()) {
+    $upd = $conn->prepare("UPDATE fin_requests SET state = 'archived' WHERE id = ? AND state = ?");
+    $upd->bind_param('is', $a['id'], $a['state']);
+    $upd->execute();
+    $done = $upd->affected_rows;
+    $upd->close();
+    if ($done === 1) {
+        cronreq_log($conn, intval($a['company_id']), intval($a['id']), 'archive',
+            'أرشفةٌ آلية (المرحلة ⑬): انقضت الدورة وركد ' . $ARCHIVE_AFTER_DAYS
+            . ' يومًا — سجلٌّ محفوظٌ للاطلاع والتدقيق لا يُحذف', $a['state'], 'archived');
+        $archived_count++;
+    }
+}
+
 echo "cron_requests: تذكير={$reminded} · تصعيد/تنبيه={$escalated} · إنذار مسبق={$prenoticed} · منتهٍ={$expired}"
-    . " · اشتقاق={$synced} · إقفالات منشورة={$closed_facts} · خرق طارئ={$exc_overdue}\n";
+    . " · اشتقاق={$synced} · إقفالات منشورة={$closed_facts} · خرق طارئ={$exc_overdue} · مؤرشف={$archived_count}\n";
