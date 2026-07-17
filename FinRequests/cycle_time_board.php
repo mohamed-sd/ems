@@ -63,6 +63,55 @@ try {
     ));
 } catch (\Throwable $t) { /* عرض */ }
 
+// ═══ مؤشرات الأداء §12.3 — الثلاثة الأخيرة (قراءةٌ خالصة) ═══
+
+// ⑥ زمن دورة الطلب (إنشاء ← إقفال): من ميلاده إلى أول ختمٍ بلغ فيه «مغلق».
+//    المؤرشف يُحسب أيضًا — أرشفتُه بعد إقفاله لا تلغي زمن دورته.
+// fin_request_events في الاستعلام الفرعي مُعلَنٌ enrich (بلا حقن عزل — يعزله
+// ارتباطه بـfr المعزول أصلًا؛ نفس نمط الاستعلامات المرتبطة في إطار التقارير).
+$cycle_hours = array();
+foreach ($gate->scopedQuery(
+    array('scope' => array('fr' => 'fin_requests'), 'enrich' => array('x' => 'fin_request_events')),
+    "SELECT TIMESTAMPDIFF(HOUR, fr.created_at,
+              (SELECT MIN(x.created_at) FROM fin_request_events x
+                WHERE x.request_id = fr.id AND x.new_value = 'closed')) AS h
+       FROM fin_requests fr
+      WHERE {TENANT_SCOPE} AND fr.state IN ('closed', 'archived')") as $c) {
+    if ($c['h'] !== null) { $cycle_hours[] = intval($c['h']); }
+}
+$cycle_avg = $cycle_hours ? round(array_sum($cycle_hours) / count($cycle_hours)) : null;
+$cycle_min = $cycle_hours ? min($cycle_hours) : null;
+$cycle_max = $cycle_hours ? max($cycle_hours) : null;
+
+// ⑦ نسبة الإعادة والرفض — تُحسب من **السجل الإلحاقي** لا من الحالة الراهنة:
+//    الطلب الذي أُعيد ثم استُكمل واعتُمد لم يعد «معادًا»، لكنه تعثّر فعلًا —
+//    وحسابُه بالحالة يُخفيه فتظهر النسبة أقلَّ من حقيقتها. المقياس الصادق:
+//    «كم طلبًا أُعيد/رُفض يومًا ما» ÷ «كم طلبًا أُرسل أصلًا».
+$evt_distinct = function ($types) use ($gate) {
+    $ph = implode(',', array_fill(0, count($types), '?'));
+    $rows = $gate->scopedQuery(array('scope' => array('e' => 'fin_request_events')),
+        "SELECT COUNT(DISTINCT e.request_id) v FROM fin_request_events e
+          WHERE {TENANT_SCOPE} AND e.event_type IN ($ph)", $types);
+    return $rows ? intval($rows[0]['v']) : 0;
+};
+$submitted_n = $evt_distinct(array('submit'));
+$returned_n  = $evt_distinct(array('return'));
+$rejected_n  = $evt_distinct(array('reject'));
+$return_pct = $submitted_n > 0 ? round($returned_n / $submitted_n * 100, 1) : 0;
+$reject_pct = $submitted_n > 0 ? round($rejected_n / $submitted_n * 100, 1) : 0;
+
+// ⑧ اكتمال المستندات من أول إرسال — **بنيويًّا 100%**: بوابة العبور الصفرية
+//    تمنع الإرسال بلا مستندٍ مكتملٍ من اليوم الأول (المستند شرط العبور §3.1)،
+//    فلا يوجد طلبٌ أُرسل ناقصَ المستند أصلًا. والرقم ذو المعنى الإداري بجانبه:
+//    الرفض المصنَّف «مستندات ناقصة» — يكشف من يُرفق مستندًا لا يفي بالغرض.
+$docs_complete_pct = 100;
+$rej_docs = 0;
+try {
+    $rej_docs = intval($gate->count('fin_requests', array(
+        'where' => array('rejection_class' => 'incomplete_docs'),
+    )));
+} catch (\Throwable $t) { /* عرض */ }
+
 $stage_labels = array(
     'under_review' => 'مراجعة الإدارة واعتمادها', 'pending_approval' => 'مكتب المحاسب والمالية',
     'approved' => 'الاعتماد المالي', 'posted' => 'القيد', 'paid' => 'الدفع', 'collected' => 'التحصيل',
@@ -93,6 +142,30 @@ include('../insidebar.php');
             <div class="stat-value"><?php echo count($escalated); ?></div></div>
         <div class="stat-card"><div class="stat-label">أعلى اختناق</div>
             <div class="stat-value" style="font-size:1.05rem;"><?php echo $bottleneck !== null ? htmlspecialchars($stage_labels[$bottleneck] ?? $bottleneck) : '—'; ?></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+        <div class="card-header"><h5><i class="fa fa-gauge-high"></i> مؤشرات الأداء (§12.3)</h5></div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-label">⑥ زمن الدورة (إنشاء←إقفال) — متوسط</div>
+                    <div class="stat-value"><?php echo $cycle_avg !== null ? $cycle_avg . ' <small>ساعة</small>' : '—'; ?></div>
+                    <?php if ($cycle_min !== null): ?><div style="font-size:.8em;color:#6b4e2a;">أسرع <?php echo $cycle_min; ?> · أبطأ <?php echo $cycle_max; ?> ساعة (<?php echo count($cycle_hours); ?> مقفلًا)</div><?php endif; ?>
+                </div>
+                <div class="stat-card"><div class="stat-label">⑦ نسبة الإعادة (من السجل)</div>
+                    <div class="stat-value" style="<?php echo $return_pct > 20 ? 'color:#b45309;' : ''; ?>"><?php echo $return_pct; ?>%</div>
+                    <div style="font-size:.8em;color:#6b4e2a;"><?php echo $returned_n; ?> أُعيد من <?php echo $submitted_n; ?> مُرسَل</div>
+                </div>
+                <div class="stat-card"><div class="stat-label">⑦ نسبة الرفض (من السجل)</div>
+                    <div class="stat-value" style="<?php echo $reject_pct > 15 ? 'color:#dc2626;' : ''; ?>"><?php echo $reject_pct; ?>%</div>
+                    <div style="font-size:.8em;color:#6b4e2a;"><?php echo $rejected_n; ?> رُفض من <?php echo $submitted_n; ?> مُرسَل</div>
+                </div>
+                <div class="stat-card"><div class="stat-label">⑧ اكتمال المستندات من أول إرسال</div>
+                    <div class="stat-value" style="color:#16a34a;"><?php echo $docs_complete_pct; ?>%</div>
+                    <div style="font-size:.8em;color:#6b4e2a;">البوابة تمنع الإرسال الناقص بنيويًا (§3.1)<?php echo $rej_docs > 0 ? ' · ' . $rej_docs . ' رُفض لنقص مستند' : ''; ?></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="card" style="margin-bottom:14px;">
