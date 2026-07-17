@@ -206,6 +206,18 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
              . '<span>' . htmlspecialchars($__meta['label'], ENT_QUOTES, 'UTF-8') . '</span>'
              . ($__n > 0 ? ' <span class="nav-count-badge">' . ($__n > 99 ? '99+' : $__n) . '</span>' : '')
              . '</a></li>' . "\n";
+          $__fr_dyn[$__code] = true;
+        }
+        // شاشات المالية الممنوحة عرضًا للأدوار التشغيلية (من role_permissions لا الملكية)
+        if (function_exists('ems_finance_nav_links')) {
+          foreach (ems_finance_nav_links($conn) as $__code => $__meta) {
+            if (isset($__fr_dyn[$__code])) { continue; }
+            echo '<li><a href="../' . htmlspecialchars($__code, ENT_QUOTES, 'UTF-8') . '">'
+               . '<i class="' . htmlspecialchars($__meta['icon'], ENT_QUOTES, 'UTF-8') . '"></i> '
+               . '<span>' . htmlspecialchars($__meta['label'], ENT_QUOTES, 'UTF-8') . '</span>'
+               . '</a></li>' . "\n";
+            $__fr_dyn[$__code] = true;
+          }
         }
       }
       ?>

@@ -62,6 +62,49 @@ if (!function_exists('ems_finreq_nav_links')) {
     }
 }
 
+if (!function_exists('ems_finance_nav_links')) {
+    /**
+     * روابط شاشات المالية الممنوحة للأدوار التشغيلية (قرار 2026-07-17):
+     * السايدبار مملوكيٌّ (owner_role_id=17) فلا يعرضها لغير عائلة المالية —
+     * هنا تُشتق من role_permissions مباشرةً (can_view=1) فيصل كل دورٍ لما
+     * مُنح له عرضًا. أدوار المالية (17-22) يغطيها dynamic_nav فلا تُكرَّر.
+     *
+     * @return array من code => array('label','icon')
+     */
+    function ems_finance_nav_links($conn)
+    {
+        $out = array();
+        if (!isset($_SESSION['user']['id'])) {
+            return $out;
+        }
+        $role = strval($_SESSION['user']['role'] ?? '');
+        if ($role === '' || $role === '-1' || in_array($role, array('17', '18', '19', '20', '21', '22'), true)) {
+            return $out;
+        }
+        try {
+            $rid = intval($role);
+            $q = $conn->prepare(
+                "SELECT m.code, m.name, COALESCE(NULLIF(TRIM(m.icon), ''), 'fa fa-coins') AS icon
+                   FROM modules m
+                   JOIN role_permissions rp ON rp.module_id = m.id
+                  WHERE rp.role_id = ? AND rp.can_view = 1
+                    AND m.code LIKE 'Finance/%' AND m.is_link = '1'
+                  ORDER BY m.display_order ASC, m.id ASC"
+            );
+            $q->bind_param('i', $rid);
+            $q->execute();
+            $res = $q->get_result();
+            while ($m = $res->fetch_assoc()) {
+                $out[strval($m['code'])] = array('label' => strval($m['name']), 'icon' => strval($m['icon']));
+            }
+            $q->close();
+        } catch (\Throwable $t) {
+            // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
+        }
+        return $out;
+    }
+}
+
 if (!function_exists('ems_finreq_nav_badges')) {
     function ems_finreq_nav_badges($conn)
     {

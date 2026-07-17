@@ -39,6 +39,35 @@ if (!function_exists('fin_user_level')) {
         return isset($map[$name]) ? $map[$name] : 'none';
     }
 }
+if (!function_exists('fin_project_scope')) {
+    /**
+     * نطاق المشروع للأدوار المرتبطة بموقعٍ محدد (قرار 2026-07-17):
+     * مدير الموقع (5) ومدير الحركة والتشغيل (6) يريان **مشروعهما حصرًا** في
+     * شاشات المالية ذات البعد المشروعي (الوحدات · التكاليف · الأحداث)،
+     * وبقية الأدوار الممنوحة ترى كل صفوف شركتها (عرضًا فقط).
+     *
+     * fail-closed: دورٌ مشروعيٌّ بلا users.project_id مضبوطٍ يعيد -1
+     * (صفر صفوف) — لا يفتح الباب كله لغياب الضبط.
+     *
+     * @return int|null null = بلا تصفية · موجب = المشروع · -1 = لا شيء
+     */
+    function fin_project_scope($conn, $ctx)
+    {
+        if ($ctx['is_super'] || !in_array(strval($ctx['role']), array('5', '6'), true)) {
+            return null;
+        }
+        try {
+            $u = ems_tenant_db()->selectOne('users', array(
+                'columns' => array('project_id'),
+                'where' => array('id' => intval($ctx['user_id'])),
+            ));
+            $pid = $u ? intval($u['project_id']) : 0;
+            return $pid > 0 ? $pid : -1;
+        } catch (\Throwable $t) {
+            return -1; // أي فشلٍ = لا صفوف، لا كل الصفوف
+        }
+    }
+}
 if (!function_exists('fin_can_perform')) {
     /**
      * هل يملك دور المستخدم صلاحية أداء مستوى معيّن؟ (فصل الواجبات)

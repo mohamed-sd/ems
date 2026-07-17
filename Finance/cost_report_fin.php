@@ -89,6 +89,11 @@ include '../insidebar.php';
                 <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>هامش %</th></tr></thead>
                 <tbody>
                 <?php
+                // نطاق المشروع للدورين 5/6 (fin_project_scope — يريان موقعهما حصرًا)
+                $proj_scope = fin_project_scope($conn, $ctx);
+                $cr_whereRaw = "COALESCE(cr.is_deleted,0)=0";
+                $cr_params = array();
+                if ($proj_scope !== null) { $cr_whereRaw .= " AND cr.project_id = ?"; $cr_params[] = $proj_scope; }
                 $prof_rows = fin_gate($is_super_admin)->scopedQuery(
                     array('scope' => array('cr' => 'fin_cost_records'), 'enrich' => array('p' => 'project')),
                     "SELECT p.name AS project_name,
@@ -97,8 +102,9 @@ include '../insidebar.php';
                             COALESCE(SUM(cr.revenue),0) - COALESCE(SUM(cr.total_cost),0) AS profit
                      FROM fin_cost_records cr
                      LEFT JOIN project p ON p.id = cr.project_id
-                     WHERE {TENANT_SCOPE} AND COALESCE(cr.is_deleted,0)=0
-                     GROUP BY cr.project_id, p.name ORDER BY profit DESC");
+                     WHERE {TENANT_SCOPE} AND " . $cr_whereRaw . "
+                     GROUP BY cr.project_id, p.name ORDER BY profit DESC",
+                    $cr_params);
                 { foreach ($prof_rows as $row) {
                     $tc = (float)$row['tc']; $tr = (float)$row['tr']; $pf = (float)$row['profit'];
                     $margin = $tr > 0 ? ($pf / $tr * 100) : 0;
@@ -126,7 +132,8 @@ include '../insidebar.php';
                     array('scope' => array('cr' => 'fin_cost_records'), 'enrich' => array('p' => 'project')),
                     "SELECT cr.*, p.name AS project_name FROM fin_cost_records cr
                      LEFT JOIN project p ON p.id = cr.project_id
-                     WHERE {TENANT_SCOPE} AND COALESCE(cr.is_deleted,0)=0 ORDER BY cr.id DESC");
+                     WHERE {TENANT_SCOPE} AND " . $cr_whereRaw . " ORDER BY cr.id DESC",
+                    $cr_params);
                 { foreach ($cost_rows as $row) {
                     $pf = (float)$row['profit']; $tone = $pf > 0 ? 'success' : ($pf < 0 ? 'danger' : 'secondary');
                     echo "<tr><td><div class='action-btns'>";

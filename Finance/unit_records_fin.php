@@ -191,11 +191,17 @@ include '../insidebar.php';
                 <tbody>
                 <?php
                 // إثراء اسم المشروع LEFT JOIN عبر scopedQuery (العزل على u، super→كل الشركات)
+                // + نطاق المشروع للدورين 5/6 (fin_project_scope — يريان موقعهما حصرًا)
+                $proj_scope = fin_project_scope($conn, $ctx);
+                $ur_whereRaw = "COALESCE(u.is_deleted,0)=0";
+                $ur_params = array();
+                if ($proj_scope !== null) { $ur_whereRaw .= " AND u.project_id = ?"; $ur_params[] = $proj_scope; }
                 $unit_rows = fin_gate($is_super_admin)->scopedQuery(
                     array('scope' => array('u' => 'fin_unit_records'), 'enrich' => array('p' => 'project')),
                     "SELECT u.*, p.name AS project_name FROM fin_unit_records u
                      LEFT JOIN project p ON p.id = u.project_id
-                     WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 ORDER BY u.record_date DESC, u.id DESC");
+                     WHERE {TENANT_SCOPE} AND " . $ur_whereRaw . " ORDER BY u.record_date DESC, u.id DESC",
+                    $ur_params);
                 foreach ($unit_rows as $row) {
                     $ms = (string)$row['match_state'];
                     $tone = $ms === 'approved' ? 'success' : ($ms === 'matched' ? 'primary' : ($ms === 'variance' ? 'danger' : 'secondary'));

@@ -305,6 +305,9 @@ include '../insidebar.php';
                     $ev_whereRaw = "COALESCE(e.is_deleted,0)=0";
                     $ev_params = array();
                     if ($filter_state !== '') { $ev_whereRaw .= " AND e.state=?"; $ev_params[] = $filter_state; }
+                    // نطاق المشروع للدورين 5/6 (fin_project_scope — يريان أحداث موقعهما حصرًا)
+                    $proj_scope = fin_project_scope($conn, $ctx);
+                    if ($proj_scope !== null) { $ev_whereRaw .= " AND e.project_id = ?"; $ev_params[] = $proj_scope; }
                     $event_rows = fin_gate($is_super_admin)->scopedQuery(
                         array('scope' => array('e' => 'fin_financial_events'), 'enrich' => array('p' => 'project', 's' => 'suppliers')),
                         "SELECT e.*, p.name AS project_name, s.name AS supplier_name
