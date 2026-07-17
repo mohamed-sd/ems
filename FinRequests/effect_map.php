@@ -66,7 +66,7 @@ include('../insidebar.php');
 
     <div class="card" style="margin-bottom:14px;">
         <div class="card-body">
-            <form method="get" class="allforms" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+            <form method="get" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
                 <div style="min-width:280px;">
                     <label>رقم الطلب (FR-…) أو معرّف الحدث (#N)</label>
                     <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001 أو #11">

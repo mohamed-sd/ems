@@ -130,7 +130,7 @@ include('../insidebar.php');
     <div class="card">
         <div class="card-header"><h5><i class="fa fa-plus-circle"></i> إضافة/تعديل توجيه إدارة</h5></div>
         <div class="card-body">
-            <form method="post" class="allforms">
+            <form method="post" class="allforms allforms-visible">
                 <div class="form-grid">
                     <div>
                         <label>الإدارة *</label>

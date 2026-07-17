@@ -75,7 +75,7 @@ include('../insidebar.php');
                     <div><strong>المبلغ:</strong> <?php echo number_format(floatval($r['amount']), 2) . ' ' . htmlspecialchars($r['currency']); ?></div>
                     <div><strong>المرجع المصدري:</strong> <?php echo htmlspecialchars($r['source_ref'] ?? '—'); ?></div>
                 </div>
-                <form action="request_actions.php" method="post" class="allforms">
+                <form action="request_actions.php" method="post" class="allforms allforms-visible">
                     <input type="hidden" name="action" value="acct_forward">
                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                     <div class="form-grid">

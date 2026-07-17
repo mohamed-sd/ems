@@ -35,6 +35,10 @@ if ($rid > 0) {
     }
 }
 $editable = $req ? in_array($req['state'], array('draft', 'returned'), true) && ($is_super || intval($req['created_by']) === $user_id) : true;
+// صلاحية الإضافة تحكم زرَّ فتح النموذج ونفسَ النموذج (نمط شاشات المجموعة أ)
+$can_add = $is_super || !empty($__pp['can_add']);
+// النموذج مخفيٌّ افتراضيًا (.allforms) ويُفتح بالزر؛ وعند تحرير مسودةٍ/معادٍ يُفتح فورًا
+$form_visible = ($req !== null);
 
 $page_title = 'إيكوبيشن | الطلب المالي الموحّد';
 include('../inheader.php');
@@ -44,7 +48,12 @@ include('../insidebar.php');
     <?php
     $header_title   = $req ? ('الطلب المالي ' . htmlspecialchars($req['request_no'])) : 'طلب مالي جديد';
     $header_icon    = 'fa fa-file-circle-plus';
-    $header_actions = array(array('href' => 'my_requests.php', 'class' => 'add-btn', 'icon' => 'fa fa-list-check', 'label' => 'طلباتي'));
+    $header_actions = array();
+    // زر فتح نموذج الإنشاء — محكومٌ بصلاحية الإضافة، ولا يظهر أثناء تحرير طلبٍ قائم
+    if ($can_add && !$req && $my_departments) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fa fa-solid fa-plus', 'label' => 'إنشاء طلب مالي');
+    }
+    $header_actions[] = array('href' => 'my_requests.php', 'class' => 'add-btn', 'icon' => 'fa fa-list-check', 'label' => 'طلباتي');
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -72,8 +81,20 @@ include('../insidebar.php');
         </div>
     <?php endif; ?>
 
-    <?php if ($editable): ?>
-    <form action="request_actions.php" method="post" class="allforms">
+    <?php if (!$req && !$can_add): ?>
+        <div class="card"><div class="card-body">
+            <h5>⛔ لا تملك صلاحية إنشاء طلبٍ مالي</h5>
+            <p>تستطيع متابعة طلباتك القائمة من «طلباتي المالية».</p>
+        </div></div>
+    <?php endif; ?>
+
+    <?php if ($editable && ($req || $can_add)): ?>
+    <?php if (!$req): ?>
+        <div class="alert alert-info" id="finreqHint" style="margin-bottom:14px;font-weight:700;">
+            <i class="fa fa-arrow-up"></i> اضغط زر <strong>«إنشاء طلب مالي»</strong> أعلى الصفحة لفتح النموذج.
+        </div>
+    <?php endif; ?>
+    <form id="finreqForm" action="request_actions.php" method="post" class="allforms<?php echo $form_visible ? ' allforms-visible' : ''; ?>">
         <input type="hidden" name="action" value="<?php echo $req ? 'update_draft' : 'create'; ?>">
         <?php if ($req): ?><input type="hidden" name="id" value="<?php echo intval($req['id']); ?>"><?php endif; ?>
         <div class="card">
@@ -216,7 +237,7 @@ include('../insidebar.php');
                     </tbody>
                 </table>
                 <?php if ($editable || $req['state'] === 'under_review'): ?>
-                <form action="request_actions.php" method="post" enctype="multipart/form-data" class="allforms" style="margin-top:10px;">
+                <form action="request_actions.php" method="post" enctype="multipart/form-data" class="allforms allforms-visible" style="margin-top:10px;">
                     <input type="hidden" name="action" value="attach_doc">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <div class="form-grid">
@@ -272,7 +293,7 @@ include('../insidebar.php');
                     </tbody>
                 </table>
                 <?php if ($editable): ?>
-                <form action="request_actions.php" method="post" class="allforms">
+                <form action="request_actions.php" method="post" class="allforms allforms-visible">
                     <input type="hidden" name="action" value="add_line">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <div class="form-grid">
@@ -332,5 +353,36 @@ include('../insidebar.php');
     <?php endif; ?>
     <?php endif; ?>
 </div>
+
+<script>
+// إظهار/إخفاء نموذج الإنشاء بزر الرأس (#toggleForm) — نمط شاشات المجموعة أ:
+// النموذج .allforms مخفيٌّ افتراضيًا بالـCSS ويُفتح بإضافة .allforms-visible.
+(function () {
+    function ready(fn) {
+        if (document.readyState !== 'loading') { fn(); }
+        else { document.addEventListener('DOMContentLoaded', fn); }
+    }
+    ready(function () {
+        var btn  = document.getElementById('toggleForm');
+        var form = document.getElementById('finreqForm');
+        var hint = document.getElementById('finreqHint');
+        if (!btn || !form) { return; }
+
+        function setState(open) {
+            form.classList.toggle('allforms-visible', open);
+            btn.classList.toggle('is-active', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (hint) { hint.style.display = open ? 'none' : ''; }
+            if (open) { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        }
+
+        setState(form.classList.contains('allforms-visible'));
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            setState(!form.classList.contains('allforms-visible'));
+        });
+    });
+})();
+</script>
 </body>
 </html>
