@@ -39,6 +39,52 @@ if (!function_exists('fin_user_level')) {
         return isset($map[$name]) ? $map[$name] : 'none';
     }
 }
+if (!function_exists('fin_publish_request_fact')) {
+    /**
+     * حقيقة دورة الطلب من جانب D04 (§9.3 — إكمال الثمانية):
+     * request.approved (الاعتماد المالي) · finance.posted (القيد) ·
+     * treasury.paid/collected (الأداء). تُنشر على الجذر المحايد فقط
+     * (publishFact — بلا إسقاطٍ مالي) وللحدث المربوط بطلبٍ حصرًا؛ حدثٌ
+     * يدويٌّ بلا طلبٍ خارج دورة D05 فلا حقيقة له هنا (NULL دلالي).
+     * لا ترمي أبدًا — فشل الحقيقة يُدوَّن ولا يكسر عملية المالية.
+     */
+    function fin_publish_request_fact($conn, $event_id, $event_key, $idem_kind, array $extra = array())
+    {
+        try {
+            $req = ems_tenant_db()->selectOne('fin_requests', array(
+                'where' => array('event_id' => intval($event_id)),
+            ));
+            if (!$req) { return null; }
+            require_once __DIR__ . '/../app/Core/EventPublisher.php';
+            $actor = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id'])
+                : (intval($req['created_by'] ?? 0) ?: 1);
+            return \App\Core\EventPublisher::publishFact($conn, array(
+                'event_key' => strval($event_key),
+                'category' => 'financial',
+                'source_module' => strval($req['source_module']) === 'general' ? 'finance' : strval($req['source_module']),
+                'company_id' => intval($req['company_id']),
+                'entity_type' => 'fin_request',
+                'entity_id' => intval($req['id']),
+                'occurred_at' => gmdate('Y-m-d H:i:s'),
+                'created_by' => $actor,
+                'idempotency_key' => 'fact:' . strval($idem_kind) . ':' . intval($req['id']),
+                'amount' => floatval($req['amount']),
+                'currency' => strval($req['currency']),
+                'source_ref' => strval($req['request_no']),
+                'project_id' => !empty($req['project_id']) ? intval($req['project_id']) : null,
+                'equipment_id' => !empty($req['equipment_id']) ? intval($req['equipment_id']) : null,
+                'payload' => array_merge(array(
+                    'request_no' => strval($req['request_no']),
+                    'request_type' => strval($req['request_type']),
+                    'event_id' => intval($event_id),
+                ), $extra),
+            ));
+        } catch (\Throwable $t) {
+            error_log('fin request fact ' . $event_key . ': ' . $t->getMessage());
+            return null;
+        }
+    }
+}
 if (!function_exists('fin_project_scope')) {
     /**
      * نطاق المشروع للأدوار المرتبطة بموقعٍ محدد (قرار 2026-07-17):

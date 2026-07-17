@@ -147,6 +147,12 @@ if (isset($_GET['advance_id'])) {
             fin_notify($conn, $company_id, $next_owner[$next], 'الحدث ' . $event['event_no'] . ' بانتظارك: ' . ($event_states[$next] ?? $next), 'events_list_fin.php?fstate=' . $next);
         }
 
+        // §9.3: حقيقة request.approved على الجذر عند الاعتماد المالي (لحدثِ طلبٍ حصرًا)
+        if ($next === 'approved' && $event) {
+            fin_publish_request_fact($conn, $aid, 'request.approved', 'appr',
+                array('approved_by' => $current_user_id));
+        }
+
         // (فجوة 2) عند الاعتماد النهائي: توليد القيد آليًا (مسودة مرتبطة)
         $auto_msg = '';
         if ($next === 'approved' && $event) {

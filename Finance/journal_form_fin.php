@@ -78,6 +78,12 @@ if (isset($_GET['post_id'])) {
         error_log('journal post refused: ' . $e->getMessage());
         header("Location: journal_form_fin.php?msg=لا+يجوز+ترحيل+قيدٍ+مرتبطٍ+بحدثٍ+منشورٍ+على+الناقل+❌"); exit();
     }
+    // §9.3: حقيقة finance.posted على الجذر — القيد رُحِّل لحدثِ طلبٍ (إن كان)
+    $eidFact = $entryRow ? intval($entryRow['event_id']) : 0;
+    if ($eidFact > 0) {
+        fin_publish_request_fact($conn, $eidFact, 'finance.posted', 'posted',
+            array('journal_entry_id' => $pid));
+    }
     // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
     $fed = fin_recalc_budget_actuals($conn, $company_id);
     header("Location: journal_form_fin.php?msg=تم+ترحيل+القيد+وتحدّث+فعلي+الموازنة+($fed+بند)+✅"); exit();

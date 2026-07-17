@@ -64,6 +64,13 @@ if (isset($_GET['execute_id'])) {
             $g->update('fin_receivables', array('collected' => $new_collected, 'state' => $new_state), array('id' => intval($pay['receivable_id'])));
         }
     }, 'payment execute + effect');
+    // §9.3: حقيقة الخزينة على الجذر — الأداء وقع لحدثِ طلبٍ (إن كانت الدفعة مربوطة)
+    if (!empty($pay['event_id'])) {
+        $tKey = $pay['direction'] === 'collection' ? 'treasury.collected' : 'treasury.paid';
+        fin_publish_request_fact($conn, intval($pay['event_id']), $tKey,
+            $pay['direction'] === 'collection' ? 'collected' : 'paid',
+            array('payment_no' => strval($pay['payment_no']), 'method' => strval($pay['method'])));
+    }
     // (فجوة 4) إشعار المدير المالي بحركة الخزينة
     $dir_lbl = $pay['direction'] === 'collection' ? 'تحصيل' : 'صرف';
     fin_notify($conn, $company_id, 'finance_manager', 'نُفِّذ ' . $dir_lbl . ' ' . $pay['payment_no'] . ' بمبلغ ' . number_format((float)$pay['amount'], 0), 'payments_fin.php');
