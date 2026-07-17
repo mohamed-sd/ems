@@ -113,12 +113,11 @@ if (isset($_GET['advance_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
     $aid = intval($_GET['advance_id']);
     $flow = fin_event_flow();
-    // A0 · تشديد الحصانة (§12): حدثٌ منشورٌ على الناقل لا تُغيَّر حالته يدويًا (دورته بالناقل).
-    // قراءةٌ واحدة للحدث كاملًا عبر البوابة (تحقن is_deleted=0) تخدم فحص الحصانة والمصفوفة والقيد.
+    // A0 · الحصانة (§12) تحرس **مضمون** الحدث المنشور لا موضعه في سير العمل:
+    // تقدّم الحالة يمرّ عبر البوابة (state ضمن immutable_allow) — وهذا شرط التحام
+    // D05→D04: الطلب يلد الحدث ثم تسير دورته وتُشتقّ حالة الطلب منها (§9).
+    // قراءةٌ واحدة للحدث كاملًا عبر البوابة (تحقن is_deleted=0) تخدم المصفوفة والقيد.
     $event = ems_tenant_db()->selectOne('fin_financial_events', array('where' => array('id' => $aid)));
-    if ($event && $event['idempotency_key'] !== null && $event['idempotency_key'] !== '') {
-        header("Location: events_list_fin.php?msg=لا+يجوز+تغيير+حالة+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
-    }
     $cur = $event ? $event['state'] : null;
     if ($cur !== null && isset($flow[$cur])) {
         list($next, $lbl, $level) = $flow[$cur];
@@ -168,11 +167,8 @@ if (isset($_GET['advance_id'])) {
 if (isset($_GET['reject_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الرفض+❌"); exit(); }
     $rid = intval($_GET['reject_id']);
-    // A0 · تشديد الحصانة (§12): الحدث المنشور لا يُرفَض يدويًا
-    $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state', 'idempotency_key'), 'where' => array('id' => $rid)));
-    if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
-        header("Location: events_list_fin.php?msg=لا+يجوز+رفض+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
-    }
+    // الرفض نقلُ حالةٍ لا تعديلُ مضمون — يمرّ للمنشور واليدوي معًا (§12 + immutable_allow)
+    $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state'), 'where' => array('id' => $rid)));
     $cur = $erow ? $erow['state'] : null;
     if ($cur !== null && !in_array($cur, array('posted','settled','closed','rejected'), true)) {
         ems_tenant_db()->update('fin_financial_events', array('state' => 'rejected'), array('id' => $rid));
@@ -187,11 +183,8 @@ if (isset($_GET['reject_id'])) {
 if (isset($_GET['resume_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $rid = intval($_GET['resume_id']);
-    // A0 · تشديد الحصانة (§12): الحدث المنشور لا يُعاد يدويًا للدورة
-    $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state', 'idempotency_key'), 'where' => array('id' => $rid)));
-    if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
-        header("Location: events_list_fin.php?msg=لا+يجوز+تعديل+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
-    }
+    // الإعادة للدورة نقلُ حالةٍ لا تعديلُ مضمون — تمرّ للمنشور واليدوي معًا
+    $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state'), 'where' => array('id' => $rid)));
     $cur = $erow ? $erow['state'] : null;
     if ($cur === 'rejected') {
         ems_tenant_db()->update('fin_financial_events', array('state' => 'draft'), array('id' => $rid), "state='rejected'");

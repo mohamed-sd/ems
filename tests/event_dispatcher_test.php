@@ -172,7 +172,8 @@ $conn->query("DELETE FROM fin_financial_events WHERE notes IN ('K4TEST_SRC','K4T
 $conn->query("DELETE FROM ems_event_consumers WHERE consumer LIKE 'k4t_%'");
 $conn->query("DELETE FROM ems_event_deliveries WHERE consumer LIKE 'k4t_%'");
 $conn->query("DELETE FROM ems_event_dead_letter WHERE consumer LIKE 'k4t_%'");
-$conn->query("DELETE FROM ems_sequences WHERE scope='fin_financial_events:EV:4'");
+// ⚠️ متتالية EV **لا تُحذف**: إعادتها للصفر تصطدم بأرقامٍ إنتاجيةٍ قائمة
+// (uq_fin_event_no) منذ صارت بوابة D05 تلد أحداثًا حقيقية. فجوات الترقيم مقبولة.
 $left = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events WHERE notes LIKE 'K4TEST%'")->fetch_row()[0]);
 ok('teardown: صفر بقايا', $left === 0);
 

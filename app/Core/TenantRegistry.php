@@ -76,9 +76,22 @@ class TenantRegistry
         'fin_depreciation' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_dues' => array('type' => self::T_TENANT, 'soft' => true),
         // immutable_key: صفٌّ يحمل هذا العمود غيرَ فارغٍ = حدثُ ناقلٍ منشور —
-        // البوابة ترفض تعديله/حذفه (عقيدة اللاتعديل · حارس الحصانة §12 · A0).
+        // البوابة ترفض تعديل مضمونه/حذفه (عقيدة اللاتعديل · حارس الحصانة §12 · A0).
         // القيود اليدوية (idempotency_key = NULL) تبقى قابلةً للإدارة.
-        'fin_financial_events' => array('type' => self::T_TENANT, 'soft' => true, 'immutable_key' => 'idempotency_key'),
+        //
+        // immutable_allow: فصل «المضمون» عن «حالة المعالجة» — المعيار المتبع في
+        // Event Sourcing ونمط Transactional Outbox: ظرفُ الحقيقة وحمولتها لا
+        // يتغيران أبدًا (المبلغ · النوع · الكيان · المراجع · التاريخ)، بينما
+        // أعمدة موضع المعالجة مصمَّمةٌ للتحديث وإلا تجمّد الحدث بلا دورة.
+        // تحديثٌ يلمس عمودًا خارج القائمة ⇒ يُرفض كما كان تمامًا (ولو معه عمودٌ مسموح).
+        //   state            موضع الحدث في سير عمل D04 (مسودة→…→مقيد→مقفل)
+        //   journal_entry_id ربط القيد المتولّد — تلازمٌ كتابيٌّ مع state='posted'
+        // إضافة أي عمودٍ هنا قرارٌ متعمَّد يوثَّق (أقل امتيازٍ ممكن).
+        'fin_financial_events' => array(
+            'type' => self::T_TENANT, 'soft' => true,
+            'immutable_key' => 'idempotency_key',
+            'immutable_allow' => array('state', 'journal_entry_id'),
+        ),
         'fin_financial_periods' => array('type' => self::T_TENANT, 'soft' => false),
         // ── بوابة الطلب المالي D05 (المرحلتان 1+2 · 2026-07-16) — أرشفةٌ لا حذف (soft=false
         // بالتصميم: الحالات الست عشرة تملك دورة الحياة، وسجلّ الطلب إلحاقيٌّ لا يُمحى) ──

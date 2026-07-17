@@ -606,6 +606,32 @@ expect_throw('ز3: السوبر أيضًا يُرفض تعديله للحدث ا
     $gateSuper->update('fin_financial_events', array('amount' => 1.00), array('id' => $busId));
 });
 
+// (ز4) فصل المضمون عن حالة المعالجة (immutable_allow) — المعيار المتبع في
+// Event Sourcing/Outbox: الحقيقة المنشورة لا تتغيّر، ودورتها تسير.
+// بدونه يولد كل حدثٍ من بوابة D05 مجمَّدًا فلا تبدأ دورة D04 ولا يُشتقّ الطلب.
+$advanced = $gateA->update('fin_financial_events', array('state' => 'dept_review'), array('id' => $busId));
+ok('ز4: تقدّم الحالة على حدثٍ منشور يمرّ (state ضمن immutable_allow)', $advanced === 1
+    && mysqli_fetch_assoc(mysqli_query($conn, "SELECT state FROM fin_financial_events WHERE id=$busId"))['state'] === 'dept_review');
+$pair = $gateA->update('fin_financial_events', array('state' => 'posted', 'journal_entry_id' => 4242), array('id' => $busId));
+ok('ز4: الزوج الكتابي (state + journal_entry_id) يمرّ — ترحيل القيد', $pair === 1
+    && mysqli_fetch_assoc(mysqli_query($conn, "SELECT journal_entry_id FROM fin_financial_events WHERE id=$busId"))['journal_entry_id'] === '4242');
+expect_throw('ز4: المضمون ما زال محصَّنًا (المبلغ وحده)', function () use ($gateA, $busId) {
+    $gateA->update('fin_financial_events', array('amount' => 7777.00), array('id' => $busId));
+});
+expect_throw('ز4: التحديث المختلط مرفوض كليًا (state مع amount — لا تهريب)', function () use ($gateA, $busId) {
+    $gateA->update('fin_financial_events', array('state' => 'closed', 'amount' => 7777.00), array('id' => $busId));
+});
+expect_throw('ز4: تهريبٌ عبر عمودٍ مرجعي مرفوض (state مع equipment_id)', function () use ($gateA, $busId) {
+    $gateA->update('fin_financial_events', array('state' => 'closed', 'equipment_id' => 5), array('id' => $busId));
+});
+expect_throw('ز4: الحذف الناعم ما زال مرفوضًا (is_deleted خارج القائمة)', function () use ($gateA, $busId) {
+    $gateA->softDelete('fin_financial_events', $busId);
+});
+$guardRow = mysqli_fetch_assoc(mysqli_query($conn, "SELECT amount, equipment_id, state, is_deleted FROM fin_financial_events WHERE id=$busId"));
+ok('ز4: بعد كل محاولات التهريب — المضمون سليمٌ والحالة وحدها تحرّكت',
+    floatval($guardRow['amount']) === 50.00 && $guardRow['equipment_id'] === null
+    && $guardRow['state'] === 'posted' && intval($guardRow['is_deleted']) === 0);
+
 } catch (\Throwable $e) {
     $FAIL++;
     echo "  ✘ استثناء غير متوقع: " . $e->getMessage() . "\n";

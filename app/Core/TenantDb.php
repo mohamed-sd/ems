@@ -177,12 +177,24 @@ class TenantDb
         if (!empty($def['immutable_key'])) {
             $ik = $def['immutable_key'];
             $this->assertIdent($ik);
-            $guardSql = 'SELECT COUNT(*) FROM `' . $table . '` WHERE ' . $cond
-                      . ' AND `' . $ik . '` IS NOT NULL AND `' . $ik . '` <> ?';
-            $guardParams = array_merge($condParams, array(''));
-            $hit = intval($this->run($guardSql, $guardParams)->fetch_row()[0]);
-            if ($hit > 0) {
-                $this->deny('immutable published-event mutation refused', $table . ' :: ' . $ik . ' present');
+            // فصل المضمون عن حالة المعالجة (immutable_allow في السجل): تحديثٌ
+            // يقتصر على أعمدة موضع المعالجة يعبر — فالحقيقة المنشورة لا تتغيّر
+            // بينما دورتها تسير. أيُّ عمودٍ خارج القائمة (ولو رافقه مسموح)
+            // يستدعي الحارس فيُرفض على الصفوف المنشورة كما كان تمامًا.
+            $allow = (isset($def['immutable_allow']) && is_array($def['immutable_allow']))
+                ? $def['immutable_allow'] : array();
+            $contentCols = array_values(array_diff(array_keys($data), $allow));
+            if (!empty($contentCols)) {
+                $guardSql = 'SELECT COUNT(*) FROM `' . $table . '` WHERE ' . $cond
+                          . ' AND `' . $ik . '` IS NOT NULL AND `' . $ik . '` <> ?';
+                $guardParams = array_merge($condParams, array(''));
+                $hit = intval($this->run($guardSql, $guardParams)->fetch_row()[0]);
+                if ($hit > 0) {
+                    $this->deny(
+                        'immutable published-event mutation refused',
+                        $table . ' :: ' . $ik . ' present :: content_cols=' . implode(',', $contentCols)
+                    );
+                }
             }
         }
 

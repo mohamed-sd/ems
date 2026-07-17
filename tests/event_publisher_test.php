@@ -240,13 +240,19 @@ EventPublisher::$rootModeOverride = null;
 EventPublisher::$rootModeOverride = null;
 $conn->query("DELETE FROM fin_financial_events WHERE notes LIKE 'K3TEST_%'"); // يشمل بقايا أي تشغيلٍ سابقٍ منقطع (الإسقاط أولًا — FK)
 $conn->query("DELETE FROM ems_business_events WHERE payload LIKE '%K3TEST_%'"); // جذور الاختبار بعد إسقاطاتها
-// متتالية EV تُحذف (لا تصادم — الأساس FIN-EV-…)؛ متتالية BE تبقى مرتفعةً عمدًا
-// (حذفها يعيد الترقيم لـBE-0001 المحجوز للردم — فجوات الترقيم مقبولة).
-$conn->query("DELETE FROM ems_sequences WHERE scope = 'fin_financial_events:EV:4'");
+// ⚠️ المتتاليتان EV وBE **لا تُحذفان أبدًا**: حذفهما يعيد العدّاد إلى الصفر
+// فيصطدم أول نشرٍ لاحق برقمٍ إنتاجيٍّ قائم (uq_fin_event_no). فجوات الترقيم
+// مقبولةٌ بالتصميم (نمط nextNo)، والتصادم ليس مقبولًا. الحارس أدناه يمنع
+// عودة هذا الخطأ: المتتالية يجب أن تغطي كل رقمٍ مستعملٍ في الدفتر.
 $final = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]);
 ok('teardown: العدّ عاد لما قبل الاختبار', $final === $count0);
 $rootsFinal = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
 ok('teardown: الجذور عادت لخط الأساس (الردم وحده)', $rootsFinal === $roots_count0);
+$maxUsed = intval($conn->query("SELECT COALESCE(MAX(CAST(SUBSTRING(event_no,4) AS UNSIGNED)),0)
+    FROM fin_financial_events WHERE company_id=4 AND event_no REGEXP '^EV-[0-9]+$'")->fetch_row()[0]);
+$seqRow = $conn->query("SELECT next_val FROM ems_sequences WHERE scope='fin_financial_events:EV:4'")->fetch_assoc();
+ok('حارس الترقيم: متتالية EV تغطي كل رقمٍ إنتاجيٍّ قائم (لا تصادم في النشر التالي)',
+    $maxUsed === 0 || ($seqRow && intval($seqRow['next_val']) >= $maxUsed));
 
 echo str_repeat('═', 50) . "\n";
 echo "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n";

@@ -178,7 +178,8 @@ $conn->query("DELETE FROM ems_state_transitions WHERE workflow='k7_test_flow'");
 $conn->query("DELETE FROM fin_financial_events WHERE notes LIKE 'K7TEST_%'");
 foreach ($cleanupUsers as $u) { $conn->query("DELETE FROM users WHERE id=" . intval($u)); }
 foreach ($cleanupPos as $p) { $conn->query("DELETE FROM positions WHERE id=" . intval($p)); }
-$conn->query("DELETE FROM ems_sequences WHERE scope='fin_financial_events:EV:4'");
+// ⚠️ متتالية EV **لا تُحذف**: إعادتها للصفر تصطدم بأرقامٍ إنتاجيةٍ قائمة
+// (uq_fin_event_no) منذ صارت بوابة D05 تلد أحداثًا حقيقية. فجوات الترقيم مقبولة.
 $left = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events WHERE notes LIKE 'K7TEST%'")->fetch_row()[0])
       + intval($conn->query("SELECT COUNT(*) FROM users WHERE username LIKE 'K7TEST%'")->fetch_row()[0])
       + intval($conn->query("SELECT COUNT(*) FROM positions WHERE name LIKE 'K7TEST%'")->fetch_row()[0]);
