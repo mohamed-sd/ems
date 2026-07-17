@@ -41,9 +41,27 @@ function cronreq_log(mysqli $conn, $company_id, $request_id, $event_type, $body,
     $stmt->close();
 }
 
+/** إشعارٌ موجَّهٌ بهوية النظام (fin_notifications) بمنع تكرارٍ يومي — قناة cron العابرة */
+function cronreq_notify(mysqli $conn, $company_id, $target_level, $title, $link = null)
+{
+    $title = mb_substr($title, 0, 200);
+    $q = $conn->prepare('SELECT COUNT(*) FROM fin_notifications WHERE company_id = ? AND target_level = ? AND title = ? AND DATE(created_at) = CURDATE()');
+    $q->bind_param('iss', $company_id, $target_level, $title);
+    $q->execute();
+    $dup = intval($q->get_result()->fetch_row()[0]);
+    $q->close();
+    if ($dup > 0) { return; }
+    $stmt = $conn->prepare('INSERT INTO fin_notifications (company_id, target_level, title, link) VALUES (?, ?, ?, ?)');
+    $stmt->bind_param('isss', $company_id, $target_level, $title, $link);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // ═══ (أ) التصعيد الزمني — الحالات النشطة ذات استحقاقٍ مختوم ═══
 $res = $conn->query(
-    "SELECT id, company_id, request_no, state, need_class, sla_due_at, escalation_level, event_id
+    "SELECT id, company_id, request_no, request_type, source_module, amount, currency,
+            project_id, contract_id, equipment_id, created_by,
+            state, need_class, sla_due_at, escalation_level, event_id
        FROM fin_requests
       WHERE sla_due_at IS NOT NULL
         AND state IN ('under_review', 'pending_approval')"
@@ -69,6 +87,17 @@ while ($r = $res->fetch_assoc()) {
             cronreq_log($conn, intval($r['company_id']), intval($r['id']),
                 'escalate', $labels[$level] . ' — مرحلة ' . $stage,
                 strval($r['escalation_level']), strval($level));
+            // §9.3: حقيقة request.escalated على الجذر عند التنبيه/التصعيد (لا التذكير)
+            if ($level >= 2) {
+                finreq_publish_fact($conn, $r, 'request.escalated',
+                    'fact:esc:' . intval($r['id']) . ':l' . $level,
+                    array('level' => $level, 'stage' => $stage));
+            }
+            if ($level === 3) {
+                cronreq_notify($conn, intval($r['company_id']), 'finance_manager',
+                    'تصعيدٌ للمستوى الثالث: ' . $r['request_no'] . ' تجاوز ضعف مدة مرحلته — يتصدر لوحة الاختناق',
+                    'FinRequests/cycle_time_board.php');
+            }
             if ($level === 1) { $reminded++; } else { $escalated++; }
         }
     }
@@ -118,4 +147,72 @@ foreach ($expiry_rules as $rule) {
     }
 }
 
-echo "cron_requests: تذكير={$reminded} · تصعيد/تنبيه={$escalated} · إنذار مسبق={$prenoticed} · منتهٍ={$expired}\n";
+// ═══ (ج) كنس الاشتقاق: حالة الطلب تلحق حالة حدثها دوريًّا (لا انتظار فتح شاشة) ═══
+//        وعند بلوغ «مغلق» تُنشر حقيقة request.closed (§9.3) — ختام خيط الدورة.
+$synced = 0; $closed_facts = 0;
+$sweep = $conn->query(
+    "SELECT fr.id, fr.company_id, fr.request_no, fr.request_type, fr.source_module,
+            fr.amount, fr.currency, fr.project_id, fr.contract_id, fr.equipment_id,
+            fr.created_by, fr.need_class, fr.state, fe.state AS ev_state, fe.id AS ev_id
+       FROM fin_requests fr
+       JOIN fin_financial_events fe ON fe.id = fr.event_id
+      WHERE fr.state IN ('pending_approval', 'approved', 'posted', 'paid', 'collected')
+        AND fe.state IN ('approved', 'posted', 'settled', 'closed', 'rejected')"
+);
+while ($s = $sweep->fetch_assoc()) {
+    $map = array(
+        'approved' => 'approved', 'posted' => 'posted',
+        'settled' => (strval($s['request_type']) === 'collection') ? 'collected' : 'paid',
+        'closed' => 'closed', 'rejected' => 'rejected',
+    );
+    $derived = $map[strval($s['ev_state'])];
+    if ($derived === strval($s['state'])) { continue; }
+    $upd = $conn->prepare('UPDATE fin_requests SET state = ? WHERE id = ? AND state = ?');
+    $upd->bind_param('sis', $derived, $s['id'], $s['state']);
+    $upd->execute();
+    $done = $upd->affected_rows;
+    $upd->close();
+    if ($done === 1) {
+        cronreq_log($conn, intval($s['company_id']), intval($s['id']), 'system',
+            'اشتقاق الحالة من حدث D04 #' . intval($s['ev_id']) . ' (كنس دوري)', strval($s['state']), $derived);
+        $synced++;
+        if ($derived === 'closed') {
+            finreq_publish_fact($conn, $s, 'request.closed', 'fact:closed:' . intval($s['id']));
+            $closed_facts++;
+        }
+    }
+}
+
+// ═══ (د) مهلة الطارئ (§8.3 — الشرط الثالث): استكمال الدورة رجعيًّا خلال 72 ساعة ═══
+//        استثناءٌ معتمدٌ ودورته لم تكتمل بعد المهلة → المستوى الثالث + مساءلة.
+$exc_overdue = 0;
+$exq = $conn->query(
+    "SELECT fr.id, fr.company_id, fr.request_no, fr.escalation_level,
+            (SELECT MAX(x.created_at) FROM fin_request_events x
+              WHERE x.request_id = fr.id AND x.event_type = 'exception') AS exc_at
+       FROM fin_requests fr
+      WHERE fr.is_exception = 1 AND fr.exception_type = 'emergency_execute'
+        AND fr.state IN ('draft', 'returned', 'under_review', 'pending_approval', 'suspended')
+        AND NOT EXISTS (
+            SELECT 1 FROM fin_request_events oe
+            WHERE oe.request_id = fr.id AND oe.event_type = 'exception_overdue'
+        )"
+);
+while ($x = $exq->fetch_assoc()) {
+    if ($x['exc_at'] === null || strtotime($x['exc_at']) > $now - 72 * 3600) { continue; }
+    if (intval($x['escalation_level']) < 3) {
+        $upd = $conn->prepare('UPDATE fin_requests SET escalation_level = 3 WHERE id = ? AND escalation_level < 3');
+        $upd->bind_param('i', $x['id']);
+        $upd->execute();
+        $upd->close();
+    }
+    cronreq_log($conn, intval($x['company_id']), intval($x['id']), 'exception_overdue',
+        'خرق مهلة الطارئ: 72 ساعةً انقضت منذ الاعتماد والدورة لم تُستكمل رجعيًّا — مساءلةٌ إلزامية (§8.3)');
+    cronreq_notify($conn, intval($x['company_id']), 'finance_manager',
+        'خرق مهلة الطارئ: ' . $x['request_no'] . ' لم تُستكمل دورته خلال 72 ساعة',
+        'FinRequests/cycle_time_board.php');
+    $exc_overdue++;
+}
+
+echo "cron_requests: تذكير={$reminded} · تصعيد/تنبيه={$escalated} · إنذار مسبق={$prenoticed} · منتهٍ={$expired}"
+    . " · اشتقاق={$synced} · إقفالات منشورة={$closed_facts} · خرق طارئ={$exc_overdue}\n";

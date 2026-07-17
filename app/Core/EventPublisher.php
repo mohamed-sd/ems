@@ -93,12 +93,12 @@ class EventPublisher
     }
 
     /**
-     * نشر حدثٍ مؤسسيٍّ واحد وفق عقد §9 على اتصال المستدعي (يشارك معاملته).
+     * التحقق والتطبيع المشترك لعقد §9 — تستعمله publish() (الإسقاط المالي)
+     * وpublishFact() (الحقيقة المحايدة): قواعد إلزامٍ وصيغٍ ومراجع واحدة للاثنين.
      *
-     * @return array{id:int,event_no:string,correlation_id:string,idempotency_key:string,duplicate:bool}
      * @throws EventValidationException عند أي خرقٍ للعقد.
      */
-    public static function publish(\mysqli $conn, array $e)
+    private static function normalize(array $e)
     {
         // ── 1) الإلزام الشامل: كل حقلٍ إلزاميٍّ حاضرٌ وغير فارغ (§9-1) ──
         foreach (self::MANDATORY as $f) {
@@ -144,7 +144,6 @@ class EventPublisher
         }
 
         // ── 4) ما يولّده الناشر ──
-        $companyId = intval($e['company_id']);
         $correlation = (isset($e['correlation_id']) && $e['correlation_id'] !== '' && $e['correlation_id'] !== null)
             ? (string) $e['correlation_id']                      // مشتق: يرث الجذر حرفيًا
             : ServerId::correlationId();                          // جذر: توليد جديد
@@ -154,16 +153,95 @@ class EventPublisher
         if (strlen($idem) > 64 || strlen($correlation) > 64) {
             throw new EventValidationException('عقد §9: correlation/idempotency ≤ 64 حرفًا');
         }
-        $eventNo = ServerId::nextNo($conn, 'fin_financial_events:EV:' . $companyId, 'EV');
 
-        $amount   = isset($e['amount']) ? round((float) $e['amount'], 2) : 0.00;
-        $currency = isset($e['currency']) && $e['currency'] !== '' ? (string) $e['currency'] : 'SDG';
-        $quantity = (isset($e['quantity']) && $e['quantity'] !== null && $e['quantity'] !== '') ? (string) round((float) $e['quantity'], 4) : null;
-        $unit     = (isset($e['unit']) && $e['unit'] !== '') ? (string) $e['unit'] : null;
+        return array(
+            'company_id'   => intval($e['company_id']),
+            'event_key'    => (string) $e['event_key'],
+            'category'     => (string) $e['category'],
+            'source_module'=> (string) $e['source_module'],
+            'entity_type'  => (string) $e['entity_type'],
+            'entity_id'    => intval($e['entity_id']),
+            'created_by'   => intval($e['created_by']),
+            'occurred_at'  => (string) $e['occurred_at'],
+            'correlation_id' => $correlation,
+            'idempotency_key' => $idem,
+            'refs'         => $refs,
+            'amount'       => isset($e['amount']) ? round((float) $e['amount'], 2) : 0.00,
+            'currency'     => (isset($e['currency']) && $e['currency'] !== '') ? (string) $e['currency'] : 'SDG',
+            'quantity'     => (isset($e['quantity']) && $e['quantity'] !== null && $e['quantity'] !== '') ? (string) round((float) $e['quantity'], 4) : null,
+            'unit'         => (isset($e['unit']) && $e['unit'] !== '') ? (string) $e['unit'] : null,
+            'payload_json' => json_encode($e['payload'], JSON_UNESCAPED_UNICODE),
+            'source_ref'   => (isset($e['source_ref']) && $e['source_ref'] !== '') ? (string) $e['source_ref'] : null,
+        );
+    }
+
+    /**
+     * نشر حقيقةٍ محايدةٍ فقط (ADR-15 · D05 §9.3): تُكتب في الجذر ems_business_events
+     * بلا أي إسقاطٍ مالي — لأحداث دورة العمل (request.submitted/…) التي ليست
+     * أحداثًا مالية فلا يجوز أن تلوّث الدفتر. خلف علم EMS_EVENT_ROOT نفسه:
+     * off = لا-عملية موثَّقة تعيد null (مفتاح إطفاءٍ واحدٌ لعائلة الجذر كلها).
+     * العقد والتحقق نفسه (§9)، والعطالة على uq_ebe_idempotency تعيد id القائم.
+     *
+     * @return array{id:int,correlation_id:string,idempotency_key:string}|null
+     * @throws EventValidationException عند أي خرقٍ للعقد.
+     */
+    public static function publishFact(\mysqli $conn, array $e)
+    {
+        if (self::rootMode() !== 'publish') {
+            return null;
+        }
+        $n = self::normalize($e);
+        $rootId = self::writeRoot($conn, array(
+            'company_id'   => $n['company_id'],
+            'event_key'    => $n['event_key'],
+            'category'     => $n['category'],
+            'source_module'=> $n['source_module'],
+            'source_ref'   => $n['source_ref'],
+            'entity_type'  => $n['entity_type'],
+            'entity_id'    => $n['entity_id'],
+            'quantity'     => $n['quantity'],
+            'unit'         => $n['unit'],
+            'amount'       => $n['amount'],
+            'currency'     => $n['currency'],
+            'refs'         => $n['refs'],
+            'event_status' => (isset($e['event_status']) && in_array($e['event_status'], self::ROOT_STATUSES, true)) ? (string) $e['event_status'] : 'recorded',
+            'reverses_event_id' => (isset($e['reverses_event_id']) && is_numeric($e['reverses_event_id']) && intval($e['reverses_event_id']) > 0) ? intval($e['reverses_event_id']) : null,
+            'occurred_at'  => $n['occurred_at'],
+            'payload'      => $n['payload_json'],
+            'correlation_id' => $n['correlation_id'],
+            'idempotency_key' => $n['idempotency_key'],
+            'created_by'   => $n['created_by'],
+        ));
+        return array(
+            'id' => $rootId,
+            'correlation_id' => $n['correlation_id'],
+            'idempotency_key' => $n['idempotency_key'],
+        );
+    }
+
+    /**
+     * نشر حدثٍ مؤسسيٍّ واحد وفق عقد §9 على اتصال المستدعي (يشارك معاملته).
+     *
+     * @return array{id:int,event_no:string,correlation_id:string,idempotency_key:string,duplicate:bool}
+     * @throws EventValidationException عند أي خرقٍ للعقد.
+     */
+    public static function publish(\mysqli $conn, array $e)
+    {
+        // ── 1-4) التحقق والتطبيع المشترك (§9) — القواعد نفسها للحقيقة وإسقاطها ──
+        $n = self::normalize($e);
+        $companyId = $n['company_id'];
+        $correlation = $n['correlation_id'];
+        $idem = $n['idempotency_key'];
+        $refs = $n['refs'];
+        $amount = $n['amount'];
+        $currency = $n['currency'];
+        $quantity = $n['quantity'];
+        $unit = $n['unit'];
+        $payload = $n['payload_json'];
+        $sourceRef = $n['source_ref'];
         $legacyType = (isset($e['legacy_event_type']) && $e['legacy_event_type'] !== '') ? (string) $e['legacy_event_type'] : 'enterprise';
-        $payload  = json_encode($e['payload'], JSON_UNESCAPED_UNICODE);
-        $sourceRef = (isset($e['source_ref']) && $e['source_ref'] !== '') ? (string) $e['source_ref'] : null;
-        $notes     = (isset($e['notes']) && $e['notes'] !== '') ? (string) $e['notes'] : null;
+        $notes = (isset($e['notes']) && $e['notes'] !== '') ? (string) $e['notes'] : null;
+        $eventNo = ServerId::nextNo($conn, 'fin_financial_events:EV:' . $companyId, 'EV');
 
         // ── 4ب) الجذر المحايد (ADR-15): الحقيقة تُدوَّن قبل إسقاطها المالي —
         //        نفس الاتصال/المعاملة، فالذرّية ذرّية المستدعي نفسها. ──
@@ -171,12 +249,12 @@ class EventPublisher
         if (self::rootMode() === 'publish') {
             $rootId = self::writeRoot($conn, array(
                 'company_id'   => $companyId,
-                'event_key'    => (string) $e['event_key'],
-                'category'     => (string) $e['category'],
-                'source_module'=> (string) $e['source_module'],
+                'event_key'    => $n['event_key'],
+                'category'     => $n['category'],
+                'source_module'=> $n['source_module'],
                 'source_ref'   => $sourceRef,
-                'entity_type'  => (string) $e['entity_type'],
-                'entity_id'    => intval($e['entity_id']),
+                'entity_type'  => $n['entity_type'],
+                'entity_id'    => $n['entity_id'],
                 'quantity'     => $quantity,
                 'unit'         => $unit,
                 'amount'       => $amount,
@@ -184,11 +262,11 @@ class EventPublisher
                 'refs'         => $refs,
                 'event_status' => (isset($e['event_status']) && in_array($e['event_status'], self::ROOT_STATUSES, true)) ? (string) $e['event_status'] : 'recorded',
                 'reverses_event_id' => (isset($e['reverses_event_id']) && is_numeric($e['reverses_event_id']) && intval($e['reverses_event_id']) > 0) ? intval($e['reverses_event_id']) : null,
-                'occurred_at'  => (string) $e['occurred_at'],
+                'occurred_at'  => $n['occurred_at'],
                 'payload'      => $payload,
                 'correlation_id' => $correlation,
                 'idempotency_key' => $idem,
-                'created_by'   => intval($e['created_by']),
+                'created_by'   => $n['created_by'],
             ));
         }
 
@@ -203,15 +281,15 @@ class EventPublisher
         if (!$stmt) {
             throw new \RuntimeException('EventPublisher: prepare failed: ' . $conn->error);
         }
-        $entityType = (string) $e['entity_type'];
-        $entityId   = intval($e['entity_id']);
-        $createdBy  = intval($e['created_by']);
+        $entityType = $n['entity_type'];
+        $entityId   = $n['entity_id'];
+        $createdBy  = $n['created_by'];
         $state      = 'draft';
         $schemaVer  = 1;
-        $eventKey   = (string) $e['event_key'];
-        $category   = (string) $e['category'];
-        $sourceModule = (string) $e['source_module'];
-        $occurredAt = (string) $e['occurred_at'];
+        $eventKey   = $n['event_key'];
+        $category   = $n['category'];
+        $sourceModule = $n['source_module'];
+        $occurredAt = $n['occurred_at'];
         // الأنواع للـ28 وسيطًا: i + s×7 + i + d + s×3 + i×6 + s×5 + i + s + i + i(root)
         $stmt->bind_param(
             'isssssssidsssiiiiiisssssisii',

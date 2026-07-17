@@ -427,6 +427,140 @@ function finreq_upload($field)
     return null;
 }
 
+/** نشر حقيقة دورة طلبٍ على الجذر المحايد (§9.3 — حقيقةٌ بلا إسقاطٍ مالي).
+ *  العطالة حتمية بمفتاح المستدعي (transition/سياق)؛ تُستدعى داخل معاملة السجل
+ *  نفسها. لا ترمي أبدًا — فشل الحقيقة يُدوَّن error_log ولا يكسر العملية. */
+function finreq_publish_fact($conn, $request, $event_key, $idem, array $extra = array())
+{
+    try {
+        $actor = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id'])
+            : (intval($request['created_by'] ?? 0) ?: 1);
+        $payload = array_merge(array(
+            'request_no' => strval($request['request_no']),
+            'request_type' => strval($request['request_type']),
+            'need_class' => strval($request['need_class']),
+        ), $extra);
+        return \App\Core\EventPublisher::publishFact($conn, array(
+            'event_key' => strval($event_key),
+            'category' => 'financial',
+            'source_module' => strval($request['source_module']) === 'general' ? 'finance' : strval($request['source_module']),
+            'company_id' => intval($request['company_id']),
+            'entity_type' => 'fin_request',
+            'entity_id' => intval($request['id']),
+            'occurred_at' => gmdate('Y-m-d H:i:s'),
+            'created_by' => $actor,
+            'idempotency_key' => strval($idem),
+            'amount' => floatval($request['amount']),
+            'currency' => strval($request['currency']),
+            'source_ref' => strval($request['request_no']),
+            'project_id' => !empty($request['project_id']) ? intval($request['project_id']) : null,
+            'contract_id' => !empty($request['contract_id']) ? intval($request['contract_id']) : null,
+            'equipment_id' => !empty($request['equipment_id']) ? intval($request['equipment_id']) : null,
+            'payload' => $payload,
+        ));
+    } catch (\Throwable $t) {
+        error_log('finreq fact ' . $event_key . ': ' . $t->getMessage());
+        return null;
+    }
+}
+
+/** إشعارٌ موجَّهٌ عبر fin_notifications القائم (§12.3) — مرآة fin_notify بلا
+ *  اعتمادٍ متبادلٍ بين الوحدتين، بمنع تكرار نفس العنوان لنفس المستوى يوميًّا. */
+function finreq_notify($gate, $target_level, $title, $link = null)
+{
+    try {
+        $title = mb_substr(strval($title), 0, 200);
+        $dup = $gate->count('fin_notifications', array(
+            'where' => array('target_level' => strval($target_level), 'title' => $title),
+            'whereRaw' => 'DATE(created_at) = CURDATE()', 'params' => array(),
+        ));
+        if (intval($dup) > 0) { return; }
+        $gate->insert('fin_notifications', array(
+            'target_level' => strval($target_level), 'title' => $title,
+            'link' => $link !== null ? strval($link) : null,
+        ));
+    } catch (\Throwable $t) { /* إشعارٌ فقط — لا يكسر العملية */ }
+}
+
+/** خريطة نوع الطلب/الإدارة → فئة بند الموازنة (بوابة الميزانية §3.4-②) —
+ *  افتراضٌ ذكيٌّ يظل المحاسب حرًّا في تجاوزه من القائمة. */
+function finreq_budget_category_for($request_type, $source_module)
+{
+    if (strval($source_module) === 'maintenance') { return 'maintenance'; }
+    if (strval($source_module) === 'transport') { return 'transport'; }
+    $map = array(
+        'purchase' => 'procurement', 'supplier_payment' => 'procurement',
+        'employee_payment' => 'salaries', 'advance' => 'salaries',
+        'collection' => 'revenue', 'disbursement' => 'operational_need',
+    );
+    return isset($map[strval($request_type)]) ? $map[strval($request_type)] : 'other';
+}
+
+/** بنود موازنة الشركة مع المتبقي المحسوب (planned - actual) للعرض والفحص */
+function finreq_budget_lines($gate)
+{
+    $out = array();
+    try {
+        foreach ($gate->select('fin_budget_lines', array(
+            'columns' => array('id', 'budget_id', 'line_kind', 'category', 'planned_amount', 'actual_amount'),
+            'orderBy' => 'category ASC',
+        )) as $l) {
+            $l['remaining'] = round(floatval($l['planned_amount']) - floatval($l['actual_amount']), 2);
+            $out[] = $l;
+        }
+    } catch (\Throwable $t) { /* لا موازنة = قائمة فارغة */ }
+    return $out;
+}
+
+/** كشف التجزئة (§8.5): طلباتٌ حيّةٌ لنفس المستفيد والنوع خلال 30 يومًا —
+ *  تُجمع قيمتها لتحديد مستوى الاعتماد الأعلى (عرضٌ تحذيريٌّ للمحاسب). */
+function finreq_fragmentation($gate, $request)
+{
+    try {
+        $rows = $gate->select('fin_requests', array(
+            'columns' => array('id', 'amount'),
+            'whereRaw' => 'id <> ? AND request_type = ? AND COALESCE(beneficiary_name,\'\') = ?
+                           AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                           AND state NOT IN (\'rejected\',\'withdrawn\',\'expired\',\'merged\',\'cancelled\')',
+            'params' => array(intval($request['id']), strval($request['request_type']),
+                strval($request['beneficiary_name'] ?? '')),
+        ));
+        if (!$rows) { return null; }
+        $total = floatval($request['amount']);
+        foreach ($rows as $r) { $total += floatval($r['amount']); }
+        return array('count' => count($rows) + 1, 'total' => $total);
+    } catch (\Throwable $t) { return null; }
+}
+
+/** أزمنة المراحل من سجل الانتقالات — قناة قراءةٍ موثَّقة لجدول T_RESTRICTED
+ *  (ems_state_transitions يُكتب عبر StateMachine حصرًا؛ هذه قراءةٌ إحصائية
+ *  معزولةٌ بالشركة عبر عمود company_id الذي يختمه المحرك في كل قيد). */
+function finreq_stage_timings($conn, $company_id)
+{
+    $out = array();
+    $sql = "SELECT to_state, COUNT(*) AS entries,
+                   ROUND(AVG(mins), 0) AS avg_mins, ROUND(MAX(mins), 0) AS max_mins
+              FROM (
+                    SELECT to_state,
+                           TIMESTAMPDIFF(MINUTE, created_at,
+                               LEAD(created_at) OVER (PARTITION BY entity_id ORDER BY id)) AS mins
+                      FROM ems_state_transitions
+                     WHERE workflow = 'fin_request' AND company_id = ?
+                   ) t
+             WHERE mins IS NOT NULL
+             GROUP BY to_state";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) { return $out; }
+    $cid = intval($company_id);
+    $stmt->bind_param('i', $cid);
+    if ($stmt->execute()) {
+        $res = $stmt->get_result();
+        while ($row = $res->fetch_assoc()) { $out[$row['to_state']] = $row; }
+    }
+    $stmt->close();
+    return $out;
+}
+
 /** جلب طلبٍ معزولًا + اشتقاق حالته (الاستدعاء المعياري لكل الشاشات) */
 function finreq_fetch($gate, $id)
 {

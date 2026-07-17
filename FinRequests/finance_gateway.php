@@ -47,6 +47,34 @@ foreach ($gate->scopedQuery(array('scope' => array('fe' => 'fin_financial_events
     $gateway_events = intval($m['via_gateway']); $total_events_30d = intval($m['total']);
 }
 
+// ── الاستثناءات (§8.3): طابور قرارات الطارئ (للمدير المالي) + مؤشر حدّ الـ5% الشهري ──
+$exception_queue = array();
+if ($is_super || $role === '17') {
+    try {
+        $exception_queue = $gate->select('fin_requests', array(
+            'whereRaw' => "is_exception = 0 AND state IN ('under_review', 'pending_approval')
+                AND EXISTS (SELECT 1 FROM fin_request_events e1
+                             WHERE e1.request_id = fin_requests.id AND e1.event_type = 'exception_requested')
+                AND NOT EXISTS (SELECT 1 FROM fin_request_events e2
+                             WHERE e2.request_id = fin_requests.id AND e2.event_type = 'exception_denied'
+                               AND e2.id > (SELECT MAX(e3.id) FROM fin_request_events e3
+                                             WHERE e3.request_id = fin_requests.id AND e3.event_type = 'exception_requested'))",
+            'params' => array(), 'orderBy' => 'id DESC', 'limit' => 50,
+        ));
+    } catch (\Throwable $t) { /* عرض */ }
+}
+$exc_month = 0; $req_month = 0;
+try {
+    $exc_month = intval($gate->count('fin_request_events', array(
+        'whereRaw' => "event_type = 'exception' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
+        'params' => array(),
+    )));
+    $req_month = intval($gate->count('fin_requests', array(
+        'whereRaw' => "created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", 'params' => array(),
+    )));
+} catch (\Throwable $t) { /* عرض */ }
+$exc_pct = $req_month > 0 ? round($exc_month / $req_month * 100, 1) : 0;
+
 $page_title = 'إيكوبيشن | بوابة الطلبات المالية';
 include('../inheader.php');
 include('../insidebar.php');
@@ -58,6 +86,7 @@ include('../insidebar.php');
     $header_actions = array(
         array('href' => 'accountant_desk.php', 'class' => 'add-btn', 'icon' => 'fa fa-calculator', 'label' => 'مكتب المحاسب'),
         array('href' => 'effect_map.php', 'class' => 'add-btn', 'icon' => 'fa fa-diagram-project', 'label' => 'خريطة الأثر'),
+        array('href' => 'cycle_time_board.php', 'class' => 'add-btn', 'icon' => 'fa fa-stopwatch', 'label' => 'لوحة زمن الدورة'),
     );
     if ($is_super || $role === '17') {
         $header_actions[] = array('href' => 'routing_admin.php', 'class' => 'add-btn', 'icon' => 'fa fa-route', 'label' => 'توجيه الإدارات');
@@ -81,7 +110,57 @@ include('../insidebar.php');
                 <?php if ($total_events_30d > 0): ?><small>(<?php echo round($gateway_events / $total_events_30d * 100); ?>%)</small><?php endif; ?>
             </div>
         </div>
+        <div class="stat-card">
+            <div class="stat-label">الاستثناءات الشهرية (§8.3 — الحدّ 5%)</div>
+            <div class="stat-value" style="<?php echo $exc_pct > 5 ? 'color:#dc2626;' : ''; ?>">
+                <?php echo $exc_month; ?> / <?php echo $req_month; ?> <small>(<?php echo $exc_pct; ?>%)</small>
+                <?php if ($exc_pct > 5): ?><small>⚠️ تجاوزٌ يستوجب مراجعة سببٍ جذري</small><?php endif; ?>
+            </div>
+        </div>
     </div>
+
+    <?php if ($exception_queue): ?>
+    <div class="card" style="margin-bottom:14px;border-right:4px solid #dc2626;">
+        <div class="card-header"><h5><i class="fa fa-bolt" style="color:#dc2626;"></i> طلبات الاستثناء الطارئ — قرارك حصرًا (§8.3)</h5></div>
+        <div class="card-body">
+            <?php foreach ($exception_queue as $xq):
+                $last_reason = '';
+                try {
+                    $lr = $gate->select('fin_request_events', array(
+                        'columns' => array('body'),
+                        'where' => array('request_id' => intval($xq['id']), 'event_type' => 'exception_requested'),
+                        'orderBy' => 'id DESC', 'limit' => 1,
+                    ));
+                    $last_reason = $lr ? strval($lr[0]['body']) : '';
+                } catch (\Throwable $t) { /* عرض */ }
+            ?>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:8px 0;border-bottom:1px dashed #e3d9c6;">
+                <strong><?php echo htmlspecialchars($xq['request_no']); ?></strong>
+                <span><?php echo htmlspecialchars($catalog[$xq['request_type']]['label'] ?? $xq['request_type']); ?></span>
+                <span><?php echo number_format(floatval($xq['amount']), 2) . ' ' . htmlspecialchars($xq['currency']); ?></span>
+                <span style="color:#6b4e2a;"><?php echo htmlspecialchars($last_reason); ?></span>
+                <form action="request_actions.php" method="post" style="display:flex;gap:6px;"
+                      onsubmit="var x=prompt('سبب الاعتماد (للتدقيق):');if(!x)return false;this.reason.value=x;">
+                    <input type="hidden" name="action" value="exception_decide">
+                    <input type="hidden" name="decision" value="approve">
+                    <input type="hidden" name="id" value="<?php echo intval($xq['id']); ?>">
+                    <input type="hidden" name="reason" value="">
+                    <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-bolt"></i> اعتماد الطارئ</button>
+                </form>
+                <form action="request_actions.php" method="post" style="display:flex;gap:6px;"
+                      onsubmit="var x=prompt('سبب الرفض:');if(!x)return false;this.reason.value=x;">
+                    <input type="hidden" name="action" value="exception_decide">
+                    <input type="hidden" name="decision" value="deny">
+                    <input type="hidden" name="id" value="<?php echo intval($xq['id']); ?>">
+                    <input type="hidden" name="reason" value="">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">رفض</button>
+                </form>
+                <a href="request_form.php?id=<?php echo intval($xq['id']); ?>" class="btn btn-sm btn-outline-primary">التفاصيل</a>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="card">
         <div class="card-header" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">

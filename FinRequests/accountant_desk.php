@@ -39,6 +39,9 @@ $accounts = $gate->select('fin_chart_of_accounts', array(
     'orderBy' => 'code ASC', 'limit' => 500,
 ));
 
+// بنود موازنة الشركة بمتبقيها (بوابة الميزانية §3.4-②) — القائمة بدل الرقم الحر
+$budget_lines = finreq_budget_lines($gate);
+
 $page_title = 'إيكوبيشن | مكتب محاسب الإدارة';
 include('../inheader.php');
 include('../insidebar.php');
@@ -65,6 +68,8 @@ include('../insidebar.php');
                     <?php echo htmlspecialchars($r['request_no']); ?> — <?php echo htmlspecialchars($catalog[$r['request_type']]['label']); ?>
                     <?php echo finreq_state_badge($r['state']); ?>
                     <span class="badge bg-info"><?php echo htmlspecialchars($rt ? $rt['module_label'] : $r['source_module']); ?></span>
+                    <?php if (intval($r['is_exception']) === 1): ?><span class="badge bg-danger">🚨 استثناء طارئ معتمد</span><?php endif; ?>
+                    <?php if (strval($r['need_class']) === 'urgent'): ?><span class="badge bg-warning">⚡ عاجل — نصف المدد</span><?php endif; ?>
                 </h5>
                 <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-outline-primary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
             </div>
@@ -75,6 +80,13 @@ include('../insidebar.php');
                     <div><strong>المبلغ:</strong> <?php echo number_format(floatval($r['amount']), 2) . ' ' . htmlspecialchars($r['currency']); ?></div>
                     <div><strong>المرجع المصدري:</strong> <?php echo htmlspecialchars($r['source_ref'] ?? '—'); ?></div>
                 </div>
+                <?php $frag = finreq_fragmentation($gate, $r); if ($frag): ?>
+                    <div class="alert alert-warning" style="margin-bottom:10px;font-weight:700;">
+                        ⚠️ كشف التجزئة (§8.5): <?php echo intval($frag['count']); ?> طلباتٍ حيّةٍ لنفس المستفيد والنوع خلال 30 يومًا
+                        بمجموع <strong><?php echo number_format($frag['total'], 2) . ' ' . htmlspecialchars($r['currency']); ?></strong>
+                        — طبّق مستوى الاعتماد على المجموع لا على هذا الطلب وحده (مصفوفة D04).
+                    </div>
+                <?php endif; ?>
                 <form action="request_actions.php" method="post" class="allforms allforms-visible">
                     <input type="hidden" name="action" value="acct_forward">
                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
@@ -88,7 +100,22 @@ include('../insidebar.php');
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div><label>بند الموازنة (اختياري)</label><input type="number" name="budget_line_id" min="1"></div>
+                        <div>
+                            <label>بند الموازنة (بوابة ② — التجاوز يستلزم استثناء §8.3)</label>
+                            <select name="budget_line_id">
+                                <option value="">— خارج الموازنة (يُدوَّن بقرارك) —</option>
+                                <?php
+                                $suggest = finreq_budget_category_for($r['request_type'], $r['source_module']);
+                                foreach ($budget_lines as $bl):
+                                    $over = floatval($r['amount']) > $bl['remaining'];
+                                ?>
+                                    <option value="<?php echo intval($bl['id']); ?>" <?php echo ($bl['category'] === $suggest && !$over) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($bl['category']); ?> — المتبقي <?php echo number_format($bl['remaining'], 2); ?>
+                                        من <?php echo number_format(floatval($bl['planned_amount']), 2); ?><?php echo $over ? ' ⛔ لا يكفي' : ''; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div><label>مركز التكلفة</label><input type="text" name="cost_center" maxlength="60" value="<?php echo htmlspecialchars($r['cost_center'] ?? ''); ?>"></div>
                         <div><label>المشروع</label><input type="number" name="project_id" min="1" value="<?php echo htmlspecialchars($r['project_id'] ?? ''); ?>"></div>
                         <div><label>المعدة</label><input type="number" name="equipment_id" min="1" value="<?php echo htmlspecialchars($r['equipment_id'] ?? ''); ?>"></div>

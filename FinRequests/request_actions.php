@@ -237,11 +237,17 @@ if (array_key_exists($action, $machine_actions)) {
         $result = $machine->apply($id, $m_action, $user_id, array('note' => $reason !== '' ? $reason : null));
 
         // السجل الإلحاقي + الحقول المرافقة + ختم SLA للمرحلة الجديدة (قاعدة الساعة §8.1)
-        $gate->runInTransaction(function ($g) use ($action, $id, $req, $reason, $S, $user_id, $result) {
+        // + نشر حقيقة الانتقال على الجذر المحايد (§9.3 — بعطالة transition_id الحتمية)
+        $gate->runInTransaction(function ($g) use ($conn, $action, $id, $req, $reason, $S, $user_id, $result) {
             if ($action === 'submit' || $action === 'resubmit') {
                 finreq_log($g, $id, $action === 'submit' ? 'submit' : 'resubmit',
                     $reason !== '' ? $reason : 'إرسال الطلب للمراجعة', $result['from'], $result['to']);
                 finreq_stamp_sla($g, $id, 'dept_review', strval($req['need_class']));
+                finreq_publish_fact($conn, $req, 'request.submitted', 'fact:st:' . intval($result['transition_id']),
+                    array('resubmit' => $action === 'resubmit'));
+                finreq_notify($g, 'dept_manager',
+                    'طلبٌ جديدٌ للمراجعة: ' . $req['request_no'] . ' (' . $req['source_module'] . ')',
+                    'FinRequests/dept_inbox.php');
                 // كشف التكرار التحذيري (§8.4) بعد الإرسال
                 $dup = finreq_duplicate_check($g, $req);
                 if ($dup) {
@@ -253,6 +259,10 @@ if (array_key_exists($action, $machine_actions)) {
                 $g->update('fin_requests', array('decided_by' => $user_id), array('id' => $id));
                 finreq_log($g, $id, 'dept_approve', $reason !== '' ? $reason : 'اعتماد إداري — فُتح باب المالية', $result['from'], $result['to']);
                 finreq_stamp_sla($g, $id, 'acct_review', strval($req['need_class']));
+                finreq_publish_fact($conn, $req, 'request.dept_approved', 'fact:st:' . intval($result['transition_id']));
+                finreq_notify($g, 'dept_accountant',
+                    'معتمدٌ إداريًّا بانتظار ولادة حدثه: ' . $req['request_no'],
+                    'FinRequests/accountant_desk.php');
             } elseif ($action === 'return_request') {
                 finreq_log($g, $id, 'return', $reason, $result['from'], $result['to']);
             } elseif ($action === 'reject') {
@@ -305,12 +315,31 @@ if ($action === 'acct_forward') {
     if (!$acct) {
         finreq_redirect('accountant_desk.php?id=' . $id, '❌ الحساب غير موجودٍ في دليل شركتك');
     }
+    // ── بوابة الميزانية (§3.4-②): بندٌ من موازنة الشركة أو «خارج الموازنة» موثَّقًا؛
+    //    وتجاوز المتبقي لا يعبر إلا باستثناءٍ معتمدٍ (§8.3) — الفحص قبل الولادة. ──
+    $budget_line_id = $In('budget_line_id');
+    $budget_line = null;
+    if ($budget_line_id !== null && $budget_line_id > 0) {
+        $budget_line = $gate->selectOne('fin_budget_lines', array('where' => array('id' => $budget_line_id)));
+        if (!$budget_line) {
+            finreq_redirect('accountant_desk.php?id=' . $id, '❌ بند الموازنة غير موجودٍ في موازنة شركتك');
+        }
+        $remaining = round(floatval($budget_line['planned_amount']) - floatval($budget_line['actual_amount']), 2);
+        if (floatval($req['amount']) > $remaining && intval($req['is_exception']) !== 1) {
+            finreq_log($gate, $id, 'note', 'بوابة الميزانية: رُدّت الولادة — المبلغ '
+                . number_format(floatval($req['amount']), 2) . ' يتجاوز متبقي بند «' . $budget_line['category'] . '» ('
+                . number_format($remaining, 2) . ') ولا استثناء معتمدًا');
+            finreq_redirect('accountant_desk.php?id=' . $id,
+                '⛔ بوابة الميزانية: المبلغ يتجاوز متبقي البند (' . number_format($remaining, 2)
+                . ') — التجاوز يستلزم استثناءً معتمدًا من المدير المالي (§8.3)');
+        }
+    }
     try {
         $ev_result = null;
-        $gate->runInTransaction(function ($g) use ($conn, $gate, $id, $account_id, $user_id, &$ev_result, $S, $In, $Dn) {
+        $gate->runInTransaction(function ($g) use ($conn, $gate, $id, $account_id, $user_id, &$ev_result, $S, $In, $Dn, $budget_line) {
             // ضبط المحاسب: الحساب والأبعاد وبند الموازنة (soft)
             $refine = array('account_id' => $account_id);
-            if ($In('budget_line_id') !== null) { $refine['budget_line_id'] = $In('budget_line_id'); }
+            if ($budget_line) { $refine['budget_line_id'] = intval($budget_line['id']); }
             if ($Dn('cost_center') !== null) { $refine['cost_center'] = $Dn('cost_center'); }
             if ($In('project_id') !== null) { $refine['project_id'] = $In('project_id'); }
             if ($In('equipment_id') !== null) { $refine['equipment_id'] = $In('equipment_id'); }
@@ -323,6 +352,26 @@ if ($action === 'acct_forward') {
                 'ولادة الحدث المالي ' . $ev_result['event_no'] . ' (id=' . $ev_result['id'] . ') بمرجع الطلب — دورة D04 بدأت',
                 null, 'event_id=' . $ev_result['id']);
             finreq_stamp_sla($g, $id, 'finance', strval($fresh['need_class']));
+
+            // استهلاك بند الموازنة ذرّيًّا مع الولادة + رابط الأثر (fin_event_links)
+            if ($budget_line) {
+                $line_now = $g->selectOne('fin_budget_lines', array('where' => array('id' => intval($budget_line['id']))));
+                $new_actual = round(floatval($line_now['actual_amount']) + floatval($fresh['amount']), 2);
+                $g->update('fin_budget_lines', array('actual_amount' => $new_actual), array('id' => intval($line_now['id'])));
+                $g->insert('fin_event_links', array(
+                    'parent_kind' => 'request', 'parent_ref' => $id,
+                    'event_id' => intval($ev_result['id']),
+                    'effect_type' => 'budget_consumption',
+                    'target_table' => 'fin_budget_lines', 'target_id' => intval($line_now['id']),
+                ));
+                finreq_log($g, $id, 'note', 'خُصم من بند «' . $line_now['category'] . '»',
+                    'actual=' . $line_now['actual_amount'], 'actual=' . $new_actual);
+            } else {
+                finreq_log($g, $id, 'note', 'بوابة الميزانية: وُلد الحدث خارج بنود الموازنة — موثَّقٌ بقرار المحاسب (§3.0)');
+            }
+            finreq_notify($g, 'finance_manager',
+                'وُلد الحدث ' . $ev_result['event_no'] . ' من الطلب ' . $fresh['request_no'],
+                'FinRequests/finance_gateway.php');
         });
         finreq_redirect('accountant_desk.php', '✅ وُلد الحدث المالي ' . ($ev_result ? $ev_result['event_no'] : '') . ' بمرجع الطلب — يتابع دورته في D04 وتُشتق حالة الطلب منه');
     } catch (\Throwable $t) {
@@ -406,6 +455,86 @@ if (in_array($action, array('cancel', 'suspend', 'resume', 'merge'), true)) {
     } catch (\Throwable $t) {
         error_log('finreq halt ' . $action . ': ' . $t->getMessage());
         finreq_redirect($back, '❌ ' . $t->getMessage());
+    }
+}
+
+// ═══ 7) الاستثناءات (§8.3): الطارئ يُطلب موثَّقًا ويعتمده المدير المالي حصرًا ═══
+if ($action === 'exception_request') {
+    $id = intval($_POST['id'] ?? 0);
+    $req = finreq_fetch($gate, $id);
+    if (!$req) { finreq_redirect($back, '❌ الطلب غير موجود'); }
+    if (!in_array($req['state'], array('under_review', 'pending_approval'), true)) {
+        finreq_redirect($back, '❌ الاستثناء لطلبٍ في دورته النشطة فقط');
+    }
+    if (strval($req['need_class']) !== 'emergency') {
+        finreq_redirect($back, '❌ التنفيذ المسبق للطارئ (emergency) حصرًا — العاجل مساره مضغوط المدد لا مُسقَط البوابات');
+    }
+    if (intval($req['is_exception']) === 1) {
+        finreq_redirect($back, 'ℹ️ الاستثناء معتمدٌ مسبقًا لهذا الطلب');
+    }
+    $routing = finreq_routing_row($gate, strval($req['source_module']));
+    $is_owner = intval($req['created_by']) === $user_id;
+    if (!$is_super && !$is_owner && !finreq_role_is($routing, $role, 'manager')) {
+        finreq_redirect($back, '❌ طلب الاستثناء لصاحب الطلب أو مدير إدارته');
+    }
+    $reason = $S('reason');
+    if ($reason === '') { finreq_redirect($back, '❌ مبرّر الطارئ إلزامي — يقرؤه المدير المالي'); }
+    try {
+        $gate->runInTransaction(function ($g) use ($id, $reason, $req) {
+            finreq_log($g, $id, 'exception_requested', 'طلب تنفيذٍ طارئ (§8.3): ' . $reason);
+            finreq_notify($g, 'finance_manager',
+                'طلب استثناءٍ طارئ بانتظار قرارك: ' . $req['request_no'],
+                'FinRequests/finance_gateway.php');
+        });
+        finreq_redirect($back . '?id=' . $id, '🚨 سُجّل طلب الطارئ — القرار للمدير المالي حصرًا (§8.3)');
+    } catch (\Throwable $t) {
+        error_log('finreq exception_request: ' . $t->getMessage());
+        finreq_redirect($back, '❌ تعذّر تسجيل طلب الاستثناء');
+    }
+}
+
+if ($action === 'exception_decide') {
+    // الشرط الأول من ثلاثية الطارئ: اعتمادٌ موثَّقٌ من المدير المالي حصرًا
+    if (!$is_super && $role !== '17') {
+        finreq_redirect('finance_gateway.php', '❌ قرار الاستثناء للمدير المالي (17) حصرًا — §8.3');
+    }
+    $id = intval($_POST['id'] ?? 0);
+    $req = finreq_fetch($gate, $id);
+    if (!$req) { finreq_redirect('finance_gateway.php', '❌ الطلب غير موجود'); }
+    if (intval($req['is_exception']) === 1) {
+        finreq_redirect('finance_gateway.php', 'ℹ️ الاستثناء معتمدٌ مسبقًا');
+    }
+    $decision = $S('decision') === 'approve' ? 'approve' : 'deny';
+    $reason = $S('reason');
+    if ($reason === '') { finreq_redirect('finance_gateway.php', '❌ سبب القرار إلزاميٌّ للتدقيق'); }
+    try {
+        $gate->runInTransaction(function ($g) use ($conn, $id, $req, $decision, $reason, $user_id) {
+            if ($decision === 'approve') {
+                $g->update('fin_requests', array(
+                    'is_exception' => 1,
+                    'exception_type' => 'emergency_execute',
+                    'exception_approved_by' => $user_id,
+                ), array('id' => $id));
+                // الشرط الثاني: حدث exception إلزاميٌّ في السجل بنوعه وسببه
+                finreq_log($g, $id, 'exception',
+                    'استثناء طارئ معتمد (emergency_execute): ' . $reason
+                    . ' — الشرط الثالث: استكمال الدورة رجعيًّا خلال 72 ساعة (تتعقبه الحوكمة الزمنية)',
+                    null, 'is_exception=1');
+                finreq_publish_fact($conn, $req, 'request.exception', 'fact:exc:' . $id,
+                    array('exception_type' => 'emergency_execute', 'approved_by' => $user_id));
+                finreq_notify($g, 'treasurer',
+                    'مأذونٌ بالأداء المسبق (طارئ §8.3): ' . $req['request_no'] . ' — الدورة تُستكمل رجعيًّا',
+                    'FinRequests/finance_gateway.php');
+            } else {
+                finreq_log($g, $id, 'exception_denied', 'رُفض الاستثناء الطارئ: ' . $reason);
+            }
+        });
+        finreq_redirect('finance_gateway.php', $decision === 'approve'
+            ? '🚨 اعتُمد الطارئ — يجوز الأداء قبل اكتمال الاعتماد وتُستكمل الدورة خلال 72 ساعة'
+            : '⛔ رُفض طلب الاستثناء بسببٍ مسجَّل');
+    } catch (\Throwable $t) {
+        error_log('finreq exception_decide: ' . $t->getMessage());
+        finreq_redirect('finance_gateway.php', '❌ تعذّر تنفيذ القرار');
     }
 }
 

@@ -191,6 +191,43 @@ ok('rollback: لا حقيقة ولا إسقاط (ذرّية الكتابة ال�
 // و) الردم الصادق قائم: كل صفوف الدفتر الأساس مربوطةٌ بجذرٍ legacy
 ok('الردم: صفر صفِّ أساسٍ بلا جذر (root_event_id IS NULL)',
     intval($conn->query("SELECT COUNT(*) FROM fin_financial_events WHERE root_event_id IS NULL AND notes NOT LIKE 'K3TEST_%'")->fetch_row()[0]) === 0);
+
+echo "── 8) publishFact (§9.3 D05): حقيقةٌ بلا إسقاطٍ مالي ──\n";
+// أ) off: لا-عملية موثقة تعيد null — مفتاح الإطفاء الواحد للعائلة
+EventPublisher::$rootModeOverride = 'off';
+$finB8 = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]);
+$rootsB8 = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+$factEvent = valid_event($MARK, '80');
+$factEvent['event_key'] = 'request.submitted';
+$factEvent['category'] = 'financial';
+$factEvent['entity_type'] = 'fin_request';
+$factEvent['idempotency_key'] = 'fact:test:' . getmypid();
+$fOff = EventPublisher::publishFact($conn, $factEvent);
+ok('off: publishFact = null وصفر كتابة', $fOff === null
+    && intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]) === $rootsB8);
+
+// ب) publish: الحقيقة تُكتب في الجذر والدفتر المالي لا يُلمس إطلاقًا
+EventPublisher::$rootModeOverride = 'publish';
+$fOn = EventPublisher::publishFact($conn, $factEvent);
+$factRow = $conn->query("SELECT * FROM ems_business_events WHERE id = " . intval($fOn['id']))->fetch_assoc();
+ok('publish: حقيقة request.submitted كُتبت في الجذر', $fOn !== null && $factRow
+    && $factRow['event_key'] === 'request.submitted' && $factRow['event_status'] === 'recorded');
+ok('الدفتر المالي لم يُلمس (حقيقةٌ بلا إسقاط — العدّ ثابت)',
+    intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]) === $finB8);
+ok('لا إسقاط يشير إلى حقيقة الدورة (root يتيمٌ عمدًا هنا)',
+    intval($conn->query("SELECT COUNT(*) FROM fin_financial_events WHERE root_event_id = " . intval($fOn['id']))->fetch_row()[0]) === 0);
+
+// ج) عطالة الحقيقة: نفس المفتاح ⇒ نفس الصف بلا ازدواج
+$rootsC8 = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+$fDup = EventPublisher::publishFact($conn, $factEvent);
+ok('عطالة الحقيقة: نفس id وصفر صفٍّ جديد', intval($fDup['id']) === intval($fOn['id'])
+    && intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]) === $rootsC8);
+
+// د) العقد يسري على الحقائق أيضًا: مفتاحٌ فاسد يُرفض
+$badFact = $factEvent; $badFact['event_key'] = 'NotDotted';
+$thrown8 = false;
+try { EventPublisher::publishFact($conn, $badFact); } catch (EventValidationException $x) { $thrown8 = true; }
+ok('حقيقةٌ بمفتاحٍ فاسد ⇒ رفض §9', $thrown8);
 EventPublisher::$rootModeOverride = null;
 
 } catch (\Throwable $t) {

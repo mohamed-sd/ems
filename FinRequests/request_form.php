@@ -21,6 +21,16 @@ if (!$is_super && !$__pp['can_view']) {
 }
 
 $my_departments = finreq_departments_for_creator($gate, $role);
+
+// مستخدمو الشركة للإدخال النيابي (§13.1 — يُوثَّق صاحب الطلب والمُدخِل معًا)
+$company_users = array();
+try {
+    $company_users = $gate->select('users', array(
+        'columns' => array('id', 'username'),
+        'where' => array('status' => 'active'),
+        'orderBy' => 'username ASC', 'limit' => 300,
+    ));
+} catch (\Throwable $t) { /* الحقل اختياري */ }
 $catalog = finreq_catalog();
 $doc_types = finreq_doc_types();
 
@@ -76,7 +86,25 @@ include('../insidebar.php');
                 <div><strong>النوع:</strong> <?php echo htmlspecialchars($catalog[$req['request_type']]['label'] ?? $req['request_type']); ?></div>
                 <div><strong>الإدارة:</strong> <?php $rt = finreq_routing_row($gate, $req['source_module']); echo htmlspecialchars($rt ? $rt['module_label'] : $req['source_module']); ?></div>
                 <?php if (intval($req['duplicate_flag']) === 1): ?><div><span class="badge bg-warning">⚠️ تحذير تكرار</span></div><?php endif; ?>
+                <?php if (intval($req['is_exception']) === 1): ?><div><span class="badge bg-danger">🚨 استثناء طارئ معتمد — الدورة تُستكمل خلال 72 ساعة</span></div><?php endif; ?>
                 <?php if (!empty($req['event_id'])): ?><div><strong>الحدث المالي:</strong> #<?php echo intval($req['event_id']); ?></div><?php endif; ?>
+                <?php
+                // §8.3: الطارئ غير المستثنى بعد — صاحبه (أو مدير إدارته أو السوبر) يطلب التنفيذ المسبق
+                $can_ask_exception = $req && strval($req['need_class']) === 'emergency'
+                    && intval($req['is_exception']) !== 1
+                    && in_array($req['state'], array('under_review', 'pending_approval'), true)
+                    && ($is_super || intval($req['created_by']) === $user_id || finreq_role_is($rt, $role, 'manager'));
+                ?>
+                <?php if ($can_ask_exception): ?>
+                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;align-items:center;"
+                          onsubmit="var x=prompt('مبرّر التنفيذ الطارئ (يقرؤه المدير المالي):');if(!x)return false;this.reason.value=x;">
+                        <input type="hidden" name="action" value="exception_request">
+                        <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
+                        <input type="hidden" name="back" value="request_form.php">
+                        <input type="hidden" name="reason" value="">
+                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-bolt"></i> طلب تنفيذٍ طارئ (§8.3)</button>
+                    </form>
+                <?php endif; ?>
             </div>
         </div>
     <?php endif; ?>
@@ -140,6 +168,17 @@ include('../insidebar.php');
                     <label>البديل المدروس إن وُجد (ملاحظات)</label>
                     <input type="text" name="notes" maxlength="255" value="<?php echo htmlspecialchars($req['notes'] ?? ''); ?>">
                 </div>
+                <?php if (!$req && $company_users): ?>
+                <div>
+                    <label>الإدخال نيابةً عن (اختياري — يُوثَّق الطرفان §13.1)</label>
+                    <select name="requester_id">
+                        <option value="">— أنا صاحب الطلب —</option>
+                        <?php foreach ($company_users as $cu): if (intval($cu['id']) === $user_id) { continue; } ?>
+                            <option value="<?php echo intval($cu['id']); ?>"><?php echo htmlspecialchars($cu['username']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
             </div></div>
         </div>
 
