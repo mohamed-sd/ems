@@ -149,6 +149,12 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الطرف</th><th>الاسم</th><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
                 <tbody>
                 <?php
+                // نطاق نوع الطرف (fin_party_scope): الموارد البشرية ترى الموظفين حصرًا،
+                // والموردون/المشتريات يرون الموردين حصرًا — والمالية ترى الكل.
+                $party_scope = fin_party_scope($ctx);
+                $pd_whereRaw = "COALESCE(d.is_deleted,0)=0";
+                $pd_params = array();
+                if ($party_scope !== null) { $pd_whereRaw .= " AND d.party_type = ?"; $pd_params[] = $party_scope; }
                 $due_rows = fin_gate($is_super_admin)->scopedQuery(
                     array('scope' => array('d' => 'fin_dues'),
                           'enrich' => array('s' => 'suppliers', 'e' => 'employees')),
@@ -156,7 +162,8 @@ include '../insidebar.php';
                      FROM fin_dues d
                      LEFT JOIN suppliers s ON (d.party_type='supplier' AND s.id=d.party_ref)
                      LEFT JOIN employees e ON (d.party_type='employee' AND e.id=d.party_ref)
-                     WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 ORDER BY d.id DESC");
+                     WHERE {TENANT_SCOPE} AND " . $pd_whereRaw . " ORDER BY d.id DESC",
+                    $pd_params);
                 { foreach ($due_rows as $row) {
                     $ss = (string)$row['settlement_state'];
                     $ss_tone = $ss === 'paid' ? 'success' : ($ss === 'settled' ? 'primary' : 'secondary');
@@ -181,6 +188,7 @@ include '../insidebar.php';
             </table>
         </div>
 
+        <?php if ($party_scope === null): // ذمم العملاء شأن المالية — لا تُعرض للأدوار المنطَّقة بطرف ?>
         <h5 style="margin:18px 0 10px"><i class="fas fa-file-invoice"></i> الذمم المدينة (العملاء)</h5>
         <div class="table-container">
             <table id="recvTable" class="display nowrap alltables no-datatable" style="width:100%;">
@@ -214,6 +222,7 @@ include '../insidebar.php';
                 </tbody>
             </table>
         </div>
+        <?php endif; // نهاية قسم ذمم العملاء (المالية فقط) ?>
     </div></div>
 </div>
 

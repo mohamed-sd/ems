@@ -147,7 +147,15 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الرقم</th><th>الاتجاه</th><th>الطرف</th><th>الطريقة</th><th>المبلغ</th><th>البيان</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $pay_rows = fin_gate($is_super_admin)->select('fin_payments', array('orderBy' => 'id DESC'));
+                // نطاق نوع الطرف (fin_party_scope): الموردون/المشتريات يرون دفعات
+                // الموردين حصرًا — لا رواتب موظفين ولا تحصيلات عملاء. المالية ترى الكل.
+                $party_scope = fin_party_scope($ctx);
+                $pay_opts = array('orderBy' => 'id DESC');
+                if ($party_scope !== null) {
+                    $pay_opts['whereRaw'] = 'party_type = ?';
+                    $pay_opts['params'] = array($party_scope);
+                }
+                $pay_rows = fin_gate($is_super_admin)->select('fin_payments', $pay_opts);
                 { foreach ($pay_rows as $row) {
                     $st = (string)$row['state'];
                     $st_lbl = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'executed' => 'منفّذة', 'reconciled' => 'مطابَقة');

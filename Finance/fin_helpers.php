@@ -68,6 +68,31 @@ if (!function_exists('fin_project_scope')) {
         }
     }
 }
+if (!function_exists('fin_party_scope')) {
+    /**
+     * نطاق نوع الطرف للأدوار التشغيلية الممنوحة عرض الذمم/المدفوعات
+     * (قرار 2026-07-17 — كل إدارةٍ ترى بيانات أطرافها هي):
+     *   الموارد البشرية (4)            ← الموظفون حصرًا (الرواتب شأنها)
+     *   الموردون (2/8) والمشتريات (16) ← الموردون حصرًا (لا رواتب موظفين)
+     * عائلة المالية والسوبر بلا نطاق (null = الكل).
+     *
+     * @return string|null 'employee' · 'supplier' · null
+     */
+    function fin_party_scope($ctx)
+    {
+        if (!empty($ctx['is_super'])) {
+            return null;
+        }
+        $r = strval($ctx['role']);
+        if ($r === '4') {
+            return 'employee';
+        }
+        if (in_array($r, array('2', '8', '16'), true)) {
+            return 'supplier';
+        }
+        return null;
+    }
+}
 if (!function_exists('fin_can_perform')) {
     /**
      * هل يملك دور المستخدم صلاحية أداء مستوى معيّن؟ (فصل الواجبات)
