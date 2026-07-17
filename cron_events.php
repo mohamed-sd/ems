@@ -126,3 +126,59 @@ $stats = $dispatcher->runOnce();
 foreach ($stats as $consumer => $s) {
     echo "[events-cron " . date('Y-m-d H:i:s') . "] {$consumer}: processed={$s['processed']} failed={$s['failed']} dead_lettered={$s['dead_lettered']} cursor={$s['cursor']}\n";
 }
+
+// ═══ مصالِح مروحة الأثر (§6.4 · §6.1) — وحدةٌ معتمدةٌ بلا مروحةٍ كاملة ═══
+// نمط المصالِح نفسه: وحدةٌ approved فاتها الخطّاف (انهيارٌ بعد الاعتماد) أو
+// سبقت المحرّك (بياناتٌ قديمة) ⇒ تُفرَّع مروحتها بعطالة المحرّك (fin_event_links).
+// كلٌّ في معاملته المستقلّة؛ فشل وحدةٍ لا يُسقط البقية. لا معالجة رجعية صامتة.
+// ⚠ العزل: cron بلا جلسةٍ فلا forAllTenants (يُرفض بحق — ليس سوبر). المصالِح
+// يبني بوابةً معزولةً **بشركة الوحدة نفسها** لكل شركةٍ على حدة — فالكتابة
+// تبقى داخل نطاق شركتها لا فوقه (المعيار: لا تجاوز عزلٍ في خلفيةٍ غير مصادَقة).
+require_once __DIR__ . '/app/Services/EffectFanout.php';
+require_once __DIR__ . '/app/Core/TenantGateException.php';
+require_once __DIR__ . '/app/Core/TenantRegistry.php';
+require_once __DIR__ . '/app/Core/TenantContext.php';
+require_once __DIR__ . '/app/Core/TenantDb.php';
+$pendingByCompany = array();
+$pq = $conn->query(
+    "SELECT ur.id, ur.company_id
+       FROM fin_unit_records ur
+      WHERE ur.match_state = 'approved' AND COALESCE(ur.is_deleted, 0) = 0
+        AND ur.approved_qty IS NOT NULL AND ur.approved_qty > 0
+        AND NOT EXISTS (
+              SELECT 1 FROM fin_event_links l
+              WHERE l.parent_kind = 'unit_record' AND l.parent_ref = ur.id
+                    AND l.effect_type = 'cost_record')
+      LIMIT 2000"
+);
+if ($pq) {
+    while ($row = $pq->fetch_assoc()) {
+        $pendingByCompany[intval($row['company_id'])][] = intval($row['id']);
+    }
+}
+$fanReconciled = 0; $fanEffects = 0;
+$systemAuthok = ($IS_CLI === true) || ((string) ems_env('EVENTS_CRON_KEY', '') !== '');
+foreach ($pendingByCompany as $cid => $ids) {
+    // بوابةٌ معزولةٌ بشركة الوحدة عبر السياق الخادمي (forSystem — CLI/مفتاح cron
+    // موثَّق، والشركة مصدرها الخادم لا العميل). لا سوبر ولا تجاوز عزل.
+    $cgate = new \App\Core\TenantDb($conn, \App\Core\TenantContext::forSystem($cid, 0, '', $systemAuthok));
+    foreach ($ids as $uid) {
+        try {
+            $res = null;
+            $cgate->runInTransaction(function ($g) use (&$res, $conn, $uid) {
+                $u = $g->selectOne('fin_unit_records', array('where' => array('id' => $uid), 'includeDeleted' => true));
+                if ($u) { $res = \App\Services\EffectFanout::forUnitRecord($conn, $g, $u, intval($u['created_by']) ?: 1); }
+            }, 'fanout reconcile unit ' . $uid);
+            if ($res) {
+                $n = count($res['effects']) + count($res['adopted']);
+                if ($n > 0) { $fanReconciled++; $fanEffects += $n; }
+            }
+        } catch (\Throwable $e) {
+            error_log('fanout reconcile unit ' . $uid . ': ' . $e->getMessage());
+            echo "[events-cron] ⚠ fanout unit={$uid} failed: " . $e->getMessage() . "\n";
+        }
+    }
+}
+if ($fanReconciled > 0) {
+    echo "[events-cron " . date('Y-m-d H:i:s') . "] effect-fanout reconciler: units={$fanReconciled} effects={$fanEffects}\n";
+}

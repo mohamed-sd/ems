@@ -100,6 +100,7 @@ class TenantRegistry
         'fin_request_documents' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_request_events' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_event_links' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_effect_map' => array('type' => self::T_TENANT, 'soft' => false), // §6.1: خريطة تفريع الأثر التصريحية
         'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),

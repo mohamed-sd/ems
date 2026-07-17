@@ -24,8 +24,31 @@ if (!$is_super && !$__pp['can_view']) {
 $catalog = finreq_catalog();
 $q = isset($_GET['q']) ? trim((string)$_GET['q']) : '';
 $req = null; $ev = null; $journals = array(); $payments = array(); $dues = array(); $links = array();
+$unit = null; $fanEffects = array(); $fanMap = array();
 
-if ($q !== '') {
+// ── مروحة أثر الوحدة المعتمدة (§6.1): بحثٌ برقم كشف الوحدة (FIN-UR-…) ──
+if ($q !== '' && preg_match('/UR-/i', $q)) {
+    $unit = $gate->selectOne('fin_unit_records', array('where' => array('record_no' => $q)));
+    if ($unit) {
+        require_once __DIR__ . '/../app/Services/EffectFanout.php';
+        $uid = intval($unit['id']);
+        // خريطة الآثار المعرَّفة (لعرض المتاح وغير المتاح جنبًا إلى جنب)
+        foreach (\App\Services\EffectFanout::mapFor($gate, intval($unit['company_id']), 'unit_record') as $mrow) {
+            $fanMap[$mrow['effect_type']] = $mrow;
+        }
+        // الآثار المتولّدة فعلًا مع صفوفها الهدف
+        foreach ($gate->select('fin_event_links', array(
+            'where' => array('parent_kind' => 'unit_record', 'parent_ref' => $uid), 'orderBy' => 'id ASC',
+        )) as $l) {
+            $target = null;
+            try { $target = $gate->selectOne($l['target_table'], array('where' => array('id' => intval($l['target_id'])), 'includeDeleted' => true)); }
+            catch (\Throwable $t) { /* عرض */ }
+            $fanEffects[$l['effect_type']] = array('link' => $l, 'target' => $target);
+        }
+    }
+}
+
+if ($q !== '' && $unit === null) {
     // البحث برقم الطلب أو بمعرّف الحدث (#N)
     if (preg_match('/^#?(\d+)$/', $q, $m)) {
         $ev = $gate->selectOne('fin_financial_events', array('where' => array('id' => intval($m[1])), 'includeDeleted' => true));
@@ -68,16 +91,71 @@ include('../insidebar.php');
         <div class="card-body">
             <form method="get" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
                 <div style="min-width:280px;">
-                    <label>رقم الطلب (FR-…) أو معرّف الحدث (#N)</label>
-                    <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001 أو #11">
+                    <label>رقم الطلب (FR-…) · الحدث (#N) · أو كشف الوحدة (FIN-UR-…)</label>
+                    <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001 · #11 · FIN-UR-0001">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fa fa-magnifying-glass"></i> تتبّع الخيط</button>
             </form>
         </div>
     </div>
 
-    <?php if ($q !== '' && !$req && !$ev): ?>
+    <?php if ($q !== '' && !$req && !$ev && !$unit): ?>
         <div class="card"><div class="card-body">🔍 لا نتيجة — تحقق من الرقم ضمن نطاق شركتك</div></div>
+    <?php endif; ?>
+
+    <?php if ($unit): ?>
+        <?php
+        $model_lbl = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر');
+        $uq = ($unit['approved_qty'] !== null ? $unit['approved_qty'] : $unit['ops_qty']);
+        ?>
+        <div class="card" style="margin-bottom:14px;">
+            <div class="card-header"><h5><i class="fa fa-cube"></i> المصدر: الوحدة التشغيلية المعتمدة</h5></div>
+            <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;">
+                <div><strong><?php echo htmlspecialchars($unit['record_no']); ?></strong></div>
+                <div><?php echo htmlspecialchars($unit['record_date']); ?></div>
+                <div><span class="badge bg-info"><?php echo number_format((float)$uq, 2) . ' ' . ($model_lbl[$unit['work_model']] ?? $unit['work_model']); ?></span></div>
+                <div><strong>سعر العميل:</strong> <?php echo $unit['client_unit_price'] !== null ? number_format((float)$unit['client_unit_price'], 2) : '—'; ?></div>
+                <div><strong>سعر المورد:</strong> <?php echo $unit['supplier_unit_price'] !== null ? number_format((float)$unit['supplier_unit_price'], 2) : '—'; ?></div>
+                <div><strong>هامش الوحدة:</strong> <?php echo number_format((float)$unit['unit_margin'], 2); ?></div>
+                <div><?php echo finreq_state_badge($unit['match_state'] === 'approved' ? 'approved' : 'under_review'); ?></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5><i class="fa fa-sitemap"></i> مروحة الأثر — الحدث الواحد والآثار المتعددة (§6.1)</h5></div>
+            <div class="card-body">
+                <p style="color:#6b4e2a;font-weight:600;">كل أثرٍ مربوطٌ بأبيه في <code>fin_event_links</code>؛ وغيرُ المتاح مُعلَنٌ بسببه لا صامت.</p>
+                <div class="fanout-tree" style="border-right:3px solid #d4b06a;padding-right:16px;">
+                <?php foreach ($fanMap as $etype => $meta):
+                    $gen = isset($fanEffects[$etype]) ? $fanEffects[$etype] : null;
+                    $target = $gen ? $gen['target'] : null;
+                    $amount = null;
+                    if ($target) {
+                        $amount = isset($target['amount']) ? $target['amount']
+                            : (isset($target['total_cost']) ? $target['total_cost'] : null);
+                    }
+                    $icon = array('revenue_event' => '💰', 'supplier_due' => '📦', 'cost_record' => '🚜',
+                                  'employee_due' => '👷', 'metric_update' => '🔧');
+                ?>
+                    <div style="padding:10px 0;border-bottom:1px dashed #e3d9c6;display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+                        <span style="font-size:1.3rem;"><?php echo $icon[$etype] ?? '•'; ?></span>
+                        <strong style="min-width:230px;"><?php echo htmlspecialchars($meta['effect_label']); ?></strong>
+                        <?php if ($gen): ?>
+                            <span class="badge bg-success">مولَّد</span>
+                            <code><?php echo htmlspecialchars($gen['link']['target_table']); ?> #<?php echo intval($gen['link']['target_id']); ?></code>
+                            <?php if ($amount !== null): ?><strong style="color:#1a7a3a;"><?php echo number_format((float)$amount, 2); ?></strong><?php endif; ?>
+                        <?php elseif (intval($meta['is_active']) !== 1): ?>
+                            <span class="badge bg-secondary">غير متاح</span>
+                            <span style="color:#9a6a00;font-size:.9rem;"><?php echo htmlspecialchars($meta['unavailable_reason'] ?? ''); ?></span>
+                        <?php else: ?>
+                            <span class="badge bg-warning">بانتظار التوليد</span>
+                            <span style="color:#6b4e2a;font-size:.9rem;">يُفرَّع عند اعتماد الوحدة أو بكنس المصالِح</span>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
     <?php endif; ?>
 
     <?php if ($req): ?>

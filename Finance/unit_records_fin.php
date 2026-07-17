@@ -38,48 +38,41 @@ if (isset($_GET['approve_id'])) {
     }
 
     $qty = round((float)$rec['ops_qty'], 2);
-    $rev_amount = round($qty * (float)$rec['client_unit_price'], 2);
-    $due_amount = round($qty * (float)$rec['supplier_unit_price'], 2);
-    $pid = intval($rec['project_id']) ?: null; $eqid = intval($rec['equipment_id']) ?: null;
-    $sup = intval($rec['supplier_entity_id']) ?: null;
     $rno = $rec['record_no'];
 
-    // التوأمان + ختم السجل = ثلاث كتابات ذرّية (§9): حدث إيراد العميل + مستحق المورد
-    // بالوحدة نفسها + وسم السجل «معتمد» وربط التوأمين — إمّا الكل أو لا شيء (لا توأم يتيم).
-    $event_no = fin_gen_code($conn, 'fin_financial_events', 'FIN-EV', $company_id);
-    $note = 'توأم إيراد من كشف وحدات ' . $rno;
-    $due_type = fin_unit_due_type($rec['work_model']);
-    $per = date('Y-m', strtotime($rec['record_date']));
-    $twins = array('rev_id' => 0, 'due_id' => null);
-    ems_tenant_db()->runInTransaction(function ($g) use (&$twins, $event_no, $rno, $note, $rev_amount, $due_amount, $due_type, $per, $pid, $eqid, $sup, $qty, $rid, $current_user_id) {
-        // التوأم 1: حدث إيراد على العميل (مسودة تدخل دورة الاعتماد)
-        $twins['rev_id'] = $g->insert('fin_financial_events', array(
-            'event_no' => $event_no, 'event_type' => 'revenue', 'source_module' => 'projects',
-            'source_ref' => $rno, 'amount' => $rev_amount, 'currency' => 'SDG',
-            'project_id' => $pid, 'equipment_id' => $eqid, 'notes' => $note,
-            'state' => 'draft', 'created_by' => $current_user_id,
-        ));
-        // التوأم 2: مستحق مورد بالوحدة نفسها (إن وُجد شريك إنتاج)
-        if ($sup) {
-            $twins['due_id'] = $g->insert('fin_dues', array(
-                'party_type' => 'supplier', 'party_ref' => $sup, 'due_type' => $due_type,
-                'direction' => 'credit', 'amount' => $due_amount, 'period_ref' => $per,
-                'event_id' => $twins['rev_id'], 'created_by' => $current_user_id,
-            ));
-        }
-        // ختم السجل: معتمد + ربط التوأمين
-        $g->update('fin_unit_records', array(
-            'match_state' => 'approved', 'approved_qty' => $qty,
-            'revenue_event_id' => $twins['rev_id'], 'supplier_due_id' => $twins['due_id'],
-        ), array('id' => $rid));
-    }, 'approve unit match + twin events');
-    $rev_id = $twins['rev_id']; $due_id = $twins['due_id'];
-    fin_log_approval($conn, $company_id, $rid, 'matched', 'approved', 'advance', 'finance_manager', $current_user_id, 'اعتماد تطابق ' . $rno . ' وتوليد التوأمين');
-    // (فجوة 4) إشعارات التوأمين
-    fin_notify($conn, $company_id, 'dept_accountant', 'توأم إيراد ' . $event_no . ' من ' . $rno . ' بانتظار رفعه للدورة', 'events_list_fin.php?fstate=draft');
-    if ($due_id) { fin_notify($conn, $company_id, 'treasurer', 'مستحق مورد جديد من ' . $rno . ' بانتظار التسوية', 'dues_fin.php'); }
-    $margin = number_format(($qty * ((float)$rec['client_unit_price'] - (float)$rec['supplier_unit_price'])), 0);
-    header("Location: unit_records_fin.php?msg=اعتُمد+التطابق+وتولّد+التوأمان+(هامش+الوحدة=" . $margin . ")+✅"); exit();
+    // ── محرّك تفريع الأثر (§6.1): الوحدة المعتمدة تولّد مروحتها كاملةً ذرّيًّا —
+    //    إيرادُ العميل + مستحقُّ المورد + تكلفةُ المعدة والمشروع (+ المشغّل والصيانة
+    //    متى توفّرت مدخلاتهما)، وكلٌّ مربوطٌ بأبيه في fin_event_links. المحرّك
+    //    نفسه دفترُ عطالته: إعادة الاعتماد لا تُكرّر أثرًا. المدخل: ختم الوحدة
+    //    «معتمدة» ثم تفريع أثرها في المعاملة نفسها (كلٌّ أو لا شيء). ──
+    require_once __DIR__ . '/../app/Services/EffectFanout.php';
+    $fan = array('effects' => array(), 'skipped' => array(), 'adopted' => array());
+    try {
+        ems_tenant_db()->runInTransaction(function ($g) use (&$fan, $conn, $rid, $qty, $current_user_id) {
+            $g->update('fin_unit_records', array('match_state' => 'approved', 'approved_qty' => $qty), array('id' => $rid));
+            $fresh = $g->selectOne('fin_unit_records', array('where' => array('id' => $rid)));
+            $fan = \App\Services\EffectFanout::forUnitRecord($conn, $g, $fresh, $current_user_id);
+        }, 'approve unit match + effect fan-out');
+    } catch (\Throwable $e) {
+        error_log('unit fanout: ' . $e->getMessage());
+        header("Location: unit_records_fin.php?msg=" . rawurlencode('تعذّر توليد مروحة الأثر: ' . $e->getMessage()) . "+❌"); exit();
+    }
+    // السجل والإشعارات — بعد نجاح المعاملة
+    $genCount = count($fan['effects']) + count($fan['adopted']);
+    fin_log_approval($conn, $company_id, $rid, 'matched', 'approved', 'advance', 'finance_manager', $current_user_id,
+        'اعتماد ' . $rno . ' وتفريع الأثر: ' . $genCount . ' أثرًا مولَّدًا/متبنّى · ' . count($fan['skipped']) . ' غير متاح');
+    fin_notify($conn, $company_id, 'dept_accountant', 'مروحة أثرٍ من ' . $rno . ' (' . $genCount . ' أثرًا) — الإيراد بانتظار رفعه', 'events_list_fin.php?fstate=draft');
+    foreach ($fan['effects'] as $e) {
+        if ($e['effect'] === 'supplier_due') { fin_notify($conn, $company_id, 'treasurer', 'مستحق مورد جديد من ' . $rno . ' بانتظار التسوية', 'dues_fin.php'); }
+    }
+    // إعلان الفجوات صراحةً (لا حدود صامتة)
+    $skipMsg = '';
+    if ($fan['skipped']) {
+        $names = array();
+        foreach ($fan['skipped'] as $s) { $names[] = $s['label']; }
+        $skipMsg = '+—+غير+متاح:+' . rawurlencode(implode('،+', $names));
+    }
+    header("Location: unit_records_fin.php?msg=" . rawurlencode('اعتُمد ' . $rno . ' وتولّدت مروحته (' . $genCount . ' أثرًا)') . $skipMsg . "+✅"); exit();
 }
 
 // ── حذف ناعم (غير المعتمد فقط) ──
