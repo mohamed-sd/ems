@@ -190,8 +190,12 @@ if ($fanReconciled > 0) {
 // رابطٍ في fin_event_links؛ الصفوف كاملة-التعذّر تُعاد داخل النافذة فقط
 // وكلُّ محاولةٍ صفرُ كتابةٍ بالعطالة — لا معالجة رجعية أبعد من النافذة (قرار
 // المستخدم: لا كنس رجعيًّا للمعتمد القديم).
+// ⚠️ البوابة نافذة (D02 §5) ⇒ المصالِح لا يحوّل نيابةً عن المالية أبدًا.
+// «لا يجوز لأي مهمةٍ مجدولةٍ أن تُنشئ استحقاقًا من وحدةٍ لم تُعتمد ماليًّا» —
+// فالكنس يشفي أعطال الخطّاف في وضع off وحده؛ وفي وضع on يظلّ الطابور بيد المالية.
+$tsGateOn = strtolower((string) ems_env('EMS_UNIT_CONVERT_GATE', 'off')) === 'on';
 $tsPendingByCompany = array();
-$tq = $conn->query(
+$tq = $tsGateOn ? false : $conn->query(
     "SELECT ta.timesheet_id, t.company_id, ta.approved_by
        FROM timesheet_approvals ta
        JOIN timesheet t ON t.id = ta.timesheet_id

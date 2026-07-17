@@ -127,9 +127,18 @@ if ($action === 'approve') {
         }
     }
 
+    // D02 §5: باكتمال المستوى الرابع تصير الحقيقة تشغيليةً كاملة — ولا تصبح
+    // استحقاقًا ماليًّا إلا بختم المالية. نُعلم المعتمِد بذلك صراحةً (لا صمت).
+    $__gate_on = function_exists('ems_env')
+        && strtolower((string) ems_env('EMS_UNIT_CONVERT_GATE', 'off')) === 'on';
+    $__msg = "تم اعتماد $approved سجل" . ($skipped ? " (تم تخطي $skipped)" : '');
+    if ($__gate_on && $my_level === 4 && $approved > 0) {
+        $__msg .= ' — اكتمل الاعتماد التشغيلي، وبانتظار التحويل المالي';
+    }
+
     echo json_encode([
         'success' => true,
-        'message' => "تم اعتماد $approved سجل" . ($skipped ? " (تم تخطي $skipped)" : ''),
+        'message' => $__msg,
         'approved' => $approved,
         'skipped'  => $skipped
     ], JSON_UNESCAPED_UNICODE);

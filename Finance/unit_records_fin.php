@@ -23,6 +23,61 @@ if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صل
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $work_models = fin_work_models(); $match_states = fin_match_states(); $downtime_causes = fin_downtime_causes();
 
+// ═══════════════════════════════════════════════════════════════════════════
+// D02 §5/§6: التحويل المالي — لحظةُ صيرورة يوم الدوام استحقاقًا ماليًّا
+// ───────────────────────────────────────────────────────────────────────────
+// «اعتماد المالية لا يعني إنشاء الوحدة؛ بل تحويلَها إلى أثرٍ مالي» — فالمروحة
+// تُنشأ هنا حصرًا حين تكون البوابة نافذة. الحارس صلاحيةُ التعديل على هذه
+// الشاشة وحدها (تُضبط من شاشة الصلاحيات لأي دور) — لا دورَ محظوظٌ في الكود.
+// دفعةٌ واحدة: سجلٌّ أو مجموعةٌ أو الكل، بنمط شاشة الاعتمادات نفسه.
+// ═══════════════════════════════════════════════════════════════════════════
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'convert_units') {
+    if (!$can_edit) { header("Location: unit_records_fin.php?msg=" . rawurlencode('لا تملك صلاحية التحويل المالي') . "+❌"); exit(); }
+    if (!fin_verify_action_token()) { header("Location: unit_records_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+
+    $ids = array();
+    foreach (explode(',', (string) ($_POST['ids'] ?? '')) as $one) {
+        $one = intval(trim($one));
+        if ($one > 0) { $ids[] = $one; }
+    }
+    $ids = array_slice(array_unique($ids), 0, 500); // سقفٌ معلَنٌ للدفعة الواحدة
+    if (!$ids) { header("Location: unit_records_fin.php?msg=لم+تحدّد+أي+يوم+للتحويل+❌"); exit(); }
+
+    require_once __DIR__ . '/../app/Services/EffectFanout.php';
+    $okCount = 0; $effCount = 0; $failed = array();
+    foreach ($ids as $tsId) {
+        // ① أهليةٌ خادمية: اليوم ضمن نطاق الشركة ومكتمل الاعتماد وغير محوَّل —
+        //    لا يُحوَّل يومٌ بمجرد إرسال معرّفه (الطابور عرضٌ لا تفويض).
+        $eligible = fin_conversion_queue($conn, $is_super_admin, array('limit' => 1, 'only_id' => $tsId));
+        if (!$eligible) { $failed[] = 'TS-' . $tsId . ': غير مؤهّلٍ للتحويل (غير مكتمل الاعتماد أو محوَّلٌ سلفًا)'; continue; }
+        try {
+            $res = null;
+            ems_tenant_db()->runInTransaction(function ($g) use (&$res, $conn, $tsId, $current_user_id) {
+                $res = \App\Services\EffectFanout::forTimesheetId($conn, $g, $tsId, $current_user_id);
+            }, 'finance unit conversion ' . $tsId);
+            $n = $res ? count($res['effects']) : 0;
+            if ($n > 0) { $okCount++; $effCount += $n; }
+            else {
+                $why = ($res && !empty($res['skipped'])) ? $res['skipped'][0]['reason'] : 'لا أثرَ قابلٌ للتوليد';
+                $failed[] = 'TS-' . $tsId . ': ' . $why;
+            }
+        } catch (\Throwable $e) {
+            error_log('unit conversion ' . $tsId . ': ' . $e->getMessage());
+            $failed[] = 'TS-' . $tsId . ': ' . $e->getMessage();
+        }
+    }
+
+    if ($okCount > 0) {
+        fin_log_approval($conn, $company_id, 0, 'operational_approved', 'converted', 'advance', 'finance_conversion',
+            $current_user_id, 'تحويلٌ ماليٌّ لـ' . $okCount . ' يومًا · ' . $effCount . ' أثرًا مولَّدًا');
+        fin_notify($conn, $company_id, 'dept_accountant',
+            'تحوّلت ' . $okCount . ' يومًا إلى استحقاقاتٍ مالية (' . $effCount . ' أثرًا) — الإيراد بانتظار رفعه', 'events_list_fin.php?fstate=draft');
+    }
+    $msg = 'حُوِّل ' . $okCount . ' يومًا (' . $effCount . ' أثرًا)';
+    if ($failed) { $msg .= ' — تعذّر ' . count($failed) . ': ' . implode(' | ', array_slice($failed, 0, 3)); }
+    header("Location: unit_records_fin.php?msg=" . rawurlencode($msg) . ($okCount > 0 ? '+✅' : '+⚠️')); exit();
+}
+
 // ── اعتماد التطابق وتوليد الحدثين التوأمين (المدير المالي + CSRF) ──
 if (isset($_GET['approve_id'])) {
     if (!$can_edit) { header("Location: unit_records_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
@@ -95,6 +150,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['work_model'])) {
     $rdate = trim($_POST['record_date'] ?? '') ?: date('Y-m-d');
     $pid = intval($_POST['project_id'] ?? 0);
     $eqid = intval($_POST['equipment_id'] ?? 0) ?: null;
+
+    // ── D02: حارس الازدواج — لا مصدرَ ثانيًا لليوم نفسه ──
+    // يومٌ حُوِّل من سجلّ الدوام (له أثرٌ في fin_event_links) لا يُدخَل يدويًّا
+    // مرةً أخرى لنفس المعدة والمشروع — وإلا تضاعف الإيراد والمستحق من بابين.
+    if ($eqid && $pid && $rdate !== '') {
+        $dupSql = "SELECT t.id FROM timesheet t
+                     JOIN operations o ON o.id = t.operator
+                    WHERE {TENANT_SCOPE} AND t.`date` = ? AND o.equipment = ? AND o.project_id = ?
+                      AND EXISTS (SELECT 1 FROM fin_event_links l
+                                   WHERE l.parent_kind = 'timesheet' AND l.parent_ref = t.id)
+                    LIMIT 1";
+        $dup = array();
+        try {
+            // operations مربوطٌ INNER (شرطُ وجود) ⇒ نطاقٌ لا إثراء (عقد البوابة)
+            $dup = fin_gate($is_super_admin)->scopedQuery(
+                array('scope' => array('t' => 'timesheet', 'o' => 'operations'),
+                      'enrich' => array('l' => 'fin_event_links')),
+                $dupSql, array($rdate, $eqid, $pid));
+        } catch (\Throwable $x) { error_log('unit dup guard: ' . $x->getMessage()); }
+        if ($dup) {
+            header("Location: unit_records_fin.php?msg=" . rawurlencode(
+                'هذا اليوم محوَّلٌ ماليًّا من سجلّ الدوام (TS-' . intval($dup[0]['id']) . ') — لا إدخالَ موازيًا يضاعف المال') . "+❌");
+            exit();
+        }
+    }
     $sup = intval($_POST['supplier_entity_id'] ?? 0) ?: null;
     $wm = isset($work_models[$_POST['work_model'] ?? '']) ? $_POST['work_model'] : '';
     $ops = round(floatval($_POST['ops_qty'] ?? 0), 2);
@@ -149,6 +229,112 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ?>
     <?php fin_msg_banner(); ?>
+
+    <?php
+    // ═══ D02: طابور التحويل المالي — أيامٌ اكتمل اعتمادها التشغيلي وتنتظر الختم ═══
+    $q_project = intval($_GET['q_project'] ?? 0);
+    $q_period  = trim((string) ($_GET['q_period'] ?? ''));
+    $queue = fin_conversion_queue($conn, $is_super_admin, array(
+        'project_id' => $q_project ?: null, 'period' => $q_period ?: null, 'limit' => 200));
+    // التسعير للصفحة المعروضة وحدها (استعلامان لكل صف — لا يُسعَّر ما لا يُعرض)
+    $pricing = $queue ? fin_queue_pricing($conn, $queue) : array();
+    $readyCount = 0;
+    foreach ($pricing as $pr) { if (!empty($pr['ready'])) { $readyCount++; } }
+    ?>
+    <div class="card" style="margin-bottom:14px;border-right:4px solid #d4b06a;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <h5 style="margin:0"><i class="fas fa-money-check-dollar"></i> طابور التحويل المالي
+                <span class="badge bg-warning"><?php echo count($queue); ?> يومًا بانتظار الختم</span>
+                <?php if (!fin_convert_gate_on()): ?>
+                    <span class="badge bg-secondary" title="العلَم EMS_UNIT_CONVERT_GATE=off">البوابة غير مفعّلة — الأثر يتولّد تلقائيًّا عند الاعتماد الرابع</span>
+                <?php endif; ?>
+            </h5>
+            <?php if ($can_edit && $queue): ?>
+            <div style="display:flex;gap:8px;">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qSelectAll(true)"><i class="fas fa-check-double"></i> حدّد الكل</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qSelectAll(false)">إلغاء التحديد</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="qConvert()"><i class="fas fa-right-left"></i> تحويل المحدد (<span id="qCount">0</span>)</button>
+            </div>
+            <?php endif; ?>
+        </div>
+        <div class="card-body">
+            <p class="text-muted" style="margin:0 0 10px">
+                <i class="fas fa-shield-halved"></i> <strong>مصدر الحقيقة سجلّ الدوام.</strong>
+                هذه الأيام اكتمل اعتمادها التشغيلي (المستويات الأربعة) وتنتظر التحويل المالي —
+                <strong>ولحظةَ التحويل تُنشأ آثارها كلها دفعةً واحدة</strong>: إيراد العميل ومستحق المورد وتكلفة المعدة والمشروع.
+                <?php echo $can_edit ? 'راجع الأرقام أدناه <strong>قبل</strong> التحويل — فالأثر بعد توليده محصَّنٌ لا يُحرَّر.'
+                    : '<strong>لديك صلاحية العرض فقط</strong> — التحويل يحتاج صلاحية التعديل على هذه الشاشة.'; ?>
+            </p>
+
+            <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px;">
+                <div><label style="font-size:.85rem">المشروع</label><br>
+                    <select name="q_project" onchange="this.form.submit()"><?php echo fin_project_options($conn, $is_super_admin, $company_id, $q_project); ?></select></div>
+                <div><label style="font-size:.85rem">الشهر</label><br>
+                    <input type="month" name="q_period" value="<?php echo htmlspecialchars($q_period); ?>" onchange="this.form.submit()"></div>
+                <?php if ($q_project || $q_period !== ''): ?>
+                    <a href="unit_records_fin.php" class="btn btn-sm btn-outline-secondary">مسح المرشّحات</a>
+                <?php endif; ?>
+            </form>
+
+            <?php if (!empty($GLOBALS['fin_queue_error'])): ?>
+                <div class="alert alert-danger" style="padding:10px"><i class="fas fa-triangle-exclamation"></i>
+                    <strong>تعذّر بناء الطابور</strong> — لا تعتبر هذه الشاشة فارغةً بحق:
+                    <code><?php echo htmlspecialchars((string) $GLOBALS['fin_queue_error']); ?></code></div>
+            <?php elseif (!$queue): ?>
+                <div class="text-muted" style="padding:10px"><i class="fas fa-check-circle"></i> لا أيامَ بانتظار التحويل ضمن هذا النطاق.</div>
+            <?php else: ?>
+            <div class="table-container">
+                <table id="queueTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                    <thead><tr>
+                        <?php if ($can_edit): ?><th style="width:34px"><input type="checkbox" id="qAll" onchange="qSelectAll(this.checked)"></th><?php endif; ?>
+                        <th>اليوم</th><th>المرجع</th><th>المشروع</th><th>المعدة</th><th>الكمية</th>
+                        <th>الإيراد المتوقَّع</th><th>مستحق المورد</th><th>الحالة</th><th>اعتمده</th>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($queue as $row):
+                        $tid = intval($row['id']);
+                        $pr = isset($pricing[$tid]) ? $pricing[$tid] : array('ready' => false, 'reason' => 'بلا تسعير', 'qty' => null, 'unit' => null, 'revenue' => null, 'due' => null);
+                        $ready = !empty($pr['ready']);
+                    ?>
+                        <tr class="<?php echo $ready ? '' : 'table-warning'; ?>">
+                            <?php if ($can_edit): ?>
+                            <td><?php if ($ready): ?>
+                                <input type="checkbox" class="q-chk" value="<?php echo $tid; ?>" onchange="qCount()">
+                            <?php else: ?><span title="غير قابلٍ للتحويل">—</span><?php endif; ?></td>
+                            <?php endif; ?>
+                            <td><?php echo htmlspecialchars((string) $row['work_date']); ?></td>
+                            <td><code>TS-<?php echo $tid; ?></code></td>
+                            <td><?php echo htmlspecialchars((string) ($row['project_name'] ?? '—')); ?></td>
+                            <td><?php echo htmlspecialchars((string) ($row['equipment_name'] ?? '—')); ?></td>
+                            <td><?php echo $pr['qty'] !== null ? number_format((float) $pr['qty'], 2) . ' ' . fin_unit_label_ar($pr['unit']) : '—'; ?></td>
+                            <td><?php echo $pr['revenue'] !== null
+                                ? '<strong style="color:#1a7a3a;">' . number_format((float) $pr['revenue'], 2) . '</strong> <small>' . htmlspecialchars((string) $pr['revenue_cur']) . '</small>'
+                                : '<span class="text-muted">—</span>'; ?></td>
+                            <td><?php echo $pr['due'] !== null
+                                ? number_format((float) $pr['due'], 2) . ' <small>' . htmlspecialchars((string) $pr['due_cur']) . '</small>'
+                                : '<span class="text-muted">—</span>'; ?></td>
+                            <td><?php if ($ready): ?><span class="badge bg-success">جاهزٌ للتحويل</span>
+                                <?php else: ?><span class="badge bg-secondary" title="<?php echo htmlspecialchars((string) $pr['reason']); ?>">متعذّر</span><?php endif; ?>
+                                <?php if ((string) $pr['reason'] !== ''): ?>
+                                    <div style="color:#9a6a00;font-size:.82rem;max-width:340px;white-space:normal;"><?php echo htmlspecialchars((string) $pr['reason']); ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo htmlspecialchars((string) ($row['approved_by_name'] ?? '—')); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php if ($can_edit): ?>
+            <form id="qForm" method="post" style="display:none">
+                <input type="hidden" name="action" value="convert_units">
+                <input type="hidden" name="csrf_token" value="<?php echo fin_action_token(); ?>">
+                <input type="hidden" name="ids" id="qIds" value="">
+            </form>
+            <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
 
     <div class="card"><div class="card-body" style="padding-bottom:6px">
         <p class="text-muted" style="margin:0"><i class="fas fa-shield-halved"></i>
@@ -273,6 +459,32 @@ $(document).ready(function () {
         $('html, body').animate({ scrollTop: $('#finForm').offset().top }, 400);
     });
 });
+
+// ═══ طابور التحويل المالي — نمط شاشة الاعتمادات نفسه (سجل/مجموعة/الكل) ═══
+// الجدول بلا DataTables (no-datatable) فمربعات التحديد تبقى في الصفحة كلها.
+function qSelectAll(on) {
+    document.querySelectorAll('.q-chk').forEach(function (c) { c.checked = !!on; });
+    var all = document.getElementById('qAll'); if (all) { all.checked = !!on; }
+    qCount();
+}
+function qSelected() {
+    return Array.prototype.slice.call(document.querySelectorAll('.q-chk:checked')).map(function (c) { return c.value; });
+}
+function qCount() {
+    var n = qSelected().length;
+    var el = document.getElementById('qCount'); if (el) { el.textContent = n; }
+    return n;
+}
+function qConvert() {
+    var ids = qSelected();
+    if (!ids.length) { alert('حدّد يومًا واحدًا على الأقل للتحويل.'); return; }
+    // تأكيدٌ يعرض الأثر قبل وقوعه — الأثر بعد توليده محصَّنٌ لا يُحرَّر
+    if (!confirm('تحويل ' + ids.length + ' يومًا إلى استحقاقاتٍ مالية؟\n\n'
+        + 'ستُنشأ لكل يوم: إيراد العميل + مستحق المورد + تكلفة المعدة والمشروع.\n'
+        + 'لا يمكن التراجع عن الأثر بعد توليده.')) { return; }
+    document.getElementById('qIds').value = ids.join(',');
+    document.getElementById('qForm').submit();
+}
 </script>
 </body>
 </html>

@@ -945,3 +945,137 @@ if (!function_exists('fin_account_parent_options')) {
         return fin_options_from_rows($rows, $selected, '— بلا أب (جذر) —');
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// D02 م1-③: بوابة التحويل المالي — طابور أيام الدوام المنتظِرة ختمَ المالية
+// ───────────────────────────────────────────────────────────────────────────
+// دستور الوحدة التشغيلية §5: «لا يجوز لأي شاشةٍ أو معالجٍ أن يُنشئ استحقاقًا من
+// وحدةٍ لم تُعتمد ماليًّا — كل إدخالٍ ماليٍّ يمرّ عبر محوِّل الوحدة حصرًا».
+// الطابور استنتاجٌ خالص: لا عمودَ حالةٍ جديد ولا جدول — «اكتمل اعتماده تشغيليًّا»
+// من timesheet_approvals، و«لم يُحوَّل بعد» من غياب رابطٍ في fin_event_links
+// (دفتر عطالة المحرّك نفسه — مصدرٌ واحدٌ للحقيقة لا علامةٌ موازية تتناقض معه).
+// ═══════════════════════════════════════════════════════════════════════════
+
+if (!defined('FIN_UNIT_FINAL_LEVEL')) {
+    /** آخر مراحل سلسلة الاعتماد التشغيلية (role_level_map في hours_approval_handler). */
+    define('FIN_UNIT_FINAL_LEVEL', 4);
+}
+
+if (!function_exists('fin_convert_gate_on')) {
+    /** هل بوابة التحويل نافذة؟ off = السلوك القديم (توليدٌ تلقائيٌّ عند الاعتماد الرابع). */
+    function fin_convert_gate_on()
+    {
+        return function_exists('ems_env')
+            && strtolower((string) ems_env('EMS_UNIT_CONVERT_GATE', 'off')) === 'on';
+    }
+}
+
+if (!function_exists('fin_conversion_queue')) {
+    /**
+     * أيام الدوام المكتمِلة اعتمادًا تشغيليًّا والمنتظِرة التحويل المالي.
+     * قراءةٌ خالصة عبر البوابة (عزل الشركة مفروضٌ بـ{TENANT_SCOPE}).
+     *
+     * @param array $filters project_id · period (Y-m) · limit
+     * @return array صفوفٌ بمعرّف الدوام وتاريخه ومشروعه ومعدته ومن اعتمده أخيرًا
+     */
+    function fin_conversion_queue($conn, $is_super, $filters = array())
+    {
+        $where = array(); $params = array();
+        if (!empty($filters['project_id'])) { $where[] = 't_op.project_id = ?'; $params[] = intval($filters['project_id']); }
+        if (!empty($filters['period']))     { $where[] = "DATE_FORMAT(t.`date`, '%Y-%m') = ?"; $params[] = strval($filters['period']); }
+        // فحصُ أهليةِ يومٍ بعينه: نفس شروط الطابور بلا استثناء — فالتحويل يمرّ
+        // بالبوابة نفسها التي بنت العرض (لا مسارَ جانبيٍّ يثق بمعرّفٍ مُرسَل).
+        if (!empty($filters['only_id']))    { $where[] = 't.id = ?'; $params[] = intval($filters['only_id']); }
+        $extra = $where ? (' AND ' . implode(' AND ', $where)) : '';
+        $limit = isset($filters['limit']) ? max(1, intval($filters['limit'])) : 200;
+
+        $sql = "SELECT t.id, t.`date` AS work_date, t.executed_hours, t.tons_count, t.meters_count,
+                       t.operator_hours, t_op.project_id, t_op.equipment AS equipment_id,
+                       p.name AS project_name, e.name AS equipment_name, e.code AS equipment_code,
+                       ta.approved_at, ta.approved_by, ta.approved_by_name
+                  FROM timesheet t
+                  JOIN timesheet_approvals ta
+                       ON ta.timesheet_id = t.id AND ta.approval_level = " . FIN_UNIT_FINAL_LEVEL . "
+                      AND ta.status = 1
+                  LEFT JOIN operations t_op ON t_op.id = t.operator
+                  LEFT JOIN project p ON p.id = t_op.project_id
+                  LEFT JOIN equipments e ON e.id = t_op.equipment
+                 WHERE {TENANT_SCOPE}
+                   AND COALESCE(t.status, 1) = 1
+                   AND NOT EXISTS (SELECT 1 FROM fin_event_links l
+                                    WHERE l.parent_kind = 'timesheet' AND l.parent_ref = t.id)
+                       " . $extra . "
+                 ORDER BY t.`date` ASC, t.id ASC
+                 LIMIT " . $limit;
+
+        try {
+            // ⚠️ عقدا البوابة في scopedQuery:
+            //   ① كل جدولٍ مستأجرٍ يظهر في FROM/JOIN يجب إعلانه — بما فيه ما
+            //      داخل الاستعلامات الفرعية (fin_event_links في NOT EXISTS).
+            //   ② جداول الإثراء تُربط LEFT JOIN حصرًا؛ فجدول الاعتمادات مربوطٌ
+            //      INNER (شرطُ وجودٍ لا إثراء) ⇒ موضعه النطاق، وبه يُعزل بشركته
+            //      أيضًا — عزلٌ أقوى لا التفافٌ عليه.
+            return fin_gate($is_super)->scopedQuery(
+                array('scope' => array('t' => 'timesheet', 'ta' => 'timesheet_approvals'),
+                      'enrich' => array('t_op' => 'operations', 'p' => 'project',
+                                        'e' => 'equipments', 'l' => 'fin_event_links')),
+                $sql, $params);
+        } catch (\Throwable $x) {
+            // ⚠️ فشلُ الطابور يُعلَن ولا يُبتلع: طابورٌ فارغٌ كذبًا يعني «لا شيء
+            //    ينتظر التحويل» بينما المال محتجَز — أخطر من رسالة خطأ.
+            error_log('fin_conversion_queue: ' . $x->getMessage());
+            if (function_exists('log_security_event')) {
+                log_security_event('CONVERT_QUEUE_FAILED', substr($x->getMessage(), 0, 300));
+            }
+            $GLOBALS['fin_queue_error'] = $x->getMessage();
+            return array();
+        }
+    }
+}
+
+if (!function_exists('fin_queue_pricing')) {
+    /**
+     * تسعير صفوف الطابور للعرض المسبق — «يرى المدير المالي الأثر قبل أن يقع».
+     * يستدعي مترجم المروحة نفسه (مصدرٌ واحدٌ للحساب: ما يُعرض هو ما سيُولَّد).
+     * ⚠️ الكلفة: استعلامان لكل صف — لذا يُستدعى للصفحة المعروضة وحدها.
+     */
+    function fin_queue_pricing($conn, array $rows)
+    {
+        require_once __DIR__ . '/../app/Services/EffectFanout.php';
+        $out = array();
+        foreach ($rows as $r) {
+            $id = intval($r['id']);
+            try { $ctx = \App\Services\EffectFanout::resolveTimesheet($conn, $id); }
+            catch (\Throwable $x) { $ctx = null; }
+            if ($ctx === null) {
+                $out[$id] = array('ready' => false, 'reason' => 'تعذّرت قراءة صف الدوام',
+                                  'qty' => null, 'unit' => null, 'revenue' => null, 'due' => null);
+                continue;
+            }
+            $revenue = $ctx['client']['ok'] ? round($ctx['qty'] * $ctx['client']['price'], 2) : null;
+            $due     = $ctx['supplier']['ok'] ? round($ctx['qty'] * $ctx['supplier']['price'], 2) : null;
+            // جاهزٌ للتحويل = أثرٌ واحدٌ حقيقيٌّ على الأقل (لا تحويلَ لصفٍّ كلُّه متعذّر)
+            $ready = ($revenue !== null || $due !== null);
+            $reasons = array();
+            if (!$ctx['client']['ok'])   { $reasons[] = 'الإيراد: ' . $ctx['client']['reason']; }
+            if (!$ctx['supplier']['ok']) { $reasons[] = 'المستحق والتكلفة: ' . $ctx['supplier']['reason']; }
+            $out[$id] = array(
+                'ready' => $ready,
+                'reason' => implode(' · ', $reasons),
+                'qty' => $ctx['qty'], 'unit' => $ctx['unit'],
+                'revenue' => $revenue, 'revenue_cur' => $ctx['client']['currency'],
+                'due' => $due, 'due_cur' => $ctx['supplier']['currency'],
+            );
+        }
+        return $out;
+    }
+}
+
+if (!function_exists('fin_unit_label_ar')) {
+    /** تسمية وحدة القياس بالعربية. */
+    function fin_unit_label_ar($u)
+    {
+        $m = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر');
+        return isset($m[$u]) ? $m[$u] : ($u === null ? '—' : $u);
+    }
+}

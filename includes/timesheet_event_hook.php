@@ -148,6 +148,21 @@ if (!function_exists('ems_timesheet_event_hook')) {
                     . ' corr=' . $r['correlation_id']);
             }
 
+            // ── D02 §5: بوابة التحويل المالي — من يخلق المال؟ ──
+            // gate=on: الاعتماد التشغيلي يكتمل ولا مالَ بعد؛ اليوم يدخل طابور
+            // المالية وتُنشأ المروحة بختمها حصرًا (Finance/unit_records_fin).
+            // gate=off: السلوك السابق — المروحة تنطلق هنا تلقائيًّا.
+            // العلَم هو نقطة التراجع الوحيدة: قلبُه يعيد السلوك القديم فورًا.
+            $convertGate = function_exists('ems_env')
+                && strtolower((string) ems_env('EMS_UNIT_CONVERT_GATE', 'off')) === 'on';
+            if ($convertGate) {
+                if (function_exists('log_security_event')) {
+                    log_security_event('FANOUT_TS_DEFERRED',
+                        'ts=' . $tsId . ' اكتمل الاعتماد التشغيلي — بانتظار التحويل المالي');
+                }
+                return; // الحقيقة نُشرت على الناقل؛ والأثر المالي بيد المالية
+            }
+
             // ── D02 م1-①: مروحة أثر يوم الدوام — بعد نشر الجذر، في معاملتها ──
             // الذرّية الخاصة (كل الآثار أو لا شيء)، بعطالة fin_event_links —
             // فتعمل أيضًا عند إعادة التسليم (dup) لشفاء مروحةٍ فاتت. فشلُها
