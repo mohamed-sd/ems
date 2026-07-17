@@ -54,6 +54,7 @@ if (!function_exists('ems_finreq_nav_links')) {
             if ($is_fin) {
                 $out['FinRequests/finance_gateway.php'] = array('label' => 'بوابة الطلبات المالية', 'icon' => 'fa fa-building-columns');
                 $out['FinRequests/cycle_time_board.php'] = array('label' => 'لوحة زمن الدورة', 'icon' => 'fa fa-stopwatch');
+                $out['FinRequests/requests_reports.php'] = array('label' => 'تقارير الطلبات المالية', 'icon' => 'fa fa-chart-column');
             }
         } catch (\Throwable $t) {
             // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
