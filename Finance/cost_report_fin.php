@@ -94,23 +94,26 @@ include '../insidebar.php';
                 $cr_whereRaw = "COALESCE(cr.is_deleted,0)=0";
                 $cr_params = array();
                 if ($proj_scope !== null) { $cr_whereRaw .= " AND cr.project_id = ?"; $cr_params[] = $proj_scope; }
+                // D02 م1-①: الآثار تُكتب بعملة عقدها — فالتجميع لكل عملةٍ صفٌّ
+                // (لا يُجمع جنيهٌ فوق دولارٍ في رقمٍ واحد)
                 $prof_rows = fin_gate($is_super_admin)->scopedQuery(
                     array('scope' => array('cr' => 'fin_cost_records'), 'enrich' => array('p' => 'project')),
-                    "SELECT p.name AS project_name,
+                    "SELECT p.name AS project_name, COALESCE(cr.currency,'SDG') AS cur,
                             COALESCE(SUM(cr.total_cost),0) AS tc,
                             COALESCE(SUM(cr.revenue),0) AS tr,
                             COALESCE(SUM(cr.revenue),0) - COALESCE(SUM(cr.total_cost),0) AS profit
                      FROM fin_cost_records cr
                      LEFT JOIN project p ON p.id = cr.project_id
                      WHERE {TENANT_SCOPE} AND " . $cr_whereRaw . "
-                     GROUP BY cr.project_id, p.name ORDER BY profit DESC",
+                     GROUP BY cr.project_id, p.name, cur ORDER BY profit DESC",
                     $cr_params);
                 { foreach ($prof_rows as $row) {
                     $tc = (float)$row['tc']; $tr = (float)$row['tr']; $pf = (float)$row['profit'];
                     $margin = $tr > 0 ? ($pf / $tr * 100) : 0;
                     $tone = $pf > 0 ? 'success' : ($pf < 0 ? 'danger' : 'secondary');
+                    $curTag = ($row['cur'] !== 'SDG') ? " <span class='badge badge-secondary'>" . htmlspecialchars($row['cur']) . "</span>" : '';
                     echo "<tr>";
-                    echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? 'بلا مشروع')) . "</td>";
+                    echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? 'بلا مشروع')) . $curTag . "</td>";
                     echo "<td>" . number_format($tc, 2) . "</td>";
                     echo "<td>" . number_format($tr, 2) . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . number_format($pf, 2) . "</span></td>";
@@ -142,9 +145,11 @@ include '../insidebar.php';
                     echo "<td>" . htmlspecialchars($cost_types[$row['cost_type']] ?? $row['cost_type']) . "</td>";
                     echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? '—')) . "</td>";
                     echo "<td>" . ($row['qty'] !== null ? number_format((float)$row['qty'], 2) . ' ' . htmlspecialchars((string)$row['unit']) : '—') . "</td>";
+                    $rowCur = (string)($row['currency'] ?? 'SDG');
+                    $curSfx = ($rowCur !== '' && $rowCur !== 'SDG') ? ' <small>' . htmlspecialchars($rowCur) . '</small>' : '';
                     echo "<td>" . ($row['unit_cost'] !== null ? number_format((float)$row['unit_cost'], 2) : '—') . "</td>";
-                    echo "<td>" . number_format((float)$row['total_cost'], 2) . "</td>";
-                    echo "<td>" . ($row['revenue'] !== null ? number_format((float)$row['revenue'], 2) : '—') . "</td>";
+                    echo "<td>" . number_format((float)$row['total_cost'], 2) . $curSfx . "</td>";
+                    echo "<td>" . ($row['revenue'] !== null ? number_format((float)$row['revenue'], 2) . $curSfx : '—') . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . number_format($pf, 2) . "</span></td>";
                     echo "</tr>";
                 } }

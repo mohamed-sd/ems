@@ -25,6 +25,32 @@ $catalog = finreq_catalog();
 $q = isset($_GET['q']) ? trim((string)$_GET['q']) : '';
 $req = null; $ev = null; $journals = array(); $payments = array(); $dues = array(); $links = array();
 $unit = null; $fanEffects = array(); $fanMap = array();
+$tsCtx = null; // D02 م1-①: سياق يوم الدوام مصدرًا للمروحة
+
+// ── مروحة أثر يوم الدوام (D02 م1-①): بحثٌ بمرجع الصف (TS-…) ──
+if ($q !== '' && preg_match('/^\s*TS-(\d+)\s*$/i', $q, $tsm)) {
+    require_once __DIR__ . '/../app/Services/EffectFanout.php';
+    $tsId = intval($tsm[1]);
+    // البوابة تعزل بالشركة: صفٌّ خارج نطاقها = لا نتيجة (لا تسريب عبر المترجم)
+    $tsRow = $gate->selectOne('timesheet', array('columns' => array('id', 'company_id'), 'where' => array('id' => $tsId)));
+    if ($tsRow) {
+        try { $tsCtx = \App\Services\EffectFanout::resolveTimesheet($conn, $tsId); }
+        catch (\Throwable $t) { $tsCtx = null; }
+    }
+    if ($tsCtx) {
+        foreach (\App\Services\EffectFanout::mapFor($gate, intval($tsCtx['company_id']), 'timesheet') as $mrow) {
+            $fanMap[$mrow['effect_type']] = $mrow;
+        }
+        foreach ($gate->select('fin_event_links', array(
+            'where' => array('parent_kind' => 'timesheet', 'parent_ref' => $tsId), 'orderBy' => 'id ASC',
+        )) as $l) {
+            $target = null;
+            try { $target = $gate->selectOne($l['target_table'], array('where' => array('id' => intval($l['target_id'])), 'includeDeleted' => true)); }
+            catch (\Throwable $t) { /* عرض */ }
+            $fanEffects[$l['effect_type']] = array('link' => $l, 'target' => $target);
+        }
+    }
+}
 
 // ── مروحة أثر الوحدة المعتمدة (§6.1): بحثٌ برقم كشف الوحدة (FIN-UR-…) ──
 if ($q !== '' && preg_match('/UR-/i', $q)) {
@@ -99,8 +125,27 @@ include('../insidebar.php');
         </div>
     </div>
 
-    <?php if ($q !== '' && !$req && !$ev && !$unit): ?>
+    <?php if ($q !== '' && !$req && !$ev && !$unit && !$tsCtx): ?>
         <div class="card"><div class="card-body">🔍 لا نتيجة — تحقق من الرقم ضمن نطاق شركتك</div></div>
+    <?php endif; ?>
+
+    <?php if ($tsCtx): ?>
+        <?php $u_lbl = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر'); ?>
+        <div class="card" style="margin-bottom:14px;">
+            <div class="card-header"><h5><i class="fa fa-calendar-day"></i> المصدر: يوم الدوام المعتمد (سجلّ الوحدات — D02)</h5></div>
+            <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;">
+                <div><strong><?php echo htmlspecialchars($tsCtx['source_ref']); ?></strong></div>
+                <div><?php echo htmlspecialchars($tsCtx['work_date']); ?></div>
+                <div><span class="badge bg-info"><?php echo $tsCtx['unit'] === null ? 'لا كميةَ مسجّلة'
+                    : number_format((float)$tsCtx['qty'], 2) . ' ' . ($u_lbl[$tsCtx['unit']] ?? $tsCtx['unit']); ?></span></div>
+                <div><strong>سعر العميل:</strong> <?php echo $tsCtx['client']['ok']
+                    ? number_format((float)$tsCtx['client']['price'], 2) . ' ' . htmlspecialchars($tsCtx['client']['currency'])
+                    : '<span style="color:#9a6a00;">— ' . htmlspecialchars($tsCtx['client']['reason']) . '</span>'; ?></div>
+                <div><strong>سعر المورد:</strong> <?php echo $tsCtx['supplier']['ok']
+                    ? number_format((float)$tsCtx['supplier']['price'], 2) . ' ' . htmlspecialchars($tsCtx['supplier']['currency'])
+                    : '<span style="color:#9a6a00;">— ' . htmlspecialchars($tsCtx['supplier']['reason']) . '</span>'; ?></div>
+            </div>
+        </div>
     <?php endif; ?>
 
     <?php if ($unit): ?>
@@ -121,6 +166,9 @@ include('../insidebar.php');
             </div>
         </div>
 
+    <?php endif; ?>
+
+    <?php if ($unit || $tsCtx): ?>
         <div class="card">
             <div class="card-header"><h5><i class="fa fa-sitemap"></i> مروحة الأثر — الحدث الواحد والآثار المتعددة (§6.1)</h5></div>
             <div class="card-body">
@@ -147,9 +195,21 @@ include('../insidebar.php');
                         <?php elseif (intval($meta['is_active']) !== 1): ?>
                             <span class="badge bg-secondary">غير متاح</span>
                             <span style="color:#9a6a00;font-size:.9rem;"><?php echo htmlspecialchars($meta['unavailable_reason'] ?? ''); ?></span>
-                        <?php else: ?>
-                            <span class="badge bg-warning">بانتظار التوليد</span>
-                            <span style="color:#6b4e2a;font-size:.9rem;">يُفرَّع عند اعتماد الوحدة أو بكنس المصالِح</span>
+                        <?php else:
+                            // مصدر الدوام: نعلن سببَ التعذّر الحقيقي (تسعيرٌ/عقدٌ/كمية) بدل «بانتظار» مبهمة
+                            $blocked = '';
+                            if ($tsCtx) {
+                                if ($etype === 'revenue_event' && !$tsCtx['client']['ok'])       { $blocked = $tsCtx['client']['reason']; }
+                                elseif (($etype === 'supplier_due' || $etype === 'cost_record') && !$tsCtx['supplier']['ok']) { $blocked = $tsCtx['supplier']['reason']; }
+                            }
+                        ?>
+                            <?php if ($blocked !== ''): ?>
+                                <span class="badge bg-secondary">متعذّر</span>
+                                <span style="color:#9a6a00;font-size:.9rem;"><?php echo htmlspecialchars($blocked); ?></span>
+                            <?php else: ?>
+                                <span class="badge bg-warning">بانتظار التوليد</span>
+                                <span style="color:#6b4e2a;font-size:.9rem;">يُفرَّع عند الاعتماد الرابع أو بكنس المصالِح</span>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>

@@ -147,6 +147,42 @@ if (!function_exists('ems_timesheet_event_hook')) {
                     . ' event_id=' . $r['id'] . ' dup=' . ($r['duplicate'] ? '1' : '0')
                     . ' corr=' . $r['correlation_id']);
             }
+
+            // ── D02 م1-①: مروحة أثر يوم الدوام — بعد نشر الجذر، في معاملتها ──
+            // الذرّية الخاصة (كل الآثار أو لا شيء)، بعطالة fin_event_links —
+            // فتعمل أيضًا عند إعادة التسليم (dup) لشفاء مروحةٍ فاتت. فشلُها
+            // يُبتلع ويُسجَّل (الاعتماد أساسيٌّ والمروحة أثرٌ جانبي)، وكنسُ
+            // cron_events يلتقط ما فات ضمن نافذته.
+            try {
+                require_once __DIR__ . '/../app/Core/TenantGateException.php';
+                require_once __DIR__ . '/../app/Core/TenantRegistry.php';
+                require_once __DIR__ . '/../app/Core/TenantContext.php';
+                require_once __DIR__ . '/../app/Core/TenantDb.php';
+                require_once __DIR__ . '/../app/Services/EffectFanout.php';
+                if (isset($_SESSION['user']['id']) && function_exists('ems_tenant_db')) {
+                    $fanGate = ems_tenant_db(); // سياق الشاشة (المعالج تحقق أن الصف لشركة الجلسة)
+                } else {
+                    // سياق خادمي (cron/CLI) — بوابةٌ معزولةٌ بشركة الصف نفسها (عقد §11)
+                    $sysOk = (PHP_SAPI === 'cli') || ((string) ems_env('EVENTS_CRON_KEY', '') !== '');
+                    $fanGate = new \App\Core\TenantDb($conn,
+                        \App\Core\TenantContext::forSystem(intval($t['company_id']), 0, '', $sysOk));
+                }
+                $fanRes = null;
+                $fanGate->runInTransaction(function ($g) use (&$fanRes, $conn, $tsId, $actorUserId) {
+                    $fanRes = \App\Services\EffectFanout::forTimesheetId($conn, $g, $tsId, intval($actorUserId));
+                }, 'timesheet effect fan-out ' . $tsId);
+                if ($fanRes && function_exists('log_security_event')) {
+                    log_security_event('FANOUT_TS',
+                        'ts=' . $tsId . ' effects=' . count($fanRes['effects'])
+                        . ' skipped=' . count($fanRes['skipped'])
+                        . ' revision=' . (!empty($fanRes['revision_pending']) ? '1' : '0'));
+                }
+            } catch (\Throwable $fx) {
+                if (function_exists('log_security_event')) {
+                    log_security_event('FANOUT_TS_FAILED',
+                        'timesheet=' . $tsId . ' err=' . substr($fx->getMessage(), 0, 300));
+                }
+            }
         } catch (\Throwable $x) {
             // الاعتماد لا يُكسر أبدًا — الفشل يُسجَّل ويُصالَح لاحقًا (cron_events).
             if (function_exists('log_security_event')) {

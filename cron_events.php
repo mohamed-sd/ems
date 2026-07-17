@@ -182,3 +182,51 @@ foreach ($pendingByCompany as $cid => $ids) {
 if ($fanReconciled > 0) {
     echo "[events-cron " . date('Y-m-d H:i:s') . "] effect-fanout reconciler: units={$fanReconciled} effects={$fanEffects}\n";
 }
+
+// ═══ مصالِح مروحة الدوام (D02 م1-①) — اعتمادٌ رابعٌ حديثٌ بلا أي رابط مروحة ═══
+// نافذة 7 أيام (كنافذة كاشف اليتيم أعلاه): تلتقط انهيارًا بعد نشر الجذر وقبل
+// المروحة، وتمنح عقودًا صُحّحت لاحقًا نافذةَ شفاءٍ محدودة. شرط وجود جذر
+// equipment.hour_logged أولًا (المصالِح فوقه يتكفّل به)، والاكتمال = وجود أي
+// رابطٍ في fin_event_links؛ الصفوف كاملة-التعذّر تُعاد داخل النافذة فقط
+// وكلُّ محاولةٍ صفرُ كتابةٍ بالعطالة — لا معالجة رجعية أبعد من النافذة (قرار
+// المستخدم: لا كنس رجعيًّا للمعتمد القديم).
+$tsPendingByCompany = array();
+$tq = $conn->query(
+    "SELECT ta.timesheet_id, t.company_id, ta.approved_by
+       FROM timesheet_approvals ta
+       JOIN timesheet t ON t.id = ta.timesheet_id
+      WHERE ta.approval_level = 4 AND ta.status = 1
+        AND ta.approved_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        AND EXISTS (
+              SELECT 1 FROM fin_financial_events fe
+              WHERE fe.idempotency_key = CONCAT('equipment.hour_logged:timesheet:', ta.timesheet_id, ':a', ta.id))
+        AND NOT EXISTS (
+              SELECT 1 FROM fin_event_links l
+              WHERE l.parent_kind = 'timesheet' AND l.parent_ref = ta.timesheet_id)
+      LIMIT 500"
+);
+if ($tq) {
+    while ($row = $tq->fetch_assoc()) {
+        $tsPendingByCompany[intval($row['company_id'])][] = array(
+            'id' => intval($row['timesheet_id']), 'actor' => intval($row['approved_by']));
+    }
+}
+$tsReconciled = 0; $tsEffects = 0;
+foreach ($tsPendingByCompany as $cid => $tsRows) {
+    $tgate = new \App\Core\TenantDb($conn, \App\Core\TenantContext::forSystem($cid, 0, '', $systemAuthok));
+    foreach ($tsRows as $tsRow) {
+        try {
+            $res = null;
+            $tgate->runInTransaction(function ($g) use (&$res, $conn, $tsRow) {
+                $res = \App\Services\EffectFanout::forTimesheetId($conn, $g, $tsRow['id'], $tsRow['actor'] ?: 1);
+            }, 'fanout reconcile timesheet ' . $tsRow['id']);
+            if ($res && count($res['effects']) > 0) { $tsReconciled++; $tsEffects += count($res['effects']); }
+        } catch (\Throwable $e) {
+            error_log('fanout reconcile timesheet ' . $tsRow['id'] . ': ' . $e->getMessage());
+            echo "[events-cron] ⚠ fanout ts={$tsRow['id']} failed: " . $e->getMessage() . "\n";
+        }
+    }
+}
+if ($tsReconciled > 0) {
+    echo "[events-cron " . date('Y-m-d H:i:s') . "] timesheet-fanout reconciler: rows={$tsReconciled} effects={$tsEffects}\n";
+}
