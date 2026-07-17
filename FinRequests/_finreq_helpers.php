@@ -405,6 +405,11 @@ function finreq_sync_state($gate, $request)
     if (!isset($map[$evState])) { return $request; }
     $derived = $map[$evState];
     if (strval($request['state']) === $derived) { return $request; }
+    // قاعدة المسار المركّب (§6.2): لا يُغلق الأصلُ وفروعُه معلّقة — الإقفال
+    // المشتق يُمسَك حتى تبلغ كل الفروع حالاتها الختامية (يبقى على حالته).
+    if ($derived === 'closed' && finreq_has_live_children($gate, intval($request['id']))) {
+        return $request;
+    }
     // انتقال اشتقاقٍ آلي — يُدوَّن في السجل بنوع system بقيمتيه قبل/بعد
     $gate->update('fin_requests', array('state' => $derived), array('id' => intval($request['id'])));
     finreq_log($gate, intval($request['id']), 'system',
@@ -566,6 +571,35 @@ function finreq_stage_timings($conn, $company_id)
     }
     $stmt->close();
     return $out;
+}
+
+/** فروع الطلب (المسار المركّب §6.2) — أبناؤه المباشرون بحالاتهم */
+function finreq_children($gate, $parent_id)
+{
+    return $gate->select('fin_requests', array(
+        'columns' => array('id', 'request_no', 'request_type', 'state', 'amount', 'currency', 'justification'),
+        'where' => array('parent_request_id' => intval($parent_id)),
+        'orderBy' => 'id ASC',
+    ));
+}
+
+/** هل للطلب فروعٌ حيّة؟ (قاعدة المسار المركّب: «لا يُغلق الأصلُ وفروعُه معلّقة») —
+ *  الحيّ = كل ما ليس في حالةٍ ختامية. */
+function finreq_has_live_children($gate, $parent_id)
+{
+    $n = $gate->count('fin_requests', array(
+        'whereRaw' => "parent_request_id = ? AND state NOT IN
+            ('closed','archived','rejected','withdrawn','cancelled','expired','merged','paid','collected')",
+        'params' => array(intval($parent_id)),
+    ));
+    return intval($n) > 0;
+}
+
+/** نوع الطلب الفرعي المشتق من مستفيد الأصل (الفرع دفعةٌ بطبيعته) */
+function finreq_child_type($beneficiary_type)
+{
+    $map = array('supplier' => 'supplier_payment', 'employee' => 'employee_payment');
+    return isset($map[strval($beneficiary_type)]) ? $map[strval($beneficiary_type)] : 'disbursement';
 }
 
 /** جلب طلبٍ معزولًا + اشتقاق حالته (الاستدعاء المعياري لكل الشاشات) */

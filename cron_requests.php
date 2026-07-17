@@ -167,6 +167,16 @@ while ($s = $sweep->fetch_assoc()) {
     );
     $derived = $map[strval($s['ev_state'])];
     if ($derived === strval($s['state'])) { continue; }
+    // قاعدة المسار المركّب (§6.2): لا يُغلق الأصلُ وفروعُه معلّقة — يُمسَك الإقفال
+    if ($derived === 'closed') {
+        $lc = $conn->prepare("SELECT COUNT(*) FROM fin_requests WHERE parent_request_id = ? AND state NOT IN
+            ('closed','archived','rejected','withdrawn','cancelled','expired','merged','paid','collected')");
+        $lc->bind_param('i', $s['id']);
+        $lc->execute();
+        $live = intval($lc->get_result()->fetch_row()[0]);
+        $lc->close();
+        if ($live > 0) { continue; }
+    }
     $upd = $conn->prepare('UPDATE fin_requests SET state = ? WHERE id = ? AND state = ?');
     $upd->bind_param('sis', $derived, $s['id'], $s['state']);
     $upd->execute();

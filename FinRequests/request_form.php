@@ -72,7 +72,9 @@ include('../insidebar.php');
         <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;"><?php echo htmlspecialchars($_GET['msg']); ?></div>
     <?php endif; ?>
 
-    <?php if (!$my_departments): ?>
+    <?php // حارس «لا إدارة مفعّلة» يخص الإنشاء فقط — عرض طلبٍ قائمٍ متاحٌ لكل
+          // ممنوح الصلاحية (المحاسب والمالية يفتحان أي طلبٍ من صناديقهما) ?>
+    <?php if (!$my_departments && !$req): ?>
         <div class="card"><div class="card-body">
             <h5>⛔ لا إدارة مفعّلةً لدورك في بوابة الطلبات المالية بعد</h5>
             <p>الإنشاء متاحٌ لأدوار الإدارات المفعّلة في جدول التوجيه — راجع الإدارة المالية.</p>
@@ -88,6 +90,13 @@ include('../insidebar.php');
                 <?php if (intval($req['duplicate_flag']) === 1): ?><div><span class="badge bg-warning">⚠️ تحذير تكرار</span></div><?php endif; ?>
                 <?php if (intval($req['is_exception']) === 1): ?><div><span class="badge bg-danger">🚨 استثناء طارئ معتمد — الدورة تُستكمل خلال 72 ساعة</span></div><?php endif; ?>
                 <?php if (!empty($req['event_id'])): ?><div><strong>الحدث المالي:</strong> #<?php echo intval($req['event_id']); ?></div><?php endif; ?>
+                <?php if (!empty($req['parent_request_id'])):
+                    $__parent = $gate->selectOne('fin_requests', array('columns' => array('request_no'), 'where' => array('id' => intval($req['parent_request_id']))));
+                ?>
+                    <div><span class="badge bg-info">🌿 فرعٌ من
+                        <a href="request_form.php?id=<?php echo intval($req['parent_request_id']); ?>" style="color:inherit;text-decoration:underline;">
+                            <?php echo htmlspecialchars($__parent ? $__parent['request_no'] : ('#' . intval($req['parent_request_id']))); ?></a></span></div>
+                <?php endif; ?>
                 <?php
                 // §8.3: الطارئ غير المستثنى بعد — صاحبه (أو مدير إدارته أو السوبر) يطلب التنفيذ المسبق
                 $can_ask_exception = $req && strval($req['need_class']) === 'emergency'
@@ -108,6 +117,44 @@ include('../insidebar.php');
             </div>
         </div>
     <?php endif; ?>
+
+    <?php
+    // المسار المركّب (§6.2): شجرة الفروع + نموذج التفريع (للمحاسب 18 والمدير المالي 17)
+    if ($req && empty($req['parent_request_id'])):
+        $__kids = finreq_children($gate, intval($req['id']));
+        $__can_split = ($is_super || $role === '17' || $role === '18')
+            && in_array($req['state'], array('pending_approval', 'approved', 'posted'), true);
+        if ($__kids || $__can_split):
+    ?>
+        <div class="card" style="margin-bottom:14px;border-right:4px solid #0e7490;">
+            <div class="card-header"><h5><i class="fa fa-code-branch"></i> المسار المركّب — فروع الطلب (§6.2)</h5></div>
+            <div class="card-body">
+                <?php if ($__kids): $__ksum = 0.0; ?>
+                    <?php foreach ($__kids as $kk): $__ksum += in_array($kk['state'], array('rejected','withdrawn','cancelled','expired','merged'), true) ? 0 : floatval($kk['amount']); ?>
+                        <div style="padding:6px 0;border-bottom:1px dashed #e3d9c6;">
+                            🌿 <strong><a href="request_form.php?id=<?php echo intval($kk['id']); ?>"><?php echo htmlspecialchars($kk['request_no']); ?></a></strong>
+                            · <?php echo htmlspecialchars($catalog[$kk['request_type']]['label'] ?? $kk['request_type']); ?>
+                            · <?php echo number_format(floatval($kk['amount']), 2); ?>
+                            · <?php echo finreq_state_badge($kk['state']); ?>
+                            <span style="color:#6b4e2a;font-size:.9em;"><?php echo htmlspecialchars($kk['justification'] ?? ''); ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                    <div style="margin-top:8px;font-weight:700;">مجموع الفروع الحيّة: <?php echo number_format($__ksum, 2); ?> من أصل <?php echo number_format(floatval($req['amount']), 2); ?></div>
+                <?php endif; ?>
+                <?php if ($__can_split): ?>
+                    <form action="request_actions.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:10px;">
+                        <input type="hidden" name="action" value="split_request">
+                        <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
+                        <input type="hidden" name="back" value="request_form.php">
+                        <div><label>وصف الفرع *</label><input type="text" name="child_label" placeholder="دفعة مقدّمة 30%" required style="min-width:200px;"></div>
+                        <div><label>مبلغ الفرع *</label><input type="number" step="0.01" min="0.01" name="child_amount" required style="min-width:140px;"></div>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-code-branch"></i> تفريع دفعة</button>
+                    </form>
+                    <p style="margin-top:8px;color:#6b4e2a;font-size:.9em;">💡 الفرع يرث مستندات أصله وبواباته الإدارية، ويولد لدى محاسب الإدارة — ولا يُغلق الأصل وفروعه معلّقة.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; endif; ?>
 
     <?php if (!$req && !$can_add): ?>
         <div class="card"><div class="card-body">

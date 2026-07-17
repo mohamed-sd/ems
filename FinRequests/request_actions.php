@@ -400,6 +400,11 @@ if (in_array($action, array('cancel', 'suspend', 'resume', 'merge'), true)) {
             if (!empty($req['event_id']) && !$is_super && $role !== '17') {
                 finreq_redirect($back, '❌ بعد ولادة الحدث الإلغاء للمدير المالي حصرًا — مع معالجة الأثر في D04');
             }
+            // قاعدة المسار المركّب (§6.2): لا يضيع فرعٌ بلا أصلٍ يُسأل عنه —
+            // أصلٌ له فروعٌ حيّة لا يُلغى قبل حسم فروعه
+            if (finreq_has_live_children($gate, $id)) {
+                finreq_redirect($back, '❌ للطلب فروعٌ حيّةٌ (مسار مركّب) — احسم الفروع أولًا ثم ألغِ الأصل');
+            }
             $result = $machine->apply($id, 'cancel_pending', $user_id, array('note' => $reason));
             $gate->runInTransaction(function ($g) use ($id, $reason, $result, $req) {
                 finreq_log($g, $id, 'cancel', $reason
@@ -455,6 +460,95 @@ if (in_array($action, array('cancel', 'suspend', 'resume', 'merge'), true)) {
     } catch (\Throwable $t) {
         error_log('finreq halt ' . $action . ': ' . $t->getMessage());
         finreq_redirect($back, '❌ ' . $t->getMessage());
+    }
+}
+
+// ═══ 6ب) المسار المركّب (§6.2): تفريع دفعةٍ عن أصلٍ معتمدٍ إداريًّا ═══
+//        «طلب شراءٍ واحد يتفرّع: الشراء + دفعة مقدّمة + دفعة نهائية» —
+//        التفريع جدولة أداءٍ ماليةٌ فيملكه محاسب الإدارة (18) والمدير المالي (17)؛
+//        الفرع يرث مستندات أصله وبواباته الإدارية المستوفاة (لا قفز فوق المصدر —
+//        الأصل عبر بوابتي التبرير والاعتماد) ويولد «بانتظار الاعتماد» ليلد حدثه
+//        من مكتب المحاسب كأي طلب. سقف النسب: مجموع الفروع لا يتجاوز مبلغ الأصل.
+if ($action === 'split_request') {
+    if (!$is_super && $role !== '17' && $role !== '18') {
+        finreq_redirect($back, '❌ التفريع جدولة أداءٍ مالية — لمحاسب الإدارة والمدير المالي');
+    }
+    $id = intval($_POST['id'] ?? 0);
+    $req = finreq_fetch($gate, $id);
+    if (!$req) { finreq_redirect($back, '❌ الطلب غير موجود'); }
+    if (!in_array($req['state'], array('pending_approval', 'approved', 'posted'), true)) {
+        finreq_redirect('request_form.php?id=' . $id, '❌ التفريع لأصلٍ معتمدٍ إداريًّا فصاعدًا (بواباته مستوفاة)');
+    }
+    if (!empty($req['parent_request_id'])) {
+        finreq_redirect('request_form.php?id=' . $id, '❌ الفرع لا يتفرّع — التفريع عن الأصل مباشرةً (شجرةٌ بمستوًى واحد)');
+    }
+    $child_amount = round(floatval($S('child_amount')), 2);
+    $child_label = $S('child_label');
+    if ($child_amount <= 0 || $child_label === '') {
+        finreq_redirect('request_form.php?id=' . $id, '❌ مبلغ الفرع الموجب ووصفه (مثل: دفعة مقدّمة 30%) إلزاميان');
+    }
+    // سقف المجموع: فروعه القائمة (غير الملغاة/المرفوضة) + الجديد ≤ مبلغ الأصل
+    $kids = finreq_children($gate, $id);
+    $kids_sum = 0.0;
+    foreach ($kids as $k) {
+        if (!in_array($k['state'], array('rejected', 'withdrawn', 'cancelled', 'expired', 'merged'), true)) {
+            $kids_sum += floatval($k['amount']);
+        }
+    }
+    if ($kids_sum + $child_amount > floatval($req['amount']) + 0.01) {
+        finreq_redirect('request_form.php?id=' . $id,
+            '❌ سقف التفريع: مجموع الفروع (' . number_format($kids_sum + $child_amount, 2)
+            . ') يتجاوز مبلغ الأصل (' . number_format(floatval($req['amount']), 2) . ')');
+    }
+    try {
+        $child_id = 0;
+        $child_no = finreq_next_no($gate);
+        $gate->runInTransaction(function ($g) use ($conn, $req, $id, $child_no, $child_amount, $child_label, $user_id, &$child_id) {
+            // الفرع: طلبٌ كاملٌ برقمه يرث هوية أصله التشغيلية ويولد بانتظار الاعتماد
+            $child_id = intval($g->insert('fin_requests', array(
+                'request_no' => $child_no,
+                'parent_request_id' => $id,
+                'request_type' => finreq_child_type($req['beneficiary_type']),
+                'source_module' => strval($req['source_module']),
+                'requester_id' => intval($req['requester_id'] ?? 0) ?: intval($req['created_by']),
+                'beneficiary_type' => strval($req['beneficiary_type']),
+                'beneficiary_ref' => $req['beneficiary_ref'] !== null ? intval($req['beneficiary_ref']) : null,
+                'beneficiary_name' => $req['beneficiary_name'] !== null ? strval($req['beneficiary_name']) : null,
+                'amount' => $child_amount,
+                'currency' => strval($req['currency']),
+                'payment_method' => $req['payment_method'] !== null ? strval($req['payment_method']) : null,
+                'justification' => $child_label . ' — فرعٌ من ' . $req['request_no'] . ' (مسار مركّب §6.2)',
+                'source_ref' => strval($req['request_no']),
+                'project_id' => $req['project_id'] !== null ? intval($req['project_id']) : null,
+                'equipment_id' => $req['equipment_id'] !== null ? intval($req['equipment_id']) : null,
+                'contract_id' => $req['contract_id'] !== null ? intval($req['contract_id']) : null,
+                'cost_center' => $req['cost_center'] !== null ? strval($req['cost_center']) : null,
+                'need_class' => strval($req['need_class']),
+                'state' => 'pending_approval',
+                'created_by' => $user_id,
+            )));
+            // وراثة المستندات: نسخ صفوف مستندات الأصل (نفس الملفات — إثباتها إثباته)
+            foreach ($g->select('fin_request_documents', array('where' => array('request_id' => $id))) as $doc) {
+                $g->insert('fin_request_documents', array(
+                    'request_id' => $child_id,
+                    'doc_type' => strval($doc['doc_type']),
+                    'file_ref' => strval($doc['file_ref']),
+                    'original_kind' => strval($doc['original_kind']),
+                    'uploaded_by' => intval($doc['uploaded_by'] ?? 0) ?: $user_id,
+                ));
+            }
+            finreq_log($g, $child_id, 'create',
+                'وُلد فرعًا من ' . $req['request_no'] . ' («' . $child_label . '») — بوابتا التبرير والاعتماد مستوفاتان في الأصل، ومستنداته موروثة');
+            finreq_stamp_sla($g, $child_id, 'acct_review', strval($req['need_class']));
+            finreq_log($g, $id, 'note', 'تفرّع عنه ' . $child_no . ' («' . $child_label . '» بمبلغ ' . number_format($child_amount, 2) . ') — §6.2');
+            finreq_publish_fact($conn, array_merge($req, array('id' => $child_id, 'request_no' => $child_no, 'amount' => $child_amount)),
+                'request.submitted', 'fact:split:' . $child_id, array('split_of' => $req['request_no'], 'label' => $child_label));
+            finreq_notify($g, 'dept_accountant', 'فرعٌ جديد بانتظار ولادة حدثه: ' . $child_no . ' من ' . $req['request_no'], 'FinRequests/accountant_desk.php');
+        });
+        finreq_redirect('request_form.php?id=' . $id, '🌿 تفرّع ' . $child_no . ' («' . $child_label . '») — لدى محاسب الإدارة لولادة حدثه');
+    } catch (\Throwable $t) {
+        error_log('finreq split: ' . $t->getMessage());
+        finreq_redirect('request_form.php?id=' . $id, '❌ تعذّر التفريع: ' . $t->getMessage());
     }
 }
 
