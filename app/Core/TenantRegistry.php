@@ -216,6 +216,7 @@ class TenantRegistry
         'ems_event_dead_letter' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4
         'positions' => array('type' => self::T_TENANT, 'soft' => true), // K6/ADR-07: جسر المنصب — معزول بالشركة، جاهز للبوابة من يومه الأول
         'ems_state_transitions' => array('type' => self::T_RESTRICTED, 'soft' => false), // K7: سجل تدقيق المحرك — append-only عبر StateMachine حصرًا
+        'ems_business_events' => array('type' => self::T_RESTRICTED, 'soft' => false), // ADR-15: الجذر المحايد — append-only عبر EventPublisher حصرًا؛ الدفتر المالي إسقاطه
         'approval_requests' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_steps' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_workflow_rules' => array('type' => self::T_RESTRICTED, 'soft' => false),

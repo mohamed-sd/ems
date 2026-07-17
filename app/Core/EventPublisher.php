@@ -35,6 +35,16 @@
  *
  * event_type القديم يبقى بقيمة الجسر 'enterprise' (دلالة النوع الكاملة في
  * event_key/category) — فلا تراه فلاتر شاشات المالية القديمة (منع عدٍّ مزدوج).
+ *
+ * الجذر المحايد (ADR-15 · REV-04 §6.2) — خلف علم EMS_EVENT_ROOT:
+ *   off (افتراضًا)  = سلوك اليوم حرفيًا: الكتابة في الدفتر المالي وحده.
+ *   publish        = كتابة مزدوجة ذرّية بنفس معاملة المستدعي: الحقيقة أولًا في
+ *                    ems_business_events ثم إسقاطها المالي في fin_financial_events
+ *                    حاملًا root_event_id — فيقرأ أي مستهلكٍ مستقبلي الحقيقةَ من
+ *                    الجذر لا من غرفة المالية. مستهلك المالية ومؤشره لا يتحركان.
+ *   العطالة متسقة: مفتاح idempotency واحد للجذر وإسقاطه؛ إعادة نشر عمليةٍ
+ *   منشورة لا تُنشئ جذرًا ثانيًا، وتشفي إسقاطًا قديمًا بلا جذرٍ بربطه (self-heal).
+ *   NULL في root_event_id دلاليٌّ مقصود: صفٌّ يدويٌّ أو سابقٌ للجذر.
  */
 
 namespace App\Core;
@@ -63,6 +73,24 @@ class EventPublisher
         'project_id', 'contract_id', 'equipment_id',
         'supplier_entity_id', 'customer_entity_id', 'operator_employee_id',
     );
+
+    /** حالات الحقيقة (ADR-18): العكسي = نفس الأثر بكميةٍ سالبة. */
+    const ROOT_STATUSES = array('recorded', 'corrected', 'reversed');
+
+    /**
+     * تجاوزٌ اختباريٌّ لوضع الجذر: null = من البيئة (EMS_EVENT_ROOT)،
+     * 'off'/'publish' = فرضٌ صريح — للاختبارات الحتمية حصرًا.
+     */
+    public static $rootModeOverride = null;
+
+    /** وضع الجذر المحايد النافذ: off (سلوك اليوم) أو publish (كتابة مزدوجة). */
+    private static function rootMode()
+    {
+        if (self::$rootModeOverride !== null) {
+            return (string) self::$rootModeOverride;
+        }
+        return function_exists('ems_env') ? (string) ems_env('EMS_EVENT_ROOT', 'off') : 'off';
+    }
 
     /**
      * نشر حدثٍ مؤسسيٍّ واحد وفق عقد §9 على اتصال المستدعي (يشارك معاملته).
@@ -137,13 +165,40 @@ class EventPublisher
         $sourceRef = (isset($e['source_ref']) && $e['source_ref'] !== '') ? (string) $e['source_ref'] : null;
         $notes     = (isset($e['notes']) && $e['notes'] !== '') ? (string) $e['notes'] : null;
 
+        // ── 4ب) الجذر المحايد (ADR-15): الحقيقة تُدوَّن قبل إسقاطها المالي —
+        //        نفس الاتصال/المعاملة، فالذرّية ذرّية المستدعي نفسها. ──
+        $rootId = null;
+        if (self::rootMode() === 'publish') {
+            $rootId = self::writeRoot($conn, array(
+                'company_id'   => $companyId,
+                'event_key'    => (string) $e['event_key'],
+                'category'     => (string) $e['category'],
+                'source_module'=> (string) $e['source_module'],
+                'source_ref'   => $sourceRef,
+                'entity_type'  => (string) $e['entity_type'],
+                'entity_id'    => intval($e['entity_id']),
+                'quantity'     => $quantity,
+                'unit'         => $unit,
+                'amount'       => $amount,
+                'currency'     => $currency,
+                'refs'         => $refs,
+                'event_status' => (isset($e['event_status']) && in_array($e['event_status'], self::ROOT_STATUSES, true)) ? (string) $e['event_status'] : 'recorded',
+                'reverses_event_id' => (isset($e['reverses_event_id']) && is_numeric($e['reverses_event_id']) && intval($e['reverses_event_id']) > 0) ? intval($e['reverses_event_id']) : null,
+                'occurred_at'  => (string) $e['occurred_at'],
+                'payload'      => $payload,
+                'correlation_id' => $correlation,
+                'idempotency_key' => $idem,
+                'created_by'   => intval($e['created_by']),
+            ));
+        }
+
         // ── 5) الإدراج — أعمدة صريحة، prepared، على اتصال/معاملة المستدعي ──
         $sql = 'INSERT INTO `fin_financial_events`
             (company_id, event_no, event_type, event_key, category, source_module, source_ref,
              entity_type, entity_id, amount, quantity, unit, currency,
              project_id, contract_id, equipment_id, supplier_entity_id, customer_entity_id, operator_employee_id,
-             state, occurred_at, notes, correlation_id, idempotency_key, schema_version, payload, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+             state, occurred_at, notes, correlation_id, idempotency_key, schema_version, payload, created_by, root_event_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             throw new \RuntimeException('EventPublisher: prepare failed: ' . $conn->error);
@@ -157,14 +212,14 @@ class EventPublisher
         $category   = (string) $e['category'];
         $sourceModule = (string) $e['source_module'];
         $occurredAt = (string) $e['occurred_at'];
-        // الأنواع للـ27 وسيطًا: i + s×7 + i + d + s×3 + i×6 + s×5 + i + s + i
+        // الأنواع للـ28 وسيطًا: i + s×7 + i + d + s×3 + i×6 + s×5 + i + s + i + i(root)
         $stmt->bind_param(
-            'isssssssidsssiiiiiisssssisi',
+            'isssssssidsssiiiiiisssssisii',
             $companyId, $eventNo, $legacyType, $eventKey, $category, $sourceModule, $sourceRef,
             $entityType, $entityId, $amount, $quantity, $unit, $currency,
             $refs['project_id'], $refs['contract_id'], $refs['equipment_id'],
             $refs['supplier_entity_id'], $refs['customer_entity_id'], $refs['operator_employee_id'],
-            $state, $occurredAt, $notes, $correlation, $idem, $schemaVer, $payload, $createdBy
+            $state, $occurredAt, $notes, $correlation, $idem, $schemaVer, $payload, $createdBy, $rootId
         );
         if (!$stmt->execute()) {
             $errno = $stmt->errno;
@@ -172,16 +227,27 @@ class EventPublisher
             $stmt->close();
             if ($errno === 1062 && strpos($err, 'uq_ffe_idempotency') !== false) {
                 // عطالة الأثر على مستوى الدالة: العملية المنطقية منشورة مسبقًا.
-                $q = $conn->prepare('SELECT id, event_no, correlation_id FROM `fin_financial_events` WHERE idempotency_key = ? LIMIT 1');
+                $q = $conn->prepare('SELECT id, event_no, correlation_id, root_event_id FROM `fin_financial_events` WHERE idempotency_key = ? LIMIT 1');
                 $q->bind_param('s', $idem);
                 $q->execute();
                 $row = $q->get_result()->fetch_assoc();
                 $q->close();
+                // الشفاء الذاتي (ADR-15): إسقاطٌ قديمٌ نُشر والعلم مطفأ فبقي بلا
+                // جذر — إن توفّر الآن جذرُ نفس المفتاح نربطه بدل تركه يتيمًا.
+                if ($rootId !== null && $row && $row['root_event_id'] === null) {
+                    $h = $conn->prepare('UPDATE `fin_financial_events` SET root_event_id = ? WHERE id = ? AND root_event_id IS NULL');
+                    $hid = intval($row['id']);
+                    $h->bind_param('ii', $rootId, $hid);
+                    $h->execute();
+                    $h->close();
+                    $row['root_event_id'] = $rootId;
+                }
                 return array(
                     'id' => intval($row['id']),
                     'event_no' => (string) $row['event_no'],
                     'correlation_id' => (string) $row['correlation_id'],
                     'idempotency_key' => $idem,
+                    'root_event_id' => isset($row['root_event_id']) && $row['root_event_id'] !== null ? intval($row['root_event_id']) : null,
                     'duplicate' => true,
                 );
             }
@@ -193,7 +259,61 @@ class EventPublisher
             'event_no' => $eventNo,
             'correlation_id' => $correlation,
             'idempotency_key' => $idem,
+            'root_event_id' => $rootId,
             'duplicate' => false,
         );
+    }
+
+    /**
+     * كتابة الحقيقة في الجذر المحايد ems_business_events (ADR-15) — على اتصال
+     * المستدعي نفسه (يشارك معاملته). عطالة المصدر بنفس مفتاح الإسقاط: التصادم
+     * على uq_ebe_idempotency يعيد id الحقيقة القائمة بلا صفٍّ جديد.
+     * (رقم BE قد يُستهلك ويضيع عند التصادم — فجوة ترقيمٍ مقبولة، نمط nextNo.)
+     *
+     * @return int معرّف الحقيقة (الجديدة أو القائمة).
+     */
+    private static function writeRoot(\mysqli $conn, array $r)
+    {
+        $eventNo = ServerId::nextNo($conn, 'ems_business_events:BE:' . $r['company_id'], 'BE');
+        $uuid = ServerId::ulid();
+        $sql = 'INSERT INTO `ems_business_events`
+            (company_id, event_no, event_uuid, event_key, category, source_module, source_ref,
+             entity_type, entity_id, quantity, unit, amount, currency,
+             project_id, contract_id, equipment_id, supplier_entity_id, customer_entity_id, operator_employee_id,
+             event_status, reverses_event_id, occurred_at, payload, correlation_id, idempotency_key, schema_version, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new \RuntimeException('EventPublisher(root): prepare failed: ' . $conn->error);
+        }
+        $schemaVer = 1;
+        // الأنواع للـ27 وسيطًا: i + s×7 + i + s×2 + d + s + i×6 + s + i + s×4 + i×2
+        $stmt->bind_param(
+            'isssssssissdsiiiiiisissssii',
+            $r['company_id'], $eventNo, $uuid, $r['event_key'], $r['category'], $r['source_module'], $r['source_ref'],
+            $r['entity_type'], $r['entity_id'], $r['quantity'], $r['unit'], $r['amount'], $r['currency'],
+            $r['refs']['project_id'], $r['refs']['contract_id'], $r['refs']['equipment_id'],
+            $r['refs']['supplier_entity_id'], $r['refs']['customer_entity_id'], $r['refs']['operator_employee_id'],
+            $r['event_status'], $r['reverses_event_id'], $r['occurred_at'], $r['payload'],
+            $r['correlation_id'], $r['idempotency_key'], $schemaVer, $r['created_by']
+        );
+        if (!$stmt->execute()) {
+            $errno = $stmt->errno;
+            $err = $stmt->error;
+            $stmt->close();
+            if ($errno === 1062 && strpos($err, 'uq_ebe_idempotency') !== false) {
+                $q = $conn->prepare('SELECT id FROM `ems_business_events` WHERE idempotency_key = ? LIMIT 1');
+                $q->bind_param('s', $r['idempotency_key']);
+                $q->execute();
+                $row = $q->get_result()->fetch_assoc();
+                $q->close();
+                if ($row) {
+                    return intval($row['id']);
+                }
+            }
+            throw new \RuntimeException('EventPublisher(root): execute failed: ' . $err);
+        }
+        $stmt->close();
+        return intval($conn->insert_id);
     }
 }

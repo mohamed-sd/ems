@@ -29,6 +29,11 @@ $conn->set_charset('utf8mb4');
 
 $MARK = 'K3TEST_' . getmypid();
 $count0 = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]);
+$roots_count0 = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+
+// الأقسام 1-6 = عقد «وضع off مطابقٌ لسلوك اليوم» — حتميةٌ مهما كان علم البيئة.
+// القسم 7 يدير وضعه بنفسه ويعيد التجاوز null في الختام.
+EventPublisher::$rootModeOverride = 'off';
 
 /** حدث صالح كامل (جذر) — قابل للتعديل لكل اختبار. */
 function valid_event($MARK, $suffix = '1')
@@ -131,6 +136,63 @@ ok('سلسلة الأثر تُجمع بمعرّفٍ واحد (جذر+مشتق)',
 $root2 = EventPublisher::publish($conn, valid_event($MARK, '5'));
 ok('جذرٌ جديد بلا تمرير = correlation جديد', $root2['correlation_id'] !== $root['correlation_id']);
 
+echo "── 7) الجذر المحايد ADR-15: off مطابقٌ · publish كتابةٌ مزدوجةٌ ذرّية ──\n";
+require_once dirname(__DIR__) . '/app/Core/TenantRegistry.php';
+$regDef = \App\Core\TenantRegistry::get('ems_business_events');
+ok('السجل: ems_business_events قناة محرّكٍ (T_RESTRICTED) لا شاشات', $regDef !== null && $regDef['type'] === \App\Core\TenantRegistry::T_RESTRICTED);
+
+// أ) off: لا جذر ولا ربط — سلوك اليوم حرفيًا
+EventPublisher::$rootModeOverride = 'off';
+$rootsA = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+$rOff = EventPublisher::publish($conn, valid_event($MARK, '70'));
+$rowOff = $conn->query("SELECT root_event_id FROM fin_financial_events WHERE id = {$rOff['id']}")->fetch_assoc();
+ok('off: الإسقاط بلا root_event_id (سلوك اليوم حرفيًا)', $rOff['root_event_id'] === null && $rowOff['root_event_id'] === null);
+ok('off: صفر جذورٍ جديدة', intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]) === $rootsA);
+
+// ب) publish: الحقيقة أولًا ثم الإسقاط مربوطًا بها
+EventPublisher::$rootModeOverride = 'publish';
+$rOn = EventPublisher::publish($conn, valid_event($MARK, '71'));
+ok('publish: الناتج يحمل root_event_id', $rOn['duplicate'] === false && intval($rOn['root_event_id']) > 0);
+$fin = $conn->query("SELECT * FROM fin_financial_events WHERE id = {$rOn['id']}")->fetch_assoc();
+$rt  = $conn->query("SELECT * FROM ems_business_events WHERE id = " . intval($rOn['root_event_id']))->fetch_assoc();
+ok('الإسقاط المالي مربوطٌ بحقيقته', $rt && intval($fin['root_event_id']) === intval($rt['id']));
+ok('الحقيقة تحمل نفس العقد (مفتاح/شركة/كيان/عطالة/سلسلة)',
+    $rt['event_key'] === 'equipment.hour_logged' && intval($rt['company_id']) === 4
+    && $rt['entity_type'] === 'timesheet' && intval($rt['entity_id']) === 990071
+    && $rt['idempotency_key'] === $fin['idempotency_key']
+    && $rt['correlation_id'] === $fin['correlation_id']);
+$beNum = 0;
+if (preg_match('/^BE-(\d{4,})$/', $rt['event_no'], $mNo)) { $beNum = intval($mNo[1]); }
+ok('حقيقة recorded بترقيم BE يواصل بعد الردم (≥11) وevent_uuid ULID',
+    $rt['event_status'] === 'recorded' && $beNum >= 11
+    && preg_match('/^[0-9A-HJKMNP-TV-Z]{26}$/', $rt['event_uuid']) === 1);
+
+// ج) العطالة المزدوجة: إعادة نشر نفس العملية لا تُنشئ جذرًا ثانيًا
+$rootsB = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+$dup2 = EventPublisher::publish($conn, valid_event($MARK, '71'));
+ok('إعادة النشر: duplicate=true ونفس الجذر القائم', $dup2['duplicate'] === true && intval($dup2['root_event_id']) === intval($rOn['root_event_id']));
+ok('صفر جذرٍ مكرّر (العدّ ثابت)', intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]) === $rootsB);
+
+// د) الشفاء الذاتي: إسقاطُ off اليتيم يُربَط عند إعادة نشره تحت publish
+$heal = EventPublisher::publish($conn, valid_event($MARK, '70'));
+$rowHeal = $conn->query("SELECT root_event_id FROM fin_financial_events WHERE id = {$rOff['id']}")->fetch_assoc();
+ok('الشفاء الذاتي: المكرّر ربط الإسقاط اليتيم بجذرٍ وليد', $heal['duplicate'] === true && $rowHeal['root_event_id'] !== null && intval($heal['root_event_id']) === intval($rowHeal['root_event_id']));
+
+// هـ) الذرّية المزدوجة: rollback يمحو الحقيقة وإسقاطها معًا
+$finC  = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]);
+$rootsC = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+$conn->begin_transaction();
+$rTx2 = EventPublisher::publish($conn, valid_event($MARK, '72'));
+$conn->rollback();
+ok('rollback: لا حقيقة ولا إسقاط (ذرّية الكتابة المزدوجة)',
+    intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]) === $finC
+    && intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]) === $rootsC);
+
+// و) الردم الصادق قائم: كل صفوف الدفتر الأساس مربوطةٌ بجذرٍ legacy
+ok('الردم: صفر صفِّ أساسٍ بلا جذر (root_event_id IS NULL)',
+    intval($conn->query("SELECT COUNT(*) FROM fin_financial_events WHERE root_event_id IS NULL AND notes NOT LIKE 'K3TEST_%'")->fetch_row()[0]) === 0);
+EventPublisher::$rootModeOverride = null;
+
 } catch (\Throwable $t) {
     $FAIL++;
     echo "  ✘ استثناء غير متوقع: " . $t->getMessage() . "\n";
@@ -138,10 +200,16 @@ ok('جذرٌ جديد بلا تمرير = correlation جديد', $root2['correla
 
 // ── تنظيف كامل ──
 @$conn->rollback(); // تحصين: لو انقطع القسم 4 قبل rollback فلا تجري DELETEs داخل معاملةٍ ستتراجع
-$conn->query("DELETE FROM fin_financial_events WHERE notes LIKE 'K3TEST_%'"); // يشمل بقايا أي تشغيلٍ سابقٍ منقطع
+EventPublisher::$rootModeOverride = null;
+$conn->query("DELETE FROM fin_financial_events WHERE notes LIKE 'K3TEST_%'"); // يشمل بقايا أي تشغيلٍ سابقٍ منقطع (الإسقاط أولًا — FK)
+$conn->query("DELETE FROM ems_business_events WHERE payload LIKE '%K3TEST_%'"); // جذور الاختبار بعد إسقاطاتها
+// متتالية EV تُحذف (لا تصادم — الأساس FIN-EV-…)؛ متتالية BE تبقى مرتفعةً عمدًا
+// (حذفها يعيد الترقيم لـBE-0001 المحجوز للردم — فجوات الترقيم مقبولة).
 $conn->query("DELETE FROM ems_sequences WHERE scope = 'fin_financial_events:EV:4'");
 $final = intval($conn->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0]);
 ok('teardown: العدّ عاد لما قبل الاختبار', $final === $count0);
+$rootsFinal = intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]);
+ok('teardown: الجذور عادت لخط الأساس (الردم وحده)', $rootsFinal === $roots_count0);
 
 echo str_repeat('═', 50) . "\n";
 echo "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n";
