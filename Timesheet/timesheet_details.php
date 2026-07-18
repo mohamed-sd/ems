@@ -745,6 +745,36 @@ if ($result) foreach ($result as $row) {
                 </div>
             </div>
 
+            <?php
+            // D02 §2.6 — الكمية المفوترة: بطاقتا الطن والمتر أدناه مشروطتان بنوع
+            // المعدة (2 و3)، فكميةُ معدةٍ من نوعٍ آخر على عقدٍ يفوتر بالطن أو
+            // المتر تبقى غيرَ مرئية. تُعرض هنا متى وُجدت ولم تعرضها بطاقتُها.
+            $eqType = isset($row['type']) ? (string) $row['type'] : '';
+            $showTon   = (float) ($row['tons_count'] ?? 0) > 0 && $eqType !== '2';
+            $showMeter = (float) ($row['meters_count'] ?? 0) > 0 && $eqType !== '3';
+            if ($showTon || $showMeter): ?>
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <span class="detail-card-title">الكمية المفوترة (وحدة العقد)</span>
+                </div>
+                <div class="detail-card-body">
+                    <?php if ($showMeter): ?>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-ruler-horizontal"></i> الأمتار المنفذة</span>
+                        <span class="detail-value"><span class="chip-primary"><?php echo number_format((float) $row['meters_count'], 2); ?> متر</span></span>
+                    </div>
+                    <?php endif; ?>
+                    <?php if ($showTon): ?>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-weight-hanging"></i> الأطنان المنفذة</span>
+                        <span class="detail-value"><span class="chip-success"><?php echo number_format((float) $row['tons_count'], 2); ?> طن</span></span>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-ellipsis-h"></i></div>
@@ -755,6 +785,21 @@ if ($result) foreach ($result as $row) {
                         <span class="detail-label"><i class="fas fa-clock"></i> ساعات أخرى</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['other_fault_hours']); ?></span>
                     </div>
+                    <?php
+                    // D02 §3.5 — الحالات الثلاث لكلٍّ حكمٌ تعاقديٌّ مستقل. بلا عرضها
+                    // يظهر «مجموع التعطل» رقمًا لا تفسّره الخاناتُ المعروضة، فيبدو خللًا.
+                    foreach (array(
+                        'ts_supplier_stop_hours' => array('توقف على المورد', 'fa-truck'),
+                        'ts_planned_stop_hours'  => array('توقف مخطط', 'fa-calendar-check'),
+                        'ts_force_majeure_hours' => array('قوة قاهرة', 'fa-cloud-showers-heavy'),
+                    ) as $col => $meta) {
+                        if (!isset($row[$col])) { continue; }
+                        ?>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas <?php echo $meta[1]; ?>"></i> <?php echo $meta[0]; ?></span>
+                            <span class="detail-value mono"><?php echo htmlspecialchars($row[$col]); ?></span>
+                        </div>
+                    <?php } ?>
                     <div class="detail-row">
                         <span class="detail-label"><i class="fas fa-sigma"></i> مجموع التعطل</span>
                         <span class="detail-value"><span class="chip-total"><?php echo htmlspecialchars($row['total_fault_hours']); ?></span></span>
