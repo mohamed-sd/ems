@@ -332,11 +332,15 @@ class EffectFanout
         $stmt->close();
         if (!$t) { return null; }
 
-        // ── الكمية والوحدة من المسجَّل فعلًا (لا من افتراض «ساعات») ──
-        $unit = null; $qty = 0.0;
-        if ((float) $t['executed_hours'] > 0)      { $unit = 'hour';  $qty = (float) $t['executed_hours']; }
-        elseif ((float) $t['meters_count'] > 0)    { $unit = 'meter'; $qty = (float) $t['meters_count']; }
-        elseif ((float) $t['tons_count'] > 0)      { $unit = 'ton';   $qty = (float) $t['tons_count']; }
+        // ── الكميات المسجَّلة كلُّها (D02 §2.6): الواقعة تحمل ما سُجّل، ولكلِّ
+        //    طرفٍ أن يقرأ منها ما يوافق **وحدة عقده هو**. لا سلّمَ أولويةٍ يفرض
+        //    وحدةً واحدةً على الجميع — فالحالة الغالبة في البيانات (184 صفًّا)
+        //    أن العميل يفوتر بالمتر والمورد يُدفع بالساعة في الواقعة نفسها.
+        $recorded = array(
+            'hour'  => (float) $t['executed_hours'],
+            'ton'   => (float) $t['tons_count'],
+            'meter' => (float) $t['meters_count'],
+        );
 
         $ctx = array(
             'id' => $tsId,
@@ -344,41 +348,55 @@ class EffectFanout
             'work_date' => strval($t['work_date']),
             'period' => date('Y-m', strtotime($t['work_date'])),
             'source_ref' => 'TS-' . $tsId,
-            'unit' => $unit, 'qty' => round($qty, 2),
+            'recorded' => $recorded,
+            // ⚠️ unit/qty الموروثان = **حكم العميل** (فالإيراد هو ما يقيسه حارس
+            //    المراجعة في fin_financial_events.quantity). لا تستعملهما لطرفٍ
+            //    آخر: مستحق المورد وتكلفته يقرآن من $ctx['supplier'] حصرًا.
+            'unit' => null, 'qty' => 0.0,
             'operator_hours' => (float) $t['operator_hours'],
             'project_id' => !empty($t['project_id']) ? intval($t['project_id']) : null,
             'equipment_id' => $t['equipment_id'] !== null ? intval($t['equipment_id']) : null,
             'employee_id' => $t['employee_id'] !== null ? intval($t['employee_id']) : null,
             'supplier_id' => !empty($t['supplier_id']) ? intval($t['supplier_id']) : null,
+            // كل طرفٍ يحمل وحدتَه وكميتَه المستقلتين (unit/qty) — لا رقمَ مشتركًا
             'client' => array('ok' => false, 'reason' => '', 'price' => null, 'currency' => null,
+                              'unit' => null, 'qty' => 0.0,
                               'currency_label' => (string) $t['client_cur_label'], 'contract_id' => !empty($t['contract_id']) ? intval($t['contract_id']) : null,
                               'unit_label' => trim((string) $t['client_unit_label'])),
             'supplier' => array('ok' => false, 'reason' => '', 'price' => null, 'currency' => null,
+                                'unit' => null, 'qty' => 0.0,
                                 'currency_label' => '', 'contract_id' => null, 'unit_label' => '', 'resolved_by' => null),
         );
 
-        // ── جانب العميل: سعرٌ موجب + وحدة فوترةٍ تطابق المسجَّل + عملةٌ معروفة ──
+        // ── جانب العميل: وحدةُ عقده تختار العمود المقروء، ثم سعرٌ موجبٌ وعملةٌ معروفة ──
         $cl = &$ctx['client'];
+        $clUnit = isset(self::CONTRACT_UNIT[$cl['unit_label']]) ? self::CONTRACT_UNIT[$cl['unit_label']] : null;
         if ($t['op_id'] === null)                       { $cl['reason'] = 'لا تشغيلَ مربوطًا بصف الدوام'; }
         elseif ($cl['contract_id'] === null)            { $cl['reason'] = 'لا عقدَ عميلٍ على التشغيل'; }
         elseif ($t['client_price'] === null || (float) $t['client_price'] <= 0) { $cl['reason'] = 'لا سعر وحدةٍ لنوع المعدة في عقد العميل'; }
-        elseif ($unit === null)                         { $cl['reason'] = 'لا كميةَ مسجّلةً موجبة على الصف'; }
-        elseif (!isset(self::CONTRACT_UNIT[$cl['unit_label']]) ) { $cl['reason'] = 'وحدة فوترةٍ غير معروفة في عقد العميل: ' . $cl['unit_label']; }
-        elseif (self::CONTRACT_UNIT[$cl['unit_label']] !== $unit) {
-            $cl['reason'] = 'عقد العميل يفوتر بـ«' . ($cl['unit_label'] !== '' ? $cl['unit_label'] : 'ساعة') . '» والمسجَّل ' . $unit . ' — لا تسعير ملفَّق';
+        elseif ($clUnit === null)                       { $cl['reason'] = 'وحدة فوترةٍ غير معروفة في عقد العميل: ' . $cl['unit_label']; }
+        elseif (!isset($recorded[$clUnit]))             { $cl['reason'] = 'وحدة عقد العميل «' . $cl['unit_label'] . '» لا يسجّلها سجلّ الدوام بعد'; }
+        elseif ($recorded[$clUnit] <= 0) {
+            // ⚠️ الوحدة مطابقةٌ لكن خانتها فارغة: تعذّرٌ معلَنٌ لا اشتقاقٌ من عمودٍ آخر.
+            $cl['reason'] = 'عقد العميل يفوتر بـ«' . ($cl['unit_label'] !== '' ? $cl['unit_label'] : 'ساعة')
+                . '» ولا كميةَ مسجّلةً بهذه الوحدة على الصف — لا تسعير ملفَّق';
         }
         elseif (!isset(self::CONTRACT_CURRENCY[trim($cl['currency_label'])])) { $cl['reason'] = 'عملة عقد العميل غير معروفة: ' . $cl['currency_label']; }
         else {
             $cl['ok'] = true;
+            $cl['unit'] = $clUnit;
+            $cl['qty'] = round($recorded[$clUnit], 2);
             $cl['price'] = (float) $t['client_price'];
             $cl['currency'] = self::CONTRACT_CURRENCY[trim($cl['currency_label'])];
+            // الموروثان يتبعان حكم العميل (الإيراد) — انظر تعليق البناء أعلاه
+            $ctx['unit'] = $clUnit;
+            $ctx['qty'] = $cl['qty'];
         }
         unset($cl);
 
         // ── جانب المورد: سلّم الحسم — الساري بالتاريخ ← النشط الوحيد ← تعذّر ──
         $sp = &$ctx['supplier'];
         if ($ctx['supplier_id'] === null || $t['op_id'] === null) { $sp['reason'] = 'لا موردَ على معدة التشغيل'; }
-        elseif ($unit === null) { $sp['reason'] = 'لا كميةَ مسجّلةً موجبة على الصف'; }
         else {
             $sq = $conn->prepare(
                 "SELECT sc.id, sc.price_currency_contract AS cur_label, sce.equip_price, sce.equip_unit,
@@ -407,13 +425,19 @@ class EffectFanout
                 $sp['contract_id'] = intval($pick['id']);
                 $sp['unit_label'] = trim((string) $pick['equip_unit']);
                 $sp['currency_label'] = (string) $pick['cur_label'];
-                if (!isset(self::CONTRACT_UNIT[$sp['unit_label']])) { $sp['reason'] = 'وحدة فوترةٍ غير معروفة في عقد المورد: ' . $sp['unit_label']; }
-                elseif (self::CONTRACT_UNIT[$sp['unit_label']] !== $unit) {
-                    $sp['reason'] = 'عقد المورد يفوتر بـ«' . ($sp['unit_label'] !== '' ? $sp['unit_label'] : 'ساعة') . '» والمسجَّل ' . $unit . ' — لا تسعير ملفَّق';
+                // وحدةُ عقد المورد تختار عمودَه المقروء — **مستقلةً عن وحدة العميل**
+                $spUnit = isset(self::CONTRACT_UNIT[$sp['unit_label']]) ? self::CONTRACT_UNIT[$sp['unit_label']] : null;
+                if ($spUnit === null) { $sp['reason'] = 'وحدة فوترةٍ غير معروفة في عقد المورد: ' . $sp['unit_label']; }
+                elseif (!isset($recorded[$spUnit])) { $sp['reason'] = 'وحدة عقد المورد «' . $sp['unit_label'] . '» لا يسجّلها سجلّ الدوام بعد'; }
+                elseif ($recorded[$spUnit] <= 0) {
+                    $sp['reason'] = 'عقد المورد يفوتر بـ«' . ($sp['unit_label'] !== '' ? $sp['unit_label'] : 'ساعة')
+                        . '» ولا كميةَ مسجّلةً بهذه الوحدة على الصف — لا تسعير ملفَّق';
                 }
                 elseif (!isset(self::CONTRACT_CURRENCY[trim($sp['currency_label'])])) { $sp['reason'] = 'عملة عقد المورد غير معروفة: ' . $sp['currency_label']; }
                 else {
                     $sp['ok'] = true;
+                    $sp['unit'] = $spUnit;
+                    $sp['qty'] = round($recorded[$spUnit], 2);
                     $sp['price'] = (float) $pick['equip_price'];
                     $sp['currency'] = self::CONTRACT_CURRENCY[trim($sp['currency_label'])];
                 }
@@ -445,7 +469,9 @@ class EffectFanout
             $old = null;
             try { $old = $gate->selectOne('fin_financial_events', array('where' => array('id' => intval($revLink['target_id'])), 'includeDeleted' => true)); }
             catch (\Throwable $t) { /* قراءة حارسٍ فقط */ }
-            if ($old && round((float) $old['quantity'], 2) !== round((float) $ctx['qty'], 2)) {
+            // المقارنة بكمية **العميل** تحديدًا: حدث الإيراد هو ما خُزّنت فيه
+            // fin_financial_events.quantity، فلا يُقارن بكمية المورد ولا بالمسجَّل الخام.
+            if ($old && round((float) $old['quantity'], 2) !== round((float) $ctx['client']['qty'], 2)) {
                 $out['revision_pending'] = true;
                 $out['skipped'][] = array('effect' => 'revenue_event', 'label' => 'مراجعة كمية',
                     'reason' => 'الكمية تغيّرت بعد توليد المروحة (' . $old['quantity'] . ' ← ' . $ctx['qty'] . ') — التصحيح لمحرّك العكسيات لا للتوليد');
@@ -473,7 +499,7 @@ class EffectFanout
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'], 'reason' => $ctx['client']['reason']);
                         break;
                     }
-                    $amount = round($ctx['qty'] * $ctx['client']['price'], 2);
+                    $amount = round($ctx['client']['qty'] * $ctx['client']['price'], 2);
                     $res = EventPublisher::publish($conn, array(
                         'event_key' => 'revenue.unit.recognized',
                         'category' => 'financial',
@@ -487,7 +513,7 @@ class EffectFanout
                         'legacy_event_type' => 'revenue',
                         'amount' => $amount,
                         'currency' => $ctx['client']['currency'],
-                        'quantity' => $ctx['qty'], 'unit' => $ctx['unit'],
+                        'quantity' => $ctx['client']['qty'], 'unit' => $ctx['client']['unit'],
                         'source_ref' => $ctx['source_ref'],
                         'project_id' => $ctx['project_id'], 'equipment_id' => $ctx['equipment_id'],
                         'supplier_entity_id' => $ctx['supplier_id'],
@@ -495,7 +521,7 @@ class EffectFanout
                         'notes' => 'مروحة أثر يوم الدوام ' . $ctx['source_ref'],
                         'payload' => array( // لقطة التسعير لحظة التوليد — لا يتغيّر أثرٌ بتغيّر عقدٍ لاحق
                             'source' => 'timesheet', 'work_date' => $ctx['work_date'],
-                            'qty' => $ctx['qty'], 'unit' => $ctx['unit'],
+                            'qty' => $ctx['client']['qty'], 'unit' => $ctx['client']['unit'],
                             'client_contract_id' => $ctx['client']['contract_id'],
                             'unit_price' => $ctx['client']['price'],
                             'currency' => $ctx['client']['currency'], 'currency_label' => $ctx['client']['currency_label'],
@@ -511,10 +537,11 @@ class EffectFanout
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'], 'reason' => $ctx['supplier']['reason']);
                         break;
                     }
-                    $amount = round($ctx['qty'] * $ctx['supplier']['price'], 2);
+                    // ⚠️ بوحدة عقد المورد وكميتها — لا بكمية العميل (قد تختلفان)
+                    $amount = round($ctx['supplier']['qty'] * $ctx['supplier']['price'], 2);
                     $dueId = intval($gate->insert('fin_dues', array(
                         'party_type' => 'supplier', 'party_ref' => $ctx['supplier_id'],
-                        'due_type' => self::WORK_MODEL_DUE[$ctx['unit']], 'direction' => 'credit',
+                        'due_type' => self::WORK_MODEL_DUE[$ctx['supplier']['unit']], 'direction' => 'credit',
                         'amount' => $amount, 'currency' => $ctx['supplier']['currency'],
                         'period_ref' => $ctx['period'],
                         'event_id' => $revId,
@@ -530,14 +557,18 @@ class EffectFanout
                             'reason' => 'لا سعر تكلفةٍ: ' . $ctx['supplier']['reason']);
                         break;
                     }
-                    $totalCost = round($ctx['qty'] * $ctx['supplier']['price'], 2);
-                    // الإيراد داخل سجلّ التكلفة (للربحية) بشرط اتحاد العملة — لا جمع عملتين
-                    $revenue = ($ctx['client']['ok'] && $ctx['client']['currency'] === $ctx['supplier']['currency'])
-                        ? round($ctx['qty'] * $ctx['client']['price'], 2) : null;
+                    $totalCost = round($ctx['supplier']['qty'] * $ctx['supplier']['price'], 2);
+                    // الإيراد داخل سجلّ التكلفة (للربحية) بشرطين: اتحاد العملة **واتحاد
+                    // الوحدة**. فربحٌ يطرح تكلفةَ ساعاتٍ من إيراد أمتارٍ رقمٌ بلا معنى —
+                    // ويُحجب الإيراد حينئذٍ بدل أن يُعرض ربحٌ ملفَّق (قاعدة عدم التلفيق).
+                    $sameBasis = $ctx['client']['ok']
+                        && $ctx['client']['currency'] === $ctx['supplier']['currency']
+                        && $ctx['client']['unit'] === $ctx['supplier']['unit'];
+                    $revenue = $sameBasis ? round($ctx['client']['qty'] * $ctx['client']['price'], 2) : null;
                     $costId = intval($gate->insert('fin_cost_records', array(
                         'cost_type' => $ctx['equipment_id'] ? 'equipment' : 'project',
                         'equipment_id' => $ctx['equipment_id'], 'project_id' => $ctx['project_id'],
-                        'period_ref' => $ctx['period'], 'qty' => $ctx['qty'], 'unit' => $ctx['unit'],
+                        'period_ref' => $ctx['period'], 'qty' => $ctx['supplier']['qty'], 'unit' => $ctx['supplier']['unit'],
                         'unit_cost' => $ctx['supplier']['price'], 'total_cost' => $totalCost,
                         'currency' => $ctx['supplier']['currency'],
                         'revenue' => $revenue,

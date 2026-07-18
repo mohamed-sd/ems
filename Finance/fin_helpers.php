@@ -1002,8 +1002,12 @@ if (!function_exists('fin_conversion_queue')) {
                   LEFT JOIN equipments e ON e.id = t_op.equipment
                  WHERE {TENANT_SCOPE}
                    AND COALESCE(t.status, 1) = 1
+                   -- ⚠️ التصفية بنوع الأثر إلزامية: «محوَّلٌ ماليًّا» لا «له رابطٌ ما».
+                   -- حكم الطرف (party_award) قرارٌ تعاقديٌّ قبل المالية — وجودُه لا
+                   -- يعني التحويل، فلا يُخرج الصفَّ من طابور التحويل (D02 §3.7).
                    AND NOT EXISTS (SELECT 1 FROM fin_event_links l
-                                    WHERE l.parent_kind = 'timesheet' AND l.parent_ref = t.id)
+                                    WHERE l.parent_kind = 'timesheet' AND l.parent_ref = t.id
+                                      AND l.effect_type IN ('revenue_event','supplier_due','cost_record'))
                        " . $extra . "
                  ORDER BY t.`date` ASC, t.id ASC
                  LIMIT " . $limit;
@@ -1052,8 +1056,10 @@ if (!function_exists('fin_queue_pricing')) {
                                   'qty' => null, 'unit' => null, 'revenue' => null, 'due' => null);
                 continue;
             }
-            $revenue = $ctx['client']['ok'] ? round($ctx['qty'] * $ctx['client']['price'], 2) : null;
-            $due     = $ctx['supplier']['ok'] ? round($ctx['qty'] * $ctx['supplier']['price'], 2) : null;
+            // ⚠️ كلُّ طرفٍ بكميته ووحدته (D02 §2.6): المعاينة تُحسب كما يُحسب التوليد
+            // تمامًا — وإلا رأى المدير المالي رقمًا غير الذي سيقع.
+            $revenue = $ctx['client']['ok']   ? round($ctx['client']['qty']   * $ctx['client']['price'], 2)   : null;
+            $due     = $ctx['supplier']['ok'] ? round($ctx['supplier']['qty'] * $ctx['supplier']['price'], 2) : null;
             // جاهزٌ للتحويل = أثرٌ واحدٌ حقيقيٌّ على الأقل (لا تحويلَ لصفٍّ كلُّه متعذّر)
             $ready = ($revenue !== null || $due !== null);
             $reasons = array();
@@ -1062,9 +1068,11 @@ if (!function_exists('fin_queue_pricing')) {
             $out[$id] = array(
                 'ready' => $ready,
                 'reason' => implode(' · ', $reasons),
-                'qty' => $ctx['qty'], 'unit' => $ctx['unit'],
+                'qty' => $ctx['client']['qty'], 'unit' => $ctx['client']['unit'],
                 'revenue' => $revenue, 'revenue_cur' => $ctx['client']['currency'],
                 'due' => $due, 'due_cur' => $ctx['supplier']['currency'],
+                // كمية المورد ووحدته منفصلتان — قد تخالفان العميل في الواقعة نفسها
+                'sup_qty' => $ctx['supplier']['qty'], 'sup_unit' => $ctx['supplier']['unit'],
             );
         }
         return $out;

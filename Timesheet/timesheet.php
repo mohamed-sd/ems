@@ -621,6 +621,33 @@ try {
               </div>
             </div>
 
+            <!-- ══ الكمية المفوترة — تظهر بوحدة عقد هذا التشغيل (D02 §2.6) ══
+                 الساعات تُسجَّل دائمًا للتشغيل والصيانة والمشغّل؛ أما ما يُفوتر
+                 فتحدّده وحدةُ العقد لا نوعُ المعدة. فمعدةٌ من النوع 1 على عقدٍ
+                 يفوتر بالمتر كانت بلا خانةٍ تسجّل فيها أمتارها — فلا تُسعَّر. -->
+            <!-- ⚠️ display:none !important إلزامي: ems-forms.css يفرض
+                 `.form-grid > div { display:block !important }`، فتخسر أمامه
+                 القيمةُ السطرية العادية وكذلك jQuery .hide()/.show(). ولهذا
+                 يبدّل الجافاسكربت العرضَ بـsetProperty(...,'important'). -->
+            <div id="billing_qty_block" style="grid-column:1/-1; display:none !important; margin:16px 0 8px;
+                 border:2px solid #d4a017; border-radius:10px; padding:14px 16px; background:#fffdf5;">
+              <h3 style="text-align:right; color:#8a6d00; margin:0 0 10px; font-weight:700; font-size:1rem;">
+                <i class="fas fa-file-invoice-dollar"></i> الكمية المفوترة —
+                <span id="billing_unit_label" style="color:#b8860b;"></span>
+              </h3>
+              <div id="billing_qty_fields" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+                <div id="billing_field_meter" style="display:none;">
+                  <label>عدد الأمتار المنفذة <span style="color:#c00;">*</span></label>
+                  <input type="number" step="0.01" min="0" name="meters_count" id="billing_meters_count" value="0">
+                </div>
+                <div id="billing_field_ton" style="display:none;">
+                  <label>عدد الأطنان المنفذة <span style="color:#c00;">*</span></label>
+                  <input type="number" step="0.01" min="0" name="tons_count" id="billing_tons_count" value="0">
+                </div>
+              </div>
+              <p id="billing_hint" style="margin:10px 0 0; font-size:.86rem; color:#8a6d00;"></p>
+            </div>
+
             <h3
               style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
               ساعات العمل </h3>
@@ -1981,7 +2008,34 @@ try {
       $("#shift_hours").val("0");
     }
 
+    applyBillingUnit(response && response.billing ? response.billing : null);
     calculateCustomHours();
+  }
+
+  // ══ الكمية المفوترة: وحدةُ العقد تقرّر أي خانةٍ تُعرض (D02 §2.6) ══════════
+  // القاعدة: الساعات تُسجَّل دائمًا (تشغيلٌ وصيانةٌ وأجرُ مشغّل)؛ ووحدةُ العقد
+  // تحدّد ما يصير مالًا. فإن كان العقد يفوتر بالمتر أو الطن ولم تعرضهما شاشةُ
+  // نوع المعدة، أظهرناهما هنا صراحةً — وإلا بقي الصفُّ بلا كميةٍ مفوترة فلا يُسعَّر.
+  function applyBillingUnit(billing) {
+    var block = document.getElementById("billing_qty_block");
+    if (!block) { return; }                    // الأنواع التي تعرض خاناتها أصلًا
+    // ⚠️ لا تستعمل jQuery .show()/.hide() هنا: ems-forms.css يفرض
+    //    `.form-grid > div { display:block !important }` فيغلب القيمةَ السطرية
+    //    العادية. الأولويةُ السطرية وحدها تغلبه.
+    var setDisp = function (v) { block.style.setProperty("display", v, "important"); };
+
+    if (!billing || !billing.unit || (billing.unit !== "meter" && billing.unit !== "ton")) {
+      // عقدٌ بالساعة (أو مجهول): خانة الساعات المعروضة أصلًا هي وحدة الفوترة
+      setDisp("none");
+      return;
+    }
+    $("#billing_field_meter, #billing_field_ton").hide();
+    $("#billing_unit_label").text(billing.label || "");
+    $("#billing_field_" + billing.unit).show();
+    $("#billing_hint").text(
+      "عقد هذا التشغيل يفوتر بـ«" + (billing.label || "") + "» — سجّل الكمية المنفذة بهذه الوحدة. "
+      + "الساعات تبقى مطلوبةً للتشغيل والصيانة، لكنها ليست وحدة الفوترة هنا.");
+    setDisp("block");
   }
 
   $(document).ready(function () {
@@ -2146,11 +2200,11 @@ try {
       $("#extra_operator_hours").val(data.extra_operator_hours);
       $("#operator_standby_hours").val(data.operator_standby_hours);
       $("#operator_notes").val(data.operator_notes);
-      $("#tons_count").val(data.tons_count || 0);
+      $("#tons_count, #billing_tons_count").val(data.tons_count || 0);
       $("#trips_count").val(data.trips_count || 0);
       $("#transport_type").val(data.transport_type || '');
       $("#meters_type").val(data.meters_type || '');
-      $("#meters_count").val(data.meters_count || 0);
+      $("#meters_count, #billing_meters_count").val(data.meters_count || 0);
       $("#drilling_holes_count").val(data.drilling_holes_count || 0);
       $("#drilling_depth").val(data.drilling_depth || 0);
 

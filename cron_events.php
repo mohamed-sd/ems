@@ -193,6 +193,10 @@ if ($fanReconciled > 0) {
 // ⚠️ البوابة نافذة (D02 §5) ⇒ المصالِح لا يحوّل نيابةً عن المالية أبدًا.
 // «لا يجوز لأي مهمةٍ مجدولةٍ أن تُنشئ استحقاقًا من وحدةٍ لم تُعتمد ماليًّا» —
 // فالكنس يشفي أعطال الخطّاف في وضع off وحده؛ وفي وضع on يظلّ الطابور بيد المالية.
+// ⚠️ التصفية بنوع الأثر إلزامية (D02 §3.7): الشرط يسأل «هل تحوّل هذا الصف
+// ماليًّا؟» لا «هل كُتب له رابطٌ ما؟». فمنذ دخول الأحكام (unit_party_awards)
+// صار الصفُّ قد يحمل رابط party_award — وهو حكمٌ تعاقديٌّ **قبل** المالية لا
+// تحويلٌ مالي. وبلا هذه التصفية يعدّه المصالِح محوَّلًا فيتخطاه إلى الأبد.
 $tsGateOn = strtolower((string) ems_env('EMS_UNIT_CONVERT_GATE', 'off')) === 'on';
 $tsPendingByCompany = array();
 $tq = $tsGateOn ? false : $conn->query(
@@ -206,7 +210,8 @@ $tq = $tsGateOn ? false : $conn->query(
               WHERE fe.idempotency_key = CONCAT('equipment.hour_logged:timesheet:', ta.timesheet_id, ':a', ta.id))
         AND NOT EXISTS (
               SELECT 1 FROM fin_event_links l
-              WHERE l.parent_kind = 'timesheet' AND l.parent_ref = ta.timesheet_id)
+              WHERE l.parent_kind = 'timesheet' AND l.parent_ref = ta.timesheet_id
+                    AND l.effect_type IN ('revenue_event','supplier_due','cost_record'))
       LIMIT 500"
 );
 if ($tq) {

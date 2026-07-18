@@ -38,10 +38,40 @@ $gch_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet contract
 $op = null;
 try {
     $op = $gch_gate->selectOne('operations', array(
-        'columns' => array('shift_hours', 'shift_type'),
+        'columns' => array('shift_hours', 'shift_type', 'contract_id', 'equipment_type'),
         'where'   => array('id' => $operation_id),
     ));
 } catch (\Throwable $t) { error_log('get_contract_hours: ' . $t->getMessage()); }
+
+// ── وحدة الفوترة من عقد العميل (D02 §2.6) ──────────────────────────────────
+// الشاشة تسأل ما يسأله المحرّك بالضبط: سطرُ معدة العقد بمفتاح (العقد + نوع
+// المعدة)، وMIN(id) عند التعدد — حتميةً واحدة. ولو اختلف مصدرُ الشاشة عن مصدر
+// المحرّك لظهر للمستخدم حقلٌ لا يقرؤه التسعير، وهي أسوأ من غياب الحقل.
+$billing = array('unit' => null, 'label' => '', 'field' => null, 'known' => false);
+if ($op && !empty($op['contract_id'])) {
+    try {
+        require_once __DIR__ . '/../app/Services/EffectFanout.php';
+        $ceRows = $gch_gate->scopedQuery(
+            array('scope' => array('ce' => 'contractequipments')),
+            "SELECT ce.equip_unit FROM contractequipments ce
+              WHERE {TENANT_SCOPE} AND ce.contract_id = ? AND ce.equip_type = ?
+              ORDER BY ce.id ASC LIMIT 1",
+            array(intval($op['contract_id']), strval($op['equipment_type']))
+        );
+        if ($ceRows) {
+            $lbl = trim((string) $ceRows[0]['equip_unit']);
+            $map = \App\Services\EffectFanout::CONTRACT_UNIT;
+            $billing['label'] = ($lbl !== '' ? $lbl : 'ساعة');
+            if (isset($map[$lbl])) {
+                $billing['unit']  = $map[$lbl];
+                $billing['known'] = true;
+                // العمود الذي يقرؤه المحرّك لهذه الوحدة — مصدرٌ واحدٌ للاسمين
+                $cols = array('hour' => 'executed_hours', 'ton' => 'tons_count', 'meter' => 'meters_count');
+                $billing['field'] = isset($cols[$billing['unit']]) ? $cols[$billing['unit']] : null;
+            }
+        }
+    } catch (\Throwable $t) { error_log('get_contract_hours billing: ' . $t->getMessage()); }
+}
 
 while (ob_get_level()) {
     ob_end_clean();
@@ -74,7 +104,8 @@ echo json_encode([
     'success' => true,
     'shift_hours' => $shift_hours,
     'shift_type' => $shift_type,
-    'allowed_shifts' => $allowed_shifts
+    'allowed_shifts' => $allowed_shifts,
+    'billing' => $billing
 ]);
 exit;
 ?>
