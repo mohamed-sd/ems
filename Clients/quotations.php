@@ -308,6 +308,7 @@ $stat_total = 0;
 $stat_offered = 0;
 $stat_accepted = 0;
 $stat_amount = 0.0;
+$stat_by_cur = array(); // [ح-9] تجميعٌ لكل عملةٍ على حدة — لا جمعَ USD فوق SDG
 
 try {
     $quo_list = $quo_gate->scopedQuery(array(
@@ -331,6 +332,8 @@ foreach ($quo_list as $row) {
     if ($row['state'] === 'مقدم') $stat_offered++;
     if ($row['state'] === 'مقبول') $stat_accepted++;
     $stat_amount += (float) $row['amount_total'];
+    $row_cur = (isset($row['currency']) && $row['currency'] !== '') ? $row['currency'] : '—';
+    $stat_by_cur[$row_cur] = (isset($stat_by_cur[$row_cur]) ? $stat_by_cur[$row_cur] : 0.0) + (float) $row['amount_total'];
 }
 
 $page_title = "العروض";
@@ -400,8 +403,19 @@ function quo_state_tone($state)
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-coins"></i></div>
-                <div class="stats-value"><?php echo quo_money($stat_amount); ?></div>
-                <div class="stats-title">إجمالي القيمة</div>
+                <div class="stats-value"><?php
+                    // [ح-9] قيمةٌ لكل عملةٍ على حدة بدل جمعٍ أعمى يخلط USD فوق SDG
+                    if (empty($stat_by_cur)) {
+                        echo '0';
+                    } else {
+                        $cur_parts = array();
+                        foreach ($stat_by_cur as $cur => $amt) {
+                            $cur_parts[] = quo_money($amt) . ' ' . quo_e($cur);
+                        }
+                        echo implode('<br>', $cur_parts);
+                    }
+                ?></div>
+                <div class="stats-title">إجمالي القيمة (لكل عملة)</div>
             </div>
         </div>
     </div>

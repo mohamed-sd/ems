@@ -43,6 +43,19 @@ if (!function_exists('opp_money')) {
     }
 }
 
+if (!function_exists('opp_money_by_cur')) {
+    // [ح-9] عرض المبالغ لكل عملةٍ على حدة (لا جمعَ USD فوق SDG)
+    function opp_money_by_cur($by_cur)
+    {
+        if (empty($by_cur)) { return '0'; }
+        $parts = array();
+        foreach ($by_cur as $cur => $amt) {
+            $parts[] = opp_money($amt) . ' ' . opp_e($cur);
+        }
+        return implode('<br>', $parts);
+    }
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // التحقق من معرف الشركة (عزل الشركات)
 // ══════════════════════════════════════════════════════════════════════════════
@@ -311,6 +324,8 @@ $stat_qualified_plus = 0;
 $pipeline_value = 0.0;    // قيمة المسار (المفتوحة)
 $negotiation_value = 0.0; // قيمة تحت التفاوض
 $won_value = 0.0;
+$pipeline_by_cur = array();    // [ح-9] تجميعٌ لكل عملةٍ على حدة — لا جمعَ USD فوق SDG
+$negotiation_by_cur = array(); // [ح-9] تجميعٌ لكل عملة
 
 // ترطيبٌ ثنائي الخطوة عبر البوابة بدل JOIN (قرار خطة K9 §4): أسماء العملاء من
 // $clients_map المبنية أعلاه (صفر استعلام إضافي)، وأسماء المنشئين بجلبٍ واحد.
@@ -345,15 +360,18 @@ if ($opp_rows) {
         $stat_total++;
         $stg = trim($row['stage']);
         $rev = (float) $row['expected_revenue'];
+        $opp_cur = (isset($row['currency']) && $row['currency'] !== '') ? $row['currency'] : '—';
         if (in_array($stg, $OPP_OPEN_STAGES, true)) {
             $stat_open++;
             $pipeline_value += $rev;
+            $pipeline_by_cur[$opp_cur] = (isset($pipeline_by_cur[$opp_cur]) ? $pipeline_by_cur[$opp_cur] : 0.0) + $rev;
         }
         if (in_array($stg, array('مؤهلة', 'عرض مقدم', 'تفاوض'), true)) {
             $stat_qualified_plus++;
         }
         if ($stg === 'تفاوض') {
             $negotiation_value += $rev;
+            $negotiation_by_cur[$opp_cur] = (isset($negotiation_by_cur[$opp_cur]) ? $negotiation_by_cur[$opp_cur] : 0.0) + $rev;
         }
         if ($stg === 'فوز') {
             $stat_won++;
@@ -428,13 +446,13 @@ function opp_stage_tone($stage)
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-sack-dollar"></i></div>
-                <div class="stats-value"><?php echo opp_money($pipeline_value); ?></div>
-                <div class="stats-title">قيمة المسار</div>
+                <div class="stats-value"><?php echo opp_money_by_cur($pipeline_by_cur); ?></div>
+                <div class="stats-title">قيمة المسار (لكل عملة)</div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-handshake"></i></div>
-                <div class="stats-value"><?php echo opp_money($negotiation_value); ?></div>
-                <div class="stats-title">تحت التفاوض</div>
+                <div class="stats-value"><?php echo opp_money_by_cur($negotiation_by_cur); ?></div>
+                <div class="stats-title">تحت التفاوض (لكل عملة)</div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-star"></i></div>
