@@ -349,6 +349,7 @@ try {
         ORDER BY a.id DESC");
 } catch (\Throwable $t) {
     $act_list = array();
+    error_log('activities.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($act_list as $row) {
     // اسم السجل المرتبط (نفس منطق الأصل: غياب السجل = نص فارغ)

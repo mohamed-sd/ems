@@ -313,6 +313,7 @@ try {
         ORDER BY e.id DESC");
 } catch (\Throwable $t) {
     $evt_list = array();
+    error_log('contract_events.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($evt_list as $row) {
     $rows[] = $row;

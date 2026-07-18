@@ -296,6 +296,7 @@ try {
         ORDER BY p.id DESC");
 } catch (\Throwable $t) {
     $prod_list = array();
+    error_log('products.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($prod_list as $row) {
     $rows[] = $row;

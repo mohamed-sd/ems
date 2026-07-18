@@ -353,6 +353,7 @@ try {
         ORDER BY a.id DESC");
 } catch (\Throwable $t) {
     $amd_list = array();
+    error_log('contract_amendments.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($amd_list as $row) {
         $rows[] = $row;

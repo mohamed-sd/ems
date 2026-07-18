@@ -322,6 +322,8 @@ try {
         ORDER BY q.id DESC");
 } catch (\Throwable $t) {
     $quo_list = array();
+    $quo_load_error = true; // [م-5] فشل الجلب يُميَّز عن «لا بيانات»
+    error_log('quotations.php list load: ' . $t->getMessage());
 }
 foreach ($quo_list as $row) {
     $rows[] = $row;
@@ -510,6 +512,11 @@ function quo_state_tone($state)
 
     <div class="card">
         <div class="card-body">
+            <?php if (!empty($quo_load_error)): ?>
+                <div class="alert alert-danger" style="margin-bottom:12px;">
+                    ⚠ تعذّر تحميل عروض الأسعار — قد يكون هناك خللٌ مؤقت. يرجى إعادة تحميل الصفحة.
+                </div>
+            <?php endif; ?>
             <div class="table-container">
                 <table id="quoTable" class="display quo-table-nowrap no-datatable">
                     <thead>

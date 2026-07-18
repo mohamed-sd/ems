@@ -300,6 +300,7 @@ try {
         ORDER BY p.id DESC");
 } catch (\Throwable $t) {
     $pl_list = array();
+    error_log('pricelists.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($pl_list as $row) {
     $rows[] = $row;

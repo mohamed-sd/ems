@@ -261,6 +261,7 @@ try {
         ORDER BY u2.id DESC");
 } catch (\Throwable $t) {
     $uom_list = array();
+    error_log('units_of_measure.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($uom_list as $row) {
     $rows[] = $row;

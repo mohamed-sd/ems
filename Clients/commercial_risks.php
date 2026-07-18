@@ -351,6 +351,7 @@ try {
         ORDER BY r.id DESC");
 } catch (\Throwable $t) {
     $risk_list = array();
+    error_log('commercial_risks.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($risk_list as $row) {
     // اسم السجل المرتبط (نفس منطق الأصل: غياب السجل = نص فارغ)

@@ -326,6 +326,7 @@ try {
         ORDER BY t.id DESC");
 } catch (\Throwable $t) {
     $tnd_list = array();
+    error_log('tenders.php list load: ' . $t->getMessage()); // [م-5]
 }
 foreach ($tnd_list as $row) {
     $rows[] = $row;

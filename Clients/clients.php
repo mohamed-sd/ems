@@ -539,6 +539,8 @@ try {
         ORDER BY cc.id DESC");
 } catch (\Throwable $t) {
     $clients_list = array();
+    $clients_load_error = true; // [م-5] فشل الجلب يُميَّز عن «لا بيانات»
+    error_log('clients.php list load: ' . $t->getMessage());
 }
 
 foreach ($clients_list as $row) {
@@ -836,6 +838,11 @@ include('../insidebar.php');
 
     <div class="card">
         <div class="card-body">
+            <?php if (!empty($clients_load_error)): ?>
+                <div class="alert alert-danger clients-table-empty-error" style="margin-bottom:12px;">
+                    ⚠ تعذّر تحميل بيانات العملاء — قد يكون هناك خللٌ مؤقت. يرجى إعادة تحميل الصفحة.
+                </div>
+            <?php endif; ?>
             <div class="table-container">
                 <table id="clientsTable" class="display clients-table-nowrap no-datatable">
                     <thead>
