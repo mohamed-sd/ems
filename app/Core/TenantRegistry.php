@@ -106,6 +106,15 @@ class TenantRegistry
         'unit_party_awards' => array('type' => self::T_TENANT, 'soft' => true),
         // D02 §3.8: سياسة استحقاق عقد الساعة — قواعدُ بياناتٍ لا كود (نمط fin_effect_map)
         'contract_hour_policies' => array('type' => self::T_TENANT, 'soft' => true),
+        // ── D02 §15 المرحلة ١: مصدر الحقيقة — الجداول الثلاثة (2026-07-18) ──
+        // soft=false في الثلاثة بالتصميم (نمط fin_requests لا نمط fin_payments):
+        // الحالات الثلاث عشرة تملك دورة الحياة، و«الوحدة المرفوضة لا تُحذف؛ حالةٌ
+        // بسببها في السجل» (§4.3) — فلا حذفَ ناعمًا يُعبَّر عنه بعمود.
+        'unit_entries' => array('type' => self::T_TENANT, 'soft' => false),
+        // سجلّ الزمن التشغيلي — إلحاقيٌّ (§3.3): سطرٌ لكل فترةٍ بحالتها ومسؤولها
+        'unit_time_log' => array('type' => self::T_TENANT, 'soft' => false),
+        // سلسلة الاعتماد — إلحاقيٌّ (§4.2): «فيُقرأ تاريخُ السلسلة كاملًا»
+        'unit_approvals' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),
