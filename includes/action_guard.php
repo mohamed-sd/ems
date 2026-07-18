@@ -92,6 +92,13 @@ if (!function_exists('ems_action_guard_registry')) {
             // ── الدردشة: متاحة لأي مستخدمٍ مصادَق بقرارٍ واعٍ (رسائل داخلية عامة) ──
             'chats/get_messages.php'     => array('modules' => array(), 'action' => 'public'),
             'chats/get_unread_count.php' => array('modules' => array(), 'action' => 'public'),
+
+            // ── البلاغات: عدّاد شارة الشريط العلوي المشترك ──
+            // «عمومي-بوعي» بنفس حجّة عدّاد المراسلات: الشارة يستطلعها كلُّ
+            // صفحةٍ ولكل الأدوار، وهي نقطةٌ حميدة تعيد رقمًا فقط — معزولةً
+            // بشركة الجلسة **وبنطاق رؤية المستخدم** داخلها، فلا تكشف وجود ما
+            // لا يراه على الشاشة أصلًا.
+            'tickets/get_tickets_count.php' => array('modules' => array(), 'action' => 'public'),
         );
     }
 

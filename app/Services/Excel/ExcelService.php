@@ -148,6 +148,26 @@ class ExcelService
         if ($def->softDeleteColumn && $this->columnExists($def->table, $def->softDeleteColumn)) {
             $sql .= " AND `{$def->softDeleteColumn}` = 0";
         }
+
+        // نطاقُ رؤيةٍ داخل الشركة (اختياري لكل كيان): يمنع أن يتجاوز التصديرُ
+        // ما تحجبه الشاشة نفسها — مثل نطاق البلاغات (D3).
+        if (is_callable($def->exportRowScope)) {
+            $extra = call_user_func($def->exportRowScope, [
+                'conn'         => $this->conn,
+                'companyId'    => $this->companyId,
+                'userId'       => $this->userId,
+                'role'         => isset($_SESSION['user']['role']) ? (string) $_SESSION['user']['role'] : '',
+                'isSuperAdmin' => $this->isSuperAdmin,
+            ]);
+            if (is_array($extra) && !empty($extra['sql'])) {
+                $sql .= ' AND (' . $extra['sql'] . ')';
+                foreach (($extra['params'] ?? []) as $p) {
+                    $params[] = $p;
+                }
+                $types .= (string) ($extra['types'] ?? '');
+            }
+        }
+
         $sql .= ' ORDER BY ' . $def->exportOrderBy;
 
         $stmt = mysqli_prepare($this->conn, $sql);

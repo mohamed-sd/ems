@@ -6,6 +6,9 @@
 # الأسرار — القالب .env.example هو الوحيد الذي يدخل المستودع
 .env
 
+# إعداد خوادم MCP — قد يحوي مفاتيح API نصًّا صريحًا
+.mcp.json
+
 # السجلات (ملفا الحماية logs/.htaccess و logs/index.php يبقيان متتبَّعين)
 logs/*.log
 storage/logs/*.log

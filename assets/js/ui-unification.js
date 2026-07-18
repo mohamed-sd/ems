@@ -189,6 +189,10 @@
     function initializeMissingDataTables() {
         if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return;
         var $ = window.jQuery;
+        // performance-boost.js يضبط errMode='none' عبر مؤقّتٍ دوري (250ms)، وقد نسبقه حين
+        // نحمّل DataTables ديناميكياً من هنا — فيخرج أيُّ خطأ تهيئة في نافذة alert حاجزة
+        // يضطرّ المستخدم لإغلاقها عند كل فتح للصفحة. نضبطه بأنفسنا قبل أي تهيئة.
+        if ($.fn.dataTable.ext) $.fn.dataTable.ext.errMode = 'none';
         $('table').each(function () {
             var table = this;
             var $table = $(table);
@@ -196,6 +200,7 @@
             if (table.classList.contains('dtr-details')) return;
             if (table.classList.contains('no-datatable')) return;
             if (table.dataset.noDt) return;
+            if (table.dataset.emsDtSkip === '1') return; // فُحص سابقاً وتقرّر استثناؤه
             if (!table.tHead || !table.tBodies || !table.tBodies.length) return;
             if ($.fn.dataTable.isDataTable(table)) return;
             if ($table.closest('.dataTables_wrapper').length) return;
@@ -204,6 +209,7 @@
             // كل الأعمدة) قبل التهيئة، وإلا يرمي DataTables «Incorrect column count» على
             // الجداول الفارغة. لا يمسّ صفوف البيانات الحقيقية (عدد خلاياها = عدد العناوين)؛
             // وعند فراغ الجدول يعرض DataTables رسالة الفراغ المعرّبة من ar.json.
+            var structureMismatch = false;
             try {
                 var theadEl = table.tHead, tbodyEl = table.tBodies[0], colCount = 0;
                 if (theadEl && theadEl.rows.length) {
@@ -217,7 +223,30 @@
                     (tbodyEl.rows[0].cells[0].colSpan || 1) >= colCount) {
                     tbodyEl.removeChild(tbodyEl.rows[0]);
                 }
+                // حارس البنية (tn/18 من مصدرٍ ثالث): جدولٌ فيه صفوفُ أقسامٍ أو مجاميعَ
+                // ممتدّة بـcolspan داخل tbody — كالقوائم المالية — لا يوافق *عددُ خلايا*
+                // صفوفه ترويستَه، فيرمي DataTables «Incorrect column count». لا نهيّئه
+                // أصلاً: يبقى جدولاً ساكناً صحيحَ العرض بدل تهيئةٍ فاشلةٍ تُبعثر صفوفه.
+                // المقارنةُ بعدد الخلايا لا بمجموع colspan: خليةٌ واحدةٌ تمتدّ على كلّ
+                // الأعمدة تساوي الترويسةَ عرضاً وتخالفها عدداً — وهي عينُ ما يرفضه DataTables.
+                // نقتصر على ترويسةٍ ورقيّةٍ صريحة (بلا colspan) كي لا نستثني الترويسات
+                // المجمَّعة التي يتولّاها DataTables بنفسه.
+                var leafCols = 0, plainHeader = true;
+                if (theadEl && theadEl.rows.length) {
+                    var leafRow = theadEl.rows[theadEl.rows.length - 1];
+                    leafCols = leafRow.cells.length;
+                    for (var lc = 0; lc < leafRow.cells.length; lc++) {
+                        if ((leafRow.cells[lc].colSpan || 1) !== 1) { plainHeader = false; break; }
+                    }
+                }
+                if (tbodyEl && plainHeader && leafCols > 1) {
+                    for (var br = 0; br < tbodyEl.rows.length; br++) {
+                        if (tbodyEl.rows[br].cells.length !== leafCols) { structureMismatch = true; break; }
+                    }
+                }
             } catch (ePlaceholder) { /* تجاهل: لا يؤثّر على التهيئة */ }
+            // نُعلّم الجدول مرةً واحدة كي لا يُعاد فحصُ صفوفه مع كل تغيّرٍ في الـDOM.
+            if (structureMismatch) { table.dataset.emsDtSkip = '1'; return; }
             $table.addClass('display');
             try {
                 $table.DataTable({

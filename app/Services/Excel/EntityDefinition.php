@@ -51,6 +51,31 @@ class EntityDefinition
     public $instructions = [];
 
     /**
+     * @var callable|null قيدُ صفوفٍ إضافيٌّ للتصدير (نطاقٌ داخل الشركة).
+     *
+     * عزلُ الشركة يبقى مسؤوليةَ الإطار دائمًا؛ هذا الخطّاف لكياناتٍ لها نطاقُ
+     * رؤيةٍ *داخل* الشركة (مثل البلاغات: كلٌّ يصدّر ما يراه على الشاشة فقط)،
+     * فلا يصير التصديرُ بابًا خلفيًّا يتجاوز ما تحجبه الشاشة.
+     *
+     * التوقيع: fn(array $ctx): array{sql:string, params:array, types:string}
+     *   $ctx = ['conn'=>\mysqli, 'companyId'=>int, 'userId'=>int,
+     *           'role'=>string, 'isSuperAdmin'=>bool]
+     * تُعاد sql فارغةً = لا قيد إضافي. تُستعمل معاملاتٌ مربوطةٌ حصرًا.
+     */
+    public $exportRowScope = null;
+
+    /**
+     * @var callable|null تحضيرُ صفٍّ قبل الإدراج — يملأ الحقولَ المشتقّة التي
+     * لا يكتبها المستخدم في الملف (مثل مفتاحٍ يُستنتج من عمودٍ آخر، أو رقمٍ
+     * تسلسليٍّ يُسنِده الخادم عند تركه فارغًا).
+     *
+     * التوقيع: fn(array $data, array $ctx): array   (يُعيد الصف بعد الإكمال)
+     *   $ctx = ['conn'=>\mysqli, 'companyId'=>int, 'userId'=>int]
+     * يعمل داخل معاملة الاستيراد، فأي فشلٍ فيه يتراجع مع الدفعة كاملة.
+     */
+    public $rowPrepare = null;
+
+    /**
      * @param string  $key
      * @param string  $title
      * @param string  $table

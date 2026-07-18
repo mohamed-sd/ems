@@ -130,9 +130,10 @@ if ($action === 'attach_doc') {
     }
     $doc_types = finreq_doc_types();
     $doc_type = isset($doc_types[$S('doc_type')]) ? $S('doc_type') : 'other';
-    $file_ref = finreq_upload('doc_file');
+    $upload_err = null;
+    $file_ref = finreq_upload('doc_file', $upload_err);
     if ($file_ref === null) {
-        finreq_redirect('request_form.php?id=' . $id, '❌ تعذّر رفع الملف (الأنواع: صور/PDF بحد 5MB)');
+        finreq_redirect('request_form.php?id=' . $id, '❌ ' . ($upload_err ?: 'تعذّر رفع الملف (الأنواع: صور/PDF بحد 5MB)'));
     }
     try {
         $gate->runInTransaction(function ($g) use ($id, $doc_type, $file_ref, $user_id) {

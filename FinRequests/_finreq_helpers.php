@@ -418,17 +418,82 @@ function finreq_sync_state($gate, $request)
     return $request;
 }
 
-/** رفع مستندٍ إلى التخزين المحمي storage/finreq (نمط كرت المعدة حرفيًا) */
-function finreq_upload($field)
+/** تحويل اختزال php.ini («2M»/«8M»/«512K») إلى بايتات. */
+function finreq_ini_bytes($v)
 {
-    if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) {
+    $v = trim((string)$v);
+    if ($v === '') { return 0; }
+    $unit = strtolower($v[strlen($v) - 1]);
+    $num = (float)$v;
+    switch ($unit) {
+        case 'g': $num *= 1024; // no break — يتراكم للأدنى
+        case 'm': $num *= 1024; // no break
+        case 'k': $num *= 1024; // no break
+    }
+    return (int)$num;
+}
+
+/** الحدُّ الفعلي لرفع ملفٍ واحدٍ بالميغابايت — أصغر قيمتَي upload_max_filesize
+ *  وpost_max_size وسقف التطبيق (5MB)، لا الرقم المُعلَن في الشاشة وحده. */
+function finreq_upload_limit_mb()
+{
+    $cands = array(
+        finreq_ini_bytes(ini_get('upload_max_filesize')),
+        finreq_ini_bytes(ini_get('post_max_size')),
+        5 * 1024 * 1024,
+    );
+    $cands = array_filter($cands, function ($x) { return $x > 0; });
+    $eff = $cands ? min($cands) : 5 * 1024 * 1024;
+    return round($eff / (1024 * 1024), 1);
+}
+
+/** رفع مستندٍ إلى التخزين المحمي storage/finreq مع سببِ فشلٍ صريحٍ في $err (بدل
+ *  الصمت): يميّز «تجاوزَ حدِّ الخادم» عن «صيغةٍ غير مدعومة» عن «خطأ تخزين». */
+function finreq_upload($field, &$err = null)
+{
+    $err = null;
+    if (!isset($_FILES[$field]) || !is_array($_FILES[$field])) {
+        // جسمُ الطلب قد يكون تجاوز post_max_size فأفرغ PHP كلَّ $_FILES
+        $clen = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+        $pmax = finreq_ini_bytes(ini_get('post_max_size'));
+        $err = ($clen > 0 && $pmax > 0 && $clen > $pmax)
+            ? 'حجم الإرسال (' . round($clen / 1048576, 1) . 'م) تجاوز حدَّ الخادم (' . round($pmax / 1048576, 1) . 'م) — الملف كبيرٌ جدًّا'
+            : 'لم يصل أيُّ ملفٍ إلى الخادم';
+        return null;
+    }
+    $e = intval($_FILES[$field]['error']);
+    if ($e !== UPLOAD_ERR_OK) {
+        switch ($e) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $err = 'حجم الملف أكبر من حدِّ الخادم (' . finreq_upload_limit_mb()
+                    . ' ميغابايت) — اضغط الصورة/الـPDF أو صوّرها بجودةٍ أقلّ ثم أعد المحاولة';
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $err = 'لم تُختَر صورةٌ أو مستندٌ للرفع';
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $err = 'انقطع رفع الملف قبل اكتماله — أعد المحاولة';
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+            case UPLOAD_ERR_CANT_WRITE:
+                $err = 'تعذّر على الخادم حفظ الملف المؤقت (إعداد المجلد المؤقت)';
+                break;
+            default:
+                $err = 'تعذّر رفع الملف (رمز خطأٍ ' . $e . ')';
+        }
         return null;
     }
     $dir = __DIR__ . '/../storage/finreq/';
     if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
     if (function_exists('validate_file_upload')) {
         $check = validate_file_upload($_FILES[$field], array('jpg', 'jpeg', 'png', 'webp', 'pdf'), 5 * 1024 * 1024);
-        if (empty($check['valid'])) { return null; }
+        if (empty($check['valid'])) {
+            $err = !empty($check['errors'])
+                ? implode(' · ', $check['errors'])
+                : 'صيغةٌ غير مدعومة — المسموح: صور JPG/PNG/WEBP أو PDF بحدّ 5 ميغابايت';
+            return null;
+        }
     }
     $name = function_exists('generate_safe_filename')
         ? generate_safe_filename($_FILES[$field]['name'])
@@ -436,6 +501,7 @@ function finreq_upload($field)
     if (@move_uploaded_file($_FILES[$field]['tmp_name'], $dir . $name)) {
         return 'storage/finreq/' . $name;
     }
+    $err = 'تعذّر حفظ الملف على الخادم — راجع صلاحيات مجلد التخزين';
     return null;
 }
 

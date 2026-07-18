@@ -790,12 +790,70 @@ class EffectFanout
                     $out['effects'][] = array('effect' => $type, 'target_id' => $written, 'amount' => null, 'currency' => null);
                     break;
 
-                case 'employee_due':
                 case 'metric_update':
-                    // معطّلان في الخريطة اليوم (لا قاعدة أجرٍ مُقرّة / لا معدّل مخصّص) —
-                    // بلوغ هذا الفرع يعني تفعيلًا بلا مولّد دوامٍ بعد: إعلانٌ لا تلفيق.
-                    $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                        'reason' => strval($eff['unavailable_reason'] ?: 'لا مولّدَ لهذا الأثر من الدوام بعد'));
+                    // مخصّص الصيانة المحمَّل على المعدة — أساسه **ساعات التشغيل الفعلية**
+                    // (executed_hours · قرار المستخدم 2026-07-18)، ومعدّله param_value من
+                    // خريطة الآثار (يضبطه المدير المالي في شاشة «مخصّص الصيانة»). قاعدة
+                    // عدم التلفيق: معدّلٌ غير مضبوط أو لا معدةَ أو لا ساعاتِ تشغيلٍ ⇒ يُعلَن
+                    // متعذّرًا في السجل ولا يُخترع رقم.
+                    $rate = ($eff['param_value'] !== null) ? (float) $eff['param_value'] : 0.0;
+                    $mhHours = round((float) $ctx['recorded']['hour'], 2); // executed_hours
+                    if ($rate <= 0 || $ctx['equipment_id'] === null || $mhHours <= 0) {
+                        $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
+                            'reason' => $rate <= 0 ? 'معدّل المخصّص غير مضبوط (param_value)'
+                                : ($ctx['equipment_id'] === null ? 'لا معدةَ على صف الدوام' : 'لا ساعاتِ تشغيلٍ فعليةً على الصف'));
+                        break;
+                    }
+                    $prov = round($mhHours * $rate, 2);
+                    $mid = intval($gate->insert('fin_cost_records', array(
+                        'cost_type' => 'maintenance', 'equipment_id' => $ctx['equipment_id'], 'project_id' => $ctx['project_id'],
+                        'period_ref' => $ctx['period'], 'qty' => $mhHours, 'unit' => 'hour',
+                        'unit_cost' => $rate, 'total_cost' => $prov, 'currency' => 'SDG',
+                        'event_id' => $revId,
+                        'created_by' => intval($actor) ?: null,
+                    )));
+                    self::link($gate, $company, $tsId, $type, 'fin_cost_records', $mid, $revId, self::SOURCE_TIMESHEET);
+                    $out['effects'][] = array('effect' => $type, 'target_id' => $mid, 'amount' => $prov, 'currency' => 'SDG');
+                    break;
+
+                case 'employee_due':
+                    // مستحق المشغّل — قرار المستخدم: لكل مشغّلٍ وضعٌ في fin_operator_pay:
+                    //   • «بالراتب» (أو غياب صفٍّ) ⇒ المستحق 0 (تدفعه الرواتب) — لا ازدواج.
+                    //   • «بالمستحق» ⇒ المروحة تدفعه: operator_hours × المعدّل، تصنيف overtime.
+                    // قاعدة عدم التلفيق: لا مشغّل / بالراتب / معدّلٌ غير مضبوط / لا ساعات ⇒ يُعلَن.
+                    $empId = $ctx['employee_id'];
+                    if ($empId === null) {
+                        $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
+                            'reason' => 'لا مشغّلَ (employee_id) على صف الدوام');
+                        break;
+                    }
+                    $mode = 'salary'; // الافتراض الآمن: بالراتب ⇒ لا مستحق
+                    try {
+                        $pm = $gate->selectOne('fin_operator_pay', array('columns' => array('pay_mode'), 'where' => array('employee_id' => $empId)));
+                        if ($pm) { $mode = strval($pm['pay_mode']); }
+                    } catch (\Throwable $t) { /* غياب الصف = بالراتب */ }
+                    if ($mode !== 'due') {
+                        $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
+                            'reason' => 'المشغّل «بالراتب» — لا مستحقَ من المروحة (تدفعه الرواتب)');
+                        break;
+                    }
+                    $rate = ($eff['param_value'] !== null) ? (float) $eff['param_value'] : 0.0;
+                    $ohours = round((float) $ctx['operator_hours'], 2);
+                    if ($rate <= 0 || $ohours <= 0) {
+                        $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
+                            'reason' => $rate <= 0 ? 'معدّل حافز المشغّل غير مضبوط (param_value)' : 'لا ساعاتِ مشغّلٍ على الصف');
+                        break;
+                    }
+                    $empAmount = round($ohours * $rate, 2);
+                    $empDueId = intval($gate->insert('fin_dues', array(
+                        'party_type' => 'employee', 'party_ref' => $empId,
+                        'due_type' => 'overtime', 'direction' => 'credit',
+                        'amount' => $empAmount, 'currency' => 'SDG',
+                        'period_ref' => $ctx['period'], 'event_id' => $revId,
+                        'created_by' => intval($actor) ?: null,
+                    )));
+                    self::link($gate, $company, $tsId, $type, 'fin_dues', $empDueId, $revId, self::SOURCE_TIMESHEET);
+                    $out['effects'][] = array('effect' => $type, 'target_id' => $empDueId, 'amount' => $empAmount, 'currency' => 'SDG');
                     break;
 
                 default:

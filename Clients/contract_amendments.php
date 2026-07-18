@@ -106,6 +106,15 @@ if (!$can_view) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// السجلّ صار للقراءة فقط (D02 · توحيد مصدر الحقيقة): الملاحق تُغذّى تلقائيًّا من
+// إجراءات العقد (Contracts/contract_actions_handler.php) داخل معاملةٍ ذرّية. لا
+// كتابةَ يدويّة — أي POST أو حذفٍ يُرفض هنا (دفاعٌ خادميّ فوق إخفاء الواجهة).
+// ══════════════════════════════════════════════════════════════════════════════
+if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['delete_id'])) {
+    amd_redirect_with_msg('سجلّ الملاحق للقراءة فقط — يُغذّى تلقائيًّا من إجراءات العقد ℹ️');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // معالجة إضافة / تعديل ملحق عبر POST
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amendment_code'])) {
@@ -374,11 +383,7 @@ include('../insidebar.php');
     $header_title = 'الملاحق والتجديدات';
     $header_icon = 'fas fa-file-pen';
     $header_actions = array();
-    if ($can_add) {
-        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fa fa-solid fa-plus', 'label' => '', 'label_class' => 'amd-toggle-form-text');
-    } else {
-        $header_actions[] = array('tag' => 'button', 'class' => '', 'disabled' => true, 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة (بدون صلاحيات)');
-    }
+    // السجلّ للقراءة فقط (D02): لا زرَّ إضافةٍ — يُغذّى تلقائيًّا من إجراءات العقد
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'amd-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
@@ -565,28 +570,7 @@ include('../insidebar.php');
                                             data-effect-summary="<?php echo amd_e($row['effect_summary']); ?>"
                                             data-created="<?php echo amd_e($created_label); ?>"
                                             title="عرض التفاصيل"><i class="fas fa-eye"></i></a>
-                                        <?php if ($can_edit): ?>
-                                            <a href="javascript:void(0)" class="action-btn edit editAmdBtn"
-                                                data-id="<?php echo intval($row['id']); ?>"
-                                                data-code="<?php echo amd_e($row['amendment_code']); ?>"
-                                                data-contract-id="<?php echo intval($row['contract_id']); ?>"
-                                                data-type="<?php echo amd_e($row['amend_type']); ?>"
-                                                data-date="<?php echo amd_e($row['amend_date']); ?>"
-                                                data-requested-id="<?php echo intval($row['requested_by']); ?>"
-                                                data-reason="<?php echo amd_e($row['reason']); ?>"
-                                                data-old="<?php echo amd_e($row['old_value']); ?>"
-                                                data-new="<?php echo amd_e($row['new_value']); ?>"
-                                                data-effect-price="<?php echo amd_e($row['effect_price']); ?>"
-                                                data-effect-qty="<?php echo amd_e($row['effect_qty']); ?>"
-                                                data-effect-duration="<?php echo amd_e($row['effect_duration']); ?>"
-                                                data-effect-summary="<?php echo amd_e($row['effect_summary']); ?>"
-                                                title="تعديل"><i class="fas fa-edit"></i></a>
-                                        <?php endif; ?>
-                                        <?php if ($can_delete): ?>
-                                            <a href="?delete_id=<?php echo urlencode($row['id']); ?>&csrf_token=<?php echo urlencode($amd_csrf_token); ?>"
-                                                class="action-btn delete"
-                                                onclick="return confirm('هل أنت متأكد من حذف هذا الملحق؟')" title="حذف"><i class="fas fa-trash-alt"></i></a>
-                                        <?php endif; ?>
+                                        <?php // السجلّ للقراءة فقط (D02): لا تعديلَ/حذفَ يدويّ — العرض وحده ?>
                                     </div>
                                 </td>
                                 <td><strong class="amd-code-cell"><?php echo amd_e($row['amendment_code']); ?></strong></td>

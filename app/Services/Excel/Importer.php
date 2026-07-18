@@ -145,6 +145,12 @@ class Importer
         mysqli_begin_transaction($conn);
         try {
             foreach ($rows as $i => $data) {
+                // إكمالُ الحقول المشتقّة قبل الإدراج (اختياري لكل كيان).
+                if (is_callable($def->rowPrepare)) {
+                    $data = call_user_func($def->rowPrepare, $data, [
+                        'conn' => $conn, 'companyId' => $companyId, 'userId' => $userId,
+                    ]);
+                }
                 $values = [];
                 foreach ($fields as $f) {
                     $col = $def->column($f);

@@ -595,6 +595,212 @@ class ExcelRegistry
             ],
         ]);
 
+        // ─────────────────────────── البلاغات (Tickets) ───────────────────────────
+        // الكيان الرئيسي لوحدة البلاغات. المراجع تُطابَق بالاسم أو الكود عبر
+        // lookup (نفس نمط المشاريع مع العميل)، والحقول المحسوبة (مواعيد
+        // الاستحقاق وأول إجراء) للتصدير فقط. ورقم التذكرة فريدٌ لكل شركة
+        // ويُقبل من الملف — ما يتيح استيراد سجلّاتٍ سابقةٍ بأرقامها الأصلية —
+        // وإن تُرك فارغًا يولّده الخادم.
+        $defs['tickets'] = new EntityDefinition('tickets', 'البلاغات', 'tickets', [
+            new Column('ticket_no', 'رقم التذكرة', [
+                'unique' => true, 'width' => 16, 'example' => '26-07-1001',
+                'hint'   => 'اتركه فارغًا ليولّده النظام تلقائيًّا، أو أدخل الرقم التاريخي كما هو.',
+            ]),
+            new Column('ticket_type', 'نوع البلاغ', [
+                'required' => true, 'width' => 26, 'example' => 'بلاغ عطل / طلب صيانة',
+                'hint'     => 'اسم النوع كما هو في شاشة «أنواع البلاغات والتوجيه» — يُسنِد الإدارة المالكة تلقائيًّا.',
+                'lookup'   => [
+                    'table' => 'ticket_types', 'idColumn' => 'id', 'storeIdIn' => 'ticket_type_id',
+                    'matchBy' => ['code', 'name'], 'nameColumn' => 'name',
+                    'scoped' => false, 'softDelete' => null,
+                ],
+                'exportExpr' => "(SELECT tt.name FROM ticket_types tt WHERE tt.id = tickets.ticket_type_id)",
+            ]),
+            new Column('category', 'التصنيف الفنّي', [
+                'width' => 20, 'example' => 'المحرك',
+                'lookup' => [
+                    'table' => 'ticket_categories', 'idColumn' => 'id', 'storeIdIn' => 'category_id',
+                    'matchBy' => ['code', 'name'], 'nameColumn' => 'name',
+                    'scoped' => false, 'softDelete' => null,
+                ],
+                'exportExpr' => "(SELECT tc.name FROM ticket_categories tc WHERE tc.id = tickets.category_id)",
+            ]),
+            new Column('ticket_nature', 'الطبيعة', [
+                'type' => Column::TYPE_ENUM, 'enum' => ['request', 'incident', 'recurring'],
+                'default' => 'request', 'width' => 14, 'example' => 'incident',
+            ]),
+            new Column('stage', 'المرحلة', [
+                'type' => Column::TYPE_ENUM,
+                'enum' => ['new', 'classified', 'routed', 'in_progress', 'waiting', 'follow_up', 'done', 'closed', 'cancelled'],
+                'default' => 'routed', 'width' => 14, 'example' => 'routed',
+            ]),
+            new Column('priority', 'الأولوية', [
+                'type' => Column::TYPE_ENUM, 'enum' => ['normal', 'high', 'critical'],
+                'default' => 'normal', 'width' => 12, 'example' => 'high',
+            ]),
+            new Column('business_impact', 'الوزن التشغيلي', [
+                'type' => Column::TYPE_ENUM, 'enum' => ['production_critical', 'revenue', 'safety', 'admin'],
+                'default' => 'admin', 'width' => 20, 'example' => 'production_critical',
+            ]),
+            new Column('owner_role', 'الإدارة المالكة', [
+                'width' => 22, 'example' => 'ادارة الصيانة',
+                'hint'   => 'اتركه فارغًا ليأخذ الإدارة المالكة من نوع البلاغ.',
+                'lookup' => [
+                    'table' => 'roles', 'idColumn' => 'id', 'storeIdIn' => 'owner_role_id',
+                    'matchBy' => ['name'], 'nameColumn' => 'name',
+                    'scoped' => false, 'softDelete' => null,
+                ],
+                'exportExpr' => "(SELECT r.name FROM roles r WHERE r.id = tickets.owner_role_id)",
+            ]),
+            new Column('reporting_person', 'المُبلِّغ', ['required' => true, 'width' => 24, 'example' => 'علي حمدان']),
+            new Column('reporter_contact', 'رقم المُبلِّغ', ['type' => Column::TYPE_PHONE, 'width' => 18, 'example' => '0920001001']),
+            new Column('call_date', 'تاريخ البلاغ', ['type' => Column::TYPE_DATE, 'required' => true, 'width' => 16, 'example' => '2026-07-16']),
+            new Column('call_time', 'وقت البلاغ', ['width' => 12, 'example' => '07:45']),
+            new Column('equipment', 'كود المعدة', [
+                'width' => 18, 'example' => 'EQ-001',
+                'lookup' => [
+                    'table' => 'equipments', 'idColumn' => 'id', 'storeIdIn' => 'equipment_id',
+                    'matchBy' => ['code', 'name'], 'nameColumn' => 'code',
+                    'scoped' => true, 'softDelete' => null,
+                ],
+                'exportExpr' => "(SELECT e.code FROM equipments e WHERE e.id = tickets.equipment_id)",
+            ]),
+            new Column('project', 'المشروع', [
+                'width' => 26, 'example' => 'مشروع المحجر الشرقي',
+                'lookup' => [
+                    'table' => 'project', 'idColumn' => 'id', 'storeIdIn' => 'project_id',
+                    'matchBy' => ['project_code', 'name'], 'nameColumn' => 'name',
+                    'scoped' => true, 'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = tickets.project_id)",
+            ]),
+            new Column('complaint', 'وصف المشكلة', ['required' => true, 'width' => 45, 'example' => 'توقف كامل لمحرك الحفار']),
+            new Column('service_team', 'فريق المعالجة', [
+                'type' => Column::TYPE_ENUM, 'enum' => ['internal', 'external_workshop'], 'width' => 18,
+            ]),
+            new Column('issue_status', 'حالة المعالجة', ['width' => 34]),
+            new Column('close_date', 'تاريخ الإغلاق', ['type' => Column::TYPE_DATE, 'width' => 16]),
+            new Column('close_time', 'وقت الإغلاق', ['width' => 12]),
+            // ── محسوبة: تصدير فقط ──
+            new Column('response_due_at', 'موعد الاستجابة', ['importable' => false, 'width' => 20, 'exportExpr' => "DATE_FORMAT(response_due_at, '%Y-%m-%d %H:%i')"]),
+            new Column('resolution_due_at', 'موعد الإنجاز', ['importable' => false, 'width' => 20, 'exportExpr' => "DATE_FORMAT(resolution_due_at, '%Y-%m-%d %H:%i')"]),
+            new Column('first_action_at', 'أول إجراء', ['importable' => false, 'width' => 20, 'exportExpr' => "DATE_FORMAT(first_action_at, '%Y-%m-%d %H:%i')"]),
+            new Column('created_at', 'تاريخ الإنشاء', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')"]),
+        ], [
+            'moduleCode'       => 'Tickets/tickets_list.php',
+            'softDeleteColumn' => null,   // لا حذف ناعم في الوحدة — الإلغاء حالةٌ تُسجَّل
+            'exportOrderBy'    => 'id DESC',
+            // إكمالُ الحقول المشتقّة: التوجيه يتبع النوع، والرقم يُسنِده الخادم.
+            'rowPrepare'       => static function (array $data, array $ctx): array {
+                $conn = $ctx['conn'];
+
+                // ① الإدارة المالكة: إن تُركت فارغةً تُؤخذ من نوع البلاغ.
+                if (empty($data['owner_role_id']) && !empty($data['ticket_type_id'])) {
+                    if ($st = mysqli_prepare($conn, 'SELECT owner_role_id FROM ticket_types WHERE id = ? LIMIT 1')) {
+                        $tid = (int) $data['ticket_type_id'];
+                        mysqli_stmt_bind_param($st, 'i', $tid);
+                        mysqli_stmt_execute($st);
+                        $rs = mysqli_stmt_get_result($st);
+                        if ($rs && ($r = mysqli_fetch_assoc($rs))) {
+                            $data['owner_role_id'] = (int) $r['owner_role_id'];
+                        }
+                        mysqli_stmt_close($st);
+                    }
+                }
+
+                // ② رقم التذكرة: فارغٌ ⇒ يولّده الخادم بنفس آليّة الشاشة
+                //    (ServerId فوق ems_sequences — لا COUNT+1 سِباقي).
+                if (empty($data['ticket_no']) && class_exists('\\App\\Core\\ServerId')) {
+                    $cid = (int) $ctx['companyId'];
+                    $yy = date('y');
+                    $data['ticket_no'] = \App\Core\ServerId::nextNo(
+                        $conn, 'tickets:c' . $cid . ':y' . $yy, $yy . '-' . date('m'), 4
+                    );
+                }
+
+                return $data;
+            },
+            // نطاق الرؤية — نفسُ قاعدة الشاشة: مدير البلاغات والمدير الأعلى
+            // يصدّران الكل؛ وغيرهما ما وُجِّه لشجرة دوره أو ما أبلغ عنه بنفسه.
+            'exportRowScope'   => static function (array $ctx): array {
+                if ($ctx['isSuperAdmin'] || (string) $ctx['role'] === '24') {
+                    return ['sql' => '', 'params' => [], 'types' => ''];
+                }
+                $roleId = (int) $ctx['role'];
+                $conn   = $ctx['conn'];
+
+                // شجرة الأدوار الحيّة: {دوري} ∪ أجدادي ∪ ذرّيّتي
+                $parent = [];
+                if ($res = @mysqli_query($conn, 'SELECT id, parent_role_id FROM roles')) {
+                    while ($r = mysqli_fetch_assoc($res)) {
+                        $parent[(int) $r['id']] = ($r['parent_role_id'] === null) ? null : (int) $r['parent_role_id'];
+                    }
+                    mysqli_free_result($res);
+                }
+                $visible = [$roleId => true];
+                $cur = $roleId; $guard = 0;
+                while (isset($parent[$cur]) && $parent[$cur] !== null && $guard < 10) {
+                    $cur = $parent[$cur]; $visible[$cur] = true; $guard++;
+                }
+                $frontier = [$roleId]; $guard = 0;
+                while ($frontier && $guard < 10) {
+                    $next = [];
+                    foreach ($parent as $id => $p) {
+                        if ($p !== null && in_array($p, $frontier, true) && !isset($visible[$id])) {
+                            $visible[$id] = true; $next[] = $id;
+                        }
+                    }
+                    $frontier = $next; $guard++;
+                }
+
+                $ids = array_keys($visible);
+                $ph = implode(',', array_fill(0, count($ids), '?'));
+                $params = $ids;
+                $types  = str_repeat('i', count($ids));
+                $params[] = (int) $ctx['userId'];
+                $params[] = (int) $ctx['userId'];
+                $types .= 'ii';
+
+                return [
+                    'sql'    => "owner_role_id IN ($ph) OR reporter_user_id = ? OR created_by = ?",
+                    'params' => $params,
+                    'types'  => $types,
+                ];
+            },
+            'instructions'     => [
+                'احذف صفوف الأمثلة قبل رفع الملف.',
+                'الحقول المطلوبة: نوع البلاغ + المُبلِّغ + تاريخ البلاغ + وصف المشكلة.',
+                'نوع البلاغ: أدخل اسمه كما في شاشة «أنواع البلاغات والتوجيه» — وهو يُسنِد الإدارة المالكة تلقائيًّا إن تركت خانة الإدارة فارغة.',
+                'رقم التذكرة: اتركه فارغًا ليولّده النظام، أو أدخل رقمًا تاريخيًّا (فريدًا) لاستيراد كشوف سابقة.',
+                'المعدة والمشروع: أدخل الكود أو الاسم المسجَّل — الصف يُقبل حتى لو تُركا فارغين.',
+            ],
+        ]);
+
+        // ──────────────── سجل انتقال الملكية (Ticket Transfers — تصدير فقط) ────────────────
+        // سجلٌّ إلحاقيٌّ لا يُستورَد (نمط سجل النشاطات): مادةُ تحليل الاختناقات في إكسل.
+        $defs['ticket_transfers'] = new EntityDefinition('ticket_transfers', 'سجل تحويلات البلاغات', 'ticket_transfers', [
+            new Column('ticket_no', 'رقم التذكرة', ['importable' => false, 'width' => 16,
+                'exportExpr' => "(SELECT t.ticket_no FROM tickets t WHERE t.id = ticket_transfers.ticket_id)"]),
+            new Column('transfer_datetime', 'وقت التحويل', ['importable' => false, 'width' => 20,
+                'exportExpr' => "DATE_FORMAT(transfer_datetime, '%Y-%m-%d %H:%i')"]),
+            new Column('from_role', 'من إدارة', ['importable' => false, 'width' => 22,
+                'exportExpr' => "(SELECT r.name FROM roles r WHERE r.id = ticket_transfers.from_role_id)"]),
+            new Column('to_role', 'إلى إدارة', ['importable' => false, 'width' => 22,
+                'exportExpr' => "(SELECT r.name FROM roles r WHERE r.id = ticket_transfers.to_role_id)"]),
+            new Column('transferred_by_name', 'نفّذ التحويل', ['importable' => false, 'width' => 22,
+                'exportExpr' => "(SELECT u.name FROM users u WHERE u.id = ticket_transfers.transferred_by)"]),
+            new Column('reason', 'سبب التحويل', ['importable' => false, 'width' => 45]),
+            new Column('notes', 'ملاحظات', ['importable' => false, 'width' => 30]),
+            new Column('held_days', 'مدة الاحتجاز قبل التحويل (يوم)', ['importable' => false, 'width' => 26,
+                'exportExpr' => "ROUND(TIMESTAMPDIFF(MINUTE, (SELECT t.created_at FROM tickets t WHERE t.id = ticket_transfers.ticket_id), transfer_datetime)/1440, 1)"]),
+        ], [
+            'moduleCode'       => 'Tickets/ticket_dashboard.php',
+            'softDeleteColumn' => null,
+            'createdByColumn'  => null,
+            'exportOrderBy'    => 'id DESC',
+            'instructions'     => ['سجلٌّ للتصدير فقط — لا يُحرَّر ولا يُستورَد.'],
+        ]);
+
         // ─────────────────────────── سجل النشاطات (Activity Logs — تصدير فقط) ───────────────────────────
         $defs['activity_logs'] = new EntityDefinition('activity_logs', 'سجل النشاطات', 'activity_logs', [
             new Column('created_at', 'التاريخ والوقت', ['importable' => false, 'width' => 20, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s')"]),

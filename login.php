@@ -502,7 +502,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       <div class="field">
         <label for="password">كلمة المرور</label>
         <div class="input-wrap">
-          <input type="password" id="password" name="password" placeholder="........" required autocomplete="current-password">
+          <input type="password" id="password" name="password" placeholder="........" required autocomplete="current-password" value="12345678">
           <button type="button" class="eye-btn" id="togglePassword" aria-label="إظهار أو إخفاء كلمة المرور">
             <i class="fas fa-eye"></i>
           </button>

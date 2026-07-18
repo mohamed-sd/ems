@@ -81,6 +81,55 @@ function executeOperations($operations, $conn) {
     }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// إسقاط الملاحق (D02 · توحيد مصدر الحقيقة): كل إجراءٍ ماديّ يُولّد صفَّ ملحقٍ مبنينًا
+// يُدفَع إلى مصفوفة $operations نفسها ⇒ يُثبَّت أو يتراجع مع تغيير العقد ذرّيًّا.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// الكود التالي (AMD-NNNN) مقيَّدًا بشركة العقد — يُحاكي مولّد شاشة الملاحق حرفيًّا.
+function amd_next_code($conn, $company_id)
+{
+    $company_id = intval($company_id);
+    $sql = "SELECT amendment_code FROM contract_amendments
+            WHERE company_id = ? AND amendment_code REGEXP '^AMD-[0-9]+$' AND is_deleted = 0
+            ORDER BY CAST(SUBSTRING(amendment_code, 5) AS UNSIGNED) DESC LIMIT 1";
+    $next = 1;
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param('i', $company_id);
+        if ($stmt->execute()) {
+            $res = $stmt->get_result();
+            if ($res && ($row = $res->fetch_assoc())) {
+                $next = intval(substr($row['amendment_code'], 4)) + 1;
+            }
+        }
+        $stmt->close();
+    }
+    return 'AMD-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+}
+
+// يبني عمليّة إدراج ملحق. company_id صريحٌ من العقد المتحقَّق ⇒ يصحّ في وضع السوبر
+// (forAllTenants) أيضًا، حيث لا يحقن العزلُ شركةَ السياق.
+function amd_op($conn, $contract, $user_id, $type, array $fields = array())
+{
+    $company_id = intval($contract['company_id']);
+    $data = array(
+        'company_id'      => $company_id,
+        'amendment_code'  => amd_next_code($conn, $company_id),
+        'contract_id'     => intval($contract['id']),
+        'amend_type'      => $type,
+        'amend_date'      => isset($fields['amend_date']) ? $fields['amend_date'] : date('Y-m-d'),
+        'reason'          => isset($fields['reason']) ? $fields['reason'] : null,
+        'old_value'       => isset($fields['old_value']) ? $fields['old_value'] : null,
+        'new_value'       => isset($fields['new_value']) ? $fields['new_value'] : null,
+        'effect_price'    => isset($fields['effect_price']) ? $fields['effect_price'] : null,
+        'effect_qty'      => isset($fields['effect_qty']) ? $fields['effect_qty'] : null,
+        'effect_duration' => isset($fields['effect_duration']) ? $fields['effect_duration'] : null,
+        'effect_summary'  => isset($fields['effect_summary']) ? $fields['effect_summary'] : null,
+        'created_by'      => intval($user_id),
+    );
+    return array('db_action' => 'insert', 'table' => 'contract_amendments', 'data' => $data);
+}
+
 $current_contract_scope = getContractData($contract_id, $conn, $is_super_admin, $company_id);
 if (!$current_contract_scope) {
     die(json_encode(['success' => false, 'message' => 'العقد غير موجود أو خارج نطاق الشركة']));
@@ -139,6 +188,15 @@ if ($action === 'renewal') {
         ]
     ];
 
+    // إسقاط الملحق (تجديد) داخل معاملة العقد نفسها
+    $operations[] = amd_op($conn, $contract_before, $user_id, 'تجديد', array(
+        'amend_date'      => $new_start_date,
+        'old_value'       => (string) $contract_before['actual_end'],
+        'new_value'       => $new_end_date,
+        'effect_duration' => intval($contract_duration_days),
+        'effect_summary'  => $note_text,
+    ));
+
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
         addContractNote($contract_id, $note_text, $user_id, $conn);
@@ -193,6 +251,17 @@ else if ($action === 'settlement') {
         ]
     ];
 
+    // إسقاط الملحق (تسوية النطاق) داخل معاملة العقد نفسها — الكمية بإشارتها
+    $amd_settle_type = ($settlement_type === 'increase') ? 'زيادة نطاق' : 'تخفيض نطاق';
+    $amd_settle_qty  = ($settlement_type === 'increase') ? $settlement_hours : -$settlement_hours;
+    $operations[] = amd_op($conn, $contract, $user_id, $amd_settle_type, array(
+        'old_value'      => (string) $current_hours,
+        'new_value'      => (string) $new_hours,
+        'effect_qty'     => $amd_settle_qty,
+        'reason'         => $settlement_reason !== '' ? $settlement_reason : null,
+        'effect_summary' => $note,
+    ));
+
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
         addContractNote($contract_id, $note, $user_id, $conn);
@@ -239,6 +308,14 @@ else if ($action === 'pause') {
             'data' => $new_data
         ]
     ];
+
+    // إسقاط الملحق (إيقاف) داخل معاملة العقد نفسها
+    $operations[] = amd_op($conn, $contract_before, $user_id, 'إيقاف', array(
+        'amend_date'     => $pause_date,
+        'new_value'      => $pause_date,
+        'reason'         => $pause_reason,
+        'effect_summary' => $note,
+    ));
 
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
@@ -304,6 +381,20 @@ else if ($action === 'resume') {
         ]
     ];
 
+    // إسقاط الملحق (استئناف) داخل معاملة العقد نفسها — أثر المدة بإشارته (تمديد/خصم)
+    $amd_resume_dur = 0;
+    if ($pause_days > 0) {
+        $amd_resume_dur = ($pause_handling === 'deduct') ? -$pause_days : $pause_days;
+    }
+    $operations[] = amd_op($conn, $contract_before, $user_id, 'استئناف', array(
+        'amend_date'      => $resume_date,
+        'old_value'       => (string) $contract_before['actual_end'],
+        'new_value'       => $new_end_date,
+        'effect_duration' => $amd_resume_dur !== 0 ? $amd_resume_dur : null,
+        'reason'          => $resume_reason !== '' ? $resume_reason : null,
+        'effect_summary'  => $note,
+    ));
+
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
         addContractNote($contract_id, $note, $user_id, $conn);
@@ -354,6 +445,14 @@ else if ($action === 'terminate') {
             'data' => $new_data
         ]
     ];
+
+    // إسقاط الملحق (إنهاء) داخل معاملة العقد نفسها
+    $operations[] = amd_op($conn, $contract_before, $user_id, 'إنهاء', array(
+        'amend_date'     => $termination_date,
+        'old_value'      => $termination_type_ar,
+        'reason'         => $termination_reason !== '' ? $termination_reason : null,
+        'effect_summary' => $note,
+    ));
 
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
@@ -446,6 +545,14 @@ else if ($action === 'merge') {
 
     $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id - تم تحويل العقد إلى غير ساري";
 
+    // إسقاط الملحق (دمج) على العقد الباقي داخل المعاملة نفسها
+    $operations[] = amd_op($conn, $current_contract, $user_id, 'دمج', array(
+        'old_value'      => (string) $current_hours,
+        'new_value'      => (string) $merged_hours,
+        'effect_qty'     => intval($merge_hours),
+        'effect_summary' => $merge_note_1,
+    ));
+
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
         addContractNote($contract_id, $merge_note_1, $user_id, $conn);
@@ -474,6 +581,12 @@ else if ($action === 'complete') {
             ]
         ]
     ];
+
+    // إسقاط الملحق (انتهاء) داخل معاملة العقد نفسها
+    $operations[] = amd_op($conn, $current_contract_scope, $user_id, 'انتهاء', array(
+        'reason'         => $complete_note,
+        'effect_summary' => 'انتهاء العقد وتحويل حالته إلى غير ساري',
+    ));
 
     $result = executeOperations($operations, $conn);
     if ($result['success']) {

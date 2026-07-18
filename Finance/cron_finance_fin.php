@@ -85,7 +85,7 @@ foreach (array_keys($company_ids) as $cid) {
         array('scope' => array('l' => 'fin_budget_lines'), 'enrich' => array('b' => 'fin_budgets')),
         "SELECT COUNT(*) n FROM fin_budget_lines l LEFT JOIN fin_budgets b ON b.id=l.budget_id WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND b.state IN('approved','active') AND COALESCE(b.is_deleted,0)=0 AND l.variance_pct IS NOT NULL AND ABS(l.variance_pct) > 10");
     if ($r && intval($r[0]['n']) > 0) {
-        fin_notify($conn, $cid, 'finance_manager', 'انحرافات موازنة فوق 10%: ' . $r[0]['n'] . ' بند', 'budget_form_fin.php'); $n_ntf++;
+        fin_notify($conn, $cid, 'finance_manager', 'انحرافات موازنة فوق 10%: ' . $r[0]['n'] . ' بند', 'variance_monitor_fin.php'); $n_ntf++;
     }
 
     fin_gate_override(null); // نهاية الدورة — لا بوابة معلّقة بين الشركات

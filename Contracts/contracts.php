@@ -172,7 +172,7 @@ include('../insidebar.php');
                 <select name="project_id" id="contract_project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php foreach ($form_projects as $project): ?>
-                    <option value="<?php echo intval($project['id']); ?>" <?php echo ($project_id > 0 && intval($project['id']) === $project_id) ? 'selected' : ''; ?>>
+                    <option value="<?php echo intval($project['id']); ?>" <?php echo ($filter_project_id > 0 && intval($project['id']) === $filter_project_id) ? 'selected' : ''; ?>>
                       <?php echo htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                   <?php endforeach; ?>

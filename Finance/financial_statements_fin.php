@@ -4,6 +4,10 @@
  * ★ قراءة فقط بالكامل ★ — تُشتَقّ من القيود المرحّلة (fin_journal_lines + الحسابات).
  * قائمة الدخل · المركز المالي (يتوازن آليًا) · التدفق النقدي (من المدفوعات المنفّذة).
  * لا جداول جديدة، لا كتابة، لا لمس للنظام القائم.
+ * ★ الجداول الثلاثة بلا DataTables قصدًا (no-datatable) ★ — صفوفُ الأقسام والمجاميع
+ * ممتدّةٌ بـcolspan داخل tbody فلا يوافق عددُ خلاياها ترويسةَ الجدول: التهيئة التلقائية
+ * كانت ترمي «Incorrect column count» (tn/18) في نافذتَي تنبيهٍ حاجزتين عند كل فتح،
+ * والفرزُ/الترقيمُ/البحثُ يُبعثر أقسامَ القائمة عن مجاميعها. القائمة تُعرَض كما تُشتَقّ.
  */
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
@@ -97,7 +101,7 @@ function fin_stmt_rows($rows, $type_lbl)
     <!-- قائمة الدخل -->
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-arrow-trend-up"></i> قائمة الدخل (الأرباح والخسائر)</h5>
-        <div class="table-container"><table class="alltables" style="width:100%">
+        <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
             <thead><tr><th>الكود</th><th>الحساب</th><th style="text-align:end">المبلغ</th></tr></thead>
             <tbody>
                 <tr><th colspan="3" style="background:#f0fdf4">الإيرادات</th></tr>
@@ -115,7 +119,7 @@ function fin_stmt_rows($rows, $type_lbl)
     <!-- المركز المالي -->
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-scale-balanced"></i> قائمة المركز المالي (الميزانية العمومية)</h5>
-        <div class="table-container"><table class="alltables" style="width:100%">
+        <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
             <thead><tr><th>الكود</th><th>الحساب</th><th style="text-align:end">الرصيد</th></tr></thead>
             <tbody>
                 <tr><th colspan="3" style="background:#eff6ff">الأصول</th></tr>
@@ -136,7 +140,7 @@ function fin_stmt_rows($rows, $type_lbl)
     <!-- التدفق النقدي -->
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-water"></i> قائمة التدفق النقدي (مبسّطة — من المدفوعات المنفّذة)</h5>
-        <div class="table-container"><table class="alltables" style="width:100%">
+        <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
             <tbody>
                 <tr><td>التدفّق النقدي الداخل (تحصيل)</td><td style="text-align:end"><?php echo number_format($inflow, 2); ?></td></tr>
                 <tr><td>التدفّق النقدي الخارج (صرف)</td><td style="text-align:end">(<?php echo number_format($outflow, 2); ?>)</td></tr>

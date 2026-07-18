@@ -56,6 +56,67 @@ if (!function_exists('opp_money_by_cur')) {
     }
 }
 
+if (!function_exists('opp_build_requirements')) {
+    // ══════════════════════════════════════════════════════════════════════════
+    // المتطلبات المبدئية المُهيكلة — يبني JSON + نصًّا مشتقًّا من حقول POST المتوازية
+    // (req_equip_type[]/req_equip_qty[]) + عددَي المشغّلين والموردين.
+    // مبدأ عدم التلفيق: تسمية نوع المعدة تُؤخذ من كتالوج الخادم لا من العميل، وأي
+    // نوعٍ غير معروفٍ أو كميةٍ غير موجبةٍ يُسقَط بصمت. الفراغُ التامُّ ⇒ json=null.
+    //   $equipment_types: صفوف [id,type] من equipments_types (المصدر الموثوق).
+    //   يُرجع: ['json' => ?string, 'summary' => string]
+    // ══════════════════════════════════════════════════════════════════════════
+    function opp_build_requirements($post, $equipment_types)
+    {
+        $label_by_id = array();
+        foreach ($equipment_types as $t) {
+            $label_by_id[intval($t['id'])] = $t['type'];
+        }
+
+        $equipment = array();
+        $types = (isset($post['req_equip_type']) && is_array($post['req_equip_type'])) ? $post['req_equip_type'] : array();
+        $qtys  = (isset($post['req_equip_qty'])  && is_array($post['req_equip_qty']))  ? $post['req_equip_qty']  : array();
+        foreach ($types as $i => $tid) {
+            $tid = intval($tid);
+            $qty = isset($qtys[$i]) ? intval($qtys[$i]) : 0;
+            if ($tid <= 0 || $qty <= 0 || !isset($label_by_id[$tid])) {
+                continue; // نوعٌ مجهولٌ أو كميةٌ غير موجبة ⇒ يُسقَط
+            }
+            $equipment[] = array(
+                'type_id'    => $tid,
+                'type_label' => $label_by_id[$tid],
+                'qty'        => $qty,
+            );
+        }
+
+        $operators = isset($post['req_operators']) ? max(0, intval($post['req_operators'])) : 0;
+        $suppliers = isset($post['req_suppliers']) ? max(0, intval($post['req_suppliers'])) : 0;
+
+        if (empty($equipment) && $operators === 0 && $suppliers === 0) {
+            return array('json' => null, 'summary' => '');
+        }
+
+        $json = json_encode(array(
+            'equipment' => $equipment,
+            'operators' => $operators,
+            'suppliers' => $suppliers,
+        ), JSON_UNESCAPED_UNICODE);
+
+        // نصٌّ مشتقٌّ مقروء — يُبقي capacity_summary مفيدًا لكل ما يقرؤه (توافقٌ رجعيّ)
+        $parts = array();
+        if (!empty($equipment)) {
+            $eq_parts = array();
+            foreach ($equipment as $e) {
+                $eq_parts[] = $e['qty'] . ' × ' . $e['type_label'];
+            }
+            $parts[] = implode('، ', $eq_parts);
+        }
+        if ($operators > 0) { $parts[] = 'مشغّلون: ' . $operators; }
+        if ($suppliers > 0) { $parts[] = 'موردون: ' . $suppliers; }
+
+        return array('json' => $json, 'summary' => implode(' · ', $parts));
+    }
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // التحقق من معرف الشركة (عزل الشركات)
 // ══════════════════════════════════════════════════════════════════════════════
@@ -95,6 +156,17 @@ $OPP_STAGE_PROB = array(
     'جديدة' => 10, 'قيد الدراسة' => 20, 'مؤهلة' => 35,
     'عرض مقدم' => 55, 'تفاوض' => 75, 'فوز' => 100, 'خسارة' => 0, 'مستبعدة' => 0,
 );
+
+// ══════════════════════════════════════════════════════════════════════════════
+// كتالوج أنواع المعدات (managed · عام) عبر البوابة — مصدر القائمة المنسدلة
+// للمتطلبات المبدئية (نمط Contracts/contracts.php:99 · value=id، label=type).
+// يُحمَّل مبكرًا لأنه يخدم تحقُّق POST (تسمية النوع من الخادم) وعرضَ النموذج معًا.
+// ══════════════════════════════════════════════════════════════════════════════
+$opp_equipment_types = $gate->select('equipments_types', array(
+    'columns'  => array('id', 'type'),
+    'whereRaw' => "status = 'active'",
+    'orderBy'  => 'type ASC',
+));
 
 // ══════════════════════════════════════════════════════════════════════════════
 // توليد الكود المقترح التالي (OPP-NNNN) — للعرض فقط
@@ -201,6 +273,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         }
     }
 
+    // المتطلبات المبدئية المُهيكلة (§2.6) — JSON مصدرُ الحقيقة + نصٌّ مشتقٌّ للتوافق
+    $opp_req = opp_build_requirements($_POST, $opp_equipment_types);
+
     // القيم خامًا — البوابة تحضّر (prepared) فلا هروب يدويًا ولا أجزاء SQL
     $close_date_raw = isset($_POST['expected_close_date']) ? trim($_POST['expected_close_date']) : '';
     $data = array(
@@ -219,7 +294,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         'stage'            => $stage_raw,
         'attractiveness'   => $attractiveness_raw !== '' ? $attractiveness_raw : null,
         'strategy_fit'     => $strategy_fit_raw !== '' ? $strategy_fit_raw : null,
-        'capacity_summary' => isset($_POST['capacity_summary']) ? trim($_POST['capacity_summary']) : '',
+        'capacity_summary' => $opp_req['summary'],
+        'requirements_json' => $opp_req['json'],
         'funding_needed'   => isset($_POST['funding_needed']) ? (float) $_POST['funding_needed'] : 0,
         'study_decision'   => $study_decision_raw !== '' ? $study_decision_raw : null,
         'expected_close_date' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $close_date_raw) ? $close_date_raw : null,
@@ -603,9 +679,57 @@ function opp_stage_tone($stage)
                         <label><i class="fas fa-hand-holding-dollar"></i> الحاجة للتمويل</label>
                         <input type="number" step="0.01" min="0" name="funding_needed" id="funding_needed" placeholder="0.00" />
                     </div>
-                    <div class="opp-col-full">
-                        <label><i class="fas fa-boxes-stacked"></i> المتطلبات المبدئية (معدات · مشغّلون · موردون)</label>
-                        <textarea name="capacity_summary" id="capacity_summary" rows="2" placeholder="ملخص القدرة المطلوبة"></textarea>
+                    <div class="opp-col-full opp-req-block">
+                        <label class="opp-req-title"><i class="fas fa-boxes-stacked"></i> المتطلبات المبدئية <span class="opp-req-hint">— قدّر ما تحتاجه هذه الفرصة لو فازت</span></label>
+                        <div class="opp-req-panel">
+                            <div class="opp-req-summary" aria-live="polite">
+                                <div class="opp-req-sumcard">
+                                    <span class="opp-req-sumicon"><i class="fas fa-truck-monster"></i></span>
+                                    <span class="opp-req-sumnum" id="reqSumEquip">0</span>
+                                    <span class="opp-req-sumlbl">معدات</span>
+                                </div>
+                                <div class="opp-req-sumcard">
+                                    <span class="opp-req-sumicon"><i class="fas fa-user-gear"></i></span>
+                                    <span class="opp-req-sumnum" id="reqSumOps">0</span>
+                                    <span class="opp-req-sumlbl">مشغّلون</span>
+                                </div>
+                                <div class="opp-req-sumcard">
+                                    <span class="opp-req-sumicon"><i class="fas fa-industry"></i></span>
+                                    <span class="opp-req-sumnum" id="reqSumSupp">0</span>
+                                    <span class="opp-req-sumlbl">موردون</span>
+                                </div>
+                            </div>
+
+                            <div id="reqLegacyNote" class="opp-req-legacy opp-req-hidden">
+                                <i class="fas fa-clock-rotate-left"></i> متطلبات قديمة (نصّ حرّ): <span id="reqLegacyText"></span>
+                                <div class="opp-req-legacy-hint">أعد إدخالها بالحقول أدناه لتُحفظ بشكلٍ مُهيكل.</div>
+                            </div>
+
+                            <div class="opp-req-main">
+                                <div class="opp-req-eqsec">
+                                    <div class="opp-req-seclbl"><i class="fas fa-truck-monster"></i> المعدات المطلوبة (بالنوع)</div>
+                                    <div id="reqEquipRows" class="opp-req-rows"></div>
+                                    <div id="reqEquipEmpty" class="opp-req-empty">لم تُضف أنواع معدات بعد — اضغط «أضف نوع معدة».</div>
+                                    <button type="button" id="reqAddEquip" class="opp-req-add"><i class="fas fa-plus"></i> أضف نوع معدة</button>
+                                </div>
+
+                                <div class="opp-req-counts">
+                                    <div class="opp-req-seclbl"><i class="fas fa-users-gear"></i> الطاقم والموردون</div>
+                                    <div class="opp-req-countgrid">
+                                        <div class="opp-req-countfield">
+                                            <label><i class="fas fa-user-gear"></i> عدد المشغّلين</label>
+                                            <input type="number" min="0" step="1" name="req_operators" id="req_operators" placeholder="0" />
+                                            <div class="opp-req-fieldhint" id="reqOpsHint">مقترح ≥ عدد المعدات</div>
+                                        </div>
+                                        <div class="opp-req-countfield">
+                                            <label><i class="fas fa-industry"></i> عدد الموردين</label>
+                                            <input type="number" min="0" step="1" name="req_suppliers" id="req_suppliers" placeholder="0" />
+                                            <div class="opp-req-fieldhint">جهات تأجير/تمليك خارجية</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label><i class="fas fa-trophy"></i> سبب الفوز</label>
@@ -699,6 +823,7 @@ function opp_stage_tone($stage)
                                             data-attractiveness="<?php echo opp_e($row['attractiveness']); ?>"
                                             data-fit="<?php echo opp_e($row['strategy_fit']); ?>"
                                             data-capacity="<?php echo opp_e($row['capacity_summary']); ?>"
+                                            data-requirements="<?php echo opp_e($row['requirements_json']); ?>"
                                             data-funding="<?php echo opp_e(opp_money($row['funding_needed'])); ?>"
                                             data-decision="<?php echo opp_e($row['study_decision']); ?>"
                                             data-close="<?php echo opp_e($row['expected_close_date']); ?>"
@@ -725,6 +850,7 @@ function opp_stage_tone($stage)
                                                 data-attractiveness="<?php echo opp_e($row['attractiveness']); ?>"
                                                 data-fit="<?php echo opp_e($row['strategy_fit']); ?>"
                                                 data-capacity="<?php echo opp_e($row['capacity_summary']); ?>"
+                                            data-requirements="<?php echo opp_e($row['requirements_json']); ?>"
                                                 data-funding="<?php echo opp_e($row['funding_needed']); ?>"
                                                 data-decision="<?php echo opp_e($row['study_decision']); ?>"
                                                 data-close="<?php echo opp_e($row['expected_close_date']); ?>"
@@ -803,9 +929,109 @@ function opp_stage_tone($stage)
     const statsToggleBtn = $('#toggleStats');
     const statsSection = $('#oppStatsSection');
 
+    // ══ المتطلبات المبدئية المُهيكلة (§2.6): صفوف [نوع معدة + عدد] + عددا مشغّلين/موردين ══
+    var OPP_EQUIP_TYPES = <?php echo json_encode(array_map(function ($t) { return array('id' => intval($t['id']), 'type' => $t['type']); }, $opp_equipment_types), JSON_UNESCAPED_UNICODE); ?>;
+
+    function oppEscHtml(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function oppParseReq(v) {
+        if (!v) return null;
+        if (typeof v === 'object') return v;           // jQuery .data() قد يفكّ JSON تلقائيًا
+        try { return JSON.parse(v); } catch (e) { return null; }
+    }
+    function oppEquipOptionsHtml(selectedId) {
+        var html = '<option value="">— اختر النوع —</option>';
+        for (var i = 0; i < OPP_EQUIP_TYPES.length; i++) {
+            var t = OPP_EQUIP_TYPES[i];
+            var sel = (String(t.id) === String(selectedId)) ? ' selected' : '';
+            html += '<option value="' + t.id + '"' + sel + '>' + oppEscHtml(t.type) + '</option>';
+        }
+        return html;
+    }
+    function oppRecalcReq() {
+        var totalEq = 0;
+        $('#reqEquipRows .opp-req-row').each(function () {
+            var t = $(this).find('.opp-req-type').val();
+            var q = parseInt($(this).find('.opp-req-qty').val(), 10) || 0;
+            if (t && q > 0) totalEq += q;
+        });
+        var ops = parseInt($('#req_operators').val(), 10) || 0;
+        var sup = parseInt($('#req_suppliers').val(), 10) || 0;
+        $('#reqSumEquip').text(totalEq);
+        $('#reqSumOps').text(ops);
+        $('#reqSumSupp').text(sup);
+        var hasRows = $('#reqEquipRows .opp-req-row').length > 0;
+        $('#reqEquipEmpty').toggleClass('opp-req-hidden', hasRows);   // class لا .hide() (ems-forms.css يهزم hide)
+        $('#reqOpsHint').text(totalEq > 0 ? ('مقترح ≥ عدد المعدات (' + totalEq + ')') : 'مقترح ≥ عدد المعدات');
+    }
+    function oppAddEquipRow(typeId, qty) {
+        var q = parseInt(qty, 10); if (!(q > 0)) q = 1;
+        var $row = $('<div class="opp-req-row"></div>').html(
+            '<select name="req_equip_type[]" class="opp-req-type">' + oppEquipOptionsHtml(typeId) + '</select>' +
+            '<input type="number" name="req_equip_qty[]" class="opp-req-qty" min="1" step="1" value="' + q + '" />' +
+            '<button type="button" class="opp-req-del" aria-label="حذف نوع المعدة"><i class="fas fa-trash-alt"></i></button>'
+        );
+        $('#reqEquipRows').append($row);
+        if (window.EmsSelect) EmsSelect.init();   // enhance() يتخطّى المُحسَّن مسبقًا
+        oppRecalcReq();
+    }
+    function oppReqReset() {
+        $('#reqEquipRows').empty();
+        $('#req_operators').val('');
+        $('#req_suppliers').val('');
+        $('#reqLegacyNote').addClass('opp-req-hidden');
+        oppRecalcReq();
+    }
+    function oppReqPopulate(reqRaw, legacy) {
+        oppReqReset();
+        var r = oppParseReq(reqRaw);
+        var hasStruct = !!(r && ((r.equipment && r.equipment.length) || parseInt(r.operators, 10) || parseInt(r.suppliers, 10)));
+        var lt = (legacy == null ? '' : String(legacy)).trim();
+        // نصٌّ قديمٌ غيرُ مُهاجَر (requirements_json فارغ + capacity_summary حرّ) — أظهره ليُعاد إدخاله
+        if (!hasStruct && lt) { $('#reqLegacyText').text(lt); $('#reqLegacyNote').removeClass('opp-req-hidden'); }
+        if (!r) return;
+        var eq = r.equipment || [];
+        for (var i = 0; i < eq.length; i++) { oppAddEquipRow(eq[i].type_id, eq[i].qty); }
+        $('#req_operators').val((parseInt(r.operators, 10) || 0) ? r.operators : '');
+        $('#req_suppliers').val((parseInt(r.suppliers, 10) || 0) ? r.suppliers : '');
+        oppRecalcReq();
+    }
+    // عرضٌ مُهيكلٌ للمودال (شرائح إجمالية + جدول أنواع) — value بصيغة HTML موثوقة.
+    // legacy: نصُّ capacity_summary القديم — يُعرَض كبديلٍ حين لا بنية مُهيكلة (توافق).
+    function oppReqHtml(reqRaw, legacy) {
+        var r = oppParseReq(reqRaw);
+        var eq = (r && r.equipment) ? r.equipment : [];
+        var totalEq = 0; for (var i = 0; i < eq.length; i++) { totalEq += parseInt(eq[i].qty, 10) || 0; }
+        var ops = r ? (parseInt(r.operators, 10) || 0) : 0;
+        var sup = r ? (parseInt(r.suppliers, 10) || 0) : 0;
+        if (!totalEq && !ops && !sup) {
+            var lt = (legacy == null ? '' : String(legacy)).trim();
+            return lt ? ('<span class="opp-reqv-legacy">' + oppEscHtml(lt) + '</span>') : '—';
+        }
+        var html = '<div class="opp-reqv"><div class="opp-reqv-chips">' +
+            '<span class="opp-reqv-chip"><i class="fas fa-truck-monster"></i> معدات: <b>' + totalEq + '</b></span>' +
+            '<span class="opp-reqv-chip"><i class="fas fa-user-gear"></i> مشغّلون: <b>' + ops + '</b></span>' +
+            '<span class="opp-reqv-chip"><i class="fas fa-industry"></i> موردون: <b>' + sup + '</b></span></div>';
+        if (eq.length) {
+            html += '<table class="opp-reqv-table"><thead><tr><th>نوع المعدة</th><th>العدد</th></tr></thead><tbody>';
+            for (var j = 0; j < eq.length; j++) {
+                html += '<tr><td>' + oppEscHtml(eq[j].type_label || ('#' + eq[j].type_id)) + '</td><td>' + (parseInt(eq[j].qty, 10) || 0) + '</td></tr>';
+            }
+            html += '</tbody></table>';
+        }
+        return html + '</div>';
+    }
+
+    $('#reqAddEquip').on('click', function () { oppAddEquipRow('', 1); });
+    $('#reqEquipRows').on('click', '.opp-req-del', function () { $(this).closest('.opp-req-row').remove(); oppRecalcReq(); });
+    $('#reqEquipRows').on('input change', '.opp-req-qty, .opp-req-type', oppRecalcReq);
+    $('#req_operators, #req_suppliers').on('input change', oppRecalcReq);
+    oppRecalcReq();
+
     function setAddMode() { formTitle.text('إضافة فرصة جديدة'); submitBtnText.text('حفظ الفرصة'); generatedCodeWrapper.show(); }
     function setEditMode() { formTitle.text('تعديل الفرصة'); submitBtnText.text('تحديث الفرصة'); generatedCodeWrapper.hide(); }
-    function resetForm() { if (!oppForm.length) return; oppForm[0].reset(); $('#opp_id').val(''); setAddMode(); if (window.EmsSelect) EmsSelect.refresh(); }
+    function resetForm() { if (!oppForm.length) return; oppForm[0].reset(); $('#opp_id').val(''); oppReqReset(); setAddMode(); if (window.EmsSelect) EmsSelect.refresh(); }
 
     function updateFormToggleState(isOpen) {
         if (!formToggleBtn.length) return;
@@ -867,7 +1093,7 @@ function opp_stage_tone($stage)
         $('#stage').val(d.stage || 'جديدة');
         $('#attractiveness').val(d.attractiveness || '');
         $('#strategy_fit').val(d.fit || '');
-        $('#capacity_summary').val(d.capacity || '');
+        oppReqPopulate(d.requirements, d.capacity);
         $('#funding_needed').val(d.funding || '');
         $('#study_decision').val(d.decision || '');
         $('#expected_close_date').val(d.close || '');
@@ -891,6 +1117,7 @@ function opp_stage_tone($stage)
             region: $(this).data('region'), revenueModel: $(this).data('revenue-model'), expected: $(this).data('expected'),
             currency: $(this).data('currency'), probability: $(this).data('probability'), stage: $(this).data('stage'),
             attractiveness: $(this).data('attractiveness'), fit: $(this).data('fit'), capacity: $(this).data('capacity'),
+            requirements: $(this).attr('data-requirements'),
             funding: $(this).data('funding'), decision: $(this).data('decision'), close: $(this).data('close'),
             win: $(this).data('win'), lost: $(this).data('lost'), review: $(this).data('review'), notes: $(this).data('notes')
         });
@@ -899,6 +1126,7 @@ function opp_stage_tone($stage)
     // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
     $(document).on('click', '.viewOppBtn', function () {
         const d = $(this).data();
+        const reqRaw = $(this).attr('data-requirements');   // JSON خام (لا تفكيك jQuery) — للعرض والتعديل
         const stage = String(d.stage || '');
         let tone = 'inactive';
         if (stage === 'فوز') tone = 'active';
@@ -921,7 +1149,7 @@ function opp_stage_tone($stage)
             { label: 'التوافق الاستراتيجي', value: d.fit || '—', icon: 'fas fa-bullseye' },
             { label: 'قرار الدراسة', value: d.decision || '—', icon: 'fas fa-clipboard-check' },
             { label: 'الحاجة للتمويل', value: d.funding || '0.00', icon: 'fas fa-hand-holding-dollar' },
-            { label: 'المتطلبات المبدئية', value: d.capacity || '—', icon: 'fas fa-boxes-stacked', size: 'lg' },
+            { label: 'المتطلبات المبدئية', value: oppReqHtml(reqRaw, d.capacity), icon: 'fas fa-boxes-stacked', size: 'full', type: 'html', html: true },
             { label: 'سبب الفوز', value: d.win || '—', icon: 'fas fa-trophy' },
             { label: 'سبب الخسارة', value: d.lost || '—', icon: 'fas fa-circle-xmark' },
             { label: 'ملاحظات المراجعة', value: d.review || '—', icon: 'fas fa-clipboard-list', size: 'lg' },
@@ -937,7 +1165,7 @@ function opp_stage_tone($stage)
                     id: d.id, code: d.code, title: d.title, clientId: '', source: d.source, sector: d.sector,
                     region: d.region, revenueModel: '', expected: (d.expected || '').replace(/,/g, ''), currency: d.currency,
                     probability: d.probability, stage: d.stage, attractiveness: d.attractiveness, fit: d.fit,
-                    capacity: d.capacity, funding: (d.funding || '').replace(/,/g, ''), decision: d.decision, close: d.close,
+                    capacity: d.capacity, requirements: reqRaw, funding: (d.funding || '').replace(/,/g, ''), decision: d.decision, close: d.close,
                     win: d.win, lost: d.lost, review: d.review, notes: d.notes
                 });
             }});
@@ -963,7 +1191,9 @@ function opp_stage_tone($stage)
     @media (max-width: 560px) { .opp-main .stats-grid { grid-template-columns: 1fr; } }
 
     .opp-main .opp-hidden { display: none; }
-    .opp-main .opp-col-full { grid-column: 1 / -1; }
+    /* .form-grid هنا flexbox (ems-forms.css) بـ5 أعمدة صلبة — التمدّد لصفٍّ كامل
+       يكون بـ flex-basis:100% لا بـ grid-column (خاصية شبكةٍ لا أثر لها في flex). */
+    .opp-main .opp-col-full { grid-column: 1 / -1; flex-basis: 100% !important; }
     .opp-main .table-container { overflow-x: auto; }
     #oppTable.opp-table-nowrap, #oppTable.opp-table-nowrap th, #oppTable.opp-table-nowrap td { white-space: nowrap; }
     #oppTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
@@ -980,6 +1210,50 @@ function opp_stage_tone($stage)
     .opp-stage-won { background: rgba(34,197,94,.15); color: #15803d; border-color: rgba(34,197,94,.30); }
     .opp-stage-lost { background: rgba(220,38,38,.12); color: #b91c1c; border-color: rgba(220,38,38,.28); }
     .opp-stage-excluded { background: rgba(107,114,128,.14); color: #4b5563; border-color: rgba(107,114,128,.30); }
+
+    /* ── المتطلبات المبدئية المُهيكلة (بناء) ── */
+    .opp-main .opp-req-title { display: block; margin-bottom: 8px; }
+    .opp-main .opp-req-hint { font-weight: 400; font-size: .8rem; color: #8a8f98; }
+    .opp-main .opp-req-panel { border: 1px solid var(--bdr, #D7DBE0); border-radius: var(--rl, 12px); background: var(--s2, #F2F3F5); padding: 14px; }
+    .opp-main .opp-req-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .opp-main .opp-req-sumcard { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 12px; background: #fff; border: 1px solid var(--bdr, #D7DBE0); border-radius: 12px; padding: 14px 12px; }
+    .opp-main .opp-req-sumcard .opp-req-sumicon { width: 40px; height: 40px; flex: 0 0 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: #FCF3D6; color: #C88A00; font-size: 1.1rem; }
+    .opp-main .opp-req-sumnum { font-size: 30px; font-weight: 900; line-height: 1; color: #1a1f28; font-variant-numeric: tabular-nums; min-width: 34px; text-align: center; }
+    .opp-main .opp-req-sumlbl { font-size: .9rem; font-weight: 700; color: #5f5e5a; }
+    .opp-main .opp-req-seclbl { font-size: .85rem; font-weight: 700; color: #444; margin-bottom: 8px; }
+    .opp-main .opp-req-seclbl i { color: #E0AE2E; }
+    .opp-main .opp-req-rows { display: flex; flex-direction: column; gap: 8px; }
+    .opp-main .opp-req-row { display: flex; gap: 8px; align-items: center; max-width: 480px; }
+    .opp-main .opp-req-row .opp-req-type, .opp-main .opp-req-row .emsf-select-wrap { flex: 1 1 auto; min-width: 0; margin: 0; }
+    .opp-main .opp-req-row .opp-req-qty { flex: 0 0 90px; width: 90px; margin: 0; text-align: center; }
+    .opp-main .opp-req-del { flex: 0 0 auto; width: 38px; height: 38px; border: 1px solid #e6b8b8; background: #fff; color: #c0392b; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .opp-main .opp-req-del:hover { background: #fdecea; }
+    .opp-main .opp-req-add { margin-top: 10px; background: #fff; border: 1px dashed #E0AE2E; color: #946A00; border-radius: 10px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: .85rem; }
+    .opp-main .opp-req-add:hover { background: #FCF3D6; }
+    .opp-main .opp-req-empty { font-size: .82rem; color: #8a8f98; padding: 6px 2px; }
+    .opp-main .opp-req-hidden { display: none !important; }
+    /* المنطقة الرئيسة: عمودان (المعدات | الطاقم والموردون) لاستغلال العرض بتوازن */
+    .opp-main .opp-req-main { display: flex; gap: 20px; align-items: stretch; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--bdr, #D7DBE0); }
+    .opp-main .opp-req-eqsec { flex: 1.35 1 0; min-width: 0; }
+    .opp-main .opp-req-counts { flex: 1 1 0; min-width: 0; border-inline-start: 1px dashed var(--bdr, #D7DBE0); padding-inline-start: 20px; }
+    .opp-main .opp-req-countgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .opp-main .opp-req-countfield label { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; font-weight: 700; color: #5f5e5a; margin-bottom: 5px; }
+    .opp-main .opp-req-countfield label i { color: #E0AE2E; }
+    .opp-main .opp-req-countfield input { width: 100%; text-align: center; }
+    .opp-main .opp-req-fieldhint { font-size: .72rem; color: #8a8f98; margin-top: 4px; }
+    @media (max-width: 900px) { .opp-main .opp-req-main { flex-direction: column; gap: 14px; } .opp-main .opp-req-counts { border-inline-start: 0; padding-inline-start: 0; border-top: 1px dashed var(--bdr, #D7DBE0); padding-top: 12px; } }
+    .opp-main .opp-req-legacy { background: #FDF6E3; border: 1px dashed #E0AE2E; border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: .84rem; color: #6b5200; font-weight: 700; }
+    .opp-main .opp-req-legacy .opp-req-legacy-hint { font-weight: 400; font-size: .74rem; color: #8a7a3a; margin-top: 3px; }
+    @media (max-width: 560px) { .opp-main .opp-req-summary { grid-template-columns: 1fr 1fr; } .opp-main .opp-req-counts { grid-template-columns: 1fr; } }
+
+    /* ── عرض المتطلبات داخل مودال التفاصيل (خارج .opp-main — المودال في body) ── */
+    .opp-reqv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .opp-reqv-chip { display: inline-flex; align-items: center; gap: 5px; background: #FCF3D6; border: 1px solid #E9D08A; color: #6b5200; border-radius: 999px; padding: 4px 12px; font-size: .82rem; font-weight: 700; }
+    .opp-reqv-chip b { font-weight: 900; }
+    .opp-reqv-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    .opp-reqv-table th, .opp-reqv-table td { border: 1px solid #e3e6ea; padding: 6px 10px; text-align: right; }
+    .opp-reqv-table thead th { background: #f7f4ec; font-weight: 800; color: #5f5e5a; }
+    .opp-reqv-legacy { color: #6b5200; font-style: italic; }
 </style>
 
 </body>

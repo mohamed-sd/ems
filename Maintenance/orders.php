@@ -706,7 +706,8 @@ function mnt_state_class($st) {
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleOrderCreateForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus', 'label' => 'أمر صيانة جديد');
     }
-    $header_actions[] = array('tag' => 'a', 'href' => 'breakdowns.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-triangle-exclamation', 'label' => 'البلاغات');
+    // البلاغات وحدةٌ مستقلّة — الرابط يشير إلى شاشتها مباشرةً.
+    $header_actions[] = array('tag' => 'a', 'href' => '../Tickets/tickets_list.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-tower-observation', 'label' => 'البلاغات');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
 ?>

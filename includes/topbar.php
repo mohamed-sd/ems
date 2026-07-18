@@ -89,8 +89,9 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
     $ems_tb_logout  = function_exists('ems_url') ? ems_url('logout.php') : '/ems/logout.php';
     $ems_tb_profile = function_exists('ems_url') ? ems_url('main/profile.php') : '/ems/main/profile.php';
     $ems_tb_settings = function_exists('ems_url') ? ems_url('Settings/settings.php') : '/ems/Settings/settings.php';
-    // شاشة البلاغات الموحّدة (متاحة لكل المستخدمين عبر التوبار، نمط المراسلات).
-    $ems_tb_breakdowns = function_exists('ems_url') ? ems_url('Maintenance/breakdowns.php') : '/ems/Maintenance/breakdowns.php';
+    // شاشة البلاغات — متاحة لكل المستخدمين عبر الشريط العلوي (نمط المراسلات:
+    // بلا فحص صلاحية موديول؛ نطاق الرؤية يُفرَض داخل الشاشة نفسها).
+    $ems_tb_tickets = function_exists('ems_url') ? ems_url('Tickets/tickets_list.php') : '/ems/Tickets/tickets_list.php';
     ?>
     <header class="<?php echo $ems_tb_barClass; ?>">
         <div class="ems-topbar-logo">
@@ -98,23 +99,27 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         </div>
 
         <div class="ems-topbar-center">
-            <?php if ($ems_tb_empName !== ''): ?>
-                <span class="ems-topbar-pill ems-topbar-pill--employee" title="الموظف صاحب الحساب">
-                    <i class="fas fa-id-card-alt"></i><?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>
-                </span>
-            <?php else: ?>
-                <span class="ems-topbar-pill ems-topbar-pill--muted" title="الحساب غير مرتبط بموظف">
-                    <i class="fas fa-id-card-alt"></i>غير مرتبط بموظف
+            <span class="ems-topbar-pill" title="الإدارة">
+                <i class="fas fa-user-shield"></i>الإدارة: <?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>
+            </span>
+            <?php if ($ems_tb_userName !== ''): ?>
+                <span class="ems-topbar-pill" title="المسمى الوظيفي">
+                    <i class="fas fa-user-circle"></i>المسمى الوظيفي: <?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?>
                 </span>
             <?php endif; ?>
-            <span class="ems-topbar-pill" title="الدور / الصلاحية"><i class="fas fa-user-shield"></i><?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?></span>
-            <?php if ($ems_tb_userName !== ''): ?>
-                <span class="ems-topbar-pill" title="اسم الحساب"><i class="fas fa-user-circle"></i><?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?></span>
+            <?php if ($ems_tb_empName !== ''): ?>
+                <span class="ems-topbar-pill ems-topbar-pill--employee" title="الموظف المسؤول">
+                    <i class="fas fa-id-card-alt"></i>الموظف المسؤول: <?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>
+                </span>
+            <?php else: ?>
+                <span class="ems-topbar-pill ems-topbar-pill--muted" title="الموظف المسؤول">
+                    <i class="fas fa-id-card-alt"></i>الموظف المسؤول: غير مرتبط بموظف
+                </span>
             <?php endif; ?>
         </div>
 
         <div class="ems-topbar-actions">
-            <a href="<?php echo htmlspecialchars($ems_tb_breakdowns, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" id="emsTopbarBreakdowns" title="البلاغات" aria-label="البلاغات"><i class="fas fa-triangle-exclamation"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
+            <a href="<?php echo htmlspecialchars($ems_tb_tickets, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" id="emsTopbarTickets" title="البلاغات" aria-label="البلاغات"><i class="fas fa-tower-observation"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
             <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-icon--power" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fas fa-power-off"></i></a>
             <a href="<?php echo htmlspecialchars($ems_tb_profile, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الملف الشخصي" aria-label="الملف الشخصي"><i class="far fa-user"></i></a>
             <a href="<?php echo htmlspecialchars($ems_tb_settings, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الإعدادات" aria-label="الإعدادات"><i class="fas fa-gear"></i></a>
@@ -132,7 +137,8 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         }
     </style>
     <script>
-        // ===== شارة عدّاد البلاغات الجديدة في التوبار =====
+        // ===== شارة عدّاد البلاغات المفتوحة =====
+        // العدّ ضمن نطاق رؤية المستخدم، فلا تكشف الشارة ما لا يراه على الشاشة.
         (function () {
             var badge = document.getElementById('emsBreakdownBadge');
             if (!badge) return;
@@ -142,7 +148,7 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
                 if (document.hidden || inFlight) return;
                 inFlight = true;
                 var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/ems/Maintenance/get_breakdown_count.php', true);
+                xhr.open('GET', '/ems/Tickets/get_tickets_count.php', true);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.onload = function () {
                     try {
@@ -151,7 +157,7 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
                         if (c > 0) {
                             badge.textContent = c > 99 ? '99+' : String(c);
                             badge.style.display = 'inline-flex';
-                            badge.setAttribute('aria-label', c + ' بلاغ جديد');
+                            badge.setAttribute('aria-label', c + ' بلاغ مفتوح');
                         } else {
                             badge.style.display = 'none';
                             badge.removeAttribute('aria-label');

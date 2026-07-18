@@ -48,6 +48,8 @@ class TenantRegistry
         'clients' => array('type' => self::T_TENANT, 'soft' => true),
         'commercial_risks' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_amendments' => array('type' => self::T_TENANT, 'soft' => true),
+        // INJAZ-S05 §ت.2: التزامات العقد — عائلة «الوحدة التعاقدية» (مع contract_hour_policies/unit_party_awards)
+        'contract_commitments' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_events' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'contractequipments' => array('type' => self::T_TENANT, 'soft' => false),
@@ -101,6 +103,7 @@ class TenantRegistry
         'fin_request_events' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_event_links' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_effect_map' => array('type' => self::T_TENANT, 'soft' => false), // §6.1: خريطة تفريع الأثر التصريحية
+        'fin_operator_pay' => array('type' => self::T_TENANT, 'soft' => false), // §12: وضع دفع المشغّل (بالراتب/بالمستحق) — يحكم مروحة employee_due
         // D02 §3.7: أحكام استحقاق الأطراف — حكمٌ لكل طرفٍ بوحدة عقده هو (soft=true:
         // الحكم قرارٌ تعاقديٌّ يُراجَع ويُعكس، فلا يُمحى من سجلّ التدقيق)
         'unit_party_awards' => array('type' => self::T_TENANT, 'soft' => true),
@@ -172,11 +175,29 @@ class TenantRegistry
         'products' => array('type' => self::T_TENANT, 'soft' => true),
         'project' => array('type' => self::T_TENANT, 'soft' => true),
         'quotations' => array('type' => self::T_TENANT, 'soft' => true),
+        // INJAZ-S05 §6.12: بنود فحص الجاهزية الستة لكل عقد
+        'readiness_lines' => array('type' => self::T_TENANT, 'soft' => true),
         'supplier_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'suppliercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'suppliers' => array('type' => self::T_TENANT, 'soft' => true),
         'supplierscontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'tenders' => array('type' => self::T_TENANT, 'soft' => true),
+        // وحدة البلاغات (2026-07-18): التذكرة وسجلّاتها بلا حذفٍ ناعم — الإلغاء
+        // حالةٌ تُسجَّل لا محوٌ للسجل؛ وسجلّا الأحداث والتحويلات للإدراج فقط
+        // (لا تعديلَ ولا حذفَ في طبقة التطبيق)؛ والأنواع والتصنيفات كتالوج
+        // مشترك (صفوف عامة بـcompany_id=NULL + إضافات كل شركة).
+        'ticket_attachments' => array('type' => self::T_TENANT, 'soft' => false),
+        'ticket_categories' => array('type' => self::T_CATALOG, 'soft' => false),
+        'ticket_escalation_rules' => array('type' => self::T_TENANT, 'soft' => false),
+        'ticket_events' => array('type' => self::T_TENANT, 'soft' => false),
+        'ticket_recurrence_templates' => array('type' => self::T_TENANT, 'soft' => false),
+        'ticket_sla_policies' => array('type' => self::T_TENANT, 'soft' => false),
+        'ticket_transfers' => array('type' => self::T_TENANT, 'soft' => false),
+        'ticket_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        'ticket_watchers' => array('type' => self::T_TENANT, 'soft' => false),
+        'tickets' => array('type' => self::T_TENANT, 'soft' => false),
+        // إشعارات وحدة البلاغات (منع تكرارٍ يوميّ، بلا حذف)
+        'tkt_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'timesheet' => array('type' => self::T_TENANT, 'soft' => false),
         'timesheet_approval_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'timesheet_approvals' => array('type' => self::T_TENANT, 'soft' => false),

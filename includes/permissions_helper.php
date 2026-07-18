@@ -548,6 +548,15 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         return;
     }
 
+    // شاشتا البلاغات (القائمة والاستمارة) بنفس نمط المراسلات: أيُّ مستخدمٍ
+    // مسجّلٍ يصلهما عبر الشريط العلوي ليُبلّغ ويتابع؛ ونطاقُ الرؤية والأزرار
+    // يُفرضان داخل الشاشتين نفسيهما. أمّا شاشات الإعداد فتبقى خلف هذا الحارس
+    // لمدير البلاغات حصرًا.
+    if (strpos($relative_script, 'Tickets/tickets_list.php') !== false
+        || strpos($relative_script, 'Tickets/ticket_form.php') !== false) {
+        return;
+    }
+
     if (strpos($relative_script, 'emsreports/') === 0) {
         $role_id = intval($_SESSION['user']['role']);
         $has_reports_permission = false;

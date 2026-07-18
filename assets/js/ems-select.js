@@ -19,7 +19,74 @@
   var FORM_SCOPE = ['.allforms', '.ems-form'];
   var openWraps = [];
 
+  // عندما تبلغ الخيارات هذا العدد (أو أكثر) يظهر صندوق البحث تلقائياً داخل القائمة.
+  // للإجبار: data-emsf-search على الـ<select>. للتعطيل: data-no-emsf-search.
+  var SEARCH_MIN_OPTIONS = 7;
+
   function getMenu(wrap) { return wrap._emsfMenu; }
+
+  // هل نعرض صندوق بحثٍ لهذه القائمة؟ (سمة صريحة تتقدّم على العدد التلقائي)
+  function shouldSearch(sel) {
+    if (sel.hasAttribute('data-no-emsf-search')) return false;
+    var attr = sel.getAttribute('data-emsf-search');
+    if (attr === 'off' || attr === 'false' || attr === '0') return false;
+    if (attr !== null) return true;
+    return sel.options.length >= SEARCH_MIN_OPTIONS;
+  }
+
+  // تطبيعٌ عربيٌّ متسامح: حروف صغيرة + إزالة التشكيل/التطويل + توحيد الألف/الياء/التاء المربوطة
+  function normText(s) {
+    s = (s == null ? '' : String(s)).toLowerCase();
+    s = s.replace(/[ً-ْٰـ]/g, '');   // تشكيل + تطويل
+    s = s.replace(/[آأإ]/g, 'ا');    // آ أ إ → ا
+    s = s.replace(/ى/g, 'ي');                  // ى → ي
+    s = s.replace(/ة/g, 'ه');                  // ة → ه
+    return s.trim();
+  }
+
+  function visibleOptions(menu) {
+    return Array.prototype.filter.call(
+      menu.querySelectorAll('.emsf-select-option'),
+      function (it) { return it.style.display !== 'none'; }
+    );
+  }
+
+  function clearActive(menu) {
+    menu.querySelectorAll('.emsf-select-option.is-active').forEach(function (it) {
+      it.classList.remove('is-active');
+    });
+  }
+
+  function moveActive(menu, dir) {
+    var vis = visibleOptions(menu);
+    if (!vis.length) return;
+    var cur = menu.querySelector('.emsf-select-option.is-active');
+    var idx = cur ? vis.indexOf(cur) : -1;
+    idx += dir;
+    if (idx < 0) idx = vis.length - 1;
+    if (idx >= vis.length) idx = 0;
+    clearActive(menu);
+    vis[idx].classList.add('is-active');
+    vis[idx].scrollIntoView({ block: 'nearest' });
+  }
+
+  // تصفية عناصر القائمة حسب نصّ البحث (يُخفي النائب أثناء البحث، ويُظهر «لا نتائج» عند الخلوّ)
+  function filterMenu(wrap) {
+    var menu = getMenu(wrap);
+    if (!menu) return;
+    var input = menu.querySelector('.emsf-select-search-input');
+    var q = input ? normText(input.value) : '';
+    var visible = 0;
+    menu.querySelectorAll('.emsf-select-option').forEach(function (it) {
+      var match = q === '' ? true : normText(it.textContent).indexOf(q) !== -1;
+      if (q !== '' && it.classList.contains('is-placeholder')) match = false;
+      it.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    var empty = menu.querySelector('.emsf-select-empty');
+    if (empty) empty.style.display = (visible === 0) ? '' : 'none';
+    clearActive(menu);
+  }
 
   function closeAll(except) {
     openWraps.slice().forEach(function (w) {
@@ -31,6 +98,37 @@
     var menu = getMenu(wrap);
     if (!menu) return;
     menu.innerHTML = '';
+
+    // ترويسة البحث (تظهر فقط للقوائم الطويلة) — مثبّتة أعلى القائمة أثناء التمرير
+    if (shouldSearch(sel)) {
+      var header = document.createElement('div');
+      header.className = 'emsf-select-search';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'emsf-select-search-input';
+      input.setAttribute('placeholder', '🔍 ابحث…');
+      input.setAttribute('autocomplete', 'off');
+      input.setAttribute('dir', 'auto');
+      // منع إغلاق القائمة أو تسرّب الأحداث عند التفاعل مع الحقل
+      input.addEventListener('click', function (e) { e.stopPropagation(); });
+      input.addEventListener('input', function () { filterMenu(wrap); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown') { e.preventDefault(); moveActive(menu, 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); moveActive(menu, -1); }
+        else if (e.key === 'Enter') {
+          e.preventDefault();
+          var active = menu.querySelector('.emsf-select-option.is-active');
+          if (!active) { var vis = visibleOptions(menu); active = vis.length ? vis[0] : null; }
+          if (active) active.click();
+        } else if (e.key === 'Escape') {
+          e.stopPropagation();
+          closeWrap(wrap);
+        }
+      });
+      header.appendChild(input);
+      menu.appendChild(header);
+    }
+
     Array.prototype.forEach.call(sel.options, function (opt, i) {
       var item = document.createElement('div');
       item.className = 'emsf-select-option';
@@ -53,6 +151,13 @@
       });
       menu.appendChild(item);
     });
+
+    // حالة «لا نتائج» (مخفيّة حتى تُفرِغ التصفيةُ القائمة)
+    var empty = document.createElement('div');
+    empty.className = 'emsf-select-empty';
+    empty.textContent = 'لا نتائج مطابقة';
+    empty.style.display = 'none';
+    menu.appendChild(empty);
   }
 
   function refresh(wrap, sel) {
@@ -102,9 +207,20 @@
     // نقل القائمة إلى <body> كي تتجاوز كل سياقات التكديس / overflow
     if (menu.parentNode !== document.body) document.body.appendChild(menu);
     menu.classList.add('is-open');
+    // إعادة ضبط البحث عند كل فتح ثم تركيز الحقل (إن وُجد)
+    var searchInput = menu.querySelector('.emsf-select-search-input');
+    if (searchInput) {
+      searchInput.value = '';
+      filterMenu(wrap);
+    }
     positionMenu(wrap);
     var selItem = menu.querySelector('.emsf-select-option.is-selected');
     if (selItem) selItem.scrollIntoView({ block: 'nearest' });
+    if (searchInput) {
+      setTimeout(function () {
+        try { searchInput.focus({ preventScroll: true }); } catch (e) { searchInput.focus(); }
+      }, 0);
+    }
     if (openWraps.indexOf(wrap) === -1) openWraps.push(wrap);
     // إعادة التموضع أثناء التمرير/تغيير الحجم
     wrap._emsfReposition = function () { positionMenu(wrap); };
