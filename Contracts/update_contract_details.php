@@ -2,11 +2,25 @@
 include '../config.php';
 require_login();
 require_once '../includes/approval_workflow.php';
+require_once '../includes/permissions_helper.php';
 
 while (ob_get_level()) ob_end_clean();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+}
+
+// [ح-7] فحص CSRF ذاتيّ — الحارس المركزي في وضع مراقبةٍ لـ/Contracts/ فلا يحجب،
+// وهذا الملف لا يطابق نمط كشف الـAJAX (get_*/‎*_handler) فلا يراه حارس الإجراءات.
+$__csrf_tok = isset($_POST['csrf_token']) ? $_POST['csrf_token']
+            : (isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '');
+if (!verify_csrf_token($__csrf_tok)) {
+    die(json_encode(['success' => false, 'message' => 'رمز الحماية غير صالح — يرجى إعادة تحميل الصفحة']));
+}
+// [ح-7] فحص صلاحية التعديل خادميًّا (كان في العميل فقط canEditDetails — يُتجاوَز بـcURL)
+$__cd_perms = check_page_permissions($conn, 'Contracts/contracts_details.php');
+if (empty($__cd_perms['can_edit'])) {
+    die(json_encode(['success' => false, 'message' => 'لا توجد صلاحية لتعديل تفاصيل العقد']));
 }
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
