@@ -878,6 +878,7 @@ include('../insidebar.php');
                 $result = false;
               }
 
+              $eq_saved = true; // [ح-8] مرجع حفظ المعدات — يُستشار قبل التوجيه
               if ($result) {
 
                 // جمع بيانات المعدات من الفورم
@@ -923,11 +924,17 @@ include('../insidebar.php');
                 // إضافة بيانات المعدات الجديدة
                 if (!empty($equipment_array)) {
                   include('contractequipments_handler.php');
-                  saveContractEquipments($contract_id, $equipment_array, $conn);
+                  $eq_saved = saveContractEquipments($contract_id, $equipment_array, $conn);
                 }
               }
 
-              echo "<script>window.location.href='contracts.php?id=$posted_project_id';</script>";
+              // [ح-8] التوجيه مشروطٌ بالنجاح الفعلي — فشلُ العقد أو معداته يُبلَّغ لا يُبتلَع
+              if ($result && $eq_saved) {
+                echo "<script>window.location.href='contracts.php?id=$posted_project_id';</script>";
+              } else {
+                $ems_save_err = !$result ? 'تعذّر حفظ بيانات العقد — لم يُحفظ' : 'حُفظ العقد لكن فشل حفظ بعض المعدات — يرجى مراجعتها';
+                echo "<script>alert('❌ " . $ems_save_err . "'); window.location.href='contracts.php?id=$posted_project_id';</script>";
+              }
               exit;
             }
 
