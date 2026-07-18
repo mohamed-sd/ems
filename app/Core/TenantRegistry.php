@@ -115,6 +115,8 @@ class TenantRegistry
         'unit_time_log' => array('type' => self::T_TENANT, 'soft' => false),
         // سلسلة الاعتماد — إلحاقيٌّ (§4.2): «فيُقرأ تاريخُ السلسلة كاملًا»
         'unit_approvals' => array('type' => self::T_TENANT, 'soft' => false),
+        // D02 §3.10: أعلام تجاوز الطاقة وتخليصها — علمٌ يُرفع ويُخلَّص ولا يُمحى
+        'unit_capacity_flags' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),
