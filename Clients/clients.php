@@ -189,10 +189,15 @@ if (!empty($last_code_rows)) {
 
 // الحصول على معرف وحدة العملاء من جدول modules (جدول عام — قراءة عبر البوابة)
 try {
+    // [ع-0ب] مطابقةٌ دقيقةٌ حتميّة بدل whereRaw الفضفاض (name LIKE '%عملاء%' كان
+    // يخاطر بأسر وحدةٍ أخرى). جدول modules فيه صفّان بهذا الـcode (id=1 «حالة
+    // العملاء» owner 1 · id=35 «إدارة العملاء» owner 12، كلٌّ رابطُ سايدبار
+    // لدوره). orderBy id ASC يثبّت الحاكمة على الوحدة 1 (كما تحلّ اليوم). الدمج
+    // الكامل مؤجّلٌ لتبعية dynamic_nav (يبني من owner_role_id لا role_permissions).
     $module_info = $clients_gate->selectOne('modules', array(
         'columns'  => array('id'),
-        'whereRaw' => "(code = ? OR code = ? OR code LIKE ? OR name LIKE ?)",
-        'params'   => array('Clients/clients.php', 'clients', '%clients.php%', '%عملاء%'),
+        'where'    => array('code' => 'Clients/clients.php'),
+        'orderBy'  => 'id ASC',
     ));
 } catch (\Throwable $t) {
     $module_info = null;
