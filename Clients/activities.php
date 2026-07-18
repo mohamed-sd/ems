@@ -41,11 +41,10 @@ if ($company_id <= 0) {
 // العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — النطاق والحذف الناعم مسؤولية البوابة
 $act_gate = ems_tenant_db();
 
-// رمز CSRF
-if (empty($_SESSION['act_csrf_token'])) {
-    $_SESSION['act_csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
-}
-$act_csrf_token = $_SESSION['act_csrf_token'];
+// رمز CSRF — [ع-0أ] اعتماد الرمز المركزي بدل رمزٍ محلّيٍّ منفصل (نفس ازدواج
+// clients.php: حقلان بنفس الاسم وقيمتين ⇒ الحارس المركزي يفشل). توحيدُ القيمة
+// يُبقي الفحص المحلّي فعّالًا ويُمرّر الحارس المركزي أيًّا كان الفائز.
+$act_csrf_token = generate_csrf_token();
 
 // القوائم الثابتة
 $ACT_TYPES = array('زيارة عميل', 'اجتماع موقع', 'افتراضي', 'هاتفي', 'تفاوضي', 'زيارة مناجم');
