@@ -263,6 +263,35 @@ $gate->runInTransaction(function ($g) use (&$r9, $conn, $ts9) {
 // ستةُ آثارٍ في الخريطة الآن — وكلُّها متعذّرةٌ معلَنةُ السبب، ولا صفَّ حكمٍ فارغ
 ok('صفر أثرٍ وكلُّ متعذّرٍ معلَنٌ بسببه', count($r9['effects']) === 0 && count($r9['skipped']) === 6);
 
+echo "── 10) سلطةُ الحكم: سياسةُ العقد تسري على الفوترة لا على الورق ──\n";
+// عقدٌ يحتسب الاستعدادَ نصفًا: 8 ساعات تشغيلٍ + 4 استعداد ⇒ المفوتر 8 + 2 = 10
+// وليس 8 (الخام) ولا 12 (الجمع الأعمى). هذا هو الفرق بين حكمٍ يُسجَّل وحكمٍ يحكم.
+$ts10 = mk_ts($root, $CO, $op1, '2026-06-15', 8, 0, 0, $seed);
+$root->query("UPDATE timesheet SET standby_hours = 4 WHERE id = $ts10");
+$root->query("INSERT INTO contract_hour_policies
+  (company_id, party_scope, contract_ref, ops_state, ruling, pct, note)
+  VALUES ($CO,'client',$c_sdg,'standby','pct',50.00,'اختبار: نصف الكمية بالسعر الكامل')");
+
+$r10 = null;
+$gate->runInTransaction(function ($g) use (&$r10, $conn, $ts10) {
+    $r10 = EffectFanout::forTimesheetId($conn, $g, $ts10, 72);
+});
+$rev10 = $root->query("SELECT amount, quantity FROM fin_financial_events
+                       WHERE idempotency_key='fanout:ts:$ts10:revenue'")->fetch_assoc();
+ok('الكمية المفوترة = 8 تشغيل + (4 استعداد × 50%) = 10',
+   $rev10 && abs(floatval($rev10['quantity']) - 10.00) < 0.005);
+ok('والمبلغ تبعها = 10 × 3500 = 35000 (لا 28000 خامًا ولا 42000 جمعًا أعمى)',
+   $rev10 && abs(floatval($rev10['amount']) - 35000.00) < 0.005);
+
+$aw10 = $root->query("SELECT award_qty, qty_due, entitlement_state, policy_snapshot
+                      FROM unit_party_awards WHERE source_kind='timesheet'
+                        AND source_ref=$ts10 AND party='client'")->fetch_assoc();
+ok('الحكم مسجَّلٌ بكميته المستحقة', $aw10 && abs(floatval($aw10['qty_due']) - 10.00) < 0.005);
+$snap10 = $aw10 ? json_decode($aw10['policy_snapshot'], true) : null;
+ok('اللقطة تحفظ القاعدة المطبَّقة لكل حالة (تدقيقٌ رجعي)',
+   $snap10 && isset($snap10['lines']) && count($snap10['lines']) === 2);
+$root->query("DELETE FROM contract_hour_policies WHERE contract_ref=$c_sdg AND company_id=$CO");
+
 } catch (\Throwable $t) {
     $FAIL++;
     echo "  ✘ استثناء غير متوقع: " . $t->getMessage() . "\n" . $t->getTraceAsString() . "\n";

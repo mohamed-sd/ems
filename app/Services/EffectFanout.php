@@ -580,22 +580,48 @@ class EffectFanout
         $done = self::existingEffects($gate, $tsId, self::SOURCE_TIMESHEET);
         $out = array('effects' => array(), 'skipped' => array(), 'adopted' => array(), 'revision_pending' => false, 'ctx' => $ctx);
 
-        // ── حارس المراجعة: أثرٌ قائمٌ وكمية اليوم تغيّرت بعده ⇒ لا كتابة —
-        //    التصحيح بعد التوليد يخصّ محرّك العكسيات (D02 §8، مرحلة لاحقة). ──
+        // ── حسابُ أحكام الأطراف مرةً واحدةً قبل الحلقة (D02 §2.6) ──────────────
+        // الأحكام هي المرجع الذي يقرؤه المالُ، فيجب أن تُحسب **قبله** لا بعده.
+        // وحسابُها هنا يفكّ الارتباط بترتيب الخريطة نهائيًّا: لو نُقل party_award
+        // إلى ذيل display_order لظلّ الإيراد يقرأ حكمًا صحيحًا. حسابٌ خالصٌ بلا
+        // كتابة — والكتابةُ في فرع party_award وحده.
+        $ctx['awards'] = array();
+        foreach (array('client', 'supplier') as $party) {
+            $ctx['awards'][$party] = $ctx[$party]['ok'] ? self::partyAward($gate, $ctx, $party) : null;
+        }
+
+        /**
+         * الكميةُ الحاكمة لطرفٍ في التحويل المالي.
+         * سلطةُ الحكم (D02 §2.6): المال يُحسب من `qty_due` في الحكم لا من الكمية
+         * الخام — فسياسةُ العقد تسري على الفوترة فعلًا لا على الورق. والرجوعُ إلى
+         * الخام يبقى ممكنًا بمفتاح البيئة حتى يُتحقّق من التطابق في كل بيئة.
+         */
+        $ruledQty = function ($party) use ($ctx) {
+            $raw = (float) $ctx[$party]['qty'];
+            $authority = strtolower((string) (function_exists('ems_env') ? ems_env('EMS_AWARD_AUTHORITY', 'on') : 'on'));
+            if ($authority !== 'on' || empty($ctx['awards'][$party])) { return $raw; }
+            $aw = $ctx['awards'][$party];
+            return round((float) $aw['award_qty'] * ((float) $aw['pct']) / 100, 2);
+        };
+
+        // ── حارس المراجعة: أثرٌ قائمٌ وكميةُ اليوم تغيّرت بعده ⇒ لا كتابة —
+        //    التصحيح بعد التوليد يخصّ محرّك العكسيات (D02 §8، مرحلة لاحقة).
+        //    ⚠️ يقع **بعد** حساب الأحكام لا قبله: المخزَّن في الحدث صار الكميةَ
+        //    المحكومة، فمقارنتُه بالخام تُطلق مراجعةً كاذبةً كلما استبعدت السياسةُ
+        //    ساعةً. المقارنة بكمية العميل المحكومة تحديدًا (هي مصدر quantity).
         if (isset($done['revenue_event'])) {
             $revLink = $done['revenue_event'];
             $old = null;
             try { $old = $gate->selectOne('fin_financial_events', array('where' => array('id' => intval($revLink['target_id'])), 'includeDeleted' => true)); }
             catch (\Throwable $t) { /* قراءة حارسٍ فقط */ }
-            // المقارنة بكمية **العميل** تحديدًا: حدث الإيراد هو ما خُزّنت فيه
-            // fin_financial_events.quantity، فلا يُقارن بكمية المورد ولا بالمسجَّل الخام.
-            if ($old && round((float) $old['quantity'], 2) !== round((float) $ctx['client']['qty'], 2)) {
+            $nowQty = $ruledQty('client');
+            if ($old && round((float) $old['quantity'], 2) !== round($nowQty, 2)) {
                 $out['revision_pending'] = true;
                 $out['skipped'][] = array('effect' => 'revenue_event', 'label' => 'مراجعة كمية',
-                    'reason' => 'الكمية تغيّرت بعد توليد المروحة (' . $old['quantity'] . ' ← ' . $ctx['qty'] . ') — التصحيح لمحرّك العكسيات لا للتوليد');
+                    'reason' => 'الكمية تغيّرت بعد توليد المروحة (' . $old['quantity'] . ' ← ' . $nowQty . ') — التصحيح لمحرّك العكسيات لا للتوليد');
                 if (function_exists('log_security_event')) {
                     log_security_event('FANOUT_REVISION_PENDING', 'timesheet=' . $tsId
-                        . ' old_qty=' . $old['quantity'] . ' new_qty=' . $ctx['qty']);
+                        . ' old_qty=' . $old['quantity'] . ' new_qty=' . $nowQty);
                 }
                 return $out;
             }
@@ -617,7 +643,8 @@ class EffectFanout
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'], 'reason' => $ctx['client']['reason']);
                         break;
                     }
-                    $amount = round($ctx['client']['qty'] * $ctx['client']['price'], 2);
+                    $clQty  = $ruledQty('client');   // ← من حكم العميل لا من الكمية الخام
+                    $amount = round($clQty * $ctx['client']['price'], 2);
                     $res = EventPublisher::publish($conn, array(
                         'event_key' => 'revenue.unit.recognized',
                         'category' => 'financial',
@@ -631,7 +658,7 @@ class EffectFanout
                         'legacy_event_type' => 'revenue',
                         'amount' => $amount,
                         'currency' => $ctx['client']['currency'],
-                        'quantity' => $ctx['client']['qty'], 'unit' => $ctx['client']['unit'],
+                        'quantity' => $clQty, 'unit' => $ctx['client']['unit'],
                         'source_ref' => $ctx['source_ref'],
                         'project_id' => $ctx['project_id'], 'equipment_id' => $ctx['equipment_id'],
                         'supplier_entity_id' => $ctx['supplier_id'],
@@ -639,7 +666,9 @@ class EffectFanout
                         'notes' => 'مروحة أثر يوم الدوام ' . $ctx['source_ref'],
                         'payload' => array( // لقطة التسعير لحظة التوليد — لا يتغيّر أثرٌ بتغيّر عقدٍ لاحق
                             'source' => 'timesheet', 'work_date' => $ctx['work_date'],
-                            'qty' => $ctx['client']['qty'], 'unit' => $ctx['client']['unit'],
+                            'qty' => $clQty, 'unit' => $ctx['client']['unit'],
+                            'qty_recorded' => $ctx['client']['qty'],   // الخام للمقارنة والتدقيق
+                            'entitlement' => isset($ctx['awards']['client']['state']) ? $ctx['awards']['client']['state'] : null,
                             'client_contract_id' => $ctx['client']['contract_id'],
                             'unit_price' => $ctx['client']['price'],
                             'currency' => $ctx['client']['currency'], 'currency_label' => $ctx['client']['currency_label'],
@@ -655,8 +684,9 @@ class EffectFanout
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'], 'reason' => $ctx['supplier']['reason']);
                         break;
                     }
-                    // ⚠️ بوحدة عقد المورد وكميتها — لا بكمية العميل (قد تختلفان)
-                    $amount = round($ctx['supplier']['qty'] * $ctx['supplier']['price'], 2);
+                    // ⚠️ بوحدة عقد المورد وكميتِه المحكومة — لا بكمية العميل ولا بالخام
+                    $spQty  = $ruledQty('supplier');
+                    $amount = round($spQty * $ctx['supplier']['price'], 2);
                     $dueId = intval($gate->insert('fin_dues', array(
                         'party_type' => 'supplier', 'party_ref' => $ctx['supplier_id'],
                         'due_type' => self::WORK_MODEL_DUE[$ctx['supplier']['unit']], 'direction' => 'credit',
@@ -675,18 +705,19 @@ class EffectFanout
                             'reason' => 'لا سعر تكلفةٍ: ' . $ctx['supplier']['reason']);
                         break;
                     }
-                    $totalCost = round($ctx['supplier']['qty'] * $ctx['supplier']['price'], 2);
+                    $spCostQty = $ruledQty('supplier');
+                    $totalCost = round($spCostQty * $ctx['supplier']['price'], 2);
                     // الإيراد داخل سجلّ التكلفة (للربحية) بشرطين: اتحاد العملة **واتحاد
                     // الوحدة**. فربحٌ يطرح تكلفةَ ساعاتٍ من إيراد أمتارٍ رقمٌ بلا معنى —
                     // ويُحجب الإيراد حينئذٍ بدل أن يُعرض ربحٌ ملفَّق (قاعدة عدم التلفيق).
                     $sameBasis = $ctx['client']['ok']
                         && $ctx['client']['currency'] === $ctx['supplier']['currency']
                         && $ctx['client']['unit'] === $ctx['supplier']['unit'];
-                    $revenue = $sameBasis ? round($ctx['client']['qty'] * $ctx['client']['price'], 2) : null;
+                    $revenue = $sameBasis ? round($ruledQty('client') * $ctx['client']['price'], 2) : null;
                     $costId = intval($gate->insert('fin_cost_records', array(
                         'cost_type' => $ctx['equipment_id'] ? 'equipment' : 'project',
                         'equipment_id' => $ctx['equipment_id'], 'project_id' => $ctx['project_id'],
-                        'period_ref' => $ctx['period'], 'qty' => $ctx['supplier']['qty'], 'unit' => $ctx['supplier']['unit'],
+                        'period_ref' => $ctx['period'], 'qty' => $spCostQty, 'unit' => $ctx['supplier']['unit'],
                         'unit_cost' => $ctx['supplier']['price'], 'total_cost' => $totalCost,
                         'currency' => $ctx['supplier']['currency'],
                         'revenue' => $revenue,
