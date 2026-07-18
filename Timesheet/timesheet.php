@@ -277,6 +277,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     "meters_count",
     "drilling_holes_count",
     "drilling_depth",
+    // D02 §3.5 — الحالات الثلاث الناقصة (لكلٍّ حكمٌ تعاقديٌّ مستقل)
+    "ts_supplier_stop_hours",
+    "ts_planned_stop_hours",
+    "ts_force_majeure_hours",
     "type",
     "user_id"
   ];
@@ -328,12 +332,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     $marketing_fault = floatval($values['marketing_fault']);
     $approval_fault = floatval($values['approval_fault']);
     $other_fault_hours = floatval($values['other_fault_hours']);
+    // D02 §3.5 — الثلاث الجديدة تدخل الميزان: وإلا رفض الحفظَ كلَّ صفٍّ تُملأ فيه
+    $supplier_stop = floatval(isset($values['ts_supplier_stop_hours']) ? $values['ts_supplier_stop_hours'] : 0);
+    $planned_stop  = floatval(isset($values['ts_planned_stop_hours']) ? $values['ts_planned_stop_hours'] : 0);
+    $force_majeure = floatval(isset($values['ts_force_majeure_hours']) ? $values['ts_force_majeure_hours'] : 0);
 
-    $total_faults_sum = $hr_fault + $maintenance_fault + $marketing_fault + $approval_fault + $other_fault_hours;
+    $total_faults_sum = $hr_fault + $maintenance_fault + $marketing_fault + $approval_fault + $other_fault_hours
+      + $supplier_stop + $planned_stop + $force_majeure;
 
     // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
     if ($total_faults_sum != $total_fault_hours) {
-      echo "<script>alert('❌ خطأ في توزيع ساعات الأعطال!\\n\\nمجموع حقول الأعطال: " . $total_faults_sum . " ساعة\\nمجموع ساعات التعطل: " . $total_fault_hours . " ساعة\\n\\nيجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\\n• عطل HR\\n• عطل صيانة\\n• عطل تسويق\\n• عطل اعتماد\\n• ساعات أعطال أخرى');</script>";
+      echo "<script>alert('❌ خطأ في توزيع ساعات الأعطال!\\n\\nمجموع حقول الأعطال: " . $total_faults_sum . " ساعة\\nمجموع ساعات التعطل: " . $total_fault_hours . " ساعة\\n\\nيجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\\n• عطل HR\\n• عطل صيانة\\n• عطل تسويق\\n• عطل اعتماد\\n• ساعات أعطال أخرى\\n• توقف على المورد\\n• توقف مخطط\\n• قوة قاهرة');</script>";
       exit;
     }
   }
@@ -740,6 +749,21 @@ try {
               <label>ساعات أعطال أخرى</label>
               <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
             </div>
+            <!-- D02 §3.5 — ثلاثُ حالاتٍ لكلٍّ حكمٌ تعاقديٌّ مستقل؛ كانت تُبتلع
+                 في «أعطال أخرى» فتضيع مسؤوليتُها ولا تستطيع سياسةُ الاستحقاق
+                 أن تحكم على ما لا تميّزه. -->
+            <div>
+              <label>توقف على المورد</label>
+              <input type="number" step="0.01" min="0" name="ts_supplier_stop_hours" id="ts_supplier_stop_hours" value="0">
+            </div>
+            <div>
+              <label>توقف مخطط (صيانة دورية)</label>
+              <input type="number" step="0.01" min="0" name="ts_planned_stop_hours" id="ts_planned_stop_hours" value="0">
+            </div>
+            <div>
+              <label>قوة قاهرة</label>
+              <input type="number" step="0.01" min="0" name="ts_force_majeure_hours" id="ts_force_majeure_hours" value="0">
+            </div>
             <div>
               <label> مجموع ساعات التعطل</label>
               <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
@@ -1119,6 +1143,21 @@ try {
               <label>ساعات أعطال أخرى</label>
               <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
             </div>
+            <!-- D02 §3.5 — ثلاثُ حالاتٍ لكلٍّ حكمٌ تعاقديٌّ مستقل؛ كانت تُبتلع
+                 في «أعطال أخرى» فتضيع مسؤوليتُها ولا تستطيع سياسةُ الاستحقاق
+                 أن تحكم على ما لا تميّزه. -->
+            <div>
+              <label>توقف على المورد</label>
+              <input type="number" step="0.01" min="0" name="ts_supplier_stop_hours" id="ts_supplier_stop_hours" value="0">
+            </div>
+            <div>
+              <label>توقف مخطط (صيانة دورية)</label>
+              <input type="number" step="0.01" min="0" name="ts_planned_stop_hours" id="ts_planned_stop_hours" value="0">
+            </div>
+            <div>
+              <label>قوة قاهرة</label>
+              <input type="number" step="0.01" min="0" name="ts_force_majeure_hours" id="ts_force_majeure_hours" value="0">
+            </div>
             <div>
               <label> مجموع ساعات التعطل</label>
               <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
@@ -1485,6 +1524,21 @@ try {
               <label>ساعات أعطال أخرى</label>
               <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
             </div>
+            <!-- D02 §3.5 — ثلاثُ حالاتٍ لكلٍّ حكمٌ تعاقديٌّ مستقل؛ كانت تُبتلع
+                 في «أعطال أخرى» فتضيع مسؤوليتُها ولا تستطيع سياسةُ الاستحقاق
+                 أن تحكم على ما لا تميّزه. -->
+            <div>
+              <label>توقف على المورد</label>
+              <input type="number" step="0.01" min="0" name="ts_supplier_stop_hours" id="ts_supplier_stop_hours" value="0">
+            </div>
+            <div>
+              <label>توقف مخطط (صيانة دورية)</label>
+              <input type="number" step="0.01" min="0" name="ts_planned_stop_hours" id="ts_planned_stop_hours" value="0">
+            </div>
+            <div>
+              <label>قوة قاهرة</label>
+              <input type="number" step="0.01" min="0" name="ts_force_majeure_hours" id="ts_force_majeure_hours" value="0">
+            </div>
             <div>
               <label> مجموع ساعات التعطل</label>
               <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
@@ -1823,8 +1877,14 @@ try {
         const marketingFault = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
         const approvalFault = parseFloat(document.querySelector("input[name='approval_fault']").value) || 0;
         const otherFaultHours = parseFloat(document.querySelector("input[name='other_fault_hours']").value) || 0;
+        // D02 §3.5 — الثلاث الجديدة تدخل الميزان تمامًا كما في التحقق الخادمي
+        const num = function (n) { var el = document.querySelector("input[name='" + n + "']"); return el ? (parseFloat(el.value) || 0) : 0; };
+        const supplierStop = num('ts_supplier_stop_hours');
+        const plannedStop  = num('ts_planned_stop_hours');
+        const forceMajeure = num('ts_force_majeure_hours');
 
-        const totalFaultsSum = hrFault + maintenanceFault + marketingFault + approvalFault + otherFaultHours;
+        const totalFaultsSum = hrFault + maintenanceFault + marketingFault + approvalFault + otherFaultHours
+          + supplierStop + plannedStop + forceMajeure;
 
         // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
         if (totalFaultsSum !== totalFaultHours) {
@@ -1837,7 +1897,10 @@ try {
             '• عطل صيانة\n' +
             '• عطل تسويق\n' +
             '• عطل اعتماد\n' +
-            '• ساعات أعطال أخرى');
+            '• ساعات أعطال أخرى\n' +
+            '• توقف على المورد\n' +
+            '• توقف مخطط\n' +
+            '• قوة قاهرة');
 
           // التمرير إلى قسم الأعطال
           const faultsSection = document.querySelector("input[name='hr_fault']");
@@ -2175,6 +2238,9 @@ try {
       $("#marketing_fault").val(data.marketing_fault);
       $("#approval_fault").val(data.approval_fault);
       $("#other_fault_hours").val(data.other_fault_hours);
+      $("#ts_supplier_stop_hours").val(data.ts_supplier_stop_hours || 0);
+      $("#ts_planned_stop_hours").val(data.ts_planned_stop_hours || 0);
+      $("#ts_force_majeure_hours").val(data.ts_force_majeure_hours || 0);
       $("#total_fault_hours").val(data.total_fault_hours);
       $("#fault_notes").val(data.fault_notes);
 
