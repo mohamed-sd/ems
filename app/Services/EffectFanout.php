@@ -296,8 +296,10 @@ class EffectFanout
     /** عملة العقد كما في بياناته الأساسية → رمزها. غير المعروف = تعذّر معلن. */
     const CONTRACT_CURRENCY = array('جنيه' => 'SDG', 'دولار' => 'USD', 'يورو' => 'EUR', 'ريال' => 'SAR');
 
-    /** تسمية وحدة الفوترة في سطر العقد → وحدة المحرّك. الفارغ = ساعة (افتراض العمود نفسه). */
-    const CONTRACT_UNIT = array('ساعة' => 'hour', 'متر طولي' => 'meter', 'متر' => 'meter', 'طن' => 'ton', '' => 'hour');
+    /** تسمية وحدة الفوترة في سطر العقد → وحدة المحرّك. الفارغ = تعذّرٌ معلَن (ح-11):
+     *  المفتاح '' حُذف — كان يفوتر الوحدةَ الفارغة بالساعة صامتًا، مناقضًا مبدأ
+     *  «لا تسعير ملفَّق» أدناه. الفراغ الآن يسقط إلى null ⇒ «وحدة فوترةٍ غير معروفة». */
+    const CONTRACT_UNIT = array('ساعة' => 'hour', 'متر طولي' => 'meter', 'متر' => 'meter', 'طن' => 'ton');
 
     /**
      * مترجم الدوام: صفُّ timesheet → سياقُ وحدةٍ جاهزٌ للمروحة.
@@ -317,7 +319,8 @@ class EffectFanout
                        e.id AS equipment_id, e.suppliers AS supplier_id,
                        emp.id AS employee_id,
                        c.price_currency_contract AS client_cur_label,
-                       ce.equip_price AS client_price, ce.equip_unit AS client_unit_label
+                       ce.equip_price AS client_price, ce.equip_unit AS client_unit_label,
+                       ce.equip_price_currency AS client_line_cur_label
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id = t.operator
                 LEFT JOIN equipments e ON e.id = o.equipment
@@ -378,9 +381,15 @@ class EffectFanout
             'employee_id' => $t['employee_id'] !== null ? intval($t['employee_id']) : null,
             'supplier_id' => !empty($t['supplier_id']) ? intval($t['supplier_id']) : null,
             // كل طرفٍ يحمل وحدتَه وكميتَه المستقلتين (unit/qty) — لا رقمَ مشتركًا
+            // عملة الطرف: عملة سطر المعدة إن سُجّلت، وإلا ارتدادٌ لعملة رأس العقد (ح-4).
+            // شاشتا الإدخال تطلبان عملةً لكل سطر وتعرضانها؛ إهمالُها كان يحجز العقد
+            // #2 بـSDG (الرأس «جنيه») والسطرُ «دولار» — فرقُ سعر الصرف على كل وحدة.
             'client' => array('ok' => false, 'reason' => '', 'price' => null, 'currency' => null,
                               'unit' => null, 'qty' => 0.0,
-                              'currency_label' => (string) $t['client_cur_label'], 'contract_id' => !empty($t['contract_id']) ? intval($t['contract_id']) : null,
+                              'currency_label' => (trim((string) $t['client_line_cur_label']) !== '')
+                                                  ? trim((string) $t['client_line_cur_label'])
+                                                  : (string) $t['client_cur_label'],
+                              'contract_id' => !empty($t['contract_id']) ? intval($t['contract_id']) : null,
                               'unit_label' => trim((string) $t['client_unit_label'])),
             'supplier' => array('ok' => false, 'reason' => '', 'price' => null, 'currency' => null,
                                 'unit' => null, 'qty' => 0.0,
@@ -419,6 +428,7 @@ class EffectFanout
         else {
             $sq = $conn->prepare(
                 "SELECT sc.id, sc.price_currency_contract AS cur_label, sce.equip_price, sce.equip_unit,
+                        sce.equip_price_currency AS line_cur_label,
                         (sc.actual_start IS NOT NULL AND sc.actual_start <= ?
                          AND (sc.actual_end IS NULL OR sc.actual_end >= ?)) AS in_force
                  FROM supplierscontracts sc
@@ -443,7 +453,10 @@ class EffectFanout
             if ($pick !== null) {
                 $sp['contract_id'] = intval($pick['id']);
                 $sp['unit_label'] = trim((string) $pick['equip_unit']);
-                $sp['currency_label'] = (string) $pick['cur_label'];
+                // عملة سطر عقد المورد إن سُجّلت، وإلا ارتدادٌ للرأس (ح-4، تناظر جانب العميل)
+                $sp['currency_label'] = (trim((string) $pick['line_cur_label']) !== '')
+                                        ? trim((string) $pick['line_cur_label'])
+                                        : (string) $pick['cur_label'];
                 // وحدةُ عقد المورد تختار عمودَه المقروء — **مستقلةً عن وحدة العميل**
                 $spUnit = isset(self::CONTRACT_UNIT[$sp['unit_label']]) ? self::CONTRACT_UNIT[$sp['unit_label']] : null;
                 if ($spUnit === null) { $sp['reason'] = 'وحدة فوترةٍ غير معروفة في عقد المورد: ' . $sp['unit_label']; }
