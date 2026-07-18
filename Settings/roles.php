@@ -6,6 +6,22 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// [ح-1] حصر شاشة إدارة الأدوار — نفس تصعيد الامتياز في role_permissions.php.
+// الشاشة الآن مسجَّلة موديولًا (owner 15). الفحص صريحٌ لأن معالج POST أدناه يسبق
+// insidebar. المخوَّلون: الدور 15 (مدير الصلاحيات) + الدور 1 (التشغيل).
+// ════════════════════════════════════════════════════════════════════════════
+$roles_perms = get_current_page_permissions($conn);
+if ($roles_perms['id'] !== null && !$roles_perms['can_view']) {
+    header('Location: ../main/dashboard.php?msg=' . urlencode('لا توجد صلاحية لهذه الصفحة ❌'));
+    exit();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $roles_perms['id'] !== null && !$roles_perms['can_edit']) {
+    header('Location: roles.php?msg=' . urlencode('لا توجد صلاحية للتعديل ❌'));
+    exit();
+}
 
 /* جلب بيانات التعديل (roles مرجع عام T_GLOBAL — قراءته عبر البوابة متاحة بلا نطاق) */
 $editData = null;

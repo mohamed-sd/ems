@@ -20,6 +20,15 @@ if ($current_company_id <= 0) {
 // العزل عبر بوابة المستأجر (الشاشة تشترط شركةً للجلسة أصلًا — لا مسار سوبر)
 $us_gate = ems_tenant_db();
 
+// ════════════════════════════════════════════════════════════════════════════
+// [ح-2] صلاحيات هذه الشاشة (module main/users.php). فحصٌ صريح هنا لأن:
+//   • مسار الحذف (?delete=) أدناه يسبق insidebar (الحارس المركزي) ⇒ غير محروس.
+//   • الإنشاء/التعديل يفحصان can_view مركزيًا فقط، لا can_add/can_edit.
+// مؤكد بتنفيذ حقيقي: مستخدمٌ بلا can_view وصل مسار الحذف (200 بلا redirect).
+// ════════════════════════════════════════════════════════════════════════════
+require_once __DIR__ . '/../includes/permissions_helper.php';
+$us_perms = get_current_page_permissions($conn);
+
 // Endpoint محلي لجلب عقود المشروع (يُستخدم عبر Ajax من نفس الصفحة)
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
     while (ob_get_level()) {
@@ -177,6 +186,11 @@ if ($prefill_employee_id > 0 && $users_has_employee_id) {
 
 // حذف ناعم
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    // [ح-2] هذا المسار يسبق insidebar ⇒ يجب فحص can_delete صراحةً هنا.
+    if ($us_perms['id'] !== null && !$us_perms['can_delete']) {
+        echo "<script>alert('❌ لا توجد صلاحية للحذف'); window.location.href='users.php';</script>";
+        exit;
+    }
     $delete_id = intval($_GET['delete']);
     $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
@@ -225,6 +239,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $project = ($requires_project_context && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
     $contract = ($requires_project_context && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
+
+    // [ح-2] فحص فعل الكتابة صراحةً (can_add للإنشاء · can_edit للتعديل) — الحارس
+    // المركزي يفحص can_view فقط، ومعالج POST هذا لا يفرّق بين الأفعال دونه.
+    $us_write_perm = ($uid > 0) ? 'can_edit' : 'can_add';
+    if ($us_perms['id'] !== null && !$us_perms[$us_write_perm]) {
+        echo "<script>alert('❌ لا توجد صلاحية لهذا الإجراء'); window.location.href='users.php';</script>";
+        exit;
+    }
 
     // 🔗 ربط الحساب بموظف (اختياري): تحقّق من الملكية والتفرّد قبل الحفظ.
     $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
