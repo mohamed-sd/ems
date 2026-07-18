@@ -45,6 +45,7 @@ function counts($conn) {
         'costs'  => intval($conn->query("SELECT COUNT(*) FROM fin_cost_records")->fetch_row()[0]),
         'links'  => intval($conn->query("SELECT COUNT(*) FROM fin_event_links")->fetch_row()[0]),
         'roots'  => intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]),
+        'awards' => intval($conn->query("SELECT COUNT(*) FROM unit_party_awards")->fetch_row()[0]),
     );
 }
 $c0 = counts($conn);
@@ -116,7 +117,8 @@ $res = null;
 $gate->runInTransaction(function ($g) use (&$res, $conn, $TS) {
     $res = EffectFanout::forTimesheetId($conn, $g, $TS, 72);
 });
-ok('ثلاثة آثارٍ مولَّدة', count($res['effects']) === 3);
+// D02 §2.6: أثرٌ رابعٌ منذ أحكام الأطراف (الحكم التعاقدي يسبق المال)
+ok('أربعة آثارٍ مولَّدة', count($res['effects']) === 4);
 $genRevenue = null; $genDue = null;
 foreach ($res['effects'] as $e) {
     if ($e['effect'] === 'revenue_event') { $genRevenue = $e['amount']; }
@@ -176,6 +178,9 @@ foreach ($seed['ts'] as $id) {
     $root->query("DELETE FROM fin_cost_records WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_cost_records')");
     $root->query("DELETE FROM fin_dues WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_dues')");
     $root->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_financial_events')");
+    // أحكام الأطراف (D02 §2.6) — صفٌّ لكل طرف، والرابط واحدٌ للأثر كلِّه فلا
+    // يكفي الحذفُ بالمعرّف: التنظيف بمفتاح المصدر (source_kind + source_ref).
+    $root->query("DELETE FROM unit_party_awards WHERE source_kind='timesheet' AND source_ref=$id");
     $root->query("DELETE FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id");
     $root->query("DELETE FROM fin_financial_events WHERE source_ref='TS-$id'");
     $root->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id=$id");

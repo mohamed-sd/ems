@@ -46,6 +46,7 @@ function counts($conn) {
         'costs'  => intval($conn->query("SELECT COUNT(*) FROM fin_cost_records")->fetch_row()[0]),
         'links'  => intval($conn->query("SELECT COUNT(*) FROM fin_event_links")->fetch_row()[0]),
         'roots'  => intval($conn->query("SELECT COUNT(*) FROM ems_business_events")->fetch_row()[0]),
+        'awards' => intval($conn->query("SELECT COUNT(*) FROM unit_party_awards")->fetch_row()[0]),
     );
 }
 $c0 = counts($conn);
@@ -134,7 +135,8 @@ $r1 = null;
 $gate->runInTransaction(function ($g) use (&$r1, $conn, $ts1) {
     $r1 = EffectFanout::forTimesheetId($conn, $g, $ts1, 72);
 });
-ok('توليد 3 آثارٍ حقيقية (إيراد + مستحق مورد + تكلفة)', count($r1['effects']) === 3);
+// D02 §2.6: أثرٌ رابعٌ منذ أحكام الأطراف — الحكمُ التعاقديُّ يسبق المال
+ok('توليد 4 آثارٍ حقيقية (إيراد + مستحق مورد + تكلفة + أحكام الأطراف)', count($r1['effects']) === 4);
 ok('إعلان أثرين غير متاحين (مشغّل + صيانة) — لا تلفيق', count($r1['skipped']) === 2);
 
 $rev = $root->query("SELECT amount, currency, quantity, unit, entity_type, entity_id, payload
@@ -223,7 +225,8 @@ $gate->runInTransaction(function ($g) use (&$r6, $conn, $ts6) {
 });
 $hasSupplierEffect = false;
 foreach ($r6['effects'] as $e) { if ($e['effect'] === 'supplier_due' || $e['effect'] === 'cost_record') { $hasSupplierEffect = true; } }
-ok('صفر مستحقٍ وصفر تكلفةٍ عند الغموض (الإيراد وحده يُولَّد)', !$hasSupplierEffect && count($r6['effects']) === 1);
+// الإيراد + حكم الأطراف (العميل مستحقٌّ والمورد معلَنُ التعذّر) — ولا مستحقَ ولا تكلفة
+ok('صفر مستحقٍ وصفر تكلفةٍ عند الغموض (الإيراد وحكمُه وحدهما)', !$hasSupplierEffect && count($r6['effects']) === 2);
 
 echo "── 7) مطابقة وحدة الفوترة: عقدٌ بالمتر وصفٌّ سجّل ساعاتٍ ⇒ لا تسعير ملفَّق ──\n";
 $c_meter = mk_client_contract($root, $CO, $PRJ, $ETYPE, 'جنيه', 40, 'متر طولي', $seed);
@@ -257,7 +260,8 @@ $r9 = null;
 $gate->runInTransaction(function ($g) use (&$r9, $conn, $ts9) {
     $r9 = EffectFanout::forTimesheetId($conn, $g, $ts9, 72);
 });
-ok('صفر أثرٍ وكلُّ متعذّرٍ معلَنٌ بسببه', count($r9['effects']) === 0 && count($r9['skipped']) === 5);
+// ستةُ آثارٍ في الخريطة الآن — وكلُّها متعذّرةٌ معلَنةُ السبب، ولا صفَّ حكمٍ فارغ
+ok('صفر أثرٍ وكلُّ متعذّرٍ معلَنٌ بسببه', count($r9['effects']) === 0 && count($r9['skipped']) === 6);
 
 } catch (\Throwable $t) {
     $FAIL++;
@@ -269,6 +273,8 @@ foreach ($seed['ts'] as $id) {
     $root->query("DELETE FROM fin_cost_records WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_cost_records')");
     $root->query("DELETE FROM fin_dues WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_dues')");
     $root->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_financial_events')");
+    // أحكام الأطراف: صفٌّ لكل طرفٍ ورابطٌ واحدٌ للأثر — التنظيف بمفتاح المصدر
+    $root->query("DELETE FROM unit_party_awards WHERE source_kind='timesheet' AND source_ref=$id");
     $root->query("DELETE FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id");
     $root->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id=$id");
     $root->query("DELETE FROM timesheet WHERE id=$id");

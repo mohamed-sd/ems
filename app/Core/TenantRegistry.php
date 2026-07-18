@@ -104,6 +104,8 @@ class TenantRegistry
         // D02 §3.7: أحكام استحقاق الأطراف — حكمٌ لكل طرفٍ بوحدة عقده هو (soft=true:
         // الحكم قرارٌ تعاقديٌّ يُراجَع ويُعكس، فلا يُمحى من سجلّ التدقيق)
         'unit_party_awards' => array('type' => self::T_TENANT, 'soft' => true),
+        // D02 §3.8: سياسة استحقاق عقد الساعة — قواعدُ بياناتٍ لا كود (نمط fin_effect_map)
+        'contract_hour_policies' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),

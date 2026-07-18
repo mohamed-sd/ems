@@ -310,6 +310,9 @@ class EffectFanout
         // سطر معدة العقد الحاسم: MIN(id) عند تعدد أسطرٍ لنفس النوع (حتمية)
         $sql = "SELECT t.id, t.company_id, t.`date` AS work_date,
                        t.executed_hours, t.tons_count, t.meters_count, t.operator_hours,
+                       t.standby_hours, t.dependence_hours, t.maintenance_fault, t.hr_fault,
+                       t.marketing_fault, t.approval_fault, t.other_fault_hours,
+                       t.ts_supplier_stop_hours, t.ts_planned_stop_hours, t.ts_force_majeure_hours,
                        o.id AS op_id, o.project_id, o.contract_id, o.equipment_type,
                        e.id AS equipment_id, e.suppliers AS supplier_id,
                        emp.id AS employee_id,
@@ -349,6 +352,22 @@ class EffectFanout
             'period' => date('Y-m', strtotime($t['work_date'])),
             'source_ref' => 'TS-' . $tsId,
             'recorded' => $recorded,
+            // توزيع زمن الوردية على حالاتها (D02 §3.5) — مدخل سياسة الاستحقاق
+            // لعقود الساعة. الأعمدة القائمة **هي بالفعل** توزيعُ ساعاتٍ على
+            // حالاتٍ بمسؤولياتها، فلا يلزم سجلُّ فتراتٍ منفصلٌ لحساب المال.
+            'states' => array(
+                'actual_work'         => (float) $t['executed_hours'],
+                'standby'             => (float) $t['standby_hours'],       // «الاستعداد بسبب العميل» في الشاشة
+                'pending_approval'    => (float) $t['dependence_hours'] + (float) $t['approval_fault'],
+                'tech_breakdown'      => (float) $t['maintenance_fault'],
+                'operator_stop'       => (float) $t['hr_fault'],
+                'client_stop'         => (float) $t['marketing_fault'],     // «عطل تسويق» = توقفٌ سببه العميل
+                'supplier_stop'       => (float) $t['ts_supplier_stop_hours'],
+                'planned_stop'        => (float) $t['ts_planned_stop_hours'],
+                'force_majeure'       => (float) $t['ts_force_majeure_hours'],
+                'fuel_logistics_stop' => 0.0,                                // لا عمودَ له بعد
+                'other'               => (float) $t['other_fault_hours'],
+            ),
             // ⚠️ unit/qty الموروثان = **حكم العميل** (فالإيراد هو ما يقيسه حارس
             //    المراجعة في fin_financial_events.quantity). لا تستعملهما لطرفٍ
             //    آخر: مستحق المورد وتكلفته يقرآن من $ctx['supplier'] حصرًا.
@@ -445,6 +464,105 @@ class EffectFanout
         }
         unset($sp);
         return $ctx;
+    }
+
+    /**
+     * سياسة استحقاق عقد الساعة السارية بتاريخ العمل (D02 §3.8).
+     * الأخصّ يغلب: قاعدةُ العقد نفسه تسبق الافتراضية (contract_ref = NULL)،
+     * والسارية بالتاريخ تسبق المفتوحة. قراءةٌ خالصةٌ بلا كتابة.
+     *
+     * @return array<string,array{ruling:string,pct:?float,note:?string,scope:string}>
+     */
+    public static function hourPolicy($gate, $company, $partyScope, $contractRef, $workDate)
+    {
+        $rows = $gate->scopedQuery(
+            array('scope' => array('p' => 'contract_hour_policies')),
+            "SELECT p.ops_state, p.ruling, p.pct, p.note, p.contract_ref
+               FROM contract_hour_policies p
+              WHERE {TENANT_SCOPE} AND p.deleted_at IS NULL
+                AND p.party_scope = ?
+                AND (p.contract_ref = ? OR p.contract_ref IS NULL)
+                AND (p.effective_from IS NULL OR p.effective_from <= ?)
+                AND (p.effective_to   IS NULL OR p.effective_to   >= ?)
+              ORDER BY (p.contract_ref IS NULL) ASC, p.effective_from DESC",
+            array($partyScope, intval($contractRef), $workDate, $workDate)
+        );
+        $out = array();
+        foreach ($rows as $r) {
+            $st = strval($r['ops_state']);
+            if (isset($out[$st])) { continue; } // الأوّل هو الأخصّ (الترتيب أعلاه)
+            $out[$st] = array(
+                'ruling' => strval($r['ruling']),
+                'pct' => ($r['pct'] === null) ? null : (float) $r['pct'],
+                'note' => $r['note'],
+                'scope' => ($r['contract_ref'] === null) ? 'company_default' : 'contract',
+            );
+        }
+        return $out;
+    }
+
+    /**
+     * حكمُ طرفٍ واحدٍ عن واقعةٍ واحدة (D02 §2.6 + §3.8).
+     *
+     * القاعدتان الحاكمتان:
+     *   • عقدُ الطن/المتر: الاستحقاق = **الكمية المنجزة كما هي** — لا سياسةَ
+     *     ولا حالات (قرار الإدارة: «استحقاقه يُحسب بالطن أو المتر المنجز»).
+     *   • عقدُ الساعة: الاستحقاق = Σ (ساعاتُ الحالة × نسبتُها) وفق سياسة عقده.
+     *     وما حكمُه `case_by_case` أو `pending` **لا يُحسب ولا يُخترع له رقم** —
+     *     يُرصد في اللقطة ويُعلَن، فتُرى الفجوةُ لا تُبتلع (قاعدة عدم التلفيق).
+     *
+     * @return array{award_qty:float,pct:float,state:string,rule:string,snapshot:array}
+     */
+    public static function partyAward($gate, array $ctx, $party)
+    {
+        $side = $ctx[$party];
+        $unit = $side['unit'];
+
+        // ① الطن والمتر: الكمية المنجزة هي الاستحقاق — لا مسارَ سياسة
+        if ($unit !== 'hour') {
+            return array(
+                'award_qty' => (float) $side['qty'], 'pct' => 100.00, 'state' => 'due',
+                'rule' => 'delivered_qty',
+                'snapshot' => array('basis' => 'delivered_qty', 'unit' => $unit,
+                                    'qty' => (float) $side['qty'],
+                                    'note' => 'عقدُ إنتاجٍ: الاستحقاق بالكمية المنجزة لا بتوزيع الزمن'),
+            );
+        }
+
+        // ② عقد الساعة: تُطبَّق السياسة حالةً حالة
+        $policy = self::hourPolicy($gate, $ctx['company_id'], $party, $side['contract_id'], $ctx['work_date']);
+        $billable = 0.0; $pendingHrs = 0.0; $excluded = 0.0; $undecided = 0.0;
+        $lines = array();
+        foreach ($ctx['states'] as $state => $hours) {
+            $hours = round((float) $hours, 2);
+            if ($hours <= 0) { continue; }
+            $rule = isset($policy[$state]) ? $policy[$state] : array('ruling' => 'case_by_case', 'pct' => null, 'note' => 'لا قاعدةَ مسجَّلةٌ لهذه الحالة', 'scope' => 'missing');
+            $applied = 0.0;
+            switch ($rule['ruling']) {
+                case 'full': $applied = $hours; $billable += $applied; break;
+                case 'pct':  $applied = round($hours * ((float) $rule['pct']) / 100, 2); $billable += $applied; break;
+                case 'none': $excluded += $hours; break;
+                case 'pending': $pendingHrs += $hours; break;
+                default: $undecided += $hours; // case_by_case — يلزم نصُّ العقد
+            }
+            $lines[] = array('state' => $state, 'hours' => $hours, 'ruling' => $rule['ruling'],
+                             'pct' => $rule['pct'], 'applied' => $applied, 'scope' => $rule['scope']);
+        }
+
+        // حالةُ الاستحقاق تصف الواقع بأمانة: معلَّقٌ إن بقي ما ينتظر حسمًا
+        $state = 'due';
+        if ($undecided > 0 || $pendingHrs > 0) { $state = ($billable > 0) ? 'partial' : 'pending'; }
+
+        return array(
+            'award_qty' => round($billable, 2), 'pct' => 100.00, 'state' => $state,
+            'rule' => 'hour_policy',
+            'snapshot' => array(
+                'basis' => 'hour_policy', 'contract_ref' => $side['contract_id'],
+                'work_date' => $ctx['work_date'], 'lines' => $lines,
+                'billable_hours' => round($billable, 2), 'excluded_hours' => round($excluded, 2),
+                'pending_hours' => round($pendingHrs, 2), 'undecided_hours' => round($undecided, 2),
+            ),
+        );
     }
 
     /**
@@ -577,6 +695,55 @@ class EffectFanout
                     )));
                     self::link($gate, $company, $tsId, $type, 'fin_cost_records', $costId, $revId, self::SOURCE_TIMESHEET);
                     $out['effects'][] = array('effect' => $type, 'target_id' => $costId, 'amount' => $totalCost, 'currency' => $ctx['supplier']['currency']);
+                    break;
+
+                case 'party_award':
+                    // ── أحكام الأطراف (D02 §2.6): حكمٌ لكل طرفٍ بوحدة عقده ──
+                    // يُكتب **قبل** المال ولا يُنشئه: هو القرار التعاقدي الذي
+                    // يقرؤه التحويلُ لاحقًا. والطرفُ المتعذّر يُسجَّل بسببه معلنًا
+                    // فتُرى الفجوةُ في سجلٍّ لا في صمت.
+                    //
+                    // ⚠️ لكن «صفٌّ بلا كميةٍ لا يولّد شيئًا» (قاعدة المصدر الواحد):
+                    // إن تعذّر الطرفان معًا فلا واقعةَ يُحكم فيها أصلًا — يُعلَن
+                    // الأثر متعذّرًا ولا يُكتب صفٌّ فارغٌ يوهم بوجود حكم.
+                    if (!$ctx['client']['ok'] && !$ctx['supplier']['ok']) {
+                        $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
+                            'reason' => 'لا طرفَ قابلًا للحكم — العميل: ' . $ctx['client']['reason']
+                                      . ' · المورد: ' . $ctx['supplier']['reason']);
+                        break;
+                    }
+                    $written = 0;
+                    foreach (array('client', 'supplier') as $party) {
+                        $side = $ctx[$party];
+                        $partyRef = ($party === 'client') ? $ctx['project_id'] : $ctx['supplier_id'];
+                        $row = array(
+                            'source_kind' => 'timesheet', 'source_ref' => $tsId,
+                            'party' => $party, 'party_ref' => $partyRef,
+                            'contract_ref' => $side['contract_id'],
+                            'created_by' => intval($actor) ?: null,
+                        );
+                        if (!$side['ok']) {
+                            // لا حكمَ ملفَّق: الوحدة والكمية صفرٌ والسببُ منصوص
+                            $row += array('award_unit_type' => 'hour', 'award_qty' => 0.00,
+                                'entitlement_state' => 'not_due', 'entitlement_pct' => 0.00,
+                                'unavailable_reason' => mb_substr($side['reason'], 0, 200));
+                        } else {
+                            $aw = self::partyAward($gate, $ctx, $party);
+                            $row += array(
+                                'award_unit_type' => $side['unit'], 'award_qty' => $aw['award_qty'],
+                                'entitlement_state' => $aw['state'], 'entitlement_pct' => $aw['pct'],
+                                'unit_price' => $side['price'], 'currency' => $side['currency'],
+                                'policy_rule' => $aw['rule'],
+                                'policy_snapshot' => json_encode($aw['snapshot'], JSON_UNESCAPED_UNICODE),
+                            );
+                        }
+                        $awardId = intval($gate->insert('unit_party_awards', $row));
+                        if ($written === 0) { // رابطٌ أبويٌّ واحدٌ للأثر (العطالة على النوع لا على الطرف)
+                            self::link($gate, $company, $tsId, $type, 'unit_party_awards', $awardId, $revId, self::SOURCE_TIMESHEET);
+                        }
+                        $written++;
+                    }
+                    $out['effects'][] = array('effect' => $type, 'target_id' => $written, 'amount' => null, 'currency' => null);
                     break;
 
                 case 'employee_due':
