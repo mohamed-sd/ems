@@ -122,14 +122,14 @@ if (isset($_GET['delete_wh_id'])) {
     header("Location: master_data_proc.php?msg=تم+حذف+المخزن+بنجاح+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | بيانات مرجعية — المشتريات';
+$page_title = 'إيكوبيشن | البيانات المرجعية — المشتريات';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main proc-master-main ems-unified-page-shell">
     <?php
-    $header_title = 'بيانات مرجعية — المشتريات';
+    $header_title = 'البيانات المرجعية — المشتريات';
     $header_icon  = 'fa fa-sliders';
     $header_actions = array();
     if ($can_add) {

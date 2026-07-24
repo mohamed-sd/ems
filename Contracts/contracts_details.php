@@ -30,7 +30,7 @@ if (!$is_super_admin && $company_id <= 0) {
 // بوابة العزل — تستبدل سُلَّم النطاق اليدوي (contracts لها company_id مقيسةً)
 $details_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract details super view') : ems_tenant_db();
 
-$page_title = 'الإيكوبيشن | تفاصيل العقد';
+$page_title = 'الإيكوبيشن | ملف عقد المشروع';
 include '../inheader.php';
 include '../insidebar.php';
 ?>

@@ -175,14 +175,14 @@ if ($edit_id > 0) {
     }
 }
 
-$page_title = "إيكوبيشن | سجل العامل التشغيلي";
+$page_title = "إيكوبيشن | السجل التشغيلي للعامل";
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main equipments-fleet-main drivers-main">
     <?php
-    $header_title   = 'سجل العامل التشغيلي';
+    $header_title   = 'السجل التشغيلي للعامل';
     $header_icon    = 'fas fa-people-group';
     $header_actions = array();
     if ($can_add) {

@@ -29,7 +29,7 @@ if (!$driver) {
     exit();
 }
 
-$page_title = "إيكوبيشن | سجل قيادة الشاحنات";
+$page_title = "إيكوبيشن | سجل قيادة السائق";
 include("../inheader.php");
 include("../insidebar.php");
 ?>
@@ -63,7 +63,7 @@ include("../insidebar.php");
 
 <div class="main">
     <div class="history-header">
-        <h2><i class="fa fa-history"></i> سجل قيادة الشاحنات</h2>
+        <h2><i class="fa fa-history"></i> سجل قيادة السائق</h2>
         <div class="history-meta">
             السائق: <?php echo htmlspecialchars($driver['name']); ?>
         </div>

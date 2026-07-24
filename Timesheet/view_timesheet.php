@@ -429,7 +429,7 @@ $export_params = $_GET;
 $export_params['export_all'] = '1';
 $export_all_url = 'view_timesheet.php?' . http_build_query($export_params);
 
-$page_title = "إيكوبيشن | عرض ساعات العمل";
+$page_title = "إيكوبيشن | سجل الوحدات اليومية";
 include('../inheader.php');
 include('../insidebar.php');
 ?>
@@ -810,7 +810,7 @@ include('../insidebar.php');
 
 <?php
 // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-$header_title   = 'شاشة عرض ساعات العمل';
+$header_title   = 'شاشة سجل الوحدات اليومية';
 $header_icon    = 'fas fa-table';
 $header_actions = array(
     array('href' => 'view_timesheet.php', 'class' => 'back-btn ts-reset-link', 'icon' => 'fas fa-redo', 'label' => 'إعادة تعيين'),

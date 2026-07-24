@@ -1,0 +1,133 @@
+id	name	code	owner_role_id	is_link	is_quick
+1	حالة العملاء	Clients/clients.php	1	1	1
+2	حالة المشاريع	Projects/projects.php	1	1	1
+3	إدارة الصلاحيات	main/users.php	1	1	1
+4	شاشة التقارير	Reports/reports.php	1	1	1
+5	شاشة انواع المعدات	Equipments/equipments_types.php	1	1	1
+6	شاشة التقارير	Reports/reports.php	2	1	1
+7	علاقات الموظفين	Employees/employees.php	4	1	1
+8	إدارة المعدات	Equipments/equipments_fleet.php	3	1	1
+9	شاشة التشغيل	Oprators/oprators.php	6	0	1
+10	تسجيل الوحدات	Timesheet/timesheet_type.php	5	1	1
+11	الإعدادات	Settings/settings.php	1	1	1
+12	سجل النشاطات	ActivityLogs/activity_logs.php	1	1	1
+14	إدارة مشرفي الموردين	main/project_users.php	2	1	1
+15	المشرفين	main/project_users.php	3	1	1
+16	المشرفين	main/project_users.php	4	1	1
+17	إدارة المعاونين	main/project_users.php	5	1	1
+18	المشرفين	main/project_users.php	6	1	1
+20	إدارة العقود	Contracts/contracts.php	1	1	1
+21	تفاصيل عقد المشاريع	Contracts/contracts_details.php	1	0	0
+22	علاقات الموردين	Suppliers/suppliers.php	2	1	1
+23	التشغيل	Oprators/select_project.php	3	1	1
+24	الاعدادات	Settings/settings.php	2	0	1
+25	عقود الموردين	Suppliers/supplierscontracts.php	2	1	1
+26	تفاصيل عقد المورد	Suppliers/supplierscontracts_details.php	2	0	1
+27	المعدات	Equipments/equipments_drivers.php	4	0	1
+28	التقارير	Reports/reports.php	5	1	1
+29	توزيع المشغلين	movement/project_drivers.php	6	0	1
+30	إدارة الورديات	movement/movement_operations.php	6	1	1
+31	التقارير	Reports/reports.php	4	1	1
+32	التقارير	Reports/reports.php	3	1	1
+34	حالة المشروع	movement/map_page.php	6	1	1
+35	إدارة العملاء	Clients/clients.php	12	1	1
+36	إدارة المبيعات	Projects/projects.php	12	1	1
+37	إدارة العقود	Contracts/contracts.php	12	1	1
+38	تصنيف الاعطال	Equipments/manage_failure_codes.php	13	1	1
+40	سجل النوع والموديل	Equipments/fleet_models.php	3	1	1
+41	ملف الإهلاك المالي	Equipments/fleet_depreciation_profiles.php	3	1	1
+42	البلاغات (غير مفعّلة)	Maintenance/breakdowns.php	13	0	1
+43	أوامر الصيانة	Maintenance/orders.php	13	1	1
+44	التفتيش الفني	Maintenance/inspections.php	13	1	1
+45	الخطة الوقائية	Maintenance/preventive_plans.php	13	1	1
+46	إعدادات الصيانة	Maintenance/master_data.php	13	1	1
+47	سجل العامل التشغيلي	Workforce/worker_register.php	4	1	1
+48	عقود العاملين	Workforce/worker_contract.php	4	1	1
+50	الإجازات والغياب	Workforce/worker_leave_absence.php	4	1	1
+51	التحرّك والنقل	Workforce/worker_movement.php	4	1	1
+52	وحدات السكن	Workforce/housing_units.php	4	1	1
+53	تقييم العاملين	Workforce/worker_evaluation.php	4	1	1
+54	تسوية العاملين	Workforce/worker_settlement.php	4	1	1
+55	الاحتياج والتخطيط	Workforce/workforce_requirement.php	4	1	1
+56	السجل التشغيلي	Workforce/worker_worklog.php	4	1	1
+57	المسميات الوظيفية	Employees/job_titles.php	4	1	1
+58	أدوار الموظفين	Employees/employee_roles.php	4	1	1
+59	السائقون والمشغّلون	Employees/equipment_operators.php	4	1	1
+60	إدارة المستخدمين	main/users.php	15	1	1
+61	إدارة المعاونين الشاملة	main/all_assistants.php	15	1	1
+62	عقود الموظفين	Employees/employee_contracts.php	4	0	1
+63	تفاصيل عقد الموظف	Employees/employee_contracts_details.php	4	0	1
+64	بطاقة الموظف	Employees/employee_profile.php	4	0	1
+65	عرض عقد الموظف	Employees/showcontractemployee.php	4	0	1
+66	مسار الفرص	Opportunities/opportunities.php	12	1	1
+67	لوحة المشتريات	Procurement/dashboard_proc.php	16	1	1
+68	كتالوج الأصناف	Procurement/items_proc.php	16	1	1
+69	طلبات الشراء	Procurement/requests_proc.php	16	1	1
+70	أوامر الشراء	Procurement/orders_proc.php	16	1	1
+71	عهدة الاستلام المؤقت	Procurement/receipt_custody_proc.php	16	1	1
+72	المخزون التشغيلي	Procurement/stock_proc.php	16	1	1
+73	الصرف والعهدة	Procurement/issue_proc.php	16	1	1
+74	قواعد إعادة الطلب	Procurement/reordering_proc.php	16	1	1
+75	الموردون التشغيليون	Procurement/suppliers_proc.php	16	1	1
+76	بيانات مرجعية	Procurement/master_data_proc.php	16	1	1
+77	الأنشطة التجارية	Clients/activities.php	12	1	1
+78	المخاطر التجارية	Clients/commercial_risks.php	12	1	1
+79	المناقصات	Clients/tenders.php	12	1	1
+80	العروض	Clients/quotations.php	12	1	1
+81	نماذج التسعير	Clients/pricelists.php	12	1	1
+82	المنتجات والخدمات	Clients/products.php	12	1	1
+83	وحدات القياس	Clients/units_of_measure.php	12	1	1
+84	الملاحق والتجديدات	Clients/contract_amendments.php	12	1	1
+85	سجل الأحداث التعاقدية	Clients/contract_events.php	12	1	1
+86	الأحداث المالية	Finance/events_list_fin.php	17	1	0
+87	دليل الحسابات	Finance/accounts_fin.php	17	1	0
+88	القيود المالية	Finance/journal_form_fin.php	17	1	0
+89	الميزانيات والانحراف	Finance/budget_form_fin.php	17	1	0
+90	الذمم والمستحقات	Finance/dues_fin.php	17	1	0
+91	المدفوعات والخزينة	Finance/payments_fin.php	17	1	0
+92	التكاليف والربحية	Finance/cost_report_fin.php	17	1	0
+93	الفترات والإقفال	Finance/periods_fin.php	17	1	0
+94	التمويل والالتزامات	Finance/funding_fin.php	17	1	0
+95	السيولة والتنبؤ النقدي	Finance/cash_forecast_fin.php	17	1	0
+96	المحاسبة الإدارية	Finance/management_accounting_fin.php	17	1	1
+97	المحاسبون والوحدات	Finance/accountants_fin.php	17	1	0
+98	استيراد أحداث الإدارات	Finance/import_events_fin.php	17	1	0
+99	اللوحة التنفيذية	Finance/executive_dashboard_fin.php	17	1	0
+100	القوائم المالية	Finance/financial_statements_fin.php	17	1	0
+101	الأصول الثابتة والإهلاك	Finance/assets_fin.php	17	1	0
+102	الضرائب / القيمة المضافة	Finance/tax_fin.php	17	1	0
+103	المطابقة البنكية	Finance/bank_reconciliation_fin.php	17	1	0
+104	لوحة المدير المالي اليومية	Finance/cfo_daily_board_fin.php	17	1	1
+105	كشف الوحدات والتطابق	Finance/unit_records_fin.php	17	1	0
+106	كشف حساب المورد	Finance/supplier_statement_fin.php	17	1	1
+107	المعاونين	main/project_users.php	17	1	1
+108	أنواع الترحيل	Transport/transfer_types_config.php	23	1	0
+109	قواعد المتحمِّل	Transport/transfer_cost_rules_config.php	23	1	0
+110	إعداد المواقع	Transport/trs_locations_config.php	23	1	0
+111	طلبات الترحيل	Transport/transfer_requests.php	23	1	1
+112	أوامر الترحيل	Transport/transfer_orders_list.php	23	1	1
+113	لوحة الرحلات	Transport/transfer_dashboard.php	23	1	1
+114	طلب مالي جديد	FinRequests/request_form.php	13	1	0
+115	طلباتي المالية	FinRequests/my_requests.php	13	1	0
+116	صندوق طلبات الإدارة	FinRequests/dept_inbox.php	13	1	0
+117	مكتب محاسب الإدارة	FinRequests/accountant_desk.php	18	1	0
+118	بوابة الطلبات المالية	FinRequests/finance_gateway.php	17	1	0
+119	خريطة تفريع الأثر	FinRequests/effect_map.php	17	1	0
+120	توجيه الطلبات المالية	FinRequests/routing_admin.php	17	1	0
+121	لوحة زمن الدورة	FinRequests/cycle_time_board.php	17	1	0
+122	تقارير الطلبات المالية	FinRequests/requests_reports.php	17	1	0
+123	إدارة صلاحيات الأدوار	Settings/role_permissions.php	15	0	0
+124	إدارة الأدوار	Settings/roles.php	15	0	0
+125	مراقبة الانحراف والمعالجة	Finance/variance_monitor_fin.php	17	1	0
+126	مخصّص الصيانة (المروحة)	Finance/maintenance_provision_fin.php	17	1	0
+127	التزامات العقد	Clients/contract_commitments.php	12	1	0
+128	مستحق المشغّل (المروحة)	Finance/operator_pay_fin.php	17	1	0
+129	فحص الجاهزية	Clients/readiness_lines.php	12	1	0
+130	أنواع البلاغات والتوجيه	Tickets/ticket_types_config.php	24	1	0
+131	التصنيف الفنّي للبلاغات	Tickets/ticket_categories_config.php	24	1	0
+132	البلاغات	Tickets/tickets_list.php	24	1	0
+133	استمارة بلاغ	Tickets/ticket_form.php	24	0	0
+134	سياسات الاستحقاق (SLA)	Tickets/ticket_sla_config.php	24	1	0
+135	سلّم التصعيد	Tickets/ticket_escalation_config.php	24	1	0
+136	القوالب الدورية	Tickets/ticket_recurrence.php	24	1	0
+137	لوحة متابعة البلاغات	Tickets/ticket_dashboard.php	24	1	0

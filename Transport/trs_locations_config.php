@@ -86,14 +86,14 @@ if (isset($_GET['delete_id'])) {
     header("Location: trs_locations_config.php?msg=تم+حذف+الموقع+بنجاح+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | إعداد المواقع';
+$page_title = 'إيكوبيشن | المواقع';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main trs-locations-main ems-unified-page-shell">
     <?php
-    $header_title = 'إعداد المواقع';
+    $header_title = 'المواقع';
     $header_icon  = 'fa fa-location-dot';
     $header_actions = array();
     if ($can_add) {

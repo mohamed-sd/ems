@@ -306,7 +306,7 @@ foreach ($prod_list as $row) {
     elseif ($row['revenue_model'] === 'ton') $stat_ton++;
 }
 
-$page_title = "المنتجات والخدمات";
+$page_title = "كتالوج المنتجات والخدمات";
 include("../inheader.php");
 include('../insidebar.php');
 
@@ -319,7 +319,7 @@ function prod_revenue_label($model, $map)
 <div class="main prod-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'المنتجات والخدمات';
+    $header_title = 'كتالوج المنتجات والخدمات';
     $header_icon = 'fas fa-box';
     $header_actions = array();
     if ($can_add) {

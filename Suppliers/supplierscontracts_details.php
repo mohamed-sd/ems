@@ -29,7 +29,7 @@ if (!$is_super_admin && $company_id <= 0) {
 // العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15) — السوبر عبر forAllTenants المسجَّل
 $scd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contract details super') : ems_tenant_db();
 
-$page_title = 'الإيكوبيشن | تفاصيل عقد المورد';
+$page_title = 'الإيكوبيشن | ملف عقد المورد';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
@@ -43,7 +43,7 @@ include '../insidebar.php';
                         <i class="fas fa-file-contract"></i>
                     </div>
                     <div>
-                        <h1 class="hero-title">تفاصيل عقد المورد</h1>
+                        <h1 class="hero-title">ملف عقد المورد</h1>
                         <p class="hero-subtitle">عرض وإدارة بيانات عقد المورد والمعدات المرتبطة</p>
                     </div>
                 </div>

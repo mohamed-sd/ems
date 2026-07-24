@@ -313,7 +313,7 @@ include('../insidebar.php');
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title = 'إدارة المشاريع';
+    $header_title = 'المشاريع';
     $header_icon = 'fas fa-project-diagram';
     $header_actions = array();
     if ($can_add) {

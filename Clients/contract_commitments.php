@@ -395,7 +395,7 @@ foreach ($cmt_list as $row) {
     if ($row['commitment_type'] === 'min_guaranteed') $stat_min_guar++;
 }
 
-$page_title = "التزامات العقد";
+$page_title = "التزامات العقود";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -403,7 +403,7 @@ include('../insidebar.php');
 <div class="main cmt-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'التزامات العقد';
+    $header_title = 'التزامات العقود';
     $header_icon = 'fas fa-handshake';
     $header_actions = array();
     if ($can_add) {

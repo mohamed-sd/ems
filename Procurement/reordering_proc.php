@@ -97,14 +97,14 @@ if (isset($_GET['edit_id'])) {
 $sel_item      = $edit_row ? intval($edit_row['item_id']) : 0;
 $sel_warehouse = $edit_row ? intval($edit_row['warehouse_id']) : 0;
 
-$page_title = 'إيكوبيشن | قواعد إعادة الطلب';
+$page_title = 'إيكوبيشن | حدود إعادة الطلب';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main proc-reordering-main ems-unified-page-shell">
     <?php
-    $header_title = 'قواعد إعادة الطلب';
+    $header_title = 'حدود إعادة الطلب';
     $header_icon  = 'fa fa-arrows-rotate';
     $header_actions = array();
     if ($can_add) {

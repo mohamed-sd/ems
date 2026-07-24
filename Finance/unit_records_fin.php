@@ -216,13 +216,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['work_model'])) {
     }
 }
 
-$page_title = 'إيكوبيشن | كشف الوحدات والتطابق';
+$page_title = 'إيكوبيشن | مطابقة الوحدات اليومية';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main fin-units-main ems-unified-page-shell">
     <?php
-    $header_title = 'كشف الوحدات التشغيلية والتطابق الثلاثي'; $header_icon = 'fa fa-cubes';
+    $header_title = 'مطابقة الوحدات اليومية'; $header_icon = 'fa fa-cubes';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'سجل وحدات يومي'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

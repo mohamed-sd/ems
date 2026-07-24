@@ -89,14 +89,14 @@ if (isset($_GET['delete_id'])) {
     header("Location: transfer_types_config.php?msg=تم+حذف+النوع+بنجاح+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | أنواع الترحيل';
+$page_title = 'إيكوبيشن | إعدادات الترحيل';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main trs-types-main ems-unified-page-shell">
     <?php
-    $header_title = 'إعداد أنواع الترحيل';
+    $header_title = 'إعدادات الترحيل';
     $header_icon  = 'fa fa-layer-group';
     $header_actions = array();
     if ($can_add) {

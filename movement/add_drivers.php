@@ -52,7 +52,7 @@ foreach ($linked_rows as $r) {
     $linked[] = $r;
 }
 
-$page_title = "إيكوبيشن | إدارة مشغلي المعدة";
+$page_title = "إيكوبيشن | مشغّلو المعدة";
 include("../inheader.php");
 ?>
 
@@ -917,7 +917,7 @@ include("../inheader.php");
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_icon       = 'fas fa-users-cog';
-    $header_title_html = 'إدارة مشغلي المعدة
+    $header_title_html = 'مشغّلو المعدة
             <span style="font-size: 15px;">
                 <i class="fas fa-cogs"></i> ' . htmlspecialchars($equipment['name']) . '
                 <p><i class="fas fa-barcode"></i> الكود:

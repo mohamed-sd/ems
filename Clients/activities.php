@@ -380,7 +380,7 @@ foreach ($act_list as $row) {
     }
 }
 
-$page_title = "الأنشطة التجارية";
+$page_title = "أنشطة العملاء";
 include("../inheader.php");
 include('../insidebar.php');
 
@@ -393,7 +393,7 @@ function act_entity_label($type, $map)
 <div class="main act-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'الأنشطة التجارية';
+    $header_title = 'أنشطة العملاء';
     $header_icon = 'fas fa-handshake';
     $header_actions = array();
     if ($can_add) {

@@ -74,14 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     }
 }
 
-$page_title = 'إيكوبيشن | التصنيف الفنّي للبلاغات';
+$page_title = 'إيكوبيشن | تصنيفات الأعطال والبلاغات';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main tkt-categories-main ems-unified-page-shell">
     <?php
-    $header_title = 'التصنيف الفنّي للبلاغات';
+    $header_title = 'تصنيفات الأعطال والبلاغات';
     $header_icon  = 'fa fa-tags';
     $header_actions = array();
     if ($can_add) {

@@ -87,14 +87,14 @@ if (isset($_GET['delete_id'])) {
     header("Location: assets_fin.php?msg=تم+حذف+الأصل+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | الأصول الثابتة';
+$page_title = 'إيكوبيشن | الأصول والإهلاك';
 include '../inheader.php';
 include '../insidebar.php';
 $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك بالكامل', 'disposed' => 'مستبعَد');
 ?>
 <div class="main fin-assets-main ems-unified-page-shell">
     <?php
-    $header_title = 'الأصول الثابتة والإهلاك'; $header_icon = 'fa fa-building-flag';
+    $header_title = 'الأصول والإهلاك'; $header_icon = 'fa fa-building-flag';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة أصل'); }
     if ($can_edit) { $header_actions[] = array('href' => '?run_dep=1&_t=' . fin_action_token(), 'class' => 'add-btn', 'icon' => 'fas fa-calculator', 'label' => 'احتساب إهلاك الشهر'); }

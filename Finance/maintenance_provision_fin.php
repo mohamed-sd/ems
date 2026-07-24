@@ -70,14 +70,14 @@ $cur_rate_display = $cur_rate > 0 ? rtrim(rtrim(number_format($cur_rate, 4, '.',
 // كل آثار المروحة (سياقٌ للعرض — قراءة فقط)
 $effects = fin_gate($is_super_admin)->select('fin_effect_map', array('orderBy' => 'source_kind ASC, display_order ASC'));
 
-$page_title = 'إيكوبيشن | مخصّص الصيانة (المروحة)';
+$page_title = 'إيكوبيشن | قواعد مخصص الصيانة';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main fin-mprov-main ems-unified-page-shell">
     <?php
-    $header_title = 'مخصّص الصيانة (مروحة الأثر)';
+    $header_title = 'قواعد مخصص الصيانة';
     $header_icon  = 'fa fa-screwdriver-wrench';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

@@ -146,14 +146,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     header("Location: journal_form_fin.php?msg=تم+حفظ+القيد+($bal)+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | القيود المالية';
+$page_title = 'إيكوبيشن | القيود اليومية';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main fin-journal-main ems-unified-page-shell">
     <?php
-    $header_title = 'القيود المالية';
+    $header_title = 'القيود اليومية';
     $header_icon  = 'fa fa-scale-balanced';
     $header_actions = array();
     if ($can_add) {

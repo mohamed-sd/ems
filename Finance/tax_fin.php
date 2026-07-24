@@ -81,13 +81,13 @@ $out_tax = $tax_ssum('output');
 $in_tax  = $tax_ssum('input');
 $net_tax = $out_tax - $in_tax;
 
-$page_title = 'إيكوبيشن | الضرائب';
+$page_title = 'إيكوبيشن | الضرائب والقيمة المضافة';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main fin-tax-main ems-unified-page-shell">
     <?php
-    $header_title = 'الضرائب / القيمة المضافة'; $header_icon = 'fa fa-percent';
+    $header_title = 'الضرائب والقيمة المضافة'; $header_icon = 'fa fa-percent';
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleCode', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'رمز ضريبة');

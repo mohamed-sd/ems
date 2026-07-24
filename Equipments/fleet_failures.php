@@ -24,7 +24,7 @@ $ops_project_col = (function_exists('db_table_has_column') && db_table_has_colum
     ? 'project_id' : 'project';
 
 // إعداد عنوان الصفحة
-$page_title = "تقرير الأعطال - إدارة الأسطول";
+$page_title = "تقرير الأعطال";
 
 $is_export_request = (isset($_GET['export']) && $_GET['export'] == 'excel');
 
@@ -140,7 +140,7 @@ $event_types_rows = $ff_gate->scopedQuery(
 <div class="main failures-page fleet-failures-main">
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title   = 'تقرير الأعطال - إدارة الأسطول';
+    $header_title   = 'تقرير الأعطال';
     $header_icon    = 'fas fa-tools';
     $header_actions = array(
         array('tag' => 'button', 'class' => 'add-btn btn', 'attrs' => 'type="button" onclick="exportToExcel()"', 'icon' => 'fas fa-file-excel', 'label' => 'تصدير Excel'),

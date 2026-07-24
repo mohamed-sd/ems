@@ -41,13 +41,13 @@ if ($my_routes) {
     ));
 }
 
-$page_title = 'إيكوبيشن | صندوق طلبات الإدارة';
+$page_title = 'إيكوبيشن | موافقات إدارتي';
 include('../inheader.php');
 include('../insidebar.php');
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php
-    $header_title   = 'صندوق طلبات الإدارة — تحت المراجعة';
+    $header_title   = 'موافقات إدارتي — تحت المراجعة';
     $header_icon    = 'fa fa-inbox';
     $header_actions = array();
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

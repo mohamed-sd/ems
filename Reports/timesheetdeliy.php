@@ -82,7 +82,7 @@ WHERE 1=1$tsd_filter AND {TENANT_SCOPE}", $tsd_params);
         error_log('timesheetdeliy.php totals query failed: ' . $t->getMessage());
     }
 
-$page_title = "إيكوبيشن | تقرير التايم شيت اليومي";
+$page_title = "إيكوبيشن | تقرير الوحدات اليومية";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -91,7 +91,7 @@ include('../insidebar.php');
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title   = 'تقرير التايم شيت اليومي';
+    $header_title   = 'تقرير الوحدات اليومية';
     $header_icon    = 'fa-solid fa-chart-column';
     $header_actions = array();
     $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

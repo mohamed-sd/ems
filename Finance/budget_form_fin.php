@@ -111,14 +111,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
     header("Location: budget_form_fin.php?msg=تم+حفظ+الميزانية+بنجاح+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | الميزانيات والانحراف';
+$page_title = 'إيكوبيشن | الميزانية والانحراف';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main fin-budget-main ems-unified-page-shell">
     <?php
-    $header_title = 'الميزانيات والانحراف';
+    $header_title = 'الميزانية والانحراف';
     $header_icon  = 'fa fa-chart-pie';
     $header_actions = array();
     if ($can_add) {

@@ -86,13 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     header("Location: dues_fin.php?msg=تمت+إضافة+الذمّة+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | الذمم والمستحقات';
+$page_title = 'إيكوبيشن | الذمم والتحصيل';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main fin-dues-main ems-unified-page-shell">
     <?php
-    $header_title = 'الذمم والمستحقات'; $header_icon = 'fa fa-hand-holding-dollar';
+    $header_title = 'الذمم والتحصيل'; $header_icon = 'fa fa-hand-holding-dollar';
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleDue', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مستحق');

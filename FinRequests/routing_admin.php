@@ -83,13 +83,13 @@ try {
     }
 } catch (\Throwable $t) { /* عرض */ }
 
-$page_title = 'إيكوبيشن | توجيه الطلبات المالية';
+$page_title = 'إيكوبيشن | قواعد توجيه الطلبات';
 include('../inheader.php');
 include('../insidebar.php');
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php
-    $header_title   = 'توجيه الإدارات — مفاتيح التفعيل والأدوار';
+    $header_title   = 'قواعد توجيه الطلبات';
     $header_icon    = 'fa fa-route';
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

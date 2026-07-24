@@ -240,7 +240,7 @@ foreach ($suppliers_data as $sup) {
     }
 }
 
-$page_title = "خريطة الموقع | " . htmlspecialchars($selected_project['name']);
+$page_title = "متابعة المشروع | " . htmlspecialchars($selected_project['name']);
 include('../inheader.php');
 // تصميم شاشة الخريطة معزول في ملف خاص (يُحمّل بعد الأنماط العامة، محصّن تحت .movement-map-page)
 echo '<link rel="stylesheet" href="/ems/assets/css/map-page.css?v=2026060603">' . "\n";
@@ -252,7 +252,7 @@ include('../insidebar.php');
   <?php
   // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
   $header_icon       = 'fas fa-map-marked-alt';
-  $header_title_html = 'خريطة الموقع
+  $header_title_html = 'متابعة المشروع
       <small class="map-project-meta">
         <i class="fas fa-project-diagram"></i>
         ' . htmlspecialchars($selected_project['name'])

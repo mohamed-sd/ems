@@ -582,7 +582,7 @@ $shiftIcon = function ($s) {
     return '🔄';
 };
 
-$page_title = "إيكوبيشن | شجرة العميل";
+$page_title = "إيكوبيشن | شجرة حسابات العميل";
 include('../inheader.php');
 // CSS معزول خاص بهذه الشاشة فقط (محصور تحت .client-tree-page)
 $__ctcss = __DIR__ . '/../assets/css/client-tree.css';
@@ -592,7 +592,7 @@ include('../insidebar.php');
 
 <div class="main client-tree-page">
     <?php
-    $header_title   = 'شجرة العميل';
+    $header_title   = 'شجرة حسابات العميل';
     $header_icon    = 'fas fa-sitemap';
     $header_actions = array();
     $header_back    = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

@@ -89,14 +89,14 @@ if (isset($_GET['delete_id'])) {
     header("Location: suppliers_proc.php?msg=تم+حذف+المورد+بنجاح+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | الموردون التشغيليون';
+$page_title = 'إيكوبيشن | موردو المشتريات';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main proc-suppliers-main ems-unified-page-shell">
     <?php
-    $header_title = 'الموردون التشغيليون';
+    $header_title = 'موردو المشتريات';
     $header_icon  = 'fa fa-truck-field';
     $header_actions = array();
     if ($can_add) {

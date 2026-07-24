@@ -225,7 +225,7 @@ function renderLogRow(array $row, array $actionLabels): string
     </tr>';
 }
 
-$page_title = 'سجل النشاطات';
+$page_title = 'سجل النشاط';
 ?>
 <?php require_once '../inheader.php'; ?>
 <?php require_once '../insidebar.php'; ?>

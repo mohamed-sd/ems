@@ -603,7 +603,7 @@ $sector_services_count = isset($sector_counts['خدمات']) ? intval($sector_co
 
 arsort($sector_counts);
 
-$page_title = "قائمة العملاء";
+$page_title = "العملاء";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -612,7 +612,7 @@ include('../insidebar.php');
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title = 'إدارة العملاء';
+    $header_title = 'العملاء';
     $header_icon = 'fas fa-users';
     $header_actions = array();
     if ($can_add) {

@@ -336,7 +336,7 @@ foreach ($quo_list as $row) {
     $stat_by_cur[$row_cur] = (isset($stat_by_cur[$row_cur]) ? $stat_by_cur[$row_cur] : 0.0) + (float) $row['amount_total'];
 }
 
-$page_title = "العروض";
+$page_title = "عروض الأسعار";
 include("../inheader.php");
 include('../insidebar.php');
 
@@ -363,7 +363,7 @@ function quo_state_tone($state)
 <div class="main quo-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'العروض';
+    $header_title = 'عروض الأسعار';
     $header_icon = 'fas fa-file-invoice-dollar';
     $header_actions = array();
     if ($can_add) {

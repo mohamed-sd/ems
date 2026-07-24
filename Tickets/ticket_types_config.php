@@ -85,14 +85,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     }
 }
 
-$page_title = 'إيكوبيشن | أنواع البلاغات والتوجيه';
+$page_title = 'إيكوبيشن | إعداد أنواع البلاغات';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main tkt-types-main ems-unified-page-shell">
     <?php
-    $header_title = 'أنواع البلاغات ومسار التوجيه';
+    $header_title = 'إعداد أنواع البلاغات';
     $header_icon  = 'fa fa-route';
     $header_actions = array();
     if ($can_add) {

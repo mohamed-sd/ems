@@ -464,7 +464,7 @@ if ($opp_rows) {
 $decided = $stat_won + $stat_lost;
 $conversion_rate = $decided > 0 ? round(($stat_won / $decided) * 100, 1) : 0;
 
-$page_title = "مسار الفرص";
+$page_title = "الفرص البيعية";
 include("../inheader.php");
 include('../insidebar.php');
 
@@ -487,7 +487,7 @@ function opp_stage_tone($stage)
 <div class="main opp-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'مسار الفرص';
+    $header_title = 'الفرص البيعية';
     $header_icon = 'fas fa-filter';
     $header_actions = array();
     if ($can_add) {

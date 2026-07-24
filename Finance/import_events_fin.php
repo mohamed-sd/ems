@@ -92,7 +92,7 @@ if (isset($_GET['gen_mnt'])) {
     header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+الصيانة+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | استيراد أحداث الإدارات';
+$page_title = 'إيكوبيشن | استقبال معاملات الإدارات';
 include '../inheader.php';
 include '../insidebar.php';
 
@@ -102,7 +102,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
 ?>
 <div class="main fin-import-main ems-unified-page-shell">
     <?php
-    $header_title = 'استيراد أحداث الإدارات (نموذج السحب)'; $header_icon = 'fa fa-file-import';
+    $header_title = 'استقبال معاملات الإدارات (نموذج السحب)'; $header_icon = 'fa fa-file-import';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');

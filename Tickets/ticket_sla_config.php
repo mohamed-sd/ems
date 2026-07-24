@@ -67,13 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     }
 }
 
-$page_title = 'إيكوبيشن | سياسات الاستحقاق';
+$page_title = 'إيكوبيشن | أزمنة الاستجابة والإنجاز';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main tkt-sla-main ems-unified-page-shell">
     <?php
-    $header_title = 'سياسات الاستحقاق (SLA)';
+    $header_title = 'أزمنة الاستجابة والإنجاز';
     $header_icon  = 'fa fa-stopwatch';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة سياسة'); }

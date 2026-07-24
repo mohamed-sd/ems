@@ -56,12 +56,12 @@ try {
     foreach ($hu_proj_rows as $p) { $projects[$p['id']] = $p['name']; }
 } catch (\Throwable $t) { error_log('housing_units.php projects: ' . $t->getMessage()); }
 
-$page_title = "إيكوبيشن | وحدات السكن";
+$page_title = "إيكوبيشن | السكن والإعاشة";
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main">
-    <?php $header_title='وحدات السكن'; $header_icon='fas fa-building'; $header_actions=array();
+    <?php $header_title='السكن والإعاشة'; $header_icon='fas fa-building'; $header_actions=array();
     if ($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'وحدة سكن');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>

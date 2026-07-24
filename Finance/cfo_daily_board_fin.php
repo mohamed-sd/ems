@@ -69,13 +69,13 @@ $cards = array(
   array('fa-landmark',          number_format($inst7, 0),       'أقساط تمويل خلال 7 أيام',      $inst7 > 0 ? 'or' : 'ok', 'funding_fin.php'),
 );
 
-$page_title = 'إيكوبيشن | لوحة المدير المالي اليومية';
+$page_title = 'إيكوبيشن | لوحة المدير المالي';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main fin-cfo-main ems-unified-page-shell">
     <?php
-    $header_title = 'لوحة المدير المالي اليومية'; $header_icon = 'fa fa-gauge-high';
+    $header_title = 'لوحة المدير المالي'; $header_icon = 'fa fa-gauge-high';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');

@@ -45,14 +45,14 @@ WHERE t.status = 1 AND o.status = 1$rep_filter AND {TENANT_SCOPE}
  ORDER BY p.name, s.name", $rep_params);
 } catch (\Throwable $t) { error_log('Reports/reports.php main: ' . $t->getMessage()); }
 
-$page_title = "إيكوبيشن | التقارير";
+$page_title = "إيكوبيشن | مركز التقارير";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
     <div class="main ems-unified-page-shell reports-main">
         <?php
         // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-        $header_title   = 'التقارير';
+        $header_title   = 'مركز التقارير';
         $header_icon    = 'fa-solid fa-chart-line';
         $header_actions = array();
         $__role = $_SESSION['user']['role'];

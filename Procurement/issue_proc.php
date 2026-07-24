@@ -188,7 +188,7 @@ if (isset($_GET['edit_id']) && $can_edit) {
     }
 }
 
-$page_title = 'إيكوبيشن | الصرف والعهدة';
+$page_title = 'إيكوبيشن | صرف المخزون والعهدة';
 include '../inheader.php';
 include '../insidebar.php';
 
@@ -212,7 +212,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
 
 <div class="main proc-issue-main ems-unified-page-shell">
     <?php
-    $header_title = 'الصرف وتحميل التكلفة';
+    $header_title = 'صرف المخزون والعهدة';
     $header_icon  = 'fa fa-hand-holding-box';
     $header_actions = array();
     if ($can_add) {

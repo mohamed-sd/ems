@@ -372,7 +372,7 @@ foreach ($amd_list as $row) {
         if ($row['amend_type'] === 'تغيير أسعار') $stat_price++;
 }
 
-$page_title = "الملاحق والتجديدات";
+$page_title = "ملاحق العقود وتجديداتها";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -380,7 +380,7 @@ include('../insidebar.php');
 <div class="main amd-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'الملاحق والتجديدات';
+    $header_title = 'ملاحق العقود وتجديداتها';
     $header_icon = 'fas fa-file-pen';
     $header_actions = array();
     // السجلّ للقراءة فقط (D02): لا زرَّ إضافةٍ — يُغذّى تلقائيًّا من إجراءات العقد

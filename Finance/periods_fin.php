@@ -102,13 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fiscal_year'])) {
 // الفترة المختارة لعرض قائمة الإقفال
 $sel_pid = isset($_GET['pid']) ? intval($_GET['pid']) : 0;
 
-$page_title = 'إيكوبيشن | الفترات والإقفال';
+$page_title = 'إيكوبيشن | إقفال الفترات';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main fin-periods-main ems-unified-page-shell">
     <?php
-    $header_title = 'الفترات المالية والإقفال'; $header_icon = 'fa fa-calendar-check';
+    $header_title = 'إقفال الفترات'; $header_icon = 'fa fa-calendar-check';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إنشاء فترة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

@@ -6,7 +6,7 @@ require_once '../includes/approval_workflow.php';
 $user_role = approval_get_user_role();
 $user_id = approval_get_user_id();
 
-$page_title = 'إيكوبيشن | طلبات الموافقات';
+$page_title = 'إيكوبيشن | صندوق موافقاتي';
 include '../inheader.php';
 include '../insidebar.php';
 
@@ -29,7 +29,7 @@ $result = approval_fetch_requests_for_listing($status_filter, $user_role, $user_
         <div class="title">
             <div class="title-content" style="display:flex;align-items:center;gap:12px;">
                 <div class="title-icon"><i class="fas fa-check-double"></i></div>
-                <h1>طلبات الموافقات</h1>
+                <h1>صندوق موافقاتي</h1>
             </div>
         </div>
         <div class="back">

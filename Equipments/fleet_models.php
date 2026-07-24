@@ -261,7 +261,7 @@ if ($has_dep_profile) {
     ));
 }
 
-$page_title = "إيكوبيشن | سجل النوع والموديل";
+$page_title = "إيكوبيشن | الأنواع والموديلات";
 include("../inheader.php");
 include("../insidebar.php");
 
@@ -272,7 +272,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 <div style="background-color:#fff; padding: 10px;;" class="main">
 
     <?php
-    $header_title   = 'سجل النوع والموديل';
+    $header_title   = 'الأنواع والموديلات';
     $header_icon    = 'fas fa-clipboard-list';
     $header_actions = array();
     if ($perms['can_add']) {

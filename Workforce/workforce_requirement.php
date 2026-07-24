@@ -93,10 +93,10 @@ if ($edit && !empty($edit['project_id']) && !empty($edit['worker_category'])) {
     $auto_preview = ems_planning_available($conn, intval($edit['project_id']), $edit['worker_category'], $is_super_admin?null:$company_id);
 }
 
-$page_title="إيكوبيشن | الاحتياج والتخطيط"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | احتياج القوى والتخطيط"; include '../inheader.php'; include '../insidebar.php';
 ?>
 <div class="main">
-    <?php $header_title='الاحتياج وتخطيط القوى'; $header_icon='fas fa-clipboard-list'; $header_actions=array();
+    <?php $header_title='احتياج القوى والتخطيط'; $header_icon='fas fa-clipboard-list'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'احتياج جديد');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>

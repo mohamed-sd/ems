@@ -206,7 +206,7 @@ if ($plan || $edit_id === 0) {
     $task_types = mnt_lookup_options($conn, $company_id, 'نوع مهمة');
 }
 
-$page_title = 'إيكوبيشن | الخطة الوقائية';
+$page_title = 'إيكوبيشن | الصيانة الوقائية';
 include '../inheader.php';
 include '../insidebar.php';
 function mnt_opt($value, $label, $selected) {
@@ -336,7 +336,7 @@ function mnt_opt($value, $label, $selected) {
     </div>
 
 <?php else: // ── قائمة الخطط + المستحقة الآن ──
-    $header_title  = 'الخطة الوقائية';
+    $header_title  = 'الصيانة الوقائية';
     $header_icon   = 'fa fa-calendar-check';
     $header_actions = array();
     if ($can_add) {

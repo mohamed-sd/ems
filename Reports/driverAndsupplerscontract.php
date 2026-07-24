@@ -12,7 +12,7 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | التقارير</title>
+    <title>إيكوبيشن | تقرير وحدات المشغّلين</title>
 
     <!-- Bootstrap 5 -->
     <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">

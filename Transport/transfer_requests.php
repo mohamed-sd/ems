@@ -133,13 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$page_title = 'إيكوبيشن | طلبات الترحيل';
+$page_title = 'إيكوبيشن | موافقات الترحيل';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main trs-requests-main ems-unified-page-shell">
     <?php
-    $header_title = 'طلبات الترحيل';
+    $header_title = 'موافقات الترحيل';
     $header_icon  = 'fa fa-file-circle-plus';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'طلب جديد'); }

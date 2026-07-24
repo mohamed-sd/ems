@@ -120,13 +120,13 @@ $stage_labels = array(
     'merged' => 'الدمج', 'expired' => 'الانتهاء', 'archived' => 'الأرشفة', 'draft' => 'المسودة',
 );
 
-$page_title = 'إيكوبيشن | لوحة زمن الدورة';
+$page_title = 'إيكوبيشن | زمن دورة الطلبات';
 include('../inheader.php');
 include('../insidebar.php');
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php
-    $header_title   = 'لوحة زمن الدورة — الالتزام والاختناق والتصعيد';
+    $header_title   = 'زمن دورة الطلبات — الالتزام والاختناق والتصعيد';
     $header_icon    = 'fa fa-stopwatch';
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

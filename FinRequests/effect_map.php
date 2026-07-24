@@ -100,13 +100,13 @@ if ($q !== '' && $unit === null) {
     }
 }
 
-$page_title = 'إيكوبيشن | خريطة تفريع الأثر';
+$page_title = 'إيكوبيشن | سجل الحركة المالية';
 include('../inheader.php');
 include('../insidebar.php');
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php
-    $header_title   = 'خريطة تفريع الأثر — الخيط في الاتجاهين';
+    $header_title   = 'سجل الحركة المالية — الخيط في الاتجاهين';
     $header_icon    = 'fa fa-diagram-project';
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

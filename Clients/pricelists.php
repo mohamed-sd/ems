@@ -310,7 +310,7 @@ foreach ($pl_list as $row) {
     elseif ($row['revenue_model'] === 'meter') $stat_meter++;
 }
 
-$page_title = "نماذج التسعير";
+$page_title = "قوائم ونماذج التسعير";
 include("../inheader.php");
 include('../insidebar.php');
 
@@ -323,7 +323,7 @@ function pl_revenue_label($model, $map)
 <div class="main pl-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'نماذج التسعير';
+    $header_title = 'قوائم ونماذج التسعير';
     $header_icon = 'fas fa-tags';
     $header_actions = array();
     if ($can_add) {

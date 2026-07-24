@@ -151,7 +151,7 @@ try {
         'columns' => array('id', 'name'), 'orderBy' => 'level, name'));
 } catch (\Throwable $t) { error_log('modules.php roles: ' . $t->getMessage()); }
 
-$page_title = "إدارة الصفحات والموديولات";
+$page_title = "شاشات النظام والوحدات";
 include("../inheader.php");
 include('../insidebar.php');
 ?>

@@ -99,10 +99,10 @@ try {
     foreach($wm_housing as $h){$housing[$h['id']]=$h['name'];}
 } catch (\Throwable $t) { error_log('worker_movement.php housing: ' . $t->getMessage()); }
 
-$page_title="إيكوبيشن | التحرّك والنقل"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | تنقلات العاملين"; include '../inheader.php'; include '../insidebar.php';
 ?>
 <div class="main">
-    <?php $header_title='التحرّك والنقل'; $header_icon='fas fa-route'; $header_actions=array();
+    <?php $header_title='تنقلات العاملين'; $header_icon='fas fa-route'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'أمر تحرّك/نقل');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>

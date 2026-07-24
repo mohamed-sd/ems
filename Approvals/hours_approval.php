@@ -258,7 +258,7 @@ $column_labels = [
 
 // الأعمدة تُتحكم بها عبر أزرار إظهار/إخفاء المجموعات في الصفحة
 
-$page_title = 'اعتماد ساعات العمل';
+$page_title = 'اعتماد الوحدات التشغيلية';
 include('../inheader.php');
 ?>
 <!-- ============================================================
@@ -300,7 +300,7 @@ include '../insidebar.php';
 
   <?php
   // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-  $header_title   = 'اعتماد ساعات العمل';
+  $header_title   = 'اعتماد الوحدات التشغيلية';
   $header_icon    = 'fa fa-check-double';
   $header_actions = array(
       array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-outline-secondary btn-sm fw-semibold', 'icon' => 'fa fa-home me-1', 'label' => 'لوحة التحكم'),

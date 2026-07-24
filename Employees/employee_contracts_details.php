@@ -22,7 +22,7 @@ $dcd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('driver contract de
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تفاصيل عقد السائق</title>
+    <title>إيكوبيشن | ملف عقد الموظف</title>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/ems/assets/css/all.min.css">

@@ -145,13 +145,13 @@ if ($can_add && !$edit) {
                      COALESCE(jt.is_operator,0) DESC, e.name", array());
 }
 
-$page_title = "إيكوبيشن | السائقون والمشغّلون";
+$page_title = "إيكوبيشن | المشغّلون والسائقون";
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main">
     <?php
-    $header_title   = 'السائقون والمشغّلون';
+    $header_title   = 'المشغّلون والسائقون';
     $header_icon    = 'fas fa-id-card-clip';
     $header_actions = array();
     if ($can_add) $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'تسجيل مشغّل');

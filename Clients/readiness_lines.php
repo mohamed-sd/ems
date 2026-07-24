@@ -364,7 +364,7 @@ foreach ($rdl_list as $row) {
 }
 $stat_ready_contracts = count($ready_contracts);
 
-$page_title = "فحص الجاهزية";
+$page_title = "جاهزية العروض";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -372,7 +372,7 @@ include('../insidebar.php');
 <div class="main rdl-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'فحص الجاهزية';
+    $header_title = 'جاهزية العروض';
     $header_icon = 'fas fa-clipboard-check';
     $header_actions = array();
     if ($can_add) {

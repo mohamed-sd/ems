@@ -24,7 +24,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$page_title = "إيكوبيشن | التشغيل";
+$page_title = "إيكوبيشن | غرفة عمليات التشغيل";
 
 include '../config.php';
 include '../includes/permissions_helper.php';

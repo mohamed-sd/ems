@@ -1,0 +1,1297 @@
+{
+    "db": [
+        {
+            "id": 12,
+            "old": "سجل النشاطات",
+            "new": "سجل النشاط",
+            "route": "ActivityLogs\/activity_logs.php",
+            "matrix": 1
+        },
+        {
+            "id": 77,
+            "old": "الأنشطة التجارية",
+            "new": "أنشطة العملاء",
+            "route": "Clients\/activities.php",
+            "matrix": 4
+        },
+        {
+            "id": 1,
+            "old": "حالة العملاء",
+            "new": "العملاء",
+            "route": "Clients\/clients.php",
+            "matrix": 6
+        },
+        {
+            "id": 35,
+            "old": "إدارة العملاء",
+            "new": "العملاء",
+            "route": "Clients\/clients.php",
+            "matrix": 6
+        },
+        {
+            "id": 84,
+            "old": "الملاحق والتجديدات",
+            "new": "ملاحق العقود وتجديداتها",
+            "route": "Clients\/contract_amendments.php",
+            "matrix": 8
+        },
+        {
+            "id": 127,
+            "old": "التزامات العقد",
+            "new": "التزامات العقود",
+            "route": "Clients\/contract_commitments.php",
+            "matrix": 9
+        },
+        {
+            "id": 85,
+            "old": "سجل الأحداث التعاقدية",
+            "new": "سجل حركة العقد",
+            "route": "Clients\/contract_events.php",
+            "matrix": 10
+        },
+        {
+            "id": 81,
+            "old": "نماذج التسعير",
+            "new": "قوائم ونماذج التسعير",
+            "route": "Clients\/pricelists.php",
+            "matrix": 11
+        },
+        {
+            "id": 82,
+            "old": "المنتجات والخدمات",
+            "new": "كتالوج المنتجات والخدمات",
+            "route": "Clients\/products.php",
+            "matrix": 12
+        },
+        {
+            "id": 80,
+            "old": "العروض",
+            "new": "عروض الأسعار",
+            "route": "Clients\/quotations.php",
+            "matrix": 13
+        },
+        {
+            "id": 129,
+            "old": "فحص الجاهزية",
+            "new": "جاهزية العروض",
+            "route": "Clients\/readiness_lines.php",
+            "matrix": 14
+        },
+        {
+            "id": 20,
+            "old": "إدارة العقود",
+            "new": "العقود",
+            "route": "Contracts\/contracts.php",
+            "matrix": 17
+        },
+        {
+            "id": 37,
+            "old": "إدارة العقود",
+            "new": "العقود",
+            "route": "Contracts\/contracts.php",
+            "matrix": 17
+        },
+        {
+            "id": 21,
+            "old": "تفاصيل عقد المشاريع",
+            "new": "ملف عقد المشروع",
+            "route": "Contracts\/contracts_details.php",
+            "matrix": 18
+        },
+        {
+            "id": 63,
+            "old": "تفاصيل عقد الموظف",
+            "new": "ملف عقد الموظف",
+            "route": "Employees\/employee_contracts_details.php",
+            "matrix": 20
+        },
+        {
+            "id": 58,
+            "old": "أدوار الموظفين",
+            "new": "الأدوار الوظيفية",
+            "route": "Employees\/employee_roles.php",
+            "matrix": 23
+        },
+        {
+            "id": 7,
+            "old": "علاقات الموظفين",
+            "new": "الموظفون",
+            "route": "Employees\/employees.php",
+            "matrix": 24
+        },
+        {
+            "id": 59,
+            "old": "السائقون والمشغّلون",
+            "new": "المشغّلون والسائقون",
+            "route": "Employees\/equipment_operators.php",
+            "matrix": 25
+        },
+        {
+            "id": 8,
+            "old": "إدارة المعدات",
+            "new": "المعدات",
+            "route": "Equipments\/equipments_fleet.php",
+            "matrix": 31
+        },
+        {
+            "id": 5,
+            "old": "شاشة انواع المعدات",
+            "new": "أنواع المعدات",
+            "route": "Equipments\/equipments_types.php",
+            "matrix": 32
+        },
+        {
+            "id": 41,
+            "old": "ملف الإهلاك المالي",
+            "new": "إعداد الإهلاك",
+            "route": "Equipments\/fleet_depreciation_profiles.php",
+            "matrix": 33
+        },
+        {
+            "id": 40,
+            "old": "سجل النوع والموديل",
+            "new": "الأنواع والموديلات",
+            "route": "Equipments\/fleet_models.php",
+            "matrix": 35
+        },
+        {
+            "id": 38,
+            "old": "تصنيف الاعطال",
+            "new": "تصنيفات الأعطال",
+            "route": "Equipments\/manage_failure_codes.php",
+            "matrix": 36
+        },
+        {
+            "id": 117,
+            "old": "مكتب محاسب الإدارة",
+            "new": "مكتب المحاسب",
+            "route": "FinRequests\/accountant_desk.php",
+            "matrix": 38
+        },
+        {
+            "id": 121,
+            "old": "لوحة زمن الدورة",
+            "new": "زمن دورة الطلبات",
+            "route": "FinRequests\/cycle_time_board.php",
+            "matrix": 39
+        },
+        {
+            "id": 116,
+            "old": "صندوق طلبات الإدارة",
+            "new": "موافقات إدارتي",
+            "route": "FinRequests\/dept_inbox.php",
+            "matrix": 40
+        },
+        {
+            "id": 119,
+            "old": "خريطة تفريع الأثر",
+            "new": "سجل الحركة المالية",
+            "route": "FinRequests\/effect_map.php",
+            "matrix": 41
+        },
+        {
+            "id": 118,
+            "old": "بوابة الطلبات المالية",
+            "new": "الطلبات المالية",
+            "route": "FinRequests\/finance_gateway.php",
+            "matrix": 42
+        },
+        {
+            "id": 120,
+            "old": "توجيه الطلبات المالية",
+            "new": "قواعد توجيه الطلبات",
+            "route": "FinRequests\/routing_admin.php",
+            "matrix": 46
+        },
+        {
+            "id": 101,
+            "old": "الأصول الثابتة والإهلاك",
+            "new": "الأصول والإهلاك",
+            "route": "Finance\/assets_fin.php",
+            "matrix": 49
+        },
+        {
+            "id": 89,
+            "old": "الميزانيات والانحراف",
+            "new": "الميزانية والانحراف",
+            "route": "Finance\/budget_form_fin.php",
+            "matrix": 51
+        },
+        {
+            "id": 104,
+            "old": "لوحة المدير المالي اليومية",
+            "new": "لوحة المدير المالي",
+            "route": "Finance\/cfo_daily_board_fin.php",
+            "matrix": 53
+        },
+        {
+            "id": 90,
+            "old": "الذمم والمستحقات",
+            "new": "الذمم والتحصيل",
+            "route": "Finance\/dues_fin.php",
+            "matrix": 55
+        },
+        {
+            "id": 86,
+            "old": "الأحداث المالية",
+            "new": "المعاملات المالية",
+            "route": "Finance\/events_list_fin.php",
+            "matrix": 56
+        },
+        {
+            "id": 98,
+            "old": "استيراد أحداث الإدارات",
+            "new": "استقبال معاملات الإدارات",
+            "route": "Finance\/import_events_fin.php",
+            "matrix": 60
+        },
+        {
+            "id": 88,
+            "old": "القيود المالية",
+            "new": "القيود اليومية",
+            "route": "Finance\/journal_form_fin.php",
+            "matrix": 61
+        },
+        {
+            "id": 126,
+            "old": "مخصّص الصيانة (المروحة)",
+            "new": "قواعد مخصص الصيانة",
+            "route": "Finance\/maintenance_provision_fin.php",
+            "matrix": 62
+        },
+        {
+            "id": 128,
+            "old": "مستحق المشغّل (المروحة)",
+            "new": "قواعد مستحقات المشغّلين",
+            "route": "Finance\/operator_pay_fin.php",
+            "matrix": 64
+        },
+        {
+            "id": 93,
+            "old": "الفترات والإقفال",
+            "new": "إقفال الفترات",
+            "route": "Finance\/periods_fin.php",
+            "matrix": 66
+        },
+        {
+            "id": 102,
+            "old": "الضرائب \/ القيمة المضافة",
+            "new": "الضرائب والقيمة المضافة",
+            "route": "Finance\/tax_fin.php",
+            "matrix": 68
+        },
+        {
+            "id": 105,
+            "old": "كشف الوحدات والتطابق",
+            "new": "مطابقة الوحدات اليومية",
+            "route": "Finance\/unit_records_fin.php",
+            "matrix": 69
+        },
+        {
+            "id": 125,
+            "old": "مراقبة الانحراف والمعالجة",
+            "new": "متابعة الانحراف",
+            "route": "Finance\/variance_monitor_fin.php",
+            "matrix": 70
+        },
+        {
+            "id": 44,
+            "old": "التفتيش الفني",
+            "new": "الفحص الفني اليومي",
+            "route": "Maintenance\/inspections.php",
+            "matrix": 72
+        },
+        {
+            "id": 45,
+            "old": "الخطة الوقائية",
+            "new": "الصيانة الوقائية",
+            "route": "Maintenance\/preventive_plans.php",
+            "matrix": 75
+        },
+        {
+            "id": 66,
+            "old": "مسار الفرص",
+            "new": "الفرص البيعية",
+            "route": "Opportunities\/opportunities.php",
+            "matrix": 76
+        },
+        {
+            "id": 73,
+            "old": "الصرف والعهدة",
+            "new": "صرف المخزون والعهدة",
+            "route": "Procurement\/issue_proc.php",
+            "matrix": 80
+        },
+        {
+            "id": 76,
+            "old": "بيانات مرجعية",
+            "new": "البيانات المرجعية",
+            "route": "Procurement\/master_data_proc.php",
+            "matrix": 82
+        },
+        {
+            "id": 71,
+            "old": "عهدة الاستلام المؤقت",
+            "new": "الاستلام المؤقت",
+            "route": "Procurement\/receipt_custody_proc.php",
+            "matrix": 84
+        },
+        {
+            "id": 74,
+            "old": "قواعد إعادة الطلب",
+            "new": "حدود إعادة الطلب",
+            "route": "Procurement\/reordering_proc.php",
+            "matrix": 85
+        },
+        {
+            "id": 72,
+            "old": "المخزون التشغيلي",
+            "new": "المخزون",
+            "route": "Procurement\/stock_proc.php",
+            "matrix": 87
+        },
+        {
+            "id": 75,
+            "old": "الموردون التشغيليون",
+            "new": "موردو المشتريات",
+            "route": "Procurement\/suppliers_proc.php",
+            "matrix": 88
+        },
+        {
+            "id": 2,
+            "old": "حالة المشاريع",
+            "new": "المشاريع",
+            "route": "Projects\/projects.php",
+            "matrix": 90
+        },
+        {
+            "id": 36,
+            "old": "إدارة المبيعات",
+            "new": "المشاريع",
+            "route": "Projects\/projects.php",
+            "matrix": 90
+        },
+        {
+            "id": 4,
+            "old": "شاشة التقارير",
+            "new": "مركز التقارير",
+            "route": "Reports\/reports.php",
+            "matrix": 99
+        },
+        {
+            "id": 6,
+            "old": "شاشة التقارير",
+            "new": "مركز التقارير",
+            "route": "Reports\/reports.php",
+            "matrix": 99
+        },
+        {
+            "id": 28,
+            "old": "التقارير",
+            "new": "مركز التقارير",
+            "route": "Reports\/reports.php",
+            "matrix": 99
+        },
+        {
+            "id": 31,
+            "old": "التقارير",
+            "new": "مركز التقارير",
+            "route": "Reports\/reports.php",
+            "matrix": 99
+        },
+        {
+            "id": 32,
+            "old": "التقارير",
+            "new": "مركز التقارير",
+            "route": "Reports\/reports.php",
+            "matrix": 99
+        },
+        {
+            "id": 123,
+            "old": "إدارة صلاحيات الأدوار",
+            "new": "صلاحيات الأدوار",
+            "route": "Settings\/role_permissions.php",
+            "matrix": 104
+        },
+        {
+            "id": 124,
+            "old": "إدارة الأدوار",
+            "new": "الأدوار",
+            "route": "Settings\/roles.php",
+            "matrix": 105
+        },
+        {
+            "id": 22,
+            "old": "علاقات الموردين",
+            "new": "الموردون",
+            "route": "Suppliers\/suppliers.php",
+            "matrix": 109
+        },
+        {
+            "id": 26,
+            "old": "تفاصيل عقد المورد",
+            "new": "ملف عقد المورد",
+            "route": "Suppliers\/supplierscontracts_details.php",
+            "matrix": 112
+        },
+        {
+            "id": 131,
+            "old": "التصنيف الفنّي للبلاغات",
+            "new": "تصنيفات الأعطال والبلاغات",
+            "route": "Tickets\/ticket_categories_config.php",
+            "matrix": 113
+        },
+        {
+            "id": 137,
+            "old": "لوحة متابعة البلاغات",
+            "new": "أداء البلاغات",
+            "route": "Tickets\/ticket_dashboard.php",
+            "matrix": 114
+        },
+        {
+            "id": 133,
+            "old": "استمارة بلاغ",
+            "new": "تسجيل بلاغ",
+            "route": "Tickets\/ticket_form.php",
+            "matrix": 116
+        },
+        {
+            "id": 136,
+            "old": "القوالب الدورية",
+            "new": "البلاغات الدورية",
+            "route": "Tickets\/ticket_recurrence.php",
+            "matrix": 117
+        },
+        {
+            "id": 134,
+            "old": "سياسات الاستحقاق (SLA)",
+            "new": "أزمنة الاستجابة والإنجاز",
+            "route": "Tickets\/ticket_sla_config.php",
+            "matrix": 118
+        },
+        {
+            "id": 130,
+            "old": "أنواع البلاغات والتوجيه",
+            "new": "إعداد أنواع البلاغات",
+            "route": "Tickets\/ticket_types_config.php",
+            "matrix": 119
+        },
+        {
+            "id": 109,
+            "old": "قواعد المتحمِّل",
+            "new": "قواعد تحميل تكلفة الترحيل",
+            "route": "Transport\/transfer_cost_rules_config.php",
+            "matrix": 126
+        },
+        {
+            "id": 111,
+            "old": "طلبات الترحيل",
+            "new": "موافقات الترحيل",
+            "route": "Transport\/transfer_requests.php",
+            "matrix": 130
+        },
+        {
+            "id": 108,
+            "old": "أنواع الترحيل",
+            "new": "إعدادات الترحيل",
+            "route": "Transport\/transfer_types_config.php",
+            "matrix": 131
+        },
+        {
+            "id": 110,
+            "old": "إعداد المواقع",
+            "new": "المواقع",
+            "route": "Transport\/trs_locations_config.php",
+            "matrix": 132
+        },
+        {
+            "id": 52,
+            "old": "وحدات السكن",
+            "new": "السكن والإعاشة",
+            "route": "Workforce\/housing_units.php",
+            "matrix": 133
+        },
+        {
+            "id": 53,
+            "old": "تقييم العاملين",
+            "new": "تقييم الأداء",
+            "route": "Workforce\/worker_evaluation.php",
+            "matrix": 135
+        },
+        {
+            "id": 51,
+            "old": "التحرّك والنقل",
+            "new": "تنقلات العاملين",
+            "route": "Workforce\/worker_movement.php",
+            "matrix": 137
+        },
+        {
+            "id": 47,
+            "old": "سجل العامل التشغيلي",
+            "new": "السجل التشغيلي للعامل",
+            "route": "Workforce\/worker_register.php",
+            "matrix": 138
+        },
+        {
+            "id": 54,
+            "old": "تسوية العاملين",
+            "new": "تسويات العاملين",
+            "route": "Workforce\/worker_settlement.php",
+            "matrix": 139
+        },
+        {
+            "id": 56,
+            "old": "السجل التشغيلي",
+            "new": "سجل الأحداث التشغيلية",
+            "route": "Workforce\/worker_worklog.php",
+            "matrix": 140
+        },
+        {
+            "id": 55,
+            "old": "الاحتياج والتخطيط",
+            "new": "احتياج القوى والتخطيط",
+            "route": "Workforce\/workforce_requirement.php",
+            "matrix": 141
+        },
+        {
+            "id": 61,
+            "old": "إدارة المعاونين الشاملة",
+            "new": "المعاونون",
+            "route": "main\/all_assistants.php",
+            "matrix": 144
+        },
+        {
+            "id": 14,
+            "old": "إدارة مشرفي الموردين",
+            "new": "مشرفو الموردين",
+            "route": "main\/project_users.php",
+            "matrix": 147
+        },
+        {
+            "id": 3,
+            "old": "إدارة الصلاحيات",
+            "new": "الصلاحيات",
+            "route": "main\/users.php",
+            "matrix": 149
+        },
+        {
+            "id": 34,
+            "old": "حالة المشروع",
+            "new": "متابعة المشروع",
+            "route": "movement\/map_page.php",
+            "matrix": 152
+        },
+        {
+            "id": 30,
+            "old": "إدارة الورديات",
+            "new": "الورديات",
+            "route": "movement\/movement_operations.php",
+            "matrix": 154
+        },
+        {
+            "id": 29,
+            "old": "توزيع المشغلين",
+            "new": "توزيع المشغّلين",
+            "route": "movement\/project_drivers.php",
+            "matrix": 155
+        },
+        {
+            "id": 24,
+            "old": "الاعدادات",
+            "new": "الإعدادات",
+            "route": "Settings\/settings.php",
+            "matrix": "تطبيع"
+        }
+    ],
+    "code": [
+        {
+            "file": "includes\/finreq_badges.php",
+            "old": "'label' => 'صندوق طلبات الإدارة'",
+            "new": "'label' => 'موافقات إدارتي'",
+            "expect": 1
+        },
+        {
+            "file": "includes\/finreq_badges.php",
+            "old": "'label' => 'مكتب محاسب الإدارة'",
+            "new": "'label' => 'مكتب المحاسب'",
+            "expect": 1
+        },
+        {
+            "file": "includes\/finreq_badges.php",
+            "old": "'label' => 'بوابة الطلبات المالية'",
+            "new": "'label' => 'الطلبات المالية'",
+            "expect": 1
+        },
+        {
+            "file": "includes\/finreq_badges.php",
+            "old": "'label' => 'لوحة زمن الدورة'",
+            "new": "'label' => 'زمن دورة الطلبات'",
+            "expect": 1
+        },
+        {
+            "file": "insidebar.php",
+            "old": "<span>اعتماد الساعات",
+            "new": "<span>اعتماد الوحدات التشغيلية",
+            "expect": 1
+        },
+        {
+            "file": "insidebar.php",
+            "old": "echo '<li><a href=\"..\/Reports\/reports.php\"><i class=\"fas fa-chart-pie\"><\/i> <span>التقارير<\/span><\/a><\/li>';",
+            "new": "echo '<li><a href=\"..\/Reports\/reports.php\"><i class=\"fas fa-chart-pie\"><\/i> <span>مركز التقارير<\/span><\/a><\/li>';",
+            "expect": 1
+        }
+    ],
+    "titles": {
+        "ActivityLogs\/activity_logs.php": {
+            "new": "سجل النشاط",
+            "olds": [
+                "سجل النشاطات"
+            ],
+            "matrix": 1
+        },
+        "Approvals\/hours_approval.php": {
+            "new": "اعتماد الوحدات التشغيلية",
+            "olds": [
+                "اعتماد ساعات العمل"
+            ],
+            "matrix": 2
+        },
+        "Approvals\/requests.php": {
+            "new": "صندوق موافقاتي",
+            "olds": [
+                "طلبات الموافقات"
+            ],
+            "matrix": 3
+        },
+        "Clients\/activities.php": {
+            "new": "أنشطة العملاء",
+            "olds": [
+                "الأنشطة التجارية"
+            ],
+            "matrix": 4
+        },
+        "Clients\/clients.php": {
+            "new": "العملاء",
+            "olds": [
+                "حالة العملاء",
+                "إدارة العملاء"
+            ],
+            "matrix": 6
+        },
+        "Clients\/contract_amendments.php": {
+            "new": "ملاحق العقود وتجديداتها",
+            "olds": [
+                "الملاحق والتجديدات"
+            ],
+            "matrix": 8
+        },
+        "Clients\/contract_commitments.php": {
+            "new": "التزامات العقود",
+            "olds": [
+                "التزامات العقد"
+            ],
+            "matrix": 9
+        },
+        "Clients\/contract_events.php": {
+            "new": "سجل حركة العقد",
+            "olds": [
+                "سجل الأحداث التعاقدية"
+            ],
+            "matrix": 10
+        },
+        "Clients\/pricelists.php": {
+            "new": "قوائم ونماذج التسعير",
+            "olds": [
+                "نماذج التسعير"
+            ],
+            "matrix": 11
+        },
+        "Clients\/products.php": {
+            "new": "كتالوج المنتجات والخدمات",
+            "olds": [
+                "المنتجات والخدمات"
+            ],
+            "matrix": 12
+        },
+        "Clients\/quotations.php": {
+            "new": "عروض الأسعار",
+            "olds": [
+                "العروض"
+            ],
+            "matrix": 13
+        },
+        "Clients\/readiness_lines.php": {
+            "new": "جاهزية العروض",
+            "olds": [
+                "فحص الجاهزية"
+            ],
+            "matrix": 14
+        },
+        "Contracts\/contracts.php": {
+            "new": "العقود",
+            "olds": [
+                "إدارة العقود"
+            ],
+            "matrix": 17
+        },
+        "Contracts\/contracts_details.php": {
+            "new": "ملف عقد المشروع",
+            "olds": [
+                "تفاصيل عقد المشاريع"
+            ],
+            "matrix": 18
+        },
+        "Employees\/employee_contracts_details.php": {
+            "new": "ملف عقد الموظف",
+            "olds": [
+                "تفاصيل عقد الموظف"
+            ],
+            "matrix": 20
+        },
+        "Employees\/employee_equipment_history.php": {
+            "new": "سجل قيادة السائق",
+            "olds": [
+                "سجل قيادة الشاحنات"
+            ],
+            "matrix": 21
+        },
+        "Employees\/employee_roles.php": {
+            "new": "الأدوار الوظيفية",
+            "olds": [
+                "أدوار الموظفين"
+            ],
+            "matrix": 23
+        },
+        "Employees\/employees.php": {
+            "new": "الموظفون",
+            "olds": [
+                "علاقات الموظفين"
+            ],
+            "matrix": 24
+        },
+        "Employees\/equipment_operators.php": {
+            "new": "المشغّلون والسائقون",
+            "olds": [
+                "السائقون والمشغّلون"
+            ],
+            "matrix": 25
+        },
+        "Equipments\/equipments_fleet.php": {
+            "new": "المعدات",
+            "olds": [
+                "إدارة المعدات"
+            ],
+            "matrix": 31
+        },
+        "Equipments\/equipments_types.php": {
+            "new": "أنواع المعدات",
+            "olds": [
+                "شاشة انواع المعدات"
+            ],
+            "matrix": 32
+        },
+        "Equipments\/fleet_depreciation_profiles.php": {
+            "new": "إعداد الإهلاك",
+            "olds": [
+                "ملف الإهلاك المالي"
+            ],
+            "matrix": 33
+        },
+        "Equipments\/fleet_failures.php": {
+            "new": "تقرير الأعطال",
+            "olds": [
+                "تقرير الأعطال — إدارة الأسطول"
+            ],
+            "matrix": 34
+        },
+        "Equipments\/fleet_models.php": {
+            "new": "الأنواع والموديلات",
+            "olds": [
+                "سجل النوع والموديل"
+            ],
+            "matrix": 35
+        },
+        "Equipments\/manage_failure_codes.php": {
+            "new": "تصنيفات الأعطال",
+            "olds": [
+                "تصنيف الاعطال"
+            ],
+            "matrix": 36
+        },
+        "FinRequests\/accountant_desk.php": {
+            "new": "مكتب المحاسب",
+            "olds": [
+                "مكتب محاسب الإدارة"
+            ],
+            "matrix": 38
+        },
+        "FinRequests\/cycle_time_board.php": {
+            "new": "زمن دورة الطلبات",
+            "olds": [
+                "لوحة زمن الدورة"
+            ],
+            "matrix": 39
+        },
+        "FinRequests\/dept_inbox.php": {
+            "new": "موافقات إدارتي",
+            "olds": [
+                "صندوق طلبات الإدارة"
+            ],
+            "matrix": 40
+        },
+        "FinRequests\/effect_map.php": {
+            "new": "سجل الحركة المالية",
+            "olds": [
+                "خريطة تفريع الأثر"
+            ],
+            "matrix": 41
+        },
+        "FinRequests\/finance_gateway.php": {
+            "new": "الطلبات المالية",
+            "olds": [
+                "بوابة الطلبات المالية"
+            ],
+            "matrix": 42
+        },
+        "FinRequests\/routing_admin.php": {
+            "new": "قواعد توجيه الطلبات",
+            "olds": [
+                "توجيه الطلبات المالية"
+            ],
+            "matrix": 46
+        },
+        "Finance\/assets_fin.php": {
+            "new": "الأصول والإهلاك",
+            "olds": [
+                "الأصول الثابتة والإهلاك"
+            ],
+            "matrix": 49
+        },
+        "Finance\/budget_form_fin.php": {
+            "new": "الميزانية والانحراف",
+            "olds": [
+                "الميزانيات والانحراف"
+            ],
+            "matrix": 51
+        },
+        "Finance\/cfo_daily_board_fin.php": {
+            "new": "لوحة المدير المالي",
+            "olds": [
+                "لوحة المدير المالي اليومية"
+            ],
+            "matrix": 53
+        },
+        "Finance\/dues_fin.php": {
+            "new": "الذمم والتحصيل",
+            "olds": [
+                "الذمم والمستحقات"
+            ],
+            "matrix": 55
+        },
+        "Finance\/events_list_fin.php": {
+            "new": "المعاملات المالية",
+            "olds": [
+                "الأحداث المالية"
+            ],
+            "matrix": 56
+        },
+        "Finance\/import_events_fin.php": {
+            "new": "استقبال معاملات الإدارات",
+            "olds": [
+                "استيراد أحداث الإدارات"
+            ],
+            "matrix": 60
+        },
+        "Finance\/journal_form_fin.php": {
+            "new": "القيود اليومية",
+            "olds": [
+                "القيود المالية"
+            ],
+            "matrix": 61
+        },
+        "Finance\/maintenance_provision_fin.php": {
+            "new": "قواعد مخصص الصيانة",
+            "olds": [
+                "مخصّص الصيانة (المروحة)"
+            ],
+            "matrix": 62
+        },
+        "Finance\/operator_pay_fin.php": {
+            "new": "قواعد مستحقات المشغّلين",
+            "olds": [
+                "مستحق المشغّل (المروحة)"
+            ],
+            "matrix": 64
+        },
+        "Finance\/periods_fin.php": {
+            "new": "إقفال الفترات",
+            "olds": [
+                "الفترات والإقفال"
+            ],
+            "matrix": 66
+        },
+        "Finance\/tax_fin.php": {
+            "new": "الضرائب والقيمة المضافة",
+            "olds": [
+                "الضرائب \/ القيمة المضافة"
+            ],
+            "matrix": 68
+        },
+        "Finance\/unit_records_fin.php": {
+            "new": "مطابقة الوحدات اليومية",
+            "olds": [
+                "كشف الوحدات والتطابق"
+            ],
+            "matrix": 69
+        },
+        "Finance\/variance_monitor_fin.php": {
+            "new": "متابعة الانحراف",
+            "olds": [
+                "مراقبة الانحراف والمعالجة"
+            ],
+            "matrix": 70
+        },
+        "Maintenance\/inspections.php": {
+            "new": "الفحص الفني اليومي",
+            "olds": [
+                "التفتيش الفني"
+            ],
+            "matrix": 72
+        },
+        "Maintenance\/preventive_plans.php": {
+            "new": "الصيانة الوقائية",
+            "olds": [
+                "الخطة الوقائية"
+            ],
+            "matrix": 75
+        },
+        "Opportunities\/opportunities.php": {
+            "new": "الفرص البيعية",
+            "olds": [
+                "مسار الفرص"
+            ],
+            "matrix": 76
+        },
+        "Procurement\/issue_proc.php": {
+            "new": "صرف المخزون والعهدة",
+            "olds": [
+                "الصرف والعهدة"
+            ],
+            "matrix": 80
+        },
+        "Procurement\/master_data_proc.php": {
+            "new": "البيانات المرجعية",
+            "olds": [
+                "بيانات مرجعية"
+            ],
+            "matrix": 82
+        },
+        "Procurement\/receipt_custody_proc.php": {
+            "new": "الاستلام المؤقت",
+            "olds": [
+                "عهدة الاستلام المؤقت"
+            ],
+            "matrix": 84
+        },
+        "Procurement\/reordering_proc.php": {
+            "new": "حدود إعادة الطلب",
+            "olds": [
+                "قواعد إعادة الطلب"
+            ],
+            "matrix": 85
+        },
+        "Procurement\/stock_proc.php": {
+            "new": "المخزون",
+            "olds": [
+                "المخزون التشغيلي"
+            ],
+            "matrix": 87
+        },
+        "Procurement\/suppliers_proc.php": {
+            "new": "موردو المشتريات",
+            "olds": [
+                "الموردون التشغيليون"
+            ],
+            "matrix": 88
+        },
+        "Projects\/projects.php": {
+            "new": "المشاريع",
+            "olds": [
+                "حالة المشاريع",
+                "إدارة المبيعات"
+            ],
+            "matrix": 90
+        },
+        "Reports\/contractall.php": {
+            "new": "تقارير العقد",
+            "olds": [
+                "تقارير تفصيلية للعقد"
+            ],
+            "matrix": 92
+        },
+        "Reports\/driverAndsupplerscontract.php": {
+            "new": "تقرير وحدات المشغّلين",
+            "olds": [
+                "تقرير ساعات عمل السائقين"
+            ],
+            "matrix": 95
+        },
+        "Reports\/reports.php": {
+            "new": "مركز التقارير",
+            "olds": [
+                "شاشة التقارير",
+                "التقارير"
+            ],
+            "matrix": 99
+        },
+        "Reports\/timesheetdeliy.php": {
+            "new": "تقرير الوحدات اليومية",
+            "olds": [
+                "تقرير التايم شيت اليومي"
+            ],
+            "matrix": 101
+        },
+        "Settings\/modules.php": {
+            "new": "شاشات النظام والوحدات",
+            "olds": [
+                "إدارة الصفحات والوحدات"
+            ],
+            "matrix": 103
+        },
+        "Settings\/role_permissions.php": {
+            "new": "صلاحيات الأدوار",
+            "olds": [
+                "إدارة صلاحيات الأدوار"
+            ],
+            "matrix": 104
+        },
+        "Settings\/roles.php": {
+            "new": "الأدوار",
+            "olds": [
+                "إدارة الأدوار"
+            ],
+            "matrix": 105
+        },
+        "Suppliers\/suppliers.php": {
+            "new": "الموردون",
+            "olds": [
+                "علاقات الموردين"
+            ],
+            "matrix": 109
+        },
+        "Suppliers\/supplierscontracts_details.php": {
+            "new": "ملف عقد المورد",
+            "olds": [
+                "تفاصيل عقد المورد"
+            ],
+            "matrix": 112
+        },
+        "Tickets\/ticket_categories_config.php": {
+            "new": "تصنيفات الأعطال والبلاغات",
+            "olds": [
+                "التصنيف الفنّي للبلاغات"
+            ],
+            "matrix": 113
+        },
+        "Tickets\/ticket_dashboard.php": {
+            "new": "أداء البلاغات",
+            "olds": [
+                "لوحة متابعة البلاغات"
+            ],
+            "matrix": 114
+        },
+        "Tickets\/ticket_form.php": {
+            "new": "تسجيل بلاغ",
+            "olds": [
+                "استمارة بلاغ"
+            ],
+            "matrix": 116
+        },
+        "Tickets\/ticket_recurrence.php": {
+            "new": "البلاغات الدورية",
+            "olds": [
+                "القوالب الدورية"
+            ],
+            "matrix": 117
+        },
+        "Tickets\/ticket_sla_config.php": {
+            "new": "أزمنة الاستجابة والإنجاز",
+            "olds": [
+                "سياسات الاستحقاق (SLA)"
+            ],
+            "matrix": 118
+        },
+        "Tickets\/ticket_types_config.php": {
+            "new": "إعداد أنواع البلاغات",
+            "olds": [
+                "أنواع البلاغات والتوجيه"
+            ],
+            "matrix": 119
+        },
+        "Timesheet\/timesheet.php": {
+            "new": "التايم شيت اليومي (إدخال الوحدات)",
+            "olds": [
+                "ساعات العمل (إدخال الدوام)"
+            ],
+            "matrix": 122
+        },
+        "Timesheet\/timesheet_details.php": {
+            "new": "تفاصيل الوحدة",
+            "olds": [
+                "تفاصيل ساعات العمل"
+            ],
+            "matrix": 123
+        },
+        "Timesheet\/view_timesheet.php": {
+            "new": "سجل الوحدات اليومية",
+            "olds": [
+                "عرض ساعات العمل"
+            ],
+            "matrix": 125
+        },
+        "Transport\/transfer_cost_rules_config.php": {
+            "new": "قواعد تحميل تكلفة الترحيل",
+            "olds": [
+                "قواعد المتحمِّل"
+            ],
+            "matrix": 126
+        },
+        "Transport\/transfer_requests.php": {
+            "new": "موافقات الترحيل",
+            "olds": [
+                "طلبات الترحيل"
+            ],
+            "matrix": 130
+        },
+        "Transport\/transfer_types_config.php": {
+            "new": "إعدادات الترحيل",
+            "olds": [
+                "أنواع الترحيل"
+            ],
+            "matrix": 131
+        },
+        "Transport\/trs_locations_config.php": {
+            "new": "المواقع",
+            "olds": [
+                "إعداد المواقع"
+            ],
+            "matrix": 132
+        },
+        "Workforce\/housing_units.php": {
+            "new": "السكن والإعاشة",
+            "olds": [
+                "وحدات السكن"
+            ],
+            "matrix": 133
+        },
+        "Workforce\/worker_evaluation.php": {
+            "new": "تقييم الأداء",
+            "olds": [
+                "تقييم العاملين"
+            ],
+            "matrix": 135
+        },
+        "Workforce\/worker_movement.php": {
+            "new": "تنقلات العاملين",
+            "olds": [
+                "التحرّك والنقل"
+            ],
+            "matrix": 137
+        },
+        "Workforce\/worker_register.php": {
+            "new": "السجل التشغيلي للعامل",
+            "olds": [
+                "سجل العامل التشغيلي"
+            ],
+            "matrix": 138
+        },
+        "Workforce\/worker_settlement.php": {
+            "new": "تسويات العاملين",
+            "olds": [
+                "تسوية العاملين"
+            ],
+            "matrix": 139
+        },
+        "Workforce\/worker_worklog.php": {
+            "new": "سجل الأحداث التشغيلية",
+            "olds": [
+                "السجل التشغيلي"
+            ],
+            "matrix": 140
+        },
+        "Workforce\/workforce_requirement.php": {
+            "new": "احتياج القوى والتخطيط",
+            "olds": [
+                "الاحتياج والتخطيط"
+            ],
+            "matrix": 141
+        },
+        "main\/all_assistants.php": {
+            "new": "المعاونون",
+            "olds": [
+                "إدارة المعاونين الشاملة"
+            ],
+            "matrix": 144
+        },
+        "main\/project_users.php": {
+            "new": "مشرفو الموردين",
+            "olds": [
+                "إدارة مشرفي الموردين",
+                "المشرفين",
+                "إدارة المعاونين",
+                "المعاونين"
+            ],
+            "matrix": 147
+        },
+        "main\/users.php": {
+            "new": "الصلاحيات",
+            "olds": [
+                "إدارة الصلاحيات",
+                "إدارة المستخدمين"
+            ],
+            "matrix": 149
+        },
+        "movement\/add_drivers.php": {
+            "new": "مشغّلو المعدة",
+            "olds": [
+                "إدارة مشغلي المعدة"
+            ],
+            "matrix": 150
+        },
+        "movement\/client_tree.php": {
+            "new": "شجرة حسابات العميل",
+            "olds": [
+                "شجرة العميل"
+            ],
+            "matrix": 151
+        },
+        "movement\/map_page.php": {
+            "new": "متابعة المشروع",
+            "olds": [
+                "حالة المشروع"
+            ],
+            "matrix": 152
+        },
+        "movement\/move_oprators.php": {
+            "new": "غرفة عمليات التشغيل",
+            "olds": [
+                "التشغيل (النسخة المحسّنة)"
+            ],
+            "matrix": 153
+        },
+        "movement\/movement_operations.php": {
+            "new": "الورديات",
+            "olds": [
+                "إدارة الورديات"
+            ],
+            "matrix": 154
+        },
+        "movement\/project_drivers.php": {
+            "new": "توزيع المشغّلين",
+            "olds": [
+                "توزيع المشغلين"
+            ],
+            "matrix": 155
+        }
+    }
+}

@@ -180,14 +180,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     }
 }
 
-$page_title = "إيكوبيشن | إدارة المعاونين الشاملة";
+$page_title = "إيكوبيشن | المعاونون";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
 <div class="main project-users-main ems-unified-page-shell">
     <?php
     $header_icon   = 'fas fa-users-cog';
-    $header_title_html = 'إدارة المعاونين الشاملة <p class="small mb-0" style="color:#fff;">كل الحسابات الفرعية في الشركة عبر جميع المدراء</p>';
+    $header_title_html = 'المعاونون <p class="small mb-0" style="color:#fff;">كل الحسابات الفرعية في الشركة عبر جميع المدراء</p>';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'إضافة معاون'); }
     $header_back = array('href'=>'../main/dashboard.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'رجوع');

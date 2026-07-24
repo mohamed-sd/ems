@@ -152,7 +152,7 @@ $top_reporters = tkt_dash_rows($gate,
      FROM tickets t WHERE {TENANT_SCOPE}$W
      GROUP BY t.reporting_person ORDER BY n DESC LIMIT 8");
 
-$page_title = 'إيكوبيشن | لوحة متابعة البلاغات';
+$page_title = 'إيكوبيشن | أداء البلاغات';
 include '../inheader.php';
 include '../insidebar.php';
 
@@ -164,7 +164,7 @@ $stage_colors = array(
 ?>
 <div class="main tkt-dash-main ems-unified-page-shell">
     <?php
-    $header_title = 'لوحة متابعة البلاغات';
+    $header_title = 'أداء البلاغات';
     $header_icon  = 'fa fa-gauge-high';
     $header_actions = array();
     // ── تصدير سجل التحويلات (تصديرٌ فقط — مادة تحليل الاختناقات في إكسل) ──

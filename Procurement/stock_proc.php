@@ -30,14 +30,14 @@ if (!$perms['can_view']) {
 
 // K9-M1 ذيل: القراءة التجميعية عبر قناة scopedQuery (عقد البوابة §10)
 
-$page_title = 'إيكوبيشن | المخزون التشغيلي';
+$page_title = 'إيكوبيشن | المخزون';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main proc-stock-main ems-unified-page-shell">
     <?php
-    $header_title = 'المخزون التشغيلي';
+    $header_title = 'المخزون';
     $header_icon  = 'fa fa-warehouse';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

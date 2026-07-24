@@ -75,13 +75,13 @@ try {
 } catch (\Throwable $t) { /* عرض */ }
 $exc_pct = $req_month > 0 ? round($exc_month / $req_month * 100, 1) : 0;
 
-$page_title = 'إيكوبيشن | بوابة الطلبات المالية';
+$page_title = 'إيكوبيشن | الطلبات المالية';
 include('../inheader.php');
 include('../insidebar.php');
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php
-    $header_title   = 'بوابة الدخول للمالية — الطلبات الموحّدة';
+    $header_title   = 'الطلبات المالية';
     $header_icon    = 'fa fa-building-columns';
     $header_actions = array(
         array('href' => 'accountant_desk.php', 'class' => 'add-btn', 'icon' => 'fa fa-calculator', 'label' => 'مكتب المحاسب'),

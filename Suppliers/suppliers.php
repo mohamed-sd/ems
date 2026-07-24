@@ -248,7 +248,7 @@ include '../insidebar.php';
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title   = 'إدارة الموردين';
+    $header_title   = 'الموردون';
     $header_icon    = 'fas fa-truck-loading';
     $header_actions = array();
     if ($can_add) {

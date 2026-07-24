@@ -50,7 +50,7 @@ if (!$can_view) {
     exit();
 }
 
-$page_title = "إيكوبيشن | سجل الموظفين";
+$page_title = "إيكوبيشن | الموظفون";
 
 // معالجة إضافة/تعديل مشغل عند إرسال الفورم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
@@ -401,7 +401,7 @@ include('../insidebar.php');
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     // NOTE: the gradient button inline styles are preserved as-is for now (separate CSS-consolidation task).
-    $header_title = 'سجل الموظفين';
+    $header_title = 'الموظفون';
     $header_icon  = 'fas fa-id-card';
     $header_actions = array();
     if ($can_add) {

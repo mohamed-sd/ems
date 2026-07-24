@@ -105,10 +105,10 @@ try {
     foreach($ws_workers as $w){$workers[$w['id']]=$w['name'];}
 } catch (\Throwable $t) { error_log('worker_settlement.php workers: ' . $t->getMessage()); }
 
-$page_title="إيكوبيشن | تسوية العاملين"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | تسويات العاملين"; include '../inheader.php'; include '../insidebar.php';
 ?>
 <div class="main">
-    <?php $header_title='تسوية العاملين'; $header_icon='fas fa-hand-holding-dollar'; $header_actions=array();
+    <?php $header_title='تسويات العاملين'; $header_icon='fas fa-hand-holding-dollar'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تسوية جديدة');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>

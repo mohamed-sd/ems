@@ -246,7 +246,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       ?>
 
       <?php if (in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
-      <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الساعات
+      <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الوحدات التشغيلية
         </span>
         <?php if ($hoursApprovalPendingCount > 0): ?>
         <span class="nav-count-badge"><?php echo ($hoursApprovalPendingCount > 99 ? '99+' : $hoursApprovalPendingCount); ?></span>
@@ -345,7 +345,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       } else {
         $__sb_old = function_exists('check_page_permissions') ? check_page_permissions($conn, 'Reports/reports.php') : array('can_view' => false);
         if ($__sb_is_super || !empty($__sb_old['can_view'])) {
-          echo '<li><a href="../Reports/reports.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>';
+          echo '<li><a href="../Reports/reports.php"><i class="fas fa-chart-pie"></i> <span>مركز التقارير</span></a></li>';
         }
       }
       ?>

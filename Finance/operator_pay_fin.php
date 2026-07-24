@@ -99,14 +99,14 @@ $cnt_due = 0;
 foreach ($operators as $op) { if (($mode_map[intval($op['employee_id'])] ?? 'salary') === 'due') { $cnt_due++; } }
 $cnt_salary = count($operators) - $cnt_due;
 
-$page_title = 'إيكوبيشن | مستحق المشغّل (المروحة)';
+$page_title = 'إيكوبيشن | قواعد مستحقات المشغّلين';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main fin-oppay-main ems-unified-page-shell">
     <?php
-    $header_title = 'مستحق المشغّل (مروحة الأثر)';
+    $header_title = 'قواعد مستحقات المشغّلين';
     $header_icon  = 'fa fa-user-clock';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

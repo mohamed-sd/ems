@@ -23,10 +23,10 @@ $company_scope = $is_super_admin ? null : $company_id;
 $events_map    = ems_events_map($conn, $company_scope);          // [worker_id => incentive/penalty معتمد]
 $rotation_due  = ems_rotation_due_soon($conn, $company_scope, 14); // العقود التي اقترب تدويرها (14 يوماً)
 
-$page_title="إيكوبيشن | السجل التشغيلي"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | سجل الأحداث التشغيلية"; include '../inheader.php'; include '../insidebar.php';
 ?>
 <div class="main">
-    <?php $header_title='السجل التشغيلي المجمَّع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();
+    <?php $header_title='سجل الأحداث التشغيلية المجمَّع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
 

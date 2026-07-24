@@ -106,7 +106,7 @@ try {
         'orderBy' => 'name'));
 } catch (\Throwable $t) { error_log('roles.php parents: ' . $t->getMessage()); }
 
-$page_title = "إدارة الصلاحيات";
+$page_title = "الأدوار";
 include("../inheader.php");
 include('../insidebar.php');
 ?>

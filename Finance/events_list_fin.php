@@ -200,14 +200,14 @@ if (isset($_GET['resume_id'])) {
     header("Location: events_list_fin.php?msg=لا+يمكن+إعادة+هذه+الحالة+❌"); exit();
 }
 
-$page_title = 'إيكوبيشن | الأحداث المالية';
+$page_title = 'إيكوبيشن | المعاملات المالية';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main fin-events-main ems-unified-page-shell">
     <?php
-    $header_title = 'الأحداث المالية';
+    $header_title = 'المعاملات المالية';
     $header_icon  = 'fa fa-file-invoice-dollar';
     $header_actions = array();
     if ($can_add) {

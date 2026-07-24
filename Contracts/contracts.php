@@ -134,7 +134,7 @@ include('../insidebar.php');
 
   <?php
   // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-  $header_title = 'إدارة العقود';
+  $header_title = 'العقود';
   $header_icon = 'fas fa-file-contract';
   $header_actions = array();
   if ($can_add) {

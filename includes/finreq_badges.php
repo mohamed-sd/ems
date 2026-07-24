@@ -46,14 +46,14 @@ if (!function_exists('ems_finreq_nav_links')) {
                 $out['FinRequests/my_requests.php']  = array('label' => 'طلباتي المالية', 'icon' => 'fa fa-list-check');
             }
             if ($can_review) {
-                $out['FinRequests/dept_inbox.php'] = array('label' => 'صندوق طلبات الإدارة', 'icon' => 'fa fa-inbox');
+                $out['FinRequests/dept_inbox.php'] = array('label' => 'موافقات إدارتي', 'icon' => 'fa fa-inbox');
             }
             if ($is_acct) {
-                $out['FinRequests/accountant_desk.php'] = array('label' => 'مكتب محاسب الإدارة', 'icon' => 'fa fa-calculator');
+                $out['FinRequests/accountant_desk.php'] = array('label' => 'مكتب المحاسب', 'icon' => 'fa fa-calculator');
             }
             if ($is_fin) {
-                $out['FinRequests/finance_gateway.php'] = array('label' => 'بوابة الطلبات المالية', 'icon' => 'fa fa-building-columns');
-                $out['FinRequests/cycle_time_board.php'] = array('label' => 'لوحة زمن الدورة', 'icon' => 'fa fa-stopwatch');
+                $out['FinRequests/finance_gateway.php'] = array('label' => 'الطلبات المالية', 'icon' => 'fa fa-building-columns');
+                $out['FinRequests/cycle_time_board.php'] = array('label' => 'زمن دورة الطلبات', 'icon' => 'fa fa-stopwatch');
                 $out['FinRequests/requests_reports.php'] = array('label' => 'تقارير الطلبات المالية', 'icon' => 'fa fa-chart-column');
             }
         } catch (\Throwable $t) {

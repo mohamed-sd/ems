@@ -87,13 +87,13 @@ if (isset($_GET['edit_id'])) {
     ));
 }
 
-$page_title = "إيكوبيشن | أدوار الموظفين";
+$page_title = "إيكوبيشن | الأدوار الوظيفية";
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main">
     <?php
-    $header_title   = 'أدوار الموظفين';
+    $header_title   = 'الأدوار الوظيفية';
     $header_icon    = 'fas fa-people-arrows';
     $header_actions = array();
     if ($can_add) {

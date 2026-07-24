@@ -20,7 +20,7 @@ $can_add    = $page_permissions['can_add'];
 $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
-$page_title = "إدارة أكواد الأعطال";
+$page_title = "تصنيفات الأعطال";
 
 // بوابة العزل — failure_codes كتالوجٌ عامٌّ (T_GLOBAL) مُدار (managed): يُقرأ للجميع،
 // ويُكتب بحوكمة صلاحيّة الصفحة (لا company_id — كتالوج مشترك بين كل الشركات).
@@ -188,7 +188,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
    <!-- عنوان الصفحة -->
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title   = 'إدارة أكواد الأعطال';
+    $header_title   = 'تصنيفات الأعطال';
     $header_icon    = 'fas fa-exclamation-triangle';
     $header_actions = array();
     if ($can_add) {

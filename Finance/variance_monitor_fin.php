@@ -105,14 +105,14 @@ if (isset($_GET['edit_id']) && $can_edit) {
     $editLine = fin_gate($is_super_admin)->selectOne('fin_budget_lines', array('where' => array('id' => intval($_GET['edit_id']))));
 }
 
-$page_title = 'إيكوبيشن | مراقبة الانحراف والمعالجة';
+$page_title = 'إيكوبيشن | متابعة الانحراف';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main fin-variance-main ems-unified-page-shell">
     <?php
-    $header_title = 'مراقبة الانحراف والمعالجة';
+    $header_title = 'متابعة الانحراف';
     $header_icon  = 'fa fa-triangle-exclamation';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

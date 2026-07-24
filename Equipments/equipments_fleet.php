@@ -194,7 +194,7 @@ if ($selected_project_id > 0) {
 
 // (أُزيل استعلام قائمة المشاريع الميت — نتيجته لا تُقرأ في أي موضع.)
 
-$page_title = "إدارة المعدات";
+$page_title = "المعدات";
 include("../inheader.php");
 include("../insidebar.php");
 
@@ -496,7 +496,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
    <!-- عنوان الصفحة -->
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title = 'إدارة المعدات';
+    $header_title = 'المعدات';
     $header_icon  = 'fas fa-cogs';
     $header_actions = array();
     if ($can_add) {

@@ -760,7 +760,7 @@ foreach ($operations_rows as $op) {
     ];
 }
 
-$page_title = "توزيع المعدات";
+$page_title = "الورديات";
 include '../inheader.php';
 include '../insidebar.php';
 ?>

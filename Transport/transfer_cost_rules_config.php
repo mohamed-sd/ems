@@ -87,14 +87,14 @@ if (isset($_GET['delete_id'])) {
     header("Location: transfer_cost_rules_config.php?msg=تم+حذف+القاعدة+بنجاح+✅"); exit();
 }
 
-$page_title = 'إيكوبيشن | قواعد المتحمِّل';
+$page_title = 'إيكوبيشن | قواعد تحميل تكلفة الترحيل';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 
 <div class="main trs-rules-main ems-unified-page-shell">
     <?php
-    $header_title = 'إعداد قواعد المتحمِّل';
+    $header_title = 'إعداد قواعد تحميل تكلفة الترحيل';
     $header_icon  = 'fa fa-scale-balanced';
     $header_actions = array();
     if ($can_add) {

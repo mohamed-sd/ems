@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_title   = 'إدارة أنواع المعدات';
+    $header_title   = 'أنواع المعدات';
     $header_icon    = 'fas fa-cubes';
     $header_actions = array();
     if ($perms['can_add']) {

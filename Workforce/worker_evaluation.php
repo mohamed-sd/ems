@@ -162,10 +162,10 @@ try {
     foreach($ev_workers as $w){$workers[$w['id']]=$w['name'];}
 } catch (\Throwable $t) { error_log('worker_evaluation.php workers: ' . $t->getMessage()); }
 
-$page_title="إيكوبيشن | تقييم العاملين"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | تقييم الأداء"; include '../inheader.php'; include '../insidebar.php';
 ?>
 <div class="main">
-    <?php $header_title='تقييم العاملين'; $header_icon='fas fa-star-half-stroke'; $header_actions=array();
+    <?php $header_title='تقييم الأداء'; $header_icon='fas fa-star-half-stroke'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تقييم جديد');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>

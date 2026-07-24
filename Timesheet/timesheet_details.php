@@ -5,7 +5,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 require_once '../config.php';
-$page_title = 'تفاصيل ساعات العمل';
+$page_title = 'تفاصيل الوحدة';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
@@ -455,7 +455,7 @@ include '../insidebar.php';
                     <i class="fas fa-clock"></i>
                 </div>
                 <div>
-                    <h1 class="hero-title" style="color: #fff;">تفاصيل ساعات العمل</h1>
+                    <h1 class="hero-title" style="color: #fff;">تفاصيل الوحدة</h1>
                     <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
                 </div>
             </div>

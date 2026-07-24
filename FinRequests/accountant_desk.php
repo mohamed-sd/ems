@@ -42,13 +42,13 @@ $accounts = $gate->select('fin_chart_of_accounts', array(
 // بنود موازنة الشركة بمتبقيها (بوابة الميزانية §3.4-②) — القائمة بدل الرقم الحر
 $budget_lines = finreq_budget_lines($gate);
 
-$page_title = 'إيكوبيشن | مكتب محاسب الإدارة';
+$page_title = 'إيكوبيشن | مكتب المحاسب';
 include('../inheader.php');
 include('../insidebar.php');
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php
-    $header_title   = 'مكتب محاسب الإدارة — ولادة الحدث المالي';
+    $header_title   = 'مكتب المحاسب — ولادة الحدث المالي';
     $header_icon    = 'fa fa-calculator';
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');

@@ -333,7 +333,7 @@ if ($ins || $edit_id === 0) {
     }
 }
 
-$page_title = 'إيكوبيشن | التفتيش الفني';
+$page_title = 'إيكوبيشن | الفحص الفني اليومي';
 include '../inheader.php';
 include '../insidebar.php';
 function mnt_opt($value, $label, $selected, $data = '') {
@@ -608,7 +608,7 @@ function mnt_seg_kind($c) {
     </form>
 
 <?php else: // ── قائمة التفتيش ──
-    $header_title  = 'التفتيش الفني';
+    $header_title  = 'الفحص الفني اليومي';
     $header_icon   = 'fa fa-clipboard-check';
     $header_actions = array();
     if ($can_add) {

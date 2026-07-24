@@ -59,13 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     }
 }
 
-$page_title = 'إيكوبيشن | القوالب الدورية';
+$page_title = 'إيكوبيشن | البلاغات الدورية';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main tkt-rec-main ems-unified-page-shell">
     <?php
-    $header_title = 'القوالب الدورية';
+    $header_title = 'البلاغات الدورية';
     $header_icon  = 'fa fa-repeat';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة قالب'); }

@@ -397,7 +397,7 @@ if ($type !== "1" && $type !== "2" && $type !== "3") {
   exit();
 }
 
-$page_title = "إيكوبيشن | ساعات العمل ";
+$page_title = "إيكوبيشن | التايم شيت اليومي (إدخال الوحدات)";
 include("../inheader.php");
 include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
@@ -528,7 +528,7 @@ try {
 
   <?php
   // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-  $header_title   = 'إدارة ساعات العمل';
+  $header_title   = 'التايم شيت اليومي (إدخال الوحدات)';
   $header_icon    = 'fas fa-clock';
   $header_actions = array(
       array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة ساعات عمل جديدة'),

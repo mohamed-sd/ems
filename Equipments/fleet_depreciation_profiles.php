@@ -171,7 +171,7 @@ if ($has_model_table) {
     $models = $dep_gate->select('fleet_model', array('columns' => array('id', 'code', 'model_name'), 'orderBy' => 'code ASC'));
 }
 
-$page_title = "إيكوبيشن | ملف الإهلاك المالي";
+$page_title = "إيكوبيشن | إعداد الإهلاك";
 include("../inheader.php");
 include("../insidebar.php");
 
@@ -182,7 +182,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
 <div class="main fleet-dep-main" style="padding:15px;background:#fff;">
 
     <?php
-    $header_title   = 'ملف الافتراضات المالية والإهلاك';
+    $header_title   = 'إعداد الإهلاك';
     $header_icon    = 'fas fa-coins';
     $header_actions = array();
     if ($perms['can_add']) {

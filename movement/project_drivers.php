@@ -663,7 +663,7 @@ if (!function_exists('get_shift_type_label')) {
     }
 }
 
-$page_title = "سائقو المشروع";
+$page_title = "توزيع المشغّلين";
 include '../inheader.php';
 include '../insidebar.php';
 ?>

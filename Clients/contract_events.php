@@ -323,7 +323,7 @@ foreach ($evt_list as $row) {
     if ($row['state'] === 'مغلق') $stat_closed++;
 }
 
-$page_title = "سجل الأحداث التعاقدية";
+$page_title = "سجل حركة العقد";
 include("../inheader.php");
 include('../insidebar.php');
 
@@ -350,7 +350,7 @@ function evt_state_tone($state)
 <div class="main evt-main ems-unified-page-shell">
 
     <?php
-    $header_title = 'سجل الأحداث التعاقدية';
+    $header_title = 'سجل حركة العقد';
     $header_icon = 'fas fa-timeline';
     $header_actions = array();
     if ($can_add) {
