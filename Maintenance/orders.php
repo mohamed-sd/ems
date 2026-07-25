@@ -377,6 +377,17 @@ if ($order || $edit_id === 0) {
     $failure_codes = $mnt_gate->select('failure_codes', array('columns' => array('id', 'full_code', 'failure_detail'), 'where' => array('status' => 1), 'orderBy' => 'full_code'));
 }
 
+// التفتيش المُولِّد للأمر (إن كان مصدرُه تفتيشًا) — للرابط العكسي في فورم التحرير.
+// العمود inspection_id قائمٌ في mnt_order منذ هجرة الوحدة، ويكتبه الآن مسارُ
+// «توليد أمر صيانة» في شاشة التفتيش. لا يمسّه save_order فيبقى الرابطُ سليمًا.
+$src_inspection = null;
+if ($order && !empty($order['inspection_id'])) {
+    $src_inspection = ($is_super_admin ? ems_tenant_db()->forAllTenants('order source inspection super view') : ems_tenant_db())
+        ->selectOne('mnt_inspection', array(
+            'columns' => array('id', 'code', 'inspection_type', 'score', 'state'),
+            'where'   => array('id' => intval($order['inspection_id']))));
+}
+
 // خيارات المعدة لفورم التحرير: معدات «تحت الصيانة» لمشروع الأمر + المعدة الحالية دائماً (تُعرض حسب المشروع).
 $edit_eq_options = $order
     ? mnt_maint_equipment_in_project($conn, $company_id, intval($order['project_id'] ?? 0), intval($order['equipment_id'] ?? 0))
@@ -477,6 +488,17 @@ function mnt_state_class($st) {
                     <div class="form-group"><label>المصدر</label>
                         <select name="source"><?php foreach ($sources as $s) echo mnt_opt($s, $s, $order['source'] === $s); ?></select>
                     </div>
+                    <?php if ($src_inspection): // التفتيش المُولِّد لهذا الأمر — رابطٌ للرجوع للاستمارة ?>
+                    <div class="form-group"><label>التفتيش المصدر</label>
+                        <a href="inspections.php?id=<?php echo intval($src_inspection['id']); ?>" class="action-btn" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
+                            <i class="fas fa-clipboard-check"></i>
+                            <?php echo htmlspecialchars((string) $src_inspection['code']); ?>
+                            <?php if ($src_inspection['score'] !== null): ?>
+                                <span style="opacity:.75">— <?php echo intval($src_inspection['score']); ?>%</span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
                     <div class="form-group"><label>نوع الصيانة</label>
                         <select name="maint_type"><option value="">— اختر —</option><?php foreach ($maint_types as $m) echo mnt_opt($m, $m, $order['maint_type'] === $m); ?></select>
                     </div>

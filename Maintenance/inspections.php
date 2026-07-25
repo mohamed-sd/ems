@@ -25,6 +25,11 @@ $can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
 $can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
 if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التفتيش+❌"); exit(); }
 
+// صلاحيةُ توليد أمرِ صيانةٍ من التفتيش: تُقرأ من موديول **أوامر الصيانة** لا من التفتيش،
+// لأنّ المُنشَأ أمرٌ لا تفتيش — فلا يولّد الأمرَ من لا يملك إنشاءه في شاشته الأصلية.
+$orders_permissions = check_page_permissions($conn, 'Maintenance/orders.php');
+$can_gen_order = $is_super_admin ? true : (bool) $orders_permissions['can_add'];
+
 // ── الحالات وقوائم القيم ───────────────────────────────────────────────
 $states     = array('جديد', 'مجدول', 'قيد التنفيذ', 'مكتمل', 'مغلق');
 $conditions = array('ممتازة', 'جيدة', 'متوسطة', 'ضعيفة', 'حرجة');
@@ -274,6 +279,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     header("Location: inspections.php?id=" . intval($iid) . "&msg=تم+حفظ+التفتيش+✅"); exit();
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// توليد أمر صيانة من تفتيشٍ مكتملٍ ذي بندٍ حرج (مسارُ التفتيش — المستند §9.1)
+// ══════════════════════════════════════════════════════════════════════════════
+// الصلاحيةُ الحاكمة هي صلاحيةُ إنشاء **أمرِ صيانة** لا التفتيش، لأنّ المُنشَأ أمرٌ:
+// $can_gen_order مُحتسبٌ أعلى الملف من موديول Maintenance/orders.php.
+// لا يُلمَس هنا availability_status ولا equipment_health — دخولُ الصيانة حصريٌّ
+// لمسار move_oprators (القرار 4.5/6)، والأمرُ يبدأ بحالة «بلاغ» كتوليد الوقائية.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_order') {
+    if (!$can_gen_order) { header("Location: inspections.php?msg=" . urlencode('لا توجد صلاحية إنشاء أوامر الصيانة ❌')); exit(); }
+    $iid = intval($_POST['inspection_id'] ?? 0);
+    $ins_g = mnt_fetch_inspection($conn, $iid, $company_id, $is_super_admin);
+    if (!$ins_g) { header("Location: inspections.php?msg=التفتيش+غير+موجود+❌"); exit(); }
+
+    $back = "inspections.php?id=" . $iid . "&msg=";
+
+    // حرس ١: التفتيش مكتملٌ أو مغلق (لا أمرَ من استمارةٍ لم تُنجَز).
+    if (!in_array((string) $ins_g['state'], array('مكتمل', 'مغلق'), true)) {
+        header("Location: " . $back . urlencode('لا يُولَّد أمرٌ إلا من تفتيشٍ مكتمل ❌')); exit();
+    }
+
+    // حرس ٢: لا بدّ من معدةٍ فعلية — رؤوس المورّد/الخارجي (ما قبل الشراء/التعاقد) بلا معدة.
+    $eq_id = !empty($ins_g['equipment_id']) ? intval($ins_g['equipment_id']) : 0;
+    if ($eq_id <= 0) {
+        header("Location: " . $back . urlencode('هذا التفتيش بلا معدةٍ مسجّلة — لا يمكن توليد أمر صيانة ❌')); exit();
+    }
+
+    // حرس ٣: منعُ التكرار — أمرٌ نشطٌ لنفس التفتيش يمنع توليدَ ثانٍ (ويُسمح بعد إغلاقه).
+    $dup = ems_tenant_db()->count('mnt_order', array(
+        'where'    => array('inspection_id' => $iid),
+        'whereRaw' => "state NOT IN ('إغلاق', 'ملغى')"));
+    if ($dup > 0) {
+        header("Location: " . $back . urlencode('لهذا التفتيش أمرُ صيانةٍ نشطٌ سلفًا — أغلِقه أولًا ❌')); exit();
+    }
+
+    // البنودُ الحرجة: شرطُ التوليد ومصدرُ نصّ التشخيص معًا (قراءةٌ واحدة).
+    $crit_lines = ems_tenant_db()->select('mnt_inspection_line', array(
+        'columns' => array('component', 'condition_state', 'recommendation', 'measured_value'),
+        'where'   => array('inspection_id' => $iid), 'orderBy' => 'seq, id'));
+    $crit_txt = array();
+    foreach ($crit_lines as $cl) {
+        if (!in_array(trim((string) $cl['condition_state']), $CRIT_STATES, true)) continue;
+        $piece = trim((string) $cl['component']) . ' — ' . trim((string) $cl['condition_state']);
+        $extra = array();
+        if (trim((string) $cl['measured_value']) !== '') { $extra[] = trim((string) $cl['measured_value']); }
+        if (trim((string) $cl['recommendation']) !== '') { $extra[] = trim((string) $cl['recommendation']); }
+        if (!empty($extra)) { $piece .= ' (' . implode(' · ', $extra) . ')'; }
+        $crit_txt[] = $piece;
+    }
+    if (empty($crit_txt)) {
+        header("Location: " . $back . urlencode('لا بنودَ حرجةً في هذا التفتيش — لا حاجةَ لأمر صيانة ❌')); exit();
+    }
+
+    $diagnosis = 'من تفتيش ' . (string) $ins_g['code'] . ': ' . implode('؛ ', $crit_txt);
+
+    $new_id = ems_tenant_db()->insert('mnt_order', array(
+        'code'          => mnt_next_code($conn, 'mnt_order', 'MNT', $company_id),
+        'inspection_id' => $iid,
+        'equipment_id'  => $eq_id,
+        'project_id'    => !empty($ins_g['project_id']) ? intval($ins_g['project_id']) : null,
+        'source'        => 'تفتيش',
+        'maint_type'    => 'إصلاح عطل',
+        'priority'      => 'عاجلة',
+        'diagnosis'     => $diagnosis,
+        'state'         => 'بلاغ',
+        'created_by'    => $current_user_id,
+    ));
+    header("Location: orders.php?id=" . intval($new_id) . "&msg=" . urlencode('تم توليد أمر صيانة من التفتيش ' . (string) $ins_g['code'] . ' ✅'));
+    exit();
+}
+
 // ── إضافة بند إضافي (مسار non-AJAX احتياطي) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_line') {
     if (!$can_edit) { header("Location: inspections.php?msg=لا+توجد+صلاحية+❌"); exit(); }
@@ -389,12 +464,38 @@ function mnt_seg_kind($c) {
     $cnt_score = $cnt_app > 0 ? intval(round(100 * $cnt_good / $cnt_app)) : 0;
     $st = (string) $ins['state'];
     $locked = ($st === 'مكتمل' || $st === 'مغلق');
+
+    // ── مسارُ التفتيش ← أمرُ الصيانة (المستند §9.1) ──────────────────────────
+    // أحدثُ أمرٍ مرتبطٍ بهذا التفتيش: إن وُجد نشطًا عُرض رابطُه بدل زرِّ التوليد،
+    // فلا يصطدم المستخدمُ برسالة منع التكرار. والزرُّ يظهر بأربعة شروطٍ مجتمعة:
+    // صلاحيةُ إنشاء الأوامر · تفتيشٌ مكتمل/مغلق · معدةٌ مسجَّلة · بندٌ حرجٌ واحدٌ فأكثر.
+    $ins_has_equipment = !empty($ins['equipment_id']);
+    $ins_order = $ins_has_equipment ? ems_tenant_db()->selectOne('mnt_order', array(
+        'columns' => array('id', 'code', 'state'),
+        'where'   => array('inspection_id' => $edit_id), 'orderBy' => 'id DESC')) : null;
+    $ins_order_active = ($ins_order && !in_array((string) $ins_order['state'], array('إغلاق', 'ملغى'), true));
+    $can_show_gen = ($can_gen_order && $locked && $ins_has_equipment && $cnt_crit > 0 && !$ins_order_active);
 ?>
     <?php
     $header_title_html = 'تفتيش: <strong>' . htmlspecialchars((string) $ins['code']) . '</strong> <span class="action-btn">' . htmlspecialchars($st) . '</span>' . ($tpl ? ' <span class="action-btn" style="background:#eef4fb;color:#1f4f7a;">' . htmlspecialchars((string) $tpl['name']) . '</span>' : '');
     $header_icon = 'fa fa-clipboard-check';
     $header_actions = array();
     $header_actions[] = array('id' => 'toggleInspForm', 'class' => 'add-btn', 'icon' => 'fas fa-pen-to-square', 'label' => 'أعلى الصفحة');
+    if ($can_show_gen) {
+        // فورمٌ مصغَّرٌ داخل رأس الصفحة (رمزُ CSRF يُحقن مركزيًّا — لا يُضاف يدويًّا).
+        $header_actions[] = array('raw' =>
+            '<form method="post" action="" style="display:inline" '
+            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">'
+            . '<input type="hidden" name="action" value="generate_order">'
+            . '<input type="hidden" name="inspection_id" value="' . intval($ins['id']) . '">'
+            . '<button type="submit" class="add-btn" title="ينشئ أمر صيانةٍ معبَّأً بالمعدة والمشروع والبنود الحرجة">'
+            . '<i class="fas fa-wrench"></i> توليد أمر صيانة</button></form>');
+    } elseif ($ins_order) {
+        $header_actions[] = array('tag' => 'a', 'href' => 'orders.php?id=' . intval($ins_order['id']),
+            'class' => 'add-btn', 'icon' => 'fas fa-wrench',
+            'title' => 'الأمر الصادر عن هذا التفتيش',
+            'label' => 'أمر الصيانة ' . (string) $ins_order['code'] . ' (' . (string) $ins_order['state'] . ')');
+    }
     $header_back = array(
         array('tag' => 'a', 'href' => 'inspections.php', 'class' => '', 'icon' => 'fas fa-list', 'label' => 'كل عمليات التفتيش'),
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
