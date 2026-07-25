@@ -496,13 +496,25 @@ class TenantDb
             $this->deny('scopedQuery: {TENANT_SCOPE} مطلوب مرةً واحدة بالضبط', substr($sql, 0, 120));
         }
 
-        // مواضع العمق 0 للكلمات الحاكمة
-        $depth0 = function ($needle) use ($upper) {
+        // مواضع العمق 0 للكلمات الحاكمة.
+        // الحدود الكلمية إلزامية: المسحُ النصّيُّ المجرَّد يقرأ `reference_limit` كأنها
+        // LIMIT و`reunion` كأنها UNION، فيرفض استعلاماتٍ سليمةً (عمودٌ اسمُه يحوي
+        // الكلمةَ ليس الكلمةَ الحاكمة). فنشترط أن يكون ما قبل المطابقة وما بعدها
+        // حرفًا غيرَ معرِّف — فلا يضعف العزلُ بحرف، ويبقى كشفُ الكلمة الحقيقية كما هو.
+        $isIdentChar = function ($ch) {
+            return ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9') || $ch === '_' || $ch === '$';
+        };
+        $depth0 = function ($needle) use ($upper, $isIdentChar) {
             $pos = array(); $d = 0; $len = strlen($upper); $nlen = strlen($needle);
             for ($i = 0; $i < $len; $i++) {
                 $ch = $upper[$i];
                 if ($ch === '(') { $d++; } elseif ($ch === ')') { $d--; }
-                elseif ($d === 0 && $ch === $needle[0] && substr($upper, $i, $nlen) === $needle) { $pos[] = $i; }
+                elseif ($d === 0 && $ch === $needle[0] && substr($upper, $i, $nlen) === $needle) {
+                    $before = ($i > 0) ? $upper[$i - 1] : ' ';
+                    $after  = (($i + $nlen) < $len) ? $upper[$i + $nlen] : ' ';
+                    if ($isIdentChar($before) || $isIdentChar($after)) { continue; }
+                    $pos[] = $i;
+                }
             }
             return $pos;
         };
