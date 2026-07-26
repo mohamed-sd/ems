@@ -82,7 +82,16 @@ if ($action === 'approve') {
 
     $approved  = 0;
     $skipped   = 0;
+    $blocked   = array();   // §5.2: المعلَّمُ الموقوف بأسبابه — يُعلَن لا يُبلَع في skipped
     $escaped_name = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غير معروف');
+
+    // ── UX-03 §5.2 حارسُ الطاقة عند اعتماد الموقع (خلف EMS_APPROVAL_BOX) ──
+    // «صفُّ تجاوزِ طاقةٍ لا يُعتمد قبل: السبب · فحص التداخل · تحديد المشغّل
+    // الثاني» — الفحصُ على المستوى الأول حصرًا (هو «اعتمادُ الموقع»)، والمصدرُ
+    // مرآةُ السجل القانوني (fail-open لصفٍّ بلا مرآة: سابقٌ للعلمين).
+    $box_on = false;
+    require_once __DIR__ . '/../app/Services/Unit/CapacityGuard.php';
+    if (function_exists('ems_env') && ems_env('EMS_APPROVAL_BOX', 'off') === 'on') { $box_on = true; }
 
     foreach ($ids as $ts_id) {
         // التحقق من أن السجل ينتمي لنفس الشركة (البوابة تعزل بالشركة؛ فرع
@@ -90,6 +99,26 @@ if ($action === 'approve') {
         try { $chk = $th_gate->selectOne('timesheet', array('columns' => array('id'), 'where' => array('id' => $ts_id))); }
         catch (\Throwable $t) { $chk = null; error_log('hours_approval approve chk: ' . $t->getMessage()); }
         if ($chk === null) { $skipped++; continue; }
+
+        // §5.2: المستوى الأول لا يعتمد صفًّا معلَّمًا غيرَ مخلَّص
+        if ($box_on && $my_level === 1) {
+            try {
+                $vg_uuid = 'ts:' . $ts_id;
+                $vg = $conn->prepare("SELECT id, company_id FROM unit_entries WHERE sync_uuid = ? LIMIT 1");
+                $vg->bind_param('s', $vg_uuid);
+                $vg->execute();
+                $vg_e = $vg->get_result()->fetch_assoc();
+                $vg->close();
+                if ($vg_e) {
+                    $verdict = \App\Services\Unit\CapacityGuard::assertSiteApprovable(
+                        $conn, (int) $vg_e['company_id'], (int) $vg_e['id']);
+                    if (!$verdict['ok']) {
+                        $blocked[] = array('id' => $ts_id, 'reasons' => $verdict['reasons']);
+                        continue;
+                    }
+                }
+            } catch (\Throwable $vgT) { error_log('approval box guard ts#' . $ts_id . ': ' . $vgT->getMessage()); }
+        }
 
         // التحقق من اعتماد المستوى السابق (ما عدا المستوى الأول)
         if ($prev_level > 0) {
@@ -155,13 +184,129 @@ if ($action === 'approve') {
     if ($__gate_on && $my_level === 4 && $approved > 0) {
         $__msg .= ' — اكتمل الاعتماد التشغيلي، وبانتظار التحويل المالي';
     }
+    if (!empty($blocked)) {
+        // §5.2: الموقوفُ يُعلَن بأسبابه — لا يُبلَع في «تخطي»
+        $__msg .= ' — ⚠ ' . count($blocked) . ' موقوفٌ بتجاوز طاقةٍ يلزمه تخليصٌ قبل اعتماد الموقع';
+    }
 
     echo json_encode([
         'success' => true,
         'message' => $__msg,
         'approved' => $approved,
-        'skipped'  => $skipped
+        'skipped'  => $skipped,
+        'blocked'  => $blocked
     ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ─────────────────────────────────────────────────────────────
+// §5.2 · تخليصُ تجاوز الطاقة — بالسبب والمشغّل الثاني (خلف EMS_APPROVAL_BOX)
+// المستوى الأول (اعتماد الموقع) حصرًا: هو المخاطَب بنصّ «لا يُعتمد قبل».
+// التخليصُ لكل محاور الواقعة المفتوحة، باسم من خلّصه في السجل.
+// ─────────────────────────────────────────────────────────────
+if ($action === 'clear_capacity') {
+    if (!function_exists('ems_env') || ems_env('EMS_APPROVAL_BOX', 'off') !== 'on') {
+        die(json_encode(['success' => false, 'message' => 'الميزة غير مفعّلة'], JSON_UNESCAPED_UNICODE));
+    }
+    if (!isset($role_level_map[$role]) || $role_level_map[$role] !== 1) {
+        die(json_encode(['success' => false, 'message' => 'تخليصُ التجاوز صلاحيةُ معتمِد الموقع (المستوى الأول)'], JSON_UNESCAPED_UNICODE));
+    }
+    $ts_id  = intval($_POST['timesheet_id'] ?? 0);
+    $cause  = trim((string) ($_POST['cause_note'] ?? ''));
+    $second = isset($_POST['second_operator']) ? (int) (bool) intval($_POST['second_operator']) : null;
+    if ($ts_id <= 0 || $cause === '' || $second === null) {
+        die(json_encode(['success' => false, 'message' => 'السببُ وإعلانُ المشغّل الثاني إلزاميان — لا تخليصَ بلا إفصاح'], JSON_UNESCAPED_UNICODE));
+    }
+    require_once __DIR__ . '/../app/Services/Unit/CapacityGuard.php';
+    try {
+        $cc_uuid = 'ts:' . $ts_id;
+        $cc = $conn->prepare("SELECT id, company_id FROM unit_entries WHERE sync_uuid = ? LIMIT 1");
+        $cc->bind_param('s', $cc_uuid);
+        $cc->execute();
+        $cc_e = $cc->get_result()->fetch_assoc();
+        $cc->close();
+        if (!$cc_e) { die(json_encode(['success' => false, 'message' => 'لا مرآةَ لهذا الصف'], JSON_UNESCAPED_UNICODE)); }
+
+        // كلُّ المحاور المفتوحة على الواقعة (معدة · مشغّل) تُخلَّص بالإعلان نفسه
+        $cf = $conn->prepare("SELECT DISTINCT subject FROM unit_capacity_flags
+                               WHERE company_id=? AND entry_id=? AND cleared_at IS NULL");
+        $cc_co = (int) $cc_e['company_id']; $cc_id = (int) $cc_e['id'];
+        $cf->bind_param('ii', $cc_co, $cc_id);
+        $cf->execute();
+        $subjects = $cf->get_result()->fetch_all(MYSQLI_ASSOC);
+        $cf->close();
+        if (empty($subjects)) { die(json_encode(['success' => false, 'message' => 'لا علمَ مفتوحًا على هذه الواقعة'], JSON_UNESCAPED_UNICODE)); }
+
+        $cleared = 0;
+        foreach ($subjects as $sj) {
+            if (\App\Services\Unit\CapacityGuard::clear($conn, $th_gate, $cc_co, $cc_id,
+                    $sj['subject'], $cause, $second, $user_id)) { $cleared++; }
+        }
+        echo json_encode(['success' => $cleared > 0,
+            'message' => $cleared > 0 ? "خُلِّص {$cleared} محورًا باسمك — يمكن الاعتماد الآن" : 'تعذّر التخليص',
+            'cleared' => $cleared], JSON_UNESCAPED_UNICODE);
+    } catch (\Throwable $t) {
+        error_log('clear_capacity ts#' . $ts_id . ': ' . $t->getMessage());
+        echo json_encode(['success' => false, 'message' => 'خطأ في التخليص'], JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
+
+// ─────────────────────────────────────────────────────────────
+// §5.2 · إعادةٌ للاستكمال بسببٍ — وبالرقم نفسه (خلف EMS_APPROVAL_BOX)
+// الثلاثية الموحّدة: اعتماد · إعادة بسبب · رفض بسبب. الإعادةُ تفتح جولةً
+// جديدةً على الواقعة نفسِها (round_no++) فتعود قابلةً للتعديل عند مُدخِلها،
+// وتُسجَّل ملاحظتُها ليراها. متاحةٌ لصفٍّ لم يُعتمد مستواه بعد.
+// ─────────────────────────────────────────────────────────────
+if ($action === 'return_to_site') {
+    if (!function_exists('ems_env') || ems_env('EMS_APPROVAL_BOX', 'off') !== 'on') {
+        die(json_encode(['success' => false, 'message' => 'الميزة غير مفعّلة'], JSON_UNESCAPED_UNICODE));
+    }
+    if (!isset($role_level_map[$role])) {
+        die(json_encode(['success' => false, 'message' => 'الأدمن لا يعيد مباشرة'], JSON_UNESCAPED_UNICODE));
+    }
+    $rt_level = $role_level_map[$role];
+    $ts_id  = intval($_POST['timesheet_id'] ?? 0);
+    $reason = trim((string) ($_POST['reason'] ?? ''));
+    if ($ts_id <= 0 || $reason === '') {
+        die(json_encode(['success' => false, 'message' => 'سببُ الإعادة إلزامي — «إعادةٌ بسبب» نصًّا'], JSON_UNESCAPED_UNICODE));
+    }
+    require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+    try {
+        $rt_uuid = 'ts:' . $ts_id;
+        $rt = $conn->prepare("SELECT id, company_id, entry_no, state FROM unit_entries WHERE sync_uuid = ? LIMIT 1");
+        $rt->bind_param('s', $rt_uuid);
+        $rt->execute();
+        $rt_e = $rt->get_result()->fetch_assoc();
+        $rt->close();
+        if (!$rt_e) { die(json_encode(['success' => false, 'message' => 'لا مرآةَ لهذا الصف'], JSON_UNESCAPED_UNICODE)); }
+
+        $stage = \App\Services\Unit\TimesheetEntryService::LEGACY_LEVEL_STAGE[$rt_level] ?? 'site';
+        $rtRes = \App\Services\Unit\TimesheetEntryService::returnToSite(
+            $conn, $th_gate, (int) $rt_e['company_id'], (int) $rt_e['id'], $stage, $reason, $user_id,
+            array('publish_events' => false));
+        if (empty($rtRes['ok'])) {
+            die(json_encode(['success' => false,
+                'message' => 'تعذّرت الإعادة: ' . ($rtRes['skipped'] ?? ($rtRes['code'] ?? '؟'))], JSON_UNESCAPED_UNICODE));
+        }
+        // ملاحظةُ الإعادة تُسجَّل ليراها المُدخِل (القناة القائمة نفسها)
+        try {
+            $th_gate->insert('timesheet_approval_notes', array(
+                'timesheet_id' => $ts_id, 'column_name' => 'return_to_site',
+                'column_label' => 'إعادة للاستكمال',
+                'note_text' => $reason . ' (بالرقم نفسه: ' . $rt_e['entry_no'] . ')',
+                'created_by' => $user_id,
+                'created_by_name' => ($_SESSION['user']['name'] ?? 'غير معروف'),
+            ));
+        } catch (\Throwable $nT) { error_log('return note ts#' . $ts_id . ': ' . $nT->getMessage()); }
+
+        echo json_encode(['success' => true,
+            'message' => 'أُعيدت للاستكمال بالرقم نفسه (' . $rt_e['entry_no'] . ') — جولةٌ جديدةٌ وتعديلُها مفتوح',
+            'entry_no' => $rt_e['entry_no']], JSON_UNESCAPED_UNICODE);
+    } catch (\Throwable $t) {
+        error_log('return_to_site ts#' . $ts_id . ': ' . $t->getMessage());
+        echo json_encode(['success' => false, 'message' => 'خطأ في الإعادة'], JSON_UNESCAPED_UNICODE);
+    }
     exit;
 }
 

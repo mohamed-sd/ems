@@ -682,6 +682,9 @@ try {
   // ⚠️ گوتشا موثقة: form قيمتُه **رقمُ النوع** (1/2/3) لا نصٌّ وصفي —
   //    نفسُ معامل الترشيح الذي تستعمله قوائمُ الشاشة حرفيًّا ($type).
   $ts_form_like = $type;
+  // فلترُ المشروع نفسُه الذي تستعمله قوائمُ المعدات أدناه — مديرُ الموقع
+  //   مسؤولٌ عن آلياتِ موقعه فقط (السوبر project_id=0 فيرى الكل).
+  $ts_cnt_project_sql = $session_project_id > 0 ? " AND o.project_id = '" . $session_project_id . "'" : "";
   // گوتشا scopedQuery: EXISTS على مستأجرٍ يعطّل حقن النطاق — فالمستأجرُ
   //   الملحق يُربط enrich بـLEFT JOIN (قيدُه في ON) كما توثّق البوابة.
   $ts_cnt_rows = $ts_gate->scopedQuery(
@@ -691,7 +694,7 @@ try {
        FROM operations o
        JOIN equipments e ON e.id = o.equipment
        LEFT JOIN timesheet tt ON tt.operator = o.id AND tt.date = CURDATE()
-      WHERE o.status = '1' AND o.equipment_category = 'أساسي'
+      WHERE o.status = '1' AND o.equipment_category = 'أساسي'" . $ts_cnt_project_sql . "
         AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active')
         AND {TENANT_SCOPE}
       GROUP BY o.id, e.code, e.name

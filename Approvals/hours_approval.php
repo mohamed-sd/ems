@@ -210,6 +210,61 @@ if (!empty($approved_ids)) {
     } catch (\Throwable $t) { error_log('hours_approval details bulk: ' . $t->getMessage()); }
 }
 
+// ═══ UX-03 §5.2 — بياناتُ صندوق الاعتماد (خلف EMS_APPROVAL_BOX) ═══════════
+// لكل صفٍّ معلّق: ملخّصُ زمنه (فعلي/استعداد/توقف من سطور السجل القانوني)
+// وشارةُ تجاوز الطاقة بأعلامها المفتوحة — جلبةٌ واحدةٌ لا N+1.
+require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+$box_on = function_exists('ems_env') && ems_env('EMS_APPROVAL_BOX', 'off') === 'on';
+$box_map = array();   // ts_id => {entry_id, state, flagged, time: {actual, standby, stop}, flags: []}
+if ($box_on && !empty($pending_rows)) {
+    try {
+        $bx_ids = array_values(array_filter(array_map('intval', array_column($pending_rows, 'id'))));
+        if (!empty($bx_ids)) {
+            $bx_uuids = "'ts:" . implode("','ts:", $bx_ids) . "'";
+            // الواقعة وملخّص زمنها
+            $bx_rows = $ha_gate->scopedQuery(
+                array('scope' => array('u' => 'unit_entries'), 'enrich' => array('l' => 'unit_time_log')),
+                "SELECT u.id AS entry_id, u.sync_uuid, u.state, u.capacity_flag,
+                        ROUND(COALESCE(SUM(CASE WHEN l.ops_state = 'actual_work' THEN l.hours END), 0), 2) AS t_actual,
+                        ROUND(COALESCE(SUM(CASE WHEN l.ops_state = 'standby' THEN l.hours END), 0), 2) AS t_standby,
+                        ROUND(COALESCE(SUM(CASE WHEN l.ops_state NOT IN ('actual_work','standby') THEN l.hours END), 0), 2) AS t_stop
+                   FROM unit_entries u
+                   LEFT JOIN unit_time_log l ON l.entry_id = u.id
+                  WHERE u.sync_uuid IN ({$bx_uuids}) AND {TENANT_SCOPE}
+                  GROUP BY u.id, u.sync_uuid, u.state, u.capacity_flag");
+            $bx_entry_ids = array();
+            foreach ($bx_rows as $bx) {
+                $bts = (int) substr($bx['sync_uuid'], 3);
+                $box_map[$bts] = array(
+                    'entry_id' => (int) $bx['entry_id'], 'state' => $bx['state'],
+                    'flagged' => (int) $bx['capacity_flag'] === 1,
+                    'time' => array('actual' => (float) $bx['t_actual'],
+                                    'standby' => (float) $bx['t_standby'],
+                                    'stop' => (float) $bx['t_stop']),
+                    'flags' => array(),
+                );
+                $bx_entry_ids[(int) $bx['entry_id']] = $bts;
+            }
+            // الأعلام المفتوحة بتفصيلها (للتلميح ومودال التخليص)
+            if (!empty($bx_entry_ids)) {
+                $bx_in = implode(',', array_keys($bx_entry_ids));
+                $bx_flags = $ha_gate->scopedQuery(
+                    array('scope' => array('f' => 'unit_capacity_flags')),
+                    "SELECT f.entry_id, f.subject, f.subject_ref, f.measured_hours, f.capacity_hours
+                       FROM unit_capacity_flags f
+                      WHERE f.entry_id IN ({$bx_in}) AND f.cleared_at IS NULL AND {TENANT_SCOPE}");
+                foreach ($bx_flags as $bf) {
+                    $bts = $bx_entry_ids[(int) $bf['entry_id']] ?? 0;
+                    if ($bts && isset($box_map[$bts])) {
+                        $box_map[$bts]['flags'][] = ($bf['subject'] === 'equipment' ? 'المعدة' : 'المشغّل')
+                            . ' #' . $bf['subject_ref'] . ': ' . $bf['measured_hours'] . '/' . $bf['capacity_hours'] . ' س';
+                    }
+                }
+            }
+        }
+    } catch (\Throwable $t) { error_log('approval box map: ' . $t->getMessage()); }
+}
+
 // ─── بيانات الفلاتر (قوائم فريدة) ───────────────────────────
 $_all_rows = $pending_rows;
 $filter_projects = array_values(array_unique(array_filter(array_column($_all_rows, 'project_name'))));
@@ -542,6 +597,10 @@ include '../insidebar.php';
             <th>المورد</th>
             <th>الآلية</th>
             <th>المشغل</th>
+            <?php if ($box_on): ?>
+            <th class="nosort" title="من سطور السجل القانوني">توزيع الزمن</th>
+            <th class="nosort" style="width:44px;">⚠</th>
+            <?php endif; ?>
             <th>المنفذة</th>
             <th>الانتظار</th>
             <th>الأعطال</th>
@@ -605,6 +664,31 @@ include '../insidebar.php';
             <td><?= htmlspecialchars($row['supplier_name'] ?? '—') ?></td>
             <td><?= htmlspecialchars(trim(($row['equip_code'] ?? '') . ' ' . ($row['equip_name'] ?? ''))) ?: '—' ?></td>
             <td><?= htmlspecialchars($row['driver_name'] ?? '—') ?></td>
+            <?php if ($box_on):
+              // §5.2: ملخّصُ الزمن من السجل القانوني + شارةُ تجاوز الطاقة
+              $_bx = $box_map[intval($row['id'])] ?? null; ?>
+            <td style="white-space:nowrap;" data-order="0">
+              <?php if ($_bx): $_t = $_bx['time']; ?>
+                <span title="تشغيل فعلي" style="color:#16a34a;font-weight:700;"><?= $_t['actual'] ?></span>
+                <span style="color:#9ca3af;">·</span>
+                <span title="استعداد" style="color:#2563eb;font-weight:700;"><?= $_t['standby'] ?></span>
+                <span style="color:#9ca3af;">·</span>
+                <span title="توقف" style="color:#6b7280;font-weight:700;"><?= $_t['stop'] ?></span>
+              <?php else: ?>
+                <span class="text-muted" title="صفٌّ سابقٌ للسجل القانوني — لا سطورَ له">—</span>
+              <?php endif; ?>
+            </td>
+            <td style="text-align:center;">
+              <?php if ($_bx && $_bx['flagged'] && !empty($_bx['flags'])): ?>
+                <span class="badge bx-flag" data-ts-id="<?= intval($row['id']) ?>"
+                      data-flags="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?>"
+                      style="background:#f0b429;color:#7c2d12;cursor:pointer;"
+                      title="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?> — لا يُعتمد قبل التخليص (انقر للتخليص)">⚠</span>
+              <?php elseif ($_bx && $_bx['flagged']): ?>
+                <span class="badge bg-success" title="كان معلَّمًا وخُلِّص — التفصيل في سجل الأعلام">✓</span>
+              <?php endif; ?>
+            </td>
+            <?php endif; ?>
             <td><?= floatval($row['executed_hours'] ?? 0) ?></td>
             <td><?= floatval($row['standby_hours'] ?? 0) ?></td>
             <td><?= floatval($row['total_fault_hours'] ?? 0) ?></td>
@@ -693,6 +777,14 @@ include '../insidebar.php';
                           title="رفض السجل">
                     <i class="fa fa-xmark"></i>
                   </button>
+                  <?php if ($box_on && isset($box_map[intval($row['id'])])): ?>
+                  <!-- §5.2 الثلاثية الموحّدة: اعتماد · إعادة بسبب · رفض بسبب -->
+                  <button class="apv-return" onclick="returnSingle(<?= $row['id'] ?>)"
+                          title="إعادة للاستكمال بسبب — بالرقم نفسه"
+                          style="background:#fef3c7;border:1px solid #f0b429;color:#92400e;border-radius:6px;padding:2px 8px;">
+                    <i class="fa fa-rotate-left"></i>
+                  </button>
+                  <?php endif; ?>
                   <?php elseif (!$is_admin && !$is_site_manager): ?>
                   <!-- أزرار معطّلة للأدوار التي لا يطابق مستواها السجل الحالي -->
                   <span class="apv-action-disabled" title="لا يمكنك الاعتماد في هذا المستوى"><i class="fa fa-check"></i></span>
@@ -1476,3 +1568,117 @@ function applyEquipTypeFilter() {
   window.location.href = 'hours_approval.php?equip_type=' + equipType;
 }
 </script>
+
+<?php if ($box_on): ?>
+<!-- ═══ UX-03 §5.2 — مودالا التخليص والإعادة (خلف EMS_APPROVAL_BOX) ═══ -->
+<div class="modal fade" id="bxClearModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="background:#fef3c7;">
+      <h6 class="modal-title"><i class="fa fa-triangle-exclamation" style="color:#b45309;"></i>
+        تخليصُ تجاوز الطاقة — السجل <strong id="bx-clear-id"></strong></h6>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-warning py-2" id="bx-clear-flags" style="font-size:.85rem;"></div>
+      <p style="font-size:.85rem;color:#6b7280;">
+        نصّ §5.2: «صفُّ تجاوزِ طاقةٍ لا يُعتمد قبل: السبب · فحصُ التداخل ·
+        تحديدُ المشغّل الثاني» — الفحصُ يجري آليًّا، والاثنان الباقيان إفصاحُك أنت.
+      </p>
+      <label class="form-label fw-bold">سببُ التجاوز *</label>
+      <textarea id="bx-clear-cause" class="form-control" rows="2"
+                placeholder="مثال: ورديةٌ مزدوجةٌ طارئةٌ بطلب العميل — تسليمُ شحنة"></textarea>
+      <label class="form-label fw-bold mt-3">هل عمل مشغّلٌ ثانٍ؟ *</label>
+      <div>
+        <label class="me-3"><input type="radio" name="bx-second" value="1"> نعم — مشغّلان تناوبا</label>
+        <label><input type="radio" name="bx-second" value="0"> لا — مشغّلٌ واحد</label>
+      </div>
+      <div id="bx-clear-err" class="text-danger mt-2" style="display:none;font-size:.85rem;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
+      <button class="btn btn-warning btn-sm fw-bold" id="bx-clear-go">
+        <i class="fa fa-unlock"></i> خلِّص باسمي</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal fade" id="bxReturnModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="background:#e0e7ff;">
+      <h6 class="modal-title"><i class="fa fa-rotate-left"></i>
+        إعادةٌ للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.85rem;color:#6b7280;">
+        تعود الواقعةُ لمُدخِلها <strong>بالرقم نفسه</strong> في جولةٍ جديدة —
+        يعدّلها ويعيد إرسالها، وتاريخُ الجولات كلِّه محفوظ (§8.2).
+      </p>
+      <label class="form-label fw-bold">سببُ الإعادة *</label>
+      <textarea id="bx-return-reason" class="form-control" rows="2"
+                placeholder="مثال: توزيعُ الزمن ناقص — ساعتا التوقف بلا مسؤولٍ ومرجع"></textarea>
+      <div id="bx-return-err" class="text-danger mt-2" style="display:none;font-size:.85rem;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
+      <button class="btn btn-primary btn-sm fw-bold" id="bx-return-go">
+        <i class="fa fa-rotate-left"></i> أعِد للاستكمال</button>
+    </div>
+  </div></div>
+</div>
+
+<script>
+// ═══ §5.2 — سلوك الصندوق ═══════════════════════════════════════════════
+var bxClearTsId = 0, bxReturnTsId = 0;
+
+// شارةُ ⚠ تفتح مودالَ التخليص (لمعتمِد الموقع؛ الخادم يتحقق من المستوى)
+$(document).on('click', '.bx-flag', function () {
+  bxClearTsId = parseInt($(this).data('ts-id'), 10);
+  $('#bx-clear-id').text('#' + bxClearTsId);
+  $('#bx-clear-flags').text($(this).data('flags'));
+  $('#bx-clear-cause').val('');
+  $('input[name="bx-second"]').prop('checked', false);
+  $('#bx-clear-err').hide();
+  new bootstrap.Modal(document.getElementById('bxClearModal')).show();
+});
+
+$('#bx-clear-go').on('click', function () {
+  var cause = $.trim($('#bx-clear-cause').val());
+  var second = $('input[name="bx-second"]:checked').val();
+  if (!cause || second === undefined) {
+    $('#bx-clear-err').text('السببُ وإعلانُ المشغّل الثاني إلزاميان.').show();
+    return;
+  }
+  var btn = this; btn.disabled = true;
+  $.post('hours_approval_handler.php',
+    { action: 'clear_capacity', timesheet_id: bxClearTsId, cause_note: cause,
+      second_operator: second, csrf_token: window.csrfToken || $('input[name="csrf_token"]').val() },
+    function (res) {
+      if (res.success) { showToast('✅ ' + res.message, 'success'); setTimeout(function(){ location.reload(); }, 1100); }
+      else { $('#bx-clear-err').text(res.message).show(); }
+    }, 'json').always(function(){ btn.disabled = false; });
+});
+
+// زرُّ الإعادة
+function returnSingle(id) {
+  bxReturnTsId = id;
+  $('#bx-return-id').text('#' + id);
+  $('#bx-return-reason').val('');
+  $('#bx-return-err').hide();
+  new bootstrap.Modal(document.getElementById('bxReturnModal')).show();
+}
+
+$('#bx-return-go').on('click', function () {
+  var reason = $.trim($('#bx-return-reason').val());
+  if (!reason) { $('#bx-return-err').text('سببُ الإعادة إلزامي — «إعادةٌ بسبب» نصًّا.').show(); return; }
+  var btn = this; btn.disabled = true;
+  $.post('hours_approval_handler.php',
+    { action: 'return_to_site', timesheet_id: bxReturnTsId, reason: reason,
+      csrf_token: window.csrfToken || $('input[name="csrf_token"]').val() },
+    function (res) {
+      if (res.success) { showToast('✅ ' + res.message, 'success'); setTimeout(function(){ location.reload(); }, 1300); }
+      else { $('#bx-return-err').text(res.message).show(); }
+    }, 'json').always(function(){ btn.disabled = false; });
+});
+</script>
+<?php endif; ?>
