@@ -69,6 +69,33 @@ $cards = array(
   array('fa-landmark',          number_format($inst7, 0),       'أقساط تمويل خلال 7 أيام',      $inst7 > 0 ? 'or' : 'ok', 'funding_fin.php'),
 );
 
+/* ── لوحة الدور بالمكوّنات السبعة (UX-00 §7 · UX-01 §5 · §8.11) ──────────────
+   البطاقات العشر أعلاه = المكوّن ① «مؤشرات اليوم» (قائمةٌ من قبل — بقرار
+   المالك تبقى ويُضاف الناقص). هنا تُجمع بيانات ②-⑦ عبر محرك role_board. */
+require_once __DIR__ . '/../includes/role_board.php';
+require_once __DIR__ . '/../includes/finreq_badges.php';
+
+$rb_gate      = fin_gate($is_super_admin);
+$rb_badges    = ems_finreq_nav_badges($conn);
+$rb_tasks     = roleBoardTasks($conn, $rb_gate, 17);                       // ② مهامي
+$rb_approvals = roleBoardApprovals($conn, $rb_gate, 17, $rb_badges);       // ③ موافقاتي
+$rb_alerts    = roleBoardAlerts($conn, $rb_gate, 17);                      // ④ التنبيهات (UX-01 §8.11 نصًّا)
+$rb_quick     = roleBoardQuickActions($conn, 17, $current_user_id);        // ⑤ إنشاء سريع
+$rb_recent    = roleBoardRecent($conn, $current_user_id);                  // ⑦ عملي الأخير
+
+// ⑥ نبض الأداء — رسمٌ واحدٌ يخص قرار الدور: التحصيل مقابل الصرف آخر 7 أيام
+$rb_pulse = array('labels' => array(), 'in' => array(), 'out' => array());
+for ($d = 6; $d >= 0; $d--) {
+    $day = date('Y-m-d', strtotime("-{$d} days"));
+    $rb_pulse['labels'][] = date('m/d', strtotime($day));
+    $rb_pulse['in'][]  = roleBoardScalar($rb_gate, array('scope' => array('p' => 'fin_payments')),
+        "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
+         AND p.direction='collection' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=?", array($day));
+    $rb_pulse['out'][] = roleBoardScalar($rb_gate, array('scope' => array('p' => 'fin_payments')),
+        "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
+         AND p.direction='disbursement' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=?", array($day));
+}
+
 $page_title = 'إيكوبيشن | لوحة المدير المالي';
 include '../inheader.php';
 include '../insidebar.php';
@@ -96,6 +123,77 @@ include '../insidebar.php';
         <?php endforeach; ?>
     </div>
 
+    <!-- ── المكوّنات ②③④⑤ — أربعةُ صناديقَ ثابتةِ البنية (UX-01 §5) ── -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:14px">
+
+        <div class="card"><div class="card-body">
+            <h5 style="margin:0 0 10px"><i class="fas fa-list-check"></i> مهامي</h5>
+            <?php if (empty($rb_tasks)): ?>
+                <p class="text-muted" style="font-size:13px;margin:0">لا مهامَّ عاجلةً الآن — كل الصناديق فارغة ✔</p>
+            <?php else: foreach ($rb_tasks as $t): ?>
+                <a href="<?php echo htmlspecialchars($t['href']); ?>" style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit">
+                    <span style="font-size:13px"><i class="<?php echo htmlspecialchars($t['icon']); ?>" style="opacity:.6;margin-left:6px"></i><?php echo htmlspecialchars($t['label']); ?></span>
+                    <span class="badge badge-primary"><?php echo intval($t['count']); ?></span>
+                </a>
+            <?php endforeach; endif; ?>
+        </div></div>
+
+        <div class="card"><div class="card-body">
+            <h5 style="margin:0 0 10px"><i class="fas fa-inbox"></i> موافقاتي</h5>
+            <?php if (empty($rb_approvals)): ?>
+                <p class="text-muted" style="font-size:13px;margin:0">لا شيءَ ينتظر اعتمادك ✔</p>
+            <?php else: foreach ($rb_approvals as $a): ?>
+                <a href="<?php echo htmlspecialchars($a['href']); ?>" style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit">
+                    <span style="font-size:13px"><i class="<?php echo htmlspecialchars($a['icon']); ?>" style="opacity:.6;margin-left:6px"></i><?php echo htmlspecialchars($a['label']); ?></span>
+                    <span class="badge badge-warning"><?php echo intval($a['count']); ?></span>
+                </a>
+            <?php endforeach; endif; ?>
+        </div></div>
+
+        <div class="card"><div class="card-body">
+            <h5 style="margin:0 0 10px"><i class="fas fa-bell"></i> التنبيهات</h5>
+            <?php if (empty($rb_alerts)): ?>
+                <p class="text-muted" style="font-size:13px;margin:0">لا متأخرَ ولا حرجَ الآن ✔</p>
+            <?php else: foreach ($rb_alerts as $al): $tone = $al['tone'] === 'err' ? '#991b1b' : '#92400e'; ?>
+                <a href="<?php echo htmlspecialchars($al['href']); ?>" style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:<?php echo $tone; ?>">
+                    <span style="font-size:13px"><i class="fas fa-triangle-exclamation" style="margin-left:6px"></i><?php echo htmlspecialchars($al['label']); ?></span>
+                    <span class="badge badge-danger"><?php echo intval($al['count']); ?></span>
+                </a>
+            <?php endforeach; endif; ?>
+        </div></div>
+
+        <div class="card"><div class="card-body">
+            <h5 style="margin:0 0 10px"><i class="fas fa-bolt"></i> إنشاء سريع</h5>
+            <?php if (empty($rb_quick)): ?>
+                <p class="text-muted" style="font-size:13px;margin:0">—</p>
+            <?php else: foreach ($rb_quick as $qk): ?>
+                <a href="../<?php echo htmlspecialchars($qk['route']); ?>" class="btn-save" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px;padding:8px">
+                    <i class="<?php echo htmlspecialchars($qk['icon'] ?: 'fa fa-link'); ?>"></i> <?php echo htmlspecialchars($qk['label_ar']); ?>
+                </a>
+            <?php endforeach; endif; ?>
+        </div></div>
+    </div>
+
+    <!-- ── المكوّنان ⑥⑦ — نبض الأداء + عملي الأخير ── -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:14px">
+        <div class="card"><div class="card-body">
+            <h5 style="margin:0 0 10px"><i class="fas fa-wave-square"></i> نبض الأداء — التحصيل مقابل الصرف (7 أيام)</h5>
+            <canvas id="rbPulse" height="90"></canvas>
+        </div></div>
+        <div class="card"><div class="card-body">
+            <h5 style="margin:0 0 10px"><i class="fas fa-clock-rotate-left"></i> عملي الأخير</h5>
+            <?php if (empty($rb_recent)): ?>
+                <p class="text-muted" style="font-size:13px;margin:0">لا نشاطَ مسجَّلًا بعد</p>
+            <?php else: foreach ($rb_recent as $rc):
+                $rcHref = preg_replace('#^.*?/ems/#', '../', (string)($rc['url'] ?? '')); if ($rcHref === '') { $rcHref = '#'; } ?>
+                <a href="<?php echo htmlspecialchars($rcHref); ?>" style="display:block;padding:6px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit;font-size:13px">
+                    <?php echo htmlspecialchars((string)$rc['screen_name']); ?>
+                    <span class="text-muted" style="float:left;font-size:11px"><?php echo htmlspecialchars(date('m/d H:i', strtotime((string)$rc['last_at']))); ?></span>
+                </a>
+            <?php endforeach; endif; ?>
+        </div></div>
+    </div>
+
     <div class="card" style="margin-top:14px"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-clipboard-check"></i> جدول القرار اليومي</h5>
         <div class="table-container"><table class="alltables" style="width:100%">
@@ -110,5 +208,19 @@ include '../insidebar.php';
         </table></div>
     </div></div>
 </div>
+<script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('rbPulse'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($rb_pulse['labels']); ?>,
+        datasets: [
+            { label: 'تحصيل', data: <?php echo json_encode($rb_pulse['in']); ?>,  backgroundColor: 'rgba(22,101,52,.75)' },
+            { label: 'صرف',   data: <?php echo json_encode($rb_pulse['out']); ?>, backgroundColor: 'rgba(153,27,27,.7)' }
+        ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', rtl: true } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
 </body>
 </html>

@@ -6,6 +6,18 @@ if (!isset($_SESSION['user'])) {
 }
 include "../config.php";
 require_once dirname(__FILE__) . '/../includes/dynamic_nav.php';
+require_once dirname(__FILE__) . '/../includes/role_board.php';
+
+// ── لوحة الدور (UX-01 §4: «أول ما يُفتح — لوحة الدور») ─────────────────────
+// الدورُ المفعَّل في EMS_ROLE_BOARD_ROLES تحوّله «الرئيسية» للوحته مباشرةً
+// (قرار المالك 2026-07-26)، وسائرُ الأدوار على هذه اللوحة العامة حرفيًّا —
+// والرجوعُ بحذف الدور من العلم بلا نشر كود (نمط السايدبار الموحّد نفسه).
+if (isset($_SESSION['user']['role']) && roleBoardEnabled($_SESSION['user']['role'])) {
+  $rb_route = roleBoardRoute($_SESSION['user']['role'],
+      isset($_SESSION['user']['parent_role_id']) ? $_SESSION['user']['parent_role_id'] : null);
+  if ($rb_route !== null) { header('Location: ../' . $rb_route); exit(); }
+}
+
 if (!headers_sent()) {
   header('Content-Type: text/html; charset=UTF-8');
 }
