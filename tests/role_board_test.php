@@ -30,29 +30,39 @@ ok('العلم: المذكور يفعَّل وغيره لا (حتميًّا بت
     roleBoardEnabled(17, '17') === true && roleBoardEnabled(1, '17') === false
     && roleBoardEnabled(17, '') === false && roleBoardEnabled(13, '17,13') === true);
 
-ok('الخريطة: أربعُ لوحاتٍ مخصصة + ثمانٍ على العامة · التشغيل (1) بلا لوحةٍ حتى UX-03',
+ok('الخريطة كاملة: أربعُ لوحاتٍ مخصصة + تسعٌ على العامة (ومنها التشغيل بعد وصول UX-03)',
     roleBoardRoute(17) === 'Finance/cfo_daily_board_fin.php'
     && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php'
     && roleBoardRoute(16) === 'Procurement/dashboard_proc.php'
     && roleBoardRoute(23) === 'Transport/transfer_dashboard.php'
     && roleBoardRoute(24) === 'main/role_board.php' && roleBoardRoute(15) === 'main/role_board.php'
-    && roleBoardRoute(1) === null);
+    && roleBoardRoute(1) === 'main/role_board.php'
+    && roleBoardRoute(999) === null);
 
-// إعدادُ اللوحة العامة كاملٌ للأدوار الثمانية — وكلُّ بطاقةٍ ومهمةٍ بقفزة (href)
+// إعدادُ اللوحة العامة كاملٌ للأدوار التسعة — وكلُّ بطاقةٍ ومهمةٍ بقفزة (href)
 $cfgOk = true;
-foreach (array(24, 12, 2, 3, 4, 5, 6, 15) as $r) {
+foreach (array(1, 24, 12, 2, 3, 4, 5, 6, 15) as $r) {
     $cfg = roleBoardGenericConfig($r);
     if ($cfg === null || empty($cfg['cards']) || empty($cfg['pulse'])) { $cfgOk = false; continue; }
     foreach (array_merge($cfg['cards'], $cfg['tasks']) as $def) {
         if (empty($def[0]) || empty($def[4])) { $cfgOk = false; }
     }
 }
-ok('إعداد الأدوار الثمانية كامل — كل بطاقةٍ ومهمةٍ باسمٍ وقفزة', $cfgOk);
-ok('دورٌ خارج الإعداد يعيد null (التشغيل ينتظر UX-03)', roleBoardGenericConfig(1) === null);
+ok('إعداد الأدوار التسعة كامل — كل بطاقةٍ ومهمةٍ باسمٍ وقفزة', $cfgOk);
+ok('دورٌ غير معرَّفٍ يعيد null', roleBoardGenericConfig(999) === null);
 
-ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (18→17 · 14→13)',
+// تنبيهات التشغيل (UX-03 §1 · UX-01 §8.1): ثلاثةٌ من أربعة — «انحرافُ الالتزام»
+// بلا محركٍ بعد (تبويب غرفة العمليات ④ القادم) فلا يُعرض — عدم التلفيق محروس.
+$ops = roleBoardAlertSpecs(1);
+ok('تنبيهات التشغيل ثلاثةٌ كاملة — و«انحراف الالتزام» غائبٌ عمدًا بلا محرك',
+    count($ops) === 3
+    && count(array_filter($ops, function ($s) { return empty($s['href']) || empty($s['label']); })) === 0
+    && count(array_filter($ops, function ($s) { return $s['key'] === 'commitment_variance'; })) === 0);
+
+ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (18→17 · 14→13 · 7→1)',
     roleBoardRoute(18, 17) === 'Finance/cfo_daily_board_fin.php'
-    && roleBoardRoute(14, 13) === 'Maintenance/dashboard_mnt.php' && roleBoardRoute(7, 1) === null);
+    && roleBoardRoute(14, 13) === 'Maintenance/dashboard_mnt.php'
+    && roleBoardRoute(7, 1) === 'main/role_board.php');
 
 echo "── ② قاعدة «كل رقمٍ ينقر إلى مصدره» (UX-00 §7) ──\n";
 
