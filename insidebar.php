@@ -3,7 +3,11 @@
 // تضمين ملف الإعدادات والروابط الديناميكية
 require_once dirname(__FILE__) . '/config.php';
 require_once dirname(__FILE__) . '/includes/dynamic_nav.php';
+require_once dirname(__FILE__) . '/includes/unified_nav.php';
 require_once dirname(__FILE__) . '/includes/permissions_helper.php';
+// التشغيل المزدوج (UX-01 §10.4-②): الدور المذكور في EMS_NAV_UNIFIED_ROLES يرى
+// المصدر الموحّد بأبوابه الستة، وسائر الأدوار على مصادرها القديمة حرفيًّا.
+$__nav_unified = isset($_SESSION['user']['role']) && unifiedNavEnabled($_SESSION['user']['role']);
 
 if (isset($_SESSION['user']) && isset($conn)) {
   enforce_current_page_view_permission($conn, '../main/dashboard.php');
@@ -187,7 +191,15 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
       // (+ شارات عدّ بوابة الطلبات المالية D05 — صناديق المراجعة والمحاسب والمعاد)
-      if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
+      if ($__nav_unified && isset($conn)) {
+        // ── المصدر الموحّد: بابٌ واحدٌ محكوم بدل المصادر الخمسة ──
+        require_once __DIR__ . '/includes/finreq_badges.php';
+        $__un_badges = ems_finreq_nav_badges($conn);           // مفاتيحها أكواد الشاشات = المسارات
+        if ($hoursApprovalPendingCount > 0) {
+          $__un_badges['Approvals/hours_approval.php'] = $hoursApprovalPendingCount;
+        }
+        renderUnifiedNavigationV2($conn, $_SESSION['user']['role'], '../', $__un_badges);
+      } elseif (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
         require_once __DIR__ . '/includes/finreq_badges.php';
         $__fr_badges = ems_finreq_nav_badges($conn);
         $__sb_links  = getDynamicNavLinks($conn, $_SESSION['user']['role']);
@@ -253,7 +265,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       }
       ?>
 
-      <?php if (in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
+      <?php if (!$__nav_unified && in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
       <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الوحدات التشغيلية
         </span>
         <?php if ($hoursApprovalPendingCount > 0): ?>
@@ -341,6 +353,10 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       //   • من يملك نظام التقارير الجديد (report_role_permissions) → emsreports.
       //   • وإلا من يملك عرض التقارير القديمة (Reports/reports.php) → Reports/reports.php.
       //   • وإلا يُخفى الرابط. (لا يُمنح أي وصول جديد هنا.)
+      // الموحّد: التقاريرُ والإعداداتُ من بابيهما في المصدر الموحّد لا من هنا —
+      // (الرابط الثابت للإعدادات كان يظهر بلا فحص صلاحيةٍ لكل الأدوار، وهو
+      //  مصدرُ الرابط الميت المرصود في v8 §16-و).
+      if (!$__nav_unified) {
       $__sb_role_id = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
       $__sb_is_super = isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1';
       $__sb_has_emsreports = $__sb_is_super;
@@ -356,9 +372,9 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
           echo '<li><a href="../Reports/reports.php"><i class="fas fa-chart-pie"></i> <span>مركز التقارير</span></a></li>';
         }
       }
+      echo '<li><a href="../Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>';
+      }
       ?>
-
-      <li><a href="../Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
 
 
       <!--

@@ -204,3 +204,23 @@
 .ems-site .sidebar.closed .nav-group-head > i.nav-group-caret {
   display: none;
 }
+
+/* ═══ فاصل مجموعةٍ داخل بابٍ موحّد (unified_nav) ═══
+   المجموعات القائمة تبقى داخل الأبواب الستة عنونةً لا طيًّا متداخلًا —
+   عنصرُ عرضٍ صِرف: لا رابط فلا يمسّه كاشفُ الصفحة النشطة ولا إغلاقُ
+   الموبايل، ولونُه بلا !important فلا يصطدم بقواعد أيقونات السايدبار. */
+.ems-site .sidebar .nav-subhead {
+  padding: 8px 18px 4px;
+  font-size: 11px;
+  letter-spacing: .3px;
+  opacity: .65;
+  pointer-events: none;
+  list-style: none;
+}
+.ems-site .sidebar .nav-subhead span {
+  display: block;
+  border-bottom: 1px dashed rgba(255, 255, 255, .18);
+  padding-bottom: 3px;
+}
+/* السايدبار المطويّ: الفاصل نصٌّ محض فلا معنى له — يُزال من التدفّق */
+.ems-site .sidebar.closed .nav-subhead { display: none; }
