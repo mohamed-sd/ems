@@ -877,7 +877,7 @@ class EffectFanout
                             foreach ($opDue['lines'] as $ol) {
                                 if ($topL === null || $ol['amount'] > $topL['amount']) { $topL = $ol; }
                             }
-                            $unitMap = array('actual_work' => 'hour', 'standby' => 'hour', 'attendance' => 'day',
+                            $unitMap = array('actual' => 'hour', 'actual_work' => 'hour', 'standby' => 'hour', 'attendance' => 'day',
                                              'ton' => 'ton', 'trip' => 'trip', 'meter' => 'meter');
                             $opRow += array(
                                 'award_unit_type' => isset($unitMap[$topL['basis']]) ? $unitMap[$topL['basis']] : 'hour',
@@ -965,7 +965,7 @@ class EffectFanout
                             if ($topLine === null || $pl['amount'] > $topLine['amount']) { $topLine = $pl; }
                         }
                         if ($topLine !== null) {
-                            $basisMap = array('actual_work' => 'hours', 'standby' => 'hours',
+                            $basisMap = array('actual' => 'hours', 'actual_work' => 'hours', 'standby' => 'hours',
                                               'attendance' => 'hours', 'ton' => 'tons',
                                               'trip' => 'other', 'meter' => 'meters');
                             $basisType = isset($basisMap[$topLine['basis']]) ? $basisMap[$topLine['basis']] : 'other';

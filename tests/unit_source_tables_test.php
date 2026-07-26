@@ -103,21 +103,20 @@ check($a1[1] === array('actual_work','standby','tech_breakdown','supplier_stop',
     'client_stop','fuel_logistics_stop','planned_stop','force_majeure','unlogged'),
     'unit_time_log.ops_state: العشر حالاتٍ كما في §3.3 حرفًا بحرف');
 
-// ── تعارضٌ مرفوعٌ للمالك (لا يُصحَّح من عند المنفّذ) ──────────────────────────
-// §3.3 و§3.8 في الدستور ينصّان على قاموسٍ واحدٍ من عشر قيمٍ آخرُها 'unlogged'.
-// لكن contract_hour_policies المطبَّق فعلًا (22 صفًّا · يقرؤه EffectFanout ·
-// محميٌّ بالقانون ٢) ينحرف: يُسقط 'unlogged' ويضيف 'pending_approval','other'.
-// الأثر: محرّك الاشتقاق (§3.4) في المرحلة ③ سيبحث عن سياسةٍ لفترةٍ 'unlogged'
-// فلا يجدها — وهو القطعُ الصامت بعينه. يُثبَّت الانحرافُ هنا صراحةً حتى لا
-// يمرّ مجهولًا، ويُحسم بقرار المالك لا باجتهادٍ في الترميز.
+// ── التعارضُ المرفوع منذ تموز — **حُسم بقرار المالك 2026-07-27** ─────────────
+// كان القاموسان يفترقان (السجلُّ فيه 'unlogged' والسياساتُ بدونها) فتمرّ ساعةٌ
+// غيرُ مصنَّفةٍ بلا حكمٍ — القطعُ الصامت. القرار: توحيدُ القاموسين — أُضيفت
+// 'unlogged' لقاموس السياسات (ترحيل 2026_07_27) وبُذر حكمُها الصريح
+// (case_by_case) للعميل والمورد. فصار قاموسُ السياسات أوسعَ بقيمتَيه
+// الإداريتين (pending_approval · other) ولا نقصَ في اتجاه السجل.
 $p = $colsOf('contract_hour_policies');
 preg_match_all("/'([^']+)'/", $p['ops_state'], $a2);
 $onlyLog = array_values(array_diff($a1[1], $a2[1]));
 $onlyPol = array_values(array_diff($a2[1], $a1[1]));
-check($onlyLog === array('unlogged') && $onlyPol === array('pending_approval', 'other'),
-    'تعارضٌ موثَّقٌ معلومٌ: القاموسان يفترقان في unlogged ↔ pending_approval/other — مرفوعٌ للمالك');
-check(count(array_intersect($a1[1], $a2[1])) === 9,
-    'التسع المشتركة متطابقةٌ حرفًا بحرف (الاشتقاق يعمل عليها بلا قطع)');
+check($onlyLog === array() && $onlyPol === array('pending_approval', 'other'),
+    'التعارضُ حُسم: كلُّ قيم السجل لها مقابلٌ في السياسات (unlogged أُضيفت) — لا قطعَ صامتًا');
+check(count(array_intersect($a1[1], $a2[1])) === 10,
+    'القيمُ العشر المشتركة متطابقةٌ حرفًا بحرف');
 
 $u = $colsOf('unit_approvals');
 // + round_no بعد entry_id — ترحيل 2026_07_26 (حسمُ المسألة المرفوعة في تعليق

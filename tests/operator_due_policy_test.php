@@ -50,7 +50,7 @@ const WIN_TO   = '2027-02-14';
 $TESTEMP = 9901; // مشغّلُ اختبار المرحلة ① — معرّفٌ لا يصادم الحقيقيين
 
 $teardown = function () use ($conn, $CO, $TESTEMP) {
-    $conn->query("DELETE FROM operator_pay_policies WHERE company_id={$CO} AND employee_id={$TESTEMP}");
+    $conn->query("DELETE FROM contract_hour_policies WHERE company_id={$CO} AND operator_id={$TESTEMP}");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -73,8 +73,8 @@ check(!$r['ok'] && strpos($r['reason'], 'لا سياسةَ') !== false,
 
 head('① المحرّك — أساس التشغيل الفعلي بمعدله');
 // سياسة: actual_work × 100 → 8 × 100 = 800 (محسوبة يدويًّا)
-$gate->insert('operator_pay_policies', array(
-    'employee_id' => $TESTEMP, 'work_model' => 'hour', 'basis' => 'actual_work',
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+    'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'actual',
     'rate' => 100, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ①'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
 check($r['ok'] && $r['amount'] === 800.0, "8 ساعات × 100 = 800 (الناتج: {$r['amount']})");
@@ -82,8 +82,8 @@ check($r['currency'] === 'SDG' && $r['is_trial'] === true, 'العملة SDG و�
 
 head('① المحرّك — الاستعداد أساسٌ مستقل (§8.2: يجوز للمشغّل وحده)');
 // + سياسة standby × 40 → 2 × 40 = 80 ⇒ المجموع 880
-$gate->insert('operator_pay_policies', array(
-    'employee_id' => $TESTEMP, 'work_model' => 'hour', 'basis' => 'standby',
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+    'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'standby',
     'rate' => 40, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ①'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
 check($r['ok'] && $r['amount'] === 880.0, "800 + (2 استعداد × 40) = 880 (الناتج: {$r['amount']})");
@@ -92,15 +92,15 @@ check(count($r['lines']) === 2, 'سطران في التفصيل — الشفاف
 head('① المحرّك — الحدُّ الأدنى والأقصى يقصّان');
 // سياسة أخصّ بنطاق المشروع 4: actual_work × 100 بحدٍّ أقصى 500 ⇒ تغلب الافتراضية
 // و800 تُقصّ إلى 500 ⇒ المجموع 500 + 80 = 580
-$gate->insert('operator_pay_policies', array(
-    'employee_id' => $TESTEMP, 'work_model' => 'hour', 'basis' => 'actual_work',
-    'rate' => 100, 'max_amount' => 500, 'scope_project_id' => 4,
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+    'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'actual',
+    'rate' => 100, 'max_amount' => 500, 'scope_type' => 'project', 'scope_id' => 4,
     'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① أخصّ'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
 check($r['ok'] && $r['amount'] === 580.0,
     "الأخصُّ (مشروع 4، سقف 500) غلب الافتراضية: 500 + 80 = 580 (الناتج: {$r['amount']})");
 $clampLine = null;
-foreach ($r['lines'] as $l) { if ($l['basis'] === 'actual_work') { $clampLine = $l; } }
+foreach ($r['lines'] as $l) { if ($l['basis'] === 'actual') { $clampLine = $l; } }
 check($clampLine !== null && $clampLine['clamped'] === 'max' && $clampLine['scope'] === 'project',
     'سطرُ التفصيل يعلن القصَّ (max) والنطاقَ (project)');
 
@@ -112,9 +112,9 @@ check($r['ok'] && $r['amount'] === 880.0,
 
 head('① المحرّك — أساسُ الإنتاج (طن) لا يلمس الساعات');
 // مشغّل طنّ: ton × 5 → 120 طن × 5 = 600؛ ولا شيءَ عن الساعات (لا سياسة ساعة)
-$conn->query("DELETE FROM operator_pay_policies WHERE company_id={$CO} AND employee_id={$TESTEMP}");
-$gate->insert('operator_pay_policies', array(
-    'employee_id' => $TESTEMP, 'work_model' => 'ton', 'basis' => 'ton',
+$conn->query("DELETE FROM contract_hour_policies WHERE company_id={$CO} AND operator_id={$TESTEMP}");
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+    'operator_id' => $TESTEMP, 'work_model' => 'ton', 'pay_basis' => 'ton',
     'rate' => 5, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① طن'));
 $tonCtx = array('employee_id' => $TESTEMP, 'work_date' => '2027-03-01',
     'project_id' => 1, 'equipment_type' => 2,
@@ -129,16 +129,16 @@ check(!$r['ok'] && strpos($r['reason'], 'لا سياسةَ') !== false,
     'سياسةُ نموذجِ طنٍّ على واقعةِ ساعة: مرشِّحُ النموذج يستبعدها — لا حكمَ ولا تلفيق');
 
 head('① المحرّك — الحضورُ يومٌ واحدٌ لا ساعات');
-$conn->query("DELETE FROM operator_pay_policies WHERE company_id={$CO} AND employee_id={$TESTEMP}");
-$gate->insert('operator_pay_policies', array(
-    'employee_id' => $TESTEMP, 'work_model' => 'hour', 'basis' => 'attendance',
+$conn->query("DELETE FROM contract_hour_policies WHERE company_id={$CO} AND operator_id={$TESTEMP}");
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+    'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'attendance',
     'rate' => 250, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① حضور'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
 check($r['ok'] && $r['amount'] === 250.0, "حضورُ يومٍ = 250 مهما بلغت الساعات (الناتج: {$r['amount']})");
 
 head('① المحرّك — المركّبُ يُتخطّى معلَنًا');
-$gate->insert('operator_pay_policies', array(
-    'employee_id' => $TESTEMP, 'work_model' => 'hour', 'basis' => 'composite',
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+    'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'composite',
     'rate' => 999, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① مركب'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
 check($r['ok'] && $r['amount'] === 250.0 && count($r['skipped']) === 1
@@ -199,7 +199,7 @@ check($lr !== null && $lr['legal_source'] === false,
 head('③ سياسات الخمسين — بذرٌ تجريبيٌّ موسومٌ ومستحقاتٌ محسوبة');
 
 // المشغّلون الحقيقيون في النافذة — سياساتُهم تُبذر عطالةً (تُحذف وتُعاد)
-$conn->query("DELETE FROM operator_pay_policies WHERE company_id={$CO} AND note LIKE 'RECON50%'");
+$conn->query("DELETE FROM contract_hour_policies WHERE company_id={$CO} AND note LIKE 'RECON50%'");
 $empRows = $conn->query(
     "SELECT DISTINCT employee_id FROM timesheet
       WHERE `date` BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'
@@ -215,17 +215,17 @@ check($empN >= 4, "مشغّلو النافذة (بإسناد البذرة الي
 foreach ($empRows as $er) {
     $emp = (int) $er['employee_id'];
     foreach (array(
-        array('hour', 'actual_work', 100), array('hour', 'standby', 40),
+        array('hour', 'actual', 100), array('hour', 'standby', 40),
         array('ton', 'ton', 5), array('meter', 'meter', 20),
     ) as $p) {
-        $gate->insert('operator_pay_policies', array(
-            'employee_id' => $emp, 'work_model' => $p[0], 'basis' => $p[1],
+        $gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+            'operator_id' => $emp, 'work_model' => $p[0], 'pay_basis' => $p[1],
             'rate' => $p[2], 'currency' => 'SDG', 'is_trial' => 1,
             'effective_from' => WIN_FROM, 'effective_to' => WIN_TO,
             'note' => 'RECON50 — سياسة تجريبية تُستبدل من الشاشة'));
     }
 }
-$polN = (int) $conn->query("SELECT COUNT(*) c FROM operator_pay_policies
+$polN = (int) $conn->query("SELECT COUNT(*) c FROM contract_hour_policies
     WHERE company_id={$CO} AND note LIKE 'RECON50%'")->fetch_assoc()['c'];
 check($polN === $empN * 4, "سياساتُ البذرة ({$empN} مشغّل × 4 أسس): {$polN}");
 

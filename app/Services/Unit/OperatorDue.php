@@ -3,12 +3,12 @@
  * محرّك مستحقّات المشغّلين — OperatorDue (UX-02 §8.2)
  * ───────────────────────────────────────────────────────────────────────────
  * «تُعاد جدولَ سياساتٍ يدعم النماذج الثلاثة والأسس السبعة» — هذا المحرّك يقرأ
- * `operator_pay_policies` ويحسب مستحقَّ مشغّلِ يومٍ واحدٍ من واقعته:
+ * `contract_hour_policies` (وضعُ party_scope=operator · §15.2-ج) ويحسب مستحقَّ مشغّلِ يومٍ واحدٍ من واقعته:
  *
  *   المستحق = Σ لكل سياسةٍ منطبقة: (كمية أساسها × معدلها) مقصوصةً بحدَّيها
  *
  * كمياتُ الأسس من الواقعة نفسها:
- *   • actual_work / standby  ← ساعاتُ الحالة من سطور الزمن (§3.3)
+ *   • actual / standby       ← ساعاتُ الحالة من سطور الزمن (§3.3)
  *   • attendance             ← يومُ حضورٍ واحدٌ إن وُجد أيُّ سطرِ زمن
  *   • ton / trip / meter     ← كميةُ وحدة العقد إن طابقت وحدةَ الأساس
  *   • composite              ← محجوزٌ بلا صيغةٍ بعد — يُتخطّى معلَنًا لا يُحسب
@@ -47,11 +47,18 @@ class OperatorDue
         $equipType = isset($ctx['equipment_type']) ? (int) $ctx['equipment_type'] : 0;
         $workModel = isset($ctx['work_model']) ? (string) $ctx['work_model'] : '';
 
+        // ── المصدرُ الموحّد (UX-02 §15.2-ج · تصحيحُ 2026-07-27) ──
+        // الجدولُ نفسُه يحمل وضعَين: حكمُ الساعة (client/supplier بـops_state)
+        // وسياسةُ المشغّل (operator بـpay_basis) — ويميّزهما party_scope.
+        // القيمُ بأسماء الوثيقة: pay_basis · scope_type/scope_id · rate.
         $st = $conn->prepare(
-            "SELECT id, basis, work_model, rate, min_amount, max_amount, currency,
-                    scope_project_id, scope_equipment_type, is_trial
-               FROM operator_pay_policies
-              WHERE company_id=? AND employee_id=? AND COALESCE(is_deleted,0)=0
+            "SELECT id, pay_basis AS basis, work_model, rate, min_amount, max_amount, currency,
+                    CASE WHEN scope_type = 'project'    THEN scope_id END AS scope_project_id,
+                    CASE WHEN scope_type = 'equip_type' THEN scope_id END AS scope_equipment_type,
+                    is_trial
+               FROM contract_hour_policies
+              WHERE company_id=? AND party_scope='operator' AND operator_id=?
+                AND COALESCE(is_deleted,0)=0 AND deleted_at IS NULL
                 AND (effective_from IS NULL OR effective_from <= ?)
                 AND (effective_to   IS NULL OR effective_to   >= ?)");
         $st->bind_param('iiss', $companyId, $empId, $date, $date);
@@ -134,6 +141,7 @@ class OperatorDue
             $basis = $p['basis'];
             $qty = null;
             switch ($basis) {
+                case 'actual':        // اسمُ الوثيقة (§15.2-ج) — والقديمُ actual_work
                 case 'actual_work':
                     $qty = isset($states['actual_work']) ? (float) $states['actual_work'] : 0.0;
                     break;

@@ -3,7 +3,8 @@
  * Finance/operator_pay_policies_fin.php — سياسات مستحقات المشغّلين (UX-02 §8.2)
  * ───────────────────────────────────────────────────────────────────────────
  * «تُعاد جدولَ سياساتٍ يدعم النماذج الثلاثة والأسس السبعة» — هذه الشاشة تدير
- * `operator_pay_policies` الذي يقرؤه محرّك OperatorDue في مروحة الأثر:
+ * `contract_hour_policies` بوضع party_scope=operator (UX-02 §15.2-ج — جدولٌ
+ * واحدٌ بوضعَين: حكمُ الساعة للعميل/المورد وسياسةُ المشغّل) الذي يقرؤه OperatorDue:
  *   المستحق = Σ (كمية الأساس × معدله) مقصوصةً بالحدين — والأخصُّ نطاقًا يغلب.
  *
  * قاعدة الغلبة (قرار المالك 2026-07-26): السياسةُ تغلب — والمسار القديم
@@ -38,7 +39,7 @@ if (!$can_view) {
 }
 
 $MODELS = array('hour' => 'ساعة', 'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر');
-$BASES  = array('actual_work' => 'تشغيل فعلي', 'standby' => 'استعداد', 'attendance' => 'حضور',
+$BASES  = array('actual' => 'تشغيل فعلي', 'standby' => 'استعداد', 'attendance' => 'حضور',
                 'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر', 'composite' => 'مركّب');
 
 // ── إيقاف سياسة (soft — تبقى في السجل التاريخي) ──
@@ -46,7 +47,7 @@ if (isset($_GET['stop_policy'])) {
     if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
     $pid = intval($_GET['stop_policy']);
     try {
-        fin_gate($is_super_admin)->softDelete('operator_pay_policies', $pid);
+        fin_gate($is_super_admin)->softDelete('contract_hour_policies', $pid);
         header("Location: operator_pay_policies_fin.php?msg=أُوقفت+السياسة+✅");
     } catch (\Throwable $t) {
         error_log('operator_pay_policies stop: ' . $t->getMessage());
@@ -81,18 +82,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
         $v = trim(strval($_POST[$k] ?? ''));
         return preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) ? $v : null;
     };
+    // النطاقُ بأسماء الوثيقة: scope_type + scope_id (لا عمودان منفصلان)
+    $scopeProj = intval($_POST['scope_project_id'] ?? 0);
+    $scopeType = intval($_POST['scope_equipment_type'] ?? 0);
     $row = array(
-        'employee_id' => $emp,
+        'party_scope' => 'operator',       // وضعُ سياسة المشغّل في الجدول الموحّد
+        'operator_id' => $emp,
         'work_model'  => $model,
-        'basis'       => $basis,
+        'pay_basis'   => $basis,
         'rate'        => round((float) $rateRaw, 4),
         'currency'    => mb_substr($cur, 0, 10),
         'min_amount'  => $optNum('min_amount'),
         'max_amount'  => $optNum('max_amount'),
         'effective_from' => $optDate('effective_from'),
         'effective_to'   => $optDate('effective_to'),
-        'scope_project_id'     => intval($_POST['scope_project_id'] ?? 0) ?: null,
-        'scope_equipment_type' => intval($_POST['scope_equipment_type'] ?? 0) ?: null,
+        'scope_type'  => $scopeProj > 0 ? 'project' : ($scopeType > 0 ? 'equip_type' : null),
+        'scope_id'    => $scopeProj > 0 ? $scopeProj : ($scopeType > 0 ? $scopeType : null),
+        'ops_state'   => null,             // لا حالةَ ساعةٍ لصف المشغّل
+        'ruling'      => 'full',           // إلزاميٌّ في الجدول — محايدٌ لهذا الوضع
         'deductions_note' => mb_substr(trim(strval($_POST['deductions_note'] ?? '')), 0, 200) ?: null,
         'exceptions_note' => mb_substr(trim(strval($_POST['exceptions_note'] ?? '')), 0, 200) ?: null,
         'note'        => mb_substr(trim(strval($_POST['note'] ?? '')), 0, 200) ?: null,
@@ -102,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
         'created_by'  => $current_user_id,
     );
     try {
-        fin_gate($is_super_admin)->insert('operator_pay_policies', $row);
+        fin_gate($is_super_admin)->insert('contract_hour_policies', $row);
         header("Location: operator_pay_policies_fin.php?msg=أُضيفت+السياسة+✅");
     } catch (\Throwable $t) {
         error_log('operator_pay_policies add: ' . $t->getMessage());
@@ -116,13 +123,15 @@ $gate = fin_gate($is_super_admin);
 
 // السياسات (الحيّة والموقوفة تُعرضان — الموقوفة موسومة)
 $policies = $gate->scopedQuery(
-    array('scope' => array('p' => 'operator_pay_policies'), 'enrich' => array('e' => 'employees', 'pr' => 'project')),
-    "SELECT p.*, e.name AS emp_name, pr.name AS proj_name
-       FROM operator_pay_policies p
-       LEFT JOIN employees e ON e.id = p.employee_id
-       LEFT JOIN project pr ON pr.id = p.scope_project_id
-      WHERE {TENANT_SCOPE}
-      ORDER BY (p.deleted_at IS NOT NULL) ASC, e.name ASC, p.basis ASC");
+    array('scope' => array('p' => 'contract_hour_policies'), 'enrich' => array('e' => 'employees', 'pr' => 'project')),
+    "SELECT p.*, p.pay_basis AS basis, e.name AS emp_name, pr.name AS proj_name,
+            CASE WHEN p.scope_type = 'project' THEN p.scope_id END AS scope_project_id,
+            CASE WHEN p.scope_type = 'equip_type' THEN p.scope_id END AS scope_equipment_type
+       FROM contract_hour_policies p
+       LEFT JOIN employees e ON e.id = p.operator_id
+       LEFT JOIN project pr ON pr.id = (CASE WHEN p.scope_type = 'project' THEN p.scope_id END)
+      WHERE {TENANT_SCOPE} AND p.party_scope = 'operator'
+      ORDER BY (p.deleted_at IS NOT NULL) ASC, e.name ASC, p.pay_basis ASC");
 
 // المشغّلون (من سجل الدوام — نفس مصدر الشاشة القديمة)
 $operators = $gate->scopedQuery(
@@ -284,7 +293,7 @@ include '../insidebar.php';
                               (($p['min_amount'] !== null && $p['max_amount'] !== null) ? ' · ' : '') .
                               ($p['max_amount'] !== null ? '≤' . $p['max_amount'] : '');
                     echo "<tr" . ($stopped ? " style='opacity:.55;'" : '') . ">";
-                    echo "<td>" . htmlspecialchars($p['emp_name'] !== null && $p['emp_name'] !== '' ? $p['emp_name'] : ('#' . $p['employee_id'])) . "</td>";
+                    echo "<td>" . htmlspecialchars($p['emp_name'] !== null && $p['emp_name'] !== '' ? $p['emp_name'] : ('#' . $p['operator_id'])) . "</td>";
                     echo "<td>" . ($MODELS[$p['work_model']] ?? $p['work_model']) . "</td>";
                     echo "<td>" . ($BASES[$p['basis']] ?? $p['basis']) . "</td>";
                     echo "<td>" . rtrim(rtrim(number_format((float) $p['rate'], 4, '.', ''), '0'), '.') . "</td>";
