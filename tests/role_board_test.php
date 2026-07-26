@@ -30,9 +30,11 @@ ok('العلم: المذكور يفعَّل وغيره لا (حتميًّا بت
     roleBoardEnabled(17, '17') === true && roleBoardEnabled(1, '17') === false
     && roleBoardEnabled(17, '') === false && roleBoardEnabled(13, '17,13') === true);
 
-ok('خريطة اللوحات: 17 → المدير المالي · 13 → الصيانة · دورٌ بلا لوحةٍ → null',
+ok('خريطة اللوحات الأربع (17·13·16·23) · دورٌ بلا لوحةٍ → null',
     roleBoardRoute(17) === 'Finance/cfo_daily_board_fin.php'
-    && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php' && roleBoardRoute(1) === null);
+    && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php'
+    && roleBoardRoute(16) === 'Procurement/dashboard_proc.php'
+    && roleBoardRoute(23) === 'Transport/transfer_dashboard.php' && roleBoardRoute(1) === null);
 
 ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (18→17 · 14→13)',
     roleBoardRoute(18, 17) === 'Finance/cfo_daily_board_fin.php'
@@ -56,6 +58,15 @@ foreach ($mspecs as $s) { if (empty($s['href']) || empty($s['label'])) { $mbad++
 ok('تنبيهات الصيانة ثلاثةٌ كاملة — والرابع (قطعة منتظرة) غائبٌ عمدًا بلا مصدر',
     count($mspecs) === 3 && $mbad === 0
     && count(array_filter($mspecs, function ($s) { return $s['key'] === 'wait_parts'; })) === 0);
+
+// §8.10 المشتريات أربعةٌ نصًّا · §8.12 النقل ثلاثةٌ نصًّا — كلٌّ بسببٍ وقفزة
+$allOk = true;
+foreach (array(16 => 4, 23 => 3) as $r => $expected) {
+    $sp = roleBoardAlertSpecs($r);
+    if (count($sp) !== $expected) { $allOk = false; }
+    foreach ($sp as $s) { if (empty($s['href']) || empty($s['label'])) { $allOk = false; } }
+}
+ok('تنبيهات المشتريات (4) والنقل (3) بنصوص §8.10 و§8.12 — كاملةَ السبب والقفزة', $allOk);
 
 // التنبيهات الحية: ما عدده صفر يختفي («المُنجَز يختفي فورًا» §9)
 // بوابةٌ نظاميةٌ صريحة بشركة 4 (نمط tenant_leak_test — لا جلسةَ في CLI)

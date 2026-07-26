@@ -47,6 +47,33 @@ $cards = array(
     array('label' => 'الموردون التشغيليون',     'value' => $k_suppliers,'icon' => 'fa fa-truck-field',         'href' => 'suppliers.php'),
 );
 
+/* ── لوحة الدور بالمكوّنات السبعة (UX-00 §7 · UX-01 §8.10) ──────────────────
+   البطاقات أعلاه = المكوّن ① «مؤشرات اليوم» (قائمةٌ من قبل — تبقى ويُضاف
+   الناقص بقرار المالك). ②-⑦ عبر المحرك الموحّد والقالب المشترك. */
+require_once __DIR__ . '/../includes/role_board.php';
+require_once __DIR__ . '/../includes/finreq_badges.php';
+
+$rb_uid       = intval($ctx['user_id'] ?? ($_SESSION['user']['id'] ?? 0));
+$rb_badges    = ems_finreq_nav_badges($conn);
+$rb_tasks     = roleBoardTasks($conn, $g, 16);
+$rb_approvals = roleBoardApprovals($conn, $g, 16, $rb_badges);
+$rb_alerts    = roleBoardAlerts($conn, $g, 16);
+$rb_quick     = roleBoardQuickActions($conn, 16, $rb_uid);
+$rb_recent    = roleBoardRecent($conn, $rb_uid);
+
+// ⑥ نبض الأداء — طلباتُ شراءٍ وردت مقابل صرفياتٍ نُفِّذت (7 أيام)
+$rb_pulse = array('labels' => array(), 'in' => array(), 'out' => array());
+for ($d = 6; $d >= 0; $d--) {
+    $day = date('Y-m-d', strtotime("-{$d} days"));
+    $rb_pulse['labels'][] = date('m/d', strtotime($day));
+    $rb_pulse['in'][]  = roleBoardScalar($g, array('scope' => array('r' => 'proc_request')),
+        "SELECT COUNT(*) FROM proc_request r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND DATE(r.created_at)=?", array($day));
+    $rb_pulse['out'][] = roleBoardScalar($g, array('scope' => array('i' => 'proc_issue')),
+        "SELECT COUNT(*) FROM proc_issue i WHERE {TENANT_SCOPE} AND COALESCE(i.is_deleted,0)=0 AND DATE(i.created_at)=?", array($day));
+}
+$rb_pulse_title  = 'نبض الأداء — طلباتٌ واردة مقابل صرفيات (7 أيام)';
+$rb_pulse_series = array('طلبات واردة', 'صرفيات');
+
 $page_title = 'إيكوبيشن | لوحة المشتريات';
 include '../inheader.php';
 include '../insidebar.php';
@@ -73,6 +100,8 @@ include '../insidebar.php';
             <?php endforeach; ?>
         </div>
     </div>
+
+    <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
 
     <div class="filter">
         <div class="filter-title">
@@ -153,6 +182,7 @@ include '../insidebar.php';
     @media (max-width: 560px) { .proc-dashboard-main .stats-grid { grid-template-columns: 1fr; } }
 </style>
 
+<script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>

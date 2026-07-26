@@ -90,6 +90,32 @@ foreach ($kanban_stages as $st) {
          ORDER BY o.id DESC LIMIT 12", array($st));
 }
 
+/* ── لوحة الدور بالمكوّنات السبعة (UX-00 §7 · UX-01 §8.12) ──────────────────
+   البطاقات أعلاه = المكوّن ① «مؤشرات اليوم». ②-⑦ عبر المحرك والقالب المشترك. */
+require_once __DIR__ . '/../includes/role_board.php';
+require_once __DIR__ . '/../includes/finreq_badges.php';
+
+$rb_uid       = intval($ctx['user_id'] ?? ($_SESSION['user']['id'] ?? 0));
+$rb_badges    = ems_finreq_nav_badges($conn);
+$rb_tasks     = roleBoardTasks($conn, $trs_dash_gate, 23);
+$rb_approvals = roleBoardApprovals($conn, $trs_dash_gate, 23, $rb_badges);
+$rb_alerts    = roleBoardAlerts($conn, $trs_dash_gate, 23);
+$rb_quick     = roleBoardQuickActions($conn, 23, $rb_uid);
+$rb_recent    = roleBoardRecent($conn, $rb_uid);
+
+// ⑥ نبض الأداء — رحلاتٌ انطلقت مقابل وصلت (7 أيام)
+$rb_pulse = array('labels' => array(), 'in' => array(), 'out' => array());
+for ($d = 6; $d >= 0; $d--) {
+    $day = date('Y-m-d', strtotime("-{$d} days"));
+    $rb_pulse['labels'][] = date('m/d', strtotime($day));
+    $rb_pulse['in'][]  = (float) trs_scoped_scalar($trs_dash_gate,
+        "SELECT COUNT(*) FROM transfer_orders o WHERE {TENANT_SCOPE} AND DATE(o.departure_datetime)=?", array($day));
+    $rb_pulse['out'][] = (float) trs_scoped_scalar($trs_dash_gate,
+        "SELECT COUNT(*) FROM transfer_orders o WHERE {TENANT_SCOPE} AND DATE(o.arrival_datetime)=?", array($day));
+}
+$rb_pulse_title  = 'نبض الأداء — انطلقت مقابل وصلت (7 أيام)';
+$rb_pulse_series = array('انطلقت', 'وصلت');
+
 $page_title = 'إيكوبيشن | لوحة الرحلات';
 include '../inheader.php';
 include '../insidebar.php';
@@ -138,8 +164,10 @@ $stage_colors = array(
         <?php endforeach; ?>
     </div>
 
+    <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
+
     <!-- عدّاد المراحل + التكلفة حسب المتحمِّل -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:16px;margin-top:14px">
         <div class="card"><div class="card-body">
             <div class="card-header" style="border:none;padding:0 0 10px"><h5><i class="fa fa-diagram-project"></i> تكلفة الترحيل لكل مشروع (USD)</h5></div>
             <?php if (empty($by_project)): ?>
@@ -208,5 +236,6 @@ $stage_colors = array(
     </div></div>
 </div>
 
+<script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
 </body>
 </html>

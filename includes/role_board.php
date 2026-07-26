@@ -49,7 +49,8 @@ function roleBoardRoute($roleId, $parentRoleId = null)
     $map = array(
         17 => 'Finance/cfo_daily_board_fin.php',
         13 => 'Maintenance/dashboard_mnt.php',
-        // القادمة: 16 المشتريات و23 الرحلات (لوحتاهما قائمتان — تُكملان بالمكوّنات)
+        16 => 'Procurement/dashboard_proc.php',
+        23 => 'Transport/transfer_dashboard.php',
     );
     $rid = intval($roleId);
     if (isset($map[$rid])) { return $map[$rid]; }
@@ -95,6 +96,19 @@ function roleBoardAlertSpecs($roleId)
             array('key' => 'critical_down', 'label' => 'معدةٌ حرجةٌ متوقفة',        'href' => '../Maintenance/orders.php',           'tone' => 'err'),
             array('key' => 'order_overdue', 'label' => 'أمرٌ مفتوحٌ فوق مدته',      'href' => '../Maintenance/orders.php',           'tone' => 'warn'),
             array('key' => 'pm_late',       'label' => 'وقائيةٌ متأخرة',            'href' => '../Maintenance/preventive_plans.php', 'tone' => 'warn'),
+        ),
+        // §8.10 · مسؤول المشتريات — الأربعة نصًّا
+        16 => array(
+            array('key' => 'reorder_hit',   'label' => 'صنفٌ بلغ حدَّ الطلب',          'href' => '../Procurement/reordering_proc.php',      'tone' => 'err'),
+            array('key' => 'po_late',       'label' => 'أمرُ شراءٍ متأخرُ التوريد',    'href' => '../Procurement/orders_proc.php',          'tone' => 'warn'),
+            array('key' => 'custody_over',  'label' => 'استلامٌ مؤقتٌ تجاوز مهلته',    'href' => '../Procurement/receipt_custody_proc.php', 'tone' => 'warn'),
+            array('key' => 'issue_waiting', 'label' => 'طلبُ صرفٍ ينتظر',              'href' => '../Procurement/issue_proc.php',           'tone' => 'warn'),
+        ),
+        // §8.12 · مدير النقل والترحيل — الثلاثة نصًّا
+        23 => array(
+            array('key' => 'trip_late',     'label' => 'رحلةٌ متأخرةٌ عن موعدها',      'href' => '../Transport/transfer_orders_list.php', 'tone' => 'err'),
+            array('key' => 'req_waiting',   'label' => 'طلبُ ترحيلٍ ينتظر اعتمادك',    'href' => '../Transport/transfer_requests.php',    'tone' => 'warn'),
+            array('key' => 'undocumented',  'label' => 'تسليمٌ بلا توثيق',             'href' => '../Transport/transfer_orders_list.php', 'tone' => 'warn'),
         ),
     );
     return isset($specs[intval($roleId)]) ? $specs[intval($roleId)] : array();
@@ -155,6 +169,51 @@ function roleBoardAlerts($conn, $gate, $roleId)
         $counts['pm_late'] = (int) roleBoardScalar($gate, array('scope' => array('p' => 'mnt_plan')),
             "SELECT COUNT(*) FROM mnt_plan p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
              AND p.next_due_date IS NOT NULL AND p.next_due_date < CURDATE()");
+
+        foreach (roleBoardAlertSpecs($rid) as $spec) {
+            $n = isset($counts[$spec['key']]) ? intval($counts[$spec['key']]) : 0;
+            if ($n > 0) { $spec['count'] = $n; $out[] = $spec; }
+        }
+    }
+
+    if ($rid === 16) {
+        $counts = array();
+        // الرصيد محسوبٌ من الحركات (صيغة stock_proc: استلام + إرجاع − صرف) مقارنًا
+        // بنقطة الطلب — الاستعلام الفرعي بجدوله المعلَن (عقد scopedQuery)
+        $counts['reorder_hit'] = (int) roleBoardScalar($gate,
+            array('scope' => array('op' => 'proc_orderpoint'), 'enrich' => array('m' => 'proc_stock_move')),
+            "SELECT COUNT(*) FROM proc_orderpoint op WHERE {TENANT_SCOPE} AND COALESCE(op.is_deleted,0)=0
+             AND (SELECT COALESCE(SUM(CASE WHEN m.move_type IN('استلام','إرجاع') THEN m.qty ELSE -m.qty END),0)
+                    FROM proc_stock_move m WHERE m.item_id = op.item_id AND m.company_id = op.company_id) <= op.min_qty");
+        // لا عمودَ موعدِ توريدٍ على الأمر — «متأخر» = مؤكَّدٌ بلا استلامٍ فوق 7 أيام (تقريبٌ موثَّق)
+        $counts['po_late'] = (int) roleBoardScalar($gate, array('scope' => array('o' => 'proc_order')),
+            "SELECT COUNT(*) FROM proc_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0
+             AND o.state = 'مؤكَّد' AND o.updated_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+        $counts['custody_over'] = (int) roleBoardScalar($gate, array('scope' => array('rc' => 'proc_receipt_custody')),
+            "SELECT COUNT(*) FROM proc_receipt_custody rc WHERE {TENANT_SCOPE} AND COALESCE(rc.is_deleted,0)=0
+             AND rc.state <> 'مسلَّمة للوجهة' AND rc.receipt_date < DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
+        // طلباتُ الشراء الواردة تنتظر قرار المشتريات (بحالاتها العربية الحية)
+        $counts['issue_waiting'] = (int) roleBoardScalar($gate, array('scope' => array('r' => 'proc_request')),
+            "SELECT COUNT(*) FROM proc_request r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0
+             AND r.state IN('مقدَّم','اعتماد المشتريات')");
+
+        foreach (roleBoardAlertSpecs($rid) as $spec) {
+            $n = isset($counts[$spec['key']]) ? intval($counts[$spec['key']]) : 0;
+            if ($n > 0) { $spec['count'] = $n; $out[] = $spec; }
+        }
+    }
+
+    if ($rid === 23) {
+        $counts = array();
+        $counts['trip_late'] = (int) roleBoardScalar($gate, array('scope' => array('o' => 'transfer_orders')),
+            "SELECT COUNT(*) FROM transfer_orders o WHERE {TENANT_SCOPE}
+             AND o.planned_date IS NOT NULL AND o.planned_date < CURDATE()
+             AND o.stage NOT IN('arrived','closed','cancelled')");
+        $counts['req_waiting'] = (int) roleBoardScalar($gate, array('scope' => array('r' => 'transfer_requests')),
+            "SELECT COUNT(*) FROM transfer_requests r WHERE {TENANT_SCOPE} AND r.state = 'submitted'");
+        // «تسليمٌ بلا توثيق» = وصلت ولم تُغلق بتوثيق تسليمها (تقريبٌ موثَّق حتى يُبنى سجل التسليم)
+        $counts['undocumented'] = (int) roleBoardScalar($gate, array('scope' => array('o' => 'transfer_orders')),
+            "SELECT COUNT(*) FROM transfer_orders o WHERE {TENANT_SCOPE} AND o.stage = 'arrived'");
 
         foreach (roleBoardAlertSpecs($rid) as $spec) {
             $n = isset($counts[$spec['key']]) ? intval($counts[$spec['key']]) : 0;
@@ -281,6 +340,35 @@ function roleBoardTasks($conn, $gate, $roleId)
             "SELECT COUNT(*) FROM mnt_plan p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
              AND p.next_due_date IS NOT NULL AND p.next_due_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)");
         if ($n > 0) { $out[] = array('label' => 'وقائيةُ الأسبوع المستحقة', 'count' => $n, 'href' => '../Maintenance/preventive_plans.php', 'icon' => 'fa fa-calendar-check'); }
+    }
+
+    if ($rid === 16) {
+        // خيطُ القطعة بحالاته العربية الحية: وارد ← أمرٌ مؤكَّد ← عهدةٌ مفتوحة
+        $map = array(
+            array("r.state IN('مقدَّم','اعتماد المشتريات')", 'proc_request', 'r', 'طلباتُ شراءٍ واردةٌ تنتظر قرارك', '../Procurement/requests_proc.php', 'fa fa-file-lines'),
+            array("o.state = 'مؤكَّد'",                      'proc_order',   'o', 'أوامرُ مؤكَّدةٌ تنتظر الاستلام',   '../Procurement/orders_proc.php',   'fa fa-file-invoice-dollar'),
+            array("rc.state <> 'مسلَّمة للوجهة'",            'proc_receipt_custody', 'rc', 'عهدُ استلامٍ مفتوحة',   '../Procurement/receipt_custody_proc.php', 'fa fa-truck-ramp-box'),
+        );
+        foreach ($map as $m) {
+            $n = (int) roleBoardScalar($gate, array('scope' => array($m[2] => $m[1])),
+                "SELECT COUNT(*) FROM {$m[1]} {$m[2]} WHERE {TENANT_SCOPE} AND COALESCE({$m[2]}.is_deleted,0)=0 AND {$m[0]}");
+            if ($n > 0) { $out[] = array('label' => $m[3], 'count' => $n, 'href' => $m[4], 'icon' => $m[5]); }
+        }
+    }
+
+    if ($rid === 23) {
+        // دورة الرحلة بمراحلها: طلبٌ وارد ← جاهزةٌ للانطلاق ← جاريةٌ ← وصلت تنتظر الإغلاق
+        $map = array(
+            array("r.state = 'submitted'", 'transfer_requests', 'r', 'طلباتُ ترحيلٍ تنتظر اعتمادك', '../Transport/transfer_requests.php', 'fa fa-inbox'),
+            array("o.stage IN('planned','ready')", 'transfer_orders', 'o', 'رحلاتٌ مخطَّطةٌ تنتظر الانطلاق', '../Transport/transfer_orders_list.php', 'fa fa-route'),
+            array("o.stage = 'in_transit'", 'transfer_orders', 'o', 'رحلاتٌ جاريةٌ الآن', '../Transport/transfer_orders_list.php', 'fa fa-truck-fast'),
+            array("o.stage = 'arrived'", 'transfer_orders', 'o', 'وصلت — تنتظر توثيقَ التسليم والإغلاق', '../Transport/transfer_orders_list.php', 'fa fa-flag-checkered'),
+        );
+        foreach ($map as $m) {
+            $n = (int) roleBoardScalar($gate, array('scope' => array($m[2] => $m[1])),
+                "SELECT COUNT(*) FROM {$m[1]} {$m[2]} WHERE {TENANT_SCOPE} AND {$m[0]}");
+            if ($n > 0) { $out[] = array('label' => $m[3], 'count' => $n, 'href' => $m[4], 'icon' => $m[5]); }
+        }
     }
     return $out;
 }
