@@ -272,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     if ($users_has_employee_id && $employee_link_id <= 0) {
         echo "<script>alert('⚠️ يجب إسناد موظف لهذا الحساب — لا يوجد حساب يعمل بلا موظف مُسنَد له');</script>";
     } elseif ($requires_project_context && ($project <= 0 || $contract <= 0)) {
-        echo "<script>alert('⚠️ هذا الدور مرتبط بمشروع محدد، يرجى اختيار المشروع والعقد');</script>";
+        echo "<script>alert('⚠️ هذه الإدارة مرتبطة بمشروع محدد، يرجى اختيار المشروع والعقد');</script>";
     } elseif ($employee_link_id > 0 && !$employee_link_valid) {
         echo "<script>alert('⚠️ الموظف المحدد غير صالح أو مرتبط بحساب آخر');</script>";
     } elseif ($uid > 0) {
@@ -394,7 +394,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             عند التعديل</small>
                     </div>
                     <div>
-                        <label><i class="fas fa-user-shield"></i> الدور / الصلاحية</label>
+                        <label><i class="fas fa-user-shield"></i> الإدارة / الصلاحية</label>
                         <select name="role" id="role" class="form-control" required>
                             <option value="">-- حدد الصلاحية --</option>
                             <?php foreach ($roles as $role_id => $role_name): ?>
@@ -483,9 +483,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-user-shield"></i> الدور</label>
+                <label><i class="fa fa-user-shield"></i> الإدارة</label>
                 <select id="filterRole" class="form-control">
-                    <option value="">-- كل الأدوار --</option>
+                    <option value="">-- كل الإدارات --</option>
                 </select>
             </div>
             <div class="filter-field">
@@ -523,7 +523,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <th>الاسم </th>
                             <th>اسم المستخدم </th>
                             <th>كلمه المرور </th>
-                            <th>الدور </th>
+                            <th>الإدارة </th>
                             <th>الموظف المرتبط</th>
                             <th>رقم الهاتف</th>
                             <th>الحالة</th>

@@ -104,6 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         'reference_contact'      => trim($_POST['reference_contact']),
         'general_notes'          => trim($_POST['general_notes']),
         'employee_status'        => $_POST['employee_status'],
+        // تصنيف مسار التوظيف (ENUM): الفراغ يُكتب NULL لا '' — فالـENUM يبتلع
+        // القيمة الخارجة عن قائمته سلسلةً فارغةً بلا خطأ، فيبدو الحفظ ناجحًا
+        // ويسقط التصنيف صامتًا.
+        'employment_classification' => (isset($_POST['employment_classification']) && $_POST['employment_classification'] !== '')
+                                        ? $_POST['employment_classification'] : null,
         'start_date'             => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
         'status'                 => $_POST['status'],
     );
@@ -290,6 +295,26 @@ include("../inheader.php");
         height: 18px;
         cursor: pointer;
         accent-color: var(--or);
+    }
+
+    /* شارة تصنيف مسار التوظيف — نفس هيئة .status-pill المعتمدة، وألوانها
+       تُحقن سطريًّا لكل قيمة لأنها دلالةُ مرحلةٍ لا حالةَ تفعيل. */
+    .emp-class-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-size: .74rem;
+        font-weight: 800;
+        white-space: nowrap;
+        border: 1px solid rgba(0, 0, 0, .06);
+    }
+
+    .emp-class-pill.emp-class-none {
+        background: #f9fafb;
+        color: #9ca3af;
+        font-weight: 700;
     }
 
     .link-alert-chip {
@@ -859,6 +884,21 @@ include('../insidebar.php');
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
+                                <label><i class="fas fa-user-tag"></i> تصنيف الموظف</label>
+                                <select name="employment_classification" id="employment_classification">
+                                    <option value="">-- اختر التصنيف --</option>
+                                    <option value="مرشح">📝 مرشح</option>
+                                    <option value="متدرب">🎓 متدرب</option>
+                                    <option value="مقبول">✅ مقبول</option>
+                                    <option value="مستقيل">🚪 مستقيل</option>
+                                    <option value="مفصول">⛔ مفصول</option>
+                                </select>
+                                <small style="color:#666; display:block; margin-top:5px;">
+                                    <i class="fas fa-info-circle"></i>
+                                    مسار التوظيف من التقديم إلى الاعتماد — مستقلٌّ عن حالة المشغل التشغيلية
+                                </small>
+                            </div>
+                            <div>
                                 <label><i class="fas fa-info-circle"></i> حالة المشغل <span
                                         style="color: red;">*</span></label>
                                 <select name="employee_status" id="employee_status" required>
@@ -946,6 +986,10 @@ include('../insidebar.php');
                 <select id="empFilterProject" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
+                <label><i class="fa fa-user-tag"></i> التصنيف</label>
+                <select id="empFilterEmpClass" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
                 <label><i class="fa fa-user-check"></i> حالة الموظف</label>
                 <select id="empFilterEmpStatus" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
@@ -974,6 +1018,7 @@ include('../insidebar.php');
                         <th>المورد</th>
                         <th>المشروع</th>
                         <th>عدد العقود</th>
+                        <th>التصنيف</th>
                         <th>الحالة</th>
                     </tr>
                 </thead>
@@ -1043,6 +1088,24 @@ include('../insidebar.php');
                             }
                         }
 
+                        // شارة تصنيف مسار التوظيف — ألوانها تتبع دلالة المرحلة:
+                        // قيد المسار (رمادي/أزرق) · معتمد (أخضر) · منتهٍ (أحمر).
+                        $cls_value = (string) ($row['employment_classification'] ?? '');
+                        $cls_map = array(
+                            'مرشح'   => array('#eef2ff', '#3730a3', '📝'),
+                            'متدرب'  => array('#fff7ed', '#9a3412', '🎓'),
+                            'مقبول'  => array('#ecfdf5', '#065f46', '✅'),
+                            'مستقيل' => array('#f3f4f6', '#4b5563', '🚪'),
+                            'مفصول'  => array('#fef2f2', '#991b1b', '⛔'),
+                        );
+                        if ($cls_value !== '' && isset($cls_map[$cls_value])) {
+                            list($cls_bg, $cls_fg, $cls_icon) = $cls_map[$cls_value];
+                            $classificationBadge = "<span class='emp-class-pill' style='background:$cls_bg;color:$cls_fg;'>"
+                                . $cls_icon . ' ' . htmlspecialchars($cls_value) . '</span>';
+                        } else {
+                            $classificationBadge = "<span class='emp-class-pill emp-class-none'>— غير مصنّف</span>";
+                        }
+
                         // سمات الصفّ لفلاتر اللوحة الموحّدة (تُقرأ في بحث DataTables المخصّص)
                         $st_label = $row['status'] == "1" ? 'مفعّل' : 'موقف';
                         $row_data = "data-type='"        . htmlspecialchars((string) ($row['employee_type'] ?? ''), ENT_QUOTES) . "' "
@@ -1054,6 +1117,7 @@ include('../insidebar.php');
                                   . "data-supplier='"    . htmlspecialchars((string) ($row['supplier_name'] ?? ''), ENT_QUOTES) . "' "
                                   . "data-project='"     . htmlspecialchars((string) ($row['project_name'] ?? ''), ENT_QUOTES) . "' "
                                   . "data-empstatus='"   . htmlspecialchars((string) ($row['employee_status'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-empclass='"    . htmlspecialchars($cls_value, ENT_QUOTES) . "' "
                                   . "data-status='"      . htmlspecialchars($st_label, ENT_QUOTES) . "'";
 
                         echo "<tr $row_data>";
@@ -1065,6 +1129,7 @@ include('../insidebar.php');
                         echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
                         echo "<td>" . $project_display . "</td>";
                         echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
+                        echo "<td>" . $classificationBadge . "</td>";
                         echo "<td>" . $statusBadge . "</td>";
                         echo "</tr>";
                     } }
@@ -1156,6 +1221,7 @@ include('../insidebar.php');
                 { key: 'salarytype',  sel: '#empFilterSalaryType' },
                 { key: 'supplier',    sel: '#empFilterSupplier' },
                 { key: 'project',     sel: '#empFilterProject' },
+                { key: 'empclass',    sel: '#empFilterEmpClass' },
                 { key: 'empstatus',   sel: '#empFilterEmpStatus' },
                 { key: 'status',      sel: '#empFilterStatus' }
             ];
@@ -1294,6 +1360,7 @@ include('../insidebar.php');
                         $("#reference_contact").val(driver.reference_contact);
                         $("#general_notes").val(driver.general_notes);
                         $("#employee_status").val(driver.employee_status);
+                        $("#employment_classification").val(driver.employment_classification || "");
                         $("#start_date").val(driver.start_date);
                         $("#status").val(driver.status);
 
