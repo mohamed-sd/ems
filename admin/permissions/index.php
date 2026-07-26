@@ -343,6 +343,35 @@ require_once __DIR__ . '/../includes/layout_head.php';
             </div>
         </a>
 
+        <!-- قوائم التنقل الموحّدة -->
+        <a href="nav_items.php" class="permission-card modules">
+            <div class="permission-card-header">
+                <div class="permission-card-icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <div>
+                    <div class="permission-card-title">قوائم التنقل الموحّدة</div>
+                    <div class="permission-card-subtitle">الأبواب الستة لكل دور</div>
+                </div>
+            </div>
+            <div class="permission-card-body">
+                <p class="permission-card-desc">
+                    المصدر الواحد لسايدبار كل دور: العنصر التابع للدور يظهر لمن يملك صلاحية العرض — تفعيلٌ وتعطيلٌ فردي وتوزيعٌ على الأبواب.
+                </p>
+                <ul class="permission-card-features">
+                    <li>الأبواب الستة الثابتة لكل دور</li>
+                    <li>تفعيل وتعطيل كل رابطٍ فرديًّا</li>
+                    <li>الحالة الفعلية: يظهر / محجوب صلاحيةً</li>
+                    <li>فحص أسماء العرض من المحظور المعماري</li>
+                </ul>
+                <div class="permission-card-footer">
+                    <div class="permission-card-link">
+                        <i class="fas fa-arrow-left"></i> إدارة القوائم
+                    </div>
+                </div>
+            </div>
+        </a>
+
         <!-- الصلاحيات المفصلة -->
         <a href="role_permissions.php" class="permission-card detailed">
             <div class="permission-card-header">

@@ -21,9 +21,12 @@
 
 require_once __DIR__ . '/dynamic_nav.php';
 
-/** الأبواب الستة الثابتة (UX-00 §6) بترتيبها وأيقوناتها. */
+/** الأبواب الستة الثابتة (UX-00 §6) بترتيبها وأيقوناتها.
+ * HOME هنا للوحات الإدارات القائمة كشاشات (لوحة المدير المالي · المشتريات ·
+ * الرحلات) — تظهر قبل الأبواب لا داخل مجموعةٍ مطوية، فرابط اللوحة أول ما يُرى. */
 function unifiedNavDoors() {
     return array(
+        'HOME'  => array('name' => 'لوحة الإدارة',        'icon' => 'fa fa-gauge-high', 'flat' => true),
         'DAILY' => array('name' => 'العمل اليومي',        'icon' => 'fa fa-briefcase'),
         'APPR'  => array('name' => 'المتابعة والموافقات', 'icon' => 'fa fa-clipboard-check'),
         'REC'   => array('name' => 'السجلات الرئيسية',    'icon' => 'fa fa-database'),
@@ -125,9 +128,15 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
     $byDoor = array();
     foreach ($items as $it) { $byDoor[$it['door']][] = $it; }
     foreach (unifiedNavDoors() as $doorKey => $meta) {
-        if (!empty($byDoor[$doorKey])) {
-            printUnifiedNavDoor($doorKey, $meta, $byDoor[$doorKey], $basePrefix, $badges);
+        if (empty($byDoor[$doorKey])) { continue; }
+        if (!empty($meta['flat'])) {
+            // بابٌ مسطّح: عناصره تُطبع مباشرةً بلا رأس طيٍّ (لوحة الإدارة أول ما يُرى)
+            foreach ($byDoor[$doorKey] as $it) {
+                printNavLinkItem(array('code' => $it['route'], 'name' => $it['label_ar'], 'icon' => $it['icon']), $basePrefix, $badges);
+            }
+            continue;
         }
+        printUnifiedNavDoor($doorKey, $meta, $byDoor[$doorKey], $basePrefix, $badges);
     }
     return true;
 }

@@ -65,10 +65,18 @@ ok('غير التابع للدور 1 معطَّل رغم صلاحية العرض
 ok('الدور الرائد: 17 عنصرًا نشطًا (قائمة اليوم نفسها — لا زيادة ولا فقدان)',
     intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id = 1 AND active = 1")->fetch_row()[0]) === 17);
 
-echo "── ③ العزل والتشغيل المزدوج ──\n";
+echo "── ③ الشمول والتشغيل المزدوج ──\n";
 
-ok('المصدر الموحّد للدور الرائد وحده — صفر صفوف لأدوارٍ أخرى',
-    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id <> 1")->fetch_row()[0]) === 0);
+// التعميم (2026-07-26): كل الأدوار النشطة مبذورة — لا دورَ نشطًا بلا قائمة.
+ok('كل الأدوار النشطة (عدا السوبر) مبذورةٌ في المصدر الموحّد',
+    intval($conn->query("SELECT COUNT(*) FROM roles r WHERE (r.status='1' OR r.status=1) AND r.id <> -1
+        AND NOT EXISTS (SELECT 1 FROM nav_items n WHERE n.role_id = r.id)")->fetch_row()[0]) === 0);
+
+// برهان التعميم قِيس 19 دورًا 1:1 عبر HTTP — والفقد الوحيد روابطُ ميتة
+// (بلا can_view) أصلحها الترشيح. هذا التأكيد يحرس ألا يعود الميتُ خلسة:
+// كلُّ عنصرٍ نشطٍ لدورٍ فاقدِ الصلاحية يبقى محجوبًا لا ظاهرًا (بنية الاستعلام).
+ok('لوحات الإدارات (HOME) مبذورةٌ لأصحابها الثلاثة',
+    intval($conn->query("SELECT COUNT(DISTINCT role_id) FROM nav_items WHERE door='HOME' AND active=1")->fetch_row()[0]) >= 3);
 
 ok('العلم: دورٌ مذكور يفعَّل ودورٌ غيره لا (اختبارٌ حتمي بتجاوز البيئة)',
     unifiedNavEnabled(1, '1') === true && unifiedNavEnabled(17, '1') === false
