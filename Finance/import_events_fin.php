@@ -2,7 +2,10 @@
 /**
  * Finance/import_events_fin.php — الربط التلقائي من الإدارات (نموذج السحب) — §16.
  * ★ صفر كتابة على أي جدول قائم ★ — المالية تقرأ proc_order/mnt_order (SELECT فقط)
- * وتُنشئ أحداثاً في fin_financial_events فقط. إزالة التكرار عبر source_ref.
+ * وتولّد أحداثها عبر الناشر EventPublisher حصرًا (ADR-15: الحقيقة تسبق إسقاطها —
+ * كل حدثٍ يحمل root_event_id ونسبَ مستنده entity_type/entity_id). إزالة التكرار
+ * مزدوجة: مطابقة source_ref للعرض + عطالة بنيوية بمفتاح (المستند × النوع).
+ * سُدّ هنا خرقُ الكتابة المباشرة على الدفتر (v8 §15-أ · UX-02 §9-①).
  */
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
@@ -37,58 +40,85 @@ function fin_pending_import($gate, $srcTable, $amtCol, $module)
     return $out;
 }
 
-/** أحداث المشتريات غير المستوردة (proc_order → مصروف). قراءة فقط على proc_order. */
-function fin_import_proc($gate, $uid)
+/**
+ * توليد حدث استيرادٍ واحد عبر الناشر (القناة المحكومة) — لا كتابة مباشرة.
+ * الشركة من صفّ المستند لا من الجلسة (يصحّ للسوبر، ويطابق درس cron/forSystem).
+ * كل حدثٍ في معاملته: الجذر وإسقاطه ذرّيان معًا، وفشل صفٍّ لا يُسقط البقية.
+ */
+function fin_import_publish($conn, array $rows, array $cfg, $uid)
 {
+    require_once __DIR__ . '/../app/Core/EventPublisher.php';
     $n = 0;
-    foreach (fin_pending_import($gate, 'proc_order', 'total_amount', 'procurement') as $po) {
-        $gate->insert('fin_financial_events', array(
-            'event_no'      => 'FIN-EV-IMP-' . intval($po['id']),
-            'event_type'    => 'expense',
-            'source_module' => 'procurement',
-            'source_ref'    => $po['code'],
-            'amount'        => $po['total_amount'],
-            'currency'      => ($po['currency'] !== null && $po['currency'] !== '') ? $po['currency'] : 'SDG',
-            'state'         => 'draft',
-            'notes'         => 'استيراد آلي من أمر شراء ' . $po['code'],
-            'created_by'    => $uid,
-        ));
-        $n++;
+    foreach ($rows as $row) {
+        $docCompany = intval($row['company_id'] ?? 0);
+        if ($docCompany <= 0) { error_log('fin import ' . $cfg['module'] . ' ' . $row['code'] . ': صف مستندٍ بلا شركة — تخطٍّ'); continue; }
+        $conn->begin_transaction();
+        try {
+            \App\Core\EventPublisher::publish($conn, array(
+                'event_key'         => $cfg['event_key'],
+                'category'          => 'financial',
+                'source_module'     => $cfg['module'],
+                'company_id'        => $docCompany,
+                'entity_type'       => $cfg['entity_type'],
+                'entity_id'         => intval($row['id']),
+                'occurred_at'       => gmdate('Y-m-d H:i:s'),
+                'created_by'        => intval($uid) > 0 ? intval($uid) : 1,
+                'idempotency_key'   => $cfg['idem_prefix'] . intval($row['id']),
+                'legacy_event_type' => 'expense',
+                'amount'            => $row[$cfg['amount_col']],
+                'currency'          => (isset($row['currency']) && $row['currency'] !== null && $row['currency'] !== '') ? $row['currency'] : 'SDG',
+                'source_ref'        => $row['code'],
+                'equipment_id'      => (isset($row['equipment_id']) && intval($row['equipment_id']) > 0) ? intval($row['equipment_id']) : null,
+                'project_id'        => (isset($row['project_id']) && intval($row['project_id']) > 0) ? intval($row['project_id']) : null,
+                'notes'             => $cfg['note_prefix'] . $row['code'],
+                'payload'           => array('order_id' => intval($row['id']), 'order_code' => (string)$row['code'], 'channel' => 'import_events_fin'),
+            ));
+            $conn->commit();
+            $n++;
+        } catch (\Throwable $t) {
+            $conn->rollback();
+            error_log('fin import ' . $cfg['module'] . ' ' . $row['code'] . ': ' . $t->getMessage());
+        }
     }
     return $n;
 }
 
-/** أحداث الصيانة غير المستوردة (mnt_order → مصروف بأبعاده). قراءة فقط على mnt_order. */
-function fin_import_mnt($gate, $uid)
+/** أحداث المشتريات غير المستوردة (proc_order → مصروف). قراءة فقط على proc_order. */
+function fin_import_proc($conn, $gate, $uid)
 {
-    $n = 0;
-    foreach (fin_pending_import($gate, 'mnt_order', 'total_cost', 'maintenance') as $mo) {
-        $gate->insert('fin_financial_events', array(
-            'event_no'      => 'FIN-EV-IMM-' . intval($mo['id']),
-            'event_type'    => 'expense',
-            'source_module' => 'maintenance',
-            'source_ref'    => $mo['code'],
-            'amount'        => $mo['total_cost'],
-            'currency'      => 'SDG',
-            'equipment_id'  => $mo['equipment_id'],
-            'project_id'    => $mo['project_id'],
-            'state'         => 'draft',
-            'notes'         => 'استيراد آلي من أمر صيانة ' . $mo['code'],
-            'created_by'    => $uid,
-        ));
-        $n++;
-    }
-    return $n;
+    return fin_import_publish($conn, fin_pending_import($gate, 'proc_order', 'total_amount', 'procurement'), array(
+        'event_key'   => 'expense.purchase.recorded',
+        'module'      => 'procurement',
+        'entity_type' => 'proc_order',
+        'idem_prefix' => 'proc:order:',
+        'amount_col'  => 'total_amount',
+        'note_prefix' => 'استيراد آلي من أمر شراء ',
+    ), $uid);
+}
+
+/** أحداث الصيانة غير المستوردة (mnt_order → مصروف بأبعاده). قراءة فقط على mnt_order. */
+function fin_import_mnt($conn, $gate, $uid)
+{
+    return fin_import_publish($conn, fin_pending_import($gate, 'mnt_order', 'total_cost', 'maintenance'), array(
+        'event_key'   => 'expense.maintenance.recorded',
+        'module'      => 'maintenance',
+        'entity_type' => 'mnt_order',
+        'idem_prefix' => 'mnt:order:',
+        'amount_col'  => 'total_cost',
+        'note_prefix' => 'استيراد آلي من أمر صيانة ',
+    ), $uid);
 }
 
 if (isset($_GET['gen_proc'])) {
     if (!$can_add) { header("Location: import_events_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-    $n = fin_import_proc(ems_tenant_db(), $current_user_id);
+    if (!fin_verify_action_token()) { header("Location: import_events_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    $n = fin_import_proc($conn, ems_tenant_db(), $current_user_id);
     header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+المشتريات+✅"); exit();
 }
 if (isset($_GET['gen_mnt'])) {
     if (!$can_add) { header("Location: import_events_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-    $n = fin_import_mnt(ems_tenant_db(), $current_user_id);
+    if (!fin_verify_action_token()) { header("Location: import_events_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    $n = fin_import_mnt($conn, ems_tenant_db(), $current_user_id);
     header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+الصيانة+✅"); exit();
 }
 
@@ -122,7 +152,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
                 <p style="font-size:26px;margin:8px 0"><strong><?php echo $proc_pending; ?></strong></p>
                 <p class="text-muted">أمر شراء لم يُولّد له حدث بعد</p>
                 <?php if ($can_add && $proc_pending > 0): ?>
-                    <a href="?gen_proc=1" class="btn-save" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
+                    <a href="?gen_proc=1&_t=<?php echo fin_action_token(); ?>" class="btn-save" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
                 <?php elseif ($proc_pending === 0): ?>
                     <span class="badge badge-success">لا جديد — كل الأوامر مستوردة</span>
                 <?php endif; ?>
@@ -133,7 +163,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
                 <p style="font-size:26px;margin:8px 0"><strong><?php echo $mnt_pending; ?></strong></p>
                 <p class="text-muted">أمر صيانة بتكلفة لم يُولّد له حدث بعد</p>
                 <?php if ($can_add && $mnt_pending > 0): ?>
-                    <a href="?gen_mnt=1" class="btn-save" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
+                    <a href="?gen_mnt=1&_t=<?php echo fin_action_token(); ?>" class="btn-save" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
                 <?php elseif ($mnt_pending === 0): ?>
                     <span class="badge badge-success">لا جديد — كل الأوامر مستوردة</span>
                 <?php endif; ?>
@@ -150,8 +180,9 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
                 <?php
                 $states = fin_event_states(); $mods = fin_source_modules();
                 // العزل عبر البوابة (super→كل الشركات via forAllTenants، يوافق fin_scope '1=1')
+                // المرشّح بنسب المستند لا بنمط الترقيم — أحداث الناشر EV-… والقديمة FIN-EV-IM… معًا
                 $imported = fin_gate($is_super_admin)->select('fin_financial_events', array(
-                    'whereRaw' => "source_module IN('procurement','maintenance') AND event_no LIKE 'FIN-EV-IM%'",
+                    'whereRaw' => "source_module IN('procurement','maintenance') AND (entity_type IN('proc_order','mnt_order') OR event_no LIKE 'FIN-EV-IM%')",
                     'orderBy'  => 'id DESC',
                 ));
                 foreach ($imported as $row) {
