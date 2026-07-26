@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>تصنيف تاسكات مستندات UX/FES بحسب الصعوبة — نظام إنجاز EMS</title>
+<style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+:root{
+  --gold:#E0AE2E; --ink:#1c1c1c; --muted:#5b5b5b; --line:#d9d9d9;
+  --green:#1f7a3d; --amber:#B07A0C; --red:#A32020;
+  --greenbg:#eef7f0; --amberbg:#fdf6e6; --redbg:#fbeeee; --graybg:#f6f6f6;
+}
+*{box-sizing:border-box;}
+body{
+  font-family:"Segoe UI","Tahoma","Arial",sans-serif;
+  color:var(--ink); font-size:9.6pt; line-height:1.65;
+  margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+h1,h2,h3,h4{ line-height:1.4; margin:0; }
+
+/* ── الغلاف ── */
+.cover{ padding:6mm 0 4mm; border-bottom:3px solid var(--gold); margin-bottom:6mm; }
+.cover .org{ font-size:9pt; color:var(--muted); letter-spacing:.3px; }
+.cover h1{ font-size:20pt; margin:3mm 0 2mm; font-weight:700; }
+.cover .sub{ font-size:11pt; color:var(--muted); font-weight:400; }
+.meta{ margin-top:5mm; display:grid; grid-template-columns:repeat(2,1fr); gap:0 8mm; font-size:8.6pt; }
+.meta div{ padding:1.4mm 0; border-bottom:1px dotted var(--line); }
+.meta b{ color:var(--muted); font-weight:600; }
+
+h2{ font-size:13pt; margin:8mm 0 3mm; padding-bottom:1.5mm; border-bottom:2px solid var(--gold);
+    break-after:avoid; page-break-after:avoid; }
+h3{ font-size:10.6pt; margin:5mm 0 2mm; color:#333; break-after:avoid; page-break-after:avoid; }
+p{ margin:0 0 2.5mm; }
+
+/* ── الجداول ── */
+table{ width:100%; border-collapse:collapse; margin:2.5mm 0 4mm; font-size:8.8pt; }
+th,td{ border:1px solid var(--line); padding:1.8mm 2.2mm; vertical-align:top; text-align:right; }
+th{ background:var(--graybg); font-weight:700; font-size:8.6pt; }
+tr{ break-inside:avoid; page-break-inside:avoid; }
+thead{ display:table-header-group; }
+td.id{ font-weight:700; white-space:nowrap; width:16mm; text-align:center; font-family:Consolas,monospace; }
+td.c{ text-align:center; }
+
+/* ── وسوم المستويات ── */
+.tier{ padding:2.5mm 3mm; border-radius:2mm; margin:6mm 0 3mm; break-after:avoid; page-break-after:avoid; }
+.tier h2{ margin:0 0 1mm; border:0; padding:0; }
+.tier .def{ font-size:8.8pt; margin:0; }
+.t1{ background:var(--greenbg); border-right:4px solid var(--green); }
+.t1 h2{ color:var(--green); }
+.t2{ background:var(--amberbg); border-right:4px solid var(--amber); }
+.t2 h2{ color:var(--amber); }
+.t3{ background:var(--redbg); border-right:4px solid var(--red); }
+.t3 h2{ color:var(--red); }
+
+.note{ background:#fffdf4; border:1px solid #ecd9a0; border-right:4px solid var(--gold);
+       padding:2.5mm 3mm; margin:3mm 0; font-size:8.8pt; break-inside:avoid; }
+.warn{ background:var(--redbg); border:1px solid #e8c0c0; border-right:4px solid var(--red);
+       padding:2.5mm 3mm; margin:3mm 0; font-size:8.8pt; break-inside:avoid; }
+
+code,.mono{ font-family:Consolas,"Courier New",monospace; font-size:8.4pt;
+            background:#f0f0f0; padding:0 1mm; border-radius:1mm; direction:ltr; display:inline-block; }
+.num{ font-family:Consolas,monospace; font-weight:700; }
+
+.sum{ font-size:10pt; }
+.sum td,.sum th{ padding:2.6mm 3mm; }
+.sum .g{ background:var(--greenbg); } .sum .a{ background:var(--amberbg); } .sum .r{ background:var(--redbg); }
+
+.pb{ break-before:page; page-break-before:always; }
+footer{ margin-top:8mm; padding-top:2.5mm; border-top:1px solid var(--line);
+        font-size:8pt; color:var(--muted); text-align:center; }
+ul{ margin:0 0 2.5mm; padding-right:5mm; } li{ margin-bottom:1.2mm; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="org">مجموعة إكيوبيشن · قطاع تشغيل المعدات — نظام إنجاز (EMS)</div>
+  <h1>تصنيف تاسكات مستندات التجربة والحدث المالي بحسب الصعوبة</h1>
+  <div class="sub">قراءةٌ للمستندات الثلاثة عشر (UX-00…UX-10 · FES-01 · SPEC-01) مقيسةً على النظام القائم</div>
+  <div class="meta">
+    <div><b>تاريخ التحرير:</b> 2026-07-25</div>
+    <div><b>مصدر المستندات:</b> <span class="mono">docs/update0001</span></div>
+    <div><b>الفرع:</b> <span class="mono">feature/inspection-to-maintenance-order</span></div>
+    <div><b>خط الأساس:</b> <span class="mono">77dd4f8</span> · معمارية v8</div>
+    <div><b>القاعدة المقيسة:</b> <span class="mono">equipation_manage</span> (حيّة)</div>
+    <div><b>مرتبة الوثيقة:</b> تقريرُ تقديرٍ داخلي — لا يعلو المستندات</div>
+  </div>
+</div>
+
+<h2>0 · المنهج</h2>
+<p>قُرئ النظام القائم ثلاث قراءات: <strong>الأولى</strong> من وثيقة المعمارية v8 نزولًا إلى الشيفرة، و<strong>الثانية</strong> من الشيفرة والأعلام الحيّة صعودًا، و<strong>الثالثة عكسيةً</strong> من البيانات الحيّة (177 جدولًا بعدد صفوفها) إلى المفاهيم. ثم قُرئت المستندات الثلاثة عشر كاملةً، ثم <strong>فُحصت ادّعاءاتُها في الشيفرة</strong> لا نقلًا عنها.</p>
+
+<p><strong>نتيجة التحقق:</strong> ستةُ ادّعاءاتٍ حاسمة فُحصت، وكلُّها صحيح:</p>
+<table>
+  <thead><tr><th style="width:38%">الادّعاء</th><th>الدليل المقيس</th><th class="c" style="width:14mm">الحكم</th></tr></thead>
+  <tbody>
+    <tr><td>شاشة الاستقبال تتخطى الناشر</td><td><span class="mono">Finance/import_events_fin.php:45،66</span> — إدراجان مباشران، صفرُ استدعاءٍ للناشر في الملف كلّه</td><td class="c">✔</td></tr>
+    <tr><td>شاشة مستحقات المشغّلين «عمودان وزرُّ تبديل»</td><td><span class="mono">operator_pay_fin.php:156</span> — المشغّل · الوضع، وزرُّ «اجعله بالمستحق»</td><td class="c">✔</td></tr>
+    <tr><td>المطابقة تشترط تساوي الكميات الثلاث</td><td><span class="mono">unit_records_fin.php:90</span> — لا اعتماد إن لم تكن <span class="mono">match_state='matched'</span></td><td class="c">✔</td></tr>
+    <tr><td>جداول الوحدة القانونية فارغةٌ بلا كاتب</td><td><span class="mono">unit_entries · unit_time_log · unit_approvals · unit_capacity_flags</span> = صفر صف</td><td class="c">✔</td></tr>
+    <tr><td>السايدبار من خمسة مصادر</td><td>خمسةٌ مقيسة — <strong>وسادسٌ</strong>: روابطُ مبرمَجةٌ في <span class="mono">insidebar.php:177</span></td><td class="c">✔+</td></tr>
+    <tr><td>لوحةٌ واحدةٌ لكل الأدوار</td><td><span class="mono">main/dashboard.php</span> — ملفٌ واحدٌ بـ1365 سطرًا، الدورُ مجردُ مُرشِّح</td><td class="c">✔</td></tr>
+  </tbody>
+</table>
+
+<h2>1 · الأساس الذي قام عليه التصنيف</h2>
+
+<h3>1.1 · ما هو موجودٌ فعلًا فيجعل تاسكاتٍ رخيصة</h3>
+<table>
+  <thead><tr><th style="width:42%">البنية القائمة</th><th>ما تُرخِّصه</th></tr></thead>
+  <tbody>
+    <tr><td><span class="mono">modules.is_link</span> — 14 صفًّا مخفيًّا أصلًا</td><td><strong>إخفاءُ شاشةٍ من التنقل = تغييرُ بيانٍ واحد</strong>، والنمطُ مُجرَّب</td></tr>
+    <tr><td><span class="mono">modules.group_id</span> + <span class="mono">link_groups</span> + <span class="mono">buildNavTree</span></td><td><strong>الأبواب مبنيةٌ كآلية</strong> — 35 من 132 صفًّا مربوطةٌ بالفعل، و6 مجموعاتٍ ماليةٍ حيّة</td></tr>
+    <tr><td><span class="mono">role_permissions.can_view</span> + حارسٌ مركزيٌّ على 158 شاشة</td><td><strong>النقلُ خلف الصلاحية = بيانات</strong> — والحارسُ يتكفّل بالحجب والتحويل</td></tr>
+    <tr><td><span class="mono">modules.is_quick</span> وبلاطات الوصول السريع</td><td>هيكلُ اللوحة قائمٌ ومُعامَلٌ بالدور</td></tr>
+    <tr><td><span class="mono">EffectFanout</span> · <span class="mono">unit_party_awards</span> · <span class="mono">contract_hour_policies</span> · <span class="mono">CapacityGuard</span></td><td><strong>محرّكاتُ صدق المصدر جاهزة</strong> — أحكامُ الأطراف منفَّذةٌ بالفعل (4 أحكامٍ حية)</td></tr>
+    <tr><td>بوابة D05 + <span class="mono">StateMachine</span> + <span class="mono">ems_state_transitions</span></td><td><strong>منطقُ الرحلة موجود</strong> — ينقصه العرض لا المنطق</td></tr>
+    <tr><td><span class="mono">EmsDetailsModal</span> · <span class="mono">ems-forms.css</span> · <span class="mono">ems-tables.css</span> · الإطار الموحّد للإكسل</td><td>طبقةُ مكوّناتٍ موحّدةٌ تُبنى عليها الشاشات الجديدة</td></tr>
+  </tbody>
+</table>
+
+<h3>1.2 · وما هو غائبٌ فيجعل تاسكاتٍ باهظة</h3>
+<table>
+  <thead><tr><th style="width:42%">الغائب</th><th>ما يُغلِّيه</th></tr></thead>
+  <tbody>
+    <tr><td><strong><span class="mono">users.role</span> عمودٌ مفردٌ — ولا جدولَ ربطٍ مستخدم×أدوار</strong></td><td>مبدّلُ المساحات وصفحةُ «مساحاتي» <strong>يحتاجان نموذج هويةٍ جديدًا</strong>، لا واجهة</td></tr>
+    <tr><td>لا مكوّن تبويباتٍ موحّد — ستةُ استعمالاتٍ متفرقةٍ لـbootstrap</td><td>كلُّ شاشةٍ أمٍّ تبني تبويباتها من الصفر</td></tr>
+    <tr><td>لا سطرَ وصفٍ في <span class="mono">page_header</span> — و127 شاشةً تستعمله</td><td>يحتاج عمودًا جديدًا وتمريرًا مركزيًّا، ثم 118 نصًّا تحريريًّا</td></tr>
+    <tr><td>لا طقمَ حالاتٍ موحّدًا — الشارات دلاليةٌ لكل مجال (<span class="mono">badge-working</span> · <span class="mono">badge-busy</span>…)</td><td>التوحيدُ يمسّ كل الشاشات</td></tr>
+    <tr><td>لا بنيةَ Redirects</td><td>تُبنى من الصفر — وهي شرطٌ لإخفاء أي شاشة</td></tr>
+    <tr><td><strong>لا كيانَ للمستخلص ولا الفاتورة الضريبية ولا تسوية المورد ولا تسوية العامل</strong></td><td>أنظمةٌ فرعيةٌ كاملةٌ تحت عنوان «تجربة مستخدم»</td></tr>
+    <tr><td>ملفاتٌ ضخمةٌ للتفكيك: <span class="mono">timesheet.php</span> 2683 · <span class="mono">equipments_fleet</span> 1959 · <span class="mono">supplierscontracts_details</span> 1905 · <span class="mono">contracts_details</span> 1849 · <span class="mono">oprators</span> 1833</td><td>كلُّ شاشةٍ أمٍّ تفكيكُ ملفٍ حيٍّ لا بناءٌ على بياض</td></tr>
+  </tbody>
+</table>
+
+<div class="pb"></div>
+
+<div class="tier t1">
+  <h2>🟢 المستوى الأول · تاسكاتٌ سهلة</h2>
+  <p class="def"><strong>التعريف:</strong> بياناتٌ أو تغييرٌ مركزيٌّ واحد · لا قرارَ مالك · خطرُ ارتدادٍ شبه معدوم · الآليةُ مبنيةٌ سلفًا.</p>
+</div>
+
+<table>
+  <thead><tr><th class="c" style="width:16mm">#</th><th style="width:40%">التاسك</th><th>لماذا سهل</th></tr></thead>
+  <tbody>
+    <tr><td class="id">C3</td><td>حذف <span class="num">14</span> شاشة من التنقل</td><td><span class="mono">is_link=0</span> — أربعةَ عشرَ صفًّا. النمطُ مُجرَّبٌ على 14 صفًّا مخفيًّا اليوم</td></tr>
+    <tr><td class="id">C4</td><td>نقل <span class="num">23</span> شاشة إلى بطاقاتٍ داخلية</td><td><span class="mono">is_link=0</span> — وهي أصلًا تُفتح من سجلاتها لا من السايدبار</td></tr>
+    <tr><td class="id">C5</td><td>نقل <span class="num">31</span> شاشة خلف باب الإعدادات</td><td><span class="mono">group_id</span> + سحبُ <span class="mono">can_view</span> — والحارسُ المركزي يتكفّل بالحجب</td></tr>
+    <tr><td class="id">C6</td><td>إلغاء <span class="num">7</span> قوائم وسيطة</td><td><span class="mono">is_link=0</span> بعد التثبّت أن محتواها موزَّعٌ على الأبواب</td></tr>
+    <tr><td class="id">C7</td><td>أسماء المجموعات عناوينُ أبوابٍ لا شاشات</td><td>تحريرُ <span class="mono">link_groups.name</span></td></tr>
+    <tr><td class="id">B5</td><td>فحصٌ آليٌّ للمحظور المعماري في الواجهات</td><td>سكربتٌ واحدٌ على <span class="mono">modules.name</span> وعناوين 158 شاشة</td></tr>
+    <tr><td class="id">C9</td><td>فحصٌ آليٌّ: صفر رابطٍ ميتٍ أو مكرر</td><td>سكربتٌ واحد — والمكرَّراتُ مقيسةٌ سلفًا (7 أكواد)</td></tr>
+    <tr><td class="id">A2</td><td>ردمُ الصفوف العشرة <span class="mono">FIN-EV-IMP-1..10</span></td><td>سكربتُ ردمٍ واحدٍ بعطالة <span class="mono">source_ref</span> القائمة أصلًا</td></tr>
+    <tr><td class="id">G17</td><td>حذفُ نسخة المعدات القديمة من التنقل</td><td><span class="mono">is_link=0</span> + تحويلٌ واحد</td></tr>
+    <tr><td class="id">G18</td><td>توحيد تصنيف الأعطال والبلاغات</td><td><span class="mono">is_link=0</span> لإحداهما + توجيه</td></tr>
+    <tr><td class="id">D8</td><td>العدّاد قبل الاسم على روابط الموافقات</td><td><span class="mono">nav-count-badge</span> و<span class="mono">finreq_badges</span> موجودان — توسيعُ خريطةٍ لا بناء</td></tr>
+    <tr><td class="id">G15أ</td><td>زرُّ التحويل من الفحص الفني إلى بلاغ/أمر</td><td><strong>منفَّذٌ للتوّ</strong> في <span class="mono">77dd4f8</span> — يحتاج توسعةً لا بناءً</td></tr>
+    <tr><td class="id">E3أ</td><td>تبويبات شاشة البلاغات الأربعة</td><td><span class="mono">tickets_list.php</span> قائمة، والحالاتُ في <span class="mono">tickets</span> — فلترةُ عرض</td></tr>
+    <tr><td class="id">B4-آلية</td><td>حقلُ «ما هذه الشاشة؟» وطباعتُه</td><td>عمودٌ واحدٌ في <span class="mono">modules</span> وتمريرٌ في <span class="mono">page_header</span> — النصوصُ نفسها ليست سهلة</td></tr>
+  </tbody>
+</table>
+
+<p><strong>المجموع: <span class="num">14</span> تاسكًا · معظمها بياناتٌ لا كود · أثرُها مرئيٌّ فورًا.</strong></p>
+
+<div class="warn">
+  <strong>تحذيرٌ حتى في السهل:</strong> ملفُّ <span class="mono">insidebar.php</span> يطبع روابطَ مبرمَجةً خارج جدول <span class="mono">modules</span> (الرئيسية · المراسلات · اعتماد الوحدات · التقارير · الإعدادات). فإخفاءُ صفٍّ في الجدول <strong>لا يكفي</strong> لهذه الخمسة — تُحذف من الملف يدويًّا. وهو عينُ درس المعمارية v8 §17-ب: <em>افحص كل مصادر النصّ قبل تغييره</em>.
+</div>
+
+<div class="pb"></div>
+
+<div class="tier t2">
+  <h2>🟡 المستوى الثاني · متوسطة — تحتاج نقاشًا</h2>
+  <p class="def"><strong>التعريف:</strong> عملٌ حقيقيٌّ معلومُ الشكل · النقاشُ في <strong>الشكل</strong> لا في المبدأ · لا يغيّر نموذج البيانات جوهريًّا.</p>
+</div>
+
+<table>
+  <thead><tr><th class="c" style="width:16mm">#</th><th style="width:30%">التاسك</th><th>نقطة النقاش المحدَّدة</th></tr></thead>
+  <tbody>
+    <tr><td class="id">C1</td><td>الأبواب الستة لـ13 دورًا</td><td>الآليةُ جاهزة، والعملُ تعبئةُ 13×6 مجموعة وضبطُ <span class="mono">group_id</span> لـ132 صفًّا. النقاش: <span class="mono">owner_role_id</span> مفردٌ — فما مصيرُ شاشةٍ يراها دوران في بابين مختلفين؟</td></tr>
+    <tr><td class="id">C2</td><td>السايدبار السباعي للمالية</td><td>ستُّ مجموعاتٍ حيّةٌ بالفعل + السابعة. النقاش: <strong>UX-01 §8.11 تخالف UX-02 §6 في توزيع الروابط</strong> — أيُّهما ينفُذ؟</td></tr>
+    <tr><td class="id">A1</td><td>تحويل شاشة الاستقبال إلى الناشر</td><td>التقديرُ نصفُ يوم. النقاش: أنستعمل عطالة <span class="mono">source_ref</span>، أم نضيف مفتاح (مستند × نوع أثر) الفريدَ الذي يوجبه FES §7؟</td></tr>
+    <tr><td class="id">A4</td><td>توحيد مصدر السايدبار</td><td>المصادرُ قائمةٌ لأسبابٍ وظيفيةٍ صحيحة. النقاش: <strong>مُحلِّلُ تنقّلٍ واحدٌ يستوعبها</strong>، أم إسقاطُها كلِّها إلى <span class="mono">modules</span> بفقدِ قدرة؟</td></tr>
+    <tr><td class="id">B3</td><td>إعادة كتابة 151 تعريفًا بلغة المهمة</td><td>العملُ تحريريٌّ لا برمجي. النقاش: <strong>من يكتب النصوص؟</strong> وأين تُخزَّن (عمودٌ جديد)</td></tr>
+    <tr><td class="id">B12</td><td>توحيد الحالات وألوانها</td><td>جردُ كل حالات النظام أولًا (بلاغات · طلبات · أوامر · وحدات · ترحيل). النقاش: أتُقسَر الحالاتُ الخاصة على الطقم الموحّد أم يُسمح بامتداد؟</td></tr>
+    <tr><td class="id">B13·B14</td><td>رسائل الخطأ ولغة الإعادة</td><td>نمطٌ موحّدٌ ثم تطبيقٌ تدريجي. النقاش: أين يُحقن مركزيًّا؟</td></tr>
+    <tr><td class="id">C8</td><td>بنية Redirects</td><td>تُبنى مرةً وتخدم الكل. النقاش: <span class="mono">.htaccess</span> أم مُحلِّلٌ في <span class="mono">config.php</span>؟ الثاني يسجّل الاستعمال — وهو شرطُ UX-02 §14 لعدم حذف أي مسار</td></tr>
+    <tr><td class="id">C10</td><td>العمق نقرتان</td><td>قياسٌ ثم تعديل. النقاش: كيف يُقاس آليًّا؟</td></tr>
+    <tr><td class="id">E1</td><td>رحلة الطلب المالي بشريط حالة</td><td><span class="mono">StateMachine</span> و<span class="mono">ems_state_transitions</span> و<span class="mono">fin_request_events</span> موجودة — العملُ عرضٌ ودمج. النقاش: أنُدمج <span class="mono">my_requests</span> و<span class="mono">request_form</span> و<span class="mono">dept_inbox</span> في شاشةٍ واحدة؟</td></tr>
+    <tr><td class="id">E2</td><td>رحلة الوحدة بشريط حالة</td><td>الاعتمادُ الرباعي و<span class="mono">timesheet_approvals</span> موجودان. النقاش: أين يُعرض الشريط — في التايم شيت أم في شاشةٍ أم؟</td></tr>
+    <tr><td class="id">F1</td><td>غرفة عمليات التشغيل</td><td>دمجُ <span class="mono">oprators.php</span> (1833 سطرًا) مع التايم شيت والاعتماد والالتزام. النقاش: أنبني جديدًا ونُحوّل، أم نُوسّع القائم؟</td></tr>
+    <tr><td class="id">F2</td><td>ملف العقد بسبعة تبويبات</td><td><span class="mono">contracts_details.php</span> 1849 سطرًا قائمة — تبويباتٌ فوق موجود</td></tr>
+    <tr><td class="id">F3</td><td>بطاقة المورد بسبعة تبويبات</td><td><span class="mono">supplierscontracts_details.php</span> 1905 سطرًا</td></tr>
+    <tr><td class="id">F4</td><td>بطاقة الموظف بسبعة تبويبات</td><td><span class="mono">employee_profile.php</span> + خمسُ شاشاتٍ تُدمج فيها</td></tr>
+    <tr><td class="id">F5</td><td>بطاقة المعدة بستة تبويبات</td><td><span class="mono">equipment_profile.php</span> يستعمل التبويبات أصلًا — الأقربُ للجاهز</td></tr>
+    <tr><td class="id">F6</td><td>أمر الصيانة بخمسة تبويبات</td><td><span class="mono">Maintenance/orders.php</span> 1399 سطرًا</td></tr>
+    <tr><td class="id">F7</td><td>أمر الشراء بأربعة تبويبات</td><td><span class="mono">orders_proc.php</span> مع تبويب الأثر المالي قراءةً</td></tr>
+    <tr><td class="id">G9</td><td>فصل الذمم رحلتين</td><td><span class="mono">fin_dues</span> (11 صفًّا) و<span class="mono">fin_receivables</span> (صفّان) موجودان — فصلُ عرضٍ لا بيانات</td></tr>
+    <tr><td class="id">G10</td><td>فصل المدفوعات ثلاثًا</td><td>نفس المنطق: دفعات اليوم · تحصيلات اليوم · حركة الخزينة</td></tr>
+    <tr><td class="id">G11</td><td>دمج متابعة الانحراف في الميزانية</td><td>شاشتان تصيران واحدةً بتبويب</td></tr>
+    <tr><td class="id">G13</td><td>لوحة التوزيع سحبًا وإفلاتًا</td><td>البياناتُ كلُّها موجودة. النقاش: مكتبةُ السحب — والقيدُ أن الواجهة كلَّها RTL</td></tr>
+    <tr><td class="id">G14</td><td>لوحة الجاهزية الشبكية</td><td><span class="mono">op_state</span> و<span class="mono">equipment_health</span> و<span class="mono">availability_status</span> موجودة. النقاش: <strong>ثلاثةُ محاور حالةٍ للمعدة — أيُّها يُلوِّن الخلية؟</strong></td></tr>
+    <tr><td class="id">G16</td><td>حدُّ إعادة الطلب يولّد طلبًا آليًّا</td><td><span class="mono">proc_orderpoint</span> (10 صفوف) موجود — ينقصه المولِّد الدوري</td></tr>
+    <tr><td class="id">G20</td><td>لوحة الصلاحيات بثلاثة تبويبات</td><td>أربعُ شاشاتٍ قائمةٌ تُدمج</td></tr>
+    <tr><td class="id">G21</td><td>دمج شاشات الساعات الثلاث</td><td>النقاش: <span class="mono">timesheet.php</span> 2683 سطرًا — أيكون الدمجُ فيها أم منها؟</td></tr>
+    <tr><td class="id">H1</td><td>الجوال وRTL لكل شاشة</td><td><span class="mono">ui-unification.js</span> والجداولُ المتجاوبة موجودة. العملُ <strong>حجمُه لا صعوبتُه</strong>: 158 شاشة</td></tr>
+    <tr><td class="id">H5</td><td>الحالة الفارغة تُرشد</td><td>نمطٌ مركزيٌّ + نصوصٌ لكل شاشة</td></tr>
+    <tr><td class="id">I1–I6</td><td>حزمة الاختبار والقبول</td><td>تنظيميٌّ لا تقني. النقاش: <strong>من هم المستخدمون الفعليون؟</strong> — أدوارٌ كثيرةٌ بمستخدمٍ واحدٍ في القاعدة</td></tr>
+    <tr><td class="id">D2</td><td>اللوحات المالية الأربع</td><td>ينتظر حسمَ ملكية المؤشر (المستوى الثالث)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>المجموع: <span class="num">30</span> تاسكًا.</strong></p>
+
+<div class="pb"></div>
+
+<div class="tier t3">
+  <h2>🔴 المستوى الثالث · صعبة — تحتاج نقاشًا وتوضيحًا وقرارًا</h2>
+  <p class="def"><strong>التعريف:</strong> إمّا نموذجُ بياناتٍ جديد · أو قرارُ مالكٍ غيرُ محسوم · أو <strong>تعارضٌ في المستندات نفسها</strong> يجب فضُّه قبل أي كود.</p>
+</div>
+
+<h3>أ · قراراتٌ في نموذج الهوية والحوكمة</h3>
+<table>
+  <thead><tr><th class="c" style="width:16mm">#</th><th style="width:28%">التاسك</th><th>القرار المطلوب</th></tr></thead>
+  <tbody>
+    <tr><td class="id">D3·D4</td><td>مبدّل مساحة العمل وصفحة «مساحاتي»</td><td><strong><span class="mono">users.role</span> عمودٌ مفردٌ ولا جدولَ ربط — فالنظام لا يعرف مستخدمًا بأكثر من دور.</strong> التاسك ليس واجهةً بل تغييرُ نموذج الهوية، ويمسّ الحارسَ المركزي والعزل وكلَّ <span class="mono">role_permissions</span>. القرار: أنبني تعدُّدَ الأدوار، أم يُلغى المطلبُ من الدستور؟</td></tr>
+    <tr><td class="id">D1</td><td>13 لوحة دور + ملكية المؤشر</td><td>القالبُ متوسط، لكن «المؤشرُ الواحد يملكه دورٌ واحد» <strong>قرارٌ تنظيميٌّ لا برمجي</strong>: من يملك «الوحدات غير المعتمدة» — التشغيل أم الموقع أم الموردون؟ ثلاثتُهم يرونها اليوم. بلا الحسم تُبنى 13 لوحةً متكرّرة</td></tr>
+    <tr><td class="id">A3</td><td>المرحلة 2 لمصدر الحقيقة</td><td>ترحيلُ 221 صفَّ دوامٍ إلى الجداول الثلاث الفارغة، ثم تحويلُ المروحة للقراءة منها، ثم <strong>إغلاقُ المدخل اليدوي</strong>. القرار: أنغلق <span class="mono">forUnitRecord</span> فعلًا؟ عليه عشرةُ صفوفٍ حية</td></tr>
+    <tr><td class="id">B10</td><td>القاموس الموحّد للحقول المشتركة</td><td>بطاقةٌ بتسع خصائصَ لكل حقل، <strong>ومالكٌ مسمًّى لكلٍّ</strong>. ميثاقٌ بين الإدارات لا كود — ولا يُنتجه المبرمج</td></tr>
+    <tr><td class="id">B6</td><td>مواصفة الـ19 بندًا × 48 جدولًا</td><td>القرار: <strong>من ينتجها؟</strong> إن كانت من فريق التطوير فهي وحدها شهورُ عمل؛ وإن كانت من الأعمال فهي مُدخَلٌ يُنتظر</td></tr>
+    <tr><td class="id">B11</td><td>تقرير توافق FES لكل إدارة</td><td>تقريرٌ يحدد لكل إدارة: المطابق · المفقود · المكرر · ما يُوحَّد · ما تُنقل مسؤوليتُه · وأثرَ كل تعديلٍ على القيود</td></tr>
+  </tbody>
+</table>
+
+<h3>ب · تعارضاتٌ في المستندات يجب فضُّها</h3>
+<table>
+  <thead><tr><th class="c" style="width:16mm">#</th><th style="width:44%">التعارض</th><th>القرار المطلوب</th></tr></thead>
+  <tbody>
+    <tr><td class="id">X1</td><td>UX-00 §1 يقول «المعمارية وقواعد البيانات خارج نطاقه» — ثم يوجب G2 وG3 وG4 وG5 وG6 وG7، وكلُّها تغييرُ نموذج بيانات</td><td>أنُعلن أن الوعد لا يُوفى حرفيًّا ونخطّط للتغيير، أم تُقصر الجولة على ما لا يمسّ البنية؟</td></tr>
+    <tr><td class="id">X2</td><td>UX-00 §6 يوجب «مصدرًا واحدًا للقوائم» — والمصادرُ قائمةٌ لأسبابٍ وظيفيةٍ صحيحة</td><td>التوحيدُ الحرفيُّ يفقد قدرة. مُحلِّلٌ موحّدٌ يستوعب المصادر، أم توحيدٌ حرفيٌّ بفقدٍ موثَّق؟</td></tr>
+    <tr><td class="id">X3</td><td>الوثائق تخاطب 13 دورًا — والنظام فيه 23. العشرةُ الباقون بلا لوحاتٍ ولا أبواب</td><td>أيرِثُ الدورُ الفرعيُّ لوحةَ أبيه، أم تُكتب لهم وثائقُهم، أم يُستثنون صراحةً؟</td></tr>
+    <tr><td class="id">X4</td><td>لا وثيقةَ للنقل والترحيل (الدور 23) رغم أن FES §8 يُلزمه بحدثٍ مالي</td><td>أنكتبها، أم يُنفَّذ على القياس، أم يؤجَّل؟</td></tr>
+    <tr><td class="id">X5</td><td>UX-02 تقيس التسمية «78 من 155» وسجلُّ المشروع «86 صفًّا و92 اسمًا · 220/220»</td><td>توحيدُ أساس القياس قبل الاحتجاج بالرقم</td></tr>
+    <tr><td class="id">X6</td><td>ترقيمُ المصفوفة (#122 · #153 · #155) لا يطابق <span class="mono">modules.id</span> — 132 صفًّا بـ118 كودًا متمايزًا</td><td>بناءُ <strong>جسر ترقيمٍ</strong> قبل أي تنفيذ، وإلا فكلُّ حكمٍ في المصفوفة ملتبسُ المرجع</td></tr>
+    <tr><td class="id">X7</td><td>UX-01 §8.11 وUX-02 §6 يوزّعان روابط المالية توزيعين مختلفين</td><td>أيُّهما ينفُذ؟ (الدستور يقول: وثيقةُ الإدارة أعلى من الدليل)</td></tr>
+  </tbody>
+</table>
+
+<h3>ج · أنظمةٌ فرعيةٌ كاملةٌ غير موجودة</h3>
+<table>
+  <thead><tr><th class="c" style="width:16mm">#</th><th style="width:28%">التاسك</th><th>الحجم الحقيقي</th></tr></thead>
+  <tbody>
+    <tr><td class="id">G1</td><td>شاشة وحدات الأطراف</td><td><strong>المحرّكُ جاهزٌ</strong> (<span class="mono">unit_party_awards</span> · 4 أحكام) — لكن الشاشةَ الحيّة تمنع الاعتماد بلا تساوٍ، وعشرةُ صفوفٍ قائمةٌ على المفهوم الملغى. القرار: مصيرُ العشرة، ومَن يعتمد الأحكام</td></tr>
+    <tr><td class="id">G2</td><td>الحقول الثلاثة منفصلةٌ في البيانات</td><td>هجرةٌ + تعديلُ المروحة + كلُّ شاشات الوحدات. <strong>أخطرُ تاسكٍ في السجل</strong> لأنه يمسّ ما صار مالًا</td></tr>
+    <tr><td class="id">G3</td><td>سياسات مستحقات المشغّلين</td><td>نموذجٌ كامل (3 نماذج × 7 أسس × حدود × خصومات × نطاق × سريان) بدل صفٍّ واحدٍ وعمودين. القرار: أبأثرٍ رجعيٍّ أم بسريانٍ فقط؟</td></tr>
+    <tr><td class="id">G4</td><td>تسوية المورد بالتحميلات الست</td><td>ستةُ مصادرَ مرجعيةٍ — <strong>أربعةٌ منها غير موجودةٍ أصلًا</strong> (الوقود · السلف · الجزاءات · تحميلُ النقل). نظامٌ فرعيٌّ كامل</td></tr>
+    <tr><td class="id">G5</td><td>تسوية العامل الشهرية</td><td><span class="mono">worker_settlement</span> فارغ — والأساسُ يعتمد على G3 وG1 معًا</td></tr>
+    <tr><td class="id">G6</td><td>المستخلص/المطالبة</td><td>لا كيانَ في القاعدة — ويعتمد كليًّا على G1</td></tr>
+    <tr><td class="id">G7</td><td>الفاتورة الضريبية</td><td>لا كيان. و«الحقول النظامية الواجبة» <strong>تحتاج توضيحًا</strong>: الوثائق تذكر ثلاث عملات (SDG · USD · QAR) — فأيُّ نظامٍ ضريبيٍّ يحكم؟</td></tr>
+    <tr><td class="id">G8</td><td>المطابقة البنكية بالمضاهاة الآلية</td><td>محرّكُ مطابقةٍ بقواعد (مبلغ + تاريخ ± أيام + مرجع) واستيرادُ كشوفٍ بصيغٍ مختلفة. القرار: أيُّ بنوك؟ وما صيغُ كشوفها؟</td></tr>
+    <tr><td class="id">G12</td><td>صندوق موافقاتي الموحّد</td><td>«أيُّ عنصرٍ منتظر» = طلبٌ + تسويةٌ + قيدٌ + إقفالٌ + بلاغٌ + ترحيلٌ + وحدة — <strong>سبعةُ محرّكاتِ اعتمادٍ مختلفة</strong>. يحتاج طبقةَ تجريدٍ للموافقات لا شاشة</td></tr>
+    <tr><td class="id">G22</td><td>خريطة الاشتقاق في كل نموذج</td><td>يعتمد على B10 (القاموس). عرضيٌّ في كل الشاشات</td></tr>
+    <tr><td class="id">B7·B8·B9</td><td>هيكل الحدث الأدنى + المجموعات الثماني + الأسئلة الست</td><td><strong>عقدُ بياناتٍ جديدٌ عابرٌ للإدارات</strong> يعلو ما بُني في ADR-15. القرار: أهو معيارٌ للجديد فقط، أم يُرجَّع على 31 صفَّ دفترٍ و125 حقيقةً قائمة؟</td></tr>
+    <tr><td class="id">A5·A6</td><td>التوليد من المنبع حصرًا + مفتاح منع التكرار البنيوي</td><td>يمسّ كلَّ الإدارات لا المالية وحدها</td></tr>
+  </tbody>
+</table>
+
+<p><strong>المجموع: <span class="num">25</span> تاسكًا صعبًا — منها <span class="num">7</span> تعارضاتٍ تُفَضّ بالكلام لا بالكود.</strong></p>
+
+<h2>2 · الخلاصة</h2>
+<table class="sum">
+  <thead><tr><th style="width:24%">المستوى</th><th class="c" style="width:16%">العدد</th><th style="width:32%">طبيعةُ العمل</th><th>متى يبدأ</th></tr></thead>
+  <tbody>
+    <tr class="g"><td><strong>🟢 سهل</strong></td><td class="c num">14</td><td>بياناتٌ وسكربتاتٌ وتغييرٌ مركزيٌّ واحد</td><td><strong>فورًا</strong> — لا ينتظر قرارًا</td></tr>
+    <tr class="a"><td><strong>🟡 متوسط</strong></td><td class="c num">30</td><td>بناءٌ معلومُ الشكل على بنيةٍ قائمة</td><td>بعد نقاشٍ قصيرٍ لكلٍّ</td></tr>
+    <tr class="r"><td><strong>🔴 صعب</strong></td><td class="c num">25</td><td>نماذجُ بياناتٍ وقراراتُ مالكٍ وفضُّ تعارضات</td><td><strong>بعد القرار — ولا يبدأ قبله</strong></td></tr>
+  </tbody>
+</table>
+
+<h2>3 · ملاحظتان تغيّران الترتيب البدهي</h2>
+
+<div class="note">
+  <strong>١ · «الصعب» ليس دائمًا الأبعد.</strong> التعارضاتُ السبعة (X1…X7) لا تحتاج سطرَ كودٍ واحد — تحتاج <strong>جلسةً واحدةً مع مالك المنصّة</strong>. وفضُّها يُنزل تاسكاتٍ كثيرةً من الأحمر إلى الأصفر مباشرةً. أرخصُ عملٍ في السجل كلِّه هو هذه الجلسة.
+</div>
+
+<div class="note">
+  <strong>٢ · التاسك الأخطر ليس الأصعب.</strong> التاسك <strong>G2</strong> (فصلُ الحقول الثلاثة) يبدو تقنيًّا متواضعًا، لكنه يمسّ <strong>ما صار مالًا بالفعل</strong> — و<span class="mono">fin_event_links</span> فيه 35 رابطًا و<span class="mono">ems_business_events</span> فيه 125 حقيقة. أيُّ خطأٍ فيه يُفسد دفترًا حيًّا. <strong>يُعامَل معاملةَ هجرةٍ لا معاملةَ ميزة.</strong>
+</div>
+
+<h2>ملحق · مصدر التاسكات في المستندات</h2>
+<table>
+  <thead><tr><th style="width:26%">المصدر</th><th class="c" style="width:16%">العدد</th><th>البيان</th></tr></thead>
+  <tbody>
+    <tr><td>تاسكات صريحة مسمّاة</td><td class="c num">86</td><td>موزّعةً على المجموعات A…K في سجل التاسكات الكامل</td></tr>
+    <tr><td>أحكام شاشاتٍ فردية</td><td class="c num">155</td><td>مصفوفة UX-01 §9 — منها 27 تتضمّن فعلًا لا مجرّد إعادة تصنيف</td></tr>
+    <tr><td>مخرجاتٌ وثائقيةٌ قبل الكود</td><td class="c num">62</td><td>14 للمالية (UX-02 §11) + 6 لكل إدارةٍ من الثمانٍ</td></tr>
+    <tr><td>بوابات حاجبة</td><td class="c num">9</td><td>أربعُ شروطٍ معمارية (UX-02 §9) + شرطا المنبع (UX-09 · FES §7) + «لا يبدأ الكود قبل الاعتماد» في كل وثيقةٍ إدارية</td></tr>
+  </tbody>
+</table>
+
+<p><strong>توزيع الـ155 شاشةً على الأبواب بحسب المصفوفة:</strong></p>
+<table>
+  <thead><tr><th>الإعدادات</th><th>العمل اليومي</th><th>داخلية</th><th>السجلات الرئيسية</th><th>التقارير</th><th>الموافقات</th><th>تُلغى من التنقل</th><th>لوحة الدور</th></tr></thead>
+  <tbody><tr class="c">
+    <td class="c num">31</td><td class="c num">27</td><td class="c num">23</td><td class="c num">21</td><td class="c num">20</td><td class="c num">15</td><td class="c num">14</td><td class="c num">4</td>
+  </tr></tbody>
+</table>
+
+<footer>
+  تقريرُ تقديرٍ داخليٌّ · نظام إنجاز (EMS) — مجموعة إكيوبيشن · 2026-07-25<br>
+  كلُّ رقمٍ في هذا التقرير مقيسٌ من قاعدة <span class="mono">equipation_manage</span> الحيّة ومن الشيفرة يوم التحرير — لا منقولٌ من وثيقة.
+</footer>
+
+</body>
+</html>
