@@ -1,0 +1,206 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   مجموعات روابط السايدبار (Link Groups) — قائمةٌ قابلة للطيّ بنمط نوشن
+   ───────────────────────────────────────────────────────────────────────────
+   يُحمَّل بعد ems.main.all.style.css مباشرةً من insidebar.php.
+
+   لماذا ملفٌّ مستقل لا إضافة في الملف الرئيس؟ قواعد السايدبار هناك مكتوبة
+   كـ`.sidebar ul li` بلا مُحدِّد ابن، وهي مكرَّرةٌ في ثلاث طبقات تجاوزٍ
+   متراكمة (الأسطر ~749 و~9253 و~11751). فأيّ <ul> متداخل يرث المسافات
+   والمؤشّر الذهبي وتلوين .active. العلاج: إعادة ضبطٍ صريحة هنا بمُحدِّدات
+   ابنٍ ومحاذاةٌ بصريّة مع الأصل — لا تعديل في ذلك الملف الضخم.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ① حاوية المجموعة: الأب flex فتُعاد للتدفّق العمودي ─────────────────── */
+.ems-site .sidebar ul li.nav-group {
+  display: block;
+  overflow: visible;      /* الأصل hidden — يقصّ القائمة المنسدلة */
+  padding: 0;
+  margin: 4px 4px;
+  border-radius: 12px;
+}
+
+/* المؤشّر الذهبي ينتقل من الحاوية إلى الرأس، وإلا امتدّ بطول المجموعة كلها */
+.ems-site .sidebar ul li.nav-group::after {
+  display: none;
+}
+
+/* ── ② رأس المجموعة: زرٌّ يحاكي شكل الرابط تمامًا ────────────────────────── */
+.ems-site .sidebar .nav-group-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  /* الأزرار لا ترث حجم الخط، والرابط المفرد <a> يرثه من الـ<li> (14px) فيصير
+     ارتفاع سطره 21px. توريثه هنا يجعل ارتفاع الصفّين متطابقًا تمامًا؛ ويبقى
+     حجمُ النصّ المرئيّ 0.86rem على .nav-group-name كما في الروابط المفردة. */
+  font-size: inherit;
+  font-weight: 700;
+  color: #555;
+  cursor: pointer;
+  text-align: inherit;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* الـ!important هنا ليس ترفًا: الملف الرئيس يفرض
+   `.ems-site .sidebar ul li i { color: #4b5563 !important }`
+   في إحدى طبقات التجاوز المتراكمة، فتخسر أيُّ قاعدةٍ عاديةٍ مهما علت نوعيّتها.
+   وهو نفس ما اضطُرّ إليه الملفُ الرئيس لتلوين أيقونة الصفحة النشطة. */
+.ems-site .sidebar .nav-group-head > i {
+  font-size: 1rem;
+  width: 24px;
+  text-align: center;
+  /* نفس درجة رمادي أيقونات الروابط المفردة حرفيًّا (#4b5563 لا #6b7280)
+     كي لا يتمايز صفّان في الشريط المطويّ بفارقِ درجةٍ لا معنى له. */
+  color: #4b5563 !important;
+  margin-left: 10px;
+  flex-shrink: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.ems-site .sidebar .nav-group-name {
+  flex: 1 1 auto;         /* يدفع السهم إلى الطرف */
+  margin-left: 10px;
+  font-size: 0.86rem;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* نفس شدّة خلفية التحويم في بقية الشريط (0.14 هي القاعدة الأخيرة الفائزة) */
+.ems-site .sidebar .nav-group-head:hover {
+  background: rgba(244, 197, 66, 0.14);
+  color: #1f1f1f;
+}
+
+/* نفس ذهبيّ التحويم في بقية الشريط (--yellow-deep = #E0AE2E) لا #F4C542 */
+.ems-site .sidebar .nav-group-head:hover > i {
+  color: #E0AE2E !important;
+  transform: translateY(-1px);
+}
+
+.ems-site .sidebar .nav-group-head::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 999px;
+  background: #F4C542;
+  opacity: 0;
+  transform: scaleY(0.25);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ems-site .sidebar .nav-group-head:hover::after,
+.ems-site .sidebar li.nav-group.has-active > .nav-group-head::after {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+/* المجموعة الحاوية للصفحة المفتوحة تبقى ذهبيةً وهي مطويّة — فالافتراض
+   أن الكل مطويّ، ولولا ذلك لَما عرف المستخدم أين هو. */
+.ems-site .sidebar li.nav-group.has-active > .nav-group-head,
+.ems-site .sidebar li.nav-group.has-active > .nav-group-head .nav-group-name {
+  color: #E0AE2E;
+}
+
+.ems-site .sidebar li.nav-group.has-active > .nav-group-head > i:first-child {
+  color: #E0AE2E !important;
+}
+
+/* المجموعة التي تقود بلاطات الوصول السريع حاليًّا */
+.ems-site .sidebar li.nav-group.is-selected > .nav-group-head {
+  background: rgba(244, 197, 66, 0.16);
+}
+
+/* ── ③ سهم الطيّ ────────────────────────────────────────────────────────── */
+/* المُحدِّد `> i.nav-group-caret` لا `.nav-group-caret` وحده: السهم <i> فيلتقطه
+   قالبُ أيقونة الرأس أعلاه (عرض 24px وحجم 1rem)، فلا بدّ من تجاوزه نوعيّةً. */
+.ems-site .sidebar .nav-group-head > i.nav-group-caret {
+  width: auto;
+  margin: 0;
+  font-size: 0.7rem;
+  color: #9ca3af !important;   /* السهم أيضًا <i> فيقع تحت الـ!important نفسه */
+  flex-shrink: 0;
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.ems-site .sidebar li.nav-group.open > .nav-group-head > i.nav-group-caret {
+  transform: rotate(180deg);
+  color: #E0AE2E !important;
+}
+
+/* ── ④ القائمة المنسدلة ─────────────────────────────────────────────────── */
+.ems-site .sidebar ul.nav-group-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  /* visibility لا opacity وحدها: بدونها تبقى الروابط المطويّة في شجرة الوصولية
+     وقابلةً للوصول بـTab — رابطٌ غير مرئيٍّ يتلقّى التركيز خللٌ لا تفصيل. */
+  visibility: hidden;
+  transition: max-height 0.28s ease, opacity 0.18s ease, visibility 0s linear 0.28s;
+}
+
+.ems-site .sidebar li.nav-group.open > ul.nav-group-items {
+  max-height: 1400px;     /* يكفي أطول مجموعة (المالية 30 رابطًا) */
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 0.28s ease, opacity 0.18s ease, visibility 0s linear 0s;
+}
+
+/* إزاحةٌ داخلية تُظهر التبعية دون خطٍّ فاصلٍ صاخب */
+.ems-site .sidebar ul.nav-group-items > li {
+  margin: 2px 6px 2px 4px;
+}
+
+.ems-site .sidebar ul.nav-group-items > li > a {
+  padding: 9px 12px 9px 10px;
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+.ems-site .sidebar ul.nav-group-items > li > a > i {
+  font-size: 0.9rem;
+}
+
+/* ── ⑤ الوضع المطويّ (شريط أيقونات) ─────────────────────────────────────── */
+/* الاسم والسهم يختفيان، والمجموعة لا تنفتح داخل الشريط إطلاقًا: النقر يوسّع
+   السايدبار أولًا ثم يفتحها (قرار المستخدم — لا flyout في هذه المرحلة). */
+.ems-site .sidebar.closed .nav-group-name,
+.ems-site .sidebar.closed .nav-group-head > i.nav-group-caret {
+  opacity: 0;
+  visibility: hidden;
+  margin-left: 0;
+}
+
+.ems-site .sidebar.closed li.nav-group > ul.nav-group-items {
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* محاذاة الأيقونة في الشريط: رأس المجموعة يطابق الرابط المفرد صندوقًا بصندوق.
+   الرابط المفرد في الوضع المطويّ: justify-content:center وحشوٌ جانبيّ صفر، فيبقى
+   داخله <i> بعرض 24px ثم <span> ينكمش لِما تبقّى (31px) وهو مخفيٌّ لكنه يشغل
+   مكانه — وهذا ما يضع الأيقونة حيث هي. فإن بقي الرأس محاذيًا للبداية بحشو 12px
+   ومعه سهمٌ يحجز 10px، انزاحت أيقونته 12px عن جاراتها فبدا الشريط مكسورًا.
+   ثلاث تسوياتٍ تُلغي الفرق كليًّا: */
+.ems-site .sidebar.closed .nav-group-head {
+  justify-content: center;
+  padding: 11px 0;
+}
+
+/* السهم يُزال من التدفّق لا يُخفى فحسب: visibility وحدها تُبقي عرضه محجوزًا */
+.ems-site .sidebar.closed .nav-group-head > i.nav-group-caret {
+  display: none;
+}

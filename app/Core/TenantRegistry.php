@@ -243,6 +243,7 @@ class TenantRegistry
         // ── مراجع نظامٍ عامة (قراءة للجميع، كتابة للمدير الأعلى) ────────────
         'roles' => array('type' => self::T_GLOBAL, 'soft' => false),
         'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'link_groups' => array('type' => self::T_GLOBAL, 'soft' => false),
         'role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
         'report_role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
         'equipments_types' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),

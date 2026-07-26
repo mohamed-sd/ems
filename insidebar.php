@@ -28,7 +28,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       '/ems/assets/css/design-tokens.css',
       '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
       '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>',
-      '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>'
+      '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>',
+      '/ems/assets/css/ems-nav-groups.css<?php echo $__sb_ver('ems-nav-groups.css'); ?>'
     ];
 
     cssFiles.forEach(function (href) {
@@ -189,36 +190,43 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
         require_once __DIR__ . '/includes/finreq_badges.php';
         $__fr_badges = ems_finreq_nav_badges($conn);
-        renderDynamicNavigation($conn, $_SESSION['user']['role'], '../', $__fr_badges);
+        $__sb_links  = getDynamicNavLinks($conn, $_SESSION['user']['role']);
+        $__sb_groups = getNavGroups($conn, $_SESSION['user']['role']);
+        $__sb_tree   = buildNavTree($__sb_links, $__sb_groups);
 
-        // بوابة الطلبات المالية (D05): الروابط تُشتق من جدول التوجيه المفعّل لا من
-        // مالك الوحدة الواحد — فيراها كل دورٍ له طريقٌ في أي إدارةٍ مفعّلة.
-        // (تُطبع مرةً واحدة: ما طبعته الروابط الديناميكية يُستثنى منعًا للتكرار.)
+        // ما طبعته الشجرة يُستثنى مما يليها منعًا للتكرار.
         $__fr_dyn = array();
-        foreach (getDynamicNavLinks($conn, $_SESSION['user']['role']) as $__l) {
+        foreach ($__sb_links as $__l) {
           if (isset($__l['code'])) { $__fr_dyn[$__l['code']] = true; }
         }
+
+        // بوابة الطلبات المالية (D05): الروابط تُشتق من جدول التوجيه المفعّل لا من
+        // مالك الوحدة الواحد — فيراها كل دورٍ له طريقٌ في أي إدارةٍ مفعّلة. ولأنها
+        // ليست صفوفًا في modules فلا group_id لها: تُجمع في مجموعةٍ اصطناعية ثابتة.
+        $__fr_group_links = array();
         foreach (ems_finreq_nav_links($conn) as $__code => $__meta) {
           if (isset($__fr_dyn[$__code])) { continue; }
-          $__n = isset($__fr_badges[$__code]) ? intval($__fr_badges[$__code]) : 0;
-          echo '<li><a href="../' . htmlspecialchars($__code, ENT_QUOTES, 'UTF-8') . '">'
-             . '<i class="' . htmlspecialchars($__meta['icon'], ENT_QUOTES, 'UTF-8') . '"></i> '
-             . '<span>' . htmlspecialchars($__meta['label'], ENT_QUOTES, 'UTF-8') . '</span>'
-             . ($__n > 0 ? ' <span class="nav-count-badge">' . ($__n > 99 ? '99+' : $__n) . '</span>' : '')
-             . '</a></li>' . "\n";
+          $__fr_group_links[] = array('code' => $__code, 'name' => $__meta['label'], 'icon' => $__meta['icon']);
           $__fr_dyn[$__code] = true;
         }
-        // شاشات المالية الممنوحة عرضًا للأدوار التشغيلية (من role_permissions لا الملكية)
+        $__fr_node = makeNavGroupNode('finreq', 'بوابة الطلبات المالية', 'fa fa-file-invoice-dollar', 9000, $__fr_group_links);
+        if ($__fr_node !== null) { $__sb_tree[] = $__fr_node; }
+
+        // شاشات المالية الممنوحة عرضًا للأدوار التشغيلية (من role_permissions لا
+        // الملكية): صفّها مملوكٌ للمالية فمجموعتُه مجموعةُ المالية — لذلك تُعرض
+        // للدور المستعير تحت مجموعةٍ محايدةٍ واحدة بدل اسمٍ لا يخصّه.
+        $__fin_group_links = array();
         if (function_exists('ems_finance_nav_links')) {
           foreach (ems_finance_nav_links($conn) as $__code => $__meta) {
             if (isset($__fr_dyn[$__code])) { continue; }
-            echo '<li><a href="../' . htmlspecialchars($__code, ENT_QUOTES, 'UTF-8') . '">'
-               . '<i class="' . htmlspecialchars($__meta['icon'], ENT_QUOTES, 'UTF-8') . '"></i> '
-               . '<span>' . htmlspecialchars($__meta['label'], ENT_QUOTES, 'UTF-8') . '</span>'
-               . '</a></li>' . "\n";
+            $__fin_group_links[] = array('code' => $__code, 'name' => $__meta['label'], 'icon' => $__meta['icon']);
             $__fr_dyn[$__code] = true;
           }
         }
+        $__fin_node = makeNavGroupNode('finshared', 'شاشات مالية', 'fa fa-coins', 9001, $__fin_group_links);
+        if ($__fin_node !== null) { $__sb_tree[] = $__fin_node; }
+
+        printNavTree($__sb_tree, '../', $__fr_badges);
       }
       ?>
 
@@ -415,9 +423,101 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
         if (p && p === current) {
           var li = a.closest('li');
           if (li) li.classList.add('active');
+          // المجموعة الحاوية تتلوّن ذهبيًّا وهي مطويّة — الافتراض أن الكل مطويّ،
+          // ولولا ذلك لَما عرف المستخدم موضعه.
+          var grp = a.closest('li.nav-group');
+          if (grp) grp.classList.add('has-active');
         }
       });
     }
+  })();
+
+  /* ═════════════════════════════════════════════════════════════════════════
+   * مجموعات الروابط: الطيّ، وحفظ الحالة، وقيادة بلاطات الوصول السريع
+   * ─────────────────────────────────────────────────────────────────────────
+   * الافتراض عند أول فتح: كل المجموعات مطويّة (قرار المستخدم). ثم تُحفظ
+   * اختيارات الطيّ في localStorage فتصمد بين الصفحات.
+   *
+   * «المجموعة المختارة» تقود بلاطات الوصول السريع في لوحة التحكم: افتراضها
+   * أول مجموعة، وتتغيّر بنقر رأس أي مجموعة — يُبثّ ذلك حدثًا تلتقطه اللوحة.
+   * ═════════════════════════════════════════════════════════════════════════ */
+  (function () {
+    var sb = document.getElementById('sidebar');
+    if (!sb) return;
+
+    var groups = Array.prototype.slice.call(sb.querySelectorAll('li.nav-group'));
+    if (!groups.length) return;
+
+    var OPEN_KEY = 'ems.navGroups.open';
+    var SEL_KEY  = 'ems.navGroups.selected';
+
+    function readOpen() {
+      try {
+        var raw = window.localStorage.getItem(OPEN_KEY);
+        var arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) { return []; }
+    }
+
+    function writeOpen(keys) {
+      try { window.localStorage.setItem(OPEN_KEY, JSON.stringify(keys)); } catch (e) {}
+    }
+
+    function currentOpenKeys() {
+      return groups.filter(function (g) { return g.classList.contains('open'); })
+                   .map(function (g) { return g.getAttribute('data-group-key'); });
+    }
+
+    function setSelected(key, broadcast) {
+      groups.forEach(function (g) {
+        g.classList.toggle('is-selected', g.getAttribute('data-group-key') === key);
+      });
+      try { window.localStorage.setItem(SEL_KEY, key); } catch (e) {}
+      if (broadcast) {
+        document.dispatchEvent(new CustomEvent('ems:navgroup-selected', { detail: { key: key } }));
+      }
+    }
+
+    function toggleGroup(g) {
+      var head = g.querySelector('.nav-group-head');
+      var open = !g.classList.contains('open');
+      g.classList.toggle('open', open);
+      if (head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      writeOpen(currentOpenKeys());
+      return open;
+    }
+
+    // استرجاع حالة الطيّ المحفوظة (أول زيارةٍ على الإطلاق = لا شيء = الكل مطويّ)
+    var saved = readOpen();
+    groups.forEach(function (g) {
+      if (saved.indexOf(g.getAttribute('data-group-key')) !== -1) {
+        g.classList.add('open');
+        var h = g.querySelector('.nav-group-head');
+        if (h) h.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // المجموعة المختارة: المحفوظة إن كانت لا تزال مرئيّة، وإلا فأوّل مجموعة.
+    var savedSel = null;
+    try { savedSel = window.localStorage.getItem(SEL_KEY); } catch (e) {}
+    var keys = groups.map(function (g) { return g.getAttribute('data-group-key'); });
+    setSelected((savedSel && keys.indexOf(savedSel) !== -1) ? savedSel : keys[0], false);
+
+    groups.forEach(function (g) {
+      var head = g.querySelector('.nav-group-head');
+      if (!head) return;
+      head.addEventListener('click', function () {
+        // في الوضع المطويّ (شريط أيقونات) النقرُ يوسّع السايدبار أولًا ثم يفتح.
+        if (sb.classList.contains('closed') && !isMobile()) {
+          sb.classList.remove('closed');
+          if (!g.classList.contains('open')) { toggleGroup(g); }
+          refreshPageLayoutAfterAnimation();
+        } else {
+          toggleGroup(g);
+        }
+        setSelected(g.getAttribute('data-group-key'), true);
+      });
+    });
   })();
 
   const sidebar       = document.getElementById('sidebar');

@@ -314,6 +314,35 @@ require_once __DIR__ . '/../includes/layout_head.php';
             </div>
         </a>
 
+        <!-- مجموعات الروابط -->
+        <a href="link_groups.php" class="permission-card modules">
+            <div class="permission-card-header">
+                <div class="permission-card-icon">
+                    <i class="fas fa-folder-tree"></i>
+                </div>
+                <div>
+                    <div class="permission-card-title">مجموعات الروابط</div>
+                    <div class="permission-card-subtitle">تنظيم الشريط الجانبي</div>
+                </div>
+            </div>
+            <div class="permission-card-body">
+                <p class="permission-card-desc">
+                    اجمع روابط كل دور تحت أسماء مجموعات تظهر في الشريط الجانبي كقوائم قابلة للطيّ، ولكل دور مجموعاته الخاصة.
+                </p>
+                <ul class="permission-card-features">
+                    <li>إنشاء مجموعات لكل دور</li>
+                    <li>ترتيب المجموعات وأيقوناتها</li>
+                    <li>تفعيل وتعطيل المجموعات</li>
+                    <li>قيادة بلاطات الوصول السريع</li>
+                </ul>
+                <div class="permission-card-footer">
+                    <div class="permission-card-link">
+                        <i class="fas fa-arrow-left"></i> إدارة المجموعات
+                    </div>
+                </div>
+            </div>
+        </a>
+
         <!-- الصلاحيات المفصلة -->
         <a href="role_permissions.php" class="permission-card detailed">
             <div class="permission-card-header">

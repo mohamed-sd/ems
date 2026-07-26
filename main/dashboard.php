@@ -116,6 +116,35 @@ foreach ($dynamicLinks as $l) {
   ];
 }
 
+// ── الوصول السريع بمنطق المجموعات ──────────────────────────────────────────
+// البلاطات = روابط المجموعة المختارة في السايدبار (أوّل مجموعة افتراضًا، ثم
+// تتبدّل بنقر رأس أي مجموعة). تُطبع كل المجموعات خادميًّا وتُخفى إلا المختارة،
+// فالتبديل فوريٌّ بلا طلبٍ للشبكة — وأكبر دورٍ عندنا 30 رابطًا فالحجم تافه.
+// روابط المجموعة كلها تظهر هنا: is_quick تبقى حاكمةً للحالة القديمة وحدها
+// (دورٌ بلا مجموعاتٍ إطلاقًا) فلا ينكسر شيء قبل إنشاء أوّل مجموعة.
+$dashGroupTiles = [];   // key => ['name' => .., 'tiles' => [[href,label,icon], ..]]
+$dashGroups = function_exists('getNavGroups') ? getNavGroups($conn, $role) : [];
+if (!empty($dashGroups)) {
+  $dashByGroup = [];
+  foreach ($dynamicLinks as $l) {
+    $gid = isset($l['group_id']) && $l['group_id'] !== null ? (int) $l['group_id'] : 0;
+    if ($gid > 0) {
+      $dashByGroup[$gid][] = $l;
+    }
+  }
+  foreach ($dashGroups as $g) {
+    $gid = (int) $g['id'];
+    if (empty($dashByGroup[$gid])) {
+      continue; // مجموعة بلا روابط مرئية — لا تُطبع (مطابقةً للسايدبار)
+    }
+    $tiles = [];
+    foreach ($dashByGroup[$gid] as $l) {
+      $tiles[] = ['../' . $l['code'], $l['name'], !empty($l['icon']) ? $l['icon'] : 'fa fa-link'];
+    }
+    $dashGroupTiles['g' . $gid] = ['name' => $g['name'], 'tiles' => $tiles];
+  }
+}
+
 // (كانت هنا نُطُق سلسلة المنشئين الموروثة $sc/$sp/$so قبل أعمدة company_id —
 // البوابة تعزل بالعمود مباشرة، وقائمة مشاريع الشركة تُجلَب مرةً لتعويض استعلامات
 // «IN(SELECT id FROM project ...)» الفرعية بنمط قائمة المعرّفات المعتمد.)
@@ -546,6 +575,31 @@ body.ems-site,
   font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
 }
 
+/* اسم المجموعة التي تقود البلاطات حاليًّا — يتبدّل بنقر رأس مجموعةٍ في السايدبار */
+.shot-quick-group-name {
+  margin-right: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(244, 197, 66, 0.18);
+  color: #8a6a10;
+  font-size: 0.82rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.shot-quick-group-name:empty {
+  display: none;
+}
+
+/* شبكةٌ لكل مجموعة، والمعروضُ منها واحدةٌ فقط */
+.shot-hex-grid[data-quick-group] {
+  display: none;
+}
+
+.shot-hex-grid[data-quick-group].is-active {
+  display: grid;
+}
+
 .shot-quick-zone {
   width: 100%;
   background: #fff;
@@ -966,37 +1020,80 @@ body.ems-site,
     <div class="shot-breadcrumb" id="emsClock"><?= date('Y F d, l') ?></div>
 
     <div class="shot-quick-zone">
-    <h2 class="shot-section-title">الوصول السريع</h2>
+    <h2 class="shot-section-title">الوصول السريع<span id="quickGroupName" class="shot-quick-group-name"></span></h2>
 
     <?php
-    // يعرض كل روابط جدول modules (مثل السايدبار تماماً) بلا قصّ.
-    $quickTiles = $links;
-    if (empty($quickTiles)) {
-      $quickTiles = [
-        ['../main/dashboard.php', 'لوحة التحكم', 'fa-solid fa-house'],
-      ];
-    }
-    $quickTilesCount = count($quickTiles);
-    $quickGridClass = ($quickTilesCount > 2 && ($quickTilesCount % 2 === 1)) ? 'cols-3' : 'cols-4';
-
-    // قاعدة التصميم: إذا تبقّى فراغ في آخر صف، يُمدّ الكارت الأخير ليملأ الصف كاملاً.
-    // نحسب عدد الأعمدة التي يمتدّها الكارت الأخير عند كل قياس شاشة (سطح المكتب / متوسط).
-    $lastSpanFor = function ($cols) use ($quickTilesCount) {
-      $rem = $quickTilesCount % $cols;        // عدد الكاردات في الصف الأخير
-      return ($rem === 0) ? 1 : ($cols - $rem + 1); // يملأ الأعمدة الشاغرة + عموده
+    // قاعدة التصميم القائمة: إذا تبقّى فراغ في آخر صف، يُمدّ الكارت الأخير ليملأ
+    // الصف كاملاً. تُحسب لكل شبكةٍ على حدة لأن كل مجموعةٍ لها عدد بلاطاتٍ مختلف.
+    $renderQuickGrid = function (array $tiles, $groupKey = null) {
+      if (empty($tiles)) {
+        return;
+      }
+      $n = count($tiles);
+      $gridClass = ($n > 2 && ($n % 2 === 1)) ? 'cols-3' : 'cols-4';
+      $spanFor = function ($cols) use ($n) {
+        $rem = $n % $cols;                        // عدد الكاردات في الصف الأخير
+        return ($rem === 0) ? 1 : ($cols - $rem + 1); // يملأ الأعمدة الشاغرة + عموده
+      };
+      $attrs = $groupKey !== null
+        ? ' data-quick-group="' . htmlspecialchars($groupKey, ENT_QUOTES, 'UTF-8') . '"'
+        : '';
+      ?>
+      <div class="shot-hex-grid <?= $gridClass ?>"<?= $attrs ?>
+           style="--last-span-desktop: <?= $spanFor($gridClass === 'cols-3' ? 3 : 4) ?>; --last-span-mid: <?= $spanFor(2) ?>;">
+        <?php foreach ($tiles as $lk): ?>
+        <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
+          <span class="shot-hex-icon"><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
+          <span class="shot-hex-title"><?= htmlspecialchars($lk[1]) ?></span>
+        </a>
+        <?php endforeach; ?>
+      </div>
+      <?php
     };
-    $lastSpanDesktop = $lastSpanFor($quickGridClass === 'cols-3' ? 3 : 4);
-    $lastSpanMid = $lastSpanFor(2); // عند ≤1280px تصبح الشبكة عمودين
+
+    if (!empty($dashGroupTiles)) {
+      // شبكةٌ لكل مجموعة، وتُظهر إحداها فقط — الاختيار من السايدبار عبر JS.
+      foreach ($dashGroupTiles as $gk => $g) {
+        $renderQuickGrid($g['tiles'], $gk);
+      }
+    } else {
+      // لا مجموعات لهذا الدور: السلوك القديم حرفيًّا (روابط is_quick بلا تجميع).
+      $quickTiles = !empty($links) ? $links : [['../main/dashboard.php', 'لوحة التحكم', 'fa-solid fa-house']];
+      $renderQuickGrid($quickTiles);
+    }
     ?>
 
-    <div class="shot-hex-grid <?= $quickGridClass ?>" style="--last-span-desktop: <?= $lastSpanDesktop ?>; --last-span-mid: <?= $lastSpanMid ?>;">
-      <?php foreach ($quickTiles as $i => $lk): ?>
-      <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
-        <span class="shot-hex-icon"><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
-        <span class="shot-hex-title"><?= htmlspecialchars($lk[1]) ?></span>
-      </a>
-      <?php endforeach; ?>
-    </div>
+    <?php if (!empty($dashGroupTiles)): ?>
+    <script>
+      /* بلاطات الوصول السريع تتبع المجموعة المختارة في السايدبار.
+         الافتراض عند أول فتح: أوّل مجموعة. والتبديل فوريٌّ بلا طلبٍ للشبكة
+         لأن كل الشبكات مطبوعةٌ خادميًّا ومخفيّة إلا واحدة. */
+      (function () {
+        var grids = Array.prototype.slice.call(document.querySelectorAll('.shot-hex-grid[data-quick-group]'));
+        if (!grids.length) return;
+
+        var nameEl = document.getElementById('quickGroupName');
+        var names  = <?= json_encode(array_map(function ($g) { return $g['name']; }, $dashGroupTiles), JSON_UNESCAPED_UNICODE) ?>;
+        var keys   = grids.map(function (g) { return g.getAttribute('data-quick-group'); });
+
+        function show(key) {
+          if (keys.indexOf(key) === -1) { key = keys[0]; }
+          grids.forEach(function (g) {
+            g.classList.toggle('is-active', g.getAttribute('data-quick-group') === key);
+          });
+          if (nameEl) { nameEl.textContent = names[key] || ''; }
+        }
+
+        var saved = null;
+        try { saved = window.localStorage.getItem('ems.navGroups.selected'); } catch (e) {}
+        show(saved || keys[0]);
+
+        document.addEventListener('ems:navgroup-selected', function (ev) {
+          if (ev && ev.detail && ev.detail.key) { show(ev.detail.key); }
+        });
+      })();
+    </script>
+    <?php endif; ?>
     </div>
 
     <div class="shot-lower-zone">
