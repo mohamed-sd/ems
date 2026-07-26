@@ -445,6 +445,21 @@ class TimesheetEntryService
         );
         $res = self::submit($conn, $gate, $input, $actor);
         if (!$res['ok']) { return array('ok' => false, 'code' => $res['code'], 'skipped' => implode('·', isset($res['missing']) ? $res['missing'] : array())); }
+
+        // ── فجوةٌ أُصلحت (2026-07-27): المرآةُ كانت تقف عند 200 فلا تنتقل
+        //    تعديلاتُ الصف الحي إليها أبدًا. الآن الواقعةُ القائمة تُنعَش —
+        //    وإن كانت مقفولةً (اعتُمد موقعُها) بقيت كما هي: مسجِّلُ تاريخٍ
+        //    لا يعدّل معتمَدًا، والرفضُ يُسجَّل لا يُفشِل.
+        if (!empty($res['existing'])) {
+            $rf = self::refreshEntry($conn, $gate, (int) $t['company_id'], (int) $res['entry']['id'], array(
+                'qty' => $qty, 'unit_type' => $unitType,
+                'operator_employee_id' => (int) $t['employee_id'] ?: null,
+                'time_lines' => $input['time_lines'],
+            ), $actor);
+            if (!$rf['ok'] && $rf['code'] !== 423) {
+                error_log('mirror refresh ts#' . $tsId . ': ' . (isset($rf['skipped']) ? $rf['skipped'] : $rf['code']));
+            }
+        }
         return array('ok' => true, 'code' => $res['code'],
                      'entry_id' => (int) $res['entry']['id'], 'existing' => !empty($res['existing']));
     }
@@ -559,6 +574,89 @@ class TimesheetEntryService
     public static function timeLinesUiOn()
     {
         return function_exists('ems_env') && ems_env('EMS_TS_TIME_LINES', 'off') === 'on';
+    }
+
+    /**
+     * علمُ قلب الكاتب (UX-03 §8.1: «مصدرُ الكتابة الوحيد عبر خدمة الإدخال»):
+     *   legacy (الافتراض) = timesheet يُكتب أولًا والخدمةُ مرآة.
+     *   service           = الخدمةُ تكتب أولًا وtimesheet نسخةٌ مشتقة.
+     * الرجوعُ قلبةُ علَمٍ بلا نشر كود.
+     */
+    public static function writerServiceOn()
+    {
+        return function_exists('ems_env') && ems_env('EMS_TS_WRITER', 'legacy') === 'service';
+    }
+
+    /** الحالاتُ التي يجوز فيها تحديثُ الواقعة — قبل قفل النسخة (§8.2). */
+    const REFRESHABLE_STATES = array('draft', 'submitted', 'returned');
+
+    /**
+     * تحديثُ واقعةٍ قائمةٍ قبل قفل النسخة (§8.2: اعتمادُ الموقع = قفل).
+     *
+     * يحدّث الكميةَ ووحدتَها والمشغّلَ ويستبدل سطورَ الزمن كاملةً، ثم يعيد
+     * تقييمَ حارس الطاقة على الواقع الجديد (وقد يرفع العلمَ أو— إن زال
+     * التجاوزُ — يتركه للتخليص البشري: العلمُ لا يُخفَض آليًّا، قرارُ D02).
+     *
+     * @return array {ok, code, warnings?}  423 = مقفولة (اعتُمد موقعُها)
+     */
+    public static function refreshEntry(\mysqli $conn, $gate, $companyId, $entryId, array $input, $actor)
+    {
+        $companyId = (int) $companyId;
+        $entryId = (int) $entryId;
+        $e = self::rawEntry($conn, $companyId, $entryId);
+        if (!$e) { return array('ok' => false, 'code' => 404, 'skipped' => 'واقعةٌ غير موجودة'); }
+        if (!in_array($e['state'], self::REFRESHABLE_STATES, true)) {
+            return array('ok' => false, 'code' => 423,
+                'skipped' => 'قفلُ نسخة: اعتُمد موقعُها (' . $e['state'] . ') — التعديلُ بالإعادة الرسمية بسببٍ وبالرقم نفسه');
+        }
+
+        $timeLines = (isset($input['time_lines']) && is_array($input['time_lines'])) ? $input['time_lines'] : array();
+        $gate->runInTransaction(function ($g) use ($conn, $companyId, $entryId, $e, $input, $timeLines, $actor) {
+            $upd = array();
+            if (isset($input['qty']))       { $upd['qty'] = round((float) $input['qty'], 2); }
+            if (isset($input['unit_type'])) { $upd['unit_type'] = (string) $input['unit_type']; }
+            if (array_key_exists('operator_employee_id', $input)) {
+                $upd['operator_employee_id'] = $input['operator_employee_id'] ? (int) $input['operator_employee_id'] : null;
+            }
+            if (!empty($upd)) { $g->update('unit_entries', $upd, array('id' => $entryId)); }
+
+            if (!empty($timeLines)) {
+                // استبدالُ السطور كاملًا — الواقعةُ الجديدة تحلّ محلّ القديمة نصًّا
+                $del = $conn->prepare("DELETE FROM unit_time_log WHERE company_id=? AND entry_id=?");
+                $del->bind_param('ii', $companyId, $entryId);
+                $del->execute();
+                $del->close();
+                $opEmp = array_key_exists('operator_employee_id', $input)
+                    ? ($input['operator_employee_id'] ? (int) $input['operator_employee_id'] : null)
+                    : ($e['operator_employee_id'] !== null ? (int) $e['operator_employee_id'] : null);
+                foreach ($timeLines as $line) {
+                    $hours = isset($line['hours']) ? round((float) $line['hours'], 2) : 0.0;
+                    if ($hours <= 0) { continue; }
+                    $g->insert('unit_time_log', array(
+                        'log_date' => $e['entry_date'], 'shift' => $e['shift'],
+                        'project_id' => (int) $e['project_id'], 'equipment_id' => (int) $e['equipment_id'],
+                        'operator_employee_id' => $opEmp,
+                        'supplier_entity_id' => $e['supplier_entity_id'] !== null ? (int) $e['supplier_entity_id'] : null,
+                        'hours' => $hours,
+                        'ops_state' => self::safeOpsState(isset($line['ops_state']) ? $line['ops_state'] : ''),
+                        'cause_note' => isset($line['cause_note']) ? mb_substr(trim((string) $line['cause_note']), 0, 200) : null,
+                        'resp_party' => self::safeRespParty(isset($line['resp_party']) ? $line['resp_party'] : ''),
+                        'entry_id' => $entryId, 'entered_by' => (int) $actor ?: null,
+                    ));
+                }
+            }
+        }, 'unit-entry-refresh');
+
+        // إعادةُ تقييم الحارس على الواقع الجديد
+        $warnings = array();
+        $fresh = self::rawEntry($conn, $companyId, $entryId);
+        if ($fresh) {
+            foreach (CapacityGuard::evaluate($conn, $gate, $fresh) as $b) {
+                $warnings[] = array('type' => 'capacity', 'subject' => $b['subject'],
+                    'measured' => $b['measured'], 'capacity' => $b['capacity']);
+            }
+        }
+        return array('ok' => true, 'code' => 200, 'warnings' => $warnings);
     }
 
     private static function timeLinesFromTimesheet(array $t)

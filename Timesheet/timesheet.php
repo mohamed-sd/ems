@@ -386,6 +386,159 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
 
   // الكتابة عبر معاملة البوابة المُدارة: سجل الدوام + إعادة بناء سطور الأعطال ذرّيًّا —
   // البوابة تحقن company_id وتفرض ملكية الصف عند التعديل (بديل نطاق EXISTS القديم حرفيًا).
+  // ═══ قلبُ الكاتب (UX-03 §8.1 · خلف EMS_TS_WRITER=service) ═══════════════
+  // «السجلُّ القانوني مصدرُ الكتابة الوحيد عبر خدمة الإدخال» — الخدمةُ تكتب
+  // أولًا (بفحوصها: 422 نقص · مفتاحُ العطالة · حارسُ الطاقة · قفلُ النسخة)
+  // وصفُّ timesheet يُكتب نسخةً مشتقةً في المعاملة نفسِها. الرجوعُ قلبةُ علَم.
+  $ts_writer_service = \App\Services\Unit\TimesheetEntryService::writerServiceOn();
+  if ($ts_writer_service) {
+    $svc_actor = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+    // معدةُ التشغيل — بابُ الاشتقاق
+    $svc_op = intval($values['operator']);
+    $svc_eq_row = null;
+    try {
+      $svc_eq_row = $ts_gate->selectOne('operations', array('columns' => array('id', 'equipment'), 'where' => array('id' => $svc_op)));
+    } catch (\Throwable $t) { /* يُعالج أدناه */ }
+    if (!$svc_eq_row || empty($svc_eq_row['equipment'])) {
+      echo "<script>alert('❌ لا معدةَ على هذا التشغيل — لا تُكتب واقعةٌ بلا معدة');</script>";
+      exit;
+    }
+    $svc_eq = intval($svc_eq_row['equipment']);
+
+    // السطور: ما جمعته الشاشةُ، وإلا ترجمةُ الأعمدة (نفسُ خريطة المرآة حرفيًّا)
+    $svc_lines = $ts_posted_lines;
+    if (empty($svc_lines)) {
+      $svc_lines = array();
+      $svc_map = array(
+        array('executed_hours', 'actual_work', 'none', null),
+        array('standby_hours', 'standby', 'client', 'استعدادٌ بسبب العميل'),
+        array('dependence_hours', 'standby', 'company', 'تبعية/انتظار اعتماد'),
+        array('maintenance_fault', 'tech_breakdown', 'company', null),
+        array('hr_fault', 'operator_stop', 'operator', null),
+        array('marketing_fault', 'client_stop', 'client', 'توقفٌ سببه العميل'),
+        array('ts_supplier_stop_hours', 'supplier_stop', 'supplier', null),
+        array('ts_planned_stop_hours', 'planned_stop', 'planned', null),
+        array('ts_force_majeure_hours', 'force_majeure', 'force_majeure', null),
+        array('other_fault_hours', 'unlogged', 'none', 'أعطالٌ أخرى غير مصنّفة'),
+      );
+      foreach ($svc_map as $sm) {
+        $h = isset($values[$sm[0]]) ? (float) $values[$sm[0]] : 0.0;
+        if ($h > 0) { $svc_lines[] = array('hours' => $h, 'ops_state' => $sm[1], 'resp_party' => $sm[2], 'cause_note' => $sm[3]); }
+      }
+    }
+    // وحدةُ العقد: غيرُ الساعيّ أولى (نفسُ قاعدة المرآة)
+    $svc_m = (float) $values['meters_count']; $svc_t = (float) $values['tons_count'];
+    if ($svc_m > 0)     { $svc_unit = 'meter'; $svc_qty = $svc_m; }
+    elseif ($svc_t > 0) { $svc_unit = 'ton';   $svc_qty = $svc_t; }
+    else                { $svc_unit = 'hour';  $svc_qty = (float) $values['executed_hours']; }
+    $svc_emp = intval($values['employee_id']) ?: null;
+
+    try {
+      $svc_capacity_warn = false;
+
+      if ($id > 0) {
+        // ── تعديل: المرآةُ القائمة تُنعَش — وقفلُ النسخة يُحترم نصًّا ──
+        $svc_uuid = 'ts:' . $id;
+        $svc_entry = null;
+        $st = $conn->prepare("SELECT id, company_id FROM unit_entries WHERE sync_uuid = ? LIMIT 1");
+        $st->bind_param('s', $svc_uuid);
+        $st->execute();
+        $svc_entry = $st->get_result()->fetch_assoc();
+        $st->close();
+
+        if ($svc_entry) {
+          $rf = \App\Services\Unit\TimesheetEntryService::refreshEntry($conn, $ts_gate,
+            (int) $svc_entry['company_id'], (int) $svc_entry['id'],
+            array('qty' => $svc_qty, 'unit_type' => $svc_unit,
+                  'operator_employee_id' => $svc_emp, 'time_lines' => $svc_lines), $svc_actor);
+          if (!$rf['ok'] && $rf['code'] === 423) {
+            echo "<script>alert('🔒 قفلُ نسخة: اعتُمد موقعُ هذا اليوم — التعديلُ بالإعادة الرسمية بسببٍ وبالرقم نفسه (UX-03 §8.2)');</script>";
+            exit;
+          }
+          if (!$rf['ok']) { throw new \RuntimeException('تعذّر تحديث الواقعة: ' . (isset($rf['skipped']) ? $rf['skipped'] : $rf['code'])); }
+          foreach ((isset($rf['warnings']) ? $rf['warnings'] : array()) as $w) {
+            if ($w['type'] === 'capacity') { $svc_capacity_warn = true; }
+          }
+          // النسخة القديمة تُحدَّث في معاملةٍ تاليةٍ بنفس بنية المسار القديم
+          $ts_gate->runInTransaction(function ($g) use ($id, $fields, $values, $fault_items) {
+            $update_data = array();
+            foreach ($fields as $f) { $update_data[$f] = $values[$f]; }
+            $g->update('timesheet', $update_data, array('id' => $id));
+            $operation_id = intval($values['operator']);
+            $equipment_type = intval($values['type']);
+            $created_by = intval($values['user_id']) ?: 0;
+            if (!save_timesheet_failure_hours($g, $id, $operation_id, $values['date'], $equipment_type, 0, $created_by, $fault_items)) {
+              throw new \RuntimeException('فشل حفظ تفاصيل الأعطال المتعددة');
+            }
+          });
+          $saved_timesheet_id = $id;
+        } else {
+          // صفٌّ سابقٌ للكتابة المزدوجة (لا مرآةَ له): يسلك المسارَ القديم أدناه
+          $ts_writer_service = false;
+        }
+      } else {
+        // ── جديد: الخدمةُ أولًا — ثم النسخةُ القديمة والربطُ ذريًّا ──
+        $svc_res = \App\Services\Unit\TimesheetEntryService::submit($conn, $ts_gate, array(
+          'company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+          'equipment_id' => $svc_eq, 'shift' => (string) $values['shift'],
+          'date' => (string) $values['date'], 'qty' => $svc_qty, 'unit_type' => $svc_unit,
+          'time_lines' => $svc_lines, 'source_ref' => 'TS-SCREEN',
+          'operation_id' => $svc_op, 'operator_employee_id' => $svc_emp,
+          'note' => 'كُتبت من الشاشة — الخدمةُ المصدرُ الأول (EMS_TS_WRITER=service)',
+          'publish_events' => false,
+        ), $svc_actor);
+
+        if (!$svc_res['ok']) {
+          $miss = isset($svc_res['missing']) ? implode(' · ', $svc_res['missing']) : 'نقصٌ غير مفسَّر';
+          echo "<script>alert('❌ رفضت خدمةُ الإدخال الحفظ (422): " . addslashes($miss) . "');</script>";
+          exit;
+        }
+        if (!empty($svc_res['existing'])) {
+          // مفتاحُ العطالة (معدة×يوم×وردية): بابُ التكرار الذي دخل منه القديمُ أُغلق
+          $ex_no = isset($svc_res['entry']['entry_no']) ? $svc_res['entry']['entry_no'] : ('#' . $svc_res['entry']['id']);
+          echo "<script>alert('⚠️ يومٌ مسجَّلٌ سلفًا لهذه المعدة بهذه الوردية — المرجع " . addslashes($ex_no) . "\\n\\nعدّل الصفَّ القائمَ بدل تكراره (مفتاح العطالة §8.2)');</script>";
+          exit;
+        }
+        foreach ((isset($svc_res['warnings']) ? $svc_res['warnings'] : array()) as $w) {
+          if ($w['type'] === 'capacity') { $svc_capacity_warn = true; }
+        }
+        $svc_entry_id = (int) $svc_res['entry']['id'];
+
+        // النسخةُ القديمة + الربطُ البنيوي — معاملةٌ واحدة: فشلُها يُبقي الواقعةَ
+        // القانونية بلا نسبٍ فتُرصد (sync_uuid فارغ = نسخةٌ لم تُكتب — لا صمت)
+        $saved_timesheet_id = 0;
+        $ts_gate->runInTransaction(function ($g) use ($conn, $fields, $values, $fault_items, $svc_entry_id, &$saved_timesheet_id) {
+          $insert_data = array();
+          foreach ($fields as $f) { $insert_data[$f] = $values[$f]; }
+          $saved_timesheet_id = intval($g->insert('timesheet', $insert_data));
+          $operation_id = intval($values['operator']);
+          $equipment_type = intval($values['type']);
+          $created_by = intval($values['user_id']) ?: 0;
+          if (!save_timesheet_failure_hours($g, $saved_timesheet_id, $operation_id, $values['date'], $equipment_type, 0, $created_by, $fault_items)) {
+            throw new \RuntimeException('فشل حفظ تفاصيل الأعطال المتعددة');
+          }
+          $g->update('unit_entries', array(
+            'sync_uuid' => 'ts:' . $saved_timesheet_id,
+            'source_ref' => 'TS-' . $saved_timesheet_id,
+          ), array('id' => $svc_entry_id));
+        });
+      }
+
+      if ($ts_writer_service) {
+        $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
+        $svc_msg = $svc_capacity_warn
+          ? '⚠️ حُفظ مع تجاوز طاقة!\n\nالمعدة أو المشغّل تجاوز حدَّه اليومي — الواقعةُ معلَّمةٌ ولن يكتمل اعتمادُ الموقع قبل بيان السبب وتخليص العلم.'
+          : '✅ تم الحفظ بنجاح (المصدر: السجل القانوني)';
+        echo "<script>alert('" . $svc_msg . "'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
+        exit;
+      }
+    } catch (\Throwable $t) {
+      error_log('timesheet writer=service save: ' . $t->getMessage());
+      echo "<script>alert('❌ خطأ في الحفظ: " . addslashes($t->getMessage()) . "');</script>";
+      exit;
+    }
+  }
+
   try {
     $saved_timesheet_id = 0; // يُلتقط بالمرجع لخطاف الكتابة المزدوجة بعد المعاملة
     $ts_gate->runInTransaction(function ($g) use ($id, $fields, $values, $fault_items, &$saved_timesheet_id) {

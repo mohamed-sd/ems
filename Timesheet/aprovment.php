@@ -42,6 +42,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    // ── قفلُ النسخة (UX-03 §8.2 · قرار المالك 2026-07-27، مع قلب الكاتب) ──
+    // اعتمادُ الموقع = قفل: لا تعديلَ ولا طلبَ تعديلٍ بعده — الطريقُ الوحيد
+    // الإعادةُ الرسمية بسببٍ وبالرقم نفسه. يسري خلف EMS_TS_WRITER=service.
+    require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+    if (\App\Services\Unit\TimesheetEntryService::writerServiceOn()) {
+        try {
+            $vl_uuid = 'ts:' . $id;
+            $vl = $conn->prepare("SELECT state FROM unit_entries WHERE sync_uuid = ? LIMIT 1");
+            $vl->bind_param('s', $vl_uuid);
+            $vl->execute();
+            $vl_row = $vl->get_result()->fetch_assoc();
+            $vl->close();
+            if ($vl_row && !in_array($vl_row['state'],
+                    \App\Services\Unit\TimesheetEntryService::REFRESHABLE_STATES, true)) {
+                echo "<script>alert('🔒 قفلُ نسخة: اعتُمد موقعُ هذا اليوم (" . $vl_row['state'] . ") — التعديلُ بالإعادة الرسمية بسببٍ وبالرقم نفسه لا بطلب تعديل');window.location.href='timesheet.php?type=$t';</script>";
+                exit();
+            }
+        } catch (\Throwable $vlT) { error_log('aprovment version lock: ' . $vlT->getMessage()); }
+    }
+
     $new_status = 0;
     $approval_action = '';
     if ($type == "1") {
