@@ -299,6 +299,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   }
   $values['date'] = $normalized_date;
 
+  // ── UX-03 §5.1: سطورُ الزمن بحالاتها ومسؤوليها (خلف EMS_TS_TIME_LINES) ──
+  // حين تصل سطورٌ من الشاشة، **الخادمُ يشتق منها الأعمدةَ التسعة** ويستبدل
+  // قيمَ POST بها — مصدرُ حقيقةٍ واحدٌ لا اثنان، ولا ثقةَ بحساب المتصفح.
+  // والسطورُ الحقيقية تُمرَّر للمرآة فيحفظ السجلُّ القانوني السببَ الدقيق
+  // (fuel_logistics_stop مثلًا) الذي لا خانةَ له في القديم.
+  $ts_posted_lines = null;
+  require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+  if (\App\Services\Unit\TimesheetEntryService::timeLinesUiOn()
+      && isset($_POST['ts_time_lines_json']) && trim((string)$_POST['ts_time_lines_json']) !== '') {
+    $ts_lines_raw = json_decode((string)$_POST['ts_time_lines_json'], true);
+    if (is_array($ts_lines_raw) && !empty($ts_lines_raw)) {
+      $ts_valid_states = array('actual_work','standby','tech_breakdown','supplier_stop','operator_stop',
+                               'client_stop','fuel_logistics_stop','planned_stop','force_majeure','unlogged');
+      $ts_valid_resp   = array('company','supplier','operator','client','planned','force_majeure','none');
+      $ts_posted_lines = array();
+      foreach ($ts_lines_raw as $tl) {
+        $h = isset($tl['hours']) ? (float)$tl['hours'] : 0.0;
+        if ($h <= 0 || $h > 24) { continue; }
+        $stt = isset($tl['ops_state']) && in_array($tl['ops_state'], $ts_valid_states, true) ? $tl['ops_state'] : 'unlogged';
+        $rsp = isset($tl['resp_party']) && in_array($tl['resp_party'], $ts_valid_resp, true) ? $tl['resp_party'] : 'none';
+        $ts_posted_lines[] = array(
+          'hours' => round($h, 2), 'ops_state' => $stt, 'resp_party' => $rsp,
+          'cause_note' => isset($tl['cause_note']) ? mb_substr(trim((string)$tl['cause_note']), 0, 190) : null,
+        );
+      }
+      if (!empty($ts_posted_lines)) {
+        // الاشتقاق الخادمي يغلب قيمَ POST للأعمدة الزمنية كلِّها
+        $ts_derived = \App\Services\Unit\TimesheetEntryService::legacyColumnsFromLines($ts_posted_lines);
+        foreach ($ts_derived as $dk => $dv) {
+          if (array_key_exists($dk, $values) || in_array($dk, $fields, true)) { $values[$dk] = (string)$dv; }
+        }
+      } else {
+        $ts_posted_lines = null;
+      }
+    }
+  }
+
   // Parse multiple failure items from hidden JSON; fallback to legacy single fault field.
   $fault_items = parse_fault_items_json($posted_fault_items_json);
   if (empty($fault_items)) {
@@ -386,14 +423,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     // ── §9-③ طور الكتابة المزدوجة (خلف EMS_UNIT_DUAL_WRITE، fail-closed) ──
     // المرآة إلى السجل القانوني unit_entries بعد نجاح الحفظ الحي وخارج معاملته:
     // فشلُها يُسجَّل ولا يمسّ الحفظ — المسار الحي سيّد الحقيقة في هذا الطور.
+    $ts_capacity_warn = false;
     if (!empty($saved_timesheet_id)) {
       try {
         require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
         if (\App\Services\Unit\TimesheetEntryService::dualWriteOn()) {
           $dw_actor = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-          $dw = \App\Services\Unit\TimesheetEntryService::mirrorFromTimesheet($conn, $ts_gate, $saved_timesheet_id, $dw_actor);
+          // السطورُ الحقيقية (إن جُمعت) تدخل السجلَّ القانوني بحالاتها الدقيقة
+          $dw = \App\Services\Unit\TimesheetEntryService::mirrorFromTimesheet($conn, $ts_gate, $saved_timesheet_id, $dw_actor, $ts_posted_lines);
           if (empty($dw['ok'])) {
             error_log('unit dual-write mirror ts#' . $saved_timesheet_id . ': ' . (isset($dw['skipped']) ? $dw['skipped'] : 'فشل غير مفسَّر'));
+          } elseif (!empty($dw['entry_id'])) {
+            // ── شارةُ تجاوز الطاقة فورَ الحفظ (§5.1: «يُحفظ ويُعلَّم») ──
+            // الحارسُ كان يعمل صامتًا في الخلفية — الآن يراه المُدخِل لحظتَها.
+            $cfq = $conn->prepare("SELECT capacity_flag FROM unit_entries WHERE id = ?");
+            $cfid = (int) $dw['entry_id'];
+            $cfq->bind_param('i', $cfid);
+            $cfq->execute();
+            $cfr = $cfq->get_result()->fetch_assoc();
+            $cfq->close();
+            $ts_capacity_warn = ($cfr && (int) $cfr['capacity_flag'] === 1);
           }
         }
       } catch (\Throwable $dwT) {
@@ -402,7 +451,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     }
 
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
-    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
+    $ts_save_msg = $ts_capacity_warn
+      ? '⚠️ حُفظ مع تجاوز طاقة!\n\nالمعدة أو المشغّل تجاوز حدَّه اليومي — الواقعةُ معلَّمةٌ ولن يكتمل اعتمادُ الموقع قبل بيان السبب وتخليص العلم.'
+      : '✅ تم الحفظ بنجاح';
+    echo "<script>alert('" . $ts_save_msg . "'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
     exit;
   } catch (\Throwable $t) {
     error_log('timesheet save: ' . $t->getMessage());
@@ -465,6 +517,38 @@ try {
     array('scope' => array('t' => 'timesheet', 'o' => 'operations', 'e' => 'equipments', 'p' => 'project', 'd' => 'employees')),
     $today_rows_query, $today_params);
 } catch (\Throwable $t) { error_log('timesheet today rows: ' . $t->getMessage()); }
+
+// ── UX-03 §5.1: عدّادُ اليوم «سُجّل N من M» ─────────────────────────────────
+// M = التشغيلاتُ النشطة (أساسي · status=1) من نوع هذه الشاشة — نفسُ ترشيح
+// قائمة المعدات (get_operations) حرفيًّا؛ N = ما له صفُّ دوامٍ بتاريخ اليوم.
+// حين تُبنى دورةُ التوزيع (§2.2) يصير M «الموزَّعَ اليوم» — التسميةُ صادقةٌ الآن.
+require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+$ts_lines_ui_on = \App\Services\Unit\TimesheetEntryService::timeLinesUiOn();
+$ts_day_total = 0; $ts_day_done = 0; $ts_day_missing = array();
+try {
+  // ⚠️ گوتشا موثقة: form قيمتُه **رقمُ النوع** (1/2/3) لا نصٌّ وصفي —
+  //    نفسُ معامل الترشيح الذي تستعمله قوائمُ الشاشة حرفيًّا ($type).
+  $ts_form_like = $type;
+  // گوتشا scopedQuery: EXISTS على مستأجرٍ يعطّل حقن النطاق — فالمستأجرُ
+  //   الملحق يُربط enrich بـLEFT JOIN (قيدُه في ON) كما توثّق البوابة.
+  $ts_cnt_rows = $ts_gate->scopedQuery(
+    array('scope' => array('o' => 'operations', 'e' => 'equipments'),
+          'enrich' => array('tt' => 'timesheet')),
+    "SELECT o.id, e.code, e.name, MAX(tt.id IS NOT NULL) AS done_today
+       FROM operations o
+       JOIN equipments e ON e.id = o.equipment
+       LEFT JOIN timesheet tt ON tt.operator = o.id AND tt.date = CURDATE()
+      WHERE o.status = '1' AND o.equipment_category = 'أساسي'
+        AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active')
+        AND {TENANT_SCOPE}
+      GROUP BY o.id, e.code, e.name
+      ORDER BY e.code", array($ts_form_like));
+  foreach ($ts_cnt_rows as $cr) {
+    $ts_day_total++;
+    if ((int) $cr['done_today'] === 1) { $ts_day_done++; }
+    elseif (count($ts_day_missing) < 6) { $ts_day_missing[] = trim($cr['code'] . ' ' . $cr['name']); }
+  }
+} catch (\Throwable $t) { error_log('timesheet day counter: ' . $t->getMessage()); }
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
@@ -559,6 +643,31 @@ try {
   $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
+
+  <?php if ($ts_day_total > 0): ?>
+  <!-- UX-03 §5.1: عدّادُ اليوم — «بطاقةُ المعدة تتلوّن منجزةً وعدّادُ المتبقي ينقص» -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;">
+      <span style="font-weight:700;font-size:15px;">
+        <i class="fas fa-clipboard-check" style="color:<?php echo $ts_day_done >= $ts_day_total ? '#16a34a' : '#d97706'; ?>;"></i>
+        تايم شيت اليوم: سُجّل <?php echo $ts_day_done; ?> من <?php echo $ts_day_total; ?> معدةً نشطة
+        <?php if ($ts_day_done < $ts_day_total): ?>
+          — <span style="color:#d97706;">متبقٍ <?php echo $ts_day_total - $ts_day_done; ?></span>
+        <?php else: ?>
+          — <span style="color:#16a34a;">اكتمل اليوم ✓</span>
+        <?php endif; ?>
+      </span>
+      <div style="flex:1;min-width:140px;max-width:340px;background:#e5e7eb;border-radius:6px;height:10px;overflow:hidden;">
+        <div style="width:<?php echo $ts_day_total > 0 ? round($ts_day_done * 100 / $ts_day_total) : 0; ?>%;height:100%;background:<?php echo $ts_day_done >= $ts_day_total ? '#16a34a' : '#f0b429'; ?>;"></div>
+      </div>
+      <?php if (!empty($ts_day_missing)): ?>
+        <span style="color:#6b7280;font-size:13px;">
+          الغائبة: <?php echo htmlspecialchars(implode(' · ', $ts_day_missing)); ?><?php echo ($ts_day_total - $ts_day_done) > count($ts_day_missing) ? ' …' : ''; ?>
+        </span>
+      <?php endif; ?>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <form id="projectForm" action="" method="post" class="allforms">
     <?php if ($_GET['type'] == "1") {
@@ -2696,6 +2805,180 @@ try {
 
   })();
 </script>
+
+<?php if ($ts_lines_ui_on): ?>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     UX-03 §5.1 — توزيعُ زمن الوردية سطورًا (خلف EMS_TS_TIME_LINES)
+     «توقفٌ رماديٌّ بحقل المسؤول والمرجع» — السببُ الجديد قيمةٌ لا عمود.
+     السطورُ تملأ الخاناتِ التسعَ القديمة تلقائيًّا (كتابةٌ مزدوجةٌ داخل
+     الشاشة) فلا ينكسر قارئٌ واحد؛ والخادمُ يعيد الاشتقاقَ بنفسه ولا يثق
+     بهذا الحساب — هذه نسخةُ العرض فقط.
+     ═══════════════════════════════════════════════════════════════════ -->
+<style>
+  #tsLinesBox { border: 2px solid #f0b429; border-radius: 10px; margin: 14px 0; background: #fffdf5; }
+  #tsLinesBox .tsl-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #f3e8c8;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #tsLinesBox table { width: 100%; border-collapse: collapse; }
+  #tsLinesBox th, #tsLinesBox td { padding: 6px 8px; text-align: right; border-bottom: 1px solid #f3ead1; }
+  #tsLinesBox input, #tsLinesBox select { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; }
+  #tsLinesBox .tsl-sum { padding: 8px 14px; color: #374151; font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .tsl-state-actual  { border-right: 4px solid #16a34a !important; }
+  .tsl-state-standby { border-right: 4px solid #2563eb !important; }
+  .tsl-state-stop    { border-right: 4px solid #6b7280 !important; }
+</style>
+<script>
+(function () {
+  'use strict';
+  // الحالات العشر بخريطة مسؤولها الافتراضي وخانتها القديمة
+  var STATES = [
+    { v: 'actual_work',         t: 'تشغيل فعلي',            resp: 'none',          cls: 'actual'  },
+    { v: 'standby',             t: 'استعداد (للعميل)',       resp: 'client',        cls: 'standby' },
+    { v: 'tech_breakdown',      t: 'عطل فني (صيانة)',        resp: 'company',       cls: 'stop' },
+    { v: 'operator_stop',       t: 'توقف مشغّل',             resp: 'operator',      cls: 'stop' },
+    { v: 'client_stop',         t: 'توقف من العميل',         resp: 'client',        cls: 'stop' },
+    { v: 'supplier_stop',       t: 'توقف على المورد',        resp: 'supplier',      cls: 'stop' },
+    { v: 'fuel_logistics_stop', t: 'وقود/لوجستيات',          resp: 'company',       cls: 'stop' },
+    { v: 'planned_stop',        t: 'توقف مخطط',              resp: 'planned',       cls: 'stop' },
+    { v: 'force_majeure',       t: 'قوة قاهرة',              resp: 'force_majeure', cls: 'stop' },
+    { v: 'unlogged',            t: 'أخرى غير مصنفة',         resp: 'none',          cls: 'stop' }
+  ];
+  var RESPS = [
+    { v: 'none', t: '—' }, { v: 'company', t: 'الشركة' }, { v: 'supplier', t: 'المورد' },
+    { v: 'operator', t: 'المشغّل' }, { v: 'client', t: 'العميل' },
+    { v: 'planned', t: 'مخطط' }, { v: 'force_majeure', t: 'قوة قاهرة' }
+  ];
+  // خريطة الاشتقاق للأعمدة القديمة — مطابقة legacyColumnsFromLines خادميًّا
+  var COLMAP = {
+    actual_work: 'executed_hours', tech_breakdown: 'maintenance_fault',
+    operator_stop: 'hr_fault', client_stop: 'marketing_fault',
+    supplier_stop: 'ts_supplier_stop_hours', planned_stop: 'ts_planned_stop_hours',
+    force_majeure: 'ts_force_majeure_hours', fuel_logistics_stop: 'other_fault_hours',
+    unlogged: 'other_fault_hours'
+  };
+  var lines = [];
+
+  function setField(name, val) {
+    var el = document.querySelector("input[name='" + name + "']");
+    if (!el) { return; }
+    el.value = (Math.round(val * 100) / 100);
+    el.setAttribute('readonly', 'readonly');
+    el.style.background = '#fdf6e3';
+    el.title = 'يُشتق من سطور الزمن — عدّل السطور لا هذه الخانة';
+  }
+
+  function recompute() {
+    if (!lines.length) { return; }   // لا سطورَ = الشاشةُ القديمة بحرفها
+    var col = { executed_hours: 0, standby_hours: 0, dependence_hours: 0, maintenance_fault: 0,
+                hr_fault: 0, marketing_fault: 0, approval_fault: 0, ts_supplier_stop_hours: 0,
+                ts_planned_stop_hours: 0, ts_force_majeure_hours: 0, other_fault_hours: 0 };
+    var sum = 0;
+    lines.forEach(function (l) {
+      var h = parseFloat(l.hours) || 0;
+      if (h <= 0) { return; }
+      sum += h;
+      if (l.ops_state === 'standby') {
+        col[l.resp_party === 'company' ? 'dependence_hours' : 'standby_hours'] += h;
+      } else {
+        col[COLMAP[l.ops_state] || 'other_fault_hours'] += h;
+      }
+    });
+    var faults = col.maintenance_fault + col.hr_fault + col.marketing_fault + col.approval_fault
+               + col.ts_supplier_stop_hours + col.ts_planned_stop_hours
+               + col.ts_force_majeure_hours + col.other_fault_hours;
+    Object.keys(col).forEach(function (k) { setField(k, col[k]); });
+    setField('total_fault_hours', faults);
+    setField('total_work_hours', col.executed_hours + col.standby_hours);
+    setField('shift_hours', sum);
+    var sumEl = document.getElementById('tslSum');
+    if (sumEl) {
+      sumEl.innerHTML = '<span>الوردية: <b>' + sum.toFixed(2) + '</b> س</span>'
+        + '<span style="color:#16a34a;">فعلي: <b>' + col.executed_hours.toFixed(2) + '</b></span>'
+        + '<span style="color:#2563eb;">استعداد: <b>' + (col.standby_hours + col.dependence_hours).toFixed(2) + '</b></span>'
+        + '<span style="color:#6b7280;">توقف: <b>' + faults.toFixed(2) + '</b></span>';
+    }
+  }
+
+  function render() {
+    var tb = document.getElementById('tslBody');
+    if (!tb) { return; }
+    tb.innerHTML = '';
+    lines.forEach(function (l, i) {
+      var tr = document.createElement('tr');
+      var stDef = STATES.filter(function (s) { return s.v === l.ops_state; })[0] || STATES[0];
+      tr.className = 'tsl-state-' + stDef.cls;
+      tr.innerHTML =
+        '<td style="width:110px;"><input type="number" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
+        + '<td style="width:190px;"><select data-i="' + i + '" data-k="ops_state">'
+        + STATES.map(function (s) { return '<option value="' + s.v + '"' + (s.v === l.ops_state ? ' selected' : '') + '>' + s.t + '</option>'; }).join('')
+        + '</select></td>'
+        + '<td style="width:130px;"><select data-i="' + i + '" data-k="resp_party">'
+        + RESPS.map(function (r) { return '<option value="' + r.v + '"' + (r.v === l.resp_party ? ' selected' : '') + '>' + r.t + '</option>'; }).join('')
+        + '</select></td>'
+        + '<td><input type="text" maxlength="190" placeholder="المرجع/السبب (WO-5511…)" value="' + (l.cause_note || '') + '" data-i="' + i + '" data-k="cause_note"></td>'
+        + '<td style="width:44px;text-align:center;"><a href="#" data-del="' + i + '" style="color:#dc2626;"><i class="fas fa-trash"></i></a></td>';
+      tb.appendChild(tr);
+    });
+    recompute();
+  }
+
+  function inject() {
+    var anchor = document.querySelector("input[name='executed_hours']");
+    if (!anchor) { return; }
+    // الحاوية: أقرب form-grid فتقف الصندوقة قبله بعرضٍ كامل
+    var grid = anchor.closest('.form-grid') || anchor.parentElement;
+    var box = document.createElement('div');
+    box.id = 'tsLinesBox';
+    box.innerHTML =
+      '<div class="tsl-head"><i class="fas fa-stream" style="color:#b8860b;"></i> توزيعُ زمن الوردية سطورًا '
+      + '<span style="font-weight:400;color:#6b7280;font-size:13px;">(كلُّ سطرٍ: ساعات · حالة · مسؤول · مرجع — والخاناتُ القديمة تُملأ تلقائيًّا)</span>'
+      + '<button type="button" id="tslAdd" class="btn-save" style="margin-inline-start:auto;padding:6px 14px;"><i class="fas fa-plus"></i> سطر زمن</button></div>'
+      + '<table><thead><tr><th>ساعات</th><th>الحالة</th><th>المسؤول</th><th>المرجع/السبب</th><th></th></tr></thead>'
+      + '<tbody id="tslBody"></tbody></table>'
+      + '<div class="tsl-sum" id="tslSum"><span style="color:#9ca3af;">لا سطورَ بعد — الإدخالُ القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
+    grid.parentElement.insertBefore(box, grid);
+
+    box.addEventListener('click', function (e) {
+      var del = e.target.closest('[data-del]');
+      if (del) { e.preventDefault(); lines.splice(parseInt(del.getAttribute('data-del'), 10), 1); render(); }
+      if (e.target.id === 'tslAdd' || e.target.closest('#tslAdd')) {
+        lines.push({ hours: 1, ops_state: 'actual_work', resp_party: 'none', cause_note: '' });
+        render();
+      }
+    });
+    box.addEventListener('input', function (e) {
+      var i = e.target.getAttribute('data-i'), k = e.target.getAttribute('data-k');
+      if (i === null || !k) { return; }
+      lines[parseInt(i, 10)][k] = e.target.value;
+      if (k === 'ops_state') {   // المسؤول الافتراضي يتبع الحالة
+        var st = STATES.filter(function (s) { return s.v === e.target.value; })[0];
+        if (st) { lines[parseInt(i, 10)].resp_party = st.resp; }
+        render(); return;
+      }
+      recompute();
+    });
+
+    // عند الإرسال: السطور تركب hidden — والخادم يعيد اشتقاقها بنفسه
+    var form = document.getElementById('projectForm');
+    if (form) {
+      form.addEventListener('submit', function () {
+        var old = document.getElementById('tslHidden');
+        if (old) { old.remove(); }
+        if (lines.length) {
+          var hid = document.createElement('input');
+          hid.type = 'hidden'; hid.name = 'ts_time_lines_json'; hid.id = 'tslHidden';
+          hid.value = JSON.stringify(lines.filter(function (l) { return (parseFloat(l.hours) || 0) > 0; }));
+          form.appendChild(hid);
+        }
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', inject); }
+  else { inject(); }
+})();
+</script>
+<?php endif; ?>
+
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 

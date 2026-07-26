@@ -393,7 +393,13 @@ class TimesheetEntryService
      *
      * @return array {ok, code, entry_id?, skipped?}
      */
-    public static function mirrorFromTimesheet(\mysqli $conn, $gate, $tsId, $actor)
+    /**
+     * @param array|null $postedLines سطورُ زمنٍ حقيقيةٌ جمعتها الشاشة (UX-03 §5.1:
+     *   «توزيعُ زمن الوردية بحالاته ومسؤوليه») — إن وُجدت استُعملت **بدل** ترجمة
+     *   الأعمدة التسعة، فيدخل السجلَّ القانوني السببُ الدقيق (fuel_logistics_stop
+     *   مثلًا) بمرجعه الميداني، بينما لا ترى الأعمدةُ القديمة إلا أقربَ خانة.
+     */
+    public static function mirrorFromTimesheet(\mysqli $conn, $gate, $tsId, $actor, $postedLines = null)
     {
         $tsId = (int) $tsId;
         $st = $conn->prepare(
@@ -427,7 +433,9 @@ class TimesheetEntryService
             'date'         => (string) $t['date'],
             'qty'          => $qty,
             'unit_type'    => $unitType,
-            'time_lines'   => self::timeLinesFromTimesheet($t),
+            'time_lines'   => (is_array($postedLines) && !empty($postedLines))
+                                ? $postedLines
+                                : self::timeLinesFromTimesheet($t),
             'source_ref'   => 'TS-' . $tsId,
             'operation_id' => (int) $t['op_id'],
             'operator_employee_id' => (int) $t['employee_id'] ?: null,
@@ -495,6 +503,64 @@ class TimesheetEntryService
 
     /** أعمدة الدوام القديم → سطور الزمن العشر (§3.3). الترجمة نفسُها المعتمدة
      *  في EffectFanout::resolveTimesheet — مصدرٌ واحدٌ للدلالة. */
+    /**
+     * العكسُ الحاكم: سطورُ الزمن → الأعمدةُ القديمة (UX-03 §5.1 خلف EMS_TS_TIME_LINES).
+     *
+     * حين تجمع الشاشةُ السطورَ مباشرةً، **الخادمُ وحده** يشتق منها الأعمدةَ التسعة
+     * — لا يُوثَق بحسابِ جافاسكربت. الخريطةُ عكسُ timeLinesFromTimesheet حرفيًّا،
+     * وما لا خانةَ له في القديم (fuel_logistics_stop) يهبط إلى «أعطال أخرى»
+     * بينما يحفظ السجلُّ القانوني حالتَه الدقيقة — هذا فرقُ القيمة كلُّه.
+     *
+     * @return array أعمدةُ timesheet المشتقة + 'balance_ok' + 'sum'
+     */
+    public static function legacyColumnsFromLines(array $lines)
+    {
+        $col = array(
+            'executed_hours' => 0.0, 'standby_hours' => 0.0, 'dependence_hours' => 0.0,
+            'maintenance_fault' => 0.0, 'hr_fault' => 0.0, 'marketing_fault' => 0.0,
+            'approval_fault' => 0.0, 'ts_supplier_stop_hours' => 0.0,
+            'ts_planned_stop_hours' => 0.0, 'ts_force_majeure_hours' => 0.0,
+            'other_fault_hours' => 0.0,
+        );
+        $sum = 0.0;
+        foreach ($lines as $l) {
+            $h = isset($l['hours']) ? (float) $l['hours'] : 0.0;
+            if ($h <= 0) { continue; }
+            $sum += $h;
+            $state = isset($l['ops_state']) ? (string) $l['ops_state'] : '';
+            $resp  = isset($l['resp_party']) ? (string) $l['resp_party'] : 'none';
+            switch ($state) {
+                case 'actual_work':    $col['executed_hours'] += $h; break;
+                case 'standby':
+                    if ($resp === 'company') { $col['dependence_hours'] += $h; }
+                    else                     { $col['standby_hours'] += $h; }
+                    break;
+                case 'tech_breakdown': $col['maintenance_fault'] += $h; break;
+                case 'operator_stop':  $col['hr_fault'] += $h; break;
+                case 'client_stop':    $col['marketing_fault'] += $h; break;
+                case 'supplier_stop':  $col['ts_supplier_stop_hours'] += $h; break;
+                case 'planned_stop':   $col['ts_planned_stop_hours'] += $h; break;
+                case 'force_majeure':  $col['ts_force_majeure_hours'] += $h; break;
+                case 'fuel_logistics_stop': // لا خانةَ قديمةً لها — أقربُ صادق
+                default:               $col['other_fault_hours'] += $h; break;
+            }
+        }
+        foreach ($col as $k => $v) { $col[$k] = round($v, 2); }
+        $faults = round($col['maintenance_fault'] + $col['hr_fault'] + $col['marketing_fault']
+                + $col['approval_fault'] + $col['ts_supplier_stop_hours'] + $col['ts_planned_stop_hours']
+                + $col['ts_force_majeure_hours'] + $col['other_fault_hours'], 2);
+        $col['total_fault_hours'] = $faults;
+        $col['total_work_hours']  = round($col['executed_hours'] + $col['standby_hours'], 2);
+        $col['shift_hours']       = round($sum, 2);
+        return $col;
+    }
+
+    /** علم إدخال سطور الزمن من الشاشة — fail-closed كأخويه. */
+    public static function timeLinesUiOn()
+    {
+        return function_exists('ems_env') && ems_env('EMS_TS_TIME_LINES', 'off') === 'on';
+    }
+
     private static function timeLinesFromTimesheet(array $t)
     {
         $mk = function ($hours, $state, $resp, $cause) {
