@@ -13,8 +13,17 @@ require_once dirname(__FILE__) . '/../includes/role_board.php';
 // (قرار المالك 2026-07-26)، وسائرُ الأدوار على هذه اللوحة العامة حرفيًّا —
 // والرجوعُ بحذف الدور من العلم بلا نشر كود (نمط السايدبار الموحّد نفسه).
 if (isset($_SESSION['user']['role']) && roleBoardEnabled($_SESSION['user']['role'])) {
-  $rb_route = roleBoardRoute($_SESSION['user']['role'],
-      isset($_SESSION['user']['parent_role_id']) ? $_SESSION['user']['parent_role_id'] : null);
+  $rb_route = roleBoardRoute($_SESSION['user']['role']);
+  if ($rb_route === null) {
+    // الفرعيُّ يرث لوحةَ أبيه (قرار المالك) — والجلسةُ لا تحمل الأب فيُجلب هنا
+    try {
+      $rb_parent = ems_tenant_db()->selectOne('roles', array('columns' => array('parent_role_id'),
+          'where' => array('id' => intval($_SESSION['user']['role']))));
+      if ($rb_parent && !empty($rb_parent['parent_role_id'])) {
+        $rb_route = roleBoardRoute($_SESSION['user']['role'], $rb_parent['parent_role_id']);
+      }
+    } catch (\Throwable $t) { error_log('dashboard role board parent: ' . $t->getMessage()); }
+  }
   if ($rb_route !== null) { header('Location: ../' . $rb_route); exit(); }
 }
 

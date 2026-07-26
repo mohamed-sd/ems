@@ -30,11 +30,13 @@ ok('العلم: المذكور يفعَّل وغيره لا (حتميًّا بت
     roleBoardEnabled(17, '17') === true && roleBoardEnabled(1, '17') === false
     && roleBoardEnabled(17, '') === false && roleBoardEnabled(13, '17,13') === true);
 
-ok('خريطة اللوحات: 17 → لوحة المدير المالي · دورٌ بلا لوحةٍ → null (يبقى على العامة)',
-    roleBoardRoute(17) === 'Finance/cfo_daily_board_fin.php' && roleBoardRoute(1) === null);
+ok('خريطة اللوحات: 17 → المدير المالي · 13 → الصيانة · دورٌ بلا لوحةٍ → null',
+    roleBoardRoute(17) === 'Finance/cfo_daily_board_fin.php'
+    && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php' && roleBoardRoute(1) === null);
 
-ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (قرار المالك)',
-    roleBoardRoute(18, 17) === 'Finance/cfo_daily_board_fin.php' && roleBoardRoute(7, 1) === null);
+ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (18→17 · 14→13)',
+    roleBoardRoute(18, 17) === 'Finance/cfo_daily_board_fin.php'
+    && roleBoardRoute(14, 13) === 'Maintenance/dashboard_mnt.php' && roleBoardRoute(7, 1) === null);
 
 echo "── ② قاعدة «كل رقمٍ ينقر إلى مصدره» (UX-00 §7) ──\n";
 
@@ -45,6 +47,15 @@ foreach ($specs as $s) {
     if (empty($s['href']) || empty($s['label']) || empty($s['key'])) { $bad++; }
 }
 ok('تعريفات تنبيهات المدير المالي الأربعة كاملةٌ (سبب + قفزة) — نصُّ UX-01 §8.11', count($specs) === 4 && $bad === 0);
+
+// الصيانة: ثلاثةٌ من أربعة — «قطعةٌ منتظرة» بلا مصدرٍ (لا wait_parts · DEC-10)
+// فلا تُعرض حتى يُبنى مصدرُها: قاعدةُ عدم التلفيق محروسةٌ بالعدد نفسه.
+$mspecs = roleBoardAlertSpecs(13);
+$mbad = 0;
+foreach ($mspecs as $s) { if (empty($s['href']) || empty($s['label'])) { $mbad++; } }
+ok('تنبيهات الصيانة ثلاثةٌ كاملة — والرابع (قطعة منتظرة) غائبٌ عمدًا بلا مصدر',
+    count($mspecs) === 3 && $mbad === 0
+    && count(array_filter($mspecs, function ($s) { return $s['key'] === 'wait_parts'; })) === 0);
 
 // التنبيهات الحية: ما عدده صفر يختفي («المُنجَز يختفي فورًا» §9)
 // بوابةٌ نظاميةٌ صريحة بشركة 4 (نمط tenant_leak_test — لا جلسةَ في CLI)

@@ -48,7 +48,8 @@ function roleBoardRoute($roleId, $parentRoleId = null)
 {
     $map = array(
         17 => 'Finance/cfo_daily_board_fin.php',
-        // القادمة بالترتيب المعتمد: 13 الصيانة ثم 16 المشتريات و23 الرحلات (لوحتاهما قائمتان)
+        13 => 'Maintenance/dashboard_mnt.php',
+        // القادمة: 16 المشتريات و23 الرحلات (لوحتاهما قائمتان — تُكملان بالمكوّنات)
     );
     $rid = intval($roleId);
     if (isset($map[$rid])) { return $map[$rid]; }
@@ -85,6 +86,15 @@ function roleBoardAlertSpecs($roleId)
             array('key' => 'aged_dues', 'label' => 'ذممٌ تجاوزت أعمارها',        'href' => '../Finance/dues_fin.php',           'tone' => 'err'),
             array('key' => 'req_sla',   'label' => 'طلباتٌ فوق مهلة الاعتماد',   'href' => '../FinRequests/finance_gateway.php','tone' => 'warn'),
             array('key' => 'variance',  'label' => 'انحرافُ ميزانيةٍ فوق النسبة', 'href' => '../Finance/budget_form_fin.php',    'tone' => 'warn'),
+        ),
+        // §8.8 · ادارة الصيانة — التنبيه الرابع في النص («قطعةٌ منتظرةٌ توقف
+        // أمرًا») بلا مصدرِ بياناتٍ اليوم: لا حالةَ wait_parts في آلة الأمر
+        // والقطعُ نصٌّ حرٌّ (قرار DEC-10) — لا يُعرض حتى يُبنى مصدرُه
+        // (تدقيق الصيانة، المستوى الأول #6). قاعدةُ عدم التلفيق نافذة.
+        13 => array(
+            array('key' => 'critical_down', 'label' => 'معدةٌ حرجةٌ متوقفة',        'href' => '../Maintenance/orders.php',           'tone' => 'err'),
+            array('key' => 'order_overdue', 'label' => 'أمرٌ مفتوحٌ فوق مدته',      'href' => '../Maintenance/orders.php',           'tone' => 'warn'),
+            array('key' => 'pm_late',       'label' => 'وقائيةٌ متأخرة',            'href' => '../Maintenance/preventive_plans.php', 'tone' => 'warn'),
         ),
     );
     return isset($specs[intval($roleId)]) ? $specs[intval($roleId)] : array();
@@ -128,6 +138,27 @@ function roleBoardAlerts($conn, $gate, $roleId)
         foreach (roleBoardAlertSpecs($rid) as $spec) {
             $n = isset($counts[$spec['key']]) ? intval($counts[$spec['key']]) : 0;
             if ($n > 0) { $spec['count'] = $n; $out[] = $spec; }   // «المُنجَز يختفي فورًا» (§9)
+        }
+    }
+
+    if ($rid === 13) {
+        $counts = array();
+        // «حرجة» = أمرٌ مفتوحٌ بأولوية عاجلة/عالية (الحقول العربية بقيمها الحية)
+        $counts['critical_down'] = (int) roleBoardScalar($gate, array('scope' => array('o' => 'mnt_order')),
+            "SELECT COUNT(*) FROM mnt_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0
+             AND o.state IN('بلاغ','تنفيذ','فحص') AND o.priority IN('عاجلة','عالية')");
+        // لا عمودَ مدةٍ مستهدفةٍ على الأمر — «فوق مدته» = مفتوحٌ منذ أكثر من 7 أيام
+        // (تقريبٌ موثَّق حتى تُبنى الأزمنة المحسوبة — تدقيق الصيانة، المستوى الأول #1)
+        $counts['order_overdue'] = (int) roleBoardScalar($gate, array('scope' => array('o' => 'mnt_order')),
+            "SELECT COUNT(*) FROM mnt_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0
+             AND o.state IN('بلاغ','تنفيذ','فحص') AND o.created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+        $counts['pm_late'] = (int) roleBoardScalar($gate, array('scope' => array('p' => 'mnt_plan')),
+            "SELECT COUNT(*) FROM mnt_plan p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
+             AND p.next_due_date IS NOT NULL AND p.next_due_date < CURDATE()");
+
+        foreach (roleBoardAlertSpecs($rid) as $spec) {
+            $n = isset($counts[$spec['key']]) ? intval($counts[$spec['key']]) : 0;
+            if ($n > 0) { $spec['count'] = $n; $out[] = $spec; }
         }
     }
     return $out;
@@ -231,6 +262,25 @@ function roleBoardTasks($conn, $gate, $roleId)
         $n = (int) roleBoardScalar($gate, array('scope' => array('u' => 'fin_unit_records')),
             "SELECT COUNT(*) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='matched'");
         if ($n > 0) { $out[] = array('label' => 'وحداتٌ تنتظر ختم المالية', 'count' => $n, 'href' => '../Finance/unit_records_fin.php', 'icon' => 'fa fa-scale-balanced'); }
+    }
+
+    if ($rid === 13) {
+        // دورة الأمر بحالاتها العربية الخمس — كل حالةٍ مفتوحةٍ صندوقُ عملٍ بقفزة
+        $map = array(
+            array('بلاغ',  'بلاغاتٌ تنتظر بدءَ التنفيذ', 'fa fa-bell'),
+            array('تنفيذ', 'أوامرُ قيد التنفيذ',          'fa fa-screwdriver-wrench'),
+            array('فحص',   'أوامرُ تنتظر الفحصَ والإقفال', 'fa fa-clipboard-check'),
+        );
+        foreach ($map as $m) {
+            $n = (int) roleBoardScalar($gate, array('scope' => array('o' => 'mnt_order')),
+                "SELECT COUNT(*) FROM mnt_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0 AND o.state=?", array($m[0]));
+            if ($n > 0) { $out[] = array('label' => $m[1], 'count' => $n, 'href' => '../Maintenance/orders.php', 'icon' => $m[2]); }
+        }
+        // وقائيةُ الأسبوع المستحقة (UX-04 §6)
+        $n = (int) roleBoardScalar($gate, array('scope' => array('p' => 'mnt_plan')),
+            "SELECT COUNT(*) FROM mnt_plan p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
+             AND p.next_due_date IS NOT NULL AND p.next_due_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)");
+        if ($n > 0) { $out[] = array('label' => 'وقائيةُ الأسبوع المستحقة', 'count' => $n, 'href' => '../Maintenance/preventive_plans.php', 'icon' => 'fa fa-calendar-check'); }
     }
     return $out;
 }
