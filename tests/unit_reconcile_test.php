@@ -224,13 +224,24 @@ $cleared = (int) $db->query(
 check($cleared === 0, 'ولا علمَ خُلِّص تلقائيًّا — التخليصُ قرارُ بشرٍ لا أثرٌ جانبي');
 
 // ═══ التعايش ═══
-head('التعايش — الصفوف التاريخية خارج النطاق ولم تُمسّ');
-$legacy = (int) $db->query(
-    "SELECT COUNT(*) c FROM timesheet WHERE `date` NOT BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'")->fetch_assoc()['c'];
-check($legacy === 221, "صفوفُ الدوام التاريخية: {$legacy} — كما كانت بلا زيادةٍ ولا نقص");
-$legacyMir = (int) $db->query(
-    "SELECT COUNT(*) c FROM unit_entries WHERE entry_date NOT BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'")->fetch_assoc()['c'];
-check($legacyMir === 0, "صفرُ مرآةٍ للتاريخي: {$legacyMir} — «لا تعتمد البيانات القديمة» منفَّذٌ حرفيًّا");
+head('التعايش — البذرة لا تلمس ما خارج نافذتها');
+// ⚠️ لا عدَّ مطلقًا هنا (گوتشا العدّ المطلق في جدولٍ مشترك — الدخناتُ الحية
+// تضيف صفوفًا بتاريخ اليوم شرعًا): يُقاس المعنى نفسُه قياسًا نسبيًّا —
+// ① كلُّ صفٍّ بذرتْه هذه المجموعة (وسم RECON50) داخل النافذة حصرًا.
+$straydSeed = (int) $db->query(
+    "SELECT COUNT(*) c FROM timesheet
+      WHERE general_notes = 'RECON50'
+        AND `date` NOT BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'")->fetch_assoc()['c'];
+check($straydSeed === 0, "صفرُ صفِّ بذرةٍ خارج النافذة: {$straydSeed} — البذرة لا تلمس القديم");
+// ② كلُّ مرآةٍ خارج النافذة نسبُها صحيح: sync_uuid يعود لصفِّ دوامٍ قائمٍ
+//    بتاريخها نفسِه (كتابةٌ مزدوجةٌ حيّةٌ شرعية) — لا مرآةَ يتيمةً من بذر.
+$orphanLegacy = (int) $db->query(
+    "SELECT COUNT(*) c FROM unit_entries u
+      WHERE u.entry_date NOT BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'
+        AND NOT EXISTS (SELECT 1 FROM timesheet t
+                         WHERE CONCAT('ts:', t.id) = u.sync_uuid
+                           AND t.`date` = u.entry_date)")->fetch_assoc()['c'];
+check($orphanLegacy === 0, "كلُّ مرآةٍ خارج النافذة نسبُها لصفِّ دوامٍ حيٍّ قائم: {$orphanLegacy} يتيمة");
 
 // ═══ الحكم ═══
 fwrite(STDOUT, "\n══════════════════════════════════════════════════\n");

@@ -843,6 +843,62 @@ class EffectFanout
                         }
                         $written++;
                     }
+
+                    // ── البطاقة الثالثة: حكمُ المشغّل (UX-02 §8.1) ──
+                    // «أساس الحافز (فعلي/استعداد/حضور/طن/نقلة/متر/مركّب) · الكمية ·
+                    //  الحالة · الاستحقاق — وفق عقده أو سياسته». مصدرُها محرّكُ
+                    //  السياسات لا أعمدةُ الدوام؛ ولا سياسةَ ⇒ صفٌّ بسببٍ معلَنٍ
+                    //  لا حكمٌ ملفَّق — فتُرى الفجوةُ في السجل لا في صمت.
+                    if ($ctx['employee_id'] !== null) {
+                        require_once __DIR__ . '/Unit/OperatorDue.php';
+                        $opUnit = null; $opQty = 0.0;
+                        if ((float) $ctx['recorded']['meter'] > 0)    { $opUnit = 'meter'; $opQty = (float) $ctx['recorded']['meter']; }
+                        elseif ((float) $ctx['recorded']['ton'] > 0)  { $opUnit = 'ton';   $opQty = (float) $ctx['recorded']['ton']; }
+                        elseif ((float) $ctx['recorded']['hour'] > 0) { $opUnit = 'hour';  $opQty = (float) $ctx['recorded']['hour']; }
+                        $opDue = \App\Services\Unit\OperatorDue::compute($conn, $company, array(
+                            'employee_id' => $ctx['employee_id'], 'work_date' => $ctx['work_date'],
+                            'project_id' => $ctx['project_id'],
+                            'equipment_type' => isset($ctx['equipment_type']) ? $ctx['equipment_type'] : 0,
+                            'states' => $ctx['states'], 'unit_type' => $opUnit, 'unit_qty' => $opQty,
+                        ));
+                        $opRow = array(
+                            'source_kind' => 'timesheet', 'source_ref' => $tsId,
+                            'party' => 'operator', 'party_ref' => $ctx['employee_id'],
+                            'contract_ref' => null,
+                            'created_by' => intval($actor) ?: null,
+                        );
+                        if (!$opDue['ok']) {
+                            $opRow += array('award_unit_type' => 'hour', 'award_qty' => 0.00,
+                                'entitlement_state' => 'not_due', 'entitlement_pct' => 0.00,
+                                'unavailable_reason' => mb_substr((string) $opDue['reason'], 0, 200));
+                        } else {
+                            // أساسُ الحافز الحاكم = صاحبُ أكبر مبلغٍ في سطوره
+                            $topL = null;
+                            foreach ($opDue['lines'] as $ol) {
+                                if ($topL === null || $ol['amount'] > $topL['amount']) { $topL = $ol; }
+                            }
+                            $unitMap = array('actual_work' => 'hour', 'standby' => 'hour', 'attendance' => 'day',
+                                             'ton' => 'ton', 'trip' => 'trip', 'meter' => 'meter');
+                            $opRow += array(
+                                'award_unit_type' => isset($unitMap[$topL['basis']]) ? $unitMap[$topL['basis']] : 'hour',
+                                'award_qty' => round((float) $topL['qty'], 2),
+                                // qty_due عمودٌ متولّد (award_qty × pct) — لا يُكتب
+                                'entitlement_state' => 'due', 'entitlement_pct' => 100.00,
+                                'unit_price' => round((float) $topL['rate'], 2),
+                                'currency' => strval($opDue['currency']),
+                                'policy_rule' => 'operator_policy:' . $topL['basis'],
+                                'policy_snapshot' => json_encode(array(
+                                    'basis' => $topL['basis'], 'total_amount' => $opDue['amount'],
+                                    'currency' => $opDue['currency'], 'is_trial' => $opDue['is_trial'],
+                                    'lines' => $opDue['lines'], 'skipped' => $opDue['skipped'],
+                                    'work_date' => $ctx['work_date'],
+                                ), JSON_UNESCAPED_UNICODE),
+                            );
+                        }
+                        $gate->insert('unit_party_awards', $opRow);
+                        $written++;
+                    }
+
                     $out['effects'][] = array('effect' => $type, 'target_id' => $written, 'amount' => null, 'currency' => null);
                     break;
 
