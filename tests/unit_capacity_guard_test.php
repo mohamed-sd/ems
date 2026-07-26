@@ -77,24 +77,37 @@ head('① إعادة تشغيل بيانات الواقع — هل يلتقط م
 
 $scan = CapacityGuard::scanLegacyTimesheet($conn, $CO);
 
+// ⚠️ نطاقُ هذا الفحص هو البياناتُ التاريخية وحدها. مجموعاتُ البذر اللاحقة
+// (مطابقةُ §9-③ في 2027-02 مثلًا) تضيف تجاوزاتٍ مقصودةً إلى المسح، فالعدُّ
+// المطلق عبر كل الجدول يكسر الحزمةَ بلا خللٍ حقيقي. القصدُ الأصلي — «هل
+// يلتقط المعيارُ التجاوزَ القائم في بيانات الواقع؟» — يُقاس على نطاقه.
+$LEGACY_BEFORE = '2027-01-01';
+$onlyLegacy = function (array $rows) use ($LEGACY_BEFORE) {
+    $out = array();
+    foreach ($rows as $r) { if ($r['d'] < $LEGACY_BEFORE) { $out[] = $r; } }
+    return $out;
+};
+$scanEq = $onlyLegacy($scan['equipment']);
+$scanOp = $onlyLegacy($scan['operator']);
+
 $eqHit = null;
-foreach ($scan['equipment'] as $row) {
+foreach ($scanEq as $row) {
     if ((int) $row['subject_ref'] === $EQ && $row['d'] === $DAY) { $eqHit = $row; }
 }
 check($eqHit !== null, "التقط تجاوز المعدة {$EQ} يوم {$DAY} — التجاوزُ الحيُّ لم يعد صامتًا");
 check($eqHit !== null && (float) $eqHit['measured'] === 28.00,
     'قاسه 28 ساعةً بالضبط (لا تقريبًا ولا تقديرًا) — الطاقة 20');
 check($eqHit !== null && (int) $eqHit['rows_n'] === 3, 'من ثلاثة صفوفٍ حيّة');
-check(count($scan['equipment']) === 1, 'تجاوزُ آلاتٍ واحدٌ في كل بيانات الشركة — مطابقٌ للمقيس');
+check(count($scanEq) === 1, 'تجاوزُ آلاتٍ واحدٌ في البيانات التاريخية — مطابقٌ للمقيس');
 
 $empHit = null;
-foreach ($scan['operator'] as $row) {
+foreach ($scanOp as $row) {
     if ((int) $row['subject_ref'] === $EMP_A && $row['d'] === $DAY) { $empHit = $row; }
 }
 check($empHit !== null && (float) $empHit['measured'] === 18.00,
     "التقط الموظف {$EMP_A} في اليوم نفسه: 18 ساعةً وطاقتُه 10");
-check(count($scan['operator']) === 17,
-    'التقط سبعة عشر تجاوزًا للمشغّلين — العدد المقيس فعلًا (§3.10 ذكر 22؛ المقيس 17)');
+check(count($scanOp) === 17,
+    'التقط سبعة عشر تجاوزًا للمشغّلين تاريخيًّا — العدد المقيس فعلًا (§3.10 ذكر 22؛ المقيس 17)');
 
 // ═══ ② الواقعة الحقيقية تُعاد في المصدر الجديد ═══
 head('② الواقعة تُدخَل — والحارس «لا يمنع إدخالَه» (§3.10)');
@@ -247,7 +260,12 @@ check((float) $live['h'] === 28.0, 'وصفوفُ الواقعة الحيّة ك�
 head('التنظيف');
 $teardown();
 $left = (int) $conn->query("SELECT COUNT(*) c FROM unit_entries WHERE entry_no LIKE '{$MARK}%'")->fetch_assoc()['c'];
-$leftF = (int) $conn->query("SELECT COUNT(*) c FROM unit_capacity_flags")->fetch_assoc()['c'];
+// الأعلامُ تُقاس يتيمةً لا مطلقةً: العدُّ المطلق كان يفترض أن الجدول ملكُ هذه
+// الحزمة وحدها، فكسرَته أعلامُ مجموعة المطابقة المشروعة (§9-③). المعنى المقصود
+// — «مضت مع الواقعة بـCASCADE» — يُقاس بغياب علمٍ بلا واقعة.
+$leftF = (int) $conn->query(
+    "SELECT COUNT(*) c FROM unit_capacity_flags f
+      WHERE NOT EXISTS (SELECT 1 FROM unit_entries u WHERE u.id = f.entry_id)")->fetch_assoc()['c'];
 check($left === 0 && $leftF === 0, 'teardown: صفر بقايا (والأعلام مضت مع الواقعة بـCASCADE)');
 
 fwrite(STDOUT, "\n" . str_repeat('═', 50) . "\n");

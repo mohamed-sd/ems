@@ -223,8 +223,13 @@ check($apCount === 2, 'وتاريخُ الجولتين كاملٌ: قراران 
 // ═══ المرآة — طور الكتابة المزدوجة ═══
 head('المرآة — صفُّ دوامٍ حيٌّ يُمرآة عطالةً بلا حدثٍ مزدوج');
 
+// ⚠️ عزلٌ عن مجموعة المطابقة (2027-02): تلك الصفوفُ ممرآةٌ سلفًا بالكتابة
+// المزدوجة، فاختيارُ أحدثِها كان يُرجع 200 ثم يحذف مرآةً ليست لهذه الحزمة.
+// المرآةُ هنا تُختبَر على صفٍّ تاريخيٍّ لا مرآةَ له.
 $tsRow = $conn->query("SELECT t.id FROM timesheet t JOIN operations o ON o.id=t.operator
     WHERE o.company_id={$CO} AND o.equipment IS NOT NULL AND t.executed_hours > 0
+      AND t.`date` < '2027-01-01'
+      AND NOT EXISTS (SELECT 1 FROM unit_entries u WHERE u.sync_uuid = CONCAT('ts:', t.id))
     ORDER BY t.id DESC LIMIT 1")->fetch_assoc();
 check($tsRow !== null, 'صفُّ دوامٍ حيٌّ للمرآة موجود');
 $tsId = (int) $tsRow['id'];
@@ -250,6 +255,8 @@ $ts4 = $conn->query("SELECT ta.timesheet_id id FROM timesheet_approvals ta
     JOIN timesheet t ON t.id=ta.timesheet_id
     JOIN operations o ON o.id=t.operator
     WHERE ta.approval_level=4 AND ta.status=1 AND o.equipment IS NOT NULL
+      AND t.`date` < '2027-01-01'
+      AND NOT EXISTS (SELECT 1 FROM unit_entries u WHERE u.sync_uuid = CONCAT('ts:', t.id))
     ORDER BY ta.timesheet_id LIMIT 1")->fetch_assoc();
 check($ts4 !== null, 'صفٌّ حيٌّ بلغ الاعتماد الرابع موجود');
 if ($ts4 !== null) {
