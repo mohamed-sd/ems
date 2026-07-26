@@ -76,12 +76,14 @@ $colsOf = function ($t) use ($conn) {
 };
 
 $e = $colsOf('unit_entries');
+// + current_round بعد revision_no — ترحيل 2026_07_26 (قرار المالك: «الإعادة
+//   بالرقم نفسه» UX-03 §8.2 تحتاج عدّادَ جولةٍ على الواقعة)
 $spec31 = array('id','company_id','entry_no','entry_date','project_id','contract_id',
     'equipment_id','operator_employee_id','supplier_entity_id','supervisor_id','unit_type',
     'qty','record_basis','capacity_flag','shift','source_ref','txn_ref','note','state',
-    'revision_no','revises_entry_id','revision_kind','superseded_by_id','converted_at',
+    'revision_no','current_round','revises_entry_id','revision_kind','superseded_by_id','converted_at',
     'event_id','entered_by','sync_uuid','created_at','updated_at');
-check(array_keys($e) === $spec31, 'unit_entries: الأعمدة التسعة والعشرون بترتيب §3.1 حرفًا بحرف');
+check(array_keys($e) === $spec31, 'unit_entries: أعمدة §3.1 حرفًا بحرف + current_round (ترحيل UX-03 §8.2)');
 
 // الحالات الثلاث عشرة — البند الذي كان «approval_level tinyint لا غير»
 $states13 = array('draft','submitted','site_approved','parties_review','parties_approved',
@@ -118,8 +120,10 @@ check(count(array_intersect($a1[1], $a2[1])) === 9,
     'التسع المشتركة متطابقةٌ حرفًا بحرف (الاشتقاق يعمل عليها بلا قطع)');
 
 $u = $colsOf('unit_approvals');
-$spec42 = array('id','company_id','entry_id','stage','decision','actor_id','note','decided_at','sync_uuid');
-check(array_keys($u) === $spec42, 'unit_approvals: الأعمدة التسعة بترتيب §4.2 حرفًا بحرف');
+// + round_no بعد entry_id — ترحيل 2026_07_26 (حسمُ المسألة المرفوعة في تعليق
+//   ترحيل الإنشاء: القيد كان يمنع اعتماد مرحلةٍ أعادت ثم استُكملت)
+$spec42 = array('id','company_id','entry_id','round_no','stage','decision','actor_id','note','decided_at','sync_uuid');
+check(array_keys($u) === $spec42, 'unit_approvals: أعمدة §4.2 حرفًا بحرف + round_no (قرار المالك 2026-07-26)');
 preg_match_all("/'([^']+)'/", $u['stage'], $a3);
 check($a3[1] === array('site','supplier','operator','supervisor','fleet','sales','finance'),
     'unit_approvals.stage: المراحل السبع كما في §4.2');
@@ -131,7 +135,8 @@ $idx = function ($t, $k) use ($conn) {
 check($idx('unit_entries', 'uq_entry_no'), 'قيد تفرّد رقم الواقعة (company_id, entry_no)');
 check($idx('unit_entries', 'uq_sync'), 'قيد تفرّد المزامنة sync_uuid — عطالةُ PWA بنيويةٌ مسبقًا');
 check($idx('unit_time_log', 'uq_sync'), 'unit_time_log: قيد تفرّد المزامنة');
-check($idx('unit_approvals', 'uq_stage_once'), 'unit_approvals: قرارٌ واحدٌ لكل مرحلة');
+check($idx('unit_approvals', 'uq_stage_once_per_round'),
+    'unit_approvals: قرارٌ واحدٌ لكل مرحلةٍ في الجولة (round_no — الإعادة بالرقم نفسه)');
 
 // ═══ ④ التسجيل في بوابة العزل ═══
 head('④ التسجيل في TenantRegistry — وإلا فشلت مغلقة');

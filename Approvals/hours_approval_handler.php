@@ -125,6 +125,26 @@ if ($action === 'approve') {
             require_once __DIR__ . '/../includes/timesheet_event_hook.php';
             ems_timesheet_event_hook($conn, $ts_id, $__k5_gen, $user_id);
         }
+
+        // ── §9-③ طور الكتابة المزدوجة (خلف EMS_UNIT_DUAL_WRITE، fail-closed) ──
+        // مرآةُ الاعتماد إلى السجل القانوني: مسجِّلُ تاريخٍ لا مُنفِذُ قواعد —
+        // تبتلع أخطاءها كخطّاف K5 أعلاه؛ الاعتمادُ الحي يكتمل مهما جرى للمرآة.
+        if ($ins_id > 0) {
+            try {
+                require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+                if (\App\Services\Unit\TimesheetEntryService::dualWriteOn()) {
+                    // الصفُّ قد يسبق تفعيلَ العلم — المرآةُ تُستكمل عند أول اعتمادٍ بعده
+                    $__dwm = \App\Services\Unit\TimesheetEntryService::mirrorFromTimesheet($conn, $th_gate, $ts_id, $user_id);
+                    if (!empty($__dwm['ok'])) {
+                        \App\Services\Unit\TimesheetEntryService::mirrorApproval($conn, $th_gate, $ts_id, $my_level, $user_id);
+                    } else {
+                        error_log('unit dual-write approve-mirror ts#' . $ts_id . ': ' . (isset($__dwm['skipped']) ? $__dwm['skipped'] : 'فشل'));
+                    }
+                }
+            } catch (\Throwable $__dwT) {
+                error_log('unit dual-write approve-mirror ts#' . $ts_id . ': ' . $__dwT->getMessage());
+            }
+        }
     }
 
     // D02 §5: باكتمال المستوى الرابع تصير الحقيقة تشغيليةً كاملة — ولا تصبح

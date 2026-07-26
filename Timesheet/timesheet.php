@@ -350,7 +350,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   // الكتابة عبر معاملة البوابة المُدارة: سجل الدوام + إعادة بناء سطور الأعطال ذرّيًّا —
   // البوابة تحقن company_id وتفرض ملكية الصف عند التعديل (بديل نطاق EXISTS القديم حرفيًا).
   try {
-    $ts_gate->runInTransaction(function ($g) use ($id, $fields, $values, $fault_items) {
+    $saved_timesheet_id = 0; // يُلتقط بالمرجع لخطاف الكتابة المزدوجة بعد المعاملة
+    $ts_gate->runInTransaction(function ($g) use ($id, $fields, $values, $fault_items, &$saved_timesheet_id) {
       if ($id > 0) {
         // UPDATE (الملكية تفرضها البوابة على WHERE id + company)
         $update_data = array();
@@ -381,6 +382,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
         throw new \RuntimeException('فشل حفظ تفاصيل الأعطال المتعددة');
       }
     });
+
+    // ── §9-③ طور الكتابة المزدوجة (خلف EMS_UNIT_DUAL_WRITE، fail-closed) ──
+    // المرآة إلى السجل القانوني unit_entries بعد نجاح الحفظ الحي وخارج معاملته:
+    // فشلُها يُسجَّل ولا يمسّ الحفظ — المسار الحي سيّد الحقيقة في هذا الطور.
+    if (!empty($saved_timesheet_id)) {
+      try {
+        require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+        if (\App\Services\Unit\TimesheetEntryService::dualWriteOn()) {
+          $dw_actor = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+          $dw = \App\Services\Unit\TimesheetEntryService::mirrorFromTimesheet($conn, $ts_gate, $saved_timesheet_id, $dw_actor);
+          if (empty($dw['ok'])) {
+            error_log('unit dual-write mirror ts#' . $saved_timesheet_id . ': ' . (isset($dw['skipped']) ? $dw['skipped'] : 'فشل غير مفسَّر'));
+          }
+        }
+      } catch (\Throwable $dwT) {
+        error_log('unit dual-write mirror ts#' . $saved_timesheet_id . ': ' . $dwT->getMessage());
+      }
+    }
 
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
