@@ -40,6 +40,10 @@ class EffectFanout
     /** أنواع المصادر المدعومة (تتوسّع بإضافة صفوفٍ للخريطة ودالة استخراج). */
     const SOURCE_UNIT_RECORD = 'unit_record';
 
+    /** تجاوزُ مصدرِ قراءة المروحة للاختبارات حصرًا (null = من .env) —
+     *  يتيح مقارنةَ المصدرين (timesheet/legal) في عمليةٍ واحدة. */
+    public static $fanoutSourceOverride = null;
+
     /** خريطة نموذج العمل → وحدة القياس اللاتينية ونوع المستحق (وحدةٌ واحدةٌ للمروحة). */
     const WORK_MODEL_UNIT = array('hour' => 'hour', 'ton' => 'ton', 'meter' => 'meter');
     const WORK_MODEL_DUE  = array('hour' => 'hours', 'ton' => 'tons', 'meter' => 'meters');
@@ -395,6 +399,58 @@ class EffectFanout
                                 'unit' => null, 'qty' => 0.0,
                                 'currency_label' => '', 'contract_id' => null, 'unit_label' => '', 'resolved_by' => null),
         );
+
+        // ── §9-③ خطوة ④: مصدرُ القراءة القانوني (خلف EMS_UNIT_FANOUT_SOURCE=legal) ──
+        // حين توجد مرآةُ الواقعة في السجل القانوني تُقرأ **الكمياتُ وحالاتُ الزمن**
+        // منها حصرًا (unit_entries + unit_time_log)؛ ويبقى timesheet للتسعير
+        // التعاقدي (العقود والأسعار لا تسكن السجل القانوني) وللقيم الموروثة
+        // (operator_hours لمسار fin_operator_pay القديم). غيابُ المرآة = ارتدادٌ
+        // معلَنٌ للأعمدة القديمة — تعايشٌ لا كسر، والعلمُ رجوعُه قلبُ قيمته.
+        $ctx['legal_source'] = false;
+        $ctx['legal_entry_id'] = null;
+        $ctx['equipment_type'] = ($t['equipment_type'] !== null) ? intval($t['equipment_type']) : 0;
+        $fanoutSource = (self::$fanoutSourceOverride !== null)
+            ? self::$fanoutSourceOverride
+            : (function_exists('ems_env') ? ems_env('EMS_UNIT_FANOUT_SOURCE', 'timesheet') : 'timesheet');
+        if ($fanoutSource === 'legal') {
+            $luuid = 'ts:' . $tsId;
+            $lco = intval($t['company_id']);
+            $lq = $conn->prepare("SELECT id, unit_type, qty FROM unit_entries
+                                   WHERE company_id=? AND sync_uuid=? LIMIT 1");
+            $lq->bind_param('is', $lco, $luuid);
+            $lq->execute();
+            $le = $lq->get_result()->fetch_assoc();
+            $lq->close();
+            if ($le) {
+                $lq = $conn->prepare("SELECT ops_state, COALESCE(SUM(hours),0) h
+                                        FROM unit_time_log WHERE company_id=? AND entry_id=?
+                                       GROUP BY ops_state");
+                $leId = intval($le['id']);
+                $lq->bind_param('ii', $lco, $leId);
+                $lq->execute();
+                $lres = $lq->get_result();
+                $lstates = array('actual_work' => 0.0, 'standby' => 0.0, 'pending_approval' => 0.0,
+                                 'tech_breakdown' => 0.0, 'operator_stop' => 0.0, 'client_stop' => 0.0,
+                                 'supplier_stop' => 0.0, 'planned_stop' => 0.0, 'force_majeure' => 0.0,
+                                 'fuel_logistics_stop' => 0.0, 'other' => 0.0);
+                while ($lr = $lres->fetch_assoc()) {
+                    $lk = ($lr['ops_state'] === 'unlogged') ? 'other' : $lr['ops_state'];
+                    if (isset($lstates[$lk])) { $lstates[$lk] += (float) $lr['h']; }
+                }
+                $lq->close();
+
+                // الكميات من السجل: وحدةُ العقد من رأس الواقعة، والساعاتُ من سطور الزمن
+                $lrec = array('hour' => 0.0, 'ton' => 0.0, 'meter' => 0.0);
+                if (isset($lrec[$le['unit_type']])) { $lrec[$le['unit_type']] = (float) $le['qty']; }
+                if ($le['unit_type'] !== 'hour') { $lrec['hour'] = round($lstates['actual_work'], 2); }
+
+                $recorded = $lrec;
+                $ctx['recorded'] = $lrec;
+                $ctx['states'] = $lstates;
+                $ctx['legal_source'] = true;
+                $ctx['legal_entry_id'] = $leId;
+            }
+        }
 
         // ── جانب العميل: وحدةُ عقده تختار العمود المقروء، ثم سعرٌ موجبٌ وعملةٌ معروفة ──
         $cl = &$ctx['client'];
@@ -827,7 +883,53 @@ class EffectFanout
                             'reason' => 'لا مشغّلَ (employee_id) على صف الدوام');
                         break;
                     }
-                    $mode = 'salary'; // الافتراض الآمن: بالراتب ⇒ لا مستحق
+
+                    // ── UX-02 §8.2: السياسةُ تغلب (قرار المالك) — المحرّك أولًا ──
+                    // سياسةٌ منطبقةٌ حُسبت ⇒ مستحقُّها هو الحكم بعملتها وتفصيلها.
+                    // لا سياسة ⇒ سقوطٌ معلَنٌ للمسار القديم (fin_operator_pay) أدناه.
+                    require_once __DIR__ . '/Unit/OperatorDue.php';
+                    $polUnit = null; $polQty = 0.0;
+                    if ((float) $ctx['recorded']['meter'] > 0)    { $polUnit = 'meter'; $polQty = (float) $ctx['recorded']['meter']; }
+                    elseif ((float) $ctx['recorded']['ton'] > 0)  { $polUnit = 'ton';   $polQty = (float) $ctx['recorded']['ton']; }
+                    elseif ((float) $ctx['recorded']['hour'] > 0) { $polUnit = 'hour';  $polQty = (float) $ctx['recorded']['hour']; }
+                    $polDue = \App\Services\Unit\OperatorDue::compute($conn, $company, array(
+                        'employee_id' => $empId,
+                        'work_date' => $ctx['work_date'],
+                        'project_id' => $ctx['project_id'],
+                        'equipment_type' => isset($ctx['equipment_type']) ? $ctx['equipment_type'] : 0,
+                        'states' => $ctx['states'],
+                        'unit_type' => $polUnit,
+                        'unit_qty' => $polQty,
+                    ));
+                    if ($polDue['ok']) {
+                        // due_type من أغلب الأسس المحسوبة — صادقًا لا تصنيفًا عامًّا
+                        $basisType = 'other';
+                        $topLine = null;
+                        foreach ($polDue['lines'] as $pl) {
+                            if ($topLine === null || $pl['amount'] > $topLine['amount']) { $topLine = $pl; }
+                        }
+                        if ($topLine !== null) {
+                            $basisMap = array('actual_work' => 'hours', 'standby' => 'hours',
+                                              'attendance' => 'hours', 'ton' => 'tons',
+                                              'trip' => 'other', 'meter' => 'meters');
+                            $basisType = isset($basisMap[$topLine['basis']]) ? $basisMap[$topLine['basis']] : 'other';
+                        }
+                        $empDueId = intval($gate->insert('fin_dues', array(
+                            'party_type' => 'employee', 'party_ref' => $empId,
+                            'due_type' => $basisType, 'direction' => 'credit',
+                            'amount' => $polDue['amount'], 'currency' => strval($polDue['currency']),
+                            'period_ref' => $ctx['period'], 'event_id' => $revId,
+                            'created_by' => intval($actor) ?: null,
+                        )));
+                        self::link($gate, $company, $tsId, $type, 'fin_dues', $empDueId, $revId, self::SOURCE_TIMESHEET);
+                        $out['effects'][] = array('effect' => $type, 'target_id' => $empDueId,
+                            'amount' => $polDue['amount'], 'currency' => $polDue['currency'],
+                            'via' => 'policy', 'is_trial' => $polDue['is_trial'],
+                            'policy_lines' => $polDue['lines']);
+                        break;
+                    }
+
+                    $mode = 'salary'; // الافتراض الآمن: بالراتب ⇒ لا مستحق (المسار القديم)
                     try {
                         $pm = $gate->selectOne('fin_operator_pay', array('columns' => array('pay_mode'), 'where' => array('employee_id' => $empId)));
                         if ($pm) { $mode = strval($pm['pay_mode']); }

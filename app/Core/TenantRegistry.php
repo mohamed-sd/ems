@@ -104,6 +104,7 @@ class TenantRegistry
         'fin_event_links' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_effect_map' => array('type' => self::T_TENANT, 'soft' => false), // §6.1: خريطة تفريع الأثر التصريحية
         'fin_operator_pay' => array('type' => self::T_TENANT, 'soft' => false), // §12: وضع دفع المشغّل (بالراتب/بالمستحق) — يحكم مروحة employee_due
+        'operator_pay_policies' => array('type' => self::T_TENANT, 'soft' => true), // UX-02 §8.2: سياسات مستحقات المشغّلين — تغلب fin_operator_pay حيث وُجدت
         // D02 §3.7: أحكام استحقاق الأطراف — حكمٌ لكل طرفٍ بوحدة عقده هو (soft=true:
         // الحكم قرارٌ تعاقديٌّ يُراجَع ويُعكس، فلا يُمحى من سجلّ التدقيق)
         'unit_party_awards' => array('type' => self::T_TENANT, 'soft' => true),
