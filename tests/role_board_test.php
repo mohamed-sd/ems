@@ -30,11 +30,25 @@ ok('العلم: المذكور يفعَّل وغيره لا (حتميًّا بت
     roleBoardEnabled(17, '17') === true && roleBoardEnabled(1, '17') === false
     && roleBoardEnabled(17, '') === false && roleBoardEnabled(13, '17,13') === true);
 
-ok('خريطة اللوحات الأربع (17·13·16·23) · دورٌ بلا لوحةٍ → null',
+ok('الخريطة: أربعُ لوحاتٍ مخصصة + ثمانٍ على العامة · التشغيل (1) بلا لوحةٍ حتى UX-03',
     roleBoardRoute(17) === 'Finance/cfo_daily_board_fin.php'
     && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php'
     && roleBoardRoute(16) === 'Procurement/dashboard_proc.php'
-    && roleBoardRoute(23) === 'Transport/transfer_dashboard.php' && roleBoardRoute(1) === null);
+    && roleBoardRoute(23) === 'Transport/transfer_dashboard.php'
+    && roleBoardRoute(24) === 'main/role_board.php' && roleBoardRoute(15) === 'main/role_board.php'
+    && roleBoardRoute(1) === null);
+
+// إعدادُ اللوحة العامة كاملٌ للأدوار الثمانية — وكلُّ بطاقةٍ ومهمةٍ بقفزة (href)
+$cfgOk = true;
+foreach (array(24, 12, 2, 3, 4, 5, 6, 15) as $r) {
+    $cfg = roleBoardGenericConfig($r);
+    if ($cfg === null || empty($cfg['cards']) || empty($cfg['pulse'])) { $cfgOk = false; continue; }
+    foreach (array_merge($cfg['cards'], $cfg['tasks']) as $def) {
+        if (empty($def[0]) || empty($def[4])) { $cfgOk = false; }
+    }
+}
+ok('إعداد الأدوار الثمانية كامل — كل بطاقةٍ ومهمةٍ باسمٍ وقفزة', $cfgOk);
+ok('دورٌ خارج الإعداد يعيد null (التشغيل ينتظر UX-03)', roleBoardGenericConfig(1) === null);
 
 ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (18→17 · 14→13)',
     roleBoardRoute(18, 17) === 'Finance/cfo_daily_board_fin.php'
