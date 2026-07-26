@@ -115,11 +115,28 @@ $dash = file_get_contents(dirname(__DIR__) . '/main/dashboard.php');
 ok('الرئيسية تحوّل المفعَّلَ للوحته خلف العلم (roleBoardEnabled ثم roleBoardRoute)',
     strpos($dash, 'roleBoardEnabled') !== false && strpos($dash, 'roleBoardRoute') !== false);
 
-$cfo = file_get_contents(dirname(__DIR__) . '/Finance/cfo_daily_board_fin.php');
-$components = array('مهامي', 'موافقاتي', 'التنبيهات', 'إنشاء سريع', 'نبض الأداء', 'عملي الأخير');
+// المكوّنات ②-⑦ صارت في قالبٍ واحدٍ مشترك — فالحارسُ يفحص القالبَ نفسه ثم تضمينَه.
+// (قبلَ الاستخراج كان يفحص نصَّ لوحة المدير المالي؛ وبعده صار ذلك الفحصُ يمرّ على
+//  التعليقات وحدها — فنُقل إلى مصدر الحقيقة الحقيقي: role_board_widgets.php.)
+$tpl = file_get_contents(dirname(__DIR__) . '/includes/role_board_widgets.php');
+$components = array('مهامي', 'موافقاتي', 'التنبيهات', 'إنشاء سريع', 'عملي الأخير');
 $missing = 0;
-foreach ($components as $c) { if (mb_strpos($cfo, $c) === false) { $missing++; } }
-ok('لوحة المدير المالي تحمل المكوّنات الستة المضافة (والبطاقات العشر = ① مؤشرات اليوم)', $missing === 0);
+foreach ($components as $c) { if (mb_strpos($tpl, $c) === false) { $missing++; } }
+ok('القالب المشترك يحمل المكوّنات ②-⑦ (النبض بعنوانٍ من الصفحة + canvas#rbPulse وسكربته)',
+    $missing === 0 && strpos($tpl, 'id="rbPulse"') !== false && strpos($tpl, 'id="rbPulseInit"') !== false
+    && strpos($tpl, '$rb_pulse_title') !== false && strpos($tpl, '$rb_pulse_series') !== false);
+
+// اللوحاتُ الأربع تضمّن القالبَ ولا تكرّر سكربتَ Chart (① مؤشرات اليوم تبقى لكلٍّ بطاقاتُها)
+$boards = array('Finance/cfo_daily_board_fin.php', 'Maintenance/dashboard_mnt.php',
+                'Procurement/dashboard_proc.php', 'Transport/transfer_dashboard.php');
+$bad = array();
+foreach ($boards as $b) {
+    $src = file_get_contents(dirname(__DIR__) . '/' . $b);
+    if (strpos($src, "includes/role_board_widgets.php") === false) { $bad[] = "$b (لا تضمين)"; }
+    if (strpos($src, 'new Chart(') !== false) { $bad[] = "$b (سكربت Chart مكرر)"; }
+    if (strpos($src, '$rb_pulse_series') === false) { $bad[] = "$b (بلا سلسلتَي النبض)"; }
+}
+ok('اللوحاتُ الأربع على القالب المشترك بلا تكرار (' . implode(' · ', $bad) . ')', $bad === array());
 
 ok('استعلامات المحرك بقيم ENUM الفعلية (approved لا ready · حالات الطلبات الصريحة)',
     strpos(file_get_contents(dirname(__DIR__) . '/includes/role_board.php'), "p.state='approved'") !== false
