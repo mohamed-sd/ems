@@ -73,9 +73,16 @@ $m = array();
 foreach ($mig as $x) { $m[$x['migrated_from']] = (int) $x['n']; }
 check(($m['equipments.license'] ?? 0) === 13, 'رخصُ المعدات: ' . ($m['equipments.license'] ?? 0) . '/13');
 check(($m['equipment_operators.license'] ?? 0) === 26, 'رخصُ المشغّلين: ' . ($m['equipment_operators.license'] ?? 0) . '/26');
+check(($m['employees.identity'] ?? 0) === 26, 'هوياتُ الموظفين: ' . ($m['employees.identity'] ?? 0) . '/26');
 $expiredMig = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
     WHERE migrated_from IS NOT NULL AND status='منتهية'")->fetch_assoc()['c'];
-check($expiredMig === 37, "الموسومةُ منتهيةً عند الترحيل: {$expiredMig}/37 — الأزمةُ المقيسة صارت مرئية");
+check($expiredMig === 63, "الموسومةُ منتهيةً عند الترحيل: {$expiredMig}/63 — الأزمةُ المقيسة صارت مرئية");
+// النسخةُ لا تُرحَّل مرتين: employees.license_expiry_date مطابقٌ لسجل التأهيل 26/26
+$dupCheck = (int) $db->query("SELECT COUNT(*) c FROM employees e
+    JOIN equipment_operators eo ON eo.employee_id = e.id
+    WHERE e.company_id=4 AND e.license_expiry_date IS NOT NULL AND eo.license_expiry_date IS NOT NULL
+      AND e.license_expiry_date <> eo.license_expiry_date")->fetch_assoc()['c'];
+check($dupCheck === 0, 'employees.license_expiry_date نسخةٌ مطابقةٌ لسجل التأهيل — فلم تُرحَّل مرتين');
 
 // ═══ ② بذر 50 عبر الشاشة ═══
 head('② بذرُ 50 وثيقةً جديدةً عبر الشاشة الحقيقية (لا اعتمادَ على المرحَّل)');
@@ -196,8 +203,46 @@ check(strpos($board, 'وثائقُ توشك') !== false, 'ومؤشر «توشك 
 check(strpos($board, 'عدّاداتٌ بلا قراءةٍ حديثة') === false,
     'والمؤشرُ الفاسد (meter_readings الغائب) لم يعد يُعرض');
 
-// ═══ ⑦ العزل ═══
-head('⑦ العزل بين الشركات');
+// ═══ ⑦ لوحةُ الموارد البشرية (طلب المالك) ═══
+head('⑦ لوحةُ الموارد البشرية (4): تنبيهُ الرخص والهويات المنتهية');
+check(login('اروينا'), 'دخول «اروينا» (الموارد البشرية 4)');
+list($c, $hb) = req(BASE . '/main/role_board.php');
+check($c === 200 && mb_strpos($hb, 'لوحة ادارة الموارد البشرية') !== false, "اللوحة تصيّر (HTTP {$c})");
+
+$srcLic = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
+    WHERE company_id=4 AND COALESCE(is_deleted,0)=0 AND status<>'ملغاة'
+      AND subject_type='operator' AND doc_type='رخصة قيادة'
+      AND expiry_date IS NOT NULL AND expiry_date < CURDATE()")->fetch_assoc()['c'];
+$srcId = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
+    WHERE company_id=4 AND COALESCE(is_deleted,0)=0 AND status<>'ملغاة'
+      AND subject_type='operator' AND doc_type='هوية'
+      AND expiry_date IS NOT NULL AND expiry_date < CURDATE()")->fetch_assoc()['c'];
+
+check(mb_strpos($hb, 'رخصُ قيادةٍ منتهية') !== false, "بطاقةُ «رخصُ قيادةٍ منتهية» ظاهرة (المصدر {$srcLic})");
+check(mb_strpos($hb, 'هوياتٌ منتهية') !== false, "بطاقةُ «هوياتٌ منتهية» ظاهرة (المصدر {$srcId})");
+// الرقمُ المعروض = المصدرُ نفسُه (لا تقريبَ ولا تلفيق)
+$licShown = false; $idShown = false;
+$pL = mb_strpos($hb, 'رخصُ قيادةٍ منتهية');
+if ($pL !== false) { $licShown = (mb_strpos(mb_substr($hb, max(0, $pL - 400), 420), '>' . $srcLic . '<') !== false); }
+$pI = mb_strpos($hb, 'هوياتٌ منتهية');
+if ($pI !== false) { $idShown = (mb_strpos(mb_substr($hb, max(0, $pI - 400), 420), '>' . $srcId . '<') !== false); }
+check($licShown && $idShown, "الرقمان المعروضان = المصدر حرفيًّا ({$srcLic} · {$srcId})");
+
+// «توشك» مهمّةٌ تختفي عند الصفر — سلوكٌ مقصودٌ موثَّق في main/role_board.php
+$srcSoon = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
+    WHERE company_id=4 AND COALESCE(is_deleted,0)=0 AND status<>'ملغاة' AND subject_type='operator'
+      AND expiry_date >= CURDATE() AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL alert_days DAY)")->fetch_assoc()['c'];
+$soonShown = mb_strpos($hb, 'وثائقُ أفرادٍ توشك') !== false;
+check(($srcSoon > 0) === $soonShown,
+    "مهمّةُ «توشك» تتبع مصدرَها ({$srcSoon}) — والصفريُّ يختفي بالتصميم لا بالعطب");
+
+// والبطاقةُ تقود إلى بابٍ مفتوح (الحارس المركزي)
+list($dc, $dpg) = req(BASE . '/Equipments/equipment_documents.php');
+check($dc === 200 && mb_strpos($dpg, 'وثائق المعدات والمشغّلين') !== false,
+    'والدور 4 يفتح شاشةَ الوثائق التي تقود إليها البطاقة (منحٌ لا بابٌ مغلق)');
+
+// ═══ ⑧ العزل ═══
+head('⑧ العزل بين الشركات');
 $co1 = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents WHERE company_id<>4")->fetch_assoc()['c'];
 check($co1 === 0, "كلُّ الوثائق لشركتها (لا تسرّبَ لغيرها): {$co1} خارجها");
 

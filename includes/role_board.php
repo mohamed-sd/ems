@@ -575,8 +575,15 @@ function roleBoardGenericConfig($rid)
                 array('طلباتُ إجازةٍ منتظرة', 'fa-umbrella-beach', array('t' => 'worker_leave_absence', 'a' => 'wl'), "SELECT COUNT(*) FROM worker_leave_absence wl WHERE {TENANT_SCOPE} AND wl.state='مطلوب'", '../Workforce/worker_leave_absence.php', 'warn'),
                 array('عقودٌ تنتهي (30 يومًا)', 'fa-hourglass-half', array('t' => 'worker_contract', 'a' => 'wc'), "SELECT COUNT(*) FROM worker_contract wc WHERE {TENANT_SCOPE} AND wc.state='نافذ' AND wc.date_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Workforce/worker_contract.php', 'err'),
                 array('تسوياتٌ تنتظر الاعتماد', 'fa-hand-holding-dollar', array('t' => 'worker_settlement', 'a' => 'ws'), "SELECT COUNT(*) FROM worker_settlement ws WHERE {TENANT_SCOPE} AND ws.state='محتسب'", '../Workforce/worker_settlement.php', 'warn'),
+                // ── تنبيهاتُ وثائق الأفراد (طلبُ المالك 2026-07-27) ──────────────
+                // المقيسُ يومَ الإضافة: 25 رخصةَ قيادةٍ منتهية و26 هويةً منتهية —
+                // وأصحابُها كلُّهم بحالةٍ نشطةٍ يعملون. المصدرُ ملفُّ الوثائق
+                // الموحّد لا الأعمدةُ المتناثرة، فالتجديدُ يُسجَّل مرةً واحدةً ويُرى هنا.
+                array('رخصُ قيادةٍ منتهية', 'fa-id-card-clip', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.doc_type='رخصة قيادة' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php', 'err'),
+                array('هوياتٌ منتهية', 'fa-address-card', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.doc_type='هوية' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php', 'err'),
             ),
             'tasks' => array(
+                array('وثائقُ أفرادٍ توشك على الانتهاء (بمهلة كلِّ وثيقة)', 'fa fa-hourglass-half', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.expiry_date >= CURDATE() AND d.expiry_date <= DATE_ADD(CURDATE(), INTERVAL d.alert_days DAY)", '../Equipments/equipment_documents.php'),
                 array('تقييماتٌ وتنقلاتٌ قيد المعالجة', 'fa fa-people-arrows', array('t' => 'worker_movement', 'a' => 'wm'), "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state='مسودة'", '../Workforce/worker_movement.php'),
             ),
             'pulse' => array('نبض الأداء — وحداتُ الدوام (7 أيام)', array('أُدخلت', 'اعتُمدت'),
