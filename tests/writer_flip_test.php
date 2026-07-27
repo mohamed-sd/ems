@@ -100,13 +100,15 @@ list(, $pg) = req(BASE . '/Timesheet/timesheet.php?type=1');
 preg_match('/name="csrf_token"\s+value="([^"]+)"/', $pg, $m);
 $csrf = $m[1] ?? '';
 
-$mkPost = function ($op, $emp, $day, $shift, array $lines) use ($csrf) {
+// زمنُ الوردية يأتي من عقد التشغيل لا من مجموع السطور — فنرسله 12 بينما
+// مجموعُ السطور 10، ليظهر أن الاشتقاق لا يبتلعه.
+$mkPost = function ($op, $emp, $day, $shift, array $lines, $shiftHours = '12') use ($csrf) {
     return array(
         'operator' => (string) $op, 'employee_id' => (string) $emp,
         'shift' => $shift, 'date' => $day, 'type' => '1', 'user_id' => '1',
         'csrf_token' => $csrf, 'general_notes' => 'FLIP-TEST',
         'ts_time_lines_json' => json_encode($lines, JSON_UNESCAPED_UNICODE),
-        'executed_hours' => '0', 'standby_hours' => '0', 'shift_hours' => '0',
+        'executed_hours' => '0', 'standby_hours' => '0', 'shift_hours' => $shiftHours,
         'total_work_hours' => '0', 'operator_hours' => '0', 'total_fault_hours' => '0',
         'maintenance_fault' => '0', 'hr_fault' => '0', 'marketing_fault' => '0',
         'ts_supplier_stop_hours' => '0', 'ts_planned_stop_hours' => '0',
@@ -131,8 +133,10 @@ $ts1 = $db->query("SELECT t.*, u.id AS eid, u.qty, u.unit_type, u.state, u.sourc
 check($ts1 !== null, 'الدفتران مكتوبان ومربوطان (sync_uuid)');
 check($ts1 && $ts1['source_ref'] === 'TS-' . $ts1['id'], "النسبُ صادق: source_ref={$ts1['source_ref']}");
 check($ts1 && (float) $ts1['executed_hours'] == 8.0 && (float) $ts1['standby_hours'] == 2.0
-    && (float) $ts1['shift_hours'] == 10.0 && (float) $ts1['qty'] == 8.0,
-    'النسخةُ القديمة مشتقةٌ صفرَ فرق (8 فعلي · 2 استعداد · وردية 10)');
+    && (float) $ts1['qty'] == 8.0,
+    'النسخةُ القديمة مشتقةٌ صفرَ فرق (8 فعلي · 2 استعداد)');
+check($ts1 && (float) $ts1['shift_hours'] == 12.0,
+    'وزمنُ الوردية بقي 12 كما جاء من العقد — لا 10 مجموعَ السطور');
 $lg1 = (int) $db->query("SELECT COUNT(*) c FROM unit_time_log WHERE entry_id={$ts1['eid']}")->fetch_assoc()['c'];
 check($lg1 === 2, "سطرا الزمن في السجل القانوني: {$lg1}");
 

@@ -46,6 +46,21 @@ if ($shift_type === 'D' || $shift_type === 'N') {
     $gop_params[] = $shift_type;
 }
 
+// ── شرطُ «ولها سائقٌ يعمل عليها» (تشخيصُ المالك 2026-07-27) ──────────────
+// كانت القائمةُ ترشّح بالمشروع والحالة والنوع **ولا تشترط وجودَ سائق**، فتظهر
+// آلياتٌ لا مشغّلَ مرتبطًا بها فتُحفظ أيامُ عملٍ بلا مشغّل — وساعاتُها مستحقّةٌ
+// لا يُعرف صاحبُها. القياس: معدتان من ثلاث عشرة قائمتُهما فارغةٌ تمامًا.
+// الشرطُ هنا بنفس منطق get_drivers.php حرفيًّا (الجدولُ والحالتان وترشيحُ
+// الوردية) — فما يظهر في قائمة الآليات له بالضرورة سائقٌ يظهر في قائمته.
+$gop_drv_shift = '';
+if ($shift_type === 'D' || $shift_type === 'N') {
+    $gop_drv_shift = " AND (ed.shift_type = 'B' OR ed.shift_type = '" . ($shift_type === 'D' ? 'D' : 'N') . "') ";
+}
+$gop_filter .= " AND EXISTS (SELECT 1 FROM equipment_drivers ed
+                              JOIN employees dd ON dd.id = ed.employee_id
+                             WHERE ed.equipment_id = o.equipment
+                               AND ed.status = 1 AND dd.status = 1{$gop_drv_shift}) ";
+
 $result = array();
 try {
     $result = $gop_gate->scopedQuery(

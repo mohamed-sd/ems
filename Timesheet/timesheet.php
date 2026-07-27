@@ -299,6 +299,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   }
   $values['date'] = $normalized_date;
 
+  // ── الحقلان الإلزاميان خادميًّا (تشخيصُ المالك 2026-07-27) ──────────────
+  // الإلزامُ في الواجهة (required) يمنع السهوَ، والإلزامُ هنا يمنع الالتفاف:
+  // لا يُحفظ يومُ عملٍ بلا آليةٍ ولا بلا مشغّل — فساعاتُ المشغّل بلا مشغّلٍ
+  // مالٌ بلا صاحب.
+  if (intval($values['operator']) <= 0) {
+    echo "<script>alert('❌ الآلية حقلٌ إلزامي — اختر الآلية');</script>";
+    exit;
+  }
+  if (intval($values['employee_id']) <= 0) {
+    echo "<script>alert('❌ المشغّل حقلٌ إلزامي — لا يُحفظ يومُ عملٍ بلا مشغّل\\n\\n(ساعاتُ المشغّل تُحسب مستحقًّا، فلا بدّ من صاحبها)');</script>";
+    exit;
+  }
+
   // ── UX-03 §5.1: سطورُ الزمن بحالاتها ومسؤوليها (خلف EMS_TS_TIME_LINES) ──
   // حين تصل سطورٌ من الشاشة، **الخادمُ يشتق منها الأعمدةَ التسعة** ويستبدل
   // قيمَ POST بها — مصدرُ حقيقةٍ واحدٌ لا اثنان، ولا ثقةَ بحساب المتصفح.
@@ -325,8 +338,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
         );
       }
       if (!empty($ts_posted_lines)) {
-        // الاشتقاق الخادمي يغلب قيمَ POST للأعمدة الزمنية كلِّها
+        // الاشتقاق الخادمي يغلب قيمَ POST للأعمدة الزمنية كلِّها — **إلا
+        // shift_hours**: زمنُ الوردية يأتي من عقد التشغيل (get_contract_hours)
+        // لا من مجموع السطور؛ فالتشغيلُ الفعلي يؤثّر في المنفَّذ وحده، وما لم
+        // يُوزَّع من الوردية يبقى ظاهرًا فرقًا لا أن يُقلَّص طولُ الوردية إليه.
         $ts_derived = \App\Services\Unit\TimesheetEntryService::legacyColumnsFromLines($ts_posted_lines);
+        unset($ts_derived['shift_hours']);
         foreach ($ts_derived as $dk => $dv) {
           if (array_key_exists($dk, $values) || in_array($dk, $fields, true)) { $values[$dk] = (string)$dv; }
         }
@@ -625,6 +642,19 @@ $page_title = "إيكوبيشن | التايم شيت اليومي (إدخال �
 include("../inheader.php");
 include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
+// ── شرطُ «ولها سائقٌ يعمل عليها» (تشخيصُ المالك 2026-07-27) ──────────────
+// السببُ الجذري لفجوة «يومُ عملٍ بلا مشغّل»: قائمةُ الآليات كانت ترشّح
+// بالمشروع والحالة والنوع **بلا شرطٍ على وجود سائق** — فتظهر آليةٌ لا مشغّلَ
+// مرتبطًا بها، ويُحفظ يومُها بساعاتِ مشغّلٍ لا يُعرف صاحبُها.
+// القياس قبل الإصلاح: معدتان من ثلاث عشرة قائمةُ سائقيهما فارغةٌ تمامًا،
+// و12 من 50 صفًّا مبذورًا حُفظت بلا مشغّل بلا اعتراض.
+// الشرطُ بنفس منطق get_drivers.php حرفيًّا — فما يظهر في قائمة الآليات
+// يضمن وجودَ خيارٍ في قائمة السائقين.
+$ts_has_driver_sql = " AND EXISTS (SELECT 1 FROM equipment_drivers ed
+                                    JOIN employees dd ON dd.id = ed.employee_id
+                                   WHERE ed.equipment_id = o.equipment
+                                     AND ed.status = 1 AND dd.status = 1) ";
+
 $type_filter = "";
 $type_filter_params = array();
 if ($type != "") {
@@ -860,7 +890,7 @@ try {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o.project_id = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " AND {TENANT_SCOPE}", $type_filter_params);
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
                 } catch (\Throwable $t) {
                   error_log('Timesheet operators query failed (type=1): ' . $t->getMessage());
                 }
@@ -875,7 +905,7 @@ try {
 
             <div>
               <label>السائق</label>
-              <select id="driver" name="employee_id">
+              <select id="driver" name="employee_id" required>
                 <option value="">-- اختر السائق --</option>
               </select>
             </div>
@@ -1247,7 +1277,7 @@ try {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o.project_id = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " AND {TENANT_SCOPE}", $type_filter_params);
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
                 } catch (\Throwable $t) {
                   error_log('Timesheet operators query failed (type=2): ' . $t->getMessage());
                 }
@@ -1279,7 +1309,7 @@ try {
 
 
 
-              <select id="driver" name="employee_id">
+              <select id="driver" name="employee_id" required>
                 <option value="">-- اختر السائق --</option>
               </select>
 
@@ -1640,7 +1670,7 @@ try {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o.project_id = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " AND {TENANT_SCOPE}", $type_filter_params);
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
                 } catch (\Throwable $t) {
                   error_log('Timesheet operators query failed (type=3): ' . $t->getMessage());
                 }
@@ -1655,7 +1685,7 @@ try {
 
             <div>
               <label>السائق</label>
-              <select id="driver" name="employee_id">
+              <select id="driver" name="employee_id" required>
                 <option value="">-- اختر السائق --</option>
               </select>
             </div>
@@ -2210,6 +2240,12 @@ try {
 
   // ✅ دالة لحساب العمليات الثلاثة
   function calculateCustomHours() {
+    // حين تكون سطورُ الزمن مفعَّلةً وفيها سطرٌ واحدٌ فأكثر، فهي مصدرُ اشتقاق
+    // الخانات الزمنية (ونفسُ اشتقاق الخادم). الحسابُ القديم هنا يبني
+    // total_fault_hours من «الوردية − المنفَّذ»، فلو تركناه يعمل بعد تحرير
+    // خانة الوردية لأفسد ميزانَ الأعطال الذي يفحصه الخادمُ عند الحفظ.
+    if (window.emsTsLines && window.emsTsLines.active()) { window.emsTsLines.recompute(); return; }
+
     var machineType = "<?php echo $_GET['type']; ?>";
     let executed = 0;
 
@@ -2495,15 +2531,57 @@ try {
       }
 
       $("#timesheet_id").val(data.id);
-      $("#operator").val(data.operator).trigger('change');
 
-      // بعد تحميل بيانات العملية عبر AJAX نضبط السائق والوردية
-      setTimeout(function () {
-        $("#driver").val(data.employee_id);
-        if (data.shift) {
-          $("#shift").val(data.shift);
+      // ══ تصحيحُ تمرير قيم القوائم عند التعديل (تشخيصُ المالك 2026-07-27) ══
+      // العطبُ القديم: الوردية كانت تُضبط **بعد** الآلية رغم أن قائمة الآليات
+      // ترشّح بالوردية؛ والسائقُ يُضبط بـsetTimeout(400ms) — سباقٌ مع AJAX
+      // يمسحه إذا تأخّرت الاستجابة. فيُفتح صفٌّ للتعديل بقائمتين فارغتين
+      // وتُحفظ قيمةٌ غيرُ التي كانت.
+      // الصواب: تسلسلٌ حتميٌّ بالردود لا بالوقت — وردية ← آليات ← سائقون،
+      // وكلُّ خطوةٍ تنتظر سابقتها ثم تُعيّن المحفوظَ selected.
+      var _shift = data.shift || '';
+      var _op    = String(data.operator || '');
+      var _emp   = String(data.employee_id || '');
+
+      if (_shift) { $("#shift").val(_shift); }
+
+      // ① قائمةُ الآليات بوردية الصف
+      $.ajax({
+        url: "get_operations.php", type: "GET",
+        data: { type: <?php echo json_encode($type); ?>, shift: _shift },
+        success: function (html) {
+          $("#operator").html(html);
+          // صفٌّ قديمٌ آليتُه لم تعد في القائمة (لا سائقَ مرتبطٌ بها الآن):
+          // تُضاف خيارًا موسومًا فلا تضيع الآليةُ صامتةً عند التعديل.
+          if (_op && $("#operator option[value='" + _op + "']").length === 0) {
+            $("#operator").append(
+              "<option value='" + _op + "'>(سجل قديم — آليةٌ بلا سائقٍ مرتبط)</option>");
+          }
+          $("#operator").val(_op);
+
+          // ② قائمةُ السائقين لهذه الآلية وهذه الوردية
+          $.ajax({
+            url: "get_drivers.php", type: "GET",
+            data: { operation_id: _op, shift: _shift },
+            success: function (dhtml) {
+              $("#driver").html(dhtml);
+              if (_emp && $("#driver option[value='" + _emp + "']").length === 0) {
+                $("#driver").append(
+                  "<option value='" + _emp + "'>(سجل قديم — مشغّلٌ غيرُ مُسنَد)</option>");
+              }
+              $("#driver").val(_emp);
+            }
+          });
+
+          // ③ بياناتُ الوردية والفوترة من عقد التشغيل
+          $.ajax({
+            url: "get_contract_hours.php", type: "GET", dataType: "json",
+            data: { operation_id: _op },
+            success: function (r) { applyOperationShiftData(r); },
+            error: function () { applyOperationShiftData({ shift_hours: 0 }); }
+          });
         }
-      }, 400);
+      });
 
       $("#date").val(data.date);
       $("#shift_hours").val(data.shift_hours);
@@ -3044,13 +3122,23 @@ try {
     Object.keys(col).forEach(function (k) { setField(k, col[k]); });
     setField('total_fault_hours', faults);
     setField('total_work_hours', col.executed_hours + col.standby_hours);
-    setField('shift_hours', sum);
+    // ⚠️ shift_hours لا تُشتق من السطور: زمنُ الوردية يأتي من عقد التشغيل عند
+    //    اختيار المعدة ويبقى بيد المستخدم. السطورُ توزّع داخلَه ولا تعيد تعريفه.
+    var shiftEl = document.querySelector("input[name='shift_hours']");
+    var shiftVal = shiftEl ? (parseFloat(shiftEl.value) || 0) : 0;
     var sumEl = document.getElementById('tslSum');
     if (sumEl) {
-      sumEl.innerHTML = '<span>الوردية: <b>' + sum.toFixed(2) + '</b> س</span>'
+      var undistributed = Math.round((shiftVal - sum) * 100) / 100;
+      sumEl.innerHTML = '<span>الوردية: <b>' + shiftVal.toFixed(2) + '</b> س</span>'
+        + '<span>مجموعُ السطور: <b>' + sum.toFixed(2) + '</b></span>'
         + '<span style="color:#16a34a;">فعلي: <b>' + col.executed_hours.toFixed(2) + '</b></span>'
         + '<span style="color:#2563eb;">استعداد: <b>' + (col.standby_hours + col.dependence_hours).toFixed(2) + '</b></span>'
-        + '<span style="color:#6b7280;">توقف: <b>' + faults.toFixed(2) + '</b></span>';
+        + '<span style="color:#6b7280;">توقف: <b>' + faults.toFixed(2) + '</b></span>'
+        + (undistributed > 0
+            ? '<span style="color:#d97706;">غيرُ موزَّع: <b>' + undistributed.toFixed(2) + '</b></span>'
+            : (undistributed < 0
+                ? '<span style="color:#dc2626;">تجاوزَ الوردية بـ<b>' + Math.abs(undistributed).toFixed(2) + '</b></span>'
+                : ''));
     }
   }
 
@@ -3113,6 +3201,11 @@ try {
       recompute();
     });
 
+    // تغيّرُ زمنِ الوردية (جلبُ العقد أو تعديلُ المستخدم) يحدّث سطرَ الملخص
+    // وحده — لا يمسّ توزيعَ السطور.
+    var shiftInput = document.querySelector("input[name='shift_hours']");
+    if (shiftInput) { shiftInput.addEventListener('input', recompute); }
+
     // عند الإرسال: السطور تركب hidden — والخادم يعيد اشتقاقها بنفسه
     var form = document.getElementById('projectForm');
     if (form) {
@@ -3128,6 +3221,9 @@ try {
       });
     }
   }
+
+  // الحسابُ القديم يسأل: هل السطورُ هي المصدر الآن؟
+  window.emsTsLines = { active: function () { return lines.length > 0; }, recompute: recompute };
 
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', inject); }
   else { inject(); }
