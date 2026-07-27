@@ -312,6 +312,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     exit;
   }
 
+  // ── رخصةُ المشغّل المنتهية: تحذيرٌ يظهر والحفظُ يمرّ (قرار المالك 2026-07-27) ──
+  // من ملف الوثائق الموحّد — أحدثُ «رخصة قيادة». المنعُ لم يُقرّ (كان سيوقف
+  // 25 من 30 مشغّلًا من أول يوم) — فالتحذيرُ يجعل الخطرَ مرئيًّا وموثَّقًا.
+  $ts_license_warn = '';
+  try {
+    $lic = $ts_gate->scopedQuery(
+      array('scope' => array('dd' => 'equipment_documents')),
+      "SELECT MAX(dd.expiry_date) AS exp FROM equipment_documents dd
+        WHERE {TENANT_SCOPE} AND dd.subject_type = 'operator' AND dd.doc_type = 'رخصة قيادة'
+          AND COALESCE(dd.is_deleted, 0) = 0 AND dd.subject_id = ?",
+      array(intval($values['employee_id'])));
+    if ($lic && isset($lic[0]['exp']) && $lic[0]['exp'] !== null && $lic[0]['exp'] < date('Y-m-d')) {
+      $ts_license_warn = '\n\n⚠️ تنبيه: رخصةُ قيادة هذا المشغّل منتهيةٌ منذ ' . $lic[0]['exp']
+        . ' — جدّدها من شاشة وثائق المعدات والمشغّلين.';
+    }
+  } catch (\Throwable $t) { error_log('timesheet license warn: ' . $t->getMessage()); }
+
   // ── UX-03 §5.1: سطورُ الزمن بحالاتها ومسؤوليها (خلف EMS_TS_TIME_LINES) ──
   // حين تصل سطورٌ من الشاشة، **الخادمُ يشتق منها الأعمدةَ التسعة** ويستبدل
   // قيمَ POST بها — مصدرُ حقيقةٍ واحدٌ لا اثنان، ولا ثقةَ بحساب المتصفح.
@@ -545,7 +562,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
         $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
         $svc_msg = $svc_capacity_warn
           ? '⚠️ حُفظ مع تجاوز طاقة!\n\nالمعدة أو المشغّل تجاوز حدَّه اليومي — الواقعةُ معلَّمةٌ ولن يكتمل اعتمادُ الموقع قبل بيان السبب وتخليص العلم.'
-          : '✅ تم الحفظ بنجاح (المصدر: السجل القانوني)';
+          : '✅ تم الحفظ بنجاح (المصدر: السجل القانوني)' . $ts_license_warn;
         echo "<script>alert('" . $svc_msg . "'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
         exit;
       }
@@ -623,7 +640,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
     $ts_save_msg = $ts_capacity_warn
       ? '⚠️ حُفظ مع تجاوز طاقة!\n\nالمعدة أو المشغّل تجاوز حدَّه اليومي — الواقعةُ معلَّمةٌ ولن يكتمل اعتمادُ الموقع قبل بيان السبب وتخليص العلم.'
-      : '✅ تم الحفظ بنجاح';
+      : '✅ تم الحفظ بنجاح' . $ts_license_warn;
     echo "<script>alert('" . $ts_save_msg . "'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
     exit;
   } catch (\Throwable $t) {

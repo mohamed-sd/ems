@@ -558,7 +558,12 @@ function roleBoardGenericConfig($rid)
                 array('معطلة (التشغيل)', 'fa-heart-crack', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.equipment_health='معطلة'", '../Equipments/equipments_fleet.php', 'err'),
             ),
             'tasks' => array(
-                array('عدّاداتٌ بلا قراءةٍ حديثة (30 يومًا)', 'fa fa-gauge', array('t' => 'equipments', 'a' => 'e', 'enrich' => array('mr' => 'meter_readings')), "SELECT COUNT(*) FROM equipments e WHERE {TENANT_SCOPE} AND NOT EXISTS(SELECT 1 FROM meter_readings mr WHERE mr.equipment_id=e.id AND mr.reading_date>=DATE_SUB(CURDATE(),INTERVAL 30 DAY))", '../Equipments/equipments_fleet.php'),
+                // مؤشرٌ فاسدٌ أُصلح 2026-07-27: كان يقرأ meter_readings **غيرَ الموجود**
+                // فيفشل صامتًا — استُبدل بمؤشرَي الوثائق (المصدرُ قائمٌ ومقيس:
+                // 37 من 39 وثيقةً منتهيةً يومَ البناء). قراءاتُ العدّاد حين يُبنى
+                // جدولُها (UX-10 §8.1 ب) يعود مؤشرُها بمصدرٍ حقيقي.
+                array('وثائقُ منتهيةٌ (معدات ومشغّلون)', 'fa fa-file-circle-xmark', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php'),
+                array('وثائقُ توشك على الانتهاء (بمهلة كلِّ وثيقة)', 'fa fa-hourglass-half', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.expiry_date >= CURDATE() AND d.expiry_date <= DATE_ADD(CURDATE(), INTERVAL d.alert_days DAY)", '../Equipments/equipment_documents.php'),
             ),
             'pulse' => array('نبض الأداء — أوامرُ صيانةٍ فُتحت مقابل أُغلقت على الأسطول (7 أيام)', array('فُتحت', 'أُغلقت'),
                 array('t' => 'mnt_order', 'a' => 'mo'), "SELECT COUNT(*) FROM mnt_order mo WHERE {TENANT_SCOPE} AND COALESCE(mo.is_deleted,0)=0 AND DATE(mo.created_at)=?",

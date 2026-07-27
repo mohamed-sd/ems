@@ -54,10 +54,37 @@ if (isset($_GET['operation_id'])) {
               AND ed.status = 1$gdr_filter AND d.status = 1" . ems_operation_types_in_sql($conn, 'd') . " AND {TENANT_SCOPE}", $gdr_params);
     } catch (\Throwable $t) { error_log('get_drivers main: ' . $t->getMessage()); }
 
+    // ── وسمُ الرخصة المنتهية (UX-10 وثائق · قرار المالك: تحذيرٌ لا منع) ──
+    // من ملف الوثائق الموحّد: أحدثُ «رخصة قيادة» لكل مشغّلٍ معروض؛ إن كان
+    // أحدثُ انتهاءٍ لها قبل اليوم وُسم الخيارُ ظاهرًا — والاختيارُ يمرّ.
+    $gdr_expired = array();
+    if (!empty($result)) {
+        $gdr_ids = array();
+        foreach ($result as $row) { $gdr_ids[] = intval($row['id']); }
+        try {
+            $gdr_docs = $gdr_gate->scopedQuery(
+                array('scope' => array('dd' => 'equipment_documents')),
+                "SELECT dd.subject_id, MAX(dd.expiry_date) AS exp
+                   FROM equipment_documents dd
+                  WHERE {TENANT_SCOPE} AND dd.subject_type = 'operator'
+                    AND dd.doc_type = 'رخصة قيادة' AND COALESCE(dd.is_deleted, 0) = 0
+                    AND dd.subject_id IN (" . implode(',', $gdr_ids) . ")
+                  GROUP BY dd.subject_id");
+            foreach ($gdr_docs as $gd) {
+                if ($gd['exp'] !== null && $gd['exp'] < date('Y-m-d')) {
+                    $gdr_expired[intval($gd['subject_id'])] = $gd['exp'];
+                }
+            }
+        } catch (\Throwable $t) { error_log('get_drivers license check: ' . $t->getMessage()); }
+    }
+
     while (ob_get_level()) ob_end_clean();
     echo "<option value=''>-- اختر السائق --</option>";
     foreach ($result as $row) {
-        echo "<option value='{$row['id']}'>{$row['name']}</option>";
+        $mark = isset($gdr_expired[intval($row['id'])])
+            ? ' ⚠ رخصة منتهية ' . $gdr_expired[intval($row['id'])]
+            : '';
+        echo "<option value='{$row['id']}'>{$row['name']}{$mark}</option>";
     }
 }
 ?>
