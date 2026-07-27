@@ -650,10 +650,20 @@ include('../insidebar.php');
 // و12 من 50 صفًّا مبذورًا حُفظت بلا مشغّل بلا اعتراض.
 // الشرطُ بنفس منطق get_drivers.php حرفيًّا — فما يظهر في قائمة الآليات
 // يضمن وجودَ خيارٍ في قائمة السائقين.
-$ts_has_driver_sql = " AND EXISTS (SELECT 1 FROM equipment_drivers ed
-                                    JOIN employees dd ON dd.id = ed.employee_id
-                                   WHERE ed.equipment_id = o.equipment
-                                     AND ed.status = 1 AND dd.status = 1) ";
+// ⚠️ لا يُكتب EXISTS على جدولٍ مستأجرٍ داخل scopedQuery — البوابةُ ترفضه
+//    («جدولٌ مستأجرٌ غير معلَن») فيُبتلع الاستثناءُ وتفرغ القائمةُ كلُّها؛
+//    فالقائمةُ تُجلب أولًا معزولةً ثم يُلصق الشرطُ IN. التفصيل في ts_driver_filter.php.
+require_once __DIR__ . '/ts_driver_filter.php';
+$ts_has_driver_sql = ts_has_driver_sql($ts_gate, $conn, '', 'o.equipment');
+
+// ── رفعُ شرط «أساسي» عن قوائم المعدات (قرارُ المالك 2026-07-27) ──────────────
+// كانت القوائمُ الثلاثُ وعدّادُ اليوم ونقطةُ get_operations تشترط
+// `o.equipment_category = 'أساسي'`، فتُحجب الآلياتُ الاحتياطيةُ العاملةُ فعلًا —
+// وهي تظهر في شاشة الحركة والتشغيل بورديات مشغّليها، فيقع التناقض:
+// معدةٌ لها مشغّلٌ ووردية ولا سبيلَ إلى تسجيل يومها. (الشاهد: EX23 على
+// مشروع اليانس — تشغيلٌ نشطٌ احتياطيٌّ بثلاثة سائقين نشطين.)
+// فالمعروضُ الآن كلُّ تشغيلٍ نشط (status=1) من نوع الشاشة وله سائق، أساسيًّا
+// كان أو احتياطيًّا؛ والفئةُ تبقى على الصف لأثرها في التسعير والمروحة لا للحجب.
 
 $type_filter = "";
 $type_filter_params = array();
@@ -724,7 +734,7 @@ try {
        FROM operations o
        JOIN equipments e ON e.id = o.equipment
        LEFT JOIN timesheet tt ON tt.operator = o.id AND tt.date = CURDATE()
-      WHERE o.status = '1' AND o.equipment_category = 'أساسي'" . $ts_cnt_project_sql . "
+      WHERE o.status = '1'" . $ts_cnt_project_sql . $ts_has_driver_sql . "
         AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active')
         AND {TENANT_SCOPE}
       GROUP BY o.id, e.code, e.name
@@ -890,7 +900,7 @@ try {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o.project_id = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
+                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
                 } catch (\Throwable $t) {
                   error_log('Timesheet operators query failed (type=1): ' . $t->getMessage());
                 }
@@ -1277,7 +1287,7 @@ try {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o.project_id = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
+                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
                 } catch (\Throwable $t) {
                   error_log('Timesheet operators query failed (type=2): ' . $t->getMessage());
                 }
@@ -1670,7 +1680,7 @@ try {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o.project_id = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
+                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " " . $ts_has_driver_sql . " AND {TENANT_SCOPE}", $type_filter_params);
                 } catch (\Throwable $t) {
                   error_log('Timesheet operators query failed (type=3): ' . $t->getMessage());
                 }

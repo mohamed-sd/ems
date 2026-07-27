@@ -52,14 +52,14 @@ if ($shift_type === 'D' || $shift_type === 'N') {
 // لا يُعرف صاحبُها. القياس: معدتان من ثلاث عشرة قائمتُهما فارغةٌ تمامًا.
 // الشرطُ هنا بنفس منطق get_drivers.php حرفيًّا (الجدولُ والحالتان وترشيحُ
 // الوردية) — فما يظهر في قائمة الآليات له بالضرورة سائقٌ يظهر في قائمته.
-$gop_drv_shift = '';
-if ($shift_type === 'D' || $shift_type === 'N') {
-    $gop_drv_shift = " AND (ed.shift_type = 'B' OR ed.shift_type = '" . ($shift_type === 'D' ? 'D' : 'N') . "') ";
-}
-$gop_filter .= " AND EXISTS (SELECT 1 FROM equipment_drivers ed
-                              JOIN employees dd ON dd.id = ed.employee_id
-                             WHERE ed.equipment_id = o.equipment
-                               AND ed.status = 1 AND dd.status = 1{$gop_drv_shift}) ";
+// ⚠️ لا يُكتب EXISTS على جدولٍ مستأجرٍ داخل scopedQuery — البوابةُ ترفضه
+//    («جدولٌ مستأجرٌ غير معلَن») فيُبتلع الاستثناءُ وتفرغ القائمةُ كلُّها؛
+//    فالمعدّاتُ ذاتُ السائق تُجلب أولًا باستعلامٍ معزولٍ ثم يُلصق الشرطُ IN.
+require_once __DIR__ . '/ts_driver_filter.php';
+$gop_filter .= ts_has_driver_sql($gop_gate, $conn, $shift_type, 'o.equipment');
+
+// شرطُ «أساسي» رُفع بقرار المالك 2026-07-27 — الاحتياطيُّ العاملُ يُسجَّل يومُه
+// كالأساسي (الشاهد EX23 على مشروع اليانس)؛ التفصيلُ في رأس timesheet.php.
 
 $result = array();
 try {
@@ -68,7 +68,7 @@ try {
         "SELECT o.id, e.code, e.name
           FROM operations o
           JOIN equipments e ON o.equipment = e.id
-          WHERE o.status = '1' AND o.equipment_category = 'أساسي' AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active')$gop_filter AND {TENANT_SCOPE}
+          WHERE o.status = '1' AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE ? AND status = 'active')$gop_filter AND {TENANT_SCOPE}
           ORDER BY e.code ASC, e.name ASC", $gop_params);
 } catch (\Throwable $t) { error_log('get_operations main: ' . $t->getMessage()); }
 

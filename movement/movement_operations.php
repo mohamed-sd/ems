@@ -219,16 +219,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     throw new Exception('تاريخ النهاية يجب أن يكون بعد البداية');
                 }
 
-                $start_save = $start_date !== '' ? $start_date : date('Y-m-d');
-                $end_save = $end_date !== '' ? $end_date : '2099-12-31';
+                // التواريخ لم تعد تُعرض في الجدول؛ فما لم يُرسَل منها يبقى كما هو في القاعدة
+                // (وإلا لأعاد الحفظُ ضبطَ البداية على اليوم والنهاية على 2099-12-31 بلا قصد).
+                $drv_fields = array(
+                    'status'     => $status,
+                    'shift_type' => $shift_type,
+                );
+                if ($start_date !== '') {
+                    $drv_fields['start_date'] = $start_date;
+                }
+                if ($end_date !== '') {
+                    $drv_fields['end_date'] = $end_date;
+                }
 
                 try {
-                    $mvp_gate->update('equipment_drivers', array(
-                        'start_date' => $start_save,
-                        'end_date'   => $end_save,
-                        'status'     => $status,
-                        'shift_type' => $shift_type,
-                    ), array('id' => $rel_id));
+                    $mvp_gate->update('equipment_drivers', $drv_fields, array('id' => $rel_id));
                 } catch (\Throwable $t) {
                     throw new Exception('خطأ في تحديث السائق');
                 }
@@ -1308,7 +1313,7 @@ include '../insidebar.php';
         ];
         foreach ($status_groups as $sgrp):
             $show_drivers = ($sgrp['key'] !== 'ended'); // عمود السائقين يظهر في الجداول السارية فقط، لا في المنتهية
-            $col_count    = $show_drivers ? 9 : 8;
+            $col_count    = $show_drivers ? 7 : 6;
         ?>
         <div class="card">
             <div class="card-header">
@@ -1323,8 +1328,6 @@ include '../insidebar.php';
                                 <th>الآلية</th>
                                 <th>النوع</th>
                                 <th>الوردية</th>
-                                <th>بداية</th>
-                                <th>نهاية</th>
                                 <?php if ($show_drivers): ?><th>السائقون</th><?php endif; ?>
                                 <th>الحالة</th>
                                 <th>إجراء</th>
@@ -1360,20 +1363,6 @@ include '../insidebar.php';
                                             </select>
                                         <?php else: ?>
                                             <span><?php echo htmlspecialchars($shift_label); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <input type="date" class="op_start" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['start'] ?? ''); ?>">
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($op['start'] ?? '-'); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <input type="date" class="op_end" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['end'] ?? ''); ?>">
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($op['end'] ?? '-'); ?></span>
                                         <?php endif; ?>
                                     </td>
                                     <?php if ($show_drivers): ?>
@@ -1417,7 +1406,7 @@ include '../insidebar.php';
                                 <?php if ($show_drivers): ?>
                                 <!-- صف السائقين القابل للتوسيع -->
                                 <tr id="op_drivers_<?php echo $tkey; ?>_<?php echo $op_id; ?>" class="drivers-sub-row" style="display:none;">
-                                    <td colspan="9">
+                                    <td colspan="7">
                                         <div class="sub-drivers-wrap">
                                             <table class="sub-drivers-table no-datatable">
                                                 <thead>
@@ -1426,15 +1415,13 @@ include '../insidebar.php';
                                                         <th>السائق</th>
                                                         <th>الهاتف</th>
                                                         <th>الوردية</th>
-                                                        <th>بداية التعيين</th>
-                                                        <th>نهاية التعيين</th>
                                                         <th>الحالة</th>
                                                         <th>إجراء</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php if (empty($eq_drivers)): ?>
-                                                        <tr><td colspan="8" style="text-align:center;color:#888;padding:10px;">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>
+                                                        <tr><td colspan="6" style="text-align:center;color:#888;padding:10px;">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>
                                                     <?php else: ?>
                                                         <?php $didx = 1; foreach ($eq_drivers as $drv):
                                                             $rel_id     = intval($drv['id']);
@@ -1442,7 +1429,6 @@ include '../insidebar.php';
                                                             $drv_status = intval($drv['status']);
                                                             $is_active  = ($drv_status === 1);
                                                             $drv_shift_label = ($drv_shift === 'D') ? 'نهاري' : (($drv_shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
-                                                            $end_display = ((string)$drv['end_date'] === '2099-12-31') ? '' : (string)$drv['end_date'];
                                                         ?>
                                                         <tr id="drv_row_<?php echo $rel_id; ?>">
                                                             <td><?php echo $didx++; ?></td>
@@ -1457,20 +1443,6 @@ include '../insidebar.php';
                                                                     </select>
                                                                 <?php else: ?>
                                                                     <span><?php echo htmlspecialchars($drv_shift_label); ?></span>
-                                                                <?php endif; ?>
-                                                            </td>
-                                                            <td>
-                                                                <?php if ($is_active && $can_edit): ?>
-                                                                    <input type="date" class="drv_start" data-rel="<?php echo $rel_id; ?>" value="<?php echo htmlspecialchars($drv['start_date'] ?? ''); ?>">
-                                                                <?php else: ?>
-                                                                    <span><?php echo htmlspecialchars($drv['start_date'] ?? '-'); ?></span>
-                                                                <?php endif; ?>
-                                                            </td>
-                                                            <td>
-                                                                <?php if ($is_active && $can_edit): ?>
-                                                                    <input type="date" class="drv_end" data-rel="<?php echo $rel_id; ?>" value="<?php echo htmlspecialchars($end_display); ?>">
-                                                                <?php else: ?>
-                                                                    <span><?php echo htmlspecialchars($end_display ?: '-'); ?></span>
                                                                 <?php endif; ?>
                                                             </td>
                                                             <td>
@@ -1594,8 +1566,6 @@ include '../insidebar.php';
         formData.append('op_id', opId);
         formData.append('shift_type', get('.op_shift[data-op="' + opId + '"]') || 'B');
         formData.append('status', 1);
-        formData.append('start', get('.op_start[data-op="' + opId + '"]'));
-        formData.append('end',   get('.op_end[data-op="'   + opId + '"]'));
         formData.append('json', '1');
         fetch(window.location.href, { method: 'POST', body: formData })
             .then(function(r) { return r.json(); })
@@ -1654,8 +1624,6 @@ include '../insidebar.php';
         formData.append('rel_id', relId);
         formData.append('shift_type', get('.drv_shift[data-rel="' + relId + '"]') || 'B');
         formData.append('status', 1);
-        formData.append('start_date', get('.drv_start[data-rel="' + relId + '"]'));
-        formData.append('end_date',   get('.drv_end[data-rel="'   + relId + '"]'));
         formData.append('json', '1');
         fetch(window.location.href, { method: 'POST', body: formData })
             .then(function(r) { return r.json(); })
