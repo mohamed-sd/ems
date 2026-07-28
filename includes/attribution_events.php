@@ -40,11 +40,23 @@ const EMS_EVT_ATTRIBUTION_OBJECTED = 'attribution.objected';
  *  اسمُ الوثيقة: AttributionOverridden (CON-02 §8) */
 const EMS_EVT_ATTRIBUTION_OVERRIDDEN = 'attribution.overridden';
 
-/** الثلاثةُ مجتمعةً — للتحقق والاختبار (نمط EMS_ROLES_* في roles.php). */
+/**
+ * عكسُ إسنادٍ **بعد أن ولّد مالًا** — سطرٌ عاكسٌ يُضاف والأصلُ يبقى (قرارُ
+ * المالك 2026-07-28، الرابعُ خارج ثلاثة الوثيقة).
+ *
+ * ولمَ لا يُعاد استعمالُ `attribution.overridden`؟ لأن معناهما مختلف:
+ *   • `overridden` = حُسم اعتراضٌ ببندٍ آخر (ق-25) — قرارٌ **لم يمسّ مالًا**.
+ *   • `reversed`   = حكمٌ ماليٌّ قائمٌ أُبطل بقيدٍ عاكس — فيه `reverses_event_id`.
+ * وخلطُهما يُعمي أيَّ تقريرٍ يسأل «كم قيدًا عُكس؟» عن جوابه.
+ */
+const EMS_EVT_ATTRIBUTION_REVERSED = 'attribution.reversed';
+
+/** الأربعةُ مجتمعةً — للتحقق والاختبار (نمط EMS_ROLES_* في roles.php). */
 const EMS_EVT_ATTRIBUTION_ALL = array(
     EMS_EVT_ATTRIBUTION_DECIDED,
     EMS_EVT_ATTRIBUTION_OBJECTED,
     EMS_EVT_ATTRIBUTION_OVERRIDDEN,
+    EMS_EVT_ATTRIBUTION_REVERSED,
 );
 
 /** تصنيفُ الأحداث الثلاثة في الناقل — تشغيليٌّ لا ماليّ: الإسنادُ قرارٌ يسبق

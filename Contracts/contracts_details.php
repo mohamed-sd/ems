@@ -150,7 +150,30 @@ include '../insidebar.php';
             }
 
             $remaining_class = $remaining_days > 30 ? 'remaining-positive' : ($remaining_days > 0 ? 'remaining-warning' : 'remaining-danger');
+
+            // ── شاراتُ العقد (CON-02 §7-② · ق-21) ────────────────────────────
+            // **شارةٌ مفردةٌ في الترويسة بلا تبويبات** (قرارُ المالك 2026-07-28).
+            // اشتقاقٌ حيٌّ عند فتح الشاشة: صفرُ عمودِ حالةٍ يبيت وصفرُ مهمةٍ دورية.
+            // و«التزامٌ ينكسر» لا تُرفع إلا عند **استحالة اللحاق حسابيًّا** بسقفِ
+            // طاقةٍ متفائلٍ عمدًا — فإن ظهرت فهي يقينٌ لا ظنّ، وصفرُ إنذارٍ كاذب.
+            //
+            // وتُعرض **لكل من يفتح الملف** لا للمبيعات وحدَها: الشارةُ حقيقةٌ
+            // مشتقّةٌ للقراءة لا صلاحيةَ فيها، ومن يقودُ المعداتِ في الميدان
+            // (التشغيل) أولى الناس بأن يرى أن اللحاقَ صار مستحيلًا. ومديرُ
+            // المالية (19) لا منحةَ عرضٍ له على هذه الشاشة أصلًا — مقيسٌ.
+            require_once __DIR__ . '/../includes/contract_badges.php';
+            $cd_badges = array('breaking' => array(), 'ending' => null);
+            try {
+                $cd_badges = contract_capacity_badges($details_gate, $contract_id);
+            } catch (\Throwable $t) {
+                error_log('contract badges #' . $contract_id . ': ' . $t->getMessage());
+            }
+            $cd_badges_html = contract_badges_html($cd_badges);
             ?>
+
+            <?php if ($cd_badges_html !== ''): ?>
+                <div class="cd-badges"><?php echo $cd_badges_html; ?></div>
+            <?php endif; ?>
 
             <!-- ===== SUMMARY CARDS ===== -->
             <div class="cards-grid">
