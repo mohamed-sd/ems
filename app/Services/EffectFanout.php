@@ -303,7 +303,8 @@ class EffectFanout
     /** تسمية وحدة الفوترة في سطر العقد → وحدة المحرّك. الفارغ = تعذّرٌ معلَن (ح-11):
      *  المفتاح '' حُذف — كان يفوتر الوحدةَ الفارغة بالساعة صامتًا، مناقضًا مبدأ
      *  «لا تسعير ملفَّق» أدناه. الفراغ الآن يسقط إلى null ⇒ «وحدة فوترةٍ غير معروفة». */
-    const CONTRACT_UNIT = array('ساعة' => 'hour', 'متر طولي' => 'meter', 'متر' => 'meter', 'طن' => 'ton');
+    const CONTRACT_UNIT = array('ساعة' => 'hour', 'متر طولي' => 'meter', 'متر' => 'meter', 'طن' => 'ton',
+                                'نقلة' => 'trip');
 
     /**
      * مترجم الدوام: صفُّ timesheet → سياقُ وحدةٍ جاهزٌ للمروحة.
@@ -315,7 +316,7 @@ class EffectFanout
         $tsId = intval($tsId);
         // سطر معدة العقد الحاسم: MIN(id) عند تعدد أسطرٍ لنفس النوع (حتمية)
         $sql = "SELECT t.id, t.company_id, t.`date` AS work_date,
-                       t.executed_hours, t.tons_count, t.meters_count, t.operator_hours,
+                       t.executed_hours, t.tons_count, t.meters_count, t.trips_count, t.operator_hours,
                        t.standby_hours, t.dependence_hours, t.maintenance_fault, t.hr_fault,
                        t.marketing_fault, t.approval_fault, t.other_fault_hours,
                        t.ts_supplier_stop_hours, t.ts_planned_stop_hours, t.ts_force_majeure_hours,
@@ -352,6 +353,11 @@ class EffectFanout
             'meter' => (float) $t['meters_count'],
         );
 
+            // CON-02 §3 «النقلة» (T-16 · 2026-07-28): المصدرُ قائمٌ سلفًا
+            // (trips_count) وENUMات الوحدة تحويها؛ الناقصُ كان وسمَ العقد وحده.
+            // خاملٌ بنيويًّا اليوم: صفرُ عقدٍ يفوتر بالنقلة (المقيس: ساعة×8 ·
+            // متر طولي×1 · فارغ×2)، وكلُّ طرفٍ يقرأ وحدةَ عقده هو.
+            'trip'  => (float) $t['trips_count'],
         $ctx = array(
             'id' => $tsId,
             'company_id' => intval($t['company_id']),
@@ -440,7 +446,10 @@ class EffectFanout
                 $lq->close();
 
                 // الكميات من السجل: وحدةُ العقد من رأس الواقعة، والساعاتُ من سطور الزمن
-                $lrec = array('hour' => 0.0, 'ton' => 0.0, 'meter' => 0.0);
+                // 'trip' حاضرةٌ هنا كحضورها في المسار الحي — وإلا لقرأ المصدرُ
+                // القانونيُّ وحدةً أقلَّ من timesheet فاختلف الحكمان بالعَلَم
+                // وحده. وunit_entries.unit_type يحوي 'trip' سلفًا (صفرُ صفٍّ به).
+                $lrec = array('hour' => 0.0, 'ton' => 0.0, 'meter' => 0.0, 'trip' => 0.0);
                 if (isset($lrec[$le['unit_type']])) { $lrec[$le['unit_type']] = (float) $le['qty']; }
                 if ($le['unit_type'] !== 'hour') { $lrec['hour'] = round($lstates['actual_work'], 2); }
 

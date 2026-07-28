@@ -50,6 +50,10 @@ class TenantRegistry
         'contract_amendments' => array('type' => self::T_TENANT, 'soft' => true),
         // INJAZ-S05 §ت.2: التزامات العقد — عائلة «الوحدة التعاقدية» (مع contract_hour_policies/unit_party_awards)
         'contract_commitments' => array('type' => self::T_TENANT, 'soft' => true),
+        // CON-02 §4/§8 (هجرة 2026-07-28): مصفوفةُ التزامات عقد العميل — بندٌ ×
+        // ملتزمٌ × أثرٌ على الفوترة. بياناتُ مستأجرٍ تحمل company_id، وsoft=true
+        // لأن تغيير الملتزم قرارٌ تعاقديٌّ يُراجَع ويُعكس فلا يُمحى من سجل التدقيق.
+        'contract_obligations' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_events' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'contractequipments' => array('type' => self::T_TENANT, 'soft' => false),
