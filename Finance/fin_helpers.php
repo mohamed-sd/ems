@@ -580,6 +580,14 @@ if (!function_exists('fin_auto_journal')) {
     function fin_auto_journal($conn, $company_id, $event, $user_id)
     {
         $company_id = intval($company_id);
+        // N-01: العطالة قبل كل شيء — حدثٌ له قيدٌ حيٌّ قائمٌ يُعاد مرجعُه ولا
+        // يولَّد ثانيةً (إعادةُ الإرسال/النقرُ المزدوج لا يضاعف القيد).
+        $eid0 = intval($event['id'] ?? 0);
+        if ($eid0 > 0) {
+            $exist = fin_gate(false)->selectOne('fin_journal_entries', array(
+                'columns' => array('id'), 'where' => array('event_id' => $eid0)));
+            if ($exist) { return intval($exist['id']); }
+        }
         $amount = round((float)$event['amount'] * (($event['currency'] ?? 'SDG') === 'USD' ? (float)($event['fx_rate'] ?: 600) : 1), 2);
         if ($amount <= 0) { return 0; }
         $type = $event['event_type']; $src = $event['source_module'] ?? '';
