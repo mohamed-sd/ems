@@ -54,6 +54,33 @@ class TenantRegistry
         // ملتزمٌ × أثرٌ على الفوترة. بياناتُ مستأجرٍ تحمل company_id، وsoft=true
         // لأن تغيير الملتزم قرارٌ تعاقديٌّ يُراجَع ويُعكس فلا يُمحى من سجل التدقيق.
         'contract_obligations' => array('type' => self::T_TENANT, 'soft' => true),
+        // CON-02 §6/§8 (هجرة 2026-07-28 · المستوى المتوسط ①): قواعدُ الجزاء
+        // والحافز — نوعا غرامةٍ ونوعا حافزٍ بسقفٍ ومرساةٍ وسريان. بياناتُ مستأجرٍ
+        // تحمل company_id، وsoft=true لأن قاعدةَ الجزاء نصُّ عقدٍ يُراجَع ويُعكس
+        // فلا يُمحى من سجل التدقيق (نفسُ حجّة contract_obligations).
+        'contract_penalty_rules' => array('type' => self::T_TENANT, 'soft' => true),
+        // CON-02 §6 (هجرة 2026-07-28 · المستوى المتوسط ④): احتسابُ الجزاء/الحافز
+        // لفترةٍ بعينها بدورة اعتماده (ق-13). soft=true لأن الاحتسابَ المُجاز
+        // أنتج قيدًا في الدفتر — فمحوُه يقطع أثرَ التدقيق عن قيدٍ حيّ.
+        'contract_penalty_assessments' => array('type' => self::T_TENANT, 'soft' => true),
+        // UX-08 §5.2/§8.1: المستخلص وبنوده — مطالبةُ الفترة من الوحدات المعتمدة.
+        // كلاهما يحمل company_id (البنودُ كذلك عمدًا: تُقرأ مجمَّعةً في التقارير
+        // بلا JOIN على رأسها، وحقنُ العزل المباشر أرخصُ وأأمن من EXISTS الأب).
+        'claims' => array('type' => self::T_TENANT, 'soft' => true),
+        'claim_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-01 §4 (المرحلة ①): حاوياتُ العقد ومشتقاتُها. الحاوياتُ والدورات
+        // `soft` (بنيةُ عقدٍ تُراجَع وتُعكس فلا تُمحى)، والاستهلاكُ والتبديلُ
+        // سجلّان إلحاقيّان لا حذفَ فيهما.
+        'op_containers' => array('type' => self::T_TENANT, 'soft' => true),
+        'container_consumption' => array('type' => self::T_TENANT, 'soft' => false),
+        'container_swaps' => array('type' => self::T_TENANT, 'soft' => false),
+        'operator_rotations' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-01: الدفعةُ المقدَّمة المقبوضةُ فعلًا — سلفةٌ تُستردّ لا إيراد.
+        // `soft` لأنها مستندُ قبضٍ لا يُمحى: الإلغاءُ حالةٌ لا حذف.
+        'contract_advances' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-02: الإشعارُ الدائن/المدين — يصحّح فاتورةً صادرةً بلا أن يمسّها.
+        // `soft` لأنه مستندٌ ماليٌّ لا يُمحى: الإلغاءُ حالةٌ لا حذف.
+        'credit_debit_notes' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_events' => array('type' => self::T_TENANT, 'soft' => true),
         'contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'contractequipments' => array('type' => self::T_TENANT, 'soft' => false),
@@ -79,8 +106,12 @@ class TenantRegistry
         'fin_closing_items' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_cost_centers' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_cost_records' => array('type' => self::T_TENANT, 'soft' => true),
+        // سجلُّ العملات وأسعارُ صرفها (FES-01 §3.3 · هجرة 2026-07-28): بياناتُ
+        // مستأجرٍ لأن عملةَ الأساس مُعلَنةٌ لكل شركةٍ في admin_companies.currency.
+        'fin_currencies' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_depreciation' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_dues' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_fx_rates' => array('type' => self::T_TENANT, 'soft' => true),
         // immutable_key: صفٌّ يحمل هذا العمود غيرَ فارغٍ = حدثُ ناقلٍ منشور —
         // البوابة ترفض تعديل مضمونه/حذفه (عقيدة اللاتعديل · حارس الحصانة §12 · A0).
         // القيود اليدوية (idempotency_key = NULL) تبقى قابلةً للإدارة.
@@ -183,6 +214,11 @@ class TenantRegistry
         'quotations' => array('type' => self::T_TENANT, 'soft' => true),
         // INJAZ-S05 §6.12: بنود فحص الجاهزية الستة لكل عقد
         'readiness_lines' => array('type' => self::T_TENANT, 'soft' => true),
+        // التسويةُ الموحّدة (UX-02 §15.3 · هجرة 2026-07-28): الرأسُ بيانات مستأجرٍ،
+        // والبنودُ تحمل company_id فتُعزل مباشرةً (لا عبر أبيها) — وحذفُها بالسلسلة
+        // من الرأس لا بالحذف الناعم (بنودٌ لا مستنداتٌ مستقلة).
+        'settlements' => array('type' => self::T_TENANT, 'soft' => true),
+        'settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
         'supplier_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'suppliercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'suppliers' => array('type' => self::T_TENANT, 'soft' => true),

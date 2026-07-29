@@ -83,30 +83,41 @@ function fin_import_publish($conn, array $rows, array $cfg, $uid)
     return $n;
 }
 
-/** أحداث المشتريات غير المستوردة (proc_order → مصروف). قراءة فقط على proc_order. */
+/**
+ * أحداث المشتريات غير المنشورة (proc_order → مصروف).
+ * ─────────────────────────────────────────────────────────────────────────
+ * منذ 2026-07-27: **الاستلامُ النهائي** ينشر الأثرَ من منبعه (UX-09 §2 و§5.1-③)،
+ * وهذه الشاشةُ شبكةُ أمانٍ لا طريق. وتستدعي ناشرَ المشتريات نفسَه
+ * (`proc_publish_order_cost`) — فالبوابةُ واحدةٌ في القناتين: **لا مصروفَ عن
+ * أمرٍ لم تصل بضاعتُه** (كان الزرُّ ينشر المسوداتِ والمؤكَّدَ بلا فحصِ حالة).
+ */
 function fin_import_proc($conn, $gate, $uid)
 {
-    return fin_import_publish($conn, fin_pending_import($gate, 'proc_order', 'total_amount', 'procurement'), array(
-        'event_key'   => 'expense.purchase.recorded',
-        'module'      => 'procurement',
-        'entity_type' => 'proc_order',
-        'idem_prefix' => 'proc:order:',
-        'amount_col'  => 'total_amount',
-        'note_prefix' => 'استيراد آلي من أمر شراء ',
-    ), $uid);
+    require_once __DIR__ . '/../Procurement/proc_helpers.php';
+    $n = 0;
+    foreach (fin_pending_import($gate, 'proc_order', 'total_amount', 'procurement') as $row) {
+        if (proc_publish_order_cost($conn, intval($row['id']), $uid, 'import_events_fin') === 'published') { $n++; }
+    }
+    return $n;
 }
 
-/** أحداث الصيانة غير المستوردة (mnt_order → مصروف بأبعاده). قراءة فقط على mnt_order. */
+/**
+ * أحداث الصيانة غير المنشورة (mnt_order → مصروف بأبعاده).
+ * ─────────────────────────────────────────────────────────────────────────
+ * منذ 2026-07-27 صار **إقفالُ الأمر** ينشر أثرَه من منبعه (UX-04 §8.2 · FES §7)،
+ * فهذه الشاشةُ لم تعد الطريقَ بل **شبكةَ أمانٍ** للأوامر المقفلة قبل التغيير أو
+ * التي تعثّر نشرُها. ولذلك تستدعي ناشرَ الصيانة نفسَه (`mnt_publish_order_cost`)
+ * لا نسخةً ثانيةً من العقد — فتعريفُ الحدث واحدٌ في وحدته المالكة، ومفتاحُ
+ * العطالة نفسُه يمنع أي ازدواج بين القناتين.
+ */
 function fin_import_mnt($conn, $gate, $uid)
 {
-    return fin_import_publish($conn, fin_pending_import($gate, 'mnt_order', 'total_cost', 'maintenance'), array(
-        'event_key'   => 'expense.maintenance.recorded',
-        'module'      => 'maintenance',
-        'entity_type' => 'mnt_order',
-        'idem_prefix' => 'mnt:order:',
-        'amount_col'  => 'total_cost',
-        'note_prefix' => 'استيراد آلي من أمر صيانة ',
-    ), $uid);
+    require_once __DIR__ . '/../Maintenance/mnt_helpers.php';
+    $n = 0;
+    foreach (fin_pending_import($gate, 'mnt_order', 'total_cost', 'maintenance') as $row) {
+        if (mnt_publish_order_cost($conn, intval($row['id']), $uid, 'import_events_fin') === 'published') { $n++; }
+    }
+    return $n;
 }
 
 if (isset($_GET['gen_proc'])) {
@@ -127,7 +138,13 @@ include '../inheader.php';
 include '../insidebar.php';
 
 // عدّادات المرشّحين (قراءة فقط) — نفس منطق قراءتَي fin_pending_import عبر البوابة
-$proc_pending = count(fin_pending_import(ems_tenant_db(), 'proc_order', 'total_amount', 'procurement'));
+// العدّادُ يعكس ما سيُنشر فعلًا — لا ما يمرّ بالمرشِّح الخام: أمرٌ لم تصل بضاعتُه
+// يُستبعد بالبوابة (proc_order_expense_states)، فلا يَعِد الزرُّ بعددٍ ثم يولّد أقلّ.
+require_once __DIR__ . '/../Procurement/proc_helpers.php';
+$proc_pending = 0;
+foreach (fin_pending_import(ems_tenant_db(), 'proc_order', 'total_amount', 'procurement') as $__po) {
+    if (in_array((string) $__po['state'], proc_order_expense_states(), true)) { $proc_pending++; }
+}
 $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_cost', 'maintenance'));
 ?>
 <div class="main fin-import-main ems-unified-page-shell">

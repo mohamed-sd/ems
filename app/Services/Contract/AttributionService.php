@@ -319,6 +319,77 @@ class AttributionService
     }
 
     /**
+     * ⑨ حكمُ **الكمية** — البُعدُ الأول في عقود الطن/المتر (M-24 · §3-④).
+     * ═══════════════════════════════════════════════════════════════════════
+     * `decide()` تحكم **زمنَ** الواقعة، وهذه تحكم **كميتَها**: «إعادةُ التنفيذ
+     * لعيبٍ لا تُفوتر» — فالمترُ الذي أُعيد تنفيذُه لعيبٍ لا يُدفع مرتين.
+     *
+     * الحرّاسُ الثلاثة، وكلٌّ منها وقع مرةً في هذا النظام:
+     *   • **409 إن ولّدت الواقعةُ مالًا** — لا يُكتب فوق حكمٍ ماليٍّ قائم؛
+     *     والتصحيحُ بعده يخصّ محرّكَ العكسيات (نفسُ حدّ `decide()` بالحرف).
+     *   • **السببُ إلزامٌ عند المنع** — حكمٌ يمنع مالًا بلا سببٍ مكتوبٍ لا
+     *     يُدقَّق بعد سنتين (قاعدةُ عدم التلفيق في اتجاهها الثاني).
+     *   • **العطالة**: الحكمُ نفسُه مرتين يُرجع 200 بلا كتابةٍ ثانيةٍ ولا حدثٍ ثانٍ.
+     *
+     * @param  int|null $billable 0 = لا تُفوتر · 1 = تُفوتر صراحةً · null = رفعُ الحكم
+     * @return array{ok:bool,code:int,reasons:array,changed:bool}
+     */
+    public static function ruleQty($conn, $gate, $companyId, $entryId, $billable, $note, $actor)
+    {
+        $entry = self::entryOf($conn, $companyId, $entryId);
+        if (!$entry) {
+            return array('ok' => false, 'code' => 404, 'changed' => false,
+                         'reasons' => array('الواقعة غير موجودة'));
+        }
+
+        if ($billable !== null && !in_array((int) $billable, array(0, 1), true)) {
+            return array('ok' => false, 'code' => 422, 'changed' => false,
+                         'reasons' => array('حكمُ الكمية إما «تُفوتر» أو «لا تُفوتر»'));
+        }
+        $note = trim((string) $note);
+        if ($billable !== null && (int) $billable === 0 && $note === '') {
+            return array('ok' => false, 'code' => 422, 'changed' => false,
+                         'reasons' => array('سببُ منع فوترة الكمية إلزامي — لا مالَ يُمنع بلا سببٍ مكتوب'));
+        }
+
+        // العطالةُ قبل كل شيء: الحكمُ نفسُه لا يُكتب مرتين ولا يُنشر مرتين
+        $curB = ($entry['qty_billable'] === null) ? null : (int) $entry['qty_billable'];
+        $curN = ($entry['qty_ruling_note'] === null) ? '' : trim((string) $entry['qty_ruling_note']);
+        $newB = ($billable === null) ? null : (int) $billable;
+        if ($curB === $newB && $curN === $note) {
+            return array('ok' => true, 'code' => 200, 'changed' => false, 'reasons' => array());
+        }
+
+        // 409: مالٌ وقع — الأصلُ لا يُكتب فوقه
+        $posted = self::postedLedger($conn, $companyId, $entryId);
+        if ($posted['count'] > 0) {
+            return array('ok' => false, 'code' => 409, 'changed' => false, 'posted' => $posted,
+                         'reasons' => array(self::conflictReason($entryId, $posted)));
+        }
+
+        $now = gmdate('Y-m-d H:i:s');
+        $gate->update('unit_entries', array(
+            'qty_billable'    => $newB,
+            'qty_ruling_note' => ($note === '') ? null : mb_substr($note, 0, 200),
+            'qty_decided_by'  => intval($actor) ?: null,
+            'qty_decided_at'  => $now,
+        ), array('id' => intval($entryId)));
+
+        // الحدثُ إشهارٌ لا شرطُ صحة — فشلُه يُسجَّل ولا يُسقط القرار
+        self::emit($conn, $companyId, $entryId, EMS_EVT_ATTRIBUTION_QTY_RULED, $actor, array(
+            'contract_id'  => intval($entry['contract_id']),
+            'work_date'    => strval($entry['entry_date']),
+            'unit_type'    => strval($entry['unit_type']),
+            'qty'          => (float) $entry['qty'],
+            'qty_billable' => $newB,
+            'was'          => $curB,
+            'note'         => $note,
+        ));
+
+        return array('ok' => true, 'code' => 200, 'changed' => true, 'reasons' => array());
+    }
+
+    /**
      * اعتراضٌ مصغَّرٌ على إسنادِ سطر (ق-25): علمٌ + سببٌ + مرجع.
      * **والبندُ المعترَضُ عليه لا يجمّد بقيةَ الواقعة** — البكتاتُ النافذةُ تمضي.
      */
@@ -551,7 +622,10 @@ class AttributionService
 
     private static function entryOf($conn, $companyId, $entryId)
     {
-        $st = $conn->prepare("SELECT id, contract_id, entry_date, state FROM unit_entries
+        // + أعمدةُ الكمية وحكمِها (M-24): `ruleQty()` تقرأ منها العطالةَ والحدث
+        $st = $conn->prepare("SELECT id, contract_id, entry_date, state,
+                                     unit_type, qty, qty_billable, qty_ruling_note
+                                FROM unit_entries
                                WHERE company_id = ? AND id = ? LIMIT 1");
         $c = intval($companyId); $e = intval($entryId);
         $st->bind_param('ii', $c, $e);

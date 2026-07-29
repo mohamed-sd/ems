@@ -51,12 +51,23 @@ const EMS_EVT_ATTRIBUTION_OVERRIDDEN = 'attribution.overridden';
  */
 const EMS_EVT_ATTRIBUTION_REVERSED = 'attribution.reversed';
 
-/** الأربعةُ مجتمعةً — للتحقق والاختبار (نمط EMS_ROLES_* في roles.php). */
+/**
+ * حكمٌ على **كمية** الواقعة نفسِها لا على سطور زمنها (M-24 · CON-02 §3-④).
+ *
+ * ولمَ لا يُعاد استعمالُ `attribution.decided`؟ لأن المحكومَ مختلف: `decided`
+ * ينسب **زمنًا** إلى بندِ التزام، وهذا يقرّر **هل الكميةُ المنجزةُ تُفوتر أصلًا**
+ * («إعادةُ التنفيذ لعيبٍ لا تُفوتر»). وخلطُهما يُعمي سؤالَ «كم واقعةً مُنعت
+ * فوترةُ كميتها ولماذا؟» عن جوابه — وهو سؤالُ مراجعةٍ ماليٌّ لا إداري.
+ */
+const EMS_EVT_ATTRIBUTION_QTY_RULED = 'attribution.qty_ruled';
+
+/** الخمسةُ مجتمعةً — للتحقق والاختبار (نمط EMS_ROLES_* في roles.php). */
 const EMS_EVT_ATTRIBUTION_ALL = array(
     EMS_EVT_ATTRIBUTION_DECIDED,
     EMS_EVT_ATTRIBUTION_OBJECTED,
     EMS_EVT_ATTRIBUTION_OVERRIDDEN,
     EMS_EVT_ATTRIBUTION_REVERSED,
+    EMS_EVT_ATTRIBUTION_QTY_RULED,
 );
 
 /** تصنيفُ الأحداث الثلاثة في الناقل — تشغيليٌّ لا ماليّ: الإسنادُ قرارٌ يسبق

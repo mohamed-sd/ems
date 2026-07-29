@@ -21,6 +21,11 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+// موضوعُ الحزمة قلبُ الكاتب والمرآة لا وثائقُ الأهلية — والتحييدُ قبل config
+// (وقائعُ 2027 و2031 يحجبها حارسُ الوثائق بحقّ. انظر tests/_guard_env.php).
+require_once __DIR__ . '/_guard_env.php';
+ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'));
+
 const BASE = 'http://localhost/ems';
 const WIN_FROM = '2027-04-01';
 const WIN_TO   = '2027-04-07';

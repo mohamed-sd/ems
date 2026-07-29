@@ -427,3 +427,84 @@ if (!defined('MNT_HELPERS_LOADED')) {
         return $out;
     }
 }
+
+if (!function_exists('mnt_publish_order_cost')) {
+    /**
+     * نشرُ أثر تكلفة أمر الصيانة من منبعه (UX-04 §8.2 · FES §7 و§8).
+     * ─────────────────────────────────────────────────────────────────────
+     * «التوليدُ من المنبع حصرًا — لا استيرادَ لاحقًا» (FES §7): كان أثرُ الصيانة
+     * لا يبلغ الدفترَ إلا بزرِّ سحبٍ يضغطه موظفُ المالية (تقرير تدقيق الصيانة:
+     * «يدويٌّ بالسحب … لا نشرَ حقيقةٍ آليًّا») — فتُقاس تكلفةُ ساعة المعدة
+     * وربحيةُ المشروع وانحرافُ الميزانية على مصروفٍ ناقص. صار الإقفالُ نفسُه
+     * ينشر الأثر.
+     *
+     * **عقدُ النشر هو عقدُ شاشة الاستيراد حرفيًّا** — المفتاح `mnt:order:{id}`
+     * ونوعُ الحدث والكيان والمرجع: فمرشِّحُ الاستيراد (source_ref غيرُ مستعمل)
+     * يستبعد الأمرَ المنشور تلقائيًّا، وعطالةُ الناشر تحجب أي تكرارٍ ثانٍ.
+     * فلا يُسجَّل المبلغُ مرتين مهما تكرر الإقفالُ أو ضُغط الزر.
+     *
+     * لا يرمي أبدًا: الإقفالُ حقيقةٌ تشغيليةٌ لا يجوز أن يُفقد لتعثّرِ نشرٍ —
+     * وعند الفشل يبقى زرُّ الاستيراد شبكةَ أمانٍ (والخطأ في السجل).
+     *
+     * @param  int    $order_id  الأمرُ بعد تحديث مجاميعه (mnt_recalc_order_totals)
+     * @param  string $channel   قناةُ النشر للتدقيق: close | import_events_fin
+     * @return string published | duplicate | skipped | failed
+     */
+    function mnt_publish_order_cost($conn, $order_id, $uid, $channel = 'close')
+    {
+        $order_id = intval($order_id);
+        if ($order_id <= 0) { return 'skipped'; }
+
+        try {
+            $row = ems_tenant_db()->selectOne('mnt_order', array('where' => array('id' => $order_id)));
+        } catch (\Throwable $t) {
+            error_log('mnt publish cost #' . $order_id . ': ' . $t->getMessage());
+            return 'failed';
+        }
+        if (!$row) { return 'skipped'; }
+
+        // شروطُ مرشِّح الاستيراد نفسُها: مبلغٌ موجبٌ وكودٌ غير فارغ — وأمرٌ بلا
+        // تكلفةٍ لا أثرَ له فلا يُنشر حدثٌ صفريٌّ يشوّش الدفتر (قاعدة عدم التلفيق).
+        $amount = (float) (isset($row['total_cost']) ? $row['total_cost'] : 0);
+        $code   = isset($row['code']) ? trim((string) $row['code']) : '';
+        $docCompany = intval(isset($row['company_id']) ? $row['company_id'] : 0);
+        if ($amount <= 0 || $code === '' || $docCompany <= 0) { return 'skipped'; }
+
+        require_once __DIR__ . '/../app/Core/EventPublisher.php';
+        $conn->begin_transaction();
+        try {
+            $res = \App\Core\EventPublisher::publish($conn, array(
+                'event_key'         => 'expense.maintenance.recorded',
+                'category'          => 'financial',
+                'source_module'     => 'maintenance',
+                'company_id'        => $docCompany,
+                'entity_type'       => 'mnt_order',
+                'entity_id'         => $order_id,
+                'occurred_at'       => gmdate('Y-m-d H:i:s'),
+                'created_by'        => intval($uid) > 0 ? intval($uid) : 1,
+                'idempotency_key'   => 'mnt:order:' . $order_id,
+                'legacy_event_type' => 'expense',
+                'amount'            => $amount,
+                'currency'          => (isset($row['currency']) && $row['currency'] !== null && $row['currency'] !== '') ? $row['currency'] : 'SDG',
+                'source_ref'        => $code,
+                'equipment_id'      => (isset($row['equipment_id']) && intval($row['equipment_id']) > 0) ? intval($row['equipment_id']) : null,
+                'project_id'        => (isset($row['project_id']) && intval($row['project_id']) > 0) ? intval($row['project_id']) : null,
+                'notes'             => 'تكلفة أمر صيانة ' . $code,
+                'payload'           => array(
+                    'order_id'      => $order_id,
+                    'order_code'    => $code,
+                    'labor_cost'    => (float) (isset($row['labor_cost']) ? $row['labor_cost'] : 0),
+                    'parts_cost'    => (float) (isset($row['parts_cost']) ? $row['parts_cost'] : 0),
+                    'external_cost' => (float) (isset($row['external_cost']) ? $row['external_cost'] : 0),
+                    'channel'       => $channel,
+                ),
+            ));
+            $conn->commit();
+            return (is_array($res) && !empty($res['duplicate'])) ? 'duplicate' : 'published';
+        } catch (\Throwable $t) {
+            $conn->rollback();
+            error_log('mnt publish cost #' . $order_id . ' (' . $channel . '): ' . $t->getMessage());
+            return 'failed';
+        }
+    }
+}

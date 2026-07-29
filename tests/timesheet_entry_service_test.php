@@ -21,6 +21,13 @@ if (PHP_SAPI !== 'cli') {
 }
 
 error_reporting(E_ALL & ~E_DEPRECATED);
+
+// موضوعُ هذه الحزمة آلةُ الحالات لا وثائقُ الأهلية — ووقائعُها بتاريخ 2031
+// فيحجبها حارسُ الوثائق بحقّ (أيُّ رخصةٍ ساريةٍ اليوم منتهيةٌ يومَ 2031).
+// التحييدُ قبل config لأن ems_env تُخزّن القيمَ عند أول نداء. (انظر _guard_env.php)
+require_once __DIR__ . '/_guard_env.php';
+ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'));
+
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/app/Core/TenantGateException.php';
 require_once dirname(__DIR__) . '/app/Core/TenantRegistry.php';

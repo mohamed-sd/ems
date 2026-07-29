@@ -37,14 +37,29 @@ $period_types   = fin_period_types();
 $budget_states  = fin_budget_states();
 $categories     = fin_budget_categories();
 
-// ── اعتماد الميزانية (مرجع حاكم) ──
-if (isset($_GET['approve_id'])) {
-    if (!$can_edit) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
-    $aid = intval($_GET['approve_id']);
-    fin_gate($is_super_admin)->update('fin_budgets',
-        array('state' => 'approved', 'approved_by' => $current_user_id),
-        array('id' => $aid), "state IN('draft','submitted')");
-    header("Location: budget_form_fin.php?msg=تم+اعتماد+الميزانية+(مرجع+حاكم)+✅"); exit();
+// ── الرؤيةُ والملكيةُ مفصولتان (قرارا المالك 2026-07-27) ──────────────────
+//   الرؤية  : كلُّ إدارةٍ موازنتُها وحدها · وأدوارُ المالية الكلَّ رقابةً
+//   الملكية : مديرُ القسم وحده يُنشئ ويرفع — والمُجيزُ لا يملك قسمًا
+// وكلتاهما من جدول توجيه الطلبات، فلا خريطةَ ثانيةً تنحرف.
+$dept_scope    = fin_budget_dept_scope($ctx['role'], $is_super_admin);
+$is_approver   = fin_budget_is_approver($ctx['role'], $is_super_admin);
+$allowed_depts = $is_super_admin ? array_keys($dept_modules) : fin_budget_owned_depts($ctx['role']);
+
+// ── دورةُ الموازنة: رفعٌ من الإدارة · إجازةٌ أو إعادةٌ من المالية ──
+// (استُبدل الاعتمادُ المباشر القديم الذي كان يقبل `draft` أيضًا — فكان مَن يُعدّ
+//  هو مَن يعتمد، وهو ما يمنعه الدستور.)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['bg_action'] ?? '', array('submit', 'approve', 'return'), true)) {
+    $act = $_POST['bg_action'];
+    if (!$can_edit) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $res = fin_budget_transition($conn, intval($_POST['id'] ?? 0), $act,
+        $ctx['role'], $current_user_id, $is_super_admin, $_POST['reason'] ?? '');
+    if ($res['status'] === 'ok') {
+        $done = array('submit' => 'رُفعت الموازنة للمالية ✅',
+                      'approve' => 'أُجيزت الموازنة — صارت مرجعًا حاكمًا ✅',
+                      'return'  => 'أُعيدت الموازنة لإدارتها بسببها ✅');
+        header("Location: budget_form_fin.php?msg=" . urlencode($done[$act])); exit();
+    }
+    header("Location: budget_form_fin.php?msg=" . urlencode(($res['reason'] !== '' ? $res['reason'] : 'تعذّر الإجراء') . ' ❌')); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
@@ -74,6 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
 
     if (!isset($dept_modules[$dept]) || !isset($period_types[$ptype]) || $fyear < 2000) {
         header("Location: budget_form_fin.php?msg=بيانات+غير+صحيحة+(إدارة/فترة/سنة)+❌"); exit();
+    }
+    // النطاقُ الصفّي: الصلاحيةُ على الشاشة لا تكفي — الإدارةُ تنشئ موازنةَ قسمها
+    // وحده، وإلا لأنشأ مديرُ الصيانة موازنةَ الموارد البشرية.
+    if (!in_array($dept, $allowed_depts, true)) {
+        header("Location: budget_form_fin.php?msg=" . urlencode('لا تُنشئ موازنةً لقسمٍ لا تديره ❌')); exit();
     }
 
     $lines = array(); $t_rev = 0; $t_exp = 0;
@@ -139,7 +159,12 @@ include '../insidebar.php';
                         <label>الإدارة المالكة <span class="required">*</span></label>
                         <select name="dept_module" id="b_dept" required>
                             <option value="">— اختر —</option>
-                            <?php foreach ($dept_modules as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?>
+                            <?php /* الأقسامُ المتاحةُ لدور المستخدم وحدها — لا يختار
+                                      مديرُ الصيانة «الموارد البشرية» فيُرفض بعد الإرسال. */
+                            foreach ($dept_modules as $k => $v) {
+                                if (!in_array($k, $allowed_depts, true)) { continue; }
+                                echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>";
+                            } ?>
                         </select>
                     </div>
                     <div class="form-group">
@@ -164,7 +189,9 @@ include '../insidebar.php';
             </div>
 
             <div class="table-container" style="margin-top:10px;">
-                <table class="alltables" style="width:100%;" id="b_lines">
+                <!-- جدولُ بنودٍ ديناميكيٌّ لا جدولَ عرض: لا يُهيَّأ DataTable البتّة،
+                     وإلا محا إعادةُ الرسم صفوفَ البنود التي يضيفها bAddLine. -->
+                <table class="alltables no-datatable" data-no-dt="1" style="width:100%;" id="b_lines">
                     <thead><tr><th>النوع</th><th>الفئة</th><th>المبلغ المخطّط</th><th></th></tr></thead>
                     <tbody id="b_lines_body"></tbody>
                 </table>
@@ -180,6 +207,21 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> الميزانيات</h5>
+        <?php
+        // النطاق: كلُّ إدارةٍ ترى موازنتَها وحدها؛ والمُجيزُ يرى الكلَّ
+        $budget_rows = fin_gate($is_super_admin)->select('fin_budgets', array('orderBy' => 'id DESC'));
+        if ($dept_scope !== null) {
+            $budget_rows = array_values(array_filter($budget_rows, function ($r) use ($dept_scope) {
+                return in_array(strval($r['dept_module']), $dept_scope, true);
+            }));
+        }
+        // إرشادُ الفراغ خارجَ الجدول: صفٌّ نائبٌ بـcolspan داخل tbody يخالف عددَ
+        // أعمدة الترويسة، فيرمي DataTables استثناءً يُجهض بقيةَ مُعالج ready —
+        // ومنه ربطُ زرِّ فتح الفورم. الجدولُ الفارغُ يعرض رسالةَ ar.json بنفسه.
+        if (!$budget_rows) {
+            echo "<p class='text-muted' style='margin:0 0 10px'>لا موازناتٍ لقسمك بعد — ابدأ بإنشاء موازنةٍ ثم ارفعها للمالية.</p>";
+        }
+        ?>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
@@ -188,26 +230,81 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $budget_rows = fin_gate($is_super_admin)->select('fin_budgets', array('orderBy' => 'id DESC'));
                     { foreach ($budget_rows as $row) {
                         $st = (string)$row['state'];
-                        $st_tone = in_array($st, array('approved','active')) ? 'success' : ($st === 'closed' ? 'dark' : 'secondary');
+                        $st_tone = in_array($st, array('approved','active')) ? 'success'
+                                 : ($st === 'closed' ? 'dark' : ($st === 'returned' ? 'warning'
+                                 : ($st === 'submitted' ? 'info' : 'secondary')));
+                        $mine = in_array(strval($row['dept_module']), $allowed_depts, true);
                         echo "<tr>";
-                        echo "<td><div class='action-btns'>";
-                        if ($can_edit && in_array($st, array('draft','submitted'))) {
-                            echo "<a href='?approve_id=" . intval($row['id']) . "' class='action-btn edit' title='اعتماد' onclick='return confirm(\"اعتماد الميزانية كمرجع حاكم؟\")'><i class='fas fa-gavel'></i></a>";
+                        // خانةُ الإجراءات تُبنى في ذاكرةٍ أولًا: إن خرجت فارغةً وُضع
+                        // مكانَها **سببُ الفراغ**. خانةٌ خاليةٌ بلا كلمةٍ تُقرأ عطبًا
+                        // — والمستخدمُ لا يميّز «لا إجراءَ مطلوبًا» من «الزرُّ معطوب».
+                        ob_start();
+                        // ① رفعٌ من الإدارة — مسودةً كانت أو معادة
+                        if ($can_edit && $mine && !$is_approver && in_array($st, fin_budget_editable_states(), true)) {
+                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفعُ الموازنة للمالية؟ لن تستطيع تعديلَ بنودها بعده.\")'>"
+                               . "<input type='hidden' name='bg_action' value='submit'>"
+                               . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
+                               . "<button type='submit' class='action-btn edit' title='رفعٌ للمالية'><i class='fas fa-paper-plane'></i></button></form>";
                         }
-                        if ($can_delete && $st === 'draft') {
+                        // ② إجازةٌ أو إعادةٌ — للإدارة المالية (رئيسِها ومعاونيه) على
+                        //    المرفوعة وحدها، وبشرط ألّا يكون القسمُ قسمَه هو.
+                        $self_owned = fin_budget_self_owned($ctx['role'], strval($row['dept_module']), $is_super_admin);
+                        if ($is_approver && $st === 'submitted' && $can_edit && !$self_owned) {
+                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"إجازةُ الموازنة كمرجعٍ حاكم؟\")'>"
+                               . "<input type='hidden' name='bg_action' value='approve'>"
+                               . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
+                               . "<button type='submit' class='action-btn edit' title='إجازة'><i class='fas fa-gavel'></i></button></form>";
+                            echo "<form method='post' style='display:inline' onsubmit='var r=prompt(\"سببُ الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>"
+                               . "<input type='hidden' name='bg_action' value='return'>"
+                               . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
+                               . "<input type='hidden' name='reason' value=''>"
+                               . "<button type='submit' class='action-btn delete' title='إعادةٌ بسبب'><i class='fas fa-rotate-left'></i></button></form>";
+                        }
+                        if ($can_delete && $mine && $st === 'draft') {
                             echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                         }
-                        echo "</div></td>";
+                        $btns = trim((string) ob_get_clean());
+
+                        // ولا خانةَ صامتة: حيث لا زرَّ يُذكر سببُه (الدستور §2 — لا
+                        // شاشةَ تنتهي بطريقٍ مسدود). السببُ يُقرأ من حالة الصفّ نفسِها،
+                        // فلا ينحرف عن الشروط أعلاه.
+                        if ($btns === '') {
+                            if ($is_approver && $st === 'submitted' && $can_edit && $self_owned) {
+                                $why = "<i class='fas fa-user-lock'></i> قسمُك — يُجيزه مديرُ الإدارة المالية";
+                            } elseif (in_array($st, array('approved', 'active'), true)) {
+                                $why = "<i class='fas fa-check'></i> معتمدة — لا إجراءَ مطلوب";
+                            } elseif ($st === 'closed') {
+                                $why = "<i class='fas fa-lock'></i> مقفلة";
+                            } elseif ($st === 'submitted') {
+                                $why = $is_approver
+                                    ? "<i class='fas fa-eye'></i> للاطّلاع — الإجازةُ لمن له تعديل"
+                                    : "<i class='fas fa-hourglass-half'></i> عند المالية — تنتظر الإجازة";
+                            } elseif (in_array($st, fin_budget_editable_states(), true)) {
+                                $why = $mine
+                                    ? "<i class='fas fa-eye'></i> للاطّلاع — الرفعُ يحتاج صلاحيةَ تعديل"
+                                    : "<i class='fas fa-building'></i> قسمُ إدارةٍ أخرى — ترفعها بنفسها";
+                            } else {
+                                $why = '—';
+                            }
+                            $btns = "<span class='text-muted' style='font-size:12px'>{$why}</span>";
+                        }
+                        echo "<td><div class='action-btns' style='display:flex;gap:6px;flex-wrap:wrap;align-items:center'>"
+                           . $btns . "</div></td>";
                         echo "<td>" . htmlspecialchars((string)$row['budget_no']) . "</td>";
                         echo "<td>" . htmlspecialchars($dept_modules[$row['dept_module']] ?? $row['dept_module']) . "</td>";
                         echo "<td>" . htmlspecialchars($period_types[$row['period_type']] ?? $row['period_type']) . ($row['period_no'] ? ' #' . intval($row['period_no']) : '') . "</td>";
                         echo "<td>" . intval($row['fiscal_year']) . "</td>";
                         echo "<td>" . number_format((float)$row['total_revenue'], 2) . "</td>";
                         echo "<td>" . number_format((float)$row['total_expense'], 2) . "</td>";
-                        echo "<td><span class='badge badge-" . $st_tone . "'>" . htmlspecialchars($budget_states[$st] ?? $st) . "</span></td>";
+                        echo "<td><span class='badge badge-" . $st_tone . "'>" . htmlspecialchars($budget_states[$st] ?? $st) . "</span>";
+                        // سببُ الإعادة بارزٌ فوق كل شيءٍ للإدارة (الدستور §4.3)
+                        if ($st === 'returned' && !empty($row['return_reason'])) {
+                            echo "<div style='color:#7C2D12;font-size:12px;margin-top:4px'><i class='fas fa-rotate-left'></i> أُعيدت لاستكمال: "
+                               . htmlspecialchars((string)$row['return_reason']) . "</div>";
+                        }
+                        echo "</td>";
                         echo "</tr>";
                     } }
                     ?>
@@ -278,15 +375,18 @@ include '../insidebar.php';
         document.getElementById('b_lines_body').appendChild(document.importNode(tpl.content, true));
     };
     $(document).ready(function () {
+        // ① ربطُ الفورم أولاً: أيُّ استثناءٍ من تهيئة الجداول يُجهض بقيةَ هذا
+        //    المُعالج، فلا يبقى فتحُ الفورم رهينةَ نجاحِ DataTables.
+        var toggleBtn = document.getElementById('toggleForm');
+        if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#finForm').toggleClass('allforms-visible'); }); }
+        $(document).on('click', '.b-del', function () { $(this).closest('tr').remove(); });
+        bAddLine(); bAddLine();
+        // ② جداولُ العرض بعده
         $('#finTable, #varTable').DataTable({
             scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
             buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
             "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
         });
-        bAddLine(); bAddLine();
-        $(document).on('click', '.b-del', function () { $(this).closest('tr').remove(); });
-        var toggleBtn = document.getElementById('toggleForm');
-        if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#finForm').toggleClass('allforms-visible'); }); }
     });
     window.finToggleForm = function () { $('#finForm').toggleClass('allforms-visible'); };
 })();

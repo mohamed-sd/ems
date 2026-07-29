@@ -104,6 +104,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
         error_log('receipt_custody_proc save refused: ' . $e->getMessage());
         header("Location: receipt_custody_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
+
+    // الحالةُ تتبع الواقعة (UX-09 §5.1-② · §8.2): تُعاد نسبةُ الاستلام من
+    // الكميات وتتقدّم حالةُ الأمر تبعًا لها — وعند الاستلام النهائي يُنشر أثرُه
+    // الماليُّ من منبعه (لا زرَّ سحبٍ بعد اليوم). لا يرمي: الاستلامُ محفوظٌ سلفًا.
+    if ($order_id) {
+        proc_sync_order_receipt($conn, $order_id, $current_user_id);
+    }
     header("Location: receipt_custody_proc.php?msg=" . ($is_editing ? 'تم+تعديل+العهدة+بنجاح+✅' : 'تمت+إضافة+العهدة+بنجاح+✅')); exit();
 }
 

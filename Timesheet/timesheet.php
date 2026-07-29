@@ -523,7 +523,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
         ), $svc_actor);
 
         if (!$svc_res['ok']) {
-          $miss = isset($svc_res['missing']) ? implode(' · ', $svc_res['missing']) : 'نقصٌ غير مفسَّر';
+          // ── H-01 ③ + درسُ E-08-أ: الردُّ الخادميُّ لا يصل المستخدم تلقائيًّا ──
+          // كان هنا `alert($svc_res['missing'])` وحدَه، فأيُّ سببِ رفضٍ جديدٍ لا
+          // يحمل مفتاحَ `missing` يظهر «نقصٌ غير مفسَّر» — رسالةٌ توقف الميدانَ
+          // بلا مخرج. وحارسُ الحاويات يُرجع `blocked` **بروابط الإصلاح**،
+          // و`alert()` لا تحمل رابطًا يُنقر — فيُصيَّر لوحٌ حقيقيّ.
+          if (!empty($svc_res['blocked'])) {
+            echo '<div style="max-width:760px;margin:40px auto;padding:20px;border:1px solid #fca5a5;'
+               . 'border-radius:12px;background:#fef2f2;font-family:Tajawal,sans-serif;direction:rtl">';
+            echo '<h3 style="margin:0 0 6px;color:#b91c1c">لم يُسجَّل يومُ العمل — حاوياتُ الموقع لم تكتمل</h3>';
+            echo '<p style="margin:0 0 14px;color:#7f1d1d;line-height:1.9">'
+               . 'الوحدةُ لا تُسجَّل في موقعٍ لم تكتمل حاوياتُه. وهذا ما ينقص، ولكلٍّ موضعُ إصلاحه:</p><ul style="line-height:2.1">';
+            foreach ($svc_res['blocked'] as $b) {
+              echo '<li style="margin-bottom:8px">'
+                 . '<strong>' . htmlspecialchars((string) $b['text'], ENT_QUOTES, 'UTF-8') . '</strong><br>'
+                 . '<a href="' . htmlspecialchars((string) $b['href'], ENT_QUOTES, 'UTF-8') . '" '
+                 . 'style="color:#1d4ed8;font-weight:700">'
+                 . htmlspecialchars((string) $b['label'], ENT_QUOTES, 'UTF-8') . ' ↗</a></li>';
+            }
+            echo '</ul><div style="margin-top:16px;display:flex;gap:10px">'
+               . '<a href="javascript:history.back()" style="padding:8px 16px;background:#e5e7eb;'
+               . 'border-radius:8px;color:#111;text-decoration:none">رجوعٌ للنموذج</a></div>';
+            echo '<p style="margin:14px 0 0;font-size:13px;color:#7f1d1d">'
+               . 'بياناتُ اليوم لم تُفقد — ارجع وأكمل بعد الإصلاح.</p></div>';
+            exit;
+          }
+          $miss = !empty($svc_res['reasons']) ? implode(' · ', $svc_res['reasons'])
+                : (isset($svc_res['missing']) ? implode(' · ', $svc_res['missing']) : 'نقصٌ غير مفسَّر');
           echo "<script>alert('❌ رفضت خدمةُ الإدخال الحفظ (422): " . addslashes($miss) . "');</script>";
           exit;
         }
@@ -3203,7 +3229,10 @@ try {
       '<div class="tsl-head"><i class="fas fa-stream" style="color:#b8860b;"></i> توزيعُ زمن الوردية سطورًا '
       + '<span style="font-weight:400;color:#6b7280;font-size:13px;">(كلُّ سطرٍ: ساعات · حالة · مسؤول · مرجع — والخاناتُ القديمة تُملأ تلقائيًّا)</span>'
       + '<button type="button" id="tslAdd" class="btn-save" style="margin-inline-start:auto;padding:6px 14px;"><i class="fas fa-plus"></i> سطر زمن</button></div>'
-      + '<table><thead><tr><th>ساعات</th><th>الحالة</th><th>المسؤول</th><th>المرجع/السبب</th><th></th></tr></thead>'
+      // ق-4 «الكاتبُ يقترح والمشرفُ يعتمد»: هذا العمودُ **اقتراحٌ** مشتقٌّ من
+      // حالة الساعة، والقرارُ في «لوحة الإسناد اليومي» حيث يُسنَد كلُّ توقفٍ إلى
+      // بندِ التزامٍ من مصفوفة العقد ومنه تُشتق الأحكامُ الثلاثة (CON-02 §5).
+      + '<table><thead><tr><th>ساعات</th><th>الحالة</th><th>المسؤول <small>(مقترح)</small></th><th>المرجع/السبب</th><th></th></tr></thead>'
       + '<tbody id="tslBody"></tbody></table>'
       + '<div class="tsl-sum" id="tslSum"><span style="color:#9ca3af;">لا سطورَ بعد — الإدخالُ القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
     grid.parentElement.insertBefore(box, grid);

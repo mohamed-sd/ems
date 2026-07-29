@@ -22,11 +22,12 @@
 require_once __DIR__ . '/dynamic_nav.php';
 
 /** الأبواب الستة الثابتة (UX-00 §6) بترتيبها وأيقوناتها.
- * HOME هنا للوحات الإدارات القائمة كشاشات (لوحة المدير المالي · المشتريات ·
- * الرحلات) — تظهر قبل الأبواب لا داخل مجموعةٍ مطوية، فرابط اللوحة أول ما يُرى. */
+ * HOME هو باب «① الرئيسية» الدستوري: عنصرٌ واحدٌ لكل دورٍ يفتح لوحتَه
+ * (§7) — عامةً كانت أو مخصصةً — ويُطبع مسطّحًا قبل الأبواب لا داخل مجموعةٍ
+ * مطوية، فيكون أولَ ما يُرى. صفوفُه في nav_items منذ 2026-07-27. */
 function unifiedNavDoors() {
     return array(
-        'HOME'  => array('name' => 'لوحة الإدارة',        'icon' => 'fa fa-gauge-high', 'flat' => true),
+        'HOME'  => array('name' => 'الرئيسية',            'icon' => 'fa fa-house', 'flat' => true),
         'DAILY' => array('name' => 'العمل اليومي',        'icon' => 'fa fa-briefcase'),
         'APPR'  => array('name' => 'المتابعة والموافقات', 'icon' => 'fa fa-clipboard-check'),
         'REC'   => array('name' => 'السجلات الرئيسية',    'icon' => 'fa fa-database'),
@@ -119,24 +120,33 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
 
 /**
  * تصيير القائمة الموحّدة كاملةً للدور — بديلُ الكتل الثلاث والروابط الثابتة
- * (عدا الرئيسية والمراسلات — ثابتتان بقرار المالك).
+ * (عدا المراسلات — ثابتةٌ بقرار المالك؛ و«الرئيسية» انتقلت 2026-07-27 صفًّا
+ *  في باب HOME لكل الأدوار الـ23 فحُذف ثابتُها من insidebar.php).
  * الشارات بمفتاح المسار (route) — تُجمع في insidebar من مصادرها القائمة.
+ *
+ * @param string $afterHome  HTML خامٌّ يُحقن مباشرةً بعد باب HOME — موضعُ
+ *   الروابط الثابتة الباقية (المراسلات) كي تبقى «الرئيسية» أولَ ما يُرى
+ *   (الدستور §6) دون أن تهبط الثوابتُ إلى ذيل القائمة.
  */
-function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array()) {
+function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array(), $afterHome = '') {
     $items = getUnifiedNavItems($conn, $roleId);
     if (empty($items)) { return false; }
     $byDoor = array();
     foreach ($items as $it) { $byDoor[$it['door']][] = $it; }
+    $injected = false;
     foreach (unifiedNavDoors() as $doorKey => $meta) {
         if (empty($byDoor[$doorKey])) { continue; }
         if (!empty($meta['flat'])) {
-            // بابٌ مسطّح: عناصره تُطبع مباشرةً بلا رأس طيٍّ (لوحة الإدارة أول ما يُرى)
+            // بابٌ مسطّح: عناصره تُطبع مباشرةً بلا رأس طيٍّ («الرئيسية» أول ما يُرى)
             foreach ($byDoor[$doorKey] as $it) {
                 printNavLinkItem(array('code' => $it['route'], 'name' => $it['label_ar'], 'icon' => $it['icon']), $basePrefix, $badges);
             }
+            if ($afterHome !== '' && !$injected) { echo $afterHome; $injected = true; }
             continue;
         }
         printUnifiedNavDoor($doorKey, $meta, $byDoor[$doorKey], $basePrefix, $badges);
     }
+    // دورٌ بلا باب HOME (لا يقع اليوم — محروسٌ باختبار): لا تُفقد الثوابت
+    if ($afterHome !== '' && !$injected) { echo $afterHome; }
     return true;
 }

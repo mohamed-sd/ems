@@ -178,16 +178,20 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     ?>
 
     <ul>
-      <li><a href="../main/dashboard.php"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
-
-      <li>
-        <a href="../chats/index.php" id="sidebarChatLink">
-          <i class="fa fa-comments"></i>
-          <span class="sidebar-link-text">المراسلات</span>
-          <span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>
-        </a>
-      </li>
-
+      <?php
+      /* «الرئيسية» لم تعد رابطًا ثابتًا (2026-07-27): انتقلت صفًّا في باب HOME
+         بالمصدر الموحّد `nav_items` لكل الأدوار الـ23 — تحقيقًا لقاعدة الدستور
+         §6 «مصدرٌ واحدٌ محكوم»، ولتفتح لوحةَ الدور مباشرةً بلا تحويلٍ وسيط
+         فيتلوّن رابطُها النشط. والمراسلاتُ تبقى ثابتةً بقرار المالك حتى جولةِ
+         تصفية السايدبار — وتُحقن بعد باب HOME لا قبله، فتبقى «الرئيسية» أولَ
+         ما يُرى (§6) ولا تهبط المراسلاتُ إلى ذيل القائمة. */
+      $__sb_chats_li = '<li>'
+        . '<a href="../chats/index.php" id="sidebarChatLink">'
+        . '<i class="fa fa-comments"></i>'
+        . '<span class="sidebar-link-text">المراسلات</span>'
+        . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
+        . '</a></li>' . "\n";
+      ?>
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
       // (+ شارات عدّ بوابة الطلبات المالية D05 — صناديق المراجعة والمحاسب والمعاد)
@@ -198,8 +202,13 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
         if ($hoursApprovalPendingCount > 0) {
           $__un_badges['Approvals/hours_approval.php'] = $hoursApprovalPendingCount;
         }
-        renderUnifiedNavigationV2($conn, $_SESSION['user']['role'], '../', $__un_badges);
+        // المصيِّر يعيد false لدورٍ بلا عناصرَ أصلًا — فلا تُفقد المراسلات حينها
+        if (!renderUnifiedNavigationV2($conn, $_SESSION['user']['role'], '../', $__un_badges, $__sb_chats_li)) {
+          echo $__sb_chats_li;
+        }
       } elseif (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
+        // المسارُ القديم (السوبر ومن خارج العلم): المراسلاتُ ثابتةٌ في صدر القائمة
+        echo $__sb_chats_li;
         require_once __DIR__ . '/includes/finreq_badges.php';
         $__fr_badges = ems_finreq_nav_badges($conn);
         $__sb_links  = getDynamicNavLinks($conn, $_SESSION['user']['role']);

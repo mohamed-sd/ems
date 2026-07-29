@@ -397,6 +397,10 @@ class PenaltyService
             'amount' => $amount, 'currency' => strval($a['currency']),
             'period_ref' => substr((string) $a['period_from'], 0, 7),
             'event_id' => intval($eventId),
+            // M-11: كلُّ خصمٍ ينقر إلى مستنده — والقيدُ البنيويُّ `ck_dues_debit_source`
+            // يرفض الإدراجَ بدونه، فلا يمرّ مسارٌ جديدٌ نُسي فيه المصدر.
+            'source_doc_type' => 'penalty_assessment',
+            'source_doc_id'   => intval($a['id']),
             'settlement_state' => 'pending',
         ));
     }

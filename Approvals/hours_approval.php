@@ -366,6 +366,19 @@ include '../insidebar.php';
   include('../includes/page_header.php');
   ?>
 
+  <?php /* E-08-أ: موضعُ الأسباب المفصَّلة للصفوف الموقوفة — يملؤه renderBlocked()
+           من `blocked[].reasons`. يبقى فارغًا حتى يقع حجبٌ فعليّ. */ ?>
+  <div id="blocked-panel" class="alert alert-warning d-none" role="alert" style="margin-bottom:16px">
+    <div class="d-flex justify-content-between align-items-start">
+      <h6 class="fw-bold mb-2"><i class="fa fa-ban me-1"></i> صفوفٌ لم تُعتمد — والسببُ لكلٍّ منها:</h6>
+      <button type="button" class="btn-close" aria-label="إغلاق"
+              onclick="document.getElementById('blocked-panel').classList.add('d-none');"></button>
+    </div>
+    <ul id="blocked-list" class="mb-2 ps-3"></ul>
+    <button type="button" class="btn btn-sm btn-outline-secondary"
+            onclick="location.reload();"><i class="fa fa-rotate me-1"></i> حدِّث الجدول</button>
+  </div>
+
   <div class="mb-4">
     <small class="text-muted">
       <?php
@@ -1232,8 +1245,19 @@ $(function () {
         var modal = bootstrap.Modal.getInstance(document.getElementById('confirmApproveModal'));
         if (modal) modal.hide();
         if (res.success) {
-          showToast('✅ ' + res.message, 'success');
-          setTimeout(function(){ location.reload(); }, 1200);
+          // ── E-08-أ: الأسبابُ المفصَّلةُ تصل المستخدم ────────────────────
+          // كان الردُّ يحمل `blocked[].reasons` مسمّاةً (اسمُ الوثيقة وتاريخُ
+          // انتهائها · محورُ الطاقة وقياسُه) و**الشاشةُ تعرض `res.message`
+          // وحدَه** — فيرى المعتمِدُ «موقوف» بلا أن يعرف ما يفعل. والملخّصُ
+          // لا يكفي: العلاجُ يختلف باختلاف السبب وباختلاف الصفّ.
+          renderBlocked(res.blocked);
+          if (res.blocked && res.blocked.length) {
+            // لا تحديثَ تلقائيّ: إعادةُ التحميل تمحو الأسبابَ قبل أن تُقرأ.
+            showToast('⚠️ ' + res.message, 'warning');
+          } else {
+            showToast('✅ ' + res.message, 'success');
+            setTimeout(function(){ location.reload(); }, 1200);
+          }
         } else {
           showToast('❌ ' + res.message, 'danger');
         }
@@ -1460,6 +1484,37 @@ function showToast(msg, type) {
   document.getElementById('toast-msg').textContent = msg;
   const toast = new bootstrap.Toast(el, { delay: 3000 });
   toast.show();
+}
+
+// ── E-08-أ: عرضُ أسباب الحجب المفصَّلة ────────────────────────
+// «الردُّ الخادميُّ لا يصل المستخدم تلقائيًّا»: المعالجُ يُرسل لكل صفٍّ موقوفٍ
+// أسبابَه مسمّاةً، وهذه الدالةُ هي التي توصلها. صفٌّ واحدٌ لكل معرّف، وأسبابُه
+// تحته — فيرى المعتمِدُ **أيَّ** صفٍّ وقف و**لماذا** و**ماذا يفعل**، لا ملخّصًا
+// يقول «موقوف» ويتركه يخمّن.
+function renderBlocked(blocked) {
+  var panel = document.getElementById('blocked-panel');
+  var list  = document.getElementById('blocked-list');
+  if (!panel || !list) { return; }
+  if (!blocked || !blocked.length) { panel.classList.add('d-none'); list.innerHTML = ''; return; }
+
+  var html = '';
+  for (var i = 0; i < blocked.length; i++) {
+    var b = blocked[i] || {};
+    var reasons = b.reasons || [];
+    // لا سببَ مُرسَل = عطبٌ يُعلَن لا يُخفى (لا نخترع له نصًّا)
+    var body = reasons.length
+      ? '<ul class="mb-0">' + reasons.map(function (r) {
+          return '<li>' + escHtml(r) + '</li>';
+        }).join('') + '</ul>'
+      : '<span class="text-muted">لم يُرسَل سببٌ مفصَّل — راجع سجلّ النظام.</span>';
+    html += '<li class="mb-2"><strong>السجل #' + escHtml(b.id) + '</strong>'
+          + (b.kind === 'document' ? ' <span class="badge bg-danger">وثيقة منتهية</span>'
+             : (b.kind === 'capacity' ? ' <span class="badge bg-warning text-dark">تجاوز طاقة</span>' : ''))
+          + body + '</li>';
+  }
+  list.innerHTML = html;
+  panel.classList.remove('d-none');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ── Escape HTML ──────────────────────────────────────────────

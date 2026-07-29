@@ -93,10 +93,17 @@ check($m13[1] === $states13, 'unit_entries.state: الحالات الثلاث ع
 check(count($m13[1]) === 13, 'عددها ثلاث عشرة — لا tinyint ولا مستوى اعتمادٍ رقمي');
 
 $t = $colsOf('unit_time_log');
+// + تسعةُ أعمدةِ الإسناد بعد resp_party — ترحيل 2026_07_28 (CON-02 · ق-3:
+//   «سجلُّ الإسناد توسيعُ unit_time_log القائم لا جدولٌ جديد» — فجدولان يحملان
+//   الزمنَ نفسَه بابُ تعارضٍ دائم). والأحكامُ الثلاثةُ لقطةٌ مخزَّنةٌ لا اشتقاقٌ
+//   حيّ (هـ-3) فتتحقق «لا رجعية» §6 مجانًا.
 $spec33 = array('id','company_id','log_date','shift','project_id','equipment_id',
     'operator_employee_id','supplier_entity_id','time_from','time_to','hours','ops_state',
-    'cause_note','resp_party','entry_id','entered_by','sync_uuid','created_at');
-check(array_keys($t) === $spec33, 'unit_time_log: الأعمدة الثمانية عشر بترتيب §3.3 حرفًا بحرف');
+    'cause_note','resp_party',
+    'obligation_type','billable','supplier_countable','operator_countable',
+    'decided_by','decided_at','objection_state','objection_ref','objection_reason',
+    'entry_id','entered_by','sync_uuid','created_at');
+check(array_keys($t) === $spec33, 'unit_time_log: أعمدة §3.3 حرفًا بحرف + تسعةُ أعمدة الإسناد (CON-02 ق-3)');
 
 preg_match_all("/'([^']+)'/", $t['ops_state'], $a1);
 check($a1[1] === array('actual_work','standby','tech_breakdown','supplier_stop','operator_stop',

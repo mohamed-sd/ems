@@ -498,8 +498,12 @@ case 'contracts_detailed': {
 
     $kpiSql = "SELECT COUNT(c.id) AS total_c,
                       SUM(CASE WHEN c.status=1 THEN 1 ELSE 0 END) AS active_c,
-                      SUM(CASE WHEN c.contract_status='paused' THEN 1 ELSE 0 END) AS paused_c,
-                      SUM(CASE WHEN c.contract_status='terminated' THEN 1 ELSE 0 END) AS term_c,
+                      -- H-02 (2026-07-29): المفرداتُ صارت آلةَ حالاتٍ عربيةً في
+                      -- `contract_status` (ENUM)، فمقارنةُ 'paused'/'terminated'
+                      -- الإنجليزيةِ لا يمكن أن تطابق شيئًا. والمنتهي يشمل ما بعده
+                      -- (مقفل · مصفّى) — فالسؤالُ «كم عقدًا انتهى؟» لا «كم في حالةٍ بعينها؟».
+                      SUM(CASE WHEN c.contract_status='معلَّق' THEN 1 ELSE 0 END) AS paused_c,
+                      SUM(CASE WHEN c.contract_status IN ('منتهٍ','مقفل','مصفّى') THEN 1 ELSE 0 END) AS term_c,
                       ROUND(IFNULL(SUM(c.forecasted_contracted_hours),0),0) AS total_hrs,
                       ROUND(AVG(c.contract_duration_months),1) AS avg_dur
                FROM contracts c LEFT JOIN project p ON p.id=c.project_id WHERE $ws AND {TENANT_SCOPE}";
@@ -535,10 +539,10 @@ case 'contracts_detailed': {
                        IFNULL(c.paid_contract,'—') AS paid_amount,
                        IFNULL(c.payment_time,'—') AS payment_time,
                        IFNULL(c.guarantees,'—') AS guarantees,
-                       CASE WHEN c.contract_status IS NULL OR c.contract_status='' THEN 'نشط'
-                            WHEN c.contract_status='paused' THEN 'موقوف'
-                            WHEN c.contract_status='terminated' THEN 'منتهي'
-                            WHEN c.contract_status='merged' THEN 'مدموج'
+                       -- H-02: الحالةُ تُعرض باسمها من الآلة. وNULL لم تعد تعني
+                       -- «نشط» ضمنًا — صارت «بلا حالة»، وهي حالةٌ تُرى لا تُخفى
+                       -- (كلُّ العقود التسعة اشتُقّت حالتُها في الترحيل).
+                       CASE WHEN c.contract_status IS NULL THEN 'بلا حالة'
                             ELSE c.contract_status END AS status_txt,
                        IFNULL(c.pause_reason,'—') AS pause_reason
                 FROM contracts c
@@ -1647,9 +1651,14 @@ body {
                 <label class="fc-filter-label"><i class="fas fa-info-circle me-1" style="color:var(--blue)"></i>حالة العقد</label>
                 <select name="contract_status" class="form-select">
                     <option value="" <?php echo $fContractStatus === '' ? 'selected' : ''; ?>>— الكل —</option>
-                    <option value="active"     <?php echo $fContractStatus === 'active'     ? 'selected' : ''; ?>>نشط</option>
-                    <option value="paused"     <?php echo $fContractStatus === 'paused'     ? 'selected' : ''; ?>>موقوف</option>
-                    <option value="terminated" <?php echo $fContractStatus === 'terminated' ? 'selected' : ''; ?>>منتهي</option>
+                    <?php /* H-02: خياراتُ المرشِّح من الآلة نفسِها — فلا قائمةٌ
+                             ثانيةٌ تفترق عنها يوم تُضاف حالة. */
+                    require_once dirname(dirname(__DIR__)) . '/app/Services/Contract/ContractStateMachine.php';
+                    foreach (\App\Services\Contract\ContractStateMachine::ALL as $__st): ?>
+                        <option value="<?php echo htmlspecialchars($__st); ?>"
+                            <?php echo $fContractStatus === $__st ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($__st); ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>

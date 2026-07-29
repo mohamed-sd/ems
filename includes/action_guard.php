@@ -87,7 +87,15 @@ if (!function_exists('ems_action_guard_registry')) {
             'reports/get_mine_contracts.php' => array('modules' => array('Reports/'), 'action' => 'view'),
 
             // ── Approvals — محصّنٌ أصلًا بمجموعة أدواره؛ نبقيه بفحص view على شاشته ──
-            'approvals/hours_approval_handler.php' => array('modules' => array('Approvals/'), 'action' => 'auto'),
+            // ⚠️ **الشاشةُ بكودها الكامل لا ببادئة المجلد.** فـ`check_page_permissions`
+            //    يطابق بـ`code LIKE '%…%' … LIMIT 1` **بلا ORDER BY**
+            //    (permissions_helper.php:353)، فبادئةُ `Approvals/` تلتقط **أيَّ**
+            //    وحدةٍ تُسجَّل لاحقًا تحت المجلد ثم تُقاس عليها الصلاحية.
+            //    وقد وقع ذلك فعلًا: تسجيلُ «لوحة الإسناد اليومي» (الوحدة 146)
+            //    جعل الاستعلامَ يعيدها، فحُجب مديرو الموردين والأسطول والمشغّلين
+            //    (الأدوار 2·3·4) عن اعتماد الساعات — وكشفه `unit_chain_e2e_proof`
+            //    بسقوطه من 37 إلى 10 ناجحًا. الكودُ الكاملُ يقطع الالتباس.
+            'approvals/hours_approval_handler.php' => array('modules' => array('Approvals/hours_approval.php'), 'action' => 'auto'),
 
             // ── الدردشة: متاحة لأي مستخدمٍ مصادَق بقرارٍ واعٍ (رسائل داخلية عامة) ──
             'chats/get_messages.php'     => array('modules' => array(), 'action' => 'public'),

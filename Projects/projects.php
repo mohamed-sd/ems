@@ -258,6 +258,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
 
 <?php
+// ── كودُ المشروع التالي (PRJ-####) — بنفسِ نمط كود العميل في Clients/clients.php ──
+// المصدرُ أعلى كودٍ قائمٍ على النمط، لا عدَّادٌ مستقلٌّ يفترق عن الواقع. والصيغةُ
+// المحفوظةُ في القاعدة اليوم `PRJ-0001…`، فما خالفها من أكوادٍ يدويةٍ لا يُحتسب.
+$next_project_code = 'PRJ-0001';
+try {
+    $prj_last_code = $prj_gate->scopedQuery(array('scope' => array('p' => 'project')),
+        "SELECT p.project_code FROM project p
+          WHERE {TENANT_SCOPE} AND p.project_code REGEXP '^PRJ-[0-9]+$' AND p.is_deleted = 0
+          ORDER BY CAST(SUBSTRING(p.project_code, 5) AS UNSIGNED) DESC
+          LIMIT 1");
+    if (!empty($prj_last_code)) {
+        $next_project_code = 'PRJ-' . str_pad(
+            (string) (intval(substr($prj_last_code[0]['project_code'], 4)) + 1), 4, '0', STR_PAD_LEFT);
+    }
+} catch (\Throwable $t) { error_log('projects.php next code: ' . $t->getMessage()); }
+
 $projects_total_count = 0;
 $projects_active_count = 0;
 $projects_inactive_count = 0;
@@ -419,9 +435,20 @@ include('../insidebar.php');
                             ?>
                         </select>
                     </div>
+                    <!-- ══ الكودُ المولَّد (عرضٌ فقط · يُخفى في وضع التعديل) — نظيرُ شاشة العملاء ══ -->
+                    <div id="generated_project_code_wrapper" class="auto">
+                        <label><i class="fas fa-magic"></i> كود المشروع المولد <i
+                                class="fas fa-info-circle clients-info-icon"></i></label>
+                        <input type="text" id="generated_project_code" class="generated-code-field"
+                            value="<?php echo e($next_project_code); ?>" readonly tabindex="-1"
+                            title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود المشروع" />
+                    </div>
                     <div>
                         <label><i class="fas fa-barcode"></i> كود المشروع</label>
-                        <input type="text" name="project_code" placeholder="كود المشروع" id="project_code" />
+                        <!-- مكتوبٌ سلفًا بالكود المولَّد **وقابلٌ للتعديل** (نظيرُ كود العميل):
+                             أكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه. -->
+                        <input type="text" name="project_code" placeholder="كود المشروع" id="project_code"
+                            value="<?php echo e($next_project_code); ?>" />
                     </div>
                     <div>
                         <label><i class="fas fa-mountain"></i> كود المنجم</label>
@@ -546,7 +573,11 @@ include('../insidebar.php');
                                 $row['total_suppliers'] = isset($prj_smap[intval($row['id'])]) ? $prj_smap[intval($row['id'])] : 0;
                                 $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
                                 // تنبيه: المشروع ليس لديه عقد ساري (status = 1) — بنفس نمط تنبيه العملاء بلا مشاريع
-                                if (intval($row['contracts']) === 0) {
+                                //
+                                // ⚠️ والمشروعُ **الموقوف** لا تنبيهَ له (طلبُ المالك): «بلا عقدٍ ساري»
+                                // ملاحظةٌ تستدعي عملًا — ومشروعٌ أُوقف عمدًا لا يُنتظر منه عقد، فالتنبيهُ
+                                // عليه ضجيجٌ يُغرق التنبيهاتِ الحقيقية. الشرطُ على المشروع لا على العقد.
+                                if (intval($row['contracts']) === 0 && intval($row['status']) === 1) {
                                     $project_name_cell .= " <span class='link-alert-chip' title='المشروع ليس لديه عقد ساري'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
                                 }
 
@@ -689,6 +720,23 @@ include('../insidebar.php');
         const statsToggleBtn = $('#toggleStats');
         const statsSection = $('#projectsStatsSection');
 
+        /**
+         * إظهارُ حقل «كود المشروع المولد» وإخفاؤه.
+         *
+         * ⚠️ **لا تستعمل `jQuery.hide()`/`style.display='none'` هنا** —
+         * `assets/css/ems-forms.css` يحمل:
+         *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
+         * والحقلُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقة الأنماط تهزم
+         * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا،
+         * بلا خطأٍ في وحدة التحكم ولا سطرٍ في أي سجل. (وقعت في شاشة العملاء.)
+         */
+        function setGeneratedProjectCodeShown(shown) {
+            var el = document.getElementById('generated_project_code_wrapper');
+            if (!el) { return; }
+            if (shown) { el.style.removeProperty('display'); }
+            else       { el.style.setProperty('display', 'none', 'important'); }
+        }
+
         function setProjectFormAddMode() {
             if (projectFormTitle) {
                 projectFormTitle.textContent = 'إضافة مشروع جديد';
@@ -696,6 +744,12 @@ include('../insidebar.php');
             if (projectSubmitBtnText) {
                 projectSubmitBtnText.textContent = 'حفظ المشروع';
             }
+            setGeneratedProjectCodeShown(true);
+            // الكودُ المولَّد يعود إلى خانته كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
+            // العرض نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). وهذه الشاشةُ تُفرّغ
+            // حقولَها يدويًّا لا بـ`reset()`، فالتعبئةُ هنا لا في السمة وحدها.
+            var gen = document.getElementById('generated_project_code');
+            if (gen && gen.value) { $("#project_code").val(gen.value); }
         }
 
         function setProjectFormEditMode() {
@@ -705,6 +759,7 @@ include('../insidebar.php');
             if (projectSubmitBtnText) {
                 projectSubmitBtnText.textContent = 'تحديث المشروع';
             }
+            setGeneratedProjectCodeShown(false);
         }
 
         function resetProjectForm() {

@@ -63,9 +63,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
     if ($party_ref <= 0 || !isset($due_types[$due_type]) || $amount <= 0) {
         header("Location: dues_fin.php?msg=بيانات+غير+صحيحة+(طرف/نوع/مبلغ)+❌"); exit();
     }
+
+    // ── M-11: لا خصمَ بلا مستندٍ يُنقر إليه ─────────────────────────────────
+    // كان هذا المسارُ يُدخل خصمًا **حرًّا بلا أيِّ مرجع** — رقمٌ يُقتطع من طرفٍ
+    // ولا أحدَ يعرف مِن أيِّ مستند. والقيدُ البنيويُّ `ck_dues_debit_source` يرفضه
+    // الآن في القاعدة، فالفحصُ هنا **رسالةٌ للمستخدم** لا حارسٌ وحيد: بدونه يرى
+    // خطأَ قاعدةٍ غامضًا بدل جملةٍ تقول ما ينقص.
+    // والاستحقاقُ (`credit`) خارجَ الإلزام: مصدرُه حدثُ المروحة.
+    $src_type = trim($_POST['source_doc_type'] ?? '');
+    $src_id   = intval($_POST['source_doc_id'] ?? 0);
+    $ALLOWED_SRC = array('proc_issue', 'mnt_order', 'transfer_order', 'penalty_assessment', 'settlement');
+    // الفجوةُ المعلَنة: أنواعٌ لا مصدرَ مستنديًّا لها بعد (M-12/M-20). تُقبل
+    // بـ`pending_source` **وحدَها** — فما له مصدرٌ مبنيٌّ لا يُقبل بلا مستنده،
+    // وإلا صارت القيمةُ بابًا خلفيًّا يُفرغ القيدَ من معناه.
+    $PENDING_OK = array('advance', 'deduction');
+
+    if ($direction === 'debit') {
+        if ($src_type === 'pending_source') {
+            if (!in_array($due_type, $PENDING_OK, true)) {
+                header("Location: dues_fin.php?msg=" . rawurlencode(
+                    '«بلا مصدرٍ بعد» تُقبل للسلف والخصومات وحدَها — وهذا النوعُ له مستندٌ مبنيٌّ فاختره')
+                    . "+❌");
+                exit();
+            }
+        } elseif (!in_array($src_type, $ALLOWED_SRC, true)) {
+            header("Location: dues_fin.php?msg=" . rawurlencode(
+                'كلُّ خصمٍ يلزمه مستندٌ مصدر — اختر نوعَه (سندُ صرفٍ · أمرُ صيانة · أمرُ نقل · احتسابُ جزاء · تسوية)') . "+❌");
+            exit();
+        } elseif ($src_id <= 0) {
+            header("Location: dues_fin.php?msg=" . rawurlencode(
+                'رقمُ المستند المصدر إلزامي — الرقمُ الذي يُخصم يجب أن يُنقر إلى أصله') . "+❌");
+            exit();
+        }
+    }
+
     fin_gate($is_super_admin)->insert('fin_dues', array(
         'party_type' => $party_type, 'party_ref' => $party_ref, 'due_type' => $due_type,
-        'direction' => $direction, 'amount' => $amount, 'created_by' => $current_user_id,
+        'direction' => $direction, 'amount' => $amount,
+        'source_doc_type' => ($direction === 'debit') ? $src_type : null,
+        'source_doc_id'   => ($direction === 'debit' && $src_type !== 'pending_source' && $src_id > 0)
+                             ? $src_id : null,
+        'created_by' => $current_user_id,
     ));
     header("Location: dues_fin.php?msg=تمت+إضافة+المستحق+✅"); exit();
 }
@@ -116,7 +154,27 @@ include '../insidebar.php';
             <div class="form-group"><label>نوع المستحق <span class="required">*</span></label>
                 <select name="due_type"><?php foreach ($due_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
             <div class="form-group"><label>الاتجاه</label>
-                <select name="direction"><option value="credit">له (دائن)</option><option value="debit">عليه (مدين)</option></select></div>
+                <select name="direction" id="d_dir"><option value="credit">له (دائن)</option><option value="debit">عليه (مدين)</option></select></div>
+            <?php /* M-11: مصدرُ الخصم — يظهر مع «عليه» وحدَه، فالاستحقاقُ مصدرُه حدثُ المروحة */ ?>
+            <div class="form-group" id="d_srcwrap" style="display:none">
+                <label>مستندُ الخصم <span class="required">*</span>
+                    <span class="mnt-req-hint">(كلُّ خصمٍ ينقر إلى أصله)</span></label>
+                <select name="source_doc_type" id="d_srctype">
+                    <option value="">— اختر نوعَ المستند —</option>
+                    <option value="proc_issue">سندُ صرف (قطعُ غيار · وقود)</option>
+                    <option value="mnt_order">أمرُ صيانة</option>
+                    <option value="transfer_order">أمرُ نقل</option>
+                    <option value="penalty_assessment">احتسابُ جزاء</option>
+                    <option value="settlement">تسوية</option>
+                    <option value="pending_source">بلا مصدرٍ بعد — سلفةٌ أو خصمٌ (فجوةٌ معلَنة)</option>
+                </select>
+                <small style="color:#78350f;display:block;margin-top:4px">
+                    «بلا مصدرٍ بعد» للسلف والخصومات وحدَها: لا جدولَ مستنديًّا لها حتى الآن،
+                    فتُعلَن الفجوةُ ولا تُخبَّأ. وما له مستندٌ مبنيٌّ يُرفض بدونه.
+                </small></div>
+            <div class="form-group" id="d_srcidwrap" style="display:none">
+                <label>رقمُ المستند <span class="required">*</span></label>
+                <input type="number" min="1" name="source_doc_id" id="d_srcid"></div>
             <div class="form-group"><label>المبلغ <span class="required">*</span></label>
                 <input type="number" step="0.01" min="0" name="amount" required></div>
         </div></div>
@@ -244,6 +302,23 @@ $(document).ready(function () {
     $('#d_ptype').on('change', function () {
         var emp = this.value === 'employee';
         $('#d_empwrap').toggle(emp); $('#d_supwrap').toggle(!emp);
+    });
+    // M-11: حقلا المصدر يظهران مع «عليه (مدين)» وحدَه ويصيران إلزامًا معه —
+    // والاستحقاقُ لا يُطالَب بمستند (مصدرُه حدثُ المروحة).
+    $('#d_dir').on('change', function () {
+        var deb = this.value === 'debit';
+        $('#d_srcwrap').toggle(deb);
+        $('#d_srctype').prop('required', deb);
+        if (!deb) { $('#d_srctype').val(''); $('#d_srcid').val(''); }
+        $('#d_srctype').trigger('change');
+    }).trigger('change');
+    // «بلا مصدرٍ بعد» لا رقمَ مستندٍ لها — فإخفاءُ الحقل أصدقُ من طلبِ رقمٍ لا وجودَ له
+    $('#d_srctype').on('change', function () {
+        var deb = $('#d_dir').val() === 'debit';
+        var needsId = deb && this.value !== '' && this.value !== 'pending_source';
+        $('#d_srcidwrap').toggle(needsId);
+        $('#d_srcid').prop('required', needsId);
+        if (!needsId) { $('#d_srcid').val(''); }
     });
 });
 </script>

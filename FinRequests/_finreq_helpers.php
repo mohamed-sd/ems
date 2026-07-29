@@ -683,3 +683,161 @@ function finreq_state_badge($state)
     $s = isset($states[$state]) ? $states[$state] : array('label' => $state, 'badge' => 'secondary');
     return '<span class="badge bg-' . $s['badge'] . '">' . htmlspecialchars($s['label']) . '</span>';
 }
+
+/** اسمُ دورٍ من سجل الأدوار — بذاكرةٍ محليةٍ فلا يتكرر الاستعلام في الصفحة. */
+function finreq_role_name($gate, $role_id)
+{
+    static $cache = array();
+    $rid = intval($role_id);
+    if ($rid <= 0) { return ''; }
+    if (array_key_exists($rid, $cache)) { return $cache[$rid]; }
+    $name = '';
+    try {
+        $row = $gate->selectOne('roles', array('columns' => array('name'), 'where' => array('id' => $rid)));
+        if ($row && isset($row['name'])) { $name = strval($row['name']); }
+    } catch (\Throwable $t) { /* الاسم زينةُ عرضٍ — لا يعطّل الشريط */ }
+    return $cache[$rid] = $name;
+}
+
+/**
+ * بانيةُ شريط رحلة الطلب المالي (الدستور §5/§9 · UX-01 §6.1 · UX-02 §5-①).
+ * ─────────────────────────────────────────────────────────────────────────
+ * تقرأ ما هو مسجَّلٌ فعلًا ولا تخترع: أزمنةُ المراحل من `fin_request_events`
+ * (سجلٌّ إلحاقي)، وأصحابُها من صفّ التوجيه وسجل الأدوار، والتأخرُ من
+ * `sla_due_at` المختوم لكل مرحلة (§8.1). وما لا مصدرَ له يُترك فارغًا.
+ *
+ * سبعُ مراحلَ تطابق حالاتِ النظام حرفيًّا — لا مرحلةَ ملفَّقة:
+ *   ① الإنشاء (draft) ② اعتماد الإدارة (under_review) ③ مكتب المحاسب
+ *   (pending_approval بلا حدث) ④ الاعتماد المالي (بحدثٍ) ⑤ القيد (posted)
+ *   ⑥ الصرف/التحصيل (paid|collected) ⑦ الإغلاق (closed)
+ *
+ * @param  array      $timeline صفوف fin_request_events مرتّبةً تصاعديًّا
+ * @param  array|null $routing  صفّ التوجيه لإدارة الطلب (لاسم المعتمِد)
+ * @return array عقد ems_journey_bar()
+ */
+function finreq_journey($gate, array $req, array $timeline = array(), $routing = null)
+{
+    require_once __DIR__ . '/../includes/journey_bar.php';   // ems_journey_ago
+
+    $state = strval($req['state']);
+    $isCollection = (strval($req['request_type']) === 'collection');
+
+    // ── ① أزمنةُ الإنجاز من السجل الإلحاقي (لا من تخمين) ────────────────
+    $at = array();          // رقم المرحلة => وقت إنجازها
+    $lastReturn = null;     // آخر إعادةٍ بسببها
+    foreach ($timeline as $ev) {
+        $type = strval($ev['event_type']);
+        $new  = strval($ev['new_value']);
+        $when = strval($ev['created_at']);
+        if ($type === 'submit' || $type === 'resubmit') { $at[1] = $when; }
+        elseif ($type === 'dept_approve')               { $at[2] = $when; }
+        elseif ($type === 'publish')                    { $at[3] = $when; }
+        elseif ($type === 'return')                     { $lastReturn = $ev; }
+        elseif ($type === 'system') {
+            // انتقالاتُ الاشتقاق من حدث D04 — قيمتُها الجديدة اسمُ الحالة
+            if     ($new === 'approved') { $at[4] = $when; }
+            elseif ($new === 'posted')   { $at[5] = $when; }
+            elseif ($new === 'paid' || $new === 'collected') { $at[6] = $when; }
+            elseif ($new === 'closed')   { $at[7] = $when; }
+        }
+    }
+
+    // ── ② المرحلة الحالية من الحالة الفعلية ─────────────────────────────
+    //   pending_approval تنقسم مرحلتين بوجود الحدث: بلا حدثٍ = مكتب المحاسب،
+    //   وبحدثٍ = المالية — وهو تمييزُ finreq_badge_counts نفسُه لا اجتهادٌ جديد.
+    $hasEvent = !empty($req['event_id']);
+    $stopped  = array('rejected', 'withdrawn', 'cancelled', 'expired', 'merged');
+    $current  = 0;
+    if     ($state === 'draft' || $state === 'returned')  { $current = 1; }
+    elseif ($state === 'under_review')                    { $current = 2; }
+    elseif ($state === 'pending_approval')                { $current = $hasEvent ? 4 : 3; }
+    elseif ($state === 'approved')                        { $current = 5; }
+    elseif ($state === 'posted')                          { $current = 6; }
+    elseif ($state === 'paid' || $state === 'collected')  { $current = 7; }
+    elseif ($state === 'closed' || $state === 'archived') { $current = 8; }   // كلُّها منجَزة
+    elseif ($state === 'suspended')                       { $current = $hasEvent ? 4 : ($at ? 2 : 1); }
+    elseif (in_array($state, $stopped, true)) {
+        // توقفٌ: آخرُ مرحلةٍ لها زمنٌ هي ما بلغه فعلًا، وما بعدها مُطفأ
+        for ($k = 7; $k >= 1; $k--) { if (isset($at[$k])) { $current = $k + 1; break; } }
+        if ($current === 0) { $current = 1; }
+    }
+
+    // ── ③ أصحابُ المراحل — من التوجيه وسجل الأدوار لا من نصٍّ مكتوب ─────
+    $deptLabel = ($routing && !empty($routing['module_label'])) ? strval($routing['module_label']) : '';
+    $mgrName   = $routing ? finreq_role_name($gate, $routing['manager_role_id']) : '';
+    $ownerMgr  = ($mgrName !== '') ? $mgrName : ($deptLabel !== '' ? ('مدير ' . $deptLabel) : '');
+
+    $defs = array(
+        1 => array('label' => 'الإنشاء والإرسال', 'owner' => 'مقدّم الطلب'),
+        2 => array('label' => 'اعتماد الإدارة',   'owner' => $ownerMgr),
+        3 => array('label' => 'مكتب المحاسب',     'owner' => finreq_role_name($gate, 18)),
+        4 => array('label' => 'الاعتماد المالي',  'owner' => finreq_role_name($gate, 17)),
+        5 => array('label' => 'القيد',            'owner' => finreq_role_name($gate, 17)),
+        6 => array('label' => $isCollection ? 'التحصيل' : 'الصرف', 'owner' => finreq_role_name($gate, 21)),
+        7 => array('label' => 'الإغلاق',          'owner' => ''),
+    );
+
+    // ── ④ التأخر: مهلةُ المرحلة المختومة (§8.1) ─────────────────────────
+    $isStopped = in_array($state, $stopped, true);
+    $overdue = (!empty($req['sla_due_at'])
+        && strtotime(strval($req['sla_due_at'])) < time()
+        && !$isStopped
+        && !in_array($state, array('closed', 'archived'), true));
+
+    $stages = array();
+    foreach ($defs as $k => $d) {
+        if     ($k <  $current) { $status = 'done'; }
+        elseif ($k === $current) { $status = $isStopped ? 'off' : 'current'; }
+        else                     { $status = $isStopped ? 'off' : 'todo'; }
+        $row = array('label' => $d['label'], 'status' => $status);
+        if (isset($at[$k]))    { $row['at'] = $at[$k]; }
+        if ($d['owner'] !== '') { $row['owner'] = $d['owner']; }
+        if ($status === 'current' && $overdue) { $row['overdue'] = true; }
+        $stages[] = $row;
+    }
+
+    $j = array('stages' => $stages);
+
+    // ── ⑤ سطر الخطوة التالية — «باسم صاحبها» ────────────────────────────
+    if (!$isStopped && $current >= 1 && $current <= 7) {
+        // بدايةُ المرحلة الحالية = زمنُ آخر إنجازٍ قبلها، وإلا فإنشاءُ الطلب
+        $since = strval($req['created_at']);
+        for ($k = $current - 1; $k >= 1; $k--) { if (isset($at[$k])) { $since = $at[$k]; break; } }
+        $j['next'] = array(
+            'label'   => $defs[$current]['label'],
+            'owner'   => $defs[$current]['owner'],
+            'since'   => $since,
+            'overdue' => $overdue,
+        );
+    }
+
+    // ── ⑥ اللافتة: إعادةٌ بسببها · توقفٌ · اكتمال ───────────────────────
+    $states = finreq_states();
+    if ($state === 'returned') {
+        $j['banner'] = array(
+            'kind'  => 'return',
+            'title' => 'أُعيد إليك لاستكمال:',
+            'text'  => $lastReturn ? strval($lastReturn['body']) : 'راجع الحقول الناقصة وأعد الإرسال.',
+            'meta'  => ($lastReturn ? (ems_journey_ago($lastReturn['created_at']) . ' · ') : '')
+                       . 'بالرقم نفسه ' . strval($req['request_no']),
+        );
+    } elseif ($isStopped) {
+        $j['banner'] = array(
+            'kind'  => 'stop',
+            'title' => 'توقفت الرحلة: ' . (isset($states[$state]) ? $states[$state]['label'] : $state),
+            'text'  => ($state === 'rejected' && !empty($req['rejection_class']))
+                       ? ('تصنيف الرفض: ' . strval($req['rejection_class'])) : '',
+        );
+    } elseif ($state === 'suspended') {
+        $j['banner'] = array('kind' => 'stop', 'title' => 'الطلب معلَّق',
+            'text' => 'الرحلة متوقفةٌ مؤقتًا بقرار الإدارة المالية حتى الاستئناف.');
+    } elseif ($state === 'closed' || $state === 'archived') {
+        $j['banner'] = array(
+            'kind'  => 'done',
+            'title' => ($state === 'closed') ? 'اكتملت الرحلة وأُغلق الطلب.' : 'اكتملت الرحلة وأُرشف الطلب.',
+            'meta'  => isset($at[7]) ? ems_journey_ago($at[7]) : '',
+        );
+    }
+
+    return $j;
+}

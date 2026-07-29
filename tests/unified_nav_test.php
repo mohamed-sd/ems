@@ -62,11 +62,15 @@ ok('غير التابع للدور 1 معطَّل رغم صلاحية العرض
     intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id = 1 AND active = 0")->fetch_row()[0]) === 6);
 
 // المحافظة 1:1 — كانت 17 عنصرًا (15 من المصادر الثلاثة + الثابتان الحيّان)،
-// وصارت 18 بإضافةِ «وثائق المعدات والمشغّلين» عرضًا للدور 1 (UX-10 §8.1 ·
-// 2026-07-27). التأكيدُ يحرس **عدمَ الفقدان** لا الجمودَ: كلُّ زيادةٍ تُعلَن هنا
-// بسببها وتاريخها، ولا تمرّ إضافةٌ صامتة.
-ok('الدور الرائد: 18 عنصرًا نشطًا (17 الأصلية + وثائق المعدات — لا فقدان)',
-    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id = 1 AND active = 1")->fetch_row()[0]) === 18);
+// ثم 18 بإضافةِ «وثائق المعدات والمشغّلين» عرضًا للدور 1 (UX-10 §8.1 ·
+// 2026-07-27)، ثم 19 بباب «① الرئيسية» الدستوري (§6) حين انتقل رابطُ
+// الرئيسية من ثابتٍ في insidebar إلى صفٍّ في المصدر الموحّد (2026-07-27).
+// ثم 20 بشاشة «المستخلصات» عرضًا للتشغيل (UX-08 §5.2: الوحداتُ مصدرُ المستخلص
+// فيراه صاحبُها قراءةً — بلا can_add؛ 2026-07-27).
+// التأكيدُ يحرس **عدمَ الفقدان** لا الجمودَ: كلُّ زيادةٍ تُعلَن هنا بسببها
+// وتاريخها، ولا تمرّ إضافةٌ صامتة.
+ok('الدور الرائد: 20 عنصرًا نشطًا (17 الأصلية + وثائق المعدات + الرئيسية + المستخلصات — لا فقدان)',
+    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id = 1 AND active = 1")->fetch_row()[0]) === 20);
 
 echo "── ③ الشمول والتشغيل المزدوج ──\n";
 
@@ -78,21 +82,59 @@ ok('كل الأدوار النشطة (عدا السوبر) مبذورةٌ في �
 // برهان التعميم قِيس 19 دورًا 1:1 عبر HTTP — والفقد الوحيد روابطُ ميتة
 // (بلا can_view) أصلحها الترشيح. هذا التأكيد يحرس ألا يعود الميتُ خلسة:
 // كلُّ عنصرٍ نشطٍ لدورٍ فاقدِ الصلاحية يبقى محجوبًا لا ظاهرًا (بنية الاستعلام).
-ok('لوحات الإدارات (HOME) مبذورةٌ لأصحابها الثلاثة',
-    intval($conn->query("SELECT COUNT(DISTINCT role_id) FROM nav_items WHERE door='HOME' AND active=1")->fetch_row()[0]) >= 3);
+// باب «① الرئيسية» (الدستور §6: «أول ما يُفتح — لوحة الدور») — 2026-07-27:
+// كان لثلاثة أصحابِ لوحاتٍ مخصصة، وصار لكل دورٍ نشطٍ صفًّا واحدًا يفتح لوحتَه
+// (عامةً أو مخصصة) بعد أن حُذف الرابطُ الثابت من insidebar. التأكيدان يحرسان:
+// لا دورَ بلا رئيسية، ولا دورَ برئيسيتين.
+ok('باب الرئيسية: صفٌّ واحدٌ لكل دورٍ نشط — لا دورَ بلا لوحةٍ ولا دورَ بصفّين',
+    intval($conn->query("SELECT COUNT(*) FROM roles r WHERE (r.status='1' OR r.status=1) AND r.id <> -1
+        AND (SELECT COUNT(*) FROM nav_items n WHERE n.role_id = r.id AND n.door='HOME' AND n.active=1) <> 1")->fetch_row()[0]) === 0);
+
+// التسمية موحَّدةٌ بقرار المالك: «الرئيسية» لا اسمُ اللوحة — والاسمُ المعتمد
+// في UX-01 §9 يبقى في modules وعنوانِ الصفحة.
+ok('اسمُ عنصر الرئيسية موحَّدٌ «الرئيسية» في كل الأدوار',
+    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE door='HOME' AND active=1 AND label_ar <> 'الرئيسية'")->fetch_row()[0]) === 0);
 
 ok('العلم: دورٌ مذكور يفعَّل ودورٌ غيره لا (اختبارٌ حتمي بتجاوز البيئة)',
     unifiedNavEnabled(1, '1') === true && unifiedNavEnabled(17, '1') === false
     && unifiedNavEnabled(1, '') === false && unifiedNavEnabled(13, '1,13') === true);
 
-ok('بابٌ بلا عناصرَ لا يُعرض (HOME فارغ في البذر — والمصيِّر يتخطاه)',
-    !isset(array_column(getUnifiedNavItems($conn, 1), null, 'door')['HOME']));
+// «بابٌ بلا عناصرَ لا يُعرض». كان البرهانُ يعلَّق على دورٍ بعينه — فانكسر مرتين
+// حين امتلأ ذلك الدور (HOME للدور 1 ثم APPR للدور 15 يوم صارت له ميزانية).
+// فصار يُستخرج من القاعدة نفسِها: أيُّ (دورٍ · باب) خالٍ يجب أن يغيب عن المخرَج،
+// وأيُّ عامرٍ يجب أن يحضر — والفِخُّ يُلتقط حيثما كان لا حيث كُتب.
+$__doors = array('HOME', 'DAILY', 'APPR', 'REC', 'REP', 'SET');
+$__roles = array();
+$__q = $conn->query("SELECT id FROM roles WHERE (status='1' OR status=1) AND id <> -1 ORDER BY id");
+while ($__r = $__q->fetch_row()) { $__roles[] = intval($__r[0]); }
+
+$__mismatch = array(); $__emptySeen = 0; $__fullSeen = 0;
+foreach ($__roles as $__rid) {
+    $__out = array_column(getUnifiedNavItems($conn, $__rid), null, 'door');
+    foreach ($__doors as $__dr) {
+        $__cnt = intval($conn->query("SELECT COUNT(*) FROM nav_items
+            WHERE role_id = {$__rid} AND door = '{$__dr}' AND active = 1")->fetch_row()[0]);
+        if ($__cnt === 0) { $__emptySeen++; if (isset($__out[$__dr])) { $__mismatch[] = "{$__rid}/{$__dr} ظهر وهو خالٍ"; } }
+        else              { $__fullSeen++;  if (!isset($__out[$__dr])) { $__mismatch[] = "{$__rid}/{$__dr} غاب وهو عامر"; } }
+    }
+}
+ok('بابٌ بلا عناصرَ لا يُعرض وبابٌ عامرٌ لا يُخفى — على كل الأدوار'
+   . " ({$__emptySeen} خالٍ · {$__fullSeen} عامر)"
+   . ($__mismatch ? ' — ' . implode('، ', array_slice($__mismatch, 0, 5)) : ''),
+    $__mismatch === array() && $__emptySeen > 0 && $__fullSeen > 0);
 
 echo "── ④ الفحص الساكن لتكامل insidebar ──\n";
 
 $sb = file_get_contents(dirname(__DIR__) . '/insidebar.php');
 ok('التشغيل المزدوج مربوط (unifiedNavEnabled ثم renderUnifiedNavigationV2)',
     strpos($sb, 'unifiedNavEnabled') !== false && strpos($sb, 'renderUnifiedNavigationV2') !== false);
+
+// حارسُ عدم العودة (2026-07-27): «الرئيسية» صارت صفًّا في المصدر الموحّد،
+// فأيُّ رابطٍ ثابتٍ يعود إلى dashboard يعيد ازدواجَ المصدر الذي أُلغي.
+// الفحصُ على شكل الرابط وحده — واستدعاءُ enforce_current_page_view_permission
+// على المسار نفسه حراسةُ صلاحيةٍ لا رابطًا، فلا يُخلط به.
+ok('رابط الرئيسية الثابت محذوفٌ (لا ازدواج مع باب HOME الموحّد)',
+    preg_match('~href\s*=\s*["\'][^"\']*main/dashboard\.php~i', $sb) === 0);
 ok('رابط الإعدادات الثابت (مصدر الرابط الميت) محروسٌ بالعلم',
     preg_match('/if\s*\(\s*!\$__nav_unified\s*\)/u', $sb) === 1
     && strpos($sb, "echo '<li><a href=\"../Settings/settings.php\"") !== false);

@@ -93,6 +93,14 @@ if ($action === 'approve') {
     require_once __DIR__ . '/../app/Services/Unit/CapacityGuard.php';
     if (function_exists('ems_env') && ems_env('EMS_APPROVAL_BOX', 'off') === 'on') { $box_on = true; }
 
+    // ── UX-10 §8.2 حارسُ الوثائق المنتهية (خلف EMS_DOC_EXPIRY_GUARD) ──
+    // «معدةٌ بوثيقةٍ منتهيةٍ تُعلَّم حاجبةً للاعتماد» — والمستوى الأول هو
+    // «اعتمادُ الموقع»، فهو موضعُ الحجب هنا كما هو في السجل القانوني.
+    // بعَلَمٍ مستقلٍّ عن EMS_APPROVAL_BOX: حارسان مختلفان بمصدرين مختلفين،
+    // وربطُهما بعَلَمٍ واحدٍ يجعل قلبَ أحدهما قلبًا للآخر بلا قصد.
+    require_once __DIR__ . '/../app/Services/Unit/DocumentGuard.php';
+    $doc_guard_on = (\App\Services\Unit\DocumentGuard::mode() !== 'off');
+
     foreach ($ids as $ts_id) {
         // التحقق من أن السجل ينتمي لنفس الشركة (البوابة تعزل بالشركة؛ فرع
         // company_id IS NULL الموروث ميتٌ — صفر صفوفٍ بلا شركةٍ قِيست).
@@ -113,11 +121,26 @@ if ($action === 'approve') {
                     $verdict = \App\Services\Unit\CapacityGuard::assertSiteApprovable(
                         $conn, (int) $vg_e['company_id'], (int) $vg_e['id']);
                     if (!$verdict['ok']) {
-                        $blocked[] = array('id' => $ts_id, 'reasons' => $verdict['reasons']);
+                        // الوسمُ يُبنى منه ملخّصُ الرسالة — فلا يُنسب حجبٌ لسببٍ غيرِ سببه
+                        $blocked[] = array('id' => $ts_id, 'kind' => 'capacity',
+                                           'reasons' => $verdict['reasons']);
                         continue;
                     }
                 }
             } catch (\Throwable $vgT) { error_log('approval box guard ts#' . $ts_id . ': ' . $vgT->getMessage()); }
+        }
+
+        // §8.2: المستوى الأول لا يعتمد صفًّا بوثيقةِ أهليةٍ منتهيةٍ يومَ العمل.
+        // يغذّي $blocked نفسَه — فالسببُ يُعلَن للمستخدم ولا يُبلَع في skipped.
+        if ($doc_guard_on && $my_level === 1) {
+            try {
+                $dg = \App\Services\Unit\DocumentGuard::assertForTimesheet($conn, $company_id, (int) $ts_id);
+                if (!$dg['ok']) {
+                    $blocked[] = array('id' => $ts_id, 'kind' => 'document',
+                                       'reasons' => $dg['reasons']);
+                    continue;
+                }
+            } catch (\Throwable $dgT) { error_log('doc expiry guard ts#' . $ts_id . ': ' . $dgT->getMessage()); }
         }
 
         // التحقق من اعتماد المستوى السابق (ما عدا المستوى الأول)
@@ -185,8 +208,29 @@ if ($action === 'approve') {
         $__msg .= ' — اكتمل الاعتماد التشغيلي، وبانتظار التحويل المالي';
     }
     if (!empty($blocked)) {
-        // §5.2: الموقوفُ يُعلَن بأسبابه — لا يُبلَع في «تخطي»
-        $__msg .= ' — ⚠ ' . count($blocked) . ' موقوفٌ بتجاوز طاقةٍ يلزمه تخليصٌ قبل اعتماد الموقع';
+        // §5.2: الموقوفُ يُعلَن بأسبابه — لا يُبلَع في «تخطي».
+        //
+        // ⚠️ **العطبُ الذي أُصلح (E-08-أ · 2026-07-29)**: كانت الرسالةُ تقول
+        // «موقوفٌ بتجاوز طاقةٍ يلزمه تخليص» **مهما كان السبب**. فمنذ دخل حارسُ
+        // الوثائق صار الصفُّ المحجوبُ برخصةٍ منتهيةٍ يُنسب إلى تجاوز طاقةٍ لم
+        // يقع، ويُرسَل صاحبُه إلى تخليصٍ لا يفكّ حجبَه. سببٌ خاطئٌ أسوأُ من لا سبب.
+        // فالملخّصُ الآن يُبنى من **وسم كل حاجزٍ بنفسه** لا من افتراضٍ واحد.
+        $__byKind = array();
+        foreach ($blocked as $__b) {
+            $__k = isset($__b['kind']) ? (string) $__b['kind'] : 'other';
+            if (!isset($__byKind[$__k])) { $__byKind[$__k] = 0; }
+            $__byKind[$__k]++;
+        }
+        $__kindAr = array(
+            'capacity' => 'بتجاوز طاقةٍ يلزمه تخليصٌ قبل اعتماد الموقع',
+            'document' => 'بوثيقةِ أهليةٍ منتهيةٍ يومَ العمل — تُجدَّد من شاشة وثائق المعدات والمشغّلين',
+            'other'    => 'بسببٍ يمنع اعتماد الموقع',
+        );
+        $__parts = array();
+        foreach ($__byKind as $__k => $__n) {
+            $__parts[] = $__n . ' ' . (isset($__kindAr[$__k]) ? $__kindAr[$__k] : $__kindAr['other']);
+        }
+        $__msg .= ' — ⚠ موقوفٌ: ' . implode(' · ', $__parts);
     }
 
     echo json_encode([

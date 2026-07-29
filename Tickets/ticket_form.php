@@ -438,6 +438,13 @@ if ($ticket) {
 
     <?php tkt_msg_banner(); ?>
 
+<?php if ($ticket !== null):
+    /* شريط الرحلة (الدستور §5: «أعلى شاشة كل معاملة» · UX-01 §6.3) — أينَ
+       وصل البلاغ، ومَن عليه الدور، وما سببُ وقفتِه إن كان موقوفًا. */
+    require_once __DIR__ . '/../includes/journey_bar.php';
+    ems_journey_bar(tkt_journey($ticket, $events));
+endif; ?>
+
 <?php if ($ticket === null): ?>
     <!-- ═══ وضع الإنشاء — بخطوة واحدة ═══ -->
     <form id="tktForm" action="" method="post" class="allforms allforms-visible">

@@ -38,9 +38,12 @@
 namespace App\Services\Unit;
 
 require_once __DIR__ . '/CapacityGuard.php';
+require_once __DIR__ . '/DocumentGuard.php';
 require_once __DIR__ . '/../../Core/EventPublisher.php';
+require_once __DIR__ . '/../Contract/AttributionService.php';
 
 use App\Core\EventPublisher;
+use App\Services\Contract\AttributionService;
 
 class TimesheetEntryService
 {
@@ -139,6 +142,26 @@ class TimesheetEntryService
         // دورةَ التوزيع (UX-03 §2.2) غيرَ المبنية — غيابُه موثَّقٌ لا ملفَّق.
         if (!empty($input['operator_employee_id'])) {
             $drv['operator_employee_id'] = (int) $input['operator_employee_id'];
+        }
+
+        // ── H-01 ③: حاوياتُ الموقع شرطُ التسجيل (خلف `EMS_CONTAINER_GATE`) ──
+        // «لا تُسجَّل وحدةٌ في موقعٍ لم تكتمل حاوياتُه». والعلَمُ **قائمةُ مواقع**
+        // لا مفتاحٌ ثنائيّ — فلا قلبةَ واحدةٌ على الجميع (فخُّ E-08: 138 من 138).
+        // والرسالةُ تحمل **روابطَ الإصلاح**: رسالةٌ بلا رابطٍ تُوقف الميدانَ بلا مخرج.
+        require_once __DIR__ . '/../Operations/ContainerGate.php';
+        $cgate = \App\Services\Operations\ContainerGate::assertReady($gate, array(
+            'project_id'           => $drv['project_id'],
+            'contract_id'          => $drv['contract_id'],
+            'equipment_id'         => $equipmentId,
+            'operator_employee_id' => isset($drv['operator_employee_id']) ? $drv['operator_employee_id'] : 0,
+            'unit_type'            => $unitType,
+            'entry_date'           => $date,
+        ));
+        if (!$cgate['ok']) {
+            return array('ok' => false, 'code' => 422,
+                         'reasons' => \App\Services\Operations\ContainerGate::flatten($cgate['reasons']),
+                         'blocked' => $cgate['reasons'],   // بروابطها — لتعرضها الشاشة
+                         'warnings' => array());
         }
 
         $state = (isset($input['state']) && $input['state'] === 'draft') ? 'draft' : 'submitted';
@@ -259,6 +282,28 @@ class TimesheetEntryService
                 if (!$guard['ok']) {
                     return array('ok' => false, 'code' => 422, 'reasons' => $guard['reasons']);
                 }
+                // ── حارسُ الإسناد الإلزامي (CON-02 §5 · ق-5) ────────────────────
+                // اعتمادُ الموقع هو نقطةُ الحجب: الإدخالُ يُحفظ مسودةً، ولا يُعتمد
+                // موقعيًّا وفيه زمنُ توقفٍ بلا مسؤول. وهي نفسُها نقطةُ ق-4 —
+                // «الكاتبُ يقترح والمشرفُ يعتمد» — فاعتمادُ المشرف **هو** الحجب.
+                //
+                // ⚠️ محكومٌ بعَلَم `EMS_ATTRIBUTION_MATRIX` (ق-24): لا يُفعَّل قبل
+                //    أن تُملأ مصفوفاتُ العقود وتُجيزها المالية، وإلا تجمّدت العقودُ
+                //    التسعةُ كلُّها بـ423. «الشاشةُ ← الملءُ ← تفعيلُ القارئ».
+                if (AttributionService::enforced()) {
+                    $att = AttributionService::assertAttributable($conn, $gate, $companyId, $entryId);
+                    if (!$att['ok']) {
+                        return array('ok' => false, 'code' => $att['code'], 'reasons' => $att['reasons']);
+                    }
+                }
+                // ── حارسُ الوثائق المنتهية (UX-10 §8.2 · UX-03 §8.3) ────────────
+                // معدةٌ أو مشغّلٌ بوثيقةِ أهليةٍ منتهيةٍ **يومَ العمل** لا يُعتمد
+                // موقعيًّا — فاليومُ يُدوَّن كما وقع، ولا يصير مالًا وهو مطعونٌ فيه.
+                // خلف `EMS_DOC_EXPIRY_GUARD` (monitor عند التسليم: 138/138 تُحجب).
+                $doc = DocumentGuard::assertDocumentsValid($conn, $companyId, $entryId);
+                if (!$doc['ok']) {
+                    return array('ok' => false, 'code' => $doc['code'], 'reasons' => $doc['reasons']);
+                }
             }
         } elseif (in_array($stage, self::PARTY_STAGES, true) || $stage === 'fleet') {
             if (!in_array($state, array('site_approved', 'parties_review'), true)) {
@@ -298,6 +343,24 @@ class TimesheetEntryService
             }
             $g->update('unit_entries', array('state' => $newState), array('id' => $entryId));
         }, 'unit-entry-approve');
+
+        // ── H-01 ③: **الاستهلاكُ عند اعتماد الموقع لا عند الإدخال** ──────────
+        // الواقعةُ أُقرّت فحينئذٍ تُخصم من سلسلة حاوياتها. ومفتاحُ العطالة يحمل
+        // **الجولة** (`entry:{id}:r{round}`)، فالاعتمادُ المكرَّرُ في الجولة نفسِها
+        // لا يخصم مرتين، والجولةُ الجديدةُ بعد إعادةٍ خصمٌ جديدٌ بمفتاحٍ جديد.
+        // ويقع **بعد** نجاح المعاملة: لا يُخصم من حاويةٍ لواقعةٍ لم تُعتمد.
+        if ($stage === 'site') {
+            try {
+                require_once __DIR__ . '/../Operations/ContainerGate.php';
+                $fresh = self::rawEntry($conn, $companyId, $entryId);
+                if ($fresh) {
+                    \App\Services\Operations\ContainerGate::consumeForEntry($conn, $gate, $companyId, $fresh);
+                }
+            } catch (\Throwable $t) {
+                // الخصمُ أثرٌ تابعٌ لا شرطُ صحةٍ للاعتماد — يُسجَّل ولا يُسقطه
+                error_log('container consume on site approve #' . $entryId . ': ' . $t->getMessage());
+            }
+        }
 
         if (!isset($opts['publish_events']) || $opts['publish_events']) {
             $key = ($newState === 'sales_approved')
@@ -341,6 +404,17 @@ class TimesheetEntryService
                 array('state' => 'returned', 'current_round' => $nextRound),
                 array('id' => $entryId));
         }, 'unit-entry-return');
+
+        // ── H-01 ③: الإعادةُ تردّ الاستهلاكَ **بحركةٍ عاكسةٍ لا بحذف** (القاعدة ①)
+        // المفتاحُ مشتقٌّ من مفتاح الخصم بلاحقة `:rev` فلا يُردُّ مرتين، والسجلُّ
+        // يبقى صفَّين (خصمٌ وردّ) — أثرُ التدقيق كاملٌ لا ممحوّ.
+        try {
+            require_once __DIR__ . '/../Operations/ContainerGate.php';
+            \App\Services\Operations\ContainerGate::reverseForEntry(
+                $conn, $gate, $companyId, $entry, $round);
+        } catch (\Throwable $t) {
+            error_log('container reverse on return #' . $entryId . ': ' . $t->getMessage());
+        }
 
         if (!isset($opts['publish_events']) || $opts['publish_events']) {
             self::publishUnitEvent($conn, $companyId, $entryId, 'operations.unit.returned',
@@ -707,6 +781,17 @@ class TimesheetEntryService
     }
 
     /** الأطراف المطلوبون توازيًا (§4.2 ③): «بين المعنيّين فقط» — الحاضرُ مرجعُه معنيّ. */
+    /**
+     * المطلوبون علنًا — **نافذةٌ للقراءة على القاعدة نفسِها** التي تحكم بها الآلة.
+     * فُتحت لشريط رحلة الوحدة (E-09): الشريطُ يعرض «2 من 3» والآلةُ تنتظر
+     * الثلاثة، فلو نسخ الشريطُ القاعدةَ لنفسه لافترقا يومَ تتغير إحداهما.
+     * قراءةٌ خالصةٌ بلا حالة — لا يغيّر استعمالُها شيئًا.
+     */
+    public static function requiredPartiesOf(array $entry)
+    {
+        return self::requiredParties($entry);
+    }
+
     private static function requiredParties(array $entry)
     {
         $req = array();
@@ -807,10 +892,33 @@ class TimesheetEntryService
         return in_array($v, $valid, true) ? $v : 'unlogged';
     }
 
+    /**
+     * الجهةُ المسؤولة — والابتلاعُ الصامتُ مرفوع (CON-02 · هـ-4).
+     *
+     * كان هذا السطرُ يبتلع **أي** قيمةٍ غير صالحةٍ إلى `'none'` بلا أثر، فيبدو
+     * الإسنادُ نظيفًا وهو في الحقيقة ضائع — وهو ما جعل تقريرَ الفروقات يقول:
+     * «أخطرُ ما في الوضع الراهن ليس ما هو مفقود بل ما يبدو موجودًا».
+     *
+     * والرفعُ على نمط المشروع المجرَّب (`EMS_ACTION_GUARD` · `EMS_CSRF_ENFORCE`):
+     *   `monitor` (الافتراض) → يُسجَّل في `error_log` ويمضي — أسبوعُ رصد
+     *   `enforce`            → يرمي، فلا تمرّ قيمةٌ مجهولةٌ إطلاقًا
+     * والبياناتُ نظيفةٌ اليوم (0 مخالفة · مقيس) فالمخاطرةُ صفر — لكن يُلتزم النمط.
+     */
     private static function safeRespParty($v)
     {
         $valid = array('company','supplier','operator','client','planned','force_majeure','none');
-        return in_array($v, $valid, true) ? $v : 'none';
+        if (in_array($v, $valid, true)) { return $v; }
+
+        $mode = function_exists('ems_env')
+            ? strtolower((string) ems_env('EMS_RESP_PARTY_STRICT', 'monitor')) : 'monitor';
+        $shown = ($v === null) ? 'NULL' : ('«' . (string) $v . '»');
+        if ($mode === 'enforce') {
+            throw new \InvalidArgumentException(
+                'جهةٌ مسؤولةٌ غيرُ معروفة: ' . $shown . ' — الإسنادُ لا يُبتلع صامتًا (CON-02 §5)');
+        }
+        error_log('[resp_party] قيمةٌ غيرُ معروفةٍ ابتُلعت إلى none: ' . $shown
+                  . ' — رصدٌ قبل الإلزام (EMS_RESP_PARTY_STRICT)');
+        return 'none';
     }
 
     private static function publishUnitEvent(\mysqli $conn, $companyId, $entryId, $eventKey, $actor, array $payload)

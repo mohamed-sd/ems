@@ -1,0 +1,226 @@
+{
+    "seed_tag": "CON02-SEED-20260728",
+    "company_id": 4,
+    "pilot": 5,
+    "seeded_at": "2026-07-28 15:56:05",
+    "inserted": {
+        "contract_obligations": [
+            342,
+            343,
+            344,
+            345,
+            346,
+            347,
+            348,
+            349,
+            350,
+            351,
+            352,
+            353,
+            354,
+            355,
+            356,
+            357,
+            358,
+            359,
+            360,
+            361,
+            362,
+            363,
+            364,
+            365,
+            366,
+            367,
+            368,
+            369,
+            370,
+            371,
+            372,
+            373,
+            374,
+            375,
+            376,
+            377,
+            378,
+            379,
+            380,
+            381,
+            382,
+            383,
+            384,
+            385,
+            386,
+            387,
+            388,
+            389,
+            390,
+            391,
+            392,
+            393,
+            394,
+            395,
+            396,
+            397,
+            398,
+            399,
+            400,
+            401,
+            402,
+            403,
+            404,
+            405,
+            406,
+            407,
+            408,
+            409,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422
+        ],
+        "contract_commitments": [
+            66
+        ],
+        "contract_penalty_rules": [
+            57,
+            58
+        ],
+        "timesheet": [
+            1730
+        ],
+        "unit_entries": [
+            1019
+        ],
+        "unit_time_log": [
+            1924,
+            1925,
+            1926
+        ],
+        "fin_financial_events": [
+            3826,
+            3827,
+            3828
+        ],
+        "fin_event_links": [
+            3314,
+            3315,
+            3316,
+            3317,
+            3318,
+            3319
+        ],
+        "unit_party_awards": [
+            1345,
+            1346,
+            1347
+        ],
+        "fin_dues": [
+            1072,
+            1073,
+            1074
+        ],
+        "unit_approvals": [
+            1062,
+            1063,
+            1064,
+            1065
+        ],
+        "ems_business_events": [
+            4884,
+            4879,
+            4880,
+            4883,
+            4884,
+            4885,
+            4886,
+            4885,
+            4886
+        ],
+        "contract_penalty_assessments": [
+            35,
+            36
+        ],
+        "claims": [
+            86
+        ],
+        "claim_lines": [
+            169,
+            170,
+            171,
+            172,
+            173
+        ]
+    },
+    "updated": {
+        "contracts": [
+            {
+                "id": 5,
+                "old": {
+                    "retention_pct": null,
+                    "advance_recovery_pct": null
+                }
+            }
+        ]
+    },
+    "baseline": {
+        "contract_obligations": 0,
+        "contract_penalty_rules": 0,
+        "contract_penalty_assessments": 0,
+        "claims": 0,
+        "claim_lines": 0,
+        "contract_commitments": 11,
+        "unit_entries": 139,
+        "unit_time_log": 256,
+        "fin_financial_events": 38,
+        "fin_event_links": 41,
+        "fin_dues": 13
+    },
+    "after": {
+        "contract_obligations": 81,
+        "contract_penalty_rules": 2,
+        "contract_penalty_assessments": 0,
+        "claims": 0,
+        "claim_lines": 0,
+        "contract_commitments": 12,
+        "unit_entries": 139,
+        "unit_time_log": 256,
+        "fin_financial_events": 38,
+        "fin_event_links": 41,
+        "fin_dues": 13
+    },
+    "live_event": {
+        "ts": 1730,
+        "entry": 1019,
+        "work_date": "2026-07-28",
+        "contract": 5,
+        "revenue_event": 3826,
+        "currency": "USD",
+        "unit_price": 20,
+        "old_billable_hours": 6,
+        "new_billable_hours": 7.5,
+        "old_amount": 120,
+        "new_amount": 150,
+        "delta": 30
+    },
+    "claim": {
+        "id": 86,
+        "no": "CLM-2026-0001",
+        "from": "2026-07-28",
+        "to": "2026-07-31",
+        "currency": "USD",
+        "gross": 106.2,
+        "lines": 5,
+        "ledger_sum": 124.95,
+        "deductions": -18.75,
+        "reconciled": true
+    }
+}

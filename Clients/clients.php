@@ -746,7 +746,13 @@ include('../insidebar.php');
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود العميل *</label>
+                        <!-- الكودُ المولَّدُ مكتوبٌ سلفًا **وقابلٌ للتعديل** (طلبُ المالك):
+                             فأكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه.
+                             ووضعُه في السمة `value` لا بجافاسكربت مقصود: `resetClientForm()`
+                             تستدعي `reset()` الأصليّ، وهو يعيد كلَّ حقلٍ إلى سمته — فيعود
+                             الكودُ المولَّدُ تلقائيًّا بعد كل إلغاءٍ أو خروجٍ من وضع التعديل. -->
                         <input type="text" name="client_code" id="client_code" placeholder="مثال: CL-001" required
+                            value="<?php echo clients_e($next_client_code); ?>"
                             pattern="[A-Za-z0-9-_]+" />
                     </div>
                     <div>
@@ -1032,16 +1038,40 @@ include('../insidebar.php');
     const statsToggleBtn = $('#toggleStats');
     const statsSection = $('#clientsStatsSection');
 
+    /**
+     * إظهارُ حقل «كود العميل المولد» وإخفاؤه.
+     *
+     * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
+     *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
+     * والحقلُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقة الأنماط تهزم
+     * `display:none` التي يكتبها jQuery **سطريًّا بلا أولوية**. النتيجةُ أن
+     * `hide()` «تنجح» (السمةُ تُكتب فعلًا) والحقلُ يبقى ظاهرًا — عطبٌ صامتٌ
+     * لا يظهر في أي سجلّ. والعلاجُ: أولويةٌ سطريةٌ تغلب أولويةَ الورقة.
+     * (وهي گوتشا المشروع المسجَّلة: «ems-forms.css يهزم jQuery.hide()».)
+     */
+    function setGeneratedCodeShown(shown) {
+        var el = generatedCodeWrapper[0];
+        if (!el) { return; }
+        if (shown) { el.style.removeProperty('display'); }
+        else       { el.style.setProperty('display', 'none', 'important'); }
+    }
+
     function setClientFormAddMode() {
         formTitle.text('إضافة عميل جديد');
         submitBtnText.text('حفظ العميل');
-        generatedCodeWrapper.show();
+        setGeneratedCodeShown(true);
+        // الكودُ المولَّدُ يعود إلى خانته كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
+        // العرض نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
+        // للخروج من الإلغاء، لكن الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا
+        // reset فيبقى كودُ العميل المعدَّل ظاهرًا — وهذا السطرُ يسدّ تلك الحالة.
+        var genCode = $('#generated_client_code').val();
+        if (genCode) { $('#client_code').val(genCode); }
     }
 
     function setClientFormEditMode() {
         formTitle.text('تعديل العميل');
         submitBtnText.text('تحديث العميل');
-        generatedCodeWrapper.hide();
+        setGeneratedCodeShown(false);
     }
 
     function resetClientForm() {
@@ -1267,6 +1297,13 @@ include('../insidebar.php');
 
     // تعبئة الفورم بالبيانات (تُستدعى من زر التعديل داخل نافذة العرض)
     function fillClientForm(c) {
+        // ⚠️ مسارُ تعديلٍ ثانٍ — ولم يكن يُعلن نفسَه تعديلًا (أُصلح بطلب المالك):
+        // هذه الدالةُ تُستدعى من زر «تعديل» داخل نافذة التفاصيل، وكانت تملأ الفورم
+        // بعميلٍ قائمٍ **وتتركه في وضع الإضافة**: العنوانُ «إضافة عميل جديد»،
+        // والزرُّ «حفظ العميل»، وحقلُ «كود العميل المولد» ظاهرٌ بكودٍ لا يخصّ
+        // المعروض. والفارقُ ليس تجميليًّا — المستخدمُ يظنّ أنه يُنشئ وهو يعدّل.
+        // (وضعُ التعديل يُخفي الحقلَ المولَّد أصلًا — فالإصلاحُ استدعاءٌ لا شرطٌ جديد.)
+        setClientFormEditMode();
         $('#client_id').val(c.id);
         $('#client_code').val(c.code);
         $('#client_name').val(c.name);

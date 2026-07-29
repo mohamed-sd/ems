@@ -864,10 +864,23 @@ if (!function_exists('fin_supplier_net')) {
 
 // ── الميزانيات (§3.5/§3.6) ──
 if (!function_exists('fin_dept_modules')) {
+    /**
+     * أقسامُ الموازنة — واحدٌ لكلِّ إدارةٍ رئيسية بلا استثناء (قرار المالك 2026-07-27).
+     *
+     * تُبنى على `fin_source_modules()` (مفرداتُ الدفتر) ثم تُتَمَّم بالخمسِ التي
+     * كانت مضمومةً إلى `general`، فصار لكلٍّ منها اسمُها ومديرُها. و`general`
+     * يبقى للطلبات العابرةِ للإدارات لا بديلًا عن قسمِ أحد.
+     * الترتيبُ هنا هو ترتيبُ القائمة في شاشة الموازنة.
+     */
     function fin_dept_modules()
     {
         $m = fin_source_modules();
-        $m['general'] = 'عام';
+        $m['sites']     = 'المواقع';
+        $m['movement']  = 'الحركة والتشغيل';
+        $m['transport'] = 'النقل والترحيل';
+        $m['tickets']   = 'البلاغات';
+        $m['admin']     = 'الإدارة والصلاحيات';
+        $m['general']   = 'عام';
         return $m;
     }
 }
@@ -880,8 +893,10 @@ if (!function_exists('fin_period_types')) {
 if (!function_exists('fin_budget_states')) {
     function fin_budget_states()
     {
-        return array('draft' => 'مسودة', 'submitted' => 'مقدَّمة', 'approved' => 'معتمدة',
-                     'active' => 'نشطة', 'closed' => 'مقفلة');
+        // «معادة» أُضيفت 2026-07-27 مع دورة الرفع — الثلاثيةُ الموحّدة تقتضيها
+        // (الدستور §4.3): إجازةٌ · إعادةٌ بسبب · وما بينهما انتظار.
+        return array('draft' => 'مسودة', 'submitted' => 'مقدَّمة', 'returned' => 'معادة',
+                     'approved' => 'معتمدة', 'active' => 'نشطة', 'closed' => 'مقفلة');
     }
 }
 if (!function_exists('fin_budget_categories')) {
@@ -1085,5 +1100,240 @@ if (!function_exists('fin_unit_label_ar')) {
     {
         $m = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر');
         return isset($m[$u]) ? $m[$u] : ($u === null ? '—' : $u);
+    }
+}
+
+if (!function_exists('fin_budget_dept_scope')) {
+    /**
+     * أقسامُ الموازنة التي يملكها الدور (UX-02 §5 دورة ⑥ · قرار المالك 2026-07-27).
+     * ─────────────────────────────────────────────────────────────────────
+     * **الخريطةُ من جدول توجيه الطلبات** (`fin_request_routing.manager_role_id`)
+     * لا من نصٍّ مكتوب: أقسامُه هي نفسُها الأحدَ عشرَ في `fin_budgets.dept_module`
+     * بالحرف — فمصدرٌ واحدٌ يخدم بوابتَي الطلب والموازنة ولا ينحرفان.
+     *
+     * **مديرُ الإدارة وحده** يملك قسمَه (قرار المالك) — لا منشئو طلباتها.
+     *
+     * **الرؤيةُ تُفصل عن الملكية**: أدوارُ المالية كلُّها (17–22) وظيفةُ رقابةٍ لا
+     * إدارةٌ صاحبةُ موازنة — فترى الكلَّ. وحصرُها في أقسامها كان يُعمي المدقّقَ
+     * والمحاسبَ وأمينَ الخزينة والقارئ عن كل موازنةٍ في الشركة (انحدارٌ رُصد
+     * وأُصلح 2026-07-27). والرفعُ والإجازةُ يبقيان محصورَين كما هما:
+     * `fin_budget_can_submit` بمالك القسم، و`fin_budget_is_approver` بالدور 19.
+     *
+     * @return array|null قائمةُ أقسام، أو null = كلُّ الأقسام (المالية/السوبر)
+     */
+    function fin_budget_dept_scope($role, $is_super = false)
+    {
+        $role = strval($role);
+        if ($is_super || $role === '-1') { return null; }
+        // أدوارُ الإدارة المالية: رؤيةٌ كاملةٌ رقابةً
+        if (in_array($role, array('17', '18', '19', '20', '21', '22'), true)) { return null; }
+        $out = array();
+        try {
+            $rows = fin_gate(false)->select('fin_request_routing', array(
+                'columns' => array('source_module', 'manager_role_id'),
+            ));
+            foreach ($rows as $r) {
+                if (strval($r['manager_role_id']) === $role) { $out[strval($r['source_module'])] = true; }
+            }
+        } catch (\Throwable $t) { error_log('fin budget dept scope: ' . $t->getMessage()); }
+        return array_keys($out);
+    }
+}
+
+if (!function_exists('fin_budget_owned_depts')) {
+    /**
+     * الأقسامُ التي **يملكها** الدورُ رفعًا — من `fin_request_routing.manager_role_id`.
+     * ─────────────────────────────────────────────────────────────────────
+     * تختلف عن `fin_budget_dept_scope` (الرؤية): الماليةُ ترى الكلَّ رقابةً
+     * وتملك أقسامَها الثلاثة وحدها (الإيرادات · الخزينة · العام) — فترفعها
+     * ولا ترفع موازنةَ الصيانة. والمُجيزُ (19) لا يملك قسمًا فلا يرفع شيئًا،
+     * وبذلك يبقى فصلُ اليدين بنيويًّا.
+     */
+    function fin_budget_owned_depts($role)
+    {
+        $role = strval($role);
+        if ($role === strval(EMS_ROLE_FIN_DEPT_MGR)) { return array(); }   // المُجيزُ لا يملك
+        $out = array();
+        try {
+            $rows = fin_gate(false)->select('fin_request_routing', array(
+                'columns' => array('source_module', 'manager_role_id'),
+            ));
+            foreach ($rows as $r) {
+                if (strval($r['manager_role_id']) === $role) { $out[strval($r['source_module'])] = true; }
+            }
+        } catch (\Throwable $t) { error_log('fin budget owned depts: ' . $t->getMessage()); }
+        return array_keys($out);
+    }
+}
+
+if (!function_exists('fin_budget_can_submit')) {
+    /** هل يملك الدورُ رفعَ موازنة هذا القسم؟ (مديرُ القسم وحده — والمُجيزُ لا يرفع) */
+    function fin_budget_can_submit($role, $dept, $is_super = false)
+    {
+        if ($is_super || strval($role) === '-1') { return true; }
+        return in_array(strval($dept), fin_budget_owned_depts($role), true);
+    }
+}
+
+if (!function_exists('fin_budget_self_owned')) {
+    /**
+     * هل الموازنةُ لقسمٍ يديره هذا الدورُ نفسُه؟ — فلا يُجيزها ولا يُعيدها.
+     * ─────────────────────────────────────────────────────────────────────
+     * حارسُ «مَن يُعدّ لا يعتمد» بعد أن اتّسع بابُ الإجازة إلى الإدارة المالية
+     * كلِّها (2026-07-28): المديرُ الماليُّ يملك الإيراداتِ والخزينةَ والعام،
+     * فلو أجازها لعاد الخللُ الذي أُغلق. ويبقى مديرُ الإدارة المالية (19) —
+     * وهو لا يملك قسمًا أصلًا — مُجيزَ هذه الثلاثة.
+     *
+     * السوبر مستثنًى: دورُ تشغيلٍ لا طرفٌ في الدورة.
+     */
+    function fin_budget_self_owned($role, $dept, $is_super = false)
+    {
+        if ($is_super || strval($role) === '-1') { return false; }
+        return in_array(strval($dept), fin_budget_owned_depts($role), true);
+    }
+}
+
+if (!function_exists('fin_budget_approver_roles')) {
+    /**
+     * أدوارُ الإدارة المالية التي تُجيز الموازنات: رئيسُها ومعاونوه.
+     * ─────────────────────────────────────────────────────────────────────
+     * تُشتَقّ **بالتبعية** من `roles.parent_role_id` لا من قائمةٍ مكتوبة (قاعدة
+     * المالك: «التبعيةُ تحدد القائمة والصلاحيةُ ترشّح») — فمعاونٌ يُضاف تحت
+     * الإدارة المالية غدًا يدخل بلا تعديل كود، ومعاونٌ يُنقل يخرج بلا سهو.
+     *
+     * والترشيحُ بعدها لصلاحية الشاشة: مَن لا `can_edit` له لا يرى زرًّا أصلًا
+     * (فالقارئُ الماليُّ داخلُ الأسرة ولا يفعل — وهذا صحيحٌ بتعريف دوره).
+     */
+    function fin_budget_approver_roles()
+    {
+        static $cache = null;
+        if ($cache !== null) { return $cache; }
+        $cache = array(strval(EMS_ROLE_CFO));
+        try {
+            // `roles` جدولٌ عالميٌّ (T_GLOBAL) — قراءةٌ بلا نطاق
+            $rows = ems_tenant_db()->select('roles', array(
+                'columns' => array('id'), 'where' => array('parent_role_id' => intval(EMS_ROLE_CFO)),
+            ));
+            foreach ($rows as $r) { $cache[] = strval($r['id']); }
+        } catch (\Throwable $t) {
+            error_log('fin budget approver roles: ' . $t->getMessage());
+            $cache = array_map('strval', EMS_ROLES_FINANCE);   // احتياطٌ ثابتٌ لا يفتح بابًا زائدًا
+        }
+        return $cache;
+    }
+}
+
+if (!function_exists('fin_budget_is_approver')) {
+    /**
+     * هل يملك الدورُ إجازةَ الموازنات؟ — الإدارةُ المالية: رئيسُها ومعاونوه
+     * (قرار المالك 2026-07-28، توسعةُ ما كان محصورًا في الدور 19 وحده).
+     *
+     * وحدَّان يبقيان قائمَين ولا تلغيهما التوسعة:
+     *   ① صلاحيةُ الشاشة (`can_edit`) ترشّح مَن يفعل فعلًا — الشاشةُ تفحصها.
+     *   ② لا يُجيز أحدٌ موازنةَ قسمٍ يملكه — `fin_budget_transition` تحرسه،
+     *      وإلا لأجاز المديرُ الماليُّ موازناتِ الإيرادات والخزينة والعام
+     *      وهي أقسامُه هو (وتلك ثغرةُ «مَن يُعدّ يعتمد» بعينها).
+     */
+    function fin_budget_is_approver($role, $is_super = false)
+    {
+        if ($is_super || strval($role) === '-1') { return true; }
+        return in_array(strval($role), fin_budget_approver_roles(), true);
+    }
+}
+
+if (!function_exists('fin_budget_editable_states')) {
+    /** الحالتان اللتان تُحرَّر فيهما البنود — وما سواهما مقفلٌ: لا تتغيّر أرقامٌ بعد الرفع. */
+    function fin_budget_editable_states() { return array('draft', 'returned'); }
+}
+
+if (!function_exists('fin_budget_transition')) {
+    /**
+     * انتقالاتُ دورة الموازنة الثلاثة (الدستور §4.3: الثلاثيةُ الموحّدة).
+     *   submit  : draft|returned → submitted  · مديرُ القسم
+     *   approve : submitted      → approved   · المدير المالي
+     *   return  : submitted      → returned   · المدير المالي بسببٍ إلزامي
+     *
+     * ولا يعتمد المرءُ ما رفَعه: المُجيزُ دورٌ **لا يملك رفعًا أصلًا**
+     * (fin_budget_can_submit تُعيد له false) — ففصلُ اليدين بنيويٌّ لا بفحصٍ لاحق.
+     *
+     * @return array ('status' => ok|denied|state|failed, 'reason')
+     */
+    function fin_budget_transition($conn, $budget_id, $action, $role, $user_id, $is_super = false, $reason = '')
+    {
+        $out = array('status' => 'failed', 'reason' => '');
+        $budget_id = intval($budget_id);
+        if ($budget_id <= 0) { $out['reason'] = 'معرّفٌ غير صالح'; return $out; }
+
+        $gate = fin_gate($is_super);
+        try { $b = $gate->selectOne('fin_budgets', array('where' => array('id' => $budget_id))); }
+        catch (\Throwable $t) { error_log('budget transition fetch: ' . $t->getMessage()); return $out; }
+        if (!$b) { $out['reason'] = 'الموازنةُ غير موجودة'; return $out; }
+
+        $state = strval($b['state']);
+        $dept  = strval($b['dept_module']);
+        $now   = date('Y-m-d H:i:s');
+        $data  = array();
+
+        if ($action === 'submit') {
+            if (!fin_budget_can_submit($role, $dept, $is_super)) {
+                $out['status'] = 'denied'; $out['reason'] = 'رفعُ موازنة القسم لمديره وحده'; return $out;
+            }
+            if (!in_array($state, fin_budget_editable_states(), true)) {
+                $out['status'] = 'state'; $out['reason'] = 'لا تُرفع إلا مسودةٌ أو معادة'; return $out;
+            }
+            $data = array('state' => 'submitted', 'submitted_by' => intval($user_id), 'submitted_at' => $now);
+        } elseif ($action === 'approve') {
+            if (!fin_budget_is_approver($role, $is_super)) {
+                $out['status'] = 'denied'; $out['reason'] = 'الإجازةُ للإدارة المالية'; return $out;
+            }
+            if (fin_budget_self_owned($role, $dept, $is_super)) {
+                $out['status'] = 'denied'; $out['reason'] = 'لا تُجيز موازنةَ قسمٍ تديره'; return $out;
+            }
+            if ($state !== 'submitted') {
+                $out['status'] = 'state'; $out['reason'] = 'لا تُجاز إلا موازنةٌ مرفوعة'; return $out;
+            }
+            $data = array('state' => 'approved', 'approved_by' => intval($user_id), 'approved_at' => $now);
+        } elseif ($action === 'return') {
+            if (!fin_budget_is_approver($role, $is_super)) {
+                $out['status'] = 'denied'; $out['reason'] = 'الإعادةُ للإدارة المالية'; return $out;
+            }
+            if (fin_budget_self_owned($role, $dept, $is_super)) {
+                $out['status'] = 'denied'; $out['reason'] = 'لا تُعيد موازنةَ قسمٍ تديره'; return $out;
+            }
+            if ($state !== 'submitted') {
+                $out['status'] = 'state'; $out['reason'] = 'لا تُعاد إلا موازنةٌ مرفوعة'; return $out;
+            }
+            $reason = trim((string) $reason);
+            if ($reason === '') {
+                $out['status'] = 'denied'; $out['reason'] = 'سببُ الإعادة إلزامي'; return $out;
+            }
+            $data = array('state' => 'returned', 'returned_by' => intval($user_id),
+                          'returned_at' => $now, 'return_reason' => mb_substr($reason, 0, 255));
+        } else {
+            $out['reason'] = 'إجراءٌ غير معروف'; return $out;
+        }
+
+        try { $gate->update('fin_budgets', $data, array('id' => $budget_id)); }
+        catch (\Throwable $t) { error_log('budget transition save: ' . $t->getMessage()); return $out; }
+
+        // الإشعارُ بسببه وقفزته (الدستور §9: «كل تنبيهٍ يحمل سببَه وزرَّ الانتقال»)
+        try {
+            $depts = fin_dept_modules();
+            $label = isset($depts[$dept]) ? $depts[$dept] : $dept;
+            $no    = strval($b['budget_no']);
+            if ($action === 'submit') {
+                fin_notify($conn, intval($b['company_id']), 'finance_manager',
+                    'موازنةٌ مرفوعةٌ تنتظر إجازتك: ' . $label . ' — ' . $no, 'budget_form_fin.php');
+            } elseif ($action === 'approve') {
+                fin_notify($conn, intval($b['company_id']), 'department',
+                    'أُجيزت موازنةُ ' . $label . ' — ' . $no, 'budget_form_fin.php');
+            } else {
+                fin_notify($conn, intval($b['company_id']), 'department',
+                    'أُعيدت موازنةُ ' . $label . ' لاستكمال: ' . mb_substr($reason, 0, 80), 'budget_form_fin.php');
+            }
+        } catch (\Throwable $t) { /* الإشعارُ لا يُسقط الانتقال */ }
+
+        $out['status'] = 'ok';
+        return $out;
     }
 }

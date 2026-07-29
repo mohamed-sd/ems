@@ -82,6 +82,13 @@ include('../insidebar.php');
     <?php else: ?>
 
     <?php if ($req): ?>
+        <?php
+        /* شريط الرحلة (الدستور §5: «أعلى شاشة كل معاملة») — أولُ ما يراه
+           فاتحُ الطلب: أين وصل، ومَن عليه الدور، وما سببُ الإعادة إن أُعيد. */
+        require_once __DIR__ . '/../includes/journey_bar.php';
+        $__jrt = finreq_routing_row($gate, $req['source_module']);
+        ems_journey_bar(finreq_journey($gate, $req, $timeline, $__jrt));
+        ?>
         <div class="card" style="margin-bottom:14px;">
             <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;">
                 <div><strong>الحالة:</strong> <?php echo finreq_state_badge($req['state']); ?></div>

@@ -23,6 +23,11 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+// موضوعُ الحزمة صندوقُ الاعتماد وحارسُ الطاقة لا وثائقُ الأهلية — والتحييدُ
+// قبل أي تحميلٍ لـconfig (انظر tests/_guard_env.php لسبب اللزوم).
+require_once __DIR__ . '/_guard_env.php';
+ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'));
+
 const BASE = 'http://localhost/ems';
 
 $env = array();

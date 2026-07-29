@@ -512,6 +512,30 @@ try {
         'where' => array('timesheet_id' => intval($project), 'status' => 1), 'orderBy' => 'created_at ASC'));
 } catch (\Throwable $t) { error_log('timesheet_details notes: ' . $t->getMessage()); }
 
+// ── شريطُ رحلة الوحدة (E-09 · UX-01 §6 · UX-03 §8.2) ──────────────────────
+// «فيرى المبتدئ أين هو وماذا بعد». صفرُ جدولٍ جديد: الرحلةُ إسقاطُ حالةِ
+// الواقعة وسجلِّها الإلحاقي. والمصدرُ هو السجلُّ القانوني `unit_entries`
+// موصولًا بصفّ الدوام عبر جسر `ts:` — فلا يُعرض شريطٌ لصفٍّ بلا مرآة.
+$ts_journey = null;
+try {
+    require_once __DIR__ . '/_ts_journey.php';
+    $ts_uuid = 'ts:' . intval($project);
+    $ts_entry_rows = $tsdet_gate->select('unit_entries', array(
+        'whereRaw' => 'sync_uuid = ?', 'params' => array($ts_uuid), 'limit' => 1));
+    if ($ts_entry_rows) {
+        $ts_entry = $ts_entry_rows[0];
+        $ts_apps = $tsdet_gate->select('unit_approvals', array(
+            'where' => array('entry_id' => intval($ts_entry['id'])), 'orderBy' => 'id ASC'));
+        $ts_journey = unit_journey($tsdet_gate, $ts_entry, $ts_apps);
+    }
+} catch (\Throwable $t) { error_log('timesheet_details journey: ' . $t->getMessage()); }
+
+if ($ts_journey !== null) {
+    echo '<div class="section-block">';
+    ems_journey_bar($ts_journey);
+    echo '</div>';
+}
+
 if ($result) foreach ($result as $row) {
     $shift_display = $row['shift'] == "D" ? "صباح" : "مساء";
     $shift_class   = $row['shift'] == "D" ? "day" : "night";

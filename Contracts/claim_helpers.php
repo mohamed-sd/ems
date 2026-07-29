@@ -162,6 +162,143 @@ if (!function_exists('claim_billable_units')) {
     }
 }
 
+if (!function_exists('claim_unbilled_scope')) {
+    /**
+     * وصلاتُ «الجاهز للفوترة ولم يُفوتر» وشرطُها — **تعريفٌ واحدٌ في موضعٍ واحد**.
+     * ─────────────────────────────────────────────────────────────────────
+     * هذه هي `claim_billable_units` نفسُها بلا قيدِ عقدٍ ولا فترة: قيدُ الإيراد
+     * شرطُ وجود (فيرث المستخلصُ بوابةَ التحويل)، والمستخلَصُ سلفًا يُستبعد
+     * بـLEFT JOIN و`IS NULL` (گوتشا البوابة: `NOT EXISTS` مرفوضٌ بنيويًّا).
+     *
+     * والعدّادُ والقائمةُ يبنيان منها معًا — فلا يفترق رقمٌ يراه المستخدم في
+     * اللوحة عن الصفوف التي ينقر إليها (UX-01 §10.3 «لكل مصدرٍ تعريفٌ واحد»).
+     * ⚠️ لا يُستنسخ هذا الشكلُ في موضعٍ ثالث: نسخةٌ ثانيةٌ = انفصامٌ مؤجَّل.
+     *
+     * @return array{scope: array, from: string}
+     */
+    function claim_unbilled_scope()
+    {
+        return array(
+            'scope' => array('ts' => 'timesheet', 'l' => 'fin_event_links',
+                             'fe' => 'fin_financial_events'),
+            'enrich' => array('o' => 'operations', 'cll' => 'claim_lines',
+                              'clh' => 'claims', 'ct' => 'contracts',
+                              'p' => 'project', 'cn' => 'clients'),
+            'from' => "FROM timesheet ts
+                       JOIN fin_event_links l
+                            ON l.parent_kind = 'timesheet' AND l.parent_ref = ts.id
+                           AND l.effect_type = 'revenue_event'
+                       JOIN fin_financial_events fe
+                            ON fe.id = l.target_id AND fe.event_type = 'revenue'
+                           AND COALESCE(fe.is_deleted,0) = 0
+                       LEFT JOIN operations o ON o.id = ts.operator
+                       LEFT JOIN claim_lines cll
+                              ON cll.source_kind = 'timesheet' AND cll.source_ref = ts.id
+                       LEFT JOIN claims clh
+                              ON clh.id = cll.claim_id AND clh.state <> 'cancelled'
+                             AND COALESCE(clh.is_deleted,0) = 0
+                       LEFT JOIN contracts ct ON ct.id = o.contract_id
+                       LEFT JOIN project p    ON p.id = ct.project_id
+                       LEFT JOIN clients cn   ON cn.id = p.client_id
+                      WHERE {TENANT_SCOPE}
+                        AND ts.status = 1
+                        AND clh.id IS NULL
+                        AND o.contract_id IS NOT NULL",
+        );
+    }
+}
+
+if (!function_exists('claim_unbilled_summary')) {
+    /**
+     * الجاهزُ للفوترة ولم يُفوتر — مجمَّعًا **بالعقد وعملته**.
+     *
+     * ⚠️ **العملةُ في المجموعة لا في الدالة** (مقيسٌ 2026-07-29): العقد 2 وحدَه
+     * فيه يومان بعملتين — 1600 SDG و400 USD. فجمعُهما في رقمٍ واحد (2000) رقمٌ
+     * لا معنى له، و**التوحيدُ إلى الأساس غيرُ متاحٍ بعد**: سعرُ SDG→USD لم
+     * يُدخَل (362 صفًّا تنتظره في سجل الأسعار). فالصفُّ لكل عملةٍ على حدة —
+     * إعلانُ الحقيقة كما هي أصدقُ من مجموعٍ يبدو نظيفًا وهو خطأ.
+     *
+     * وعدُّ الأيام `COUNT(DISTINCT ts.id)` لا `COUNT(*)`: يومٌ بقيدَي إيرادٍ
+     * يُعدُّ يومًا واحدًا.
+     *
+     * @return array[] contract_id · currency · days · amount · first_date
+     *                 · last_date · project_name · client_name
+     */
+    function claim_unbilled_summary($gate)
+    {
+        $d = claim_unbilled_scope();
+        try {
+            return $gate->scopedQuery(
+                array('scope' => $d['scope'], 'enrich' => $d['enrich']),
+                "SELECT o.contract_id AS contract_id,
+                        fe.currency AS currency,
+                        COUNT(DISTINCT ts.id) AS days,
+                        ROUND(SUM(fe.amount), 2) AS amount,
+                        MIN(ts.date) AS first_date,
+                        MAX(ts.date) AS last_date,
+                        MAX(p.name) AS project_name,
+                        MAX(cn.client_name) AS client_name
+                 {$d['from']}
+                  GROUP BY o.contract_id, fe.currency
+                  ORDER BY o.contract_id DESC, amount DESC", array());
+        } catch (\Throwable $t) {
+            error_log('claim_unbilled_summary: ' . $t->getMessage());
+            return array();
+        }
+    }
+}
+
+if (!function_exists('claim_unbilled_days')) {
+    /**
+     * عددُ **أيام العمل** الجاهزة للفوترة ولم تُفوتر — رقمُ تنبيه اللوحة.
+     *
+     * عدٌّ مستقلٌّ لا مجموعُ صفوف `claim_unbilled_summary`: تلك مجمَّعةٌ بالعملة
+     * أيضًا، فيومٌ بعملتين يظهر في صفّين ويُحسب مرتين لو جُمع. والوصلاتُ
+     * والشرطُ من `claim_unbilled_scope()` نفسِها — فالتعريفُ واحدٌ والعدُّ دقيق.
+     */
+    function claim_unbilled_days($gate)
+    {
+        $d = claim_unbilled_scope();
+        try {
+            $rows = $gate->scopedQuery(
+                array('scope' => $d['scope'], 'enrich' => $d['enrich']),
+                "SELECT COUNT(DISTINCT ts.id) AS n {$d['from']}", array());
+            return isset($rows[0]['n']) ? intval($rows[0]['n']) : 0;
+        } catch (\Throwable $t) {
+            error_log('claim_unbilled_days: ' . $t->getMessage());
+            return 0;
+        }
+    }
+}
+
+if (!function_exists('claim_pending_states')) {
+    /**
+     * حالاتُ «المطالبةِ المعلَّقة» — ما لم يبلغ الاعتمادَ بعد.
+     * `draft` عملُ المبيعات لم يُرفع · `review` رُفع وينتظر إجازةَ المالية.
+     * وكلاهما معلَّقٌ من زاوية المبيعات: الأولُ ينتظر يدَه، والثاني ينتظر ردًّا.
+     * والمعتمَدُ والمفوترُ والمحصَّلُ والملغى خارجَ العدّ — انتهى انتظارُها.
+     */
+    function claim_pending_states() { return array('draft', 'review'); }
+}
+
+if (!function_exists('claim_pending_count')) {
+    /** عددُ المستخلصات المعلَّقة — تعريفٌ واحدٌ للّوحة وللشاشة. */
+    function claim_pending_count($gate)
+    {
+        try {
+            $rows = $gate->scopedQuery(
+                array('scope' => array('cl' => 'claims')),
+                "SELECT COUNT(*) AS n FROM claims cl
+                  WHERE {TENANT_SCOPE} AND COALESCE(cl.is_deleted,0) = 0
+                    AND cl.state IN ('draft','review')", array());
+            return isset($rows[0]['n']) ? intval($rows[0]['n']) : 0;
+        } catch (\Throwable $t) {
+            error_log('claim_pending_count: ' . $t->getMessage());
+            return 0;
+        }
+    }
+}
+
 if (!function_exists('claim_period_diagnosis')) {
     /**
      * تشخيصُ فترةٍ لم تُنتج بنودًا — **أين وقف اليومُ في السلسلة؟**
@@ -377,7 +514,12 @@ if (!function_exists('claim_penalty_lines')) {
      *    الاثنين لخُصم مرتين. والبندُ الظاهرُ هو ما تنصّ عليه ق-19، فيُترك
      *    العمودُ صفرًا ويُقرأ الرصيدُ التراكميُّ بجمع بنود `retention` للعقد.
      */
-    function claim_penalty_lines($gate, $contract_id, $from, $to)
+    /**
+     * @param int $exclude_claim_id مستخلصٌ يُستثنى من حساب المستهلَك من الدفعة
+     *   المقدَّمة — لإعادة توليدٍ لا تعدّ بنودَ نفسِها استهلاكًا سابقًا. صفرٌ عند
+     *   التوليد الأول (المستخلصُ لم يُنشأ بعد).
+     */
+    function claim_penalty_lines($gate, $contract_id, $from, $to, $exclude_claim_id = 0)
     {
         $lines = array();
 
@@ -420,8 +562,20 @@ if (!function_exists('claim_penalty_lines')) {
                 );
             }
         }
+        // ── M-01: الاستردادُ محكومٌ برصيدٍ وسقف (2026-07-29) ────────────────
+        // كان هنا `round($base * $advPct / 100, 2)` **بلا رصيدٍ ولا سقفٍ ولا
+        // قبضٍ ابتدائي**، فيتكرر الخصمُ إلى الأبد حتى بعد تصفية الدفعة — بل
+        // ويقع على عقدٍ **لم تُقبض له دفعةٌ أصلًا** (النظامُ يسترد دَينًا لم
+        // يُقرضه؛ العقد 5: 12.50 مخصومةٌ وصفرُ قبضٍ مسجَّل).
+        //
+        // والآن: الأقلُّ من (النسبة · الرصيد)، **وصفرٌ إن لا رصيد** ⇒ لا بندَ
+        // يُولَّد أصلًا. فالحالةُ الافتراضية (لا قبضَ مسجَّل) توقف النزيفَ فورًا
+        // بلا انتظار قرار، ولا تُمسّ المبالغُ المخصومةُ سلفًا (تُرصد في
+        // `advance_reconciliation()` وتُقفل بقرار المالك).
         if ($advPct > 0) {
-            $amt = round($base * $advPct / 100, 2);
+            require_once __DIR__ . '/advance_helpers.php';
+            $rec = advance_recovery_due($gate, $contract_id, $base, $advPct, intval($exclude_claim_id));
+            $amt = round((float) $rec['due'], 2);
             if ($amt > 0) {
                 $lines[] = array(
                     'source_kind' => 'advance_recovery', 'source_ref' => intval($contract_id),

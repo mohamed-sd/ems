@@ -669,3 +669,146 @@ if (!function_exists('tkt_active_badge')) {
             : "<span class='action-btn' style='color:#c0392b'>معطّل</span>";
     }
 }
+
+if (!function_exists('tkt_journey')) {
+    /**
+     * بانيةُ شريط رحلة البلاغ (الدستور §5/§9 · UX-01 §6.3 · UX-07 §2).
+     * ─────────────────────────────────────────────────────────────────────
+     * المكوّنُ المصيِّر عامٌّ (includes/journey_bar.php) — هذه بانيتُه للبلاغ،
+     * توأمُ finreq_journey للطلب المالي. تقرأ ما هو مسجَّلٌ ولا تخترع.
+     *
+     * **خمسُ مراحلَ من مراحل النظام التسع** — والأربعُ الباقية ليست تقدّمًا:
+     *   ① سُجّل (new · classified) ② وُجّه (routed) ③ قيد التنفيذ (in_progress)
+     *   ④ أُنجز (done) ⑤ أُغلق (closed)
+     * و`waiting` و`follow_up` **وقفتان داخل ③** لا مرحلتان (نصُّ آلة الحالات:
+     * تعليقٌ بانتظار جهة ثم رفعُ المعوّق ثم استئنافُ التنفيذ — لا تقدّمَ فيهما)
+     * فتُعرضان لافتةً بسببها؛ و`cancelled` توقفٌ.
+     *
+     * **آخرُ دخولٍ للمرحلة لا أوّلُه**: البلاغُ يُعاد فتحُه ويُعاد للاستكمال
+     * (closed→follow_up · done→in_progress في الآلة)، فالزمنُ المعروض آخرُ مرةٍ
+     * دخل فيها المرحلةَ — وإلا عرضنا زمنَ دورةٍ ماتت.
+     *
+     * @param  array $events صفوف ticket_events مرتّبةً تصاعديًّا
+     * @return array عقد ems_journey_bar()
+     */
+    function tkt_journey(array $t, array $events = array())
+    {
+        require_once __DIR__ . '/../includes/journey_bar.php';   // ems_journey_ago
+
+        $stage = strval($t['stage']);
+
+        // ── ① آخرُ دخولٍ لكل مرحلة + سببُ آخر وقفة ─────────────────────
+        $stageIdx = array('new' => 1, 'classified' => 1, 'routed' => 2,
+                          'in_progress' => 3, 'done' => 4, 'closed' => 5);
+        $at = array();
+        $pauseReason = null; $pauseAt = null;
+        $escalations = 0;
+        foreach ($events as $ev) {
+            $type = strval($ev['event_type']);
+            if ($type === 'escalation') { $escalations++; continue; }
+            if ($type !== 'status_change' && $type !== 'system') { continue; }
+            $new = strval($ev['new_value']);
+            if ($new === '') { continue; }
+            if (isset($stageIdx[$new])) { $at[$stageIdx[$new]] = strval($ev['created_at']); }
+            if ($new === 'waiting' || $new === 'follow_up') {
+                $pauseReason = trim(strval($ev['body']));
+                $pauseAt = strval($ev['created_at']);
+            }
+        }
+        // زمنُ التسجيل من البلاغ نفسه حين لا حركةَ مسجَّلة له
+        if (!isset($at[1])) { $at[1] = strval($t['created_at']); }
+
+        // ── ② المرحلة الحالية ───────────────────────────────────────────
+        $paused = ($stage === 'waiting' || $stage === 'follow_up');
+        if     ($stage === 'cancelled')   { $current = 0; }      // توقف
+        elseif ($stage === 'closed')      { $current = 6; }      // كلُّها منجَزة
+        elseif (isset($stageIdx[$stage])) { $current = $stageIdx[$stage]; }
+        else                              { $current = $paused ? 3 : 1; }
+
+        if ($stage === 'cancelled') {
+            for ($k = 5; $k >= 1; $k--) { if (isset($at[$k])) { $current = $k + 1; break; } }
+            if ($current === 0) { $current = 1; }
+        }
+
+        // ── ③ الأصحاب: المسنَد إليه شخصًا إن وُجد، وإلا الإدارةُ المالكة ──
+        $roles = tkt_roles_map();
+        $ownerRole = isset($roles[intval($t['owner_role_id'])]) ? $roles[intval($t['owner_role_id'])] : '';
+        $assignee = '';
+        if (!empty($t['assigned_user_id'])) {
+            try {
+                $u = tkt_gate(false)->selectOne('users', array(
+                    'columns' => array('username'), 'where' => array('id' => intval($t['assigned_user_id']))));
+                if ($u && !empty($u['username'])) { $assignee = strval($u['username']); }
+            } catch (\Throwable $e) { /* اسمٌ زينةُ عرض */ }
+        }
+        $doer = ($assignee !== '') ? $assignee : $ownerRole;
+
+        $defs = array(
+            1 => array('label' => 'سُجّل',        'owner' => 'المبلِّغ'),
+            2 => array('label' => 'وُجّه',        'owner' => $ownerRole),
+            3 => array('label' => 'قيد التنفيذ', 'owner' => $doer),
+            4 => array('label' => 'أُنجز',        'owner' => $doer),
+            5 => array('label' => 'أُغلق',        'owner' => $ownerRole),
+        );
+
+        // ── ④ الساعتان: الاستجابة قبل البدء، والإنجاز بعده ──────────────
+        $isStopped = ($stage === 'cancelled');
+        $isFinal   = in_array($stage, array('done', 'closed', 'cancelled'), true);
+        $started   = !empty($t['first_action_at']);
+        $overdueResp = (!$isFinal && !$started && !empty($t['response_due_at'])
+                        && strtotime(strval($t['response_due_at'])) < time());
+        $overdueRes  = tkt_is_overdue($t);      // مهلة الإنجاز — الحارس القائم
+        $overdue = ($overdueResp || $overdueRes);
+
+        $stages = array();
+        foreach ($defs as $k => $d) {
+            if     ($k <  $current)  { $status = 'done'; }
+            elseif ($k === $current) { $status = $isStopped ? 'off' : 'current'; }
+            else                     { $status = $isStopped ? 'off' : 'todo'; }
+            $row = array('label' => $d['label'], 'status' => $status);
+            if (isset($at[$k]))     { $row['at'] = $at[$k]; }
+            if ($d['owner'] !== '') { $row['owner'] = $d['owner']; }
+            if ($status === 'current' && $overdue) { $row['overdue'] = true; }
+            if ($status === 'current' && $paused)  { $row['note'] = tkt_label(tkt_stages(), $stage); }
+            $stages[] = $row;
+        }
+
+        $j = array('stages' => $stages);
+
+        // ── ⑤ الخطوة التالية باسم صاحبها ────────────────────────────────
+        if (!$isStopped && $current >= 1 && $current <= 5) {
+            $since = isset($at[$current]) ? $at[$current] : strval($t['created_at']);
+            $j['next'] = array(
+                'label'   => $paused ? tkt_label(tkt_stages(), $stage) : $defs[$current]['label'],
+                'owner'   => $defs[$current]['owner'],
+                'since'   => $since,
+                'overdue' => $overdue,
+            );
+        }
+
+        // ── ⑥ اللافتة: وقفةٌ بسببها · إلغاءٌ · اكتمال ────────────────────
+        if ($paused) {
+            $j['banner'] = array(
+                'kind'  => 'return',
+                'title' => ($stage === 'waiting') ? 'موقوفٌ بانتظار جهةٍ أخرى:' : 'رُفع المعوّق — قيد المتابعة:',
+                'text'  => ($pauseReason !== null && $pauseReason !== '') ? $pauseReason : 'بلا سببٍ مسجَّل',
+                'meta'  => $pauseAt ? ems_journey_ago($pauseAt) : '',
+            );
+        } elseif ($isStopped) {
+            $j['banner'] = array('kind' => 'stop', 'title' => 'أُلغي البلاغ — توقفت الرحلة.');
+        } elseif ($stage === 'closed') {
+            $j['banner'] = array('kind' => 'done', 'title' => 'أُغلق البلاغ واكتملت رحلته.',
+                'meta' => isset($at[5]) ? ems_journey_ago($at[5]) : '');
+        } elseif ($overdueResp) {
+            $j['banner'] = array('kind' => 'stop', 'title' => 'انكسرت مهلة الاستجابة',
+                'text' => 'لم يبدأ أحدٌ العملَ عليه بعد.');
+        }
+
+        // التصعيداتُ المسجَّلة تُذكر عددًا — لا تُخترع درجة
+        if ($escalations > 0 && isset($j['next'])) {
+            $j['next']['label'] .= ' · صُعّد ' . ems_journey_plural($escalations, 'مرة', 'مرتين', 'مرات', 'مرةً');
+        }
+
+        return $j;
+    }
+}

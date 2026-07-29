@@ -112,6 +112,25 @@ $page_title="إيكوبيشن | تسويات العاملين"; include '../inhe
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تسوية جديدة');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
+    <?php /* ── إحالةٌ إلى المسار الموحّد (E-02 · 2026-07-29) ──────────────────
+       هذه الشاشةُ مسارُ كتابةٍ ثانٍ بإدخالٍ يدويٍّ حرٍّ للمبالغ — ومبدأُ النظام
+       «الإدخالُ مرةً واحدةً في المنبع وما سواه اشتقاق». فأُحيلت إلى العرض
+       (سُحبت مِنحُ الإضافة والتعديل بترحيل 2026_07_29)، والعملُ في الشاشة
+       الموحّدة التي تجلب البنودَ من مصادرها. ولم يُمسّ صفٌّ: الجدولُ فارغٌ
+       أصلًا (صفرُ صفٍّ مقيسٌ 2026-07-29) والبنيةُ باقيةٌ كما هي. */ ?>
+    <div class="card"><div class="card-body" style="border-right:4px solid #f59e0b;">
+        <p style="color:#78350f;margin:0;line-height:1.8;">
+            <i class="fas fa-triangle-exclamation"></i>
+            <strong>هذه الشاشةُ صارت للعرض فقط.</strong>
+            تسويةُ الموظف تُعدّ الآن من الشاشة الموحّدة التي <strong>تجلب البنودَ من
+            مصادرها</strong> — استحقاقُه وتحميلاتُه من دفتر ذممه بروابط أصولها،
+            بلا إدخال مبلغٍ باليد، وبفصلِ يدين: مَن يُعدّ لا يُجيز.
+            <br>
+            <a class="btn btn-sm btn-primary" style="margin-top:8px"
+               href="employee_settlements.php">
+               <i class="fas fa-arrow-left"></i> اذهب إلى «تسويات الموظفين»</a>
+        </p>
+    </div></div>
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>

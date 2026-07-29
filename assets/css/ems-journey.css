@@ -1,0 +1,192 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ems-journey.css — شريط الرحلة الموحّد
+ * ───────────────────────────────────────────────────────────────────────────
+ * الدستور §5 («شريط الرحلة — أعلى شاشة كل معاملة: المرحلةُ الحالية مضاءةً
+ * والتاليةُ باسم صاحبها») و§9 («لا شاشةَ تنتهي بطريقٍ مسدود») · UX-01 §6.
+ *
+ * مكوّنٌ واحدٌ لكل الرحلات (الطلب المالي · البلاغ · الوحدة) — لا نسخةَ لكل
+ * إدارة. الألوانُ من طقم النظام (design-tokens.css) لا ألوانًا محلية.
+ * الاتجاه عربيٌّ أصلًا: التسلسل يمضي يمينًا→يسارًا بـflex العادي في RTL.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.ems-journey {
+    background: var(--white, #fff);
+    border: 1px solid var(--gray-200, #E7E5E4);
+    border-radius: 10px;
+    padding: 14px 16px 12px;
+    margin-bottom: 14px;
+}
+
+/* ── المسار: شرائح متتابعة ────────────────────────────────────────────── */
+.ems-journey-track {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;                 /* الجداول العريضة تُمرَّر داخل حاويتها */
+    padding-bottom: 4px;
+}
+.ems-journey-track::-webkit-scrollbar { height: 6px; }
+.ems-journey-track::-webkit-scrollbar-thumb { background: var(--gray-300, #D6D3D1); border-radius: 3px; }
+
+.ems-jstep {
+    flex: 1 1 0;
+    min-width: 128px;
+    position: relative;
+    padding: 8px 10px 6px;
+    text-align: center;
+}
+/* الواصل بين المراحل — من مركز هذه الشريحة إلى مركز **سابقتها**.
+   بخصائصَ منطقية (inset-inline-end) لا بـleft: في RTL السابقةُ يمينًا وفي LTR
+   يسارًا — فيصحّ الاتجاهان بقاعدةٍ واحدة، ولا يتدلّى خطٌّ خارج آخر مرحلة. */
+.ems-jstep::before {
+    content: '';
+    position: absolute;
+    top: 19px;
+    inset-inline-end: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--gray-300, #D6D3D1);
+    z-index: 0;
+}
+.ems-jstep:first-child::before { display: none; }
+
+.ems-jdot {
+    position: relative;
+    z-index: 1;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    margin: 0 auto 6px;
+    border-radius: 50%;
+    background: var(--gray-100, #F5F5F4);
+    border: 2px solid var(--gray-300, #D6D3D1);
+    color: var(--gray-500, #78716C);
+    font-size: 12px;
+    font-weight: 800;
+}
+.ems-jlabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-700, #44403C);
+    line-height: 1.35;
+}
+.ems-jmeta {
+    font-size: 11px;
+    color: var(--gray-500, #78716C);
+    margin-top: 3px;
+    line-height: 1.5;
+}
+.ems-jowner { display: block; font-weight: 700; }
+
+/* ── منجَزة ───────────────────────────────────────────────────────────── */
+.ems-jstep.is-done .ems-jdot {
+    background: var(--success-100, #ECF1DE);
+    border-color: var(--success-600, #5B7F1E);
+    color: var(--success-deep, #365314);
+}
+.ems-jstep.is-done + .ems-jstep::before,
+.ems-jstep.is-done::before { background: var(--success-600, #5B7F1E); }
+.ems-jstep.is-done .ems-jlabel { color: var(--success-deep, #365314); }
+
+/* ── الحالية (مضاءة) ──────────────────────────────────────────────────── */
+.ems-jstep.is-current .ems-jdot {
+    background: var(--brand-amber, #F2AA2A);
+    border-color: var(--brand-orange-bright, #E67E00);
+    color: var(--brand-black, #0F1115);
+    box-shadow: 0 0 0 4px rgba(242, 170, 42, .22);
+}
+.ems-jstep.is-current .ems-jlabel {
+    color: var(--brand-black, #0F1115);
+    font-weight: 800;
+}
+/* المتأخرة عن مهلتها تتقدم بصريًّا بثبات (الدستور §9: «الحرجُ يتقدم بصريًّا») */
+.ems-jstep.is-current.is-overdue .ems-jdot {
+    background: var(--danger-100, #F5DCDC);
+    border-color: var(--danger-600, #991B1B);
+    color: var(--danger-deep, #7F1D1D);
+    box-shadow: 0 0 0 4px rgba(153, 27, 27, .18);
+}
+.ems-jstep.is-current.is-overdue .ems-jlabel { color: var(--danger-deep, #7F1D1D); }
+
+/* ── لم تبدأ ──────────────────────────────────────────────────────────── */
+.ems-jstep.is-todo .ems-jlabel { color: var(--gray-500, #78716C); font-weight: 600; }
+
+/* ── مسارٌ توقف (رفض/سحب/إلغاء…): ما بعده يُطفأ ───────────────────────── */
+.ems-jstep.is-off { opacity: .45; }
+
+/* ── سطر الخطوة التالية ───────────────────────────────────────────────── */
+.ems-journey-next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--gray-200, #E7E5E4);
+    font-size: 13px;
+    color: var(--gray-700, #44403C);
+}
+.ems-journey-next .ems-jnext-owner { font-weight: 800; color: var(--brand-black, #0F1115); }
+.ems-journey-next .ems-jage { color: var(--gray-500, #78716C); }
+.ems-journey-next .ems-jage.is-overdue { color: var(--danger-deep, #7F1D1D); font-weight: 800; }
+
+/* ── لافتة الإعادة (سببٌ بارزٌ فوق الحقول الناقصة — §4.3) ─────────────── */
+.ems-journey-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+.ems-journey-banner .ems-jb-title { font-weight: 800; }
+.ems-journey-banner .ems-jb-meta { font-size: 12px; opacity: .85; }
+.ems-journey-banner.is-return {
+    background: var(--warning-100, #F4E5D3);
+    border: 1px solid var(--warning-600, #A8541C);
+    color: var(--warning-deep, #7C2D12);
+}
+.ems-journey-banner.is-stop {
+    background: var(--danger-100, #F5DCDC);
+    border: 1px solid var(--danger-600, #991B1B);
+    color: var(--danger-deep, #7F1D1D);
+}
+.ems-journey-banner.is-done {
+    background: var(--success-100, #ECF1DE);
+    border: 1px solid var(--success-600, #5B7F1E);
+    color: var(--success-deep, #365314);
+}
+.ems-journey-banner .ems-jb-action {
+    margin-inline-start: auto;
+    background: var(--brand-black, #0F1115);
+    color: var(--white, #fff);
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.ems-journey-banner .ems-jb-action:hover { background: var(--brand-orange-bright, #E67E00); color: #fff; }
+
+/* ── الهاتف: المراحل قائمةً رأسيةً والحرجُ مقروء ──────────────────────── */
+@media (max-width: 720px) {
+    .ems-journey-track { display: block; overflow-x: visible; }
+    .ems-jstep {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        text-align: start;
+        min-width: 0;
+        padding: 6px 2px;
+    }
+    .ems-jstep::before {
+        top: -6px; bottom: auto;
+        inset-inline-start: 13px; inset-inline-end: auto;
+        width: 2px; height: 12px;
+    }
+    .ems-jdot { margin: 0; flex: 0 0 26px; }
+    .ems-journey-banner .ems-jb-action { margin-inline-start: 0; }
+}

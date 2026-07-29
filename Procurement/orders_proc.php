@@ -49,6 +49,29 @@ foreach ($request_option_rows as &$ror) {
 }
 unset($ror);
 
+// ── تسجيلُ فاتورة المورد ومطابقتُها الثلاثية (UX-09 §8.2) ──
+// «لا استحقاقَ بلا مطابقة»: تُقارن الفاتورةُ بالأمر وبالاستلام، فإن كانت ضمن
+// السماح فُتح دَينُ المورد، وإلا وقفت بفرقها حتى قرارٍ موثَّق.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match_invoice') {
+    if (!$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $mid = intval($_POST['id'] ?? 0);
+    $res = proc_match_invoice(
+        $conn, $mid,
+        $_POST['invoice_no'] ?? '',
+        $_POST['invoice_date'] ?? '',
+        $_POST['invoice_amount'] ?? 0,
+        $current_user_id
+    );
+    if ($res['status'] === 'matched') {
+        $msg = 'طوبقت الفاتورةُ وفُتح استحقاقُ المورد ✅';
+    } elseif ($res['status'] === 'var_pending') {
+        $msg = 'فرقٌ فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' ⚠️';
+    } else {
+        $msg = 'تعذّرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
+    }
+    header("Location: orders_proc.php?edit_id=" . $mid . "&msg=" . urlencode($msg)); exit();
+}
+
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -197,6 +220,59 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     ?>
 
     <?php proc_msg_banner(); ?>
+
+    <?php if ($edit): /* ── فاتورةُ المورد ومطابقتُها الثلاثية (UX-09 §8.2) ── */
+        $__gated  = in_array((string)$edit['state'], proc_order_expense_states(), true);
+        $__ms     = (string)($edit['match_state'] ?? 'unmatched');
+        $__tol    = round(proc_match_tolerance((float)$edit['total_amount']), 2);
+        $__tone   = ($__ms === 'matched') ? '#166534' : (($__ms === 'var_pending') ? '#991b1b' : '#78716c');
+        $__label  = array('unmatched' => 'لم تُطابَق', 'matched' => 'مطابَقة', 'var_pending' => 'فرقٌ ينتظر قرارًا', 'rejected' => 'مرفوضة');
+    ?>
+    <div class="card" style="margin-bottom:14px">
+        <div class="card-header"><h5><i class="fas fa-file-invoice"></i> فاتورة المورد والمطابقة الثلاثية</h5></div>
+        <div class="card-body">
+            <p class="text-muted" style="margin:0 0 10px">
+                تُقارن الفاتورةُ بأمر الشراء (السعر المتفق) وبسند الاستلام (ما وصل فعلًا).
+                ضمن السماح <strong><?php echo number_format($__tol, 2); ?></strong>
+                <?php echo htmlspecialchars((string)$edit['currency']); ?> (±2٪ أو 100 أيُّهما أصغر)
+                يُفتح استحقاقُ المورد — وفوقه تقف بفرقها حتى قرارٍ موثَّق.
+            </p>
+            <div style="margin-bottom:10px">
+                <strong>الحالة:</strong>
+                <span style="color:<?php echo $__tone; ?>;font-weight:800">
+                    <?php echo htmlspecialchars($__label[$__ms] ?? $__ms); ?></span>
+                <?php if (!empty($edit['invoice_no'])): ?>
+                    · فاتورة <strong><?php echo htmlspecialchars((string)$edit['invoice_no']); ?></strong>
+                    <?php if (!empty($edit['invoice_amount'])): ?>
+                        بقيمة <?php echo number_format((float)$edit['invoice_amount'], 2); ?>
+                        (الأمر <?php echo number_format((float)$edit['total_amount'], 2); ?>)
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+            <?php if (!$__gated): ?>
+                <div class="alert alert-info" style="margin:0">
+                    لا مطابقةَ قبل الاستلام النهائي — حالةُ الأمر الآن:
+                    <strong><?php echo htmlspecialchars((string)$edit['state']); ?></strong>.
+                </div>
+            <?php elseif ($can_edit): ?>
+                <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+                    <input type="hidden" name="action" value="match_invoice">
+                    <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
+                    <div class="form-group"><label>رقم الفاتورة</label>
+                        <input type="text" name="invoice_no" required
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_no'] ?? '')); ?>"></div>
+                    <div class="form-group"><label>تاريخها</label>
+                        <input type="date" name="invoice_date"
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_date'] ?? '')); ?>"></div>
+                    <div class="form-group"><label>قيمتها</label>
+                        <input type="number" step="0.01" name="invoice_amount" required
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>"></div>
+                    <button type="submit" class="btn-save"><i class="fas fa-scale-balanced"></i> طابِق</button>
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <form id="procForm" action="orders_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل أمر شراء' : 'أمر شراء جديد'; ?></h5></div>

@@ -260,6 +260,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     if (in_array($effective_state, $active_states, true) && $equipment_id) {
         mnt_mark_equipment_unhealthy($conn, $equipment_id, $company_id, $current_user_id);
     }
+    // أثرُ التكلفة يُنشر من منبعه لحظةَ الإقفال (UX-04 §8.2 · FES §7 و§8) —
+    // بعد إعادة احتساب المجاميع أعلاه فالمبلغُ نهائي. بمفتاح الاستيراد نفسه
+    // فلا ازدواج، ولا يرمي فلا يضيع الإقفالُ لتعثّرِ نشر.
+    if ($closing_now) {
+        mnt_publish_order_cost($conn, $oid, $current_user_id, 'close');
+    }
+
     if ($closing_now && $equipment_id) {
         mnt_mark_equipment_healthy($conn, $equipment_id, $company_id, $current_user_id);
         mnt_return_equipment_available($conn, $equipment_id, $company_id);

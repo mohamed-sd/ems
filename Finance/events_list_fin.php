@@ -386,6 +386,9 @@ include '../insidebar.php';
     $(document).ready(function () {
         $('#finTable').DataTable({
             scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
+            // الأحدثُ أولًا: الترتيبُ من الخادم (ORDER BY e.id DESC) — نمنع فرزَ
+            // DataTables الافتراضيَّ على عمود «الإجراءات» الذي كان يبعثره
+            order: [],
             buttons: [
                 { extend: 'copy', text: '📋 نسخ' },
                 { extend: 'excel', text: '📊 Excel' },

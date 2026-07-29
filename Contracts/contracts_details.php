@@ -257,6 +257,90 @@ include '../insidebar.php';
 
             </div>
 
+            <?php
+            // ── M-01: رصيدُ الدفعة المقدَّمة في ملف العقد (ق-19) ──────────────
+            // «رصيدٌ تراكميٌّ ظاهر»: المقبوضُ والمستهلَكُ والمتبقي — وكلُّ رقمٍ
+            // مصدرُه سجلٌّ يُنقر إليه (سنداتُ القبض · بنودُ المستخلصات).
+            // ولا يُعرض اللوحُ إلا لعقدٍ له نسبةُ استردادٍ أو قبضٌ مسجَّل — فلا
+            // يُثقَّل ملفُّ عقدٍ لا دفعةَ فيه بسؤالٍ لا معنى له.
+            $adv_bal = null; $adv_sch = array(); $adv_recv = array();
+            try {
+                require_once __DIR__ . '/advance_helpers.php';
+                $adv_cid = isset($contract_id) ? intval($contract_id) : 0;
+                if ($adv_cid > 0) {
+                    $adv_bal = advance_balance($details_gate, $adv_cid);
+                    if ($adv_bal['received'] > 0 || $adv_bal['recovered'] > 0) {
+                        $adv_sch  = advance_schedule($details_gate, $adv_cid);
+                        $adv_recv = $details_gate->select('contract_advances', array(
+                            'where' => array('contract_id' => $adv_cid), 'orderBy' => 'received_date ASC'));
+                    } else { $adv_bal = null; }
+                }
+            } catch (\Throwable $t) { error_log('contract advance panel: ' . $t->getMessage()); $adv_bal = null; }
+            if ($adv_bal !== null):
+            ?>
+            <div class="section-wrapper">
+                <div class="section-header">
+                    <div class="section-header-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+                    <h4>الدفعةُ المقدَّمة — الرصيدُ التراكمي</h4>
+                </div>
+                <div style="padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-bottom:14px">
+                    <p style="margin:0 0 8px;line-height:1.9;color:#78350f">
+                        <strong>المقبوض:</strong> <?php echo number_format($adv_bal['received'], 2); ?>
+                        · <strong>المستهلَك:</strong> <?php echo number_format($adv_bal['recovered'], 2); ?>
+                        · <strong>المتبقي:</strong>
+                        <strong style="color:<?php echo ($adv_bal['balance'] < 0) ? '#b91c1c' : '#15803d'; ?>">
+                            <?php echo number_format($adv_bal['balance'], 2); ?></strong>
+                        <?php if ($adv_bal['balance'] < 0): ?>
+                            <br><i class="fas fa-triangle-exclamation"></i>
+                            <strong>رصيدٌ سالب:</strong> استُردّ أكثرُ ممّا قُبض —
+                            وهو انحرافٌ معلَنٌ ينتظر قرارَ المالك، ولا يُصحَّح بمسحٍ ولا تعديل.
+                        <?php elseif ($adv_bal['balance'] == 0 && $adv_bal['received'] > 0): ?>
+                            <br><i class="fas fa-circle-check"></i>
+                            استُردّت الدفعةُ بالكامل — <strong>ولا استقطاعَ بعدها</strong>.
+                        <?php endif; ?>
+                    </p>
+                    <?php if ($adv_recv): ?>
+                    <div style="overflow-x:auto">
+                    <table class="table table-sm" style="width:100%;font-size:13px">
+                        <thead><tr><th>سندُ القبض</th><th>التاريخ</th><th>المبلغ</th><th>المستند</th><th>الحالة</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($adv_recv as $a): ?>
+                            <tr<?php echo ((string) $a['state'] === 'cancelled') ? ' style="opacity:.55"' : ''; ?>>
+                                <td><code><?php echo htmlspecialchars((string) $a['advance_no']); ?></code></td>
+                                <td><?php echo htmlspecialchars((string) $a['received_date']); ?></td>
+                                <td><?php echo number_format((float) $a['amount'], 2) . ' ' . htmlspecialchars((string) $a['currency']); ?></td>
+                                <td><?php echo htmlspecialchars((string) $a['doc_ref']); ?></td>
+                                <td><?php echo ((string) $a['state'] === 'cancelled') ? 'ملغى' : 'مقبوض'; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    <?php endif; ?>
+                    <?php if ($adv_sch): ?>
+                    <p style="margin:10px 0 4px;font-weight:700;color:#78350f">جدولُ الاستهلاك</p>
+                    <div style="overflow-x:auto">
+                    <table class="table table-sm" style="width:100%;font-size:13px">
+                        <thead><tr><th>المستخلص</th><th>الفترة</th><th>المستهلَك</th><th>حالتُه</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($adv_sch as $s): ?>
+                            <tr>
+                                <td><code><?php echo htmlspecialchars((string) $s['claim_no']); ?></code></td>
+                                <td><?php echo htmlspecialchars($s['period_from'] . ' → ' . $s['period_to']); ?></td>
+                                <td><?php echo number_format(-(float) $s['amount'], 2); ?></td>
+                                <td><?php echo htmlspecialchars((string) $s['claim_state']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    <?php else: ?>
+                        <p style="margin:8px 0 0;color:#78350f">لم يُستهلك منها شيءٌ بعد.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- ===== DETAIL CARDS ===== -->
             <div class="section-wrapper">
                 <div class="section-header">

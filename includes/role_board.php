@@ -123,10 +123,15 @@ function roleBoardAlertSpecs($roleId)
             array('key' => 'sla_broken',          'label' => 'بلاغٌ كسر مهلته',          'href' => '../Tickets/tickets_list.php', 'tone' => 'err'),
             array('key' => 'repeat_late_dept',    'label' => 'إدارةٌ تكرر التأخر',       'href' => '../Tickets/ticket_dashboard.php', 'tone' => 'warn'),
         ),
-        // §8.7 · ادارة المبيعات — اثنان من أربعة: «مطالبةٌ معلّقة» و«وحداتٌ جاهزة
-        // للفوترة لم تُفوتر» بلا مصدرٍ بعد (لا جدولَ مستخلصاتٍ ولا فواتير —
-        // ينتظران UX-08 §8.1) فلا يُعرضان — قاعدة عدم التلفيق.
+        // §8.7 · ادارة المبيعات — **الأربعةُ كاملةً منذ 2026-07-29**.
+        // كان هنا تعليقٌ يقول إن «مطالبةً معلَّقة» و«وحداتٍ جاهزةً للفوترة» بلا
+        // مصدر — وقد صار لهما مصدرٌ حيٌّ يوم بُني `claims`/`claim_lines`
+        // (2026-07-27)، فبقاءُ التعليق كذبٌ موثَّق: قاعدةُ عدم التلفيق تعمل في
+        // الاتجاهين — لا رقمَ بلا مصدر، ولا إعلانَ عدمِ مصدرٍ ومصدرُه قائم.
+        // والتعريفان يُقرآن من `claim_helpers` نفسِها التي تقرأ منها الشاشة.
         12 => array(
+            array('key' => 'unbilled_units',  'label' => 'وحداتٌ جاهزةٌ للفوترة لم تُفوتر', 'href' => '../Contracts/claims.php?unbilled=1', 'tone' => 'err'),
+            array('key' => 'claim_pending',   'label' => 'مطالبةٌ معلَّقة',                 'href' => '../Contracts/claims.php?pending=1',  'tone' => 'warn'),
             array('key' => 'contract_ending', 'label' => 'عقدٌ ينتهي خلال 30 يومًا',     'href' => '../Contracts/contracts.php',   'tone' => 'warn'),
             array('key' => 'quote_stale',     'label' => 'عرضٌ بلا ردٍّ فوق أسبوع',      'href' => '../Clients/quotations.php',    'tone' => 'warn'),
         ),
@@ -394,6 +399,23 @@ function roleBoardAlerts($conn, $gate, $roleId)
                     AND NOT EXISTS (SELECT 1 FROM modules m WHERE m.owner_role_id = ro.id)");
                 $counts['role_no_screens'] = $r ? intval($r->fetch_row()[0]) : 0;
             } catch (\Throwable $t) { $counts['role_no_screens'] = 0; }
+        }
+        // ── §8.7 عدّادا المبيعات — من `claim_helpers` لا باستعلامٍ منسوخ ──────
+        // خارجَ الجدول التصريحي عمدًا: تعريفُ «الجاهز للفوترة» ثلاثُ وصلاتٍ
+        // وشرطُ `IS NULL`، ونسخُه هنا يفتح بابَ الانفصام عن الشاشة (وهو الفخُّ
+        // نفسُه الذي وقع في المستخلص حين سعّر من `executed_hours` والمروحةُ من
+        // الكمية المحكومة). فالمصدرُ واحدٌ والنداءُ نداء — كنمط الدور 15 أعلاه.
+        if ($rid === 12) {
+            try {
+                require_once dirname(__DIR__) . '/Contracts/claim_helpers.php';
+                $counts['unbilled_units'] = claim_unbilled_days($gate);
+                $counts['claim_pending']  = claim_pending_count($gate);
+            } catch (\Throwable $t) {
+                // تعذّرٌ يُسجَّل ويُطفئ التنبيهَ — ولا يُخترع له رقم
+                error_log('role_board sales counters: ' . $t->getMessage());
+                $counts['unbilled_units'] = 0;
+                $counts['claim_pending']  = 0;
+            }
         }
         foreach (roleBoardAlertSpecs($rid) as $spec) {
             $n = isset($counts[$spec['key']]) ? intval($counts[$spec['key']]) : 0;

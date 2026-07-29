@@ -323,6 +323,7 @@ class EffectFanout
                        o.id AS op_id, o.project_id, o.contract_id, o.equipment_type,
                        e.id AS equipment_id, e.suppliers AS supplier_id,
                        emp.id AS employee_id,
+                       prj.client_id AS client_entity_id,
                        c.price_currency_contract AS client_cur_label,
                        ce.equip_price AS client_price, ce.equip_unit AS client_unit_label,
                        ce.equip_price_currency AS client_line_cur_label
@@ -330,6 +331,7 @@ class EffectFanout
                 LEFT JOIN operations o ON o.id = t.operator
                 LEFT JOIN equipments e ON e.id = o.equipment
                 LEFT JOIN employees emp ON emp.id = t.employee_id
+                LEFT JOIN project prj ON prj.id = o.project_id
                 LEFT JOIN contracts c ON c.id = o.contract_id
                 LEFT JOIN contractequipments ce ON ce.id = (
                     SELECT MIN(x.id) FROM contractequipments x
@@ -351,13 +353,13 @@ class EffectFanout
             'hour'  => (float) $t['executed_hours'],
             'ton'   => (float) $t['tons_count'],
             'meter' => (float) $t['meters_count'],
-        );
-
             // CON-02 §3 «النقلة» (T-16 · 2026-07-28): المصدرُ قائمٌ سلفًا
             // (trips_count) وENUMات الوحدة تحويها؛ الناقصُ كان وسمَ العقد وحده.
             // خاملٌ بنيويًّا اليوم: صفرُ عقدٍ يفوتر بالنقلة (المقيس: ساعة×8 ·
             // متر طولي×1 · فارغ×2)، وكلُّ طرفٍ يقرأ وحدةَ عقده هو.
             'trip'  => (float) $t['trips_count'],
+        );
+
         $ctx = array(
             'id' => $tsId,
             'company_id' => intval($t['company_id']),
@@ -386,6 +388,9 @@ class EffectFanout
             //    آخر: مستحق المورد وتكلفته يقرآن من $ctx['supplier'] حصرًا.
             'unit' => null, 'qty' => 0.0,
             'operator_hours' => (float) $t['operator_hours'],
+            // العميلُ المَدين — سلسلةُ (تشغيل → مشروع → عميل) المتحقَّقة. غيابُه
+            // يُترك null معلَنًا: قيدُ إيرادٍ بلا مَدينٍ خللٌ يُرى لا يُخترع له رقم.
+            'client_entity_id' => !empty($t['client_entity_id']) ? intval($t['client_entity_id']) : null,
             'project_id' => !empty($t['project_id']) ? intval($t['project_id']) : null,
             'equipment_id' => $t['equipment_id'] !== null ? intval($t['equipment_id']) : null,
             'employee_id' => $t['employee_id'] !== null ? intval($t['employee_id']) : null,
@@ -421,16 +426,27 @@ class EffectFanout
         if ($fanoutSource === 'legal') {
             $luuid = 'ts:' . $tsId;
             $lco = intval($t['company_id']);
-            $lq = $conn->prepare("SELECT id, unit_type, qty FROM unit_entries
+            // ⚠️ M-24 ①: `qty_billable` يُقرأ هنا — حكمُ **الواقعة** على كميتها.
+            // بلا قراءته يبقى فرعُ الكمية أعمى عن المصفوفة كما كان.
+            $lq = $conn->prepare("SELECT id, unit_type, qty, qty_billable, qty_ruling_note
+                                    FROM unit_entries
                                    WHERE company_id=? AND sync_uuid=? LIMIT 1");
             $lq->bind_param('is', $lco, $luuid);
             $lq->execute();
             $le = $lq->get_result()->fetch_assoc();
             $lq->close();
             if ($le) {
-                $lq = $conn->prepare("SELECT ops_state, COALESCE(SUM(hours),0) h
+                // المحورُ الثاني (ق-1): التجميعُ بـ(حالة × بندُ التزام) لا بالحالة
+                // وحدَها — وإلا ضاع البندُ قبل أن يبلغ الحكم. و`states` المجمَّعةُ
+                // تبقى كما هي لمن يقرؤها (اللقطاتُ والتقاريرُ والمسارُ الحيّ).
+                // ⚠️ التجميعُ يشمل الأحكامَ الثلاثة عمدًا: هي **لقطةٌ لكل سطر**
+                //    (هـ-3)، فجمعُ سطرين بحكمين مختلفين في صفٍّ واحدٍ يُضيّع أحدَهما.
+                $lq = $conn->prepare("SELECT ops_state, obligation_type,
+                                             billable, supplier_countable, operator_countable,
+                                             COALESCE(SUM(hours),0) h
                                         FROM unit_time_log WHERE company_id=? AND entry_id=?
-                                       GROUP BY ops_state");
+                                       GROUP BY ops_state, obligation_type,
+                                                billable, supplier_countable, operator_countable");
                 $leId = intval($le['id']);
                 $lq->bind_param('ii', $lco, $leId);
                 $lq->execute();
@@ -439,9 +455,19 @@ class EffectFanout
                                  'tech_breakdown' => 0.0, 'operator_stop' => 0.0, 'client_stop' => 0.0,
                                  'supplier_stop' => 0.0, 'planned_stop' => 0.0, 'force_majeure' => 0.0,
                                  'fuel_logistics_stop' => 0.0, 'other' => 0.0);
+                $llines = array();
                 while ($lr = $lres->fetch_assoc()) {
                     $lk = ($lr['ops_state'] === 'unlogged') ? 'other' : $lr['ops_state'];
                     if (isset($lstates[$lk])) { $lstates[$lk] += (float) $lr['h']; }
+                    $llines[] = array(
+                        'state' => $lk, 'hours' => (float) $lr['h'],
+                        'obligation_type' => ($lr['obligation_type'] === null || $lr['obligation_type'] === '')
+                            ? null : strval($lr['obligation_type']),
+                        // لقطةُ الإسناد — NULL أي «سطرٌ ما قبل المصفوفة» فيُحكم بالسياسة
+                        'billable'           => ($lr['billable'] === null) ? null : intval($lr['billable']),
+                        'supplier_countable' => ($lr['supplier_countable'] === null) ? null : intval($lr['supplier_countable']),
+                        'operator_countable' => ($lr['operator_countable'] === null) ? null : intval($lr['operator_countable']),
+                    );
                 }
                 $lq->close();
 
@@ -456,8 +482,13 @@ class EffectFanout
                 $recorded = $lrec;
                 $ctx['recorded'] = $lrec;
                 $ctx['states'] = $lstates;
+                $ctx['state_lines'] = $llines;   // بمحورَيها — يقرؤها حكمُ الساعة
                 $ctx['legal_source'] = true;
                 $ctx['legal_entry_id'] = $leId;
+                // M-24 ①: حكمُ الواقعة على كميتها — NULL = لم يُحكم = مفوترة
+                $ctx['qty_billable'] = ($le['qty_billable'] === null) ? null : intval($le['qty_billable']);
+                $ctx['qty_ruling_note'] = ($le['qty_ruling_note'] === null || $le['qty_ruling_note'] === '')
+                    ? null : strval($le['qty_ruling_note']);
             }
         }
 
@@ -545,38 +576,205 @@ class EffectFanout
     }
 
     /**
-     * سياسة استحقاق عقد الساعة السارية بتاريخ العمل (D02 §3.8).
-     * الأخصّ يغلب: قاعدةُ العقد نفسه تسبق الافتراضية (contract_ref = NULL)،
-     * والسارية بالتاريخ تسبق المفتوحة. قراءةٌ خالصةٌ بلا كتابة.
+     * سياسة استحقاق عقد الساعة السارية بتاريخ العمل (D02 §3.8 · CON-02 §5).
      *
-     * @return array<string,array{ruling:string,pct:?float,note:?string,scope:string}>
+     * **المحورُ الثاني (ق-1):** صار الحكمُ مفتاحُه **(حالة × بندُ التزام × طرف)**
+     * لا (حالة × طرف) وحدَها. فالسياسةُ تُقرأ في أربع سِلالٍ ويحسمها
+     * `resolveRuling()` بسُلَّم الأخصّ (هـ-5).
+     *
+     * الأخصّ يغلب داخل كل سلّة: السارية بالتاريخ تسبق المفتوحة (ORDER BY أدناه)،
+     * والأوّلُ الواصلُ يفوز. قراءةٌ خالصةٌ بلا كتابة.
+     *
+     * @return array<string,array<string,array<string,array{ruling:string,pct:?float,note:?string,scope:string,obligation_type:?string}>>>
+     *         [ops_state][contract|default][obligation_type|'*']
      */
     public static function hourPolicy($gate, $company, $partyScope, $contractRef, $workDate)
     {
         $rows = $gate->scopedQuery(
             array('scope' => array('p' => 'contract_hour_policies')),
-            "SELECT p.ops_state, p.ruling, p.pct, p.note, p.contract_ref
+            "SELECT p.ops_state, p.obligation_type, p.ruling, p.pct, p.note, p.contract_ref
                FROM contract_hour_policies p
               WHERE {TENANT_SCOPE} AND p.deleted_at IS NULL
                 AND p.party_scope = ?
                 AND (p.contract_ref = ? OR p.contract_ref IS NULL)
                 AND (p.effective_from IS NULL OR p.effective_from <= ?)
                 AND (p.effective_to   IS NULL OR p.effective_to   >= ?)
-              ORDER BY (p.contract_ref IS NULL) ASC, p.effective_from DESC",
+              ORDER BY (p.contract_ref IS NULL) ASC, (p.obligation_type IS NULL) ASC, p.effective_from DESC",
             array($partyScope, intval($contractRef), $workDate, $workDate)
         );
         $out = array();
         foreach ($rows as $r) {
-            $st = strval($r['ops_state']);
-            if (isset($out[$st])) { continue; } // الأوّل هو الأخصّ (الترتيب أعلاه)
-            $out[$st] = array(
+            $st    = strval($r['ops_state']);
+            $scope = ($r['contract_ref'] === null) ? 'default' : 'contract';
+            $ob    = ($r['obligation_type'] === null) ? '*' : strval($r['obligation_type']);
+            if (isset($out[$st][$scope][$ob])) { continue; } // الأوّل هو الأخصّ (الترتيب أعلاه)
+            $out[$st][$scope][$ob] = array(
                 'ruling' => strval($r['ruling']),
                 'pct' => ($r['pct'] === null) ? null : (float) $r['pct'],
                 'note' => $r['note'],
-                'scope' => ($r['contract_ref'] === null) ? 'company_default' : 'contract',
+                'scope' => ($scope === 'default') ? 'company_default' : 'contract',
+                'obligation_type' => ($ob === '*') ? null : $ob,
             );
         }
         return $out;
+    }
+
+    /**
+     * سُلَّمُ الأخصِّ (هـ-5) — أربعُ درجاتٍ بترتيبٍ ملزَم:
+     *   ① (عقد + بند)  ← نصُّ العقد على هذا البند بعينه
+     *   ② (عقد بلا بند) ← نصُّ العقد العامُّ للحالة
+     *   ③ (افتراضي + بند) ← سياسةُ الشركة على هذا البند
+     *   ④ (افتراضي)     ← سياسةُ الشركة العامة
+     *
+     * **العقدُ يغلب البندَ عمدًا**: نصُّ العقد المكتوبُ مع هذا العميل أخصُّ من
+     * سياسةٍ عامةٍ للشركة مهما دقّت — فالمالُ يُحكم بما وُقّع لا بما اعتدنا.
+     *
+     * وغيابُ الأربع كلِّها **لا يُخترع له حكم**: تُرجَع `case_by_case` بنطاقٍ
+     * `missing` فتُرى الفجوةُ في اللقطة ولا تُبتلع (قاعدة عدم التلفيق).
+     *
+     * @param array   $policy  مخرَجُ hourPolicy()
+     * @param string  $state   حالةُ الساعة
+     * @param ?string $oblig   بندُ الالتزام المُسنَد — NULL أي لا بندَ (تشغيلٌ فعليّ)
+     */
+    public static function resolveRuling(array $policy, $state, $oblig = null)
+    {
+        $st = strval($state);
+        $ob = ($oblig === null || $oblig === '') ? null : strval($oblig);
+        $ladder = array();
+        if ($ob !== null) { $ladder[] = array('contract', $ob); }
+        $ladder[] = array('contract', '*');
+        if ($ob !== null) { $ladder[] = array('default', $ob); }
+        $ladder[] = array('default', '*');
+
+        foreach ($ladder as $rung) {
+            if (isset($policy[$st][$rung[0]][$rung[1]])) {
+                return $policy[$st][$rung[0]][$rung[1]];
+            }
+        }
+        return array('ruling' => 'case_by_case', 'pct' => null,
+                     'note' => 'لا قاعدةَ مسجَّلةٌ لهذه الحالة', 'scope' => 'missing',
+                     'obligation_type' => $ob);
+    }
+
+    /**
+     * سطورُ الزمن التي يقرؤها حكمُ الساعة — بمحورَيها (حالة × بندُ التزام).
+     *
+     * **مصدرٌ واحدٌ ومسارانِ**: حين يقود المصدرُ القانوني (`unit_time_log`) تأتي
+     * السطورُ بأبعادها كاملةً فيحمل كلُّ سطرٍ بندَ التزامه المُسنَد؛ وحين يقود
+     * الحيُّ (أعمدةُ `timesheet`) فلا بندَ هناك أصلًا — والبندُ NULL يعني «القاعدةُ
+     * العامة»، وهو **بالضبط سلوكُ اليوم**. فالمسارُ الحيُّ لا يتغيّر بحرف.
+     *
+     * @return array<int,array{state:string,hours:float,obligation_type:?string}>
+     */
+    private static function stateLines(array $ctx)
+    {
+        if (!empty($ctx['state_lines']) && is_array($ctx['state_lines'])) {
+            return $ctx['state_lines'];
+        }
+        $out = array();
+        foreach ($ctx['states'] as $state => $hours) {
+            $out[] = array('state' => strval($state), 'hours' => (float) $hours,
+                           'obligation_type' => null);
+        }
+        return $out;
+    }
+
+    /**
+     * حكمُ عقدِ الكمية (طن · متر · نقلة …) — **بُعدان لا بُعدٌ واحد** (M-24).
+     * ═══════════════════════════════════════════════════════════════════════
+     * كان هذا الفرعُ يعود بالكمية فورًا ولا يمرّ على `stateLines()` ولا على لقطة
+     * الإسناد، فمصفوفةُ الالتزامات (CON-02 §5) كانت حيّةً **لعقود الساعة حصرًا**
+     * والعقدُ المسعَّرُ بالمتر أو الطن لا تصله أبدًا.
+     *
+     * ── لماذا بُعدان ──────────────────────────────────────────────────────
+     * عقدُ الطن يسجّل **كميةً واحدةً** وسطورَ زمنٍ متعددة، والمصفوفةُ تحكم
+     * **السطورَ**. فالسؤال: كيف تحكم المصفوفةُ رقمًا واحدًا؟ الجوابُ أنها لا
+     * تحكمه — يحكمه سؤالٌ آخر. فهما سؤالان مستقلّان لا يُسحقان في واحد:
+     *
+     *   ① **هل الكميةُ نفسُها مفوترة؟** — حكمٌ على **الواقعة**
+     *      (`unit_entries.qty_billable`). «إعادةُ التنفيذ لعيبٍ لا تُفوتر»
+     *      (§3-④): المترُ الذي أُعيد تنفيذُه لعيبٍ لا يُدفع مرتين.
+     *      NULL = لم يُحكم = مفوترة (سلوكُ اليوم حرفًا بحرف).
+     *
+     *   ② **هل يُضاف بندُ استعدادٍ منفصل؟** — حكمٌ على **سطور التوقف**
+     *      (لقطةُ `billable` لكل سطر). «الاستعدادُ مفوترٌ بشرطٍ صريح» (§3-②):
+     *      لا يُفوتر افتراضًا، بل حين تقول المصفوفةُ `billable_standby` صراحةً.
+     *
+     * ── ولماذا لا يُجمع الاستعدادُ إلى الكمية ─────────────────────────────
+     * **الوحدةُ تمنع**: ساعاتُ الاستعداد لا تُجمع إلى أطنان. ولا صفَّ حكمٍ ثانٍ
+     * يستقبلها — `uq_party_award (company, source_kind, source_ref, party)`
+     * صفٌّ واحدٌ لكل طرف. **ولا سعرَ لها**: عقدُ الطن يسعَّر بالطن، فلا سعرَ
+     * ساعةٍ فيه. فتحويلُ الاستعداد إلى مالٍ هنا **يلزمه سعرٌ لا وجودَ له**، وإخراجُ
+     * رقمٍ بلا سعرٍ تلفيقٌ. فالحكمُ يُسجَّل ويُعلَن في اللقطة بساعاته وسببه ويُوسَم
+     * `standby_needs_rate`، ولا يُخترع له مال. هذا هو الصدقُ لا القصور.
+     *
+     * @return array{award_qty:float,pct:float,state:string,rule:string,snapshot:array}
+     */
+    private static function qtyAward(array $ctx, $party, array $side, $unit)
+    {
+        $qty = (float) $side['qty'];
+
+        // ── البُعد ②: سطورُ التوقف بأحكامها المقرَّرة ──────────────────────
+        // المفتاحُ يختلف بالطرف كما في فرع الساعة: العميلُ يقرأ `billable`
+        // والمورد `supplier_countable` — فلا يُحكم على طرفٍ بلقطة غيره.
+        $snapKey = ($party === 'client') ? 'billable'
+                 : (($party === 'supplier') ? 'supplier_countable' : null);
+
+        $sbBillable = 0.0; $sbExcluded = 0.0; $sbUndecided = 0.0;
+        $sbLines = array();
+        foreach (self::stateLines($ctx) as $ln) {
+            $state = $ln['state'];
+            $hours = round((float) $ln['hours'], 2);
+            if ($hours <= 0 || $state === 'actual_work') { continue; }   // التشغيلُ الفعليُّ هو الكمية
+            $snap = ($snapKey !== null && isset($ln[$snapKey])) ? $ln[$snapKey] : null;
+
+            if ($snap === null)      { $sbUndecided += $hours; $verdict = 'undecided'; }
+            elseif ((int) $snap === 1) { $sbBillable += $hours; $verdict = 'billable'; }
+            else                     { $sbExcluded += $hours; $verdict = 'excluded'; }
+
+            $sbLines[] = array('state' => $state, 'hours' => $hours, 'verdict' => $verdict,
+                               'obligation_type' => isset($ln['obligation_type']) ? $ln['obligation_type'] : null);
+        }
+
+        // ── البُعد ①: هل الكميةُ نفسُها مفوترة؟ ────────────────────────────
+        // الحكمُ على العميل وحدَه: «لا تُفوتر» نصٌّ في الفوترة. واحتسابُ الكمية
+        // للمورد قرارٌ آخر لم يُحسم بعد، فلا يُبتّ فيه هنا ضمنًا.
+        $qtyRuled = $qty;
+        $state = 'due';
+        $qtyNote = 'عقدُ إنتاجٍ: الاستحقاق بالكمية المنجزة لا بتوزيع الزمن';
+        $qtyBillable = isset($ctx['qty_billable']) ? $ctx['qty_billable'] : null;
+
+        if ($party === 'client' && $qtyBillable !== null && (int) $qtyBillable === 0) {
+            $qtyRuled = 0.0;
+            $state = 'not_due';
+            $reason = (isset($ctx['qty_ruling_note']) && $ctx['qty_ruling_note'] !== null)
+                    ? $ctx['qty_ruling_note'] : 'حُكم بعدم فوترة الكمية';
+            $qtyNote = 'الكميةُ غيرُ مفوترةٍ بحكمٍ على الواقعة — ' . $reason;
+        }
+
+        return array(
+            'award_qty' => round($qtyRuled, 2), 'pct' => 100.00, 'state' => $state,
+            'rule' => 'delivered_qty',
+            'snapshot' => array(
+                'basis' => 'delivered_qty', 'unit' => $unit,
+                'qty' => $qty, 'qty_ruled' => round($qtyRuled, 2),
+                'qty_billable' => $qtyBillable,
+                'note' => $qtyNote,
+                // البُعد ② — معلَنٌ بساعاته لا مبلوعٌ في الكمية
+                'standby_billable_hours'  => round($sbBillable, 2),
+                'standby_excluded_hours'  => round($sbExcluded, 2),
+                'standby_undecided_hours' => round($sbUndecided, 2),
+                'standby_lines' => $sbLines,
+                'standby_needs_rate' => ($sbBillable > 0),
+                'standby_note' => ($sbBillable > 0)
+                    ? ('استعدادٌ مفوترٌ بشرطٍ صريح: ' . round($sbBillable, 2)
+                       . ' ساعة — ولا سعرَ ساعةٍ في عقدٍ مسعَّرٍ بـ' . $unit
+                       . '، فلا يُحوَّل إلى مالٍ بلا سعرٍ مقرَّر')
+                    : (($sbUndecided > 0)
+                        ? ('زمنُ توقفٍ بلا حكمٍ مقرَّر: ' . round($sbUndecided, 2) . ' ساعة')
+                        : 'لا استعدادَ مفوترًا'),
+            ),
+        );
     }
 
     /**
@@ -596,25 +794,37 @@ class EffectFanout
         $side = $ctx[$party];
         $unit = $side['unit'];
 
-        // ① الطن والمتر: الكمية المنجزة هي الاستحقاق — لا مسارَ سياسة
-        if ($unit !== 'hour') {
-            return array(
-                'award_qty' => (float) $side['qty'], 'pct' => 100.00, 'state' => 'due',
-                'rule' => 'delivered_qty',
-                'snapshot' => array('basis' => 'delivered_qty', 'unit' => $unit,
-                                    'qty' => (float) $side['qty'],
-                                    'note' => 'عقدُ إنتاجٍ: الاستحقاق بالكمية المنجزة لا بتوزيع الزمن'),
-            );
-        }
+        // ① الطن والمتر: الكمية المنجزة هي الاستحقاق — **وتحكمها المصفوفةُ ببُعدين**
+        if ($unit !== 'hour') { return self::qtyAward($ctx, $party, $side, $unit); }
 
         // ② عقد الساعة: تُطبَّق السياسة حالةً حالة
         $policy = self::hourPolicy($gate, $ctx['company_id'], $party, $side['contract_id'], $ctx['work_date']);
         $billable = 0.0; $pendingHrs = 0.0; $excluded = 0.0; $undecided = 0.0;
         $lines = array();
-        foreach ($ctx['states'] as $state => $hours) {
-            $hours = round((float) $hours, 2);
+        // سطورُ الزمن بمحورَيها (حالة × بندُ التزام) — ومصدرُها `stateLines()`:
+        // من `unit_time_log` حين يقود المصدرُ القانوني (فيحمل البند)، ومن أعمدة
+        // الدوام حين يقود الحيُّ (فبندُه NULL أي القاعدةُ العامة = سلوكُ اليوم).
+        foreach (self::stateLines($ctx) as $ln) {
+            $state = $ln['state'];
+            $hours = round((float) $ln['hours'], 2);
             if ($hours <= 0) { continue; }
-            $rule = isset($policy[$state]) ? $policy[$state] : array('ruling' => 'case_by_case', 'pct' => null, 'note' => 'لا قاعدةَ مسجَّلةٌ لهذه الحالة', 'scope' => 'missing');
+            $oblig = isset($ln['obligation_type']) ? $ln['obligation_type'] : null;
+
+            // ── لقطةُ الإسناد تغلب السياسةَ الحيّة (هـ-3) ──────────────────────
+            // الحكمُ الذي قرّره المشرفُ يومَ الواقعة هو الحاكم، لا قاعدةٌ قد
+            // تتبدّل بعده. وبهذا تتحقق «لا رجعية» (§6) مجانًا: ملحقُ اليومِ لا
+            // يغيّر فاتورةَ الشهر الماضي. وغيابُ اللقطة (NULL) = سطرٌ ما قبل
+            // المصفوفة ⇒ يُحكم بالسياسة كما كان يُحكم تمامًا.
+            $snapKey = ($party === 'client') ? 'billable'
+                     : (($party === 'supplier') ? 'supplier_countable' : null);
+            $snap = ($snapKey !== null && isset($ln[$snapKey])) ? $ln[$snapKey] : null;
+            if ($snap !== null) {
+                $rule = array('ruling' => ((int) $snap === 1) ? 'full' : 'none', 'pct' => null,
+                              'note' => 'لقطةُ إسنادٍ مقرَّرةٌ على السطر (CON-02 §5)',
+                              'scope' => 'attribution_snapshot', 'obligation_type' => $oblig);
+            } else {
+                $rule = self::resolveRuling($policy, $state, $oblig);
+            }
             $applied = 0.0;
             switch ($rule['ruling']) {
                 case 'full': $applied = $hours; $billable += $applied; break;
@@ -624,7 +834,8 @@ class EffectFanout
                 default: $undecided += $hours; // case_by_case — يلزم نصُّ العقد
             }
             $lines[] = array('state' => $state, 'hours' => $hours, 'ruling' => $rule['ruling'],
-                             'pct' => $rule['pct'], 'applied' => $applied, 'scope' => $rule['scope']);
+                             'pct' => $rule['pct'], 'applied' => $applied, 'scope' => $rule['scope'],
+                             'obligation_type' => $oblig);
         }
 
         // حالةُ الاستحقاق تصف الواقع بأمانة: معلَّقٌ إن بقي ما ينتظر حسمًا
@@ -741,6 +952,12 @@ class EffectFanout
                         'project_id' => $ctx['project_id'], 'equipment_id' => $ctx['equipment_id'],
                         'supplier_entity_id' => $ctx['supplier_id'],
                         'operator_employee_id' => $ctx['employee_id'],
+                        // قرارُ المالك 2026-07-28: **المروحةُ بابُ الاعتراف بالإيراد**،
+                        // فيلزمها أن تسمّي مَن يُحصَّل منه. غيابُه كان منشأَ «إيرادٌ
+                        // لا يُعرف ممّن يُحصَّل» (9.29M مقيسة) — والمستخلصُ يفوتر بعدُ
+                        // على هذا القيد نفسِه ولا ينشئ ثانيًا.
+                        'customer_entity_id' => $ctx['client_entity_id'],
+                        'contract_id' => $ctx['client']['contract_id'],
                         'notes' => 'مروحة أثر يوم الدوام ' . $ctx['source_ref'],
                         'payload' => array( // لقطة التسعير لحظة التوليد — لا يتغيّر أثرٌ بتغيّر عقدٍ لاحق
                             'source' => 'timesheet', 'work_date' => $ctx['work_date'],
