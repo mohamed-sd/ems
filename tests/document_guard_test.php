@@ -256,12 +256,19 @@ function ajax($action, array $data) {
     return json_decode($b, true);
 }
 
-// صفٌّ حقيقيٌّ غيرُ معتمَدٍ ووثيقةُ أهليةٍ منتهيةٌ يومَ عمله
+// صفٌّ حقيقيٌّ غيرُ معتمَدٍ ووثيقةُ أهليةٍ منتهيةٌ يومَ عمله.
+// ⚠️ عزلُ بذرٍ (أمرُ التنفيذ §3): حارسُ الطاقة يسبق حارسَ الوثائق في المعالج،
+// فصفٌّ مرآتُه تحمل علمَ طاقةٍ غيرَ مخلَّص (بقايا بذرِ جولاتٍ سابقةٍ ترفع ساعاتِ
+// اليوم) يُحجب بـcapacity لا بـdocument فتفشل ⑧⑨ كذبًا. يُستثنى صراحةً.
 $victim = $db->query(
     "SELECT t.id ts_id, t.`date`, t.`operator` eq, t.employee_id op
        FROM timesheet t
       WHERE t.company_id = 4
         AND NOT EXISTS (SELECT 1 FROM timesheet_approvals a WHERE a.timesheet_id = t.id)
+        AND NOT EXISTS (SELECT 1 FROM unit_entries ue
+                          JOIN unit_capacity_flags cf
+                            ON cf.entry_id = ue.id AND cf.cleared_at IS NULL
+                         WHERE ue.sync_uuid = CONCAT('ts:', t.id))
         AND EXISTS (SELECT 1 FROM equipment_documents d
                      WHERE d.is_deleted = 0 AND d.expiry_date IS NOT NULL
                        AND d.expiry_date < t.`date`

@@ -1,0 +1,27 @@
+-- ملاحظاتُ ما قبل الوسم — 2026-07-29 21:11:55
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة ج (شاحنات خفيفة)' WHERE doc_id=18;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة ب (سيارات خصوصية)' WHERE doc_id=21;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة د (شاحنات ثقيلة)' WHERE doc_id=22;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة د (شاحنات ثقيلة)' WHERE doc_id=27;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة د (شاحنات ثقيلة)' WHERE doc_id=31;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة أ (دراجات نارية)' WHERE doc_id=32;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة د (شاحنات ثقيلة)' WHERE doc_id=35;
+UPDATE equipment_documents SET note='مُرحَّلة من سجل التأهيل · فئة د (شاحنات ثقيلة)' WHERE doc_id=36;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=251;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=252;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=253;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=255;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=256;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=257;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=259;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=260;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=262;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=263;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=264;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=265;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=267;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=268;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=269;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=271;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=272;
+UPDATE equipment_documents SET note='مُرحَّلة من ملف الموظف (هوية)' WHERE doc_id=276;
