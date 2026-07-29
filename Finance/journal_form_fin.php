@@ -106,14 +106,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     if ($company_id <= 0) { header("Location: journal_form_fin.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
 
     $posting_date = trim($_POST['posting_date'] ?? '');
+    $txn_date     = trim($_POST['txn_date'] ?? '');
+    $jr_currency  = trim($_POST['currency'] ?? '');
     $event_id     = intval($_POST['event_id'] ?? 0) ?: null;
     $memo         = trim($_POST['memo'] ?? '');
     $accounts = $_POST['account_id'] ?? array();
     $debits   = $_POST['debit'] ?? array();
     $credits  = $_POST['credit'] ?? array();
     $lmemos   = $_POST['line_memo'] ?? array();
+    $lccs     = $_POST['cost_center_id'] ?? array();
 
     if ($posting_date === '') { header("Location: journal_form_fin.php?msg=تاريخ+الترحيل+مطلوب+❌"); exit(); }
+    // M-38: تاريخُ الحركة الفعلي إلزامٌ (بجانب تاريخ الترحيل) — SPEC-01 #13
+    if ($txn_date === '') { $txn_date = $posting_date; }
+    // M-38: اليدويُّ الاستثنائي بسببٍ موثَّق إلزامًا (SPEC-01 #13: POST /journal/manual بسببٍ إلزامي)
+    if ($memo === '') { header("Location: journal_form_fin.php?msg=بيان+القيد+(السبب)+إلزامي+للقيد+اليدوي+❌"); exit(); }
+    // M-38: العملة من الدليل المسجَّل حصرًا
+    require_once __DIR__ . '/../includes/fx.php';
+    $jr_code = ems_fx_code($jr_currency !== '' ? $jr_currency : 'SDG');
+    if ($jr_code === null) { header("Location: journal_form_fin.php?msg=عملة+غير+مسجَّلة+❌"); exit(); }
 
     // اجمع السطور الصالحة
     $lines = array(); $tot_d = 0; $tot_c = 0;
@@ -122,16 +133,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
         $dv  = round(floatval($debits[$i] ?? 0), 2);
         $cv  = round(floatval($credits[$i] ?? 0), 2);
         if ($acc <= 0 || ($dv == 0 && $cv == 0)) { continue; }
-        $lines[] = array('acc' => $acc, 'd' => $dv, 'c' => $cv, 'm' => trim($lmemos[$i] ?? ''));
+        $lines[] = array('acc' => $acc, 'd' => $dv, 'c' => $cv, 'm' => trim($lmemos[$i] ?? ''),
+                         'cc' => intval($lccs[$i] ?? 0) ?: null);
         $tot_d += $dv; $tot_c += $cv;
     }
     if (count($lines) < 2) { header("Location: journal_form_fin.php?msg=القيد+يحتاج+سطرين+صالحين+فأكثر+❌"); exit(); }
+    // M-38: توازنُ القيد شرطُ الحفظ (المتطلب النظامي SPEC-01 #13) — لا مسودةَ غيرَ متوازنة
+    if (round($tot_d, 2) !== round($tot_c, 2)) {
+        header("Location: journal_form_fin.php?msg=لا+حفظ:+القيد+غير+متوازن+(مدين+" . $tot_d . "+≠+دائن+" . $tot_c . ")+❌"); exit();
+    }
+
+    // M-38: المعادلُ الموحّد من سجل الأسعار النافذ يومَ الحركة — NULL معلَنٌ إن لا سعر
+    $fx = ems_fx_to_base($tot_d, $jr_code, $txn_date);
+    $jr_fx = $fx['ok'] ? $fx['rate'] : null;
+    $jr_base = $fx['ok'] ? $fx['base'] : null;
 
     $entry_no = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $company_id);
     // رأس + سطور = زوجٌ ذرّي (§9): إمّا القيد كاملًا أو لا شيء (لا رأسٌ بلا سطوره)
-    ems_tenant_db()->runInTransaction(function ($g) use ($entry_no, $event_id, $posting_date, $tot_d, $tot_c, $memo, $current_user_id, $lines) {
+    ems_tenant_db()->runInTransaction(function ($g) use ($entry_no, $event_id, $posting_date, $txn_date, $jr_code, $jr_fx, $jr_base, $tot_d, $tot_c, $memo, $current_user_id, $lines) {
         $entry_id = $g->insert('fin_journal_entries', array(
             'entry_no' => $entry_no, 'event_id' => $event_id, 'posting_date' => $posting_date,
+            'txn_date' => $txn_date, 'currency' => $jr_code,
+            'fx_rate' => $jr_fx, 'base_amount' => $jr_base,
             'total_debit' => $tot_d, 'total_credit' => $tot_c, 'memo' => $memo,
             'state' => 'draft', 'created_by' => $current_user_id,
         ));
@@ -139,11 +162,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
             $g->insert('fin_journal_lines', array(
                 'entry_id' => $entry_id, 'account_id' => $ln['acc'],
                 'debit' => $ln['d'], 'credit' => $ln['c'], 'memo' => $ln['m'],
+                'cost_center_id' => $ln['cc'],
             ));
         }
     }, 'create journal entry + lines');
-    $bal = (round($tot_d, 2) === round($tot_c, 2)) ? 'متوازن' : 'غير متوازن';
-    header("Location: journal_form_fin.php?msg=تم+حفظ+القيد+($bal)+✅"); exit();
+    header("Location: journal_form_fin.php?msg=تم+حفظ+القيد+(متوازن)+✅"); exit();
 }
 
 $page_title = 'إيكوبيشن | القيود اليومية';
@@ -175,6 +198,16 @@ include '../insidebar.php';
                         <input type="date" name="posting_date" id="j_date" required value="<?php echo date('Y-m-d'); ?>">
                     </div>
                     <div class="form-group">
+                        <label>تاريخ الحركة الفعلي <span class="required">*</span></label>
+                        <input type="date" name="txn_date" id="j_txn_date" required value="<?php echo date('Y-m-d'); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>العملة <span class="required">*</span></label>
+                        <select name="currency" id="j_currency" required>
+                            <?php echo fin_currency_options($conn, $is_super_admin, $company_id, 'SDG'); ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>الحدث المرتبط (اختياري)</label>
                         <select name="event_id" id="j_event">
                             <option value="">— بلا حدث —</option>
@@ -198,10 +231,10 @@ include '../insidebar.php';
 
             <div class="table-container" style="margin-top:10px;">
                 <table class="alltables" style="width:100%;" id="j_lines">
-                    <thead><tr><th>الحساب</th><th>مدين</th><th>دائن</th><th>بيان</th><th></th></tr></thead>
+                    <thead><tr><th>الحساب</th><th>مركز التكلفة</th><th>مدين</th><th>دائن</th><th>بيان</th><th></th></tr></thead>
                     <tbody id="j_lines_body"></tbody>
                     <tfoot><tr>
-                        <th style="text-align:end">الإجمالي</th>
+                        <th colspan="2" style="text-align:end">الإجمالي</th>
                         <th id="j_tot_d">0.00</th>
                         <th id="j_tot_c">0.00</th>
                         <th colspan="2"><span id="j_balance" class="badge badge-secondary">—</span></th>
@@ -260,6 +293,7 @@ include '../insidebar.php';
 <template id="j_line_tpl">
     <tr class="j-line">
         <td><select name="account_id[]" class="j-acc"><?php echo fin_postable_account_options($conn, $is_super_admin, $company_id); ?></select></td>
+        <td><select name="cost_center_id[]" class="j-cc"><?php echo fin_cost_center_options($conn, $is_super_admin, $company_id); ?></select></td>
         <td><input type="number" step="0.01" min="0" name="debit[]" class="j-debit" value="0"></td>
         <td><input type="number" step="0.01" min="0" name="credit[]" class="j-credit" value="0"></td>
         <td><input type="text" name="line_memo[]" class="j-memo"></td>

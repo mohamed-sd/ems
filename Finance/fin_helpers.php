@@ -521,6 +521,57 @@ if (!function_exists('fin_account_by_code')) {
         return $row ? intval($row['id']) : 0;
     }
 }
+if (!function_exists('fin_cost_center_for_project')) {
+    /**
+     * M-38: مركزُ التكلفة المقابل لمشروعٍ — بتطابق الاسم مع دليل المراكز حرفيًّا
+     * (الدليلُ لا يحمل project_id — والتطابقُ الاسميُّ اشتقاقٌ مسجَّلٌ لا تخمين).
+     * يعيد id أو null إن لا تطابق (فجوةٌ معلَنة لا قيمةٌ مخترعة).
+     */
+    function fin_cost_center_for_project($conn, $company_id, $project_id)
+    {
+        $project_id = intval($project_id);
+        if ($project_id <= 0) { return null; }
+        $st = $conn->prepare(
+            "SELECT cc.id FROM fin_cost_centers cc
+               JOIN project p ON p.name = cc.name AND p.company_id = cc.company_id
+              WHERE p.id = ? AND cc.company_id = ?
+                AND COALESCE(cc.is_deleted,0) = 0 AND cc.active = 1
+              LIMIT 1");
+        $cid = intval($company_id);
+        $st->bind_param('ii', $project_id, $cid);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        return $row ? intval($row['id']) : null;
+    }
+}
+if (!function_exists('fin_request_thread_for_event')) {
+    /**
+     * M-38: خيطُ الطلب المولِّد للحدث — request_no · request_owner (لقطةُ اسم) ·
+     * request_group. يعيد مصفوفةَ الثلاثة (NULL حيث لا طلبَ وراء الحدث — بحق).
+     */
+    function fin_request_thread_for_event($conn, $company_id, $event_id)
+    {
+        $out = array('request_no' => null, 'request_owner' => null, 'request_group' => null);
+        $event_id = intval($event_id);
+        if ($event_id <= 0) { return $out; }
+        $st = $conn->prepare(
+            "SELECT fr.request_no, fr.request_type, u.name owner_name, fr.requester_id
+               FROM fin_requests fr LEFT JOIN users u ON u.id = fr.requester_id
+              WHERE fr.event_id = ? AND fr.company_id = ? LIMIT 1");
+        $cid = intval($company_id);
+        $st->bind_param('ii', $event_id, $cid);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        if ($row) {
+            $out['request_no']    = $row['request_no'];
+            $out['request_owner'] = mb_substr((string) ($row['owner_name'] ?: ('user#' . $row['requester_id'])), 0, 64);
+            $out['request_group'] = $row['request_type'];
+        }
+        return $out;
+    }
+}
 if (!function_exists('fin_auto_journal')) {
     /**
      * محرّك القيد الآلي (§7.2): يشتقّ المدين/الدائن من نوع الحدث وينشئ قيدًا متوازنًا
@@ -557,21 +608,45 @@ if (!function_exists('fin_auto_journal')) {
         $memo = 'قيد آلي من الحدث ' . $event['event_no'];
         $pid = intval($event['project_id'] ?? 0) ?: null;
         $eqid = intval($event['equipment_id'] ?? 0) ?: null;
+
+        // ── M-38: رأسُ الحدث المالي — القيدُ الآلي يستنتج كلَّ حقوله (SPEC-01 #13) ──
+        // تاريخُ الحركة = وقوعُ الحدث لا يومُ توليد القيد
+        $txn_date = !empty($event['occurred_at']) ? substr((string) $event['occurred_at'], 0, 10) : $today;
+        // العملةُ عملةُ القيد (المبلغُ أعلاه حُوِّل إلى SDG بمنطق المحرّك القائم)
+        $jr_currency = 'SDG';
+        // المعادلُ الموحّد: من سجل الأسعار النافذ يومَ الحركة — NULL معلَنٌ إن لا سعر
+        require_once dirname(__DIR__) . '/includes/fx.php';
+        $jr_fx = null; $jr_base = null;
+        if (function_exists('ems_fx_base_currency') && ems_fx_base_currency() === $jr_currency) {
+            $jr_fx = 1.0;
+        } elseif (function_exists('ems_fx_rate')) {
+            try { $jr_fx = ems_fx_rate($jr_currency, $txn_date); } catch (\Throwable $t) { $jr_fx = null; }
+        }
+        if ($jr_fx !== null) { $jr_base = round($amount * (float) $jr_fx, 2); }
+        // خيطُ الطلب المولِّد (إن كان الحدثُ من طلبٍ مالي)
+        $thread = fin_request_thread_for_event($conn, $company_id, $eid);
+        // مركزُ التكلفة من الدليل بمطابقة اسم المشروع (NULL معلَنٌ إن لا تطابق)
+        $ccid = fin_cost_center_for_project($conn, $company_id, $pid);
+
         // رأس + سطران متوازنان = زوجٌ ذرّي (§9) عبر البوابة
         $entry_id = 0;
-        fin_gate(false)->runInTransaction(function ($g) use (&$entry_id, $entry_no, $eid, $today, $amount, $memo, $user_id, $debit, $credit, $pid, $eqid) {
+        fin_gate(false)->runInTransaction(function ($g) use (&$entry_id, $entry_no, $eid, $today, $amount, $memo, $user_id, $debit, $credit, $pid, $eqid, $txn_date, $jr_currency, $jr_fx, $jr_base, $thread, $ccid) {
             $entry_id = $g->insert('fin_journal_entries', array(
                 'entry_no' => $entry_no, 'event_id' => $eid, 'posting_date' => $today,
+                'txn_date' => $txn_date, 'currency' => $jr_currency,
+                'fx_rate' => $jr_fx, 'base_amount' => $jr_base,
+                'request_no' => $thread['request_no'], 'request_owner' => $thread['request_owner'],
+                'request_group' => $thread['request_group'],
                 'total_debit' => $amount, 'total_credit' => $amount, 'memo' => $memo,
                 'state' => 'draft', 'created_by' => $user_id,
             ));
             $g->insert('fin_journal_lines', array(
                 'entry_id' => $entry_id, 'account_id' => $debit, 'debit' => $amount, 'credit' => 0,
-                'project_id' => $pid, 'equipment_id' => $eqid, 'memo' => $memo,
+                'project_id' => $pid, 'equipment_id' => $eqid, 'cost_center_id' => $ccid, 'memo' => $memo,
             ));
             $g->insert('fin_journal_lines', array(
                 'entry_id' => $entry_id, 'account_id' => $credit, 'debit' => 0, 'credit' => $amount,
-                'project_id' => $pid, 'equipment_id' => $eqid, 'memo' => $memo,
+                'project_id' => $pid, 'equipment_id' => $eqid, 'cost_center_id' => $ccid, 'memo' => $memo,
             ));
         }, 'auto journal from approved event');
         return $entry_id;
@@ -949,6 +1024,30 @@ if (!function_exists('fin_postable_account_options')) {
         $rows = fin_gate($is_super)->select('fin_chart_of_accounts', array('columns' => array('id', 'code', 'name'), 'whereRaw' => 'is_postable=1', 'orderBy' => 'code ASC'));
         foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
         return fin_options_from_rows($rows, $selected, '— اختر حساباً —');
+    }
+}
+if (!function_exists('fin_cost_center_options')) {
+    /** M-38: مراكزُ التكلفة الفعّالة منسدلةً من الدليل (بديلُ النص الحر). */
+    function fin_cost_center_options($conn, $is_super, $company_id, $selected = 0)
+    {
+        $rows = fin_gate($is_super)->select('fin_cost_centers', array('columns' => array('id', 'code', 'name'), 'whereRaw' => 'active=1', 'orderBy' => 'code ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— بلا مركز —');
+    }
+}
+if (!function_exists('fin_currency_options')) {
+    /** M-38: العملات المسجَّلة الفعّالة منسدلةً (fin_currencies — F-04). */
+    function fin_currency_options($conn, $is_super, $company_id, $selected = '')
+    {
+        $rows = fin_gate($is_super)->select('fin_currencies', array('columns' => array('code', 'name_ar', 'is_base'), 'whereRaw' => 'active=1', 'orderBy' => 'sort_order ASC'));
+        $out = '';
+        foreach ($rows as $r) {
+            $sel = ((string) $selected === (string) $r['code']) ? ' selected' : '';
+            $out .= "<option value='" . htmlspecialchars($r['code']) . "'{$sel}>"
+                  . htmlspecialchars($r['code'] . ' — ' . $r['name_ar'] . ($r['is_base'] ? ' (الأساس)' : ''))
+                  . "</option>";
+        }
+        return $out;
     }
 }
 if (!function_exists('fin_account_parent_options')) {
