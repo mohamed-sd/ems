@@ -77,6 +77,13 @@ class EventPublisher
     /** حالات الحقيقة (ADR-18): العكسي = نفس الأثر بكميةٍ سالبة. */
     const ROOT_STATUSES = array('recorded', 'corrected', 'reversed');
 
+    /** أنواعُ الأثر الحصرية (FES §4.1 · H-12) — ما ليس فيها يسقط إلى الاشتقاق. */
+    const EFFECT_TYPES = array(
+        'client_receivable', 'supplier_accrual', 'operator_due', 'project_cost',
+        'equip_cost', 'payment', 'receipt', 'settlement', 'depreciation',
+        'tax_return', 'finance_installment', 'adjustment_reversal',
+    );
+
     /**
      * تجاوزٌ اختباريٌّ لوضع الجذر: null = من البيئة (EMS_EVENT_ROOT)،
      * 'off'/'publish' = فرضٌ صريح — للاختبارات الحتمية حصرًا.
@@ -270,13 +277,25 @@ class EventPublisher
             ));
         }
 
+        // ── 4ج) عقد FES §3.1 (H-12): الطرفُ الموحّد والفترةُ وبصمةُ المستند ──
+        // الناشرُ يستنتج (خريطة الاشتقاق) — والمستدعي له تمريرُ الأدقّ صراحةً.
+        $srcLineId  = (isset($e['source_line_id']) && is_numeric($e['source_line_id'])) ? intval($e['source_line_id']) : 0;
+        $srcDocVer  = (isset($e['source_doc_version']) && is_numeric($e['source_doc_version']) && intval($e['source_doc_version']) > 0) ? intval($e['source_doc_version']) : 1;
+        $causation  = (isset($e['causation_id']) && $e['causation_id'] !== '') ? (string) $e['causation_id'] : null;
+        $dueDate    = (isset($e['due_date']) && preg_match('/^\d{4}-\d{2}-\d{2}/', (string) $e['due_date'])) ? substr((string) $e['due_date'], 0, 10) : null;
+        $contractLineId = (isset($e['contract_line_id']) && is_numeric($e['contract_line_id']) && intval($e['contract_line_id']) > 0) ? intval($e['contract_line_id']) : null;
+        list($partyType, $partyId) = self::resolveParty($e, $legacyType, $refs);
+        $periodId   = self::resolvePeriodId($conn, $companyId, $n['occurred_at']);
+        $fesStatus  = 'Published'; // الناشرُ هو خطوةُ النشر (Draft ما قبل الناشر)
+
         // ── 5) الإدراج — أعمدة صريحة، prepared، على اتصال/معاملة المستدعي ──
         $sql = 'INSERT INTO `fin_financial_events`
             (company_id, event_no, event_type, event_key, category, source_module, source_ref,
-             entity_type, entity_id, amount, quantity, unit, currency,
-             project_id, contract_id, equipment_id, supplier_entity_id, customer_entity_id, operator_employee_id,
-             state, occurred_at, notes, correlation_id, idempotency_key, schema_version, payload, created_by, root_event_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+             entity_type, entity_id, source_line_id, source_doc_version, amount, quantity, unit, currency,
+             project_id, contract_id, contract_line_id, equipment_id, supplier_entity_id, customer_entity_id, operator_employee_id,
+             party_type, party_id, fiscal_period_id, due_date, fes_status,
+             state, occurred_at, notes, correlation_id, causation_id, idempotency_key, schema_version, payload, created_by, root_event_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             throw new \RuntimeException('EventPublisher: prepare failed: ' . $conn->error);
@@ -290,14 +309,15 @@ class EventPublisher
         $category   = $n['category'];
         $sourceModule = $n['source_module'];
         $occurredAt = $n['occurred_at'];
-        // الأنواع للـ28 وسيطًا: i + s×7 + i + d + s×3 + i×6 + s×5 + i + s + i + i(root)
+        // الأنواع للـ37 وسيطًا (بترتيب الأعمدة أعلاه حرفيًّا)
         $stmt->bind_param(
-            'isssssssidsssiiiiiisssssisii',
+            'isssssssiiidsssiiiiiiisiissssssssisii',
             $companyId, $eventNo, $legacyType, $eventKey, $category, $sourceModule, $sourceRef,
-            $entityType, $entityId, $amount, $quantity, $unit, $currency,
-            $refs['project_id'], $refs['contract_id'], $refs['equipment_id'],
+            $entityType, $entityId, $srcLineId, $srcDocVer, $amount, $quantity, $unit, $currency,
+            $refs['project_id'], $refs['contract_id'], $contractLineId, $refs['equipment_id'],
             $refs['supplier_entity_id'], $refs['customer_entity_id'], $refs['operator_employee_id'],
-            $state, $occurredAt, $notes, $correlation, $idem, $schemaVer, $payload, $createdBy, $rootId
+            $partyType, $partyId, $periodId, $dueDate, $fesStatus,
+            $state, $occurredAt, $notes, $correlation, $causation, $idem, $schemaVer, $payload, $createdBy, $rootId
         );
         if (!$stmt->execute()) {
             $errno = $stmt->errno;
@@ -332,14 +352,125 @@ class EventPublisher
             throw new \RuntimeException('EventPublisher: execute failed: ' . $err);
         }
         $stmt->close();
+        $newId = intval($conn->insert_id);
+
+        // ── 6) أثرُ الحدث (FES §3.2 · H-12): رأسٌ وأثرُه معًا في معاملة المستدعي ──
+        // النوعُ من المستدعي إن مرّره، وإلا اشتقاقٌ من نوع الجسر والمراجع.
+        // UQ المركّب يجعل التكرار عطالةً (1062 يُبتلع عمدًا — الأثرُ قائم).
+        $effType = (isset($e['effect_type']) && in_array((string) $e['effect_type'], self::EFFECT_TYPES, true))
+            ? (string) $e['effect_type']
+            : self::deriveEffectType($legacyType, $refs);
+        if ($effType !== null) {
+            $es = $conn->prepare('INSERT INTO `fin_event_effects`
+                (company_id, event_id, effect_type, party_type, party_id, contract_line_id, amount, base_amount, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NULL, \'active\')');
+            if ($es) {
+                // أعمدةُ المفتاح الفريد لا تقبل NULL (عطالةٌ حقيقية): الغياب = ''/0
+                $effPartyType = ($partyType === null) ? '' : $partyType;
+                $effPartyId   = ($partyId === null) ? 0 : $partyId;
+                $effLineId    = ($contractLineId === null) ? 0 : $contractLineId;
+                $es->bind_param('iissiid', $companyId, $newId, $effType, $effPartyType, $effPartyId, $effLineId, $amount);
+                if (!$es->execute() && $es->errno !== 1062) {
+                    $err = $es->error;
+                    $es->close();
+                    throw new \RuntimeException('EventPublisher: effect insert failed: ' . $err);
+                }
+                $es->close();
+            }
+        }
+
         return array(
-            'id' => intval($conn->insert_id),
+            'id' => $newId,
             'event_no' => $eventNo,
             'correlation_id' => $correlation,
             'idempotency_key' => $idem,
             'root_event_id' => $rootId,
             'duplicate' => false,
         );
+    }
+
+    /**
+     * الطرفُ الموحّد (FES §4.1 · H-12): من المستدعي صراحةً، وإلا فالمرجعُ
+     * الوحيدُ المعمور، وعند التعدد الأسبقيةُ لنوع الحدث (إيراد → عميل ·
+     * رواتب → مشغّل · وإلا مورد). صفرُ اختراع: لا مرجعَ = NULL معلَن.
+     *
+     * @return array{0:?string,1:?int}
+     */
+    private static function resolveParty(array $e, $legacyType, array $refs)
+    {
+        $valid = array('customer', 'supplier', 'operator', 'employee', 'owner_dept');
+        if (isset($e['party_type'], $e['party_id'])
+            && in_array((string) $e['party_type'], $valid, true)
+            && is_numeric($e['party_id']) && intval($e['party_id']) > 0) {
+            return array((string) $e['party_type'], intval($e['party_id']));
+        }
+        $cust = isset($refs['customer_entity_id']) ? intval($refs['customer_entity_id']) : 0;
+        $sup  = isset($refs['supplier_entity_id']) ? intval($refs['supplier_entity_id']) : 0;
+        $op   = isset($refs['operator_employee_id']) ? intval($refs['operator_employee_id']) : 0;
+        $set = array();
+        if ($cust > 0) { $set['customer'] = $cust; }
+        if ($sup > 0)  { $set['supplier'] = $sup; }
+        if ($op > 0)   { $set['operator'] = $op; }
+        if (empty($set)) { return array(null, null); }
+        if (count($set) === 1) {
+            $t = array_keys($set);
+            return array($t[0], $set[$t[0]]);
+        }
+        // تعدُّدٌ: الأسبقية بنوع الحدث
+        if (in_array($legacyType, array('revenue', 'receivable'), true) && isset($set['customer'])) {
+            return array('customer', $set['customer']);
+        }
+        if ($legacyType === 'payroll' && isset($set['operator'])) {
+            return array('operator', $set['operator']);
+        }
+        if (isset($set['supplier'])) { return array('supplier', $set['supplier']); }
+        $t = array_keys($set);
+        return array($t[0], $set[$t[0]]);
+    }
+
+    /**
+     * الفترةُ المالية الشهرية التي يقع فيها تاريخُ الحدث — NULL إن لا فترةَ
+     * معرَّفة (فجوةٌ معلَنة؛ حارسُ «لا نشرَ في فترةٍ مقفلة» في M-39).
+     */
+    private static function resolvePeriodId(\mysqli $conn, $companyId, $occurredAt)
+    {
+        $date = ($occurredAt !== null && $occurredAt !== '') ? substr((string) $occurredAt, 0, 10) : date('Y-m-d');
+        $st = $conn->prepare('SELECT id FROM `fin_financial_periods`
+            WHERE company_id = ? AND period_type = \'month\'
+              AND ? BETWEEN start_date AND end_date LIMIT 1');
+        if (!$st) { return null; }
+        $cid = intval($companyId);
+        $st->bind_param('is', $cid, $date);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        return $row ? intval($row['id']) : null;
+    }
+
+    /**
+     * اشتقاقُ نوع الأثر (FES §4.1) من نوع الجسر والمراجع — الخريطةُ نفسُها
+     * المستعملة في التعبئة الرجعية (هجرة H-12). NULL = لا نسبةَ صادقة
+     * (enterprise ذو المروحة القائمة يبقى بلا أثرٍ مشتقٍّ هنا — أحداثُ
+     * مروحته المستقلة تحمل آثارَها بأنفسها).
+     */
+    private static function deriveEffectType($legacyType, array $refs)
+    {
+        $sup  = isset($refs['supplier_entity_id']) ? intval($refs['supplier_entity_id']) : 0;
+        $proj = isset($refs['project_id']) ? intval($refs['project_id']) : 0;
+        $eq   = isset($refs['equipment_id']) ? intval($refs['equipment_id']) : 0;
+        switch ($legacyType) {
+            case 'revenue':
+            case 'receivable': return 'client_receivable';
+            case 'payable':    return 'supplier_accrual';
+            case 'payroll':    return 'operator_due';
+            case 'settlement': return 'settlement';
+            case 'expense':
+                if ($sup > 0)  { return 'supplier_accrual'; }
+                if ($proj > 0) { return 'project_cost'; }
+                if ($eq > 0)   { return 'equip_cost'; }
+                return null;
+            default: return null;
+        }
     }
 
     /**

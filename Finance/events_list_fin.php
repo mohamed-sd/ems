@@ -139,6 +139,15 @@ if (isset($_GET['advance_id'])) {
         // نقل الحالة عبر البوابة (حارس تفاؤلي state=? + حصانة §12) — للحدث اليدوي يمرّ؛ للمنشور يُرفض
         ems_tenant_db()->update('fin_financial_events', array('state' => $next), array('id' => $aid), "state=?", array($cur));
         fin_log_approval($conn, $company_id, $aid, $cur, $next, 'advance', $level, $current_user_id, $lbl);
+        // H-12 (FES §7.2): مزامنةُ آلة الحالات الأربعَ عشرة — بقفلها التفاؤلي
+        // وختمِ فاعلها (approved_by/at عند الاعتماد). فشلُها يُسجَّل ولا يقطع
+        // المسارَ القائم (الحالةُ القديمة تقدّمت سلفًا والمرآةُ تلحق).
+        require_once __DIR__ . '/../app/Services/Finance/EventStateMachine.php';
+        $fesSync = \App\Services\Finance\EventStateMachine::syncFromLegacy(
+            ems_tenant_db(), $conn, $aid, $next, $current_user_id);
+        if (!$fesSync['ok']) {
+            error_log('events_list fes sync #' . $aid . ' → ' . $next . ': ' . implode(' · ', $fesSync['reasons']));
+        }
 
         // (فجوة 4) إشعار صاحب الخطوة التالية
         $next_owner = array('dept_review' => 'dept_manager', 'dept_approved' => 'dept_manager',
@@ -179,6 +188,12 @@ if (isset($_GET['reject_id'])) {
     if ($cur !== null && !in_array($cur, array('posted','settled','closed','rejected'), true)) {
         ems_tenant_db()->update('fin_financial_events', array('state' => 'rejected'), array('id' => $rid));
         fin_log_approval($conn, $company_id, $rid, $cur, 'rejected', 'reject', null, $current_user_id, 'رفض/إعادة');
+        // H-12: رفضُ هذه الشاشة قابلٌ للإعادة للدورة — فهو ReturnedToSource دلاليًّا
+        // (FES §7.2) لا Rejected النهائية التي لا رجعةَ منها إلا بمستندٍ جديد.
+        require_once __DIR__ . '/../app/Services/Finance/EventStateMachine.php';
+        $fesSync = \App\Services\Finance\EventStateMachine::syncTo(
+            ems_tenant_db(), $conn, $rid, 'ReturnedToSource', $current_user_id);
+        if (!$fesSync['ok']) { error_log('events_list fes reject sync #' . $rid . ': ' . implode(' · ', $fesSync['reasons'])); }
         fin_notify($conn, $company_id, 'dept_accountant', 'حدث مرفوض أُعيد إليك للتصحيح', 'events_list_fin.php?fstate=rejected');
         header("Location: events_list_fin.php?msg=تم+رفض+الحدث+✅"); exit();
     }
@@ -195,6 +210,11 @@ if (isset($_GET['resume_id'])) {
     if ($cur === 'rejected') {
         ems_tenant_db()->update('fin_financial_events', array('state' => 'draft'), array('id' => $rid), "state='rejected'");
         fin_log_approval($conn, $company_id, $rid, 'rejected', 'draft', 'advance', 'dept_accountant', $current_user_id, 'إعادة للدورة');
+        // H-12: العودةُ للدورة = ReturnedToSource → Published (نسخةٌ تُستأنف — FES §7.2)
+        require_once __DIR__ . '/../app/Services/Finance/EventStateMachine.php';
+        $fesSync = \App\Services\Finance\EventStateMachine::syncTo(
+            ems_tenant_db(), $conn, $rid, 'Published', $current_user_id);
+        if (!$fesSync['ok']) { error_log('events_list fes resume sync #' . $rid . ': ' . implode(' · ', $fesSync['reasons'])); }
         header("Location: events_list_fin.php?msg=تمت+إعادة+الحدث+للدورة+(مسودة)+✅"); exit();
     }
     header("Location: events_list_fin.php?msg=لا+يمكن+إعادة+هذه+الحالة+❌"); exit();

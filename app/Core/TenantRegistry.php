@@ -123,12 +123,21 @@ class TenantRegistry
         // تحديثٌ يلمس عمودًا خارج القائمة ⇒ يُرفض كما كان تمامًا (ولو معه عمودٌ مسموح).
         //   state            موضع الحدث في سير عمل D04 (مسودة→…→مقيد→مقفل)
         //   journal_entry_id ربط القيد المتولّد — تلازمٌ كتابيٌّ مع state='posted'
+        //   fes_status · event_version · approved_by/at · posted_by/at · event_status
+        //                    عقدُ FES §7.2 (H-12 · 2026-07-30): آلةُ الحالات الأربعَ عشرةَ
+        //                    بقفلها التفاؤلي وتدقيقِ فاعليها — «موضعُ معالجة» بالتعريف،
+        //                    والمضمونُ (المبلغ · الطرف · الفترة · المراجع) يبقى محصَّنًا.
         // إضافة أي عمودٍ هنا قرارٌ متعمَّد يوثَّق (أقل امتيازٍ ممكن).
         'fin_financial_events' => array(
             'type' => self::T_TENANT, 'soft' => true,
             'immutable_key' => 'idempotency_key',
-            'immutable_allow' => array('state', 'journal_entry_id'),
+            'immutable_allow' => array('state', 'journal_entry_id',
+                'fes_status', 'event_version', 'approved_by', 'approved_at',
+                'posted_by', 'posted_at', 'event_status'),
         ),
+        // H-12 (FES §3.2): آثارُ الحدث المستقلة — سجلٌّ إلحاقيٌّ (لا حذفَ ناعمًا:
+        // الأثرُ يُبطل بعكس حدثه لا بمحوه)، وUQ المركّب يمنع تكرارَ الأثر للطرف.
+        'fin_event_effects' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_financial_periods' => array('type' => self::T_TENANT, 'soft' => false),
         // ── بوابة الطلب المالي D05 (المرحلتان 1+2 · 2026-07-16) — أرشفةٌ لا حذف (soft=false
         // بالتصميم: الحالات الست عشرة تملك دورة الحياة، وسجلّ الطلب إلحاقيٌّ لا يُمحى) ──

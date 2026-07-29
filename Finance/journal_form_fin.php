@@ -83,6 +83,11 @@ if (isset($_GET['post_id'])) {
     if ($eidFact > 0) {
         fin_publish_request_fact($conn, $eidFact, 'finance.posted', 'posted',
             array('journal_entry_id' => $pid));
+        // H-12 (FES §7.2): Approved → Posted بقفلٍ تفاؤلي وختمِ posted_by/at
+        require_once __DIR__ . '/../app/Services/Finance/EventStateMachine.php';
+        $fesSync = \App\Services\Finance\EventStateMachine::syncTo(
+            ems_tenant_db(), $conn, $eidFact, 'Posted', $current_user_id);
+        if (!$fesSync['ok']) { error_log('journal post fes sync ev#' . $eidFact . ': ' . implode(' · ', $fesSync['reasons'])); }
     }
     // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
     $fed = fin_recalc_budget_actuals($conn, $company_id);
