@@ -14,6 +14,18 @@ $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
+// ── H-20: عزلُ مشرف المورد — يرى عقودَ موردِه وحدها قراءةً (403 مسجَّلة) ──
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+$spg_scope = \App\Services\Portal\SupplierPortalGuard::enforce(
+    $conn, $_SESSION['user'], intval($_GET['id'] ?? 0), 'Suppliers/supplierscontracts.php');
+if ($spg_scope !== null) {
+    // بوابةُ المشرف قراءةٌ حصرًا — لا إنشاءَ عقدٍ ولا تعديلَه ولا حذفَه من الخارج
+    $can_add = false; $can_edit = false; $can_delete = false;
+    // الحقنُ البنيوي: كلُّ القوائم والمرشِّحات على موردِه ولو طُلب غيرُه بمعامل
+    $_GET['id'] = $spg_scope;
+    $_GET['filter_supplier_id'] = $spg_scope;
+}
+
 if (!$can_view) {
   header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+عقود+الموردين+❌");
   exit();

@@ -12,6 +12,13 @@ include '../config.php';
 if (isset($_POST['contract_id']) || isset($_GET['contract_id'])) {
   $contract_id = intval(isset($_POST['contract_id']) ? $_POST['contract_id'] : $_GET['contract_id']);
 
+  // H-20: قراءةُ معدات عقدٍ — المقيَّدُ لا يقرأ إلا عقدَ موردِه (403 JSON مسجَّلة)
+  require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+  \App\Services\Portal\SupplierPortalGuard::enforceJson(
+    $conn, $_SESSION['user'],
+    \App\Services\Portal\SupplierPortalGuard::supplierOfContract($conn, $contract_id) ?? 0,
+    'Suppliers/get_supplier_contract_equipments.php');
+
   // عزل الشركة عبر البوابة: عقد المورد الأب يجب أن يتبع شركة المستخدم (السوبر -1 عبر forAllTenants المسجَّل)
   $_is_super = (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1');
   $sce_gate = $_is_super ? ems_tenant_db()->forAllTenants('supplier contract equipments super') : ems_tenant_db();

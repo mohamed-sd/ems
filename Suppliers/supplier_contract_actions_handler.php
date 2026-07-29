@@ -15,6 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 enforce_module_permission_json($conn, 'Suppliers/supplierscontracts_details.php', 'edit', 'لا توجد صلاحية تعديل عقود الموردين');
 
+// H-20: إجراءاتُ دورة حياة العقد أفعالُ كتابةٍ داخلية — بوابةُ المشرف الخارجي
+// قراءةٌ حصرًا فتُحجب كليًّا ولو حمل حسابُه صلاحيةَ تعديلٍ موروثة
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+if (\App\Services\Portal\SupplierPortalGuard::isRestricted($_SESSION['user'] ?? array())) {
+    http_response_code(403);
+    die(json_encode(['success' => false, 'message' => 'خارج نطاق بوابة مشرف المورد'], JSON_UNESCAPED_UNICODE));
+}
+
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 

@@ -530,6 +530,12 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         ? ems_relative_path($script_name)
         : ltrim(str_replace('\\', '/', $script_name), '/');
 
+    // H-20 · بوابة مشرف المورد (UX-05 §8.1): الجلسةُ المقيَّدةُ بمورد تُحصر
+    // في شاشات بوابتها — مسارٌ خارجها 404 مسجَّلةٌ «في الطبقة لا في الشاشات».
+    // قبل إعفاءات المراسلات/البلاغات عمدًا: المفتوحُ للجميع مُدرجٌ في القائمة.
+    require_once dirname(__DIR__) . '/app/Services/Portal/SupplierPortalGuard.php';
+    \App\Services\Portal\SupplierPortalGuard::gateScreen($conn, $_SESSION['user'], $relative_script);
+
     // لوحة التحكم هي صفحة الهبوط **وهدف التحويل الافتراضي لهذا المُنفِذ نفسه**:
     // حجبها = حلقة تحويل لا نهائية لكل دورٍ محجوب (حادثة 2026-07-10). هدف
     // التحويل لا يجوز أن يحوّل — إعفاء صريح بنمط إعفاءات المراسلات/البلاغات.

@@ -172,6 +172,24 @@ foreach ($employees_for_link as $e) {
     $emp_name_by_id[$e['id']] = $e['name'];
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// 🔗 H-20: الموردون المتاحون لربط حساب «مشرف موردين» (users.supplier_entity_id)
+// «إنشاءُ مشرفٍ يرث صلاحياتِ موردِه آليًّا» (UX-05) — الربطُ هنا هو النطاقُ
+// البنيويُّ الذي يقرؤه SupplierPortalGuard حصرًا، وحسابُ الدور 8 بلا مورد
+// لا يرى شيئًا (fail-closed).
+// ════════════════════════════════════════════════════════════════════════════
+$suppliers_for_link = array();
+try {
+    $us_sups = $us_gate->scopedQuery(array('scope' => array('s' => 'suppliers')),
+        "SELECT s.id, s.name FROM suppliers s
+         WHERE {TENANT_SCOPE} AND COALESCE(s.is_deleted,0)=0 ORDER BY s.name ASC");
+    foreach ($us_sups as $sr) {
+        $suppliers_for_link[] = array('id' => intval($sr['id']), 'name' => $sr['name']);
+    }
+} catch (\Throwable $t) { error_log('users.php suppliers: ' . $t->getMessage()); }
+$sup_name_by_id = array();
+foreach ($suppliers_for_link as $s) { $sup_name_by_id[$s['id']] = $s['name']; }
+
 // تهيئة مسبقة عند القدوم من بطاقة الموظف (users.php?employee_id=N):
 //   إن كان للموظف حساب مرتبط ⇒ نفتح الحساب في وضع التعديل، وإلا نفتح نموذج إضافة مهيّأً.
 $prefill_employee_id = isset($_GET['employee_id']) ? intval($_GET['employee_id']) : 0;
@@ -269,8 +287,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         } catch (\Throwable $t) { $employee_link_valid = false; error_log('users.php employee check: ' . $t->getMessage()); }
     }
 
+    // H-20: حسابُ «مشرف موردين» (8) يُربط بمورده — إلزامٌ وظيفيٌّ عند الحفظ
+    // (الحارسُ fail-closed فبلا ربطٍ لا يرى الحسابُ شيئًا). التحقق: مورد الشركة.
+    $supplier_link_id = !empty($_POST['supplier_entity_id']) ? intval($_POST['supplier_entity_id']) : 0;
+    $supplier_link_valid = true;
+    if (strval($role) !== '8') { $supplier_link_id = 0; }
+    if ($supplier_link_id > 0) {
+        try {
+            $us_sup_chk = $us_gate->selectOne('suppliers', array('columns' => array('id'), 'where' => array('id' => $supplier_link_id)));
+            if ($us_sup_chk === null) { $supplier_link_valid = false; }
+        } catch (\Throwable $t) { $supplier_link_valid = false; error_log('users.php supplier check: ' . $t->getMessage()); }
+    }
+
     if ($users_has_employee_id && $employee_link_id <= 0) {
         echo "<script>alert('⚠️ يجب إسناد موظف لهذا الحساب — لا يوجد حساب يعمل بلا موظف مُسنَد له');</script>";
+    } elseif (strval($role) === '8' && $supplier_link_id <= 0) {
+        echo "<script>alert('⚠️ حساب مشرف الموردين يجب ربطه بمورد — بلا ربطٍ لا يرى الحساب شيئًا');</script>";
+    } elseif ($supplier_link_id > 0 && !$supplier_link_valid) {
+        echo "<script>alert('⚠️ المورد المحدد غير صالح أو خارج نطاق الشركة');</script>";
     } elseif ($requires_project_context && ($project <= 0 || $contract <= 0)) {
         echo "<script>alert('⚠️ هذه الإدارة مرتبطة بمشروع محدد، يرجى اختيار المشروع والعقد');</script>";
     } elseif ($employee_link_id > 0 && !$employee_link_valid) {
@@ -298,6 +332,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             // إذا تم إدخال كلمة مرور جديدة، نشفّرها ونحدّثها؛ وإلا لا نغيّرها
             if ($passwordRaw !== '') { $us_data['password'] = password_hash($passwordRaw, PASSWORD_BCRYPT); }
             if ($users_has_employee_id) { $us_data['employee_id'] = $employee_link_id > 0 ? $employee_link_id : null; }
+            // H-20: نطاقُ مشرف المورد — يُكتب للدور 8 ويُصفَّر لغيره (لا نطاقَ يتيمًا)
+            $us_data['supplier_entity_id'] = $supplier_link_id > 0 ? $supplier_link_id : null;
 
             $us_upd_ok = false;
             try { $us_gate->update('users', $us_data, array('id' => $uid), $users_not_deleted_sql); $us_upd_ok = true; }
@@ -331,6 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         'parent_id' => '0', 'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s'),
                         'status' => $status,
                         'employee_id' => $employee_link_id > 0 ? $employee_link_id : null,
+                        'supplier_entity_id' => $supplier_link_id > 0 ? $supplier_link_id : null,
                     ));
                     $us_ins_ok = true;
                 } catch (\Throwable $t) { error_log('users.php insert: ' . $t->getMessage()); }
@@ -436,6 +473,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </div>
                     <?php endif; ?>
 
+                    <div id="supplierDiv" class="pu-hidden">
+                        <label><i class="fas fa-truck-field"></i> المورد المرتبط <span class="pu-required-star">*</span></label>
+                        <select name="supplier_entity_id" id="supplier_entity_id" class="form-control">
+                            <option value="">— اختر المورد —</option>
+                            <?php foreach ($suppliers_for_link as $sup): ?>
+                                <option value="<?php echo intval($sup['id']); ?>">
+                                    <?php echo htmlspecialchars((string) $sup['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> إلزامي لدور «مشرف موردين» — الحسابُ يرى موردَه هذا حصرًا (H-20)، وبلا ربطٍ لا يرى شيئًا.</small>
+                    </div>
+
                     <div id="projectDiv" class="pu-hidden">
                         <label><i class="fas fa-project-diagram"></i> المشروع <span
                                 class="pu-required-star">*</span></label>
@@ -534,7 +584,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         $result = array();
                         try {
                             $result = $us_gate->select('users', array(
-                                'columns' => array('id', 'name', 'username', 'password', 'phone', 'role', 'project_id', 'contract_id', 'status', 'employee_id'),
+                                'columns' => array('id', 'name', 'username', 'password', 'phone', 'role', 'project_id', 'contract_id', 'status', 'employee_id', 'supplier_entity_id'),
                                 'whereRaw' => "parent_id='0' AND role!='-1' AND $users_not_deleted_sql",
                                 'orderBy' => 'id DESC',
                                 'includeDeleted' => true));
@@ -600,6 +650,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                                                      data-project='{$row['project_id']}'
                                                                      data-contract='{$row['contract_id']}'
                                                                      data-employee='" . intval($row['employee_id']) . "'
+                                                                     data-supplier='" . intval(isset($row['supplier_entity_id']) ? $row['supplier_entity_id'] : 0) . "'
                                                                      title='تعديل'><i class='fas fa-edit'></i></a>
                                                                 <a href='?delete={$row['id']}' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
                                                                 </div>
@@ -675,6 +726,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         const projectSelect = document.getElementById("project_id");
         const contractSelect = document.getElementById("contract_id");
         const employeeSelect = document.getElementById("employee_id_link");
+        const supplierDiv = document.getElementById("supplierDiv");
+        const supplierSelect = document.getElementById("supplier_entity_id");
+
+        // H-20: حقلُ «المورد المرتبط» يظهر لدور مشرف الموردين (8) وحده
+        function toggleSupplierLink(roleId) {
+            const isPortalRole = String(roleId) === '8';
+            supplierDiv.classList.toggle("pu-hidden", !isPortalRole);
+            supplierSelect.required = isPortalRole;
+            if (!isPortalRole) { supplierSelect.value = ""; }
+        }
 
         const form = document.getElementById('projectForm');
         const usernameInput = document.getElementById("username");
@@ -718,6 +779,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
            إظهار الحقول حسب الدور
         ============================== */
         roleSelect.addEventListener("change", function () {
+
+            toggleSupplierLink(this.value);
 
             if (roleNeedsMineScope(this.value)) {
 
@@ -896,6 +959,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
             usernameValid = true;
             if (employeeSelect) { employeeSelect.value = ""; refreshEmployeeOptions(0); }
+            toggleSupplierLink("");
             form.classList.toggle("allforms-visible");
         });
 
@@ -914,6 +978,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const projectId = $(this).data('project');
             const contractId = $(this).data('contract');
             const employeeId = $(this).data('employee');
+            const supplierId = $(this).data('supplier');
 
             $('#uid').val(id);
             $('#name').val(name);
@@ -927,6 +992,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 refreshEmployeeOptions(id);
                 employeeSelect.value = (employeeId && parseInt(employeeId, 10) > 0) ? String(employeeId) : "";
             }
+
+            // H-20: نطاق مشرف المورد — أظهر الحقل بحسب الدور واضبط قيمته
+            toggleSupplierLink(role);
+            supplierSelect.value = (supplierId && parseInt(supplierId, 10) > 0) ? String(supplierId) : "";
 
             // إعادة تعيين حالة التحقق من اسم المستخدم
             usernameFeedback.innerHTML = '<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';

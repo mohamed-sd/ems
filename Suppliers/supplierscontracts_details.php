@@ -95,6 +95,13 @@ include '../insidebar.php';
 
 $contract_id = intval($_GET['id']);
 
+// H-20: المعرّفُ عقدُ موردٍ — يُحلّ إلى موردِه ويُفرض نطاقُ المشرف (403 مسجَّلة)
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+\App\Services\Portal\SupplierPortalGuard::enforce(
+    $conn, $_SESSION['user'],
+    \App\Services\Portal\SupplierPortalGuard::supplierOfContract($conn, $contract_id) ?? 0,
+    'Suppliers/supplierscontracts_details.php');
+
 try {
     $scd_rows = $scd_gate->scopedQuery(array(
         'scope'  => array('sc' => 'supplierscontracts'),

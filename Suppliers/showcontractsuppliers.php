@@ -41,6 +41,13 @@ include '../config.php';
 
 $contract_id = intval($_GET['id']);
 
+// H-20: المعرّفُ عقدُ موردٍ — يُحلّ إلى موردِه ويُفرض نطاقُ المشرف (403 مسجَّلة)
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+\App\Services\Portal\SupplierPortalGuard::enforce(
+    $conn, $_SESSION['user'],
+    \App\Services\Portal\SupplierPortalGuard::supplierOfContract($conn, $contract_id) ?? 0,
+    'Suppliers/showcontractsuppliers.php');
+
 // العزل عبر البوابة (الأصل كان بمعرّفٍ فقط — بلا عزل شركة)
 try {
     $scs_rows = ems_tenant_db()->scopedQuery(array(

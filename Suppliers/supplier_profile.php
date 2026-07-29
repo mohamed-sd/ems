@@ -23,6 +23,10 @@ if ($supplier_id <= 0) {
     exit();
 }
 
+// H-20: جلسةُ مشرف المورد تُقصر على موردها — 403 مسجَّلةٌ لغيره
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+\App\Services\Portal\SupplierPortalGuard::enforce($conn, $_SESSION['user'], $supplier_id, 'Suppliers/supplier_profile.php');
+
 // العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشف الأعمدة أُسقط (مضمونة
 // بالسجل)، والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق شركة).
 $spf_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier profile super') : ems_tenant_db();

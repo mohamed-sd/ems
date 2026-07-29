@@ -49,6 +49,10 @@ if (!isset($_SESSION['user'])) {
         <?php
         include '../config.php';
 
+        // H-20: جلسةُ مشرف المورد تُقصر على موردها — 403 مسجَّلةٌ لغيره
+        require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+        \App\Services\Portal\SupplierPortalGuard::enforce($conn, $_SESSION['user'], intval($_GET['id'] ?? 0), 'Suppliers/suppliers_details.php');
+
         $project = intval($_GET['id']);
 
         // العزل عبر البوابة؛ العدّادات المترابطة تُقيَّد بمراسلة suppliers.id المُنطَّق

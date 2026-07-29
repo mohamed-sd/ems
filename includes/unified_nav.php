@@ -72,6 +72,13 @@ function getUnifiedNavItems($conn, $roleId) {
     $items = array();
     $res = mysqli_query($conn, $sql);
     if ($res) { while ($row = mysqli_fetch_assoc($res)) { $items[] = $row; } }
+
+    // H-20: سايدبارُ المشرف الخارجي «أضيقُ عمدًا» (UX-05 §4) — الجلسةُ
+    // المقيَّدةُ بمورد تُرشَّح عناصرُها لقائمة البوابة (إخفاءٌ لا حذفُ منح).
+    if (isset($_SESSION['user'])) {
+        require_once dirname(__DIR__) . '/app/Services/Portal/SupplierPortalGuard.php';
+        $items = \App\Services\Portal\SupplierPortalGuard::filterNavItems($_SESSION['user'], $items);
+    }
     return $items;
 }
 

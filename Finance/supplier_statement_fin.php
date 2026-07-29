@@ -19,6 +19,13 @@ if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=لا+تو
 $cid = intval($company_id);
 
 $sel_sup = isset($_GET['sup']) ? intval($_GET['sup']) : 0;
+
+// H-20: كشفُ المشرف كشفُ موردِه حصرًا — طلبُ غيرِه 403 مسجَّلة، وغيابُ
+// المعامل يُحقن بمورده (لا يفتح فارغًا على قائمة الكل)
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+$spg_scope = \App\Services\Portal\SupplierPortalGuard::enforce($conn, $_SESSION['user'], $sel_sup, 'Finance/supplier_statement_fin.php');
+if ($spg_scope !== null) { $sel_sup = $spg_scope; }
+
 $sel_period = isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', $_GET['period']) ? $_GET['period'] : date('Y-m');
 $due_types = fin_due_types(); $settle_states = fin_settlement_states(); $work_models = fin_work_models();
 
@@ -74,7 +81,14 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <strong><i class="fas fa-truck-field"></i> المورد:</strong>
-            <select name="sup" onchange="this.form.submit()" style="min-width:220px"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id, $sel_sup); ?></select>
+            <select name="sup" onchange="this.form.submit()" style="min-width:220px"><?php
+                // H-20: المقيَّدُ يرى خيارَ موردِه وحده — لا تسريبَ لأسماء بقية الموردين
+                if ($spg_scope !== null) {
+                    echo '<option value="' . intval($spg_scope) . '" selected>' . htmlspecialchars($sup_name !== '' ? $sup_name : ('#' . intval($spg_scope))) . '</option>';
+                } else {
+                    echo fin_supplier_options($conn, $is_super_admin, $company_id, $sel_sup);
+                }
+            ?></select>
             <strong>الفترة:</strong>
             <input type="month" name="period" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
         </form>

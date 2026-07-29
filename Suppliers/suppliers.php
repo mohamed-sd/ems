@@ -39,6 +39,15 @@ if (!$can_view) {
     exit();
 }
 
+// ── H-20: عزلُ مشرف المورد بنيويًّا — يرى موردَه وحده قراءةً (403 مسجَّلة) ──
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+$spg_scope = \App\Services\Portal\SupplierPortalGuard::enforce($conn, $_SESSION['user'], 0, 'Suppliers/suppliers.php');
+if ($spg_scope !== null) {
+    // مشرفُ المورد لا يضيف موردين ولا يعدّلهم ولا يحذفهم — قراءةُ نطاقِه فقط
+    $can_add = false; $can_edit = false; $can_delete = false;
+}
+$spg_filter = ($spg_scope !== null) ? " AND s.id = " . intval($spg_scope) : "";
+
 // ══════════════════════════════════════════════════════════════════════════════
 // معالجة إضافة / تعديل مورد
 // ══════════════════════════════════════════════════════════════════════════════
@@ -522,7 +531,7 @@ include '../insidebar.php';
                               (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = s.id) AS 'num_contracts',
                               (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = s.id) AS 'total_hours'
                               FROM suppliers s
-                              WHERE {TENANT_SCOPE} AND (COALESCE(s.is_deleted,0)=0)
+                              WHERE {TENANT_SCOPE} AND (COALESCE(s.is_deleted,0)=0){$spg_filter}
                               ORDER BY s.id DESC");
                         } catch (\Throwable $t) { $suppliers_rows = array(); }
                         foreach ($suppliers_rows as $row) {
