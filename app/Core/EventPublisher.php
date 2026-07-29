@@ -248,6 +248,71 @@ class EventPublisher
         $sourceRef = $n['source_ref'];
         $legacyType = (isset($e['legacy_event_type']) && $e['legacy_event_type'] !== '') ? (string) $e['legacy_event_type'] : 'enterprise';
         $notes = (isset($e['notes']) && $e['notes'] !== '') ? (string) $e['notes'] : null;
+        // ── العطالةُ قبل كل الحوارس (N-01/M-39): عمليةٌ منشورةٌ سلفًا تعيد
+        //    مرجعَها القائم **ولو أُقفلت الفترةُ بعدها** — لا كتابةَ جديدةَ فيها. ──
+        $pre = $conn->prepare('SELECT id, event_no, correlation_id, root_event_id
+                                 FROM `fin_financial_events` WHERE idempotency_key = ? LIMIT 1');
+        if ($pre) {
+            $pre->bind_param('s', $idem);
+            $pre->execute();
+            $preRow = $pre->get_result()->fetch_assoc();
+            $pre->close();
+            if ($preRow) {
+                // الشفاء الذاتي (ADR-15) كما في مسار 1062: إسقاطٌ قديمٌ بلا جذرٍ
+                // يُربط الآن — وwriteRoot عاطلةٌ بالعطالة فلا جذرَ ثانيًا.
+                if ($preRow['root_event_id'] === null && self::rootMode() === 'publish') {
+                    try {
+                        $healRoot = self::writeRoot($conn, array(
+                            'company_id'   => $companyId,
+                            'event_key'    => $n['event_key'],
+                            'category'     => $n['category'],
+                            'source_module'=> $n['source_module'],
+                            'source_ref'   => $sourceRef,
+                            'entity_type'  => $n['entity_type'],
+                            'entity_id'    => $n['entity_id'],
+                            'quantity'     => $quantity,
+                            'unit'         => $unit,
+                            'amount'       => $amount,
+                            'currency'     => $currency,
+                            'refs'         => $refs,
+                            'event_status' => 'recorded',
+                            'reverses_event_id' => null,
+                            'occurred_at'  => $n['occurred_at'],
+                            'payload'      => $payload,
+                            'correlation_id' => $correlation,
+                            'idempotency_key' => $idem,
+                            'created_by'   => $n['created_by'],
+                        ));
+                        $h = $conn->prepare('UPDATE `fin_financial_events` SET root_event_id = ? WHERE id = ? AND root_event_id IS NULL');
+                        $hid = intval($preRow['id']);
+                        $h->bind_param('ii', $healRoot, $hid);
+                        $h->execute();
+                        $h->close();
+                        $preRow['root_event_id'] = $healRoot;
+                    } catch (\Throwable $t) {
+                        error_log('EventPublisher pre-dup heal: ' . $t->getMessage());
+                    }
+                }
+                return array(
+                    'id' => intval($preRow['id']),
+                    'event_no' => (string) $preRow['event_no'],
+                    'correlation_id' => (string) $preRow['correlation_id'],
+                    'idempotency_key' => $idem,
+                    'root_event_id' => ($preRow['root_event_id'] !== null) ? intval($preRow['root_event_id']) : null,
+                    'duplicate' => true,
+                );
+            }
+        }
+
+        // ── M-39 (UX-02 §15.4 · FES §3.1): لا نشرَ ماليًّا في فترةٍ مقفلة — 423 ──
+        // الناشرُ نقطةُ الخنق الوحيدةُ للدفتر فالحارسُ هنا يغطي كلَّ منبع، ويسبق
+        // كتابةَ الجذر حتى لا يبقى جذرٌ يتيمٌ لمستدعٍ بلا معاملة.
+        require_once dirname(__DIR__, 2) . '/includes/period_guard.php';
+        $pchk = ems_period_check($conn, $companyId, $n['occurred_at']);
+        if (!$pchk['ok']) {
+            throw new EventValidationException($pchk['reason']);
+        }
+
         $eventNo = ServerId::nextNo($conn, 'fin_financial_events:EV:' . $companyId, 'EV');
 
         // ── 4ب) الجذر المحايد (ADR-15): الحقيقة تُدوَّن قبل إسقاطها المالي —

@@ -39,13 +39,33 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
         // قاعدة الإقفال: كل البنود الإلزامية يجب أن تكون منجَزة
         $n = $g->count('fin_closing_items', array('where'=>array('period_id'=>$pid,'required'=>1,'item_state'=>'pending')));
         if ($n > 0) { header("Location: periods_fin.php?pid=$pid&msg=لا+إقفال:+بنود+إلزامية+غير+منجَزة+($n)+❌"); exit(); }
+        // M-39 (SPEC-01 #14): «زرُّ الإقفال يمنع حين يوجد غيرُ مرحَّلٍ أو فرقٌ
+        // مفتوح — بقائمة الموانع» — الفحصُ قبل Close لا بعده.
+        require_once __DIR__ . '/../includes/period_guard.php';
+        $blockers = ems_period_close_blockers($conn, $company_id, $pid);
+        if (!empty($blockers)) {
+            $bl = array();
+            foreach ($blockers as $b) { $bl[] = $b['label'] . ' (' . $b['count'] . ')'; }
+            header("Location: periods_fin.php?pid=$pid&msg=" . urlencode('لا إقفال — الموانع: ' . implode(' · ', $bl)) . "+❌"); exit();
+        }
         $g->update('fin_financial_periods', array('state'=>'closed','posting_allowed'=>0,'closed_at'=>$now), array('id'=>$pid), "state IN('open','soft_closed')");
         header("Location: periods_fin.php?msg=تم+إقفال+الفترة+✅"); exit();
     } elseif ($act === 'lock') {
         $g->update('fin_financial_periods', array('state'=>'locked','locked_at'=>$now), array('id'=>$pid), "state='closed'");
         header("Location: periods_fin.php?msg=تم+القفل+النهائي+✅"); exit();
     } elseif ($act === 'reopen') {
-        $g->update('fin_financial_periods', array('state'=>'reopened','posting_allowed'=>1,'reopen_reason'=>'فتح استثنائي','reopened_by'=>$current_user_id), array('id'=>$pid), "state IN('closed','soft_closed')");
+        // M-39 (SPEC-01 #14): «فتحُ فترةٍ مقفلةٍ قرارٌ أعلى موثَّق» — السببُ
+        // إلزامٌ مكتوبٌ لا نصٌّ ثابت، وفاعلُه مختوم (reopened_by).
+        $reason = trim((string) ($_GET['reason'] ?? ''));
+        if ($reason === '') {
+            header("Location: periods_fin.php?pid=$pid&msg=" . urlencode('الفتحُ الاستثنائي يلزمه سببٌ موثَّق — اكتبه في نافذة التأكيد') . "+❌"); exit();
+        }
+        $g->update('fin_financial_periods', array('state'=>'reopened','posting_allowed'=>1,'reopen_reason'=>mb_substr($reason,0,200),'reopened_by'=>$current_user_id), array('id'=>$pid), "state IN('closed','soft_closed')");
+        // N-02: قرارُ الفتح الاستثنائي يدخل سجلَّ التدقيق بسببه
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        ems_audit_change($conn, 'journal', 'periods_fin', 'reopen_period', $pid,
+            array('posting_allowed' => 0), array('posting_allowed' => 1),
+            array('company_id' => $company_id, 'user_id' => $current_user_id, 'note' => $reason));
         header("Location: periods_fin.php?msg=تم+الفتح+الاستثنائي+✅"); exit();
     }
 }
@@ -145,7 +165,7 @@ include '../insidebar.php';
                         if ($st === 'open') echo "<a href='?action=soft_close&pid=$id' class='action-btn edit' title='إقفال مرحلي'><i class='fas fa-hourglass-half'></i></a>";
                         if (in_array($st, array('open','soft_closed'))) echo "<a href='?action=close&pid=$id' class='action-btn edit' title='إقفال نهائي' onclick='return confirm(\"إقفال الفترة؟ يتطلب إنجاز بنود الإقفال.\")'><i class='fas fa-flag-checkered'></i></a>";
                         if ($st === 'closed') echo "<a href='?action=lock&pid=$id' class='action-btn delete' title='قفل نهائي' onclick='return confirm(\"قفل نهائي؟ يمنع أي تعديل.\")'><i class='fas fa-lock'></i></a>";
-                        if (in_array($st, array('closed','soft_closed'))) echo "<a href='?action=reopen&pid=$id' class='action-btn edit' title='فتح استثنائي' onclick='return confirm(\"فتح استثنائي؟\")'><i class='fas fa-rotate-left'></i></a>";
+                        if (in_array($st, array('closed','soft_closed'))) echo "<a href='javascript:void(0)' class='action-btn edit' title='فتح استثنائي' onclick='emsReopenPeriod($id)'><i class='fas fa-rotate-left'></i></a>";
                     }
                     echo "<a href='?pid=$id' class='action-btn' title='قائمة الإقفال'><i class='fas fa-list-check'></i></a>";
                     echo "</div></td>";
@@ -209,6 +229,14 @@ $(document).ready(function () {
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
     $('#pt').on('change', function () { $('#pnowrap').toggle(this.value === 'month'); });
 });
+// M-39: الفتحُ الاستثنائي قرارٌ موثَّق — السببُ إلزامٌ قبل الإرسال
+window.emsReopenPeriod = function (pid) {
+    var reason = window.prompt('الفتحُ الاستثنائي لفترةٍ مقفلةٍ قرارٌ موثَّق.\nاكتب سببَ الفتح:');
+    if (reason === null) { return; }
+    reason = reason.trim();
+    if (reason === '') { alert('السببُ إلزامي — لا فتحَ بلا سببٍ مكتوب'); return; }
+    window.location = '?action=reopen&pid=' + pid + '&reason=' + encodeURIComponent(reason);
+};
 </script>
 </body>
 </html>

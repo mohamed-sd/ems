@@ -137,6 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     if ($posting_date === '') { header("Location: journal_form_fin.php?msg=تاريخ+الترحيل+مطلوب+❌"); exit(); }
     // M-38: تاريخُ الحركة الفعلي إلزامٌ (بجانب تاريخ الترحيل) — SPEC-01 #13
     if ($txn_date === '') { $txn_date = $posting_date; }
+    // M-39: لا كتابةَ ماليةً في فترةٍ مقفلة — حتى المسودةُ (423)
+    require_once __DIR__ . '/../includes/period_guard.php';
+    $pchk = ems_period_check($conn, $company_id, $posting_date);
+    if (!$pchk['ok']) { header("Location: journal_form_fin.php?msg=" . urlencode($pchk['reason']) . "+❌"); exit(); }
     // M-38: اليدويُّ الاستثنائي بسببٍ موثَّق إلزامًا (SPEC-01 #13: POST /journal/manual بسببٍ إلزامي)
     if ($memo === '') { header("Location: journal_form_fin.php?msg=بيان+القيد+(السبب)+إلزامي+للقيد+اليدوي+❌"); exit(); }
     // M-38: العملة من الدليل المسجَّل حصرًا

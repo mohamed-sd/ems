@@ -134,6 +134,9 @@ fwrite(STDOUT, "  (بُذرت بيئةٌ: عميل#{$CLIENT} → مشروع#{$PR
 
 $recv0 = (int) $scalar("SELECT COUNT(*) FROM fin_receivables");
 $ev0   = (int) $scalar("SELECT COUNT(*) FROM fin_financial_events");
+// خطُّ أساسٍ لا صفر: الجدولُ لم يعد بكرًا منذ أول مستخلصٍ حيٍّ في تاريخ النظام
+// (CLM-2026-0001 · تفعيل CON-02) — انزياحُ توقُّعٍ مصنَّفٌ في أمر التنفيذ §3.
+$claims0 = (int) $scalar("SELECT COUNT(*) FROM claims");
 
 // ثم يُبذَر التحويلُ المالي (قيودُ الإيراد) — بعد اللقطة لا قبلها
 foreach (array(array($tsIds[0], '2027-08-02', 8.0), array($tsIds[1], '2027-08-03', 6.5),
@@ -192,8 +195,13 @@ head('③ لا وحدةَ تُستخلص مرتين');
 $again = claim_billable_units($g, $CONTRACT, '2027-08-01', '2027-08-31');
 check(count($again) === 0, '★ الوقائعُ المستخلَصةُ لم تعد قابلةً للاستخلاص');
 
+// M-08 (ENT-03 §7): كانت تعيد «لا وحدات» صامتةً — صارت 409 بمرجع سطر كلِّ
+// وحدةٍ فُوترت سابقًا (صفرُ ازدواجٍ في الإيراد، والسببُ مسمًّى لا مُخمَّن)
 $res2 = claim_generate($conn, $CONTRACT, '2027-08-01', '2027-08-15', $ACTOR);
-check($res2['status'] === 'empty', 'وفترةٌ فرعيةٌ داخلها تعيد «لا وحدات» لا بنودًا مكررة');
+check($res2['status'] === 'conflict' && intval($res2['code'] ?? 0) === 409,
+    'وفترةٌ فرعيةٌ داخلها تُرفض 409 (فُوترت سابقًا) لا بنودًا مكررة: ' . $res2['status']);
+check(!empty($res2['billed_conflicts']) && strpos((string) $res2['reason'], 'سطر #') !== false,
+    'وبمرجع سطر كلِّ وحدة: ' . mb_substr((string) $res2['reason'], 0, 90));
 
 check((int) $scalar("SELECT COUNT(*) FROM claim_lines cl1 JOIN claim_lines cl2
         ON cl1.source_kind=cl2.source_kind AND cl1.source_ref=cl2.source_ref AND cl1.id<>cl2.id
@@ -310,7 +318,7 @@ if ($res8['claim_id']) {
 $cleanup();
 check((int) $scalar("SELECT COUNT(*) FROM fin_receivables") === $recv0, 'بعد الكنس: الذممُ كما كانت');
 check((int) $scalar("SELECT COUNT(*) FROM fin_financial_events") === $ev0, 'والدفترُ كما كان');
-check((int) $scalar("SELECT COUNT(*) FROM claims") === 0, 'ولا مستخلصَ متبقٍّ');
+check((int) $scalar("SELECT COUNT(*) FROM claims") === $claims0, 'ولا مستخلصَ زائدًا على خط الأساس (' . $claims0 . ')');
 
 fwrite(STDOUT, "\n" . str_repeat('═', 46) . "\nالنتيجة: {$PASS} ناجح · {$FAIL} فاشل\n");
 exit($FAIL > 0 ? 1 : 0);

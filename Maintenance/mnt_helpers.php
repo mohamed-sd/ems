@@ -503,6 +503,13 @@ if (!function_exists('mnt_publish_order_cost')) {
             return (is_array($res) && !empty($res['duplicate'])) ? 'duplicate' : 'published';
         } catch (\Throwable $t) {
             $conn->rollback();
+            // M-33 (UX-04 §8.2): «423 بفترةٍ مقفلةٍ → RetryPending» — حكمُ الفترة
+            // يُعلَن باسمه لا يُبلَع في failed: الأمرُ يبقى وينشره الاستيرادُ أو
+            // إعادةُ الإقفال يومَ تُفتح الفترة (زرُّ الاستيراد شبكةُ الأمان القائمة).
+            if (strpos($t->getMessage(), '423') !== false) {
+                error_log('mnt publish cost #' . $order_id . ' (' . $channel . '): RetryPending — ' . $t->getMessage());
+                return 'retry_pending';
+            }
             error_log('mnt publish cost #' . $order_id . ' (' . $channel . '): ' . $t->getMessage());
             return 'failed';
         }

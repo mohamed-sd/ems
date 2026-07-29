@@ -162,6 +162,42 @@ if (!function_exists('claim_billable_units')) {
     }
 }
 
+if (!function_exists('claim_already_billed_units')) {
+    /**
+     * M-08 (ENT-03 §7): الوحداتُ المفوترةُ سابقًا في الفترة — **بمرجع سطرها**.
+     * كانت تُستبعد صامتةً (`clh.id IS NULL` في claim_billable_units)، والمعيارُ:
+     * «وحدةٌ فُوترت سابقًا → 409 بمرجع سطرها · صفرُ ازدواجٍ في الإيراد».
+     *
+     * @return array[] {source_ref, work_date, claim_line_id, claim_id, claim_no}
+     */
+    function claim_already_billed_units($gate, $contract_id, $from, $to)
+    {
+        try {
+            return $gate->scopedQuery(
+                array('scope' => array('ts' => 'timesheet', 'cll' => 'claim_lines', 'clh' => 'claims'),
+                      'enrich' => array('o' => 'operations')),
+                "SELECT ts.id AS source_ref, ts.date AS work_date,
+                        cll.id AS claim_line_id, clh.id AS claim_id, clh.claim_no
+                   FROM timesheet ts
+                   JOIN claim_lines cll
+                        ON cll.source_kind = 'timesheet' AND cll.source_ref = ts.id
+                   JOIN claims clh
+                        ON clh.id = cll.claim_id AND clh.state <> 'cancelled'
+                       AND COALESCE(clh.is_deleted,0) = 0
+                   LEFT JOIN operations o ON o.id = ts.operator
+                  WHERE {TENANT_SCOPE}
+                    AND o.contract_id = ?
+                    AND ts.date BETWEEN ? AND ?
+                    AND ts.status = 1
+                  ORDER BY ts.date ASC, ts.id ASC",
+                array(intval($contract_id), $from, $to));
+        } catch (\Throwable $t) {
+            error_log('claim_already_billed_units: ' . $t->getMessage());
+            return array();
+        }
+    }
+}
+
 if (!function_exists('claim_unbilled_scope')) {
     /**
      * وصلاتُ «الجاهز للفوترة ولم يُفوتر» وشرطُها — **تعريفٌ واحدٌ في موضعٍ واحد**.
@@ -455,6 +491,24 @@ if (!function_exists('claim_generate')) {
         if (!$lines) {
             // تشخيصٌ يقول **أين وقف اليوم** بدل رسالةٍ عامةٍ تُترك للتخمين
             $diag = claim_period_diagnosis($gate, $contract_id, $from, $to);
+            // M-08 (ENT-03 §7): وحدةٌ فُوترت سابقًا → 409 **بمرجع سطرها** لا
+            // استبعادٌ صامتٌ يوهم أن الفترةَ فارغة.
+            $billed = claim_already_billed_units($gate, $contract_id, $from, $to);
+            if (!empty($billed)) {
+                $refs = array();
+                foreach (array_slice($billed, 0, 5) as $b) {
+                    $refs[] = 'اليوم #' . $b['source_ref'] . ' (' . $b['work_date'] . ') في '
+                            . $b['claim_no'] . ' سطر #' . $b['claim_line_id'];
+                }
+                $out['status'] = 'conflict';
+                $out['code'] = 409;
+                $out['billed_conflicts'] = $billed;
+                $out['reason'] = '409: ' . count($billed) . ' وحدةً في الفترة فُوترت سابقًا — '
+                    . implode(' · ', $refs)
+                    . (count($billed) > 5 ? ' · …' : '')
+                    . ' — صفرُ ازدواجٍ في الإيراد';
+                return $out;
+            }
             $out['status'] = 'empty';
             $out['reason'] = 'لا يومَ قابلًا للاستخلاص'
                 . ($diag !== '' ? (' — ' . $diag) : '')
@@ -493,6 +547,12 @@ if (!function_exists('claim_generate')) {
             if ($curMismatch > 0) { $skips[] = $curMismatch . ' بعملةٍ تخالف عملة العقد'; }
             if ($zeroQty > 0)     { $skips[] = $zeroQty . ' بكميةٍ أو مبلغٍ صفري'; }
             if ($penSkipped > 0)  { $skips[] = $penSkipped . ' جزاءً/حافزًا بعملةٍ مخالفة'; }
+            // M-08: المفوترةُ سابقًا تُعلَن بعدّها ومراجعها — لا استبعادَ صامتًا
+            $billedPartial = claim_already_billed_units($gate, $contract_id, $from, $to);
+            if (!empty($billedPartial)) {
+                $out['billed_conflicts'] = $billedPartial;
+                $skips[] = count($billedPartial) . ' وحدةً فُوترت سابقًا (لم تُكرَّر — 409 لكلٍّ بمرجع سطرها)';
+            }
             if ($skips) { $out['reason'] = 'تُركت: ' . implode(' · ', $skips); }
         } catch (\Throwable $t) {
             error_log('claim generate: ' . $t->getMessage());
@@ -952,6 +1012,17 @@ if (!function_exists('claim_approve')) {
         if (!empty($c['submitted_by']) && intval($c['submitted_by']) === intval($uid)) {
             $out['status'] = 'blocked';
             $out['reason'] = 'لا يُجيز المستخلصَ من رفعه — الإجازةُ يدٌ ثانية';
+            return $out;
+        }
+
+        // M-08/M-39 (ENT-03 §7): فترةٌ مقفلة → 423 — الفوترةُ فعلٌ ماليٌّ يقع
+        // اليوم، فالفترةُ المفحوصة فترةُ يوم الإجازة لا فترةُ العمل المستخلَص.
+        require_once __DIR__ . '/../includes/period_guard.php';
+        $pchk = ems_period_check($conn, intval($c['company_id']), date('Y-m-d'));
+        if (!$pchk['ok']) {
+            $out['status'] = 'blocked';
+            $out['code'] = 423;
+            $out['reason'] = $pchk['reason'];
             return $out;
         }
 
