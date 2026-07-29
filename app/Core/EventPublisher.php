@@ -353,14 +353,23 @@ class EventPublisher
         $periodId   = self::resolvePeriodId($conn, $companyId, $n['occurred_at']);
         $fesStatus  = 'Published'; // الناشرُ هو خطوةُ النشر (Draft ما قبل الناشر)
 
+        // ── M-40 (FES §3.3): ثلاثيةُ العملة عند النشر — السعرُ النافذ بتاريخ
+        //    الوقوع من fin_fx_rates، والمعادلُ ROUND(amount × fx, 2). المستدعي
+        //    له تمريرُ سعره (يثبت بالاعتماد)، وغيابُ السعر NULL معلَنٌ لا مخترَع. ──
+        $fxRate = (isset($e['fx_rate']) && is_numeric($e['fx_rate']) && (float) $e['fx_rate'] > 0)
+            ? (float) $e['fx_rate']
+            : self::resolveFxRate($conn, $companyId, $currency, $n['occurred_at']);
+        $baseAmount = ($fxRate !== null && $amount !== null) ? round(((float) $amount) * $fxRate, 2) : null;
+
         // ── 5) الإدراج — أعمدة صريحة، prepared، على اتصال/معاملة المستدعي ──
         $sql = 'INSERT INTO `fin_financial_events`
             (company_id, event_no, event_type, event_key, category, source_module, source_ref,
              entity_type, entity_id, source_line_id, source_doc_version, amount, quantity, unit, currency,
+             fx_rate, base_amount,
              project_id, contract_id, contract_line_id, equipment_id, supplier_entity_id, customer_entity_id, operator_employee_id,
              party_type, party_id, fiscal_period_id, due_date, fes_status,
              state, occurred_at, notes, correlation_id, causation_id, idempotency_key, schema_version, payload, created_by, root_event_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             throw new \RuntimeException('EventPublisher: prepare failed: ' . $conn->error);
@@ -374,11 +383,12 @@ class EventPublisher
         $category   = $n['category'];
         $sourceModule = $n['source_module'];
         $occurredAt = $n['occurred_at'];
-        // الأنواع للـ37 وسيطًا (بترتيب الأعمدة أعلاه حرفيًّا)
+        // الأنواع للـ39 وسيطًا (بترتيب الأعمدة أعلاه حرفيًّا)
         $stmt->bind_param(
-            'isssssssiiidsssiiiiiiisiissssssssisii',
+            'isssssssiiidsssddiiiiiiisiissssssssisii',
             $companyId, $eventNo, $legacyType, $eventKey, $category, $sourceModule, $sourceRef,
             $entityType, $entityId, $srcLineId, $srcDocVer, $amount, $quantity, $unit, $currency,
+            $fxRate, $baseAmount,
             $refs['project_id'], $refs['contract_id'], $contractLineId, $refs['equipment_id'],
             $refs['supplier_entity_id'], $refs['customer_entity_id'], $refs['operator_employee_id'],
             $partyType, $partyId, $periodId, $dueDate, $fesStatus,
@@ -428,13 +438,13 @@ class EventPublisher
         if ($effType !== null) {
             $es = $conn->prepare('INSERT INTO `fin_event_effects`
                 (company_id, event_id, effect_type, party_type, party_id, contract_line_id, amount, base_amount, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, NULL, \'active\')');
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, \'active\')');
             if ($es) {
                 // أعمدةُ المفتاح الفريد لا تقبل NULL (عطالةٌ حقيقية): الغياب = ''/0
                 $effPartyType = ($partyType === null) ? '' : $partyType;
                 $effPartyId   = ($partyId === null) ? 0 : $partyId;
                 $effLineId    = ($contractLineId === null) ? 0 : $contractLineId;
-                $es->bind_param('iissiid', $companyId, $newId, $effType, $effPartyType, $effPartyId, $effLineId, $amount);
+                $es->bind_param('iissiidd', $companyId, $newId, $effType, $effPartyType, $effPartyId, $effLineId, $amount, $baseAmount);
                 if (!$es->execute() && $es->errno !== 1062) {
                     $err = $es->error;
                     $es->close();
@@ -491,6 +501,29 @@ class EventPublisher
         if (isset($set['supplier'])) { return array('supplier', $set['supplier']); }
         $t = array_keys($set);
         return array($t[0], $set[$t[0]]);
+    }
+
+    /**
+     * السعرُ النافذ لعملةٍ بتاريخٍ — آخرُ سعرٍ سريانُه ≤ التاريخ (FES §3.3 · M-40).
+     * SQL مباشرٌ لا بوابة: الناشرُ يُستدعى من كل السياقات (شاشة · cron · CLI).
+     * NULL = لا سعرَ يغطي التاريخ — غيابٌ معلَنٌ لا يُخترع.
+     */
+    private static function resolveFxRate(\mysqli $conn, $companyId, $currency, $occurredAt)
+    {
+        $currency = trim((string) $currency);
+        if ($currency === '') { return null; }
+        $date = ($occurredAt !== null && $occurredAt !== '') ? substr((string) $occurredAt, 0, 10) : date('Y-m-d');
+        $st = $conn->prepare('SELECT rate_to_base FROM `fin_fx_rates`
+            WHERE company_id = ? AND currency_code = ? AND COALESCE(is_deleted, 0) = 0
+              AND effective_from <= ?
+            ORDER BY effective_from DESC LIMIT 1');
+        if (!$st) { return null; }
+        $cid = intval($companyId);
+        $st->bind_param('iss', $cid, $currency, $date);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        return $row ? (float) $row['rate_to_base'] : null;
     }
 
     /**
