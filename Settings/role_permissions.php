@@ -45,10 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$role_id || !$module_id) {
         $error_msg = 'الدور والصفحة مطلوبان ❌';
     } else {
-        // القراءة عبر البوابة (role_permissions مرجع عام)
+        // القراءة عبر البوابة (role_permissions مرجع عام) — الأعمدةُ الأربعة تُقرأ
+        // كاملةً لأن سجل التدقيق (N-02) يحتاج قيمَ «قبل» لا الوجودَ فقط.
         $existing = null;
         try {
-            $existing = ems_tenant_db()->selectOne('role_permissions', array('columns' => array('id'),
+            $existing = ems_tenant_db()->selectOne('role_permissions', array(
+                'columns' => array('id', 'can_view', 'can_add', 'can_edit', 'can_delete'),
                 'where' => array('role_id' => intval($role_id), 'module_id' => intval($module_id))));
         } catch (\Throwable $t) { error_log('role_permissions.php existing: ' . $t->getMessage()); }
 
@@ -72,6 +74,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         if ($stmt->execute()) {
             $success_msg = 'تم حفظ الصلاحيات بنجاح ✅';
+            // N-02: تدقيقُ تغيير الصلاحية بقيم قبل/بعد (من غيّر ماذا ومتى)
+            require_once __DIR__ . '/../includes/audit_trail.php';
+            ems_audit_change($conn, 'permissions', 'role_permissions', $existing ? 'update' : 'grant',
+                intval($existing['id'] ?? 0),
+                $existing ? array('can_view' => $existing['can_view'], 'can_add' => $existing['can_add'],
+                                  'can_edit' => $existing['can_edit'], 'can_delete' => $existing['can_delete'])
+                          : array(),
+                array('role_id' => intval($role_id), 'module_id' => intval($module_id),
+                      'can_view' => $can_view, 'can_add' => $can_add,
+                      'can_edit' => $can_edit, 'can_delete' => $can_delete));
         } else {
             $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
         }
@@ -85,12 +97,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$id) {
         $error_msg = 'معرف الصلاحية غير صحيح ❌';
     } else {
+        // N-02: قيمُ «قبل» تُلتقط قبل الحذف — وإلا ضاع ما حُذف بلا أثر
+        $oldPerm = null;
+        try {
+            $oldPerm = ems_tenant_db()->selectOne('role_permissions', array(
+                'columns' => array('role_id', 'module_id', 'can_view', 'can_add', 'can_edit', 'can_delete'),
+                'where' => array('id' => intval($id))));
+        } catch (\Throwable $t) { error_log('role_permissions.php old perm: ' . $t->getMessage()); }
         // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] (انظر تعليق الحفظ أعلاه)
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE id = ?");
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
             $success_msg = 'تم حذف الصلاحية بنجاح ✅';
+            require_once __DIR__ . '/../includes/audit_trail.php';
+            ems_audit_change($conn, 'permissions', 'role_permissions', 'revoke', intval($id),
+                is_array($oldPerm) ? $oldPerm : array(), array());
         } else {
             $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
         }
@@ -124,6 +146,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $stmt->execute();
         }
 
+        // N-02: منحٌ شامل — يُدوَّن فعلًا واحدًا بعدّاده (لا صفًّا لكل موديول)
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        ems_audit_change($conn, 'permissions', 'role_permissions', 'grant_all', intval($role_id),
+            array('modules_granted' => 0),
+            array('role_id' => intval($role_id), 'modules_granted' => count($modules_result)));
+
         $success_msg = 'تم منح جميع الصلاحيات للدور ✅';
     }
 }
@@ -135,12 +163,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$role_id) {
         $error_msg = 'الدور مطلوب ❌';
     } else {
+        // N-02: عدُّ ما سيُسحب قبل السحب — قيمةُ «قبل»
+        $beforeCount = 0;
+        try {
+            $cq = $conn->prepare("SELECT COUNT(*) c FROM role_permissions WHERE role_id = ?");
+            $rid = intval($role_id);
+            $cq->bind_param('i', $rid);
+            $cq->execute();
+            $beforeCount = intval($cq->get_result()->fetch_assoc()['c']);
+            $cq->close();
+        } catch (\Throwable $t) { error_log('role_permissions.php revoke count: ' . $t->getMessage()); }
         // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] (انظر تعليق الحفظ أعلاه)
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE role_id = ?");
         $stmt->bind_param("i", $role_id);
 
         if ($stmt->execute()) {
             $success_msg = 'تم سحب جميع الصلاحيات من الدور ✅';
+            require_once __DIR__ . '/../includes/audit_trail.php';
+            ems_audit_change($conn, 'permissions', 'role_permissions', 'revoke_all', intval($role_id),
+                array('role_id' => intval($role_id), 'modules_granted' => $beforeCount),
+                array('modules_granted' => 0));
         } else {
             $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
         }

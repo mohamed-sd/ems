@@ -193,7 +193,9 @@ head('⑧ الاشتقاقُ الابتدائيُّ مطابقٌ لشواهده'
 $rows = $conn->query("SELECT id, contract_status, status, pause_date, resume_date, actual_end,
                         (SELECT COUNT(*) FROM operations o WHERE o.contract_id=c.id) ops
                         FROM contracts c WHERE company_id={$CO} ORDER BY id")->fetch_all(MYSQLI_ASSOC);
-check(count($rows) === 9, 'العقودُ التسعة: ' . count($rows));
+// كان `=== 9` يومَ الاشتقاق — والعقودُ تنمو بالاستعمال فالعدُّ أرضيةٌ لا سقف
+// (انزياحُ توقُّعاتٍ مصنَّفٌ في أمر التنفيذ §3 — والسلوكُ يُفحص صفًّا صفًّا أدناه)
+check(count($rows) >= 9, 'عقودُ الاشتقاق حاضرة (9 فأكثر): ' . count($rows));
 $nulls = 0; $wrong = array();
 foreach ($rows as $r) {
     if ($r['contract_status'] === null) { $nulls++; continue; }

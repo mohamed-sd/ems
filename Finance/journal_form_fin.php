@@ -89,6 +89,12 @@ if (isset($_GET['post_id'])) {
             ems_tenant_db(), $conn, $eidFact, 'Posted', $current_user_id);
         if (!$fesSync['ok']) { error_log('journal post fes sync ev#' . $eidFact . ': ' . implode(' · ', $fesSync['reasons'])); }
     }
+    // N-02: تدقيقُ الترحيل بقيم قبل/بعد
+    require_once __DIR__ . '/../includes/audit_trail.php';
+    ems_audit_change($conn, 'journal', 'journal_form_fin', 'post', $pid,
+        array('state' => 'draft'), array('state' => 'posted', 'posted_by' => $current_user_id),
+        array('company_id' => $company_id, 'user_id' => $current_user_id));
+
     // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
     $fed = fin_recalc_budget_actuals($conn, $company_id);
     header("Location: journal_form_fin.php?msg=تم+ترحيل+القيد+وتحدّث+فعلي+الموازنة+($fed+بند)+✅"); exit();
@@ -99,9 +105,16 @@ if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: journal_form_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $did = intval($_GET['delete_id']);
     // حذف ناعم مشروط بحالة draft → update بحارس whereRaw (softDelete بالـid فقط لا يحمل شرط الحالة)
-    ems_tenant_db()->update('fin_journal_entries',
+    $affected = ems_tenant_db()->update('fin_journal_entries',
         array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
         array('id' => $did), "state='draft'");
+    // N-02: تدقيقُ حذف المسودة (حذفٌ ناعمٌ فقط — والمرحَّل لا يُحذف أصلًا)
+    if (intval($affected) > 0) {
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        ems_audit_change($conn, 'journal', 'journal_form_fin', 'soft_delete', $did,
+            array('is_deleted' => 0), array('is_deleted' => 1, 'deleted_by' => $current_user_id),
+            array('company_id' => $company_id, 'user_id' => $current_user_id));
+    }
     header("Location: journal_form_fin.php?msg=تم+حذف+القيد+بنجاح+✅"); exit();
 }
 

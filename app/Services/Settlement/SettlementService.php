@@ -386,6 +386,14 @@ class SettlementService
             error_log('settlement submit: ' . $t->getMessage());
             $out['reason'] = 'تعذّر الرفع'; return $out;
         }
+        // N-02: تدقيقُ التغيير بقيم قبل/بعد
+        if (isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof \mysqli) {
+            require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+            ems_audit_change($GLOBALS['conn'], 'settlements', 'settlements', 'state_transition',
+                intval($settlementId),
+                array('state' => (string) $st['state']), array('state' => self::ST_REVIEW),
+                array('company_id' => intval($st['company_id']), 'user_id' => intval($userId)));
+        }
         $out['ok'] = true;
         return $out;
     }
@@ -517,6 +525,14 @@ class SettlementService
             error_log('settlement approve state #' . $sid . ': ' . $t->getMessage());
             $out['reason'] = 'نُشر الحدثُ وتعذّر تحديثُ الحالة'; return $out;
         }
+
+        // N-02: تدقيقُ الاعتماد بقيم قبل/بعد (الحالةُ والاتجاهُ والمعتمِد)
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'settlements', 'settlements', 'approve', $sid,
+            array('state' => (string) $st['state'], 'net_direction' => (string) $st['net_direction']),
+            array('state' => ($reqId !== null) ? self::ST_REQUESTED : self::ST_APPROVED,
+                  'net_direction' => $direction, 'approved_by' => intval($userId)),
+            array('company_id' => $company, 'user_id' => intval($userId)));
 
         $out['ok'] = true;
         $out['net_direction']      = $direction;

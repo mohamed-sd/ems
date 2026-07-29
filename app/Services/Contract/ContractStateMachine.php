@@ -279,6 +279,13 @@ class ContractStateMachine
     /** حقيقةُ الانتقال في الجذر المحايد — إشهارٌ لا شرطُ صحة. */
     private static function emit($conn, $gate, $companyId, $contractId, $from, $to, $note, $actor)
     {
+        // N-02: سجلُّ التدقيق بقيم قبل/بعد — نقطةُ الخنق الواحدة لكل انتقالات
+        // العقد (transition/suspend/resume تمرّ كلُّها من هنا).
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'contracts', 'contracts', 'state_transition', (int) $contractId,
+            array('contract_status' => $from), array('contract_status' => $to),
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor,
+                  'contract_id' => (int) $contractId, 'note' => (string) $note));
         try {
             require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
             \App\Core\EventPublisher::publishFact($conn, array(
