@@ -16,8 +16,10 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once __DIR__ . '/../app/Services/Payroll/PayrollRunService.php';
+require_once __DIR__ . '/../app/Services/Payroll/TimePathService.php';
 
 use App\Services\Payroll\PayrollRunService as PRS;
+use App\Services\Payroll\TimePathService as TPS;
 
 $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -84,6 +86,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $r = PRS::bindSnapshots($conn, $gate, $company_id, $rid2, $uid);
         $redirect($r['ok'] ? ('ربطُ اللقطات: ' . $r['lines'] . ' سطرًا · ' . $r['reason'] . ' ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
+    }
+
+    if ($action === 'time_path') {
+        $rid2 = intval($_POST['run_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
+        $r = TPS::compute($conn, $gate, $company_id, $rid2, $uid);
+        $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
+    }
+
+    if ($action === 'time_input') {
+        $rid2 = intval($_POST['run_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
+        $r = TPS::recordTimeInput($conn, $gate, $company_id, $rid2, array(
+            'person_id' => $_POST['person_id'] ?? 0,
+            'kind'      => $_POST['kind'] ?? '',
+            'qty'       => $_POST['qty'] ?? 0,
+            'doc_ref'   => $_POST['doc_ref'] ?? '',
+            'note'      => $_POST['input_note'] ?? '',
+        ), $uid);
+        $redirect($r['ok'] ? 'سُجّل مدخلُ الزمن بمستنده ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 }
 
@@ -180,6 +202,14 @@ include '../insidebar.php';
                     <button type="submit" class="btn-save"><i class="fa fa-link"></i> اربط اللقطات</button>
                 </form>
             <?php else: ?></form><?php endif; ?>
+            <?php if ($run !== null && $can_edit
+                      && in_array((string)$run['state'], array('Calculated','Blocked'), true)): ?>
+                <form method="post" style="display:inline">
+                    <input type="hidden" name="pr_action" value="time_path">
+                    <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
+                    <button type="submit" class="btn-save"><i class="fa fa-clock"></i> المسارُ الزمني</button>
+                </form>
+            <?php endif; ?>
 
         <?php if ($run !== null): ?>
         <div style="margin-top:14px;line-height:1.9">
@@ -221,21 +251,63 @@ include '../insidebar.php';
     </div></div></div>
     <?php endif; ?>
 
+    <?php if ($run !== null && $can_edit): ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-keyboard"></i> مدخلاتُ الزمن — <strong>بمستندها إلزامًا</strong></h5></div>
+    <div class="card-body">
+        <p style="color:#666;margin-bottom:10px">
+            «ولا خصمَ بلا مستند» (ENT-01 §4) — والزيادةُ مثلُه: ساعةُ إضافيٍّ بلا مرجعٍ
+            رقمٌ يزيد أجرًا بلا سند. ولا مصدرَ آليًّا لهذه المدخلات في النظام اليوم.
+        </p>
+        <form method="post" class="ems-form">
+            <input type="hidden" name="pr_action" value="time_input">
+            <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
+            <div class="form-grid">
+                <div class="form-group"><label>رقم الشخص <span style="color:#c00">*</span></label>
+                    <input type="number" name="person_id" min="1" required></div>
+                <div class="form-group">
+                    <label>النوع <span style="color:#c00">*</span></label>
+                    <select name="kind" required>
+                        <option value="overtime_hours">ساعاتُ إضافي</option>
+                        <option value="night_shifts">ورديّاتٌ ليلية</option>
+                        <option value="unpaid_days">أيامٌ غيرُ مدفوعة</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>الكمية <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0.01" name="qty" required></div>
+                <div class="form-group"><label>مرجع المستند <span style="color:#c00">*</span></label>
+                    <input type="text" name="doc_ref" required maxlength="120"
+                           placeholder="إذنُ عملٍ إضافي 2047/114"></div>
+                <div class="form-group"><label>ملاحظة</label><input type="text" name="input_note" maxlength="255"></div>
+            </div>
+            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
+        </form>
+    </div></div>
+    <?php endif; ?>
+
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> أسطرُ الاحتساب بلقطاتها</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr>
-                <th>الشخص</th><th>المسار</th><th>المكوّن</th><th>الطريقة</th>
-                <th>المعدل</th><th>الجهة</th><th>٪</th><th>المبلغ</th><th>الحالة</th><th>اللقطة</th>
+                <th>الشخص</th><th>النوع</th><th>المسار</th><th>المكوّن</th><th>الطريقة</th>
+                <th>المعدل</th><th>الأيام</th><th>الجهة</th><th>٪</th><th>المبلغ</th><th>الحالة</th><th>اللقطة</th>
             </tr></thead>
             <tbody>
             <?php foreach ($lines as $l): ?>
                 <tr>
                     <td>#<?php echo intval($l['person_id']); ?></td>
+                    <td><?php
+                        $k = (string) $l['line_kind'];
+                        echo $k === 'absence_deduction' ? "<span class='badge badge-danger'>خصمُ غياب</span>"
+                           : ($k === 'overtime' ? "<span class='badge badge-info'>إضافي</span>" : 'مكوّن');
+                    ?></td>
                     <td><?php echo (string)$l['path'] === 'project' ? 'مشروعي' : 'مؤسسي'; ?></td>
                     <td><?php echo htmlspecialchars((string)($l['component_type'] ?? $l['component_ref'])); ?></td>
                     <td><small><?php echo htmlspecialchars((string)($l['calc_method'] ?? '')); ?></small></td>
                     <td><?php echo $l['rate'] !== null ? htmlspecialchars((string)$l['rate']) : '—'; ?></td>
+                    <td><?php echo $l['entitled_days'] !== null
+                        ? (htmlspecialchars((string)$l['entitled_days']) . '/' . htmlspecialchars((string)$l['period_days']))
+                        : '—'; ?></td>
                     <td><?php echo htmlspecialchars((string)($l['bearer_type'] ?? '—')); ?>
                         <?php echo $l['bearer_id'] ? ('#' . intval($l['bearer_id'])) : ''; ?></td>
                     <td><?php echo $l['percent'] !== null ? htmlspecialchars((string)$l['percent']) : '—'; ?></td>
