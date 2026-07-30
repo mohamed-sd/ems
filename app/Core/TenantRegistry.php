@@ -285,6 +285,8 @@ class TenantRegistry
         'supplier_penalty_rules' => array('type' => self::T_TENANT, 'soft' => true),
         // M-16 (CON-03 §3 · §6): بطاقةُ الطاقة النظرية والجاهزيةِ ومهلةِ الإحلال.
         'supplier_capacity' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-03 (ENT-03 §4 · §7): الفاتورةُ الضريبيةُ بتسلسلها النظامي.
+        'tax_invoices' => array('type' => self::T_TENANT, 'soft' => false),
         // M-18 (ENT-02 §4): تصفيةُ إنهاء العقد — «بمفتاح (العقد × التصفية)».
         'supplier_contract_closures' => array('type' => self::T_TENANT, 'soft' => true),
         // M-17 (CON-03 §4-التقييم): الأوزانُ المكتوبةُ والتقييمُ الدوريُّ وأسطرُ مؤشراته.

@@ -110,6 +110,10 @@ $cleanup = function () use ($conn, $CLIENT, $PROJ, $CONTRACT, $OP, $tsIds, $tsOu
         $conn->query("DELETE FROM fin_financial_events WHERE entity_type='claim' AND entity_id=" . intval($cid));
         $conn->query("DELETE FROM ems_business_events WHERE entity_type='claim' AND entity_id=" . intval($cid));
         $conn->query("DELETE FROM claim_lines WHERE claim_id=" . intval($cid));
+        // M-03: `tax_invoices.claim_id` مفتاحٌ أجنبيٌّ بـ**RESTRICT** (نصُّ
+        // ENT-03 §7) — فالمستندُ الضريبيُّ يُكنس قبل مستخلصه، وإلا بقي المستخلصُ
+        // حيًّا صامتًا وانكسر خطُّ الأساس في التشغيل التالي.
+        $conn->query("DELETE FROM tax_invoices WHERE claim_id=" . intval($cid));
         $conn->query("DELETE FROM claims WHERE id=" . intval($cid));
     }
     $all = array_merge($tsIds, array($tsOut, $tsUnapproved));

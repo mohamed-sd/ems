@@ -887,10 +887,24 @@ if (!function_exists('claim_retention_release')) {
 }
 
 if (!function_exists('claim_recalc')) {
-    /** إعادةُ حساب المجاميع من البنود والاستقطاع — الصافي محسوبٌ لا مُدخل. */
+    /**
+     * إعادةُ حساب المجاميع من البنود والاستقطاع — الصافي محسوبٌ لا مُدخل.
+     *
+     * **M-03 · لا تعديلَ بعد الإصدار** (ENT-03 §6): مستخلصٌ صدرت فاتورتُه
+     * الضريبيةُ **تتجمّد أرقامُه** — فتُعاد قيمتُه المحفوظة ولا يُعاد الحساب،
+     * والتصحيحُ **بإشعارٍ دائن/مدين** لا بتحريكِ رقمٍ تحت مستندٍ ضريبيٍّ صادر.
+     */
     function claim_recalc($gate, $claim_id)
     {
         $claim_id = intval($claim_id);
+
+        require_once __DIR__ . '/../app/Services/Revenue/TaxInvoiceService.php';
+        if (\App\Services\Revenue\TaxInvoiceService::assertEditable($gate, $claim_id) !== null) {
+            $frozen = $gate->selectOne('claims', array(
+                'columns' => array('net_amount'), 'where' => array('id' => $claim_id)));
+            return $frozen ? round((float) $frozen['net_amount'], 2) : 0.0;
+        }
+
         $rows = $gate->scopedQuery(array('scope' => array('cl' => 'claim_lines')),
             "SELECT COALESCE(SUM(CASE WHEN cl.dispute_flag = 0 THEN cl.amount ELSE 0 END),0) s
                FROM claim_lines cl WHERE {TENANT_SCOPE} AND cl.claim_id = ?",
@@ -1030,21 +1044,27 @@ if (!function_exists('claim_approve')) {
         $net = claim_recalc($gate, $claim_id);
         if ($net <= 0) { $out['reason'] = 'الصافي صفرٌ أو سالب — لا استحقاق'; $out['status'] = 'blocked'; return $out; }
 
-        // الضريبةُ من كودها (fin_tax_codes) — صافي المستخلص وعاؤها
-        $taxAmount = 0.0; $taxCodeUsed = null;
-        if ($tax_code !== null && $tax_code !== '') {
-            try {
-                $tc = $gate->selectOne('fin_tax_codes', array('whereRaw' => "code = ?", 'params' => array($tax_code)));
-                if ($tc) {
-                    $taxCodeUsed = (string) $tc['code'];
-                    $taxAmount = round($net * ((float) $tc['rate']) / 100, 2);
-                }
-            } catch (\Throwable $t) { /* الضريبةُ اختيارية — لا تُسقط الاعتماد */ }
-        }
-
-        $invoiceNo = 'INV-' . preg_replace('~^CLM-~', '', (string) $c['claim_no']);
         $currency  = (string) $c['currency'];
         $company   = intval($c['company_id']);
+
+        // ── M-03 · الفاتورةُ الضريبيةُ بتسلسلها النظامي (ENT-03 §4) ─────────
+        // كان الرقمُ **مشتقًّا من رقم المستخلص** (`INV-{claim_no}`) وبلا حقلٍ
+        // نظاميٍّ واحد. وصار يُصدَر من `tax_invoices` **بتسلسلٍ لكل (شركة ×
+        // سنة)** وحقولٍ نظاميةٍ ملتقَطةٍ لحظةَ الإصدار — والضريبةُ **بمرجعها**.
+        // و«Approved → Invoiced» فعلٌ واحدٌ يقع هنا (§4)، فالعلَمُ `approving`.
+        require_once __DIR__ . '/../app/Services/Revenue/TaxInvoiceService.php';
+        $inv = \App\Services\Revenue\TaxInvoiceService::issueForClaim(
+            $conn, $gate, $company, $claim_id,
+            array('tax_code' => $tax_code, 'approving' => true), $uid);
+        if (!$inv['ok'] && (int) $inv['code'] !== 409) {
+            $out['status'] = 'blocked';
+            $out['code']   = (int) $inv['code'];
+            $out['reason'] = $inv['reason'];
+            return $out;
+        }
+        $invoiceNo   = (string) $inv['serial_no'];
+        $taxAmount   = (float) $inv['tax'];
+        $taxCodeUsed = ($tax_code !== null && $tax_code !== '') ? (string) $tax_code : null;
 
         // قيودُ الإيراد التي يفوترها هذا المستخلص — للحقيقة المحايدة ولا تُنشأ
         // من جديد (البنودُ تحملها في `claim_lines.event_id` منذ التوليد).
