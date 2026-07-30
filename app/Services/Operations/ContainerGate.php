@@ -59,6 +59,18 @@ class ContainerGate
     }
 
     /**
+     * H-01-③ (فتحُ الرائد): وضعُ البوابة — `EMS_CONTAINER_GATE_MODE`.
+     * enforce (الافتراضُ — دلالةُ القائمة كما صُمّمت) · monitor = يفحص ويسجّل
+     * would-block **مهيكلًا** (موصل N-02) ويمرّر — نمطُ TenantDb/CSRF المجرَّب
+     * وقاعدةُ N-04 §2-④: رصدُ أسبوعِ الرائد قبل قلب الحجب.
+     */
+    public static function mode()
+    {
+        $m = function_exists('ems_env') ? strtolower(trim((string) ems_env('EMS_CONTAINER_GATE_MODE', 'enforce'))) : 'enforce';
+        return $m === 'monitor' ? 'monitor' : 'enforce';
+    }
+
+    /**
      * فحصُ جاهزية سلسلةِ حاوياتِ واقعةٍ **قبل تسجيلها**.
      *
      * الشروطُ الثلاثةُ بنصّ الوثيقة، وكلٌّ برابطه:
@@ -123,9 +135,49 @@ class ContainerGate
 
         if (empty($reasons)) { return $out; }
 
+        // وضعُ الرصد: يُسجَّل ما كان سيُحجب (مهيكلًا — يقرؤه تقريرُ المطابقة
+        // الأسبوعي §13-①) وتمرّ الواقعة — الميدانُ لا يقف أثناء أسبوع الرائد.
+        if (self::mode() === 'monitor') {
+            self::logWouldBlock($ctx, $reasons);
+            $out['monitored'] = true;
+            return $out;   // ok=true — مرورٌ مرصود
+        }
+
         $out['ok'] = false; $out['code'] = 422; $out['blocked'] = true;
         $out['reasons'] = $reasons;
         return $out;
+    }
+
+    /** تسجيلُ would-block مهيكلًا (activity_logs عبر موصل N-02) — لا يرمي. */
+    private static function logWouldBlock(array $ctx, array $reasons)
+    {
+        try {
+            require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+            $conn = isset($GLOBALS['conn']) ? $GLOBALS['conn'] : null;
+            if (!$conn) { return; }
+            $kinds = array();
+            foreach ($reasons as $r) { $kinds[] = (string) $r['kind']; }
+            ems_audit_change($conn, 'operations', 'container_gate', 'would_block',
+                (int) ($ctx['equipment_id'] ?? 0),
+                array(), array(
+                    'kinds'      => implode(',', $kinds),
+                    'reasons'    => self::flatten($reasons),
+                    'project_id' => (int) ($ctx['project_id'] ?? 0),
+                    'operator'   => (int) ($ctx['operator_employee_id'] ?? 0),
+                    'entry_date' => (string) ($ctx['entry_date'] ?? ''),
+                ),
+                array(
+                    'company_id'  => (int) ($ctx['company_id'] ?? 0),
+                    'user_id'     => 0,
+                    'contract_id' => (int) ($ctx['contract_id'] ?? 0),
+                ));
+        } catch (\Throwable $t) {
+            error_log('ContainerGate logWouldBlock: ' . $t->getMessage());
+        }
+        if (function_exists('log_security_event')) {
+            log_security_event('container_gate_would_block',
+                'project=' . (int) ($ctx['project_id'] ?? 0) . ' :: ' . implode(' | ', self::flatten($reasons)));
+        }
     }
 
     /** نصٌّ مسطَّحٌ للأسباب — لمن لا يستطيع عرضَ الروابط (سجلٌّ · رسالةٌ قصيرة). */

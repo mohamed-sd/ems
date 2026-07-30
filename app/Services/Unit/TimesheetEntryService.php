@@ -150,6 +150,7 @@ class TimesheetEntryService
         // والرسالةُ تحمل **روابطَ الإصلاح**: رسالةٌ بلا رابطٍ تُوقف الميدانَ بلا مخرج.
         require_once __DIR__ . '/../Operations/ContainerGate.php';
         $cgate = \App\Services\Operations\ContainerGate::assertReady($gate, array(
+            'company_id'           => $companyId,
             'project_id'           => $drv['project_id'],
             'contract_id'          => $drv['contract_id'],
             'equipment_id'         => $equipmentId,

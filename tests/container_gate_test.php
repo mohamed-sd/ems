@@ -32,11 +32,15 @@ $ENV_BAK  = file_get_contents($ENV_FILE);
 // التحميل هي `_guard_env.php` (نفسُها التي حيّدت حارسَ الوثائق في حزمٍ أخرى).
 // فيُفعَّل الموقعُ الرائدُ هنا، وتُختبر القيمُ الأخرى بمسابيرَ في عملياتٍ منفصلة.
 require_once __DIR__ . '/_guard_env.php';
-ems_test_env_override(array('EMS_CONTAINER_GATE' => '4'));
+// H-01-③ (فتحُ الرائد): عقدُ هذا الاختبار هو دلالةُ **الحجب** — فيُثبَّت
+// enforce صراحةً؛ وضعُ monitor الحيُّ (رصدُ أسبوع الرائد) له اختبارُه
+// المستقل container_pilot_test.
+ems_test_env_override(array('EMS_CONTAINER_GATE' => '4', 'EMS_CONTAINER_GATE_MODE' => 'enforce'));
 
 /** يقلب قيمةَ الحارس في .env للمسابير — والاستعادةُ يضمنها `_guard_env`. */
 $setGate = function ($val) use ($ENV_FILE, $ENV_BAK) {
     $out = preg_replace('/^EMS_CONTAINER_GATE=.*$/m', 'EMS_CONTAINER_GATE=' . $val, $ENV_BAK);
+    $out = preg_replace('/^EMS_CONTAINER_GATE_MODE=.*$/m', 'EMS_CONTAINER_GATE_MODE=enforce', $out);
     file_put_contents($ENV_FILE, $out);
 };
 

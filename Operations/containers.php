@@ -115,6 +115,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cnt_action'])) {
         cnt_back($r['ok'] ? ('أُقرّت الحصةُ المشتقّة — ورُفع عنها الوسم ✅')
                           : ($r['reason'] . ' ❌'), $cid);
 
+    } elseif ($act === 'rotation') {
+        // H-01-③: مقبضُ الدورات — رابطُ «سجّل دورةَ تناوبه» كان طريقًا مسدودًا.
+        // الميدانُ يسجّل دوراتِه الحقيقية هنا — لا بذرَ آليًّا (اختراعُ الأنماط تلفيق).
+        $rcId = intval($_POST['container_id'] ?? 0);
+        $on   = intval($_POST['cycle_on_days'] ?? 0);
+        $off  = intval($_POST['cycle_off_days'] ?? 0);
+        $start = strval($_POST['cycle_start'] ?? '');
+        if ($on <= 0) { cnt_back('أيامُ العمل في الدورة موجبةٌ إلزامًا ❌', $cid); }
+        if ($off < 0) { cnt_back('أيامُ الراحة لا تكون سالبة ❌', $cid); }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) { cnt_back('تاريخُ بدء الدورة إلزامي ❌', $cid); }
+        $rc = null;
+        try { $rc = $gate->selectOne('op_containers', array('where' => array('id' => $rcId))); }
+        catch (\Throwable $t) { $rc = null; }
+        if (!$rc) { cnt_back('الحاويةُ غير موجودةٍ في نطاقك ❌', $cid); }
+        if ((string) $rc['level'] !== 'مشغّل') { cnt_back('الدورةُ تُسجَّل على حاوية مشغّلٍ حصرًا ❌', $cid); }
+        try {
+            $gate->insert('operator_rotations', array(
+                'container_id'         => $rcId,
+                'operator_employee_id' => intval($rc['operator_employee_id']),
+                'cycle_on_days'        => $on,
+                'cycle_off_days'       => $off,
+                'cycle_start'          => $start,
+                'shift_no'             => intval($_POST['shift_no'] ?? 0) ?: null,
+                'note'                 => mb_substr(trim(strval($_POST['note'] ?? '')), 0, 200) ?: null,
+                'created_by'           => $uid ?: null,
+            ));
+        } catch (\Throwable $t) {
+            error_log('container rotation: ' . $t->getMessage());
+            cnt_back('تعذّر تسجيل الدورة ❌', $cid);
+        }
+        cnt_back('سُجّلت دورةُ التناوب — وزال سببُ «مشغّلٌ بلا دورة» عن حاويته ✅', $cid);
+
     } elseif ($act === 'swap') {
         $reason = trim(strval($_POST['reason'] ?? ''));
         if ($reason === '') { cnt_back('سببُ التبديل إلزامي — لا تبديلَ بلا سبب ❌', $cid); }
@@ -224,6 +256,23 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             <button class="btn btn-sm btn-outline-secondary cnt-swap-btn"
                     data-container="<?php echo $id; ?>"
                     data-kind="<?php echo cnt_e($n['level']); ?>">بدّل</button>
+            <?php endif; ?>
+            <?php if ($can_manage && (string) $n['level'] === 'مشغّل'): ?>
+            <!-- H-01-③: مقبضُ الدورات — شرطُ بوابة الحصص الثالث (كان طريقًا مسدودًا) -->
+            <details style="display:inline-block">
+                <summary class="btn btn-sm btn-outline-warning" style="cursor:pointer">دورة</summary>
+                <form method="post" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+                    <input type="hidden" name="cnt_action" value="rotation">
+                    <input type="hidden" name="container_id" value="<?php echo $id; ?>">
+                    <input type="hidden" name="contract_id" value="<?php echo (int) $contract; ?>">
+                    <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
+                    <input type="number" name="cycle_on_days" min="1" placeholder="أيام عمل" style="width:80px" required>
+                    <input type="number" name="cycle_off_days" min="0" placeholder="أيام راحة" style="width:80px" required>
+                    <input type="date" name="cycle_start" required>
+                    <input type="text" name="note" placeholder="ملاحظة" style="width:100px">
+                    <button class="btn btn-sm btn-warning">سجّل الدورة</button>
+                </form>
+            </details>
             <?php endif; ?>
         </td>
     </tr>
