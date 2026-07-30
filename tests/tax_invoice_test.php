@@ -52,7 +52,9 @@ $teardown = function () use ($conn, $MARK) {
     $conn->query("DELETE l FROM claim_lines l JOIN claims c ON c.id = l.claim_id
                    WHERE c.claim_no LIKE '{$MARK}%'");
     $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$MARK}%'");
-    $conn->query("DELETE FROM clients WHERE name LIKE '%{$MARK}%'");
+    // عمودُ الاسم في `clients` هو **`client_name`** — وكنسٌ بعمودٍ لا وجودَ له
+    // يفشل **صامتًا** ويترك أثرًا (كُشف بالقياس بعد التشغيل، لا بالثقة).
+    $conn->query("DELETE FROM clients WHERE client_name LIKE '%{$MARK}%'");
 };
 register_shutdown_function($teardown);
 $teardown();

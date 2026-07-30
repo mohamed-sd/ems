@@ -28,6 +28,8 @@ if (!function_exists('claim_states')) {
             'review'    => 'قيد المراجعة',
             'approved'  => 'معتمد',
             'invoiced'  => 'مفوتر',
+            // M-05 (ENT-03 §4): «Invoiced → **PartiallyCollected** → Collected»
+            'partially_collected' => 'محصَّلٌ جزئيًّا',
             'collected' => 'محصَّل',
             'cancelled' => 'ملغى',
         );

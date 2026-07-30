@@ -287,6 +287,8 @@ class TenantRegistry
         'supplier_capacity' => array('type' => self::T_TENANT, 'soft' => true),
         // M-03 (ENT-03 §4 · §7): الفاتورةُ الضريبيةُ بتسلسلها النظامي.
         'tax_invoices' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-05 (ENT-03 §4): تخصيصُ التحصيل — «ظاهرٌ في الكشف لا صامتًا».
+        'fin_collection_allocations' => array('type' => self::T_TENANT, 'soft' => false),
         // M-18 (ENT-02 §4): تصفيةُ إنهاء العقد — «بمفتاح (العقد × التصفية)».
         'supplier_contract_closures' => array('type' => self::T_TENANT, 'soft' => true),
         // M-17 (CON-03 §4-التقييم): الأوزانُ المكتوبةُ والتقييمُ الدوريُّ وأسطرُ مؤشراته.

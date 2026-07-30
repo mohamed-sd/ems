@@ -98,10 +98,13 @@ $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_t
               amount, collected, state, created_at)
               VALUES ({$CO}, {$CL_A}, 'invoice', '{$MARK}-R1', 1000, 0, 'open', NOW())");
 $R1 = intval($conn->insert_id);
+// M-05: **قبضٌ بلا مرجعٍ بنكيٍّ مستحيلٌ بنيويًّا** — والبذرُ يحترم القيدَ الجديد.
 $okP = $conn->query("INSERT INTO fin_payments (company_id, payment_no, direction, party_type,
-                     party_ref, receivable_id, amount, currency, method, state, created_at)
+                     party_ref, receivable_id, amount, currency, method, bank_ref, received_on,
+                     state, created_at)
                      VALUES ({$CO}, '{$MARK}-P1', 'collection', 'client', {$CL_A}, {$R1},
-                             400, 'USD', 'bank', 'executed', '2098-01-20 10:00:00')");
+                             400, 'USD', 'bank', '{$MARK}-BR1', '2098-01-20',
+                             'executed', '2098-01-20 10:00:00')");
 check($okP, 'وتحصيلٌ 400 مخصَّصٌ لذمّة الفاتورة ' . ($okP ? '' : $conn->error));
 
 // ═══ ① الطبقاتُ الخمس ═══
@@ -176,9 +179,11 @@ check(mb_strpos((string) $col['description'], $MARK . '-R1') !== false,
       '★ سطرُ التحصيل **يسمّي الذمّةَ التي خُصّص لها**');
 
 $conn->query("INSERT INTO fin_payments (company_id, payment_no, direction, party_type,
-              party_ref, receivable_id, amount, currency, method, state, created_at)
+              party_ref, receivable_id, amount, currency, method, bank_ref, received_on,
+              state, created_at)
               VALUES ({$CO}, '{$MARK}-P2', 'collection', 'client', {$CL_A}, {$R1},
-                      100, 'USD', 'cash', 'draft', '2098-02-10 10:00:00')");
+                      100, 'USD', 'cash', '{$MARK}-BR2', '2098-02-10',
+                      'draft', '2098-02-10 10:00:00')");
 $s3 = CSS::build($gate, $CL_A, '2098-01-01', '2098-03-31');
 check(count($s3['layers']['collections']['rows']) === 2,
       'وتحصيلٌ مسودةٌ يظهر **بحالته** — الكشفُ يُري ما وقع لا ما اعتُمد فقط');
