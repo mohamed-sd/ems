@@ -133,6 +133,20 @@ class ContainerGate
             }
         }
 
+        // ④ H-03 (OPM-01 §6-⑥): «تخصيصُ المواقع والورديات» — موقعٌ بلا خطةِ
+        //   يومٍ مفتوحةٍ ناقصُ التخصيص. خلف العلمِ والوضعِ نفسِهما (يُرصد أسبوعًا).
+        if ($projectId > 0 && !empty($ctx['entry_date'])) {
+            require_once __DIR__ . '/DailyPlanService.php';
+            if (!DailyPlanService::hasOpenPlan($gate, $projectId, (string) $ctx['entry_date'])) {
+                $reasons[] = array(
+                    'kind'  => 'no_open_plan',
+                    'text'  => 'موقعٌ بلا خطةِ يومٍ مفتوحة — «لا يُفتح تسجيلٌ لموقعٍ ناقص التخصيص»',
+                    'href'  => '../Operations/daily_plan.php?project=' . $projectId,
+                    'label' => 'افتح خطةَ اليوم (توليدٌ ← توزيعٌ ← اعتمادٌ ← فتح)',
+                );
+            }
+        }
+
         if (empty($reasons)) { return $out; }
 
         // وضعُ الرصد: يُسجَّل ما كان سيُحجب (مهيكلًا — يقرؤه تقريرُ المطابقة

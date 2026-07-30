@@ -113,6 +113,11 @@ class TenantRegistry
         // H-10 (هجرة 2026-08-22 · CON-01 §5): ملاحقُ عقد الموظف — مستندُ تغييرٍ
         // قانونيٌّ لا يُمحى (soft)؛ والقائمُ contract_amendments لعقود العملاء.
         'employee_contract_amendments' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-03 (هجرة 2026-08-23 · UX-03 §2.2): خطةُ عمل الغد وسطورُها —
+        // الرأسُ soft (خطةٌ معتمدةٌ تُرجَع بسببٍ لا تُمحى)؛ السطورُ ابنُ رأسها
+        // (CASCADE) تُدار داخل دورته فلا soft لها.
+        'daily_plans' => array('type' => self::T_TENANT, 'soft' => true),
+        'daily_plan_lines' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),

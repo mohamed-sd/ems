@@ -51,6 +51,7 @@ $gate = new TenantDb($conn, TenantContext::forSystem($CO, $ACTOR, '', true));
 
 $teardown = function () use ($conn) {
     $conn->query("DELETE FROM operator_rotations WHERE note LIKE 'H013T_%'");
+    $conn->query("DELETE FROM daily_plans WHERE reopen_reason = 'H013T_seed'");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -126,6 +127,11 @@ $scr = file_get_contents(dirname(__DIR__) . '/Operations/containers.php');
 check(strpos($scr, "'rotation'") !== false && strpos($scr, 'cycle_on_days') !== false
       && strpos($scr, 'مشغّل» حصرًا') !== false || (strpos($scr, "'rotation'") !== false && strpos($scr, 'cycle_on_days') !== false),
       'شاشةُ الحاويات تحمل مقبضَ الدورات (كان رابطًا مسدودًا)');
+// H-03: السببُ الرابع (no_open_plan) — تُبذر خطةٌ مفتوحةٌ ليوم الرائد كي
+// تكتمل السلسلةُ (تُكنس في النهاية؛ دورةُ الخطة الكاملة بيتُها daily_plan_test)
+$conn->query("INSERT INTO daily_plans (company_id, project_id, plan_date, state, opened_at, reopen_reason, created_by)
+              SELECT {$CO}, 10, CURDATE(), 'opened', NOW(), 'H013T_seed', {$ACTOR}
+              WHERE NOT EXISTS (SELECT 1 FROM daily_plans WHERE project_id=10 AND plan_date=CURDATE())");
 $gate->insert('operator_rotations', array(
     'container_id' => intval($leaf['id']),
     'operator_employee_id' => intval($leaf['operator_employee_id']),

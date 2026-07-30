@@ -138,10 +138,17 @@ class TimesheetEntryService
         // ── الاشتقاق (§5.1): المعدة تجلب مشروعَها وعقدَها وموردَها ومشغّلَها ──
         $opId = isset($input['operation_id']) ? (int) $input['operation_id'] : 0;
         $drv = self::deriveFromEquipment($conn, $companyId, $equipmentId, $opId);
-        // المشغّل: يُمرَّر صراحةً (المرآة تمرّر عمود الدوام). اشتقاقُه الآلي ينتظر
-        // دورةَ التوزيع (UX-03 §2.2) غيرَ المبنية — غيابُه موثَّقٌ لا ملفَّق.
+        // المشغّل: يُمرَّر صراحةً (المرآة تمرّر عمود الدوام)؛ وغيابُه يُشتق من
+        // **خطة الغد المفتوحة** (H-03 — دورةُ التوزيع UX-03 §2.2 سدّت الفجوةَ
+        // المدوَّنة هنا): سطرُ (المعدة × اليوم × الوردية) في خطةٍ opened.
+        // passthrough عند غياب الخطة — لا حجبَ من هنا (الحجبُ بيتُه البوابة).
         if (!empty($input['operator_employee_id'])) {
             $drv['operator_employee_id'] = (int) $input['operator_employee_id'];
+        } elseif (empty($drv['operator_employee_id'])) {
+            require_once __DIR__ . '/../Operations/DailyPlanService.php';
+            $planned = \App\Services\Operations\DailyPlanService::plannedOperatorFor(
+                $gate, $equipmentId, $date, max(1, (int) $shift));
+            if ($planned !== null) { $drv['operator_employee_id'] = $planned; }
         }
 
         // ── H-01 ③: حاوياتُ الموقع شرطُ التسجيل (خلف `EMS_CONTAINER_GATE`) ──
