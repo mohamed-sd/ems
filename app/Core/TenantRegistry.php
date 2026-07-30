@@ -75,6 +75,9 @@ class TenantRegistry
         // ابنُ المشروع وأبو العقود. بياناتُ مستأجرٍ بcompany_id، وsoft=true
         // لأن الموقعَ مرجعُ تسجيلٍ تاريخيٍّ لا يُمحى (تُقرأ به الوحداتُ القديمة).
         'sites' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-25 (UX-10 §8): سلسلةُ قراءات العدّاد — **للإدراج فقط**، والتصحيحُ
+        // قراءةٌ جديدةٌ أو تصفيرٌ موثَّقٌ يفتح سلسلةً، لا محوٌ لماضٍ.
+        'meter_readings' => array('type' => self::T_TENANT, 'soft' => false),
         'op_containers' => array('type' => self::T_TENANT, 'soft' => true),
         'container_consumption' => array('type' => self::T_TENANT, 'soft' => false),
         'container_swaps' => array('type' => self::T_TENANT, 'soft' => false),

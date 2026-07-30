@@ -528,6 +528,15 @@ class TimesheetEntryService
             'note'         => 'مرآةُ الكتابة المزدوجة عن سجل الدوام الحي',
             'publish_events' => false,           // الناشر القديم يمثّل الواقعة سلفًا
         );
+        // ── M-25 · التقاطُ قراءة العدّاد من نهاية الوردية (UX-10 §8) ─────────
+        // الصفُّ الموروثُ يحمل عدّادَ ساعاتٍ فعليًّا (end_hours/minutes/seconds)
+        // كان يُكتب ولا يُقرأ. يُلتقط هنا لأنها **نقطةُ خنق** كل كتابةِ دوام.
+        // ولا يُفشِل الدوامَ أبدًا: تعارضُ عدّادٍ أو قراءةُ يومٍ قائمةٌ تُعلَن
+        // وتمضي — مسجِّلُ تاريخٍ لا مانعُ ميدان (نمطُ المرآة نفسُه).
+        require_once dirname(__DIR__, 2) . '/Services/Fleet/MeterReadingService.php';
+        \App\Services\Fleet\MeterReadingService::captureFromTimesheet(
+            $conn, $gate, (int) $t['company_id'], $t, $actor);
+
         $res = self::submit($conn, $gate, $input, $actor);
         if (!$res['ok']) { return array('ok' => false, 'code' => $res['code'], 'skipped' => implode('·', isset($res['missing']) ? $res['missing'] : array())); }
 

@@ -270,26 +270,43 @@ if (!defined('MNT_HELPERS_LOADED')) {
     }
 
     /**
-     * إجمالي ساعات التشغيل الفعلية لمعدة من التايم‌شيت (مصدر الوقائية، القرار 9).
-     * timesheet لا يحوي equipment_id؛ يُربط عبر operations: timesheet.operator = operations.id
-     * و operations.equipment = equipments.id. مقيّد بالشركة.
+     * عدّادُ ساعات المعدة — مصدرُ جدولة الوقائية (UX-04 §3 · القرار 9).
+     *
+     * ── M-25: ما تغيّر ولماذا ─────────────────────────────────────────────
+     * كانت هذه الدالّة تجمع `SUM(timesheet.operator_hours)` وتُقدَّم عدّادًا —
+     * **وليست عدّادًا**: هي ساعاتُ المشغّل التراكمية (لا ساعاتُ الآلة)، ولا
+     * تتأثر بتغيير عدّادٍ ولا بتصفيرِه، والوقائيةُ كانت تُجدول عليها.
+     *
+     * صارت الآن واجهةً على `MeterReadingService::currentMeter` بسلّمها المعلَن:
+     * ① آخرُ **قراءةِ عدّادٍ** مسجَّلة ← ② العدّادُ الافتتاحي ← ③ **البديلُ
+     * الموروثُ نفسُه مسمًّى باسمه**. فالرقمُ لا يقفز على البيانات القائمة (③
+     * يعيد ما كانت تعيده حرفيًّا)، ويصير صادقًا فورَ تسجيل أول قراءة.
+     *
+     * التوقيعُ محفوظٌ عمدًا فلا يُكسر مستدعٍ. ولمن يحتاج المصدرَ مسمًّى:
+     * `mnt_equipment_meter_info()` أدناه.
      */
     function mnt_equipment_actual_hours($conn, $equipment_id, $company_id)
+    {
+        $info = mnt_equipment_meter_info($conn, $equipment_id, $company_id);
+        return (float) $info['value'];
+    }
+
+    /**
+     * العدّادُ **بمصدره مسمًّى** — للعرض والتقارير: من يقرأ رقمًا يعرف أهو
+     * قراءةُ عدّادٍ أم بديلٌ موروث (`is_reading`).
+     * @return array{value:float,source:string,as_of:?string,is_reading:bool,note:string}
+     */
+    function mnt_equipment_meter_info($conn, $equipment_id, $company_id)
     {
         $equipment_id = intval($equipment_id);
         $company_id   = intval($company_id);
         if ($equipment_id <= 0) {
-            return 0.0;
+            return array('value' => 0.0, 'source' => 'none', 'as_of' => null,
+                         'is_reading' => false, 'note' => 'لا معدةَ محدَّدة');
         }
-
-        // عزل على t (التايم‌شيت) + إثراء LEFT بـoperations؛ INNER→LEFT+o.equipment=? مكافئ
-        // (شرط o.equipment=? يستبعد صفوف o=NULL). صفر timesheet بـNULL فالعزل الصارم مطابق.
-        $rows = ems_tenant_db()->scopedQuery(
-            array('scope' => array('t' => 'timesheet'), 'enrich' => array('o' => 'operations')),
-            "SELECT COALESCE(SUM(t.operator_hours),0) AS h
-               FROM timesheet t LEFT JOIN operations o ON o.id = t.operator
-              WHERE {TENANT_SCOPE} AND o.equipment = ?", array($equipment_id));
-        return $rows ? (float) $rows[0]['h'] : 0.0;
+        require_once dirname(__DIR__) . '/app/Services/Fleet/MeterReadingService.php';
+        return \App\Services\Fleet\MeterReadingService::currentMeter(
+            $conn, ems_tenant_db(), $company_id, $equipment_id, 'hour');
     }
 
     /**
