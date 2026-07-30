@@ -104,6 +104,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($res['ok'] && $res['net_direction'] === 'receivable') {
             $res['reason'] = 'اعتُمدت — والصافي سالبٌ ففُتحت ذمّةٌ مدينةٌ على المورد';
         }
+    } elseif ($act === 'invoice' && $can_edit) {
+        // M-13 · «استلامُ فاتورة المورد ومطابقتُها بالصافي المعتمد» (ENT-02 §4)
+        $res = SVC::markInvoiced($gate, $conn, $sid, array(
+            'invoice_no'       => $_POST['invoice_no'] ?? '',
+            'invoice_date'     => $_POST['invoice_date'] ?? '',
+            'invoice_amount'   => $_POST['invoice_amount'] ?? '',
+            'invoice_currency' => $_POST['invoice_currency'] ?? '',
+            'diff_reason'      => $_POST['diff_reason'] ?? '',
+            'diff_doc_ref'     => $_POST['diff_doc_ref'] ?? '',
+        ), $uid);
+    } elseif ($act === 'close' && $can_approve) {
+        $res = SVC::close($gate, $conn, $sid, $uid);
     } else {
         $res['reason'] = 'لا توجد صلاحية لهذا الإجراء';
     }
@@ -163,7 +175,8 @@ if ($open > 0) {
 
 $STATE_AR = array(
     'draft' => 'مسودة', 'review' => 'قيد المراجعة', 'approved' => 'معتمدة',
-    'payment_requested' => 'طُلب الدفع', 'paid' => 'مدفوعة', 'cancelled' => 'ملغاة',
+    'payment_requested' => 'طُلب الدفع', 'invoiced' => 'مفوترة', 'paid' => 'مدفوعة',
+    'closed' => 'مقفلة', 'cancelled' => 'ملغاة',
 );
 $CHARGE_AR = array(
     'fuel' => 'وقود', 'parts' => 'قطع غيار', 'maintenance' => 'صيانة',
@@ -299,6 +312,19 @@ include '../insidebar.php';
                             <button class="btn btn-sm btn-success" type="submit">إجازة</button>
                         </form>
                         <?php endif; ?>
+                        <?php // M-13 · استلامُ الفاتورة ومطابقتُها بالصافي المعتمد
+                        if ($can_edit && in_array((string) $s['state'],
+                                array('approved', 'payment_requested'), true)): ?>
+                        <a class="btn btn-sm btn-warning" href="?open=<?php echo intval($s['id']); ?>&invoice=1">فاتورة</a>
+                        <?php endif; ?>
+                        <?php if ($can_approve && (string) $s['state'] === 'paid'): ?>
+                        <form action="" method="post" style="display:inline;"
+                              onsubmit="return confirm('الإقفال نهائيّ — والتصحيحُ بعده بعكسٍ موثَّقٍ لا بتعديل. متابعة؟');">
+                            <input type="hidden" name="action" value="close">
+                            <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
+                            <button class="btn btn-sm btn-dark" type="submit">إقفال</button>
+                        </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -306,6 +332,69 @@ include '../insidebar.php';
         </table>
         </div>
     </div></div>
+
+    <?php
+    // ── M-13 · نموذجُ استلام الفاتورة ومطابقتِها ─────────────────────────
+    $openRow = null;
+    if ($open > 0) {
+        try { $openRow = $gate->selectOne('settlements', array('where' => array('id' => $open))); }
+        catch (\Throwable $t) { $openRow = null; }
+    }
+    if ($openRow !== null && !empty($_GET['invoice']) && $can_edit
+        && in_array((string) $openRow['state'], array('approved', 'payment_requested'), true)): ?>
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0 0 10px;"><i class="fas fa-file-invoice-dollar"></i>
+            فاتورةُ المورد للتسوية #<?php echo $open; ?></h5>
+        <p style="color:#6b7280">
+            الصافي المعتمد: <strong><?php echo number_format((float) $openRow['net_amount'], 2); ?></strong>
+            <?php echo htmlspecialchars((string) $openRow['currency']); ?> —
+            والفاتورةُ <strong>مستندٌ ضريبيٌّ يُطابَق به لا مصدرُ اعتراف</strong>:
+            الصافي لا يتغير، و<strong>الاختلافُ يفتح فرقًا بقرارٍ لا تعديلًا صامتًا</strong> (ENT-02 §4/§5).
+        </p>
+        <form action="" method="post">
+            <input type="hidden" name="action" value="invoice">
+            <input type="hidden" name="sid" value="<?php echo $open; ?>">
+            <div class="form-grid">
+                <div class="form-group"><label>رقم الفاتورة <span style="color:#c00">*</span></label>
+                    <input type="text" name="invoice_no" required maxlength="64"></div>
+                <div class="form-group"><label>تاريخ الفاتورة <span style="color:#c00">*</span></label>
+                    <input type="date" name="invoice_date" required></div>
+                <div class="form-group"><label>مبلغ الفاتورة <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0" name="invoice_amount" required></div>
+                <div class="form-group"><label>العملة</label>
+                    <input type="text" name="invoice_currency" maxlength="8"
+                           value="<?php echo htmlspecialchars((string) $openRow['currency']); ?>"></div>
+                <div class="form-group"><label>سبب الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
+                    <input type="text" name="diff_reason" maxlength="255"></div>
+                <div class="form-group"><label>مستند الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
+                    <input type="text" name="diff_doc_ref" maxlength="120"></div>
+            </div>
+            <div style="margin-top:12px">
+                <button class="btn btn-sm btn-warning" type="submit">تسجيلُ الفاتورة ومطابقتُها</button>
+            </div>
+        </form>
+    </div></div>
+    <?php endif; ?>
+
+    <?php if ($openRow !== null && $openRow['invoice_no'] !== null): ?>
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0 0 10px;"><i class="fas fa-file-invoice"></i> الفاتورةُ والمطابقة</h5>
+        <p>
+            رقمُها <strong><?php echo htmlspecialchars((string) $openRow['invoice_no']); ?></strong>
+            بتاريخ <?php echo htmlspecialchars((string) $openRow['invoice_date']); ?>
+            · مبلغُها <strong><?php echo number_format((float) $openRow['invoice_amount'], 2); ?></strong>
+            · الصافي المعتمد <strong><?php echo number_format((float) $openRow['net_amount'], 2); ?></strong>
+            ·
+            <?php if (abs((float) $openRow['invoice_diff']) < 0.005): ?>
+                <span class="badge badge-success">مطابِقة</span>
+            <?php else: ?>
+                <span class="badge badge-warning">فرقٌ <?php echo number_format((float) $openRow['invoice_diff'], 2); ?></span>
+                <br><small>السبب: <?php echo htmlspecialchars((string) $openRow['invoice_diff_reason']); ?>
+                    · المستند: <?php echo htmlspecialchars((string) $openRow['invoice_diff_doc_ref']); ?></small>
+            <?php endif; ?>
+        </p>
+    </div></div>
+    <?php endif; ?>
 
     <?php if ($open > 0): ?>
     <div class="card"><div class="card-body">

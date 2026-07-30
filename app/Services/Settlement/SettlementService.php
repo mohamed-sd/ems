@@ -34,8 +34,25 @@ class SettlementService
     const ST_REVIEW    = 'review';
     const ST_APPROVED  = 'approved';
     const ST_REQUESTED = 'payment_requested';
+    /** M-13 · ENT-02 §4 — الحالتان اللتان كانتا مفقودتين. */
+    const ST_INVOICED  = 'invoiced';
     const ST_PAID      = 'paid';
+    const ST_CLOSED    = 'closed';
     const ST_CANCELLED = 'cancelled';
+
+    /**
+     * M-13 · الحالاتُ التي تُستقبل منها فاتورةُ المورد.
+     *
+     * **اجتهادٌ مدوَّن:** §4 يرسم `Approved → Invoiced → PaymentRequested`، بينما
+     * المنفَّذُ يولّد طلبَ الدفع **عند الاعتماد** (سلوكٌ قائمٌ ومختبَر). وتقديمُ
+     * الفاتورة على طلب الدفع يعطّل صرفًا مستحقًّا انتظارًا لمستندٍ **بيدِ المورد
+     * لا بيدنا** — وهو أسوأُ ماليًّا وأكثرُ كسرًا للقائم. فالفاتورةُ تُستقبل من
+     * الحالتين، و«الدفعُ لا يكون إلا بتسويةٍ معتمدة» (§4) محفوظٌ كما هو.
+     */
+    const INVOICEABLE_STATES = array(self::ST_APPROVED, self::ST_REQUESTED);
+
+    /** فرقٌ دون هذا يُعدُّ مطابقةً تامّة (تقريبُ عملة). */
+    const INVOICE_TOLERANCE = 0.005;
 
     /** أنواعُ التحميل الستة (UX-05 §2.2) — الأربعةُ بلا مصدرٍ تدخل عبر دفتر الطرف. */
     const CHARGE_TYPES = array('fuel', 'parts', 'maintenance', 'transport', 'advance', 'penalty');
@@ -594,6 +611,148 @@ class SettlementService
         $out['net_direction']      = $direction;
         $out['payment_request_id'] = $reqId;
         $out['payment_request_no'] = $reqNo;
+        return $out;
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // M-13 · الحالتان الناقصتان: Invoiced وClosed
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * استلامُ فاتورة المورد ومطابقتُها بالصافي المعتمد (ENT-02 §4 · §5).
+     *
+     * **القاعدةُ التي تحكم كلَّ سطرٍ هنا:** «الاعترافُ بالتكلفة **من التسوية
+     * المعتمدة لا من الفاتورة**؛ والفاتورةُ **مستندٌ ضريبيٌّ يُطابَق بها** —
+     * **والفرقُ بندُ تسويةٍ موثَّق**» (§5).
+     *
+     * فـ`net_amount` **لا يُمسّ أبدًا**، والاختلافُ يُسجَّل فرقًا **بسببه
+     * ومستنده** — «اختلافُها يفتح فرقًا **بقرارٍ لا تعديلًا صامتًا**» (§4).
+     *
+     * @return array{ok:bool,code:int,reason:string,matched:?bool,diff:?float}
+     */
+    public static function markInvoiced($gate, $conn, $settlementId, $args, $userId)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'matched' => null, 'diff' => null);
+        $sid = intval($settlementId);
+
+        $st = $gate->selectOne('settlements', array('where' => array('id' => $sid)));
+        if (!$st) { $out['code'] = 404; $out['reason'] = 'التسويةُ غيرُ موجودة'; return $out; }
+        if ((string) $st['party_type'] !== 'supplier') {
+            $out['code'] = 422;
+            $out['reason'] = 'فاتورةُ المورد لتسويات الموردين — والعاملُ لا يُصدر فاتورة';
+            return $out;
+        }
+        if (!in_array((string) $st['state'], self::INVOICEABLE_STATES, true)) {
+            $out['code'] = 409;
+            $out['reason'] = 'الفاتورةُ تُستقبل على المعتمَدة أو المطلوبِ دفعُها — الحالةُ «'
+                           . $st['state'] . '»';
+            return $out;
+        }
+
+        $no = isset($args['invoice_no']) ? trim((string) $args['invoice_no']) : '';
+        if ($no === '') { $out['code'] = 422; $out['reason'] = 'رقمُ الفاتورة إلزامي'; return $out; }
+        $date = isset($args['invoice_date']) ? trim((string) $args['invoice_date']) : '';
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $out['code'] = 422; $out['reason'] = 'تاريخُ الفاتورة إلزامي'; return $out;
+        }
+        if (!isset($args['invoice_amount']) || trim((string) $args['invoice_amount']) === '') {
+            $out['code'] = 422; $out['reason'] = 'مبلغُ الفاتورة إلزامي — به تُطابَق'; return $out;
+        }
+        $amount = round((float) $args['invoice_amount'], 2);
+        if ($amount < 0) { $out['code'] = 422; $out['reason'] = 'مبلغُ الفاتورة لا يكون سالبًا'; return $out; }
+
+        // ── المطابقة: الفاتورة مقابل **الصافي المعتمد** ────────────────────
+        $net = round((float) $st['net_amount'], 2);
+        $diff = round($amount - $net, 2);
+        $matched = (abs($diff) < self::INVOICE_TOLERANCE);
+
+        $reason = isset($args['diff_reason']) ? trim((string) $args['diff_reason']) : '';
+        $docRef = isset($args['diff_doc_ref']) ? trim((string) $args['diff_doc_ref']) : '';
+        if (!$matched && ($reason === '' || $docRef === '')) {
+            $out['code'] = 422;
+            $out['reason'] = 'فرقٌ قدرُه ' . $diff . ' بين الفاتورة (' . $amount . ') والصافي المعتمد ('
+                           . $net . ') — **يلزمه سببٌ ومستند**: «فرقٌ بقرارٍ لا تعديلًا صامتًا» (§4)';
+            $out['diff'] = $diff; $out['matched'] = false;
+            return $out;
+        }
+
+        try {
+            $gate->update('settlements', array(
+                'state'                => self::ST_INVOICED,
+                'invoice_no'           => mb_substr($no, 0, 64),
+                'invoice_date'         => $date,
+                'invoice_amount'       => $amount,
+                'invoice_currency'     => isset($args['invoice_currency'])
+                                          && trim((string) $args['invoice_currency']) !== ''
+                                          ? strtoupper(trim((string) $args['invoice_currency']))
+                                          : (string) $st['currency'],
+                'invoice_diff'         => $diff,
+                'invoice_diff_reason'  => $matched ? null : mb_substr($reason, 0, 255),
+                'invoice_diff_doc_ref' => $matched ? null : mb_substr($docRef, 0, 120),
+                'invoiced_by'          => intval($userId),
+                'invoiced_at'          => date('Y-m-d H:i:s'),
+            ), array('id' => $sid));
+        } catch (\Throwable $t) {
+            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+        }
+
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'settlements', 'settlements', 'invoiced', $sid,
+            array('state' => (string) $st['state']),
+            array('state' => self::ST_INVOICED, 'invoice_no' => $no,
+                  'invoice_amount' => $amount, 'net_amount' => $net, 'diff' => $diff),
+            array('company_id' => intval($st['company_id']), 'user_id' => intval($userId)));
+
+        $out['ok'] = true; $out['code'] = 200;
+        $out['matched'] = $matched; $out['diff'] = $diff;
+        $out['reason'] = $matched
+            ? 'الفاتورةُ مطابقةٌ للصافي المعتمد'
+            : ('فرقٌ موثَّقٌ قدرُه ' . $diff . ' — **والصافي لم يُمسّ**: الاعترافُ من التسوية لا من الفاتورة (§5)');
+        return $out;
+    }
+
+    /**
+     * إقفالُ التسوية (ENT-02 §4): «الإقفال · **لا بندَ معلَّقًا** · Closed —
+     * والتصحيحُ بعدها **بعكسٍ موثَّقٍ لا بتعديل**».
+     *
+     * @return array{ok:bool,code:int,reason:string}
+     */
+    public static function close($gate, $conn, $settlementId, $userId)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $sid = intval($settlementId);
+
+        $st = $gate->selectOne('settlements', array('where' => array('id' => $sid)));
+        if (!$st) { $out['code'] = 404; $out['reason'] = 'التسويةُ غيرُ موجودة'; return $out; }
+        if ((string) $st['state'] !== self::ST_PAID) {
+            $out['code'] = 409;
+            $out['reason'] = 'الإقفالُ للمدفوعة وحدَها — الحالةُ «' . $st['state'] . '»';
+            return $out;
+        }
+        // «لا بندَ معلَّقًا»
+        if (intval($st['open_objections']) > 0) {
+            $out['code'] = 423;
+            $out['reason'] = 'لا يُقفل وفيه ' . intval($st['open_objections']) . ' بندًا معترَضًا لم يُحسم';
+            return $out;
+        }
+
+        try {
+            $gate->update('settlements', array(
+                'state'     => self::ST_CLOSED,
+                'closed_by' => intval($userId),
+                'closed_at' => date('Y-m-d H:i:s'),
+            ), array('id' => $sid));
+        } catch (\Throwable $t) {
+            $out['code'] = 422; $out['reason'] = 'تعذّر الإقفال: ' . $t->getMessage(); return $out;
+        }
+
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'settlements', 'settlements', 'close', $sid,
+            array('state' => self::ST_PAID), array('state' => self::ST_CLOSED),
+            array('company_id' => intval($st['company_id']), 'user_id' => intval($userId)));
+
+        $out['ok'] = true; $out['code'] = 200;
+        $out['reason'] = 'أُقفلت — والتصحيحُ بعدها **بعكسٍ موثَّقٍ لا بتعديل** (§4)';
         return $out;
     }
 
