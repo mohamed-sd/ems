@@ -530,6 +530,28 @@ class SettlementService
             $out['code']   = 422; return $out;
         }
 
+        // ── M-19 · وثائقُ المورد وحسابُه الموثَّق (UX-05 §5.1-①) ────────────
+        // «الحقولُ النظامية **أعمدةٌ واجبة**» — واعتمادُ تسويةٍ تُولّد طلبَ دفعٍ
+        // إلى **حسابٍ غيرِ موثَّق** خطرٌ لا إجراء. والحجبُ **بعلَمه**:
+        // `EMS_SUPPLIER_DOC_GATE` = off · monitor (الافتراض: يقيس ويُعلن ويمرّ)
+        // · enforce — نمطُ E-08 نفسُه، فلا يتجمّد مسارٌ حيٌّ في يومه الأول.
+        if ((string) $st['party_type'] === 'supplier') {
+            require_once dirname(__DIR__) . '/Supplier/SupplierDocumentService.php';
+            $docGate = \App\Services\Supplier\SupplierDocumentService::gateFor(
+                $gate, (int) $st['party_ref']);
+            if ($docGate['reasons']) {
+                if ($docGate['blocked']) {
+                    $out['reason'] = 'مستنداتُ المورد ناقصةٌ أو منتهية: '
+                                   . implode(' · ', $docGate['reasons']);
+                    $out['code'] = 422;
+                    return $out;
+                }
+                error_log('[supplier_doc_gate:' . $docGate['mode'] . '] settlement=' . $sid
+                          . ' supplier=' . (int) $st['party_ref']
+                          . ' reasons=' . implode(' | ', $docGate['reasons']));
+            }
+        }
+
         $net       = (float) $st['net_amount'];
         $direction = ($net < 0) ? 'receivable' : 'payable';
         $company   = intval($st['company_id']);
