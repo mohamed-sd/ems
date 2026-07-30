@@ -349,6 +349,30 @@ class SettlementService
             }
         } catch (\Throwable $t) { error_log('settlement maintenance: ' . $t->getMessage()); }
 
+        // ── ④ M-16 · جزاءُ الجاهزية والتغطية من بطاقة الطاقة ────────────────
+        // CON-03 §6.1-Q3: «جاهزيةُ شهرٍ 81٪ والحد 85٪ ← جزاءٌ محسوبٌ بقاعدته
+        // وسقفه · **Ledger عند التسوية (ENT-02) خصمًا ظاهرًا**».
+        // القياسُ من سجل الزمن الموحّد، والمبلغُ بقاعدة الجزاء المكتوبة (M-15)
+        // — **وبلا قاعدةٍ لا جزاء**. والأساسُ الذي يُقاس عليه السقفُ هو استحقاقُ
+        // الفترة **معادَلًا بعملة الأساس**: لا تُجمع عملتان في رقم.
+        try {
+            require_once dirname(dirname(__DIR__)) . '/../includes/fx.php';
+            $baseCode = ems_fx_base_currency();
+            if ($baseCode !== null) {
+                $entitled = 0.0;
+                foreach ($lines as $l) {
+                    if ($l['line_kind'] !== 'entitlement') { continue; }
+                    $c = ems_fx_to_base($l['amount'], $l['currency'], $l['work_date']);
+                    if ($c['ok']) { $entitled = round($entitled + $c['base'], 2); }
+                }
+                require_once dirname(__DIR__) . '/Contract/SupplierCapacityService.php';
+                foreach (\App\Services\Contract\SupplierCapacityService::penaltyLines(
+                             $gate, $partyRef, $from, $to, $entitled, $baseCode) as $p) {
+                    $lines[] = $p;
+                }
+            }
+        } catch (\Throwable $t) { error_log('settlement capacity penalty: ' . $t->getMessage()); }
+
         return $lines;
     }
 
