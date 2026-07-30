@@ -79,6 +79,11 @@ class TenantRegistry
         // قراءةٌ جديدةٌ أو تصفيرٌ موثَّقٌ يفتح سلسلةً، لا محوٌ لماضٍ.
         'meter_readings' => array('type' => self::T_TENANT, 'soft' => false),
         'op_containers' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-09-① (ENT-01 §8): مسيّرُ الرواتب — الرأسُ ناعمُ الإخفاء، والأسطرُ
+        // وقائعُ احتسابٍ تُكنس بالسلسلة من رأسها لا بحذفٍ ناعمٍ مستقل.
+        'payroll_runs' => array('type' => self::T_TENANT, 'soft' => true),
+        'payroll_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'payroll_run_blocks' => array('type' => self::T_TENANT, 'soft' => false),
         'container_consumption' => array('type' => self::T_TENANT, 'soft' => false),
         'container_swaps' => array('type' => self::T_TENANT, 'soft' => false),
         'operator_rotations' => array('type' => self::T_TENANT, 'soft' => false),
