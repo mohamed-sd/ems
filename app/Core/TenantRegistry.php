@@ -280,6 +280,9 @@ class TenantRegistry
         // من الرأس لا بالحذف الناعم (بنودٌ لا مستنداتٌ مستقلة).
         'settlements' => array('type' => self::T_TENANT, 'soft' => true),
         'settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-15 (CON-03 §2-⑥/⑦ · §6): قواعدُ التحميل المسعَّرة وقواعدُ الجزاء.
+        'supplier_charge_rules' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplier_penalty_rules' => array('type' => self::T_TENANT, 'soft' => true),
         // M-12 (ENT-02 §3/§7): بوابةُ سلفيات الموردين وسجلُّ استردادها.
         'supplier_advance_requests' => array('type' => self::T_TENANT, 'soft' => true),
         'supplier_advance_recoveries' => array('type' => self::T_TENANT, 'soft' => false),

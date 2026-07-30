@@ -296,15 +296,21 @@ class SettlementService
                   ORDER BY i.id",
                 array($partyRef, $from, $to)
             );
+            require_once __DIR__ . '/SupplierRuleService.php';
             foreach ($issues as $x) {
+                // ── M-15 · «بأسعارٍ وقواعدَ مكتوبة» (CON-03 §2-⑥) ───────────
+                // التكلفةُ الخامُ تمرّ بقاعدة التحميل المكتوبة إن وُجدت؛ وبلا
+                // قاعدةٍ **تُحمَّل كما هي موسومةً** — لا نسبةٌ مخترَعة ولا حجب.
+                $priced = SupplierRuleService::priceCharge(
+                    $gate, $partyRef, 'parts', (float) $x['total_cost'], (string) $x['d_date']);
                 $lines[] = array(
                     'line_kind'   => 'charge',
                     'charge_type' => 'parts',
                     'source_kind' => 'parts',
                     'source_ref'  => (string) $x['id'],
-                    'description' => 'قطعُ غيار — صرف #' . $x['id'],
+                    'description' => 'قطعُ غيار — صرف #' . $x['id'] . ' · ' . $priced['note'],
                     'work_date'   => (string) $x['d_date'],
-                    'amount'      => (float) $x['total_cost'],
+                    'amount'      => (float) $priced['amount'],
                     'currency'    => ($x['currency'] !== null && $x['currency'] !== '')
                                      ? (string) $x['currency'] : 'SDG',
                 );
@@ -325,15 +331,19 @@ class SettlementService
                   ORDER BY o.id",
                 array($partyRef, $from, $to)
             );
+            require_once __DIR__ . '/SupplierRuleService.php';
             foreach ($orders as $x) {
+                // M-15 · التسعيرُ بقاعدة الصيانة المكتوبة — وبلا قاعدةٍ يُعلَن
+                $priced = SupplierRuleService::priceCharge(
+                    $gate, $partyRef, 'maintenance', (float) $x['total_cost'], (string) $x['d_date']);
                 $lines[] = array(
                     'line_kind'   => 'charge',
                     'charge_type' => 'maintenance',
                     'source_kind' => 'maintenance',
                     'source_ref'  => (string) $x['id'],
-                    'description' => 'صيانة — أمر #' . $x['id'],
+                    'description' => 'صيانة — أمر #' . $x['id'] . ' · ' . $priced['note'],
                     'work_date'   => (string) $x['d_date'],
-                    'amount'      => (float) $x['total_cost'],
+                    'amount'      => (float) $priced['amount'],
                     'currency'    => 'SDG',   // أمرُ الصيانة بلا عمود عملة — عملةُ التشغيل
                 );
             }
