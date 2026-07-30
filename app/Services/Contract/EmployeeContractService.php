@@ -402,6 +402,179 @@ class EmployeeContractService
     }
 
     // ═══════════════════════════════════════════════════════════════════════
+    // H-08-③ · قواعدُ الحوافز وتوزيعُها (CON-01 §3.3 · تدمج M-23)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /** أسسُ الحافز السبعة — §3.3 نصًّا (لا قيمَ فيها). */
+    const INCENTIVE_BASES = array(
+        'unit' => 'وحدة منفَّذة', 'threshold' => 'تجاوز عتبة', 'quality' => 'جودة',
+        'readiness' => 'جاهزية', 'safety' => 'التزام سلامة', 'fuel' => 'توفير وقود',
+        'tier' => 'شرائح',
+    );
+
+    const INCENTIVE_SCOPES = array('project', 'equipment_type', 'site');
+    const BENEFICIARY_TYPES = array('employee', 'job_title');
+
+    /**
+     * إضافةُ قاعدةِ حافز — على عقدٍ محرَّرٍ غيرِ مرحَّل حصرًا (حراسُ المكوّنات نفسُها).
+     * @return array{ok:bool,code:int,reason:string,id:?int}
+     */
+    public static function addIncentiveRule($conn, $gate, $companyId, $contractId, $data, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'id' => null);
+        $guard = self::componentContractGuard($gate, $contractId);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+
+        $v = self::incentiveValidate($data);
+        if (!$v['ok']) { return array_merge($out, $v['err']); }
+        $row = $v['row'];
+        $row['contract_id'] = (int) $contractId;
+        $row['state'] = 'active';
+        $row['created_by'] = (int) $actor ?: null;
+
+        $newId = 0;
+        try { $newId = (int) $gate->insert('incentive_rules', $row); }
+        catch (\Throwable $t) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out; }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ — افحص القيود'; return $out; }
+
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'incentive_rules', 'create', $newId,
+            array(), $row, array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200; $out['id'] = $newId;
+        return $out;
+    }
+
+    /** إنهاءُ قاعدة (state=ended + تاريخ) — على المحرَّر حصرًا. */
+    public static function endIncentiveRule($conn, $gate, $companyId, $ruleId, $endDate, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $r = self::ruleOf($gate, $ruleId);
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'القاعدةُ غير موجودة'; return $out; }
+        $guard = self::componentContractGuard($gate, (int) $r['contract_id']);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+        $d = self::dateOrNull($endDate);
+        if ($d === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الإنهاء إلزامي'; return $out; }
+
+        $upd = array('state' => 'ended', 'valid_to' => $d);
+        $gate->update('incentive_rules', $upd, array('id' => (int) $ruleId));
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'incentive_rules', 'end', (int) $ruleId,
+            array('state' => $r['state'], 'valid_to' => $r['valid_to']), $upd,
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200;
+        return $out;
+    }
+
+    /**
+     * التوزيعُ الذري — «مجموعُ التوزيع مئةٌ بالمئة قيدًا بنيويًّا» (§3.3 · M-23).
+     * الاستبدالُ دفعةً واحدة (replaceChildren) — لا يبقى توزيعٌ نصفيٌّ أبدًا،
+     * وΣ ≠ 100.00 → **422 بالفارق** (§7.2 · حالة N2) والقائمُ لا يُمسّ.
+     * التوزيعُ الغائب (صفرُ صفوف) = 100٪ لصاحب العقد ضمنًا («قد يُوزَّع» — §3.3).
+     */
+    public static function setIncentiveAllocations($conn, $gate, $companyId, $ruleId, $rows, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $r = self::ruleOf($gate, $ruleId);
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'القاعدةُ غير موجودة'; return $out; }
+        $guard = self::componentContractGuard($gate, (int) $r['contract_id']);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+
+        $clean = array(); $sum = 0.0; $seen = array();
+        foreach ((array) $rows as $i => $row) {
+            $bt = isset($row['beneficiary_type']) ? (string) $row['beneficiary_type'] : '';
+            $bid = isset($row['beneficiary_id']) ? (int) $row['beneficiary_id'] : 0;
+            $pct = isset($row['percent']) ? round((float) $row['percent'], 2) : 0.0;
+            if (!in_array($bt, self::BENEFICIARY_TYPES, true) || $bid <= 0) {
+                $out['code'] = 422; $out['reason'] = 'مستفيدُ السطر ' . ($i + 1) . ' ناقصُ النوع أو المعرّف'; return $out;
+            }
+            if ($pct <= 0 || $pct > 100) {
+                $out['code'] = 422; $out['reason'] = 'نسبةُ السطر ' . ($i + 1) . ' خارج (0، 100]'; return $out;
+            }
+            $key = $bt . '#' . $bid;
+            if (isset($seen[$key])) { $out['code'] = 422; $out['reason'] = 'مستفيدٌ مكرر: ' . $key; return $out; }
+            $seen[$key] = true;
+            $sum = round($sum + $pct, 2);
+            $clean[] = array('beneficiary_type' => $bt, 'beneficiary_id' => $bid, 'percent' => $pct);
+        }
+        if ($clean && $sum !== 100.00) {
+            // 422 **بالفارق** — نصُّ §7.2 حرفيًّا (N2: توزيعٌ 80/30 يُرفض ولا يُحفظ)
+            $out['code'] = 422;
+            $out['reason'] = 'مجموعُ التوزيع ' . number_format($sum, 2) . '٪ لا 100٪ — الفارق '
+                . number_format(round(100 - $sum, 2), 2) . '٪';
+            return $out;
+        }
+
+        try {
+            $gate->replaceChildren('incentive_rules', (int) $ruleId, 'incentive_allocations', 'rule_id',
+                $clean, 'H-08-3 incentive allocations Σ=100');
+        } catch (\Throwable $t) {
+            $out['code'] = 422; $out['reason'] = 'تعذّر الاستبدال الذري: ' . $t->getMessage(); return $out;
+        }
+
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'incentive_allocations', 'replace', (int) $ruleId,
+            array(), array('rows' => $clean, 'sum' => $clean ? $sum : 'ضمني 100 لصاحب العقد'),
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200;
+        return $out;
+    }
+
+    /** تحققُ قاعدة الحافز. */
+    private static function incentiveValidate($data)
+    {
+        $basis = isset($data['basis']) ? (string) $data['basis'] : '';
+        if (!isset(self::INCENTIVE_BASES[$basis])) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'أساسٌ من خارج السبعة (§3.3): ' . $basis));
+        }
+        $type = trim((string) (isset($data['incentive_type']) ? $data['incentive_type'] : ''));
+        if ($type === '') {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'اسمُ الحافز إلزامي'));
+        }
+        $num = function ($k) use ($data) {
+            return (isset($data[$k]) && trim((string) $data[$k]) !== '') ? round((float) $data[$k], 4) : null;
+        };
+        $rate = $num('rate'); $threshold = $num('threshold');
+        $cap = $num('cap'); $floor = $num('floor');
+        if ($rate !== null && $rate < 0) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'المعدلُ لا يكون سالبًا'));
+        }
+        if ($cap !== null && $floor !== null && $cap < $floor) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'السقفُ دون الحد الأدنى'));
+        }
+        $from = self::dateOrNull(isset($data['valid_from']) ? $data['valid_from'] : null);
+        $to   = self::dateOrNull(isset($data['valid_to']) ? $data['valid_to'] : null);
+        if ($from !== null && $to !== null && $to < $from) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نهايةُ السريان قبل بدايته'));
+        }
+        $scopeType = isset($data['scope_type']) ? trim((string) $data['scope_type']) : '';
+        if ($scopeType !== '' && !in_array($scopeType, self::INCENTIVE_SCOPES, true)) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نطاقٌ من خارج الثلاثة (مشروع · نوع معدة · موقع)'));
+        }
+        $per = isset($data['periodicity']) ? (string) $data['periodicity'] : 'monthly';
+        if (!in_array($per, array('monthly', 'periodic', 'once'), true)) { $per = 'monthly'; }
+
+        return array('ok' => true, 'row' => array(
+            'incentive_type' => mb_substr($type, 0, 50),
+            'basis' => $basis, 'rate' => $rate, 'threshold' => $threshold,
+            'cap' => $cap, 'floor' => $floor, 'periodicity' => $per,
+            'condition_text' => self::strOrNull(isset($data['condition_text']) ? $data['condition_text'] : null, 255),
+            'scope_type' => $scopeType !== '' ? $scopeType : null,
+            'scope_id' => !empty($data['scope_id']) ? (int) $data['scope_id'] : null,
+            'valid_from' => $from, 'valid_to' => $to,
+        ));
+    }
+
+    private static function ruleOf($gate, $ruleId)
+    {
+        try {
+            return $gate->selectOne('incentive_rules', array('where' => array('id' => (int) $ruleId)));
+        } catch (\Throwable $t) { return null; }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * التداخل: عقدٌ للشخص نفسه في الكيان نفسه (نطاقُ البوابة يحصر الكيان)

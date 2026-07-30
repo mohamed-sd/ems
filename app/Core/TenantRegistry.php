@@ -98,6 +98,11 @@ class TenantRegistry
         // بcompany_id مباشرٍ (سابقة claim_lines)، وsoft=true لأن المكوّنَ نصُّ
         // عقدٍ يُستبدل بحالةٍ (replaced/ended) ولا يُمحى من أثر التدقيق.
         'pay_components' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-08-③ (هجرة 2026-08-19 · CON-01 §3.3): قواعدُ الحوافز — نصُّ عقدٍ
+        // يُستبدل بحالةٍ لا يُمحى (soft)؛ والتوزيعُ ابنُ قاعدته يُستبدل ذريًّا
+        // (replaceChildren يكنسه صلبًا داخل معاملته — فلا soft له).
+        'incentive_rules' => array('type' => self::T_TENANT, 'soft' => true),
+        'incentive_allocations' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),

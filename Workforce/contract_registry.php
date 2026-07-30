@@ -137,6 +137,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
+// ── H-08-③: قواعدُ الحوافز وتوزيعُها Σ=100 (الحكمُ في الخدمة) ─────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('inc_add', 'inc_end', 'inc_alloc'), true)) {
+    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    $ctxContract = intval($_POST['contract_id'] ?? 0);
+    $act = strval($_POST['do']);
+    if ($act === 'inc_add') {
+        $r = ECS::addIncentiveRule($conn, $gate, $company_id, $ctxContract, array(
+            'incentive_type' => strval($_POST['incentive_type'] ?? ''),
+            'basis'          => strval($_POST['basis'] ?? ''),
+            'rate'           => strval($_POST['rate'] ?? ''),
+            'threshold'      => strval($_POST['threshold'] ?? ''),
+            'cap'            => strval($_POST['cap'] ?? ''),
+            'floor'          => strval($_POST['floor'] ?? ''),
+            'periodicity'    => strval($_POST['periodicity'] ?? 'monthly'),
+            'condition_text' => strval($_POST['condition_text'] ?? ''),
+            'scope_type'     => strval($_POST['scope_type'] ?? ''),
+            'scope_id'       => intval($_POST['scope_id'] ?? 0),
+            'valid_from'     => strval($_POST['valid_from'] ?? ''),
+            'valid_to'       => strval($_POST['valid_to'] ?? ''),
+        ), $uid);
+    } elseif ($act === 'inc_end') {
+        $r = ECS::endIncentiveRule($conn, $gate, $company_id, intval($_POST['rule_id'] ?? 0), strval($_POST['end_date'] ?? ''), $uid);
+    } else {
+        // صفوفُ التوزيع تصل مصفوفاتٍ متوازية — تُجمع ثم تُسلَّم دفعةً للذرّية
+        $allocRows = array();
+        $types = (array) ($_POST['alloc_type'] ?? array());
+        $ids   = (array) ($_POST['alloc_id'] ?? array());
+        $pcts  = (array) ($_POST['alloc_pct'] ?? array());
+        foreach ($types as $i => $bt) {
+            if (trim(strval($bt)) === '' && trim(strval($ids[$i] ?? '')) === '') { continue; }
+            $allocRows[] = array('beneficiary_type' => strval($bt),
+                'beneficiary_id' => intval($ids[$i] ?? 0), 'percent' => strval($pcts[$i] ?? ''));
+        }
+        $r = ECS::setIncentiveAllocations($conn, $gate, $company_id, intval($_POST['rule_id'] ?? 0), $allocRows, $uid);
+    }
+    $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+}
+
 // ── القراءة ────────────────────────────────────────────────────────────────
 $f_category = strval($_GET['category'] ?? '');
 $f_state    = strval($_GET['state'] ?? '');
@@ -185,7 +224,7 @@ $pmRes = $conn->query("SELECT id, code, label_ar, calc_path FROM pay_models WHER
 if ($pmRes) { while ($pmRow = $pmRes->fetch_assoc()) { $pay_models[] = $pmRow; } }
 
 // ── H-08-②: عقدٌ معروضٌ بمكوّناته (?contract_id=N) ─────────────────────────
-$view_contract = null; $view_components = array();
+$view_contract = null; $view_components = array(); $view_rules = array(); $view_allocs = array();
 $vc_id = intval($_GET['contract_id'] ?? 0);
 if ($vc_id > 0) {
     try {
@@ -203,6 +242,17 @@ if ($vc_id > 0) {
                 "SELECT pc.* FROM pay_components pc
                  WHERE {TENANT_SCOPE} AND pc.contract_id = ? AND COALESCE(pc.is_deleted,0)=0
                  ORDER BY pc.state = 'active' DESC, pc.id", array($vc_id));
+            // H-08-③: القواعدُ بتوزيعها (التوزيعُ ابنُ قاعدته — يُقرأ معها)
+            $view_rules = $gate->scopedQuery(array('scope' => array('ir' => 'incentive_rules')),
+                "SELECT ir.* FROM incentive_rules ir
+                 WHERE {TENANT_SCOPE} AND ir.contract_id = ? AND COALESCE(ir.is_deleted,0)=0
+                 ORDER BY ir.state = 'active' DESC, ir.id", array($vc_id));
+            $view_allocs = array();
+            foreach ($view_rules as $vr) {
+                $view_allocs[intval($vr['id'])] = $gate->scopedQuery(array('scope' => array('ia' => 'incentive_allocations')),
+                    "SELECT ia.* FROM incentive_allocations ia
+                     WHERE {TENANT_SCOPE} AND ia.rule_id = ? ORDER BY ia.percent DESC", array(intval($vr['id'])));
+            }
         }
     } catch (\Throwable $t) { $view_contract = null; $view_components = array(); }
 }
@@ -349,6 +399,119 @@ $stateChip = function ($state) {
                 </div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                </div>
+            </form>
+            <?php endif; ?>
+
+            <!-- ── H-08-③: قواعدُ الحوافز وتوزيعُها Σ=100 (تدمج M-23) ── -->
+            <h6 style="margin-top:18px"><i class="fa fa-bullseye"></i> قواعدُ الحوافز — التوزيعُ بمجموع 100٪ قيدًا</h6>
+            <div class="table-container">
+                <table class="alltables display no-datatable" style="width:100%">
+                    <thead><tr>
+                        <th>#</th><th>الحافز</th><th>الأساس</th><th>المعدل</th><th>العتبة</th>
+                        <th>السقف/الأدنى</th><th>التوزيع</th><th>السريان</th><th>الحالة</th>
+                        <?php if ($vc_editable): ?><th>إجراء</th><?php endif; ?>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($view_rules as $vr): $rid = intval($vr['id']); ?>
+                        <tr>
+                            <td><?php echo $rid; ?></td>
+                            <td><strong><?php echo htmlspecialchars($vr['incentive_type']); ?></strong></td>
+                            <td><?php echo htmlspecialchars(ECS::INCENTIVE_BASES[$vr['basis']] ?? $vr['basis']); ?></td>
+                            <td><?php echo $vr['rate'] !== null ? htmlspecialchars($vr['rate']) : '—'; ?></td>
+                            <td><?php echo $vr['threshold'] !== null ? htmlspecialchars($vr['threshold']) : '—'; ?></td>
+                            <td><?php echo ($vr['cap'] !== null ? htmlspecialchars($vr['cap']) : '—') . ' / '
+                                          . ($vr['floor'] !== null ? htmlspecialchars($vr['floor']) : '—'); ?></td>
+                            <td>
+                                <?php $als = $view_allocs[$rid] ?? array();
+                                if (!$als) { echo '<span class="badge badge-secondary" title="التوزيعُ الغائب = كلُّه لصاحب العقد">100٪ لصاحب العقد</span>'; }
+                                else { foreach ($als as $al) {
+                                    echo '<span class="badge badge-info">'
+                                        . ($al['beneficiary_type'] === 'employee' ? 'موظف' : 'مسمًّى') . ' #'
+                                        . intval($al['beneficiary_id']) . ' · ' . htmlspecialchars($al['percent']) . '٪</span> ';
+                                } } ?>
+                            </td>
+                            <td><?php echo htmlspecialchars(($vr['valid_from'] ?: '؟') . ' → ' . ($vr['valid_to'] ?: 'مفتوح')); ?></td>
+                            <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
+                                                 'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
+                                                 'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$vr['state']] ?? htmlspecialchars($vr['state']); ?></td>
+                            <?php if ($vc_editable): ?>
+                            <td>
+                                <?php if ($vr['state'] === 'active'): ?>
+                                <details style="display:inline-block">
+                                    <summary class="action-btn edit" style="cursor:pointer" title="توزيع">توزيع</summary>
+                                    <form method="post" style="margin-top:6px">
+                                        <input type="hidden" name="do" value="inc_alloc">
+                                        <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                        <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
+                                        <?php for ($ai = 0; $ai < 3; $ai++): ?>
+                                        <div style="display:flex;gap:4px;margin-bottom:4px">
+                                            <select name="alloc_type[]">
+                                                <option value="">—</option>
+                                                <option value="employee">موظف</option>
+                                                <option value="job_title">مسمًّى وظيفي</option>
+                                            </select>
+                                            <input type="number" name="alloc_id[]" placeholder="المعرّف" style="width:70px">
+                                            <input type="number" step="0.01" name="alloc_pct[]" placeholder="٪" style="width:60px">
+                                        </div>
+                                        <?php endfor; ?>
+                                        <button type="submit" class="btn-save">حفظ التوزيع (Σ=100)</button>
+                                    </form>
+                                </details>
+                                <form method="post" style="display:inline-flex;gap:4px">
+                                    <input type="hidden" name="do" value="inc_end">
+                                    <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                    <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
+                                    <input type="date" name="end_date" required>
+                                    <button type="submit" class="action-btn" title="إنهاء"><i class="fas fa-stop"></i></button>
+                                </form>
+                                <?php endif; ?>
+                            </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$view_rules): ?>
+                        <tr><td colspan="10">لا قواعدَ حوافزَ بعد</td></tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($vc_editable): ?>
+            <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+                <input type="hidden" name="do" value="inc_add">
+                <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                <div class="form-grid">
+                    <div class="form-group"><label>اسم الحافز <span style="color:#c00">*</span></label>
+                        <input type="text" name="incentive_type" required maxlength="50" placeholder="مثال: حافز إنتاج الطن"></div>
+                    <div class="form-group"><label>الأساس <span style="color:#c00">*</span></label>
+                        <select name="basis" required>
+                            <?php foreach (ECS::INCENTIVE_BASES as $k => $lbl): ?>
+                                <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
+                            <?php endforeach; ?>
+                        </select></div>
+                    <div class="form-group"><label>المعدل</label><input type="number" step="0.0001" min="0" name="rate"></div>
+                    <div class="form-group"><label>العتبة</label><input type="number" step="0.01" name="threshold"></div>
+                    <div class="form-group"><label>السقف</label><input type="number" step="0.01" name="cap"></div>
+                    <div class="form-group"><label>الحد الأدنى</label><input type="number" step="0.01" name="floor"></div>
+                    <div class="form-group"><label>الدورية</label>
+                        <select name="periodicity">
+                            <option value="monthly">شهري</option><option value="periodic">دوري</option><option value="once">لمرة</option>
+                        </select></div>
+                    <div class="form-group"><label>شرط الاستحقاق</label><input type="text" name="condition_text" maxlength="255"></div>
+                    <div class="form-group"><label>النطاق</label>
+                        <select name="scope_type">
+                            <option value="">— عام —</option>
+                            <option value="project">مشروع</option>
+                            <option value="equipment_type">نوع معدة</option>
+                            <option value="site">موقع</option>
+                        </select></div>
+                    <div class="form-group"><label>معرّف النطاق</label><input type="number" name="scope_id"></div>
+                    <div class="form-group"><label>سريان من</label><input type="date" name="valid_from"></div>
+                    <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة قاعدة حافز</button>
                 </div>
             </form>
             <?php endif; ?>
