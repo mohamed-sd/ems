@@ -122,9 +122,9 @@ $r = RSS::swap($conn, $gate, $CO, $OPCA, $OP_B, 'مرضُ الأساسي — إ�
 check($r['ok'] && intval($r['to_container_id']) === $OPCB && floatval($r['moved_qty']) === 180.0,
       'النقلُ الذري: المتبقي 180 (300−120) إلى الاحتياطية القائمة — **فُعّلت لا استُنسخت**');
 $a = $conn->query("SELECT state, cap_qty, consumed_qty, valid_to FROM op_containers WHERE id = {$OPCA}")->fetch_assoc();
-check($a['state'] === 'معلَّقة' && floatval($a['cap_qty']) === 300.0 && floatval($a['consumed_qty']) === 120.0
+check($a['state'] === 'معلَّقة' && floatval($a['cap_qty']) === 120.0 && floatval($a['consumed_qty']) === 120.0
       && $a['valid_to'] === '2040-02-01',
-      'الخارجةُ مجمَّدةٌ **عند رصيدها** — تاريخُها محفوظٌ (120 مستهلكةً باقية)');
+      'الخارجةُ مجمَّدةٌ **عند رصيدها**: قُفلت على المستهلَك (cap=consumed=120) — فلا يتضاعف رصيدٌ عند عودتها');
 $b = $conn->query("SELECT state, cap_qty, consumed_qty FROM op_containers WHERE id = {$OPCB}")->fetch_assoc();
 check($b['state'] === 'نشطة' && floatval($b['cap_qty']) === 180.0,
       'البديلةُ نشطةٌ **بالمتبقي** (0 + 180)');

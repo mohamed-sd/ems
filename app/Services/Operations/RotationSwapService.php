@@ -92,9 +92,12 @@ class RotationSwapService
             $gate->runInTransaction(function ($g) use ($c, $containerId, $level, $holderCol, $inRef, $outRef,
                                                        $remaining, $sibling, $reason, $docRef, $actor, $date,
                                                        &$toId, &$swapId) {
-                // ① الخارجةُ تُجمَّد عند رصيدها — consumed تاريخُها محفوظ
+                // ① الخارجةُ تُجمَّد عند رصيدها: **تُقفل على المستهلَك** (cap=consumed)
+                //   — فمتبقّيها انتقل ولم يعد لها؛ وإعادةُ تفعيلها لاحقًا (عودةُ
+                //   التناوب) تضيف العائدَ وحدَه فلا يتضاعف رصيدٌ أبدًا.
                 $g->update('op_containers', array(
                     'state' => 'معلَّقة', 'valid_to' => $date,
+                    'cap_qty' => round((float) $c['consumed_qty'], 2),
                     'close_reason' => mb_substr('استبدالٌ: ' . $reason, 0, 200),
                 ), array('id' => $containerId));
 
@@ -163,6 +166,80 @@ class RotationSwapService
     }
 
     /**
+     * N-05 · انتقالُ الحصة آليًّا في مواعيد التناوب (تكملةُ H-04).
+     *
+     * «الحصةُ تنتقل آليًّا بين المشغّلين في مواعيد التناوب بلا إعادة بناء
+     * التخصيصات» (OPM-01 §5.2-③): لكل حاوية معدةٍ نشطةٍ في المشروع — إن كان
+     * المناوبُ بحسب الجدول غيرَ حائزِ الحصة النشطِ نُقلت ذريًّا إليه (swap
+     * بسجل قرارٍ آلي). عطالةٌ: بعد النقل الحائزُ = المناوبُ فلا نقلَ ثانيًا.
+     * الشراكةُ (أكثرُ من حاوية مشغّلٍ نشطة) ليست تناوبًا — تُتخطى معلَنةً.
+     * العلمُ قائمةُ مشاريع: `EMS_ROTATION_AUTOTRANSFER` (فارغٌ = مطفأ — N-04 §2-③).
+     *
+     * @return array{ok:bool,transferred:int,skipped:array}
+     */
+    public static function autoTransferForDate($conn, $gate, $companyId, $projectId, $date, $actor = 0)
+    {
+        $out = array('ok' => true, 'transferred' => 0, 'skipped' => array());
+        $projectId = (int) $projectId;
+        if (!self::autoTransferEnabledFor($projectId)) {
+            $out['skipped'][] = 'المشروعُ خارج علم EMS_ROTATION_AUTOTRANSFER — لا نقلَ آليًّا';
+            return $out;
+        }
+        $eqs = array();
+        try {
+            $eqs = $gate->scopedQuery(array('scope' => array('c' => 'op_containers')),
+                "SELECT c.id FROM op_containers c
+                 WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.level = 'معدة'
+                   AND c.state = 'نشطة' AND COALESCE(c.is_deleted,0)=0
+                 ORDER BY c.id", array($projectId));
+        } catch (\Throwable $t) { $eqs = array(); }
+
+        foreach ($eqs as $eq) {
+            $eqId = (int) $eq['id'];
+            $duty = self::onDuty($gate, $eqId, $date);
+            if ($duty['on_duty'] === null) {
+                $out['skipped'][] = 'معدة#' . $eqId . ': لا مناوبَ بحسب الجدول — يُعلَن ولا يُخترع';
+                continue;
+            }
+            // الحائزُ النشطُ الحالي
+            $actives = array();
+            try {
+                $actives = $gate->scopedQuery(array('scope' => array('o' => 'op_containers')),
+                    "SELECT o.id, o.operator_employee_id FROM op_containers o
+                     WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
+                       AND o.state = 'نشطة' AND COALESCE(o.is_deleted,0)=0
+                     ORDER BY o.id", array($eqId));
+            } catch (\Throwable $t) { $actives = array(); }
+            if (count($actives) !== 1) {
+                if (count($actives) > 1) {
+                    $out['skipped'][] = 'معدة#' . $eqId . ': ' . count($actives)
+                        . ' حاوياتٍ نشطة (شراكةٌ لا تناوب) — تُدار يدويًّا';
+                }
+                continue;
+            }
+            $holder = (int) $actives[0]['operator_employee_id'];
+            if ($holder === (int) $duty['on_duty']) { continue; }   // عطالة — الحائزُ هو المناوب
+
+            $r = self::swap($conn, $gate, $companyId, (int) $actives[0]['id'], (int) $duty['on_duty'],
+                'تناوبٌ مجدول — انتقالُ الحصة آليًّا لمناوبِ ' . $date . ' (N-05)', '', $actor, $date);
+            if (!empty($r['ok'])) { $out['transferred']++; }
+            else { $out['skipped'][] = 'معدة#' . $eqId . ': ' . $r['reason']; }
+        }
+        return $out;
+    }
+
+    /** علمُ النقل الآلي — قائمةُ مشاريعَ لا ثنائي (N-04 §2-③). */
+    public static function autoTransferEnabledFor($projectId)
+    {
+        $raw = function_exists('ems_env') ? trim((string) ems_env('EMS_ROTATION_AUTOTRANSFER', '')) : '';
+        if ($raw === '') { return false; }
+        foreach (explode(',', $raw) as $p) {
+            if ((int) trim($p) === (int) $projectId && (int) $projectId > 0) { return true; }
+        }
+        return false;
+    }
+
+    /**
      * «من يعمل في أي تاريخ» — جدولُ المناوبة لسلسلة حاوية معدة.
      *
      * لكل مشغّلٍ أحدثُ دورةٍ ساريةٍ له: موقعُ اليوم في (on+off) من anchor —
@@ -174,10 +251,12 @@ class RotationSwapService
         $result = array('on_duty' => null, 'on_duty_container' => null, 'chain' => array());
         $ops = array();
         try {
+            // السلسلةُ كاملةً: النشطةُ **والمعلَّقة** (عضويةُ السلسلة غيرُ حال
+            // رصيدها — المجمَّدةُ بالتناوب تعود) · المقفلةُ وحدَها خارجَها.
             $ops = $gate->scopedQuery(array('scope' => array('o' => 'op_containers')),
                 "SELECT o.id, o.operator_employee_id, o.role_kind FROM op_containers o
                  WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
-                   AND o.state = 'نشطة' AND COALESCE(o.is_deleted,0)=0
+                   AND o.state <> 'مقفلة' AND COALESCE(o.is_deleted,0)=0
                  ORDER BY o.id", array((int) $equipmentContainerId));
         } catch (\Throwable $t) { $ops = array(); }
 
