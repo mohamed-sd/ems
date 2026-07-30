@@ -19,11 +19,13 @@ require_once __DIR__ . '/../app/Services/Payroll/PayrollRunService.php';
 require_once __DIR__ . '/../app/Services/Payroll/TimePathService.php';
 require_once __DIR__ . '/../app/Services/Payroll/ProductionPathService.php';
 require_once __DIR__ . '/../app/Services/Payroll/OffsetService.php';
+require_once __DIR__ . '/../app/Services/Payroll/PayrollStateMachine.php';
 
 use App\Services\Payroll\PayrollRunService as PRS;
 use App\Services\Payroll\TimePathService as TPS;
 use App\Services\Payroll\ProductionPathService as PPS;
 use App\Services\Payroll\OffsetService as OFS;
+use App\Services\Payroll\PayrollStateMachine as PSM;
 
 $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -111,6 +113,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
         $r = OFS::computeOffsets($conn, $gate, $company_id, $rid2, $uid);
         $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
+    }
+
+    if ($action === 'transition') {
+        $rid2 = intval($_POST['run_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
+        $r = PSM::transition($conn, $gate, $company_id, $rid2, strval($_POST['to_state'] ?? ''), $uid,
+            array('payment_ref' => $_POST['payment_ref'] ?? ''));
+        $redirect($r['ok'] ? ('الدورةُ صارت «' . PSM::labelAr($r['state']) . '» ✅')
+                           : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 
     if ($action === 'time_input') {
@@ -239,6 +250,35 @@ include '../insidebar.php';
                 </form>
             <?php endif; ?>
 
+        <?php if ($run !== null && $can_edit):
+            $red = PSM::redRows($gate, $selected);
+            $allowed = PSM::allowedFrom((string) $run['state']);
+        ?>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <strong>الانتقال:</strong>
+            <?php foreach ($allowed as $to): ?>
+                <form method="post" style="display:inline">
+                    <input type="hidden" name="pr_action" value="transition">
+                    <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
+                    <input type="hidden" name="to_state" value="<?php echo htmlspecialchars($to); ?>">
+                    <?php if ($to === PSM::PAID): ?>
+                        <input type="text" name="payment_ref" placeholder="مرجع الصرف (إلزامي)"
+                               required style="max-width:200px">
+                    <?php endif; ?>
+                    <button type="submit" class="btn-save">→ <?php echo htmlspecialchars(PSM::labelAr($to)); ?></button>
+                </form>
+            <?php endforeach; ?>
+            <?php if (!$allowed): ?><span style="color:#666">حالةٌ نهائية — التصحيحُ بحدثٍ عاكسٍ لا بتعديل</span><?php endif; ?>
+        </div>
+        <?php if (!$red['ok']): ?>
+            <div class="alert alert-danger" style="margin-top:10px">
+                <i class="fa fa-circle-exclamation"></i>
+                <strong>صفوفٌ حمراءُ تمنع الاعتماد:</strong>
+                <?php echo htmlspecialchars(implode(' · ', $red['reasons'])); ?>
+            </div>
+        <?php endif; ?>
+        <?php endif; ?>
+
         <?php if ($run !== null): ?>
         <div style="margin-top:14px;line-height:1.9">
             <span class="badge <?php echo (string)$run['state'] === 'Blocked' ? 'badge-danger' : 'badge-info'; ?>">
@@ -310,6 +350,83 @@ include '../insidebar.php';
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>
+    </div></div>
+    <?php endif; ?>
+
+    <?php $register = $selected > 0 ? PSM::register($gate, $selected) : array(); if ($register): ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-table-list"></i> سجلُّ المراجعة — صفٌّ لكل شخص</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table class="alltables display nowrap" style="width:100%">
+            <thead><tr>
+                <th>الشخص</th><th>أجرٌ وإنتاج</th><th>حوافز</th><th>إضافي</th>
+                <th>غياب</th><th>خصومات</th><th>الصافي</th>
+            </tr></thead>
+            <tbody>
+            <?php $tNet = 0.0; foreach ($register as $rr): $tNet += (float) $rr['net']; ?>
+                <tr <?php echo intval($rr['red_rows']) > 0 ? 'style="background:#ffecec"' : ''; ?>>
+                    <td>#<?php echo intval($rr['person_id']); ?>
+                        <?php if (intval($rr['red_rows']) > 0): ?>
+                            <span class="badge badge-danger"
+                                  title="صفٌّ بلا احتسابٍ تامٍّ — لا يُعتمد (ENT-01 §7)">أحمر</span>
+                        <?php endif; ?>
+                        <a href="?run_id=<?php echo $selected; ?>&slip=<?php echo intval($rr['person_id']); ?>"
+                           title="كشفُ الفرد بطبقاته"><i class="fas fa-file-invoice"></i></a></td>
+                    <td><?php echo number_format((float)$rr['pay'], 2); ?></td>
+                    <td><?php echo number_format((float)$rr['incentive'], 2); ?></td>
+                    <td><?php echo number_format((float)$rr['overtime'], 2); ?></td>
+                    <td><?php echo number_format((float)$rr['absence'], 2); ?></td>
+                    <td><?php echo number_format((float)$rr['deductions'], 2); ?></td>
+                    <td><strong><?php echo number_format((float)$rr['net'], 2); ?></strong></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+            <tfoot><tr>
+                <th colspan="6">المجموع (تذييلٌ ثابت — §7)</th>
+                <th><?php echo number_format($tNet, 2); ?></th>
+            </tr></tfoot>
+        </table>
+    </div></div></div>
+    <?php endif; ?>
+
+    <?php
+    $slipPerson = intval($_GET['slip'] ?? 0);
+    if ($slipPerson > 0 && $selected > 0):
+        $slip = PSM::payslip($gate, $selected, $slipPerson);
+    ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-file-invoice"></i> كشفُ الفرد #<?php echo $slipPerson; ?> — بطبقاته</h5></div>
+    <div class="card-body">
+        <?php foreach ($slip['layers'] as $layerName => $layer): ?>
+            <h6 style="margin-top:12px"><strong><?php echo htmlspecialchars($layerName); ?></strong>
+                — <?php echo number_format((float)$layer['total'], 2); ?></h6>
+            <ul style="line-height:1.8">
+            <?php foreach ($layer['rows'] as $row): ?>
+                <li>
+                    <?php echo htmlspecialchars((string)($row['component_ref'] ?? ($row['source_type'] ?? ''))); ?>
+                    <?php if (isset($row['amount'])): ?>
+                        — <strong><?php echo $row['amount'] !== null
+                            ? number_format((float)$row['amount'], 2) : 'لم يُحتسب'; ?></strong>
+                    <?php endif; ?>
+                    <?php if (!empty($row['doc_ref'])): ?>
+                        · <small>سند: <?php echo htmlspecialchars((string)$row['doc_ref']); ?></small>
+                    <?php endif; ?>
+                    <?php if (!empty($row['note'])): ?>
+                        <br><small style="color:#666"><?php echo htmlspecialchars((string)$row['note']); ?></small>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        <?php endforeach; ?>
+        <hr>
+        <p>الإجمالي <strong><?php echo number_format($slip['gross'], 2); ?></strong>
+           · الخصومات <strong><?php echo number_format($slip['deductions'], 2); ?></strong>
+           · <span style="font-size:1.2em">الصافي <strong><?php echo number_format($slip['net'], 2); ?></strong></span></p>
+        <p style="color:#666">اللقطاتُ المستنَدُ إليها:
+            <?php foreach ($slip['snapshot_ids'] as $sid): ?>
+                <span class="badge badge-secondary">لقطة #<?php echo intval($sid); ?></span>
+            <?php endforeach; ?>
+            — «تعديلُ العقد لاحقًا لا يمسّ ما احتُسب».</p>
     </div></div>
     <?php endif; ?>
 
