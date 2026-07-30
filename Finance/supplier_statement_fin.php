@@ -66,6 +66,24 @@ if ($sel_sup > 0) {
 }
 $net = $credit_sum - $debit_sum;
 
+// ── M-14 · الكشفُ بطبقاته وكلُّ رقمٍ برابط مصدره (ENT-02 §6) ───────────────
+// المجاميعُ أعلاه بقيت كما هي (لا كسرَ لمسارٍ قائم)، والطبقاتُ تُضاف تحتها:
+// «قراءةُ المورد كشفَه ففهمُه **بندًا بندًا حتى مستنده**» (§7-القبول).
+require_once __DIR__ . '/../app/Services/Settlement/SupplierStatementService.php';
+$stmt_from = $sel_period . '-01';
+$stmt_to   = date('Y-m-t', strtotime($stmt_from));
+$stmt = array('layers' => array(), 'totals' => array(), 'orphans' => 0);
+$price_snapshot = array();
+$adv_balance = 0.0;
+if ($sel_sup > 0) {
+    $stmt = \App\Services\Settlement\SupplierStatementService::build(
+        fin_gate($is_super_admin), $sel_sup, $stmt_from, $stmt_to);
+    $price_snapshot = \App\Services\Settlement\SupplierStatementService::priceSnapshot(
+        fin_gate($is_super_admin), $sel_sup, $stmt_to);
+    $adv_balance = \App\Services\Settlement\SupplierStatementService::openAdvanceBalance(
+        fin_gate($is_super_admin), $sel_sup);
+}
+
 $page_title = 'إيكوبيشن | كشف حساب المورد';
 include '../inheader.php';
 include '../insidebar.php';
@@ -103,6 +121,98 @@ include '../insidebar.php';
             <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">الصافي</div><div style="font-size:20px;font-weight:700"><span class="badge badge-<?php echo $net >= 0 ? 'primary' : 'danger'; ?>"><?php echo number_format($net, 2); ?></span></div></div></div>
             <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">المصروف له بالفترة</div><div style="font-size:20px;font-weight:700"><?php echo number_format($paid_sum, 2); ?></div></div></div>
             <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">وحداته المعتمدة بالفترة</div><div style="font-size:20px;font-weight:700"><?php echo number_format($units_sum, 2); ?></div></div></div>
+        </div>
+
+        <?php // ── M-14 · الطبقاتُ الخمسُ بروابط مصادرها ─────────────────── ?>
+        <h5 style="margin:18px 0 10px"><i class="fas fa-layer-group"></i>
+            الكشفُ بطبقاته — <small style="color:#6b7280">كلُّ رقمٍ ينقر إلى مصدره</small>
+            <?php if ($adv_balance > 0): ?>
+                <span class="badge badge-warning" style="margin-inline-start:8px"
+                      title="رصيدُ السلف المفتوح — ظاهرٌ في بطاقته دائمًا (ENT-02 §3)">
+                    رصيدُ سلفٍ مفتوح: <?php echo number_format($adv_balance, 2); ?></span>
+            <?php endif; ?>
+            <?php if (intval($stmt['orphans']) > 0): ?>
+                <span class="badge badge-danger" style="margin-inline-start:8px">
+                    <?php echo intval($stmt['orphans']); ?> سطرًا بلا مصدرٍ — يُعلَن ولا يُخفى</span>
+            <?php endif; ?>
+        </h5>
+        <?php foreach ($stmt['layers'] as $lkey => $layer):
+            if (!$layer['rows']) { continue; } ?>
+            <div class="card" style="margin-bottom:10px"><div class="card-body">
+                <strong><?php echo htmlspecialchars($layer['label']); ?></strong>
+                — <span style="font-weight:700"><?php echo number_format((float) $layer['total'], 2); ?></span>
+                <div class="table-container" style="margin-top:8px">
+                <table class="alltables no-datatable" style="width:100%">
+                    <thead><tr><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>المصدر</th><th>السياق</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($layer['rows'] as $row): ?>
+                        <tr<?php echo !empty($row['objected']) ? ' style="background:#fef2f2"' : ''; ?>>
+                            <td><?php echo htmlspecialchars((string) $row['date']); ?></td>
+                            <td><?php echo htmlspecialchars((string) $row['description']); ?>
+                                <?php if (!empty($row['objected'])): ?>
+                                    <span class="badge badge-danger">معترَض</span>
+                                <?php endif; ?></td>
+                            <td style="white-space:nowrap;<?php echo ((float) $row['amount'] < 0) ? 'color:#991b1b' : ''; ?>">
+                                <?php echo ((float) $row['amount'] == 0.0 && $lkey === 'advances')
+                                    ? '—' : number_format((float) $row['amount'], 2); ?>
+                                <small><?php echo htmlspecialchars((string) $row['currency']); ?></small></td>
+                            <td>
+                                <?php if ($row['orphan']): ?>
+                                    <span class="badge badge-danger" title="رقمٌ بلا مصدرٍ — يُعلَن ليُصلَح">بلا مصدر</span>
+                                <?php elseif ($row['link'] !== null): ?>
+                                    <a href="<?php echo htmlspecialchars($row['link']); ?>">
+                                        <?php echo htmlspecialchars($row['source_kind'] . '#' . $row['source_ref']); ?></a>
+                                <?php else: ?>
+                                    <small><?php echo htmlspecialchars($row['source_kind'] . '#' . $row['source_ref']); ?></small>
+                                <?php endif; ?>
+                            </td>
+                            <td><small><?php echo htmlspecialchars((string) $row['context']); ?></small></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+                </div>
+            </div></div>
+        <?php endforeach; ?>
+        <?php if (!empty($stmt['totals'])): ?>
+        <p style="margin:6px 0 16px">
+            صافي الفترة (استحقاقٌ − تحميلاتٌ − جزاءاتٌ):
+            <strong><?php echo number_format((float) $stmt['totals']['net'], 2); ?></strong>
+            · بعد السداد:
+            <strong><?php echo number_format((float) $stmt['totals']['balance'], 2); ?></strong>
+        </p>
+        <?php endif; ?>
+
+        <?php // ── «تبويبُ اللقطة يعرض الأسعارَ التي احتُسب بها» (§6) ────── ?>
+        <h5 style="margin:16px 0 10px"><i class="fas fa-tags"></i> اللقطةُ — الأسعارُ التي احتُسب بها</h5>
+        <div class="table-container">
+            <table class="alltables no-datatable" style="width:100%">
+                <thead><tr><th>العقد</th><th>النموذج</th><th>الوحدة</th><th>سعر الوحدة</th>
+                    <th>أساس الاستعداد</th><th>سريان البند</th></tr></thead>
+                <tbody>
+                <?php if (!$price_snapshot): ?>
+                    <tr><td colspan="6" style="text-align:center;color:#6b7280;padding:14px">
+                        لا عقدَ موردٍ نافذًا بتاريخ <?php echo htmlspecialchars($stmt_to); ?> —
+                        <strong>يُعلَن ولا تُخترع أسعار</strong>.</td></tr>
+                <?php endif; ?>
+                <?php foreach ($price_snapshot as $ps): ?>
+                    <tr>
+                        <td>#<?php echo intval($ps['contract_id']); ?>
+                            <small>(<?php echo htmlspecialchars((string) $ps['state']); ?>)</small></td>
+                        <td><?php echo htmlspecialchars((string) ($ps['work_model'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string) ($ps['unit'] ?? '—')); ?></td>
+                        <td><?php echo $ps['unit_price'] !== null
+                            ? number_format((float) $ps['unit_price'], 2) : '—'; ?>
+                            <small><?php echo htmlspecialchars((string) ($ps['currency'] ?? '')); ?></small></td>
+                        <td><?php echo htmlspecialchars((string) ($ps['standby_basis'] ?? '—')); ?>
+                            <?php echo $ps['standby_rate'] !== null
+                                ? (' · ' . htmlspecialchars((string) $ps['standby_rate'])) : ''; ?></td>
+                        <td><?php echo htmlspecialchars((string) ($ps['valid_from'] ?? '—')); ?>
+                            → <?php echo htmlspecialchars((string) ($ps['valid_to'] ?? 'مفتوح')); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
 
         <h5 style="margin:16px 0 10px"><i class="fas fa-list"></i> بنود الكشف (له / عليه)</h5>
