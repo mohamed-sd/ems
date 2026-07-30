@@ -210,6 +210,198 @@ class EmployeeContractService
     }
 
     // ═══════════════════════════════════════════════════════════════════════
+    // H-08-② · مكوّناتُ الأجر (CON-01 §3.2) — «عددٌ غيرُ محدودٍ ولا نسبَ
+    // مثبَّتةً في الكود»: القوائمُ أدناه أسماءٌ محكومةٌ لا قيمَ فيها إطلاقًا.
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /** أنواعُ المكوّن العشرون — قائمةُ §3.2 نصًّا (الرمزُ لاتينيٌّ والتعريبُ هنا). */
+    const COMPONENT_TYPES = array(
+        'basic' => 'أساسي', 'cost_of_living' => 'غلاء معيشة', 'housing' => 'سكن',
+        'transport' => 'نقل', 'food' => 'إعاشة', 'site' => 'موقع', 'hazard' => 'مخاطر',
+        'work_nature' => 'طبيعة عمل', 'shift' => 'وردية', 'night' => 'ليلي',
+        'responsibility' => 'مسؤولية', 'supervision' => 'إشراف', 'assignment' => 'تكليف',
+        'travel' => 'سفر', 'mission' => 'مأمورية', 'communication' => 'اتصال',
+        'medical' => 'علاج', 'fixed_bonus' => 'مكافأة ثابتة', 'other_allowance' => 'بدل آخر',
+        'custom' => 'مخصّص',
+    );
+
+    /** طرقُ الاحتساب العشر — §3.2. */
+    const CALC_METHODS = array(
+        'fixed_amount' => 'مبلغ ثابت', 'pct_reference' => 'نسبة من المرجعي',
+        'pct_basic' => 'نسبة من الأساسي', 'pct_gross' => 'نسبة من الإجمالي',
+        'per_day' => 'عن يوم', 'per_shift' => 'عن وردية', 'per_hour' => 'عن ساعة',
+        'per_unit' => 'عن وحدة', 'tiers' => 'شرائح', 'custom_formula' => 'معادلة مخصّصة',
+    );
+
+    /** ما يلزمه مبلغٌ (value) وما يلزمه معدلٌ (rate) — الشرائحُ والمعادلةُ بيانُهما لاحق. */
+    const VALUE_METHODS = array('fixed_amount');
+    const RATE_METHODS  = array('pct_reference', 'pct_basic', 'pct_gross',
+                                'per_day', 'per_shift', 'per_hour', 'per_unit');
+
+    /** أعلامُ الدخول السبعة («خصائصُها السبع» PLAN-01 §5.2-②). */
+    const COMPONENT_FLAGS = array('in_insurance', 'in_tax', 'in_leave_pay', 'in_eos',
+                                  'in_hour_base', 'in_overtime', 'in_incentive_base');
+
+    const BEARER_TYPES = array('project', 'client_contract', 'dept', 'company');
+
+    /**
+     * إضافةُ مكوّنِ أجرٍ — على عقدٍ محرَّرٍ (draft/completed) غيرِ مرحَّل حصرًا.
+     * @return array{ok:bool,code:int,reason:string,id:?int}
+     */
+    public static function addComponent($conn, $gate, $companyId, $contractId, $data, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'id' => null);
+        $guard = self::componentContractGuard($gate, $contractId);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+
+        $v = self::componentValidate($data, false);
+        if (!$v['ok']) { return array_merge($out, $v['err']); }
+        $row = $v['row'];
+        $row['contract_id'] = (int) $contractId;
+        $row['state'] = 'active';
+        $row['created_by'] = (int) $actor ?: null;
+
+        $newId = 0;
+        try { $newId = (int) $gate->insert('pay_components', $row); }
+        catch (\Throwable $t) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out; }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ — افحص القيود'; return $out; }
+
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'pay_components', 'create', $newId,
+            array(), $row, array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200; $out['id'] = $newId;
+        return $out;
+    }
+
+    /** تعديلُ مكوّن — بحراس الإضافة نفسِها. */
+    public static function updateComponent($conn, $gate, $companyId, $componentId, $data, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $c = self::componentOf($gate, $componentId);
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'المكوّنُ غير موجود'; return $out; }
+        $guard = self::componentContractGuard($gate, (int) $c['contract_id']);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+
+        $v = self::componentValidate(array_merge(
+            array_intersect_key($c, array_flip(array_merge(
+                array('component_type', 'calc_method', 'value', 'rate', 'periodicity',
+                      'cost_bearer_type', 'cost_bearer_id', 'cost_center_id',
+                      'valid_from', 'valid_to', 'is_variable'),
+                self::COMPONENT_FLAGS))),
+            $data), true);
+        if (!$v['ok']) { return array_merge($out, $v['err']); }
+        $upd = $v['row'];
+
+        $gate->update('pay_components', $upd, array('id' => (int) $componentId));
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'pay_components', 'update', (int) $componentId,
+            array_intersect_key($c, $upd), $upd,
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200;
+        return $out;
+    }
+
+    /** إنهاءُ مكوّن (state=ended + تاريخ) — على المحرَّر حصرًا؛ النافذُ بملحق (H-10). */
+    public static function endComponent($conn, $gate, $companyId, $componentId, $endDate, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $c = self::componentOf($gate, $componentId);
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'المكوّنُ غير موجود'; return $out; }
+        $guard = self::componentContractGuard($gate, (int) $c['contract_id']);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+        $d = self::dateOrNull($endDate);
+        if ($d === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الإنهاء إلزاميٌّ بصيغةٍ سليمة'; return $out; }
+
+        $upd = array('state' => 'ended', 'valid_to' => $d);
+        $gate->update('pay_components', $upd, array('id' => (int) $componentId));
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'pay_components', 'end', (int) $componentId,
+            array('state' => $c['state'], 'valid_to' => $c['valid_to']), $upd,
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200;
+        return $out;
+    }
+
+    /** حارسُ عقدِ المكوّن: موجودٌ · غيرُ مرحَّلٍ (423 بمصدره) · محرَّرٌ (وإلا 423 بملحق). */
+    private static function componentContractGuard($gate, $contractId)
+    {
+        $c = null;
+        try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => (int) $contractId))); }
+        catch (\Throwable $t) { $c = null; }
+        if (!$c) { return array('ok' => false, 'err' => array('code' => 404, 'reason' => 'العقدُ غير موجود')); }
+        $src = trim((string) ($c['source_table'] ?? ''));
+        if ($src !== '') {
+            return array('ok' => false, 'err' => array('code' => 423,
+                'reason' => 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم (' . $src . ') حتى إقفال القديم (N-04)'));
+        }
+        $state = (string) $c['state'];
+        if (!in_array($state, self::EDITABLE_STATES, true)) {
+            return array('ok' => false, 'err' => array('code' => 423,
+                'reason' => 'العقدُ ' . EmployeeContractStateMachine::labelAr($state)
+                    . ' — تغييرُ المكوّنات على النافذ بملحقٍ بسريان (H-10)'));
+        }
+        return array('ok' => true, 'contract' => $c);
+    }
+
+    /** تحققُ حقول المكوّن — يعيد صفَّ الكتابة أو الخطأ. */
+    private static function componentValidate($data, $isUpdate)
+    {
+        $type   = isset($data['component_type']) ? (string) $data['component_type'] : '';
+        $method = isset($data['calc_method']) ? (string) $data['calc_method'] : '';
+        if (!isset(self::COMPONENT_TYPES[$type])) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نوعُ مكوّنٍ من خارج قائمة §3.2 العشرين: ' . $type));
+        }
+        if (!isset(self::CALC_METHODS[$method])) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقةُ احتسابٍ من خارج العشر: ' . $method));
+        }
+        $value = (isset($data['value']) && trim((string) $data['value']) !== '') ? round((float) $data['value'], 2) : null;
+        $rate  = (isset($data['rate'])  && trim((string) $data['rate'])  !== '') ? round((float) $data['rate'], 2)  : null;
+        if (in_array($method, self::VALUE_METHODS, true) && $value === null) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقةُ «' . self::CALC_METHODS[$method] . '» تلزم مبلغًا (value)'));
+        }
+        if (in_array($method, self::RATE_METHODS, true) && $rate === null) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقةُ «' . self::CALC_METHODS[$method] . '» تلزم معدلًا (rate)'));
+        }
+        if ($value !== null && $value < 0) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'المبلغُ لا يكون سالبًا — الخصومُ بيتُها M-11 لا المكوّنات'));
+        }
+        $from = self::dateOrNull(isset($data['valid_from']) ? $data['valid_from'] : null);
+        $to   = self::dateOrNull(isset($data['valid_to']) ? $data['valid_to'] : null);
+        if ($from !== null && $to !== null && $to < $from) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نهايةُ السريان قبل بدايته'));
+        }
+        $bearerType = isset($data['cost_bearer_type']) ? trim((string) $data['cost_bearer_type']) : '';
+        if ($bearerType !== '' && !in_array($bearerType, self::BEARER_TYPES, true)) {
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'جهةُ تحمّلٍ من خارج الأربع'));
+        }
+        $per = isset($data['periodicity']) ? (string) $data['periodicity'] : 'monthly';
+        if (!in_array($per, array('monthly', 'periodic', 'once'), true)) { $per = 'monthly'; }
+
+        $row = array(
+            'component_type' => $type, 'calc_method' => $method,
+            'value' => $value, 'rate' => $rate,
+            'is_variable' => !empty($data['is_variable']) ? 1 : 0,
+            'periodicity' => $per,
+            'cost_bearer_type' => $bearerType !== '' ? $bearerType : null,
+            'cost_bearer_id' => !empty($data['cost_bearer_id']) ? (int) $data['cost_bearer_id'] : null,
+            'cost_center_id' => !empty($data['cost_center_id']) ? (int) $data['cost_center_id'] : null,
+            'valid_from' => $from, 'valid_to' => $to,
+        );
+        foreach (self::COMPONENT_FLAGS as $f) { $row[$f] = !empty($data[$f]) ? 1 : 0; }
+        return array('ok' => true, 'row' => $row);
+    }
+
+    private static function componentOf($gate, $componentId)
+    {
+        try {
+            return $gate->selectOne('pay_components', array('where' => array('id' => (int) $componentId)));
+        } catch (\Throwable $t) { return null; }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * التداخل: عقدٌ للشخص نفسه في الكيان نفسه (نطاقُ البوابة يحصر الكيان)

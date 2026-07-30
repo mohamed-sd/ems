@@ -94,6 +94,10 @@ class TenantRegistry
         // الأشخاص — بياناتُ مستأجرٍ بcompany_id (صاحبُ العمل)، وsoft=true لأن
         // العقدَ مستندٌ لا يُمحى: الإنهاءُ والأرشفةُ حالاتٌ في آلته لا حذف.
         'employee_contracts' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-08-② (هجرة 2026-08-18 · CON-01 §3.2): مكوّناتُ الأجر — ابنُ الرأس
+        // بcompany_id مباشرٍ (سابقة claim_lines)، وsoft=true لأن المكوّنَ نصُّ
+        // عقدٍ يُستبدل بحالةٍ (replaced/ended) ولا يُمحى من أثر التدقيق.
+        'pay_components' => array('type' => self::T_TENANT, 'soft' => true),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),

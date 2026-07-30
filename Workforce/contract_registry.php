@@ -108,6 +108,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     header("Location: contract_registry.php?msg=" . rawurlencode($msg)); exit();
 }
 
+// ── H-08-②: مكوّناتُ الأجر (إضافةٌ/تعديلٌ/إنهاء — الحكمُ في الخدمة) ────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('comp_add', 'comp_update', 'comp_end'), true)) {
+    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    $ctxContract = intval($_POST['contract_id'] ?? 0);
+    $act = strval($_POST['do']);
+    $compData = array(
+        'component_type' => strval($_POST['component_type'] ?? ''),
+        'calc_method'    => strval($_POST['calc_method'] ?? ''),
+        'value'          => strval($_POST['value'] ?? ''),
+        'rate'           => strval($_POST['rate'] ?? ''),
+        'is_variable'    => intval($_POST['is_variable'] ?? 0),
+        'periodicity'    => strval($_POST['periodicity'] ?? 'monthly'),
+        'valid_from'     => strval($_POST['valid_from'] ?? ''),
+        'valid_to'       => strval($_POST['valid_to'] ?? ''),
+    );
+    foreach (\App\Services\Contract\EmployeeContractService::COMPONENT_FLAGS as $flag) {
+        $compData[$flag] = intval($_POST[$flag] ?? 0);
+    }
+    if ($act === 'comp_add') {
+        $r = ECS::addComponent($conn, $gate, $company_id, $ctxContract, $compData, $uid);
+    } elseif ($act === 'comp_update') {
+        $r = ECS::updateComponent($conn, $gate, $company_id, intval($_POST['component_id'] ?? 0), $compData, $uid);
+    } else {
+        $r = ECS::endComponent($conn, $gate, $company_id, intval($_POST['component_id'] ?? 0), strval($_POST['end_date'] ?? ''), $uid);
+    }
+    $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+}
+
 // ── القراءة ────────────────────────────────────────────────────────────────
 $f_category = strval($_GET['category'] ?? '');
 $f_state    = strval($_GET['state'] ?? '');
@@ -155,6 +184,33 @@ $pay_models = array();
 $pmRes = $conn->query("SELECT id, code, label_ar, calc_path FROM pay_models WHERE is_active = 1 ORDER BY id");
 if ($pmRes) { while ($pmRow = $pmRes->fetch_assoc()) { $pay_models[] = $pmRow; } }
 
+// ── H-08-②: عقدٌ معروضٌ بمكوّناته (?contract_id=N) ─────────────────────────
+$view_contract = null; $view_components = array();
+$vc_id = intval($_GET['contract_id'] ?? 0);
+if ($vc_id > 0) {
+    try {
+        $vrows = $gate->scopedQuery(array(
+            'scope'  => array('ec' => 'employee_contracts'),
+            'enrich' => array('e' => 'employees'),
+        ), "SELECT ec.*, e.name AS employee_name, pm.label_ar AS pay_label
+            FROM employee_contracts ec
+            LEFT JOIN employees e ON e.id = ec.employee_id
+            LEFT JOIN pay_models pm ON pm.id = ec.pay_model_id
+            WHERE {TENANT_SCOPE} AND ec.id = ?", array($vc_id));
+        $view_contract = $vrows ? $vrows[0] : null;
+        if ($view_contract) {
+            $view_components = $gate->scopedQuery(array('scope' => array('pc' => 'pay_components')),
+                "SELECT pc.* FROM pay_components pc
+                 WHERE {TENANT_SCOPE} AND pc.contract_id = ? AND COALESCE(pc.is_deleted,0)=0
+                 ORDER BY pc.state = 'active' DESC, pc.id", array($vc_id));
+        }
+    } catch (\Throwable $t) { $view_contract = null; $view_components = array(); }
+}
+$vc_editable = $view_contract
+    && trim(strval($view_contract['source_table'] ?? '')) === ''
+    && in_array(strval($view_contract['state']), ECS::EDITABLE_STATES, true)
+    && ($can_add || $can_edit);
+
 $page_title = 'إيكوبيشن | سجل العقود الموحّد';
 include '../inheader.php';
 include '../insidebar.php';
@@ -184,6 +240,121 @@ $stateChip = function ($state) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
+
+    <?php if ($view_contract): ?>
+    <div class="card">
+        <div class="card-header"><h5><i class="fa fa-puzzle-piece"></i>
+            مكوّناتُ أجر العقد #<?php echo intval($view_contract['id']); ?> —
+            <?php echo htmlspecialchars($view_contract['employee_name'] ?? ''); ?>
+            <?php echo $stateChip(strval($view_contract['state'])); ?>
+            <?php if (trim(strval($view_contract['source_table'] ?? '')) !== ''): ?>
+                <span class="badge badge-light">مرحَّل قراءةً — مكوّناتُه في مصدره القديم</span>
+            <?php elseif (!$vc_editable): ?>
+                <span class="badge badge-info">التغييرُ على النافذ بملحق (H-10)</span>
+            <?php endif; ?>
+            <a href="contract_registry.php" style="float:left">✕ إغلاق</a>
+        </h5></div>
+        <div class="card-body">
+            <div class="table-container">
+                <table class="alltables display no-datatable" style="width:100%">
+                    <thead><tr>
+                        <th>#</th><th>النوع</th><th>الطريقة</th><th>المبلغ</th><th>المعدل</th>
+                        <th>الأعلام السبعة</th><th>الدورية</th><th>السريان</th><th>الحالة</th>
+                        <?php if ($vc_editable): ?><th>إنهاء</th><?php endif; ?>
+                    </tr></thead>
+                    <tbody>
+                    <?php $FLAG_LBL = array('in_insurance' => 'تأمينات', 'in_tax' => 'ضريبة', 'in_leave_pay' => 'إجازة',
+                          'in_eos' => 'نهاية خدمة', 'in_hour_base' => 'ساعة', 'in_overtime' => 'إضافي', 'in_incentive_base' => 'وعاء حافز');
+                    foreach ($view_components as $pc): ?>
+                        <tr>
+                            <td><?php echo intval($pc['id']); ?></td>
+                            <td><strong><?php echo htmlspecialchars(ECS::COMPONENT_TYPES[$pc['component_type']] ?? $pc['component_type']); ?></strong></td>
+                            <td><?php echo htmlspecialchars(ECS::CALC_METHODS[$pc['calc_method']] ?? $pc['calc_method']); ?></td>
+                            <td><?php echo $pc['value'] !== null ? htmlspecialchars($pc['value']) : '—'; ?></td>
+                            <td><?php echo $pc['rate'] !== null ? htmlspecialchars($pc['rate']) : '—'; ?></td>
+                            <td><?php
+                                $on = array();
+                                foreach ($FLAG_LBL as $fk => $fl) { if (intval($pc[$fk]) === 1) { $on[] = $fl; } }
+                                echo $on ? htmlspecialchars(implode(' · ', $on)) : '—';
+                            ?></td>
+                            <td><?php echo array('monthly' => 'شهري', 'periodic' => 'دوري', 'once' => 'لمرة')[$pc['periodicity']] ?? $pc['periodicity']; ?></td>
+                            <td><?php echo htmlspecialchars(($pc['valid_from'] ?: '؟') . ' → ' . ($pc['valid_to'] ?: 'مفتوح')); ?></td>
+                            <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
+                                                 'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
+                                                 'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$pc['state']] ?? htmlspecialchars($pc['state']); ?></td>
+                            <?php if ($vc_editable): ?>
+                            <td>
+                                <?php if ($pc['state'] === 'active'): ?>
+                                <form method="post" style="display:inline-flex;gap:4px">
+                                    <input type="hidden" name="do" value="comp_end">
+                                    <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                    <input type="hidden" name="component_id" value="<?php echo intval($pc['id']); ?>">
+                                    <input type="date" name="end_date" required>
+                                    <button type="submit" class="action-btn" title="إنهاء"><i class="fas fa-stop"></i></button>
+                                </form>
+                                <?php endif; ?>
+                            </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$view_components): ?>
+                        <tr><td colspan="10">لا مكوّناتَ بعد<?php echo $vc_editable ? ' — أضف أولَها أدناه' : ''; ?></td></tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($vc_editable): ?>
+            <form method="post" class="allforms allforms-visible" style="margin-top:14px">
+                <input type="hidden" name="do" value="comp_add">
+                <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>النوع <span style="color:#c00">*</span></label>
+                        <select name="component_type" required>
+                            <?php foreach (ECS::COMPONENT_TYPES as $k => $lbl): ?>
+                                <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>طريقة الاحتساب <span style="color:#c00">*</span></label>
+                        <select name="calc_method" required>
+                            <?php foreach (ECS::CALC_METHODS as $k => $lbl): ?>
+                                <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>المبلغ (للمبلغ الثابت)</label><input type="number" step="0.01" min="0" name="value"></div>
+                    <div class="form-group"><label>المعدل (للنسب وعن-الوحدة)</label><input type="number" step="0.01" name="rate"></div>
+                    <div class="form-group">
+                        <label>الدورية</label>
+                        <select name="periodicity">
+                            <option value="monthly">شهري</option><option value="periodic">دوري</option><option value="once">لمرة</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>سريان من</label><input type="date" name="valid_from"></div>
+                    <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label>يدخل في:</label>
+                        <?php foreach ($FLAG_LBL as $fk => $fl): ?>
+                            <label style="margin-inline-end:12px;font-weight:normal">
+                                <input type="checkbox" name="<?php echo $fk; ?>" value="1"> <?php echo $fl; ?>
+                            </label>
+                        <?php endforeach; ?>
+                        <label style="margin-inline-end:12px;font-weight:normal">
+                            <input type="checkbox" name="is_variable" value="1"> متغيّر
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                </div>
+            </form>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="headForm">
@@ -279,7 +450,7 @@ $stateChip = function ($state) {
                     $daysLeft = ($r['days_left'] !== null) ? intval($r['days_left']) : null;
                 ?>
                     <tr>
-                        <td><?php echo intval($r['id']); ?></td>
+                        <td><a href="?contract_id=<?php echo intval($r['id']); ?>" title="مكوّنات الأجر (H-08-②)"><?php echo intval($r['id']); ?></a></td>
                         <td><strong><?php echo htmlspecialchars($r['employee_name'] ?? ('#' . intval($r['employee_id']))); ?></strong></td>
                         <td><?php echo htmlspecialchars($CATEGORIES[$r['category']] ?? $r['category']); ?></td>
                         <td><?php echo htmlspecialchars($r['pay_label'] ?? '—'); ?></td>
