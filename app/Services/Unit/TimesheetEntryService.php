@@ -204,6 +204,9 @@ class TimesheetEntryService
             foreach ($timeLines as $line) {
                 $hours = isset($line['hours']) ? round((float) $line['hours'], 2) : 0.0;
                 if ($hours <= 0) { continue; }
+                $lnState = self::safeOpsState(isset($line['ops_state']) ? $line['ops_state'] : '');
+                $lnResp  = self::safeRespParty(isset($line['resp_party']) ? $line['resp_party'] : '');
+                self::assertStopResponsible($lnState, $lnResp); // E-07: لا توقفَ بلا مسؤول
                 $g->insert('unit_time_log', array(
                     'log_date'             => $date,
                     'shift'                => $shift,
@@ -212,9 +215,9 @@ class TimesheetEntryService
                     'operator_employee_id' => $drv['operator_employee_id'],
                     'supplier_entity_id'   => $drv['supplier_entity_id'],
                     'hours'                => $hours,
-                    'ops_state'            => self::safeOpsState(isset($line['ops_state']) ? $line['ops_state'] : ''),
+                    'ops_state'            => $lnState,
                     'cause_note'           => isset($line['cause_note']) ? mb_substr(trim((string) $line['cause_note']), 0, 200) : null,
-                    'resp_party'           => self::safeRespParty(isset($line['resp_party']) ? $line['resp_party'] : ''),
+                    'resp_party'           => $lnResp,
                     'entry_id'             => $entryId,
                     'entered_by'           => (int) $actor ?: null,
                 ));
@@ -706,15 +709,18 @@ class TimesheetEntryService
                 foreach ($timeLines as $line) {
                     $hours = isset($line['hours']) ? round((float) $line['hours'], 2) : 0.0;
                     if ($hours <= 0) { continue; }
+                    $lnState = self::safeOpsState(isset($line['ops_state']) ? $line['ops_state'] : '');
+                    $lnResp  = self::safeRespParty(isset($line['resp_party']) ? $line['resp_party'] : '');
+                    self::assertStopResponsible($lnState, $lnResp); // E-07: لا توقفَ بلا مسؤول
                     $g->insert('unit_time_log', array(
                         'log_date' => $e['entry_date'], 'shift' => $e['shift'],
                         'project_id' => (int) $e['project_id'], 'equipment_id' => (int) $e['equipment_id'],
                         'operator_employee_id' => $opEmp,
                         'supplier_entity_id' => $e['supplier_entity_id'] !== null ? (int) $e['supplier_entity_id'] : null,
                         'hours' => $hours,
-                        'ops_state' => self::safeOpsState(isset($line['ops_state']) ? $line['ops_state'] : ''),
+                        'ops_state' => $lnState,
                         'cause_note' => isset($line['cause_note']) ? mb_substr(trim((string) $line['cause_note']), 0, 200) : null,
-                        'resp_party' => self::safeRespParty(isset($line['resp_party']) ? $line['resp_party'] : ''),
+                        'resp_party' => $lnResp,
                         'entry_id' => $entryId, 'entered_by' => (int) $actor ?: null,
                     ));
                 }
@@ -904,6 +910,30 @@ class TimesheetEntryService
      *   `enforce`            → يرمي، فلا تمرّ قيمةٌ مجهولةٌ إطلاقًا
      * والبياناتُ نظيفةٌ اليوم (0 مخالفة · مقيس) فالمخاطرةُ صفر — لكن يُلتزم النمط.
      */
+    /** عائلةُ التوقف السبعُ — «صفرُ فترةِ توقفٍ بلا مسؤول» (المعيار §9-④). */
+    const STOP_STATES = array('tech_breakdown','supplier_stop','operator_stop',
+                              'client_stop','fuel_logistics_stop','planned_stop','force_majeure');
+
+    /**
+     * E-07: إلزامُ مسؤول التوقف — بعد أن قام المرجعُ الذي يُختار منه (مصفوفةُ
+     * الالتزامات معبّأةٌ لكل العقود · N-03). فترةُ توقفٍ بمسؤول 'none' ليست
+     * حيادًا بل إسنادٌ ضائعٌ يُسقط الفوترةَ والجزاءَ صامتًا.
+     * بعلَم EMS_RESP_PARTY_STRICT نفسِه: enforce → 422 يرمي · monitor → يرصد.
+     * ('unlogged' خارج العائلة عمدًا — سلةُ الترحيل القديم «أعطال أخرى».)
+     */
+    private static function assertStopResponsible($state, $resp)
+    {
+        if (!in_array($state, self::STOP_STATES, true)) { return; }
+        if ($resp !== 'none' && $resp !== '' && $resp !== null) { return; }
+        $mode = function_exists('ems_env')
+            ? strtolower((string) ems_env('EMS_RESP_PARTY_STRICT', 'monitor')) : 'monitor';
+        if ($mode === 'enforce') {
+            throw new \InvalidArgumentException(
+                'E-07: فترةُ توقف (' . $state . ') بلا مسؤولٍ — يُختار من مصفوفة الالتزامات (422)');
+        }
+        error_log('[resp_party] E-07 would-reject: توقف ' . $state . ' بمسؤول none — رصدٌ قبل الإلزام');
+    }
+
     private static function safeRespParty($v)
     {
         $valid = array('company','supplier','operator','client','planned','force_majeure','none');
