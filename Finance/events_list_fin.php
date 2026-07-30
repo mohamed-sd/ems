@@ -40,6 +40,112 @@ $currencies     = fin_currencies();
 // (فجوة 4) تعليم الإشعارات مقروءة
 fin_handle_notif_read($conn, $company_id, 'events_list_fin.php');
 
+/**
+ * H-22: خلايا صفِّ الحدث (8 أعمدة) — تُستهلك من نقطة serverSide حصرًا.
+ * أزرارُ الصف تُبنى بصلاحيات الجلسة نفسِها التي كانت تبنيها في SSR.
+ */
+function fin_event_row_cells(array $row, array $event_types, array $source_modules,
+                             array $event_states, array $flow, $can_edit, $can_delete): array
+{
+    $st  = (string) $row['state'];
+    $dim = $row['project_name'] ?: ($row['supplier_name'] ?: '—');
+    $data_attrs =
+        "data-id='" . intval($row['id']) . "' " .
+        "data-type='" . htmlspecialchars((string) $row['event_type'], ENT_QUOTES) . "' " .
+        "data-source='" . htmlspecialchars((string) $row['source_module'], ENT_QUOTES) . "' " .
+        "data-ref='" . htmlspecialchars((string) ($row['source_ref'] ?? ''), ENT_QUOTES) . "' " .
+        "data-amount='" . htmlspecialchars((string) $row['amount'], ENT_QUOTES) . "' " .
+        "data-currency='" . htmlspecialchars((string) $row['currency'], ENT_QUOTES) . "' " .
+        "data-fx='" . htmlspecialchars((string) ($row['fx_rate'] ?? ''), ENT_QUOTES) . "' " .
+        "data-project='" . intval($row['project_id']) . "' " .
+        "data-supplier='" . intval($row['supplier_entity_id']) . "' " .
+        "data-equipment='" . intval($row['equipment_id']) . "' " .
+        "data-notes='" . htmlspecialchars((string) ($row['notes'] ?? ''), ENT_QUOTES) . "'";
+    $can_modify = ($st === 'draft'); // الإقفال بالمرحلة: بعد المسودة تُقفل من الشاشة
+
+    $actions = "<div class='action-btns'>";
+    if ($can_edit && $can_modify) {
+        $actions .= "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
+    }
+    if ($can_delete && $can_modify) {
+        $actions .= "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+    }
+    if ($can_edit && isset($flow[$st])) {
+        $lbl = $flow[$st][1];
+        $actions .= "<a href='?advance_id=" . intval($row['id']) . "' class='action-btn edit' title='" . htmlspecialchars($lbl) . "' onclick='return confirm(\"" . htmlspecialchars($lbl) . "؟\")'><i class='fas fa-circle-chevron-left'></i></a>";
+    }
+    if ($can_edit && !in_array($st, array('draft', 'posted', 'settled', 'closed', 'rejected'), true)) {
+        $actions .= "<a href='?reject_id=" . intval($row['id']) . "' class='action-btn delete' title='رفض/إعادة' onclick='return confirm(\"رفض الحدث وإعادته؟\")'><i class='fas fa-ban'></i></a>";
+    }
+    if ($can_edit && $st === 'rejected') {
+        $actions .= "<a href='?resume_id=" . intval($row['id']) . "' class='action-btn edit' title='إعادة للدورة' onclick='return confirm(\"إعادة الحدث للدورة كمسودة؟\")'><i class='fas fa-rotate-left'></i></a>";
+    }
+    $actions .= "</div>";
+
+    return array(
+        $actions,
+        htmlspecialchars((string) $row['event_no']),
+        htmlspecialchars($event_types[$row['event_type']] ?? $row['event_type']),
+        htmlspecialchars($source_modules[$row['source_module']] ?? $row['source_module']),
+        htmlspecialchars((string) ($row['source_ref'] ?? '')),
+        number_format((float) $row['amount'], 2) . " " . htmlspecialchars((string) $row['currency']),
+        htmlspecialchars((string) $dim),
+        "<span class='badge badge-" . fin_state_tone($st) . "'>" . htmlspecialchars($event_states[$st] ?? $st) . "</span>",
+    );
+}
+
+// ── H-22: نقطةُ DataTables الخادمية (UI-01 §4) — دفترُ الناقل ينمو مع كل
+//    تشغيلٍ (507+ حدثًا) وكان يُحمَّل كاملًا في المتصفح بلا LIMIT.
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'dt') {
+    require_once __DIR__ . '/../includes/datatable_server.php';
+
+    $dt = ems_dt_params(array(
+        1 => 'e.id', 2 => 'e.event_type', 3 => 'e.source_module',
+        4 => 'e.source_ref', 5 => 'e.amount', 7 => 'e.state',
+    ));
+
+    $filter_state = (isset($_GET['fstate']) && isset($event_states[$_GET['fstate']])) ? $_GET['fstate'] : '';
+    $flow = fin_event_flow();
+
+    $ev_whereRaw = "COALESCE(e.is_deleted,0)=0";
+    $ev_params = array();
+    if ($filter_state !== '') { $ev_whereRaw .= " AND e.state=?"; $ev_params[] = $filter_state; }
+    $proj_scope = fin_project_scope($conn, $ctx);
+    if ($proj_scope !== null) { $ev_whereRaw .= " AND e.project_id = ?"; $ev_params[] = $proj_scope; }
+
+    $searchClause = ems_dt_like_clause($conn, $dt['search'],
+        array('e.event_no', 'e.source_ref', 'e.event_type', 'e.source_module', 'p.name', 's.name'));
+    $ev_whereAll = $ev_whereRaw . ($searchClause !== '' ? " AND " . $searchClause : '');
+
+    $decl = array('scope' => array('e' => 'fin_financial_events'),
+                  'enrich' => array('p' => 'project', 's' => 'suppliers'));
+    $joins = "FROM fin_financial_events e
+              LEFT JOIN project p ON p.id = e.project_id
+              LEFT JOIN suppliers s ON s.id = e.supplier_entity_id";
+
+    $trows = fin_gate($is_super_admin)->scopedQuery($decl,
+        "SELECT COUNT(*) c $joins WHERE {TENANT_SCOPE} AND " . $ev_whereRaw, $ev_params);
+    $total = $trows ? intval($trows[0]['c']) : 0;
+    $frows = fin_gate($is_super_admin)->scopedQuery($decl,
+        "SELECT COUNT(*) c $joins WHERE {TENANT_SCOPE} AND " . $ev_whereAll, $ev_params);
+    $filtered = $frows ? intval($frows[0]['c']) : 0;
+
+    $order = $dt['order_sql'] !== '' ? $dt['order_sql'] : 'e.id DESC';
+    $event_rows = fin_gate($is_super_admin)->scopedQuery($decl,
+        "SELECT e.*, p.name AS project_name, s.name AS supplier_name
+         $joins WHERE {TENANT_SCOPE} AND " . $ev_whereAll . "
+         ORDER BY $order, e.id DESC
+         LIMIT " . intval($dt['length']) . " OFFSET " . intval($dt['start']),
+        $ev_params);
+
+    $data = array();
+    foreach ($event_rows as $row) {
+        $data[] = fin_event_row_cells($row, $event_types, $source_modules, $event_states,
+                                      $flow, $can_edit, $can_delete);
+    }
+    ems_dt_emit($dt['draw'], $total, $filtered, $data);
+}
+
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -324,68 +430,9 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
+                    // H-22: كان يُحمَّل هنا الدفترُ كاملًا بلا LIMIT (محظورُ UI-01 §4)
+                    // — الجدولُ الآن serverSide يجلب صفحةَ 50 من ?ajax=dt أعلاه.
                     $filter_state = (isset($_GET['fstate']) && isset($event_states[$_GET['fstate']])) ? $_GET['fstate'] : '';
-                    $flow = fin_event_flow();
-                    // إثراء المشروع/المورد LEFT JOIN عبر scopedQuery (العزل على e، super→كل الشركات)؛
-                    // تصفية الحالة الاختيارية بمعامِلٍ مربوط (لا حقن)
-                    $ev_whereRaw = "COALESCE(e.is_deleted,0)=0";
-                    $ev_params = array();
-                    if ($filter_state !== '') { $ev_whereRaw .= " AND e.state=?"; $ev_params[] = $filter_state; }
-                    // نطاق المشروع للدورين 5/6 (fin_project_scope — يريان أحداث موقعهما حصرًا)
-                    $proj_scope = fin_project_scope($conn, $ctx);
-                    if ($proj_scope !== null) { $ev_whereRaw .= " AND e.project_id = ?"; $ev_params[] = $proj_scope; }
-                    $event_rows = fin_gate($is_super_admin)->scopedQuery(
-                        array('scope' => array('e' => 'fin_financial_events'), 'enrich' => array('p' => 'project', 's' => 'suppliers')),
-                        "SELECT e.*, p.name AS project_name, s.name AS supplier_name
-                         FROM fin_financial_events e
-                         LEFT JOIN project p ON p.id = e.project_id
-                         LEFT JOIN suppliers s ON s.id = e.supplier_entity_id
-                         WHERE {TENANT_SCOPE} AND " . $ev_whereRaw . " ORDER BY e.id DESC",
-                        $ev_params);
-                    foreach ($event_rows as $row) {
-                        $st   = (string)$row['state'];
-                        $dim  = $row['project_name'] ?: ($row['supplier_name'] ?: '—');
-                        $data_attrs =
-                            "data-id='" . intval($row['id']) . "' " .
-                            "data-type='" . htmlspecialchars((string)$row['event_type'], ENT_QUOTES) . "' " .
-                            "data-source='" . htmlspecialchars((string)$row['source_module'], ENT_QUOTES) . "' " .
-                            "data-ref='" . htmlspecialchars((string)($row['source_ref'] ?? ''), ENT_QUOTES) . "' " .
-                            "data-amount='" . htmlspecialchars((string)$row['amount'], ENT_QUOTES) . "' " .
-                            "data-currency='" . htmlspecialchars((string)$row['currency'], ENT_QUOTES) . "' " .
-                            "data-fx='" . htmlspecialchars((string)($row['fx_rate'] ?? ''), ENT_QUOTES) . "' " .
-                            "data-project='" . intval($row['project_id']) . "' " .
-                            "data-supplier='" . intval($row['supplier_entity_id']) . "' " .
-                            "data-equipment='" . intval($row['equipment_id']) . "' " .
-                            "data-notes='" . htmlspecialchars((string)($row['notes'] ?? ''), ENT_QUOTES) . "'";
-                        $can_modify = ($st === 'draft'); // الإقفال بالمرحلة: بعد المسودة تُقفل من الشاشة
-                        echo "<tr>";
-                        echo "<td><div class='action-btns'>";
-                        if ($can_edit && $can_modify) {
-                            echo "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
-                        }
-                        if ($can_delete && $can_modify) {
-                            echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
-                        }
-                        if ($can_edit && isset($flow[$st])) {
-                            $lbl = $flow[$st][1];
-                            echo "<a href='?advance_id=" . intval($row['id']) . "' class='action-btn edit' title='" . htmlspecialchars($lbl) . "' onclick='return confirm(\"" . htmlspecialchars($lbl) . "؟\")'><i class='fas fa-circle-chevron-left'></i></a>";
-                        }
-                        if ($can_edit && !in_array($st, array('draft','posted','settled','closed','rejected'), true)) {
-                            echo "<a href='?reject_id=" . intval($row['id']) . "' class='action-btn delete' title='رفض/إعادة' onclick='return confirm(\"رفض الحدث وإعادته؟\")'><i class='fas fa-ban'></i></a>";
-                        }
-                        if ($can_edit && $st === 'rejected') {
-                            echo "<a href='?resume_id=" . intval($row['id']) . "' class='action-btn edit' title='إعادة للدورة' onclick='return confirm(\"إعادة الحدث للدورة كمسودة؟\")'><i class='fas fa-rotate-left'></i></a>";
-                        }
-                        echo "</div></td>";
-                        echo "<td>" . htmlspecialchars((string)$row['event_no']) . "</td>";
-                        echo "<td>" . htmlspecialchars($event_types[$row['event_type']] ?? $row['event_type']) . "</td>";
-                        echo "<td>" . htmlspecialchars($source_modules[$row['source_module']] ?? $row['source_module']) . "</td>";
-                        echo "<td>" . htmlspecialchars((string)($row['source_ref'] ?? '')) . "</td>";
-                        echo "<td>" . number_format((float)$row['amount'], 2) . " " . htmlspecialchars((string)$row['currency']) . "</td>";
-                        echo "<td>" . htmlspecialchars((string)$dim) . "</td>";
-                        echo "<td><span class='badge badge-" . fin_state_tone($st) . "'>" . htmlspecialchars($event_states[$st] ?? $st) . "</span></td>";
-                        echo "</tr>";
-                    }
                     ?>
                 </tbody>
             </table>
@@ -406,9 +453,24 @@ include '../insidebar.php';
     $(document).ready(function () {
         $('#finTable').DataTable({
             scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
+            // ── H-22 (UI-01 §4/§9): معالجةٌ خادمية — الدفترُ لا يُحمَّل كاملًا
+            //    في المتصفح؛ صفحةُ 50 وبحثٌ مؤخَّر 400ms من الخادم.
+            serverSide: true,
+            processing: true,
+            searchDelay: 400,
+            deferRender: true,
+            pageLength: 50,
+            ajax: {
+                url: 'events_list_fin.php',
+                data: function (d) {
+                    d.ajax = 'dt';
+                    d.fstate = <?php echo json_encode($filter_state); ?>;
+                }
+            },
             // الأحدثُ أولًا: الترتيبُ من الخادم (ORDER BY e.id DESC) — نمنع فرزَ
             // DataTables الافتراضيَّ على عمود «الإجراءات» الذي كان يبعثره
             order: [],
+            columnDefs: [{ targets: [0, 6], orderable: false }],
             buttons: [
                 { extend: 'copy', text: '📋 نسخ' },
                 { extend: 'excel', text: '📊 Excel' },

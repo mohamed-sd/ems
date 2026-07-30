@@ -270,6 +270,88 @@ class ActivityLogRepository
         return $rows;
     }
 
+    /**
+     * H-22 — صفحةٌ خادميةٌ حقيقية لبروتوكول DataTables (UI-01 §4):
+     * عدٌّ كليٌّ (نطاقُ الشركة/الدور) · عدٌّ مرشَّح (بحثٌ + فلاتر) · صفحةُ
+     * LIMIT/OFFSET — لا تحميلَ لكل السجلات أبدًا. الفرزُ يصل جاهزًا من قائمة
+     * سماحِ المساعد (ems_dt_params) فلا يبلغ SQL اسمُ عمودٍ من المتصفح.
+     *
+     * @param  array  $baseFilters   نطاقٌ ثابت (company_id · role_id)
+     * @param  array  $extraFilters  فلاترُ الشاشة (action_type · date_from/to · http_method)
+     * @param  string $searchClause  شرطُ LIKE جاهزٌ من ems_dt_like_clause ('' = بلا بحث)
+     * @param  string $orderSql      عبارةُ فرزٍ مأمونة ('' = الافتراضي: الأحدث أولًا)
+     * @return array{total:int, filtered:int, rows:array<int,array<string,mixed>>}
+     */
+    public function getDataTablePage(
+        array $baseFilters,
+        array $extraFilters,
+        string $searchClause,
+        string $orderSql,
+        int $offset,
+        int $limit
+    ): array {
+        $baseConds = [];
+        $this->applyFilters($baseConds, $baseFilters);
+        $baseWhere = $baseConds ? ('WHERE ' . implode(' AND ', $baseConds)) : '';
+
+        $allConds = $baseConds;
+        $this->applyFilters($allConds, $extraFilters);
+        if ($searchClause !== '') {
+            $allConds[] = $searchClause;
+        }
+        $allWhere = $allConds ? ('WHERE ' . implode(' AND ', $allConds)) : '';
+
+        $total = 0;
+        $res = mysqli_query($this->conn, "SELECT COUNT(*) c FROM activity_logs al $baseWhere");
+        if ($res && ($r = mysqli_fetch_assoc($res))) { $total = intval($r['c']); }
+
+        // العدُّ المرشَّح يحتاج الـJOINات حين يبحث في أسماء المستخدم/الموظف
+        $filtered = 0;
+        $res = mysqli_query($this->conn,
+            "SELECT COUNT(*) c
+             FROM activity_logs al
+             LEFT JOIN users u ON u.id = al.user_id
+             LEFT JOIN employees e ON e.id = COALESCE(al.employee_id, u.employee_id)
+             $allWhere");
+        if ($res && ($r = mysqli_fetch_assoc($res))) { $filtered = intval($r['c']); }
+
+        $order = $orderSql !== '' ? $orderSql : 'al.created_at DESC, al.id DESC';
+        $sql = "SELECT
+                    al.id,
+                    al.created_at,
+                    al.company_id,
+                    al.project_id,
+                    al.user_id,
+                    COALESCE(u.name, u.username, CONCAT('مستخدم #', al.user_id)) AS user_name,
+                    e.name AS employee_name,
+                    COALESCE(al.employee_id, u.employee_id) AS employee_id,
+                    al.role_id,
+                    COALESCE(r.name, al.role_name, CONCAT('دور #', al.role_id)) AS role_name,
+                    al.module_name,
+                    al.screen_name,
+                    al.action_type,
+                    al.button_name,
+                    al.record_id,
+                    al.response_status,
+                    al.http_method,
+                    al.url
+                FROM activity_logs al
+                LEFT JOIN users u ON u.id = al.user_id
+                LEFT JOIN employees e ON e.id = COALESCE(al.employee_id, u.employee_id)
+                LEFT JOIN roles r ON r.id = al.role_id
+                $allWhere
+                ORDER BY $order, al.id DESC
+                LIMIT " . intval($limit) . " OFFSET " . intval($offset);
+
+        $rows = [];
+        $res = mysqli_query($this->conn, $sql);
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) { $rows[] = $row; }
+        }
+
+        return ['total' => $total, 'filtered' => $filtered, 'rows' => $rows];
+    }
+
     // ─────────────────────────────────────────────────────────────────────
     // Internal helpers
     // ─────────────────────────────────────────────────────────────────────

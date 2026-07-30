@@ -131,17 +131,11 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'clear_logs') {
 // ── Phase 1: role cards ───────────────────────────────────────────────────
 $roleSummary = $repo->getRoleSummary($is_super_admin ? 0 : $company_id);
 
-// ── Phase 2: initial rows (SSR for DataTables) ────────────────────────────
+// ── Phase 2 ───────────────────────────────────────────────────────────────
+// H-22: أُبطل تحميلُ 5000 صفٍّ في الخادم (كان «SSR ثم ترقيمٌ في المتصفح» —
+// محظورُ UI-01 §4). الجدولُ يبدأ فارغًا وserverSide يجلب صفحةَ 50 من ?ajax=dt.
 $selectedRoleId = isset($_GET['role_id']) ? intval($_GET['role_id']) : 0;
 $initialRows = [];
-if ($selectedRoleId > 0) {
-    // Load up to 5000 rows; DataTables handles client-side paging/search from here.
-    $initialRows = $repo->getInitialPage(
-        $is_super_admin ? 0 : $company_id,
-        $selectedRoleId,
-        5000
-    );
-}
 
 $currentRoleCard = null;
 if ($selectedRoleId > 0) {
@@ -183,7 +177,10 @@ $actionLabels = [
     'click' => ['label' => 'نقرة', 'badge' => 'bg-secondary'],
 ];
 
-function renderLogRow(array $row, array $actionLabels): string
+/**
+ * H-22: خلايا الصف مصفوفةً (بروتوكول serverSide) — والغلاف <tr> للتوافق.
+ */
+function renderLogCells(array $row, array $actionLabels): array
 {
     $e = fn($s) => htmlspecialchars((string) ($s ?? ''), ENT_QUOTES, 'UTF-8');
     $t = $row['created_at'] ? date('Y-m-d H:i:s', strtotime($row['created_at'])) : '—';
@@ -201,28 +198,78 @@ function renderLogRow(array $row, array $actionLabels): string
     $recordDisplay = ($row['record_id'] !== null && $row['record_id'] !== '') ? $e($row['record_id']) : '—';
     $buttonDisplay = ($row['button_name'] !== null && $row['button_name'] !== '') ? $e($row['button_name']) : '—';
 
-    return '<tr data-id="' . intval($row['id']) . '">
-        <td class="px-3 text-nowrap small" data-date="' . substr($e($t), 0, 10) . '">' . $e($t) . '</td>
-        <td class="small">' . (
-            ($row['employee_name'] ?? '') !== ''
-                ? '<strong>' . $e($row['employee_name']) . '</strong><br><small class="text-muted"><i class="fa fa-user-circle"></i> ' . $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '</small>'
-                : $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '<br><small class="text-muted">— غير مرتبط بموظف —</small>'
-        ) . '</td>
-        <td class="small">' . $e($row['role_name'] ?? '—') . '</td>
-        <td class="small">' . $e($row['module_name'] ?? '—') . '</td>
-        <td class="small">' . $e($row['screen_name'] ?? '—') . '</td>
-        <td data-action="' . $e($actionType) . '">' . $badge . '</td>
-        <td class="small text-truncate" style="max-width:100px" title="' . $e($row['button_name'] ?? '') . '">' . $buttonDisplay . '</td>
-        <td class="small">' . $recordDisplay . '</td>
-        <td class="small ' . $statusClass . '">' . $statusDisplay . '</td>
-        <td class="text-center">
-            <button class="action-btn view detail-btn"
-                    data-id="' . intval($row['id']) . '" title="تفاصيل">
-                <i class="fa fa-eye"></i>
-            </button>
-        </td>
-        <td class="d-none">' . $e($row['http_method'] ?? '') . '</td>
-    </tr>';
+    return [
+        /* 0 */ '<span class="text-nowrap small" data-date="' . substr($e($t), 0, 10) . '">' . $e($t) . '</span>',
+        /* 1 */ '<span class="small">' . (
+                    ($row['employee_name'] ?? '') !== ''
+                        ? '<strong>' . $e($row['employee_name']) . '</strong><br><small class="text-muted"><i class="fa fa-user-circle"></i> ' . $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '</small>'
+                        : $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '<br><small class="text-muted">— غير مرتبط بموظف —</small>'
+                ) . '</span>',
+        /* 2 */ '<span class="small">' . $e($row['role_name'] ?? '—') . '</span>',
+        /* 3 */ '<span class="small">' . $e($row['module_name'] ?? '—') . '</span>',
+        /* 4 */ '<span class="small">' . $e($row['screen_name'] ?? '—') . '</span>',
+        /* 5 */ '<span data-action="' . $e($actionType) . '">' . $badge . '</span>',
+        /* 6 */ '<span class="small text-truncate d-inline-block" style="max-width:100px" title="' . $e($row['button_name'] ?? '') . '">' . $buttonDisplay . '</span>',
+        /* 7 */ '<span class="small">' . $recordDisplay . '</span>',
+        /* 8 */ '<span class="small ' . $statusClass . '">' . $statusDisplay . '</span>',
+        /* 9 */ '<button class="action-btn view detail-btn" data-id="' . intval($row['id']) . '" title="تفاصيل"><i class="fa fa-eye"></i></button>',
+        /* 10 */ $e($row['http_method'] ?? ''),
+    ];
+}
+
+function renderLogRow(array $row, array $actionLabels): string
+{
+    $cells = renderLogCells($row, $actionLabels);
+    $classes = ['px-3 text-nowrap small', 'small', 'small', 'small', 'small', '', 'small', 'small', 'small', 'text-center', 'd-none'];
+    $html = '<tr data-id="' . intval($row['id']) . '">';
+    foreach ($cells as $i => $c) {
+        $html .= '<td' . ($classes[$i] !== '' ? ' class="' . $classes[$i] . '"' : '') . '>' . $c . '</td>';
+    }
+    return $html . '</tr>';
+}
+
+// ── H-22: نقطة DataTables الخادمية (UI-01 §4 — الترقيمُ والفرزُ والبحثُ في
+//    الخادم أبدًا). تحلّ محلَّ تحميل 5000 صفٍّ في المتصفح على أكبر جدولٍ
+//    في النظام (13 ألف صف). الصلاحيةُ صراحةً — لا اعتمادَ على مرور الشاشة.
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'dt') {
+    $dt_perms = check_page_permissions($conn, 'ActivityLogs/activity_logs.php');
+    if (!$is_super_admin && $dt_perms['id'] !== null && !$dt_perms['can_view']) {
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(403);
+        exit(json_encode(['error' => 'no_view_permission'], JSON_UNESCAPED_UNICODE));
+    }
+    require_once __DIR__ . '/../includes/datatable_server.php';
+
+    // قائمةُ سماح الفرز: فهرسُ عمود الجدول ⇒ عمودُ SQL (9 زرٌّ لا يُفرز)
+    $dt = ems_dt_params([
+        0 => 'al.created_at', 1 => 'user_name',      2 => 'role_name',
+        3 => 'al.module_name', 4 => 'al.screen_name', 5 => 'al.action_type',
+        6 => 'al.button_name', 7 => 'al.record_id',   8 => 'al.response_status',
+        10 => 'al.http_method',
+    ]);
+
+    $baseFilters = [];
+    if (!$is_super_admin && $company_id > 0) { $baseFilters['company_id'] = $company_id; }
+    $dtRole = intval($_GET['role_id'] ?? 0);
+    if ($dtRole > 0) { $baseFilters['role_id'] = $dtRole; }
+
+    $extraFilters = [];
+    if (!empty($_GET['f_action_type'])) { $extraFilters['action_type'] = trim($_GET['f_action_type']); }
+    if (!empty($_GET['f_http_method'])) { $extraFilters['http_method'] = trim($_GET['f_http_method']); }
+    if (!empty($_GET['f_date_from']))   { $extraFilters['date_from'] = trim($_GET['f_date_from']); }
+    if (!empty($_GET['f_date_to']))     { $extraFilters['date_to'] = trim($_GET['f_date_to']); }
+
+    // البحثُ في الحقول المعرَّفة لا كل عمود (UI-01 §4)
+    $searchClause = ems_dt_like_clause($conn, $dt['search'], [
+        'al.module_name', 'al.screen_name', 'al.action_type', 'al.button_name',
+        'al.url', 'u.name', 'u.username', 'e.name',
+    ]);
+
+    $page = $repo->getDataTablePage($baseFilters, $extraFilters, $searchClause,
+                                    $dt['order_sql'], $dt['start'], $dt['length']);
+    $data = [];
+    foreach ($page['rows'] as $r) { $data[] = renderLogCells($r, $actionLabels); }
+    ems_dt_emit($dt['draw'], $page['total'], $page['filtered'], $data);
 }
 
 $page_title = 'سجل النشاط';
@@ -760,12 +807,32 @@ $page_title = 'سجل النشاط';
             language: { url: '/ems/assets/i18n/datatables/ar.json' },
             responsive: true,
             autoWidth: false,
-            pageLength: 25,
+            // ── H-22 (UI-01 §4/§9): معالجةٌ خادمية — الترقيمُ والفرزُ والبحثُ
+            //    في الخادم، صفحةُ 50، تأخيرُ البحث 400ms، ولا stateSave مع
+            //    الفلاتر الخارجية (درسُ الأعمدة المخبوءة المقيس).
+            serverSide: true,
+            processing: true,
+            searchDelay: 400,
+            stateSave: false,
+            deferRender: true,
+            pageLength: 50,
             lengthMenu: [10, 25, 50, 100, 250],
             order: [[0, 'desc']], // newest first
+            ajax: {
+                url: 'activity_logs.php',
+                data: function (d) {
+                    d.ajax = 'dt';
+                    d.role_id = ROLE_ID;
+                    d.f_action_type = $('#f_action_type').val() || '';
+                    d.f_date_from = $('#f_date_from').val() || '';
+                    d.f_date_to = $('#f_date_to').val() || '';
+                    d.f_http_method = $('#f_http_method').val() || '';
+                }
+            },
             // Column 9 (details button) is not sortable
             columnDefs: [
-                { targets: 9, orderable: false, searchable: false },
+                { targets: 0, className: 'px-3' },
+                { targets: 9, orderable: false, searchable: false, className: 'text-center' },
                 { targets: 10, visible: false, searchable: true }   // http_method hidden col
             ],
             dom: '<"row align-items-center mb-2"<"col-sm-4"l><"col-sm-4 text-center" B><"col-sm-4"f>>rtip',
@@ -801,61 +868,18 @@ $page_title = 'سجل النشاط';
         });
 
         // ══════════════════════════════════════════════════════════════════════
-        // Custom search functions
+        // H-22: الفلاتر خادمية — تُرسل مع كل طلب (دالة ajax.data أعلاه)،
+        // فتغييرُها إعادةُ تحميلٍ من الخادم لا تصفيةً في المتصفح.
         // ══════════════════════════════════════════════════════════════════════
-
-        // نوع الإجراء — يقرأ data-action من الخلية مباشرة (يتجاوز HTML للـ badge)
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex, rowData, counter) {
-            if (settings.nTable.id !== 'logsTable') return true;
-
-            var actionFilter = $('#f_action_type').val();
-            var dateFrom = $('#f_date_from').val();
-            var dateTo = $('#f_date_to').val();
-            var methodFilter = $('#f_http_method').val();
-
-            // فلتر نوع الإجراء — يقرأ data-action من خلية العمود 5
-            // نستخدم الـ row node مباشرة لتجنب مشاكل responsive مع cell().node()
-            if (actionFilter) {
-                var rowNode = logsTable.row(dataIndex).node();
-                var actionCell = rowNode ? $(rowNode).find('td').eq(5).attr('data-action') : '';
-                if ((actionCell || '') !== actionFilter) return false;
-            }
-
-            // فلتر التاريخ — يقرأ data-date من أول خلية في الصف
-            // data[0] قد يحتوي على whitespace أو HTML لذا نقرأ من الـ attribute مباشرة
-            if (dateFrom || dateTo) {
-                var rowNode = logsTable.row(dataIndex).node();
-                var rowDate = rowNode ? ($(rowNode).find('td').eq(0).attr('data-date') || '').trim() : '';
-                if (!rowDate) {
-                    // fallback: trim data[0] وخذ أول 10 أحرف
-                    rowDate = (data[0] || '').replace(/<[^>]+>/g, '').trim().substring(0, 10);
-                }
-                if (dateFrom && rowDate < dateFrom) return false;
-                if (dateTo && rowDate > dateTo) return false;
-            }
-
-            // فلتر HTTP method — column 10 (hidden)
-            if (methodFilter) {
-                var rowMethod = (data[10] || '').trim().toUpperCase();
-                if (rowMethod !== methodFilter.toUpperCase()) return false;
-            }
-
-            return true;
-        });
-
-        // ربط الفلاتر بالأحداث
-        $('#f_action_type, #f_http_method').on('change', function () {
-            logsTable.draw();
-        });
-        $('#f_date_from, #f_date_to').on('change', function () {
-            logsTable.draw();
+        $('#f_action_type, #f_http_method, #f_date_from, #f_date_to').on('change', function () {
+            logsTable.ajax.reload();
         });
 
         // زر إعادة الفلاتر
         $('#resetFiltersBtn').on('click', function () {
             $('#f_action_type, #f_http_method').val('');
             $('#f_date_from, #f_date_to').val('');
-            logsTable.draw();
+            logsTable.ajax.reload();
         });
 
         // ══════════════════════════════════════════════════════════════════════
@@ -886,8 +910,8 @@ $page_title = 'سجل النشاط';
                 .done(function (data) {
                     getModal('clearConfirmModal').hide();
                     if (data.success) {
-                        // امسح جميع صفوف الجدول في DataTables
-                        logsTable.clear().draw();
+                        // H-22 serverSide: أعد التحميل من الخادم (clear لا يكفي)
+                        logsTable.ajax.reload();
                         // حدّث عداد البادج
                         $('#roleLogCount').text('0 سجل');
                         $('#heroLogCount').text('0 سجل');

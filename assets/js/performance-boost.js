@@ -14,9 +14,9 @@
             processing: true,
             stateSave: true,
             autoWidth: false,
-            pageLength: 25,
+            pageLength: 50, // H-22 · UI-01 §9: «خمسون صفًّا افتراضًا»
             lengthMenu: [[10, 25, 50, 100, 250], [10, 25, 50, 100, 250]],
-            searchDelay: 350
+            searchDelay: 400 // UI-01 §4: تأخيرُ البحث 400ms قبل الإرسال
         });
     }
 
