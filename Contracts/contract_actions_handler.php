@@ -262,6 +262,18 @@ else if ($action === 'settlement') {
         'effect_summary' => $note,
     ));
 
+    // M-10 (CON-02 §6): «الحاوياتُ تُعاد موازنتُها عند تغيّر الكمية» — عملياتُ
+    // الموازنة تنضم لمعاملة الملحق نفسِها؛ وفشلُ الفحص المسبق (تخفيضٌ دون
+    // المخصَّص للموردين) يُسقط الملحقَ كلَّه — لا ملحقَ بلا موازنته.
+    require_once __DIR__ . '/../app/Services/Contract/ClientAmendmentEffects.php';
+    $rebalance = \App\Services\Contract\ClientAmendmentEffects::rebalanceOps(
+        contract_actions_gate(), $contract, $amd_settle_qty);
+    if (!$rebalance['ok']) {
+        die(json_encode(['success' => false, 'message' => $rebalance['reason']]));
+    }
+    foreach ($rebalance['ops'] as $rop) { $operations[] = $rop; }
+    if ($rebalance['note'] !== '') { $note .= ' · ' . $rebalance['note']; }
+
     $result = executeOperations($operations, $conn);
     if ($result['success']) {
         addContractNote($contract_id, $note, $user_id, $conn);
@@ -596,6 +608,34 @@ else if ($action === 'complete') {
     }
 
     echo json_encode($result);
+}
+
+// M-10. تغيير ملتزمٍ في المصفوفة — ملحقُ «تغيير التزامات» يولّد صفَّ الالتزام
+// مسودةً بسريانه ذريًّا (CON-02 §6 · A6) — والإجازةُ تبقى بيد المالية (ق-18).
+else if ($action === 'change_obligation') {
+    $contract = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+    if (!$contract) {
+        die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
+    }
+    require_once __DIR__ . '/../app/Services/Contract/ClientAmendmentEffects.php';
+    $r = \App\Services\Contract\ClientAmendmentEffects::changeObligation(
+        $conn, contract_actions_gate(), intval($contract['company_id']), $contract_id, array(
+            'obligation_type'   => strval($_POST['obligation_type'] ?? ''),
+            'obligor'           => strval($_POST['obligor'] ?? ''),
+            'effect_on_billing' => strval($_POST['effect_on_billing'] ?? ''),
+            'effective_from'    => strval($_POST['effective_from'] ?? ''),
+            'reason'            => strval($_POST['reason'] ?? ''),
+        ), $user_id);
+    if ($r['ok']) {
+        addContractNote($contract_id,
+            'ملحقُ تغيير التزامات #' . intval($r['amendment_id'])
+            . ' — ولّد بندَ مصفوفةٍ مسودةً #' . intval($r['obligation_id']) . ' ينتظر إجازةَ المالية',
+            $user_id, $conn);
+    }
+    echo json_encode(['success' => (bool) $r['ok'], 'message' => $r['ok']
+        ? ('أُنشئ الملحقُ وولّد بندَ المصفوفة مسودةً — بانتظار إجازة المالية ✅')
+        : ($r['reason'] . ' (' . intval($r['code']) . ')'),
+        'amendment_id' => $r['amendment_id'], 'obligation_id' => $r['obligation_id']]);
 }
 
 else {

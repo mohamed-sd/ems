@@ -161,30 +161,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
         if ($act === 'one') {
             $oid = intval($_POST['obligation_id'] ?? 0);
             $cur = $gate->selectOne('contract_obligations', array(
-                'columns' => array('id', 'approval_state'), 'where' => array('id' => $oid),
+                'where' => array('id' => $oid),
             ));
             if (!$cur) { obl_back('البندُ غير موجود أو خارج نطاق شركتك ❌', $cid); }
             if ($cur['approval_state'] === 'approved') { obl_back('البندُ مُجازٌ سلفًا', $cid); }
             $gate->update('contract_obligations', array(
                 'approval_state' => 'approved', 'approved_by' => $uid, 'approved_at' => $now,
             ), array('id' => $oid), 'is_deleted = 0');
-            obl_back('أُجيز البند — وصار نافذًا من تاريخ سريانه ✅', $cid);
+            // M-10 (CON-02 §6 · A6): الجديدُ النافذُ يقفل سلفَه على (سريانه − 1)
+            // — «ما قبله بحكمه القديم وما بعده بالجديد» بنيويًّا لا التباسًا.
+            require_once __DIR__ . '/../app/Services/Contract/ClientAmendmentEffects.php';
+            $closed = \App\Services\Contract\ClientAmendmentEffects::closePredecessors($gate, $cur);
+            obl_back('أُجيز البند — وصار نافذًا من تاريخ سريانه ✅'
+                . ($closed > 0 ? ' وأُقفل سلفُه على ما قبل سريانه' : ''), $cid);
         } elseif ($act === 'all') {
             $drafts = $gate->scopedQuery(array('scope' => array('o' => 'contract_obligations')),
                 "SELECT o.id FROM contract_obligations o
                   WHERE {TENANT_SCOPE} AND o.is_deleted = 0 AND o.client_contract_id = ?
                     AND o.approval_state = 'draft'", array($cid));
             if (empty($drafts)) { obl_back('لا مسوداتٍ تنتظر الإجازة', $cid); }
+            require_once __DIR__ . '/../app/Services/Contract/ClientAmendmentEffects.php';
             $n = 0;
             $gate->runInTransaction(function ($g) use ($drafts, $uid, $now, &$n) {
                 foreach ($drafts as $d) {
                     $g->update('contract_obligations', array(
                         'approval_state' => 'approved', 'approved_by' => $uid, 'approved_at' => $now,
                     ), array('id' => intval($d['id'])), 'is_deleted = 0');
+                    // M-10: كلُّ مُجازٍ يقفل أسلافَه على (سريانه − 1) — داخل المعاملة نفسِها
+                    $row = $g->selectOne('contract_obligations', array('where' => array('id' => intval($d['id']))));
+                    if ($row) { \App\Services\Contract\ClientAmendmentEffects::closePredecessors($g, $row); }
                     $n++;
                 }
             });
-            obl_back('أُجيزت ' . $n . ' مسودةً — وصارت نافذةً من تواريخ سريانها ✅', $cid);
+            obl_back('أُجيزت ' . $n . ' مسودةً — وصارت نافذةً من تواريخ سريانها وأُقفلت أسلافُها ✅', $cid);
         }
     } catch (\Throwable $t) {
         error_log('contract_obligations approve: ' . $t->getMessage());
