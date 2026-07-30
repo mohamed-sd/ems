@@ -162,6 +162,18 @@ class SupplierContractService
                 $out['code'] = 423; $out['reason'] = $g['reason']; return $out;
             }
         }
+
+        // ── M-18 · «تصفيةُ إنهاء العقد» شرطُ إقفاله (ENT-02 §4) ─────────────
+        // الإقفالُ وحدَه يُحرَس: إقفالُ الحصة وتسويةُ السلف وردُّ الضمان وشهادةُ
+        // الإخلاء **قبل** أن يصير العقدُ «مقفلًا» — وإلا أُقفل عقدٌ وعليه رصيدُ
+        // سلفةٍ أو ضمانٌ محتجزٌ لصاحبه.
+        if ((string) $to === ContractStateMachine::CLOSED) {
+            require_once __DIR__ . '/SupplierClosureService.php';
+            $g = SupplierClosureService::contractCloseGate($gate, (int) $contractId);
+            if (!$g['ok']) {
+                $out['code'] = 423; $out['reason'] = $g['reason']; return $out;
+            }
+        }
         try {
             $gate->update('supplier_contracts',
                 array('state' => (string) $to, 'version' => (int) $head['version'] + 1),
