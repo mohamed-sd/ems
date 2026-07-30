@@ -71,6 +71,10 @@ class TenantRegistry
         // H-01 §4 (المرحلة ①): حاوياتُ العقد ومشتقاتُها. الحاوياتُ والدورات
         // `soft` (بنيةُ عقدٍ تُراجَع وتُعكس فلا تُمحى)، والاستهلاكُ والتبديلُ
         // سجلّان إلحاقيّان لا حذفَ فيهما.
+        // H-05 §2-③ (هجرة 2026-07-30): الموقعُ/المنجم كيانُ الهرم الثالث —
+        // ابنُ المشروع وأبو العقود. بياناتُ مستأجرٍ بcompany_id، وsoft=true
+        // لأن الموقعَ مرجعُ تسجيلٍ تاريخيٍّ لا يُمحى (تُقرأ به الوحداتُ القديمة).
+        'sites' => array('type' => self::T_TENANT, 'soft' => true),
         'op_containers' => array('type' => self::T_TENANT, 'soft' => true),
         'container_consumption' => array('type' => self::T_TENANT, 'soft' => false),
         'container_swaps' => array('type' => self::T_TENANT, 'soft' => false),
