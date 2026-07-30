@@ -148,24 +148,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cnt_action'])) {
         cnt_back('سُجّلت دورةُ التناوب — وزال سببُ «مشغّلٌ بلا دورة» عن حاويته ✅', $cid);
 
     } elseif ($act === 'swap') {
-        $reason = trim(strval($_POST['reason'] ?? ''));
-        if ($reason === '') { cnt_back('سببُ التبديل إلزامي — لا تبديلَ بلا سبب ❌', $cid); }
-        try {
-            $gate->insert('container_swaps', array(
-                'container_id'   => intval($_POST['container_id'] ?? 0),
-                'swap_kind'      => strval($_POST['swap_kind'] ?? 'مشغّل'),
-                'out_ref'        => intval($_POST['out_ref'] ?? 0) ?: null,
-                'in_ref'         => intval($_POST['in_ref'] ?? 0) ?: null,
-                'effective_from' => strval($_POST['effective_from'] ?? date('Y-m-d')),
-                'reason'         => mb_substr($reason, 0, 255),
-                'doc_ref'        => strval($_POST['doc_ref'] ?? '') ?: null,
-                'created_by'     => $uid ?: null,
-            ));
-        } catch (\Throwable $t) {
-            error_log('container swap: ' . $t->getMessage());
-            cnt_back('تعذّر التبديل — تحقّق أن الداخلَ غيرُ الخارج ❌', $cid);
-        }
-        cnt_back('سُجّل التبديلُ بسببه ✅', $cid);
+        // H-04: الاستبدالُ صار **نقلًا ذريًّا** لا سجلًّا وصفيًّا — «تُجمَّد
+        // الخارجةُ عند رصيدها وتُفتح البديلةُ بالمتبقي» والسجلُّ داخل معاملته.
+        require_once __DIR__ . '/../app/Services/Operations/RotationSwapService.php';
+        $r = \App\Services\Operations\RotationSwapService::swap(
+            $conn, $gate, $company_id,
+            intval($_POST['container_id'] ?? 0),
+            intval($_POST['in_ref'] ?? 0),
+            strval($_POST['reason'] ?? ''),
+            strval($_POST['doc_ref'] ?? ''),
+            $uid,
+            strval($_POST['effective_from'] ?? date('Y-m-d')));
+        cnt_back($r['ok']
+            ? ('نُقل الرصيدُ ذريًّا: ' . $r['moved_qty'] . ' إلى الحاوية #' . intval($r['to_container_id'])
+               . ' — والخارجةُ مجمَّدةٌ عند رصيدها ✅')
+            : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')'), $cid);
     }
     cnt_back('إجراءٌ غير معروف ❌', $cid);
 }

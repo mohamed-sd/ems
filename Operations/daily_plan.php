@@ -138,6 +138,13 @@ if ($sel_project > 0) {
                     array($ecId));
             } catch (\Throwable $t) { $chains[$ecId] = array(); }
         }
+        // H-04: المناوبُ المقترَح من جدول الدورات — اقتراحٌ لا فرضٌ (القرارُ للموزّع)
+        require_once __DIR__ . '/../app/Services/Operations/RotationSwapService.php';
+        $onDuty = array();
+        foreach (array_keys($chains) as $ecId2) {
+            $d = \App\Services\Operations\RotationSwapService::onDuty($gate, $ecId2, $sel_date);
+            $onDuty[$ecId2] = $d['on_duty'];
+        }
     }
 }
 $STATES = array('draft' => 'مسودة (توزيع)', 'approved' => 'معتمدةُ الحركة', 'opened' => 'مفتوحة ✓', 'closed' => 'مقفلة');
@@ -263,7 +270,9 @@ include '../insidebar.php';
                                         <?php foreach (($chains[$ecId] ?? array()) as $c): ?>
                                             <option value="<?php echo intval($c['operator_employee_id']); ?>">
                                                 <?php echo htmlspecialchars(($c['name'] ?? ('#' . intval($c['operator_employee_id'])))
-                                                    . ($c['role_kind'] ? ' (' . $c['role_kind'] . ')' : '')); ?>
+                                                    . ($c['role_kind'] ? ' (' . $c['role_kind'] . ')' : '')
+                                                    . ((isset($onDuty[$ecId]) && $onDuty[$ecId] === intval($c['operator_employee_id']))
+                                                        ? ' ★ مناوبُ اليوم' : '')); ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
