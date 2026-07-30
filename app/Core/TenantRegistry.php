@@ -285,6 +285,10 @@ class TenantRegistry
         'supplier_penalty_rules' => array('type' => self::T_TENANT, 'soft' => true),
         // M-16 (CON-03 §3 · §6): بطاقةُ الطاقة النظرية والجاهزيةِ ومهلةِ الإحلال.
         'supplier_capacity' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-17 (CON-03 §4-التقييم): الأوزانُ المكتوبةُ والتقييمُ الدوريُّ وأسطرُ مؤشراته.
+        'supplier_evaluation_weights' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplier_evaluations' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplier_evaluation_lines' => array('type' => self::T_TENANT, 'soft' => false),
         // M-12 (ENT-02 §3/§7): بوابةُ سلفيات الموردين وسجلُّ استردادها.
         'supplier_advance_requests' => array('type' => self::T_TENANT, 'soft' => true),
         'supplier_advance_recoveries' => array('type' => self::T_TENANT, 'soft' => false),

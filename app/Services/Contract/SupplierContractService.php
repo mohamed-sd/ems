@@ -150,6 +150,18 @@ class SupplierContractService
         if ((int) $version > 0 && (int) $version !== (int) $head['version']) {
             $out['code'] = 409; $out['reason'] = 'تغيّر العقدُ من طرفٍ آخر (قفلٌ تفاؤلي) — أعد التحميل'; return $out;
         }
+
+        // ── M-17 · «**ونتيجتُه شرطٌ في التجديد**» (CON-03 §4-التقييم) ───────
+        // التجديدُ وحدَه يُحرَس: باقي الانتقالات لا تمسّها النتيجة. وبلا تقييمٍ
+        // معتمَدٍ — أو بتقييمٍ يقضي بعدم الأهلية — **423 بسببه مسمًّى**، لا رفضٌ
+        // أعمى: القارئُ يعرف ما يفعله ليجدّد.
+        if ((string) $to === ContractStateMachine::RENEWED) {
+            require_once __DIR__ . '/SupplierEvaluationService.php';
+            $g = SupplierEvaluationService::renewalGate($gate, (int) $head['supplier_id']);
+            if (!$g['ok']) {
+                $out['code'] = 423; $out['reason'] = $g['reason']; return $out;
+            }
+        }
         try {
             $gate->update('supplier_contracts',
                 array('state' => (string) $to, 'version' => (int) $head['version'] + 1),
