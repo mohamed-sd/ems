@@ -5,12 +5,12 @@
 
 ## رأسُ الحالة (يُحدَّث دائمًا)
 
-- **الموجةُ الجارية:** ② العقودُ والحصص — **الموجةُ ① أُغلقت** (`docs/reports/WAVE1_CLOSURE_20260730.md` — مكتملةٌ تقنيًّا · بندُ اعتماد قالب الجرد ينتظر توقيعَ المالك ولا يوقف العمل §11)
-- **آخرُ مهمةٍ أُقفلت:** H-07 عقدُ المورد ببنوده وبندِ الاستعداد
-- **المهمةُ الجارية:** M-09 شروطُ تعديل السعر — الموجة ② · 14 (**آخرُ بنودها**)
-- **المتبقي في الموجة ②:** 1 من 14 بندًا (M-09 — وH-01-③ رصدُها جارٍ)
+- **الموجةُ الجارية:** ③ الاحتسابُ والاستحقاق (24 مهمة) — **الموجتان ①② أُغلقتا** (`WAVE1_CLOSURE_20260730.md` · `WAVE2_CLOSURE_20260730.md` — مكتملتان تقنيًّا؛ وما ينتظر توقيعًا أو زمنًا لا يوقف العمل §11)
+- **آخرُ مهمةٍ أُقفلت:** M-09 شروطُ تعديل السعر — **وبها أُغلقت الموجة ② (14/14)**
+- **المهمةُ الجارية:** M-25 قراءاتُ العدّادات (**تُقدَّم داخل الموجة ③ نصًّا — تحجب ثلاثًا** · بلا مانع)
+- **ملفاتُ فحص الطبقات:** `layer_3_signoff.md` العقود · `layer_4_signoff.md` الالتزامات · `layer_5_signoff.md` الحصص — مكتملةٌ تقنيًّا تنتظر إعلانَ المالك
 - **⏳ معلَّقٌ على الزمن:** قلبُ `EMS_CONTAINER_GATE_MODE=enforce` للرائد 10 بعد أسبوعِ رصدٍ نظيفٍ (تقريرُ `Operations/cron_container_gate_report.php` الأسبوعيُّ يحكم — §13-①) · وفتحُ `EMS_ROTATION_AUTOTRANSFER` للرائد نفسِه **بعد** استكمال دوراته من مقبض الشاشة (صفرُ دورةٍ = صفرُ نقلٍ ممكن — الفتحُ الفارغ ضوضاء)
-- **حالةُ الانحدار:** 22 حزمةً خضراء بعد H-08-①: `employee_contract_registry_test` 51/0 ×2 · datatable_server 34/0 · supplier_portal_guard 52/0 · tenant_leak 130/0 · audit 26/0 · publisher 54/0 · fes 45/0 · period 19/0 · journal 27/0 · base_equivalent 19/0 · fx 45/0 · unified_nav 16/0 · role_board 16/0 · ts-service 50/0 · doc-guard 41/0 · sites 24/0 · contract_state_machine 46/0 · resp_party 12/0 · attribution 42/0 · rollback_flag 11/0 · operator_due_policy 21/0 · employee_settlement 49/0 · idempotency 14/0 — الباقي على خط الأساس §3
+- **حالةُ الانحدار:** **30 حزمةً خضراء** عند إغلاق الموجة ② (منها الجديدة: `price_adjustment` 38/0 ×2 · `supplier_contract_lines` 38/0 ×2 · `rotation_autotransfer` 15/0 ×2) — والسابقة: `employee_contract_registry_test` 52/0 ×2 · datatable_server 34/0 · supplier_portal_guard 52/0 · tenant_leak 130/0 · audit 26/0 · publisher 54/0 · fes 45/0 · period 19/0 · journal 27/0 · base_equivalent 19/0 · fx 45/0 · unified_nav 16/0 · role_board 16/0 · ts-service 50/0 · doc-guard 41/0 · sites 24/0 · contract_state_machine 46/0 · resp_party 12/0 · attribution 42/0 · rollback_flag 11/0 · operator_due_policy 21/0 · employee_settlement 49/0 · idempotency 14/0 — الباقي على خط الأساس §3
 - **مؤشرات PLAN-01 §14:** مهامٌّ بدأت ومانعُها مفتوح = **0** · مهامٌّ أُعيد فتحُها بعد الإنجاز = 0
 
 ## يحتاج قرارَ المالك (حذفٌ أو قرارٌ من الستة فقط)
