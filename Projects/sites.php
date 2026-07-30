@@ -148,9 +148,11 @@ try {
 
 $employees_options = array();
 try {
+    // گوتشا مقيسة (H-08-①): employees بلا عمود is_deleted — الشرطُ السابق كان
+    // يُفشل الاستعلامَ صامتًا (catch) فتفرغ منسدلةُ المسؤول.
     $employees_options = $gate->scopedQuery(array('scope' => array('e' => 'employees')),
         "SELECT e.id, e.name FROM employees e
-         WHERE {TENANT_SCOPE} AND COALESCE(e.is_deleted,0)=0
+         WHERE {TENANT_SCOPE}
          ORDER BY e.name");
 } catch (\Throwable $t) { $employees_options = array(); }
 

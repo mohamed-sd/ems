@@ -90,6 +90,10 @@ class TenantRegistry
         'contractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'contracts' => array('type' => self::T_TENANT, 'soft' => true),
         'driver_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-08-① (هجرة 2026-08-16 · CON-01 §7.1): رأسُ العقد الموحّد لعقود
+        // الأشخاص — بياناتُ مستأجرٍ بcompany_id (صاحبُ العمل)، وsoft=true لأن
+        // العقدَ مستندٌ لا يُمحى: الإنهاءُ والأرشفةُ حالاتٌ في آلته لا حذف.
+        'employee_contracts' => array('type' => self::T_TENANT, 'soft' => true),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),
@@ -296,6 +300,9 @@ class TenantRegistry
             'parent' => 'employees', 'fk' => 'employee_id'),
 
         // ── مراجع نظامٍ عامة (قراءة للجميع، كتابة للمدير الأعلى) ────────────
+        // H-08-① (CON-01 §3.1): كتالوجُ نماذج الأجر الخمسة عشر — قائمةٌ محكومةٌ
+        // عامةٌ بلا company_id («نموذجٌ غيرُ مذكورٍ في القائمة → 422»).
+        'pay_models' => array('type' => self::T_GLOBAL, 'soft' => false),
         'roles' => array('type' => self::T_GLOBAL, 'soft' => false),
         'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
         'link_groups' => array('type' => self::T_GLOBAL, 'soft' => false),
