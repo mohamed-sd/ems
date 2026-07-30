@@ -107,6 +107,9 @@ class TenantRegistry
         // مالكٍ (مكوّن/قاعدة) — soft لأن استبدالَ الجهات قرارُ تحميلٍ يُراجَع
         // فيُطوى القديمُ ولا يُمحى (الاستبدالُ الذري في الخدمة).
         'cost_bearers' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-11 (هجرة 2026-08-21 · ENT-01 §2): لقطةُ العقد الثابتة — Insert-only
+        // (لا soft: الصفُّ يُدرج ويُبطل بأعمدته ولا يُحذف أبدًا — أثرُ احتسابٍ حي).
+        'contract_snapshots' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),

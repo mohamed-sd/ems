@@ -203,6 +203,12 @@ class EmployeeContractStateMachine
             $upd['approved_at'] = gmdate('Y-m-d H:i:s');
         }
         $gate->update('employee_contracts', $upd, array('id' => $contractId));
+        // H-11: الإنهاءُ والانتهاءُ يُبطلان اللقطاتِ من يومهما — «فيُعاد احتسابُ
+        // ما بعده لا ما قبله» (ENT-01 §2؛ والملحقُ H-10 سيمرّ بسريانه).
+        if ($to === self::TERMINATED || $to === self::EXPIRED) {
+            self::invalidateSnapshots($conn, $gate, (int) $c['company_id'], $contractId,
+                'انتقالُ الحالة: ' . self::labelAr($from) . ' ← ' . self::labelAr($to), $actor);
+        }
         self::emit($conn, $gate, (int) $c['company_id'], $contractId, $from, $to, $note, $actor);
 
         $out['ok'] = true; $out['code'] = 200; $out['changed'] = true;
@@ -252,6 +258,9 @@ class EmployeeContractStateMachine
             'hold_reason'       => $note,
             'version'           => (int) $c['version'] + 1,
         ), array('id' => (int) $contractId));
+        // H-11: التعليقُ/الإعارةُ من مصادر الإبطال المسمّاة (ENT-01 §2)
+        self::invalidateSnapshots($conn, $gate, (int) $c['company_id'], (int) $contractId,
+            ($kind === self::SUSPENDED ? 'تعليقُ العقد: ' : 'إعارةُ العقد: ') . $note, $actor);
         self::emit($conn, $gate, (int) $c['company_id'], (int) $contractId, $from, $kind, $note, $actor);
 
         $out['ok'] = true; $out['code'] = 200; $out['changed'] = true;
@@ -285,13 +294,29 @@ class EmployeeContractStateMachine
             'hold_reason'       => null,
             'version'           => (int) $c['version'] + 1,
         ), array('id' => (int) $contractId));
-        self::emit($conn, $gate, (int) $c['company_id'], (int) $contractId, $from, $back, $note, $actor);
+        // H-11: الاستئنافُ يعيد سريانَ القواعد — لقطاتُ ما بعده تُبطل فتُعاد
+        self::invalidateSnapshots($conn, $gate, (int) $c['company_id'], (int) $contractId,
+            'استئنافُ العقد من ' . self::labelAr($from), $actor);
+        self::emit($conn, $gate, (int) $c['company_id'], (int) $contractId,
+                   $from, $back, $note, $actor);
 
         $out['ok'] = true; $out['code'] = 200; $out['to'] = $back; $out['changed'] = true;
         return $out;
     }
 
     // ═══════════════════════════════════════════════════════════════════════
+
+    /** H-11: إبطالُ اللقطات من يوم الحدث — لا يرمي (الإبطالُ لا يعطّل الانتقال). */
+    private static function invalidateSnapshots($conn, $gate, $companyId, $contractId, $reason, $actor)
+    {
+        try {
+            require_once __DIR__ . '/ContractSnapshotService.php';
+            ContractSnapshotService::invalidateFrom($conn, $gate, $companyId, $contractId,
+                date('Y-m-d'), $reason, $actor);
+        } catch (\Throwable $t) {
+            error_log('EmployeeContractStateMachine invalidateSnapshots #' . $contractId . ': ' . $t->getMessage());
+        }
+    }
 
     /** المرحَّلُ قراءةً محصَّن: مصدرُه القديمُ كاتبُه حتى إقفال القديم (N-04). */
     private static function guardWritable($c)
