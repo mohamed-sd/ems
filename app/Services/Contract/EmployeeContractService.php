@@ -209,6 +209,43 @@ class EmployeeContractService
         return $out;
     }
 
+    /**
+     * H-10 · رفعُ النسخة الموقَّعة — «ثابتةٌ لا تُستبدل، والتصحيحُ ملحقٌ يوضّح».
+     * تُقبل في accepted حصرًا (شرطُ Accepted → Signed) وما دامت فارغة.
+     */
+    public static function attachSignedFile($conn, $gate, $companyId, $contractId, $fileRef, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $fileRef = trim((string) $fileRef);
+        if ($fileRef === '') { $out['code'] = 422; $out['reason'] = 'مرجعُ الملف إلزامي'; return $out; }
+        $c = null;
+        try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => (int) $contractId))); }
+        catch (\Throwable $t) { $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (trim((string) ($c['source_table'] ?? '')) !== '') {
+            $out['code'] = 423; $out['reason'] = 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم'; return $out;
+        }
+        if (trim((string) ($c['signed_file_ref'] ?? '')) !== '') {
+            $out['code'] = 423;
+            $out['reason'] = 'النسخةُ الموقَّعة ثابتةٌ لا تُستبدل — التصحيحُ ملحقٌ يوضّح (CON-01 §5)';
+            return $out;
+        }
+        if ((string) $c['state'] !== EmployeeContractStateMachine::ACCEPTED) {
+            $out['code'] = 422;
+            $out['reason'] = 'النسخةُ تُرفع بعد قبول الموظف (accepted) — العقدُ '
+                . EmployeeContractStateMachine::labelAr($c['state']);
+            return $out;
+        }
+        $gate->update('employee_contracts', array('signed_file_ref' => mb_substr($fileRef, 0, 255)),
+                      array('id' => (int) $contractId));
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'employee_contracts', 'attach_signed_file', (int) $contractId,
+            array('signed_file_ref' => null), array('signed_file_ref' => $fileRef),
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+        $out['ok'] = true; $out['code'] = 200;
+        return $out;
+    }
+
     // ═══════════════════════════════════════════════════════════════════════
     // H-08-② · مكوّناتُ الأجر (CON-01 §3.2) — «عددٌ غيرُ محدودٍ ولا نسبَ
     // مثبَّتةً في الكود»: القوائمُ أدناه أسماءٌ محكومةٌ لا قيمَ فيها إطلاقًا.

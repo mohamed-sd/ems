@@ -110,6 +110,9 @@ class TenantRegistry
         // H-11 (هجرة 2026-08-21 · ENT-01 §2): لقطةُ العقد الثابتة — Insert-only
         // (لا soft: الصفُّ يُدرج ويُبطل بأعمدته ولا يُحذف أبدًا — أثرُ احتسابٍ حي).
         'contract_snapshots' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-10 (هجرة 2026-08-22 · CON-01 §5): ملاحقُ عقد الموظف — مستندُ تغييرٍ
+        // قانونيٌّ لا يُمحى (soft)؛ والقائمُ contract_amendments لعقود العملاء.
+        'employee_contract_amendments' => array('type' => self::T_TENANT, 'soft' => true),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),

@@ -183,6 +183,12 @@ class EmployeeContractStateMachine
             $out['reason'] = 'لا اعتمادَ لمن أنشأ — فصلُ الواجبات بنيويٌّ لا إخفاءُ زر';
             return $out;
         }
+        // H-10: «Accepted → Signed · شرطُه رفعُ النسخة الموقَّعة (ثابتةٌ لا تُعدَّل)»
+        if ($to === self::SIGNED && trim((string) ($c['signed_file_ref'] ?? '')) === '') {
+            $out['code'] = 422;
+            $out['reason'] = 'النسخةُ الموقَّعةُ تُرفع أولًا (attachSignedFile) — شرطُ التوقيع (CON-01 §4)';
+            return $out;
+        }
         if ($expectedVersion !== null && (int) $expectedVersion !== (int) $c['version']) {
             $out['code'] = 409;
             $out['reason'] = 'نسخةٌ متغيرة — أعِد التحميل (المسجَّلة ' . (int) $c['version'] . ')';

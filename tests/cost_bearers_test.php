@@ -167,7 +167,9 @@ check(count($bl) === 1 && $bl[0]['bearer_type'] === 'company', 'costBearersOf ت
 head('⑤ الحراس — النافذُ بملحقٍ والمرحَّلُ في مصدره');
 foreach (array('completed', 'validated') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 ECSM::transition($conn, $gateApprover, $CO, $CID, 'approved', '', $APPROVER);
-foreach (array('accepted', 'signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
+ECSM::transition($conn, $gate, $CO, $CID, 'accepted', '', $CREATOR);
+ECS::attachSignedFile($conn, $gate, $CO, $CID, 'signed/' . $MARK . '.pdf', $CREATOR); // H-10 شرطُ التوقيع
+foreach (array('signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 $r = ECS::setCostBearers($conn, $gate, $CO, 'component', $COMP, array(
     array('bearer_type' => 'company', 'percent' => 100),
 ), $CREATOR);

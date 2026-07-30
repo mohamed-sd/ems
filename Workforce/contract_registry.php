@@ -18,9 +18,11 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once __DIR__ . '/../app/Services/Contract/EmployeeContractStateMachine.php';
 require_once __DIR__ . '/../app/Services/Contract/EmployeeContractService.php';
+require_once __DIR__ . '/../app/Services/Contract/EmployeeContractAmendmentService.php';
 
 use App\Services\Contract\EmployeeContractStateMachine as ECSM;
 use App\Services\Contract\EmployeeContractService as ECS;
+use App\Services\Contract\EmployeeContractAmendmentService as ECAS;
 
 $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -195,6 +197,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'bearer_se
     header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
+// ── H-10: الملاحقُ والنسخةُ الموقَّعة (الحكمُ في الخدمة) ───────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('amd_add', 'amd_approve', 'amd_reject', 'sign_attach'), true)) {
+    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    $ctxContract = intval($_POST['contract_id'] ?? 0);
+    $act = strval($_POST['do']);
+    if ($act === 'amd_add') {
+        // «قبل» يُلتقط في الخدمة من الواقع الحي — الشاشةُ ترسل الحقلَ و«بعد» فقط
+        $r = ECAS::createAmendment($conn, $gate, $company_id, $ctxContract, array(
+            'amend_type'       => strval($_POST['amend_type'] ?? ''),
+            'effective_from'   => strval($_POST['effective_from'] ?? ''),
+            'expected_version' => intval($_POST['version'] ?? 0) ?: null,
+        ), array(array(
+            'field' => strval($_POST['amd_field'] ?? ''),
+            'after' => strval($_POST['amd_after'] ?? ''),
+        )), $uid);
+    } elseif ($act === 'amd_approve') {
+        $r = ECAS::approveAmendment($conn, $gate, $company_id, intval($_POST['amendment_id'] ?? 0), $uid);
+    } elseif ($act === 'amd_reject') {
+        $r = ECAS::rejectAmendment($conn, $gate, $company_id, intval($_POST['amendment_id'] ?? 0), strval($_POST['reason'] ?? ''), $uid);
+    } else {
+        $r = ECS::attachSignedFile($conn, $gate, $company_id, $ctxContract, strval($_POST['signed_file_ref'] ?? ''), $uid);
+    }
+    $msg = $r['ok'] ? 'نُفّذ ✅' . (isset($r['snapshot_invalidated_from']) && $r['snapshot_invalidated_from']
+                        ? ' (أُبطلت اللقطاتُ من ' . $r['snapshot_invalidated_from'] . ')' : '')
+                    : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+}
+
 // ── القراءة ────────────────────────────────────────────────────────────────
 $f_category = strval($_GET['category'] ?? '');
 $f_state    = strval($_GET['state'] ?? '');
@@ -243,7 +273,7 @@ $pmRes = $conn->query("SELECT id, code, label_ar, calc_path FROM pay_models WHER
 if ($pmRes) { while ($pmRow = $pmRes->fetch_assoc()) { $pay_models[] = $pmRow; } }
 
 // ── H-08-②: عقدٌ معروضٌ بمكوّناته (?contract_id=N) ─────────────────────────
-$view_contract = null; $view_components = array(); $view_rules = array(); $view_allocs = array(); $view_bearers = array();
+$view_contract = null; $view_components = array(); $view_rules = array(); $view_allocs = array(); $view_bearers = array(); $view_amendments = array();
 $vc_id = intval($_GET['contract_id'] ?? 0);
 if ($vc_id > 0) {
     try {
@@ -272,6 +302,11 @@ if ($vc_id > 0) {
                     "SELECT ia.* FROM incentive_allocations ia
                      WHERE {TENANT_SCOPE} AND ia.rule_id = ? ORDER BY ia.percent DESC", array(intval($vr['id'])));
             }
+            // H-10: ملاحقُ العقد
+            $view_amendments = $gate->scopedQuery(array('scope' => array('a' => 'employee_contract_amendments')),
+                "SELECT a.* FROM employee_contract_amendments a
+                 WHERE {TENANT_SCOPE} AND a.contract_id = ? AND COALESCE(a.is_deleted,0)=0
+                 ORDER BY a.effective_from DESC, a.id DESC", array($vc_id));
             // H-08-④: جهاتُ التحمّل لكل مالكٍ (مكوّنٍ وقاعدة)
             $view_bearers = array();
             foreach ($view_components as $pc0) {
@@ -580,6 +615,102 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 </div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة قاعدة حافز</button>
+                </div>
+            </form>
+            <?php endif; ?>
+
+            <!-- ── H-10: الملاحقُ والنسخةُ الموقَّعة المقفلة ── -->
+            <h6 style="margin-top:18px"><i class="fa fa-file-medical"></i> الملاحق — «لا تعديلَ مباشرًا على نافذ؛ كلُّ تغييرٍ ملحقٌ بسريان»</h6>
+            <?php $vcState = strval($view_contract['state']);
+                  $isAmendable = in_array($vcState, ECAS::AMENDABLE, true)
+                      && trim(strval($view_contract['source_table'] ?? '')) === '' && ($can_add || $can_edit); ?>
+            <div class="table-container">
+                <table class="alltables display no-datatable" style="width:100%">
+                    <thead><tr>
+                        <th>#</th><th>النوع</th><th>السريان</th><th>قبل ← بعد</th><th>الحالة</th><th>المعتمِد</th>
+                        <?php if ($can_edit): ?><th>إجراء</th><?php endif; ?>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($view_amendments as $am): $aid = intval($am['id']);
+                        $chs = json_decode(strval($am['changes_json']), true) ?: array(); ?>
+                        <tr>
+                            <td><?php echo $aid; ?></td>
+                            <td><?php echo htmlspecialchars(ECAS::AMEND_TYPES[$am['amend_type']] ?? $am['amend_type']); ?></td>
+                            <td><?php echo htmlspecialchars($am['effective_from']); ?></td>
+                            <td><?php foreach ($chs as $ch) {
+                                echo '<div><code>' . htmlspecialchars($ch['field']) . '</code>: '
+                                    . htmlspecialchars(strval($ch['before'] ?? '—')) . ' ← <strong>'
+                                    . htmlspecialchars(strval($ch['after'] ?? '—')) . '</strong></div>';
+                            } ?></td>
+                            <td><?php echo array('draft' => "<span class='badge badge-info'>مسودة</span>",
+                                                 'approved' => "<span class='badge badge-success'>معتمد</span>",
+                                                 'rejected' => "<span class='badge badge-danger' title='" . htmlspecialchars(strval($am['reject_reason'] ?? ''), ENT_QUOTES) . "'>مرفوض</span>")[$am['state']] ?? htmlspecialchars($am['state']); ?></td>
+                            <td><?php echo $am['approved_by'] ? '#' . intval($am['approved_by']) : '—'; ?></td>
+                            <?php if ($can_edit): ?>
+                            <td>
+                                <?php if ($am['state'] === 'draft'): ?>
+                                <form method="post" style="display:inline">
+                                    <input type="hidden" name="do" value="amd_approve">
+                                    <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                    <input type="hidden" name="amendment_id" value="<?php echo $aid; ?>">
+                                    <button type="submit" class="action-btn edit" title="اعتماد (لا اعتمادَ لمن أنشأ)"><i class="fas fa-check"></i></button>
+                                </form>
+                                <form method="post" style="display:inline-flex;gap:4px">
+                                    <input type="hidden" name="do" value="amd_reject">
+                                    <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                    <input type="hidden" name="amendment_id" value="<?php echo $aid; ?>">
+                                    <input type="text" name="reason" placeholder="سبب الرفض (إلزامي)" style="width:120px">
+                                    <button type="submit" class="action-btn" title="رفض"><i class="fas fa-times"></i></button>
+                                </form>
+                                <?php else: ?>—<?php endif; ?>
+                            </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$view_amendments): ?>
+                        <tr><td colspan="7">لا ملاحقَ بعد</td></tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($isAmendable): ?>
+            <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+                <input type="hidden" name="do" value="amd_add">
+                <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                <input type="hidden" name="version" value="<?php echo intval($view_contract['version']); ?>">
+                <div class="form-grid">
+                    <div class="form-group"><label>نوع الملحق <span style="color:#c00">*</span></label>
+                        <select name="amend_type" required>
+                            <?php foreach (ECAS::AMEND_TYPES as $k => $lbl): ?>
+                                <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
+                            <?php endforeach; ?>
+                        </select></div>
+                    <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
+                        <input type="date" name="effective_from" required></div>
+                    <div class="form-group"><label>الحقل المستهدف <span style="color:#c00">*</span>
+                        <small>(head:end_date · component:ID:value · rule:ID:rate …)</small></label>
+                        <input type="text" name="amd_field" required placeholder="head:end_date"></div>
+                    <div class="form-group"><label>القيمة بعد («قبل» يُلتقط من الواقع)</label>
+                        <input type="text" name="amd_after"></div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إنشاء ملحق (مسودة)</button>
+                </div>
+            </form>
+            <?php elseif (trim(strval($view_contract['source_table'] ?? '')) === ''
+                          && $vcState === ECSM::ACCEPTED && ($can_add || $can_edit)): ?>
+            <!-- النسخةُ الموقَّعة — شرطُ Accepted → Signed · «ثابتةٌ لا تُستبدل» -->
+            <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+                <input type="hidden" name="do" value="sign_attach">
+                <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                <div class="form-grid">
+                    <div class="form-group"><label>مرجع النسخة الموقَّعة <span style="color:#c00">*</span>
+                        <small>(ثابتةٌ لا تُستبدل — التصحيحُ ملحقٌ يوضّح)</small></label>
+                        <input type="text" name="signed_file_ref" required maxlength="255" placeholder="uploads/contracts/....pdf"></div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="btn-save"><i class="fa fa-file-signature"></i> تثبيت النسخة الموقَّعة</button>
                 </div>
             </form>
             <?php endif; ?>

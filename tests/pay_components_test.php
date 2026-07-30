@@ -154,7 +154,9 @@ head('④ الحراس — النافذُ بملحقٍ والمرحَّلُ في
 // دورةُ العقد إلى النفاذ
 foreach (array('completed', 'validated') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 ECSM::transition($conn, $gateApprover, $CO, $CID, 'approved', '', $APPROVER);
-foreach (array('accepted', 'signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
+ECSM::transition($conn, $gate, $CO, $CID, 'accepted', '', $CREATOR);
+ECS::attachSignedFile($conn, $gate, $CO, $CID, 'signed/' . $MARK . '.pdf', $CREATOR); // H-10 شرطُ التوقيع
+foreach (array('signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 $st = $conn->query("SELECT state FROM employee_contracts WHERE id = {$CID}")->fetch_assoc()['state'];
 check($st === 'active', 'عقدُ البذر بلغ النفاذ');
 $r = ECS::addComponent($conn, $gate, $CO, $CID, array('component_type' => 'night',

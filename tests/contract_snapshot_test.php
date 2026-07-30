@@ -99,7 +99,9 @@ $r = CSS::snapshotFor($conn, $gate, $CO, $CID, '2035-02-01', $CREATOR);
 check(!$r['ok'] && $r['code'] === 422, 'مسودةٌ → 422 «لا يُقرأ في الاحتساب إلا نافذ»');
 foreach (array('completed', 'validated') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 ECSM::transition($conn, $gateApprover, $CO, $CID, 'approved', '', $APPROVER);
-foreach (array('accepted', 'signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
+ECSM::transition($conn, $gate, $CO, $CID, 'accepted', '', $CREATOR);
+ECS::attachSignedFile($conn, $gate, $CO, $CID, 'signed/' . $MARK . '.pdf', $CREATOR); // H-10 شرطُ التوقيع
+foreach (array('signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 $r = CSS::snapshotFor($conn, $gate, $CO, $CID, '2035-02-01', $CREATOR);
 check($r['ok'] && intval($r['id']) > 0 && !$r['reused'], 'لقطةُ العقد النافذ أُدرجت ببصمتها');
 $SNAP = intval($r['id']); $FP1 = strval($r['fingerprint']);

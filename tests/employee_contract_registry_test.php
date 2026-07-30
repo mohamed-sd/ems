@@ -212,7 +212,12 @@ $r = ECSM::transition($conn, $gateApprover, $CO, $CID, 'approved', 'اعتماد
 check($r['ok'], 'validated ← approved بغير منشئه');
 $row = $conn->query("SELECT approved_by FROM employee_contracts WHERE id={$CID}")->fetch_assoc();
 check(intval($row['approved_by']) === $APPROVER, 'ختمُ المعتمِد (approved_by)');
-foreach (array('accepted', 'signed', 'active') as $to) {
+ECSM::transition($conn, $gate, $CO, $CID, 'accepted', '', $CREATOR);
+// H-10: التوقيعُ يشترط النسخةَ الموقَّعة — تُرفع في accepted
+$r = ECSM::transition($conn, $gate, $CO, $CID, 'signed', '', $CREATOR);
+check(!$r['ok'] && $r['code'] === 422, 'H-10: التوقيعُ بلا نسخةٍ موقَّعة → 422');
+ECS::attachSignedFile($conn, $gate, $CO, $CID, 'signed/' . $MARK . '.pdf', $CREATOR);
+foreach (array('signed', 'active') as $to) {
     $r = ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR);
     if (!$r['ok']) { bad("التقدمُ إلى {$to}: " . $r['reason']); }
 }

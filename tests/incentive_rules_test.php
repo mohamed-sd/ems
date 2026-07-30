@@ -159,7 +159,9 @@ $row = $conn->query("SELECT state, valid_to FROM incentive_rules WHERE id = {$RI
 check($r['ok'] && $row['state'] === 'ended' && $row['valid_to'] === '2033-06-30', 'الإنهاءُ يؤرّخ valid_to');
 foreach (array('completed', 'validated') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 ECSM::transition($conn, $gateApprover, $CO, $CID, 'approved', '', $APPROVER);
-foreach (array('accepted', 'signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
+ECSM::transition($conn, $gate, $CO, $CID, 'accepted', '', $CREATOR);
+ECS::attachSignedFile($conn, $gate, $CO, $CID, 'signed/' . $MARK . '.pdf', $CREATOR); // H-10 شرطُ التوقيع
+foreach (array('signed', 'active') as $to) { ECSM::transition($conn, $gate, $CO, $CID, $to, '', $CREATOR); }
 $r = ECS::addIncentiveRule($conn, $gate, $CO, $CID, array(
     'incentive_type' => 'متأخر', 'basis' => 'safety'), $CREATOR);
 check(!$r['ok'] && $r['code'] === 423 && strpos($r['reason'], 'ملحق') !== false,
