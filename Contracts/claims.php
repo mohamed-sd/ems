@@ -118,6 +118,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// M-06 · فعلُ النزاع على بند المستخلص (ENT-03 §3-⑤)
+// ──────────────────────────────────────────────────────────────────────────────
+// كان النزاعُ **عرضًا باهتًا بلا فعل**: العَلَمُ يُقرأ ويُحترم في الاحتساب ولا
+// يُرفع من الشاشة ولا يُحسم. واليدان: **الرفعُ لمن يُعدّ** (`can_add` — المبيعاتُ
+// أو مراجعُ العميل)، و**الحسمُ ليدِ الإجازة** (`can_approve` — المالية).
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dispute_raise') {
+    if (!$can_add) { clm_back('رفعُ النزاع صلاحيةُ من يُعدّ ❌'); }
+    if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
+    require_once __DIR__ . '/../app/Services/Revenue/ClaimDisputeService.php';
+    $r = \App\Services\Revenue\ClaimDisputeService::raise($conn, $gate, $company_id,
+        intval($_POST['line_id'] ?? 0),
+        array('reason' => strval($_POST['dispute_reason'] ?? ''),
+              'doc_ref' => strval($_POST['dispute_doc_ref'] ?? '')), $current_user_id);
+    clm_back($r['ok']
+        ? ('رُفع النزاعُ على البند — والبقيةُ تمضي (نزاعٌ مفتوح: ' . $r['open_count'] . ') ✅')
+        : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dispute_resolve') {
+    if (!$can_approve) { clm_back('حسمُ النزاع صلاحيةُ المالية ❌'); }
+    if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
+    require_once __DIR__ . '/../app/Services/Revenue/ClaimDisputeService.php';
+    $r = \App\Services\Revenue\ClaimDisputeService::resolve($conn, $gate, $company_id,
+        intval($_POST['line_id'] ?? 0), strval($_POST['resolution'] ?? ''),
+        strval($_POST['resolution_note'] ?? ''), $current_user_id);
+    clm_back($r['ok']
+        ? ('حُسم النزاعُ — الصافي ' . $r['net'] . ' · نزاعٌ مفتوح: ' . $r['open_count'] . ' ✅')
+        : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // M-02 · الإشعارُ الدائن/المدين — يصحّح الفاتورةَ الصادرةَ بلا أن يمسّها
 // ──────────────────────────────────────────────────────────────────────────────
 // **اليدان نفسُهما**: `can_add` = المبيعاتُ تُنشئ وترفع · `can_edit` = الماليةُ
@@ -375,9 +406,12 @@ include('../insidebar.php');
         <div class="card-body table-container">
             <table class="display" style="width:100%">
                 <thead><tr><th>التاريخ</th><th>المعدة</th><th>الوحدة</th><th>الكمية</th>
-                    <th>سعر الوحدة</th><th>القيمة</th><th>الأصل</th></tr></thead>
+                    <th>سعر الوحدة</th><th>القيمة</th><th>الأصل</th>
+                    <th>النزاع (§3-⑤)</th></tr></thead>
                 <tbody>
-                <?php foreach ($open_lines as $l): ?>
+                <?php foreach ($open_lines as $l):
+                    $dstate = isset($l['dispute_state']) ? (string) $l['dispute_state'] : 'none';
+                ?>
                     <tr<?php echo intval($l['dispute_flag']) === 1 ? ' style="opacity:.6"' : ''; ?>>
                         <td><?php echo clm_e($l['work_date']); ?></td>
                         <td><?php echo clm_e($l['equipment_ref']); ?></td>
@@ -386,6 +420,43 @@ include('../insidebar.php');
                         <td><?php echo clm_num($l['unit_price']); ?></td>
                         <td><strong><?php echo clm_num($l['amount']); ?></strong></td>
                         <td><span class="text-muted">دوام #<?php echo intval($l['source_ref']); ?></span></td>
+                        <td>
+                        <?php if ($dstate === 'open'): ?>
+                            <span class="badge badge-warning">متنازَعٌ عليه</span>
+                            <small><?php echo clm_e($l['dispute_reason']); ?>
+                                · مستند <?php echo clm_e($l['dispute_doc_ref']); ?></small>
+                            <?php if ($can_approve): ?>
+                            <form method="post" style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                                <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
+                                <input type="hidden" name="action" value="dispute_resolve">
+                                <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
+                                <select name="resolution">
+                                    <option value="rejected">رُدَّ الاعتراض (البند يعود)</option>
+                                    <option value="upheld">أُقرَّ الاعتراض (البند يسقط)</option>
+                                </select>
+                                <input type="text" name="resolution_note" placeholder="سببُ الحسم" required>
+                                <button type="submit" class="btn-save">احسِم</button>
+                            </form>
+                            <?php endif; ?>
+                        <?php elseif ($dstate === 'resolved'): ?>
+                            <span class="badge <?php echo (string)$l['resolution'] === 'upheld'
+                                ? 'badge-danger' : 'badge-success'; ?>">
+                                <?php echo (string)$l['resolution'] === 'upheld'
+                                    ? 'أُقرَّ — البندُ ساقط' : 'رُدَّ — البندُ محتسَب'; ?></span>
+                            <small><?php echo clm_e($l['resolution_note']); ?></small>
+                        <?php elseif ($can_add): ?>
+                            <form method="post" style="display:flex;gap:6px;flex-wrap:wrap">
+                                <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
+                                <input type="hidden" name="action" value="dispute_raise">
+                                <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
+                                <input type="text" name="dispute_reason" placeholder="سببُ الاعتراض" required>
+                                <input type="text" name="dispute_doc_ref" placeholder="مستندُه" required>
+                                <button type="submit" class="btn-save">ارفع نزاعًا</button>
+                            </form>
+                        <?php else: ?>
+                            <span class="text-muted">—</span>
+                        <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
