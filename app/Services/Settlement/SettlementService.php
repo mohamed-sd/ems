@@ -217,6 +217,41 @@ class SettlementService
             );
         }
 
+        // ── M-21 · تحميلاتُ العامل: أقساطُ سلفه ومدفوعاتُ النيابة عنه ────────
+        // الفجوةُ المقيسة كانت هنا حرفيًّا: «التحميلاتُ للمورد فقط» — فتسويةُ
+        // العامل تعرض استحقاقَه ولا تعرض ما عليه. وبعد H-09-④ صار للسلفة
+        // جدولٌ ورصيدٌ ومستند، فتُقرأ أقساطُها المخصومةُ فعلًا **بمرجعها**.
+        // (تُقرأ من `payroll_deductions` لا من السلفة: المخصومُ واقعةٌ جرت،
+        //  والرصيدُ نيّةٌ — ولا تُحمَّل نيّةٌ على تسوية.)
+        if ($partyType === 'employee') {
+            try {
+                $ded = $gate->scopedQuery(
+                    array('scope' => array('d' => 'payroll_deductions'),
+                          'enrich' => array('r' => 'payroll_runs')),
+                    "SELECT d.id, d.amount, d.doc_ref, d.source_type, d.source_id, d.note,
+                            r.period_to AS d_date
+                       FROM payroll_deductions d
+                       LEFT JOIN payroll_runs r ON r.id = d.run_id
+                      WHERE {TENANT_SCOPE} AND d.person_id = ? AND d.amount > 0
+                        AND r.period_to BETWEEN ? AND ?
+                      ORDER BY d.id",
+                    array((int) $partyRef, $from, $to));
+                foreach ($ded as $x) {
+                    $lines[] = array(
+                        'line_kind'   => 'charge',
+                        'charge_type' => 'advance',
+                        'source_kind' => 'payroll_deduction',
+                        'source_ref'  => (string) $x['id'],
+                        'description' => 'قسطُ سلفةٍ من المسيّر — سند ' . $x['doc_ref']
+                                         . ' (سلفة #' . (int) $x['source_id'] . ')',
+                        'work_date'   => (string) $x['d_date'],
+                        'amount'      => (float) $x['amount'],
+                        'currency'    => 'SDG',
+                    );
+                }
+            } catch (\Throwable $t) { error_log('settlement employee advances: ' . $t->getMessage()); }
+        }
+
         // التحميلان المباشران للمورد وحده (العاملُ لا تُصرف له قطعٌ ولا أوامرُ صيانة)
         if ($partyType !== 'supplier') { return $lines; }
 

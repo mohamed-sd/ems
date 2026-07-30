@@ -87,6 +87,10 @@ class TenantRegistry
         // H-09-② (ENT-01 §4): كتالوجُ أنواع الغياب ومدخلاتُ الزمن بمستنداتها.
         'payroll_absence_types' => array('type' => self::T_TENANT, 'soft' => false),
         'payroll_time_inputs' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-09-④ (ENT-01 §4): بوابةُ السلفيات وخصومُ المسيّر وحدُّ حماية الصافي.
+        'employee_advances' => array('type' => self::T_TENANT, 'soft' => true),
+        'payroll_deductions' => array('type' => self::T_TENANT, 'soft' => false),
+        'payroll_settings' => array('type' => self::T_TENANT, 'soft' => false),
         'container_consumption' => array('type' => self::T_TENANT, 'soft' => false),
         'container_swaps' => array('type' => self::T_TENANT, 'soft' => false),
         'operator_rotations' => array('type' => self::T_TENANT, 'soft' => false),

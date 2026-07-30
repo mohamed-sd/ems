@@ -18,10 +18,12 @@ include '../config.php';
 require_once __DIR__ . '/../app/Services/Payroll/PayrollRunService.php';
 require_once __DIR__ . '/../app/Services/Payroll/TimePathService.php';
 require_once __DIR__ . '/../app/Services/Payroll/ProductionPathService.php';
+require_once __DIR__ . '/../app/Services/Payroll/OffsetService.php';
 
 use App\Services\Payroll\PayrollRunService as PRS;
 use App\Services\Payroll\TimePathService as TPS;
 use App\Services\Payroll\ProductionPathService as PPS;
+use App\Services\Payroll\OffsetService as OFS;
 
 $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -101,6 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rid2 = intval($_POST['run_id'] ?? 0);
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
         $r = PPS::compute($conn, $gate, $company_id, $rid2, $uid);
+        $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
+    }
+
+    if ($action === 'offsets') {
+        $rid2 = intval($_POST['run_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
+        $r = OFS::computeOffsets($conn, $gate, $company_id, $rid2, $uid);
         $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 
@@ -223,6 +232,11 @@ include '../insidebar.php';
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-save"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
                 </form>
+                <form method="post" style="display:inline">
+                    <input type="hidden" name="pr_action" value="offsets">
+                    <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
+                    <button type="submit" class="btn-save"><i class="fa fa-scale-balanced"></i> المقاصّة</button>
+                </form>
             <?php endif; ?>
 
         <?php if ($run !== null): ?>
@@ -297,6 +311,42 @@ include '../insidebar.php';
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>
     </div></div>
+    <?php endif; ?>
+
+    <?php
+    $deductions = $selected > 0 ? OFS::deductionsOf($gate, $selected) : array();
+    if ($deductions):
+        $dedTotal = 0.0;
+        foreach ($deductions as $d) { $dedTotal += (float) $d['amount']; }
+    ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-scale-balanced"></i> المقاصّة — خصومٌ بمراجعها
+            (<?php echo count($deductions); ?> · <?php echo number_format($dedTotal, 2); ?>)</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table class="alltables display nowrap" style="width:100%">
+            <thead><tr>
+                <th>الشخص</th><th>المصدر</th><th>المستحق</th><th>المخصوم</th>
+                <th>المستند</th><th>الحالة</th><th>البيان</th>
+            </tr></thead>
+            <tbody>
+            <?php foreach ($deductions as $d): ?>
+                <tr>
+                    <td>#<?php echo intval($d['person_id']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$d['source_type']); ?>
+                        #<?php echo intval($d['source_id']); ?></td>
+                    <td><?php echo $d['requested_amount'] !== null
+                        ? htmlspecialchars((string)$d['requested_amount']) : '—'; ?></td>
+                    <td><strong><?php echo htmlspecialchars((string)$d['amount']); ?></strong></td>
+                    <td><small><?php echo htmlspecialchars((string)$d['doc_ref']); ?></small></td>
+                    <td><?php echo intval($d['rescheduled']) === 1
+                        ? "<span class='badge badge-warning'>مُرحَّلٌ بحدِّ الحماية</span>"
+                        : "<span class='badge badge-success'>كاملًا</span>"; ?></td>
+                    <td><small><?php echo htmlspecialchars((string)$d['note']); ?></small></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div></div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> أسطرُ الاحتساب بلقطاتها</h5></div>
