@@ -325,6 +325,7 @@ class EffectFanout
                        emp.id AS employee_id,
                        prj.client_id AS client_entity_id,
                        c.price_currency_contract AS client_cur_label,
+                       ce.id AS client_item_id,
                        ce.equip_price AS client_price, ce.equip_unit AS client_unit_label,
                        ce.equip_price_currency AS client_line_cur_label
                 FROM timesheet t
@@ -510,7 +511,17 @@ class EffectFanout
             $cl['ok'] = true;
             $cl['unit'] = $clUnit;
             $cl['qty'] = round($recorded[$clUnit], 2);
-            $cl['price'] = (float) $t['client_price'];
+            // ── M-09 · «لا رجعية» حسابًا لا وعدًا (CON-02 §6) ─────────────────
+            // سعرُ الواقعة = آخرُ مراجعةِ سعرٍ **معتمَدةٍ** سريانُها ≤ يومِ العمل،
+            // وإلا فالأساسُ في `contractequipments` كما هو. فتعديلُ اليوم لا يمسّ
+            // فاتورةَ أمسِ ولو أُعيد احتسابُها — والأساسُ نفسُه لا يُمسّ أبدًا.
+            $cl['base_price'] = (float) $t['client_price'];
+            $cl['item_id'] = !empty($t['client_item_id']) ? intval($t['client_item_id']) : null;
+            require_once dirname(__DIR__, 2) . '/app/Services/Contract/PriceAdjustmentService.php';
+            $cl['price'] = \App\Services\Contract\PriceAdjustmentService::effectivePrice(
+                $conn, $ctx['company_id'], (int) $cl['contract_id'], (int) $cl['item_id'],
+                $ctx['work_date'], $cl['base_price']);
+            $cl['price_adjusted'] = (abs($cl['price'] - $cl['base_price']) > 0.00001);
             $cl['currency'] = self::CONTRACT_CURRENCY[trim($cl['currency_label'])];
             // الموروثان يتبعان حكم العميل (الإيراد) — انظر تعليق البناء أعلاه
             $ctx['unit'] = $clUnit;

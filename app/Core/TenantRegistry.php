@@ -89,6 +89,11 @@ class TenantRegistry
         'contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'contractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'contracts' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-09 (CON-02 §2-③): شرطُ تعديل السعر وقراءاتُ مؤشره وسجلُّ مراجعاته.
+        // المراجعاتُ والقراءاتُ **للإدراج فقط** (لا حذفَ ناعمًا — سجلُّ وقائع).
+        'contract_price_terms' => array('type' => self::T_TENANT, 'soft' => true),
+        'contract_price_index_readings' => array('type' => self::T_TENANT, 'soft' => true),
+        'contract_price_revisions' => array('type' => self::T_TENANT, 'soft' => false),
         'driver_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         // H-08-① (هجرة 2026-08-16 · CON-01 §7.1): رأسُ العقد الموحّد لعقود
         // الأشخاص — بياناتُ مستأجرٍ بcompany_id (صاحبُ العمل)، وsoft=true لأن
