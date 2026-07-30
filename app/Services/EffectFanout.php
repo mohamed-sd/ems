@@ -572,6 +572,20 @@ class EffectFanout
             }
         }
         unset($sp);
+
+        // ── H-07 · «أساسُ احتساب الاستعداد إن استُحق» (CON-03 §2-④) ──────────
+        // خريطةُ الأسس للنماذج الأربعة من **بنود عقد المورد الحديث** — تُقرأ هنا
+        // ويستهلكها `qtyAward` أدناه. وهي الجوابُ على الفجوة المدوَّنة نصًّا هناك
+        // («يلزمه سعرٌ لا وجودَ له»): بندٌ يعلن أساسًا ⇒ سعرٌ **مقرَّر**؛ وبلا
+        // إعلانٍ يبقى `standby_needs_rate` كما هو حرفًا بحرف.
+        //
+        // ⚠️ ومسارُ **سعر الوحدة** أعلاه لم يُمسّ عمدًا: الموروثُ يسعّر بنوع
+        // المعدة والنموذجُ الجديد بـ(نموذج × وحدة)، فتحويلُ مسار المال قبل
+        // مطابقةِ فترةٍ بصفر فرقٍ يخالف قاعدةَ التنفيذ §7-② — موعدُه ENT-02/M-15.
+        require_once dirname(__DIR__, 2) . '/app/Services/Contract/SupplierContractService.php';
+        $ctx['supplier_standby'] = \App\Services\Contract\SupplierContractService::standbyBasisMap(
+            $conn, $ctx['company_id'], $ctx['supplier_id'], $ctx['client']['contract_id'], $ctx['work_date']);
+
         return $ctx;
     }
 
@@ -752,6 +766,26 @@ class EffectFanout
             $qtyNote = 'الكميةُ غيرُ مفوترةٍ بحكمٍ على الواقعة — ' . $reason;
         }
 
+        // ── H-07 · السعرُ المقرَّر إن أعلنه بندُ عقد المورد ────────────────────
+        // «أساسُ احتساب الاستعداد إن استُحق» (CON-03 §2-④) يسدّ الفجوةَ المشروحة
+        // أعلاه — **للمورد وحدَه**: بندُ عقده هو الذي يقرّر أساسَه، وأساسُ العميل
+        // بيتُه CON-02 لا هنا. وبلا بندٍ معلِنٍ يبقى الوسمُ والنصُّ كما كانا.
+        $sbBasis = null; $sbAmount = null; $sbAmountNote = null; $sbCurrency = null;
+        if ($party === 'supplier' && $sbBillable > 0 && isset($ctx['supplier_standby'][$unit])) {
+            $info = $ctx['supplier_standby'][$unit];
+            if (!empty($info['ok'])) {
+                require_once dirname(__DIR__, 2) . '/app/Services/Contract/SupplierContractService.php';
+                $calc = \App\Services\Contract\SupplierContractService::standbyAmount($info, $sbBillable);
+                if ($calc['amount'] !== null) {
+                    $sbBasis = (string) $info['basis'];
+                    $sbAmount = (float) $calc['amount'];
+                    $sbAmountNote = (string) $calc['note'];
+                    $sbCurrency = $info['currency'];
+                }
+            }
+        }
+        $needsRate = ($sbBillable > 0 && $sbAmount === null);
+
         return array(
             'award_qty' => round($qtyRuled, 2), 'pct' => 100.00, 'state' => $state,
             'rule' => 'delivered_qty',
@@ -765,14 +799,21 @@ class EffectFanout
                 'standby_excluded_hours'  => round($sbExcluded, 2),
                 'standby_undecided_hours' => round($sbUndecided, 2),
                 'standby_lines' => $sbLines,
-                'standby_needs_rate' => ($sbBillable > 0),
-                'standby_note' => ($sbBillable > 0)
+                'standby_needs_rate' => $needsRate,
+                // H-07: أساسٌ وسعرٌ مقرَّران — أو null معلَنًا (لا صفرَ ملفَّق)
+                'standby_basis'    => $sbBasis,
+                'standby_amount'   => $sbAmount,
+                'standby_currency' => $sbCurrency,
+                'standby_note' => $needsRate
                     ? ('استعدادٌ مفوترٌ بشرطٍ صريح: ' . round($sbBillable, 2)
                        . ' ساعة — ولا سعرَ ساعةٍ في عقدٍ مسعَّرٍ بـ' . $unit
                        . '، فلا يُحوَّل إلى مالٍ بلا سعرٍ مقرَّر')
-                    : (($sbUndecided > 0)
-                        ? ('زمنُ توقفٍ بلا حكمٍ مقرَّر: ' . round($sbUndecided, 2) . ' ساعة')
-                        : 'لا استعدادَ مفوترًا'),
+                    : (($sbAmount !== null)
+                        ? ('استعدادٌ مفوترٌ محسوبٌ بسعرٍ مقرَّر: ' . round($sbBillable, 2)
+                           . ' ساعة ⇒ ' . $sbAmount . ' — ' . $sbAmountNote)
+                        : (($sbUndecided > 0)
+                            ? ('زمنُ توقفٍ بلا حكمٍ مقرَّر: ' . round($sbUndecided, 2) . ' ساعة')
+                            : 'لا استعدادَ مفوترًا')),
             ),
         );
     }

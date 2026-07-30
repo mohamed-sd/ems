@@ -261,6 +261,10 @@ class TenantRegistry
         'settlements' => array('type' => self::T_TENANT, 'soft' => true),
         'settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
         'supplier_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-07 (CON-03 §6): رأسُ عقد المورد الحديث وبنودُه — بناءٌ بجانب
+        // `supplierscontracts` الموروث الذي يبقى الكاتبَ (N-04 مرحلة ①).
+        'supplier_contracts' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplier_contract_lines' => array('type' => self::T_TENANT, 'soft' => true),
         'suppliercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'suppliers' => array('type' => self::T_TENANT, 'soft' => true),
         'supplierscontracts' => array('type' => self::T_TENANT, 'soft' => false),
