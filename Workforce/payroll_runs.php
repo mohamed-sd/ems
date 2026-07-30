@@ -17,9 +17,11 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once __DIR__ . '/../app/Services/Payroll/PayrollRunService.php';
 require_once __DIR__ . '/../app/Services/Payroll/TimePathService.php';
+require_once __DIR__ . '/../app/Services/Payroll/ProductionPathService.php';
 
 use App\Services\Payroll\PayrollRunService as PRS;
 use App\Services\Payroll\TimePathService as TPS;
+use App\Services\Payroll\ProductionPathService as PPS;
 
 $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -92,6 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rid2 = intval($_POST['run_id'] ?? 0);
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
         $r = TPS::compute($conn, $gate, $company_id, $rid2, $uid);
+        $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
+    }
+
+    if ($action === 'production_path') {
+        $rid2 = intval($_POST['run_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
+        $r = PPS::compute($conn, $gate, $company_id, $rid2, $uid);
         $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 
@@ -209,6 +218,11 @@ include '../insidebar.php';
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-save"><i class="fa fa-clock"></i> المسارُ الزمني</button>
                 </form>
+                <form method="post" style="display:inline">
+                    <input type="hidden" name="pr_action" value="production_path">
+                    <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
+                    <button type="submit" class="btn-save"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
+                </form>
             <?php endif; ?>
 
         <?php if ($run !== null): ?>
@@ -298,8 +312,13 @@ include '../insidebar.php';
                     <td>#<?php echo intval($l['person_id']); ?></td>
                     <td><?php
                         $k = (string) $l['line_kind'];
-                        echo $k === 'absence_deduction' ? "<span class='badge badge-danger'>خصمُ غياب</span>"
-                           : ($k === 'overtime' ? "<span class='badge badge-info'>إضافي</span>" : 'مكوّن');
+                        $kindLabels = array(
+                            'absence_deduction' => "<span class='badge badge-danger'>خصمُ غياب</span>",
+                            'overtime'   => "<span class='badge badge-info'>إضافي</span>",
+                            'production' => "<span class='badge badge-success'>إنتاج</span>",
+                            'incentive'  => "<span class='badge badge-success'>حافز</span>",
+                        );
+                        echo isset($kindLabels[$k]) ? $kindLabels[$k] : 'مكوّن';
                     ?></td>
                     <td><?php echo (string)$l['path'] === 'project' ? 'مشروعي' : 'مؤسسي'; ?></td>
                     <td><?php echo htmlspecialchars((string)($l['component_type'] ?? $l['component_ref'])); ?></td>
