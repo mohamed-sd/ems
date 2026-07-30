@@ -103,6 +103,10 @@ class TenantRegistry
         // (replaceChildren يكنسه صلبًا داخل معاملته — فلا soft له).
         'incentive_rules' => array('type' => self::T_TENANT, 'soft' => true),
         'incentive_allocations' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-08-④ (هجرة 2026-08-20 · CON-01 §3.3): جهاتُ التحمّل Σ=100 لكل
+        // مالكٍ (مكوّن/قاعدة) — soft لأن استبدالَ الجهات قرارُ تحميلٍ يُراجَع
+        // فيُطوى القديمُ ولا يُمحى (الاستبدالُ الذري في الخدمة).
+        'cost_bearers' => array('type' => self::T_TENANT, 'soft' => true),
         'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
         'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
         'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),

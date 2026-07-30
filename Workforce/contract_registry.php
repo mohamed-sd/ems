@@ -176,6 +176,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
+// ── H-08-④: جهاتُ التحمّل Σ=100 (رفضُ الحفظ دون المئة — الحكمُ في الخدمة) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'bearer_set') {
+    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    $ctxContract = intval($_POST['contract_id'] ?? 0);
+    $bearerRows = array();
+    $types = (array) ($_POST['bearer_type'] ?? array());
+    $ids   = (array) ($_POST['bearer_id'] ?? array());
+    $pcts  = (array) ($_POST['bearer_pct'] ?? array());
+    foreach ($types as $i => $bt) {
+        if (trim(strval($bt)) === '') { continue; }
+        $bearerRows[] = array('bearer_type' => strval($bt),
+            'bearer_id' => intval($ids[$i] ?? 0), 'percent' => strval($pcts[$i] ?? ''));
+    }
+    $r = ECS::setCostBearers($conn, $gate, $company_id,
+        strval($_POST['owner_type'] ?? ''), intval($_POST['owner_id'] ?? 0), $bearerRows, $uid);
+    $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+}
+
 // ── القراءة ────────────────────────────────────────────────────────────────
 $f_category = strval($_GET['category'] ?? '');
 $f_state    = strval($_GET['state'] ?? '');
@@ -224,7 +243,7 @@ $pmRes = $conn->query("SELECT id, code, label_ar, calc_path FROM pay_models WHER
 if ($pmRes) { while ($pmRow = $pmRes->fetch_assoc()) { $pay_models[] = $pmRow; } }
 
 // ── H-08-②: عقدٌ معروضٌ بمكوّناته (?contract_id=N) ─────────────────────────
-$view_contract = null; $view_components = array(); $view_rules = array(); $view_allocs = array();
+$view_contract = null; $view_components = array(); $view_rules = array(); $view_allocs = array(); $view_bearers = array();
 $vc_id = intval($_GET['contract_id'] ?? 0);
 if ($vc_id > 0) {
     try {
@@ -253,6 +272,14 @@ if ($vc_id > 0) {
                     "SELECT ia.* FROM incentive_allocations ia
                      WHERE {TENANT_SCOPE} AND ia.rule_id = ? ORDER BY ia.percent DESC", array(intval($vr['id'])));
             }
+            // H-08-④: جهاتُ التحمّل لكل مالكٍ (مكوّنٍ وقاعدة)
+            $view_bearers = array();
+            foreach ($view_components as $pc0) {
+                $view_bearers['component#' . intval($pc0['id'])] = ECS::costBearersOf($gate, 'component', intval($pc0['id']));
+            }
+            foreach ($view_rules as $vr0) {
+                $view_bearers['rule#' . intval($vr0['id'])] = ECS::costBearersOf($gate, 'rule', intval($vr0['id']));
+            }
         }
     } catch (\Throwable $t) { $view_contract = null; $view_components = array(); }
 }
@@ -274,6 +301,45 @@ $stateChip = function ($state) {
     elseif (in_array($state, array(ECSM::EXPIRED, ECSM::SETTLED, ECSM::CLOSED, ECSM::ARCHIVED), true)) { $cls = 'badge-dark'; }
     elseif ($state !== ECSM::DRAFT) { $cls = 'badge-info'; }
     return "<span class='badge {$cls}'>" . htmlspecialchars($label) . "</span>";
+};
+
+// H-08-④: خليةُ التحمّل لمالكٍ — شاراتُ الجهات + نموذجُ الحفظ الدفعي (Σ=100)
+$bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable, &$view_contract) {
+    $list = $view_bearers[$ownerType . '#' . $ownerId] ?? array();
+    if (!$list) {
+        echo '<span class="badge badge-secondary" title="الغائبُ = إشارةُ المالك المفردة أو جهةُ العقد">—</span> ';
+    } else {
+        foreach ($list as $cb) {
+            echo '<span class="badge badge-warning">'
+                . htmlspecialchars(ECS::COST_BEARER_TYPES[$cb['bearer_type']] ?? $cb['bearer_type'])
+                . ($cb['bearer_id'] !== null ? ' #' . intval($cb['bearer_id']) : '')
+                . ' · ' . htmlspecialchars($cb['percent']) . '٪</span> ';
+        }
+    }
+    if ($vc_editable) { ?>
+        <details style="display:inline-block">
+            <summary style="cursor:pointer" class="action-btn edit" title="جهات التحمّل">تحمّل</summary>
+            <form method="post" style="margin-top:6px">
+                <input type="hidden" name="do" value="bearer_set">
+                <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                <input type="hidden" name="owner_type" value="<?php echo htmlspecialchars($ownerType); ?>">
+                <input type="hidden" name="owner_id" value="<?php echo intval($ownerId); ?>">
+                <?php for ($bi = 0; $bi < 3; $bi++): ?>
+                <div style="display:flex;gap:4px;margin-bottom:4px">
+                    <select name="bearer_type[]">
+                        <option value="">—</option>
+                        <?php foreach (ECS::COST_BEARER_TYPES as $bk => $bl): ?>
+                            <option value="<?php echo $bk; ?>"><?php echo $bl; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="number" name="bearer_id[]" placeholder="المعرّف" style="width:70px">
+                    <input type="number" step="0.01" name="bearer_pct[]" placeholder="٪" style="width:60px">
+                </div>
+                <?php endfor; ?>
+                <button type="submit" class="btn-save">حفظ التحمّل (Σ=100)</button>
+            </form>
+        </details>
+    <?php }
 };
 ?>
 <div class="main ems-unified-page-shell">
@@ -309,7 +375,7 @@ $stateChip = function ($state) {
                 <table class="alltables display no-datatable" style="width:100%">
                     <thead><tr>
                         <th>#</th><th>النوع</th><th>الطريقة</th><th>المبلغ</th><th>المعدل</th>
-                        <th>الأعلام السبعة</th><th>الدورية</th><th>السريان</th><th>الحالة</th>
+                        <th>الأعلام السبعة</th><th>الدورية</th><th>السريان</th><th>التحمّل</th><th>الحالة</th>
                         <?php if ($vc_editable): ?><th>إنهاء</th><?php endif; ?>
                     </tr></thead>
                     <tbody>
@@ -329,6 +395,7 @@ $stateChip = function ($state) {
                             ?></td>
                             <td><?php echo array('monthly' => 'شهري', 'periodic' => 'دوري', 'once' => 'لمرة')[$pc['periodicity']] ?? $pc['periodicity']; ?></td>
                             <td><?php echo htmlspecialchars(($pc['valid_from'] ?: '؟') . ' → ' . ($pc['valid_to'] ?: 'مفتوح')); ?></td>
+                            <td><?php $bearerCell('component', intval($pc['id'])); ?></td>
                             <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
                                                  'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
                                                  'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$pc['state']] ?? htmlspecialchars($pc['state']); ?></td>
@@ -348,7 +415,7 @@ $stateChip = function ($state) {
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$view_components): ?>
-                        <tr><td colspan="10">لا مكوّناتَ بعد<?php echo $vc_editable ? ' — أضف أولَها أدناه' : ''; ?></td></tr>
+                        <tr><td colspan="11">لا مكوّناتَ بعد<?php echo $vc_editable ? ' — أضف أولَها أدناه' : ''; ?></td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -409,7 +476,7 @@ $stateChip = function ($state) {
                 <table class="alltables display no-datatable" style="width:100%">
                     <thead><tr>
                         <th>#</th><th>الحافز</th><th>الأساس</th><th>المعدل</th><th>العتبة</th>
-                        <th>السقف/الأدنى</th><th>التوزيع</th><th>السريان</th><th>الحالة</th>
+                        <th>السقف/الأدنى</th><th>التوزيع</th><th>التحمّل</th><th>السريان</th><th>الحالة</th>
                         <?php if ($vc_editable): ?><th>إجراء</th><?php endif; ?>
                     </tr></thead>
                     <tbody>
@@ -431,6 +498,7 @@ $stateChip = function ($state) {
                                         . intval($al['beneficiary_id']) . ' · ' . htmlspecialchars($al['percent']) . '٪</span> ';
                                 } } ?>
                             </td>
+                            <td><?php $bearerCell('rule', $rid); ?></td>
                             <td><?php echo htmlspecialchars(($vr['valid_from'] ?: '؟') . ' → ' . ($vr['valid_to'] ?: 'مفتوح')); ?></td>
                             <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
                                                  'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
@@ -471,7 +539,7 @@ $stateChip = function ($state) {
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$view_rules): ?>
-                        <tr><td colspan="10">لا قواعدَ حوافزَ بعد</td></tr>
+                        <tr><td colspan="11">لا قواعدَ حوافزَ بعد</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>

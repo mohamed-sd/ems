@@ -575,6 +575,112 @@ class EmployeeContractService
     }
 
     // ═══════════════════════════════════════════════════════════════════════
+    // H-08-④ · جهاتُ التحمّل Σ=100 لكل مالكٍ (CON-01 §3.3 · خاتمةُ H-08)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    const OWNER_TYPES = array('component', 'rule');
+    /** جهاتُ §3.3 الأربع — company (صاحبُ العمل) بلا معرّف. */
+    const COST_BEARER_TYPES = array('project' => 'مشروع', 'client_contract' => 'عقد عميل',
+                                    'dept' => 'إدارة داخلية', 'company' => 'كيان الشركة');
+
+    /**
+     * حفظُ جهات التحمّل دفعةً ذرية — «مجموعُ نسب التحمّل لكل عنصرٍ مئةٌ بالمئة»
+     * وΣ ≠ 100.00 → **422 بالفارق ولا حفظَ جزئيًّا** (رفضُ الحفظ بنص PLAN-01 §5.2-④).
+     * الاستبدالُ يطوي القديمَ ناعمًا ويدرج الجديدَ في معاملةٍ واحدة.
+     */
+    public static function setCostBearers($conn, $gate, $companyId, $ownerType, $ownerId, $rows, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '');
+        $ownerType = (string) $ownerType; $ownerId = (int) $ownerId;
+        if (!in_array($ownerType, self::OWNER_TYPES, true)) {
+            $out['code'] = 422; $out['reason'] = 'مالكُ التحمّل مكوّنٌ أو قاعدةٌ حصرًا'; return $out;
+        }
+        $owner = $ownerType === 'component' ? self::componentOf($gate, $ownerId) : self::ruleOf($gate, $ownerId);
+        if (!$owner) { $out['code'] = 404; $out['reason'] = 'مالكُ التحمّل غير موجود'; return $out; }
+        $guard = self::componentContractGuard($gate, (int) $owner['contract_id']);
+        if (!$guard['ok']) { return array_merge($out, $guard['err']); }
+
+        // التحققُ كاملًا قبل أي كتابة — لا حفظَ جزئيًّا
+        $clean = array(); $sum = 0.0; $seen = array();
+        foreach ((array) $rows as $i => $row) {
+            $bt = isset($row['bearer_type']) ? (string) $row['bearer_type'] : '';
+            $bid = !empty($row['bearer_id']) ? (int) $row['bearer_id'] : null;
+            $pct = isset($row['percent']) ? round((float) $row['percent'], 2) : 0.0;
+            if (!isset(self::COST_BEARER_TYPES[$bt])) {
+                $out['code'] = 422; $out['reason'] = 'جهةُ السطر ' . ($i + 1) . ' من خارج الأربع (§3.3)'; return $out;
+            }
+            if ($bt !== 'company' && ($bid === null || $bid <= 0)) {
+                $out['code'] = 422; $out['reason'] = 'جهةُ «' . self::COST_BEARER_TYPES[$bt] . '» تلزم معرّفًا'; return $out;
+            }
+            if ($bt === 'company') { $bid = null; }
+            if ($pct <= 0 || $pct > 100) {
+                $out['code'] = 422; $out['reason'] = 'نسبةُ السطر ' . ($i + 1) . ' خارج (0، 100]'; return $out;
+            }
+            // المشروعُ وعقدُ العميل من نطاق الشركة (البوابةُ ترفض الأجنبي)
+            if ($bt === 'project' || $bt === 'client_contract') {
+                $tbl = $bt === 'project' ? 'project' : 'contracts';
+                $ref = null;
+                try { $ref = $gate->selectOne($tbl, array('columns' => array('id'), 'where' => array('id' => $bid))); }
+                catch (\Throwable $t) { $ref = null; }
+                if (!$ref) {
+                    $out['code'] = 422; $out['reason'] = self::COST_BEARER_TYPES[$bt] . ' #' . $bid . ' غيرُ موجودٍ في نطاقك'; return $out;
+                }
+            }
+            $key = $bt . '#' . ($bid === null ? '0' : $bid);
+            if (isset($seen[$key])) { $out['code'] = 422; $out['reason'] = 'جهةٌ مكررة: ' . $key; return $out; }
+            $seen[$key] = true;
+            $sum = round($sum + $pct, 2);
+            $clean[] = array('bearer_type' => $bt, 'bearer_id' => $bid, 'percent' => $pct);
+        }
+        if ($clean && $sum !== 100.00) {
+            $out['code'] = 422;
+            $out['reason'] = 'مجموعُ التحمّل ' . number_format($sum, 2) . '٪ لا 100٪ — الفارق '
+                . number_format(round(100 - $sum, 2), 2) . '٪ (يُرفض الحفظ — PLAN-01 §5.2-④)';
+            return $out;
+        }
+
+        try {
+            $gate->runInTransaction(function ($g) use ($ownerType, $ownerId, $clean, $actor) {
+                // طيُّ القائم ناعمًا (لا محوَ لقرار تحميلٍ سابق) ثم إدراجُ الجديد
+                $existing = $g->scopedQuery(array('scope' => array('cb' => 'cost_bearers')),
+                    "SELECT cb.id FROM cost_bearers cb
+                     WHERE {TENANT_SCOPE} AND cb.owner_type = ? AND cb.owner_id = ?
+                       AND COALESCE(cb.is_deleted,0)=0", array($ownerType, $ownerId));
+                foreach ($existing as $ex) { $g->softDelete('cost_bearers', (int) $ex['id']); }
+                foreach ($clean as $row) {
+                    $row['owner_type'] = $ownerType; $row['owner_id'] = $ownerId;
+                    $row['created_by'] = (int) $actor ?: null;
+                    $g->insert('cost_bearers', $row);
+                }
+                return true;
+            }, 'H-08-4 cost bearers Σ=100');
+        } catch (\Throwable $t) {
+            $out['code'] = 422; $out['reason'] = 'تعذّر الاستبدال الذري: ' . $t->getMessage(); return $out;
+        }
+
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'workforce', 'cost_bearers', 'replace', $ownerId,
+            array('owner' => $ownerType . '#' . $ownerId),
+            array('rows' => $clean, 'sum' => $clean ? $sum : 'غائبٌ — إشارةُ المالك المفردة/جهةُ العقد'),
+            array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
+
+        $out['ok'] = true; $out['code'] = 200;
+        return $out;
+    }
+
+    /** جهاتُ تحمّل مالكٍ — الحيّةُ وحدَها. */
+    public static function costBearersOf($gate, $ownerType, $ownerId)
+    {
+        try {
+            return $gate->scopedQuery(array('scope' => array('cb' => 'cost_bearers')),
+                "SELECT cb.* FROM cost_bearers cb
+                 WHERE {TENANT_SCOPE} AND cb.owner_type = ? AND cb.owner_id = ?
+                   AND COALESCE(cb.is_deleted,0)=0 ORDER BY cb.percent DESC",
+                array((string) $ownerType, (int) $ownerId));
+        } catch (\Throwable $t) { return array(); }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * التداخل: عقدٌ للشخص نفسه في الكيان نفسه (نطاقُ البوابة يحصر الكيان)
