@@ -255,6 +255,16 @@ class SettlementService
         // التحميلان المباشران للمورد وحده (العاملُ لا تُصرف له قطعٌ ولا أوامرُ صيانة)
         if ($partyType !== 'supplier') { return $lines; }
 
+        // ── M-12 · أقساطُ سلف المورد — «بوابةٌ واحدةٌ … بجدولِ استرداد» ──────
+        // البندُ يظهر هنا بمستنده، ولا يُنقص الرصيدَ إلا عند **اعتماد** التسوية:
+        // المسودةُ نيّةٌ والمعتمَدةُ واقعة (ENT-02 §3-«المقاصّة الظاهرة»).
+        try {
+            require_once __DIR__ . '/SupplierAdvanceService.php';
+            foreach (SupplierAdvanceService::chargeLines($gate, $partyRef, $from, $to) as $adv) {
+                $lines[] = $adv;
+            }
+        } catch (\Throwable $t) { error_log('settlement supplier advances: ' . $t->getMessage()); }
+
         // ── ② قطعُ الغيار من الصرف بعمودِ التحميل الصريح ────────────────────
         try {
             $issues = $gate->scopedQuery(
@@ -513,6 +523,17 @@ class SettlementService
             error_log('settlement approve publish #' . $sid . ': ' . $t->getMessage());
             $out['reason'] = 'تعذّر نشرُ حدث التسوية';
             return $out;
+        }
+
+        // ── M-12 · الاستردادُ يقع **باعتماد التسوية** لا بتوليدها ────────────
+        // المسودةُ نيّةٌ والمعتمَدةُ واقعة — والعطالةُ بمفتاح (سلفة × تسوية).
+        if ((string) $st['party_type'] === 'supplier') {
+            try {
+                require_once __DIR__ . '/SupplierAdvanceService.php';
+                SupplierAdvanceService::applyRecoveries($conn, $gate, $company, $sid, $userId);
+            } catch (\Throwable $t) {
+                error_log('settlement advance recovery #' . $sid . ': ' . $t->getMessage());
+            }
         }
 
         // الصافي السالب ⇒ ذمّةٌ مدينةٌ على الطرف (قرارُ المالك ①)

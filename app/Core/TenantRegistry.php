@@ -280,6 +280,9 @@ class TenantRegistry
         // من الرأس لا بالحذف الناعم (بنودٌ لا مستنداتٌ مستقلة).
         'settlements' => array('type' => self::T_TENANT, 'soft' => true),
         'settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-12 (ENT-02 §3/§7): بوابةُ سلفيات الموردين وسجلُّ استردادها.
+        'supplier_advance_requests' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplier_advance_recoveries' => array('type' => self::T_TENANT, 'soft' => false),
         'supplier_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
         // H-07 (CON-03 §6): رأسُ عقد المورد الحديث وبنودُه — بناءٌ بجانب
         // `supplierscontracts` الموروث الذي يبقى الكاتبَ (N-04 مرحلة ①).
