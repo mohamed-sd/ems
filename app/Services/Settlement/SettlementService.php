@@ -349,7 +349,19 @@ class SettlementService
             }
         } catch (\Throwable $t) { error_log('settlement maintenance: ' . $t->getMessage()); }
 
-        // ── ④ M-16 · جزاءُ الجاهزية والتغطية من بطاقة الطاقة ────────────────
+        // ── ④ M-52 · الترحيلُ من أمره المسلَّم بتعرفته ───────────────────────
+        // ENT-02 §3-④: «**أمرُ الترحيل المسلَّم · بتعرفته**» — والمبلغُ يُقرأ من
+        // `tariff_amount` الذي كتبته خدمةُ التعرفة وحدَها؛ فما لم يُسعَّر لا
+        // يُحمَّل، و**تكلفتُنا الداخلية** (`transfer_cost_lines`) ليست تعرفتَه.
+        try {
+            require_once dirname(__DIR__) . '/Transport/TransferTariffService.php';
+            foreach (\App\Services\Transport\TransferTariffService::chargeLines(
+                         $gate, $partyRef, $from, $to) as $trp) {
+                $lines[] = $trp;
+            }
+        } catch (\Throwable $t) { error_log('settlement transport: ' . $t->getMessage()); }
+
+        // ── ⑤ M-16 · جزاءُ الجاهزية والتغطية من بطاقة الطاقة ────────────────
         // CON-03 §6.1-Q3: «جاهزيةُ شهرٍ 81٪ والحد 85٪ ← جزاءٌ محسوبٌ بقاعدته
         // وسقفه · **Ledger عند التسوية (ENT-02) خصمًا ظاهرًا**».
         // القياسُ من سجل الزمن الموحّد، والمبلغُ بقاعدة الجزاء المكتوبة (M-15)

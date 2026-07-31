@@ -338,6 +338,8 @@ class TenantRegistry
         'transfer_orders' => array('type' => self::T_TENANT, 'soft' => true),
         'transfer_permits' => array('type' => self::T_TENANT, 'soft' => true),
         'transfer_requests' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-52 (ENT-02 §3-④): تعرفةُ الترحيل — «أمرُ الترحيل المسلَّم **بتعرفته**».
+        'transfer_tariffs' => array('type' => self::T_TENANT, 'soft' => true),
         'transfer_types' => array('type' => self::T_TENANT, 'soft' => true),
         'trs_locations' => array('type' => self::T_TENANT, 'soft' => true),
         'trs_notifications' => array('type' => self::T_TENANT, 'soft' => true),
