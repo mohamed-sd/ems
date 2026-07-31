@@ -19,40 +19,31 @@ $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms
 if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الأصول+❌"); exit(); }
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 
-// ── احتساب إهلاك الشهر (القسط الثابت) ──
+require_once __DIR__ . '/../app/Services/Finance/DepreciationService.php';
+use App\Services\Finance\DepreciationService as DEP;
+
+// ── احتساب إهلاك فترةٍ (M-30) ──
+// كان المحرّكُ هنا داخلَ الشاشة، وبثلاثة خلالٍ مقيسة: يتجاهل `acquisition_date`
+// تجاهلًا تامًّا · ويحتسب **الشهرَ الحاضرَ جبرًا** فما فات لا يُدرَك · ولا يفحص
+// قفلَ الفترة ولا يُنتج حدثًا ماليًّا. فصار استدعاءً للخدمة، **والفترةُ مُدخَل**.
 if (isset($_GET['run_dep'])) {
     if (!$can_edit) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+الاحتساب+❌"); exit(); }
     if (!fin_verify_action_token()) { header("Location: assets_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
-    $period = date('Y-m'); $today = date('Y-m-d'); $n = 0; $sum = 0;
-    $gate = fin_gate($is_super_admin);
-    $active = $gate->select('fin_assets', array(
-        'columns' => array('id', 'acquisition_cost', 'salvage_value', 'useful_life_months', 'accumulated_depreciation', 'state'),
-        'where' => array('state' => 'active'),
-    ));
-    foreach ($active as $a) {
-        $aid = intval($a['id']);
-        // تخطّي إن كان الشهر محتسبًا (فريد على asset+period)
-        if ($gate->count('fin_depreciation', array('where' => array('asset_id' => $aid, 'period_ref' => $period))) > 0) { continue; }
-        $life = max(1, intval($a['useful_life_months']));
-        $depreciable = (float)$a['acquisition_cost'] - (float)$a['salvage_value'];
-        $monthly = round($depreciable / $life, 2);
-        $remaining = round($depreciable - (float)$a['accumulated_depreciation'], 2);
-        $dep = min($monthly, max(0, $remaining));
-        if ($dep <= 0) { continue; }
-        // القيمُ محسوبةٌ PHP-side (التعبير accumulated+dep والحالة) — نفس نتيجة الأصل
-        $new_acc = round((float)$a['accumulated_depreciation'] + $dep, 2);
-        $new_state = ($new_acc >= round($depreciable, 2)) ? 'fully_depreciated' : (string)$a['state'];
-        // الزوج الذرّي (§9): قيد الإهلاك + تحديث مجمّع الأصل معًا (الأصل كتابتان غير معاملتين)
-        $gate->runInTransaction(function ($g) use ($aid, $period, $dep, $today, $current_user_id, $new_acc, $new_state) {
-            $g->insert('fin_depreciation', array(
-                'asset_id' => $aid, 'period_ref' => $period, 'depreciation_amount' => $dep,
-                'run_date' => $today, 'created_by' => $current_user_id,
-            ));
-            $g->update('fin_assets', array('accumulated_depreciation' => $new_acc, 'state' => $new_state), array('id' => $aid));
-        }, 'assets depreciation run');
-        $n++; $sum += $dep;
-    }
-    header("Location: assets_fin.php?msg=تم+احتساب+إهلاك+$period+لعدد+$n+أصل+(إجمالي+" . number_format($sum, 0) . ")+✅"); exit();
+    $period = (isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', (string) $_GET['period']))
+              ? (string) $_GET['period'] : date('Y-m', strtotime('first day of last month'));
+    $r = DEP::runPeriod($conn, fin_gate($is_super_admin), $company_id, $period, $current_user_id, 'screen');
+    $msg = $r['ok']
+        ? ($r['reason'] . ' · أحداثٌ منشورة: ' . $r['events'] . ' ✅')
+        : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
+    header("Location: assets_fin.php?msg=" . rawurlencode($msg)); exit();
+}
+
+// ── الاستدراك: من شهر الاقتناء حتى الشهر المنقضي ──
+if (isset($_GET['catch_up'])) {
+    if (!$can_edit) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+الاحتساب+❌"); exit(); }
+    if (!fin_verify_action_token()) { header("Location: assets_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    $r = DEP::catchUp($conn, fin_gate($is_super_admin), $company_id, $current_user_id, null, 'screen');
+    header("Location: assets_fin.php?msg=" . rawurlencode($r['reason'] . ' ✅')); exit();
 }
 
 // ── حفظ أصل ──
@@ -97,7 +88,13 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     $header_title = 'الأصول والإهلاك'; $header_icon = 'fa fa-building-flag';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة أصل'); }
-    if ($can_edit) { $header_actions[] = array('href' => '?run_dep=1&_t=' . fin_action_token(), 'class' => 'add-btn', 'icon' => 'fas fa-calculator', 'label' => 'احتساب إهلاك الشهر'); }
+    if ($can_edit) {
+        $lastMonth = date('Y-m', strtotime('first day of last month'));
+        $header_actions[] = array('href' => '?run_dep=1&period=' . $lastMonth . '&_t=' . fin_action_token(),
+            'class' => 'add-btn', 'icon' => 'fas fa-calculator', 'label' => 'احتساب إهلاك ' . $lastMonth);
+        $header_actions[] = array('href' => '?catch_up=1&_t=' . fin_action_token(),
+            'class' => 'add-btn', 'icon' => 'fas fa-clock-rotate-left', 'label' => 'استدراك الشهور الفائتة');
+    }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -121,10 +118,14 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     </form>
 
     <div class="card"><div class="card-body">
-        <p class="text-muted" style="margin:0 0 10px"><i class="fas fa-circle-info"></i> الإهلاك بطريقة القسط الثابت: (التكلفة − التخريدية) ÷ العمر الإنتاجي شهريًا. «احتساب إهلاك الشهر» لا يكرّر نفس الشهر.</p>
+        <p class="text-muted" style="margin:0 0 10px"><i class="fas fa-circle-info"></i>
+            الإهلاك بطريقة القسط الثابت: (التكلفة − التخريدية) ÷ العمر الإنتاجي شهريًا —
+            <strong>حدثٌ دوريٌّ بمفتاح (الأصل × الفترة)</strong> لا يتكرر، ولا يقع
+            <strong>قبل شهر الاقتناء</strong> ولا في <strong>فترةٍ مقفلة</strong>.
+            وعمودُ «شهورٌ غير محتسَبة» يُري الفجوةَ — و«الاستدراك» يسدّها من شهر الاقتناء.</p>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>الكود</th><th>الأصل</th><th>الفئة</th><th>التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>الحالة</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>الكود</th><th>الأصل</th><th>الفئة</th><th>التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>شهورٌ غير محتسَبة</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
                 $asset_rows = fin_gate($is_super_admin)->select('fin_assets', array('orderBy' => 'code ASC'));
@@ -141,6 +142,12 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
                     echo "<td>" . number_format((float)$row['accumulated_depreciation'], 2) . "</td>";
                     echo "<td><strong>" . number_format((float)$row['book_value'], 2) . "</strong></td>";
                     echo "<td>" . intval($row['useful_life_months']) . "</td>";
+                    // M-30: الفجوةُ تُرى — شهورٌ بين الاقتناء والشهر المنقضي بلا قسط
+                    $miss = ($st === 'active') ? DEP::missingPeriods(fin_gate($is_super_admin), $row) : array();
+                    echo "<td>" . (count($miss) > 0
+                        ? ("<span class='badge badge-warning' title='" . htmlspecialchars(implode(' · ', array_slice($miss, 0, 24)))
+                           . "'>" . count($miss) . "</span>")
+                        : "<span class='badge badge-success'>0</span>") . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . htmlspecialchars($state_lbl[$st] ?? $st) . "</span></td>";
                     echo "</tr>";
                 } }
