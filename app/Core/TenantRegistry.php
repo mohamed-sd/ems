@@ -227,7 +227,12 @@ class TenantRegistry
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-41 (SPEC-01 #23): قاعدةُ مخصص الصيانة وسجلُّه بمفتاح (المعدة × الفترة).
+        'fin_maint_provision_rules' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_maint_provisions' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_tax_codes' => array('type' => self::T_TENANT, 'soft' => true),
+        // M-41 (SPEC-01 #22): الإقرارُ الضريبيُّ الدوريُّ بمفتاح الفترة.
+        'fin_tax_returns' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_tax_transactions' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_unit_records' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_units' => array('type' => self::T_TENANT, 'soft' => true),
