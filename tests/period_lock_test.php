@@ -51,11 +51,18 @@ $CO = 4; $ACTOR = 1;
 $MARK = 'PLKT_' . getmypid();
 $ENT = 960000 + (getmypid() % 1000);
 
-// فترةُ اليوم (تموز 2026) — تُقلب مقفلةً مؤقتًا ويُضمن ردُّها
+// فترةُ اليوم — تُقلب مقفلةً مؤقتًا ويُضمن ردُّها.
+// ⚠ **بساعةٍ واحدةٍ لا ساعتين**: كان البذرُ يختار الفترةَ بـ`CURDATE()` (ساعةُ
+// MySQL المحلية) بينما كلُّ التأكيدات تستدعي `ems_period_check(..., date('Y-m-d'))`
+// (ساعةُ PHP بـUTC). والفارقُ بين الساعتين ثلاثُ ساعاتٍ في هذه البيئة — فثلاثَ
+// ساعاتٍ يوميًّا **يختار البذرُ شهرًا وتقيس التأكيداتُ شهرًا آخر**. وهو خللٌ
+// كامنٌ منذ كتابة الحزمة، لم يظهر حتى عبر منتصفُ الليل بينهما (2026-08-01).
+// فالبذرُ يقرأ **بساعة الكود المُختبَر** — والقاعدة: مقياسٌ واحدٌ للزمن في الحزمة.
+$TODAY = date('Y-m-d');
 $JULY = $conn->query("SELECT id, posting_allowed, state FROM fin_financial_periods
     WHERE company_id={$CO} AND period_type='month'
-      AND CURDATE() BETWEEN start_date AND end_date LIMIT 1")->fetch_assoc();
-if (!$JULY) { fwrite(STDERR, "FATAL: لا فترةَ شهريةً لليوم\n"); exit(1); }
+      AND '{$TODAY}' BETWEEN start_date AND end_date LIMIT 1")->fetch_assoc();
+if (!$JULY) { fwrite(STDERR, "FATAL: لا فترةَ شهريةً لليوم ({$TODAY})\n"); exit(1); }
 $JID = intval($JULY['id']);
 $restorePeriod = function () use ($conn, $JID, $JULY) {
     $conn->query("UPDATE fin_financial_periods SET posting_allowed=" . intval($JULY['posting_allowed'])
