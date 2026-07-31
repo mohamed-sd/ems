@@ -19,7 +19,7 @@
 | الاسم | المهمة | ملاحظة |
 |---|---|---|
 | `contract_operational_sites` | `P-01` | نطاقُ العقد التشغيلي |
-| `client_contract_lines` | `P-02` | *(لم تُبنَ بعد)* |
+| `client_contract_lines` | `P-02` | ✅ **بُني** — الجدولُ الوحيدُ الذي يحمل القيمة |
 | `contract_monthly_plan` | `P-03` | *(لم تُبنَ بعد)* |
 | `contract_resource_plan` | `P-04` | *(لم تُبنَ بعد)* |
 | `contract_payment_schedule` | `P-05` | *(لم تُبنَ بعد)* |
