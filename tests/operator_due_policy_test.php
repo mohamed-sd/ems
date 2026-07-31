@@ -73,7 +73,9 @@ check(!$r['ok'] && strpos($r['reason'], 'لا سياسةَ') !== false,
 
 head('① المحرّك — أساس التشغيل الفعلي بمعدله');
 // سياسة: actual_work × 100 → 8 × 100 = 800 (محسوبة يدويًّا)
-$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+// E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
     'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'actual',
     'rate' => 100, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ①'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
@@ -82,7 +84,9 @@ check($r['currency'] === 'SDG' && $r['is_trial'] === true, 'العملة SDG و�
 
 head('① المحرّك — الاستعداد أساسٌ مستقل (§8.2: يجوز للمشغّل وحده)');
 // + سياسة standby × 40 → 2 × 40 = 80 ⇒ المجموع 880
-$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+// E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
     'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'standby',
     'rate' => 40, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ①'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
@@ -92,7 +96,9 @@ check(count($r['lines']) === 2, 'سطران في التفصيل — الشفاف
 head('① المحرّك — الحدُّ الأدنى والأقصى يقصّان');
 // سياسة أخصّ بنطاق المشروع 4: actual_work × 100 بحدٍّ أقصى 500 ⇒ تغلب الافتراضية
 // و800 تُقصّ إلى 500 ⇒ المجموع 500 + 80 = 580
-$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+// E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
     'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'actual',
     'rate' => 100, 'max_amount' => 500, 'scope_type' => 'project', 'scope_id' => 4,
     'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① أخصّ'));
@@ -113,7 +119,9 @@ check($r['ok'] && $r['amount'] === 880.0,
 head('① المحرّك — أساسُ الإنتاج (طن) لا يلمس الساعات');
 // مشغّل طنّ: ton × 5 → 120 طن × 5 = 600؛ ولا شيءَ عن الساعات (لا سياسة ساعة)
 $conn->query("DELETE FROM contract_hour_policies WHERE company_id={$CO} AND operator_id={$TESTEMP}");
-$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+// E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
     'operator_id' => $TESTEMP, 'work_model' => 'ton', 'pay_basis' => 'ton',
     'rate' => 5, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① طن'));
 $tonCtx = array('employee_id' => $TESTEMP, 'work_date' => '2027-03-01',
@@ -130,14 +138,18 @@ check(!$r['ok'] && strpos($r['reason'], 'لا سياسةَ') !== false,
 
 head('① المحرّك — الحضورُ يومٌ واحدٌ لا ساعات');
 $conn->query("DELETE FROM contract_hour_policies WHERE company_id={$CO} AND operator_id={$TESTEMP}");
-$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+// E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
     'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'attendance',
     'rate' => 250, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① حضور'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
 check($r['ok'] && $r['amount'] === 250.0, "حضورُ يومٍ = 250 مهما بلغت الساعات (الناتج: {$r['amount']})");
 
 head('① المحرّك — المركّبُ يُتخطّى معلَنًا');
-$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+// E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
     'operator_id' => $TESTEMP, 'work_model' => 'hour', 'pay_basis' => 'composite',
     'rate' => 999, 'currency' => 'SDG', 'is_trial' => 1, 'note' => 'اختبار ① مركب'));
 $r = OperatorDue::compute($conn, $CO, $dayCtx);
@@ -218,7 +230,9 @@ foreach ($empRows as $er) {
         array('hour', 'actual', 100), array('hour', 'standby', 40),
         array('ton', 'ton', 5), array('meter', 'meter', 20),
     ) as $p) {
-        $gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full', 
+        // E-24: البذرُ يعلن `policy_state` صراحةً — الافتراضُ `draft` **لا يسعّر** عمدًا
+$gate->insert('contract_hour_policies', array('party_scope' => 'operator', 'ruling' => 'full',
+    'policy_state' => 'active',
             'operator_id' => $emp, 'work_model' => $p[0], 'pay_basis' => $p[1],
             'rate' => $p[2], 'currency' => 'SDG', 'is_trial' => 1,
             'effective_from' => WIN_FROM, 'effective_to' => WIN_TO,

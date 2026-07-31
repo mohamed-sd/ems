@@ -59,6 +59,10 @@ class OperatorDue
                FROM contract_hour_policies
               WHERE company_id=? AND party_scope='operator' AND operator_id=?
                 AND COALESCE(is_deleted,0)=0 AND deleted_at IS NULL
+                -- E-24 · UX-06 §8.2: **المسودةُ لا تسعّر شيئًا**. و`superseded`
+                -- و`expired` تُقرآن عمدًا — القراءةُ بالتاريخ، و«أثرُ الماضي
+                -- بحكم سياسته النافذة يومَها»؛ فإسقاطُهما يفقد حكمَ ما مضى.
+                AND policy_state <> 'draft'
                 AND (effective_from IS NULL OR effective_from <= ?)
                 AND (effective_to   IS NULL OR effective_to   >= ?)");
         $st->bind_param('iiss', $companyId, $empId, $date, $date);

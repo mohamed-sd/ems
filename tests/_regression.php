@@ -17,6 +17,8 @@ $core = array(
     'incentive_rules_test', 'cost_bearers_test', 'payroll_snapshot_gate_test',
     'payroll_time_path_test', 'payroll_production_path_test', 'payroll_offset_test',
     'payroll_run_cycle_test', 'final_settlement_test', 'employee_settlement_test',
+    'pay_policy_state_test', 'operator_due_policy_test', 'timesheet_fanout_test',
+    'attribution_test', 'effect_fanout_test',
     'daily_plan_test', 'dues_source_doc_test', 'settlement_test', 'settlement_invoice_close_test',
     'supplier_advances_test', 'supplier_statement_test', 'supplier_rules_test',
     'supplier_capacity_test', 'supplier_evaluation_test', 'supplier_closure_test',

@@ -269,8 +269,8 @@ echo "── 10) سلطةُ الحكم: سياسةُ العقد تسري على 
 $ts10 = mk_ts($root, $CO, $op1, '2026-06-15', 8, 0, 0, $seed);
 $root->query("UPDATE timesheet SET standby_hours = 4 WHERE id = $ts10");
 $root->query("INSERT INTO contract_hour_policies
-  (company_id, party_scope, contract_ref, ops_state, ruling, pct, note)
-  VALUES ($CO,'client',$c_sdg,'standby','pct',50.00,'اختبار: نصف الكمية بالسعر الكامل')");
+  (company_id, party_scope, contract_ref, ops_state, ruling, pct, note, policy_state)
+  VALUES ($CO,'client',$c_sdg,'standby','pct',50.00,'اختبار: نصف الكمية بالسعر الكامل','active')");
 
 $r10 = null;
 $gate->runInTransaction(function ($g) use (&$r10, $conn, $ts10) {

@@ -620,6 +620,8 @@ class EffectFanout
             "SELECT p.ops_state, p.obligation_type, p.ruling, p.pct, p.note, p.contract_ref
                FROM contract_hour_policies p
               WHERE {TENANT_SCOPE} AND p.deleted_at IS NULL
+                -- E-24: المسودةُ لا تحكم ساعةً — الوصلُ في موضعين وإلا زخرفة
+                AND p.policy_state <> 'draft'
                 AND p.party_scope = ?
                 AND (p.contract_ref = ? OR p.contract_ref IS NULL)
                 AND (p.effective_from IS NULL OR p.effective_from <= ?)

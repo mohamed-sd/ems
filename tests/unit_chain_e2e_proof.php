@@ -160,13 +160,13 @@ $OP = sq($root, "INSERT INTO operations (company_id, project_id, equipment, equi
 
 // سياساتُ المشغّل (UX-02 §8.2) — بلا سياسةٍ لا مستحقَّ مشغّل (قاعدة عدم التلفيق)
 sq($root, "INSERT INTO contract_hour_policies (company_id, party_scope, operator_id, pay_basis, work_model,
-           rate, currency, ruling, effective_from, effective_to, note)
+           rate, currency, ruling, effective_from, effective_to, note, policy_state)
            VALUES ($CO, 'operator', $EMP, 'actual', 'hour', $R_OP_ACTUAL, 'SDG', 'full',
-                   '2026-07-01', '2026-07-31', '$TAG')", $seed['policies']);
+                   '2026-07-01', '2026-07-31', '$TAG', 'active')", $seed['policies']);
 sq($root, "INSERT INTO contract_hour_policies (company_id, party_scope, operator_id, pay_basis, work_model,
-           rate, currency, ruling, effective_from, effective_to, note)
+           rate, currency, ruling, effective_from, effective_to, note, policy_state)
            VALUES ($CO, 'operator', $EMP, 'standby', 'hour', $R_OP_STANDBY, 'SDG', 'full',
-                   '2026-07-01', '2026-07-31', '$TAG')", $seed['policies']);
+                   '2026-07-01', '2026-07-31', '$TAG', 'active')", $seed['policies']);
 ok("العالَم مبذور: عميل#$CL مشروع#$PRJ مورد#$SUP معدة#$EQ مشغّل#$EMP عقدُ عميل#$CCON عقدُ مورد#$SCON تشغيل#$OP");
 info("عقد العميل: ساعة × $P_CLIENT جنيه · عقد المورد: ساعة × $P_SUPPLIER جنيه · سياسةُ المشغّل: فعلي $R_OP_ACTUAL · استعداد $R_OP_STANDBY");
 

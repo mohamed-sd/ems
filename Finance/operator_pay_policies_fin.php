@@ -20,6 +20,9 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
+require_once __DIR__ . '/../app/Services/Payroll/PayPolicyStateMachine.php';
+
+use App\Services\Payroll\PayPolicyStateMachine as PPS;
 
 $ctx             = fin_ctx();
 $is_super_admin  = $ctx['is_super'];
@@ -53,6 +56,30 @@ if (isset($_GET['stop_policy'])) {
         error_log('operator_pay_policies stop: ' . $t->getMessage());
         header("Location: operator_pay_policies_fin.php?msg=تعذّر+الإيقاف+❌");
     }
+    exit();
+}
+
+// ── تفعيلُ سياسةٍ مسودة (E-24) — وبه يقع الإخلاف ──
+if (isset($_GET['activate_policy'])) {
+    if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    $r = PPS::activate($conn, fin_gate($is_super_admin), $company_id,
+                       intval($_GET['activate_policy']), $current_user_id);
+    $m = $r['ok']
+        ? ('فُعّلت السياسة ✅' . (count($r['superseded']) > 0
+            ? (' · أُخلفت ' . count($r['superseded']) . ' سياسةً سابقةً بسريانها') : ''))
+        : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
+    header("Location: operator_pay_policies_fin.php?msg=" . rawurlencode($m));
+    exit();
+}
+
+// ── إنهاءُ سياسةٍ بسببه (E-24) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expire_policy'])) {
+    if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    $r = PPS::expire($conn, fin_gate($is_super_admin), $company_id,
+                     intval($_POST['policy_id'] ?? 0), strval($_POST['expire_reason'] ?? ''),
+                     $current_user_id);
+    header("Location: operator_pay_policies_fin.php?msg="
+        . rawurlencode($r['ok'] ? 'أُنهيت السياسةُ بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌')));
     exit();
 }
 
@@ -104,13 +131,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
         'exceptions_note' => mb_substr(trim(strval($_POST['exceptions_note'] ?? '')), 0, 200) ?: null,
         'note'        => mb_substr(trim(strval($_POST['note'] ?? '')), 0, 200) ?: null,
         'is_trial'    => isset($_POST['is_trial']) ? 1 : 0,
-        'approved_at' => date('Y-m-d H:i:s'),
-        'approved_by' => $current_user_id,
+        // E-24: **تُحفظ مسودةً** — والتفعيلُ فعلٌ ثانٍ يُخلِف ما قبله بسريانه.
+        // والاعتمادُ يقع مع التفعيل لا مع الحفظ (مسودةٌ معتمدةٌ تناقض).
+        'policy_state' => 'draft',
         'created_by'  => $current_user_id,
     );
     try {
         fin_gate($is_super_admin)->insert('contract_hour_policies', $row);
-        header("Location: operator_pay_policies_fin.php?msg=أُضيفت+السياسة+✅");
+        header("Location: operator_pay_policies_fin.php?msg=حُفظت+مسودةُ+السياسة+—+فعّلها+لتسري+✅");
     } catch (\Throwable $t) {
         error_log('operator_pay_policies add: ' . $t->getMessage());
         header("Location: operator_pay_policies_fin.php?msg=تعذّرت+الإضافة+❌");
@@ -120,6 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
 
 // ── القراءات ──
 $gate = fin_gate($is_super_admin);
+
+// E-24: تصريحُ ما انقضى سريانُه — **تصريحٌ بما وقع لا قرارٌ جديد**، ولا يقع
+// إلا بيدٍ لها الضبط (فالقارئُ لا يكتب).
+if ($can_edit) { PPS::sweepExpired($gate); }
 
 // السياسات (الحيّة والموقوفة تُعرضان — الموقوفة موسومة)
 $policies = $gate->scopedQuery(
@@ -151,9 +183,14 @@ try {
     if ($etr) { while ($et = $etr->fetch_assoc()) { $equipTypes[intval($et['id'])] = strval($et['name']); } }
 } catch (\Throwable $t) { /* قاموسٌ عام — غيابه لا يكسر الشاشة */ }
 
-$liveN = 0; $trialN = 0;
+$liveN = 0; $trialN = 0; $draftN = 0; $supN = 0;
 foreach ($policies as $p) {
-    if ($p['deleted_at'] === null) { $liveN++; if (intval($p['is_trial']) === 1) { $trialN++; } }
+    $ps = strval($p['policy_state']);
+    if ($ps === 'draft') { $draftN++; }
+    if ($ps === 'superseded') { $supN++; }
+    if ($p['deleted_at'] === null && $ps === 'active') {
+        $liveN++; if (intval($p['is_trial']) === 1) { $trialN++; }
+    }
 }
 
 $page_title = 'إيكوبيشن | سياسات مستحقات المشغّلين';
@@ -182,7 +219,17 @@ include '../insidebar.php';
             <a href="operator_pay_fin.php">الوضع القديم (بالراتب/بالمستحق)</a> مؤقتًا.
         </p>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <span class="badge badge-success" style="padding:6px 12px;"><?php echo $liveN; ?> سياسة سارية</span>
+            <span class="badge badge-success" style="padding:6px 12px;"><?php echo $liveN; ?> سياسة نافذة</span>
+            <?php if ($draftN > 0): ?>
+            <span class="badge badge-secondary" style="padding:6px 12px;">
+                <i class="fas fa-pen"></i> <?php echo $draftN; ?> مسودة — <strong>لا تسعّر شيئًا حتى تُفعَّل</strong>
+            </span>
+            <?php endif; ?>
+            <?php if ($supN > 0): ?>
+            <span class="badge badge-info" style="padding:6px 12px;">
+                <?php echo $supN; ?> مستبدَلة — تبقى حاكمةً لما قبل سريان خَلَفها
+            </span>
+            <?php endif; ?>
             <?php if ($trialN > 0): ?>
             <span class="badge badge-warning" style="padding:6px 12px;">
                 <i class="fas fa-flask"></i> <?php echo $trialN; ?> تجريبية — استبدل قيمَها قبل الاستعمال الحقيقي
@@ -301,14 +348,36 @@ include '../insidebar.php';
                     echo "<td>" . htmlspecialchars($p['currency']) . "</td>";
                     echo "<td>" . htmlspecialchars($scope) . "</td>";
                     echo "<td style='direction:ltr;'>" . $valid . "</td>";
-                    echo "<td>" . ($stopped
-                        ? "<span class='badge badge-secondary'>موقوفة</span>"
-                        : (intval($p['is_trial']) === 1
-                            ? "<span class='badge badge-warning'><i class='fas fa-flask'></i> تجريبية</span>"
-                            : "<span class='badge badge-success'>سارية</span>")) . "</td>";
+                    // E-24: الحالةُ من آلتها — والوسمُ التجريبيُّ محورٌ ثانٍ لا بديلٌ عنها
+                    $ps = strval($p['policy_state']);
+                    $psCls = array('draft' => 'badge-secondary', 'active' => 'badge-success',
+                                   'superseded' => 'badge-info', 'expired' => 'badge-dark');
+                    $stateCell = "<span class='badge " . ($psCls[$ps] ?? 'badge-secondary') . "'>"
+                        . htmlspecialchars(PPS::labelAr($ps)) . "</span>";
+                    if ($ps === 'superseded' && $p['superseded_by'] !== null) {
+                        $stateCell .= " <small>← #" . intval($p['superseded_by']) . "</small>";
+                    }
+                    if (intval($p['is_trial']) === 1) {
+                        $stateCell .= " <span class='badge badge-warning'><i class='fas fa-flask'></i> تجريبية</span>";
+                    }
+                    if ($stopped) { $stateCell .= " <span class='badge badge-secondary'>موقوفة</span>"; }
+                    if ($p['state_note'] !== null && $p['state_note'] !== '') {
+                        $stateCell .= "<div><small style='color:#6b7280;'>"
+                            . htmlspecialchars(strval($p['state_note'])) . "</small></div>";
+                    }
+                    echo "<td style='white-space:normal;'>" . $stateCell . "</td>";
                     if ($can_edit) {
-                        echo "<td>" . ($stopped ? '—'
-                            : "<a href='?stop_policy=" . intval($p['id']) . "' class='badge badge-danger' style='text-decoration:none;padding:5px 10px;' onclick=\"return confirm('إيقاف هذه السياسة؟ تبقى في السجل موقوفةً.');\"><i class='fas fa-stop'></i> إيقاف</a>") . "</td>";
+                        $act = '—';
+                        if ($ps === 'draft') {
+                            $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success' style='text-decoration:none;padding:5px 10px;' onclick=\"return confirm('تفعيلُ السياسة؟ ما يُخلِفه سريانُها من سياساتٍ نافذةٍ يُغلق عند يومٍ قبله.');\"><i class='fas fa-play'></i> فعّل</a>";
+                        } elseif ($ps === 'active' || $ps === 'superseded') {
+                            $act = "<form method='post' style='display:flex;gap:6px;align-items:center;'>"
+                                 . "<input type='hidden' name='expire_policy' value='1'>"
+                                 . "<input type='hidden' name='policy_id' value='" . intval($p['id']) . "'>"
+                                 . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سببُ الإنهاء' style='width:150px;'>"
+                                 . "<button type='submit' class='badge badge-danger' style='border:0;padding:5px 10px;'><i class='fas fa-stop'></i> أنهِ</button></form>";
+                        }
+                        echo "<td>" . $act . "</td>";
                     }
                     echo "</tr>";
                 } ?>
