@@ -227,6 +227,8 @@ class TenantRegistry
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        // P-03 (PLAN-03 §2): الجدولُ الشهريُّ لبند البيع بنسخه.
+        'contract_monthly_plan' => array('type' => self::T_TENANT, 'soft' => false),
         // P-02 (PLAN-03 §2): بندُ بيع عقد العميل — **الجدولُ الوحيدُ الذي يحمل القيمة**.
         'client_contract_lines' => array('type' => self::T_TENANT, 'soft' => true),
         // P-01 (PLAN-03 §2.1): نطاقُ العقد التشغيلي — الموقعُ داخل العقد باسمه ومدته.
