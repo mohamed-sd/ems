@@ -227,6 +227,11 @@ class TenantRegistry
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-21 (UX-05 §2.1 · §8.2): دورةُ عروض الموردين — طلبٌ وبنودٌ وعروضٌ وترسية.
+        'supplier_rfqs' => array('type' => self::T_TENANT, 'soft' => true),
+        'rfq_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'rfq_quotes' => array('type' => self::T_TENANT, 'soft' => false),
+        'rfq_awards' => array('type' => self::T_TENANT, 'soft' => false),
         // H-13 (SPEC-01 #19): المطابقةُ البنكية — رأسُ الكشف وأسطرُه ومضاهاتُه.
         'bank_recon_matches' => array('type' => self::T_TENANT, 'soft' => false),
         'bank_statement_lines' => array('type' => self::T_TENANT, 'soft' => false),
