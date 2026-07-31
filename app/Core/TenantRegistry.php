@@ -227,6 +227,10 @@ class TenantRegistry
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        // H-13 (SPEC-01 #19): المطابقةُ البنكية — رأسُ الكشف وأسطرُه ومضاهاتُه.
+        'bank_recon_matches' => array('type' => self::T_TENANT, 'soft' => false),
+        'bank_statement_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'bank_statements' => array('type' => self::T_TENANT, 'soft' => true),
         // M-41 (SPEC-01 #23): قاعدةُ مخصص الصيانة وسجلُّه بمفتاح (المعدة × الفترة).
         'fin_maint_provision_rules' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_maint_provisions' => array('type' => self::T_TENANT, 'soft' => false),

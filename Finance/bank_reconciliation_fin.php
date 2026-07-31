@@ -20,6 +20,94 @@ if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صل
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $sel_acct = isset($_GET['acct']) ? intval($_GET['acct']) : 0;
 
+// ═══════════════════════════════════════════════════════════════════════════
+// H-13 (SPEC-01 #19) — الدورةُ الكاملةُ فوق القائم: رأسُ كشفٍ وأسطرٌ بمفاتيحها
+// ومضاهاةٌ بقاعدتها وفروقٌ بأسبابها وإقفالٌ يمنع.
+// **القائمُ لا يُمسّ**: `fin_bank_statement_lines` وشاشتُه القديمةُ تبقيان أدناه
+// (مطابقةٌ بالمبلغ والاتجاه)، والدورةُ الجديدةُ تُضاف فوقها — لا تحلّ محلَّها
+// قسرًا. والترحيلُ بينهما قرارُ مالكٍ لا أثرُ نشر.
+// ═══════════════════════════════════════════════════════════════════════════
+require_once __DIR__ . '/../app/Services/Finance/BankReconService.php';
+use App\Services\Finance\BankReconService as BRS;
+
+$h13_gate = fin_gate($is_super_admin);
+$h13_stmt = isset($_GET['stmt']) ? intval($_GET['stmt']) : 0;
+$h13_redirect = function ($msg, $stmt = 0) {
+    $q = $stmt > 0 ? ('&stmt=' . $stmt) : '';
+    header("Location: bank_reconciliation_fin.php?msg=" . rawurlencode($msg) . $q);
+    exit();
+};
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['h13'] ?? '') !== '') {
+    if (!$can_edit) { $h13_redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
+    $act = strval($_POST['h13']);
+
+    if ($act === 'import') {
+        // الأسطرُ تُلصق نصًّا: تاريخ | وصف | اتجاه | مبلغ | مرجع
+        $raw = trim(strval($_POST['lines_raw'] ?? ''));
+        $rows = array();
+        foreach (preg_split('/\r\n|\r|\n/', $raw) as $ln) {
+            $ln = trim($ln);
+            if ($ln === '') { continue; }
+            $p = array_map('trim', explode('|', $ln));
+            $rows[] = array(
+                'txn_date' => isset($p[0]) ? $p[0] : '',
+                'description' => isset($p[1]) ? $p[1] : '',
+                'direction' => isset($p[2]) ? $p[2] : '',
+                'amount' => isset($p[3]) ? $p[3] : 0,
+                'bank_ref' => isset($p[4]) ? $p[4] : '',
+            );
+        }
+        $r = BRS::import($conn, $h13_gate, $company_id, array(
+            'bank_account_id' => intval($_POST['bank_account_id'] ?? 0),
+            'statement_ref' => strval($_POST['statement_ref'] ?? ''),
+            'period_from' => strval($_POST['period_from'] ?? ''),
+            'period_to' => strval($_POST['period_to'] ?? ''),
+            'opening_balance' => strval($_POST['opening_balance'] ?? '0'),
+            'closing_balance' => strval($_POST['closing_balance'] ?? '0'),
+        ), $rows, $current_user_id);
+        $msg = $r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
+        $h13_redirect($msg, (int) $r['statement_id']);
+    }
+    if ($act === 'automatch') {
+        $r = BRS::autoMatch($conn, $h13_gate, $company_id, intval($_POST['statement_id'] ?? 0), $current_user_id);
+        $h13_redirect(($r['ok'] ? $r['reason'] . ' ✅' : $r['code'] . ' — ' . $r['reason'] . ' ❌'),
+                      intval($_POST['statement_id'] ?? 0));
+    }
+    if ($act === 'open_diff') {
+        $r = BRS::openDifference($conn, $h13_gate, $company_id, intval($_POST['match_id'] ?? 0),
+                                 strval($_POST['why'] ?? ''), $current_user_id);
+        $h13_redirect(($r['ok'] ? 'فُتح الفرقُ بسببه ✅' : $r['code'] . ' — ' . $r['reason'] . ' ❌'),
+                      intval($_POST['statement_id'] ?? 0));
+    }
+    if ($act === 'resolve') {
+        $r = BRS::resolveDifference($conn, $h13_gate, $company_id, intval($_POST['match_id'] ?? 0),
+                                    strval($_POST['decision'] ?? ''), strval($_POST['why'] ?? ''),
+                                    $current_user_id);
+        $h13_redirect(($r['ok']
+            ? ('حُسم الفرق' . ($r['event_id'] ? (' · قيدُ تسويةٍ #' . $r['event_id']) : ' بلا قيد') . ' ✅')
+            : $r['code'] . ' — ' . $r['reason'] . ' ❌'), intval($_POST['statement_id'] ?? 0));
+    }
+    if ($act === 'accept') {
+        // «قبولُ المضاهاة» (§19) — استقرارُ السطر على «مطابق» بقرارٍ ظاهر
+        try {
+            $h13_gate->update('bank_statement_lines', array('match_state' => 'matched'),
+                array('id' => intval($_POST['line_id'] ?? 0)));
+            $h13_redirect('قُبلت المضاهاة ✅', intval($_POST['statement_id'] ?? 0));
+        } catch (\Throwable $t) { $h13_redirect('تعذّر القبول ❌', intval($_POST['statement_id'] ?? 0)); }
+    }
+    if ($act === 'close') {
+        $r = BRS::close($conn, $h13_gate, $company_id, intval($_POST['statement_id'] ?? 0), $current_user_id);
+        $h13_redirect(($r['ok'] ? $r['reason'] . ' ✅' : $r['code'] . ' — ' . $r['reason'] . ' ❌'),
+                      intval($_POST['statement_id'] ?? 0));
+    }
+}
+
+$h13_statements = BRS::statements($h13_gate);
+$h13_lines = $h13_stmt > 0 ? BRS::linesOf($h13_gate, $h13_stmt) : array();
+$h13_stats = $h13_stmt > 0 ? BRS::stats($h13_gate, $h13_stmt) : null;
+$h13_head  = $h13_stmt > 0 ? BRS::statementOf($h13_gate, $h13_stmt) : null;
+
 // ── مطابقة آلية بالمبلغ والاتجاه (CSRF) ──
 if (isset($_GET['automatch']) && $sel_acct > 0) {
     if (!$can_edit) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
@@ -156,6 +244,178 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ?>
     <?php fin_msg_banner(); ?>
+
+    <!-- ═══ H-13 · الدورةُ الكاملة (SPEC-01 #19) ═══ -->
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0 0 8px"><i class="fas fa-file-import"></i> كشوفُ البنك ودورةُ المطابقة</h5>
+        <p style="color:#4b5563;line-height:1.8;margin:0 0 10px">
+            <strong>استيرادٌ لا يكرر</strong> (بصمةُ السطر: كشف × مرجع × تاريخ × اتجاه × مبلغ — والملفُّ
+            نفسُه يُستورد مرارًا بصفر سطرٍ مكرر) · <strong>ومضاهاةٌ بقاعدتها</strong> (المرجعُ أولًا ثم
+            المبلغُ والتاريخُ ± 3 أيام — والقاعدةُ تُحفظ) · <strong>وفرقٌ يُفتح بسببٍ ويُحسم بقيدِ تسويةٍ
+            بمرجعه</strong> والسندُ الأصليُّ لا يُمسّ · <strong>ولا إقفالَ وفرقٌ مفتوح</strong>.
+        </p>
+        <?php if ($can_edit): ?>
+        <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+            <input type="hidden" name="h13" value="import">
+            <div class="form-section"><div class="form-grid">
+                <div class="form-group"><label>الحساب البنكي <span class="required">*</span></label>
+                    <select name="bank_account_id" required>
+                        <?php
+                        $accs = $h13_gate->select('fin_bank_accounts', array('orderBy' => 'name ASC'));
+                        foreach ($accs as $a) {
+                            echo "<option value='" . intval($a['id']) . "'>" . htmlspecialchars((string)$a['name']) . "</option>";
+                        } ?>
+                    </select></div>
+                <div class="form-group"><label>مرجع الكشف <span class="required">*</span></label>
+                    <input type="text" name="statement_ref" required maxlength="60" placeholder="من البنك"></div>
+                <div class="form-group"><label>من تاريخ <span class="required">*</span></label>
+                    <input type="date" name="period_from" required></div>
+                <div class="form-group"><label>إلى تاريخ <span class="required">*</span></label>
+                    <input type="date" name="period_to" required></div>
+                <div class="form-group"><label>رصيدٌ افتتاحي</label>
+                    <input type="number" step="0.01" name="opening_balance" value="0"></div>
+                <div class="form-group"><label>رصيدٌ ختامي</label>
+                    <input type="number" step="0.01" name="closing_balance" value="0"></div>
+            </div>
+            <div class="form-group" style="margin-top:10px">
+                <label>أسطرُ الكشف — سطرٌ لكل حركة:
+                    <code>التاريخ | الوصف | deposit أو withdrawal | المبلغ | المرجع البنكي</code></label>
+                <textarea name="lines_raw" rows="5" style="width:100%;direction:ltr"
+                    placeholder="2026-07-01 | تحصيل عميل | deposit | 1000.00 | REF-001"></textarea>
+                <small style="color:#6b7280">سطرٌ <strong>بلا مرجعٍ بنكيٍّ يُرفض ويُعلَن</strong> — ولا يُخترع له مفتاح.</small>
+            </div></div>
+            <div class="form-actions"><button type="submit" class="btn-save">
+                <i class="fas fa-file-import"></i> استورد الكشف</button></div>
+        </form>
+        <?php endif; ?>
+
+        <div class="table-container" style="margin-top:12px">
+        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+            <thead><tr><th>#</th><th>الحساب</th><th>المرجع</th><th>المدى</th><th>الأسطر</th>
+                <th>الحال</th><th></th></tr></thead>
+            <tbody>
+            <?php foreach ($h13_statements as $s): ?>
+                <tr><td><?php echo intval($s['id']); ?></td>
+                    <td><?php echo htmlspecialchars((string)($s['account_name'] ?? '—')); ?></td>
+                    <td><strong><?php echo htmlspecialchars((string)$s['statement_ref']); ?></strong></td>
+                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$s['period_from']); ?>
+                        → <?php echo htmlspecialchars((string)$s['period_to']); ?></td>
+                    <td><?php echo intval($s['lines_count']); ?></td>
+                    <td><?php
+                        $lbl = array('imported' => 'مستورد', 'matching' => 'قيد المضاهاة',
+                                     'reconciled' => 'مطابَق', 'closed' => 'مقفل');
+                        $cls = (string)$s['state'] === 'closed' ? 'badge-secondary' : 'badge-info';
+                        echo "<span class='badge {$cls}'>" . htmlspecialchars($lbl[(string)$s['state']] ?? (string)$s['state']) . "</span>";
+                    ?></td>
+                    <td><a class="action-btn" href="?stmt=<?php echo intval($s['id']); ?>">
+                        <i class="fa fa-eye"></i> افتح</a></td></tr>
+            <?php endforeach; ?>
+            <?php if (!$h13_statements): ?><tr><td colspan="7"><em>لا كشوفَ مستوردةً بعد</em></td></tr><?php endif; ?>
+            </tbody>
+        </table>
+        </div>
+    </div></div>
+
+    <?php if ($h13_head): ?>
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0 0 8px"><i class="fas fa-scale-balanced"></i>
+            كشف <?php echo htmlspecialchars((string)$h13_head['statement_ref']); ?></h5>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge badge-success" style="padding:6px 12px">نسبةُ المطابقة
+                <?php echo htmlspecialchars((string)$h13_stats['rate']); ?>٪</span>
+            <span class="badge <?php echo $h13_stats['open_diff'] > 0 ? 'badge-danger' : 'badge-success'; ?>"
+                style="padding:6px 12px">فروقٌ مفتوحة <?php echo intval($h13_stats['open_diff']); ?></span>
+            <span class="badge badge-secondary" style="padding:6px 12px">بلا نظير
+                <?php echo intval($h13_stats['none']); ?></span>
+        </div>
+        <?php if ($can_edit && (string)$h13_head['state'] !== 'closed'): ?>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <form method="post" style="display:inline">
+                <input type="hidden" name="h13" value="automatch">
+                <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
+                <button type="submit" class="btn-save"><i class="fa fa-wand-magic-sparkles"></i> مضاهاةٌ آلية</button>
+            </form>
+            <form method="post" style="display:inline">
+                <input type="hidden" name="h13" value="close">
+                <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
+                <button type="submit" class="btn-save"><i class="fa fa-lock"></i> أقفل الكشف</button>
+            </form>
+        </div>
+        <?php endif; ?>
+        <div class="table-container">
+        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+            <thead><tr><th>#</th><th>التاريخ</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
+                <th>المرجع</th><th>النظير</th><th>القاعدة</th><th>الفرق</th><th>الحال</th>
+                <?php if ($can_edit) echo '<th>القرار</th>'; ?></tr></thead>
+            <tbody>
+            <?php foreach ($h13_lines as $l):
+                $ms = (string)$l['match_state'];
+                $msLbl = array('unmatched' => 'لم يُضاهَ', 'matched' => 'مطابق',
+                               'difference' => 'فرقٌ بقيمته', 'no_counterpart' => 'بلا نظير');
+                $msCls = $ms === 'matched' ? 'badge-success' : ($ms === 'difference' ? 'badge-warning' : 'badge-secondary');
+            ?>
+                <tr><td><?php echo intval($l['line_no']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$l['txn_date']); ?></td>
+                    <td style="white-space:normal"><?php echo htmlspecialchars((string)($l['description'] ?? '')); ?></td>
+                    <td><?php echo (string)$l['direction'] === 'deposit' ? 'إيداع' : 'سحب'; ?></td>
+                    <td><strong><?php echo htmlspecialchars((string)$l['amount']); ?></strong></td>
+                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$l['bank_ref']); ?></td>
+                    <td><?php echo $l['payment_id'] !== null ? ('سند #' . intval($l['payment_id'])) : '—'; ?></td>
+                    <td style="white-space:normal"><small><?php echo htmlspecialchars((string)($l['rule_note'] ?? '')); ?></small></td>
+                    <td><?php echo $l['difference'] !== null && abs((float)$l['difference']) > 0.004
+                        ? ('<strong style="color:#c00">' . htmlspecialchars((string)$l['difference']) . '</strong>')
+                        : '—'; ?></td>
+                    <td><span class="badge <?php echo $msCls; ?>"><?php echo htmlspecialchars($msLbl[$ms] ?? $ms); ?></span>
+                        <?php if ((string)($l['match_row_state'] ?? '') === 'open_difference'): ?>
+                            <div><small style="color:#c00"><?php echo htmlspecialchars((string)$l['difference_reason']); ?></small></div>
+                        <?php elseif ($l['adjustment_event_id'] !== null): ?>
+                            <div><small>قيدُ تسويةٍ #<?php echo intval($l['adjustment_event_id']); ?></small></div>
+                        <?php endif; ?></td>
+                    <?php if ($can_edit && (string)$h13_head['state'] !== 'closed'): ?>
+                    <td style="white-space:normal">
+                        <?php $mid = intval($l['match_id']); $mrs = (string)($l['match_row_state'] ?? ''); ?>
+                        <?php if ($mid > 0 && $mrs === 'matched' && $ms === 'difference'): ?>
+                            <form method="post" style="display:flex;gap:4px">
+                                <input type="hidden" name="h13" value="open_diff">
+                                <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
+                                <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
+                                <input type="text" name="why" required maxlength="200" placeholder="سببُ الفرق" style="width:130px">
+                                <button type="submit" class="badge badge-warning" style="border:0;padding:5px 8px">افتح فرقًا</button>
+                            </form>
+                        <?php elseif ($mid > 0 && $mrs === 'open_difference'): ?>
+                            <form method="post" style="display:flex;gap:4px;flex-wrap:wrap">
+                                <input type="hidden" name="h13" value="resolve">
+                                <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
+                                <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
+                                <select name="decision"><option value="adjust">قيدُ تسوية</option><option value="reject">رفض</option></select>
+                                <input type="text" name="why" required maxlength="200" placeholder="قرارٌ بسببه" style="width:120px">
+                                <button type="submit" class="badge badge-success" style="border:0;padding:5px 8px">احسم</button>
+                            </form>
+                        <?php elseif ($ms !== 'matched'): ?>
+                            <form method="post" style="display:inline">
+                                <input type="hidden" name="h13" value="accept">
+                                <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
+                                <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
+                                <button type="submit" class="badge badge-secondary" style="border:0;padding:5px 8px">اقبل المضاهاة</button>
+                            </form>
+                        <?php else: ?>—<?php endif; ?>
+                    </td>
+                    <?php endif; ?>
+                </tr>
+            <?php endforeach; ?>
+            <?php if (!$h13_lines): ?><tr><td colspan="11"><em>لا أسطرَ</em></td></tr><?php endif; ?>
+            </tbody>
+        </table>
+        </div>
+    </div></div>
+    <?php endif; ?>
+
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0"><i class="fas fa-clock-rotate-left"></i> الدورةُ القديمة (تبقى للقراءة والتاريخ)</h5>
+        <p style="color:#6b7280;margin:6px 0 0">
+            `fin_bank_statement_lines` ومطابقتُها بالمبلغ والاتجاه — <strong>لا تُحذف ولا تُرحَّل قسرًا</strong>،
+            والانتقالُ إلى الدورة أعلاه قرارُ مالك.</p>
+    </div></div>
 
     <div class="card"><div class="card-body">
         <form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
