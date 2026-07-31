@@ -192,7 +192,8 @@ class EmployeeContractAmendmentService
         try {
             require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
             \App\Core\EventPublisher::publishFact($conn, array(
-                'event_key' => 'employee_contract.amended',
+                // النطاقُ الأولُ بلا شرطةٍ سفلية (عقد §9) — وإلا رُفض الحدثُ صامتًا
+                'event_key' => 'workforce.contract.amended',
                 'category' => 'operational', 'source_module' => 'workforce',
                 'company_id' => (int) $companyId,
                 'entity_type' => 'employee_contract_amendment', 'entity_id' => (int) $a['id'],

@@ -289,6 +289,9 @@ class TenantRegistry
         'tax_invoices' => array('type' => self::T_TENANT, 'soft' => false),
         // M-05 (ENT-03 §4): تخصيصُ التحصيل — «ظاهرٌ في الكشف لا صامتًا».
         'fin_collection_allocations' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-22 (ENT-01 §5): تصفيةُ إنهاء الخدمة المحسوبة وبنودُها.
+        'employee_final_settlements' => array('type' => self::T_TENANT, 'soft' => true),
+        'employee_final_settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
         // M-18 (ENT-02 §4): تصفيةُ إنهاء العقد — «بمفتاح (العقد × التصفية)».
         'supplier_contract_closures' => array('type' => self::T_TENANT, 'soft' => true),
         // M-17 (CON-03 §4-التقييم): الأوزانُ المكتوبةُ والتقييمُ الدوريُّ وأسطرُ مؤشراته.

@@ -82,6 +82,108 @@ class ContractSnapshotService
         return $out;
     }
 
+    /**
+     * قناةُ التصفية (M-22) — **توسيعٌ لا نقض**.
+     * ───────────────────────────────────────────────────────────────────────
+     * `snapshotFor` تشترط عقدًا **يُقرأ** — والتصفيةُ **لا تقع إلا بعد الإنهاء**
+     * (ENT-01 §5)، فالبوابةُ كما هي تجعل «نهايةُ الخدمة **بقاعدتها من اللقطة**»
+     * مستحيلةً. فالقناةُ الثانيةُ **مسمّاةٌ للتصفية** وتقبل الحالاتِ الطرفية
+     * الثلاثَ وحدَها — بالمضمون والبصمة والعطالة نفسِها حرفيًّا.
+     *
+     * والأولويةُ دائمًا **للقطةٍ قائمةٍ صالحةٍ ≤ تاريخِ الأثر**: العقدُ الذي
+     * حُسب له في حياته يُصفّى بما حُسب به، ولا تُصنع لقطةٌ إلا حين لا توجد.
+     *
+     * @return array{ok:bool,code:int,reason:string,id:?int,fingerprint:?string,reused:bool,minted:bool}
+     */
+    const SETTLEMENT_STATES = array('terminated', 'expired', 'closed');
+
+    public static function snapshotForSettlement($conn, $gate, $companyId, $contractId, $asOfDate, $actor = 0)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '',
+                     'id' => null, 'fingerprint' => null, 'reused' => false, 'minted' => false);
+        $contractId = (int) $contractId;
+        $asOf = self::dateOrNull($asOfDate);
+        if ($asOf === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الأثر إلزاميٌّ بصيغةٍ سليمة'; return $out; }
+
+        $c = null;
+        try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => $contractId))); }
+        catch (\Throwable $t) { $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+
+        // ① لقطةٌ قائمةٌ صالحةٌ حتى تاريخ الأثر — **تُقرأ ولا تُصنع**
+        $prior = array();
+        try {
+            $prior = $gate->scopedQuery(array('scope' => array('cs' => 'contract_snapshots')),
+                "SELECT cs.id, cs.fingerprint FROM contract_snapshots cs
+                 WHERE {TENANT_SCOPE} AND cs.contract_id = ? AND cs.valid = 1
+                   AND cs.as_of_date <= ?
+                 ORDER BY cs.as_of_date DESC, cs.id DESC LIMIT 1", array($contractId, $asOf));
+        } catch (\Throwable $t) { $prior = array(); }
+        if ($prior) {
+            $out['ok'] = true; $out['code'] = 200; $out['reused'] = true;
+            $out['id'] = (int) $prior[0]['id'];
+            $out['fingerprint'] = (string) $prior[0]['fingerprint'];
+            return $out;
+        }
+
+        // ② ولا تُصنع إلا لعقدٍ **انتهى فعلًا** — لا لمسودةٍ لم تحيَ قط
+        $state = (string) $c['state'];
+        if (!in_array($state, self::SETTLEMENT_STATES, true)) {
+            $out['code'] = 422;
+            $out['reason'] = 'قناةُ التصفية للمنتهي والمنهَى والمقفل حصرًا — العقدُ '
+                . EmployeeContractStateMachine::labelAr($state);
+            return $out;
+        }
+
+        $payload = self::canonicalPayload($gate, $c);
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $fp = sha1($json);
+        $out['fingerprint'] = $fp;
+
+        // العطالة: بالبصمة نفسِها لليوم نفسِه تُعاد لا تُكرَّر
+        $existing = array();
+        try {
+            $existing = $gate->scopedQuery(array('scope' => array('cs' => 'contract_snapshots')),
+                "SELECT cs.id FROM contract_snapshots cs
+                 WHERE {TENANT_SCOPE} AND cs.contract_id = ? AND cs.as_of_date = ?
+                   AND cs.fingerprint = ? AND cs.valid = 1
+                 ORDER BY cs.id DESC LIMIT 1", array($contractId, $asOf, $fp));
+        } catch (\Throwable $t) { $existing = array(); }
+        if ($existing) {
+            $out['ok'] = true; $out['code'] = 200; $out['id'] = (int) $existing[0]['id']; $out['reused'] = true;
+            return $out;
+        }
+
+        try {
+            $newId = (int) $gate->insert('contract_snapshots', array(
+                'contract_id'   => $contractId,
+                'as_of_date'    => $asOf,
+                'snapshot_json' => $json,
+                'fingerprint'   => $fp,
+                'amendment_ref' => null,
+                'valid'         => 1,
+                'created_by'    => (int) $actor ?: null,
+            ));
+        } catch (\Throwable $t) {
+            $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج: ' . $t->getMessage(); return $out;
+        }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج — افحص القيود'; return $out; }
+
+        $out['ok'] = true; $out['code'] = 200; $out['id'] = $newId; $out['minted'] = true;
+        return $out;
+    }
+
+    /** مضمونُ لقطةٍ مفكوكًا — «تبويبُ اللقطة يعرض القيمَ التي احتُسب بها». */
+    public static function payloadOf($gate, $snapshotId)
+    {
+        $s = null;
+        try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
+        catch (\Throwable $t) { $s = null; }
+        if (!$s) { return null; }
+        $p = json_decode((string) $s['snapshot_json'], true);
+        return is_array($p) ? $p : null;
+    }
+
     /** كشفُ التلاعب: إعادةُ حساب البصمة من المخزون ومقارنتُها. */
     public static function verify($gate, $snapshotId)
     {

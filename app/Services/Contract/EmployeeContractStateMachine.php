@@ -357,7 +357,10 @@ class EmployeeContractStateMachine
         try {
             require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
             \App\Core\EventPublisher::publishFact($conn, array(
-                'event_key'       => 'employee_contract.state.changed',
+                // عقدُ §9 يفرض `domain.entity.action` والنطاقُ الأولُ **بلا شرطة
+                // سفلية** — و`employee_contract.…` كان يُرفض صامتًا فلا تصل الحقيقةُ
+                // الجذرَ أبدًا (كُشف مع M-22 وأُصلح؛ صفرُ صفٍّ منشورٍ يفقده التغيير).
+                'event_key'       => 'workforce.contract_state.changed',
                 'category'        => 'operational',
                 'source_module'   => 'workforce',
                 'company_id'      => (int) $companyId,

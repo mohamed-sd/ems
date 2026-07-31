@@ -255,7 +255,8 @@ class DailyPlanService
         try {
             require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
             \App\Core\EventPublisher::publishFact($conn, array(
-                'event_key' => 'daily_plan.opened', 'category' => 'operational',
+                // النطاقُ الأولُ بلا شرطةٍ سفلية (عقد §9) — وإلا رُفض الحدثُ صامتًا
+                'event_key' => 'operations.daily_plan.opened', 'category' => 'operational',
                 'source_module' => 'operations', 'company_id' => (int) $companyId,
                 'entity_type' => 'daily_plan', 'entity_id' => (int) $planId,
                 'occurred_at' => gmdate('Y-m-d H:i:s'), 'created_by' => (int) $actor ?: 1,
