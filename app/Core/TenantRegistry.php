@@ -229,6 +229,11 @@ class TenantRegistry
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
         // H-15 (USR-01 §2): طبقةُ الصفات — شخصٌ × صفةٌ × نطاقٌ × مدةٌ × مصدر.
         'user_capacities' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-19 (WSP-01): مساحاتُ العمل — التخطيطُ والقاموسُ عالميان والتفضيلاتُ والسجلُّ بشركتهما.
+        'workspace_layouts' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'workspace_cards' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'workspace_prefs' => array('type' => self::T_TENANT, 'soft' => false),
+        'workspace_navigation_log' => array('type' => self::T_TENANT, 'soft' => false),
         // H-18 (USR-01): البوابةُ الشخصية — اللقطاتُ والتقييمُ والشهادةُ وسجلُّ النشاط.
         'achievement_snapshots' => array('type' => self::T_TENANT, 'soft' => false),
         'evaluations' => array('type' => self::T_TENANT, 'soft' => false),
