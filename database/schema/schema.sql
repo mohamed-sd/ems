@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 21:50:41
--- الجداول: 315 · المناظير: 5
+-- المصدر: equipation_manage · التوليد: 2026-08-01 22:20:29
+-- الجداول: 326 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -368,6 +368,49 @@ CREATE TABLE `asset_ownership_shares` (
   CONSTRAINT `fk_aos_financier` FOREIGN KEY (`financier_entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT,
   CONSTRAINT `ck_aos_pct` CHECK (((`percent` > 0) and (`percent` <= 100)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-01 §5: حصص الملكية عبر الزمن — Σ النشطة = 100.00 بالضبط (تحرسه الخدمة معاملةً) ولا تداخل لنفس (الأصل×الممول)';
+
+-- ── Table: assignment_audit ──
+CREATE TABLE `assignment_audit` (
+  `log_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `asg_id` int unsigned NOT NULL,
+  `action` enum('created','amended','suspended','transferred','ended','delegated') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `before_json` json DEFAULT NULL,
+  `after_json` json DEFAULT NULL,
+  `by_person_id` int NOT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`log_id`),
+  KEY `idx_audit_asg` (`asg_id`,`at`),
+  CONSTRAINT `fk_audit_asg` FOREIGN KEY (`asg_id`) REFERENCES `org_assignments` (`asg_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2⑧: سجلُّ التعديلات والاعتمادات — للإدراج فقط لا يُعدَّل ولا يُحذف';
+
+-- ── Table: assignment_capabilities ──
+CREATE TABLE `assignment_capabilities` (
+  `cap_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `asg_id` int unsigned NOT NULL,
+  `capability_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_limit_json` json DEFAULT NULL COMMENT 'المواقعُ والمشاريعُ المسموحة — السقفُ التشغيليُّ نطاقيّ',
+  `amount_cap` decimal(18,2) DEFAULT NULL COMMENT 'NULL للتشغيلي — والسقفُ الماليُّ نقدي',
+  `currency` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`cap_id`),
+  UNIQUE KEY `uq_cap_per_asg` (`asg_id`,`capability_code`),
+  CONSTRAINT `fk_cap_asg` FOREIGN KEY (`asg_id`) REFERENCES `org_assignments` (`asg_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: صلاحياتُ التكليف — السقفُ التشغيليُّ نطاقيٌّ والماليُّ نقدي (DEC-01 ①)';
+
+-- ── Table: assignment_reporting_lines ──
+CREATE TABLE `assignment_reporting_lines` (
+  `line_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `asg_id` int unsigned NOT NULL,
+  `line_type` enum('operational','functional') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reports_to_assignment_id` int unsigned NOT NULL,
+  `valid_from` date DEFAULT NULL,
+  `valid_to` date DEFAULT NULL,
+  PRIMARY KEY (`line_id`),
+  UNIQUE KEY `uq_line_per_asg` (`asg_id`,`line_type`),
+  KEY `idx_line_reports_to` (`reports_to_assignment_id`),
+  CONSTRAINT `fk_line_asg` FOREIGN KEY (`asg_id`) REFERENCES `org_assignments` (`asg_id`),
+  CONSTRAINT `fk_line_target` FOREIGN KEY (`reports_to_assignment_id`) REFERENCES `org_assignments` (`asg_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2⑦: التبعيةُ المزدوجة — وقيدُ «الموقعيُّ له خطّان» يحرسه AssignmentService بـ422';
 
 -- ── Table: attendance_days ──
 CREATE TABLE `attendance_days` (
@@ -4828,6 +4871,66 @@ CREATE TABLE `opportunities` (
   KEY `idx_opp_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- ── Table: org_assignment_types ──
+CREATE TABLE `org_assignment_types` (
+  `type_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` enum('central','site') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `default_capabilities_json` json DEFAULT NULL,
+  `requires_functional_line` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'الموقعيُّ كلُّه =1: خطّان تشغيليٌّ وفنيٌّ لا خطٌّ واحد (§2⑦)',
+  `is_unit_head` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'نوعٌ يجعل صاحبَه رأسَ وحدته — يغذي اشتقاق v_org_unit_heads',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`type_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: أنواعُ التكليف — يُضاف نوعٌ جديدٌ بصفٍّ لا بتعديل برمجة';
+
+-- ── Table: org_assignments ──
+CREATE TABLE `org_assignments` (
+  `asg_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `person_id` int NOT NULL COMMENT 'users.id — كنمط signing_authorities.person_id',
+  `assignment_type_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `org_unit_id` int unsigned NOT NULL,
+  `scope_type` enum('project','site','site_group') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_id` int NOT NULL COMMENT 'المشروعُ أو الموقعُ أو مجموعةُ المواقع — ولا تكليفَ مفتوحُ النطاق',
+  `valid_from` date NOT NULL,
+  `valid_to` date NOT NULL COMMENT 'إلزاميٌّ — لا تكليفَ مفتوحُ المدة، وتمديدُه قرارٌ جديد',
+  `decided_by_person_id` int NOT NULL COMMENT 'مصدرُ القرار: مديرُ التشغيل أو المديرُ التنفيذي',
+  `decision_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deputy_person_id` int DEFAULT NULL COMMENT 'النائبُ المعتمَد — ولا نيابةَ شفويةٌ ولا مفتوحةُ المدة',
+  `state` enum('active','suspended','ended') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `active_site_mgr_key` varchar(80) COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if(((`assignment_type_code` = _utf8mb4'site_movement_mgr') and (`state` = _utf8mb4'active')),concat(`company_id`,_utf8mb4':',`scope_type`,_utf8mb4':',`scope_id`),NULL)) STORED COMMENT 'حيلةُ الفريد المشروط: NULL لغير مدير الحركة النشط — فينتج «واحدٌ نشطٌ لكل موقع»',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`asg_id`),
+  UNIQUE KEY `uq_asg_natural` (`company_id`,`assignment_type_code`,`scope_type`,`scope_id`,`valid_from`),
+  UNIQUE KEY `uq_one_active_movement_mgr` (`active_site_mgr_key`),
+  KEY `idx_asg_person` (`person_id`,`state`),
+  KEY `idx_asg_scope` (`company_id`,`scope_type`,`scope_id`,`state`),
+  KEY `idx_asg_validity` (`state`,`valid_to`),
+  KEY `fk_asg_type` (`assignment_type_code`),
+  KEY `fk_asg_unit` (`org_unit_id`),
+  CONSTRAINT `fk_asg_type` FOREIGN KEY (`assignment_type_code`) REFERENCES `org_assignment_types` (`type_code`),
+  CONSTRAINT `fk_asg_unit` FOREIGN KEY (`org_unit_id`) REFERENCES `org_units` (`unit_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2/§7: التكليفُ سجلٌّ تنظيميٌّ بنطاقٍ ومدةٍ وسقفٍ ونائبٍ — ويسقط آليًّا بانتهائه';
+
+-- ── Table: org_units ──
+CREATE TABLE `org_units` (
+  `unit_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `unit_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'رمزٌ ثابتٌ للوحدة تُخاطَب به برمجيًّا',
+  `name_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `layer` enum('operational','parallel','oversight') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الطبقة: تشغيليةٌ تحت مدير التشغيل · موازيةٌ تحت التنفيذي · رقابية',
+  `parent_unit_id` int unsigned DEFAULT NULL,
+  `owner_doc` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الوثيقةُ الحاكمة للوحدة',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`unit_id`),
+  UNIQUE KEY `uq_org_units_scope` (`company_id`,`unit_code`),
+  KEY `idx_org_units_parent` (`parent_unit_id`),
+  CONSTRAINT `fk_org_units_parent` FOREIGN KEY (`parent_unit_id`) REFERENCES `org_units` (`unit_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: الوحداتُ التنظيمية — head_person_id مشتقٌّ من org_assignments (v_org_unit_heads) ولا يُكتب';
+
 -- ── Table: ownership_access_grants ──
 CREATE TABLE `ownership_access_grants` (
   `grant_id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -5054,6 +5157,79 @@ CREATE TABLE `payroll_time_inputs` (
   CONSTRAINT `ck_time_input_doc` CHECK ((char_length(trim(`doc_ref`)) > 0)),
   CONSTRAINT `ck_time_input_qty` CHECK ((`qty` > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: permit_approval_actions ──
+CREATE TABLE `permit_approval_actions` (
+  `act_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `req_id` int unsigned NOT NULL,
+  `rq_id` int unsigned NOT NULL,
+  `approver_person_id` int NOT NULL,
+  `auth_id` int unsigned DEFAULT NULL COMMENT 'مرجعُ التفويض signing_authorities — LEG-01 §4',
+  `decision` enum('approve','reject') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`act_id`),
+  UNIQUE KEY `uq_act_step` (`req_id`,`rq_id`),
+  KEY `fk_permit_act_rq` (`rq_id`),
+  CONSTRAINT `fk_permit_act_req` FOREIGN KEY (`req_id`) REFERENCES `permit_requests` (`req_id`),
+  CONSTRAINT `fk_permit_act_rq` FOREIGN KEY (`rq_id`) REFERENCES `permit_required_approvals` (`rq_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: قيدُ التسلسل «لا تُفتح خطوةٌ قبل اكتمال ما قبلها» يحرسه PermitGate بـ409';
+
+-- ── Table: permit_requests ──
+CREATE TABLE `permit_requests` (
+  `req_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `permit_type_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_ref` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'مرجعُ الموضوع: معدةٌ أو مادةٌ أو شخصٌ أو فني',
+  `site_id` int NOT NULL,
+  `requested_by` int NOT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `doc_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `state` enum('draft','pending','approved','rejected','expired','used') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `valid_until` datetime DEFAULT NULL COMMENT 'يُحسب من validity_hours عند اكتمال الموافقات — بساعة القاعدة',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`req_id`),
+  KEY `idx_permit_state_site` (`state`,`site_id`),
+  KEY `idx_permit_company` (`company_id`,`state`),
+  KEY `fk_preq_type` (`permit_type_code`),
+  CONSTRAINT `fk_preq_type` FOREIGN KEY (`permit_type_code`) REFERENCES `permit_types` (`permit_type_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: طلبُ الإذن — يمرّ بصندوق الاعتماد الجامع بندًا واحدًا لكل موافقٍ في دوره';
+
+-- ── Table: permit_required_approvals ──
+CREATE TABLE `permit_required_approvals` (
+  `rq_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `permit_type_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `seq_no` int NOT NULL,
+  `approver_role` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'المجالُ الوظيفيُّ الموافق — يحلُّه PermitGate من التكليفات النافذة',
+  `mandatory` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`rq_id`),
+  UNIQUE KEY `uq_rq_seq` (`permit_type_code`,`seq_no`),
+  CONSTRAINT `fk_permit_rq_type` FOREIGN KEY (`permit_type_code`) REFERENCES `permit_types` (`permit_type_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §5/§7: مصفوفةُ الموافقات المشتركة — يُقرأ منها من يوافق وبأي ترتيب';
+
+-- ── Table: permit_status_history ──
+CREATE TABLE `permit_status_history` (
+  `hist_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `req_id` int unsigned NOT NULL,
+  `from_state` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `to_state` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `by_person_id` int NOT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`hist_id`),
+  KEY `idx_hist_req` (`req_id`,`at`),
+  CONSTRAINT `fk_permit_hist_req` FOREIGN KEY (`req_id`) REFERENCES `permit_requests` (`req_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: تاريخُ حالات الإذن — للإدراج فقط';
+
+-- ── Table: permit_types ──
+CREATE TABLE `permit_types` (
+  `permit_type_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_kind` enum('equipment','material','person','technician') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `direction` enum('in','out','activate','deactivate') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `validity_hours` int NOT NULL DEFAULT '24',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`permit_type_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §5/§7: الأنواعُ التسعةُ صفوفٌ هنا لا كودًا';
 
 -- ── Table: policy_rules ──
 CREATE TABLE `policy_rules` (
@@ -7955,6 +8131,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `client_contracts` AS selec
 -- ── View: unified_fault_taxonomy ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS select distinct `fc`.`main_category_code` AS `code`,`fc`.`main_category_name` AS `name`,`fc`.`equipment_type` AS `equipment_type`,'failure_codes' AS `source` from `failure_codes` `fc` where ((`fc`.`main_category_code` is not null) and (`fc`.`main_category_code` <> ''));
+
+-- ── View: v_org_unit_heads ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_org_unit_heads` AS select `u`.`unit_id` AS `unit_id`,`u`.`company_id` AS `company_id`,`u`.`unit_code` AS `unit_code`,`u`.`name_ar` AS `name_ar`,`a`.`person_id` AS `head_person_id`,`a`.`asg_id` AS `head_assignment_id`,`a`.`scope_type` AS `head_scope_type`,`a`.`scope_id` AS `head_scope_id` from (`org_units` `u` left join `org_assignments` `a` on(((`a`.`org_unit_id` = `u`.`unit_id`) and (`a`.`state` = 'active') and (curdate() between `a`.`valid_from` and `a`.`valid_to`) and `a`.`assignment_type_code` in (select `t`.`type_code` from `org_assignment_types` `t` where (`t`.`is_unit_head` = 1)))));
 
 -- ── View: v_worker_billable_hours ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_worker_billable_hours` AS select `wp`.`id` AS `employee_id`,`t`.`date` AS `work_date`,cast(`t`.`operator` as unsigned) AS `operation_id`,coalesce(sum(`t`.`executed_hours`),0) AS `productive_hours`,coalesce(sum(`t`.`standby_hours`),0) AS `standby_hours`,coalesce(sum(`t`.`hr_fault`),0) AS `worker_downtime`,coalesce(sum(`t`.`maintenance_fault`),0) AS `maintenance_downtime`,greatest(((coalesce(sum(`t`.`executed_hours`),0) + coalesce(sum(`t`.`standby_hours`),0)) - coalesce(sum(`t`.`hr_fault`),0)),0) AS `billable_baseline` from (`employees` `wp` join `timesheet` `t` on((cast(`t`.`employee_id` as unsigned) = `wp`.`id`))) group by `wp`.`id`,`t`.`date`,cast(`t`.`operator` as unsigned);

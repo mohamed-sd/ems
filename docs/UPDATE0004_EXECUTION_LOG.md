@@ -15,3 +15,17 @@
 | D-07 | سجلُّ القرارات: `DEC-ORG-A` معكوسًا · `DEC-SEC-F/H` و`DEC-NAV-C/J` و`DEC-UAT-I` مغلقةً · `DEC-SEC-K` و`DEC-NAV-E` و`DEC-UAT-G` مفتوحةً بأحكام مضيّها · وقرارا النطاق | `docs/UPDATE0004_DECISIONS_ar.md` | — | — |
 
 **ملاحظة قياس:** الحزمةُ اكتملت تسعَ وثائقَ في `docs/sources/` (الخمسُ الأصلية + `DEC-01` + ملحق §12 + `PLAN-05` + طلب تجربة النظام) منسوخةً من Downloads بلا مساس بالأصول، ومستخرَجةً نصًّا بـ`docx2md.php`.
+
+## الموجة ① · ORG-01 البنية — 5/5
+
+**القياس قبل التنفيذ:** 320 جدولًا · صفر جدول `org_*`/`permit_*`/`assignment_*` · `positions`=0 · `signing_authorities` قائم بperson_id=users.id · نمط الفريد المشروط القائم: عمود مولَّد NULL + UNIQUE (`primary_flag`/`live_type_key`).
+
+| المهمة | ما فُعل | الملفات | الاختبار | اجتهاد |
+|---|---|---|---|---|
+| ORG-01 | الجداول الستة: `org_units` · `org_assignment_types` · `org_assignments` (المدة والنطاق إلزاميان · UQ طبيعي · **الفريد المشروط `active_site_mgr_key`** لمدير الحركة) · `assignment_capabilities` · `assignment_reporting_lines` · `assignment_audit` | `database/migrations/2026_08_02_org01_structure.sql` · `app/Core/TenantRegistry.php` | O-belt ①③④⑥ ✅ | J-09 |
+| ORG-02 | لا عمود `head_person_id` — منظر `v_org_unit_heads` يشتق الرأس من التكليف النافذ (نوع `is_unit_head` + حالة active + سريان التاريخ) | الهجرة نفسها | ⑤ يظهر ويسقط بالإنهاء ✅ | J-05 |
+| ORG-03 | بذر 13 نوعًا: 5 مركزية + 8 موقعية كلها `requires_functional_line=1` — وضابط البوابة صف (DEC-ORG-B) | الهجرة | عدّ 5+8 ✅ | — |
+| ORG-04 | بذر الوحدات الأربع عشرة (§1.1) بطبقاتها: 8 تشغيلية (البنات تحت «التشغيل» والموارد البشرية معها بالتبعية الإدارية) · 4 موازية · 2 رقابية — للشركة 4 | الهجرة | عدّ 14 ✅ | J-06 |
+| ORG-05 | جداول الأذونات الخمسة + بذر الأنواع التسعة + مصفوفة §5 = 24 صف موافقة مرتبة | الهجرة | عدّ 9 و24 وترتيب الحركة أولًا ✅ | J-07 · J-08 |
+
+**الحزام:** `tests/org_structure_test.php` = **28/28** ✅ · `dump-schema` حُدِّث (323 جدولًا + منظر).

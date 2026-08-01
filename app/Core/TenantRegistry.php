@@ -510,6 +510,28 @@ class TenantRegistry
         'approval_requests' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_steps' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_workflow_rules' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        // ── update0004 · ORG-01 §7 (هجرة 2026-08-02): الهيكلُ التشغيليُّ والتكليفات ──
+        // الوحداتُ والتكليفاتُ بياناتُ مستأجرٍ بcompany_id؛ والأنواعُ كتالوجٌ مشترك؛
+        // والأبناءُ (صلاحياتٌ وخطوطٌ وسجلٌّ) يُعزلون عبر أبيهم org_assignments.
+        'org_units' => array('type' => self::T_TENANT, 'soft' => false),
+        'org_assignment_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        'org_assignments' => array('type' => self::T_TENANT, 'soft' => false),
+        'assignment_capabilities' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑤
+        'assignment_reporting_lines' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑦: خطا التبعية
+        'assignment_audit' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑧: Insert-only
+        'v_org_unit_heads' => array('type' => self::T_TENANT, 'soft' => false), // ORG-02: الاشتقاق للقراءة
+        // ── update0004 · ORG-01 §5/§7: الأذونات المشتركة ──
+        'permit_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        'permit_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'permit_required_approvals' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permit_types', 'fk' => 'permit_type_code'), // مصفوفة §5 منمذَجة
+        'permit_approval_actions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permit_requests', 'fk' => 'req_id'),
+        'permit_status_history' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permit_requests', 'fk' => 'req_id'), // Insert-only
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */
