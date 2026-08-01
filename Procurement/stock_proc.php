@@ -42,6 +42,9 @@ include '../insidebar.php';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي — المخزون والاستلام (§2-③)
+    require_once __DIR__ . '/../includes/report_button.php';
+    ems_report_button(array('screen' => 'warehouse'));
     ?>
 
     <div class="success-message is-success" style="background:#eef6ff;color:#245">

@@ -640,6 +640,9 @@ include('../insidebar.php');
     foreach (ems_excel_header_actions('operations', 'حركات التشغيل', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي — المشغلون والقوى (§2-⑤)
+    require_once __DIR__ . '/../includes/report_button.php';
+    ems_report_button(array('screen' => 'operators', 'project_id' => $selected_project_id ?? null));
     ?>
 
     <div class="ems-content">

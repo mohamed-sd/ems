@@ -301,6 +301,9 @@ include('../insidebar.php');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي — المستخلص والفاتورة (§2-⑦)
+    require_once __DIR__ . '/../includes/report_button.php';
+    ems_report_button(array('screen' => 'claims', 'contract_id' => $contract_id ?? null));
     ?>
 
     <p class="text-muted" style="margin:4px 2px 12px">

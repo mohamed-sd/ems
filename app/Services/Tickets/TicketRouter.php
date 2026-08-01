@@ -174,6 +174,23 @@ class TicketRouter
                     $out['pending_conditional']++;
                 }
             }
+            // T9 · بلاغ السلامة/الطارئ: إيقاف فوري بنيوي + تصعيد مباشر للإدارة العامة
+            if ((string) $type['nature'] === 'emergency') {
+                $ws1 = $conn->query("SELECT ws_id FROM ticket_workstreams WHERE tk_id = {$tkId} AND mandatory = 1 LIMIT 1")->fetch_assoc();
+                if ($ws1) {
+                    $wsId1 = intval($ws1['ws_id']);
+                    $conn->query("INSERT INTO ticket_escalations (ws_id, level, triggered_by, to_person_id)
+                                  VALUES ({$wsId1}, 'exec', 'safety', NULL)");
+                    $conn->query("INSERT INTO ticket_effects (ws_id, effect_type, effect_ref, is_provisional)
+                                  VALUES ({$wsId1}, 'decision', 'SAFETY-STOP-TK{$tkId}', 0)");
+                }
+                $stmt2 = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
+                                         VALUES (?, 'all', ?, 'Tickets/tickets_list.php')");
+                $title = 'طارئ سلامة #' . $tkId . ': إيقاف فوري بنيوي وتصعيد مباشر للإدارة العامة — لا يُغلق إلا بموافقة السلامة';
+                $stmt2->bind_param('is', $co, $title);
+                $stmt2->execute();
+                $stmt2->close();
+            }
             $conn->commit();
             $out['ok'] = true; $out['code'] = 201; $out['tk_id'] = $tkId; $out['priority'] = $priority;
             $out['reason'] = 'أُنشئ ووُجّه آليًّا خلال ثانية — ' . count($out['routed']) . ' مسار فوري و'

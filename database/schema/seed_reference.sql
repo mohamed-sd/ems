@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 23:39:04
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:58:45
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -259,7 +259,10 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (217,'الهيكل التنظيمي','admin/org_structure.php',NULL,NULL,0,0,'fa fa-sitemap',302),
 (218,'أذونات المواقع','admin/org_permits.php',NULL,NULL,0,0,'fa fa-key',303),
 (222,'مركز حوكمة الصلاحيات','admin/sec_governance.php',NULL,NULL,0,0,'fa fa-shield-alt',310),
-(223,'معالج إعداد الموظف','admin/sec_employee_wizard.php',NULL,NULL,0,0,'fa fa-user-plus',311);
+(223,'معالج إعداد الموظف','admin/sec_employee_wizard.php',NULL,NULL,0,0,'fa fa-user-plus',311),
+(225,'لوحة مسارات البلاغات','Tickets/ticket_workstreams_board.php',NULL,NULL,0,0,'fa fa-code-branch',320),
+(226,'برج المراقبة','Tickets/watchtower.php',NULL,NULL,0,0,'fa fa-broadcast-tower',321),
+(227,'بلاغ سياقي جديد','Tickets/ticket_contextual_open.php',NULL,NULL,0,0,'fa fa-bullhorn',322);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -1285,7 +1288,34 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1312,6,217,1,0,0,0),
 (1313,6,218,1,1,1,0),
 (1314,15,222,1,1,1,0),
-(1315,15,223,1,1,1,0);
+(1315,15,223,1,1,1,0),
+(1317,24,225,1,1,1,0),
+(1318,24,226,1,1,1,0),
+(1319,24,227,1,1,1,0),
+(1320,1,227,1,1,0,0),
+(1321,2,227,1,1,0,0),
+(1322,3,227,1,1,0,0),
+(1323,4,227,1,1,0,0),
+(1324,5,227,1,1,0,0),
+(1325,6,227,1,1,0,0),
+(1326,12,227,1,1,0,0),
+(1327,13,227,1,1,0,0),
+(1328,15,227,1,1,0,0),
+(1329,16,227,1,1,0,0),
+(1330,17,227,1,1,0,0),
+(1331,23,227,1,1,0,0),
+(1332,25,227,1,1,0,0),
+(1333,26,227,1,1,0,0),
+(1334,7,227,1,1,0,0),
+(1335,8,227,1,1,0,0),
+(1336,10,227,1,1,0,0),
+(1337,11,227,1,1,0,0),
+(1338,14,227,1,1,0,0),
+(1339,18,227,1,1,0,0),
+(1340,19,227,1,1,0,0),
+(1341,20,227,1,1,0,0),
+(1342,21,227,1,1,0,0),
+(1343,22,227,1,1,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -1933,7 +1963,9 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (840,6,'REC',NULL,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',95,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
 (841,6,'APPR',NULL,218,'أذونات المواقع','admin/org_permits.php','fa fa-key',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
 (843,15,'GOV',NULL,222,'مركز حوكمة الصلاحيات','admin/sec_governance.php','fa fa-shield-alt',10,NULL,NULL,1,'2026-08-02 02:24:13','2026-08-02 02:24:13'),
-(844,15,'GOV',NULL,223,'معالج إعداد الموظف','admin/sec_employee_wizard.php','fa fa-user-plus',11,NULL,NULL,1,'2026-08-02 02:24:13','2026-08-02 02:24:13');
+(844,15,'GOV',NULL,223,'معالج إعداد الموظف','admin/sec_employee_wizard.php','fa fa-user-plus',11,NULL,NULL,1,'2026-08-02 02:24:13','2026-08-02 02:24:13'),
+(846,24,'DAILY',NULL,225,'لوحة المسارات المتوازية','Tickets/ticket_workstreams_board.php','fa fa-code-branch',15,NULL,NULL,1,'2026-08-02 02:56:36','2026-08-02 02:56:36'),
+(847,24,'REP',NULL,226,'برج المراقبة والمؤشرات','Tickets/watchtower.php','fa fa-broadcast-tower',15,NULL,NULL,1,'2026-08-02 02:56:36','2026-08-02 02:56:36');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

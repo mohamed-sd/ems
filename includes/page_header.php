@@ -151,4 +151,19 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
         } ?>
     </div>
     <?php } ?>
+
+    <?php
+    // TKT-15 (update0004 · TKT-01 §2-⑧): «أي شاشة في النظام» موضع فتح بلاغ —
+    // زر عام في الرأس الموحد يحمل مسار الشاشة، والشاشات التشغيلية تضيف فوقه
+    // زرها الغني بالسياق (المعدة والموقع). يُخفى بـ$header_no_report عند اللزوم.
+    if (empty($header_no_report) && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'ticket_contextual_open.php') {
+        $__rbScreen = trim(str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+        $__rbScreen = basename($__rbScreen) . '/' . basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        echo '<form method="post" action="../Tickets/ticket_contextual_open.php" style="display:inline" class="ems-report-btn-form">'
+            . '<input type="hidden" name="ctx_screen" value="' . htmlspecialchars($__rbScreen, ENT_QUOTES, 'UTF-8') . '">'
+            . '<button type="submit" class="head_back ems-head-circle" title="أبلغ عن مشكلة" '
+            . 'style="border:0;background:transparent;cursor:pointer;color:#c0392b">'
+            . '<i class="fas fa-bullhorn"></i></button></form>';
+    }
+    ?>
 </div>

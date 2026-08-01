@@ -1297,6 +1297,11 @@ include '../insidebar.php';
     );
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي الغني — التايم شيت والتشغيل اليومي (§2-①)
+    require_once __DIR__ . '/../includes/report_button.php';
+    require_once __DIR__ . '/../includes/permit_gate.php'; // لدالة موقع المشروع الافتراضي
+    ems_report_button(array('screen' => 'movement', 'project_id' => $selected_project_id ?? null,
+        'site_id' => !empty($selected_project_id) ? ems_default_site_of_project($conn, $company_id, $selected_project_id) : null));
     ?>
 
     <div class="ems-content">

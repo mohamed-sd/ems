@@ -469,6 +469,11 @@ function mnt_state_class($st) {
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
     include('../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي — أمر الصيانة (§2-②)
+    require_once __DIR__ . '/../includes/report_button.php';
+    ems_report_button(array('screen' => 'maintenance',
+        'entity_type' => 'mnt_order', 'entity_id' => $oid ?? null,
+        'equipment_id' => $order['equipment_id'] ?? null, 'project_id' => $order['project_id'] ?? null));
     ?>
 
     <!-- شريط مراحل الدورة (Stepper) -->
