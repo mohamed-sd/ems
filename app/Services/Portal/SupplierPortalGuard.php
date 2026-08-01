@@ -145,7 +145,38 @@ class SupplierPortalGuard
         $row = $st->get_result()->fetch_assoc();
         $st->close();
         $sid = ($row && $row['sid'] !== null) ? intval($row['sid']) : 0;
-        return $sid > 0 ? $sid : null;
+        if ($sid <= 0) { return null; }
+
+        // ── استيعابُ H-15 (الشريحة ②): إن كانت للحساب صفاتُ مشرفِ موردٍ في
+        //    طبقة الصفات فهي **الحكم**: يلزم صفةٌ نشطةٌ بنطاق هذا المورد
+        //    بعينه — وغيابُها fail-closed. والحسابُ الذي لم تُشتقّ صفاتُه
+        //    بعدُ يمرّ بالمسار القائم (توسيعٌ لا هدم — لا كسرَ للرائد).
+        $capCount = 0; $capMatch = 0;
+        if ($cst = @$conn->prepare(
+            "SELECT COUNT(*) n,
+                    SUM(CASE WHEN state='active' AND scope_type='supplier' AND scope_id=? THEN 1 ELSE 0 END) m
+               FROM user_capacities
+              WHERE account_id = ? AND capacity_type = 'supplier_supervisor'")) {
+            $cst->bind_param('ii', $sid, $uid);
+            $cst->execute();
+            if ($crow = $cst->get_result()->fetch_assoc()) {
+                $capCount = intval($crow['n']);
+                $capMatch = intval($crow['m']);
+            }
+            $cst->close();
+        }
+        if ($capCount > 0 && $capMatch === 0) {
+            // تسجيلٌ مباشرٌ — لا عبر log403 لأنها تستدعي supplierOf (عودٌ لانهائي)
+            require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+            ems_audit_change($conn, 'permissions', 'capacity_layer', 'denied_403', $sid,
+                array(),
+                array('kind' => 'supplier_capacity_mismatch_or_frozen',
+                      'attempted_supplier_id' => $sid, 'own_supplier_id' => $sid),
+                array('company_id' => isset($sessionUser['company_id']) ? intval($sessionUser['company_id']) : 0,
+                      'user_id' => $uid));
+            return null; // بلا صفةٍ نشطةٍ مطابقة = بلا مورد (fail-closed)
+        }
+        return $sid;
     }
 
     /**

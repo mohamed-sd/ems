@@ -92,6 +92,33 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
     // شاشة البلاغات — متاحة لكل المستخدمين عبر الشريط العلوي (نمط المراسلات:
     // بلا فحص صلاحية موديول؛ نطاق الرؤية يُفرَض داخل الشاشة نفسها).
     $ems_tb_tickets = function_exists('ems_url') ? ems_url('Tickets/tickets_list.php') : '/ems/Tickets/tickets_list.php';
+
+    // مبدّلُ المساحة (H-15 · USR-01 §2): الصفةُ الفعّالةُ تُعرض، والتبديلُ
+    // في شاشته (لا AJAX — action_guard يحجب غيرَ المسجَّل). العدُّ مكاشٌ في
+    // الجلسة كالدور، ويظهر المبدّلُ لمن له أكثرُ من صفةٍ نشطة.
+    $ems_tb_capLabel = (isset($_SESSION['active_capacity']['label']))
+                     ? (string) $_SESSION['active_capacity']['label'] : '';
+    $ems_tb_capCount = 0;
+    if ($ems_tb_userId > 0) {
+        if (isset($_SESSION['ems_topbar_caps']['uid'])
+            && (int) $_SESSION['ems_topbar_caps']['uid'] === $ems_tb_userId) {
+            $ems_tb_capCount = (int) $_SESSION['ems_topbar_caps']['n'];
+        } elseif (isset($conn) && $conn) {
+            if ($ems_tb_cstmt = @$conn->prepare(
+                "SELECT COUNT(*) n FROM user_capacities WHERE account_id = ? AND state = 'active'")) {
+                $ems_tb_cstmt->bind_param('i', $ems_tb_userId);
+                $ems_tb_cstmt->execute();
+                if ($ems_tb_cres = $ems_tb_cstmt->get_result()) {
+                    if ($ems_tb_crow = $ems_tb_cres->fetch_assoc()) {
+                        $ems_tb_capCount = (int) $ems_tb_crow['n'];
+                    }
+                }
+                $ems_tb_cstmt->close();
+            }
+            $_SESSION['ems_topbar_caps'] = array('uid' => $ems_tb_userId, 'n' => $ems_tb_capCount);
+        }
+    }
+    $ems_tb_capsUrl = function_exists('ems_url') ? ems_url('user_capacities.php') : '/ems/user_capacities.php';
     ?>
     <header class="<?php echo $ems_tb_barClass; ?>">
         <div class="ems-topbar-logo">
@@ -102,6 +129,13 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
             <span class="ems-topbar-pill" title="الإدارة">
                 <i class="fas fa-user-shield"></i>الإدارة: <?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>
             </span>
+            <?php if ($ems_tb_capLabel !== '' || $ems_tb_capCount > 1): ?>
+                <a class="ems-topbar-pill" href="<?php echo htmlspecialchars($ems_tb_capsUrl, ENT_QUOTES, 'UTF-8'); ?>"
+                   title="مبدّل المساحة — صفاتك ونطاقاتك" style="text-decoration:none">
+                    <i class="fas fa-people-arrows"></i>الصفة:
+                    <?php echo htmlspecialchars($ems_tb_capLabel !== '' ? $ems_tb_capLabel : ('متعددة (' . $ems_tb_capCount . ') ▾'), ENT_QUOTES, 'UTF-8'); ?>
+                </a>
+            <?php endif; ?>
             <?php if ($ems_tb_userName !== ''): ?>
                 <span class="ems-topbar-pill" title="المسمى الوظيفي">
                     <i class="fas fa-user-circle"></i>المسمى الوظيفي: <?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?>
