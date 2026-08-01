@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 23:17:37
--- الجداول: 345 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:33:53
+-- الجداول: 346 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -5226,6 +5226,25 @@ CREATE TABLE `payroll_time_inputs` (
   CONSTRAINT `ck_time_input_doc` CHECK ((char_length(trim(`doc_ref`)) > 0)),
   CONSTRAINT `ck_time_input_qty` CHECK ((`qty` > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: perm_shadow_diffs ──
+CREATE TABLE `perm_shadow_diffs` (
+  `diff_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `module_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `legacy_decision` tinyint(1) NOT NULL,
+  `derived_decision` tinyint(1) NOT NULL,
+  `detail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resolved` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'حُقق وأُصلح سببه (قالب أو تحويل)',
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`diff_id`),
+  KEY `idx_psd_at` (`at`),
+  KEY `idx_psd_user` (`company_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §13 المرحلة ③: كل فرق سماح/منع/نطاق/سقف صف — والحد صفر لا نسبة';
 
 -- ── Table: permission_approval_steps ──
 CREATE TABLE `permission_approval_steps` (

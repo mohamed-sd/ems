@@ -1,29 +1,29 @@
 {
-    "generated_at": "2026-08-01 23:17:37",
+    "generated_at": "2026-08-01 23:33:53",
     "source_db": "equipation_manage",
     "server_version": "8.4.7",
     "files": {
         "schema.sql": {
-            "sha1": "e043663d395429e5a046bb71f5cf6f9d187aaf23",
-            "bytes": 612398
+            "sha1": "a8883c68d92fd7ca07c21feba38f54e94f2d1e47",
+            "bytes": 613454
         },
         "seed_reference.sql": {
-            "sha1": "16ccb78d5e711f47288353b4693ab16ceb6121c0",
-            "bytes": 241624
+            "sha1": "e6471c8c2afb765a82381849a80a75f2fc074962",
+            "bytes": 242236
         }
     },
     "schema": {
-        "tables": 345,
+        "tables": 346,
         "views": 6
     },
     "seed": {
-        "rows": 2354,
+        "rows": 2360,
         "tables": {
             "roles": 25,
-            "modules": 212,
-            "role_permissions": 1015,
+            "modules": 214,
+            "role_permissions": 1017,
             "link_groups": 16,
-            "nav_items": 619,
+            "nav_items": 621,
             "equipments_types": 3,
             "failure_codes": 402,
             "fin_chart_of_accounts": 16,

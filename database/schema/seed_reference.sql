@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 23:17:37
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:33:53
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -257,7 +257,9 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (215,'لوحة مدير التشغيل','admin/ops_manager_board.php',NULL,NULL,0,0,'fa fa-tachometer-alt',300),
 (216,'التكليفات التنظيمية','admin/org_assignments.php',NULL,NULL,0,0,'fa fa-id-badge',301),
 (217,'الهيكل التنظيمي','admin/org_structure.php',NULL,NULL,0,0,'fa fa-sitemap',302),
-(218,'أذونات المواقع','admin/org_permits.php',NULL,NULL,0,0,'fa fa-key',303);
+(218,'أذونات المواقع','admin/org_permits.php',NULL,NULL,0,0,'fa fa-key',303),
+(222,'مركز حوكمة الصلاحيات','admin/sec_governance.php',NULL,NULL,0,0,'fa fa-shield-alt',310),
+(223,'معالج إعداد الموظف','admin/sec_employee_wizard.php',NULL,NULL,0,0,'fa fa-user-plus',311);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -1281,7 +1283,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1307,1,218,1,1,1,0),
 (1311,6,216,1,0,0,0),
 (1312,6,217,1,0,0,0),
-(1313,6,218,1,1,1,0);
+(1313,6,218,1,1,1,0),
+(1314,15,222,1,1,1,0),
+(1315,15,223,1,1,1,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -1927,7 +1931,9 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (835,1,'SET',NULL,217,'الهيكل التنظيمي','admin/org_structure.php','fa fa-sitemap',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
 (836,1,'APPR',NULL,218,'أذونات المواقع','admin/org_permits.php','fa fa-key',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
 (840,6,'REC',NULL,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',95,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
-(841,6,'APPR',NULL,218,'أذونات المواقع','admin/org_permits.php','fa fa-key',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38');
+(841,6,'APPR',NULL,218,'أذونات المواقع','admin/org_permits.php','fa fa-key',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
+(843,15,'GOV',NULL,222,'مركز حوكمة الصلاحيات','admin/sec_governance.php','fa fa-shield-alt',10,NULL,NULL,1,'2026-08-02 02:24:13','2026-08-02 02:24:13'),
+(844,15,'GOV',NULL,223,'معالج إعداد الموظف','admin/sec_employee_wizard.php','fa fa-user-plus',11,NULL,NULL,1,'2026-08-02 02:24:13','2026-08-02 02:24:13');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

@@ -560,6 +560,7 @@ class TenantRegistry
             'parent' => 'permission_review_cycles', 'fk' => 'cycle_id'), // Insert-only
         'founding_mode' => array('type' => self::T_GLOBAL, 'soft' => false),
         // sensitive_read_log مسجَّل أعلاه سلفًا (T_RESTRICTED · LEG-01 §9) — والجدول أُنشئ في هجرة 2026-08-02
+        'perm_shadow_diffs' => array('type' => self::T_TENANT, 'soft' => false), // SEC-29: ميزان صفر الفرق 14 يومًا
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */

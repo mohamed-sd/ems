@@ -209,6 +209,30 @@ class PositionService
         return $out;
     }
 
+    /**
+     * التعليق الأمني الفوري (§8-⑨ · S21): «مدير الصلاحيات يعلّق الوصول فورًا
+     * بلا انتظار» — تعليق المراكز وسحب الاستثناءات وإعادة البناء في اللحظة؛
+     * والإلغاء الوظيفي الدائم يُستكمل بموافقة مدير الإدارة والموارد البشرية.
+     */
+    public static function securitySuspend(\mysqli $conn, $personId, $companyId, $byPersonId, $reason = 'تعليق أمني')
+    {
+        $personId = intval($personId);
+        $companyId = intval($companyId);
+        $conn->query("UPDATE person_positions SET state = 'suspended'
+                      WHERE person_id = {$personId} AND company_id = {$companyId} AND state = 'active'");
+        $positions = $conn->affected_rows;
+        $conn->query("UPDATE permission_exceptions SET state = 'revoked'
+                      WHERE person_id = {$personId} AND company_id = {$companyId} AND state = 'active'");
+        $exceptions = $conn->affected_rows;
+        self::audit($conn, $companyId, $personId, 'suspended', 'security_suspend',
+            json_encode(array('positions' => $positions, 'exceptions' => $exceptions)),
+            $reason . ' — فوري بلا انتظار، والإلغاء الدائم بموافقتين', intval($byPersonId));
+        require_once __DIR__ . '/PermissionResolver.php';
+        PermissionResolver::rebuild($conn, $personId, $companyId);
+        return array('ok' => true, 'code' => 200, 'positions' => $positions, 'exceptions' => $exceptions,
+            'reason' => 'عُلِّق فورًا (' . $positions . ' مركزًا · ' . $exceptions . ' استثناءً) — والمشتق أُعيد بناؤه');
+    }
+
     /** سطر سجل تغيير الصلاحيات المستقل (Insert-only). */
     public static function audit(\mysqli $conn, $co, $personId, $eventType, $ref, $afterJson, $reason, $by)
     {
