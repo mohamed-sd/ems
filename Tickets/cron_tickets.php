@@ -104,12 +104,20 @@ foreach (array_keys($company_ids) as $cid) {
             }
             if ($hit === null) { continue; }
 
+            // E-14 (UX-07 §5.2): **منعُ تكرار المستوى بنيويًّا** — العمودُ
+            // `escalation_level` هو الحكم: مستوًى ≤ المسجَّلِ لا يُشعَر به
+            // ثانيةً أبدًا (كان المفتاحُ يوميًّا فيتكرر الإشعارُ نفسُه غدًا).
+            if (intval($hit['level_no']) <= intval($t['escalation_level'] ?? 0)) { continue; }
+
             $target = tkt_escalation_target_role($hit['escalate_to_role'], intval($t['owner_role_id']));
-            $dedupe = 'escalation:' . $tid . ':L' . intval($hit['level_no']) . ':' . $today;
+            $dedupe = 'escalation:' . $tid . ':L' . intval($hit['level_no']);
             if (tkt_notify('escalation', 'تصعيد المستوى ' . intval($hit['level_no']) . ' — التذكرة ' . $t['ticket_no'],
                     'تجاوزت موعد الإنجاز بـ' . (int) floor($late_h) . ' ساعة', $tid, $target,
                     'ticket_form.php?id=' . $tid, $dedupe)) {
                 $n_escal++;
+                $cycleGate->update('tickets',
+                    array('escalation_level' => intval($hit['level_no'])),
+                    array('id' => $tid));
                 tkt_log_event($tid, 'escalation',
                     'تصعيد تلقائي (مستوى ' . intval($hit['level_no']) . ') إلى: ' . $hit['escalate_to_role']
                     . ' — تأخّر ' . (int) floor($late_h) . ' ساعة',

@@ -177,6 +177,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
     }
 }
 
+// ── M-34 (UX-04 §5.2): تحويلُ ملاحظة الفحص **بلاغًا** بنقرة (NoteConverted) ──
+// كان نصفُ المسار (تفتيش→أمر) منفَّذًا ونصفُه (تفتيش→بلاغ) مفقودًا — وهذا سدُّه.
+// عاطلٌ: البندُ المحوَّلُ سلفًا لا يتحوّل ثانيةً (`converted_ticket_id` هو الحكم).
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'convert_note_ticket') {
+    if (!$can_add) { header("Location: inspections.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $lid = intval($_POST['line_id'] ?? 0);
+    $line = ems_tenant_db()->selectOne('mnt_inspection_line', array('where' => array('id' => $lid)));
+    if (!$line) { header("Location: inspections.php?msg=البند+غير+موجود+❌"); exit(); }
+    if (!empty($line['converted_ticket_id'])) {
+        header("Location: inspections.php?open=" . intval($line['inspection_id'])
+             . "&msg=" . rawurlencode('الملاحظةُ محوَّلةٌ سلفًا إلى البلاغ #' . $line['converted_ticket_id'] . ' — لا تحويلَ مرتين ❌'));
+        exit();
+    }
+    $insp = ems_tenant_db()->selectOne('mnt_inspection', array('where' => array('id' => intval($line['inspection_id']))));
+    require_once __DIR__ . '/../Tickets/tkt_helpers.php';
+    // نوعُ البلاغ: أولُ نوعٍ فعّالٍ وجهتُه الصيانة (13) وإلا أولُ فعّال — يُعلَن في متن البلاغ
+    $tt = $conn->query("SELECT id, owner_role_id, default_nature FROM ticket_types
+                         WHERE active=1 ORDER BY (owner_role_id=13) DESC, id ASC LIMIT 1");
+    $type = $tt ? $tt->fetch_assoc() : null;
+    if (!$type) { header("Location: inspections.php?msg=" . rawurlencode('لا نوعَ بلاغٍ فعّالًا — أنشئه أولًا ❌')); exit(); }
+    $complaint = 'ملاحظةُ تفتيشٍ محوَّلة (NoteConverted): ' . strval($line['component'] ?? '')
+               . ' — ' . strval($line['note'] ?? '') . ' · التوصية: ' . strval($line['recommendation'] ?? '');
+    $new_tid = 0;
+    ems_tenant_db()->runInTransaction(function ($g) use ($conn, $company_id, $type, $line, $insp,
+                                                          $complaint, $current_user_id, $current_role, &$new_tid) {
+        $tno = tkt_next_ticket_no($conn, $company_id);
+        $new_tid = (int) $g->insert('tickets', array(
+            'ticket_no' => $tno, 'ticket_type_id' => intval($type['id']),
+            'stage' => 'routed', 'ticket_nature' => strval($type['default_nature']),
+            'call_date' => date('Y-m-d'), 'call_time' => date('H:i'),
+            'reporting_person' => 'تفتيش #' . intval($line['inspection_id']),
+            'reporter_user_id' => intval($current_user_id),
+            'equipment_id' => $insp && !empty($insp['equipment_id']) ? intval($insp['equipment_id']) : null,
+            'complaint' => $complaint,
+            'owner_role_id' => intval($type['owner_role_id']),
+            'linked_ref_table' => 'mnt_inspection_line', 'linked_ref_id' => intval($line['id']),
+            'created_by' => intval($current_user_id),
+        ));
+        $g->insert('ticket_events', array(
+            'ticket_id' => $new_tid, 'event_type' => 'system',
+            'actor_user_id' => intval($current_user_id), 'actor_role_id' => intval($current_role),
+            'body' => 'NoteConverted — بلاغٌ مولَّدٌ من ملاحظة تفتيش (M-34)', 'new_value' => 'routed'));
+        $g->update('mnt_inspection_line', array('converted_ticket_id' => $new_tid),
+            array('id' => intval($line['id'])));
+    }, 'convert inspection note to ticket');
+    header("Location: inspections.php?open=" . intval($line['inspection_id'])
+         . "&msg=" . rawurlencode('حُوّلت الملاحظةُ بلاغًا #' . $new_tid . ' — والخيطُ موصولٌ بالاتجاهين ✅'));
+    exit();
+}
+
 // ── إنشاء تفتيش جديد + نسخ بنود القالب ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_inspection') {
     if (!$can_add) { header("Location: inspections.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
@@ -244,6 +294,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                 'measured_value'  => isset($ld['measured_value']) ? trim($ld['measured_value']) : '',
                 'note'            => isset($ld['note']) ? trim($ld['note']) : '',
                 'recommendation'  => isset($ld['recommendation']) ? trim($ld['recommendation']) : '',
+                'photo_ref'       => isset($ld['photo_ref']) && trim($ld['photo_ref']) !== ''
+                                   ? trim($ld['photo_ref']) : null, // M-34
             ), array('id' => $lid, 'inspection_id' => $iid));
         }
     }
@@ -669,7 +721,19 @@ function mnt_seg_kind($c) {
                                         <input type="text" class="mnt-d-measured" name="line[<?php echo intval($l['id']); ?>][measured_value]" value="<?php echo htmlspecialchars((string) ($l['measured_value'] ?? '')); ?>" placeholder="<?php echo $ref !== '' ? 'القيمة المقاسة (الحد: ' . htmlspecialchars($ref, ENT_QUOTES) . ')' : 'القيمة المقاسة'; ?>">
                                         <input type="text" name="line[<?php echo intval($l['id']); ?>][note]" value="<?php echo htmlspecialchars((string) ($l['note'] ?? '')); ?>" placeholder="ملاحظة">
                                         <input type="text" name="line[<?php echo intval($l['id']); ?>][recommendation]" value="<?php echo htmlspecialchars((string) ($l['recommendation'] ?? '')); ?>" placeholder="توصية">
+                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][photo_ref]" value="<?php echo htmlspecialchars((string) ($l['photo_ref'] ?? '')); ?>" placeholder="مرجع الصورة (M-34)">
                                     </div>
+                                    <?php // M-34: تحويلُ الملاحظة بلاغًا بنقرة — والمحوَّلُ يعرض بلاغَه (الخيطُ بالاتجاهين)
+                                    if (!empty($l['converted_ticket_id'])): ?>
+                                        <a class="badge badge-success" href="../Tickets/ticket_form.php?id=<?php echo intval($l['converted_ticket_id']); ?>"
+                                           title="بلاغُ هذه الملاحظة"><i class="fas fa-tower-observation"></i> بلاغ #<?php echo intval($l['converted_ticket_id']); ?></a>
+                                    <?php elseif (trim((string)($l['note'] ?? '')) !== '' || trim((string)($l['recommendation'] ?? '')) !== ''): ?>
+                                        <form method="post" style="display:inline" onsubmit="return confirm('تحويلُ هذه الملاحظة بلاغًا؟')">
+                                            <input type="hidden" name="action" value="convert_note_ticket">
+                                            <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
+                                            <button type="submit" class="action-btn view" title="حوّلها بلاغًا (NoteConverted)"><i class="fas fa-tower-observation"></i></button>
+                                        </form>
+                                    <?php endif; ?>
                                 <?php else:
                                     $det = array_filter(array((string) ($l['measured_value'] ?? ''), (string) ($l['note'] ?? ''), (string) ($l['recommendation'] ?? '')));
                                     echo htmlspecialchars($det ? implode(' — ', $det) : '');

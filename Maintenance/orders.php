@@ -41,8 +41,9 @@ if (!$can_view) {
     exit();
 }
 
-$states       = array('بلاغ', 'تنفيذ', 'فحص', 'إغلاق', 'ملغى');
-$active_states = array('بلاغ', 'تنفيذ', 'فحص');
+// M-32 (UX-04 §5.1): «قطعة منتظرة» حالةٌ مسمّاةٌ بعدّاد أيامها — لا ملاحظةً حرة
+$states       = array('بلاغ', 'تنفيذ', 'قطعة منتظرة', 'فحص', 'إغلاق', 'ملغى');
+$active_states = array('بلاغ', 'تنفيذ', 'قطعة منتظرة', 'فحص');
 $sources      = array('بلاغ', 'وقائي', 'تفتيش');
 $cost_parties = array('داخلي', 'خارجي');
 $priorities   = array('عادية', 'متوسطة', 'عالية', 'عاجلة');
@@ -245,6 +246,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         'root_cause_id' => $root_cause_id, 'actions_taken' => $actions_taken, 'work_start' => $work_start,
         'work_end' => $work_end, 'downtime_hours' => $downtime, 'external_cost' => $external_cost,
         'inspection_result' => $inspection_result, 'state' => $effective_state);
+    // M-32: دخولُ «قطعة منتظرة» يختم تاريخَه (العدّادُ يُحسب منه) — والخروجُ يمسحه
+    if ($effective_state === 'قطعة منتظرة' && $order['state'] !== 'قطعة منتظرة') {
+        $ord_data['waiting_part_since'] = date('Y-m-d');
+    } elseif ($effective_state !== 'قطعة منتظرة' && $order['state'] === 'قطعة منتظرة') {
+        $ord_data['waiting_part_since'] = null;
+    }
     if ($closing_now) { $ord_data['closed_at'] = date('Y-m-d H:i:s'); $ord_data['closed_by'] = intval($current_user_id); }
     ems_tenant_db()->update('mnt_order', $ord_data, array('id' => $oid));
 
@@ -746,6 +753,29 @@ function mnt_state_class($st) {
             <span class="mnt-bell-badge" id="openOrdersBadge" style="display:none">0</span>
         </span>
     </div>
+    <?php
+    // M-32 (UX-04 §8.2): بطاقةُ «قطعةٌ منتظرة» بعدّاد أيامها — كانت معطَّلةً
+    // لغياب مصدرها؛ ومصدرُها الآن الحالةُ المسمّاة وتاريخُها
+    $wp_rows = $list_gate_wp = null;
+    $wp_rows = array();
+    $wq = $conn->query("SELECT o.id, o.code, o.waiting_part_since,
+                               DATEDIFF(CURDATE(), o.waiting_part_since) days_waiting,
+                               e.name eq_name
+                          FROM mnt_order o LEFT JOIN equipments e ON e.id = o.equipment_id
+                         WHERE o.company_id = " . intval($company_id) . "
+                           AND o.state = 'قطعة منتظرة' AND COALESCE(o.is_deleted,0)=0
+                         ORDER BY o.waiting_part_since ASC");
+    while ($wq && ($wx = $wq->fetch_assoc())) { $wp_rows[] = $wx; }
+    if ($wp_rows): ?>
+    <div class="card" style="border-inline-start:4px solid #a15c00"><div class="card-body">
+        <strong><i class="fa fa-gears"></i> قطعٌ منتظرة (<?php echo count($wp_rows); ?>)</strong> —
+        <?php foreach ($wp_rows as $w): ?>
+            <a href="orders.php?id=<?php echo intval($w['id']); ?>" class="badge badge-warning"
+               style="margin:0 3px"><?php echo htmlspecialchars($w['code'] . ' · ' . ($w['eq_name'] ?: ''))
+                . ' — ' . intval($w['days_waiting']) . ' يومًا'; ?></a>
+        <?php endforeach; ?>
+    </div></div>
+    <?php endif; ?>
     <?php if ($can_add): ?>
     <!-- فورم إنشاء أمر (نمط العملاء/المشاريع: يُفتح بزر «أمر صيانة جديد»، ولا يُحفظ شيء إلا عند الإرسال) -->
     <form method="post" action="" class="allforms" id="orderCreateForm">
@@ -802,7 +832,7 @@ function mnt_state_class($st) {
             <table id="ordersTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الإجراءات</th><th>المرجع</th><th>المعدة</th><th>المصدر</th><th>نوع الصيانة</th>
-                    <th>جهة التكلفة</th><th>الإجمالي</th><th>الحالة</th>
+                    <th>جهة التكلفة</th><th>الإجمالي</th><th>الحالة</th><th>بلاغه</th>
                 </tr></thead>
                 <tbody>
                     <?php
@@ -812,10 +842,12 @@ function mnt_state_class($st) {
                     $order_rows = $list_gate->scopedQuery(
                         array('scope' => array('o' => 'mnt_order'),
                               'enrich' => array('e' => 'equipments', 'p' => 'project', 's' => 'suppliers',
-                                                'ut' => 'users', 'us' => 'users', 'lk' => 'mnt_lookup')),
+                                                'ut' => 'users', 'us' => 'users', 'lk' => 'mnt_lookup',
+                                                'tk' => 'tickets')),
                         "SELECT o.*, e.name AS eq_name, e.code AS eq_code, p.name AS proj_name,
                                 s.name AS vendor_name, ut.name AS tech_name, us.name AS sup_name,
-                                lk.name AS root_name, fc.full_code, fc.failure_detail
+                                lk.name AS root_name, fc.full_code, fc.failure_detail,
+                                tk.id AS src_ticket_id, tk.ticket_no AS src_ticket_no
                            FROM mnt_order o
                            LEFT JOIN equipments e ON e.id = o.equipment_id
                            LEFT JOIN project p ON p.id = o.project_id
@@ -824,6 +856,8 @@ function mnt_state_class($st) {
                            LEFT JOIN users us ON us.id = o.supervisor_id
                            LEFT JOIN mnt_lookup lk ON lk.id = o.root_cause_id
                            LEFT JOIN failure_codes fc ON fc.id = o.failure_code_id
+                           LEFT JOIN tickets tk ON tk.linked_ref_table = 'mnt_order'
+                                               AND tk.linked_ref_id = o.id
                           WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0
                           ORDER BY o.id DESC");
                     $order_ids = array();
@@ -875,6 +909,15 @@ function mnt_state_class($st) {
                         echo "<td>" . htmlspecialchars((string) ($row['cost_party'] ?? '-')) . "</td>";
                         echo "<td>" . number_format((float) $row['total_cost'], 2) . "</td>";
                         echo "<td><span class='" . mnt_state_class($st) . "'>" . htmlspecialchars($st) . "</span></td>";
+                        // E-12 (UX-04 §2): «الخيطُ بالاتجاهين» — رابطُ بلاغ الأمر
+                        // بعينه لا رابطٌ عامٌّ لقائمة البلاغات
+                        if (!empty($row['src_ticket_id'])) {
+                            echo "<td><a href='../Tickets/ticket_form.php?id=" . intval($row['src_ticket_id'])
+                               . "' title='بلاغُ هذا الأمر بعينه'><i class='fas fa-tower-observation'></i> "
+                               . htmlspecialchars((string) $row['src_ticket_no']) . "</a></td>";
+                        } else {
+                            echo "<td><span class='text-muted' title='أمرٌ بلا بلاغ مصدر'>—</span></td>";
+                        }
                         echo "</tr>";
                     }
                     ?>

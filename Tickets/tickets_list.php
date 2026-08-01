@@ -46,6 +46,20 @@ if (!$is_super_admin && !$is_tickets_mgr) {
     $scope_sql = " AND (t.owner_role_id IN ($in) OR t.reporter_user_id = $uid OR t.created_by = $uid)";
 }
 
+// E-13 (UX-07 §5.1): **التبويباتُ الأربعة بدل الفلاتر المنسدلة وحدَها** —
+// وتبويبُ «تنتظر اعتمادًا» (done) كان غائبًا؛ و«بلاغاتي» هو M-37 (UX-07 §4):
+// المرشَّحُ على المستلم لكل الأدوار لا لدور 24 وحده.
+$TABS = array(
+    'open'     => array('مفتوحة', " AND t.stage NOT IN ('done','closed','cancelled')"),
+    'approval' => array('تنتظر اعتمادًا', " AND t.stage = 'done'"),
+    'mine'     => array('بلاغاتي', ' AND (t.reporter_user_id = ' . intval($current_user_id)
+                       . ' OR t.assigned_user_id = ' . intval($current_user_id)
+                       . ' OR t.created_by = ' . intval($current_user_id) . ')'),
+    'closed'   => array('مغلقة', " AND t.stage IN ('closed','cancelled')"),
+);
+$tab = isset($_GET['tab']) && isset($TABS[$_GET['tab']]) ? strval($_GET['tab']) : 'open';
+$scope_sql .= $TABS[$tab][1];
+
 $page_title = 'إيكوبيشن | البلاغات';
 include '../inheader.php';
 include '../insidebar.php';
@@ -106,6 +120,27 @@ include '../insidebar.php';
             </a>
         <?php endforeach; ?>
     </div>
+
+    <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">
+        <?php // E-13: التبويباتُ الأربعة — كلٌّ بعدّاده الحي
+        foreach ($TABS as $tk => $tv):
+            $cnt_row = tkt_gate($is_super_admin)->scopedQuery(
+                array('scope' => array('t' => 'tickets')),
+                "SELECT COUNT(*) n FROM tickets t WHERE {TENANT_SCOPE}"
+                . ($is_super_admin || $is_tickets_mgr ? '' :
+                   " AND (t.owner_role_id IN (" . implode(',', array_map('intval', tkt_visible_owner_role_ids($current_role_id)))
+                   . ") OR t.reporter_user_id = " . intval($current_user_id)
+                   . " OR t.created_by = " . intval($current_user_id) . ")")
+                . $tv[1]);
+            $cnt = $cnt_row ? intval($cnt_row[0]['n']) : 0;
+        ?>
+            <a href="?tab=<?php echo $tk; ?>" class="btn btn-sm"
+               style="border:1px solid #ddd;border-radius:8px;padding:6px 14px;text-decoration:none;<?php
+                   echo $tk === $tab ? 'background:#e2b93b;font-weight:800' : ''; ?>">
+                <?php echo htmlspecialchars($tv[0]); ?>
+                <span class="badge badge-secondary"><?php echo $cnt; ?></span></a>
+        <?php endforeach; ?>
+    </div></div>
 
     <div class="filter">
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>

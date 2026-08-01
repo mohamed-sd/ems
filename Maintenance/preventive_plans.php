@@ -180,9 +180,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
     if (!$plan) { header("Location: preventive_plans.php?msg=الخطة+غير+موجودة+❌"); exit(); }
     $code = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
     $eq = $plan['equipment_id'] !== null ? intval($plan['equipment_id']) : null;
+    // M-36 (SPEC-04 بطاقة 3): مفتاحُ (معدة × خدمة × دورة) يمنع توليدَ الدورة
+    // مرتين — الدورةُ = استحقاقُها القائم، والفريدُ في القاعدة هو الحكم.
+    $cycle_key = 'plan:' . $pid . ':eq:' . intval($eq ?: 0)
+               . ':due:' . strval($plan['next_due_date'] ?: date('Y-m-d'));
+    $dup = $conn->query("SELECT id FROM mnt_order WHERE pm_cycle_key = '"
+         . $conn->real_escape_string($cycle_key) . "' LIMIT 1");
+    if ($dup && ($dx = $dup->fetch_assoc())) {
+        header("Location: orders.php?id=" . intval($dx['id'])
+             . "&msg=" . rawurlencode('هذه الدورةُ ولّدت أمرَها سلفًا #' . $dx['id'] . ' — لا توليدَ مرتين (M-36) ❌'));
+        exit();
+    }
     $new_id = ems_tenant_db()->insert('mnt_order', array(
-        'code' => $code, 'plan_id' => $pid, 'equipment_id' => $eq,
+        'code' => $code, 'plan_id' => $pid, 'equipment_id' => $eq, 'pm_cycle_key' => $cycle_key,
         'source' => 'وقائي', 'maint_type' => 'صيانة وقائية', 'state' => 'بلاغ', 'created_by' => $current_user_id));
+    if (!$new_id) { // الفريدُ حكمٌ عند التزاحم — mysqli لا يرمي (گوتشا config)
+        header("Location: preventive_plans.php?msg=" . rawurlencode('رفض الفريدُ التوليدَ — الدورةُ مولَّدةٌ سلفًا (M-36) ❌'));
+        exit();
+    }
     header("Location: orders.php?id=" . intval($new_id) . "&msg=تم+توليد+أمر+وقائي+من+الخطة+✅"); exit();
 }
 
