@@ -81,6 +81,29 @@ class ApprovalsInboxService
         $boxes[] = array('key' => 'periods', 'title' => 'إقفال الفترات',
             'owner' => 'Finance/periods_fin.php', 'rows' => $rows, 'count' => count($rows));
 
+        // ── ⑤ أذونات المواقع — كل إذن بندٌ واحدٌ يعرض لكل موافقٍ في دوره ─────
+        //    (update0004 · ORG-01 §5 «قاعدة التنفيذ» · ORG-14)
+        $rows = array();
+        $r = $conn->query(
+            "SELECT r.req_id, r.subject_ref, r.site_id, r.created_at, t.name_ar,
+                    (SELECT rq.approver_role FROM permit_required_approvals rq
+                      WHERE rq.permit_type_code = r.permit_type_code
+                        AND NOT EXISTS (SELECT 1 FROM permit_approval_actions a
+                                         WHERE a.req_id = r.req_id AND a.rq_id = rq.rq_id)
+                      ORDER BY rq.seq_no LIMIT 1) AS next_role
+               FROM permit_requests r
+               JOIN permit_types t ON t.permit_type_code = r.permit_type_code
+              WHERE r.company_id={$co} AND r.state = 'pending'
+              ORDER BY r.created_at LIMIT 50");
+        while ($r && ($x = $r->fetch_assoc())) {
+            $rows[] = array('label' => 'إذن #' . (int) $x['req_id'] . ' — ' . $x['name_ar']
+                    . ' (' . $x['subject_ref'] . ') · الدور الآن: ' . ($x['next_role'] ?: '—'),
+                'link' => '../admin/org_permits.php?id=' . (int) $x['req_id'],
+                'since' => (string) $x['created_at']);
+        }
+        $boxes[] = array('key' => 'permits', 'title' => 'أذونات المواقع',
+            'owner' => 'admin/org_permits.php', 'rows' => $rows, 'count' => count($rows));
+
         $total = 0;
         foreach ($boxes as $b) { $total += (int) $b['count']; }
         return array('ok' => true, 'boxes' => $boxes, 'total' => $total);

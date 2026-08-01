@@ -13,14 +13,18 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/app/Services/Org/AssignmentExpiryJob.php';
+require_once dirname(__DIR__) . '/app/Services/Org/PermitGate.php';
 
 use App\Services\Org\AssignmentExpiryJob;
+use App\Services\Org\PermitGate;
 
 while (ob_get_level() > 0) { ob_end_clean(); }
 $conn = $GLOBALS['conn'];
 $conn->set_charset('utf8mb4');
 
 $r = AssignmentExpiryJob::run($conn);
+$p = PermitGate::sweepExpired($conn);
 fwrite(STDOUT, "التكليفات: أُنهي آليًّا " . intval($r['expired'])
-    . " · ونُبِّه على " . intval($r['notified']) . " قادمة على الانتهاء.\n");
+    . " · ونُبِّه على " . intval($r['notified']) . " قادمة على الانتهاء"
+    . " · وانتهت صلاحية " . intval($p) . " إذنًا (PermitExpired).\n");
 exit(0);

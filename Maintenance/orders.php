@@ -209,6 +209,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $inspection_result = trim($_POST['inspection_result'] ?? '');
     $requested_state   = in_array($_POST['state'] ?? '', $states, true) ? $_POST['state'] : $order['state'];
 
+    // ORG-13 · حارس الأذونات: تكليف فني جديد بالأمر = دخول فني للموقع (ORG-01 §5-⑧)
+    if ($technician_id !== null && intval($order['technician_id'] ?? 0) !== $technician_id) {
+        require_once dirname(__DIR__) . '/includes/permit_gate.php';
+        $pg_site = $project_id !== null ? ems_default_site_of_project($conn, $company_id, $project_id) : 0;
+        $pg = ems_permit_gate($conn, $company_id, 'technician_site_entry',
+            'TECH:' . $technician_id, $pg_site, intval($current_user_id ?? 0));
+        if (!$pg['ok']) {
+            header("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode($pg['reason'] . ' ❌'));
+            exit();
+        }
+    }
+
     // منع إعادة فتح أمر مُغلق أو ملغى إلى حالة نشطة (سلامة آلة الحالة)
     if (in_array($order['state'], array('إغلاق', 'ملغى'), true)
         && in_array($requested_state, $active_states, true)) {

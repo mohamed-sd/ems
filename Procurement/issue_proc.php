@@ -95,6 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     // ملاحظة stock_move: المسح بref_id+الشركة (القناة أحادية عمود الأب)؛
     // الثابت الكودي: هذه الشاشة هي الكاتب الوحيد للجدول وref_type دائمًا
     // 'proc_issue' — عند ظهور كاتبٍ بنوعٍ آخر يلزم توسيع القناة بشرطٍ معلن.
+    // ORG-13 · حارس الأذونات: خروج مواد من الموقع/المخزن (ORG-01 §5-⑥)
+    require_once dirname(__DIR__) . '/includes/permit_gate.php';
+    $pg_site = $project_id !== null ? ems_default_site_of_project($conn, $company_id, $project_id) : 0;
+    $pg = ems_permit_gate($conn, $company_id, 'material_site_exit',
+        'ISSUE:' . ($id > 0 ? $id : 'new'), $pg_site, intval($current_user_id ?? 0));
+    if (!$pg['ok']) { header('Location: issue_proc.php?msg=' . rawurlencode($pg['reason'] . ' ❌')); exit(); }
+
     $parent = array(
         'warehouse_id' => $warehouse_id, 'holder_name' => $holder_name, 'issue_date' => $issue_date,
         'equipment_id' => $equipment_id, 'project_id' => $project_id,

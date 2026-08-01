@@ -41,3 +41,14 @@
 | ORG-08 | `AssignmentService`: 422 المدة/النطاق · 403 مصدر القرار · 409 التداخل وO1 · 422 الموقعي بلا خطين · إنشاء ذري بصلاحيات وخطوط وسجل · إنهاء «الطلب للفني والقرار لمن كلّف» (202) | `app/Services/Org/AssignmentService.php` | O1·O6·O6-ب·O6-و ✅ | J-12 |
 | ORG-09 | `AssignmentExpiryJob` (سقوط آلي بساعة القاعدة + تنبيه 30 يومًا بعطالة يومية) · `DeputyResolver` (الغياب/التعليق يفعّلان النائب بسطر delegated · لا نيابة بعد الانتهاء) · كرون يومي | `app/Services/Org/AssignmentExpiryJob.php` · `DeputyResolver.php` · `Operations/cron_org_assignments.php` | O2·O4·O7 ✅ | — |
 | ORG-10 | حزام O1→O8 كاملًا | `tests/org_authority_test.php` | **26/26** ✅ | — |
+
+## الموجة ③ · ORG-01 الأذونات — 4/4
+
+| المهمة | ما فُعل | الملفات | الاختبار | اجتهاد |
+|---|---|---|---|---|
+| ORG-11 | `PermitGate`: طلب → موافقات متسلسلة → approved بvalid_until من ساعة القاعدة → استهلاك used · وأحداث PermitApproved/Used/Expired سطور `permit_status_history` · والمنع في `guard_denials` بكود `permit_gate` | `app/Services/Org/PermitGate.php` | ①③④ ✅ | — |
+| ORG-12 | التسلسل: خطوة قبل سابقتها → **409** · موافق بلا تفويض لدوره → **403** (الدور يُحل من التكليفات النافذة للمجالات التشغيلية الست، وبusers.role للموازية fleet/hr/material_owner) · إذن منتهٍ يُستعمل → **423** + مسح دوري في الكرون | نفسه + `Operations/cron_org_assignments.php` | ①②④ ✅ | J-13 |
+| ORG-13 | الوصل بالمواضع التسعة خلف `EMS_PERMIT_GATE` (off افتراضًا · monitor يسجّل ويمضي · enforce يمنع · `EMS_PERMIT_GATE_SITES` للتجربة بموقع واحد): دخول معدة + إنهاء تشغيل (خروج) + تعمل/جاهزة (خدمة) + دخول مشغّل في `movement_operations.php` · دخول مشتريات `receipt_custody_proc.php` · خروج مواد `issue_proc.php` · دخول فني `Maintenance/orders.php` · خروج عامل `final_settlement.php` | الخمسة + `includes/permit_gate.php` | مسبار monitor فرعي ✅ | J-14 |
+| ORG-14 | صندوق «أذونات المواقع» في الصندوق الجامع — بند واحد لكل إذن معلَّق بدوره الحالي | `app/Services/Finance/ApprovalsInboxService.php` | ⑥ ✅ | — |
+
+**الحزام:** `tests/permit_gate_test.php` = **24/24** ✅ · lint كل الملفات المعدلة نظيف.
