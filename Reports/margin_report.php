@@ -1,0 +1,109 @@
+<?php
+/**
+ * Reports/margin_report.php — هامشُ الواقعة والعقد (M-07 · الشاشة 202)
+ * ───────────────────────────────────────────────────────────────────────────
+ * ENT-03 §5: التقريرُ **من الاعترافات الثلاثة** (`unit_party_awards`:
+ * إيرادُ العميل − تكلفةُ المورد − استحقاقُ المشغّل) — «البياناتُ كلُّها
+ * موجودةٌ والتقريرُ غائب». قراءةٌ واشتقاقٌ بلا أثر — **ولا تُجمع عملتان
+ * في رقم** (التعدُّدُ يُعلَن).
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+require_once __DIR__ . '/../includes/screen_contract.php';
+
+$company_id = intval($_SESSION['user']['company_id'] ?? 0);
+$is_super   = (strval($_SESSION['user']['role'] ?? '') === '-1');
+if (!$is_super && $company_id <= 0) { header("Location: ../login.php"); exit(); }
+$co = $company_id;
+
+$from = preg_match('/^\d{4}-\d{2}-\d{2}$/', strval($_GET['from'] ?? '')) ? $_GET['from'] : date('Y-01-01');
+$to   = preg_match('/^\d{4}-\d{2}-\d{2}$/', strval($_GET['to'] ?? '')) ? $_GET['to'] : date('Y-m-d');
+$f = $conn->real_escape_string($from);
+$t = $conn->real_escape_string($to);
+
+// الاعترافاتُ الثلاثةُ مجمَّعةً بالعقد والعملة — كلُّ طرفٍ من حكمه هو
+$rows = array();
+$r = $conn->query("SELECT a.contract_ref, a.currency,
+        ROUND(SUM(CASE WHEN a.party='client'   THEN a.qty_due * a.unit_price ELSE 0 END),2) revenue,
+        ROUND(SUM(CASE WHEN a.party='supplier' THEN a.qty_due * a.unit_price ELSE 0 END),2) supplier_cost,
+        ROUND(SUM(CASE WHEN a.party='operator' THEN a.qty_due * a.unit_price ELSE 0 END),2) operator_cost,
+        COUNT(DISTINCT a.source_ref) events_n
+   FROM unit_party_awards a
+  WHERE a.company_id={$co} AND a.deleted_at IS NULL
+    AND DATE(a.created_at) BETWEEN '{$f}' AND '{$t}'
+  GROUP BY a.contract_ref, a.currency
+  ORDER BY revenue DESC");
+while ($r && ($x = $r->fetch_assoc())) {
+    $x['margin'] = round((float)$x['revenue'] - (float)$x['supplier_cost'] - (float)$x['operator_cost'], 2);
+    $x['margin_pct'] = (float)$x['revenue'] > 0
+        ? round(100.0 * $x['margin'] / (float)$x['revenue'], 1) : null;
+    $rows[] = $x;
+}
+// تعدُّدُ العملات لعقدٍ واحدٍ يُعلَن — «لا تُجمع عملتان في رقم»
+$byContract = array(); $multiCurrency = array();
+foreach ($rows as $x) {
+    $cid = (string) ($x['contract_ref'] ?? '—');
+    $byContract[$cid] = ($byContract[$cid] ?? 0) + 1;
+    if ($byContract[$cid] > 1) { $multiCurrency[$cid] = true; }
+}
+
+$page_title = 'إيكوبيشن | هامش الواقعة والعقد';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main ems-unified-page-shell">
+    <?php
+    $header_title = 'هامش الواقعة والعقد'; $header_icon = 'fa fa-percent';
+    $header_actions = array();
+    include('../includes/page_header.php');
+    ems_screen_about('الهامشُ من الاعترافات الثلاثة للواقعة الواحدة (حكمُ العميل − حكمُ المورد − '
+        . 'حكمُ المشغّل) مجمَّعًا بالعقد والعملة — كلُّ رقمٍ من سجل الأحكام لا من تقدير. '
+        . 'وعقدٌ بعملتين يظهر سطرين معلَنين لا رقمًا ملفَّقًا.',
+        array('حدّد الفترة', 'اقرأ الهامشَ السالبَ أولًا — هو القرار'));
+    ?>
+
+    <div class="card"><div class="card-body">
+        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <label>من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>">
+            <label>إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>">
+            <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اعرض</button>
+        </form>
+    </div></div>
+
+    <div class="card"><div class="card-body">
+        <?php if (!$rows): ems_state_empty('لا اعترافاتٍ في الفترة — الأحكامُ تولَد مع اعتماد الوحدات',
+            'وسّع المدة', '?from=' . date('Y-01-01', strtotime('-1 year')) . '&to=' . $to); else: ?>
+        <div class="table-container"><table class="alltables display nowrap" style="width:100%">
+            <thead><tr><th>العقد</th><th>العملة</th><th>الوقائع</th>
+                <th>إيراد العميل</th><th>تكلفة المورد</th><th>استحقاق المشغّل</th>
+                <th>الهامش</th><th>الهامش٪</th></tr></thead>
+            <tbody>
+            <?php foreach ($rows as $x): $cid = (string)($x['contract_ref'] ?? '—'); ?>
+                <tr<?php echo $x['margin'] < 0 ? ' style="background:#fff3f0"' : ''; ?>>
+                    <td><a href="../Contracts/contract_card.php?id=<?php echo intval($cid); ?>">عقد #<?php
+                        echo htmlspecialchars($cid); ?> ▸</a>
+                        <?php if (isset($multiCurrency[$cid])): ?>
+                            <span class="badge badge-warning" title="عقدٌ بعملتين — سطران لا رقم">⚠ عملات</span>
+                        <?php endif; ?></td>
+                    <td><?php echo htmlspecialchars((string)$x['currency']); ?></td>
+                    <td><?php echo intval($x['events_n']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$x['revenue']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$x['supplier_cost']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$x['operator_cost']); ?></td>
+                    <td><strong style="<?php echo $x['margin'] < 0 ? 'color:#c00' : 'color:#0a7'; ?>">
+                        <?php echo htmlspecialchars((string)$x['margin']); ?></strong></td>
+                    <td><?php echo $x['margin_pct'] !== null
+                        ? htmlspecialchars($x['margin_pct'] . '٪') : '—'; ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody></table></div>
+        <p style="color:#666;margin-top:8px">استحقاقُ المشغّل هنا من أحكام الوقائع (M-24) —
+            وعقودُ الاستعداد المقطوعة ليست فيه (لا سعرَ ساعةٍ لها) فهامشُها يقرؤه كشفُ الرواتب.</p>
+        <?php endif; ?>
+    </div></div>
+</div>
+
+<script src="../includes/js/jquery-3.7.1.main.js"></script>
+</body>
+</html>

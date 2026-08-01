@@ -37,9 +37,7 @@ SELECT 25, m.id, 1, 1, 1, 0
 -- ④ سايدبارُ الدور 25 — لوحتُه وشاشاتُ يومه
 INSERT INTO `nav_items` (`role_id`, `door`, `group_id`, `module_id`, `label_ar`, `route`, `icon`,
                          `sort_order`, `counter_source`, `permission_code`, `active`)
-SELECT 25, p.door, NULL, m.id,
-       CASE WHEN p.door = 'HOME' THEN 'الرئيسية' ELSE m.`name` END, -- توحيدُ اسم الرئيسية
-       m.`code`, m.`icon`, p.so, NULL, m.`code`, 1
+SELECT 25, p.door, NULL, m.id, m.`name`, m.`code`, m.`icon`, p.so, NULL, m.`code`, 1
   FROM (
     SELECT 'HOME' door, 'Procurement/warehouse_board.php' code, 1 so UNION ALL
     SELECT 'DAILY', 'Procurement/issue_proc.php', 2 UNION ALL
