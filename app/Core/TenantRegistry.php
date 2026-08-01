@@ -532,6 +532,33 @@ class TenantRegistry
             'parent' => 'permit_requests', 'fk' => 'req_id'),
         'permit_status_history' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'permit_requests', 'fk' => 'req_id'), // Insert-only
+        // ── update0004 · SEC-01 §12/§15 (هجرة 2026-08-02): الشؤون الوظيفية ──
+        // الشخص عابر للكيانات (حساب واحد عبر المنصة §14) فهو عام؛ والعلاقات
+        // والمراكز والاستثناءات والمنح والسجلات بياناتُ مستأجرٍ بcompany_id؛
+        // والقواميس والقوالب والسياسات كتالوجات سياسة عامة.
+        'persons' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'person_relationships' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_dictionaries' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'person_positions' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_templates' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'permission_template_versions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_templates', 'fk' => 'tpl_id'),
+        'template_permissions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_template_versions', 'fk' => 'template_version_id'),
+        'permission_exceptions' => array('type' => self::T_TENANT, 'soft' => false),
+        'sensitive_access_grants' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_change_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_approval_steps' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_change_requests', 'fk' => 'req_id'),
+        'sod_conflicts' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'guard_override_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'sensitive_field_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'effective_permissions' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_audit_events' => array('type' => self::T_TENANT, 'soft' => false), // Insert-only
+        'permission_review_cycles' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_review_lines' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_review_cycles', 'fk' => 'cycle_id'), // Insert-only
+        'founding_mode' => array('type' => self::T_GLOBAL, 'soft' => false),
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */

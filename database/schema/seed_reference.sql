@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 22:47:42
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:01:20
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -2391,23 +2391,23 @@ INSERT INTO `fin_effect_map` (`id`, `company_id`, `source_kind`, `effect_type`, 
 
 -- ── job_titles (قالبُ شركة 4) ──
 DELETE FROM `job_titles`;
-INSERT INTO `job_titles` (`id`, `company_id`, `name`, `description`, `is_operator`, `status`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1,{{COMPANY_ID}},'مدير',NULL,0,1,10,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(2,{{COMPANY_ID}},'مهندس',NULL,0,1,20,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(3,{{COMPANY_ID}},'فني',NULL,0,1,30,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(4,{{COMPANY_ID}},'كهربائي',NULL,0,1,40,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(5,{{COMPANY_ID}},'مراقب',NULL,0,1,50,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(6,{{COMPANY_ID}},'عامل مساندة',NULL,0,1,60,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(7,{{COMPANY_ID}},'سائق',NULL,1,1,70,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(8,{{COMPANY_ID}},'مشغل',NULL,1,1,80,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(9,{{COMPANY_ID}},'سائق/مشغّل',NULL,1,1,90,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(10,{{COMPANY_ID}},'مساعد',NULL,1,1,100,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(11,{{COMPANY_ID}},'مبنشر',NULL,1,1,110,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(12,{{COMPANY_ID}},'مشرف',NULL,0,1,120,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(13,{{COMPANY_ID}},'إداري',NULL,0,1,130,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(14,{{COMPANY_ID}},'فني ورشة',NULL,0,1,140,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(15,{{COMPANY_ID}},'أمن',NULL,0,1,150,'2026-06-27 13:49:46','2026-07-13 21:06:58'),
-(16,{{COMPANY_ID}},'أخرى',NULL,0,1,160,'2026-06-27 13:49:46','2026-07-13 21:06:58');
+INSERT INTO `job_titles` (`id`, `title_code`, `company_id`, `name`, `family_code`, `level_code`, `org_unit_id`, `description`, `duties_json`, `default_manager_position_id`, `functional_line_unit_id`, `operational_line_unit_id`, `template_id`, `allowed_scopes_json`, `amount_cap`, `currency`, `prohibitions_json`, `qualifications_json`, `active`, `is_operator`, `status`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1,'jt_1',{{COMPANY_ID}},'مدير','fam_ops','lvl_dept_mgr',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,10,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(2,'jt_2',{{COMPANY_ID}},'مهندس','fam_maintenance','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,20,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(3,'jt_3',{{COMPANY_ID}},'فني','fam_maintenance','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,30,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(4,'jt_4',{{COMPANY_ID}},'كهربائي','fam_maintenance','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,40,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(5,'jt_5',{{COMPANY_ID}},'مراقب','fam_ops','lvl_officer',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,50,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(6,'jt_6',{{COMPANY_ID}},'عامل مساندة','fam_operators','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,60,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(7,'jt_7',{{COMPANY_ID}},'سائق','fam_operators','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,70,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(8,'jt_8',{{COMPANY_ID}},'مشغل','fam_operators','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,80,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(9,'jt_9',{{COMPANY_ID}},'سائق/مشغّل','fam_operators','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,90,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(10,'jt_10',{{COMPANY_ID}},'مساعد','fam_operators','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,100,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(11,'jt_11',{{COMPANY_ID}},'مبنشر','fam_operators','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1,1,110,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(12,'jt_12',{{COMPANY_ID}},'مشرف','fam_ops','lvl_supervisor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,120,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(13,'jt_13',{{COMPANY_ID}},'إداري','fam_hr','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,130,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(14,'jt_14',{{COMPANY_ID}},'فني ورشة','fam_maintenance','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,140,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(15,'jt_15',{{COMPANY_ID}},'أمن','fam_ops','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,150,'2026-06-27 13:49:46','2026-08-02 02:00:01'),
+(16,'jt_16',{{COMPANY_ID}},'أخرى','fam_ops','lvl_executor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,160,'2026-06-27 13:49:46','2026-08-02 02:00:01');
 
 -- ── employee_roles (قالبُ شركة 4) ──
 DELETE FROM `employee_roles`;

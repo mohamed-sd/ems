@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 22:47:42
--- الجداول: 326 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:01:20
+-- الجداول: 345 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -1859,6 +1859,22 @@ CREATE TABLE `drivercontracts` (
   CONSTRAINT `fk_drivercontracts_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `fk_drivercontracts_project_contract` FOREIGN KEY (`project_contract_id`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: effective_permissions ──
+CREATE TABLE `effective_permissions` (
+  `ep_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `person_id` int NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount_cap` decimal(18,2) DEFAULT NULL,
+  `source_kind` enum('relation','family','level','title','assignment','exception','grant') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `source_ref` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `computed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ep_id`),
+  KEY `idx_ep_person` (`company_id`,`person_id`,`permission_code`),
+  KEY `idx_ep_code` (`permission_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: جدول مشتق — ومنه يُجاب «لماذا يملكها؟»';
 
 -- ── Table: employee_advances ──
 CREATE TABLE `employee_advances` (
@@ -4052,6 +4068,22 @@ CREATE TABLE `fleet_model_service_spec` (
   CONSTRAINT `fk_fmss_model` FOREIGN KEY (`model_id`) REFERENCES `fleet_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- ── Table: founding_mode ──
+CREATE TABLE `founding_mode` (
+  `mode_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `mode` enum('discovery','permission_test') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `started_at` datetime DEFAULT NULL,
+  `ends_at` datetime DEFAULT NULL COMMENT 'إلزامي عند التفعيل — لا وضع تأسيس مفتوح المدة',
+  `banner_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `closed_by` int DEFAULT NULL,
+  `closed_at` datetime DEFAULT NULL,
+  `closure_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`mode_id`),
+  UNIQUE KEY `uq_fm_mode` (`mode`),
+  CONSTRAINT `chk_fm_ends` CHECK (((`enabled` = 0) or (`ends_at` is not null)))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §7: التوسيع في discovery وحده — والحراس لا يُعطَّلون مهما اتسع التأسيس';
+
 -- ── Table: governance_flags ──
 CREATE TABLE `governance_flags` (
   `flag_id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -4103,6 +4135,15 @@ CREATE TABLE `guard_denials` (
   KEY `ix_gd_guard` (`guard_code`,`at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §9: سجل المنع — مقياس ملاءمة الحماية لا سجل مخالفات المستخدمين';
 
+-- ── Table: guard_override_policies ──
+CREATE TABLE `guard_override_policies` (
+  `guard_code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `overridable` enum('never','break_glass_only','with_compensating_control') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `environments_json` json DEFAULT NULL COMMENT 'بيئات السريان — production·founding·test',
+  PRIMARY KEY (`guard_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §7.2: الاسم يصف السياسة لا النتيجة — ويقرؤها كسر الزجاج فلا يتجاوز never';
+
 -- ── Table: guard_policies ──
 CREATE TABLE `guard_policies` (
   `guard_code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -4130,6 +4171,16 @@ CREATE TABLE `housing_unit` (
   PRIMARY KEY (`id`),
   KEY `idx_hu_company` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: hr_dictionaries ──
+CREATE TABLE `hr_dictionaries` (
+  `code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `layer` enum('relation','family','level') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank` int DEFAULT NULL COMMENT 'للمستوى — درجة السلطة تصاعديًّا',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: تُضاف قيمها بصف لا بكود';
 
 -- ── Table: impact_matrix ──
 CREATE TABLE `impact_matrix` (
@@ -4236,9 +4287,24 @@ CREATE TABLE `intercompany_loans` (
 -- ── Table: job_titles ──
 CREATE TABLE `job_titles` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `title_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'SEC-01 §12: الكود المعتمد',
   `company_id` int DEFAULT NULL,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `family_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'العائلة — hr_dictionaries',
+  `level_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `org_unit_id` int unsigned DEFAULT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `duties_json` json DEFAULT NULL,
+  `default_manager_position_id` int unsigned DEFAULT NULL,
+  `functional_line_unit_id` int unsigned DEFAULT NULL,
+  `operational_line_unit_id` int unsigned DEFAULT NULL,
+  `template_id` int unsigned DEFAULT NULL,
+  `allowed_scopes_json` json DEFAULT NULL,
+  `amount_cap` decimal(18,2) DEFAULT NULL,
+  `currency` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `prohibitions_json` json DEFAULT NULL,
+  `qualifications_json` json DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `is_operator` tinyint(1) NOT NULL DEFAULT '0',
   `status` tinyint(1) NOT NULL DEFAULT '1',
   `sort_order` int NOT NULL DEFAULT '0',
@@ -4246,6 +4312,7 @@ CREATE TABLE `job_titles` (
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_jobtitle_company_name` (`company_id`,`name`),
+  UNIQUE KEY `uq_jt_code` (`title_code`),
   KEY `idx_jobtitle_company` (`company_id`),
   KEY `idx_jobtitle_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -5160,6 +5227,144 @@ CREATE TABLE `payroll_time_inputs` (
   CONSTRAINT `ck_time_input_qty` CHECK ((`qty` > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: permission_approval_steps ──
+CREATE TABLE `permission_approval_steps` (
+  `st_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `req_id` int unsigned NOT NULL,
+  `seq_no` int NOT NULL,
+  `approver_rule` enum('hr','functional_owner','requester_department_manager','finance_owner_if_financial','security_manager','executive') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'قاعدة ديناميكية لا دور ثابت — functional_owner يُحل من ORG-01 بحسب المجال والنطاق والتاريخ',
+  `mandatory` tinyint(1) NOT NULL DEFAULT '1',
+  `approver_person_id` int DEFAULT NULL COMMENT 'يُحل لحظة الفتح',
+  `auth_id` int unsigned DEFAULT NULL,
+  `decision` enum('approve','reject') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `at` datetime DEFAULT NULL,
+  PRIMARY KEY (`st_id`),
+  UNIQUE KEY `uq_step` (`req_id`,`seq_no`),
+  CONSTRAINT `fk_step_req` FOREIGN KEY (`req_id`) REFERENCES `permission_change_requests` (`req_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: لا تُفتح خطوة قبل سابقتها — يحرسه PermissionChangeWorkflow';
+
+-- ── Table: permission_audit_events ──
+CREATE TABLE `permission_audit_events` (
+  `ev_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `event_type` enum('granted','elevated','reduced','revoked','expired','suspended','break_glass') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `person_id` int NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `before_json` json DEFAULT NULL,
+  `after_json` json DEFAULT NULL,
+  `requested_by` int DEFAULT NULL,
+  `approved_by` int DEFAULT NULL,
+  `executed_by` int DEFAULT NULL,
+  `request_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `source` enum('template','assignment','exception','grant','break_glass') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `founding_mode` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'وسم أفعال التأسيس §7-④',
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ev_id`),
+  KEY `idx_pae_person` (`company_id`,`person_id`,`at`),
+  KEY `idx_pae_type` (`event_type`,`at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: لا يُعدَّل ولا يُحذف — ولا يُخلط بمراجعة المدير الدورية';
+
+-- ── Table: permission_change_requests ──
+CREATE TABLE `permission_change_requests` (
+  `req_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `person_id` int NOT NULL,
+  `change_kind` enum('within_role','supervisor','section_mgr','dept_mgr_or_high') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `from_json` json DEFAULT NULL,
+  `to_json` json DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `doc_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `risk_level` enum('low','medium','high') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'محسوب من النوع',
+  `state` enum('draft','pending','approved','rejected','applied') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `created_by` int NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`req_id`),
+  KEY `idx_pcr_state` (`company_id`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §8: الموافقات بدرجة المخاطرة لا بمسار واحد';
+
+-- ── Table: permission_exceptions ──
+CREATE TABLE `permission_exceptions` (
+  `ex_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `person_id` int NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `effect` enum('grant','deny') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'grant',
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valid_from` datetime NOT NULL,
+  `valid_to` datetime NOT NULL COMMENT 'إلزامي — ويسقط آليًّا',
+  `is_break_glass` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'كسر الزجاج: مدة ≤ 24 ساعة بمراجعة لاحقة إلزامية',
+  `approvals_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `state` enum('active','expired','revoked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ex_id`),
+  KEY `idx_ex_person` (`company_id`,`person_id`,`state`),
+  KEY `idx_ex_expiry` (`state`,`valid_to`),
+  CONSTRAINT `chk_bg_24h` CHECK (((`is_break_glass` = 0) or (timestampdiff(HOUR,`valid_from`,`valid_to`) <= 24)))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §8⑥⑦ — والسلفان exception_requests/approvals يبقيان لمسار GOV-01 §7 (0 صف فلا ترحيل)';
+
+-- ── Table: permission_review_cycles ──
+CREATE TABLE `permission_review_cycles` (
+  `cycle_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `org_unit_id` int unsigned NOT NULL,
+  `period` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'مثال 2026-H2',
+  `manager_person_id` int NOT NULL,
+  `due_at` date NOT NULL,
+  `state` enum('open','signed','escalated') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `signed_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`cycle_id`),
+  UNIQUE KEY `uq_prc` (`org_unit_id`,`period`),
+  KEY `idx_prc_due` (`state`,`due_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §10⑥: ما لم يُوقَّع خلال مهلته يُصعَّد للإدارة العامة';
+
+-- ── Table: permission_review_lines ──
+CREATE TABLE `permission_review_lines` (
+  `line_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `cycle_id` int unsigned NOT NULL,
+  `person_id` int NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `decision` enum('confirm','reduce','revoke') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `decided_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`line_id`),
+  KEY `idx_prl_cycle` (`cycle_id`,`person_id`),
+  CONSTRAINT `fk_prl_cycle` FOREIGN KEY (`cycle_id`) REFERENCES `permission_review_cycles` (`cycle_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: سطر لكل (موظف × صلاحية) — Insert-only';
+
+-- ── Table: permission_template_versions ──
+CREATE TABLE `permission_template_versions` (
+  `ver_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tpl_id` int unsigned NOT NULL,
+  `version` int NOT NULL,
+  `effective_from` date DEFAULT NULL,
+  `effective_to` date DEFAULT NULL,
+  `state` enum('draft','tested','published','superseded') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `approval_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `change_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `impact_preview_json` json DEFAULT NULL COMMENT 'أثر التغيير قبل النشر: كم مستخدمًا وأي صلاحية',
+  `superseded_by` int unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ver_id`),
+  UNIQUE KEY `uq_ver` (`tpl_id`,`version`),
+  CONSTRAINT `fk_ver_tpl` FOREIGN KEY (`tpl_id`) REFERENCES `permission_templates` (`tpl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §4⑥: لا يُعدل إصدار نافذ بأثر رجعي — النشر إصدار جديد بسريان مستقبلي';
+
+-- ── Table: permission_templates ──
+CREATE TABLE `permission_templates` (
+  `tpl_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tpl_kind` enum('relation','family','level','title','assignment') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key_code` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_ceiling` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'لقوالب العلاقة: سقف لا أرضية',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`tpl_id`),
+  UNIQUE KEY `uq_tpl_kind_key` (`tpl_kind`,`key_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §4: القالب جدول يُعدل بقرار لا كود يُبرمج';
+
 -- ── Table: permit_approval_actions ──
 CREATE TABLE `permit_approval_actions` (
   `act_id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -5232,6 +5437,69 @@ CREATE TABLE `permit_types` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`permit_type_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §5/§7: الأنواعُ التسعةُ صفوفٌ هنا لا كودًا';
+
+-- ── Table: person_positions ──
+CREATE TABLE `person_positions` (
+  `p_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `person_id` int unsigned NOT NULL,
+  `company_id` int NOT NULL,
+  `relation_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `family_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'ولا موظف بلا عائلة (DEC-SEC-F)',
+  `level_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'job_titles.title_code',
+  `org_unit_id` int unsigned DEFAULT NULL,
+  `manager_person_id` int unsigned DEFAULT NULL,
+  `scope_type` enum('company','department','section','unit','project','site','site_group','shift','own_records') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_id` int NOT NULL COMMENT 'قيد: لا صف بلا نطاق — الصلاحية بلا نطاق مرفوضة بنيويًّا',
+  `is_primary` tinyint(1) NOT NULL DEFAULT '1',
+  `valid_from` date NOT NULL,
+  `valid_to` date DEFAULT NULL,
+  `state` enum('active','suspended','ended') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`p_id`),
+  UNIQUE KEY `uq_pp_natural` (`person_id`,`title_code`,`scope_type`,`scope_id`,`valid_from`),
+  KEY `idx_pp_person` (`person_id`,`state`),
+  KEY `idx_pp_company` (`company_id`,`state`),
+  KEY `fk_pp_relation` (`relation_code`),
+  KEY `fk_pp_family` (`family_code`),
+  KEY `fk_pp_level` (`level_code`),
+  CONSTRAINT `fk_pp_family` FOREIGN KEY (`family_code`) REFERENCES `hr_dictionaries` (`code`),
+  CONSTRAINT `fk_pp_level` FOREIGN KEY (`level_code`) REFERENCES `hr_dictionaries` (`code`),
+  CONSTRAINT `fk_pp_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`person_id`),
+  CONSTRAINT `fk_pp_relation` FOREIGN KEY (`relation_code`) REFERENCES `hr_dictionaries` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: منع تداخل فترتين لنفس (المسمى×النطاق) يحرسه PositionService — ومركزان مشروعان يبدآن معًا مقبولان';
+
+-- ── Table: person_relationships ──
+CREATE TABLE `person_relationships` (
+  `rel_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `person_id` int unsigned NOT NULL,
+  `company_id` int NOT NULL COMMENT 'الكيان — والعزل يمنع تسرب كيان إلى آخر ولو كان الشخص واحدًا',
+  `relation_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'hr_dictionaries layer=relation',
+  `employee_id` int DEFAULT NULL COMMENT 'جسر صفوف employees — تبقى بياناتِ الموظف الإدارية لا الهوية',
+  `valid_from` date NOT NULL,
+  `valid_to` date DEFAULT NULL COMMENT 'NULL = علاقة قائمة (الدائم) — والمؤقتة بنهاية',
+  `state` enum('active','suspended','ended') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`rel_id`),
+  KEY `idx_prel_person` (`person_id`,`state`),
+  KEY `idx_prel_company` (`company_id`,`relation_code`,`state`),
+  CONSTRAINT `fk_prel_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`person_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §14②: موظف المورد لا يُنشأ له موظف داخلي وهمي';
+
+-- ── Table: persons ──
+CREATE TABLE `persons` (
+  `person_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `full_name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `national_ref` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع هوية — معرّف دائم لا يُعاد استعماله',
+  `contact_json` json DEFAULT NULL,
+  `docs_json` json DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`person_id`),
+  UNIQUE KEY `uq_persons_national` (`national_ref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §14: سجل الإنسان — حساب واحد عبر المنصة والصفات متعددة';
 
 -- ── Table: policy_rules ──
 CREATE TABLE `policy_rules` (
@@ -5953,6 +6221,37 @@ CREATE TABLE `seat_assignments` (
   CONSTRAINT `ck_sa_dates` CHECK (((`date_to` is null) or (`date_to` >= `date_from`)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-11: تعاقب المعدات على المقعد التعاقدي — لا تداخل فترتين لمعدتين في مقعد (تحرسه الخدمة 409)';
 
+-- ── Table: sensitive_access_grants ──
+CREATE TABLE `sensitive_access_grants` (
+  `gr_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `person_id` int NOT NULL,
+  `domain` enum('ownership','financing','payroll','bank','medical','pricing') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'إلزامي',
+  `approvals_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `granted_from` date NOT NULL,
+  `review_due_at` date DEFAULT NULL,
+  `renewal_policy` enum('periodic','on_role_change','none') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'periodic',
+  `state` enum('active','suspended','revoked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`gr_id`),
+  KEY `idx_sag_person` (`company_id`,`person_id`,`state`),
+  KEY `idx_sag_domain` (`domain`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §1.1②: دائم ما دامت الوظيفة قائمة · كل قراءة به تُسجَّل · ويُعرض في المراجعة الدورية';
+
+-- ── Table: sensitive_field_policies ──
+CREATE TABLE `sensitive_field_policies` (
+  `pol_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `field_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `classification` enum('payroll','bank','medical','personal','ownership','pricing') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `masking_rule` enum('full','partial','none') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'full',
+  `allowed_roles_json` json DEFAULT NULL,
+  PRIMARY KEY (`pol_id`),
+  UNIQUE KEY `uq_sfp_field` (`field_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §10⑦: الحقل الذي لا يُملك لا يُجلب أصلًا';
+
 -- ── Table: sensitive_read_log ──
 CREATE TABLE `sensitive_read_log` (
   `read_id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -6161,6 +6460,20 @@ CREATE TABLE `sites` (
   CONSTRAINT `fk_sites_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
   CONSTRAINT `fk_sites_resp` FOREIGN KEY (`responsible_employee_id`) REFERENCES `employees` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: sod_conflicts ──
+CREATE TABLE `sod_conflicts` (
+  `sod_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `conflict_code` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_ar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permission_a` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permission_b` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `severity` enum('high','critical') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'high',
+  `compensating_control` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الاستثناء بموافقة التنفيذي ورقابة تعويضية معلنة — ولا يُمنح صامتًا',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`sod_id`),
+  UNIQUE KEY `uq_sod_code` (`conflict_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §5: الثمانية صفوف هنا — 409 مع عرض التعارض';
 
 -- ── Table: stop_reason_codes ──
 CREATE TABLE `stop_reason_codes` (
@@ -6713,6 +7026,21 @@ CREATE TABLE `tax_invoices` (
   CONSTRAINT `ck_tax_ref` CHECK (((`tax_amount` = 0) or ((`tax_code` is not null) and (`tax_code` <> _utf8mb4'') and (`tax_rate` is not null)))),
   CONSTRAINT `ck_tax_total` CHECK ((`total_amount` = (`net_amount` + `tax_amount`)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: template_permissions ──
+CREATE TABLE `template_permissions` (
+  `tp_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `template_version_id` int unsigned NOT NULL COMMENT 'FK للنسخة لا للقالب — فمحتوى القديمة لا يتغير عند نشر جديدة',
+  `dimension` enum('visibility','action','approval','scope') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permission_code` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope_rule` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `amount_cap` decimal(18,2) DEFAULT NULL,
+  `currency` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `effect` enum('grant','deny') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'grant',
+  PRIMARY KEY (`tp_id`),
+  KEY `idx_tp_ver` (`template_version_id`,`dimension`),
+  CONSTRAINT `fk_tp_ver` FOREIGN KEY (`template_version_id`) REFERENCES `permission_template_versions` (`ver_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: الأبعاد الأربعة — وdeny يغلب grant دائمًا';
 
 -- ── Table: tenants ──
 CREATE TABLE `tenants` (

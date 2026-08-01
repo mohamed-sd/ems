@@ -78,3 +78,19 @@
 | SEC-06 | مراجعة المصادر الأربعة: ① غائب (K) ② حي ③ مؤجَّل لUAT ④ جاهز نموذجًا — والخلاصة للتوقيع | `SEC-D6_four_sources_review_ar.md` | ✅ | — |
 
 **الحزام:** `tests/sec_deliverables_test.php` = **28/28** ✅
+
+## الموجة ⑥ · SEC البنية — 7/7
+
+**القياس قبل التنفيذ:** الأسلاف الخمسة: `job_titles`=16 رقيقًا · `user_capacities`=30 · `positions`=0 · `guard_policies`=9 (حراس GOV-01 التجارية) · `exception_requests/approvals`=0 · وصفر جدول من قاموس §15.
+
+| المهمة | ما فُعل | الاختبار | اجتهاد |
+|---|---|---|---|
+| SEC-07 | `persons` (عام عبر المنصة §14) + `person_relationships` (بكيانها — موظف المورد بلا موظف وهمي) | ⑤ ✅ | — |
+| SEC-08 | `hr_dictionaries` + بذر 6 علاقات و13 عائلة (DEC-SEC-F) و7 مستويات برتبها + **توسيع `job_titles`** بأعمدة §12 الخمسة عشر وترميز الـ16 بمسودة D1 (★) | ②③ ✅ | J-18 |
+| SEC-09 | `person_positions` بالطبقات والنطاق الإلزامي وUQ الطبيعي — وuser_capacities/positions أسلاف تبقى للجسر بلا ترحيل بيانات (0 صف حي يلزم نقله الآن) | ⑤ ✅ | J-19 |
+| SEC-10 | القوالب الثلاثية: هوية (42 مبذورة: 6 سقوف علاقة +13+7+16) · إصدارات (لا تعديل بأثر رجعي) · محتوى بFK النسخة وdeny يغلب | ③ ✅ | — |
+| SEC-11 | `permission_exceptions` (لا مفتوح المدة · **CHECK كسر الزجاج ≤24h**) + `sensitive_access_grants` (دائم وظيفي بسجل اطلاع) + دورة التغيير (طلب + خطوات بقواعد ديناميكية) — وأسلاف exception_* تبقى لGOV-01 | ④ ✅ | J-20 |
+| SEC-12 | `sod_conflicts` بذر الثمانية (§5) + `guard_override_policies` بذر الـ17 (§7.2: 8 never · 7 break_glass · 2 compensating) + `sensitive_field_policies` (6 سياسات أساس) | ③ ✅ | J-21 |
+| SEC-13 | `effective_permissions` (المشتق) + `permission_audit_events` (Insert-only بوسم founding_mode) + دورتا المراجعة + `founding_mode` بوضعين مطفأين و**CHECK لا enabled بلا ends_at** | ①④ ✅ | — |
+
+**الحزام:** `tests/sec_structure_test.php` = **39/39** ✅ · القاعدة صارت 342 جدولًا · `dump-schema` محدَّث.
