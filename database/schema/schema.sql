@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 23:01:20
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:17:37
 -- الجداول: 345 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -6255,6 +6255,7 @@ CREATE TABLE `sensitive_field_policies` (
 -- ── Table: sensitive_read_log ──
 CREATE TABLE `sensitive_read_log` (
   `read_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL COMMENT 'SEC-21: شركة السياق',
   `person_id` int NOT NULL,
   `element_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_type` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -6262,6 +6263,8 @@ CREATE TABLE `sensitive_read_log` (
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `result` enum('allowed','denied') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `grant_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع المنح المسوِّغ (GR-… · policy:…)',
+  `context` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الشاشة أو الخدمة',
   PRIMARY KEY (`read_id`),
   KEY `ix_srl_person` (`person_id`,`at`),
   KEY `ix_srl_subject` (`subject_type`,`subject_id`)

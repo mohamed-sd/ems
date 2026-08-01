@@ -106,3 +106,14 @@
 | SEC-18 | `ExpiryJob`: إسقاط الاستثناءات (NOW) والمراكز (CURDATE) في لحظتها + أسطر PermissionExpired/PositionEnded + إعادة بناء لمن مُسّ + تنبيه 30 يومًا بعطالة — وكرون `Governance/cron_permissions.php` | `ExpiryJob.php` + الكرون | S5·S27 ✅ | — |
 
 **الحزام:** `tests/permission_resolver_test.php` = **19/19** ✅ (S1·S2·S3·S5·S6·S12·S16·S17 + deny/422)
+
+## الموجة ⑧ · SEC الحراس — 4/4
+
+| المهمة | ما فُعل | الملفات | الاختبار | اجتهاد |
+|---|---|---|---|---|
+| SEC-19 | `SelfGrantGuard`: منح النفس واعتماد الذات → 403 بنيويًّا ولو مدير الصلاحيات — وكل رفض في `guard_denials` | `SelfGrantGuard.php` | S8·S9 ✅ | — |
+| SEC-20 | `SegregationOfDutiesGuard`: فحص عند حساب الصلاحية — اجتماع طرفَي تعارضٍ من الثمانية → **409 مع عرض التعارض باسمه**؛ والاستثناء بالرقابة التعويضية إلا ما ضابطه NULL (تصعيد السلطة الذاتي لا يُستثنى) | `SegregationOfDutiesGuard.php` | S18 (بأربعة أوجه) ✅ | — |
+| SEC-21 | `SensitiveFieldGuard`: الترشيح في الخادم — الحقل غير المملوك **لا يُعاد أصلًا** والجزئي بآخر أربعة أرقام؛ وكل قراءة سطر في `sensitive_read_log` بمرجع المنح — **والجدول كان قائمًا بمخطط LEG-01 فوُسِّع لا استُبدل** | `SensitiveFieldGuard.php` · هجرتا read_log | S11·S26 ✅ | J-23 |
+| SEC-22 | `BreakGlassService`: منح ≤24h · **يقرأ `guard_override_policies` فلا يتجاوز never** · لا يمنح النفس · بلاغ حوكمة آلي (نوع «بلاغ حوكمة وصلاحيات» حرج للدور 15) · ومسح 48h يُسقط غير المراجَع ويُصعِّد — في كرون الحوكمة | `BreakGlassService.php` + الكرون | S22·S23 + البلاغ ✅ | — |
+
+**الحزام:** `tests/sec_guards_test.php` = **23/23** ✅
