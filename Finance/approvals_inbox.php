@@ -1,0 +1,101 @@
+<?php
+/**
+ * Finance/approvals_inbox.php — صندوقُ الاعتمادات الموحّد (M-42 · الشاشة 192)
+ * ───────────────────────────────────────────────────────────────────────────
+ * UX-02 §5: صناديقُ الاعتماد الأربعةُ المتفرقة (طلبٌ · تسويةٌ · قيدٌ ·
+ * إقفال) في **صندوقٍ واحدٍ بعدّاده** — والقرارُ يمرّ **بخدمة مصدره**:
+ * كلُّ سطرٍ بزرِّ قفزٍ إلى موضع الفعل، ولا قرارَ يُنفَّذ هنا.
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+require_once __DIR__ . '/../app/Services/Finance/ApprovalsInboxService.php';
+require_once __DIR__ . '/../includes/screen_contract.php';
+
+use App\Services\Finance\ApprovalsInboxService as AIS;
+
+$current_role   = strval($_SESSION['user']['role'] ?? '');
+$is_super_admin = ($current_role === '-1');
+$company_id     = intval($_SESSION['user']['company_id'] ?? 0);
+if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
+
+$MODULE_CODE = 'Finance/approvals_inbox.php';
+$can_view = false;
+if ($is_super_admin) { $can_view = true; }
+else {
+    $st = $conn->prepare("SELECT rp.can_view FROM role_permissions rp
+                            JOIN modules m ON m.id = rp.module_id
+                           WHERE m.code = ? AND rp.role_id = ? LIMIT 1");
+    $rid = intval($current_role);
+    $st->bind_param('si', $MODULE_CODE, $rid);
+    $st->execute();
+    if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
+    $st->close();
+}
+if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ للصندوق الموحد ❌')); exit(); }
+
+$inbox = AIS::inbox($conn, $company_id);
+
+$page_title = 'إيكوبيشن | صندوق الاعتمادات الموحد';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main ems-unified-page-shell">
+    <?php
+    $header_title = 'صندوق الاعتمادات الموحد'; $header_icon = 'fa fa-inbox';
+    $header_actions = array();
+    include('../includes/page_header.php');
+
+    // M-44: «ما هذه الشاشة؟» — المكوّنُ الموحّد
+    ems_screen_about(
+        'صندوقٌ واحدٌ يجمع كلَّ ما ينتظر قرارًا ماليًّا من الصناديق الأربعة: '
+        . 'الطلباتُ المالية · تسوياتُ الموردين · القيودُ اليدوية · إقفالُ الفترات. '
+        . 'القرارُ لا يُنفَّذ هنا — كلُّ سطرٍ يقفز بك إلى شاشة مالكه حيث الحرّاسُ كاملة.',
+        array('افتح الصندوقَ صباحًا واقرأ العدّادات',
+              'انقر السطرَ فيفتح موضعَ الفعل في شاشة مالكه',
+              'اتخذ القرارَ هناك — يدان لا يدٌ واحدة، ومن أنشأ لا يعتمد'));
+    ?>
+
+    <div class="card"><div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
+        <?php foreach ($inbox['boxes'] as $b): ?>
+            <div class="badge <?php echo $b['count'] > 0 ? 'badge-warning' : 'badge-secondary'; ?>"
+                 style="font-size:15px;padding:8px 14px">
+                <?php echo htmlspecialchars($b['title']); ?>: <strong><?php echo intval($b['count']); ?></strong>
+            </div>
+        <?php endforeach; ?>
+        <div class="badge badge-danger" style="font-size:16px;padding:8px 14px">
+            المجموع: <strong><?php echo intval($inbox['total']); ?></strong></div>
+    </div></div>
+
+    <?php foreach ($inbox['boxes'] as $b): ?>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i>
+        <?php echo htmlspecialchars($b['title']); ?> (<?php echo intval($b['count']); ?>)
+        <small style="color:#888">— القرارُ في <?php echo htmlspecialchars($b['owner']); ?></small></h5></div>
+    <div class="card-body">
+        <?php if (!$b['rows']):
+            // M-44: الحالةُ الفارغة الموحّدة — لا نصَّ DataTables العام
+            ems_state_empty('لا شيءَ ينتظر قرارًا في هذا الصندوق — نظيف ✨');
+        else: ?>
+        <div class="table-container">
+        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+            <thead><tr><th>العنصر</th><th>منذ</th><th></th></tr></thead>
+            <tbody>
+            <?php foreach ($b['rows'] as $r): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($r['label']); ?></td>
+                    <td><small><?php echo htmlspecialchars($r['since']); ?></small></td>
+                    <td><a class="btn-save" href="<?php echo htmlspecialchars($r['link']); ?>">
+                        اذهب إلى موضع الفعل ▸</a></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+        <?php endif; ?>
+    </div></div>
+    <?php endforeach; ?>
+</div>
+
+<script src="../includes/js/jquery-3.7.1.main.js"></script>
+</body>
+</html>

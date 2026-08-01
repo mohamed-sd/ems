@@ -221,6 +221,14 @@ if (array_key_exists($action, $machine_actions)) {
             finreq_redirect($back, '❌ الرفض يستلزم تصنيفًا وسببًا مسجَّلين (§8.5)');
         }
     }
+    // M-45: **من أنشأ لا يعتمد** — قيدًا عامًّا في الخادم لا بإخفاء زر
+    if (in_array($action, array('dept_approve', 'approve', 'acct_approve', 'finance_approve'), true)) {
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $creator = intval($req['requester_id'] ?? 0) ?: intval($req['created_by'] ?? 0);
+        $blocked = ems_no_self_approval($conn, $creator, $user_id,
+            'الطلب المالي ' . strval($req['request_no'] ?? ('#' . $id)), $company_id ?? 0);
+        if ($blocked !== null) { finreq_redirect($back, '❌ ' . $blocked['reason']); }
+    }
     if ($action === 'submit' || $action === 'resubmit') {
         // بوابة العبور الصفرية: المستند شرطٌ صارمٌ من اليوم الأول
         if (!finreq_docs_satisfied($gate, $req)) {

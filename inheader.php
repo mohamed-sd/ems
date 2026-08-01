@@ -26,6 +26,8 @@ if (!function_exists('ems_css_ver')) {
     <?php if (function_exists('csrf_meta')) { echo csrf_meta(); } ?>
     <!-- CSRF: يُلحق التوكن تلقائياً بكل طلب POST/PUT/DELETE (يجب أن يُحمّل قبل أي سكربت يطلب البيانات) -->
     <script src="/ems/assets/js/csrf.js"></script>
+    <!-- M-46: المسودةُ التلقائية كل 30 ثانية — تلتقط النماذجَ الطويلة آليًّا (UI-01 §3) -->
+    <script src="/ems/includes/js/ems-autosave.js" defer></script>
     <title><?php echo $page_title ; ?></title>
 
     <!-- Font awsome icon link مكتبة الايقونات -->
