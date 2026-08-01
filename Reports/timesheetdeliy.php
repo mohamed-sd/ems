@@ -5,6 +5,18 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+
+// M-29 (SPEC-03 بطاقة 6): «تُستوعب تقاريرُ الساعات القديمة» في سجل الوحدات
+// اليومية — Redirect بعدّاد hits، و?legacy=1 بابُ رجوعٍ معلَن.
+if (!isset($_GET['legacy'])) {
+    require_once '../includes/audit_trail.php';
+    ems_audit_change($conn, 'operations', 'route_redirect', 'legacy_hit', 125,
+        array(), array('from' => 'Reports/timesheetdeliy.php', 'to' => 'Reports/daily_units_report.php'),
+        array('company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+              'user_id' => intval($_SESSION['user']['id'] ?? 0)));
+    header("Location: daily_units_report.php");
+    exit();
+}
 $_ts_current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $_ts_is_super_admin = ($_ts_current_role === '-1');
 // العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).

@@ -6,6 +6,18 @@ if (!isset($_SESSION['user'])) {
 }
 $page_title = "إيكوبيشن | التشغيل ";
 include '../config.php';
+
+// M-27 (SPEC-03 بطاقة 1 · SPEC-00 §3-②): الشاشةُ استُوعبت في غرفة العمليات —
+// **Redirect بعدّاد hits حتى يصفر**، و?legacy=1 بابُ رجوعٍ مؤقتٌ معلَن.
+if (!isset($_GET['legacy'])) {
+    require_once '../includes/audit_trail.php';
+    ems_audit_change($conn, 'operations', 'route_redirect', 'legacy_hit', 9,
+        array(), array('from' => 'Oprators/oprators.php', 'to' => 'Operations/operations_room.php'),
+        array('company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+              'user_id' => intval($_SESSION['user']['id'] ?? 0)));
+    header("Location: ../Operations/operations_room.php");
+    exit();
+}
 include '../includes/permissions_helper.php';
 require_once '../includes/approval_workflow.php';
 

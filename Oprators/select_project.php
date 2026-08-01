@@ -5,6 +5,19 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 $page_title = "إيكوبيشن | اختيار المشروع للتشغيل";
+
+// M-27 (UX-03 §7 + الدستور §6 «لا قوائمَ وسيطة»): القائمةُ الوسيطة استُوعبت
+// في غرفة العمليات — Redirect بعدّاد hits، و?legacy=1 بابُ رجوعٍ معلَن.
+if (!isset($_GET['legacy'])) {
+    include '../config.php';
+    require_once '../includes/audit_trail.php';
+    ems_audit_change($conn, 'operations', 'route_redirect', 'legacy_hit', 23,
+        array(), array('from' => 'Oprators/select_project.php', 'to' => 'Operations/operations_room.php'),
+        array('company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+              'user_id' => intval($_SESSION['user']['id'] ?? 0)));
+    header("Location: ../Operations/operations_room.php");
+    exit();
+}
 include("../inheader.php");
 include("../insidebar.php");
 
