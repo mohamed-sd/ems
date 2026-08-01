@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 22:29:33
+-- المصدر: equipation_manage · التوليد: 2026-08-01 22:47:42
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -253,7 +253,11 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (211,'إنشاء عملية تمويل','Financing/financing_operation_new.php',1,NULL,0,1,'fa fa-money-check-dollar',0),
 (212,'الاعتمادات المتأخرة والوثائق','Reports/approval_lag_report.php',1,NULL,0,1,'fa fa-hourglass-half',0),
 (213,'منح المجال المقيَّد','Governance/ownership_grants.php',1,NULL,0,1,'fa fa-user-lock',0),
-(214,'لوحة إدارة التمويل','Financing/financing_board.php',26,NULL,0,1,'fa fa-money-bill-trend-up',0);
+(214,'لوحة إدارة التمويل','Financing/financing_board.php',26,NULL,0,1,'fa fa-money-bill-trend-up',0),
+(215,'لوحة مدير التشغيل','admin/ops_manager_board.php',NULL,NULL,0,0,'fa fa-tachometer-alt',300),
+(216,'التكليفات التنظيمية','admin/org_assignments.php',NULL,NULL,0,0,'fa fa-id-badge',301),
+(217,'الهيكل التنظيمي','admin/org_structure.php',NULL,NULL,0,0,'fa fa-sitemap',302),
+(218,'أذونات المواقع','admin/org_permits.php',NULL,NULL,0,0,'fa fa-key',303);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -1270,7 +1274,14 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1294,26,212,1,0,0,0),
 (1295,26,214,1,0,0,0),
 (1296,1,213,1,1,1,0),
-(1297,19,213,1,1,1,0);
+(1297,19,213,1,1,1,0),
+(1304,1,215,1,1,1,0),
+(1305,1,216,1,1,1,0),
+(1306,1,217,1,1,1,0),
+(1307,1,218,1,1,1,0),
+(1311,6,216,1,0,0,0),
+(1312,6,217,1,0,0,0),
+(1313,6,218,1,1,1,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -1910,7 +1921,13 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (826,26,'REP',NULL,212,'الاعتمادات المتأخرة والوثائق','Reports/approval_lag_report.php','fa fa-hourglass-half',90,NULL,'Reports/approval_lag_report.php',1,'2026-08-01 21:13:11','2026-08-01 21:13:11'),
 (827,26,'HOME',NULL,214,'الرئيسية','Financing/financing_board.php','fa fa-money-bill-trend-up',1,NULL,'Financing/financing_board.php',1,'2026-08-01 21:13:11','2026-08-01 21:13:11'),
 (828,19,'GOV',NULL,213,'منح المجال المقيَّد','Governance/ownership_grants.php','fa fa-user-lock',5,NULL,'Governance/ownership_grants.php',1,'2026-08-01 21:13:11','2026-08-01 21:13:11'),
-(829,1,'GOV',NULL,213,'منح المجال المقيَّد','Governance/ownership_grants.php','fa fa-user-lock',5,NULL,'Governance/ownership_grants.php',1,'2026-08-01 21:13:11','2026-08-01 21:13:11');
+(829,1,'GOV',NULL,213,'منح المجال المقيَّد','Governance/ownership_grants.php','fa fa-user-lock',5,NULL,'Governance/ownership_grants.php',1,'2026-08-01 21:13:11','2026-08-01 21:13:11'),
+(833,1,'HOME',NULL,215,'لوحة مدير التشغيل','admin/ops_manager_board.php','fa fa-tachometer-alt',5,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
+(834,1,'REC',NULL,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
+(835,1,'SET',NULL,217,'الهيكل التنظيمي','admin/org_structure.php','fa fa-sitemap',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
+(836,1,'APPR',NULL,218,'أذونات المواقع','admin/org_permits.php','fa fa-key',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
+(840,6,'REC',NULL,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',95,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38'),
+(841,6,'APPR',NULL,218,'أذونات المواقع','admin/org_permits.php','fa fa-key',90,NULL,NULL,1,'2026-08-02 01:46:38','2026-08-02 01:46:38');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
