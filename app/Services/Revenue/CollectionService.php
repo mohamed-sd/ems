@@ -283,10 +283,12 @@ class CollectionService
                 return $out;
             }
             // الهدفُ **موجودٌ ومفتوح** — لا يُخصَّص قبضٌ لعدم
-            $chk = self::checkTarget($gate, $kind, $ref, $amt);
+            // (P-08: والمقارنةُ **بالمعادل** حين تختلف العملتان)
+            $chk = self::checkTarget($gate, $kind, $ref, $amt,
+                (string) $p['currency'], (string) ($p['received_on'] ?: date('Y-m-d')));
             if (!$chk['ok']) { $out['code'] = $chk['code']; $out['reason'] = $chk['reason']; return $out; }
             $clean[$key] = array('kind' => $kind, 'ref' => $ref, 'amount' => $amt,
-                                 'recv' => $chk['recv'],
+                                 'recv' => $chk['recv'], 'fx' => $chk['fx'],
                                  'note' => isset($t['note']) ? mb_substr((string) $t['note'], 0, 255) : null);
             $sum = round($sum + $amt, 2);
         }
@@ -301,23 +303,45 @@ class CollectionService
             return $out;
         }
 
-        $rows = array();
+        $rows = array(); $fxRows = array();
+        $payCur = (string) $p['currency'];
+        $payOn = (string) ($p['received_on'] ?: date('Y-m-d'));
         try {
-            $gate->runInTransaction(function ($g) use ($clean, $paymentId, $already, $sum, $actor, &$rows) {
+            $gate->runInTransaction(function ($g) use (
+                $clean, $paymentId, $already, $sum, $actor, &$rows, &$fxRows, $payCur, $payOn
+            ) {
                 foreach ($clean as $c) {
-                    $g->insert('fin_collection_allocations', array(
-                        'payment_id'    => (int) $paymentId,
-                        'receivable_id' => ($c['kind'] === 'invoice') ? (int) $c['ref'] : null,
-                        'target_kind'   => $c['kind'],
-                        'target_ref'    => (int) $c['ref'],
-                        'amount'        => $c['amount'],
-                        'basis'         => 'explicit',
-                        'note'          => $c['note'],
-                        'created_by'    => (int) $actor ?: null,
+                    $fx = $c['fx'];
+                    // P-08: **الفرقُ المحقَّق** = قيمةُ النقد بالوظيفية − قيمةُ
+                    // الذمّة الملغاة بسعرها **المجمَّد يومَ الاعتراف**.
+                    $diff = 0.0;
+                    $rateRec = null;
+                    if ($c['kind'] === 'invoice' && $c['recv'] !== null
+                        && $c['recv']['fx_rate_recognized'] !== null) {
+                        $rateRec = (float) $c['recv']['fx_rate_recognized'];
+                        $diff = \App\Services\Finance\FxSettlementService::realizedDiff(
+                            $fx['amount_target'], $fx['base'], $rateRec);
+                    }
+                    $allocId = (int) $g->insert('fin_collection_allocations', array(
+                        'payment_id'     => (int) $paymentId,
+                        'receivable_id'  => ($c['kind'] === 'invoice') ? (int) $c['ref'] : null,
+                        'target_kind'    => $c['kind'],
+                        'target_ref'     => (int) $c['ref'],
+                        'amount'         => $c['amount'],
+                        'pay_currency'   => $payCur,
+                        'target_currency' => (string) $fx['target_currency'],
+                        'amount_target'  => $fx['amount_target'],
+                        'fx_rate_pay'    => $fx['rate_pay'],
+                        'fx_rate_target' => $fx['rate_target'],
+                        'base_amount'    => $fx['base'],
+                        'fx_diff_base'   => $diff,
+                        'basis'          => 'explicit',
+                        'note'           => $c['note'],
+                        'created_by'     => (int) $actor ?: null,
                     ));
-                    // الفاتورةُ تُحدَّث في ذمّتها كما في M-05 حرفيًّا
+                    // الفاتورةُ تُطفأ **بالمعادل** لا بالمبلغ الخام (§9-⑨)
                     if ($c['kind'] === 'invoice' && $c['recv'] !== null) {
-                        $newCollected = round((float) $c['recv']['collected'] + $c['amount'], 2);
+                        $newCollected = round((float) $c['recv']['collected'] + $fx['amount_target'], 2);
                         $g->update('fin_receivables', array(
                             'collected' => $newCollected,
                             'state' => ($newCollected >= round((float) $c['recv']['amount'], 2) - 0.004)
@@ -326,7 +350,7 @@ class CollectionService
                     }
                     // وسطرُ خطة الدفع (P-05) يُحدَّث في مستلمِه — **لا رقمَ ثانٍ**
                     if ($c['kind'] !== 'invoice' && $c['recv'] !== null) {
-                        $rec = round((float) $c['recv']['received_amount'] + $c['amount'], 2);
+                        $rec = round((float) $c['recv']['received_amount'] + $fx['amount_target'], 2);
                         $g->update('contract_payment_schedule', array(
                             'received_amount' => $rec,
                             'state' => ($rec >= round((float) $c['recv']['amount_expected'], 2) - 0.004)
@@ -334,7 +358,14 @@ class CollectionService
                         ), array('id' => (int) $c['ref']));
                     }
                     $rows[] = array('kind' => $c['kind'], 'ref' => (int) $c['ref'],
-                                    'amount' => $c['amount']);
+                                    'amount' => $c['amount'], 'amount_target' => $fx['amount_target'],
+                                    'target_currency' => (string) $fx['target_currency'],
+                                    'fx_diff' => $diff);
+                    if (abs($diff) >= 0.005) {
+                        $fxRows[] = array('alloc_id' => $allocId, 'diff' => $diff,
+                                          'from' => (string) $fx['target_currency'],
+                                          'rate_from' => $rateRec, 'rate_to' => $fx['rate_pay']);
+                    }
                 }
                 $g->update('fin_payments', array('allocated_amount' => round($already + $sum, 2)),
                     array('id' => (int) $paymentId));
@@ -354,24 +385,48 @@ class CollectionService
                 self::reflectClaimState($conn, $gate, $companyId, (int) $r['ref'], $actor);
             }
         }
+        // P-08: **وفرقُ الصرف بسطره** في العملة الوظيفية — بابٌ غيرُ باب الذمّة
+        foreach ($fxRows as $f) {
+            \App\Services\Finance\FxSettlementService::recordDiff($conn, $gate, $companyId, array(
+                'kind' => 'realized', 'source_kind' => 'allocation',
+                'source_ref' => (int) $f['alloc_id'], 'party_ref' => (int) $p['party_ref'],
+                'from_currency' => $f['from'], 'amount' => $f['diff'],
+                'rate_from' => $f['rate_from'], 'rate_to' => $f['rate_to'],
+                'occurred_on' => $payOn,
+                'note' => 'فرقُ صرفٍ محقَّقٌ عند تخصيص السند ' . (int) $paymentId,
+            ), $actor);
+        }
         self::audit($conn, $companyId, $actor, 'allocate_targets', (int) $paymentId,
             array('allocated' => $already), array('allocated' => round($already + $sum, 2)));
 
         $out['ok'] = true; $out['code'] = 200; $out['rows'] = $rows;
         $out['allocated'] = round($already + $sum, 2);
         $out['unallocated'] = round($amount - $already - $sum, 2);
-        $out['reason'] = 'خُصّص ' . $sum . ' على ' . count($rows) . ' هدفًا · '
+        $fxTotal = 0.0; $crossed = 0;
+        foreach ($rows as $r) {
+            $fxTotal = round($fxTotal + (float) $r['fx_diff'], 2);
+            if ((string) $r['target_currency'] !== $payCur) { $crossed++; }
+        }
+        $out['fx_diff'] = $fxTotal;
+        $out['reason'] = 'خُصّص ' . $sum . ' ' . $payCur . ' على ' . count($rows) . ' هدفًا · '
             . 'المخصَّصُ ' . $out['allocated'] . ' من ' . $amount
+            . ($crossed > 0 ? (' · **' . $crossed . ' هدفًا بعملةٍ أخرى أُطفئ بالمعادل**') : '')
+            . (abs($fxTotal) >= 0.005
+               ? (' · **وفرقُ صرفٍ ' . $fxTotal . ' بسطره في العملة الوظيفية**') : '')
             . ($out['unallocated'] > 0.004
                ? (' · **وبقي ' . $out['unallocated'] . ' رصيدًا غيرَ مخصَّصٍ ظاهرًا**')
                : ' · **Σ التخصيصات = السند**');
         return $out;
     }
 
-    /** الهدفُ موجودٌ ومفتوحٌ ويتسع للمبلغ — **قبل أيِّ كتابة**. */
-    private static function checkTarget($gate, $kind, $ref, $amount)
+    /**
+     * الهدفُ موجودٌ ومفتوحٌ ويتسع للمبلغ — **قبل أيِّ كتابة**.
+     * و**P-08**: حين تختلف عملةُ السداد عن عملة الهدف تُقارَن **بالمعادل**،
+     * و`fx` تحمل ما يلزم لكتابة السطر وحسابِ الفرق المحقَّق.
+     */
+    private static function checkTarget($gate, $kind, $ref, $amount, $payCur = '', $payDate = null)
     {
-        $o = array('ok' => false, 'code' => 422, 'reason' => '', 'recv' => null);
+        $o = array('ok' => false, 'code' => 422, 'reason' => '', 'recv' => null, 'fx' => null);
         if ($kind === 'invoice') {
             $r = null;
             try { $r = $gate->selectOne('fin_receivables', array('where' => array('id' => (int) $ref))); }
@@ -383,13 +438,17 @@ class CollectionService
                 $o['reason'] = 'الذمّةُ #' . $ref . ' **مسدَّدةٌ كاملًا** — ولا يُخصَّص قبضٌ لمسدَّد';
                 return $o;
             }
-            if ($amount > $outst + 0.0001) {
+            $fx = self::fxOf($amount, $payCur, (string) $r['currency'], $payDate);
+            if (!$fx['ok']) { $o['code'] = 422; $o['reason'] = $fx['reason']; return $o; }
+            if ($fx['amount_target'] > $outst + 0.0001) {
                 $o['code'] = 409;
-                $o['reason'] = 'المبلغُ ' . $amount . ' **يتجاوز متبقّي الذمّة ' . $outst . '** — '
+                $o['reason'] = 'المبلغُ ' . $amount . ' ' . $payCur
+                             . ($fx['crossed'] ? (' (= ' . $fx['amount_target'] . ' ' . $r['currency'] . ')') : '')
+                             . ' **يتجاوز متبقّي الذمّة ' . $outst . ' ' . $r['currency'] . '** — '
                              . 'والزيادةُ **رصيدٌ دائنٌ للعميل لا إيراد**';
                 return $o;
             }
-            $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; return $o;
+            $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; $o['fx'] = $fx; return $o;
         }
         // الأهدافُ الأربعةُ الأخرى **أسطرُ خطةِ الدفع** (P-05) — لا جدولَ ثالث
         $r = null;
@@ -412,13 +471,48 @@ class CollectionService
             $o['code'] = 409;
             $o['reason'] = 'السطرُ #' . $ref . ' **مستلَمٌ كاملًا** — ولا يُخصَّص قبضٌ لمكتمل'; return $o;
         }
-        if ($amount > $left + 0.0001) {
+        $fx = self::fxOf($amount, $payCur, (string) $r['currency'], $payDate);
+        if (!$fx['ok']) { $o['code'] = 422; $o['reason'] = $fx['reason']; return $o; }
+        if ($fx['amount_target'] > $left + 0.0001) {
             $o['code'] = 409;
-            $o['reason'] = 'المبلغُ ' . $amount . ' **يتجاوز متبقّي السطر ' . $left . '** — '
+            $o['reason'] = 'المبلغُ ' . $amount . ' ' . $payCur
+                         . ($fx['crossed'] ? (' (= ' . $fx['amount_target'] . ' ' . $r['currency'] . ')') : '')
+                         . ' **يتجاوز متبقّي السطر ' . $left . ' ' . $r['currency'] . '** — '
                          . 'والزيادةُ **رصيدٌ دائنٌ للعميل لا إيراد**';
             return $o;
         }
-        $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; return $o;
+        $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; $o['fx'] = $fx; return $o;
+    }
+
+    /**
+     * P-08 — **الذمةُ تُطفأ بالمعادل**: تحويلُ مبلغ السداد إلى عملة الهدف،
+     * وقيمتُه بالعملة الوظيفية. و**النقصُ بعد التحويل رصيدٌ غيرُ مسددٍ يبقى في
+     * الذمّة** — لا فرقُ صرفٍ يُقفل به الباب (§9-⑨).
+     */
+    private static function fxOf($amount, $payCur, $targetCur, $payDate)
+    {
+        require_once dirname(__DIR__) . '/Finance/FxSettlementService.php';
+        $payCur = trim((string) $payCur);
+        $targetCur = trim((string) $targetCur);
+        $o = array('ok' => true, 'reason' => '', 'crossed' => false,
+                   'pay_currency' => $payCur, 'target_currency' => $targetCur,
+                   'amount_target' => round((float) $amount, 2),
+                   'rate_pay' => null, 'rate_target' => null,
+                   'base' => round((float) $amount, 2));
+        if ($targetCur === '') {
+            // ذمّةٌ بلا عملةٍ — وهو ما كانت عليه البنيةُ قبل P-08
+            $o['ok'] = false;
+            $o['reason'] = '**الهدفُ بلا عملةٍ مسجَّلة** — ولا يُخصَّص قبضٌ لمبلغٍ لا يُعرف بأيِّ عملةٍ هو';
+            return $o;
+        }
+        $r = \App\Services\Finance\FxSettlementService::convert($amount, $payCur, $targetCur, $payDate);
+        if (!$r['ok']) { $o['ok'] = false; $o['reason'] = $r['reason']; return $o; }
+        $o['crossed'] = ($payCur !== $targetCur);
+        $o['amount_target'] = $r['amount'];
+        $o['rate_pay'] = $r['rate_from'];
+        $o['rate_target'] = $r['rate_to'];
+        $o['base'] = $r['base'];
+        return $o;
     }
 
     /** **الرصيدُ غيرُ المخصَّص ظاهرًا** — لا رقمٌ في رسالةٍ تختفي. */

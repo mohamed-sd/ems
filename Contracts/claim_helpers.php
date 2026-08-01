@@ -1126,6 +1126,7 @@ if (!function_exists('claim_approve')) {
 
         // الذمّةُ المدينة — دَينٌ باسم العميل يُطارَد (بعطالته: مرجعُ المستخلص)
         $recvId = null;
+        require_once __DIR__ . '/../app/Services/Finance/FxSettlementService.php';
         try {
             // `doc_type` قيمتان محصورتان (invoice·statement) — والذمّةُ تنشأ عن
             // **الفاتورة الضريبية** المولَّدة من المستخلص، فمرجعُها رقمُ الفاتورة.
@@ -1142,6 +1143,15 @@ if (!function_exists('claim_approve')) {
                     'doc_ref'            => $invoiceNo,
                     'project_id'         => !empty($c['project_id']) ? intval($c['project_id']) : null,
                     'amount'             => round($net + $taxAmount, 2),
+                    // P-08: **الذمّةُ بعملتها وسعرِها المجمَّد** — ذمّةٌ بلا عملةٍ
+                    // مبلغٌ لا يُعرف بأيِّ عملةٍ هو، ولا يُخصَّص له قبضٌ أصلًا.
+                    'currency'           => (string) $c['currency'],
+                    'fx_rate_recognized' => \App\Services\Finance\FxSettlementService::rateOf(
+                                                (string) $c['currency'], date('Y-m-d')),
+                    'base_amount'        => (function ($amt, $cur) {
+                                                $r = \App\Services\Finance\FxSettlementService::rateOf($cur, date('Y-m-d'));
+                                                return ($r === null) ? null : round($amt * $r, 2);
+                                            })(round($net + $taxAmount, 2), (string) $c['currency']),
                     'collected'          => 0,
                     // `outstanding` عمودٌ **مولَّد** (amount − collected) — الكتابةُ
                     // إليه يرفضها MySQL؛ يُترك للقاعدة تحسبه.

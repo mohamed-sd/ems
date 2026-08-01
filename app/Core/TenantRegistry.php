@@ -227,6 +227,8 @@ class TenantRegistry
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        // P-08 (PLAN-03 §3.8): فروقُ الصرف — المحقَّقُ وغيرُ المحقَّق ولكلٍّ بابُه.
+        'fin_fx_differences' => array('type' => self::T_TENANT, 'soft' => false),
         // P-06 (PLAN-03 §3.1): سجلُّ الضمانات — الأصلُ والالتزامُ المحتمل لا يختلطان.
         'contract_guarantees' => array('type' => self::T_TENANT, 'soft' => true),
         // P-05 (PLAN-03 §3.5): خطةُ الدفع بأنماطها الثمانية وأنواعِ المقدم الأربعة.

@@ -81,12 +81,16 @@ $MST = intval($conn->insert_id);
 
 $CLIENT = 1;
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, collected, due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-A-{$MARK}', {$PRJ}, 3000, 0, '2088-03-31', 'open', NOW())");
+              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              due_date, state, created_at)
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-A-{$MARK}', {$PRJ}, 3000, 'USD', 1.0, 3000, 0,
+                      '2088-03-31', 'open', NOW())");
 $R1 = intval($conn->insert_id);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, collected, due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-B-{$MARK}', {$PRJ}, 2000, 0, '2088-04-30', 'open', NOW())");
+              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              due_date, state, created_at)
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-B-{$MARK}', {$PRJ}, 2000, 'USD', 1.0, 2000, 0,
+                      '2088-04-30', 'open', NOW())");
 $R2 = intval($conn->insert_id);
 check($CID > 0 && $ADV > 0 && $MST > 0 && $R1 > 0 && $R2 > 0,
       "عقدٌ #{$CID} · مقدَّمٌ 5,000 (#{$ADV}) · معلَمٌ 4,000 (#{$MST}) · ذمّتان 3,000 و2,000");

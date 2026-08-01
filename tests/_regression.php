@@ -19,7 +19,7 @@ $core = array(
     'payroll_run_cycle_test', 'final_settlement_test', 'employee_settlement_test',
     'pay_policy_state_test', 'operator_due_policy_test', 'timesheet_fanout_test',
     'attribution_test', 'effect_fanout_test',
-    'transfer_tariff_test', 'depreciation_event_test', 'periodic_events_test', 'bank_reconciliation_test', 'rfq_cycle_test', 'contract_sites_test', 'contract_lines_test', 'contract_monthly_plan_test', 'contract_resource_plan_test', 'contract_payment_schedule_test', 'contract_guarantees_test', 'allocation_targets_test', 'daily_plan_test', 'dues_source_doc_test', 'settlement_test', 'settlement_invoice_close_test',
+    'transfer_tariff_test', 'depreciation_event_test', 'periodic_events_test', 'bank_reconciliation_test', 'rfq_cycle_test', 'contract_sites_test', 'contract_lines_test', 'contract_monthly_plan_test', 'contract_resource_plan_test', 'contract_payment_schedule_test', 'contract_guarantees_test', 'allocation_targets_test', 'three_currencies_test', 'daily_plan_test', 'dues_source_doc_test', 'settlement_test', 'settlement_invoice_close_test',
     'supplier_advances_test', 'supplier_statement_test', 'supplier_rules_test',
     'supplier_capacity_test', 'supplier_evaluation_test', 'supplier_closure_test',
     'supplier_documents_test', 'tax_invoice_test', 'client_statement_test',

@@ -111,6 +111,11 @@ try {
           ORDER BY p.id DESC LIMIT 30");
 } catch (\Throwable $t) { $recent = array(); }
 
+// P-08: الفروقُ الأربعةُ **منفصلةً** وسجلُّ فروق الصرف
+require_once __DIR__ . '/../app/Services/Finance/FxSettlementService.php';
+$four = \App\Services\Finance\FxSettlementService::fourfold($gate, $filterClient);
+$fxRows = \App\Services\Finance\FxSettlementService::differencesOf($gate, '', 50);
+
 // P-07: السنداتُ ذاتُ رصيدٍ غيرِ مخصَّص — **الفجوةُ تُرى**
 $unallocated = COL::unallocatedPayments($gate);
 $PAY = intval($_GET['payment_id'] ?? 0);
@@ -243,6 +248,66 @@ include '../insidebar.php';
             </tbody>
         </table>
     </div></div></div>
+
+    <!-- ═══ P-08: الفروقُ الأربعةُ — أربعةُ أبوابٍ لا مجموعٌ واحد ═══ -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-code-compare"></i>
+        الفروقُ الأربعة — <strong>لا تُخلط ولا تُجمع في رقم</strong></h5></div>
+    <div class="card-body">
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="border:1px solid #d1d5db;border-radius:8px;padding:10px 16px;min-width:210px">
+                <div style="color:#6b7280;font-size:.85em">① رصيدٌ غيرُ مسدد <small>(بعملة كل ذمّة)</small></div>
+                <div style="font-size:1.15em;font-weight:700"><?php
+                    $__p = array();
+                    foreach ($four['unpaid'] as $__c => $__v) {
+                        $__p[] = $__v . ' ' . ($__c !== '' ? htmlspecialchars((string)$__c) : '؟');
+                    }
+                    echo $__p ? implode(' · ', $__p) : 'صفر'; ?></div>
+                <small>بيتُه <code>fin_receivables.outstanding</code></small>
+            </div>
+            <div style="border:1px solid #d1d5db;border-radius:8px;padding:10px 16px;min-width:190px">
+                <div style="color:#6b7280;font-size:.85em">② فرقُ صرفٍ <strong>محقَّق</strong></div>
+                <div style="font-size:1.15em;font-weight:700"><?php
+                    echo $four['realized'] . ' ' . htmlspecialchars((string)$four['functional']); ?></div>
+                <small>عند السداد — بالعملة الوظيفية</small>
+            </div>
+            <div style="border:1px solid #d1d5db;border-radius:8px;padding:10px 16px;min-width:190px">
+                <div style="color:#6b7280;font-size:.85em">③ فرقُ صرفٍ <strong>غيرُ محقَّق</strong></div>
+                <div style="font-size:1.15em;font-weight:700"><?php
+                    echo $four['unrealized'] . ' ' . htmlspecialchars((string)$four['functional']); ?></div>
+                <small><strong>تقديرٌ لا يُقفل ذمّةً ولا يمسّ رصيدًا</strong></small>
+            </div>
+            <div style="border:1px solid #d1d5db;border-radius:8px;padding:10px 16px;min-width:190px">
+                <div style="color:#6b7280;font-size:.85em">④ زيادةُ سداد</div>
+                <div style="font-size:1.15em;font-weight:700"><?php echo $four['overpayment']; ?></div>
+                <small><strong>رصيدٌ دائنٌ للعميل لا إيراد</strong></small>
+            </div>
+        </div>
+        <?php if ($fxRows): ?>
+        <div class="table-container" style="margin-top:12px">
+            <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+                <thead><tr><th>النوع</th><th>المصدر</th><th>من عملة</th><th>المبلغ</th>
+                    <th>سعرُ الاعتراف</th><th>سعرُ السداد</th><th>التاريخ</th><th>البيان</th></tr></thead>
+                <tbody>
+                <?php foreach ($fxRows as $d): ?>
+                    <tr><td><span class="badge <?php echo (string)$d['kind'] === 'realized'
+                            ? 'badge-info' : 'badge-secondary'; ?>">
+                            <?php echo (string)$d['kind'] === 'realized' ? 'محقَّق' : 'غيرُ محقَّق'; ?></span></td>
+                        <td><?php echo htmlspecialchars((string)$d['source_kind']); ?>
+                            #<?php echo intval($d['source_ref']); ?></td>
+                        <td><?php echo htmlspecialchars((string)$d['from_currency']); ?></td>
+                        <td><strong><?php echo htmlspecialchars((string)$d['amount']); ?></strong>
+                            <?php echo htmlspecialchars((string)$d['functional_currency']); ?></td>
+                        <td><?php echo htmlspecialchars((string)($d['rate_from'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string)($d['rate_to'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string)$d['occurred_on']); ?></td>
+                        <td style="white-space:normal"><small><?php
+                            echo htmlspecialchars((string)($d['note'] ?? '—')); ?></small></td></tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+    </div></div>
 
     <!-- ═══ P-07: أهدافُ التخصيص الخمسة والرصيدُ غيرُ المخصَّص ═══ -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-scale-balanced"></i>

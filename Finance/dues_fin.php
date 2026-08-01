@@ -117,9 +117,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     $amount   = round(floatval($_POST['r_amount'] ?? 0), 2);
     $due_date = trim($_POST['due_date'] ?? '') ?: null;
     if ($cust <= 0 || $amount <= 0) { header("Location: dues_fin.php?msg=بيانات+الذمّة+غير+صحيحة+❌"); exit(); }
+    // P-08: **الذمّةُ بعملتها** — والافتراضُ عملةُ الأساس مُعلَنًا في الشاشة
+    require_once __DIR__ . '/../app/Services/Finance/FxSettlementService.php';
+    require_once __DIR__ . '/../includes/fx.php';
+    $r_cur = trim(strval($_POST['r_currency'] ?? '')) !== ''
+             ? (string) ems_fx_code($_POST['r_currency']) : (string) ems_fx_base_currency();
+    if ($r_cur === '') { $r_cur = (string) ems_fx_base_currency(); }
+    $r_rate = \App\Services\Finance\FxSettlementService::rateOf($r_cur, date('Y-m-d'));
     fin_gate($is_super_admin)->insert('fin_receivables', array(
         'customer_entity_id' => $cust, 'doc_type' => $doc_type, 'doc_ref' => $doc_ref,
-        'amount' => $amount, 'due_date' => $due_date, 'state' => 'open', 'created_by' => $current_user_id,
+        'amount' => $amount, 'currency' => $r_cur,
+        'fx_rate_recognized' => $r_rate,
+        'base_amount' => ($r_rate === null) ? null : round($amount * $r_rate, 2),
+        'due_date' => $due_date, 'state' => 'open', 'created_by' => $current_user_id,
     ));
     header("Location: dues_fin.php?msg=تمت+إضافة+الذمّة+✅"); exit();
 }
@@ -193,6 +203,17 @@ include '../insidebar.php';
                 <select name="doc_type"><option value="invoice">فاتورة</option><option value="statement">مستخلص</option></select></div>
             <div class="form-group"><label>مرجع المستند</label><input type="text" name="doc_ref"></div>
             <div class="form-group"><label>المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="r_amount" required></div>
+            <?php // P-08: **الذمّةُ بعملتها** — ومبلغٌ بلا عملةٍ لا يُعرف بأيِّ عملةٍ هو
+                  require_once __DIR__ . '/../includes/fx.php';
+                  $__base = (string) ems_fx_base_currency(); ?>
+            <div class="form-group"><label>العملة</label>
+                <select name="r_currency">
+                    <?php foreach (ems_fx_currencies() as $__c => $__row): ?>
+                        <option value="<?php echo htmlspecialchars((string)$__c); ?>"
+                            <?php echo ((string)$__c === $__base) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars((string)$__c . ' — ' . $__row['name_ar']); ?></option>
+                    <?php endforeach; ?>
+                </select></div>
             <div class="form-group"><label>تاريخ الاستحقاق</label><input type="date" name="due_date"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
