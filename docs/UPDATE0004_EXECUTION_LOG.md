@@ -29,3 +29,15 @@
 | ORG-05 | جداول الأذونات الخمسة + بذر الأنواع التسعة + مصفوفة §5 = 24 صف موافقة مرتبة | الهجرة | عدّ 9 و24 وترتيب الحركة أولًا ✅ | J-07 · J-08 |
 
 **الحزام:** `tests/org_structure_test.php` = **28/28** ✅ · `dump-schema` حُدِّث (323 جدولًا + منظر).
+
+## الموجة ② · ORG-01 السلطة — 5/5
+
+**القياس قبل التنفيذ:** `AuthorityGuard::sign` يفحص الذات ثم التفويض (`signing_authorities`) — لا مساس بمساره؛ `guard_denials` جاهز للتسجيل؛ الدور 1 = مدير التشغيل و-1 = الأعلى (`includes/roles.php`)؛ `fin_notifications.target_level` ENUM بلا قيمة لمدير التشغيل.
+
+| المهمة | ما فُعل | الملفات | الاختبار | اجتهاد |
+|---|---|---|---|---|
+| ORG-06 | `OrgAuthorityResolver`: التكليفات النافذة وصلاحياتها وسقوفها · منتهٍ→403 مسجَّلة · خارج النطاق→403 · فوق السقف→409 بالمتاح · التغطية بالتقاطع (مشروع↔مواقعه) | `app/Services/Org/OrgAuthorityResolver.php` | O2·O3·O5 ✅ | J-11 |
+| ORG-07 | الوصل بـ`AuthorityGuard` خلف `EMS_ORG_AUTHORITY` (off·monitor·enforce) + عمود `org_asg_id` في `approval_signatures` فالتوقيع بمرجع التكليف | `app/Core/AuthorityGuard.php` · `2026_08_02_org02_signature_asg_ref.sql` · `.env`(+example)=monitor | O8 ✅ | J-10 |
+| ORG-08 | `AssignmentService`: 422 المدة/النطاق · 403 مصدر القرار · 409 التداخل وO1 · 422 الموقعي بلا خطين · إنشاء ذري بصلاحيات وخطوط وسجل · إنهاء «الطلب للفني والقرار لمن كلّف» (202) | `app/Services/Org/AssignmentService.php` | O1·O6·O6-ب·O6-و ✅ | J-12 |
+| ORG-09 | `AssignmentExpiryJob` (سقوط آلي بساعة القاعدة + تنبيه 30 يومًا بعطالة يومية) · `DeputyResolver` (الغياب/التعليق يفعّلان النائب بسطر delegated · لا نيابة بعد الانتهاء) · كرون يومي | `app/Services/Org/AssignmentExpiryJob.php` · `DeputyResolver.php` · `Operations/cron_org_assignments.php` | O2·O4·O7 ✅ | — |
+| ORG-10 | حزام O1→O8 كاملًا | `tests/org_authority_test.php` | **26/26** ✅ | — |

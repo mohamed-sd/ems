@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 22:20:29
+-- المصدر: equipation_manage · التوليد: 2026-08-01 22:29:33
 -- الجداول: 326 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -273,6 +273,7 @@ CREATE TABLE `approval_signatures` (
   `person_id` int NOT NULL,
   `capacity_id` int DEFAULT NULL,
   `auth_id` int unsigned DEFAULT NULL COMMENT 'مرجع التفويض — NULL فقط لما قبل تفعيل الحارس',
+  `org_asg_id` int unsigned DEFAULT NULL COMMENT 'مرجع التكليف التنظيمي المعتمِد — ORG-01 O8',
   `amount` decimal(18,2) DEFAULT NULL COMMENT 'المبلغ الذي اعتُمد تحته',
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -281,6 +282,7 @@ CREATE TABLE `approval_signatures` (
   UNIQUE KEY `uq_sig_step` (`document_type`,`document_id`,`person_id`,`step`),
   KEY `ix_sig_person` (`person_id`,`at`),
   KEY `fk_sig_auth` (`auth_id`),
+  KEY `idx_sig_org_asg` (`org_asg_id`),
   CONSTRAINT `fk_sig_auth` FOREIGN KEY (`auth_id`) REFERENCES `signing_authorities` (`auth_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §6-③: الاعتماد توقيع — Insert-only ولا تعديل ولا حذف؛ يلف الاعتمادات القائمة لا يوازيها';
 

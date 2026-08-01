@@ -40,6 +40,30 @@ class AuthorityGuard
             return $out;
         }
 
+        // ①-ب السلطة التنظيمية (update0004 · ORG-01 §7-① · ORG-07) — خلف علم
+        //    EMS_ORG_AUTHORITY (off·monitor·enforce): يُستدعى OrgAuthorityResolver
+        //    قبل كل اعتماد؛ monitor يسجّل المخالفة في guard_denials ويمضي،
+        //    وenforce يرفض 403 — والتوقيع يحمل مرجع التكليف (O8).
+        $orgAsgId = null;
+        $orgMode = function_exists('ems_env') ? strtolower((string) ems_env('EMS_ORG_AUTHORITY', 'off')) : 'off';
+        if ($orgMode === 'monitor' || $orgMode === 'enforce') {
+            require_once dirname(__DIR__) . '/Services/Org/OrgAuthorityResolver.php';
+            $orgChk = \App\Services\Org\OrgAuthorityResolver::can($conn, $person, $company, array(
+                'scope_type' => isset($a['scope_type']) ? $a['scope_type'] : null,
+                'scope_id' => isset($a['scope_id']) ? $a['scope_id'] : null,
+                'attempted_ref' => $docType . '#' . $docId,
+            ));
+            if ($orgChk['ok']) {
+                $orgAsgId = $orgChk['asg_id'];
+            } elseif ($orgMode === 'enforce') {
+                $out['code'] = intval($orgChk['code']);
+                $out['reason'] = $orgChk['reason'];
+                self::record($conn, $company, $docType, $docId, $step, $person, null, $amount, 'denied');
+                return $out;
+            }
+            // monitor: المخالفة سُجِّلت في guard_denials داخل الحلّال — والاعتماد يمضي
+        }
+
         // ② التفويض الساري — النمط ①: إن لم يكن عنصر السقوف مفعَّلًا للكيان/العقد
         //    فالاعتماد الداخلي يمضي بلا تفويض (ويُسجَّل توقيعًا بلا auth_id)؛
         //    وإن فُعّل signing_caps صار التفويض الساري شرطًا (403 بدونه).
@@ -75,8 +99,9 @@ class AuthorityGuard
         }
 
         // ③ سطر التوقيع — Insert-only، وتكرار الخطوة نفسها عاطل (UQ)
+        //    ويحمل مرجع تكليف معتمِده إن حُلّ (ORG-01 §8 · O8)
         $authId = $auth ? intval($auth['auth_id']) : null;
-        $sigId = self::record($conn, $company, $docType, $docId, $step, $person, $authId, $amount, 'signed');
+        $sigId = self::record($conn, $company, $docType, $docId, $step, $person, $authId, $amount, 'signed', $orgAsgId);
         if ($sigId === 0) {
             // UQ: توقيع قائم لهذه الخطوة — عاطل، يُعاد مرجعه
             $stmt = $conn->prepare('SELECT sig_id FROM approval_signatures WHERE document_type=? AND document_id=? AND person_id=? AND step=? LIMIT 1');
@@ -140,13 +165,13 @@ class AuthorityGuard
         return count($rows);
     }
 
-    private static function record(\mysqli $conn, $company, $docType, $docId, $step, $person, $authId, $amount, $result)
+    private static function record(\mysqli $conn, $company, $docType, $docId, $step, $person, $authId, $amount, $result, $orgAsgId = null)
     {
         $stmt = $conn->prepare(
-            'INSERT IGNORE INTO approval_signatures (company_id, document_type, document_id, step, person_id, auth_id, amount, ip, result)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            'INSERT IGNORE INTO approval_signatures (company_id, document_type, document_id, step, person_id, auth_id, org_asg_id, amount, ip, result)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $ip = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : 'cli';
-        $stmt->bind_param('isisiidss', $company, $docType, $docId, $step, $person, $authId, $amount, $ip, $result);
+        $stmt->bind_param('isisiiidss', $company, $docType, $docId, $step, $person, $authId, $orgAsgId, $amount, $ip, $result);
         $stmt->execute();
         $id = ($stmt->affected_rows === 1) ? intval($stmt->insert_id) : 0;
         $stmt->close();
