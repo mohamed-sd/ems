@@ -229,6 +229,10 @@ class TenantRegistry
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
         // H-15 (USR-01 §2): طبقةُ الصفات — شخصٌ × صفةٌ × نطاقٌ × مدةٌ × مصدر.
         'user_capacities' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-16 (ADM-01): منظومةُ الظهور — القاموسُ عالميٌّ والمفاتيحُ والسجلُّ بشركتهما.
+        'portal_elements' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'visibility_keys' => array('type' => self::T_TENANT, 'soft' => false),
+        'visibility_audit_log' => array('type' => self::T_TENANT, 'soft' => false),
         // P-11 (PLAN-03 §6): اقتصادُ دورة الحياة — الأثرُ محكومٌ بالحالة لا يُختار.
         'contract_lifecycle_events' => array('type' => self::T_TENANT, 'soft' => true),
         // P-10 (PLAN-03 §3.6): خطُّ الأساس بحالته — ومن القفل فقط تبدأ الفوترة.
