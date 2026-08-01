@@ -25,6 +25,7 @@
 | `contract_payment_schedule` | `P-05` | **مبنيّ** (`2026_09_28` · الشاشة 176) |
 | `contract_guarantees` | `P-06` | **مبنيّ** (`2026_09_29` · الشاشة 177 · **الأصلُ والالتزامُ لا يختلطان**) |
 | `collection_allocations` | `P-07` | **يبقى باسمه `fin_collection_allocations`** — ووُسّع بـ`target_kind` الخمسة (`2026_09_30` · **بلا وحدةٍ جديدة**: الشاشة 166) |
+| `fx_differences` | `P-08` | **مبنيّ باسم `fin_fx_differences`** (`2026_10_01`) — والفروقُ الأربعةُ **لكلٍّ بيتُه**: `fin_receivables.outstanding` · السجلُّ (محقَّق/غيرُ محقَّق) · `fin_payments.unallocated_amount` |
 
 ---
 
