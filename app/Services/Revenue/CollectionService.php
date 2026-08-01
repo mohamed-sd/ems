@@ -120,6 +120,9 @@ class CollectionService
                     $g->insert('fin_collection_allocations', array(
                         'payment_id'    => $paymentId,
                         'receivable_id' => (int) $recv['id'],
+                        // P-07: الفاتورةُ **واحدٌ من خمسةِ أهداف** لا الهدفَ الوحيد
+                        'target_kind'   => 'invoice',
+                        'target_ref'    => (int) $recv['id'],
                         'amount'        => $take,
                         'basis'         => $explicit > 0 ? 'explicit' : 'oldest_first',
                         'created_by'    => (int) $actor ?: null,
@@ -137,10 +140,12 @@ class CollectionService
                     $left = round($left - $take, 2);
                 }
                 // أولُ تخصيصٍ يُكتب في العمود القديم أيضًا — مرآةٌ للقائم لا مصدر
-                if ($allocations) {
-                    $g->update('fin_payments', array('receivable_id' => $allocations[0]['receivable_id']),
-                        array('id' => $paymentId));
-                }
+                // و**العدّادُ يُرفع في المعاملة نفسِها** (P-07): `CHECK` يحرس
+                // «Σ ≤ السند»، و`unallocated_amount` مولَّدٌ فيظهر الباقي رصيدًا.
+                $g->update('fin_payments', array(
+                    'allocated_amount' => round($amount - $left, 2),
+                ) + ($allocations ? array('receivable_id' => $allocations[0]['receivable_id']) : array()),
+                    array('id' => $paymentId));
             }, 'تسجيل تحصيل ' . $ref);
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
@@ -209,6 +214,247 @@ class CollectionService
             array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
 
         return array('claim_id' => (int) $claim['id'], 'state' => $newState);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // P-07 — أهدافُ التخصيص الخمسة (الملحق §3-`P-07`)
+    // «توسعةٌ لا هدم»: `record()` تبقى كما هي وهذه تضيف الأهدافَ الأربعةَ
+    // الأخرى فوقها — والقيدُ الحاكمُ **Σ ≤ السند** محمولٌ على السند.
+    // ═════════════════════════════════════════════════════════════════════
+
+    const TARGET_KINDS = array('advance', 'invoice', 'milestone', 'retention', 'final');
+
+    const TARGET_AR = array(
+        'advance' => 'مقدَّم', 'invoice' => 'فاتورة', 'milestone' => 'معلَم',
+        'retention' => 'محتجَز', 'final' => 'ختامية',
+    );
+
+    /** نوعُ سطرِ خطة الدفع (P-05) المقابلُ لكل هدفٍ غيرِ الفاتورة. */
+    const SCHEDULE_KIND_OF = array(
+        'advance' => 'advance', 'milestone' => 'milestone',
+        'retention' => 'retention_release', 'final' => 'final',
+    );
+
+    /**
+     * تخصيصُ سندٍ قائمٍ على **أهدافٍ متعددة** — «سندٌ واحدٌ على مقدمٍ وفاتورتين».
+     *
+     * @param array $targets كلٌّ: {target_kind, target_ref, amount, note?}
+     * @return array{ok:bool,code:int,reason:string,allocated:float,unallocated:float,rows:array}
+     */
+    public static function allocate($conn, $gate, $companyId, $paymentId, array $targets, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'allocated' => 0.0,
+                     'unallocated' => 0.0, 'rows' => array());
+        $p = null;
+        try { $p = $gate->selectOne('fin_payments', array('where' => array('id' => (int) $paymentId))); }
+        catch (\Throwable $t) { $p = null; }
+        if (!$p) { $out['code'] = 404; $out['reason'] = 'السندُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if ((string) $p['direction'] !== 'collection') {
+            $out['code'] = 422;
+            $out['reason'] = '**التخصيصُ للقبض لا للصرف** — والسندُ ' . $p['direction']; return $out;
+        }
+        if (!$targets) { $out['code'] = 422; $out['reason'] = 'لا أهدافَ في الطلب'; return $out; }
+
+        $amount = round((float) $p['amount'], 2);
+        $already = round((float) $p['allocated_amount'], 2);
+        $free = round($amount - $already, 2);
+
+        // ── التحقُّقُ **كلُّه قبل أيِّ كتابة** ────────────────────────────────
+        $clean = array(); $sum = 0.0;
+        foreach ($targets as $t) {
+            $kind = (string) (isset($t['target_kind']) ? $t['target_kind'] : '');
+            if (!in_array($kind, self::TARGET_KINDS, true)) {
+                $out['code'] = 422; $out['reason'] = 'هدفٌ غيرُ معروف: ' . $kind; return $out;
+            }
+            $ref = (int) (isset($t['target_ref']) ? $t['target_ref'] : 0);
+            if ($ref <= 0) {
+                $out['code'] = 422;
+                $out['reason'] = '**مرجعُ الهدف إلزامي** — ولا يُخصَّص قبضٌ لمجهول'; return $out;
+            }
+            $amt = round((float) (isset($t['amount']) ? $t['amount'] : 0), 2);
+            if ($amt <= 0) {
+                $out['code'] = 422; $out['reason'] = 'مبلغُ التخصيص موجبٌ إلزامًا'; return $out;
+            }
+            $key = $kind . ':' . $ref;
+            if (isset($clean[$key])) {
+                $out['code'] = 409;
+                $out['reason'] = 'الهدفُ «' . self::TARGET_AR[$kind] . ' #' . $ref
+                               . '» مكرَّرٌ في الطلب — **ولا سطران لهدفٍ واحدٍ من سندٍ واحد**';
+                return $out;
+            }
+            // الهدفُ **موجودٌ ومفتوح** — لا يُخصَّص قبضٌ لعدم
+            $chk = self::checkTarget($gate, $kind, $ref, $amt);
+            if (!$chk['ok']) { $out['code'] = $chk['code']; $out['reason'] = $chk['reason']; return $out; }
+            $clean[$key] = array('kind' => $kind, 'ref' => $ref, 'amount' => $amt,
+                                 'recv' => $chk['recv'],
+                                 'note' => isset($t['note']) ? mb_substr((string) $t['note'], 0, 255) : null);
+            $sum = round($sum + $amt, 2);
+        }
+
+        // **Σ لا يتجاوز السند أبدًا** — والرسالةُ تسمّي الفائض
+        if ($sum > $free + 0.0001) {
+            $out['code'] = 409;
+            $out['reason'] = '**Σ التخصيصات ' . $sum . ' تتجاوز المتاحَ من السند ' . $free
+                . '** (المبلغُ ' . $amount . ' · المخصَّصُ سلفًا ' . $already . ') — '
+                . 'والفائضُ ' . round($sum - $free, 2) . ' **يُعلَن ولا يُبتلع**';
+            $out['allocated'] = $already; $out['unallocated'] = $free;
+            return $out;
+        }
+
+        $rows = array();
+        try {
+            $gate->runInTransaction(function ($g) use ($clean, $paymentId, $already, $sum, $actor, &$rows) {
+                foreach ($clean as $c) {
+                    $g->insert('fin_collection_allocations', array(
+                        'payment_id'    => (int) $paymentId,
+                        'receivable_id' => ($c['kind'] === 'invoice') ? (int) $c['ref'] : null,
+                        'target_kind'   => $c['kind'],
+                        'target_ref'    => (int) $c['ref'],
+                        'amount'        => $c['amount'],
+                        'basis'         => 'explicit',
+                        'note'          => $c['note'],
+                        'created_by'    => (int) $actor ?: null,
+                    ));
+                    // الفاتورةُ تُحدَّث في ذمّتها كما في M-05 حرفيًّا
+                    if ($c['kind'] === 'invoice' && $c['recv'] !== null) {
+                        $newCollected = round((float) $c['recv']['collected'] + $c['amount'], 2);
+                        $g->update('fin_receivables', array(
+                            'collected' => $newCollected,
+                            'state' => ($newCollected >= round((float) $c['recv']['amount'], 2) - 0.004)
+                                       ? 'collected' : 'partial',
+                        ), array('id' => (int) $c['ref']));
+                    }
+                    // وسطرُ خطة الدفع (P-05) يُحدَّث في مستلمِه — **لا رقمَ ثانٍ**
+                    if ($c['kind'] !== 'invoice' && $c['recv'] !== null) {
+                        $rec = round((float) $c['recv']['received_amount'] + $c['amount'], 2);
+                        $g->update('contract_payment_schedule', array(
+                            'received_amount' => $rec,
+                            'state' => ($rec >= round((float) $c['recv']['amount_expected'], 2) - 0.004)
+                                       ? 'completed' : 'partial',
+                        ), array('id' => (int) $c['ref']));
+                    }
+                    $rows[] = array('kind' => $c['kind'], 'ref' => (int) $c['ref'],
+                                    'amount' => $c['amount']);
+                }
+                $g->update('fin_payments', array('allocated_amount' => round($already + $sum, 2)),
+                    array('id' => (int) $paymentId));
+            }, 'تخصيص سند ' . $paymentId);
+        } catch (\Throwable $t) {
+            if (strpos($t->getMessage(), 'Duplicate') !== false) {
+                $out['code'] = 409;
+                $out['reason'] = '**الهدفُ مخصَّصٌ سلفًا من هذا السند** — والتعديلُ بسطرٍ جديدٍ لهدفٍ آخر';
+                return $out;
+            }
+            $out['code'] = 422; $out['reason'] = 'تعذّر التخصيص: ' . $t->getMessage(); return $out;
+        }
+
+        // ارتدادُ حالة المستخلص لكل فاتورةٍ مسّها التخصيص
+        foreach ($rows as $r) {
+            if ($r['kind'] === 'invoice') {
+                self::reflectClaimState($conn, $gate, $companyId, (int) $r['ref'], $actor);
+            }
+        }
+        self::audit($conn, $companyId, $actor, 'allocate_targets', (int) $paymentId,
+            array('allocated' => $already), array('allocated' => round($already + $sum, 2)));
+
+        $out['ok'] = true; $out['code'] = 200; $out['rows'] = $rows;
+        $out['allocated'] = round($already + $sum, 2);
+        $out['unallocated'] = round($amount - $already - $sum, 2);
+        $out['reason'] = 'خُصّص ' . $sum . ' على ' . count($rows) . ' هدفًا · '
+            . 'المخصَّصُ ' . $out['allocated'] . ' من ' . $amount
+            . ($out['unallocated'] > 0.004
+               ? (' · **وبقي ' . $out['unallocated'] . ' رصيدًا غيرَ مخصَّصٍ ظاهرًا**')
+               : ' · **Σ التخصيصات = السند**');
+        return $out;
+    }
+
+    /** الهدفُ موجودٌ ومفتوحٌ ويتسع للمبلغ — **قبل أيِّ كتابة**. */
+    private static function checkTarget($gate, $kind, $ref, $amount)
+    {
+        $o = array('ok' => false, 'code' => 422, 'reason' => '', 'recv' => null);
+        if ($kind === 'invoice') {
+            $r = null;
+            try { $r = $gate->selectOne('fin_receivables', array('where' => array('id' => (int) $ref))); }
+            catch (\Throwable $t) { $r = null; }
+            if (!$r) { $o['code'] = 404; $o['reason'] = 'الذمّةُ #' . $ref . ' غيرُ موجودة'; return $o; }
+            $outst = round((float) $r['outstanding'], 2);
+            if ($outst <= 0.004) {
+                $o['code'] = 409;
+                $o['reason'] = 'الذمّةُ #' . $ref . ' **مسدَّدةٌ كاملًا** — ولا يُخصَّص قبضٌ لمسدَّد';
+                return $o;
+            }
+            if ($amount > $outst + 0.0001) {
+                $o['code'] = 409;
+                $o['reason'] = 'المبلغُ ' . $amount . ' **يتجاوز متبقّي الذمّة ' . $outst . '** — '
+                             . 'والزيادةُ **رصيدٌ دائنٌ للعميل لا إيراد**';
+                return $o;
+            }
+            $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; return $o;
+        }
+        // الأهدافُ الأربعةُ الأخرى **أسطرُ خطةِ الدفع** (P-05) — لا جدولَ ثالث
+        $r = null;
+        try { $r = $gate->selectOne('contract_payment_schedule', array('where' => array('id' => (int) $ref))); }
+        catch (\Throwable $t) { $r = null; }
+        if (!$r) { $o['code'] = 404; $o['reason'] = 'سطرُ خطة الدفع #' . $ref . ' غيرُ موجود'; return $o; }
+        if ($r['effective_to'] !== null) {
+            $o['code'] = 423;
+            $o['reason'] = 'السطرُ #' . $ref . ' **من نسخةٍ مختومة** — والتخصيصُ على النافذة'; return $o;
+        }
+        $want = self::SCHEDULE_KIND_OF[$kind];
+        if ((string) $r['payment_kind'] !== $want) {
+            $o['code'] = 422;
+            $o['reason'] = '**الهدفُ «' . self::TARGET_AR[$kind] . '» لا يطابق نوعَ السطر «'
+                . $r['payment_kind'] . '»** — ولا يُخصَّص مقدمٌ على معلَمٍ ولا العكس';
+            return $o;
+        }
+        $left = round((float) $r['amount_expected'] - (float) $r['received_amount'], 2);
+        if ($left <= 0.004) {
+            $o['code'] = 409;
+            $o['reason'] = 'السطرُ #' . $ref . ' **مستلَمٌ كاملًا** — ولا يُخصَّص قبضٌ لمكتمل'; return $o;
+        }
+        if ($amount > $left + 0.0001) {
+            $o['code'] = 409;
+            $o['reason'] = 'المبلغُ ' . $amount . ' **يتجاوز متبقّي السطر ' . $left . '** — '
+                         . 'والزيادةُ **رصيدٌ دائنٌ للعميل لا إيراد**';
+            return $o;
+        }
+        $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; return $o;
+    }
+
+    /** **الرصيدُ غيرُ المخصَّص ظاهرًا** — لا رقمٌ في رسالةٍ تختفي. */
+    public static function unallocatedOf($gate, $paymentId)
+    {
+        try {
+            $p = $gate->selectOne('fin_payments', array('where' => array('id' => (int) $paymentId)));
+            if (!$p) { return null; }
+            return array(
+                'amount' => round((float) $p['amount'], 2),
+                'allocated' => round((float) $p['allocated_amount'], 2),
+                'unallocated' => round((float) $p['unallocated_amount'], 2),
+                'currency' => (string) $p['currency'],
+            );
+        } catch (\Throwable $t) { return null; }
+    }
+
+    /** السنداتُ التي فيها رصيدٌ غيرُ مخصَّص — «الفجوةُ تُرى». */
+    public static function unallocatedPayments($gate)
+    {
+        try {
+            return $gate->scopedQuery(array('scope' => array('p' => 'fin_payments')),
+                "SELECT p.id, p.payment_no, p.party_ref, p.amount, p.allocated_amount,
+                        p.unallocated_amount, p.currency, p.received_on, p.bank_ref
+                   FROM fin_payments p
+                  WHERE {TENANT_SCOPE} AND p.direction = 'collection'
+                    AND COALESCE(p.is_deleted,0) = 0 AND p.unallocated_amount > 0.004
+                  ORDER BY p.received_on DESC, p.id DESC LIMIT 200");
+        } catch (\Throwable $t) { return array(); }
+    }
+
+    private static function audit($conn, $companyId, $actor, $action, $rowId, $before, $after)
+    {
+        require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'finance', 'fin_collection_allocations', $action, (int) $rowId,
+            $before, $after, array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
     }
 
     /** الذممُ المفتوحةُ **بأقدمها أولًا** — أو الذمّةُ المحددةُ وحدَها. */

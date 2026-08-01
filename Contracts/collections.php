@@ -77,6 +77,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['col_action'] ?? '') 
     $redirect($r['code'] . ' — ' . $r['reason'] . ' ❌');
 }
 
+// ── P-07: تخصيصُ سندٍ قائمٍ على **أهدافٍ متعددة** — توسعةُ M-05 لا بابٌ ثانٍ ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['col_action'] ?? '') === 'allocate') {
+    if (!$can_add) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
+    $targets = array();
+    foreach (($_POST['t_kind'] ?? array()) as $i => $k) {
+        $amt = trim(strval($_POST['t_amount'][$i] ?? ''));
+        $ref = intval($_POST['t_ref'][$i] ?? 0);
+        if ($amt === '' || $ref <= 0) { continue; }
+        $targets[] = array('target_kind' => strval($k), 'target_ref' => $ref,
+                           'amount' => $amt, 'note' => strval($_POST['t_note'][$i] ?? ''));
+    }
+    $r = COL::allocate($conn, $gate, $company_id, intval($_POST['payment_id'] ?? 0), $targets, $uid);
+    $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+}
+
 $clients = array();
 try {
     $clients = $gate->scopedQuery(array('scope' => array('c' => 'clients')),
@@ -95,6 +110,13 @@ try {
           WHERE {TENANT_SCOPE} AND p.direction = 'collection' AND COALESCE(p.is_deleted,0)=0
           ORDER BY p.id DESC LIMIT 30");
 } catch (\Throwable $t) { $recent = array(); }
+
+// P-07: السنداتُ ذاتُ رصيدٍ غيرِ مخصَّص — **الفجوةُ تُرى**
+$unallocated = COL::unallocatedPayments($gate);
+$PAY = intval($_GET['payment_id'] ?? 0);
+$payInfo = $PAY > 0 ? COL::unallocatedOf($gate, $PAY) : null;
+$payAllocs = $PAY > 0 ? COL::allocationsOf($gate, $PAY) : array();
+$TARGET_AR = COL::TARGET_AR;
 
 $page_title = 'إيكوبيشن | الذمم والتحصيل';
 include '../inheader.php';
@@ -221,6 +243,105 @@ include '../insidebar.php';
             </tbody>
         </table>
     </div></div></div>
+
+    <!-- ═══ P-07: أهدافُ التخصيص الخمسة والرصيدُ غيرُ المخصَّص ═══ -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-scale-balanced"></i>
+        تخصيصٌ على أهدافٍ متعددة — <strong>والرصيدُ غيرُ المخصَّص ظاهرٌ لا يختفي</strong></h5></div>
+    <div class="card-body">
+        <p style="color:#4b5563;line-height:1.8">
+            <i class="fas fa-circle-info"></i>
+            السندُ الواحدُ يُخصَّص على <strong>خمسةِ أنواعٍ من الأهداف</strong>:
+            مقدَّمٌ · فاتورةٌ · معلَمٌ · محتجَزٌ · ختامية.
+            و<strong>Σ التخصيصات لا تتجاوز السند أبدًا</strong>،
+            و<strong>ما بقي رصيدٌ دائنٌ للعميل لا إيراد</strong> — يُعلَن ويُسوّى بقرار.
+        </p>
+
+        <?php if ($unallocated): ?>
+        <div class="table-container" style="margin-bottom:14px">
+            <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+                <thead><tr><th>السند</th><th>المرجع</th><th>التاريخ</th><th>المبلغ</th>
+                    <th>المخصَّص</th><th><strong>غيرُ المخصَّص</strong></th><th></th></tr></thead>
+                <tbody>
+                <?php foreach ($unallocated as $p): ?>
+                    <tr style="background:#fff7ed">
+                        <td><?php echo htmlspecialchars((string)$p['payment_no']); ?></td>
+                        <td><?php echo htmlspecialchars((string)$p['bank_ref']); ?></td>
+                        <td><?php echo htmlspecialchars((string)($p['received_on'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string)$p['amount']); ?>
+                            <?php echo htmlspecialchars((string)$p['currency']); ?></td>
+                        <td><?php echo htmlspecialchars((string)$p['allocated_amount']); ?></td>
+                        <td><span class="badge badge-warning">
+                            <?php echo htmlspecialchars((string)$p['unallocated_amount']); ?></span></td>
+                        <td><a class="action-btn" href="?payment_id=<?php echo intval($p['id']); ?>">
+                            <i class="fa fa-scale-balanced"></i> خصّص</a></td></tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php else: ?>
+            <p><em>لا سندَ فيه رصيدٌ غيرُ مخصَّص — <strong>وΣ التخصيصات = السند في كلٍّ</strong>.</em></p>
+        <?php endif; ?>
+
+        <?php if ($payInfo !== null): ?>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="badge badge-secondary" style="padding:6px 12px">مبلغُ السند
+                <?php echo $payInfo['amount'] . ' ' . htmlspecialchars((string)$payInfo['currency']); ?></span>
+            <span class="badge badge-info" style="padding:6px 12px">المخصَّص
+                <?php echo $payInfo['allocated']; ?></span>
+            <span class="badge <?php echo $payInfo['unallocated'] > 0.004
+                ? 'badge-warning' : 'badge-success'; ?>" style="padding:6px 12px">
+                غيرُ المخصَّص <?php echo $payInfo['unallocated']; ?></span>
+        </div>
+        <?php if ($payAllocs): ?>
+        <div class="table-container" style="margin-bottom:10px">
+            <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+                <thead><tr><th>الهدف</th><th>المرجع</th><th>المبلغ</th><th>الأساس</th><th>ملاحظة</th></tr></thead>
+                <tbody>
+                <?php foreach ($payAllocs as $a): ?>
+                    <tr><td><?php echo htmlspecialchars($TARGET_AR[(string)$a['target_kind']]
+                            ?? (string)$a['target_kind']); ?></td>
+                        <td>#<?php echo intval($a['target_ref']); ?>
+                            <?php echo $a['doc_ref'] !== null
+                                ? (' — ' . htmlspecialchars((string)$a['doc_ref'])) : ''; ?></td>
+                        <td><?php echo htmlspecialchars((string)$a['amount']); ?></td>
+                        <td><?php echo (string)$a['basis'] === 'explicit'
+                            ? 'مرجعٌ صريح' : 'أقدمُ فاتورةٍ أولًا'; ?></td>
+                        <td style="white-space:normal"><?php
+                            echo htmlspecialchars((string)($a['note'] ?? '—')); ?></td></tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($can_add && $payInfo['unallocated'] > 0.004): ?>
+        <form method="post" class="ems-form">
+            <input type="hidden" name="col_action" value="allocate">
+            <input type="hidden" name="payment_id" value="<?php echo $PAY; ?>">
+            <?php for ($i = 0; $i < 3; $i++): ?>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px">
+                <div class="form-group"><label>الهدف <?php echo $i + 1; ?></label>
+                    <select name="t_kind[<?php echo $i; ?>]">
+                        <?php foreach ($TARGET_AR as $k => $v): ?>
+                            <option value="<?php echo $k; ?>"
+                                <?php echo $k === 'invoice' ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($v); ?></option>
+                        <?php endforeach; ?></select></div>
+                <div class="form-group"><label>مرجعُه</label>
+                    <input type="number" name="t_ref[<?php echo $i; ?>]" style="width:120px"
+                           placeholder="رقمُ الذمّة أو سطرِ الخطة"></div>
+                <div class="form-group"><label>المبلغ</label>
+                    <input type="number" step="0.01" name="t_amount[<?php echo $i; ?>]" style="width:120px"></div>
+                <div class="form-group" style="min-width:200px"><label>ملاحظة</label>
+                    <input type="text" name="t_note[<?php echo $i; ?>]" maxlength="255"></div>
+            </div>
+            <?php endfor; ?>
+            <button type="submit" class="btn-save"><i class="fa fa-scale-balanced"></i>
+                خصّص — <strong>وΣ لا تتجاوز السند</strong></button>
+        </form>
+        <?php endif; ?>
+        <?php endif; ?>
+    </div></div>
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
