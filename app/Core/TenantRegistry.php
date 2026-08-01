@@ -227,6 +227,8 @@ class TenantRegistry
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        // P-10 (PLAN-03 §3.6): خطُّ الأساس بحالته — ومن القفل فقط تبدأ الفوترة.
+        'contract_baseline' => array('type' => self::T_TENANT, 'soft' => true),
         // P-08 (PLAN-03 §3.8): فروقُ الصرف — المحقَّقُ وغيرُ المحقَّق ولكلٍّ بابُه.
         'fin_fx_differences' => array('type' => self::T_TENANT, 'soft' => false),
         // P-06 (PLAN-03 §3.1): سجلُّ الضمانات — الأصلُ والالتزامُ المحتمل لا يختلطان.

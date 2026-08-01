@@ -1015,6 +1015,17 @@ if (!function_exists('claim_approve')) {
             return $out;
         }
         if ((string) $c['state'] === 'cancelled') { $out['reason'] = 'المستخلصُ ملغى'; $out['status'] = 'blocked'; return $out; }
+
+        // ── P-10: «فوترةٌ قبل قفل خط الأساس تُرفض» (PLAN-03 §9-⑱) ────────────
+        // **وبحدود §2-② الملزِمة**: البوابةُ **تبدأ مطفأة** والعقودُ القائمةُ
+        // تُفوتر كما هي؛ ولا تمنع إلا في `enforce` **ولعقدٍ رائدٍ مسمًّى**.
+        require_once __DIR__ . '/../app/Services/Contract/ContractBaselineService.php';
+        $__bg = \App\Services\Contract\ContractBaselineService::billingGate($gate, (int) $c['contract_id']);
+        if (!$__bg['allow']) {
+            $out['status'] = 'blocked';
+            $out['reason'] = $__bg['reason'];
+            return $out;
+        }
         if (empty($c['client_id'])) { $out['reason'] = 'لا عميلَ على العقد — لا ذمّةَ بلا مَدين'; $out['status'] = 'blocked'; return $out; }
 
         // ── يدان لا يدٌ واحدة (قرارُ المالك 2026-07-28) ──────────────────────
