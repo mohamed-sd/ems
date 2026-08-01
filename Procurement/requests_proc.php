@@ -176,6 +176,21 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
 
     <?php proc_msg_banner(); ?>
 
+    <?php
+    // E-17: قدومٌ من زرِّ النقص — تلميحُ التعبئة بمرجع الأمر وصنفه
+    if (isset($_GET['prefill_item'])):
+        $pfItem = proc_gate(false)->selectOne('proc_item', array('columns' => array('name'),
+            'where' => array('id' => intval($_GET['prefill_item']))));
+    ?>
+    <div class="alert alert-info">
+        <i class="fa fa-cart-plus"></i> طلبُ شراءٍ من زرِّ النقص —
+        الصنف: <strong><?php echo htmlspecialchars((string)($pfItem['name'] ?? ('#' . intval($_GET['prefill_item'])))); ?></strong>
+        · المصدر: <strong><?php echo htmlspecialchars((string)($_GET['need_source'] ?? '')); ?></strong>
+        · مرجعُ الأمر: <strong><?php echo htmlspecialchars((string)($_GET['source_ref'] ?? '')); ?></strong>
+        — عبّئ النموذجَ بها.
+    </div>
+    <?php endif; ?>
+
     <form id="procForm" action="requests_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل طلب شراء' : 'طلب شراء جديد'; ?></h5></div>
         <div class="card"><div class="card-body">

@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
         'total_cost' => $total, 'state' => $state, 'notes' => $notes,
     );
     try {
-        proc_gate(false)->runInTransaction(function ($g) use (
+        $issue_saved_id = proc_gate(false)->runInTransaction(function ($g) use (
             $is_editing, $id, $parent, $company_id, $current_user_id, $conn,
             $item_ids, $item_names, $qtys, $costs,
             $warehouse_id, $holder_name, $issue_date, $equipment_id, $project_id, $maintenance_order_id
@@ -156,6 +156,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
         error_log('issue_proc save rolled back: ' . $e->getMessage());
         header("Location: issue_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
+    // E-17 (UX-09 §2.2): بعد الصرف — الصنفُ الذي هبط رصيدُه لحدِّه الأدنى
+    // يُعلَن **بزرِّ «طلبُ شراءٍ بمرجع الأمر»** لا رسالةً تُنسى
+    require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
+    $shortages = array();
+    for ($i = 0; $i < count($item_names); $i++) {
+        $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null;
+        if ($iid === null) { continue; }
+        $bal = \App\Services\Procurement\ProcReorderService::balance($conn, $company_id, $iid);
+        $it = proc_gate(false)->selectOne('proc_item', array('columns' => array('name', 'min_qty'),
+            'where' => array('id' => $iid)));
+        if ($it && (float) $it['min_qty'] > 0 && $bal <= (float) $it['min_qty']) {
+            $shortages[] = array('item_id' => $iid, 'name' => (string) $it['name'], 'balance' => $bal);
+        }
+    }
+    $_SESSION['proc_shortage_flash'] = array('issue_ref' => 'ISS#' . intval($issue_saved_id ?? 0),
+        'items' => $shortages);
     header("Location: issue_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الصرف+بنجاح+✅' : 'تم+الصرف+بنجاح+✅')); exit();
 }
 
@@ -223,6 +239,25 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     ?>
 
     <?php proc_msg_banner(); ?>
+
+    <?php
+    // E-17: أصنافٌ هبطت لحدّها بعد آخر صرف — **زرُّ طلب شراءٍ بمرجع الأمر**
+    if (!empty($_SESSION['proc_shortage_flash']['items'])):
+        $psf = $_SESSION['proc_shortage_flash'];
+        unset($_SESSION['proc_shortage_flash']);
+    ?>
+    <div class="card" style="border-inline-start:4px solid #c62828"><div class="card-body">
+        <strong><i class="fa fa-triangle-exclamation"></i> نقصُ مخزونٍ بعد الصرف
+            (<?php echo htmlspecialchars((string)$psf['issue_ref']); ?>):</strong>
+        <?php foreach ($psf['items'] as $sh): ?>
+            <a class="btn-save" style="margin:0 4px"
+               href="requests_proc.php?prefill_item=<?php echo intval($sh['item_id']); ?>&need_source=<?php
+                   echo rawurlencode('نقص مخزون'); ?>&source_ref=<?php echo rawurlencode((string)$psf['issue_ref']); ?>">
+                <i class="fa fa-cart-plus"></i> طلبُ شراءٍ بمرجع الأمر —
+                <?php echo htmlspecialchars($sh['name'] . ' (الرصيد ' . $sh['balance'] . ')'); ?></a>
+        <?php endforeach; ?>
+    </div></div>
+    <?php endif; ?>
 
     <form id="procForm" action="issue_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل صرف' : 'صرف جديد'; ?></h5></div>

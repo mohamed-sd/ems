@@ -182,6 +182,8 @@ include '../insidebar.php';
                             "data-notes='" . htmlspecialchars((string)($row['notes'] ?? ''), ENT_QUOTES) . "'";
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
+                        // M-49: بطاقةُ المورد بتبويباتها السبعة — بدل الجدول المسطّح
+                        echo "<a href='supplier_card_proc.php?id=" . intval($row['id']) . "' class='action-btn view' title='البطاقة بتبويباتها السبعة'><i class='fas fa-id-card-clip'></i></a>";
                         if ($can_edit) {
                             echo "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
                         }

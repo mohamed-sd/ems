@@ -116,6 +116,51 @@ include '../insidebar.php';
 
     <?php proc_msg_banner(); ?>
 
+    <?php
+    // M-43 + M-51: التوليدُ الآلي بمفتاح (صنف × دورة) + المتوسطُ مصدرًا للحد
+    require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
+    $reorderResult = null;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['reorder_action'] ?? '', array('dry', 'apply'), true)) {
+        if ($can_add) {
+            $reorderResult = \App\Services\Procurement\ProcReorderService::run(
+                $conn, proc_gate(false), $company_id, $current_user_id,
+                ($_POST['reorder_action'] === 'dry'));
+        }
+    }
+    ?>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-rotate"></i>
+        التوليدُ الآلي لطلبات الشراء (M-43) — بمفتاح (صنف × دورة)</h5></div>
+    <div class="card-body">
+        <p style="color:#666">لكل نقطةِ طلبٍ بلغ رصيدُها الحيُّ حدَّها: يولَّد طلبُ شراءٍ واحدٌ
+            بكمية (الحدُّ الأعلى − الرصيد) — <strong>والدورةُ الجاريةُ تمنع توليدًا ثانيًا</strong>
+            حتى تُقفل. والمتوسطُ اليوميُّ (آخر 90 يومًا) يُعرض <strong>مصدرًا مقترحًا للحد</strong> (M-51).</p>
+        <?php if ($can_add): ?>
+        <div style="display:flex;gap:8px">
+            <form method="post"><input type="hidden" name="reorder_action" value="dry">
+                <button type="submit" class="btn-save"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
+            <form method="post"><input type="hidden" name="reorder_action" value="apply">
+                <button type="submit" class="btn-save"><i class="fa fa-play"></i> ولّد فعلًا</button></form>
+        </div>
+        <?php endif; ?>
+        <?php if ($reorderResult !== null): ?>
+            <div style="margin-top:10px">
+                <strong><?php echo $reorderResult['dry'] ? 'تجريب:' : 'توليد:'; ?></strong>
+                <?php echo count($reorderResult['generated']); ?> مرشحًا ·
+                <?php echo count($reorderResult['skipped']); ?> متجاوَزًا
+                <?php foreach ($reorderResult['generated'] as $g): ?>
+                    <div class="alert alert-success" style="margin:4px 0">
+                        <?php echo htmlspecialchars($g['item'] . ' — الرصيد ' . $g['balance']
+                            . ' ≤ الحد ' . $g['trigger'] . ' ⇒ كمية ' . $g['qty']
+                            . (isset($g['request_id']) ? (' · طلب #' . $g['request_id']) : '')); ?></div>
+                <?php endforeach; ?>
+                <?php foreach ($reorderResult['skipped'] as $s): ?>
+                    <div class="alert alert-info" style="margin:4px 0">
+                        <?php echo htmlspecialchars($s['item'] . ' — ' . $s['reason']); ?></div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div></div>
+
     <!-- فورم إضافة/تعديل -->
     <form id="procForm" action="" method="post" class="allforms<?php echo $edit_row ? ' allforms-visible' : ''; ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل قاعدة إعادة طلب</h5></div>

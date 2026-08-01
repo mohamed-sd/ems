@@ -1,0 +1,190 @@
+<?php
+/**
+ * Procurement/supplier_card_proc.php — بطاقةُ مورد المشتريات (M-49 · الشاشة 198)
+ * ───────────────────────────────────────────────────────────────────────────
+ * UX-09 §5: البطاقةُ بتبويباتها السبعة — كان `suppliers_proc.php` جدولًا
+ * مسطَّحًا. قراءةٌ من مصادرها الحية بروابط الأصل — لا نسخَ ولا تخزين.
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+require_once __DIR__ . '/proc_helpers.php';
+require_once __DIR__ . '/../includes/screen_contract.php';
+
+$ctx = proc_ctx();
+$company_id = $ctx['company_id'];
+$is_super_admin = $ctx['is_super'];
+if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
+$perms = proc_page_perms($conn, 'Procurement/supplier_card_proc.php', $is_super_admin);
+if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ لبطاقة المورد ❌')); exit(); }
+
+$sid = intval($_GET['id'] ?? 0);
+$sup = $sid > 0 ? proc_gate($is_super_admin)->selectOne('proc_supplier',
+    array('where' => array('id' => $sid), 'includeDeleted' => true)) : null;
+$tab = in_array(strval($_GET['tab'] ?? '1'), array('1','2','3','4','5','6','7'), true)
+     ? strval($_GET['tab'] ?? '1') : '1';
+$co = intval($company_id);
+
+$TABS = array('1' => 'البيانات', '2' => 'أوامرُ الشراء', '3' => 'الاستلامات',
+              '4' => 'الفواتيرُ والمطابقة', '5' => 'العهد', '6' => 'الأصناف', '7' => 'السجل');
+
+$page_title = 'إيكوبيشن | بطاقة مورد المشتريات';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main ems-unified-page-shell">
+    <?php
+    $header_title = 'بطاقة مورد المشتريات'; $header_icon = 'fa fa-id-card-clip';
+    $header_actions = array();
+    $header_back = array('href' => 'suppliers_proc.php', 'class' => '',
+                         'icon' => 'fas fa-arrow-right', 'label' => 'الموردون');
+    include('../includes/page_header.php');
+    ems_screen_about('بطاقةُ المورد الواحدة بتبويباتها السبعة — بدل الجدول المسطّح: '
+        . 'كلُّ تبويبٍ قراءةٌ حيةٌ من جدول مالكه برابط أصله.', array());
+    ?>
+
+    <?php if (!$sup): ems_state_empty('اختر موردًا من القائمة', 'إلى الموردين', 'suppliers_proc.php'); ?>
+    <?php else: ?>
+    <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <strong style="font-size:1.1rem"><?php echo htmlspecialchars((string)$sup['name']); ?></strong>
+        <span style="margin-inline-start:auto">
+        <?php foreach ($TABS as $tk => $tl): ?>
+            <a class="btn btn-sm" style="border:1px solid #ddd;border-radius:6px;padding:4px 10px;margin:0 2px;<?php
+                echo $tk === $tab ? 'background:#e2b93b;font-weight:800' : ''; ?>"
+               href="?id=<?php echo $sid; ?>&tab=<?php echo $tk; ?>"><?php echo $tl; ?></a>
+        <?php endforeach; ?></span>
+    </div></div>
+
+    <div class="card"><div class="card-body">
+    <?php
+    switch ($tab) {
+        case '1':
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%"><tbody>';
+            foreach (array('name' => 'الاسم', 'phone' => 'الهاتف', 'email' => 'البريد',
+                           'address' => 'العنوان', 'tax_number' => 'الرقم الضريبي',
+                           'commercial_registration' => 'السجل التجاري') as $k => $lbl) {
+                if (array_key_exists($k, $sup)) {
+                    echo '<tr><th>' . $lbl . '</th><td>' . htmlspecialchars((string)($sup[$k] ?? '—')) . '</td></tr>';
+                }
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '2':
+            $rows = array();
+            $r = $conn->query("SELECT id, code, state, currency, total_amount, received_pct,
+                                      expected_delivery_date, created_at
+                                 FROM proc_order WHERE company_id={$co} AND supplier_id={$sid}
+                                  AND COALESCE(is_deleted,0)=0 ORDER BY id DESC LIMIT 100");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا أوامرَ لهذا المورد', 'أمرٌ جديد', 'orders_proc.php'); break; }
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+               . '<thead><tr><th>الكود</th><th>الحالة</th><th>الإجمالي</th><th>استلم٪</th><th>موعد التسليم</th><th></th></tr></thead><tbody>';
+            foreach ($rows as $x) {
+                echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['state']) . '</td>'
+                   . '<td>' . htmlspecialchars($x['total_amount'] . ' ' . $x['currency']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)($x['received_pct'] ?? '—')) . '</td>'
+                   . '<td>' . htmlspecialchars((string)($x['expected_delivery_date'] ?? '—')) . '</td>'
+                   . '<td><a href="orders_proc.php?edit_id=' . intval($x['id']) . '">افتح ▸</a></td></tr>';
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '3':
+            $rows = array();
+            $r = $conn->query("SELECT rl.id, rc.code, rl.item_name, rl.qty, rl.created_at
+                                 FROM proc_receipt_line rl
+                                 JOIN proc_receipt_custody rc ON rc.id = rl.custody_id
+                                WHERE rl.company_id={$co} AND rc.supplier_id={$sid}
+                                ORDER BY rl.id DESC LIMIT 100");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا استلاماتٍ بعدُ'); break; }
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+               . '<thead><tr><th>عهدة الاستلام</th><th>الصنف</th><th>الكمية</th><th>التاريخ</th></tr></thead><tbody>';
+            foreach ($rows as $x) {
+                echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['item_name']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['qty']) . '</td>'
+                   . '<td><small>' . htmlspecialchars((string)$x['created_at']) . '</small></td></tr>';
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '4':
+            $rows = array();
+            $r = $conn->query("SELECT id, code, invoice_no, invoice_date, invoice_amount,
+                                      invoice_diff, match_state
+                                 FROM proc_order WHERE company_id={$co} AND supplier_id={$sid}
+                                  AND invoice_no IS NOT NULL ORDER BY id DESC LIMIT 100");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا فواتيرَ مسجَّلةً بعدُ'); break; }
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+               . '<thead><tr><th>الأمر</th><th>الفاتورة</th><th>مبلغها</th><th>الفرق</th><th>المطابقة</th></tr></thead><tbody>';
+            foreach ($rows as $x) {
+                echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
+                   . '<td>' . htmlspecialchars($x['invoice_no'] . ' · ' . $x['invoice_date']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['invoice_amount']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)($x['invoice_diff'] ?? '0')) . '</td>'
+                   . '<td>' . htmlspecialchars((string)($x['match_state'] ?? '—')) . '</td></tr>';
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '5':
+            $rows = array();
+            $r = $conn->query("SELECT rc.id, rc.code, rc.holder_name, rc.receipt_date,
+                                      rc.receipt_location, rc.state
+                                 FROM proc_receipt_custody rc
+                                WHERE rc.company_id={$co} AND rc.supplier_id={$sid}
+                                  AND COALESCE(rc.is_deleted,0)=0
+                                ORDER BY rc.id DESC LIMIT 100");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا عهدَ استلامٍ لهذا المورد'); break; }
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+               . '<thead><tr><th>الكود</th><th>المستلم</th><th>التاريخ</th><th>الموقع</th><th>الحالة</th></tr></thead><tbody>';
+            foreach ($rows as $x) {
+                echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['holder_name']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['receipt_date']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)($x['receipt_location'] ?? '—')) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['state']) . '</td></tr>';
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '6':
+            $rows = array();
+            $r = $conn->query("SELECT ol.item_name, COUNT(*) n, ROUND(SUM(ol.qty),2) qty
+                                 FROM proc_order_line ol JOIN proc_order o ON o.id = ol.order_id
+                                WHERE ol.company_id={$co} AND o.supplier_id={$sid}
+                                GROUP BY ol.item_name ORDER BY n DESC LIMIT 100");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا أصنافَ مورَّدةً بعدُ'); break; }
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+               . '<thead><tr><th>الصنف</th><th>مرات التوريد</th><th>إجمالي الكمية</th></tr></thead><tbody>';
+            foreach ($rows as $x) {
+                echo '<tr><td>' . htmlspecialchars((string)$x['item_name']) . '</td>'
+                   . '<td>' . intval($x['n']) . '</td>'
+                   . '<td>' . htmlspecialchars((string)$x['qty']) . '</td></tr>';
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '7':
+            $rows = array();
+            $r = $conn->query("SELECT action_type, screen_name, created_at FROM activity_logs
+                                WHERE company_id={$co} AND record_id={$sid}
+                                  AND screen_name LIKE '%proc%' ORDER BY id DESC LIMIT 50");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا سجلَّ نشاطٍ محفوظًا لهذا المورد'); break; }
+            echo '<ul>';
+            foreach ($rows as $x) {
+                echo '<li><small>' . htmlspecialchars($x['created_at'] . ' — ' . $x['action_type']
+                    . ' (' . $x['screen_name'] . ')') . '</small></li>';
+            }
+            echo '</ul>';
+            break;
+    }
+    ?>
+    </div></div>
+    <?php endif; ?>
+</div>
+
+<script src="../includes/js/jquery-3.7.1.main.js"></script>
+</body>
+</html>

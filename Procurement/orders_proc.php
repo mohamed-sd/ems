@@ -374,14 +374,15 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المورد</th><th>التصنيف</th><th>العملة</th>
-                    <th>الإجمالي</th><th>الحالة</th><th>مرجع الاعتماد</th><th>أُنشئ</th>
+                    <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد</th><th>أُنشئ</th>
                 </tr></thead>
                 <tbody>
                     <?php
                     // ترطيب ثنائي: الأوامر ثم أسماء الموردين بجلبٍ واحد (دلالة LEFT JOIN)
                     $gv = proc_gate($is_super_admin);
                     $order_rows = $gv->select('proc_order', array(
-                        'columns' => array('id', 'code', 'op_classification', 'currency', 'total_amount', 'state', 'fin_approval_ref', 'created_at', 'supplier_id'),
+                        'columns' => array('id', 'code', 'op_classification', 'currency', 'total_amount', 'state', 'fin_approval_ref', 'created_at', 'supplier_id',
+                                           'received_pct', 'expected_delivery_date', 'final_receipt_at'),
                         'orderBy' => 'id DESC',
                     ));
                     $sup_names = array();
@@ -414,6 +415,22 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                         echo "<td>" . htmlspecialchars((string)$row['currency']) . "</td>";
                         echo "<td>" . htmlspecialchars(number_format((float)$row['total_amount'], 2)) . "</td>";
                         echo "<td><span class='action-btn'>" . htmlspecialchars((string)$row['state']) . "</span></td>";
+                        // E-18 (UX-09 §5.1): PartialReceived وLate **حالتين صريحتين**
+                        // بعدّاديهما — لا تنبيهًا ضمنيًّا في اللوحة وحدها
+                        $e18 = array();
+                        $pct = $row['received_pct'] !== null ? (float)$row['received_pct'] : null;
+                        $isFinal = ($row['final_receipt_at'] !== null || (string)$row['state'] === 'استلام نهائي');
+                        if (!$isFinal && $pct !== null && $pct > 0 && $pct < 100) {
+                            $e18[] = "<span class='badge badge-warning' title='PartialReceived'>استلامٌ جزئي — متبقٍ "
+                                   . htmlspecialchars(number_format(100 - $pct, 1)) . "٪</span>";
+                        }
+                        if (!$isFinal && !empty($row['expected_delivery_date'])
+                            && $row['expected_delivery_date'] < date('Y-m-d')) {
+                            $lateDays = (int) floor((time() - strtotime((string)$row['expected_delivery_date'])) / 86400);
+                            $e18[] = "<span class='badge badge-danger' title='Late'>متأخرٌ "
+                                   . $lateDays . " يومًا</span>";
+                        }
+                        echo "<td>" . ($e18 ? implode(' ', $e18) : "<span class='text-muted'>—</span>") . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['fin_approval_ref'] ?? '')) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['created_at']) . "</td>";
                         echo "</tr>";
