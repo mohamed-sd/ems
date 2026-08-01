@@ -94,3 +94,15 @@
 | SEC-13 | `effective_permissions` (المشتق) + `permission_audit_events` (Insert-only بوسم founding_mode) + دورتا المراجعة + `founding_mode` بوضعين مطفأين و**CHECK لا enabled بلا ends_at** | ①④ ✅ | — |
 
 **الحزام:** `tests/sec_structure_test.php` = **39/39** ✅ · القاعدة صارت 342 جدولًا · `dump-schema` محدَّث.
+
+## الموجة ⑦ · SEC الاشتقاق — 5/5
+
+| المهمة | ما فُعل | الملفات | الاختبار | اجتهاد |
+|---|---|---|---|---|
+| SEC-14 | `PermissionResolver::resolve`: يجمع الطبقات السبع (قوالب المراكز بأصنافها + تكليفات ORG + الاستثناءات + المنح الحساس) ثم deny فوقها · سقف العلاقة لا يرفعه إلا كسر زجاج · **الأقل سقفًا يسري** · **تكليف يقيّد قالب «كل المواقع» — التقاطع لا الاتحاد** · بلا نطاق → 422 | `app/Services/Security/PermissionResolver.php` | S16·S17·deny·422 ✅ | J-22 |
+| SEC-15 | `rebuild()`: إعادة بناء `effective_permissions` — حذف وبناء ذري، والمنع لا يُخزن (المشتق «ما يُملك» بعد الدمج) | نفسه | S1 ✅ | — |
+| SEC-16 | `PermissionExplainService`: صيغة مثال §12 حرفيًّا — sources بمُددها وdenies بمصدر الحكم وnote «تسقط بانتهاء…» | `PermissionExplainService.php` | S12 (سماحًا ومنعًا) ✅ | — |
+| SEC-17 | `PositionService`: preview (⑨) · submit (المركز معلَّق + طلب تغيير بدرجة المخاطرة + خطوات §8 — **والرباعية لا تُختصر لمدير الإدارة**) · نقل بلا إنهاء القديم → 422 · تداخل (المسمى×النطاق) → 409 · `activate` لا يعمل قبل اكتمال الإلزامي ثم يفعّل ويعيد البناء | `PositionService.php` | S3·S6·409·⑪ ✅ | — |
+| SEC-18 | `ExpiryJob`: إسقاط الاستثناءات (NOW) والمراكز (CURDATE) في لحظتها + أسطر PermissionExpired/PositionEnded + إعادة بناء لمن مُسّ + تنبيه 30 يومًا بعطالة — وكرون `Governance/cron_permissions.php` | `ExpiryJob.php` + الكرون | S5·S27 ✅ | — |
+
+**الحزام:** `tests/permission_resolver_test.php` = **19/19** ✅ (S1·S2·S3·S5·S6·S12·S16·S17 + deny/422)
