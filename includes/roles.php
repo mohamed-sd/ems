@@ -49,6 +49,7 @@ const EMS_ROLE_PROCUREMENT_MGR = '16';        // مسؤول المشتريات
 const EMS_ROLE_TRANSPORT_MGR = '23';          // مدير النقل والترحيل
 const EMS_ROLE_TICKETS_MGR = '24';            // مدير البلاغات
 const EMS_ROLE_WAREHOUSE_KEEPER = '25';       // أمين المستودع (M-50 · UX-09 §6)
+const EMS_ROLE_FINANCING_MGR = '26';          // إدارة التمويل (FIN-26 · DEC-01 ② · FIN-01 §1.1)
 
 // ── الإدارة المالية (D04) ────────────────────────────────────────────────────
 const EMS_ROLE_CFO = '17';                    // المدير المالي
@@ -101,6 +102,7 @@ const EMS_ROLE_NAMES = array(
     '23' => 'مدير النقل والترحيل',
     '24' => 'مدير البلاغات',
     '25' => 'أمين المستودع',
+    '26' => 'إدارة التمويل',
 );
 
 /**

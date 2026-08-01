@@ -249,6 +249,7 @@ function login($u) {
 function ajax($action, array $data) {
     list(, $pg) = req(BASE . '/Approvals/hours_approval.php');
     preg_match('/name="csrf_token"\s+value="([^"]+)"/', $pg, $m);
+    if (empty($m[1])) { preg_match('/window\.csrfToken="([^"]+)"/', $pg, $m); } // الحاقن المركزي يبث الرمز سكربتًا لشاشات AJAX
     $data['action'] = $action;
     $data['csrf_token'] = $m[1] ?? '';
     list(, $b) = req(BASE . '/Approvals/hours_approval_handler.php', $data,

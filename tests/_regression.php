@@ -24,6 +24,7 @@ $core = array(
     'supplier_capacity_test', 'supplier_evaluation_test', 'supplier_closure_test',
     'supplier_documents_test', 'tax_invoice_test', 'client_statement_test',
     'collection_control_test', 'claim_dispute_test', 'claims_test', 'unified_nav_test',
+    'csrf_client_helper_test', 'fin26_role_test',
 );
 
 $files = $core;

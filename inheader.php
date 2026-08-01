@@ -24,8 +24,10 @@ if (!function_exists('ems_css_ver')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php if (function_exists('csrf_meta')) { echo csrf_meta(); } ?>
-    <!-- CSRF: يُلحق التوكن تلقائياً بكل طلب POST/PUT/DELETE (يجب أن يُحمّل قبل أي سكربت يطلب البيانات) -->
-    <script src="/ems/assets/js/csrf.js"></script>
+    <!-- CSRF: يُلحق التوكن تلقائياً بكل طلب POST/PUT/DELETE (يجب أن يُحمّل قبل أي سكربت يطلب البيانات)
+         بصمةُ الإصدار إلزامية: Cache-Control شهرٌ كامل، فنسخةٌ معطوبةٌ بلا بصمةٍ تبقى في
+         متصفحات المستخدمين ثلاثين يومًا بعد إصلاحها (وقع فعلًا 2026-08-01). -->
+    <script src="/ems/assets/js/csrf.js<?php $__csrfjs=__DIR__.'/assets/js/csrf.js'; echo is_file($__csrfjs)?('?v='.filemtime($__csrfjs)):''; ?>"></script>
     <!-- M-46: المسودةُ التلقائية كل 30 ثانية — تلتقط النماذجَ الطويلة آليًّا (UI-01 §3) -->
     <script src="/ems/includes/js/ems-autosave.js" defer></script>
     <title><?php echo $page_title ; ?></title>

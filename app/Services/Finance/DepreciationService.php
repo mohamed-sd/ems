@@ -194,6 +194,12 @@ class DepreciationService
         $amount = $calc['amount'];
         if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'قسطٌ صفريّ'; return $out; }
 
+        // الإهلاك المقسَّم (FIN-01 §6 · F11): الوظيفة القائمة **تقرأ الحصص** —
+        // أصل بحصتين 60/40 ⇒ قيد بسطرين بنسبة الحصة النافذة في الفترة،
+        // لا سطر واحد لمالك واحد. والملكية من المجال المقيَّد (N-15).
+        $calc['basis']['ownership_split'] = self::ownershipSplit($conn, (int) $companyId, $asset, $lastDay, $amount);
+        $asset['__ownership_split'] = $calc['basis']['ownership_split']; // يمر لسطور حدث القيد
+
         $newAcc = round((float) $asset['accumulated_depreciation'] + $amount, 2);
         $newState = ($newAcc >= round($calc['basis']['depreciable'], 2))
                     ? 'fully_depreciated' : (string) $asset['state'];
@@ -344,6 +350,54 @@ class DepreciationService
     }
 
     /** «قيدُ الإهلاك الدوري آليًّا **بمرجع الأصل والفترة**» — بمفتاحٍ حتمي. */
+    /**
+     * سطور الإهلاك بنسبة الحصص النافذة (asset_ownership_shares — N-15).
+     * بلا حصص مسجَّلة: سطر واحد على المستأجر (السلوك القائم لا يتغير).
+     * @return array [{bearer_kind:tenant|financier, ref:int, pct:float, amount:float}]
+     */
+    private static function ownershipSplit($conn, $companyId, array $asset, $onDate, $amount)
+    {
+        $lines = array();
+        try {
+            $eqId = ($asset['equipment_id'] !== null && (int) $asset['equipment_id'] > 0) ? (int) $asset['equipment_id'] : null;
+            $stmt = $conn->prepare(
+                "SELECT financier_entity_id, percent FROM asset_ownership_shares
+                  WHERE company_id = ? AND ((asset_kind = 'fin_asset' AND asset_id = ?)
+                     OR (asset_kind = 'equipment' AND asset_id = ?))
+                    AND valid_from <= ? AND (valid_to IS NULL OR valid_to >= ?)
+                  ORDER BY percent DESC");
+            $aid = (int) $asset['id'];
+            $eq = ($eqId !== null) ? $eqId : -1;
+            $od = (string) $onDate;
+            $stmt->bind_param('iiiss', $companyId, $aid, $eq, $od, $od);
+            $stmt->execute();
+            $shares = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            $tenantEntity = null;
+            $t = $conn->query('SELECT entity_id FROM tenants WHERE tenant_id = ' . (int) $companyId . ' LIMIT 1');
+            if ($t && ($tr = $t->fetch_assoc())) { $tenantEntity = (int) $tr['entity_id']; }
+            $allocated = 0.0;
+            foreach ($shares as $s) {
+                $pct = (float) $s['percent'];
+                $lineAmt = round($amount * $pct / 100, 2);
+                $allocated = round($allocated + $lineAmt, 2);
+                $lines[] = array(
+                    'bearer_kind' => ((int) $s['financier_entity_id'] === $tenantEntity) ? 'tenant' : 'financier',
+                    'ref' => (int) $s['financier_entity_id'],
+                    'pct' => $pct, 'amount' => $lineAmt,
+                );
+            }
+            // فرق التقريب يلحق بأكبر سطر — Σ السطور = القسط بالضبط
+            if (!empty($lines) && abs($allocated - $amount) > 0.001) {
+                $lines[0]['amount'] = round($lines[0]['amount'] + ($amount - $allocated), 2);
+            }
+        } catch (\Throwable $t) { $lines = array(); }
+        if (empty($lines)) {
+            $lines[] = array('bearer_kind' => 'tenant', 'ref' => null, 'pct' => 100.0, 'amount' => round((float) $amount, 2));
+        }
+        return $lines;
+    }
+
     private static function publishEvent($conn, $companyId, array $asset, $period, $amount, $lastDay, $actor)
     {
         require_once dirname(__DIR__, 2) . '/Core/EventPublisher.php';
@@ -369,6 +423,8 @@ class DepreciationService
                 'asset_id' => (int) $asset['id'], 'asset_code' => (string) $asset['code'],
                 'period' => (string) $period, 'amount' => round((float) $amount, 2),
                 'method' => (string) $asset['method'],
+                // F11: سطور القيد بنسبة الحصة النافذة — سطران للأصل المشترك
+                'lines' => isset($asset['__ownership_split']) ? $asset['__ownership_split'] : array(),
             ),
         ));
         return (is_array($res) && isset($res['id'])) ? (int) $res['id'] : null;

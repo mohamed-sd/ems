@@ -23,12 +23,13 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('contract card super') : ems_
 
 $cid = intval($_GET['id'] ?? 0);
 $c = $cid > 0 ? $gate->selectOne('contracts', array('where' => array('id' => $cid))) : null;
-$tab = in_array(strval($_GET['tab'] ?? '1'), array('1','2','3','4','5','6','7'), true)
+$tab = in_array(strval($_GET['tab'] ?? '1'), array('1','2','3','4','5','6','7','8'), true)
      ? strval($_GET['tab'] ?? '1') : '1';
 
 $TABS = array('1' => 'الرأس والحالة', '2' => 'البنود والقيمة', '3' => 'الخطط الثلاث',
               '4' => 'الملاحق والالتزامات', '5' => 'المستخلصات والفواتير',
-              '6' => 'الضمانات والمقدمات', '7' => 'الاقتصاد');
+              '6' => 'الضمانات والمقدمات', '7' => 'الاقتصاد',
+              '8' => 'المقاعد والفجوة');
 
 $page_title = 'إيكوبيشن | بطاقة العقد';
 include '../inheader.php';
@@ -201,6 +202,81 @@ include '../insidebar.php';
             }
             echo '</div><p style="margin-top:10px;color:#666">' . htmlspecialchars((string)$row['note'])
                . '</p><p><a class="btn-save" href="commercial_board.php">اللوحة التجارية الكاملة ▸</a></p>';
+            break;
+        case '8':
+            // N-20 لوحة العقد الكاملة: المقاعد والفجوة والتعاقب + ترويسة الأرقام الأربعة —
+            // توسعةُ ملف العقد لا شاشة ثانية (SCR-02 §4.1)، وكل رقمٍ من خدمته المالكة.
+            require_once dirname(__DIR__) . '/app/Services/ContractSeatService.php';
+            $row = CBD::row($gate, $cid);
+            if ($row['ok']) {
+                echo '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">';
+                foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفَّذ',
+                               'billed' => 'المفوتَر', 'collected' => 'المحصَّل') as $k => $lbl) {
+                    echo '<div class="badge badge-secondary" style="font-size:14px;padding:8px 14px">'
+                       . $lbl . ': <strong>' . htmlspecialchars((string)$row[$k]) . '</strong></div>';
+                }
+                echo '</div>';
+            }
+            $gap = \App\Services\ContractSeatService::seatGap($gate, $co, $cid);
+            echo '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">'
+               . '<div class="badge badge-info" style="font-size:14px;padding:8px 14px">المقاعد المتعاقدة: <strong>' . intval($gap['seats_contracted']) . '</strong></div>'
+               . '<div class="badge badge-success" style="font-size:14px;padding:8px 14px">المملوءة: <strong>' . intval($gap['seats_filled']) . '</strong></div>'
+               . '<div class="badge ' . ($gap['seat_gap'] > 0 ? 'badge-warning' : 'badge-secondary') . '" style="font-size:14px;padding:8px 14px">الفجوة: <strong>' . intval($gap['seat_gap']) . '</strong></div>'
+               . '</div>';
+            if (!empty($gap['empty_seats'])) {
+                echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+                   . '<thead><tr><th>المقعد الفارغ</th><th>نوعه</th><th>دلالته — والمطالبة من العقد لا تُفترض</th></tr></thead><tbody>';
+                foreach ($gap['empty_seats'] as $es) {
+                    echo '<tr><td>#' . intval($es['seat_no']) . '</td><td>' . htmlspecialchars((string)$es['seat_kind'])
+                       . '</td><td>' . htmlspecialchars((string)$es['implication']) . '</td></tr>';
+                }
+                echo '</tbody></table></div>';
+            }
+            // تعاقب المعدات على مقاعد العقد
+            $seats = $gate->scopedQuery(array('scope' => array('c2' => 'op_containers')),
+                "SELECT c2.id, c2.seat_no, c2.seat_kind FROM op_containers c2
+                  WHERE {TENANT_SCOPE} AND c2.contract_id = ? AND c2.seat_no IS NOT NULL
+                    AND COALESCE(c2.is_deleted,0)=0 ORDER BY c2.seat_no", array($cid));
+            if (empty($seats)) {
+                ems_state_empty('لا مقاعدَ معرَّفةً لهذا العقد بعد — تُعرَّف على حاويات المعدات (N-11)', 'إلى الحاويات', 'containers.php');
+            } else {
+                echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>من</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th></tr></thead><tbody>';
+                foreach ($seats as $s) {
+                    $succ = \App\Services\ContractSeatService::successionOf($gate, $co, intval($s['id']));
+                    if (empty($succ)) {
+                        echo '<tr><td>#' . intval($s['seat_no']) . '</td><td colspan="6" style="color:#999">فارغ — لم تجلس فيه معدة</td></tr>';
+                        continue;
+                    }
+                    foreach ($succ as $a) {
+                        echo '<tr><td>#' . intval($s['seat_no']) . '</td>'
+                           . '<td><a href="../Equipments/equipments.php?id=' . intval($a['equipment_id']) . '">معدة #' . intval($a['equipment_id']) . '</a></td>'
+                           . '<td>' . htmlspecialchars((string)$a['date_from']) . '</td>'
+                           . '<td>' . ($a['date_to'] !== null ? htmlspecialchars((string)$a['date_to']) : '<em>مفتوح</em>') . '</td>'
+                           . '<td>' . htmlspecialchars((string)($a['replace_reason'] ?? '—')) . '</td>'
+                           . '<td>' . htmlspecialchars((string)$a['assignment_role']) . '</td>'
+                           . '<td>' . intval($a['drivers_count']) . '</td></tr>';
+                    }
+                }
+                echo '</tbody></table></div>';
+            }
+            // التعطل بأطرافه من سجل الأداء (N-12) — كل فجوة بمالكها المسمّى
+            $dt = $gate->scopedQuery(array('scope' => array('m' => 'monthly_performance'),
+                                           'enrich' => array('d' => 'monthly_performance_downtime')),
+                "SELECT m.period, d.reason_code, d.hours, d.bearer_party FROM monthly_performance m
+                   LEFT JOIN monthly_performance_downtime d ON d.perf_id = m.id
+                  WHERE {TENANT_SCOPE} AND m.contract_id = ? ORDER BY m.period DESC LIMIT 24", array($cid));
+            if (!empty($dt) && $dt[0]['reason_code'] !== null) {
+                echo '<h6 style="margin-top:12px">التعطل بأطرافه (سجل الأداء N-12)</h6>'
+                   . '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+                   . '<thead><tr><th>الشهر</th><th>السبب</th><th>الساعات</th><th>الطرف المتحمل</th></tr></thead><tbody>';
+                foreach ($dt as $x) {
+                    if ($x['reason_code'] === null) { continue; }
+                    echo '<tr><td>' . htmlspecialchars((string)$x['period']) . '</td><td>' . htmlspecialchars((string)$x['reason_code'])
+                       . '</td><td>' . htmlspecialchars((string)$x['hours']) . '</td><td><strong>' . htmlspecialchars((string)$x['bearer_party']) . '</strong></td></tr>';
+                }
+                echo '</tbody></table></div>';
+            }
             break;
     }
     ?>

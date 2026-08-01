@@ -79,6 +79,9 @@ class TenantRegistry
         // قراءةٌ جديدةٌ أو تصفيرٌ موثَّقٌ يفتح سلسلةً، لا محوٌ لماضٍ.
         'meter_readings' => array('type' => self::T_TENANT, 'soft' => false),
         'op_containers' => array('type' => self::T_TENANT, 'soft' => true),
+        'seat_assignments' => array('type' => self::T_TENANT, 'soft' => false), // N-11: تعاقب المعدات على المقعد التعاقدي
+        'monthly_performance' => array('type' => self::T_TENANT, 'soft' => false), // N-12: سجل الأداء الشهري (مقعد × شهر)
+        'monthly_performance_downtime' => array('type' => self::T_TENANT, 'soft' => false), // N-12: التعطل بسببه وطرفه المتحمل
         // H-09-① (ENT-01 §8): مسيّرُ الرواتب — الرأسُ ناعمُ الإخفاء، والأسطرُ
         // وقائعُ احتسابٍ تُكنس بالسلسلة من رأسها لا بحذفٍ ناعمٍ مستقل.
         'payroll_runs' => array('type' => self::T_TENANT, 'soft' => true),
@@ -422,6 +425,7 @@ class TenantRegistry
         // H-08-① (CON-01 §3.1): كتالوجُ نماذج الأجر الخمسة عشر — قائمةٌ محكومةٌ
         // عامةٌ بلا company_id («نموذجٌ غيرُ مذكورٍ في القائمة → 422»).
         'pay_models' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'stop_reason_codes' => array('type' => self::T_GLOBAL, 'soft' => false), // N-12: أسباب التعطل الستة — قاموس محكوم
         'roles' => array('type' => self::T_GLOBAL, 'soft' => false),
         'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
         'link_groups' => array('type' => self::T_GLOBAL, 'soft' => false),
@@ -449,6 +453,57 @@ class TenantRegistry
         'ems_event_consumers' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4: بنية الموزّع — عبر EventDispatcher حصرًا
         'ems_event_deliveries' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4
         'ems_event_dead_letter' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4
+        'processed_operations' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-06 ركن ③: عطالة (مستهلك × مستند × أثر) — عبر ProcessedOperations حصرًا
+        'equipment_ownership_registry' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-21: المجال المقيَّد للملكية — عبر OwnershipDomainGuard حصرًا
+        'financing_models' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15/FIN-01: المجال المقيَّد
+        'financing_operations' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
+        'financed_assets' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
+        'asset_ownership_shares' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15: الحصص عبر الزمن
+        'financing_installments' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
+        'financing_deviations' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15: أوراق الانحراف
+        'asset_hour_reconciliations' => array('type' => self::T_TENANT, 'soft' => false), // N-17: مطابقة الأصول
+        'intercompany_loans' => array('type' => self::T_TENANT, 'soft' => false), // N-09: الإعارة بين كيانين
+        'intercompany_dues' => array('type' => self::T_TENANT, 'soft' => false), // N-09: المستحق المتبادل
+        'ownership_access_grants' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-21: منح الصلاحية الفردية — عبر OwnershipDomainGuard حصرًا
+        'sensitive_read_log' => array('type' => self::T_RESTRICTED, 'soft' => false), // LEG-01 §9: سجل الاطلاع — Insert-only عبر الحرّاس حصرًا
+        'legal_entities' => array('type' => self::T_GLOBAL, 'soft' => false), // LEG-01: سجل الكيانات — طبقة تحت الجميع، قراءة عامة وكتابة محكومة
+        'entity_roles' => array('type' => self::T_GLOBAL, 'soft' => false), // LEG-01: صفات الكيان المؤرَّخة
+        'entity_ownership' => array('type' => self::T_RESTRICTED, 'soft' => false), // LEG-01 §3: الملكية — حساسة (سجل الاطلاع)
+        'entity_licenses' => array('type' => self::T_GLOBAL, 'soft' => false), // LEG-01 §5
+        'guarantees' => array('type' => self::T_GLOBAL, 'soft' => false), // LEG-01 §5
+        'tenants' => array('type' => self::T_RESTRICTED, 'soft' => false), // LEG-01: حد العزل — عبر البوابة حصرًا
+        'signing_authorities' => array('type' => self::T_TENANT, 'soft' => false), // LEG-01 §4: التفويض بالتوقيع
+        'approval_signatures' => array('type' => self::T_TENANT, 'soft' => false), // LEG-01 §6-③: سجل التوقيعات Insert-only
+        'governance_flags' => array('type' => self::T_GLOBAL, 'soft' => false), // LEG-01 §7: أعلام أنماط التفعيل
+        'guard_policies' => array('type' => self::T_GLOBAL, 'soft' => false), // GOV-01: قاموس تصنيف الحمايات
+        'exception_requests' => array('type' => self::T_TENANT, 'soft' => false), // GOV-01 §7
+        'exception_approvals' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'exception_requests', 'fk' => 'req_id'), // GOV-01 §7
+        'exception_usages' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'exception_requests', 'fk' => 'req_id'), // GOV-01 §7-⑤
+        'waivers_reversals' => array('type' => self::T_TENANT, 'soft' => false), // GOV-01 §8
+        'guard_denials' => array('type' => self::T_TENANT, 'soft' => false), // GOV-01 §9: سجل المنع
+        'unit_state_changes' => array('type' => self::T_TENANT, 'soft' => false), // GOV-01 §6
+        'change_approvals' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'unit_state_changes', 'fk' => 'chg_id'), // GOV-01 §6-④
+        'dept_policies' => array('type' => self::T_TENANT, 'soft' => false), // POL-01 §2
+        'policy_rules' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'dept_policies', 'fk' => 'policy_id'), // POL-01 §2-②
+        'impact_matrix' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'dept_policies', 'fk' => 'policy_id'), // POL-01 §8
+        'deduction_types' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'dept_policies', 'fk' => 'policy_id'), // POL-01 §9
+        'approval_chains' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'dept_policies', 'fk' => 'policy_id'), // POL-01 §4
+        'decision_reasons' => array('type' => self::T_GLOBAL, 'soft' => false), // POL-01 §10: قائمة محكومة
+        'unit_effects' => array('type' => self::T_TENANT, 'soft' => false), // POL-01 §12: طبقة التدرّج
+        'shift_patterns' => array('type' => self::T_TENANT, 'soft' => false), // WRK-01 §2
+        'shift_period_defs' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'shift_patterns', 'fk' => 'pattern_id'), // WRK-01 §2.1
+        'shift_period_logs' => array('type' => self::T_TENANT, 'soft' => false), // WRK-01: سجل الفترة
+        'attendance_policies' => array('type' => self::T_TENANT, 'soft' => false), // WRK-01 §1
+        'attendance_days' => array('type' => self::T_TENANT, 'soft' => false), // WRK-01 §3
+        'deduction_proposals' => array('type' => self::T_TENANT, 'soft' => false), // WRK-01 §6
         'positions' => array('type' => self::T_TENANT, 'soft' => true), // K6/ADR-07: جسر المنصب — معزول بالشركة، جاهز للبوابة من يومه الأول
         'ems_state_transitions' => array('type' => self::T_RESTRICTED, 'soft' => false), // K7: سجل تدقيق المحرك — append-only عبر StateMachine حصرًا
         'ems_business_events' => array('type' => self::T_RESTRICTED, 'soft' => false), // ADR-15: الجذر المحايد — append-only عبر EventPublisher حصرًا؛ الدفتر المالي إسقاطه

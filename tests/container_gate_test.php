@@ -37,11 +37,10 @@ require_once __DIR__ . '/_guard_env.php';
 // المستقل container_pilot_test.
 ems_test_env_override(array('EMS_CONTAINER_GATE' => '4', 'EMS_CONTAINER_GATE_MODE' => 'enforce'));
 
-/** يقلب قيمةَ الحارس في .env للمسابير — والاستعادةُ يضمنها `_guard_env`. */
-$setGate = function ($val) use ($ENV_FILE, $ENV_BAK) {
-    $out = preg_replace('/^EMS_CONTAINER_GATE=.*$/m', 'EMS_CONTAINER_GATE=' . $val, $ENV_BAK);
-    $out = preg_replace('/^EMS_CONTAINER_GATE_MODE=.*$/m', 'EMS_CONTAINER_GATE_MODE=enforce', $out);
-    file_put_contents($ENV_FILE, $out);
+/** يقلب قيمةَ الحارس للمسابير — عبر التراكب المعزول لا .env الحي (سلامة البيئة §3-⑩)؛
+ *  التراكب يورَّث للعمليات الفرعية عبر EMS_ENV_OVERLAY. */
+$setGate = function ($val) {
+    ems_test_env_override(array('EMS_CONTAINER_GATE' => $val, 'EMS_CONTAINER_GATE_MODE' => 'enforce'));
 };
 
 require_once $ROOT . '/config.php';

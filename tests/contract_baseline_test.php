@@ -21,6 +21,10 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+// عقد هذه الحزمة: دلالة «البوابة تبدأ مطفأة» — تُثبَّت off عبر التراكب المعزول
+// (البيئة الحية صارت enforce للرائد بعد إغلاق البوابة ① — ولا يكتب اختبار في .env الحي)
+require_once __DIR__ . '/_guard_env.php';
+ems_test_env_override(array('EMS_BASELINE_GATE' => 'off', 'EMS_BASELINE_GATE_CONTRACTS' => ''));
 require_once dirname(__DIR__) . '/config.php';
 while (ob_get_level() > 0) { ob_end_clean(); }
 $_SESSION['user'] = array('id' => 1, 'role' => '12', 'company_id' => 4, 'name' => 'P10 baseline test');

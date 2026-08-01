@@ -63,6 +63,7 @@ $teardown = function () use ($conn) {
         $conn->query("DELETE FROM contracts WHERE id = {$cid}");
     }
     $conn->query("DELETE FROM contract_price_index_readings WHERE index_code LIKE 'M09T%'");
+    $conn->query("DELETE FROM project WHERE name LIKE '%M09T%'");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -71,8 +72,11 @@ fwrite(STDOUT, "\n══ M-09 — شروطُ تعديل السعر (وقودٌ �
 
 // ═══ البذر ═══
 head('البذر — عقدٌ صوريٌّ ببندِ ساعةٍ سعرُه 100');
+// P-01: كلُّ عقدٍ له مشروع (FK بنيوي منذ P-01b) — البذرُ يلتزم القاعدة
+$conn->query("INSERT INTO project (company_id, name, client, location, total) VALUES ({$CO}, 'مشروع M09T', 'ع', 'م', '0')");
+$M09_PRJ = intval($conn->insert_id);
 $conn->query("INSERT INTO contracts (company_id, contract_signing_date, first_party, contract_status,
-              actual_start, actual_end) VALUES ({$CO}, '2043-01-01', 'M09T', 'قيد التنفيذ', '2043-01-01', '2043-12-31')");
+              actual_start, actual_end, project_id) VALUES ({$CO}, '2043-01-01', 'M09T', 'قيد التنفيذ', '2043-01-01', '2043-12-31', {$M09_PRJ})");
 $CID = intval($conn->insert_id);
 $conn->query("INSERT INTO contractequipments (company_id, contract_id, equip_type, equip_unit, equip_price,
               equip_price_currency) VALUES ({$CO}, {$CID}, '1', 'ساعة', 100.00, 'دولار')");

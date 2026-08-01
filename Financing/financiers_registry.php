@@ -1,0 +1,108 @@
+<?php
+/**
+ * Financing/financiers_registry.php — سجل الممولين (FIN-01 §3 · §8-① · الشاشة 210)
+ * ───────────────────────────────────────────────────────────────────────────
+ * باب التمويل **خلف بوابة المجال المقيَّد** (DEC-01 ② · FIN-01 §1.1):
+ * بلا منحة فردية نافذة لا تُفتح الشاشة أصلًا — والعضوية في إدارة ليست صلاحية.
+ * الممول **كيان في سجل الكيانات بصفة «ممول» لا سجل موازٍ** — وهذه الشاشة
+ * عرضه بنماذجه وعملاته واستحقاقه القائم. وكل فتح بسطر اطّلاع.
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+require_once __DIR__ . '/../includes/screen_contract.php';
+require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
+
+use App\Core\OwnershipDomainGuard;
+
+$company_id = intval($_SESSION['user']['company_id'] ?? 0);
+$role = strval($_SESSION['user']['role'] ?? '');
+$uid = intval($_SESSION['user']['id'] ?? 0);
+$co = $company_id ?: 4;
+
+// بوابة المجال المقيَّد — fail-closed: منحة فردية أو لا شيء (السوبر خارجها)
+$granted = ($role === '-1');
+if (!$granted) {
+    foreach (array(OwnershipDomainGuard::PERM_OWNER, OwnershipDomainGuard::PERM_TERMS, OwnershipDomainGuard::PERM_VALUE) as $p) {
+        if (OwnershipDomainGuard::hasGrant($conn, $co, $uid, $p)) { $granted = true; break; }
+    }
+}
+if (!$granted) {
+    http_response_code(403);
+    exit('403 — باب التمويل خلف بوابة المجال المقيَّد: الرؤية بمنحة فردية لا بالعضوية في إدارة (FIN-01 §1.1)');
+}
+$canTerms = ($role === '-1') || OwnershipDomainGuard::hasGrant($conn, $co, $uid, OwnershipDomainGuard::PERM_TERMS);
+
+// سطر اطّلاع — فتح السجل قراءة لبيانات الملكية
+$st = $conn->prepare("INSERT INTO sensitive_read_log (person_id, element_code, subject_type, subject_id, ip, result) VALUES (?, 'ownership.financiers_registry', 'screen', 210, ?, 'allowed')");
+$ip = strval($_SERVER['REMOTE_ADDR'] ?? 'cli');
+$st->bind_param('is', $uid, $ip);
+$st->execute();
+$st->close();
+
+$rows = $conn->query(
+    "SELECT e.entity_id, e.legal_name, e.base_currency, e.state,
+            COUNT(DISTINCT o.op_id) ops,
+            COUNT(DISTINCT fa.asset_id) assets,
+            MIN(o.signed_date) first_op, MAX(o.signed_date) last_op
+       FROM legal_entities e
+       JOIN entity_roles r ON r.entity_id = e.entity_id AND r.role = 'financier'
+            AND (r.valid_to IS NULL OR r.valid_to >= CURDATE())
+       LEFT JOIN financing_operations o ON o.financier_entity_id = e.entity_id
+       LEFT JOIN financed_assets fa ON fa.op_id = o.op_id
+      GROUP BY e.entity_id ORDER BY ops DESC, e.legal_name"
+)->fetch_all(MYSQLI_ASSOC);
+
+// الاستحقاق القائم بكل عملة — لمن يملك رؤية شروط التمويل
+$balances = array();
+if ($canTerms) {
+    $q = $conn->query(
+        "SELECT financier_entity_id, currency, SUM(outstanding_balance) bal, COUNT(*) ops
+           FROM financing_operations WHERE state IN ('active') GROUP BY financier_entity_id, currency");
+    while ($q && ($b = $q->fetch_assoc())) { $balances[intval($b['financier_entity_id'])][] = $b; }
+}
+
+$page_title = 'إيكوبيشن | سجل الممولين';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main ems-unified-page-shell">
+    <?php
+    $header_title = 'سجل الممولين'; $header_icon = 'fa fa-hand-holding-dollar';
+    $header_actions = array();
+    include('../includes/page_header.php');
+    ems_screen_about('الممول كيان في سجل الكيانات بصفة «ممول» — لا سجل موازٍ؛ وهذه الشاشة عرضه بعملياته '
+        . 'وأعيانه ومدة علاقته واستحقاقه القائم بكل عملة. الشاشة خلف بوابة المجال المقيَّد: الرؤية '
+        . 'بمنحة فردية، وكل فتح بسطر اطّلاع — فالتسرّب يقع بالاطّلاع لا بالتغيير.',
+        array('الاستحقاق لمن يملك رؤية الشروط', 'الممول الجديد يُنشأ كيانًا في الحوكمة'));
+    ?>
+    <div class="card"><div class="card-body">
+        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <thead><tr><th>الممول</th><th>العمليات</th><th>الأعيان</th><th>مدة العلاقة</th><th>الاستحقاق القائم<?php echo $canTerms ? '' : ' (خلف صلاحية الشروط)'; ?></th><th>الحالة</th></tr></thead><tbody>
+        <?php foreach ($rows as $f): ?>
+        <tr>
+            <td><strong><?php echo htmlspecialchars($f['legal_name']); ?></strong><br><small>#<?php echo intval($f['entity_id']); ?></small></td>
+            <td><?php echo intval($f['ops']); ?></td>
+            <td><?php echo intval($f['assets']); ?></td>
+            <td><small><?php echo $f['first_op'] ? htmlspecialchars($f['first_op'] . ' → ' . $f['last_op']) : '—'; ?></small></td>
+            <td>
+            <?php if (!$canTerms): ?>
+                <em>محجوب — يلزم ownership.finance_terms</em>
+            <?php elseif (empty($balances[intval($f['entity_id'])])): ?>
+                —
+            <?php else: foreach ($balances[intval($f['entity_id'])] as $b): ?>
+                <div><?php echo number_format((float) $b['bal'], 2) . ' ' . htmlspecialchars($b['currency']) . ' (' . intval($b['ops']) . ' عملية)'; ?></div>
+            <?php endforeach; endif; ?>
+            </td>
+            <td><span class="badge badge-<?php echo $f['state'] === 'active' ? 'success' : 'danger'; ?>"><?php echo htmlspecialchars($f['state']); ?></span></td>
+        </tr>
+        <?php endforeach; if (empty($rows)): ?>
+        <tr><td colspan="6">لا كيانات بصفة «ممول» — تُنشأ في <a href="../Governance/entities_registry.php">سجل الكيانات</a> بصفتها</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
+        <p style="margin-top:10px"><a href="financing_operation_new.php" class="btn-save">+ إنشاء عملية تمويل (النموذج أولًا)</a></p>
+    </div></div>
+</div>
+<script src="../includes/js/jquery-3.7.1.main.js"></script>
+</body>
+</html>

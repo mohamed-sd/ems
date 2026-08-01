@@ -21,10 +21,13 @@
 
 require_once __DIR__ . '/dynamic_nav.php';
 
-/** الأبواب الستة الثابتة (UX-00 §6) بترتيبها وأيقوناتها.
+/** الأبواب الثمانية (UX-00 §6 معدَّلًا بقرار DEC-01 ② الصريح — لا تنفيذ صامتًا).
  * HOME هو باب «① الرئيسية» الدستوري: عنصرٌ واحدٌ لكل دورٍ يفتح لوحتَه
  * (§7) — عامةً كانت أو مخصصةً — ويُطبع مسطّحًا قبل الأبواب لا داخل مجموعةٍ
- * مطوية، فيكون أولَ ما يُرى. صفوفُه في nav_items منذ 2026-07-27. */
+ * مطوية، فيكون أولَ ما يُرى. صفوفُه في nav_items منذ 2026-07-27.
+ * GOV خلف صلاحية حوكمةٍ إدارية · FIN خلف **بوابة المجال المقيَّد** (FIN-01
+ * §1.1): مستويا سريةٍ مختلفان فلا يُدمجان تحت سقفٍ واحد — ومن لا صلاحيةَ
+ * له **لا يُصيَّر له البابُ أصلًا** لا معطَّلًا ولا مخفيَّ المحتوى. */
 function unifiedNavDoors() {
     return array(
         'HOME'  => array('name' => 'الرئيسية',            'icon' => 'fa fa-house', 'flat' => true),
@@ -32,6 +35,8 @@ function unifiedNavDoors() {
         'APPR'  => array('name' => 'المتابعة والموافقات', 'icon' => 'fa fa-clipboard-check'),
         'REC'   => array('name' => 'السجلات الرئيسية',    'icon' => 'fa fa-database'),
         'REP'   => array('name' => 'التقارير والتحليلات', 'icon' => 'fa fa-chart-pie'),
+        'GOV'   => array('name' => 'الحوكمة',             'icon' => 'fa fa-landmark'),
+        'FIN'   => array('name' => 'التمويل',             'icon' => 'fa fa-hand-holding-dollar'),
         'SET'   => array('name' => 'الإعدادات والتدقيق',  'icon' => 'fa fa-cog'),
     );
 }
@@ -68,7 +73,7 @@ function getUnifiedNavItems($conn, $roleId) {
                         WHERE p.module_id = n.module_id AND p.role_id = n.role_id AND p.can_view = 1
                     )
                   )
-            ORDER BY FIELD(n.door,'HOME','DAILY','APPR','REC','REP','SET'), n.sort_order, n.id";
+            ORDER BY FIELD(n.door,'HOME','DAILY','APPR','REC','REP','GOV','FIN','SET'), n.sort_order, n.id";
     $items = array();
     $res = mysqli_query($conn, $sql);
     if ($res) { while ($row = mysqli_fetch_assoc($res)) { $items[] = $row; } }
@@ -78,6 +83,26 @@ function getUnifiedNavItems($conn, $roleId) {
     if (isset($_SESSION['user'])) {
         require_once dirname(__DIR__) . '/app/Services/Portal/SupplierPortalGuard.php';
         $items = \App\Services\Portal\SupplierPortalGuard::filterNavItems($_SESSION['user'], $items);
+    }
+
+    // DEC-01 ②: باب التمويل خلف بوابة المجال المقيَّد (N-21 · FIN-01 §1.1) —
+    // صلاحية can_view لا تكفي: بلا منحةٍ فرديةٍ نافذة **لا يُصيَّر الباب أصلًا**
+    // (fail-closed كالبوابة نفسها). السوبر (-1) خارج الترشيح.
+    $hasFin = false;
+    foreach ($items as $it) { if ($it['door'] === 'FIN') { $hasFin = true; break; } }
+    if ($hasFin && isset($_SESSION['user']) && strval($_SESSION['user']['role'] ?? '') !== '-1') {
+        require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
+        $uid = intval($_SESSION['user']['id'] ?? 0);
+        $co = intval($_SESSION['user']['company_id'] ?? 0);
+        $granted = false;
+        foreach (array(\App\Core\OwnershipDomainGuard::PERM_OWNER,
+                       \App\Core\OwnershipDomainGuard::PERM_TERMS,
+                       \App\Core\OwnershipDomainGuard::PERM_VALUE) as $p) {
+            if (\App\Core\OwnershipDomainGuard::hasGrant($conn, $co, $uid, $p)) { $granted = true; break; }
+        }
+        if (!$granted) {
+            $items = array_values(array_filter($items, function ($it) { return $it['door'] !== 'FIN'; }));
+        }
     }
     return $items;
 }

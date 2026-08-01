@@ -52,6 +52,7 @@ function roleBoardRoute($roleId, $parentRoleId = null)
         13 => 'Maintenance/dashboard_mnt.php',
         16 => 'Procurement/dashboard_proc.php',
         23 => 'Transport/transfer_dashboard.php',
+        26 => 'Financing/financing_board.php',   // FIN-26 — لوحة إدارة التمويل (الشاشة 214)
         // الباقون على اللوحة العامة الواحدة (تصيَّر من إعداد الدور)
         1  => 'main/role_board.php',
         24 => 'main/role_board.php', 12 => 'main/role_board.php',

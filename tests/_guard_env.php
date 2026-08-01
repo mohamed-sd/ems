@@ -1,53 +1,71 @@
 <?php
 /**
- * tests/_guard_env.php — تحييدُ علَمٍ لا يخصّ موضوعَ الحزمة
+ * tests/_guard_env.php — تجاوز أعلام البيئة للاختبارات **بلا مسّ .env الحي**
  * ─────────────────────────────────────────────────────────────────────────
- * **لماذا يلزم:** الحزمُ التي تختبر آلةَ الحالات تسجّل وقائعَ بتاريخٍ مستقبليٍّ
- * بعيد (2031 مثلًا) كي لا تلامس مفاتيحَ الأيام الحيّة. وحارسُ الوثائق يقارن
- * `expiry_date < entry_date` — **فأيُّ رخصةٍ سارية اليوم منتهيةٌ بالنسبة ليومِ
- * عملٍ في 2031**. القياسُ 2026-07-29: المشغّلون الأربعةُ المفحوصون كلُّهم
- * محجوبون في 2031، بمن فيهم المجدَّدون (رخصةٌ إلى 2029).
+ * (سلامة البيئة — PLAN-05 §3-⑩): «لا يكتب اختبارٌ في ملف تهيئةٍ حي —
+ * نسخةٌ معزولةٌ أو استثناءٌ من المشغّل الجامع».
  *
- * فالحجبُ **سلوكٌ صحيحٌ لا عطب** — لكنه يخصّ حارسَ الوثائق لا آلةَ الحالات.
- * والحزمةُ التي موضوعُها الآلةُ تُعلن تحييدَ ما لا يخصّها، كما تمرّر المرآةُ
- * `enforce_capacity=false` لأنها مسجِّلُ تاريخٍ لا مُنفِذُ قواعد.
+ * الآلية الجديدة: **ملف تراكبٍ مؤقتٍ معزول** في مجلد النظام المؤقت، يُعلَن
+ * مسارُه عبر متغير البيئة الحقيقي `EMS_ENV_OVERLAY` فيقرؤه `ems_env_all()`
+ * **بعد** .env فتغلب قيمُه — و.env الحي لا يُقرأ للكتابة إطلاقًا.
+ * التراكب يورَّث للعمليات الفرعية (المسابير) عبر بيئة العملية، ويُكنس عند
+ * انتهائها بـregister_shutdown_function.
  *
- * **الاستعمال — قبل `require config.php` حتمًا** (فـ`ems_env_all()` تُخزّن
- * القيمَ في `static` عند أول نداء، وهو يقع داخل config):
+ * الاستعمال — قبل `require config.php` حتمًا (ems_env_all تُخزّن في static):
  *
  *     require_once __DIR__ . '/_guard_env.php';
  *     ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'));
  *     require_once dirname(__DIR__) . '/config.php';
  *
- * الاستعادةُ مضمونةٌ بـ`register_shutdown_function` — و.env يعود **بايت-مطابقًا**
- * حتى لو ماتت الحزمةُ في منتصفها. ولا تُشغَّل حزمتان معًا (التشغيلُ تسلسليٌّ).
+ * التوقيع نفسه القديم — كل الحزم القائمة تعمل بلا تعديل.
  */
 
 if (!function_exists('ems_test_env_override')) {
     /**
-     * يكتب قيمًا في .env مؤقتًا ويستعيده كاملًا عند انتهاء العملية.
+     * يعلن قيمًا تغلب .env لهذه العملية وفروعها — بلا كتابة في الملف الحي.
      *
      * @param array<string,string> $pairs المفتاح => القيمة
+     * @param bool $forWebServer الحزم ذات مسابير HTTP: Apache لا يرى تراكب
+     *        العملية — فتُكتب القيم عبر ems_env_write (**بنسخة آلية قبلها** —
+     *        وهذا «الاستثناء من المشغّل الجامع» المنصوص) وتُستعاد بايت-مطابقة
+     *        عند الانتهاء من النسخة نفسها.
      */
-    function ems_test_env_override(array $pairs)
+    function ems_test_env_override(array $pairs, $forWebServer = false)
     {
-        $file = dirname(__DIR__) . '/.env';
-        if (!is_readable($file) || !is_writable($file)) { return false; }
+        if ($forWebServer) {
+            require_once dirname(__DIR__) . '/includes/env.php';
+            static $webBak = null;
+            $bak = ems_env_write($pairs);
+            if ($bak === false) { return false; }
+            if ($webBak === null) {
+                $webBak = $bak; // أول نسخة = حالة ما قبل الحزمة كلها
+                register_shutdown_function(function () use ($webBak) {
+                    @copy($webBak, dirname(__DIR__) . '/.env'); // استعادة بايت-مطابقة
+                });
+            }
+            // ويُعلَن للتراكب المحلي أيضًا كي ترى عمليةُ الاختبار نفسها القيمَ
+        }
+        static $overlayFile = null;
+        static $accum = array();
 
-        static $original = null;
-        if ($original === null) {
-            $original = file_get_contents($file);
-            register_shutdown_function(function () use ($file, $original) {
-                file_put_contents($file, $original);
+        if ($overlayFile === null) {
+            $overlayFile = rtrim(sys_get_temp_dir(), '/\\') . DIRECTORY_SEPARATOR
+                . 'ems_env_overlay_' . getmypid() . '_' . substr(sha1(uniqid('', true)), 0, 8) . '.env';
+            putenv('EMS_ENV_OVERLAY=' . $overlayFile);
+            $_ENV['EMS_ENV_OVERLAY'] = $overlayFile;
+            register_shutdown_function(function () use ($overlayFile) {
+                @unlink($overlayFile);
+                putenv('EMS_ENV_OVERLAY');
             });
         }
 
-        $out = $original;
         foreach ($pairs as $k => $v) {
-            $line = $k . '=' . $v;
-            $swapped = preg_replace('/^' . preg_quote($k, '/') . '=.*$/m', $line, $out, 1, $n);
-            $out = ($n > 0) ? $swapped : (rtrim($out) . "\n" . $line . "\n");
+            $accum[$k] = $v;
         }
-        return file_put_contents($file, $out) !== false;
+        $out = '';
+        foreach ($accum as $k => $v) {
+            $out .= $k . '=' . $v . "\n";
+        }
+        return file_put_contents($overlayFile, $out) !== false;
     }
 }

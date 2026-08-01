@@ -21,6 +21,10 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+// موضوع الحزمة دلالة التسوية لا حارس وثائق المورد (له حزمته supplier_documents_test)
+// — يُحيَّد بالتراكب المعزول بعد قلبه enforce في البوابة ② (سلامة البيئة §3-⑩)
+require_once __DIR__ . '/_guard_env.php';
+ems_test_env_override(array('EMS_SUPPLIER_DOC_GATE' => 'monitor'));
 require_once dirname(__DIR__) . '/config.php';
 while (ob_get_level() > 0) { ob_end_clean(); }
 $_SESSION['user'] = array('id' => 1, 'role' => '2', 'company_id' => 4, 'name' => 'settlement test');

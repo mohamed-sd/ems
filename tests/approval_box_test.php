@@ -26,7 +26,7 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 // موضوعُ الحزمة صندوقُ الاعتماد وحارسُ الطاقة لا وثائقُ الأهلية — والتحييدُ
 // قبل أي تحميلٍ لـconfig (انظر tests/_guard_env.php لسبب اللزوم).
 require_once __DIR__ . '/_guard_env.php';
-ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'));
+ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'), true); // مسابير HTTP — Apache يقرأ .env
 
 const BASE = 'http://localhost/ems';
 
@@ -67,6 +67,7 @@ function login($u) {
 function ajax($action, array $data) {
     list(, $pg) = req(BASE . '/Approvals/hours_approval.php');
     preg_match('/name="csrf_token"\s+value="([^"]+)"/', $pg, $m);
+    if (empty($m[1])) { preg_match('/window\.csrfToken="([^"]+)"/', $pg, $m); } // الحاقن المركزي يبث الرمز سكربتًا لشاشات AJAX
     $data['action'] = $action;
     $data['csrf_token'] = $m[1] ?? '';
     list(, $b) = req(BASE . '/Approvals/hours_approval_handler.php', $data,

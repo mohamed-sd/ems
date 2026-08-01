@@ -32,8 +32,14 @@ $dup = $conn->query("INSERT INTO nav_items (role_id, door, label_ar, route, sort
                      SELECT role_id, door, label_ar, route, sort_order FROM nav_items WHERE role_id = 1 LIMIT 1");
 ok('القيد الفريد (دور×مسار) يرفض التكرار', $dup === false && stripos($conn->error, 'Duplicate') !== false);
 
-ok('أبواب العناصر كلها من الستة المشروعة',
-    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE door NOT IN ('HOME','DAILY','APPR','REC','REP','SET')")->fetch_row()[0]) === 0);
+// DEC-01 ②: الأبواب ثمانية بقرار صريح — أُضيف GOV (الحوكمة) وFIN (التمويل
+// خلف بوابة المجال المقيَّد)؛ ودمجُهما كان يضع مستويَي سرية تحت سقف واحد.
+ok('أبواب العناصر كلها من الثمانية المشروعة (DEC-01 ②)',
+    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE door NOT IN ('HOME','DAILY','APPR','REC','REP','GOV','FIN','SET')")->fetch_row()[0]) === 0);
+
+$__d = unifiedNavDoors();
+ok('قاموس الأبواب ثمانية وفيه الحوكمة والتمويل',
+    count($__d) === 8 && isset($__d['GOV']) && isset($__d['FIN']));
 
 ok('صفر مسارٍ مكرر داخل قائمة أي دور',
     intval($conn->query("SELECT COUNT(*) FROM (SELECT role_id, route FROM nav_items GROUP BY role_id, route HAVING COUNT(*) > 1) d")->fetch_row()[0]) === 0);
@@ -79,8 +85,12 @@ ok('غير التابع للدور 1 معطَّل رغم صلاحية العرض
 // (وقيمةُ العقد ليست فيها أصلًا — فلا يُطّلع التشغيلُ على مالٍ بهذا الباب.)
 // ثم 31 بشاشات الموجة ④ الأربع (M-27 غرفة العمليات · M-28 التوزيع ·
 // M-29 سجل الوحدات · M-26 الجاهزية — SPEC-03 · UX-10 · 2026-08-01).
-ok('الدور الرائد: 31 عنصرًا نشطًا (27 السابقة + شاشات التشغيل والجاهزية الأربع — لا فقدان)',
-    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id = 1 AND active = 1")->fetch_row()[0]) === 31);
+// ثم 38 بشاشات DEC-01 السبع (206–212: أربع الحوكمة · اثنتا التمويل ·
+// مؤشر الاعتمادات المتأخرة — 2026-08-01).
+// ثم 39 بشاشة FIN-26 «منح المجال المقيَّد» (213 — سد فجوة المنح: باب FIN كان
+// محجوبًا عن الجميع لخلو ownership_access_grants — 2026-08-01).
+ok('الدور الرائد: 39 عنصرًا نشطًا (38 السابقة + شاشة المنح 213 — لا فقدان)',
+    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE role_id = 1 AND active = 1")->fetch_row()[0]) === 39);
 
 echo "── ③ الشمول والتشغيل المزدوج ──\n";
 
@@ -113,7 +123,7 @@ ok('العلم: دورٌ مذكور يفعَّل ودورٌ غيره لا (اخ�
 // حين امتلأ ذلك الدور (HOME للدور 1 ثم APPR للدور 15 يوم صارت له ميزانية).
 // فصار يُستخرج من القاعدة نفسِها: أيُّ (دورٍ · باب) خالٍ يجب أن يغيب عن المخرَج،
 // وأيُّ عامرٍ يجب أن يحضر — والفِخُّ يُلتقط حيثما كان لا حيث كُتب.
-$__doors = array('HOME', 'DAILY', 'APPR', 'REC', 'REP', 'SET');
+$__doors = array('HOME', 'DAILY', 'APPR', 'REC', 'REP', 'GOV', 'FIN', 'SET');
 $__roles = array();
 $__q = $conn->query("SELECT id FROM roles WHERE (status='1' OR status=1) AND id <> -1 ORDER BY id");
 while ($__r = $__q->fetch_row()) { $__roles[] = intval($__r[0]); }

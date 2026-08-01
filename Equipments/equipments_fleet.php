@@ -254,10 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         'operating_hours'               => $Ni('operating_hours'),
         'engine_condition'              => $D('engine_condition', 'جيدة'),
         'tires_condition'               => $D('tires_condition', 'N/A'),
-        'actual_owner_name'             => $S('actual_owner_name'),
-        'owner_type'                    => $D('owner_type', ''),
-        'owner_phone'                   => $S('owner_phone'),
-        'owner_supplier_relation'       => $D('owner_supplier_relation', ''),
+        // N-21: أعمدة المالك مهجورة — بيانات الملكية في المجال المقيَّد حصرًا
         'license_number'                => $S('license_number'),
         'license_authority'             => $S('license_authority'),
         'license_expiry_date'           => $Nd('license_expiry_date'),
@@ -834,62 +831,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             </select>
                         </div>
 
-                        <!-- ================================= -->
-                        <!-- قسم: بيانات الملكية -->
-                        <!-- ================================= -->
-                        <div class="form-section">
-                            <h6><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
-                        </div>
-
-                        <div>
-                            <label>
-                                <i class="fas fa-user"></i>
-                                اسم المالك الفعلي
-                            </label>
-                            <input type="text" name="actual_owner_name" id="actual_owner_name"
-                                placeholder="مثال: محمد علي أحمد"
-                                value="<?php echo isset($editData['actual_owner_name']) ? htmlspecialchars($editData['actual_owner_name']) : ''; ?>" />
-                        </div>
-
-                        <div>
-                            <label>
-                                <i class="fas fa-briefcase"></i>
-                                نوع المالك
-                            </label>
-                            <select name="owner_type" id="owner_type">
-                                <option value="">-- اختر نوع المالك --</option>
-                                <option value="مالك فردي" <?php echo (!empty($editData) && $editData['owner_type'] == "مالك فردي") ? "selected" : ""; ?>>مالك فردي</option>
-                                <option value="شركة متخصصة" <?php echo (!empty($editData) && $editData['owner_type'] == "شركة متخصصة") ? "selected" : ""; ?>>شركة متخصصة</option>
-                                <option value="مؤسسة" <?php echo (!empty($editData) && $editData['owner_type'] == "مؤسسة") ? "selected" : ""; ?>>مؤسسة</option>
-                                <option value="شركة إيكوبيشن" <?php echo (!empty($editData) && $editData['owner_type'] == "شركة إيكوبيشن") ? "selected" : ""; ?>>شركة إيكوبيشن</option>
-                                <option value="أخرى" <?php echo (!empty($editData) && $editData['owner_type'] == "أخرى") ? "selected" : ""; ?>>أخرى</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label>
-                                <i class="fas fa-phone"></i>
-                                رقم هاتف المالك
-                            </label>
-                            <input type="text" name="owner_phone" id="owner_phone" placeholder="مثال: +249-9-123-4567"
-                                value="<?php echo isset($editData['owner_phone']) ? htmlspecialchars($editData['owner_phone']) : ''; ?>" />
-                        </div>
-
-                        <div>
-                            <label>
-                                <i class="fas fa-handshake"></i>
-                                علاقة المالك بالمورد
-                            </label>
-                            <select name="owner_supplier_relation" id="owner_supplier_relation">
-                                <option value="">-- اختر العلاقة --</option>
-                                <option value="مالك مباشر (يتعاقد معنا مباشرة)" <?php echo (!empty($editData) && $editData['owner_supplier_relation'] == "مالك مباشر (يتعاقد معنا مباشرة)") ? "selected" : ""; ?>>مالك مباشر (يتعاقد معنا مباشرة)</option>
-                                <option value="تحت وساطة المورد (المورد يدير المعدة نيابة عنه)" <?php echo (!empty($editData) && $editData['owner_supplier_relation'] == "تحت وساطة المورد (المورد يدير المعدة نيابة عنه)") ? "selected" : ""; ?>>تحت وساطة المورد (المورد يدير المعدة
-                                    نيابة عنه)</option>
-                                <option value="تابع للمورد (مملوكة للمورد نفسه)" <?php echo (!empty($editData) && $editData['owner_supplier_relation'] == "تابع للمورد (مملوكة للمورد نفسه)") ? "selected" : ""; ?>>تابع للمورد (مملوكة للمورد نفسه)</option>
-                                <option value="غير محدد" <?php echo (!empty($editData) && $editData['owner_supplier_relation'] == "غير محدد") ? "selected" : ""; ?>>غير محدد
-                                </option>
-                            </select>
-                        </div>
+                        <!-- N-21: قسم بيانات الملكية نُزع — المجال المقيَّد (equipment_ownership_registry) حصرًا -->
 
                         <!-- ================================= -->
                         <!-- قسم: الوثائق والتسجيلات -->
@@ -1235,9 +1177,6 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                 <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="ownership" title="بيانات الملكية">
-                    <i class="fas fa-user-tie"></i> الملكية
-                </button>
                 <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
@@ -1258,7 +1197,6 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             <th data-group="manufacturing"> الموديل</th>
                             <th data-group="manufacturing"> سنة الصنع</th>
                             <th data-group="technical"> حالة المعدة</th>
-                            <th data-group="ownership"> المالك</th>
                             <th data-group="status"> التوفر</th>
                             <th data-group="status"> الحالة </th>
                         </tr>
@@ -1286,7 +1224,6 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             m.model,
                             m.manufacturing_year,
                             m.equipment_condition,
-                            m.actual_owner_name,
                             m.availability_status,
                             $availability_state_select
                             $card_state_select
@@ -1403,9 +1340,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
                             echo "<td>" . $equipment_condition . "</td>";
 
-                            // المالك
-                            $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
-                            echo "<td>" . $owner . "</td>";
+                            // N-21: عمود المالك نُزع — لا بُعد مالك في أي عرض تشغيلي
 
                             $row_availability_state = normalize_equipment_availability_state(
                                 isset($row['availability_state']) ? $row['availability_state'] : '',
@@ -1485,8 +1420,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     'basic': [0, 1, 2, 3],          // إجراءات، الكود، المورد، النوع
                     'manufacturing': [4, 5],        // الموديل، سنة الصنع
                     'technical': [6],               // حالة المعدة
-                    'ownership': [7],               // المالك
-                    'status': [8, 9]                // التوفر، الحالة
+                    'status': [7, 8]                // التوفر، الحالة — N-21: عمود المالك نُزع
                 };
 
                 // نظام الفلترة الاحترافي
@@ -1864,10 +1798,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     { label: 'ساعات التشغيل', value: data.operating_hours ? (data.operating_hours + ' ساعة') : 'غير محدد', icon: 'fas fa-clock' },
                     { label: 'حالة المحرك', value: eqVal(data.engine_condition), icon: 'fas fa-car-crash' },
                     { label: 'حالة الإطارات', value: eqVal(data.tires_condition), icon: 'fas fa-circle-notch' },
-                    { label: 'اسم المالك', value: eqVal(data.actual_owner_name), icon: 'fas fa-user' },
-                    { label: 'نوع المالك', value: eqVal(data.owner_type), icon: 'fas fa-briefcase' },
-                    { label: 'هاتف المالك', value: eqVal(data.owner_phone), icon: 'fas fa-phone' },
-                    { label: 'علاقة المالك بالمورد', value: eqVal(data.owner_supplier_relation), icon: 'fas fa-handshake' },
+                    // N-21: حقول المالك نُزعت — المجال المقيَّد حصرًا
                     { label: 'رقم الترخيص', value: eqVal(data.license_number), icon: 'fas fa-address-card' },
                     { label: 'جهة الترخيص', value: eqVal(data.license_authority), icon: 'fas fa-landmark' },
                     { label: 'نوع الوثيقة', value: eqVal(data.document_type), icon: 'fas fa-file-alt' },

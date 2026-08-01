@@ -40,13 +40,17 @@ class EventDispatcher
     private $batch;
     /** @var int|null معرّف حدثٍ يُحقن الانهيار بعده (اختباري حصرًا) */
     private $crashAfterEvent;
+    /** @var bool N-06: تفعيل التصاعد الزمني بين المحاولات (يُطفأ اختباريًا) */
+    private $backoff = true;
 
     public function __construct(\mysqli $conn, array $opts = array())
     {
+        // N-06 ركن ②: الحد المعياري خمس محاولات (PLAN-05 §3-①) — قابل للتضييق اختباريًا.
         $this->conn = $conn;
-        $this->maxAttempts = isset($opts['max_attempts']) ? max(1, intval($opts['max_attempts'])) : 3;
+        $this->maxAttempts = isset($opts['max_attempts']) ? max(1, intval($opts['max_attempts'])) : 5;
         $this->batch = isset($opts['batch']) ? max(1, intval($opts['batch'])) : 100;
         $this->crashAfterEvent = isset($opts['crash_after_event']) ? intval($opts['crash_after_event']) : null;
+        $this->backoff = !isset($opts['backoff']) || (bool) $opts['backoff'];
     }
 
     /**
@@ -102,6 +106,19 @@ class EventDispatcher
         foreach ($events as $event) {
             $eventId = intval($event['id']);
 
+            // N-06 ركن ②: التصاعد الزمني — محاولةٌ غير مستحقةٍ بعدُ توقف دورة
+            // هذا المستهلك (لا قفز فوقها حفاظًا على الترتيب) وتُستأنف في موعدها.
+            if ($this->backoff) {
+                $due = $this->q1(
+                    'SELECT 1 AS blocked FROM `ems_event_deliveries`
+                      WHERE consumer = ? AND event_id = ? AND next_retry_at IS NOT NULL AND next_retry_at > NOW()',
+                    'si', array($consumer, $eventId)
+                );
+                if ($due) {
+                    break;
+                }
+            }
+
             // عدّاد المحاولات (قبل المعالجة): يتقدّم ذرّيًا مع كل التقاط.
             $this->exec(
                 'INSERT INTO `ems_event_deliveries` (`consumer`, `event_id`, `attempts`) VALUES (?, ?, 1)
@@ -118,6 +135,8 @@ class EventDispatcher
                     'siiss', array($consumer, $eventId, $attempts - 1, (string) $d['last_error'], date('Y-m-d H:i:s'))
                 );
                 $this->exec('DELETE FROM `ems_event_deliveries` WHERE consumer = ? AND event_id = ?', 'si', array($consumer, $eventId));
+                // N-06 ركن ②: العزل بإنذارٍ لا بصمت — إشعارٌ لمدير المالية برابط شاشة المراقبة.
+                $this->alertDeadLetter($consumer, $eventId, intval($event['company_id']), (string) $d['last_error']);
                 $this->advanceCursor($consumer, $eventId);
                 $st['dead_lettered']++;
                 $st['cursor'] = $eventId;
@@ -127,9 +146,13 @@ class EventDispatcher
             try {
                 $handler($event, $this->conn); // المعالج يستلم الصفّ كاملًا (ومعه correlation_id للوراثة)
             } catch (\Throwable $t) {
-                // فشل: يبقى الـCursor مكانه — إعادة المحاولة في دورةٍ قادمة (حتى الاستنفاد).
+                // فشل: يبقى الـCursor مكانه — والموعد التالي تصاعديٌّ 2^attempts دقيقة
+                // (سقفه 64) — إعادة المحاولة عند استحقاقه حتى الاستنفاد.
+                $delayMin = min(64, pow(2, min(6, $attempts)));
                 $this->exec(
-                    'UPDATE `ems_event_deliveries` SET `last_error` = ? WHERE consumer = ? AND event_id = ?',
+                    'UPDATE `ems_event_deliveries`
+                        SET `last_error` = ?, `next_retry_at` = ' . ($this->backoff ? 'DATE_ADD(NOW(), INTERVAL ' . intval($delayMin) . ' MINUTE)' : 'NULL') . '
+                      WHERE consumer = ? AND event_id = ?',
                     'ssi', array(substr($t->getMessage(), 0, 500), $consumer, $eventId)
                 );
                 $st['failed']++;
@@ -151,6 +174,24 @@ class EventDispatcher
         }
 
         return $st;
+    }
+
+    /**
+     * N-06 ركن ②: إنذار العزل — إشعارٌ لمدير المالية عند انتقال حدثٍ للرسائل
+     * الميتة. فشل الإشعار لا يوقف العزل (الإنذار غلافٌ والعزل نواة).
+     */
+    private function alertDeadLetter($consumer, $eventId, $companyId, $lastError)
+    {
+        try {
+            $title = mb_substr('إنذار الناقل: حدث #' . $eventId . ' عُزل في الرسائل الميتة (المستهلك ' . $consumer . ') — ' . $lastError, 0, 200);
+            $link = 'admin/bus_monitor.php';
+            $this->exec(
+                "INSERT INTO `fin_notifications` (`company_id`, `target_level`, `title`, `link`) VALUES (?, 'finance_manager', ?, ?)",
+                'iss', array($companyId > 0 ? $companyId : 1, $title, $link)
+            );
+        } catch (\Throwable $t) {
+            error_log('[dispatcher] dead-letter alert failed: ' . $t->getMessage());
+        }
     }
 
     /** تقدّم رتيب (monotonic): لا يعود الـCursor للخلف أبدًا. */

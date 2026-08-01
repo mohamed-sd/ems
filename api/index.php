@@ -25,6 +25,7 @@ require_once __DIR__ . '/controllers/employees.php';
 require_once __DIR__ . '/controllers/lists.php';
 require_once __DIR__ . '/controllers/timesheet.php';
 require_once __DIR__ . '/controllers/sync.php';
+require_once __DIR__ . '/controllers/periods.php';
 
 // ── CORS (تطبيق جوّال/أدوات اختبار) — توكن لا كوكيز، فلا خطر على الجلسة ──────
 if (!headers_sent()) {
@@ -170,6 +171,9 @@ switch ($resource) {
     case 'sync':
         if ($id === 'timesheets' && $method === 'POST') {
             sync_push();
+        } elseif ($id === 'periods' && $method === 'POST') {
+            // N-08: مزامنة الفترات — عطالة بالمفتاح الطبيعي (معدة×تاريخ×وردية×فترة)
+            periods_sync_push();
         } elseif ($id === 'pull' && $method === 'GET') {
             sync_pull();
         } else {

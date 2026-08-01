@@ -189,10 +189,7 @@ class ExcelRegistry
             new Column('operating_hours', 'ساعات التشغيل', ['type' => Column::TYPE_INT, 'width' => 15, 'example' => '5400']),
             new Column('engine_condition', 'حالة المحرك', ['width' => 15, 'default' => 'جيدة', 'example' => 'جيدة']),
             new Column('tires_condition', 'حالة الإطارات', ['width' => 15, 'default' => 'N/A', 'example' => 'N/A']),
-            new Column('actual_owner_name', 'اسم المالك الفعلي', ['width' => 20, 'example' => 'محمد علي أحمد']),
-            new Column('owner_type', 'نوع المالك', ['width' => 18, 'example' => 'مالك فردي']),
-            new Column('owner_phone', 'رقم هاتف المالك', ['width' => 18, 'example' => '+249912345678']),
-            new Column('owner_supplier_relation', 'علاقة المالك بالمورد', ['width' => 25, 'example' => 'تابع للمورد (مملوكة للمورد نفسه)']),
+            // N-21: أعمدة المالك نُزعت من التصدير — «لا بُعد مالك في أي تقرير تشغيلي ولا في التصدير»
             new Column('license_number', 'رقم الترخيص', ['width' => 18, 'example' => 'VEH-2024-12345']),
             new Column('license_authority', 'جهة الترخيص', ['width' => 18, 'example' => 'المرور']),
             new Column('license_expiry_date', 'تاريخ انتهاء الترخيص', ['type' => Column::TYPE_DATE, 'width' => 18, 'example' => '2025-12-31']),

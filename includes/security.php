@@ -288,7 +288,20 @@ function ems_inject_csrf_fields($buffer) {
         return $buffer;
     }
 
-    if (stripos($buffer, '<form') === false || !isset($_SESSION['csrf_token'])) {
+    if (!isset($_SESSION['csrf_token'])) {
+        return $buffer;
+    }
+
+    // شاشات AJAX بلا <form>: يبثّ الحاقن المركزي الرمزَ سكربتًا (window.csrfToken)
+    // — فالمعالجات تحت CSRF_ENFORCE_PATHS ترفض token=missing، والشاشة التي
+    // تقرأ window.csrfToken يفي المركزُ بوعدها لا كل شاشة بنفسها (ADR-05).
+    $headPos = stripos($buffer, '</head>');
+    if ($headPos !== false) {
+        $csrfScript = '<script>window.csrfToken=' . json_encode($_SESSION['csrf_token']) . ';</script>';
+        $buffer = substr($buffer, 0, $headPos) . $csrfScript . substr($buffer, $headPos);
+    }
+
+    if (stripos($buffer, '<form') === false) {
         return $buffer;
     }
 

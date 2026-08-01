@@ -212,10 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         'operating_hours'               => $Ni('operating_hours'),
         'engine_condition'              => $D('engine_condition', 'جيدة'),
         'tires_condition'               => $D('tires_condition', 'N/A'),
-        'actual_owner_name'             => $S('actual_owner_name'),
-        'owner_type'                    => $D('owner_type', ''),
-        'owner_phone'                   => $S('owner_phone'),
-        'owner_supplier_relation'       => $D('owner_supplier_relation', ''),
+        // N-21: أعمدة المالك مهجورة — بيانات الملكية في المجال المقيَّد حصرًا
         'license_number'                => $S('license_number'),
         'license_authority'             => $S('license_authority'),
         'license_expiry_date'           => $Nd('license_expiry_date'),
@@ -545,59 +542,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         </select>
                     </div>
                     
-                    <!-- ================================= -->
-                    <!-- قسم: بيانات الملكية -->
-                    <!-- ================================= -->
-                    <div class="form-section-header">
-                        <h6><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
-                    </div>
-                    
-                    <div>
-                        <label>
-                            <i class="fas fa-user"></i>
-                            اسم المالك الفعلي
-                        </label>
-                        <input type="text" name="actual_owner_name" id="actual_owner_name" placeholder="مثال: محمد علي أحمد" 
-                               value="<?php echo isset($editData['actual_owner_name']) ? htmlspecialchars($editData['actual_owner_name']) : ''; ?>" />
-                    </div>
-                    
-                    <div>
-                        <label>
-                            <i class="fas fa-briefcase"></i>
-                            نوع المالك
-                        </label>
-                        <select name="owner_type" id="owner_type">
-                            <option value="">-- اختر نوع المالك --</option>
-                            <option value="مالك فردي" <?php echo (!empty($editData) && $editData['owner_type']=="مالك فردي") ? "selected" : ""; ?>>مالك فردي</option>
-                            <option value="شركة متخصصة" <?php echo (!empty($editData) && $editData['owner_type']=="شركة متخصصة") ? "selected" : ""; ?>>شركة متخصصة</option>
-                            <option value="مؤسسة" <?php echo (!empty($editData) && $editData['owner_type']=="مؤسسة") ? "selected" : ""; ?>>مؤسسة</option>
-                            <option value="أخرى" <?php echo (!empty($editData) && $editData['owner_type']=="أخرى") ? "selected" : ""; ?>>أخرى</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label>
-                            <i class="fas fa-phone"></i>
-                            رقم هاتف المالك
-                        </label>
-                        <input type="text" name="owner_phone" id="owner_phone" placeholder="مثال: +249-9-123-4567" 
-                               value="<?php echo isset($editData['owner_phone']) ? htmlspecialchars($editData['owner_phone']) : ''; ?>" />
-                    </div>
-                    
-                    <div>
-                        <label>
-                            <i class="fas fa-handshake"></i>
-                            علاقة المالك بالمورد
-                        </label>
-                        <select name="owner_supplier_relation" id="owner_supplier_relation">
-                            <option value="">-- اختر العلاقة --</option>
-                            <option value="مالك مباشر (يتعاقد معنا مباشرة)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="مالك مباشر (يتعاقد معنا مباشرة)") ? "selected" : ""; ?>>مالك مباشر (يتعاقد معنا مباشرة)</option>
-                            <option value="تحت وساطة المورد (المورد يدير المعدة نيابة عنه)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="تحت وساطة المورد (المورد يدير المعدة نيابة عنه)") ? "selected" : ""; ?>>تحت وساطة المورد (المورد يدير المعدة نيابة عنه)</option>
-                            <option value="تابع للمورد (مملوكة للمورد نفسه)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="تابع للمورد (مملوكة للمورد نفسه)") ? "selected" : ""; ?>>تابع للمورد (مملوكة للمورد نفسه)</option>
-                            <option value="غير محدد" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="غير محدد") ? "selected" : ""; ?>>غير محدد</option>
-                        </select>
-                    </div>
-                    
+                    <!-- N-21: قسم بيانات الملكية نُزع — المجال المقيَّد (equipment_ownership_registry) حصرًا -->
+
                     <!-- ================================= -->
                     <!-- قسم: الوثائق والتسجيلات -->
                     <!-- ================================= -->
@@ -879,9 +825,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="ownership" title="بيانات الملكية">
-                    <i class="fas fa-user-tie"></i> الملكية
-                </button>
                 <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
@@ -902,7 +845,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
                         <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
                         <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
-                        <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
                         <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
                         <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
                         <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
@@ -932,7 +874,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             m.model,
                             m.manufacturing_year,
                             m.equipment_condition,
-                            m.actual_owner_name,
                             m.availability_status,
                             " . ($equipment_has_availability_state ? "m.availability_state," : "NULL AS availability_state,") . "
                             o.project_id,
@@ -1007,10 +948,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $equipment_condition . "</td>";
                         
-                        // المالك
-                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
-                        echo "<td>" . $owner . "</td>";
-                        
+                        // N-21: عمود المالك نُزع — لا بُعد مالك في أي عرض تشغيلي
+
                         // التوفر - نفس نمط equipments_fleet
                         $avail_state_raw  = isset($row['availability_state'])  ? $row['availability_state']  : '';
                         $avail_status_raw = isset($row['availability_status']) ? $row['availability_status'] : '';
@@ -1131,22 +1070,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <div class="view-item-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
                     <div class="view-item-value" id="view_eq_tires">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user"></i> اسم المالك</div>
-                    <div class="view-item-value" id="view_eq_owner">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
-                    <div class="view-item-value" id="view_eq_owner_type">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-phone"></i> هاتف المالك</div>
-                    <div class="view-item-value" id="view_eq_owner_phone">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
-                    <div class="view-item-value" id="view_eq_owner_relation">-</div>
-                </div>
+                <!-- N-21: حقول المالك نُزعت — المجال المقيَّد حصرًا -->
                 <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
                     <div class="view-item-value" id="view_eq_license">-</div>
@@ -1254,9 +1178,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
                 'identification': [3],            // رقم تسلسلي
                 'manufacturing': [6, 7],          // الموديل، سنة الصنع
-                'technical': [8, 10],             // حالة المعدة، التوفر
-                'ownership': [9],                 // المالك
-                'status': [11, 12]                // الحالة، الإجراءات
+                'technical': [8, 9],              // حالة المعدة، التوفر
+                'status': [10, 11]                // الحالة، الإجراءات — N-21: عمود المالك نُزع
             };
             
             // نظام الفلترة الاحترافي
@@ -1463,7 +1386,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 'view_eq_code','view_eq_name','view_eq_type','view_eq_supplier','view_eq_project','view_eq_mine',
                 'view_eq_serial','view_eq_chassis','view_eq_manufacturer','view_eq_model','view_eq_year',
                 'view_eq_import_year','view_eq_condition','view_eq_hours','view_eq_engine','view_eq_tires',
-                'view_eq_owner','view_eq_owner_type','view_eq_owner_phone','view_eq_owner_relation',
                 'view_eq_license','view_eq_license_authority','view_eq_license_expiry','view_eq_inspection',
                 'view_eq_last_inspection','view_eq_location','view_eq_availability','view_eq_value',
                 'view_eq_daily','view_eq_monthly','view_eq_insurance','view_eq_notes','view_eq_last_maintenance',
@@ -1503,10 +1425,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' ساعة' : 'غير محدد');
                     setViewValue('view_eq_engine', data.engine_condition);
                     setViewValue('view_eq_tires', data.tires_condition);
-                    setViewValue('view_eq_owner', data.actual_owner_name);
-                    setViewValue('view_eq_owner_type', data.owner_type);
-                    setViewValue('view_eq_owner_phone', data.owner_phone);
-                    setViewValue('view_eq_owner_relation', data.owner_supplier_relation);
                     setViewValue('view_eq_license', data.license_number);
                     setViewValue('view_eq_license_authority', data.license_authority);
                     setViewValue('view_eq_license_expiry', data.license_expiry_date);

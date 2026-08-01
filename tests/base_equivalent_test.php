@@ -22,6 +22,8 @@ if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
 require_once dirname(__DIR__) . '/config.php';
+// سياق مستأجر للبوابة (EMS_TENANT_GATE=enforce): الحزم تحاكي جلسة حقيقية لا GUEST
+$_SESSION['user'] = array('id' => 1, 'role' => '19', 'company_id' => 4, 'name' => 'fes test');
 require_once dirname(__DIR__) . '/app/Core/EventValidationException.php';
 require_once dirname(__DIR__) . '/app/Core/ServerId.php';
 require_once dirname(__DIR__) . '/app/Core/EventPublisher.php';
