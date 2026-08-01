@@ -153,6 +153,9 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         </div>
 
         <div class="ems-topbar-actions">
+            <?php // البوابةُ الشخصية (H-18): «متاحةٌ بنقرةٍ من أي صفحة» — بابُها هنا
+            $ems_tb_portal = function_exists('ems_url') ? ems_url('Portal/my_portal.php') : '/ems/Portal/my_portal.php'; ?>
+            <a href="<?php echo htmlspecialchars($ems_tb_portal, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="بوابتي — ماذا يخصّني أنا؟" aria-label="بوابتي"><i class="fas fa-id-card"></i></a>
             <a href="<?php echo htmlspecialchars($ems_tb_tickets, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" id="emsTopbarTickets" title="البلاغات" aria-label="البلاغات"><i class="fas fa-tower-observation"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
             <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-icon--power" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fas fa-power-off"></i></a>
             <a href="<?php echo htmlspecialchars($ems_tb_profile, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الملف الشخصي" aria-label="الملف الشخصي"><i class="far fa-user"></i></a>

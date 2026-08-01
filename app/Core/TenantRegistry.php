@@ -229,6 +229,11 @@ class TenantRegistry
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
         // H-15 (USR-01 §2): طبقةُ الصفات — شخصٌ × صفةٌ × نطاقٌ × مدةٌ × مصدر.
         'user_capacities' => array('type' => self::T_TENANT, 'soft' => false),
+        // H-18 (USR-01): البوابةُ الشخصية — اللقطاتُ والتقييمُ والشهادةُ وسجلُّ النشاط.
+        'achievement_snapshots' => array('type' => self::T_TENANT, 'soft' => false),
+        'evaluations' => array('type' => self::T_TENANT, 'soft' => false),
+        'achievement_certificates' => array('type' => self::T_TENANT, 'soft' => false),
+        'portal_activity_log' => array('type' => self::T_TENANT, 'soft' => false),
         // H-16 (ADM-01): منظومةُ الظهور — القاموسُ عالميٌّ والمفاتيحُ والسجلُّ بشركتهما.
         'portal_elements' => array('type' => self::T_GLOBAL, 'soft' => false),
         'visibility_keys' => array('type' => self::T_TENANT, 'soft' => false),
