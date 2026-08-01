@@ -561,6 +561,23 @@ class TenantRegistry
         'founding_mode' => array('type' => self::T_GLOBAL, 'soft' => false),
         // sensitive_read_log مسجَّل أعلاه سلفًا (T_RESTRICTED · LEG-01 §9) — والجدول أُنشئ في هجرة 2026-08-02
         'perm_shadow_diffs' => array('type' => self::T_TENANT, 'soft' => false), // SEC-29: ميزان صفر الفرق 14 يومًا
+        // ── update0004 · TKT-01 v1.1 (هجرة 2026-08-02): المسارات المتوازية ──
+        'ticket_type_workstreams' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_types', 'fk' => 'ticket_type_id'), // §12: التفعيل الشرطي
+        'ticket_workstreams' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'), // المسار وحدة العمل
+        'ticket_holds' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_workstreams', 'fk' => 'ws_id'),
+        'ticket_escalations' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_workstreams', 'fk' => 'ws_id'), // Insert-only
+        'ticket_participants' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'),
+        'ticket_responses' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'),
+        'ticket_effects' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_workstreams', 'fk' => 'ws_id'),
+        'ticket_communications' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'),
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */

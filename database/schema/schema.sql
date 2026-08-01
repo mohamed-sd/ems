@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 23:33:53
--- الجداول: 346 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-01 23:39:04
+-- الجداول: 354 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7134,6 +7134,32 @@ CREATE TABLE `ticket_categories` (
   UNIQUE KEY `uq_cat_code` (`company_id`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: ticket_communications ──
+CREATE TABLE `ticket_communications` (
+  `cm_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tk_id` int unsigned NOT NULL,
+  `person_id` int NOT NULL,
+  `channel` enum('system','phone','field') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'system',
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cm_id`),
+  KEY `idx_tc_ticket` (`tk_id`,`at`),
+  CONSTRAINT `fk_tktc_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تواصل مركز البلاغات يسجَّل فيبقى أثره (§10-③)';
+
+-- ── Table: ticket_effects ──
+CREATE TABLE `ticket_effects` (
+  `lnk_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `ws_id` int unsigned NOT NULL,
+  `effect_type` enum('inspection_request','work_order','issue_request','purchase_request','stoppage_attribution','decision','reply','acknowledge','info_added','no_action') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `effect_ref` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_provisional` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'للإسناد قبل اعتماد الأثر — الخطوات الأربع §7',
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`lnk_id`),
+  KEY `idx_te_ws` (`ws_id`),
+  CONSTRAINT `fk_tkte_ws` FOREIGN KEY (`ws_id`) REFERENCES `ticket_workstreams` (`ws_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ولا يُغلق مسار بلا سطر هنا (عدا الإغلاق الإداري)';
+
 -- ── Table: ticket_escalation_rules ──
 CREATE TABLE `ticket_escalation_rules` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -7149,6 +7175,19 @@ CREATE TABLE `ticket_escalation_rules` (
   PRIMARY KEY (`id`),
   KEY `ix_level` (`company_id`,`level_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: ticket_escalations ──
+CREATE TABLE `ticket_escalations` (
+  `esc_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `ws_id` int unsigned NOT NULL,
+  `level` enum('mgr','ops_mgr','exec') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `triggered_by` enum('sla_breach','reopen_threshold','safety','hold_overdue') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `to_person_id` int DEFAULT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`esc_id`),
+  KEY `idx_esc_ws` (`ws_id`,`at`),
+  CONSTRAINT `fk_esc_ws` FOREIGN KEY (`ws_id`) REFERENCES `ticket_workstreams` (`ws_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Insert-only — ولا تصعيد يدوي يسجَّل هنا (§6: آلي لا بطلب)';
 
 -- ── Table: ticket_events ──
 CREATE TABLE `ticket_events` (
@@ -7169,6 +7208,31 @@ CREATE TABLE `ticket_events` (
   CONSTRAINT `fk_ev_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: ticket_holds ──
+CREATE TABLE `ticket_holds` (
+  `hold_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `ws_id` int unsigned NOT NULL COMMENT 'على المسار لا الرأس — فالمهلة تتوقف لمسار ولا توقف الباقي',
+  `reason_code` enum('awaiting_part','awaiting_approval','awaiting_technician','awaiting_reporter','awaiting_external') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'قائمة محكومة لا نص حر — وإلا صار التعليق بابًا للتهرب',
+  `expected_until` datetime NOT NULL COMMENT 'ولا تعليق بلا مدة متوقعة — وتجاوزها يصعد التعليق نفسه',
+  `started_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ended_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`hold_id`),
+  KEY `idx_holds_open` (`ws_id`,`ended_at`),
+  CONSTRAINT `fk_hold_ws` FOREIGN KEY (`ws_id`) REFERENCES `ticket_workstreams` (`ws_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: ticket_participants ──
+CREATE TABLE `ticket_participants` (
+  `p_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tk_id` int unsigned NOT NULL,
+  `person_id` int NOT NULL,
+  `role` enum('reporter','assignee','watcher','duplicate_reporter') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `added_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`p_id`),
+  UNIQUE KEY `uq_tp` (`tk_id`,`person_id`,`role`),
+  CONSTRAINT `fk_tp_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ومبلغ المكرر يضاف متابعًا للأصل فلا يُفقد أنه أبلغ (§9)';
+
 -- ── Table: ticket_recurrence_templates ──
 CREATE TABLE `ticket_recurrence_templates` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -7188,6 +7252,20 @@ CREATE TABLE `ticket_recurrence_templates` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_next` (`company_id`,`active`,`next_occurrence_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: ticket_responses ──
+CREATE TABLE `ticket_responses` (
+  `rd_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tk_id` int unsigned NOT NULL,
+  `ws_id` int unsigned DEFAULT NULL COMMENT 'إلزامي لردود المسار وفارغ للرد المركزي على الرأس',
+  `person_id` int NOT NULL,
+  `response_type` enum('reply','acknowledge','info_added','no_action_decision') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `body` text COLLATE utf8mb4_unicode_ci,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`rd_id`),
+  KEY `idx_tr_ticket` (`tk_id`,`at`),
+  CONSTRAINT `fk_tktr_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_sla_policies ──
@@ -7229,6 +7307,26 @@ CREATE TABLE `ticket_transfers` (
   CONSTRAINT `fk_tr_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: ticket_type_workstreams ──
+CREATE TABLE `ticket_type_workstreams` (
+  `ws_def_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `ticket_type_id` int unsigned NOT NULL,
+  `workstream_type` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'maintenance·movement·operators·warehouse·procurement·hr·governance·support…',
+  `seq_no` int NOT NULL DEFAULT '1',
+  `target_org_unit_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'org_units.unit_code — والمكلف يُحل من ORG-01 لا من شخص ثابت',
+  `target_role` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'دور الحل في PermitGate/TicketRouter (movement·maintenance·…)',
+  `mandatory` tinyint(1) NOT NULL DEFAULT '1',
+  `activation_mode` enum('immediate','conditional') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'immediate',
+  `trigger_event` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مثال StockUnavailable — الشرطي يفتح بوقوعه لا بالإنشاء',
+  `depends_on_workstream_type` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `response_sla_minutes` int DEFAULT NULL,
+  `resolve_sla_minutes` int DEFAULT NULL,
+  `sla_clock` enum('absolute','business') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'absolute' COMMENT '§6: الحرج مطلق وما دونه بساعات العمل',
+  PRIMARY KEY (`ws_def_id`),
+  UNIQUE KEY `uq_ttws` (`ticket_type_id`,`workstream_type`,`seq_no`),
+  CONSTRAINT `fk_ttws_type` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-01 §12: فمسار المشتريات يُفتح عند إعلان نفاد القطعة لا عند إنشاء البلاغ';
+
 -- ── Table: ticket_types ──
 CREATE TABLE `ticket_types` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -7237,6 +7335,12 @@ CREATE TABLE `ticket_types` (
   `name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner_role_id` int unsigned NOT NULL,
   `default_nature` enum('request','incident','recurring') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'request',
+  `nature` enum('incident','problem','request','complaint','information','risk','emergency','suggestion') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'TKT-01 §3: الطبيعة غير المجال — تحدد الدورة والسرية والإغلاق',
+  `category` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '§4: المجال — منه تشتق الإدارة المختصة',
+  `default_confidentiality` enum('normal','protected','secret') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal',
+  `closure_policy` enum('reporter_confirm','owner_approve','auto','admin_only','committee') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'reporter_confirm' COMMENT '§5-⑥: ولا إغلاق آلي للسلامة والحوادث وشكاوى العاملين',
+  `allow_anonymous` tinyint(1) NOT NULL DEFAULT '0',
+  `default_priority` enum('normal','high','critical') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal',
   `ref_table` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `default_sla_id` int unsigned DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
@@ -7263,6 +7367,31 @@ CREATE TABLE `ticket_watchers` (
   CONSTRAINT `fk_wt_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: ticket_workstreams ──
+CREATE TABLE `ticket_workstreams` (
+  `ws_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `tk_id` int unsigned NOT NULL,
+  `workstream_type` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `seq_no` int NOT NULL DEFAULT '1',
+  `org_unit_id` int unsigned DEFAULT NULL,
+  `assignee_person_id` int DEFAULT NULL COMMENT 'يُحل من تكليفات ORG-01 النافذة لا من جدول النوع',
+  `mandatory` tinyint(1) NOT NULL DEFAULT '1',
+  `state` enum('new','received','in_progress','on_hold','done_pending','closed','reopened','admin_closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new',
+  `activation_state` enum('pending','opened','skipped') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'opened' COMMENT 'الشرطي pending حتى حدث تفعيله',
+  `response_due_at` datetime DEFAULT NULL,
+  `resolve_due_at` datetime DEFAULT NULL,
+  `received_at` datetime DEFAULT NULL,
+  `resolved_at` datetime DEFAULT NULL,
+  `closed_at` datetime DEFAULT NULL,
+  `reopen_count` int NOT NULL DEFAULT '0' COMMENT 'ظاهر — وثلاث إعادات ترفعه للمركز',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ws_id`),
+  UNIQUE KEY `uq_tws` (`tk_id`,`workstream_type`,`seq_no`),
+  KEY `idx_tws_assignee` (`assignee_person_id`,`state`),
+  KEY `idx_tws_due` (`state`,`response_due_at`),
+  CONSTRAINT `fk_tws_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-01 §12: UQ على (البلاغ×نوع المسار×التسلسل) — فللإدارة الواحدة مساران مختلفان';
+
 -- ── Table: tickets ──
 CREATE TABLE `tickets` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -7271,8 +7400,10 @@ CREATE TABLE `tickets` (
   `ticket_type_id` int unsigned NOT NULL,
   `category_id` int unsigned DEFAULT NULL,
   `stage` enum('new','classified','routed','in_progress','waiting','follow_up','done','closed','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new',
+  `head_state` enum('open','closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open' COMMENT 'ذاكرة مشتقة لا مصدر حقيقة — لا يكتبها إلا معيد الحساب (TicketStateService)',
   `ticket_nature` enum('request','incident','recurring') COLLATE utf8mb4_unicode_ci NOT NULL,
   `priority` enum('normal','high','critical') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal',
+  `confidentiality` enum('normal','protected','secret') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal',
   `business_impact` enum('production_critical','revenue','safety','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'admin',
   `production_critical` tinyint(1) NOT NULL DEFAULT '0',
   `project_weight` enum('strategic','main','normal') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -7282,12 +7413,22 @@ CREATE TABLE `tickets` (
   `reporter_contact` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `reporter_entity_id` int unsigned DEFAULT NULL,
   `reporter_user_id` int unsigned DEFAULT NULL,
+  `is_anonymous` tinyint(1) NOT NULL DEFAULT '0' COMMENT '§8-④: الهوية محفوظة للحوكمة',
   `project_id` int unsigned DEFAULT NULL,
+  `site_id` int DEFAULT NULL,
+  `contract_id` int DEFAULT NULL,
+  `shift_no` int DEFAULT NULL,
+  `period_no` int DEFAULT NULL,
   `equipment_id` int unsigned DEFAULT NULL,
   `machine_type` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `machine_condition` enum('running','stopped') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `meter_reading` decimal(12,2) DEFAULT NULL,
   `complaint` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `operational_summary` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'يراه الجميع — الفصل البنيوي §8',
+  `private_details` text COLLATE utf8mb4_unicode_ci COMMENT 'خلف ConfidentialityGuard — لا يُجلب بلا صلاحية',
+  `source_screen` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '§2: السياق محمول لا مُدخل',
+  `source_entity_type` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `source_entity_id` bigint unsigned DEFAULT NULL,
   `driver_id` int unsigned DEFAULT NULL,
   `helper_id` int unsigned DEFAULT NULL,
   `shift` enum('morning','evening') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -7296,6 +7437,9 @@ CREATE TABLE `tickets` (
   `service_team` enum('internal','external_workshop') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `issue_status` text COLLATE utf8mb4_unicode_ci,
   `parent_id` int unsigned DEFAULT NULL,
+  `duplicate_of_ticket_id` int unsigned DEFAULT NULL,
+  `related_ticket_id` int unsigned DEFAULT NULL,
+  `recurrence_group_id` int unsigned DEFAULT NULL,
   `is_parent` tinyint(1) NOT NULL DEFAULT '0',
   `ticket_role` enum('parent','child','standalone') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'standalone',
   `sla_policy_id` int unsigned DEFAULT NULL,
@@ -7325,6 +7469,8 @@ CREATE TABLE `tickets` (
   KEY `ix_parent` (`parent_id`),
   KEY `fk_tk_cat` (`category_id`),
   KEY `fk_tk_sla` (`sla_policy_id`),
+  KEY `idx_tickets_head` (`head_state`,`priority`,`created_at`),
+  KEY `idx_tickets_dup` (`duplicate_of_ticket_id`),
   CONSTRAINT `fk_tk_cat` FOREIGN KEY (`category_id`) REFERENCES `ticket_categories` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_tk_parent` FOREIGN KEY (`parent_id`) REFERENCES `tickets` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `fk_tk_sla` FOREIGN KEY (`sla_policy_id`) REFERENCES `ticket_sla_policies` (`id`) ON DELETE SET NULL,
