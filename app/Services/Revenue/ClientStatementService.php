@@ -23,18 +23,26 @@
 
 namespace App\Services\Revenue;
 
+// مواءمةُ PLAN-03 §5: طبقةُ المخطَّط تقرأ خطَّ الأساس من خدماته لا تستنسخه
+require_once dirname(__DIR__) . '/Contract/PlanActualLinkService.php';
+
 class ClientStatementService
 {
     /** خريطةُ مصدر الصف إلى شاشته — والرابطُ يشير إلى **مصدر السطر**. */
     const SOURCE_ROUTES = array(
-        'claim'       => '../Contracts/claims.php?open=',
-        'tax_invoice' => '../Contracts/tax_invoices.php?open=',
-        'collection'  => '../Finance/payments_fin.php?id=',
-        'advance'     => '../Contracts/advances.php?id=',
+        'claim'        => '../Contracts/claims.php?open=',
+        'tax_invoice'  => '../Contracts/tax_invoices.php?open=',
+        'collection'   => '../Finance/payments_fin.php?id=',
+        'advance'      => '../Contracts/advances.php?id=',
+        'monthly_plan' => '../Contracts/contract_monthly_plan.php?contract_id=',
+        'guarantee'    => '../Contracts/contract_guarantees.php?contract_id=',
     );
 
-    const LAYERS = array('claims', 'invoices', 'collections', 'retention', 'advance');
+    // مواءمةُ PLAN-03 §5: طبقةُ **المخطَّط** أُضيفت أولى الطبقات — مقارِنةٌ
+    // من خط الأساس التجاري (P-03 × أسعارِ P-02) **ولا تدخل الرصيد الجاري**.
+    const LAYERS = array('planned', 'claims', 'invoices', 'collections', 'retention', 'advance');
     const LAYER_LABELS = array(
+        'planned'     => 'المخطَّط (خطُّ الأساس التجاري)',
         'claims'      => 'المستخلصات (اعترافٌ)',
         'invoices'    => 'الفواتير الضريبية (مطالبة)',
         'collections' => 'التحصيلات',
@@ -53,11 +61,62 @@ class ClientStatementService
         $out = array(
             'layers' => array(), 'orphans' => 0, 'currencies' => array(), 'notes' => array(),
             'period' => array('from' => (string) $from, 'to' => (string) $to),
-            'totals' => array('claims' => 0.0, 'invoices' => 0.0, 'collections' => 0.0,
-                              'retention' => 0.0, 'advance' => 0.0, 'balance' => 0.0),
+            'totals' => array('planned' => 0.0, 'claims' => 0.0, 'invoices' => 0.0,
+                              'collections' => 0.0, 'retention' => 0.0, 'advance' => 0.0,
+                              'balance' => 0.0),
         );
         foreach (self::LAYERS as $l) {
             $out['layers'][$l] = array('label' => self::LAYER_LABELS[$l], 'rows' => array(), 'total' => 0.0);
+        }
+
+        // ── عقودُ العميل — تُحسم أولًا لأن المخطَّطَ والمقدمةَ والمحتجزَ تقرأ بها ──
+        // (`contracts` بلا عمود عميل — والرابطُ الموثوقُ `claims.contract_id`؛
+        //  اجتهادُ M-04 المدوَّن، والقياسُ به **يُعلَن** ولا يُخترع ربط.)
+        $contractIds = array();
+        try {
+            foreach ($gate->scopedQuery(array('scope' => array('c' => 'claims')),
+                "SELECT DISTINCT c.contract_id FROM claims c
+                  WHERE {TENANT_SCOPE} AND c.client_id = ? AND c.contract_id IS NOT NULL
+                    AND COALESCE(c.is_deleted,0)=0", array($clientId)) as $x) {
+                if ((int) $x['contract_id'] > 0) { $contractIds[] = (int) $x['contract_id']; }
+            }
+        } catch (\Throwable $t) { $contractIds = array(); }
+
+        // ── ⓪ المخطَّط — مواءمةُ PLAN-03 §5: من `contract_monthly_plan` × سعرِ
+        //     بندِه (نمطُ اللوحة التجارية P-12 نفسُه) — **مقارِنٌ لا ذمة**،
+        //     والنسخةُ الحاكمةُ نسخةُ الفترة لا نسخةُ اليوم (درسُ P-03).
+        $fromMonth = substr((string) $from, 0, 7);
+        $toMonth   = substr((string) $to, 0, 7);
+        foreach ($contractIds as $cid) {
+            $priceOf = array(); $curOf = array(); $descOf = array(); $noOf = array();
+            try {
+                foreach (\App\Services\Contract\ContractLineService::linesOf($gate, $cid, false) as $l) {
+                    $priceOf[(int) $l['id']] = (float) $l['unit_price'];
+                    $curOf[(int) $l['id']]   = (string) $l['currency'];
+                    $descOf[(int) $l['id']]  = (string) $l['description'];
+                    $noOf[(int) $l['id']]    = (int) $l['line_no'];
+                }
+                $pv = \App\Services\Contract\PlanActualLinkService::planVsActual(
+                    $gate, $cid, $fromMonth, $toMonth);
+            } catch (\Throwable $t) { continue; }
+            $agg = array(); // line_id => [qty, months]
+            foreach ($pv['rows'] as $r) {
+                $lid = (int) $r['line_id'];
+                if (!isset($agg[$lid])) { $agg[$lid] = array('qty' => 0.0, 'months' => 0); }
+                $agg[$lid]['qty'] = round($agg[$lid]['qty'] + (float) $r['planned'], 2);
+                $agg[$lid]['months']++;
+            }
+            foreach ($agg as $lid => $a) {
+                $price = isset($priceOf[$lid]) ? $priceOf[$lid] : 0.0;
+                self::push($out, 'planned', self::row(
+                    'المخطَّط — عقد #' . $cid . ' · بند ' . (isset($noOf[$lid]) ? $noOf[$lid] : $lid)
+                    . ' (' . (isset($descOf[$lid]) ? $descOf[$lid] : '') . ')',
+                    $fromMonth . ' → ' . $toMonth,
+                    round($a['qty'] * $price, 2),
+                    isset($curOf[$lid]) ? $curOf[$lid] : '',
+                    'monthly_plan', (string) $cid,
+                    'كمية ' . $a['qty'] . ' × سعر ' . $price . ' · ' . $a['months'] . ' شهرًا'));
+            }
         }
 
         // ── ① المستخلصات — اعترافٌ لا مطالبة ────────────────────────────────
@@ -142,19 +201,8 @@ class ClientStatementService
         }
 
         // ── ⑤ الدفعة المقدمة — «ورصيدُها المتبقي ظاهرٌ دائمًا» (§4) ─────────
-        // **الوصلُ بعقود مستخلصاته**: `contracts` بلا عمود عميل (الطرفُ الثاني
-        // نصٌّ حر) — والرابطُ الموثوقُ هو `claims.contract_id` لعميلٍ بعينه.
-        // فالقياسُ به **ويُعلَن كذلك**، ولا يُخترع ربطٌ لا وجودَ له.
+        // (عقودُ العميل حُسمت أول الدالة — والقياسُ بها مُعلَنٌ لا مخترَع.)
         $advances = array();
-        $contractIds = array();
-        try {
-            foreach ($gate->scopedQuery(array('scope' => array('c' => 'claims')),
-                "SELECT DISTINCT c.contract_id FROM claims c
-                  WHERE {TENANT_SCOPE} AND c.client_id = ? AND c.contract_id IS NOT NULL
-                    AND COALESCE(c.is_deleted,0)=0", array($clientId)) as $x) {
-                if ((int) $x['contract_id'] > 0) { $contractIds[] = (int) $x['contract_id']; }
-            }
-        } catch (\Throwable $t) { $contractIds = array(); }
         if ($contractIds) {
             $cin = implode(',', $contractIds);
             try {
@@ -175,6 +223,52 @@ class ClientStatementService
                 (string) $a['received_date'], (float) $a['amount'], (string) $a['currency'],
                 'advance', (string) $a['id'], 'تُستهلك بجدولها من كل مستخلص'));
         }
+        // مواءمةُ PLAN-03 §5: **رصيدُ المقدم المتبقي ظاهرٌ دائمًا** — من دفتر
+        // M-01 نفسِه (`advance_balance`) لا من حسابٍ ثانٍ للرقم الواحد.
+        foreach ($contractIds as $cid) {
+            try {
+                require_once dirname(__DIR__, 3) . '/Contracts/advance_helpers.php';
+                $ab = advance_balance($gate, $cid);
+                if ((float) $ab['received'] > 0) {
+                    $out['notes'][] = 'ℹ عقد #' . $cid . ': المقدمُ المقبوض ' . $ab['received']
+                        . ' — المستقطَع ' . $ab['recovered']
+                        . ' — **الرصيدُ المتبقي ' . $ab['balance'] . '**';
+                }
+            } catch (\Throwable $t) { /* لا مقدمَ = لا سطر */ }
+        }
+
+        // مواءمةُ PLAN-03 §5: المحتجزُ **بتاريخ ردّه** من سجل الضمانات (P-06) —
+        // إعلانٌ لا صفوفُ مبالغَ: مبلغُ المحتجز في طبقته من المستخلصات سلفًا،
+        // وتكرارُه من سجل الضمان **يحتسبه مرتين**. وخطابُ الضمان البنكي
+        // **التزامٌ خارج الميزانية لا يظهر رقمًا** (قاعدةُ P-06 نصًّا).
+        if ($contractIds) {
+            $cin = implode(',', array_map('intval', $contractIds));
+            $guarantees = array();
+            try {
+                $guarantees = $gate->scopedQuery(array('scope' => array('g' => 'contract_guarantees')),
+                    "SELECT g.id, g.contract_id, g.kind, g.nature, g.amount, g.currency,
+                            g.due_release_date, g.release_condition, g.state
+                       FROM contract_guarantees g
+                      WHERE {TENANT_SCOPE} AND g.contract_id IN ({$cin})
+                        AND COALESCE(g.is_deleted,0)=0 AND g.state IN ('active','expired')
+                      ORDER BY g.contract_id, g.id");
+            } catch (\Throwable $t) { $guarantees = array(); }
+            foreach ($guarantees as $g) {
+                if ((string) $g['kind'] === 'cash_retention') {
+                    $out['notes'][] = 'ℹ محتجزُ عقد #' . (int) $g['contract_id']
+                        . ' (' . $g['amount'] . ' ' . $g['currency'] . ') — **تاريخُ ردّه '
+                        . ((string) $g['due_release_date'] !== '' && $g['due_release_date'] !== null
+                            ? (string) $g['due_release_date']
+                            : 'غيرُ محدَّدٍ — يُعلَن ولا يُخمَّن')
+                        . '**' . ((string) $g['release_condition'] !== ''
+                            ? ' · شرطُه: ' . $g['release_condition'] : '');
+                } elseif ((string) $g['nature'] === 'off_balance') {
+                    $out['notes'][] = 'ℹ خطابُ ضمانٍ (' . $g['kind'] . ') قائمٌ على عقد #'
+                        . (int) $g['contract_id'] . ' — **التزامٌ خارج الميزانية: لا يُخصم من '
+                        . 'مستخلصٍ ولا يظهر رقمًا في الرصيد** (P-06)';
+                }
+            }
+        }
 
         // ── المجاميع ────────────────────────────────────────────────────────
         foreach (self::LAYERS as $l) {
@@ -182,6 +276,10 @@ class ClientStatementService
         }
         // ② الرصيدُ من **الفواتير** لا من المستخلصات — وإلا احتُسب الدَّينُ مرتين
         $out['totals']['balance'] = round($out['totals']['invoices'] + $out['totals']['collections'], 2);
+        if ($out['totals']['planned'] != 0.0 || $out['layers']['planned']['rows']) {
+            $out['notes'][] = 'ℹ طبقةُ المخطَّط **مقارِنةٌ من خط الأساس التجاري (P-03)** — '
+                            . 'خطةٌ لا ذمة، **ولا تدخل الرصيد الجاري**';
+        }
 
         if (count($out['currencies']) > 1) {
             $out['notes'][] = '⚠ الكشفُ يحمل أكثرَ من عملة (' . implode(' · ', array_keys($out['currencies']))

@@ -126,6 +126,9 @@ include '../insidebar.php';
     <?php if ($openInv !== null):
         $fields = json_decode((string)$openInv['tax_fields_json'], true);
         if (!is_array($fields)) { $fields = array(); }
+        // مواءمةُ PLAN-03 §5: الفاتورةُ تقرأ **بندَ البيع** لكل سطرٍ من مصدره
+        // الحي (claim_lines بمفتاح P-09) — وما لا بندَ له يُعلَن غيرَ موصول.
+        $invLines = TIS::linesOf($gate, intval($openInv['claim_id']));
     ?>
     <div class="card" id="printable"><div class="card-header"><h5><i class="fa fa-print"></i>
         فاتورة ضريبية <?php echo htmlspecialchars((string)$openInv['serial_no']); ?></h5></div>
@@ -142,18 +145,49 @@ include '../insidebar.php';
                 · <?php echo htmlspecialchars((string)($fields['period_from'] ?? '')); ?>
                 → <?php echo htmlspecialchars((string)($fields['period_to'] ?? '')); ?></td></tr>
             <tr><th>تاريخ الإصدار</th><td><?php echo htmlspecialchars((string)$openInv['issued_at']); ?></td></tr>
-            <tr><th>الصافي</th><td><?php echo htmlspecialchars((string)$openInv['net_amount']); ?>
+            <tr><th>القيمة قبل الضريبة</th><td><?php echo htmlspecialchars((string)$openInv['net_amount']); ?>
                 <?php echo htmlspecialchars((string)$openInv['currency']); ?></td></tr>
             <tr><th>الضريبة</th><td><?php echo htmlspecialchars((string)$openInv['tax_amount']); ?>
                 <?php if ($openInv['tax_code'] !== null): ?>
                     (<?php echo htmlspecialchars((string)$openInv['tax_code']); ?>
                     · <?php echo htmlspecialchars((string)$openInv['tax_rate']); ?>٪)
                 <?php endif; ?></td></tr>
-            <tr><th>الإجمالي</th><td><strong><?php echo htmlspecialchars((string)$openInv['total_amount']); ?>
+            <tr><th>القيمة شاملة الضريبة</th><td><strong><?php echo htmlspecialchars((string)$openInv['total_amount']); ?>
                 <?php echo htmlspecialchars((string)$openInv['currency']); ?></strong></td></tr>
             </tbody>
         </table>
         </div>
+
+        <?php if ($invLines): ?>
+        <h6 style="margin-top:14px"><i class="fa fa-list-ol"></i> أسطرُ المستخلص ببند بيعها
+            <small style="color:#666">(تُقرأ من مصدرها الحي — والفاتورةُ لا تخزّن أسطرًا)</small></h6>
+        <div class="table-container">
+        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+            <thead><tr><th>بند البيع</th><th>التاريخ</th><th>المعدة</th><th>الوحدة</th>
+                <th>الكمية</th><th>سعر الوحدة</th><th>القيمة</th></tr></thead>
+            <tbody>
+            <?php foreach ($invLines as $ln): ?>
+                <tr>
+                    <td><?php if ($ln['contract_line_id'] !== null && intval($ln['contract_line_id']) > 0): ?>
+                            <strong>بند <?php echo intval($ln['sale_line_no']); ?></strong>
+                            — <?php echo htmlspecialchars((string)($ln['sale_line_desc'] ?? '')); ?>
+                            <small>(<?php echo htmlspecialchars((string)($ln['sale_line_model'] ?? '')); ?>
+                                · <?php echo htmlspecialchars((string)($ln['sale_tax_status'] ?? '')); ?>)</small>
+                        <?php else: ?>
+                            <span class="badge badge-warning">⚠ غيرُ موصولٍ ببند بيع</span>
+                        <?php endif; ?></td>
+                    <td><?php echo htmlspecialchars((string)$ln['work_date']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$ln['equipment_ref']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$ln['unit_type']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$ln['qty']); ?></td>
+                    <td><?php echo htmlspecialchars((string)$ln['unit_price']); ?></td>
+                    <td><strong><?php echo htmlspecialchars((string)$ln['amount']); ?></strong></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
+        <?php endif; ?>
         <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
             <button type="button" class="btn-save" onclick="window.print()"><i class="fa fa-print"></i> الطباعة الرسمية</button>
             <a class="btn-save" href="notes.php?invoice_no=<?php echo rawurlencode((string)$openInv['serial_no']); ?>">

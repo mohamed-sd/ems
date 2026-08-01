@@ -280,8 +280,9 @@ if ($open_id > 0) {
     try {
         $open_claim = $gate->selectOne('claims', array('where' => array('id' => $open_id)));
         if ($open_claim) {
-            $open_lines = $gate->select('claim_lines', array(
-                'where' => array('claim_id' => $open_id), 'orderBy' => 'work_date ASC, id ASC'));
+            // مواءمةُ PLAN-03 §5 (M-06): الأسطرُ ببند بيعها — والفاقدُه يُعلَن
+            require_once __DIR__ . '/../app/Services/Revenue/ClaimDisputeService.php';
+            $open_lines = \App\Services\Revenue\ClaimDisputeService::linesOf($gate, $open_id);
         }
     } catch (\Throwable $t) { error_log('claim open: ' . $t->getMessage()); }
 }
@@ -406,7 +407,7 @@ include('../insidebar.php');
         <div class="card-body table-container">
             <table class="display" style="width:100%">
                 <thead><tr><th>التاريخ</th><th>المعدة</th><th>الوحدة</th><th>الكمية</th>
-                    <th>سعر الوحدة</th><th>القيمة</th><th>الأصل</th>
+                    <th>سعر الوحدة</th><th>القيمة</th><th>الأصل</th><th>بند البيع</th>
                     <th>النزاع (§3-⑤)</th></tr></thead>
                 <tbody>
                 <?php foreach ($open_lines as $l):
@@ -420,6 +421,12 @@ include('../insidebar.php');
                         <td><?php echo clm_num($l['unit_price']); ?></td>
                         <td><strong><?php echo clm_num($l['amount']); ?></strong></td>
                         <td><span class="text-muted">دوام #<?php echo intval($l['source_ref']); ?></span></td>
+                        <td><?php if (isset($l['contract_line_id']) && intval($l['contract_line_id']) > 0): ?>
+                                بند <?php echo intval($l['sale_line_no']); ?>
+                                <small>(<?php echo clm_e($l['sale_line_model']); ?>)</small>
+                            <?php else: ?>
+                                <span class="badge badge-warning" title="النزاعُ يُروى بلا بندٍ يُنسَب إليه — صِل السطرَ من شاشة الربط 178">⚠ غيرُ موصول</span>
+                            <?php endif; ?></td>
                         <td>
                         <?php if ($dstate === 'open'): ?>
                             <span class="badge badge-warning">متنازَعٌ عليه</span>

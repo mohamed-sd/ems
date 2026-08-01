@@ -287,6 +287,29 @@ class TaxInvoiceService
         } catch (\Throwable $t) { return array(); }
     }
 
+    /**
+     * أسطرُ المستخلص **ببند بيعها** — مواءمةُ PLAN-03 §5 (توسيعٌ لا هدم):
+     * الفاتورةُ لا تخزّن أسطرًا (أرقامُها مجمَّدةٌ في رأسها) والبندُ يُقرأ من
+     * `claim_lines.contract_line_id` (مفتاحُ P-09) — وما لا بندَ له
+     * **يُعلَن غيرَ موصولٍ ولا يُخفى ولا يُخمَّن له بند**.
+     */
+    public static function linesOf($gate, $claimId)
+    {
+        try {
+            return $gate->scopedQuery(
+                array('scope' => array('l' => 'claim_lines'),
+                      'enrich' => array('ccl' => 'client_contract_lines')),
+                "SELECT l.id, l.work_date, l.equipment_ref, l.unit_type, l.qty, l.unit_price,
+                        l.amount, l.contract_line_id,
+                        ccl.line_no AS sale_line_no, ccl.description AS sale_line_desc,
+                        ccl.pricing_model AS sale_line_model, ccl.tax_status AS sale_tax_status
+                   FROM claim_lines l
+                   LEFT JOIN client_contract_lines ccl ON ccl.id = l.contract_line_id
+                  WHERE {TENANT_SCOPE} AND l.claim_id = ?
+                  ORDER BY l.id", array((int) $claimId));
+        } catch (\Throwable $t) { return array(); }
+    }
+
     private static function claimOf($gate, $claimId)
     {
         try { return $gate->selectOne('claims', array('where' => array('id' => (int) $claimId))); }

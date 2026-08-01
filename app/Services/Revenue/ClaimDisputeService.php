@@ -29,10 +29,11 @@ class ClaimDisputeService
     // ① الرفع
     // ═════════════════════════════════════════════════════════════════════
 
-    /** @return array{ok:bool,code:int,reason:string,open_count:int} */
+    /** @return array{ok:bool,code:int,reason:string,open_count:int,contract_line_id:?int} */
     public static function raise($conn, $gate, $companyId, $lineId, $args, $actor)
     {
-        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'open_count' => 0);
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'open_count' => 0,
+                     'contract_line_id' => null);
         $line = self::line($gate, (int) $lineId);
         if (!$line) { $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في نطاقك'; return $out; }
         if ((string) $line['dispute_state'] === 'open') {
@@ -72,11 +73,18 @@ class ClaimDisputeService
         }
 
         self::recalc($gate, (int) $line['claim_id']);
+        // مواءمةُ PLAN-03 §5: النزاعُ **يسمّي بندَ البيع** المتنازَعَ عليه —
+        // المفتاحُ محمولٌ على السطر نفسِه (`claim_lines.contract_line_id` · P-09)
+        // فيُقرأ ولا يُخمَّن، وغيابُه **يُعلَن** في السجل ولا يُخترع له بند.
+        $saleLineId = isset($line['contract_line_id']) && (int) $line['contract_line_id'] > 0
+                    ? (int) $line['contract_line_id'] : null;
         self::audit($conn, $companyId, $actor, 'dispute_raise', (int) $lineId,
             array('dispute_state' => (string) $line['dispute_state']),
-            array('dispute_state' => 'open', 'reason' => $reason, 'doc' => $doc));
+            array('dispute_state' => 'open', 'reason' => $reason, 'doc' => $doc,
+                  'contract_line_id' => $saleLineId !== null ? $saleLineId : 'غيرُ موصولٍ ببند بيع'));
 
         $out['ok'] = true; $out['code'] = 200;
+        $out['contract_line_id'] = $saleLineId;
         $out['open_count'] = self::openCount($gate, (int) $line['claim_id']);
         return $out;
     }
@@ -167,12 +175,20 @@ class ClaimDisputeService
         } catch (\Throwable $t) { return 0; }
     }
 
-    /** أسطرُ المستخلص بحال نزاعها — للشاشة. */
+    /**
+     * أسطرُ المستخلص بحال نزاعها **وبند بيعها** — للشاشة.
+     * (مواءمةُ PLAN-03 §5: البندُ يُقرأ بمفتاح P-09 والفاقدُه يُعلَن.)
+     */
     public static function linesOf($gate, $claimId)
     {
         try {
-            return $gate->scopedQuery(array('scope' => array('l' => 'claim_lines')),
-                "SELECT l.* FROM claim_lines l
+            return $gate->scopedQuery(
+                array('scope' => array('l' => 'claim_lines'),
+                      'enrich' => array('ccl' => 'client_contract_lines')),
+                "SELECT l.*, ccl.line_no AS sale_line_no, ccl.description AS sale_line_desc,
+                        ccl.pricing_model AS sale_line_model
+                   FROM claim_lines l
+                   LEFT JOIN client_contract_lines ccl ON ccl.id = l.contract_line_id
                   WHERE {TENANT_SCOPE} AND l.claim_id = ? ORDER BY l.id",
                 array((int) $claimId));
         } catch (\Throwable $t) { return array(); }
