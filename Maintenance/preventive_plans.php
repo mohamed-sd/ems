@@ -172,6 +172,25 @@ if (isset($_GET['del_task'], $_GET['plan_id'])) {
     }
 }
 
+// ── E-16: تأجيلُ خطةٍ زمنيةٍ **بسبب** — يوثَّق في التدقيق ولا يمرّ صامتًا ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'postpone_plan') {
+    if (!$can_edit) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $pid = intval($_POST['plan_id'] ?? 0);
+    $days = max(1, min(90, intval($_POST['days'] ?? 7)));
+    $reason = trim((string)($_POST['reason'] ?? ''));
+    if ($reason === '') { header("Location: preventive_plans.php?msg=" . rawurlencode('التأجيلُ بسببٍ مكتوبٍ — لا تأجيلَ صامتًا ❌')); exit(); }
+    $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
+    if (!$plan || $plan['next_due_date'] === null) { header("Location: preventive_plans.php?msg=خطةٌ+غير+صالحة+للتأجيل+❌"); exit(); }
+    $newDue = date('Y-m-d', strtotime($plan['next_due_date'] . ' +' . $days . ' day'));
+    ems_tenant_db()->update('mnt_plan', array('next_due_date' => $newDue), array('id' => $pid));
+    require_once '../includes/audit_trail.php';
+    ems_audit_change($conn, 'maintenance', 'mnt_plan', 'postpone', $pid,
+        array('next_due_date' => (string)$plan['next_due_date']),
+        array('next_due_date' => $newDue, 'days' => $days, 'reason' => $reason),
+        array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
+    header("Location: preventive_plans.php?msg=" . rawurlencode('أُجّلت ' . $days . ' يومًا بسببها الموثَّق ✅')); exit();
+}
+
 // ── توليد أمر صيانة وقائي من خطة (يدوي) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_order') {
     if (!$can_add) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+توليد+أمر+❌"); exit(); }
@@ -416,11 +435,34 @@ function mnt_opt($value, $label, $selected) {
                 if ($r['next_due_date'] <= $threshold) { $is_due = true; }
             }
         }
-        if ($is_due) { $due_rows[] = $r; }
+        if ($is_due) {
+            // E-16 (SPEC-04 بطاقة 3): وسمُ «متأخر» = تجاوز تاريخَه بلا هامش ·
+            // و«هذا الأسبوع» = يستحق خلال 7 أيام — فلترةٌ لا حسابٌ جديد
+            $r['e16_late'] = ($r['trigger_basis'] === 'زمن' && $r['next_due_date'] !== null
+                              && $r['next_due_date'] < $today);
+            $r['e16_week'] = ($r['trigger_basis'] === 'زمن' && $r['next_due_date'] !== null
+                              && $r['next_due_date'] >= $today
+                              && $r['next_due_date'] <= date('Y-m-d', strtotime('+7 day')));
+            $due_rows[] = $r;
+        }
+    }
+    // E-16: الفلاتر — الكل · متأخرة · هذا الأسبوع
+    $e16_filter = in_array(strval($_GET['due_filter'] ?? 'all'), array('all', 'late', 'week'), true)
+                ? strval($_GET['due_filter'] ?? 'all') : 'all';
+    if ($e16_filter !== 'all') {
+        $due_rows = array_values(array_filter($due_rows, function ($r) use ($e16_filter) {
+            return $e16_filter === 'late' ? !empty($r['e16_late']) : !empty($r['e16_week']);
+        }));
     }
 ?>
-    <?php if (!empty($due_rows)): ?>
-    <div class="card"><div class="card-header"><h5><i class="fas fa-bell"></i> خطط مستحقة الآن (<?php echo count($due_rows); ?>)</h5></div><div class="card-body">
+    <?php if (!empty($due_rows) || $e16_filter !== 'all'): ?>
+    <div class="card"><div class="card-header"><h5><i class="fas fa-bell"></i> خطط مستحقة الآن (<?php echo count($due_rows); ?>)
+        <span style="margin-inline-start:12px">
+        <?php foreach (array('all' => 'الكل', 'late' => 'متأخرة', 'week' => 'هذا الأسبوع') as $fk => $fl): ?>
+            <a href="?due_filter=<?php echo $fk; ?>" class="btn btn-sm"
+               style="border:1px solid #ddd;border-radius:6px;padding:2px 8px;<?php
+                   echo $fk === $e16_filter ? 'background:#e2b93b;font-weight:800' : ''; ?>"><?php echo $fl; ?></a>
+        <?php endforeach; ?></span></h5></div><div class="card-body">
         <div class="table-container"><table class="display nowrap alltables no-datatable" style="width:100%">
             <thead><tr><th>توليد أمر</th><th>المرجع</th><th>الخطة</th><th>المعدة</th><th>الأساس</th><th>الاستحقاق</th></tr></thead>
             <tbody>
@@ -435,11 +477,23 @@ function mnt_opt($value, $label, $selected) {
                         </form>
                         <?php endif; ?>
                     </td>
-                    <td><strong><?php echo htmlspecialchars((string) $r['code']); ?></strong></td>
+                    <td><strong><?php echo htmlspecialchars((string) $r['code']); ?></strong>
+                        <?php if (!empty($r['e16_late'])): ?><span class="badge badge-danger">متأخرة</span>
+                        <?php elseif (!empty($r['e16_week'])): ?><span class="badge badge-warning">هذا الأسبوع</span><?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string) $r['name']); ?></td>
                     <td><?php echo htmlspecialchars((string) ($r['equipment_name'] ?? '-')); ?></td>
                     <td><?php echo htmlspecialchars((string) $r['trigger_basis']); ?></td>
-                    <td><?php echo $r['trigger_basis'] === 'ساعات' ? ('عدّاد: ' . htmlspecialchars((string) $r['next_due_meter'])) : ('تاريخ: ' . htmlspecialchars((string) $r['next_due_date'])); ?></td>
+                    <td><?php echo $r['trigger_basis'] === 'ساعات' ? ('عدّاد: ' . htmlspecialchars((string) $r['next_due_meter'])) : ('تاريخ: ' . htmlspecialchars((string) $r['next_due_date'])); ?>
+                        <?php if ($can_edit && $r['trigger_basis'] === 'زمن'): ?>
+                        <form method="post" style="display:inline-flex;gap:4px;margin-inline-start:6px"
+                              onsubmit="return this.reason.value.trim() !== '' || (alert('السببُ إلزامي'), false)">
+                            <input type="hidden" name="action" value="postpone_plan">
+                            <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
+                            <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل">
+                            <input type="text" name="reason" placeholder="سببُ التأجيل *" style="width:130px" required>
+                            <button type="submit" class="btn-save" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
+                        </form>
+                        <?php endif; ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

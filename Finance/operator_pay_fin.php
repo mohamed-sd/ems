@@ -118,8 +118,8 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <p style="color:#4b5563;margin:0 0 12px;line-height:1.7;">
             <i class="fas fa-circle-info"></i>
-            لكل مشغّلٍ وضعٌ تقرّره: <strong>«بالراتب»</strong> (تدفعه الرواتب — لا مستحقَ من المروحة)، أو
-            <strong>«بالمستحق»</strong> (المروحة تدفعه: <code>ساعات المشغّل × المعدّل</code>، تصنيف «إضافي»).
+            لكل مشغّلٍ وضعٌ تقرّره: <strong>«بالراتب»</strong> (تدفعه الرواتب — لا مستحقَ من محرك الآثار)، أو
+            <strong>«بالمستحق»</strong> (محرك الآثار المالية يدفعه: <code>ساعات المشغّل × المعدّل</code>، تصنيف «إضافي»).
             الافتراض «بالراتب» حتى تُفعّل مشغّلًا صراحةً وتضبط المعدّل — فلا يُحتسب رقمٌ قبل ذلك.
         </p>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">

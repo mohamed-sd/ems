@@ -126,7 +126,7 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-diagram-project"></i> آثار المروحة وحالتها (للاطّلاع)</h5>
+        <h5 style="margin:0 0 10px;"><i class="fas fa-diagram-project"></i> الآثار المالية المولَّدة وحالتها (للاطّلاع)</h5>
         <div class="table-container">
             <table id="effTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>

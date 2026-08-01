@@ -141,6 +141,11 @@ include '../insidebar.php';
     $header_title = 'الميزانية والانحراف';
     $header_icon  = 'fa fa-chart-pie';
     $header_actions = array();
+    // E-04 (SPEC-01 #21): متابعةُ الانحراف تبويبٌ من الميزانية لا رابطًا
+    // مستقلًّا في التنقل — رابطُه من هنا وصفُّه في السايدبار أُخفي
+    $header_actions[] = array('tag' => 'a', 'href' => 'variance_monitor_fin.php',
+        'class' => 'suppliers-header-link', 'icon' => 'fa fa-magnifying-glass-chart',
+        'label' => 'متابعة الانحراف');
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إنشاء ميزانية');
     }

@@ -110,6 +110,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
 }
 
 // ── حذف ناعم (السطور تُحذف بالـ CASCADE عند الحذف الصلب، لكن هنا حذف ناعم للرأس فقط) ──
+// E-21 (UX-00 §4.3): **ثلاثيةُ القرار الموحّدة** على صندوق طلبات الشراء —
+// اعتمادٌ · إعادةٌ للاستكمال بسبب · رفضٌ بسبب (كانت الحالةُ قائمةً منسدلةً حرة)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_decide') {
+    if (!$can_edit) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $rid = intval($_POST['request_id'] ?? 0);
+    $decision = strval($_POST['decision'] ?? '');
+    $reason = trim((string)($_POST['reason'] ?? ''));
+    $req = proc_gate(false)->selectOne('proc_request', array('where' => array('id' => $rid)));
+    if (!$req || (string)$req['state'] !== 'مقدَّم') {
+        header("Location: requests_proc.php?msg=" . rawurlencode('القرارُ على «مقدَّم» وحدَه — الحالُ: ' . ($req['state'] ?? 'غير موجود') . ' ❌')); exit();
+    }
+    // M-45: من أنشأ لا يعتمد — الحارسُ العام
+    if ($decision === 'approve') {
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $blocked = ems_no_self_approval($conn, intval($req['created_by']), $current_user_id,
+            'طلب الشراء ' . strval($req['code']), $company_id);
+        if ($blocked !== null) { header("Location: requests_proc.php?msg=" . rawurlencode($blocked['reason'] . ' ❌')); exit(); }
+    }
+    if (in_array($decision, array('return', 'reject'), true) && $reason === '') {
+        header("Location: requests_proc.php?msg=" . rawurlencode('الإعادةُ والرفضُ بسببٍ مكتوبٍ إلزامًا ❌')); exit();
+    }
+    $to = $decision === 'approve' ? 'اعتماد المشتريات'
+        : ($decision === 'return' ? 'مسودة' : 'مرفوض');
+    proc_gate(false)->update('proc_request', array('state' => $to,
+        'notes' => trim((string)$req['notes'] . ($reason !== '' ? ("\n[" . ($decision === 'return' ? 'إعادة' : 'رفض') . '] ' . $reason) : ''))),
+        array('id' => $rid));
+    require_once __DIR__ . '/../includes/audit_trail.php';
+    ems_audit_change($conn, 'procurement', 'proc_request', 'e21_' . $decision, $rid,
+        array('state' => 'مقدَّم'), array('state' => $to, 'reason' => $reason),
+        array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
+    header("Location: requests_proc.php?msg=" . rawurlencode('قرارٌ بالثلاثية: ' . $to . ' ✅')); exit();
+}
+
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
@@ -327,7 +360,30 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         echo "<td>" . htmlspecialchars((string)$row['need_source']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['op_classification']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['priority']) . "</td>";
-                        echo "<td><span class='action-btn'>" . htmlspecialchars((string)$row['state']) . "</span></td>";
+                        echo "<td><span class='action-btn'>" . htmlspecialchars((string)$row['state']) . "</span>";
+                        // E-21: الثلاثيةُ الموحّدة على «مقدَّم» — والإعادةُ والرفضُ بسبب
+                        if ($can_edit && (string)$row['state'] === 'مقدَّم') {
+                            $rid = intval($row['id']);
+                            echo "<div style='display:flex;gap:3px;margin-top:4px;flex-wrap:wrap'>"
+                               . "<form method='post' style='display:inline'>"
+                               . "<input type='hidden' name='action' value='e21_decide'>"
+                               . "<input type='hidden' name='request_id' value='{$rid}'>"
+                               . "<input type='hidden' name='decision' value='approve'>"
+                               . "<button type='submit' class='btn-save' title='اعتماد'>✓</button></form>"
+                               . "<form method='post' style='display:inline-flex;gap:2px'>"
+                               . "<input type='hidden' name='action' value='e21_decide'>"
+                               . "<input type='hidden' name='request_id' value='{$rid}'>"
+                               . "<input type='hidden' name='decision' value='return'>"
+                               . "<input type='text' name='reason' placeholder='سببُ الإعادة *' required style='width:90px'>"
+                               . "<button type='submit' class='btn-save' title='إعادةٌ للاستكمال'>↩</button></form>"
+                               . "<form method='post' style='display:inline-flex;gap:2px'>"
+                               . "<input type='hidden' name='action' value='e21_decide'>"
+                               . "<input type='hidden' name='request_id' value='{$rid}'>"
+                               . "<input type='hidden' name='decision' value='reject'>"
+                               . "<input type='text' name='reason' placeholder='سببُ الرفض *' required style='width:90px'>"
+                               . "<button type='submit' class='btn-save' title='رفض'>✗</button></form></div>";
+                        }
+                        echo "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['fin_approval_state']) . "</td>";
                         echo "<td>" . intval($row['line_count']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['created_at']) . "</td>";

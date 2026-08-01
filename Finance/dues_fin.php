@@ -293,7 +293,16 @@ include '../insidebar.php';
                     echo "<td>" . number_format((float)$row['amount'], 2) . "</td>";
                     echo "<td>" . number_format((float)$row['collected'], 2) . "</td>";
                     echo "<td>" . number_format((float)$row['outstanding'], 2) . "</td>";
-                    echo "<td>" . htmlspecialchars((string)($row['due_date'] ?? '—')) . "</td>";
+                    // E-06 (ENT-03 §4): عمرُ الذمة بشرائح 30/60/90 ملوَّنةً —
+                    // كان التلوينُ في اللوحة وحدَها وشاشةُ الذمم بلا شرائح
+                    $e06 = '';
+                    if ($row['due_date'] && (float)$row['outstanding'] > 0) {
+                        $age = (int) floor((time() - strtotime((string)$row['due_date'])) / 86400);
+                        if ($age >= 90)      { $e06 = " <span class='badge badge-danger'>+90ي</span>"; }
+                        elseif ($age >= 60)  { $e06 = " <span class='badge badge-warning'>60–90ي</span>"; }
+                        elseif ($age >= 30)  { $e06 = " <span class='badge badge-secondary'>30–60ي</span>"; }
+                    }
+                    echo "<td>" . htmlspecialchars((string)($row['due_date'] ?? '—')) . $e06 . "</td>";
                     echo "<td><span class='badge badge-" . $st_tone . "'>" . ($st_lbl[$st] ?? $st) . "</span></td>";
                     echo "</tr>";
                 } }

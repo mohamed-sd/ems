@@ -93,7 +93,15 @@ class ExcelService
     {
         $this->authorize($def, 'view');
         $rows = $this->fetchRows($def);
-        $spreadsheet = Exporter::build($def, $rows);
+        // E-19: معاييرُ التصدير المطبَّقةُ فعلًا — تُعلَن في الملف لا تُضمَر
+        $criteria = [];
+        if (!$this->isSuperAdmin && $def->companyScoped) {
+            $criteria[] = 'نطاقُ الشركة #' . $this->companyId;
+        }
+        if ($def->softDeleteColumn) { $criteria[] = 'بلا المحذوف'; }
+        if (is_callable($def->exportRowScope)) { $criteria[] = 'نطاقُ رؤية الشاشة'; }
+        $criteria[] = 'عددُ الصفوف: ' . count($rows);
+        $spreadsheet = Exporter::build($def, $rows, $criteria);
         $this->stream($spreadsheet, 'export_' . $def->key);
     }
 

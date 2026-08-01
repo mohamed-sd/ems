@@ -516,7 +516,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           'company_id' => intval($_SESSION['user']['company_id'] ?? 0),
           'equipment_id' => $svc_eq, 'shift' => (string) $values['shift'],
           'date' => (string) $values['date'], 'qty' => $svc_qty, 'unit_type' => $svc_unit,
-          'time_lines' => $svc_lines, 'source_ref' => 'TS-SCREEN',
+          // E-10 (SPEC-03 بطاقة 2): المرجعُ الميدانيُّ حقلٌ حقيقيٌّ لا ثابتٌ —
+          // والفارغُ يبقى 'TS-SCREEN' معلَنًا أنه بلا مستندٍ ميداني
+          'time_lines' => $svc_lines,
+          'source_ref' => trim((string)($_POST['field_ref'] ?? '')) !== ''
+                        ? mb_substr(trim((string)$_POST['field_ref']), 0, 64) : 'TS-SCREEN',
           'operation_id' => $svc_op, 'operator_employee_id' => $svc_emp,
           'note' => 'كُتبت من الشاشة — الخدمةُ المصدرُ الأول (EMS_TS_WRITER=service)',
           'publish_events' => false,
@@ -927,6 +931,10 @@ try {
               </select>
             </div>
             <div>
+              <label>المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني">
+            </div>
+            <div>
               <label>الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
@@ -1312,6 +1320,10 @@ try {
                 <option value="D">☀️ صباحية</option>
                 <option value="N">🌙 مسائية</option>
               </select>
+            </div>
+            <div>
+              <label>المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني">
             </div>
             <div>
               <label>الالية</label>
@@ -1705,6 +1717,10 @@ try {
                 <option value="D">☀️ صباحية</option>
                 <option value="N">🌙 مسائية</option>
               </select>
+            </div>
+            <div>
+              <label>المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني">
             </div>
             <div>
               <label>الالية</label>

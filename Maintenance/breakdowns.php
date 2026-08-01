@@ -19,5 +19,10 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+// E-15/E-23 (SPEC-00 §3-②): كلُّ نقرةٍ على الميت تُعَدّ في nav_redirects —
+// والحذفُ النهائيُّ قرارُ مالكٍ بعد أن يثبت العدّادُ صفرَه مدةً كافية.
+include '../config.php';
+$conn->query("UPDATE nav_redirects SET hits = hits + 1, last_hit_at = NOW()
+               WHERE old_route = 'Maintenance/breakdowns.php' AND active = 1");
 header("Location: ../Tickets/tickets_list.php");
 exit();

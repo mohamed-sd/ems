@@ -20,7 +20,7 @@ class Exporter
      * @param EntityDefinition $def
      * @param array[]          $rows  صفوف مفتاحها اسم الحقل (field => value).
      */
-    public static function build(EntityDefinition $def, array $rows): Spreadsheet
+    public static function build(EntityDefinition $def, array $rows, array $criteria = []): Spreadsheet
     {
         $columns = $def->exportColumns();
         $colCount = count($columns);
@@ -30,8 +30,13 @@ class Exporter
 
         Styler::columnWidths($sheet, array_map(static function (Column $c) { return $c->width; }, $columns));
 
-        // صف العنوان + صف الرؤوس.
-        Styler::titleRow($sheet, 1, $colCount, 'قائمة ' . $def->title . ' — تاريخ التصدير: ' . date('Y-m-d H:i'));
+        // صف العنوان + صف الرؤوس — **ومعاييرُ التصدير ظاهرةٌ في العنوان** (E-19 ·
+        // UI-01 ⑱): تُلحق بالنص لا صفًّا مستقلًّا كي لا تنزاح رؤوسُ الاستيراد.
+        $title = 'قائمة ' . $def->title . ' — تاريخ التصدير: ' . date('Y-m-d H:i');
+        if ($criteria) {
+            $title .= ' — معايير التصدير: ' . implode(' · ', array_map('strval', $criteria));
+        }
+        Styler::titleRow($sheet, 1, $colCount, $title);
         Styler::headerRow($sheet, 2, array_map(static function (Column $c) { return $c->label; }, $columns));
         Styler::freeze($sheet, 2);
 

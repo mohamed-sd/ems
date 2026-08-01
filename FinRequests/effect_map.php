@@ -286,7 +286,7 @@ include('../insidebar.php');
 
         <?php if ($links): ?>
         <div class="card">
-            <div class="card-header"><h5><i class="fa fa-sitemap"></i> روابط المروحة الموثقة (fin_event_links)</h5></div>
+            <div class="card-header"><h5><i class="fa fa-sitemap"></i> روابط الآثار المالية الموثقة (fin_event_links)</h5></div>
             <div class="card-body">
                 <table class="table table-striped no-datatable" data-no-dt="1">
                     <thead><tr><th>الأب</th><th>نوع الأثر</th><th>الجدول الهدف</th><th>المعرف</th></tr></thead>
