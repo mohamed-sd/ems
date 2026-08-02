@@ -12,6 +12,17 @@ $__nav_unified = isset($_SESSION['user']['role']) && unifiedNavEnabled($_SESSION
 if (isset($_SESSION['user']) && isset($conn)) {
   enforce_current_page_view_permission($conn, '../main/dashboard.php');
 }
+
+// TKT-01 §2-⑧ + NAV-01 §5-② (update0006-b): زرُّ الإبلاغ الاحتياطيُّ العالمي —
+// يُبثُّ آخرَ الصفحة إن لم تستدعِ الشاشةُ زرًّا سياقيًّا أغنى بنفسها،
+// فتتحقق «صفرُ شاشةٍ تشغيليةٍ بلا زرِّ إبلاغ» بلا ازدواج.
+if (isset($_SESSION['user'])) {
+  require_once dirname(__FILE__) . '/includes/report_button.php';
+  if (empty($GLOBALS['__ems_rb_shutdown'])) {
+    $GLOBALS['__ems_rb_shutdown'] = true;
+    register_shutdown_function('ems_report_button_fallback');
+  }
+}
 ?>
 <?php
 // Match inheader.php cache-busting so the dedup check below recognises the

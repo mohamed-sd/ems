@@ -23,6 +23,7 @@ if (!function_exists('ems_report_button')) {
                     . htmlspecialchars((string) $ctx[$k]) . '">';
             }
         }
+        $GLOBALS['__ems_rb_rendered'] = true; // يُعلم الاحتياطيَّ العالميَّ فلا يزدوج
         // النموذج POST عادي إلى نقطة الفتح السياقي — السياق محمول لا مُدخَل
         echo '<form method="post" action="' . htmlspecialchars(ems_report_button_base()) . '/Tickets/ticket_contextual_open.php"'
             . ' style="display:inline" class="ems-report-btn-form">'
@@ -36,5 +37,20 @@ if (!function_exists('ems_report_button')) {
     function ems_report_button_base()
     {
         return '..';
+    }
+
+    /**
+     * الزرُّ الاحتياطيُّ العالمي (TKT-01 §2-⑧ · update0006-b E-04):
+     * «أيُّ شاشةٍ في النظام — يُحمل الشاشةُ والمسارُ والمستخدمُ والوقت».
+     * يطفو أسفلَ يسارِ كلِّ شاشةٍ مصادَقةٍ لم تستدعِ زرًّا أغنى بنفسها —
+     * فتتحقق «صفرُ شاشةٍ تشغيليةٍ بلا زرِّ إبلاغ» بلا ازدواجٍ حيث الزرُّ الغني.
+     */
+    function ems_report_button_fallback()
+    {
+        if (!empty($GLOBALS['__ems_rb_rendered'])) { return; } // شاشةٌ لها زرُّها الغني
+        $screen = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+        echo '<div style="position:fixed;bottom:14px;left:14px;z-index:1050" class="ems-report-fallback">';
+        ems_report_button(array('screen' => $screen), 'أبلغ عن مشكلة');
+        echo '</div>';
     }
 }
