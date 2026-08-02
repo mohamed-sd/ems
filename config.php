@@ -233,6 +233,32 @@ $conn->set_charset("utf8mb4");
 // «Illegal mix of collations» عند مقارنة عمود بنتيجة CAST/تعبير تأخذ ترتيب الاتصال.
 mysqli_query($conn, "SET collation_connection = 'utf8mb4_unicode_ci'");
 
+// N-24 (update0004 · NFR-09): حارس الخمس ثوان — «لا احتساب يتجاوز خمس ثوان
+// داخل الطلب». يرصد كل طلب ويب تجاوزها في guard_denials بكود request_over_5s
+// (مراقبة كاشفة — والمنع البنيوي عبر JobQueueService::mustQueue في الخدمات
+// الثقيلة التي تصرح بتقديرها). لا يمس CLI ولا الكرون.
+if (PHP_SAPI !== 'cli' && !defined('EMS_REQUEST_GUARD_SET')) {
+    define('EMS_REQUEST_GUARD_SET', 1);
+    register_shutdown_function(function () use ($conn) {
+        $elapsed = microtime(true) - (isset($_SERVER['REQUEST_TIME_FLOAT']) ? (float) $_SERVER['REQUEST_TIME_FLOAT'] : microtime(true));
+        if ($elapsed <= 5.0 || !($conn instanceof mysqli)) { return; }
+        $script = isset($_SERVER['SCRIPT_NAME']) ? basename(dirname($_SERVER['SCRIPT_NAME'])) . '/' . basename($_SERVER['SCRIPT_NAME']) : 'unknown';
+        $co = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
+        $uid = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0;
+        @$conn->query("INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code)
+            VALUES ({$co}, 'request_over_5s', {$uid}, '" . $conn->real_escape_string(mb_substr($script, 0, 118)) . "', '"
+            . $conn->real_escape_string(round($elapsed, 1) . 's — يمر عبر الطابور') . "')");
+    });
+}
+
+// N-25 (update0004 · NFR-02): توحيد ساعة التطبيق على ساعة القاعدة — القياس
+// الحاكم أثبت أن التخزين محلي (MySQL SYSTEM = توقيت الخادم) وPHP كان UTC،
+// فكانت ساعتان مختلطتان (فارق موسمي 2-3 ساعات بالتوقيت الصيفي). التوحيد
+// إعدادٌ لا ترحيل (الملحق §12.6-⑤) — والإزاحة الموسمية تمنع الترحيل المسطح.
+// الرجوع: EMS_APP_TIMEZONE=UTC في .env. وخطة ترحيل UTC الكاملة جاهزة بلا
+// تشغيل في docs/nfr/N-25_utc_migration_plan_ar.md — قرار مالك.
+date_default_timezone_set(function_exists('ems_env') ? (string) ems_env('EMS_APP_TIMEZONE', 'Africa/Cairo') : 'Africa/Cairo');
+
 // تهيئة إعدادات أداء اتصال قاعدة البيانات
 ems_optimize_db_session($conn);
 

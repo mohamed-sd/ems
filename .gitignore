@@ -28,3 +28,8 @@ desktop.ini
 # سلامة البيئة (PLAN-05 §3-⑩): النسخ المشفَّرة وتاريخ التهيئة لا يدخلان المستودع
 database/backups/secrets/
 database/backups/env_history/
+
+# المُثبِّت: علامةُ التنصيب ورمزُه خاصّان بكل خادم — لا يدخلان المستودع.
+# (مصنوعاتُ database/schema/ كودٌ معتمدٌ وتبقى متتبَّعة — هي وصفةُ التنصيب.)
+.installed
+install/install.token

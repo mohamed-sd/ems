@@ -134,6 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     throw new Exception('تاريخ النهاية يجب أن يكون بعد البداية');
                 }
 
+                // ORG-13 · حارس الأذونات: إنهاء التشغيل = خروج المعدة من الموقع (ORG-01 §5-④)
+                if ($old_status === 1 && $status === 0 && $log_equipment > 0) {
+                    require_once dirname(__DIR__) . '/includes/permit_gate.php';
+                    $pg_site = ems_default_site_of_project($conn, $company_id, $selected_project_id);
+                    $pg = ems_permit_gate($conn, $company_id, 'equipment_site_exit',
+                        'EQ:' . $log_equipment, $pg_site, intval($current_user_id ?? 0));
+                    if (!$pg['ok']) { throw new Exception($pg['reason']); }
+                }
+
                 $op_fields = array(
                     'shift_type' => $shift_type,
                     'status'     => $status,
@@ -309,6 +318,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     throw new Exception('المعدة تعمل بالفعل في تشغيل ساري آخر');
                 }
 
+                // ORG-13 · حارس الأذونات: دخول معدة إلى الموقع (ORG-01 §5-①)
+                require_once dirname(__DIR__) . '/includes/permit_gate.php';
+                $pg_site = ems_default_site_of_project($conn, $company_id, $selected_project_id);
+                $pg = ems_permit_gate($conn, $company_id, 'equipment_site_entry',
+                    'EQ:' . $equipment, $pg_site, intval($current_user_id ?? 0));
+                if (!$pg['ok']) { throw new Exception($pg['reason']); }
+
                 $total_equipment_hours = floatval($_POST['total_equipment_hours'] ?? 0);
                 $shift_hours = floatval($_POST['shift_hours'] ?? 0);
                 $status = intval($_POST['status'] ?? 1);
@@ -386,6 +402,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!$eq_check) {
                     throw new Exception('المعدة المختارة غير مشغّلة في مشروع ساري');
                 }
+
+                // ORG-13 · حارس الأذونات: دخول مشغّل (ORG-01 §5-⑦)
+                require_once dirname(__DIR__) . '/includes/permit_gate.php';
+                $pg_site = ems_default_site_of_project($conn, $company_id, $selected_project_id);
+                $pg = ems_permit_gate($conn, $company_id, 'operator_site_entry',
+                    'EMP:' . $employee_id, $pg_site, intval($current_user_id ?? 0));
+                if (!$pg['ok']) { throw new Exception($pg['reason']); }
 
                 // إنهاء التعيينات السابقة النشطة للسائق
                 try {
@@ -548,6 +571,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if ($sos_row) {
                     $sos_equipment = intval($sos_row['equipment']);
                     $old_op_state  = (string)$sos_row['op_state'];
+                }
+
+                // ORG-13 · حارس الأذونات: «تعمل» = إدخال للخدمة (§5-②) و«جاهزة» = إخراج منها (§5-③)
+                if ($sos_equipment > 0 && $old_op_state !== null && $old_op_state !== $new_state) {
+                    require_once dirname(__DIR__) . '/includes/permit_gate.php';
+                    $pg_site = ems_default_site_of_project($conn, $company_id, $selected_project_id);
+                    $pg = ems_permit_gate($conn, $company_id,
+                        $new_state === 'تعمل' ? 'equipment_service_entry' : 'equipment_service_exit',
+                        'EQ:' . $sos_equipment, $pg_site, intval($current_user_id ?? 0));
+                    if (!$pg['ok']) { throw new Exception($pg['reason']); }
                 }
 
                 try {
@@ -1264,6 +1297,11 @@ include '../insidebar.php';
     );
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي الغني — التايم شيت والتشغيل اليومي (§2-①)
+    require_once __DIR__ . '/../includes/report_button.php';
+    require_once __DIR__ . '/../includes/permit_gate.php'; // لدالة موقع المشروع الافتراضي
+    ems_report_button(array('screen' => 'movement', 'project_id' => $selected_project_id ?? null,
+        'site_id' => !empty($selected_project_id) ? ems_default_site_of_project($conn, $company_id, $selected_project_id) : null));
     ?>
 
     <div class="ems-content">

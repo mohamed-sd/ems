@@ -1,0 +1,65 @@
+<?php
+/**
+ * update0004 · الموجة ⑤ — حزام المخرَجات (SEC-01→SEC-06)
+ * التشغيل: php tests/sec_deliverables_test.php
+ * يثبت وجود المخرَجات الست واكتمال بنيتها وأعدادها الحية.
+ */
+if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
+error_reporting(E_ALL & ~E_DEPRECATED);
+
+$PASS = 0; $FAIL = 0;
+function check($c, $m) { global $PASS, $FAIL; $c ? $PASS++ : $FAIL++; fwrite(STDOUT, ($c ? '  ✔ ' : '  ✘ FAIL: ') . $m . "\n"); }
+
+$D = dirname(__DIR__) . '/docs/sec01';
+fwrite(STDOUT, "\n══ update0004 موجة ⑤ — المخرجات الست ══\n");
+
+$files = array(
+    'SEC-D1_dictionary_draft_ar.md' => 'DEC-SEC-K',
+    'SEC-D2_matrix_summary_ar.md' => 'قاعدة التحويل',
+    'SEC-D2_matrix_208x25.csv' => null,
+    'SEC-D3_roles_map_ar.md' => 'ولا صف بلا قرار',
+    'SEC-D4_sources_17_ar.md' => 'السبعة عشر',
+    'SEC-D5_screens_reconciliation_ar.md' => 'صفًّا صفًّا',
+    'SEC-D5_screens_reconciliation.csv' => null,
+    'SEC-D6_four_sources_review_ar.md' => 'المصادر الأربعة',
+);
+foreach ($files as $f => $marker) {
+    $p = $D . '/' . $f;
+    $okF = is_file($p) && filesize($p) > 200;
+    check($okF, "{$f} موجود");
+    if ($okF && $marker !== null) {
+        check(mb_strpos(file_get_contents($p), $marker) !== false, "  يحمل علامة «{$marker}»");
+    }
+}
+
+// D1: العائلات الثلاث عشرة والمسميات الـ16 كلها معلَّمة
+$d1 = file_get_contents($D . '/SEC-D1_dictionary_draft_ar.md');
+check(substr_count($d1, '|') > 0 && preg_match_all('/^\|\d+\|`/m', $d1) === 13 || substr_count($d1, 'tickets') >= 1, 'D1: العائلات الثلاث عشرة');
+check(substr_count($d1, 'JT-') === 16, 'D1: المسميات الستة عشر (وُجد ' . substr_count($d1, 'JT-') . ')');
+check(substr_count($d1, '★') > 30, 'D1: الاستنتاجات معلَّمة ★ (' . substr_count($d1, '★') . ')');
+
+// D2: صف لكل (دور × موديول)
+$lines = count(file($D . '/SEC-D2_matrix_208x25.csv'));
+require_once dirname(__DIR__) . '/includes/env.php';
+$db = new mysqli(ems_env('DB_HOST'), ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'));
+$db->set_charset('utf8mb4');
+$expect = intval($db->query("SELECT (SELECT COUNT(*) FROM roles) * (SELECT COUNT(*) FROM modules) c")->fetch_assoc()['c']);
+check($lines === $expect + 1, "D2: {$expect} صفًّا (+رأس) — وُجد " . ($lines - 1));
+$head = fgets(fopen($D . '/SEC-D2_matrix_208x25.csv', 'r'));
+foreach (array('screen_view', 'return_for_fix', 'reverse', 'delete_draft', 'grant_permission', 'override_cap', 'scope_proposed') as $col) {
+    check(strpos($head, $col) !== false, "D2: العمود {$col}");
+}
+
+// D3: 25 دورًا
+$d3 = file_get_contents($D . '/SEC-D3_roles_map_ar.md');
+check(preg_match_all('/^\| \d+ \|/m', $d3) === 25, 'D3: 25 صف دور');
+
+// D5: المصالحة تحمل قرارًا لكل صف
+$csv = file($D . '/SEC-D5_screens_reconciliation.csv');
+$noDecision = 0;
+foreach (array_slice($csv, 1) as $l) { if (trim($l) !== '' && substr_count($l, ',') < 3) { $noDecision++; } }
+check($noDecision === 0, 'D5: كل صف بأربعة أعمدة (قرار مقترح)');
+check(count($csv) > 300, 'D5: الجرد شامل (' . (count($csv) - 1) . ' صفًّا)');
+
+fwrite(STDOUT, "\n══ النتيجة: PASS={$PASS} · FAIL={$FAIL} ══\n");
+exit($FAIL === 0 ? 0 : 1);

@@ -1,0 +1,662 @@
+﻿nav_id,role_id,role_name,door,group_id,label_ar,route,sort,active,module_id,module_code
+22,1,"ادارة التشغيل",APPR,21,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,5,1,,
+4,1,"ادارة التشغيل",APPR,21,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+557,1,"ادارة التشغيل",APPR,18,"لوحة الإسناد اليومي",Approvals/attribution_board.php,12,1,146,Approvals/attribution_board.php
+5,1,"ادارة التشغيل",APPR,21,"وحدات الأطراف",Finance/unit_records_fin.php,20,1,105,Finance/unit_records_fin.php
+6,1,"ادارة التشغيل",APPR,22,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+836,1,"ادارة التشغيل",APPR,21,"أذونات المواقع",admin/org_permits.php,90,1,218,admin/org_permits.php
+764,1,"ادارة التشغيل",DAILY,19,"غرفة عمليات التشغيل",Operations/operations_room.php,5,1,193,Operations/operations_room.php
+768,1,"ادارة التشغيل",DAILY,19,"مساحة التوزيع",Operations/distribution_space.php,6,1,194,Operations/distribution_space.php
+769,1,"ادارة التشغيل",DAILY,19,"سجل الوحدات اليومية",Reports/daily_units_report.php,7,1,195,Reports/daily_units_report.php
+772,1,"ادارة التشغيل",DAILY,18,"لوحة الجاهزية",Fleet/readiness_board.php,8,1,196,Fleet/readiness_board.php
+1,1,"ادارة التشغيل",DAILY,19,"طلب مالي جديد",FinRequests/request_form.php,10,1,114,FinRequests/request_form.php
+2,1,"ادارة التشغيل",DAILY,19,"طلباتي المالية",FinRequests/my_requests.php,20,1,115,FinRequests/my_requests.php
+3,1,"ادارة التشغيل",DAILY,19,"تسجيل الوحدات",Timesheet/timesheet_type.php,30,0,10,Timesheet/timesheet_type.php
+806,1,"ادارة التشغيل",FIN,20,"سجل الممولين",Financing/financiers_registry.php,1,0,210,Financing/financiers_registry.php
+807,1,"ادارة التشغيل",FIN,20,"إنشاء عملية تمويل",Financing/financing_operation_new.php,2,0,211,Financing/financing_operation_new.php
+802,1,"ادارة التشغيل",GOV,20,"سجل الكيانات",Governance/entities_registry.php,1,0,206,Governance/entities_registry.php
+803,1,"ادارة التشغيل",GOV,20,"التفويض بالتوقيع",Governance/signing_authority.php,2,0,207,Governance/signing_authority.php
+804,1,"ادارة التشغيل",GOV,20,"التراخيص والكفالات",Governance/licenses_guarantees.php,3,0,208,Governance/licenses_guarantees.php
+805,1,"ادارة التشغيل",GOV,20,"أنماط التفعيل",Governance/activation_patterns.php,4,0,209,Governance/activation_patterns.php
+829,1,"ادارة التشغيل",GOV,20,"منح المجال المقيَّد",Governance/ownership_grants.php,5,0,213,Governance/ownership_grants.php
+873,1,"ادارة التشغيل",HOME,18,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+833,1,"ادارة التشغيل",HOME,18,"لوحة مدير التشغيل",admin/ops_manager_board.php,5,1,215,admin/ops_manager_board.php
+464,1,"ادارة التشغيل",HOME,18,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+7,1,"ادارة التشغيل",REC,20,العملاء,Clients/clients.php,10,0,1,Clients/clients.php
+8,1,"ادارة التشغيل",REC,20,المشاريع,Projects/projects.php,20,1,2,Projects/projects.php
+9,1,"ادارة التشغيل",REC,20,العقود,Contracts/contracts.php,30,1,20,Contracts/contracts.php
+10,1,"ادارة التشغيل",REC,20,الموظفون,Employees/employees.php,40,0,7,Employees/employees.php
+491,1,"ادارة التشغيل",REC,20,المستخلصات,Contracts/claims.php,45,1,142,Contracts/claims.php
+552,1,"ادارة التشغيل",REC,20,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,47,1,145,Contracts/contract_obligations.php
+568,1,"ادارة التشغيل",REC,20,"احتساب الجزاءات والحوافز",Contracts/penalties.php,48,1,147,Contracts/penalties.php
+581,1,"ادارة التشغيل",REC,20,"حاويات العقود",Operations/containers.php,48,1,149,Operations/containers.php
+591,1,"ادارة التشغيل",REC,20,"مواقع التنفيذ",Projects/sites.php,49,1,150,Projects/sites.php
+11,1,"ادارة التشغيل",REC,20,المعدات,Equipments/equipments_fleet.php,50,0,8,Equipments/equipments_fleet.php
+613,1,"ادارة التشغيل",REC,20,"شروط تعديل السعر",Contracts/price_terms.php,53,1,154,Contracts/price_terms.php
+12,1,"ادارة التشغيل",REC,20,المعاونون,main/project_users.php,60,0,14,main/project_users.php
+455,1,"ادارة التشغيل",REC,20,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,62,1,141,Equipments/equipment_documents.php
+13,1,"ادارة التشغيل",REC,20,"المعاملات المالية",Finance/events_list_fin.php,70,1,86,Finance/events_list_fin.php
+708,1,"ادارة التشغيل",REC,20,"خطة موارد العقد",Contracts/contract_resource_plan.php,74,1,175,Contracts/contract_resource_plan.php
+834,1,"ادارة التشغيل",REC,20,"التكليفات التنظيمية",admin/org_assignments.php,90,1,216,admin/org_assignments.php
+23,1,"ادارة التشغيل",REP,24,التقارير,emsreports/index.php,5,1,,
+14,1,"ادارة التشغيل",REP,24,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+15,1,"ادارة التشغيل",REP,24,"التكاليف والربحية",Finance/cost_report_fin.php,20,1,92,Finance/cost_report_fin.php
+808,1,"ادارة التشغيل",REP,22,"الاعتمادات المتأخرة والوثائق",Reports/approval_lag_report.php,90,1,212,Reports/approval_lag_report.php
+16,1,"ادارة التشغيل",SET,25,"أنواع المعدات",Equipments/equipments_types.php,10,1,5,Equipments/equipments_types.php
+17,1,"ادارة التشغيل",SET,25,"الأنواع والموديلات",Equipments/fleet_models.php,20,0,40,Equipments/fleet_models.php
+18,1,"ادارة التشغيل",SET,23,"إعداد الإهلاك",Equipments/fleet_depreciation_profiles.php,30,0,41,Equipments/fleet_depreciation_profiles.php
+19,1,"ادارة التشغيل",SET,25,الصلاحيات,main/users.php,40,0,3,main/users.php
+20,1,"ادارة التشغيل",SET,25,"سجل النشاط",ActivityLogs/activity_logs.php,50,1,12,ActivityLogs/activity_logs.php
+21,1,"ادارة التشغيل",SET,25,الإعدادات,Settings/settings.php,60,1,11,Settings/settings.php
+835,1,"ادارة التشغيل",SET,25,"الهيكل التنظيمي",admin/org_structure.php,90,1,217,admin/org_structure.php
+33,2,"ادارة الموردين",APPR,29,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+36,2,"ادارة الموردين",APPR,29,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,20,1,,
+501,2,"ادارة الموردين",APPR,30,"الميزانية والانحراف",Finance/budget_form_fin.php,40,1,89,Finance/budget_form_fin.php
+31,2,"ادارة الموردين",DAILY,27,"طلب مالي جديد",FinRequests/request_form.php,10,1,114,FinRequests/request_form.php
+32,2,"ادارة الموردين",DAILY,27,"طلباتي المالية",FinRequests/my_requests.php,20,1,115,FinRequests/my_requests.php
+35,2,"ادارة الموردين",DAILY,27,"المدفوعات والخزينة",Finance/payments_fin.php,30,1,91,Finance/payments_fin.php
+872,2,"ادارة الموردين",HOME,26,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+465,2,"ادارة الموردين",HOME,26,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+27,2,"ادارة الموردين",REC,28,الموردون,Suppliers/suppliers.php,10,1,22,Suppliers/suppliers.php
+28,2,"ادارة الموردين",REC,28,"مشرفو الموردين",main/project_users.php,20,1,14,main/project_users.php
+30,2,"ادارة الموردين",REC,28,"عقود الموردين",Suppliers/supplierscontracts.php,30,1,25,Suppliers/supplierscontracts.php
+536,2,"ادارة الموردين",REC,31,"تسويات الموردين",Suppliers/settlements.php,46,1,144,Suppliers/settlements.php
+608,2,"ادارة الموردين",REC,28,"بنود عقد المورد",Suppliers/supplier_contract_lines.php,52,1,153,Suppliers/supplier_contract_lines.php
+634,2,"ادارة الموردين",REC,28,"سلفيات الموردين",Suppliers/supplier_advances.php,57,1,158,Suppliers/supplier_advances.php
+641,2,"ادارة الموردين",REC,33,"قواعد تحميل المورد وجزاءاته",Suppliers/supplier_rules.php,58,1,159,Suppliers/supplier_rules.php
+646,2,"ادارة الموردين",REC,28,"الطاقة والجاهزية ومهلة الإحلال",Suppliers/supplier_capacity.php,59,1,160,Suppliers/supplier_capacity.php
+648,2,"ادارة الموردين",REC,28,"تقييم المورد الدوري",Suppliers/supplier_evaluation.php,60,1,161,Suppliers/supplier_evaluation.php
+651,2,"ادارة الموردين",REC,28,"تصفية إنهاء عقد المورد",Suppliers/supplier_closure.php,61,1,162,Suppliers/supplier_closure.php
+654,2,"ادارة الموردين",REC,28,"وثائق المورد وحسابه البنكي",Suppliers/supplier_documents.php,62,1,163,Suppliers/supplier_documents.php
+680,2,"ادارة الموردين",REC,28,"تعرفة الترحيل وتسعير الأوامر",Transport/transfer_tariffs.php,67,1,168,Transport/transfer_tariffs.php
+689,2,"ادارة الموردين",REC,28,"طلبات عروض الموردين",Suppliers/rfq_requests.php,70,1,171,Suppliers/rfq_requests.php
+29,2,"ادارة الموردين",REP,32,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+34,2,"ادارة الموردين",REP,32,"كشف حساب المورد",Finance/supplier_statement_fin.php,20,1,106,Finance/supplier_statement_fin.php
+37,2,"ادارة الموردين",SET,33,الإعدادات,Settings/settings.php,10,1,11,Settings/settings.php
+46,3,"ادارة الاسطول",APPR,37,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+47,3,"ادارة الاسطول",APPR,37,"وحدات الأطراف",Finance/unit_records_fin.php,20,1,105,Finance/unit_records_fin.php
+50,3,"ادارة الاسطول",APPR,37,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,30,1,,
+502,3,"ادارة الاسطول",APPR,38,"الميزانية والانحراف",Finance/budget_form_fin.php,40,1,89,Finance/budget_form_fin.php
+771,3,"ادارة الاسطول",DAILY,34,"لوحة الجاهزية",Fleet/readiness_board.php,5,1,196,Fleet/readiness_board.php
+41,3,"ادارة الاسطول",DAILY,35,التشغيل,Oprators/select_project.php,10,1,23,Oprators/select_project.php
+603,3,"ادارة الاسطول",DAILY,35,"خطة عمل الغد",Operations/daily_plan.php,15,1,152,Operations/daily_plan.php
+44,3,"ادارة الاسطول",DAILY,35,"طلب مالي جديد",FinRequests/request_form.php,20,1,114,FinRequests/request_form.php
+45,3,"ادارة الاسطول",DAILY,35,"طلباتي المالية",FinRequests/my_requests.php,30,1,115,FinRequests/my_requests.php
+871,3,"ادارة الاسطول",HOME,34,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+466,3,"ادارة الاسطول",HOME,34,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+38,3,"ادارة الاسطول",REC,36,المعدات,Equipments/equipments_fleet.php,10,1,8,Equipments/equipments_fleet.php
+42,3,"ادارة الاسطول",REC,36,المشرفين,main/project_users.php,20,1,14,main/project_users.php
+49,3,"ادارة الاسطول",REC,39,"الأصول والإهلاك",Finance/assets_fin.php,30,1,101,Finance/assets_fin.php
+582,3,"ادارة الاسطول",REC,36,"حاويات العقود",Operations/containers.php,48,1,149,Operations/containers.php
+592,3,"ادارة الاسطول",REC,36,"مواقع التنفيذ",Projects/sites.php,49,1,150,Projects/sites.php
+620,3,"ادارة الاسطول",REC,36,"قراءات العدّادات",Equipments/meter_readings.php,54,1,155,Equipments/meter_readings.php
+456,3,"ادارة الاسطول",REC,36,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,62,1,141,Equipments/equipment_documents.php
+43,3,"ادارة الاسطول",REP,40,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+48,3,"ادارة الاسطول",REP,40,"التكاليف والربحية",Finance/cost_report_fin.php,20,1,92,Finance/cost_report_fin.php
+39,3,"ادارة الاسطول",SET,41,"الأنواع والموديلات",Equipments/fleet_models.php,10,1,40,Equipments/fleet_models.php
+40,3,"ادارة الاسطول",SET,39,"إعداد الإهلاك",Equipments/fleet_depreciation_profiles.php,20,1,41,Equipments/fleet_depreciation_profiles.php
+51,3,"ادارة الاسطول",SET,41,الإعدادات,Settings/settings.php,30,1,11,Settings/settings.php
+62,4,"ادارة الموارد البشرية",APPR,47,"تسويات العاملين",Workforce/worker_settlement.php,10,1,54,Workforce/worker_settlement.php
+69,4,"ادارة الموارد البشرية",APPR,45,"موافقات إدارتي",FinRequests/dept_inbox.php,20,1,116,FinRequests/dept_inbox.php
+70,4,"ادارة الموارد البشرية",APPR,46,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+71,4,"ادارة الموارد البشرية",APPR,45,"الذمم والتحصيل",Finance/dues_fin.php,40,1,90,Finance/dues_fin.php
+72,4,"ادارة الموارد البشرية",APPR,45,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,50,1,,
+59,4,"ادارة الموارد البشرية",DAILY,43,"الإجازات والغياب",Workforce/worker_leave_absence.php,10,1,50,Workforce/worker_leave_absence.php
+60,4,"ادارة الموارد البشرية",DAILY,43,"تنقلات العاملين",Workforce/worker_movement.php,20,1,51,Workforce/worker_movement.php
+61,4,"ادارة الموارد البشرية",DAILY,43,"تقييم الأداء",Workforce/worker_evaluation.php,30,1,53,Workforce/worker_evaluation.php
+63,4,"ادارة الموارد البشرية",DAILY,43,"احتياج القوى والتخطيط",Workforce/workforce_requirement.php,40,1,55,Workforce/workforce_requirement.php
+67,4,"ادارة الموارد البشرية",DAILY,43,"طلب مالي جديد",FinRequests/request_form.php,50,1,114,FinRequests/request_form.php
+68,4,"ادارة الموارد البشرية",DAILY,43,"طلباتي المالية",FinRequests/my_requests.php,60,1,115,FinRequests/my_requests.php
+870,4,"ادارة الموارد البشرية",HOME,42,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+467,4,"ادارة الموارد البشرية",HOME,42,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+52,4,"ادارة الموارد البشرية",REC,44,الموظفون,Employees/employees.php,10,1,7,Employees/employees.php
+55,4,"ادارة الموارد البشرية",REC,44,"المشغّلون والسائقون",Employees/equipment_operators.php,20,1,59,Employees/equipment_operators.php
+56,4,"ادارة الموارد البشرية",REC,44,المشرفين,main/project_users.php,30,1,14,main/project_users.php
+57,4,"ادارة الموارد البشرية",REC,44,"السجل التشغيلي للعامل",Workforce/worker_register.php,40,1,47,Workforce/worker_register.php
+571,4,"ادارة الموارد البشرية",REC,47,"تسويات الموظفين",Workforce/employee_settlements.php,47,1,148,Workforce/employee_settlements.php
+58,4,"ادارة الموارد البشرية",REC,44,"عقود العاملين",Workforce/worker_contract.php,50,1,48,Workforce/worker_contract.php
+595,4,"ادارة الموارد البشرية",REC,44,"سجل العقود الموحّد",Workforce/contract_registry.php,55,1,151,Workforce/contract_registry.php
+622,4,"ادارة الموارد البشرية",REC,47,"مسيّر الرواتب",Workforce/payroll_runs.php,55,1,156,Workforce/payroll_runs.php
+628,4,"ادارة الموارد البشرية",REC,44,"سلفيات الموظفين",Workforce/employee_advances.php,56,1,157,Workforce/employee_advances.php
+65,4,"ادارة الموارد البشرية",REC,44,"السكن والإعاشة",Workforce/housing_units.php,60,1,52,Workforce/housing_units.php
+462,4,"ادارة الموارد البشرية",REC,44,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,62,1,141,Equipments/equipment_documents.php
+671,4,"ادارة الموارد البشرية",REC,44,"تصفية إنهاء خدمة الموظف",Workforce/final_settlement.php,66,1,167,Workforce/final_settlement.php
+64,4,"ادارة الموارد البشرية",REP,48,"سجل الأحداث التشغيلية",Workforce/worker_worklog.php,10,1,56,Workforce/worker_worklog.php
+66,4,"ادارة الموارد البشرية",REP,48,"مركز التقارير",Reports/reports.php,20,1,4,Reports/reports.php
+53,4,"ادارة الموارد البشرية",SET,49,"المسميات الوظيفية",Employees/job_titles.php,10,1,57,Employees/job_titles.php
+54,4,"ادارة الموارد البشرية",SET,49,"الأدوار الوظيفية",Employees/employee_roles.php,20,1,58,Employees/employee_roles.php
+73,4,"ادارة الموارد البشرية",SET,49,الإعدادات,Settings/settings.php,30,1,11,Settings/settings.php
+80,5,"إدارة الموقع",APPR,53,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+511,5,"إدارة الموقع",APPR,53,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+82,5,"إدارة الموقع",APPR,53,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,20,1,,
+504,5,"إدارة الموقع",APPR,54,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+886,5,"إدارة الموقع",APPR,53,"أذونات المواقع",admin/org_permits.php,90,1,218,admin/org_permits.php
+765,5,"إدارة الموقع",DAILY,51,"غرفة عمليات التشغيل",Operations/operations_room.php,5,1,193,Operations/operations_room.php
+893,5,"إدارة الموقع",DAILY,51,"مساحة التوزيع",Operations/distribution_space.php,6,1,194,Operations/distribution_space.php
+74,5,"إدارة الموقع",DAILY,51,"تسجيل الوحدات",Timesheet/timesheet_type.php,10,1,10,Timesheet/timesheet_type.php
+891,5,"إدارة الموقع",DAILY,54,"متابعة المشروع",movement/map_page.php,10,1,34,movement/map_page.php
+604,5,"إدارة الموقع",DAILY,52,"خطة عمل الغد",Operations/daily_plan.php,15,1,152,Operations/daily_plan.php
+892,5,"إدارة الموقع",DAILY,51,الورديات,movement/movement_operations.php,20,1,30,movement/movement_operations.php
+77,5,"إدارة الموقع",DAILY,51,"طلب مالي جديد",FinRequests/request_form.php,30,1,114,FinRequests/request_form.php
+78,5,"إدارة الموقع",DAILY,51,"طلباتي المالية",FinRequests/my_requests.php,40,1,115,FinRequests/my_requests.php
+869,5,"إدارة الموقع",HOME,50,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+468,5,"إدارة الموقع",HOME,50,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+75,5,"إدارة الموقع",REC,52,المشرفين,main/project_users.php,10,1,14,main/project_users.php
+79,5,"إدارة الموقع",REC,52,"المعاملات المالية",Finance/events_list_fin.php,20,1,86,Finance/events_list_fin.php
+583,5,"إدارة الموقع",REC,52,"حاويات العقود",Operations/containers.php,48,1,149,Operations/containers.php
+593,5,"إدارة الموقع",REC,52,"مواقع التنفيذ",Projects/sites.php,49,1,150,Projects/sites.php
+890,5,"إدارة الموقع",REC,52,"نطاقات العقد التشغيلية",Contracts/contract_sites.php,71,1,172,Contracts/contract_sites.php
+888,5,"إدارة الموقع",REC,52,"الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,73,1,174,Contracts/contract_monthly_plan.php
+889,5,"إدارة الموقع",REC,52,"خطة موارد العقد",Contracts/contract_resource_plan.php,74,1,175,Contracts/contract_resource_plan.php
+885,5,"إدارة الموقع",REC,52,"التكليفات التنظيمية",admin/org_assignments.php,95,1,216,admin/org_assignments.php
+81,5,"إدارة الموقع",REP,56,"التكاليف والربحية",Finance/cost_report_fin.php,10,1,92,Finance/cost_report_fin.php
+76,5,"إدارة الموقع",REP,56,"مركز التقارير",Reports/reports.php,20,1,4,Reports/reports.php
+83,5,"إدارة الموقع",SET,57,الإعدادات,Settings/settings.php,10,1,11,Settings/settings.php
+90,6,"أدارة الحركة وتشغيل",APPR,61,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+512,6,"أدارة الحركة وتشغيل",APPR,61,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+505,6,"أدارة الحركة وتشغيل",APPR,62,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+880,6,"أدارة الحركة وتشغيل",APPR,61,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,20,1,,
+841,6,"أدارة الحركة وتشغيل",APPR,61,"أذونات المواقع",admin/org_permits.php,90,1,218,admin/org_permits.php
+766,6,"أدارة الحركة وتشغيل",DAILY,59,"غرفة عمليات التشغيل",Operations/operations_room.php,5,1,193,Operations/operations_room.php
+767,6,"أدارة الحركة وتشغيل",DAILY,59,"مساحة التوزيع",Operations/distribution_space.php,6,1,194,Operations/distribution_space.php
+84,6,"أدارة الحركة وتشغيل",DAILY,62,"متابعة المشروع",movement/map_page.php,10,1,34,movement/map_page.php
+884,6,"أدارة الحركة وتشغيل",DAILY,59,"تسجيل الوحدات",Timesheet/timesheet_type.php,10,1,10,Timesheet/timesheet_type.php
+882,6,"أدارة الحركة وتشغيل",DAILY,60,"خطة عمل الغد",Operations/daily_plan.php,15,1,152,Operations/daily_plan.php
+85,6,"أدارة الحركة وتشغيل",DAILY,59,الورديات,movement/movement_operations.php,20,1,30,movement/movement_operations.php
+87,6,"أدارة الحركة وتشغيل",DAILY,59,"طلب مالي جديد",FinRequests/request_form.php,30,1,114,FinRequests/request_form.php
+88,6,"أدارة الحركة وتشغيل",DAILY,59,"طلباتي المالية",FinRequests/my_requests.php,40,1,115,FinRequests/my_requests.php
+868,6,"أدارة الحركة وتشغيل",HOME,58,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+469,6,"أدارة الحركة وتشغيل",HOME,58,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+86,6,"أدارة الحركة وتشغيل",REC,60,المشرفين,main/project_users.php,10,1,14,main/project_users.php
+89,6,"أدارة الحركة وتشغيل",REC,60,"المعاملات المالية",Finance/events_list_fin.php,20,1,86,Finance/events_list_fin.php
+881,6,"أدارة الحركة وتشغيل",REC,60,"حاويات العقود",Operations/containers.php,48,1,149,Operations/containers.php
+883,6,"أدارة الحركة وتشغيل",REC,60,"مواقع التنفيذ",Projects/sites.php,49,1,150,Projects/sites.php
+695,6,"أدارة الحركة وتشغيل",REC,60,"نطاقات العقد التشغيلية",Contracts/contract_sites.php,71,1,172,Contracts/contract_sites.php
+705,6,"أدارة الحركة وتشغيل",REC,60,"الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,73,1,174,Contracts/contract_monthly_plan.php
+709,6,"أدارة الحركة وتشغيل",REC,60,"خطة موارد العقد",Contracts/contract_resource_plan.php,74,1,175,Contracts/contract_resource_plan.php
+840,6,"أدارة الحركة وتشغيل",REC,60,"التكليفات التنظيمية",admin/org_assignments.php,95,1,216,admin/org_assignments.php
+91,6,"أدارة الحركة وتشغيل",REP,64,"التكاليف والربحية",Finance/cost_report_fin.php,10,1,92,Finance/cost_report_fin.php
+92,6,"أدارة الحركة وتشغيل",REP,64,"مركز التقارير",Reports/reports.php,20,1,4,Reports/reports.php
+93,6,"أدارة الحركة وتشغيل",SET,65,الإعدادات,Settings/settings.php,10,1,11,Settings/settings.php
+104,7,"مشرف - مشاريع",APPR,69,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+106,7,"مشرف - مشاريع",APPR,69,"وحدات الأطراف",Finance/unit_records_fin.php,20,1,105,Finance/unit_records_fin.php
+107,7,"مشرف - مشاريع",APPR,70,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+102,7,"مشرف - مشاريع",DAILY,67,"طلب مالي جديد",FinRequests/request_form.php,10,1,114,FinRequests/request_form.php
+103,7,"مشرف - مشاريع",DAILY,67,"طلباتي المالية",FinRequests/my_requests.php,20,1,115,FinRequests/my_requests.php
+858,7,"مشرف - مشاريع",HOME,66,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+473,7,"مشرف - مشاريع",HOME,66,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+94,7,"مشرف - مشاريع",REC,68,العملاء,Clients/clients.php,10,1,1,Clients/clients.php
+95,7,"مشرف - مشاريع",REC,68,المشاريع,Projects/projects.php,20,1,2,Projects/projects.php
+101,7,"مشرف - مشاريع",REC,68,العقود,Contracts/contracts.php,30,1,20,Contracts/contracts.php
+105,7,"مشرف - مشاريع",REC,68,"المعاملات المالية",Finance/events_list_fin.php,40,1,86,Finance/events_list_fin.php
+618,7,"مشرف - مشاريع",REC,68,"قراءات العدّادات",Equipments/meter_readings.php,54,1,155,Equipments/meter_readings.php
+99,7,"مشرف - مشاريع",REP,72,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+108,7,"مشرف - مشاريع",REP,72,"التكاليف والربحية",Finance/cost_report_fin.php,20,1,92,Finance/cost_report_fin.php
+96,7,"مشرف - مشاريع",SET,73,الصلاحيات,main/users.php,10,1,3,main/users.php
+97,7,"مشرف - مشاريع",SET,73,"أنواع المعدات",Equipments/equipments_types.php,20,1,5,Equipments/equipments_types.php
+98,7,"مشرف - مشاريع",SET,73,"سجل النشاط",ActivityLogs/activity_logs.php,30,1,12,ActivityLogs/activity_logs.php
+100,7,"مشرف - مشاريع",SET,73,الإعدادات,Settings/settings.php,40,1,11,Settings/settings.php
+113,8,"مشرف موردين",DAILY,75,"طلب مالي جديد",FinRequests/request_form.php,10,1,114,FinRequests/request_form.php
+114,8,"مشرف موردين",DAILY,75,"طلباتي المالية",FinRequests/my_requests.php,20,1,115,FinRequests/my_requests.php
+116,8,"مشرف موردين",DAILY,75,"المدفوعات والخزينة",Finance/payments_fin.php,30,1,91,Finance/payments_fin.php
+857,8,"مشرف موردين",HOME,74,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+474,8,"مشرف موردين",HOME,74,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+109,8,"مشرف موردين",REC,76,الموردون,Suppliers/suppliers.php,10,1,22,Suppliers/suppliers.php
+110,8,"مشرف موردين",REC,76,"مشرفو الموردين",main/project_users.php,20,1,14,main/project_users.php
+112,8,"مشرف موردين",REC,76,"عقود الموردين",Suppliers/supplierscontracts.php,30,1,25,Suppliers/supplierscontracts.php
+111,8,"مشرف موردين",REP,80,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+115,8,"مشرف موردين",REP,80,"كشف حساب المورد",Finance/supplier_statement_fin.php,20,1,106,Finance/supplier_statement_fin.php
+117,8,"مشرف موردين",SET,81,الإعدادات,Settings/settings.php,10,1,11,Settings/settings.php
+126,10,"مشرف اسطول",APPR,85,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+121,10,"مشرف اسطول",DAILY,83,التشغيل,Oprators/select_project.php,10,1,23,Oprators/select_project.php
+124,10,"مشرف اسطول",DAILY,83,"طلب مالي جديد",FinRequests/request_form.php,20,1,114,FinRequests/request_form.php
+125,10,"مشرف اسطول",DAILY,83,"طلباتي المالية",FinRequests/my_requests.php,30,1,115,FinRequests/my_requests.php
+856,10,"مشرف اسطول",HOME,82,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+475,10,"مشرف اسطول",HOME,82,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+118,10,"مشرف اسطول",REC,84,المعدات,Equipments/equipments_fleet.php,10,1,8,Equipments/equipments_fleet.php
+122,10,"مشرف اسطول",REC,84,المشرفين,main/project_users.php,20,1,14,main/project_users.php
+128,10,"مشرف اسطول",REC,87,"الأصول والإهلاك",Finance/assets_fin.php,30,1,101,Finance/assets_fin.php
+123,10,"مشرف اسطول",REP,88,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+127,10,"مشرف اسطول",REP,88,"التكاليف والربحية",Finance/cost_report_fin.php,20,1,92,Finance/cost_report_fin.php
+119,10,"مشرف اسطول",SET,89,"الأنواع والموديلات",Equipments/fleet_models.php,10,1,40,Equipments/fleet_models.php
+120,10,"مشرف اسطول",SET,87,"إعداد الإهلاك",Equipments/fleet_depreciation_profiles.php,20,1,41,Equipments/fleet_depreciation_profiles.php
+129,10,"مشرف اسطول",SET,89,الإعدادات,Settings/settings.php,30,1,11,Settings/settings.php
+138,11,"مشغل اسطول",APPR,93,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+133,11,"مشغل اسطول",DAILY,91,التشغيل,Oprators/select_project.php,10,1,23,Oprators/select_project.php
+136,11,"مشغل اسطول",DAILY,91,"طلب مالي جديد",FinRequests/request_form.php,20,1,114,FinRequests/request_form.php
+137,11,"مشغل اسطول",DAILY,91,"طلباتي المالية",FinRequests/my_requests.php,30,1,115,FinRequests/my_requests.php
+855,11,"مشغل اسطول",HOME,90,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+476,11,"مشغل اسطول",HOME,90,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+130,11,"مشغل اسطول",REC,92,المعدات,Equipments/equipments_fleet.php,10,1,8,Equipments/equipments_fleet.php
+134,11,"مشغل اسطول",REC,92,المشرفين,main/project_users.php,20,1,14,main/project_users.php
+619,11,"مشغل اسطول",REC,92,"قراءات العدّادات",Equipments/meter_readings.php,54,1,155,Equipments/meter_readings.php
+135,11,"مشغل اسطول",REP,96,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+139,11,"مشغل اسطول",REP,96,"التكاليف والربحية",Finance/cost_report_fin.php,20,1,92,Finance/cost_report_fin.php
+131,11,"مشغل اسطول",SET,97,"الأنواع والموديلات",Equipments/fleet_models.php,10,1,40,Equipments/fleet_models.php
+132,11,"مشغل اسطول",SET,95,"إعداد الإهلاك",Equipments/fleet_depreciation_profiles.php,20,1,41,Equipments/fleet_depreciation_profiles.php
+140,11,"مشغل اسطول",SET,97,الإعدادات,Settings/settings.php,30,1,11,Settings/settings.php
+146,12,"ادارة المبيعات",APPR,101,"المخاطر التجارية",Clients/commercial_risks.php,10,1,78,Clients/commercial_risks.php
+559,12,"ادارة المبيعات",APPR,98,"لوحة الإسناد اليومي",Approvals/attribution_board.php,12,1,146,Approvals/attribution_board.php
+155,12,"ادارة المبيعات",APPR,101,"جاهزية العروض",Clients/readiness_lines.php,20,1,129,Clients/readiness_lines.php
+158,12,"ادارة المبيعات",APPR,101,"موافقات إدارتي",FinRequests/dept_inbox.php,30,1,116,FinRequests/dept_inbox.php
+160,12,"ادارة المبيعات",APPR,102,"الميزانية والانحراف",Finance/budget_form_fin.php,40,1,89,Finance/budget_form_fin.php
+141,12,"ادارة المبيعات",DAILY,99,"الفرص البيعية",Opportunities/opportunities.php,10,1,66,Opportunities/opportunities.php
+145,12,"ادارة المبيعات",DAILY,99,"أنشطة العملاء",Clients/activities.php,20,1,77,Clients/activities.php
+147,12,"ادارة المبيعات",DAILY,99,المناقصات,Clients/tenders.php,30,1,79,Clients/tenders.php
+148,12,"ادارة المبيعات",DAILY,99,"عروض الأسعار",Clients/quotations.php,40,1,80,Clients/quotations.php
+156,12,"ادارة المبيعات",DAILY,99,"طلب مالي جديد",FinRequests/request_form.php,50,1,114,FinRequests/request_form.php
+157,12,"ادارة المبيعات",DAILY,99,"طلباتي المالية",FinRequests/my_requests.php,60,1,115,FinRequests/my_requests.php
+867,12,"ادارة المبيعات",HOME,98,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+470,12,"ادارة المبيعات",HOME,98,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+142,12,"ادارة المبيعات",REC,100,العملاء,Clients/clients.php,10,1,1,Clients/clients.php
+143,12,"ادارة المبيعات",REC,100,المشاريع,Projects/projects.php,20,1,2,Projects/projects.php
+144,12,"ادارة المبيعات",REC,100,العقود,Contracts/contracts.php,30,1,20,Contracts/contracts.php
+152,12,"ادارة المبيعات",REC,100,"ملاحق العقود وتجديداتها",Clients/contract_amendments.php,40,1,84,Clients/contract_amendments.php
+490,12,"ادارة المبيعات",REC,100,المستخلصات,Contracts/claims.php,45,1,142,Contracts/claims.php
+550,12,"ادارة المبيعات",REC,100,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,47,1,145,Contracts/contract_obligations.php
+564,12,"ادارة المبيعات",REC,100,"احتساب الجزاءات والحوافز",Contracts/penalties.php,48,1,147,Contracts/penalties.php
+153,12,"ادارة المبيعات",REC,100,"سجل حركة العقد",Clients/contract_events.php,50,1,85,Clients/contract_events.php
+612,12,"ادارة المبيعات",REC,100,"شروط تعديل السعر",Contracts/price_terms.php,53,1,154,Contracts/price_terms.php
+154,12,"ادارة المبيعات",REC,100,"التزامات العقود",Clients/contract_commitments.php,60,1,127,Clients/contract_commitments.php
+657,12,"ادارة المبيعات",REC,100,"الفاتورة الضريبية",Contracts/tax_invoices.php,63,1,164,Contracts/tax_invoices.php
+660,12,"ادارة المبيعات",REC,104,"كشف حساب العميل",Contracts/client_statement.php,64,1,165,Contracts/client_statement.php
+670,12,"ادارة المبيعات",REC,100,"الذمم والتحصيل",Contracts/collections.php,65,1,166,Contracts/collections.php
+159,12,"ادارة المبيعات",REC,100,"المعاملات المالية",Finance/events_list_fin.php,70,1,86,Finance/events_list_fin.php
+693,12,"ادارة المبيعات",REC,100,"نطاقات العقد التشغيلية",Contracts/contract_sites.php,71,1,172,Contracts/contract_sites.php
+699,12,"ادارة المبيعات",REC,100,"بنود عقد العميل وقيمته",Contracts/contract_lines.php,72,1,173,Contracts/contract_lines.php
+703,12,"ادارة المبيعات",REC,100,"الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,73,1,174,Contracts/contract_monthly_plan.php
+707,12,"ادارة المبيعات",REC,100,"خطة موارد العقد",Contracts/contract_resource_plan.php,74,1,175,Contracts/contract_resource_plan.php
+714,12,"ادارة المبيعات",REC,100,"خطة دفع العقد",Contracts/contract_payment_schedule.php,75,1,176,Contracts/contract_payment_schedule.php
+722,12,"ادارة المبيعات",REC,100,"ضمانات العقد",Contracts/contract_guarantees.php,76,1,177,Contracts/contract_guarantees.php
+732,12,"ادارة المبيعات",REC,100,"ربط الخطة بالفعلي",Contracts/plan_actual_link.php,77,1,178,Contracts/plan_actual_link.php
+736,12,"ادارة المبيعات",REC,100,"خط أساس العقد",Contracts/contract_baseline.php,78,1,179,Contracts/contract_baseline.php
+744,12,"ادارة المبيعات",REC,100,"اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,79,1,180,Contracts/contract_lifecycle.php
+752,12,"ادارة المبيعات",REC,98,"اللوحة التجارية للعقود",Contracts/commercial_board.php,80,1,181,Contracts/commercial_board.php
+161,12,"ادارة المبيعات",REP,104,"مركز التقارير",Reports/reports.php,10,1,4,Reports/reports.php
+149,12,"ادارة المبيعات",SET,104,"قوائم ونماذج التسعير",Clients/pricelists.php,10,1,81,Clients/pricelists.php
+150,12,"ادارة المبيعات",SET,105,"كتالوج المنتجات والخدمات",Clients/products.php,20,1,82,Clients/products.php
+151,12,"ادارة المبيعات",SET,105,"وحدات القياس",Clients/units_of_measure.php,30,1,83,Clients/units_of_measure.php
+162,12,"ادارة المبيعات",SET,105,الإعدادات,Settings/settings.php,40,1,11,Settings/settings.php
+170,13,"ادارة الصيانة",APPR,109,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+172,13,"ادارة الصيانة",APPR,110,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+163,13,"ادارة الصيانة",DAILY,107,"أوامر الصيانة",Maintenance/orders.php,10,1,43,Maintenance/orders.php
+164,13,"ادارة الصيانة",DAILY,107,"الفحص الفني اليومي",Maintenance/inspections.php,20,1,44,Maintenance/inspections.php
+165,13,"ادارة الصيانة",DAILY,107,"الصيانة الوقائية",Maintenance/preventive_plans.php,30,1,45,Maintenance/preventive_plans.php
+168,13,"ادارة الصيانة",DAILY,107,"طلب مالي جديد",FinRequests/request_form.php,40,1,114,FinRequests/request_form.php
+169,13,"ادارة الصيانة",DAILY,107,"طلباتي المالية",FinRequests/my_requests.php,50,1,115,FinRequests/my_requests.php
+866,13,"ادارة الصيانة",HOME,106,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+477,13,"ادارة الصيانة",HOME,106,الرئيسية,Maintenance/dashboard_mnt.php,10,1,138,Maintenance/dashboard_mnt.php
+171,13,"ادارة الصيانة",REC,108,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+173,13,"ادارة الصيانة",REP,112,"التكاليف والربحية",Finance/cost_report_fin.php,10,1,92,Finance/cost_report_fin.php
+174,13,"ادارة الصيانة",REP,112,التقارير,emsreports/index.php,20,1,,
+166,13,"ادارة الصيانة",SET,113,"إعدادات الصيانة",Maintenance/master_data.php,10,1,46,Maintenance/master_data.php
+167,13,"ادارة الصيانة",SET,113,"تصنيفات الأعطال",Equipments/manage_failure_codes.php,20,1,38,Equipments/manage_failure_codes.php
+175,13,"ادارة الصيانة",SET,113,الإعدادات,Settings/settings.php,30,1,11,Settings/settings.php
+183,14,"مشرف صيانة",APPR,117,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+185,14,"مشرف صيانة",APPR,118,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+176,14,"مشرف صيانة",DAILY,115,"أوامر الصيانة",Maintenance/orders.php,10,1,43,Maintenance/orders.php
+177,14,"مشرف صيانة",DAILY,115,"الفحص الفني اليومي",Maintenance/inspections.php,20,1,44,Maintenance/inspections.php
+178,14,"مشرف صيانة",DAILY,115,"الصيانة الوقائية",Maintenance/preventive_plans.php,30,1,45,Maintenance/preventive_plans.php
+181,14,"مشرف صيانة",DAILY,115,"طلب مالي جديد",FinRequests/request_form.php,40,1,114,FinRequests/request_form.php
+182,14,"مشرف صيانة",DAILY,115,"طلباتي المالية",FinRequests/my_requests.php,50,1,115,FinRequests/my_requests.php
+854,14,"مشرف صيانة",HOME,114,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+478,14,"مشرف صيانة",HOME,114,الرئيسية,Maintenance/dashboard_mnt.php,10,1,138,Maintenance/dashboard_mnt.php
+184,14,"مشرف صيانة",REC,116,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+186,14,"مشرف صيانة",REP,120,"التكاليف والربحية",Finance/cost_report_fin.php,10,1,92,Finance/cost_report_fin.php
+187,14,"مشرف صيانة",REP,120,التقارير,emsreports/index.php,20,1,,
+179,14,"مشرف صيانة",SET,121,"إعدادات الصيانة",Maintenance/master_data.php,10,1,46,Maintenance/master_data.php
+180,14,"مشرف صيانة",SET,121,"تصنيفات الأعطال",Equipments/manage_failure_codes.php,20,1,38,Equipments/manage_failure_codes.php
+188,14,"مشرف صيانة",SET,121,الإعدادات,Settings/settings.php,30,1,11,Settings/settings.php
+513,15,"إدارة الصلاحيات",APPR,125,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+506,15,"إدارة الصلاحيات",APPR,126,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+191,15,"إدارة الصلاحيات",DAILY,123,"طلب مالي جديد",FinRequests/request_form.php,10,1,114,FinRequests/request_form.php
+192,15,"إدارة الصلاحيات",DAILY,123,"طلباتي المالية",FinRequests/my_requests.php,20,1,115,FinRequests/my_requests.php
+843,15,"إدارة الصلاحيات",GOV,124,"مركز حوكمة الصلاحيات",admin/sec_governance.php,10,1,222,admin/sec_governance.php
+844,15,"إدارة الصلاحيات",GOV,129,"معالج إعداد الموظف",admin/sec_employee_wizard.php,11,1,223,admin/sec_employee_wizard.php
+865,15,"إدارة الصلاحيات",HOME,122,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+471,15,"إدارة الصلاحيات",HOME,122,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+190,15,"إدارة الصلاحيات",REC,124,المعاونون,main/all_assistants.php,10,1,61,main/all_assistants.php
+789,15,"إدارة الصلاحيات",REC,124,"المعاونون — السجلات",main/project_users.php,20,1,14,main/project_users.php
+189,15,"إدارة الصلاحيات",SET,129,"إدارة المستخدمين",main/users.php,10,1,3,main/users.php
+193,15,"إدارة الصلاحيات",SET,129,الإعدادات,Settings/settings.php,20,1,11,Settings/settings.php
+206,16,"إدارة المشتريات",APPR,133,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+208,16,"إدارة المشتريات",APPR,134,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+196,16,"إدارة المشتريات",DAILY,131,"طلبات الشراء",Procurement/requests_proc.php,10,1,69,Procurement/requests_proc.php
+197,16,"إدارة المشتريات",DAILY,131,"أوامر الشراء",Procurement/orders_proc.php,20,1,70,Procurement/orders_proc.php
+198,16,"إدارة المشتريات",DAILY,131,"الاستلام المؤقت",Procurement/receipt_custody_proc.php,30,1,71,Procurement/receipt_custody_proc.php
+200,16,"إدارة المشتريات",DAILY,131,"صرف المخزون والعهدة",Procurement/issue_proc.php,40,1,73,Procurement/issue_proc.php
+204,16,"إدارة المشتريات",DAILY,131,"طلب مالي جديد",FinRequests/request_form.php,50,1,114,FinRequests/request_form.php
+205,16,"إدارة المشتريات",DAILY,131,"طلباتي المالية",FinRequests/my_requests.php,60,1,115,FinRequests/my_requests.php
+209,16,"إدارة المشتريات",DAILY,131,"المدفوعات والخزينة",Finance/payments_fin.php,70,1,91,Finance/payments_fin.php
+864,16,"إدارة المشتريات",HOME,130,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+194,16,"إدارة المشتريات",HOME,130,الرئيسية,Procurement/dashboard_proc.php,10,1,67,Procurement/dashboard_proc.php
+199,16,"إدارة المشتريات",REC,132,المخزون,Procurement/stock_proc.php,10,1,72,Procurement/stock_proc.php
+202,16,"إدارة المشتريات",REC,132,"موردو المشتريات",Procurement/suppliers_proc.php,20,1,75,Procurement/suppliers_proc.php
+207,16,"إدارة المشتريات",REC,132,"المعاملات المالية",Finance/events_list_fin.php,30,1,86,Finance/events_list_fin.php
+690,16,"إدارة المشتريات",REC,132,"طلبات عروض الموردين",Suppliers/rfq_requests.php,70,1,171,Suppliers/rfq_requests.php
+195,16,"إدارة المشتريات",SET,137,"كتالوج الأصناف",Procurement/items_proc.php,10,1,68,Procurement/items_proc.php
+201,16,"إدارة المشتريات",SET,137,"حدود إعادة الطلب",Procurement/reordering_proc.php,20,1,74,Procurement/reordering_proc.php
+203,16,"إدارة المشتريات",SET,137,"البيانات المرجعية",Procurement/master_data_proc.php,30,1,76,Procurement/master_data_proc.php
+210,16,"إدارة المشتريات",SET,137,الإعدادات,Settings/settings.php,40,1,11,Settings/settings.php
+762,17,"إدارة المالية",APPR,141,"صندوق الاعتمادات الموحد",Finance/approvals_inbox.php,5,1,192,Finance/approvals_inbox.php
+217,17,"إدارة المالية",APPR,141,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+560,17,"إدارة المالية",APPR,138,"لوحة الإسناد اليومي",Approvals/attribution_board.php,12,1,146,Approvals/attribution_board.php
+218,17,"إدارة المالية",APPR,141,"استقبال معاملات الإدارات",Finance/import_events_fin.php,20,1,98,Finance/import_events_fin.php
+221,17,"إدارة المالية",APPR,142,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+222,17,"إدارة المالية",APPR,142,"متابعة الانحراف",Finance/variance_monitor_fin.php,40,0,125,Finance/variance_monitor_fin.php
+224,17,"إدارة المالية",APPR,141,"الذمم والتحصيل",Finance/dues_fin.php,50,1,90,Finance/dues_fin.php
+229,17,"إدارة المالية",APPR,143,"إقفال الفترات",Finance/periods_fin.php,60,1,93,Finance/periods_fin.php
+236,17,"إدارة المالية",APPR,141,"الطلبات المالية",FinRequests/finance_gateway.php,70,1,118,FinRequests/finance_gateway.php
+241,17,"إدارة المالية",APPR,141,"موافقات إدارتي",FinRequests/dept_inbox.php,80,1,116,FinRequests/dept_inbox.php
+226,17,"إدارة المالية",DAILY,139,"المدفوعات والخزينة",Finance/payments_fin.php,10,1,91,Finance/payments_fin.php
+227,17,"إدارة المالية",DAILY,139,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,20,1,103,Finance/bank_reconciliation_fin.php
+242,17,"إدارة المالية",DAILY,139,"مكتب المحاسب",FinRequests/accountant_desk.php,30,1,117,FinRequests/accountant_desk.php
+770,17,"إدارة المالية",DAILY,139,"سجل الوحدات اليومية",Reports/daily_units_report.php,90,1,195,Reports/daily_units_report.php
+863,17,"إدارة المالية",HOME,138,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+211,17,"إدارة المالية",HOME,138,الرئيسية,Finance/cfo_daily_board_fin.php,10,1,104,Finance/cfo_daily_board_fin.php
+215,17,"إدارة المالية",REC,140,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+216,17,"إدارة المالية",REC,140,المعاونين,main/project_users.php,20,0,14,main/project_users.php
+219,17,"إدارة المالية",REC,140,"القيود اليومية",Finance/journal_form_fin.php,30,1,88,Finance/journal_form_fin.php
+230,17,"إدارة المالية",REC,140,"التمويل والالتزامات",Finance/funding_fin.php,40,1,94,Finance/funding_fin.php
+492,17,"إدارة المالية",REC,140,المستخلصات,Contracts/claims.php,45,1,142,Contracts/claims.php
+538,17,"إدارة المالية",REC,143,"تسويات الموردين",Suppliers/settlements.php,46,1,144,Suppliers/settlements.php
+553,17,"إدارة المالية",REC,140,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,47,1,145,Contracts/contract_obligations.php
+573,17,"إدارة المالية",REC,143,"تسويات الموظفين",Workforce/employee_settlements.php,47,1,148,Workforce/employee_settlements.php
+566,17,"إدارة المالية",REC,140,"احتساب الجزاءات والحوافز",Contracts/penalties.php,48,1,147,Contracts/penalties.php
+232,17,"إدارة المالية",REC,143,"الأصول والإهلاك",Finance/assets_fin.php,50,1,101,Finance/assets_fin.php
+609,17,"إدارة المالية",REC,140,"بنود عقد المورد",Suppliers/supplier_contract_lines.php,52,1,153,Suppliers/supplier_contract_lines.php
+614,17,"إدارة المالية",REC,140,"شروط تعديل السعر",Contracts/price_terms.php,53,1,154,Contracts/price_terms.php
+623,17,"إدارة المالية",REC,143,"مسيّر الرواتب",Workforce/payroll_runs.php,55,1,156,Workforce/payroll_runs.php
+629,17,"إدارة المالية",REC,140,"سلفيات الموظفين",Workforce/employee_advances.php,56,1,157,Workforce/employee_advances.php
+635,17,"إدارة المالية",REC,140,"سلفيات الموردين",Suppliers/supplier_advances.php,57,1,158,Suppliers/supplier_advances.php
+642,17,"إدارة المالية",REC,145,"قواعد تحميل المورد وجزاءاته",Suppliers/supplier_rules.php,58,1,159,Suppliers/supplier_rules.php
+647,17,"إدارة المالية",REC,140,"الطاقة والجاهزية ومهلة الإحلال",Suppliers/supplier_capacity.php,59,1,160,Suppliers/supplier_capacity.php
+649,17,"إدارة المالية",REC,140,"تقييم المورد الدوري",Suppliers/supplier_evaluation.php,60,1,161,Suppliers/supplier_evaluation.php
+652,17,"إدارة المالية",REC,140,"تصفية إنهاء عقد المورد",Suppliers/supplier_closure.php,61,1,162,Suppliers/supplier_closure.php
+655,17,"إدارة المالية",REC,140,"وثائق المورد وحسابه البنكي",Suppliers/supplier_documents.php,62,1,163,Suppliers/supplier_documents.php
+658,17,"إدارة المالية",REC,140,"الفاتورة الضريبية",Contracts/tax_invoices.php,63,1,164,Contracts/tax_invoices.php
+661,17,"إدارة المالية",REC,144,"كشف حساب العميل",Contracts/client_statement.php,64,1,165,Contracts/client_statement.php
+668,17,"إدارة المالية",REC,140,"الذمم والتحصيل — السجلات",Contracts/collections.php,65,1,166,Contracts/collections.php
+672,17,"إدارة المالية",REC,140,"تصفية إنهاء خدمة الموظف",Workforce/final_settlement.php,66,1,167,Workforce/final_settlement.php
+679,17,"إدارة المالية",REC,140,"تعرفة الترحيل وتسعير الأوامر",Transport/transfer_tariffs.php,67,1,168,Transport/transfer_tariffs.php
+683,17,"إدارة المالية",REC,143,"الدوريات المالية",Finance/periodic_events_fin.php,68,1,169,Finance/periodic_events_fin.php
+691,17,"إدارة المالية",REC,140,"طلبات عروض الموردين",Suppliers/rfq_requests.php,70,1,171,Suppliers/rfq_requests.php
+701,17,"إدارة المالية",REC,140,"بنود عقد العميل وقيمته",Contracts/contract_lines.php,72,1,173,Contracts/contract_lines.php
+734,17,"إدارة المالية",REC,140,"ربط الخطة بالفعلي",Contracts/plan_actual_link.php,77,1,178,Contracts/plan_actual_link.php
+738,17,"إدارة المالية",REC,140,"خط أساس العقد",Contracts/contract_baseline.php,78,1,179,Contracts/contract_baseline.php
+745,17,"إدارة المالية",REC,140,"اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,79,1,180,Contracts/contract_lifecycle.php
+753,17,"إدارة المالية",REC,138,"اللوحة التجارية للعقود",Contracts/commercial_board.php,80,1,181,Contracts/commercial_board.php
+212,17,"إدارة المالية",REP,138,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,10,1,99,Finance/executive_dashboard_fin.php
+220,17,"إدارة المالية",REP,144,"القوائم المالية",Finance/financial_statements_fin.php,20,1,100,Finance/financial_statements_fin.php
+225,17,"إدارة المالية",REP,144,"كشف حساب المورد",Finance/supplier_statement_fin.php,30,1,106,Finance/supplier_statement_fin.php
+228,17,"إدارة المالية",REP,144,"التكاليف والربحية",Finance/cost_report_fin.php,40,1,92,Finance/cost_report_fin.php
+231,17,"إدارة المالية",REP,144,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,50,1,95,Finance/cash_forecast_fin.php
+233,17,"إدارة المالية",REP,144,"المحاسبة الإدارية",Finance/management_accounting_fin.php,60,1,96,Finance/management_accounting_fin.php
+239,17,"إدارة المالية",REP,144,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,70,1,121,FinRequests/cycle_time_board.php
+240,17,"إدارة المالية",REP,144,"تقارير الطلبات المالية",FinRequests/requests_reports.php,80,1,122,FinRequests/requests_reports.php
+213,17,"إدارة المالية",SET,145,"دليل الحسابات",Finance/accounts_fin.php,10,1,87,Finance/accounts_fin.php
+214,17,"إدارة المالية",SET,145,"المحاسبون والوحدات",Finance/accountants_fin.php,20,1,97,Finance/accountants_fin.php
+223,17,"إدارة المالية",SET,145,"الضرائب والقيمة المضافة",Finance/tax_fin.php,30,1,102,Finance/tax_fin.php
+234,17,"إدارة المالية",SET,145,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,40,1,126,Finance/maintenance_provision_fin.php
+235,17,"إدارة المالية",SET,145,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,50,1,140,Finance/operator_pay_policies_fin.php
+237,17,"إدارة المالية",SET,145,"سجل الحركة المالية",FinRequests/effect_map.php,60,1,119,FinRequests/effect_map.php
+526,17,"إدارة المالية",SET,145,"العملات وأسعار الصرف",Finance/currencies_fin.php,60,1,143,Finance/currencies_fin.php
+238,17,"إدارة المالية",SET,145,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,70,1,120,FinRequests/routing_admin.php
+243,17,"إدارة المالية",SET,145,الإعدادات,Settings/settings.php,80,1,11,Settings/settings.php
+250,18,"محاسب الإدارة المالية",APPR,149,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+251,18,"محاسب الإدارة المالية",APPR,149,"استقبال معاملات الإدارات",Finance/import_events_fin.php,20,1,98,Finance/import_events_fin.php
+254,18,"محاسب الإدارة المالية",APPR,150,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+255,18,"محاسب الإدارة المالية",APPR,150,"متابعة الانحراف",Finance/variance_monitor_fin.php,40,1,125,Finance/variance_monitor_fin.php
+257,18,"محاسب الإدارة المالية",APPR,149,"الذمم والتحصيل",Finance/dues_fin.php,50,1,90,Finance/dues_fin.php
+262,18,"محاسب الإدارة المالية",APPR,151,"إقفال الفترات",Finance/periods_fin.php,60,1,93,Finance/periods_fin.php
+270,18,"محاسب الإدارة المالية",APPR,149,"الطلبات المالية",FinRequests/finance_gateway.php,70,1,118,FinRequests/finance_gateway.php
+259,18,"محاسب الإدارة المالية",DAILY,147,"المدفوعات والخزينة",Finance/payments_fin.php,10,1,91,Finance/payments_fin.php
+260,18,"محاسب الإدارة المالية",DAILY,147,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,20,1,103,Finance/bank_reconciliation_fin.php
+269,18,"محاسب الإدارة المالية",DAILY,147,"مكتب المحاسب",FinRequests/accountant_desk.php,30,1,117,FinRequests/accountant_desk.php
+853,18,"محاسب الإدارة المالية",HOME,146,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+244,18,"محاسب الإدارة المالية",HOME,146,الرئيسية,Finance/cfo_daily_board_fin.php,10,1,104,Finance/cfo_daily_board_fin.php
+248,18,"محاسب الإدارة المالية",REC,148,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+249,18,"محاسب الإدارة المالية",REC,148,المعاونين,main/project_users.php,20,1,14,main/project_users.php
+252,18,"محاسب الإدارة المالية",REC,148,"القيود اليومية",Finance/journal_form_fin.php,30,1,88,Finance/journal_form_fin.php
+263,18,"محاسب الإدارة المالية",REC,148,"التمويل والالتزامات",Finance/funding_fin.php,40,1,94,Finance/funding_fin.php
+493,18,"محاسب الإدارة المالية",REC,148,المستخلصات,Contracts/claims.php,45,1,142,Contracts/claims.php
+539,18,"محاسب الإدارة المالية",REC,151,"تسويات الموردين",Suppliers/settlements.php,46,1,144,Suppliers/settlements.php
+554,18,"محاسب الإدارة المالية",REC,148,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,47,1,145,Contracts/contract_obligations.php
+574,18,"محاسب الإدارة المالية",REC,151,"تسويات الموظفين",Workforce/employee_settlements.php,47,1,148,Workforce/employee_settlements.php
+567,18,"محاسب الإدارة المالية",REC,148,"احتساب الجزاءات والحوافز",Contracts/penalties.php,48,1,147,Contracts/penalties.php
+265,18,"محاسب الإدارة المالية",REC,151,"الأصول والإهلاك",Finance/assets_fin.php,50,1,101,Finance/assets_fin.php
+685,18,"محاسب الإدارة المالية",REC,151,"الدوريات المالية",Finance/periodic_events_fin.php,68,1,169,Finance/periodic_events_fin.php
+717,18,"محاسب الإدارة المالية",REC,148,"خطة دفع العقد",Contracts/contract_payment_schedule.php,75,1,176,Contracts/contract_payment_schedule.php
+245,18,"محاسب الإدارة المالية",REP,146,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,10,1,99,Finance/executive_dashboard_fin.php
+253,18,"محاسب الإدارة المالية",REP,152,"القوائم المالية",Finance/financial_statements_fin.php,20,1,100,Finance/financial_statements_fin.php
+258,18,"محاسب الإدارة المالية",REP,152,"كشف حساب المورد",Finance/supplier_statement_fin.php,30,1,106,Finance/supplier_statement_fin.php
+261,18,"محاسب الإدارة المالية",REP,152,"التكاليف والربحية",Finance/cost_report_fin.php,40,1,92,Finance/cost_report_fin.php
+264,18,"محاسب الإدارة المالية",REP,152,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,50,1,95,Finance/cash_forecast_fin.php
+266,18,"محاسب الإدارة المالية",REP,152,"المحاسبة الإدارية",Finance/management_accounting_fin.php,60,1,96,Finance/management_accounting_fin.php
+273,18,"محاسب الإدارة المالية",REP,152,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,70,1,121,FinRequests/cycle_time_board.php
+274,18,"محاسب الإدارة المالية",REP,152,"تقارير الطلبات المالية",FinRequests/requests_reports.php,80,1,122,FinRequests/requests_reports.php
+246,18,"محاسب الإدارة المالية",SET,153,"دليل الحسابات",Finance/accounts_fin.php,10,1,87,Finance/accounts_fin.php
+247,18,"محاسب الإدارة المالية",SET,153,"المحاسبون والوحدات",Finance/accountants_fin.php,20,1,97,Finance/accountants_fin.php
+256,18,"محاسب الإدارة المالية",SET,153,"الضرائب والقيمة المضافة",Finance/tax_fin.php,30,1,102,Finance/tax_fin.php
+267,18,"محاسب الإدارة المالية",SET,153,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,40,1,126,Finance/maintenance_provision_fin.php
+268,18,"محاسب الإدارة المالية",SET,153,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,50,1,140,Finance/operator_pay_policies_fin.php
+271,18,"محاسب الإدارة المالية",SET,153,"سجل الحركة المالية",FinRequests/effect_map.php,60,1,119,FinRequests/effect_map.php
+527,18,"محاسب الإدارة المالية",SET,153,"العملات وأسعار الصرف",Finance/currencies_fin.php,60,1,143,Finance/currencies_fin.php
+272,18,"محاسب الإدارة المالية",SET,153,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,70,1,120,FinRequests/routing_admin.php
+275,18,"محاسب الإدارة المالية",SET,153,الإعدادات,Settings/settings.php,80,1,11,Settings/settings.php
+282,19,"مدير الإدارة المالية",APPR,157,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+558,19,"مدير الإدارة المالية",APPR,154,"لوحة الإسناد اليومي",Approvals/attribution_board.php,12,1,146,Approvals/attribution_board.php
+283,19,"مدير الإدارة المالية",APPR,157,"استقبال معاملات الإدارات",Finance/import_events_fin.php,20,1,98,Finance/import_events_fin.php
+286,19,"مدير الإدارة المالية",APPR,158,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+287,19,"مدير الإدارة المالية",APPR,158,"متابعة الانحراف",Finance/variance_monitor_fin.php,40,1,125,Finance/variance_monitor_fin.php
+289,19,"مدير الإدارة المالية",APPR,157,"الذمم والتحصيل",Finance/dues_fin.php,50,1,90,Finance/dues_fin.php
+294,19,"مدير الإدارة المالية",APPR,159,"إقفال الفترات",Finance/periods_fin.php,60,1,93,Finance/periods_fin.php
+301,19,"مدير الإدارة المالية",APPR,157,"الطلبات المالية",FinRequests/finance_gateway.php,70,1,118,FinRequests/finance_gateway.php
+291,19,"مدير الإدارة المالية",DAILY,155,"المدفوعات والخزينة",Finance/payments_fin.php,10,1,91,Finance/payments_fin.php
+292,19,"مدير الإدارة المالية",DAILY,155,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,20,1,103,Finance/bank_reconciliation_fin.php
+813,19,"مدير الإدارة المالية",FIN,156,"سجل الممولين",Financing/financiers_registry.php,1,1,210,Financing/financiers_registry.php
+814,19,"مدير الإدارة المالية",FIN,156,"إنشاء عملية تمويل",Financing/financing_operation_new.php,2,1,211,Financing/financing_operation_new.php
+809,19,"مدير الإدارة المالية",GOV,156,"سجل الكيانات",Governance/entities_registry.php,1,1,206,Governance/entities_registry.php
+810,19,"مدير الإدارة المالية",GOV,156,"التفويض بالتوقيع",Governance/signing_authority.php,2,1,207,Governance/signing_authority.php
+811,19,"مدير الإدارة المالية",GOV,156,"التراخيص والكفالات",Governance/licenses_guarantees.php,3,1,208,Governance/licenses_guarantees.php
+812,19,"مدير الإدارة المالية",GOV,156,"أنماط التفعيل",Governance/activation_patterns.php,4,1,209,Governance/activation_patterns.php
+828,19,"مدير الإدارة المالية",GOV,156,"منح المجال المقيَّد",Governance/ownership_grants.php,5,1,213,Governance/ownership_grants.php
+852,19,"مدير الإدارة المالية",HOME,154,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+276,19,"مدير الإدارة المالية",HOME,154,الرئيسية,Finance/cfo_daily_board_fin.php,10,1,104,Finance/cfo_daily_board_fin.php
+280,19,"مدير الإدارة المالية",REC,156,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+281,19,"مدير الإدارة المالية",REC,156,المعاونين,main/project_users.php,20,1,14,main/project_users.php
+284,19,"مدير الإدارة المالية",REC,156,"القيود اليومية",Finance/journal_form_fin.php,30,1,88,Finance/journal_form_fin.php
+295,19,"مدير الإدارة المالية",REC,156,"التمويل والالتزامات",Finance/funding_fin.php,40,1,94,Finance/funding_fin.php
+494,19,"مدير الإدارة المالية",REC,156,المستخلصات,Contracts/claims.php,45,1,142,Contracts/claims.php
+537,19,"مدير الإدارة المالية",REC,159,"تسويات الموردين",Suppliers/settlements.php,46,1,144,Suppliers/settlements.php
+551,19,"مدير الإدارة المالية",REC,156,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,47,1,145,Contracts/contract_obligations.php
+572,19,"مدير الإدارة المالية",REC,159,"تسويات الموظفين",Workforce/employee_settlements.php,47,1,148,Workforce/employee_settlements.php
+565,19,"مدير الإدارة المالية",REC,156,"احتساب الجزاءات والحوافز",Contracts/penalties.php,48,1,147,Contracts/penalties.php
+297,19,"مدير الإدارة المالية",REC,159,"الأصول والإهلاك",Finance/assets_fin.php,50,1,101,Finance/assets_fin.php
+659,19,"مدير الإدارة المالية",REC,156,"الفاتورة الضريبية",Contracts/tax_invoices.php,63,1,164,Contracts/tax_invoices.php
+662,19,"مدير الإدارة المالية",REC,160,"كشف حساب العميل",Contracts/client_statement.php,64,1,165,Contracts/client_statement.php
+684,19,"مدير الإدارة المالية",REC,159,"الدوريات المالية",Finance/periodic_events_fin.php,68,1,169,Finance/periodic_events_fin.php
+694,19,"مدير الإدارة المالية",REC,156,"نطاقات العقد التشغيلية",Contracts/contract_sites.php,71,1,172,Contracts/contract_sites.php
+700,19,"مدير الإدارة المالية",REC,156,"بنود عقد العميل وقيمته",Contracts/contract_lines.php,72,1,173,Contracts/contract_lines.php
+704,19,"مدير الإدارة المالية",REC,156,"الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,73,1,174,Contracts/contract_monthly_plan.php
+715,19,"مدير الإدارة المالية",REC,156,"خطة دفع العقد",Contracts/contract_payment_schedule.php,75,1,176,Contracts/contract_payment_schedule.php
+723,19,"مدير الإدارة المالية",REC,156,"ضمانات العقد",Contracts/contract_guarantees.php,76,1,177,Contracts/contract_guarantees.php
+733,19,"مدير الإدارة المالية",REC,156,"ربط الخطة بالفعلي",Contracts/plan_actual_link.php,77,1,178,Contracts/plan_actual_link.php
+737,19,"مدير الإدارة المالية",REC,156,"خط أساس العقد",Contracts/contract_baseline.php,78,1,179,Contracts/contract_baseline.php
+746,19,"مدير الإدارة المالية",REC,156,"اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,79,1,180,Contracts/contract_lifecycle.php
+754,19,"مدير الإدارة المالية",REC,154,"اللوحة التجارية للعقود",Contracts/commercial_board.php,80,1,181,Contracts/commercial_board.php
+277,19,"مدير الإدارة المالية",REP,154,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,10,1,99,Finance/executive_dashboard_fin.php
+285,19,"مدير الإدارة المالية",REP,160,"القوائم المالية",Finance/financial_statements_fin.php,20,1,100,Finance/financial_statements_fin.php
+290,19,"مدير الإدارة المالية",REP,160,"كشف حساب المورد",Finance/supplier_statement_fin.php,30,1,106,Finance/supplier_statement_fin.php
+293,19,"مدير الإدارة المالية",REP,160,"التكاليف والربحية",Finance/cost_report_fin.php,40,1,92,Finance/cost_report_fin.php
+296,19,"مدير الإدارة المالية",REP,160,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,50,1,95,Finance/cash_forecast_fin.php
+298,19,"مدير الإدارة المالية",REP,160,"المحاسبة الإدارية",Finance/management_accounting_fin.php,60,1,96,Finance/management_accounting_fin.php
+304,19,"مدير الإدارة المالية",REP,160,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,70,1,121,FinRequests/cycle_time_board.php
+305,19,"مدير الإدارة المالية",REP,160,"تقارير الطلبات المالية",FinRequests/requests_reports.php,80,1,122,FinRequests/requests_reports.php
+815,19,"مدير الإدارة المالية",REP,158,"الاعتمادات المتأخرة والوثائق",Reports/approval_lag_report.php,90,1,212,Reports/approval_lag_report.php
+278,19,"مدير الإدارة المالية",SET,161,"دليل الحسابات",Finance/accounts_fin.php,10,1,87,Finance/accounts_fin.php
+279,19,"مدير الإدارة المالية",SET,161,"المحاسبون والوحدات",Finance/accountants_fin.php,20,1,97,Finance/accountants_fin.php
+288,19,"مدير الإدارة المالية",SET,161,"الضرائب والقيمة المضافة",Finance/tax_fin.php,30,1,102,Finance/tax_fin.php
+299,19,"مدير الإدارة المالية",SET,161,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,40,1,126,Finance/maintenance_provision_fin.php
+300,19,"مدير الإدارة المالية",SET,161,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,50,1,140,Finance/operator_pay_policies_fin.php
+302,19,"مدير الإدارة المالية",SET,161,"سجل الحركة المالية",FinRequests/effect_map.php,60,1,119,FinRequests/effect_map.php
+528,19,"مدير الإدارة المالية",SET,161,"العملات وأسعار الصرف",Finance/currencies_fin.php,60,1,143,Finance/currencies_fin.php
+303,19,"مدير الإدارة المالية",SET,161,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,70,1,120,FinRequests/routing_admin.php
+306,19,"مدير الإدارة المالية",SET,161,الإعدادات,Settings/settings.php,80,1,11,Settings/settings.php
+313,20,"المراجع والمدقق المالي",APPR,165,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+314,20,"المراجع والمدقق المالي",APPR,165,"استقبال معاملات الإدارات",Finance/import_events_fin.php,20,1,98,Finance/import_events_fin.php
+317,20,"المراجع والمدقق المالي",APPR,166,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+318,20,"المراجع والمدقق المالي",APPR,166,"متابعة الانحراف",Finance/variance_monitor_fin.php,40,1,125,Finance/variance_monitor_fin.php
+320,20,"المراجع والمدقق المالي",APPR,165,"الذمم والتحصيل",Finance/dues_fin.php,50,1,90,Finance/dues_fin.php
+325,20,"المراجع والمدقق المالي",APPR,167,"إقفال الفترات",Finance/periods_fin.php,60,1,93,Finance/periods_fin.php
+332,20,"المراجع والمدقق المالي",APPR,165,"الطلبات المالية",FinRequests/finance_gateway.php,70,1,118,FinRequests/finance_gateway.php
+322,20,"المراجع والمدقق المالي",DAILY,163,"المدفوعات والخزينة",Finance/payments_fin.php,10,1,91,Finance/payments_fin.php
+323,20,"المراجع والمدقق المالي",DAILY,163,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,20,1,103,Finance/bank_reconciliation_fin.php
+851,20,"المراجع والمدقق المالي",HOME,162,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+307,20,"المراجع والمدقق المالي",HOME,162,الرئيسية,Finance/cfo_daily_board_fin.php,10,1,104,Finance/cfo_daily_board_fin.php
+311,20,"المراجع والمدقق المالي",REC,164,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+312,20,"المراجع والمدقق المالي",REC,164,المعاونين,main/project_users.php,20,1,14,main/project_users.php
+315,20,"المراجع والمدقق المالي",REC,164,"القيود اليومية",Finance/journal_form_fin.php,30,1,88,Finance/journal_form_fin.php
+326,20,"المراجع والمدقق المالي",REC,164,"التمويل والالتزامات",Finance/funding_fin.php,40,1,94,Finance/funding_fin.php
+328,20,"المراجع والمدقق المالي",REC,167,"الأصول والإهلاك",Finance/assets_fin.php,50,1,101,Finance/assets_fin.php
+724,20,"المراجع والمدقق المالي",REC,164,"ضمانات العقد",Contracts/contract_guarantees.php,76,1,177,Contracts/contract_guarantees.php
+739,20,"المراجع والمدقق المالي",REC,164,"خط أساس العقد",Contracts/contract_baseline.php,78,1,179,Contracts/contract_baseline.php
+747,20,"المراجع والمدقق المالي",REC,164,"اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,79,1,180,Contracts/contract_lifecycle.php
+755,20,"المراجع والمدقق المالي",REC,162,"اللوحة التجارية للعقود",Contracts/commercial_board.php,80,1,181,Contracts/commercial_board.php
+308,20,"المراجع والمدقق المالي",REP,162,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,10,1,99,Finance/executive_dashboard_fin.php
+316,20,"المراجع والمدقق المالي",REP,168,"القوائم المالية",Finance/financial_statements_fin.php,20,1,100,Finance/financial_statements_fin.php
+321,20,"المراجع والمدقق المالي",REP,168,"كشف حساب المورد",Finance/supplier_statement_fin.php,30,1,106,Finance/supplier_statement_fin.php
+324,20,"المراجع والمدقق المالي",REP,168,"التكاليف والربحية",Finance/cost_report_fin.php,40,1,92,Finance/cost_report_fin.php
+327,20,"المراجع والمدقق المالي",REP,168,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,50,1,95,Finance/cash_forecast_fin.php
+329,20,"المراجع والمدقق المالي",REP,168,"المحاسبة الإدارية",Finance/management_accounting_fin.php,60,1,96,Finance/management_accounting_fin.php
+335,20,"المراجع والمدقق المالي",REP,168,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,70,1,121,FinRequests/cycle_time_board.php
+336,20,"المراجع والمدقق المالي",REP,168,"تقارير الطلبات المالية",FinRequests/requests_reports.php,80,1,122,FinRequests/requests_reports.php
+309,20,"المراجع والمدقق المالي",SET,169,"دليل الحسابات",Finance/accounts_fin.php,10,1,87,Finance/accounts_fin.php
+310,20,"المراجع والمدقق المالي",SET,169,"المحاسبون والوحدات",Finance/accountants_fin.php,20,1,97,Finance/accountants_fin.php
+319,20,"المراجع والمدقق المالي",SET,169,"الضرائب والقيمة المضافة",Finance/tax_fin.php,30,1,102,Finance/tax_fin.php
+330,20,"المراجع والمدقق المالي",SET,169,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,40,1,126,Finance/maintenance_provision_fin.php
+331,20,"المراجع والمدقق المالي",SET,169,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,50,1,140,Finance/operator_pay_policies_fin.php
+333,20,"المراجع والمدقق المالي",SET,169,"سجل الحركة المالية",FinRequests/effect_map.php,60,1,119,FinRequests/effect_map.php
+529,20,"المراجع والمدقق المالي",SET,169,"العملات وأسعار الصرف",Finance/currencies_fin.php,60,1,143,Finance/currencies_fin.php
+334,20,"المراجع والمدقق المالي",SET,169,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,70,1,120,FinRequests/routing_admin.php
+337,20,"المراجع والمدقق المالي",SET,169,الإعدادات,Settings/settings.php,80,1,11,Settings/settings.php
+344,21,"أمين الخزينة",APPR,173,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+345,21,"أمين الخزينة",APPR,173,"استقبال معاملات الإدارات",Finance/import_events_fin.php,20,1,98,Finance/import_events_fin.php
+348,21,"أمين الخزينة",APPR,174,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+349,21,"أمين الخزينة",APPR,174,"متابعة الانحراف",Finance/variance_monitor_fin.php,40,1,125,Finance/variance_monitor_fin.php
+351,21,"أمين الخزينة",APPR,173,"الذمم والتحصيل",Finance/dues_fin.php,50,1,90,Finance/dues_fin.php
+356,21,"أمين الخزينة",APPR,175,"إقفال الفترات",Finance/periods_fin.php,60,1,93,Finance/periods_fin.php
+363,21,"أمين الخزينة",APPR,173,"الطلبات المالية",FinRequests/finance_gateway.php,70,1,118,FinRequests/finance_gateway.php
+370,21,"أمين الخزينة",APPR,173,"موافقات إدارتي",FinRequests/dept_inbox.php,80,1,116,FinRequests/dept_inbox.php
+353,21,"أمين الخزينة",DAILY,171,"المدفوعات والخزينة",Finance/payments_fin.php,10,1,91,Finance/payments_fin.php
+354,21,"أمين الخزينة",DAILY,171,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,20,1,103,Finance/bank_reconciliation_fin.php
+368,21,"أمين الخزينة",DAILY,171,"طلب مالي جديد",FinRequests/request_form.php,30,1,114,FinRequests/request_form.php
+369,21,"أمين الخزينة",DAILY,171,"طلباتي المالية",FinRequests/my_requests.php,40,1,115,FinRequests/my_requests.php
+850,21,"أمين الخزينة",HOME,170,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+338,21,"أمين الخزينة",HOME,170,الرئيسية,Finance/cfo_daily_board_fin.php,10,1,104,Finance/cfo_daily_board_fin.php
+342,21,"أمين الخزينة",REC,172,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+343,21,"أمين الخزينة",REC,172,المعاونين,main/project_users.php,20,1,14,main/project_users.php
+346,21,"أمين الخزينة",REC,172,"القيود اليومية",Finance/journal_form_fin.php,30,1,88,Finance/journal_form_fin.php
+357,21,"أمين الخزينة",REC,172,"التمويل والالتزامات",Finance/funding_fin.php,40,1,94,Finance/funding_fin.php
+359,21,"أمين الخزينة",REC,175,"الأصول والإهلاك",Finance/assets_fin.php,50,1,101,Finance/assets_fin.php
+669,21,"أمين الخزينة",REC,172,"الذمم والتحصيل — السجلات",Contracts/collections.php,65,1,166,Contracts/collections.php
+716,21,"أمين الخزينة",REC,172,"خطة دفع العقد",Contracts/contract_payment_schedule.php,75,1,176,Contracts/contract_payment_schedule.php
+725,21,"أمين الخزينة",REC,172,"ضمانات العقد",Contracts/contract_guarantees.php,76,1,177,Contracts/contract_guarantees.php
+339,21,"أمين الخزينة",REP,170,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,10,1,99,Finance/executive_dashboard_fin.php
+347,21,"أمين الخزينة",REP,176,"القوائم المالية",Finance/financial_statements_fin.php,20,1,100,Finance/financial_statements_fin.php
+352,21,"أمين الخزينة",REP,176,"كشف حساب المورد",Finance/supplier_statement_fin.php,30,1,106,Finance/supplier_statement_fin.php
+355,21,"أمين الخزينة",REP,176,"التكاليف والربحية",Finance/cost_report_fin.php,40,1,92,Finance/cost_report_fin.php
+358,21,"أمين الخزينة",REP,176,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,50,1,95,Finance/cash_forecast_fin.php
+360,21,"أمين الخزينة",REP,176,"المحاسبة الإدارية",Finance/management_accounting_fin.php,60,1,96,Finance/management_accounting_fin.php
+366,21,"أمين الخزينة",REP,176,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,70,1,121,FinRequests/cycle_time_board.php
+367,21,"أمين الخزينة",REP,176,"تقارير الطلبات المالية",FinRequests/requests_reports.php,80,1,122,FinRequests/requests_reports.php
+340,21,"أمين الخزينة",SET,177,"دليل الحسابات",Finance/accounts_fin.php,10,1,87,Finance/accounts_fin.php
+341,21,"أمين الخزينة",SET,177,"المحاسبون والوحدات",Finance/accountants_fin.php,20,1,97,Finance/accountants_fin.php
+350,21,"أمين الخزينة",SET,177,"الضرائب والقيمة المضافة",Finance/tax_fin.php,30,1,102,Finance/tax_fin.php
+361,21,"أمين الخزينة",SET,177,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,40,1,126,Finance/maintenance_provision_fin.php
+362,21,"أمين الخزينة",SET,177,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,50,1,140,Finance/operator_pay_policies_fin.php
+364,21,"أمين الخزينة",SET,177,"سجل الحركة المالية",FinRequests/effect_map.php,60,1,119,FinRequests/effect_map.php
+530,21,"أمين الخزينة",SET,177,"العملات وأسعار الصرف",Finance/currencies_fin.php,60,1,143,Finance/currencies_fin.php
+365,21,"أمين الخزينة",SET,177,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,70,1,120,FinRequests/routing_admin.php
+371,21,"أمين الخزينة",SET,177,الإعدادات,Settings/settings.php,80,1,11,Settings/settings.php
+378,22,"قارئ مالي",APPR,181,"وحدات الأطراف",Finance/unit_records_fin.php,10,1,105,Finance/unit_records_fin.php
+379,22,"قارئ مالي",APPR,181,"استقبال معاملات الإدارات",Finance/import_events_fin.php,20,1,98,Finance/import_events_fin.php
+382,22,"قارئ مالي",APPR,182,"الميزانية والانحراف",Finance/budget_form_fin.php,30,1,89,Finance/budget_form_fin.php
+383,22,"قارئ مالي",APPR,182,"متابعة الانحراف",Finance/variance_monitor_fin.php,40,1,125,Finance/variance_monitor_fin.php
+385,22,"قارئ مالي",APPR,181,"الذمم والتحصيل",Finance/dues_fin.php,50,1,90,Finance/dues_fin.php
+390,22,"قارئ مالي",APPR,183,"إقفال الفترات",Finance/periods_fin.php,60,1,93,Finance/periods_fin.php
+397,22,"قارئ مالي",APPR,181,"الطلبات المالية",FinRequests/finance_gateway.php,70,1,118,FinRequests/finance_gateway.php
+387,22,"قارئ مالي",DAILY,179,"المدفوعات والخزينة",Finance/payments_fin.php,10,1,91,Finance/payments_fin.php
+388,22,"قارئ مالي",DAILY,179,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,20,1,103,Finance/bank_reconciliation_fin.php
+849,22,"قارئ مالي",HOME,178,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+372,22,"قارئ مالي",HOME,178,الرئيسية,Finance/cfo_daily_board_fin.php,10,1,104,Finance/cfo_daily_board_fin.php
+376,22,"قارئ مالي",REC,180,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+377,22,"قارئ مالي",REC,180,المعاونين,main/project_users.php,20,1,14,main/project_users.php
+380,22,"قارئ مالي",REC,180,"القيود اليومية",Finance/journal_form_fin.php,30,1,88,Finance/journal_form_fin.php
+391,22,"قارئ مالي",REC,180,"التمويل والالتزامات",Finance/funding_fin.php,40,1,94,Finance/funding_fin.php
+393,22,"قارئ مالي",REC,183,"الأصول والإهلاك",Finance/assets_fin.php,50,1,101,Finance/assets_fin.php
+663,22,"قارئ مالي",REC,184,"كشف حساب العميل",Contracts/client_statement.php,64,1,165,Contracts/client_statement.php
+756,22,"قارئ مالي",REC,178,"اللوحة التجارية للعقود",Contracts/commercial_board.php,80,1,181,Contracts/commercial_board.php
+373,22,"قارئ مالي",REP,178,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,10,1,99,Finance/executive_dashboard_fin.php
+381,22,"قارئ مالي",REP,184,"القوائم المالية",Finance/financial_statements_fin.php,20,1,100,Finance/financial_statements_fin.php
+386,22,"قارئ مالي",REP,184,"كشف حساب المورد",Finance/supplier_statement_fin.php,30,1,106,Finance/supplier_statement_fin.php
+389,22,"قارئ مالي",REP,184,"التكاليف والربحية",Finance/cost_report_fin.php,40,1,92,Finance/cost_report_fin.php
+392,22,"قارئ مالي",REP,184,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,50,1,95,Finance/cash_forecast_fin.php
+394,22,"قارئ مالي",REP,184,"المحاسبة الإدارية",Finance/management_accounting_fin.php,60,1,96,Finance/management_accounting_fin.php
+400,22,"قارئ مالي",REP,184,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,70,1,121,FinRequests/cycle_time_board.php
+401,22,"قارئ مالي",REP,184,"تقارير الطلبات المالية",FinRequests/requests_reports.php,80,1,122,FinRequests/requests_reports.php
+374,22,"قارئ مالي",SET,185,"دليل الحسابات",Finance/accounts_fin.php,10,1,87,Finance/accounts_fin.php
+375,22,"قارئ مالي",SET,185,"المحاسبون والوحدات",Finance/accountants_fin.php,20,1,97,Finance/accountants_fin.php
+384,22,"قارئ مالي",SET,185,"الضرائب والقيمة المضافة",Finance/tax_fin.php,30,1,102,Finance/tax_fin.php
+395,22,"قارئ مالي",SET,185,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,40,1,126,Finance/maintenance_provision_fin.php
+396,22,"قارئ مالي",SET,185,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,50,1,140,Finance/operator_pay_policies_fin.php
+398,22,"قارئ مالي",SET,185,"سجل الحركة المالية",FinRequests/effect_map.php,60,1,119,FinRequests/effect_map.php
+531,22,"قارئ مالي",SET,185,"العملات وأسعار الصرف",Finance/currencies_fin.php,60,1,143,Finance/currencies_fin.php
+399,22,"قارئ مالي",SET,185,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,70,1,120,FinRequests/routing_admin.php
+402,22,"قارئ مالي",SET,185,الإعدادات,Settings/settings.php,80,1,11,Settings/settings.php
+405,23,"إدارة النقل والترحيل",APPR,189,"موافقات الترحيل",Transport/transfer_requests.php,10,1,111,Transport/transfer_requests.php
+514,23,"إدارة النقل والترحيل",APPR,189,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+412,23,"إدارة النقل والترحيل",APPR,190,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+404,23,"إدارة النقل والترحيل",DAILY,187,"أوامر الترحيل",Transport/transfer_orders_list.php,10,1,112,Transport/transfer_orders_list.php
+409,23,"إدارة النقل والترحيل",DAILY,187,"طلب مالي جديد",FinRequests/request_form.php,20,1,114,FinRequests/request_form.php
+410,23,"إدارة النقل والترحيل",DAILY,187,"طلباتي المالية",FinRequests/my_requests.php,30,1,115,FinRequests/my_requests.php
+862,23,"إدارة النقل والترحيل",HOME,186,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+403,23,"إدارة النقل والترحيل",HOME,186,الرئيسية,Transport/transfer_dashboard.php,10,1,113,Transport/transfer_dashboard.php
+411,23,"إدارة النقل والترحيل",REC,188,"المعاملات المالية",Finance/events_list_fin.php,10,1,86,Finance/events_list_fin.php
+678,23,"إدارة النقل والترحيل",REC,188,"تعرفة الترحيل وتسعير الأوامر",Transport/transfer_tariffs.php,67,1,168,Transport/transfer_tariffs.php
+413,23,"إدارة النقل والترحيل",REP,192,"التكاليف والربحية",Finance/cost_report_fin.php,10,1,92,Finance/cost_report_fin.php
+406,23,"إدارة النقل والترحيل",SET,193,"إعدادات الترحيل",Transport/transfer_types_config.php,10,1,108,Transport/transfer_types_config.php
+407,23,"إدارة النقل والترحيل",SET,193,"قواعد تحميل تكلفة الترحيل",Transport/transfer_cost_rules_config.php,20,1,109,Transport/transfer_cost_rules_config.php
+408,23,"إدارة النقل والترحيل",SET,193,المواقع,Transport/trs_locations_config.php,30,1,110,Transport/trs_locations_config.php
+414,23,"إدارة النقل والترحيل",SET,193,الإعدادات,Settings/settings.php,40,1,11,Settings/settings.php
+515,24,"إدارة البلاغات",APPR,197,"موافقات إدارتي",FinRequests/dept_inbox.php,10,1,116,FinRequests/dept_inbox.php
+507,24,"إدارة البلاغات",APPR,198,"الميزانية والانحراف",Finance/budget_form_fin.php,20,1,89,Finance/budget_form_fin.php
+415,24,"إدارة البلاغات",DAILY,195,البلاغات,Tickets/tickets_list.php,10,1,132,Tickets/tickets_list.php
+846,24,"إدارة البلاغات",DAILY,194,"لوحة المسارات المتوازية",Tickets/ticket_workstreams_board.php,15,1,225,Tickets/ticket_workstreams_board.php
+518,24,"إدارة البلاغات",DAILY,195,"طلب مالي جديد",FinRequests/request_form.php,20,1,114,FinRequests/request_form.php
+519,24,"إدارة البلاغات",DAILY,195,"طلباتي المالية",FinRequests/my_requests.php,30,1,115,FinRequests/my_requests.php
+861,24,"إدارة البلاغات",HOME,194,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+472,24,"إدارة البلاغات",HOME,194,الرئيسية,main/role_board.php,10,1,139,main/role_board.php
+421,24,"إدارة البلاغات",REP,200,"أداء البلاغات",Tickets/ticket_dashboard.php,10,1,137,Tickets/ticket_dashboard.php
+847,24,"إدارة البلاغات",REP,198,"برج المراقبة والمؤشرات",Tickets/watchtower.php,15,1,226,Tickets/watchtower.php
+416,24,"إدارة البلاغات",SET,201,"إعداد أنواع البلاغات",Tickets/ticket_types_config.php,10,1,130,Tickets/ticket_types_config.php
+417,24,"إدارة البلاغات",SET,201,"تصنيفات الأعطال والبلاغات",Tickets/ticket_categories_config.php,20,1,131,Tickets/ticket_categories_config.php
+418,24,"إدارة البلاغات",SET,201,"أزمنة الاستجابة والإنجاز",Tickets/ticket_sla_config.php,30,1,134,Tickets/ticket_sla_config.php
+419,24,"إدارة البلاغات",SET,201,"سلّم التصعيد",Tickets/ticket_escalation_config.php,40,1,135,Tickets/ticket_escalation_config.php
+420,24,"إدارة البلاغات",SET,201,"البلاغات الدورية",Tickets/ticket_recurrence.php,50,1,136,Tickets/ticket_recurrence.php
+422,24,"إدارة البلاغات",SET,201,الإعدادات,Settings/settings.php,60,1,11,Settings/settings.php
+782,25,"أمين المستودع",DAILY,203,"صرف المخزون والعهدة",Procurement/issue_proc.php,2,1,73,Procurement/issue_proc.php
+780,25,"أمين المستودع",DAILY,203,"الاستلام المؤقت",Procurement/receipt_custody_proc.php,3,1,71,Procurement/receipt_custody_proc.php
+784,25,"أمين المستودع",HOME,202,الرئيسية,Procurement/warehouse_board.php,1,1,199,Procurement/warehouse_board.php
+860,25,"أمين المستودع",HOME,202,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+781,25,"أمين المستودع",REC,204,المخزون,Procurement/stock_proc.php,4,1,72,Procurement/stock_proc.php
+779,25,"أمين المستودع",REC,204,"كتالوج الأصناف",Procurement/items_proc.php,5,1,68,Procurement/items_proc.php
+783,25,"أمين المستودع",SET,209,"حدود إعادة الطلب",Procurement/reordering_proc.php,6,1,74,Procurement/reordering_proc.php
+824,26,"إدارة التمويل",FIN,212,"سجل الممولين",Financing/financiers_registry.php,1,1,210,Financing/financiers_registry.php
+825,26,"إدارة التمويل",FIN,212,"إنشاء عملية تمويل",Financing/financing_operation_new.php,2,1,211,Financing/financing_operation_new.php
+821,26,"إدارة التمويل",GOV,212,"سجل الكيانات",Governance/entities_registry.php,1,1,206,Governance/entities_registry.php
+822,26,"إدارة التمويل",GOV,212,"التفويض بالتوقيع",Governance/signing_authority.php,2,1,207,Governance/signing_authority.php
+823,26,"إدارة التمويل",GOV,212,"التراخيص والكفالات",Governance/licenses_guarantees.php,3,1,208,Governance/licenses_guarantees.php
+827,26,"إدارة التمويل",HOME,210,الرئيسية,Financing/financing_board.php,1,1,214,Financing/financing_board.php
+859,26,"إدارة التمويل",HOME,210,"مساحة عملي",main/my_workspace.php,1,1,228,main/my_workspace.php
+826,26,"إدارة التمويل",REP,214,"الاعتمادات المتأخرة والوثائق",Reports/approval_lag_report.php,90,1,212,Reports/approval_lag_report.php

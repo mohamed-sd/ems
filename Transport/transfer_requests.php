@@ -145,6 +145,9 @@ include '../insidebar.php';
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'طلب جديد'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // TKT-15 · زر الإبلاغ السياقي — النقل والترحيل (§2-④)
+    require_once __DIR__ . '/../includes/report_button.php';
+    ems_report_button(array('screen' => 'transport'));
     ?>
     <?php trs_msg_banner(); ?>
 

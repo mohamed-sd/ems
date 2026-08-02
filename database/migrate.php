@@ -71,6 +71,10 @@ if ($conn->character_set_name() !== 'utf8mb4') {
 
 define('MIGRATE_DIR', __DIR__ . '/migrations');
 define('BASELINE_DIR', __DIR__ . '/baseline');
+define('SCHEMA_DIR', __DIR__ . '/schema');
+// أرشيفُ ما قبل خطِّ الأساس: ترحيلاتٌ أثرُها داخلٌ في database/schema/schema.sql،
+// نُقلت خارج مسار المسح لتبقى تاريخًا مقروءًا بلا ضجيجٍ في `status`.
+define('HISTORY_DIR', __DIR__ . '/_history');
 define('TRACKING_TABLE', 'schema_migrations');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -383,7 +387,8 @@ function cmd_status(mysqli $conn)
     $files = migrate_scan_files();
     $tracked = migrate_fetch_tracked($conn);
 
-    $counts = array('applied' => 0, 'baseline' => 0, 'pending' => 0, 'failed' => 0, 'modified' => 0, 'missing' => 0);
+    $counts = array('applied' => 0, 'baseline' => 0, 'pending' => 0, 'failed' => 0,
+                    'modified' => 0, 'missing' => 0, 'archived' => 0);
     echo "حالة الترحيلات — قاعدة التتبّع: " . TRACKING_TABLE . "\n";
     echo str_repeat('─', 78) . "\n";
 
@@ -406,12 +411,24 @@ function cmd_status(mysqli $conn)
         }
     }
 
+    // مسجَّلٌ في القاعدة وغائبٌ عن migrations/: إن كان في الأرشيف فهذا هو الوضعُ
+    // الطبيعيُّ بعد الضغط (أثرُه في schema.sql) ولا ينبغي أن يُنذر؛ وإن لم يكن
+    // فهو فقدٌ حقيقيٌّ يستحق التنبيه.
     foreach ($tracked as $f => $row) {
-        if (!in_array($f, $files, true)) {
-            $counts['missing']++;
-            printf("  %-10s %s\n", '[MISSING]', $f);
-            echo "             ⚠ مسجَّل في القاعدة لكن الملف غير موجود على القرص.\n";
+        if (in_array($f, $files, true)) {
+            continue;
         }
+        if (is_file(HISTORY_DIR . '/' . $f)) {
+            $counts['archived']++;
+            continue;
+        }
+        $counts['missing']++;
+        printf("  %-10s %s\n", '[MISSING]', $f);
+        echo "             ⚠ مسجَّل في القاعدة لكن الملف غير موجود على القرص ولا في الأرشيف.\n";
+    }
+    if ($counts['archived'] > 0) {
+        printf("  %-10s %d ملفًّا في database/_history/ — أثرُها داخلٌ في schema.sql\n",
+            '[archived]', $counts['archived']);
     }
 
     foreach (migrate_scan_unmanaged() as $f) {
@@ -421,7 +438,8 @@ function cmd_status(mysqli $conn)
 
     echo str_repeat('─', 78) . "\n";
     echo "applied={$counts['applied']} baseline={$counts['baseline']} pending={$counts['pending']}"
-        . " failed={$counts['failed']} modified={$counts['modified']} missing={$counts['missing']}\n";
+        . " failed={$counts['failed']} modified={$counts['modified']} missing={$counts['missing']}"
+        . " archived={$counts['archived']}\n";
 
     // حالات تستدعي انتباه المشغّل تُعيد رمزًا غير صفري في up فقط؛ status للعرض دائمًا.
     return 0;
@@ -552,6 +570,68 @@ function cmd_baseline(mysqli $conn)
     return 0;
 }
 
+/**
+ * توليدُ مصنوعات التثبيت من هذه القاعدة إلى database/schema/.
+ * قراءةٌ خالصة — لا يكتب في القاعدة حرفًا. يُعاد تشغيلُه بعد أيِّ تغييرِ مخطَّط،
+ * وحارسُ الانحراف (tools/schema_drift.php) يكشف نسيانَه.
+ */
+function cmd_dump_schema(mysqli $conn)
+{
+    require_once dirname(__DIR__) . '/app/Install/SchemaDumper.php';
+
+    if (!is_dir(SCHEMA_DIR) && !mkdir(SCHEMA_DIR, 0755, true)) {
+        fwrite(STDERR, "[migrate] تعذّر إنشاء مجلد schema/\n");
+        return 1;
+    }
+
+    $dumper = new \App\Install\SchemaDumper($conn);
+    echo "توليدُ مصنوعات التثبيت من: " . $dumper->databaseName() . "\n";
+    echo str_repeat('─', 78) . "\n";
+
+    list($schemaSql, $err, $schemaMeta) = $dumper->dumpSchema();
+    if ($err !== '') {
+        fwrite(STDERR, "[migrate] فشل توليد المخطّط: {$err}\n");
+        return 1;
+    }
+    echo "  ✔ المخطّط: {$schemaMeta['tables']} جدولًا · {$schemaMeta['views']} منظورًا\n";
+
+    list($seedSql, $err, $seedMeta) = $dumper->dumpSeed();
+    if ($err !== '') {
+        fwrite(STDERR, "[migrate] فشل توليد البذرة: {$err}\n");
+        return 1;
+    }
+    echo "  ✔ البذرة: {$seedMeta['rows']} صفًّا في " . count($seedMeta['tables']) . " جدولًا\n";
+    foreach ($seedMeta['tables'] as $t => $n) {
+        printf("      %-26s %s\n", $t, $n);
+    }
+
+    $files = array(
+        'schema.sql'         => $schemaSql,
+        'seed_reference.sql' => $seedSql,
+    );
+    $manifest = $dumper->manifest($files, array(
+        'schema' => $schemaMeta,
+        'seed'   => $seedMeta,
+    ));
+    $files['MANIFEST.json'] = json_encode(
+        $manifest,
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    ) . "\n";
+
+    foreach ($files as $name => $content) {
+        $path = SCHEMA_DIR . '/' . $name;
+        if (file_put_contents($path, $content) === false) {
+            fwrite(STDERR, "[migrate] تعذّرت كتابة {$name}\n");
+            return 1;
+        }
+        printf("  ✔ %-20s %s ك.ب\n", $name, number_format(strlen($content) / 1024, 1));
+    }
+
+    echo str_repeat('─', 78) . "\n";
+    echo "اكتمل. راجع الفرق بـ git diff قبل الالتزام.\n";
+    return 0;
+}
+
 function cmd_help()
 {
     echo "مُشغِّل الترحيلات — الاستخدام:\n";
@@ -559,7 +639,8 @@ function cmd_help()
     echo "  php database/migrate.php up [--dry-run]\n";
     echo "  php database/migrate.php mark-applied <filename>|--all-pending\n";
     echo "  php database/migrate.php baseline\n";
-    echo "الدليل: docs/MIGRATIONS_GUIDE_ar.md\n";
+    echo "  php database/migrate.php dump-schema     # يولّد database/schema/ للمُثبِّت\n";
+    echo "الدليل: docs/MIGRATIONS_GUIDE_ar.md · التثبيت: docs/INSTALL_ar.md\n";
     return 0;
 }
 
@@ -582,6 +663,8 @@ switch ($command) {
         exit(cmd_mark_applied($conn, $argv[2]));
     case 'baseline':
         exit(cmd_baseline($conn));
+    case 'dump-schema':
+        exit(cmd_dump_schema($conn));
     default:
         exit(cmd_help());
 }

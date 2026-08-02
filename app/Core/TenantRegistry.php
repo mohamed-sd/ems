@@ -510,6 +510,79 @@ class TenantRegistry
         'approval_requests' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_steps' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_workflow_rules' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        // ── update0004 · ORG-01 §7 (هجرة 2026-08-02): الهيكلُ التشغيليُّ والتكليفات ──
+        // الوحداتُ والتكليفاتُ بياناتُ مستأجرٍ بcompany_id؛ والأنواعُ كتالوجٌ مشترك؛
+        // والأبناءُ (صلاحياتٌ وخطوطٌ وسجلٌّ) يُعزلون عبر أبيهم org_assignments.
+        'org_units' => array('type' => self::T_TENANT, 'soft' => false),
+        'org_assignment_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        'org_assignments' => array('type' => self::T_TENANT, 'soft' => false),
+        'assignment_capabilities' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑤
+        'assignment_reporting_lines' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑦: خطا التبعية
+        'assignment_audit' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑧: Insert-only
+        'v_org_unit_heads' => array('type' => self::T_TENANT, 'soft' => false), // ORG-02: الاشتقاق للقراءة
+        // ── update0004 · ORG-01 §5/§7: الأذونات المشتركة ──
+        'permit_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        'permit_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'permit_required_approvals' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permit_types', 'fk' => 'permit_type_code'), // مصفوفة §5 منمذَجة
+        'permit_approval_actions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permit_requests', 'fk' => 'req_id'),
+        'permit_status_history' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permit_requests', 'fk' => 'req_id'), // Insert-only
+        // ── update0004 · SEC-01 §12/§15 (هجرة 2026-08-02): الشؤون الوظيفية ──
+        // الشخص عابر للكيانات (حساب واحد عبر المنصة §14) فهو عام؛ والعلاقات
+        // والمراكز والاستثناءات والمنح والسجلات بياناتُ مستأجرٍ بcompany_id؛
+        // والقواميس والقوالب والسياسات كتالوجات سياسة عامة.
+        'persons' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'person_relationships' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_dictionaries' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'person_positions' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_templates' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'permission_template_versions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_templates', 'fk' => 'tpl_id'),
+        'template_permissions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_template_versions', 'fk' => 'template_version_id'),
+        'permission_exceptions' => array('type' => self::T_TENANT, 'soft' => false),
+        'sensitive_access_grants' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_change_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_approval_steps' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_change_requests', 'fk' => 'req_id'),
+        'sod_conflicts' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'guard_override_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'sensitive_field_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'effective_permissions' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_audit_events' => array('type' => self::T_TENANT, 'soft' => false), // Insert-only
+        'permission_review_cycles' => array('type' => self::T_TENANT, 'soft' => false),
+        'permission_review_lines' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'permission_review_cycles', 'fk' => 'cycle_id'), // Insert-only
+        'founding_mode' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // sensitive_read_log مسجَّل أعلاه سلفًا (T_RESTRICTED · LEG-01 §9) — والجدول أُنشئ في هجرة 2026-08-02
+        'perm_shadow_diffs' => array('type' => self::T_TENANT, 'soft' => false), // SEC-29: ميزان صفر الفرق 14 يومًا
+        'ems_job_queue' => array('type' => self::T_TENANT, 'soft' => false), // N-24: الطابور — «قيد المعالجة» ثم إشعار
+        'ems_sessions' => array('type' => self::T_RESTRICTED, 'soft' => false), // NFR-13: مخزن الجلسات — معالج PHP حصرًا لا البوابة
+        'uat_runs' => array('type' => self::T_TENANT, 'soft' => false), // UAT-02: جولات التجربة
+        'uat_evidence' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'uat_runs', 'fk' => 'run_id'), // UAT-14: الشواهد
+        // ── update0004 · TKT-01 v1.1 (هجرة 2026-08-02): المسارات المتوازية ──
+        'ticket_type_workstreams' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_types', 'fk' => 'ticket_type_id'), // §12: التفعيل الشرطي
+        'ticket_workstreams' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'), // المسار وحدة العمل
+        'ticket_holds' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_workstreams', 'fk' => 'ws_id'),
+        'ticket_escalations' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_workstreams', 'fk' => 'ws_id'), // Insert-only
+        'ticket_participants' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'),
+        'ticket_responses' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'),
+        'ticket_effects' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'ticket_workstreams', 'fk' => 'ws_id'),
+        'ticket_communications' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'tickets', 'fk' => 'tk_id'),
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */

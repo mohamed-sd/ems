@@ -190,8 +190,19 @@ foreach (array_keys($company_ids) as $cid) {
     tkt_gate_override(null);
 }
 
+// update0004 · TKT-10: مراقب مهل المسارات المتوازية — تصعيد آلي كل دورة
+// (ResponseBreached·ResolveBreached·hold_overdue) بساعة القاعدة
+require_once __DIR__ . '/../app/Services/Tickets/SlaMonitor.php';
+$slaTotals = array('response_breach' => 0, 'resolve_breach' => 0, 'hold_overdue' => 0);
+foreach ($company_ids as $cid) {
+    $slaR = \App\Services\Tickets\SlaMonitor::run($conn, (int) $cid);
+    foreach ($slaTotals as $k => $v) { $slaTotals[$k] += (int) $slaR[$k]; }
+}
+
 $summary = "[tickets-cron] companies=" . count($company_ids)
-    . " reminders=$n_remind escalations=$n_escal recurring=$n_recur\n";
+    . " reminders=$n_remind escalations=$n_escal recurring=$n_recur"
+    . " ws_sla=" . $slaTotals['response_breach'] . '/' . $slaTotals['resolve_breach']
+    . '/' . $slaTotals['hold_overdue'] . "\n";
 echo $summary;
 if (function_exists('log_security_event')) {
     log_security_event('tickets_cron_run', trim($summary));

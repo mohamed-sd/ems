@@ -65,6 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'open') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve') {
     if (!$can_edit) { $redirect('الاعتمادُ ليد الإجازة — لا صلاحية ❌'); }
+    // ORG-13 · حارس الأذونات: خروج عامل نهائيًّا — الحركة + الموارد البشرية (ORG-01 §5-⑨)
+    require_once dirname(__DIR__) . '/includes/permit_gate.php';
+    $pg = ems_permit_gate($conn, $company_id, 'worker_final_exit',
+        'FS:' . intval($_POST['settlement_id'] ?? 0), 0, $uid);
+    if (!$pg['ok']) { $redirect($pg['reason'] . ' ❌'); }
     $r = FS::approve($conn, $gate, $company_id, intval($_POST['settlement_id'] ?? 0),
                      strval($_POST['clearance_doc'] ?? ''), $uid);
     $redirect($r['ok']

@@ -364,6 +364,9 @@ include '../insidebar.php';
   );
   $header_back = array();
   include('../includes/page_header.php');
+  // TKT-15 · زر الإبلاغ السياقي — الاعتمادات (§2-⑥)
+  require_once __DIR__ . '/../includes/report_button.php';
+  ems_report_button(array('screen' => 'approvals'));
   ?>
 
   <?php /* E-08-أ: موضعُ الأسباب المفصَّلة للصفوف الموقوفة — يملؤه renderBlocked()

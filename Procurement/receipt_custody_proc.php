@@ -89,6 +89,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
             'qty'       => (float)($qtys[$i] ?? 1),
         );
     }
+    // ORG-13 · حارس الأذونات: دخول مشتريات للموقع/المخزن (ORG-01 §5-⑤)
+    if (!$is_editing) {
+        require_once dirname(__DIR__) . '/includes/permit_gate.php';
+        $pg = ems_permit_gate($conn, $company_id, 'material_site_entry',
+            'RCPT:' . ($order_id ?: 'direct'), 0, intval($current_user_id ?? 0));
+        if (!$pg['ok']) { header('Location: receipt_custody_proc.php?msg=' . rawurlencode($pg['reason'] . ' ❌')); exit(); }
+    }
+
     try {
         $g = proc_gate(false);
         if ($is_editing) {
