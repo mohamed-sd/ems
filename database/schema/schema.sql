@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-01 23:58:45
+-- المصدر: equipation_manage · التوليد: 2026-08-02 00:13:38
 -- الجداول: 354 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -4343,6 +4343,7 @@ CREATE TABLE `legal_entities` (
 CREATE TABLE `link_groups` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم المجموعة كما يظهر في السايدبار',
+  `group_code` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'NAV-01 §4: g1..g8 — المجموعات القياسية',
   `owner_role_id` int DEFAULT NULL COMMENT 'الدور المالك — نفس دلالة modules.owner_role_id',
   `icon` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'fa fa-folder',
   `display_order` int NOT NULL DEFAULT '0' COMMENT 'الأصغر يظهر أولاً',
@@ -4350,6 +4351,7 @@ CREATE TABLE `link_groups` (
   PRIMARY KEY (`id`),
   KEY `ix_owner_role` (`owner_role_id`),
   KEY `ix_display_order` (`display_order`),
+  KEY `idx_lg_code` (`owner_role_id`,`group_code`),
   CONSTRAINT `link_groups_role_fk` FOREIGN KEY (`owner_role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='مجموعات روابط السايدبار — لكل دورٍ مجموعاته';
 
