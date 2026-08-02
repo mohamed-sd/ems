@@ -113,22 +113,76 @@ $rolesWith = array_column(q($conn, "SELECT DISTINCT role_id FROM nav_items WHERE
 $noSurface = array_values(array_diff($rolesAll, $rolesWith));
 $out[] = array('⑩','إداراتٌ (أدوارٌ) بلا سطح بلاغات', count($noSurface), true, array_map(fn($r)=>"دور $r", $noSurface));
 
-/* ── ⑪ ملكيةُ الشاشة: الغريبُ غيرُ المصنَّف (من مصفوفة المالك) ──────────── */
-// الغريبُ المصنَّفُ في المصفوفة بأحد الإجراءات المقبولة لا يُعدّ — يُقاس المتبقي حيًّا:
-// رابطٌ معلَّمٌ غريبًا في المصفوفة وما زال في قائمة غير مالكه ولم يُصنَّف
-$matrixCsv = $root . '/docs/nav02/matrix_delta.csv';
-$strangeLeft = array();
-if (is_file($matrixCsv)) {
-    foreach (array_slice(file($matrixCsv), 1) as $line) {
-        $c = str_getcsv($line);
-        if (($c[3] ?? '') === 'strange_unresolved') $strangeLeft[] = $c[0];
+/* ── ⑪ صفُّ العرض (ACT-01 v6): ظهورٌ لغير المالك بلا صفٍّ في المصفوفة ──── */
+// خريطةُ الدور ← إدارتُه المستهدفة (أدوارُ الإدارات المالكة)
+$roleDept = array(1=>'التشغيل',6=>'إدارة الموقع',13=>'الصيانة',23=>'النقل والترحيل',
+ 16=>'سلسلة الإمداد — المشتريات',25=>'سلسلة الإمداد — المخازن',12=>'المبيعات والعقود',
+ 17=>'المالية',26=>'التمويل والملكية',3=>'الأسطول',2=>'الموردون',4=>'الموارد البشرية',
+ 15=>'الحوكمة والالتزام',24=>'مركز البلاغات',27=>'المشغّلون والقوى التشغيلية');
+$svr = array();      // route → [dept => role_kind]
+foreach (q($conn, "SELECT route, dept, role_kind FROM screen_view_rows WHERE active=1 AND route IS NOT NULL") as $v)
+    $svr[strtolower(trim($v['route']))][$v['dept']] = $v['role_kind'];
+$noViewRow = array();
+foreach (q($conn, "SELECT n.route, n.role_id FROM nav_items n WHERE n.active=1") as $n) {
+    $rid = intval($n['role_id']);
+    if (!isset($roleDept[$rid])) continue;            // الأدوارُ الفرعيةُ تتبع مالكها
+    $rt = strtolower(trim($n['route']));
+    if ($rt === 'main/my_workspace.php') continue;    // حاويةُ مساحة عملي — فوق الإدارات لا فيها
+    if (!isset($svr[$rt])) continue;                  // شاشةٌ خارج مصفوفة العرض (ثوابت/جديدة)
+    $dept = $roleDept[$rid];
+    $kinds = $svr[$rt];
+    if (isset($kinds['مساحة عملي'])) continue;        // عنصرُ مساحةِ عملي — لا صفَّ إدارةٍ له
+    if (isset($kinds[$dept])) continue;               // له صفٌّ (مالكًا أو عارضًا)
+    if (in_array('owner', $kinds, true) && count($kinds) === 1
+        && array_key_first($kinds) === $dept) continue;
+    // ظهورٌ عند إدارةٍ ليست مالكةً وبلا صفِّ عرضٍ معلن
+    if (!in_array('owner', array(($kinds[$dept] ?? '')), true) && !isset($kinds[$dept]))
+        $noViewRow[] = $n['route'] . ' @ ' . $dept;
+}
+$noViewRow = array_unique($noViewRow);
+$out[] = array('⑪','ظهورٌ لغير المالك بلا صفِّ عرض', count($noViewRow), true, array_slice($noViewRow,0,12));
+
+/* ── ⑫ لا احتكار (ACT-01 v6): ذو مصلحةٍ معلَنٍ بلا ظهورٍ حي — تنبيه ─────── */
+$deptRole = array_flip($roleDept);
+$liveRoleRoutes = array();
+foreach (q($conn, "SELECT DISTINCT role_id, route FROM nav_items WHERE active=1") as $n)
+    $liveRoleRoutes[intval($n['role_id'])][strtolower(trim($n['route']))] = 1;
+$monopoly = array();
+foreach (q($conn, "SELECT route, dept FROM screen_view_rows WHERE active=1 AND role_kind='viewer' AND route IS NOT NULL") as $v) {
+    $rid = $deptRole[$v['dept']] ?? null;
+    if ($rid === null) continue;
+    $rt = strtolower(trim($v['route']));
+    if (!isset($liveRoleRoutes[$rid][$rt])) $monopoly[] = $v['route'] . ' ← ' . $v['dept'];
+}
+$out[] = array('⑫','ذو مصلحةٍ معلَنٍ بلا ظهورٍ حي (تنبيه)', count($monopoly), false, array_slice($monopoly,0,10));
+
+/* ── ⑬ إنجازي وبوابتي (ACT-01 v6): لكل حسابٍ بلا استثناء ────────────────── */
+$wsrc = @file_get_contents($root . '/main/my_workspace.php') ?: '';
+$missA = (mb_strpos($wsrc, 'إنجازي') === false) ? 1 : 0;
+$missG = (mb_strpos($wsrc, 'بوابتي') === false) ? 1 : 0;
+$out[] = array('⑬','إنجازي وبوابتي غائبان عن مساحة عملي', $missA + $missG, true,
+               array_filter(array($missA ? 'إنجازي غائب' : '', $missG ? 'بوابتي غائب' : '')));
+
+/* ── التقرير — بمقاماتِ تغطيةٍ موجبة (ACT-01 v6 §5.1) ───────────────────── */
+$fail = 0;
+echo "════ فحوصُ الاتصال الثلاثةَ عشرَ — ACT-01 v6 §5 ════\n";
+// «صفرُ الأزرار المستخرجة يعني أن الماسحَ لم يعمل لا أن النظامَ نظيف»
+$denomButtons = 0;
+foreach ($dirs as $d) {
+    $base = basename($d);
+    if (in_array($base, array('vendor','node_modules','database','docs','tools','logs','app','tests','.git','.claude','.ssdiff'))) continue;
+    foreach (glob($d . '/*.php') as $f) {
+        $src = @file_get_contents($f); if ($src === false) continue;
+        if (preg_match_all('~["\'](?:\.\./)?[A-Za-z_][\w/]*/(?:[\w]*handler[\w]*|get_[\w]+)\.php~u', $src, $mm)) $denomButtons += count($mm[0]);
     }
 }
-$out[] = array('⑪','روابطُ غريبةٌ غيرُ مصنَّفة', count($strangeLeft), true, array_slice($strangeLeft,0,15));
-
-/* ── التقرير ─────────────────────────────────────────────────────────────── */
-$fail = 0;
-echo "════ فحوصُ الاتصال الأحدَ عشرَ — ACT-01 §5 ════\n";
+$denomActions = count(q($conn, "SELECT action_code FROM actions WHERE active=1"));
+$denomNav     = count(q($conn, "SELECT id FROM nav_items WHERE active=1"));
+$denomSvr     = count(q($conn, "SELECT svr_id FROM screen_view_rows WHERE active=1"));
+printf("مقاماتُ التغطية (موجبةٌ لزامًا): استدعاءاتُ أزرار=%d · أفعال=%d · روابط=%d · صفوفُ عرض=%d\n",
+       $denomButtons, $denomActions, $denomNav, $denomSvr);
+if ($denomButtons === 0 || $denomActions === 0 || $denomNav === 0)
+    { echo "✘ مقامٌ صفري — الماسحُ لم يعمل\n"; $fail++; }
 foreach ($out as $o) {
     list($n, $name, $cnt, $blocking, $details) = $o;
     $mark = $cnt === 0 ? '✔' : ($blocking ? '✘' : '⚠');
