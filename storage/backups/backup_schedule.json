@@ -1,0 +1,9 @@
+{
+    "enabled": false,
+    "interval_days": 1,
+    "retention": 14,
+    "last_run_at": null,
+    "last_status": null,
+    "last_message": null,
+    "last_file": null
+}

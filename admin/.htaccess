@@ -21,6 +21,16 @@ RewriteRule ^bus-monitor/?$            bus_monitor.php            [L,QSA]
 RewriteRule ^reports-permissions/?$    reports_permissions.php    [L,QSA]
 RewriteRule ^settings/?$               settings.php               [L,QSA]
 
+# ═══════════════════════════════════════════════════════════════════════════
+# حدُّ رفع أكبر — مقصورٌ على لوحة السوبر أدمن (استيراد قاعدة بيانات).
+# يتجاوز الحدَّ العام (6M في .htaccess الجذر) لهذا المجلد وحده. mod_php يقرأ
+# .htaccess مع كل طلب فيسري فورًا بلا إعادة تشغيل؛ بقيّة التطبيق تبقى على 6M.
+# ═══════════════════════════════════════════════════════════════════════════
+<IfModule php_module>
+    php_value upload_max_filesize 256M
+    php_value post_max_size 256M
+</IfModule>
+
 # Sensitive one-time setup script must only be accessed locally
 <Files "setup_once.php">
 	Require local

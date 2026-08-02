@@ -20,6 +20,13 @@ try {
     if (isset($_bp[0]['c'])) { $_admin_pending_badge = intval($_bp[0]['c']); }
 } catch (\Throwable $t) { error_log('admin/layout_head badge: ' . $t->getMessage()); }
 
+// الشبكة الاحتياطية للنسخ الاحتياطي المجدوَل — إن حان موعد نسخةٍ أطلقها في الخلفية
+// (غير حاجبة للصفحة) تعويضًا عن أي تشغيلٍ فائتٍ لمهمّة النظام. رخيصةٌ حين لا موعد.
+require_once __DIR__ . '/db_tools.php';
+if (function_exists('ems_dbtool_lazy_tick')) {
+    ems_dbtool_lazy_tick();
+}
+
 $_admin_nav = [
     ['slug' => 'dashboard',     'label' => 'لوحة التحكم',    'icon' => 'fa-gauge-high',        'url' => 'dashboard'],
     ['slug' => 'managers',      'label' => 'إدارة المدراء',   'icon' => 'fa-user-shield',       'url' => 'managers'],
