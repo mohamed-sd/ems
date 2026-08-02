@@ -1,4 +1,4 @@
-# N-26 · جاهزية البنية — تقرير الفحص الحاكم والقياسات (2026-08-02 03:27:00)
+# N-26 · جاهزية البنية — تقرير الفحص الحاكم والقياسات (2026-08-02 08:01:11)
 
 ## NFR-11 · الفحص الحاكم — يتصدر كل بند
 
@@ -27,7 +27,7 @@ opcache.revalidate_freq=60
 ## NFR-13 · الجلسات إلى مخزن مشترك
 
 - الحالة: **ملفات — والبنية جاهزة للقلب** · جدول `ems_sessions`: قائم ✔
-- المعالج `includes/session_bootstrap.php` محمَّل عبر `auto_prepend_file` في `.htaccess` قبل كل `session_start()` — **القلب: `EMS_SESSION_STORE=db` والرجوع قلبه عكسًا** (فلا يقفل ملفُ جلسةٍ طلباتِ المستخدم المتوازية).
+- المعالج `includes/session_bootstrap.php` مطلوبٌ بـ`require_once` نسبيًّا (`__DIR__`) قبل كل `session_start()` في الصفحات — **القلب: `EMS_SESSION_STORE=db` والرجوع قلبه عكسًا** (فلا يقفل ملفُ جلسةٍ طلباتِ المستخدم المتوازية). كان يُحقن بـ`auto_prepend_file` بمسارٍ مطلقٍ في `.htaccess` فكان المشروع لا يعمل إلا من ذلك المسار بعينه.
 
 ## NFR-14 · اتصالات القاعدة وسجل البطيء
 
@@ -60,7 +60,7 @@ slow_query_log_file="ems-slow.log"
 | النقل الآلي للتناوب | 23:30 | `php Operations/cron_rotation_transfer.php` |
 
 ```bat
-REM جدولة وندوز (تُنفَّذ بيد المشغّل — أمثلة جاهزة):
-schtasks /Create /TN EMS\JobWorker /SC MINUTE /MO 5 /TR "C:\wamp64\bin\php\php8.2.30\php.exe C:\wamp64\www\ems\Operations\cron_job_worker.php 10"
-schtasks /Create /TN EMS\NightlyOrg /SC DAILY /ST 22:15 /TR "C:\wamp64\bin\php\php8.2.30\php.exe C:\wamp64\www\ems\Operations\cron_org_assignments.php"
+REM جدولة وندوز (تُنفَّذ بيد المشغّل — أمثلة مبنية على مسار هذا الجهاز):
+schtasks /Create /TN EMS\JobWorker /SC MINUTE /MO 5 /TR "C:\wamp64\bin\php\php8.0.30\php.exe C:\wamp64\www\ems\Operations\cron_job_worker.php 10"
+schtasks /Create /TN EMS\NightlyOrg /SC DAILY /ST 22:15 /TR "C:\wamp64\bin\php\php8.0.30\php.exe C:\wamp64\www\ems\Operations\cron_org_assignments.php"
 ```

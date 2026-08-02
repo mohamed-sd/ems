@@ -65,7 +65,7 @@ $md .= "| MaxRequestWorkers | " . ($workers ?? 'غير مقيس') . " | ضبط �
 $md .= "```ini\n; php.ini — توجيهات جاهزة (تطبيقها إعادة تشغيل أباتشي — قرار تشغيل):\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=16\nopcache.max_accelerated_files=20000\nopcache.validate_timestamps=1\nopcache.revalidate_freq=60\n```\n\n";
 $md .= "## NFR-13 · الجلسات إلى مخزن مشترك\n\n";
 $md .= "- الحالة: **" . ($sessStore === 'db' ? 'قاعدة (مفعَّل)' : 'ملفات — والبنية جاهزة للقلب') . "** · جدول `ems_sessions`: " . ($sessReady ? 'قائم ✔' : 'غائب') . "\n";
-$md .= "- المعالج `includes/session_bootstrap.php` محمَّل عبر `auto_prepend_file` في `.htaccess` قبل كل `session_start()` — **القلب: `EMS_SESSION_STORE=db` والرجوع قلبه عكسًا** (فلا يقفل ملفُ جلسةٍ طلباتِ المستخدم المتوازية).\n\n";
+$md .= "- المعالج `includes/session_bootstrap.php` مطلوبٌ بـ`require_once` نسبيًّا (`__DIR__`) قبل كل `session_start()` في الصفحات — **القلب: `EMS_SESSION_STORE=db` والرجوع قلبه عكسًا** (فلا يقفل ملفُ جلسةٍ طلباتِ المستخدم المتوازية). كان يُحقن بـ`auto_prepend_file` بمسارٍ مطلقٍ في `.htaccess` فكان المشروع لا يعمل إلا من ذلك المسار بعينه.\n\n";
 $md .= "## NFR-14 · اتصالات القاعدة وسجل البطيء\n\n";
 $md .= "| القياس | القيمة | المطلوب |\n|---|---|---|\n";
 $md .= "| max_connections | {$maxConn} | " . ($neededConn !== null ? "≥ {$neededConn} (العمال {$workers} + 20%)" : 'العمال + 20%') . ($neededConn !== null && $maxConn < $neededConn ? ' — **ناقص**' : ' ✔') . " |\n";

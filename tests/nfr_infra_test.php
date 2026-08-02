@@ -39,8 +39,35 @@ check($h->read($id) === 'user|s:4:"test";', 'قراءة الجلسة');
 check($h->destroy($id) === true, 'إتلافها');
 $h->gc(1);
 $h->close();
+// المعالج كان يُحقن بـauto_prepend_file بمسارٍ مطلق يكسر المشروع في أي مسارٍ آخر؛
+// صار require_once يسبق كل session_start(). الحارسُ يحرس الأمرين معًا.
 $ht = file_get_contents(dirname(__DIR__) . '/.htaccess');
-check(mb_strpos($ht, 'session_bootstrap.php') !== false, 'auto_prepend_file موصول في .htaccess');
+check(!preg_match('/^\s*php_value\s+auto_prepend_file/mi', $ht) && !preg_match('/[A-Za-z]:[\\\\\/]/', $ht),
+    '.htaccess خالٍ من auto_prepend_file ومن أي مسارٍ مطلق');
+
+$appRoot = dirname(__DIR__);
+$missing = array(); $unresolved = array(); $scanned = 0;
+$walk = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($appRoot, FilesystemIterator::SKIP_DOTS));
+foreach ($walk as $file) {
+    $p = str_replace('\\', '/', $file->getPathname());
+    if (substr($p, -4) !== '.php' || preg_match('#/(\.git|\.claude|vendor|node_modules|storage)/#', $p)) { continue; }
+    $src = file_get_contents($p);
+    // سطرٌ مستقلٌّ فقط — لا معلَّقٌ (//session_start();) ولا نصٌّ داخل سلسلة.
+    // وإزاحةُ البايتات لا الحروف: preg_match بايتيّة، وmb_strpos تكذب مع العربية.
+    if (!preg_match('/^[ \t]*session_start\(\);/m', $src, $ms, PREG_OFFSET_CAPTURE)) { continue; }
+    $posSession = $ms[0][1];
+    $scanned++;
+    if (!preg_match("#require_once __DIR__ \. '([^']+session_bootstrap\.php)'#", $src, $m, PREG_OFFSET_CAPTURE)) {
+        $missing[] = $p; continue;
+    }
+    if ($m[0][1] > $posSession)                          { $missing[] = $p; }
+    if (realpath(dirname($p) . $m[1][0]) === false)      { $unresolved[] = $p; }
+}
+check($scanned > 200, "صفحاتُ الجلسة ممسوحة ({$scanned} ملفًا)");
+check(empty($missing), 'المعالجُ مطلوبٌ قبل session_start() في كل صفحة' .
+    (empty($missing) ? '' : ' — ينقص: ' . implode(', ', array_slice($missing, 0, 5))));
+check(empty($unresolved), 'كلُّ مسارات require تُحَل نسبيًّا (__DIR__) — لا مسارَ مثبَّتًا' .
+    (empty($unresolved) ? '' : ' — مكسور: ' . implode(', ', array_slice($unresolved, 0, 5))));
 check(strtolower((string) ems_env('EMS_SESSION_STORE', 'files')) === 'files',
     'العلم files افتراضًا — القلب قرار تشغيل بعد لقطة (§1.3)');
 

@@ -172,6 +172,29 @@ class TimesheetEntryService
                          'warnings' => array());
         }
 
+        // ── CAP-31/32 (§12.1 · UX-03): مفاتيحُ الربط تُجلب آليًّا عند الإدخال ──
+        // ولا يُدخل المستخدمُ ما يعرفه النظام. وخلف قائمة مواقع EMS_CONTAINER_GATE
+        // نفسِها بوضعها: enforce = التخصيصاتُ الناقصةُ تمنع الفتحَ بقائمة الناقص
+        // وروابطِه · monitor = تُقاس وتُسجَّل وتمرّ (فخُّ E-08: لا قلبةَ على الجميع).
+        require_once __DIR__ . '/../Capacity/CapacityContextResolver.php';
+        $capKeys = null;
+        $capCtx = \App\Services\Capacity\CapacityContextResolver::resolve($gate, $companyId, array(
+            'contract_id' => (int) $drv['contract_id'], 'equipment_id' => $equipmentId,
+            'entry_date' => $date, 'unit_type' => $unitType,
+        ));
+        if ($capCtx['resolved']) {
+            $capKeys = $capCtx['keys'];
+        } elseif (\App\Services\Operations\ContainerGate::isEnabledFor((int) $drv['project_id'])) {
+            if (\App\Services\Operations\ContainerGate::mode() === 'enforce') {
+                return array('ok' => false, 'code' => 422,
+                             'reasons' => $capCtx['missing'],
+                             'blocked' => array_map(null, $capCtx['missing'], $capCtx['links']),
+                             'links' => $capCtx['links'], 'warnings' => array());
+            }
+            error_log('CAP-32 monitor: تخصيصاتٌ ناقصةٌ لواقعة معدة#' . $equipmentId . ' يوم ' . $date
+                . ' — ' . implode(' | ', $capCtx['missing']));
+        }
+
         $state = (isset($input['state']) && $input['state'] === 'draft') ? 'draft' : 'submitted';
         $basis = (isset($input['record_basis']) && $input['record_basis'] === 'analytical')
                ? 'analytical' : 'contract';
@@ -179,7 +202,7 @@ class TimesheetEntryService
         $entryId = 0;
         $gate->runInTransaction(function ($g) use (&$entryId, $conn, $companyId, $equipmentId,
             $date, $shift, $qty, $unitType, $basis, $state, $sourceRef, $syncUuid, $drv,
-            $input, $actor, $timeLines) {
+            $input, $actor, $timeLines, $capKeys) {
 
             $row = array(
                 // عنصرٌ نائبٌ فريدٌ لا يتصادم تحت التزامن — يُستبدل بالهوية النهائية فورًا
@@ -200,6 +223,10 @@ class TimesheetEntryService
                 'entered_by'           => (int) $actor ?: null,
             );
             if ($syncUuid !== '') { $row['sync_uuid'] = $syncUuid; }
+            // CAP-31: المفاتيحُ الثمانيةُ مقترحةً مع الإدراج — تُعرض للتأكيد لا للإدخال
+            if ($capKeys !== null) {
+                $row = array_merge($row, $capKeys, array('cap_context_state' => 'proposed'));
+            }
             $entryId = (int) $g->insert('unit_entries', $row);
             if ($entryId <= 0) { throw new \RuntimeException('TimesheetEntryService: فشل إدراج الواقعة'); }
 
@@ -355,21 +382,27 @@ class TimesheetEntryService
             $g->update('unit_entries', array('state' => $newState), array('id' => $entryId));
         }, 'unit-entry-approve');
 
-        // ── H-01 ③: **الاستهلاكُ عند اعتماد الموقع لا عند الإدخال** ──────────
-        // الواقعةُ أُقرّت فحينئذٍ تُخصم من سلسلة حاوياتها. ومفتاحُ العطالة يحمل
-        // **الجولة** (`entry:{id}:r{round}`)، فالاعتمادُ المكرَّرُ في الجولة نفسِها
-        // لا يخصم مرتين، والجولةُ الجديدةُ بعد إعادةٍ خصمٌ جديدٌ بمفتاحٍ جديد.
-        // ويقع **بعد** نجاح المعاملة: لا يُخصم من حاويةٍ لواقعةٍ لم تُعتمد.
-        if ($stage === 'site') {
+        // ── CAP-34 (§12 — التصحيحُ الحاكم): **الاستهلاكُ عند اكتمال سلسلة
+        // الاعتماد لا قبله** — لا عند الإدخال ولا عند اعتماد الموقع وحدَه.
+        // «اعتمادُ الموقع يُثبت أن الواقعةَ جرت» ثم أحكامُ الأطراف، وباكتمال
+        // السلسلة (sales_approved) تقع الكتاباتُ: اللقطةُ تُثبَّت (CAP-33 · C29)
+        // ثم الخصمُ من الحاويات (ContainerGate::consumeForEntry — كان عند اعتماد
+        // الموقع في H-01 وصحّحته CAP-01 §12). المسودةُ والمرفوضةُ والمعادةُ
+        // صفرُ سطرٍ بالبناء (C22 · C23). ومفتاحُ العطالة يحمل الجولةَ فلا خصمَ
+        // مرتين، ويقع بعد نجاح معاملة الاعتماد.
+        if ($newState === 'sales_approved') {
             try {
                 require_once __DIR__ . '/../Operations/ContainerGate.php';
+                require_once __DIR__ . '/../Capacity/CapacityContextResolver.php';
                 $fresh = self::rawEntry($conn, $companyId, $entryId);
                 if ($fresh) {
+                    // CAP-33: تثبيتُ اللقطة — revision_no هو النسخة ولا تُحلّ ثانيةً
+                    \App\Services\Capacity\CapacityContextResolver::lockSnapshot($gate, $entryId);
                     \App\Services\Operations\ContainerGate::consumeForEntry($conn, $gate, $companyId, $fresh);
                 }
             } catch (\Throwable $t) {
                 // الخصمُ أثرٌ تابعٌ لا شرطُ صحةٍ للاعتماد — يُسجَّل ولا يُسقطه
-                error_log('container consume on site approve #' . $entryId . ': ' . $t->getMessage());
+                error_log('capacity consume on chain completion #' . $entryId . ': ' . $t->getMessage());
             }
         }
 

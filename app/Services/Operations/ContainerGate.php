@@ -271,7 +271,10 @@ class ContainerGate
                 'source_kind' => 'unit_entry', 'source_ref' => (int) $entry['id'],
                 'unit_type'   => (string) $entry['unit_type'],
                 'consumed_on' => (string) $entry['entry_date'],
-                'note'        => 'اعتمادُ الموقع — الجولة ' . $round,
+                'note'        => 'اكتمالُ سلسلة الاعتماد — الجولة ' . $round,
+                // CAP-31/33: النسخةُ والدورُ من لقطة الواقعة المثبَّتة لا من الوضع الحالي
+                'revision_no'   => isset($entry['revision_no']) ? (int) $entry['revision_no'] : null,
+                'role_snapshot' => isset($entry['cap_role_snapshot']) ? $entry['cap_role_snapshot'] : null,
             ));
         $out['ok'] = !empty($r['ok']);
         $out['skipped'] = !empty($r['existing']);

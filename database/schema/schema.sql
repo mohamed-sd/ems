@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 07:49:39
+-- المصدر: equipation_manage · التوليد: 2026-08-02 07:58:37
 -- الجداول: 365 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -8318,6 +8318,15 @@ CREATE TABLE `unit_entries` (
   `superseded_by_id` int unsigned DEFAULT NULL COMMENT 'مؤشرٌ أماميٌّ إلى المراجعة الخالفة',
   `converted_at` datetime DEFAULT NULL COMMENT 'لحظة التحوّل المالي',
   `event_id` int unsigned DEFAULT NULL COMMENT 'الحدث الجذري (D04) — مرجعٌ مرن',
+  `cap_obligation_id` int unsigned DEFAULT NULL COMMENT '§12.1-①: التزامُ النوع المستهلَك — contract_commitments.id (لقطة)',
+  `cap_supplier_share_id` int unsigned DEFAULT NULL COMMENT '§12.1-②: حصةُ المورد المنفَّذُ منها — op_containers درجة «مورد»',
+  `cap_seat_id` int unsigned DEFAULT NULL COMMENT '§12.1-③: المقعدُ التعاقدي — op_containers درجة «معدة»',
+  `cap_assignment_id` int unsigned DEFAULT NULL COMMENT '§12.1-④: فترةُ إسناد المعدة — seat_assignments.id',
+  `cap_supplier_line_id` int DEFAULT NULL COMMENT '§12.1-⑤: بندُ عقد المورد الذي يُحتسب به',
+  `cap_role_snapshot` enum('primary','standby') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '§12.1-⑥: أساسيةٌ أم احتياطيةٌ مفعَّلة لحظةَ الواقعة — ولو تغيّر الدورُ لاحقًا',
+  `cap_coverage_id` bigint unsigned DEFAULT NULL COMMENT '§12.1-⑦: إن كانت تغطيةً بديلة — substitute_coverages.cov_id',
+  `cap_measure_code` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '§12.1-⑧: المقياس — فلا يُخصم الطنُّ من حصة ساعات',
+  `cap_context_state` enum('proposed','confirmed','locked') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '§12.1: مقترحةٌ عند الإدخال · مؤكدةٌ من المستخدم · مقفلةٌ لقطةً عند الاعتماد فلا تُحلّ ثانيةً (C29)',
   `entered_by` int unsigned DEFAULT NULL,
   `sync_uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

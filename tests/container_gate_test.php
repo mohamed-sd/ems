@@ -178,11 +178,15 @@ $svcSrc = $svc;
 $posSubmit = mb_strpos($svcSrc, 'ContainerGate::assertReady');
 $posConsume = mb_strpos($svcSrc, 'ContainerGate::consumeForEntry');
 check($posSubmit !== false && $posConsume !== false, 'الوصلان قائمان');
-check(mb_strpos($svcSrc, 'الاستهلاكُ عند اعتماد الموقع لا عند الإدخال') !== false,
-    'والقاعدةُ منصوصةٌ في موضعها');
-check(mb_strpos($svcSrc, "if (\$stage === 'site') {\n            try {") !== false
-      || mb_strpos($svcSrc, 'consume on site approve') !== false,
-    'والخصمُ في فرع اعتماد الموقع حصرًا');
+// update0005 · CAP-01 §12 (التصحيحُ الحاكم): الاستهلاكُ عند **اكتمال سلسلة
+// الاعتماد** لا عند اعتماد الموقع — القاعدةُ القديمة (H-01 ③) صحّحتها الوثيقةُ
+// الأخصُّ والأحدث، فالشاهدُ هنا يتبعها (سجلُّ اجتهادات update0005 · J-15).
+check(mb_strpos($svcSrc, 'الاستهلاكُ عند اكتمال سلسلة\n        // الاعتماد لا قبله') !== false
+      || mb_strpos($svcSrc, 'اكتمال سلسلة') !== false,
+    'والقاعدةُ منصوصةٌ في موضعها — الاستهلاكُ عند اكتمال السلسلة (CAP-01 §12)');
+check(mb_strpos($svcSrc, "if (\$newState === 'sales_approved') {") !== false
+      && mb_strpos($svcSrc, 'consume on chain completion') !== false,
+    'والخصمُ في فرع اكتمال السلسلة حصرًا (C22: لا استهلاكَ قبله)');
 
 if ($leafRow) {
     $LID = (int) $leafRow['id'];
