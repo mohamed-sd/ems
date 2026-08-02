@@ -20,7 +20,7 @@ class TicketRouter
 {
     /** خريطة دور المسار → أنواع التكليف الحاملة له (موقعيًّا فمركزيًّا) — كمصفوفة PermitGate. */
     public static $roleTypes = array(
-        'movement' => array('site_movement_mgr'),
+        'movement' => array('site_manager'),
         'maintenance' => array('site_maintenance_officer', 'maintenance_mgr'),
         'operators' => array('site_operators_officer', 'operators_mgr'),
         'warehouse' => array('site_warehouse_keeper', 'warehouse_mgr'),
