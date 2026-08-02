@@ -74,24 +74,24 @@ $today = OAR::dbToday($conn);
 $plus1y = date('Y-m-d', strtotime($today . ' +364 days'));
 
 head('O6 — الإلزاميات 422');
-$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_movement_mgr',
+$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'scope_type' => 'site', 'scope_id' => $SITE_A,
     'valid_from' => $today, 'decided_by_person_id' => $DECIDER, 'decision_ref' => $MARK));
 check(!$r['ok'] && $r['code'] === 422, "بلا مدة → 422 ({$r['reason']})");
-$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_movement_mgr',
+$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'valid_from' => $today, 'valid_to' => $plus1y,
     'decided_by_person_id' => $DECIDER, 'decision_ref' => $MARK));
 check(!$r['ok'] && $r['code'] === 422, 'بلا نطاق → 422');
 
 head('403 — مصدر القرار غير مخوَّل');
-$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_movement_mgr',
+$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'scope_type' => 'site', 'scope_id' => $SITE_A,
     'valid_from' => $today, 'valid_to' => $plus1y,
     'decided_by_person_id' => $OUTSIDER, 'decision_ref' => $MARK));
 check(!$r['ok'] && $r['code'] === 403, "مصدر قرار غير مخوَّل → 403");
 
 head('O6-ب — الموقعي بخط واحد 422 وبخطين يُقبل');
-$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_movement_mgr',
+$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'scope_type' => 'site', 'scope_id' => $SITE_A,
     'valid_from' => $today, 'valid_to' => $plus1y, 'decided_by_person_id' => $DECIDER,
     'decision_ref' => $MARK,
@@ -107,7 +107,7 @@ $rc = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9200, 'assign
 check($rc['ok'], "تكليف مركزي مرجعي أُنشئ (#{$rc['asg_id']})");
 $CENTRAL = $rc['asg_id'];
 
-$r1 = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_movement_mgr',
+$r1 = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'scope_type' => 'site', 'scope_id' => $SITE_A,
     'valid_from' => $today, 'valid_to' => $plus1y, 'decided_by_person_id' => $DECIDER,
     'decision_ref' => $MARK, 'deputy_person_id' => 9250,
@@ -119,7 +119,7 @@ check($r1['ok'] && $r1['code'] === 201, "بخطين → 201 (#{$r1['asg_id']})")
 $ASG1 = $r1['asg_id'];
 
 head('O1 — واحد لكل موقع 409');
-$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9202, 'assignment_type_code' => 'site_movement_mgr',
+$r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9202, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'scope_type' => 'site', 'scope_id' => $SITE_A,
     'valid_from' => date('Y-m-d', strtotime($today . ' +30 days')), 'valid_to' => $plus1y,
     'decided_by_person_id' => $DECIDER, 'decision_ref' => $MARK,
