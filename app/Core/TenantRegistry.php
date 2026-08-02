@@ -505,6 +505,7 @@ class TenantRegistry
         'action_events' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8
         'event_consumers' => array('type' => self::T_GLOBAL, 'soft' => false), // ACT-01 §8: قاموسُ مستهلكي الأحداث
+        'screen_view_rows' => array('type' => self::T_GLOBAL, 'soft' => false), // NAV-01 v6 §6: مصفوفةُ العرض — قاموسُ بنيةٍ لا بياناتُ كيان
         'action_impacts' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8: خريطةُ الأثر
         'action_execution_log' => array('type' => self::T_TENANT, 'soft' => false), // ACT-01 §8: Insert-only بشركته
