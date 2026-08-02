@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 06:56:43
--- الجداول: 358 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 07:16:20
+-- الجداول: 362 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -558,6 +558,59 @@ CREATE TABLE `bank_statements` (
   CONSTRAINT `ck_stmt_closed` CHECK (((`state` <> _utf8mb4'closed') or ((`closed_at` is not null) and (`closed_by` is not null)))),
   CONSTRAINT `ck_stmt_span` CHECK ((`period_to` >= `period_from`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SPEC-01 #19 — رأسُ كشف البنك: مرجعُه ومداه ورصيداه';
+
+-- ── Table: capacity_consumption_ledger ──
+CREATE TABLE `capacity_consumption_ledger` (
+  `led_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `unit_record_id` int NOT NULL COMMENT 'سجلُّ الوحدة القانوني — unit_entries.id (§13.2)',
+  `unit_record_version` smallint NOT NULL COMMENT 'النسخة — unit_entries.revision_no؛ التصحيحُ نسخةٌ جديدةٌ بأسطرها',
+  `contract_obligation_id` int unsigned DEFAULT NULL COMMENT 'التزامُ نوع المعدة — contract_commitments.id (الهجين DEC-CAP-C)',
+  `supplier_share_id` int unsigned DEFAULT NULL COMMENT 'حصةُ المورد — op_containers.id درجة «مورد»',
+  `contract_seat_id` int unsigned DEFAULT NULL COMMENT 'المقعدُ التعاقدي — op_containers.id درجة «معدة» بseat_no',
+  `equipment_assignment_id` int unsigned DEFAULT NULL COMMENT 'فترةُ إسناد المعدة — seat_assignments.id',
+  `supplier_contract_line_id` int DEFAULT NULL COMMENT 'بندُ عقد المورد الذي يُحتسب به — supplier_contract_lines.id',
+  `operator_assignment_id` int unsigned DEFAULT NULL COMMENT 'تكليفُ المشغّل — unit_party_awards.id',
+  `coverage_id` bigint unsigned DEFAULT NULL COMMENT 'إن كانت تغطيةً بديلة — substitute_coverages.cov_id (§12.1-⑦)',
+  `effect_target_type` enum('client','supplier','operator') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'طرفُ الأثر (§13.2)',
+  `effect_target_ref` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'مرجعُ الطرف — لا يكون فارغًا فالمفتاحُ عليه',
+  `measure_code` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'المقياس — فلا يُخصم الطنُّ من حصة ساعات (C30)',
+  `qty` decimal(18,3) NOT NULL COMMENT 'الكميةُ بمقياسها — موجبةٌ دائمًا والعكسُ بسطرِ effect_type=reversal',
+  `operational_hours` decimal(18,3) DEFAULT NULL COMMENT 'زمنُ التشغيل مستقلًّا — للجاهزية والتكلفة في عقود الكمية (C30)',
+  `analytical_output_qty` decimal(18,3) DEFAULT NULL COMMENT 'الإنتاجُ التحليليُّ مستقلًّا',
+  `effect_type` enum('client_obligation','supplier_share','operator_entitlement','exceptional_coverage','reversal') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_snapshot` enum('primary','standby') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'دورُ المعدة لحظةَ الواقعة — لقطةٌ لا إحالة (§12.1-⑥)',
+  `unit_decision_snapshot_id` int unsigned DEFAULT NULL COMMENT 'سلسلةُ القرارات كاملةً — unit_approvals سلسلة round_no للنسخة',
+  `period` char(7) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'YYYY-MM — فترةُ الاستهلاك',
+  `reverses_led_id` bigint unsigned DEFAULT NULL COMMENT 'مرجعُ السطر المعكوس — والأصلُ باقٍ (C26)',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`led_id`),
+  UNIQUE KEY `uq_ledger_no_double` (`unit_record_id`,`unit_record_version`,`effect_type`,`effect_target_type`,`effect_target_ref`),
+  KEY `ix_led_share_period` (`supplier_share_id`,`period`),
+  KEY `ix_led_obl_period` (`contract_obligation_id`,`period`),
+  KEY `ix_led_company_period` (`company_id`,`period`),
+  KEY `ix_led_coverage` (`coverage_id`),
+  KEY `ix_led_reverses` (`reverses_led_id`),
+  CONSTRAINT `fk_led_reverses` FOREIGN KEY (`reverses_led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`),
+  CONSTRAINT `ck_led_enums_not_empty` CHECK (((`effect_type` <> _utf8mb4'') and (`effect_target_type` <> _utf8mb4'') and (`measure_code` <> _utf8mb4''))),
+  CONSTRAINT `ck_led_qty_positive` CHECK ((`qty` >= 0)),
+  CONSTRAINT `ck_led_reversal_ref` CHECK ((((`effect_type` = _utf8mb4'reversal') and (`reverses_led_id` is not null)) or ((`effect_type` <> _utf8mb4'reversal') and (`reverses_led_id` is null))))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §13 — دفترُ استهلاك القدرات: سجلٌّ قانونيٌّ Insert-only؛ الرصيدُ نتيجةٌ لا مصدر؛ المفتاحُ يمنع الخصمَ مرتين';
+
+-- ── Table: capacity_financial_event_links ──
+CREATE TABLE `capacity_financial_event_links` (
+  `lnk_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `led_id` bigint unsigned NOT NULL COMMENT 'سطرُ الدفتر',
+  `fin_event_id` int NOT NULL COMMENT 'fin_financial_events.id — الحدثُ الماليُّ المولَّد بعد النشر',
+  `journal_ref` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجعُ القيد إن رُحِّل',
+  `linked_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`lnk_id`),
+  UNIQUE KEY `uq_led_fin` (`led_id`,`fin_event_id`),
+  KEY `ix_lnk_fin` (`fin_event_id`),
+  CONSTRAINT `fk_lnk_led` FOREIGN KEY (`led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §13.2 — جدولُ ربطٍ Append-only بين سطر الدفتر والحدث المالي؛ UQ(led,fin) يمنع الربطَ مرتين';
 
 -- ── Table: chain_objections ──
 CREATE TABLE `chain_objections` (
@@ -1604,6 +1657,27 @@ CREATE TABLE `cost_bearers` (
   KEY `ix_cb_owner` (`owner_type`,`owner_id`),
   KEY `ix_cb_company` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: coverage_settlement_lines ──
+CREATE TABLE `coverage_settlement_lines` (
+  `ln_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `cov_id` bigint unsigned NOT NULL,
+  `party` enum('client','failed_supplier','covering_supplier','operator') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الطرف (§7)',
+  `effect` enum('billable','gap_kept','exceptional_line','entitlement') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'billable=يُفوتر كاملًا · gap_kept=العجزُ باقٍ بجزائه · exceptional_line=بندُ تغطيةٍ مستقلٌّ بسعره · entitlement=استحقاقُ المشغّل بعقده',
+  `qty` decimal(18,3) NOT NULL DEFAULT '0.000',
+  `measure_code` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `amount` decimal(18,2) DEFAULT NULL COMMENT 'القيمةُ إن سُعِّرت — بسعرِ التغطية المتفق لا بحصةٍ تُرفع',
+  `currency` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `settlement_ref` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجعُ التسوية التي قُرئ فيها البند',
+  `note` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ln_id`),
+  KEY `ix_csl_cov` (`cov_id`,`party`),
+  KEY `ix_csl_company` (`company_id`,`settlement_ref`),
+  CONSTRAINT `fk_csl_cov` FOREIGN KEY (`cov_id`) REFERENCES `substitute_coverages` (`cov_id`) ON DELETE RESTRICT,
+  CONSTRAINT `ck_csl_enums_not_empty` CHECK (((`party` <> _utf8mb4'') and (`effect` <> _utf8mb4'')))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §7 — محاسبةُ التغطية: بندٌ ظاهرٌ باسمه ومرجعِه لكل طرفٍ — لا سطرٌ مدموج';
 
 -- ── Table: credit_debit_notes ──
 CREATE TABLE `credit_debit_notes` (
@@ -6563,6 +6637,34 @@ CREATE TABLE `stop_reason_codes` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-12: أسباب التعطل الستة — قائمة محكومة لا نص حر، وكل سبب ببنده المقابل';
+
+-- ── Table: substitute_coverages ──
+CREATE TABLE `substitute_coverages` (
+  `cov_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `level` enum('own_standby','cross_supplier','source_change') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الدرجة: احتياطيُّ المورد نفسِه · تغطيةُ موردٍ آخر · تبديلُ مصدر التوريد (§6)',
+  `covered_seat_id` int unsigned NOT NULL COMMENT 'المقعدُ المغطى — op_containers.id (والموردُ المتعطل من شجرته)',
+  `covering_supplier_id` int NOT NULL COMMENT 'الموردُ المغطِّي — suppliers.id (في own_standby هو المتعطلُ نفسُه)',
+  `covering_equipment_id` int DEFAULT NULL COMMENT 'المعدةُ البديلة إن عُيّنت',
+  `reason_code` enum('breakdown','scheduled_maintenance','relocation_exit','document_expired','operator_shortage') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '§6.1-①: سببٌ من قائمةٍ محكومة — لا تغطيةَ بلا سبب',
+  `reason_ref` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجعُ بلاغٍ أو أمرِ عملٍ حيث ينطبق',
+  `valid_from` date NOT NULL,
+  `valid_to` date NOT NULL COMMENT '§6.1-②: إلزاميٌّ — لا تغطيةَ مفتوحةَ المدة؛ والتمديدُ قرارٌ جديد',
+  `estimated_hours` decimal(10,2) DEFAULT NULL COMMENT '§6.1-⑤: الأثرُ يُحسب قبل الاعتماد ويُعرض على الموافقين',
+  `approvals_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجعُ سلسلة الموافقات بدرجتها',
+  `state` enum('draft','pending_approvals','approved','active','ended','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cov_id`),
+  KEY `ix_cov_seat` (`company_id`,`covered_seat_id`,`valid_from`),
+  KEY `ix_cov_supplier` (`company_id`,`covering_supplier_id`,`state`),
+  KEY `fk_cov_seat` (`covered_seat_id`),
+  CONSTRAINT `fk_cov_seat` FOREIGN KEY (`covered_seat_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `ck_cov_dates` CHECK ((`valid_to` >= `valid_from`)),
+  CONSTRAINT `ck_cov_reason_governed` CHECK (((`reason_code` <> _utf8mb4'') and (`level` <> _utf8mb4'')))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §6 — التغطيةُ البديلةُ بدرجاتها: سببٌ محكومٌ ومدةٌ مغلقةٌ وموافقاتٌ بالدرجة؛ ولا تُعدَّل الحصةُ الأصلية';
 
 -- ── Table: super_admin_password_resets ──
 CREATE TABLE `super_admin_password_resets` (

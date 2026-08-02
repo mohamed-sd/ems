@@ -96,6 +96,18 @@ class TenantRegistry
         'payroll_settings' => array('type' => self::T_TENANT, 'soft' => false),
         'container_consumption' => array('type' => self::T_TENANT, 'soft' => false),
         'container_swaps' => array('type' => self::T_TENANT, 'soft' => false),
+        // update0005 · CAP-01 §13 — دفترُ استهلاك القدرات: سجلٌّ قانونيٌّ Insert-only.
+        // الحصانةُ بنمط immutable_key (كنمط ems_business_events): effect_type لا يكون
+        // فارغًا في أي صف ⇒ كلُّ صفٍّ محصنٌ عن التعديل والحذف عبر البوابة.
+        'capacity_consumption_ledger' => array('type' => self::T_TENANT, 'soft' => false,
+            'immutable_key' => 'effect_type', 'immutable_allow' => array()),
+        // §13.2 — روابطُ الحدث المالي Append-only: journal_ref وحدَه موضعُ معالجةٍ لاحق.
+        'capacity_financial_event_links' => array('type' => self::T_TENANT, 'soft' => false,
+            'immutable_key' => 'fin_event_id', 'immutable_allow' => array('journal_ref')),
+        // §6 — التغطياتُ البديلة: دورةُ حالةٍ لا حذف.
+        'substitute_coverages' => array('type' => self::T_TENANT, 'soft' => false),
+        // §7 — بنودُ تسوية التغطية: بندٌ ظاهرٌ لكل طرف.
+        'coverage_settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
         'operator_rotations' => array('type' => self::T_TENANT, 'soft' => false),
         // M-01: الدفعةُ المقدَّمة المقبوضةُ فعلًا — سلفةٌ تُستردّ لا إيراد.
         // `soft` لأنها مستندُ قبضٍ لا يُمحى: الإلغاءُ حالةٌ لا حذف.
