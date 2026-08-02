@@ -238,6 +238,16 @@ include '../insidebar.php';
     $uw_params = array();
     // unit_entries سجلٌّ قانونيٌّ بلا أعمدة حذفٍ أصلًا — التصحيح بالمراجعات لا بالحذف
     $uw_where = "1=1";
+    // NAV-01 v6 §13-⑤: البحثُ الموحَّد «يجد الكيانَ أيًّا كان نوعُه — فلا يُسأل
+    // المتدربُ عن الشاشة»؛ فالواقعةُ تُفتح برقمها هنا مباشرةً. يقبل رقمَ الواقعة
+    // (UNT-…) أو معرّفَها الرقمي — ويُعلَن أن العرضَ محصورٌ بها لا أنه القائمةُ كلُّها.
+    $q_entry = trim((string) ($_GET['entry'] ?? ''));
+    $entry_focus = null;
+    if ($q_entry !== '') {
+        if (ctype_digit($q_entry)) { $uw_where .= " AND u.id = ?"; $uw_params[] = intval($q_entry); }
+        else { $uw_where .= " AND u.entry_no = ?"; $uw_params[] = $q_entry; }
+        $entry_focus = $q_entry;
+    }
     if ($q_project > 0) { $uw_where .= " AND u.project_id = ?"; $uw_params[] = $q_project; }
     if ($q_period !== '' && preg_match('/^\d{4}-\d{2}$/', $q_period)) {
         $uw_where .= " AND DATE_FORMAT(u.entry_date, '%Y-%m') = ?"; $uw_params[] = $q_period;
@@ -320,6 +330,16 @@ include '../insidebar.php';
     }
     ?>
     <div class="card"><div class="card-body">
+        <?php if ($entry_focus !== null): ?>
+            <div class="alert alert-info" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <i class="fas fa-crosshairs"></i>
+                <span>العرضُ محصورٌ بالواقعة <code><?php echo htmlspecialchars($entry_focus, ENT_QUOTES, 'UTF-8'); ?></code>
+                    <?php if (empty($entries)): ?>
+                        — <strong>لا واقعةَ بهذا الرقم ضمن نطاقك</strong> (قد تكون في مشروعٍ خارج صلاحيتك).
+                    <?php endif; ?></span>
+                <a class="btn btn-sm btn-outline-secondary" href="unit_records_fin.php">اعرض كلَّ الوقائع</a>
+            </div>
+        <?php endif; ?>
         <h5 style="margin:0 0 6px;"><i class="fas fa-scale-balanced"></i> وقائعُ السجل القانوني وأحكامُ أطرافها
             <span class="badge badge-info"><?php echo count($entries); ?> واقعة</span></h5>
         <p class="text-muted" style="margin:0 0 10px;font-size:.9rem;">

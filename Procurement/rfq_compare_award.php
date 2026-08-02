@@ -59,6 +59,7 @@ if ($rfq > 0) {
 }
 
 $page_title = 'مقارنة العروض والترسية';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

@@ -39,6 +39,7 @@ $r = mysqli_query($conn, "SELECT mo.id, mo.order_no, mo.state, e.id eq_id, e.nam
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
 $page_title = 'العودة للخدمة';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

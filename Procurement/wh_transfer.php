@@ -53,6 +53,7 @@ $r = mysqli_query($conn, "SELECT m.moved_at, i.name item, w.name wh, m.move_type
 if ($r) while ($x = mysqli_fetch_assoc($r)) $recent[] = $x;
 
 $page_title = 'التحويل بين المخازن';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

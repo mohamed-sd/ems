@@ -48,6 +48,7 @@ $r = mysqli_query($conn, "SELECT m.moved_at, i.name item, m.qty, m.ref_id, m.not
 if ($r) while ($x = mysqli_fetch_assoc($r)) $recent[] = $x;
 
 $page_title = 'المرتجعات';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

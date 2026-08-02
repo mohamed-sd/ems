@@ -55,6 +55,7 @@ $r = mysqli_query($conn, "SELECT i.*, o.op_code, o.currency op_cur FROM financin
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
 $page_title = 'الأقساط والسداد';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

@@ -81,6 +81,7 @@ $r = mysqli_query($conn, "SELECT entity_id, legal_name FROM legal_entities ORDER
 if ($r) while ($x = mysqli_fetch_assoc($r)) $ents[] = $x;
 
 $page_title = 'التصرف في الأصل';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

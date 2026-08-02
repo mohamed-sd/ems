@@ -30,6 +30,7 @@ if ($sup > 0) {
 }
 
 $page_title = 'خطة معدات المورد';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

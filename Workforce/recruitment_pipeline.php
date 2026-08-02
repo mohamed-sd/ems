@@ -111,6 +111,7 @@ $r = mysqli_query($conn, "SELECT a.*, v.vacancy_no, v.title_text FROM rec_applic
 if ($r) while ($x = mysqli_fetch_assoc($r)) $apps[] = $x;
 
 $page_title = 'دورة التوظيف';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

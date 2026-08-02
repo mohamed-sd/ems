@@ -37,6 +37,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $depts = array('العميل','المورد','الصيانة','التشغيل','المشغّل','قوةٌ قاهرة');
 
 $page_title = 'التوقفات بلا مسؤول';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

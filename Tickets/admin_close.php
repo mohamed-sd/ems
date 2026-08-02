@@ -53,6 +53,7 @@ $r = mysqli_query($conn, "SELECT id, ticket_no, complaint, stage, created_at FRO
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
 $page_title = 'الإغلاق الإداري';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

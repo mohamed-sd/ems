@@ -36,6 +36,7 @@ $r = mysqli_query($conn, "SELECT b.id, b.budget_no, b.dept_module, b.period_no, 
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
 $page_title = 'ميزانية إدارتي';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

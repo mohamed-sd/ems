@@ -49,6 +49,7 @@ if ($wh > 0) {
 }
 
 $page_title = 'الجرد والتسويات';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

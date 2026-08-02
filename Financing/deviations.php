@@ -64,6 +64,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $types = array('no_movement' => 'عقدٌ بلا حركة', 'payment_gap' => 'فروقُ سداد', 'unrecorded_exit' => 'خروجٌ غيرُ مسجَّل');
 
 $page_title = 'الانحرافات الثلاث';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

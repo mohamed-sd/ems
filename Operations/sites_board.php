@@ -56,6 +56,7 @@ if ($sel_site > 0) {
 }
 
 $page_title = 'لوحة المواقع';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

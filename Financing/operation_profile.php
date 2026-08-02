@@ -35,6 +35,7 @@ $r = mysqli_query($conn, "SELECT o.*, le.legal_name AS financier
 if ($r) $op = mysqli_fetch_assoc($r);
 
 $page_title = 'ملف عملية التمويل';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

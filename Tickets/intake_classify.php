@@ -51,6 +51,7 @@ $r = mysqli_query($conn, "SELECT id, name FROM ticket_types WHERE active = 1 ORD
 if ($r) while ($x = mysqli_fetch_assoc($r)) $types[] = $x;
 
 $page_title = 'الاستقبال والتصنيف';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

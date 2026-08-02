@@ -20,6 +20,7 @@ $r = mysqli_query($conn, "SELECT b.dept_module, COUNT(DISTINCT b.id) budgets,
 if ($r) while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; $tp += floatval($x['planned']); $ta += floatval($x['actual']); }
 
 $page_title = 'الموازنة العامة والتوحيد';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

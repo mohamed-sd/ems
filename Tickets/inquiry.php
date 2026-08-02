@@ -37,6 +37,7 @@ if ($q !== '') {
 }
 
 $page_title = 'الاستفسار عن بلاغ';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

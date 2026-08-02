@@ -45,6 +45,7 @@ $metrics = array(
 );
 
 $page_title = 'إنجاز الإدارة';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

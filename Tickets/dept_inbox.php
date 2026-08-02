@@ -74,6 +74,7 @@ if ($res) {
 }
 
 $page_title = 'بلاغاتُ إدارتي';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">

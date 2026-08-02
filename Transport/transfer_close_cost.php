@@ -48,6 +48,7 @@ $r = mysqli_query($conn,
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
 $page_title = 'إقفال الأمر وتحميل التكلفة';
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">
