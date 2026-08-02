@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 07:58:37
+-- المصدر: equipation_manage · التوليد: 2026-08-02 08:07:48
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -263,7 +263,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (225,'لوحة مسارات البلاغات','Tickets/ticket_workstreams_board.php',NULL,NULL,0,0,'fa fa-code-branch',320),
 (226,'برج المراقبة','Tickets/watchtower.php',NULL,NULL,0,0,'fa fa-broadcast-tower',321),
 (227,'بلاغ سياقي جديد','Tickets/ticket_contextual_open.php',NULL,NULL,0,0,'fa fa-bullhorn',322),
-(228,'مساحة عملي','main/my_workspace.php',NULL,NULL,0,0,'fa fa-user-circle',5);
+(228,'مساحة عملي','main/my_workspace.php',NULL,NULL,0,0,'fa fa-user-circle',5),
+(229,'التغطية التعاقدية','Contracts/contract_coverage.php',NULL,NULL,0,0,'fas fa-shield-halved',330);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -1341,7 +1342,17 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1372,19,228,1,0,0,0),
 (1373,20,228,1,0,0,0),
 (1374,21,228,1,0,0,0),
-(1375,22,228,1,0,0,0);
+(1375,22,228,1,0,0,0),
+(1382,12,229,1,0,0,0),
+(1383,5,229,1,0,0,0),
+(1384,4,229,1,0,0,0),
+(1385,6,229,1,0,0,0),
+(1386,11,229,1,0,0,0),
+(1387,3,229,1,0,0,0),
+(1388,8,229,1,0,0,0),
+(1389,2,229,1,0,0,0),
+(1390,7,229,1,0,0,0),
+(1391,1,229,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -2052,9 +2063,9 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (572,19,'REC',159,148,'تسويات الموظفين','Workforce/employee_settlements.php','fa fa-file-invoice-dollar',47,NULL,'Workforce/employee_settlements.php',1,'2026-07-29 12:30:32','2026-08-02 03:06:13'),
 (573,17,'REC',143,148,'تسويات الموظفين','Workforce/employee_settlements.php','fa fa-file-invoice-dollar',47,NULL,'Workforce/employee_settlements.php',1,'2026-07-29 12:30:32','2026-08-02 03:11:23'),
 (574,18,'REC',151,148,'تسويات الموظفين','Workforce/employee_settlements.php','fa fa-file-invoice-dollar',47,NULL,'Workforce/employee_settlements.php',1,'2026-07-29 12:30:32','2026-08-02 03:06:13'),
-(581,1,'REC',20,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',1,'2026-07-29 16:17:00','2026-08-02 03:06:13'),
-(582,3,'REC',36,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',1,'2026-07-29 16:17:00','2026-08-02 03:06:13'),
-(583,5,'REC',52,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',1,'2026-07-29 16:17:00','2026-08-02 03:11:58'),
+(581,1,'REC',20,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',0,'2026-07-29 16:17:00','2026-08-02 08:07:48'),
+(582,3,'REC',36,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',0,'2026-07-29 16:17:00','2026-08-02 08:07:48'),
+(583,5,'REC',52,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',0,'2026-07-29 16:17:00','2026-08-02 08:07:48'),
 (591,1,'REC',20,150,'مواقع التنفيذ','Projects/sites.php','fa fa-map-location-dot',49,NULL,'Projects/sites.php',1,'2026-07-30 03:34:35','2026-08-02 03:06:13'),
 (592,3,'REC',36,150,'مواقع التنفيذ','Projects/sites.php','fa fa-map-location-dot',49,NULL,'Projects/sites.php',1,'2026-07-30 03:34:35','2026-08-02 03:06:13'),
 (593,5,'REC',52,150,'مواقع التنفيذ','Projects/sites.php','fa fa-map-location-dot',49,NULL,'Projects/sites.php',1,'2026-07-30 03:34:35','2026-08-02 03:11:58'),
@@ -2219,7 +2230,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (872,2,'HOME',26,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,NULL,1,'2026-08-02 03:09:29','2026-08-02 03:09:29'),
 (873,1,'HOME',18,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,NULL,1,'2026-08-02 03:09:29','2026-08-02 03:09:29'),
 (880,6,'APPR',61,NULL,'اعتماد الوحدات التشغيلية','Approvals/hours_approval.php','fa fa-check-double',20,NULL,NULL,1,'2026-08-02 03:11:23','2026-08-02 03:11:58'),
-(881,6,'REC',60,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,NULL,1,'2026-08-02 03:11:23','2026-08-02 03:11:23'),
+(881,6,'REC',60,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,NULL,0,'2026-08-02 03:11:23','2026-08-02 08:07:48'),
 (882,6,'DAILY',60,152,'خطة عمل الغد','Operations/daily_plan.php','fa fa-calendar-day',15,NULL,NULL,1,'2026-08-02 03:11:23','2026-08-02 03:11:23'),
 (883,6,'REC',60,150,'مواقع التنفيذ','Projects/sites.php','fa fa-map-location-dot',49,NULL,NULL,1,'2026-08-02 03:11:23','2026-08-02 03:11:23'),
 (884,6,'DAILY',59,10,'تسجيل الوحدات','Timesheet/timesheet_type.php','fa fa-business-time',10,NULL,NULL,1,'2026-08-02 03:11:23','2026-08-02 03:11:58'),

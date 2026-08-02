@@ -114,7 +114,7 @@ $ins = function ($code, $etype, $from) use ($conn, $CO, $CC_ID) {
 check($ins('CAPW1T-A1', 'CAPW1T_EXC', '2042-01-01'), 'التزامُ نوعٍ أولُ يُقبل');
 $OBL_ID = intval($conn->insert_id);
 check(!$ins('CAPW1T-A2', 'CAPW1T_EXC', '2042-01-01'), 'التزامٌ ثانٍ للنوع نفسِه بالسريان نفسِه → مرفوضٌ بنيويًّا (Duplicate)');
-check($ins('CAPW1T-A3', 'CAPW1T_EXC', '2042-06-01'), 'السريانُ المختلف فترةٌ جديدةٌ تُقبل — التعديلُ فترةٌ لا مسُّ ماضٍ (§5-④)');
+check($ins('CAPW1T-A3', 'CAPW1T_EXC', '2042-06-01'), 'C20: السريانُ المختلف فترةٌ جديدةٌ تُقبل والماضي كما هو — التعديلُ فترةٌ لا مسُّ ماضٍ (§5-④)');
 check($ins('CAPW1T-B1', null, null) && $ins('CAPW1T-B2', null, null),
       'التزامان عامّان بلا نوعٍ خارج القيد — الفهرسُ مشروطٌ لا خانق');
 
@@ -158,7 +158,7 @@ $good = $conn->query("INSERT INTO seat_assignments
     (company_id, container_id, equipment_id, date_from, assignment_role, activation_state,
      planned_qty_month, measure_code, supplier_contract_line_id, replace_reason)
     VALUES ({$CO}, {$CONT}, {$EQ}, '2042-01-01', 'احتياطي', 'pending', 0, 'hour', {$LINE_ID}, 'CAPW1T ①')");
-check($good, 'احتياطيٌّ pending بصفر ساعاتٍ يُقبل — تغطيةُ جاهزيةٍ لا وحدةٌ مباعة (§4-②)');
+check($good, 'C2: احتياطيٌّ pending بصفر ساعاتٍ يُقبل ولا يدخل Σ ولا يُحتسب مدفوعًا بلا نص — تغطيةُ جاهزيةٍ لا وحدةٌ مباعة (§4-②)');
 
 // ═══ ⑤ CAP-04 · C17: السقفان ═══
 head('⑤ C17 — سقفُ الاحتياطي بعرض السقفين');

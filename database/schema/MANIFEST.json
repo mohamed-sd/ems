@@ -1,15 +1,15 @@
 {
-    "generated_at": "2026-08-02 07:58:37",
+    "generated_at": "2026-08-02 08:07:48",
     "source_db": "equipation_manage",
     "server_version": "8.4.7",
     "files": {
         "schema.sql": {
-            "sha1": "34d02bcb7d9ae663f6119625a4ad9e9dfd3130b5",
+            "sha1": "4ed0bf70118768315c446f0e1cbe7951b424f0b8",
             "bytes": 652930
         },
         "seed_reference.sql": {
-            "sha1": "abf102c2c5aa72f30f365df8dc14ac8cc3fe9eb7",
-            "bytes": 263228
+            "sha1": "17381d62e4e48a27e190bdbd8afaf38867b78c53",
+            "bytes": 263568
         }
     },
     "schema": {
@@ -17,11 +17,11 @@
         "views": 6
     },
     "seed": {
-        "rows": 2656,
+        "rows": 2667,
         "tables": {
             "roles": 25,
-            "modules": 218,
-            "role_permissions": 1069,
+            "modules": 219,
+            "role_permissions": 1079,
             "link_groups": 216,
             "nav_items": 661,
             "equipments_types": 3,

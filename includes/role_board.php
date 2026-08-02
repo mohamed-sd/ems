@@ -292,6 +292,21 @@ function roleBoardAlerts($conn, $gate, $roleId)
         }
     }
 
+    // update0005 · CAP-35 (CAP-01 §10-①): الفجوةُ في لوحة مدير التشغيل
+    // **بالساعات لا بالعدد فقط** — من مرقب الفجوة اليومي، والمقفلةُ تختفي.
+    if ($rid === 1) {
+        $gapHours = (float) roleBoardScalar($gate, array('scope' => array('g' => 'capacity_gap_watch')),
+            "SELECT COALESCE(SUM(g.gap_hours),0) FROM capacity_gap_watch g
+              WHERE {TENANT_SCOPE} AND g.closed_on IS NULL");
+        $gapCount = (int) roleBoardScalar($gate, array('scope' => array('g' => 'capacity_gap_watch')),
+            "SELECT COUNT(*) FROM capacity_gap_watch g WHERE {TENANT_SCOPE} AND g.closed_on IS NULL");
+        if ($gapCount > 0) {
+            $out[] = array('key' => 'coverage_gap_hours',
+                'label' => 'فجوةُ تغطيةٍ تعاقدية: ' . number_format($gapHours, 1) . ' ساعةً شهريةً غيرَ مغطاة',
+                'href' => '../Contracts/contracts.php', 'tone' => 'err', 'count' => $gapCount);
+        }
+    }
+
     // الأدوار على الشاشة العامة — عدّاداتُها بجدولٍ واحدٍ لكل تنبيه
     $generic = array(
         1 => array(

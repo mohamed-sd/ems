@@ -176,6 +176,21 @@ include '../insidebar.php';
                 <div class="cd-badges"><?php echo $cd_badges_html; ?></div>
             <?php endif; ?>
 
+            <!-- update0005 · CAP-35: تبويبُ «التغطية التعاقدية» — الرحلةُ بلغة العمل
+                 (نوعُ المعدة ← توزيعُ الموردين ← المعداتُ المخصَّصة) والفجوةُ بالساعات -->
+            <div class="cd-coverage-tab">
+                <a href="contract_coverage.php?contract_id=<?php echo intval($contract_id); ?>" class="cd-coverage-link">
+                    <i class="fas fa-shield-halved"></i> التغطية التعاقدية — الالتزامُ والموردون والمعداتُ والفجوةُ بالساعات
+                </a>
+            </div>
+            <style>
+                .cd-coverage-tab { margin: 6px 0 14px; }
+                .cd-coverage-link { display: inline-flex; align-items: center; gap: 8px;
+                    padding: 10px 18px; border-radius: 10px; font-weight: 800;
+                    background: #fff8e6; border: 1px solid #d9b44a; color: #6b5200; text-decoration: none; }
+                .cd-coverage-link:hover { background: #fdeeba; }
+            </style>
+
             <!-- ===== SUMMARY CARDS ===== -->
             <div class="cards-grid">
 
