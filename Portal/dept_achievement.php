@@ -30,15 +30,17 @@ $cw = "company_id = $company_id";
 
 $metrics = array(
     array('وحداتٌ معتمدةٌ في المدة', $q("SELECT COUNT(*) FROM unit_entries WHERE $cw
-          AND state IN ('approved','converted') AND entry_date BETWEEN '$from' AND '$to'")),
+          AND state IN ('site_approved','parties_approved','sales_approved','converted')
+          AND entry_date BETWEEN '$from' AND '$to'")),
     array('ساعاتٌ منفَّذةٌ معتمدة', $q("SELECT COALESCE(SUM(qty),0) FROM unit_entries WHERE $cw
-          AND state IN ('approved','converted') AND entry_date BETWEEN '$from' AND '$to'")),
+          AND state IN ('site_approved','parties_approved','sales_approved','converted')
+          AND entry_date BETWEEN '$from' AND '$to'")),
     array('مساراتُ بلاغاتٍ أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
           JOIN tickets t ON t.id = ws.tk_id AND t.$cw
           WHERE ws.org_unit_id = " . intval($unit) . " AND ws.state = 'closed'
           AND ws.closed_at BETWEEN '$from' AND '$to 23:59:59'")),
     array('أوامرُ صيانةٍ أُقفلت', $q("SELECT COUNT(*) FROM mnt_order WHERE $cw
-          AND state IN ('Closed','Done') AND updated_at BETWEEN '$from' AND '$to 23:59:59'")),
+          AND state = 'إغلاق' AND updated_at BETWEEN '$from' AND '$to 23:59:59'")),
 );
 
 $page_title = 'إنجاز الإدارة';
