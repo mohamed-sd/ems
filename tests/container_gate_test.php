@@ -237,6 +237,9 @@ if ($leafRow) {
     check((float) $a5['consumed_qty'] == (float) $a3['consumed_qty'], 'ولا مستوًى تغيّر');
 
     $conn->query("DELETE FROM container_consumption WHERE source_ref IN (90001,90002)");
+    // update0005: الكتابةُ المزدوجةُ تقيّد سطرَ دفترٍ للواقعة الصورية — يُكنس معها
+    $conn->query("DELETE FROM capacity_consumption_ledger WHERE unit_record_id IN (90001,90002) AND reverses_led_id IS NOT NULL");
+    $conn->query("DELETE FROM capacity_consumption_ledger WHERE unit_record_id IN (90001,90002)");
     $conn->query("UPDATE op_containers SET consumed_qty=0");
 }
 
