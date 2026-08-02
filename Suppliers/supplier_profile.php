@@ -207,3 +207,7 @@ $(function () {
     $('#supplierContractsTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
 });
 </script>
+
+<?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة
+$rt_kind = 'supplier'; $rt_ref = $supplier_id;
+include __DIR__ . '/../includes/related_tickets_tab.php'; ?>

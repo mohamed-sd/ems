@@ -179,3 +179,7 @@ $(function () {
     $('#projectSuppliersTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
 });
 </script>
+
+<?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة بالموقع/المشروع
+$rt_kind = 'site'; $rt_ref = $project_id;
+include __DIR__ . '/../includes/related_tickets_tab.php'; ?>
