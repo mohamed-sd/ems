@@ -109,7 +109,7 @@ $out[] = array('⑨','تحويلاتٌ وجهتُها مكسورة', count($bad)
 /* ── ⑩ سطحُ البلاغات: كلُّ دورٍ له «بلاغاتُ إدارتي» ─────────────────────── */
 $rolesAll = array_column(q($conn, "SELECT DISTINCT role_id FROM nav_items WHERE active=1"), 'role_id');
 $rolesWith = array_column(q($conn, "SELECT DISTINCT role_id FROM nav_items WHERE active=1
-              AND (label_ar LIKE '%بلاغات إدارتي%' OR route LIKE '%dept_tickets%')"), 'role_id');
+              AND (label_ar LIKE '%بلاغات إدارتي%' OR route LIKE '%dept_inbox%')"), 'role_id');
 $noSurface = array_values(array_diff($rolesAll, $rolesWith));
 $out[] = array('⑩','إداراتٌ (أدوارٌ) بلا سطح بلاغات', count($noSurface), true, array_map(fn($r)=>"دور $r", $noSurface));
 
