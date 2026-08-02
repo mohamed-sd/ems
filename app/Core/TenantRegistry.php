@@ -563,6 +563,9 @@ class TenantRegistry
         'perm_shadow_diffs' => array('type' => self::T_TENANT, 'soft' => false), // SEC-29: ميزان صفر الفرق 14 يومًا
         'ems_job_queue' => array('type' => self::T_TENANT, 'soft' => false), // N-24: الطابور — «قيد المعالجة» ثم إشعار
         'ems_sessions' => array('type' => self::T_RESTRICTED, 'soft' => false), // NFR-13: مخزن الجلسات — معالج PHP حصرًا لا البوابة
+        'uat_runs' => array('type' => self::T_TENANT, 'soft' => false), // UAT-02: جولات التجربة
+        'uat_evidence' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'uat_runs', 'fk' => 'run_id'), // UAT-14: الشواهد
         // ── update0004 · TKT-01 v1.1 (هجرة 2026-08-02): المسارات المتوازية ──
         'ticket_type_workstreams' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'ticket_types', 'fk' => 'ticket_type_id'), // §12: التفعيل الشرطي
