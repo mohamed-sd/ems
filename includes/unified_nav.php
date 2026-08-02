@@ -129,21 +129,40 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
        . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
     echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
 
-    $lastGroup = null;
+    // NAV-01 v6 §4 (update0007-ب): التكدّسُ يُدار بأدوات التعقيد — المجموعةُ
+    // الكثيفةُ (> 12) تعرض أولَها ويطوي «المزيدُ» بقيتَها قابلةً للفتح،
+    // «فلا تظهر المستوياتُ كلُّها دفعةً واحدة» — بلا حذفِ رابطٍ ولا تغييرِ بنية.
+    $byGroup = array();
     foreach ($items as $it) {
-        $gname = isset($it['group_name']) && $it['group_name'] !== null ? $it['group_name'] : '';
-        if ($gname !== $lastGroup) {
-            if ($gname !== '') {
-                echo '<li class="nav-subhead" aria-hidden="true"><span>'
-                   . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
-            }
-            $lastGroup = $gname;
+        $g = isset($it['group_name']) && $it['group_name'] !== null ? $it['group_name'] : '';
+        $byGroup[$g][] = $it;
+    }
+    static $moreSeq = 0;
+    foreach ($byGroup as $gname => $gItems) {
+        if ($gname !== '') {
+            echo '<li class="nav-subhead" aria-hidden="true"><span>'
+               . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
         }
-        printNavLinkItem(array(
-            'code' => $it['route'],
-            'name' => $it['label_ar'],
-            'icon' => $it['icon'],
-        ), $basePrefix, $badges);
+        $dense = count($gItems) > 12;
+        foreach ($gItems as $idx => $it) {
+            if ($dense && $idx === 7) {
+                $moreSeq++;
+                $rest = count($gItems) - 7;
+                echo '<li class="nav-more-toggle"><button type="button" class="nav-group-head" '
+                   . 'style="font-size:.85em;opacity:.8" '
+                   . 'onclick="var m=document.getElementById(\'navmore-' . $moreSeq . '\');'
+                   . 'var open=m.style.display!==\'none\';m.style.display=open?\'none\':\'block\';'
+                   . 'this.querySelector(\'span\').textContent=open?\'المزيد (' . $rest . ') ▾\':\'أقل ▴\';">'
+                   . '<span>المزيد (' . $rest . ') ▾</span></button></li>' . "\n";
+                echo '<li><ul id="navmore-' . $moreSeq . '" style="display:none;list-style:none;padding:0;margin:0">' . "\n";
+            }
+            printNavLinkItem(array(
+                'code' => $it['route'],
+                'name' => $it['label_ar'],
+                'icon' => $it['icon'],
+            ), $basePrefix, $badges);
+        }
+        if ($dense) { echo '</ul></li>' . "\n"; }
     }
 
     echo '  </ul>' . "\n";

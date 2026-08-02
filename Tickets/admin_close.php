@@ -1,0 +1,81 @@
+<?php
+/**
+ * Tickets/admin_close.php — الإغلاقُ الإداري (★ المركز · update0007-ب F10)
+ * «للمكرر أو الملغى فقط · بسببٍ مكتوبٍ ومرجعِ الأصل · ولا يُستعمل لإغلاق
+ * ما لم يُنجَز» (TKT-01 §5-⑧) — لمدير البلاغات وحدَه.
+ */
+require_once __DIR__ . '/../includes/session_bootstrap.php';
+session_start();
+if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/tkt_helpers.php';
+
+$ctx = tkt_ctx();
+$company_id = $ctx['company_id'];
+$uid = $ctx['user_id'];
+if (intval($ctx['role']) !== 24 && !$ctx['is_super']) { http_response_code(403); die('الإغلاقُ الإداريُّ لمدير البلاغات وحدَه (403)'); }
+$msg = '';
+
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['aclose_tk'])) {
+    $tid = intval($_POST['aclose_tk']);
+    $why = trim($_POST['reason'] ?? '');
+    $dup = intval($_POST['duplicate_of'] ?? 0);
+    if ($why === '') { $msg = 'السببُ المكتوبُ إلزامي (422)'; }
+    else {
+        // لا يُغلق منجَزٌ إداريًّا — المكررُ والملغى فقط
+        $r = mysqli_query($conn, "SELECT stage FROM tickets WHERE id = $tid AND company_id = $company_id");
+        if (!$r || !($t = mysqli_fetch_assoc($r))) { $msg = 'بلاغٌ غيرُ موجود (404)'; }
+        elseif (in_array($t['stage'], array('done', 'closed'), true)) { $msg = 'منجَزٌ — يُغلق بمساره لا إداريًّا (403)'; }
+        else {
+            mysqli_begin_transaction($conn);
+            $ok1 = mysqli_query($conn, "UPDATE tickets SET stage = 'cancelled'" .
+                   ($dup > 0 ? ", duplicate_of_ticket_id = $dup" : '') . " WHERE id = $tid");
+            $ok2 = mysqli_query($conn, "UPDATE ticket_workstreams SET state = 'admin_closed', closed_at = NOW()
+                                        WHERE tk_id = $tid AND state NOT IN ('closed','admin_closed')");
+            $ok3 = mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id)
+                    VALUES ($company_id, $tid, 'admin_closed', '" . mysqli_real_escape_string($conn, $why .
+                    ($dup ? " — مكررٌ من #$dup" : '')) . "', $uid)");
+            if ($dup > 0) { // مبلِّغُ المكرر يُضاف متابعًا للأصل — فلا يُفقد أنه أبلغ (TKT §8)
+                mysqli_query($conn, "INSERT IGNORE INTO ticket_watchers (company_id, ticket_id, user_id, role_id)
+                    SELECT company_id, $dup, reporter_user_id, NULL FROM tickets WHERE id = $tid AND reporter_user_id IS NOT NULL");
+            }
+            if ($ok1 && $ok2 && $ok3) { mysqli_commit($conn); $msg = "أُغلق #$tid إداريًّا بسببه" . ($dup ? " ومبلِّغُه متابعٌ للأصل #$dup" : ''); }
+            else { mysqli_rollback($conn); $msg = 'فشلت: ' . mysqli_error($conn); }
+        }
+    }
+}
+
+$rows = array();
+$r = mysqli_query($conn, "SELECT id, ticket_no, complaint, stage, created_at FROM tickets
+                          WHERE company_id = $company_id AND stage NOT IN ('done','closed','cancelled')
+                          ORDER BY created_at DESC LIMIT 60");
+if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
+
+$page_title = 'الإغلاق الإداري';
+include '../insidebar.php';
+?>
+<div class="content-wrapper allforms" dir="rtl">
+  <div class="ems-topbar"><h4><i class="fa fa-ban"></i> الإغلاقُ الإداري — للمكرر والملغى فقط</h4></div>
+  <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+  <table class="table table-striped" data-no-dt>
+    <thead><tr><th>البلاغ</th><th>الوصف</th><th>الحالة</th><th>الإغلاقُ بسببٍ ومرجع</th></tr></thead>
+    <tbody>
+    <?php foreach ($rows as $t): ?>
+      <tr>
+        <td><?= htmlspecialchars($t['ticket_no'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(mb_substr($t['complaint'], 0, 50), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars($t['stage'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td>
+          <form method="post" style="display:flex;gap:6px">
+            <input type="hidden" name="aclose_tk" value="<?= intval($t['id']) ?>">
+            <input type="text" name="reason" class="form-control form-control-sm" placeholder="السببُ المكتوب" style="max-width:170px" required>
+            <input type="number" name="duplicate_of" class="form-control form-control-sm" placeholder="مكررٌ من #" style="max-width:110px">
+            <button class="action-btn" type="submit" style="color:#dc3545">أغلق إداريًّا</button>
+          </form>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
