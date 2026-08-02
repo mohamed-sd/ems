@@ -69,7 +69,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 }
 
 $shares = array(); $ents = array();
-$r = mysqli_query($conn, "SELECT s.share_id, s.asset_id, e.name eq_name, le.name_ar financier,
+$r = mysqli_query($conn, "SELECT s.share_id, s.asset_id, e.name eq_name, le.legal_name financier,
                                  COALESCE(s.approved_percent, s.percent) pct
                           FROM asset_ownership_shares s
                           LEFT JOIN equipments e ON e.id = s.asset_id AND s.asset_kind = 'equipment'
@@ -77,7 +77,7 @@ $r = mysqli_query($conn, "SELECT s.share_id, s.asset_id, e.name eq_name, le.name
                           WHERE s.company_id = $company_id AND (s.valid_to IS NULL OR s.valid_to >= CURDATE())
                           ORDER BY s.asset_id");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $shares[] = $x;
-$r = mysqli_query($conn, "SELECT entity_id, name_ar FROM legal_entities ORDER BY name_ar LIMIT 60");
+$r = mysqli_query($conn, "SELECT entity_id, legal_name FROM legal_entities ORDER BY legal_name LIMIT 60");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $ents[] = $x;
 
 $page_title = 'التصرف في الأصل';
@@ -95,7 +95,7 @@ include '../insidebar.php';
         <?php endforeach; ?></select></div>
     <div><label>إلى الكيان</label>
       <select name="to_entity" class="form-control" required><option value="">—</option>
-        <?php foreach ($ents as $e2): ?><option value="<?= intval($e2['entity_id']) ?>"><?= htmlspecialchars($e2['name_ar'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
+        <?php foreach ($ents as $e2): ?><option value="<?= intval($e2['entity_id']) ?>"><?= htmlspecialchars($e2['legal_name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
     <div><label>النسبةُ المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control" required style="max-width:110px"></div>
     <div><label>مرجعُ القرار — إلزامي</label><input type="text" name="doc_ref" class="form-control" required></div>
     <button class="btn btn-primary">انقل الحصة</button>

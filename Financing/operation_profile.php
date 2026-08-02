@@ -25,10 +25,10 @@ if (!$granted) { http_response_code(403); die('المجالُ المقيَّد �
 
 $op_id = intval($_GET['id'] ?? 0);
 $tab   = preg_replace('/[^a-z]/', '', $_GET['tab'] ?? 'terms');
-if (!in_array($tab, array('terms','assets','shares','ledger','docs'), true)) $tab = 'terms';
+if (!in_array($tab, array('terms','assets','shares','installments','ledger','docs'), true)) $tab = 'terms';
 
 $op = null;
-$r = mysqli_query($conn, "SELECT o.*, le.name_ar AS financier
+$r = mysqli_query($conn, "SELECT o.*, le.legal_name AS financier
                           FROM financing_operations o
                           LEFT JOIN legal_entities le ON le.entity_id = o.financier_entity_id
                           WHERE o.op_id = $op_id AND o.company_id = $company_id");
@@ -100,6 +100,30 @@ include '../insidebar.php';
       <?php } if (!$any) echo '<tr><td colspan="6" class="text-center text-muted">لا حصصَ بعد</td></tr>'; ?>
       </tbody>
     </table>
+
+  <?php elseif ($tab === 'installments'): ?>
+    <table class="table table-striped" data-no-dt>
+      <thead><tr><th>#</th><th>الاستحقاق</th><th>أصل</th><th>ربح</th><th>الإجمالي</th><th>الحالة</th><th>السداد</th><th>مرجعُه</th></tr></thead>
+      <tbody>
+      <?php $r2 = mysqli_query($conn, "SELECT seq_no, due_date, amount_principal, amount_profit, amount_total,
+                                              currency, paid_date, payment_ref, state
+                                       FROM financing_installments WHERE op_id = $op_id ORDER BY seq_no");
+      $any = false;
+      if ($r2) while ($x = mysqli_fetch_assoc($r2)) { $any = true;
+          $clr = array('paid' => '#198754', 'overdue' => '#dc3545', 'due' => '#fd7e14');
+      ?>
+        <tr><td><?= intval($x['seq_no']) ?></td>
+            <td><?= htmlspecialchars($x['due_date'], ENT_QUOTES, 'UTF-8') ?></td>
+            <td><?= number_format(floatval($x['amount_principal']), 2) ?></td>
+            <td><?= number_format(floatval($x['amount_profit']), 2) ?></td>
+            <td><strong><?= number_format(floatval($x['amount_total']), 2) ?></strong> <?= htmlspecialchars($x['currency'], ENT_QUOTES, 'UTF-8') ?></td>
+            <td><span class="badge" style="background:<?= $clr[$x['state']] ?? '#6c757d' ?>"><?= htmlspecialchars($x['state'], ENT_QUOTES, 'UTF-8') ?></span></td>
+            <td><?= htmlspecialchars($x['paid_date'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
+            <td><?= htmlspecialchars($x['payment_ref'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
+      <?php } if (!$any) echo '<tr><td colspan="8" class="text-center text-muted">لا أقساطَ بعد</td></tr>'; ?>
+      </tbody>
+    </table>
+    <p><a class="action-btn" href="installments.php?op=<?= $op_id ?>"><i class="fa fa-calendar-check"></i> شاشةُ السداد</a></p>
 
   <?php elseif ($tab === 'ledger'): ?>
     <p class="text-muted">حركةُ العملية في دفتر الأحداث — أقساطٌ مستحقةٌ ومسددةٌ وتعديلات</p>

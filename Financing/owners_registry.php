@@ -27,13 +27,14 @@ mysqli_query($conn, "INSERT INTO action_execution_log (company_id, action_code, 
 
 $rows = array();
 $r = mysqli_query($conn,
-    "SELECT r.equipment_id, e.name eq_name, r.owner_kind, r.owner_ref, r.ownership_note,
-            s.approved_percent, s.percent, s.valid_from, s.valid_to, le.name_ar financier
+    "SELECT r.equipment_id, e.name eq_name, r.owner_type owner_kind, r.actual_owner_name owner_ref, r.note ownership_note,
+            s.approved_percent, s.percent, s.valid_from, s.valid_to, le.legal_name financier
      FROM equipment_ownership_registry r
      LEFT JOIN equipments e ON e.id = r.equipment_id
      LEFT JOIN asset_ownership_shares s ON s.asset_id = r.equipment_id AND s.asset_kind = 'equipment'
                                         AND (s.valid_to IS NULL OR s.valid_to >= CURDATE())
      LEFT JOIN legal_entities le ON le.entity_id = s.financier_entity_id
+     WHERE r.company_id = $company_id
      ORDER BY r.equipment_id");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
