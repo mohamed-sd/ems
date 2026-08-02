@@ -1,180 +1,180 @@
 ﻿الإدارة,الشاشة,المسار,المصدر,الحكم
-التشغيل,"لوحة الجاهزية",Fleet/readiness_board.php,"قائمٌ — منفَّذ",move:to-role-1
+التشغيل,"لوحة الجاهزية",Fleet/readiness_board.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"لوحة مدير التشغيل",admin/ops_manager_board.php,"قائمٌ — منفَّذ",ok:placed
-التشغيل,"أذونات الدخول والخروج والحركة",admin/org_permits.php,"قائمٌ — منفَّذ",ok:placed
-التشغيل,المستخلصات,Contracts/claims.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,"توزيع المعدات والمشغّلين",Operations/distribution_space.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,"غرفة عمليات التشغيل",Operations/operations_room.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"أذونات الدخول والخروج والحركة",admin/org_permits.php,"قائمٌ — منفَّذ",revive:role-1
+التشغيل,المستخلصات,Contracts/claims.php,"قائمٌ — منفَّذ",revive:role-1
+التشغيل,"توزيع المعدات والمشغّلين",Operations/distribution_space.php,"قائمٌ — منفَّذ",revive:role-1
+التشغيل,"غرفة عمليات التشغيل",Operations/operations_room.php,"قائمٌ — منفَّذ",revive:role-1
 التشغيل,"لوحة المواقع",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-التشغيل,"احتساب الجزاءات والحوافز",Contracts/penalties.php,"قائمٌ — منفَّذ",revive:role-1
+التشغيل,"احتساب الجزاءات والحوافز",Contracts/penalties.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,الإعدادات,Settings/settings.php,"قائمٌ — منفَّذ",ok:placed
-التشغيل,التقارير,emsreports/index.php,"قائمٌ — منفَّذ",revive:role-1
-التشغيل,"التكليفات التنظيمية",admin/org_assignments.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,العقود,Contracts/contracts.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,المشاريع,Projects/projects.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,"خطة موارد العقد",Contracts/contract_resource_plan.php,"قائمٌ — منفَّذ",revive:role-1
-التشغيل,"شروط تعديل السعر",Contracts/price_terms.php,"قائمٌ — منفَّذ",revive:role-1
-التشغيل,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,"قائمٌ — منفَّذ",revive:role-1
+التشغيل,التقارير,emsreports/index.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"التكليفات التنظيمية",admin/org_assignments.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,العقود,Contracts/contracts.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,المشاريع,Projects/projects.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"خطة موارد العقد",Contracts/contract_resource_plan.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"شروط تعديل السعر",Contracts/price_terms.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"مواقع التنفيذ",Projects/sites.php,"قائمٌ — منفَّذ",ok:placed
-التشغيل,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,"قائمٌ — منفَّذ",move:to-role-1
+التشغيل,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"أحكام العميل والمورد والمشغّل",Finance/unit_records_fin.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"لوحة الإسناد اليومي",Approvals/attribution_board.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 التشغيل,"الاعتمادات المتأخرة والوثائق",Reports/approval_lag_report.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"سجل الوحدات اليومية",Reports/daily_units_report.php,"قائمٌ — منفَّذ",ok:placed
-التشغيل,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-1
-التشغيل,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",revive:role-1
+التشغيل,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",ok:placed
 التشغيل,"مركز التقارير",Reports/reports.php,"قائمٌ — منفَّذ",ok:placed
-التشغيل,"سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-1
-التشغيل,"سجل النشاط",ActivityLogs/activity_logs.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,"أنواع المعدات",Equipments/equipments_types.php,"قائمٌ — منفَّذ",move:to-role-1
-التشغيل,"الهيكل التنظيمي",admin/org_structure.php,"قائمٌ — منفَّذ",move:to-role-1
+التشغيل,"سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"سجل النشاط",ActivityLogs/activity_logs.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"أنواع المعدات",Equipments/equipments_types.php,"قائمٌ — منفَّذ",ok:placed
+التشغيل,"الهيكل التنظيمي",admin/org_structure.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","تسجيل التايم شيت والإنتاج",Timesheet/timesheet_type.php,"قائمٌ — منفَّذ",revive:role-6
-"إدارة الموقع","أذونات الدخول والخروج والحركة",admin/org_permits.php,"قائمٌ — منفَّذ",ok:placed
-"إدارة الموقع",الورديات,movement/movement_operations.php,"قائمٌ — منفَّذ",move:to-role-6
-"إدارة الموقع","توزيع المعدات والمشغّلين",Operations/distribution_space.php,"قائمٌ — منفَّذ",move:to-role-6
-"إدارة الموقع","خطة عمل الغد",Operations/daily_plan.php,"قائمٌ — منفَّذ",move:to-role-6
-"إدارة الموقع","غرفة عمليات التشغيل",Operations/operations_room.php,"قائمٌ — منفَّذ",ok:placed
+"إدارة الموقع","أذونات الدخول والخروج والحركة",admin/org_permits.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع",الورديات,movement/movement_operations.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع","توزيع المعدات والمشغّلين",Operations/distribution_space.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع","خطة عمل الغد",Operations/daily_plan.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع","غرفة عمليات التشغيل",Operations/operations_room.php,"قائمٌ — منفَّذ",revive:role-6
 "إدارة الموقع",الإعدادات,Settings/settings.php,"قائمٌ — منفَّذ",ok:placed
-"إدارة الموقع","التكليفات التنظيمية",admin/org_assignments.php,"قائمٌ — منفَّذ",move:to-role-6
-"إدارة الموقع","الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,"قائمٌ — منفَّذ",revive:role-6
-"إدارة الموقع","خريطة التشغيل اليومية",movement/map_page.php,"قائمٌ — منفَّذ",move:to-role-6
-"إدارة الموقع","خطة موارد العقد",Contracts/contract_resource_plan.php,"قائمٌ — منفَّذ",revive:role-6
-"إدارة الموقع","فريق الإدارة والتكليفات",main/project_users.php,"قائمٌ — منفَّذ",move:to-role-6
+"إدارة الموقع","التكليفات التنظيمية",admin/org_assignments.php,"قائمٌ — منفَّذ",ok:placed
+"إدارة الموقع","الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,"قائمٌ — منفَّذ",ok:placed
+"إدارة الموقع","خريطة التشغيل اليومية",movement/map_page.php,"قائمٌ — منفَّذ",ok:placed
+"إدارة الموقع","خطة موارد العقد",Contracts/contract_resource_plan.php,"قائمٌ — منفَّذ",ok:placed
+"إدارة الموقع","فريق الإدارة والتكليفات",main/project_users.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","مواقع التنفيذ",Projects/sites.php,"قائمٌ — منفَّذ",ok:placed
-"إدارة الموقع","نطاقات العقد التشغيلية",Contracts/contract_sites.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع","نطاقات العقد التشغيلية",Contracts/contract_sites.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","أحكام العميل والمورد والمشغّل",Finance/unit_records_fin.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","التوقفات بلا مسؤول",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "إدارة الموقع","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
-"إدارة الموقع","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-6
-"إدارة الموقع","التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
+"إدارة الموقع","التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",ok:placed
 "إدارة الموقع","مركز التقارير",Reports/reports.php,"قائمٌ — منفَّذ",ok:placed
-"إدارة الموقع","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-6
+"إدارة الموقع","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
 الصيانة,"لوحة الإدارة",Maintenance/dashboard_mnt.php,"قائمٌ — منفَّذ",ok:placed
-الصيانة,"أوامر الصيانة",Maintenance/orders.php,"قائمٌ — منفَّذ",ok:placed
+الصيانة,"أوامر الصيانة",Maintenance/orders.php,"قائمٌ — منفَّذ",move:to-role-13
 الصيانة,"بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 الصيانة,"ساعات المعدة والوقائية",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-الصيانة,التقارير,emsreports/index.php,"قائمٌ — منفَّذ",revive:role-13
-الصيانة,"الصيانة الوقائية",Maintenance/preventive_plans.php,"قائمٌ — منفَّذ",ok:placed
-الصيانة,"الفحص الفني اليومي",Maintenance/inspections.php,"قائمٌ — منفَّذ",ok:placed
-الصيانة,"تصنيفات الأعطال",Equipments/manage_failure_codes.php,"قائمٌ — منفَّذ",ok:placed
+الصيانة,التقارير,emsreports/index.php,"قائمٌ — منفَّذ",move:to-role-13
+الصيانة,"الصيانة الوقائية",Maintenance/preventive_plans.php,"قائمٌ — منفَّذ",move:to-role-13
+الصيانة,"الفحص الفني اليومي",Maintenance/inspections.php,"قائمٌ — منفَّذ",move:to-role-13
+الصيانة,"تصنيفات الأعطال",Equipments/manage_failure_codes.php,"قائمٌ — منفَّذ",move:to-role-13
 الصيانة,"العودة للخدمة",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-الصيانة,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-13
-الصيانة,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",revive:role-13
-الصيانة,"سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-13
+الصيانة,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
+الصيانة,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",ok:placed
+الصيانة,"سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
 الصيانة,"إعدادات الصيانة",Maintenance/master_data.php,"قائمٌ — منفَّذ",ok:placed
 "النقل والترحيل","لوحة الإدارة",Transport/transfer_dashboard.php,"قائمٌ — منفَّذ",ok:placed
-"النقل والترحيل","أوامر الترحيل",Transport/transfer_orders_list.php,"قائمٌ — منفَّذ",ok:placed
+"النقل والترحيل","أوامر الترحيل",Transport/transfer_orders_list.php,"قائمٌ — منفَّذ",revive:role-23
 "النقل والترحيل","الحركة في الطريق",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "النقل والترحيل","الوصول والتسليم",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"النقل والترحيل","موافقات الترحيل",Transport/transfer_requests.php,"قائمٌ — منفَّذ",ok:placed
+"النقل والترحيل","موافقات الترحيل",Transport/transfer_requests.php,"قائمٌ — منفَّذ",revive:role-23
 "النقل والترحيل","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
-"النقل والترحيل","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-23
+"النقل والترحيل","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",move:to-role-23
 "النقل والترحيل","إقفال الأمر وتحميل التكلفة",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"النقل والترحيل","التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",revive:role-23
-"النقل والترحيل","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-23
+"النقل والترحيل","التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",ok:placed
+"النقل والترحيل","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
 "النقل والترحيل","إعدادات الترحيل",Transport/transfer_types_config.php,"قائمٌ — منفَّذ",ok:placed
 "النقل والترحيل",المواقع,Transport/trs_locations_config.php,"قائمٌ — منفَّذ",ok:placed
 "النقل والترحيل","تعرفة الترحيل وتسعير الأوامر",Transport/transfer_tariffs.php,"قائمٌ — منفَّذ",ok:placed
 "النقل والترحيل","قواعد تحميل تكلفة الترحيل",Transport/transfer_cost_rules_config.php,"قائمٌ — منفَّذ",ok:placed
 "سلسلة الإمداد — المشتريات","لوحة الإدارة",Procurement/dashboard_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المشتريات","طلبات الشراء",Procurement/requests_proc.php,"قائمٌ — منفَّذ",ok:placed
+"سلسلة الإمداد — المشتريات","طلبات الشراء",Procurement/requests_proc.php,"قائمٌ — منفَّذ",revive:role-16
 "سلسلة الإمداد — المشتريات","طلبات عروض الموردين",Suppliers/rfq_requests.php,"قائمٌ — منفَّذ",move:to-role-16
 "سلسلة الإمداد — المشتريات","مقارنة العروض والترسية",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"سلسلة الإمداد — المشتريات","أوامر الشراء",Procurement/orders_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المشتريات","الاستلام المؤقت",Procurement/receipt_custody_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المشتريات","صرف المخزون والعهدة",Procurement/issue_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المشتريات",المخزون,Procurement/stock_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المشتريات","كتالوج الأصناف",Procurement/items_proc.php,"قائمٌ — منفَّذ",ok:placed
+"سلسلة الإمداد — المشتريات","أوامر الشراء",Procurement/orders_proc.php,"قائمٌ — منفَّذ",revive:role-16
+"سلسلة الإمداد — المشتريات","الاستلام المؤقت",Procurement/receipt_custody_proc.php,"قائمٌ — منفَّذ",revive:role-16
+"سلسلة الإمداد — المشتريات","صرف المخزون والعهدة",Procurement/issue_proc.php,"قائمٌ — منفَّذ",revive:role-16
+"سلسلة الإمداد — المشتريات",المخزون,Procurement/stock_proc.php,"قائمٌ — منفَّذ",revive:role-16
+"سلسلة الإمداد — المشتريات","كتالوج الأصناف",Procurement/items_proc.php,"قائمٌ — منفَّذ",revive:role-16
 "سلسلة الإمداد — المشتريات","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 "سلسلة الإمداد — المشتريات","المدفوعات والخزينة",Finance/payments_fin.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المشتريات","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-16
-"سلسلة الإمداد — المشتريات","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-16
+"سلسلة الإمداد — المشتريات","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
+"سلسلة الإمداد — المشتريات","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
 "سلسلة الإمداد — المشتريات","البيانات المرجعية",Procurement/master_data_proc.php,"قائمٌ — منفَّذ",ok:placed
 "سلسلة الإمداد — المشتريات","حدود إعادة الطلب",Procurement/reordering_proc.php,"قائمٌ — منفَّذ",ok:placed
 "سلسلة الإمداد — المشتريات","موردو المشتريات",Procurement/suppliers_proc.php,"قائمٌ — منفَّذ",ok:placed
 "سلسلة الإمداد — المخازن","لوحة الإدارة",Procurement/warehouse_board.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المخازن","الاستلام المؤقت",Procurement/receipt_custody_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المخازن","صرف المخزون والعهدة",Procurement/issue_proc.php,"قائمٌ — منفَّذ",ok:placed
+"سلسلة الإمداد — المخازن","الاستلام المؤقت",Procurement/receipt_custody_proc.php,"قائمٌ — منفَّذ",revive:role-25
+"سلسلة الإمداد — المخازن","صرف المخزون والعهدة",Procurement/issue_proc.php,"قائمٌ — منفَّذ",revive:role-25
 "سلسلة الإمداد — المخازن","التحويل بين المخازن",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "سلسلة الإمداد — المخازن",المرتجعات,,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"سلسلة الإمداد — المخازن",المخزون,Procurement/stock_proc.php,"قائمٌ — منفَّذ",ok:placed
-"سلسلة الإمداد — المخازن","كتالوج الأصناف",Procurement/items_proc.php,"قائمٌ — منفَّذ",ok:placed
+"سلسلة الإمداد — المخازن",المخزون,Procurement/stock_proc.php,"قائمٌ — منفَّذ",revive:role-25
+"سلسلة الإمداد — المخازن","كتالوج الأصناف",Procurement/items_proc.php,"قائمٌ — منفَّذ",revive:role-25
 "سلسلة الإمداد — المخازن","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 "سلسلة الإمداد — المخازن","الجرد والتسويات",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "سلسلة الإمداد — المخازن","ميزانية إدارتي",Finance/budget_dept.php,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "سلسلة الإمداد — المخازن","حدود إعادة الطلب",Procurement/reordering_proc.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","اللوحة التجارية للعقود",Contracts/commercial_board.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","عروض الأسعار",Clients/quotations.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","أنشطة العملاء",Clients/activities.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","الفاتورة الضريبية",Contracts/tax_invoices.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","الفرص البيعية",Opportunities/opportunities.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","المخاطر التجارية",Clients/commercial_risks.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود",المستخلصات,Contracts/claims.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود",المناقصات,Clients/tenders.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","احتساب الجزاءات والحوافز",Contracts/penalties.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","عروض الأسعار",Clients/quotations.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","أنشطة العملاء",Clients/activities.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","الفاتورة الضريبية",Contracts/tax_invoices.php,"قائمٌ — منفَّذ",move:to-role-12
+"المبيعات والعقود","الفرص البيعية",Opportunities/opportunities.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","المخاطر التجارية",Clients/commercial_risks.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود",المستخلصات,Contracts/claims.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود",المناقصات,Clients/tenders.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","احتساب الجزاءات والحوافز",Contracts/penalties.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود",الإعدادات,Settings/settings.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","التزامات العقود",Clients/contract_commitments.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","التزامات العقود",Clients/contract_commitments.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","الجدول الشهري للعقد",Contracts/contract_monthly_plan.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود",العقود,Contracts/contracts.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود",العملاء,Clients/clients.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود",المشاريع,Projects/projects.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","بنود عقد العميل وقيمته",Contracts/contract_lines.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","خط أساس العقد",Contracts/contract_baseline.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","خطة دفع العقد",Contracts/contract_payment_schedule.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","خطة موارد العقد",Contracts/contract_resource_plan.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","ربط الخطة بالفعلي",Contracts/plan_actual_link.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","شروط تعديل السعر",Contracts/price_terms.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","ضمانات العقد",Contracts/contract_guarantees.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","مصفوفة التزامات العقد",Contracts/contract_obligations.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","ملاحق العقود وتجديداتها",Clients/contract_amendments.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","نطاقات العقد التشغيلية",Contracts/contract_sites.php,"قائمٌ — منفَّذ",revive:role-12
-"المبيعات والعقود","سجل حركة العقد",Clients/contract_events.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","بنود عقد العميل وقيمته",Contracts/contract_lines.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","خط أساس العقد",Contracts/contract_baseline.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","خطة دفع العقد",Contracts/contract_payment_schedule.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","خطة موارد العقد",Contracts/contract_resource_plan.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","ربط الخطة بالفعلي",Contracts/plan_actual_link.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","شروط تعديل السعر",Contracts/price_terms.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","ضمانات العقد",Contracts/contract_guarantees.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","مصفوفة التزامات العقد",Contracts/contract_obligations.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","ملاحق العقود وتجديداتها",Clients/contract_amendments.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","نطاقات العقد التشغيلية",Contracts/contract_sites.php,"قائمٌ — منفَّذ",ok:placed
+"المبيعات والعقود","سجل حركة العقد",Clients/contract_events.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","جاهزية العروض",Clients/readiness_lines.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","لوحة الإسناد اليومي",Approvals/attribution_board.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","الذمم والتحصيل",Contracts/collections.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","الذمم والتحصيل",Contracts/collections.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
-"المبيعات والعقود","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","كشف حساب العميل",Contracts/client_statement.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","مركز التقارير",Reports/reports.php,"قائمٌ — منفَّذ",ok:placed
-"المبيعات والعقود","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-12
+"المبيعات والعقود","سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","قوائم ونماذج التسعير",Clients/pricelists.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","كتالوج المنتجات والخدمات",Clients/products.php,"قائمٌ — منفَّذ",ok:placed
 "المبيعات والعقود","وحدات القياس",Clients/units_of_measure.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"اللوحة التجارية للعقود",Contracts/commercial_board.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,"اللوحة التجارية للعقود",Contracts/commercial_board.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"اللوحة التنفيذية",Finance/executive_dashboard_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"لوحة الإدارة",Finance/cfo_daily_board_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"طلبات عروض الموردين",Suppliers/rfq_requests.php,"قائمٌ — منفَّذ",move:to-role-17
-المالية,"الفاتورة الضريبية",Contracts/tax_invoices.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"القيود اليومية",Finance/journal_form_fin.php,"قائمٌ — منفَّذ",ok:placed
-المالية,المستخلصات,Contracts/claims.php,"قائمٌ — منفَّذ",move:to-role-17
-المالية,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"احتساب الجزاءات والحوافز",Contracts/penalties.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"الفاتورة الضريبية",Contracts/tax_invoices.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,"القيود اليومية",Finance/journal_form_fin.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,المستخلصات,Contracts/claims.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"المطابقة البنكية",Finance/bank_reconciliation_fin.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,"احتساب الجزاءات والحوافز",Contracts/penalties.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"اقتصاد دورة حياة العقد",Contracts/contract_lifecycle.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"الأصول والإهلاك",Finance/assets_fin.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"التمويل والالتزامات",Finance/funding_fin.php,"قائمٌ — منفَّذ",move:to-role-17
-المالية,"الطاقة والجاهزية ومهلة الإحلال",Suppliers/supplier_capacity.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"بنود عقد العميل وقيمته",Contracts/contract_lines.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"بنود عقد المورد",Suppliers/supplier_contract_lines.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"التمويل والالتزامات",Finance/funding_fin.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"الطاقة والجاهزية ومهلة الإحلال",Suppliers/supplier_capacity.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"بنود عقد العميل وقيمته",Contracts/contract_lines.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"بنود عقد المورد",Suppliers/supplier_contract_lines.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"تسويات الموظفين",Workforce/employee_settlements.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"تصفية إنهاء خدمة الموظف",Workforce/final_settlement.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"تصفية إنهاء عقد المورد",Suppliers/supplier_closure.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"تقييم المورد الدوري",Suppliers/supplier_evaluation.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"خط أساس العقد",Contracts/contract_baseline.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"تصفية إنهاء عقد المورد",Suppliers/supplier_closure.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"تقييم المورد الدوري",Suppliers/supplier_evaluation.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"خط أساس العقد",Contracts/contract_baseline.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"دليل الحسابات",Finance/accounts_fin.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"ربط الخطة بالفعلي",Contracts/plan_actual_link.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"سلفيات الموردين",Suppliers/supplier_advances.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,"ربط الخطة بالفعلي",Contracts/plan_actual_link.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"سلفيات الموردين",Suppliers/supplier_advances.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"سلفيات الموظفين",Workforce/employee_advances.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"شروط تعديل السعر",Contracts/price_terms.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"قواعد تحميل المورد وجزاءاته",Suppliers/supplier_rules.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"كشف حساب المورد",Finance/supplier_statement_fin.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"وثائق المورد وحسابه البنكي",Suppliers/supplier_documents.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"شروط تعديل السعر",Contracts/price_terms.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"قواعد تحميل المورد وجزاءاته",Suppliers/supplier_rules.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"كشف حساب المورد",Finance/supplier_statement_fin.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"مصفوفة التزامات العقد",Contracts/contract_obligations.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"وثائق المورد وحسابه البنكي",Suppliers/supplier_documents.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"الطلبات المالية",FinRequests/finance_gateway.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"أحكام العميل والمورد والمشغّل",Finance/unit_records_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"بوابة الاستحقاق المالي",,"★ جديدٌ — مطلوبٌ للبناء",build:new
@@ -185,90 +185,90 @@
 المالية,"بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 المالية,"سجل الوحدات اليومية",Reports/daily_units_report.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"استقبال معاملات الإدارات",Finance/import_events_fin.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"الدوريات المالية",Finance/periodic_events_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"السيولة والتنبؤ النقدي",Finance/cash_forecast_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"الضرائب والقيمة المضافة",Finance/tax_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"المحاسبة الإدارية",Finance/management_accounting_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"المدفوعات والخزينة",Finance/payments_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"الموازنة العامة والتوحيد",Finance/budget_master.php,"★ جديدٌ — مطلوبٌ للبناء",build:new
-المالية,"الميزانية والانحراف",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"تسويات الموردين",Suppliers/settlements.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,"الميزانية والانحراف",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"تسويات الموردين",Suppliers/settlements.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"مسيّر الرواتب",Workforce/payroll_runs.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"سجل الذمم المدينة والتحصيلات",Contracts/collections.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"سجل الأحداث المالية",Finance/events_list_fin.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"سجل الذمم المدينة والتحصيلات",Contracts/collections.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"إقفال الفترات",Finance/periods_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"القوائم المالية",Finance/financial_statements_fin.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"تقارير الطلبات المالية",FinRequests/requests_reports.php,"قائمٌ — منفَّذ",revive:role-17
-المالية,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"تقارير الطلبات المالية",FinRequests/requests_reports.php,"قائمٌ — منفَّذ",ok:placed
+المالية,"زمن دورة الطلبات",FinRequests/cycle_time_board.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"كشف حساب العميل",Contracts/client_statement.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"سجل الحركة المالية",FinRequests/effect_map.php,"قائمٌ — منفَّذ",revive:role-17
+المالية,"سجل الحركة المالية",FinRequests/effect_map.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"العملات وأسعار الصرف",Finance/currencies_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"المحاسبون والوحدات",Finance/accountants_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"تعرفة الترحيل وتسعير الأوامر",Transport/transfer_tariffs.php,"قائمٌ — منفَّذ",ok:placed
-المالية,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,"قائمٌ — منفَّذ",move:to-role-17
+المالية,"سياسات مستحقات المشغّلين",Finance/operator_pay_policies_fin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"قواعد توجيه الطلبات",FinRequests/routing_admin.php,"قائمٌ — منفَّذ",ok:placed
 المالية,"قواعد مخصص الصيانة",Finance/maintenance_provision_fin.php,"قائمٌ — منفَّذ",ok:placed
 "التمويل والملكية","لوحة الإدارة",Financing/financing_board.php,"قائمٌ — منفَّذ",ok:placed
-"التمويل والملكية","إنشاء عملية تمويل",Financing/financing_operation_new.php,"قائمٌ — منفَّذ",ok:placed
+"التمويل والملكية","إنشاء عملية تمويل",Financing/financing_operation_new.php,"قائمٌ — منفَّذ",move:to-role-26
 "التمويل والملكية","الأقساط والسداد",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "التمويل والملكية","ملف عملية التمويل",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"التمويل والملكية","سجل الممولين",Financing/financiers_registry.php,"قائمٌ — منفَّذ",ok:placed
+"التمويل والملكية","سجل الممولين",Financing/financiers_registry.php,"قائمٌ — منفَّذ",move:to-role-26
 "التمويل والملكية","الانحرافات الثلاث",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "التمويل والملكية","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
-"التمويل والملكية","الاعتمادات المتأخرة والوثائق",Reports/approval_lag_report.php,"قائمٌ — منفَّذ",ok:placed
+"التمويل والملكية","الاعتمادات المتأخرة والوثائق",Reports/approval_lag_report.php,"قائمٌ — منفَّذ",move:to-role-26
 "التمويل والملكية","توزيع تكلفة التمويل",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "التمويل والملكية","ميزانية إدارتي",Finance/budget_dept.php,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"التمويل والملكية","التراخيص والكفالات",Governance/licenses_guarantees.php,"قائمٌ — منفَّذ",move:to-role-26
-"التمويل والملكية","التفويض بالتوقيع",Governance/signing_authority.php,"قائمٌ — منفَّذ",move:to-role-26
-"التمويل والملكية","سجل الكيانات",Governance/entities_registry.php,"قائمٌ — منفَّذ",move:to-role-26
+"التمويل والملكية","التراخيص والكفالات",Governance/licenses_guarantees.php,"قائمٌ — منفَّذ",ok:placed
+"التمويل والملكية","التفويض بالتوقيع",Governance/signing_authority.php,"قائمٌ — منفَّذ",ok:placed
+"التمويل والملكية","سجل الكيانات",Governance/entities_registry.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
-الأسطول,"لوحة الجاهزية",Fleet/readiness_board.php,"قائمٌ — منفَّذ",move:to-role-3
-الأسطول,"خطة عمل الغد",Operations/daily_plan.php,"قائمٌ — منفَّذ",move:to-role-3
+الأسطول,"لوحة الجاهزية",Fleet/readiness_board.php,"قائمٌ — منفَّذ",ok:placed
+الأسطول,"خطة عمل الغد",Operations/daily_plan.php,"قائمٌ — منفَّذ",revive:role-3
 الأسطول,"الأصول والإهلاك",Finance/assets_fin.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,الإعدادات,Settings/settings.php,"قائمٌ — منفَّذ",ok:placed
-الأسطول,المعدات,Equipments/equipments_fleet.php,"قائمٌ — منفَّذ",revive:role-3
+الأسطول,المعدات,Equipments/equipments_fleet.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"الملكية والمُلّاك",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-الأسطول,"تخصيص المعدات للمشروعات",Oprators/select_project.php,"قائمٌ — منفَّذ",revive:role-3
-الأسطول,"فريق الإدارة والتكليفات",main/project_users.php,"قائمٌ — منفَّذ",move:to-role-3
-الأسطول,"قراءات العدّادات",Equipments/meter_readings.php,"قائمٌ — منفَّذ",move:to-role-3
+الأسطول,"تخصيص المعدات للمشروعات",Oprators/select_project.php,"قائمٌ — منفَّذ",ok:placed
+الأسطول,"فريق الإدارة والتكليفات",main/project_users.php,"قائمٌ — منفَّذ",ok:placed
+الأسطول,"قراءات العدّادات",Equipments/meter_readings.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"مواقع التنفيذ",Projects/sites.php,"قائمٌ — منفَّذ",ok:placed
-الأسطول,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,"قائمٌ — منفَّذ",move:to-role-3
+الأسطول,"وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"أحكام العميل والمورد والمشغّل",Finance/unit_records_fin.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
-الأسطول,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-3
+الأسطول,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"التصرف في الأصل",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-الأسطول,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",revive:role-3
+الأسطول,"التكاليف والربحية",Finance/cost_report_fin.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"مركز التقارير",Reports/reports.php,"قائمٌ — منفَّذ",ok:placed
 الأسطول,"إعداد الإهلاك",Equipments/fleet_depreciation_profiles.php,"قائمٌ — منفَّذ",ok:placed
-الأسطول,"الأنواع والموديلات",Equipments/fleet_models.php,"قائمٌ — منفَّذ",move:to-role-3
+الأسطول,"الأنواع والموديلات",Equipments/fleet_models.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,"لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
-الموردون,"طلبات عروض الموردين",Suppliers/rfq_requests.php,"قائمٌ — منفَّذ",move:to-role-2
+الموردون,"طلبات عروض الموردين",Suppliers/rfq_requests.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,الإعدادات,Settings/settings.php,"قائمٌ — منفَّذ",ok:placed
-الموردون,"الطاقة والجاهزية ومهلة الإحلال",Suppliers/supplier_capacity.php,"قائمٌ — منفَّذ",revive:role-2
-الموردون,الموردون,Suppliers/suppliers.php,"قائمٌ — منفَّذ",move:to-role-2
-الموردون,"بنود عقد المورد",Suppliers/supplier_contract_lines.php,"قائمٌ — منفَّذ",revive:role-2
-الموردون,"تصفية إنهاء عقد المورد",Suppliers/supplier_closure.php,"قائمٌ — منفَّذ",revive:role-2
-الموردون,"تقييم المورد الدوري",Suppliers/supplier_evaluation.php,"قائمٌ — منفَّذ",revive:role-2
+الموردون,"الطاقة والجاهزية ومهلة الإحلال",Suppliers/supplier_capacity.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,الموردون,Suppliers/suppliers.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"بنود عقد المورد",Suppliers/supplier_contract_lines.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"تصفية إنهاء عقد المورد",Suppliers/supplier_closure.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"تقييم المورد الدوري",Suppliers/supplier_evaluation.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,"حصص الموردين والتغطية",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 الموردون,"خطة معدات المورد",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-الموردون,"سلفيات الموردين",Suppliers/supplier_advances.php,"قائمٌ — منفَّذ",move:to-role-2
-الموردون,"عقود الموردين",Suppliers/supplierscontracts.php,"قائمٌ — منفَّذ",move:to-role-2
-الموردون,"قواعد تحميل المورد وجزاءاته",Suppliers/supplier_rules.php,"قائمٌ — منفَّذ",revive:role-2
-الموردون,"كشف حساب المورد",Finance/supplier_statement_fin.php,"قائمٌ — منفَّذ",revive:role-2
-الموردون,"مشرفو الموردين",main/project_users.php,"قائمٌ — منفَّذ",move:to-role-2
-الموردون,"وثائق المورد وحسابه البنكي",Suppliers/supplier_documents.php,"قائمٌ — منفَّذ",revive:role-2
+الموردون,"سلفيات الموردين",Suppliers/supplier_advances.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"عقود الموردين",Suppliers/supplierscontracts.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"قواعد تحميل المورد وجزاءاته",Suppliers/supplier_rules.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"كشف حساب المورد",Finance/supplier_statement_fin.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"مشرفو الموردين",main/project_users.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"وثائق المورد وحسابه البنكي",Suppliers/supplier_documents.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,"اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,"بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 الموردون,"المدفوعات والخزينة",Finance/payments_fin.php,"قائمٌ — منفَّذ",ok:placed
-الموردون,"تسويات الموردين",Suppliers/settlements.php,"قائمٌ — منفَّذ",move:to-role-2
-الموردون,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-2
+الموردون,"تسويات الموردين",Suppliers/settlements.php,"قائمٌ — منفَّذ",ok:placed
+الموردون,"ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,"مركز التقارير",Reports/reports.php,"قائمٌ — منفَّذ",ok:placed
 الموردون,"تعرفة الترحيل وتسعير الأوامر",Transport/transfer_tariffs.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
-"الموارد البشرية","احتياج القوى والتخطيط",Workforce/workforce_requirement.php,"قائمٌ — منفَّذ",ok:placed
-"الموارد البشرية","الإجازات والغياب",Workforce/worker_leave_absence.php,"قائمٌ — منفَّذ",ok:placed
+"الموارد البشرية","احتياج القوى والتخطيط",Workforce/workforce_requirement.php,"قائمٌ — منفَّذ",revive:role-4
+"الموارد البشرية","الإجازات والغياب",Workforce/worker_leave_absence.php,"قائمٌ — منفَّذ",revive:role-4
 "الموارد البشرية","دورة التوظيف",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "الموارد البشرية",الإعدادات,Settings/settings.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","السكن والإعاشة",Workforce/housing_units.php,"قائمٌ — منفَّذ",ok:placed
@@ -280,9 +280,9 @@
 "الموارد البشرية","تنقلات العاملين",Workforce/worker_movement.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","سلفيات الموظفين",Workforce/employee_advances.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","عقود العاملين",Workforce/worker_contract.php,"قائمٌ — منفَّذ",ok:placed
-"الموارد البشرية","فريق الإدارة والتكليفات",main/project_users.php,"قائمٌ — منفَّذ",move:to-role-4
+"الموارد البشرية","فريق الإدارة والتكليفات",main/project_users.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","ملف العامل التشغيلي",Workforce/worker_register.php,"قائمٌ — منفَّذ",ok:placed
-"الموارد البشرية","وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,"قائمٌ — منفَّذ",move:to-role-4
+"الموارد البشرية","وثائق المعدات والمشغّلين",Equipments/equipment_documents.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","سجل العقود الموحّد",Workforce/contract_registry.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","اعتماد الوحدات التشغيلية",Approvals/hours_approval.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","الخصوم المقترحة",,"★ جديدٌ — مطلوبٌ للبناء",build:new
@@ -290,33 +290,33 @@
 "الموارد البشرية","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 "الموارد البشرية","تسويات العاملين",Workforce/worker_settlement.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","مسيّر الرواتب",Workforce/payroll_runs.php,"قائمٌ — منفَّذ",ok:placed
-"الموارد البشرية","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-4
+"الموارد البشرية","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","مركز التقارير",Reports/reports.php,"قائمٌ — منفَّذ",ok:placed
-"الموارد البشرية","سجل الأحداث التشغيلية",Workforce/worker_worklog.php,"قائمٌ — منفَّذ",move:to-role-4
+"الموارد البشرية","سجل الأحداث التشغيلية",Workforce/worker_worklog.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","الأدوار الوظيفية",Employees/employee_roles.php,"قائمٌ — منفَّذ",ok:placed
 "الموارد البشرية","المسميات الوظيفية",Employees/job_titles.php,"قائمٌ — منفَّذ",ok:placed
 "الحوكمة والالتزام","لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
 "الحوكمة والالتزام","مكوّنات البوابة وإنجازي",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "الحوكمة والالتزام","من يرى ماذا (محاكاة)",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"الحوكمة والالتزام","إدارة المستخدمين",main/users.php,"قائمٌ — منفَّذ",ok:placed
-"الحوكمة والالتزام","فريق الإدارة والتكليفات",main/all_assistants.php,"قائمٌ — منفَّذ",ok:placed
-"الحوكمة والالتزام","مركز الحوكمة والالتزام",admin/sec_governance.php,"قائمٌ — منفَّذ",ok:placed
-"الحوكمة والالتزام","معالج إعداد الموظف",admin/sec_employee_wizard.php,"قائمٌ — منفَّذ",ok:placed
+"الحوكمة والالتزام","إدارة المستخدمين",main/users.php,"قائمٌ — منفَّذ",move:to-role-15
+"الحوكمة والالتزام","فريق الإدارة والتكليفات",main/all_assistants.php,"قائمٌ — منفَّذ",revive:role-15
+"الحوكمة والالتزام","مركز الحوكمة والالتزام",admin/sec_governance.php,"قائمٌ — منفَّذ",revive:role-15
+"الحوكمة والالتزام","معالج إعداد الموظف",admin/sec_employee_wizard.php,"قائمٌ — منفَّذ",revive:role-15
 "الحوكمة والالتزام","سجل التكليفات والإنابات",main/project_users.php,"قائمٌ — منفَّذ",move:to-role-15
 "الحوكمة والالتزام","بلاغات إدارتي",,"★ جديدٌ — مطلوبٌ للبناء",link:dept_inbox
 "الحوكمة والالتزام","المراجعة الدورية للصلاحيات",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"الحوكمة والالتزام","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-15
+"الحوكمة والالتزام","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
 "الحوكمة والالتزام","لماذا يملك فلانٌ هذه الصلاحية؟",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"مركز البلاغات","برج المراقبة والمؤشرات",Tickets/watchtower.php,"قائمٌ — منفَّذ",ok:placed
-"مركز البلاغات","لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",ok:placed
-"مركز البلاغات","لوحة المسارات المتوازية",Tickets/ticket_workstreams_board.php,"قائمٌ — منفَّذ",ok:placed
+"مركز البلاغات","برج المراقبة والمؤشرات",Tickets/watchtower.php,"قائمٌ — منفَّذ",revive:role-24
+"مركز البلاغات","لوحة الإدارة",main/role_board.php,"قائمٌ — منفَّذ",move:to-role-24
+"مركز البلاغات","لوحة المسارات المتوازية",Tickets/ticket_workstreams_board.php,"قائمٌ — منفَّذ",revive:role-24
 "مركز البلاغات","الاستفسار عن بلاغٍ متعثر",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "مركز البلاغات","الاستقبال والتصنيف",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"مركز البلاغات",البلاغات,Tickets/tickets_list.php,"قائمٌ — منفَّذ",ok:placed
-"مركز البلاغات","البلاغات الدورية",Tickets/ticket_recurrence.php,"قائمٌ — منفَّذ",ok:placed
-"مركز البلاغات","تصنيفات الأعطال والبلاغات",Tickets/ticket_categories_config.php,"قائمٌ — منفَّذ",ok:placed
+"مركز البلاغات",البلاغات,Tickets/tickets_list.php,"قائمٌ — منفَّذ",revive:role-24
+"مركز البلاغات","البلاغات الدورية",Tickets/ticket_recurrence.php,"قائمٌ — منفَّذ",revive:role-24
+"مركز البلاغات","تصنيفات الأعطال والبلاغات",Tickets/ticket_categories_config.php,"قائمٌ — منفَّذ",revive:role-24
 "مركز البلاغات","الإغلاق الإداري",,"★ جديدٌ — مطلوبٌ للبناء",build:new
-"مركز البلاغات","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",revive:role-24
+"مركز البلاغات","ميزانية إدارتي",Finance/budget_form_fin.php,"قائمٌ — منفَّذ",ok:placed
 "مركز البلاغات","أداء البلاغات",Tickets/ticket_dashboard.php,"قائمٌ — منفَّذ",ok:placed
 "مركز البلاغات","تقرير من يتأخر ومن لا يستجيب",,"★ جديدٌ — مطلوبٌ للبناء",build:new
 "مركز البلاغات","أزمنة الاستجابة والإنجاز",Tickets/ticket_sla_config.php,"قائمٌ — منفَّذ",ok:placed
