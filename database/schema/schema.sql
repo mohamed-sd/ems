@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 03:28:27
--- الجداول: 356 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 03:43:53
+-- الجداول: 358 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7972,6 +7972,38 @@ CREATE TABLE `trs_notifications` (
   KEY `ix_company_read` (`company_id`,`is_read`),
   KEY `ix_order` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: uat_evidence ──
+CREATE TABLE `uat_evidence` (
+  `ev_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `run_id` int unsigned NOT NULL,
+  `criterion` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'رمز المعيار: H1..H6 · S1.. · الشواهد الأربعة عشر',
+  `expected` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `actual` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `result` enum('pass','fail','na') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'na',
+  `evidence_ref` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'لقطة أو مرجع سجل',
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ev_id`),
+  KEY `idx_uatev_run` (`run_id`,`criterion`),
+  CONSTRAINT `fk_uatev_run` FOREIGN KEY (`run_id`) REFERENCES `uat_runs` (`run_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-14: الشواهد الأربعة عشر — موثقة كلها';
+
+-- ── Table: uat_runs ──
+CREATE TABLE `uat_runs` (
+  `run_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `tag` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UAT-2026' COMMENT 'وسم التمييز — للتقارير لا للحذف',
+  `phase` enum('hardening','functional','break','close','load','decision') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `state` enum('planned','running','passed','failed','blocked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'planned',
+  `executor` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '§12.1: مستخدمو الإدارات — والفريق يراقب ويوثق',
+  `metrics_json` json DEFAULT NULL,
+  `started_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`run_id`),
+  KEY `idx_uat_phase` (`company_id`,`phase`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-01: جولات التجربة — التحصين قبل كل تجربة';
 
 -- ── Table: unit_approvals ──
 CREATE TABLE `unit_approvals` (
