@@ -1,19 +1,19 @@
 {
-    "generated_at": "2026-08-02 03:22:35",
+    "generated_at": "2026-08-02 03:28:27",
     "source_db": "equipation_manage",
     "server_version": "8.4.7",
     "files": {
         "schema.sql": {
-            "sha1": "d539993cd3a48295e138708cb944dd19a5afff07",
-            "bytes": 625757
+            "sha1": "d52c7e1f5085abfd825ce036bdc3b5d92eece55e",
+            "bytes": 626250
         },
         "seed_reference.sql": {
-            "sha1": "44af0eeff9d61f266bfe92e4e8e7d74de68f01d5",
+            "sha1": "183659706249a53bc623ee0617ff181bead1d1ab",
             "bytes": 263228
         }
     },
     "schema": {
-        "tables": 355,
+        "tables": 356,
         "views": 6
     },
     "seed": {

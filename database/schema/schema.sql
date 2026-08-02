@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 03:22:35
--- الجداول: 355 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 03:28:27
+-- الجداول: 356 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2255,6 +2255,16 @@ CREATE TABLE `ems_sequences` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`scope`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K8: متتاليات ذرّية للترقيم الخادمي (ServerId::nextNo)';
+
+-- ── Table: ems_sessions ──
+CREATE TABLE `ems_sessions` (
+  `sess_id` varchar(128) COLLATE utf8mb4_bin NOT NULL,
+  `sess_data` mediumblob,
+  `expires_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`sess_id`),
+  KEY `idx_sess_exp` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='NFR-13: قراءة/كتابة صف لا قفل ملف — والكنس بالدورية';
 
 -- ── Table: ems_state_transitions ──
 CREATE TABLE `ems_state_transitions` (

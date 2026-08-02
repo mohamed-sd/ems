@@ -89,6 +89,9 @@ DirectoryIndex index.php index.html
 <IfModule php_module>
     php_value upload_max_filesize 6M
     php_value post_max_size 10M
+    # N-26/NFR-13 (update0004): محمّل معالج الجلسات المشترك — يعمل قبل أي
+    # session_start()، ولا أثر له والعلم EMS_SESSION_STORE=files (الافتراض).
+    php_value auto_prepend_file "C:/wamp64/www/ems/includes/session_bootstrap.php"
 </IfModule>
 
 # ═══════════════════════════════════════════════════════════════════════════
