@@ -35,7 +35,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'حصص الموردين والتغطية';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-chart-pie"></i> حصصُ الموردين والتغطية</h4></div>
   <p class="text-muted" style="font-size:.9em">المستهلَكُ محسوبٌ من دفتر القدرات لا من عمودٍ مخزَّن — والتغطيةُ الاستثنائيةُ بندٌ لا يرفع الحصة (CAP-01 §7).</p>
   <table class="table table-striped" data-no-dt>

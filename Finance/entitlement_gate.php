@@ -26,7 +26,7 @@ if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
 $page_title = 'بوابة الاستحقاق المالي';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar">
     <h4><i class="fa fa-door-closed"></i> بوابةُ الاستحقاق المالي</h4>
     <span class="badge" style="background:#fd7e14;font-size:.95em">بانتظار البوابة: <?= count($rows) ?></span>

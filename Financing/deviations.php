@@ -66,7 +66,7 @@ $types = array('no_movement' => 'عقدٌ بلا حركة', 'payment_gap' => 'ف
 $page_title = 'الانحرافات الثلاث';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-exclamation-triangle"></i> الانحرافاتُ الثلاث</h4></div>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>

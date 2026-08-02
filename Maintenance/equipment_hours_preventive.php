@@ -41,7 +41,7 @@ if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
 $page_title = 'ساعاتُ المعدة والوقائية';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-stopwatch"></i> ساعاتُ المعدة مقابل جدول الغيار</h4></div>
   <p class="text-muted" style="font-size:.9em">زاويةُ الصيانة للتايم شيت: المتراكمُ منذ آخر إنجازٍ مقابل الفترة — لا «من عمل اليوم».</p>
 

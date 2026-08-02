@@ -38,7 +38,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'ميزانية إدارتي';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-coins"></i> ميزانيةُ إدارتي — <?= $isFinance ? 'كلُّ الإدارات (زاويةُ المالية)' : htmlspecialchars($dept !== '' ? $dept : 'دورُك بلا وحدة', ENT_QUOTES, 'UTF-8') ?></h4></div>
   <form method="get" style="margin-bottom:12px"><label>السنة</label>
     <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()"></form>

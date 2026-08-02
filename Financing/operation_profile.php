@@ -37,7 +37,7 @@ if ($r) $op = mysqli_fetch_assoc($r);
 $page_title = 'ملف عملية التمويل';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <?php if (!$op): ?>
     <div class="alert alert-warning">عمليةٌ غيرُ موجودةٍ — <a href="financing_board.php">العودةُ للوحة</a></div>
   <?php else: ?>

@@ -58,7 +58,7 @@ if ($sel_site > 0) {
 $page_title = 'لوحة المواقع';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-map"></i> لوحةُ المواقع</h4></div>
 
   <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">

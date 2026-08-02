@@ -234,8 +234,8 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 
-<!-- HTML Content -->
-<div class="content-wrapper">
+<!-- HTML Content — الحاوية المعتمدة .main (لا تستعمل allforms غلافَ صفحة: إنها جلدُ فورم الإضافة القابل للطي وهي display:none حتى allforms-visible) -->
+<div class="main" dir="rtl">
     <form method="POST">
         <?php echo csrf_field(); ?>
         <!-- الحقول -->

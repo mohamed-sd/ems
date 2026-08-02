@@ -45,7 +45,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'الحركة في الطريق';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-truck-moving"></i> الحركةُ في الطريق</h4>
     <span class="badge" style="background:#fd7e14"><?= count($rows) ?> في الطريق</span></div>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>

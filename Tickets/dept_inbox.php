@@ -76,7 +76,7 @@ if ($res) {
 $page_title = 'بلاغاتُ إدارتي';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar">
     <h4><i class="fa fa-bell"></i> بلاغاتُ إدارتي</h4>
     <div>

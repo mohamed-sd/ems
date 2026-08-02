@@ -39,7 +39,7 @@ $depts = array('العميل','المورد','الصيانة','التشغيل','
 $page_title = 'التوقفات بلا مسؤول';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-user-slash"></i> التوقفاتُ بلا مسؤول</h4>
     <span class="badge" style="background:#dc3545"><?= count($rows) ?> — ولا يُقفل يومٌ وفيها واحد</span></div>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>

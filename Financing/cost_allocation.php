@@ -42,7 +42,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'توزيع تكلفة التمويل';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-percentage"></i> توزيعُ تكلفة التمويل على المشاريع</h4></div>
   <p class="text-muted" style="font-size:.9em">الربحُ الشهريُّ لكل عمليةٍ (الإجماليُّ ÷ الأقساط) يوزَّع على مشروع كل عينٍ بنسبة حصتها — والتشغيلُ يرى تكلفةً محمَّلةً بلا مصدر.</p>
   <table class="table table-striped" data-no-dt>

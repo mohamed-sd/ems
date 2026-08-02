@@ -41,7 +41,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'الملكية والملاك';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-user-shield"></i> الملكيةُ والمُلّاك — سجلٌّ مقيَّد</h4>
     <span class="badge" style="background:#dc3545">كلُّ اطّلاعٍ مسجَّل</span></div>
   <table class="table table-striped" data-no-dt>

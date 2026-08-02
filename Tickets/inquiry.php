@@ -39,7 +39,7 @@ if ($q !== '') {
 $page_title = 'الاستفسار عن بلاغ';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-search"></i> الاستفسارُ عن بلاغٍ متعثر — جهةٌ واحدةٌ تُسأل</h4></div>
   <form method="get" class="ems-form" style="display:flex;gap:8px;max-width:440px;margin-bottom:16px">
     <input type="text" name="q" class="form-control" placeholder="رقمُ البلاغ (TK-… أو #)" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" required>

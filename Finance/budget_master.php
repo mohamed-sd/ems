@@ -22,7 +22,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; $tp += floatval($x['
 $page_title = 'الموازنة العامة والتوحيد';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-university"></i> الموازنةُ العامة — <?= $year ?></h4></div>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الإدارة</th><th>ميزانيات</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th></tr></thead>

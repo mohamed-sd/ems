@@ -47,7 +47,7 @@ $metrics = array(
 $page_title = 'إنجاز الإدارة';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-chart-line"></i> إنجازُ الإدارة</h4></div>
   <form method="get" class="ems-form" style="display:flex;gap:8px;align-items:end;margin-bottom:14px">
     <div><label>من</label><input type="date" name="from" class="form-control" value="<?= htmlspecialchars($from) ?>"></div>

@@ -28,7 +28,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'الخصوم المقترحة';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-minus-circle"></i> الخصومُ المقترحة — بانتظار السلّم الثلاثي</h4>
     <span class="badge" style="background:#fd7e14"><?= count($rows) ?></span></div>
   <p class="text-muted" style="font-size:.9em">كلُّ خصمٍ بمصدره (M-11: لا خصمَ بلا مستند) — والاعتمادُ من صندوق الاعتماد الجامع لا من هنا.</p>

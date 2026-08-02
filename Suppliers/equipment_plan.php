@@ -32,7 +32,7 @@ if ($sup > 0) {
 $page_title = 'خطة معدات المورد';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-truck"></i> خطةُ معدات المورد</h4></div>
   <form method="get" class="ems-form" style="margin-bottom:14px">
     <select name="supplier_id" class="form-control" style="max-width:340px" onchange="this.form.submit()">

@@ -61,7 +61,7 @@ if ($rfq > 0) {
 $page_title = 'مقارنة العروض والترسية';
 include '../insidebar.php';
 ?>
-<div class="content-wrapper allforms" dir="rtl">
+<div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-balance-scale"></i> مقارنةُ العروض والترسية</h4></div>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="get" class="ems-form" style="margin-bottom:14px">
