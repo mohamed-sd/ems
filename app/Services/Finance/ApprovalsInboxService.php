@@ -104,6 +104,21 @@ class ApprovalsInboxService
         $boxes[] = array('key' => 'permits', 'title' => 'أذونات المواقع',
             'owner' => 'admin/org_permits.php', 'rows' => $rows, 'count' => count($rows));
 
+        // ── ⑥ طلباتُ التبديل (NAV-01 v6 §6.3 · update0007 S-02) — بموافقتين ──
+        $rows = array();
+        $r = $conn->query("SELECT cov_id, reason_code, valid_to, estimated_hours, created_at
+                             FROM substitute_coverages
+                            WHERE state = 'Pending'
+                            ORDER BY created_at LIMIT 50");
+        while ($r && ($x = $r->fetch_assoc())) {
+            $rows[] = array('label' => 'تبديل #' . (int) $x['cov_id'] . ' — ' . $x['reason_code']
+                    . ' · حتى ' . $x['valid_to'] . ' · ~' . $x['estimated_hours'] . ' ساعة',
+                'link' => '../Operations/swap_request.php?view=' . (int) $x['cov_id'],
+                'since' => (string) $x['created_at']);
+        }
+        $boxes[] = array('key' => 'swaps', 'title' => 'طلبات التبديل — بموافقتين',
+            'owner' => 'Operations/sites_board.php', 'rows' => $rows, 'count' => count($rows));
+
         $total = 0;
         foreach ($boxes as $b) { $total += (int) $b['count']; }
         return array('ok' => true, 'boxes' => $boxes, 'total' => $total);

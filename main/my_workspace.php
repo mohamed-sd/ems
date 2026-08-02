@@ -44,6 +44,9 @@ $tiles = array(
     array('⑥ المراسلات والتنبيهات', 'الداخلية وغير المقروءة', 'fa fa-bell', '../admin/bus_monitor.php', $myMsgs),
     array('⑦ بلاغاتي', 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة', 'fa fa-bullhorn', '../Tickets/ticket_contextual_open.php', $myTickets),
     array('⑧ ملفي', 'ملفي الشخصي وكشوفي ووثائقي', 'fa fa-id-card', '../Portal/my_portal.php', null),
+    // NAV-01 v6 §7 (update0007 S-03/S-04): عنصران إلزاميان لكل حسابٍ بلا استثناء
+    array('⑨ إنجازي', 'ما أنجزتُه أمسِ والأسبوعَ والشهرَ — وبمدةٍ أحددها بتاريخين · بلغة عملي', 'fa fa-trophy', '../Portal/my_achievement.php', null),
+    array('⑩ بوابتي', 'ما يخصّني ومحيطي المباشر: معدتي · ورديتي · موقعي — بحسب دوري', 'fa fa-door-open', '../Portal/my_portal.php?view=gateway', null),
 );
 
 $page_title = 'إيكوبيشن | مساحة عملي';
