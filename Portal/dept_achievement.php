@@ -17,7 +17,8 @@ require_once __DIR__ . '/../Tickets/tkt_helpers.php';
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role       = intval($_SESSION['user']['role'] ?? 0);
-$from = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '') ? $_GET['from'] : date('Y-m-01');
+/* الافتراضُ آخرُ تسعين يومًا لا الشهرُ الجاري — فمطلعُ الشهرِ نافذةٌ خاويةٌ تُوهم أن لا إنجاز */
+$from = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '') ? $_GET['from'] : date('Y-m-d', strtotime('-90 days'));
 $to   = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to'] ?? '')   ? $_GET['to']   : date('Y-m-d');
 
 /* وحدةُ الإدارة من خريطة الدور (المصححة في update0007 G-04) */
@@ -53,6 +54,10 @@ include '../insidebar.php';
     <div><label>إلى</label><input type="date" name="to" class="form-control" value="<?= htmlspecialchars($to) ?>"></div>
     <button class="btn btn-primary">عرض</button>
   </form>
+  <?php $allZero = true; foreach ($metrics as $m2) if ($m2[1] > 0) { $allZero = false; break; }
+  if ($allZero): ?>
+    <div class="alert alert-warning">لا نشاطَ معتمدًا في هذه المدة — وسّع «من/إلى» أعلاه.</div>
+  <?php endif; ?>
   <div style="display:flex;flex-wrap:wrap;gap:12px">
     <?php foreach ($metrics as $m2): ?>
     <div style="min-width:200px;padding:14px;border:1px solid #dee2e6;border-radius:8px;background:#f8f9fa">
