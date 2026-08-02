@@ -514,6 +514,7 @@ class TenantRegistry
         'action_impacts' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8: خريطةُ الأثر
         'action_execution_log' => array('type' => self::T_TENANT, 'soft' => false), // ACT-01 §8: Insert-only بشركته
+        'action_impact_log' => array('type' => self::T_TENANT, 'soft' => false), // ACT-01 §8-④: سجل الأثر المطبق
         'exception_requests' => array('type' => self::T_TENANT, 'soft' => false), // GOV-01 §7
         'exception_approvals' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'exception_requests', 'fk' => 'req_id'), // GOV-01 §7

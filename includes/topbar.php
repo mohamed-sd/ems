@@ -153,6 +153,30 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         </div>
 
         <div class="ems-topbar-actions">
+            <?php
+            // مساحةُ عملي — بابٌ فوق الإدارات كلِّها (NAV-01 §3) لا رابطٌ داخل كل قائمة،
+            // وعدّادُ ما ينتظر المستخدمَ على أيقونة الباب (NAV-02 §7.5) — بخبيئة جلسةٍ خمسَ دقائق.
+            $ems_tb_ws = function_exists('ems_url') ? ems_url('main/my_workspace.php') : '/ems/main/my_workspace.php';
+            $ems_tb_wsCount = 0;
+            $ems_tb_wsCache = isset($_SESSION['ems_ws_badge']) ? $_SESSION['ems_ws_badge'] : null;
+            if (is_array($ems_tb_wsCache) && (time() - intval($ems_tb_wsCache['at'])) < 300) {
+                $ems_tb_wsCount = intval($ems_tb_wsCache['n']);
+            } else {
+                $ems_tb_wsSvcPath = __DIR__ . '/../app/Services/Finance/ApprovalsInboxService.php';
+                if (is_file($ems_tb_wsSvcPath) && isset($GLOBALS['conn'])) {
+                    require_once $ems_tb_wsSvcPath;
+                    try {
+                        $ems_tb_wsItems = \App\Services\Finance\ApprovalsInboxService::inbox($GLOBALS['conn'], intval($_SESSION['user']['company_id'] ?? 0));
+                        $ems_tb_wsCount = is_array($ems_tb_wsItems) ? count($ems_tb_wsItems) : 0;
+                    } catch (\Throwable $e) { $ems_tb_wsCount = 0; }
+                }
+                $_SESSION['ems_ws_badge'] = array('n' => $ems_tb_wsCount, 'at' => time());
+            }
+            ?>
+            <a href="<?php echo htmlspecialchars($ems_tb_ws, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" title="مساحة عملي — موافقاتي وطلباتي ومهامي" aria-label="مساحة عملي"><i class="fas fa-briefcase"></i><?php if ($ems_tb_wsCount > 0): ?><span class="ems-topbar-badge"><?php echo $ems_tb_wsCount > 99 ? '99+' : $ems_tb_wsCount; ?></span><?php endif; ?></a>
+            <?php // البحثُ الموحَّد (NAV-01 §13-⑤): «يجد الكيانَ أيًّا كان نوعُه — فلا يُسأل المتدربُ عن الشاشة»
+            $ems_tb_search = function_exists('ems_url') ? ems_url('main/global_search.php') : '/ems/main/global_search.php'; ?>
+            <a href="<?php echo htmlspecialchars($ems_tb_search, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="البحث الموحد — بالكود أو الاسم" aria-label="البحث الموحد"><i class="fas fa-search"></i></a>
             <?php // البوابةُ الشخصية (H-18): «متاحةٌ بنقرةٍ من أي صفحة» — بابُها هنا
             $ems_tb_portal = function_exists('ems_url') ? ems_url('Portal/my_portal.php') : '/ems/Portal/my_portal.php'; ?>
             <a href="<?php echo htmlspecialchars($ems_tb_portal, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="بوابتي — ماذا يخصّني أنا؟" aria-label="بوابتي"><i class="fas fa-id-card"></i></a>

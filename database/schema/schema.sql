@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 14:33:30
--- الجداول: 371 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 21:38:35
+-- الجداول: 376 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -76,6 +76,23 @@ CREATE TABLE `action_execution_log` (
   KEY `ix_ael_action` (`action_code`,`result`,`at`),
   KEY `ix_ael_company` (`company_id`,`at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACT-01 §8: Insert-only — لا تعديلَ ولا حذف';
+
+-- ── Table: action_impact_log ──
+CREATE TABLE `action_impact_log` (
+  `il_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int unsigned NOT NULL,
+  `action_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `impacted_type` enum('org_unit','person','party','screen') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `impacted_ref` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `effect` enum('notify','counter','data_change','state_change') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `actor_person_id` int DEFAULT NULL,
+  `seen` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`il_id`),
+  KEY `ix_ail_target` (`company_id`,`impacted_type`,`impacted_ref`,`seen`),
+  KEY `ix_ail_action` (`action_code`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: action_impacts ──
 CREATE TABLE `action_impacts` (
@@ -6384,6 +6401,60 @@ CREATE TABLE `readiness_lines` (
   KEY `idx_rdl_state` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJAZ-S05 §6.12 — بنود فحص الجاهزية الستة بحالاتها لكل عقد';
 
+-- ── Table: rec_applications ──
+CREATE TABLE `rec_applications` (
+  `app_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int unsigned NOT NULL,
+  `vac_id` int unsigned NOT NULL,
+  `applicant_name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `applicant_phone` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cv_ref` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '③ السيرةُ الذاتية — مرجعُ الملف',
+  `stage` enum('received','screening','interview','practical_test','offer','offer_accepted','contracting','onboarded','probation','confirmed','rejected','withdrawn') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'received' COMMENT 'الخطواتُ ③→⑩ — والرفضُ والانسحابُ خروجان معلَنان',
+  `stage_note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `interview_at` datetime DEFAULT NULL,
+  `test_score` decimal(5,2) DEFAULT NULL COMMENT '⑥ الاختبارُ العمليُّ للمشغّل',
+  `offer_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `employee_id` int DEFAULT NULL COMMENT '⑨ المباشرة — يربط بموظفٍ حقيقيٍّ في employees',
+  `probation_end` date DEFAULT NULL COMMENT '⑩ نهايةُ فترة التجربة',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`app_id`),
+  KEY `ix_app_vac` (`vac_id`,`stage`),
+  CONSTRAINT `fk_app_vac` FOREIGN KEY (`vac_id`) REFERENCES `rec_vacancies` (`vac_id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: rec_stage_log ──
+CREATE TABLE `rec_stage_log` (
+  `log_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `app_id` int unsigned NOT NULL,
+  `from_stage` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `to_stage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `by_person` int DEFAULT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`log_id`),
+  KEY `ix_rsl_app` (`app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ التقدم — Insert-only: من فعل ماذا ومتى';
+
+-- ── Table: rec_vacancies ──
+CREATE TABLE `rec_vacancies` (
+  `vac_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int unsigned NOT NULL,
+  `vacancy_no` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `job_title_id` int DEFAULT NULL COMMENT 'job_titles — قاموسُ المسميات (SEC-01)',
+  `title_text` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `org_unit_id` int DEFAULT NULL COMMENT 'org_units — الإدارةُ الطالبة',
+  `site_scope` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `headcount` int NOT NULL DEFAULT '1',
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `state` enum('draft','open','filled','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `posted_at` date DEFAULT NULL COMMENT '② نشرُ الوظيفة',
+  `created_by` int DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`vac_id`),
+  UNIQUE KEY `uq_vac` (`company_id`,`vacancy_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='① طلبُ الشاغر — أولُ الدورة العشرية';
+
 -- ── Table: report_role_permissions ──
 CREATE TABLE `report_role_permissions` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -6499,6 +6570,27 @@ CREATE TABLE `schema_migrations` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_schema_migrations_filename` (`filename`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: screen_view_rows ──
+CREATE TABLE `screen_view_rows` (
+  `svr_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `screen_name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الاسمُ المستهدفُ للشاشة (مفتاحُ المصفوفة)',
+  `route` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المسارُ التقنيُّ إن حُسم — والجديدُ ★ قد لا مسارَ له بعد',
+  `dept` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الإدارةُ الناظرة',
+  `role_id` int DEFAULT NULL COMMENT 'دورُها المالكُ في النظام — يُحلّ من target_dept_role',
+  `role_kind` enum('owner','viewer') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'مالك/عارض',
+  `scope_text` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'النطاق: الشركة · نطاقُ الإدارة · موقعُه · مورديه · عقودُه · سجلاتُه',
+  `angle` varchar(160) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الزاوية — تحدد الأعمدةَ والفلاتر',
+  `columns_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الأعمدةُ المعروضةُ لهذا العارض',
+  `filters_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الفلاترُ الافتراضية',
+  `nav_group` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المجموعةُ في قائمة هذا الناظر',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`svr_id`),
+  UNIQUE KEY `uq_svr` (`screen_name`,`dept`),
+  KEY `ix_svr_role` (`role_id`,`role_kind`,`active`),
+  KEY `ix_svr_route` (`route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-01 v6 §6: صفوفُ العرض — النطاقُ والزاويةُ والأفعالُ معلنةٌ لكل ناظر';
 
 -- ── Table: seat_assignments ──
 CREATE TABLE `seat_assignments` (

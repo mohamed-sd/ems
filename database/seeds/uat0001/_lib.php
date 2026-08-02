@@ -37,7 +37,9 @@ function uat_db()
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     $db = new mysqli($env['DB_HOST'], $env['DB_MIGRATOR_USER'], $env['DB_MIGRATOR_PASS'], $env['DB_NAME']);
     $db->set_charset('utf8mb4');
-    $db->query("SET SESSION sql_mode=''");   // بياناتٌ تاريخيةٌ فيها تواريخُ صفرية
+    // **لا يُطفأ sql_mode**: الوضعُ المتساهل يبتلع قيمةَ ENUM غير الصالحة صامتةً
+    // فيُكتب '' بدل الخطأ — وهو أخطرُ من الفشل. الصارمُ مع السماح بتواريخَ تاريخية.
+    $db->query("SET SESSION sql_mode='STRICT_ALL_TABLES,ALLOW_INVALID_DATES'");
     return $db;
 }
 
@@ -97,11 +99,36 @@ function uat_date($v)
     return $ts ? date('Y-m-d', $ts) : null;
 }
 
+/** الأعمدةُ القابلةُ للكتابة — تُستبعد المولَّدةُ (STORED/VIRTUAL GENERATED) فلا يرفضها الخادم. */
+function uat_writable($table)
+{
+    static $cache = [];
+    if (isset($cache[$table])) return $cache[$table];
+    $db = uat_db();
+    $st = $db->prepare("SELECT COLUMN_NAME, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?");
+    $st->bind_param('s', $table);
+    $st->execute();
+    $res = $st->get_result();
+    $out = [];
+    while ($r = $res->fetch_assoc()) {
+        if (stripos($r['EXTRA'], 'GENERATED') !== false && stripos($r['EXTRA'], 'DEFAULT_GENERATED') === false) continue;
+        $out[$r['COLUMN_NAME']] = true;
+    }
+    return $cache[$table] = $out;
+}
+
+function uat_filter($table, array $row)
+{
+    $ok = uat_writable($table);
+    return array_intersect_key($row, $ok);
+}
+
 /** إدراجٌ عاطل: يبحث بالمفتاح الطبيعي، فإن وُجد أعاد المعرّف، وإلا أدرج. */
 function uat_upsert($table, array $key, array $row, $idCol = 'id')
 {
     uat_guard($table);
     $db = uat_db();
+    $row = uat_filter($table, $row);
     $where = []; $types = ''; $vals = [];
     foreach ($key as $k => $v) {
         if ($v === null) { $where[] = "`$k` IS NULL"; continue; }
@@ -130,7 +157,8 @@ function uat_upsert($table, array $key, array $row, $idCol = 'id')
 function uat_insert($table, array $row)
 {
     uat_guard($table);
-    $db = uat_db();
+    $db   = uat_db();
+    $row  = uat_filter($table, $row);
     $cols = array_keys($row);
     $ph   = implode(',', array_fill(0, count($cols), '?'));
     $st   = $db->prepare("INSERT INTO `$table` (`" . implode('`,`', $cols) . "`) VALUES ($ph)");

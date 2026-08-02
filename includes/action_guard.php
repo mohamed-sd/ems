@@ -209,6 +209,25 @@ if (!function_exists('ems_action_guard_registry')) {
         }
 
         if ($allowed) {
+            // خطافُ نهاية الطلب (ACT-01 §8-④): إن أُنجز فعلُ كتابةٍ مسجَّلٌ لهذا
+            // المسار بنجاح (استجابة < 400) طُبّقت خريطةُ أثره — فلا لوحةَ تبقى قديمة.
+            $agConn = $conn; $agScript = $script;
+            register_shutdown_function(function () use ($agConn, $agScript) {
+                if (http_response_code() >= 400) { return; }
+                if (!$agConn || !@mysqli_ping($agConn)) { return; }
+                $es = mysqli_real_escape_string($agConn, $agScript);
+                $r = @mysqli_query($agConn, "SELECT action_code FROM actions
+                        WHERE is_write = 1 AND active = 1 AND handler_path LIKE '%$es'");
+                if (!$r || !mysqli_num_rows($r)) { return; }
+                $svc = __DIR__ . '/../app/Services/Actions/ImpactResolver.php';
+                if (!is_file($svc)) { return; }
+                require_once $svc;
+                $co = intval($_SESSION['user']['company_id'] ?? 0);
+                $uid = intval($_SESSION['user']['id'] ?? 0);
+                while ($a = mysqli_fetch_assoc($r)) {
+                    \App\Services\Actions\ImpactResolver::apply($agConn, $co, $a['action_code'], $agScript, $uid);
+                }
+            });
             return;
         }
 

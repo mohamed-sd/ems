@@ -147,6 +147,31 @@ if (!function_exists('ems_journey_bar')) {
             echo '  </div>' . "\n";
         }
 
+        // ── المانعُ برابطٍ يفتحه + تصعيدٌ وتذكيرٌ مسجّلان (NAV-01 §11-⑤/⑥) ──
+        // «ما يمنع الانتقالَ برابطٍ يفتحه — وهو أثمنُ العناصر» · «إجراءان لا أكثر، ويُسجَّلان»
+        if (!empty($j['blocker']) && is_array($j['blocker'])) {
+            $bl = $j['blocker'];
+            echo '  <div class="ems-journey-next" style="background:#fff3f3;border-color:#f5c2c7">' . "\n";
+            echo '    <i class="fa fa-ban" aria-hidden="true" style="color:#dc3545"></i>' . "\n";
+            echo '    <span>المانع:</span> <span class="ems-jnext-owner">' . $e($bl['label']) . '</span>' . "\n";
+            if (!empty($bl['href'])) {
+                echo '    <a class="ems-jb-action" href="' . $e($bl['href']) . '">عرض</a>' . "\n";
+            }
+            echo '  </div>' . "\n";
+        }
+        if (!empty($j['subject'])) { // مرجعُ المعاملة يفعّل زرَّي التصعيد والتذكير
+            $subj = $e($j['subject']);
+            echo '  <div style="display:flex;gap:8px;margin-top:6px">' . "\n";
+            foreach (array('escalate' => 'تصعيد', 'remind' => 'تذكير') as $act => $lbl) {
+                echo '    <form method="post" action="' . $e((function_exists('ems_url') ? ems_url('Portal/journey_action.php') : '/ems/Portal/journey_action.php')) . '" style="display:inline">'
+                   . '<input type="hidden" name="jact" value="' . $act . '">'
+                   . '<input type="hidden" name="subject" value="' . $subj . '">'
+                   . '<input type="hidden" name="back" value="' . $e($_SERVER['REQUEST_URI'] ?? '') . '">'
+                   . '<button type="submit" class="action-btn" style="font-size:.8em">' . $lbl . '</button></form>' . "\n";
+            }
+            echo '  </div>' . "\n";
+        }
+
         echo '</div>' . "\n";
         return true;
     }
