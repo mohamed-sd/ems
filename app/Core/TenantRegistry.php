@@ -108,6 +108,8 @@ class TenantRegistry
         'substitute_coverages' => array('type' => self::T_TENANT, 'soft' => false),
         // §7 — بنودُ تسوية التغطية: بندٌ ظاهرٌ لكل طرف.
         'coverage_settlement_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        // EMS_CAPACITY_SOURCE — فروقُ ظل الرصيد (المخزَّنُ × المحسوبُ من الدفتر).
+        'capacity_shadow_diffs' => array('type' => self::T_TENANT, 'soft' => false),
         'operator_rotations' => array('type' => self::T_TENANT, 'soft' => false),
         // M-01: الدفعةُ المقدَّمة المقبوضةُ فعلًا — سلفةٌ تُستردّ لا إيراد.
         // `soft` لأنها مستندُ قبضٍ لا يُمحى: الإلغاءُ حالةٌ لا حذف.

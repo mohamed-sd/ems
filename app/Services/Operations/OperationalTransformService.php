@@ -25,8 +25,13 @@
 namespace App\Services\Operations;
 
 require_once __DIR__ . '/../Contract/ContractStateMachine.php';
+require_once __DIR__ . '/../Capacity/CapacityLedgerService.php';
+require_once __DIR__ . '/../Capacity/BalanceCalculator.php';
+require_once __DIR__ . '/../Capacity/CapacitySourceService.php';
 
 use App\Services\Contract\ContractStateMachine as CSM;
+use App\Services\Capacity\CapacityLedgerService;
+use App\Services\Capacity\CapacitySourceService;
 
 class OperationalTransformService
 {
@@ -287,9 +292,10 @@ class OperationalTransformService
         }
         $leaf = $chain[0];
 
-        // رسالةُ العجز قبل المحاولة — والحارسُ قيدُ القاعدة
+        // رسالةُ العجز قبل المحاولة — والحارسُ قيدُ القاعدة.
+        // CAP-15: المصدرُ بحسب العلم — columns من العمود (القائم) · ledger محسوبًا من الدفتر
         if ($qty > 0) {
-            $free = round((float) $leaf['cap_qty'] - (float) $leaf['consumed_qty'], 2);
+            $free = CapacitySourceService::freeOf($gate, $leaf);
             if ($qty > $free) {
                 $out['code'] = 422;
                 $out['reason'] = 'المطلوب ' . number_format($qty, 2) . ' يتجاوز متبقّي «'
@@ -301,7 +307,7 @@ class OperationalTransformService
         $levels = 0;
         try {
             $gate->runInTransaction(function ($g) use (
-                $chain, $qty, $idemKey, $leafId, $opts, &$levels
+                $conn, $chain, $qty, $idemKey, $leafId, $opts, &$levels
             ) {
                 foreach ($chain as $node) {
                     $g->update('op_containers',
@@ -320,6 +326,11 @@ class OperationalTransformService
                     'note'         => isset($opts['note']) ? $opts['note'] : null,
                     'created_by'   => isset($opts['actor']) ? ((int) $opts['actor'] ?: null) : null,
                 ));
+                // CAP-14/15: الكتابةُ المزدوجة — سطرُ الدفتر في المعاملة نفسِها.
+                // العمودُ صار مخبأً والدفترُ هو السجل؛ ومكررُ المفتاح يمرّ (عطالةٌ
+                // متوازيةُ المسارين) — والمتعذّرُ (بلا سجلِّ وحدةٍ أو بمقياسٍ خارج
+                // الأربعة) يُترك للظل يرصده لا يُلفَّق له سطر.
+                self::dualWriteLedger($conn, $g, $chain[0], $qty, $opts);
             }, 'container-consume');
         } catch (\Throwable $t) {
             error_log('container consume leaf#' . $leafId . ': ' . $t->getMessage());
@@ -330,6 +341,74 @@ class OperationalTransformService
 
         $out['ok'] = true; $out['code'] = 201; $out['levels'] = $levels;
         return $out;
+    }
+
+    /**
+     * CAP-14/15 — سطرُ الدفتر المرافقُ للخصم (الكتابةُ المزدوجة داخل المعاملة).
+     * لا يرمي على المكرر (409 = المساران كتبا المفتاحَ نفسَه) ويرمي على أي فشلٍ
+     * آخرَ فتسقط المعاملةُ كلُّها — لا خصمَ عمودٍ بلا سطرِ دفترٍ لواقعةٍ صالحة.
+     */
+    private static function dualWriteLedger($conn, $g, array $leaf, $qty, array $opts)
+    {
+        $sourceKind = isset($opts['source_kind']) ? (string) $opts['source_kind'] : 'unit_entry';
+        $unitType = isset($opts['unit_type']) ? (string) $opts['unit_type'] : 'hour';
+        $sourceRef = isset($opts['source_ref']) ? (int) $opts['source_ref'] : 0;
+        if ($sourceKind !== 'unit_entry' || $sourceRef <= 0
+            || !in_array($unitType, array('hour', 'ton', 'trip', 'meter'), true)) {
+            return; // بلا سجلِّ وحدةٍ مرقَّمٍ أو بمقياسٍ خارج §16 — يُعلَن بالظل لا يُلفَّق
+        }
+        // النسخة: من الخيار أولًا ثم من السجل الحي — والغائبُ نسخةٌ أولى
+        $version = isset($opts['revision_no']) && (int) $opts['revision_no'] > 0
+                   ? (int) $opts['revision_no'] : null;
+        if ($version === null) {
+            $r = $conn->query('SELECT revision_no FROM unit_entries WHERE id = ' . $sourceRef);
+            if ($r && ($x = $r->fetch_assoc())) { $version = (int) $x['revision_no']; }
+        }
+        if ($version === null) { $version = 1; }
+        // الأثرُ بدرجة الورقة (كخرط CAP-12)
+        switch ((string) $leaf['level']) {
+            case self::LEVEL_OPERATOR:
+                $effect = 'operator_entitlement'; $target = 'operator';
+                $ref = !empty($leaf['operator_employee_id']) ? 'emp:' . (int) $leaf['operator_employee_id']
+                     : 'container:' . (int) $leaf['id'];
+                break;
+            case self::LEVEL_SUPPLIER:
+                $effect = 'supplier_share'; $target = 'supplier';
+                $ref = !empty($leaf['supplier_id']) ? 'sup:' . (int) $leaf['supplier_id']
+                     : 'container:' . (int) $leaf['id'];
+                break;
+            default:
+                $effect = 'client_obligation'; $target = 'client';
+                $ref = 'contract:' . (int) $leaf['contract_id'];
+        }
+        $consumedOn = isset($opts['consumed_on']) ? (string) $opts['consumed_on'] : date('Y-m-d');
+        $actor = isset($opts['actor']) ? ((int) $opts['actor'] ?: null) : null;
+        if ($qty < 0) {
+            // ردٌّ: سطرٌ عاكسٌ بمرجع الأصل — وبلا أصلٍ يُعلَن بالظل لا يُخترع
+            $orig = CapacityLedgerService::findByKey($g, $sourceRef, $version, $effect, $target, $ref);
+            if ($orig !== null) {
+                $r = CapacityLedgerService::reverse($g, $orig, $actor);
+                if (!$r['ok'] && (int) $r['code'] !== 409) {
+                    throw new \RuntimeException('فشل سطرُ العكس: ' . $r['reason']);
+                }
+            }
+            return;
+        }
+        $r = CapacityLedgerService::appendLine($g, array(
+            'unit_record_id'      => $sourceRef,
+            'unit_record_version' => $version,
+            'contract_seat_id'    => (int) $leaf['id'],
+            'effect_type'         => $effect,
+            'effect_target_type'  => $target,
+            'effect_target_ref'   => $ref,
+            'measure_code'        => $unitType,
+            'qty'                 => abs((float) $qty),
+            'period'              => substr($consumedOn, 0, 7),
+            'role_snapshot'       => isset($opts['role_snapshot']) ? (string) $opts['role_snapshot'] : null,
+        ), $actor);
+        if (!$r['ok'] && (int) $r['code'] !== 409) {
+            throw new \RuntimeException('فشل سطرُ الدفتر: ' . $r['reason']);
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════════════

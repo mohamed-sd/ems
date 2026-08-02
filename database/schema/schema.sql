@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 07:16:20
--- الجداول: 362 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 07:21:47
+-- الجداول: 363 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -612,6 +612,22 @@ CREATE TABLE `capacity_financial_event_links` (
   CONSTRAINT `fk_lnk_led` FOREIGN KEY (`led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §13.2 — جدولُ ربطٍ Append-only بين سطر الدفتر والحدث المالي؛ UQ(led,fin) يمنع الربطَ مرتين';
 
+-- ── Table: capacity_shadow_diffs ──
+CREATE TABLE `capacity_shadow_diffs` (
+  `diff_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `container_id` int unsigned NOT NULL,
+  `stored_consumed` decimal(16,2) NOT NULL COMMENT 'العمودُ المخزَّن لحظةَ القياس',
+  `ledger_consumed` decimal(16,2) NOT NULL COMMENT 'المحسوبُ من الدفتر والإعكاسات',
+  `diff_qty` decimal(16,2) NOT NULL COMMENT 'الفرق — والحدُّ صفرٌ لا نسبة',
+  `noted_on` date NOT NULL COMMENT 'يومُ الرصد بساعة القاعدة',
+  `detail` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`diff_id`),
+  UNIQUE KEY `uq_shadow_daily` (`container_id`,`noted_on`),
+  KEY `ix_shadow_day` (`company_id`,`noted_on`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 · EMS_CAPACITY_SOURCE: فروقُ الظل بين العمود المخزَّن والدفتر — لا قلبَ قبل صفرِ فرقٍ ١٤ يومًا متصلة (نمطُ EMS_PERM_SOURCE)';
+
 -- ── Table: chain_objections ──
 CREATE TABLE `chain_objections` (
   `obj_id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -988,6 +1004,8 @@ CREATE TABLE `contract_commitments` (
   `standby_compensation_type` enum('none','fixed_allowance','readiness_allowance','billed_on_activation') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: مقابلُ الاحتياطي — NULL = لم يُنَصَّ، ولا يُفترض (DEC-CAP-A)',
   `standby_activation_rule` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: متى يُفعَّل الاحتياطيُّ وبإذن من ولأي مدة',
   `standby_hours_treatment` enum('within_obligation','separate_line') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: ساعاتُ الاحتياطي المفعَّل — ضمن الالتزام أم بندًا مستقلًّا',
+  `plan_state` enum('draft','partial','submitted','approved') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft' COMMENT 'CAP-01 §5-②: حالةُ خطة التغطية — المسودةُ والجزئيةُ Σ≤ والمعتمدةُ Σ= أو استثناءٌ موقَّع',
+  `sigma_exception_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §5-②: مرجعُ قرار الاستثناء الموقَّع — إلزاميٌّ لاعتمادٍ بفجوةٍ ظاهرة (C16)',
   `valid_from` date DEFAULT NULL COMMENT 'CAP-01 §5-④: الالتزامُ مؤرَّخ — والتعديلُ فترةٌ جديدةٌ لا مسٌّ بالماضي',
   `valid_to` date DEFAULT NULL,
   `unit_type` enum('hour','ton','meter','cbm','day','shift','trip') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -4913,6 +4931,7 @@ CREATE TABLE `op_containers` (
   `parent_id` int unsigned DEFAULT NULL COMMENT 'NULL للرئيسية حصرًا — يحرسه ck_container_parent',
   `contract_id` int unsigned NOT NULL,
   `contract_item_id` int unsigned DEFAULT NULL COMMENT 'contractequipments.id — مصدرُ سقف الرئيسية',
+  `obl_id` int unsigned DEFAULT NULL COMMENT 'CAP-01 §16: التزامُ نوع المعدة (contract_commitments.id) — مضافٌ صراحةً ليصحَّ قيدُ التطابق (C21)',
   `resource_plan_id` int unsigned DEFAULT NULL COMMENT 'صفُّ خطة الموارد الذي بُذرت منه الحاوية (P-04) — والقديمُ يبقى على contract_item_id',
   `unit_type` enum('hour','ton','meter','cbm','day','shift','trip') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'hour' COMMENT 'وحدةُ البند — والسقفُ والمستهلَكُ بها',
   `work_model` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نموذجُ العمل كما في البند',
@@ -4949,17 +4968,21 @@ CREATE TABLE `op_containers` (
   `created_by` int unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `seat_obl_uq_key` varchar(40) COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if(((`seat_no` is not null) and (`obl_id` is not null) and (`is_deleted` = 0)),concat(`obl_id`,_utf8mb4':',`seat_no`),NULL)) STORED COMMENT 'CAP-01 §16: UQ(obl_id, seat_no) — فهرسٌ فريدٌ مشروطٌ على عمودٍ مولَّد',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_container_no` (`company_id`,`container_no`),
   UNIQUE KEY `uq_main_per_item` (`company_id`,`contract_item_id`,`level`),
   UNIQUE KEY `uq_seat_no` (`company_id`,`contract_id`,`seat_no`),
+  UNIQUE KEY `uq_oc_id_obl` (`id`,`obl_id`),
+  UNIQUE KEY `uq_seat_per_obl` (`seat_obl_uq_key`),
   KEY `ix_parent` (`company_id`,`parent_id`),
   KEY `ix_contract` (`company_id`,`contract_id`,`level`),
   KEY `ix_site` (`company_id`,`project_id`,`state`),
-  KEY `fk_container_parent` (`parent_id`),
   KEY `ix_container_origin` (`company_id`,`origin`,`origin_ack_by`),
   KEY `ix_oc_resource_plan` (`resource_plan_id`),
+  KEY `fk_oc_parent_obl` (`parent_id`,`obl_id`),
   CONSTRAINT `fk_container_parent` FOREIGN KEY (`parent_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_oc_parent_obl` FOREIGN KEY (`parent_id`, `obl_id`) REFERENCES `op_containers` (`id`, `obl_id`),
   CONSTRAINT `ck_container_alloc` CHECK (((`allocated_qty` >= 0) and (`allocated_qty` <= `cap_qty`))),
   CONSTRAINT `ck_container_cap` CHECK ((`cap_qty` >= 0)),
   CONSTRAINT `ck_container_consumed` CHECK (((`consumed_qty` >= 0) and (`consumed_qty` <= `cap_qty`))),
@@ -6362,7 +6385,9 @@ CREATE TABLE `seat_assignments` (
   `created_by` int unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `active_open_seat_key` varchar(40) COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if(((`state` = _utf8mb4'active') and (`date_to` is null) and ((`assignment_role` <> _utf8mb4'احتياطي') or (`activation_state` = _utf8mb4'active'))),concat(`company_id`,_utf8mb4':',`container_id`),NULL)) STORED COMMENT 'CAP-01 §4-⑥/C4: تخصيصٌ مفتوحٌ فعّالٌ واحدٌ لكل مقعد — والاحتياطيُّ pending خارج القيد؛ التداخلُ المدَّدُ بحارس الخدمة',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sa_active_open` (`active_open_seat_key`),
   KEY `ix_sa_seat` (`company_id`,`container_id`,`date_from`),
   KEY `ix_sa_equipment` (`company_id`,`equipment_id`,`date_from`),
   KEY `fk_sa_container` (`container_id`),
