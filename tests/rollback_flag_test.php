@@ -74,7 +74,7 @@ check($grep === count($flags), "لكل علمٍ قارئٌ في الكود ({$gr
 
 // ═══ ③ المساران المختبَران سلفًا ═══
 head('③ مسارا رجوعٍ مختبَران سلفًا — تُستوثق خضرتُهما الآن');
-$php = 'C:/wamp64/bin/php/php8.2.30/php.exe';
+$php = escapeshellarg(PHP_BINARY);   // نفسُ مفسِّر السطر الحالي — لا مسارَ نسخةٍ مثبَّتًا
 $out = shell_exec($php . ' ' . escapeshellarg(dirname(__DIR__) . '/tests/writer_flip_test.php') . ' 2>&1');
 check(strpos((string) $out, '0 فاشل') !== false, 'قلبُ كاتب الدوام (TS_WRITER legacy↔service) أخضر — رجوعٌ بلا فقد');
 // حارسُ الوثائق مرَّ بدورة monitor→enforce→monitor فعليةً في TASK-0 وتغطيتُه قائمة

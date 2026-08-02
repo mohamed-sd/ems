@@ -10,7 +10,8 @@ param(
 )
 
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$emsPath = "C:\wamp64\www\ems"
+# جذر المشروع يُشتق من موضع هذا السكربت (scripts/..) — لا مسار مثبَّت
+$emsPath = Split-Path -Parent $PSScriptRoot
 $logsPath = Join-Path $emsPath "logs"
 $reportPath = Join-Path $logsPath "encoding-audit-$(Get-Date -Format 'yyyy-MM-dd').log"
 

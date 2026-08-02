@@ -150,7 +150,7 @@ check($cg['ok'] === true && empty($cg['monitored']) && intval($cg['container_id'
 
 // ═══ ④ مولّدُ تقرير المطابقة ═══
 head('④ تقريرُ المطابقة الأسبوعي — §13-① الشرطُ الثاني');
-$out = shell_exec('"C:/wamp64/bin/php/php8.2.30/php.exe" ' . escapeshellarg(dirname(__DIR__) . '/Operations/cron_container_gate_report.php') . ' 2>&1');
+$out = shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(dirname(__DIR__) . '/Operations/cron_container_gate_report.php') . ' 2>&1');
 $reportPath = dirname(__DIR__) . '/docs/reports/CONTAINER_GATE_WEEK_' . str_replace('-', '', date('Y-m-d')) . '.md';
 check(is_file($reportPath), 'المولّدُ كتب ملفَّ الأسبوع: ' . basename($reportPath));
 $rep = is_file($reportPath) ? file_get_contents($reportPath) : '';

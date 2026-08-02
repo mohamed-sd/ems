@@ -332,6 +332,14 @@ class SupplierContractService
                                    . ' — الكتابةُ تبقى في مصدره حتى تكتمل المطابقة (N-04 مرحلة ①)';
                     return $out;
                 }
+                // C12 (CAP-25): حصةٌ استُهلك منها في شهرٍ مقفلٍ لا تُعدَّل كمياتُها —
+                // الانحرافُ التاريخيُّ محفوظٌ والتعديلُ فترةٌ جديدةٌ بسريان
+                $qtyChanged = ((int) $cur['primary_units_committed'] !== (int) $primaryCommitted)
+                    || (round((float) $cur['unit_price'], 2) !== $price);
+                if ($qtyChanged && class_exists('\\App\\Services\\Capacity\\SupplierPerformanceAggregator')) {
+                    $ed = \App\Services\Capacity\SupplierPerformanceAggregator::assertShareEditable($gate, $lineId);
+                    if (!$ed['ok']) { return array_merge($out, array('code' => $ed['code'], 'reason' => $ed['reason'])); }
+                }
                 $before = array('work_model' => $cur['work_model'], 'unit' => $cur['unit'],
                                 'unit_price' => $cur['unit_price'], 'standby_basis' => $cur['standby_basis'],
                                 'standby_rate' => $cur['standby_rate']);

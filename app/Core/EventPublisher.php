@@ -66,6 +66,7 @@ class EventPublisher
     const SOURCE_MODULES = array(
         'sales', 'suppliers', 'workforce', 'procurement', 'warehouse', 'maintenance',
         'projects', 'revenue', 'assets', 'treasury', 'movement', 'finance', 'transport', 'system',
+        'capacity', // update0005 · CAP-29: مجالُ القدرات — أحداثُ CAP-01 §14 الستة
     );
 
     /** الحقول المرجعية: مفاتيح رقمية إلى الجداول المالكة — لا نسخ بيانات. */

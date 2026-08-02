@@ -6,7 +6,8 @@ param(
     [switch]$Report = $false
 )
 
-$emsPath = "C:\wamp64\www\ems"
+# جذر المشروع يُشتق من موضع هذا السكربت (scripts/..) — لا مسار مثبَّت
+$emsPath = Split-Path -Parent $PSScriptRoot
 $issues = @()
 $fixed = @()
 $filesToCheck = @()

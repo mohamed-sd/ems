@@ -24,9 +24,23 @@ $singleMachine = in_array($dbHost, array('localhost', '127.0.0.1'), true);
 $opcacheLoaded = extension_loaded('Zend OPcache');
 $opcacheIni = ini_get('opcache.memory_consumption');
 $workers = null;
-$mpm = 'C:/wamp64/bin/apache';
-foreach (glob($mpm . '/apache*/conf/extra/httpd-mpm.conf') as $f) {
-    if (preg_match('/MaxRequestWorkers\s+(\d+)/', (string) file_get_contents($f), $m)) { $workers = intval($m[1]); }
+// مجلد أباتشي يُشتق من ثنائي PHP (WAMP: bin/php/… → bin/apache · XAMPP: php/ → apache/)
+// أو يُملى صراحةً بـEMS_APACHE_DIR في .env — لا مسار مثبَّت.
+$mpmBases = array();
+$envApache = trim((string) ems_env('EMS_APACHE_DIR', ''));
+if ($envApache !== '') { $mpmBases[] = rtrim(str_replace('\\', '/', $envApache), '/'); }
+if (defined('PHP_BINARY') && PHP_BINARY !== '') {
+    $binDir = str_replace('\\', '/', dirname(PHP_BINARY));
+    $mpmBases[] = dirname(dirname($binDir)) . '/apache';   // C:/wamp64/bin/php/php8.x → C:/wamp64/bin/apache
+    $mpmBases[] = dirname($binDir) . '/apache';            // C:/xampp/php            → C:/xampp/apache
+}
+foreach ($mpmBases as $mpm) {
+    foreach (array($mpm . '/apache*/conf/extra/httpd-mpm.conf', $mpm . '/conf/extra/httpd-mpm.conf') as $pattern) {
+        foreach (glob($pattern) ?: array() as $f) {
+            if (preg_match('/MaxRequestWorkers\s+(\d+)/', (string) file_get_contents($f), $m)) { $workers = intval($m[1]); }
+        }
+    }
+    if ($workers !== null) { break; }
 }
 $maxConn = intval($vars['max_connections'] ?? 0);
 $neededConn = $workers !== null ? (int) ceil($workers * 1.2) : null;
@@ -68,7 +82,10 @@ $md .= "| الصلاحيات (السقوط وكسر الزجاج) | 22:30 | `php
 $md .= "| الدوريات المالية (ثقيلة) | 22:45 | `php Operations/cron_job_worker.php` بعد `enqueue periodic_cron` |\n";
 $md .= "| الإهلاك والأحداث الدورية | 23:00 | `php Finance/cron_depreciation_fin.php` · `cron_periodic_fin.php` |\n";
 $md .= "| النقل الآلي للتناوب | 23:30 | `php Operations/cron_rotation_transfer.php` |\n\n";
-$md .= "```bat\nREM جدولة وندوز (تُنفَّذ بيد المشغّل — أمثلة جاهزة):\nschtasks /Create /TN EMS\\JobWorker /SC MINUTE /MO 5 /TR \"C:\\wamp64\\bin\\php\\php8.2.30\\php.exe C:\\wamp64\\www\\ems\\Operations\\cron_job_worker.php 10\"\nschtasks /Create /TN EMS\\NightlyOrg /SC DAILY /ST 22:15 /TR \"C:\\wamp64\\bin\\php\\php8.2.30\\php.exe C:\\wamp64\\www\\ems\\Operations\\cron_org_assignments.php\"\n```\n";
+// أمثلة الجدولة تُبنى من ثنائي PHP وجذر المشروع الحاليَّين — لا مسار مثبَّت في الكود.
+$phpExe  = str_replace('/', '\\', defined('PHP_BINARY') && PHP_BINARY !== '' ? PHP_BINARY : 'php.exe');
+$appRoot = str_replace('/', '\\', dirname(__DIR__));
+$md .= "```bat\nREM جدولة وندوز (تُنفَّذ بيد المشغّل — أمثلة مبنية على مسار هذا الجهاز):\nschtasks /Create /TN EMS\\JobWorker /SC MINUTE /MO 5 /TR \"{$phpExe} {$appRoot}\\Operations\\cron_job_worker.php 10\"\nschtasks /Create /TN EMS\\NightlyOrg /SC DAILY /ST 22:15 /TR \"{$phpExe} {$appRoot}\\Operations\\cron_org_assignments.php\"\n```\n";
 
 $out = dirname(__DIR__) . '/docs/nfr/N-26_infra_readiness_ar.md';
 file_put_contents($out, $md);

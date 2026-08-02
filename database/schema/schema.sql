@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 07:21:47
--- الجداول: 363 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 07:30:32
+-- الجداول: 364 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -611,6 +611,29 @@ CREATE TABLE `capacity_financial_event_links` (
   KEY `ix_lnk_fin` (`fin_event_id`),
   CONSTRAINT `fk_lnk_led` FOREIGN KEY (`led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §13.2 — جدولُ ربطٍ Append-only بين سطر الدفتر والحدث المالي؛ UQ(led,fin) يمنع الربطَ مرتين';
+
+-- ── Table: capacity_gap_watch ──
+CREATE TABLE `capacity_gap_watch` (
+  `gap_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `obl_id` int unsigned NOT NULL COMMENT 'التزامُ نوع المعدة — contract_commitments.id',
+  `gap_units` smallint NOT NULL COMMENT 'الوحداتُ غيرُ المغطاة',
+  `gap_hours` decimal(14,2) NOT NULL COMMENT 'الفجوةُ بالساعات لا بالعدد فقط (§10-①/C13)',
+  `measure_code` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'hour',
+  `opened_on` date NOT NULL COMMENT 'يومُ أول رصدٍ — بساعة القاعدة',
+  `last_seen_on` date NOT NULL COMMENT 'آخرُ يومٍ رُصدت فيه — المرقبُ يوميٌّ لا شهري',
+  `escalate_after_days` smallint NOT NULL DEFAULT '3' COMMENT 'مهلةُ المعالجة المعلنةُ قبل التصعيد',
+  `escalated_ops_at` datetime DEFAULT NULL COMMENT 'تصعيدٌ آليٌّ لمدير التشغيل',
+  `escalated_gm_at` datetime DEFAULT NULL COMMENT 'ثم للإدارة العامة',
+  `closed_on` date DEFAULT NULL,
+  `state` enum('open','escalated_ops','escalated_gm','closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `open_key` varchar(40) COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if((`closed_on` is null),concat(`company_id`,_utf8mb4':',`obl_id`),NULL)) STORED COMMENT 'صفٌّ مفتوحٌ واحدٌ لكل التزام — فريدٌ مشروطٌ على عمودٍ مولَّد',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`gap_id`),
+  UNIQUE KEY `uq_gap_open` (`open_key`),
+  KEY `ix_gap_state` (`company_id`,`state`,`last_seen_on`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §10 — مرقبُ الفجوة اليومي بالساعات: الفجوةُ التي تُكتشف آخرَ الشهر خسارةٌ وقعت';
 
 -- ── Table: capacity_shadow_diffs ──
 CREATE TABLE `capacity_shadow_diffs` (
@@ -6670,6 +6693,7 @@ CREATE TABLE `substitute_coverages` (
   `level` enum('own_standby','cross_supplier','source_change') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الدرجة: احتياطيُّ المورد نفسِه · تغطيةُ موردٍ آخر · تبديلُ مصدر التوريد (§6)',
   `covered_seat_id` int unsigned NOT NULL COMMENT 'المقعدُ المغطى — op_containers.id (والموردُ المتعطل من شجرته)',
   `covering_supplier_id` int NOT NULL COMMENT 'الموردُ المغطِّي — suppliers.id (في own_standby هو المتعطلُ نفسُه)',
+  `failed_supplier_id` int DEFAULT NULL COMMENT 'الموردُ المتعطل — لقطةٌ من شجرة المقعد عند التقديم',
   `covering_equipment_id` int DEFAULT NULL COMMENT 'المعدةُ البديلة إن عُيّنت',
   `reason_code` enum('breakdown','scheduled_maintenance','relocation_exit','document_expired','operator_shortage') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '§6.1-①: سببٌ من قائمةٍ محكومة — لا تغطيةَ بلا سبب',
   `reason_ref` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجعُ بلاغٍ أو أمرِ عملٍ حيث ينطبق',
@@ -6677,6 +6701,8 @@ CREATE TABLE `substitute_coverages` (
   `valid_to` date NOT NULL COMMENT '§6.1-②: إلزاميٌّ — لا تغطيةَ مفتوحةَ المدة؛ والتمديدُ قرارٌ جديد',
   `estimated_hours` decimal(10,2) DEFAULT NULL COMMENT '§6.1-⑤: الأثرُ يُحسب قبل الاعتماد ويُعرض على الموافقين',
   `approvals_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجعُ سلسلة الموافقات بدرجتها',
+  `approvals_json` json DEFAULT NULL COMMENT 'CAP-01 §6: موافقاتُ الدرجة المجموعة — {role: {by, at}}؛ والاكتمالُ بحسب مصفوفة الدرجة',
+  `impact_json` json DEFAULT NULL COMMENT 'CAP-01 §6.1-⑤: الأثرُ على الأطراف الأربعة محسوبًا قبل الإرسال — يُعرض على الموافقين لا يُقدَّر بعد التنفيذ',
   `state` enum('draft','pending_approvals','approved','active','ended','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
   `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_by` int DEFAULT NULL,
