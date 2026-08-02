@@ -10,6 +10,7 @@
  * المقيسُ يومَ البناء: 37 من 39 وثيقةً مرحَّلةً منتهية (25 رخصةَ مشغّلٍ
  * و12 رخصةَ معدة) — وأصحابُها يعملون. قرارُ المالك: تحذيرٌ ظاهرٌ لا منع.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

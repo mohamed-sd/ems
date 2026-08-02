@@ -6,6 +6,7 @@
  * فيحدد بقية الحقول والمعالجة المحاسبية** — ولا اعتماد بلا نموذج ومعالجة
  * مكتوبة (FinancingService يرفض 422). الأقساط تُولَّد ولا تُدخل يدويًّا.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

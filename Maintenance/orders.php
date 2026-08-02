@@ -12,6 +12,7 @@
  *   فقط، دون لمس status/الإتاحة). الإغلاق (actions_taken + root_cause + inspection_result='ناجح')
  *   ⇒ 'سليمة' + availability_status='متاحة للعمل' + last_maintenance_date + إعادة جدولة الخطة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

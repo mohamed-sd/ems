@@ -3,6 +3,7 @@
  * send_message.php - إرسال رسالة داخلية
  * POST: receiver_id, message
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 

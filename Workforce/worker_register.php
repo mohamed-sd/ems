@@ -6,6 +6,7 @@
  * كل الكتابة Prepared Statements. عزل الشركة كالقائم.
  * الهوية والتصميم موحّدان عبر inheader/insidebar/page_header وأصول assets القائمة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

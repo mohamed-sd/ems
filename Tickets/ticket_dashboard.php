@@ -13,6 +13,7 @@
  * النطاق: نفس قاعدة الرؤية المطبَّقة في القائمة، تُحقن كشرطٍ في كل استعلام.
  * الفلترة الزمنية على تاريخ البلاغ (افتراضيًّا آخر 90 يومًا).
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

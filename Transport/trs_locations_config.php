@@ -4,6 +4,7 @@
  * نمط موحّد: ترويسة + توبار + DataTables + فورم .allforms + عزل الشركة.
  * شاشة جديدة مستقلة تماماً — لا تلمس أي جدول قائم.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

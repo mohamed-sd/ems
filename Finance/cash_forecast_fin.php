@@ -5,6 +5,7 @@
  * «توليد من البيانات الحية» يسحب الداخل من الذمم والخارج من المستحقات وأقساط التمويل.
  * شاشة مستقلة — عزل شركة + حذف ناعم. لا FK للخارج.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

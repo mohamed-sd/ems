@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 07:30:32
--- الجداول: 364 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 07:49:39
+-- الجداول: 365 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -634,6 +634,30 @@ CREATE TABLE `capacity_gap_watch` (
   UNIQUE KEY `uq_gap_open` (`open_key`),
   KEY `ix_gap_state` (`company_id`,`state`,`last_seen_on`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §10 — مرقبُ الفجوة اليومي بالساعات: الفجوةُ التي تُكتشف آخرَ الشهر خسارةٌ وقعت';
+
+-- ── Table: capacity_outbox ──
+CREATE TABLE `capacity_outbox` (
+  `obx_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `event_key` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'أحد أحداث مجال القدرات الستة (§14)',
+  `entity_type` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entity_id` int NOT NULL,
+  `quantity` decimal(18,3) DEFAULT NULL,
+  `unit` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `payload_json` json NOT NULL,
+  `idempotency_key` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'مفتاحُ منع التكرار عبر الطبقات (CAP-30) — يمرّ إلى publishFact نفسِه',
+  `state` enum('pending','published','failed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `attempts` smallint NOT NULL DEFAULT '0',
+  `next_attempt_at` datetime DEFAULT NULL COMMENT 'إعادةُ المحاولة التصاعدية — بساعة القاعدة',
+  `published_event_id` int DEFAULT NULL COMMENT 'ems_business_events.id بعد النشر',
+  `last_error` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `published_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`obx_id`),
+  UNIQUE KEY `uq_obx_idem` (`idempotency_key`),
+  KEY `ix_obx_pending` (`company_id`,`state`,`next_attempt_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §14 · DEC-CAP-B — صادرُ مجال القدرات: صفٌّ داخل المعاملة والنشرُ بعد COMMIT؛ الفشلُ يُعاد تصاعديًّا بلا استهلاكٍ ثانٍ (C28)';
 
 -- ── Table: capacity_shadow_diffs ──
 CREATE TABLE `capacity_shadow_diffs` (

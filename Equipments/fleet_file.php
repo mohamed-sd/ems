@@ -1,5 +1,6 @@
 <?php
 // تقديم مرفقات كرت المعدة من التخزين المحمي storage/fleet (بعد التحقق من الجلسة وملكية الشركة).
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     http_response_code(403);

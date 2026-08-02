@@ -7,6 +7,7 @@
  * تُبنى فوق البوابة الشخصية (H-18) ومساحات العمل (H-19) القائمتين: حاوية
  * تنقّل لا شاشة معاملة (المبدأ ⑥-ب) — كل عنصر يقفز إلى موضعه الحي.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

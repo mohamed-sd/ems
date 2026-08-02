@@ -6,6 +6,7 @@
  * والشاشةُ تُري **جدولَ §6 نفسَه** ثم **خطةَ عملٍ بأرقام العقد الحيّة** —
  * و**تُقرّر ولا تُنفّذ**: لكلِّ فعلٍ بيتُه.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

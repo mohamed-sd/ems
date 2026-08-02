@@ -1,6 +1,7 @@
 <?php
 /** EQUIP-OPE-S04 — 8.5 التقييم والحوافز والجزاءات (+ بنود مؤشّرات الأداء KPI). Bolt-on.
  *  المالية: يدوي + تعليق (قرار 5). الدرجة الإجمالية تُحتسَب آلياً من بنود المؤشّرات (متوسطٌ موزون). */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

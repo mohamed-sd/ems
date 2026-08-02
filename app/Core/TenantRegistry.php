@@ -112,6 +112,12 @@ class TenantRegistry
         'capacity_shadow_diffs' => array('type' => self::T_TENANT, 'soft' => false),
         // §10 — مرقبُ الفجوة اليومي بالساعات وتصعيدُها الآلي.
         'capacity_gap_watch' => array('type' => self::T_TENANT, 'soft' => false),
+        // §14/DEC-CAP-B — صادرُ مجال القدرات: الصفُّ داخل المعاملة والنشرُ بعده؛
+        // المضمونُ محصنٌ (idempotency_key) وحالةُ المعالجة وحدَها تتحرك.
+        'capacity_outbox' => array('type' => self::T_TENANT, 'soft' => false,
+            'immutable_key' => 'idempotency_key',
+            'immutable_allow' => array('state', 'attempts', 'next_attempt_at',
+                                       'published_event_id', 'last_error', 'published_at')),
         'operator_rotations' => array('type' => self::T_TENANT, 'soft' => false),
         // M-01: الدفعةُ المقدَّمة المقبوضةُ فعلًا — سلفةٌ تُستردّ لا إيراد.
         // `soft` لأنها مستندُ قبضٍ لا يُمحى: الإلغاءُ حالةٌ لا حذف.

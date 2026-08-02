@@ -9,6 +9,7 @@
  * بنيوي يسندها) · وكل منح أو إلغاء بسطر توقيع (AuthorityGuard) وسطر اطّلاع.
  * خلف الأدوار 1 و19 والسوبر — نمط Settings/guard_classification.php حرفيًّا.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

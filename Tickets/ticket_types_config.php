@@ -6,6 +6,7 @@
  * المرتبط به (من قائمةٍ بيضاء). الأنواع الافتراضية عامةٌ لكل الشركات وتُعرض
  * للقراءة فقط؛ وما تضيفه الشركة قابلٌ للتحرير والتعطيل — بلا حذف.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

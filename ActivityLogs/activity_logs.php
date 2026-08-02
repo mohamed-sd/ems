@@ -6,6 +6,7 @@
  * Phase 1: Role Cards overview.
  * Phase 2: Log table via DataTables + AJAX endpoint for clear-logs action.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

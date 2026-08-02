@@ -1,5 +1,6 @@
 <?php
 /** EQUIP-OPE-S04 — 8.10 الاحتياج وطلب القوى والتخطيط. Bolt-on. مرشّحون يدوياً (قرار 6). */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

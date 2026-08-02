@@ -12,6 +12,7 @@
  * لا حذفَ: الموقعُ مرجعُ تسجيلٍ تاريخي — التعطيلُ بـstatus لا بالمسح،
  * والافتراضيُّ (is_default — موقعُ الترحيل الرجعي) لا يُعطَّل من الشاشة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

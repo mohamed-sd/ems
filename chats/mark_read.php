@@ -3,6 +3,7 @@
  * mark_read.php - تعليم الرسائل كمقروءة
  * POST: sender_id (الشخص الذي فتحنا محادثته)
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 

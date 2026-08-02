@@ -4,6 +4,7 @@
  * شاشة جديدة مستقلة (وحدة 113). قراءة فقط من الجداول المملوكة
  * (transfer_orders · transfer_cost_lines · trs_locations · project للاسم) — صفر كتابة، صفر مساس بأي جدول قائم.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

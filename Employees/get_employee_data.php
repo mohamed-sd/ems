@@ -2,6 +2,7 @@
 // بدء output buffering من البداية لمنع أي output غير متوقع
 ob_start();
 
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 
 if (!isset($_SESSION['user'])) {

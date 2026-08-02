@@ -5,6 +5,7 @@
  * يُستدعى عبر XHR فقط (نمط get_breakdown_count.php).
  * (لعدّ كل المفتوحة بصرف النظر عن المصدر: احذف شرط is_auto = 1.)
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 

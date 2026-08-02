@@ -1,5 +1,6 @@
 <?php
 /** بوابة الطلب المالي D05 — مكتب محاسب الإدارة (§3.2): ضبط الحساب والأبعاد وولادة الحدث event_id */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header('Location: ../login.php');

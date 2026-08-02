@@ -118,6 +118,7 @@ function secure_session_start() {
     ini_set('session.sid_bits_per_character', 6);
 
     // بدء الجلسة
+    require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
     session_start();
 
     // تجديد session ID بشكل دوري للحماية من Session Fixation

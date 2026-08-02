@@ -6,6 +6,7 @@
  * ونطاقها **وعدد استعمالاتها** — وارتفاعها في حماية بعينها يعني مراجعة
  * صنفها لا زيادة الاستثناءات (PLAN-05 §13-④). قراءة واشتقاق بلا أثر.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

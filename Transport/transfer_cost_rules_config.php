@@ -4,6 +4,7 @@
  * قاعدة الستين يوماً = صفّان على demob بعتبة 60. محرّك التكلفة يقرأ منها لا من الكود.
  * نمط موحّد — شاشة جديدة مستقلة، لا تلمس أي جدول قائم.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

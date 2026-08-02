@@ -7,6 +7,7 @@
  * (السعر · الجاهزية · السجل) واختيارٌ كاملٌ أو جزئيٌّ بالبنود ← التعاقد».
  * و**لا حقلَ لكمية بند**: البنودُ مشتقّةٌ من الالتزامات لا مكتوبة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

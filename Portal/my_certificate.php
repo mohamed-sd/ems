@@ -6,6 +6,7 @@
  * أزرارِ تفاعلٍ داخلها» · §7: «تُولَّد من الأرقام المقاسة ولا تُصدَر لفترةٍ
  * لم تُقفل أو لتقييمٍ لم يُعتمد».
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

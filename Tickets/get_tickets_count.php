@@ -7,6 +7,7 @@
  *   • غيرهما: ما وُجِّه إلى شجرة دوره أو ما أبلغ عنه بنفسه.
  * يُستدعى عبر XHR كل دقيقة، فيبقى استعلامَ عدٍّ واحدًا رخيصًا.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 header('Content-Type: application/json; charset=UTF-8');
 

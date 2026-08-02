@@ -6,6 +6,7 @@
  * سجل المنع **مقياس ملاءمة للحماية نفسها** لا سجل مخالفات للمستخدمين — الحماية
  * التي تُمنع مئة مرة في الشهر إما الواقع يخالف السياسة أو السياسة تحتاج مراجعة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

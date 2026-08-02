@@ -4,6 +4,7 @@
  * fin_bank_accounts + fin_bank_statement_lines؛ مطابقة بنود الكشف مع fin_payments المنفّذة.
  * مطابقة آلية بالمبلغ+الاتجاه. رصيد البنك مقابل رصيد الدفاتر. شاشة مستقلة — لا FK للخارج.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

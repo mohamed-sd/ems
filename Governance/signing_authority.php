@@ -6,6 +6,7 @@
  * والمستند · عرض المنتهية خلال 30 يومًا · **وتعيين مدير الحركة ونائبه هنا**
  * (DEC-01 ①): السقف نطاقي لا نقدي، والنائب بمرجع أصيله وبمدة مكتوبة إلزامًا.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

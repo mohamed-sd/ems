@@ -7,6 +7,7 @@
  * الأدوارُ ذواتُ اللوحات المخصصة (17·13·16·23) لا تمرّ من هنا — خريطتُها
  * في roleBoardRoute تسبق. كلُّ رقمٍ ينقر لمصدره والتنبيهاتُ من §8 نصًّا.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

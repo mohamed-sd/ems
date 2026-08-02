@@ -2,6 +2,7 @@
 /** بوابة الطلب المالي D05 — إدارة التوجيه: تفعيل الإدارات وأدوار المراجعة/الاعتماد
  *  (قرار «الجميع ينشئ عبر مفتاح تفعيلٍ لكل إدارة» — التعميم من هنا لا من الكود).
  *  للمدير المالي (17) والسوبر. المحاسب يُحلّ من fin_accountants ولا يُحرَّر هنا. */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header('Location: ../login.php');

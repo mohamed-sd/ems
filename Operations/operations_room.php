@@ -5,6 +5,7 @@
  * SPEC-03 بطاقة 1: الشاشةُ الأم بتبويبات اليوم الأربعة — «قراءةٌ وقفز؛
  * لا أثرَ مباشر» — وتستوعب شاشةَ التشغيل القديمة بRedirect بعدّاد.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

@@ -4,6 +4,7 @@
  * الوحدات المالية (fin_units) + محاسب لكل إدارة بتبعيّة مزدوجة (fin_accountants).
  * شاشة مستقلة — عزل شركة + حذف ناعم. الموظفون يُقرأون قراءةً فقط من employees.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

@@ -5,6 +5,7 @@
  * يقبل طلبات POST فقط ويعيد JSON
  */
 
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 
 require_once '../config.php';

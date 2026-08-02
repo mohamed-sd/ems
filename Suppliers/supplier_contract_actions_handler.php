@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 include '../config.php';
 require_once '../includes/permissions_helper.php';

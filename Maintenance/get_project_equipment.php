@@ -4,6 +4,7 @@
  * يُستدعى عبر XHR فقط (حارس config.php يفرض X-Requested-With + جلسة صالحة).
  * المدخلات: project_id (إجباري) + include_id (اختياري، يضمن ظهور معدة محدّدة في فورم التحرير).
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 

@@ -6,6 +6,7 @@
  * والإنهاء والتعليق عبر AssignmentService بحرّاسه (422/403/409)، وكل فعل
  * سطر Insert-only في assignment_audit.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

@@ -4,6 +4,7 @@
  * يدير على صفحة واحدة: (أ) القيم المرجعية (proc_lookup) + (ب) المخازن (proc_warehouse).
  * نمط موحّد: ترويسة + توبار + DataTables + فورم .allforms + عزل الشركة + حذف ناعم.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

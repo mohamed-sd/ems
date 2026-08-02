@@ -10,6 +10,7 @@
  * **الصلاحيةُ صارمة** (نمطُ التسويات): الوحدةُ بكودها الحرفي وغيابُها منع.
  * **المرحَّلُ قراءةً** (source_table): مصدرُه القديمُ كاتبُه — شارةٌ ولا أزرار.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

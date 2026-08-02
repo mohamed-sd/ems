@@ -4,6 +4,7 @@
  * الرصيد محسوب بالتجميع من proc_stock_move (لا حقل رصيد مخزَّن): المتاح = الوارد + المرتجع − المصروف.
  * شاشة جديدة مستقلة للقراءة فقط — لا كتابة على أي جدول.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

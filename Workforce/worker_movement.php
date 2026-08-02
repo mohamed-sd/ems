@@ -1,5 +1,6 @@
 <?php
 /** EQUIP-OPE-S04 — 8.11 التحرّك والوصول + 8.12 النقل بين المشاريع (موحّدة). Bolt-on. */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

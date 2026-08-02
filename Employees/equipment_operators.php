@@ -5,6 +5,7 @@
  * «جميع السائقين/المشغلين موظفون، وليس كل الموظفين سائقين/مشغلين.»
  * يكتب في equipment_operators ويزامن employees.license_* (المرآة التي تقرأها الشاشات القائمة).
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 

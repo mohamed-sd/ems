@@ -3,6 +3,7 @@
  * get_messages.php - جلب رسائل المحادثة
  * GET/POST: with_user_id, [last_id] للتحديث التزايدي
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 

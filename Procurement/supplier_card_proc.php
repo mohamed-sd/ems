@@ -5,6 +5,7 @@
  * UX-09 §5: البطاقةُ بتبويباتها السبعة — كان `suppliers_proc.php` جدولًا
  * مسطَّحًا. قراءةٌ من مصادرها الحية بروابط الأصل — لا نسخَ ولا تخزين.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

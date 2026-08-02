@@ -15,6 +15,7 @@
  * **السعرُ بتاريخه**: `rate_to_base` = كم وحدةَ أساسٍ يساوي واحدٌ من العملة،
  * فيكون `base = ROUND(amount × rate, 2)` ضربًا لا قسمة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

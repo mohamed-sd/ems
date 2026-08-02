@@ -4,6 +4,7 @@
  * محرك التسوية: صافي المورد = Σله − Σعليه؛ التسوية شرطٌ للصرف (يُفرض في شاشة المدفوعات).
  * شاشة مستقلة — عزل شركة + حذف ناعم. الأطراف تُقرأ قراءةً فقط من suppliers/employees/clients.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

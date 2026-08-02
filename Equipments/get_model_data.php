@@ -1,5 +1,6 @@
 <?php
 // نقطة AJAX خفيفة: تُعيد بيانات موديل من سجل النوع والموديل (للوراثة في كرت المعدة)
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 while (ob_get_level()) {
     ob_end_clean();

@@ -5,6 +5,7 @@
  * UX-09 §6: لوحةُ الدور المستقل (25) — أسئلةُ صباحه: ما الأصنافُ تحت الحد؟
  * ما استلاماتُ وصرفياتُ اليوم؟ ما العهدُ المفتوحة؟ — قراءةٌ وقفزٌ بلا أثر.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

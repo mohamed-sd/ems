@@ -4,6 +4,7 @@
  * مراكز التكلفة/الربح (شجرة) + التخصيص الداخلي والتسويات البينية (fin_cost_centers + fin_internal_allocations).
  * شاشة مستقلة — عزل شركة + حذف ناعم. لا FK للخارج.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

@@ -8,6 +8,7 @@
  *
  * فلا حقلَ تعديلٍ هنا ألبتة: عرضٌ · طباعةٌ · وإلغاءٌ ضريبيٌّ بسببٍ مكتوب.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

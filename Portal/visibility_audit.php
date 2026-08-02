@@ -5,6 +5,7 @@
  * ADM-01 §3-④: «قراءة فقط: سجلُّ كل تغييرٍ بفاعله وسببه ومدته وأثره —
  * **لا يُعدَّل ولا يُحذف**».
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

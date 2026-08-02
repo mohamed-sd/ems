@@ -3,6 +3,7 @@
  * Procurement/dashboard_proc.php — لوحة المشتريات والمؤشرات (عرض فقط) — §16.
  * بطاقات إحصائية + جدول القطع الحرجة. كلها مقيّدة بالشركة، قراءة فقط.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

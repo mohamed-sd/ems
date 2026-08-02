@@ -4,6 +4,7 @@
  * ★ تجميع قراءة فقط ★ — بنود المورد له/عليه من fin_dues + مدفوعاته من fin_payments
  * + وحداته المعتمدة من fin_unit_records، بالفترة المختارة. الصافي وحالة التسوية.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

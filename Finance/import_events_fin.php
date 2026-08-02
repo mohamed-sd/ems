@@ -7,6 +7,7 @@
  * مزدوجة: مطابقة source_ref للعرض + عطالة بنيوية بمفتاح (المستند × النوع).
  * سُدّ هنا خرقُ الكتابة المباشرة على الدفتر (v8 §15-أ · UX-02 §9-①).
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

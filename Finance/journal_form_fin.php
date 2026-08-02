@@ -4,6 +4,7 @@
  * محرك القيد المتوازن: لا يُرحَّل قيدٌ إلا إذا تساوى إجمالي المدين والدائن وله سطران فأكثر.
  * رأس + سطور ديناميكية في صفحة واحدة. عزل شركة + حذف ناعم. شاشة مستقلة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

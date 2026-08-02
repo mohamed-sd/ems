@@ -6,6 +6,7 @@
  * إجراؤه. و«ما ينتظر قراره **بالساعات لا بالعدد فقط**» (§8 القبول): كل بند
  * معلَّق بعمر انتظاره ساعاتٍ من ساعة القاعدة، ومجموع ساعات الانتظار ظاهر.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

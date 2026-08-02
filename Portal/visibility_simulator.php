@@ -5,6 +5,7 @@
  * ADM-01 §3-③: «"ماذا يرى هذا الحساب؟" و"من يرى هذا العنصر؟" — إجابتان
  * مباشرتان **بمصدر كل قرارٍ ونطاقه**».
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

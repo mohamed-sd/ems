@@ -1,6 +1,7 @@
 <?php
 // اعتماد كرت المعدة (حوكمة خفيفة): draft → active + تسجيل المعتمِد ووقت الاعتماد.
 // لا يُغيّر أي منطق تشغيل قائم — card_state عرضي/حوكمي في هذه المرحلة.
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header('Location: ../login.php');

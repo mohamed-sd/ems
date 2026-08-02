@@ -6,6 +6,7 @@
  * ناقصةَ التبويبات. قراءةٌ حيةٌ من مالكيها — **والحساسُ (الراتبُ والسلف)
  * خلف حارس الظهور الثلاثي (H-17)** لا خلف إخفاء زر.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

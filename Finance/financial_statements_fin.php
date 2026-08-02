@@ -9,6 +9,7 @@
  * كانت ترمي «Incorrect column count» (tn/18) في نافذتَي تنبيهٍ حاجزتين عند كل فتح،
  * والفرزُ/الترقيمُ/البحثُ يُبعثر أقسامَ القائمة عن مجاميعها. القائمة تُعرَض كما تُشتَقّ.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

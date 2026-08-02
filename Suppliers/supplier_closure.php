@@ -8,6 +8,7 @@
  * الشاشةُ **قائمةُ خطواتٍ بترتيبها**: كلُّ خطوةٍ بزرّها وحالتِها ومصدرِ رقمها،
  * والإخلاءُ آخرُها — ولا يُفتح زرُّه قبل إتمام ما قبله.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");

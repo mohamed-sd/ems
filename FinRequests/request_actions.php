@@ -5,6 +5,7 @@
  *          return_request/reject/acct_forward — كلها عبر بوابة العزل، وقرارات
  *          الحالة عبر محرّك StateMachine بأدوار صفّ التوجيه، والسجل إلحاقي.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header('Location: ../login.php');

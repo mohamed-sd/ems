@@ -13,6 +13,7 @@
  *  - تحسينات UX: Toast بدلاً من alert()
  */
 
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 
 // ═══════════════════════════════════════════════════════════

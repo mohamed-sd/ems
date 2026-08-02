@@ -3,6 +3,7 @@
  * إعداد جدول صلاحيات التقارير — يُشغَّل مرة واحدة
  * يُنشئ الجدول ويُضيف صلاحيات لكل الأدوار
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user']) || intval($_SESSION['user']['role']) !== -1) {
     die('<p style="font-family:Arial;color:red">هذا الملف للمديرين فقط (Super Admin). سجّل دخولك كمدير أولاً.</p>');

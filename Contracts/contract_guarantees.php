@@ -6,6 +6,7 @@
  * **التزامٌ محتملٌ خارج الميزانية لا يُخصم من مستخلص**».
  * والشاشةُ تُري **الرقمين في عمودين لا في مجموع** — والفرقُ مخزَّنٌ لا محكيّ.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';

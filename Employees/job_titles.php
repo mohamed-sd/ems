@@ -4,6 +4,7 @@
  * employees.job_title_id يشير إلى job_titles.id (مفتاح خارجي، لا نصّ ثابت).
  * عزل الشركة: company_id=NULL مسمّياتٌ عامّة (للجميع) + مسمّيات خاصّة بالشركة.
  */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 

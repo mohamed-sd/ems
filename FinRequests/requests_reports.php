@@ -3,6 +3,7 @@
  *  ① الطلبات بالحالة والنوع والإدارة ② أعمار الطلبات المفتوحة
  *  ③ المعاد والمرفوض بأسبابه ④ سجلّ طلبٍ كامل (للتدقيق — القصة برقمٍ واحد).
  *  قراءةٌ خالصة — كل بياناتها من fin_requests والسجل الإلحاقي؛ صفر كتابة. */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
     header('Location: ../login.php');
