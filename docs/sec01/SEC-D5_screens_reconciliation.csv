@@ -100,6 +100,7 @@ FinRequests/routing_admin.php,Y,"شاشة مسجَّلة",تبقى
 Fleet/cron_doc_expiry_escalation.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Fleet/readiness_board.php,Y,"شاشة مسجَّلة",تبقى
 Governance/activation_patterns.php,Y,"شاشة مسجَّلة",تبقى
+Governance/cron_permissions.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Governance/entities_registry.php,Y,"شاشة مسجَّلة",تبقى
 Governance/licenses_guarantees.php,Y,"شاشة مسجَّلة",تبقى
 Governance/ownership_grants.php,Y,"شاشة مسجَّلة",تبقى
@@ -123,6 +124,7 @@ Oprators/oprators.php,Y,"شاشة مسجَّلة",تبقى
 Oprators/select_project.php,Y,"شاشة مسجَّلة",تبقى
 Operations/containers.php,Y,"شاشة مسجَّلة",تبقى
 Operations/cron_container_gate_report.php,N,معالج/كرون/مساعد,"ليست شاشة"
+Operations/cron_job_worker.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Operations/cron_org_assignments.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Operations/cron_rotation_transfer.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Operations/daily_plan.php,Y,"شاشة مسجَّلة",تبقى
@@ -163,14 +165,17 @@ Suppliers/supplierscontracts_details.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/cron_tickets.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Tickets/get_tickets_count.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Tickets/ticket_categories_config.php,Y,"شاشة مسجَّلة",تبقى
+Tickets/ticket_contextual_open.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_dashboard.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_escalation_config.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_form.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_recurrence.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_sla_config.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_types_config.php,Y,"شاشة مسجَّلة",تبقى
+Tickets/ticket_workstreams_board.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/tickets_list.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/tkt_helpers.php,N,معالج/كرون/مساعد,"ليست شاشة"
+Tickets/watchtower.php,Y,"شاشة مسجَّلة",تبقى
 Timesheet/_ts_journey.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 Timesheet/aprovment.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 Timesheet/get_contract_hours.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
@@ -236,12 +241,15 @@ admin/org_structure.php,Y,"شاشة مسجَّلة",تبقى
 admin/plans.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 admin/reports_permissions.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 admin/reset_password.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
+admin/sec_employee_wizard.php,Y,"شاشة مسجَّلة",تبقى
+admin/sec_governance.php,Y,"شاشة مسجَّلة",تبقى
 admin/settings.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 admin/setup_once.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 admin/update_permission_quick.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 main/all_assistants.php,Y,"شاشة مسجَّلة",تبقى
 main/check_username_availability.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 main/dashboard.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
+main/my_workspace.php,Y,"شاشة مسجَّلة",تبقى
 main/profile.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 main/project_users.php,Y,"شاشة مسجَّلة",تبقى
 main/role_board.php,Y,"شاشة مسجَّلة",تبقى

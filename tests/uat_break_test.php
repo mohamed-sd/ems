@@ -84,7 +84,10 @@ foreach ($bgCases as $perm => $label) {
         'scope_rule' => 'company:4', 'reason' => $label . ' ' . $MARK, 'granted_by' => $decider, 'hours' => 2));
     scen($b, $conn, $RUN, $r['ok'], "break_glass «{$label}» يُفتح بكسر زجاج وحده");
     if (!empty($r['ex_id'])) { $conn->query("DELETE FROM permission_exceptions WHERE ex_id=" . intval($r['ex_id'])); }
-    if (!empty($r['ticket_id'])) { $conn->query("DELETE FROM tickets WHERE id=" . intval($r['ticket_id'])); }
+    if (!empty($r['ticket_id'])) {
+        $conn->query("DELETE FROM ticket_workstreams WHERE tk_id=" . intval($r['ticket_id']));
+        $conn->query("DELETE FROM tickets WHERE id=" . intval($r['ticket_id']));
+    }
 }
 // with_compensating_control (2): تجاوز السقف وفصل الشراء
 scen($b, $conn, $RUN, true, 'with_compensating_control (السقف والفصل) بسياسة الرقابة التعويضية');

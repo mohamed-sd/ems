@@ -83,7 +83,13 @@ class TicketRouter
         $siteId = intval($ctx['site_id'] ?? 0);
         $conn->begin_transaction();
         try {
-            $no = date('y-m') . '-' . (8000 + intval($conn->query("SELECT COUNT(*) c FROM tickets")->fetch_assoc()['c']) + 1);
+            // رقم البلاغ من أعلى لاحقةٍ رقميةٍ قائمةٍ +1 (لا COUNT — فالحذف يوقعه في تصادم UQ)
+            $prefix = date('y-m') . '-';
+            $maxRow = $conn->query("SELECT MAX(CAST(SUBSTRING_INDEX(ticket_no, '-', -1) AS UNSIGNED)) mx
+                                     FROM tickets WHERE ticket_no LIKE '" . $conn->real_escape_string($prefix) . "%'
+                                       AND ticket_no REGEXP '[0-9]+$'")->fetch_assoc();
+            $seq = max(8000, intval($maxRow['mx'] ?? 0)) + 1;
+            $no = $prefix . $seq;
             $stmt = $conn->prepare(
                 "INSERT INTO tickets (company_id, ticket_no, ticket_type_id, stage, ticket_nature, priority,
                     confidentiality, business_impact, call_date, reporting_person, reporter_user_id, is_anonymous,

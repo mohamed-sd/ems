@@ -175,12 +175,17 @@ class BreakGlassService
             . ' · مراجعة إلزامية خلال 48 ساعة';
         $stmt = $conn->prepare(
             "INSERT INTO tickets (company_id, ticket_no, ticket_type_id, stage, ticket_nature, priority,
-                business_impact, call_date, reporting_person, complaint, owner_role_id, created_by)
-             VALUES (?, ?, ?, 'new', 'incident', 'critical', 'admin', CURDATE(), 'النظام — كسر زجاج', ?, 15, ?)");
+                business_impact, call_date, reporting_person, complaint, owner_role_id, head_state, created_by)
+             VALUES (?, ?, ?, 'new', 'incident', 'critical', 'admin', CURDATE(), 'النظام — كسر زجاج', ?, 15, 'open', ?)");
         $stmt->bind_param('isisi', $co, $no, $typeId, $complaint, $personId);
         $ok = $stmt->execute();
         $id = $ok ? intval($conn->insert_id) : 0;
         $stmt->close();
+        // مسار حوكمة واحد — فكل بلاغ في النموذج الجديد له رأس ومسار (TKT-04)
+        if ($id > 0) {
+            $conn->query("INSERT INTO ticket_workstreams (tk_id, workstream_type, seq_no, mandatory, state, activation_state)
+                          VALUES ({$id}, 'governance', 1, 1, 'new', 'opened')");
+        }
         return $id;
     }
 }

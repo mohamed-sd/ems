@@ -33,6 +33,7 @@ $teardown = function () use ($conn, $MARK) {
     $conn->query("DELETE FROM permission_exceptions WHERE reason LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM effective_permissions WHERE source_ref LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM permission_audit_events WHERE reason LIKE '%{$MARK}%'");
+    $conn->query("DELETE w FROM ticket_workstreams w JOIN tickets t ON t.id=w.tk_id WHERE t.reporting_person = 'النظام — كسر زجاج' AND t.complaint LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM tickets WHERE reporting_person = 'النظام — كسر زجاج' AND complaint LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM sensitive_read_log WHERE context LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM guard_denials WHERE attempted_ref LIKE '%{$MARK}%'");

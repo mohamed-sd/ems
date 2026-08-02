@@ -46,6 +46,9 @@ $teardown = function () use ($conn, $MARK) {
     $conn->query("DELETE tp FROM template_permissions tp JOIN permission_template_versions v ON v.ver_id=tp.template_version_id WHERE v.change_reason LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM permission_template_versions WHERE change_reason LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM approval_signatures WHERE document_type = 'fb10_test'");
+    // بلاغات حوكمة كسر الزجاج التي فتحها S14 (bg) — مع مساراتها (TKT-04)
+    $conn->query("DELETE w FROM ticket_workstreams w JOIN tickets t ON t.id=w.tk_id WHERE t.reporting_person = 'النظام — كسر زجاج' AND t.complaint LIKE '%{$MARK}%'");
+    $conn->query("DELETE FROM tickets WHERE reporting_person = 'النظام — كسر زجاج' AND complaint LIKE '%{$MARK}%'");
     $conn->query("UPDATE founding_mode SET enabled=0, ends_at=NULL WHERE 1=1");
 };
 register_shutdown_function($teardown);
