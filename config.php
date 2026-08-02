@@ -233,6 +233,14 @@ $conn->set_charset("utf8mb4");
 // «Illegal mix of collations» عند مقارنة عمود بنتيجة CAST/تعبير تأخذ ترتيب الاتصال.
 mysqli_query($conn, "SET collation_connection = 'utf8mb4_unicode_ci'");
 
+// N-25 (update0004 · NFR-02): توحيد ساعة التطبيق على ساعة القاعدة — القياس
+// الحاكم أثبت أن التخزين محلي (MySQL SYSTEM = توقيت الخادم) وPHP كان UTC،
+// فكانت ساعتان مختلطتان (فارق موسمي 2-3 ساعات بالتوقيت الصيفي). التوحيد
+// إعدادٌ لا ترحيل (الملحق §12.6-⑤) — والإزاحة الموسمية تمنع الترحيل المسطح.
+// الرجوع: EMS_APP_TIMEZONE=UTC في .env. وخطة ترحيل UTC الكاملة جاهزة بلا
+// تشغيل في docs/nfr/N-25_utc_migration_plan_ar.md — قرار مالك.
+date_default_timezone_set(function_exists('ems_env') ? (string) ems_env('EMS_APP_TIMEZONE', 'Africa/Cairo') : 'Africa/Cairo');
+
 // تهيئة إعدادات أداء اتصال قاعدة البيانات
 ems_optimize_db_session($conn);
 
