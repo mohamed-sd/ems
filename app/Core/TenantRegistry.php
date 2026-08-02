@@ -506,6 +506,11 @@ class TenantRegistry
             'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8
         'event_consumers' => array('type' => self::T_GLOBAL, 'soft' => false), // ACT-01 §8: قاموسُ مستهلكي الأحداث
         'screen_view_rows' => array('type' => self::T_GLOBAL, 'soft' => false), // NAV-01 v6 §6: مصفوفةُ العرض — قاموسُ بنيةٍ لا بياناتُ كيان
+        // ── دورةُ التوظيف العشرية (NAV-02 §12-① · update0007-ب) ──
+        'rec_vacancies' => array('type' => self::T_TENANT, 'soft' => false),
+        'rec_applications' => array('type' => self::T_TENANT, 'soft' => false),
+        'rec_stage_log' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'rec_applications', 'fk' => 'app_id'),
         'action_impacts' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8: خريطةُ الأثر
         'action_execution_log' => array('type' => self::T_TENANT, 'soft' => false), // ACT-01 §8: Insert-only بشركته
