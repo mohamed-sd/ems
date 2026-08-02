@@ -1,0 +1,42 @@
+#!/bin/bash
+# Pre-commit hook - encoding validation
+# Works on both Windows (via PowerShell) and Linux/Mac (via bash)
+
+# On Windows with Git Bash, call the PowerShell script
+if command -v powershell.exe &> /dev/null; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(pwd)/.git/hooks/pre-commit.ps1"
+    exit $?
+fi
+
+# Linux/Mac fallback - native bash check
+STAGED=$(git diff --cached --name-only | grep -E '\.(php|js|css|json|sql)$' || true)
+ERRORS=0
+
+if [ -z "$STAGED" ]; then
+    exit 0
+fi
+
+echo "Checking encoding..."
+while IFS= read -r file; do
+    [ -z "$file" ] || [ ! -f "$file" ] && continue
+    # BOM check
+    if head -c 3 "$file" | od -An -tx1 | grep -q "ef bb bf"; then
+        echo "BOM in: $file"
+        ERRORS=$((ERRORS + 1))
+    fi
+    # CRLF check
+    if grep -q $'\r' "$file" 2>/dev/null; then
+        echo "CRLF in: $file"
+        ERRORS=$((ERRORS + 1))
+    fi
+done <<< "$STAGED"
+
+if [ $ERRORS -gt 0 ]; then
+    echo "$ERRORS issue(s) found. Run: powershell -File scripts/fix-bom.ps1"
+    exit 1
+fi
+# ACT-01 §5 (update0006 D-01): فحوصُ الاتصال تمنع الدمجَ عند مسِّ التنقل أو الأفعال
+if git diff --cached --name-only | grep -qE "nav_|action|Tickets/|link_groups|tools/act_"; then
+    /c/wamp64/bin/php/php8.2.30/php tools/act_checks.php --enforce || { echo "فحوصُ الاتصال منعت الالتزام — أصلح ثم أعد"; exit 1; }
+fi
+exit 0
