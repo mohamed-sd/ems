@@ -382,11 +382,19 @@ function roleBoardAlerts($conn, $gate, $roleId)
         ),
         6 => array(
             'eq_no_operator' => array(array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')),
+                // ed.operation_id لا وجودَ له: equipment_drivers يربط **معدةً بموظّف**
+                // (equipment_id · employee_id) لا عمليةً بموظّف. والوصلُ المعتمَد في
+                // المستودع كلِّه هو equipments.id = operations.equipment.
                 "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل'
-                 AND NOT EXISTS (SELECT 1 FROM equipment_drivers ed WHERE ed.operation_id = o.id AND ed.status = 1)"),
+                 AND NOT EXISTS (SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id = o.equipment AND ed.status = 1)"),
             'assign_conflict' => array(array('t' => 'equipment_drivers', 'a' => 'ed'),
-                "SELECT COUNT(*) FROM (SELECT ed.operation_id FROM equipment_drivers ed
-                 WHERE {TENANT_SCOPE} AND ed.status = 1 GROUP BY ed.operation_id HAVING COUNT(*) > 1) d"),
+                // تعارضُ الإسناد = أكثرُ من مشغّلٍ نشطٍ على المعدة **في الوردية
+                // الواحدة**. الوردية جزءٌ من التجميع لا زينة: معدةٌ لها مشغّلٌ
+                // نهاريٌّ وآخرُ ليليٌّ تشغيلٌ طبيعيٌّ لا تعارض — وإسقاطُ shift_type
+                // كان يعدّها تعارضًا (قِيس على البيانات الحية: 9 بلا الوردية · 6 بها).
+                "SELECT COUNT(*) FROM (SELECT ed.equipment_id FROM equipment_drivers ed
+                 WHERE {TENANT_SCOPE} AND ed.status = 1
+                 GROUP BY ed.equipment_id, ed.shift_type HAVING COUNT(*) > 1) d"),
             'move_waiting' => array(array('t' => 'worker_movement', 'a' => 'wm'),
                 "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state = 'مسودة'"),
         ),
@@ -533,7 +541,7 @@ function roleBoardGenericConfig($rid)
                 array('مواقعُ لم ترفع اليوم', 'fa-location-crosshairs', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ts' => 'timesheet')), "SELECT COUNT(DISTINCT o.project_id) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM timesheet ts WHERE ts.operator=o.id AND ts.date=CURDATE())", '../Timesheet/timesheet_type.php', 'err'),
                 array('وحداتٌ تنتظر الاعتماد', 'fa-check-double', array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.status=1", '../Approvals/hours_approval.php', 'warn'),
                 array('معداتٌ متوقفة', 'fa-heart-crack', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='معطلة'", '../Oprators/select_project.php', 'err'),
-                array('تعمل بلا مشغّلٍ نشط', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.operation_id=o.id AND ed.status=1)", '../Oprators/select_project.php', 'err'),
+                array('تعمل بلا مشغّلٍ نشط', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id=o.equipment AND ed.status=1)", '../Oprators/select_project.php', 'err'),
                 array('التزاماتُ العقود', 'fa-file-signature', array('t' => 'contract_commitments', 'a' => 'cc'), "SELECT COUNT(*) FROM contract_commitments cc WHERE {TENANT_SCOPE} AND COALESCE(cc.is_deleted,0)=0", '../Clients/contract_commitments.php', 'or'),
             ),
             'tasks' => array(
@@ -645,7 +653,7 @@ function roleBoardGenericConfig($rid)
                 array('تشغيلاتٌ تعمل الآن', 'fa-play-circle', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل'", '../Oprators/select_project.php', 'ok'),
                 array('جاهزةٌ (احتياط)', 'fa-circle-pause', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='جاهزة'", '../Oprators/select_project.php', 'or'),
                 array('معطلة', 'fa-heart-crack', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='معطلة'", '../Oprators/select_project.php', 'err'),
-                array('عاملةٌ بلا مشغّل', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.operation_id=o.id AND ed.status=1)", '../Oprators/select_project.php', 'err'),
+                array('عاملةٌ بلا مشغّل', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id=o.equipment AND ed.status=1)", '../Oprators/select_project.php', 'err'),
             ),
             'tasks' => array(
                 array('طلباتُ تنقّلٍ تنتظر', 'fa fa-people-arrows', array('t' => 'worker_movement', 'a' => 'wm'), "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state='مسودة'", '../Workforce/worker_movement.php'),

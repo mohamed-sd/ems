@@ -9,16 +9,44 @@
  * • كلمة مرور القاعدة تُمرَّر عبر ملف اعتماداتٍ مؤقّت (--defaults-extra-file)،
  *   لا في سطر الأوامر (كي لا تظهر في قائمة العمليات).
  * • التنفيذ عبر proc_open بصيغة المصفوفة (بلا صدفة) — لا حقن ولا مزالق اقتباس.
+ * • مسارات الأدوات تُكتشف وقت التشغيل (includes/portable_paths.php) — لا مسارَ
+ *   مطلقًا لحزمةٍ بعينها، فالمشروع يعمل على WAMP وXAMPP معًا (ج٢ · قابلية النقل).
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
+require_once dirname(__DIR__, 2) . '/includes/portable_paths.php';
+
 if (!function_exists('ems_dbtool_bin_dir')) {
 
-    /** مجلد أدوات MariaDB (mysqldump/mysql). قابل للتهيئة عبر .env: MYSQL_BIN_DIR. */
+    /**
+     * مجلد أدوات MySQL ‏(mysqldump/mysql). **لا افتراضَ مثبَّتًا لحزمةٍ بعينها** —
+     * كان `C:/xampp/mysql/bin` فكان يعمل على XAMPP ويفشل على أي بيئةٍ سواها
+     * (قابلية النقل · PROMPT_cross_env_portability_fix ج٢). الترتيب:
+     *   ① `.env` ← MYSQL_BIN_DIR (المصدر المُعتمَد صراحةً)
+     *   ② مجلدُ mysqldump المُكتشَفُ من PATH
+     *   ③ المواضعُ الشائعةُ للحزمِ المعروفة — **بالفحص `is_dir` لا بالافتراض**
+     * وإن أخفقتِ الثلاثةُ رجع '' فيُظهر النداءُ رسالةً تطلب ضبطَ المفتاح.
+     */
     function ems_dbtool_bin_dir()
     {
-        $dir = (string) ems_env('MYSQL_BIN_DIR', 'C:/xampp/mysql/bin');
-        return rtrim(str_replace('\\', '/', $dir), '/');
+        return ems_portable_mysql_bin_dir();
+    }
+
+    /**
+     * رسالةُ فشلٍ قابلةٌ للتنفيذ حين لا تُكتشف أداةُ MySQL — تقول ما ينقص وكيف
+     * يُضبط، لا «غير موجودة في: » وحدها (تصير فارغةً حين يخفق الاكتشافُ كلُّه).
+     */
+    function ems_dbtool_bin_hint($tool)
+    {
+        $dir = ems_dbtool_bin_dir();
+        if ($dir === '') {
+            return 'تعذّر اكتشافُ مجلد أدوات MySQL على هذا الجهاز. اضبط MYSQL_BIN_DIR '
+                . 'في ملف .env على مجلد bin الخاص بخادم قاعدتك — مثال: '
+                . 'MYSQL_BIN_DIR=C:/…/mysql/bin  (شخِّص بـ: php tools/doctor.php)';
+        }
+
+        return 'أداة ' . $tool . ' غير موجودة في: ' . $dir
+            . ' — صحِّح MYSQL_BIN_DIR في .env (شخِّص بـ: php tools/doctor.php)';
     }
 
     /** مجلد تخزين النسخ (storage/backups — محجوب عن الويب عبر storage/.htaccess). */
@@ -149,7 +177,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
             $dumpBin = ems_dbtool_bin_dir() . '/mysqldump';
         }
         if (!is_file($dumpBin)) {
-            $err = 'أداة mysqldump غير موجودة في: ' . ems_dbtool_bin_dir();
+            $err = ems_dbtool_bin_hint('mysqldump');
             return null;
         }
         $cnf = ems_dbtool_write_cnf();
@@ -267,7 +295,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
             $mysqlBin = ems_dbtool_bin_dir() . '/mysql';
         }
         if (!is_file($mysqlBin)) {
-            $err = 'أداة mysql غير موجودة في: ' . ems_dbtool_bin_dir();
+            $err = ems_dbtool_bin_hint('mysql');
             return false;
         }
 
@@ -379,10 +407,14 @@ if (!function_exists('ems_dbtool_bin_dir')) {
     // (بلا تعديل مخطّط)، ومُشغّلٌ يأخذ نسخةً متى حان الموعد ويُقلّم القديمة.
     // ═══════════════════════════════════════════════════════════════════════
 
-    /** مسار مُنفّذ PHP لإطلاق العمليات الخلفية. قابل للتهيئة عبر .env: PHP_BIN. */
+    /**
+     * مسار مُنفّذ PHP لإطلاق العمليات الخلفية. **بلا افتراضٍ مثبَّت** — كان
+     * `C:/xampp/php/php.exe` فكان يفشل خارج XAMPP (قابلية النقل · ج٢).
+     * الاكتشافُ في ems_portable_php_bin(): ‏.env ← PHP_BINARY ← PATH ← فحصُ الجذور.
+     */
     function ems_dbtool_php_bin()
     {
-        return str_replace('\\', '/', (string) ems_env('PHP_BIN', 'C:/xampp/php/php.exe'));
+        return ems_portable_php_bin();
     }
 
     /** مسار ملف إعدادات الجدولة. */

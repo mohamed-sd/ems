@@ -60,7 +60,17 @@ if ($migUser !== null && $migUser !== '' && $migPass !== null && $migPass !== ''
     }
     $conn->close();
     $conn = $migConn;
+    define('MIGRATE_CONN_USER', $migUser);
+    define('MIGRATE_CONN_IS_MIGRATOR', true);
     fwrite(STDOUT, "[migrate] الاتصال: $migUser (مسار الترحيلات المنفصل — DDL)\n");
+} else {
+    // توافقٌ رجعي: من كان DB_USER عنده يملك DDL (root مثلًا) يمضي كما كان. لكن
+    // الإفصاحَ عن الهوية شرطُ تشخيصٍ سريع — فبدونه يظهر رفضُ الصلاحية لاحقًا
+    // بلا دلالةٍ على سببه (ج٣ · قابلية النقل).
+    define('MIGRATE_CONN_USER', (string) ems_env('DB_USER'));
+    define('MIGRATE_CONN_IS_MIGRATOR', false);
+    fwrite(STDOUT, '[migrate] الاتصال: ' . MIGRATE_CONN_USER
+        . " (اتصالُ التطبيق — لا زوجَ DB_MIGRATOR_* في .env)\n");
 }
 
 // تأكيد صريح للترميز حتى لو تغيّر config.php مستقبلًا — شرط سلامة العربية في DDL.
@@ -96,6 +106,33 @@ function migrate_ensure_tracking_table(mysqli $conn)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
     if (!$conn->query($sql)) {
+        // 1142 = command denied · 1044 = access denied for database. وهما الحالةُ
+        // الغالبةُ على جهازٍ جديد: اتصالُ التطبيق DML-only بتصميمٍ مقصود (ADR-04)،
+        // فالخطأُ الخام «CREATE command denied» يبدو عطلًا وهو في الحقيقة إعدادٌ
+        // ناقصٌ في .env. الرسالةُ تدلّ على الحلِّ لا على العَرَض (ج٣ · قابلية النقل).
+        if (in_array((int) $conn->errno, array(1142, 1044), true)) {
+            $user = defined('MIGRATE_CONN_USER') ? MIGRATE_CONN_USER : (string) ems_env('DB_USER');
+            $db   = (string) ems_env('DB_NAME');
+            fwrite(STDERR,
+                "[migrate] FATAL: المستخدم '{$user}' لا يملك صلاحية DDL على '{$db}'.\n"
+                . "\n"
+                . "  السبب: اتصالُ التطبيق مقصورٌ على DML بتصميمٍ مقصود (ADR-04) — لا تُوسَّع\n"
+                . "         صلاحياتُه. المسارُ الصحيح مستخدمُ ترحيلٍ منفصل.\n"
+                . "\n"
+                . "  الحل: أضف إلى .env زوجَ المُرحِّل:\n"
+                . "         DB_MIGRATOR_USER=ems_migrator\n"
+                . "         DB_MIGRATOR_PASS=<كلمة-مرور-قوية>\n"
+                . "\n"
+                . "  وأنشئه مرةً واحدةً على الخادم بمستخدمٍ إداري:\n"
+                . "         CREATE USER 'ems_migrator'@'localhost' IDENTIFIED BY '<كلمة-المرور>';\n"
+                . "         GRANT ALL PRIVILEGES ON `{$db}`.* TO 'ems_migrator'@'localhost';\n"
+                . "         FLUSH PRIVILEGES;\n"
+                . "\n"
+                . "  شخِّص جهازك كاملًا بـ: php tools/doctor.php\n"
+                . "  (الخطأ الخام: {$conn->error})\n");
+            exit(1);
+        }
+
         fwrite(STDERR, "[migrate] FATAL: تعذّر إنشاء جدول التتبّع: {$conn->error}\n");
         exit(1);
     }

@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "ems",
-      "runtimeExecutable": "C:\\wamp64\\bin\\php\\php8.3.28\\php.exe",
+      "runtimeExecutable": "php",
       "runtimeArgs": ["-S", "localhost:8765", "-t", ".."],
       "port": 8765,
       "env": { "PHP_CLI_SERVER_WORKERS": "6" }
