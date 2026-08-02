@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 03:43:53
+-- المصدر: equipation_manage · التوليد: 2026-08-02 06:56:43
 -- الجداول: 358 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -926,6 +926,17 @@ CREATE TABLE `contract_commitments` (
   `party_scope` enum('client','supplier') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'client',
   `contract_ref` int NOT NULL,
   `commitment_type` enum('equipment_count','daily_availability_hours','period_hours','min_guaranteed','period_qty','total_qty','capacity_support') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'total_qty',
+  `equipment_type_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: نوعُ المعدة — الصفُّ ذو القيمة التزامُ نوعٍ خاضعٌ لمفتاح UQ',
+  `primary_units_contracted` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.1: عددُ الأساسية المتعاقد عليها — وحدَه يدخل Σ الالتزام',
+  `standby_units_required` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.1: الاحتياطياتُ التي ألزم العميلُ بها — التزامٌ لا خيار',
+  `standby_units_allowed` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.1: السقفُ الأقصى المسموح — وعليه يُقاس (StandbyCapService)',
+  `qty_per_primary_unit_month` decimal(14,2) DEFAULT NULL COMMENT 'CAP-01 §8.1: كميةُ الوحدة الأساسية شهريًّا بمقياسها — ومنها تُشتق الكمياتُ كلُّها',
+  `measure_code` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §16: مقياسُ الكمية — فلا يُخصم الطنُّ من حصة ساعات (C30)',
+  `standby_compensation_type` enum('none','fixed_allowance','readiness_allowance','billed_on_activation') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: مقابلُ الاحتياطي — NULL = لم يُنَصَّ، ولا يُفترض (DEC-CAP-A)',
+  `standby_activation_rule` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: متى يُفعَّل الاحتياطيُّ وبإذن من ولأي مدة',
+  `standby_hours_treatment` enum('within_obligation','separate_line') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.1: ساعاتُ الاحتياطي المفعَّل — ضمن الالتزام أم بندًا مستقلًّا',
+  `valid_from` date DEFAULT NULL COMMENT 'CAP-01 §5-④: الالتزامُ مؤرَّخ — والتعديلُ فترةٌ جديدةٌ لا مسٌّ بالماضي',
+  `valid_to` date DEFAULT NULL,
   `unit_type` enum('hour','ton','meter','cbm','day','shift','trip') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `qty` decimal(14,2) NOT NULL DEFAULT '0.00',
   `period` enum('daily','monthly','contract') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'monthly',
@@ -939,8 +950,10 @@ CREATE TABLE `contract_commitments` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int DEFAULT NULL,
+  `obl_type_uq_key` varchar(130) COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if(((`equipment_type_code` is not null) and (`is_deleted` = 0)),concat(`company_id`,_utf8mb4':',`contract_ref`,_utf8mb4':',`equipment_type_code`,_utf8mb4':',ifnull(date_format(`valid_from`,_utf8mb4'%Y-%m-%d'),_utf8mb4'open')),NULL)) STORED COMMENT 'CAP-01: فهرسٌ فريدٌ مشروطٌ على عمودٍ مولَّد — UQ(contract, equipment_type_code, valid_from) للأحياء ذوي النوع (DEC-CAP-C)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_commit_company_code` (`company_id`,`commitment_code`),
+  UNIQUE KEY `uq_obl_type_from` (`obl_type_uq_key`),
   KEY `idx_commit_scope` (`company_id`,`is_deleted`),
   KEY `idx_commit_contract` (`contract_ref`),
   KEY `idx_commit_type` (`commitment_type`)
@@ -4842,6 +4855,9 @@ CREATE TABLE `op_containers` (
   `seat_kind` enum('contractual_seat','operational_resource_slot','supplier_allocation') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'N-11: نوع المقعد — يُشتق من فصل بند البيع عن خطة الموارد (PLAN-03 §4) لا يُصنَّف مستقلًّا',
   `seat_equipment_type_id` int unsigned DEFAULT NULL COMMENT 'N-11: نوع المعدة المطلوب للمقعد (equipments_types.id)',
   `contract_hours_monthly` decimal(10,2) DEFAULT NULL COMMENT 'N-11: الساعات التعاقدية الشهرية للمقعد',
+  `primary_units_contracted` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.1: أساسياتُ درجة «نوع» — الشجرةُ تفرض Σ والسياسةُ في contract_commitments',
+  `standby_units_required` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.1: الاحتياطيُّ المطلوب لدرجة «نوع»',
+  `standby_units_allowed` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.1: سقفُ الاحتياطي لدرجة «نوع» — StandbyCapService يقيس عليه',
   `seat_unit_price` decimal(14,4) DEFAULT NULL COMMENT 'N-11: سعر وحدة المقعد',
   `seat_currency` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'N-11: عملة سعر المقعد',
   `shift_no` tinyint unsigned DEFAULT NULL COMMENT 'نوبةُ المشغّل',
@@ -6261,6 +6277,11 @@ CREATE TABLE `seat_assignments` (
   `date_to` date DEFAULT NULL COMMENT 'NULL = جالسة حتى الآن',
   `replace_reason` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'سبب الاستبدال — إلزامي لغير الأول (تحرسه الخدمة)',
   `assignment_role` enum('أساسي','احتياطي','مؤقت') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'أساسي' COMMENT 'صفة الإسناد',
+  `planned_qty_month` decimal(16,2) DEFAULT NULL COMMENT 'CAP-01 §8.3: الحصةُ الشهريةُ الأولية بمقياسها — والاحتياطيُّ صفرٌ قبل التفعيل',
+  `planned_qty_total` decimal(16,2) DEFAULT NULL COMMENT 'CAP-01 §8.3: الحصةُ الإجمالية المخططة',
+  `measure_code` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §16: مقياسُ الخطة',
+  `activation_state` enum('active','pending') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active' COMMENT 'CAP-01 §8.3: حالةُ التفعيل — الاحتياطيُّ pending حتى يُفعَّل بحدثٍ له سببٌ ومعتمِد (§4-④)',
+  `supplier_contract_line_id` int DEFAULT NULL COMMENT 'CAP-01 §8.3: بندُ عقد المورد الذي تُحتسب به (supplier_contract_lines.id)',
   `drivers_count` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'عدد السائقين على المعدة في هذا المقعد',
   `drivers_json` json DEFAULT NULL COMMENT 'قائمة employee_id للسائقين — مراجع لا نسخ',
   `state` enum('active','ended') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
@@ -6271,8 +6292,10 @@ CREATE TABLE `seat_assignments` (
   KEY `ix_sa_seat` (`company_id`,`container_id`,`date_from`),
   KEY `ix_sa_equipment` (`company_id`,`equipment_id`,`date_from`),
   KEY `fk_sa_container` (`container_id`),
+  KEY `ix_sa_supplier_line` (`supplier_contract_line_id`),
   CONSTRAINT `fk_sa_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT,
-  CONSTRAINT `ck_sa_dates` CHECK (((`date_to` is null) or (`date_to` >= `date_from`)))
+  CONSTRAINT `ck_sa_dates` CHECK (((`date_to` is null) or (`date_to` >= `date_from`))),
+  CONSTRAINT `ck_sa_standby_zero` CHECK (((`activation_state` = _utf8mb4'active') or ((coalesce(`planned_qty_month`,0) = 0) and (coalesce(`planned_qty_total`,0) = 0))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-11: تعاقب المعدات على المقعد التعاقدي — لا تداخل فترتين لمعدتين في مقعد (تحرسه الخدمة 409)';
 
 -- ── Table: sensitive_access_grants ──
@@ -6714,6 +6737,14 @@ CREATE TABLE `supplier_contract_lines` (
   `id` int NOT NULL AUTO_INCREMENT,
   `company_id` int NOT NULL,
   `contract_id` int NOT NULL COMMENT 'رأسُ عقد المورد — البندُ ابنُه',
+  `contract_obligation_ref` int unsigned DEFAULT NULL COMMENT 'CAP-01 §8.2: التزامُ نوع المعدة في عقد العميل (contract_commitments.id) — لا حصةَ بلا التزامٍ في عقدٍ نافذ',
+  `equipment_type_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.2: نوعُ المعدة الملتزَم به',
+  `primary_units_committed` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.2: عددُ الأساسية التي التزم المورد بتوفيرها',
+  `standby_units_required` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.2: الاحتياطياتُ المطلوبةُ منه',
+  `standby_units_allowed` smallint unsigned DEFAULT NULL COMMENT 'CAP-01 §8.2: سقفُه الأقصى — والقيدُ: المسجَّلُ ≤ هذا الرقم (C17)',
+  `replacement_sla_hours` decimal(8,2) DEFAULT NULL COMMENT 'CAP-01 §8.2: مهلةُ الإحلال بالساعات — تُقاس من لحظة التعطل لا التغطية (§7)',
+  `standby_activation_terms` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.2: شروطُ تفعيل احتياطيّه',
+  `standby_payment_terms` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CAP-01 §8.2: مقابلُ احتياطيّه إن وُجد — NULL = لم يُنَصَّ ولا يُفترض (DEC-CAP-A)',
   `work_model` enum('hour','ton','trip','meter') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'نماذجُ §2-② الأربعة — ما خرج عنها 422',
   `unit` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'تسميةُ الوحدة كما يقرؤها محرّكُ الفوترة',
   `unit_price` decimal(18,2) NOT NULL COMMENT 'سعرُ الوحدة — ≤ 0 مرفوضٌ 422',
@@ -6732,6 +6763,7 @@ CREATE TABLE `supplier_contract_lines` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_line_model_unit` (`contract_id`,`work_model`,`unit`),
   KEY `ix_sup_line_co` (`company_id`,`contract_id`),
+  KEY `ix_sup_line_obl` (`contract_obligation_ref`),
   CONSTRAINT `fk_sup_line_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
   CONSTRAINT `ck_sup_line_price` CHECK ((`unit_price` > 0)),
   CONSTRAINT `ck_sup_line_standby` CHECK ((((`standby_basis` = _utf8mb4'none') and (`standby_rate` is null)) or ((`standby_basis` <> _utf8mb4'none') and (`standby_rate` is not null) and (`standby_rate` > 0))))

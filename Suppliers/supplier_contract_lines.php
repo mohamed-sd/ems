@@ -100,6 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'standby_rate'  => $_POST['standby_rate'] ?? '',
             'valid_from'    => $_POST['valid_from'] ?? '',
             'valid_to'      => $_POST['valid_to'] ?? '',
+            // CAP-01 §8.2 — بندُ نوع المعدة والاحتياطي في عقد المورد
+            'contract_obligation_ref'  => $_POST['contract_obligation_ref'] ?? 0,
+            'equipment_type_code'      => $_POST['equipment_type_code'] ?? '',
+            'primary_units_committed'  => $_POST['primary_units_committed'] ?? '',
+            'standby_units_required'   => $_POST['standby_units_required'] ?? '',
+            'standby_units_allowed'    => $_POST['standby_units_allowed'] ?? '',
+            'replacement_sla_hours'    => $_POST['replacement_sla_hours'] ?? '',
+            'standby_activation_terms' => $_POST['standby_activation_terms'] ?? '',
+            'standby_payment_terms'    => $_POST['standby_payment_terms'] ?? '',
         ), $uid);
         $redirect($r['ok'] ? 'حُفظ البند ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
@@ -148,6 +157,20 @@ try {
         "SELECT c.id, c.first_party, c.contract_status FROM contracts c
           WHERE {TENANT_SCOPE} AND COALESCE(c.is_deleted,0)=0 ORDER BY c.id DESC");
 } catch (\Throwable $t) { $client_contracts = array(); }
+
+// CAP-01 §8.2 — التزاماتُ أنواع المعدات في عقد العميل المرتبط (لا حصةَ بلا التزام)
+$obligation_options = array();
+if ($head !== null && intval($head['client_contract_id'] ?? 0) > 0) {
+    try {
+        $obligation_options = $gate->scopedQuery(array('scope' => array('cc' => 'contract_commitments')),
+            "SELECT cc.id, cc.commitment_code, cc.equipment_type_code, cc.primary_units_contracted,
+                    cc.standby_units_required, cc.standby_units_allowed
+               FROM contract_commitments cc
+              WHERE {TENANT_SCOPE} AND cc.contract_ref = ? AND cc.is_deleted = 0
+                AND cc.equipment_type_code IS NOT NULL
+              ORDER BY cc.id DESC", array(intval($head['client_contract_id'])));
+    } catch (\Throwable $t) { $obligation_options = array(); }
+}
 
 $page_title = 'إيكوبيشن | بنود عقد المورد';
 include '../inheader.php';
@@ -274,6 +297,14 @@ include '../insidebar.php';
                                data-rate="<?php echo htmlspecialchars((string)($l['standby_rate'] ?? ''), ENT_QUOTES); ?>"
                                data-from="<?php echo htmlspecialchars((string)($l['valid_from'] ?? ''), ENT_QUOTES); ?>"
                                data-to="<?php echo htmlspecialchars((string)($l['valid_to'] ?? ''), ENT_QUOTES); ?>"
+                               data-obl="<?php echo htmlspecialchars((string)($l['contract_obligation_ref'] ?? ''), ENT_QUOTES); ?>"
+                               data-etype="<?php echo htmlspecialchars((string)($l['equipment_type_code'] ?? ''), ENT_QUOTES); ?>"
+                               data-pcommit="<?php echo htmlspecialchars((string)($l['primary_units_committed'] ?? ''), ENT_QUOTES); ?>"
+                               data-sbreq="<?php echo htmlspecialchars((string)($l['standby_units_required'] ?? ''), ENT_QUOTES); ?>"
+                               data-sbalw="<?php echo htmlspecialchars((string)($l['standby_units_allowed'] ?? ''), ENT_QUOTES); ?>"
+                               data-sla="<?php echo htmlspecialchars((string)($l['replacement_sla_hours'] ?? ''), ENT_QUOTES); ?>"
+                               data-sbact="<?php echo htmlspecialchars((string)($l['standby_activation_terms'] ?? ''), ENT_QUOTES); ?>"
+                               data-sbpay="<?php echo htmlspecialchars((string)($l['standby_payment_terms'] ?? ''), ENT_QUOTES); ?>"
                                title="تعديل"><i class="fas fa-edit"></i></a>
                             <?php elseif (trim((string)$l['source_table']) !== ''): ?>
                                 <span class="badge badge-secondary" title="مرحَّلٌ قراءةً — الكتابةُ في مصدره">مرحَّل</span>
@@ -347,6 +378,36 @@ include '../insidebar.php';
                 </div>
                 <div class="form-group"><label>سريان من</label><input type="date" name="valid_from" id="f_from"></div>
                 <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
+                <div class="form-group" style="grid-column:1/-1;border-top:1px dashed #bbb;padding-top:10px">
+                    <strong><i class="fa fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (CAP-01 §8.2)</strong>
+                </div>
+                <div class="form-group">
+                    <label>التزام نوع المعدة في عقد العميل <small>— لا حصةَ بلا التزام</small></label>
+                    <select name="contract_obligation_ref" id="f_obl">
+                        <option value="">— غير مرتبط —</option>
+                        <?php foreach ($obligation_options as $ob): ?>
+                            <option value="<?php echo intval($ob['id']); ?>">
+                                <?php echo htmlspecialchars($ob['commitment_code'] . ' · ' . $ob['equipment_type_code']
+                                    . ' (أساسية ' . ($ob['primary_units_contracted'] ?? '—')
+                                    . ' · احتياطي ≤ ' . ($ob['standby_units_allowed'] ?? '—') . ')', ENT_QUOTES); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group"><label>رمز نوع المعدة</label>
+                    <input type="text" name="equipment_type_code" id="f_etype" pattern="[A-Za-z0-9-_]+" placeholder="EXCAVATOR"></div>
+                <div class="form-group"><label>الأساسية الملتزَم بها</label>
+                    <input type="number" step="1" min="0" name="primary_units_committed" id="f_pcommit"></div>
+                <div class="form-group"><label>الاحتياطي المطلوب منه</label>
+                    <input type="number" step="1" min="0" name="standby_units_required" id="f_sbreq"></div>
+                <div class="form-group"><label>سقفه الأقصى للاحتياطي</label>
+                    <input type="number" step="1" min="0" name="standby_units_allowed" id="f_sbalw"></div>
+                <div class="form-group"><label>مهلة الإحلال (ساعات)</label>
+                    <input type="number" step="0.5" min="0" name="replacement_sla_hours" id="f_sla"></div>
+                <div class="form-group"><label>شروط تفعيل احتياطيّه</label>
+                    <input type="text" name="standby_activation_terms" id="f_sbact" maxlength="255"></div>
+                <div class="form-group"><label>مقابل احتياطيّه <small>— فارغٌ = لم يُنَصَّ ولا يُفترض</small></label>
+                    <input type="text" name="standby_payment_terms" id="f_sbpay" maxlength="255"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ البند</button></div>
             </div></div>
@@ -404,6 +465,16 @@ include '../insidebar.php';
             document.getElementById('f_rate').value = btn.dataset.rate || '';
             document.getElementById('f_from').value = btn.dataset.from || '';
             document.getElementById('f_to').value = btn.dataset.to || '';
+            // CAP-01 §8.2 — الفارغُ يبقى فارغًا: مقابلُ الاحتياطي لا يُفترض (DEC-CAP-A)
+            var setIf = function (id, v) { var el = document.getElementById(id); if (el) { el.value = v || ''; } };
+            setIf('f_obl', btn.dataset.obl);
+            setIf('f_etype', btn.dataset.etype);
+            setIf('f_pcommit', btn.dataset.pcommit);
+            setIf('f_sbreq', btn.dataset.sbreq);
+            setIf('f_sbalw', btn.dataset.sbalw);
+            setIf('f_sla', btn.dataset.sla);
+            setIf('f_sbact', btn.dataset.sbact);
+            setIf('f_sbpay', btn.dataset.sbpay);
             syncRate();
             document.getElementById('lineForm').scrollIntoView({ behavior: 'smooth' });
         });

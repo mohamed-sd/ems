@@ -89,6 +89,23 @@ $CMT_SURPLUS = array(
     'open'           => 'مفتوح',
     'not_billable'   => 'غير قابلة للفوترة',
 );
+// CAP-01 §8.1 — مقابلُ الاحتياطي: لا قيمةَ افتراضيةً (DEC-CAP-A: بلا نصٍّ فهي التزامُ موردٍ لا بندُ إيراد)
+$CMT_STANDBY_COMP = array(
+    'none'                 => 'بلا مقابل',
+    'fixed_allowance'      => 'بدلٌ ثابت',
+    'readiness_allowance'  => 'بدلُ جاهزية',
+    'billed_on_activation' => 'يُفوتر عند التفعيل فقط',
+);
+$CMT_STANDBY_TREAT = array(
+    'within_obligation' => 'ضمن التزام النوع',
+    'separate_line'     => 'بندٌ مستقل',
+);
+$CMT_MEASURE = array(
+    'hour'  => 'ساعة',
+    'ton'   => 'طن',
+    'trip'  => 'نقلة',
+    'meter' => 'متر',
+);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // التحقق من معرف الشركة (عزل الشركات)
@@ -228,6 +245,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
     if (mb_strlen($note_raw) > 160) {
         $note_raw = mb_substr($note_raw, 0, 160);
     }
+
+    // ── CAP-01 §8.1: حقولُ التزام نوع المعدة والاحتياطي ──
+    // ENUM يبتلع '' صامتًا — الفارغُ يُمرَّر NULL صراحةً، ومقابلُ الاحتياطي لا يُفترض (DEC-CAP-A)
+    $etype_raw = isset($_POST['equipment_type_code']) ? trim($_POST['equipment_type_code']) : '';
+    if ($etype_raw !== '' && !preg_match('/^[A-Za-z0-9_-]{1,40}$/', $etype_raw)) {
+        cmt_redirect_with_msg('رمز نوع المعدة غير صالح — أحرفٌ وأرقامٌ و - أو _ فقط ❌');
+    }
+    $etype_val = $etype_raw === '' ? null : $etype_raw;
+    $cap_int = function ($key) {
+        $v = isset($_POST[$key]) ? trim($_POST[$key]) : '';
+        if ($v === '') return null;
+        if (!preg_match('/^\d{1,5}$/', $v)) return false;
+        return intval($v);
+    };
+    $primary_units = $cap_int('primary_units_contracted');
+    $standby_req   = $cap_int('standby_units_required');
+    $standby_alw   = $cap_int('standby_units_allowed');
+    if ($primary_units === false || $standby_req === false || $standby_alw === false) {
+        cmt_redirect_with_msg('أعدادُ الوحدات الأساسية والاحتياطية أرقامٌ صحيحةٌ غيرُ سالبة ❌');
+    }
+    $qty_month_raw = isset($_POST['qty_per_primary_unit_month']) ? trim($_POST['qty_per_primary_unit_month']) : '';
+    $qty_month_val = $qty_month_raw === '' ? null : (float) $qty_month_raw;
+    if ($qty_month_val !== null && $qty_month_val < 0) {
+        cmt_redirect_with_msg('كميةُ الوحدة الأساسية شهريًّا لا تكون سالبة ❌');
+    }
+    $measure_raw = isset($_POST['measure_code']) ? trim($_POST['measure_code']) : '';
+    $measure_val = ($measure_raw !== '' && isset($CMT_MEASURE[$measure_raw])) ? $measure_raw : null;
+    $sb_comp_raw = isset($_POST['standby_compensation_type']) ? trim($_POST['standby_compensation_type']) : '';
+    $sb_comp_val = ($sb_comp_raw !== '' && isset($CMT_STANDBY_COMP[$sb_comp_raw])) ? $sb_comp_raw : null;
+    $sb_rule_raw = isset($_POST['standby_activation_rule']) ? trim($_POST['standby_activation_rule']) : '';
+    $sb_rule_val = $sb_rule_raw === '' ? null : mb_substr($sb_rule_raw, 0, 255);
+    $sb_treat_raw = isset($_POST['standby_hours_treatment']) ? trim($_POST['standby_hours_treatment']) : '';
+    $sb_treat_val = ($sb_treat_raw !== '' && isset($CMT_STANDBY_TREAT[$sb_treat_raw])) ? $sb_treat_raw : null;
+    $vfrom_raw = isset($_POST['valid_from']) ? trim($_POST['valid_from']) : '';
+    $vfrom_val = preg_match('/^\d{4}-\d{2}-\d{2}$/', $vfrom_raw) ? $vfrom_raw : null;
+    $vto_raw = isset($_POST['valid_to']) ? trim($_POST['valid_to']) : '';
+    $vto_val = preg_match('/^\d{4}-\d{2}-\d{2}$/', $vto_raw) ? $vto_raw : null;
+    $cap_fields = array(
+        'equipment_type_code'        => $etype_val,
+        'primary_units_contracted'   => $primary_units,
+        'standby_units_required'     => $standby_req,
+        'standby_units_allowed'      => $standby_alw,
+        'qty_per_primary_unit_month' => $qty_month_val,
+        'measure_code'               => $measure_val,
+        'standby_compensation_type'  => $sb_comp_val,
+        'standby_activation_rule'    => $sb_rule_val,
+        'standby_hours_treatment'    => $sb_treat_val,
+        'valid_from'                 => $vfrom_val,
+        'valid_to'                   => $vto_val,
+    );
     $created_by = intval($_SESSION['user']['id']);
 
     if ($is_editing) {
@@ -251,7 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
         }
 
         try {
-            $cmt_gate->update('contract_commitments', array(
+            $cmt_gate->update('contract_commitments', array_merge(array(
                 'commitment_code' => $cmt_code_raw,
                 'party_scope'     => $party_scope_raw,
                 'contract_ref'    => $contract_val,
@@ -263,12 +330,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
                 'shortfall_rule'  => $shortfall_raw,
                 'surplus_rule'    => $surplus_raw,
                 'note'            => $note_raw,
-            ), array('id' => $cmt_id), 'is_deleted = 0');
+            ), $cap_fields), array('id' => $cmt_id), 'is_deleted = 0');
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('contract_commitments', 'contract_commitments', $cmt_id, null, ['commitment_code' => $cmt_code_raw]);
             }
             cmt_redirect_with_msg('تم تعديل الالتزام بنجاح ✅');
         } catch (\Throwable $t) {
+            if (strpos($t->getMessage(), 'uq_obl_type_from') !== false) {
+                cmt_redirect_with_msg('التزامُ هذا النوع بهذا السريان قائمٌ في العقد — التعديلُ فترةٌ جديدةٌ بسريانٍ مختلف ❌');
+            }
             error_log('contract_commitments.php update failed: ' . $t->getMessage());
             cmt_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
         }
@@ -285,7 +355,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
         }
 
         try {
-            $new_id = (int) $cmt_gate->insert('contract_commitments', array(
+            $new_id = (int) $cmt_gate->insert('contract_commitments', array_merge(array(
                 'commitment_code' => $cmt_code_raw,
                 'party_scope'     => $party_scope_raw,
                 'contract_ref'    => $contract_val,
@@ -298,12 +368,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
                 'surplus_rule'    => $surplus_raw,
                 'note'            => $note_raw,
                 'created_by'      => $created_by,
-            ));
+            ), $cap_fields));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('contract_commitments', 'contract_commitments', $new_id, ['commitment_code' => $cmt_code_raw]);
             }
             cmt_redirect_with_msg('تم إضافة الالتزام بنجاح ✅');
         } catch (\Throwable $t) {
+            if (strpos($t->getMessage(), 'uq_obl_type_from') !== false) {
+                cmt_redirect_with_msg('التزامُ هذا النوع بهذا السريان قائمٌ في العقد — التعديلُ فترةٌ جديدةٌ بسريانٍ مختلف ❌');
+            }
             error_log('contract_commitments.php insert failed: ' . $t->getMessage());
             cmt_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
         }
@@ -539,6 +612,68 @@ include('../insidebar.php');
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="cmt-col-full cmt-section-title">
+                        <i class="fas fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (يُملأ لالتزامات أنواع المعدات)
+                    </div>
+                    <div>
+                        <label><i class="fas fa-truck-monster"></i> رمز نوع المعدة</label>
+                        <input type="text" name="equipment_type_code" id="equipment_type_code" placeholder="مثال: EXCAVATOR" pattern="[A-Za-z0-9-_]+" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-cubes"></i> الوحدات الأساسية المتعاقد عليها</label>
+                        <input type="number" step="1" min="0" name="primary_units_contracted" id="primary_units_contracted" placeholder="—" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-life-ring"></i> الاحتياطيات المطلوبة (إلزام العميل)</label>
+                        <input type="number" step="1" min="0" name="standby_units_required" id="standby_units_required" placeholder="—" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-arrows-up-to-line"></i> سقف الاحتياطيات المسموح</label>
+                        <input type="number" step="1" min="0" name="standby_units_allowed" id="standby_units_allowed" placeholder="—" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-gauge-high"></i> كمية الوحدة الأساسية شهريًّا</label>
+                        <input type="number" step="0.01" min="0" name="qty_per_primary_unit_month" id="qty_per_primary_unit_month" placeholder="—" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-scale-balanced"></i> مقياس الكمية</label>
+                        <select name="measure_code" id="measure_code">
+                            <option value="">-- غير محدد --</option>
+                            <?php foreach ($CMT_MEASURE as $k => $v): ?>
+                                <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-hand-holding-dollar"></i> مقابل الاحتياطي (لا يُفترض)</label>
+                        <select name="standby_compensation_type" id="standby_compensation_type">
+                            <option value="">— لم يُنَصَّ في العقد —</option>
+                            <?php foreach ($CMT_STANDBY_COMP as $k => $v): ?>
+                                <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-hourglass-half"></i> معالجة ساعات الاحتياطي المفعَّل</label>
+                        <select name="standby_hours_treatment" id="standby_hours_treatment">
+                            <option value="">— لم تُحدَّد —</option>
+                            <?php foreach ($CMT_STANDBY_TREAT as $k => $v): ?>
+                                <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="cmt-col-full">
+                        <label><i class="fas fa-bolt"></i> قاعدة تفعيل الاحتياطي (متى وبإذن من ولأي مدة)</label>
+                        <input type="text" name="standby_activation_rule" id="standby_activation_rule" maxlength="255" placeholder="نصُّ العقد — مثال: عند تعطل أساسية بإذن مدير الحركة لمدة لا تتجاوز مهلة الإحلال" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-calendar-day"></i> سريان الالتزام من</label>
+                        <input type="date" name="valid_from" id="valid_from" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-calendar-xmark"></i> إلى</label>
+                        <input type="date" name="valid_to" id="valid_to" />
+                    </div>
                     <div class="cmt-col-full">
                         <label><i class="fas fa-note-sticky"></i> ملاحظة (بند العقد / سبب الحكم)</label>
                         <textarea name="note" id="note" rows="2" maxlength="160" placeholder="بندُ العقد أو سببُ الحكم (حتى 160 حرفًا)"></textarea>
@@ -623,6 +758,20 @@ include('../insidebar.php');
                                             data-surplus="<?php echo cmt_e($surplus_label); ?>"
                                             data-note="<?php echo cmt_e($row['note']); ?>"
                                             data-created="<?php echo cmt_e($created_label); ?>"
+                                            <?php
+                                            // CAP-01 §8.1 — ملخصُ التغطية للعرض: «أنواعُ المعدات يُحسب لا يُدخل» يبقى في ملخص العقد
+                                            $sb_summary = '';
+                                            if ($row['equipment_type_code'] !== null && $row['equipment_type_code'] !== '') {
+                                                $comp_lbl = ($row['standby_compensation_type'] !== null && isset($CMT_STANDBY_COMP[$row['standby_compensation_type']]))
+                                                    ? $CMT_STANDBY_COMP[$row['standby_compensation_type']] : 'لم يُنَصَّ — التزامُ موردٍ لا بندُ إيراد';
+                                                $sb_summary = 'النوع: ' . $row['equipment_type_code']
+                                                    . ' · الأساسية: ' . ($row['primary_units_contracted'] ?? '—')
+                                                    . ' · الاحتياطي المطلوب: ' . ($row['standby_units_required'] ?? '—')
+                                                    . ' · المسموح: ' . ($row['standby_units_allowed'] ?? '—')
+                                                    . ' · المقابل: ' . $comp_lbl;
+                                            }
+                                            ?>
+                                            data-standby="<?php echo cmt_e($sb_summary); ?>"
                                             title="عرض التفاصيل"><i class="fas fa-eye"></i></a>
                                         <?php if ($can_edit): ?>
                                             <a href="javascript:void(0)" class="action-btn edit editCmtBtn"
@@ -638,6 +787,17 @@ include('../insidebar.php');
                                                 data-shortfall="<?php echo cmt_e($row['shortfall_rule']); ?>"
                                                 data-surplus="<?php echo cmt_e($row['surplus_rule']); ?>"
                                                 data-note="<?php echo cmt_e($row['note']); ?>"
+                                                data-etype="<?php echo cmt_e($row['equipment_type_code']); ?>"
+                                                data-primary="<?php echo cmt_e($row['primary_units_contracted']); ?>"
+                                                data-sbreq="<?php echo cmt_e($row['standby_units_required']); ?>"
+                                                data-sbalw="<?php echo cmt_e($row['standby_units_allowed']); ?>"
+                                                data-qtymonth="<?php echo cmt_e($row['qty_per_primary_unit_month']); ?>"
+                                                data-measure="<?php echo cmt_e($row['measure_code']); ?>"
+                                                data-sbcomp="<?php echo cmt_e($row['standby_compensation_type']); ?>"
+                                                data-sbrule="<?php echo cmt_e($row['standby_activation_rule']); ?>"
+                                                data-sbtreat="<?php echo cmt_e($row['standby_hours_treatment']); ?>"
+                                                data-vfrom="<?php echo cmt_e($row['valid_from']); ?>"
+                                                data-vto="<?php echo cmt_e($row['valid_to']); ?>"
                                                 title="تعديل"><i class="fas fa-edit"></i></a>
                                         <?php endif; ?>
                                         <?php if ($can_delete): ?>
@@ -771,6 +931,18 @@ include('../insidebar.php');
         $('#shortfall_rule').val(d.shortfall || 'invoice_actual');
         $('#surplus_rule').val(d.surplus || 'same_price');
         $('#note').val(d.note || '');
+        // CAP-01 §8.1 — الفارغُ يبقى فارغًا: مقابلُ الاحتياطي لا يُفترض (DEC-CAP-A)
+        $('#equipment_type_code').val(d.etype || '');
+        $('#primary_units_contracted').val(d.primary !== undefined && d.primary !== '' ? d.primary : '');
+        $('#standby_units_required').val(d.sbreq !== undefined && d.sbreq !== '' ? d.sbreq : '');
+        $('#standby_units_allowed').val(d.sbalw !== undefined && d.sbalw !== '' ? d.sbalw : '');
+        $('#qty_per_primary_unit_month').val(d.qtymonth !== undefined && d.qtymonth !== '' ? d.qtymonth : '');
+        $('#measure_code').val(d.measure || '');
+        $('#standby_compensation_type').val(d.sbcomp || '');
+        $('#standby_hours_treatment').val(d.sbtreat || '');
+        $('#standby_activation_rule').val(d.sbrule || '');
+        $('#valid_from').val(d.vfrom || '');
+        $('#valid_to').val(d.vto || '');
         if (window.EmsSelect) EmsSelect.refresh();
         setEditMode();
         if (!cmtForm.is(':visible')) {
@@ -785,7 +957,11 @@ include('../insidebar.php');
             id: $(this).data('id'), code: $(this).data('code'), contractId: $(this).data('contract-id'),
             party: $(this).data('party'), type: $(this).data('type'), unit: $(this).data('unit'),
             qty: $(this).data('qty'), period: $(this).data('period'), obliged: $(this).data('obliged'),
-            shortfall: $(this).data('shortfall'), surplus: $(this).data('surplus'), note: $(this).data('note')
+            shortfall: $(this).data('shortfall'), surplus: $(this).data('surplus'), note: $(this).data('note'),
+            etype: $(this).data('etype'), primary: $(this).data('primary'), sbreq: $(this).data('sbreq'),
+            sbalw: $(this).data('sbalw'), qtymonth: $(this).data('qtymonth'), measure: $(this).data('measure'),
+            sbcomp: $(this).data('sbcomp'), sbrule: $(this).data('sbrule'), sbtreat: $(this).data('sbtreat'),
+            vfrom: $(this).data('vfrom'), vto: $(this).data('vto')
         });
     });
 
@@ -804,6 +980,7 @@ include('../insidebar.php');
             { label: 'حكم العجز', value: d.shortfall || '—', icon: 'fas fa-arrow-trend-down' },
             { label: 'حكم الزيادة', value: d.surplus || '—', icon: 'fas fa-arrow-trend-up' },
             { label: 'ملاحظة', value: d.note || '—', icon: 'fas fa-note-sticky', size: 'lg' },
+            { label: 'التغطية والاحتياطي', value: d.standby || '—', icon: 'fas fa-shield-halved', size: 'lg' },
             { label: 'أضيف بواسطة', value: d.created || '—', icon: 'fas fa-user-plus' }
         ];
 
@@ -836,6 +1013,7 @@ include('../insidebar.php');
 
     .cmt-main .cmt-hidden { display: none; }
     .cmt-main .cmt-col-full { grid-column: 1 / -1; }
+    .cmt-main .cmt-section-title { border-top: 1px dashed var(--bdr, #bbb); padding-top: 10px; margin-top: 4px; font-weight: 800; color: #6b5200; }
     .cmt-main .table-container { overflow-x: auto; }
     #cmtTable.cmt-table-nowrap, #cmtTable.cmt-table-nowrap th, #cmtTable.cmt-table-nowrap td { white-space: nowrap; }
     #cmtTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }

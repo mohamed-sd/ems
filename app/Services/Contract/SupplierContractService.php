@@ -256,7 +256,57 @@ class SupplierContractService
             $out['code'] = 422; $out['reason'] = 'نسبةُ الاستعداد تتجاوز 100٪ من سعر الوحدة'; return $out;
         }
 
+        // ── CAP-01 §8.2: بندُ نوع المعدة والاحتياطي في عقد المورد ──────────
+        // «لا حصةَ بلا التزامِ نوعِ معدةٍ في عقد عميلٍ نافذ» — المرجعُ يُفحص وجودًا ونفاذًا
+        $oblRef = isset($args['contract_obligation_ref']) && (int) $args['contract_obligation_ref'] > 0
+                  ? (int) $args['contract_obligation_ref'] : null;
+        if ($oblRef !== null) {
+            $obl = $gate->scopedQuery(array('scope' => array('cc' => 'contract_commitments', 'k' => 'contracts')),
+                "SELECT cc.id, cc.equipment_type_code FROM contract_commitments cc
+                   JOIN contracts k ON k.id = cc.contract_ref AND k.is_deleted = 0
+                  WHERE {TENANT_SCOPE} AND cc.id = ? AND cc.is_deleted = 0",
+                array($oblRef));
+            if (!$obl) {
+                $out['code'] = 422;
+                $out['reason'] = 'لا حصةَ بلا التزامٍ — مرجعُ التزام نوع المعدة غيرُ موجودٍ في عقد عميلٍ نافذ';
+                return $out;
+            }
+        }
+        $etype = isset($args['equipment_type_code']) ? trim((string) $args['equipment_type_code']) : '';
+        if ($etype !== '' && !preg_match('/^[A-Za-z0-9_-]{1,40}$/', $etype)) {
+            $out['code'] = 422; $out['reason'] = 'رمزُ نوع المعدة غيرُ صالح'; return $out;
+        }
+        $capInt = function ($key) use ($args) {
+            if (!isset($args[$key]) || trim((string) $args[$key]) === '') return null;
+            $v = (int) $args[$key];
+            return $v < 0 ? false : $v;
+        };
+        $primaryCommitted = $capInt('primary_units_committed');
+        $sbRequired = $capInt('standby_units_required');
+        $sbAllowed = $capInt('standby_units_allowed');
+        if ($primaryCommitted === false || $sbRequired === false || $sbAllowed === false) {
+            $out['code'] = 422; $out['reason'] = 'أعدادُ الوحدات الملتزَم بها أرقامٌ غيرُ سالبة'; return $out;
+        }
+        $slaRaw = isset($args['replacement_sla_hours']) && trim((string) $args['replacement_sla_hours']) !== ''
+                  ? (float) $args['replacement_sla_hours'] : null;
+        if ($slaRaw !== null && $slaRaw < 0) {
+            $out['code'] = 422; $out['reason'] = 'مهلةُ الإحلال بالساعات لا تكون سالبة'; return $out;
+        }
+        // مقابلُ الاحتياطي لا يُفترض — الفارغُ NULL صراحةً (DEC-CAP-A)
+        $sbActTerms = isset($args['standby_activation_terms']) && trim((string) $args['standby_activation_terms']) !== ''
+                      ? mb_substr(trim((string) $args['standby_activation_terms']), 0, 255) : null;
+        $sbPayTerms = isset($args['standby_payment_terms']) && trim((string) $args['standby_payment_terms']) !== ''
+                      ? mb_substr(trim((string) $args['standby_payment_terms']), 0, 255) : null;
+
         $data = array(
+            'contract_obligation_ref'  => $oblRef,
+            'equipment_type_code'      => $etype !== '' ? $etype : null,
+            'primary_units_committed'  => $primaryCommitted,
+            'standby_units_required'   => $sbRequired,
+            'standby_units_allowed'    => $sbAllowed,
+            'replacement_sla_hours'    => $slaRaw,
+            'standby_activation_terms' => $sbActTerms,
+            'standby_payment_terms'    => $sbPayTerms,
             'work_model'    => $model,
             'unit'          => $unit,
             'unit_price'    => $price,
