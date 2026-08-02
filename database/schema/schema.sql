@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 00:13:38
--- الجداول: 354 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 03:22:35
+-- الجداول: 355 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2214,6 +2214,29 @@ CREATE TABLE `ems_event_deliveries` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`consumer`,`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K4: محاولات تسليمٍ جارية (تُحذف عند النجاح أو تنتقل للرسائل الميتة)';
+
+-- ── Table: ems_job_queue ──
+CREATE TABLE `ems_job_queue` (
+  `job_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `job_type` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'payroll_bind · periodic_cron · bank_recon · batch_loop …',
+  `payload_json` json DEFAULT NULL,
+  `state` enum('queued','processing','done','failed','dead') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'queued',
+  `attempts` int NOT NULL DEFAULT '0',
+  `max_attempts` int NOT NULL DEFAULT '3',
+  `next_attempt_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'التصاعد: 1د ثم 5د ثم 25د — بساعة القاعدة',
+  `progress_done` int NOT NULL DEFAULT '0',
+  `progress_total` int NOT NULL DEFAULT '0',
+  `batch_failures` json DEFAULT NULL COMMENT 'NFR-06: فشل دفعة لا يسقط الباقي — يسجَّل هنا ظاهرًا',
+  `last_error` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'سجل الفشل الظاهر — لا فشل صامت',
+  `created_by` int DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `started_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`job_id`),
+  KEY `idx_jq_claim` (`state`,`next_attempt_at`),
+  KEY `idx_jq_company` (`company_id`,`state`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-24: «قيد المعالجة» ثم إشعار الاكتمال — والصفحة لا تتجمد أبدًا';
 
 -- ── Table: ems_processed_events ──
 CREATE TABLE `ems_processed_events` (
