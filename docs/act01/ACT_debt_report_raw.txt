@@ -1,0 +1,64 @@
+════ فحوصُ الاتصال الأحدَ عشرَ — ACT-01 §5 ════
+✔ ① أزرارٌ يتيمة (استدعاءٌ بلا فعلٍ مسجَّل) : 0
+✘ ② أفعالٌ بلا معالج             : 17
+     · collection.record ← App\Services\Finance\CollectionService
+     · collection.reverse ← App\Services\Finance\CollectionService
+     · coverage.substitute.activate ← ::activate
+     · coverage.substitute.end ← ::end
+     · entitlement.gate.approve ← App\Services\Finance\EntitlementGateService
+     · entitlement.gate.reverse ← App\Services\Finance\EntitlementGateService
+     · invoice.credit_note ← App\Services\Finance\CreditNoteService
+     · invoice.issue ← App\Services\Finance\InvoiceService
+     · payroll.reverse ← App\Services\HR\PayrollService
+     · payroll.run ← App\Services\HR\PayrollService
+     · period.close ← App\Services\Finance\PeriodCloseService
+     · period.reopen ← App\Services\Finance\PeriodCloseService
+     · supplier.settlement.approve ← App\Services\Suppliers\SettlementService
+     · supplier.settlement.reverse ← App\Services\Suppliers\SettlementService
+     · unit.chain.approve ← App\Services\Units\UnitApprovalChainService
+✔ ③ كتابةٌ بلا حارس               : 0
+✔ ④ أحداثٌ يتيمةٌ بلا مستهلك : 0
+✔ ⑤ مستهلكون صامتون (تنبيه) : 0
+✘ ⑥ خطواتُ سلسلةٍ بلا شاشة  : 1
+     · لا شاشةَ اعتمادٍ مسجَّلة
+✘ ⑦ ماليٌّ بلا عكس                 : 9
+     · collection.reverse
+     · coverage.substitute.end
+     · entitlement.gate.reverse
+     · invoice.credit_note
+     · payroll.reverse
+     · period.reopen
+     · supplier.settlement.reverse
+     · unit.chain.reverse
+     · unit.state.revert
+✔ ⑧ روابطُ تنقلٍ مكسورة       : 0
+✔ ⑨ تحويلاتٌ وجهتُها مكسورة : 0
+✘ ⑩ إداراتٌ (أدوارٌ) بلا سطح بلاغات : 25
+     · دور 1
+     · دور 2
+     · دور 3
+     · دور 4
+     · دور 5
+     · دور 6
+     · دور 7
+     · دور 8
+     · دور 10
+     · دور 11
+     · دور 12
+     · دور 13
+     · دور 14
+     · دور 15
+     · دور 16
+     · دور 17
+     · دور 18
+     · دور 19
+     · دور 20
+     · دور 21
+     · دور 22
+     · دور 23
+     · دور 24
+     · دور 25
+     · دور 26
+✔ ⑪ روابطُ غريبةٌ غيرُ مصنَّفة : 0
+────────────────────────────────────────────────────────────
+الحكم: ✘ 4 فحصًا حاكمًا غيرَ صفري (وضعُ الرصد — لا منع)

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 08:07:48
--- الجداول: 365 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-02 14:33:30
+-- الجداول: 371 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -47,6 +47,82 @@ CREATE TABLE `achievement_snapshots` (
   CONSTRAINT `fk_snap_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`),
   CONSTRAINT `ck_snap_window` CHECK ((`period_to` >= `period_from`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='USR-01 §6/§9.1 — قياسُ الإنجاز بين تاريخين لكل صفة';
+
+-- ── Table: action_events ──
+CREATE TABLE `action_events` (
+  `e_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `action_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `event_name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_conditional` tinyint(1) NOT NULL DEFAULT '0',
+  `condition_expr` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `no_event_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'فعلُ كتابةٍ بلا حدثٍ يحتاج تعليلًا مكتوبًا',
+  PRIMARY KEY (`e_id`),
+  UNIQUE KEY `uq_ae` (`action_code`,`event_name`),
+  CONSTRAINT `fk_ae_action` FOREIGN KEY (`action_code`) REFERENCES `actions` (`action_code`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: action_execution_log ──
+CREATE TABLE `action_execution_log` (
+  `r_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int unsigned NOT NULL,
+  `action_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `person_id` int DEFAULT NULL,
+  `subject_ref` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `result` enum('allowed','denied') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `denied_by_guard` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`r_id`),
+  KEY `ix_ael_action` (`action_code`,`result`,`at`),
+  KEY `ix_ael_company` (`company_id`,`at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACT-01 §8: Insert-only — لا تعديلَ ولا حذف';
+
+-- ── Table: action_impacts ──
+CREATE TABLE `action_impacts` (
+  `i_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `action_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `impacted_type` enum('org_unit','person','party','screen') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `impacted_ref` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `effect` enum('notify','counter','data_change','state_change') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `latency` enum('sync','async') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'async',
+  PRIMARY KEY (`i_id`),
+  KEY `ix_ai_action` (`action_code`),
+  CONSTRAINT `fk_ai_action` FOREIGN KEY (`action_code`) REFERENCES `actions` (`action_code`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: action_writes ──
+CREATE TABLE `action_writes` (
+  `w_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `action_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `table_name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `operation` enum('insert','update','delete','none') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'update',
+  PRIMARY KEY (`w_id`),
+  UNIQUE KEY `uq_aw` (`action_code`,`table_name`,`operation`),
+  CONSTRAINT `fk_aw_action` FOREIGN KEY (`action_code`) REFERENCES `actions` (`action_code`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: actions ──
+CREATE TABLE `actions` (
+  `action_code` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'كودٌ فريدٌ للفعل — مفتاحُ كل ما بعده',
+  `name_ar` varchar(160) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module_id` int DEFAULT NULL COMMENT 'modules.id — الشاشةُ الأم (NULL لفعلٍ عابرٍ للشاشات)',
+  `placement` enum('header','row','tab','bulk','context') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'row',
+  `handler_class` varchar(160) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الخدمةُ المنفِّذة — ولا فعلَ ينفّذ منطقًا في الشاشة',
+  `handler_method` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `handler_path` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مسارُ المعالج الإجرائي (المستخرَجُ من action_guard) حين لا صنفَ له',
+  `is_write` tinyint(1) NOT NULL DEFAULT '0',
+  `guards_json` text COLLATE utf8mb4_unicode_ci COMMENT 'الحرّاسُ بترتيب الفحص المعلن — وفعلُ كتابةٍ بلا حرّاس يُرفض',
+  `precondition_expr` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الشرطُ المسبق — يُفحص في الخادم لا بإخفاء الزر',
+  `reverse_action_code` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'فعلُ العكس — إلزاميٌّ لكل فعلٍ ماليٍّ أو تعاقدي',
+  `is_financial` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'ماليٌّ أو تعاقديٌّ — يستوجب عكسًا',
+  `owner_doc` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`action_code`),
+  KEY `ix_act_module` (`module_id`),
+  KEY `ix_act_write` (`is_write`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACT-01 §8: سجلُّ الأفعال — ولا زرَّ في واجهةٍ بلا صفٍّ هنا';
 
 -- ── Table: activities ──
 CREATE TABLE `activities` (
@@ -2694,6 +2770,19 @@ CREATE TABLE `evaluations` (
   CONSTRAINT `fk_eval_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`),
   CONSTRAINT `ck_eval_approved` CHECK (((`state` <> _utf8mb4'Approved') or ((`approved_by` is not null) and (`approved_at` is not null) and (`final_score` is not null))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='USR-01 §7 — التقييمُ الثنائي: ذاتيٌّ ثم مديرٌ ثم مناقشةٌ فاعتماد';
+
+-- ── Table: event_consumers ──
+CREATE TABLE `event_consumers` (
+  `c_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `event_name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `consumer_class` varchar(160) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `consumer_method` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `produces` enum('write','notify','dashboard_refresh') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'write' COMMENT 'مستهلكٌ لا يُنتج أثرًا مرئيًّا أو مسجَّلًا يُراجَع',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`c_id`),
+  UNIQUE KEY `uq_ec` (`event_name`,`consumer_class`),
+  KEY `ix_ec_event` (`event_name`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: exception_approvals ──
 CREATE TABLE `exception_approvals` (

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 08:07:48
+-- المصدر: equipation_manage · التوليد: 2026-08-02 14:33:30
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -2691,17 +2691,17 @@ INSERT INTO `fin_approval_matrix` (`id`, `company_id`, `event_type`, `min_amount
 -- ── fin_effect_map (قالبُ شركة 1) ──
 DELETE FROM `fin_effect_map`;
 INSERT INTO `fin_effect_map` (`id`, `company_id`, `source_kind`, `effect_type`, `effect_label`, `target_table`, `is_active`, `param_value`, `unavailable_reason`, `display_order`, `created_at`, `updated_at`) VALUES
-(16,{{COMPANY_ID}},'timesheet','cost_record','تكلفة يوم الدوام على المعدة والمشروع','fin_cost_records',1,NULL,NULL,3,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
-(18,{{COMPANY_ID}},'timesheet','employee_due','مستحق المشغّل عن ساعاته المسجّلة','fin_dues',0,NULL,'ساعات المشغّل مسجّلة (timesheet.operator_hours) لكن قاعدة الأجر/الحافز قرارٌ إداريٌّ لم يُقَرّ — يُفعَّل يوم تُضبط القاعدة ولا تُلفَّق مستحقات.',4,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
-(20,{{COMPANY_ID}},'timesheet','metric_update','مخصّص صيانةٍ محمَّلٌ على المعدة','fin_cost_records',0,0.0000,'معدّل مخصّص الصيانة للوحدة قرارٌ محاسبي — اضبط param_value بقيمةٍ موجبة لتفعيله.',5,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
-(26,{{COMPANY_ID}},'timesheet','party_award','أحكام استحقاق الأطراف','unit_party_awards',1,NULL,NULL,5,'2026-07-18 03:50:04','2026-07-18 03:50:04'),
-(12,{{COMPANY_ID}},'timesheet','revenue_event','إيراد على العميل من يوم الدوام بسعر عقده','fin_financial_events',1,NULL,NULL,1,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
-(14,{{COMPANY_ID}},'timesheet','supplier_due','مستحق المورد من يوم الدوام بسعر عقده','fin_dues',1,NULL,NULL,2,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
+(2,{{COMPANY_ID}},'unit_record','revenue_event','إيراد على العميل بسعر عقده','fin_financial_events',1,NULL,NULL,1,'2026-07-17 20:55:48','2026-07-17 20:55:48'),
+(4,{{COMPANY_ID}},'unit_record','supplier_due','مستحق المورد بسعر عقده (التوأم الثاني)','fin_dues',1,NULL,NULL,2,'2026-07-17 20:55:48','2026-07-17 20:55:48'),
 (6,{{COMPANY_ID}},'unit_record','cost_record','تكلفة على المعدة والمشروع','fin_cost_records',1,NULL,NULL,3,'2026-07-17 20:55:48','2026-07-17 20:55:48'),
 (8,{{COMPANY_ID}},'unit_record','employee_due','مستحق المشغّل عن وحدته','fin_dues',0,NULL,'لا مصدر تكليفِ مشغّلٍ بمعدةٍ وتاريخ: equipment_operators جدول تأهيلٍ (رُخَص) لا تكليف. يُفعَّل يوم يتوفّر المصدر — ولا تُلفَّق مستحقات.',4,'2026-07-17 20:55:48','2026-07-17 20:55:48'),
 (10,{{COMPANY_ID}},'unit_record','metric_update','مخصّص صيانةٍ محمَّلٌ على المعدة','fin_cost_records',0,0.0000,'معدّل مخصّص الصيانة للوحدة قرارٌ محاسبي — اضبط param_value بقيمةٍ موجبة لتفعيله.',5,'2026-07-17 20:55:48','2026-07-17 20:55:48'),
-(2,{{COMPANY_ID}},'unit_record','revenue_event','إيراد على العميل بسعر عقده','fin_financial_events',1,NULL,NULL,1,'2026-07-17 20:55:48','2026-07-17 20:55:48'),
-(4,{{COMPANY_ID}},'unit_record','supplier_due','مستحق المورد بسعر عقده (التوأم الثاني)','fin_dues',1,NULL,NULL,2,'2026-07-17 20:55:48','2026-07-17 20:55:48');
+(12,{{COMPANY_ID}},'timesheet','revenue_event','إيراد على العميل من يوم الدوام بسعر عقده','fin_financial_events',1,NULL,NULL,1,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
+(14,{{COMPANY_ID}},'timesheet','supplier_due','مستحق المورد من يوم الدوام بسعر عقده','fin_dues',1,NULL,NULL,2,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
+(16,{{COMPANY_ID}},'timesheet','cost_record','تكلفة يوم الدوام على المعدة والمشروع','fin_cost_records',1,NULL,NULL,3,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
+(18,{{COMPANY_ID}},'timesheet','employee_due','مستحق المشغّل عن ساعاته المسجّلة','fin_dues',0,NULL,'ساعات المشغّل مسجّلة (timesheet.operator_hours) لكن قاعدة الأجر/الحافز قرارٌ إداريٌّ لم يُقَرّ — يُفعَّل يوم تُضبط القاعدة ولا تُلفَّق مستحقات.',4,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
+(20,{{COMPANY_ID}},'timesheet','metric_update','مخصّص صيانةٍ محمَّلٌ على المعدة','fin_cost_records',0,0.0000,'معدّل مخصّص الصيانة للوحدة قرارٌ محاسبي — اضبط param_value بقيمةٍ موجبة لتفعيله.',5,'2026-07-17 23:54:32','2026-07-17 23:54:32'),
+(26,{{COMPANY_ID}},'timesheet','party_award','أحكام استحقاق الأطراف','unit_party_awards',1,NULL,NULL,5,'2026-07-18 03:50:04','2026-07-18 03:50:04');
 
 -- ── job_titles (قالبُ شركة 4) ──
 DELETE FROM `job_titles`;
@@ -2739,11 +2739,11 @@ INSERT INTO `employee_roles` (`id`, `company_id`, `name`, `description`, `status
 -- ── transfer_types (قالبُ شركة 4) ──
 DELETE FROM `transfer_types`;
 INSERT INTO `transfer_types` (`id`, `company_id`, `code`, `name`, `operational_category`, `default_bearer`, `active`, `created_at`, `updated_at`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
-(2,{{COMPANY_ID}},'attachments','ترحيل المرفقات والملحقات','equipment_transfer','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
-(6,{{COMPANY_ID}},'external_maintenance','ترحيل الصيانة الخارجية','equipment_plus_move','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
 (1,{{COMPANY_ID}},'heavy_equipment','ترحيل المعدات الثقيلة','equipment_transfer','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
-(4,{{COMPANY_ID}},'personnel','ترحيل المشغّلين والعمّال','personnel_move','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
+(2,{{COMPANY_ID}},'attachments','ترحيل المرفقات والملحقات','equipment_transfer','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
 (3,{{COMPANY_ID}},'supplies','نقل المستلزمات وقطع الغيار','parts_transfer','client',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
-(5,{{COMPANY_ID}},'technicians','ترحيل الفنيين والمهندسين','personnel_move','company',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL);
+(4,{{COMPANY_ID}},'personnel','ترحيل المشغّلين والعمّال','personnel_move','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
+(5,{{COMPANY_ID}},'technicians','ترحيل الفنيين والمهندسين','personnel_move','company',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL),
+(6,{{COMPANY_ID}},'external_maintenance','ترحيل الصيانة الخارجية','equipment_plus_move','by_rule',1,'2026-07-06 16:05:46','2026-07-06 16:05:46',0,NULL,NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

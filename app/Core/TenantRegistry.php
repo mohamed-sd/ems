@@ -498,6 +498,16 @@ class TenantRegistry
         'approval_signatures' => array('type' => self::T_TENANT, 'soft' => false), // LEG-01 §6-③: سجل التوقيعات Insert-only
         'governance_flags' => array('type' => self::T_GLOBAL, 'soft' => false), // LEG-01 §7: أعلام أنماط التفعيل
         'guard_policies' => array('type' => self::T_GLOBAL, 'soft' => false), // GOV-01: قاموس تصنيف الحمايات
+        // ── ACT-01: عقدُ الفعل وخريطةُ الأثر (update0006) ──
+        'actions' => array('type' => self::T_GLOBAL, 'soft' => false), // ACT-01 §8: سجلُّ الأفعال — قاموسُ نظامٍ لا بياناتُ كيان
+        'action_writes' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8
+        'action_events' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8
+        'event_consumers' => array('type' => self::T_GLOBAL, 'soft' => false), // ACT-01 §8: قاموسُ مستهلكي الأحداث
+        'action_impacts' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'actions', 'fk' => 'action_code'), // ACT-01 §8: خريطةُ الأثر
+        'action_execution_log' => array('type' => self::T_TENANT, 'soft' => false), // ACT-01 §8: Insert-only بشركته
         'exception_requests' => array('type' => self::T_TENANT, 'soft' => false), // GOV-01 §7
         'exception_approvals' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'exception_requests', 'fk' => 'req_id'), // GOV-01 §7
