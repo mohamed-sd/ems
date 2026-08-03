@@ -121,32 +121,58 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
     $ems_tb_capsUrl = function_exists('ems_url') ? ems_url('user_capacities.php') : '/ems/user_capacities.php';
     ?>
     <header class="<?php echo $ems_tb_barClass; ?>">
+        <?php
+        /* زرُّ فتح السايدبار — موضعُه الطبيعيُّ داخلَ الشريط لا طافيًا فوقه.
+           كان <button> عائمًا (position:fixed) يُطبع من insidebar.php بعد
+           الشريط، فيجلس فوق أيقونات الإجراءات ويتدلّى تحت حدّه. صار عنصرًا
+           في شبكة الشريط يحجز مكانَه. المعرّفُ والصنفُ كما هما بلا تغيير،
+           فسلوكُ insidebar.php وكلُّ قواعد CSS القائمة تعمل كما هي — وهو
+           `display:none` على الحاسوب بقاعدةٍ قائمةٍ منذ الأصل. */
+        ?>
+        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn"
+                aria-label="القائمة الجانبية" aria-expanded="false" aria-controls="sidebar">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+
         <div class="ems-topbar-logo">
             <img src="<?php echo htmlspecialchars($ems_tb_logo, ENT_QUOTES, 'UTF-8'); ?>" alt="Equipation">
         </div>
 
         <div class="ems-topbar-center">
-            <span class="ems-topbar-pill" title="الإدارة">
+            <?php
+            /* `data-value` هو الإضافةُ الوحيدةُ على الحاويّات — سِمةٌ بلا أثرٍ
+               تخطيطيٍّ البتّة، فالنصُّ داخلَها باقٍ سائبًا كما كان حرفًا بحرف
+               وعرضُ الحاويّة على الحاسوب لا يتزحزح نقطةً واحدة.
+               ولمَ لم يُفصَل الوسمُ عن القيمة في عنصرين؟ لأن النصَّ السائب
+               عنصرُ فلكسٍ مجهول، وقياسُه يختلف عن قياس النصّ نفسِه داخلَ
+               <span> بمقدار 8px (قِيس على الحاويّات الثلاث) — أي أن مجرّدَ
+               اللفّ يُنقص عرضَ شريط الهويّة 31px على الحاسوب بلا داعٍ.
+               فعلى الجوّال يُصمَّت النصُّ السائب بـ`font-size:0` وتُطبع القيمةُ
+               من هذه السِمة، والنصُّ الكاملُ يبقى في شجرة الوصولية للقارئ. */
+            ?>
+            <span class="ems-topbar-pill" title="الإدارة" data-value="<?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>">
                 <i class="fas fa-user-shield"></i>الإدارة: <?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>
             </span>
             <?php if ($ems_tb_capLabel !== '' || $ems_tb_capCount > 1): ?>
+                <?php $ems_tb_capShow = $ems_tb_capLabel !== '' ? $ems_tb_capLabel : ('متعددة (' . $ems_tb_capCount . ') ▾'); ?>
                 <a class="ems-topbar-pill" href="<?php echo htmlspecialchars($ems_tb_capsUrl, ENT_QUOTES, 'UTF-8'); ?>"
-                   title="مبدّل المساحة — صفاتك ونطاقاتك" style="text-decoration:none">
+                   title="مبدّل المساحة — صفاتك ونطاقاتك" style="text-decoration:none"
+                   data-value="<?php echo htmlspecialchars($ems_tb_capShow, ENT_QUOTES, 'UTF-8'); ?>">
                     <i class="fas fa-people-arrows"></i>الصفة:
-                    <?php echo htmlspecialchars($ems_tb_capLabel !== '' ? $ems_tb_capLabel : ('متعددة (' . $ems_tb_capCount . ') ▾'), ENT_QUOTES, 'UTF-8'); ?>
+                    <?php echo htmlspecialchars($ems_tb_capShow, ENT_QUOTES, 'UTF-8'); ?>
                 </a>
             <?php endif; ?>
             <?php if ($ems_tb_userName !== ''): ?>
-                <span class="ems-topbar-pill" title="المسمى الوظيفي">
+                <span class="ems-topbar-pill" title="المسمى الوظيفي" data-value="<?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?>">
                     <i class="fas fa-user-circle"></i>المسمى الوظيفي: <?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?>
                 </span>
             <?php endif; ?>
             <?php if ($ems_tb_empName !== ''): ?>
-                <span class="ems-topbar-pill ems-topbar-pill--employee" title="الموظف المسؤول">
+                <span class="ems-topbar-pill ems-topbar-pill--employee" title="الموظف المسؤول" data-value="<?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>">
                     <i class="fas fa-id-card-alt"></i>الموظف المسؤول: <?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>
                 </span>
             <?php else: ?>
-                <span class="ems-topbar-pill ems-topbar-pill--muted" title="الموظف المسؤول">
+                <span class="ems-topbar-pill ems-topbar-pill--muted" title="الموظف المسؤول" data-value="غير مرتبط بموظف">
                     <i class="fas fa-id-card-alt"></i>الموظف المسؤول: غير مرتبط بموظف
                 </span>
             <?php endif; ?>

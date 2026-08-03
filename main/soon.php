@@ -39,6 +39,12 @@ if ($meta) {
 }
 
 $page_title = 'قريبًا';
+/* inheader.php ليس زينةً: هو مَن يكتب <!DOCTYPE> و<meta viewport> ومكتبةَ
+   الأيقونات. كانت هذه الشاشةُ وحدَها تستدعي insidebar بلا رأسٍ إطلاقًا،
+   فيسقط المتصفّحُ في Quirks Mode ويقرأ العرضَ 981px على هاتفٍ عرضُه 375px —
+   فلا تعمل @media (max-width:768px) أصلًا: لا لوحَ منزلقًا ولا زرَّ قائمةٍ،
+   والشريطُ شريحةٌ بعرض 1px وطولِ 2122px بأيقوناتٍ فارغة. */
+include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main" dir="rtl">
@@ -63,3 +69,5 @@ include '../insidebar.php';
   </div>
   <?php endif; ?>
 </div>
+</body>
+</html>

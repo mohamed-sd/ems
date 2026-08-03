@@ -194,6 +194,7 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
     $byStage = array();
     foreach ($items as $it) { $byStage[intval($it['stage_no'])][] = $it; }
     ksort($byStage);
+    $hdrPrinted = false; // رأسا كل إدارة (قرار المالك 2026-08-03) يُحقنان مرةً في أول مرحلة
     foreach ($byStage as $stageNo => $sItems) {
         usort($sItems, function ($a, $b) {
             return (intval($a['group_order']) - intval($b['group_order']))
@@ -217,6 +218,21 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
            . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
         echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
+
+        // ── رأسا كل إدارة (قرار المالك 2026-08-03): «الرئيسية» تؤدي دائمًا
+        // إلى لوحة الإدارة المعنية (مسلك role_board يحلّها بالدور)، وتحتها
+        // «المراسلات» بشارة غير المقروء الحية (يحدّثها مستطلِع insidebar
+        // القائم عبر #nav-unread-badge) — أولَ رابطين في أول مرحلة، على
+        // مستوى المصيّر فيصمدان أمام كل إعادة توليدٍ من الوثيقة.
+        if (!$hdrPrinted) {
+            $hdrPrinted = true;
+            echo '<li><a href="' . $basePrefix . 'main/role_board.php">'
+               . '<i class="fa fa-house"></i> <span>الرئيسية</span></a></li>' . "\n";
+            echo '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
+               . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
+               . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
+               . '</a></li>' . "\n";
+        }
 
         $byGroup = array();
         foreach ($sItems as $it) { $byGroup[(string) $it['group_name']][] = $it; }
@@ -259,8 +275,9 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
         if ($it['stage_no'] !== null) { $staged[] = $it; } else { $doored[] = $it; }
     }
     if (!empty($staged)) {
+        // afterHome (رابط المراسلات الثابت) لا يُطبع في الوضع المرحلي —
+        // فالمراسلاتُ صارت الرابطَ الثاني داخل أول مرحلة (قرار المالك 2026-08-03)
         printStageNav($roleId, $staged, $basePrefix, $badges);
-        if ($afterHome !== '') { echo $afterHome; }
         if (empty($doored)) { return true; }
         $items = $doored; $afterHome = '';
     }

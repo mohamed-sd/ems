@@ -1,0 +1,369 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ems-sidebar-mobile.css — واجهةُ السايدبار على الجوّال وحدَها
+   ───────────────────────────────────────────────────────────────────────────
+   يُحمَّل آخرَ ملفات CSS من insidebar.php، وكلُّ ما فيه محبوسٌ داخل
+   `@media (max-width: 768px)` — فلا يمسّ الحاسوبَ ولا الجهازَ اللوحيَّ
+   العريضَ ولا أيَّ جزءٍ آخرَ من النظام بحرف.
+
+   لماذا وُجد؟ لأن الشريطَ على الجوّال كان يرث حالةَ الطيّ من الحاسوب:
+   الصنفُ `closed` يبقى على العنصر وهو مفتوحٌ على الهاتف (`sidebar closed
+   active`)، فتنطبق عليه قواعدُ «شريط الأيقونات» بنوعيّةٍ أعلى من قواعد
+   الجوّال في الملف الرئيس:
+     • `.sidebar.closed .nav-group-name`      → أسماءُ الأبواب مخفيّةٌ
+     • `.sidebar.closed .nav-group-caret`     → سهمُ الطيّ محذوفٌ
+     • `.sidebar.closed .nav-group-items`     → البابُ لا ينفتح ولو نُقر
+     • `.sidebar.closed .sidebar-link-text`   → «المراسلات» بلا اسم
+     • `.sidebar.closed .nav-subhead`         → عناوينُ المجموعات محذوفة
+     • `.sidebar.closed .nav-count-badge`     → العدّادُ يطفو في زاوية الصف
+   فكانت النتيجةُ على الهاتف لوحًا أبيضَ فيه أيقوناتٌ بلا أسماءَ لا تُفتح.
+   القسم ① أدناه يُبطل ذلك الميراثَ كلَّه، وما بعده هو إعادةُ التصميم.
+
+   الهويّة كما هي: الأصفر #F4C542 والذهبيّ العميق #E0AE2E وسطحٌ أبيض
+   وخطّ IBM Plex Sans Arabic — لا لونَ جديدًا ولا خطَّ جديدًا.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* رأسُ اللوح عنصرُ جوّالٍ خالص: لا وجودَ له خارج الهاتف بحال.
+   (القاعدةُ الوحيدةُ خارجَ الـmedia في هذا الملف — وهي إخفاءٌ لا تصميم.) */
+.ems-site .sidebar .sidebar-mobile-head {
+  display: none;
+}
+
+@media (max-width: 768px) {
+
+  /* ── ① إبطالُ ميراث «الشريط المطويّ» على الهاتف ───────────────────────── */
+  /* الصنفُ closed حالةُ حاسوبٍ محفوظةٌ — على الهاتف اللوحُ إمّا مغلقٌ كلّيًّا
+     (خارج الشاشة) أو مفتوحٌ بعرضه الكامل، فلا معنى لوضعٍ ثالثٍ بينهما. */
+  .ems-site .sidebar.closed .nav-group-name,
+  .ems-site .sidebar.closed ul li span,
+  .ems-site .sidebar.closed ul li .sidebar-link-text {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .ems-site .sidebar.closed .nav-group-head {
+    justify-content: flex-start !important;
+    padding: 12px 14px !important;
+  }
+
+  .ems-site .sidebar.closed .nav-group-head > i.nav-group-caret {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .ems-site .sidebar.closed li.nav-group.open > ul.nav-group-items {
+    max-height: 3000px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .ems-site .sidebar.closed .nav-subhead {
+    display: list-item !important;
+  }
+
+  /* العدّادُ يعود سطرًا في الصفّ بدل أن يطفو في زاويته، ويُدفع إلى طرف
+     الصفّ فيصطفّ عمودًا واحدًا مهما اختلفت أطوالُ الأسماء.
+     الهوامشُ فيزيائيّةٌ لا منطقيّة عن قصد: `.nav-count-badge` يحمل
+     `direction: ltr` (لتُقرأ أرقامُه صحيحةً)، فـ`margin-inline-start`
+     يُحسب عليه يسارًا لا يمينًا — أي في عكس الاتجاه المطلوب تمامًا. */
+  .ems-site .sidebar.closed ul li .nav-count-badge,
+  .ems-site .sidebar.closed ul li a .nav-count-badge,
+  .ems-site .sidebar .nav-group-head > .nav-count-badge {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  /* ── ② اللوحُ نفسه: ورقةٌ منزلقةٌ من اليمين ──────────────────────────── */
+  .ems-site .sidebar,
+  .ems-site .sidebar.closed {
+    width: min(86vw, 340px) !important;
+    flex-basis: min(86vw, 340px) !important;
+    max-width: 340px;
+    background: #FFFFFF !important;
+    border-left: 0 !important;
+    border-radius: 20px 0 0 20px;
+    box-shadow: -18px 0 44px rgba(15, 17, 21, 0.28) !important;
+    /* الحوافُّ الآمنةُ في هواتف الشقّ العلويّ وشريط الإيماءة السفليّ */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    justify-content: flex-start;
+    /* الانزلاقُ أنعمُ قليلًا وبمنحنى دخولٍ طبيعيّ */
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1) !important;
+    will-change: transform;
+    overflow: hidden;
+  }
+
+  /* حاويةُ المحتوى تملأ اللوحَ طولًا: كانت تقف عند ارتفاع محتواها فيبقى
+     أسفلَ اللوح فراغٌ أبيضُ ميّت (قِيس: 224px على 812px) وتُمرَّر القائمةُ
+     داخل نافذةٍ أقصرَ من الشاشة. */
+  /* `:not(.sidebar-mobile-head)` ليس تجميلًا: الرأسُ أدناه <div> ابنٌ مباشرٌ
+     أيضًا، فلولا الاستثناءُ لصار عمودًا مطّاطًا وتكدّست عناصرُه الثلاثة
+     رأسيًّا (قِيس: 157px بدل 68px). */
+  .ems-site .sidebar > div:not(.sidebar-mobile-head) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .ems-site .sidebar ul {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 8px 8px calc(16px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* لا يجرُّ الصفحةَ خلفه عند بلوغ الطرف */
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .ems-site .sidebar ul::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  /* ── ③ رأسُ اللوح: هويّةٌ + مَن أنت + زرُّ إغلاقٍ صريح ─────────────────── */
+  /* لم يكن في اللوح ما يُغلقه سوى الخلفيةِ المعتمة — وزرُّ الطيّ مخفيٌّ على
+     الهاتف. زرٌّ صريحٌ (×) أوضحُ وأقربُ للإبهام. */
+  .ems-site .sidebar .sidebar-mobile-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 14px;
+    background: linear-gradient(135deg, rgba(244, 197, 66, 0.22), rgba(244, 197, 66, 0.05));
+    border-bottom: 1px solid #E3E6EA;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-head img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    flex: 0 0 auto;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-id {
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-brand {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: #1F2933;
+    letter-spacing: 0.2px;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-role {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-close {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E3E6EA;
+    border-radius: 12px;
+    background: #FFFFFF;
+    color: #44403C;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-close:active {
+    background: rgba(244, 197, 66, 0.22);
+    color: #1F2933;
+  }
+
+  .ems-site .sidebar .sidebar-mobile-close i {
+    margin: 0 !important;
+    width: auto !important;
+    color: inherit !important;
+  }
+
+  /* ── ④ الصفوف: مساحةُ لمسٍ ٤٦px ونصٌّ مقروء ──────────────────────────── */
+  .ems-site .sidebar ul li {
+    margin: 3px 2px;
+    border-radius: 14px;
+  }
+
+  .ems-site .sidebar ul li a,
+  .ems-site .sidebar .nav-group-head,
+  .ems-site .sidebar.closed .nav-group-head {
+    min-height: 46px;
+    padding: 12px 14px !important;
+    border-radius: 14px;
+    font-size: 15px;
+    gap: 2px;
+  }
+
+  .ems-site .sidebar ul li a span,
+  .ems-site .sidebar .nav-group-name {
+    font-size: 15px !important;
+    font-weight: 600;
+    margin-left: 8px;
+    line-height: 1.35;
+    /* الاسمُ الطويلُ يُلفّ سطرين بدل أن يُبتر بثلاث نقاط: على الهاتف
+       المساحةُ الرأسيّة رخيصةٌ والاسمُ المبتورُ غاليّ. */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .ems-site .sidebar ul li i {
+    font-size: 1.05rem;
+    width: 26px;
+    margin-left: 10px;
+    flex-shrink: 0;
+  }
+
+  /* رأسُ البابِ أثقلُ قليلًا من روابطه — تراتبيّةٌ تُقرأ بلمحة.
+     الصنفُ `closed` مذكورٌ صراحةً: `.sidebar.closed .nav-group-head` في
+     ems-nav-groups.css تفوز عليه بالنوعيّة (٤ أصناف مقابل ٣). */
+  .ems-site .sidebar .nav-group-head,
+  .ems-site .sidebar.closed .nav-group-head {
+    min-height: 52px;
+    font-weight: 800;
+  }
+
+  .ems-site .sidebar .nav-group-name {
+    font-weight: 800;
+  }
+
+  .ems-site .sidebar .nav-group-head > i.nav-group-caret {
+    font-size: 0.8rem;
+    margin-inline-start: 6px !important;
+    width: auto !important;
+  }
+
+  /* ── ⑤ روابطُ الباب المفتوح: إزاحةٌ وخطُّ إرشادٍ خفيف ─────────────────── */
+  .ems-site .sidebar ul.nav-group-items {
+    margin: 2px 6px 6px 4px;
+    padding-right: 10px;
+    border-right: 2px solid rgba(244, 197, 66, 0.35);
+  }
+
+  .ems-site .sidebar ul.nav-group-items > li {
+    margin: 2px 0;
+  }
+
+  .ems-site .sidebar ul.nav-group-items > li > a {
+    min-height: 44px;
+    padding: 10px 12px !important;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .ems-site .sidebar ul.nav-group-items > li > a > span {
+    font-size: 14.5px !important;
+  }
+
+  .ems-site .sidebar ul.nav-group-items > li > a > i {
+    font-size: 0.95rem;
+  }
+
+  /* عنوانُ المجموعة داخل الباب: كان خطُّه الفاصلُ أبيضَ على سطحٍ أبيضَ
+     (بقيّةُ سِمةٍ داكنةٍ سابقة) فلا يُرى، وحجمُه 11px لا يُقرأ على الهاتف. */
+  .ems-site .sidebar .nav-subhead {
+    padding: 12px 12px 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8A8F98;
+    opacity: 1;
+    letter-spacing: 0.2px;
+  }
+
+  .ems-site .sidebar .nav-subhead span {
+    border-bottom: 1px dashed #E3E6EA;
+    padding-bottom: 4px;
+  }
+
+  /* ── ⑥ الحالات: اللمسُ والصفحةُ الحاليّةُ بالهويّة نفسها ──────────────── */
+  /* لا :hover على الهاتف — الأثرُ يكون على اللمس (:active) وإلا «علِق»
+     الصفُّ ملوَّنًا بعد النقر لأن المتصفّح يبقيه في حالة hover وهميّة. */
+  .ems-site .sidebar ul li a:active,
+  .ems-site .sidebar .nav-group-head:active {
+    background: rgba(244, 197, 66, 0.18) !important;
+    color: #1F2933 !important;
+  }
+
+  .ems-site .sidebar ul li.active > a,
+  .ems-site .sidebar ul li.active:hover > a {
+    background: rgba(244, 197, 66, 0.28) !important;
+    font-weight: 800;
+  }
+
+  .ems-site .sidebar ul li.active::after,
+  .ems-site .sidebar li.nav-group.has-active > .nav-group-head::after {
+    width: 4px;
+    top: 10px;
+    bottom: 10px;
+    background: #E0AE2E !important;
+  }
+
+  /* البابُ الحاوي للصفحة الحاليّة يبقى مميَّزًا وهو مطويّ */
+  .ems-site .sidebar li.nav-group.has-active > .nav-group-head {
+    background: rgba(244, 197, 66, 0.14);
+  }
+
+  /* «المجموعةُ المختارة» مفهومُ حاسوبٍ (تقود بلاطاتِ لوحة التحكّم) —
+     على الهاتف تُربك لأنها تلوِّن بابًا لا علاقةَ له بالصفحة المفتوحة. */
+  .ems-site .sidebar li.nav-group.is-selected:not(.has-active):not(.open) > .nav-group-head {
+    background: transparent;
+  }
+
+  /* ── ⑦ الخلفيةُ المعتمة ───────────────────────────────────────────────── */
+  /* زرُّ فتح اللوح لم يعد عائمًا هنا: انتقل إلى داخل الشريط العلويّ،
+     وتصميمُه صار في ems-topbar-mobile.css — مالكٌ واحدٌ لكل شأن. */
+  .ems-site .sidebar-overlay {
+    background: rgba(15, 17, 21, 0.5);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ems-site .sidebar-overlay.active {
+    opacity: 1;
+  }
+
+  /* «المزيد (n) ▾» زرٌّ بصنف nav-group-head — يُميَّز عن رؤوس الأبواب */
+  .ems-site .sidebar li.nav-more-toggle > .nav-group-head {
+    min-height: 40px;
+    justify-content: center !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    color: #6B7280;
+  }
+
+  .ems-site .sidebar li.nav-more-toggle > .nav-group-head::after {
+    display: none;
+  }
+}
+
+/* الحركةُ تُحترم لمن أوقفها في إعدادات جهازه */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .ems-site .sidebar,
+  .ems-site .sidebar.closed,
+  .ems-site .sidebar-overlay {
+    transition: none !important;
+  }
+}

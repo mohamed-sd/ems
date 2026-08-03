@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ems-topbar-mobile.css — واجهةُ الشريط العلويّ على الجوّال وحدَها
+   ───────────────────────────────────────────────────────────────────────────
+   يُحمَّل آخرَ ملفات CSS من insidebar.php (بعد ems-sidebar-mobile.css)، وكلُّ
+   ما فيه محبوسٌ داخل `@media (max-width: 768px)` بلا استثناءٍ واحد — فالحاسوبُ
+   واللوحيُّ العريضُ لا يريان منه حرفًا.
+
+   ما الذي كان معطوبًا؟ الشريطُ شبكةٌ من ثلاثة أعمدة `1fr auto 1fr` بمحتوًى
+   ثابتِ العرض: الحاويّاتُ الأربعُ في الوسط تشغل وحدَها **502px** في شريطٍ
+   عرضُه 375px، فتُدفَع كتلةُ الإجراءات إلى `x = 557` — أي **426px خارجَ
+   الشاشة**. و`overflow-x: hidden` على `.ems-site` يبتلع الفيضَ صامتًا فلا
+   يظهر شريطُ تمرير. النتيجةُ أن الأيقوناتِ السبعَ كلَّها (مساحةُ عملي ·
+   البحثُ الموحّد · بوابتي · البلاغات · الخروج · الملفُّ الشخصيّ · الإعدادات)
+   كانت **غيرَ موجودةٍ عمليًّا على الهاتف**.
+
+   العلاج: صفّان بدل صفٍّ واحدٍ مزدحم —
+     الصفُّ ①  (50px) — التنقّلُ والأفعال: [☰] [الشعار] ······· [٧ أيقونات]
+     الصفُّ ②  (28px) — السياق: حاويّاتُ الهويّة مضغوطةً بلا وسومٍ مكرّرة
+   والزرُّ ☰ صار عنصرًا في الشبكة يحجز مكانَه، لا زرًّا عائمًا فوقها.
+
+   الهويّة كما هي: الرماديّ #E2E2E2 للشريط · الأصفر #F4C542 للزرّ · الحاويّات
+   بيضاءُ بحدودٍ #CFCFCF · خطُّ IBM Plex Sans Arabic. لا لونَ جديدًا ولا خطّ.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+  /* ── ① ارتفاعُ الشريط: رمزٌ واحدٌ يقود كلَّ شيء ────────────────────────── */
+  /* `--ems-topbar-height` يقود موضعين لا ثالثَ لهما: ارتفاعُ الشريط نفسِه
+     وحشوةُ <body> العلويّة. فتغييرُه هنا وحدَه يكفي، ولا يبقى رقمٌ مكرَّرٌ
+     في مكانٍ آخرَ يتعفّن. و`env()` تُبقيه 78px على الأجهزة بلا شقٍّ علويّ. */
+  :root {
+    --ems-topbar-row1: 50px;
+    --ems-topbar-row2: 28px;
+    --ems-topbar-height: calc(50px + 28px + env(safe-area-inset-top, 0px));
+  }
+
+  /* ── ② الشبكة: صفَّان، والاتجاهُ عربيٌّ فالبدايةُ يمين ─────────────────── */
+  .ems-topbar {
+    /* الأصلُ `direction: ltr` كي يقف الشعارُ يسارًا على الحاسوب. على الهاتف
+       الشريطُ أداةُ تنقّلٍ لا لوحةَ عرض، فبدايتُه حيث يبدأ القارئُ العربيّ
+       وحيث يقع الإبهام: اليمين. */
+    direction: rtl;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-rows: var(--ems-topbar-row1) var(--ems-topbar-row2);
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 0;
+    padding: env(safe-area-inset-top, 0px) 8px 0;
+    height: var(--ems-topbar-height);
+  }
+
+  /* ── ③ الصفُّ الأوّل ──────────────────────────────────────────────────── */
+
+  /* زرُّ فتح السايدبار — أوّلُ ما تصله الإبهام، وبلون الهويّة فلا يُخطئه أحد */
+  .ems-site .mobile-menu-btn {
+    position: static;          /* كان fixed يطفو فوق الشريط ويتدلّى تحت حدّه */
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    align-self: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: var(--primary-yellow, #F4C542) !important;
+    color: #1F1F1F !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 2px rgba(15, 17, 21, 0.14);
+    transition: background-color 0.18s ease, transform 0.18s ease;
+  }
+
+  .ems-site .mobile-menu-btn:active {
+    background: var(--yellow-deep, #E0AE2E) !important;
+    transform: scale(0.94);
+  }
+
+  .ems-topbar-logo {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .ems-topbar.ems-topbar--icon .ems-topbar-logo img,
+  .ems-topbar .ems-topbar-logo img {
+    height: 26px;
+    margin: 0;
+  }
+
+  /* الأيقوناتُ السبعُ تعود إلى الشاشة: العمودُ الثالث مرنٌ وهي مرصوفةٌ
+     إلى طرفه (يسارًا في RTL) فتقابلُ زرَّ القائمة على الطرف الآخر. */
+  .ems-topbar-actions {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+    direction: rtl;
+    gap: 5px;
+    /* حزامُ أمانٍ لا غير: لو أُضيفت أيقونةٌ ثامنةٌ لاحقًا زحفت القائمةُ
+       بالتمرير بدل أن تختفيَ خارجَ الشاشة صامتةً كما كان يحدث. */
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ems-topbar-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ems-topbar-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.84rem;
+    flex-shrink: 0;
+  }
+
+  /* شارةُ العدّاد تصغُر مع أيقونتها فلا تبتلعها */
+  .ems-topbar-badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: -3px;
+    inset-inline-end: -3px;
+  }
+
+  /* ── ④ الصفُّ الثاني: شريطُ السياق ────────────────────────────────────── */
+  /* «مَن أنا الآن؟» سؤالٌ حقيقيٌّ في نظامٍ فيه مبدّلُ صفةٍ وأدوارٌ متعدّدة —
+     فلا تُحذف الحاويّاتُ على الهاتف، بل تُضغَط: الوسمُ يُطوى (الأيقونةُ
+     تدلّ عليه، و`title` يبقى للقارئ الشاشيّ) وتبقى القيمةُ وحدَها. */
+  .ems-topbar-center {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: stretch;
+    align-self: center;
+    direction: rtl;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    /* الاسمُ الطويلُ جدًّا يُمرَّر أفقيًّا بدل أن يقصَّ ما بعده */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .ems-topbar-center::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* توسيطُ الحاويّات الثلاث في منتصف الشاشة تمامًا — كما على الحاسوب.
+     ليس `justify-content: center` عن عمد: الشريطُ قابلٌ للتمرير الأفقيّ
+     (اسمٌ طويلٌ جدًّا يفيض)، والتوسيطُ المباشرُ على حاويّةٍ فائضةٍ يقصُّ
+     طرفَها الأوّل قصًّا لا يبلغه التمريرُ أصلًا (خلل flexbox المعروف).
+     العلاج: مِباعدان مرنان (::before/::after) يتقاسمان الفراغَ بالتساوي
+     فيتوسّط المحتوى وهو مُلائم، وينكمشان إلى الصفر وهو فائضٌ فيعود
+     الشريطُ ممرَّرًا من أوّله بلا قصّ — على أيّ عرضِ شاشة. */
+  .ems-topbar-center::before,
+  .ems-topbar-center::after {
+    content: '';
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .ems-topbar-pill {
+    height: 23px;
+    min-width: 0;
+    max-width: 46%;
+    padding: 0 9px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: 999px;
+    flex: 0 1 auto;
+    justify-content: flex-start;
+  }
+
+  /* الوسمُ («الإدارة:» · «المسمى الوظيفي:» …) يُصمَّت بلا حذف: `font-size:0`
+     يُلغي عرضَه بصريًّا والنصُّ باقٍ في الترميز وفي شجرة الوصولية — فقارئُ
+     الشاشة ما زال ينطق «الإدارة: إدارة الموقع» كاملةً. ثم تُطبع القيمةُ
+     وحدَها من `data-value`. والأيقونةُ تدلّ على الوسم المطويّ.
+     و`color: transparent` حزامُ أمانٍ ثانٍ: بعضُ متصفحات الجوّال (سامسونج
+     إنترنت · تكبيرُ النصّ في أندرويد) يرفع الخطوطَ الدقيقةَ إلى حدٍّ أدنى
+     فيُبعث النصُّ الخام — فيبقى حينها شفافًا لا يُرى، وتُعاد الألوانُ
+     صراحةً للقيمة والأيقونة وحدَهما. */
+  .ems-topbar-pill {
+    font-size: 0;
+    color: transparent;
+  }
+
+  .ems-topbar-pill > i {
+    font-size: 11px;
+    margin-inline-end: 5px;
+    flex-shrink: 0;
+    color: #121212;
+  }
+
+  .ems-topbar-pill::after {
+    content: attr(data-value);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #121212;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* حالةُ «غير مرتبطٍ بموظف» تحتفظ برماديّها الباهت المقصود */
+  .ems-topbar-pill--muted > i,
+  .ems-topbar-pill--muted::after {
+    color: #8A8A8A;
+  }
+
+  /* حاويّةُ «الصفة» رابطٌ لا نصّ — تُميَّز بحدٍّ ذهبيٍّ كي تُقرأ قابلةً للنقر */
+  a.ems-topbar-pill {
+    border-color: var(--yellow-deep, #E0AE2E);
+    background: #FFFDF6;
+  }
+
+  a.ems-topbar-pill:active {
+    background: rgba(244, 197, 66, 0.24);
+  }
+
+  /* ── ⑤ لمسةُ الهويّة ──────────────────────────────────────────────────── */
+  /* خطٌّ ذهبيٌّ رفيعٌ أسفلَ الشريط: يفصل الشريطَ عن المحتوى بوضوحٍ على شاشةٍ
+     صغيرةٍ لا هوامشَ فيها، وهو لونُ النظام نفسُه لا لونٌ جديد. */
+  .ems-topbar {
+    border-bottom: 2px solid var(--primary-yellow, #F4C542);
+    box-shadow: 0 2px 8px rgba(15, 17, 21, 0.08);
+  }
+
+  .ems-topbar.ems-topbar--dash {
+    border-bottom-color: #d4a500;
+  }
+
+  /* السايدبارُ المفتوحُ يغطّي الشريطَ كلَّه (z:1000 مقابل 130) — فلا حاجةَ
+     لإخفاء زرِّ القائمة، لكنّ حالتَه المنطقيّة تبقى معلَنةً للوصولية. */
+  .ems-site .mobile-menu-btn[aria-expanded="true"] {
+    background: var(--yellow-deep, #E0AE2E) !important;
+  }
+}
+
+/* شاشاتٌ ضيّقةٌ جدًّا (≤360px): تضييقٌ محسوبٌ يُبقي الأيقوناتِ السبعَ كلَّها
+   داخلَ الشاشة بدل أن تُدفع واحدةٌ منها خارجَها. */
+@media (max-width: 360px) {
+  .ems-topbar {
+    column-gap: 6px;
+    padding-inline: 6px;
+  }
+
+  .ems-site .mobile-menu-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ems-topbar-actions {
+    gap: 3px;
+  }
+
+  .ems-topbar-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .ems-topbar-logo img {
+    height: 24px;
+  }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .ems-site .mobile-menu-btn {
+    transition: none !important;
+  }
+}

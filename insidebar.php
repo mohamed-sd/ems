@@ -44,7 +44,11 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
       '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>',
       '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>',
-      '/ems/assets/css/ems-nav-groups.css<?php echo $__sb_ver('ems-nav-groups.css'); ?>'
+      '/ems/assets/css/ems-nav-groups.css<?php echo $__sb_ver('ems-nav-groups.css'); ?>',
+      // واجهةُ الجوّال — آخرُ الملفات كي تفوز على طبقات التجاوز المتراكمة،
+      // وكلُّ ما فيها محبوسٌ في @media (max-width:768px) فلا تمسّ الحاسوب.
+      '/ems/assets/css/ems-sidebar-mobile.css<?php echo $__sb_ver('ems-sidebar-mobile.css'); ?>',
+      '/ems/assets/css/ems-topbar-mobile.css<?php echo $__sb_ver('ems-topbar-mobile.css'); ?>'
     ];
 
     cssFiles.forEach(function (href) {
@@ -82,15 +86,36 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 <!-- الهيدر/التوببار المشترك (مكوّن واحد لكل الصفحات التي بها Sidebar) -->
 <?php require_once __DIR__ . '/includes/topbar.php'; ?>
 
-<!-- زر القائمة في الموبايل -->
-<button class="mobile-menu-btn" id="mobileMenuBtn">
-  <i class="fa fa-bars"></i>
-</button>
+<!-- زرُّ القائمة في الموبايل: انتقل إلى داخل الشريط العلويّ (includes/topbar.php)
+     ليحجز مكانَه في صفّه بدل أن يطفو فوق أيقونات الإجراءات. المعرّفُ نفسُه
+     `mobileMenuBtn`، وهو مطبوعٌ قبل هذا الموضع فيبقى سكربتُ الأسفل يجده. -->
 
 <!-- طبقة الخلفية المعتمة (للموبايل) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="sidebar closed" id="sidebar">
+  <?php
+  /* رأسُ اللوح على الجوّال (NAV — واجهة الجوّال): هويّةٌ + مَن أنت + إغلاقٌ صريح.
+     مخفيٌّ افتراضًا (display:none في ems.main.all.style.css؟ لا — هنا صراحةً)،
+     ويظهر داخل @media (max-width:768px) وحدَه في ems-sidebar-mobile.css.
+     اسمُ الإدارة من خبيئة الجلسة التي يملؤها includes/topbar.php أعلاه — بلا
+     استعلامٍ إضافي، وبلا كسرٍ إن غاب. */
+  $__sb_mrole = isset($_SESSION['ems_topbar_role_label']['text'])
+              ? (string) $_SESSION['ems_topbar_role_label']['text'] : '';
+  $__sb_micon = function_exists('ems_url') ? ems_url('assets/images/icon.png') : '/ems/assets/images/icon.png';
+  ?>
+  <div class="sidebar-mobile-head" id="sidebarMobileHead">
+    <img src="<?php echo htmlspecialchars($__sb_micon, ENT_QUOTES, 'UTF-8'); ?>" alt="" aria-hidden="true">
+    <span class="sidebar-mobile-id">
+      <span class="sidebar-mobile-brand">إيكوبيشن</span>
+      <?php if ($__sb_mrole !== ''): ?>
+        <span class="sidebar-mobile-role"><?php echo htmlspecialchars($__sb_mrole, ENT_QUOTES, 'UTF-8'); ?></span>
+      <?php endif; ?>
+    </span>
+    <button type="button" class="sidebar-mobile-close" id="sidebarMobileClose" aria-label="إغلاق القائمة">
+      <i class="fa fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
   <div>
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
     <!-- <h2 class="logo">Equipation</h2> -->
@@ -606,6 +631,10 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     sidebar.classList.add('active');
     sidebarOverlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // منع التمرير خلف السايدبار
+    // صنفٌ على <body> يقود إخفاءَ الزرّ العائم على الجوّال — الزرّ يسبق
+    // السايدبار في الـDOM فلا يصله محدِّدُ الشقيق من حالة اللوح.
+    document.body.classList.add('ems-sidebar-open');
+    if (mobileMenuBtn) { mobileMenuBtn.setAttribute('aria-expanded', 'true'); }
     refreshPageLayoutAfterAnimation();
   }
 
@@ -613,6 +642,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     sidebar.classList.remove('active');
     sidebarOverlay.classList.remove('active');
     document.body.style.overflow = '';
+    document.body.classList.remove('ems-sidebar-open');
+    if (mobileMenuBtn) { mobileMenuBtn.setAttribute('aria-expanded', 'false'); }
     refreshPageLayoutAfterAnimation();
   }
 
@@ -650,6 +681,44 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       if (isMobile()) closeSidebar();
     });
   });
+
+  /* ── إغلاقُ لوح الجوّال: زرٌّ صريحٌ في رأسه · Escape · سحبةٌ نحو اليمين ──
+     الخلفيةُ المعتمة وحدَها لم تكن كافية: زرُّ الطيّ مخفيٌّ على الهاتف،
+     والزرُّ العائم يختفي عند الفتح. كلُّ ما يلي محروسٌ بـisMobile() فلا
+     يغيّر حرفًا من سلوك الحاسوب. */
+  const sidebarMobileClose = document.getElementById('sidebarMobileClose');
+  if (sidebarMobileClose) {
+    sidebarMobileClose.addEventListener('click', closeSidebar);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+      closeSidebar();
+    }
+  });
+
+  (function () {
+    // سحبةٌ أفقيّةٌ نحو اليمين تغلق اللوح (اتجاه انزلاقه في RTL).
+    // العتبةُ 60px، ويُلغى الالتقاطُ إن غلب الميلُ الرأسيُّ — كي لا تُختطف
+    // حركةُ تمرير القائمة الطويلة.
+    let sx = 0, sy = 0, tracking = false;
+    sidebar.addEventListener('touchstart', (e) => {
+      if (!isMobile() || !sidebar.classList.contains('active') || e.touches.length !== 1) return;
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    sidebar.addEventListener('touchmove', (e) => {
+      if (!tracking || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - sx;
+      const dy = e.touches[0].clientY - sy;
+      if (Math.abs(dy) > Math.abs(dx)) { tracking = false; return; }
+      if (dx > 60) { tracking = false; closeSidebar(); }
+    }, { passive: true });
+
+    sidebar.addEventListener('touchend', () => { tracking = false; }, { passive: true });
+  })();
 
   // إغلاق عند تغيير حجم الشاشة للكمبيوتر
   window.addEventListener('resize', () => {
