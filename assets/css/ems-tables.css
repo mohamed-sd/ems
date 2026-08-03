@@ -1101,3 +1101,27 @@ body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.clos
   body.ems-site .main .filter .filter-field { flex: 1 1 100% !important; }
   body.ems-site .main .filter .filter-actions { width: 100% !important; justify-content: flex-start !important; }
 }
+
+/* ═══ CMP-03 ②③④: أعمدة طبقة الحوكمة المشتركة ═══
+   رؤوس <th data-gov> تحقن حرفيا (tools/cmp03_apply.php) وخلاياها يحشوها
+   ui-unification.js — تمييز بصري خفيف بشرائحها الثلاث عبر data-slice. */
+body.ems-site table th[data-gov] {
+  position: relative;
+}
+body.ems-site table th[data-gov]::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: #c9a227; /* شريحة ① الأعمدة الحاكمة — ذهبي النظام */
+  opacity: .55;
+}
+body.ems-site table th[data-gov][data-slice="2"]::before { background: #8e44ad; } /* ② الأثر والعكس */
+body.ems-site table th[data-gov][data-slice="3"]::before { background: #2e86c1; } /* ③ المال والإثبات */
+body.ems-site table td.ems-gov-empty {
+  color: #9aa0a6;
+  text-align: center;
+}

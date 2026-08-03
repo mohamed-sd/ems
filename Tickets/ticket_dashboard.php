@@ -322,7 +322,10 @@ $stage_colors = array(
             <div>
                 <div style="font-weight:700;margin-bottom:6px;color:#198754"><i class="fa fa-circle-check"></i> أعلى التزامًا بالاستحقاق</div>
                 <table class="alltables no-datatable" style="width:100%">
-                    <thead><tr><th>#</th><th>الإدارة</th><th>النسبة</th></tr></thead>
+                    <thead><tr><th>#</th><th>الإدارة</th><th>النسبة</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              </tr></thead>
                     <tbody>
                     <?php if (empty($best_compliance)): ?><tr><td colspan="3" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($best_compliance as $i => $b):

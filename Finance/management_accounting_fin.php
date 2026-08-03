@@ -128,7 +128,15 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-sitemap"></i> مراكز التكلفة والربح</h5>
         <div class="table-container">
             <table id="ccTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>الأب</th><th>الإدارة</th><th>المستوى</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>الأب</th><th>الإدارة</th><th>المستوى</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
+              <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              </tr></thead>
                 <tbody>
                 <?php
                 $cc_rows = fin_gate($is_super_admin)->scopedQuery(

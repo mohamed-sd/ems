@@ -61,7 +61,10 @@ include '../insidebar.php';
     <div class="card-body">
         <?php if (!$sites): ems_state_empty('لا مواقعَ نشطةً في آخر أسبوعين', 'افتح التايم شيت', '?tab=2'); else: ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>المشروع/الموقع</th><th>رفعُ اليوم</th><th>آخرُ تحديث</th><th></th></tr></thead>
+            <thead><tr><th>المشروع/الموقع</th><th>رفعُ اليوم</th><th>آخرُ تحديث</th><th></th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              </tr></thead>
             <tbody>
             <?php foreach ($sites as $s): ?>
                 <tr<?php echo $s['late'] ? ' style="background:#fff3f0"' : ''; ?>>

@@ -224,7 +224,10 @@ $page_title="إيكوبيشن | تقييم الأداء"; include '../inheader.p
     <?php endif; ?>
 
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
-        <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>الفترة</th><th>الدرجة</th><th>النوع</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>الفترة</th><th>الدرجة</th><th>النوع</th><th>المبلغ</th><th>الحالة</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              </tr></thead><tbody>
         <?php $list = array();
         try {
             $list = $ev_gate->scopedQuery(array('scope'=>array('ev'=>'worker_evaluation'), 'enrich'=>array('e'=>'employees')),

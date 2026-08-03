@@ -63,5 +63,13 @@ if (!function_exists('ems_css_ver')) {
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->
     <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
+    <?php
+    // CMP-03 ②: سياق طبقة الحوكمة المشتركة — قيم عامة (الكيان · العملة الأساسية)
+    // يقرأها ui-unification.js لحشو خلايا أعمدة الحوكمة المحقونة قبل تهيئة الجداول.
+    if (isset($_SESSION['user'])) {
+        require_once __DIR__ . '/includes/gov_columns.php';
+        ems_gov_emit_assets();
+    }
+    ?>
 </head>
 <body class="ems-site">

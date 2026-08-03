@@ -196,7 +196,12 @@ include('../insidebar.php');
         <div class="card-body">
             <?php if ($escalated): ?>
             <table class="table table-striped no-datatable" data-no-dt="1">
-                <thead><tr><th>الطلب</th><th>الإدارة</th><th>الحالة</th><th>الاستحقاق</th><th>المستوى</th><th></th></tr></thead>
+                <thead><tr><th>الطلب</th><th>الإدارة</th><th>الحالة</th><th>الاستحقاق</th><th>المستوى</th><th></th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              </tr></thead>
                 <tbody>
                 <?php $lv = array(1 => array('تذكير', 'info'), 2 => array('تنبيه', 'warning'), 3 => array('تصعيد', 'danger'));
                 foreach ($escalated as $e): $L = $lv[min(3, intval($e['escalation_level']))]; ?>

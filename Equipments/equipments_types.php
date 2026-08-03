@@ -166,7 +166,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <th>النوع</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
-                        </tr>
+                        
+                            <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            </tr>
                     </thead>
                     <tbody>
 

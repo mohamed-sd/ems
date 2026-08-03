@@ -201,7 +201,15 @@ include '../insidebar.php';
         <div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr><th>#</th><th>الشخص</th><th>النوع</th><th>الوحدة</th><th>النطاق</th>
-                <th>من</th><th>إلى</th><th>النائب</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                <th>من</th><th>إلى</th><th>النائب</th><th>الحالة</th><th>إجراءات</th>
+                <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+                </tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>

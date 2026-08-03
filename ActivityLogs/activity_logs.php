@@ -178,11 +178,20 @@ $actionLabels = [
     'click' => ['label' => 'نقرة', 'badge' => 'bg-secondary'],
 ];
 
+// CMP-03 ②: خريطة الكيانات مرةً واحدة — عمود «الكيان» لكل صف (السوبر يرى شركة كل سجل)
+$companyNames = [];
+$__cr = mysqli_query($conn, "SELECT id, company_name FROM admin_companies");
+if ($__cr) { while ($__c = mysqli_fetch_assoc($__cr)) { $companyNames[intval($__c['id'])] = $__c['company_name']; } }
+
 /**
  * H-22: خلايا الصف مصفوفةً (بروتوكول serverSide) — والغلاف <tr> للتوافق.
+ * CMP-03 ②: الخلايا 11-21 أعمدة طبقة الحوكمة — الموصول منها من بيانات السجل
+ * (الكيان · المُنشئ · تاريخ الإنشاء) وسائرها «—» حتى يُربط مصدرها
+ * (docs/CMP03_FOLLOWUP_SOURCES_ar.md — توصية المالك ③).
  */
 function renderLogCells(array $row, array $actionLabels): array
 {
+    global $companyNames;
     $e = fn($s) => htmlspecialchars((string) ($s ?? ''), ENT_QUOTES, 'UTF-8');
     $t = $row['created_at'] ? date('Y-m-d H:i:s', strtotime($row['created_at'])) : '—';
 
@@ -198,6 +207,12 @@ function renderLogCells(array $row, array $actionLabels): array
     $statusDisplay = ($status !== 0) ? strval($status) : '—';
     $recordDisplay = ($row['record_id'] !== null && $row['record_id'] !== '') ? $e($row['record_id']) : '—';
     $buttonDisplay = ($row['button_name'] !== null && $row['button_name'] !== '') ? $e($row['button_name']) : '—';
+
+    $govEntity  = $companyNames[intval($row['company_id'] ?? 0)] ?? '—';
+    $govCreator = ($row['employee_name'] ?? '') !== ''
+        ? $e($row['employee_name']) . ' — ' . $e($row['role_name'] ?? '')
+        : $e($row['user_name'] ?? '—') . (($row['role_name'] ?? '') !== '' ? ' — ' . $e($row['role_name']) : '');
+    $govDash    = '<span class="ems-gov-empty">—</span>';
 
     return [
         /* 0 */ '<span class="text-nowrap small" data-date="' . substr($e($t), 0, 10) . '">' . $e($t) . '</span>',
@@ -215,6 +230,17 @@ function renderLogCells(array $row, array $actionLabels): array
         /* 8 */ '<span class="small ' . $statusClass . '">' . $statusDisplay . '</span>',
         /* 9 */ '<button class="action-btn view detail-btn" data-id="' . intval($row['id']) . '" title="تفاصيل"><i class="fa fa-eye"></i></button>',
         /* 10 */ $e($row['http_method'] ?? ''),
+        /* 11 الكيان */               '<span class="small">' . $e($govEntity) . '</span>',
+        /* 12 المُنشئ — الاسم والصفة */ '<span class="small">' . $govCreator . '</span>',
+        /* 13 تاريخ الإنشاء */         '<span class="small text-nowrap">' . $e($t) . '</span>',
+        /* 14 المعتمِد — الاسم والصفة */ $govDash,
+        /* 15 تاريخ الاعتماد */        $govDash,
+        /* 16 مرجع التفويض */          $govDash,
+        /* 17 الحالة */                $govDash,
+        /* 18 المرجع الأب */           $govDash,
+        /* 19 المرفق */                $govDash,
+        /* 20 مركز التكلفة */          $govDash,
+        /* 21 سعر الصرف ومصدره */      $govDash,
     ];
 }
 
@@ -222,6 +248,7 @@ function renderLogRow(array $row, array $actionLabels): string
 {
     $cells = renderLogCells($row, $actionLabels);
     $classes = ['px-3 text-nowrap small', 'small', 'small', 'small', 'small', '', 'small', 'small', 'small', 'text-center', 'd-none'];
+    $classes = array_pad($classes, 22, 'small'); // CMP-03 ②: أعمدة الحوكمة 11-21
     $html = '<tr data-id="' . intval($row['id']) . '">';
     foreach ($cells as $i => $c) {
         $html .= '<td' . ($classes[$i] !== '' ? ' class="' . $classes[$i] . '"' : '') . '>' . $c . '</td>';
@@ -430,6 +457,18 @@ $page_title = 'سجل النشاط';
                                     <th>الاستجابة</th><!-- col 8 -->
                                     <th class="text-center" data-orderable="false">تفاصيل</th><!-- col 9 -->
                                     <th class="d-none">http_method</th><!-- col 10 hidden -->
+                                    <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — خلاياها من renderLogCells (serverSide) -->
+                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th><!-- col 11 -->
+                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th><!-- col 12 -->
+                                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th><!-- col 13 -->
+                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th><!-- col 14 -->
+                                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th><!-- col 15 -->
+                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th><!-- col 16 -->
+                                    <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th><!-- col 17 -->
+                                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th><!-- col 18 -->
+                                    <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th><!-- col 19 -->
+                                    <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th><!-- col 20 -->
+                                    <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th><!-- col 21 -->
                                 </tr>
                             </thead>
                             <tbody id="logsTableBody">
@@ -834,7 +873,9 @@ $page_title = 'سجل النشاط';
             columnDefs: [
                 { targets: 0, className: 'px-3' },
                 { targets: 9, orderable: false, searchable: false, className: 'text-center' },
-                { targets: 10, visible: false, searchable: true }   // http_method hidden col
+                { targets: 10, visible: false, searchable: true },   // http_method hidden col
+                // CMP-03 ②: أعمدة الحوكمة 11-21 — بلا فرزٍ (خارج قائمة سماح الفرز الخادمية)
+                { targets: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], orderable: false }
             ],
             dom: '<"row align-items-center mb-2"<"col-sm-4"l><"col-sm-4 text-center" B><"col-sm-4"f>>rtip',
             buttons: {

@@ -422,7 +422,12 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                             <th>الكود الكامل</th>
                             <th>الحالة</th>
                             <th class="fc-col-actions">إجراءات</th>
-                        </tr>
+                        
+                            <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                            <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                            </tr>
                     </thead>
                     <tbody>
                     <?php

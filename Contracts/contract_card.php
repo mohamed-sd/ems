@@ -242,7 +242,16 @@ include '../insidebar.php';
                 ems_state_empty('لا مقاعدَ معرَّفةً لهذا العقد بعد — تُعرَّف على حاويات المعدات (N-11)', 'إلى الحاويات', 'containers.php');
             } else {
                 echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
-                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>من</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th></tr></thead><tbody>';
+                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>من</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              </tr></thead><tbody>';
                 foreach ($seats as $s) {
                     $succ = \App\Services\ContractSeatService::successionOf($gate, $co, intval($s['id']));
                     if (empty($succ)) {

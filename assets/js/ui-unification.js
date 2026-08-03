@@ -178,11 +178,63 @@
         });
     }
 
+    /* ── CMP-03 ②: حشو خلايا أعمدة الحوكمة المحقونة ─────────────
+       رؤوس <th data-gov="…"> تُحقن حرفيًّا في ملفات الشاشات (tools/cmp03_apply.php)
+       بينما حلقات PHP التي ترسم الصفوف لا تعرفها؛ فنحشو هنا خلايا كل صفٍّ بقيمة
+       السياق العام (window.emsGovCtx من includes/gov_columns.php) أو «—»
+       (توصية المالك ③: العمود بلا مصدرٍ بعدُ يظهر بمكانه فارغًا). يجري الحشو
+       داخل normalizeAllTables قبل حارس structureMismatch وقبل تهيئة DataTables،
+       فلا يستثنى الجدول ولا يُرمى «Incorrect column count». */
+    function padGovernanceCells(tableEl) {
+        if (!tableEl.tHead || !tableEl.tHead.rows.length) return;
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable &&
+            window.jQuery.fn.dataTable.isDataTable && window.jQuery.fn.dataTable.isDataTable(tableEl)) return;
+        var headerRow = tableEl.tHead.rows[tableEl.tHead.rows.length - 1];
+        var govIdx = [];
+        for (var i = 0; i < headerRow.cells.length; i++) {
+            if ((headerRow.cells[i].colSpan || 1) !== 1) return; // ترويسة مجمّعة — لا نتدخل
+            if (headerRow.cells[i].hasAttribute('data-gov')) govIdx.push(i);
+        }
+        if (!govIdx.length) return;
+        var expected = headerRow.cells.length;
+        var ctxValues = (window.emsGovCtx && window.emsGovCtx.values) || {};
+        var sections = [];
+        for (var s = 0; s < tableEl.tBodies.length; s++) sections.push(tableEl.tBodies[s]);
+        if (tableEl.tFoot) sections.push(tableEl.tFoot);
+        sections.forEach(function (section) {
+            for (var r = 0; r < section.rows.length; r++) {
+                var row = section.rows[r];
+                // صفُّ عنصرٍ نائبٍ ممتدٌّ بخليةٍ واحدة: نمدّ colspan بدل الحشو
+                if (row.cells.length === 1 && (row.cells[0].colSpan || 1) >= expected - govIdx.length && expected > 1) {
+                    if ((row.cells[0].colSpan || 1) < expected) row.cells[0].colSpan = expected;
+                    continue;
+                }
+                if (row.cells.length !== expected - govIdx.length) continue; // ليس صفًّا قابلًا للحشو
+                for (var g = 0; g < govIdx.length; g++) {
+                    var pos = govIdx[g];
+                    var th = headerRow.cells[pos];
+                    var key = th.getAttribute('data-gov');
+                    var cell = row.insertCell(Math.min(pos, row.cells.length));
+                    cell.className = 'ems-gov-cell';
+                    if (section.tagName === 'TFOOT') { cell.textContent = ''; continue; }
+                    var v = ctxValues[key];
+                    if (v === undefined || v === null || v === '') {
+                        cell.textContent = '—';
+                        cell.classList.add('ems-gov-empty');
+                    } else {
+                        cell.textContent = v;
+                    }
+                }
+            }
+        });
+    }
+
     function normalizeAllTables() {
         document.querySelectorAll('table').forEach(function (tableEl) {
             ensureUnifiedTableClass(tableEl);
             normalizeSortableHeaders(tableEl);
             normalizeTableSemanticCells(tableEl);
+            try { padGovernanceCells(tableEl); } catch (eGov) { /* لا يعطل التوحيد */ }
         });
     }
 

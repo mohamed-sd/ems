@@ -867,7 +867,10 @@ include('../insidebar.php');
                             <th> عدد المشاريع</th>
                             <th> الهاتف</th>
                             <th> الحالة</th>
-                        </tr>
+                        
+                            <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                            <th class="ems-gov-th" data-gov="base_currency" data-slice="3" title="عملة دفاتر الكيان">العملة الأساسية</th>
+                            </tr>
                     </thead>
                     <tbody>
                         <?php

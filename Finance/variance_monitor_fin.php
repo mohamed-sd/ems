@@ -212,7 +212,10 @@ include '../insidebar.php';
                     <th>الميزانية</th><th>الإدارة</th><th>الفئة</th><th>النوع</th>
                     <th>مخطّط</th><th>فعلي</th><th>الانحراف</th><th>النسبة %</th>
                     <th>السبب</th><th>الإجراء التصحيحي</th><th>المالك</th><th>الحالة</th>
-                </tr></thead>
+                
+                    <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    </tr></thead>
                 <tbody>
                     <?php foreach ($var_rows as $l) {
                         $var  = (float)$l['variance'];

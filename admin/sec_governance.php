@@ -160,7 +160,10 @@ include '../insidebar.php';
     <div class="card-body">
         <?php if (!$pcrs) { ems_state_empty('لا طلبات تنتظر — نظيف ✨'); } else { ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>#</th><th>الشخص</th><th>النوع</th><th>المخاطرة</th><th>السبب</th><th>الباقي</th><th>الحالة</th><th></th></tr></thead>
+            <thead><tr><th>#</th><th>الشخص</th><th>النوع</th><th>المخاطرة</th><th>السبب</th><th>الباقي</th><th>الحالة</th><th></th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              </tr></thead>
             <tbody>
             <?php foreach ($pcrs as $x): ?>
                 <tr><td><?php echo intval($x['req_id']); ?></td>

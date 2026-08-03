@@ -135,7 +135,11 @@ require_once __DIR__ . '/includes/layout_head.php';
                     <th>العنصر المستهدف</th>
                     <th>الوصف</th>
                     <th>عنوان IP</th>
-                </tr>
+                
+                    <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+                    </tr>
             </thead>
             <tbody>
                 <?php foreach ($logs as $log):

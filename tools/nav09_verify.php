@@ -32,6 +32,10 @@ $DEPT_ROLES = array(
     'الحوكمة والالتزام' => array(15),
 );
 
+/* كتمُ المالك — مرآةُ قاعدة nav09_import.php حرفيًّا (2026-08-03):
+   الصندوقُ الجامع يُسقط من التشغيل، فالمتوقعُ هنا يُسقطه أيضًا وإلا كذب العدّ */
+$SUPPRESS = array(1 => array('approvals_inbox.php'));
+
 $doc = Nav09Reader::load($ROOT . '/docs/files/NAV-09-current.xlsx');
 $map = array();
 $r = mysqli_query($conn, "SELECT canonical_file, state, real_path FROM nav09_file_map");
@@ -48,16 +52,18 @@ $fails = array('موضع' => array(), 'وجهة' => array(), 'صلاحية' => a
 /* ── ① أمانةُ الموضع: التسلسل المتوقع من الورقة == المولَّد لكل دور ─────── */
 foreach ($doc['depts'] as $dept) {
     if (!isset($DEPT_ROLES[$dept['name']])) { continue; }
-    /* المتوقع: [ [stage, group, title, route], ... ] بترتيب الورقة (مع مرساة التكرار) */
-    $expected = array(); $seen = array();
-    foreach ($dept['rows'] as $row) {
-        if ($row['kind'] !== 'screen') { continue; }
-        $route = $routeOf($row['file']);
-        if (isset($seen[$route])) { $route .= '#'; } // التكرار المقصود بمرساة — تُقارن بالبادئة
-        $seen[$routeBase = preg_replace('/#.*/', '', $route)] = 1;
-        $expected[] = array($row['stage'], (string) $row['group'], $row['title'], $routeBase);
-    }
     foreach ($DEPT_ROLES[$dept['name']] as $role) {
+        /* المتوقع: [ [stage, group, title, route], ... ] بترتيب الورقة (مع مرساة التكرار)
+           لكل دورٍ على حدة — فكتمُ المالك ($SUPPRESS) قاعدةٌ دوريّة */
+        $expected = array(); $seen = array();
+        foreach ($dept['rows'] as $row) {
+            if ($row['kind'] !== 'screen') { continue; }
+            if (isset($SUPPRESS[$role]) && in_array($row['file'], $SUPPRESS[$role], true)) { continue; }
+            $route = $routeOf($row['file']);
+            if (isset($seen[$route])) { $route .= '#'; } // التكرار المقصود بمرساة — تُقارن بالبادئة
+            $seen[$routeBase = preg_replace('/#.*/', '', $route)] = 1;
+            $expected[] = array($row['stage'], (string) $row['group'], $row['title'], $routeBase);
+        }
         $got = array();
         $r = mysqli_query($conn,
             "SELECT lg.stage_no, lg.name gname, ni.label_ar, ni.route

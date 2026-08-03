@@ -170,7 +170,11 @@ include '../insidebar.php';
                 <thead><tr>
                     <th>فتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
                     <th>المُبلِّغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخّر</th>
-                </tr></thead>
+                
+                    <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+                    </tr></thead>
                 <tbody>
                 <?php
                 // scopedQuery: scope على tickets + إثراءات LEFT حصرًا (مراجع مرنة قد تغيب)

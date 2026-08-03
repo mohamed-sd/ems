@@ -537,7 +537,10 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             <th>الفئة</th>
                             <th>عدد الوحدات</th>
                             <th>الحالة</th>
-                        </tr>
+                        
+                            <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            </tr>
                     </thead>
                     <tbody>
                         <?php

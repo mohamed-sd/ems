@@ -86,7 +86,10 @@ include '../insidebar.php';
         سجلُّ نشاطي (لا يُعدَّل ولا يُحذف)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>الوقت</th><th>الفعل</th><th>الهدف</th><th>النتيجة</th></tr></thead>
+            <thead><tr><th>الوقت</th><th>الفعل</th><th>الهدف</th><th>النتيجة</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              </tr></thead>
             <tbody>
             <?php foreach ($activity as $a): ?>
                 <tr><td><small><?php echo htmlspecialchars((string)$a['at']); ?></small></td>

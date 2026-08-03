@@ -158,7 +158,16 @@ include '../insidebar.php';
             <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
-                </tr></thead>
+                
+                    <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                    </tr></thead>
                 <tbody>
                     <?php
                     $type_rows = tkt_gate($is_super_admin)->select('ticket_types', array(

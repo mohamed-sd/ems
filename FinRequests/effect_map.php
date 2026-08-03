@@ -251,7 +251,13 @@ include('../insidebar.php');
             <div class="card-body">
                 <?php if ($journals): ?>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
-                    <thead><tr><th>القيد</th><th>الحالة</th><th>إجمالي مدين</th><th>البيان</th></tr></thead>
+                    <thead><tr><th>القيد</th><th>الحالة</th><th>إجمالي مدين</th><th>البيان</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              <th class="ems-gov-th" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
+              </tr></thead>
                     <tbody>
                     <?php foreach ($journals as $j): ?>
                         <tr>

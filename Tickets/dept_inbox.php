@@ -94,7 +94,10 @@ include '../insidebar.php';
     <thead><tr>
       <th>البلاغ</th><th>المسار</th><th>الوصف</th><th>الحالة</th>
       <th>المكلَّف</th><th>مهلةُ الإنجاز</th><th>إلزامي؟</th>
-    </tr></thead>
+    
+      <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+      <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+      </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
       <tr><td colspan="7" class="text-center text-muted">لا مساراتَ لإدارتك — صفرُ بلاغٍ ينتظر</td></tr>

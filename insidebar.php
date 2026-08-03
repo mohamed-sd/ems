@@ -16,6 +16,13 @@ if (isset($_SESSION['user']) && isset($conn)) {
 // TKT-01 §2-⑧ + NAV-01 §5-② (update0006-b): زرُّ الإبلاغ الاحتياطيُّ العالمي —
 // يُبثُّ آخرَ الصفحة إن لم تستدعِ الشاشةُ زرًّا سياقيًّا أغنى بنفسها،
 // فتتحقق «صفرُ شاشةٍ تشغيليةٍ بلا زرِّ إبلاغ» بلا ازدواج.
+// CMP-03 ②: سياق طبقة الحوكمة المشتركة — قيم عامة (الكيان · العملة الأساسية)
+// يقرأها ui-unification.js لحشو خلايا أعمدة الحوكمة المحقونة قبل تهيئة الجداول.
+if (isset($_SESSION['user'])) {
+  require_once dirname(__FILE__) . '/includes/gov_columns.php';
+  ems_gov_emit_assets();
+}
+
 if (isset($_SESSION['user'])) {
   require_once dirname(__FILE__) . '/includes/report_button.php';
   if (empty($GLOBALS['__ems_rb_shutdown'])) {

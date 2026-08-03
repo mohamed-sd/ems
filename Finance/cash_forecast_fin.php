@@ -140,7 +140,14 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-water"></i> التنبؤات النقدية</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>افتتاحي</th><th>داخل</th><th>خارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>افتتاحي</th><th>داخل</th><th>خارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              </tr></thead>
                 <tbody>
                 <?php
                 $fc_rows = fin_gate($is_super_admin)->select('fin_cash_forecasts', array('orderBy' => 'id DESC'));

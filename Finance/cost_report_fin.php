@@ -87,7 +87,14 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-chart-line"></i> ربحية المشاريع (تجميع)</h5>
         <div class="table-container">
             <table id="profTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>هامش %</th></tr></thead>
+                <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>هامش %</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              </tr></thead>
                 <tbody>
                 <?php
                 // نطاق المشروع للدورين 5/6 (fin_project_scope — يريان موقعهما حصرًا)

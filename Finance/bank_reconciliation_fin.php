@@ -347,7 +347,12 @@ include '../insidebar.php';
         <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
             <thead><tr><th>#</th><th>التاريخ</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
                 <th>المرجع</th><th>النظير</th><th>القاعدة</th><th>الفرق</th><th>الحال</th>
-                <?php if ($can_edit) echo '<th>القرار</th>'; ?></tr></thead>
+                <?php if ($can_edit) echo '<th>القرار</th>'; ?>
+                <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                </tr></thead>
             <tbody>
             <?php foreach ($h13_lines as $l):
                 $ms = (string)$l['match_state'];

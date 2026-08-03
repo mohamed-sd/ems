@@ -88,7 +88,10 @@ include '../insidebar.php';
         <small style="color:#888">(لُقطت ببصمتها #<?php echo intval($res['snap_id']); ?>)</small></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>المؤشر</th><th>الفترة الحالية</th><th>الفترة السابقة (بالطول نفسه)</th></tr></thead>
+            <thead><tr><th>المؤشر</th><th>الفترة الحالية</th><th>الفترة السابقة (بالطول نفسه)</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              </tr></thead>
             <tbody>
             <?php foreach ($LABELS as $k => $lbl):
                 $cur = $res['metrics'][$k] ?? array();

@@ -26,7 +26,12 @@ include '../insidebar.php';
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-university"></i> الموازنةُ العامة — <?= $year ?></h4></div>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الإدارة</th><th>ميزانيات</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th></tr></thead>
+    <thead><tr><th>الإدارة</th><th>ميزانيات</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              </tr></thead>
     <tbody>
     <?php foreach ($rows as $b): $var = floatval($b['actual']) - floatval($b['planned']); ?>
       <tr><td><?= htmlspecialchars($b['dept_module'], ENT_QUOTES, 'UTF-8') ?></td>
