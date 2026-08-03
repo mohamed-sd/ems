@@ -517,17 +517,30 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     function toggleGroup(g) {
       var head = g.querySelector('.nav-group-head');
       var open = !g.classList.contains('open');
+      // أكورديون (قرار المالك 2026-08-02): مجموعةٌ واحدةٌ مفتوحةٌ لا غير —
+      // فتحُ واحدةٍ يطوي سواها، والقائمةُ تبقى بسيطةً مهما طالت.
+      if (open) {
+        groups.forEach(function (other) {
+          if (other === g) return;
+          if (other.classList.contains('open')) {
+            other.classList.remove('open');
+            var oh = other.querySelector('.nav-group-head');
+            if (oh) oh.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
       g.classList.toggle('open', open);
       if (head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
       writeOpen(currentOpenKeys());
       return open;
     }
 
-    // استرجاع حالة الطيّ المحفوظة (أول زيارةٍ على الإطلاق = لا شيء = الكل مطويّ)
+    // الاسترجاع (قرار المالك 2026-08-02): أولُ زيارةٍ = الكلُّ مطويٌّ ·
+    // والعائدُ يجد آخرَ مجموعةٍ فتحها وحدَها (أكورديون — واحدةٌ على الأكثر)
     var saved = readOpen();
+    var restoreKey = saved.length ? saved[saved.length - 1] : null;
     groups.forEach(function (g) {
-      // NAV-09 حكم ١٣: المراحلُ الموسومةُ data-default-open تبقى مفتوحةً افتراضًا
-      if (saved.indexOf(g.getAttribute('data-group-key')) !== -1 || g.hasAttribute('data-default-open')) {
+      if (restoreKey !== null && g.getAttribute('data-group-key') === restoreKey) {
         g.classList.add('open');
         var h = g.querySelector('.nav-group-head');
         if (h) h.setAttribute('aria-expanded', 'true');
