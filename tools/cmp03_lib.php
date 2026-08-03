@@ -95,7 +95,7 @@ function cmp03_doc_screens($ROOT, $onlySheet = null) {
 
 function cmp03_file_map($conn) {
     $map = array();
-    $r = mysqli_query($conn, "SELECT canonical_file, state, real_path FROM nav09_file_map");
+    $r = mysqli_query($conn, "SELECT canonical_file, state, real_path, note FROM nav09_file_map");
     while ($x = mysqli_fetch_assoc($r)) { $map[$x['canonical_file']] = $x; }
     return $map;
 }

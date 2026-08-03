@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-03 22:03:20
--- الجداول: 380 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-03 22:27:32
+-- الجداول: 381 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -982,6 +982,22 @@ CREATE TABLE `clients` (
   KEY `idx_client_name` (`client_name`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
+
+-- ── Table: cmp03_screen_rows ──
+CREATE TABLE `cmp03_screen_rows` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد',
+  `company_id` int NOT NULL COMMENT 'الكيان المالك — عزل المستأجر',
+  `canonical_file` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الشاشة القانونية (nav09_file_map)',
+  `payload` json NOT NULL COMMENT 'قيم الأعمدة معنونةً بأسماء المستند الحرفية',
+  `status` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'مسودة' COMMENT 'الحالة',
+  `is_seed` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'صف بذرة تجريبية (يعاد بذره بأمان)',
+  `created_by` int DEFAULT NULL COMMENT 'المنشئ users.id',
+  `created_by_name` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم المنشئ وصفته لحظة الإدخال',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'لحظة الإنشاء',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `ix_cmp03_screen` (`company_id`,`canonical_file`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03: صفوف الشاشات الوليدة حتى تولد جداولها الأصلية';
 
 -- ── Table: commercial_risks ──
 CREATE TABLE `commercial_risks` (
