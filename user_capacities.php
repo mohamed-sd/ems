@@ -175,6 +175,13 @@ include 'insidebar.php';
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr><th>#</th><th>كود الحساب</th><th>الشخص</th><th>الصفة</th><th>الدور</th>
                 <th>النطاق</th><th>المصدر</th><th>الحال</th><th>تجميد</th>
+                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                <th class="ems-fn-th" data-fn="1">الإدارة</th>
+                <th class="ems-fn-th" data-fn="1">سقف الاعتماد</th>
+                <th class="ems-fn-th" data-fn="1">من تاريخ</th>
+                <th class="ems-fn-th" data-fn="1">إلى تاريخ</th>
+                <th class="ems-fn-th" data-fn="1">الصفة النشطة الآن</th>
+                <th class="ems-fn-th" data-fn="1">آخر تبديل</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -183,7 +190,7 @@ include 'insidebar.php';
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
                 <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
-                <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>
             <?php foreach ($allCaps as $c): ?>

@@ -261,16 +261,28 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المستلِم</th><th>تاريخ الصرف</th><th>المورد</th>
                     <th>موقع الاستلام</th><th>الوجهة</th><th>الحالة</th><th>عدد الأصناف</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">رقم العهدة</th>
+                    <th class="ems-fn-th" data-fn="1">سند الصرف</th>
+                    <th class="ems-fn-th" data-fn="1">الصفة</th>
+                    <th class="ems-fn-th" data-fn="1">الصنف</th>
+                    <th class="ems-fn-th" data-fn="1">الكمية المصروفة</th>
+                    <th class="ems-fn-th" data-fn="1">الكمية المستهلكة</th>
+                    <th class="ems-fn-th" data-fn="1">الكمية المرتجعة</th>
+                    <th class="ems-fn-th" data-fn="1">تاريخ الإرجاع</th>
+                    <th class="ems-fn-th" data-fn="1">حالة المرتجع</th>
+                    <th class="ems-fn-th" data-fn="1">قرار المرتجع</th>
+                    <th class="ems-fn-th" data-fn="1">المتبقي في العهدة</th>
+                    <th class="ems-fn-th" data-fn="1">المسؤول</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                    <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     </tr></thead>
                 <tbody>
                     <?php

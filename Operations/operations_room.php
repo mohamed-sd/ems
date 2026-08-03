@@ -62,6 +62,16 @@ include '../insidebar.php';
         <?php if (!$sites): ems_state_empty('لا مواقعَ نشطةً في آخر أسبوعين', 'افتح التايم شيت', '?tab=2'); else: ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>الموقع</th><th>رفعُ اليوم</th><th>آخرُ تحديث</th><th></th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">المشروع</th>
+              <th class="ems-fn-th" data-fn="1">المعدات المخططة</th>
+              <th class="ems-fn-th" data-fn="1">المعدات العاملة</th>
+              <th class="ems-fn-th" data-fn="1">المتوقفة</th>
+              <th class="ems-fn-th" data-fn="1">نسبة التشغيل</th>
+              <th class="ems-fn-th" data-fn="1">الإنتاج اليوم</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الإنجاز من الخطة</th>
+              <th class="ems-fn-th" data-fn="1">وحدات لم تُرفع</th>
+              <th class="ems-fn-th" data-fn="1">بلاغات مفتوحة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>

@@ -66,19 +66,46 @@ include '../insidebar.php';
         <?php if (!$grid): ems_state_empty('لا توزيعَ لهذا اليوم', 'افتح إدخال الوحدات', 'units.php'); else: ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>الوردية</th><th>☀ نهارية</th><th>🌙 ليلية</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم التكليف</th>
+              <th class="ems-fn-th" data-fn="1">كود المشغّل</th>
+              <th class="ems-fn-th" data-fn="1">كود المعدة</th>
+              <th class="ems-fn-th" data-fn="1">الوحدة التعاقدية</th>
+              <th class="ems-fn-th" data-fn="1">من الموقع</th>
+              <th class="ems-fn-th" data-fn="1">التاريخ</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
+              <th class="ems-fn-th" data-fn="1">عدد الأيام</th>
+              <th class="ems-fn-th" data-fn="1">سبب الإنهاء</th>
+              <th class="ems-fn-th" data-fn="1">المشغّل البديل</th>
+              <th class="ems-fn-th" data-fn="1">فحص التأهيل</th>
+              <th class="ems-fn-th" data-fn="1">فحص الرخصة</th>
+              <th class="ems-fn-th" data-fn="1">كلّفه</th>
+              <th class="ems-fn-th" data-fn="1">وافق عليه</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الأمر</th>
+              <th class="ems-fn-th" data-fn="1">إلى الموقع</th>
+              <th class="ems-fn-th" data-fn="1">نوع المورد</th>
+              <th class="ems-fn-th" data-fn="1">كود المورد</th>
+              <th class="ems-fn-th" data-fn="1">اسم المورد</th>
+              <th class="ems-fn-th none" data-fn="1">سبب النقل</th>
+              <th class="ems-fn-th none" data-fn="1">أمر الترحيل المرتبط</th>
+              <th class="ems-fn-th none" data-fn="1">موافقة القوى</th>
+              <th class="ems-fn-th none" data-fn="1">موافقة الموقع المصدر</th>
+              <th class="ems-fn-th none" data-fn="1">أصدره</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ التنفيذ</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
-              <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
             <tbody>
             <?php foreach ($grid as $eqId => $row): ?>

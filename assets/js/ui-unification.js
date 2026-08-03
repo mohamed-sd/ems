@@ -193,7 +193,8 @@
         var govIdx = [];
         for (var i = 0; i < headerRow.cells.length; i++) {
             if ((headerRow.cells[i].colSpan || 1) !== 1) return; // ترويسة مجمّعة — لا نتدخل
-            if (headerRow.cells[i].hasAttribute('data-gov')) govIdx.push(i);
+            // الحوكمة (الموجة ②) والوظيفي المحقون (الموجة ⑤) كلاهما يُحشى
+            if (headerRow.cells[i].hasAttribute('data-gov') || headerRow.cells[i].hasAttribute('data-fn')) govIdx.push(i);
         }
         if (!govIdx.length) return;
         var expected = headerRow.cells.length;
@@ -229,12 +230,112 @@
         });
     }
 
+    /* ── CMP-03 توصية المالك ①: طي الأعمدة المحقونة فوق 22 ─────────────
+       الرؤوس المحقونة الفائضة تحمل class="none":
+       - جدول DataTables بإضافة Responsive الحية → Responsive نفسها تطويها
+         لسطرٍ تابعٍ (زر التوسيع أول الصف) — لا نتدخل.
+       - جدول DataTables بلا Responsive (تهيئة ذاتية قديمة) → نطويها عبر
+         column().visible(false) ونضع زرَّ «الأعمدة المطوية» فوق الجدول.
+       - جدول ساكن → نطويها بصنف CSS وبالزر نفسه. */
+    function collapseInjectedOverflow(tableEl) {
+        var overs = tableEl.querySelectorAll('th.none[data-gov], th.none[data-fn]');
+        if (!overs.length) return;
+        var $ = window.jQuery;
+        var isDT = $ && $.fn && $.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable(tableEl);
+        if (isDT) {
+            var api = $(tableEl).DataTable();
+            if (api.responsive) { tableEl.dataset.emsXcol = 'responsive'; return; }
+            if (tableEl.dataset.emsXcol === 'api') return;
+            tableEl.dataset.emsXcol = 'api';
+            /* الفهارس لا العقد: column().visible(false) ينزع الرأس من الـDOM
+               فتموت العقدة المخزنة — الفهرس ثابت في نموذج DataTables */
+            var idxs = [];
+            var headerRow = overs[0].parentNode;
+            Array.prototype.forEach.call(overs, function (th) {
+                idxs.push(Array.prototype.indexOf.call(headerRow.cells, th));
+            });
+            tableEl.dataset.emsXcolIdxs = idxs.join(',');
+            idxs.forEach(function (i) { try { api.column(i).visible(false, false); } catch (e) {} });
+            try { api.columns.adjust(); } catch (e) {}
+            ensureOverflowToggle(tableEl, overs.length);
+        } else {
+            if (tableEl.dataset.emsXcol) return;
+            tableEl.dataset.emsXcol = 'css';
+            cssToggleOverflow(tableEl, overs, false);
+            ensureOverflowToggle(tableEl, overs.length);
+        }
+    }
+
+    function cssToggleOverflow(tableEl, overs, show) {
+        var headerRow = overs[0].parentNode;
+        var idxs = Array.prototype.map.call(overs, function (th) {
+            return Array.prototype.indexOf.call(headerRow.cells, th);
+        });
+        Array.prototype.forEach.call(overs, function (th) { th.classList.toggle('ems-xcol-off', !show); });
+        var sections = Array.prototype.slice.call(tableEl.tBodies);
+        if (tableEl.tFoot) sections.push(tableEl.tFoot);
+        sections.forEach(function (section) {
+            for (var r = 0; r < section.rows.length; r++) {
+                var row = section.rows[r];
+                if (row.cells.length !== headerRow.cells.length) continue;
+                idxs.forEach(function (i) { row.cells[i].classList.toggle('ems-xcol-off', !show); });
+            }
+        });
+    }
+
+    function xcolLabel(btn, shown, count) {
+        btn.innerHTML = '<i class="fa fa-columns"></i> ' +
+            (shown ? 'طيّ الأعمدة الإضافية' : 'الأعمدة المطوية (' + count + ')');
+    }
+
+    function ensureOverflowToggle(tableEl, count) {
+        if (tableEl.dataset.emsXcolBtn) return;
+        tableEl.dataset.emsXcolBtn = '1';
+        var host = tableEl.parentNode;
+        var wrapper = window.jQuery ? window.jQuery(tableEl).closest('.dataTables_wrapper')[0] : null;
+        if (wrapper) host = wrapper.parentNode;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ems-xcol-toggle';
+        btn.dataset.emsXcolCount = String(count);
+        btn.__emsXcolTable = tableEl; // ربط مباشر — التفويض يقرأه
+        xcolLabel(btn, false, count);
+        host.insertBefore(btn, wrapper || tableEl);
+    }
+
+    /* تفويض على الوثيقة: يصمد أمام أي إعادة رسمٍ أو التصاق مستمعين */
+    document.addEventListener('click', function (ev) {
+        var btn = ev.target && ev.target.closest ? ev.target.closest('.ems-xcol-toggle') : null;
+        if (!btn) return;
+        ev.preventDefault();
+        var tableEl = btn.__emsXcolTable;
+        if (!tableEl) return;
+        var count = parseInt(btn.dataset.emsXcolCount || '0', 10);
+        var shown = btn.dataset.emsXcolShown === '1';
+        shown = !shown;
+        btn.dataset.emsXcolShown = shown ? '1' : '0';
+        if (tableEl.dataset.emsXcol === 'api' && window.jQuery && window.jQuery.fn.dataTable &&
+            window.jQuery.fn.dataTable.isDataTable(tableEl)) {
+            var api = window.jQuery(tableEl).DataTable();
+            (tableEl.dataset.emsXcolIdxs || '').split(',').forEach(function (s) {
+                if (s === '') return;
+                try { api.column(parseInt(s, 10)).visible(shown, false); } catch (e) {}
+            });
+            try { api.columns.adjust(); } catch (e) {}
+        } else {
+            var overs = tableEl.querySelectorAll('th.none[data-gov], th.none[data-fn]');
+            cssToggleOverflow(tableEl, overs, shown);
+        }
+        xcolLabel(btn, shown, count);
+    }, true);
+
     function normalizeAllTables() {
         document.querySelectorAll('table').forEach(function (tableEl) {
             ensureUnifiedTableClass(tableEl);
             normalizeSortableHeaders(tableEl);
             normalizeTableSemanticCells(tableEl);
             try { padGovernanceCells(tableEl); } catch (eGov) { /* لا يعطل التوحيد */ }
+            try { collapseInjectedOverflow(tableEl); } catch (eXc) { /* لا يعطل التوحيد */ }
         });
     }
 
@@ -342,7 +443,12 @@
         var dtSrc = '/ems/assets/vendor/datatables/js/jquery.dataTables.min.js';
         var dtResponsiveSrc = '/ems/assets/vendor/datatables/js/dataTables.responsive.min.js';
         var loadDataTables = function () {
-            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) { done(); return; }
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
+                // CMP-03 ①(توصية): صفحةٌ حمّلت DataTables بنفسها بلا إضافة Responsive —
+                // نحمّلها كي يعمل انهيارُ class="none" لسطرٍ تابعٍ في الجداول المهيأة لاحقًا.
+                if (!window.jQuery.fn.dataTable.Responsive) { loadScriptOnce(dtResponsiveSrc, done); return; }
+                done(); return;
+            }
             loadScriptOnce(dtSrc, function () { loadScriptOnce(dtResponsiveSrc, done); });
         };
         if (!window.jQuery) { loadScriptOnce(jquerySrc, loadDataTables); return; }

@@ -77,16 +77,32 @@ include '../insidebar.php';
   <?php if ($rfq > 0): ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>المورد</th><th>سعرُ الوحدة</th><th>الكمية</th><th>جاهزية (يوم)</th><th>تقييمُ السجل</th><th>ملاحظة</th><th>ترسية</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الإرسال</th>
+              <th class="ems-fn-th" data-fn="1">مرجع طلب الشراء</th>
+              <th class="ems-fn-th" data-fn="1">الأصناف</th>
+              <th class="ems-fn-th" data-fn="1">الموردون المدعوون</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ إقفال العروض</th>
+              <th class="ems-fn-th" data-fn="1">الإجمالي</th>
+              <th class="ems-fn-th" data-fn="1">مدة التوريد</th>
+              <th class="ems-fn-th" data-fn="1">شروط الدفع</th>
+              <th class="ems-fn-th" data-fn="1">التقييم الفني</th>
+              <th class="ems-fn-th" data-fn="1">الترتيب</th>
+              <th class="ems-fn-th" data-fn="1">القرار</th>
+              <th class="ems-fn-th" data-fn="1">مبرر الاختيار</th>
+              <th class="ems-fn-th" data-fn="1">أعدّه</th>
+              <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
     <?php if (empty($quotes)): ?><tr><td colspan="7" class="text-center text-muted">لا عروضَ مقدَّمةً لهذا الطلب</td></tr><?php endif; ?>

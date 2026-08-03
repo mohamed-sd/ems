@@ -239,7 +239,15 @@ include '../insidebar.php';
                     <th>الصاحب</th><th>نوع الوثيقة</th><th>رقم الوثيقة</th><th>الجهة المصدِرة</th>
                     <th>تاريخ الانتهاء</th><th>الوضع الفعلي</th><th>الحالة</th>
                     <?php if ($can_edit) echo '<th>إجراء</th>'; ?>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">كود المعدة أو المشغّل</th>
+                    <th class="ems-fn-th" data-fn="1">الرقم أو المرجع</th>
+                    <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
+                    <th class="ems-fn-th" data-fn="1">المدة المتبقية بالأيام</th>
+                    <th class="ems-fn-th" data-fn="1">وثيقة حرجة؟</th>
+                    <th class="ems-fn-th" data-fn="1">أثر الانتهاء</th>
+                    <th class="ems-fn-th" data-fn="1">التنبيه قبل بالأيام</th>
+                    <th class="ems-fn-th" data-fn="1">المسؤول</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -247,7 +255,7 @@ include '../insidebar.php';
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                    <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     </tr></thead>
                 <tbody>
                 <?php foreach ($docs as $d) {

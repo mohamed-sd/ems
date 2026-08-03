@@ -35,20 +35,36 @@ include '../insidebar.php';
   <p class="text-muted" style="font-size:.9em">كلُّ خصمٍ بمصدره (M-11: لا خصمَ بلا مستند) — والاعتمادُ من صندوق الاعتماد الجامع لا من هنا.</p>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>#</th><th>الطرف</th><th>نوع الخصم</th><th>المبلغ</th><th>المصدرُ المستندي</th><th>منذ</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الاقتراح</th>
+              <th class="ems-fn-th" data-fn="1">كود المشغّل</th>
+              <th class="ems-fn-th" data-fn="1">الشهر</th>
+              <th class="ems-fn-th" data-fn="1">سبب الخصم</th>
+              <th class="ems-fn-th" data-fn="1">المستند المؤيد</th>
+              <th class="ems-fn-th" data-fn="1">أيام أو ساعات</th>
+              <th class="ems-fn-th" data-fn="1">معادلة الاحتساب</th>
+              <th class="ems-fn-th" data-fn="1">قيمة الخصم</th>
+              <th class="ems-fn-th" data-fn="1">نسبة من الصافي</th>
+              <th class="ems-fn-th" data-fn="1">اقترحه</th>
+              <th class="ems-fn-th" data-fn="1">راجعته الموارد</th>
+              <th class="ems-fn-th" data-fn="1">اعتماد الإدارة</th>
+              <th class="ems-fn-th" data-fn="1">الاعتماد المالي</th>
+              <th class="ems-fn-th" data-fn="1">المسيّر المرحَّل إليه</th>
+              <th class="ems-fn-th" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
-              <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center" style="color:#198754">✔ صفرُ خصمٍ معلَّقٍ بلا قرار</td></tr><?php endif; ?>

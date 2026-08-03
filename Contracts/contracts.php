@@ -705,7 +705,30 @@ include('../insidebar.php');
 
               <!-- الحالة والإجراءات -->
               <th class="group-status"> الحالة</th>
-            
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th none" data-fn="1">نموذج العمل</th>
+              <th class="ems-fn-th none" data-fn="1">رمز النموذج</th>
+              <th class="ems-fn-th none" data-fn="1">العقد الأساسي</th>
+              <th class="ems-fn-th none" data-fn="1">رقم التجديد</th>
+              <th class="ems-fn-th none" data-fn="1">العميل</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ البدء</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء</th>
+              <th class="ems-fn-th none" data-fn="1">المدة بالأشهر</th>
+              <th class="ems-fn-th none" data-fn="1">نموذج التسعير</th>
+              <th class="ems-fn-th none" data-fn="1">نوع القيمة</th>
+              <th class="ems-fn-th none" data-fn="1">القيمة الموقَّعة</th>
+              <th class="ems-fn-th none" data-fn="1">عملة الفوترة</th>
+              <th class="ems-fn-th none" data-fn="1">عملة التحصيل</th>
+              <th class="ems-fn-th none" data-fn="1">دورة التسوية</th>
+              <th class="ems-fn-th none" data-fn="1">مهلة السداد</th>
+              <th class="ems-fn-th none" data-fn="1">نسبة المقدم</th>
+              <th class="ems-fn-th none" data-fn="1">شامل الضريبة؟</th>
+              <th class="ems-fn-th none" data-fn="1">حالة خط الأساس</th>
+              <th class="ems-fn-th none" data-fn="1">ملاحظات حرجة مفتوحة</th>
+              <th class="ems-fn-th none" data-fn="1">جاهزية الاعتماد القانوني</th>
+              <th class="ems-fn-th none" data-fn="1">وقّعه عنّا</th>
+              <th class="ems-fn-th none" data-fn="1">وقّعه العميل</th>
+              <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

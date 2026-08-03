@@ -94,7 +94,18 @@ include '../insidebar.php';
     <thead><tr>
       <th>رقم البلاغ</th><th>حالة المسار</th><th>الوصف</th><th>الحالة</th>
       <th>المكلَّف</th><th>مهلةُ الإنجاز</th><th>إلزامي؟</th>
-    
+      <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+      <th class="ems-fn-th" data-fn="1">تاريخ الفتح</th>
+      <th class="ems-fn-th" data-fn="1">الفئة</th>
+      <th class="ems-fn-th" data-fn="1">النوع</th>
+      <th class="ems-fn-th" data-fn="1">الأولوية</th>
+      <th class="ems-fn-th" data-fn="1">الموقع</th>
+      <th class="ems-fn-th" data-fn="1">المعدة</th>
+      <th class="ems-fn-th" data-fn="1">المبلِّغ</th>
+      <th class="ems-fn-th" data-fn="1">مهلة الاستجابة</th>
+      <th class="ems-fn-th" data-fn="1">تاريخ الاستلام</th>
+      <th class="ems-fn-th" data-fn="1">المتبقي</th>
+      <th class="ems-fn-th" data-fn="1">سبب التعليق</th>
       <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
       <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
       </tr></thead>

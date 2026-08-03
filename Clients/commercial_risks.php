@@ -567,7 +567,15 @@ function risk_entity_label($type, $map)
                             <th>الحالة</th>
                             <th>الارتباط</th>
                             <th>المسؤول</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">رقم الخطر</th>
+                            <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
+                            <th class="ems-fn-th" data-fn="1">العقد</th>
+                            <th class="ems-fn-th" data-fn="1">الاحتمال</th>
+                            <th class="ems-fn-th" data-fn="1">الأثر المالي المقدَّر</th>
+                            <th class="ems-fn-th" data-fn="1">خطة المعالجة</th>
+                            <th class="ems-fn-th" data-fn="1">تاريخ المراجعة</th>
+                            <th class="ems-fn-th" data-fn="1">حالة المعالجة</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -575,9 +583,9 @@ function risk_entity_label($type, $map)
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-                            <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                            <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                             </tr>
                     </thead>
                     <tbody>

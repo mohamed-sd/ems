@@ -109,6 +109,18 @@ include '../insidebar.php';
     <div class="card"><div class="card-body"><div class="table-container">
         <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
             <thead><tr><th>الإجراءات</th><th>المستوى قبل</th><th>الاسم</th><th>بعد (ساعات)</th><th>الجهة</th><th>القناة</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم التصعيد</th>
+              <th class="ems-fn-th" data-fn="1">البلاغ</th>
+              <th class="ems-fn-th" data-fn="1">المهلة المتجاوزة</th>
+              <th class="ems-fn-th" data-fn="1">المستوى بعد</th>
+              <th class="ems-fn-th" data-fn="1">المصعَّد إليه</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التصعيد</th>
+              <th class="ems-fn-th" data-fn="1">مدة التجاوز</th>
+              <th class="ems-fn-th" data-fn="1">المالك الأصلي</th>
+              <th class="ems-fn-th" data-fn="1">هل بقي مسؤولًا؟</th>
+              <th class="ems-fn-th" data-fn="1">الإجراء المتخذ</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ رفع التصعيد</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>

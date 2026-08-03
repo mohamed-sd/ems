@@ -41,20 +41,53 @@ include '../insidebar.php';
   <p class="text-muted" style="font-size:.9em">المستهلَكُ محسوبٌ من دفتر القدرات لا من عمودٍ مخزَّن — والتغطيةُ الاستثنائيةُ بندٌ لا يرفع الحصة (CAP-01 §7).</p>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>المورد</th><th>نسبة الحصة من الالتزام</th><th>المستهلَك (الدفتر)</th><th>التنفيذ ٪</th><th>تغطيةٌ أعطاها</th><th>الفجوة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الحصة</th>
+              <th class="ems-fn-th" data-fn="1">العقد</th>
+              <th class="ems-fn-th" data-fn="1">نموذج العمل</th>
+              <th class="ems-fn-th" data-fn="1">وحدة العمل</th>
+              <th class="ems-fn-th" data-fn="1">نوع المعدة</th>
+              <th class="ems-fn-th" data-fn="1">الحصة المخصَّصة (وحدات)</th>
+              <th class="ems-fn-th" data-fn="1">حصة المبيعات لهذا النوع</th>
+              <th class="ems-fn-th" data-fn="1">مجموع حصص الموردين لهذا النوع</th>
+              <th class="ems-fn-th" data-fn="1">المتبقي من حصة المبيعات</th>
+              <th class="ems-fn-th" data-fn="1">معدات أساسية</th>
+              <th class="ems-fn-th" data-fn="1">معدات احتياطية</th>
+              <th class="ems-fn-th" data-fn="1">الموزَّع على المعدات</th>
+              <th class="ems-fn-th" data-fn="1">غير الموزَّع</th>
+              <th class="ems-fn-th" data-fn="1">الساعات المشتقة من عقد العميل (محسوبة)</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الانتهاء</th>
+              <th class="ems-fn-th none" data-fn="1">حالة الحصة</th>
+              <th class="ems-fn-th none" data-fn="1">مرجع العقد أو الملحق</th>
+              <th class="ems-fn-th none" data-fn="1">مرجع الترسية</th>
+              <th class="ems-fn-th none" data-fn="1">خصّصها</th>
+              <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th none" data-fn="1">رقم السطر</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ القيد</th>
+              <th class="ems-fn-th none" data-fn="1">الحصة المرجعية</th>
+              <th class="ems-fn-th none" data-fn="1">الوحدة التعاقدية</th>
+              <th class="ems-fn-th none" data-fn="1">المعدة</th>
+              <th class="ems-fn-th none" data-fn="1">الفترة</th>
+              <th class="ems-fn-th none" data-fn="1">الساعات المستهلكة</th>
+              <th class="ems-fn-th none" data-fn="1">الرصيد قبل</th>
+              <th class="ems-fn-th none" data-fn="1">الرصيد بعد</th>
+              <th class="ems-fn-th none" data-fn="1">المستند المصدر</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
-              <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center text-muted">لا حصصَ موزَّعة</td></tr><?php endif; ?>

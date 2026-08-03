@@ -55,7 +55,13 @@ include('../insidebar.php');
                     <tr>
                         <th>رقم الطلب</th><th>نوع الطلب</th><th>المبرّر</th><th>المستفيد</th>
                         <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>أُنشئ</th><th></th>
-                    
+                        <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                        <th class="ems-fn-th" data-fn="1">تاريخ الطلب</th>
+                        <th class="ems-fn-th" data-fn="1">مقدّم الطلب</th>
+                        <th class="ems-fn-th" data-fn="1">الإدارة</th>
+                        <th class="ems-fn-th" data-fn="1">الوصف</th>
+                        <th class="ems-fn-th" data-fn="1">الجهة المعنية</th>
+                        <th class="ems-fn-th" data-fn="1">سبب الرفض</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                         <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -64,7 +70,7 @@ include('../insidebar.php');
                         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
                         <th class="ems-gov-th" data-gov="required_approver" data-slice="1" title="من يلزم اعتماده بحسب سلسلة الاعتماد">المعتمِد المطلوب</th>
-                        <th class="ems-gov-th" data-gov="attachments" data-slice="3" title="مرفقات الإثبات">المرفقات</th>
+                        <th class="ems-gov-th none" data-gov="attachments" data-slice="3" title="مرفقات الإثبات">المرفقات</th>
                         </tr>
                 </thead>
                 <tbody>

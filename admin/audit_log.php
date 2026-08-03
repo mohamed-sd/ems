@@ -135,7 +135,19 @@ require_once __DIR__ . '/includes/layout_head.php';
                     <th>العنصر المستهدف</th>
                     <th>الوصف</th>
                     <th>عنوان IP</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">رقم المحاولة</th>
+                    <th class="ems-fn-th" data-fn="1">المستخدم</th>
+                    <th class="ems-fn-th" data-fn="1">الصفة</th>
+                    <th class="ems-fn-th" data-fn="1">الشاشة</th>
+                    <th class="ems-fn-th" data-fn="1">الفعل المحاول</th>
+                    <th class="ems-fn-th" data-fn="1">الحارس المانع</th>
+                    <th class="ems-fn-th" data-fn="1">سبب المنع</th>
+                    <th class="ems-fn-th" data-fn="1">رمز الاستجابة</th>
+                    <th class="ems-fn-th" data-fn="1">تكرار المحاولة</th>
+                    <th class="ems-fn-th" data-fn="1">هل طُلب استثناء؟</th>
+                    <th class="ems-fn-th" data-fn="1">رقم الاستثناء</th>
+                    <th class="ems-fn-th" data-fn="1">إجراء الحوكمة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>

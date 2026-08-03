@@ -166,7 +166,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <th>كود النوع</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">اسم النوع</th>
+                            <th class="ems-fn-th" data-fn="1">وحدة العدّاد</th>
+                            <th class="ems-fn-th" data-fn="1">وحدة الإنتاج</th>
+                            <th class="ems-fn-th" data-fn="1">يحتاج مشغّلًا؟</th>
+                            <th class="ems-fn-th" data-fn="1">يحتاج تأهيلًا؟</th>
+                            <th class="ems-fn-th" data-fn="1">فئة الرخصة المطلوبة</th>
+                            <th class="ems-fn-th" data-fn="1">العمر الإنتاجي القياسي</th>
+                            <th class="ems-fn-th" data-fn="1">دورية الوقائية القياسية</th>
+                            <th class="ems-fn-th" data-fn="1">يُستعمل في بنود العقد؟</th>
+                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             </tr>

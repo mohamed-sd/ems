@@ -106,6 +106,9 @@ function cmp03_judge($docCols, $heads) {
     foreach (cmp03_gov_labels() as $g) { $govNorm[cmp03_norm($g)] = 1; }
     foreach (cmp03_ui_cols() as $u) { unset($heads[cmp03_norm($u)]); }
     $docN = array(); foreach ($docCols as $c) { $docN[cmp03_norm($c)] = $c; }
+    /* استبعاد أعمدة الواجهة متناظرٌ (منهج 99): ما استُبعد من النظام يُستبعد من
+       المستند — وإلا بقي «الإجراء» ناقصًا لا يُصفَّر أبدًا (اجتهاد J-05) */
+    foreach (cmp03_ui_cols() as $u) { unset($docN[cmp03_norm($u)]); }
     $match = array_intersect_key($docN, $heads);
     $docLeft = array_diff_key($docN, $match);
     $sysLeft = array_diff_key($heads, $match);

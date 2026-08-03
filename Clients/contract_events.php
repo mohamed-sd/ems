@@ -509,7 +509,15 @@ function evt_state_tone($state)
                             <th>الطرف</th>
                             <th>تاريخ الحدث</th>
                             <th>الحالة</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">رقم الحدث</th>
+                            <th class="ems-fn-th" data-fn="1">الوصف</th>
+                            <th class="ems-fn-th" data-fn="1">المستند المرجعي</th>
+                            <th class="ems-fn-th" data-fn="1">القيمة المتأثرة</th>
+                            <th class="ems-fn-th" data-fn="1">الحالة قبل</th>
+                            <th class="ems-fn-th" data-fn="1">الحالة بعد</th>
+                            <th class="ems-fn-th" data-fn="1">المستخدم</th>
+                            <th class="ems-fn-th" data-fn="1">الصفة</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

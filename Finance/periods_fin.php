@@ -154,15 +154,30 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr><th>الإجراءات</th><th>السنة</th><th>النوع</th><th>القيود المنشورة</th><th>إلى</th><th>القيد مسموح</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
+              <th class="ems-fn-th" data-fn="1">الفترة</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
+              <th class="ems-fn-th" data-fn="1">الوحدات المعتمدة</th>
+              <th class="ems-fn-th" data-fn="1">الوحدات المعلَّقة</th>
+              <th class="ems-fn-th" data-fn="1">المستخلصات المُصدَرة</th>
+              <th class="ems-fn-th" data-fn="1">الفواتير المُصدَرة</th>
+              <th class="ems-fn-th" data-fn="1">المسيّرات المعتمدة</th>
+              <th class="ems-fn-th" data-fn="1">تسويات الموردين</th>
+              <th class="ems-fn-th" data-fn="1">المطابقات البنكية</th>
+              <th class="ems-fn-th" data-fn="1">بنود لم تُحسم</th>
+              <th class="ems-fn-th" data-fn="1">شرط الإقفال</th>
+              <th class="ems-fn-th" data-fn="1">أقفله</th>
+              <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
                 <tbody>
                 <?php

@@ -940,7 +940,19 @@ include('../insidebar.php');
                                 <th>الشاشة</th>
                                 <th>العنوان</th>
                                 <th>التاريخ والوقت</th>
-                            
+                                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                                <th class="ems-fn-th" data-fn="1">كود الموظف</th>
+                                <th class="ems-fn-th" data-fn="1">الاسم</th>
+                                <th class="ems-fn-th" data-fn="1">رقم الهوية</th>
+                                <th class="ems-fn-th" data-fn="1">تاريخ الميلاد</th>
+                                <th class="ems-fn-th" data-fn="1">الهاتف</th>
+                                <th class="ems-fn-th" data-fn="1">البريد</th>
+                                <th class="ems-fn-th" data-fn="1">حالة اجتماعية</th>
+                                <th class="ems-fn-th" data-fn="1">المستفيدون</th>
+                                <th class="ems-fn-th" data-fn="1">الحساب البنكي</th>
+                                <th class="ems-fn-th" data-fn="1">الوثائق المرفقة</th>
+                                <th class="ems-fn-th" data-fn="1">تاريخ آخر تحديث</th>
+                                <th class="ems-fn-th" data-fn="1">حقول تحتاج اعتمادًا</th>
                                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                                 <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>

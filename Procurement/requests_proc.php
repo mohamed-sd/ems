@@ -325,16 +325,30 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>مصدر الاحتياج</th><th>التصنيف التشغيلي</th><th>الأولوية</th>
                     <th>الحالة</th><th>الاعتماد المالي</th><th>عدد الأصناف</th><th>أُنشئ</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
+                    <th class="ems-fn-th" data-fn="1">تاريخ الطلب</th>
+                    <th class="ems-fn-th" data-fn="1">الإدارة الطالبة</th>
+                    <th class="ems-fn-th" data-fn="1">المرجع</th>
+                    <th class="ems-fn-th" data-fn="1">المعدة أو المشروع</th>
+                    <th class="ems-fn-th" data-fn="1">رقم الصنف</th>
+                    <th class="ems-fn-th" data-fn="1">اسم الصنف</th>
+                    <th class="ems-fn-th" data-fn="1">الكمية</th>
+                    <th class="ems-fn-th" data-fn="1">الوحدة</th>
+                    <th class="ems-fn-th" data-fn="1">القيمة التقديرية</th>
+                    <th class="ems-fn-th" data-fn="1">بند الموازنة</th>
+                    <th class="ems-fn-th" data-fn="1">المتاح في الموازنة</th>
+                    <th class="ems-fn-th" data-fn="1">قدّمه</th>
+                    <th class="ems-fn-th none" data-fn="1">اعتماد الإدارة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-                    <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-                    <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                    <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                    <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                    <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                    <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                    <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                     </tr></thead>
                 <tbody>
                     <?php

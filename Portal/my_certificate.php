@@ -123,6 +123,17 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>رقم الشهادة</th><th>الفترة</th><th>رمز التحقق</th><th>أُصدرت</th><th></th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الموظف</th>
+              <th class="ems-fn-th" data-fn="1">الإدارة</th>
+              <th class="ems-fn-th" data-fn="1">المهام المنجزة</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الالتزام بالمهل</th>
+              <th class="ems-fn-th" data-fn="1">ساعات العمل</th>
+              <th class="ems-fn-th" data-fn="1">الإنتاج المنسوب</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الإنجاز</th>
+              <th class="ems-fn-th" data-fn="1">الترتيب</th>
+              <th class="ems-fn-th" data-fn="1">أصدرها</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -131,7 +142,7 @@ include '../insidebar.php';
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
             <tbody>
             <?php foreach ($certs as $c): ?>

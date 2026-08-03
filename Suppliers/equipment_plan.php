@@ -46,17 +46,44 @@ include '../insidebar.php';
   <?php if ($sup > 0): ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>المشروع</th><th>المقعد</th><th>نوع المعدة</th><th>دور المعدة</th><th>الطاقة</th><th>السريان</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الخطة</th>
+              <th class="ems-fn-th" data-fn="1">المورد</th>
+              <th class="ems-fn-th" data-fn="1">العقد</th>
+              <th class="ems-fn-th" data-fn="1">العدد المتعهَّد</th>
+              <th class="ems-fn-th" data-fn="1">الموديل المتوقع</th>
+              <th class="ems-fn-th" data-fn="1">سنة الصنع الدنيا</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الجاهزية المتعهَّد</th>
+              <th class="ems-fn-th" data-fn="1">الوصول الفعلي</th>
+              <th class="ems-fn-th" data-fn="1">التأخر بالأيام</th>
+              <th class="ems-fn-th" data-fn="1">جزاء التأخر</th>
+              <th class="ems-fn-th" data-fn="1">سقف الاحتياطي المسموح</th>
+              <th class="ems-fn-th" data-fn="1">كود المعدة</th>
+              <th class="ems-fn-th" data-fn="1">المورد المتعاقد معه</th>
+              <th class="ems-fn-th" data-fn="1">المالك الحقيقي</th>
+              <th class="ems-fn-th" data-fn="1">علاقة المورد بالمالك</th>
+              <th class="ems-fn-th none" data-fn="1">الموديل</th>
+              <th class="ems-fn-th none" data-fn="1">سنة الصنع</th>
+              <th class="ems-fn-th none" data-fn="1">الرقم التسلسلي</th>
+              <th class="ems-fn-th none" data-fn="1">العقد المرتبط</th>
+              <th class="ems-fn-th none" data-fn="1">الوحدة التعاقدية</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ التفعيل</th>
+              <th class="ems-fn-th none" data-fn="1">العدّاد عند التفعيل</th>
+              <th class="ems-fn-th none" data-fn="1">العدّاد الحالي</th>
+              <th class="ems-fn-th none" data-fn="1">حالة الجاهزية</th>
+              <th class="ems-fn-th none" data-fn="1">حق الرجوع</th>
+              <th class="ems-fn-th none" data-fn="1">درجة سرية الملكية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">لا خطةَ معداتٍ لهذا المورد</td></tr><?php endif; ?>

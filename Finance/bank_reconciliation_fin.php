@@ -348,10 +348,23 @@ include '../insidebar.php';
             <thead><tr><th>#</th><th>تاريخ الإقفال</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
                 <th>المرجع</th><th>النظير</th><th>القاعدة</th><th>الفرق</th><th>الحال</th>
                 <?php if ($can_edit) echo '<th>القرار</th>'; ?>
+                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
+                <th class="ems-fn-th" data-fn="1">الشهر</th>
+                <th class="ems-fn-th" data-fn="1">البنك</th>
+                <th class="ems-fn-th" data-fn="1">الرصيد حسب الدفتر</th>
+                <th class="ems-fn-th" data-fn="1">الرصيد حسب الكشف</th>
+                <th class="ems-fn-th" data-fn="1">حركات في الدفتر لم تظهر بالبنك</th>
+                <th class="ems-fn-th" data-fn="1">حركات بالبنك لم تُقيَّد</th>
+                <th class="ems-fn-th" data-fn="1">شيكات معلَّقة</th>
+                <th class="ems-fn-th" data-fn="1">رسوم بنكية غير مقيَّدة</th>
+                <th class="ems-fn-th" data-fn="1">تسويات معتمدة</th>
+                <th class="ems-fn-th" data-fn="1">الرصيد بعد التسوية</th>
+                <th class="ems-fn-th none" data-fn="1">اعتمده</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-                <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                 </tr></thead>
             <tbody>
             <?php foreach ($h13_lines as $l):

@@ -161,6 +161,18 @@ include '../insidebar.php';
         <?php if (!$pcrs) { ems_state_empty('لا طلبات تنتظر — نظيف ✨'); } else { ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>#</th><th>الشخص</th><th>نوع الفحص</th><th>المخاطرة</th><th>السبب</th><th>الباقي</th><th>الحالة</th><th></th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم المراجعة</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ المراجعة</th>
+              <th class="ems-fn-th" data-fn="1">الحساب أو الدور</th>
+              <th class="ems-fn-th" data-fn="1">الواجبان المتعارضان</th>
+              <th class="ems-fn-th" data-fn="1">درجة الخطورة</th>
+              <th class="ems-fn-th" data-fn="1">الاستثناءات القائمة</th>
+              <th class="ems-fn-th" data-fn="1">الإجراء المتخذ</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التنفيذ</th>
+              <th class="ems-fn-th" data-fn="1">المراجع</th>
+              <th class="ems-fn-th" data-fn="1">اعتمده</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ المراجعة القادمة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>

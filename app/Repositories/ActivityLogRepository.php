@@ -334,7 +334,11 @@ class ActivityLogRepository
                     al.record_id,
                     al.response_status,
                     al.http_method,
-                    al.url
+                    al.url,
+                    al.ip_address,
+                    al.session_id,
+                    LEFT(al.old_value, 120) AS old_value_brief,
+                    LEFT(al.new_value, 120) AS new_value_brief
                 FROM activity_logs al
                 LEFT JOIN users u ON u.id = al.user_id
                 LEFT JOIN employees e ON e.id = COALESCE(al.employee_id, u.employee_id)

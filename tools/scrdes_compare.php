@@ -119,6 +119,9 @@ foreach ($screens as $cf => $sc) {
     $T['compared']++;
 
     $docN = array(); foreach ($sc['cols'] as $c) { $docN[$norm($c)] = $c; }
+    /* استبعاد أعمدة الواجهة متناظرٌ: ما استُبعد من النظام يُستبعد من المستند
+       (وإلا بقي «الإجراء» المستندي ناقصًا لا يُصفَّر) — اجتهاد J-05 في CMP03_EXECUTION_LOG */
+    foreach ($UI_COLS as $u) { unset($docN[$norm($u)]); }
     /* ① مطابقٌ حرفي */
     $match = array_intersect_key($docN, $heads);
     $docLeft = array_diff_key($docN, $match);

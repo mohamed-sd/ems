@@ -327,7 +327,14 @@ include '../insidebar.php';
                 <tr>
                     <th>من عملة</th><th>الرمز</th><th>الحالة</th>
                     <th>السعر</th><th>يسري من</th><th>التاريخ</th><th>بانتظار سعر</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">إلى عملة</th>
+                    <th class="ems-fn-th" data-fn="1">مصدر السعر</th>
+                    <th class="ems-fn-th" data-fn="1">نوع السعر</th>
+                    <th class="ems-fn-th" data-fn="1">المستند المرجعي</th>
+                    <th class="ems-fn-th" data-fn="1">اعتمده</th>
+                    <th class="ems-fn-th" data-fn="1">سارٍ من</th>
+                    <th class="ems-fn-th" data-fn="1">سارٍ إلى</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

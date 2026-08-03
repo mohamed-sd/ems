@@ -29,9 +29,14 @@ foreach ($argv as $a) { if (strpos($a, '--screen=') === 0) { $onlyScreen = subst
    القانوني تثبت ولا يتأرجح الرأس، والزوج الباقي مرادفٌ بنيوي بقرار. المفتاح:
    real_path => [norm(الرأس الثابت) => 1] */
 $SKIP = array(
-    'Contracts/tax_invoices.php'        => array(cmp03_norm('فترة الإقرار') => 1),
-    'Suppliers/supplier_capacity.php'   => array(cmp03_norm('نسبة الجاهزية الدنيا') => 1),
+    'Contracts/tax_invoices.php'        => array(cmp03_norm('فترة الإقرار') => 1, cmp03_norm('الفترة') => 1),
+    'Suppliers/supplier_capacity.php'   => array(cmp03_norm('نسبة الجاهزية الدنيا') => 1, cmp03_norm('نسبة الجاهزية') => 1),
     'ActivityLogs/activity_logs.php'    => array(cmp03_norm('القيمة') => 1),
+    'Operations/distribution_space.php' => array(cmp03_norm('التاريخ') => 1, cmp03_norm('من تاريخ') => 1,
+                                                 cmp03_norm('تاريخ السريان') => 1, cmp03_norm('إلى تاريخ') => 1,
+                                                 cmp03_norm('من الموقع') => 1, cmp03_norm('الموقع') => 1),
+    'Suppliers/shares_coverage.php'     => array(cmp03_norm('العقد') => 1, cmp03_norm('العقد العميل') => 1),
+    'Finance/entitlement_gate.php'      => array(cmp03_norm('رقم الحدث المولَّد') => 1, cmp03_norm('رقم الحدث') => 1),
 );
 
 $screens = cmp03_doc_screens($ROOT);

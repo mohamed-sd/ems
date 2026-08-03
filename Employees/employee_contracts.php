@@ -673,7 +673,26 @@ if ($driver_owned === null) {
 
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
-            
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th none" data-fn="1">كود الموظف</th>
+              <th class="ems-fn-th none" data-fn="1">فئة العقد</th>
+              <th class="ems-fn-th none" data-fn="1">نوع العقد</th>
+              <th class="ems-fn-th none" data-fn="1">عقد المورد المرتبط</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ البدء</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء المخطط</th>
+              <th class="ems-fn-th none" data-fn="1">محفّزات الانتهاء الثلاثة</th>
+              <th class="ems-fn-th none" data-fn="1">المحفّز الواقع</th>
+              <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء الفعلي</th>
+              <th class="ems-fn-th none" data-fn="1">فترة التجربة</th>
+              <th class="ems-fn-th none" data-fn="1">الراتب الأساسي</th>
+              <th class="ems-fn-th none" data-fn="1">بدل الطبيعة</th>
+              <th class="ems-fn-th none" data-fn="1">إجمالي الأجر</th>
+              <th class="ems-fn-th none" data-fn="1">دورية الصرف</th>
+              <th class="ems-fn-th none" data-fn="1">نموذج الحافز</th>
+              <th class="ems-fn-th none" data-fn="1">رصيد الإجازة السنوية</th>
+              <th class="ems-fn-th none" data-fn="1">جهة التحمل</th>
+              <th class="ems-fn-th none" data-fn="1">وقّعه عنّا</th>
+              <th class="ems-fn-th none" data-fn="1">وقّعه الموظف</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

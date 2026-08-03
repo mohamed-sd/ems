@@ -109,17 +109,41 @@ include '../insidebar.php';
     <div class="card"><div class="card-body"><div class="table-container">
         <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
             <thead><tr><th>الإجراءات</th><th>اسم القالب</th><th>النوع</th><th>الفاصل</th><th>التالي</th><th>المهلة</th><th>الأولوية</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم المجموعة</th>
+              <th class="ems-fn-th" data-fn="1">الموضوع</th>
+              <th class="ems-fn-th" data-fn="1">الموقع أو المعدة</th>
+              <th class="ems-fn-th" data-fn="1">عدد البلاغات</th>
+              <th class="ems-fn-th" data-fn="1">النافذة الزمنية</th>
+              <th class="ems-fn-th" data-fn="1">أول بلاغ</th>
+              <th class="ems-fn-th" data-fn="1">آخر بلاغ</th>
+              <th class="ems-fn-th" data-fn="1">إجمالي ساعات التوقف</th>
+              <th class="ems-fn-th" data-fn="1">إجمالي التكلفة</th>
+              <th class="ems-fn-th" data-fn="1">السبب الجذري المرجَّح</th>
+              <th class="ems-fn-th" data-fn="1">الإجراء الجذري</th>
+              <th class="ems-fn-th" data-fn="1">المسؤول</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
+              <th class="ems-fn-th" data-fn="1">رقم القالب</th>
+              <th class="ems-fn-th none" data-fn="1">الفئة</th>
+              <th class="ems-fn-th none" data-fn="1">الإدارة المستهدفة</th>
+              <th class="ems-fn-th none" data-fn="1">المكلَّف الافتراضي</th>
+              <th class="ems-fn-th none" data-fn="1">الدورية</th>
+              <th class="ems-fn-th none" data-fn="1">يوم التوليد</th>
+              <th class="ems-fn-th none" data-fn="1">آخر توليد</th>
+              <th class="ems-fn-th none" data-fn="1">عدد المولَّد</th>
+              <th class="ems-fn-th none" data-fn="1">نسبة الإنجاز</th>
+              <th class="ems-fn-th none" data-fn="1">عرّفه</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               </tr></thead>
             <tbody>
             <?php

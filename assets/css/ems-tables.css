@@ -1125,3 +1125,20 @@ body.ems-site table td.ems-gov-empty {
   color: #9aa0a6;
   text-align: center;
 }
+
+/* CMP-03 توصية ①: الأعمدة المحقونة المطوية وزر إظهارها */
+.ems-xcol-off { display: none !important; }
+body.ems-site .ems-xcol-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 4px 12px;
+  border: 1px dashed #c9a227;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #7a5c00;
+  font-size: .8rem;
+  cursor: pointer;
+}
+body.ems-site .ems-xcol-toggle:hover { background: #fef3c7; }

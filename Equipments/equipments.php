@@ -876,18 +876,47 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
                         <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
                         <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
-                    
+                        <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                        <th class="ems-fn-th" data-fn="1">مسار التوزيع</th>
+                        <th class="ems-fn-th" data-fn="1">الفئة التشغيلية</th>
+                        <th class="ems-fn-th" data-fn="1">بلد الصنع</th>
+                        <th class="ems-fn-th" data-fn="1">حالة الرقم التسلسلي</th>
+                        <th class="ems-fn-th" data-fn="1">رقم الشاسيه</th>
+                        <th class="ems-fn-th" data-fn="1">رقم الموتور</th>
+                        <th class="ems-fn-th" data-fn="1">رقم اللوحة</th>
+                        <th class="ems-fn-th" data-fn="1">المصدر</th>
+                        <th class="ems-fn-th" data-fn="1">المالك القانوني</th>
+                        <th class="ems-fn-th" data-fn="1">تاريخ الدخول</th>
+                        <th class="ems-fn-th none" data-fn="1">العدّاد الافتتاحي</th>
+                        <th class="ems-fn-th none" data-fn="1">العدّاد الحالي</th>
+                        <th class="ems-fn-th none" data-fn="1">وحدة العدّاد</th>
+                        <th class="ems-fn-th none" data-fn="1">تكلفة الشراء</th>
+                        <th class="ems-fn-th none" data-fn="1">العمر الإنتاجي بالساعات</th>
+                        <th class="ems-fn-th none" data-fn="1">معدل الإهلاك بالساعة</th>
+                        <th class="ems-fn-th none" data-fn="1">قيمة الخردة</th>
+                        <th class="ems-fn-th none" data-fn="1">الإهلاك المتراكم</th>
+                        <th class="ems-fn-th none" data-fn="1">القيمة الدفترية</th>
+                        <th class="ems-fn-th none" data-fn="1">الساعات المتراكمة بالسجل</th>
+                        <th class="ems-fn-th none" data-fn="1">الساعات بالتشغيل</th>
+                        <th class="ems-fn-th none" data-fn="1">فرق الساعات</th>
+                        <th class="ems-fn-th none" data-fn="1">الممول</th>
+                        <th class="ems-fn-th none" data-fn="1">نموذج التمويل</th>
+                        <th class="ems-fn-th none" data-fn="1">حصص الملكية</th>
+                        <th class="ems-fn-th none" data-fn="1">الموقع الحالي</th>
+                        <th class="ems-fn-th none" data-fn="1">الحالة الأسطولية</th>
+                        <th class="ems-fn-th none" data-fn="1">الجاهزية الفنية</th>
+                        <th class="ems-fn-th none" data-fn="1">سجّله</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                        <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                        <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                        <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-                        <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-                        <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                        <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                        <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                        <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                        <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                        <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                        <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                        <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                        <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                         </tr>
                 </thead>
                 <tbody>

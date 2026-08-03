@@ -212,9 +212,18 @@ include '../insidebar.php';
                     <th>الميزانية</th><th>الإدارة</th><th>الفئة</th><th>النوع</th>
                     <th>الكمية المخططة</th><th>فعلي</th><th>انحراف التنفيذ</th><th>النسبة %</th>
                     <th>سبب انحراف التنفيذ</th><th>الإجراء التصحيحي</th><th>مالك الفجوة</th><th>الحالة</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">الفترة</th>
+                    <th class="ems-fn-th" data-fn="1">العقد</th>
+                    <th class="ems-fn-th" data-fn="1">الوحدة</th>
+                    <th class="ems-fn-th" data-fn="1">المنفَّذة</th>
+                    <th class="ems-fn-th" data-fn="1">المفوترة</th>
+                    <th class="ems-fn-th" data-fn="1">المحصَّلة</th>
+                    <th class="ems-fn-th" data-fn="1">انحراف الفوترة</th>
+                    <th class="ems-fn-th" data-fn="1">انحراف التحصيل</th>
+                    <th class="ems-fn-th" data-fn="1">تاريخ المتابعة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     </tr></thead>
                 <tbody>
                     <?php foreach ($var_rows as $l) {

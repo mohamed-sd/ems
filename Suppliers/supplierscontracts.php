@@ -814,7 +814,24 @@ include('../insidebar.php');
 
             <!-- الحالة والإجراءات -->
             <th class="group-status"> الحالة</th>
-          
+            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+            <th class="ems-fn-th none" data-fn="1">تاريخ البدء</th>
+            <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء</th>
+            <th class="ems-fn-th none" data-fn="1">نموذج التعاقد</th>
+            <th class="ems-fn-th none" data-fn="1">وحدة التعاقد</th>
+            <th class="ems-fn-th none" data-fn="1">نوع المعدة</th>
+            <th class="ems-fn-th none" data-fn="1">عدد الوحدات المتعاقد عليها</th>
+            <th class="ems-fn-th none" data-fn="1">عدد الورديات المتفق عليها</th>
+            <th class="ems-fn-th none" data-fn="1">وحدات الوردية الواحدة</th>
+            <th class="ems-fn-th none" data-fn="1">الوحدات الشهرية الملزمة</th>
+            <th class="ems-fn-th none" data-fn="1">الساعات الشهرية للوحدة</th>
+            <th class="ems-fn-th none" data-fn="1">سعر الساعة</th>
+            <th class="ems-fn-th none" data-fn="1">نسبة الجاهزية الدنيا</th>
+            <th class="ems-fn-th none" data-fn="1">مهلة الإحلال</th>
+            <th class="ems-fn-th none" data-fn="1">غرامة العجز</th>
+            <th class="ems-fn-th none" data-fn="1">دورية التسوية</th>
+            <th class="ems-fn-th none" data-fn="1">مهلة السداد</th>
+            <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
             <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
             <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

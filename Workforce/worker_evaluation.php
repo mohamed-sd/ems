@@ -225,6 +225,20 @@ $page_title="إيكوبيشن | تقييم الأداء"; include '../inheader.p
 
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>#</th><th>كود الموظف</th><th>الفترة</th><th>الدرجة</th><th>نوع التقييم</th><th>المبلغ</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم التقييم</th>
+              <th class="ems-fn-th" data-fn="1">محور الالتزام</th>
+              <th class="ems-fn-th" data-fn="1">محور الإنتاجية</th>
+              <th class="ems-fn-th" data-fn="1">محور السلامة</th>
+              <th class="ems-fn-th" data-fn="1">محور التعاون</th>
+              <th class="ems-fn-th" data-fn="1">محور الانضباط</th>
+              <th class="ems-fn-th" data-fn="1">الدرجة القصوى</th>
+              <th class="ems-fn-th" data-fn="1">النسبة</th>
+              <th class="ems-fn-th" data-fn="1">التصنيف</th>
+              <th class="ems-fn-th" data-fn="1">التوصية</th>
+              <th class="ems-fn-th" data-fn="1">المقيِّم</th>
+              <th class="ems-fn-th" data-fn="1">اعتماد الموارد</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead><tbody>

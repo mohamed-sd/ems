@@ -241,6 +241,19 @@ function renderLogCells(array $row, array $actionLabels): array
         /* 19 المرفق */                $govDash,
         /* 20 مركز التكلفة */          $govDash,
         /* 21 سعر الصرف ومصدره */      $govDash,
+        // CMP-03 ⑤: الأعمدة الوظيفية بتصميم المستند — الموصول من بيانات السجل حقيقي
+        // والباقي «—» (درجة الحساسية ونوع التسجيل والصفة — مصادرها مهام لحاق)
+        /* 22 المستخدم */              '<span class="small">' . $e($row['user_name'] ?? '—') . '</span>',
+        /* 23 الصفة */                 $govDash,
+        /* 24 الإدارة */               '<span class="small">' . $e($row['role_name'] ?? '—') . '</span>',
+        /* 25 نوع العملية */           '<span class="small">' . $e($info['label']) . '</span>',
+        /* 26 السجل المتأثر */         '<span class="small">' . $e(($row['module_name'] ?? '') !== '' ? ($row['module_name'] . ($recordDisplay !== '—' ? ' #' . strip_tags($recordDisplay) : '')) : '—') . '</span>',
+        /* 27 القيمة قبل */            '<span class="small text-truncate d-inline-block" style="max-width:140px">' . (($row['old_value_brief'] ?? '') !== '' ? $e($row['old_value_brief']) : '—') . '</span>',
+        /* 28 القيمة بعد */            '<span class="small text-truncate d-inline-block" style="max-width:140px">' . (($row['new_value_brief'] ?? '') !== '' ? $e($row['new_value_brief']) : '—') . '</span>',
+        /* 29 عنوان IP */              '<span class="small">' . (($row['ip_address'] ?? '') !== '' ? $e($row['ip_address']) : '—') . '</span>',
+        /* 30 الجلسة */                '<span class="small text-truncate d-inline-block" style="max-width:100px">' . (($row['session_id'] ?? '') !== '' ? $e($row['session_id']) : '—') . '</span>',
+        /* 31 درجة حساسية البيان */    $govDash,
+        /* 32 نوع التسجيل */           $govDash,
     ];
 }
 
@@ -248,7 +261,7 @@ function renderLogRow(array $row, array $actionLabels): string
 {
     $cells = renderLogCells($row, $actionLabels);
     $classes = ['px-3 text-nowrap small', 'small', 'small', 'small', 'small', '', 'small', 'small', 'small', 'text-center', 'd-none'];
-    $classes = array_pad($classes, 22, 'small'); // CMP-03 ②: أعمدة الحوكمة 11-21
+    $classes = array_pad($classes, 33, 'small'); // CMP-03 ②+⑤: الحوكمة 11-21 والوظيفي 22-32
     $html = '<tr data-id="' . intval($row['id']) . '">';
     foreach ($cells as $i => $c) {
         $html .= '<td' . ($classes[$i] !== '' ? ' class="' . $classes[$i] . '"' : '') . '>' . $c . '</td>';
@@ -469,6 +482,19 @@ $page_title = 'سجل النشاط';
                                     <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th><!-- col 19 -->
                                     <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th><!-- col 20 -->
                                     <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th><!-- col 21 -->
+                                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — خلاياها من renderLogCells (serverSide)،
+                                         والفائض فوق 22 ينهار لسطر تابع عبر Responsive (class="none") -->
+                                    <th class="ems-fn-th none" data-fn="1">المستخدم</th><!-- col 22 -->
+                                    <th class="ems-fn-th none" data-fn="1">الصفة</th><!-- col 23 -->
+                                    <th class="ems-fn-th none" data-fn="1">الإدارة</th><!-- col 24 -->
+                                    <th class="ems-fn-th none" data-fn="1">نوع العملية</th><!-- col 25 -->
+                                    <th class="ems-fn-th none" data-fn="1">السجل المتأثر</th><!-- col 26 -->
+                                    <th class="ems-fn-th none" data-fn="1">القيمة قبل</th><!-- col 27 -->
+                                    <th class="ems-fn-th none" data-fn="1">القيمة بعد</th><!-- col 28 -->
+                                    <th class="ems-fn-th none" data-fn="1">عنوان IP</th><!-- col 29 -->
+                                    <th class="ems-fn-th none" data-fn="1">الجلسة</th><!-- col 30 -->
+                                    <th class="ems-fn-th none" data-fn="1">درجة حساسية البيان</th><!-- col 31 -->
+                                    <th class="ems-fn-th none" data-fn="1">نوع التسجيل</th><!-- col 32 -->
                                 </tr>
                             </thead>
                             <tbody id="logsTableBody">
@@ -874,8 +900,8 @@ $page_title = 'سجل النشاط';
                 { targets: 0, className: 'px-3' },
                 { targets: 9, orderable: false, searchable: false, className: 'text-center' },
                 { targets: 10, visible: false, searchable: true },   // http_method hidden col
-                // CMP-03 ②: أعمدة الحوكمة 11-21 — بلا فرزٍ (خارج قائمة سماح الفرز الخادمية)
-                { targets: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21], orderable: false }
+                // CMP-03 ②+⑤: أعمدة الحوكمة 11-21 والوظيفي 22-32 — بلا فرزٍ (خارج قائمة سماح الفرز الخادمية)
+                { targets: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32], orderable: false }
             ],
             dom: '<"row align-items-center mb-2"<"col-sm-4"l><"col-sm-4 text-center" B><"col-sm-4"f>>rtip',
             buttons: {

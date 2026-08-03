@@ -474,7 +474,17 @@ function prod_revenue_label($model, $map)
                             <th>نموذج الإيراد</th>
                             <th>وحدة القياس</th>
                             <th>السعر المرجعي</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">الفئة</th>
+                            <th class="ems-fn-th" data-fn="1">نموذج التسعير</th>
+                            <th class="ems-fn-th" data-fn="1">الحساب الإيرادي</th>
+                            <th class="ems-fn-th" data-fn="1">مركز الإيراد</th>
+                            <th class="ems-fn-th" data-fn="1">نسبة الضريبة</th>
+                            <th class="ems-fn-th" data-fn="1">قابل للخصم؟</th>
+                            <th class="ems-fn-th" data-fn="1">الحد الأدنى للسعر</th>
+                            <th class="ems-fn-th" data-fn="1">العملة الافتراضية</th>
+                            <th class="ems-fn-th" data-fn="1">العقود المستعمِلة</th>
+                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>

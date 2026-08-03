@@ -323,6 +323,18 @@ $stage_colors = array(
                 <div style="font-weight:700;margin-bottom:6px;color:#198754"><i class="fa fa-circle-check"></i> أعلى التزامًا بالاستحقاق</div>
                 <table class="alltables no-datatable" style="width:100%">
                     <thead><tr><th>#</th><th>الإدارة</th><th>نسبة الالتزام</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الفترة</th>
+              <th class="ems-fn-th" data-fn="1">الملتزم بمهلة الاستجابة</th>
+              <th class="ems-fn-th" data-fn="1">الملتزم بمهلة الإنجاز</th>
+              <th class="ems-fn-th" data-fn="1">بلا استجابة</th>
+              <th class="ems-fn-th" data-fn="1">متوسط زمن التعليق</th>
+              <th class="ems-fn-th" data-fn="1">إعادة الفتح</th>
+              <th class="ems-fn-th" data-fn="1">نسبة إعادة الفتح</th>
+              <th class="ems-fn-th" data-fn="1">المغلق بلا أثر</th>
+              <th class="ems-fn-th" data-fn="1">متوسط التأخير</th>
+              <th class="ems-fn-th" data-fn="1">المستهدف</th>
+              <th class="ems-fn-th" data-fn="1">الحكم</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>

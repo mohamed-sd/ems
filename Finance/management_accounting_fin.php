@@ -129,6 +129,13 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="ccTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr><th>الإجراءات</th><th>الكود</th><th>اسم الحساب</th><th>نوع الحساب</th><th>الحساب الأب</th><th>الإدارة</th><th>المستوى</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الحساب</th>
+              <th class="ems-fn-th" data-fn="1">طبيعة الرصيد</th>
+              <th class="ems-fn-th" data-fn="1">يقبل القيد المباشر؟</th>
+              <th class="ems-fn-th" data-fn="1">مركز التكلفة إلزامي؟</th>
+              <th class="ems-fn-th" data-fn="1">عرّفه</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التعريف</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>

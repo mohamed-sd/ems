@@ -158,15 +158,33 @@ include '../insidebar.php';
             <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المُنشئ — الاسم والصفة</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">رقم القاعدة</th>
+                    <th class="ems-fn-th" data-fn="1">الفئة</th>
+                    <th class="ems-fn-th" data-fn="1">النوع</th>
+                    <th class="ems-fn-th" data-fn="1">الموقع</th>
+                    <th class="ems-fn-th" data-fn="1">الإدارة المختصة</th>
+                    <th class="ems-fn-th" data-fn="1">الدور المستقبِل</th>
+                    <th class="ems-fn-th" data-fn="1">مهلة الاستجابة</th>
+                    <th class="ems-fn-th" data-fn="1">مهلة الإنجاز</th>
+                    <th class="ems-fn-th" data-fn="1">الأولوية الافتراضية</th>
+                    <th class="ems-fn-th" data-fn="1">شرط رفع الأولوية</th>
+                    <th class="ems-fn-th" data-fn="1">سياسة الإغلاق</th>
+                    <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
+                    <th class="ems-fn-th" data-fn="1">عرّفها</th>
+                    <th class="ems-fn-th" data-fn="1">رقم الإعداد</th>
+                    <th class="ems-fn-th none" data-fn="1">نوع قياس المهلة</th>
+                    <th class="ems-fn-th none" data-fn="1">سلّم التصعيد</th>
+                    <th class="ems-fn-th none" data-fn="1">مستوى السرية الافتراضي</th>
+                    <th class="ems-fn-th none" data-fn="1">عرّفه</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                    <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     </tr></thead>
                 <tbody>
                     <?php

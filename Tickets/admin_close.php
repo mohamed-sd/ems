@@ -61,6 +61,17 @@ include '../insidebar.php';
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم البلاغ</th><th>وصف الحل</th><th>الحالة</th><th>الإغلاقُ بسببٍ ومرجع</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">تاريخ الإنجاز</th>
+              <th class="ems-fn-th" data-fn="1">المنجِز</th>
+              <th class="ems-fn-th" data-fn="1">الأثر التشغيلي المسجَّل</th>
+              <th class="ems-fn-th" data-fn="1">المستند الناتج</th>
+              <th class="ems-fn-th" data-fn="1">سياسة الإغلاق</th>
+              <th class="ems-fn-th" data-fn="1">المؤكِّد</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التأكيد</th>
+              <th class="ems-fn-th" data-fn="1">عدد مرات إعادة الفتح</th>
+              <th class="ems-fn-th" data-fn="1">سبب آخر إعادة فتح</th>
+              <th class="ems-fn-th" data-fn="1">نوع الإغلاق</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

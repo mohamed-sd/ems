@@ -219,14 +219,28 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr><th>الفترة</th><th>النتيجة</th><th>تغطيةُ الوزن</th><th>الحالة</th>
                 <th>قرار التجديد</th><th>السبب</th><th></th>
+                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                <th class="ems-fn-th" data-fn="1">رقم التقييم</th>
+                <th class="ems-fn-th" data-fn="1">المورد</th>
+                <th class="ems-fn-th" data-fn="1">محور الجاهزية</th>
+                <th class="ems-fn-th" data-fn="1">محور الالتزام بالمهل</th>
+                <th class="ems-fn-th" data-fn="1">محور جودة المعدات</th>
+                <th class="ems-fn-th" data-fn="1">محور الاستجابة</th>
+                <th class="ems-fn-th" data-fn="1">محور الوثائق</th>
+                <th class="ems-fn-th" data-fn="1">الدرجة الممنوحة</th>
+                <th class="ems-fn-th" data-fn="1">الدرجة القصوى</th>
+                <th class="ems-fn-th" data-fn="1">التصنيف الناتج</th>
+                <th class="ems-fn-th" data-fn="1">أثر التقييم</th>
+                <th class="ems-fn-th" data-fn="1">قيّمه</th>
+                <th class="ems-fn-th" data-fn="1">اعتمده</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>
             <?php foreach ($evals as $e): ?>

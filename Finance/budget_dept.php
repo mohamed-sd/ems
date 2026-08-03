@@ -45,6 +45,16 @@ include '../insidebar.php';
     <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()"></form>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>المخطط</th><th>المصروف الفعلي</th><th>الانحراف</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">بند الموازنة</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد للسنة</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد للفترة</th>
+              <th class="ems-fn-th" data-fn="1">الملتزم به</th>
+              <th class="ems-fn-th" data-fn="1">المتاح</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الصرف</th>
+              <th class="ems-fn-th" data-fn="1">سبب الانحراف</th>
+              <th class="ems-fn-th" data-fn="1">طلبات تعديل قائمة</th>
+              <th class="ems-fn-th" data-fn="1">المسؤول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

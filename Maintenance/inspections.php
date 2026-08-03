@@ -840,13 +840,27 @@ function mnt_seg_kind($c) {
         <div class="table-container">
             <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr><th>الإجراءات</th><th>مرجع التفويض</th><th>نوع الاستمارة</th><th>المعدة/الجهة</th><th>الفاحص</th><th>التاريخ</th><th>درجة الخطورة</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم التفتيش</th>
+              <th class="ems-fn-th" data-fn="1">كود المعدة</th>
+              <th class="ems-fn-th" data-fn="1">الموقع</th>
+              <th class="ems-fn-th" data-fn="1">قراءة العدّاد</th>
+              <th class="ems-fn-th" data-fn="1">عدد البنود المفحوصة</th>
+              <th class="ems-fn-th" data-fn="1">بنود سليمة</th>
+              <th class="ems-fn-th" data-fn="1">بنود ملاحظة</th>
+              <th class="ems-fn-th" data-fn="1">بنود حرجة</th>
+              <th class="ems-fn-th" data-fn="1">قرار التشغيل</th>
+              <th class="ems-fn-th" data-fn="1">سريان القرار حتى</th>
+              <th class="ems-fn-th" data-fn="1">التوصيات</th>
+              <th class="ems-fn-th" data-fn="1">الفني</th>
+              <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
                 <tbody>
                     <?php

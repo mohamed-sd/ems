@@ -243,14 +243,30 @@ include '../insidebar.php';
             } else {
                 echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
                    . '<thead><tr><th>المقعد</th><th>المعدة</th><th>المُنشئ — الاسم والصفة</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم العقد</th>
+              <th class="ems-fn-th" data-fn="1">عملة التسعير</th>
+              <th class="ems-fn-th" data-fn="1">عملة الفوترة</th>
+              <th class="ems-fn-th" data-fn="1">عملة التحصيل</th>
+              <th class="ems-fn-th" data-fn="1">نسبة المقدم</th>
+              <th class="ems-fn-th" data-fn="1">طريقة استهلاك المقدم</th>
+              <th class="ems-fn-th" data-fn="1">مهلة السداد</th>
+              <th class="ems-fn-th" data-fn="1">دورية الإقفال</th>
+              <th class="ems-fn-th" data-fn="1">نسبة محتجز الضمان</th>
+              <th class="ems-fn-th" data-fn="1">مدة رد المحتجز</th>
+              <th class="ems-fn-th" data-fn="1">حق تعليق العمل</th>
+              <th class="ems-fn-th" data-fn="1">شرط الإنهاء</th>
+              <th class="ems-fn-th" data-fn="1">حالة الضريبة</th>
+              <th class="ems-fn-th" data-fn="1">ثبّتها</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التثبيت</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               </tr></thead><tbody>';
                 foreach ($seats as $s) {
                     $succ = \App\Services\ContractSeatService::successionOf($gate, $co, intval($s['id']));

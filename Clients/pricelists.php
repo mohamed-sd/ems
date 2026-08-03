@@ -481,7 +481,16 @@ function pl_revenue_label($model, $map)
                             <th>النموذج</th>
                             <th>العملة</th>
                             <th>السعر الأساس</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">رقم القائمة</th>
+                            <th class="ems-fn-th" data-fn="1">العميل أو الشريحة</th>
+                            <th class="ems-fn-th" data-fn="1">اسم البند</th>
+                            <th class="ems-fn-th" data-fn="1">سعر الوحدة</th>
+                            <th class="ems-fn-th" data-fn="1">الحد الأدنى للكمية</th>
+                            <th class="ems-fn-th" data-fn="1">الخصم المسموح</th>
+                            <th class="ems-fn-th" data-fn="1">من تاريخ</th>
+                            <th class="ems-fn-th" data-fn="1">إلى تاريخ</th>
+                            <th class="ems-fn-th" data-fn="1">اعتمدها</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

@@ -252,6 +252,19 @@ include('../insidebar.php');
                 <?php if ($journals): ?>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
                     <thead><tr><th>رقم القيد</th><th>الحالة</th><th>إجمالي مدين</th><th>البيان</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم الحدث</th>
+              <th class="ems-fn-th" data-fn="1">التاريخ</th>
+              <th class="ems-fn-th" data-fn="1">الشاشة المصدر</th>
+              <th class="ems-fn-th" data-fn="1">الفعل</th>
+              <th class="ems-fn-th" data-fn="1">المستند التشغيلي</th>
+              <th class="ems-fn-th" data-fn="1">الإدارة المصدر</th>
+              <th class="ems-fn-th" data-fn="1">الطرف</th>
+              <th class="ems-fn-th" data-fn="1">المبلغ</th>
+              <th class="ems-fn-th" data-fn="1">المعادل</th>
+              <th class="ems-fn-th" data-fn="1">الحساب المدين</th>
+              <th class="ems-fn-th" data-fn="1">الحساب الدائن</th>
+              <th class="ems-fn-th" data-fn="1">الفترة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

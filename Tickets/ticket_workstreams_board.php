@@ -104,14 +104,24 @@ include '../insidebar.php';
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>رقم المسار</th><th>الإدارة المالكة</th><th>المكلف</th><th>مسار إلزامي؟</th><th>الحالة</th>
                 <th>المانع</th><th>مهلة الإنجاز</th><th>الأثر</th><th>إعادات</th><th>إجراء</th>
+                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                <th class="ems-fn-th" data-fn="1">البلاغ الأصل</th>
+                <th class="ems-fn-th" data-fn="1">نوع المسار</th>
+                <th class="ems-fn-th" data-fn="1">المستند الناتج</th>
+                <th class="ems-fn-th" data-fn="1">مهلة المسار</th>
+                <th class="ems-fn-th" data-fn="1">تاريخ الاستلام</th>
+                <th class="ems-fn-th" data-fn="1">تاريخ الإنجاز</th>
+                <th class="ems-fn-th" data-fn="1">حالة المسار</th>
+                <th class="ems-fn-th" data-fn="1">سبب التعليق</th>
+                <th class="ems-fn-th" data-fn="1">مدة التعليق</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>
             <?php foreach ($streams as $w): ?>

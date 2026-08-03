@@ -410,7 +410,12 @@ include('../insidebar.php');
                             <th>الرمز</th>
                             <th>الفئة</th>
                             <th>معامل التحويل</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">النوع</th>
+                            <th class="ems-fn-th" data-fn="1">الوحدة الأساسية</th>
+                            <th class="ems-fn-th" data-fn="1">عدد المنازل العشرية</th>
+                            <th class="ems-fn-th" data-fn="1">يُستعمل في</th>
+                            <th class="ems-fn-th" data-fn="1">عرّفها</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>

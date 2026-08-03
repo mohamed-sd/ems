@@ -537,7 +537,17 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             <th>الفئة التشغيلية</th>
                             <th>عدد الوحدات</th>
                             <th>الحالة</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">الاسم</th>
+                            <th class="ems-fn-th" data-fn="1">بلد الصنع</th>
+                            <th class="ems-fn-th" data-fn="1">القدرة</th>
+                            <th class="ems-fn-th" data-fn="1">سعة الجردل أو الحمولة</th>
+                            <th class="ems-fn-th" data-fn="1">استهلاك الوقود التقديري</th>
+                            <th class="ems-fn-th" data-fn="1">دورية تغيير الزيت</th>
+                            <th class="ems-fn-th" data-fn="1">دورية الفلاتر</th>
+                            <th class="ems-fn-th" data-fn="1">العمر الإنتاجي بالساعات</th>
+                            <th class="ems-fn-th" data-fn="1">القطع القياسية</th>
+                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                             </tr>

@@ -14,6 +14,9 @@
  *
  * التشغيل: php tools/cmp03_apply.php [--apply] [--screen=file.php] [--limit=N]
  *          بلا --apply: عرض الفروق (diff) دون كتابة.
+ *   --fn : الموجة ⑤ — حقن الأعمدة الوظيفية الناقصة (missFn) بدل الحوكمة،
+ *          رؤوسًا <th data-fn="1"> بتسمية المستند الحرفية قبل كتلة الحوكمة،
+ *          وخلاياها «—» من الحاشي المركزي حتى يُربط مصدرها الصفّي (توصية ③).
  */
 define('EMS_CLI', true);
 require_once __DIR__ . '/../includes/session_bootstrap.php';
@@ -27,10 +30,13 @@ mysqli_set_charset($conn, 'utf8mb4');
 $ROOT = dirname(__DIR__);
 
 $APPLY = in_array('--apply', $argv, true);
+$FN = in_array('--fn', $argv, true); // الموجة ⑤: الوظيفي بدل الحوكمة
 $onlyScreen = null; $limit = 0;
+$onlySet = null; // --screens=a.php,b.php — دفعة محددة
 foreach ($argv as $a) {
-    if (strpos($a, '--screen=') === 0) { $onlyScreen = substr($a, 9); }
-    if (strpos($a, '--limit=') === 0)  { $limit = (int) substr($a, 8); }
+    if (strpos($a, '--screen=') === 0)  { $onlyScreen = substr($a, 9); }
+    if (strpos($a, '--screens=') === 0) { $onlySet = array_flip(array_filter(array_map('trim', explode(',', substr($a, 10))))); }
+    if (strpos($a, '--limit=') === 0)   { $limit = (int) substr($a, 8); }
 }
 
 $MAX_VISIBLE = 22; // توصية المالك ①: حد الأعمدة الظاهرة
@@ -45,6 +51,7 @@ foreach ($registry as $k => $def) { $labelToKey[cmp03_norm($def[0])] = $k; }
 $byFile = array();
 foreach ($screens as $cf => $sc) {
     if ($onlyScreen !== null && $cf !== $onlyScreen) { continue; }
+    if ($onlySet !== null && !isset($onlySet[$cf])) { continue; }
     if (!isset($map[$cf]) || $map[$cf]['state'] === 'soon' || !$map[$cf]['real_path']) { continue; }
     $byFile[$map[$cf]['real_path']][$cf] = $sc;
 }
@@ -66,13 +73,17 @@ foreach ($byFile as $real => $docScreens) {
         continue;
     }
 
-    /* اتحاد ناقص الحوكمة لكل شاشات المستند المشيرة لهذا الملف */
-    $missing = array(); // norm → original doc label
+    /* اتحاد الناقص (حوكمةً أو وظيفيًّا بحسب الوضع) لكل شاشات المستند المشيرة لهذا الملف */
+    $missing = array(); // norm → original doc label — بترتيب ورود المستند
     $titles = array();
     foreach ($docScreens as $cf => $sc) {
         $titles[] = $sc['title'] . " ($cf)";
         $j = cmp03_judge($sc['cols'], cmp03_extract_heads($path));
-        foreach ($j['missGov'] as $dn => $orig) { $missing[$dn] = $orig; }
+        $pool = $FN ? $j['missFn'] : $j['missGov'];
+        foreach ($sc['cols'] as $c) { // ترتيب المستند الحرفي
+            $cn = cmp03_norm($c);
+            if (isset($pool[$cn]) && !isset($missing[$cn])) { $missing[$cn] = $pool[$cn]; }
+        }
     }
     if (!$missing) { continue; }
 
@@ -113,44 +124,69 @@ foreach ($byFile as $real => $docScreens) {
 
     list($score, $trAbs, $trContent, $existing, , $already) = $best;
 
-    /* ترتيب الحقن بترتيب سجل الحوكمة (تواتر ورقة 04) واستبعاد المحقون سلفًا */
-    $inject = array();
-    foreach ($keyOrder as $k) {
-        $lbl = $registry[$k][0];
-        $n = cmp03_norm($lbl);
-        if (isset($missing[$n]) && !isset($already[$k])) { $inject[$k] = $missing[$n]; }
-    }
-    foreach ($missing as $dn => $orig) {
-        if (!isset($labelToKey[$dn])) { $manual[] = "$real — تسمية حوكمة خارج السجل: $orig"; }
-    }
-    if (!$inject) { continue; }
-
     /* المحاذاة: مسافة آخر <th> في الصف */
     $indent = '              ';
     if (preg_match_all('/\n([ \t]*)<th\b/', $trContent, $mInd) && $mInd[1]) {
         $indent = end($mInd[1]);
     }
 
-    $block = "\n" . $indent . "<!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->";
-    $pos = $existing + count($already);
-    foreach ($inject as $k => $lbl) {
-        $pos++;
-        $def = $registry[$k];
-        $cls = 'ems-gov-th' . ($pos > $MAX_VISIBLE ? ' none' : '');
-        if ($pos > $MAX_VISIBLE) {
-            $overflowLog[] = array($real, $lbl, $pos);
+    if ($FN) {
+        /* الموجة ⑤: الوظيفي بترتيب المستند — قبل كتلة الحوكمة إن وُجدت */
+        $inject = $missing;
+        $block = "\n" . $indent . "<!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->";
+        foreach ($inject as $dn => $lbl) {
+            $block .= "\n" . $indent . '<th class="ems-fn-th" data-fn="1">' . $lbl . '</th>';
+            $followups[] = array($real, implode(' · ', $titles), $lbl, 'fn');
+            $nCols++;
         }
-        $block .= "\n" . $indent . '<th class="' . $cls . '" data-gov="' . $k . '" data-slice="' . $def[1] . '" title="' . $def[2] . '">' . $lbl . '</th>';
-        $followups[] = array($real, implode(' · ', $titles), $lbl, $k);
-        $nCols++;
+        $govAt = strpos($trContent, '<!-- CMP-03 ②③④');
+        $insertRel = $govAt !== false ? $govAt : strlen($trContent);
+        /* قصّ ذيل المسافات قبل نقطة الإدراج كي لا تتراكم */
+        $head = rtrim(substr($trContent, 0, $insertRel), " \t\n");
+        $tail = substr($trContent, $insertRel);
+        $newTr = $head . $block . "\n" . $indent . ($govAt !== false ? $tail : '');
+    } else {
+        /* الموجة ②: الحوكمة بترتيب سجلها (تواتر ورقة 04) واستبعاد المحقون سلفًا */
+        $inject = array();
+        foreach ($keyOrder as $k) {
+            $lbl = $registry[$k][0];
+            $n = cmp03_norm($lbl);
+            if (isset($missing[$n]) && !isset($already[$k])) { $inject[$k] = $missing[$n]; }
+        }
+        foreach ($missing as $dn => $orig) {
+            if (!isset($labelToKey[$dn])) { $manual[] = "$real — تسمية حوكمة خارج السجل: $orig"; }
+        }
+        if (!$inject) { continue; }
+        $block = "\n" . $indent . "<!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->";
+        foreach ($inject as $k => $lbl) {
+            $def = $registry[$k];
+            $block .= "\n" . $indent . '<th class="ems-gov-th" data-gov="' . $k . '" data-slice="' . $def[1] . '" title="' . $def[2] . '">' . $lbl . '</th>';
+            $followups[] = array($real, implode(' · ', $titles), $lbl, $k);
+            $nCols++;
+        }
+        $newTr = rtrim($trContent, " \t\n") . $block . "\n" . $indent;
     }
+    if (!$inject) { continue; }
 
-    /* الإدراج قبل </tr> */
-    $insertAt = $trAbs + strlen($trContent);
-    $newSrc = substr($src, 0, $insertAt) . $block . "\n" . $indent . substr($src, $insertAt);
+    /* توصية المالك ①: إعادة وزن الظهور — عدّ الرؤوس تسلسليًّا، وما تجاوز 22 من
+       رؤوسنا المحقونة (حوكمةً أو وظيفيًّا) يحمل none فينهار لسطرٍ تابع؛
+       رؤوس الشاشة الأصلية لا تُمسّ أبدًا. */
+    $seq = 0; $nOver = 0;
+    $newTr = preg_replace_callback('/<th\b([^>]*)>(.*?)<\/th>/su', function ($mm) use (&$seq, $MAX_VISIBLE, &$overflowLog, &$nOver, $real) {
+        $seq++;
+        $attrs = $mm[1];
+        if (!preg_match('/class="(ems-gov-th|ems-fn-th)[^"]*"/', $attrs, $mc)) { return $mm[0]; }
+        $isOver = $seq > $MAX_VISIBLE;
+        $cls = $mc[1] . ($isOver ? ' none' : '');
+        $attrs = preg_replace('/class="(?:ems-gov-th|ems-fn-th)[^"]*"/', 'class="' . $cls . '"', $attrs);
+        if ($isOver) { $overflowLog[] = array($real, trim(strip_tags($mm[2])), $seq); $nOver++; }
+        return '<th' . $attrs . '>' . $mm[2] . '</th>';
+    }, $newTr);
+
+    $newSrc = substr($src, 0, $trAbs) . $newTr . substr($src, $trAbs + strlen($trContent));
 
     $planned[] = sprintf('%s ← %d عمودًا (%s)%s', $real, count($inject),
-        implode('، ', array_values($inject)), $pos > $MAX_VISIBLE ? ' — فائضٌ منهارٌ لسطرٍ تابع' : '');
+        implode('، ', array_values($inject)), $nOver > 0 ? " — $nOver فوق 22 تنهار لسطرٍ تابع" : '');
     $nFiles++;
 
     if ($APPLY) {
@@ -168,7 +204,7 @@ if ($manual) {
     echo "\n── للمعالجة اليدوية (" . count($manual) . "):\n";
     foreach (array_unique($manual) as $m) { echo "   ⚠ $m\n"; }
 }
-echo "\n" . ($APPLY ? 'حُقن' : 'سيُحقن') . " $nCols عمودَ حوكمةٍ في $nFiles ملفًّا.\n";
+echo "\n" . ($APPLY ? 'حُقن' : 'سيُحقن') . " $nCols عمودًا " . ($FN ? 'وظيفيًّا' : 'حاكمًا') . " في $nFiles ملفًّا.\n";
 
 if ($APPLY) {
     /* توثيق توصية ① (الفائض) وتوصية ③ (مصادر اللحاق) */

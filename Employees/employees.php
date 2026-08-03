@@ -1021,16 +1021,30 @@ include('../insidebar.php');
                         <th>عدد العقود</th>
                         <th>التصنيف</th>
                         <th>حالة الحساب</th>
-                    
+                        <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                        <th class="ems-fn-th" data-fn="1">الاسم الرباعي</th>
+                        <th class="ems-fn-th" data-fn="1">رقم الهوية</th>
+                        <th class="ems-fn-th" data-fn="1">تاريخ الميلاد</th>
+                        <th class="ems-fn-th" data-fn="1">الجنسية</th>
+                        <th class="ems-fn-th" data-fn="1">المؤهل</th>
+                        <th class="ems-fn-th" data-fn="1">تاريخ التعيين</th>
+                        <th class="ems-fn-th" data-fn="1">الإدارة</th>
+                        <th class="ems-fn-th" data-fn="1">المسمى الوظيفي</th>
+                        <th class="ems-fn-th" data-fn="1">المستوى التنظيمي</th>
+                        <th class="ems-fn-th" data-fn="1">الموقع</th>
+                        <th class="ems-fn-th" data-fn="1">الحساب البنكي</th>
+                        <th class="ems-fn-th" data-fn="1">البنك</th>
+                        <th class="ems-fn-th none" data-fn="1">حالة الخدمة</th>
+                        <th class="ems-fn-th none" data-fn="1">سجّله</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                        <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                        <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                        <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
-                        <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                        <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                        <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                        <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                        <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                        <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                         </tr>
                 </thead>
                 <tbody>

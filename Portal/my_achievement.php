@@ -89,6 +89,21 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>المؤشر</th><th>الفترة</th><th>الفترة السابقة (بالطول نفسه)</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الموظف</th>
+              <th class="ems-fn-th" data-fn="1">الإدارة</th>
+              <th class="ems-fn-th" data-fn="1">المدى المختار</th>
+              <th class="ems-fn-th" data-fn="1">المهام المسنَدة</th>
+              <th class="ems-fn-th" data-fn="1">المنجَزة في المهلة</th>
+              <th class="ems-fn-th" data-fn="1">المتأخرة</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الالتزام</th>
+              <th class="ems-fn-th" data-fn="1">ساعات العمل</th>
+              <th class="ems-fn-th" data-fn="1">الإنتاج المنسوب</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الإنجاز من المستهدف</th>
+              <th class="ems-fn-th" data-fn="1">البلاغات المرفوعة</th>
+              <th class="ems-fn-th" data-fn="1">البلاغات المعالَجة</th>
+              <th class="ems-fn-th" data-fn="1">الترتيب في الإدارة</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التوليد</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>

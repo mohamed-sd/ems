@@ -88,6 +88,19 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="profTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>الهامش</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الفترة</th>
+              <th class="ems-fn-th" data-fn="1">العقد</th>
+              <th class="ems-fn-th" data-fn="1">المعدة</th>
+              <th class="ems-fn-th" data-fn="1">تكلفة مباشرة — مشغّلون</th>
+              <th class="ems-fn-th" data-fn="1">وقود</th>
+              <th class="ems-fn-th" data-fn="1">صيانة</th>
+              <th class="ems-fn-th" data-fn="1">مخزون</th>
+              <th class="ems-fn-th" data-fn="1">ترحيل</th>
+              <th class="ems-fn-th" data-fn="1">تكلفة غير مباشرة</th>
+              <th class="ems-fn-th" data-fn="1">تكلفة تمويل</th>
+              <th class="ems-fn-th" data-fn="1">إهلاك</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الهامش</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>

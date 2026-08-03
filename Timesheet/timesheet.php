@@ -2115,15 +2115,31 @@ try {
             <th><i class="fas fa-chart-bar"></i> الإجمالي</th>
             <th><i class="fas fa-toggle-on"></i> الحالة</th>
             <th><i class="fas fa-cogs"></i> إجراءات</th>
-          
+            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+            <th class="ems-fn-th" data-fn="1">رقم الصف</th>
+            <th class="ems-fn-th" data-fn="1">الموقع</th>
+            <th class="ems-fn-th" data-fn="1">العقد</th>
+            <th class="ems-fn-th" data-fn="1">الوحدة التعاقدية</th>
+            <th class="ems-fn-th" data-fn="1">المشغّل</th>
+            <th class="ems-fn-th" data-fn="1">الفترة</th>
+            <th class="ems-fn-th" data-fn="1">من الساعة</th>
+            <th class="ems-fn-th none" data-fn="1">إلى الساعة</th>
+            <th class="ems-fn-th none" data-fn="1">ساعات التوقف</th>
+            <th class="ems-fn-th none" data-fn="1">سبب التوقف</th>
+            <th class="ems-fn-th none" data-fn="1">الطرف المتحمل</th>
+            <th class="ems-fn-th none" data-fn="1">العدّاد أول</th>
+            <th class="ems-fn-th none" data-fn="1">العدّاد آخر</th>
+            <th class="ems-fn-th none" data-fn="1">المُدخِل</th>
+            <th class="ems-fn-th none" data-fn="1">اعتماد الموقع</th>
+            <th class="ems-fn-th none" data-fn="1">اعتماد التشغيل</th>
             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-            <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+            <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+            <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>

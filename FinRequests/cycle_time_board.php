@@ -197,6 +197,20 @@ include('../insidebar.php');
             <?php if ($escalated): ?>
             <table class="table table-striped no-datatable" data-no-dt="1">
                 <thead><tr><th>نوع الطلب</th><th>الإدارة</th><th>الحالة</th><th>الاستحقاق</th><th>المستوى</th><th></th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الفترة</th>
+              <th class="ems-fn-th" data-fn="1">عدد الطلبات</th>
+              <th class="ems-fn-th" data-fn="1">متوسط زمن الحلقة الأولى</th>
+              <th class="ems-fn-th" data-fn="1">الثانية</th>
+              <th class="ems-fn-th" data-fn="1">الثالثة</th>
+              <th class="ems-fn-th" data-fn="1">إجمالي زمن الدورة</th>
+              <th class="ems-fn-th" data-fn="1">المستهدف</th>
+              <th class="ems-fn-th" data-fn="1">الانحراف</th>
+              <th class="ems-fn-th" data-fn="1">أطول حلقة</th>
+              <th class="ems-fn-th" data-fn="1">المعتمِد الأبطأ</th>
+              <th class="ems-fn-th" data-fn="1">عدد المتجاوز للمهلة</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الالتزام</th>
+              <th class="ems-fn-th" data-fn="1">الإجراء</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

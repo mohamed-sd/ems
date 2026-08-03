@@ -170,10 +170,21 @@ include '../insidebar.php';
                 <thead><tr>
                     <th>تاريخ الفتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
                     <th>المُبلِّغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخّر</th>
-                
+                    <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                    <th class="ems-fn-th" data-fn="1">رقم البلاغ</th>
+                    <th class="ems-fn-th" data-fn="1">الفئة</th>
+                    <th class="ems-fn-th" data-fn="1">الأولوية</th>
+                    <th class="ems-fn-th" data-fn="1">الموقع</th>
+                    <th class="ems-fn-th" data-fn="1">الإدارة المختصة</th>
+                    <th class="ems-fn-th" data-fn="1">المكلَّف</th>
+                    <th class="ems-fn-th" data-fn="1">مستوى السرية</th>
+                    <th class="ems-fn-th" data-fn="1">المسارات المتوازية</th>
+                    <th class="ems-fn-th" data-fn="1">المهلة</th>
+                    <th class="ems-fn-th none" data-fn="1">المتبقي</th>
+                    <th class="ems-fn-th none" data-fn="1">التصعيد الحالي</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                     </tr></thead>
                 <tbody>
                 <?php

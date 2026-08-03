@@ -141,12 +141,27 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>الرصيد الافتتاحي</th><th>إجمالي الداخل</th><th>إجمالي الخارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الفترة</th>
+              <th class="ems-fn-th" data-fn="1">الأسبوع أو الشهر</th>
+              <th class="ems-fn-th" data-fn="1">تحصيلات متوقعة — عملاء</th>
+              <th class="ems-fn-th" data-fn="1">تحصيلات أخرى</th>
+              <th class="ems-fn-th" data-fn="1">سداد موردين</th>
+              <th class="ems-fn-th" data-fn="1">مسيّر رواتب</th>
+              <th class="ems-fn-th" data-fn="1">أقساط تمويل</th>
+              <th class="ems-fn-th" data-fn="1">مشتريات</th>
+              <th class="ems-fn-th" data-fn="1">ترحيل ونثريات</th>
+              <th class="ems-fn-th" data-fn="1">صافي التدفق</th>
+              <th class="ems-fn-th" data-fn="1">الرصيد الختامي</th>
+              <th class="ems-fn-th" data-fn="1">فجوة السيولة</th>
+              <th class="ems-fn-th" data-fn="1">إجراء المعالجة</th>
+              <th class="ems-fn-th none" data-fn="1">أعدّه</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
                 <tbody>
                 <?php

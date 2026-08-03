@@ -630,17 +630,27 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     <thead><tr>
                         <th>#</th><th>نوع الطرف</th><th>السريان</th><th>قبل ← بعد</th><th>الحالة</th><th>المعتمِد — الاسم والصفة</th>
                         <?php if ($can_edit): ?><th>إجراء</th><?php endif; ?>
-                    
+                        <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                        <th class="ems-fn-th" data-fn="1">رقم العقد</th>
+                        <th class="ems-fn-th" data-fn="1">الطرف الآخر</th>
+                        <th class="ems-fn-th" data-fn="1">تاريخ التوقيع</th>
+                        <th class="ems-fn-th" data-fn="1">تاريخ البدء</th>
+                        <th class="ems-fn-th" data-fn="1">تاريخ الانتهاء</th>
+                        <th class="ems-fn-th" data-fn="1">القيمة</th>
+                        <th class="ems-fn-th" data-fn="1">الالتزام القائم</th>
+                        <th class="ems-fn-th" data-fn="1">حالة الكفالة</th>
+                        <th class="ems-fn-th" data-fn="1">المفوَّض بالتوقيع</th>
+                        <th class="ems-fn-th" data-fn="1">الإدارة المالكة</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                         <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-                        <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                        <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-                        <th class="ems-gov-th" data-gov="attached_doc" data-slice="3" title="مستند الإثبات المرفق">المستند المرفق</th>
+                        <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                        <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                        <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+                        <th class="ems-gov-th none" data-gov="attached_doc" data-slice="3" title="مستند الإثبات المرفق">المستند المرفق</th>
                         </tr></thead>
                     <tbody>
                     <?php foreach ($view_amendments as $am): $aid = intval($am['id']);

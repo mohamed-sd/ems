@@ -422,11 +422,25 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                             <th>الكود الكامل</th>
                             <th>الحالة</th>
                             <th class="fc-col-actions">إجراءات</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">رقم السجل</th>
+                            <th class="ems-fn-th" data-fn="1">تاريخ العطل</th>
+                            <th class="ems-fn-th" data-fn="1">كود المعدة</th>
+                            <th class="ems-fn-th" data-fn="1">أمر العمل</th>
+                            <th class="ems-fn-th" data-fn="1">نظام العطل</th>
+                            <th class="ems-fn-th" data-fn="1">تصنيف العطل</th>
+                            <th class="ems-fn-th" data-fn="1">السبب المباشر</th>
+                            <th class="ems-fn-th" data-fn="1">السبب الجذري</th>
+                            <th class="ems-fn-th" data-fn="1">تكرار العطل خلال 90 يومًا</th>
+                            <th class="ems-fn-th" data-fn="1">مجموعة التكرار</th>
+                            <th class="ems-fn-th" data-fn="1">ساعات التوقف التراكمية</th>
+                            <th class="ems-fn-th none" data-fn="1">التكلفة التراكمية</th>
+                            <th class="ems-fn-th none" data-fn="1">الإجراء التصحيحي</th>
+                            <th class="ems-fn-th none" data-fn="1">المسؤول</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-                            <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                            <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                             </tr>
                     </thead>
                     <tbody>

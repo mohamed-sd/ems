@@ -87,6 +87,19 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
             <thead><tr><th>الوقت</th><th>الفعل</th><th>الهدف</th><th>النتيجة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الموظف</th>
+              <th class="ems-fn-th" data-fn="1">الصفة</th>
+              <th class="ems-fn-th" data-fn="1">الإدارة</th>
+              <th class="ems-fn-th" data-fn="1">الموقع</th>
+              <th class="ems-fn-th" data-fn="1">المعدة المكلَّف عليها</th>
+              <th class="ems-fn-th" data-fn="1">المشغّل الآخر على المعدة</th>
+              <th class="ems-fn-th" data-fn="1">مهام مفتوحة</th>
+              <th class="ems-fn-th" data-fn="1">موافقات تنتظرني</th>
+              <th class="ems-fn-th" data-fn="1">طلباتي المعلَّقة</th>
+              <th class="ems-fn-th" data-fn="1">بلاغاتي المفتوحة</th>
+              <th class="ems-fn-th" data-fn="1">إنجاز الشهر</th>
+              <th class="ems-fn-th" data-fn="1">آخر دخول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>

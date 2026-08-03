@@ -27,6 +27,20 @@ include '../insidebar.php';
   <div class="ems-topbar"><h4><i class="fa fa-university"></i> الموازنةُ العامة — <?= $year ?></h4></div>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الإدارة</th><th>ميزانيات</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">السنة المالية</th>
+              <th class="ems-fn-th" data-fn="1">بند الموازنة</th>
+              <th class="ems-fn-th" data-fn="1">رقم الحساب</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد السنوي</th>
+              <th class="ems-fn-th" data-fn="1">التوزيع الربعي 1</th>
+              <th class="ems-fn-th" data-fn="1">الربع 2</th>
+              <th class="ems-fn-th" data-fn="1">الربع 3</th>
+              <th class="ems-fn-th" data-fn="1">الربع 4</th>
+              <th class="ems-fn-th" data-fn="1">المصروف حتى تاريخه</th>
+              <th class="ems-fn-th" data-fn="1">الملتزم به</th>
+              <th class="ems-fn-th" data-fn="1">المتاح</th>
+              <th class="ems-fn-th" data-fn="1">نسبة الصرف</th>
+              <th class="ems-fn-th" data-fn="1">اعتمدها</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

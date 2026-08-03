@@ -867,7 +867,20 @@ include('../insidebar.php');
                             <th> عدد المشاريع</th>
                             <th> الهاتف</th>
                             <th> الحالة</th>
-                        
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                            <th class="ems-fn-th" data-fn="1">الاسم القانوني الكامل</th>
+                            <th class="ems-fn-th" data-fn="1">الشكل النظامي</th>
+                            <th class="ems-fn-th" data-fn="1">بلد التسجيل</th>
+                            <th class="ems-fn-th" data-fn="1">رقم السجل التجاري</th>
+                            <th class="ems-fn-th" data-fn="1">الرقم الضريبي</th>
+                            <th class="ems-fn-th" data-fn="1">العنوان المسجَّل</th>
+                            <th class="ems-fn-th" data-fn="1">جهة الاتصال</th>
+                            <th class="ems-fn-th" data-fn="1">المنصب</th>
+                            <th class="ems-fn-th" data-fn="1">البريد</th>
+                            <th class="ems-fn-th" data-fn="1">تصنيف العميل</th>
+                            <th class="ems-fn-th" data-fn="1">شريحة الأهمية</th>
+                            <th class="ems-fn-th" data-fn="1">سجّله</th>
+                            <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="base_currency" data-slice="3" title="عملة دفاتر الكيان">العملة الأساسية</th>
                             </tr>
