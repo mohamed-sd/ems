@@ -33,3 +33,4 @@ database/backups/env_history/
 # (مصنوعاتُ database/schema/ كودٌ معتمدٌ وتبقى متتبَّعة — هي وصفةُ التنصيب.)
 .installed
 install/install.token
+**/~$*.xlsx
