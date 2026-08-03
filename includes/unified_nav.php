@@ -20,6 +20,7 @@
  */
 
 require_once __DIR__ . '/dynamic_nav.php';
+require_once __DIR__ . '/nav_icon_map.php';
 
 /** الأبواب الثمانية (UX-00 §6 معدَّلًا بقرار DEC-01 ② الصريح — لا تنفيذ صامتًا).
  * HOME هو باب «① الرئيسية» الدستوري: عنصرٌ واحدٌ لكل دورٍ يفتح لوحتَه
@@ -206,7 +207,7 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         // قرارُ المالك (2026-08-02) يخصص حكمَ ١٣: البدءُ مطويًّا بالكامل —
         // والوصولُ محفوظٌ بأكورديون «مجموعةٌ واحدةٌ مفتوحة» في insidebar.
         $openDefault = false;
-        $icon = $stageNo === 99 ? 'fa fa-box-archive' : ($stageNo === 0 ? 'fa fa-gauge-high' : 'fa fa-diagram-project');
+        $icon = ems_nav_stage_icon($stageNo, $title); // أيقونة معبِّرة من عنوان المرحلة لا واحدة موحّدة
 
         $total = 0;
         foreach ($sItems as $it) { if (isset($badges[$it['route']])) { $total += intval($badges[$it['route']]); } }

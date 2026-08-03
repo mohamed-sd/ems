@@ -16,6 +16,7 @@ define('EMS_CLI', true);
 require_once __DIR__ . '/../includes/session_bootstrap.php';
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/nav09_read.php';
+require_once __DIR__ . '/../includes/nav_icon_map.php';
 while (ob_get_level()) ob_end_clean();
 $conn = $GLOBALS['conn'];
 mysqli_set_charset($conn, 'utf8mb4');
@@ -184,12 +185,14 @@ foreach ($doc['depts'] as $deptNo => $dept) {
             // التصادمُ مع رابطٍ قديمٍ لنفس الدور = تبنّيه في بنية المولَّد لا خطأ
             mysqli_query($conn, sprintf(
                 "INSERT INTO nav_items (role_id, door, group_id, label_ar, route, icon, sort_order, active)
-                 VALUES (%d, 'DAILY', %d, '%s', '%s', 'fa fa-circle-dot', %d, 1)
+                 VALUES (%d, 'DAILY', %d, '%s', '%s', '%s', %d, 1)
                  ON DUPLICATE KEY UPDATE group_id = %d, label_ar = VALUES(label_ar), door = 'DAILY',
                      icon = VALUES(icon), sort_order = VALUES(sort_order), active = 1",
                 $role, $gid,
                 mysqli_real_escape_string($conn, $row['title']),
-                mysqli_real_escape_string($conn, $route), $si, $gid)) or die('✘ ni: ' . mysqli_error($conn) . "\n");
+                mysqli_real_escape_string($conn, $route),
+                mysqli_real_escape_string($conn, ems_nav_icon_for($row['title'], $route)),
+                $si, $gid)) or die('✘ ni: ' . mysqli_error($conn) . "\n");
             $links++;
         }
     }
