@@ -89,8 +89,12 @@ function getUnifiedNavItems($conn, $roleId) {
     // DEC-01 ②: باب التمويل خلف بوابة المجال المقيَّد (N-21 · FIN-01 §1.1) —
     // صلاحية can_view لا تكفي: بلا منحةٍ فرديةٍ نافذة **لا يُصيَّر الباب أصلًا**
     // (fail-closed كالبوابة نفسها). السوبر (-1) خارج الترشيح.
+    // NAV-09: روابطُ التمويل تولَّد بمسارها لا ببابها — فالبوابةُ على البادئة
+    // Financing/ لكل الأدوار (والوثيقةُ تعلن العارضين، والمنحةُ الفرديةُ تكشف)
     $hasFin = false;
-    foreach ($items as $it) { if ($it['door'] === 'FIN') { $hasFin = true; break; } }
+    foreach ($items as $it) {
+        if ($it['door'] === 'FIN' || strpos($it['route'], 'Financing/') === 0) { $hasFin = true; break; }
+    }
     if ($hasFin && isset($_SESSION['user']) && strval($_SESSION['user']['role'] ?? '') !== '-1') {
         require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
         $uid = intval($_SESSION['user']['id'] ?? 0);
@@ -102,7 +106,9 @@ function getUnifiedNavItems($conn, $roleId) {
             if (\App\Core\OwnershipDomainGuard::hasGrant($conn, $co, $uid, $p)) { $granted = true; break; }
         }
         if (!$granted) {
-            $items = array_values(array_filter($items, function ($it) { return $it['door'] !== 'FIN'; }));
+            $items = array_values(array_filter($items, function ($it) {
+                return $it['door'] !== 'FIN' && strpos($it['route'], 'Financing/') !== 0;
+            }));
         }
     }
     return $items;

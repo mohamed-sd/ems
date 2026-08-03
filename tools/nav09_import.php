@@ -172,7 +172,9 @@ foreach ($doc['depts'] as $deptNo => $dept) {
             $route = $routeOf($row['file']);
             if (strpos($route, 'main/soon.php') === 0) { $soonLinks++; }
             if (isset($usedRoutes[$route])) { // ظهورٌ ثانٍ مقصودٌ للشاشة نفسِها في القائمة
-                $route .= (strpos($route, '?') === false ? '#' : '#') . 'n9g' . $gi;
+                // المرساةُ بموضع الصف كاملًا (مجموعة×تسلسل) — فمواءمتان لمسارٍ واحدٍ
+                // داخل المجموعة نفسِها لا تتصادمان (قيست: distribution+op_assign)
+                $route .= '#n9g' . $gi . 'i' . $si;
             }
             $usedRoutes[$route] = 1;
             // التصادمُ مع رابطٍ قديمٍ لنفس الدور = تبنّيه في بنية المولَّد لا خطأ
