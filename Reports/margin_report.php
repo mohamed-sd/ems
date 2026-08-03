@@ -78,7 +78,27 @@ include '../insidebar.php';
         <div class="table-container"><table class="alltables display nowrap" style="width:100%">
             <thead><tr><th>العقد</th><th>العملة</th><th>الوقائع</th>
                 <th>إيراد العميل</th><th>تكلفة المورد</th><th>استحقاق المشغّل</th>
-                <th>الهامش</th><th>الهامش٪</th></tr></thead>
+                <th>الهامش</th><th>الهامش٪</th>
+                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+                <th class="ems-fn-th" data-fn="1">الفترة</th>
+                <th class="ems-fn-th" data-fn="1">المشروع</th>
+                <th class="ems-fn-th" data-fn="1">الوحدة</th>
+                <th class="ems-fn-th" data-fn="1">الإيراد المعترَف به</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة المشغّلين</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة الوقود</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة الصيانة</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة المخزون</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة الترحيل</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة التمويل</th>
+                <th class="ems-fn-th" data-fn="1">الإهلاك</th>
+                <th class="ems-fn-th" data-fn="1">إجمالي التكلفة</th>
+                <th class="ems-fn-th" data-fn="1">نسبة الهامش</th>
+                <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+                <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+                </tr></thead>
             <tbody>
             <?php foreach ($rows as $x): $cid = (string)($x['contract_ref'] ?? '—'); ?>
                 <tr<?php echo $x['margin'] < 0 ? ' style="background:#fff3f0"' : ''; ?>>

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-03 12:46:00
--- الجداول: 378 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-03 22:03:20
+-- الجداول: 380 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -25,7 +25,9 @@ CREATE TABLE `achievement_certificates` (
   UNIQUE KEY `uq_cert_serial` (`serial_no`),
   UNIQUE KEY `uq_cert_verify` (`verify_code`),
   UNIQUE KEY `uq_cert_snap` (`snap_id`),
-  KEY `fk_cert_eval` (`eval_id`)
+  KEY `fk_cert_eval` (`eval_id`),
+  CONSTRAINT `fk_cert_eval` FOREIGN KEY (`eval_id`) REFERENCES `evaluations` (`id`),
+  CONSTRAINT `fk_cert_snap` FOREIGN KEY (`snap_id`) REFERENCES `achievement_snapshots` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='USR-01 §7-⑤ — الشهادةُ تُولَّد من الأرقام المقاسة ولا تُصدَر مرتين';
 
 -- ── Table: achievement_snapshots ──
@@ -41,8 +43,9 @@ CREATE TABLE `achievement_snapshots` (
   `source_fingerprint` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'بصمةُ المصادر لحظةَ الحساب',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_snap` (`capacity_id`,`period_from`,`period_to`),
-  KEY `ix_snap_person` (`person_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_snap_person` (`person_id`),
+  CONSTRAINT `fk_snap_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: action_events ──
 CREATE TABLE `action_events` (
@@ -53,7 +56,8 @@ CREATE TABLE `action_events` (
   `condition_expr` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `no_event_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'فعلُ كتابةٍ بلا حدثٍ يحتاج تعليلًا مكتوبًا',
   PRIMARY KEY (`e_id`),
-  UNIQUE KEY `uq_ae` (`action_code`,`event_name`)
+  UNIQUE KEY `uq_ae` (`action_code`,`event_name`),
+  CONSTRAINT `fk_ae_action` FOREIGN KEY (`action_code`) REFERENCES `actions` (`action_code`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: action_execution_log ──
@@ -98,7 +102,8 @@ CREATE TABLE `action_impacts` (
   `effect` enum('notify','counter','data_change','state_change') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `latency` enum('sync','async') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'async',
   PRIMARY KEY (`i_id`),
-  KEY `ix_ai_action` (`action_code`)
+  KEY `ix_ai_action` (`action_code`),
+  CONSTRAINT `fk_ai_action` FOREIGN KEY (`action_code`) REFERENCES `actions` (`action_code`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: action_writes ──
@@ -108,7 +113,8 @@ CREATE TABLE `action_writes` (
   `table_name` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `operation` enum('insert','update','delete','none') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'update',
   PRIMARY KEY (`w_id`),
-  UNIQUE KEY `uq_aw` (`action_code`,`table_name`,`operation`)
+  UNIQUE KEY `uq_aw` (`action_code`,`table_name`,`operation`),
+  CONSTRAINT `fk_aw_action` FOREIGN KEY (`action_code`) REFERENCES `actions` (`action_code`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: actions ──
@@ -216,7 +222,8 @@ CREATE TABLE `admin_audit_log` (
   PRIMARY KEY (`id`),
   KEY `idx_admin_audit_admin` (`admin_id`),
   KEY `idx_admin_audit_action` (`action_type`),
-  KEY `idx_admin_audit_date` (`created_at`)
+  KEY `idx_admin_audit_date` (`created_at`),
+  CONSTRAINT `fk_admin_audit_admin` FOREIGN KEY (`admin_id`) REFERENCES `super_admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: admin_companies ──
@@ -254,7 +261,8 @@ CREATE TABLE `admin_companies` (
   UNIQUE KEY `uq_admin_companies_email` (`email`),
   UNIQUE KEY `uq_admin_companies_commercial_registration` (`commercial_registration`),
   KEY `idx_admin_companies_plan` (`plan_id`),
-  KEY `idx_admin_companies_status` (`status`)
+  KEY `idx_admin_companies_status` (`status`),
+  CONSTRAINT `fk_admin_companies_plan` FOREIGN KEY (`plan_id`) REFERENCES `admin_subscription_plans` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: admin_subscription_plans ──
@@ -290,7 +298,9 @@ CREATE TABLE `admin_subscription_requests` (
   PRIMARY KEY (`id`),
   KEY `idx_admin_sub_req_status` (`status`),
   KEY `idx_admin_sub_req_plan` (`plan_id`),
-  KEY `fk_admin_sub_req_reviewer` (`reviewed_by`)
+  KEY `fk_admin_sub_req_reviewer` (`reviewed_by`),
+  CONSTRAINT `fk_admin_sub_req_plan` FOREIGN KEY (`plan_id`) REFERENCES `admin_subscription_plans` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_admin_sub_req_reviewer` FOREIGN KEY (`reviewed_by`) REFERENCES `super_admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: api_tokens ──
@@ -319,7 +329,8 @@ CREATE TABLE `approval_chains` (
   `sla_hours` int unsigned DEFAULT NULL COMMENT 'المهلة المعلنة — تجاوزها تصعيد لا إغلاق',
   `skip_if_not_applicable` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`chain_id`),
-  UNIQUE KEY `uq_ac_seq` (`policy_id`,`seq_no`)
+  UNIQUE KEY `uq_ac_seq` (`policy_id`,`seq_no`),
+  CONSTRAINT `fk_ac_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POL-01 §4: سلسلة الاعتماد — لا تُفتح حلقة قبل سابقتها';
 
 -- ── Table: approval_requests ──
@@ -363,7 +374,8 @@ CREATE TABLE `approval_signatures` (
   UNIQUE KEY `uq_sig_step` (`document_type`,`document_id`,`person_id`,`step`),
   KEY `ix_sig_person` (`person_id`,`at`),
   KEY `fk_sig_auth` (`auth_id`),
-  KEY `idx_sig_org_asg` (`org_asg_id`)
+  KEY `idx_sig_org_asg` (`org_asg_id`),
+  CONSTRAINT `fk_sig_auth` FOREIGN KEY (`auth_id`) REFERENCES `signing_authorities` (`auth_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §6-③: الاعتماد توقيع — Insert-only ولا تعديل ولا حذف؛ يلف الاعتمادات القائمة لا يوازيها';
 
 -- ── Table: approval_steps ──
@@ -380,7 +392,8 @@ CREATE TABLE `approval_steps` (
   PRIMARY KEY (`id`),
   KEY `idx_approval_steps_request` (`request_id`),
   KEY `idx_approval_steps_status` (`status`),
-  KEY `idx_approval_steps_order` (`step_order`)
+  KEY `idx_approval_steps_order` (`step_order`),
+  CONSTRAINT `fk_approval_steps_request` FOREIGN KEY (`request_id`) REFERENCES `approval_requests` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: approval_workflow_rules ──
@@ -418,7 +431,7 @@ CREATE TABLE `asset_hour_reconciliations` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`rec_id`),
   UNIQUE KEY `uq_ahr` (`company_id`,`equipment_id`,`period`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_ownership_shares ──
 CREATE TABLE `asset_ownership_shares` (
@@ -444,8 +457,9 @@ CREATE TABLE `asset_ownership_shares` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`share_id`),
   KEY `ix_aos_asset` (`company_id`,`asset_kind`,`asset_id`,`valid_from`),
-  KEY `ix_aos_financier` (`financier_entity_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_aos_financier` (`financier_entity_id`),
+  CONSTRAINT `fk_aos_financier` FOREIGN KEY (`financier_entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: assignment_audit ──
 CREATE TABLE `assignment_audit` (
@@ -458,7 +472,8 @@ CREATE TABLE `assignment_audit` (
   `by_person_id` int NOT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`log_id`),
-  KEY `idx_audit_asg` (`asg_id`,`at`)
+  KEY `idx_audit_asg` (`asg_id`,`at`),
+  CONSTRAINT `fk_audit_asg` FOREIGN KEY (`asg_id`) REFERENCES `org_assignments` (`asg_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2⑧: سجلُّ التعديلات والاعتمادات — للإدراج فقط لا يُعدَّل ولا يُحذف';
 
 -- ── Table: assignment_capabilities ──
@@ -470,7 +485,8 @@ CREATE TABLE `assignment_capabilities` (
   `amount_cap` decimal(18,2) DEFAULT NULL COMMENT 'NULL للتشغيلي — والسقفُ الماليُّ نقدي',
   `currency` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`cap_id`),
-  UNIQUE KEY `uq_cap_per_asg` (`asg_id`,`capability_code`)
+  UNIQUE KEY `uq_cap_per_asg` (`asg_id`,`capability_code`),
+  CONSTRAINT `fk_cap_asg` FOREIGN KEY (`asg_id`) REFERENCES `org_assignments` (`asg_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: صلاحياتُ التكليف — السقفُ التشغيليُّ نطاقيٌّ والماليُّ نقدي (DEC-01 ①)';
 
 -- ── Table: assignment_reporting_lines ──
@@ -483,7 +499,9 @@ CREATE TABLE `assignment_reporting_lines` (
   `valid_to` date DEFAULT NULL,
   PRIMARY KEY (`line_id`),
   UNIQUE KEY `uq_line_per_asg` (`asg_id`,`line_type`),
-  KEY `idx_line_reports_to` (`reports_to_assignment_id`)
+  KEY `idx_line_reports_to` (`reports_to_assignment_id`),
+  CONSTRAINT `fk_line_asg` FOREIGN KEY (`asg_id`) REFERENCES `org_assignments` (`asg_id`),
+  CONSTRAINT `fk_line_target` FOREIGN KEY (`reports_to_assignment_id`) REFERENCES `org_assignments` (`asg_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2⑦: التبعيةُ المزدوجة — وقيدُ «الموقعيُّ له خطّان» يحرسه AssignmentService بـ422';
 
 -- ── Table: attendance_days ──
@@ -573,8 +591,9 @@ CREATE TABLE `bank_recon_matches` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_recon_line` (`statement_line_id`) COMMENT 'مضاهاةٌ واحدةٌ لكل سطرِ بنك — ولا سطرَ يُطابَق مرتين',
   KEY `ix_recon_payment` (`company_id`,`payment_id`),
-  KEY `ix_recon_state` (`company_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_recon_state` (`company_id`,`state`),
+  CONSTRAINT `fk_recon_line` FOREIGN KEY (`statement_line_id`) REFERENCES `bank_statement_lines` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: bank_statement_lines ──
 CREATE TABLE `bank_statement_lines` (
@@ -594,8 +613,9 @@ CREATE TABLE `bank_statement_lines` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_bank_line_key` (`company_id`,`line_key`) COMMENT 'إعادةُ استيراد الملف نفسِه **لا تُنشئ سطرًا ثانيًا**',
   KEY `ix_bank_line_stmt` (`statement_id`,`line_no`),
-  KEY `ix_bank_line_match` (`company_id`,`match_state`,`txn_date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_bank_line_match` (`company_id`,`match_state`,`txn_date`),
+  CONSTRAINT `fk_bank_line_stmt` FOREIGN KEY (`statement_id`) REFERENCES `bank_statements` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: bank_statements ──
 CREATE TABLE `bank_statements` (
@@ -622,7 +642,7 @@ CREATE TABLE `bank_statements` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_bank_statement` (`company_id`,`bank_account_id`,`statement_ref`) COMMENT 'كشفٌ واحدٌ لمرجعه في الحساب — إعادةُ الاستيراد تُعيده لا تُكرره',
   KEY `ix_stmt_period` (`company_id`,`bank_account_id`,`period_from`,`period_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: capacity_consumption_ledger ──
 CREATE TABLE `capacity_consumption_ledger` (
@@ -656,8 +676,9 @@ CREATE TABLE `capacity_consumption_ledger` (
   KEY `ix_led_obl_period` (`contract_obligation_id`,`period`),
   KEY `ix_led_company_period` (`company_id`,`period`),
   KEY `ix_led_coverage` (`coverage_id`),
-  KEY `ix_led_reverses` (`reverses_led_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_led_reverses` (`reverses_led_id`),
+  CONSTRAINT `fk_led_reverses` FOREIGN KEY (`reverses_led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: capacity_financial_event_links ──
 CREATE TABLE `capacity_financial_event_links` (
@@ -669,7 +690,8 @@ CREATE TABLE `capacity_financial_event_links` (
   `linked_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`lnk_id`),
   UNIQUE KEY `uq_led_fin` (`led_id`,`fin_event_id`),
-  KEY `ix_lnk_fin` (`fin_event_id`)
+  KEY `ix_lnk_fin` (`fin_event_id`),
+  CONSTRAINT `fk_lnk_led` FOREIGN KEY (`led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §13.2 — جدولُ ربطٍ Append-only بين سطر الدفتر والحدث المالي؛ UQ(led,fin) يمنع الربطَ مرتين';
 
 -- ── Table: capacity_gap_watch ──
@@ -764,7 +786,8 @@ CREATE TABLE `change_approvals` (
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`step_id`),
-  UNIQUE KEY `uq_ca_seq` (`chg_id`,`seq_no`)
+  UNIQUE KEY `uq_ca_seq` (`chg_id`,`seq_no`),
+  CONSTRAINT `fk_ca_chg` FOREIGN KEY (`chg_id`) REFERENCES `unit_state_changes` (`chg_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §6-④: سلّم الموافقات الرباعي — لا تُفتح خطوة قبل اكتمال ما قبلها';
 
 -- ── Table: claim_lines ──
@@ -800,8 +823,9 @@ CREATE TABLE `claim_lines` (
   KEY `ix_cl_claim` (`claim_id`),
   KEY `ix_cl_source` (`source_kind`,`source_ref`) COMMENT 'يكشف أي وحدةٍ استُخلصت في أكثر من مستخلص (حارسٌ في الاختبار)',
   KEY `ix_claim_lines_event` (`event_id`),
-  KEY `ix_cl_plan_keys` (`contract_line_id`,`plan_period_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_cl_plan_keys` (`contract_line_id`,`plan_period_id`),
+  CONSTRAINT `fk_claim_line_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: claims ──
 CREATE TABLE `claims` (
@@ -877,7 +901,63 @@ CREATE TABLE `client_contract_lines` (
   UNIQUE KEY `uq_ccl_line_no` (`company_id`,`contract_id`,`line_no`),
   UNIQUE KEY `uq_ccl_source` (`contract_id`,`source_commitment_id`,`valid_from`) COMMENT 'التزامٌ واحدٌ بسريانٍ واحد — «نسختان لا تكديس»',
   KEY `ix_ccl_lookup` (`company_id`,`contract_id`,`state`,`valid_from`,`valid_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: client_contracts ──
+CREATE TABLE `client_contracts` (
+  `id` int DEFAULT NULL,
+  `company_id` int DEFAULT NULL,
+  `contract_signing_date` date DEFAULT NULL,
+  `grace_period_days` int DEFAULT NULL,
+  `contract_duration_months` int DEFAULT NULL,
+  `contract_duration_days` int DEFAULT NULL,
+  `equip_shifts_contract` int DEFAULT NULL,
+  `shift_contract` int DEFAULT NULL,
+  `equip_total_contract_daily` int DEFAULT NULL,
+  `total_contract_permonth` int DEFAULT NULL,
+  `total_contract_units` int DEFAULT NULL,
+  `actual_start` date DEFAULT NULL,
+  `actual_end` date DEFAULT NULL,
+  `transportation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `accommodation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `place_for_living` mediumtext COLLATE utf8mb4_unicode_ci,
+  `workshop` mediumtext COLLATE utf8mb4_unicode_ci,
+  `hours_monthly_target` int DEFAULT NULL,
+  `forecasted_contracted_hours` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `daily_work_hours` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `daily_operators` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `second_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_one` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_two` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price_currency_contract` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `paid_contract` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `payment_time` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `guarantees` mediumtext COLLATE utf8mb4_unicode_ci,
+  `retention_pct` decimal(5,2) DEFAULT NULL,
+  `advance_recovery_pct` decimal(5,2) DEFAULT NULL,
+  `payment_date` date DEFAULT NULL,
+  `contract_status` enum('مسودة','تفاوض','معتمد','موقَّع','نافذ','قيد التنفيذ','معلَّق','معدَّل','مجدَّد','منتهٍ','مقفل','مصفّى') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pause_state_before` enum('مسودة','تفاوض','معتمد','موقَّع','نافذ','قيد التنفيذ','معلَّق','معدَّل','مجدَّد','منتهٍ','مقفل','مصفّى') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pause_reason` mediumtext COLLATE utf8mb4_unicode_ci,
+  `pause_date` date DEFAULT NULL,
+  `resume_date` date DEFAULT NULL,
+  `termination_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `termination_reason` mediumtext COLLATE utf8mb4_unicode_ci,
+  `merged_with` int DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  `project_id` int DEFAULT NULL,
+  `site_id` int DEFAULT NULL,
+  `readiness_state` enum('لم يبدأ','جارٍ','مجتاز') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `primary_scope_id` int unsigned DEFAULT NULL,
+  `primary_site_id` int DEFAULT NULL,
+  `primary_scope_name` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: clients ──
 CREATE TABLE `clients` (
@@ -940,7 +1020,8 @@ CREATE TABLE `company_user_password_resets` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_company_user_password_resets_token_hash` (`token_hash`),
-  KEY `idx_company_user_password_resets_user_id` (`user_id`)
+  KEY `idx_company_user_password_resets_user_id` (`user_id`),
+  CONSTRAINT `fk_company_user_password_resets_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: container_consumption ──
@@ -961,7 +1042,8 @@ CREATE TABLE `container_consumption` (
   UNIQUE KEY `uq_consumption_idem` (`company_id`,`idem_key`),
   KEY `ix_container` (`company_id`,`container_id`,`consumed_on`),
   KEY `ix_source` (`company_id`,`source_kind`,`source_ref`),
-  KEY `fk_consumption_container` (`container_id`)
+  KEY `fk_consumption_container` (`container_id`),
+  CONSTRAINT `fk_consumption_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='H-01 §4 — دفترُ استهلاك الحاويات؛ الخصمُ الذريُّ يُسجَّل هنا';
 
 -- ── Table: container_swaps ──
@@ -982,8 +1064,10 @@ CREATE TABLE `container_swaps` (
   PRIMARY KEY (`id`),
   KEY `ix_container_swap` (`company_id`,`container_id`,`effective_from`),
   KEY `fk_swap_container` (`container_id`),
-  KEY `fk_swap_to_container` (`to_container_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_swap_to_container` (`to_container_id`),
+  CONSTRAINT `fk_swap_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_swap_to_container` FOREIGN KEY (`to_container_id`) REFERENCES `op_containers` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_advances ──
 CREATE TABLE `contract_advances` (
@@ -1074,7 +1158,7 @@ CREATE TABLE `contract_baseline` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cb_version` (`contract_id`,`version`),
   KEY `ix_cb_state` (`company_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_commitments ──
 CREATE TABLE `contract_commitments` (
@@ -1110,7 +1194,7 @@ CREATE TABLE `contract_commitments` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int DEFAULT NULL,
-  `obl_type_uq_key` varchar(130) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if(((`equipment_type_code` is not null) and (`is_deleted` = 0)),concat(`company_id`,_utf8mb4':',`contract_ref`,_utf8mb4':',`equipment_type_code`,_utf8mb4':',ifnull(cast(`valid_from` as char charset utf8mb4),_utf8mb4'open')),NULL)) STORED COMMENT 'CAP-01: فهرسٌ فريدٌ مشروطٌ على عمودٍ مولَّد — UQ(contract, equipment_type_code, valid_from) للأحياء ذوي النوع (DEC-CAP-C)',
+  `obl_type_uq_key` varchar(130) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if(((`equipment_type_code` is not null) and (`is_deleted` = 0)),concat(`company_id`,_utf8mb4':',`contract_ref`,_utf8mb4':',`equipment_type_code`,_utf8mb4':',ifnull(date_format(`valid_from`,_utf8mb4'%Y-%m-%d'),_utf8mb4'open')),NULL)) STORED COMMENT 'CAP-01: فهرسٌ فريدٌ مشروطٌ على عمودٍ مولَّد — UQ(contract, equipment_type_code, valid_from) للأحياء ذوي النوع (DEC-CAP-C)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_commit_company_code` (`company_id`,`commitment_code`),
   UNIQUE KEY `uq_obl_type_from` (`obl_type_uq_key`),
@@ -1175,7 +1259,7 @@ CREATE TABLE `contract_guarantees` (
   PRIMARY KEY (`id`),
   KEY `ix_cg_lookup` (`company_id`,`contract_id`,`state`),
   KEY `ix_cg_expiry` (`expiry_date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_hour_policies ──
 CREATE TABLE `contract_hour_policies` (
@@ -1224,7 +1308,7 @@ CREATE TABLE `contract_hour_policies` (
   KEY `ix_lookup_obligation` (`company_id`,`party_scope`,`contract_ref`,`obligation_type`,`ops_state`),
   KEY `ix_policy_state` (`company_id`,`party_scope`,`policy_state`),
   KEY `ix_policy_superseded` (`superseded_by`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_lifecycle_events ──
 CREATE TABLE `contract_lifecycle_events` (
@@ -1253,7 +1337,7 @@ CREATE TABLE `contract_lifecycle_events` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cle_event` (`contract_id`,`state`,`effect_date`),
   KEY `ix_cle_lookup` (`company_id`,`state`,`effect_date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_monthly_plan ──
 CREATE TABLE `contract_monthly_plan` (
@@ -1272,8 +1356,9 @@ CREATE TABLE `contract_monthly_plan` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cmp_month` (`line_id`,`plan_version`,`period_month`) COMMENT 'شهرٌ واحدٌ لكل (بند × نسخة) — لا تكديسَ ولا ازدواج',
-  KEY `ix_cmp_lookup` (`company_id`,`contract_id`,`plan_version`,`period_month`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_cmp_lookup` (`company_id`,`contract_id`,`plan_version`,`period_month`),
+  CONSTRAINT `fk_cmp_line` FOREIGN KEY (`line_id`) REFERENCES `client_contract_lines` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_notes ──
 CREATE TABLE `contract_notes` (
@@ -1287,7 +1372,10 @@ CREATE TABLE `contract_notes` (
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `fk_contract_notes_contract` (`contract_id`),
-  KEY `fk_contract_notes_created_by` (`created_by`)
+  KEY `fk_contract_notes_created_by` (`created_by`),
+  CONSTRAINT `fk_contract_notes_contract` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_contract_notes_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_contract_notes_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_obligations ──
@@ -1316,7 +1404,9 @@ CREATE TABLE `contract_obligations` (
   KEY `ix_obligation_contract` (`client_contract_id`),
   KEY `ix_obligation_validity` (`valid_from`,`valid_to`),
   KEY `fk_obligation_penalty_rule` (`penalty_rule_id`),
-  KEY `ix_obligation_effective` (`client_contract_id`,`approval_state`,`valid_from`,`valid_to`)
+  KEY `ix_obligation_effective` (`client_contract_id`,`approval_state`,`valid_from`,`valid_to`),
+  CONSTRAINT `fk_contract_obligations_contract` FOREIGN KEY (`client_contract_id`) REFERENCES `contracts` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_obligation_penalty_rule` FOREIGN KEY (`penalty_rule_id`) REFERENCES `contract_penalty_rules` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CON-02 §4/§8 — مصفوفةُ التزامات عقد العميل: منها يُشتق المسؤولُ لا من حالة الساعة';
 
 -- ── Table: contract_operational_sites ──
@@ -1344,8 +1434,9 @@ CREATE TABLE `contract_operational_sites` (
   UNIQUE KEY `uq_cos_primary` (`contract_id`,`primary_flag`) COMMENT '«رئيسٌ واحدٌ على الأكثر» بنيويًّا',
   KEY `ix_cos_lookup` (`company_id`,`contract_id`,`state`),
   KEY `ix_cos_site` (`company_id`,`site_id`),
-  KEY `fk_cos_site` (`site_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_cos_site` (`site_id`),
+  CONSTRAINT `fk_cos_site` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_payment_schedule ──
 CREATE TABLE `contract_payment_schedule` (
@@ -1387,7 +1478,7 @@ CREATE TABLE `contract_payment_schedule` (
   UNIQUE KEY `uq_cps_seq` (`contract_id`,`version`,`seq`),
   KEY `ix_cps_lookup` (`company_id`,`contract_id`,`state`,`due_date`),
   KEY `ix_cps_live` (`contract_id`,`effective_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_penalty_assessments ──
 CREATE TABLE `contract_penalty_assessments` (
@@ -1431,7 +1522,9 @@ CREATE TABLE `contract_penalty_assessments` (
   KEY `ix_assessment_scope` (`company_id`,`is_deleted`),
   KEY `ix_assessment_state` (`state`),
   KEY `ix_assessment_period` (`client_contract_id`,`period_from`,`period_to`),
-  KEY `fk_assessment_rule` (`rule_id`)
+  KEY `fk_assessment_rule` (`rule_id`),
+  CONSTRAINT `fk_assessment_contract` FOREIGN KEY (`client_contract_id`) REFERENCES `contracts` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_assessment_rule` FOREIGN KEY (`rule_id`) REFERENCES `contract_penalty_rules` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CON-02 §6 — احتسابُ الجزاء والحافز والحد الأدنى لفترةٍ بعينها بدورة اعتماده';
 
 -- ── Table: contract_penalty_rules ──
@@ -1461,7 +1554,9 @@ CREATE TABLE `contract_penalty_rules` (
   UNIQUE KEY `uq_penalty_rule` (`client_contract_id`,`rule_kind`,`commitment_key`,`valid_from`) COMMENT 'قاعدةٌ واحدةٌ لكل (عقد × نوع × مرساة × تاريخ سريان) — والتعديلُ صفٌّ جديدٌ بسريانه (لا رجعية)',
   KEY `ix_penalty_scope` (`company_id`,`is_deleted`),
   KEY `ix_penalty_contract` (`client_contract_id`,`valid_from`,`valid_to`),
-  KEY `fk_penalty_rule_commitment` (`commitment_ref`)
+  KEY `fk_penalty_rule_commitment` (`commitment_ref`),
+  CONSTRAINT `fk_penalty_rule_commitment` FOREIGN KEY (`commitment_ref`) REFERENCES `contract_commitments` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_penalty_rule_contract` FOREIGN KEY (`client_contract_id`) REFERENCES `contracts` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CON-02 §6/§8 — قواعدُ الجزاء والحافز: نوعان لكلٍّ، بسقفٍ ومرساةٍ وسريان';
 
 -- ── Table: contract_price_index_readings ──
@@ -1478,7 +1573,7 @@ CREATE TABLE `contract_price_index_readings` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_price_index_reading` (`company_id`,`index_code`,`reading_date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_price_revisions ──
 CREATE TABLE `contract_price_revisions` (
@@ -1507,7 +1602,9 @@ CREATE TABLE `contract_price_revisions` (
   UNIQUE KEY `uq_price_revision_period_item` (`term_id`,`period_key`,`contract_item_id`),
   KEY `ix_price_revision_live` (`company_id`,`contract_id`,`effective_from`),
   KEY `fk_price_revision_amd` (`amendment_id`),
-  KEY `ix_price_revision_term` (`term_id`)
+  KEY `ix_price_revision_term` (`term_id`),
+  CONSTRAINT `fk_price_revision_amd` FOREIGN KEY (`amendment_id`) REFERENCES `contract_amendments` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_price_revision_term` FOREIGN KEY (`term_id`) REFERENCES `contract_price_terms` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_price_terms ──
@@ -1534,8 +1631,9 @@ CREATE TABLE `contract_price_terms` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_price_term_scope` (`contract_id`,`contract_item_id`,`trigger_kind`,`valid_from`),
-  KEY `ix_price_term_co` (`company_id`,`contract_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_price_term_co` (`company_id`,`contract_id`,`state`),
+  CONSTRAINT `fk_price_term_contract` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_resource_plan ──
 CREATE TABLE `contract_resource_plan` (
@@ -1572,8 +1670,10 @@ CREATE TABLE `contract_resource_plan` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_crp_live_type` (`line_id`,`live_type_key`) COMMENT 'نوعٌ واحدٌ نافذٌ لكل بند — ولا صفَّان يتنازعان الحصةَ نفسَها',
   KEY `ix_crp_lookup` (`company_id`,`contract_id`,`state`),
-  KEY `ix_crp_type` (`equipment_type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_crp_type` (`equipment_type_id`),
+  CONSTRAINT `fk_crp_line` FOREIGN KEY (`line_id`) REFERENCES `client_contract_lines` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_crp_type` FOREIGN KEY (`equipment_type_id`) REFERENCES `equipments_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_snapshots ──
 CREATE TABLE `contract_snapshots` (
@@ -1593,7 +1693,8 @@ CREATE TABLE `contract_snapshots` (
   PRIMARY KEY (`id`),
   KEY `ix_cs_contract_asof` (`contract_id`,`as_of_date`,`valid`),
   KEY `ix_cs_company` (`company_id`),
-  KEY `ix_cs_fingerprint` (`fingerprint`)
+  KEY `ix_cs_fingerprint` (`fingerprint`),
+  CONSTRAINT `fk_cs_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contractequipments ──
@@ -1624,7 +1725,8 @@ CREATE TABLE `contractequipments` (
   `equip_price_currency` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تمييز السعر',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `contract_id` (`contract_id`)
+  KEY `contract_id` (`contract_id`),
+  CONSTRAINT `fk_contractequipments_contract` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contracts ──
@@ -1684,7 +1786,10 @@ CREATE TABLE `contracts` (
   KEY `idx_contracts_signing_date` (`contract_signing_date`),
   KEY `idx_contracts_status_contract_status` (`status`,`contract_status`),
   KEY `ix_contract_state` (`company_id`,`contract_status`),
-  KEY `ix_contracts_site` (`site_id`)
+  KEY `ix_contracts_site` (`site_id`),
+  CONSTRAINT `fk_contracts_merged` FOREIGN KEY (`merged_with`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_contracts_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
+  CONSTRAINT `fk_contracts_site` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: cost_bearers ──
@@ -1723,8 +1828,9 @@ CREATE TABLE `coverage_settlement_lines` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ln_id`),
   KEY `ix_csl_cov` (`cov_id`,`party`),
-  KEY `ix_csl_company` (`company_id`,`settlement_ref`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_csl_company` (`company_id`,`settlement_ref`),
+  CONSTRAINT `fk_csl_cov` FOREIGN KEY (`cov_id`) REFERENCES `substitute_coverages` (`cov_id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: credit_debit_notes ──
 CREATE TABLE `credit_debit_notes` (
@@ -1782,7 +1888,10 @@ CREATE TABLE `daily_plan_lines` (
   KEY `ix_dpl_operator` (`operator_employee_id`),
   KEY `ix_dpl_equipment` (`equipment_id`,`shift_no`),
   KEY `fk_dpl_eq_container` (`equipment_container_id`),
-  KEY `fk_dpl_op_container` (`operator_container_id`)
+  KEY `fk_dpl_op_container` (`operator_container_id`),
+  CONSTRAINT `fk_dpl_eq_container` FOREIGN KEY (`equipment_container_id`) REFERENCES `op_containers` (`id`),
+  CONSTRAINT `fk_dpl_op_container` FOREIGN KEY (`operator_container_id`) REFERENCES `op_containers` (`id`),
+  CONSTRAINT `fk_dpl_plan` FOREIGN KEY (`plan_id`) REFERENCES `daily_plans` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: daily_plans ──
@@ -1805,7 +1914,8 @@ CREATE TABLE `daily_plans` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_dp_project_date` (`project_id`,`plan_date`) COMMENT 'خطةٌ واحدةٌ ليومِ المشروع',
   KEY `ix_dp_company` (`company_id`),
-  KEY `ix_dp_state_date` (`state`,`plan_date`)
+  KEY `ix_dp_state_date` (`state`,`plan_date`),
+  CONSTRAINT `fk_dp_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: decision_reasons ──
@@ -1841,7 +1951,7 @@ CREATE TABLE `deduction_proposals` (
   PRIMARY KEY (`ded_id`),
   UNIQUE KEY `uq_dp_source` (`person_id`,`period`,`source`,`source_ref`),
   KEY `ix_dp_state` (`company_id`,`period`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: deduction_types ──
 CREATE TABLE `deduction_types` (
@@ -1853,8 +1963,9 @@ CREATE TABLE `deduction_types` (
   `auto_propose` tinyint(1) NOT NULL DEFAULT '1',
   `requires_approval` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'دائمًا 1 — لا خصم آلي الترحيل في أي إدارة',
   PRIMARY KEY (`ded_id`),
-  KEY `ix_dt_policy` (`policy_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_dt_policy` (`policy_id`),
+  CONSTRAINT `fk_dt_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: dept_policies ──
 CREATE TABLE `dept_policies` (
@@ -1883,7 +1994,8 @@ CREATE TABLE `driver_contract_notes` (
   `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الملاحظة أو الإجراء المتخذ',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'تاريخ الإضافة',
   PRIMARY KEY (`id`),
-  KEY `idx_driver_contract_notes_contract_id` (`contract_id`)
+  KEY `idx_driver_contract_notes_contract_id` (`contract_id`),
+  CONSTRAINT `fk_driver_contract_notes_contract` FOREIGN KEY (`contract_id`) REFERENCES `drivercontracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجل التدقيق لإجراءات عقود السائقين';
 
 -- ── Table: drivercontractequipments ──
@@ -1914,7 +2026,8 @@ CREATE TABLE `drivercontractequipments` (
   `equip_assistants` int DEFAULT NULL COMMENT 'عدد المساعدين',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `contract_id` (`contract_id`)
+  KEY `contract_id` (`contract_id`),
+  CONSTRAINT `fk_drivercontractequipments_contract` FOREIGN KEY (`contract_id`) REFERENCES `drivercontracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='معدات عقود السائقين';
 
 -- ── Table: drivercontracts ──
@@ -1978,7 +2091,11 @@ CREATE TABLE `drivercontracts` (
   KEY `fk_drivercontracts_driver` (`employee_id`),
   KEY `fk_drivercontracts_project` (`project_id`),
   KEY `fk_drivercontracts_merged` (`merged_with`),
-  KEY `idx_dc_status_signing` (`status`,`contract_signing_date`)
+  KEY `idx_dc_status_signing` (`status`,`contract_signing_date`),
+  CONSTRAINT `fk_drivercontracts_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_drivercontracts_merged` FOREIGN KEY (`merged_with`) REFERENCES `drivercontracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_drivercontracts_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_drivercontracts_project_contract` FOREIGN KEY (`project_contract_id`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: effective_permissions ──
@@ -2023,7 +2140,7 @@ CREATE TABLE `employee_advances` (
   PRIMARY KEY (`id`),
   KEY `ix_adv_person_state` (`person_id`,`state`),
   KEY `ix_adv_co` (`company_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_contract_amendments ──
 CREATE TABLE `employee_contract_amendments` (
@@ -2045,7 +2162,8 @@ CREATE TABLE `employee_contract_amendments` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_eca_contract_eff_type` (`contract_id`,`effective_from`,`amend_type`),
-  KEY `ix_eca_company` (`company_id`)
+  KEY `ix_eca_company` (`company_id`),
+  CONSTRAINT `fk_eca_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_contracts ──
@@ -2084,8 +2202,11 @@ CREATE TABLE `employee_contracts` (
   KEY `ix_ec_state_end` (`state`,`end_date`) COMMENT 'فهرسُ التنبيه (state, end_date) — CON-01 §7.1',
   KEY `ix_ec_company` (`company_id`),
   KEY `fk_ec_project` (`project_id`),
-  KEY `fk_ec_pay_model` (`pay_model_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_ec_pay_model` (`pay_model_id`),
+  CONSTRAINT `fk_ec_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
+  CONSTRAINT `fk_ec_pay_model` FOREIGN KEY (`pay_model_id`) REFERENCES `pay_models` (`id`),
+  CONSTRAINT `fk_ec_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_final_settlement_lines ──
 CREATE TABLE `employee_final_settlement_lines` (
@@ -2101,7 +2222,8 @@ CREATE TABLE `employee_final_settlement_lines` (
   `source_note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_fs_line` (`settlement_id`,`line_type`)
+  UNIQUE KEY `uq_fs_line` (`settlement_id`,`line_type`),
+  CONSTRAINT `fk_fs_line` FOREIGN KEY (`settlement_id`) REFERENCES `employee_final_settlements` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_final_settlements ──
@@ -2136,8 +2258,9 @@ CREATE TABLE `employee_final_settlements` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_final_settlement` (`contract_id`) COMMENT '«بمفتاح (العقد × التصفية) لا يتكرر»',
-  KEY `ix_final_settlement` (`company_id`,`employee_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_final_settlement` (`company_id`,`employee_id`,`state`),
+  CONSTRAINT `fk_fs_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_roles ──
 CREATE TABLE `employee_roles` (
@@ -2283,7 +2406,8 @@ CREATE TABLE `ems_business_events` (
   KEY `ix_ebe_corr` (`correlation_id`),
   KEY `ix_ebe_occurred` (`company_id`,`occurred_at`),
   KEY `ix_ebe_reverses` (`reverses_event_id`),
-  KEY `fk_be_currency` (`company_id`,`currency`)
+  KEY `fk_be_currency` (`company_id`,`currency`),
+  CONSTRAINT `fk_be_currency` FOREIGN KEY (`company_id`, `currency`) REFERENCES `fin_currencies` (`company_id`, `code`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ADR-15: الجذر المحايد — سجل الحقائق المؤسسي append-only؛ القناة: EventPublisher حصرًا؛ الدفتر المالي إسقاطه الأول';
 
 -- ── Table: ems_event_consumers ──
@@ -2404,7 +2528,8 @@ CREATE TABLE `entity_licenses` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`lic_id`),
   KEY `ix_el_expiry` (`expiry_date`,`state`),
-  KEY `fk_el_entity` (`entity_id`)
+  KEY `fk_el_entity` (`entity_id`),
+  CONSTRAINT `fk_el_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §5: التراخيص بتواريخ انتهائها وتنبيهاتها';
 
 -- ── Table: entity_ownership ──
@@ -2424,8 +2549,9 @@ CREATE TABLE `entity_ownership` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`own_id`),
   KEY `ix_eo_owned` (`owned_entity_id`,`valid_from`),
-  KEY `ix_eo_owner` (`owner_type`,`owner_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_eo_owner` (`owner_type`,`owner_id`),
+  CONSTRAINT `fk_eo_owned` FOREIGN KEY (`owned_entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: entity_roles ──
 CREATE TABLE `entity_roles` (
@@ -2438,7 +2564,8 @@ CREATE TABLE `entity_roles` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `uq_er_entity_role` (`entity_id`,`role`,`valid_from`),
-  KEY `ix_er_role` (`role`,`valid_to`)
+  KEY `ix_er_role` (`role`,`valid_to`),
+  CONSTRAINT `fk_er_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §2-②: صفات الكيان جدول علاقة مؤرَّخ — لا حقل نصي';
 
 -- ── Table: equipment_documents ──
@@ -2481,7 +2608,9 @@ CREATE TABLE `equipment_drivers` (
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `fk_equipment_drivers_equipment` (`equipment_id`),
-  KEY `fk_equipment_drivers_driver` (`employee_id`)
+  KEY `fk_equipment_drivers_driver` (`employee_id`),
+  CONSTRAINT `fk_equipment_drivers_driver` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_equipment_drivers_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: equipment_operators ──
@@ -2635,8 +2764,9 @@ CREATE TABLE `evaluations` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_eval` (`capacity_id`,`period_from`,`period_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `uq_eval` (`capacity_id`,`period_from`,`period_to`),
+  CONSTRAINT `fk_eval_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: event_consumers ──
 CREATE TABLE `event_consumers` (
@@ -2663,7 +2793,8 @@ CREATE TABLE `exception_approvals` (
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`app_id`),
-  UNIQUE KEY `uq_exa_seq` (`req_id`,`seq_no`)
+  UNIQUE KEY `uq_exa_seq` (`req_id`,`seq_no`),
+  CONSTRAINT `fk_exa_req` FOREIGN KEY (`req_id`) REFERENCES `exception_requests` (`req_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §7: موافقات الاستثناء بالتسلسل — approver ≠ requester ولا دور مكرر';
 
 -- ── Table: exception_requests ──
@@ -2688,7 +2819,8 @@ CREATE TABLE `exception_requests` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`req_id`),
   KEY `ix_exr_guard` (`guard_code`,`state`,`valid_to`),
-  KEY `ix_exr_company` (`company_id`,`state`)
+  KEY `ix_exr_company` (`company_id`,`state`),
+  CONSTRAINT `fk_exr_guard` FOREIGN KEY (`guard_code`) REFERENCES `guard_policies` (`guard_code`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §7: طلبات الاستثناء — بمدة ونطاق وسبب ومستندات، ولا استثناء عام';
 
 -- ── Table: exception_usages ──
@@ -2699,7 +2831,8 @@ CREATE TABLE `exception_usages` (
   `person_id` int NOT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`usage_id`),
-  KEY `ix_exu_req` (`req_id`,`at`)
+  KEY `ix_exu_req` (`req_id`,`at`),
+  CONSTRAINT `fk_exu_req` FOREIGN KEY (`req_id`) REFERENCES `exception_requests` (`req_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §7-⑤: كل عبور باستثناء يُسجَّل — Insert-only';
 
 -- ── Table: failure_codes ──
@@ -2741,7 +2874,8 @@ CREATE TABLE `fin_accountants` (
   UNIQUE KEY `uq_fin_acct` (`company_id`,`employee_id`,`admin_module`),
   KEY `ix_fin_acct_module` (`company_id`,`admin_module`),
   KEY `ix_fin_acct_deleted` (`is_deleted`),
-  KEY `fk_fin_acct_unit` (`finance_unit_id`)
+  KEY `fk_fin_acct_unit` (`finance_unit_id`),
+  CONSTRAINT `fk_fin_acct_unit` FOREIGN KEY (`finance_unit_id`) REFERENCES `fin_units` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_approval_matrix ──
@@ -2842,7 +2976,8 @@ CREATE TABLE `fin_bank_statement_lines` (
   PRIMARY KEY (`id`),
   KEY `ix_fin_bsl_acct` (`company_id`,`bank_account_id`),
   KEY `ix_fin_bsl_rec` (`company_id`,`reconciled`),
-  KEY `fk_fin_bsl_acct` (`bank_account_id`)
+  KEY `fk_fin_bsl_acct` (`bank_account_id`),
+  CONSTRAINT `fk_fin_bsl_acct` FOREIGN KEY (`bank_account_id`) REFERENCES `fin_bank_accounts` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_budget_lines ──
@@ -2866,7 +3001,9 @@ CREATE TABLE `fin_budget_lines` (
   PRIMARY KEY (`id`),
   KEY `ix_fin_bl_budget` (`company_id`,`budget_id`),
   KEY `fk_fin_bl_budget` (`budget_id`),
-  KEY `fk_fin_bl_acc` (`account_id`)
+  KEY `fk_fin_bl_acc` (`account_id`),
+  CONSTRAINT `fk_fin_bl_acc` FOREIGN KEY (`account_id`) REFERENCES `fin_chart_of_accounts` (`id`),
+  CONSTRAINT `fk_fin_bl_budget` FOREIGN KEY (`budget_id`) REFERENCES `fin_budgets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_budgets ──
@@ -2946,7 +3083,8 @@ CREATE TABLE `fin_chart_of_accounts` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fin_acc_code` (`company_id`,`code`),
   KEY `ix_fin_acc_type` (`company_id`,`account_type`),
-  KEY `ix_fin_acc_parent` (`parent_id`)
+  KEY `ix_fin_acc_parent` (`parent_id`),
+  CONSTRAINT `fk_fin_coa_parent` FOREIGN KEY (`parent_id`) REFERENCES `fin_chart_of_accounts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_closing_items ──
@@ -2963,7 +3101,8 @@ CREATE TABLE `fin_closing_items` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_fin_ci_period` (`company_id`,`period_id`),
-  KEY `fk_fin_ci_period` (`period_id`)
+  KEY `fk_fin_ci_period` (`period_id`),
+  CONSTRAINT `fk_fin_ci_period` FOREIGN KEY (`period_id`) REFERENCES `fin_financial_periods` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_collection_allocations ──
@@ -2990,8 +3129,10 @@ CREATE TABLE `fin_collection_allocations` (
   UNIQUE KEY `uq_alloc_target` (`payment_id`,`target_kind`,`target_ref`),
   UNIQUE KEY `uq_alloc` (`payment_id`,`receivable_id`),
   KEY `ix_alloc_recv` (`company_id`,`receivable_id`),
-  KEY `fk_alloc_receivable` (`receivable_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_alloc_receivable` (`receivable_id`),
+  CONSTRAINT `fk_alloc_payment` FOREIGN KEY (`payment_id`) REFERENCES `fin_payments` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_alloc_receivable` FOREIGN KEY (`receivable_id`) REFERENCES `fin_receivables` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_cost_centers ──
 CREATE TABLE `fin_cost_centers` (
@@ -3015,7 +3156,8 @@ CREATE TABLE `fin_cost_centers` (
   UNIQUE KEY `uq_fin_cc_code` (`company_id`,`code`),
   KEY `ix_fin_cc_parent` (`company_id`,`parent_id`),
   KEY `ix_fin_cc_deleted` (`is_deleted`),
-  KEY `fk_fin_cc_parent` (`parent_id`)
+  KEY `fk_fin_cc_parent` (`parent_id`),
+  CONSTRAINT `fk_fin_cc_parent` FOREIGN KEY (`parent_id`) REFERENCES `fin_cost_centers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_cost_records ──
@@ -3087,7 +3229,8 @@ CREATE TABLE `fin_depreciation` (
   UNIQUE KEY `uq_fin_dep` (`company_id`,`asset_id`,`period_ref`),
   KEY `ix_fin_dep_asset` (`company_id`,`asset_id`),
   KEY `fk_fin_dep_asset` (`asset_id`),
-  KEY `ix_fin_dep_event` (`event_id`)
+  KEY `ix_fin_dep_event` (`event_id`),
+  CONSTRAINT `fk_fin_dep_asset` FOREIGN KEY (`asset_id`) REFERENCES `fin_assets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_dues ──
@@ -3120,8 +3263,9 @@ CREATE TABLE `fin_dues` (
   KEY `ix_fin_dues_settle` (`company_id`,`settlement_state`),
   KEY `ix_fin_dues_deleted` (`is_deleted`),
   KEY `fk_dues_currency` (`company_id`,`currency`),
-  KEY `ix_dues_source_doc` (`company_id`,`source_doc_type`,`source_doc_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_dues_source_doc` (`company_id`,`source_doc_type`,`source_doc_id`),
+  CONSTRAINT `fk_dues_currency` FOREIGN KEY (`company_id`, `currency`) REFERENCES `fin_currencies` (`company_id`, `code`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_effect_map ──
 CREATE TABLE `fin_effect_map` (
@@ -3158,7 +3302,8 @@ CREATE TABLE `fin_event_effects` (
   PRIMARY KEY (`effect_id`),
   UNIQUE KEY `uq_effect` (`event_id`,`effect_type`,`party_type`,`party_id`,`contract_line_id`),
   KEY `ix_eff_company_party` (`company_id`,`party_type`,`party_id`),
-  KEY `ix_eff_type` (`company_id`,`effect_type`)
+  KEY `ix_eff_type` (`company_id`,`effect_type`),
+  CONSTRAINT `fk_eff_event` FOREIGN KEY (`event_id`) REFERENCES `fin_financial_events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='H-12 (FES §3.2): آثارُ الحدث — الحدثُ الواحد قد يولّد آثارًا لعدة أطراف';
 
 -- ── Table: fin_event_links ──
@@ -3256,8 +3401,10 @@ CREATE TABLE `fin_financial_events` (
   KEY `ix_ffe_due` (`company_id`,`due_date`),
   KEY `ix_ffe_causation` (`causation_id`),
   KEY `ix_ffe_source_line` (`company_id`,`entity_type`,`entity_id`,`source_line_id`,`source_doc_version`),
-  KEY `fk_ffe_period` (`fiscal_period_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_ffe_period` (`fiscal_period_id`),
+  CONSTRAINT `fk_ffe_period` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fin_financial_periods` (`id`),
+  CONSTRAINT `fk_ffe_root` FOREIGN KEY (`root_event_id`) REFERENCES `ems_business_events` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_financial_periods ──
 CREATE TABLE `fin_financial_periods` (
@@ -3331,7 +3478,8 @@ CREATE TABLE `fin_funding_schedules` (
   KEY `ix_fin_fs_fac` (`company_id`,`facility_id`),
   KEY `ix_fin_fs_due` (`company_id`,`due_date`),
   KEY `fk_fin_fs_fac` (`facility_id`),
-  KEY `ix_funding_due` (`company_id`,`due_date`,`state`)
+  KEY `ix_funding_due` (`company_id`,`due_date`,`state`),
+  CONSTRAINT `fk_fin_fs_fac` FOREIGN KEY (`facility_id`) REFERENCES `fin_funding_facilities` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_fx_differences ──
@@ -3355,7 +3503,7 @@ CREATE TABLE `fin_fx_differences` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fxd_source` (`kind`,`source_kind`,`source_ref`),
   KEY `ix_fxd_lookup` (`company_id`,`kind`,`occurred_on`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_fx_rates ──
 CREATE TABLE `fin_fx_rates` (
@@ -3400,7 +3548,9 @@ CREATE TABLE `fin_internal_allocations` (
   KEY `ix_fin_ia_type` (`company_id`,`alloc_type`),
   KEY `ix_fin_ia_deleted` (`is_deleted`),
   KEY `fk_fin_ia_from` (`from_center_id`),
-  KEY `fk_fin_ia_to` (`to_center_id`)
+  KEY `fk_fin_ia_to` (`to_center_id`),
+  CONSTRAINT `fk_fin_ia_from` FOREIGN KEY (`from_center_id`) REFERENCES `fin_cost_centers` (`id`),
+  CONSTRAINT `fk_fin_ia_to` FOREIGN KEY (`to_center_id`) REFERENCES `fin_cost_centers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_journal_entries ──
@@ -3436,7 +3586,7 @@ CREATE TABLE `fin_journal_entries` (
   KEY `ix_fin_entry_deleted` (`is_deleted`),
   KEY `ix_je_txn_date` (`company_id`,`txn_date`),
   KEY `ix_je_request_no` (`company_id`,`request_no`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_journal_lines ──
 CREATE TABLE `fin_journal_lines` (
@@ -3458,7 +3608,10 @@ CREATE TABLE `fin_journal_lines` (
   KEY `fk_fin_jl_entry` (`entry_id`),
   KEY `fk_fin_jl_acc` (`account_id`),
   KEY `ix_jl_cost_center` (`company_id`,`cost_center_id`),
-  KEY `fk_fin_jl_cc` (`cost_center_id`)
+  KEY `fk_fin_jl_cc` (`cost_center_id`),
+  CONSTRAINT `fk_fin_jl_acc` FOREIGN KEY (`account_id`) REFERENCES `fin_chart_of_accounts` (`id`),
+  CONSTRAINT `fk_fin_jl_cc` FOREIGN KEY (`cost_center_id`) REFERENCES `fin_cost_centers` (`id`),
+  CONSTRAINT `fk_fin_jl_entry` FOREIGN KEY (`entry_id`) REFERENCES `fin_journal_entries` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_maint_provision_rules ──
@@ -3483,7 +3636,7 @@ CREATE TABLE `fin_maint_provision_rules` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mprov_rule` (`company_id`,`equipment_id`,`equipment_type`,`basis`,`effective_from`),
   KEY `ix_mprov_rule_lookup` (`company_id`,`state`,`effective_from`,`effective_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_maint_provisions ──
 CREATE TABLE `fin_maint_provisions` (
@@ -3506,7 +3659,7 @@ CREATE TABLE `fin_maint_provisions` (
   UNIQUE KEY `uq_maint_provision` (`company_id`,`equipment_id`,`period_ref`) COMMENT '«بمفتاح (المعدة × الفترة)» بنيويًّا',
   KEY `ix_mprov_period` (`company_id`,`period_ref`),
   KEY `ix_mprov_event` (`event_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_notifications ──
 CREATE TABLE `fin_notifications` (
@@ -3574,7 +3727,7 @@ CREATE TABLE `fin_payments` (
   KEY `ix_fin_pay_dir` (`company_id`,`direction`),
   KEY `ix_fin_pay_state` (`company_id`,`state`),
   KEY `ix_fin_pay_deleted` (`is_deleted`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_receivables ──
 CREATE TABLE `fin_receivables` (
@@ -3621,7 +3774,8 @@ CREATE TABLE `fin_request_documents` (
   `sync_uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_req` (`company_id`,`request_id`),
-  KEY `fk_frd_req` (`request_id`)
+  KEY `fk_frd_req` (`request_id`),
+  CONSTRAINT `fk_frd_req` FOREIGN KEY (`request_id`) REFERENCES `fin_requests` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_request_events ──
@@ -3640,7 +3794,8 @@ CREATE TABLE `fin_request_events` (
   PRIMARY KEY (`id`),
   KEY `ix_req` (`company_id`,`request_id`,`created_at`),
   KEY `ix_type` (`company_id`,`event_type`),
-  KEY `fk_fre_req` (`request_id`)
+  KEY `fk_fre_req` (`request_id`),
+  CONSTRAINT `fk_fre_req` FOREIGN KEY (`request_id`) REFERENCES `fin_requests` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_request_lines ──
@@ -3656,7 +3811,8 @@ CREATE TABLE `fin_request_lines` (
   `note` varchar(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_req` (`company_id`,`request_id`),
-  KEY `fk_frl_req` (`request_id`)
+  KEY `fk_frl_req` (`request_id`),
+  CONSTRAINT `fk_frl_req` FOREIGN KEY (`request_id`) REFERENCES `fin_requests` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_request_routing ──
@@ -3728,8 +3884,10 @@ CREATE TABLE `fin_requests` (
   KEY `ix_module` (`company_id`,`source_module`),
   KEY `ix_event` (`event_id`),
   KEY `ix_req_parent` (`parent_request_id`),
-  KEY `ix_req_settlement` (`settlement_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_req_settlement` (`settlement_id`),
+  CONSTRAINT `fk_req_parent` FOREIGN KEY (`parent_request_id`) REFERENCES `fin_requests` (`id`),
+  CONSTRAINT `fk_req_settlement` FOREIGN KEY (`settlement_id`) REFERENCES `settlements` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_tax_codes ──
 CREATE TABLE `fin_tax_codes` (
@@ -3775,7 +3933,7 @@ CREATE TABLE `fin_tax_returns` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_tax_return` (`company_id`,`period_ref`) COMMENT '«بمفتاح الفترة»',
   KEY `ix_tax_return_state` (`company_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_tax_transactions ──
 CREATE TABLE `fin_tax_transactions` (
@@ -3799,7 +3957,8 @@ CREATE TABLE `fin_tax_transactions` (
   KEY `ix_fin_taxtr_period` (`company_id`,`period_ref`),
   KEY `ix_fin_taxtr_dir` (`company_id`,`direction`),
   KEY `ix_fin_taxtr_deleted` (`is_deleted`),
-  KEY `fk_fin_taxtr_code` (`tax_code_id`)
+  KEY `fk_fin_taxtr_code` (`tax_code_id`),
+  CONSTRAINT `fk_fin_taxtr_code` FOREIGN KEY (`tax_code_id`) REFERENCES `fin_tax_codes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_unit_records ──
@@ -3870,7 +4029,8 @@ CREATE TABLE `financed_assets` (
   `in_fleet` tinyint(1) NOT NULL DEFAULT '0',
   `in_asset_register` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`fa_id`),
-  UNIQUE KEY `uq_fa` (`op_id`,`asset_kind`,`asset_id`)
+  UNIQUE KEY `uq_fa` (`op_id`,`asset_kind`,`asset_id`),
+  CONSTRAINT `fk_fa_op` FOREIGN KEY (`op_id`) REFERENCES `financing_operations` (`op_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-01 §4-②: أعيان العملية — فحص تقاطع الأسطول وسجل الأصول';
 
 -- ── Table: financing_deviations ──
@@ -3891,7 +4051,7 @@ CREATE TABLE `financing_deviations` (
   PRIMARY KEY (`dev_id`),
   UNIQUE KEY `uq_fd_subject` (`company_id`,`dev_type`,`subject_ref`),
   KEY `ix_fd_state` (`company_id`,`state`,`priority`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: financing_installments ──
 CREATE TABLE `financing_installments` (
@@ -3912,7 +4072,8 @@ CREATE TABLE `financing_installments` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`inst_id`),
   UNIQUE KEY `uq_fi_seq` (`op_id`,`seq_no`) COMMENT 'يمنع تكرار القسط — وحدث الاستحقاق بمفتاح (العملية×القسط)',
-  KEY `ix_fi_due` (`due_date`,`state`)
+  KEY `ix_fi_due` (`due_date`,`state`),
+  CONSTRAINT `fk_fi_op` FOREIGN KEY (`op_id`) REFERENCES `financing_operations` (`op_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-01 §6: الأقساط تولَّد من العملية ولا تُدخل يدويًّا';
 
 -- ── Table: financing_models ──
@@ -3962,7 +4123,9 @@ CREATE TABLE `financing_operations` (
   PRIMARY KEY (`op_id`),
   UNIQUE KEY `uq_fo_code` (`company_id`,`op_code`),
   KEY `ix_fo_financier` (`financier_entity_id`,`state`),
-  KEY `fk_fo_model` (`model_code`)
+  KEY `fk_fo_model` (`model_code`),
+  CONSTRAINT `fk_fo_financier` FOREIGN KEY (`financier_entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_fo_model` FOREIGN KEY (`model_code`) REFERENCES `financing_models` (`model_code`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-01 §4: عمليات التمويل بدورة حياتها — ولا عملية بلا نموذج ومعالجة';
 
 -- ── Table: fleet_depreciation_profile ──
@@ -4025,7 +4188,8 @@ CREATE TABLE `fleet_equipment_compliance` (
   PRIMARY KEY (`id`),
   KEY `idx_fec_equipment` (`equipment_id`),
   KEY `idx_fec_company` (`company_id`),
-  KEY `idx_fec_expiry` (`expiry_date`)
+  KEY `idx_fec_expiry` (`expiry_date`),
+  CONSTRAINT `fk_fec_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: fleet_equipment_component ──
@@ -4046,7 +4210,8 @@ CREATE TABLE `fleet_equipment_component` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_fecmp_equipment` (`equipment_id`),
-  KEY `idx_fecmp_company` (`company_id`)
+  KEY `idx_fecmp_company` (`company_id`),
+  CONSTRAINT `fk_fecmp_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: fleet_equipment_history ──
@@ -4075,7 +4240,8 @@ CREATE TABLE `fleet_equipment_history` (
   KEY `idx_feh_equipment` (`equipment_id`),
   KEY `idx_feh_company` (`company_id`),
   KEY `idx_feh_date` (`event_date`),
-  KEY `idx_feh_equipment_date` (`equipment_id`,`event_date`)
+  KEY `idx_feh_equipment_date` (`equipment_id`,`event_date`),
+  CONSTRAINT `fk_feh_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: fleet_equipment_protection ──
@@ -4100,7 +4266,9 @@ CREATE TABLE `fleet_equipment_protection` (
   PRIMARY KEY (`id`),
   KEY `idx_fep_equipment` (`equipment_id`),
   KEY `idx_fep_company` (`company_id`),
-  KEY `idx_fep_compliance` (`compliance_id`)
+  KEY `idx_fep_compliance` (`compliance_id`),
+  CONSTRAINT `fk_fep_compliance` FOREIGN KEY (`compliance_id`) REFERENCES `fleet_equipment_compliance` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_fep_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: fleet_model ──
@@ -4148,7 +4316,8 @@ CREATE TABLE `fleet_model_service_spec` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_fmss_model` (`model_id`),
-  KEY `idx_fmss_company` (`company_id`)
+  KEY `idx_fmss_company` (`company_id`),
+  CONSTRAINT `fk_fmss_model` FOREIGN KEY (`model_id`) REFERENCES `fleet_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: founding_mode ──
@@ -4164,7 +4333,7 @@ CREATE TABLE `founding_mode` (
   `closure_ref` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`mode_id`),
   UNIQUE KEY `uq_fm_mode` (`mode`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: governance_flags ──
 CREATE TABLE `governance_flags` (
@@ -4200,7 +4369,8 @@ CREATE TABLE `guarantees` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`gtee_id`),
   KEY `ix_g_expiry` (`expiry_date`,`state`),
-  KEY `fk_g_entity` (`entity_id`)
+  KEY `fk_g_entity` (`entity_id`),
+  CONSTRAINT `fk_g_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §5: الكفالات وخطابات الضمان — التزام/حق محتمل خارج الميزانية، مفصول عن المحتجَز النقدي (P-06)';
 
 -- ── Table: guard_denials ──
@@ -4272,7 +4442,8 @@ CREATE TABLE `impact_matrix` (
   `effect` enum('billable','countable','payable','penalized','none') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `derived_from` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع المصفوفة الأم (CON-02 §5) إن اشتُقت',
   PRIMARY KEY (`mx_id`),
-  UNIQUE KEY `uq_mx` (`policy_id`,`state_code`,`party_type`)
+  UNIQUE KEY `uq_mx` (`policy_id`,`state_code`,`party_type`),
+  CONSTRAINT `fk_mx_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POL-01 §8: مصفوفة الأثر — لا حالة بلا أثر معلن لكل طرف، ولا أثر يُستنتج';
 
 -- ── Table: incentive_allocations ──
@@ -4287,7 +4458,8 @@ CREATE TABLE `incentive_allocations` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ia_beneficiary` (`rule_id`,`beneficiary_type`,`beneficiary_id`),
   KEY `ix_ia_rule` (`rule_id`),
-  KEY `ix_ia_company` (`company_id`)
+  KEY `ix_ia_company` (`company_id`),
+  CONSTRAINT `fk_ia_rule` FOREIGN KEY (`rule_id`) REFERENCES `incentive_rules` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: incentive_rules ──
@@ -4316,7 +4488,8 @@ CREATE TABLE `incentive_rules` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_ir_contract` (`contract_id`),
-  KEY `ix_ir_company` (`company_id`)
+  KEY `ix_ir_company` (`company_id`),
+  CONSTRAINT `fk_ir_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: intercompany_dues ──
@@ -4332,7 +4505,8 @@ CREATE TABLE `intercompany_dues` (
   `state` enum('accrued','settled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'accrued',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`due_id`),
-  UNIQUE KEY `uq_icd` (`loan_id`,`period`,`creditor_entity_id`)
+  UNIQUE KEY `uq_icd` (`loan_id`,`period`,`creditor_entity_id`),
+  CONSTRAINT `fk_icd_loan` FOREIGN KEY (`loan_id`) REFERENCES `intercompany_loans` (`loan_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-09: المستحق المتبادل المسجَّل بين الكيانين — بنسب التحمل';
 
 -- ── Table: intercompany_loans ──
@@ -4355,8 +4529,10 @@ CREATE TABLE `intercompany_loans` (
   PRIMARY KEY (`loan_id`),
   KEY `ix_icl_equipment` (`company_id`,`equipment_id`,`state`),
   KEY `fk_icl_lender` (`lender_entity_id`),
-  KEY `fk_icl_borrower` (`borrower_entity_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_icl_borrower` (`borrower_entity_id`),
+  CONSTRAINT `fk_icl_borrower` FOREIGN KEY (`borrower_entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_icl_lender` FOREIGN KEY (`lender_entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: job_titles ──
 CREATE TABLE `job_titles` (
@@ -4427,7 +4603,8 @@ CREATE TABLE `link_groups` (
   PRIMARY KEY (`id`),
   KEY `ix_owner_role` (`owner_role_id`),
   KEY `ix_display_order` (`display_order`),
-  KEY `idx_lg_code` (`owner_role_id`,`group_code`)
+  KEY `idx_lg_code` (`owner_role_id`,`group_code`),
+  CONSTRAINT `link_groups_role_fk` FOREIGN KEY (`owner_role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='مجموعات روابط السايدبار — لكل دورٍ مجموعاته';
 
 -- ── Table: messages ──
@@ -4472,8 +4649,9 @@ CREATE TABLE `meter_readings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_meter_reading_day` (`equipment_id`,`meter_type`,`reading_date`),
   KEY `ix_meter_latest` (`equipment_id`,`meter_type`,`chain_no`,`reading_date`),
-  KEY `ix_meter_co` (`company_id`,`reading_date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_meter_co` (`company_id`,`reading_date`),
+  CONSTRAINT `fk_meter_reading_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_breakdown ──
 CREATE TABLE `mnt_breakdown` (
@@ -4559,7 +4737,8 @@ CREATE TABLE `mnt_inspection_line` (
   `photo_ref` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M-34: مرجعُ صورة البند',
   `converted_ticket_id` int DEFAULT NULL COMMENT 'M-34: بلاغُ NoteConverted — ولا يتكرر',
   PRIMARY KEY (`id`),
-  KEY `idx_inspline_inspection` (`inspection_id`)
+  KEY `idx_inspline_inspection` (`inspection_id`),
+  CONSTRAINT `fk_inspline_inspection` FOREIGN KEY (`inspection_id`) REFERENCES `mnt_inspection` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_inspection_template ──
@@ -4589,7 +4768,8 @@ CREATE TABLE `mnt_inspection_template_line` (
   `check_method` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'طريقة الفحص',
   `reference_limit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'القيمة المقاسة / الحد المرجعي',
   PRIMARY KEY (`id`),
-  KEY `idx_tplline_template` (`template_id`)
+  KEY `idx_tplline_template` (`template_id`),
+  CONSTRAINT `fk_tplline_template` FOREIGN KEY (`template_id`) REFERENCES `mnt_inspection_template` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_lookup ──
@@ -4677,7 +4857,8 @@ CREATE TABLE `mnt_order_labor` (
   `cost` decimal(12,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_labor_order` (`order_id`)
+  KEY `idx_labor_order` (`order_id`),
+  CONSTRAINT `fk_labor_order` FOREIGN KEY (`order_id`) REFERENCES `mnt_order` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_order_part ──
@@ -4693,7 +4874,8 @@ CREATE TABLE `mnt_order_part` (
   `is_major_component` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_part_order` (`order_id`)
+  KEY `idx_part_order` (`order_id`),
+  CONSTRAINT `fk_part_order` FOREIGN KEY (`order_id`) REFERENCES `mnt_order` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_plan ──
@@ -4736,7 +4918,8 @@ CREATE TABLE `mnt_plan_task` (
   `est_hours` decimal(8,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_plantask_plan` (`plan_id`)
+  KEY `idx_plantask_plan` (`plan_id`),
+  CONSTRAINT `fk_plantask_plan` FOREIGN KEY (`plan_id`) REFERENCES `mnt_plan` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: modules ──
@@ -4753,7 +4936,9 @@ CREATE TABLE `modules` (
   PRIMARY KEY (`id`),
   KEY `owner_role_id` (`owner_role_id`),
   KEY `idx_display_order` (`display_order`),
-  KEY `ix_modules_group` (`group_id`)
+  KEY `ix_modules_group` (`group_id`),
+  CONSTRAINT `modules_group_fk` FOREIGN KEY (`group_id`) REFERENCES `link_groups` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`owner_role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: monthly_performance ──
@@ -4783,8 +4968,9 @@ CREATE TABLE `monthly_performance` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mp_seat_period` (`company_id`,`container_id`,`period`),
   KEY `ix_mp_contract` (`company_id`,`contract_id`,`period`),
-  KEY `fk_mp_container` (`container_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_mp_container` (`container_id`),
+  CONSTRAINT `fk_mp_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: monthly_performance_downtime ──
 CREATE TABLE `monthly_performance_downtime` (
@@ -4803,8 +4989,11 @@ CREATE TABLE `monthly_performance_downtime` (
   UNIQUE KEY `uq_mpd_reason` (`perf_id`,`reason_code`),
   KEY `ix_mpd_company` (`company_id`,`perf_id`),
   KEY `fk_mpd_reason` (`reason_code`),
-  KEY `fk_mpd_obligation` (`obligation_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_mpd_obligation` (`obligation_id`),
+  CONSTRAINT `fk_mpd_obligation` FOREIGN KEY (`obligation_id`) REFERENCES `contract_obligations` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_mpd_perf` FOREIGN KEY (`perf_id`) REFERENCES `monthly_performance` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_mpd_reason` FOREIGN KEY (`reason_code`) REFERENCES `stop_reason_codes` (`code`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav09_action_map ──
 CREATE TABLE `nav09_action_map` (
@@ -4859,7 +5048,7 @@ CREATE TABLE `nav_items` (
   KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
   KEY `ix_nav_group` (`group_id`),
   KEY `ix_nav_module` (`module_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav_redirects ──
 CREATE TABLE `nav_redirects` (
@@ -4932,8 +5121,10 @@ CREATE TABLE `op_containers` (
   KEY `ix_site` (`company_id`,`project_id`,`state`),
   KEY `ix_container_origin` (`company_id`,`origin`,`origin_ack_by`),
   KEY `ix_oc_resource_plan` (`resource_plan_id`),
-  KEY `fk_oc_parent_obl` (`parent_id`,`obl_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_oc_parent_obl` (`parent_id`,`obl_id`),
+  CONSTRAINT `fk_container_parent` FOREIGN KEY (`parent_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_oc_parent_obl` FOREIGN KEY (`parent_id`, `obl_id`) REFERENCES `op_containers` (`id`, `obl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: operations ──
 CREATE TABLE `operations` (
@@ -4989,8 +5180,9 @@ CREATE TABLE `operator_rotations` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rotation` (`company_id`,`container_id`,`operator_employee_id`,`cycle_start`),
   KEY `ix_rotation_op` (`company_id`,`operator_employee_id`),
-  KEY `fk_rotation_container` (`container_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_rotation_container` (`container_id`),
+  CONSTRAINT `fk_rotation_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: opportunities ──
 CREATE TABLE `opportunities` (
@@ -5069,7 +5261,9 @@ CREATE TABLE `org_assignments` (
   KEY `idx_asg_scope` (`company_id`,`scope_type`,`scope_id`,`state`),
   KEY `idx_asg_validity` (`state`,`valid_to`),
   KEY `fk_asg_type` (`assignment_type_code`),
-  KEY `fk_asg_unit` (`org_unit_id`)
+  KEY `fk_asg_unit` (`org_unit_id`),
+  CONSTRAINT `fk_asg_type` FOREIGN KEY (`assignment_type_code`) REFERENCES `org_assignment_types` (`type_code`),
+  CONSTRAINT `fk_asg_unit` FOREIGN KEY (`org_unit_id`) REFERENCES `org_units` (`unit_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2/§7: التكليفُ سجلٌّ تنظيميٌّ بنطاقٍ ومدةٍ وسقفٍ ونائبٍ — ويسقط آليًّا بانتهائه';
 
 -- ── Table: org_units ──
@@ -5086,7 +5280,8 @@ CREATE TABLE `org_units` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`unit_id`),
   UNIQUE KEY `uq_org_units_scope` (`company_id`,`unit_code`),
-  KEY `idx_org_units_parent` (`parent_unit_id`)
+  KEY `idx_org_units_parent` (`parent_unit_id`),
+  CONSTRAINT `fk_org_units_parent` FOREIGN KEY (`parent_unit_id`) REFERENCES `org_units` (`unit_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: الوحداتُ التنظيمية — head_person_id مشتقٌّ من org_assignments (v_org_unit_heads) ولا يُكتب';
 
 -- ── Table: ownership_access_grants ──
@@ -5105,7 +5300,7 @@ CREATE TABLE `ownership_access_grants` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`grant_id`),
   KEY `ix_oag_person` (`company_id`,`person_id`,`permission_code`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: pay_components ──
 CREATE TABLE `pay_components` (
@@ -5140,7 +5335,9 @@ CREATE TABLE `pay_components` (
   PRIMARY KEY (`id`),
   KEY `ix_pc_contract` (`contract_id`),
   KEY `ix_pc_company` (`company_id`),
-  KEY `fk_pc_cost_center` (`cost_center_id`)
+  KEY `fk_pc_cost_center` (`cost_center_id`),
+  CONSTRAINT `fk_pc_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`),
+  CONSTRAINT `fk_pc_cost_center` FOREIGN KEY (`cost_center_id`) REFERENCES `fin_cost_centers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: pay_models ──
@@ -5177,7 +5374,7 @@ CREATE TABLE `payroll_absence_types` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_absence_type` (`company_id`,`event_type`),
   UNIQUE KEY `uq_absence_code` (`company_id`,`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_deductions ──
 CREATE TABLE `payroll_deductions` (
@@ -5195,8 +5392,9 @@ CREATE TABLE `payroll_deductions` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_payroll_deduction` (`run_id`,`person_id`,`source_type`,`source_id`),
-  KEY `ix_deduction_run` (`run_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_deduction_run` (`run_id`),
+  CONSTRAINT `fk_deduction_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_lines ──
 CREATE TABLE `payroll_lines` (
@@ -5225,7 +5423,9 @@ CREATE TABLE `payroll_lines` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_payroll_line_run_person` (`run_id`,`person_id`),
-  KEY `ix_payroll_line_snapshot` (`snapshot_id`)
+  KEY `ix_payroll_line_snapshot` (`snapshot_id`),
+  CONSTRAINT `fk_payroll_line_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_payroll_line_snapshot` FOREIGN KEY (`snapshot_id`) REFERENCES `contract_snapshots` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_run_blocks ──
@@ -5242,7 +5442,8 @@ CREATE TABLE `payroll_run_blocks` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_payroll_block` (`run_id`,`contract_id`,`block_code`),
-  KEY `ix_payroll_block_run` (`run_id`)
+  KEY `ix_payroll_block_run` (`run_id`),
+  CONSTRAINT `fk_payroll_block_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_runs ──
@@ -5268,7 +5469,7 @@ CREATE TABLE `payroll_runs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_payroll_run_key` (`company_id`,`period_from`,`period_to`,`category_filter`),
   KEY `ix_payroll_run_state` (`company_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_settings ──
 CREATE TABLE `payroll_settings` (
@@ -5281,7 +5482,7 @@ CREATE TABLE `payroll_settings` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_payroll_settings_co` (`company_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_time_inputs ──
 CREATE TABLE `payroll_time_inputs` (
@@ -5297,8 +5498,9 @@ CREATE TABLE `payroll_time_inputs` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_time_input` (`run_id`,`person_id`,`kind`),
-  KEY `ix_time_input_co` (`company_id`,`run_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_time_input_co` (`company_id`,`run_id`),
+  CONSTRAINT `fk_time_input_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: perm_shadow_diffs ──
 CREATE TABLE `perm_shadow_diffs` (
@@ -5332,7 +5534,8 @@ CREATE TABLE `permission_approval_steps` (
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `at` datetime DEFAULT NULL,
   PRIMARY KEY (`st_id`),
-  UNIQUE KEY `uq_step` (`req_id`,`seq_no`)
+  UNIQUE KEY `uq_step` (`req_id`,`seq_no`),
+  CONSTRAINT `fk_step_req` FOREIGN KEY (`req_id`) REFERENCES `permission_change_requests` (`req_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: لا تُفتح خطوة قبل سابقتها — يحرسه PermissionChangeWorkflow';
 
 -- ── Table: permission_audit_events ──
@@ -5394,7 +5597,7 @@ CREATE TABLE `permission_exceptions` (
   PRIMARY KEY (`ex_id`),
   KEY `idx_ex_person` (`company_id`,`person_id`,`state`),
   KEY `idx_ex_expiry` (`state`,`valid_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: permission_review_cycles ──
 CREATE TABLE `permission_review_cycles` (
@@ -5422,7 +5625,8 @@ CREATE TABLE `permission_review_lines` (
   `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `decided_at` datetime DEFAULT NULL,
   PRIMARY KEY (`line_id`),
-  KEY `idx_prl_cycle` (`cycle_id`,`person_id`)
+  KEY `idx_prl_cycle` (`cycle_id`,`person_id`),
+  CONSTRAINT `fk_prl_cycle` FOREIGN KEY (`cycle_id`) REFERENCES `permission_review_cycles` (`cycle_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: سطر لكل (موظف × صلاحية) — Insert-only';
 
 -- ── Table: permission_template_versions ──
@@ -5439,7 +5643,8 @@ CREATE TABLE `permission_template_versions` (
   `superseded_by` int unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ver_id`),
-  UNIQUE KEY `uq_ver` (`tpl_id`,`version`)
+  UNIQUE KEY `uq_ver` (`tpl_id`,`version`),
+  CONSTRAINT `fk_ver_tpl` FOREIGN KEY (`tpl_id`) REFERENCES `permission_templates` (`tpl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §4⑥: لا يُعدل إصدار نافذ بأثر رجعي — النشر إصدار جديد بسريان مستقبلي';
 
 -- ── Table: permission_templates ──
@@ -5465,7 +5670,9 @@ CREATE TABLE `permit_approval_actions` (
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`act_id`),
   UNIQUE KEY `uq_act_step` (`req_id`,`rq_id`),
-  KEY `fk_permit_act_rq` (`rq_id`)
+  KEY `fk_permit_act_rq` (`rq_id`),
+  CONSTRAINT `fk_permit_act_req` FOREIGN KEY (`req_id`) REFERENCES `permit_requests` (`req_id`),
+  CONSTRAINT `fk_permit_act_rq` FOREIGN KEY (`rq_id`) REFERENCES `permit_required_approvals` (`rq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: قيدُ التسلسل «لا تُفتح خطوةٌ قبل اكتمال ما قبلها» يحرسه PermitGate بـ409';
 
 -- ── Table: permit_requests ──
@@ -5484,7 +5691,8 @@ CREATE TABLE `permit_requests` (
   PRIMARY KEY (`req_id`),
   KEY `idx_permit_state_site` (`state`,`site_id`),
   KEY `idx_permit_company` (`company_id`,`state`),
-  KEY `fk_preq_type` (`permit_type_code`)
+  KEY `fk_preq_type` (`permit_type_code`),
+  CONSTRAINT `fk_preq_type` FOREIGN KEY (`permit_type_code`) REFERENCES `permit_types` (`permit_type_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: طلبُ الإذن — يمرّ بصندوق الاعتماد الجامع بندًا واحدًا لكل موافقٍ في دوره';
 
 -- ── Table: permit_required_approvals ──
@@ -5495,7 +5703,8 @@ CREATE TABLE `permit_required_approvals` (
   `approver_role` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'المجالُ الوظيفيُّ الموافق — يحلُّه PermitGate من التكليفات النافذة',
   `mandatory` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`rq_id`),
-  UNIQUE KEY `uq_rq_seq` (`permit_type_code`,`seq_no`)
+  UNIQUE KEY `uq_rq_seq` (`permit_type_code`,`seq_no`),
+  CONSTRAINT `fk_permit_rq_type` FOREIGN KEY (`permit_type_code`) REFERENCES `permit_types` (`permit_type_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §5/§7: مصفوفةُ الموافقات المشتركة — يُقرأ منها من يوافق وبأي ترتيب';
 
 -- ── Table: permit_status_history ──
@@ -5507,7 +5716,8 @@ CREATE TABLE `permit_status_history` (
   `by_person_id` int NOT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`hist_id`),
-  KEY `idx_hist_req` (`req_id`,`at`)
+  KEY `idx_hist_req` (`req_id`,`at`),
+  CONSTRAINT `fk_permit_hist_req` FOREIGN KEY (`req_id`) REFERENCES `permit_requests` (`req_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §7: تاريخُ حالات الإذن — للإدراج فقط';
 
 -- ── Table: permit_types ──
@@ -5546,7 +5756,11 @@ CREATE TABLE `person_positions` (
   KEY `idx_pp_company` (`company_id`,`state`),
   KEY `fk_pp_relation` (`relation_code`),
   KEY `fk_pp_family` (`family_code`),
-  KEY `fk_pp_level` (`level_code`)
+  KEY `fk_pp_level` (`level_code`),
+  CONSTRAINT `fk_pp_family` FOREIGN KEY (`family_code`) REFERENCES `hr_dictionaries` (`code`),
+  CONSTRAINT `fk_pp_level` FOREIGN KEY (`level_code`) REFERENCES `hr_dictionaries` (`code`),
+  CONSTRAINT `fk_pp_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`person_id`),
+  CONSTRAINT `fk_pp_relation` FOREIGN KEY (`relation_code`) REFERENCES `hr_dictionaries` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: منع تداخل فترتين لنفس (المسمى×النطاق) يحرسه PositionService — ومركزان مشروعان يبدآن معًا مقبولان';
 
 -- ── Table: person_relationships ──
@@ -5562,7 +5776,8 @@ CREATE TABLE `person_relationships` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`rel_id`),
   KEY `idx_prel_person` (`person_id`,`state`),
-  KEY `idx_prel_company` (`company_id`,`relation_code`,`state`)
+  KEY `idx_prel_company` (`company_id`,`relation_code`,`state`),
+  CONSTRAINT `fk_prel_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §14②: موظف المورد لا يُنشأ له موظف داخلي وهمي';
 
 -- ── Table: persons ──
@@ -5591,7 +5806,8 @@ CREATE TABLE `policy_rules` (
   `valid_from` date DEFAULT NULL,
   `valid_to` date DEFAULT NULL,
   PRIMARY KEY (`rule_id`),
-  KEY `ix_pr_policy` (`policy_id`,`rule_kind`)
+  KEY `ix_pr_policy` (`policy_id`,`rule_kind`),
+  CONSTRAINT `fk_pr_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POL-01 §2-②: قواعد الإدارة بمعادلاتها وسقوفها';
 
 -- ── Table: portal_activity_log ──
@@ -5742,7 +5958,8 @@ CREATE TABLE `proc_issue_line` (
   `subtotal` decimal(14,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_proc_issline_issue` (`issue_id`)
+  KEY `idx_proc_issline_issue` (`issue_id`),
+  CONSTRAINT `fk_proc_issline_iss` FOREIGN KEY (`issue_id`) REFERENCES `proc_issue` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: proc_item ──
@@ -5860,7 +6077,8 @@ CREATE TABLE `proc_order_line` (
   `subtotal` decimal(14,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_proc_ordline_order` (`order_id`)
+  KEY `idx_proc_ordline_order` (`order_id`),
+  CONSTRAINT `fk_proc_ordline_ord` FOREIGN KEY (`order_id`) REFERENCES `proc_order` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: proc_orderpoint ──
@@ -5920,7 +6138,8 @@ CREATE TABLE `proc_receipt_line` (
   `qty` decimal(12,2) NOT NULL DEFAULT '1.00',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_proc_rcline_custody` (`custody_id`)
+  KEY `idx_proc_rcline_custody` (`custody_id`),
+  CONSTRAINT `fk_proc_rcline_custody` FOREIGN KEY (`custody_id`) REFERENCES `proc_receipt_custody` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: proc_request ──
@@ -5961,7 +6180,8 @@ CREATE TABLE `proc_request_line` (
   `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_proc_reqline_request` (`request_id`)
+  KEY `idx_proc_reqline_request` (`request_id`),
+  CONSTRAINT `fk_proc_reqline_req` FOREIGN KEY (`request_id`) REFERENCES `proc_request` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: proc_stock_move ──
@@ -6098,7 +6318,9 @@ CREATE TABLE `project` (
   KEY `fk_project_created_by` (`created_by`),
   KEY `idx_client_id` (`client_id`),
   KEY `idx_mine_code` (`mine_code`),
-  KEY `idx_project_status_deleted` (`status`,`is_deleted`)
+  KEY `idx_project_status_deleted` (`status`,`is_deleted`),
+  CONSTRAINT `fk_project_client` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_project_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: quotations ──
@@ -6170,7 +6392,8 @@ CREATE TABLE `rec_applications` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`app_id`),
-  KEY `ix_app_vac` (`vac_id`,`stage`)
+  KEY `ix_app_vac` (`vac_id`,`stage`),
+  CONSTRAINT `fk_app_vac` FOREIGN KEY (`vac_id`) REFERENCES `rec_vacancies` (`vac_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: rec_stage_log ──
@@ -6230,8 +6453,9 @@ CREATE TABLE `rfq_awards` (
   `awarded_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_award` (`line_id`,`supplier_id`) COMMENT 'ترسيةٌ واحدةٌ لكل (بند × مورد)',
-  KEY `ix_rfq_award` (`company_id`,`rfq_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_rfq_award` (`company_id`,`rfq_id`),
+  CONSTRAINT `fk_rfq_award_line` FOREIGN KEY (`line_id`) REFERENCES `rfq_lines` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: rfq_lines ──
 CREATE TABLE `rfq_lines` (
@@ -6247,8 +6471,9 @@ CREATE TABLE `rfq_lines` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_line` (`rfq_id`,`commitment_id`) COMMENT 'التزامٌ واحدٌ = بندٌ واحدٌ في الطلب — لا اشتقاقَ مضاعف',
-  KEY `ix_rfq_line` (`company_id`,`rfq_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_rfq_line` (`company_id`,`rfq_id`),
+  CONSTRAINT `fk_rfq_line_rfq` FOREIGN KEY (`rfq_id`) REFERENCES `supplier_rfqs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: rfq_quotes ──
 CREATE TABLE `rfq_quotes` (
@@ -6267,8 +6492,9 @@ CREATE TABLE `rfq_quotes` (
   `submitted_by` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_quote` (`line_id`,`supplier_id`) COMMENT 'عرضٌ واحدٌ لكل (بند × مورد) — والتعديلُ استبدالٌ لا تكديس',
-  KEY `ix_rfq_quote` (`company_id`,`rfq_id`,`supplier_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_rfq_quote` (`company_id`,`rfq_id`,`supplier_id`),
+  CONSTRAINT `fk_rfq_quote_line` FOREIGN KEY (`line_id`) REFERENCES `rfq_lines` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: role_permissions ──
 CREATE TABLE `role_permissions` (
@@ -6281,7 +6507,9 @@ CREATE TABLE `role_permissions` (
   `can_delete` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `role_id` (`role_id`,`module_id`),
-  KEY `module_id` (`module_id`)
+  KEY `module_id` (`module_id`),
+  CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`module_id`) REFERENCES `modules` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: roles ──
@@ -6294,7 +6522,8 @@ CREATE TABLE `roles` (
   `status` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `parent_role_id` (`parent_role_id`)
+  KEY `parent_role_id` (`parent_role_id`),
+  CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`parent_role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: schema_migrations ──
@@ -6363,8 +6592,9 @@ CREATE TABLE `seat_assignments` (
   KEY `ix_sa_seat` (`company_id`,`container_id`,`date_from`),
   KEY `ix_sa_equipment` (`company_id`,`equipment_id`,`date_from`),
   KEY `fk_sa_container` (`container_id`),
-  KEY `ix_sa_supplier_line` (`supplier_contract_line_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sa_supplier_line` (`supplier_contract_line_id`),
+  CONSTRAINT `fk_sa_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: sensitive_access_grants ──
 CREATE TABLE `sensitive_access_grants` (
@@ -6439,7 +6669,8 @@ CREATE TABLE `settlement_lines` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_line_source` (`settlement_id`,`source_kind`,`source_ref`) COMMENT 'لا يُحمَّل مصدرٌ مرتين في التسوية الواحدة',
   KEY `ix_line_settlement` (`settlement_id`),
-  KEY `ix_line_objected` (`objected`)
+  KEY `ix_line_objected` (`objected`),
+  CONSTRAINT `fk_line_settlement` FOREIGN KEY (`settlement_id`) REFERENCES `settlements` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='بنودُ التسوية — كلُّ بندٍ برابط أصله (UX-05 §5.2)';
 
 -- ── Table: settlements ──
@@ -6493,7 +6724,7 @@ CREATE TABLE `settlements` (
   KEY `ix_settlement_state` (`state`),
   KEY `ix_settlement_party` (`party_type`,`party_ref`),
   KEY `ix_settlement_invoice` (`company_id`,`party_ref`,`invoice_no`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: shift_patterns ──
 CREATE TABLE `shift_patterns` (
@@ -6520,7 +6751,8 @@ CREATE TABLE `shift_period_defs` (
   `base_hours` decimal(5,2) NOT NULL,
   `overtime_hours` decimal(5,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`def_id`),
-  UNIQUE KEY `uq_spd` (`pattern_id`,`shift_no`,`period_no`)
+  UNIQUE KEY `uq_spd` (`pattern_id`,`shift_no`,`period_no`),
+  CONSTRAINT `fk_spd_pattern` FOREIGN KEY (`pattern_id`) REFERENCES `shift_patterns` (`pattern_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WRK-01 §2.1: فترات النمط بمواعيدها وساعاتها الأساسية والإضافية';
 
 -- ── Table: shift_period_logs ──
@@ -6547,7 +6779,8 @@ CREATE TABLE `shift_period_logs` (
   UNIQUE KEY `uq_spl_key` (`work_date`,`equipment_id`,`shift_no`,`period_no`) COMMENT 'مفتاح (معدة×تاريخ×وردية×فترة) — يمنع تكرار المزامنة (وشرط N-08)',
   KEY `ix_spl_operator` (`operator_person_id`,`work_date`),
   KEY `ix_spl_company` (`company_id`,`work_date`),
-  KEY `fk_spl_reason` (`stop_reason_code`)
+  KEY `fk_spl_reason` (`stop_reason_code`),
+  CONSTRAINT `fk_spl_reason` FOREIGN KEY (`stop_reason_code`) REFERENCES `stop_reason_codes` (`code`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WRK-01 §2.1: سجل الفترة — وحدة الحقيقة؛ المعدة ثابتة للوردية والمشغّل يتغير بالفترة';
 
 -- ── Table: signing_authorities ──
@@ -6574,7 +6807,8 @@ CREATE TABLE `signing_authorities` (
   KEY `ix_sa_person` (`person_id`,`entity_id`,`state`),
   KEY `ix_sa_expiry` (`valid_to`),
   KEY `fk_sa_entity` (`entity_id`),
-  KEY `ix_sa_delegated` (`delegated_from_auth_id`)
+  KEY `ix_sa_delegated` (`delegated_from_auth_id`),
+  CONSTRAINT `fk_sa_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §4: التفويض بالتوقيع — لا اعتماد بلا تفويض نافذ ساري';
 
 -- ── Table: sites ──
@@ -6599,7 +6833,9 @@ CREATE TABLE `sites` (
   UNIQUE KEY `uq_site_name` (`company_id`,`project_id`,`name`),
   KEY `ix_sites_project` (`project_id`),
   KEY `ix_sites_company` (`company_id`),
-  KEY `fk_sites_resp` (`responsible_employee_id`)
+  KEY `fk_sites_resp` (`responsible_employee_id`),
+  CONSTRAINT `fk_sites_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
+  CONSTRAINT `fk_sites_resp` FOREIGN KEY (`responsible_employee_id`) REFERENCES `employees` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: sod_conflicts ──
@@ -6650,8 +6886,9 @@ CREATE TABLE `substitute_coverages` (
   PRIMARY KEY (`cov_id`),
   KEY `ix_cov_seat` (`company_id`,`covered_seat_id`,`valid_from`),
   KEY `ix_cov_supplier` (`company_id`,`covering_supplier_id`,`state`),
-  KEY `fk_cov_seat` (`covered_seat_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_cov_seat` (`covered_seat_id`),
+  CONSTRAINT `fk_cov_seat` FOREIGN KEY (`covered_seat_id`) REFERENCES `op_containers` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: super_admin_password_resets ──
 CREATE TABLE `super_admin_password_resets` (
@@ -6663,7 +6900,8 @@ CREATE TABLE `super_admin_password_resets` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_super_admin_password_resets_token_hash` (`token_hash`),
-  KEY `idx_super_admin_password_resets_admin_id` (`super_admin_id`)
+  KEY `idx_super_admin_password_resets_admin_id` (`super_admin_id`),
+  CONSTRAINT `fk_super_admin_password_resets_admin` FOREIGN KEY (`super_admin_id`) REFERENCES `super_admins` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: super_admins ──
@@ -6692,8 +6930,9 @@ CREATE TABLE `supplier_advance_recoveries` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sadv_recovery` (`advance_id`,`settlement_id`),
-  KEY `ix_sadv_rec_settlement` (`settlement_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sadv_rec_settlement` (`settlement_id`),
+  CONSTRAINT `fk_sadv_rec_advance` FOREIGN KEY (`advance_id`) REFERENCES `supplier_advance_requests` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_advance_requests ──
 CREATE TABLE `supplier_advance_requests` (
@@ -6721,8 +6960,9 @@ CREATE TABLE `supplier_advance_requests` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_sadv_supplier_state` (`supplier_id`,`state`),
-  KEY `ix_sadv_co` (`company_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sadv_co` (`company_id`,`state`),
+  CONSTRAINT `fk_sadv_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_capacity ──
 CREATE TABLE `supplier_capacity` (
@@ -6745,8 +6985,10 @@ CREATE TABLE `supplier_capacity` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_capacity` (`contract_id`,`equipment_id`,`valid_from`),
   KEY `ix_sup_capacity_eq` (`company_id`,`equipment_id`,`state`),
-  KEY `fk_sup_capacity_equipment` (`equipment_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_sup_capacity_equipment` (`equipment_id`),
+  CONSTRAINT `fk_sup_capacity_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_sup_capacity_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_charge_rules ──
 CREATE TABLE `supplier_charge_rules` (
@@ -6768,8 +7010,9 @@ CREATE TABLE `supplier_charge_rules` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_charge_rule` (`contract_id`,`charge_type`,`valid_from`),
-  KEY `ix_charge_rule_co` (`company_id`,`contract_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_charge_rule_co` (`company_id`,`contract_id`,`state`),
+  CONSTRAINT `fk_charge_rule_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contract_closures ──
 CREATE TABLE `supplier_contract_closures` (
@@ -6798,8 +7041,9 @@ CREATE TABLE `supplier_contract_closures` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_closure` (`contract_id`) COMMENT 'تصفيةٌ واحدةٌ للعقد — «بمفتاح (العقد × التصفية)»',
-  KEY `ix_sup_closure` (`company_id`,`supplier_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sup_closure` (`company_id`,`supplier_id`,`state`),
+  CONSTRAINT `fk_sup_closure_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contract_lines ──
 CREATE TABLE `supplier_contract_lines` (
@@ -6832,8 +7076,9 @@ CREATE TABLE `supplier_contract_lines` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_line_model_unit` (`contract_id`,`work_model`,`unit`),
   KEY `ix_sup_line_co` (`company_id`,`contract_id`),
-  KEY `ix_sup_line_obl` (`contract_obligation_ref`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sup_line_obl` (`contract_obligation_ref`),
+  CONSTRAINT `fk_sup_line_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contract_notes ──
 CREATE TABLE `supplier_contract_notes` (
@@ -6845,7 +7090,9 @@ CREATE TABLE `supplier_contract_notes` (
   `created_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `contract_id` (`contract_id`),
-  KEY `fk_supplier_contract_notes_created_by` (`created_by`)
+  KEY `fk_supplier_contract_notes_created_by` (`created_by`),
+  CONSTRAINT `fk_supplier_contract_notes_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplierscontracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_supplier_contract_notes_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contracts ──
@@ -6874,8 +7121,10 @@ CREATE TABLE `supplier_contracts` (
   UNIQUE KEY `uq_sup_contract_party` (`supplier_id`,`client_contract_id`,`start_date`),
   UNIQUE KEY `uq_sup_contract_source` (`source_table`,`source_id`,`company_id`),
   KEY `ix_sup_contract_co_state` (`company_id`,`state`),
-  KEY `ix_sup_contract_client` (`client_contract_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sup_contract_client` (`client_contract_id`),
+  CONSTRAINT `fk_sup_contract_client` FOREIGN KEY (`client_contract_id`) REFERENCES `contracts` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_sup_contract_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_evaluation_lines ──
 CREATE TABLE `supplier_evaluation_lines` (
@@ -6892,8 +7141,9 @@ CREATE TABLE `supplier_evaluation_lines` (
   `source_note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مصدرُ الرقم بلغة المهمة — لا رقمَ بلا مصدر',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_sup_eval_line` (`evaluation_id`,`indicator`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `uq_sup_eval_line` (`evaluation_id`,`indicator`),
+  CONSTRAINT `fk_sup_eval_line` FOREIGN KEY (`evaluation_id`) REFERENCES `supplier_evaluations` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_evaluation_weights ──
 CREATE TABLE `supplier_evaluation_weights` (
@@ -6909,7 +7159,7 @@ CREATE TABLE `supplier_evaluation_weights` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_eval_weight` (`company_id`,`indicator`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_evaluations ──
 CREATE TABLE `supplier_evaluations` (
@@ -6932,8 +7182,9 @@ CREATE TABLE `supplier_evaluations` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_eval_period` (`supplier_id`,`period_from`,`period_to`),
-  KEY `ix_sup_eval` (`company_id`,`supplier_id`,`state`,`period_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_sup_eval` (`company_id`,`supplier_id`,`state`,`period_to`),
+  CONSTRAINT `fk_sup_eval_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_penalty_rules ──
 CREATE TABLE `supplier_penalty_rules` (
@@ -6959,8 +7210,9 @@ CREATE TABLE `supplier_penalty_rules` (
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_penalty_rule` (`contract_id`,`kind`,`valid_from`),
-  KEY `ix_penalty_rule_co` (`company_id`,`contract_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_penalty_rule_co` (`company_id`,`contract_id`,`state`),
+  CONSTRAINT `fk_sup_penalty_rule_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_rfqs ──
 CREATE TABLE `supplier_rfqs` (
@@ -6986,7 +7238,7 @@ CREATE TABLE `supplier_rfqs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_no` (`company_id`,`rfq_no`),
   KEY `ix_rfq_contract` (`company_id`,`client_contract_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: suppliercontractequipments ──
 CREATE TABLE `suppliercontractequipments` (
@@ -7016,7 +7268,8 @@ CREATE TABLE `suppliercontractequipments` (
   `equip_assistants` int DEFAULT NULL COMMENT 'عدد المساعدين',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `contract_id` (`contract_id`)
+  KEY `contract_id` (`contract_id`),
+  CONSTRAINT `fk_suppliercontractequipments_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplierscontracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='معدات عقود الموردين';
 
 -- ── Table: suppliers ──
@@ -7054,7 +7307,7 @@ CREATE TABLE `suppliers` (
   `deleted_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_suppliers_is_deleted` (`is_deleted`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplierscontracts ──
 CREATE TABLE `supplierscontracts` (
@@ -7117,7 +7370,11 @@ CREATE TABLE `supplierscontracts` (
   KEY `fk_supplierscontracts_supplier` (`supplier_id`),
   KEY `fk_supplierscontracts_project` (`project_id`),
   KEY `fk_supplierscontracts_merged` (`merged_with`),
-  KEY `idx_sc_status_signing` (`status`,`contract_signing_date`)
+  KEY `idx_sc_status_signing` (`status`,`contract_signing_date`),
+  CONSTRAINT `fk_supplierscontracts_merged` FOREIGN KEY (`merged_with`) REFERENCES `supplierscontracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_supplierscontracts_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_supplierscontracts_project_contract` FOREIGN KEY (`project_contract_id`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_supplierscontracts_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: tax_invoices ──
@@ -7148,8 +7405,9 @@ CREATE TABLE `tax_invoices` (
   UNIQUE KEY `uq_tax_serial` (`company_id`,`serial_no`),
   UNIQUE KEY `uq_tax_seq` (`company_id`,`serial_year`,`serial_seq`),
   KEY `ix_tax_claim` (`claim_id`),
-  KEY `ix_tax_client` (`company_id`,`client_id`,`state`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_tax_client` (`company_id`,`client_id`,`state`),
+  CONSTRAINT `fk_tax_invoice_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: template_permissions ──
 CREATE TABLE `template_permissions` (
@@ -7162,7 +7420,8 @@ CREATE TABLE `template_permissions` (
   `currency` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `effect` enum('grant','deny') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'grant',
   PRIMARY KEY (`tp_id`),
-  KEY `idx_tp_ver` (`template_version_id`,`dimension`)
+  KEY `idx_tp_ver` (`template_version_id`,`dimension`),
+  CONSTRAINT `fk_tp_ver` FOREIGN KEY (`template_version_id`) REFERENCES `permission_template_versions` (`ver_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: الأبعاد الأربعة — وdeny يغلب grant دائمًا';
 
 -- ── Table: tenants ──
@@ -7171,7 +7430,8 @@ CREATE TABLE `tenants` (
   `entity_id` int unsigned NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`tenant_id`),
-  UNIQUE KEY `uq_tenants_entity` (`entity_id`)
+  UNIQUE KEY `uq_tenants_entity` (`entity_id`),
+  CONSTRAINT `fk_tenants_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §2-②-ب: حد العزل يُقرأ من هنا حصرًا — ولا يُشتق من أي صفة أخرى';
 
 -- ── Table: tenders ──
@@ -7215,7 +7475,8 @@ CREATE TABLE `ticket_attachments` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_ticket` (`company_id`,`ticket_id`),
-  KEY `fk_at_ticket` (`ticket_id`)
+  KEY `fk_at_ticket` (`ticket_id`),
+  CONSTRAINT `fk_at_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_categories ──
@@ -7242,7 +7503,8 @@ CREATE TABLE `ticket_communications` (
   `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cm_id`),
-  KEY `idx_tc_ticket` (`tk_id`,`at`)
+  KEY `idx_tc_ticket` (`tk_id`,`at`),
+  CONSTRAINT `fk_tktc_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تواصل مركز البلاغات يسجَّل فيبقى أثره (§10-③)';
 
 -- ── Table: ticket_effects ──
@@ -7254,7 +7516,8 @@ CREATE TABLE `ticket_effects` (
   `is_provisional` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'للإسناد قبل اعتماد الأثر — الخطوات الأربع §7',
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`lnk_id`),
-  KEY `idx_te_ws` (`ws_id`)
+  KEY `idx_te_ws` (`ws_id`),
+  CONSTRAINT `fk_tkte_ws` FOREIGN KEY (`ws_id`) REFERENCES `ticket_workstreams` (`ws_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ولا يُغلق مسار بلا سطر هنا (عدا الإغلاق الإداري)';
 
 -- ── Table: ticket_escalation_rules ──
@@ -7282,7 +7545,8 @@ CREATE TABLE `ticket_escalations` (
   `to_person_id` int DEFAULT NULL,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`esc_id`),
-  KEY `idx_esc_ws` (`ws_id`,`at`)
+  KEY `idx_esc_ws` (`ws_id`,`at`),
+  CONSTRAINT `fk_esc_ws` FOREIGN KEY (`ws_id`) REFERENCES `ticket_workstreams` (`ws_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Insert-only — ولا تصعيد يدوي يسجَّل هنا (§6: آلي لا بطلب)';
 
 -- ── Table: ticket_events ──
@@ -7300,7 +7564,8 @@ CREATE TABLE `ticket_events` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ix_ticket_time` (`company_id`,`ticket_id`,`created_at`),
-  KEY `fk_ev_ticket` (`ticket_id`)
+  KEY `fk_ev_ticket` (`ticket_id`),
+  CONSTRAINT `fk_ev_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_holds ──
@@ -7312,7 +7577,8 @@ CREATE TABLE `ticket_holds` (
   `started_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `ended_at` datetime DEFAULT NULL,
   PRIMARY KEY (`hold_id`),
-  KEY `idx_holds_open` (`ws_id`,`ended_at`)
+  KEY `idx_holds_open` (`ws_id`,`ended_at`),
+  CONSTRAINT `fk_hold_ws` FOREIGN KEY (`ws_id`) REFERENCES `ticket_workstreams` (`ws_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_participants ──
@@ -7323,7 +7589,8 @@ CREATE TABLE `ticket_participants` (
   `role` enum('reporter','assignee','watcher','duplicate_reporter') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `added_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`p_id`),
-  UNIQUE KEY `uq_tp` (`tk_id`,`person_id`,`role`)
+  UNIQUE KEY `uq_tp` (`tk_id`,`person_id`,`role`),
+  CONSTRAINT `fk_tp_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ومبلغ المكرر يضاف متابعًا للأصل فلا يُفقد أنه أبلغ (§9)';
 
 -- ── Table: ticket_recurrence_templates ──
@@ -7357,7 +7624,8 @@ CREATE TABLE `ticket_responses` (
   `body` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`rd_id`),
-  KEY `idx_tr_ticket` (`tk_id`,`at`)
+  KEY `idx_tr_ticket` (`tk_id`,`at`),
+  CONSTRAINT `fk_tktr_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_sla_policies ──
@@ -7395,7 +7663,8 @@ CREATE TABLE `ticket_transfers` (
   `sync_uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_ticket` (`company_id`,`ticket_id`),
-  KEY `fk_tr_ticket` (`ticket_id`)
+  KEY `fk_tr_ticket` (`ticket_id`),
+  CONSTRAINT `fk_tr_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_type_workstreams ──
@@ -7414,7 +7683,8 @@ CREATE TABLE `ticket_type_workstreams` (
   `resolve_sla_minutes` int DEFAULT NULL,
   `sla_clock` enum('absolute','business') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'absolute' COMMENT '§6: الحرج مطلق وما دونه بساعات العمل',
   PRIMARY KEY (`ws_def_id`),
-  UNIQUE KEY `uq_ttws` (`ticket_type_id`,`workstream_type`,`seq_no`)
+  UNIQUE KEY `uq_ttws` (`ticket_type_id`,`workstream_type`,`seq_no`),
+  CONSTRAINT `fk_ttws_type` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-01 §12: فمسار المشتريات يُفتح عند إعلان نفاد القطعة لا عند إنشاء البلاغ';
 
 -- ── Table: ticket_types ──
@@ -7453,7 +7723,8 @@ CREATE TABLE `ticket_watchers` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_watch` (`company_id`,`ticket_id`,`user_id`),
-  KEY `fk_wt_ticket` (`ticket_id`)
+  KEY `fk_wt_ticket` (`ticket_id`),
+  CONSTRAINT `fk_wt_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ticket_workstreams ──
@@ -7477,7 +7748,8 @@ CREATE TABLE `ticket_workstreams` (
   PRIMARY KEY (`ws_id`),
   UNIQUE KEY `uq_tws` (`tk_id`,`workstream_type`,`seq_no`),
   KEY `idx_tws_assignee` (`assignee_person_id`,`state`),
-  KEY `idx_tws_due` (`state`,`response_due_at`)
+  KEY `idx_tws_due` (`state`,`response_due_at`),
+  CONSTRAINT `fk_tws_ticket` FOREIGN KEY (`tk_id`) REFERENCES `tickets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-01 §12: UQ على (البلاغ×نوع المسار×التسلسل) — فللإدارة الواحدة مساران مختلفان';
 
 -- ── Table: tickets ──
@@ -7558,7 +7830,11 @@ CREATE TABLE `tickets` (
   KEY `fk_tk_cat` (`category_id`),
   KEY `fk_tk_sla` (`sla_policy_id`),
   KEY `idx_tickets_head` (`head_state`,`priority`,`created_at`),
-  KEY `idx_tickets_dup` (`duplicate_of_ticket_id`)
+  KEY `idx_tickets_dup` (`duplicate_of_ticket_id`),
+  CONSTRAINT `fk_tk_cat` FOREIGN KEY (`category_id`) REFERENCES `ticket_categories` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_tk_parent` FOREIGN KEY (`parent_id`) REFERENCES `tickets` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_tk_sla` FOREIGN KEY (`sla_policy_id`) REFERENCES `ticket_sla_policies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_tk_type` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: timesheet ──
@@ -7732,7 +8008,8 @@ CREATE TABLE `transfer_attachments` (
   `deleted_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_order` (`company_id`,`order_id`),
-  KEY `fk_at_order` (`order_id`)
+  KEY `fk_at_order` (`order_id`),
+  CONSTRAINT `fk_at_order` FOREIGN KEY (`order_id`) REFERENCES `transfer_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_cost_lines ──
@@ -7753,7 +8030,8 @@ CREATE TABLE `transfer_cost_lines` (
   `deleted_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_order` (`company_id`,`order_id`),
-  KEY `fk_cl_order` (`order_id`)
+  KEY `fk_cl_order` (`order_id`),
+  CONSTRAINT `fk_cl_order` FOREIGN KEY (`order_id`) REFERENCES `transfer_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_cost_rules ──
@@ -7793,7 +8071,8 @@ CREATE TABLE `transfer_events` (
   `deleted_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_order_time` (`company_id`,`order_id`,`created_at`),
-  KEY `fk_ev_order` (`order_id`)
+  KEY `fk_ev_order` (`order_id`),
+  CONSTRAINT `fk_ev_order` FOREIGN KEY (`order_id`) REFERENCES `transfer_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_lines ──
@@ -7813,7 +8092,8 @@ CREATE TABLE `transfer_lines` (
   `deleted_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_order` (`company_id`,`order_id`),
-  KEY `fk_ln_order` (`order_id`)
+  KEY `fk_ln_order` (`order_id`),
+  CONSTRAINT `fk_ln_order` FOREIGN KEY (`order_id`) REFERENCES `transfer_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_orders ──
@@ -7871,8 +8151,12 @@ CREATE TABLE `transfer_orders` (
   KEY `fk_to_req` (`request_id`),
   KEY `fk_to_from` (`from_location_id`),
   KEY `fk_to_to` (`to_location_id`),
-  KEY `ix_order_charge_supplier` (`company_id`,`charge_supplier_id`,`stage`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_order_charge_supplier` (`company_id`,`charge_supplier_id`,`stage`),
+  CONSTRAINT `fk_to_from` FOREIGN KEY (`from_location_id`) REFERENCES `trs_locations` (`id`),
+  CONSTRAINT `fk_to_req` FOREIGN KEY (`request_id`) REFERENCES `transfer_requests` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_to_to` FOREIGN KEY (`to_location_id`) REFERENCES `trs_locations` (`id`),
+  CONSTRAINT `fk_to_type` FOREIGN KEY (`transfer_type_id`) REFERENCES `transfer_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_permits ──
 CREATE TABLE `transfer_permits` (
@@ -7891,7 +8175,8 @@ CREATE TABLE `transfer_permits` (
   PRIMARY KEY (`id`),
   KEY `ix_order` (`company_id`,`order_id`),
   KEY `ix_expiry` (`company_id`,`expiry_date`),
-  KEY `fk_pm_order` (`order_id`)
+  KEY `fk_pm_order` (`order_id`),
+  CONSTRAINT `fk_pm_order` FOREIGN KEY (`order_id`) REFERENCES `transfer_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_requests ──
@@ -7919,7 +8204,8 @@ CREATE TABLE `transfer_requests` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_req_code` (`company_id`,`code`),
   KEY `ix_state` (`company_id`,`state`),
-  KEY `fk_rq_type` (`transfer_type_id`)
+  KEY `fk_rq_type` (`transfer_type_id`),
+  CONSTRAINT `fk_rq_type` FOREIGN KEY (`transfer_type_id`) REFERENCES `transfer_types` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_tariffs ──
@@ -7948,7 +8234,7 @@ CREATE TABLE `transfer_tariffs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_transfer_tariff` (`company_id`,`supplier_id`,`transfer_type_id`,`from_location_id`,`to_location_id`,`pricing_model`,`effective_from`) COMMENT 'تعرفةٌ واحدةٌ لمفتاحها في تاريخها — والجديدُ بسريانٍ جديد',
   KEY `ix_tariff_lookup` (`company_id`,`state`,`effective_from`,`effective_to`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_types ──
 CREATE TABLE `transfer_types` (
@@ -8019,7 +8305,8 @@ CREATE TABLE `uat_evidence` (
   `evidence_ref` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'لقطة أو مرجع سجل',
   `at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ev_id`),
-  KEY `idx_uatev_run` (`run_id`,`criterion`)
+  KEY `idx_uatev_run` (`run_id`,`criterion`),
+  CONSTRAINT `fk_uatev_run` FOREIGN KEY (`run_id`) REFERENCES `uat_runs` (`run_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-14: الشواهد الأربعة عشر — موثقة كلها';
 
 -- ── Table: uat_runs ──
@@ -8039,6 +8326,14 @@ CREATE TABLE `uat_runs` (
   KEY `idx_uat_phase` (`company_id`,`phase`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-01: جولات التجربة — التحصين قبل كل تجربة';
 
+-- ── Table: unified_fault_taxonomy ──
+CREATE TABLE `unified_fault_taxonomy` (
+  `code` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `equipment_type` tinyint(1) DEFAULT NULL,
+  `source` varchar(13) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── Table: unit_approvals ──
 CREATE TABLE `unit_approvals` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -8055,7 +8350,8 @@ CREATE TABLE `unit_approvals` (
   UNIQUE KEY `uq_stage_once_per_round` (`company_id`,`entry_id`,`round_no`,`stage`) COMMENT 'قرارٌ واحدٌ لكل مرحلةٍ في الجولة',
   KEY `ix_entry` (`company_id`,`entry_id`),
   KEY `ix_stage` (`company_id`,`stage`,`decided_at`),
-  KEY `fk_ua_entry` (`entry_id`)
+  KEY `fk_ua_entry` (`entry_id`),
+  CONSTRAINT `fk_ua_entry` FOREIGN KEY (`entry_id`) REFERENCES `unit_entries` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §4.2 — سلسلة الاعتماد الخماسية: سطرٌ إلحاقيٌّ لكل قرار';
 
 -- ── Table: unit_capacity_flags ──
@@ -8080,7 +8376,8 @@ CREATE TABLE `unit_capacity_flags` (
   UNIQUE KEY `uq_flag` (`company_id`,`entry_id`,`subject`),
   KEY `ix_open` (`company_id`,`cleared_at`),
   KEY `ix_subject` (`company_id`,`subject`,`subject_ref`,`flag_date`),
-  KEY `fk_ucf_entry` (`entry_id`)
+  KEY `fk_ucf_entry` (`entry_id`),
+  CONSTRAINT `fk_ucf_entry` FOREIGN KEY (`entry_id`) REFERENCES `unit_entries` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.10 — أعلام تجاوز الطاقة وتخليصها: لا اعتمادَ موقعٍ قبل الحسم';
 
 -- ── Table: unit_effects ──
@@ -8103,7 +8400,7 @@ CREATE TABLE `unit_effects` (
   PRIMARY KEY (`pe_id`),
   UNIQUE KEY `uq_ue_effect` (`company_id`,`source_unit_id`,`domain`,`effect_kind`,`stage`),
   KEY `ix_ue_stage` (`company_id`,`stage`,`state`,`period`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: unit_entries ──
 CREATE TABLE `unit_entries` (
@@ -8306,7 +8603,7 @@ CREATE TABLE `user_capacities` (
   KEY `ix_uc_person` (`person_id`),
   KEY `ix_uc_company` (`company_id`),
   KEY `ix_uc_scope` (`scope_type`,`scope_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: users ──
 CREATE TABLE `users` (
@@ -8343,7 +8640,9 @@ CREATE TABLE `users` (
   KEY `idx_users_status` (`status`),
   KEY `idx_users_is_deleted` (`is_deleted`),
   KEY `idx_users_position` (`position_id`),
-  KEY `ix_users_supplier` (`supplier_entity_id`)
+  KEY `ix_users_supplier` (`supplier_entity_id`),
+  CONSTRAINT `fk_users_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_users_supplier` FOREIGN KEY (`supplier_entity_id`) REFERENCES `suppliers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: visibility_audit_log ──
@@ -8381,8 +8680,9 @@ CREATE TABLE `visibility_keys` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_vk_key` (`company_id`,`element_code`,`scope_type`,`scope_id`),
   KEY `ix_vk_element` (`element_code`),
-  KEY `ix_vk_scope` (`scope_type`,`scope_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `ix_vk_scope` (`scope_type`,`scope_id`),
+  CONSTRAINT `fk_vk_element` FOREIGN KEY (`element_code`) REFERENCES `portal_elements` (`element_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: waivers_reversals ──
 CREATE TABLE `waivers_reversals` (
@@ -8412,7 +8712,9 @@ CREATE TABLE `worker_backup` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_backup` (`employee_id`,`backup_employee_id`,`backup_type`),
   KEY `idx_wb_company` (`company_id`),
-  KEY `idx_wb_backup` (`backup_employee_id`)
+  KEY `idx_wb_backup` (`backup_employee_id`),
+  CONSTRAINT `fk_wb_backup_emp` FOREIGN KEY (`backup_employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_wb_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_contract ──
@@ -8451,7 +8753,8 @@ CREATE TABLE `worker_contract` (
   KEY `idx_wc_worker` (`employee_id`),
   KEY `idx_wc_company` (`company_id`),
   KEY `idx_wc_state` (`state`),
-  KEY `idx_wc_planned_backup` (`planned_backup_id`)
+  KEY `idx_wc_planned_backup` (`planned_backup_id`),
+  CONSTRAINT `fk_wc_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_evaluation ──
@@ -8478,7 +8781,8 @@ CREATE TABLE `worker_evaluation` (
   PRIMARY KEY (`id`),
   KEY `idx_we_worker` (`employee_id`),
   KEY `idx_we_company` (`company_id`),
-  KEY `idx_we_state` (`state`)
+  KEY `idx_we_state` (`state`),
+  CONSTRAINT `fk_we_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_evaluation_kpi ──
@@ -8490,7 +8794,8 @@ CREATE TABLE `worker_evaluation_kpi` (
   `score` decimal(6,2) DEFAULT NULL,
   `notes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_wek_eval` (`evaluation_id`)
+  KEY `idx_wek_eval` (`evaluation_id`),
+  CONSTRAINT `fk_wek_eval` FOREIGN KEY (`evaluation_id`) REFERENCES `worker_evaluation` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: worker_leave_absence ──
@@ -8517,7 +8822,8 @@ CREATE TABLE `worker_leave_absence` (
   KEY `idx_wla_worker` (`employee_id`),
   KEY `idx_wla_company` (`company_id`),
   KEY `idx_wla_state` (`state`),
-  KEY `idx_wla_dates` (`date_from`,`date_to`)
+  KEY `idx_wla_dates` (`date_from`,`date_to`),
+  CONSTRAINT `fk_wla_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_movement ──
@@ -8554,7 +8860,8 @@ CREATE TABLE `worker_movement` (
   PRIMARY KEY (`id`),
   KEY `idx_wm_worker` (`employee_id`),
   KEY `idx_wm_company` (`company_id`),
-  KEY `idx_wm_state` (`state`)
+  KEY `idx_wm_state` (`state`),
+  CONSTRAINT `fk_wm_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_qualification ──
@@ -8581,7 +8888,8 @@ CREATE TABLE `worker_qualification` (
   KEY `idx_wq_worker` (`employee_id`),
   KEY `idx_wq_company` (`company_id`),
   KEY `idx_wq_expiry` (`expiry_date`),
-  KEY `idx_wq_critical` (`is_critical`)
+  KEY `idx_wq_critical` (`is_critical`),
+  CONSTRAINT `fk_wq_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_restricted_site ──
@@ -8594,7 +8902,8 @@ CREATE TABLE `worker_restricted_site` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_restricted` (`employee_id`,`project_id`),
-  KEY `idx_wrs_company` (`company_id`)
+  KEY `idx_wrs_company` (`company_id`),
+  CONSTRAINT `fk_wrs_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_settlement ──
@@ -8616,7 +8925,8 @@ CREATE TABLE `worker_settlement` (
   PRIMARY KEY (`id`),
   KEY `idx_ws_worker` (`employee_id`),
   KEY `idx_ws_company` (`company_id`),
-  KEY `idx_ws_state` (`state`)
+  KEY `idx_ws_state` (`state`),
+  CONSTRAINT `fk_ws_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FUTURE: worker<->employee merge — see Workforce/FUTURE_MERGE_NOTES.md';
 
 -- ── Table: worker_settlement_line ──
@@ -8627,7 +8937,8 @@ CREATE TABLE `worker_settlement_line` (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `amount` decimal(12,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_wsl_set` (`settlement_id`)
+  KEY `idx_wsl_set` (`settlement_id`),
+  CONSTRAINT `fk_wsl_set` FOREIGN KEY (`settlement_id`) REFERENCES `worker_settlement` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: workforce_requirement ──
@@ -8709,13 +9020,6 @@ CREATE TABLE `workspace_prefs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_wp` (`account_id`,`entity_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ── View: client_contracts ──
-SET collation_connection = 'utf8mb4_unicode_ci';
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `client_contracts` AS select `c`.`id` AS `id`,`c`.`company_id` AS `company_id`,`c`.`contract_signing_date` AS `contract_signing_date`,`c`.`grace_period_days` AS `grace_period_days`,`c`.`contract_duration_months` AS `contract_duration_months`,`c`.`contract_duration_days` AS `contract_duration_days`,`c`.`equip_shifts_contract` AS `equip_shifts_contract`,`c`.`shift_contract` AS `shift_contract`,`c`.`equip_total_contract_daily` AS `equip_total_contract_daily`,`c`.`total_contract_permonth` AS `total_contract_permonth`,`c`.`total_contract_units` AS `total_contract_units`,`c`.`actual_start` AS `actual_start`,`c`.`actual_end` AS `actual_end`,`c`.`transportation` AS `transportation`,`c`.`accommodation` AS `accommodation`,`c`.`place_for_living` AS `place_for_living`,`c`.`workshop` AS `workshop`,`c`.`hours_monthly_target` AS `hours_monthly_target`,`c`.`forecasted_contracted_hours` AS `forecasted_contracted_hours`,`c`.`created_at` AS `created_at`,`c`.`updated_at` AS `updated_at`,`c`.`daily_work_hours` AS `daily_work_hours`,`c`.`daily_operators` AS `daily_operators`,`c`.`first_party` AS `first_party`,`c`.`second_party` AS `second_party`,`c`.`witness_one` AS `witness_one`,`c`.`witness_two` AS `witness_two`,`c`.`price_currency_contract` AS `price_currency_contract`,`c`.`paid_contract` AS `paid_contract`,`c`.`payment_time` AS `payment_time`,`c`.`guarantees` AS `guarantees`,`c`.`retention_pct` AS `retention_pct`,`c`.`advance_recovery_pct` AS `advance_recovery_pct`,`c`.`payment_date` AS `payment_date`,`c`.`contract_status` AS `contract_status`,`c`.`pause_state_before` AS `pause_state_before`,`c`.`pause_reason` AS `pause_reason`,`c`.`pause_date` AS `pause_date`,`c`.`resume_date` AS `resume_date`,`c`.`termination_type` AS `termination_type`,`c`.`termination_reason` AS `termination_reason`,`c`.`merged_with` AS `merged_with`,`c`.`status` AS `status`,`c`.`is_deleted` AS `is_deleted`,`c`.`deleted_at` AS `deleted_at`,`c`.`deleted_by` AS `deleted_by`,`c`.`project_id` AS `project_id`,`c`.`site_id` AS `site_id`,`c`.`readiness_state` AS `readiness_state`,`cos`.`id` AS `primary_scope_id`,`cos`.`site_id` AS `primary_site_id`,`cos`.`scope_name` AS `primary_scope_name` from (`contracts` `c` left join `contract_operational_sites` `cos` on(((`cos`.`contract_id` = `c`.`id`) and (`cos`.`is_primary` = 1) and (coalesce(`cos`.`is_deleted`,0) = 0))));
-
--- ── View: unified_fault_taxonomy ──
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS select distinct `fc`.`main_category_code` AS `code`,`fc`.`main_category_name` AS `name`,`fc`.`equipment_type` AS `equipment_type`,'failure_codes' AS `source` from `failure_codes` `fc` where ((`fc`.`main_category_code` is not null) and (`fc`.`main_category_code` <> ''));
 
 -- ── View: v_org_unit_heads ──
 SET collation_connection = 'utf8mb4_unicode_ci';

@@ -115,7 +115,27 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>التراخيص والسجلات</h4>
         <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
-        <thead><tr><th>الكيان</th><th>النوع</th><th>الجهة</th><th>الرقم</th><th>الانتهاء</th><th>تجديد</th></tr></thead><tbody>
+        <thead><tr><th>الكيان</th><th>نوع المستند</th><th>الجهة المصدِرة</th><th>رقم السجل</th><th>تاريخ الانتهاء</th><th>تجديد</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">الرقم أو المرجع</th>
+              <th class="ems-fn-th" data-fn="1">المستفيد</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
+              <th class="ems-fn-th" data-fn="1">المدة المتبقية</th>
+              <th class="ems-fn-th" data-fn="1">شرط التمديد التلقائي</th>
+              <th class="ems-fn-th" data-fn="1">الرسوم</th>
+              <th class="ems-fn-th" data-fn="1">حالة الرد أو المصادرة</th>
+              <th class="ems-fn-th" data-fn="1">المسؤول</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              </tr></thead><tbody>
         <?php foreach ($lics as $l): ?>
         <tr>
             <td><?php echo htmlspecialchars($l['legal_name']); ?></td>
@@ -142,7 +162,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>الكفالات وخطابات الضمان — الصادرة ثم الواردة</h4>
         <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
-        <thead><tr><th>الاتجاه</th><th>عن/إلى</th><th>الطرف المقابل</th><th>النوع</th><th>البنك</th><th>القيمة</th><th>الانتهاء</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>الاتجاه</th><th>عن/إلى</th><th>الطرف المقابل</th><th>نوع الكفالة</th><th>البنك</th><th>القيمة</th><th>الانتهاء</th><th>الحالة</th></tr></thead><tbody>
         <?php foreach ($gtees as $g): ?>
         <tr>
             <td><strong><?php echo $g['direction'] === 'issued' ? 'صادرة — التزام محتمل' : 'واردة — حق محتمل'; ?></strong></td>

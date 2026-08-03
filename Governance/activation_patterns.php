@@ -82,7 +82,26 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>الأعلام النافذة (ما لم يُضبط فالافتراض: مطفأ — النمط ①)</h4>
         <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
-        <thead><tr><th>العنصر</th><th>النطاق</th><th>الحال</th><th>السبب</th><th>آخر ضبط</th></tr></thead><tbody>
+        <thead><tr><th>العنصر</th><th>النطاق</th><th>الحالة</th><th>سبب النمط</th><th>آخر ضبط</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">كود النمط</th>
+              <th class="ems-fn-th" data-fn="1">الكيان أو العقد</th>
+              <th class="ems-fn-th" data-fn="1">نمط التفعيل</th>
+              <th class="ems-fn-th" data-fn="1">العناصر المفعَّلة</th>
+              <th class="ems-fn-th" data-fn="1">العناصر المطفأة</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التفعيل</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الترقية المتوقع</th>
+              <th class="ems-fn-th" data-fn="1">شرط الترقية</th>
+              <th class="ems-fn-th" data-fn="1">اعتمده</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              </tr></thead><tbody>
         <?php foreach ($flags as $f): $el = $ELEMENTS[$f['element_code']] ?? array($f['element_code'], ''); ?>
         <tr>
             <td><strong><?php echo htmlspecialchars($el[0]); ?></strong><br><small><?php echo htmlspecialchars($f['element_code']); ?></small></td>

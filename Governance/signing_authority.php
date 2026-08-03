@@ -100,7 +100,25 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
-        <thead><tr><th>#</th><th>المفوَّض</th><th>عن الكيان</th><th>النوع</th><th>السقف</th><th>النطاق</th><th>نيابة عن</th><th>المدة</th><th>المستند</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>#</th><th>المفوَّض</th><th>الكيان المفوِّض</th><th>نوع التفويض</th><th>السقف المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مستند التفويض</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">رقم التفويض</th>
+              <th class="ems-fn-th" data-fn="1">صفته</th>
+              <th class="ems-fn-th" data-fn="1">توقيع مشترك مطلوب؟</th>
+              <th class="ems-fn-th" data-fn="1">من تاريخ</th>
+              <th class="ems-fn-th" data-fn="1">إلى تاريخ</th>
+              <th class="ems-fn-th" data-fn="1">جهة التصديق</th>
+              <th class="ems-fn-th" data-fn="1">أصدره</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              </tr></thead><tbody>
         <?php foreach ($auths as $a):
             $left = $a['days_left'];
             $expSoon = $left !== null && intval($left) >= 0 && intval($left) <= 30;

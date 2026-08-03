@@ -1200,3 +1200,15 @@
 | Settings/modules.php | المرفق | 29 |
 | Portal/my_certificate.php | المرفق | 23 |
 | user_capacities.php | المرفق | 23 |
+| Governance/signing_authority.php | المعتمِد — الاسم والصفة | 23 |
+| Governance/signing_authority.php | المرفق | 24 |
+| Governance/signing_authority.php | العملة | 25 |
+| Reports/margin_report.php | الحالة | 23 |
+| Reports/margin_report.php | مركز التكلفة | 24 |
+| Reports/margin_report.php | سعر الصرف ومصدره | 25 |
+| Governance/licenses_guarantees.php | العملة | 23 |
+| Governance/entities_registry.php | تاريخ الإنشاء | 23 |
+| Governance/entities_registry.php | المرجع الأب | 24 |
+| Governance/entities_registry.php | المعتمِد — الاسم والصفة | 25 |
+| Governance/entities_registry.php | سجل الاطّلاع | 26 |
+| Governance/entities_registry.php | المرفق | 27 |

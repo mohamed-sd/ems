@@ -94,7 +94,30 @@ include '../insidebar.php';
             فلتر: <a href="?f=all">الكل</a> · <a href="?f=internal">كياناتنا (المستأجرة)</a> · <a href="?f=external">الأطراف الخارجية</a>
         </div>
         <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
-        <thead><tr><th>الكيان</th><th>الثلاثية (بلد · جهة · سجل)</th><th>الصفات</th><th>العملة</th><th>داخلي؟</th><th>أقرب انتهاء ترخيص</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>الكيان</th><th>الثلاثية (بلد · جهة · سجل)</th><th>الصفات</th><th>العملة الأساسية</th><th>داخلي؟</th><th>أقرب انتهاء ترخيص</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">كود الكيان</th>
+              <th class="ems-fn-th" data-fn="1">الاسم القانوني الكامل</th>
+              <th class="ems-fn-th" data-fn="1">الشكل النظامي</th>
+              <th class="ems-fn-th" data-fn="1">بلد التسجيل</th>
+              <th class="ems-fn-th" data-fn="1">جهة التسجيل</th>
+              <th class="ems-fn-th" data-fn="1">رقم السجل</th>
+              <th class="ems-fn-th" data-fn="1">الرقم الضريبي</th>
+              <th class="ems-fn-th" data-fn="1">العنوان المسجَّل</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التأسيس</th>
+              <th class="ems-fn-th" data-fn="1">كيان مجموعة؟</th>
+              <th class="ems-fn-th" data-fn="1">اكتمال الملكية</th>
+              <th class="ems-fn-th" data-fn="1">سجّله</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              </tr></thead><tbody>
         <?php foreach ($rows as $e):
             $exp = $e['next_expiry'];
             $expSoon = $exp !== null && strtotime($exp) < strtotime('+30 days');

@@ -2794,3 +2794,88 @@
 | user_capacities.php | صفاتي والتبديل بينها (user_capacities.php) | إلى تاريخ | `fn` |
 | user_capacities.php | صفاتي والتبديل بينها (user_capacities.php) | الصفة النشطة الآن | `fn` |
 | user_capacities.php | صفاتي والتبديل بينها (user_capacities.php) | آخر تبديل | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | الكيان | `entity` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | مرجع التفويض | `authority_ref` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | تاريخ الاعتماد | `approved_at` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | تاريخ الإنشاء | `created_at` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | المرجع الأب | `parent_ref` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | المعتمِد — الاسم والصفة | `approver` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | المرفق | `attachment` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | العملة | `currency` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | الكيان | `entity` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | الحالة | `status` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | مركز التكلفة | `cost_center` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | سعر الصرف ومصدره | `fx_rate_source` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | مرجع التفويض | `authority_ref` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | تاريخ الاعتماد | `approved_at` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | تاريخ الإنشاء | `created_at` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | المُنشئ — الاسم والصفة | `creator` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | المعتمِد — الاسم والصفة | `approver` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | المرفق | `attachment` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | مركز التكلفة | `cost_center` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | سعر الصرف ومصدره | `fx_rate_source` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | العملة | `currency` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | مرجع التفويض | `authority_ref` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | تاريخ الاعتماد | `approved_at` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | تاريخ الإنشاء | `created_at` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | المرجع الأب | `parent_ref` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | المعتمِد — الاسم والصفة | `approver` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | سجل الاطّلاع | `view_log` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | المرفق | `attachment` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | الكيان | `entity` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | مرجع التفويض | `authority_ref` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | تاريخ الاعتماد | `approved_at` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | تاريخ الإنشاء | `created_at` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | المرجع الأب | `parent_ref` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | المُنشئ — الاسم والصفة | `creator` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | المرفق | `attachment` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | رقم التفويض | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | صفته | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | توقيع مشترك مطلوب؟ | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | من تاريخ | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | إلى تاريخ | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | جهة التصديق | `fn` |
+| Governance/signing_authority.php | التفويض بالتوقيع (delegations.php) | أصدره | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | الفترة | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | المشروع | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | الوحدة | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | الإيراد المعترَف به | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | تكلفة المشغّلين | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | تكلفة الوقود | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | تكلفة الصيانة | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | تكلفة المخزون | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | تكلفة الترحيل | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | تكلفة التمويل | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | الإهلاك | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | إجمالي التكلفة | `fn` |
+| Reports/margin_report.php | هامش الربح للعقد والواقعة (margin.php) | نسبة الهامش | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | الرقم أو المرجع | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | المستفيد | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | تاريخ الإصدار | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | المدة المتبقية | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | شرط التمديد التلقائي | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | الرسوم | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | حالة الرد أو المصادرة | `fn` |
+| Governance/licenses_guarantees.php | التراخيص والكفالات (licenses.php) | المسؤول | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | كود الكيان | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | الاسم القانوني الكامل | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | الشكل النظامي | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | بلد التسجيل | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | جهة التسجيل | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | رقم السجل | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | الرقم الضريبي | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | العنوان المسجَّل | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | تاريخ التأسيس | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | كيان مجموعة؟ | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | اكتمال الملكية | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | سجّله | `fn` |
+| Governance/entities_registry.php | سجل الشركات والكيانات (entities.php) | تاريخ التسجيل | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | كود النمط | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | الكيان أو العقد | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | نمط التفعيل | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | العناصر المفعَّلة | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | العناصر المطفأة | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | تاريخ التفعيل | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | تاريخ الترقية المتوقع | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | شرط الترقية | `fn` |
+| Governance/activation_patterns.php | أنماط تفعيل المزايا (activation.php) | اعتمده | `fn` |
