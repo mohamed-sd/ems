@@ -220,6 +220,7 @@ function ems_nav_route_icons() {
         'contract_review.php'   => 'fa fa-file-circle-question',
         'ceo_board.php'         => 'fa fa-gauge-high',
         'ceo_approvals.php'     => 'fa fa-stamp',
+        'Approvals/hours_approval.php' => 'fa fa-stamp', // سلسلة اعتماد التايم شيت الرباعية
         'ceo_contracts.php'     => 'fa fa-pen-fancy',
         'ceo_risk.php'          => 'fa fa-scale-unbalanced',
         'exceptions.php'        => 'fa fa-hand',
