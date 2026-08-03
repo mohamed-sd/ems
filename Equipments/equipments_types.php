@@ -162,8 +162,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>الفئة</th>
-                            <th>النوع</th>
+                            <th>الفئة التشغيلية</th>
+                            <th>كود النوع</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
                         

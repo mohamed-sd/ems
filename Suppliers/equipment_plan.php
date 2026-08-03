@@ -45,7 +45,7 @@ include '../insidebar.php';
   </form>
   <?php if ($sup > 0): ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>المشروع</th><th>المقعد</th><th>المعدة</th><th>الدور</th><th>الطاقة</th><th>السريان</th><th>الحالة</th>
+    <thead><tr><th>المشروع</th><th>المقعد</th><th>نوع المعدة</th><th>دور المعدة</th><th>الطاقة</th><th>السريان</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

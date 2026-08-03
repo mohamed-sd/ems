@@ -458,7 +458,7 @@ include('../insidebar.php');
                             <th width="80"><i class="fas fa-barcode"></i> #</th>
                             <th><i class="fas fa-book"></i> اسم الصفحة</th>
                             <th width="110"><i class="fas fa-icons"></i> الأيقونة</th>
-                            <th width="150"><i class="fas fa-code"></i> الكود</th>
+                            <th width="150"><i class="fas fa-code"></i> كود الصفحة</th>
                             <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
                             <th width="80"><i class="fas fa-link"></i> رابط</th>
                             <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>

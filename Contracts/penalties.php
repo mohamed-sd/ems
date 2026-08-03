@@ -280,9 +280,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="table-container">
                 <table class="display pen-table no-datatable">
                     <thead><tr>
-                        <th>النوع</th><th>القاعدة</th><th>الفترة</th>
+                        <th>نوع البند</th><th>نسخة القاعدة المستعملة</th><th>الفترة</th>
                         <th>الملتزَم</th><th>المنفَّذ</th><th>الفارق</th>
-                        <th>الأساس</th><th>قبل السقف</th><th>السقف</th><th>المبلغ</th>
+                        <th>الأساس المحتسب</th><th>قبل السقف</th><th>السقف</th><th>المبلغ</th>
                         <th>الحالة</th><th>إجراءات</th>
                     
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

@@ -51,7 +51,7 @@ include '../insidebar.php';
     <span class="badge" style="background:#fd7e14"><?= count($rows) ?> في الطريق</span></div>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الأمر</th><th>من → إلى</th><th>المركبة</th><th>السائق</th><th>غادر</th><th>منذ</th><th>إجراء</th>
+    <thead><tr><th>أمر الترحيل</th><th>من → إلى</th><th>المركبة</th><th>السائق</th><th>تاريخ المغادرة</th><th>منذ</th><th>إجراء</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

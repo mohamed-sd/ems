@@ -125,7 +125,7 @@ include '../insidebar.php';
         <strong><?php echo htmlspecialchars((string)$layer['total']); ?></strong></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>العملة</th>
+            <thead><tr><th>تاريخ الإنشاء</th><th>البيان</th><th>المبلغ</th><th>العملة</th>
                 <th>السياق</th><th>المصدر</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

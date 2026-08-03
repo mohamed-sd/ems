@@ -361,7 +361,7 @@ include '../insidebar.php';
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr>
                 <th>الشخص</th><th>أجرٌ وإنتاج</th><th>حوافز</th><th>إضافي</th>
-                <th>غياب</th><th>خصومات</th><th>الصافي</th>
+                <th>خصم الغياب</th><th>إجمالي الخصومات</th><th>صافي المستحق</th>
             
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

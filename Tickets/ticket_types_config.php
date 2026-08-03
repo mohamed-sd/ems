@@ -157,7 +157,7 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
+                    <th>الإجراءات</th><th>الكود</th><th>المُنشئ — الاسم والصفة</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

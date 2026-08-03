@@ -122,7 +122,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> شهاداتي (<?php echo count($certs); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>الرقم</th><th>الفترة</th><th>رمز التحقق</th><th>أُصدرت</th><th></th>
+            <thead><tr><th>رقم الشهادة</th><th>الفترة</th><th>رمز التحقق</th><th>أُصدرت</th><th></th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

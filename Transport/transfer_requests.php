@@ -183,7 +183,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body"><div class="table-container">
         <table id="reqTable" class="display nowrap alltables no-datatable" style="width:100%"><thead><tr>
-            <th>الإجراءات</th><th>الكود</th><th>النوع</th><th>المصدر</th><th>المشروع</th><th>المبرّر</th><th>الأولوية</th><th>الحالة</th>
+            <th>الإجراءات</th><th>كود العنصر</th><th>نوع الترحيل</th><th>مصدر تحميل التكلفة</th><th>المشروع</th><th>المبرّر</th><th>الأولوية</th><th>الحالة</th>
         
             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

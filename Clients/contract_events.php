@@ -507,7 +507,7 @@ function evt_state_tone($state)
                             <th>العقد</th>
                             <th>نوع الحدث</th>
                             <th>الطرف</th>
-                            <th>التاريخ</th>
+                            <th>تاريخ الحدث</th>
                             <th>الحالة</th>
                         
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

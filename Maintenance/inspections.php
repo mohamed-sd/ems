@@ -839,7 +839,7 @@ function mnt_seg_kind($c) {
         </div>
         <div class="table-container">
             <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>المرجع</th><th>النوع</th><th>المعدة/الجهة</th><th>الفاحص</th><th>التاريخ</th><th>الدرجة</th><th>الحالة</th>
+                <thead><tr><th>الإجراءات</th><th>مرجع التفويض</th><th>نوع الاستمارة</th><th>المعدة/الجهة</th><th>الفاحص</th><th>التاريخ</th><th>درجة الخطورة</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

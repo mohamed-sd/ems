@@ -193,8 +193,8 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr>
-                <th>السلسلة</th><th>التاريخ</th><th>القيمة</th><th>الفارق</th>
-                <th>المصدر</th><th>المرجع</th><th>ملاحظة</th>
+                <th>السلسلة</th><th>تاريخ القراءة</th><th>القيمة</th><th>الفارق</th>
+                <th>مصدر القراءة</th><th>مرجع التفويض</th><th>ملاحظة</th>
             
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -264,7 +264,7 @@ include '../insidebar.php';
             (<?php echo count($stale); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>المعدة</th><th>آخر قراءة</th></tr></thead>
+            <thead><tr><th>كود المعدة</th><th>القراءة</th></tr></thead>
             <tbody>
             <?php foreach ($stale as $s): ?>
                 <tr>

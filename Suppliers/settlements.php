@@ -249,9 +249,9 @@ include '../insidebar.php';
         <div style="overflow-x:auto;">
         <table class="table table-striped" style="width:100%;">
             <thead><tr>
-                <th>الرقم</th><th>المورّد</th><th>الفترة</th>
-                <th>الأولي</th><th>التحميلات</th><th>الصافي</th>
-                <th>الحالة</th><th>طلب الدفع</th><th>اعتراضات</th><th></th>
+                <th>رقم التسوية</th><th>المورّد</th><th>الفترة</th>
+                <th>الأولي</th><th>تحميلات علينا</th><th>صافي الساعات المستحقة</th>
+                <th>الحالة</th><th>طلب الدفع</th><th>اعتراضات المورد</th><th></th>
             
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -417,8 +417,8 @@ include '../insidebar.php';
         <div style="overflow-x:auto;">
         <table class="table table-striped" style="width:100%;">
             <thead><tr>
-                <th>النوع</th><th>البيان</th><th>الأصل</th><th>التاريخ</th>
-                <th>المبلغ</th><th>المعادل</th><th>الاعتراض</th><th></th>
+                <th>النوع</th><th>البيان</th><th>الأصل</th><th>تاريخ الإنشاء</th>
+                <th>المبلغ</th><th>المعادل بعملة الدفاتر</th><th>الاعتراض</th><th></th>
             </tr></thead>
             <tbody>
             <?php if (!$lines): ?>

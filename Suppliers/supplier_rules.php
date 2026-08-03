@@ -195,8 +195,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعدُ التحميل</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>النوع</th><th>التسعير</th><th>المعدل</th><th>السقف</th>
-                <th>السريان</th><th>الحالة</th><th>ملاحظة</th>
+            <thead><tr><th>نوع التحميل</th><th>التسعير</th><th>المعدل</th><th>السقف الأقصى</th>
+                <th>تاريخ السريان</th><th>الحالة</th><th>ملاحظة</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

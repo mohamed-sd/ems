@@ -253,8 +253,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr>
-                <th>الإجراءات</th><th>المحفِّز</th><th>المؤشر</th><th>المرجع</th><th>البند</th>
-                <th>عتبة</th><th>تمرير</th><th>سقف</th><th>الدورية</th><th>السريان</th><th>الحالة</th>
+                <th>الإجراءات</th><th>المتغير المحفّز</th><th>المؤشر</th><th>مرجع التفويض</th><th>البند المتأثر</th>
+                <th>عتبة</th><th>تمرير</th><th>السقف الأقصى للتعديل</th><th>دورية المراجعة</th><th>السريان</th><th>الحالة</th>
             
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -328,7 +328,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </form>
         <div class="table-container" style="margin-top:14px">
             <table class="alltables display nowrap" style="width:100%">
-                <thead><tr><th>المؤشر</th><th>التاريخ</th><th>القيمة</th><th>المرجع</th></tr></thead>
+                <thead><tr><th>المؤشر</th><th>تاريخ آخر مراجعة</th><th>القيمة الحالية للمتغير</th><th>المرجع</th></tr></thead>
                 <tbody>
                 <?php foreach ($readings as $rd): ?>
                     <tr>
@@ -360,7 +360,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <table class="alltables display nowrap" style="width:100%">
                 <thead><tr>
                     <th>الإجراءات</th><th>الدورة</th><th>البند</th><th>المؤشر</th><th>المصدر</th>
-                    <th>الفارق</th><th>المطبَّق</th><th>قبل</th><th>بعد</th><th>السريان</th><th>النتيجة</th><th>الاعتماد</th>
+                    <th>الفارق</th><th>المطبَّق</th><th>قبل</th><th>بعد</th><th>السريان</th><th>النتيجة</th><th>تاريخ الاعتماد</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($revisions as $rv): ?>

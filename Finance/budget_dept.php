@@ -44,7 +44,7 @@ include '../insidebar.php';
   <form method="get" style="margin-bottom:12px"><label>السنة</label>
     <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()"></form>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th><th>الحالة</th>
+    <thead><tr><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>المخطط</th><th>المصروف الفعلي</th><th>الانحراف</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

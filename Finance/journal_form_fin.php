@@ -254,7 +254,7 @@ include '../insidebar.php';
 
             <div class="table-container" style="margin-top:10px;">
                 <table class="alltables" style="width:100%;" id="j_lines">
-                    <thead><tr><th>الحساب</th><th>مركز التكلفة</th><th>مدين</th><th>دائن</th><th>بيان</th><th></th></tr></thead>
+                    <thead><tr><th>رقم الحساب</th><th>مركز التكلفة</th><th>مدين</th><th>دائن</th><th>بيان</th><th></th></tr></thead>
                     <tbody id="j_lines_body"></tbody>
                     <tfoot><tr>
                         <th colspan="2" style="text-align:end">الإجمالي</th>
@@ -277,7 +277,7 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>رقم القيد</th><th>التاريخ</th><th>مدين</th><th>دائن</th>
+                    <th>الإجراءات</th><th>رقم القيد</th><th>تاريخ القيد</th><th>مدين</th><th>دائن</th>
                     <th>التوازن</th><th>البيان</th><th>الحالة</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

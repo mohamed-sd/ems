@@ -208,10 +208,10 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="varTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <?php if ($can_edit) echo '<th>معالجة</th>'; ?>
+                    <?php if ($can_edit) echo '<th>إجراء المعالجة</th>'; ?>
                     <th>الميزانية</th><th>الإدارة</th><th>الفئة</th><th>النوع</th>
-                    <th>مخطّط</th><th>فعلي</th><th>الانحراف</th><th>النسبة %</th>
-                    <th>السبب</th><th>الإجراء التصحيحي</th><th>المالك</th><th>الحالة</th>
+                    <th>الكمية المخططة</th><th>فعلي</th><th>انحراف التنفيذ</th><th>النسبة %</th>
+                    <th>سبب انحراف التنفيذ</th><th>الإجراء التصحيحي</th><th>مالك الفجوة</th><th>الحالة</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

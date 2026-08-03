@@ -236,8 +236,8 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>الفئة</th><th>الطبيعة</th>
-                    <th>الوحدة</th><th>حرجة</th><th>Min</th><th>Max</th><th>مخزون الأمان</th><th>مدة التوريد</th>
+                    <th>الإجراءات</th><th>الكود</th><th>اسم الصنف</th><th>الفئة</th><th>طبيعة المادة</th>
+                    <th>وحدة القياس</th><th>قطعة حرجة؟</th><th>Min</th><th>Max</th><th>مخزون الأمان</th><th>مدة التوريد بالأيام</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

@@ -200,8 +200,8 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>#</th><th>الشخص</th><th>النوع</th><th>الوحدة</th><th>النطاق</th>
-                <th>من</th><th>إلى</th><th>النائب</th><th>الحالة</th><th>إجراءات</th>
+            <thead><tr><th>#</th><th>الشخص</th><th>نوع التكليف</th><th>الوحدة المكلَّف بها</th><th>النطاق</th>
+                <th>من تاريخ</th><th>إلى تاريخ</th><th>النائب</th><th>الحالة</th><th>إجراءات</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -246,7 +246,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5><i class="fas fa-history"></i> سجل التكليف #<?php echo $auditFor; ?> — Insert-only</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>الوقت</th><th>الفعل</th><th>السبب</th><th>قبل</th><th>بعد</th><th>بواسطة</th></tr></thead>
+            <thead><tr><th>الوقت</th><th>الفعل</th><th>سبب التكليف</th><th>قبل</th><th>بعد</th><th>بواسطة</th></tr></thead>
             <tbody>
             <?php foreach ($auditRows as $g): ?>
                 <tr><td><?php echo htmlspecialchars($g['at']); ?></td>

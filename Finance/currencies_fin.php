@@ -325,8 +325,8 @@ include '../insidebar.php';
         <table class="table table-striped" style="width:100%;">
             <thead>
                 <tr>
-                    <th>العملة</th><th>الرمز</th><th>الحالة</th>
-                    <th>السعر النافذ</th><th>يسري من</th><th>تاريخُ الأسعار</th><th>بانتظار سعر</th>
+                    <th>من عملة</th><th>الرمز</th><th>الحالة</th>
+                    <th>السعر</th><th>يسري من</th><th>التاريخ</th><th>بانتظار سعر</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

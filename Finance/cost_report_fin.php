@@ -87,7 +87,7 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-chart-line"></i> ربحية المشاريع (تجميع)</h5>
         <div class="table-container">
             <table id="profTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>هامش %</th>
+                <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>الهامش</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
@@ -136,7 +136,7 @@ include '../insidebar.php';
         <h5 style="margin:18px 0 10px"><i class="fas fa-coins"></i> سجلّ التكاليف</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>النوع</th><th>المشروع</th><th>الكمية</th><th>تكلفة الوحدة</th><th>إجمالي التكلفة</th><th>الإيراد</th><th>الربحية</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>النوع</th><th>المشروع</th><th>الكمية</th><th>تكلفة الوحدة</th><th>إجمالي التكلفة</th><th>الإيراد المنسوب</th><th>الربحية</th></tr></thead>
                 <tbody>
                 <?php
                 $cost_rows = fin_gate($is_super_admin)->scopedQuery(

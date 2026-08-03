@@ -79,7 +79,7 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
-        <thead><tr><th>الممول</th><th>العمليات</th><th>الأعيان</th><th>مدة العلاقة</th><th>الاستحقاق القائم<?php echo $canTerms ? '' : ' (خلف صلاحية الشروط)'; ?></th><th>الحالة</th>
+        <thead><tr><th>كود الممول</th><th>عدد العمليات</th><th>عدد الأعيان</th><th>مدة العلاقة</th><th>الاستحقاق القائم<?php echo $canTerms ? '' : ' (خلف صلاحية الشروط)'; ?></th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

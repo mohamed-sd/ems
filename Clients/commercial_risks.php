@@ -562,8 +562,8 @@ function risk_entity_label($type, $map)
                             <th>إجراءات</th>
                             <th width="90">الكود</th>
                             <th>وصف الخطر</th>
-                            <th>النوع</th>
-                            <th>الخطورة</th>
+                            <th>نوع الخطر</th>
+                            <th>درجة الخطورة</th>
                             <th>الحالة</th>
                             <th>الارتباط</th>
                             <th>المسؤول</th>

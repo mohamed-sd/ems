@@ -323,7 +323,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
         <div class="table-container">
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>المصدر</th><th>التصنيف</th><th>الأولوية</th>
+                    <th>الإجراءات</th><th>الكود</th><th>مصدر الاحتياج</th><th>التصنيف التشغيلي</th><th>الأولوية</th>
                     <th>الحالة</th><th>الاعتماد المالي</th><th>عدد الأصناف</th><th>أُنشئ</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

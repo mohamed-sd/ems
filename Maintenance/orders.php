@@ -679,7 +679,7 @@ function mnt_state_class($st) {
                 </form>
                 <?php endif; ?>
                 <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="laborTable" style="width:100%">
-                    <thead><tr><th>الموظف</th><th>الدور</th><th>الساعات</th><th>تكلفة الساعة</th><th>التكلفة</th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></thead>
+                    <thead><tr><th>الموظف</th><th>الدور</th><th>ساعات العمالة</th><th>تكلفة الساعة</th><th>تكلفة العمالة</th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></thead>
                     <tbody>
                         <?php foreach ($labor_rows as $l): ?>
                         <tr data-line="<?php echo intval($l['id']); ?>">
@@ -724,7 +724,7 @@ function mnt_state_class($st) {
                 </form>
                 <?php endif; ?>
                 <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="partTable" style="width:100%">
-                    <thead><tr><th>القطعة</th><th>التصنيف</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th><th>رئيسي</th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></thead>
+                    <thead><tr><th>القطعة</th><th>تصنيف العطل</th><th>الكمية</th><th>سعر الوحدة</th><th>إجمالي التكلفة</th><th>رئيسي</th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></thead>
                     <tbody>
                         <?php foreach ($part_rows as $pt): ?>
                         <tr data-line="<?php echo intval($pt['id']); ?>">
@@ -849,8 +849,8 @@ function mnt_state_class($st) {
         <div class="table-container">
             <table id="ordersTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>المرجع</th><th>المعدة</th><th>المصدر</th><th>نوع الصيانة</th>
-                    <th>جهة التكلفة</th><th>الإجمالي</th><th>الحالة</th><th>بلاغه</th>
+                    <th>الإجراءات</th><th>مرجع التفويض</th><th>كود المعدة</th><th>مصدر الأمر</th><th>نوع الصيانة</th>
+                    <th>تكلفة جهة خارجية</th><th>الإجمالي</th><th>الحالة</th><th>بلاغه</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

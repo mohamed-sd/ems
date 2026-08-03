@@ -105,7 +105,7 @@ include('../insidebar.php');
         <div class="card-header"><h5><i class="fas fa-table"></i> صفوف التوجيه القائمة</h5></div>
         <div class="card-body">
             <table class="table table-bordered no-datatable" data-no-dt="1">
-                <thead><tr><th>الإدارة</th><th>أدوار الإنشاء</th><th>المراجع (رئيس مباشر)</th><th>المعتمد (مدير الإدارة)</th><th>محاسبها (fin_accountants)</th><th>الحالة</th>
+                <thead><tr><th>الإدارة الطالبة</th><th>أدوار الإنشاء</th><th>المراجع (رئيس مباشر)</th><th>المعتمد (مدير الإدارة)</th><th>محاسبها (fin_accountants)</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

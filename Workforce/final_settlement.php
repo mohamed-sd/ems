@@ -129,8 +129,8 @@ include '../insidebar.php';
         <?php else: ?>
         <div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>العقد</th><th>الموظف</th><th>الحال</th><th>من</th><th>إلى</th>
-                <th>قاعدةُ نهاية الخدمة</th><th>قاعدةُ الإجازة</th><th>التصفية</th><th></th>
+            <thead><tr><th>العقد</th><th>كود الموظف</th><th>الحالة</th><th>المُنشئ — الاسم والصفة</th><th>إجمالي المستحقات</th>
+                <th>مكافأة نهاية الخدمة</th><th>قاعدةُ الإجازة</th><th>التصفية</th><th></th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -230,7 +230,7 @@ include '../insidebar.php';
                 <?php endforeach; ?>
                 </tbody>
                 <tfoot><tr>
-                    <th colspan="3">الرصيدُ الصافي بعد المقاصّة</th>
+                    <th colspan="3">الصافي</th>
                     <th><?php echo htmlspecialchars((string)$preview['totals']['net']); ?></th>
                     <th><?php echo $preview['totals']['advances_remaining'] > 0
                         ? ('رصيدُ سلفٍ مفتوحٌ باقٍ: ' . htmlspecialchars((string)$preview['totals']['advances_remaining']))

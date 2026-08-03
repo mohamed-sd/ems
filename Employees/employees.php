@@ -1014,13 +1014,13 @@ include('../insidebar.php');
                         <th>الإجراءات</th>
                         <th>#</th>
                         <th>كود الموظف</th>
-                        <th>النوع</th>
+                        <th>نوع العقد</th>
                         <th>اسم الموظف</th>
                         <th>المورد</th>
                         <th>المشروع</th>
                         <th>عدد العقود</th>
                         <th>التصنيف</th>
-                        <th>الحالة</th>
+                        <th>حالة الحساب</th>
                     
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

@@ -354,7 +354,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         <table class="display cnt-table no-datatable" style="width:100%">
             <thead><tr>
                 <th>الحاوية</th><th>السقف</th><th>الموزَّع</th><th>المتاح للتوزيع</th>
-                <th>المستهلَك</th><th>المتبقي</th><th>الوحدة</th><th></th>
+                <th>المستهلَك</th><th>المتبقي</th><th>رقم الوحدة</th><th></th>
             </tr></thead>
             <tbody>
             <?php foreach ($mains as $m) {
@@ -397,7 +397,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         <?php if ($recon['unmatched_units']): ?>
         <div class="table-container" style="overflow-x:auto">
         <table class="display no-datatable" style="width:100%">
-            <thead><tr><th>العقد</th><th>الوحدة</th><th>الوقائع</th><th>الكمية</th><th>الحكم</th>
+            <thead><tr><th>العقد</th><th>الوحدة التعاقدية</th><th>الوقائع</th><th>الكمية</th><th>الحكم</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

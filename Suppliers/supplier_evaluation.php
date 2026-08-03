@@ -262,7 +262,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>المؤشر</th><th>القياس</th><th>الأساس</th><th>نسبةُ الإجادة</th>
+            <thead><tr><th>المؤشر</th><th>القياس</th><th>الأساس</th><th>النسبة</th>
                 <th>الوزن</th><th>المكتسَب</th><th>المصدر</th></tr></thead>
             <tbody>
             <?php foreach ($openLines as $l): ?>

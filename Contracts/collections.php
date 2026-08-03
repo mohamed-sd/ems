@@ -196,8 +196,8 @@ include '../insidebar.php';
         </form>
         <div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>المرجع</th><th>المبلغ</th><th>المحصَّل</th><th>المتبقي</th>
-                <th>العمر (يوم)</th><th>الحال</th>
+            <thead><tr><th>مرجع التفويض</th><th>المبلغ</th><th>المحصَّل</th><th>المتبقي</th>
+                <th>العمر (يوم)</th><th>الحالة</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -234,7 +234,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> آخرُ المقبوضات وتخصيصُها</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>الرقم</th><th>المرجع البنكي</th><th>التاريخ</th><th>المبلغ</th>
+            <thead><tr><th>رقم الفاتورة</th><th>المرجع البنكي</th><th>تاريخ الفاتورة</th><th>المبلغ</th>
                 <th>الحال</th><th>التخصيص</th></tr></thead>
             <tbody>
             <?php foreach ($recent as $p): $alloc = COL::allocationsOf($gate, intval($p['id'])); ?>
@@ -297,8 +297,8 @@ include '../insidebar.php';
         <?php if ($fxRows): ?>
         <div class="table-container" style="margin-top:12px">
             <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
-                <thead><tr><th>النوع</th><th>المصدر</th><th>من عملة</th><th>المبلغ</th>
-                    <th>سعرُ الاعتراف</th><th>سعرُ السداد</th><th>التاريخ</th><th>البيان</th></tr></thead>
+                <thead><tr><th>النوع</th><th>المصدر</th><th>عملة الفاتورة</th><th>المبلغ</th>
+                    <th>سعرُ الاعتراف</th><th>سعرُ السداد</th><th>تاريخ الاستحقاق</th><th>البيان</th></tr></thead>
                 <tbody>
                 <?php foreach ($fxRows as $d): ?>
                     <tr><td><span class="badge <?php echo (string)$d['kind'] === 'realized'
@@ -337,7 +337,7 @@ include '../insidebar.php';
         <div class="table-container" style="margin-bottom:14px">
             <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
                 <thead><tr><th>السند</th><th>المرجع</th><th>التاريخ</th><th>المبلغ</th>
-                    <th>المخصَّص</th><th><strong>غيرُ المخصَّص</strong></th><th></th></tr></thead>
+                    <th>المخصص المكوَّن</th><th><strong>غيرُ المخصَّص</strong></th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($unallocated as $p): ?>
                     <tr style="background:#fff7ed">

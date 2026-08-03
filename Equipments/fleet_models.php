@@ -530,11 +530,11 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                         <tr>
                             <th>الإجراءات</th>
                             <th>#</th>
-                            <th>الكود</th>
+                            <th>كود الموديل</th>
                             <th>الصانع</th>
                             <th>الموديل</th>
-                            <th>النوع</th>
-                            <th>الفئة</th>
+                            <th>نوع المعدة</th>
+                            <th>الفئة التشغيلية</th>
                             <th>عدد الوحدات</th>
                             <th>الحالة</th>
                         

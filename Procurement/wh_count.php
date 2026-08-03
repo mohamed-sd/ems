@@ -61,7 +61,7 @@ include '../insidebar.php';
   </form>
   <?php if ($wh > 0): ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الصنف</th><th>الدفتري (محسوبٌ من الحركات)</th><th>الفعليُّ المجرود</th><th>السبب</th><th>تسوية</th>
+    <thead><tr><th>رقم الصنف</th><th>الدفتري (محسوبٌ من الحركات)</th><th>الفعليُّ المجرود</th><th>سبب الفرق</th><th>قرار التسوية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

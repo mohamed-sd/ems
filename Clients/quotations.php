@@ -539,7 +539,7 @@ function quo_state_tone($state)
                             <th>إجراءات</th>
                             <th width="90">الكود</th>
                             <th>العميل</th>
-                            <th>الفرصة</th>
+                            <th>الفرصة المرتبطة</th>
                             <th>القيمة</th>
                             <th>الصلاحية</th>
                             <th>الحالة</th>

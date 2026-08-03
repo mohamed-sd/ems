@@ -244,7 +244,7 @@ include '../insidebar.php';
             <div class="table-container">
                 <table class="alltables display no-datatable" style="width:100%">
                     <thead><tr>
-                        <th>المعدة</th><th>الوردية</th><th>المشغّل الموزَّع</th>
+                        <th>نوع المعدة</th><th>الوردية</th><th>المشغّل الموزَّع</th>
                         <?php if ($editable): ?><th>التوزيع (من سلسلة حاويتها حصرًا)</th><?php endif; ?>
                     
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

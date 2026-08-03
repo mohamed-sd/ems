@@ -867,9 +867,9 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
                         <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
                         <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
-                        <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
-                        <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
-                        <th data-group="basic"><i class="fas fa-tag"></i> الاسم</th>
+                        <th data-group="identification"><i class="fas fa-hashtag"></i> الرقم التسلسلي</th>
+                        <th data-group="basic"><i class="fas fa-list-alt"></i> نوع المعدة</th>
+                        <th data-group="basic"><i class="fas fa-tag"></i> الاسم الوصفي</th>
                         <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
                         <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
                         <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>

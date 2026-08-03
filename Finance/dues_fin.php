@@ -226,7 +226,7 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-hand-holding-dollar"></i> مستحقات الموردين والموظفين</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>الطرف</th><th>الاسم</th><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>الطرف</th><th>المُنشئ — الاسم والصفة</th><th>نوع المستفيد</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
                 <tbody>
                 <?php
                 // نطاق نوع الطرف (fin_party_scope): الموارد البشرية ترى الموظفين حصرًا،
@@ -272,7 +272,7 @@ include '../insidebar.php';
         <h5 style="margin:18px 0 10px"><i class="fas fa-file-invoice"></i> الذمم المدينة (العملاء)</h5>
         <div class="table-container">
             <table id="recvTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصّل</th><th>المتبقّي</th><th>الاستحقاق</th><th>الحالة</th>
+                <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصّل</th><th>المتبقّي</th><th>تاريخ الاستحقاق</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

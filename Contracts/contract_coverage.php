@@ -153,8 +153,8 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="display no-datatable cov-table">
             <thead><tr>
-                <th>نوع المعدة</th><th>المتعاقد</th><th>المغطى</th><th>الفجوة</th>
-                <th>ساعة شهرية</th><th>الفجوة بالساعات</th><th>التغطية٪</th><th>حالة الخطة</th>
+                <th>نوع المعدة</th><th>العدد المتعاقد عليه</th><th>المغطى</th><th>فجوة التغطية</th>
+                <th>ساعة شهرية</th><th>الفجوة بالساعات</th><th>التغطية٪</th><th>الحالة</th>
             
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -207,13 +207,13 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="display no-datatable cov-table">
             <thead><tr>
-                <th>المورد</th><th>وحداته</th><th>ساعته الشهرية (مشتقة)</th><th>مهلة الإحلال</th>
+                <th>المتاح من الموردين</th><th>وحداته</th><th>ساعته الشهرية (مشتقة)</th><th>مهلة الإحلال</th>
                 <th colspan="9">المؤشراتُ التسعة — <?php echo $cv_e($period); ?> (⑦ لا تدخل ④ ولا ترفع ⑥)</th>
             </tr>
             <tr class="cov-sub">
                 <th colspan="4"></th>
                 <th>① المخطط</th><th>② بالأساسية</th><th>③ باحتياطيّه</th><th>④ التنفيذ (②+③)</th>
-                <th>⑤ العجز</th><th>⑥ النسبة</th><th>⑦ تغطيةٌ أعطاها</th><th>⑧ غُطّي عنه</th><th>⑨ المتبقي</th>
+                <th>قاعدة العجز</th><th>⑥ النسبة</th><th>⑦ تغطيةٌ أعطاها</th><th>⑧ غُطّي عنه</th><th>⑨ المتبقي</th>
             </tr></thead>
             <tbody>
             <?php if (empty($sup)): ?>
@@ -251,7 +251,7 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="display no-datatable cov-table">
             <thead><tr>
-                <th>الوحدة التعاقدية</th><th>المعدة</th><th>من</th><th>إلى</th>
+                <th>الوحدة التعاقدية</th><th>المعدة</th><th>المتاح من أسطولنا</th><th>إجمالي الساعات الشهرية</th>
                 <th>الدور</th><th>الحصة الشهرية المخططة</th>
             </tr></thead>
             <tbody>

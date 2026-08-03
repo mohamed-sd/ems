@@ -92,7 +92,7 @@ include '../insidebar.php';
 
   <table class="table table-striped" data-no-dt>
     <thead><tr>
-      <th>البلاغ</th><th>المسار</th><th>الوصف</th><th>الحالة</th>
+      <th>رقم البلاغ</th><th>حالة المسار</th><th>الوصف</th><th>الحالة</th>
       <th>المكلَّف</th><th>مهلةُ الإنجاز</th><th>إلزامي؟</th>
     
       <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

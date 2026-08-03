@@ -191,7 +191,7 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="lookupTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>النوع</th><th>الاسم</th><th>وصف / تفصيل</th><th>مفعّل</th>
+                    <th>الإجراءات</th><th>نوع المخزن</th><th>اسم المخزن</th><th>وصف / تفصيل</th><th>مفعّل</th>
                 </tr></thead>
                 <tbody>
                     <?php
@@ -266,7 +266,7 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="whTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>الموقع</th><th>ملاحظات</th>
+                    <th>الإجراءات</th><th>كود المخزن</th><th>الاسم</th><th>النوع</th><th>الموقع الجغرافي</th><th>ملاحظات</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

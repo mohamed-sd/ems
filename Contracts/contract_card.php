@@ -97,7 +97,7 @@ include '../insidebar.php';
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا بنودَ بيعٍ — العقدُ قبل خط الأساس', 'افتح البنود', 'contract_lines.php?contract_id=' . $cid); break; }
             echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
-               . '<thead><tr><th>بند</th><th>النموذج</th><th>الوصف</th><th>الكمية</th><th>السعر</th><th>الحال</th><th>السريان</th></tr></thead><tbody>';
+               . '<thead><tr><th>بند</th><th>النموذج</th><th>الوصف</th><th>الكمية</th><th>مصدر سعر الصرف</th><th>الحال</th><th>السريان</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . intval($x['line_no']) . '</td>'
                    . '<td>' . htmlspecialchars((string)$x['pricing_model']) . '</td>'
@@ -150,7 +150,7 @@ include '../insidebar.php';
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا مستخلصاتٍ بعدُ', 'إلى المستخلصات', 'claims.php'); break; }
             echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
-               . '<thead><tr><th>المستخلص</th><th>الفترة</th><th>الصافي</th><th>الحال</th><th>فاتورته</th><th></th></tr></thead><tbody>';
+               . '<thead><tr><th>مهلة اعتماد المستخلص</th><th>الفترة</th><th>الصافي</th><th>الحال</th><th>فاتورته</th><th></th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['claim_no']) . '</td>'
                    . '<td>' . htmlspecialchars($x['period_from'] . ' → ' . $x['period_to']) . '</td>'
@@ -242,7 +242,7 @@ include '../insidebar.php';
                 ems_state_empty('لا مقاعدَ معرَّفةً لهذا العقد بعد — تُعرَّف على حاويات المعدات (N-11)', 'إلى الحاويات', 'containers.php');
             } else {
                 echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
-                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>من</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
+                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>المُنشئ — الاسم والصفة</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

@@ -468,8 +468,8 @@ function prod_revenue_label($model, $map)
                     <thead>
                         <tr>
                             <th>إجراءات</th>
-                            <th width="90">الكود</th>
-                            <th>الاسم</th>
+                            <th width="90">كود البند</th>
+                            <th>اسم الخدمة</th>
                             <th>النوع</th>
                             <th>نموذج الإيراد</th>
                             <th>وحدة القياس</th>

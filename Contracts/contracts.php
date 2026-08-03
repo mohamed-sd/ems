@@ -697,7 +697,7 @@ include('../insidebar.php');
               <th class="group-operations"> عدد المشغلين يومياً</th>
 
               <!-- البيانات المالية -->
-              <th class="group-basic"> العملة</th>
+              <th class="group-basic"> عملة التسعير</th>
               <th class="group-basic"> المبلغ المدفوع</th>
               <th class="group-basic"> وقت الدفع</th>
               <th class="group-basic"> الضمانات</th>

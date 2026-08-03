@@ -34,7 +34,7 @@ include '../insidebar.php';
     <span class="badge" style="background:#fd7e14"><?= count($rows) ?></span></div>
   <p class="text-muted" style="font-size:.9em">كلُّ خصمٍ بمصدره (M-11: لا خصمَ بلا مستند) — والاعتمادُ من صندوق الاعتماد الجامع لا من هنا.</p>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>#</th><th>الطرف</th><th>النوع</th><th>المبلغ</th><th>المصدرُ المستندي</th><th>منذ</th>
+    <thead><tr><th>#</th><th>الطرف</th><th>نوع الخصم</th><th>المبلغ</th><th>المصدرُ المستندي</th><th>منذ</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

@@ -201,7 +201,7 @@ include '../insidebar.php';
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr>
                 <th>الإجراءات</th><th>المورد</th><th>النوع</th><th>المبلغ</th>
-                <th>القسط</th><th>المستردّ</th><th>الرصيد</th><th>السند</th><th>الحالة</th>
+                <th>القسط</th><th>المستردّ</th><th>الرصيد</th><th>سند الصرف</th><th>الحالة</th>
             
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

@@ -776,7 +776,7 @@ include('../insidebar.php');
             <th class="group-basic"> رقم العقد</th>
             <th class="group-basic"> المشروع</th>
             <th class="group-basic"> المورد</th>
-            <th class="group-basic"> عقد المشروع المرتبط</th>
+            <th class="group-basic"> العقد العميل المرتبط</th>
 
             <!-- التواريخ والمدد -->
             <th class="group-dates"> تاريخ التوقيع</th>
@@ -787,7 +787,7 @@ include('../insidebar.php');
 
             <!-- الساعات والأهداف -->
             <th class="group-hours"> هدف ساعات شهري</th>
-            <th class="group-hours"> إجمالي ساعات متوقعة</th>
+            <th class="group-hours"> وقّعه</th>
 
             <!-- أطراف العقد -->
             <th class="group-parties"> الطرف الأول</th>

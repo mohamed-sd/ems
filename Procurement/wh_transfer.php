@@ -71,7 +71,7 @@ include '../insidebar.php';
   </form>
   <h6>آخرُ التحويلات</h6>
   <table class="table table-sm" data-no-dt>
-    <thead><tr><th>الوقت</th><th>الصنف</th><th>المخزن</th><th>الحركة</th><th>الكمية</th><th>المرجع</th>
+    <thead><tr><th>الوقت</th><th>رقم الصنف</th><th>من مخزن</th><th>الحركة</th><th>الكمية</th><th>مرجع التفويض</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

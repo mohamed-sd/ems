@@ -1239,7 +1239,7 @@ try {
                 <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
                   <thead>
                     <tr style="background:#f8f9fa;">
-                      <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">كود المعدة</th>
                       <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
                       <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
                       <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
@@ -2109,7 +2109,7 @@ try {
             <th><i class="fas fa-cube"></i> الجردل</th>
             <th><i class="fas fa-gavel"></i> الجاكهمر</th>
             <th><i class="fas fa-plus-circle"></i> الإضافية</th>
-            <th><i class="fas fa-pause"></i> الاستعداد</th>
+            <th><i class="fas fa-pause"></i> ساعات الاستعداد</th>
             <th><i class="fas fa-wrench"></i> الأعطال</th>
             <th><i class="fas fa-briefcase"></i> ساعات العمل</th>
             <th><i class="fas fa-chart-bar"></i> الإجمالي</th>
@@ -3261,7 +3261,7 @@ try {
       // ق-4 «الكاتبُ يقترح والمشرفُ يعتمد»: هذا العمودُ **اقتراحٌ** مشتقٌّ من
       // حالة الساعة، والقرارُ في «لوحة الإسناد اليومي» حيث يُسنَد كلُّ توقفٍ إلى
       // بندِ التزامٍ من مصفوفة العقد ومنه تُشتق الأحكامُ الثلاثة (CON-02 §5).
-      + '<table><thead><tr><th>ساعات</th><th>الحالة</th><th>المسؤول <small>(مقترح)</small></th><th>المرجع/السبب</th><th></th></tr></thead>'
+      + '<table><thead><tr><th>ساعات التشغيل</th><th>الحالة</th><th>المسؤول <small>(مقترح)</small></th><th>المرجع/السبب</th><th></th></tr></thead>'
       + '<tbody id="tslBody"></tbody></table>'
       + '<div class="tsl-sum" id="tslSum"><span style="color:#9ca3af;">لا سطورَ بعد — الإدخالُ القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
     grid.parentElement.insertBefore(box, grid);

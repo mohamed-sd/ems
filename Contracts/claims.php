@@ -424,7 +424,7 @@ include('../insidebar.php');
             — <?php echo clm_e($open_claim['period_from']); ?> إلى <?php echo clm_e($open_claim['period_to']); ?></h5></div>
         <div class="card-body table-container">
             <table class="display" style="width:100%">
-                <thead><tr><th>التاريخ</th><th>المعدة</th><th>الوحدة</th><th>الكمية</th>
+                <thead><tr><th>تاريخ الإصدار</th><th>المعدة</th><th>الوحدة</th><th>الكمية المعتمدة</th>
                     <th>سعر الوحدة</th><th>القيمة</th><th>الأصل</th><th>بند البيع</th>
                     <th>النزاع (§3-⑤)</th></tr></thead>
                 <tbody>
@@ -592,7 +592,7 @@ include('../insidebar.php');
 
             <?php if ($open_notes): ?>
             <table class="display" style="width:100%">
-                <thead><tr><th>الرقم</th><th>الاتجاه</th><th>المبلغ</th><th>السبب</th>
+                <thead><tr><th>رقم المستخلص</th><th>الاتجاه</th><th>المبلغ</th><th>السبب</th>
                     <th>المستند</th><th>السطر</th><th>الحالة</th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($open_notes as $n): ?>
@@ -707,8 +707,8 @@ include('../insidebar.php');
             </div>
             <table class="display" style="width:100%">
                 <thead><tr>
-                    <th>الرقم</th><th>العميل</th><th>المشروع</th><th>الفترة</th>
-                    <th>الإجمالي</th><th>الصافي</th><th>الضريبة</th><th>الفاتورة</th><th>الحالة</th><th></th>
+                    <th>رقم البند</th><th>العميل</th><th>المشروع</th><th>الفترة</th>
+                    <th>الإجمالي</th><th>صافي المستحق</th><th>الضريبة</th><th>الفاتورة</th><th>الحالة</th><th></th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($claims as $c): ?>

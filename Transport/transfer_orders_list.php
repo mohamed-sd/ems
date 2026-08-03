@@ -69,8 +69,8 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="ordTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>كود الحركة</th><th>النوع</th><th>الاتجاه</th><th>المرحلة</th>
-                    <th>المشروع</th><th>من ← إلى</th><th>التاريخ المخطط</th><th>المتحمِّل</th><th>التكلفة (USD)</th><th>متأخّر</th>
+                    <th>الإجراءات</th><th>كود الحركة</th><th>نوع الترحيل</th><th>اتجاه الحركة</th><th>المرحلة</th>
+                    <th>المشروع</th><th>من</th><th>التاريخ المخطط</th><th>المتحمل للتكلفة</th><th>التكلفة (USD)</th><th>متأخّر</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

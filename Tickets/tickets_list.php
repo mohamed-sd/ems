@@ -168,7 +168,7 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>فتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
+                    <th>تاريخ الفتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
                     <th>المُبلِّغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخّر</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

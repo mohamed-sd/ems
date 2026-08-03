@@ -405,11 +405,11 @@ include('../insidebar.php');
                     <thead>
                         <tr>
                             <th>إجراءات</th>
-                            <th width="90">الكود</th>
+                            <th width="90">كود الوحدة</th>
                             <th>الاسم</th>
                             <th>الرمز</th>
                             <th>الفئة</th>
-                            <th>المعامل</th>
+                            <th>معامل التحويل</th>
                         
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

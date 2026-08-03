@@ -713,7 +713,7 @@ $page_title = 'سجل النشاط';
                                     <thead class="table-light">
                                         <tr>
                                             <th style="width:220px">الحقل</th>
-                                            <th>القيمة</th>
+                                            <th>القيمة</th><!-- جدول تفاصيل المودال — «القيمة قبل/بعد» عمودا الجدول الرئيس (CMP-03 ⑤) --><!-- جدول تفاصيل المودال — «القيمة قبل/بعد» عمودا الجدول الرئيس (CMP-03 ⑤) -->
                                         </tr>
                                     </thead>
                                     <tbody id="detailAllFields"></tbody>

@@ -360,8 +360,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         <div class="table-container">
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>المستلِم</th><th>التاريخ</th><th>المعدة</th>
-                    <th>نوع الصيانة</th><th>الإجمالي</th><th>الحالة</th><th>عدد الأصناف</th>
+                    <th>الإجراءات</th><th>كود المعدة</th><th>المستلِم</th><th>تاريخ الصرف</th><th>المعدة</th>
+                    <th>نوع الصيانة</th><th>إجمالي التكلفة</th><th>الحالة</th><th>عدد الأصناف</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

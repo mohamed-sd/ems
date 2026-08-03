@@ -160,7 +160,7 @@ include '../insidebar.php';
     <div class="card-body">
         <?php if (!$pcrs) { ems_state_empty('لا طلبات تنتظر — نظيف ✨'); } else { ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>#</th><th>الشخص</th><th>النوع</th><th>المخاطرة</th><th>السبب</th><th>الباقي</th><th>الحالة</th><th></th>
+            <thead><tr><th>#</th><th>الشخص</th><th>نوع الفحص</th><th>المخاطرة</th><th>السبب</th><th>الباقي</th><th>الحالة</th><th></th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>
@@ -232,7 +232,7 @@ include '../insidebar.php';
     <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div><strong>القوالب بأصنافها</strong>
             <div class="table-container"><table class="alltables" style="width:100%" data-no-dt="1">
-            <thead><tr><th>الصنف</th><th>العدد</th><th>منشور</th></tr></thead>
+            <thead><tr><th>الصنف</th><th>عدد الحسابات المتأثرة</th><th>منشور</th></tr></thead>
             <tbody><?php foreach ($tplStats as $t) {
                 echo '<tr><td>' . htmlspecialchars($t['tpl_kind']) . '</td><td>' . intval($t['total']) . '</td><td>' . intval($t['published']) . '</td></tr>';
             } ?></tbody></table></div></div>

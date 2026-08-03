@@ -410,7 +410,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
             <div class="table-container">
                 <table class="alltables display no-datatable" style="width:100%">
                     <thead><tr>
-                        <th>#</th><th>النوع</th><th>الطريقة</th><th>المبلغ</th><th>المعدل</th>
+                        <th>#</th><th>نوع العقد</th><th>الطريقة</th><th>المبلغ</th><th>المعدل</th>
                         <th>الأعلام السبعة</th><th>الدورية</th><th>السريان</th><th>التحمّل</th><th>الحالة</th>
                         <?php if ($vc_editable): ?><th>إنهاء</th><?php endif; ?>
                     </tr></thead>
@@ -628,7 +628,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
             <div class="table-container">
                 <table class="alltables display no-datatable" style="width:100%">
                     <thead><tr>
-                        <th>#</th><th>النوع</th><th>السريان</th><th>قبل ← بعد</th><th>الحالة</th><th>المعتمِد</th>
+                        <th>#</th><th>نوع الطرف</th><th>السريان</th><th>قبل ← بعد</th><th>الحالة</th><th>المعتمِد — الاسم والصفة</th>
                         <?php if ($can_edit): ?><th>إجراء</th><?php endif; ?>
                     
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

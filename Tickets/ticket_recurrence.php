@@ -108,7 +108,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body"><div class="table-container">
         <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
-            <thead><tr><th>الإجراءات</th><th>الاسم</th><th>النوع</th><th>الفاصل</th><th>التوليد التالي</th><th>المهلة (يوم)</th><th>الأولوية</th><th>الحالة</th>
+            <thead><tr><th>الإجراءات</th><th>اسم القالب</th><th>النوع</th><th>الفاصل</th><th>التالي</th><th>المهلة</th><th>الأولوية</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

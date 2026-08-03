@@ -126,7 +126,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
             وعمودُ «شهورٌ غير محتسَبة» يُري الفجوةَ — و«الاستدراك» يسدّها من شهر الاقتناء.</p>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>الكود</th><th>الأصل</th><th>الفئة</th><th>التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>شهورٌ غير محتسَبة</th><th>الحالة</th>
+                <thead><tr><th>الإجراءات</th><th>كود المعدة</th><th>الأصل</th><th>الفئة</th><th>مركز التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>شهورٌ غير محتسَبة</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

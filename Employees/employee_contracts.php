@@ -634,7 +634,7 @@ if ($driver_owned === null) {
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
               <!-- المعلومات الأساسية -->
               <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
-              <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
+              <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع المرتبط</th>
               <th class="group-basic"><i class="fas fa-file-contract"></i> عقد المشروع</th>
 
               <!-- التواريخ والمدد -->
@@ -655,8 +655,8 @@ if ($driver_owned === null) {
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
 
               <!-- الخدمات المقدمة -->
-              <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
-              <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
+              <th class="group-services"><i class="fas fa-truck"></i> بدل النقل</th>
+              <th class="group-services"><i class="fas fa-bed"></i> بدل السكن</th>
               <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
               <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
 

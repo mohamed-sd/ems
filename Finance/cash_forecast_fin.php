@@ -140,7 +140,7 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-water"></i> التنبؤات النقدية</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>افتتاحي</th><th>داخل</th><th>خارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th>
+                <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>الرصيد الافتتاحي</th><th>إجمالي الداخل</th><th>إجمالي الخارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>

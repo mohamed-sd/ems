@@ -65,7 +65,7 @@ include '../insidebar.php';
     <div class="card-body">
         <?php if (!$grid): ems_state_empty('لا توزيعَ لهذا اليوم', 'افتح إدخال الوحدات', 'units.php'); else: ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>المعدة ↓ / الوردية ←</th><th>☀ نهارية</th><th>🌙 ليلية</th>
+            <thead><tr><th>الوردية</th><th>☀ نهارية</th><th>🌙 ليلية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

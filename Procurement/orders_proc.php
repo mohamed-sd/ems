@@ -375,7 +375,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المورد</th><th>التصنيف</th><th>العملة</th>
-                    <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد</th><th>أُنشئ</th>
+                    <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد المالي</th><th>أُنشئ</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

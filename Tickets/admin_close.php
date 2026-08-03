@@ -60,7 +60,7 @@ include '../insidebar.php';
   <div class="ems-topbar"><h4><i class="fa fa-ban"></i> الإغلاقُ الإداري — للمكرر والملغى فقط</h4></div>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>البلاغ</th><th>الوصف</th><th>الحالة</th><th>الإغلاقُ بسببٍ ومرجع</th>
+    <thead><tr><th>رقم البلاغ</th><th>وصف الحل</th><th>الحالة</th><th>الإغلاقُ بسببٍ ومرجع</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

@@ -128,7 +128,7 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-sitemap"></i> مراكز التكلفة والربح</h5>
         <div class="table-container">
             <table id="ccTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>الأب</th><th>الإدارة</th><th>المستوى</th>
+                <thead><tr><th>الإجراءات</th><th>الكود</th><th>اسم الحساب</th><th>نوع الحساب</th><th>الحساب الأب</th><th>الإدارة</th><th>المستوى</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
@@ -166,7 +166,7 @@ include '../insidebar.php';
         <h5 style="margin:18px 0 10px"><i class="fas fa-arrows-turn-to-dots"></i> التخصيص الداخلي والتسويات البينية</h5>
         <div class="table-container">
             <table id="iaTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>النوع</th><th>من</th><th>إلى</th><th>الأساس</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>النوع</th><th>مفتاح منع التكرار</th><th>إلى</th><th>الأساس</th><th>المبلغ</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
                 $ia_rows = fin_gate($is_super_admin)->scopedQuery(

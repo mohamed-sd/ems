@@ -540,11 +540,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <tr>
                             <th>إجراءات</th>
                             <th width="90">الكود</th>
-                            <th>العقد</th>
+                            <th>العقد الأصل</th>
                             <th>نوع التعديل</th>
-                            <th>التاريخ</th>
-                            <th>الأثر على السعر</th>
-                            <th>الأثر على المدة</th>
+                            <th>تاريخ التوقيع</th>
+                            <th>أثر على الكميات</th>
+                            <th>أثر على الحصص</th>
                         
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

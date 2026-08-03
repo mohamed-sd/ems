@@ -147,7 +147,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 — <span style="font-weight:700"><?php echo number_format((float) $layer['total'], 2); ?></span>
                 <div class="table-container" style="margin-top:8px">
                 <table class="alltables no-datatable" style="width:100%">
-                    <thead><tr><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>المصدر</th><th>السياق</th></tr></thead>
+                    <thead><tr><th>تاريخ مطابقة المورد</th><th>البيان</th><th>المبلغ</th><th>المصدر</th><th>السياق</th></tr></thead>
                     <tbody>
                     <?php foreach ($layer['rows'] as $row): ?>
                         <tr<?php echo !empty($row['objected']) ? ' style="background:#fef2f2"' : ''; ?>>
@@ -252,7 +252,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <h5 style="margin:16px 0 10px"><i class="fas fa-cubes"></i> وحداته المعتمدة بالفترة (من التطابق الثلاثي)</h5>
         <div class="table-container">
             <table class="alltables" style="width:100%">
-                <thead><tr><th>الرقم</th><th>التاريخ</th><th>النموذج</th><th>الكمية المعتمدة</th><th>سعر عقده</th><th>قيمة مستحقه</th>
+                <thead><tr><th>رقم الكشف</th><th>التاريخ</th><th>النموذج</th><th>الكمية المعتمدة</th><th>سعر عقده</th><th>قيمة مستحقه</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

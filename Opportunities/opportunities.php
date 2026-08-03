@@ -791,11 +791,11 @@ function opp_stage_tone($stage)
                             <th>إجراءات</th>
                             <th width="90">الكود</th>
                             <th>عنوان الفرصة</th>
-                            <th>العميل</th>
+                            <th>العميل المحتمل</th>
                             <th>القطاع</th>
                             <th>المرحلة</th>
                             <th>القيمة التقديرية</th>
-                            <th>الاحتمال</th>
+                            <th>احتمال الفوز</th>
                         
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

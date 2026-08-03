@@ -207,8 +207,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> صفٌّ لكل معدة</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>المعدة</th><th>النموذج</th><th>الطاقة اليومية</th>
-                <th>الجاهزية الدنيا</th><th>مهلة الإحلال</th><th>السريان</th><th>الحالة</th><th>ملاحظة</th>
+            <thead><tr><th>نوع المعدة</th><th>النموذج</th><th>الطاقة اليومية</th>
+                <th>نسبة الجاهزية الدنيا</th><th>مهلة الإحلال المتفقة</th><th>السريان</th><th>الحالة</th><th>ملاحظة</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -288,7 +288,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr><th>المعدة</th><th>الزمن المخطط</th><th>غير صالح</th><th>نُقل للتغطية</th>
-                <th>غير مسجَّل</th><th>الجاهزية</th><th>الحد</th><th>النوب</th></tr></thead>
+                <th>غير مسجَّل</th><th>الجاهزية الفعلية</th><th>الحد</th><th>النوب</th></tr></thead>
             <tbody>
             <?php foreach ($measure['equipment'] as $m): ?>
                 <tr>

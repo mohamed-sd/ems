@@ -103,7 +103,7 @@ function fin_stmt_rows($rows, $type_lbl)
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-arrow-trend-up"></i> قائمة الدخل (الأرباح والخسائر)</h5>
         <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>الكود</th><th>الحساب</th><th style="text-align:end">المبلغ</th></tr></thead>
+            <thead><tr><th>الكود</th><th>رقم الحساب</th><th style="text-align:end">المبلغ</th></tr></thead>
             <tbody>
                 <tr><th colspan="3" style="background:#f0fdf4">الإيرادات</th></tr>
                 <?php echo fin_stmt_rows($byType['revenue'], $type_lbl); ?>
@@ -121,7 +121,7 @@ function fin_stmt_rows($rows, $type_lbl)
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-scale-balanced"></i> قائمة المركز المالي (الميزانية العمومية)</h5>
         <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>الكود</th><th>الحساب</th><th style="text-align:end">الرصيد</th>
+            <thead><tr><th>الكود</th><th>الحساب</th><th style="text-align:end">الرصيد الحالي</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

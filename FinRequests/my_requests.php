@@ -53,7 +53,7 @@ include('../insidebar.php');
             <table class="display" style="width:100%">
                 <thead>
                     <tr>
-                        <th>الرقم</th><th>النوع</th><th>المبرّر</th><th>المستفيد</th>
+                        <th>رقم الطلب</th><th>نوع الطلب</th><th>المبرّر</th><th>المستفيد</th>
                         <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>أُنشئ</th><th></th>
                     
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->

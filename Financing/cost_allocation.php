@@ -47,7 +47,7 @@ include '../insidebar.php';
   <div class="ems-topbar"><h4><i class="fa fa-percentage"></i> توزيعُ تكلفة التمويل على المشاريع</h4></div>
   <p class="text-muted" style="font-size:.9em">الربحُ الشهريُّ لكل عمليةٍ (الإجماليُّ ÷ الأقساط) يوزَّع على مشروع كل عينٍ بنسبة حصتها — والتشغيلُ يرى تكلفةً محمَّلةً بلا مصدر.</p>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>العملية</th><th>العين</th><th>الحصة ٪</th><th>مشروعُ التشغيل الحالي</th><th>ربحُ العملية شهريًّا</th><th>المحمَّلُ على المشروع</th>
+    <thead><tr><th>عملية التمويل</th><th>العين المموَّلة</th><th>الحصة ٪</th><th>المشروع</th><th>ربحُ العملية شهريًّا</th><th>المحمَّلُ على المشروع</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

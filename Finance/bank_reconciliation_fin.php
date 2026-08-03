@@ -292,8 +292,8 @@ include '../insidebar.php';
 
         <div class="table-container" style="margin-top:12px">
         <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>#</th><th>الحساب</th><th>المرجع</th><th>المدى</th><th>الأسطر</th>
-                <th>الحال</th><th></th></tr></thead>
+            <thead><tr><th>#</th><th>رقم الحساب</th><th>المرجع</th><th>المدى</th><th>الأسطر</th>
+                <th>الحالة</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($h13_statements as $s): ?>
                 <tr><td><?php echo intval($s['id']); ?></td>
@@ -345,7 +345,7 @@ include '../insidebar.php';
         <?php endif; ?>
         <div class="table-container">
         <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>#</th><th>التاريخ</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
+            <thead><tr><th>#</th><th>تاريخ الإقفال</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
                 <th>المرجع</th><th>النظير</th><th>القاعدة</th><th>الفرق</th><th>الحال</th>
                 <?php if ($can_edit) echo '<th>القرار</th>'; ?>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
@@ -473,7 +473,7 @@ include '../insidebar.php';
         <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> بنود كشف الحساب</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الوصف</th><th>النوع</th><th>المبلغ</th><th>المطابقة</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الوصف</th><th>النوع</th><th>المبلغ</th><th>طابقه</th></tr></thead>
                 <tbody>
                 <?php
                 $line_rows = fin_gate($is_super_admin)->select('fin_bank_statement_lines', array(

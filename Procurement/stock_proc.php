@@ -57,7 +57,7 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الصنف</th><th>المخزن</th><th>الوارد</th><th>المرتجع</th><th>المصروف</th><th>المتاح</th>
+                    <th>رقم الصنف</th><th>المخزن</th><th>الوارد</th><th>المرتجع</th><th>المصروف</th><th>المتاح</th>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

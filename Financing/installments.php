@@ -64,7 +64,7 @@ include '../insidebar.php';
   <?php if ($op_filter): $ff_op_id = $op_filter; $ff_active = 'installments';
         include __DIR__ . '/../includes/financing_file_tabs.php'; endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>العملية</th><th>#</th><th>الاستحقاق</th><th>أصل</th><th>ربح</th><th>الإجمالي</th><th>الحالة</th><th>سداد</th>
+    <thead><tr><th>عملية التمويل</th><th>#</th><th>تاريخ الاستحقاق</th><th>أصل القسط</th><th>ربح القسط</th><th>إجمالي القسط</th><th>الحالة</th><th>تاريخ السداد الفعلي</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

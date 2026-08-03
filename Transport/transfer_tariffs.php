@@ -235,8 +235,8 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5><i class="fa fa-table-list"></i> التعرفات</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>#</th><th>المورد</th><th>النوع</th><th>المسار</th><th>النموذج</th>
-                <th>المعدّل</th><th>الحدود</th><th>السريان</th><th>الحال</th>
+            <thead><tr><th>#</th><th>المورد</th><th>نوع الترحيل</th><th>المسار</th><th>النموذج</th>
+                <th>المعدّل</th><th>الحدود</th><th>تاريخ السريان</th><th>الحالة</th>
                 <?php if ($can_edit) echo '<th>إجراء</th>'; ?>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -295,8 +295,8 @@ include '../insidebar.php';
         الأوامرُ المسلَّمة — وتسعيرُها بالتعرفة</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>الأمر</th><th>المرحلة</th><th>المورد المحمَّل</th><th>التاريخ</th>
-                <th>المسافة</th><th>التسعير</th><?php if ($can_edit) echo '<th>إجراء</th>'; ?></tr></thead>
+            <thead><tr><th>الأمر</th><th>المرحلة</th><th>المورد المحمَّل</th><th>تاريخ الإنشاء</th>
+                <th>المسافة كم</th><th>التسعير</th><?php if ($can_edit) echo '<th>إجراء</th>'; ?></tr></thead>
             <tbody>
             <?php foreach ($orders as $o): ?>
                 <tr>

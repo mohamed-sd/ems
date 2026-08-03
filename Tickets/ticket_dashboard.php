@@ -322,7 +322,7 @@ $stage_colors = array(
             <div>
                 <div style="font-weight:700;margin-bottom:6px;color:#198754"><i class="fa fa-circle-check"></i> أعلى التزامًا بالاستحقاق</div>
                 <table class="alltables no-datatable" style="width:100%">
-                    <thead><tr><th>#</th><th>الإدارة</th><th>النسبة</th>
+                    <thead><tr><th>#</th><th>الإدارة</th><th>نسبة الالتزام</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>
@@ -341,7 +341,7 @@ $stage_colors = array(
             <div>
                 <div style="font-weight:700;margin-bottom:6px;color:#dc3545"><i class="fa fa-truck-monster"></i> أكثر المعدّات بلاغًا</div>
                 <table class="alltables no-datatable" style="width:100%">
-                    <thead><tr><th>#</th><th>المعدة</th><th>بلاغ</th><th>مفتوح</th></tr></thead>
+                    <thead><tr><th>#</th><th>المعدة</th><th>البلاغات الواردة</th><th>مفتوح</th></tr></thead>
                     <tbody>
                     <?php if (empty($top_equipment)): ?><tr><td colspan="4" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($top_equipment as $i => $e): ?>
@@ -357,7 +357,7 @@ $stage_colors = array(
             <div>
                 <div style="font-weight:700;margin-bottom:6px;color:#6f42c1"><i class="fa fa-user-check"></i> أنشط المُبلِّغين</div>
                 <table class="alltables no-datatable" style="width:100%">
-                    <thead><tr><th>#</th><th>المُبلِّغ</th><th>بلاغ</th></tr></thead>
+                    <thead><tr><th>#</th><th>المُبلِّغ</th><th>البلاغات المتكررة</th></tr></thead>
                     <tbody>
                     <?php if (empty($top_reporters)): ?><tr><td colspan="3" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($top_reporters as $i => $r): ?>

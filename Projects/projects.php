@@ -521,7 +521,7 @@ include('../insidebar.php');
                     <thead>
                         <tr>
                             <th> إجراءات</th>
-                            <th> المشروع</th>
+                            <th> اسم المشروع</th>
                             <th> تاريخ الإضافة</th>
                             <th> العميل</th>
                             <th> كود المشروع</th>

@@ -476,8 +476,8 @@ function pl_revenue_label($model, $map)
                     <thead>
                         <tr>
                             <th>إجراءات</th>
-                            <th width="90">الكود</th>
-                            <th>الاسم</th>
+                            <th width="90">كود البند</th>
+                            <th>اسم القائمة</th>
                             <th>النموذج</th>
                             <th>العملة</th>
                             <th>السعر الأساس</th>

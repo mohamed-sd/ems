@@ -213,7 +213,7 @@ include '../insidebar.php';
     <div class="table-wrap" style="margin-top:14px;">
         <table class="data-table" id="opTable" style="width:100%;">
             <thead>
-                <tr><th>إجراءات</th><th>#</th><th>المشغّل</th><th>المسمى</th><th>رقم الرخصة</th><th>الفئة</th><th>الانتهاء</th><th>الصلاحية</th><th>الحالة</th>
+                <tr><th>إجراءات</th><th>#</th><th>كود المشغّل</th><th>المسمى</th><th>الرخصة</th><th>فئة الرخصة</th><th>تاريخ انتهاء الرخصة</th><th>الصلاحية</th><th>الحالة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>

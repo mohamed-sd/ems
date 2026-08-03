@@ -102,7 +102,7 @@ include '../insidebar.php';
     </h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
-            <thead><tr><th>المسار</th><th>الإدارة</th><th>المكلف</th><th>إلزامي</th><th>الحالة</th>
+            <thead><tr><th>رقم المسار</th><th>الإدارة المالكة</th><th>المكلف</th><th>مسار إلزامي؟</th><th>الحالة</th>
                 <th>المانع</th><th>مهلة الإنجاز</th><th>الأثر</th><th>إعادات</th><th>إجراء</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

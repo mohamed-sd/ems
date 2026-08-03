@@ -185,7 +185,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>#</th><th>النوع</th><th>الموضوع</th><th>الموقع</th><th>الطالب</th>
+            <thead><tr><th>#</th><th>نوع الإذن</th><th>الموضوع</th><th>الموقع</th><th>الطالب</th>
                 <th>الحالة</th><th>ساري حتى</th><th>أُنشئ</th><th></th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

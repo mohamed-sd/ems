@@ -353,7 +353,7 @@ function mnt_opt($value, $label, $selected) {
             </form>
             <?php endif; ?>
             <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="taskTable" style="width:100%">
-                <thead><tr><th>المهمة</th><th>النوع</th><th>المكوّن</th><th>ساعات تقديرية</th><?php if ($can_edit) echo '<th></th>'; ?></tr></thead>
+                <thead><tr><th>المهمة</th><th>نوع المعدة</th><th>المكوّن</th><th>ساعات تقديرية</th><?php if ($can_edit) echo '<th></th>'; ?></tr></thead>
                 <tbody>
                     <?php foreach ($tasks as $t): ?>
                     <tr data-line="<?php echo intval($t['id']); ?>">
@@ -465,7 +465,7 @@ function mnt_opt($value, $label, $selected) {
                    echo $fk === $e16_filter ? 'background:#e2b93b;font-weight:800' : ''; ?>"><?php echo $fl; ?></a>
         <?php endforeach; ?></span></h5></div><div class="card-body">
         <div class="table-container"><table class="display nowrap alltables no-datatable" style="width:100%">
-            <thead><tr><th>توليد أمر</th><th>المرجع</th><th>الخطة</th><th>المعدة</th><th>الأساس</th><th>الاستحقاق</th></tr></thead>
+            <thead><tr><th>توليد أمر</th><th>مرجع التفويض</th><th>رقم الخطة</th><th>كود المعدة</th><th>الأساس</th><th>تاريخ الاستحقاق المتوقع</th></tr></thead>
             <tbody>
                 <?php foreach ($due_rows as $r): ?>
                 <tr>

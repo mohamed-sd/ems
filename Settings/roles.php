@@ -224,7 +224,7 @@ include('../insidebar.php');
                             <th width="80"><i class="fas fa-barcode"></i> #</th>
                             <th><i class="fas fa-tag"></i> اسم الصلاحية</th>
                             <th><i class="fas fa-sitemap"></i> الدور الأب</th>
-                            <th width="100"><i class="fas fa-layer-group"></i> المستوى</th>
+                            <th width="100"><i class="fas fa-layer-group"></i> المستوى التنظيمي</th>
                             <th width="100"><i class="fas fa-toggle-on"></i> الحالة</th>
                             <th width="120"><i class="fas fa-calendar"></i> تاريخ الإنشاء</th>
                             <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>

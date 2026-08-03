@@ -236,8 +236,8 @@ include '../insidebar.php';
         <div class="table-container">
             <table id="docsTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الصاحب</th><th>النوع</th><th>الرقم</th><th>الجهة</th>
-                    <th>الانتهاء</th><th>الوضع الفعلي</th><th>الحالة الإدارية</th>
+                    <th>الصاحب</th><th>نوع الوثيقة</th><th>رقم الوثيقة</th><th>الجهة المصدِرة</th>
+                    <th>تاريخ الانتهاء</th><th>الوضع الفعلي</th><th>الحالة</th>
                     <?php if ($can_edit) echo '<th>إجراء</th>'; ?>
                 
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
