@@ -36,7 +36,7 @@ $live = array();
 $r = mysqli_query($conn, "SELECT action_code FROM actions WHERE active = 1");
 while ($x = mysqli_fetch_row($r)) { $live[$x[0]] = 1; }
 
-$doc = Nav09Reader::load(dirname(__DIR__) . '/docs/files/NAV-09 نظام الشاشات النافذ الموسع-1.xlsx');
+$doc = Nav09Reader::load(dirname(__DIR__) . '/docs/files/NAV-09-current.xlsx');
 
 /* عنوانُ الشاشة → ملفُّها القانوني (من مصفوفة العرض) لربط الفعل بشاشته */
 $fileOfTitle = array();

@@ -24,6 +24,7 @@ $APPLY = in_array('--apply', $argv, true);
 
 /* أدوارُ كل إدارةٍ — معكوسُ خريطة dept_inbox المعتمدة (الدورُ الأول أساسي) */
 $DEPT_ROLES = array(
+    'الإدارة التنفيذية' => array(9), // الفجوة 9 التاريخية سُدت بها (NAV-09 v4) — الحساب بيد المالك
     'إدارة الموقع'      => array(6, 7),
     'إدارة التشغيل'     => array(1),
     'إدارة الصيانة'     => array(13, 14),
@@ -41,7 +42,7 @@ $DEPT_ROLES = array(
     'الحوكمة والالتزام' => array(15),
 );
 
-$doc = Nav09Reader::load($ROOT . '/docs/files/NAV-09 نظام الشاشات النافذ الموسع-1.xlsx');
+$doc = Nav09Reader::load($ROOT . '/docs/files/NAV-09-current.xlsx');
 
 /* القاموس: قانوني → مسارُ الوجهة الفعلي */
 $map = array();

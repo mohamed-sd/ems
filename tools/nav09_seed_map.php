@@ -113,6 +113,10 @@ $MAP = array(
     'fin_variance.php'    => array('Financing/deviations.php'),
     'fin_idle.php'        => array('Financing/deviations.php'),
     'fin_cost.php'        => array('Financing/cost_allocation.php'),
+    // الجديد في v4
+    'fin_deviations.php'  => array('Financing/deviations.php'),
+    'supplier_plan.php'   => array('Suppliers/equipment_plan.php'),
+    'quota_ledger.php'    => array('Suppliers/shares_coverage.php'),
     // الحوكمة
     'visibility.php'      => array('Portal/visibility_keys.php'),
     'audit.php'           => array('ActivityLogs/activity_logs.php'),
@@ -127,7 +131,7 @@ $preferred = array(
     'modules.php'    => 'Settings/modules.php',
 );
 
-$d = Nav09Reader::load($ROOT . '/docs/files/NAV-09 نظام الشاشات النافذ الموسع-1.xlsx');
+$d = Nav09Reader::load($ROOT . '/docs/files/NAV-09-current.xlsx');
 $files = array();
 foreach ($d['matrix'] as $m) {
     if (!isset($files[$m['file']])) { $files[$m['file']] = array('title' => $m['title'], 'owner' => $m['owner']); }

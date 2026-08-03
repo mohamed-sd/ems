@@ -23,20 +23,27 @@ class Nav09Reader
 
         $out = array('index' => array(), 'depts' => array(), 'impact' => array(), 'matrix' => array(), 'rules' => array());
 
-        /* ── 00 الفهرس ─────────────────────────────────────────────────── */
+        /* ── 00 الفهرس ─────────────────────────────────────────────────────
+         * v4 أضافت عمودَ «الطبقة» بخلايا مدمجةٍ تُقرأ فارغةً — فالمواضعُ تتزحزح.
+         * القراءةُ الصامدة: الاسمُ أولُ خليةٍ نصيةٍ بعد الرقم، والأعدادُ الثلاثة
+         * (مراحل·مجموعات·شاشات) آخرُ ثلاث خلايا رقميةٍ في الصف. */
         $s = $wb->getSheetByName('00 — الفهرس');
         foreach ($s->toArray(null, true, false, false) as $i => $r) {
-            if ($i === 0 || trim((string) $r[1]) === '' ) { continue; }
-            if (trim((string) $r[0]) === '—') {
-                // صفُّ الإجمالي: الأعمدةُ F/G/H كسائر الصفوف (المهمةُ والدورتان فارغةٌ فيه)
+            if ($i === 0) { continue; }
+            $cells = array(); foreach ($r as $c) { $c = trim((string) $c); if ($c !== '') { $cells[] = $c; } }
+            if (count($cells) < 4) { continue; }
+            $nums = array_values(array_filter($cells, function ($c) { return ctype_digit($c); }));
+            if (count($nums) < 3) { continue; }
+            $tail = array_slice($nums, -3);
+            if ($cells[0] === '—') {
                 $out['index']['totals'] = array(
-                    'stages' => intval($r[5]), 'groups' => intval($r[6]), 'screens' => intval($r[7]));
+                    'stages' => intval($tail[0]), 'groups' => intval($tail[1]), 'screens' => intval($tail[2]));
                 continue;
             }
-            $out['index']['depts'][intval($r[0])] = array(
-                'name' => trim($r[1]), 'mission' => trim((string) $r[2]),
-                'work_cycle' => trim((string) $r[3]), 'doc_cycle' => trim((string) $r[4]),
-                'stages' => intval($r[5]), 'groups' => intval($r[6]), 'screens' => intval($r[7]));
+            if (!ctype_digit($cells[0])) { continue; }
+            $out['index']['depts'][intval($cells[0])] = array(
+                'name' => $cells[1],
+                'stages' => intval($tail[0]), 'groups' => intval($tail[1]), 'screens' => intval($tail[2]));
         }
 
         /* ── الأوراق الإدارية ───────────────────────────────────────────── */
@@ -169,7 +176,7 @@ class Nav09Reader
 
 /* ── CLI ───────────────────────────────────────────────────────────────── */
 if (PHP_SAPI === 'cli' && realpath($argv[0] ?? '') === __FILE__) {
-    $file = 'C:/wamp64/www/ems/docs/files/NAV-09 نظام الشاشات النافذ الموسع-1.xlsx';
+    $file = 'C:/wamp64/www/ems/docs/files/NAV-09-current.xlsx';
     foreach ($argv as $a) { if (strpos($a, '--file=') === 0) { $file = substr($a, 7); } }
     $d = Nav09Reader::load($file);
     $mode = in_array('--depts', $argv, true) ? 'depts' : (in_array('--check', $argv, true) ? 'check' : 'summary');
