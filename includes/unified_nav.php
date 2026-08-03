@@ -62,7 +62,8 @@ function unifiedNavEnabled($roleId, $csv = null) {
 function getUnifiedNavItems($conn, $roleId) {
     $roleId = intval($roleId);
     $sql = "SELECT n.door, n.group_id, n.label_ar, n.route, n.icon, n.sort_order,
-                   n.counter_source, g.name AS group_name
+                   n.counter_source, g.name AS group_name,
+                   g.stage_no, g.stage_title, g.display_order AS group_order
             FROM nav_items n
             LEFT JOIN link_groups g ON g.id = n.group_id AND g.is_active = 1
             WHERE n.role_id = {$roleId} AND n.active = 1
@@ -179,9 +180,84 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
  *   الروابط الثابتة الباقية (المراسلات) كي تبقى «الرئيسية» أولَ ما يُرى
  *   (الدستور §6) دون أن تهبط الثوابتُ إلى ذيل القائمة.
  */
+/**
+ * وضعُ المراحل (NAV-09 حكم ١٣): المرحلةُ رأسُ طيٍّ والمجموعاتُ عناوينُ داخلها —
+ * «المراحلُ ٠ و١ و٢ مفتوحةٌ وما بعدها مطويّ» · و«أخرى» (99) ذيلٌ مطويٌّ للمراجعة.
+ */
+function printStageNav($roleId, array $items, $basePrefix = '../', $badges = array()) {
+    $byStage = array();
+    foreach ($items as $it) { $byStage[intval($it['stage_no'])][] = $it; }
+    ksort($byStage);
+    foreach ($byStage as $stageNo => $sItems) {
+        usort($sItems, function ($a, $b) {
+            return (intval($a['group_order']) - intval($b['group_order']))
+                ?: (intval($a['sort_order']) - intval($b['sort_order']));
+        });
+        $title = trim((string) $sItems[0]['stage_title']);
+        if ($title === '') { $title = $stageNo === 0 ? 'اللوحة والمساحة' : "المرحلة $stageNo"; }
+        $key = 'stage-' . $roleId . '-' . $stageNo;
+        $openDefault = ($stageNo <= 2); // حكم ١٣
+        $icon = $stageNo === 99 ? 'fa fa-box-archive' : ($stageNo === 0 ? 'fa fa-gauge-high' : 'fa fa-diagram-project');
+
+        $total = 0;
+        foreach ($sItems as $it) { if (isset($badges[$it['route']])) { $total += intval($badges[$it['route']]); } }
+        $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
+
+        echo '<li class="nav-group' . ($openDefault ? ' open' : '') . '" data-group-key="' . $key . '"'
+           . ($openDefault ? ' data-default-open="1"' : '') . '>' . "\n";
+        echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($openDefault ? 'true' : 'false')
+           . '" aria-controls="navgrp-' . $key . '">'
+           . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</span>' . $badge
+           . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
+        echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
+
+        $byGroup = array();
+        foreach ($sItems as $it) { $byGroup[(string) $it['group_name']][] = $it; }
+        static $stMoreSeq = 1000;
+        foreach ($byGroup as $gname => $gItems) {
+            if ($gname !== '' && count($byGroup) > 1) {
+                echo '<li class="nav-subhead" aria-hidden="true"><span>'
+                   . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
+            }
+            $dense = count($gItems) > 12; // أداةُ التكدس نفسُها (NAV-01 §4)
+            foreach ($gItems as $idx => $it) {
+                if ($dense && $idx === 7) {
+                    $stMoreSeq++;
+                    $rest = count($gItems) - 7;
+                    echo '<li class="nav-more-toggle"><button type="button" class="nav-group-head" '
+                       . 'style="font-size:.85em;opacity:.8" '
+                       . 'onclick="var m=document.getElementById(\'navmore-' . $stMoreSeq . '\');'
+                       . 'var open=m.style.display!==\'none\';m.style.display=open?\'none\':\'block\';'
+                       . 'this.querySelector(\'span\').textContent=open?\'المزيد (' . $rest . ') ▾\':\'أقل ▴\';">'
+                       . '<span>المزيد (' . $rest . ') ▾</span></button></li>' . "\n";
+                    echo '<li><ul id="navmore-' . $stMoreSeq . '" style="display:none;list-style:none;padding:0;margin:0">' . "\n";
+                }
+                printNavLinkItem(array('code' => $it['route'], 'name' => $it['label_ar'], 'icon' => $it['icon']), $basePrefix, $badges);
+            }
+            if ($dense) { echo '</ul></li>' . "\n"; }
+        }
+        echo '  </ul>' . "\n";
+        echo '</li>' . "\n";
+    }
+}
+
 function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array(), $afterHome = '') {
     $items = getUnifiedNavItems($conn, $roleId);
     if (empty($items)) { return false; }
+
+    // NAV-09: للدور المولَّد (مجموعاتٌ مرحلية) وضعُ المراحل يلغي كرومَ الأبواب،
+    // وما بقي بلا مرحلةٍ (ثوابتُ قديمة) يُطبع بأبوابه بعده.
+    $staged = array(); $doored = array();
+    foreach ($items as $it) {
+        if ($it['stage_no'] !== null) { $staged[] = $it; } else { $doored[] = $it; }
+    }
+    if (!empty($staged)) {
+        printStageNav($roleId, $staged, $basePrefix, $badges);
+        if ($afterHome !== '') { echo $afterHome; }
+        if (empty($doored)) { return true; }
+        $items = $doored; $afterHome = '';
+    }
+
     $byDoor = array();
     foreach ($items as $it) { $byDoor[$it['door']][] = $it; }
     $injected = false;

@@ -1,37 +1,37 @@
 {
-    "generated_at": "2026-08-02 21:38:35",
+    "generated_at": "2026-08-03 08:49:28",
     "source_db": "equipation_manage",
     "server_version": "8.4.7",
     "files": {
         "schema.sql": {
-            "sha1": "e8937d00224700749817d46aa4d753ede1b72cb7",
-            "bytes": 665269
+            "sha1": "45dfcac4a0740d26a2f93cc8532eebf9b5c46095",
+            "bytes": 667429
         },
         "seed_reference.sql": {
-            "sha1": "df737b2f343b32c36da6d10eefccdfb0d825de27",
-            "bytes": 314331
+            "sha1": "67b9247fc9585b76522da4da6f9ec369dbaaf98a",
+            "bytes": 489836
         }
     },
     "schema": {
-        "tables": 376,
+        "tables": 378,
         "views": 6
     },
     "seed": {
-        "rows": 3126,
+        "rows": 4322,
         "tables": {
             "roles": 26,
             "modules": 220,
             "role_permissions": 1079,
-            "link_groups": 429,
-            "nav_items": 770,
+            "link_groups": 995,
+            "nav_items": 1355,
             "equipments_types": 30,
             "failure_codes": 402,
             "fin_chart_of_accounts": 124,
-            "fin_approval_matrix": 4,
+            "fin_approval_matrix": 20,
             "fin_effect_map": 11,
-            "job_titles": 16,
-            "employee_roles": 9,
-            "transfer_types": 6
+            "job_titles": 20,
+            "employee_roles": 20,
+            "transfer_types": 20
         }
     }
 }

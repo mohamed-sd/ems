@@ -526,7 +526,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     // استرجاع حالة الطيّ المحفوظة (أول زيارةٍ على الإطلاق = لا شيء = الكل مطويّ)
     var saved = readOpen();
     groups.forEach(function (g) {
-      if (saved.indexOf(g.getAttribute('data-group-key')) !== -1) {
+      // NAV-09 حكم ١٣: المراحلُ الموسومةُ data-default-open تبقى مفتوحةً افتراضًا
+      if (saved.indexOf(g.getAttribute('data-group-key')) !== -1 || g.hasAttribute('data-default-open')) {
         g.classList.add('open');
         var h = g.querySelector('.nav-group-head');
         if (h) h.setAttribute('aria-expanded', 'true');

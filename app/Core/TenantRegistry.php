@@ -478,6 +478,8 @@ class TenantRegistry
         'processed_operations' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-06 ركن ③: عطالة (مستهلك × مستند × أثر) — عبر ProcessedOperations حصرًا
         'equipment_ownership_registry' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-21: المجال المقيَّد للملكية — عبر OwnershipDomainGuard حصرًا
         'financing_models' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15/FIN-01: المجال المقيَّد
+        'nav09_file_map' => array('type' => self::T_GLOBAL, 'soft' => false), // NAV-09: قاموس المواءمة القانوني — مرجع نظام عام
+        'nav09_action_map' => array('type' => self::T_GLOBAL, 'soft' => false), // NAV-09: خريطة أفعال الورقة 97
         'financing_operations' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
         'financed_assets' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
         'asset_ownership_shares' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15: الحصص عبر الزمن

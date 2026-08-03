@@ -109,21 +109,31 @@ $out[] = array('⑨','تحويلاتٌ وجهتُها مكسورة', count($bad)
 /* ── ⑩ سطحُ البلاغات: كلُّ دورٍ له «بلاغاتُ إدارتي» ─────────────────────── */
 $rolesAll = array_column(q($conn, "SELECT DISTINCT role_id FROM nav_items WHERE active=1"), 'role_id');
 $rolesWith = array_column(q($conn, "SELECT DISTINCT role_id FROM nav_items WHERE active=1
-              AND (label_ar LIKE '%بلاغات إدارتي%' OR route LIKE '%dept_inbox%')"), 'role_id');
+              AND (label_ar LIKE '%بلاغات إدارتي%' OR route LIKE '%dept_inbox%'
+                   OR route LIKE 'Tickets/tickets_list.php%')"), 'role_id');
+// مركزُ البلاغات (24): قائمتُه كلُّها سطحُ بلاغات — «بلاغات المركز» تفي (NAV-09 ورقة 14)
 $noSurface = array_values(array_diff($rolesAll, $rolesWith));
 $out[] = array('⑩','إداراتٌ (أدوارٌ) بلا سطح بلاغات', count($noSurface), true, array_map(fn($r)=>"دور $r", $noSurface));
 
 /* ── ⑪ صفُّ العرض (ACT-01 v6): ظهورٌ لغير المالك بلا صفٍّ في المصفوفة ──── */
 // خريطةُ الدور ← إدارتُه المستهدفة (أدوارُ الإدارات المالكة)
-$roleDept = array(1=>'التشغيل',6=>'إدارة الموقع',13=>'الصيانة',23=>'النقل والترحيل',
- 16=>'سلسلة الإمداد — المشتريات',25=>'سلسلة الإمداد — المخازن',12=>'المبيعات والعقود',
- 17=>'المالية',26=>'التمويل والملكية',3=>'الأسطول',2=>'الموردون',4=>'الموارد البشرية',
- 15=>'الحوكمة والالتزام',24=>'مركز البلاغات',27=>'المشغّلون والقوى التشغيلية');
+// أسماءُ الإدارات القانونية — مفردات NAV-09 (الورقة 98) لا المفردات القديمة
+$roleDept = array(1=>'إدارة التشغيل',6=>'إدارة الموقع',7=>'إدارة الموقع',
+ 13=>'إدارة الصيانة',14=>'إدارة الصيانة',23=>'النقل والترحيل',
+ 16=>'المشتريات',25=>'المخازن',12=>'المبيعات والعقود',
+ 17=>'المالية والخزينة',18=>'المالية والخزينة',19=>'المالية والخزينة',
+ 20=>'المالية والخزينة',21=>'المالية والخزينة',22=>'المالية والخزينة',
+ 26=>'التمويل والملكية',3=>'إدارة الأسطول',10=>'إدارة الأسطول',
+ 2=>'إدارة الموردين',8=>'إدارة الموردين',4=>'الموارد البشرية',
+ 15=>'الحوكمة والالتزام',24=>'مركز البلاغات',27=>'القوى التشغيلية');
 $svr = array();      // route → [dept => role_kind]
 foreach (q($conn, "SELECT route, dept, role_kind FROM screen_view_rows WHERE active=1 AND route IS NOT NULL") as $v)
     $svr[strtolower(trim($v['route']))][$v['dept']] = $v['role_kind'];
 $noViewRow = array();
-foreach (q($conn, "SELECT n.route, n.role_id FROM nav_items n WHERE n.active=1") as $n) {
+// «أخرى — للمراجعة» (n9s99): معزولةٌ بتصنيفها بانتظار قرار المالك — ليست «غريبًا بلا تصنيف»
+foreach (q($conn, "SELECT n.route, n.role_id FROM nav_items n
+                   LEFT JOIN link_groups lg ON lg.id = n.group_id
+                   WHERE n.active=1 AND (lg.group_code IS NULL OR lg.group_code NOT LIKE 'n9s99_others%')") as $n) {
     $rid = intval($n['role_id']);
     if (!isset($roleDept[$rid])) continue;            // الأدوارُ الفرعيةُ تتبع مالكها
     $rt = strtolower(trim($n['route']));
@@ -131,7 +141,9 @@ foreach (q($conn, "SELECT n.route, n.role_id FROM nav_items n WHERE n.active=1")
     if (!isset($svr[$rt])) continue;                  // شاشةٌ خارج مصفوفة العرض (ثوابت/جديدة)
     $dept = $roleDept[$rid];
     $kinds = $svr[$rt];
-    if (isset($kinds['مساحة عملي'])) continue;        // عنصرُ مساحةِ عملي — لا صفَّ إدارةٍ له
+    $isWs = false;                                     // عنصرُ مساحةِ عملي (باسمه أو بنجمته) — لا صفَّ إدارةٍ له
+    foreach (array_keys($kinds) as $kk) { if (mb_strpos($kk, 'مساحة عملي') === 0) { $isWs = true; break; } }
+    if ($isWs) continue;
     if (isset($kinds[$dept])) continue;               // له صفٌّ (مالكًا أو عارضًا)
     if (in_array('owner', $kinds, true) && count($kinds) === 1
         && array_key_first($kinds) === $dept) continue;
@@ -163,6 +175,13 @@ $missG = (mb_strpos($wsrc, 'بوابتي') === false) ? 1 : 0;
 $out[] = array('⑬','إنجازي وبوابتي غائبان عن مساحة عملي', $missA + $missG, true,
                array_filter(array($missA ? 'إنجازي غائب' : '', $missG ? 'بوابتي غائب' : '')));
 
+/* ── ⑭ رباعيةُ الظهور (NAV-09 حكم ٥): «أربعةٌ لكل ظهورٍ — ولا ظهورَ بلا الأربعة» ── */
+$noQuad = q($conn, "SELECT CONCAT(canonical_file, ' ⊕ ', dept) k FROM screen_view_rows
+                    WHERE canonical_file IS NOT NULL AND active = 1
+                      AND (COALESCE(scope_text,'') = '' OR COALESCE(angle,'') = ''
+                        OR COALESCE(allowed_text,'') = '' OR COALESCE(blocked_text,'') = '')");
+$out[] = array('⑭','ظهوراتٌ قانونيةٌ ناقصةُ الرباعية', count($noQuad), true, array_slice($noQuad, 0, 5));
+
 /* ── التقرير — بمقاماتِ تغطيةٍ موجبة (ACT-01 v6 §5.1) ───────────────────── */
 $fail = 0;
 echo "════ فحوصُ الاتصال الثلاثةَ عشرَ — ACT-01 v6 §5 ════\n";
@@ -190,6 +209,13 @@ foreach ($out as $o) {
     if ($cnt > 0 && $details) foreach ($details as $d) echo "     · $d\n";
     if ($cnt > 0 && $blocking) $fail++;
 }
+/* عدّاداتُ NAV-09 الاسترشادية (لا تمنع — تقيس التقدم نحو إغلاق الوثيقة) */
+$soonN = count(q($conn, "SELECT canonical_file FROM nav09_file_map WHERE state = 'soon'"));
+$othersN = count(q($conn, "SELECT ni.id FROM nav_items ni JOIN link_groups lg ON lg.id = ni.group_id
+                           WHERE lg.group_code LIKE 'n9s99_others%' AND ni.active = 1"));
+$pendActs = count(q($conn, "SELECT canonical_code FROM nav09_action_map WHERE state = 'pending'"));
+printf("عداداتُ NAV-09: شاشاتُ «قريبًا» المتبقية=%d · «أخرى» بانتظار قرار المالك=%d · أفعالٌ معلَّقةُ الترقية=%d\n",
+       $soonN, $othersN, $pendActs);
 echo str_repeat('─', 60) . "\n";
 echo $fail === 0 ? "الحكم: ✔ صفرٌ في الحاكمة — الدمجُ مسموح\n"
                  : "الحكم: ✘ $fail فحصًا حاكمًا غيرَ صفري" . ($enforce ? " — الدمجُ ممنوع\n" : " (وضعُ الرصد — لا منع)\n");

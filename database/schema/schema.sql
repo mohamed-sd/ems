@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-02 21:38:35
--- الجداول: 376 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-03 08:49:28
+-- الجداول: 378 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -4634,10 +4634,12 @@ CREATE TABLE `legal_entities` (
 CREATE TABLE `link_groups` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم المجموعة كما يظهر في السايدبار',
-  `group_code` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'NAV-01 §4: g1..g8 — المجموعات القياسية',
+  `group_code` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `owner_role_id` int DEFAULT NULL COMMENT 'الدور المالك — نفس دلالة modules.owner_role_id',
   `icon` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'fa fa-folder',
   `display_order` int NOT NULL DEFAULT '0' COMMENT 'الأصغر يظهر أولاً',
+  `stage_no` tinyint DEFAULT NULL,
+  `stage_title` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `ix_owner_role` (`owner_role_id`),
@@ -5037,6 +5039,38 @@ CREATE TABLE `monthly_performance_downtime` (
   CONSTRAINT `fk_mpd_reason` FOREIGN KEY (`reason_code`) REFERENCES `stop_reason_codes` (`code`) ON DELETE RESTRICT,
   CONSTRAINT `ck_mpd_hours` CHECK ((`hours` > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-12: ساعات التعطل بسببها وبندها وطرفها المتحمل — الإسناد بالساعات لا بالعلامة';
+
+-- ── Table: nav09_action_map ──
+CREATE TABLE `nav09_action_map` (
+  `canonical_code` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `screen_title` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `canonical_file` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `actor_ar` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `writes_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `event_name` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `consumers_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `effect_text` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reverse_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `live_code` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `state` enum('alias','pending') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`canonical_code`),
+  KEY `ix_n9a_state` (`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav09_file_map ──
+CREATE TABLE `nav09_file_map` (
+  `canonical_file` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_ar` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner_dept` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `state` enum('live','mapped','soon') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'soon',
+  `real_path` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`canonical_file`),
+  KEY `ix_n9m_state` (`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav_items ──
 CREATE TABLE `nav_items` (
@@ -6575,6 +6609,7 @@ CREATE TABLE `schema_migrations` (
 CREATE TABLE `screen_view_rows` (
   `svr_id` int unsigned NOT NULL AUTO_INCREMENT,
   `screen_name` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الاسمُ المستهدفُ للشاشة (مفتاحُ المصفوفة)',
+  `canonical_file` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `route` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المسارُ التقنيُّ إن حُسم — والجديدُ ★ قد لا مسارَ له بعد',
   `dept` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الإدارةُ الناظرة',
   `role_id` int DEFAULT NULL COMMENT 'دورُها المالكُ في النظام — يُحلّ من target_dept_role',
@@ -6583,13 +6618,16 @@ CREATE TABLE `screen_view_rows` (
   `angle` varchar(160) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الزاوية — تحدد الأعمدةَ والفلاتر',
   `columns_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الأعمدةُ المعروضةُ لهذا العارض',
   `filters_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الفلاترُ الافتراضية',
+  `allowed_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `blocked_text` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nav_group` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المجموعةُ في قائمة هذا الناظر',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`svr_id`),
-  UNIQUE KEY `uq_svr` (`screen_name`,`dept`),
+  UNIQUE KEY `uq_svr_canonical` (`canonical_file`,`dept`),
   KEY `ix_svr_role` (`role_id`,`role_kind`,`active`),
-  KEY `ix_svr_route` (`route`)
+  KEY `ix_svr_route` (`route`),
+  KEY `ix_svr_canonical` (`canonical_file`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-01 v6 §6: صفوفُ العرض — النطاقُ والزاويةُ والأفعالُ معلنةٌ لكل ناظر';
 
 -- ── Table: seat_assignments ──
