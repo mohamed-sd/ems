@@ -48,6 +48,9 @@ $doc = Nav09Reader::load($ROOT . '/docs/files/NAV-09-current.xlsx');
 $map = array();
 $r = mysqli_query($conn, "SELECT canonical_file, state, real_path FROM nav09_file_map");
 while ($x = mysqli_fetch_assoc($r)) { $map[$x['canonical_file']] = $x; }
+$hidden = array(); // «قريبًا» التي أخفاها المالك (owner-hide) — لا يولَّد رابطُها حتى تُبنى
+$r = mysqli_query($conn, "SELECT canonical_file FROM nav09_file_map WHERE note = 'owner-hide' AND state = 'soon'");
+while ($x = mysqli_fetch_row($r)) { $hidden[$x[0]] = 1; }
 $routeOf = function ($cf) use ($map) {
     if (isset($map[$cf]) && $map[$cf]['state'] !== 'soon' && $map[$cf]['real_path'] !== null) {
         return $map[$cf]['real_path'];
@@ -168,6 +171,7 @@ foreach ($doc['depts'] as $deptNo => $dept) {
                 $si = 0;
             }
             if ($row['kind'] !== 'screen') { continue; } // الأفعالُ تستوردها أداة 97
+            if (isset($hidden[$row['file']])) { continue; } // أخفاها المالك — بلا رابطٍ حتى تُبنى
             $si++;
             $route = $routeOf($row['file']);
             if (strpos($route, 'main/soon.php') === 0) { $soonLinks++; }

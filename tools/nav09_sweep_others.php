@@ -34,7 +34,7 @@ foreach ($ROLES as $role) {
     $r = mysqli_query($conn, "SELECT ni.id, ni.label_ar, ni.route FROM nav_items ni
                               LEFT JOIN link_groups lg ON lg.id = ni.group_id
                               WHERE ni.role_id = $role AND ni.active = 1
-                                AND (lg.id IS NULL OR lg.group_code NOT LIKE 'n9s%')");
+                                AND (lg.id IS NULL OR (lg.group_code NOT LIKE 'n9s%' AND lg.group_code NOT LIKE 'n9o%'))");
     while ($x = mysqli_fetch_assoc($r)) { $olds[] = $x; }
     if (!$olds) { continue; }
 
