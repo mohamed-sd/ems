@@ -43,6 +43,10 @@ $DEPT_ROLES = array(
     'الحوكمة والالتزام' => array(15),
 );
 
+/* كتمُ المالك: روابطُ يقرر المالكُ إسقاطَها من قائمة دورٍ بعينه (تصمد أمام التوليد)
+   2026-08-03: الصندوق الجامع يُسقط من التشغيل — «ما ينتظر اعتمادي» الحلقي يغني عنه */
+$SUPPRESS = array(1 => array('approvals_inbox.php'));
+
 $doc = Nav09Reader::load($ROOT . '/docs/files/NAV-09-current.xlsx');
 
 /* القاموس: قانوني → مسارُ الوجهة الفعلي */
@@ -173,6 +177,7 @@ foreach ($doc['depts'] as $deptNo => $dept) {
             }
             if ($row['kind'] !== 'screen') { continue; } // الأفعالُ تستوردها أداة 97
             if (isset($hidden[$row['file']])) { continue; } // أخفاها المالك — بلا رابطٍ حتى تُبنى
+            if (isset($SUPPRESS[$role]) && in_array($row['file'], $SUPPRESS[$role], true)) { continue; } // كتمُ المالك لهذا الدور
             $si++;
             $route = $routeOf($row['file']);
             if (strpos($route, 'main/soon.php') === 0) { $soonLinks++; }
