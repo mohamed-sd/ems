@@ -19,6 +19,7 @@ RewriteRule ^audit-log/?$              audit_log.php              [L,QSA]
 RewriteRule ^csrf-monitor/?$           csrf_monitor.php           [L,QSA]
 RewriteRule ^bus-monitor/?$            bus_monitor.php            [L,QSA]
 RewriteRule ^reports-permissions/?$    reports_permissions.php    [L,QSA]
+RewriteRule ^perm-system/?$            perm_system.php            [L,QSA]
 RewriteRule ^settings/?$               settings.php               [L,QSA]
 
 # ═══════════════════════════════════════════════════════════════════════════

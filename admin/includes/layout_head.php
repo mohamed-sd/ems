@@ -39,6 +39,7 @@ $_admin_nav = [
     ['slug' => 'csrf-monitor',       'label' => 'مراقبة CSRF',          'icon' => 'fa-shield-halved',     'url' => 'csrf-monitor'],
     ['slug' => 'bus-monitor',        'label' => 'مراقبة الناقل',        'icon' => 'fa-satellite-dish',    'url' => 'bus-monitor'],
     ['slug' => 'report-permissions', 'label' => 'صلاحيات التقارير',     'icon' => 'fa-chart-pie',         'url' => 'reports-permissions'],
+    ['slug' => 'perm-system',        'label' => 'نظام الصلاحيات الجديد', 'icon' => 'fa-shield-halved',     'url' => 'perm-system'],
     ['slug' => 'settings',           'label' => 'الإعدادات',            'icon' => 'fa-gear',              'url' => 'settings'],
 ];
 ?>
