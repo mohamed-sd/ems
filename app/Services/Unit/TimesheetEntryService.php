@@ -109,6 +109,13 @@ class TimesheetEntryService
         if (!in_array($unitType, $validUnits, true)) { $missing[] = 'unit_type'; }
         if (empty($timeLines)) { $missing[] = 'time_lines'; }
         if ($sourceRef === '') { $missing[] = 'source_ref'; }
+        // UN-02 (E-02): الساعات في كل النماذج — صف الطن/المتر بأسطر زمنٍ مجموعها صفر يُرفض
+        if (in_array($unitType, array('ton', 'meter'), true) && !empty($timeLines)
+            && (!function_exists('ems_env') || ems_env('EMS_E02_HOURS_GUARD', 'enforce') !== 'off')) {
+            $sumH = 0.0;
+            foreach ($timeLines as $l) { $sumH += (float) (isset($l['hours']) ? $l['hours'] : 0); }
+            if ($sumH <= 0) { $missing[] = 'time_lines_hours'; }
+        }
         if (!empty($missing)) {
             return array('ok' => false, 'code' => 422, 'missing' => $missing, 'warnings' => array());
         }

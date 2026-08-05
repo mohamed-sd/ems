@@ -307,6 +307,26 @@ function roleBoardAlerts($conn, $gate, $roleId)
         }
     }
 
+    // DEC-01 ⑦ (قرار المالك): مؤشرُ الاعتمادات المتأخرة على لوحتَي 1و6 —
+    // الرقمان نصًّا: غيرُ المعتمد وأقدمُه بالأيام (+نسبة الأسبوع) · والموروثُ
+    // قبل السلسلة مستثنًى (unit_chain_helpers) · أحمرُ فوق سبعة أيام.
+    if ($rid === 1 || $rid === 6) {
+        require_once __DIR__ . '/unit_chain_helpers.php';
+        $cidLag = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
+        if ($cidLag > 0) {
+            $mLag = ems_uc_lag_metrics($conn, $cidLag);
+            if ($mLag['pending'] > 0) {
+                $out[] = array('key' => 'chain_lag',
+                    'label' => 'بانتظار الاعتماد: ' . $mLag['pending'] . ' وحدةً · الأقدمُ '
+                             . $mLag['oldest_days'] . ' يومًا'
+                             . ($mLag['ratio'] !== null ? ' · نسبةُ الأسبوع ' . $mLag['ratio'] . '٪' : ''),
+                    'href' => '../Approvals/hours_approval.php',
+                    'tone' => ($mLag['oldest_days'] > 7 ? 'err' : 'warn'),
+                    'count' => $mLag['pending']);
+            }
+        }
+    }
+
     // الأدوار على الشاشة العامة — عدّاداتُها بجدولٍ واحدٍ لكل تنبيه
     $generic = array(
         1 => array(
