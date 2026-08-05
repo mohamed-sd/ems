@@ -164,22 +164,4 @@ include '../insidebar.php';
     </div></div>
 </div>
 
-<script>
-(function () {
-    var btn = document.getElementById('cmp03AddBtn');
-    var form = document.getElementById('cmp03AddForm');
-    var cancel = document.getElementById('cmp03CancelBtn');
-    if (btn && form) {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            form.classList.toggle('allforms-visible');
-            if (form.classList.contains('allforms-visible')) {
-                form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    }
-    if (cancel && form) {
-        cancel.addEventListener('click', function () { form.classList.remove('allforms-visible'); });
-    }
-})();
-</script>
+<!-- WF-01: أُزيل مبدّلُ فورم الإضافة مع الفورم نفسِه — لا إنشاءَ من مساحة عملي -->
