@@ -349,22 +349,32 @@ function has_all_permissions($conn, $module_id) {
  * }
  */
 function check_page_permissions($conn, $module_code) {
-    // البحث عن الوحدة في جدول modules
-    $stmt = $conn->prepare("SELECT id FROM modules WHERE code LIKE ? OR name LIKE ? LIMIT 1");
-    $search_pattern1 = '%' . $module_code . '%';
-    $search_pattern2 = '%' . $module_code . '%';
-    $stmt->bind_param("ss", $search_pattern1, $search_pattern2);
+    // المطابقة الدقيقة أولًا (code = المسار) — فالمطابقة التقريبية قد تحل موديولًا خطأ
+    $stmt = $conn->prepare("SELECT id FROM modules WHERE code = ? LIMIT 1");
+    $stmt->bind_param("s", $module_code);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
-    
+
     if (!$result) {
-        // إذا لم تجد الوحدة، افترض أن المستخدم لديه كل الصلاحيات (للتوافقية مع الصفحات القديمة)
+        // توافق مع الأكواد القصيرة القديمة (equipments · suppliers · timesheet …)
+        $stmt = $conn->prepare("SELECT id FROM modules WHERE code LIKE ? OR name LIKE ? LIMIT 1");
+        $search_pattern1 = '%' . $module_code . '%';
+        $search_pattern2 = '%' . $module_code . '%';
+        $stmt->bind_param("ss", $search_pattern1, $search_pattern2);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+    }
+
+    if (!$result) {
+        // الشاشة غير المسجَّلة تُرفض — الحارس في الخادم لا في الواجهة (M-14 BR-GOV-01).
+        // كان الافتراض القديم فتحَ كل الصلاحيات، وأُغلق بقرار المالك 2026-08-05.
         return [
             'id' => null,
-            'can_view' => true,
-            'can_add' => true,
-            'can_edit' => true,
-            'can_delete' => true
+            'can_view' => false,
+            'can_add' => false,
+            'can_edit' => false,
+            'can_delete' => false,
+            'unregistered' => true
         ];
     }
     

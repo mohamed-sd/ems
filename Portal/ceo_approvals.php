@@ -26,6 +26,17 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $CANONICAL = 'ceo_approvals.php';
+
+// حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
+$__pp = check_page_permissions($conn, 'Portal/ceo_approvals.php');
+if (!$is_super_admin && empty($__pp['can_view'])) {
+    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية لهذه الشاشة'));
+    exit();
+}
+if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
+    http_response_code(403);
+    exit('غير مصرح بالكتابة في هذه الشاشة');
+}
 $COLS   = array (
   0 => 'الكيان',
   1 => 'رقم الطلب',

@@ -26,6 +26,17 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $CANONICAL = 'my_tasks.php';
+
+// حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
+$__pp = check_page_permissions($conn, 'Portal/my_tasks.php');
+if (!$is_super_admin && empty($__pp['can_view'])) {
+    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية لهذه الشاشة'));
+    exit();
+}
+if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
+    http_response_code(403);
+    exit('غير مصرح بالكتابة في هذه الشاشة');
+}
 $COLS   = array (
   0 => 'رقم المهمة',
   1 => 'تاريخ الإسناد',
@@ -56,25 +67,8 @@ $FIELDS = array (
   11 => 'تاريخ الإنجاز',
 );
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
-    }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, 0, ?, ?)");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
-    $ok = $st->execute();
-    $st->close();
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
-    exit();
-}
+/* WF-01: مساحةُ عملي واجهةُ قراءةٍ لا مصدر — أُزيل فورمُ الإدخال اليدوي ومعالجُه؛
+   الصفوف تُشتق من مصادرها الحية حين يُبنى محرّك WFM (WFM-001 · AC-WFM-12). */
 
 /* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
 $rows = array();
@@ -126,10 +120,7 @@ include '../insidebar.php';
     <?php
     $header_title = 'مهامي';
     $header_icon = 'fa fa-list-check';
-    $header_actions = array(
-        array('tag' => 'button', 'id' => 'cmp03AddBtn', 'class' => '', 'icon' => 'fa fa-plus',
-              'label' => 'إضافة', 'title' => 'إضافة صف جديد', 'attrs' => 'type="button"'),
-    );
+    $header_actions = array(); // WF-01: لا إنشاءَ من مساحة عملي — أُزيل زر الإضافة
     $header_back = false;
     include '../includes/page_header.php';
     if (isset($_GET['msg'])) {
@@ -137,44 +128,7 @@ include '../insidebar.php';
     }
     ?>
 
-    <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
-    <form method="post" action="" class="allforms" id="cmp03AddForm">
-        <input type="hidden" name="cmp03_action" value="add">
-        <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — مهامي</h5>
-        </div><div class="card-body">
-            <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم المهمة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإسناد</label>
-                    <input type="date" name="f1"></div>
-                <div class="form-group"><label>نوع المهمة</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>المستند المرتبط</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الوصف</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الإدارة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>مُسنِد المهمة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>المهلة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>المتبقي</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>الأولوية</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>حالة المهمة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإنجاز</label>
-                    <input type="date" name="f11"></div>
-            </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
-                <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
-            </div>
-        </div></div>
-    </form>
+    <!-- WF-01: أُزيل فورم الإدخال اليدوي — مساحةُ عملي واجهةُ قراءةٍ والعناصر من مصادرها -->
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">

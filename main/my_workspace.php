@@ -37,11 +37,11 @@ $myMsgs = $q1("SELECT COUNT(*) FROM fin_notifications WHERE company_id = {$compa
 
 $tiles = array(
     array('① لوحة دوري', 'ما ينتظرني اليوم بترتيب الإلحاح', 'fa fa-tachometer-alt', '../main/dashboard.php', null),
-    array('② مهامي', 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري', 'fa fa-tasks', '../Tickets/ticket_workstreams_board.php', $myTasks),
+    array('② مهامي', 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري', 'fa fa-tasks', '../Portal/my_tasks.php', $myTasks),
     array('③ موافقاتي', 'صندوق الاعتماد الجامع: كل ما ينتظر قراري', 'fa fa-check-double', '../Finance/approvals_inbox.php', $myApprovals),
-    array('④ طلباتي', 'ما رفعته وحالته ومن يقف عنده', 'fa fa-paper-plane', '../FinRequests/finance_gateway.php', $myRequests),
+    array('④ طلباتي', 'ما رفعته وحالته ومن يقف عنده', 'fa fa-paper-plane', '../FinRequests/my_requests.php', $myRequests),
     array('⑤ طلب جديد', 'طلب مالي جديد — والنوع يُختار داخله', 'fa fa-plus-circle', '../FinRequests/finance_gateway.php?new=1', null),
-    array('⑥ المراسلات والتنبيهات', 'الداخلية وغير المقروءة', 'fa fa-bell', '../admin/bus_monitor.php', $myMsgs),
+    array('⑥ المراسلات والتنبيهات', 'الداخلية وغير المقروءة', 'fa fa-bell', '../chats/index.php', $myMsgs),
     array('⑦ بلاغاتي', 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة', 'fa fa-bullhorn', '../Tickets/ticket_contextual_open.php', $myTickets),
     array('⑧ ملفي', 'ملفي الشخصي وكشوفي ووثائقي', 'fa fa-id-card', '../Portal/my_portal.php', null),
     // NAV-01 v6 §7 (update0007 S-03/S-04): عنصران إلزاميان لكل حسابٍ بلا استثناء
