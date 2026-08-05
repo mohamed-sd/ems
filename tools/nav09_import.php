@@ -188,16 +188,22 @@ foreach ($doc['depts'] as $deptNo => $dept) {
             }
             $usedRoutes[$route] = 1;
             // التصادمُ مع رابطٍ قديمٍ لنفس الدور = تبنّيه في بنية المولَّد لا خطأ
+            // E-03 UX-07: الربطُ بالصلاحية من القاعدة الواحدة في nav09_read
+            $pl = nav09_perm_link($conn, $route);
             mysqli_query($conn, sprintf(
-                "INSERT INTO nav_items (role_id, door, group_id, label_ar, route, icon, sort_order, active)
-                 VALUES (%d, 'DAILY', %d, '%s', '%s', '%s', %d, 1)
+                "INSERT INTO nav_items (role_id, door, group_id, label_ar, route, icon, sort_order, active, module_id, permission_code)
+                 VALUES (%d, 'DAILY', %d, '%s', '%s', '%s', %d, 1, %s, %s)
                  ON DUPLICATE KEY UPDATE group_id = %d, label_ar = VALUES(label_ar), door = 'DAILY',
-                     icon = VALUES(icon), sort_order = VALUES(sort_order), active = 1",
+                     icon = VALUES(icon), sort_order = VALUES(sort_order), active = 1,
+                     module_id = VALUES(module_id), permission_code = VALUES(permission_code)",
                 $role, $gid,
                 mysqli_real_escape_string($conn, $row['title']),
                 mysqli_real_escape_string($conn, $route),
                 mysqli_real_escape_string($conn, ems_nav_icon_for($row['title'], $route)),
-                $si, $gid)) or die('✘ ni: ' . mysqli_error($conn) . "\n");
+                $si,
+                $pl['module_id'] === null ? 'NULL' : (int) $pl['module_id'],
+                $pl['permission_code'] === null ? 'NULL' : "'" . mysqli_real_escape_string($conn, $pl['permission_code']) . "'",
+                $gid)) or die('✘ ni: ' . mysqli_error($conn) . "\n");
             $links++;
         }
     }

@@ -12,6 +12,24 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+/**
+ * القاعدة الواحدة لربط رابط قائمةٍ بصلاحيته (E-03 UX-07 · قرار 2026-08-06):
+ * المسارُ (بلا مرساة #) المطابقُ لموديولٍ مسجَّلٍ بcode يُربط به —
+ * module_id للفحص وpermission_code مفتاحًا؛ وما لا موديولَ له يبقى NULL
+ * (ظهورٌ بلا فحصٍ كالثوابت). يستهلكها المستورد وتمريرةُ الربط معًا
+ * فيبقى «المصدرُ الواحدُ المحكوم» (UXP-041) كودًا واحدًا.
+ */
+function nav09_perm_link(mysqli $conn, $route)
+{
+    $base = strpos($route, '#') !== false ? substr($route, 0, strpos($route, '#')) : $route;
+    $e = mysqli_real_escape_string($conn, $base);
+    $r = mysqli_query($conn, "SELECT id FROM modules WHERE code = '{$e}' LIMIT 1");
+    if ($r && ($x = mysqli_fetch_assoc($r))) {
+        return array('module_id' => (int) $x['id'], 'permission_code' => $base);
+    }
+    return array('module_id' => null, 'permission_code' => null);
+}
+
 class Nav09Reader
 {
     /** الأوراق الإدارية 01..16 → [dept_no, dept_name, meta{}, stages[], groups[], screens[], actions[]] */
