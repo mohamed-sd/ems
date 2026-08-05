@@ -387,6 +387,26 @@ class TimesheetEntryService
                 $newState = $allDone ? 'parties_approved' : 'parties_review';
             }
             $g->update('unit_entries', array('state' => $newState), array('id' => $entryId));
+
+            // ── ختمُ الأصحاب (قرار المالك 2026-08-05 · UN-05 «من شهد هو من يحكم») ──
+            // اعتمادُ الموقع يختم حكمَ الكمية على الواقعة، واكتمالُ أحكام الأطراف
+            // يختم أسطرَ الزمن غيرَ المعترَض عليها جملةً — فالفوترةُ تستند إلى
+            // شهادةٍ مختومةٍ بيد صاحبها لا إلى اشتقاقٍ آلي (كانت 3 من 103,000).
+            if ($stage === 'site') {
+                $st = $conn->prepare("UPDATE unit_entries SET qty_decided_by=?, qty_decided_at=NOW()
+                                       WHERE id=? AND qty_decided_at IS NULL");
+                $st->bind_param('ii', $actor, $entryId);
+                $st->execute();
+                $st->close();
+            }
+            if ($newState === 'parties_approved') {
+                $st = $conn->prepare("UPDATE unit_time_log SET decided_by=?, decided_at=NOW()
+                                       WHERE entry_id=? AND decided_at IS NULL
+                                         AND (objection_state IS NULL OR objection_state='none')");
+                $st->bind_param('ii', $actor, $entryId);
+                $st->execute();
+                $st->close();
+            }
         }, 'unit-entry-approve');
 
         // ── CAP-34 (§12 — التصحيحُ الحاكم): **الاستهلاكُ عند اكتمال سلسلة
