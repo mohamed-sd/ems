@@ -15,7 +15,10 @@
  * المفردات: permission_code = «مسارُ الشاشة:الفعل» بمفردات PermSourceService
  * العشر — فالمقارنة تسأل الجانبين بالمفتاح نفسِه فلا التباس.
  *
- * التشغيل:  php tools/perm_templates_build.php --diff | --apply
+ * التشغيل:  php tools/perm_templates_build.php --diff | --apply | --rebuild
+ *   --rebuild: يمسح بنودَ النسخ المولَّدة (approval_ref=OWNER-2026-08-06)
+ *   ثم يعيد الاشتقاق — يُستعمل بعد أي تعديلٍ على role_permissions
+ *   كي لا تبقى القوالبُ أوسعَ من الحي (فالإضافةُ وحدَها لا تحذف الزائد).
  */
 define('EMS_CLI', true);
 require_once __DIR__ . '/../includes/session_bootstrap.php';
@@ -23,7 +26,15 @@ require_once __DIR__ . '/../config.php';
 while (ob_get_level()) { ob_end_clean(); }
 $conn = $GLOBALS['conn'];
 mysqli_set_charset($conn, 'utf8mb4');
-$APPLY = in_array('--apply', $argv, true);
+$REBUILD = in_array('--rebuild', $argv, true);
+$APPLY = $REBUILD || in_array('--apply', $argv, true);
+if ($REBUILD) {
+    $del = mysqli_query($conn,
+        "DELETE tp FROM template_permissions tp
+          JOIN permission_template_versions v ON v.ver_id = tp.template_version_id
+         WHERE v.approval_ref = 'OWNER-2026-08-06'");
+    echo "أُعيد البناء: مُسح " . mysqli_affected_rows($conn) . " بندًا مولَّدًا قبل الاشتقاق.\n\n";
+}
 
 /** الرايةُ الأربع ← فعلُها القانوني (مفردات legacyDecision) وبُعدُها */
 $FLAGS = array(

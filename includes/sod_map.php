@@ -38,8 +38,8 @@ if (!function_exists('ems_sod_map')) {
             'proc.disburse'            => $m('Procurement/issue_proc.php',             'create', 'exact'),
             // ③ الساعات والمستخلص
             'timesheet.entry'          => $m('Timesheet/timesheet_type.php',           'create', 'exact'),
-            'timesheet.approve'        => $m(null, null, 'absent',
-                                             'Approvals/hours_approval.php غيرُ مسجَّلةٍ في سجل الشاشات'),
+            'timesheet.approve'        => $m('Approvals/hours_approval.php',        'update', 'exact',
+                                             'سُجّلت 2026-08-06 — الشاشةُ كلُّها اعتماد فرايةُ التعديل تمثله'),
             'claim.create'             => $m('Contracts/claims.php',                   'create', 'exact'),
             // ④ دورة المسيّر
             'employee.create'          => $m('Employees/employees.php',                'create', 'exact'),
@@ -60,12 +60,15 @@ if (!function_exists('ems_sod_map')) {
             // ⑦ نقل الملكية
             'ownership.share.create'   => $m(null, null, 'absent', 'لا شاشةَ لحصص الملكية في السجل'),
             'ownership.transfer.approve' => $m(null, null, 'absent', 'لا شاشةَ لنقل الحصص في السجل'),
-            // ⑧ الفترة والقيد
-            'period.open'              => $m('Finance/periods_fin.php',                'update', 'approx',
-                                             'الفتحُ والإقفالُ في شاشةٍ واحدة'),
+            // ⑧ الفترة والقيد — الفتحُ والإقفالُ (شاشةٌ واحدةٌ ورايةٌ واحدة):
+            // تعارضُهما يقع بالبناء لا بالواقع فيُنتج إنذارًا كاذبًا لكل من يملك
+            // الشاشةَ — يُعلَنان غيرَ قابلَين للقياس حتى تدقّ الأبعاد (DEC-SEC-K).
+            // والحمايةُ الفعليةُ للدورة في الزوج ⑨ (قيد + مطابقة) القابلِ للقياس.
+            'period.open'              => $m(null, null, 'absent',
+                                             'يتقاسم الشاشةَ والرايةَ مع الإقفال — قياسُه بالرايات إنذارٌ كاذب'),
             'journal.entry'            => $m('Finance/journal_form_fin.php',           'create', 'exact'),
-            'period.close.approve'     => $m('Finance/periods_fin.php',                'update', 'approx',
-                                             'يتقاسم شاشةَ الفتح — الرايةُ لا تفرّق'),
+            'period.close.approve'     => $m(null, null, 'absent',
+                                             'يتقاسم الشاشةَ والرايةَ مع الفتح — قياسُه بالرايات إنذارٌ كاذب'),
         );
     }
 }

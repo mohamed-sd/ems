@@ -22,6 +22,17 @@ require_once '../config.php';
 $role           = strval($_SESSION['user']['role']);
 $user_id        = intval($_SESSION['user']['id']);
 $company_id     = intval($_SESSION['user']['company_id'] ?? 0);
+
+// حارس الشاشة (M-14 BR-GOV-01): كانت شاشةَ اعتمادٍ حيةً بلا فحص can_view —
+// كشفها مسحُ فصل الواجبات 2026-08-06. (المعالجُ محميٌّ سلفًا بقائمة ADR-07.)
+require_once '../includes/permissions_helper.php';
+$__pp = check_page_permissions($conn, 'Approvals/hours_approval.php');
+if ($role !== '-1' && empty($__pp['can_view'])) {
+    require_once __DIR__ . '/../includes/perm_explain_live.php';
+    $__why = ems_deny_message($conn, intval($role), 'Approvals/hours_approval.php');
+    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    exit();
+}
 $session_proj   = intval($_SESSION['user']['project_id'] ?? 0);
 
 $equip_type_filter = intval($_GET['equip_type'] ?? 0);
