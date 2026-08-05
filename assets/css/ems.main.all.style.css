@@ -12526,6 +12526,35 @@ body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip
   color: var(--ems-ui-danger-text) !important;
 }
 
+/* ── طقمُ الحالات السبعة (E-03 §4-1 · 2026-08-06): الأربعُ المكمّلة للثلاث القائمة ──
+   مسودة رمادٌ هادئ · مرفوع أزرقُ المعلومة · معلَّق كهرمانُ التحذير ·
+   مقفَلٌ رمادٌ داكن (قراءةٌ فقط لا خطأ) · معكوسٌ بنفسجيٌّ مميّز */
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="draft"] {
+  background: #f1f3f5 !important;
+  border-color: #ced4da !important;
+  color: #495057 !important;
+}
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="submitted"] {
+  background: var(--ems-ui-info-bg, #e7f5ff) !important;
+  border-color: var(--ems-ui-info-border, #74c0fc) !important;
+  color: var(--ems-ui-info-text, #1864ab) !important;
+}
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="held"] {
+  background: var(--ems-ui-warning-bg) !important;
+  border-color: var(--ems-ui-warning-border) !important;
+  color: var(--ems-ui-warning-text) !important;
+}
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="locked"] {
+  background: #e9ecef !important;
+  border-color: #868e96 !important;
+  color: #343a40 !important;
+}
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="reversed"] {
+  background: #f3e8ff !important;
+  border-color: #b197fc !important;
+  color: #6741d9 !important;
+}
+
 body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="info"] {
   background: var(--ems-ui-info-bg) !important;
   border-color: var(--ems-ui-info-border) !important;

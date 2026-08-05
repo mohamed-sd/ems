@@ -126,18 +126,35 @@
         });
     }
 
+    // طقمُ الحالات السبعة الموحّد (E-03 §4-1 · قرار المالك 2026-08-06):
+    // مسودة · مرفوع · معتمد · معلَّق · مقفَل · ملغى · معكوس — لونٌ ورمزٌ
+    // ثابتان في كل المنصة، والحالاتُ التخصصية تُنسب إليه عرضًا.
+    var EMS_STATE_ICONS = {
+        draft: 'far fa-circle', submitted: 'fas fa-arrow-up', active: 'fas fa-check',
+        held: 'far fa-dot-circle', locked: 'fas fa-lock', inactive: 'fas fa-ban',
+        reversed: 'fas fa-undo', pending: 'fas fa-arrow-up'
+    };
     function mapStatusToken(rawText) {
         if (!rawText) return null;
         var text = rawText.replace(/\s+/g, ' ').trim().toLowerCase();
         if (!text) return null;
 
-        var activeTokens = ['نشط', 'معتمد', 'مكتمل', 'مدفوع', 'مفتوح', 'active', 'approved', 'completed', 'paid', 'open'];
-        var pendingTokens = ['قيد التنفيذ', 'قيد المراجعة', 'جاري', 'pending', 'processing', 'in progress', 'in-progress'];
-        var inactiveTokens = ['غير نشط', 'غير معتمد', 'ملغي', 'مغلق', 'غير مدفوع', 'inactive', 'cancelled', 'canceled', 'closed', 'unpaid', 'rejected'];
-
-        if (activeTokens.indexOf(text) !== -1) return 'active';
-        if (pendingTokens.indexOf(text) !== -1) return 'pending';
-        if (inactiveTokens.indexOf(text) !== -1) return 'inactive';
+        var sets = {
+            draft:     ['مسودة', 'مسوّدة', 'draft'],
+            submitted: ['مرفوع', 'مقدم', 'مقدّم', 'قيد التنفيذ', 'قيد المراجعة', 'جاري',
+                        'بانتظار الاعتماد', 'submitted', 'pending', 'processing', 'in progress', 'in-progress'],
+            active:    ['نشط', 'معتمد', 'معتمدة', 'مكتمل', 'مكتملة', 'مدفوع', 'مفتوح', 'محوّلة', 'محولة',
+                        'active', 'approved', 'completed', 'paid', 'open', 'converted'],
+            held:      ['معلق', 'معلّق', 'معلقة', 'مردود', 'معاد', 'معادة', 'موقوف',
+                        'held', 'on hold', 'on-hold', 'returned'],
+            locked:    ['مقفل', 'مقفَل', 'مقفلة', 'مغلق', 'مغلقة', 'locked', 'closed'],
+            inactive:  ['غير نشط', 'غير معتمد', 'ملغي', 'ملغى', 'ملغاة', 'مرفوض', 'مرفوضة', 'غير مدفوع',
+                        'inactive', 'cancelled', 'canceled', 'unpaid', 'rejected'],
+            reversed:  ['معكوس', 'معكوسة', 'عُكس', 'reversed']
+        };
+        for (var token in sets) {
+            if (sets[token].indexOf(text) !== -1) return token;
+        }
         return null;
     }
 
@@ -155,7 +172,14 @@
                     var chip = document.createElement('span');
                     chip.className = 'ems-status-chip';
                     chip.setAttribute('data-status', statusToken);
-                    chip.textContent = rawText;
+                    if (EMS_STATE_ICONS[statusToken]) {   // الطقم: رمزُ الحالة قبل نصّها
+                        var ic = document.createElement('i');
+                        ic.className = EMS_STATE_ICONS[statusToken];
+                        ic.setAttribute('aria-hidden', 'true');
+                        chip.appendChild(ic);
+                        chip.appendChild(document.createTextNode(' '));
+                    }
+                    chip.appendChild(document.createTextNode(rawText));
                     td.appendChild(chip);
                 }
             }
