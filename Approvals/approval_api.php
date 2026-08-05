@@ -36,6 +36,22 @@ if ($api_action === 'create') {
 if ($api_action === 'approve') {
     $request_id = isset($_POST['request_id']) ? intval($_POST['request_id']) : 0;
     $note = isset($_POST['note']) ? trim($_POST['note']) : '';
+    // «من أنشأ لا يعتمد» بنيويًّا (E-04 UXP-090 · self.approval=never)
+    require_once __DIR__ . '/../includes/self_approval_guard.php';
+    $__rq = approval_stmt_execute($conn, "SELECT requested_by FROM approval_requests WHERE id = ?", array($request_id));
+    $__reqBy = 0;
+    if ($__rq) {                                   // يعيد mysqli_stmt لا نتيجةً
+        $__rs = $__rq->get_result();
+        if ($__rs && ($__row = $__rs->fetch_assoc())) { $__reqBy = intval($__row['requested_by']); }
+        $__rq->close();
+    }
+    $__sa = ems_no_self_approval($conn, $__reqBy, $user_id, 'طلب اعتماد #' . $request_id,
+        intval($_SESSION['user']['company_id'] ?? 0));
+    if ($__sa !== null) {
+        http_response_code(403);
+        echo json_encode(array('success' => false, 'message' => $__sa['reason']), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
     $result = approval_approve_request($request_id, $user_id, $conn, $note);
     echo json_encode($result, JSON_UNESCAPED_UNICODE);
     exit;

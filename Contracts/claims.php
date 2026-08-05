@@ -90,6 +90,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'approve') {
     if (!$can_approve) { clm_back('الإجازةُ صلاحيةُ المالية — لا يعتمد المستخلصَ من أنشأه ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
+    // «من أنشأ لا يعتمد» بنيويًّا (E-04 UXP-090 · حارس self.approval=never):
+    // كانت الرسالةُ أعلاه تَعِد بما لا يفحصه الكود — $can_approve رايةُ دورٍ لا
+    // فحصُ يد. (قِيس قبل الزرع: 285 مستخلصًا اعتمده مُنشئه.)
+    require_once __DIR__ . '/../includes/self_approval_guard.php';
+    $__clmRow = $gate->selectOne('claims', array('columns' => array('created_by'),
+        'where' => array('id' => intval($_POST['id'] ?? 0))));
+    $__sa = ems_no_self_approval($conn, intval($__clmRow['created_by'] ?? 0), $current_user_id,
+        'مستخلص #' . intval($_POST['id'] ?? 0), $company_id);
+    if ($__sa !== null) { clm_back($__sa['reason'] . ' ❌'); }
     $res = claim_approve($conn, intval($_POST['id'] ?? 0),
         (($_POST['tax_code'] ?? '') !== '' ? $_POST['tax_code'] : null), $current_user_id);
     if ($res['status'] === 'approved') {
