@@ -58,6 +58,24 @@ class PermSourceService
     }
 
     /**
+     * users.id ← persons.person_id عبر المركز الوظيفي (جسرُ الهوية E-05).
+     * يعيد null للحساب غير الموصول — فلا يُقاس بدل أن يُسجَّل فرقٌ كاذب.
+     */
+    public static function personIdOf(\mysqli $conn, $userId)
+    {
+        static $cache = array();
+        $userId = (int) $userId;
+        if (array_key_exists($userId, $cache)) { return $cache[$userId]; }
+        $res = $conn->query(
+            "SELECT p.person_id FROM users u
+               JOIN person_positions p ON p.p_id = u.position_id
+              WHERE u.id = {$userId} AND p.state = 'active' LIMIT 1");
+        $row = $res ? $res->fetch_assoc() : null;
+        $cache[$userId] = $row ? (int) $row['person_id'] : null;
+        return $cache[$userId];
+    }
+
+    /**
      * الظل (المرحلة ③): يحسب المشتق ويقارنه بالقديم عند الطلب بلا تفعيل —
      * القديم يقرِّر، والفرق يُسجَّل. فرق النطاق أو السقف فرقٌ.
      * @return array{decision:bool, source:string, diff:bool}
@@ -65,7 +83,16 @@ class PermSourceService
     public static function shadowCompare(\mysqli $conn, $userId, $companyId, $moduleCode, $action, $permissionCode, $scopeType, $scopeId)
     {
         $legacy = self::legacyDecision($conn, $userId, $moduleCode, $action);
-        $derived = PermissionResolver::resolve($conn, $userId, $companyId, $permissionCode, $scopeType, $scopeId);
+        // القديمُ يعمل بـusers.id والمشتقُّ بـpersons.person_id — معرّفان مختلفان.
+        // كان يُمرَّر users.id إلى المحلِّل فيمنع دائمًا (لا مركزَ بذلك المعرّف)،
+        // فيُسجَّل فرقٌ كاذبٌ في كل فحص. الوصلة: users.position_id → المركز → الشخص.
+        $personId = self::personIdOf($conn, $userId);
+        if ($personId === null) {
+            // حسابٌ بلا جسرِ هوية — لا يُقاس ولا يُسجَّل فرقٌ كاذب (E-05 EN-02)
+            return array('decision' => $legacy, 'source' => self::currentSource(),
+                         'diff' => false, 'unbridged' => true);
+        }
+        $derived = PermissionResolver::resolve($conn, $personId, $companyId, $permissionCode, $scopeType, $scopeId);
         $derivedAllow = $derived['allowed'];
         $diff = ($legacy !== $derivedAllow);
         if ($diff) {

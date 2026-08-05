@@ -44,24 +44,15 @@ $FLAGS = array(
     'can_delete' => array('delete_draft', 'action'),
 );
 
-/** الدور ← عائلتُه (حيث تُوجد عائلةٌ معلنة؛ وما لا عائلةَ له يحمل كلَّه في مسماه) */
-$FAMILY = array(
-    1 => 'fam_ops', 5 => 'fam_ops', 6 => 'fam_ops', 7 => 'fam_ops',
-    3 => 'fam_fleet', 10 => 'fam_fleet', 11 => 'fam_fleet',
-    13 => 'fam_maintenance', 14 => 'fam_maintenance',
-    17 => 'fam_finance', 18 => 'fam_finance', 19 => 'fam_finance',
-    20 => 'fam_finance', 21 => 'fam_finance', 22 => 'fam_finance',
-    4 => 'fam_hr', 12 => 'fam_sales', 15 => 'fam_governance',
-    16 => 'fam_procurement', 23 => 'fam_transport', 24 => 'fam_tickets',
-    25 => 'fam_warehouse', 26 => 'fam_financing', 27 => 'fam_operators',
-    // 2 و8 (الموردون) و9 (التنفيذية): لا عائلةَ معلنةٌ لهما في القوالب —
-    // فيحملان صلاحياتهما كاملةً في مسمَّييهما (تدهورٌ آمنٌ لا تلفيقٌ لعائلة)
-);
-/** الدور ← مستواه */
-function levelKeyOf($roleId, $lvl) {
-    if ((int) $roleId === 9) { return 'lvl_executive'; }
-    return ((int) $lvl === 2) ? 'lvl_supervisor' : 'lvl_dept_mgr';
+// الخريطةُ من المصدر الواحد — يقرؤها جسرُ الهوية أيضًا فلا يتفرّق التصنيف
+require_once __DIR__ . '/../includes/role_taxonomy.php';
+$FAMILY = array();
+$rr = mysqli_query($conn, "SELECT id FROM roles");
+while ($rx = mysqli_fetch_assoc($rr)) {
+    $f = ems_role_family((int) $rx['id']);
+    if ($f !== null) { $FAMILY[(int) $rx['id']] = $f; }
 }
+function levelKeyOf($roleId, $lvl) { return ems_role_level($roleId, $lvl); }
 
 // ── ① قراءة الواقع: صلاحياتُ كل دورٍ كمجموعةِ رموز ──────────────────────
 $roleName = array(); $roleLevel = array();
@@ -198,7 +189,7 @@ foreach ($lvlPerms as $lvl => $codes) {
 }
 foreach ($titlePerms as $rid => $codes) {
     if (!$codes) { continue; }
-    $t = tplId($conn, 'title', 'role_' . $rid);
+    $t = tplId($conn, 'title', ems_role_title_key($rid));
     $v = publishedVersion($conn, $t, 'اشتقاقٌ من role_permissions — باقي صلاحيات الدور ' . $rid);
     $made += putItems($conn, $v, $codes);
 }
