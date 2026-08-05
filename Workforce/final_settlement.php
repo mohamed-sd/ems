@@ -145,6 +145,8 @@ include '../insidebar.php';
                 <th class="ems-fn-th" data-fn="1">خصومات</th>
                 <th class="ems-fn-th" data-fn="1">العهد غير المخلاة</th>
                 <th class="ems-fn-th" data-fn="1">إجمالي الخصومات</th>
+                <!-- CMP-03 مراجعة عكسية: «الصافي» كان يُحتسب من tfoot جدول المعاينة — عمود قائمة أصيل -->
+                <th class="ems-fn-th" data-fn="1">الصافي</th>
                 <th class="ems-fn-th none" data-fn="1">إخلاء طرف المخازن</th>
                 <th class="ems-fn-th none" data-fn="1">إخلاء طرف الأسطول</th>
                 <th class="ems-fn-th none" data-fn="1">تعطيل الحساب</th>

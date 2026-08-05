@@ -97,7 +97,10 @@ include '../insidebar.php';
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap" style="width:100%">
             <thead><tr><th>الرقم التسلسلي</th><th>مرجع المستخلص</th><th>العميل</th><th>فترة الإقرار</th>
-                <th>الصافي</th><th>الإجمالي قبل الضريبة</th><th>الإجمالي</th><th>الحالة</th><th></th>
+                <!-- CMP-03 مراجعة عكسية: تاريخ الإصدار والضريبتان أعمدة قائمة بقيمها الحقيقية
+                     (كانت قيمة الضريبة تعرض تحت رأس «الإجمالي قبل الضريبة» ملتبسة) -->
+                <th>تاريخ الإصدار</th>
+                <th>الصافي</th><th>الإجمالي قبل الضريبة</th><th>نسبة الضريبة</th><th>قيمة الضريبة</th><th>الإجمالي</th><th>الحالة</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم الفاتورة</th>
                 <th class="ems-fn-th" data-fn="1">الرقم الضريبي للعميل</th>
@@ -138,12 +141,13 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars((string)($i['client_name'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)($i['period_from'] ?? '')); ?>
                         → <?php echo htmlspecialchars((string)($i['period_to'] ?? '')); ?></td>
+                    <td><?php echo htmlspecialchars((string)($i['issued_at'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)$i['net_amount']); ?></td>
-                    <td><?php echo htmlspecialchars((string)$i['tax_amount']); ?>
-                        <?php if ($i['tax_code'] !== null): ?>
-                            <small>(<?php echo htmlspecialchars((string)$i['tax_code']); ?>
-                                · <?php echo htmlspecialchars((string)$i['tax_rate']); ?>٪)</small>
-                        <?php endif; ?></td>
+                    <td><?php // الإجمالي قبل الضريبة = الإجمالي − الضريبة (لا الضريبة كما كان ملتبسًا)
+                        echo htmlspecialchars(number_format((float)$i['total_amount'] - (float)$i['tax_amount'], 2)); ?></td>
+                    <td><?php echo $i['tax_rate'] !== null ? htmlspecialchars((string)$i['tax_rate']) . '٪' : '—'; ?>
+                        <?php if ($i['tax_code'] !== null): ?><small>(<?php echo htmlspecialchars((string)$i['tax_code']); ?>)</small><?php endif; ?></td>
+                    <td><?php echo htmlspecialchars((string)$i['tax_amount']); ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$i['total_amount']); ?>
                         <?php echo htmlspecialchars((string)$i['currency']); ?></strong></td>
                     <td><?php echo (string)$i['state'] === 'issued'
