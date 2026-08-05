@@ -30,7 +30,9 @@ $CANONICAL = 'sensitive_fields.php';
 // حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
 $__pp = check_page_permissions($conn, 'Governance/sensitive_fields.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية لهذه الشاشة'));
+    require_once __DIR__ . '/../includes/perm_explain_live.php';
+    $__why = ems_deny_message($conn, intval($_SESSION['user']['role'] ?? 0), 'Governance/sensitive_fields.php');
+    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {

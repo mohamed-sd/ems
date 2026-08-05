@@ -30,7 +30,9 @@ $CANONICAL = 'perm_explain.php';
 // حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
 $__pp = check_page_permissions($conn, 'Governance/perm_explain.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية لهذه الشاشة'));
+    require_once __DIR__ . '/../includes/perm_explain_live.php';
+    $__why = ems_deny_message($conn, intval($_SESSION['user']['role'] ?? 0), 'Governance/perm_explain.php');
+    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
@@ -93,6 +95,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     exit();
 }
 
+/* ── المفسِّر الحي (E-04 SEC-001-د · قرار المالك 2026-08-06): «كلُّ مصدرٍ
+   بحكمه والنتيجةُ النهائية» — يُحسب من حيث يقع المنعُ فعلًا (modules ×
+   role_permissions) لا من طبقة SEC-01 الفارغة. ───────────────────────── */
+require_once __DIR__ . '/../includes/perm_explain_live.php';
+$px_role   = isset($_GET['px_role']) ? intval($_GET['px_role']) : 0;
+$px_screen = isset($_GET['px_screen']) ? trim((string) $_GET['px_screen']) : '';
+$px_result = ($px_role > 0 && $px_screen !== '')
+    ? ems_explain_screen_access($conn, $px_role, $px_screen, false) : null;
+$px_roles = array();
+$__rr = mysqli_query($conn, "SELECT id, name FROM roles ORDER BY id");
+while ($__rr && ($__x = mysqli_fetch_assoc($__rr))) { $px_roles[] = $__x; }
+$px_screens = array();
+$__sr = mysqli_query($conn, "SELECT code, name FROM modules WHERE code LIKE '%.php' ORDER BY name LIMIT 400");
+while ($__sr && ($__x = mysqli_fetch_assoc($__sr))) { $px_screens[] = $__x; }
+
 /* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
 $rows = array();
 $sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
@@ -153,6 +170,51 @@ include '../insidebar.php';
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
     ?>
+
+    <!-- ── المفسِّر الحي: دورٌ × شاشة ← كلُّ مصدرٍ بحكمه والنتيجة ── -->
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-question-circle"></i> لماذا يرى هذا الدورُ هذه الشاشة — أو لا يراها؟</h5>
+    </div><div class="card-body">
+        <form method="get" action="" class="ems-form" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+            <div class="form-group" style="min-width:220px"><label>الدور</label>
+                <select name="px_role" class="form-control">
+                    <option value="">— اختر —</option>
+                    <?php foreach ($px_roles as $r0): ?>
+                    <option value="<?php echo (int) $r0['id']; ?>"<?php echo $px_role === (int) $r0['id'] ? ' selected' : ''; ?>>
+                        <?php echo htmlspecialchars($r0['id'] . ' — ' . $r0['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                    <?php endforeach; ?>
+                </select></div>
+            <div class="form-group" style="min-width:320px"><label>الشاشة</label>
+                <select name="px_screen" class="form-control">
+                    <option value="">— اختر —</option>
+                    <?php foreach ($px_screens as $s0): ?>
+                    <option value="<?php echo htmlspecialchars($s0['code'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo $px_screen === $s0['code'] ? ' selected' : ''; ?>>
+                        <?php echo htmlspecialchars($s0['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                    <?php endforeach; ?>
+                </select></div>
+            <button type="submit" class="btn-save"><i class="fa fa-search"></i> فسِّر</button>
+        </form>
+        <?php if ($px_result !== null): ?>
+        <div style="margin-top:14px;padding:12px;border-radius:8px;border:1px solid #ddd">
+            <div style="font-weight:800;margin-bottom:8px">
+                <?php echo $px_result['allowed'] ? '✔ مسموح' : '✘ ممنوع'; ?>
+                — <?php echo htmlspecialchars($px_result['reason'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+            <table class="alltables no-datatable" data-no-dt="1" style="width:100%">
+                <thead><tr><th style="width:30%">المصدر</th><th>حكمُه</th></tr></thead>
+                <tbody>
+                <?php foreach ($px_result['chain'] as $step): ?>
+                    <tr><td><?php echo htmlspecialchars($step['step'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($step['verdict'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php if (!empty($px_result['grantor'])): ?>
+            <div style="margin-top:8px;color:#555">المنحُ من: <?php echo htmlspecialchars($px_result['grantor'], ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    </div></div>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
