@@ -681,7 +681,17 @@ endif; ?>
                     : "<span class='action-btn' style='color:#1e7e34'>كلها مغلقة</span>"; ?>
         </h5>
         <table class="alltables no-datatable" style="width:100%;">
-            <thead><tr><th>فتح</th><th>رقم الفرع</th><th>المرحلة</th><th>الإدارة المالكة</th><th>الوصف</th></tr></thead>
+            <thead><tr><th>فتح</th><th>رقم الفرع</th><th>المرحلة</th><th>الإدارة المالكة</th><th>الوصف</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              </tr></thead>
             <tbody>
             <?php foreach ($children as $ch): ?>
                 <tr>

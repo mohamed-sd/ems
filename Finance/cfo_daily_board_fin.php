@@ -132,7 +132,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card" style="margin-top:14px"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fas fa-clipboard-check"></i> جدول القرار اليومي</h5>
         <div class="table-container"><table class="alltables" style="width:100%">
-            <thead><tr><th>القرار</th><th>المؤشر</th><th>أين يُتّخذ</th></tr></thead>
+            <thead><tr><th>القرار</th><th>المؤشر</th><th>أين يُتّخذ</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              </tr></thead>
             <tbody>
                 <tr><td>ماذا نصرف اليوم؟</td><td>المسوّى الجاهز (<?php echo number_format($settled_ready, 0); ?>) مقابل النقد (<?php echo number_format($cash, 0); ?>)</td><td><a href="payments_fin.php">المدفوعات</a></td></tr>
                 <tr><td>ماذا نحصّل اليوم؟</td><td>الذمم المتأخرة (<?php echo number_format($overdue, 0); ?>)</td><td><a href="dues_fin.php">الذمم</a></td></tr>

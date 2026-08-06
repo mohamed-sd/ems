@@ -272,7 +272,15 @@ $attrLabel = function ($a) {
 
   <h5><i class="fa fa-list-check"></i> مهام أعضاء الإدارة (<?= count($tasks) ?>)</h5>
   <table class="table table-striped">
-    <thead><tr><th>#</th><th>العنوان</th><th>المنفذ</th><th>المالك</th><th>المصدر</th><th>الأولوية</th><th>الحالة</th><th>المهلة</th><th>تاريخ الإنشاء</th></tr></thead>
+    <thead><tr><th>#</th><th>العنوان</th><th>المنفذ</th><th>المالك</th><th>المصدر</th><th>الأولوية</th><th>الحالة</th><th>المهلة</th><th>تاريخ الإنشاء</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              </tr></thead>
     <tbody>
     <?php foreach ($tasks as $t): ?>
       <tr>

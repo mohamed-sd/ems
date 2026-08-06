@@ -127,7 +127,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ (يحسب المتوفّر والعجز/الفائض)</button><a href="workforce_requirement.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
-        <thead><tr><th>إجراءات</th><th>المشروع</th><th>الفئة</th><th>مطلوب</th><th>متوفّر</th><th>عجز</th><th>فائض</th><th>الأولوية</th><th>المرحلة</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>إجراءات</th><th>المشروع</th><th>الفئة</th><th>مطلوب</th><th>متوفّر</th><th>عجز</th><th>فائض</th><th>الأولوية</th><th>المرحلة</th><th>الحالة</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              </tr></thead><tbody>
         <?php $list = array();
         try {
             $list = $wr_gate->scopedQuery(array('scope'=>array('wr'=>'workforce_requirement'), 'enrich'=>array('p'=>'project')),

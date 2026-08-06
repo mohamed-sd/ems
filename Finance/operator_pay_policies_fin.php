@@ -326,7 +326,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>المشغّل</th><th>النموذج</th><th>الأساس</th><th>المعدّل</th>
                     <th>الحدود</th><th>العملة</th><th>النطاق</th><th>السريان</th>
                     <th>الحالة</th><?php if ($can_edit) echo '<th>إجراء</th>'; ?>
-                </tr></thead>
+                    <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                    </tr></thead>
                 <tbody>
                 <?php foreach ($policies as $p) {
                     $stopped = ($p['deleted_at'] !== null);

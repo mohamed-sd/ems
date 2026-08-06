@@ -493,10 +493,82 @@
         }
     }
 
+    /* ── الحالات الخمس (E-03 موجة ٤ · emsFiveStates) ──────────────────────
+       عقدُ كل شاشة: تحميل · فارغة · خطأ · نجاح · دون اتصال — مركزيًّا:
+       · فارغة: رسالة DataTables المعرَّبة (ar.json) على كل جدولٍ موحَّد.
+       · نجاح: لافتة ?msg= القائمة في الشاشات (عرف موحّد مسبقًا).
+       · تحميل: غلاف «جارٍ التنفيذ…» على كل إرسال POST — يمنع الإرسال المزدوج
+         بصريًّا ويصدُق حالَ الشاشة (تعطيل بdata-no-loading على الفورم).
+       · خطأ: أي فشل AJAX (jQuery) يرفع لافتةً حمراء برمز الحالة — لا فشل صامت.
+       · دون اتصال: لافتة ثابتة عند انقطاع الشبكة وتنبيه عودةٍ أخضر عابر. */
+    function bootFiveStates() {
+        var css = '#emsFsOffline{position:fixed;top:0;right:0;left:0;z-index:99999;background:#b3261e;color:#fff;' +
+            'text-align:center;padding:8px 14px;font-weight:bold;display:none}' +
+            '#emsFsOffline.on{display:block}' +
+            '#emsFsOffline.back{background:#1e7d32}' +
+            '#emsFsError{position:fixed;bottom:14px;right:14px;z-index:99999;background:#b3261e;color:#fff;' +
+            'padding:10px 16px;border-radius:8px;max-width:70vw;box-shadow:0 2px 10px rgba(0,0,0,.3);display:none}' +
+            '#emsFsLoading{position:fixed;inset:0;z-index:99998;background:rgba(255,255,255,.55);display:none;' +
+            'align-items:center;justify-content:center;font-size:18px;font-weight:bold}' +
+            '#emsFsLoading.on{display:flex}' +
+            '#emsFsLoading .box{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px 26px;box-shadow:0 2px 14px rgba(0,0,0,.15)}';
+        var st = document.createElement('style');
+        st.textContent = css;
+        document.head.appendChild(st);
+        var off = document.createElement('div');
+        off.id = 'emsFsOffline';
+        off.textContent = 'لا اتصالَ بالشبكة — التغييرات لن تُحفظ حتى يعود الاتصال';
+        document.body.appendChild(off);
+        var err = document.createElement('div');
+        err.id = 'emsFsError';
+        document.body.appendChild(err);
+        var ld = document.createElement('div');
+        ld.id = 'emsFsLoading';
+        ld.innerHTML = '<div class="box">جارٍ التنفيذ…</div>';
+        document.body.appendChild(ld);
+
+        window.addEventListener('offline', function () {
+            off.classList.remove('back');
+            off.textContent = 'لا اتصالَ بالشبكة — التغييرات لن تُحفظ حتى يعود الاتصال';
+            off.classList.add('on');
+        });
+        window.addEventListener('online', function () {
+            off.classList.add('back');
+            off.textContent = 'عاد الاتصال ✅';
+            setTimeout(function () { off.classList.remove('on', 'back'); }, 2500);
+        });
+
+        // تحميل: إرسال POST يرفع الغلاف (والملاحة تُسقطه تلقائيًّا بتحميل الصفحة)
+        document.addEventListener('submit', function (e) {
+            var f = e.target;
+            if (!f || (f.method || '').toLowerCase() !== 'post') return;
+            if (f.hasAttribute('data-no-loading') || f.target === '_blank') return;
+            setTimeout(function () { if (!e.defaultPrevented) ld.classList.add('on'); }, 0);
+        }, true);
+        window.addEventListener('pageshow', function () { ld.classList.remove('on'); });
+
+        // خطأ: فشل AJAX لا يمر صامتًا (jQuery حيثما حضر)
+        function hookAjaxError() {
+            if (!window.jQuery || !window.jQuery.fn) { return false; }
+            window.jQuery(document).ajaxError(function (ev, xhr, settings) {
+                if (xhr && xhr.statusText === 'abort') { return; }
+                err.textContent = 'تعذر الطلب (' + (xhr && xhr.status ? xhr.status : 'شبكة') + ') — أعد المحاولة أو أبلغ الدعم';
+                err.style.display = 'block';
+                setTimeout(function () { err.style.display = 'none'; }, 6000);
+            });
+            return true;
+        }
+        if (!hookAjaxError()) {
+            var tries = 0;
+            var t = setInterval(function () { if (hookAjaxError() || ++tries > 20) clearInterval(t); }, 500);
+        }
+    }
+
     /* ── Boot ───────────────────────────────────────────────── */
     function boot() {
         bootUnifiedHeaders();
         bootUnifiedTables();
+        try { bootFiveStates(); } catch (eFs) { /* لا يعطل التوحيد */ }
     }
 
     if (document.readyState === 'loading') {

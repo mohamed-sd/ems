@@ -738,7 +738,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="table-container" style="margin-top:12px;">
                 <table class="display ep-ins-table" style="width:100%;">
-                    <thead><tr><th>المرجع</th><th>النوع</th><th>الفاحص</th><th>التاريخ</th><th>الدرجة</th><th>الجاهزية</th><th>الملاحظات</th><th>الحالة</th><th>عرض</th></tr></thead>
+                    <thead><tr><th>المرجع</th><th>النوع</th><th>الفاحص</th><th>التاريخ</th><th>الدرجة</th><th>الجاهزية</th><th>الملاحظات</th><th>الحالة</th><th>عرض</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              </tr></thead>
                     <tbody>
                         <?php if (empty($ins_rows)): ?>
                             <tr><td colspan="9" style="text-align:center;color:#888;">لا توجد تفتيشات لهذه المعدة</td></tr>

@@ -185,7 +185,17 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
     <div class="card-body">
         <?php if (!$preview['proposed']) { ems_state_empty('لا محتوى منشورًا لقوالب هذه الطبقات بعد — تُبنى في شاشة القوالب'); } else { ?>
         <div class="table-container"><table class="alltables" style="width:100%" data-no-dt="1">
-            <thead><tr><th>المصدر</th><th>المرجع</th><th>الصلاحية</th><th>الحكم</th><th>النطاق</th></tr></thead>
+            <thead><tr><th>المصدر</th><th>المرجع</th><th>الصلاحية</th><th>الحكم</th><th>النطاق</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+              </tr></thead>
             <tbody><?php foreach ($preview['proposed'] as $p) {
                 echo '<tr><td>' . htmlspecialchars($p['kind']) . '</td><td>' . htmlspecialchars($p['ref'])
                     . '</td><td>' . htmlspecialchars($p['permission']) . '</td><td>'

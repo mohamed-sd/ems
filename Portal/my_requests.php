@@ -219,7 +219,16 @@ include '../insidebar.php';
         <div class="table-responsive">
         <table class="alltables display" id="myRequestsTable">
             <thead><tr><th>الرقم</th><th>النوع</th><th>الموضوع</th><th>قُدّم</th><th>الحالة</th>
-                <th>عند مَن الآن</th><th>القرار والرد</th><th>إجراء</th></tr></thead>
+                <th>عند مَن الآن</th><th>القرار والرد</th><th>إجراء</th>
+                <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                </tr></thead>
             <tbody><?php foreach ($mineRows as $q): $id = intval($q['id']); ?>
             <tr>
                 <td><code><?php echo htmlspecialchars((string) $q['request_no']); ?></code><br>

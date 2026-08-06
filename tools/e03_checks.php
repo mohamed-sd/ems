@@ -57,6 +57,15 @@ $ok5 = $rb && $rbWired;
 if (!$ok5) { $fail++; }
 fwrite(STDOUT, ($ok5 ? '✔' : '✘') . " ⑤ زرُّ الإبلاغ بسياقه في القالب المشترك (UX-08)\n");
 
+/* ⑥ الحالات الخمس المركزية (موجة ٤): تحميل · فارغة · خطأ · نجاح · دون اتصال */
+$fsOk = (strpos($ui, 'bootFiveStates') !== false)
+     && (strpos($ui, 'emsFsOffline') !== false)
+     && (strpos($ui, 'emsFsLoading') !== false)
+     && (strpos($ui, 'ajaxError') !== false)
+     && is_file($ROOT . '/assets/i18n/datatables/ar.json'); // «فارغة» المعرَّبة
+if (!$fsOk) { $fail++; }
+fwrite(STDOUT, ($fsOk ? '✔' : '✘') . " ⑥ الحالاتُ الخمسُ مركزيةٌ في طبقة التوحيد (تحميل·فارغة·خطأ·نجاح·اتصال)\n");
+
 fwrite(STDOUT, "④ الترتيبُ بالدورة والوثيقة — يشهد به nav09_verify (حزامه المستقل)\n");
 fwrite(STDOUT, "──────────────────────────────────────────────\n");
 if ($fail === 0) { fwrite(STDOUT, "الحكم: ✔ البنيويُّ قائمٌ — والتبنّي عدّادٌ يرتفع\n"); exit(0); }
