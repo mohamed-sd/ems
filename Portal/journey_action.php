@@ -9,6 +9,10 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+// حارس المعالج (إغلاق فئة B — مسح دَين الحارس): يرث صلاحية شاشته الأم
+require_once __DIR__ . '/../includes/handler_guard.php';
+ems_guard_handler($conn, 'Timesheet/timesheet.php', 'view');
+
 require_once __DIR__ . '/../app/Services/Actions/ImpactResolver.php';
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);

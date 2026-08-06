@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 include '../config.php';
+// حارس المعالج (إغلاق فئة B — مسح دَين الحارس): يرث صلاحية شاشته الأم
+require_once __DIR__ . '/../includes/handler_guard.php';
+ems_guard_handler($conn, 'Employees/employee_contracts.php', 'edit');
+
 require_once '../includes/permissions_helper.php';
 
 while (ob_get_level()) ob_end_clean();

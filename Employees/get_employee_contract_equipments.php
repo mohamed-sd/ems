@@ -9,6 +9,10 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+// حارس المعالج (إغلاق فئة B — مسح دَين الحارس): يرث صلاحية شاشته الأم
+require_once __DIR__ . '/../includes/handler_guard.php';
+ems_guard_handler($conn, 'Employees/employee_contracts.php', 'view');
+
 
 if (isset($_POST['contract_id'])) {
   $contract_id = intval($_POST['contract_id']);

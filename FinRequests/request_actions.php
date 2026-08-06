@@ -12,6 +12,10 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+// حارس المعالج (إغلاق فئة B — مسح دَين الحارس): يرث صلاحية شاشته الأم
+require_once __DIR__ . '/../includes/handler_guard.php';
+ems_guard_handler($conn, 'FinRequests/my_requests.php', 'view');
+
 require_once __DIR__ . '/_finreq_helpers.php';
 
 $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';

@@ -20,6 +20,9 @@ $rows = array(); $cnt = array('A' => 0, 'B' => 0, 'C' => 0, 'P' => 0, 'guarded' 
 /* عامٌّ بطبيعته (قبل الجلسة): الدخول والاسترداد والتسجيل — يُعلَن لا يُدفن.
    setup_once تعطّل نفسها بعد أول تهيئة (تُفحص يدويًّا في كل مراجعة). */
 $PUBLIC = '/(login|forgot_password|reset_password|register|request_subscription|logout|setup_once)\.php$|^company\/home\.php$/';
+/* معالجاتُ المراسلات مفتوحةٌ لكل مسجَّلٍ بعرف النظام المعلن (نمط chats/index
+   في قائمة OPEN_SCREENS بحزام SEC-GOV) — والنطاقُ يُفرض داخلها بالمحادثة. */
+$OPEN_BY_CONVENTION = '/^chats\//';
 foreach ($dirs as $d) {
     $p = $ROOT . '/' . $d;
     if (!is_dir($p)) { continue; }
@@ -27,7 +30,8 @@ foreach ($dirs as $d) {
         $rel = $d . '/' . basename($f);
         $src = (string) file_get_contents($f);
         $hasSidebar = strpos($src, 'insidebar') !== false;
-        $hasCheck = strpos($src, 'check_page_permissions') !== false
+        $hasCheck = strpos($src, 'ems_guard_handler') !== false          // حارس المعالجات المشترك
+                 || strpos($src, 'check_page_permissions') !== false
                  || strpos($src, 'enforce_current_page_view_permission') !== false
                  || strpos($src, 'governance_guard') !== false
                  || strpos($src, 'action_guard') !== false
@@ -45,6 +49,7 @@ foreach ($dirs as $d) {
         $handlesPost = strpos($src, "\$_POST") !== false || strpos($src, "\$_REQUEST") !== false;
         $sessionOnly = strpos($src, "\$_SESSION['user']") !== false; // فحص جلسةٍ فقط لا صلاحية
         if (preg_match($PUBLIC, $rel)) { $k = 'P'; }
+        elseif (preg_match($OPEN_BY_CONVENTION, $rel)) { $k = 'P'; }
         elseif ($isCli) { $k = 'C'; }
         elseif ($emitsHtml) { $k = 'A'; }
         elseif ($handlesPost) { $k = 'B'; }
