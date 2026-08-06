@@ -145,4 +145,59 @@ while ($r && ($x = mysqli_fetch_assoc($r))) {
     $st->close();
 }
 fwrite(STDOUT, "⑤ استثناءاتٌ انقضت آليًّا: {$expired}\n");
+
+/* ⑥ SRC-09 · M-14 (SCN-728): «المنعُ المتكرر يكشف: حاجةَ استثناءٍ أو خطأَ
+   تصنيفٍ أو محاولةَ تجاوز» — ≥5 لمحاولةٍ واحدةٍ (مستخدم×حدث) في أسبوعٍ
+   تفتح إجراءً تصحيحيًّا للحوكمة. عطالة: مرجعُ (مستخدم×حدث×أسبوع). */
+$corrective = 0;
+$logF = __DIR__ . '/../logs/security.log';
+if (is_file($logF)) {
+    $h = fopen($logF, 'rb');
+    $sz = filesize($logF);
+    if ($sz > 800000) { fseek($h, -800000, SEEK_END); fgets($h); }
+    $since = date('Y-m-d H:i:s', time() - 7 * 86400);
+    $tally = array();
+    while (($ln = fgets($h)) !== false) {
+        if (!preg_match('/^\[([\d\- :]+)\] \[([^\]]+)\] IP: \S+ \| User: (.*?) \(/u', $ln, $m)) { continue; }
+        if ($m[1] < $since) { continue; }
+        if (!preg_match('/DENY|DENIED|BLOCKED|REFUSED|403/i', $m[2])) { continue; }
+        $k = $m[3] . '|' . $m[2];
+        $tally[$k] = ($tally[$k] ?? 0) + 1;
+    }
+    fclose($h);
+    // حامل الإجراء: الحوكمة (15) — بأهلية الإجازة
+    $govUser = null;
+    $q = mysqli_query($conn, "SELECT id FROM users WHERE role = '15' AND COALESCE(status,'active')='active' ORDER BY id LIMIT 3");
+    $govCands = array();
+    while ($q && ($u = mysqli_fetch_row($q))) { $govCands[] = intval($u[0]); }
+    if ($govCands) { $pk = ems_pick_available($conn, $govCands); $govUser = $pk['user_id']; }
+    if ($govUser) {
+        $week = date('oW');
+        foreach ($tally as $k => $n) {
+            if ($n < 5) { continue; }
+            list($who, $ev) = explode('|', $k, 2);
+            $ref = 'DENY-' . substr(md5($k), 0, 8) . '-' . $week;
+            $st = $conn->prepare("SELECT 1 FROM work_items WHERE source_type='SRC-09' AND source_ref=? LIMIT 1");
+            $st->bind_param('s', $ref);
+            $st->execute();
+            $dup = (bool) $st->get_result()->fetch_row();
+            $st->close();
+            if ($dup) { continue; }
+            $res = WI::create($conn, array(
+                'company_id' => 4, 'source_type' => 'SRC-09', 'source_ref' => $ref,
+                'source_screen' => 'Governance/gov_reports.php',
+                'owner_user_id' => $govUser, 'assigned_user_id' => $govUser,
+                'org_unit_id' => 1,
+                'title' => 'إجراء تصحيحي: منعٌ متكرر (' . $n . '×) — «' . mb_substr($who, 0, 30) . '» على ' . mb_substr($ev, 0, 40),
+                'details' => 'المنع المتكرر يكشف: حاجةَ استثناءٍ أو خطأَ تصنيف حمايةٍ أو محاولةَ تجاوز — يُحسم أحدها ويوثَّق.',
+                'deliverable' => 'قرارٌ موثَّق: استثناءٌ أو تصحيحُ تصنيفٍ أو تصعيدٌ أمني',
+                'evidence_required' => 'مرجع القرار في سجل الحوكمة',
+                'priority' => 'P2', 'due_at' => date('Y-m-d H:i:s', time() + 72 * 3600),
+                'created_by' => 0, 'parent_ref' => 'gov_reports:denials',
+            ));
+            if ($res['ok']) { $corrective++; }
+        }
+    }
+}
+fwrite(STDOUT, "⑥ إجراءاتٌ تصحيحيةٌ من المنع المتكرر: {$corrective}\n");
 fwrite(STDOUT, "✔ اكتمل النبض\n");
