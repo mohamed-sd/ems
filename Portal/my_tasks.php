@@ -76,6 +76,7 @@ $views = array(
     'blocked'        => array('المعطلة', "{$mine} AND wi.status = 'blocked'"),
     'returned'       => array('المعادة إليّ', "{$mine} AND wi.status IN ('returned','reopened')"),
     'delegated'      => array('المفوَّضة إليّ', "{$mine} AND wi.delegation_ref IS NOT NULL"),
+    'assignments'    => array('تكليفاتي', "{$mine} AND wi.item_type = 'assignment' AND wi.status NOT IN ('closed_accepted','cancelled')"),
     'assigned_by_me' => array('التي كلّفتُ بها', "(wi.created_by = {$uid} OR wi.owner_user_id = {$uid}) AND wi.assigned_user_id <> {$uid} AND wi.status NOT IN ('closed_accepted','cancelled')"),
     'verify'         => array('تنتظر تحققي', "wi.verifier_user_id = {$uid} AND wi.status = 'done_pending_verify'"),
     'team'           => array('فريقي', ''),
@@ -163,6 +164,33 @@ include '../insidebar.php';
                 <?php echo htmlspecialchars($v[0]); ?> <span class="badge bg-light text-dark"><?php echo $counts[$k]; ?></span></a>
         <?php endforeach; ?>
     </div>
+
+    <?php if ($VIEW === 'assignments'):
+        /* WI-ASG: «التكليفُ إطارٌ والمهمةُ عملٌ داخله» — التفويضاتُ النافذةُ إليّ تُعرض مع تكليفاتي */
+        $dels = array();
+        $r = mysqli_query($conn, "SELECT wd.kind, wd.scope_ref, wd.starts_at, wd.ends_at, uf.name AS from_name
+                                    FROM work_delegations wd LEFT JOIN users uf ON uf.id = wd.from_user_id
+                                   WHERE wd.company_id = " . intval($co === '1=1' ? 4 : $company_id) . "
+                                     AND wd.to_user_id = {$uid} AND wd.status = 'active'
+                                     AND NOW() BETWEEN wd.starts_at AND wd.ends_at ORDER BY wd.ends_at");
+        while ($r && ($x = mysqli_fetch_assoc($r))) { $dels[] = $x; }
+        $KIND_AR = array('task_assign' => 'إسناد مهمة', 'role_assign' => 'تكليف بدور', 'deputize' => 'إنابة',
+                         'delegate_approval' => 'تفويض اعتماد', 'reassign' => 'إعادة إسناد', 'workload_move' => 'نقل عبء');
+    ?>
+    <div class="card" style="margin-bottom:12px;border-right:4px solid #6c5ce7;">
+        <div class="card-header"><strong><i class="fas fa-user-shield"></i> تفويضاتٌ وإناباتٌ نافذةٌ إليّ</strong>
+            <span class="badge bg-secondary"><?php echo count($dels); ?></span></div>
+        <div class="card-body" style="padding:10px 14px">
+            <?php if (!$dels): ?><span class="text-muted">لا تفويضَ نافذًا إليك الآن — «انتهاءُ التفويض يوقف التوليدَ في اللحظة» (WF-08)</span>
+            <?php else: foreach ($dels as $d): ?>
+                <div style="margin:4px 0">· <strong><?php echo htmlspecialchars($KIND_AR[$d['kind']] ?? $d['kind']); ?></strong>
+                    من <?php echo htmlspecialchars((string) ($d['from_name'] ?: '—')); ?>
+                    — النطاق: <code><?php echo htmlspecialchars((string) $d['scope_ref']); ?></code>
+                    · حتى <?php echo htmlspecialchars((string) $d['ends_at']); ?></div>
+            <?php endforeach; endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
