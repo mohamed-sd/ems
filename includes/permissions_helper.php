@@ -356,8 +356,21 @@ function check_page_permissions($conn, $module_code) {
     $result = $stmt->get_result()->fetch_assoc();
 
     if (!$result) {
-        // توافق مع الأكواد القصيرة القديمة (equipments · suppliers · timesheet …)
-        $stmt = $conn->prepare("SELECT id FROM modules WHERE code LIKE ? OR name LIKE ? LIMIT 1");
+        // الاسم القصير القديم يعني شاشتَه لا أول شبيه: الذيلُ الدقيق «/الاسم.php»
+        // أولًا (equipments ⇒ Equipments/equipments.php لا equipments_types)
+        $stmt = $conn->prepare("SELECT id FROM modules WHERE code LIKE ?
+                                 ORDER BY CHAR_LENGTH(code) ASC, id ASC LIMIT 1");
+        $tail = '%/' . $module_code . '.php';
+        $stmt->bind_param("s", $tail);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+    }
+
+    if (!$result) {
+        // توافق أخير مع الأكواد القصيرة القديمة (equipments · suppliers · timesheet …)
+        // — بترتيبٍ حتميٍّ لا «أدنى id» صدفةً
+        $stmt = $conn->prepare("SELECT id FROM modules WHERE code LIKE ? OR name LIKE ?
+                                 ORDER BY CHAR_LENGTH(code) ASC, id ASC LIMIT 1");
         $search_pattern1 = '%' . $module_code . '%';
         $search_pattern2 = '%' . $module_code . '%';
         $stmt->bind_param("ss", $search_pattern1, $search_pattern2);
@@ -422,12 +435,24 @@ function get_module_id_by_script_path($conn, $script_path = null) {
     //    ذيلُ «%/my_requests.php» موديولَ FinRequests (#115) قبل المطابقة
     //    الدقيقة لـPortal/my_requests.php (#249) — فتُحجب الشاشةُ الجديدة بصلاحية
     //    شاشةٍ قديمةٍ تشاركها الاسم (گوتشا «أدنى id» الموثقة · وحادثة 2026-07-10).
+    // ⚠️ [ح-16] وعند تساوي المطابقة: الشاشةُ المشتركة لها صفٌّ لكلِّ مالك
+    //    (main/project_users.php ستةُ صفوف · Reports/reports.php خمسة)، فـ id ASC
+    //    وحدَه يختار موديولَ دورٍ آخر ⇒ تُقاس صلاحيةُ الدور على موديولٍ ليس له
+    //    فيُحجب عن شاشةٍ في قائمته. الترتيبُ يطابق get_page_permissions أدناه:
+    //    المطابقةُ التامة · ثم موديولُ دوري · ثم غيرُ المملوك · ثم الأقدم.
+    $current_role_id = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
     $stmt = $conn->prepare(
         "SELECT id FROM modules
          WHERE code = ?
             OR code = ?
             OR code LIKE ?
-         ORDER BY (code = ?) DESC, id ASC
+         ORDER BY (code = ?) DESC,
+            CASE
+                WHEN owner_role_id = ? THEN 0
+                WHEN owner_role_id IS NULL OR owner_role_id = 0 THEN 1
+                ELSE 2
+            END,
+            id ASC
          LIMIT 1"
     );
 
@@ -436,7 +461,7 @@ function get_module_id_by_script_path($conn, $script_path = null) {
     }
 
     $pattern1 = '%/' . $basename;
-    $stmt->bind_param("ssss", $relative_path, $basename, $pattern1, $relative_path);
+    $stmt->bind_param("ssssi", $relative_path, $basename, $pattern1, $relative_path, $current_role_id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
