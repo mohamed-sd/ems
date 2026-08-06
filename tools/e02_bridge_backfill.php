@@ -51,7 +51,7 @@ $matchSt = $conn->prepare(
       WHERE op.equipment = ? AND t.`date` = ? AND t.company_id = ?");
 $qtyCol = array('hour' => 'executed_hours', 'ton' => 'tons_count', 'meter' => 'meters_count');
 
-$bridged = 0; $healed = 0; $ambiguous = array(); $nomatch = 0; $lvl = array(1 => 0, 2 => 0);
+$bridged = 0; $healed = 0; $ambiguous = array(); $nomatch = 0; $lvl = array(1 => 0, 2 => 0, 3 => 0);
 foreach ($rows as $ue) {
     $eq = intval($ue['equipment_id']); $dt = strval($ue['entry_date']); $co = intval($ue['company_id']);
     $matchSt->bind_param('isi', $eq, $dt, $co);
@@ -68,6 +68,16 @@ foreach ($rows as $ue) {
         $sub = array();
         foreach ($cands as $t) { if (intval($t['employee_id']) === $emp && $emp > 0) { $sub[] = $t; } }
         if (count($sub) === 1) { $pick = $sub[0]; $level = 2; }
+        // L3: تضييقٌ بالكمية — كميةُ الصف بوحدة نوعه تساوي عمودَ الدوام المقابل
+        // (مطابقةٌ حتميةٌ لا تخمين: الفريدُ بالقيمة الموجبة وحدَه يُجسَّر)
+        if ($pick === null && isset($qtyCol[$ue['unit_type']]) && (float) $ue['qty'] > 0) {
+            $qv = round((float) $ue['qty'], 2);
+            $sub3 = array();
+            foreach ($cands as $t) {
+                if (abs(round((float) $t[$qtyCol[$ue['unit_type']]], 2) - $qv) < 0.005) { $sub3[] = $t; }
+            }
+            if (count($sub3) === 1) { $pick = $sub3[0]; $level = 3; }
+        }
     }
 
     if ($pick === null) {
@@ -114,6 +124,6 @@ if ($ambiguous) {
     fclose($f);
 }
 
-fwrite(STDOUT, "الجسر: {$bridged} (L1={$lvl[1]} · L2={$lvl[2]}) · شفاءُ رأسٍ صفري: {$healed}\n");
+fwrite(STDOUT, "الجسر: {$bridged} (L1={$lvl[1]} · L2={$lvl[2]} · L3كمية={$lvl[3]}) · شفاءُ رأسٍ صفري: {$healed}\n");
 fwrite(STDOUT, "غامض: " . count($ambiguous) . " (docs/E02_BRIDGE_AMBIGUOUS_ar.csv) · بلا مقابل: {$nomatch}\n");
 fwrite(STDOUT, $APPLY ? "✔ نُفِّذ\n" : "— معاينة فقط\n");
