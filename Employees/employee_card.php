@@ -157,6 +157,9 @@ include '../insidebar.php';
                    . ' — فتحُه بمنحٍ مؤقتٍ من لوحة الظهور (ADM-01)</div>';
                 break;
             }
+            // M-14 BR-GOV-07: القراءةُ على السرِّ فعلٌ يُسجَّل — بعد السماح لا قبله
+            require_once __DIR__ . '/../includes/sensitive_read_log.php';
+            ems_log_sensitive_read($conn, 'salary', 'employee:' . $eid, 'Employees/employee_card.php');
             $pr = $conn->query("SELECT pr.period_from, pr.period_to, ROUND(SUM(pl.amount),2) total
                                   FROM payroll_lines pl JOIN payroll_runs pr ON pr.id = pl.run_id
                                  WHERE pl.company_id={$co} AND pl.person_id={$eid}

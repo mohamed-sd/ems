@@ -105,6 +105,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         if ($v !== '') { $payload[$lbl] = $v; }
     }
     $status = $payload['الحالة'] ?? 'مسودة';
+
+    // ═══ BR-CEO-03: لا فتحَ مشروعٍ بقرارٍ فردي — الإفاداتُ الخمسُ لازمةٌ للعرض ═══
+    // صفُّ قرارِ فتحٍ (حالة مفتوح/معتمد أو قرارٌ مؤرَّخ) بلا الإفادات الخمس
+    // كاملةً يُرفض ويُسمّى الناقص — والإفادةُ رأيٌ ملزمٌ للعرض والقرارُ للتنفيذي.
+    $isOpening = in_array($status, array('مفتوح', 'معتمد', 'قرار فتح'), true)
+              || trim((string) ($payload['تاريخ القرار'] ?? '')) !== '';
+    if ($isOpening) {
+        $needStatements = array('إفادة التشغيل', 'إفادة المبيعات', 'إفادة القوى', 'إفادة المالية', 'إفادة الأسطول');
+        $missing = array();
+        foreach ($needStatements as $sLbl) {
+            if (trim((string) ($payload[$sLbl] ?? '')) === '') { $missing[] = $sLbl; }
+        }
+        if ($missing) {
+            header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
+                'BR-CEO-03: لا يُعرض قرارُ الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌'));
+            exit();
+        }
+    }
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     $st = $conn->prepare("INSERT INTO cmp03_screen_rows
         (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)

@@ -99,6 +99,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         if ($v !== '') { $payload[$lbl] = $v; }
     }
     $status = $payload['الحالة'] ?? 'مسودة';
+
+    // ═══ BR-CEO-02: لا توقيعَ بملاحظةٍ حرجةٍ مفتوحة — الحجبُ بنيويٌّ لا سياسة ═══
+    // الحارس على طبقة الشاشتين الفعلية (مخزن CMP-03 البيني) ويرتحل مع اللحاق:
+    // ملاحظةُ contract_review على العقد نفسه، «يحجب الاعتماد؟» مثبتةً، بلا
+    // إقفال — تمنع صفَّ توقيعٍ (تاريخ توقيعٍ مملوء) ولا تُرفع بقرارٍ شفهي.
+    $signDate = trim((string) ($payload['تاريخ التوقيع'] ?? ''));
+    $contractNo = trim((string) ($payload['رقم العقد'] ?? ''));
+    if ($signDate !== '' && $contractNo !== '') {
+        $st = $conn->prepare("SELECT payload FROM cmp03_screen_rows
+                               WHERE canonical_file = 'contract_review.php' AND company_id = ?");
+        $st->bind_param('i', $company_id);
+        $st->execute();
+        $rvs = $st->get_result();
+        $blockNote = null;
+        while ($rv = $rvs->fetch_assoc()) {
+            $p = json_decode((string) $rv['payload'], true) ?: array();
+            $sameContract = trim((string) ($p['العقد'] ?? '')) === $contractNo;
+            $blocks = mb_strpos((string) ($p['يحجب الاعتماد؟'] ?? ''), 'نعم') !== false
+                   || mb_strpos((string) ($p['يحجب الاعتماد؟'] ?? ''), 'يحجب') !== false;
+            $open = trim((string) ($p['تاريخ الإقفال'] ?? '')) === ''
+                 && !in_array(trim((string) ($p['الحالة'] ?? '')), array('مقفل', 'مقفلة', 'مغلقة', 'معالَجة'), true);
+            if ($sameContract && $blocks && $open) { $blockNote = (string) ($p['رقم الملاحظة'] ?? '؟'); break; }
+        }
+        $st->close();
+        if ($blockNote !== null) {
+            header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
+                'BR-CEO-02: التوقيع محجوبٌ — ملاحظةٌ حرجةٌ مفتوحة (' . $blockNote
+                . ') على العقد ' . $contractNo . ' · تُقفل بمستند معالجةٍ أولًا ولا تُرفع شفهيًّا ❌'));
+            exit();
+        }
+    }
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     $st = $conn->prepare("INSERT INTO cmp03_screen_rows
         (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
