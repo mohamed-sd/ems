@@ -70,3 +70,10 @@ foreach ($companies as $cid) {
     }
 }
 echo "تم — إشعاراتٌ جديدة: {$totalNotified}\n";
+
+/* ── نبض محرّك WFM يركب الساعةَ نفسَها (كنسُ مهلٍ بجوار كنسِ مهل) ──────────
+ * تسجيلُ مهمةٍ مستقلةٍ EMS_WFM_Engine يحتاج يدَ المالك (schtasks محجوبٌ على
+ * الأتمتة — سجل القرارات)؛ الركوبُ هنا يُبقي المهلَ والدوريةَ والتفويضاتِ
+ * حيّةً حتى حينها. فشلُه لا يُسقط كنسَ السلسلة. */
+try { require __DIR__ . '/cron_wfm_engine.php'; }
+catch (\Throwable $wfmX) { echo "نبض WFM تعثر: " . $wfmX->getMessage() . "\n"; }
