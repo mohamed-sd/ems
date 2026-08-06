@@ -21,6 +21,68 @@ class RequestService
     const STATES = array('draft', 'submitted', 'routed', 'in_approval', 'approved',
                          'rejected', 'executing', 'executed', 'closed', 'returned', 'cancelled');
 
+    /**
+     * تفكيك نص سلسلة الاعتماد (الورقة 04) إلى خطواتٍ قابلةِ الحل:
+     * «المدير ← الموارد ← المالية» ⇒ [manager, roles(4), roles(19,17,18)].
+     * الرموز غير المحلولة (سلّم السقوف · بحسب الدرجة …) تسقط للحوكمة (15)
+     * معلَنةً — لا تُخترع جهة (WF-07).
+     */
+    public static function chainStepsOf($chainText)
+    {
+        $steps = array();
+        $parts = preg_split('/[←→]|<-|->/u', (string) $chainText);
+        $map = array(
+            'المدير' => 'manager', 'مديره' => 'manager',
+            'الموارد' => array('4'), 'المالية' => array('19', '17', '18'),
+            'التنفيذي' => array('9'), 'الحوكمة' => array('15'),
+            'التشغيل' => array('1', '6'), 'الصيانة' => array('13', '14'),
+            'المخازن' => array('25'), 'المشتريات' => array('16'),
+            'النقل' => array('23'), 'المبيعات' => array('12'),
+            'الموردون' => array('2', '8'), 'الأسطول' => array('3', '10'),
+            'التمويل' => array('26'), 'القوى' => array('4'),
+            'المفوض' => 'requester_manager', 'القانوني' => array('15'),
+        );
+        foreach ($parts as $p) {
+            $p = trim($p);
+            if ($p === '' || mb_strpos($p, 'لا اعتماد') !== false) { continue; }
+            $resolved = null;
+            foreach ($map as $needle => $target) {
+                if (mb_strpos($p, $needle) !== false) { $resolved = $target; break; }
+            }
+            if ($resolved === null) { $resolved = array('15'); } // غير محلول ⇒ الحوكمة معلَنةً
+            // «إن لزم» و«للتحقق» خطوات شرطية — تُنشأ وتُعلَّم بنصها
+            $steps[] = array('who' => $resolved, 'label' => mb_substr($p, 0, 60));
+        }
+        return $steps;
+    }
+
+    /** حل خطوةٍ إلى مستخدمٍ متاح (المدير من الهرم · الدور بأهلية الإجازة) */
+    private static function resolveStepUser(\mysqli $conn, $co, array $step, $requesterId)
+    {
+        require_once dirname(__DIR__, 2) . '/../includes/resolve_manager.php';
+        if ($step['who'] === 'manager' || $step['who'] === 'requester_manager') {
+            $m = ems_resolve_manager($conn, intval($requesterId));
+            if ($m !== null) {
+                $pick = ems_pick_available($conn, array($m));
+                return $pick['user_id'] ?: $m;
+            }
+            return ems_resolve_verifier($conn, intval($requesterId), $co);
+        }
+        $candidates = array();
+        foreach ((array) $step['who'] as $role) {
+            $st = $conn->prepare("SELECT id FROM users WHERE role = ? AND company_id = ?
+                                   AND COALESCE(status,'active') = 'active' ORDER BY id LIMIT 3");
+            $st->bind_param('si', $role, $co);
+            $st->execute();
+            $rs = $st->get_result();
+            while ($r = $rs->fetch_assoc()) { $candidates[] = intval($r['id']); }
+            $st->close();
+        }
+        if (!$candidates) { return null; }
+        $pick = ems_pick_available($conn, $candidates);
+        return $pick['user_id'];
+    }
+
     /** جلب نوعٍ نافذ */
     public static function typeOf(\mysqli $conn, $code)
     {
@@ -75,29 +137,44 @@ class RequestService
         $no = 'REQ-' . str_pad((string) $id, 6, '0', STR_PAD_LEFT);
         $conn->query("UPDATE requests SET request_no = '{$no}' WHERE id = " . intval($id));
 
-        // التوجيه بقاعدة القاموس (WF-07): المستقبِل حامل الطلب الآن
-        $holder = self::resolveReceiverUser($conn, $co, $type, $ru);
-        if ($holder) {
-            $u = intval($holder);
-            $conn->query("UPDATE requests SET status = 'routed', current_holder_user_id = {$u}, current_step = 1 WHERE id = " . intval($id));
-            WorkItemService::notifyUser($conn, $co, $u, 'طلبٌ جديدٌ لإدارتك (' . $type['name_ar'] . ')', $ti,
-                'Portal/my_requests.php?req=' . $id, true, $by);
-            // SRC-05: مهمة معالجةٍ للمستقبِل
-            WorkItemService::create($conn, array(
-                'company_id' => $co, 'source_type' => 'SRC-05', 'source_ref' => $no,
-                'source_screen' => 'Portal/my_requests.php',
-                'owner_user_id' => $u, 'assigned_user_id' => $u,
-                'org_unit_id' => $org ?: 0, 'project_id' => $prj ?: 0, 'site_id' => $site ?: 0,
-                'title' => 'معالجة ' . $type['name_ar'] . ' — ' . $no,
-                'deliverable' => (string) $type['deliverable'],
-                'evidence_required' => 'صف الرد التسعة على ' . $no,
-                'due_at' => date('Y-m-d H:i:s', time() + $sla * 3600),
-                'priority' => $sla <= 8 ? 'P1' : ($sla <= 48 ? 'P2' : 'P3'),
-                'created_by' => $by, 'parent_ref' => $no,
-            ));
+        // ═══ مصفوفة الموافقات تشغيلًا (الورقة 09): السلسلة خطواتُ approval_links ═══
+        // خطوةُ اليوم وحدَها pending والحاملُ معتمِدُها (SRC-04: خطوةُ اعتمادٍ
+        // تنتظر قرارًا) — والتنفيذُ بعد اكتمالها للمستقبِل (SRC-05).
+        $steps = self::chainStepsOf((string) $type['approval_chain']);
+        $holder = null;
+        if ($steps) {
+            $stepUser = self::resolveStepUser($conn, $co, $steps[0], $ru);
+            if ($stepUser !== null) {
+                $holder = intval($stepUser);
+                $stepSla = max(1, intval(ceil($sla / max(1, count($steps)))));
+                $al = $conn->prepare("INSERT INTO approval_links
+                    (company_id, source_kind, source_ref, action_code, step_no, approver_user_id,
+                     approver_role, status, sla_due_at, created_by, parent_ref)
+                    VALUES (?, 'request', ?, 'request.approve', 1, ?, ?, 'pending',
+                            DATE_ADD(NOW(), INTERVAL ? HOUR), ?, ?)");
+                $roleLbl = mb_substr((string) $steps[0]['label'], 0, 120);
+                $al->bind_param('ssisiis', $co, $no, $holder, $roleLbl, $stepSla, $by, $no);
+                $al->execute();
+                $al->close();
+                $conn->query("UPDATE requests SET status = 'in_approval', current_holder_user_id = {$holder}, current_step = 1 WHERE id = " . intval($id));
+                WorkItemService::notifyUser($conn, $co, $holder,
+                    'خطوةُ اعتمادٍ تنتظر قرارك (' . $type['name_ar'] . ' · ' . $steps[0]['label'] . ')',
+                    $ti, 'Portal/approvals_inbox.php', true, $by);
+            }
+        }
+        if ($holder === null) {
+            // لا سلسلةَ (توجيه آلي) أو تعذّر حلُّ الخطوة ⇒ للمستقبِل مباشرة
+            $holder = self::resolveReceiverUser($conn, $co, $type, $ru);
+            if ($holder) {
+                $u = intval($holder);
+                $conn->query("UPDATE requests SET status = 'routed', current_holder_user_id = {$u}, current_step = 0 WHERE id = " . intval($id));
+                WorkItemService::notifyUser($conn, $co, $u, 'طلبٌ جديدٌ لإدارتك (' . $type['name_ar'] . ')', $ti,
+                    'Portal/my_requests.php?req=' . $id, true, $by);
+            }
         }
         WorkItemService::notifyUser($conn, $co, $ru, 'قُدّم طلبك ' . $no, $ti, 'Portal/my_requests.php?req=' . $id, false, $by);
-        return array('ok' => true, 'code' => 200, 'id' => $id, 'request_no' => $no, 'holder' => $holder);
+        return array('ok' => true, 'code' => 200, 'id' => $id, 'request_no' => $no, 'holder' => $holder,
+                     'steps' => count($steps));
     }
 
     /**
@@ -115,6 +192,12 @@ class RequestService
         if ($decision === 'approve' && $actor === intval($rq['requester_user_id'])) {
             return array('ok' => false, 'code' => 403, 'reason' => 'لا اعتمادَ للذات — من قدَّم لا يعتمد');
         }
+        // القرارُ لحاملِ الخطوة وحدَه (SRC-04) — لا «لأي أحدٍ غير المقدّم»
+        $holderNow = intval($rq['current_holder_user_id']);
+        if ($holderNow > 0 && $actor !== $holderNow) {
+            return array('ok' => false, 'code' => 403,
+                'reason' => 'القرارُ لحامل الخطوة الحالي (u' . $holderNow . ') — وأنت لست إياه');
+        }
         if (in_array($decision, array('reject', 'return'), true) && trim($note) === '') {
             return array('ok' => false, 'code' => 422, 'reason' => 'السبب إلزاميٌّ للرفض والإعادة');
         }
@@ -123,15 +206,84 @@ class RequestService
         $to = $map[$decision];
         $id = intval($rq['id']);
         $co = intval($rq['company_id']);
+        $no = (string) ($rq['request_no'] ?: $id);
+        $stepNo = intval($rq['current_step']);
+
+        // ختم خطوة approval_links الجارية بقرارها
+        $alStatus = array('approved' => 'approved', 'rejected' => 'rejected', 'returned' => 'returned');
+        $st = $conn->prepare("UPDATE approval_links SET status = ?, decided_at = NOW(), decision_note = ?,
+                                     approved_by = ?, approved_at = NOW()
+                               WHERE source_kind = 'request' AND source_ref = ? AND step_no = ? AND status = 'pending'");
+        $als = $alStatus[$to];
+        $noteS = mb_substr($note, 0, 300);
+        $st->bind_param('ssisi', $als, $noteS, $actor, $no, $stepNo);
+        $st->execute();
+        $st->close();
+
+        // اعتمادُ خطوةٍ وسْطى: تُفتح التالية ويظل الطلب in_approval
+        if ($to === 'approved' && $stepNo > 0) {
+            $type = self::typeOf($conn, (string) $rq['request_type_code']);
+            $steps = self::chainStepsOf((string) ($type['approval_chain'] ?? ''));
+            if ($stepNo < count($steps)) {
+                $next = $steps[$stepNo]; // الفهرس صفري والخطوة تالية
+                $nextUser = self::resolveStepUser($conn, $co, $next, intval($rq['requester_user_id']));
+                if ($nextUser !== null) {
+                    $nu = intval($nextUser);
+                    $ns = $stepNo + 1;
+                    $al = $conn->prepare("INSERT INTO approval_links
+                        (company_id, source_kind, source_ref, action_code, step_no, approver_user_id,
+                         approver_role, status, sla_due_at, created_by, parent_ref)
+                        VALUES (?, 'request', ?, 'request.approve', ?, ?, ?, 'pending',
+                                DATE_ADD(NOW(), INTERVAL 48 HOUR), ?, ?)");
+                    $roleLbl = mb_substr((string) $next['label'], 0, 120);
+                    $al->bind_param('ssiisis', $co, $no, $ns, $nu, $roleLbl, $actor, $no);
+                    $al->execute();
+                    $al->close();
+                    $conn->query("UPDATE requests SET current_holder_user_id = {$nu}, current_step = {$ns}
+                                   WHERE id = {$id} AND status = 'in_approval'");
+                    WorkItemService::notifyUser($conn, $co, $nu,
+                        'خطوةُ اعتمادٍ تنتظر قرارك (' . $next['label'] . ') — ' . $no,
+                        (string) $rq['title'], 'Portal/approvals_inbox.php', true, $actor);
+                    WorkItemService::notifyUser($conn, $co, intval($rq['requester_user_id']),
+                        'اجتاز طلبُك الخطوة ' . $stepNo . ' وانتقل إلى: ' . $next['label'],
+                        (string) $rq['title'], 'Portal/my_requests.php?req=' . $id, false, $actor);
+                    return array('ok' => true, 'code' => 200, 'status' => 'in_approval', 'next_step' => $ns);
+                }
+            }
+        }
+
         $st = $conn->prepare("UPDATE requests SET status = ?, status_reason = ?, approved_by = ?, approved_at = NOW(),
                                 current_holder_user_id = CASE WHEN ? = 'returned' THEN requester_user_id ELSE current_holder_user_id END
                               WHERE id = ? AND status IN ('submitted','routed','in_approval')");
-        $noteS = mb_substr($note, 0, 300);
         $st->bind_param('ssisi', $to, $noteS, $actor, $to, $id);
         $st->execute();
         $ok = $st->affected_rows > 0;
         $st->close();
         if (!$ok) { return array('ok' => false, 'code' => 409, 'reason' => 'سباق حالة'); }
+
+        if ($to === 'approved') {
+            // اكتملت السلسلة ⇒ التنفيذ للمستقبِل (SRC-05: مهمةُ معالجةٍ بمهلتها)
+            $type = isset($type) ? $type : self::typeOf($conn, (string) $rq['request_type_code']);
+            $exec = self::resolveReceiverUser($conn, $co, $type ?: array('receiver' => '', 'owner_dept' => ''), intval($rq['requester_user_id']));
+            if ($exec) {
+                $eu = intval($exec);
+                $conn->query("UPDATE requests SET current_holder_user_id = {$eu} WHERE id = {$id}");
+                WorkItemService::create($conn, array(
+                    'company_id' => $co, 'source_type' => 'SRC-05', 'source_ref' => $no,
+                    'source_screen' => 'Portal/my_requests.php',
+                    'owner_user_id' => $eu, 'assigned_user_id' => $eu,
+                    'org_unit_id' => intval($rq['org_unit_id']) ?: 1,
+                    'project_id' => intval($rq['project_id']) ?: 0, 'site_id' => intval($rq['site_id']) ?: 0,
+                    'title' => 'تنفيذ ' . (($type['name_ar'] ?? 'طلب')) . ' — ' . $no,
+                    'deliverable' => (string) ($type['deliverable'] ?? 'مخرَج الطلب'),
+                    'evidence_required' => 'صف الرد التسعة على ' . $no,
+                    'due_at' => date('Y-m-d H:i:s', time() + 48 * 3600),
+                    'priority' => 'P2', 'created_by' => $actor, 'parent_ref' => $no,
+                ));
+                WorkItemService::notifyUser($conn, $co, $eu, 'طلبٌ معتمدٌ ينتظر تنفيذك — ' . $no,
+                    (string) $rq['title'], 'Portal/my_requests.php?req=' . $id, true, $actor);
+            }
+        }
 
         $msg = array('approved' => 'اعتُمد طلبُك — والخطوةُ التالية التنفيذ',
                      'rejected' => 'رُفض طلبُك — والسبب: ' . $note,
@@ -152,6 +304,12 @@ class RequestService
         if (!$rq) { return array('ok' => false, 'code' => 404, 'reason' => 'الطلب غير موجود'); }
         if (!in_array($rq['status'], array('approved', 'executing'), true)) {
             return array('ok' => false, 'code' => 409, 'reason' => 'التنفيذ بعد الاعتماد — الحالة ' . $rq['status']);
+        }
+        // التنفيذ لحامله (الإدارة المنفِّذة) — كما القرار لحامل خطوته
+        $holderNow = intval($rq['current_holder_user_id']);
+        if ($holderNow > 0 && intval($actorUserId) !== $holderNow) {
+            return array('ok' => false, 'code' => 403,
+                'reason' => 'التنفيذُ لحامل الطلب الحالي (u' . $holderNow . ')');
         }
         foreach (array('decision' => '① القرار', 'result_doc_ref' => '⑦ المستند الناتج',
                        'executed_summary' => '⑧ التنفيذ الذي تم') as $k => $l) {

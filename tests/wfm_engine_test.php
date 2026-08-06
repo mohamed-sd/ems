@@ -108,14 +108,26 @@ $q1 = RQ::submit($conn, array('company_id' => $CO, 'request_type_code' => 'RQ-XX
 ok(!$q1['ok'], 'منع: نوعٌ خارج القاموس يُرفض');
 $q2 = RQ::submit($conn, array('company_id' => $CO, 'request_type_code' => 'RQ-HR-04',
     'requester_user_id' => $EXEC, 'org_unit_id' => 1, 'title' => 'TST-WFM شهادة خبرة', 'created_by' => $EXEC));
-ok($q2['ok'] && !empty($q2['holder']), 'سماح: قُدّم ووُجّه بقاعدة القاموس — الحامل u' . ($q2['holder'] ?? '؟'));
+ok($q2['ok'] && !empty($q2['holder']), 'سماح: قُدّم وفُتحت خطوة السلسلة — الحامل u' . ($q2['holder'] ?? '؟'));
 $REQ = intval($q2['id'] ?? 0);
+$HOLDER = intval($q2['holder']);
+$r = mysqli_query($conn, "SELECT COUNT(*) FROM approval_links WHERE source_kind='request' AND source_ref='" . ($q2['request_no'] ?? '') . "' AND status='pending'");
+ok(intval(mysqli_fetch_row($r)[0]) === 1, 'الورقة 09 تشغيلًا: خطوةُ approval_links مفتوحةٌ للحامل');
 $self = RQ::decide($conn, $REQ, 'approve', $EXEC);
 ok(!$self['ok'] && $self['code'] === 403, 'منع: لا اعتمادَ للذات (من قدَّم لا يعتمد)');
-ok(RQ::decide($conn, $REQ, 'approve', $VERIF, 'مستوفٍ')['ok'], 'سماح: اعتماد من غير المقدّم');
-$e1 = RQ::executeAndClose($conn, $REQ, $VERIF, array('decision' => 'approved'));
+$stranger2 = null;
+foreach ($actors as $ac) { $aid = intval($ac['id']); if ($aid !== $EXEC && $aid !== $HOLDER) { $stranger2 = $aid; break; } }
+$ns = RQ::decide($conn, $REQ, 'approve', $stranger2);
+ok(!$ns['ok'] && $ns['code'] === 403, 'منع: القرارُ لحامل الخطوة وحدَه — الغريب 403');
+ok(RQ::decide($conn, $REQ, 'approve', $HOLDER, 'مستوفٍ')['ok'], 'سماح: اعتماد حامل الخطوة');
+$r = mysqli_query($conn, "SELECT current_holder_user_id FROM requests WHERE id = {$REQ}");
+$EXEC_HOLDER = intval(mysqli_fetch_row($r)[0]);
+ok($EXEC_HOLDER > 0, 'بعد السلسلة: الحاملُ منفِّذُ الإدارة (u' . $EXEC_HOLDER . ')');
+$e0 = RQ::executeAndClose($conn, $REQ, $stranger2, array('decision' => 'approved', 'result_doc_ref' => 'x', 'executed_summary' => 'x'));
+ok(!$e0['ok'] && $e0['code'] === 403, 'منع: التنفيذُ لحامله وحدَه');
+$e1 = RQ::executeAndClose($conn, $REQ, $EXEC_HOLDER, array('decision' => 'approved'));
 ok(!$e1['ok'] && mb_strpos($e1['reason'], 'WF-05') !== false, 'منع (WF-05): إغلاقٌ بلا الرد التسعة يُرفض');
-$e2 = RQ::executeAndClose($conn, $REQ, $VERIF, array(
+$e2 = RQ::executeAndClose($conn, $REQ, $EXEC_HOLDER, array(
     'decision' => 'approved', 'decided_capacity' => 'الموارد', 'notes' => 'استُوفي',
     'action_required' => 'استلام المستند', 'result_doc_ref' => 'DOC-TST-1',
     'executed_summary' => 'أُصدرت الشهادة ووُقّعت', 'next_step' => 'لا شيء'));
@@ -156,12 +168,28 @@ $ex2 = WI::explainAppearance($conn, $ITEM, $stranger);
 ok(!$ex2['complete'] || $stranger === $EXEC || $stranger === $OWNER || $stranger === $VERIF,
    'الغريبُ خارج النطاق ⇒ سلسلةٌ ناقصة (يُحجب)');
 
+fwrite(STDOUT, "── ⑦ سلسلة متعددة الخطوات (المدير ← الموارد)\n");
+$q4 = RQ::submit($conn, array('company_id' => $CO, 'request_type_code' => 'RQ-HR-01',
+    'requester_user_id' => $EXEC, 'org_unit_id' => 1, 'title' => 'TST-WFM إجازة', 'created_by' => $EXEC));
+$H1 = intval($q4['holder'] ?? 0);
+ok($q4['ok'] && intval($q4['steps']) === 2 && $H1 > 0, 'خطوتان — الأولى للمدير (u' . $H1 . ')');
+$REQ4 = intval($q4['id'] ?? 0);
+$d1 = RQ::decide($conn, $REQ4, 'approve', $H1, 'موافق');
+ok($d1['ok'] && ($d1['status'] ?? '') === 'in_approval', 'اعتمادُ الوسطى يفتح التالية ولا يعتمد الطلب');
+$r = mysqli_query($conn, "SELECT current_holder_user_id, current_step FROM requests WHERE id = {$REQ4}");
+$x = mysqli_fetch_assoc($r);
+ok(intval($x['current_step']) === 2 && intval($x['current_holder_user_id']) !== $H1, 'الحاملُ انتقل للخطوة 2 (u' . $x['current_holder_user_id'] . ')');
+$r = mysqli_query($conn, "SELECT COUNT(*) FROM approval_links WHERE source_kind='request' AND source_ref='" . ($q4['request_no'] ?? '') . "'");
+ok(intval(mysqli_fetch_row($r)[0]) === 2, 'صفّا خطوتين في approval_links (الأولى مختومة)');
+RQ::cancel($conn, $REQ4, $EXEC, 'اختبار');
+
 /* الخاتمة: كنس بيانات الاختبار */
 mysqli_query($conn, "DELETE FROM achievement_records WHERE source_ref IN ('" . $ITEM . "','" . ($q2['request_no'] ?? 'x') . "') OR title LIKE 'TST-WFM%' OR title LIKE '%TST-WFM%'");
 mysqli_query($conn, "DELETE FROM work_escalations WHERE note LIKE 'TST-WFM%'");
 mysqli_query($conn, "DELETE FROM task_assignments WHERE item_id IN (SELECT id FROM work_items WHERE source_ref LIKE 'TST-WFM%' OR title LIKE '%TST-WFM%')");
 mysqli_query($conn, "DELETE FROM personal_notifications WHERE title LIKE '%TST-WFM%' OR body LIKE '%TST-WFM%'");
 mysqli_query($conn, "DELETE FROM request_responses WHERE request_id IN (SELECT id FROM requests WHERE title LIKE '%TST-WFM%')");
+mysqli_query($conn, "DELETE FROM approval_links WHERE source_kind='request' AND source_ref IN (SELECT request_no FROM requests WHERE title LIKE '%TST-WFM%')");
 mysqli_query($conn, "DELETE FROM work_items WHERE source_ref LIKE 'TST-WFM%' OR title LIKE '%TST-WFM%' OR parent_ref IN (SELECT request_no FROM requests WHERE title LIKE '%TST-WFM%')");
 mysqli_query($conn, "DELETE FROM requests WHERE title LIKE '%TST-WFM%'");
 mysqli_query($conn, "DELETE FROM work_delegations WHERE scope_ref = 'TST-WFM-DELEG'");
