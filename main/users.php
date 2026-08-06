@@ -1,4 +1,5 @@
 <?php
+// شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-674 · SCN-675 · SCN-676 · SCN-678
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 // تضمين ملف الجلسات

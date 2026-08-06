@@ -1,4 +1,5 @@
 <?php
+// شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-038 · SCN-039 · SCN-040 · SCN-042 · SCN-043 · SCN-044 · SCN-045 · SCN-046 · SCN-047 · SCN-048 · SCN-049 · SCN-050 · SCN-051 · SCN-052 · SCN-053 · SCN-054 · SCN-055 · SCN-056
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {

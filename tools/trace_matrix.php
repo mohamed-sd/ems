@@ -35,7 +35,14 @@ fwrite(STDOUT, 'معرفات المتطلبات المحصودة: ' . count($ids
 /* ② فهرسة الشجرة مرة واحدة (الملفات النصية القابلة للشاهد) */
 $corpus = array(); // rel => content
 $scanDirs = array('tests', 'tools', 'app', 'includes', 'Portal', 'Operations', 'FinRequests',
-    'Finance', 'Governance', 'Approvals', 'docs');
+    'Finance', 'Governance', 'Approvals', 'docs',
+    // موجة ٣: الفهرس كان يقصي مواطن شواهد حية — فتُحرم شاشاتها من شهادتها
+    'main', 'Settings', 'admin', 'Tickets', 'Equipments', 'Financing', 'Workforce',
+    'Transport', 'Maintenance', 'Suppliers', 'Clients', 'Procurement', 'Projects', 'Opportunities');
+foreach (glob($ROOT . '/*.php') as $f) { // ملفات الجذر (user_capacities …)
+    $rel = basename($f);
+    $corpus[$rel] = (string) file_get_contents($f);
+}
 foreach ($scanDirs as $d) {
     $base = $ROOT . '/' . $d;
     if (!is_dir($base)) { continue; }
@@ -46,6 +53,8 @@ foreach ($scanDirs as $d) {
         if (!in_array($ext, array('php', 'md'), true)) { continue; }
         $rel = ltrim(str_replace('\\', '/', substr($f->getPathname(), strlen($ROOT))), '/');
         if (strpos($rel, '.claude/') === 0 || strpos($rel, 'docs/update0008') === 0) { continue; }
+        // مخرجات هذه الأداة نفسها ليست شواهد — شهادة ذاتية دائرية (اصطيدت موجة ٣)
+        if (strpos($rel, 'docs/TRACE_') === 0) { continue; }
         $corpus[$rel] = (string) file_get_contents($f->getPathname());
     }
 }
