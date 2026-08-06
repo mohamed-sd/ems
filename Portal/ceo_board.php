@@ -154,7 +154,49 @@ include '../insidebar.php';
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+
+    /* M-00 ④-٦: المؤشرات الجامعة الست حيةً من مصادرها — فوق الجدول البيني
+     * (عقود · مشاريع · معلَّق أمام القمة · قرارات بلا حسم · متابعات · وقائع §11) */
+    $bd = function ($sql) use ($conn) {
+        try { $r = $conn->query($sql); $w = $r ? $r->fetch_assoc() : null; return $w ? (int) reset($w) : 0; }
+        catch (\Throwable $t) { return 0; }
+    };
+    $bdCoE = ($is_super_admin && $company_id <= 0) ? '' : ' AND company_id = ' . $company_id;
+    $bdContracts = $bd("SELECT COUNT(*) FROM contracts WHERE COALESCE(is_deleted,0)=0 {$bdCoE}");
+    $bdProjects  = $bd("SELECT COUNT(*) FROM project  WHERE COALESCE(is_deleted,0)=0 {$bdCoE}");
+    $bdPending   = $bd("SELECT COUNT(*) FROM cmp03_screen_rows WHERE canonical_file='ceo_approvals.php'
+                         AND status IN ('مسودة','قيد المراجعة','مؤجل') {$bdCoE}")
+                 + $bd("SELECT COUNT(*) FROM requests r JOIN users u ON u.id=r.current_holder_user_id AND u.role='9'
+                         WHERE r.status IN ('submitted','routed','in_approval')" . str_replace('company_id', 'r.company_id', $bdCoE));
+    $bdOpenDec   = $bd("SELECT COUNT(*) FROM cmp03_screen_rows WHERE canonical_file='ceo_risk.php'
+                         AND status IN ('مسودة','قيد الدراسة','قيد المراجعة') {$bdCoE}");
+    $bdFollow    = $bd("SELECT COUNT(*) FROM work_items WHERE source_type='SRC-10'
+                         AND status NOT IN ('closed_accepted','cancelled') {$bdCoE}");
+    $bdFacts     = $bd("SELECT COUNT(*) FROM ems_business_events
+                         WHERE event_key IN ('contract.signed','project.chartered','exec.decision.made','exec.approval.granted') {$bdCoE}");
+    $bdCards = array(
+        array('العقود', $bdContracts, 'fa-file-contract'),
+        array('المشاريع', $bdProjects, 'fa-diagram-project'),
+        array('معلَّق أمام القمة', $bdPending, 'fa-hourglass-half'),
+        array('قضايا بلا حسم', $bdOpenDec, 'fa-triangle-exclamation'),
+        array('متابعات مفتوحة', $bdFollow, 'fa-bell'),
+        array('وقائع §11', $bdFacts, 'fa-bolt'),
+    );
     ?>
+    <div class="card"><div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+            <?php foreach ($bdCards as $c): ?>
+            <div style="border:1px solid var(--ems-border,#e5e5e5);border-radius:10px;padding:10px;text-align:center">
+                <div style="font-size:20px;font-weight:700"><?php echo (int) $c[1]; ?></div>
+                <div class="text-muted" style="font-size:12px"><i class="fa <?php echo $c[2]; ?>"></i> <?php echo htmlspecialchars($c[0], ENT_QUOTES, 'UTF-8'); ?></div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="text-muted" style="margin-top:6px;font-size:12px">
+            مؤشراتٌ حيةٌ من المصادر (لا من صفوف هذا الجدول) — التفصيل في
+            <a href="ceo_reports.php">تقارير الإدارة التنفيذية الثمانية</a>
+        </div>
+    </div></div>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
