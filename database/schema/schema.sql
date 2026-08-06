@@ -1,14 +1,28 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-06 02:40:08
--- الجداول: 381 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-06 04:07:44
+-- الجداول: 399 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
 -- ═══════════════════════════════════════════════════════════════════════════
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ── Table: achievement_attributions ──
+CREATE TABLE `achievement_attributions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `work_item_ref` varchar(60) NOT NULL,
+  `person_user_id` int(10) unsigned NOT NULL,
+  `share_pct` decimal(5,2) NOT NULL,
+  `share_kind` varchar(12) NOT NULL DEFAULT 'executive',
+  `decided_by` int(10) unsigned NOT NULL COMMENT 'المكلِّف يقررها عند الإغلاق',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_aa` (`work_item_ref`,`person_user_id`,`share_kind`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: achievement_certificates ──
 CREATE TABLE `achievement_certificates` (
@@ -29,6 +43,28 @@ CREATE TABLE `achievement_certificates` (
   CONSTRAINT `fk_cert_eval` FOREIGN KEY (`eval_id`) REFERENCES `evaluations` (`id`),
   CONSTRAINT `fk_cert_snap` FOREIGN KEY (`snap_id`) REFERENCES `achievement_snapshots` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='USR-01 §7-⑤ — الشهادةُ تُولَّد من الأرقام المقاسة ولا تُصدَر مرتين';
+
+-- ── Table: achievement_records ──
+CREATE TABLE `achievement_records` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `source_kind` varchar(24) NOT NULL COMMENT 'task|request|approval|work_order|unit|claim|ticket|corrective — الثمانية حصرًا',
+  `source_ref` varchar(60) NOT NULL,
+  `person_user_id` int(10) unsigned NOT NULL,
+  `attribution` varchar(12) NOT NULL DEFAULT 'executive' COMMENT 'executive|supervisory|decision',
+  `weight_pct` decimal(5,2) NOT NULL DEFAULT 100.00,
+  `title` varchar(300) NOT NULL,
+  `evidence_ref` varchar(200) NOT NULL COMMENT 'صفر إنجاز بلا دليل — AC-WFM-05',
+  `recognized_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `reversed_at` datetime DEFAULT NULL COMMENT 'يُعكس آليًّا إن عُكس أصله — AC-WFM-14',
+  `reverse_reason` varchar(300) DEFAULT NULL,
+  `event_ref` varchar(60) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'محرّك الإنجاز — لا إدخال يدوي',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ach` (`source_kind`,`source_ref`,`person_user_id`,`attribution`),
+  KEY `ix_ach_person` (`company_id`,`person_user_id`,`recognized_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WF-03: منع التضاعف بنيوي بالمفتاح الفريد';
 
 -- ── Table: achievement_snapshots ──
 CREATE TABLE `achievement_snapshots` (
@@ -332,6 +368,33 @@ CREATE TABLE `approval_chains` (
   UNIQUE KEY `uq_ac_seq` (`policy_id`,`seq_no`),
   CONSTRAINT `fk_ac_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POL-01 §4: سلسلة الاعتماد — لا تُفتح حلقة قبل سابقتها';
+
+-- ── Table: approval_links ──
+CREATE TABLE `approval_links` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `source_kind` varchar(30) NOT NULL COMMENT 'request|document|…',
+  `source_ref` varchar(60) NOT NULL,
+  `action_code` varchar(60) NOT NULL COMMENT 'رمز فعل الاعتماد — الورقة 09',
+  `step_no` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `approver_user_id` int(10) unsigned DEFAULT NULL,
+  `approver_role` varchar(120) DEFAULT NULL COMMENT 'أو دور مستقبِل يُحل وقت العرض',
+  `status` varchar(16) NOT NULL DEFAULT 'pending' COMMENT 'pending|approved|returned|rejected|withdrawn',
+  `sla_due_at` datetime DEFAULT NULL,
+  `decided_at` datetime DEFAULT NULL,
+  `decision_note` varchar(400) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_al` (`source_kind`,`source_ref`,`action_code`,`step_no`),
+  KEY `ix_al_approver` (`company_id`,`approver_user_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: صفر موافقة بلا صلاحية ونطاق — تُقرأ من E-04';
 
 -- ── Table: approval_requests ──
 CREATE TABLE `approval_requests` (
@@ -5796,6 +5859,26 @@ CREATE TABLE `person_relationships` (
   CONSTRAINT `fk_prel_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §14②: موظف المورد لا يُنشأ له موظف داخلي وهمي';
 
+-- ── Table: personal_notifications ──
+CREATE TABLE `personal_notifications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `kind` varchar(24) NOT NULL DEFAULT 'info',
+  `title` varchar(300) NOT NULL,
+  `body` varchar(600) DEFAULT NULL,
+  `link` varchar(300) DEFAULT NULL COMMENT 'رابط الأصل بضغطة واحدة',
+  `requires_action` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'WF-06',
+  `task_item_id` bigint(20) unsigned DEFAULT NULL COMMENT 'المهمة المولَّدة إن تطلب فعلًا — AC-WFM-08',
+  `read_at` datetime DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_pn_user` (`company_id`,`user_id`,`read_at`),
+  KEY `ix_pn_action` (`requires_action`,`task_item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: التنبيه إحاطة — ولا يصير مهمة إلا بفعل مطلوب';
+
 -- ── Table: persons ──
 CREATE TABLE `persons` (
   `person_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6444,6 +6527,22 @@ CREATE TABLE `rec_vacancies` (
   UNIQUE KEY `uq_vac` (`company_id`,`vacancy_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='① طلبُ الشاغر — أولُ الدورة العشرية';
 
+-- ── Table: recurring_tasks ──
+CREATE TABLE `recurring_tasks` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `template_id` int(10) unsigned NOT NULL,
+  `freq` varchar(12) NOT NULL DEFAULT 'monthly' COMMENT 'daily|weekly|monthly|quarterly',
+  `day_key` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT 'يوم الأسبوع/الشهر بحسب النمط',
+  `next_run_at` datetime DEFAULT NULL,
+  `last_run_at` datetime DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_rt_next` (`active`,`next_run_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── Table: report_role_permissions ──
 CREATE TABLE `report_role_permissions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -6452,6 +6551,90 @@ CREATE TABLE `report_role_permissions` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_role_report` (`role_id`,`report_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: request_responses ──
+CREATE TABLE `request_responses` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `request_id` bigint(20) unsigned NOT NULL,
+  `decision` varchar(24) NOT NULL COMMENT '① القرار',
+  `decided_by` int(10) unsigned NOT NULL COMMENT '② من قرّر',
+  `decided_capacity` varchar(60) DEFAULT NULL COMMENT '③ صفته',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '④ تاريخه',
+  `notes` varchar(400) DEFAULT NULL COMMENT '⑤ الملاحظات',
+  `action_required` varchar(300) DEFAULT NULL COMMENT '⑥ ما يجب فعله',
+  `result_doc_ref` varchar(200) DEFAULT NULL COMMENT '⑦ المستند الناتج',
+  `executed_summary` varchar(300) DEFAULT NULL COMMENT '⑧ التنفيذ الذي تم',
+  `next_step` varchar(200) DEFAULT NULL COMMENT '⑨ الخطوة اللاحقة',
+  `origin_link` varchar(200) NOT NULL DEFAULT '' COMMENT 'رابط الأصل',
+  PRIMARY KEY (`id`),
+  KEY `ix_rr_req` (`request_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WF-05: الطلب لا يُغلق بتغيير حالة — تسعة عناصر تصل مقدّمه';
+
+-- ── Table: request_routes ──
+CREATE TABLE `request_routes` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `item_kind` varchar(20) NOT NULL COMMENT 'nav_action|approval|request|ticket|recurring|escalation',
+  `trigger_key` varchar(60) NOT NULL DEFAULT '*' COMMENT 'رمز النوع/الفعل أو * للقاعدة العامة',
+  `rule_text` varchar(300) NOT NULL COMMENT 'قاعدة التوجيه المعلنة — تفسير الظهور ②',
+  `receiver_dept` varchar(80) NOT NULL,
+  `receiver_role` varchar(120) NOT NULL,
+  `fallback_role` varchar(120) NOT NULL COMMENT 'البديل عند الغياب',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_rr` (`item_kind`,`trigger_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: التوجيه بقاعدة لا باجتهاد — واليدوي استثناء يُسجَّل';
+
+-- ── Table: request_types ──
+CREATE TABLE `request_types` (
+  `code` varchar(12) NOT NULL COMMENT 'RQ-HR-01…',
+  `name_ar` varchar(160) NOT NULL,
+  `owner_dept` varchar(80) NOT NULL COMMENT 'الإدارة المالكة',
+  `submitter` varchar(160) NOT NULL COMMENT 'من يقدّمه',
+  `receiver` varchar(160) NOT NULL COMMENT 'من يستقبله — صفر طلب بلا جهة',
+  `approval_chain` varchar(300) NOT NULL,
+  `sla_hours` int(10) unsigned NOT NULL DEFAULT 72,
+  `deliverable` varchar(200) NOT NULL COMMENT 'المخرَج الناتج',
+  `source_ref` varchar(160) NOT NULL COMMENT 'مرجع الدورة في وثيقة الإدارة',
+  `status` varchar(16) NOT NULL DEFAULT 'active' COMMENT 'active|proposed|retired',
+  `display_order` smallint(5) unsigned NOT NULL DEFAULT 100,
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM الورقة 04 — تُستخرج من الدورات ولا تُخترع';
+
+-- ── Table: requests ──
+CREATE TABLE `requests` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `request_no` varchar(20) DEFAULT NULL COMMENT 'REQ-000001',
+  `request_type_code` varchar(12) NOT NULL,
+  `requester_user_id` int(10) unsigned NOT NULL,
+  `beneficiary_ref` varchar(60) DEFAULT NULL COMMENT 'المستفيد إن خالف المقدّم',
+  `org_unit_id` int(10) unsigned DEFAULT NULL,
+  `project_id` int(10) unsigned DEFAULT NULL,
+  `site_id` int(10) unsigned DEFAULT NULL,
+  `title` varchar(300) NOT NULL,
+  `fields_json` mediumtext DEFAULT NULL COMMENT 'حقول النموذج المشتقة من الصفة والعقد',
+  `status` varchar(24) NOT NULL DEFAULT 'draft' COMMENT 'draft|submitted|routed|in_approval|approved|rejected|executing|executed|closed|returned|cancelled',
+  `current_holder_user_id` int(10) unsigned DEFAULT NULL COMMENT 'من هو عنده الآن — AC-WFM-07',
+  `current_step` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `submitted_at` datetime DEFAULT NULL,
+  `sla_due_at` datetime DEFAULT NULL,
+  `executed_at` datetime DEFAULT NULL,
+  `closed_at` datetime DEFAULT NULL,
+  `status_reason` varchar(300) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  KEY `ix_rq_type` (`request_type_code`,`status`),
+  KEY `ix_rq_requester` (`company_id`,`requester_user_id`,`status`),
+  KEY `ix_rq_holder` (`company_id`,`current_holder_user_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: الطلب يُقدَّم قصدًا — وصفر طلب لا يُعرف أين توقف';
 
 -- ── Table: rfq_awards ──
 CREATE TABLE `rfq_awards` (
@@ -6610,6 +6793,19 @@ CREATE TABLE `seat_assignments` (
   KEY `fk_sa_container` (`container_id`),
   KEY `ix_sa_supplier_line` (`supplier_contract_line_id`),
   CONSTRAINT `fk_sa_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: sec_perm_backup_20260806 ──
+CREATE TABLE `sec_perm_backup_20260806` (
+  `role_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `can_view` tinyint(1) NOT NULL DEFAULT 0,
+  `can_add` tinyint(1) NOT NULL DEFAULT 0,
+  `can_edit` tinyint(1) NOT NULL DEFAULT 0,
+  `can_delete` tinyint(1) NOT NULL DEFAULT 0,
+  `rule_applied` varchar(16) NOT NULL,
+  `captured_at` datetime NOT NULL,
+  PRIMARY KEY (`role_id`,`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: sensitive_access_grants ──
@@ -7392,6 +7588,81 @@ CREATE TABLE `supplierscontracts` (
   CONSTRAINT `fk_supplierscontracts_project_contract` FOREIGN KEY (`project_contract_id`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_supplierscontracts_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: task_assignments ──
+CREATE TABLE `task_assignments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `item_id` bigint(20) unsigned NOT NULL,
+  `kind` varchar(16) NOT NULL COMMENT 'assign|reassign|delegate|transfer',
+  `from_user_id` int(10) unsigned DEFAULT NULL,
+  `to_user_id` int(10) unsigned NOT NULL,
+  `reason` varchar(300) DEFAULT NULL COMMENT 'إلزامي لإعادة الإسناد',
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  KEY `ix_ta_item` (`item_id`),
+  KEY `ix_ta_to` (`company_id`,`to_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: تاريخ الإسناد — العدّ يستمر ولا يُصفَّر';
+
+-- ── Table: task_dependencies ──
+CREATE TABLE `task_dependencies` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `item_id` bigint(20) unsigned NOT NULL,
+  `depends_on_item_id` bigint(20) unsigned NOT NULL,
+  `dep_type` varchar(12) NOT NULL DEFAULT 'blocks',
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_td` (`item_id`,`depends_on_item_id`),
+  KEY `ix_td_dep` (`depends_on_item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: task_evidence ──
+CREATE TABLE `task_evidence` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `item_id` bigint(20) unsigned NOT NULL,
+  `kind` varchar(12) NOT NULL DEFAULT 'note' COMMENT 'file|link|record|note',
+  `ref` varchar(300) NOT NULL,
+  `note` varchar(400) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_te_item` (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: task_templates ──
+CREATE TABLE `task_templates` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `code` varchar(30) NOT NULL,
+  `title` varchar(300) NOT NULL,
+  `details` text DEFAULT NULL,
+  `org_unit_id` int(10) unsigned DEFAULT NULL,
+  `owner_role_id` int(10) unsigned DEFAULT NULL COMMENT 'الدور المالك — تُعاد للدور لا للشخص',
+  `priority` varchar(4) NOT NULL DEFAULT 'P3',
+  `deliverable` varchar(300) NOT NULL,
+  `evidence_required` varchar(200) NOT NULL DEFAULT 'أثر الفعل في سجل التدقيق',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tt` (`company_id`,`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: SRC-08 — المهمة الدورية تتولد بدوريتها من قالبها';
 
 -- ── Table: tax_invoices ──
 CREATE TABLE `tax_invoices` (
@@ -8717,6 +8988,105 @@ CREATE TABLE `waivers_reversals` (
   KEY `ix_wr_source` (`source_type`,`source_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §8: الإعفاء والعكس والتعليق والتخفيض — Insert-only ولا حذف للأصل أبدًا';
 
+-- ── Table: work_delegations ──
+CREATE TABLE `work_delegations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `kind` varchar(20) NOT NULL COMMENT 'task_assign|role_assign|deputize|delegate_approval|reassign|workload_move',
+  `from_user_id` int(10) unsigned NOT NULL,
+  `to_user_id` int(10) unsigned NOT NULL,
+  `scope_ref` varchar(160) NOT NULL COMMENT 'المهمة/الدور/نوع المستند — لا تفويض مفتوح النطاق',
+  `cap_amount` decimal(14,2) DEFAULT NULL COMMENT 'سقف تفويض الاعتماد',
+  `cap_currency` varchar(3) DEFAULT NULL,
+  `starts_at` datetime NOT NULL,
+  `ends_at` datetime NOT NULL COMMENT 'لا تفويض مفتوح المدة',
+  `status` varchar(12) NOT NULL DEFAULT 'active' COMMENT 'active|ended|revoked',
+  `effect_on_open` varchar(200) NOT NULL DEFAULT 'تعود للأصل فورًا بانتهائها',
+  `approval_ref` varchar(60) DEFAULT NULL COMMENT 'جهة الموافقة — الحوكمة',
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  KEY `ix_wd_to` (`company_id`,`to_user_id`,`status`),
+  KEY `ix_wd_window` (`status`,`starts_at`,`ends_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WF-08: انتهاء التفويض يوقف التوليد ولا يلغي المفتوح';
+
+-- ── Table: work_escalations ──
+CREATE TABLE `work_escalations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `item_kind` varchar(16) NOT NULL COMMENT 'work_item|request|approval|ticket',
+  `item_ref` bigint(20) unsigned NOT NULL,
+  `from_user_id` int(10) unsigned DEFAULT NULL,
+  `to_user_id` int(10) unsigned NOT NULL,
+  `level` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `reason` varchar(24) NOT NULL DEFAULT 'sla_response' COMMENT 'sla_response|sla_completion|manual|risk',
+  `note` varchar(300) DEFAULT NULL,
+  `escalated_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `resolved_at` datetime DEFAULT NULL,
+  `company_scope` varchar(60) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `ix_we_item` (`item_kind`,`item_ref`),
+  KEY `ix_we_open` (`company_id`,`resolved_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AC-WFM-09: صفر مهمة متأخرة بلا تصعيد';
+
+-- ── Table: work_items ──
+CREATE TABLE `work_items` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL COMMENT 'الكيان — EN-03',
+  `item_type` varchar(12) NOT NULL DEFAULT 'task' COMMENT 'task|assignment',
+  `title` varchar(300) NOT NULL,
+  `details` text DEFAULT NULL,
+  `source_type` varchar(12) NOT NULL COMMENT 'SRC-01..SRC-14 — لا مصدر خارجها',
+  `source_ref` varchar(120) NOT NULL COMMENT 'مرجع المستند/الواقعة/القرار المنشئ',
+  `source_screen` varchar(120) DEFAULT NULL COMMENT 'شاشة الأصل وملفها',
+  `action_code` varchar(60) DEFAULT NULL COMMENT 'رمز الفعل من NAV-09 إن اشتُق من فعل',
+  `event_ref` varchar(60) DEFAULT NULL,
+  `org_unit_id` int(10) unsigned DEFAULT NULL,
+  `project_id` int(10) unsigned DEFAULT NULL,
+  `site_id` int(10) unsigned DEFAULT NULL,
+  `assigned_person_id` int(10) unsigned DEFAULT NULL COMMENT 'جسر الهوية E-05 — يُشتق',
+  `assigned_role_id` int(10) unsigned DEFAULT NULL,
+  `due_at` datetime DEFAULT NULL,
+  `status` varchar(24) NOT NULL DEFAULT 'draft',
+  `completed_at` datetime DEFAULT NULL,
+  `evidence_ref` varchar(200) DEFAULT NULL COMMENT 'دليل الإنجاز المرفوع',
+  `owner_user_id` int(10) unsigned NOT NULL COMMENT 'المالك',
+  `assigned_user_id` int(10) unsigned DEFAULT NULL COMMENT 'المنفذ الفعلي (users)',
+  `deliverable` varchar(300) NOT NULL COMMENT 'المخرَج المطلوب',
+  `evidence_required` varchar(200) NOT NULL DEFAULT 'أثر الفعل في سجل التدقيق' COMMENT 'دليل الإغلاق المطلوب',
+  `verifier_user_id` int(10) unsigned DEFAULT NULL COMMENT 'المتحقق — لا يُغلق أحدٌ مهمته (WF-04)',
+  `priority` varchar(4) NOT NULL DEFAULT 'P3' COMMENT 'P0..P4 — الورقة 05',
+  `response_due_at` datetime DEFAULT NULL COMMENT 'مهلة الاستجابة',
+  `accepted_at` datetime DEFAULT NULL,
+  `sla_paused_at` datetime DEFAULT NULL,
+  `sla_pause_reason` varchar(60) DEFAULT NULL COMMENT 'من قائمة الأسباب الموقفة وحدها',
+  `escalation_level` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `reopened_of` bigint(20) unsigned DEFAULT NULL COMMENT 'أعيد فتحها من',
+  `status_reason` varchar(300) DEFAULT NULL COMMENT 'سبب آخر انتقالٍ يشترط سببًا',
+  `closed_at` datetime DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  KEY `ix_wi_co_status` (`company_id`,`status`),
+  KEY `ix_wi_assignee` (`company_id`,`assigned_user_id`,`status`),
+  KEY `ix_wi_owner` (`company_id`,`owner_user_id`,`status`),
+  KEY `ix_wi_due` (`company_id`,`due_at`),
+  KEY `ix_wi_source` (`source_type`,`source_ref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM-01: عنصر العمل — واجهة قراءة وتنفيذ لا مصدر بيانات';
+
 -- ── Table: worker_backup ──
 CREATE TABLE `worker_backup` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -9035,6 +9405,20 @@ CREATE TABLE `workspace_prefs` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_wp` (`account_id`,`entity_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: workspace_views ──
+CREATE TABLE `workspace_views` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `screen` varchar(40) NOT NULL COMMENT 'my_tasks|my_requests|…',
+  `view_key` varchar(40) NOT NULL COMMENT 'today|late|upcoming|blocked|returned|delegated|assigned_by_me|team',
+  `filters_json` text DEFAULT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_wv` (`user_id`,`screen`,`view_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── View: v_org_unit_heads ──
