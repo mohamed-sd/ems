@@ -349,12 +349,20 @@ class RequestService
         return array('ok' => true, 'code' => 200);
     }
 
-    /** إلغاء/عكس: يسحب إنجازه إن اشتُق (AC-WFM-14) */
+    /** إلغاء/عكس: يسحب إنجازه إن اشتُق (AC-WFM-14) — لمقدِّمه أو حامله وحدهما */
     public static function cancel(\mysqli $conn, $requestId, $actorUserId, $reason)
     {
         $rq = self::fetch($conn, $requestId);
         if (!$rq) { return array('ok' => false, 'code' => 404, 'reason' => 'الطلب غير موجود'); }
         if (trim($reason) === '') { return array('ok' => false, 'code' => 422, 'reason' => 'السبب إلزامي'); }
+        $actor = intval($actorUserId);
+        if ($actor !== intval($rq['requester_user_id']) && $actor !== intval($rq['current_holder_user_id'])) {
+            return array('ok' => false, 'code' => 403,
+                'reason' => 'الإلغاءُ لمقدِّم الطلب أو حامله الحالي وحدهما');
+        }
+        if (in_array((string) $rq['status'], array('closed', 'cancelled'), true)) {
+            return array('ok' => false, 'code' => 409, 'reason' => 'لا إلغاءَ لطلبٍ ' . $rq['status']);
+        }
         $id = intval($rq['id']);
         $co = intval($rq['company_id']);
         $conn->query("UPDATE requests SET status = 'cancelled', status_reason = '" .

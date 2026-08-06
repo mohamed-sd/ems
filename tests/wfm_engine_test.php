@@ -141,8 +141,12 @@ $q3 = RQ::submit($conn, array('company_id' => $CO, 'request_type_code' => 'RQ-HR
     'requester_user_id' => $EXEC, 'org_unit_id' => 1, 'title' => 'TST-WFM تدريب', 'created_by' => $EXEC));
 ok($q3['ok'], 'سماح: النوع المقترح صار نافذًا بقرار الشركة (RQ-HR-07)');
 $REQ2 = intval($q3['id'] ?? 0);
+$cs = RQ::cancel($conn, $REQ2, $stranger2, 'دخيل');
+ok(!$cs['ok'] && $cs['code'] === 403, 'منع: الإلغاءُ لمقدِّمه أو حامله وحدهما — الغريب 403');
 $cx = RQ::cancel($conn, $REQ2, $EXEC, 'اختبار الإلغاء');
-ok($cx['ok'], 'عكس: الإلغاء بسببٍ يمضي ويعكس أثره');
+ok($cx['ok'], 'عكس: إلغاءُ المقدِّم بسببٍ يمضي ويعكس أثره');
+$c2 = RQ::cancel($conn, $REQ2, $EXEC, 'ثانية');
+ok(!$c2['ok'] && $c2['code'] === 409, 'تكرار: إلغاءُ الملغى 409');
 
 fwrite(STDOUT, "── ⑤ الهرم والمهل\n");
 $mgrKnown = null;
