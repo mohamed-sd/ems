@@ -107,6 +107,11 @@ class TenantRegistry
         'request_responses' => array('type' => self::T_TENANT, 'soft' => false),
         'request_routes' => array('type' => self::T_GLOBAL, 'soft' => false),
         'request_types' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // SEC-013 (هجرة 2026_11_18): قواميس مرجعية مشتركة كسابقة ق-03 —
+        // الأفعال الـ16 والنطاقات الـ9 وتنقيحات بنود القوالب (القوالب نفسها عالمية)
+        'sec_actions' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'sec_scopes' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'template_permission_dims' => array('type' => self::T_GLOBAL, 'soft' => false),
         'requests' => array('type' => self::T_TENANT, 'soft' => false),
         'task_assignments' => array('type' => self::T_TENANT, 'soft' => false),
         'task_dependencies' => array('type' => self::T_TENANT, 'soft' => false),

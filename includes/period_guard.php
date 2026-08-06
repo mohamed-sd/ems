@@ -92,6 +92,24 @@ if (!function_exists('ems_period_close_blockers')) {
                                 'link' => 'events_list_fin.php');
         }
 
+        // ④ AC-E01-05 «لا إقفالَ لمبدئي»: أحداثُ الفترة الموسومةُ مبدئيةً
+        //    (fin_event_grades.grade='provisional') تمنع الإقفال حتى تُرقَّى
+        //    نهائيةً بمستندها — الدرجةُ جدولٌ جانبيٌّ (هجرة 2026_11_17) حتى
+        //    تنقضي نافذةُ تجميد المخطط فيُطوى عمودًا إن شاء المالك.
+        $t = $conn->query("SHOW TABLES LIKE 'fin_event_grades'");
+        if ($t && $t->num_rows > 0) {
+            $r = $conn->query("SELECT COUNT(*) c FROM fin_event_grades g
+                JOIN fin_financial_events ev ON ev.id = g.event_id
+                WHERE g.company_id = {$companyId} AND g.grade = 'provisional'
+                  AND COALESCE(ev.is_deleted,0) = 0
+                  AND DATE(COALESCE(ev.occurred_at, ev.created_at)) BETWEEN '{$s}' AND '{$e}'");
+            $n = $r ? intval($r->fetch_assoc()['c']) : 0;
+            if ($n > 0) {
+                $blockers[] = array('label' => 'أحداثٌ بدرجة أثرٍ مبدئيةٍ لم تُرقَّ (AC-E01-05)', 'count' => $n,
+                                    'link' => 'events_list_fin.php');
+            }
+        }
+
         // ③ فروقُ مطابقةٍ بنكيةٍ مفتوحة — الجدولُ يُبنى في H-13؛ غيابُه = صفرٌ معلَن
         $t = $conn->query("SHOW TABLES LIKE 'bank_recon_matches'");
         if ($t && $t->num_rows > 0) {
@@ -106,5 +124,32 @@ if (!function_exists('ems_period_close_blockers')) {
             }
         }
         return $blockers;
+    }
+}
+
+if (!function_exists('ems_event_grade_set')) {
+    /**
+     * AC-E01-05: وسم حدثٍ ماليٍّ بدرجة أثره — provisional لا يُقفل عليه،
+     * والترقية إلى final تُختم بفاعلها ولحظتها. idempotent بمفتاح الحدث.
+     */
+    function ems_event_grade_set(\mysqli $conn, $companyId, $eventId, $grade, $reason = '', $actorId = 0)
+    {
+        $grade = $grade === 'final' ? 'final' : 'provisional';
+        $st = $conn->prepare("INSERT INTO fin_event_grades (company_id, event_id, grade, reason, created_by,
+                                  finalized_at, finalized_by)
+                              VALUES (?, ?, ?, ?, ?,
+                                  IF(? = 'final', NOW(), NULL), IF(? = 'final', ?, NULL))
+                              ON DUPLICATE KEY UPDATE grade = VALUES(grade), reason = VALUES(reason),
+                                  finalized_at = IF(VALUES(grade)='final', COALESCE(finalized_at, NOW()), NULL),
+                                  finalized_by = IF(VALUES(grade)='final', COALESCE(finalized_by, VALUES(finalized_by)), NULL)");
+        if (!$st) { error_log('[event-grade] prepare: ' . $conn->error); return false; }
+        $co = intval($companyId);
+        $ev = intval($eventId);
+        $ac = intval($actorId);
+        $st->bind_param('iississi', $co, $ev, $grade, $reason, $ac, $grade, $grade, $ac);
+        $ok = $st->execute();
+        if (!$ok) { error_log('[event-grade] execute: ' . $st->error); }
+        $st->close();
+        return (bool) $ok;
     }
 }

@@ -46,8 +46,16 @@ $add('AC-E01-03', 'العقدُ الخماسيُّ مكتمل', 'PARTIAL',
 $add('AC-E01-04', 'الفان أوت مستقل',
     has('app/Services/EffectFanout.php', 'party_award') ? 'ENFORCED' : 'OPEN',
     'كلُّ أثرٍ بمفتاحه ورابطه الأبوي — والتبنّي يُحصى منفصلًا لكل نوع');
-$add('AC-E01-05', 'لا إقفالَ لمبدئيّ', 'OPEN',
-    'درجةُ الأثر (مبدئي/نهائي) لم تُبنَ عمودًا بعد — DDL مؤجَّل بعد نافذة الظل');
+// أُغلق 2026-08-06 مساءً: درجة الأثر جدولًا جانبيًّا CREATE-only (يحترم تجميد
+// المخطط) + مانع إقفال ④ في ems_period_close_blockers — والقياس حي لا وصفي.
+$feg = false;
+$rq = mysqli_query($conn, "SHOW TABLES LIKE 'fin_event_grades'");
+if ($rq && $rq->num_rows > 0) {
+    $feg = has('includes\period_guard.php', 'AC-E01-05') && has('includes\period_guard.php', 'fin_event_grades');
+}
+$add('AC-E01-05', 'لا إقفالَ لمبدئيّ', $feg ? 'ENFORCED' : 'OPEN',
+    $feg ? 'درجةُ الأثر جدولٌ جانبيٌّ (fin_event_grades · هجرة 2026_11_17) والمبدئيُّ يمنع إقفالَ فترته (مانع ④) — event_grade_test 8/8'
+         : 'درجةُ الأثر (مبدئي/نهائي) لم تُبنَ عمودًا بعد — DDL مؤجَّل بعد نافذة الظل');
 $add('AC-E01-06', 'العكسُ بمرجع',
     has('app/Services/EffectFanout.php', 'reversal') || has('Finance/fin_helpers.php', 'عكس') ? 'ENFORCED' : 'PARTIAL',
     'العكسُ بحركةٍ مقابلةٍ بمرجع الأصل (CON-02/M-02 سابقتان) — وصفرُ حذفٍ ماليٍّ في المسار');
@@ -99,8 +107,18 @@ $add('AC-E03-07', 'الإبلاغُ من كل شاشة',
 $permSrc = strtolower((string) (function_exists('ems_env') ? ems_env('EMS_PERM_SOURCE', 'legacy') : 'legacy'));
 $add('AC-E04-01', 'الاشتقاقُ من القالب', 'PARTIAL',
     "القوالبُ مملوءةٌ (1852 بندًا) والمصدرُ الحيُّ ما زال legacy — القلبُ بعد نافذة الظل (قرار مالك)");
+// SEC-013 بُنيت بنيتها كاملةً 2026-08-06 مساءً (16 فعلًا · 9 نطاقات · 1852 بعدًا
+// مشتقًا · محلّل fail-closed خلف علم) — والإنفاذ الحي وحده ينتظر قلب المصدر.
+$s13 = false;
+$rq = mysqli_query($conn, "SHOW TABLES LIKE 'sec_actions'");
+if ($rq && $rq->num_rows > 0) {
+    $na = intval(mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM sec_actions"))[0]);
+    $nd = intval(mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM template_permission_dims"))[0]);
+    $s13 = ($na === 16 && $nd > 0 && is_file($ROOT . '/includes/sec013.php'));
+}
 $add('AC-E04-02', 'الثلاثةُ معًا (فعل·نطاق·ظهور)', 'PARTIAL',
-    'الرايات الأربع + مفاتيح الظهور نافذة — والأبعادُ الأربعة والأفعالُ الـ16 (SEC-013) خلف نافذة الظل');
+    $s13 ? 'بنية SEC-013 كاملةٌ ومقيسة (16 فعلًا · 9 نطاقات · بُعدٌ مشتقٌّ لكل بندٍ رباعيّ الراية · محلّل fail-closed — sec013_test 10/10) والإنفاذُ خلف EMS_SEC013 حتى قلب المصدر 19-08'
+         : 'الرايات الأربع + مفاتيح الظهور نافذة — والأبعادُ الأربعة والأفعالُ الـ16 (SEC-013) خلف نافذة الظل');
 $add('AC-E04-03', 'السقفُ يُفحص عند الاعتماد', 'PARTIAL',
     'سقوفُ التفويض في work_delegations وسلّمُ الطلبات نافذان — وتعميمُ السقف النقدي على كل مستندٍ لم يُمسح');
 $add('AC-E04-04', 'لا حسابَ جامع (فصل الواجبات)',

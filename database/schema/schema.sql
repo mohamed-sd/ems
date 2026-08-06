@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-06 14:53:06
--- الجداول: 451 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-06 15:03:55
+-- الجداول: 455 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -3579,6 +3579,23 @@ CREATE TABLE `fin_event_effects` (
   KEY `ix_eff_type` (`company_id`,`effect_type`),
   CONSTRAINT `fk_eff_event` FOREIGN KEY (`event_id`) REFERENCES `fin_financial_events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='H-12 (FES §3.2): آثارُ الحدث — الحدثُ الواحد قد يولّد آثارًا لعدة أطراف';
+
+-- ── Table: fin_event_grades ──
+CREATE TABLE `fin_event_grades` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'الكيان المالك — EN-03',
+  `event_id` int(11) NOT NULL COMMENT 'الحدث المالي fin_financial_events.id',
+  `grade` enum('provisional','final') NOT NULL DEFAULT 'provisional' COMMENT 'مبدئي: تقديري لا يُقفل عليه ماليًّا · نهائي: مؤكد',
+  `reason` varchar(300) DEFAULT NULL COMMENT 'علة الوسم المبدئي (تقدير · بانتظار مستند …)',
+  `finalized_at` datetime DEFAULT NULL COMMENT 'لحظة الترقية إلى نهائي',
+  `finalized_by` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_grade` (`event_id`) COMMENT 'درجة واحدة لكل حدث',
+  KEY `ix_feg_live` (`company_id`,`grade`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AC-E01-05: درجة أثر الحدث المالي — المبدئي لا يُقفل عليه';
 
 -- ── Table: fin_event_links ──
 CREATE TABLE `fin_event_links` (
@@ -8526,6 +8543,15 @@ CREATE TABLE `seat_assignments` (
   CONSTRAINT `fk_sa_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: sec_actions ──
+CREATE TABLE `sec_actions` (
+  `action_code` varchar(24) NOT NULL,
+  `name_ar` varchar(60) NOT NULL,
+  `family` enum('visibility','mutation','workflow','output','admin') NOT NULL,
+  `display_order` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`action_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-013 ②: الأفعال الستة عشر لا أربع رايات';
+
 -- ── Table: sec_perm_backup_20260806 ──
 CREATE TABLE `sec_perm_backup_20260806` (
   `role_id` int(11) NOT NULL,
@@ -8538,6 +8564,14 @@ CREATE TABLE `sec_perm_backup_20260806` (
   `captured_at` datetime NOT NULL,
   PRIMARY KEY (`role_id`,`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: sec_scopes ──
+CREATE TABLE `sec_scopes` (
+  `scope_code` varchar(24) NOT NULL,
+  `name_ar` varchar(60) NOT NULL,
+  `narrowness` tinyint(3) unsigned NOT NULL COMMENT '1 أوسع (شركة) … 9 أضيق (سجلاته هو)',
+  PRIMARY KEY (`scope_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-013 ④: تسعة نطاقات لا ثنائية — الفعل نفسه يختلف بالنطاق';
 
 -- ── Table: sensitive_access_grants ──
 CREATE TABLE `sensitive_access_grants` (
@@ -9426,6 +9460,27 @@ CREATE TABLE `tax_invoices` (
   KEY `ix_tax_client` (`company_id`,`client_id`,`state`),
   CONSTRAINT `fk_tax_invoice_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: template_permission_dims ──
+CREATE TABLE `template_permission_dims` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tp_id` int(10) unsigned NOT NULL COMMENT 'بند القالب template_permissions.tp_id',
+  `action_code` varchar(24) NOT NULL COMMENT 'من قاموس الستة عشر',
+  `scope_code` varchar(24) NOT NULL DEFAULT 'company' COMMENT 'من النطاقات التسعة',
+  `field_rule` varchar(190) DEFAULT NULL COMMENT 'ظهور الحقل/التبويب المسمى (NULL = الشاشة كلها)',
+  `doc_type` varchar(60) DEFAULT NULL COMMENT 'بعد الاعتماد: نوع المستند',
+  `amount_cap` decimal(18,2) DEFAULT NULL COMMENT 'بعد الاعتماد: السقف النقدي',
+  `currency` varchar(8) DEFAULT NULL,
+  `effect` enum('grant','deny') NOT NULL DEFAULT 'grant',
+  `derived_from` varchar(40) DEFAULT NULL COMMENT 'baseline4 = اشتقاق الرايات الأربع · manual',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tp_dim` (`tp_id`,`action_code`,`scope_code`),
+  KEY `ix_tpd_action` (`action_code`),
+  KEY `fk_tpd_scope` (`scope_code`),
+  CONSTRAINT `fk_tpd_action` FOREIGN KEY (`action_code`) REFERENCES `sec_actions` (`action_code`),
+  CONSTRAINT `fk_tpd_scope` FOREIGN KEY (`scope_code`) REFERENCES `sec_scopes` (`scope_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-013: البعد الرباعي لكل بند قالب — يُشتق baseline ويُنقح يدويًّا';
 
 -- ── Table: template_permissions ──
 CREATE TABLE `template_permissions` (
