@@ -46,6 +46,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$role_id || !$module_id) {
         $error_msg = 'الدور والصفحة مطلوبان ❌';
     } else {
+        // ═══ E-04 RB-04: فصلُ الواجبات بنيويٌّ عند المنح لا مسحًا بعديًّا ═══
+        // الزوج الدقيق المكتمل يمنع الحفظَ باسمه وضابطِه؛ والتقريبي يمضي مُبلَّغًا
+        // ومسجَّلًا (قرار المالك: «تُبلَّغ ولا تُمنع» · «مسحٌ يكشف ثم منع»).
+        require_once __DIR__ . '/../includes/sod_guard.php';
+        $sod = ems_sod_check_grant($conn, intval($role_id), intval($module_id), array(
+            'can_view' => $can_view, 'can_add' => $can_add,
+            'can_edit' => $can_edit, 'can_delete' => $can_delete));
+        if ($sod['block'] !== null) {
+            $b = $sod['block'];
+            if (function_exists('log_security_event')) {
+                log_security_event('SOD_GRANT_BLOCKED', 'role=' . intval($role_id)
+                    . ' module=' . intval($module_id) . ' pair=' . $b['code']
+                    . ' by=' . intval($_SESSION['user']['id'] ?? 0));
+            }
+            $error_msg = 'فصل الواجبات يمنع هذا المنح: يكتمل به الزوج المحظور «' . $b['name']
+                . '» (' . $b['code'] . ' · ' . $b['severity'] . ') — الضابط: '
+                . ($b['control'] ?: 'فصل اليدين') . ' ❌';
+        }
+        if (!isset($error_msg)) {
+            foreach ($sod['warnings'] as $w) {
+                if (function_exists('log_security_event')) {
+                    log_security_event('SOD_GRANT_WARN', 'role=' . intval($role_id)
+                        . ' module=' . intval($module_id) . ' pair=' . $w['code'] . ' (approx)');
+                }
+            }
+        }
+    }
+    if (!isset($error_msg) && $role_id && $module_id) {
         // القراءة عبر البوابة (role_permissions مرجع عام) — الأعمدةُ الأربعة تُقرأ
         // كاملةً لأن سجل التدقيق (N-02) يحتاج قيمَ «قبل» لا الوجودَ فقط.
         $existing = null;
@@ -75,6 +103,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         if ($stmt->execute()) {
             $success_msg = 'تم حفظ الصلاحيات بنجاح ✅';
+            if (!empty($sod['warnings'])) {
+                $wNames = array();
+                foreach ($sod['warnings'] as $w) { $wNames[] = $w['name']; }
+                $success_msg .= ' — تنبيه فصل واجبات (تقريبي · مسجَّل): ' . implode(' · ', $wNames) . ' ⚠️';
+            }
             // N-02: تدقيقُ تغيير الصلاحية بقيم قبل/بعد (من غيّر ماذا ومتى)
             require_once __DIR__ . '/../includes/audit_trail.php';
             ems_audit_change($conn, 'permissions', 'role_permissions', $existing ? 'update' : 'grant',

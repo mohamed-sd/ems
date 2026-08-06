@@ -211,10 +211,14 @@ class RequestService
     {
         require_once dirname(__DIR__, 2) . '/../includes/resolve_manager.php';
         $recv = (string) $type['receiver'];
-        // «مديره المباشر» قاعدة هرمية لا دورية
+        // «مديره المباشر» قاعدة هرمية لا دورية — والمُجاز يقدَّم نائبُه (قرار 10)
         if (mb_strpos($recv, 'مدير') !== false && mb_strpos($recv, 'المباشر') !== false) {
             $m = ems_resolve_manager($conn, intval($requesterId));
-            if ($m) { return $m; }
+            if ($m) {
+                $pick = ems_pick_available($conn, array($m, ems_resolve_manager($conn, $m)));
+                if ($pick['user_id']) { return $pick['user_id']; }
+                return $m;
+            }
         }
         // خريطة استقبال الإدارات → أدوار الاستقبال المعتمدة
         $map = array(
@@ -233,15 +237,19 @@ class RequestService
             }
         }
         if (!$roles) { $roles = array('15'); } // الحوكمة قاعُ السلّم — لا طلبَ بلا جهة
+        $candidates = array();
         foreach ($roles as $role) {
-            $st = $conn->prepare("SELECT id FROM users WHERE role = ? AND company_id = ? AND COALESCE(status,'active') = 'active' ORDER BY id LIMIT 1");
+            $st = $conn->prepare("SELECT id FROM users WHERE role = ? AND company_id = ? AND COALESCE(status,'active') = 'active' ORDER BY id LIMIT 3");
             $st->bind_param('si', $role, $co);
             $st->execute();
-            $r = $st->get_result()->fetch_assoc();
+            $rs = $st->get_result();
+            while ($r = $rs->fetch_assoc()) { $candidates[] = intval($r['id']); }
             $st->close();
-            if ($r) { return intval($r['id']); }
         }
-        return null;
+        if (!$candidates) { return null; }
+        // قرار 10: المُجاز لا يُسنَد إليه آليًّا — يُقدَّم المتاح أو نائبُ المُجاز
+        $pick = ems_pick_available($conn, $candidates);
+        return $pick['user_id'];
     }
 
     public static function fetch(\mysqli $conn, $id)

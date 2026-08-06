@@ -48,6 +48,14 @@ while ($r && ($t = mysqli_fetch_assoc($r))) {
         if ($q && ($u = mysqli_fetch_row($q))) { $assignee = intval($u[0]); }
     }
     if ($assignee === null) { continue; } // لا مالكَ حيًّا — يُترك مستحقًّا للجولة القادمة
+    // قرار 10: المُجاز لا يُسنَد إليه آليًّا — النائب أو التأجيل للجولة القادمة
+    $pick = ems_pick_available($conn, array($assignee));
+    if ($pick['on_leave']) {
+        WI::notifyUser($conn, $co, intval($t['owner_role_id']) > 0 ? $assignee : $assignee,
+            'مهمةٌ دوريةٌ مؤجلة — المكلَّف في إجازة', (string) $t['title'], 'Portal/my_tasks.php', false, 0);
+        continue;
+    }
+    $assignee = $pick['user_id'];
     $res = WI::create($conn, array(
         'company_id' => $co, 'source_type' => 'SRC-08',
         'source_ref' => 'TPL-' . $t['code'] . '-' . date('Ymd'),
