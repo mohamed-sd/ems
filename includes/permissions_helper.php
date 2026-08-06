@@ -418,11 +418,16 @@ function get_module_id_by_script_path($conn, $script_path = null) {
     // مشابهة الاسم (main/dashboard.php أسرها Transport/transfer_dashboard.php
     // فحُجبت اللوحة عن كل الأدوار عدا النقل — حادثة 2026-07-10). صفحة بلا
     // موديول مسجَّل = null = شفافة الصلاحية (السلوك التاريخي المقصود).
+    // ⚠️ المسارُ التام يغلب الذيلَ: LIMIT 1 بلا ترتيبٍ كان يُرجع أدنى id فيأسر
+    //    ذيلُ «%/my_requests.php» موديولَ FinRequests (#115) قبل المطابقة
+    //    الدقيقة لـPortal/my_requests.php (#249) — فتُحجب الشاشةُ الجديدة بصلاحية
+    //    شاشةٍ قديمةٍ تشاركها الاسم (گوتشا «أدنى id» الموثقة · وحادثة 2026-07-10).
     $stmt = $conn->prepare(
         "SELECT id FROM modules
          WHERE code = ?
             OR code = ?
             OR code LIKE ?
+         ORDER BY (code = ?) DESC, id ASC
          LIMIT 1"
     );
 
@@ -431,7 +436,7 @@ function get_module_id_by_script_path($conn, $script_path = null) {
     }
 
     $pattern1 = '%/' . $basename;
-    $stmt->bind_param("sss", $relative_path, $basename, $pattern1);
+    $stmt->bind_param("ssss", $relative_path, $basename, $pattern1, $relative_path);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
