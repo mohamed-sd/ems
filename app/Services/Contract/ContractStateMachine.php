@@ -310,6 +310,35 @@ class ContractStateMachine
                     'effective'   => self::isEffective($to),
                 ),
             ));
+
+            // M-00 §11 (ContractSigned): بلوغُ «موقَّع» حقيقةٌ متخصصةٌ تُنشر باسمها
+            // من نقطةِ الحدث نفسِها — يستهلكها السجلُّ الموحّد والمبيعاتُ والموردون
+            // والتمويلُ والماليةُ والحوكمة. العطالة بالعقد ومصدرِ الانتقال: التوقيعُ
+            // من المسارِ الواحد لا يتكرر، وإعادةُ توقيعٍ بعد مسارٍ آخر حقيقةٌ جديدة.
+            if ($to === self::SIGNED) {
+                $row = self::contractOf($gate, $contractId);
+                \App\Core\EventPublisher::publishFact($conn, array(
+                    'event_key'       => 'contract.signed',
+                    'category'        => 'commercial',
+                    'source_module'   => 'sales',
+                    'company_id'      => (int) $companyId,
+                    'entity_type'     => 'contract',
+                    'entity_id'       => (int) $contractId,
+                    'occurred_at'     => gmdate('Y-m-d H:i:s'),
+                    'created_by'      => (int) $actor ?: 1,
+                    'idempotency_key' => 'contract_signed:' . (int) $contractId . ':' . $from,
+                    'contract_id'     => (int) $contractId,
+                    'notes'           => 'توقيعُ العقد' . (!empty($row['contract_no']) ? ' ' . $row['contract_no'] : ''),
+                    'payload'         => array(
+                        'contract_id'  => (int) $contractId,
+                        'contract_no'  => isset($row['contract_no']) ? (string) $row['contract_no'] : '',
+                        'client_id'    => isset($row['client_id']) ? (int) $row['client_id'] : 0,
+                        'signing_date' => isset($row['contract_signing_date']) ? (string) $row['contract_signing_date'] : '',
+                        'from'         => $from,
+                        'note'         => trim((string) $note),
+                    ),
+                ));
+            }
         } catch (\Throwable $t) {
             error_log('ContractStateMachine emit #' . $contractId . ': ' . $t->getMessage());
         }

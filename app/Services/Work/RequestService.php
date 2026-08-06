@@ -283,6 +283,38 @@ class RequestService
                 WorkItemService::notifyUser($conn, $co, $eu, 'طلبٌ معتمدٌ ينتظر تنفيذك — ' . $no,
                     (string) $rq['title'], 'Portal/my_requests.php?req=' . $id, true, $actor);
             }
+
+            // M-00 §11 (ExecApproved): حين يكون صاحبُ القرار النهائي تنفيذيًّا (دور 9)
+            // تُنشر حقيقةُ الاعتماد التنفيذي باسمها من نقطة الحدث — يستهلكها سجلُّ
+            // الاعتمادات والتدقيق. الحارس أعلاه (409 سباق حالة) يضمن نشرةً واحدة
+            // لكل بلوغِ «approved»، والمفتاح الموقوت يحفظ إعادةَ الاعتماد بعد إرجاعٍ حقيقةً جديدة.
+            try {
+                $rr = $conn->query('SELECT role FROM users WHERE id = ' . intval($actor) . ' LIMIT 1');
+                $actorRole = ($rr && ($w = $rr->fetch_assoc())) ? (string) $w['role'] : '';
+                if ($actorRole === '9') {
+                    require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
+                    \App\Core\EventPublisher::publishFact($conn, array(
+                        'event_key'       => 'exec.approval.granted',
+                        'category'        => 'operational',
+                        'source_module'   => 'system',
+                        'company_id'      => $co,
+                        'entity_type'     => 'request',
+                        'entity_id'       => $id,
+                        'occurred_at'     => gmdate('Y-m-d H:i:s'),
+                        'created_by'      => intval($actor) ?: 1,
+                        'idempotency_key' => 'exec_approval:req:' . $id . ':' . gmdate('YmdHis'),
+                        'notes'           => 'اعتمادٌ تنفيذيٌّ نهائي — ' . $no,
+                        'payload'         => array(
+                            'request_id'   => $id,
+                            'request_no'   => $no,
+                            'request_type' => (string) $rq['request_type_code'],
+                            'title'        => (string) $rq['title'],
+                            'requester'    => intval($rq['requester_user_id']),
+                            'approved_by'  => intval($actor),
+                        ),
+                    ));
+                }
+            } catch (\Throwable $t) { error_log('RequestService exec fact #' . $id . ': ' . $t->getMessage()); }
         }
 
         $msg = array('approved' => 'اعتُمد طلبُك — والخطوةُ التالية التنفيذ',

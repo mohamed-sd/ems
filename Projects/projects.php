@@ -223,8 +223,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     } else {
         // إضافة عبر البوابة (company_id تحقنه من سياق الجلسة، وcreate_at بتاريخ PHP بدل NOW)
         $inserted = false;
+        $new_project_id = 0;
         try {
-            $prj_gate->insert('project', array(
+            $new_project_id = (int) $prj_gate->insert('project', array(
                 $project_client_column => $client_id,
                 'name' => $name,
                 'client' => $client,
@@ -248,6 +249,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
         if ($inserted) {
             log_security_event('PROJECT_CREATED', "Created project: $name");
+
+            // M-00 §11 (ProjectChartered): فتحُ مشروعٍ حقيقةٌ تُنشر من نقطة الحدث —
+            // يستهلكها ميثاقُ المشروع ومراكزُ التكلفة ومديرو المواقع. لا تلفيق:
+            // الحمولة مما أدخله المستخدم فعلًا، والعميل إن وُجد هو أقصى ربطِ العقد المتاح هنا.
+            if ($new_project_id > 0) {
+                try {
+                    require_once dirname(__DIR__) . '/app/Core/EventPublisher.php';
+                    \App\Core\EventPublisher::publishFact($conn, array(
+                        'event_key'       => 'project.chartered',
+                        'category'        => 'operational',
+                        'source_module'   => 'system',
+                        'company_id'      => $company_id,
+                        'entity_type'     => 'project',
+                        'entity_id'       => $new_project_id,
+                        'occurred_at'     => gmdate('Y-m-d H:i:s'),
+                        'created_by'      => $created_by ?: 1,
+                        'idempotency_key' => 'project_chartered:' . $new_project_id,
+                        'project_id'      => $new_project_id,
+                        'notes'           => 'فتحُ مشروع: ' . $name,
+                        'payload'         => array(
+                            'project_id'   => $new_project_id,
+                            'name'         => (string) $name,
+                            'project_code' => (string) $project_code,
+                            'client_id'    => (int) $client_id,
+                            'client'       => (string) $client,
+                            'location'     => (string) $location,
+                            'status'       => (string) $status,
+                        ),
+                    ));
+                } catch (\Throwable $t) { error_log('projects.php charter fact #' . $new_project_id . ': ' . $t->getMessage()); }
+            }
             projects_redirect_with_msg('تم إضافة المشروع بنجاح ✅');
         } else {
             projects_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');

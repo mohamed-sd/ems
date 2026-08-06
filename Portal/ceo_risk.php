@@ -86,13 +86,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     }
     $status = $payload['الحالة'] ?? 'مسودة';
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
+
+    // BR-CEO-04: القرارُ المحسوم لا يُقبل بلا جهةٍ مكلَّفةٍ ومهلةِ تنفيذ —
+    // الحسمُ بتاريخ قرارٍ أو حالةٍ حاسمة، والمسودةُ وقيدُ الدراسة خارج الشرط.
+    $decisive = (($payload['تاريخ القرار'] ?? '') !== '')
+        || in_array($status, array('محسوم', 'معتمد', 'نافذ', 'قيد التنفيذ', 'مقفل'), true);
+    if ($decisive) {
+        $missing = array();
+        if (($payload['الجهة المكلَّفة بالتنفيذ'] ?? '') === '') { $missing[] = 'الجهة المكلَّفة بالتنفيذ'; }
+        if (($payload['مهلة التنفيذ'] ?? '') === '') { $missing[] = 'مهلة التنفيذ'; }
+        if ($missing) {
+            header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
+                'BR-CEO-04: قرارٌ محسومٌ بلا ' . implode(' و', $missing) . ' — أكمل الحقلين ثم احفظ ❌'));
+            exit();
+        }
+    }
+
     $st = $conn->prepare("INSERT INTO cmp03_screen_rows
         (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
         VALUES (?, ?, ?, ?, 0, ?, ?)");
     $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
     $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
     $ok = $st->execute();
+    $newId = $ok ? (int) $conn->insert_id : 0;
     $st->close();
+
+    // M-00 §11 (ExecDecisionMade): الصفُّ الحقيقي المحسوم حقيقةٌ تُنشر من نقطة
+    // الحدث + متابعةٌ تُجدول (SRC-10) على صاحب القرار بموعد المتابعة المدخل.
+    if ($ok && $decisive && $newId > 0) {
+        try {
+            require_once dirname(__DIR__) . '/app/Core/EventPublisher.php';
+            \App\Core\EventPublisher::publishFact($conn, array(
+                'event_key'       => 'exec.decision.made',
+                'category'        => 'operational',
+                'source_module'   => 'system',
+                'company_id'      => $company_id,
+                'entity_type'     => 'exec_decision',
+                'entity_id'       => $newId,
+                'occurred_at'     => gmdate('Y-m-d H:i:s'),
+                'created_by'      => $uid ?: 1,
+                'idempotency_key' => 'exec_decision:CMP03-' . $newId,
+                'notes'           => 'قرارٌ تنفيذي: ' . mb_substr((string) ($payload['وصف القضية'] ?? ($payload['رقم القرار'] ?? '')), 0, 120),
+                'payload'         => array(
+                    'decision_ref' => 'CMP03-' . $newId,
+                    'decision_no'  => (string) ($payload['رقم القرار'] ?? ''),
+                    'issue_type'   => (string) ($payload['نوع القضية'] ?? ''),
+                    'chosen'       => (string) ($payload['الخيار المختار'] ?? ''),
+                    'assignee'     => (string) ($payload['الجهة المكلَّفة بالتنفيذ'] ?? ''),
+                    'deadline'     => (string) ($payload['مهلة التنفيذ'] ?? ''),
+                    'follow_up'    => (string) ($payload['تاريخ المتابعة'] ?? ''),
+                    'status'       => (string) $status,
+                ),
+            ));
+
+            require_once dirname(__DIR__) . '/app/Services/Work/WorkItemService.php';
+            $fu = strtotime((string) ($payload['تاريخ المتابعة'] ?? ''));
+            if ($fu === false) { $fu = strtotime((string) ($payload['مهلة التنفيذ'] ?? '')); }
+            if ($fu === false || $fu < time()) { $fu = time() + 7 * 86400; }
+            \App\Services\Work\WorkItemService::create($conn, array(
+                'company_id' => $company_id, 'source_type' => 'SRC-10', 'source_ref' => 'CMP03-' . $newId,
+                'source_screen' => 'Portal/ceo_risk.php',
+                'owner_user_id' => $uid, 'assigned_user_id' => $uid,
+                'org_unit_id' => 1, 'project_id' => 0, 'site_id' => 0,
+                'title' => 'متابعة قرارٍ تنفيذي — ' . ((string) ($payload['رقم القرار'] ?? ('CMP03-' . $newId))),
+                'deliverable' => 'إفادةُ تنفيذ الجهة المكلَّفة: ' . (string) ($payload['الجهة المكلَّفة بالتنفيذ'] ?? ''),
+                'evidence_required' => 'ما يُثبت التنفيذ ضمن المهلة: ' . (string) ($payload['مهلة التنفيذ'] ?? ''),
+                'due_at' => date('Y-m-d H:i:s', $fu),
+                'priority' => 'P2', 'created_by' => $uid, 'parent_ref' => 'CMP03-' . $newId,
+            ));
+        } catch (\Throwable $t) { error_log('ceo_risk decision fact #' . $newId . ': ' . $t->getMessage()); }
+    }
+
     header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
     exit();
 }
