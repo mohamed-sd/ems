@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-06 14:36:16
+-- المصدر: equipation_manage · التوليد: 2026-08-06 14:53:06
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -4098,9 +4098,9 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6791,15,'DAILY',3855,NULL,'ميزانية إدارتي','Finance/budget_dept.php','fa fa-circle-dot',1,NULL,NULL,1,'2026-08-03 10:14:18','2026-08-03 10:14:18'),
 (6792,15,'DAILY',3855,NULL,'إنجاز الإدارة','Portal/dept_achievement.php','fa fa-circle-dot',2,NULL,NULL,1,'2026-08-03 10:14:18','2026-08-03 10:14:18'),
 (6793,15,'DAILY',3855,NULL,'مركز التقارير','emsreports/index.php','fa fa-circle-dot',3,NULL,NULL,1,'2026-08-03 10:14:18','2026-08-03 10:14:18'),
-(6802,12,'DAILY',3414,258,'تقويمُ الأسطول والحجز','../Operations/fleet_calendar.php','fa fa-calendar-check',5,NULL,'Operations/fleet_calendar.php',1,'2026-08-06 11:01:13','2026-08-06 11:01:13'),
-(6803,12,'DAILY',3417,259,'دفترُ الأسعار بالشرائح','../Clients/rate_books.php','fa fa-book-open',5,NULL,'Clients/rate_books.php',1,'2026-08-06 11:01:13','2026-08-06 11:01:13'),
-(6804,12,'DAILY',3426,260,'استغلالُ الأسطول ومردودُه','../Operations/fleet_utilization.php','fa fa-gauge-high',5,NULL,'Operations/fleet_utilization.php',1,'2026-08-06 11:01:13','2026-08-06 11:01:13');
+(6802,12,'DAILY',100,258,'تقويمُ الأسطول والحجز','Operations/fleet_calendar.php','fa fa-calendar-check',5,NULL,'Operations/fleet_calendar.php',1,'2026-08-06 11:01:13','2026-08-06 14:51:18'),
+(6803,12,'DAILY',280,259,'دفترُ الأسعار بالشرائح','Clients/rate_books.php','fa fa-book-open',5,NULL,'Clients/rate_books.php',1,'2026-08-06 11:01:13','2026-08-06 14:51:18'),
+(6804,12,'DAILY',100,260,'استغلالُ الأسطول ومردودُه','Operations/fleet_utilization.php','fa fa-gauge-high',5,NULL,'Operations/fleet_utilization.php',1,'2026-08-06 11:01:13','2026-08-06 14:51:18');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
