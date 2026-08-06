@@ -30,6 +30,20 @@ $us_gate = ems_tenant_db();
 require_once __DIR__ . '/../includes/permissions_helper.php';
 $us_perms = get_current_page_permissions($conn);
 
+// ════════════════════════════════════════════════════════════════════════════
+// [ح-02] منعُ تصعيد الامتياز — الطبقةُ الكوديّة.
+// كانت هذه الشاشة تعرض كلَّ الأدوار الجذرية لكل من يصلها، وتقبل أيَّ role في
+// POST بلا فحصٍ للنسب. ومع صفوفِ صلاحيةٍ مفتوحةٍ لعشرة أدوار (صُحّحت بيانيًّا
+// في هجرة 2026_08_06) كان حسابُ مبيعاتٍ يُنشئ حسابًا بدور «إدارة الصلاحيات».
+// القاعدة: «لا تمنح ما لا تملك» — دورُك وذريّتُك فقط، وأدوارُ إدارة الحسابات
+// (1 · 15) والسوبر بلا قيد. وهي القاعدةُ نفسُها المطبَّقة في project_users.php،
+// نُقلت إلى governance_guard ليشترك فيها كلُّ مسارٍ يُسنِد دورًا.
+// التقييدُ هنا مزدوج: القائمةُ المعروضة **و** الفحصُ الخادميُّ عند الحفظ —
+// فتقييدُ الواجهة وحدَه لا يكفي (يمكن تزوير الطلب).
+// ════════════════════════════════════════════════════════════════════════════
+require_once __DIR__ . '/../includes/governance_guard.php';
+$us_assignable = ems_assignable_role_ids($conn, isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '');
+
 // Endpoint محلي لجلب عقود المشروع (يُستخدم عبر Ajax من نفس الصفحة)
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
     while (ob_get_level()) {
@@ -142,6 +156,15 @@ if (empty($roles)) {
         "5" => "mine",
         "10" => "mine"
     );
+}
+
+// [ح-02] ترشيحُ القائمة المعروضة بسياسة الإسناد (null = بلا قيد للسوبر وإدارة الحسابات).
+if ($us_assignable !== null) {
+    foreach (array_keys($roles) as $us_rid) {
+        if (!in_array((string) $us_rid, $us_assignable, true)) {
+            unset($roles[$us_rid], $roles_scope[$us_rid]);
+        }
+    }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -264,6 +287,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $us_write_perm = ($uid > 0) ? 'can_edit' : 'can_add';
     if ($us_perms['id'] !== null && !$us_perms[$us_write_perm]) {
         echo "<script>alert('❌ لا توجد صلاحية لهذا الإجراء'); window.location.href='users.php';</script>";
+        exit;
+    }
+
+    // [ح-02] الفحصُ الخادميُّ لمنع التصعيد — يسبق أيَّ كتابة، ولا يعتمد على القائمة
+    // المعروضة. أيُّ دورٍ خارج (دورِك + ذريّتِك) يُرفض ويُسجَّل حدثًا أمنيًّا.
+    if (!ems_role_is_assignable($conn, isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '', $role)) {
+        ems_gov_log('ROLE_ESCALATION_BLOCKED',
+            'screen=main/users.php actor_role=' . (isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '?')
+            . ' target_role=' . $role . ' actor_uid=' . (isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0));
+        echo "<script>alert('❌ لا يمكنك إسناد دورٍ خارج نطاق دورك'); window.location.href='users.php';</script>";
         exit;
     }
 
