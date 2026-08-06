@@ -102,6 +102,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     exit();
 }
 
+/* ── القرار: الأفعال الأربعة (M-00 ④-٢ اعتماد · اعتماد بشرط · رد · تأجيل) ──
+ * القرارُ للإدارة التنفيذية وحدها (دور 9 أو السوبر) — كلُّ خيارٍ بشرط حقله:
+ * الشرطُ للمشروط، والسببُ للرد، والتاريخُ للتأجيل. الاعتمادُ (المطلق والمشروط)
+ * على صفٍّ حقيقيٍّ يُنشر حقيقتَه exec.approval.granted (نقطة حدث §11). */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'decide') {
+    $goBack = function ($m) { header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($m)); exit(); };
+    $actorRole = strval($_SESSION['user']['role'] ?? '');
+    if (!$is_super_admin && $actorRole !== '9') {
+        http_response_code(403);
+        exit('الاعتمادُ الأعلى قرارُ الإدارة التنفيذية وحدها');
+    }
+    $rowId    = intval($_POST['row'] ?? 0);
+    $decision = trim((string) ($_POST['decision'] ?? ''));
+    $reason   = trim((string) ($_POST['reason'] ?? ''));
+    $until    = trim((string) ($_POST['until'] ?? ''));
+    $OPTS = array('اعتماد' => 'معتمد', 'اعتماد بشرط' => 'معتمد بشرط', 'رد' => 'مردود', 'تأجيل' => 'مؤجل');
+    if ($rowId <= 0 || !isset($OPTS[$decision])) { $goBack('قرارٌ غير معروف ❌'); }
+    if ($decision === 'اعتماد بشرط' && $reason === '') { $goBack('الاعتمادُ المشروط يستلزم نصَّ الشرط ❌'); }
+    if ($decision === 'رد' && $reason === '') { $goBack('الردُّ يستلزم سببًا مكتوبًا ❌'); }
+    if ($decision === 'تأجيل' && $until === '') { $goBack('التأجيلُ يستلزم تاريخًا ❌'); }
+
+    $st = $conn->prepare("SELECT id, payload, status, is_seed FROM cmp03_screen_rows
+                           WHERE id = ? AND canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?'));
+    if ($is_super_admin && $company_id <= 0) { $st->bind_param('is', $rowId, $CANONICAL); }
+    else { $st->bind_param('isi', $rowId, $CANONICAL, $company_id); }
+    $st->execute();
+    $row = $st->get_result()->fetch_assoc();
+    $st->close();
+    if (!$row) { $goBack('الصفُّ غير موجودٍ في نطاقك ❌'); }
+    // القابل للقرار: الحيُّ والمؤجَّل (يُعاد بتُّه) — والمقرَّر لا يُقرَّر ثانية
+    if (!in_array((string) $row['status'], array('مسودة', 'قيد المراجعة', 'مؤجل'), true)) {
+        $goBack('الصفُّ مقرَّرٌ سلفًا (' . $row['status'] . ') — لا قرارَ على قرار ❌');
+    }
+
+    $payload = json_decode((string) $row['payload'], true) ?: array();
+    $actorName = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
+    $payload['قراري'] = $decision;
+    $payload['سبب القرار'] = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتمادٌ مطلق' : $payload['سبب القرار'] ?? '');
+    if ($decision === 'تأجيل') { $payload['سبب القرار'] = trim('مؤجل إلى ' . $until . ($reason !== '' ? ' — ' . $reason : '')); }
+    $payload['تاريخ القرار'] = date('Y-m-d');
+    $payload['المعتمِد — الاسم والصفة'] = $actorName . ' (الإدارة التنفيذية)';
+    if (($payload['مرجع التفويض'] ?? '') === '') { $payload['مرجع التفويض'] = 'سلطة أصلية'; }
+    $newStatus = $OPTS[$decision];
+
+    $st = $conn->prepare("UPDATE cmp03_screen_rows SET payload = ?, status = ? WHERE id = ?");
+    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+    $st->bind_param('ssi', $json, $newStatus, $rowId);
+    $ok = $st->execute();
+    $st->close();
+    if (!$ok) { $goBack('تعذر حفظ القرار ❌'); }
+    if (function_exists('log_security_event')) {
+        log_security_event('CEO_APPROVAL_DECIDED', 'CMP03-' . $rowId . ' → ' . $decision);
+    }
+
+    // §11 ExecApproved: الاعتمادُ الفعلي (مطلقًا أو بشرط) على صفٍّ حقيقيٍّ حقيقةٌ تُنشر
+    if ((int) $row['is_seed'] === 0 && in_array($decision, array('اعتماد', 'اعتماد بشرط'), true)) {
+        try {
+            require_once dirname(__DIR__) . '/app/Core/EventPublisher.php';
+            \App\Core\EventPublisher::publishFact($conn, array(
+                'event_key'       => 'exec.approval.granted',
+                'category'        => 'operational',
+                'source_module'   => 'system',
+                'company_id'      => $company_id,
+                'entity_type'     => 'exec_approval',
+                'entity_id'       => $rowId,
+                'occurred_at'     => gmdate('Y-m-d H:i:s'),
+                'created_by'      => $uid ?: 1,
+                'idempotency_key' => 'exec_approval:CMP03-' . $rowId,
+                'notes'           => 'اعتمادٌ أعلى: ' . mb_substr((string) ($payload['المستند'] ?? ($payload['رقم الطلب'] ?? '')), 0, 120),
+                'payload'         => array(
+                    'approval_ref' => 'CMP03-' . $rowId,
+                    'request_no'   => (string) ($payload['رقم الطلب'] ?? ''),
+                    'document'     => (string) ($payload['المستند'] ?? ''),
+                    'department'   => (string) ($payload['الإدارة الطالبة'] ?? ''),
+                    'amount'       => (string) ($payload['القيمة'] ?? ''),
+                    'currency'     => (string) ($payload['العملة'] ?? ''),
+                    'decision'     => $decision,
+                    'condition'    => ($decision === 'اعتماد بشرط') ? $reason : '',
+                    'approved_by'  => $uid,
+                ),
+            ));
+        } catch (\Throwable $t) { error_log('ceo_approvals fact #' . $rowId . ': ' . $t->getMessage()); }
+    }
+    $goBack('قُيّد القرار: ' . $decision . ' ✅');
+}
+
 /* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
 $rows = array();
 $sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
@@ -214,6 +300,49 @@ include '../insidebar.php';
         </div></div>
     </form>
 
+    <?php
+    // لوحة القرار الرباعي (M-00 ④-٢) — للإدارة التنفيذية وحدها وعلى القابل للبت
+    $decidable = array();
+    foreach ($rows as $r) {
+        if (in_array((string) $r['status'], array('مسودة', 'قيد المراجعة', 'مؤجل'), true)) { $decidable[] = $r; }
+    }
+    $canDecide = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
+    if ($canDecide && $decidable): ?>
+    <form method="post" action="" class="allforms allforms-visible" id="cmp03DecideForm">
+        <input type="hidden" name="cmp03_action" value="decide">
+        <div class="card"><div class="card-header">
+            <h5><i class="fa fa-gavel"></i> قرار الاعتماد الأعلى — الخيارات الأربعة</h5>
+        </div><div class="card-body">
+            <div class="form-section"><div class="form-grid">
+                <div class="form-group"><label>الصف المعروض للبت</label>
+                    <select name="row" required>
+                        <?php foreach ($decidable as $d):
+                            $lbl = 'CMP03-' . intval($d['id'])
+                                 . ' — ' . (string) ($d['payload']['رقم الطلب'] ?? '؟')
+                                 . ' · ' . (string) ($d['payload']['المستند'] ?? ($d['payload']['نوع المستند'] ?? '—'))
+                                 . ' (' . (string) $d['status'] . ')'; ?>
+                        <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($lbl, ENT_QUOTES, 'UTF-8'); ?></option>
+                        <?php endforeach; ?>
+                    </select></div>
+                <div class="form-group"><label>قراري</label>
+                    <select name="decision" id="cmp03DecisionSel" required>
+                        <option value="اعتماد">اعتماد</option>
+                        <option value="اعتماد بشرط">اعتماد بشرط</option>
+                        <option value="رد">رد</option>
+                        <option value="تأجيل">تأجيل</option>
+                    </select></div>
+                <div class="form-group" id="cmp03ReasonWrap"><label id="cmp03ReasonLbl">سبب القرار (إلزامي للمشروط والرد)</label>
+                    <input type="text" name="reason" maxlength="300" placeholder="الشرط أو السبب"></div>
+                <div class="form-group" id="cmp03UntilWrap" style="display:none"><label>مؤجل إلى (إلزامي للتأجيل)</label>
+                    <input type="date" name="until"></div>
+            </div></div>
+            <div style="margin-top:12px;display:flex;gap:10px">
+                <button type="submit" class="btn-save"><i class="fa fa-stamp"></i> قيد القرار</button>
+            </div>
+        </div></div>
+    </form>
+    <?php endif; ?>
+
     <div class="card"><div class="card-body">
         <div class="table-responsive">
         <table class="alltables display" id="ceo_approvalsTable">
@@ -271,6 +400,26 @@ include '../insidebar.php';
     }
     if (cancel && form) {
         cancel.addEventListener('click', function () { form.classList.remove('allforms-visible'); });
+    }
+    // لوحة القرار: إظهار حقل الخيار المختار (شرط/سبب أم تاريخ التأجيل)
+    var sel = document.getElementById('cmp03DecisionSel');
+    var rw = document.getElementById('cmp03ReasonWrap');
+    var rl = document.getElementById('cmp03ReasonLbl');
+    var uw = document.getElementById('cmp03UntilWrap');
+    if (sel && rw && uw) {
+        var sync = function () {
+            var v = sel.value;
+            uw.style.display = (v === 'تأجيل') ? '' : 'none';
+            rw.style.display = '';
+            if (rl) {
+                rl.textContent = (v === 'اعتماد بشرط') ? 'نص الشرط (إلزامي)'
+                    : (v === 'رد') ? 'سبب الرد (إلزامي)'
+                    : (v === 'تأجيل') ? 'ملاحظة التأجيل (اختياري)'
+                    : 'سبب القرار (اختياري للاعتماد المطلق)';
+            }
+        };
+        sel.addEventListener('change', sync);
+        sync();
     }
 })();
 </script>
