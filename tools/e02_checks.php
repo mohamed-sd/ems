@@ -42,7 +42,9 @@ $r = mysqli_query($conn,
        FROM unit_entries ue
        JOIN unit_time_log l ON l.entry_id = ue.id
       WHERE ue.state IN ('parties_approved','sales_approved')
-        AND ue.updated_at >= '{$CUTOFF}'
+        /* المرساة created_at لا updated_at: أي لمسة بيانات (كجسر sync_uuid)
+           تحدّث updated_at فتُدخل الموروثَ كذبًا في نافذة الفحص */
+        AND ue.created_at >= '{$CUTOFF}'
         AND NOT " . ems_uc_prechain_sql('ue') . "
         AND l.decided_at IS NULL
         AND (l.objection_state IS NULL OR l.objection_state='none')");
@@ -66,6 +68,40 @@ $mirrorMiss = ($r && ($x = mysqli_fetch_assoc($r))) ? (int) $x['n'] : 0;
 $ok4 = ($mirrorMiss === 0);
 if (!$ok4) { $fail++; }
 echo ($ok4 ? '✔' : '✘') . " ④ اعتمادٌ حيٌّ بعد العتبة بلا مرآةِ سلسلة : {$mirrorMiss}\n";
+
+/* ⑤ ذرّية الختم والمال: سلسلةٌ مختومةٌ عبر المحرّك بلا أثرٍ ماليٍّ يقابلها
+   (converted_at مملوء = ختمُ المحرّك؛ الموروثُ NULL خارجُ الفحص بنيويًّا) */
+$r = mysqli_query($conn,
+    "SELECT COUNT(*) n
+       FROM unit_entries ue
+      WHERE ue.state = 'converted' AND ue.converted_at IS NOT NULL
+        AND ue.sync_uuid LIKE 'ts:%'
+        AND NOT EXISTS (
+            SELECT 1 FROM fin_event_links l
+             WHERE l.parent_kind = 'timesheet'
+               AND l.parent_ref = CAST(SUBSTRING(ue.sync_uuid, 4) AS UNSIGNED)
+               AND l.effect_type IN ('revenue_event','supplier_due','cost_record'))");
+$sealNoMoney = ($r && ($x = mysqli_fetch_assoc($r))) ? (int) $x['n'] : 0;
+$ok5 = ($sealNoMoney === 0);
+if (!$ok5) { $fail++; }
+echo ($ok5 ? '✔' : '✘') . " ⑤ ختمٌ عبر المحرّك بلا أثرٍ مالي : {$sealNoMoney}\n";
+
+/* ⑥ انحراف السكّتين: أثرٌ ماليٌّ قائمٌ والسلسلةُ ما تزال sales_approved —
+   المالُ وُلد ولم تُختم حلقتُه (يشفيه الكنسُ تبنّيًا) */
+$r = mysqli_query($conn,
+    "SELECT COUNT(*) n
+       FROM unit_entries ue
+      WHERE ue.state = 'sales_approved'
+        AND ue.sync_uuid LIKE 'ts:%'
+        AND EXISTS (
+            SELECT 1 FROM fin_event_links l
+             WHERE l.parent_kind = 'timesheet'
+               AND l.parent_ref = CAST(SUBSTRING(ue.sync_uuid, 4) AS UNSIGNED)
+               AND l.effect_type IN ('revenue_event','supplier_due','cost_record'))");
+$moneyNoSeal = ($r && ($x = mysqli_fetch_assoc($r))) ? (int) $x['n'] : 0;
+$ok6 = ($moneyNoSeal === 0);
+if (!$ok6) { $fail++; }
+echo ($ok6 ? '✔' : '✘') . " ⑥ أثرٌ ماليٌّ وسلسلتُه بلا ختم : {$moneyNoSeal}\n";
 
 /* ② علم الحارس */
 $flag = function_exists('ems_env') ? (string) ems_env('EMS_E02_HOURS_GUARD', 'enforce') : 'enforce';

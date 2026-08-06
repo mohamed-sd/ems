@@ -1102,49 +1102,55 @@ if (!function_exists('fin_conversion_queue')) {
      */
     function fin_conversion_queue($conn, $is_super, $filters = array())
     {
+        // ═══ E-01×E-02 (قرار المالك 2026-08-05): الطابور يتغذى من **السلسلة** ═══
+        // «السلسلة هي المسار وtimesheet مرآة»: الأهلية = state='sales_approved'
+        // في unit_entries لا اكتمال timesheet_approvals. المرآة تبقى للتسعير
+        // التعاقدي وأعمدة العرض، والجسر sync_uuid='ts:{id}'. الصف بلا جسرٍ
+        // يظهر معلَنًا (id فارغ · متعذّر) — فطابورٌ يُخفي الدَّينَ أخطرُ من طوله.
         $where = array(); $params = array();
-        if (!empty($filters['project_id'])) { $where[] = 't_op.project_id = ?'; $params[] = intval($filters['project_id']); }
-        if (!empty($filters['period']))     { $where[] = "DATE_FORMAT(t.`date`, '%Y-%m') = ?"; $params[] = strval($filters['period']); }
+        if (!empty($filters['project_id'])) { $where[] = 'ue.project_id = ?'; $params[] = intval($filters['project_id']); }
+        if (!empty($filters['period']))     { $where[] = "DATE_FORMAT(ue.entry_date, '%Y-%m') = ?"; $params[] = strval($filters['period']); }
         // فحصُ أهليةِ يومٍ بعينه: نفس شروط الطابور بلا استثناء — فالتحويل يمرّ
         // بالبوابة نفسها التي بنت العرض (لا مسارَ جانبيٍّ يثق بمعرّفٍ مُرسَل).
         if (!empty($filters['only_id']))    { $where[] = 't.id = ?'; $params[] = intval($filters['only_id']); }
         $extra = $where ? (' AND ' . implode(' AND ', $where)) : '';
         $limit = isset($filters['limit']) ? max(1, intval($filters['limit'])) : 200;
 
-        $sql = "SELECT t.id, t.`date` AS work_date, t.executed_hours, t.tons_count, t.meters_count,
-                       t.operator_hours, t_op.project_id, t_op.equipment AS equipment_id,
+        // ⚠️ الجسر يُحل رقميًّا (CAST) لا نصيًّا — خلطُ الترتيبين general/unicode
+        //    على sync_uuid يفجّر Illegal mix of collations.
+        $sql = "SELECT t.id, ue.id AS ue_id, ue.entry_no, ue.entry_date AS work_date,
+                       t.executed_hours, t.tons_count, t.meters_count,
+                       t.operator_hours, ue.project_id, ue.equipment_id,
                        p.name AS project_name, e.name AS equipment_name, e.code AS equipment_code,
                        ta.approved_at, ta.approved_by, ta.approved_by_name
-                  FROM timesheet t
-                  JOIN timesheet_approvals ta
-                       ON ta.timesheet_id = t.id AND ta.approval_level = " . FIN_UNIT_FINAL_LEVEL . "
-                      AND ta.status = 1
-                  LEFT JOIN operations t_op ON t_op.id = t.operator
-                  LEFT JOIN project p ON p.id = t_op.project_id
-                  LEFT JOIN equipments e ON e.id = t_op.equipment
+                  FROM unit_entries ue
+                  LEFT JOIN timesheet t
+                         ON ue.sync_uuid LIKE 'ts:%'
+                        AND t.id = CAST(SUBSTRING(ue.sync_uuid, 4) AS UNSIGNED)
+                  LEFT JOIN timesheet_approvals ta
+                         ON ta.timesheet_id = t.id AND ta.approval_level = " . FIN_UNIT_FINAL_LEVEL . "
+                        AND ta.status = 1
+                  LEFT JOIN project p ON p.id = ue.project_id
+                  LEFT JOIN equipments e ON e.id = ue.equipment_id
                  WHERE {TENANT_SCOPE}
-                   AND COALESCE(t.status, 1) = 1
-                   -- ⚠️ التصفية بنوع الأثر إلزامية: «محوَّلٌ ماليًّا» لا «له رابطٌ ما».
-                   -- حكم الطرف (party_award) قرارٌ تعاقديٌّ قبل المالية — وجودُه لا
-                   -- يعني التحويل، فلا يُخرج الصفَّ من طابور التحويل (D02 §3.7).
-                   AND NOT EXISTS (SELECT 1 FROM fin_event_links l
-                                    WHERE l.parent_kind = 'timesheet' AND l.parent_ref = t.id
-                                      AND l.effect_type IN ('revenue_event','supplier_due','cost_record'))
+                   -- التحويل على السكّة = **حالة السلسلة** لا روابط المال: صفٌّ
+                   -- sales_approved له مالٌ سابق (انحراف سكّتين) يبقى في الطابور
+                   -- ليُتبنّى ويُختم — والخدمة لا تكرر مالًا (عطالة fin_event_links).
+                   AND ue.state = 'sales_approved'
                        " . $extra . "
-                 ORDER BY t.`date` ASC, t.id ASC
+                 ORDER BY ue.entry_date ASC, ue.id ASC
                  LIMIT " . $limit;
 
         try {
             // ⚠️ عقدا البوابة في scopedQuery:
             //   ① كل جدولٍ مستأجرٍ يظهر في FROM/JOIN يجب إعلانه — بما فيه ما
             //      داخل الاستعلامات الفرعية (fin_event_links في NOT EXISTS).
-            //   ② جداول الإثراء تُربط LEFT JOIN حصرًا؛ فجدول الاعتمادات مربوطٌ
-            //      INNER (شرطُ وجودٍ لا إثراء) ⇒ موضعه النطاق، وبه يُعزل بشركته
-            //      أيضًا — عزلٌ أقوى لا التفافٌ عليه.
+            //   ② جداول الإثراء تُربط LEFT JOIN حصرًا — والنطاق هنا السلسلة
+            //      وحدَها (هي مصدرُ الحقيقة)، والمرآةُ والاعتماداتُ إثراءُ عرض.
             return fin_gate($is_super)->scopedQuery(
-                array('scope' => array('t' => 'timesheet', 'ta' => 'timesheet_approvals'),
-                      'enrich' => array('t_op' => 'operations', 'p' => 'project',
-                                        'e' => 'equipments', 'l' => 'fin_event_links')),
+                array('scope' => array('ue' => 'unit_entries'),
+                      'enrich' => array('t' => 'timesheet', 'ta' => 'timesheet_approvals',
+                                        'p' => 'project', 'e' => 'equipments')),
                 $sql, $params);
         } catch (\Throwable $x) {
             // ⚠️ فشلُ الطابور يُعلَن ولا يُبتلع: طابورٌ فارغٌ كذبًا يعني «لا شيء
@@ -1171,6 +1177,13 @@ if (!function_exists('fin_queue_pricing')) {
         $out = array();
         foreach ($rows as $r) {
             $id = intval($r['id']);
+            if ($id <= 0) {
+                // صفُّ سلسلةٍ بلا جسرِ دوامٍ — دَينٌ معلَنٌ لا صفٌّ مُسقَط
+                $out[0] = array('ready' => false,
+                    'reason' => 'بلا جسرِ سجلِّ دوام — شغّل tools/e02_bridge_backfill.php ثم أعد التحميل',
+                    'qty' => null, 'unit' => null, 'revenue' => null, 'due' => null);
+                continue;
+            }
             try { $ctx = \App\Services\EffectFanout::resolveTimesheet($conn, $id); }
             catch (\Throwable $x) { $ctx = null; }
             if ($ctx === null) {

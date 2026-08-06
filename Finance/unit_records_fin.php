@@ -62,27 +62,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
     $ids = array_slice(array_unique($ids), 0, 500); // سقفٌ معلَنٌ للدفعة الواحدة
     if (!$ids) { header("Location: unit_records_fin.php?msg=لم+تحدّد+أي+يوم+للاعتماد+❌"); exit(); }
 
-    require_once __DIR__ . '/../app/Services/EffectFanout.php';
-    $okCount = 0; $effCount = 0; $failed = array();
+    require_once __DIR__ . '/../app/Services/Finance/UnitConversionService.php';
+    $okCount = 0; $effCount = 0; $failed = array(); $eligibleIds = array();
     foreach ($ids as $tsId) {
-        // ① أهليةٌ خادمية: اليوم ضمن نطاق الشركة ومكتمل الاعتماد وغير محوَّل —
+        // ① أهليةٌ خادمية: اليوم ضمن نطاق الشركة وعلى السلسلة sales_approved —
         //    لا يُحوَّل يومٌ بمجرد إرسال معرّفه (الطابور عرضٌ لا تفويض).
         $eligible = fin_conversion_queue($conn, $is_super_admin, array('limit' => 1, 'only_id' => $tsId));
-        if (!$eligible) { $failed[] = 'TS-' . $tsId . ': غير مؤهّلٍ للتحويل (غير مكتمل الاعتماد أو محوَّلٌ سلفًا)'; continue; }
-        try {
-            $res = null;
-            ems_tenant_db()->runInTransaction(function ($g) use (&$res, $conn, $tsId, $current_user_id) {
-                $res = \App\Services\EffectFanout::forTimesheetId($conn, $g, $tsId, $current_user_id);
-            }, 'finance unit conversion ' . $tsId);
-            $n = $res ? count($res['effects']) : 0;
-            if ($n > 0) { $okCount++; $effCount += $n; }
-            else {
-                $why = ($res && !empty($res['skipped'])) ? $res['skipped'][0]['reason'] : 'لا أثرَ قابلٌ للتوليد';
-                $failed[] = 'TS-' . $tsId . ': ' . $why;
-            }
-        } catch (\Throwable $e) {
-            error_log('unit conversion ' . $tsId . ': ' . $e->getMessage());
-            $failed[] = 'TS-' . $tsId . ': ' . $e->getMessage();
+        if (!$eligible) { $failed[] = 'TS-' . $tsId . ': غير مؤهّلٍ للتحويل (ليس sales_approved على السلسلة أو محوَّلٌ سلفًا)'; continue; }
+        $eligibleIds[] = $tsId;
+    }
+    // ② الخدمة الواحدة (E-01 §6-1): المروحة + ختم السلسلة ذرّيًّا لكل يوم
+    if ($eligibleIds) {
+        $batch = \App\Services\Finance\UnitConversionService::convertBatch($conn, $eligibleIds, $current_user_id);
+        $okCount = $batch['converted'];
+        $effCount = $batch['effects'];
+        foreach ($batch['failed'] as $f) { $failed[] = $f; }
+        foreach ($batch['rows'] as $bTs => $bRes) {
+            if ($bRes['ok'] && !$bRes['converted']) { $failed[] = 'TS-' . $bTs . ': ' . $bRes['reason']; }
         }
     }
 
@@ -194,7 +190,9 @@ include '../insidebar.php';
                             <?php else: ?><span title="غير قابلٍ للتحويل">—</span><?php endif; ?></td>
                             <?php endif; ?>
                             <td><?php echo htmlspecialchars((string) $row['work_date']); ?></td>
-                            <td><code>TS-<?php echo $tid; ?></code></td>
+                            <td><code><?php echo htmlspecialchars((string) ($row['entry_no'] ?? '')); ?></code>
+                                <?php if ($tid > 0): ?><small class="text-muted">TS-<?php echo $tid; ?></small>
+                                <?php else: ?><span class="badge bg-danger" title="صفُّ سلسلةٍ بلا مرآة دوام">بلا جسر</span><?php endif; ?></td>
                             <td><?php echo htmlspecialchars((string) ($row['project_name'] ?? '—')); ?></td>
                             <td><?php echo htmlspecialchars((string) ($row['equipment_name'] ?? '—')); ?></td>
                             <td><?php echo $pr['qty'] !== null ? number_format((float) $pr['qty'], 2) . ' ' . fin_unit_label_ar($pr['unit']) : '—'; ?></td>
