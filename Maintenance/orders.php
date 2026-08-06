@@ -270,6 +270,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
 
     mnt_recalc_order_totals($conn, $oid, $company_id);
 
+    // ═══ WFM — ورقة الصيانة فوق المحرّك (فشلُه لا يُسقط حفظَ الأمر) ═══
+    // SRC-03: إسنادُ فنيٍّ جديدٍ لأمرٍ نشطٍ = مرحلةٌ لصاحبها ⇒ مهمةُ معالجةٍ
+    // بمهلة أولويته. والإقفالُ الناجح يشتق الإنجازَ (الورقة 11: «أمرُ عملٍ
+    // أُقفل» — الفنيُّ تنفيذيًّا والمشرفُ قرارًا · الدليلُ نتيجةُ الفحص)
+    // ويُقفل مهامَّ الأمر المفتوحةَ بقبول النظام.
+    try {
+        require_once dirname(__DIR__) . '/app/Services/Work/WorkItemService.php';
+        require_once dirname(__DIR__) . '/app/Services/Work/AchievementService.php';
+        $techChanged = ($technician_id !== null && intval($order['technician_id'] ?? 0) !== $technician_id);
+        if ($techChanged && in_array($effective_state, $active_states, true)) {
+            $dupe = $conn->query("SELECT id FROM work_items WHERE source_type='SRC-03'
+                                   AND parent_ref='MNT-" . intval($oid) . "' AND assigned_user_id=" . intval($technician_id) . "
+                                   AND status NOT IN ('closed_accepted','cancelled') LIMIT 1");
+            if (!($dupe && $dupe->fetch_assoc())) {
+                $slaH = ($priority === 'عالية' || $priority === 'طارئة') ? 24 : 72;
+                \App\Services\Work\WorkItemService::create($conn, array(
+                    'company_id' => $company_id, 'source_type' => 'SRC-03',
+                    'source_ref' => 'MNT-' . intval($oid),
+                    'source_screen' => 'Maintenance/orders.php',
+                    'owner_user_id' => intval($supervisor_id ?: $current_user_id),
+                    'assigned_user_id' => intval($technician_id),
+                    'verifier_user_id' => intval($supervisor_id) ?: null,
+                    'org_unit_id' => 1, 'project_id' => intval($project_id ?: 0),
+                    'title' => 'تنفيذ أمر الصيانة #' . intval($oid) . ' — ' . ($maint_type ?: 'صيانة'),
+                    'deliverable' => 'إقفال الأمر بفحصٍ «ناجح» وسببٍ جذريٍّ وإجراءات',
+                    'evidence_required' => 'نتيجة الفحص النهائي على الأمر',
+                    'priority' => ($priority === 'طارئة') ? 'P1' : (($priority === 'عالية') ? 'P2' : 'P3'),
+                    'due_at' => date('Y-m-d H:i:s', time() + $slaH * 3600),
+                    'created_by' => intval($current_user_id ?: 0), 'parent_ref' => 'MNT-' . intval($oid),
+                ));
+            }
+        }
+        if ($closing_now) {
+            $evd = 'إقفال MNT-' . intval($oid) . ' — فحص «ناجح» · السبب الجذري موثَّق';
+            if (intval($technician_id ?: 0) > 0) {
+                \App\Services\Work\AchievementService::derive($conn, array(
+                    'company_id' => $company_id, 'source_kind' => 'work_order',
+                    'source_ref' => 'MNT-' . intval($oid), 'person_user_id' => intval($technician_id),
+                    'attribution' => 'executive', 'title' => 'إقفال أمر صيانة #' . intval($oid),
+                    'evidence_ref' => $evd, 'created_by' => intval($current_user_id ?: 0)));
+            }
+            if (intval($supervisor_id ?: 0) > 0 && intval($supervisor_id) !== intval($technician_id ?: 0)) {
+                \App\Services\Work\AchievementService::derive($conn, array(
+                    'company_id' => $company_id, 'source_kind' => 'work_order',
+                    'source_ref' => 'MNT-' . intval($oid), 'person_user_id' => intval($supervisor_id),
+                    'attribution' => 'decision', 'title' => 'اعتماد إقفال أمر صيانة #' . intval($oid),
+                    'evidence_ref' => $evd, 'created_by' => intval($current_user_id ?: 0)));
+            }
+            $conn->query("UPDATE work_items
+                             SET status='closed_accepted', closed_at=NOW(), approved_at=NOW(),
+                                 approved_by=" . intval($current_user_id ?: 0) . ",
+                                 evidence_ref='" . $conn->real_escape_string(mb_substr($evd, 0, 200)) . "',
+                                 status_reason='أُقفل الأمرُ المصدرُ بفحصٍ ناجح'
+                           WHERE parent_ref='MNT-" . intval($oid) . "' AND source_type='SRC-03'
+                             AND status NOT IN ('closed_accepted','cancelled')");
+        }
+    } catch (\Throwable $wfmX) { error_log('WFM mnt hook ' . $oid . ': ' . $wfmX->getMessage()); }
+
     // عند تغيير معدة الأمر: أعد المعدة القديمة «سليمة» و«متاحة» حتى لا تبقى معطلة بلا أمر
     $old_equipment_id = intval($order['equipment_id'] ?? 0);
     if ($old_equipment_id > 0 && $old_equipment_id !== intval($equipment_id)) {
