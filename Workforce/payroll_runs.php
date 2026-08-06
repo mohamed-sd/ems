@@ -162,6 +162,9 @@ foreach ($lines as $l) {
 $page_title = 'إيكوبيشن | مسيّر الرواتب';
 include '../inheader.php';
 include '../insidebar.php';
+// M-14 BR-GOV-07: المسيّر رواتبُ الناس — القراءةُ تُسجَّل كما تُسجَّل الكتابة
+require_once __DIR__ . '/../includes/sensitive_read_log.php';
+ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected) : 'screen:list', 'Workforce/payroll_runs.php');
 ?>
 <div class="main ems-unified-page-shell">
     <?php

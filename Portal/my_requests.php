@@ -92,6 +92,30 @@ $STATE_AR = array('draft' => 'مسودة', 'submitted' => 'مرفوع', 'routed'
     'approved' => 'معتمد', 'rejected' => 'مرفوضة', 'executing' => 'قيد التنفيذ', 'executed' => 'مكتملة',
     'closed' => 'مقفل', 'returned' => 'معادة', 'cancelled' => 'ملغاة');
 
+/* «لماذا أرى هذا؟» للطلب — السلسلة الخماسية نفسها (AC-WFM-13) */
+$explainRq = null;
+if (isset($_GET['explain'])) {
+    $exq = null;
+    foreach (array_merge($mineRows, $inboxRows) as $q0) {
+        if (intval($q0['id']) === intval($_GET['explain'])) { $exq = $q0; break; }
+    }
+    if ($exq) {
+        $isRequester = intval($exq['requester_user_id']) === $uid;
+        $isHolder = intval($exq['current_holder_user_id']) === $uid;
+        $explainRq = array('complete' => ($isRequester || $isHolder), 'steps' => array(
+            array('q' => 'ما أصلُ هذا العنصر؟', 'ok' => true,
+                  'a' => 'طلبٌ من قاموس الأنواع (' . $exq['request_type_code'] . ' · ' . $exq['type_name'] . ') — الورقة 04'),
+            array('q' => 'بأي قاعدةٍ وُجِّه؟', 'ok' => true,
+                  'a' => 'قاعدةُ القاموس: يستقبله وتعتمده سلسلتُه المعرَّفة — لا اجتهاد (WF-07)'),
+            array('q' => 'بأي صفةٍ أراه؟', 'ok' => ($isRequester || $isHolder),
+                  'a' => $isRequester ? 'أنت مقدِّمُه — تتابع أين توقف' : ($isHolder ? 'أنت حاملُه الحالي — القرارُ أو التنفيذُ عندك' : 'لستَ طرفَه — يُحجب')),
+            array('q' => 'ما نطاقي فيه؟', 'ok' => true,
+                  'a' => 'كيانُك وسياقُ الطلب (إدارة/مشروع) — والعزلُ محقونٌ بنيويًّا'),
+            array('q' => 'أصالةً أم تفويضًا؟', 'ok' => true, 'a' => 'أصالةً بصفتك المذكورة'),
+        ));
+    }
+}
+
 $page_title = 'إيكوبيشن | طلباتي';
 include '../inheader.php';
 include '../insidebar.php';
@@ -108,6 +132,19 @@ include '../insidebar.php';
 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>'; }
     ?>
+
+    <?php if ($explainRq): ?>
+    <div class="card" style="margin-bottom:12px;border-right:4px solid #6c5ce7;">
+        <div class="card-header"><strong><i class="fas fa-circle-question"></i> لماذا يظهر لي هذا الطلب؟</strong>
+            <a class="btn btn-sm btn-outline-secondary" style="float:left" href="my_requests.php">إغلاق</a></div>
+        <div class="card-body">
+            <?php foreach ($explainRq['steps'] as $i => $s): ?>
+                <div style="margin:4px 0"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
+                    <strong><?php echo htmlspecialchars($s['q']); ?></strong> — <?php echo htmlspecialchars($s['a']); ?></div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="card" style="margin-bottom:12px;">
         <div class="card-header"><strong><i class="fas fa-plus-circle"></i> تقديم طلب — من القاموس الحاكم (<?php echo count($types); ?> نوعًا)</strong></div>
@@ -185,7 +222,9 @@ include '../insidebar.php';
                 <th>عند مَن الآن</th><th>القرار والرد</th><th>إجراء</th></tr></thead>
             <tbody><?php foreach ($mineRows as $q): $id = intval($q['id']); ?>
             <tr>
-                <td><code><?php echo htmlspecialchars((string) $q['request_no']); ?></code></td>
+                <td><code><?php echo htmlspecialchars((string) $q['request_no']); ?></code><br>
+                    <a href="my_requests.php?explain=<?php echo $id; ?>" style="font-size:.78rem"
+                       title="السلسلة الخماسية"><i class="fas fa-circle-question"></i> لماذا؟</a></td>
                 <td><?php echo htmlspecialchars((string) $q['type_name']); ?></td>
                 <td style="white-space:normal;max-width:240px"><?php echo htmlspecialchars((string) $q['title']); ?></td>
                 <td><?php echo htmlspecialchars((string) $q['submitted_at']); ?></td>
