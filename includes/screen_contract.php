@@ -105,3 +105,48 @@ if (!function_exists('ems_state_offline_bar')) {
            . 'document.getElementById("emsOfflineBar").style.display="none"});</script>';
     }
 }
+
+if (!function_exists('ems_screen_about_auto')) {
+    /**
+     * «ما هذه الشاشة؟» مشتقًّا آليًّا (E-03 · الاكتساح) — من سجل الشاشة نفسه:
+     * اسمُ الموديول + موضعُها في قائمة الدور (المرحلة/المجموعة). الشاشاتُ ذات
+     * السطر المصوغ يدويًّا لا تستدعي هذا — اليدويُّ أبلغ حيث وُجد.
+     */
+    function ems_screen_about_auto($conn)
+    {
+        $script = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+        $rel = ltrim(preg_replace('~^.*?/ems/~', '', strtr($script, chr(92), '/')), '/');
+        if ($rel === '') { return; }
+        $name = ''; $place = '';
+        try {
+            $st = $conn->prepare("SELECT id, name FROM modules WHERE code = ? OR code LIKE ?
+                                   ORDER BY (code = ?) DESC, CHAR_LENGTH(code) ASC LIMIT 1");
+            $tail = '%/' . basename($rel);
+            $st->bind_param('sss', $rel, $tail, $rel);
+            $st->execute();
+            $m = $st->get_result()->fetch_assoc();
+            $st->close();
+            if ($m) { $name = (string) $m['name']; }
+            $role = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+            if ($role > 0) {
+                $st = $conn->prepare("SELECT lg.stage_title, lg.name gname FROM nav_items ni
+                                       JOIN link_groups lg ON lg.id = ni.group_id
+                                      WHERE ni.role_id = ? AND ni.route = ? AND ni.active = 1 LIMIT 1");
+                $st->bind_param('is', $role, $rel);
+                $st->execute();
+                $g = $st->get_result()->fetch_assoc();
+                $st->close();
+                if ($g) {
+                    $place = trim((string) $g['stage_title']);
+                    if ((string) $g['gname'] !== '' && (string) $g['gname'] !== $place) {
+                        $place .= ($place !== '' ? ' ← ' : '') . $g['gname'];
+                    }
+                }
+            }
+        } catch (\Throwable $t) { /* السطر إرشاد — لا يُسقط الشاشة */ }
+        if ($name === '') { $name = basename($rel, '.php'); }
+        $purpose = 'شاشة «' . $name . '»' . ($place !== '' ? ' — ضمن ' . $place . ' في قائمتك' : '')
+                 . '. البياناتُ فيها تخضع لعزل شركتك وصلاحياتِ دورك.';
+        ems_screen_about($purpose);
+    }
+}
