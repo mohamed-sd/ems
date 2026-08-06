@@ -167,6 +167,9 @@ function rpt_head($n, $title, $who, $cadence, $src)
     $header_actions = array();
     $header_back = false;
     include '../includes/page_header.php';
+    require_once __DIR__ . '/../includes/screen_contract.php';
+    ems_screen_about('تقارير الحوكمة التسعة بدورياتها من مصادرها الحية — أقرأ ما مُنع وما استُثني ومن اطّلع على الحساس.');
+
     ?>
     <p class="text-muted"><i class="fas fa-circle-info"></i> M-14 §12 نصًّا — قراءةٌ خالصةٌ من المصادر الحية،
         وما مصدرُه المخزنُ البينيُّ معلَّمٌ حتى اللحاق. «لا يُنشر مؤشرٌ لا يُتتبَّع إلى مصدره».</p>

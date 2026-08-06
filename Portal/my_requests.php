@@ -103,6 +103,9 @@ include '../insidebar.php';
     $header_actions = array();
     $header_back = false;
     include '../includes/page_header.php';
+    require_once __DIR__ . '/../includes/screen_contract.php';
+    ems_screen_about('أقدّم طلبًا من القاموس الحاكم وأتابع أين توقف — والمعالجةُ قرارٌ ثم تنفيذٌ بالرد التسعة لا تغييرُ حالة.');
+
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>'; }
     ?>
 

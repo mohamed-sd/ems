@@ -136,6 +136,9 @@ include '../insidebar.php';
     $header_actions = array(); // WF-01: لا إنشاءَ من مساحة عملي
     $header_back = false;
     include '../includes/page_header.php';
+    require_once __DIR__ . '/../includes/screen_contract.php';
+    ems_screen_about('كلُّ ما ينتظر تنفيذي أنا — بعروضه العشرة، وكلُّ عنصرٍ يرجع لأصله بضغطةٍ ويشرح «لماذا أراه» بسلسلته الخماسية.');
+
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }

@@ -117,6 +117,9 @@ include '../insidebar.php';
     $header_actions = array();
     $header_back = false;
     include '../includes/page_header.php';
+    require_once __DIR__ . '/../includes/screen_contract.php';
+    ems_screen_about('صندوقٌ واحدٌ لكل ما ينتظر قراري من كل المنابع — وكلُّ سطرٍ يقفز لموضع الفعل بحارسه.');
+
     ?>
     <div class="card"><div class="card-body">
         <p class="text-muted" style="margin:0 0 10px">

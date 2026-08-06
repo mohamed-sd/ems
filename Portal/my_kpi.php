@@ -100,6 +100,9 @@ function kpi_card($label, $value, $link, $hint = '')
     $header_actions = array();
     $header_back = false;
     include '../includes/page_header.php';
+    require_once __DIR__ . '/../includes/screen_contract.php';
+    ems_screen_about('مؤشراتي مشتقةٌ آليًّا من عملي — كلُّ رقمٍ يقود لمصدره، وفريقي من الهيكل لا من قوائم.');
+
     ?>
     <form method="get" style="display:flex;gap:10px;align-items:end;margin-bottom:12px;flex-wrap:wrap">
         <div><label style="font-size:.85rem">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>"></div>
