@@ -31,6 +31,32 @@ if ($capId <= 0) {
 }
 $feed = $capId > 0 ? PFS::feed($conn, $gate, $company_id, $uid, $capId) : null;
 
+/* ── بوابتي فوق المحرك (م-د · WFM-01): عدّادات حيّة من work_items/requests/
+   approval_links/work_notifications/achievement_records — كل رقمٍ ينقر
+   لشاشته (عرف USR-01: البوابة لا تملك بيانًا؛ كلُّ بطاقةٍ من مالكها) ── */
+$wfmCards = array();
+if ($uid > 0) {
+    $qn = function ($sql) use ($conn) { $r = mysqli_query($conn, $sql);
+        return $r ? intval(mysqli_fetch_row($r)[0]) : 0; };
+    $coW = $company_id > 0 ? "company_id = {$company_id} AND" : '';
+    $wfmCards = array(
+        array('مهامي المفتوحة', $qn("SELECT COUNT(*) FROM work_items WHERE {$coW} assigned_user_id = {$uid}
+              AND status NOT IN ('closed_accepted','cancelled')"), 'my_tasks.php'),
+        array('مهامي المتأخرة', $qn("SELECT COUNT(*) FROM work_items WHERE {$coW} assigned_user_id = {$uid}
+              AND (status = 'overdue' OR (due_at < NOW() AND status IN ('assigned','accepted','in_progress')))"), 'my_tasks.php?view=late'),
+        array('طلباتي الحية', $qn("SELECT COUNT(*) FROM requests WHERE {$coW} requester_user_id = {$uid}
+              AND status IN ('submitted','routed','in_approval','approved','executing','returned')"), 'my_requests.php'),
+        array('موافقات بيدي الآن', $qn("SELECT COUNT(*) FROM requests WHERE {$coW} current_holder_user_id = {$uid}
+              AND status IN ('submitted','routed','in_approval')"), 'approvals_inbox.php'),
+        array('تنبيهات غير مقروءة', $qn("SELECT COUNT(*) FROM personal_notifications WHERE {$coW} user_id = {$uid}
+              AND read_at IS NULL"), 'notifications.php'),
+        array('إنجازي — 30 يومًا', $qn("SELECT COUNT(*) FROM achievement_records WHERE {$coW} person_user_id = {$uid}
+              AND reversed_at IS NULL AND recognized_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"), 'my_achievement.php'),
+        array('رسائل غير مقروءة', $qn("SELECT COUNT(*) FROM messages WHERE {$coW} receiver_id = {$uid}
+              AND is_read = 0 AND COALESCE(is_deleted_receiver,0) = 0"), '../chats/index.php'),
+    );
+}
+
 // سجلُّ نشاطي — يراه صاحبُه (§5)
 $activity = array();
 $r = $conn->query("SELECT * FROM portal_activity_log
@@ -53,6 +79,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     include('../includes/page_header.php');
     ?>
+
+    <?php if ($wfmCards): ?>
+    <!-- مساحة عملي فوق المحرك (WFM-01) — كل رقمٍ ينقر لشاشته -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-briefcase"></i> مساحة عملي — من المحرك حيًّا</h5></div>
+    <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px">
+            <?php foreach ($wfmCards as $wc): ?>
+                <a href="<?php echo htmlspecialchars($wc[2]); ?>" style="text-decoration:none;color:inherit">
+                <div style="border:1px solid #e5e0d5;border-radius:10px;padding:12px;background:#fffdf7;text-align:center">
+                    <div style="font-size:1.5rem;font-weight:800"><?php echo intval($wc[1]); ?></div>
+                    <div style="color:#777;font-size:.85rem"><?php echo htmlspecialchars($wc[0]); ?></div>
+                </div></a>
+            <?php endforeach; ?>
+        </div>
+    </div></div>
+    <?php endif; ?>
 
     <?php if ($feed === null): ?>
         <div class="alert alert-warning">لا صفةَ نشطةً لحسابك — الاشتقاقُ بيد مدير الصلاحيات (شاشة 182).</div>

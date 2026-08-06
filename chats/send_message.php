@@ -64,6 +64,22 @@ if (!$result) {
 
 $new_id = mysqli_insert_id($conn);
 
+/* المراسلات فوق المحرك (م-د · WFM-01): الرسالة الواردة تنبيهٌ في مساحة عمل
+   المستلم (personal_notifications) بوجهة المحادثة — والتحويل مهمةً بيد
+   المستلم من شاشة التنبيهات (AC-WFM-08: زر صريح لا تحويل صامت). fail-soft:
+   تعثر التنبيه لا يفشل الإرسال. */
+try {
+    require_once __DIR__ . '/../app/Services/Work/WorkItemService.php';
+    \App\Services\Work\WorkItemService::notifyUser(
+        $conn, $safe_company, $safe_receiver,
+        'رسالة جديدة من ' . (string) ($_SESSION['user']['name'] ?? ('مستخدم #' . $sender_id)),
+        mb_substr($message, 0, 140),
+        'chats/index.php', false, 0
+    );
+} catch (\Throwable $t) {
+    error_log('chat notify: ' . $t->getMessage());
+}
+
 // سجل إرسال واحد فقط باسم "إرسال".
 \App\Services\ActivityLogService::logAction('send', 'chats', 'send_message', [
     'button_name'     => 'إرسال',

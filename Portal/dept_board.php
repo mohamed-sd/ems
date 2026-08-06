@@ -100,6 +100,37 @@ function ems_dept_engine_kpis(mysqli $conn, $companyId, array $memberIds)
     return $z;
 }
 
+/* ── تكليف المدير من ورقته (SRC-01 · م-د): الورقة منبعُ عناصرَ لا عارضة فقط.
+   القيود: المكلَّف عضو إدارة المكلِّف نفسها · المحرك يحرس السبعة والمتحقق
+   يُحل آليًّا (WF-04) — لا إنشاء حر (WF-01: خارج الإدارة لا يُكلَّف من هنا) ── */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dept_assign') {
+    require_once __DIR__ . '/../app/Services/Work/WorkItemService.php';
+    $unit0 = ems_dept_unit_of_role($role);
+    $members0 = $unit0 > 0 ? ems_dept_member_ids($conn, $company_id, $unit0) : array();
+    $to = intval($_POST['to_user'] ?? 0);
+    $title = trim((string) ($_POST['title'] ?? ''));
+    $deliv = trim((string) ($_POST['deliverable'] ?? ''));
+    $dueD  = trim((string) ($_POST['due_date'] ?? ''));
+    if (!in_array($to, $members0, true)) {
+        $msg = 'المكلَّف ليس من أعضاء إدارتك ❌';
+    } else {
+        $res = \App\Services\Work\WorkItemService::create($conn, array(
+            'company_id' => $company_id, 'source_type' => 'SRC-01',
+            'source_ref' => 'DEPT-' . $unit0 . '-' . date('YmdHis'),
+            'source_screen' => 'Portal/dept_board.php',
+            'owner_user_id' => $uid, 'assigned_user_id' => $to,
+            'org_unit_id' => $unit0, 'title' => $title,
+            'deliverable' => $deliv !== '' ? $deliv : 'إنجاز التكليف بدليله',
+            'priority' => in_array($_POST['priority'] ?? '', array('P0','P1','P2','P3','P4'), true) ? $_POST['priority'] : 'P3',
+            'due_at' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueD) ? $dueD . ' 17:00:00' : date('Y-m-d H:i:s', time() + 86400 * 3),
+            'created_by' => $uid,
+        ));
+        $msg = !empty($res['ok']) ? ('كُلّف وأُخطر ✅ #' . $res['id']) : (($res['reason'] ?? 'تعذر') . ' ❌');
+    }
+    header('Location: dept_board.php?msg=' . urlencode($msg));
+    exit();
+}
+
 /* ── حل الإدارة المعروضة ─────────────────────────────────────────────────── */
 $myUnit    = ems_dept_unit_of_role($role);
 $isUmbrella = ($is_super_admin || $role === 9 || $role === 15);
@@ -252,6 +283,37 @@ $attrLabel = function ($a) {
     العضوية من الهيكل لا من قوائم: أدوار الوحدة «<?= htmlspecialchars($deptOwner) ?>» في خريطة الـ17
     + نطاقك الإداري من الهرم (<?= count($members) ?> عضوًا).
   </p>
+  <?php if (isset($_GET['msg'])): ?>
+    <div class="alert alert-info"><?= htmlspecialchars((string) $_GET['msg']) ?></div>
+  <?php endif; ?>
+  <?php
+  /* تكليف SRC-01: لمن له مرؤوسون في الهيكل (المدير) وفي إدارته هو لا في تعمق الأدوار الجامعة */
+  $iAmManager = (count(ems_manager_scope_user_ids($conn, $uid, 1)) > 0) && ($unit === $myUnit);
+  if ($iAmManager && $members): ?>
+  <details style="margin-bottom:14px"><summary style="cursor:pointer;font-weight:bold">
+    <i class="fa fa-user-plus"></i> تكليف عضوٍ من إدارتي (SRC-01)</summary>
+    <form method="post" class="ems-form" style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:10px">
+      <input type="hidden" name="action" value="dept_assign">
+      <div><label>المكلَّف</label>
+        <select name="to_user" class="form-control" required>
+          <?php $r = mysqli_query($conn, 'SELECT id, name FROM users WHERE id IN (' . implode(',', array_map('intval', $members)) . ') ORDER BY name');
+          while ($r && ($u = mysqli_fetch_assoc($r))): if (intval($u['id']) === $uid) { continue; } ?>
+            <option value="<?= intval($u['id']) ?>"><?= htmlspecialchars($u['name']) ?></option>
+          <?php endwhile; ?>
+        </select></div>
+      <div style="flex:2;min-width:220px"><label>المهمة</label>
+        <input type="text" name="title" class="form-control" required maxlength="300"></div>
+      <div style="flex:1;min-width:160px"><label>المخرج المطلوب</label>
+        <input type="text" name="deliverable" class="form-control" maxlength="300"></div>
+      <div><label>المهلة</label><input type="date" name="due_date" class="form-control"></div>
+      <div><label>الأولوية</label>
+        <select name="priority" class="form-control">
+          <option>P3</option><option>P2</option><option>P1</option><option>P0</option><option>P4</option>
+        </select></div>
+      <button class="btn btn-primary">كلِّف</button>
+    </form>
+  </details>
+  <?php endif; ?>
 
   <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">
     <?php $tiles = array(
