@@ -168,6 +168,7 @@ class TicketRouter
                         $fallback = self::resolveAssignee($conn, $co, 'movement', $siteId);
                         if ($fallback !== null) {
                             $conn->query("UPDATE ticket_workstreams SET assignee_person_id = " . intval($fallback) . " WHERE ws_id = {$wsId}");
+                            $assignee = $fallback;
                         }
                         $stmt2 = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
                                                  VALUES (?, 'all', ?, 'Tickets/tickets_list.php')");
@@ -175,6 +176,40 @@ class TicketRouter
                         $stmt2->bind_param('is', $co, $title);
                         $stmt2->execute();
                         $stmt2->close();
+                    }
+                    // ═══ WFM SRC-06: البلاغُ الموجَّه يولّد «مهمةَ معالجةٍ بمهلتها» ═══
+                    // في مهامي المكلَّفِ فورَ الإسناد — والعنصر يرجع لبلاغه بضغطة
+                    // (WF-01). فشلُ التوليد لا يُسقط التوجيه (يُلتقط بالكانس لاحقًا).
+                    // بلا مكلَّفٍ محسوم: سلّمُ بديل الورقة 07 — منسّقُ مركز البلاغات
+                    // (24) ثم الحوكمة (15) — «صفرُ مهمةٍ بلا منفِّذ» (AC-WFM-02).
+                    if ($assignee === null) {
+                        foreach (array('24', '15') as $fbRole) {
+                            $fq = $conn->query("SELECT id FROM users WHERE role = '{$fbRole}' AND company_id = {$co}
+                                                 AND COALESCE(status,'active') = 'active' ORDER BY id LIMIT 1");
+                            if ($fq && ($fu = $fq->fetch_assoc())) { $assignee = intval($fu['id']); break; }
+                        }
+                    }
+                    if ($assignee !== null) {
+                        try {
+                            require_once dirname(__DIR__) . '/Work/WorkItemService.php';
+                            $dueMin = $w['resolve_sla_minutes'] !== null ? intval($w['resolve_sla_minutes']) : 1440;
+                            \App\Services\Work\WorkItemService::create($conn, array(
+                                'company_id' => $co, 'source_type' => 'SRC-06',
+                                'source_ref' => 'TKT-' . intval($tkId) . '-WS' . $wsId,
+                                'source_screen' => 'Tickets/tickets_list.php',
+                                'action_code' => 'ticket.ack',
+                                'owner_user_id' => $assignee, 'assigned_user_id' => $assignee,
+                                'org_unit_id' => $unitId ?: 1, 'site_id' => $siteId ?: 0,
+                                'title' => 'معالجة بلاغ #' . intval($tkId) . ' — مسار ' . $w['workstream_type'],
+                                'deliverable' => 'إغلاق المسار بتوثيق الحل وتأكيد المبلِّغ',
+                                'evidence_required' => 'توثيق الحل وتأكيد المبلِّغ (الورقة 11)',
+                                'priority' => ($w['response_sla_minutes'] !== null && intval($w['response_sla_minutes']) <= 60) ? 'P1' : 'P2',
+                                'due_at' => date('Y-m-d H:i:s', time() + $dueMin * 60),
+                                'created_by' => 0, 'parent_ref' => 'TKT-' . intval($tkId),
+                            ));
+                        } catch (\Throwable $wx) {
+                            error_log('SRC-06 work item for ticket ' . $tkId . ': ' . $wx->getMessage());
+                        }
                     }
                 } else {
                     $out['pending_conditional']++;

@@ -437,6 +437,69 @@ class WorkItemService
         return array('complete' => $complete, 'steps' => $steps);
     }
 
+    /* ───────────── الاشتقاق من الفعل (WF-10 · WFM-114/115/116) ───────────── */
+
+    /**
+     * تصنيف نص الفعل بقواعد الوثيقة الثابتة — «يُستنبط لا يُجتهد»:
+     * اعتماد/توقيع/إقرار ⇒ موافقة · طلب/تقديم ⇒ طلب · بلاغ/تذكرة ⇒ بلاغ ·
+     * تنبيه/إشعار ⇒ تنبيه · وما عداه مهمة. والأولوية: توقف/منع/إيقاف ⇒ P1 ·
+     * اعتماد/إقفال/نشر ⇒ P2 · وما عداه P3.
+     */
+    public static function classifyAction($actionText)
+    {
+        $t = (string) $actionText;
+        $type = 'task';
+        if (preg_match('/اعتماد|توقيع|إقرار|موافق/u', $t)) { $type = 'approval'; }
+        elseif (preg_match('/طلب|تقديم/u', $t)) { $type = 'request'; }
+        elseif (preg_match('/بلاغ|تذكرة/u', $t)) { $type = 'ticket'; }
+        elseif (preg_match('/تنبيه|إشعار/u', $t)) { $type = 'notification'; }
+        $priority = 'P3';
+        if (preg_match('/توقف|منع|إيقاف|طارئ/u', $t)) { $priority = 'P1'; }
+        elseif (preg_match('/اعتماد|إقفال|نشر|توقيع/u', $t)) { $priority = 'P2'; }
+        return array('type' => $type, 'priority' => $priority);
+    }
+
+    /**
+     * اشتقاق عنصر عملٍ من فعل NAV-09 (WF-10: «لا يُخترع عنصرٌ بلا فعلٍ يقابله»):
+     * يقرأ صفَّ الفعل من nav09_action_map (الشاشة · الملف · الفعل) ويستنبط
+     * النوعَ والأولوية، ودليلُ الإكمال من مستند المرحلة وإلا أثرُ الفعل في
+     * سجل التدقيق (WFM-116). عطالة: (source_type,source_ref) القائم لا يتكرر.
+     */
+    public static function fromNavAction(\mysqli $conn, $actionCode, array $a)
+    {
+        $actionCode = trim((string) $actionCode);
+        $st = $conn->prepare("SELECT canonical_code, label_ar, screen_title, canonical_file
+                                FROM nav09_action_map WHERE canonical_code = ? LIMIT 1");
+        $st->bind_param('s', $actionCode);
+        $st->execute();
+        $act = $st->get_result()->fetch_assoc();
+        $st->close();
+        if (!$act) {
+            return array('ok' => false, 'code' => 422,
+                'reason' => 'فعلٌ خارج خريطة NAV-09: ' . $actionCode . ' — لا يُخترع عنصر (WF-10)');
+        }
+        $cls = self::classifyAction((string) $act['label_ar']);
+        // عطالة الاشتقاق: العنصر القائم لنفس الفعل والمرجع يُعاد مرجعُه
+        $srcRef = (string) ($a['source_ref'] ?? '');
+        $stq = $conn->prepare("SELECT id FROM work_items
+                                WHERE source_type = 'SRC-03' AND action_code = ? AND source_ref = ?
+                                  AND status NOT IN ('cancelled') LIMIT 1");
+        $stq->bind_param('ss', $actionCode, $srcRef);
+        $stq->execute();
+        $ex = $stq->get_result()->fetch_assoc();
+        $stq->close();
+        if ($ex) { return array('ok' => true, 'code' => 200, 'id' => intval($ex['id']), 'duplicate' => true); }
+
+        return self::create($conn, array_merge($a, array(
+            'source_type' => $a['source_type'] ?? 'SRC-03',
+            'source_screen' => (string) $act['canonical_file'],
+            'action_code' => $actionCode,
+            'title' => $a['title'] ?? ($act['label_ar'] . ' — ' . $act['screen_title']),
+            'priority' => $a['priority'] ?? $cls['priority'],
+            'evidence_required' => $a['evidence_required'] ?? 'أثر الفعل في سجل التدقيق (WFM-116)',
+        )));
+    }
+
     /* ─────────────────────────── مساعدات داخلية ─────────────────────────── */
 
     public static function fetch(\mysqli $conn, $id)
