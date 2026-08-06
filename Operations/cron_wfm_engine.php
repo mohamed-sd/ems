@@ -200,4 +200,42 @@ if (is_file($logF)) {
     }
 }
 fwrite(STDOUT, "⑥ إجراءاتٌ تصحيحيةٌ من المنع المتكرر: {$corrective}\n");
+
+/* ⑦ SRC-13 · ورقة المخازن: العهدةُ المصروفة غيرُ المسوّاة تولّد مهمةَ تسويةٍ
+ * لحاملها المربوط (holder_id ← users.employee_id) — idempotent بمرجع العهدة.
+ * بلا ربطٍ لا مهمة (لا تلفيقَ مسؤولية) — والمتبقي غير المربوط يُعدُّ ويُعلن. */
+$custTasks = 0; $custUnlinked = 0;
+$cq = $conn->query("SELECT pc.id, pc.item_name, pc.qty_issued, pc.qty_returned, pc.qty_consumed,
+                           pc.holder_id, pc.holder_name, pc.company_id, u.id AS holder_user
+                      FROM proc_custody pc
+                 LEFT JOIN users u ON u.employee_id = pc.holder_id AND u.company_id = pc.company_id
+                     WHERE COALESCE(pc.is_deleted,0) = 0 AND pc.state = 'مصروفة'
+                       AND (COALESCE(pc.qty_issued,0) - COALESCE(pc.qty_returned,0) - COALESCE(pc.qty_consumed,0)) > 0");
+if ($cq) {
+    while ($c = $cq->fetch_assoc()) {
+        if (empty($c['holder_user'])) { $custUnlinked++; continue; }
+        $ref = 'CUSTODY-' . intval($c['id']);
+        $st = $conn->prepare("SELECT 1 FROM work_items WHERE source_type='SRC-13' AND source_ref=? LIMIT 1");
+        $st->bind_param('s', $ref);
+        $st->execute();
+        $dupe = $st->get_result()->fetch_assoc();
+        $st->close();
+        if ($dupe) { continue; }
+        $hu = intval($c['holder_user']);
+        $remain = (float) $c['qty_issued'] - (float) $c['qty_returned'] - (float) $c['qty_consumed'];
+        $res = \App\Services\Work\WorkItemService::create($conn, array(
+            'company_id' => intval($c['company_id']), 'source_type' => 'SRC-13', 'source_ref' => $ref,
+            'source_screen' => 'Procurement/custody.php',
+            'owner_user_id' => $hu, 'assigned_user_id' => $hu, 'org_unit_id' => 1,
+            'title' => 'تسوية عهدة: ' . mb_substr((string) $c['item_name'], 0, 60) . ' (متبقٍ ' . $remain . ')',
+            'details' => 'عهدة مصروفة بلا تسوية — الإرجاع أو إثبات الاستهلاك بمستنده.',
+            'deliverable' => 'عهدة مسوّاة: إرجاع أو استهلاك موثق',
+            'evidence_required' => 'مستند الإرجاع/الاستهلاك على ' . $ref,
+            'priority' => 'P3', 'due_at' => date('Y-m-d H:i:s', time() + 7 * 86400),
+            'created_by' => 0, 'parent_ref' => $ref,
+        ));
+        if (!empty($res['ok'])) { $custTasks++; }
+    }
+}
+fwrite(STDOUT, "⑦ مهامُّ تسوية عهدةٍ وُلدت: {$custTasks}" . ($custUnlinked ? " · بلا ربط حامل: {$custUnlinked}" : '') . "\n");
 fwrite(STDOUT, "✔ اكتمل النبض\n");
