@@ -73,8 +73,8 @@ $BR = array(
         strpos(src('Portal/project_charter.php'), 'BR-CEO-03') !== false ? 'ENFORCED' : 'OPEN',
         'الإفاداتُ الخمسُ شرطُ حفظِ قرار الفتح — والناقصُ يُسمّى'),
     'BR-CEO-04' => array('القرارُ يُلزم بمهلةٍ لا يوجّه',
-        strpos(src('Portal/ceo_risk.php'), 'مهلة التنفيذ') !== false ? 'PARTIAL' : 'OPEN',
-        'أعمدةُ (الجهة المكلَّفة · مهلة التنفيذ · تاريخ المتابعة) قائمة — ولا حارسَ يمنع حسمًا بلا مكلَّفٍ ومهلة'),
+        strpos(src('Portal/ceo_risk.php'), 'BR-CEO-04') !== false ? 'ENFORCED' : 'OPEN',
+        'الحارسُ في معالج الحفظ: حسمٌ (تاريخُ قرارٍ أو حالةٌ حاسمة) بلا مكلَّفٍ أو مهلةٍ يُرفض مسمًّى بالناقص'),
     'BR-CEO-05' => array('الرفعُ آليٌّ عند تجاوز السقف', 'PARTIAL',
         'سلّمُ الطلبات يرفع بالسلسلة (approval_links) — والرفعُ الآليُّ بالسقف النقدي من شاشات المال لم يُوصل بشاشة الاعتماد الأعلى'),
     'BR-CEO-06' => array('لا تنفيذَ ولا إدخالَ من القمة', 'CHECK', ''),
@@ -93,19 +93,25 @@ $BR['BR-CEO-06'][2] = "قياسٌ حي: صلاحياتُ كتابةٍ تنفيذ
     . ($execWrite === 0 ? ' — القمةُ لا تُدخل ولا تعتمد وحدةً ولا تنشر قيدًا' : ' — تحتاج نزعًا');
 foreach ($BR as $code => $b) { $add('قواعد العمل ٧', $code . ' · ' . $b[0], $b[1], $b[2]); }
 
-/* ═══ ④ الأحداث الصادرة الأربعة والوارد ═══ */
-$EV = array('ExecApproved' => 'اعتمادُ الإدارة العليا', 'ContractSigned' => 'التوقيعُ على عقد',
-            'ProjectChartered' => 'اعتمادُ فتح مشروع', 'ExecDecisionMade' => 'حسمُ قضيةٍ عليا');
-foreach ($EV as $ev => $act) {
-    $inCode = false;
-    foreach (array('Portal/ceo_approvals.php', 'Portal/ceo_contracts.php', 'Portal/project_charter.php',
-                   'Portal/ceo_risk.php', 'app/Core/EventPublisher.php') as $f) {
-        if (strpos(src($f), $ev) !== false) { $inCode = true; break; }
-    }
-    $published = q1($conn, "SELECT COUNT(*) FROM ems_business_events WHERE event_key LIKE '%" . strtolower($ev) . "%'");
-    $add('الأحداث ١١', $ev . ' (' . $act . ')', $inCode ? 'PARTIAL' : 'OPEN',
-        $inCode ? 'الاسمُ في الكود — ولم يُنشر بعد (منشورٌ: ' . max(0, $published) . ')'
-                : 'لم يُوصل بالناشر — الفعلُ يحفظ ولا يُنشر حدثًا');
+/* ═══ ④ الأحداث الصادرة الأربعة والوارد ═══
+ * كلُّ حدثٍ يُقاس عند نقطة حدثه الحقيقية (لا الشاشة البينية):
+ * التوقيع في آلة حالات العقد · الاعتماد الأعلى في قرار الطلبات ·
+ * فتح المشروع عند إدراجه · الحسم في معالج ceo_risk. */
+$EV = array(
+    'ExecApproved'     => array('اعتمادُ الإدارة العليا', 'app/Services/Work/RequestService.php', 'exec.approval.granted'),
+    'ContractSigned'   => array('التوقيعُ على عقد', 'app/Services/Contract/ContractStateMachine.php', 'contract.signed'),
+    'ProjectChartered' => array('اعتمادُ فتح مشروع', 'Projects/projects.php', 'project.chartered'),
+    'ExecDecisionMade' => array('حسمُ قضيةٍ عليا', 'Portal/ceo_risk.php', 'exec.decision.made'),
+);
+foreach ($EV as $ev => $d) {
+    list($act, $srcFile, $key) = $d;
+    $inCode = strpos(src($srcFile), "'" . $key . "'") !== false;
+    $published = q1($conn, "SELECT COUNT(*) FROM ems_business_events WHERE event_key = '" . $key . "'");
+    $add('الأحداث ١١', $ev . ' (' . $act . ')',
+        ($inCode && $published > 0) ? 'ENFORCED' : ($inCode ? 'PARTIAL' : 'OPEN'),
+        $inCode
+            ? ('منشورٌ من نقطة الحدث ' . basename($srcFile) . ' — ' . $key . ' (وقائعُ: ' . max(0, $published) . ')')
+            : 'لم يُوصل بالناشر — الفعلُ يحفظ ولا يُنشر حدثًا');
 }
 $add('الأحداث ١١', 'ContractBlocked (وارد)',
     strpos(src('Portal/ceo_contracts.php'), 'BR-CEO-02') !== false ? 'ENFORCED' : 'OPEN',
@@ -116,8 +122,8 @@ $add('الدورات ٤', '④-٤ فتحُ المشروع: الأثر الخما
     'الإفاداتُ محروسةٌ والقرارُ يُحفظ — والتوليدُ الآليُّ للمشروع ومركزِ التكلفة والمواقع لم يُوصل');
 $add('الدورات ٤', '④-٣ التوقيع: الأثر الرباعي (نفاذ·سجل موحَّد·التزام·خط أساس)', 'PARTIAL',
     'الحجبُ نافذٌ وعمودُ «سُجّل في السجل الموحَّد؟» قائم — والتوليدُ الآليُّ للحاوية والالتزام لم يُوصل');
-$add('الدورات ٤', '④-٥ القرارات: التكليفُ بمهلةٍ وجدولةُ المتابعة', 'PARTIAL',
-    'الأعمدةُ قائمة — والمتابعةُ لا تُجدول مهمةً في WFM بعد (وصلٌ ممكن: SRC-10)');
+$add('الدورات ٤', '④-٥ القرارات: التكليفُ بمهلةٍ وجدولةُ المتابعة', 'ENFORCED',
+    'الحسمُ الحقيقي يُنشر حقيقتَه ويُجدول متابعةً SRC-10 على صاحب القرار بموعد المتابعة المدخل — والحارسُ يُلزم المكلَّفَ والمهلة');
 $add('الدورات ٤', '④-٦ الرقابة العليا: المؤشرات الجامعة الستة', 'PARTIAL',
     'لوحةُ ceo_board بأعمدتها الـ16 قائمةٌ عرضًا — والاشتقاقُ الحيُّ لكل مؤشرٍ من مصدره لم يُقَس');
 $add('الدورات ٤', '④-١ نماذج العمل والموازنة', 'PARTIAL', 'الشاشتان عارضتان للتنفيذي (يملكهما غيرُه) — والسقوفُ تُقرأ ولا تُفرض من هنا');
