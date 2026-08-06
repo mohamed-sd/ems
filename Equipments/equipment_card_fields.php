@@ -1,4 +1,9 @@
 <?php
+// EMS_DIRECT_ACCESS_FORBIDDEN: تضمينٌ مشتركٌ لا صفحة — النداء المباشر يُرفض
+if (basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) === basename(__FILE__)) {
+    http_response_code(403);
+    exit('تضمينٌ مشتركٌ — لا يُفتح مباشرة');
+}
 /**
  * كرت المعدة — حقول الهوية الأساسية (مشترك بين equipments.php و equipments_fleet.php)
  *

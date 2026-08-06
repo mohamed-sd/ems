@@ -11,6 +11,18 @@ include '../config.php';
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
+// حارس الصلاحية (سدُّ فجوة «عزلٌ بلا صلاحية» — مسح دَين الحارس 2026-08-06):
+// المغذّي يخدم شاشةَ سجل الدوام، فرؤيتُها شرطُه — والرفض JSON بعقد الشاشة.
+require_once __DIR__ . '/../includes/permissions_helper.php';
+if (!$is_super_admin) {
+    $__pp = check_page_permissions($conn, 'Timesheet/timesheet.php');
+    if (empty($__pp['can_view'])) {
+        while (ob_get_level()) ob_end_clean();
+        http_response_code(403);
+        die(json_encode(['error' => 'لا صلاحيةَ عرضٍ لسجل الدوام'], JSON_UNESCAPED_UNICODE));
+    }
+}
+
 if (!$is_super_admin && $company_id <= 0) {
     while (ob_get_level()) ob_end_clean();
     die(json_encode(['error' => 'Unauthorized company context'], JSON_UNESCAPED_UNICODE));
