@@ -6,7 +6,6 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
 
 // Cache-busting version for unified stylesheets so CSS edits show immediately
 // (the same constant is reused by insidebar.php's defensive CSS loader).
-require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 if (!defined('EMS_ASSET_VER')) {
     $__ems_main_css = __DIR__ . '/assets/css/ems.main.all.style.css';
     define('EMS_ASSET_VER', is_file($__ems_main_css) ? (string) filemtime($__ems_main_css) : '1');
