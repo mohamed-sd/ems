@@ -79,6 +79,23 @@ try {
             break;
 
         case 'export':
+            /* BR-GOV-07 (م-هـ): التصدير أخطر أبواب الاطّلاع — يُفحص مركزيًّا
+               هنا ضد قاموس الحقول الحساسة (scr_sensitive_fields): كل حقل
+               «يُسجَّل الاطلاع؟ = نعم» في جدول الكيان يُقيَّد اطلاعًا باسم
+               المصدِّر قبل بث الملف (القناة الموحدة sensitive_read_log). */
+            try {
+                require_once __DIR__ . '/includes/sensitive_read_log.php';
+                $tbl = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $def->table);
+                $rs = $conn->query("SELECT field_name FROM scr_sensitive_fields
+                                     WHERE table_name = '" . $conn->real_escape_string($tbl) . "'
+                                       AND log_views_flag LIKE '%نعم%' AND status = 'معتمد'");
+                while ($rs && ($sf = $rs->fetch_assoc())) {
+                    ems_log_sensitive_read($conn, $tbl . '.' . $sf['field_name'],
+                        'export:' . $entity, 'excel.php?action=export');
+                }
+            } catch (\Throwable $t) {
+                ems_excel_log_error('SENSITIVE_LOG', $t->getMessage()); // لا يعطل التصدير
+            }
             $service->export($def); // يبثّ ويُنهي.
             break;
 

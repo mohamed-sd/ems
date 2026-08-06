@@ -17,6 +17,13 @@ $ROOT = dirname(__DIR__);
 $PHP = PHP_BINARY;
 $SKIP_UAT_DOC = in_array('--skip-uat-doc', $argv, true);
 
+/* اتصال القاعدة لبصمة الإصدار الآلية (BR-GOV-08) — config يبتلع مخرج CLI */
+ob_start();
+require_once $ROOT . '/config.php';
+while (ob_get_level()) { ob_end_clean(); }
+$conn = $GLOBALS['conn'];
+mysqli_set_charset($conn, 'utf8mb4');
+
 $report = array();
 $say = function ($s) use (&$report) { fwrite(STDOUT, $s . "\n"); $report[] = $s; };
 
@@ -112,4 +119,31 @@ $cert = "# شهادة بوابات التسليم — آخر عبور\n\n"
       . ($gateFailed === null ? '✔ عبور كامل' : '✘ توقف عند ' . $gateFailed) . "\n\n```\n"
       . implode("\n", $report) . "\n```\n";
 file_put_contents($ROOT . '/docs/RELEASE_GATE_LAST_ar.md', $cert);
+
+/* BR-GOV-08 (م-هـ): «لا نشرَ بلا بصمةٍ وتقريرِ اكتمال» — البصمة تُختم آليًّا
+   من الشهادة نفسها لا يدويًّا: sha1(الشهادة) + رأس git لحظة العبور، صفًّا
+   في سجل الإصدارات (scr_release_stamp) بعطالة البصمة. العبور الكامل وحده
+   يُختم — المتوقف يُسجَّل بشاهده متوقفًا. */
+$head = trim((string) shell_exec('git -C "' . $ROOT . '" rev-parse --short HEAD 2>&1'));
+$fp = 'RG-' . substr(sha1($cert), 0, 12) . '-' . preg_replace('/[^a-f0-9]/', '', $head);
+$ex = mysqli_query($conn, "SELECT id FROM scr_release_stamp WHERE fingerprint_release = '"
+    . mysqli_real_escape_string($conn, $fp) . "' LIMIT 1");
+if (!($ex && mysqli_fetch_row($ex))) {
+    $st = $conn->prepare("INSERT INTO scr_release_stamp
+        (company_id, no_release, fingerprint_release, date_publish, type_release,
+         migrations_executed, report_completeness, tests_passed, tests_failed, flag_rollback,
+         publisher_name_capacity_role, status, status_label, is_seed, created_by, created_by_name)
+        VALUES (4, ?, ?, CURDATE(), 'بوابات التسليم',
+                'من مُشغِّل الترحيلات (status)', ?, ?, ?, 'جاهز — التراجع بلقطات ما قبل التنفيذ',
+                'مُشغِّل البوابات — آليًّا (BR-GOV-08)', ?, ?, 0, 0, 'release_gate آليًّا')");
+    $no = 'REL-' . date('Ymd-Hi');
+    $comp = $gateFailed === null ? 'docs/RELEASE_GATE_LAST_ar.md — عبور كامل' : 'متوقف عند ' . $gateFailed;
+    $tp = $gateFailed === null ? 'البوابات الخمس' : 'حتى ما قبل ' . $gateFailed;
+    $tf = $gateFailed === null ? '0' : $gateFailed;
+    $stt = $gateFailed === null ? 'منشور' : 'متوقف';
+    $st->bind_param('sssssss', $no, $fp, $comp, $tp, $tf, $stt, $stt);
+    $st->execute();
+    $st->close();
+    $say('✎ بصمة الإصدار خُتمت آليًّا: ' . $fp . ' (' . $stt . ')');
+}
 exit($gateFailed === null ? 0 : 1);
