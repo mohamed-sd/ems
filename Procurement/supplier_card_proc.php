@@ -81,7 +81,16 @@ include '../insidebar.php';
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا أوامرَ لهذا المورد', 'أمرٌ جديد', 'orders_proc.php'); break; }
             echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
-               . '<thead><tr><th>الكود</th><th>الحالة</th><th>الإجمالي</th><th>استلم٪</th><th>موعد التسليم</th><th></th></tr></thead><tbody>';
+               . '<thead><tr><th>الكود</th><th>الحالة</th><th>الإجمالي</th><th>استلم٪</th><th>موعد التسليم</th><th></th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              </tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
                    . '<td>' . htmlspecialchars((string)$x['state']) . '</td>'

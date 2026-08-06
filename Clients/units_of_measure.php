@@ -275,6 +275,7 @@ foreach ($uom_list as $row) {
 $page_title = "وحدات القياس";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main uom-main ems-unified-page-shell">

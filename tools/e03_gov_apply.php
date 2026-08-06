@@ -51,7 +51,9 @@ function eg_norm($s) {
 
 $dirs = array('Approvals', 'Contracts', 'Employees', 'Equipments', 'Finance', 'FinRequests', 'Financing',
     'Governance', 'Maintenance', 'Operations', 'Portal', 'Procurement', 'Projects', 'Settings',
-    'Tickets', 'Transport', 'Workforce', 'admin', 'main');
+    'Tickets', 'Transport', 'Workforce', 'admin', 'main',
+    // الحارة الموازية فُتحت بعد لقطة الحفظ (تفويض إكمال الـ66)
+    'Clients', 'Suppliers', 'Opportunities');
 
 $registry = ems_gov_registry();
 $done = 0; $cols = 0; $skipped = array();

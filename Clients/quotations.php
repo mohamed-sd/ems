@@ -341,6 +341,7 @@ foreach ($quo_list as $row) {
 $page_title = "عروض الأسعار";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 function quo_state_class($state)
 {

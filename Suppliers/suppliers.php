@@ -252,6 +252,7 @@ if (!empty($cstats_rows)) {
 $page_title = 'إيكوبيشن | الموردون';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main suppliers-main ems-unified-page-shell">

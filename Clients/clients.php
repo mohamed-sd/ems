@@ -607,6 +607,7 @@ arsort($sector_counts);
 $page_title = "العملاء";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main clients-main ems-unified-page-shell">

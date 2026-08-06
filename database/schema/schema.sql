@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-06 10:46:09
--- الجداول: 448 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-06 14:36:16
+-- الجداول: 451 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -4594,6 +4594,38 @@ CREATE TABLE `fleet_model_service_spec` (
   CONSTRAINT `fk_fmss_model` FOREIGN KEY (`model_id`) REFERENCES `fleet_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- ── Table: fleet_reservations ──
+CREATE TABLE `fleet_reservations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'الكيان المالك',
+  `reservation_no` varchar(40) NOT NULL COMMENT 'رقم الحجز — فريد داخل الشركة',
+  `equipment_id` int(11) DEFAULT NULL COMMENT 'حجزُ معدةٍ بعينها (يمنع التعارض فعليًّا)',
+  `equipment_type_id` int(11) DEFAULT NULL COMMENT 'أو حجزُ فئةٍ بعددٍ — قبل تحديد الآلة',
+  `qty` int(11) NOT NULL DEFAULT 1 COMMENT 'العددُ المحجوز حين يكون الحجزُ بالفئة',
+  `client_id` int(11) DEFAULT NULL,
+  `opportunity_id` int(11) DEFAULT NULL COMMENT 'الفرصةُ التي وُلد منها الحجز',
+  `quotation_id` int(11) DEFAULT NULL COMMENT 'العرضُ المرتبط',
+  `contract_id` int(11) DEFAULT NULL COMMENT 'يُملأ عند التحويل لعقد',
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `state` enum('مبدئي','مؤكَّد','محوَّل لعقد','منتهٍ','ملغى') NOT NULL DEFAULT 'مبدئي',
+  `hold_until` datetime DEFAULT NULL COMMENT 'مهلةُ الحجز المبدئي — بعدها يسقط',
+  `purpose` varchar(160) DEFAULT NULL COMMENT 'الغرض/الموقع',
+  `note` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_res_no` (`company_id`,`reservation_no`),
+  KEY `ix_res_eq` (`company_id`,`equipment_id`,`start_date`,`end_date`),
+  KEY `ix_res_type` (`company_id`,`equipment_type_id`,`start_date`,`end_date`),
+  KEY `ix_res_state` (`company_id`,`state`,`start_date`),
+  KEY `ix_res_opp` (`company_id`,`opportunity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='حجوزاتُ الأسطول — النافذةُ الزمنية المحجوزة قبل العقد (RENTAL-CORE ①)';
+
 -- ── Table: founding_mode ──
 CREATE TABLE `founding_mode` (
   `mode_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6672,6 +6704,60 @@ CREATE TABLE `quotations` (
   KEY `idx_quo_opp` (`opportunity_id`),
   KEY `idx_quo_state` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: rate_book_lines ──
+CREATE TABLE `rate_book_lines` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `book_id` int(11) NOT NULL,
+  `equipment_type_id` int(11) NOT NULL COMMENT 'فئةُ المعدة — equipments_types.id',
+  `work_model` enum('hour','day','shift','month','ton','meter','trip','cbm') NOT NULL DEFAULT 'hour',
+  `tier_from_days` int(11) NOT NULL DEFAULT 1 COMMENT 'بدايةُ شريحة المدة بالأيام',
+  `tier_to_days` int(11) DEFAULT NULL COMMENT 'نهايتُها — NULL = ما فوق',
+  `unit_price` decimal(14,2) NOT NULL COMMENT 'سعرُ الوحدة في هذه الشريحة',
+  `min_hire_days` int(11) NOT NULL DEFAULT 1 COMMENT 'الحدُّ الأدنى لمدة الإيجار',
+  `min_hours_per_day` decimal(6,2) DEFAULT NULL COMMENT 'الحدُّ الأدنى للساعات اليومية المفوترة',
+  `mobilization_fee` decimal(14,2) NOT NULL DEFAULT 0.00 COMMENT 'رسمُ التعبئة/الترحيل',
+  `operator_included` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'أالمشغّلُ ضمن السعر؟',
+  `fuel_included` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'أالوقودُ ضمن السعر؟',
+  `note` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_rate_tier` (`company_id`,`book_id`,`equipment_type_id`,`work_model`,`tier_from_days`),
+  KEY `ix_line_book` (`company_id`,`book_id`),
+  KEY `ix_line_lookup` (`company_id`,`equipment_type_id`,`work_model`,`tier_from_days`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='بنودُ دفتر الأسعار — سعرٌ لكل (فئة × نموذج عمل × شريحة مدة) (RENTAL-CORE ②)';
+
+-- ── Table: rate_books ──
+CREATE TABLE `rate_books` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `book_code` varchar(40) NOT NULL COMMENT 'كودُ الدفتر — فريد داخل الشركة',
+  `name` varchar(160) NOT NULL,
+  `currency` enum('USD','SDG') NOT NULL DEFAULT 'USD',
+  `client_id` int(11) DEFAULT NULL COMMENT 'دفترٌ خاصٌّ بعميل — NULL يعني الدفترَ العام',
+  `valid_from` date NOT NULL,
+  `valid_to` date DEFAULT NULL COMMENT 'NULL = مفتوح',
+  `state` enum('مسودة','معتمد','منتهٍ') NOT NULL DEFAULT 'مسودة',
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_book_code` (`company_id`,`book_code`),
+  KEY `ix_book_live` (`company_id`,`state`,`valid_from`,`valid_to`),
+  KEY `ix_book_client` (`company_id`,`client_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='دفاترُ الأسعار — رأسُ الدفتر بسريانه وعملته (RENTAL-CORE ②)';
 
 -- ── Table: readiness_lines ──
 CREATE TABLE `readiness_lines` (

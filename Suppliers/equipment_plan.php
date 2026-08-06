@@ -32,6 +32,7 @@ if ($sup > 0) {
 $page_title = 'خطة معدات المورد';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-truck"></i> خطةُ معدات المورد</h4></div>

@@ -424,7 +424,17 @@ if (function_exists('ems_screen_about')) {
 
     <div class="table-responsive"><table class="table display" id="rbLines">
       <thead><tr><th>الفئة</th><th>نموذجُ العمل</th><th>الشريحة</th><th>سعرُ الوحدة</th>
-        <th>حدٌّ أدنى (أيام)</th><th>ساعات/يوم</th><th>ترحيل</th><th>مشغّل</th><th>وقود</th></tr></thead>
+        <th>حدٌّ أدنى (أيام)</th><th>ساعات/يوم</th><th>ترحيل</th><th>مشغّل</th><th>وقود</th>
+        <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+        <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+        <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+        <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+        <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+        </tr></thead>
       <tbody>
       <?php foreach ($lines as $l): ?>
         <tr>

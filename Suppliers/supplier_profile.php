@@ -119,6 +119,7 @@ try {
 $page_title = 'إيكوبيشن | بطاقة المورد';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 $sf_supplier_id = intval($_GET['id'] ?? 0); $sf_active = 'profile';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>

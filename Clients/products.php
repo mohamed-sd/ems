@@ -311,6 +311,7 @@ foreach ($prod_list as $row) {
 $page_title = "كتالوج المنتجات والخدمات";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 function prod_revenue_label($model, $map)
 {

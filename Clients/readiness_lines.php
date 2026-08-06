@@ -368,6 +368,7 @@ $stat_ready_contracts = count($ready_contracts);
 $page_title = "جاهزية العروض";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main rdl-main ems-unified-page-shell">

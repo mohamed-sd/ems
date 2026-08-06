@@ -33,6 +33,7 @@ $scd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contract 
 $page_title = 'الإيكوبيشن | ملف عقد المورد';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main contracts-main contracts-details-page ems-unified-page-shell">
     <div class="page-wrapper">

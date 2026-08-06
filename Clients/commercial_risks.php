@@ -379,6 +379,7 @@ foreach ($risk_list as $row) {
 $page_title = "المخاطر التجارية";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 function risk_entity_label($type, $map)
 {

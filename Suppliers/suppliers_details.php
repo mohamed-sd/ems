@@ -28,6 +28,7 @@ if (!isset($_SESSION['user'])) {
 <body>
 
     <?php include('../insidebar.php'); ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
     <div class="main">
 

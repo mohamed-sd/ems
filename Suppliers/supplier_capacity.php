@@ -117,6 +117,7 @@ $measure = ($head !== null)
 $page_title = 'إيكوبيشن | الطاقة والجاهزية ومهلة الإحلال';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف المورد الأم
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'capacity';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';

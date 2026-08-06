@@ -315,6 +315,7 @@ foreach ($pl_list as $row) {
 $page_title = "قوائم ونماذج التسعير";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 function pl_revenue_label($model, $map)
 {

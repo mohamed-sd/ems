@@ -341,6 +341,7 @@ foreach ($tnd_list as $row) {
 $page_title = "المناقصات";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // لون شارة النتيجة
 function tnd_result_class($result)

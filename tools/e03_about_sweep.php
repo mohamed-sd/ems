@@ -18,13 +18,12 @@ $ROOT = dirname(__DIR__);
 $PHP = 'C:/wamp64/bin/php/php8.2.30/php.exe';
 
 $SKIP_DIRS = array('app', 'includes', 'database', 'tools', 'tests', 'vendor', 'docs', 'storage',
-    'logs', 'node_modules', '.git', '.claude', 'worktrees', 'chats', 'emsreports',
-    // حارة الجلسة الموازية — لا ألمسها
-    'Clients', 'Suppliers', 'Opportunities');
+    'logs', 'node_modules', '.git', '.claude', 'worktrees', 'chats', 'emsreports');
+// الحارة الموازية فُتحت (تفويض إكمال الـ66 · 2026-08-06 مساءً): عملها الجاري
+// حُفظ لقطةً ملتزمة والجلسة خاملة — الزرع الإضافي لا يمس منطقها.
 $SKIP_FILES = array(
-    // شاشات M-00 الخمس: موجة اللحاق جارية بيد الجلسة الموازية
-    'Portal/ceo_board.php', 'Portal/ceo_approvals.php', 'Portal/ceo_contracts.php',
-    'Portal/project_charter.php', 'Portal/ceo_risk.php',
+    // قوالب الإطار في الجذر ليست شاشات — الزرع فيها ينفجر مسارًا (درس inheader)
+    'inheader.php', 'insidebar.php', 'infooter.php', 'config.php',
 );
 
 $candidates = array();
@@ -41,6 +40,7 @@ foreach ($rii as $f) {
     if (!$f->isFile() || strtolower($f->getExtension()) !== 'php') { continue; }
     $rel = ltrim(str_replace('\\', '/', substr($f->getPathname(), strlen($ROOT))), '/');
     if (in_array($rel, $SKIP_FILES, true)) { continue; }
+    if (strpos($rel, '/') === false) { continue; } // ملفات الجذر قوالب إطار لا شاشات
     $src = (string) file_get_contents($f->getPathname());
     if (strpos($src, 'insidebar.php') === false) { continue; }          // ليست شاشة مصيَّرة
     if (strpos($src, 'ems_screen_about') !== false) { continue; }        // لديها سطرها

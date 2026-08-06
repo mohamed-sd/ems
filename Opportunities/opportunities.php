@@ -493,6 +493,7 @@ $conversion_rate = $decided > 0 ? round(($stat_won / $decided) * 100, 1) : 0;
 $page_title = "الفرص البيعية";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // أدوات عرض المرحلة
 function opp_stage_tone($stage)
