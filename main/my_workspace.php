@@ -21,27 +21,46 @@ if ($company_id <= 0) { $company_id = 4; }
 
 $q1 = function ($sql) use ($conn) { $r = $conn->query($sql); $x = $r ? $r->fetch_assoc() : null; return $x ? intval(reset($x)) : 0; };
 
-// العدادات الثمانية — من مصادرها الحية
-$myApprovals = $q1("SELECT COUNT(*) FROM permission_approval_steps s
-                     JOIN permission_change_requests r ON r.req_id = s.req_id
-                    WHERE r.company_id = {$company_id} AND r.state = 'pending' AND s.decision IS NULL");
-$myRequests = $q1("SELECT COUNT(*) FROM fin_requests WHERE company_id = {$company_id}
+// العدادات — من المحرّك (WFM) أولًا ومصادرِ ما قبله جمعًا صادقًا
+$myTasks = $q1("SELECT COUNT(*) FROM work_items WHERE company_id = {$company_id}
+                 AND assigned_user_id = {$uid}
+                 AND status NOT IN ('closed_accepted','cancelled','rejected')");
+// موافقاتي = صندوق الاعتماد الموحد الثلاثي (طلبٌ بحَملي + خطوةُ approval_links + حلقةُ سلسلةٍ بدوري)
+$myApprovals = $q1("SELECT COUNT(*) FROM requests WHERE company_id = {$company_id}
+                     AND current_holder_user_id = {$uid}
+                     AND status IN ('submitted','routed','in_approval','approved')")
+             + $q1("SELECT COUNT(*) FROM approval_links WHERE company_id = {$company_id}
+                     AND status = 'pending' AND approver_user_id = {$uid}");
+$role = strval($_SESSION['user']['role'] ?? '');
+$stageRoles = array('submitted' => array('5','6'), 'site_approved' => array('1'),
+                    'parties_review' => array('2','4'), 'parties_approved' => array('12'),
+                    'sales_approved' => array('17','19'));
+$myStages = array();
+foreach ($stageRoles as $stg => $rr) { if (in_array($role, $rr, true)) { $myStages[] = $stg; } }
+if ($myStages) {
+    $in = "'" . implode("','", $myStages) . "'";
+    $myApprovals += $q1("SELECT COUNT(*) FROM unit_entries ue
+                          WHERE ue.company_id = {$company_id} AND ue.state IN ({$in})
+                            AND NOT (ue.state='converted' AND ue.converted_at IS NULL)");
+}
+$myRequests = $q1("SELECT COUNT(*) FROM requests WHERE company_id = {$company_id}
+                    AND requester_user_id = {$uid} AND status NOT IN ('closed','cancelled','rejected')")
+            + $q1("SELECT COUNT(*) FROM fin_requests WHERE company_id = {$company_id}
                     AND created_by = {$uid} AND state NOT IN ('closed','rejected','paid')");
 $myTickets = $q1("SELECT COUNT(*) FROM tickets t JOIN ticket_participants p ON p.tk_id = t.id
                    WHERE t.company_id = {$company_id} AND p.person_id = {$uid} AND t.head_state = 'open'");
-$myTasks = $q1("SELECT COUNT(*) FROM ticket_workstreams w JOIN tickets t ON t.id = w.tk_id
-                 WHERE t.company_id = {$company_id} AND w.assignee_person_id = {$uid}
-                   AND w.state IN ('new','received','in_progress','reopened')");
-$myMsgs = $q1("SELECT COUNT(*) FROM fin_notifications WHERE company_id = {$company_id}
+$myMsgs = $q1("SELECT COUNT(*) FROM personal_notifications WHERE company_id = {$company_id}
+                AND user_id = {$uid} AND read_at IS NULL")
+        + $q1("SELECT COUNT(*) FROM fin_notifications WHERE company_id = {$company_id}
                 AND is_read = 0 AND (target_user_id = {$uid} OR target_user_id IS NULL)");
 
 $tiles = array(
     array('① لوحة دوري', 'ما ينتظرني اليوم بترتيب الإلحاح', 'fa fa-tachometer-alt', '../main/dashboard.php', null),
     array('② مهامي', 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري', 'fa fa-tasks', '../Portal/my_tasks.php', $myTasks),
-    array('③ موافقاتي', 'صندوق الاعتماد الجامع: كل ما ينتظر قراري', 'fa fa-check-double', '../Finance/approvals_inbox.php', $myApprovals),
-    array('④ طلباتي', 'ما رفعته وحالته ومن يقف عنده', 'fa fa-paper-plane', '../FinRequests/my_requests.php', $myRequests),
-    array('⑤ طلب جديد', 'طلب مالي جديد — والنوع يُختار داخله', 'fa fa-plus-circle', '../FinRequests/finance_gateway.php?new=1', null),
-    array('⑥ المراسلات والتنبيهات', 'الداخلية وغير المقروءة', 'fa fa-bell', '../chats/index.php', $myMsgs),
+    array('③ موافقاتي', 'صندوق الاعتماد الموحد: طلباتٌ وخطواتٌ وحلقاتُ سلسلةٍ — كلٌّ يقفز لموضع فعله', 'fa fa-check-double', '../Portal/approvals_inbox.php', $myApprovals),
+    array('④ طلباتي', 'من قاموس الأنواع الـ62 — وكلُّ طلبٍ يُعرف عند مَن توقف', 'fa fa-paper-plane', '../Portal/my_requests.php', $myRequests),
+    array('⑤ طلب جديد', 'تقديمٌ من القاموس الحاكم — والمالي عبر بوابته', 'fa fa-plus-circle', '../Portal/my_requests.php', null),
+    array('⑥ المراسلات والتنبيهات', 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط', 'fa fa-bell', '../Portal/notifications.php', $myMsgs),
     array('⑦ بلاغاتي', 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة', 'fa fa-bullhorn', '../Tickets/ticket_contextual_open.php', $myTickets),
     array('⑧ ملفي', 'ملفي الشخصي وكشوفي ووثائقي', 'fa fa-id-card', '../Portal/my_portal.php', null),
     // NAV-01 v6 §7 (update0007 S-03/S-04): عنصران إلزاميان لكل حسابٍ بلا استثناء
