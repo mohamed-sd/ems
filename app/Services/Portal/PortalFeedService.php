@@ -75,20 +75,47 @@ class PortalFeedService
                     'period' => date('Y-m'), 'link' => 'Operations/units.php');
             },
             'card.requests' => function () use ($conn, $co, $accountId) {
+                // WFM أولًا (قاموس الـ62) والمالية القديمة تُجمع معًا — رقمٌ واحدٌ صادق
+                $wfm = 0;
+                $r = $conn->query("SELECT COUNT(*) n FROM requests
+                                    WHERE company_id={$co} AND requester_user_id={$accountId}
+                                      AND status NOT IN ('closed','cancelled','rejected')");
+                if ($r && ($x = $r->fetch_assoc())) { $wfm = intval($x['n']); }
+                $fin = 0;
                 $r = $conn->query("SELECT COUNT(*) n FROM fin_requests
                                     WHERE company_id={$co} AND requester_id={$accountId}
                                       AND state NOT IN ('approved','rejected','paid','closed')");
-                $row = $r ? $r->fetch_assoc() : array('n' => 0);
-                return array('value' => $row['n'] . ' طلبًا جاريًا', 'period' => '',
-                    'link' => 'Finance/requests_fin.php');
+                if ($r && ($x = $r->fetch_assoc())) { $fin = intval($x['n']); }
+                return array('value' => ($wfm + $fin) . ' طلبًا جاريًا' . ($fin > 0 ? " (منها {$fin} مالية)" : ''),
+                    'period' => '', 'link' => 'Portal/my_requests.php');
             },
             'card.approvals' => function () use ($conn, $co, $accountId) {
-                $r = $conn->query("SELECT COUNT(*) n FROM fin_requests
-                                    WHERE company_id={$co} AND decided_by IS NULL
-                                      AND state IN ('submitted','pending','review')");
-                $row = $r ? $r->fetch_assoc() : array('n' => 0);
-                return array('value' => $row['n'] . ' بانتظار قرار', 'period' => '',
-                    'link' => 'Finance/requests_fin.php');
+                // صندوق الاعتماد الموحد: حاملُ طلبٍ + خطوةُ approval_links + حلقةُ سلسلةٍ بدوره
+                $n = 0;
+                $r = $conn->query("SELECT COUNT(*) x FROM requests
+                                    WHERE company_id={$co} AND current_holder_user_id={$accountId}
+                                      AND status IN ('submitted','routed','in_approval','approved')");
+                if ($r && ($x = $r->fetch_assoc())) { $n += intval($x['x']); }
+                $r = $conn->query("SELECT COUNT(*) x FROM approval_links
+                                    WHERE company_id={$co} AND status='pending' AND approver_user_id={$accountId}");
+                if ($r && ($x = $r->fetch_assoc())) { $n += intval($x['x']); }
+                $role = '';
+                $r = $conn->query("SELECT role FROM users WHERE id={$accountId} LIMIT 1");
+                if ($r && ($x = $r->fetch_assoc())) { $role = strval($x['role']); }
+                $stageRoles = array('submitted' => array('5','6'), 'site_approved' => array('1'),
+                                    'parties_review' => array('2','4'), 'parties_approved' => array('12'),
+                                    'sales_approved' => array('17','19'));
+                $mine = array();
+                foreach ($stageRoles as $stage => $rr) { if (in_array($role, $rr, true)) { $mine[] = $stage; } }
+                if ($mine) {
+                    $in = "'" . implode("','", $mine) . "'";
+                    $r = $conn->query("SELECT COUNT(*) x FROM unit_entries ue
+                                        WHERE ue.company_id={$co} AND ue.state IN ({$in})
+                                          AND NOT (ue.state='converted' AND ue.converted_at IS NULL)");
+                    if ($r && ($x = $r->fetch_assoc())) { $n += intval($x['x']); }
+                }
+                return array('value' => $n . ' بانتظار قرارك', 'period' => '',
+                    'link' => 'Portal/approvals_inbox.php');
             },
             'card.tickets' => function () use ($conn, $co, $accountId) {
                 $r = $conn->query("SELECT COUNT(*) n FROM tickets
