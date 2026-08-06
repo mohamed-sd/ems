@@ -135,6 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
 $page_title = 'إيكوبيشن | الميزانية والانحراف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-budget-main ems-unified-page-shell">

@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 $page_title = 'إيكوبيشن | تصنيفات الأعطال والبلاغات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main tkt-categories-main ems-unified-page-shell">

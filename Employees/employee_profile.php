@@ -265,6 +265,7 @@ $driver_status_text = (isset($driver['status']) && strval($driver['status']) ===
 $page_title = "إيكوبيشن | بطاقة السائق";
 include("../inheader.php");
 include("../insidebar.php");
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>

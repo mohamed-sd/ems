@@ -264,6 +264,60 @@ if (!function_exists('proc_lookup_types')) {
     function proc_lookup_types() { return array('فئة صنف', 'وحدة قياس', 'طبيعة مادة'); }
 }
 
+if (!function_exists('proc_stock_moves_clear')) {
+    /**
+     * حذفُ حركات المخزون لمرجعٍ بعينه — بالشرطين معًا (ref_type + ref_id).
+     * ─────────────────────────────────────────────────────────────────────
+     * لا يُستعمل replaceChildren هنا: حذفُه بـ ref_id وحده يصيب حركاتِ
+     * كاتبٍ آخرَ يشاركه الرقمَ نفسَه (صرفٌ واستلامٌ بمعرّفين متساويين).
+     */
+    function proc_stock_moves_clear($g, $ref_type, $ref_id)
+    {
+        $rows = $g->select('proc_stock_move', array(
+            'columns' => array('id'),
+            'where'   => array('ref_type' => (string) $ref_type, 'ref_id' => intval($ref_id)),
+        ));
+        foreach ($rows as $r) {
+            $g->deleteRow('proc_stock_move', intval($r['id']), 'stock rewrite ' . $ref_type . '#' . intval($ref_id));
+        }
+        return count($rows);
+    }
+}
+
+if (!function_exists('proc_receipt_stock_rewrite')) {
+    /**
+     * §15.6: كاتبُ حركة «استلام» من عهدة الاستلام — سدُّ فجوةِ «المتاحُ لا يزيد
+     * بالشراء» (مقيسة 2026-08-06: أمرٌ استُلم 100٪ وصفرُ حركةٍ له).
+     * ─────────────────────────────────────────────────────────────────────
+     * القاعدة: الوجهةُ **المخزنية** وحدَها تحرّك المخزون؛ المعدة/المشروع/الورشة
+     * عهدةٌ مباشرةٌ بلا رصيد (§15.3). إعادةُ الكتابة كاملةً عند كل حفظٍ —
+     * فالتعديل لا يضاعف. تُستدعى داخل معاملة الحفظ (ذرّيةٌ مع السطور).
+     */
+    function proc_receipt_stock_rewrite($g, $custody_id, array $line_rows, $destination, $warehouse_id, $receipt_date, $uid)
+    {
+        proc_stock_moves_clear($g, 'proc_receipt_custody', $custody_id);
+        if ($destination !== 'مخزن' || intval($warehouse_id) <= 0) { return 0; }
+        $n = 0;
+        foreach ($line_rows as $lr) {
+            if (empty($lr['item_id'])) { continue; }   // سطرٌ حرٌّ بلا صنف كتالوج — لا رصيدَ له
+            $mv = array(
+                'item_id'      => intval($lr['item_id']),
+                'warehouse_id' => intval($warehouse_id),
+                'move_type'    => 'استلام',
+                'qty'          => (float) $lr['qty'],
+                'ref_type'     => 'proc_receipt_custody',
+                'ref_id'       => intval($custody_id),
+                'note'         => 'استلام ' . (string) $lr['item_name'],
+                'created_by'   => intval($uid) > 0 ? intval($uid) : null,
+            );
+            if ($receipt_date) { $mv['moved_at'] = $receipt_date . ' 00:00:00'; }
+            $g->insert('proc_stock_move', $mv);
+            $n++;
+        }
+        return $n;
+    }
+}
+
 if (!function_exists('proc_sync_order_receipt')) {
     /**
      * مزامنةُ أمر الشراء مع واقع استلامه (UX-09 §5.1-② · §8.2).

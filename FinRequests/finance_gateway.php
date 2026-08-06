@@ -79,6 +79,7 @@ $exc_pct = $req_month > 0 ? round($exc_month / $req_month * 100, 1) : 0;
 $page_title = 'إيكوبيشن | الطلبات المالية';
 include('../inheader.php');
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php

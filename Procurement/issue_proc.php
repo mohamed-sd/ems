@@ -127,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
             // مسح الأبناء الثلاثة (تتبنّى معاملة المدير — لا commit ضمني)
             $g->replaceChildren('proc_issue', $issue_id, 'proc_issue_line', 'issue_id', array(), 'issue lines clear');
             $g->replaceChildren('proc_issue', $issue_id, 'proc_custody', 'issue_id', array(), 'issue custody clear');
-            $g->replaceChildren('proc_issue', $issue_id, 'proc_stock_move', 'ref_id', array(), 'issue moves clear');
+            // الحذفُ مقيَّدٌ بالنوع والرقم معًا — ref_id وحده يصيب حركاتِ استلامٍ تشاركه الرقم
+            proc_stock_moves_clear($g, 'proc_issue', $issue_id);
 
             // سطر ← حركة (إن ارتبط بصنف) ← عهدة بline_id الوليد
             for ($i = 0; $i < count($item_names); $i++) {
@@ -191,7 +192,8 @@ if (isset($_GET['delete_id'])) {
         proc_gate(false)->runInTransaction(function ($g) use ($delete_id) {
             $g->softDelete('proc_issue', $delete_id);
             // اعكس أثر المخزون والعهدة لهذا الصرف — ذرّيًا مع الحذف الناعم
-            $g->replaceChildren('proc_issue', $delete_id, 'proc_stock_move', 'ref_id', array(), 'issue delete: moves reversal');
+            // (الحركاتُ بحذفٍ مقيَّدِ النوع — لا ref_id وحده)
+            proc_stock_moves_clear($g, 'proc_issue', $delete_id);
             $g->replaceChildren('proc_issue', $delete_id, 'proc_custody', 'issue_id', array(), 'issue delete: custody reversal');
         }, 'issue delete#' . $delete_id);
     } catch (\Throwable $e) {
@@ -215,6 +217,7 @@ if (isset($_GET['edit_id']) && $can_edit) {
 $page_title = 'إيكوبيشن | صرف المخزون والعهدة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /** صف سطر صرف. */
 function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)

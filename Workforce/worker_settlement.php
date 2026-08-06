@@ -107,6 +107,7 @@ try {
 } catch (\Throwable $t) { error_log('worker_settlement.php workers: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | تسويات العاملين"; include '../inheader.php'; include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='تسويات العاملين'; $header_icon='fas fa-hand-holding-dollar'; $header_actions=array();

@@ -59,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     $supplier_id = ($_POST['supplier_id'] ?? '') !== '' ? intval($_POST['supplier_id']) : null;
     $order_id    = ($_POST['order_id'] ?? '') !== '' ? intval($_POST['order_id']) : null;
     $receipt_location = trim($_POST['receipt_location'] ?? '');
+    $warehouse_id = ($_POST['warehouse_id'] ?? '') !== '' ? intval($_POST['warehouse_id']) : null;
     $expected_destination = trim($_POST['expected_destination'] ?? 'مخزن');
     $state = trim($_POST['state'] ?? 'مستلَمة');
     $notes = trim($_POST['notes'] ?? '');
@@ -66,6 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     if ($holder_name === '') { header("Location: receipt_custody_proc.php?msg=اسم+المستلِم+إلزامي+❌"); exit(); }
     if (!in_array($expected_destination, $destinations, true)) { $expected_destination = 'مخزن'; }
     if (!in_array($state, $states, true)) { $state = 'مستلَمة'; }
+    // §15.6: الوجهةُ المخزنية بلا مخزنِ إدخالٍ = رصيدٌ لا يتحرك — تُرفض
+    if ($expected_destination === 'مخزن' && !$warehouse_id) {
+        header("Location: receipt_custody_proc.php?msg=حدد+مخزن+الإدخال+—+الوجهة+مخزن+❌"); exit();
+    }
 
     // K9-M1: الأب عبر البوابة، والسطور عبر قناة replaceChildren (عقد البوابة §8 —
     // النمط المبرَّر: تحرير أبٍ يعيد كتابة تفاصيله). حذف/إدراج السطور ذرّيٌّ داخل
@@ -74,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     $parent = array(
         'holder_name' => $holder_name, 'receipt_date' => $receipt_date,
         'supplier_id' => $supplier_id, 'order_id' => $order_id,
-        'receipt_location' => $receipt_location, 'expected_destination' => $expected_destination,
+        'receipt_location' => $receipt_location, 'warehouse_id' => $warehouse_id,
+        'expected_destination' => $expected_destination,
         'state' => $state, 'notes' => $notes,
     );
     $item_ids = $_POST['line_item_id'] ?? array();
@@ -99,16 +105,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     }
 
     try {
-        $g = proc_gate(false);
-        if ($is_editing) {
-            $g->update('proc_receipt_custody', $parent, array('id' => $id, 'is_deleted' => 0));
-            $custody_id = $id;
-        } else {
-            $parent['code'] = proc_gen_code($conn, 'proc_receipt_custody', 'PRC-RC', $company_id);
-            $parent['created_by'] = $current_user_id;
-            $custody_id = $g->insert('proc_receipt_custody', $parent);
-        }
-        $g->replaceChildren('proc_receipt_custody', $custody_id, 'proc_receipt_line', 'custody_id', $line_rows, 'receipt lines rewrite');
+        proc_gate(false)->runInTransaction(function ($g) use (
+            $is_editing, $id, $parent, $company_id, $current_user_id, $conn, $line_rows,
+            $expected_destination, $warehouse_id, $receipt_date
+        ) {
+            if ($is_editing) {
+                $g->update('proc_receipt_custody', $parent, array('id' => $id, 'is_deleted' => 0));
+                $custody_id = $id;
+            } else {
+                $parent['code'] = proc_gen_code($conn, 'proc_receipt_custody', 'PRC-RC', $company_id);
+                $parent['created_by'] = $current_user_id;
+                $custody_id = $g->insert('proc_receipt_custody', $parent);
+            }
+            $g->replaceChildren('proc_receipt_custody', $custody_id, 'proc_receipt_line', 'custody_id', $line_rows, 'receipt lines rewrite');
+
+            // §15.6: حركةُ «استلام» للمخزون — للوجهة المخزنية حصرًا (المعدة/المشروع/
+            // الورشة عهدةٌ لا مخزون). إعادةُ الكتابة عند التعديل بحذفٍ **مقيَّدٍ بالنوع**
+            // (ref_type + ref_id) — لا replaceChildren: الحذفُ بـ ref_id وحده يصيب
+            // حركاتِ كاتبٍ آخرَ يشاركه الرقم (proc_issue).
+            proc_receipt_stock_rewrite($g, $custody_id, $line_rows, $expected_destination,
+                $warehouse_id, $receipt_date, $current_user_id);
+            return $custody_id;
+        }, 'receipt save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
         error_log('receipt_custody_proc save refused: ' . $e->getMessage());
         header("Location: receipt_custody_proc.php?msg=تعذّر+الحفظ+❌"); exit();
@@ -127,11 +145,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: receipt_custody_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
+    $del_order_id = null;
     try {
-        proc_gate(false)->softDelete('proc_receipt_custody', $delete_id);
-    } catch (\App\Core\TenantGateException $e) {
+        $prev = proc_gate(false)->selectOne('proc_receipt_custody', array(
+            'columns' => array('order_id'), 'where' => array('id' => $delete_id)));
+        $del_order_id = $prev ? intval($prev['order_id']) : null;
+        proc_gate(false)->runInTransaction(function ($g) use ($delete_id) {
+            $g->softDelete('proc_receipt_custody', $delete_id);
+            // أرشفةُ العهدة تُرجع أثرَها المخزونيَّ — ذرّيًا معها
+            proc_stock_moves_clear($g, 'proc_receipt_custody', $delete_id);
+        }, 'receipt delete#' . $delete_id);
+    } catch (\Throwable $e) {
         error_log('receipt_custody softDelete refused: ' . $e->getMessage());
     }
+    // الحالةُ تتبع الواقعة: حذفُ استلامٍ يعيد حسابَ نسبة الأمر (تقدُّمٌ لا نكوص)
+    if ($del_order_id) { proc_sync_order_receipt($conn, $del_order_id, $current_user_id); }
     header("Location: receipt_custody_proc.php?msg=تم+حذف+العهدة+بنجاح+✅"); exit();
 }
 
@@ -150,6 +178,7 @@ if (isset($_GET['edit_id']) && $can_edit) {
 $page_title = 'إيكوبيشن | الاستلام المؤقت';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /** صف سطر عهدة استلام. */
 function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
@@ -206,6 +235,10 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                     <div class="form-group">
                         <label>موقع الاستلام</label>
                         <input type="text" name="receipt_location" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_location']) : ''; ?>" placeholder="عطبرة / موقع المورد …">
+                    </div>
+                    <div class="form-group">
+                        <label>مخزن الإدخال <span class="required">*</span> <small>(إلزامي حين الوجهة «مخزن» — يحرّك الرصيد)</small></label>
+                        <select name="warehouse_id"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
                         <label>الوجهة النهائية المتوقعة</label>

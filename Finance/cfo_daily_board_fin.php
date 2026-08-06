@@ -102,6 +102,7 @@ $rb_pulse_series = array('تحصيل', 'صرف');
 $page_title = 'إيكوبيشن | لوحة المدير المالي';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main fin-cfo-main ems-unified-page-shell">
     <?php

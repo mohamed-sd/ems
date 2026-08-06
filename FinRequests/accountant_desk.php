@@ -46,6 +46,7 @@ $budget_lines = finreq_budget_lines($gate);
 $page_title = 'إيكوبيشن | مكتب المحاسب';
 include('../inheader.php');
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php

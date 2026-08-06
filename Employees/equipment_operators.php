@@ -149,6 +149,7 @@ if ($can_add && !$edit) {
 $page_title = "إيكوبيشن | المشغّلون والسائقون";
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php

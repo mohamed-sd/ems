@@ -194,6 +194,7 @@ function atb_flag($v) {
 $page_title = 'لوحة الإسناد اليومي';
 include('../inheader.php');
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main atb-main ems-unified-page-shell">

@@ -79,6 +79,7 @@ $type_lbl = fin_account_types();
 $page_title = 'إيكوبيشن | القوائم المالية';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 function fin_stmt_rows($rows, $type_lbl)
 {

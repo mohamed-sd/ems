@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['horizon_type'])) {
 $page_title = 'إيكوبيشن | السيولة والتنبؤ النقدي';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main fin-cash-main ems-unified-page-shell">
     <?php

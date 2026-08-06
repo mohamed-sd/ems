@@ -39,6 +39,7 @@ $depts = array('العميل','المورد','الصيانة','التشغيل','
 $page_title = 'التوقفات بلا مسؤول';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-user-slash"></i> التوقفاتُ بلا مسؤول</h4>

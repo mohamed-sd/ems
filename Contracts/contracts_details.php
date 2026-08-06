@@ -34,6 +34,7 @@ $details_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract detai
 $page_title = 'الإيكوبيشن | ملف عقد المشروع';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 $cf_contract_id = intval($_GET['id'] ?? 0); $cf_active = 'summary';
 if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php';
 ?>

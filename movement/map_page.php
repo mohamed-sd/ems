@@ -246,6 +246,7 @@ include('../inheader.php');
 // تصميم شاشة الخريطة معزول في ملف خاص (يُحمّل بعد الأنماط العامة، محصّن تحت .movement-map-page)
 echo '<link rel="stylesheet" href="/ems/assets/css/map-page.css?v=2026060603">' . "\n";
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main map-page-main movement-map-page ems-unified-page-shell">

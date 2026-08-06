@@ -344,6 +344,7 @@ if (isset($_GET['delete_id'])) {
 <?php
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">

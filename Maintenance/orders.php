@@ -481,6 +481,7 @@ $edit_eq_options = $order
 $page_title = 'إيكوبيشن | أوامر الصيانة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 function mnt_opt($value, $label, $selected) {
     return "<option value='" . htmlspecialchars((string) $value, ENT_QUOTES) . "'" . ($selected ? " selected" : "") . ">" . htmlspecialchars((string) $label) . "</option>";

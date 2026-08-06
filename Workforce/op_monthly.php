@@ -142,6 +142,7 @@ function cmp03_screen_norm($s) {
 $page_title = 'إيكوبيشن | الأداء الشهري للمشغّل';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php

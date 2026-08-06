@@ -137,6 +137,7 @@ if (isset($_GET['gen_mnt'])) {
 $page_title = 'إيكوبيشن | استقبال معاملات الإدارات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // عدّادات المرشّحين (قراءة فقط) — نفس منطق قراءتَي fin_pending_import عبر البوابة
 // العدّادُ يعكس ما سيُنشر فعلًا — لا ما يمرّ بالمرشِّح الخام: أمرٌ لم تصل بضاعتُه

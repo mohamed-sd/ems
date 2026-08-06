@@ -93,6 +93,7 @@ if (isset($_GET['delete_id'])) {
 $page_title = 'إيكوبيشن | موردو المشتريات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main proc-suppliers-main ems-unified-page-shell">

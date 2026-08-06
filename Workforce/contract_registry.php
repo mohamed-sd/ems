@@ -327,6 +327,7 @@ $vc_editable = $view_contract
 $page_title = 'إيكوبيشن | سجل العقود الموحّد';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 $stateChip = function ($state) {
     $label = ECSM::labelAr($state);

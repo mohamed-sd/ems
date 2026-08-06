@@ -72,6 +72,7 @@ if ($driver_owned === null) {
 <body class="ems-site">
 
   <?php include('../insidebar.php'); ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
   <div class="main driver-contracts-main ems-unified-page-shell">
 

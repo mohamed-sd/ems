@@ -233,6 +233,7 @@ foreach ($pending as $p) { $pendingTotal += (isset($p['events']) ? $p['events'] 
 $page_title = 'إيكوبيشن | العملات وأسعار الصرف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-currencies-main ems-unified-page-shell">

@@ -175,6 +175,7 @@ if ($has_model_table) {
 $page_title = "إيكوبيشن | إعداد الإهلاك";
 include("../inheader.php");
 include("../insidebar.php");
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
 $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : 'بالساعة التشغيلية'; };

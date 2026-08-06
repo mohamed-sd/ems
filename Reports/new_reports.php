@@ -136,6 +136,7 @@ if(!$workhours_count) $workhours_count = 0;
 <body>
 
 <?php include('../insidebar.php');?> 
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
  <div class="main">
 

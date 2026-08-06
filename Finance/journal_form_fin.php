@@ -195,6 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
 $page_title = 'إيكوبيشن | القيود اليومية';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-journal-main ems-unified-page-shell">

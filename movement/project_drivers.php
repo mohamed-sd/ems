@@ -667,6 +667,7 @@ if (!function_exists('get_shift_type_label')) {
 $page_title = "توزيع المشغّلين";
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">

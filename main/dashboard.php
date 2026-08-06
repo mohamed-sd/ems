@@ -492,6 +492,7 @@ $page_title = 'Equipation | الرئيسية';
 $ems_topbar_variant = 'dashboard';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <style>
 /* ─── Dashboard font: IBM Plex Sans Arabic ────────────────────

@@ -91,6 +91,7 @@ if (isset($_GET['edit_id'])) {
 $page_title = "إيكوبيشن | الأدوار الوظيفية";
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php

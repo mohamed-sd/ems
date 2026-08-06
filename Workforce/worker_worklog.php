@@ -25,6 +25,7 @@ $events_map    = ems_events_map($conn, $company_scope);          // [worker_id =
 $rotation_due  = ems_rotation_due_soon($conn, $company_scope, 14); // العقود التي اقترب تدويرها (14 يوماً)
 
 $page_title="إيكوبيشن | سجل الأحداث التشغيلية"; include '../inheader.php'; include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='سجل الأحداث التشغيلية المجمَّع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();

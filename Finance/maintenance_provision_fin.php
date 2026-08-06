@@ -74,6 +74,7 @@ $effects = fin_gate($is_super_admin)->select('fin_effect_map', array('orderBy' =
 $page_title = 'إيكوبيشن | قواعد مخصص الصيانة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-mprov-main ems-unified-page-shell">

@@ -9,6 +9,7 @@ $user_id = approval_get_user_id();
 $page_title = 'إيكوبيشن | صندوق موافقاتي';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 $status_filter = isset($_GET['status']) ? trim($_GET['status']) : 'pending';
 $allowed_status = ['pending', 'approved', 'rejected', 'all'];

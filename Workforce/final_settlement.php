@@ -103,6 +103,7 @@ $ST_LABEL   = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'canc
 $page_title = 'إيكوبيشن | تصفية إنهاء خدمة الموظف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // M-14 BR-GOV-07: التصفية كشفُ مستحقاتٍ حساس — القراءةُ تُسجَّل (عطالة يومية)
 require_once __DIR__ . '/../includes/sensitive_read_log.php';
 ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/final_settlement.php');

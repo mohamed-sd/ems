@@ -818,6 +818,155 @@ class ExcelRegistry
             'instructions'     => ['هذا الكيان للتصدير فقط (سجل تدقيق).'],
         ]);
 
+        // ═══════════════════════════════════════════════════════════════════
+        // ح-09 · كياناتُ المبيعات السبعة — كانت الوحدةُ كلُّها بلا مخرجٍ إلى
+        // Excel: عشرُ شاشاتٍ بصفر زرِّ تصدير، فلا يُخرج مديرُ المبيعات مسارَه
+        // ولا عروضَه إلى الإدارة. الأعمدةُ وقوائمُ ENUM مطابقةٌ للمخطط الحيّ.
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ─────────────────────────── الفرص البيعية ───────────────────────────
+        $defs['opportunities'] = new EntityDefinition('opportunities', 'الفرص البيعية', 'opportunities', [
+            new Column('opp_code', 'كود الفرصة', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'OPP-0001']),
+            new Column('title', 'عنوان الفرصة', ['required' => true, 'width' => 35, 'example' => 'توريد معدات حفر']),
+            new Column('client_id', 'العميل (اسم أو كود)', ['width' => 26, 'example' => 'CLT-0001', 'lookup' => [
+                'table' => 'clients', 'idColumn' => 'id', 'storeIdIn' => 'client_id',
+                'matchBy' => ['client_code', 'client_name'], 'nameColumn' => 'client_name',
+                'scoped' => true, 'softDelete' => 'is_deleted']]),
+            new Column('stage', 'المرحلة', ['type' => Column::TYPE_ENUM, 'width' => 16,
+                'enum' => ['جديدة', 'قيد الدراسة', 'مؤهلة', 'عرض مقدم', 'تفاوض', 'فوز', 'خسارة', 'مستبعدة'], 'default' => 'جديدة']),
+            new Column('source', 'المصدر', ['width' => 16, 'example' => 'مناقصة']),
+            new Column('sector_category', 'تصنيف القطاع', ['width' => 18, 'example' => 'تعدين']),
+            new Column('state_region', 'الولاية/المنطقة', ['width' => 18, 'example' => 'نهر النيل']),
+            new Column('revenue_model', 'نموذج الإيراد', ['type' => Column::TYPE_ENUM, 'enum' => ['hourly', 'ton', 'meter', 'mixed'], 'example' => 'hourly']),
+            new Column('expected_revenue', 'الإيراد المتوقع', ['type' => Column::TYPE_FLOAT, 'example' => '250000']),
+            new Column('currency', 'العملة', ['type' => Column::TYPE_ENUM, 'enum' => ['USD', 'SDG'], 'default' => 'USD', 'width' => 10]),
+            new Column('probability', 'احتمال الفوز ٪', ['type' => Column::TYPE_FLOAT, 'example' => '40']),
+            new Column('expected_close_date', 'تاريخ الإغلاق المتوقع', ['type' => Column::TYPE_DATE, 'example' => '2026-10-01']),
+            new Column('attractiveness', 'الجاذبية', ['type' => Column::TYPE_ENUM, 'enum' => ['منخفضة', 'متوسطة', 'عالية']]),
+            new Column('strategy_fit', 'التوافق الاستراتيجي', ['type' => Column::TYPE_ENUM, 'enum' => ['منخفض', 'متوسط', 'عالي']]),
+            new Column('win_reason', 'سبب الفوز', ['width' => 26]),
+            new Column('lost_reason', 'سبب الخسارة', ['width' => 26]),
+            new Column('notes', 'ملاحظات', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Opportunities/opportunities.php',
+            'instructions' => [
+                'احذف صفوف الأمثلة قبل رفع الملف.',
+                'كود الفرصة فريدٌ داخل شركتك — أحرفٌ وأرقامٌ و - أو _ فقط.',
+                'المرحلة «فوز» تستلزم سبب فوز، و«خسارة»/«مستبعدة» تستلزم سبب خسارة.',
+                'الإيراد المتوقع لا يكون سالبًا.',
+            ],
+        ]);
+
+        // ─────────────────────────── عروض الأسعار ───────────────────────────
+        $defs['quotations'] = new EntityDefinition('quotations', 'عروض الأسعار', 'quotations', [
+            new Column('quotation_code', 'كود العرض', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'QUO-0001']),
+            new Column('client_id', 'العميل (اسم أو كود)', ['width' => 26, 'example' => 'CLT-0001', 'lookup' => [
+                'table' => 'clients', 'idColumn' => 'id', 'storeIdIn' => 'client_id',
+                'matchBy' => ['client_code', 'client_name'], 'nameColumn' => 'client_name',
+                'scoped' => true, 'softDelete' => 'is_deleted']]),
+            new Column('opportunity_id', 'الفرصة (كود)', ['width' => 20, 'example' => 'OPP-0001', 'lookup' => [
+                'table' => 'opportunities', 'idColumn' => 'id', 'storeIdIn' => 'opportunity_id',
+                'matchBy' => ['opp_code'], 'nameColumn' => 'opp_code',
+                'scoped' => true, 'softDelete' => 'is_deleted']]),
+            new Column('amount_total', 'إجمالي العرض', ['type' => Column::TYPE_FLOAT, 'example' => '120000']),
+            new Column('currency', 'العملة', ['type' => Column::TYPE_ENUM, 'enum' => ['USD', 'SDG'], 'default' => 'USD', 'width' => 10]),
+            new Column('validity_date', 'تاريخ الصلاحية', ['type' => Column::TYPE_DATE, 'example' => '2026-12-31']),
+            new Column('payment_terms', 'شروط الدفع', ['width' => 26]),
+            new Column('state', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['مسودة', 'مقدم', 'مقبول', 'مرفوض'], 'default' => 'مسودة', 'width' => 14]),
+            new Column('notes', 'ملاحظات', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Clients/quotations.php',
+            'instructions' => ['كود العرض فريدٌ داخل شركتك.', 'الفرصة والعميل يُطابقان بالكود أو الاسم.'],
+        ]);
+
+        // ─────────────────────────── المناقصات ───────────────────────────
+        $defs['tenders'] = new EntityDefinition('tenders', 'المناقصات', 'tenders', [
+            new Column('tender_code', 'كود المناقصة', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'TND-0001']),
+            new Column('name', 'اسم المناقصة', ['required' => true, 'width' => 35, 'example' => 'مناقصة تخريم حكومية']),
+            new Column('authority_id', 'الجهة (عميل)', ['width' => 26, 'example' => 'CLT-0001', 'lookup' => [
+                'table' => 'clients', 'idColumn' => 'id', 'storeIdIn' => 'authority_id',
+                'matchBy' => ['client_code', 'client_name'], 'nameColumn' => 'client_name',
+                'scoped' => true, 'softDelete' => 'is_deleted']]),
+            new Column('opportunity_id', 'الفرصة (كود)', ['width' => 20, 'example' => 'OPP-0001', 'lookup' => [
+                'table' => 'opportunities', 'idColumn' => 'id', 'storeIdIn' => 'opportunity_id',
+                'matchBy' => ['opp_code'], 'nameColumn' => 'opp_code',
+                'scoped' => true, 'softDelete' => 'is_deleted']]),
+            new Column('closing_date', 'تاريخ الإقفال', ['type' => Column::TYPE_DATE, 'example' => '2026-11-30']),
+            new Column('participation_state', 'حالة المشاركة', ['type' => Column::TYPE_ENUM, 'enum' => ['إعداد', 'مقدمة', 'مسحوبة'], 'default' => 'إعداد', 'width' => 14]),
+            new Column('result', 'النتيجة', ['type' => Column::TYPE_ENUM, 'enum' => ['قيد التقييم', 'فوز', 'خسارة', 'إلغاء'], 'width' => 14]),
+            new Column('result_reason', 'سبب النتيجة', ['width' => 26]),
+            new Column('notes', 'ملاحظات', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Clients/tenders.php',
+            'instructions' => ['كود المناقصة فريدٌ داخل شركتك.', 'الجهة عميلٌ مسجَّلٌ في سجل العملاء.'],
+        ]);
+
+        // ─────────────────────────── كتالوج الخدمات ───────────────────────────
+        $defs['products'] = new EntityDefinition('products', 'كتالوج الخدمات وبنود البيع', 'products', [
+            new Column('product_code', 'كود البند', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'PRD-0001']),
+            new Column('name', 'اسم البند', ['required' => true, 'width' => 32, 'example' => 'ساعة حفار 320']),
+            new Column('product_type', 'النوع', ['type' => Column::TYPE_ENUM, 'enum' => ['خدمة', 'معدة', 'مادة'], 'default' => 'خدمة', 'width' => 12]),
+            new Column('revenue_model', 'نموذج الإيراد', ['type' => Column::TYPE_ENUM, 'enum' => ['hourly', 'ton', 'meter'], 'example' => 'hourly']),
+            new Column('default_uom', 'وحدة القياس', ['width' => 14, 'example' => 'ساعة']),
+            new Column('standard_price', 'السعر القياسي', ['type' => Column::TYPE_FLOAT, 'example' => '150']),
+            new Column('currency', 'العملة', ['type' => Column::TYPE_ENUM, 'enum' => ['USD', 'SDG'], 'default' => 'USD', 'width' => 10]),
+            new Column('description', 'الوصف', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Clients/products.php',
+            'instructions' => ['كود البند فريدٌ داخل شركتك.'],
+        ]);
+
+        // ─────────────────────────── قوائم التسعير ───────────────────────────
+        $defs['pricelists'] = new EntityDefinition('pricelists', 'قوائم التسعير', 'pricelists', [
+            new Column('pricelist_code', 'كود القائمة', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'PL-0001']),
+            new Column('name', 'اسم القائمة', ['required' => true, 'width' => 32, 'example' => 'تسعيرة 2026 — تعدين']),
+            new Column('revenue_model', 'نموذج الإيراد', ['type' => Column::TYPE_ENUM, 'enum' => ['hourly', 'ton', 'meter'], 'example' => 'hourly']),
+            new Column('base_price', 'السعر الأساس', ['type' => Column::TYPE_FLOAT, 'example' => '150']),
+            new Column('currency', 'العملة', ['type' => Column::TYPE_ENUM, 'enum' => ['USD', 'SDG'], 'default' => 'USD', 'width' => 10]),
+            new Column('distance_factor', 'معامل المسافة', ['type' => Column::TYPE_FLOAT, 'example' => '1.0']),
+            new Column('shift_factor', 'معامل الوردية', ['type' => Column::TYPE_FLOAT, 'example' => '1.0']),
+            new Column('volume_factor', 'معامل الحجم', ['type' => Column::TYPE_FLOAT, 'example' => '1.0']),
+            new Column('duration_factor', 'معامل المدة', ['type' => Column::TYPE_FLOAT, 'example' => '1.0']),
+            new Column('notes', 'ملاحظات', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Clients/pricelists.php',
+            'instructions' => ['كود القائمة فريدٌ داخل شركتك.', 'المعاملات نسبٌ — 1.0 تعني بلا تعديل.'],
+        ]);
+
+        // ─────────────────────────── المخاطر التجارية ───────────────────────────
+        $defs['commercial_risks'] = new EntityDefinition('commercial_risks', 'المخاطر التجارية', 'commercial_risks', [
+            new Column('risk_code', 'كود المخاطرة', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'RSK-0001']),
+            new Column('name', 'اسم المخاطرة', ['required' => true, 'width' => 32, 'example' => 'تأخر تحصيل عميل']),
+            new Column('risk_type', 'النوع', ['type' => Column::TYPE_ENUM, 'enum' => ['عميل', 'موقع', 'تمويل', 'تحصيل', 'تشغيل', 'موردون'], 'width' => 14]),
+            new Column('severity', 'الشدّة', ['type' => Column::TYPE_ENUM, 'enum' => ['منخفضة', 'متوسطة', 'عالية'], 'width' => 12]),
+            new Column('state', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['مفتوح', 'تحت المعالجة', 'مغلق'], 'default' => 'مفتوح', 'width' => 16]),
+            new Column('mitigation', 'إجراء التخفيف', ['width' => 32]),
+            new Column('notes', 'ملاحظات', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Clients/commercial_risks.php',
+            'instructions' => ['كود المخاطرة فريدٌ داخل شركتك.'],
+        ]);
+
+        // ─────────────────────────── الأنشطة التجارية ───────────────────────────
+        $defs['activities'] = new EntityDefinition('activities', 'الأنشطة التجارية', 'activities', [
+            new Column('activity_code', 'كود النشاط', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'ACT-0001']),
+            new Column('activity_type', 'نوع النشاط', ['width' => 18, 'example' => 'زيارة عميل']),
+            new Column('subject', 'الموضوع', ['required' => true, 'width' => 32, 'example' => 'زيارة موقع المنجم']),
+            new Column('activity_date', 'تاريخ النشاط', ['type' => Column::TYPE_DATE, 'example' => '2026-08-01']),
+            new Column('outcome', 'المخرج', ['width' => 32]),
+            new Column('notes', 'ملاحظات', ['width' => 30]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'   => 'Clients/activities.php',
+            'instructions' => ['كود النشاط فريدٌ داخل شركتك.', 'الربطُ بالفرصة/العميل يُدار من الشاشة لا من الملف.'],
+        ]);
+
         return $defs;
     }
 }

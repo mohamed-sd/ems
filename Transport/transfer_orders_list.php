@@ -31,6 +31,7 @@ $stage_map     = trs_stages();
 $page_title = 'إيكوبيشن | أوامر الترحيل';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main trs-orders-main ems-unified-page-shell">
     <?php

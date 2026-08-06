@@ -172,6 +172,7 @@ $mc_list_rows = array_values($mc_list_rows);
 
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <?php

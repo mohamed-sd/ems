@@ -37,6 +37,7 @@ if ($r) $op = mysqli_fetch_assoc($r);
 $page_title = 'ملف عملية التمويل';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <?php if (!$op): ?>

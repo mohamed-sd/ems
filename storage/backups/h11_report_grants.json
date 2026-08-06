@@ -1,0 +1,674 @@
+[
+    {
+        "role_id": 2,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 2,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 2,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 2,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 2,
+        "report_code": "supplier_equipment_performance"
+    },
+    {
+        "role_id": 2,
+        "report_code": "supplier_timesheet"
+    },
+    {
+        "role_id": 3,
+        "report_code": "fleet_equipment_detailed"
+    },
+    {
+        "role_id": 3,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 3,
+        "report_code": "fleet_operations"
+    },
+    {
+        "role_id": 3,
+        "report_code": "fleet_timesheet"
+    },
+    {
+        "role_id": 3,
+        "report_code": "timesheet_by_equipment"
+    },
+    {
+        "role_id": 4,
+        "report_code": "drivers_contracts"
+    },
+    {
+        "role_id": 4,
+        "report_code": "drivers_detailed"
+    },
+    {
+        "role_id": 4,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 4,
+        "report_code": "drivers_timesheet"
+    },
+    {
+        "role_id": 4,
+        "report_code": "timesheet_by_driver"
+    },
+    {
+        "role_id": 6,
+        "report_code": "fleet_operations"
+    },
+    {
+        "role_id": 6,
+        "report_code": "operations_detailed"
+    },
+    {
+        "role_id": 6,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 6,
+        "report_code": "timesheet_by_driver"
+    },
+    {
+        "role_id": 6,
+        "report_code": "timesheet_by_equipment"
+    },
+    {
+        "role_id": 6,
+        "report_code": "timesheet_by_project"
+    },
+    {
+        "role_id": 6,
+        "report_code": "timesheet_detailed"
+    },
+    {
+        "role_id": 6,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 7,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 7,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 7,
+        "report_code": "project_detailed"
+    },
+    {
+        "role_id": 7,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 7,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 7,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 7,
+        "report_code": "timesheet_by_project"
+    },
+    {
+        "role_id": 8,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 8,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 8,
+        "report_code": "supplier_equipment_performance"
+    },
+    {
+        "role_id": 8,
+        "report_code": "supplier_timesheet"
+    },
+    {
+        "role_id": 10,
+        "report_code": "fleet_equipment_detailed"
+    },
+    {
+        "role_id": 10,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 10,
+        "report_code": "fleet_operations"
+    },
+    {
+        "role_id": 10,
+        "report_code": "fleet_timesheet"
+    },
+    {
+        "role_id": 12,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 12,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 12,
+        "report_code": "project_detailed"
+    },
+    {
+        "role_id": 12,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 12,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 12,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 12,
+        "report_code": "timesheet_by_project"
+    },
+    {
+        "role_id": 15,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 15,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 16,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 16,
+        "report_code": "supplier_equipment_performance"
+    },
+    {
+        "role_id": 16,
+        "report_code": "supplier_timesheet"
+    },
+    {
+        "role_id": 16,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 17,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "project_detailed"
+    },
+    {
+        "role_id": 17,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 17,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 17,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 18,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 18,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 18,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 19,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "project_detailed"
+    },
+    {
+        "role_id": 19,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 19,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 19,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "drivers_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "fleet_equipment_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "operations_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "project_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 20,
+        "report_code": "timesheet_detailed"
+    },
+    {
+        "role_id": 20,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 21,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 22,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 23,
+        "report_code": "fleet_equipment_detailed"
+    },
+    {
+        "role_id": 23,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 23,
+        "report_code": "fleet_operations"
+    },
+    {
+        "role_id": 23,
+        "report_code": "fleet_timesheet"
+    },
+    {
+        "role_id": 23,
+        "report_code": "operations_detailed"
+    },
+    {
+        "role_id": 23,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 24,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 25,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 25,
+        "report_code": "supplier_equipment_performance"
+    },
+    {
+        "role_id": 25,
+        "report_code": "supplier_timesheet"
+    },
+    {
+        "role_id": 25,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "contracts_detailed"
+    },
+    {
+        "role_id": 26,
+        "report_code": "contracts_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "fleet_equipment_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "maintenance_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "operations_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "project_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "supplier_contracts_detailed"
+    },
+    {
+        "role_id": 26,
+        "report_code": "supplier_contracts_summary"
+    },
+    {
+        "role_id": 26,
+        "report_code": "timesheet_summary"
+    },
+    {
+        "role_id": 27,
+        "report_code": "drivers_contracts"
+    },
+    {
+        "role_id": 27,
+        "report_code": "drivers_detailed"
+    },
+    {
+        "role_id": 27,
+        "report_code": "drivers_summary"
+    },
+    {
+        "role_id": 27,
+        "report_code": "drivers_timesheet"
+    },
+    {
+        "role_id": 27,
+        "report_code": "timesheet_by_driver"
+    }
+]

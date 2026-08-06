@@ -92,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $page_title = "إيكوبيشن | $typetext";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <h2 style="text-align:center;"><?= $typetext; ?></h2>

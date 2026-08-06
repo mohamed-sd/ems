@@ -62,6 +62,7 @@ WHERE 1=1$drv_filter AND {TENANT_SCOPE} GROUP BY d.name, p.name, e.name, t.date 
 <body>
 
 <?php include('../insidebar.php'); ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
 <div class="main reports-main driver-report-main">
 

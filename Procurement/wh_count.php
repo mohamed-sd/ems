@@ -51,6 +51,7 @@ if ($wh > 0) {
 $page_title = 'الجرد والتسويات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-clipboard-list"></i> الجردُ والتسويات</h4></div>

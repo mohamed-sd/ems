@@ -244,6 +244,7 @@ if ($plan || $edit_id === 0) {
 $page_title = 'إيكوبيشن | الصيانة الوقائية';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 function mnt_opt($value, $label, $selected) {
     return "<option value='" . htmlspecialchars((string) $value, ENT_QUOTES) . "'" . ($selected ? " selected" : "") . ">" . htmlspecialchars((string) $label) . "</option>";
 }

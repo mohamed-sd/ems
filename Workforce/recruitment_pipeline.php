@@ -113,6 +113,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $apps[] = $x;
 $page_title = 'دورة التوظيف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-user-plus"></i> دورةُ التوظيف — عشرُ خطواتٍ من الشاغر إلى التثبيت</h4></div>

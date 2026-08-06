@@ -66,6 +66,7 @@ if (!isset($_SESSION['user'])) {
 
 <?php
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants (سلوك الأصل: بلا تنطيق).
 // (operations.project_id عمودٌ قائم فسقط فحصه)

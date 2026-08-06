@@ -689,6 +689,7 @@ if ($type !== "1" && $type !== "2" && $type !== "3") {
 $page_title = "إيكوبيشن | التايم شيت اليومي (إدخال الوحدات)";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // تحديد النوع من الرابط (إن وجد)
 // ── شرطُ «ولها سائقٌ يعمل عليها» (تشخيصُ المالك 2026-07-27) ──────────────
 // السببُ الجذري لفجوة «يومُ عملٍ بلا مشغّل»: قائمةُ الآليات كانت ترشّح

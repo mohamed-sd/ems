@@ -96,6 +96,7 @@ if (isset($_GET['delete_id'])) {
 $page_title = 'إيكوبيشن | إعدادات الصيانة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main mnt-master-main ems-unified-page-shell">

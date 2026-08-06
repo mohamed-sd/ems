@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 $page_title = 'إيكوبيشن | أزمنة الاستجابة والإنجاز';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main tkt-sla-main ems-unified-page-shell">
     <?php

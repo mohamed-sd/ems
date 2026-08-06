@@ -257,6 +257,7 @@ $page_title = 'Equipation | المستخدمين';
 include '../inheader.php';
 // تضمين الشريط الجانبي
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // إضافة أو تعديل مستخدم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {

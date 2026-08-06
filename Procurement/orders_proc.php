@@ -121,6 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
         'fin_approval_ref' => $fin_approval_ref, 'op_classification' => $op_classification,
         'currency' => $currency, 'fx_rate' => $fx_rate, 'payment_time' => $payment_time,
         'expected_receipt_type' => $expected_receipt_type, 'total_amount' => $total,
+        // المعادلُ الموحّد ضربًا (FES §3.3): يُحسب عند الحفظ لا عند النشر —
+        // «كلُّ أمرٍ يحمل معادلَه» (حزام expense_gate) لا NULL ينتظر البوابة
+        'base_amount' => round($total * ($fx_rate > 0 ? $fx_rate : 1), 2),
         'state' => $state, 'notes' => $notes,
     );
     $line_rows = array();
@@ -182,6 +185,7 @@ if (isset($_GET['edit_id']) && $can_edit) {
 $page_title = 'إيكوبيشن | أوامر الشراء';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /** صف سطر أمر شراء. */
 function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications, $line = null)

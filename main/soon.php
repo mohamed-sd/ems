@@ -46,6 +46,7 @@ $page_title = 'قريبًا';
    والشريطُ شريحةٌ بعرض 1px وطولِ 2122px بأيقوناتٍ فارغة. */
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <?php if (!$meta): ?>

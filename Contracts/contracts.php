@@ -129,6 +129,7 @@ foreach ($form_projects as $project_filter_row) {
 $page_title = "إيكوبيشن | العقود";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main contracts-main ems-unified-page-shell">

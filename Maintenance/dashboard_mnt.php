@@ -92,6 +92,7 @@ $rb_pulse_series = array('أُنشئت', 'أُغلقت');
 $page_title = 'إيكوبيشن | لوحة إدارة الصيانة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main mnt-board-main ems-unified-page-shell">
     <?php

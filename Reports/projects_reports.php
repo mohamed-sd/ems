@@ -109,6 +109,7 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
 
 <body>
      <?php include('../insidebar.php'); ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
     <div class="main">
 
         <div class="container py-4">

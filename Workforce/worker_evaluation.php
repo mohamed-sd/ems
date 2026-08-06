@@ -164,6 +164,7 @@ try {
 } catch (\Throwable $t) { error_log('worker_evaluation.php workers: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | تقييم الأداء"; include '../inheader.php'; include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='تقييم الأداء'; $header_icon='fas fa-star-half-stroke'; $header_actions=array();

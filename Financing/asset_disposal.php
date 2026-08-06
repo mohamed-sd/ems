@@ -83,6 +83,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $ents[] = $x;
 $page_title = 'التصرف في الأصل';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-exchange-alt"></i> التصرفُ في الأصل — نقلُ حصة</h4></div>

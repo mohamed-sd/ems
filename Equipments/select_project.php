@@ -9,6 +9,7 @@ $page_title = "إيكوبيشن | اختيار المشروع";
 include '../config.php'; // config أولًا (يعرّف $conn/البوابة) — كان بعد الترويسة فيُفشِلها (500 قائم)
 include("../inheader.php");
 include("../insidebar.php");
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <style>

@@ -589,6 +589,7 @@ include('../inheader.php');
 $__ctcss = __DIR__ . '/../assets/css/client-tree.css';
 echo '<link rel="stylesheet" href="/ems/assets/css/client-tree.css' . (is_file($__ctcss) ? '?v=' . filemtime($__ctcss) : '') . '">' . "\n";
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main client-tree-page">

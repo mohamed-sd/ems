@@ -126,6 +126,7 @@ $sel_pid = isset($_GET['pid']) ? intval($_GET['pid']) : 0;
 $page_title = 'إيكوبيشن | إقفال الفترات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main fin-periods-main ems-unified-page-shell">
     <?php

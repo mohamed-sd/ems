@@ -256,6 +256,7 @@ $logout_url = function_exists('ems_url') ? ems_url('logout.php') : '../logout.ph
 $page_title = "إيكويبيشن | الملف الشخصي";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <style>

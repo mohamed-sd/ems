@@ -93,6 +93,7 @@ if (isset($_GET['delete_id'])) {
 $page_title = 'إيكوبيشن | إعدادات الترحيل';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main trs-types-main ems-unified-page-shell">

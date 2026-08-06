@@ -95,6 +95,7 @@ if ($edit && !empty($edit['project_id']) && !empty($edit['worker_category'])) {
 }
 
 $page_title="إيكوبيشن | احتياج القوى والتخطيط"; include '../inheader.php'; include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='احتياج القوى والتخطيط'; $header_icon='fas fa-clipboard-list'; $header_actions=array();

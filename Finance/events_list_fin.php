@@ -330,6 +330,7 @@ if (isset($_GET['resume_id'])) {
 $page_title = 'إيكوبيشن | المعاملات المالية';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-events-main ems-unified-page-shell">

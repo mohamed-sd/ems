@@ -63,6 +63,7 @@ $cards = array(
 $page_title = 'إيكوبيشن | اللوحة التنفيذية المالية';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 $states = fin_event_states();
 ?>
 <div class="main fin-exec-main ems-unified-page-shell">

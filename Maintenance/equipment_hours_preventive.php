@@ -41,6 +41,7 @@ if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
 $page_title = 'ساعاتُ المعدة والوقائية';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-stopwatch"></i> ساعاتُ المعدة مقابل جدول الغيار</h4></div>

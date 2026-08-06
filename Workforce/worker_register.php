@@ -179,6 +179,7 @@ if ($edit_id > 0) {
 $page_title = "إيكوبيشن | السجل التشغيلي للعامل";
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main equipments-fleet-main drivers-main">

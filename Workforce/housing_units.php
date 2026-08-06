@@ -60,6 +60,7 @@ try {
 $page_title = "إيكوبيشن | السكن والإعاشة";
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='السكن والإعاشة'; $header_icon='fas fa-building'; $header_actions=array();

@@ -579,6 +579,7 @@ function get_shift_info(string $code): array
 ?>
 <?php include("../inheader.php"); ?>
 <?php include('../insidebar.php'); ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">

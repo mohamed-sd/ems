@@ -120,6 +120,7 @@ $rb_pulse_series = array('انطلقت', 'وصلت');
 $page_title = 'إيكوبيشن | لوحة الرحلات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 $stage_colors = array(
     'request' => '#6c757d', 'planned' => '#0d6efd', 'ready' => '#0dcaf0',

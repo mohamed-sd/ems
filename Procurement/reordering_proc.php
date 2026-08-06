@@ -101,6 +101,7 @@ $sel_warehouse = $edit_row ? intval($edit_row['warehouse_id']) : 0;
 $page_title = 'إيكوبيشن | حدود إعادة الطلب';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main proc-reordering-main ems-unified-page-shell">

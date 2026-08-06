@@ -39,13 +39,13 @@ $k_issues   = $g->count('proc_issue');
 $k_suppliers= $g->count('proc_supplier');
 
 $cards = array(
-    array('label' => 'الأصناف',                 'value' => $k_items,    'icon' => 'fa fa-boxes-stacked',       'href' => 'items.php'),
-    array('label' => 'القطع الحرجة',            'value' => $k_critical, 'icon' => 'fa fa-triangle-exclamation','href' => 'items.php'),
-    array('label' => 'طلبات شراء مفتوحة',       'value' => $k_req_open, 'icon' => 'fa fa-file-lines',          'href' => 'requests.php'),
-    array('label' => 'أوامر شراء مؤكَّدة',       'value' => $k_po_conf,  'icon' => 'fa fa-file-invoice-dollar', 'href' => 'orders.php'),
-    array('label' => 'عهد استلام مفتوحة',       'value' => $k_rc_open,  'icon' => 'fa fa-truck-ramp-box',      'href' => 'receipt_custody.php'),
-    array('label' => 'عمليات الصرف',            'value' => $k_issues,   'icon' => 'fa fa-hand-holding-box',    'href' => 'issue.php'),
-    array('label' => 'الموردون التشغيليون',     'value' => $k_suppliers,'icon' => 'fa fa-truck-field',         'href' => 'suppliers.php'),
+    array('label' => 'الأصناف',                 'value' => $k_items,    'icon' => 'fa fa-boxes-stacked',       'href' => 'items_proc.php'),
+    array('label' => 'القطع الحرجة',            'value' => $k_critical, 'icon' => 'fa fa-triangle-exclamation','href' => 'items_proc.php'),
+    array('label' => 'طلبات شراء مفتوحة',       'value' => $k_req_open, 'icon' => 'fa fa-file-lines',          'href' => 'requests_proc.php'),
+    array('label' => 'أوامر شراء مؤكَّدة',       'value' => $k_po_conf,  'icon' => 'fa fa-file-invoice-dollar', 'href' => 'orders_proc.php'),
+    array('label' => 'عهد استلام مفتوحة',       'value' => $k_rc_open,  'icon' => 'fa fa-truck-ramp-box',      'href' => 'receipt_custody_proc.php'),
+    array('label' => 'عمليات الصرف',            'value' => $k_issues,   'icon' => 'fa fa-hand-holding-box',    'href' => 'issue_proc.php'),
+    array('label' => 'الموردون التشغيليون',     'value' => $k_suppliers,'icon' => 'fa fa-truck-field',         'href' => 'suppliers_proc.php'),
 );
 
 /* ── لوحة الدور بالمكوّنات السبعة (UX-00 §7 · UX-01 §8.10) ──────────────────
@@ -78,6 +78,7 @@ $rb_pulse_series = array('طلبات واردة', 'صرفيات');
 $page_title = 'إيكوبيشن | لوحة المشتريات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main proc-dashboard-main ems-unified-page-shell">

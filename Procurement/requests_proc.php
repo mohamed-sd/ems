@@ -170,6 +170,7 @@ if (isset($_GET['edit_id']) && $can_edit) {
 $page_title = 'إيكوبيشن | طلبات الشراء';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /** يبني صف سطر واحد (للسطور المحمّلة عند التعديل). */
 function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications, $line = null)

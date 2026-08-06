@@ -104,6 +104,7 @@ $ST_AR = array('draft' => 'مسودة', 'active' => 'نافذ', 'superseded' => 
 $page_title = 'إيكوبيشن | بنود عقد العميل';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف العقد الأم لا صفحةٌ يتيمة
 $cf_contract_id = intval($_GET['contract'] ?? $_GET['id'] ?? 0); $cf_active = 'lines';
 if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php';

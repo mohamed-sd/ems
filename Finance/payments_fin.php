@@ -112,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
 $page_title = 'إيكوبيشن | المدفوعات والخزينة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main fin-pay-main ems-unified-page-shell">
     <?php

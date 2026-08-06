@@ -22,6 +22,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; $tp += floatval($x['
 $page_title = 'الموازنة العامة والتوحيد';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-university"></i> الموازنةُ العامة — <?= $year ?></h4></div>

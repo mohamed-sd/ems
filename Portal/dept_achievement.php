@@ -29,24 +29,50 @@ $q = function ($sql) use ($conn) { $r = mysqli_query($conn, $sql);
     return $r ? floatval(mysqli_fetch_row($r)[0] ?? 0) : 0; };
 $cw = "company_id = $company_id";
 
+/**
+ * ح-07 · نسبةُ المؤشرات إلى الإدارة فعلًا — لا إلى الشركة كلِّها.
+ * ───────────────────────────────────────────────────────────────────────────
+ * كانت ثلاثةٌ من أربعةٍ ترشّح بـ company_id وحدَه، فيرى كلُّ دورٍ أرقامَ الشركة
+ * منسوبةً إليه (المبيعاتُ ترى 48 ألف وحدةٍ وهي لا تُدخل وحدةً واحدة).
+ *
+ * لا عمودَ وحدةٍ تنظيميةٍ في unit_entries ولا في mnt_order — والمنسبُ الحقيقيُّ
+ * هو **فاعلُ الواقعة**: unit_entries.entered_by (ممتلئٌ 100٪) و
+ * mnt_order.created_by. فنجمع مستخدمي الإدارة ونرشّح بهم.
+ *
+ * والإدارةُ وحدةٌ لا دور: 13 و14 صيانةٌ واحدة · 17–22 ماليةٌ واحدة — فنأخذ كلَّ
+ * الأدوار التي تشترك في وحدةِ الدور الحالي (خريطةُ dept_inbox_map).
+ */
+$unit_roles = array();
+if (intval($unit) > 0) {
+    for ($rid = 1; $rid <= 40; $rid++) {
+        if (ems_dept_unit_of_role($rid) === intval($unit)) { $unit_roles[] = $rid; }
+    }
+}
+// دورٌ بلا وحدةٍ في الخريطة ⇒ لا مستخدمين ⇒ أصفارٌ صريحةٌ لا أرقامُ شركةٍ مضلِّلة
+$roles_in   = count($unit_roles) ? implode(',', $unit_roles) : '0';
+$dept_users = "SELECT id FROM users WHERE company_id = $company_id AND role IN ($roles_in)";
+$ue_state   = "state IN ('site_approved','parties_approved','sales_approved','converted')";
+
 $metrics = array(
     array('وحداتٌ معتمدةٌ في المدة', $q("SELECT COUNT(*) FROM unit_entries WHERE $cw
-          AND state IN ('site_approved','parties_approved','sales_approved','converted')
-          AND entry_date BETWEEN '$from' AND '$to'")),
+          AND $ue_state AND entry_date BETWEEN '$from' AND '$to'
+          AND entered_by IN ($dept_users)")),
     array('ساعاتٌ منفَّذةٌ معتمدة', $q("SELECT COALESCE(SUM(qty),0) FROM unit_entries WHERE $cw
-          AND state IN ('site_approved','parties_approved','sales_approved','converted')
-          AND entry_date BETWEEN '$from' AND '$to'")),
+          AND $ue_state AND entry_date BETWEEN '$from' AND '$to'
+          AND entered_by IN ($dept_users)")),
     array('مساراتُ بلاغاتٍ أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
           JOIN tickets t ON t.id = ws.tk_id AND t.$cw
           WHERE ws.org_unit_id = " . intval($unit) . " AND ws.state = 'closed'
           AND ws.closed_at BETWEEN '$from' AND '$to 23:59:59'")),
     array('أوامرُ صيانةٍ أُقفلت', $q("SELECT COUNT(*) FROM mnt_order WHERE $cw
-          AND state = 'إغلاق' AND updated_at BETWEEN '$from' AND '$to 23:59:59'")),
+          AND state = 'إغلاق' AND updated_at BETWEEN '$from' AND '$to 23:59:59'
+          AND created_by IN ($dept_users)")),
 );
 
 $page_title = 'إنجاز الإدارة';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-chart-line"></i> إنجازُ الإدارة</h4></div>

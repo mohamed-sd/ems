@@ -265,6 +265,7 @@ if ($has_dep_profile) {
 $page_title = "إيكوبيشن | الأنواع والموديلات";
 include("../inheader.php");
 include("../insidebar.php");
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // أداة تهريب موحّدة
 $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };

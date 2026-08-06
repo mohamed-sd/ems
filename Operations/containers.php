@@ -197,6 +197,7 @@ $ROLES = array('مورد' => array(), 'معدة' => array('أساسية', 'اح�
 $page_title = 'إيكوبيشن | حاويات العقود';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /** صفُّ حاويةٍ وأبناؤه — تكرارٌ مرتّبٌ بعمقه. */
 function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES, $contract)

@@ -96,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
 $page_title = 'إيكوبيشن | وحدات الأطراف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main fin-units-main ems-unified-page-shell">
     <?php

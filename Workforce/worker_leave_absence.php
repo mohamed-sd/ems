@@ -74,6 +74,7 @@ try {
 } catch (\Throwable $t) { error_log('worker_leave_absence.php workers: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | الإجازات والغياب"; include '../inheader.php'; include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='الإجازات والغياب'; $header_icon='fas fa-plane-departure'; $header_actions=array();

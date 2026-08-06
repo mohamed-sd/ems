@@ -404,6 +404,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
 $page_title = $ticket ? ('إيكوبيشن | تذكرة ' . $ticket['ticket_no']) : 'إيكوبيشن | بلاغ جديد';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // بيانات العرض للتذكرة المفتوحة
 $type_row = $cat_row = null; $events = $attachments = array();

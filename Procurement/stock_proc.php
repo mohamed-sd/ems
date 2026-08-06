@@ -34,6 +34,7 @@ if (!$perms['can_view']) {
 $page_title = 'إيكوبيشن | المخزون';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main proc-stock-main ems-unified-page-shell">

@@ -98,6 +98,7 @@ WHERE 1=1$tsd_filter AND {TENANT_SCOPE}", $tsd_params);
 $page_title = "إيكوبيشن | تقرير الوحدات اليومية";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main ems-unified-page-shell reports-main timesheet-daily-main">

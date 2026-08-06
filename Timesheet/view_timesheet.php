@@ -433,6 +433,7 @@ $export_all_url = 'view_timesheet.php?' . http_build_query($export_params);
 $page_title = "إيكوبيشن | سجل الوحدات اليومية";
 include('../inheader.php');
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">

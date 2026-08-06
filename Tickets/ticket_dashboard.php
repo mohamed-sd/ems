@@ -156,6 +156,7 @@ $top_reporters = tkt_dash_rows($gate,
 $page_title = 'إيكوبيشن | أداء البلاغات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 $stage_colors = array(
     'new' => '#6c757d', 'classified' => '#6610f2', 'routed' => '#0d6efd',

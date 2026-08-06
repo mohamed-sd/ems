@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-06 04:07:44
--- الجداول: 399 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-06 08:45:52
+-- الجداول: 405 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -1859,6 +1859,7 @@ CREATE TABLE `contracts` (
   `project_id` int(11) NOT NULL COMMENT 'PLAN-03 §2.1: لا عقدَ بلا مشروع — بنيويًّا لا رجاءً',
   `site_id` int(11) DEFAULT NULL COMMENT '⚠ مرآةٌ موروثةٌ (P-01) — المصدرُ `contract_operational_sites`. لا يُكتب ولا يُقرأ في حسابٍ جديد، ويبقى لأن الحذفَ ممنوع (§0-④)',
   `readiness_state` enum('لم يبدأ','جارٍ','مجتاز') NOT NULL DEFAULT 'لم يبدأ' COMMENT 'INJAZ-S05 §6.6 — محسوبٌ من readiness_lines (عرضٌ لا إنفاذ)',
+  `signing_authority_ref` varchar(120) DEFAULT NULL COMMENT 'BR-CEO-01: سلطة أصلية أو مرجع تفويض موثق — يُلزم عند الانتقال إلى موقَّع',
   PRIMARY KEY (`id`),
   KEY `fk_contracts_merged` (`merged_with`),
   KEY `idx_contracts_project_id` (`project_id`),
@@ -2913,6 +2914,200 @@ CREATE TABLE `exception_usages` (
   KEY `ix_exu_req` (`req_id`,`at`),
   CONSTRAINT `fk_exu_req` FOREIGN KEY (`req_id`) REFERENCES `exception_requests` (`req_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §7-⑤: كل عبور باستثناء يُسجَّل — Insert-only';
+
+-- ── Table: exec_approvals ──
+CREATE TABLE `exec_approvals` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `request_no` varchar(40) NOT NULL COMMENT 'رقم الطلب',
+  `received_date` date DEFAULT NULL COMMENT 'تاريخ الورود',
+  `doc_type` varchar(80) DEFAULT NULL COMMENT 'نوع المستند',
+  `document` varchar(255) DEFAULT NULL COMMENT 'المستند',
+  `requesting_dept` varchar(80) DEFAULT NULL COMMENT 'الإدارة الطالبة',
+  `raise_reason` varchar(255) DEFAULT NULL COMMENT 'سبب الرفع للأعلى',
+  `amount` decimal(18,2) DEFAULT NULL COMMENT 'القيمة',
+  `currency` varchar(8) DEFAULT NULL,
+  `dept_cap` decimal(18,2) DEFAULT NULL COMMENT 'سقف الإدارة لحظة الرفع',
+  `overage` decimal(18,2) DEFAULT NULL COMMENT 'التجاوز',
+  `prior_approvers` varchar(255) DEFAULT NULL COMMENT 'المعتمِدون قبلي',
+  `deadline` varchar(60) DEFAULT NULL COMMENT 'المهلة المعلنة',
+  `decision` varchar(30) DEFAULT NULL COMMENT 'قراري: اعتماد/اعتماد بشرط/رد/تأجيل',
+  `decision_reason` varchar(300) DEFAULT NULL COMMENT 'سبب القرار أو الشرط',
+  `decision_date` date DEFAULT NULL,
+  `approver_name` varchar(120) DEFAULT NULL COMMENT 'المعتمِد — الاسم والصفة',
+  `authority_ref` varchar(120) DEFAULT NULL COMMENT 'مرجع التفويض أو سلطة أصلية',
+  `status` varchar(40) NOT NULL DEFAULT 'قيد المراجعة',
+  `source_request_id` bigint(20) unsigned DEFAULT NULL COMMENT 'ربط الطلب الحقيقي requests.id',
+  `source_kind` varchar(30) DEFAULT NULL COMMENT 'منشأ الصف: يدوي/رفع آلي/طلب',
+  `is_seed` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_by_name` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_exap_live` (`company_id`,`status`,`received_date`),
+  KEY `ix_exap_src` (`source_request_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: الاعتماد الأعلى — الجدول الأصلي لشاشة ceo_approvals';
+
+-- ── Table: exec_board_snapshots ──
+CREATE TABLE `exec_board_snapshots` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `period` varchar(20) NOT NULL COMMENT 'الفترة',
+  `active_contracts` varchar(40) DEFAULT NULL COMMENT 'العقود النافذة',
+  `portfolio_value` varchar(60) DEFAULT NULL COMMENT 'قيمة المحفظة',
+  `recognized_revenue` varchar(60) DEFAULT NULL COMMENT 'الإيراد المعترف',
+  `collection` varchar(60) DEFAULT NULL COMMENT 'التحصيل',
+  `overdue_receivables` varchar(60) DEFAULT NULL COMMENT 'الذمم المتأخرة',
+  `expected_cashflow` varchar(60) DEFAULT NULL COMMENT 'التدفق المتوقع',
+  `financing_commitments` varchar(60) DEFAULT NULL COMMENT 'التزامات التمويل',
+  `working_equipment` varchar(40) DEFAULT NULL COMMENT 'المعدات العاملة',
+  `readiness_pct` varchar(20) DEFAULT NULL COMMENT 'نسبة الجاهزية',
+  `approved_units` varchar(40) DEFAULT NULL COMMENT 'الوحدات المعتمدة',
+  `margin_pct` varchar(20) DEFAULT NULL COMMENT 'الهامش',
+  `open_risks` varchar(20) DEFAULT NULL COMMENT 'المخاطر المفتوحة',
+  `pending_approvals` varchar(20) DEFAULT NULL COMMENT 'الاعتمادات المعلَّقة',
+  `last_updated` varchar(30) DEFAULT NULL COMMENT 'آخر تحديث',
+  `status` varchar(40) NOT NULL DEFAULT 'معتمد',
+  `is_seed` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_by_name` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_board_period` (`company_id`,`period`,`is_seed`),
+  KEY `ix_exbs_live` (`company_id`,`period`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: لقطات المؤشرات العليا — الجدول الأصلي لشاشة ceo_board';
+
+-- ── Table: exec_contract_signings ──
+CREATE TABLE `exec_contract_signings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `contract_no` varchar(60) NOT NULL COMMENT 'رقم العقد',
+  `contract_kind` varchar(80) DEFAULT NULL COMMENT 'نوع العقد',
+  `other_party` varchar(190) DEFAULT NULL COMMENT 'الطرف الآخر',
+  `party_type` varchar(30) DEFAULT NULL COMMENT 'عميل/مورد/موظف/ممول',
+  `amount` decimal(18,2) DEFAULT NULL,
+  `currency` varchar(8) DEFAULT NULL,
+  `duration` varchar(40) DEFAULT NULL COMMENT 'المدة',
+  `work_model` varchar(40) DEFAULT NULL COMMENT 'نموذج العمل',
+  `contract_unit` varchar(40) DEFAULT NULL COMMENT 'وحدة التعاقد',
+  `units_count` varchar(80) DEFAULT NULL COMMENT 'عدد الوحدات',
+  `bond_required` varchar(10) DEFAULT NULL COMMENT 'الكفالة المطلوبة',
+  `bond_value` varchar(60) DEFAULT NULL COMMENT 'قيمة الكفالة',
+  `legal_review` varchar(190) DEFAULT NULL COMMENT 'المراجعة القانونية',
+  `financial_review` varchar(190) DEFAULT NULL COMMENT 'المراجعة المالية',
+  `signed_by_us` varchar(120) DEFAULT NULL COMMENT 'الموقّع عنّا',
+  `signer_capacity` varchar(80) DEFAULT NULL COMMENT 'صفة الموقّع عنّا',
+  `authority_ref` varchar(120) DEFAULT NULL COMMENT 'مرجع سلطته — BR-CEO-01',
+  `signing_date` date DEFAULT NULL,
+  `other_signer` varchar(120) DEFAULT NULL COMMENT 'الموقّع عن الطرف الآخر',
+  `other_signer_capacity` varchar(80) DEFAULT NULL COMMENT 'صفته',
+  `other_authority_doc` varchar(120) DEFAULT NULL COMMENT 'مستند تخويله',
+  `registry_recorded` varchar(10) NOT NULL DEFAULT 'لا' COMMENT 'سُجّل في السجل الموحَّد؟',
+  `status` varchar(40) NOT NULL DEFAULT 'قيد المراجعة',
+  `contract_id` int(11) DEFAULT NULL COMMENT 'ربط العقد الحقيقي contracts.id',
+  `is_seed` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_by_name` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_excs_live` (`company_id`,`status`,`signing_date`),
+  KEY `ix_excs_contract` (`contract_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل التوقيع — الجدول الأصلي لشاشة ceo_contracts';
+
+-- ── Table: exec_decisions ──
+CREATE TABLE `exec_decisions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `decision_no` varchar(40) NOT NULL COMMENT 'رقم القرار',
+  `raised_date` date DEFAULT NULL COMMENT 'تاريخ الرفع',
+  `raising_dept` varchar(80) DEFAULT NULL COMMENT 'الجهة الرافعة',
+  `issue_type` varchar(60) DEFAULT NULL COMMENT 'نوع القضية',
+  `issue_desc` varchar(300) DEFAULT NULL COMMENT 'وصف القضية',
+  `est_impact` varchar(60) DEFAULT NULL COMMENT 'الأثر المقدَّر',
+  `currency` varchar(8) DEFAULT NULL,
+  `options_text` varchar(400) DEFAULT NULL COMMENT 'الخيارات المطروحة',
+  `chosen_option` varchar(190) DEFAULT NULL COMMENT 'الخيار المختار',
+  `choice_reason` varchar(300) DEFAULT NULL COMMENT 'مبرر الاختيار',
+  `assigned_dept` varchar(80) DEFAULT NULL COMMENT 'الجهة المكلَّفة بالتنفيذ',
+  `exec_deadline` varchar(40) DEFAULT NULL COMMENT 'مهلة التنفيذ — BR-CEO-04',
+  `followup_date` date DEFAULT NULL COMMENT 'تاريخ المتابعة',
+  `approver_name` varchar(120) DEFAULT NULL,
+  `decision_date` date DEFAULT NULL,
+  `status` varchar(40) NOT NULL DEFAULT 'قيد الحسم',
+  `is_seed` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_by_name` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_exdc_live` (`company_id`,`status`,`raised_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل القرارات العليا — الجدول الأصلي لشاشة ceo_risk';
+
+-- ── Table: exec_dept_caps ──
+CREATE TABLE `exec_dept_caps` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'الكيان المالك',
+  `dept_name` varchar(80) NOT NULL COMMENT 'اسم الإدارة كما يرد في الطلبات',
+  `cap_amount` decimal(18,2) NOT NULL COMMENT 'السقف النقدي — ما فوقه يُرفع آليًّا',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `effective_from` date NOT NULL COMMENT 'بداية السريان',
+  `effective_to` date DEFAULT NULL COMMENT 'نهاية السريان (NULL = مفتوح)',
+  `authority_ref` varchar(120) DEFAULT NULL COMMENT 'سند الاعتماد — قرار الموازنة',
+  `note` varchar(255) DEFAULT NULL,
+  `is_seed` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_by_name` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_dept_cap` (`company_id`,`dept_name`,`currency`,`effective_from`),
+  KEY `ix_cap_live` (`company_id`,`effective_from`,`effective_to`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §5-1: سقوف الإدارات — أساس الرفع الآلي BR-CEO-05';
+
+-- ── Table: exec_project_charters ──
+CREATE TABLE `exec_project_charters` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `decision_no` varchar(40) NOT NULL COMMENT 'رقم القرار',
+  `project_name` varchar(190) DEFAULT NULL,
+  `client` varchar(190) DEFAULT NULL COMMENT 'العميل',
+  `contract_ref` varchar(60) DEFAULT NULL COMMENT 'العقد',
+  `sites_text` varchar(255) DEFAULT NULL COMMENT 'الموقع أو المواقع',
+  `work_model` varchar(40) DEFAULT NULL,
+  `work_unit` varchar(40) DEFAULT NULL COMMENT 'وحدة العمل',
+  `contracted_qty` varchar(80) DEFAULT NULL COMMENT 'الكمية المتعاقدة',
+  `planned_start` date DEFAULT NULL COMMENT 'تاريخ البدء المخطط',
+  `duration` varchar(40) DEFAULT NULL,
+  `equipment_needed` varchar(190) DEFAULT NULL COMMENT 'المعدات المطلوبة',
+  `operators_needed` varchar(80) DEFAULT NULL COMMENT 'المشغّلون المطلوبون',
+  `equipment_source` varchar(80) DEFAULT NULL COMMENT 'مصدر المعدات',
+  `financing_need` varchar(190) DEFAULT NULL COMMENT 'احتياج التمويل',
+  `cost_center` varchar(60) DEFAULT NULL COMMENT 'مركز التكلفة',
+  `site_manager` varchar(120) DEFAULT NULL COMMENT 'مدير الموقع المعيَّن',
+  `manager_powers` varchar(255) DEFAULT NULL COMMENT 'صلاحياته',
+  `cert_operations` varchar(190) DEFAULT NULL COMMENT 'إفادة التشغيل',
+  `cert_sales` varchar(190) DEFAULT NULL COMMENT 'إفادة المبيعات',
+  `cert_workforce` varchar(190) DEFAULT NULL COMMENT 'إفادة القوى',
+  `cert_finance` varchar(190) DEFAULT NULL COMMENT 'إفادة المالية',
+  `cert_fleet` varchar(190) DEFAULT NULL COMMENT 'إفادة الأسطول',
+  `cert_financing` varchar(190) DEFAULT NULL COMMENT 'إفادة التمويل',
+  `approver_name` varchar(120) DEFAULT NULL COMMENT 'المعتمِد — الاسم والصفة',
+  `approval_date` varchar(80) DEFAULT NULL COMMENT 'تاريخ الاعتماد أو حالة التأجيل',
+  `status` varchar(40) NOT NULL DEFAULT 'قيد الإفادات',
+  `project_id` int(11) DEFAULT NULL COMMENT 'المشروع المولَّد project.id (الأثر الخماسي)',
+  `cost_center_id` int(11) DEFAULT NULL COMMENT 'مركز التكلفة المولَّد fin_cost_centers.id',
+  `is_seed` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` int(11) DEFAULT NULL,
+  `created_by_name` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_expc_live` (`company_id`,`status`,`planned_start`),
+  KEY `ix_expc_project` (`project_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: قرار فتح المشروع — الجدول الأصلي لشاشة project_charter';
 
 -- ── Table: failure_codes ──
 CREATE TABLE `failure_codes` (
@@ -6213,6 +6408,7 @@ CREATE TABLE `proc_receipt_custody` (
   `supplier_id` int(11) DEFAULT NULL COMMENT 'proc_supplier.id',
   `order_id` int(11) DEFAULT NULL COMMENT 'proc_order.id',
   `receipt_location` varchar(255) DEFAULT NULL COMMENT 'عطبرة/موقع المورد/…',
+  `warehouse_id` int(11) DEFAULT NULL COMMENT 'مخزن الإدخال — إلزامي حين الوجهة مخزن؛ NULL لغير المخزنية',
   `expected_destination` varchar(30) NOT NULL DEFAULT 'مخزن' COMMENT 'مخزن/ورشة/مشروع/معدة',
   `state` varchar(30) NOT NULL DEFAULT 'مستلَمة' COMMENT 'مستلَمة/قيد الترحيل/مسلَّمة للوجهة',
   `notes` mediumtext DEFAULT NULL,

@@ -103,6 +103,7 @@ $cnt_salary = count($operators) - $cnt_due;
 $page_title = 'إيكوبيشن | قواعد مستحقات المشغّلين';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-oppay-main ems-unified-page-shell">

@@ -386,6 +386,7 @@ $dcd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('driver contract de
 <body>
 
 <?php include('../insidebar.php'); ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
 <div class="main">
 

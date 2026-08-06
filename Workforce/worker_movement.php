@@ -101,6 +101,7 @@ try {
 } catch (\Throwable $t) { error_log('worker_movement.php housing: ' . $t->getMessage()); }
 
 $page_title="إيكوبيشن | تنقلات العاملين"; include '../inheader.php'; include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
     <?php $header_title='تنقلات العاملين'; $header_icon='fas fa-route'; $header_actions=array();

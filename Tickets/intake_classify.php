@@ -53,6 +53,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $types[] = $x;
 $page_title = 'الاستقبال والتصنيف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-inbox"></i> الاستقبالُ والتصنيف — الجديدةُ وغيرُ المصنَّفة</h4></div>

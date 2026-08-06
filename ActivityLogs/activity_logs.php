@@ -317,6 +317,7 @@ $page_title = 'سجل النشاط';
 ?>
 <?php require_once '../inheader.php'; ?>
 <?php require_once '../insidebar.php'; ?>
+<?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
 <div class="main activity-logs-main ems-unified-page-shell">
 

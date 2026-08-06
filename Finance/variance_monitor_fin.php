@@ -109,6 +109,7 @@ if (isset($_GET['edit_id']) && $can_edit) {
 $page_title = 'إيكوبيشن | متابعة الانحراف';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-variance-main ems-unified-page-shell">

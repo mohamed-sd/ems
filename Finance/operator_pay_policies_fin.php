@@ -197,6 +197,7 @@ foreach ($policies as $p) {
 $page_title = 'إيكوبيشن | سياسات مستحقات المشغّلين';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
 <div class="main fin-oppol-main ems-unified-page-shell">

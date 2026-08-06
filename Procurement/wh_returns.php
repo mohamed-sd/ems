@@ -50,6 +50,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $recent[] = $x;
 $page_title = 'المرتجعات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-undo"></i> المرتجعات</h4></div>

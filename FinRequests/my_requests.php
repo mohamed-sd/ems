@@ -33,6 +33,7 @@ foreach ($rows as $k => $r) { $rows[$k] = finreq_sync_state($gate, $r); }
 $page_title = 'إيكوبيشن | طلباتي المالية';
 include('../inheader.php');
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell finreq-main">
     <?php

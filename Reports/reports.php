@@ -49,6 +49,7 @@ WHERE t.status = 1 AND o.status = 1$rep_filter AND {TENANT_SCOPE}
 $page_title = "إيكوبيشن | مركز التقارير";
 include("../inheader.php");
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
     <div class="main ems-unified-page-shell reports-main">
         <?php

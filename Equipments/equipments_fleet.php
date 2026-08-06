@@ -198,6 +198,7 @@ if ($selected_project_id > 0) {
 $page_title = "المعدات";
 include("../inheader.php");
 include("../insidebar.php");
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 // معالجة رسالة النجاح
 $success_msg = '';

@@ -38,6 +38,7 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $page_title = 'الوصول والتسليم';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <div class="ems-topbar"><h4><i class="fa fa-flag-checkered"></i> الوصولُ والتسليم</h4></div>
