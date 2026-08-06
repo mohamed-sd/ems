@@ -1,11 +1,11 @@
 <?php
 /**
- * Portal/ceo_risk.php — المخاطر والقرارات العليا (CMP-03 ⑥ v2 — بتصميم SCR-DES حرفيًّا + إدخال حي)
+ * Portal/ceo_risk.php — المخاطر والقرارات العليا (M-00 §8-2 — على جدولها الأصلي)
  * ───────────────────────────────────────────────────────────────────────────
  * الورقة المالكة: 00 · الإدارة التنفيذية · الأعمدة 17 بترتيب المستند وطبقة
- * الحوكمة بشرائحها. الصفوف في المخزن البيني `cmp03_screen_rows` (معزول
- * بالكيان) حتى يولد جدول الشاشة الأصلي — مهمة اللحاق في
- * docs/CMP03_FOLLOWUP_SOURCES_ar.md. الفائض فوق 22 عمودًا منهارٌ (توصية ①).
+ * الحوكمة بشرائحها. الصفوف في الجدول الأصلي `exec_decisions` (هجرة
+ * 2026_11_14 — أُنجز لحاق CMP03_FOLLOWUP) معزولةً بالكيان، والقرارُ المحسوم
+ * محصَّنٌ بقادح BR-CEO-08 في القاعدة: تعديلُه مرفوضٌ والتغييرُ قرارٌ جديد.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
+require_once '../includes/m00_exec_helpers.php';
 
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
@@ -24,8 +25,6 @@ if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=غير+مصرح");
     exit();
 }
-
-$CANONICAL = 'ceo_risk.php';
 
 // حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
 $__pp = check_page_permissions($conn, 'Portal/ceo_risk.php');
@@ -58,43 +57,32 @@ $COLS   = array (
   15 => 'تاريخ القرار',
   16 => 'الحالة',
 );
-$FIELDS = array (
-  0 => 'رقم القرار',
-  1 => 'تاريخ الرفع',
-  2 => 'الجهة الرافعة',
-  3 => 'نوع القضية',
-  4 => 'وصف القضية',
-  5 => 'الأثر المقدَّر',
-  6 => 'العملة',
-  7 => 'الخيارات المطروحة',
-  8 => 'الخيار المختار',
-  9 => 'مبرر الاختيار',
-  10 => 'الجهة المكلَّفة بالتنفيذ',
-  11 => 'مهلة التنفيذ',
-  12 => 'تاريخ المتابعة',
-  13 => 'المعتمِد — الاسم والصفة',
-  14 => 'تاريخ القرار',
-  15 => 'الحالة',
+/* أعمدة الجدول الأصلي بترتيب حقول الفورم f0..f15 (الأخير الحالة) */
+$DB_FIELDS = array(
+    'decision_no', 'raised_date', 'raising_dept', 'issue_type', 'issue_desc',
+    'est_impact', 'currency', 'options_text', 'chosen_option', 'choice_reason',
+    'assigned_dept', 'exec_deadline', 'followup_date', 'approver_name', 'decision_date',
 );
+/* خريطة عرض: فهرس عمود المستند → عمود القاعدة (null = حوكمة آلية) */
+$COLDB = array(null, 'decision_no', 'raised_date', 'raising_dept', 'issue_type',
+    'issue_desc', 'est_impact', 'currency', 'options_text', 'chosen_option',
+    'choice_reason', 'assigned_dept', 'exec_deadline', 'followup_date',
+    'approver_name', 'decision_date', '__status');
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
+/* ── الحفظ: فورم الإضافة الموحد → الجدول الأصلي ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
-    }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
+    $in = array();
+    foreach ($DB_FIELDS as $i => $col) { $in[$col] = trim((string) ($_POST['f' . $i] ?? '')); }
+    $status = trim((string) ($_POST['f15'] ?? '')) ?: 'مسودة';
 
-    // BR-CEO-04: القرارُ المحسوم لا يُقبل بلا جهةٍ مكلَّفةٍ ومهلةِ تنفيذ —
+    // ═══ BR-CEO-04: القرارُ المحسوم لا يُقبل بلا جهةٍ مكلَّفةٍ ومهلةِ تنفيذ ═══
     // الحسمُ بتاريخ قرارٍ أو حالةٍ حاسمة، والمسودةُ وقيدُ الدراسة خارج الشرط.
-    $decisive = (($payload['تاريخ القرار'] ?? '') !== '')
+    $decisive = ($in['decision_date'] !== '')
         || in_array($status, array('محسوم', 'معتمد', 'نافذ', 'قيد التنفيذ', 'مقفل'), true);
     if ($decisive) {
         $missing = array();
-        if (($payload['الجهة المكلَّفة بالتنفيذ'] ?? '') === '') { $missing[] = 'الجهة المكلَّفة بالتنفيذ'; }
-        if (($payload['مهلة التنفيذ'] ?? '') === '') { $missing[] = 'مهلة التنفيذ'; }
+        if ($in['assigned_dept'] === '') { $missing[] = 'الجهة المكلَّفة بالتنفيذ'; }
+        if ($in['exec_deadline'] === '') { $missing[] = 'مهلة التنفيذ'; }
         if ($missing) {
             header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
                 'BR-CEO-04: قرارٌ محسومٌ بلا ' . implode(' و', $missing) . ' — أكمل الحقلين ثم احفظ ❌'));
@@ -102,11 +90,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         }
     }
 
-    $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, 0, ?, ?)");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
+    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
+    // الفارغ NULL من هنا لا NULLIF في SQL — خلطُ الترتيبات على اتصال الويب يرفضها
+    $bindIn = $in;
+    foreach ($bindIn as $k => $v) { if ($v === '') { $bindIn[$k] = null; } }
+    $st = $conn->prepare("INSERT INTO exec_decisions
+        (company_id, decision_no, raised_date, raising_dept, issue_type, issue_desc,
+         est_impact, currency, options_text, chosen_option, choice_reason,
+         assigned_dept, exec_deadline, followup_date, approver_name, decision_date,
+         status, is_seed, created_by, created_by_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+    $st->bind_param('issssssssssssssssis',
+        $company_id, $bindIn['decision_no'], $bindIn['raised_date'], $bindIn['raising_dept'],
+        $bindIn['issue_type'], $bindIn['issue_desc'], $bindIn['est_impact'], $bindIn['currency'],
+        $bindIn['options_text'], $bindIn['chosen_option'], $bindIn['choice_reason'],
+        $bindIn['assigned_dept'], $bindIn['exec_deadline'], $bindIn['followup_date'],
+        $bindIn['approver_name'], $bindIn['decision_date'], $status, $uid, $creator);
     $ok = $st->execute();
     $newId = $ok ? (int) $conn->insert_id : 0;
     $st->close();
@@ -125,34 +124,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'entity_id'       => $newId,
                 'occurred_at'     => gmdate('Y-m-d H:i:s'),
                 'created_by'      => $uid ?: 1,
-                'idempotency_key' => 'exec_decision:CMP03-' . $newId,
-                'notes'           => 'قرارٌ تنفيذي: ' . mb_substr((string) ($payload['وصف القضية'] ?? ($payload['رقم القرار'] ?? '')), 0, 120),
+                'idempotency_key' => 'exec_decision:EXDC-' . $newId,
+                'notes'           => 'قرارٌ تنفيذي: ' . mb_substr($in['issue_desc'] !== '' ? $in['issue_desc'] : $in['decision_no'], 0, 120),
                 'payload'         => array(
-                    'decision_ref' => 'CMP03-' . $newId,
-                    'decision_no'  => (string) ($payload['رقم القرار'] ?? ''),
-                    'issue_type'   => (string) ($payload['نوع القضية'] ?? ''),
-                    'chosen'       => (string) ($payload['الخيار المختار'] ?? ''),
-                    'assignee'     => (string) ($payload['الجهة المكلَّفة بالتنفيذ'] ?? ''),
-                    'deadline'     => (string) ($payload['مهلة التنفيذ'] ?? ''),
-                    'follow_up'    => (string) ($payload['تاريخ المتابعة'] ?? ''),
-                    'status'       => (string) $status,
+                    'decision_ref' => 'EXDC-' . $newId,
+                    'decision_no'  => $in['decision_no'],
+                    'issue_type'   => $in['issue_type'],
+                    'chosen'       => $in['chosen_option'],
+                    'assignee'     => $in['assigned_dept'],
+                    'deadline'     => $in['exec_deadline'],
+                    'follow_up'    => $in['followup_date'],
+                    'status'       => $status,
                 ),
             ));
 
             require_once dirname(__DIR__) . '/app/Services/Work/WorkItemService.php';
-            $fu = strtotime((string) ($payload['تاريخ المتابعة'] ?? ''));
-            if ($fu === false) { $fu = strtotime((string) ($payload['مهلة التنفيذ'] ?? '')); }
+            $fu = strtotime($in['followup_date']);
+            if ($fu === false) { $fu = strtotime($in['exec_deadline']); }
             if ($fu === false || $fu < time()) { $fu = time() + 7 * 86400; }
             \App\Services\Work\WorkItemService::create($conn, array(
-                'company_id' => $company_id, 'source_type' => 'SRC-10', 'source_ref' => 'CMP03-' . $newId,
+                'company_id' => $company_id, 'source_type' => 'SRC-10', 'source_ref' => 'EXDC-' . $newId,
                 'source_screen' => 'Portal/ceo_risk.php',
                 'owner_user_id' => $uid, 'assigned_user_id' => $uid,
                 'org_unit_id' => 1, 'project_id' => 0, 'site_id' => 0,
-                'title' => 'متابعة قرارٍ تنفيذي — ' . ((string) ($payload['رقم القرار'] ?? ('CMP03-' . $newId))),
-                'deliverable' => 'إفادةُ تنفيذ الجهة المكلَّفة: ' . (string) ($payload['الجهة المكلَّفة بالتنفيذ'] ?? ''),
-                'evidence_required' => 'ما يُثبت التنفيذ ضمن المهلة: ' . (string) ($payload['مهلة التنفيذ'] ?? ''),
+                'title' => 'متابعة قرارٍ تنفيذي — ' . ($in['decision_no'] !== '' ? $in['decision_no'] : ('EXDC-' . $newId)),
+                'deliverable' => 'إفادةُ تنفيذ الجهة المكلَّفة: ' . $in['assigned_dept'],
+                'evidence_required' => 'ما يُثبت التنفيذ ضمن المهلة: ' . $in['exec_deadline'],
                 'due_at' => date('Y-m-d H:i:s', $fu),
-                'priority' => 'P2', 'created_by' => $uid, 'parent_ref' => 'CMP03-' . $newId,
+                'priority' => 'P2', 'created_by' => $uid, 'parent_ref' => 'EXDC-' . $newId,
             ));
         } catch (\Throwable $t) { error_log('ceo_risk decision fact #' . $newId . ': ' . $t->getMessage()); }
     }
@@ -161,46 +160,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     exit();
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
+/* ── القراءة: صفوف الكيان من الجدول الأصلي ──────────────────────────────── */
 $rows = array();
-$sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
-          FROM cmp03_screen_rows
-         WHERE canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?') . "
-         ORDER BY id DESC LIMIT 500";
+$sql = "SELECT * FROM exec_decisions"
+     . ($is_super_admin && $company_id <= 0 ? '' : ' WHERE company_id = ?')
+     . ' ORDER BY id DESC LIMIT 500';
 $st = $conn->prepare($sql);
-if ($is_super_admin && $company_id <= 0) { $st->bind_param('s', $CANONICAL); }
-else { $st->bind_param('si', $CANONICAL, $company_id); }
+if (!($is_super_admin && $company_id <= 0)) { $st->bind_param('i', $company_id); }
 $st->execute();
 $rs = $st->get_result();
-while ($x = $rs->fetch_assoc()) {
-    $x['payload'] = json_decode((string) $x['payload'], true) ?: array();
-    $rows[] = $x;
-}
+while ($x = $rs->fetch_assoc()) { $rows[] = $x; }
 $st->close();
 
 $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';
 
-/** قيمة خلية العمود من الصف — الحوكمة الآلية حية وسائرها من الحمولة أو «—» */
-function cmp03_cell($col, $row, $entityName) {
-    $n = cmp03_screen_norm($col);
-    if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
-        return $row['created_by_name'] ?: '—';
-    }
-    if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
-    if ($n === cmp03_screen_norm('الحالة')) { return $row['status']; }
-    if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
-    if (isset($row['payload'][$col]) && $row['payload'][$col] !== '') { return $row['payload'][$col]; }
-    return '—';
-}
-/** تطبيع محلي خفيف (مرآة cmp03_norm دون جر مكتبة الأدوات للويب) */
-function cmp03_screen_norm($s) {
-    $s = preg_replace('/\s+/u', ' ', trim((string) $s));
-    $s = str_replace(array('أ','إ','آ'), 'ا', $s);
-    $s = str_replace('ة', 'ه', $s);
-    $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+/** قيمة خلية بفهرس عمود المستند — الحوكمة الآلية حية وسائرها من الجدول أو «—» */
+function m00_cell_at($idx, $row, $entityName, $COLDB) {
+    $col = $COLDB[$idx] ?? null;
+    if ($col === null) { return $entityName; }
+    if ($col === '__status') { return (string) $row['status']; }
+    if ($col === '__creator') { return $row['created_by_name'] ?: '—'; }
+    $v = isset($row[$col]) ? trim((string) $row[$col]) : '';
+    return $v !== '' ? $v : '—';
 }
 
 $page_title = 'إيكوبيشن | المخاطر والقرارات العليا';
@@ -260,7 +242,7 @@ include '../insidebar.php';
                 <div class="form-group"><label>تاريخ القرار</label>
                     <input type="date" name="f14"></div>
                 <div class="form-group"><label>الحالة</label>
-                    <select name="f15"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                    <select name="f15"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="قيد الحسم">قيد الحسم</option><option value="محسوم">محسوم</option><option value="قيد المتابعة">قيد المتابعة</option><option value="مغلق بعد المعالجة">مغلق بعد المعالجة</option><option value="مؤجل">مؤجل</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
@@ -296,7 +278,7 @@ include '../insidebar.php';
                 <tr><td colspan="17" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
+                    <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
                 </tr>

@@ -421,6 +421,13 @@ class TenantRegistry
         'products' => array('type' => self::T_TENANT, 'soft' => true),
         'project' => array('type' => self::T_TENANT, 'soft' => true),
         'quotations' => array('type' => self::T_TENANT, 'soft' => true),
+        // RENTAL-CORE (هجرة 2026-11-16): الثلاثيُّ الذي يفصل التأجيرَ عن البيع.
+        // الحجزُ نافذةٌ زمنيةٌ محجوزةٌ على معدةٍ أو فئة قبل العقد؛ ودفترُ الأسعار
+        // رأسٌ (سريانٌ وعملة) وبنودٌ (فئة × نموذج عمل × شريحة مدة). ثلاثتُها
+        // بياناتُ مستأجرٍ بحذفٍ ناعم — والبنودُ تحمل company_id فتُعزل مباشرةً.
+        'fleet_reservations' => array('type' => self::T_TENANT, 'soft' => true),
+        'rate_books' => array('type' => self::T_TENANT, 'soft' => true),
+        'rate_book_lines' => array('type' => self::T_TENANT, 'soft' => true),
         // INJAZ-S05 §6.12: بنود فحص الجاهزية الستة لكل عقد
         'readiness_lines' => array('type' => self::T_TENANT, 'soft' => true),
         // التسويةُ الموحّدة (UX-02 §15.3 · هجرة 2026-07-28): الرأسُ بيانات مستأجرٍ،
@@ -532,6 +539,8 @@ class TenantRegistry
         // لقطةُ تراجع حزمة SEC-GOV 2026-08-06 (نسخة role_permissions قبل القصّ) —
         // عالميةٌ بطبيعة أصلها؛ تسجيلُها يُمرّر ترحيلَها من سور migrate على القرينة
         'sec_perm_backup_20260806' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // التكلفة الوصولية لأوامر الشراء (إضافات الدور 16 · 2026-08-06)
+        'proc_landed_cost' => array('type' => self::T_TENANT, 'soft' => true),
         'report_role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
         'equipments_types' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
         'failure_codes' => array('type' => self::T_GLOBAL, 'managed' => true, 'soft' => false),

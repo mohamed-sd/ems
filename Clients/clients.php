@@ -247,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
 
     // التحقق من صحة كود العميل
     $client_code_raw = isset($_POST['client_code']) ? trim($_POST['client_code']) : '';
-    if ($client_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $client_code_raw)) {
+    if ($client_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $client_code_raw)) {
         clients_redirect_with_msg('كود العميل غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -754,7 +754,7 @@ include('../insidebar.php');
                              الكودُ المولَّدُ تلقائيًّا بعد كل إلغاءٍ أو خروجٍ من وضع التعديل. -->
                         <input type="text" name="client_code" id="client_code" placeholder="مثال: CL-001" required
                             value="<?php echo clients_e($next_client_code); ?>"
-                            pattern="[A-Za-z0-9-_]+" />
+                            pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-user"></i> اسم العميل *</label>

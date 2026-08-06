@@ -38,9 +38,11 @@ if (!isset($_SESSION['user'])) {
     </div>
 
 <?php
-include '../config.php';
+// insidebar.php أعلاه حمّل config.php بـ require_once؛ فـ include عارٍ هنا يُعيد
+// تنفيذ الملف ويُسقط الصفحة بـ«Cannot redeclare ems_table_has_column_raw».
+require_once __DIR__ . '/../config.php';
 
-$contract_id = intval($_GET['id']);
+$contract_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // H-20: المعرّفُ عقدُ موردٍ — يُحلّ إلى موردِه ويُفرض نطاقُ المشرف (403 مسجَّلة)
 require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';

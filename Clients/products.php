@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
 if (!headers_sent()) {
@@ -132,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     // الكود
     $prod_code_raw = isset($_POST['product_code']) ? trim($_POST['product_code']) : '';
-    if ($prod_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $prod_code_raw)) {
+    if ($prod_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $prod_code_raw)) {
         prod_redirect_with_msg('كود المنتج غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -330,6 +331,8 @@ function prod_revenue_label($model, $map)
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'prod-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
+    // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
+    foreach (ems_excel_header_actions('products', 'كتالوج الخدمات', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
     ?>
 
@@ -384,7 +387,7 @@ function prod_revenue_label($model, $map)
 
                     <div>
                         <label><i class="fas fa-barcode"></i> الكود *</label>
-                        <input type="text" name="product_code" id="product_code" placeholder="مثال: PRD-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="product_code" id="product_code" placeholder="مثال: PRD-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-heading"></i> اسم المنتج/الخدمة *</label>
@@ -728,3 +731,7 @@ function prod_revenue_label($model, $map)
 </body>
 
 </html>
+
+<?php
+// ح-09 · نافذةُ معالج الاستيراد وأصولُ الإطار (مرة واحدة)
+if (function_exists('ems_excel_render')) { ems_excel_render('products'); }

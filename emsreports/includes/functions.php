@@ -200,6 +200,16 @@ function getReportsCatalog() {
             'url'         => 'reports/maintenance_summary.php',
         ],
 
+        // ── المشتريات (§16 — أول تقارير الوحدة، أُضيف 2026-08-06) ──
+        'procurement_summary' => [
+            'code'        => 'procurement_summary',
+            'name_ar'     => 'ملخص المشتريات',
+            'icon'        => 'fa-cart-shopping',
+            'category'    => 'procurement',
+            'description' => 'الدورة لكل مورد: الأوامر وقيمها، نسب الاستلام، المطابقة الثلاثية، الذمم المفتوحة',
+            'url'         => 'reports/procurement_summary.php',
+        ],
+
         // ── التشغيل ─────────────────────────────────────────────
         'operations_summary' => [
             'code'        => 'operations_summary',
@@ -290,6 +300,7 @@ function getCategoryLabel($category) {
         'drivers'    => 'المشغلون',
         'operations' => 'التشغيل',
         'maintenance' => 'الصيانة',
+        'procurement' => 'المشتريات',
     ];
     return isset($labels[$category]) ? $labels[$category] : $category;
 }
@@ -307,6 +318,7 @@ function getCategoryIcon($category) {
         'drivers'    => 'fa-id-card',
         'operations' => 'fa-cogs',
         'maintenance' => 'fa-wrench',
+        'procurement' => 'fa-cart-shopping',
     ];
     return isset($icons[$category]) ? $icons[$category] : 'fa-chart-bar';
 }

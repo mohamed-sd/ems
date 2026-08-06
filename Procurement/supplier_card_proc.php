@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once '../includes/permissions_helper.php';   // proc_page_perms تستدعي check_page_permissions — كانت غائبةً فتُسقط الشاشة 500
 require_once __DIR__ . '/proc_helpers.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 
@@ -22,12 +23,13 @@ if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=" . rawur
 $sid = intval($_GET['id'] ?? 0);
 $sup = $sid > 0 ? proc_gate($is_super_admin)->selectOne('proc_supplier',
     array('where' => array('id' => $sid), 'includeDeleted' => true)) : null;
-$tab = in_array(strval($_GET['tab'] ?? '1'), array('1','2','3','4','5','6','7'), true)
+$tab = in_array(strval($_GET['tab'] ?? '1'), array('1','2','3','4','5','6','7','8'), true)
      ? strval($_GET['tab'] ?? '1') : '1';
 $co = intval($company_id);
 
 $TABS = array('1' => 'البيانات', '2' => 'أوامرُ الشراء', '3' => 'الاستلامات',
-              '4' => 'الفواتيرُ والمطابقة', '5' => 'العهد', '6' => 'الأصناف', '7' => 'السجل');
+              '4' => 'الفواتيرُ والمطابقة', '5' => 'العهد', '6' => 'الأصناف', '7' => 'السجل',
+              '8' => 'كشفُ الحساب');
 
 $page_title = 'إيكوبيشن | بطاقة مورد المشتريات';
 include '../inheader.php';
@@ -163,6 +165,43 @@ include '../insidebar.php';
                 echo '<tr><td>' . htmlspecialchars((string)$x['item_name']) . '</td>'
                    . '<td>' . intval($x['n']) . '</td>'
                    . '<td>' . htmlspecialchars((string)$x['qty']) . '</td></tr>';
+            }
+            echo '</tbody></table></div>';
+            break;
+        case '8':
+            // كشفُ حساب مورد المشتريات (UX-09 §5.3): الذمّةُ كانت تُقيَّد ولا شاشةَ
+            // تعرضها للدور — الكشفُ من fin_dues بهوية proc_supplier حصرًا
+            // (لا suppliers — سجلّان بمعرّفاتٍ متصادمة)
+            $rows = array();
+            $r = $conn->query("SELECT d.id, d.amount, d.currency, d.period_ref, d.settlement_state,
+                                      d.direction, d.created_at
+                                 FROM fin_dues d
+                                WHERE d.company_id={$co} AND d.party_type='proc_supplier'
+                                  AND d.party_ref={$sid} AND d.due_type='purchase'
+                                ORDER BY d.id DESC LIMIT 200");
+            while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
+            if (!$rows) { ems_state_empty('لا ذممَ مقيَّدةً لهذا المورد — الذمّةُ تُفتح بالمطابقة الثلاثية', 'إلى المطابقة', 'po_match.php'); break; }
+            $tot = array();   // إجمالي المفتوح لكل عملة
+            foreach ($rows as $x) {
+                if ((string) $x['settlement_state'] === 'pending') {
+                    $cur = (string) $x['currency'];
+                    $tot[$cur] = ($tot[$cur] ?? 0) + (float) $x['amount'];
+                }
+            }
+            echo '<p style="font-weight:800">الرصيدُ المفتوح (بانتظار التسوية): '
+               . ($tot ? implode(' · ', array_map(function ($c, $v) { return number_format($v, 2) . ' ' . $c; }, array_keys($tot), $tot)) : 'صفر')
+               . '</p>';
+            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+               . '<thead><tr><th>الذمّة</th><th>المرجع</th><th>المبلغ</th><th>الاتجاه</th><th>حالة التسوية</th><th>تاريخ القيد</th></tr></thead><tbody>';
+            foreach ($rows as $x) {
+                $oid_ref = (strpos((string) $x['period_ref'], 'PO-') === 0) ? intval(substr((string) $x['period_ref'], 3)) : 0;
+                echo '<tr><td>#' . intval($x['id']) . '</td>'
+                   . '<td>' . ($oid_ref ? ('<a href="orders_proc.php?edit_id=' . $oid_ref . '">' . htmlspecialchars((string) $x['period_ref']) . '</a>')
+                                        : htmlspecialchars((string) $x['period_ref'])) . '</td>'
+                   . '<td>' . htmlspecialchars(number_format((float) $x['amount'], 2) . ' ' . $x['currency']) . '</td>'
+                   . '<td>' . ((string) $x['direction'] === 'credit' ? 'دائن (له)' : 'مدين (عليه)') . '</td>'
+                   . '<td>' . htmlspecialchars((string) $x['settlement_state']) . '</td>'
+                   . '<td><small>' . htmlspecialchars((string) $x['created_at']) . '</small></td></tr>';
             }
             echo '</tbody></table></div>';
             break;

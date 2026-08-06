@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
 if (!headers_sent()) {
@@ -124,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['quotation_code'])) {
 
     // الكود
     $quo_code_raw = isset($_POST['quotation_code']) ? trim($_POST['quotation_code']) : '';
-    if ($quo_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $quo_code_raw)) {
+    if ($quo_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $quo_code_raw)) {
         quo_redirect_with_msg('كود العرض غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -374,6 +375,8 @@ function quo_state_tone($state)
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'quo-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
+    // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
+    foreach (ems_excel_header_actions('quotations', 'عروض الأسعار', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
     ?>
 
@@ -439,7 +442,7 @@ function quo_state_tone($state)
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود العرض *</label>
-                        <input type="text" name="quotation_code" id="quotation_code" placeholder="مثال: QUO-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="quotation_code" id="quotation_code" placeholder="مثال: QUO-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-user-tie"></i> العميل</label>
@@ -835,3 +838,7 @@ function quo_state_tone($state)
 </body>
 
 </html>
+
+<?php
+// ح-09 · نافذةُ معالج الاستيراد وأصولُ الإطار (مرة واحدة)
+if (function_exists('ems_excel_render')) { ems_excel_render('quotations'); }

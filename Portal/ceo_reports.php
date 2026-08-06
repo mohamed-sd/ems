@@ -228,7 +228,16 @@ function cr_p($row, $key) {
     <div class="card"><div class="card-header"><h5><i class="fa fa-gavel"></i> ⑤ القرارات التنفيذية ومتابعاتها (SRC-10)</h5></div>
     <div class="card-body">
         <table class="alltables display no-datatable" style="width:100%"><thead>
-            <tr><th>القرار</th><th>القضية</th><th>المكلَّف</th><th>المهلة</th><th>حالة الصف</th><th>متابعته</th></tr></thead><tbody>
+            <tr><th>القرار</th><th>القضية</th><th>المكلَّف</th><th>المهلة</th><th>حالة الصف</th><th>متابعته</th>
+              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              </tr></thead><tbody>
             <?php
             $followByRef = array();
             foreach ($decFollow as $f) { $followByRef[$f['source_ref']] = $f; }

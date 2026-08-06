@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
 if (!headers_sent()) {
@@ -121,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['activity_type'])) {
 
     // الكود
     $act_code_raw = isset($_POST['activity_code']) ? trim($_POST['activity_code']) : '';
-    if ($act_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $act_code_raw)) {
+    if ($act_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $act_code_raw)) {
         act_redirect_with_msg('كود النشاط غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -404,6 +405,8 @@ function act_entity_label($type, $map)
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'act-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
+    // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
+    foreach (ems_excel_header_actions('activities', 'الأنشطة التجارية', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
     ?>
 
@@ -458,7 +461,7 @@ function act_entity_label($type, $map)
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود النشاط *</label>
-                        <input type="text" name="activity_code" id="activity_code" placeholder="مثال: ACT-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="activity_code" id="activity_code" placeholder="مثال: ACT-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-list-check"></i> نوع النشاط *</label>
@@ -833,3 +836,7 @@ function act_entity_label($type, $map)
 </body>
 
 </html>
+
+<?php
+// ح-09 · نافذةُ معالج الاستيراد وأصولُ الإطار (مرة واحدة)
+if (function_exists('ems_excel_render')) { ems_excel_render('activities'); }

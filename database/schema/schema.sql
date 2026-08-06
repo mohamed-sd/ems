@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-06 09:46:51
--- الجداول: 447 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-06 10:46:09
+-- الجداول: 448 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6270,6 +6270,8 @@ CREATE TABLE `proc_item` (
   `max_qty` decimal(12,2) NOT NULL DEFAULT 0.00,
   `lead_time_days` int(11) NOT NULL DEFAULT 0,
   `safety_stock` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `avg_cost` decimal(18,4) DEFAULT NULL COMMENT 'المتوسط المرجح بمعادل الدفاتر — يشتقه ProcCostingService من دفتر الحركات',
+  `avg_cost_updated_at` datetime DEFAULT NULL COMMENT 'لحظة آخر إعادة احتساب',
   `served_equipment_id` int(11) DEFAULT NULL COMMENT 'equipments.id (بلا FK)',
   `served_category` varchar(100) DEFAULT NULL,
   `notes` mediumtext DEFAULT NULL,
@@ -6285,6 +6287,28 @@ CREATE TABLE `proc_item` (
   KEY `idx_proc_item_critical` (`company_id`,`is_critical`),
   KEY `idx_proc_item_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: proc_landed_cost ──
+CREATE TABLE `proc_landed_cost` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'الكيان المالك — عزل المستأجر',
+  `order_id` int(11) NOT NULL COMMENT 'أمر الشراء المحمَّل (proc_order.id — بلا FK كسائر proc_*)',
+  `doc_no` varchar(60) NOT NULL COMMENT 'رقم مستند المصروف (بوليصة/إيصال جمركي…)',
+  `cost_type` varchar(30) NOT NULL DEFAULT 'شحن' COMMENT 'شحن · جمارك · تخليص · نقل داخلي · أخرى',
+  `amount` decimal(18,2) NOT NULL COMMENT 'المبلغ بعملة المستند',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `fx_rate` decimal(12,4) NOT NULL DEFAULT 1.0000 COMMENT 'إلى معادل الدفاتر — ضربًا (عرف base_amount)',
+  `base_amount` decimal(18,2) NOT NULL COMMENT 'المعادل = amount × fx_rate',
+  `supplier_id` int(11) DEFAULT NULL COMMENT 'مقدم الخدمة (proc_supplier) إن وُجد',
+  `notes` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_landed_order` (`company_id`,`order_id`,`is_deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='التكلفة الوصولية لأوامر الشراء — ترسمل على تكلفة الاستلام توزيعا بالقيمة';
 
 -- ── Table: proc_lookup ──
 CREATE TABLE `proc_lookup` (
@@ -6491,6 +6515,7 @@ CREATE TABLE `proc_stock_move` (
   `warehouse_id` int(11) DEFAULT NULL,
   `move_type` varchar(20) NOT NULL COMMENT 'استلام/صرف/إرجاع/تحويل',
   `qty` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `unit_cost` decimal(18,4) DEFAULT NULL COMMENT 'تكلفة الوحدة بمعادل الدفاتر: الاستلام بفعليته + نصيبه الوصولي · الصرف بالمتوسط لحظته · NULL=حركة تاريخية غير مسعرة',
   `ref_type` varchar(30) DEFAULT NULL COMMENT 'proc_order/proc_issue/proc_receipt/يدوي',
   `ref_id` int(11) DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,

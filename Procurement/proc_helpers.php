@@ -437,7 +437,7 @@ if (!function_exists('proc_match_invoice')) {
      * @return array ('status' => matched|var_pending|skipped|failed,
      *                'qty_var','price_var','tolerance','due_id','reason')
      */
-    function proc_match_invoice($conn, $order_id, $invoice_no, $invoice_date, $invoice_amount, $uid = 0)
+    function proc_match_invoice($conn, $order_id, $invoice_no, $invoice_date, $invoice_amount, $uid = 0, $invoice_tax = 0.0)
     {
         $order_id = intval($order_id);
         $out = array('status' => 'skipped', 'qty_var' => 0.0, 'price_var' => 0.0,
@@ -446,8 +446,15 @@ if (!function_exists('proc_match_invoice')) {
 
         $invoice_no = trim((string) $invoice_no);
         $invoice_amount = (float) $invoice_amount;
+        // الضريبةُ مفصولةٌ عن الصافي (UX-09 §8.2 متبقيات): تُقارن قيمةُ البضاعة
+        // (الفاتورة − ضريبتها) بقيمة الأمر — والذمّةُ تُفتح بالإجمالي (الضريبةُ دَينٌ أيضًا)
+        $invoice_tax = max(0.0, (float) $invoice_tax);
         if ($invoice_no === '' || $invoice_amount <= 0) {
             $out['reason'] = 'رقمُ الفاتورة وقيمتُها إلزاميان';
+            return $out;
+        }
+        if ($invoice_tax >= $invoice_amount) {
+            $out['reason'] = 'الضريبةُ لا تبلغ قيمةَ الفاتورة';
             return $out;
         }
 
@@ -487,7 +494,7 @@ if (!function_exists('proc_match_invoice')) {
 
         $orderAmount = (float) $po['total_amount'];
         $qtyVar   = round($received - $ordered, 4);
-        $priceVar = round($invoice_amount - $orderAmount, 2);
+        $priceVar = round(($invoice_amount - $invoice_tax) - $orderAmount, 2);   // مقارنةُ الصافي بالأمر
         $tol      = proc_match_tolerance($orderAmount);
 
         $out['qty_var'] = $qtyVar;
@@ -500,14 +507,19 @@ if (!function_exists('proc_match_invoice')) {
 
         $state = $ok ? 'matched' : 'var_pending';
         try {
-            $gate->update('proc_order', array(
+            $upd = array(
                 'invoice_no'     => $invoice_no,
                 'invoice_date'   => ($invoice_date !== '' && $invoice_date !== null) ? $invoice_date : null,
                 'invoice_amount' => $invoice_amount,
+                'tax_amount'     => $invoice_tax,
                 'match_state'    => $state,
                 'matched_at'     => date('Y-m-d H:i:s'),
                 'matched_by'     => intval($uid) > 0 ? intval($uid) : null,
-            ), array('id' => $order_id));
+            );
+            // المطابقةُ الناجحةُ تُقدّم الأمر إلى «مطابَق» (الحالةُ التي وُضعت لها) —
+            // تقدُّمٌ لا نكوص: «مغلق» يبقى مغلقًا
+            if ($ok && (string) $po['state'] === 'استلام نهائي') { $upd['state'] = 'مطابَق'; }
+            $gate->update('proc_order', $upd, array('id' => $order_id));
         } catch (\Throwable $t) {
             error_log('proc match save #' . $order_id . ': ' . $t->getMessage());
             $out['status'] = 'failed'; return $out;
@@ -521,9 +533,36 @@ if (!function_exists('proc_match_invoice')) {
         }
 
         // ── مطابَقة: الدَّينُ يُفتح باسم المورد في سجله ────────────────────
-        $out['status'] = 'matched';
+        $res = proc_open_supplier_payable($conn, $po, $invoice_amount, $invoice_no, $uid, array(
+            'qty_var'   => $qtyVar,
+            'price_var' => $priceVar,
+            'tolerance' => round($tol, 2),
+        ));
+        $out['status'] = $res['ok'] ? 'matched' : 'failed';
+        $out['due_id'] = $res['due_id'];
+        return $out;
+    }
+}
+
+if (!function_exists('proc_open_supplier_payable')) {
+    /**
+     * فتحُ استحقاق المورد لفاتورة أمر شراء — حدثٌ + صفُّ ذمّةٍ بعطالتيهما.
+     * ─────────────────────────────────────────────────────────────────────
+     * القناةُ الواحدة للمطابقة الناجحة **ولحسم الفرق** معًا (فلا ينحرف
+     * التنفيذان). العطالة مزدوجة: الحدثُ بمفتاح proc:invoice:{order_id}
+     * والذمّةُ بمرجع period_ref=PO-{order_id} — فلا تقييدَ مرتين أبدًا.
+     *
+     * @param array $po      صفُّ proc_order كاملًا
+     * @param float $amount  قيمةُ الذمّة (الفاتورةُ كاملةً أو قيمةُ الأمر بقرار الحسم)
+     * @return array ('ok' => bool, 'due_id' => int|null)
+     */
+    function proc_open_supplier_payable($conn, array $po, $amount, $invoice_no, $uid = 0, array $extra = array())
+    {
+        $order_id   = intval($po['id']);
         $docCompany = intval($po['company_id']);
         $currency   = (isset($po['currency']) && $po['currency'] !== '') ? $po['currency'] : 'SDG';
+        $amount     = (float) $amount;
+        $gate       = proc_gate(false);
 
         require_once __DIR__ . '/../app/Core/EventPublisher.php';
         $conn->begin_transaction();
@@ -539,31 +578,28 @@ if (!function_exists('proc_match_invoice')) {
                 'created_by'        => intval($uid) > 0 ? intval($uid) : 1,
                 'idempotency_key'   => 'proc:invoice:' . $order_id,
                 'legacy_event_type' => 'expense',
-                'amount'            => $invoice_amount,
+                'amount'            => $amount,
                 'currency'          => $currency,
-                'source_ref'        => $invoice_no,
+                'source_ref'        => (string) $invoice_no,
                 'project_id'        => (isset($po['project_id']) && intval($po['project_id']) > 0) ? intval($po['project_id']) : null,
                 'notes'             => 'استحقاقُ فاتورة مورد ' . $invoice_no . ' — أمر ' . $po['code'],
-                'payload'           => array(
+                'payload'           => array_merge(array(
                     'order_id'    => $order_id,
                     'order_code'  => (string) $po['code'],
-                    'invoice_no'  => $invoice_no,
-                    'qty_var'     => $qtyVar,
-                    'price_var'   => $priceVar,
-                    'tolerance'   => round($tol, 2),
+                    'invoice_no'  => (string) $invoice_no,
                     'party_type'  => 'proc_supplier',
                     'party_ref'   => intval($po['supplier_id']),
-                ),
+                ), $extra),
             ));
             $conn->commit();
         } catch (\Throwable $t) {
             $conn->rollback();
-            error_log('proc match publish #' . $order_id . ': ' . $t->getMessage());
-            $out['status'] = 'failed';
-            return $out;
+            error_log('proc payable publish #' . $order_id . ': ' . $t->getMessage());
+            return array('ok' => false, 'due_id' => null);
         }
 
         // صفُّ الذمّة — بعطالته: فاتورةُ الأمر تُقيَّد مرةً واحدة
+        $due_id = null;
         try {
             $existing = $gate->selectOne('fin_dues', array(
                 'columns'  => array('id'),
@@ -571,14 +607,14 @@ if (!function_exists('proc_match_invoice')) {
                 'params'   => array('PO-' . $order_id),
             ));
             if ($existing) {
-                $out['due_id'] = intval($existing['id']);
+                $due_id = intval($existing['id']);
             } else {
-                $out['due_id'] = intval($gate->insert('fin_dues', array(
+                $due_id = intval($gate->insert('fin_dues', array(
                     'party_type'       => 'proc_supplier',
                     'party_ref'        => intval($po['supplier_id']),
                     'due_type'         => 'purchase',
                     'direction'        => 'credit',
-                    'amount'           => $invoice_amount,
+                    'amount'           => $amount,
                     'currency'         => $currency,
                     'period_ref'       => 'PO-' . $order_id,
                     'settlement_state' => 'pending',
@@ -586,10 +622,225 @@ if (!function_exists('proc_match_invoice')) {
                 )));
             }
         } catch (\Throwable $t) {
-            error_log('proc match due #' . $order_id . ': ' . $t->getMessage());
+            error_log('proc payable due #' . $order_id . ': ' . $t->getMessage());
+        }
+        return array('ok' => true, 'due_id' => $due_id);
+    }
+}
+
+if (!function_exists('proc_match_resolve')) {
+    /**
+     * حسمُ الفرق المعلَّق (var_pending) — «حتى قرارٍ موثَّق» صار له موضعُه.
+     * ─────────────────────────────────────────────────────────────────────
+     * القراراتُ الثلاثة (UX-09 §8.2):
+     *   · «قبول الفرق»   → الذمّةُ بقيمة **الفاتورة** كاملةً — الفرقُ مقبولٌ بمخوَّله
+     *   · «إشعار دائن»   → الذمّةُ بقيمة **الأمر** — والفرقُ يُنتظر له إشعارٌ دائنٌ
+     *                       من المورد (توثيقُه في السبب)
+     *   · «رفض الفاتورة» → لا ذمّةَ؛ match_state='rejected' وحقولُ الفاتورة تبقى
+     *                       أثرًا — وتسجيلُ فاتورةٍ بديلةٍ متاحٌ (إعادةُ مطابقة)
+     * «لا حسمَ بلا تفسير»: السببُ إلزاميٌّ في القرارات كلِّها، ويُختم بمخوَّله ولحظته.
+     *
+     * @return array ('status' => resolved|skipped|failed, 'due_id', 'reason')
+     */
+    function proc_match_resolve($conn, $order_id, $decision, $reason, $uid = 0)
+    {
+        $order_id = intval($order_id);
+        $decision = trim((string) $decision);
+        $reason   = trim((string) $reason);
+        $out = array('status' => 'skipped', 'due_id' => null, 'reason' => '');
+
+        $valid = array('قبول الفرق', 'إشعار دائن', 'رفض الفاتورة');
+        if ($order_id <= 0 || !in_array($decision, $valid, true)) {
+            $out['reason'] = 'قرارٌ غير معروف'; return $out;
+        }
+        if ($reason === '') { $out['reason'] = 'لا حسمَ بلا تفسير — السببُ إلزامي'; return $out; }
+
+        $gate = proc_gate(false);
+        try {
+            $po = $gate->selectOne('proc_order', array('where' => array('id' => $order_id)));
+        } catch (\Throwable $t) {
+            error_log('proc resolve #' . $order_id . ': ' . $t->getMessage());
+            $out['status'] = 'failed'; return $out;
+        }
+        if (!$po) { $out['reason'] = 'الأمرُ غير موجود'; return $out; }
+        if ((string) $po['match_state'] !== 'var_pending') {
+            $out['reason'] = 'لا فرقَ معلَّقًا على هذا الأمر — الحالة: ' . $po['match_state'];
+            return $out;
         }
 
+        $stamp = array(
+            'var_decision'        => $decision,
+            'var_decision_reason' => mb_substr($reason, 0, 255),
+            'var_decided_by'      => intval($uid) > 0 ? intval($uid) : null,
+            'var_decided_at'      => date('Y-m-d H:i:s'),
+        );
+
+        if ($decision === 'رفض الفاتورة') {
+            $stamp['match_state'] = 'rejected';
+            try { $gate->update('proc_order', $stamp, array('id' => $order_id)); }
+            catch (\Throwable $t) { $out['status'] = 'failed'; return $out; }
+            $out['status'] = 'resolved';
+            return $out;
+        }
+
+        // قبولُ الفرق → قيمةُ الفاتورة · إشعارٌ دائن → قيمةُ الأمر
+        $dueAmount = ($decision === 'قبول الفرق')
+                   ? (float) $po['invoice_amount']
+                   : (float) $po['total_amount'];
+        $stamp['match_state'] = 'matched';
+        if ((string) $po['state'] === 'استلام نهائي') { $stamp['state'] = 'مطابَق'; }
+        try { $gate->update('proc_order', $stamp, array('id' => $order_id)); }
+        catch (\Throwable $t) { $out['status'] = 'failed'; return $out; }
+
+        $res = proc_open_supplier_payable($conn, $po, $dueAmount, (string) $po['invoice_no'], $uid, array(
+            'var_decision' => $decision,
+            'var_reason'   => mb_substr($reason, 0, 255),
+        ));
+        $out['status'] = $res['ok'] ? 'resolved' : 'failed';
+        $out['due_id'] = $res['due_id'];
         return $out;
+    }
+}
+
+if (!function_exists('proc_base_currency')) {
+    /** عملةُ دفاتر الكيان (admin_companies.currency) — مرجعُ «المعادل الموحد». */
+    function proc_base_currency($conn, $company_id)
+    {
+        static $cache = array();
+        $cid = intval($company_id);
+        if (!isset($cache[$cid])) {
+            $cache[$cid] = 'SDG';
+            $st = $conn->prepare('SELECT currency FROM admin_companies WHERE id = ? LIMIT 1');
+            if ($st) {
+                $st->bind_param('i', $cid);
+                $st->execute();
+                $r = $st->get_result()->fetch_assoc();
+                if ($r && trim((string) $r['currency']) !== '') { $cache[$cid] = trim((string) $r['currency']); }
+                $st->close();
+            }
+        }
+        return $cache[$cid];
+    }
+}
+
+if (!function_exists('proc_publish_landed_cost')) {
+    /**
+     * ② نشرُ مصروف التكلفة الوصولية من مستنده (بوليصة/إيصال جمركي) — بعطالة
+     * proc:landed:{id}. الترسملُ على تكلفة الاستلام شأنُ ProcCostingService؛
+     * وهذا الأثرُ الماليُّ للمصروف نفسِه (فاتورةُ الشحن دَينٌ/مصروفٌ قائمٌ بذاته
+     * خارج المطابقة الثلاثية للبضاعة — عرفٌ عالمي).
+     */
+    function proc_publish_landed_cost($conn, $landed_id, $uid = 0)
+    {
+        $landed_id = intval($landed_id);
+        if ($landed_id <= 0) { return 'skipped'; }
+        try {
+            $row = proc_gate(false)->selectOne('proc_landed_cost', array('where' => array('id' => $landed_id)));
+        } catch (\Throwable $t) { return 'failed'; }
+        if (!$row || (float) $row['amount'] <= 0) { return 'skipped'; }
+
+        $po = null;
+        try { $po = proc_gate(false)->selectOne('proc_order', array(
+            'columns' => array('code', 'project_id'), 'where' => array('id' => intval($row['order_id'])), 'includeDeleted' => true)); }
+        catch (\Throwable $t) { /* الأمرُ زينةُ سياق */ }
+
+        require_once __DIR__ . '/../app/Core/EventPublisher.php';
+        $conn->begin_transaction();
+        try {
+            $res = \App\Core\EventPublisher::publish($conn, array(
+                'event_key'         => 'expense.landed_cost.recorded',
+                'category'          => 'financial',
+                'source_module'     => 'procurement',
+                'company_id'        => intval($row['company_id']),
+                'entity_type'       => 'proc_landed_cost',
+                'entity_id'         => $landed_id,
+                'occurred_at'       => gmdate('Y-m-d H:i:s'),
+                'created_by'        => intval($uid) > 0 ? intval($uid) : 1,
+                'idempotency_key'   => 'proc:landed:' . $landed_id,
+                'legacy_event_type' => 'expense',
+                'amount'            => (float) $row['amount'],
+                'currency'          => (string) $row['currency'],
+                'source_ref'        => (string) $row['doc_no'],
+                'project_id'        => ($po && intval($po['project_id']) > 0) ? intval($po['project_id']) : null,
+                'notes'             => 'تكلفة وصولية (' . $row['cost_type'] . ') — أمر ' . ($po ? $po['code'] : ('#' . $row['order_id'])),
+                'payload'           => array(
+                    'landed_id'   => $landed_id,
+                    'order_id'    => intval($row['order_id']),
+                    'cost_type'   => (string) $row['cost_type'],
+                    'base_amount' => (float) $row['base_amount'],
+                    'party_type'  => 'proc_supplier',
+                    'party_ref'   => intval($row['supplier_id']),
+                ),
+            ));
+            $conn->commit();
+            return (is_array($res) && !empty($res['duplicate'])) ? 'duplicate' : 'published';
+        } catch (\Throwable $t) {
+            $conn->rollback();
+            error_log('proc publish landed #' . $landed_id . ': ' . $t->getMessage());
+            return 'failed';
+        }
+    }
+}
+
+if (!function_exists('proc_publish_issue_cost')) {
+    /**
+     * ① نشرُ مصروف قطع الصرف على أبعاده (معدة/مشروع/أمر صيانة) — من منبعه.
+     * ─────────────────────────────────────────────────────────────────────
+     * كان الصرفُ يقيّد كميةً بلا أثرٍ ماليٍّ فربحيةُ المعدة تفقد تكلفةَ قطعها.
+     * البوابة: حالةٌ منفَّذة ('مصروف' · 'محمَّل التكلفة') ومبلغٌ موجب. العطالة:
+     * proc:issue:{id} — التعديلُ لا يضاعف (النشرُ مرةً واحدةً كعرف أمر الشراء).
+     * المبلغُ بمعادل الدفاتر (المتوسطُ المرجح أصلًا معادلٌ) وعملتُه عملةُ الكيان.
+     *
+     * @return string published | duplicate | skipped | failed
+     */
+    function proc_publish_issue_cost($conn, $issue_id, $uid = 0)
+    {
+        $issue_id = intval($issue_id);
+        if ($issue_id <= 0) { return 'skipped'; }
+        try {
+            $row = proc_gate(false)->selectOne('proc_issue', array('where' => array('id' => $issue_id)));
+        } catch (\Throwable $t) { return 'failed'; }
+        if (!$row) { return 'skipped'; }
+
+        if (!in_array((string) $row['state'], array('مصروف', 'محمَّل التكلفة'), true)) { return 'skipped'; }
+        $amount = (float) (isset($row['total_cost']) ? $row['total_cost'] : 0);
+        $docCompany = intval($row['company_id']);
+        if ($amount <= 0 || $docCompany <= 0) { return 'skipped'; }
+
+        require_once __DIR__ . '/../app/Core/EventPublisher.php';
+        $conn->begin_transaction();
+        try {
+            $res = \App\Core\EventPublisher::publish($conn, array(
+                'event_key'         => 'expense.parts.issued',
+                'category'          => 'financial',
+                'source_module'     => 'procurement',
+                'company_id'        => $docCompany,
+                'entity_type'       => 'proc_issue',
+                'entity_id'         => $issue_id,
+                'occurred_at'       => gmdate('Y-m-d H:i:s'),
+                'created_by'        => intval($uid) > 0 ? intval($uid) : 1,
+                'idempotency_key'   => 'proc:issue:' . $issue_id,
+                'legacy_event_type' => 'expense',
+                'amount'            => round($amount, 2),
+                'currency'          => proc_base_currency($conn, $docCompany),
+                'source_ref'        => (string) ($row['code'] ?? ('ISS#' . $issue_id)),
+                'project_id'        => (isset($row['project_id']) && intval($row['project_id']) > 0) ? intval($row['project_id']) : null,
+                'notes'             => 'تكلفة قطع صرف ' . (string) ($row['code'] ?? $issue_id),
+                'payload'           => array(
+                    'issue_id'             => $issue_id,
+                    'equipment_id'         => isset($row['equipment_id']) ? intval($row['equipment_id']) : null,
+                    'maintenance_order_id' => isset($row['maintenance_order_id']) ? intval($row['maintenance_order_id']) : null,
+                    'holder_name'          => (string) ($row['holder_name'] ?? ''),
+                    'costing'              => 'weighted_avg',
+                ),
+            ));
+            $conn->commit();
+            return (is_array($res) && !empty($res['duplicate'])) ? 'duplicate' : 'published';
+        } catch (\Throwable $t) {
+            $conn->rollback();
+            error_log('proc publish issue cost #' . $issue_id . ': ' . $t->getMessage());
+            return 'failed';
+        }
     }
 }
 

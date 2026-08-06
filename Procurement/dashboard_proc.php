@@ -103,6 +103,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div>
 
+    <?php
+    // ③ نزيفُ التوقف: معداتٌ أوامرُ صيانتها المفتوحةُ بقطعٍ لم يكتمل شراؤها بعد
+    require_once __DIR__ . '/../app/Services/Procurement/MntProcBridgeService.php';
+    $waiting_eq = \App\Services\Procurement\MntProcBridgeService::waitingEquipment($conn, $company_id, 8);
+    if ($waiting_eq): ?>
+    <div class="card" style="margin-bottom:14px;border-inline-start:4px solid #b3261e">
+        <div class="card-header"><h5><i class="fas fa-triangle-exclamation" style="color:#b3261e"></i>
+            معداتٌ بانتظار قطعٍ (<?php echo count($waiting_eq); ?>) — كلُّ يومٍ هنا إيرادُ تأجيرٍ ضائع</h5></div>
+        <div class="card-body"><div class="table-container">
+            <table class="alltables display" data-no-dt="1" style="width:100%">
+                <thead><tr><th>المعدة</th><th>أمر الصيانة</th><th>الانتظار (يوم)</th><th>طلب الشراء</th><th>حالته</th><th>الأولوية</th></tr></thead>
+                <tbody>
+                <?php foreach ($waiting_eq as $we): ?>
+                    <tr<?php echo intval($we['waiting_days']) > 7 ? ' style="background:#fff1f0"' : ''; ?>>
+                        <td><?php echo htmlspecialchars((string)($we['equipment_name'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string)$we['mnt_code'] . ' (' . $we['mnt_state'] . ')'); ?></td>
+                        <td><strong><?php echo intval($we['waiting_days']); ?></strong></td>
+                        <td><?php echo $we['req_code']
+                            ? '<a href="requests_proc.php">' . htmlspecialchars((string)$we['req_code']) . '</a>'
+                            : '<span style="color:#b3261e;font-weight:700">بلا طلبٍ بعد — ولّده من شاشة الطلبات</span>'; ?></td>
+                        <td><?php echo htmlspecialchars((string)($we['req_state'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string)($we['priority'] ?? '—')); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <?php endif; ?>
+
     <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
 
     <div class="filter">
@@ -134,7 +164,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الكود</th><th>الصنف</th><th>الفئة</th><th>الحد الأدنى</th><th>مخزون الأمان</th><th>مدة التوريد (يوم)</th>
-                </tr></thead>
+                    <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                    <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+                    </tr></thead>
                 <tbody>
                     <?php
                     $critical_rows = $g->select('proc_item', array(

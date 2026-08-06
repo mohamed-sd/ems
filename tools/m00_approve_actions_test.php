@@ -57,8 +57,16 @@ function loginAs($user, $passWord) {
     return true;
 }
 function statusOf(mysqli $conn, $id) {
-    $w = $conn->query("SELECT status, payload FROM cmp03_screen_rows WHERE id = " . (int) $id)->fetch_assoc();
-    if ($w) { $w['payload'] = json_decode((string) $w['payload'], true) ?: array(); }
+    // اللحاق CMP03_FOLLOWUP: الشاشة صارت على جدولها الأصلي exec_approvals —
+    // وتُعاد الأعمدة بمفاتيح المستند نفسها لتبقى إثباتات الرباعية كما هي
+    $w = $conn->query("SELECT * FROM exec_approvals WHERE id = " . (int) $id)->fetch_assoc();
+    if ($w) {
+        $w['payload'] = array(
+            'قراري'                  => (string) ($w['decision'] ?? ''),
+            'سبب القرار'             => (string) ($w['decision_reason'] ?? ''),
+            'المعتمِد — الاسم والصفة' => (string) ($w['approver_name'] ?? ''),
+        );
+    }
     return $w;
 }
 
@@ -76,13 +84,13 @@ req($BASE . '/Portal/ceo_approvals.php', array(
     'f4' => 'إدارة التشغيل', 'f5' => 'تجاوز سقف', 'f6' => '5000', 'f7' => 'USD',
     'f8' => '3000', 'f9' => '2000', 'f11' => '48 ساعة', 'f17' => 'قيد المراجعة',
 ));
-$rw = $conn->query("SELECT id FROM cmp03_screen_rows
-                     WHERE canonical_file='ceo_approvals.php' AND payload LIKE '%"
-    . $conn->real_escape_string($reqNo) . "%' ORDER BY id DESC LIMIT 1")->fetch_assoc();
+$rw = $conn->query("SELECT id FROM exec_approvals
+                     WHERE request_no='" . $conn->real_escape_string($reqNo) . "'
+                     ORDER BY id DESC LIMIT 1")->fetch_assoc();
 ok($rw !== null, 'صف التجربة حُفظ (قيد المراجعة)');
 if (!$rw) { fwrite(STDOUT, "═══ توقف — لا صف ═══\n"); exit(1); }
 $rid = (int) $rw['id'];
-$lbl = 'CMP03-' . $rid;
+$lbl = 'EXAP-' . $rid;
 
 // ① الناقص يُرفض ولا يُقيَّد
 req($BASE . '/Portal/ceo_approvals.php', array('cmp03_action' => 'decide', 'csrf_token' => $tok,
@@ -145,7 +153,7 @@ ok($s['status'] === 'معتمد' && (string) ($s['payload']['قراري'] ?? '')
    'دور 6 لم يغيّر شيئًا (رد ' . $r['code'] . ')');
 
 // نظافة: صف التجربة (الحقيقة تبقى — واقعة وقعت)
-$conn->query("DELETE FROM cmp03_screen_rows WHERE id={$rid} AND is_seed=0");
+$conn->query("DELETE FROM exec_approvals WHERE id={$rid} AND is_seed=0");
 
 @unlink($JAR);
 fwrite(STDOUT, "═══ الحصيلة: {$pass} ناجح · {$fail} فاشل ═══\n");

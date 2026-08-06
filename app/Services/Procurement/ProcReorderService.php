@@ -121,8 +121,10 @@ class ProcReorderService
                         $code = 'PRQ-AUTO-' . date('ymd') . '-' . $itemId;
                         $reqId = (int) $g->insert('proc_request', array(
                             'code' => $code, 'need_source' => ProcReorderService::AUTO_SOURCE,
-                            'op_classification' => 'تشغيلي', 'requesting_dept' => 'المستودع',
-                            'priority' => 'عادية', 'state' => 'مقدَّم',
+                            // القيمُ من قوائم proc_helpers الصالحة — كانت ('تشغيلي'/'عادية')
+                            // خارجَها فتلوث الفلاتر (نفسُ علة بذور UAT)
+                            'op_classification' => 'استهلاكية', 'requesting_dept' => 'المستودع',
+                            'priority' => 'عادي', 'state' => 'مقدَّم',
                             'notes' => 'توليدٌ آليٌّ: الرصيدُ بلغ الحد (M-43)',
                             'created_by' => (int) $actor,
                         ));

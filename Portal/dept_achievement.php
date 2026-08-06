@@ -53,6 +53,36 @@ $roles_in   = count($unit_roles) ? implode(',', $unit_roles) : '0';
 $dept_users = "SELECT id FROM users WHERE company_id = $company_id AND role IN ($roles_in)";
 $ue_state   = "state IN ('site_approved','parties_approved','sales_approved','converted')";
 
+/**
+ * ح-12 · مؤشراتُ الإدارة من **دورتها هي** لا من دورة غيرها.
+ * ───────────────────────────────────────────────────────────────────────────
+ * كانت الأربعةُ العامة (وحدات/ساعات/صيانة) أصفارًا دائمةً للمشتريات — فالإدارةُ
+ * لا تُدخل وحداتٍ ولا تقفل أوامرَ صيانة. مؤشراتُها من جداولها: أوامرُ صدرت ·
+ * استلاماتٌ · مطابقاتٌ · ذممٌ فُتحت · صرفيات (والبلاغاتُ مؤشرٌ مشتركٌ يبقى).
+ */
+if (intval($unit) === 11) {   // المشتريات
+    $metrics = array(
+        array('أوامرُ شراءٍ صدرت (غادرت المسودة)', $q("SELECT COUNT(*) FROM proc_order WHERE $cw
+              AND COALESCE(is_deleted,0)=0 AND state <> 'مسودة'
+              AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
+        array('عهدُ استلامٍ سُجّلت', $q("SELECT COUNT(*) FROM proc_receipt_custody WHERE $cw
+              AND COALESCE(is_deleted,0)=0
+              AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
+        array('فواتيرُ طوبقت (مطابقة ثلاثية)', $q("SELECT COUNT(*) FROM proc_order WHERE $cw
+              AND COALESCE(is_deleted,0)=0 AND match_state = 'matched'
+              AND matched_at BETWEEN '$from' AND '$to 23:59:59'")),
+        array('ذممُ موردين فُتحت بالمطابقة', $q("SELECT COUNT(*) FROM fin_dues WHERE $cw
+              AND party_type = 'proc_supplier' AND due_type = 'purchase'
+              AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
+        array('صرفياتُ مخزونٍ نُفّذت', $q("SELECT COUNT(*) FROM proc_issue WHERE $cw
+              AND COALESCE(is_deleted,0)=0
+              AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
+        array('مساراتُ بلاغاتٍ أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
+              JOIN tickets t ON t.id = ws.tk_id AND t.$cw
+              WHERE ws.org_unit_id = " . intval($unit) . " AND ws.state = 'closed'
+              AND ws.closed_at BETWEEN '$from' AND '$to 23:59:59'")),
+    );
+} else {
 $metrics = array(
     array('وحداتٌ معتمدةٌ في المدة', $q("SELECT COUNT(*) FROM unit_entries WHERE $cw
           AND $ue_state AND entry_date BETWEEN '$from' AND '$to'
@@ -68,6 +98,7 @@ $metrics = array(
           AND state = 'إغلاق' AND updated_at BETWEEN '$from' AND '$to 23:59:59'
           AND created_by IN ($dept_users)")),
 );
+}
 
 $page_title = 'إنجاز الإدارة';
 include '../inheader.php';

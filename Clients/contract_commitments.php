@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
 
     // الكود
     $cmt_code_raw = isset($_POST['commitment_code']) ? trim($_POST['commitment_code']) : '';
-    if ($cmt_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $cmt_code_raw)) {
+    if ($cmt_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $cmt_code_raw)) {
         cmt_redirect_with_msg('كود الالتزام غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -544,7 +544,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود الالتزام *</label>
-                        <input type="text" name="commitment_code" id="commitment_code" placeholder="مثال: CMT-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="commitment_code" id="commitment_code" placeholder="مثال: CMT-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-file-contract"></i> العقد المرتبط *</label>
@@ -621,7 +621,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     </div>
                     <div>
                         <label><i class="fas fa-truck-monster"></i> رمز نوع المعدة</label>
-                        <input type="text" name="equipment_type_code" id="equipment_type_code" placeholder="مثال: EXCAVATOR" pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="equipment_type_code" id="equipment_type_code" placeholder="مثال: EXCAVATOR" pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-cubes"></i> الوحدات الأساسية المتعاقد عليها</label>

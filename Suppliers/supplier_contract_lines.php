@@ -91,6 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cid = intval($_POST['contract_id'] ?? 0);
         $isEdit = intval($_POST['line_id'] ?? 0) > 0;
         if (($isEdit && !$can_edit) || (!$isEdit && !$can_add)) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $cid); }
+        // نظيرٌ خادميٌّ لسمة pattern في النموذج — الواجهةُ وحدَها لا تحرس (الحقل اختياري)
+        $etype_raw = trim((string) ($_POST['equipment_type_code'] ?? ''));
+        if ($etype_raw !== '' && !preg_match('/^[A-Za-z0-9_\-]+$/', $etype_raw)) {
+            $redirect('رمز نوع المعدة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌', $cid);
+        }
         $r = SCS::saveLine($conn, $gate, $company_id, $cid, array(
             'line_id'       => $_POST['line_id'] ?? 0,
             'work_model'    => $_POST['work_model'] ?? '',
@@ -103,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valid_to'      => $_POST['valid_to'] ?? '',
             // CAP-01 §8.2 — بندُ نوع المعدة والاحتياطي في عقد المورد
             'contract_obligation_ref'  => $_POST['contract_obligation_ref'] ?? 0,
-            'equipment_type_code'      => $_POST['equipment_type_code'] ?? '',
+            'equipment_type_code'      => $etype_raw,
             'primary_units_committed'  => $_POST['primary_units_committed'] ?? '',
             'standby_units_required'   => $_POST['standby_units_required'] ?? '',
             'standby_units_allowed'    => $_POST['standby_units_allowed'] ?? '',
@@ -399,7 +404,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group"><label>رمز نوع المعدة</label>
-                    <input type="text" name="equipment_type_code" id="f_etype" pattern="[A-Za-z0-9-_]+" placeholder="EXCAVATOR"></div>
+                    <input type="text" name="equipment_type_code" id="f_etype" pattern="[A-Za-z0-9_\-]+" placeholder="EXCAVATOR"></div>
                 <div class="form-group"><label>الأساسية الملتزَم بها</label>
                     <input type="number" step="1" min="0" name="primary_units_committed" id="f_pcommit"></div>
                 <div class="form-group"><label>الاحتياطي المطلوب منه</label>

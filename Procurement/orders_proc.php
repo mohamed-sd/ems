@@ -73,6 +73,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
     header("Location: orders_proc.php?edit_id=" . $mid . "&msg=" . urlencode($msg)); exit();
 }
 
+// ── ② التكلفة الوصولية: إضافة/أرشفة مصروف وصولٍ على الأمر ──
+// «سعرُ القطعة الحقيقي لا سعرُ فاتورتها»: تُرسمَل على تكلفة الاستلام توزيعًا
+// بقيمة البنود (ProcCostingService::repriceOrderReceipts) وتنشر مصروفَها بعطالته.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_landed_cost') {
+    if (!$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $lo_id = intval($_POST['id'] ?? 0);
+    $doc_no = trim($_POST['lc_doc_no'] ?? '');
+    $cost_type = trim($_POST['lc_type'] ?? 'شحن');
+    $amount = (float)($_POST['lc_amount'] ?? 0);
+    $lc_currency = trim($_POST['lc_currency'] ?? 'SDG');
+    $lc_fx = (float)($_POST['lc_fx'] ?? 1);
+    $lc_supplier = ($_POST['lc_supplier_id'] ?? '') !== '' ? intval($_POST['lc_supplier_id']) : null;
+    if (!in_array($cost_type, array('شحن', 'جمارك', 'تخليص', 'نقل داخلي', 'أخرى'), true)) { $cost_type = 'أخرى'; }
+    if ($lc_fx <= 0) { $lc_fx = 1; }
+    if ($lo_id <= 0 || $doc_no === '' || $amount <= 0) {
+        header("Location: orders_proc.php?edit_id=$lo_id&msg=مستندُ+المصروف+ورقمُه+وقيمتُه+إلزامية+❌"); exit();
+    }
+    $lo = proc_gate(false)->selectOne('proc_order', array('where' => array('id' => $lo_id)));
+    if (!$lo) { header("Location: orders_proc.php?msg=الأمرُ+غير+موجود+❌"); exit(); }
+    // لا ترسملَ قبل وصول البضاعة — المصاريفُ تُعرف عند الوصول (نفسُ بوابة المصروف)
+    if (!in_array((string)$lo['state'], proc_order_expense_states(), true)) {
+        header("Location: orders_proc.php?edit_id=$lo_id&msg=لا+تكلفةَ+وصوليةً+قبل+الاستلام+النهائي+❌"); exit();
+    }
+    try {
+        $landed_id = proc_gate(false)->runInTransaction(function ($g) use ($lo_id, $doc_no, $cost_type, $amount, $lc_currency, $lc_fx, $lc_supplier, $current_user_id) {
+            $lid = $g->insert('proc_landed_cost', array(
+                'order_id' => $lo_id, 'doc_no' => $doc_no, 'cost_type' => $cost_type,
+                'amount' => $amount, 'currency' => $lc_currency, 'fx_rate' => $lc_fx,
+                'base_amount' => round($amount * $lc_fx, 2),
+                'supplier_id' => $lc_supplier, 'created_by' => $current_user_id,
+            ));
+            require_once __DIR__ . '/../app/Services/Procurement/ProcCostingService.php';
+            \App\Services\Procurement\ProcCostingService::repriceOrderReceipts($g, $lo_id);
+            return $lid;
+        }, 'landed cost add PO#' . $lo_id);
+    } catch (\Throwable $e) {
+        error_log('landed cost add refused: ' . $e->getMessage());
+        header("Location: orders_proc.php?edit_id=$lo_id&msg=تعذّرت+إضافة+التكلفة+الوصولية+❌"); exit();
+    }
+    proc_publish_landed_cost($conn, intval($landed_id), $current_user_id);
+    header("Location: orders_proc.php?edit_id=$lo_id&msg=رُسملت+التكلفة+الوصولية+على+الاستلام+✅"); exit();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archive_landed_cost') {
+    if (!$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $lo_id = intval($_POST['id'] ?? 0);
+    $lid = intval($_POST['landed_id'] ?? 0);
+    try {
+        proc_gate(false)->runInTransaction(function ($g) use ($lid, $lo_id) {
+            $g->softDelete('proc_landed_cost', $lid);
+            require_once __DIR__ . '/../app/Services/Procurement/ProcCostingService.php';
+            \App\Services\Procurement\ProcCostingService::repriceOrderReceipts($g, $lo_id);   // نصيبُها يخرج من التكلفة
+        }, 'landed cost archive#' . $lid);
+    } catch (\Throwable $e) { error_log('landed archive refused: ' . $e->getMessage()); }
+    header("Location: orders_proc.php?edit_id=$lo_id&msg=أُرشفت+التكلفة+وأُعيد+الاحتساب+✅"); exit();
+}
+
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -274,6 +330,74 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                                value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>"></div>
                     <button type="submit" class="btn-save"><i class="fas fa-scale-balanced"></i> طابِق</button>
                 </form>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php /* ── ② التكلفة الوصولية — سعرُ القطعة الحقيقي (شحن/جمارك/تخليص) ── */
+        $__landed = array(); $__landed_sum = 0.0;
+        try {
+            $__landed = proc_gate($is_super_admin)->select('proc_landed_cost', array(
+                'where' => array('order_id' => intval($edit['id'])), 'orderBy' => 'id DESC'));
+            foreach ($__landed as $__l) { $__landed_sum += (float) $__l['base_amount']; }
+        } catch (\Throwable $__t) { $__landed = array(); }
+    ?>
+    <div class="card" style="margin-bottom:14px">
+        <div class="card-header"><h5><i class="fas fa-ship"></i> التكلفة الوصولية (Landed Cost)
+            <?php if ($__landed_sum > 0): ?> — الإجمالي المرسمَل <strong><?php echo number_format($__landed_sum, 2); ?></strong> (معادل)<?php endif; ?></h5></div>
+        <div class="card-body">
+            <p class="text-muted" style="margin:0 0 10px">
+                شحنٌ وجمارك وتخليصٌ تُرسمَل على تكلفة استلام هذا الأمر توزيعًا بقيمة بنوده —
+                فيصير متوسطُ تكلفة القطعة سعرَها **الحقيقي** لا سعرَ فاتورتها فقط.
+            </p>
+            <?php if ($__landed): ?>
+            <div class="table-container" style="margin-bottom:10px">
+                <table class="alltables display" data-no-dt="1" style="width:100%">
+                    <thead><tr><th>المستند</th><th>النوع</th><th>المبلغ</th><th>المعادل</th><th>أُدخلت</th><th></th></tr></thead>
+                    <tbody>
+                    <?php foreach ($__landed as $__l): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars((string)$__l['doc_no']); ?></td>
+                            <td><?php echo htmlspecialchars((string)$__l['cost_type']); ?></td>
+                            <td><?php echo number_format((float)$__l['amount'], 2) . ' ' . htmlspecialchars((string)$__l['currency']); ?></td>
+                            <td><?php echo number_format((float)$__l['base_amount'], 2); ?></td>
+                            <td><small><?php echo htmlspecialchars((string)$__l['created_at']); ?></small></td>
+                            <td>
+                                <?php if ($can_edit): ?>
+                                <form method="post" style="display:inline" onsubmit="return confirm('أرشفةُ المصروف وإخراجُ نصيبه من التكلفة؟')">
+                                    <input type="hidden" name="action" value="archive_landed_cost">
+                                    <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
+                                    <input type="hidden" name="landed_id" value="<?php echo intval($__l['id']); ?>">
+                                    <button type="submit" class="btn-cancel" style="padding:2px 8px" title="أرشفة"><i class="fas fa-box-archive"></i></button>
+                                </form>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
+            <?php if ($can_edit && $__gated): ?>
+            <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+                <input type="hidden" name="action" value="add_landed_cost">
+                <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
+                <div class="form-group"><label>رقم المستند <span class="required">*</span></label>
+                    <input type="text" name="lc_doc_no" required maxlength="60" placeholder="بوليصة / إيصال جمركي"></div>
+                <div class="form-group"><label>النوع</label>
+                    <select name="lc_type"><option>شحن</option><option>جمارك</option><option>تخليص</option><option>نقل داخلي</option><option>أخرى</option></select></div>
+                <div class="form-group"><label>المبلغ <span class="required">*</span></label>
+                    <input type="number" step="0.01" min="0.01" name="lc_amount" required></div>
+                <div class="form-group"><label>العملة</label>
+                    <input type="text" name="lc_currency" value="<?php echo htmlspecialchars((string)$edit['currency']); ?>" maxlength="8"></div>
+                <div class="form-group"><label>سعر الصرف (للمعادل)</label>
+                    <input type="number" step="0.0001" min="0.0001" name="lc_fx" value="<?php echo htmlspecialchars((string)$edit['fx_rate']); ?>"></div>
+                <div class="form-group"><label>مقدم الخدمة</label>
+                    <select name="lc_supplier_id"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+                <button type="submit" class="btn-save"><i class="fas fa-ship"></i> رسملة</button>
+            </form>
+            <?php elseif (!$__gated): ?>
+                <div class="alert alert-info" style="margin:0">تُرسمَل بعد بلوغ الأمر الاستلامَ النهائي — المصاريفُ تُعرف عند الوصول.</div>
             <?php endif; ?>
         </div>
     </div>

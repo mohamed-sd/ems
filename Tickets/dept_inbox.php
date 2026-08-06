@@ -120,8 +120,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
       <tr<?= $lateMark ? ' style="background:#fff3f3"' : '' ?>>
         <td><a href="tickets_list.php?open=<?= intval($r['tk_id']) ?>"><?= htmlspecialchars($r['ticket_no'], ENT_QUOTES, 'UTF-8') ?></a></td>
-        <td><?= htmlspecialchars($r['workstream_type'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars(mb_substr($r['complaint'], 0, 70), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(function_exists('ems_dept_label') ? ems_dept_label($r['workstream_type']) : $r['workstream_type'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?php $cmpl = trim((string) $r['complaint']);
+            echo ($cmpl === '' || $cmpl === '0') ? '<span class="text-muted">—</span>'
+                : htmlspecialchars(mb_substr($cmpl, 0, 70), ENT_QUOTES, 'UTF-8'); ?></td>
         <td><span class="badge" style="background:<?= $st[1] ?>"><?= $st[0] ?></span><?= $lateMark ? ' <span class="badge" style="background:#dc3545">متأخر</span>' : '' ?></td>
         <td><?= $r['assignee_name'] ? htmlspecialchars($r['assignee_name'], ENT_QUOTES, 'UTF-8') : '<span class="text-muted">بلا مكلَّف</span>' ?></td>
         <td><?= $r['resolve_due_at'] ? htmlspecialchars($r['resolve_due_at'], ENT_QUOTES, 'UTF-8') : '—' ?></td>

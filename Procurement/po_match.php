@@ -48,14 +48,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
         $_POST['invoice_no'] ?? '',
         $_POST['invoice_date'] ?? '',
         $_POST['invoice_amount'] ?? 0,
-        $current_user_id
+        $current_user_id,
+        $_POST['invoice_tax'] ?? 0
     );
     if ($res['status'] === 'matched') {
         $msg = 'طوبقت الفاتورةُ وفُتح استحقاقُ المورد' . ($res['due_id'] ? ' (ذمة #' . $res['due_id'] . ')' : '') . ' ✅';
     } elseif ($res['status'] === 'var_pending') {
-        $msg = 'فرقٌ فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' ⚠️';
+        $msg = 'فرقٌ فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' — احسمه من زر «حسم الفرق» ⚠️';
     } else {
         $msg = 'تعذّرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
+    }
+    header("Location: po_match.php?msg=" . urlencode($msg)); exit();
+}
+
+// ── حسمُ الفرق المعلَّق بقرارٍ موثَّق (proc_match_resolve) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resolve_variance') {
+    if (!$can_edit) { header("Location: po_match.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    $rid = intval($_POST['order_id'] ?? 0);
+    $res = proc_match_resolve($conn, $rid, $_POST['decision'] ?? '', $_POST['reason'] ?? '', $current_user_id);
+    if ($res['status'] === 'resolved') {
+        $msg = 'حُسم الفرقُ (' . ($_POST['decision'] ?? '') . ')' . ($res['due_id'] ? ' — ذمة #' . $res['due_id'] : '') . ' ✅';
+    } else {
+        $msg = 'تعذّر الحسم: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
     }
     header("Location: po_match.php?msg=" . urlencode($msg)); exit();
 }
@@ -123,9 +137,17 @@ $badge = function ($state) {
     switch ($state) {
         case 'matched':     return '<span style="color:#1a7f37;font-weight:700">مطابَق ✔</span>';
         case 'var_pending': return '<span style="color:#b35900;font-weight:700">فرقٌ معلَّق ⚠</span>';
+        case 'rejected':    return '<span style="color:#b3261e;font-weight:700">فاتورةٌ مرفوضة ✖</span>';
         default:            return '<span style="color:#888">لم تُسجَّل فاتورة</span>';
     }
 };
+
+// ── نموذجُ حسم الفرق (?resolve_id=N) ──
+$resolve_order = null;
+if (isset($_GET['resolve_id']) && $can_edit) {
+    $resolve_order = $gate->selectOne('proc_order', array('where' => array('id' => intval($_GET['resolve_id']))));
+    if ($resolve_order && (string) $resolve_order['match_state'] !== 'var_pending') { $resolve_order = null; }
+}
 
 $page_title = 'إيكوبيشن | مطابقة الفاتورة بالأمر والاستلام';
 include '../inheader.php';
@@ -178,14 +200,60 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                value="<?php echo htmlspecialchars((string) ($match_order['invoice_date'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
-                        <label>قيمة الفاتورة <span class="required">*</span></label>
+                        <label>قيمة الفاتورة (إجمالي) <span class="required">*</span></label>
                         <input type="number" step="0.01" min="0.01" name="invoice_amount" required
                                value="<?php echo htmlspecialchars((string) ($match_order['invoice_amount'] ?? '')); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>الضريبة ضمن القيمة <small>(تُفصل — المطابقة على الصافي)</small></label>
+                        <input type="number" step="0.01" min="0" name="invoice_tax"
+                               value="<?php echo htmlspecialchars((string) ($match_order['tax_amount'] ?? '0')); ?>">
                     </div>
                 </div>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn-save"><i class="fas fa-scale-balanced"></i> مطابقة</button>
+                <a href="po_match.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+            </div>
+        </div></div>
+    </form>
+    <?php endif; ?>
+
+    <?php if ($resolve_order):
+        $rid  = intval($resolve_order['id']);
+        $rAmt = (float) $resolve_order['total_amount'];
+        $rInv = (float) $resolve_order['invoice_amount'];
+    ?>
+    <form action="po_match.php" method="post" class="allforms allforms-visible">
+        <div class="card-header"><h5><i class="fas fa-gavel"></i>
+            حسم الفرق المعلَّق — أمر <?php echo htmlspecialchars((string) $resolve_order['code']); ?></h5></div>
+        <div class="card"><div class="card-body">
+            <input type="hidden" name="action" value="resolve_variance">
+            <input type="hidden" name="order_id" value="<?php echo $rid; ?>">
+            <div class="form-section">
+                <p style="margin:0 0 10px">
+                    فاتورة <strong><?php echo htmlspecialchars((string) $resolve_order['invoice_no']); ?></strong>
+                    بقيمة <strong><?php echo number_format($rInv, 2); ?></strong>
+                    مقابل أمرٍ بقيمة <strong><?php echo number_format($rAmt, 2); ?></strong>
+                    — الفرق <strong style="color:#b35900"><?php echo number_format($rInv - $rAmt, 2); ?></strong>
+                </p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>القرار <span class="required">*</span></label>
+                        <select name="decision" required>
+                            <option value="قبول الفرق">قبول الفرق — الذمّة بقيمة الفاتورة كاملة</option>
+                            <option value="إشعار دائن">إشعار دائن — الذمّة بقيمة الأمر والفرق يُنتظر له إشعار المورد</option>
+                            <option value="رفض الفاتورة">رفض الفاتورة — لا ذمّة، وتسجيل فاتورة بديلة متاح</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label>تفسير القرار <span class="required">*</span> <small>(لا حسمَ بلا تفسير — يُختم باسمك ولحظته)</small></label>
+                        <input type="text" name="reason" required maxlength="255">
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-save"><i class="fas fa-gavel"></i> حسم</button>
                 <a href="po_match.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
@@ -210,6 +278,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>فرق القيمة</th>
                     <th>حد السماح</th>
                     <th>نتيجة المطابقة</th>
+                    <th>قرار الحسم</th>
                     <th>تاريخ المطابقة</th>
                     <th>حالة الأمر</th>
                     <th>الاستحقاق</th>
@@ -229,10 +298,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 ?>
                     <tr>
                         <td>
-                            <?php if ($can_edit && $matchable): ?>
+                            <?php if ($can_edit && (string) $po['match_state'] === 'var_pending'): ?>
+                                <a href="po_match.php?resolve_id=<?php echo $oid; ?>" class="add-btn" style="padding:4px 10px;background:#b35900"
+                                   title="حسم الفرق بقرار موثق"><i class="fas fa-gavel"></i> حسم الفرق</a>
+                                <a href="po_match.php?match_id=<?php echo $oid; ?>" style="margin-inline-start:4px"
+                                   title="إعادة المطابقة بفاتورة معدلة">إعادة المطابقة</a>
+                            <?php elseif ($can_edit && $matchable): ?>
                                 <a href="po_match.php?match_id=<?php echo $oid; ?>" class="add-btn" style="padding:4px 10px"
-                                   title="تسجيل فاتورة ومطابقة"><i class="fas fa-file-invoice"></i>
-                                   <?php echo ((string) $po['match_state'] === 'var_pending') ? 'إعادة المطابقة' : 'تسجيل فاتورة'; ?></a>
+                                   title="تسجيل فاتورة ومطابقة"><i class="fas fa-file-invoice"></i> تسجيل فاتورة</a>
                             <?php else: ?>—<?php endif; ?>
                         </td>
                         <td><?php echo htmlspecialchars((string) $po['code']); ?></td>
@@ -248,6 +321,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo ($iAmt !== null) ? number_format($iAmt - $oAmt, 2) : '—'; ?></td>
                         <td>±<?php echo number_format($tol, 2); ?></td>
                         <td><?php echo $badge((string) $po['match_state']); ?></td>
+                        <td><?php echo ((string) ($po['var_decision'] ?? '') !== '')
+                            ? htmlspecialchars((string) $po['var_decision']) . ' <small title="' . htmlspecialchars((string) ($po['var_decision_reason'] ?? '')) . '">(' . htmlspecialchars((string) ($po['var_decided_at'] ?? '')) . ')</small>'
+                            : '—'; ?></td>
                         <td><?php echo htmlspecialchars((string) ($po['matched_at'] ?? '') !== '' ? (string) $po['matched_at'] : '—'); ?></td>
                         <td><?php echo htmlspecialchars((string) $po['state']); ?></td>
                         <td><?php echo $due

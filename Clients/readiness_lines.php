@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['readiness_code'])) {
 
     // الكود
     $rdl_code_raw = isset($_POST['readiness_code']) ? trim($_POST['readiness_code']) : '';
-    if ($rdl_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $rdl_code_raw)) {
+    if ($rdl_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $rdl_code_raw)) {
         rdl_redirect_with_msg('كود البند غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -437,7 +437,7 @@ include('../insidebar.php');
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود البند *</label>
-                        <input type="text" name="readiness_code" id="readiness_code" placeholder="مثال: RDL-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="readiness_code" id="readiness_code" placeholder="مثال: RDL-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-file-contract"></i> العقد المرتبط *</label>

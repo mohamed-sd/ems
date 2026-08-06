@@ -861,6 +861,35 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
         $cur    = strval($req['currency'] ?: '');
         if ($amount <= 0) { return null; }
 
+        // ── سقفُ الإدارة المعلن (M-00 §5-1 · exec_dept_caps) — الحدُّ الأول ──
+        // «تجاوزُ سقف الإدارة يرفع المستندَ آليًّا» — السقفُ الساري لإدارة
+        // الطلب بعملته؛ وإن لم يُعلَن سقفٌ قِيسَ على حدَّي DEC-01 ③ أدناه.
+        $DEPT_AR = array(
+            'sales' => 'المبيعات والعقود', 'suppliers' => 'إدارة الموردين',
+            'workforce' => 'الموارد البشرية', 'procurement' => 'المشتريات',
+            'maintenance' => 'الصيانة', 'treasury' => 'المالية والخزينة',
+            'assets' => 'إدارة الأسطول', 'movement' => 'إدارة التشغيل',
+            'transport' => 'إدارة التشغيل', 'projects' => 'إدارة التشغيل',
+            'sites' => 'إدارة التشغيل', 'general' => 'المالية والخزينة',
+            'admin' => 'المالية والخزينة',
+        );
+        $deptAr = $DEPT_AR[strval($req['source_module'])] ?? null;
+        $deptCap = null;
+        if ($deptAr !== null) {
+            $st = $conn->prepare("SELECT cap_amount FROM exec_dept_caps
+                WHERE company_id = ? AND dept_name = ? AND currency = ?
+                  AND effective_from <= CURDATE()
+                  AND (effective_to IS NULL OR effective_to >= CURDATE())
+                ORDER BY effective_from DESC LIMIT 1");
+            $coQ = intval($req['company_id']);
+            $st->bind_param('iss', $coQ, $deptAr, $cur);
+            $st->execute();
+            $w = $st->get_result()->fetch_assoc();
+            $st->close();
+            if ($w !== null) { $deptCap = (float) $w['cap_amount']; }
+        }
+        $deptCapHit = ($deptCap !== null && $amount > $deptCap);
+
         // المرجع الشهري من العقد المربوط (بعملة العقد — التصريح في سبب الرفع)
         $monthlyRef = null;
         if (!empty($req['contract_id'])) {
@@ -890,14 +919,20 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
             error_log('finreq_gm_escalate fx: ' . $t->getMessage());
         }
 
-        if ($usd === null && $monthlyRef === null) {
-            error_log('finreq_gm_escalate: ' . $req['request_no'] . ' لا سعر ولا مرجع شهري — لم يُقَس (معلَن)');
+        if (!$deptCapHit && $usd === null && $monthlyRef === null) {
+            error_log('finreq_gm_escalate: ' . $req['request_no'] . ' لا سقفَ معلنًا ولا سعر ولا مرجع شهري — لم يُقَس (معلَن)');
             return null;
         }
 
-        $assess = \App\Services\Governance\UnitStateChangeService::assessGmNeed(
-            $amount, $monthlyRef, ($usd !== null ? $usd : 0.0), '');
-        if (empty($assess['needs_gm'])) { return false; }
+        if ($deptCapHit) {
+            $assess = array('needs_gm' => true, 'reason' =>
+                'BR-CEO-05: تجاوزُ سقف ' . $deptAr . ' المعلن ('
+                . number_format($deptCap, 2) . ' ' . $cur . ') — رفعٌ آليٌّ لا اختياري');
+        } else {
+            $assess = \App\Services\Governance\UnitStateChangeService::assessGmNeed(
+                $amount, $monthlyRef, ($usd !== null ? $usd : 0.0), '');
+            if (empty($assess['needs_gm'])) { return false; }
+        }
 
         // idempotent: صفُّ الاعتماد الأعلى بمرجع الطلب المصدري لا يتكرر (يشمل resubmit)
         // — الوجهة صارت الجدول الأصلي exec_approvals (لحاق CMP03_FOLLOWUP 2026-11-14)
@@ -912,33 +947,36 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
         $st->close();
         if ($dupe) { return true; }
 
-        $capTxt = ($monthlyRef !== null)
-            ? ('min(5٪ = ' . round($monthlyRef * 0.05, 2) . ' ' . $cur . ' · 10,000$)')
-            : '10,000$ معادلًا';
-        $overTxt = ($usd !== null ? ('المعادل ' . round($usd, 2) . '$') : 'بحد النسبة');
+        // السقفُ والتجاوزُ رقمان حين يُقاسان (سقف الإدارة أو حد النسبة) —
+        // وما لا يُقاس يُترك فارغًا معلَنًا وتفصيلُه في سبب الرفع لا تلفيقًا
+        $capNum = $deptCapHit ? $deptCap : (($monthlyRef !== null) ? round($monthlyRef * 0.05, 2) : null);
+        $overNum = ($capNum !== null) ? round($amount - $capNum, 2) : null;
+        $capS = ($capNum !== null) ? (string) $capNum : null;   // NULL من هنا لا NULLIF
+        $overS = ($overNum !== null) ? (string) $overNum : null; // (خلط الترتيبات على الويب)
         $docTxt = mb_substr(strval($req['statement'] ?: $req['justification']), 0, 160);
         $typeTxt = 'طلب مالي (' . strval($req['request_type']) . ')';
-        $deptTxt = strval($req['source_module']);
+        $deptTxt = ($deptAr !== null) ? $deptAr : strval($req['source_module']);
         $needBy = strval($req['needed_by'] ?: '48 ساعة');
         $today = date('Y-m-d');
         $amountS = (string) $amount;
-        $creator = 'آلي — DEC-01 ③ (بوابة الطلب المالي)';
+        $creator = $deptCapHit ? 'آلي — BR-CEO-05 (سقف الإدارة المعلن)' : 'آلي — DEC-01 ③ (بوابة الطلب المالي)';
         $uid = intval($req['created_by'] ?: 0);
         $st = $conn->prepare("INSERT INTO exec_approvals
             (company_id, request_no, received_date, doc_type, document, requesting_dept,
              raise_reason, amount, currency, dept_cap, overage, deadline,
              status, source_request_id, source_kind, is_seed, created_by, created_by_name)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'قيد المراجعة', ?, 'آلي', 0, ?, ?)");
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    'قيد المراجعة', ?, 'آلي', 0, ?, ?)");
         $st->bind_param('isssssssssssiis',
             $co, $no, $today, $typeTxt, $docTxt, $deptTxt,
-            $assess['reason'], $amountS, $cur, $capTxt, $overTxt, $needBy,
+            $assess['reason'], $amountS, $cur, $capS, $overS, $needBy,
             $srcId, $uid, $creator);
         $st->execute() or error_log('finreq_gm_escalate insert: ' . $st->error);
         $rowId = intval($conn->insert_id);
         $st->close();
 
         if (function_exists('log_security_event')) {
-            log_security_event('CEO_CEILING_ESCALATED', $no . ' → CMP03-' . $rowId . ' — ' . $assess['reason']);
+            log_security_event('CEO_CEILING_ESCALATED', $no . ' → EXAP-' . $rowId . ' — ' . $assess['reason']);
         }
         // تنبيه التنفيذي الأول الحي في الشركة (fail-soft)
         try {

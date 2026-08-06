@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
 if (!headers_sent()) {
@@ -235,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
 
     // كود الفرصة
     $opp_code_raw = isset($_POST['opp_code']) ? trim($_POST['opp_code']) : '';
-    if ($opp_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $opp_code_raw)) {
+    if ($opp_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $opp_code_raw)) {
         opp_redirect_with_msg('كود الفرصة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -265,6 +266,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         $study_decision_raw = '';
     }
 
+    // ح-10 · المالُ لا يكون سالبًا. سمةُ min="0" في النموذج تُتجاوَز بطلبٍ مُركَّب،
+    // وإيرادٌ متوقعٌ سالبٌ واحدٌ يقلب مجموعَ المسار في اللوحة والتقارير.
+    $expected_revenue_raw = (isset($_POST['expected_revenue']) && $_POST['expected_revenue'] !== '')
+        ? (float) $_POST['expected_revenue'] : 0;
+    if ($expected_revenue_raw < 0) {
+        opp_redirect_with_msg('الإيراد المتوقع لا يكون سالبًا ❌');
+    }
+    $funding_needed_raw = (isset($_POST['funding_needed']) && $_POST['funding_needed'] !== '')
+        ? (float) $_POST['funding_needed'] : 0;
+    if ($funding_needed_raw < 0) {
+        opp_redirect_with_msg('التمويل المطلوب لا يكون سالبًا ❌');
+    }
+
+    // ح-10 · إقفالُ الفرصة يلزمه سببُه. الحقلان موجودان في النموذج فالنيّةُ معلنة —
+    // وبلا إلزامٍ يضيع تعلُّمُ المسار: لماذا رَبِحنا ولماذا خَسِرنا.
+    $win_reason_raw  = isset($_POST['win_reason']) ? trim($_POST['win_reason']) : '';
+    $lost_reason_raw = isset($_POST['lost_reason']) ? trim($_POST['lost_reason']) : '';
+    if ($stage_raw === 'فوز' && $win_reason_raw === '') {
+        opp_redirect_with_msg('لا تُقفل الفرصة على «فوز» بلا سبب فوز ❌');
+    }
+    if (($stage_raw === 'خسارة' || $stage_raw === 'مستبعدة') && $lost_reason_raw === '') {
+        opp_redirect_with_msg('لا تُقفل الفرصة على «' . $stage_raw . '» بلا سبب ❌');
+    }
+
     // العميل المرتبط — البوابة تعزل بالشركة والحذف الناعم آليًا
     $client_id_in = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
     if ($client_id_in > 0) {
@@ -287,7 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         'sector_category'  => isset($_POST['sector_category']) ? trim($_POST['sector_category']) : '',
         'state_region'     => isset($_POST['state_region']) ? trim($_POST['state_region']) : '',
         'revenue_model'    => $revenue_model_raw !== '' ? $revenue_model_raw : null,
-        'expected_revenue' => isset($_POST['expected_revenue']) ? (float) $_POST['expected_revenue'] : 0,
+        'expected_revenue' => $expected_revenue_raw,
         'currency'         => $currency_raw,
         'probability'      => isset($_POST['probability']) && $_POST['probability'] !== ''
             ? max(0, min(100, (float) $_POST['probability']))
@@ -297,11 +322,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         'strategy_fit'     => $strategy_fit_raw !== '' ? $strategy_fit_raw : null,
         'capacity_summary' => $opp_req['summary'],
         'requirements_json' => $opp_req['json'],
-        'funding_needed'   => isset($_POST['funding_needed']) ? (float) $_POST['funding_needed'] : 0,
+        'funding_needed'   => $funding_needed_raw,
         'study_decision'   => $study_decision_raw !== '' ? $study_decision_raw : null,
         'expected_close_date' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $close_date_raw) ? $close_date_raw : null,
-        'lost_reason'      => isset($_POST['lost_reason']) ? trim($_POST['lost_reason']) : '',
-        'win_reason'       => isset($_POST['win_reason']) ? trim($_POST['win_reason']) : '',
+        'lost_reason'      => $lost_reason_raw,
+        'win_reason'       => $win_reason_raw,
         'review_notes'     => isset($_POST['review_notes']) ? trim($_POST['review_notes']) : '',
         'notes'            => isset($_POST['notes']) ? trim($_POST['notes']) : '',
     );
@@ -498,6 +523,8 @@ function opp_stage_tone($stage)
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'opp-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
+    // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
+    foreach (ems_excel_header_actions('opportunities', 'الفرص البيعية', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
     ?>
 
@@ -572,7 +599,7 @@ function opp_stage_tone($stage)
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود الفرصة *</label>
-                        <input type="text" name="opp_code" id="opp_code" placeholder="مثال: OPP-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="opp_code" id="opp_code" placeholder="مثال: OPP-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-lightbulb"></i> عنوان الفرصة *</label>
@@ -1282,3 +1309,7 @@ function opp_stage_tone($stage)
 </body>
 
 </html>
+
+<?php
+// ح-09 · نافذةُ معالج الاستيراد وأصولُ الإطار (مرة واحدة)
+if (function_exists('ems_excel_render')) { ems_excel_render('opportunities'); }

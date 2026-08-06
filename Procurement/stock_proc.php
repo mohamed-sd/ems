@@ -96,28 +96,61 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             'enrich' => array('it' => 'proc_item', 'w' => 'proc_warehouse'),
                         ),
                         "SELECT
+                             COALESCE(it.code, '—') AS item_code,
                              COALESCE(it.name, CONCAT('#', m.item_id)) AS item_name,
+                             COALESCE(it.category, '—') AS category,
+                             COALESCE(it.uom, '—') AS uom,
+                             it.min_qty, it.max_qty, it.is_critical, it.avg_cost,
                              COALESCE(w.name, '—') AS wh_name,
                              SUM(CASE WHEN m.move_type='استلام' THEN m.qty ELSE 0 END) AS q_in,
                              SUM(CASE WHEN m.move_type='إرجاع' THEN m.qty ELSE 0 END) AS q_ret,
-                             SUM(CASE WHEN m.move_type='صرف' THEN m.qty ELSE 0 END) AS q_out
+                             SUM(CASE WHEN m.move_type='صرف' THEN m.qty ELSE 0 END) AS q_out,
+                             MAX(m.moved_at) AS last_move
                          FROM proc_stock_move m
                          LEFT JOIN proc_item it ON it.id = m.item_id
                          LEFT JOIN proc_warehouse w ON w.id = m.warehouse_id
                          WHERE {TENANT_SCOPE}
-                         GROUP BY m.item_id, m.warehouse_id, it.name, w.name
+                         GROUP BY m.item_id, m.warehouse_id, it.code, it.name, it.category, it.uom,
+                                  it.min_qty, it.max_qty, it.is_critical, it.avg_cost, w.name
                          ORDER BY item_name ASC"
                     );
+                    // اسمُ الكيان (عرضًا في عمود الحوكمة)
+                    $stk_entity = '—';
+                    if ($company_id > 0) {
+                        $stq = $conn->prepare('SELECT name FROM admin_companies WHERE id = ? LIMIT 1');
+                        $stq->bind_param('i', $company_id);
+                        $stq->execute();
+                        $ser = $stq->get_result()->fetch_assoc();
+                        if ($ser) { $stk_entity = (string) $ser['name']; }
+                    }
+                    // ① الصفُّ كاملُ الأعمدة من مصادره — «متوسط التكلفة» و«قيمة الرصيد»
+                    // صارا حيَّين (كانا حشوَ ui-unification حتى ربط المصدر)
                     { foreach ($stock_rows as $row) {
                         $in = (float)$row['q_in']; $ret = (float)$row['q_ret']; $out = (float)$row['q_out'];
                         $avail = $in + $ret - $out;
+                        $avg = ($row['avg_cost'] !== null) ? (float)$row['avg_cost'] : null;
+                        $td = function ($v) { echo "<td>" . htmlspecialchars((string)$v) . "</td>"; };
                         echo "<tr>";
-                        echo "<td>" . htmlspecialchars((string)$row['item_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars((string)$row['wh_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars(number_format($in, 2)) . "</td>";
-                        echo "<td>" . htmlspecialchars(number_format($ret, 2)) . "</td>";
-                        echo "<td>" . htmlspecialchars(number_format($out, 2)) . "</td>";
+                        $td($row['item_code']);
+                        $td($row['wh_name']);
+                        $td(number_format($in, 2));
+                        $td(number_format($ret, 2));
+                        $td(number_format($out, 2));
                         echo "<td><span class='action-btn' style='" . ($avail <= 0 ? 'color:#c0392b' : '') . "'>" . htmlspecialchars(number_format($avail, 2)) . "</span></td>";
+                        $td($row['item_name']);                                       // اسم الصنف
+                        $td($row['category']);                                        // الفئة
+                        $td($row['uom']);                                             // الوحدة
+                        $td('—');                                                     // الموقع الداخلي
+                        $td(number_format($avail, 2));                                // الرصيد المادي
+                        $td('—'); $td('—'); $td('—'); $td('—');                       // المحجوز · قيد الشراء · قيد التحويل · في العهدة
+                        $td($row['min_qty'] !== null ? number_format((float)$row['min_qty'], 2) : '—');
+                        $td($row['max_qty'] !== null ? number_format((float)$row['max_qty'], 2) : '—');
+                        $td(intval($row['is_critical']) === 1 ? 'حرجة' : '—');
+                        $td($avg !== null ? number_format($avg, 2) : '—');            // متوسط التكلفة
+                        $td($avg !== null ? number_format($avail * $avg, 2) : '—');   // قيمة الرصيد
+                        $td($row['last_move'] !== null ? (string)$row['last_move'] : '—');
+                        $td($stk_entity);                                             // الكيان
+                        for ($gv = 0; $gv < 10; $gv++) { $td('—'); }                  // بقية الحوكمة حتى ربط مصادرها
                         echo "</tr>";
                     } }
                     ?>

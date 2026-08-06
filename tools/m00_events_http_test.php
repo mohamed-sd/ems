@@ -75,9 +75,8 @@ $r1 = req($BASE . '/Portal/ceo_risk.php', array(
     'f0' => $guardNo, 'f4' => 'قضية تجربة الحارس', 'f8' => 'الخيار أ',
     'f14' => date('Y-m-d'), 'f15' => 'محسوم',
 ), false);
-$saved1 = $conn->query("SELECT id FROM cmp03_screen_rows
-                         WHERE canonical_file='ceo_risk.php' AND payload LIKE '%"
-    . $conn->real_escape_string($guardNo) . "%' LIMIT 1")->fetch_assoc();
+$saved1 = $conn->query("SELECT id FROM exec_decisions
+                         WHERE decision_no='" . $conn->real_escape_string($guardNo) . "' LIMIT 1")->fetch_assoc();
 ok($saved1 === null, 'BR-CEO-04: الصف الناقص لم يُحفظ');
 ok(mb_strpos(rawurldecode((string) $r1['body']), 'BR-CEO-04') !== false, 'الرفض مسمّى بالحارس والناقصَين');
 
@@ -92,13 +91,13 @@ req($BASE . '/Portal/ceo_risk.php', array(
     'f12' => date('Y-m-d', time() + 7 * 86400),
     'f13' => 'المدير التنفيذي', 'f14' => date('Y-m-d'), 'f15' => 'محسوم',
 ));
-$rw = $conn->query("SELECT id, is_seed FROM cmp03_screen_rows
-                     WHERE canonical_file='ceo_risk.php' AND company_id=4
-                       AND payload LIKE '%" . $conn->real_escape_string($decNo) . "%'
+$rw = $conn->query("SELECT id, is_seed FROM exec_decisions
+                     WHERE company_id=4
+                       AND decision_no='" . $conn->real_escape_string($decNo) . "'
                      ORDER BY id DESC LIMIT 1")->fetch_assoc();
 ok($rw !== null && (int) $rw['is_seed'] === 0, 'الصف الكامل حُفظ حقيقيًّا (is_seed=0)');
 if ($rw) {
-    $ref = 'CMP03-' . (int) $rw['id'];
+    $ref = 'EXDC-' . (int) $rw['id'];
     $f2 = $conn->query("SELECT payload FROM ems_business_events
                          WHERE event_key='exec.decision.made'
                            AND idempotency_key='exec_decision:{$ref}' LIMIT 1")->fetch_assoc();
@@ -114,7 +113,7 @@ if ($rw) {
         ok((int) $wi['owner_user_id'] === 881, 'المتابعة على صاحب القرار (u881)');
         $conn->query("UPDATE work_items SET status='cancelled', status_reason='اختبار §11' WHERE id=" . (int) $wi['id']);
     }
-    $conn->query("DELETE FROM cmp03_screen_rows WHERE id=" . (int) $rw['id'] . " AND is_seed=0");
+    $conn->query("DELETE FROM exec_decisions WHERE id=" . (int) $rw['id'] . " AND is_seed=0");
 }
 
 /* ── ③ project.chartered بحساب «موقع» (دور 6 يملك الإضافة) ───────────── */

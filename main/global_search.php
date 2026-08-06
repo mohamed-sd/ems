@@ -44,6 +44,10 @@ $entities = array(
     'tickets'    => array('البلاغات', 'fa-solid fa-bullhorn', 'Tickets/ticket_form.php'),
     'units'      => array('الوحدات (التايم شيت)', 'fa-solid fa-business-time', 'Finance/unit_records_fin.php'),
     'financing'  => array('عمليات التمويل', 'fa-solid fa-file-invoice-dollar', 'Financing/operation_profile.php'),
+    // كيانا المشتريات (أُضيفا 2026-08-06 — كانت التسعةُ لا تشملها فمديرُ المشتريات
+    // لا يجد صنفَه ولا أمرَه): الوجهةُ شاشةُ الكيان الحقيقية بحارسها الخادمي
+    'proc_items'  => array('أصناف المشتريات', 'fa-solid fa-boxes-stacked', 'Procurement/items_proc.php'),
+    'proc_orders' => array('أوامر الشراء', 'fa-solid fa-file-invoice-dollar', 'Procurement/orders_proc.php'),
 );
 
 /**
@@ -132,6 +136,13 @@ if (mb_strlen($q) >= 2) {
     $probe('financing', "SELECT op_id id, op_code name, state extra FROM financing_operations
             WHERE company_id = $company_id AND (op_code LIKE $like$or_opid) LIMIT 8",
         function ($x) { return '../Financing/operation_profile.php?id=' . intval($x['id']); });
+    $probe('proc_items', "SELECT id, name, code extra FROM proc_item WHERE company_id = $company_id
+            AND COALESCE(is_deleted,0) = 0 AND (name LIKE $like OR code LIKE $like$or_id) LIMIT 8",
+        function ($x) { return '../Procurement/items_proc.php'; });
+    $probe('proc_orders', "SELECT id, CONCAT(code, ' — ', state) name, invoice_no extra FROM proc_order
+            WHERE company_id = $company_id AND COALESCE(is_deleted,0) = 0
+            AND (code LIKE $like OR invoice_no LIKE $like OR fin_approval_ref LIKE $like$or_id) LIMIT 8",
+        function ($x) { return '../Procurement/orders_proc.php?edit_id=' . intval($x['id']); });
 }
 
 /** تمييزُ الجزء المطابق داخل النص (أول مطابقة، بلا حساسيةٍ لحالة الأحرف) — آمنُ الإخراج. */
@@ -438,7 +449,7 @@ body.ems-site .main.gs-page .gs-btn {
     <div class="gs-empty">
       <div class="gs-empty-ico"><i class="fas fa-box-open"></i></div>
       <h5>لا نتيجةَ لـ«<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>»</h5>
-      <p>بحثنا في <?= 9 - intval($hidden_sections) ?> من الكيانات التسعة فلم نجد مطابقًا<?php
+      <p>بحثنا في <?= count($entities) - intval($hidden_sections) ?> من الكيانات الـ<?= count($entities) ?> فلم نجد مطابقًا<?php
           if ($hidden_sections > 0) { echo ' — و' . intval($hidden_sections) . ' منها خارج صلاحيتك'; } ?>.</p>
       <p>جرّب جزءًا أقصر من الاسم، أو الكودَ كما هو مدوَّن في الملف.</p>
     </div>
@@ -452,7 +463,7 @@ body.ems-site .main.gs-page .gs-btn {
     </div>
     <?php if ($hidden_sections > 0): ?>
       <div class="gs-note"><i class="fas fa-lock"></i>
-        <?= intval($hidden_sections) ?> من الكيانات التسعة خارج صلاحيتك فلم يُبحث فيها.</div>
+        <?= intval($hidden_sections) ?> من الكيانات الـ<?= count($entities) ?> خارج صلاحيتك فلم يُبحث فيها.</div>
     <?php endif; ?>
 
     <!-- بطاقات الأقسام -->

@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
 if (!headers_sent()) {
@@ -118,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tender_code'])) {
 
     // الكود
     $tnd_code_raw = isset($_POST['tender_code']) ? trim($_POST['tender_code']) : '';
-    if ($tnd_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $tnd_code_raw)) {
+    if ($tnd_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $tnd_code_raw)) {
         tnd_redirect_with_msg('كود المناقصة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -376,6 +377,8 @@ function tnd_result_tone($result)
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'tnd-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
+    // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
+    foreach (ems_excel_header_actions('tenders', 'المناقصات', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
     ?>
 
@@ -430,7 +433,7 @@ function tnd_result_tone($result)
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود المناقصة *</label>
-                        <input type="text" name="tender_code" id="tender_code" placeholder="مثال: TND-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="tender_code" id="tender_code" placeholder="مثال: TND-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-heading"></i> رقم الدعوة / العنوان *</label>
@@ -779,3 +782,7 @@ function tnd_result_tone($result)
 </body>
 
 </html>
+
+<?php
+// ح-09 · نافذةُ معالج الاستيراد وأصولُ الإطار (مرة واحدة)
+if (function_exists('ems_excel_render')) { ems_excel_render('tenders'); }

@@ -30,3 +30,34 @@ if (!function_exists('ems_dept_unit_of_role')) {
         return isset($map[$roleId]) ? $map[$roleId] : 0;
     }
 }
+
+if (!function_exists('ems_dept_label')) {
+    /**
+     * التسميةُ العربية لمفتاح الإدارة (dept_module/track) — كانت المفاتيحُ
+     * الإنجليزية (procurement …) تصل الشاشات خامًا (ميزانية إدارتي ·
+     * بلاغات إدارتي). المفتاحُ المجهول يعود كما هو — لا إخفاءَ للبيانات.
+     */
+    function ems_dept_label($key)
+    {
+        static $labels = array(
+            'operations'  => 'التشغيل',
+            'sales'       => 'المبيعات والعقود',
+            'finance'     => 'المالية',
+            'financing'   => 'التمويل والملكية',
+            'fleet'       => 'الأسطول',
+            'governance'  => 'الحوكمة والالتزام',
+            'tickets'     => 'مركز البلاغات',
+            'sites'       => 'إدارات المواقع',
+            'maintenance' => 'الصيانة',
+            'workforce'   => 'القوى التشغيلية',
+            'procurement' => 'المشتريات',
+            'warehouse'   => 'المخازن',
+            'transport'   => 'النقل والترحيل',
+            'hr'          => 'الموارد البشرية',
+            'suppliers'   => 'الموردون',
+            'commercial'  => 'التجارية',
+        );
+        $k = strtolower(trim((string) $key));
+        return isset($labels[$k]) ? $labels[$k] : (string) $key;
+    }
+}

@@ -39,6 +39,24 @@ $priorities     = proc_priorities();
 $states         = proc_request_states();
 $fin_states     = array('بانتظار', 'معتمد مالياً', 'مرفوض');
 
+// ── ③ توليدُ الاحتياج الآن: جسرُ الصيانة + كنّاسُ حدود الطلب — يدويًّا ──
+// (القناةُ الدورية cron_proc_replenish.php؛ والزرُّ لمن لا ينتظر الساعة)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_needs') {
+    if (!$can_add) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
+    require_once __DIR__ . '/../app/Services/Procurement/MntProcBridgeService.php';
+    $gn_gate = proc_gate(false);
+    $b = \App\Services\Procurement\MntProcBridgeService::run($conn, $gn_gate, $company_id, $current_user_id, false);
+    $r2 = \App\Services\Procurement\ProcReorderService::run($conn, $gn_gate, $company_id, $current_user_id, false);
+    $n = count($b['generated']) + count($r2['generated']);
+    $sk = count($b['skipped']) + count($r2['skipped']);
+    header("Location: requests_proc.php?msg=" . urlencode(
+        $n > 0 ? "وُلّد $n طلبًا (صيانة: " . count($b['generated']) . " · حد الطلب: " . count($r2['generated']) . ")"
+               . ($sk ? " — وتُخطي $sk بعطالته" : '') . " ✅"
+               : "لا احتياجَ جديدًا — كلُّ المفتوح مغطًّى بطلبه" . ($sk ? " ($sk بعطالته)" : '') . " ✅"
+    )); exit();
+}
+
 // ── حفظ (إضافة/تعديل) رأس + سطور ضمن معاملة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -210,6 +228,15 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     ?>
 
     <?php proc_msg_banner(); ?>
+
+    <?php if ($can_add): ?>
+    <form method="post" style="margin-bottom:12px">
+        <input type="hidden" name="action" value="generate_needs">
+        <button type="submit" class="add-btn" style="background:#166534"
+                title="جسر الصيانة + كناس حدود الطلب — بعطالة فلا ازدواج">
+            <i class="fas fa-bolt"></i> توليد الاحتياج الآن (صيانة + حدود الطلب)</button>
+    </form>
+    <?php endif; ?>
 
     <?php
     // E-17: قدومٌ من زرِّ النقص — تلميحُ التعبئة بمرجع الأمر وصنفه

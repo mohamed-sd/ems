@@ -1137,6 +1137,97 @@ case 'maintenance_summary': {
     break;
 }
 
+case 'procurement_summary': {
+    // §16 — الدورةُ لكل موردٍ من جداولها الحية (proc_order × الاستلام × المطابقة × الذمم)
+    $poDecl = array('scope'  => array('po' => 'proc_order'),
+                    'enrich' => array('ps' => 'proc_supplier'));
+    $where = ["COALESCE(po.is_deleted,0)=0"];
+    if ($fDateFrom) $where[] = "DATE(po.created_at) >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
+    if ($fDateTo)   $where[] = "DATE(po.created_at) <= '" . mysqli_real_escape_string($conn, $fDateTo) . "'";
+    $ws = implode(' AND ', $where);
+
+    $kpiSql = "SELECT COUNT(*) total,
+                      SUM(po.state <> 'مسودة') issued,
+                      SUM(po.state IN ('استلام نهائي','مطابَق','مغلق')) received,
+                      SUM(po.match_state = 'matched') matched,
+                      SUM(po.match_state = 'var_pending') pending_var,
+                      ROUND(IFNULL(SUM(po.base_amount),0),2) base_value
+               FROM proc_order po WHERE $ws AND {TENANT_SCOPE}";
+    try { $krows_ = $rpt_gate->scopedQuery(array('scope' => array('po' => 'proc_order')), $kpiSql); $ka = $krows_ ? $krows_[0] : []; }
+    catch (\Throwable $t_) { $ka = []; error_log('emsreports proc kpi: ' . $t_->getMessage()); }
+
+    $duesOpen = 0;
+    try {
+        $dr = $rpt_gate->scopedQuery(array('scope' => array('d' => 'fin_dues')),
+            "SELECT ROUND(IFNULL(SUM(d.amount),0),2) s FROM fin_dues d
+              WHERE {TENANT_SCOPE} AND d.party_type='proc_supplier' AND d.due_type='purchase'
+                AND d.settlement_state='pending'");
+        $duesOpen = $dr ? floatval($dr[0]['s']) : 0;
+    } catch (\Throwable $t_) { error_log('emsreports proc dues: ' . $t_->getMessage()); }
+
+    $kpi = [
+        ['icon'=>'fa-file-invoice-dollar', 'value'=> number_format($ka['total']       ?? 0),   'label'=>'إجمالي الأوامر',        'color'=>'blue'],
+        ['icon'=>'fa-paper-plane',         'value'=> number_format($ka['issued']      ?? 0),   'label'=>'أوامر صادرة',            'color'=>'gold'],
+        ['icon'=>'fa-truck-ramp-box',      'value'=> number_format($ka['received']    ?? 0),   'label'=>'مستلَمة نهائيًا',        'color'=>'teal'],
+        ['icon'=>'fa-scale-balanced',      'value'=> number_format($ka['matched']     ?? 0),   'label'=>'فواتير مطابَقة',         'color'=>'green'],
+        ['icon'=>'fa-triangle-exclamation','value'=> number_format($ka['pending_var'] ?? 0),   'label'=>'فروق معلَّقة',           'color'=>'red'],
+        ['icon'=>'fa-coins',               'value'=> number_format($duesOpen, 0),              'label'=>'ذمم موردين مفتوحة',      'color'=>'purple'],
+    ];
+
+    $headers = ['المورد','عدد الأوامر','قيمة الأوامر (معادل)','متوسط نسبة الاستلام%','مطابَقة','فروق معلَّقة','فواتير مرفوضة','ذمم مفتوحة'];
+    $sql = "SELECT IFNULL(ps.name,'غير محدد') AS supplier_name,
+                   po.supplier_id AS sid,
+                   COUNT(po.id) AS orders_cnt,
+                   ROUND(IFNULL(SUM(po.base_amount),0),2) AS base_value,
+                   ROUND(IFNULL(AVG(po.received_pct),0),1) AS avg_received,
+                   SUM(po.match_state='matched') AS matched_cnt,
+                   SUM(po.match_state='var_pending') AS var_cnt,
+                   SUM(po.match_state='rejected') AS rejected_cnt
+            FROM proc_order po
+            LEFT JOIN proc_supplier ps ON ps.id = po.supplier_id
+            WHERE $ws AND {TENANT_SCOPE}
+            GROUP BY po.supplier_id, ps.name
+            ORDER BY base_value DESC";
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
+    try { $result = $rpt_gate->scopedQuery($poDecl, $sql); }
+    catch (\Throwable $t_) { die('خطأ: ' . $t_->getMessage()); }
+
+    // الذممُ المفتوحة لكل مورد — استعلامٌ مجمَّعٌ واحد
+    $duesMap = array();
+    try {
+        foreach ($rpt_gate->scopedQuery(array('scope' => array('d' => 'fin_dues')),
+            "SELECT d.party_ref, ROUND(IFNULL(SUM(d.amount),0),2) s FROM fin_dues d
+              WHERE {TENANT_SCOPE} AND d.party_type='proc_supplier' AND d.due_type='purchase'
+                AND d.settlement_state='pending' GROUP BY d.party_ref") as $d_) {
+            $duesMap[intval($d_['party_ref'])] = floatval($d_['s']);
+        }
+    } catch (\Throwable $t_) { error_log('emsreports proc dues map: ' . $t_->getMessage()); }
+
+    foreach ($result as $r) {
+        $rows[] = [
+            'supplier_name' => $r['supplier_name'],
+            'orders_cnt'    => $r['orders_cnt'],
+            'base_value'    => number_format(floatval($r['base_value']), 2),
+            'avg_received'  => $r['avg_received'] . '%',
+            'matched_cnt'   => $r['matched_cnt'],
+            'var_cnt'       => $r['var_cnt'],
+            'rejected_cnt'  => $r['rejected_cnt'],
+            'dues_open'     => number_format(isset($duesMap[intval($r['sid'])]) ? $duesMap[intval($r['sid'])] : 0, 2),
+        ];
+    }
+    // العمود المساعد sid لا يُعرض
+    foreach ($rows as &$rr_) { unset($rr_['sid']); } unset($rr_);
+
+    if (count($rows) > 0) {
+        $cl2 = []; $cv = [];
+        foreach (array_slice($result, 0, 8) as $r) { $cl2[] = mb_substr((string)$r['supplier_name'], 0, 14, 'UTF-8'); $cv[] = floatval($r['base_value']); }
+        $chartData = ['type'=>'bar','labels'=>$cl2,'datasets'=>[
+            ['label'=>'قيمة الأوامر (معادل)','data'=>$cv,'color'=>'rgba(37,99,235,0.70)'],
+        ],'title'=>'أعلى الموردين بقيمة الأوامر'];
+    }
+    break;
+}
+
 default:
     $kpi     = [];
     $headers = ['رسالة'];

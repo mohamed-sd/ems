@@ -509,7 +509,15 @@ function roleBoardRecent($conn, $userId, $limit = 6)
         $q->bind_param('i', $uid);
         $q->execute();
         $res = $q->get_result();
-        while ($r = $res->fetch_assoc()) { $out[] = $r; }
+        while ($r = $res->fetch_assoc()) {
+            // رسالةُ الفلاش التاريخية (msg=…) لا تُعاد بثُّها من رابط المتابعة —
+            // نقرُ «عملي الأخير» كان يعرض «تمت الإضافة ✅» قديمةً كأنها الآن
+            if (isset($r['url']) && $r['url'] !== null) {
+                $r['url'] = preg_replace('/([?&])msg=[^&]*(&|$)/', '$1', (string) $r['url']);
+                $r['url'] = rtrim((string) $r['url'], '?&');
+            }
+            $out[] = $r;
+        }
         $q->close();
     } catch (\Throwable $t) { error_log('role_board recent: ' . $t->getMessage()); }
     return $out;

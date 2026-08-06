@@ -83,6 +83,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     $item_names = $_POST['line_item_name'] ?? array();
     $qtys = $_POST['line_qty'] ?? array();
     $costs = $_POST['line_cost'] ?? array();
+
+    // ① طبقةُ التكاليف: صنفُ الكتالوج يُصرف **بالمتوسط المرجح** لا باليدوي —
+    // التكلفةُ من الدفتر لا من ذاكرة المستخدم (EMS_PROC_COSTING=off يعيد اليدوي).
+    // السطرُ الحر (بلا صنف) يبقى بتكلفته اليدوية — لا متوسطَ له أصلًا.
+    require_once __DIR__ . '/../app/Services/Procurement/ProcCostingService.php';
+    if (\App\Services\Procurement\ProcCostingService::enabled()) {
+        $costing_gate = proc_gate(false);
+        for ($i = 0; $i < count($item_names); $i++) {
+            $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : 0;
+            if ($iid <= 0) { continue; }
+            $avg = \App\Services\Procurement\ProcCostingService::avgCostOf($costing_gate, $iid);
+            if ($avg !== null) { $costs[$i] = $avg; }
+        }
+    }
+
     $total = 0.0;
     for ($i = 0; $i < count($item_names); $i++) {
         if (trim($item_names[$i] ?? '') === '') { continue; }
@@ -146,6 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
                     $g->insert('proc_stock_move', array(
                         'item_id' => $iid, 'warehouse_id' => $warehouse_id,
                         'move_type' => 'صرف', 'qty' => $qty,
+                        // تجميدُ متوسط لحظة الصرف في الحركة — دفترُ قيمةٍ دائم
+                        'unit_cost' => ($cost > 0 ? round($cost, 4) : null),
                         'ref_type' => 'proc_issue', 'ref_id' => $issue_id,
                         'note' => 'صرف ' . $iname, 'created_by' => $current_user_id,
                     ));
@@ -165,6 +182,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
         error_log('issue_proc save rolled back: ' . $e->getMessage());
         header("Location: issue_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
+    // ① أثرُ الصرف المالي على أبعاده (معدة/مشروع/أمر) — من منبعه بعطالته.
+    // لا يرمي: الصرفُ حقيقةٌ تشغيليةٌ لا تُفقد لتعثّرِ نشرٍ مالي.
+    proc_publish_issue_cost($conn, intval($issue_saved_id ?? 0), $current_user_id);
     // E-17 (UX-09 §2.2): بعد الصرف — الصنفُ الذي هبط رصيدُه لحدِّه الأدنى
     // يُعلَن **بزرِّ «طلبُ شراءٍ بمرجع الأمر»** لا رسالةً تُنسى
     require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
@@ -231,7 +251,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item">' . $opts . '</select></div>'
         . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required></div>'
         . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '"></div>'
-        . '<div class="form-group"><label>تكلفة الوحدة</label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '"></div>'
+        . '<div class="form-group"><label>تكلفة الوحدة <small>(صنفُ الكتالوج يُحتسب آليًّا بالمتوسط المرجح)</small></label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '"></div>'
         . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }

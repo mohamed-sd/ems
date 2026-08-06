@@ -125,6 +125,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
             // حركاتِ كاتبٍ آخرَ يشاركه الرقم (proc_issue).
             proc_receipt_stock_rewrite($g, $custody_id, $line_rows, $expected_destination,
                 $warehouse_id, $receipt_date, $current_user_id);
+            // ① طبقةُ التكاليف: تسعيرُ حركات الاستلام من سطور الأمر (+ نصيبها
+            // الوصولي) وإعادةُ احتساب المتوسط المرجح — ذرّيًّا مع الحفظ
+            if (!empty($parent['order_id'])) {
+                require_once __DIR__ . '/../app/Services/Procurement/ProcCostingService.php';
+                \App\Services\Procurement\ProcCostingService::repriceOrderReceipts($g, intval($parent['order_id']));
+            }
             return $custody_id;
         }, 'receipt save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
@@ -151,9 +157,19 @@ if (isset($_GET['delete_id'])) {
             'columns' => array('order_id'), 'where' => array('id' => $delete_id)));
         $del_order_id = $prev ? intval($prev['order_id']) : null;
         proc_gate(false)->runInTransaction(function ($g) use ($delete_id) {
+            // أصنافُ الحركات قبل مسحها — لإعادة احتساب متوسطاتها بعده
+            $affected = array();
+            foreach ($g->select('proc_stock_move', array('columns' => array('item_id'),
+                'where' => array('ref_type' => 'proc_receipt_custody', 'ref_id' => $delete_id))) as $mv) {
+                if (intval($mv['item_id']) > 0) { $affected[intval($mv['item_id'])] = true; }
+            }
             $g->softDelete('proc_receipt_custody', $delete_id);
             // أرشفةُ العهدة تُرجع أثرَها المخزونيَّ — ذرّيًا معها
             proc_stock_moves_clear($g, 'proc_receipt_custody', $delete_id);
+            require_once __DIR__ . '/../app/Services/Procurement/ProcCostingService.php';
+            foreach (array_keys($affected) as $iid) {
+                \App\Services\Procurement\ProcCostingService::recomputeItemAvg($g, $iid);
+            }
         }, 'receipt delete#' . $delete_id);
     } catch (\Throwable $e) {
         error_log('receipt_custody softDelete refused: ' . $e->getMessage());

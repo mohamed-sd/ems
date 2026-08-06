@@ -1,11 +1,11 @@
 <?php
 /**
- * Portal/ceo_approvals.php — اعتمادات المدير التنفيذي (CMP-03 ⑥ v2 — بتصميم SCR-DES حرفيًّا + إدخال حي)
+ * Portal/ceo_approvals.php — اعتمادات المدير التنفيذي (M-00 §8-2 — على جدولها الأصلي)
  * ───────────────────────────────────────────────────────────────────────────
  * الورقة المالكة: 00 · الإدارة التنفيذية · الأعمدة 20 بترتيب المستند وطبقة
- * الحوكمة بشرائحها. الصفوف في المخزن البيني `cmp03_screen_rows` (معزول
- * بالكيان) حتى يولد جدول الشاشة الأصلي — مهمة اللحاق في
- * docs/CMP03_FOLLOWUP_SOURCES_ar.md. الفائض فوق 22 عمودًا منهارٌ (توصية ①).
+ * الحوكمة بشرائحها. الصفوف في الجدول الأصلي `exec_approvals` (هجرة 2026_11_14
+ * — أُنجز لحاق CMP03_FOLLOWUP) معزولةً بالكيان، ويصلها الرفعُ الآليُّ من بوابة
+ * الطلب المالي عند تجاوز السقف (BR-CEO-05)، والمقرَّرُ محصَّنٌ بقادح BR-CEO-08.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
+require_once '../includes/m00_exec_helpers.php';
 
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
@@ -24,8 +25,6 @@ if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=غير+مصرح");
     exit();
 }
-
-$CANONICAL = 'ceo_approvals.php';
 
 // حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
 $__pp = check_page_permissions($conn, 'Portal/ceo_approvals.php');
@@ -61,42 +60,45 @@ $COLS   = array (
   18 => 'مرجع التفويض',
   19 => 'الحالة',
 );
-$FIELDS = array (
-  0 => 'رقم الطلب',
-  1 => 'تاريخ الورود',
-  2 => 'نوع المستند',
-  3 => 'المستند',
-  4 => 'الإدارة الطالبة',
-  5 => 'سبب الرفع للأعلى',
-  6 => 'القيمة',
-  7 => 'العملة',
-  8 => 'سقف الإدارة',
-  9 => 'التجاوز',
-  10 => 'المعتمِدون قبلي',
-  11 => 'المهلة',
-  12 => 'قراري',
-  13 => 'سبب القرار',
-  14 => 'تاريخ القرار',
-  15 => 'المعتمِد — الاسم والصفة',
-  16 => 'مرجع التفويض',
-  17 => 'الحالة',
+/* أعمدة الجدول الأصلي بترتيب حقول الفورم f0..f17 (الأخير الحالة) */
+$DB_FIELDS = array(
+    'request_no', 'received_date', 'doc_type', 'document', 'requesting_dept',
+    'raise_reason', 'amount', 'currency', 'dept_cap', 'overage',
+    'prior_approvers', 'deadline', 'decision', 'decision_reason', 'decision_date',
+    'approver_name', 'authority_ref',
 );
+/* خريطة عرض: فهرس عمود المستند → عمود القاعدة (null = الكيان) */
+$COLDB = array(null, 'request_no', 'received_date', 'doc_type', 'document',
+    'requesting_dept', 'raise_reason', 'amount', 'currency', 'dept_cap', 'overage',
+    'prior_approvers', 'deadline', 'decision', 'decision_reason', 'decision_date',
+    '__creator', 'approver_name', 'authority_ref', '__status');
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
+/* ── الحفظ: فورم الإضافة الموحد → الجدول الأصلي ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
+    $in = array();
+    foreach ($DB_FIELDS as $i => $col) { $in[$col] = trim((string) ($_POST['f' . $i] ?? '')); }
+    $status = trim((string) ($_POST['f17'] ?? '')) ?: 'مسودة';
+    foreach (array('amount', 'dept_cap', 'overage') as $numCol) {
+        $in[$numCol] = str_replace(array(',', ' '), '', $in[$numCol]);
+        if ($in[$numCol] !== '' && !is_numeric($in[$numCol])) { $in[$numCol] = ''; }
     }
-    $status = $payload['الحالة'] ?? 'مسودة';
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, 0, ?, ?)");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
+    // الفارغ NULL من هنا لا NULLIF في SQL — خلطُ الترتيبات على اتصال الويب يرفضها
+    foreach ($in as $k => $v) { if ($v === '') { $in[$k] = null; } }
+    $st = $conn->prepare("INSERT INTO exec_approvals
+        (company_id, request_no, received_date, doc_type, document, requesting_dept,
+         raise_reason, amount, currency, dept_cap, overage, prior_approvers, deadline,
+         decision, decision_reason, decision_date, approver_name, authority_ref,
+         status, source_kind, is_seed, created_by, created_by_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'يدوي', 0, ?, ?)");
+    $st->bind_param('issssssssssssssssssis',
+        $company_id, $in['request_no'], $in['received_date'], $in['doc_type'],
+        $in['document'], $in['requesting_dept'], $in['raise_reason'], $in['amount'],
+        $in['currency'], $in['dept_cap'], $in['overage'], $in['prior_approvers'],
+        $in['deadline'], $in['decision'], $in['decision_reason'], $in['decision_date'],
+        $in['approver_name'], $in['authority_ref'], $status, $uid, $creator);
     $ok = $st->execute();
+    if (!$ok) { error_log('ceo_approvals add: ' . $st->error); }
     $st->close();
     header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
     exit();
@@ -105,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
 /* ── القرار: الأفعال الأربعة (M-00 ④-٢ اعتماد · اعتماد بشرط · رد · تأجيل) ──
  * القرارُ للإدارة التنفيذية وحدها (دور 9 أو السوبر) — كلُّ خيارٍ بشرط حقله:
  * الشرطُ للمشروط، والسببُ للرد، والتاريخُ للتأجيل. الاعتمادُ (المطلق والمشروط)
- * على صفٍّ حقيقيٍّ يُنشر حقيقتَه exec.approval.granted (نقطة حدث §11). */
+ * على صفٍّ حقيقيٍّ يُنشر حقيقتَه exec.approval.granted (نقطة حدث §11)،
+ * والمقرَّرُ لا يُقرَّر ثانيةً — وقادحُ BR-CEO-08 في القاعدة يمنع تعديلَه. */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'decide') {
     $goBack = function ($m) { header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($m)); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
@@ -123,10 +126,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     if ($decision === 'رد' && $reason === '') { $goBack('الردُّ يستلزم سببًا مكتوبًا ❌'); }
     if ($decision === 'تأجيل' && $until === '') { $goBack('التأجيلُ يستلزم تاريخًا ❌'); }
 
-    $st = $conn->prepare("SELECT id, payload, status, is_seed FROM cmp03_screen_rows
-                           WHERE id = ? AND canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?'));
-    if ($is_super_admin && $company_id <= 0) { $st->bind_param('is', $rowId, $CANONICAL); }
-    else { $st->bind_param('isi', $rowId, $CANONICAL, $company_id); }
+    $st = $conn->prepare("SELECT * FROM exec_approvals WHERE id = ?"
+        . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?'));
+    if ($is_super_admin && $company_id <= 0) { $st->bind_param('i', $rowId); }
+    else { $st->bind_param('ii', $rowId, $company_id); }
     $st->execute();
     $row = $st->get_result()->fetch_assoc();
     $st->close();
@@ -136,24 +139,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $goBack('الصفُّ مقرَّرٌ سلفًا (' . $row['status'] . ') — لا قرارَ على قرار ❌');
     }
 
-    $payload = json_decode((string) $row['payload'], true) ?: array();
-    $actorName = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    $payload['قراري'] = $decision;
-    $payload['سبب القرار'] = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتمادٌ مطلق' : $payload['سبب القرار'] ?? '');
-    if ($decision === 'تأجيل') { $payload['سبب القرار'] = trim('مؤجل إلى ' . $until . ($reason !== '' ? ' — ' . $reason : '')); }
-    $payload['تاريخ القرار'] = date('Y-m-d');
-    $payload['المعتمِد — الاسم والصفة'] = $actorName . ' (الإدارة التنفيذية)';
-    if (($payload['مرجع التفويض'] ?? '') === '') { $payload['مرجع التفويض'] = 'سلطة أصلية'; }
+    $actorName = (trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid)) . ' (الإدارة التنفيذية)';
+    $decisionReason = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتمادٌ مطلق' : (string) ($row['decision_reason'] ?? ''));
+    if ($decision === 'تأجيل') { $decisionReason = trim('مؤجل إلى ' . $until . ($reason !== '' ? ' — ' . $reason : '')); }
+    $decisionDate = date('Y-m-d');
+    $authorityRef = trim((string) ($row['authority_ref'] ?? '')) !== '' ? (string) $row['authority_ref'] : 'سلطة أصلية';
     $newStatus = $OPTS[$decision];
 
-    $st = $conn->prepare("UPDATE cmp03_screen_rows SET payload = ?, status = ? WHERE id = ?");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('ssi', $json, $newStatus, $rowId);
+    // التأجيلُ يبقي أعمدةَ القرار فارغةً (يُعاد بتُّه لاحقًا) — وقادحُ القاعدة
+    // يصون المقرَّر: أيُّ تعديلٍ لاحقٍ لأعمدة القرار يُرفض من القاعدة نفسها.
+    if ($decision === 'تأجيل') {
+        $st = $conn->prepare("UPDATE exec_approvals
+            SET status = ?, decision_reason = ?, approver_name = ? WHERE id = ?");
+        $st->bind_param('sssi', $newStatus, $decisionReason, $actorName, $rowId);
+    } else {
+        $st = $conn->prepare("UPDATE exec_approvals
+            SET decision = ?, decision_reason = ?, decision_date = ?,
+                approver_name = ?, authority_ref = ?, status = ?
+            WHERE id = ?");
+        $st->bind_param('ssssssi', $decision, $decisionReason, $decisionDate,
+            $actorName, $authorityRef, $newStatus, $rowId);
+    }
     $ok = $st->execute();
+    $err = $st->error;
     $st->close();
-    if (!$ok) { $goBack('تعذر حفظ القرار ❌'); }
+    if (!$ok) { $goBack('تعذر حفظ القرار: ' . ($err ?: '؟') . ' ❌'); }
     if (function_exists('log_security_event')) {
-        log_security_event('CEO_APPROVAL_DECIDED', 'CMP03-' . $rowId . ' → ' . $decision);
+        log_security_event('CEO_APPROVAL_DECIDED', 'EXAP-' . $rowId . ' → ' . $decision);
     }
 
     // §11 ExecApproved: الاعتمادُ الفعلي (مطلقًا أو بشرط) على صفٍّ حقيقيٍّ حقيقةٌ تُنشر
@@ -169,15 +181,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'entity_id'       => $rowId,
                 'occurred_at'     => gmdate('Y-m-d H:i:s'),
                 'created_by'      => $uid ?: 1,
-                'idempotency_key' => 'exec_approval:CMP03-' . $rowId,
-                'notes'           => 'اعتمادٌ أعلى: ' . mb_substr((string) ($payload['المستند'] ?? ($payload['رقم الطلب'] ?? '')), 0, 120),
+                'idempotency_key' => 'exec_approval:EXAP-' . $rowId,
+                'notes'           => 'اعتمادٌ أعلى: ' . mb_substr((string) ($row['document'] ?? $row['request_no']), 0, 120),
                 'payload'         => array(
-                    'approval_ref' => 'CMP03-' . $rowId,
-                    'request_no'   => (string) ($payload['رقم الطلب'] ?? ''),
-                    'document'     => (string) ($payload['المستند'] ?? ''),
-                    'department'   => (string) ($payload['الإدارة الطالبة'] ?? ''),
-                    'amount'       => (string) ($payload['القيمة'] ?? ''),
-                    'currency'     => (string) ($payload['العملة'] ?? ''),
+                    'approval_ref' => 'EXAP-' . $rowId,
+                    'request_no'   => (string) $row['request_no'],
+                    'document'     => (string) ($row['document'] ?? ''),
+                    'department'   => (string) ($row['requesting_dept'] ?? ''),
+                    'amount'       => (string) ($row['amount'] ?? ''),
+                    'currency'     => (string) ($row['currency'] ?? ''),
                     'decision'     => $decision,
                     'condition'    => ($decision === 'اعتماد بشرط') ? $reason : '',
                     'approved_by'  => $uid,
@@ -188,46 +200,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $goBack('قُيّد القرار: ' . $decision . ' ✅');
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
+/* ── القراءة: صفوف الكيان من الجدول الأصلي ──────────────────────────────── */
 $rows = array();
-$sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
-          FROM cmp03_screen_rows
-         WHERE canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?') . "
-         ORDER BY id DESC LIMIT 500";
+$sql = "SELECT * FROM exec_approvals"
+     . ($is_super_admin && $company_id <= 0 ? '' : ' WHERE company_id = ?')
+     . ' ORDER BY id DESC LIMIT 500';
 $st = $conn->prepare($sql);
-if ($is_super_admin && $company_id <= 0) { $st->bind_param('s', $CANONICAL); }
-else { $st->bind_param('si', $CANONICAL, $company_id); }
+if (!($is_super_admin && $company_id <= 0)) { $st->bind_param('i', $company_id); }
 $st->execute();
 $rs = $st->get_result();
-while ($x = $rs->fetch_assoc()) {
-    $x['payload'] = json_decode((string) $x['payload'], true) ?: array();
-    $rows[] = $x;
-}
+while ($x = $rs->fetch_assoc()) { $rows[] = $x; }
 $st->close();
 
 $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';
 
-/** قيمة خلية العمود من الصف — الحوكمة الآلية حية وسائرها من الحمولة أو «—» */
-function cmp03_cell($col, $row, $entityName) {
-    $n = cmp03_screen_norm($col);
-    if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
-        return $row['created_by_name'] ?: '—';
+/** قيمة خلية بفهرس عمود المستند — الحوكمة الآلية حية وسائرها من الجدول أو «—» */
+function m00_cell_at($idx, $row, $entityName, $COLDB) {
+    $col = $COLDB[$idx] ?? null;
+    if ($col === null) { return $entityName; }
+    if ($col === '__status') { return (string) $row['status']; }
+    if ($col === '__creator') { return $row['created_by_name'] ?: '—'; }
+    $v = isset($row[$col]) ? trim((string) $row[$col]) : '';
+    if ($v !== '' && in_array($col, array('amount', 'dept_cap', 'overage'), true) && is_numeric($v)) {
+        $v = rtrim(rtrim(number_format((float) $v, 2), '0'), '.');
     }
-    if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
-    if ($n === cmp03_screen_norm('الحالة')) { return $row['status']; }
-    if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
-    if (isset($row['payload'][$col]) && $row['payload'][$col] !== '') { return $row['payload'][$col]; }
-    return '—';
-}
-/** تطبيع محلي خفيف (مرآة cmp03_norm دون جر مكتبة الأدوات للويب) */
-function cmp03_screen_norm($s) {
-    $s = preg_replace('/\s+/u', ' ', trim((string) $s));
-    $s = str_replace(array('أ','إ','آ'), 'ا', $s);
-    $s = str_replace('ة', 'ه', $s);
-    $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return $v !== '' ? $v : '—';
 }
 
 $page_title = 'إيكوبيشن | اعتمادات المدير التنفيذي';
@@ -273,9 +271,9 @@ include '../insidebar.php';
                 <div class="form-group"><label>العملة</label>
                     <input type="text" name="f7" maxlength="190"></div>
                 <div class="form-group"><label>سقف الإدارة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
                 <div class="form-group"><label>التجاوز</label>
-                    <input type="text" name="f9" maxlength="190"></div>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
                 <div class="form-group"><label>المعتمِدون قبلي</label>
                     <input type="text" name="f10" maxlength="190"></div>
                 <div class="form-group"><label>المهلة</label>
@@ -317,9 +315,9 @@ include '../insidebar.php';
                 <div class="form-group"><label>الصف المعروض للبت</label>
                     <select name="row" required>
                         <?php foreach ($decidable as $d):
-                            $lbl = 'CMP03-' . intval($d['id'])
-                                 . ' — ' . (string) ($d['payload']['رقم الطلب'] ?? '؟')
-                                 . ' · ' . (string) ($d['payload']['المستند'] ?? ($d['payload']['نوع المستند'] ?? '—'))
+                            $lbl = 'EXAP-' . intval($d['id'])
+                                 . ' — ' . (string) ($d['request_no'] ?? '؟')
+                                 . ' · ' . (string) ($d['document'] ?? ($d['doc_type'] ?? '—'))
                                  . ' (' . (string) $d['status'] . ')'; ?>
                         <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($lbl, ENT_QUOTES, 'UTF-8'); ?></option>
                         <?php endforeach; ?>
@@ -373,7 +371,7 @@ include '../insidebar.php';
                 <tr><td colspan="20" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
+                    <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
                 </tr>

@@ -1,11 +1,13 @@
 <?php
 /**
- * Procurement/wh_receipt.php — الاستلام المؤقت قبل الإدخال (CMP-03 ⑥ v2 — بتصميم SCR-DES حرفيًّا + إدخال حي)
+ * Procurement/wh_receipt.php — الاستلام المؤقت قبل الإدخال (v3 · إسقاط حي)
  * ───────────────────────────────────────────────────────────────────────────
- * الورقة المالكة: 05 · المشتريات · الأعمدة 22 بترتيب المستند وطبقة
- * الحوكمة بشرائحها. الصفوف في المخزن البيني `cmp03_screen_rows` (معزول
- * بالكيان) حتى يولد جدول الشاشة الأصلي — مهمة اللحاق في
- * docs/CMP03_FOLLOWUP_SOURCES_ar.md. الفائض فوق 22 عمودًا منهارٌ (توصية ①).
+ * أُعيد بناؤها 2026-08-06 (قرار المالك «حل مشاكل الدور»): كانت v2 مخزنًا
+ * بينيًّا (cmp03_screen_rows) ببذورٍ مبعثرة — فصارت **قائمةَ عملِ ما قبل
+ * الوجهة** فوق proc_receipt_custody الحقيقي: كلُّ عهدةٍ لم تبلغ «مسلَّمة
+ * للوجهة» تظهر هنا بعمرها وبنودها، والفعلُ يُنجَز في شاشة العهدة الأم
+ * (receipt_custody_proc) — مصدرٌ واحدٌ للحقيقة ولا إدخالَ موازيًا.
+ * صلاحياتُ العرض من موديول العهدة نفسِه (#71) — كيانٌ واحدٌ بابُه واحد.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
@@ -14,258 +16,125 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
-require_once '../includes/permissions_helper.php';
-require_once '../includes/gov_columns.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/proc_helpers.php';
 
-$company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-$is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
-$uid            = intval($_SESSION['user']['id'] ?? 0);
+$ctx             = proc_ctx();
+$is_super_admin  = $ctx['is_super'];
+$company_id      = $ctx['company_id'];
+
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=غير+مصرح");
+    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
     exit();
 }
 
-$CANONICAL = 'wh_receipt.php';
-$COLS   = array (
-  0 => 'رقم العهدة',
-  1 => 'تاريخ الاستلام',
-  2 => 'المستلِم',
-  3 => 'صفة المستلِم',
-  4 => 'المورد',
-  5 => 'مرجع أمر الشراء',
-  6 => 'موقع الاستلام',
-  7 => 'الأصناف',
-  8 => 'الكمية المستلَمة',
-  9 => 'حالة الأصناف',
-  10 => 'الوجهة النهائية',
-  11 => 'تاريخ التسليم للوجهة',
-  12 => 'مستلم الوجهة',
-  13 => 'مستند التسليم',
-  14 => 'الحالة',
-  15 => 'الكيان',
-  16 => 'المُنشئ — الاسم والصفة',
-  17 => 'تاريخ الإنشاء',
-  18 => 'المعتمِد — الاسم والصفة',
-  19 => 'تاريخ الاعتماد',
-  20 => 'مرجع التفويض',
-  21 => 'المرفق',
-);
-$FIELDS = array (
-  0 => 'رقم العهدة',
-  1 => 'تاريخ الاستلام',
-  2 => 'المستلِم',
-  3 => 'صفة المستلِم',
-  4 => 'المورد',
-  5 => 'مرجع أمر الشراء',
-  6 => 'موقع الاستلام',
-  7 => 'الأصناف',
-  8 => 'الكمية المستلَمة',
-  9 => 'حالة الأصناف',
-  10 => 'الوجهة النهائية',
-  11 => 'تاريخ التسليم للوجهة',
-  12 => 'مستلم الوجهة',
-  13 => 'مستند التسليم',
-  14 => 'الحالة',
-  15 => 'المعتمِد — الاسم والصفة',
-  16 => 'تاريخ الاعتماد',
-  17 => 'مرجع التفويض',
-  18 => 'المرفق',
-);
-
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
-    }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, 0, ?, ?)");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
-    $ok = $st->execute();
-    $st->close();
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
+$perms = proc_page_perms($conn, 'Procurement/receipt_custody_proc.php', $is_super_admin);
+if (!$perms['can_view']) {
+    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الاستلام+المؤقت+❌");
     exit();
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
-$rows = array();
-$sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
-          FROM cmp03_screen_rows
-         WHERE canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?') . "
-         ORDER BY id DESC LIMIT 500";
-$st = $conn->prepare($sql);
-if ($is_super_admin && $company_id <= 0) { $st->bind_param('s', $CANONICAL); }
-else { $st->bind_param('si', $CANONICAL, $company_id); }
-$st->execute();
-$rs = $st->get_result();
-while ($x = $rs->fetch_assoc()) {
-    $x['payload'] = json_decode((string) $x['payload'], true) ?: array();
-    $rows[] = $x;
-}
-$st->close();
+$gate = proc_gate($is_super_admin);
 
-$govCtx = ems_gov_ctx();
-$entityName = $govCtx['values']['entity'] ?? '—';
+// العهدُ التي لم تبلغ وجهتَها — قائمةُ العمل (مستلَمة · قيد الترحيل)
+$rows = $gate->select('proc_receipt_custody', array(
+    'whereRaw' => "state IN ('مستلَمة', 'قيد الترحيل')",
+    'orderBy'  => 'receipt_date ASC, id ASC',
+));
 
-/** قيمة خلية العمود من الصف — الحوكمة الآلية حية وسائرها من الحمولة أو «—» */
-function cmp03_cell($col, $row, $entityName) {
-    $n = cmp03_screen_norm($col);
-    if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
-        return $row['created_by_name'] ?: '—';
-    }
-    if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
-    if ($n === cmp03_screen_norm('الحالة')) { return $row['status']; }
-    if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
-    if (isset($row['payload'][$col]) && $row['payload'][$col] !== '') { return $row['payload'][$col]; }
-    return '—';
+// خرائطُ الإثراء المجمَّعة
+$sup_map = array();
+foreach ($gate->select('proc_supplier', array('columns' => array('id', 'name'))) as $s) {
+    $sup_map[intval($s['id'])] = (string) $s['name'];
 }
-/** تطبيع محلي خفيف (مرآة cmp03_norm دون جر مكتبة الأدوات للويب) */
-function cmp03_screen_norm($s) {
-    $s = preg_replace('/\s+/u', ' ', trim((string) $s));
-    $s = str_replace(array('أ','إ','آ'), 'ا', $s);
-    $s = str_replace('ة', 'ه', $s);
-    $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+$wh_map = array();
+foreach ($gate->select('proc_warehouse', array('columns' => array('id', 'name'))) as $w) {
+    $wh_map[intval($w['id'])] = (string) $w['name'];
 }
+$po_map = array();
+foreach ($gate->select('proc_order', array('columns' => array('id', 'code'))) as $o) {
+    $po_map[intval($o['id'])] = (string) $o['code'];
+}
+$lines_map = array();
+foreach ($gate->scopedQuery(array('scope' => array('rl' => 'proc_receipt_line')),
+    "SELECT rl.custody_id, COUNT(*) n, COALESCE(SUM(rl.qty),0) q
+       FROM proc_receipt_line rl WHERE {TENANT_SCOPE} GROUP BY rl.custody_id") as $r) {
+    $lines_map[intval($r['custody_id'])] = $r;
+}
+
+$today = new DateTime('today');
 
 $page_title = 'إيكوبيشن | الاستلام المؤقت قبل الإدخال';
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell" dir="rtl">
+
+<div class="main proc-whrc-main ems-unified-page-shell">
     <?php
     $header_title = 'الاستلام المؤقت قبل الإدخال';
-    $header_icon = 'fa fa-truck-ramp-box';
-    $header_actions = array(
-        array('tag' => 'button', 'id' => 'cmp03AddBtn', 'class' => '', 'icon' => 'fa fa-plus',
-              'label' => 'إضافة', 'title' => 'إضافة صف جديد', 'attrs' => 'type="button"'),
-    );
-    $header_back = false;
-    include '../includes/page_header.php';
-    if (isset($_GET['msg'])) {
-        echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
-    }
+    $header_icon  = 'fa fa-hourglass-half';
+    $header_actions = array(array('href' => 'receipt_custody_proc.php', 'class' => 'add-btn',
+                                  'icon' => 'fas fa-truck-ramp-box', 'label' => 'شاشة العهدة (الفعل هناك)'));
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
     ?>
 
-    <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
-    <form method="post" action="" class="allforms" id="cmp03AddForm">
-        <input type="hidden" name="cmp03_action" value="add">
-        <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — الاستلام المؤقت قبل الإدخال</h5>
-        </div><div class="card-body">
-            <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم العهدة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاستلام</label>
-                    <input type="date" name="f1"></div>
-                <div class="form-group"><label>المستلِم</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>صفة المستلِم</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>المورد</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>مرجع أمر الشراء</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>موقع الاستلام</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>الأصناف</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>الكمية المستلَمة</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>حالة الأصناف</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الوجهة النهائية</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ التسليم للوجهة</label>
-                    <input type="date" name="f11"></div>
-                <div class="form-group"><label>مستلم الوجهة</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>مستند التسليم</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f14"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f16"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-            </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
-                <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
-            </div>
-        </div></div>
-    </form>
+    <?php proc_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <div class="table-responsive">
-        <table class="alltables display" id="wh_receiptTable">
-            <thead><tr>
-            <th>رقم العهدة</th>
-            <th>تاريخ الاستلام</th>
-            <th>المستلِم</th>
-            <th>صفة المستلِم</th>
-            <th>المورد</th>
-            <th>مرجع أمر الشراء</th>
-            <th>موقع الاستلام</th>
-            <th>الأصناف</th>
-            <th>الكمية المستلَمة</th>
-            <th>حالة الأصناف</th>
-            <th>الوجهة النهائية</th>
-            <th>تاريخ التسليم للوجهة</th>
-            <th>مستلم الوجهة</th>
-            <th>مستند التسليم</th>
-            <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="22" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <p style="color:#4b5563;margin:0 0 10px"><i class="fas fa-circle-info"></i>
+            قائمةُ عمل: العهدُ التي **لم تبلغ وجهتَها بعد** (مستلَمة · قيد الترحيل) بعمرها منذ الاستلام —
+            التسليمُ للوجهة يُسجَّل من شاشة العهدة، فيغادر الصفُّ هذه القائمة.</p>
+        <div class="table-container">
+            <table id="procTable" class="display nowrap alltables" style="width:100%;">
+                <thead><tr>
+                    <th>الإجراءات</th>
+                    <th>رقم العهدة</th>
+                    <th>تاريخ الاستلام</th>
+                    <th>العمر (يوم)</th>
+                    <th>المستلِم</th>
+                    <th>المورد</th>
+                    <th>مرجع أمر الشراء</th>
+                    <th>موقع الاستلام</th>
+                    <th>مخزن الإدخال</th>
+                    <th>الوجهة المتوقعة</th>
+                    <th>عدد الأصناف</th>
+                    <th>إجمالي الكمية</th>
+                    <th>الحالة</th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($rows as $rc):
+                    $rid = intval($rc['id']);
+                    $ln  = isset($lines_map[$rid]) ? $lines_map[$rid] : array('n' => 0, 'q' => 0);
+                    $age = '—';
+                    if (!empty($rc['receipt_date'])) {
+                        try { $age = (int) (new DateTime((string) $rc['receipt_date']))->diff($today)->format('%r%a'); }
+                        catch (\Throwable $t) { $age = '—'; }
+                    }
+                    $overdue = is_int($age) && $age > 7;   // فوق أسبوعٍ بلا وجهة = متأخرة
+                ?>
+                    <tr<?php echo $overdue ? ' style="background:#fff7ed"' : ''; ?>>
+                        <td><a href="receipt_custody_proc.php?edit_id=<?php echo $rid; ?>" class="add-btn" style="padding:4px 10px"
+                               title="أكمل التسليم من شاشة العهدة"><i class="fas fa-pen"></i> افتح العهدة</a></td>
+                        <td><?php echo htmlspecialchars((string) $rc['code']); ?></td>
+                        <td><?php echo htmlspecialchars((string) ($rc['receipt_date'] ?? '—')); ?></td>
+                        <td><?php echo is_int($age) ? $age . ($overdue ? ' ⚠' : '') : '—'; ?></td>
+                        <td><?php echo htmlspecialchars((string) $rc['holder_name']); ?></td>
+                        <td><?php echo htmlspecialchars(isset($sup_map[intval($rc['supplier_id'])]) ? $sup_map[intval($rc['supplier_id'])] : '—'); ?></td>
+                        <td><?php echo htmlspecialchars(isset($po_map[intval($rc['order_id'])]) ? $po_map[intval($rc['order_id'])] : '—'); ?></td>
+                        <td><?php echo htmlspecialchars((string) ($rc['receipt_location'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars(isset($wh_map[intval($rc['warehouse_id'])]) ? $wh_map[intval($rc['warehouse_id'])] : '—'); ?></td>
+                        <td><?php echo htmlspecialchars((string) $rc['expected_destination']); ?></td>
+                        <td><?php echo intval($ln['n']); ?></td>
+                        <td><?php echo number_format((float) $ln['q'], 2); ?></td>
+                        <td><?php echo htmlspecialchars((string) $rc['state']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div></div>
 </div>
 
-<script>
-(function () {
-    var btn = document.getElementById('cmp03AddBtn');
-    var form = document.getElementById('cmp03AddForm');
-    var cancel = document.getElementById('cmp03CancelBtn');
-    if (btn && form) {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            form.classList.toggle('allforms-visible');
-            if (form.classList.contains('allforms-visible')) {
-                form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    }
-    if (cancel && form) {
-        cancel.addEventListener('click', function () { form.classList.remove('allforms-visible'); });
-    }
-})();
-</script>
+</body>
+</html>

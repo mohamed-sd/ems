@@ -614,11 +614,17 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 
   function refreshPageLayout() {
     // Recalculate DataTables widths after layout changes.
+    // محصَّنة: جدولٌ واحدٌ برأسٍ لا يطابق خلاياه (علة عدّ الأعمدة tn/18) كان
+    // يرمي «reading 'style'» فيقتل المعالجَ كلَّه لكل الجداول — الخطأ يُسجَّل ولا يُفشل.
     if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
-      const tablesApi = window.jQuery.fn.dataTable.tables({ visible: true, api: true });
-      tablesApi.columns.adjust();
-      if (typeof tablesApi.responsive === 'function') {
-        tablesApi.responsive.recalc();
+      try {
+        const tablesApi = window.jQuery.fn.dataTable.tables({ visible: true, api: true });
+        tablesApi.columns.adjust();
+        if (typeof tablesApi.responsive === 'function') {
+          tablesApi.responsive.recalc();
+        }
+      } catch (e) {
+        if (window.console && console.debug) { console.debug('refreshPageLayout skipped:', e.message); }
       }
     }
   }

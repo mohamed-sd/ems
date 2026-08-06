@@ -1,11 +1,11 @@
 <?php
 /**
- * Portal/ceo_board.php — لوحة المدير التنفيذي (CMP-03 ⑥ v2 — بتصميم SCR-DES حرفيًّا + إدخال حي)
+ * Portal/ceo_board.php — لوحة المدير التنفيذي (M-00 §8-2 — على جدولها الأصلي)
  * ───────────────────────────────────────────────────────────────────────────
  * الورقة المالكة: 00 · الإدارة التنفيذية · الأعمدة 16 بترتيب المستند وطبقة
- * الحوكمة بشرائحها. الصفوف في المخزن البيني `cmp03_screen_rows` (معزول
- * بالكيان) حتى يولد جدول الشاشة الأصلي — مهمة اللحاق في
- * docs/CMP03_FOLLOWUP_SOURCES_ar.md. الفائض فوق 22 عمودًا منهارٌ (توصية ①).
+ * الحوكمة بشرائحها. لقطات الفترات في الجدول الأصلي `exec_board_snapshots`
+ * (هجرة 2026_11_14 — أُنجز لحاق CMP03_FOLLOWUP) معزولةً بالكيان، والمؤشرات
+ * الجامعة الست (④-٦) حيةٌ فوق الجدول من مصادرها لا من لقطاته.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
@@ -24,8 +24,6 @@ if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=غير+مصرح");
     exit();
 }
-
-$CANONICAL = 'ceo_board.php';
 
 // حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
 $__pp = check_page_permissions($conn, 'Portal/ceo_board.php');
@@ -57,84 +55,64 @@ $COLS   = array (
   14 => 'الاعتمادات المعلَّقة',
   15 => 'آخر تحديث',
 );
-$FIELDS = array (
-  0 => 'الفترة',
-  1 => 'العقود النافذة',
-  2 => 'قيمة المحفظة',
-  3 => 'الإيراد المعترف',
-  4 => 'التحصيل',
-  5 => 'الذمم المتأخرة',
-  6 => 'التدفق المتوقع',
-  7 => 'التزامات التمويل',
-  8 => 'المعدات العاملة',
-  9 => 'نسبة الجاهزية',
-  10 => 'الوحدات المعتمدة',
-  11 => 'الهامش',
-  12 => 'المخاطر المفتوحة',
-  13 => 'الاعتمادات المعلَّقة',
-  14 => 'آخر تحديث',
+/* أعمدة الجدول الأصلي بترتيب حقول الفورم f0..f14 */
+$DB_FIELDS = array(
+    'period', 'active_contracts', 'portfolio_value', 'recognized_revenue',
+    'collection', 'overdue_receivables', 'expected_cashflow', 'financing_commitments',
+    'working_equipment', 'readiness_pct', 'approved_units', 'margin_pct',
+    'open_risks', 'pending_approvals', 'last_updated',
 );
+/* خريطة عرض: فهرس عمود المستند → عمود القاعدة (null = الكيان) */
+$COLDB = array_merge(array(null), $DB_FIELDS);
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
+/* ── الحفظ: فورم الإضافة الموحد → الجدول الأصلي ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
-    }
-    $status = $payload['الحالة'] ?? 'مسودة';
+    $in = array();
+    foreach ($DB_FIELDS as $i => $col) { $in[$col] = trim((string) ($_POST['f' . $i] ?? '')); }
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, 0, ?, ?)");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
+    // الفارغ NULL من هنا لا NULLIF في SQL — خلطُ الترتيبات على اتصال الويب يرفضها
+    foreach ($in as $k => $v) { if ($v === '') { $in[$k] = null; } }
+    $st = $conn->prepare("INSERT INTO exec_board_snapshots
+        (company_id, period, active_contracts, portfolio_value, recognized_revenue,
+         collection, overdue_receivables, expected_cashflow, financing_commitments,
+         working_equipment, readiness_pct, approved_units, margin_pct,
+         open_risks, pending_approvals, last_updated, status, is_seed, created_by, created_by_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'معتمد', 0, ?, ?)");
+    $st->bind_param('isssssssssssssssis',
+        $company_id, $in['period'], $in['active_contracts'], $in['portfolio_value'],
+        $in['recognized_revenue'], $in['collection'], $in['overdue_receivables'],
+        $in['expected_cashflow'], $in['financing_commitments'], $in['working_equipment'],
+        $in['readiness_pct'], $in['approved_units'], $in['margin_pct'],
+        $in['open_risks'], $in['pending_approvals'], $in['last_updated'], $uid, $creator);
     $ok = $st->execute();
+    $dup = !$ok && $conn->errno === 1062;
     $st->close();
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
+    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
+        $ok ? 'حُفظت اللقطة ✅' : ($dup ? 'لقطة هذه الفترة موجودة — الفترة الواحدة لقطة واحدة ❌' : 'تعذر الحفظ ❌')));
     exit();
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
+/* ── القراءة: لقطات الكيان من الجدول الأصلي ─────────────────────────────── */
 $rows = array();
-$sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
-          FROM cmp03_screen_rows
-         WHERE canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?') . "
-         ORDER BY id DESC LIMIT 500";
+$sql = "SELECT * FROM exec_board_snapshots"
+     . ($is_super_admin && $company_id <= 0 ? '' : ' WHERE company_id = ?')
+     . ' ORDER BY period DESC, id DESC LIMIT 500';
 $st = $conn->prepare($sql);
-if ($is_super_admin && $company_id <= 0) { $st->bind_param('s', $CANONICAL); }
-else { $st->bind_param('si', $CANONICAL, $company_id); }
+if (!($is_super_admin && $company_id <= 0)) { $st->bind_param('i', $company_id); }
 $st->execute();
 $rs = $st->get_result();
-while ($x = $rs->fetch_assoc()) {
-    $x['payload'] = json_decode((string) $x['payload'], true) ?: array();
-    $rows[] = $x;
-}
+while ($x = $rs->fetch_assoc()) { $rows[] = $x; }
 $st->close();
 
 $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';
 
-/** قيمة خلية العمود من الصف — الحوكمة الآلية حية وسائرها من الحمولة أو «—» */
-function cmp03_cell($col, $row, $entityName) {
-    $n = cmp03_screen_norm($col);
-    if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
-        return $row['created_by_name'] ?: '—';
-    }
-    if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
-    if ($n === cmp03_screen_norm('الحالة')) { return $row['status']; }
-    if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
-    if (isset($row['payload'][$col]) && $row['payload'][$col] !== '') { return $row['payload'][$col]; }
-    return '—';
-}
-/** تطبيع محلي خفيف (مرآة cmp03_norm دون جر مكتبة الأدوات للويب) */
-function cmp03_screen_norm($s) {
-    $s = preg_replace('/\s+/u', ' ', trim((string) $s));
-    $s = str_replace(array('أ','إ','آ'), 'ا', $s);
-    $s = str_replace('ة', 'ه', $s);
-    $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+/** قيمة خلية بفهرس عمود المستند — الكيان حي وسائرها من الجدول أو «—» */
+function m00_cell_at($idx, $row, $entityName, $COLDB) {
+    $col = $COLDB[$idx] ?? null;
+    if ($col === null) { return $entityName; }
+    $v = isset($row[$col]) ? trim((string) $row[$col]) : '';
+    return $v !== '' ? $v : '—';
 }
 
 $page_title = 'إيكوبيشن | لوحة المدير التنفيذي';
@@ -155,7 +133,7 @@ include '../insidebar.php';
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
 
-    /* M-00 ④-٦: المؤشرات الجامعة الست حيةً من مصادرها — فوق الجدول البيني
+    /* M-00 ④-٦: المؤشرات الجامعة الست حيةً من مصادرها — فوق جدول اللقطات
      * (عقود · مشاريع · معلَّق أمام القمة · قرارات بلا حسم · متابعات · وقائع §11) */
     $bd = function ($sql) use ($conn) {
         try { $r = $conn->query($sql); $w = $r ? $r->fetch_assoc() : null; return $w ? (int) reset($w) : 0; }
@@ -164,12 +142,12 @@ include '../insidebar.php';
     $bdCoE = ($is_super_admin && $company_id <= 0) ? '' : ' AND company_id = ' . $company_id;
     $bdContracts = $bd("SELECT COUNT(*) FROM contracts WHERE COALESCE(is_deleted,0)=0 {$bdCoE}");
     $bdProjects  = $bd("SELECT COUNT(*) FROM project  WHERE COALESCE(is_deleted,0)=0 {$bdCoE}");
-    $bdPending   = $bd("SELECT COUNT(*) FROM cmp03_screen_rows WHERE canonical_file='ceo_approvals.php'
-                         AND status IN ('مسودة','قيد المراجعة','مؤجل') {$bdCoE}")
+    $bdPending   = $bd("SELECT COUNT(*) FROM exec_approvals
+                         WHERE status IN ('مسودة','قيد المراجعة','مؤجل') {$bdCoE}")
                  + $bd("SELECT COUNT(*) FROM requests r JOIN users u ON u.id=r.current_holder_user_id AND u.role='9'
                          WHERE r.status IN ('submitted','routed','in_approval')" . str_replace('company_id', 'r.company_id', $bdCoE));
-    $bdOpenDec   = $bd("SELECT COUNT(*) FROM cmp03_screen_rows WHERE canonical_file='ceo_risk.php'
-                         AND status IN ('مسودة','قيد الدراسة','قيد المراجعة') {$bdCoE}");
+    $bdOpenDec   = $bd("SELECT COUNT(*) FROM exec_decisions
+                         WHERE status IN ('مسودة','قيد الدراسة','قيد المراجعة','قيد الحسم') {$bdCoE}");
     $bdFollow    = $bd("SELECT COUNT(*) FROM work_items WHERE source_type='SRC-10'
                          AND status NOT IN ('closed_accepted','cancelled') {$bdCoE}");
     $bdFacts     = $bd("SELECT COUNT(*) FROM ems_business_events
@@ -193,7 +171,7 @@ include '../insidebar.php';
             <?php endforeach; ?>
         </div>
         <div class="text-muted" style="margin-top:6px;font-size:12px">
-            مؤشراتٌ حيةٌ من المصادر (لا من صفوف هذا الجدول) — التفصيل في
+            مؤشراتٌ حيةٌ من المصادر (لا من لقطات هذا الجدول) — التفصيل في
             <a href="ceo_reports.php">تقارير الإدارة التنفيذية الثمانية</a>
         </div>
     </div></div>
@@ -269,7 +247,7 @@ include '../insidebar.php';
                 <tr><td colspan="16" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
+                    <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
                 </tr>

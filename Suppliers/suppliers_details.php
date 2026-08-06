@@ -48,7 +48,9 @@ if (!isset($_SESSION['user'])) {
         <br />
 
         <?php
-        include '../config.php';
+        // insidebar.php أعلاه حمّل config.php بـ require_once؛ فـ include عارٍ هنا يُعيد
+        // تنفيذ الملف ويُسقط الصفحة بـ«Cannot redeclare ems_table_has_column_raw».
+        require_once __DIR__ . '/../config.php';
 
         // H-20: جلسةُ مشرف المورد تُقصر على موردها — 403 مسجَّلةٌ لغيره
         require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
@@ -154,7 +156,7 @@ if (!isset($_SESSION['user'])) {
             </thead>
             <tbody>
                 <?php
-                include '../config.php';
+                require_once __DIR__ . '/../config.php'; // محمَّلٌ سلفًا — التكرار يُسقط الصفحة
 
                 try {
                     $sc_rows = ems_tenant_db()->scopedQuery(array(

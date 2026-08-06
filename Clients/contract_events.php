@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_code'])) {
 
     // الكود
     $evt_code_raw = isset($_POST['event_code']) ? trim($_POST['event_code']) : '';
-    if ($evt_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $evt_code_raw)) {
+    if ($evt_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $evt_code_raw)) {
         evt_redirect_with_msg('كود الحدث غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -418,7 +418,7 @@ function evt_state_tone($state)
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود الحدث *</label>
-                        <input type="text" name="event_code" id="event_code" placeholder="مثال: EVT-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="event_code" id="event_code" placeholder="مثال: EVT-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-file-contract"></i> العقد المرتبط</label>

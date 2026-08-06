@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     // الكود
     $uom_code_raw = isset($_POST['uom_code']) ? trim($_POST['uom_code']) : '';
-    if ($uom_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $uom_code_raw)) {
+    if ($uom_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $uom_code_raw)) {
         uom_redirect_with_msg('كود الوحدة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -344,7 +344,7 @@ include('../insidebar.php');
 
                     <div>
                         <label><i class="fas fa-barcode"></i> الكود *</label>
-                        <input type="text" name="uom_code" id="uom_code" placeholder="مثال: UOM-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="uom_code" id="uom_code" placeholder="مثال: UOM-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-heading"></i> اسم الوحدة *</label>

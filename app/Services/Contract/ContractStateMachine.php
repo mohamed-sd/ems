@@ -141,9 +141,11 @@ class ContractStateMachine
     /**
      * تنفيذُ انتقالٍ مشروع.
      *
+     * @param array $opts خياراتُ الانتقال: authority_ref (BR-CEO-01 عند التوقيع) ·
+     *                    amount/currency (قيمةُ الالتزام لأثر ④-٣ إن عُرفت)
      * @return array{ok:bool,code:int,reason:string,from:?string,to:?string,changed:bool}
      */
-    public static function transition($conn, $gate, $companyId, $contractId, $to, $note, $actor)
+    public static function transition($conn, $gate, $companyId, $contractId, $to, $note, $actor, array $opts = array())
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '',
                      'from' => null, 'to' => null, 'changed' => false);
@@ -189,8 +191,53 @@ class ContractStateMachine
             return $out;
         }
 
-        $gate->update('contracts', array('contract_status' => $to), array('id' => $contractId));
+        // ═══ BR-CEO-01: التوقيعُ بالسلطة الأصلية — الحارسُ في نقطة الخنق ═══
+        // بلوغُ «موقَّع» محصورٌ: الإدارةُ التنفيذية (الدور 9 أو السوبر) بسلطتها
+        // الأصلية، وغيرُها بمرجع تفويضٍ موثَّقٍ إلزاميٍّ — ويُسجَّل المرجعُ مع
+        // كل توقيعٍ في contracts.signing_authority_ref فيُجاب سؤالُ المراجعة
+        // الأول: بأي صفةٍ وقّع؟ ولا توقيعَ بلا سند.
+        $authorityRef = trim((string) ($opts['authority_ref'] ?? ''));
+        if ($to === self::SIGNED) {
+            $actorRole = '';
+            if ((int) $actor > 0) {
+                try {
+                    $rs = mysqli_query($conn, 'SELECT role_id FROM users WHERE id = ' . (int) $actor);
+                    $u = $rs ? mysqli_fetch_assoc($rs) : null;
+                    $actorRole = $u ? strval($u['role_id']) : '';
+                } catch (\Throwable $t) { $actorRole = ''; }
+            }
+            $isExec = ($actorRole === '9' || $actorRole === '-1');
+            if ($isExec && $authorityRef === '') { $authorityRef = 'سلطة أصلية'; }
+            if ($authorityRef === '') {
+                $out['code'] = 403;
+                $out['reason'] = 'BR-CEO-01: التوقيعُ محصورٌ بالسلطة الأصلية للمدير التنفيذي'
+                    . ' أو تفويضٍ موثَّقٍ بمرجعه — مرِّر authority_ref أو وقِّع بحساب الإدارة التنفيذية';
+                return $out;
+            }
+        }
+
+        $upd = array('contract_status' => $to);
+        if ($to === self::SIGNED && $authorityRef !== '') {
+            $upd['signing_authority_ref'] = $authorityRef;
+        }
+        $gate->update('contracts', $upd, array('id' => $contractId));
         self::emit($conn, $gate, (int) $c['company_id'], $contractId, $from, $to, $note, $actor);
+
+        // M-00 ④-٣: الأثرُ الرباعيُّ للتوقيع — نفاذٌ (بالآلة) · قيدٌ في السجل
+        // الموحَّد (يقرأ contracts مباشرةً) · حاويةٌ تُولَّد · التزامٌ يدخل
+        // الموازنةَ والتدفقَ بنمط المروحة (خريطة أثرٍ + صفُّ أثرٍ + وصلةُ عطالة)
+        if ($to === self::SIGNED) {
+            try {
+                require_once __DIR__ . '/ContractSignedEffects.php';
+                ContractSignedEffects::apply($conn, $gate, (int) $c['company_id'], $contractId, array(
+                    'amount'   => $opts['amount'] ?? null,
+                    'currency' => $opts['currency'] ?? null,
+                    'actor'    => (int) $actor,
+                ));
+            } catch (\Throwable $t) {
+                error_log('ContractSignedEffects #' . $contractId . ': ' . $t->getMessage());
+            }
+        }
 
         $out['ok'] = true; $out['code'] = 200; $out['changed'] = true;
         return $out;

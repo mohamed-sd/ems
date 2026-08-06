@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amendment_code'])) {
 
     // الكود
     $amd_code_raw = isset($_POST['amendment_code']) ? trim($_POST['amendment_code']) : '';
-    if ($amd_code_raw === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $amd_code_raw)) {
+    if ($amd_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $amd_code_raw)) {
         amd_redirect_with_msg('كود الملحق غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
     }
 
@@ -444,7 +444,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود الملحق *</label>
-                        <input type="text" name="amendment_code" id="amendment_code" placeholder="مثال: AMD-001" required pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="amendment_code" id="amendment_code" placeholder="مثال: AMD-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-file-contract"></i> العقد المرتبط</label>
