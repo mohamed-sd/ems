@@ -22,6 +22,43 @@ class EntityGovernanceService
         4 => array('internal_parties', 'external_accounts', 'signing_caps', 'joint_signing', 'licenses', 'guarantees'),
     );
 
+    /**
+     * تغيير وسم اكتمال الملكية — EN-04 (E-05 · AC-E05-04): «كامل» لا يُمنح
+     * إلا ومجموعُ الحصص النافذة 100٪ بالضبط، فالوسمُ شهادةٌ لا أمنية.
+     * (كان الوسمُ يُحرَّر إدخالًا حرًّا فيُعلَن «كامل» على هيكلٍ ناقص —
+     * والفاحص ③ في e05_checks يلتقط الخرق بعديًّا؛ هذه البوابة تمنعه قبليًّا.)
+     */
+    public static function setCompleteness(\mysqli $conn, $entityId, $mode)
+    {
+        $entityId = intval($entityId);
+        $mode = (string) $mode;
+        if (!in_array($mode, array('full', 'partial', 'unknown'), true)) {
+            return array('ok' => false, 'code' => 422, 'reason' => 'وسمُ اكتمالٍ غيرُ معروف: ' . $mode);
+        }
+        $r = $conn->query('SELECT ownership_completeness FROM legal_entities WHERE entity_id = ' . $entityId);
+        $ent = $r ? $r->fetch_assoc() : null;
+        if (!$ent) { return array('ok' => false, 'code' => 404, 'reason' => 'الكيان غير موجود'); }
+        if ((string) $ent['ownership_completeness'] === $mode) {
+            return array('ok' => true, 'code' => 200, 'changed' => false); // عطالة: الوسم قائم
+        }
+        if ($mode === 'full') {
+            $sum = 0.0;
+            foreach (self::treeAt($conn, $entityId, date('Y-m-d')) as $row) { $sum += (float) $row['percent']; }
+            if (abs($sum - 100.0) > 0.005) {
+                return array('ok' => false, 'code' => 422,
+                    'reason' => 'لا يُوسم «كامل الهيكل»: Σ الحصص النافذة ' . number_format($sum, 2)
+                              . ' (الفارق ' . sprintf('%+0.2f', $sum - 100) . ') — أكمل الهيكل إلى 100 ثم وسِّم');
+            }
+        }
+        $stmt = $conn->prepare('UPDATE legal_entities SET ownership_completeness = ? WHERE entity_id = ?');
+        $stmt->bind_param('si', $mode, $entityId);
+        $ok = $stmt->execute();
+        $err = $stmt->error;
+        $stmt->close();
+        return $ok ? array('ok' => true, 'code' => 200, 'changed' => true)
+                   : array('ok' => false, 'code' => 422, 'reason' => $err);
+    }
+
     /** إضافة علاقة ملكية — قيد المئة المشروط بحسب ownership_completeness. */
     public static function addOwnership(\mysqli $conn, array $a)
     {
