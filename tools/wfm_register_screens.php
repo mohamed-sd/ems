@@ -18,6 +18,9 @@ $SCREENS = array(
     array('طلباتي', 'Portal/my_requests.php'),
     array('التنبيهات', 'Portal/notifications.php'),
     array('لوحتي', 'Portal/my_kpi.php'),
+    // الموجة ١ (2026-08-06): ورقة الإدارات الـ17 المعيَّرة — المحتوى يعزل نفسه
+    // بوحدة دور الجلسة (خريطة الـ17) فالرؤية لكل الأدوار كعرف مساحة عملي.
+    array('ورقة الإدارة', 'Portal/dept_board.php'),
 );
 
 foreach ($SCREENS as $s) {
