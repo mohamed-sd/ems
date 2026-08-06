@@ -899,15 +899,14 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
             $amount, $monthlyRef, ($usd !== null ? $usd : 0.0), '');
         if (empty($assess['needs_gm'])) { return false; }
 
-        // idempotent: صفُّ الاعتماد الأعلى برقم الطلب لا يتكرر (يشمل resubmit)
+        // idempotent: صفُّ الاعتماد الأعلى بمرجع الطلب المصدري لا يتكرر (يشمل resubmit)
+        // — الوجهة صارت الجدول الأصلي exec_approvals (لحاق CMP03_FOLLOWUP 2026-11-14)
         $co = intval($req['company_id']);
         $no = strval($req['request_no']);
-        // النمط يُبنى في PHP — CONCAT مع معلمةٍ يخلط الترتيبات فيفشل صامتًا (MariaDB)
-        $like = '%' . $no . '%';
-        $st = $conn->prepare("SELECT id FROM cmp03_screen_rows
-                               WHERE canonical_file = 'ceo_approvals.php' AND company_id = ?
-                                 AND payload LIKE ? LIMIT 1");
-        $st->bind_param('is', $co, $like);
+        $srcId = intval($req['id'] ?? 0);
+        $st = $conn->prepare("SELECT id FROM exec_approvals
+                               WHERE company_id = ? AND (source_request_id = ? OR request_no = ?) LIMIT 1");
+        $st->bind_param('iis', $co, $srcId, $no);
         $st->execute();
         $dupe = $st->get_result()->fetch_assoc();
         $st->close();
@@ -916,28 +915,25 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
         $capTxt = ($monthlyRef !== null)
             ? ('min(5٪ = ' . round($monthlyRef * 0.05, 2) . ' ' . $cur . ' · 10,000$)')
             : '10,000$ معادلًا';
-        $payload = array(
-            'رقم الطلب'        => $no,
-            'تاريخ الورود'     => date('Y-m-d'),
-            'نوع المستند'      => 'طلب مالي (' . strval($req['request_type']) . ')',
-            'المستند'          => mb_substr(strval($req['statement'] ?: $req['justification']), 0, 160),
-            'الإدارة الطالبة'  => strval($req['source_module']),
-            'سبب الرفع للأعلى' => $assess['reason'],
-            'القيمة'           => (string) $amount,
-            'العملة'           => $cur,
-            'سقف الإدارة'      => $capTxt,
-            'التجاوز'          => ($usd !== null ? ('المعادل ' . round($usd, 2) . '$') : 'بحد النسبة'),
-            'المهلة'           => strval($req['needed_by'] ?: '48 ساعة'),
-            'الحالة'           => 'قيد المراجعة',
-        );
-        $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $overTxt = ($usd !== null ? ('المعادل ' . round($usd, 2) . '$') : 'بحد النسبة');
+        $docTxt = mb_substr(strval($req['statement'] ?: $req['justification']), 0, 160);
+        $typeTxt = 'طلب مالي (' . strval($req['request_type']) . ')';
+        $deptTxt = strval($req['source_module']);
+        $needBy = strval($req['needed_by'] ?: '48 ساعة');
+        $today = date('Y-m-d');
+        $amountS = (string) $amount;
         $creator = 'آلي — DEC-01 ③ (بوابة الطلب المالي)';
         $uid = intval($req['created_by'] ?: 0);
-        $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-            (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-            VALUES (?, 'ceo_approvals.php', ?, 'قيد المراجعة', 0, ?, ?)");
-        $st->bind_param('isis', $co, $json, $uid, $creator);
-        $st->execute();
+        $st = $conn->prepare("INSERT INTO exec_approvals
+            (company_id, request_no, received_date, doc_type, document, requesting_dept,
+             raise_reason, amount, currency, dept_cap, overage, deadline,
+             status, source_request_id, source_kind, is_seed, created_by, created_by_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'قيد المراجعة', ?, 'آلي', 0, ?, ?)");
+        $st->bind_param('isssssssssssiis',
+            $co, $no, $today, $typeTxt, $docTxt, $deptTxt,
+            $assess['reason'], $amountS, $cur, $capTxt, $overTxt, $needBy,
+            $srcId, $uid, $creator);
+        $st->execute() or error_log('finreq_gm_escalate insert: ' . $st->error);
         $rowId = intval($conn->insert_id);
         $st->close();
 

@@ -36,6 +36,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 }
 
 $coW = $is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ' . $company_id;
+$coW2 = $is_super_admin && $company_id <= 0 ? '' : ' WHERE company_id = ' . $company_id;
 $coWc = $is_super_admin && $company_id <= 0 ? '' : ' AND c.company_id = ' . $company_id;
 
 /** استعلام قائمة آمن القراءة — يعيد مصفوفة صفوف (فارغة عند أي عطل) */
@@ -61,9 +62,9 @@ foreach (cr_rows($conn, "SELECT event_key k, COUNT(*) c FROM ems_business_events
 $src10 = cr_rows($conn, "SELECT status, COUNT(*) c FROM work_items
                           WHERE source_type='SRC-10' {$coW} GROUP BY status");
 
-/* ② معلَّقات الاعتماد الأعلى — المصادر الثلاثة */
-$pInterim = cr_rows($conn, "SELECT id, payload, status FROM cmp03_screen_rows
-                             WHERE canonical_file='ceo_approvals.php' AND status IN ('مسودة','قيد المراجعة','مؤجل')
+/* ② معلَّقات الاعتماد الأعلى — المصادر الثلاثة (الجدول الأصلي بعد اللحاق) */
+$pInterim = cr_rows($conn, "SELECT id, request_no, document, doc_type, status FROM exec_approvals
+                             WHERE status IN ('مسودة','قيد المراجعة','مؤجل')
                                {$coW} ORDER BY id DESC LIMIT 15");
 $pReqs = cr_rows($conn, "SELECT r.id, r.request_no, r.title, r.status, r.created_at
                           FROM requests r JOIN users u ON u.id = r.current_holder_user_id AND u.role = '9'
@@ -86,9 +87,10 @@ $charteredLast = cr_rows($conn, "SELECT e.entity_id pid, e.occurred_at, e.payloa
                                   WHERE e.event_key = 'project.chartered' " . str_replace('company_id', 'e.company_id', $coW) . "
                                   ORDER BY e.id DESC LIMIT 10");
 
-/* ⑤ القرارات ومتابعاتها */
-$decRows = cr_rows($conn, "SELECT id, payload, status FROM cmp03_screen_rows
-                            WHERE canonical_file='ceo_risk.php' {$coW} ORDER BY id DESC LIMIT 15");
+/* ⑤ القرارات ومتابعاتها (الجدول الأصلي بعد اللحاق) */
+$decRows = cr_rows($conn, "SELECT id, decision_no, issue_type, issue_desc, est_impact, currency,
+                                   assigned_dept, exec_deadline, status
+                              FROM exec_decisions {$coW2} ORDER BY id DESC LIMIT 15");
 $decFollow = cr_rows($conn, "SELECT source_ref, status, due_at FROM work_items
                               WHERE source_type='SRC-10' {$coW} ORDER BY id DESC LIMIT 15");
 
@@ -171,8 +173,8 @@ function cr_p($row, $key) {
                 <tr><td colspan="4" class="text-center text-muted">لا معلَّقَ الآن — صفرُ انتظارٍ أمام القمة</td></tr>
             <?php else: ?>
                 <?php foreach ($pInterim as $w): ?>
-                <tr><td>شاشة الاعتمادات</td><td>CMP03-<?php echo (int) $w['id']; ?></td>
-                    <td><?php echo htmlspecialchars(cr_p($w, 'المستند') . ' · ' . cr_p($w, 'رقم الطلب'), ENT_QUOTES, 'UTF-8'); ?></td>
+                <tr><td>شاشة الاعتمادات</td><td><?php echo htmlspecialchars((string) ($w['request_no'] ?: ('#' . $w['id'])), ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo htmlspecialchars(trim((string) $w['document'] . ' · ' . (string) $w['doc_type'], ' ·'), ENT_QUOTES, 'UTF-8'); ?></td>
                     <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
                 <?php endforeach; foreach ($pReqs as $w): ?>
                 <tr><td>طلب بيد تنفيذي</td><td><?php echo htmlspecialchars((string) $w['request_no'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -231,12 +233,12 @@ function cr_p($row, $key) {
             $followByRef = array();
             foreach ($decFollow as $f) { $followByRef[$f['source_ref']] = $f; }
             foreach ($decRows as $w):
-                $ref = 'CMP03-' . (int) $w['id'];
-                $fu = $followByRef[$ref] ?? null; ?>
-            <tr><td><?php echo htmlspecialchars(cr_p($w, 'رقم القرار'), ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?php echo htmlspecialchars(mb_substr(cr_p($w, 'وصف القضية'), 0, 60), ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?php echo htmlspecialchars(cr_p($w, 'الجهة المكلَّفة بالتنفيذ'), ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?php echo htmlspecialchars(cr_p($w, 'مهلة التنفيذ'), ENT_QUOTES, 'UTF-8'); ?></td>
+                // مرجع المتابعة بعد اللحاق EXDC-{id} (والقديم CMP03-{id} احتياط)
+                $fu = $followByRef['EXDC-' . (int) $w['id']] ?? ($followByRef['CMP03-' . (int) $w['id']] ?? null); ?>
+            <tr><td><?php echo htmlspecialchars((string) ($w['decision_no'] ?: ('EXDC-' . $w['id'])), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars(mb_substr((string) $w['issue_desc'], 0, 60), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars((string) ($w['assigned_dept'] ?: '—'), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars((string) ($w['exec_deadline'] ?: '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo $fu ? htmlspecialchars($fu['status'] . ' · ' . $fu['due_at'], ENT_QUOTES, 'UTF-8') : '—'; ?></td></tr>
             <?php endforeach; if (!$decRows): ?><tr><td colspan="6" class="text-center text-muted">لا قراراتَ بعدُ — تُقيَّد من شاشة القرارات</td></tr><?php endif; ?>
@@ -262,10 +264,10 @@ function cr_p($row, $key) {
         <table class="alltables display no-datatable" style="width:100%"><thead>
             <tr><th>المرجع</th><th>النوع</th><th>القضية</th><th>الأثر المقدَّر</th><th>الحالة</th></tr></thead><tbody>
             <?php foreach ($openRisk as $w): ?>
-            <tr><td>CMP03-<?php echo (int) $w['id']; ?></td>
-                <td><?php echo htmlspecialchars(cr_p($w, 'نوع القضية'), ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?php echo htmlspecialchars(mb_substr(cr_p($w, 'وصف القضية'), 0, 70), ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?php echo htmlspecialchars(cr_p($w, 'الأثر المقدَّر') . ' ' . cr_p($w, 'العملة'), ENT_QUOTES, 'UTF-8'); ?></td>
+            <tr><td>EXDC-<?php echo (int) $w['id']; ?></td>
+                <td><?php echo htmlspecialchars((string) ($w['issue_type'] ?: '—'), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars(mb_substr((string) $w['issue_desc'], 0, 70), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars(trim((string) $w['est_impact'] . ' ' . (string) $w['currency']), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
             <?php endforeach; if (!$openRisk): ?><tr><td colspan="5" class="text-center text-muted">لا قضيةَ مفتوحةً — كلُّ المرفوع محسوم</td></tr><?php endif; ?>
         </tbody></table>
