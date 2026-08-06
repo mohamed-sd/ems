@@ -237,4 +237,80 @@ if ($cq) {
     }
 }
 fwrite(STDOUT, "⑦ مهامُّ تسوية عهدةٍ وُلدت: {$custTasks}" . ($custUnlinked ? " · بلا ربط حامل: {$custUnlinked}" : '') . "\n");
+/* ⑧ M-14 · حملة المراجعة الدورية للوصول (الموجة ٦): كل ربع سنةٍ تُفتح دورة
+   AR-<سنة>Q<ربع> في scr_access_review وتُولَّد مهامها: قائدُ الحملة (الحوكمة
+   15) + مهمةُ مراجعةٍ لمدير كل إدارةٍ من خريطة الـ17 على أعضائها (SRC-08 —
+   المهمةُ الدوريةُ المنصوصة M-14 §الأدوار). العطالة بمرجع الدورة في source_ref.
+   «الصمتُ سحبٌ» الآلي مؤجلٌ لما بعد قلب EMS_PERM_SOURCE (بند النافذة 6) —
+   فالسحب فوق مصدرين متزامنين خطرُ ازدواج. */
+require_once __DIR__ . '/../Tickets/dept_inbox_map.php';
+$q = intval(ceil(intval(date('n')) / 3));
+$cycle = 'AR-' . date('Y') . 'Q' . $q;
+$campTasks = 0;
+$coRows = array();
+$r = mysqli_query($conn, "SELECT DISTINCT company_id FROM users WHERE COALESCE(status,'active')='active' AND company_id > 0");
+while ($r && ($x = mysqli_fetch_row($r))) { $coRows[] = intval($x[0]); }
+foreach ($coRows as $co) {
+    $ex = mysqli_query($conn, "SELECT id FROM scr_access_review WHERE company_id = {$co}
+                                AND no_cycle = '" . $conn->real_escape_string($cycle) . "' LIMIT 1");
+    if ($ex && mysqli_fetch_row($ex)) { continue; } // الدورة مفتوحة — عطالة
+    // قائد الحملة: أول حساب حوكمة (15) نشط، وإلا التنفيذي (9)
+    $lead = null;
+    foreach (array(15, 9) as $rid) {
+        $u = mysqli_query($conn, "SELECT id FROM users WHERE role = '{$rid}' AND company_id = {$co}
+                                   AND COALESCE(status,'active')='active' ORDER BY id LIMIT 1");
+        if ($u && ($uu = mysqli_fetch_row($u))) { $lead = intval($uu[0]); break; }
+    }
+    if ($lead === null) { continue; }
+    $nAcc = 0;
+    $c = mysqli_query($conn, "SELECT COUNT(*) FROM users WHERE company_id = {$co} AND COALESCE(status,'active')='active'");
+    if ($c) { $nAcc = intval(mysqli_fetch_row($c)[0]); }
+    $st = $conn->prepare("INSERT INTO scr_access_review
+        (company_id, no_cycle, period_ref, date_launch, dept_name, count_accounts_review,
+         status, status_label, is_seed, created_by, created_by_name)
+        VALUES (?, ?, ?, CURDATE(), 'كل الإدارات', ?, 'مفتوحة', 'مفتوحة', 0, 0, 'نبض المحرك ⑧ — M-14')");
+    $period = date('Y') . '-Q' . $q;
+    $st->bind_param('isss', $co, $cycle, $period, $nAcc);
+    $st->execute();
+    $st->close();
+    // مهمة قائد الحملة
+    $resL = WI::create($conn, array(
+        'company_id' => $co, 'source_type' => 'SRC-08',
+        'source_ref' => 'ARC-' . $cycle . '-LEAD', 'source_screen' => 'Governance/access_review.php',
+        'owner_user_id' => $lead, 'assigned_user_id' => $lead, 'org_unit_id' => 6,
+        'title' => 'حملة المراجعة الدورية للوصول ' . $cycle . ' — قُد الدورة وأقفلها',
+        'details' => 'M-14: مراجعة كل الحسابات النشطة (' . $nAcc . ') — والصمت يُعد طلب سحبٍ يقيد يدويًّا حتى قلب المصدر.',
+        'deliverable' => 'دورة ' . $cycle . ' مقفلة بنسب استجابتها في شاشة المراجعة',
+        'evidence_required' => 'صف الدورة محدثًا بأعداده وتاريخ إقفاله',
+        'priority' => 'P2', 'due_at' => date('Y-m-d H:i:s', time() + 86400 * 14), 'created_by' => 0,
+        'parent_ref' => 'ARC-' . $cycle,
+    ));
+    if (!empty($resL['ok'])) { $campTasks++; }
+    // مهمة مراجعة لمدير كل إدارة على أعضائها (من الهيكل لا من قوائم)
+    for ($unit = 1; $unit <= 15; $unit++) {
+        $unitRoles = array();
+        for ($rid = 1; $rid <= 40; $rid++) { if (ems_dept_unit_of_role($rid) === $unit) { $unitRoles[] = $rid; } }
+        if (!$unitRoles) { continue; }
+        $rin = implode(',', array_map('intval', $unitRoles));
+        $mgr = null;
+        $u = mysqli_query($conn, "SELECT id FROM users WHERE company_id = {$co} AND role IN ({$rin})
+                                   AND COALESCE(status,'active')='active' ORDER BY id LIMIT 1");
+        if ($u && ($uu = mysqli_fetch_row($u))) { $mgr = intval($uu[0]); }
+        if ($mgr === null) { continue; }
+        $res = WI::create($conn, array(
+            'company_id' => $co, 'source_type' => 'SRC-08',
+            'source_ref' => 'ARC-' . $cycle . '-U' . $unit, 'source_screen' => 'Governance/access_review.php',
+            'owner_user_id' => $lead, 'assigned_user_id' => $mgr, 'org_unit_id' => $unit,
+            'title' => 'راجع وصول أعضاء إدارتك — حملة ' . $cycle,
+            'details' => 'أكّد حاجة كل عضوٍ لصلاحياته الحالية أو اطلب سحبها — M-14 §المراجعة الدورية.',
+            'deliverable' => 'تأكيد أو طلبات سحبٍ لكل أعضاء الإدارة',
+            'evidence_required' => 'ملاحظة الإقفال بأسماء من رُوجعوا',
+            'priority' => 'P3', 'due_at' => date('Y-m-d H:i:s', time() + 86400 * 14), 'created_by' => 0,
+            'parent_ref' => 'ARC-' . $cycle,
+        ));
+        if (!empty($res['ok'])) { $campTasks++; }
+    }
+}
+fwrite(STDOUT, "⑧ حملة المراجعة الدورية {$cycle}: مهام وُلدت {$campTasks}\n");
+
 fwrite(STDOUT, "✔ اكتمل النبض\n");
