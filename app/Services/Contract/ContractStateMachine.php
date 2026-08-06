@@ -328,11 +328,14 @@ class ContractStateMachine
                     'created_by'      => (int) $actor ?: 1,
                     'idempotency_key' => 'contract_signed:' . (int) $contractId . ':' . $from,
                     'contract_id'     => (int) $contractId,
-                    'notes'           => 'توقيعُ العقد' . (!empty($row['contract_no']) ? ' ' . $row['contract_no'] : ''),
+                    'notes'           => 'توقيعُ العقد #' . (int) $contractId
+                                         . (!empty($row['second_party']) ? ' — ' . $row['second_party'] : ''),
                     'payload'         => array(
                         'contract_id'  => (int) $contractId,
-                        'contract_no'  => isset($row['contract_no']) ? (string) $row['contract_no'] : '',
-                        'client_id'    => isset($row['client_id']) ? (int) $row['client_id'] : 0,
+                        // هوية العقد الفعلية: طرفاه ومشروعه (لا عمودَ رقمٍ في contracts)
+                        'first_party'  => isset($row['first_party']) ? (string) $row['first_party'] : '',
+                        'second_party' => isset($row['second_party']) ? (string) $row['second_party'] : '',
+                        'project_id'   => isset($row['project_id']) ? (int) $row['project_id'] : 0,
                         'signing_date' => isset($row['contract_signing_date']) ? (string) $row['contract_signing_date'] : '',
                         'from'         => $from,
                         'note'         => trim((string) $note),

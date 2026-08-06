@@ -252,11 +252,14 @@ class RequestService
             }
         }
 
+        // الفرع في PHP لا في SQL: مقارنةُ معلمةٍ بنصٍّ حرفيٍّ داخل CASE تخلط
+        // الترتيبات (general_ci×unicode_ci) فتُفشل التنفيذ صامتًا وتُقرأ «سباق حالة»
+        $holderCol = ($to === 'returned') ? 'requester_user_id' : 'current_holder_user_id';
         $st = $conn->prepare("UPDATE requests SET status = ?, status_reason = ?, approved_by = ?, approved_at = NOW(),
-                                current_holder_user_id = CASE WHEN ? = 'returned' THEN requester_user_id ELSE current_holder_user_id END
+                                current_holder_user_id = {$holderCol}
                               WHERE id = ? AND status IN ('submitted','routed','in_approval')");
-        $st->bind_param('ssisi', $to, $noteS, $actor, $to, $id);
-        $st->execute();
+        $st->bind_param('ssii', $to, $noteS, $actor, $id);
+        $st->execute() or error_log('RequestService decide UPDATE #' . $id . ': ' . $st->error);
         $ok = $st->affected_rows > 0;
         $st->close();
         if (!$ok) { return array('ok' => false, 'code' => 409, 'reason' => 'سباق حالة'); }
