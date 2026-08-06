@@ -45,13 +45,13 @@ while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; }
 fwrite(STDOUT, "بلا جسر: " . count($rows) . "\n\n");
 
 $matchSt = $conn->prepare(
-    "SELECT t.id, t.executed_hours, t.tons_count, t.meters_count, t.employee_id
+    "SELECT t.id, t.executed_hours, t.tons_count, t.meters_count, t.employee_id, t.shift
        FROM timesheet t
        JOIN operations op ON op.id = t.operator
       WHERE op.equipment = ? AND t.`date` = ? AND t.company_id = ?");
 $qtyCol = array('hour' => 'executed_hours', 'ton' => 'tons_count', 'meter' => 'meters_count');
 
-$bridged = 0; $healed = 0; $ambiguous = array(); $nomatch = 0; $lvl = array(1 => 0, 2 => 0, 3 => 0);
+$bridged = 0; $healed = 0; $ambiguous = array(); $nomatch = 0; $lvl = array(1 => 0, 2 => 0, 3 => 0, 4 => 0);
 foreach ($rows as $ue) {
     $eq = intval($ue['equipment_id']); $dt = strval($ue['entry_date']); $co = intval($ue['company_id']);
     $matchSt->bind_param('isi', $eq, $dt, $co);
@@ -77,6 +77,16 @@ foreach ($rows as $ue) {
                 if (abs(round((float) $t[$qtyCol[$ue['unit_type']]], 2) - $qv) < 0.005) { $sub3[] = $t; }
             }
             if (count($sub3) === 1) { $pick = $sub3[0]; $level = 3; }
+        }
+        // L4: تضييقٌ بالوردية — ue.shift الثنائية ↔ نصُّ ts النظيف
+        // (day=صباحية · night=مسائية — قِيست القيم قبل الاعتماد: لا سواهما)
+        if ($pick === null) {
+            $want = ($ue['shift'] === 'night') ? 'مسائية' : 'صباحية';
+            $sub4 = array();
+            foreach ($cands as $t) {
+                if (trim((string) $t['shift']) === $want) { $sub4[] = $t; }
+            }
+            if (count($sub4) === 1) { $pick = $sub4[0]; $level = 4; }
         }
     }
 
@@ -124,6 +134,6 @@ if ($ambiguous) {
     fclose($f);
 }
 
-fwrite(STDOUT, "الجسر: {$bridged} (L1={$lvl[1]} · L2={$lvl[2]} · L3كمية={$lvl[3]}) · شفاءُ رأسٍ صفري: {$healed}\n");
+fwrite(STDOUT, "الجسر: {$bridged} (L1={$lvl[1]} · L2={$lvl[2]} · L3كمية={$lvl[3]} · L4وردية={$lvl[4]}) · شفاءُ رأسٍ صفري: {$healed}\n");
 fwrite(STDOUT, "غامض: " . count($ambiguous) . " (docs/E02_BRIDGE_AMBIGUOUS_ar.csv) · بلا مقابل: {$nomatch}\n");
 fwrite(STDOUT, $APPLY ? "✔ نُفِّذ\n" : "— معاينة فقط\n");
