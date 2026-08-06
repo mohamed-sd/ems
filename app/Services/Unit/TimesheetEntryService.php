@@ -57,7 +57,9 @@ class TimesheetEntryService
 
     /** ورديات الشاشات القديمة → ENUM الوردية القانوني. */
     const SHIFT_MAP = array('D' => 'day', 'N' => 'night', 'ص' => 'day', 'م' => 'night',
-                            'day' => 'day', 'night' => 'night');
+                            'day' => 'day', 'night' => 'night',
+                            // الأسماء العربية الكاملة (بذور 2026-08-06 وشاشات الإدارات)
+                            'صباحية' => 'day', 'مسائية' => 'night');
 
     // ═══════════════════════════════════════════════════════════════════════
     // §8.3 — الإدخال: POST /units
@@ -118,6 +120,33 @@ class TimesheetEntryService
         }
         if (!empty($missing)) {
             return array('ok' => false, 'code' => 422, 'missing' => $missing, 'warnings' => array());
+        }
+
+        /* AC-E02-04 (م-و): «لا صفَّ بلا أربعة» — الوردية والتخصيص محروسان
+           أعلاه، وهذان الباقيان (الجاهزية والتكليف) يُفحصان هنا في كل إدخالٍ
+           لا في مسار الخطة وحده: معدةٌ بحالة صحةٍ مانعةٍ أو بلا مشغّلٍ مكلفٍ
+           يوم العمل تُعلَّم. العلم EMS_E02_ENTRY_QUAD: monitor يحذر (افتراضًا —
+           فالموروث لم يُلتقط تكليفه كاملًا) وenforce يرفض 422 مسمًّى. */
+        $quadMode = function_exists('ems_env') ? strtolower((string) ems_env('EMS_E02_ENTRY_QUAD', 'monitor')) : 'monitor';
+        $quadWarn = array();
+        if ($quadMode !== 'off') {
+            // config يضبط mysqli على عدم الرمي — افحص المُرجَع (درس H-01)
+            $rq = $conn->query("SELECT availability_state FROM equipments WHERE id = " . intval($equipmentId));
+            $eq = $rq ? $rq->fetch_assoc() : null;
+            $health = $eq ? (string) $eq['availability_state'] : '';
+            if (in_array($health, array('معطلة', 'خارج الخدمة', 'out_of_service', 'broken'), true)) {
+                $quadWarn[] = 'readiness: المعدة بحالة «' . $health . '» يوم الإدخال';
+            }
+            $rq = $conn->query("SELECT COUNT(*) c FROM contractequipments ce
+                                 WHERE ce.equipment_id = " . intval($equipmentId));
+            $asg = $rq ? $rq->fetch_assoc() : null;
+            if (!$asg || intval($asg['c']) === 0) {
+                $quadWarn[] = 'assignment: المعدة بلا تكليفٍ تعاقديٍّ قائم';
+            }
+            if ($quadWarn && $quadMode === 'enforce') {
+                return array('ok' => false, 'code' => 422, 'missing' => $quadWarn, 'warnings' => array());
+            }
+            foreach ($quadWarn as $w) { error_log('[E02][QUAD][' . $quadMode . '] eq=' . $equipmentId . ' ' . $w); }
         }
 
         // ── العطالة الخدمية: (المعدة × التاريخ × الوردية) → 200 بالمرجع (§8.2/§8.3) ──
