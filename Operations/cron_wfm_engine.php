@@ -125,22 +125,20 @@ while ($r && ($q = mysqli_fetch_assoc($r))) {
 fwrite(STDOUT, "④ مهل الطلبات: صُعّد {$esc}\n");
 
 /* ⑤ حوكمة M-14 · BR-GOV-05: الاستثناء ينقضي بانقضاء مدته ولا يمتد بالسكوت.
-   (الشاشة على المخزن البيني — الكنس على طبقتها ويرتحل مع اللحاق) */
+   (الموجة ٢: الشاشة تحررت إلى جدولها الأصلي scr_exceptions — ارتحل الكنس معها) */
 $expired = 0;
-$r = mysqli_query($conn, "SELECT id, company_id, payload, status FROM cmp03_screen_rows
-                           WHERE canonical_file = 'exceptions.php'
-                             AND status NOT IN ('منتهٍ','منته','ملغى','مرفوض') LIMIT 500");
+$r = mysqli_query($conn, "SELECT id, period_to FROM scr_exceptions
+                           WHERE status NOT IN ('منتهٍ','منته','ملغى','مرفوض') LIMIT 500");
 while ($r && ($x = mysqli_fetch_assoc($r))) {
-    $p = json_decode((string) $x['payload'], true) ?: array();
-    $until = trim((string) ($p['المدة إلى'] ?? ''));
+    $until = trim((string) ($x['period_to'] ?? ''));
     if ($until === '' || !preg_match('/^\d{4}-\d{2}-\d{2}/', $until)) { continue; }
     if (strtotime(substr($until, 0, 10)) >= strtotime(date('Y-m-d'))) { continue; }
-    $p['تاريخ الانتهاء'] = $p['تاريخ الانتهاء'] ?? date('Y-m-d');
-    $p['الحالة'] = 'منتهٍ';
-    $st = $conn->prepare("UPDATE cmp03_screen_rows SET status = 'منتهٍ', payload = ? WHERE id = ?");
-    $json = json_encode($p, JSON_UNESCAPED_UNICODE);
+    $st = $conn->prepare("UPDATE scr_exceptions
+                             SET status = 'منتهٍ', status_label = 'منتهٍ',
+                                 date_expiry = COALESCE(date_expiry, CURDATE())
+                           WHERE id = ?");
     $rid = intval($x['id']);
-    $st->bind_param('si', $json, $rid);
+    $st->bind_param('i', $rid);
     if ($st->execute() && $st->affected_rows > 0) { $expired++; }
     $st->close();
 }

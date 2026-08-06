@@ -50,6 +50,18 @@ function gov_security_tail($maxBytes = 800000)
 }
 function gov_interim_rows(mysqli $c, $canonical, $co, $limit = 500)
 {
+    // الموجة ٢ (2026-08-06): الشاشة المحررة تُقرأ من جدولها الأصلي عبر محوّل
+    // السجل (الحمولة بالتسميات نفسها) — وغير المسجَّلة تبقى على المخزن البيني.
+    require_once __DIR__ . '/../includes/cmp03_local_store.php';
+    $reg = cmp03_registry();
+    if (isset($reg[$canonical])) {
+        $rows = array();
+        foreach (cmp03_store_rows($c, $canonical, intval($co), $limit) as $x) {
+            $x['p'] = $x['payload'];
+            $rows[] = $x;
+        }
+        return $rows;
+    }
     $rows = array();
     $st = $c->prepare("SELECT id, payload, status, created_at FROM cmp03_screen_rows
                         WHERE canonical_file = ? AND company_id = ? ORDER BY id DESC LIMIT " . intval($limit));
