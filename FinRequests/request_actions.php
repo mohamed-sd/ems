@@ -291,6 +291,13 @@ if (array_key_exists($action, $machine_actions)) {
             }
         });
 
+        // BR-CEO-05 (M-00): بعد نجاح الإرسال يُقاس حدا DEC-01 ③ — والتجاوز
+        // يرفع صفًّا آليًّا لشاشة الاعتماد الأعلى (fail-soft: لا يعطّل الإرسال)
+        if ($action === 'submit' || $action === 'resubmit') {
+            $fresh = finreq_fetch($gate, $id);
+            if ($fresh) { finreq_gm_escalate($conn, $gate, $fresh); }
+        }
+
         $msgs = array(
             'submit' => '✅ أُرسل الطلب للمراجعة الإدارية',
             'resubmit' => '✅ استُكمل الطلب وأُعيد إرساله بالرقم نفسه',

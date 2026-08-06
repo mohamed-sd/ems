@@ -841,3 +841,124 @@ function finreq_journey($gate, array $req, array $timeline = array(), $routing =
 
     return $j;
 }
+
+/**
+ * BR-CEO-05 (M-00): الرفعُ الآلي للاعتماد الأعلى عند تجاوز حدَّي DEC-01 ③
+ * — يُقاس عند الإرسال لا بعد التنفيذ: الأثرُ > min(5٪ من المرجع الشهري للعقد،
+ * 10,000$ معادلًا). قاعدةُ عدم التلفيق نافذة: بلا سعر صرفٍ لا حدَّ دولاريًّا،
+ * وبلا عقدٍ مرجعيٍّ لا حدَّ نسبيًّا — وما لا يُقاس بأحدهما يُتخطى معلَنًا.
+ * الرفع = صفٌّ حقيقيٌّ في شاشة الاعتماد الأعلى (idempotent برقم الطلب)
+ * + تنبيهٌ للتنفيذي. فشلُه لا يعطّل الإرسال (fail-soft بسجل).
+ * @return true رُفع · false دون الحدين · null لم يُقَس (معلَن)
+ */
+function finreq_gm_escalate(mysqli $conn, $gate, array $req)
+{
+    try {
+        require_once __DIR__ . '/../app/Services/Governance/UnitStateChangeService.php';
+        require_once __DIR__ . '/../includes/fx.php';
+
+        $amount = abs((float) $req['amount']);
+        $cur    = strval($req['currency'] ?: '');
+        if ($amount <= 0) { return null; }
+
+        // المرجع الشهري من العقد المربوط (بعملة العقد — التصريح في سبب الرفع)
+        $monthlyRef = null;
+        if (!empty($req['contract_id'])) {
+            $st = $conn->prepare("SELECT total_contract_permonth FROM contracts WHERE id = ? LIMIT 1");
+            $cid = intval($req['contract_id']);
+            $st->bind_param('i', $cid);
+            $st->execute();
+            $w = $st->get_result()->fetch_assoc();
+            $st->close();
+            if ($w && (float) $w['total_contract_permonth'] > 0) { $monthlyRef = (float) $w['total_contract_permonth']; }
+        }
+
+        // المعادل الدولاري: عملةُ الأساس معادلُها ذاتُها، وسواها عبر جدول الأسعار
+        // — لا سعرَ فلا حدَّ دولاريًّا (لا 1:1 ملفَّقة). التحويل بمعزلٍ (بوابة
+        // الأسعار جلسية وقد تغيب في CLI) وغيابُه لا يُسقط التقدير النسبي.
+        $usd = null;
+        try {
+            $code = function_exists('ems_fx_code') ? ems_fx_code($cur) : null;
+            $baseC = function_exists('ems_fx_base_currency') ? ems_fx_base_currency() : null;
+            if ($code !== null && $baseC !== null && $code === $baseC) {
+                $usd = $amount; // الأساس نفسه — تعادلٌ لا تحويل
+            } elseif ($code !== null && function_exists('ems_fx_to_base')) {
+                $fx = ems_fx_to_base($amount, $cur, date('Y-m-d'));
+                if (is_array($fx) && !empty($fx['ok'])) { $usd = (float) $fx['base']; }
+            }
+        } catch (\Throwable $t) {
+            error_log('finreq_gm_escalate fx: ' . $t->getMessage());
+        }
+
+        if ($usd === null && $monthlyRef === null) {
+            error_log('finreq_gm_escalate: ' . $req['request_no'] . ' لا سعر ولا مرجع شهري — لم يُقَس (معلَن)');
+            return null;
+        }
+
+        $assess = \App\Services\Governance\UnitStateChangeService::assessGmNeed(
+            $amount, $monthlyRef, ($usd !== null ? $usd : 0.0), '');
+        if (empty($assess['needs_gm'])) { return false; }
+
+        // idempotent: صفُّ الاعتماد الأعلى برقم الطلب لا يتكرر (يشمل resubmit)
+        $co = intval($req['company_id']);
+        $no = strval($req['request_no']);
+        // النمط يُبنى في PHP — CONCAT مع معلمةٍ يخلط الترتيبات فيفشل صامتًا (MariaDB)
+        $like = '%' . $no . '%';
+        $st = $conn->prepare("SELECT id FROM cmp03_screen_rows
+                               WHERE canonical_file = 'ceo_approvals.php' AND company_id = ?
+                                 AND payload LIKE ? LIMIT 1");
+        $st->bind_param('is', $co, $like);
+        $st->execute();
+        $dupe = $st->get_result()->fetch_assoc();
+        $st->close();
+        if ($dupe) { return true; }
+
+        $capTxt = ($monthlyRef !== null)
+            ? ('min(5٪ = ' . round($monthlyRef * 0.05, 2) . ' ' . $cur . ' · 10,000$)')
+            : '10,000$ معادلًا';
+        $payload = array(
+            'رقم الطلب'        => $no,
+            'تاريخ الورود'     => date('Y-m-d'),
+            'نوع المستند'      => 'طلب مالي (' . strval($req['request_type']) . ')',
+            'المستند'          => mb_substr(strval($req['statement'] ?: $req['justification']), 0, 160),
+            'الإدارة الطالبة'  => strval($req['source_module']),
+            'سبب الرفع للأعلى' => $assess['reason'],
+            'القيمة'           => (string) $amount,
+            'العملة'           => $cur,
+            'سقف الإدارة'      => $capTxt,
+            'التجاوز'          => ($usd !== null ? ('المعادل ' . round($usd, 2) . '$') : 'بحد النسبة'),
+            'المهلة'           => strval($req['needed_by'] ?: '48 ساعة'),
+            'الحالة'           => 'قيد المراجعة',
+        );
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $creator = 'آلي — DEC-01 ③ (بوابة الطلب المالي)';
+        $uid = intval($req['created_by'] ?: 0);
+        $st = $conn->prepare("INSERT INTO cmp03_screen_rows
+            (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
+            VALUES (?, 'ceo_approvals.php', ?, 'قيد المراجعة', 0, ?, ?)");
+        $st->bind_param('isis', $co, $json, $uid, $creator);
+        $st->execute();
+        $rowId = intval($conn->insert_id);
+        $st->close();
+
+        if (function_exists('log_security_event')) {
+            log_security_event('CEO_CEILING_ESCALATED', $no . ' → CMP03-' . $rowId . ' — ' . $assess['reason']);
+        }
+        // تنبيه التنفيذي الأول الحي في الشركة (fail-soft)
+        try {
+            require_once __DIR__ . '/../app/Services/Work/WorkItemService.php';
+            $r9 = $conn->query("SELECT id FROM users WHERE role = '9' AND company_id = {$co}
+                                 AND COALESCE(status,'active') = 'active' ORDER BY id LIMIT 1");
+            $w9 = $r9 ? $r9->fetch_assoc() : null;
+            if ($w9) {
+                \App\Services\Work\WorkItemService::notifyUser($conn, $co, intval($w9['id']),
+                    'تجاوزُ سقفٍ رفع آليًّا للاعتماد الأعلى: ' . $no,
+                    $assess['reason'], 'Portal/ceo_approvals.php', true, $uid ?: 1);
+            }
+        } catch (\Throwable $t) { error_log('finreq_gm_escalate notify: ' . $t->getMessage()); }
+        return true;
+    } catch (\Throwable $t) {
+        error_log('finreq_gm_escalate ' . strval($req['request_no'] ?? '?') . ': ' . $t->getMessage());
+        return null;
+    }
+}
