@@ -167,3 +167,16 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
     }
     ?>
 </div>
+<?php
+/* AS-04 (UXR-0037): سطرٌ ثانٍ صغيرٌ بالأرقام السياقية تحت العنوان — تملؤه
+   الشاشة قبل التضمين بمصفوفة $header_context = ['التسمية' => 'القيمة', ...].
+   كلُّ رقمٍ معروضٍ هنا يذكر تسميتَه (نصف إعلان المقام — UI-DEF-03). */
+if (!empty($header_context) && is_array($header_context)) {
+    echo '<div class="ems-page-context" dir="rtl">';
+    foreach ($header_context as $__ctxK => $__ctxV) {
+        echo '<span>' . htmlspecialchars((string) $__ctxK, ENT_QUOTES, 'UTF-8')
+           . ': <b>' . htmlspecialchars((string) $__ctxV, ENT_QUOTES, 'UTF-8') . '</b></span>';
+    }
+    echo '</div>';
+    $header_context = array(); // لا تسرُّبَ لتضمينٍ لاحقٍ في الصفحة نفسها
+}

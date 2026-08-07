@@ -54,14 +54,16 @@ $myMsgs = $q1("SELECT COUNT(*) FROM personal_notifications WHERE company_id = {$
         + $q1("SELECT COUNT(*) FROM fin_notifications WHERE company_id = {$company_id}
                 AND is_read = 0 AND (target_user_id = {$uid} OR target_user_id IS NULL)");
 
+/* UXR-0071 (UI-DEF: ترتيب الأولوية معكوس): ما ينتظر قراري وتنفيذي يتصدر —
+   القرارات (موافقاتي) أولًا ثم التنفيذ (مهامي) ثم متابعاتي، والمعلوماتي بعدها. */
 $tiles = array(
-    array('① لوحة دوري', 'ما ينتظرني اليوم بترتيب الإلحاح', 'fa fa-tachometer-alt', '../main/dashboard.php', null),
+    array('① موافقاتي', 'صندوق الاعتماد الموحد: طلباتٌ وخطواتٌ وحلقاتُ سلسلةٍ — كلٌّ يقفز لموضع فعله', 'fa fa-check-double', '../Portal/approvals_inbox.php', $myApprovals),
     array('② مهامي', 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري', 'fa fa-tasks', '../Portal/my_tasks.php', $myTasks),
-    array('③ موافقاتي', 'صندوق الاعتماد الموحد: طلباتٌ وخطواتٌ وحلقاتُ سلسلةٍ — كلٌّ يقفز لموضع فعله', 'fa fa-check-double', '../Portal/approvals_inbox.php', $myApprovals),
+    array('③ بلاغاتي', 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة', 'fa fa-bullhorn', '../Tickets/ticket_contextual_open.php', $myTickets),
     array('④ طلباتي', 'من قاموس الأنواع الـ62 — وكلُّ طلبٍ يُعرف عند مَن توقف', 'fa fa-paper-plane', '../Portal/my_requests.php', $myRequests),
-    array('⑤ طلب جديد', 'تقديمٌ من القاموس الحاكم — والمالي عبر بوابته', 'fa fa-plus-circle', '../Portal/my_requests.php', null),
-    array('⑥ المراسلات والتنبيهات', 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط', 'fa fa-bell', '../Portal/notifications.php', $myMsgs),
-    array('⑦ بلاغاتي', 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة', 'fa fa-bullhorn', '../Tickets/ticket_contextual_open.php', $myTickets),
+    array('⑤ المراسلات والتنبيهات', 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط', 'fa fa-bell', '../Portal/notifications.php', $myMsgs),
+    array('⑥ طلب جديد', 'تقديمٌ من القاموس الحاكم — والمالي عبر بوابته', 'fa fa-plus-circle', '../Portal/my_requests.php', null),
+    array('⑦ لوحة دوري', 'ما ينتظرني اليوم بترتيب الإلحاح', 'fa fa-tachometer-alt', '../main/dashboard.php', null),
     array('⑧ ملفي', 'ملفي الشخصي وكشوفي ووثائقي', 'fa fa-id-card', '../Portal/my_portal.php', null),
     // NAV-01 v6 §7 (update0007 S-03/S-04): عنصران إلزاميان لكل حسابٍ بلا استثناء
     array('⑨ إنجازي', 'ما أنجزتُه أمسِ والأسبوعَ والشهرَ — وبمدةٍ أحددها بتاريخين · بلغة عملي', 'fa fa-trophy', '../Portal/my_achievement.php', null),

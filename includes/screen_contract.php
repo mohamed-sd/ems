@@ -150,3 +150,29 @@ if (!function_exists('ems_screen_about_auto')) {
         ems_screen_about($purpose);
     }
 }
+
+if (!function_exists('ems_shell_axes')) {
+    /**
+     * CM-00 (DEC-E · update0010) — اشتقاقُ محاورِ الغلافِ الحاكمِ من مصادرها الحية
+     * وبذرُها لـinheader (data-ems-ax-*). تُستدعى قبل تضمين inheader:
+     *   ems_shell_axes($perms);                          // الاشتقاق القياسي
+     *   ems_shell_axes($perms, array('edit' => 'locked')); // تجاوزٌ من آلة الحالة/إقفال الفترة
+     * AX-2 الصلاحية من محرّك الصلاحيات · AX-3 التحرير منه ومن تجاوز الشاشة ·
+     * AX-1/4/5 افتراضيةً هنا ويحدّثها العميل (الجلبُ والاتصالُ والحداثةُ لحظية).
+     */
+    function ems_shell_axes($perms = null, array $override = array())
+    {
+        $canView = is_array($perms) ? !empty($perms['can_view']) : true;
+        $canWrite = is_array($perms) && (!empty($perms['can_edit']) || !empty($perms['can_add']) || !empty($perms['can_delete']));
+        $ax = array(
+            'data' => 'data',
+            'permission' => $canWrite ? 'full' : ($canView ? 'partial' : 'none'),
+            'edit' => $canWrite ? 'editable' : 'readonly',
+            'connection' => 'online',
+            'freshness' => 'fresh',
+        );
+        foreach ($override as $k => $v) { $ax[$k] = $v; }
+        $GLOBALS['EMS_AX'] = $ax;
+        return $ax;
+    }
+}

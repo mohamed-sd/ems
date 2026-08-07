@@ -915,7 +915,12 @@ if ($result) foreach ($result as $row) {
                                 <th style="padding:8px 12px;">الفئة الرئيسية</th>
                                 <th style="padding:8px 12px;">الفئة الفرعية</th>
                                 <th style="padding:8px 12px;">تفصيل العطل</th>
-                            </tr>
+                                                <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
+</tr>
                         </thead>
                         <tbody>
                             <?php $fi = 1; foreach ($ts_fault_records as $_flt): ?>

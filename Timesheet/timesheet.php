@@ -687,6 +687,9 @@ if ($type !== "1" && $type !== "2" && $type !== "3") {
 }
 
 $page_title = "إيكوبيشن | التايم شيت اليومي (إدخال الوحدات)";
+// CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -888,6 +891,15 @@ try {
   $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
+
+  <?php /* UI-16 (UXR-0063): شريحة المزامنة ظاهرة دائمًا في الشاشة الميدانية —
+           تقرأ محور الاتصال من الغلاف الحاكم CM-00 وتتحدث مع online/offline. */ ?>
+  <div id="tsSyncChip" style="margin:0 2px 10px"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.EmsUI) { document.getElementById('tsSyncChip').appendChild(EmsUI.syncChip()); }
+    });
+  </script>
 
   <?php if ($ts_day_total > 0): ?>
   <!-- UX-03 §5.1: عدّادُ اليوم — «بطاقةُ المعدة تتلوّن منجزةً وعدّادُ المتبقي ينقص» -->

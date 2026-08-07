@@ -147,7 +147,10 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
     }
     static $moreSeq = 0;
     foreach ($byGroup as $gname => $gItems) {
-        if ($gname !== '') {
+        // UI-DEF-05: مجموعةٌ برابطٍ واحدٍ يحمل اسمَها نفسَه كانت تطبع النصَّ مرتين
+        // (رأسًا ثم رابطًا) فتُقرأ تكرارًا — الرأسُ يسقط والرابطُ يبقى.
+        $soloSameName = (count($gItems) === 1 && trim((string) $gItems[0]['label_ar']) === trim((string) $gname));
+        if ($gname !== '' && !$soloSameName) {
             echo '<li class="nav-subhead" aria-hidden="true"><span>'
                . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
         }
@@ -239,7 +242,9 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         foreach ($sItems as $it) { $byGroup[(string) $it['group_name']][] = $it; }
         static $stMoreSeq = 1000;
         foreach ($byGroup as $gname => $gItems) {
-            if ($gname !== '' && count($byGroup) > 1) {
+            // UI-DEF-05 نفسه في وضع المراحل: رأسٌ يطابق رابطَه الوحيد لا يُطبع.
+            $soloSameName = (count($gItems) === 1 && trim((string) $gItems[0]['label_ar']) === trim((string) $gname));
+            if ($gname !== '' && count($byGroup) > 1 && !$soloSameName) {
                 echo '<li class="nav-subhead" aria-hidden="true"><span>'
                    . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
             }

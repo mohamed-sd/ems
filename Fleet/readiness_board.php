@@ -27,6 +27,9 @@ $COLORS = array('working' => '#1a7f37', 'idle' => '#b58a00', 'stopped' => '#c628
 $LABELS = array('working' => 'تعمل', 'idle' => 'استعداد', 'stopped' => 'متوقفة', 'maintenance' => 'صيانة/بلاغ');
 
 $page_title = 'إيكوبيشن | لوحة الجاهزية';
+// CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
 include '../inheader.php';
 include '../insidebar.php';
 ?>

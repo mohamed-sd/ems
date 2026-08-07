@@ -195,7 +195,9 @@ $role6SupplierBreakdown = [];
 $role6ContextText = '';
 $opsProjectCol = 'project_id';
 
-if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
+// الدور 9 (الرئيس التنفيذي) يرى عدادات الشركة الشاملة — كان ساقطًا من السلسلة
+// فيهبط على بديل الأصفار المثبَّتة (UI-DEF-02: العداد صفر والعقود 250).
+if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "9" || $dashboardRole == "12") {
   $c = dashboard_gate_scalar($dash_gate, array('scope' => array('clients' => 'clients')),
     "SELECT COUNT(*) AS t FROM clients WHERE status='نشط' AND {TENANT_SCOPE}");
   $p = dashboard_gate_scalar($dash_gate, array('scope' => array('project' => 'project')),
@@ -1143,19 +1145,27 @@ body.ems-site,
     </div>
 
     <?php
+    // دور بلا فرع عدادات: لا نلفّق أصفارًا (UI-DEF-02 / قاعدة «لا رقم بلا بيانات») —
+    // تُعرض شرطة «—» بدل عدّاد كاذب.
     $displayStats = !empty($stats) ? $stats : [
-      ['fa-users', 0, 'العمـــــلاء', 'or'],
-      ['fa-project-diagram', 0, 'المشــــاريع', 'or'],
-      ['fa-file-contract', 0, 'العقود', 'or'],
-      ['fa-user-shield', 0, 'المستخدمون', 'or'],
+      ['fa-users', null, 'العمـــــلاء', 'or'],
+      ['fa-project-diagram', null, 'المشــــاريع', 'or'],
+      ['fa-file-contract', null, 'العقود', 'or'],
+      ['fa-user-shield', null, 'المستخدمون', 'or'],
     ];
     ?>
     <div class="shot-stat-panel">
       <div class="shot-stat-grid">
         <?php foreach ($displayStats as $st): ?>
-        <div class="shot-stat-card">
+        <div class="shot-stat-card" title="<?= htmlspecialchars($st[2]) ?> — الوحدة: سجل · الفترة: لحظي · بلا مقارنة معلنة">
           <div class="shot-stat-label"><?= htmlspecialchars($st[2]) ?></div>
+          <?php if ($st[1] === null): ?>
+          <div class="shot-stat-value">&mdash;</div>
+          <?php else: ?>
           <div class="shot-stat-value" data-count="<?= intval($st[1]) ?>">00</div>
+          <?php // UI-07: إعلان الوحدة والفترة تحت الرقم (الثيم الإنلайн لا يُمس — سطر خافت فقط) ?>
+          <div style="font-size:10px;opacity:.55;margin-top:2px">سجل · لحظي</div>
+          <?php endif; ?>
         </div>
         <?php endforeach; ?>
       </div>

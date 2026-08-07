@@ -52,28 +52,34 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         $ems_tb_roleText = 'مستخدم';
     }
 
-    // اسم الموظف صاحب الحساب المسجَّل دخوله (عبر الربط users.employee_id).
-    // يُخزَّن في الجلسة كالدور لتفادي الاستعلام في كل صفحة.
-    $ems_tb_userId  = isset($ems_tb_user['id']) ? intval($ems_tb_user['id']) : 0;
-    $ems_tb_empName = '';
+    // اسم الموظف صاحب الحساب المسجَّل دخوله (عبر الربط users.employee_id)
+    // ومسمّاه الوظيفي الحقيقي (employees.job_title_id → job_titles.name).
+    // كانت حاويّة «المسمى الوظيفي» تطبع اسمَ الشخص (UI-DEF-01) — الربط صُحّح هنا.
+    // يُخزَّنان في الجلسة كالدور لتفادي الاستعلام في كل صفحة (غياب مفتاح title
+    // في خبيئة جلسة قديمة يعيد الاستعلام تلقائيًّا).
+    $ems_tb_userId   = isset($ems_tb_user['id']) ? intval($ems_tb_user['id']) : 0;
+    $ems_tb_empName  = '';
+    $ems_tb_jobTitle = '';
     if ($ems_tb_userId > 0) {
         if (
-            isset($_SESSION['ems_topbar_emp_label']['uid'], $_SESSION['ems_topbar_emp_label']['text'])
+            isset($_SESSION['ems_topbar_emp_label']['uid'], $_SESSION['ems_topbar_emp_label']['text'], $_SESSION['ems_topbar_emp_label']['title'])
             && (int) $_SESSION['ems_topbar_emp_label']['uid'] === $ems_tb_userId
         ) {
-            $ems_tb_empName = $_SESSION['ems_topbar_emp_label']['text'];
+            $ems_tb_empName  = $_SESSION['ems_topbar_emp_label']['text'];
+            $ems_tb_jobTitle = $_SESSION['ems_topbar_emp_label']['title'];
         } elseif (isset($conn) && $conn) {
-            if ($ems_tb_estmt = $conn->prepare('SELECT e.name FROM users u LEFT JOIN employees e ON e.id = u.employee_id WHERE u.id = ? LIMIT 1')) {
+            if ($ems_tb_estmt = $conn->prepare('SELECT e.name, jt.name AS job_title FROM users u LEFT JOIN employees e ON e.id = u.employee_id LEFT JOIN job_titles jt ON jt.id = e.job_title_id WHERE u.id = ? LIMIT 1')) {
                 $ems_tb_estmt->bind_param('i', $ems_tb_userId);
                 $ems_tb_estmt->execute();
                 if ($ems_tb_eres = $ems_tb_estmt->get_result()) {
                     if ($ems_tb_erow = $ems_tb_eres->fetch_assoc()) {
-                        $ems_tb_empName = (string) ($ems_tb_erow['name'] ?? '');
+                        $ems_tb_empName  = (string) ($ems_tb_erow['name'] ?? '');
+                        $ems_tb_jobTitle = (string) ($ems_tb_erow['job_title'] ?? '');
                     }
                 }
                 $ems_tb_estmt->close();
             }
-            $_SESSION['ems_topbar_emp_label'] = array('uid' => $ems_tb_userId, 'text' => $ems_tb_empName);
+            $_SESSION['ems_topbar_emp_label'] = array('uid' => $ems_tb_userId, 'text' => $ems_tb_empName, 'title' => $ems_tb_jobTitle);
         }
     }
 
@@ -140,42 +146,37 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
 
         <div class="ems-topbar-center">
             <?php
-            /* `data-value` هو الإضافةُ الوحيدةُ على الحاويّات — سِمةٌ بلا أثرٍ
-               تخطيطيٍّ البتّة، فالنصُّ داخلَها باقٍ سائبًا كما كان حرفًا بحرف
-               وعرضُ الحاويّة على الحاسوب لا يتزحزح نقطةً واحدة.
-               ولمَ لم يُفصَل الوسمُ عن القيمة في عنصرين؟ لأن النصَّ السائب
-               عنصرُ فلكسٍ مجهول، وقياسُه يختلف عن قياس النصّ نفسِه داخلَ
-               <span> بمقدار 8px (قِيس على الحاويّات الثلاث) — أي أن مجرّدَ
-               اللفّ يُنقص عرضَ شريط الهويّة 31px على الحاسوب بلا داعٍ.
-               فعلى الجوّال يُصمَّت النصُّ السائب بـ`font-size:0` وتُطبع القيمةُ
-               من هذه السِمة، والنصُّ الكاملُ يبقى في شجرة الوصولية للقارئ. */
+            /* AS-02 (UXR-0032/0033): الحاويّاتُ الأربع (الإدارة · الصفة · المسمى ·
+               الموظف) اندمجت في مبدّلِ سياقٍ واحدٍ يعرض «الإدارة | الصفة النشطة»
+               ويفتح لوحةً بالتفاصيل وتبديلِ الصفة. `data-value` تبقى لنسق الجوال
+               (font-size:0 + ::after — گوتشا فصل الـspans القائمة).
+               واسمُ الشخص انتقل لقائمة الحساب (UXR-0034-ب). */
+            $ems_tb_ctxShow = $ems_tb_roleText . ($ems_tb_capLabel !== '' ? ' | ' . $ems_tb_capLabel : '');
             ?>
-            <span class="ems-topbar-pill" title="الإدارة" data-value="<?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>">
-                <i class="fas fa-user-shield"></i>الإدارة: <?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>
-            </span>
-            <?php if ($ems_tb_capLabel !== '' || $ems_tb_capCount > 1): ?>
-                <?php $ems_tb_capShow = $ems_tb_capLabel !== '' ? $ems_tb_capLabel : ('متعددة (' . $ems_tb_capCount . ') ▾'); ?>
-                <a class="ems-topbar-pill" href="<?php echo htmlspecialchars($ems_tb_capsUrl, ENT_QUOTES, 'UTF-8'); ?>"
-                   title="مبدّل المساحة — صفاتك ونطاقاتك" style="text-decoration:none"
-                   data-value="<?php echo htmlspecialchars($ems_tb_capShow, ENT_QUOTES, 'UTF-8'); ?>">
-                    <i class="fas fa-people-arrows"></i>الصفة:
-                    <?php echo htmlspecialchars($ems_tb_capShow, ENT_QUOTES, 'UTF-8'); ?>
-                </a>
-            <?php endif; ?>
-            <?php if ($ems_tb_userName !== ''): ?>
-                <span class="ems-topbar-pill" title="المسمى الوظيفي" data-value="<?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?>">
-                    <i class="fas fa-user-circle"></i>المسمى الوظيفي: <?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?>
-                </span>
-            <?php endif; ?>
-            <?php if ($ems_tb_empName !== ''): ?>
-                <span class="ems-topbar-pill ems-topbar-pill--employee" title="الموظف المسؤول" data-value="<?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>">
-                    <i class="fas fa-id-card-alt"></i>الموظف المسؤول: <?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>
-                </span>
-            <?php else: ?>
-                <span class="ems-topbar-pill ems-topbar-pill--muted" title="الموظف المسؤول" data-value="غير مرتبط بموظف">
-                    <i class="fas fa-id-card-alt"></i>الموظف المسؤول: غير مرتبط بموظف
-                </span>
-            <?php endif; ?>
+            <div class="ems-ctx-switcher" id="emsCtxSwitcher">
+                <button type="button" class="ems-topbar-pill ems-ctx-btn" aria-haspopup="true" aria-expanded="false"
+                        title="مبدّل السياق — الإدارة والصفة والنطاق"
+                        data-value="<?php echo htmlspecialchars($ems_tb_ctxShow, ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="fas fa-user-shield"></i><?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>
+                    <?php if ($ems_tb_capLabel !== ''): ?><span class="ems-ctx-sep">|</span><?php echo htmlspecialchars($ems_tb_capLabel, ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
+                    <i class="fa fa-chevron-down" style="font-size:.7em;opacity:.55"></i>
+                </button>
+                <div class="ems-ctx-panel" role="menu" dir="rtl">
+                    <div class="ems-ctx-row"><i class="fas fa-user-shield"></i><span class="ems-ctx-k">الإدارة</span><span class="ems-ctx-v"><?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?></span></div>
+                    <?php if ($ems_tb_capLabel !== '' || $ems_tb_capCount > 1): ?>
+                    <div class="ems-ctx-row"><i class="fas fa-people-arrows"></i><span class="ems-ctx-k">الصفة النشطة</span><span class="ems-ctx-v"><?php echo htmlspecialchars($ems_tb_capLabel !== '' ? $ems_tb_capLabel : ('متعددة (' . $ems_tb_capCount . ')'), ENT_QUOTES, 'UTF-8'); ?></span></div>
+                    <?php endif; ?>
+                    <?php if ($ems_tb_jobTitle !== ''): ?>
+                    <div class="ems-ctx-row"><i class="fas fa-user-circle"></i><span class="ems-ctx-k">المسمى الوظيفي</span><span class="ems-ctx-v"><?php echo htmlspecialchars($ems_tb_jobTitle, ENT_QUOTES, 'UTF-8'); ?></span></div>
+                    <?php endif; ?>
+                    <div class="ems-ctx-row"><i class="fas fa-id-card-alt"></i><span class="ems-ctx-k">الموظف المسؤول</span><span class="ems-ctx-v"><?php echo $ems_tb_empName !== '' ? htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8') : 'غير مرتبط بموظف'; ?></span></div>
+                    <?php if ($ems_tb_capCount > 0): ?>
+                    <div class="ems-ctx-actions">
+                        <a href="<?php echo htmlspecialchars($ems_tb_capsUrl, ENT_QUOTES, 'UTF-8'); ?>"><i class="fas fa-repeat"></i> تبديل الصفة والنطاق</a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
 
         <div class="ems-topbar-actions">
@@ -203,13 +204,31 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
             <?php // البحثُ الموحَّد (NAV-01 §13-⑤): «يجد الكيانَ أيًّا كان نوعُه — فلا يُسأل المتدربُ عن الشاشة»
             $ems_tb_search = function_exists('ems_url') ? ems_url('main/global_search.php') : '/ems/main/global_search.php'; ?>
             <a href="<?php echo htmlspecialchars($ems_tb_search, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="البحث الموحد — بالكود أو الاسم" aria-label="البحث الموحد"><i class="fas fa-search"></i></a>
-            <?php // البوابةُ الشخصية (H-18): «متاحةٌ بنقرةٍ من أي صفحة» — بابُها هنا
-            $ems_tb_portal = function_exists('ems_url') ? ems_url('Portal/my_portal.php') : '/ems/Portal/my_portal.php'; ?>
-            <a href="<?php echo htmlspecialchars($ems_tb_portal, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="بوابتي — ماذا يخصّني أنا؟" aria-label="بوابتي"><i class="fas fa-id-card"></i></a>
-            <a href="<?php echo htmlspecialchars($ems_tb_tickets, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" id="emsTopbarTickets" title="البلاغات" aria-label="البلاغات"><i class="fas fa-tower-observation"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
-            <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-icon--power" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fas fa-power-off"></i></a>
-            <a href="<?php echo htmlspecialchars($ems_tb_profile, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الملف الشخصي" aria-label="الملف الشخصي"><i class="far fa-user"></i></a>
-            <a href="<?php echo htmlspecialchars($ems_tb_settings, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الإعدادات" aria-label="الإعدادات"><i class="fas fa-gear"></i></a>
+            <?php // AS-08: الجرسُ بعددٍ حقيقي (بلاغات ضمن نطاق الرؤية) — قائمًا منذ S12 ?>
+            <a href="<?php echo htmlspecialchars($ems_tb_tickets, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" id="emsTopbarTickets" title="البلاغات" aria-label="البلاغات"><i class="fas fa-bell"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
+            <?php // AS-08: زرُّ بلاغٍ سياقيٌّ ثابتُ الموضع
+            $ems_tb_newTicket = function_exists('ems_url') ? ems_url('Tickets/ticket_form.php') : '/ems/Tickets/ticket_form.php'; ?>
+            <a href="<?php echo htmlspecialchars($ems_tb_newTicket, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="بلاغ جديد" aria-label="بلاغ جديد"><i class="fas fa-bullhorn"></i></a>
+            <?php
+            /* AS-01 (UXR-0032): الأفعالُ الظاهرة خمسةٌ فقط — مساحةُ عملي · البحث ·
+               الجرس · بلاغٌ جديد · الحساب. والبقيةُ (بوابتي · الملف · الإعدادات ·
+               الخروج) في قائمة الحساب، ومعها اسمُ الشخص (UXR-0034-ب). */
+            $ems_tb_portal = function_exists('ems_url') ? ems_url('Portal/my_portal.php') : '/ems/Portal/my_portal.php';
+            ?>
+            <div class="ems-account-menu" id="emsAccountMenu">
+                <button type="button" class="ems-topbar-icon" title="الحساب" aria-label="الحساب" aria-haspopup="true" aria-expanded="false"
+                        style="background:none;border:0;cursor:pointer"><i class="far fa-user"></i></button>
+                <div class="ems-account-panel" role="menu" dir="rtl">
+                    <div class="ems-acct-head">
+                        <strong><?php echo htmlspecialchars($ems_tb_userName !== '' ? $ems_tb_userName : 'مستخدم', ENT_QUOTES, 'UTF-8'); ?></strong>
+                        <?php if ($ems_tb_empName !== ''): ?><small><?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?></small><?php endif; ?>
+                    </div>
+                    <a href="<?php echo htmlspecialchars($ems_tb_portal, ENT_QUOTES, 'UTF-8'); ?>"><i class="fas fa-id-card"></i> بوابتي</a>
+                    <a href="<?php echo htmlspecialchars($ems_tb_profile, ENT_QUOTES, 'UTF-8'); ?>"><i class="far fa-user"></i> الملف الشخصي</a>
+                    <a href="<?php echo htmlspecialchars($ems_tb_settings, ENT_QUOTES, 'UTF-8'); ?>"><i class="fas fa-gear"></i> الإعدادات</a>
+                    <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" style="color:#b91c1c"><i class="fas fa-power-off"></i> تسجيل الخروج</a>
+                </div>
+            </div>
         </div>
     </header>
     <style>
@@ -262,6 +281,30 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
                 if (!document.hidden) updateBreakdownBadge();
             });
             setInterval(updateBreakdownBadge, 60000);
+        })();
+
+        // ===== AS-02/قائمة الحساب: فتح/إغلاق اللوحتين (نقرة خارجية تُغلق · Esc تُغلق) =====
+        (function () {
+            ['emsCtxSwitcher', 'emsAccountMenu'].forEach(function (id) {
+                var box = document.getElementById(id);
+                if (!box) return;
+                var btn = box.querySelector('button');
+                btn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    var open = box.classList.toggle('open');
+                    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+            });
+            document.addEventListener('click', function () {
+                document.querySelectorAll('.ems-ctx-switcher.open, .ems-account-menu.open')
+                    .forEach(function (b) { b.classList.remove('open'); });
+            });
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Escape') {
+                    document.querySelectorAll('.ems-ctx-switcher.open, .ems-account-menu.open')
+                        .forEach(function (b) { b.classList.remove('open'); });
+                }
+            });
         })();
     </script>
     <?php

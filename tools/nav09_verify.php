@@ -150,6 +150,30 @@ while ($x = mysqli_fetch_assoc($r)) {
     }
 }
 
+/* ── ⑤ التكرار (UI-DEF-05): لا عنصرين بنفس التسمية والمسار داخل المجموعة
+ *     الواحدة، ولا عنصرَ موروثٍ (خارج مجموعات n9) يوازي عنصرًا مولَّدًا لنفس
+ *     الدور والمسار. الظهورُ المتعدد عبر مجموعاتٍ مختلفةٍ مقصودٌ بالوثيقة
+ *     (عدّاد الظهور 1075 > 206 شاشة) فلا يُحتسب. تصادمُ «رأسٌ يطابق رابطَه
+ *     الوحيد» يُكبح في المصيّر (unified_nav) بنيويًّا. ──────────────────── */
+$r = mysqli_query($conn,
+    "SELECT ni.role_id, ni.group_id, ni.label_ar, SUBSTRING_INDEX(ni.route,'#',1) base, COUNT(*) c
+     FROM nav_items ni WHERE ni.active = 1
+     GROUP BY ni.role_id, ni.group_id, ni.label_ar, base HAVING c > 1");
+while ($x = mysqli_fetch_assoc($r)) {
+    $fails['تكرار'][] = "دور {$x['role_id']}: «{$x['label_ar']}» مكررة {$x['c']}× داخل المجموعة {$x['group_id']}";
+}
+$r = mysqli_query($conn,
+    "SELECT ni.role_id, ni.label_ar, SUBSTRING_INDEX(ni.route,'#',1) base,
+            SUM(CASE WHEN lg.group_code LIKE 'n9%' THEN 1 ELSE 0 END) n9,
+            SUM(CASE WHEN lg.group_code IS NULL OR lg.group_code NOT LIKE 'n9%' THEN 1 ELSE 0 END) legacy
+     FROM nav_items ni LEFT JOIN link_groups lg ON lg.id = ni.group_id
+     WHERE ni.active = 1
+     GROUP BY ni.role_id, ni.label_ar, base HAVING n9 > 0 AND legacy > 0");
+while ($x = mysqli_fetch_assoc($r)) {
+    $fails['تكرار'][] = "دور {$x['role_id']}: «{$x['label_ar']}» ({$x['base']}) موروثٌ يوازي المولَّد";
+}
+if (!isset($fails['تكرار'])) { $fails['تكرار'] = array(); }
+
 /* ── التقرير ──────────────────────────────────────────────────────────── */
 $total = 0;
 foreach ($fails as $axis => $list) {

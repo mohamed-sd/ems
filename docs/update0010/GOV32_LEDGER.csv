@@ -1,0 +1,33 @@
+﻿screen,nature,gap_type,action
+Employees/showcontractemployee.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Equipments/select_project.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Finance/events_list_fin.php,,missing-4,inject
+FinRequests/accountant_desk.php,"سجلٌّ أو إعداد",no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+FinRequests/dept_inbox.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Financing/asset_disposal.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Fleet/readiness_board.php,"مستندٌ يُعتمد",no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Maintenance/dashboard_mnt.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Movement/add_drivers.php,,missing-4,inject
+Movement/client_tree.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Movement/map_page.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Movement/move_oprators.php,,missing-4,inject
+Movement/movement_operations.php,,missing-4,inject
+Movement/project_drivers.php,,missing-4,inject
+Operations/swap_request.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Portal/dept_achievement.php,"سجلٌّ أو إعداد",no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Portal/my_evaluation.php,"سجلٌّ أو إعداد",no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Portal/workspace.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Settings/change_password.php,"سجلٌّ أو إعداد",no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Settings/settings.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Suppliers/showcontractsuppliers.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Tickets/ticket_contextual_open.php,"سجلٌّ أو إعداد",no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Timesheet/aprovment.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Timesheet/timesheet_details.php,,missing-4,inject
+Timesheet/timesheet_type.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+Timesheet/view_timesheet.php,,missing-4,inject
+Transport/transfer_dashboard.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+main/dashboard.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+main/global_search.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+main/my_workspace.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+main/role_board.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"
+main/soon.php,,no-doc-table,"declared — لوحة/نموذج/بوابة بلا جدول مستند (عرف DEF-005)"

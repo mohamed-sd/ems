@@ -1,0 +1,261 @@
+/**
+ * ems-shell.css — قشرةُ التطبيق الموحّدة (UXR-01 §4-3 · AS-01..AS-08)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * تُحمَّل بعد ems.main.all.style.css فتَحكم قياساتِ القشرة دون المساس بهوية
+ * الألوان (الأصفر الرسمي يبقى في ems.main.all.style.css — UI Theme System).
+ *
+ * الأحكام المنفَّذة هنا:
+ *   AS-01  الشريط العلوي 56–64px · شعارٌ في طرف · مبدّل سياق في الوسط ·
+ *          ≤5 أفعال عالمية ظاهرة (البقية في قائمة الحساب).
+ *   AS-02  مبدّل السياق عنصرٌ واحد «الإدارة | الصفة النشطة» يفتح لوحة
+ *          (الصفة · الإدارة · المسمى · الموظف · النطاق · تبديل الصفة).
+ *   AS-03  السايدبار حالتان: موسَّع 264px · مختصر 68px بأيقونات وتلميح.
+ *   AS-04  رأس الصفحة سطران (عنوان + أرقام سياقية صغيرة) — لا ترويسة تملأ
+ *          ربع الشاشة (سقف ارتفاع صارم).
+ *   AS-05  شريط الأفعال بثلاثة مستويات بصرية (رئيس مملوء · ثانوي محدود ·
+ *          ثالثي أيقوني) — أصنافٌ جاهزة تستهلكها المكونات UI-02.
+ *   AS-06  شريط الفلاتر مطويٌّ بعدّاد المفعَّل — أصناف UI-03.
+ *   AS-07  منطقة المحتوى: شبكة 12 عمودًا · سلّم مسافات من 4 · أقصى عرض
+ *          1440 يتوسط · حاشية 24–32 · بين البطاقات 16–24 · حشوة 20–24.
+ *   AS-08  جرسٌ بعدد حقيقي (بنية التوبار) — ورسائل النظام داخل الشاشة
+ *          (الحامل في inheader.php · UI-DEF-06).
+ */
+
+:root {
+    /* سلّم المسافات من 4 (UXR-0087: شبكةُ اثني عشرَ وسلّمُ مسافاتٍ من ٤) */
+    --ems-sp-1: 4px;  --ems-sp-2: 8px;  --ems-sp-3: 12px; --ems-sp-4: 16px;
+    --ems-sp-5: 20px; --ems-sp-6: 24px; --ems-sp-7: 28px; --ems-sp-8: 32px;
+    --ems-shell-topbar-h: 64px;        /* AS-01: السقف 64 */
+    --ems-shell-sidebar-w: 264px;      /* AS-03: الموسَّع */
+    --ems-shell-sidebar-w-mini: 68px;  /* AS-03: المختصر */
+    --ems-shell-content-max: 1440px;   /* AS-07 */
+}
+
+/* ── AS-01: الشريط العلوي — سقف الارتفاع الصارم ─────────────────────────── */
+.ems-topbar {
+    max-height: var(--ems-shell-topbar-h);
+    min-height: 56px;
+}
+
+/* ── AS-02: مبدّل السياق الواحد ─────────────────────────────────────────── */
+.ems-ctx-switcher { position: relative; }
+.ems-ctx-btn {
+    display: inline-flex; align-items: center; gap: var(--ems-sp-2);
+    max-width: 420px; padding: 6px 14px; border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, .12); background: rgba(255, 255, 255, .55);
+    font: inherit; font-size: .86rem; font-weight: 700; color: inherit;
+    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ems-ctx-btn:hover { background: rgba(255, 255, 255, .8); }
+.ems-ctx-btn .ems-ctx-sep { opacity: .45; font-weight: 400; }
+.ems-ctx-panel {
+    position: absolute; top: calc(100% + 8px); inset-inline-start: 0;
+    min-width: 300px; max-width: 380px; z-index: 3000;
+    background: #fff; color: #1f2937; border: 1px solid #e5e7eb;
+    border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .16);
+    padding: var(--ems-sp-3) 0; display: none;
+}
+.ems-ctx-switcher.open .ems-ctx-panel { display: block; }
+.ems-ctx-row {
+    display: flex; align-items: center; gap: var(--ems-sp-3);
+    padding: var(--ems-sp-2) var(--ems-sp-4); font-size: .84rem;
+}
+.ems-ctx-row i { width: 18px; text-align: center; opacity: .55; }
+.ems-ctx-row .ems-ctx-k { color: #6b7280; min-width: 88px; }
+.ems-ctx-row .ems-ctx-v { font-weight: 700; flex: 1; }
+.ems-ctx-actions {
+    border-top: 1px solid #f3f4f6; margin-top: var(--ems-sp-2);
+    padding: var(--ems-sp-2) var(--ems-sp-4) 0;
+}
+.ems-ctx-actions a {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .82rem; font-weight: 700; text-decoration: none;
+}
+
+/* قائمة الحساب (UXR-0034-ب: اسمُ الشخص في قائمة الحساب لا صندوقًا دائمًا) */
+.ems-account-menu { position: relative; }
+.ems-account-panel {
+    position: absolute; top: calc(100% + 8px); inset-inline-end: 0;
+    min-width: 220px; z-index: 3000; background: #fff; color: #1f2937;
+    border: 1px solid #e5e7eb; border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .16); padding: var(--ems-sp-2) 0; display: none;
+}
+.ems-account-menu.open .ems-account-panel { display: block; }
+.ems-account-panel .ems-acct-head {
+    padding: var(--ems-sp-2) var(--ems-sp-4) var(--ems-sp-3);
+    border-bottom: 1px solid #f3f4f6; font-size: .84rem;
+}
+.ems-account-panel .ems-acct-head strong { display: block; }
+.ems-account-panel .ems-acct-head small { color: #6b7280; }
+.ems-account-panel a {
+    display: flex; align-items: center; gap: var(--ems-sp-3);
+    padding: var(--ems-sp-2) var(--ems-sp-4); font-size: .84rem;
+    color: inherit; text-decoration: none;
+}
+.ems-account-panel a:hover { background: #f9fafb; }
+.ems-account-panel a i { width: 18px; text-align: center; opacity: .6; }
+
+/* ── AS-03: حالتا السايدبار على الآلية القائمة (toggle-btn + .closed) —
+       المواءمة بقياسَي المواصفة: موسَّع 264 · مختصر 68 (كانا 280/80). ─────── */
+.ems-site {
+    --sidebar-width-expanded: var(--ems-shell-sidebar-w);
+    --sidebar-width-collapsed: var(--ems-shell-sidebar-w-mini);
+}
+
+/* ── AS-04: رأس الصفحة — سطران وسقف ارتفاع (لا ترويسة تملأ ربع الشاشة) ──── */
+.main_head { max-height: 96px; overflow: hidden; }
+.ems-page-context {
+    display: flex; flex-wrap: wrap; gap: var(--ems-sp-2) var(--ems-sp-4);
+    margin: 2px 2px var(--ems-sp-3); font-size: .8rem; color: #6b7280;
+}
+.ems-page-context b { color: #374151; font-weight: 800; }
+
+/* ── AS-05: شريط الأفعال — ثلاثة مستويات بصرية (تستهلكه UI-02) ──────────── */
+.ems-toolbar {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: var(--ems-sp-2); margin-bottom: var(--ems-sp-4);
+}
+.ems-toolbar .ems-btn-primary {
+    background: var(--ems-topbar-bg, #f5b301); color: #1f2937;
+    border: 0; border-radius: 8px; padding: 8px 18px; font-weight: 800; font-size: .86rem;
+    cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.ems-toolbar .ems-btn-secondary {
+    background: none; color: #374151; border: 1px solid #d1d5db;
+    border-radius: 8px; padding: 7px 14px; font-weight: 700; font-size: .84rem;
+    cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.ems-toolbar .ems-btn-tertiary {
+    background: none; border: 0; color: #6b7280; padding: 7px 9px;
+    border-radius: 8px; cursor: pointer; font-size: .9rem;
+}
+.ems-toolbar .ems-btn-tertiary:hover,
+.ems-toolbar .ems-btn-secondary:hover { background: #f3f4f6; }
+.ems-toolbar .ems-toolbar-search { margin-inline-start: auto; }
+
+/* ── AS-06: شريط الفلاتر المطوي بعدّاد (تستهلكه UI-03) ─────────────────── */
+.ems-filterbar { margin-bottom: var(--ems-sp-4); }
+.ems-filterbar > .ems-filterbar-head {
+    display: inline-flex; align-items: center; gap: var(--ems-sp-2);
+    background: none; border: 1px solid #d1d5db; border-radius: 8px;
+    padding: 6px 14px; font-size: .82rem; font-weight: 700; color: #374151; cursor: pointer;
+}
+.ems-filterbar .ems-filter-count {
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+    background: #1f2937; color: #fff; font-size: .72rem; font-weight: 800;
+    display: none; align-items: center; justify-content: center;
+}
+.ems-filterbar.has-active .ems-filter-count { display: inline-flex; }
+.ems-filterbar .ems-filterbar-body { display: none; padding-top: var(--ems-sp-3); }
+.ems-filterbar.open .ems-filterbar-body { display: block; }
+.ems-filterbar .ems-filter-clear {
+    background: none; border: 0; color: #b91c1c; font-size: .8rem;
+    font-weight: 700; cursor: pointer; display: none;
+}
+.ems-filterbar.has-active .ems-filter-clear { display: inline; }
+
+/* ── AS-07: منطقة المحتوى — الشبكة والسقف والوسط ────────────────────────── */
+.ems-unified-page-shell {
+    max-width: var(--ems-shell-content-max);
+    margin-inline: auto;
+    padding: var(--ems-sp-6) var(--ems-sp-6) var(--ems-sp-8);
+}
+.ems-grid {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--ems-sp-4);
+}
+.ems-grid > * { min-width: 0; }
+.ems-col-12 { grid-column: span 12; } .ems-col-9 { grid-column: span 9; }
+.ems-col-8 { grid-column: span 8; }  .ems-col-6 { grid-column: span 6; }
+.ems-col-4 { grid-column: span 4; }  .ems-col-3 { grid-column: span 3; }
+@media (max-width: 1024px) {
+    .ems-col-3, .ems-col-4 { grid-column: span 6; }
+    .ems-col-6, .ems-col-8, .ems-col-9 { grid-column: span 12; }
+}
+@media (max-width: 640px) { .ems-grid > * { grid-column: span 12; } }
+.ems-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: var(--ems-sp-5) var(--ems-sp-6); }
+
+/* صفر تمرير أفقي للصفحة على 1280 فأعلى (UXR-0044): العريض يمرَّر داخل حاويته */
+.ems-unified-page-shell .table-responsive,
+.ems-unified-page-shell .dataTables_wrapper { overflow-x: auto; }
+
+/* ═══ نواة المكونات (UXR-01 §4-4) — أنماط الحالات والبطاقات ═══════════════ */
+
+/* UI-11/12/13/14: الحالات — لا أصفار عملاقة ولا شاشة بيضاء */
+.ems-state {
+    display: flex; flex-direction: column; align-items: center; gap: var(--ems-sp-2);
+    padding: var(--ems-sp-8) var(--ems-sp-6); text-align: center; color: #6b7280;
+}
+.ems-state > i { font-size: 34px; opacity: .35; }
+.ems-state-title { font-size: 1rem; font-weight: 800; color: #374151; }
+.ems-state-reason { font-size: .84rem; max-width: 460px; }
+.ems-state-code {
+    background: #f3f4f6; border-radius: 6px; padding: 2px 10px; font-size: .76rem;
+}
+.ems-state-error > i { color: #dc2626; opacity: .8; }
+.ems-state-access > i { color: #b45309; opacity: .8; }
+.ems-state .ems-btn-create {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: var(--ems-sp-2);
+    background: var(--ems-topbar-bg, #f5b301); color: #1f2937; border-radius: 8px;
+    padding: 8px 18px; font-weight: 800; font-size: .86rem; text-decoration: none;
+}
+.ems-state .ems-btn-clear-filters {
+    margin-top: var(--ems-sp-2); background: none; border: 1px solid #d1d5db;
+    border-radius: 8px; padding: 6px 16px; font-weight: 700; font-size: .82rem; cursor: pointer;
+}
+
+/* UI-15: الهيكل العظمي */
+.ems-skeleton { padding: var(--ems-sp-4) 0; }
+.ems-skel-row { display: flex; gap: var(--ems-sp-3); margin-bottom: var(--ems-sp-3); }
+.ems-skel-cell {
+    height: 14px; border-radius: 6px;
+    background: linear-gradient(90deg, #eceff3 25%, #f7f8fa 50%, #eceff3 75%);
+    background-size: 200% 100%; animation: ems-skel 1.2s infinite linear;
+}
+.ems-skel-cell.w20 { width: 20%; } .ems-skel-cell.w25 { width: 25%; } .ems-skel-cell.w40 { width: 40%; }
+@keyframes ems-skel { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* UI-16: شريحة المزامنة — ظاهرة دائمًا في الميدانية */
+.ems-sync-chip {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
+    padding: 4px 12px; font-size: .78rem; font-weight: 700;
+}
+.ems-sync-online  { background: #ecfdf5; color: #065f46; }
+.ems-sync-offline { background: #fef3c7; color: #92400e; }
+.ems-sync-syncing { background: #eff6ff; color: #1d4ed8; }
+.ems-sync-syncing i { animation: ems-spin 1.4s infinite linear; }
+.ems-sync-failed  { background: #fef2f2; color: #991b1b; }
+@keyframes ems-spin { to { transform: rotate(360deg); } }
+
+/* UI-07: بطاقة KPI بالسبعة */
+.ems-kpi-card {
+    display: block; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+    padding: var(--ems-sp-5) var(--ems-sp-6); text-decoration: none; color: inherit;
+    border-inline-start: 4px solid #d1d5db;
+}
+.ems-kpi-card:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, .07); }
+.ems-kpi-ok   { border-inline-start-color: #16a34a; }
+.ems-kpi-warn { border-inline-start-color: #d97706; }
+.ems-kpi-err  { border-inline-start-color: #dc2626; }
+.ems-kpi-title { font-size: .8rem; color: #6b7280; font-weight: 700; }
+.ems-kpi-value { font-size: 1.5rem; font-weight: 800; margin: var(--ems-sp-1) 0; }
+.ems-kpi-value small { font-size: .72rem; color: #6b7280; font-weight: 700; }
+.ems-kpi-meta { display: flex; justify-content: space-between; font-size: .74rem; color: #9ca3af; }
+
+/* UI-08/09/10: بطاقات المهام والاعتماد وقائمة التنبيه */
+.ems-task-card, .ems-approval-card {
+    display: flex; align-items: center; gap: var(--ems-sp-4);
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+    padding: var(--ems-sp-4) var(--ems-sp-5); margin-bottom: var(--ems-sp-3);
+}
+.ems-approval-card > i { color: #b45309; font-size: 18px; }
+.ems-task-main { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.ems-task-main small { color: #6b7280; font-size: .76rem; }
+.ems-alert-list { list-style: none; margin: 0; padding: 0; }
+.ems-alert-item {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--ems-sp-3);
+    padding: var(--ems-sp-3) var(--ems-sp-4); border-radius: 10px; margin-bottom: var(--ems-sp-2);
+    font-size: .84rem;
+}
+.ems-alert-warn { background: #fffbeb; } .ems-alert-err { background: #fef2f2; }
+.ems-alert-item b { font-size: .95rem; }

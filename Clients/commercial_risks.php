@@ -403,6 +403,11 @@ function risk_entity_label($type, $map)
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('commercial_risks', 'المخاطر التجارية', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
+    // R9 (M-16 ورقة 32): الشاشة صارت منظرًا نطاقيًّا — الخطر التجاري يُسجَّل
+    // مركزيًّا في risk_register (وحدة RU-07) ويُعرض هنا بزاويته لا نسخة له.
+    $legacy_ru_codes = array('RU-07');
+    $legacy_view_note = 'زاوية المبيعات والعقود: المخاطر التعاقدية والتجارية (RU-07) من السجل المركزي';
+    include __DIR__ . '/../Risk/_legacy_view_panel.php';
     ?>
 
     <?php if (!empty($_GET['msg'])):

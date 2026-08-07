@@ -104,14 +104,14 @@ if (!function_exists('ems_require_governance_screen')) {
         if ($perms['id'] === null) {
             ems_gov_log('GOVERNANCE_SCREEN_DENY_UNREGISTERED',
                 'path=' . $script . ' role=' . $role);
-            header('Location: ' . $redirect . '?msg=' . urlencode('لا توجد صلاحية لهذه الشاشة ❌'));
-            exit();
+            ems_gov_flash_redirect($redirect, 'الشاشة غير مسجَّلة في سجل الوحدات فلا تُمنح صلاحيتها لأحد',
+                'GOV-UNREG-403', 'راجع مدير الصلاحيات لتسجيل الشاشة قبل طلب الوصول');
         }
         if (empty($perms['can_view'])) {
             ems_gov_log('GOVERNANCE_SCREEN_DENY',
                 'path=' . $script . ' role=' . $role . ' module=' . $perms['id']);
-            header('Location: ' . $redirect . '?msg=' . urlencode('لا توجد صلاحية لهذه الشاشة ❌'));
-            exit();
+            ems_gov_flash_redirect($redirect, 'لا تملك صلاحية عرض هذه الشاشة',
+                'GOV-VIEW-403', 'اطلب منحة العرض من مدير الصلاحيات إن كانت ضمن عملك');
         }
         return $perms;
     }
@@ -135,8 +135,8 @@ if (!function_exists('ems_require_governance_write')) {
         ems_gov_log('GOVERNANCE_WRITE_DENY',
             'path=' . (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '')
             . ' role=' . ems_current_role() . ' action=' . $action);
-        header('Location: ' . $back . '?msg=' . urlencode('لا توجد صلاحية لهذا الإجراء ❌'));
-        exit();
+        ems_gov_flash_redirect($back, 'لا تملك صلاحية هذا الإجراء (' . $action . ') على الشاشة',
+            'GOV-ACT-403', 'الإجراء يتطلب منحة كتابة من مدير الصلاحيات');
     }
 }
 

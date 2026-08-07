@@ -429,7 +429,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <thead><tr>
                     <th>الإجراءات</th><th>رقم الحدث</th><th>النوع</th><th>المصدر</th><th>المرجع</th>
                     <th>المبلغ</th><th>المشروع/المورد</th><th>الحالة</th>
-                </tr></thead>
+                                    <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
+</tr></thead>
                 <tbody>
                     <?php
                     // H-22: كان يُحمَّل هنا الدفترُ كاملًا بلا LIMIT (محظورُ UI-01 §4)

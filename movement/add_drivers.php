@@ -1108,7 +1108,12 @@ include("../inheader.php");
                                 <th>نظام الوردية</th>
                                 <th>الحالة</th>
                                 <th>الإجراءات</th>
-                            </tr>
+                                                <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
+</tr>
                         </thead>
                         <tbody>
                             <?php

@@ -203,6 +203,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    // R9 (M-16 ورقة 32): زاوية نطاقية على السجل المركزي — المؤسسية والحرجة
+    $legacy_ru_codes = array('RU-01');
+    $legacy_view_note = 'زاوية الرئيس: المخاطر المؤسسية (RU-01) — والقرارات العليا أدناه تبقى على سجلها الأصلي';
+    include __DIR__ . '/../Risk/_legacy_view_panel.php';
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->

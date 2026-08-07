@@ -127,6 +127,28 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
     <!-- <h2 class="logo">Equipation</h2> -->
 
+    <?php /* AS-03 (UXR-0035): حالتا السايدبار على toggle-btn القائم — القياسات
+             264/68 في ems-shell.css، وهنا ثباتُ الاختيار عبر الصفحات. */ ?>
+    <script>
+    (function () {
+      try {
+        var sb = document.getElementById('sidebar');
+        if (!sb || window.matchMedia('(max-width: 768px)').matches) return;
+        var saved = localStorage.getItem('ems.nav.closed');
+        if (saved === '0') { sb.classList.remove('closed'); }
+        var tb = document.getElementById('toggleBtn');
+        if (tb) {
+          tb.addEventListener('click', function () {
+            // القراءة بعد معالِج التبديل نفسه (مسجَّل لاحقًا في هذا الملف)
+            setTimeout(function () {
+              try { localStorage.setItem('ems.nav.closed', sb.classList.contains('closed') ? '1' : '0'); } catch (e) {}
+            }, 0);
+          });
+        }
+      } catch (e) {}
+    })();
+    </script>
+
     <?php
     $hoursApprovalPendingCount = 0;
     if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {

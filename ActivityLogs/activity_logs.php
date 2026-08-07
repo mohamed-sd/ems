@@ -315,6 +315,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'dt') {
 
 $page_title = 'سجل النشاط';
 ?>
+<?php
+// CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
+?>
 <?php require_once '../inheader.php'; ?>
 <?php require_once '../insidebar.php'; ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>

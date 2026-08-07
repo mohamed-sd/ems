@@ -49,7 +49,11 @@ $OPEN_SCREENS = array(
     'Maintenance/breakdowns.php', 'chats/index.php', 'main/dashboard.php', 'main/role_board.php',
 );
 $PERSONAL_PREFIX = array('Portal/', 'main/my_', 'main/profile.php', 'Settings/change_password.php', 'user_capacities.php');
-$REDIRECT_ALIAS = array('Timesheet/timesheet_type.php' => 'Timesheet/timesheet.php');
+$REDIRECT_ALIAS = array(
+    'Timesheet/timesheet_type.php' => 'Timesheet/timesheet.php',
+    // M-16: ملف الخطر شاشة تعمق تُفتح من السجل المركزي — بابها باب السجل
+    'Risk/risk_card.php' => 'Risk/risk_register.php',
+);
 
 $modules = array();
 $q = mysqli_query($conn, "SELECT id, code, owner_role_id FROM modules");

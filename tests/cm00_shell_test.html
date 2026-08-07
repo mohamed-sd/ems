@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>CM-00 — اختبار تركيبة المحاور الخمسة (DEC-E)</title>
+<style>body{font-family:sans-serif;padding:20px}#log div{padding:4px 8px}.ok{color:#1e7d32}.bad{color:#b3261e;font-weight:bold}</style>
+</head>
+<body data-ems-ax-data="data" data-ems-ax-edit="readonly" data-ems-ax-freshness="stale">
+<h1>CM-00 · الغلاف الحاكم — اختبار التركيبة الميدانية</h1>
+<p>التركيبة: بياناتٌ + قراءةٌ فقط + دون اتصال + بياناتٌ قديمة — أربعُ قيمٍ متزامنةٌ لا حالةٌ واحدة.</p>
+<button class="ems-write-action" id="btnWrite">فعل كتابة (يجب أن يختفي)</button>
+<button id="btnRead">فعل قراءة (يبقى)</button>
+<div id="log"></div>
+<script src="../assets/js/ui-unification.js"></script>
+<script>
+window.addEventListener('load', function () {
+    var log = document.getElementById('log');
+    var fails = 0;
+    function assert(name, cond) {
+        var d = document.createElement('div');
+        d.className = cond ? 'ok' : 'bad';
+        d.textContent = (cond ? '✔ ' : '✘ ') + name;
+        log.appendChild(d);
+        if (!cond) fails++;
+    }
+    // المحاكاة: قطع الاتصال (المحور الرابع من مصدره الحي)
+    window.dispatchEvent(new Event('offline'));
+
+    var b = document.body;
+    assert('AX-1 بيانات: data-ax-data=data', b.getAttribute('data-ax-data') === 'data');
+    assert('AX-3 تحرير: data-ax-edit=readonly (مبذور من الخادم)', b.getAttribute('data-ax-edit') === 'readonly');
+    assert('AX-4 اتصال: data-ax-connection=offline (من الحدث الحي)', b.getAttribute('data-ax-connection') === 'offline');
+    assert('AX-5 حداثة: data-ax-freshness=stale', b.getAttribute('data-ax-freshness') === 'stale');
+    assert('التركيب: أربع قيم متزامنة في حالة واحدة للشاشة',
+        b.getAttribute('data-ax-data') === 'data' && b.getAttribute('data-ax-edit') === 'readonly'
+        && b.getAttribute('data-ax-connection') === 'offline' && b.getAttribute('data-ax-freshness') === 'stale');
+    assert('قراءة فقط تُخفي فعل الكتابة (ems-write-action)',
+        getComputedStyle(document.getElementById('btnWrite')).display === 'none');
+    assert('فعل القراءة يبقى ظاهرًا',
+        getComputedStyle(document.getElementById('btnRead')).display !== 'none');
+    assert('لافتة القِدم ظاهرة (emsAxStale)',
+        getComputedStyle(document.getElementById('emsAxStale')).display === 'block');
+    assert('لافتة الانقطاع القائمة (bootFiveStates) تعمل معًا — لا بدل',
+        document.getElementById('emsFsOffline') && document.getElementById('emsFsOffline').classList.contains('on'));
+    assert('القيمة الشاذة تُرفض (set يرجع false)',
+        window.EmsScreenShell.set('data', 'weird') === false);
+    // عودة الاتصال
+    window.dispatchEvent(new Event('online'));
+    assert('عودة الاتصال تقلب AX-4 وحده والبقية ثابتة',
+        b.getAttribute('data-ax-connection') === 'online' && b.getAttribute('data-ax-edit') === 'readonly');
+    var h = document.createElement('h2');
+    h.id = 'verdict';
+    h.textContent = fails === 0 ? 'النتيجة: ✔ التركيبة كاملة — CM-00 حي' : ('النتيجة: ✘ ' + fails + ' إخفاق');
+    h.className = fails === 0 ? 'ok' : 'bad';
+    document.body.insertBefore(h, log);
+});
+</script>
+</body>
+</html>

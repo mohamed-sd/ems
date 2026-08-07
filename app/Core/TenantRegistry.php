@@ -113,6 +113,20 @@ class TenantRegistry
         'sec_scopes' => array('type' => self::T_GLOBAL, 'soft' => false),
         'template_permission_dims' => array('type' => self::T_GLOBAL, 'soft' => false),
         'requests' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-16 (update0011 · DEC-G): جداول إدارة المخاطر التسعة — كلها بعمود
+        // company_id (السجل المركزي الواحد RK-02 لكل مستأجر · لا حذف إطلاقًا)
+        'risk_units' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_register' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_assessments' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_controls' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_control_links' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_control_evidence' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_appetite' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_kris' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_signals' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_treatments' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_acceptances' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_escalations' => array('type' => self::T_TENANT, 'soft' => false),
         'task_assignments' => array('type' => self::T_TENANT, 'soft' => false),
         'task_dependencies' => array('type' => self::T_TENANT, 'soft' => false),
         'task_evidence' => array('type' => self::T_TENANT, 'soft' => false),
@@ -572,6 +586,7 @@ class TenantRegistry
         'financing_models' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15/FIN-01: المجال المقيَّد
         'nav09_file_map' => array('type' => self::T_GLOBAL, 'soft' => false), // NAV-09: قاموس المواءمة القانوني — مرجع نظام عام
         'nav09_action_map' => array('type' => self::T_GLOBAL, 'soft' => false), // NAV-09: خريطة أفعال الورقة 97
+        'nav09_action_alias' => array('type' => self::T_GLOBAL, 'soft' => false), // DEC-A: خريطة ترحيل الرموز (قديم→جديد) — مرجع نظام عام
         'financing_operations' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
         'financed_assets' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15
         'asset_ownership_shares' => array('type' => self::T_RESTRICTED, 'soft' => false), // N-15: الحصص عبر الزمن

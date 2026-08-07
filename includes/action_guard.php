@@ -34,6 +34,9 @@ if (!function_exists('ems_action_guard_registry')) {
     {
         return array(
             // ── Timesheet — شاشة الساعات ──
+            // M-16 (update0011): معالج أفعال المخاطر الموحد — الحسم الدقيق
+            // بالسلطة داخل RiskService (مصفوفة ورقة 27) فوق صلاحية الشاشة.
+            'risk/risk_actions.php'                => array('modules' => array('Risk/'), 'action' => 'auto'),
             'timesheet/get_timesheet.php'          => array('modules' => array('Timesheet/'), 'action' => 'view'),
             'timesheet/get_timesheet_data.php'     => array('modules' => array('Timesheet/'), 'action' => 'view'),
             'timesheet/get_timesheet_failures.php' => array('modules' => array('Timesheet/'), 'action' => 'view'),

@@ -11,6 +11,32 @@
 // 🔒 التحقق من صلاحية محددة
 // ════════════════════════════════════════════════════════════════════════════
 
+if (!function_exists('ems_gov_flash_redirect')) {
+    /**
+     * UI-DEF-06 → UI-13: رسالةُ الحوكمة تُودَع الجلسةَ وتُعرض داخل الشاشة
+     * (الحاملُ المركزي في inheader.php) — وصفرُ رسالةٍ في الرابط.
+     *
+     * @param string $to      وجهةُ التحويل (بلا msg=)
+     * @param string $message ما حدث — بلغة المستخدم لا نصًّا تقنيًّا
+     * @param string $code    رمزُ الخطأ المعلن (يظهر في الشاشة للدعم)
+     * @param string $hint    كيف يُصحَّح
+     */
+    function ems_gov_flash_redirect($to, $message, $code = 'GOV-403', $hint = '')
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            if (!isset($_SESSION['ems_flash_gov']) || !is_array($_SESSION['ems_flash_gov'])) {
+                $_SESSION['ems_flash_gov'] = array();
+            }
+            $_SESSION['ems_flash_gov'][] = array(
+                'text' => (string) $message, 'code' => (string) $code,
+                'hint' => (string) $hint, 'at' => time(),
+            );
+        }
+        header('Location: ' . $to);
+        exit();
+    }
+}
+
 /**
  * التحقق من وجود صلاحية معينة للمستخدم الحالي
  * 
@@ -614,8 +640,8 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         }
 
         if (!$has_reports_permission) {
-            header('Location: ' . $redirect_path . '?msg=' . urlencode('لا توجد صلاحية عرض للتقارير ❌'));
-            exit();
+            ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض التقارير',
+                'GOV-RPT-403', 'اطلب منحة تقارير دورك من مدير الصلاحيات');
         }
 
         return;
@@ -629,8 +655,8 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
     }
 
     if ($current['id'] !== null && !$current['can_view']) {
-        header('Location: ' . $redirect_path . '?msg=' . urlencode('لا توجد صلاحية عرض لهذه الصفحة ❌'));
-        exit();
+        ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض هذه الصفحة',
+            'GOV-VIEW-403', 'اطلب منحة العرض من مدير الصلاحيات إن كانت ضمن عملك');
     }
 }
 

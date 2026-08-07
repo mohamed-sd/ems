@@ -564,11 +564,84 @@
         }
     }
 
+    /* ── CM-00 · الغلافُ الحاكم (DEC-E · update0009) ────────────────────────
+       إعادةُ نمذجةِ حالاتِ الشاشة من قائمةٍ واحدةٍ إلى خمسةِ محاورَ مستقلةٍ تُركَّب:
+         AX-1 البيانات: loading·data·empty·no-results·error   (خدمةُ الجلب)
+         AX-2 الصلاحية: full·partial·none                     (محرّكُ الصلاحيات)
+         AX-3 التحرير:  editable·readonly·locked              (آلةُ الحالة/إقفالُ الفترة)
+         AX-4 الاتصال:  online·offline·syncing·sync-failed    (محرّكُ دون اتصال)
+         AX-5 الحداثة:  fresh·stale·cached                    (طابعُ آخرِ جلبٍ ناجح)
+       فتركيبةُ الميدان «بياناتٌ + قراءةٌ فقط + دون اتصال + قديمة» تُمثَّل بأربعِ
+       قيمٍ متزامنةٍ لا بحالةٍ واحدة. القائمُ (bootFiveStates) يبقى عاملًا —
+       CM-00 يركّب فوقه ويبثّ data-ax-* على body وحدث ems:shell للمكونات.
+       الشاشةُ تبذر قيمَها بوسوم data-ems-ax-* على body أو نداءً EmsScreenShell.set. */
+    window.EmsScreenShell = (function () {
+        var VALID = {
+            data: ['loading', 'data', 'empty', 'no-results', 'error'],
+            permission: ['full', 'partial', 'none'],
+            edit: ['editable', 'readonly', 'locked'],
+            connection: ['online', 'offline', 'syncing', 'sync-failed'],
+            freshness: ['fresh', 'stale', 'cached']
+        };
+        var axes = {
+            data: 'data', permission: 'full', edit: 'editable',
+            connection: (typeof navigator !== 'undefined' && navigator.onLine === false) ? 'offline' : 'online',
+            freshness: 'fresh'
+        };
+        function getState() {
+            var o = {};
+            for (var k in axes) { if (axes.hasOwnProperty(k)) o[k] = axes[k]; }
+            return o;
+        }
+        function apply() {
+            var b = document.body;
+            if (!b) return;
+            for (var k in axes) { if (axes.hasOwnProperty(k)) b.setAttribute('data-ax-' + k, axes[k]); }
+            try { document.dispatchEvent(new CustomEvent('ems:shell', { detail: getState() })); } catch (e) { /* IE-safe */ }
+        }
+        function set(axis, val) {
+            if (!VALID[axis] || VALID[axis].indexOf(val) === -1) return false;
+            axes[axis] = val;
+            apply();
+            return true;
+        }
+        function seed() {
+            var b = document.body;
+            if (!b) return;
+            for (var k in VALID) {
+                if (!VALID.hasOwnProperty(k)) continue;
+                var v = b.getAttribute('data-ems-ax-' + k);
+                if (v && VALID[k].indexOf(v) !== -1) axes[k] = v;
+            }
+            apply();
+        }
+        /* محورُ الاتصال من مصدره الحي — يركّب مع لافتة bootFiveStates لا بدلها */
+        window.addEventListener('offline', function () { set('connection', 'offline'); });
+        window.addEventListener('online', function () { set('connection', 'online'); });
+        return { set: set, get: getState, seed: seed, valid: VALID };
+    })();
+
+    /* تركيباتُ CM-00 المرئية: القراءةُ فقط تُخفي أفعالَ الكتابة · والقديمةُ تعلن عمرَها */
+    function bootShellCss() {
+        var css = 'body[data-ax-edit="readonly"] .ems-write-action,body[data-ax-edit="locked"] .ems-write-action{display:none !important}' +
+            'body[data-ax-freshness="stale"] #emsAxStale,body[data-ax-freshness="cached"] #emsAxStale{display:block}' +
+            '#emsAxStale{display:none;position:fixed;bottom:14px;left:14px;z-index:99997;background:#8a6d00;color:#fff;' +
+            'padding:8px 14px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}';
+        var st = document.createElement('style');
+        st.textContent = css;
+        document.head.appendChild(st);
+        var stale = document.createElement('div');
+        stale.id = 'emsAxStale';
+        stale.textContent = 'البياناتُ المعروضةُ ليست لحظية — حدّث الشاشةَ عند عودة الاتصال';
+        document.body.appendChild(stale);
+    }
+
     /* ── Boot ───────────────────────────────────────────────── */
     function boot() {
         bootUnifiedHeaders();
         bootUnifiedTables();
         try { bootFiveStates(); } catch (eFs) { /* لا يعطل التوحيد */ }
+        try { bootShellCss(); window.EmsScreenShell.seed(); } catch (eSh) { /* CM-00 لا يعطل القائم */ }
     }
 
     if (document.readyState === 'loading') {

@@ -231,7 +231,11 @@ if ($conn->connect_error) {
 $conn->set_charset("utf8mb4");
 // مواءمة ترتيب الاتصال مع ترتيب الأعمدة الموحّد (utf8mb4_unicode_ci) — يمنع خطأ
 // «Illegal mix of collations» عند مقارنة عمود بنتيجة CAST/تعبير تأخذ ترتيب الاتصال.
-mysqli_query($conn, "SET collation_connection = 'utf8mb4_unicode_ci'");
+// ◆ 2026-08-06: SET NAMES ... COLLATE لا SET collation_connection وحدها — فالأخيرة
+// تترك معاملات prepared على ترتيب utf8mb4 الافتراضي (general_ci على MariaDB 11.4)
+// فينفجر كل «DATE_FORMAT(..)=?» بالخلط نفسه (شاشة المدير المالي 500). SET NAMES
+// COLLATE يوحّد ترتيب المعاملات مع الاتصال — وset_charset قبله يُبقي escaping سليمًا.
+mysqli_query($conn, "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 
 // N-24 (update0004 · NFR-09): حارس الخمس ثوان — «لا احتساب يتجاوز خمس ثوان
 // داخل الطلب». يرصد كل طلب ويب تجاوزها في guard_denials بكود request_over_5s

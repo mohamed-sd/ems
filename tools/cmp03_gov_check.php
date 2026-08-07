@@ -14,13 +14,34 @@ $conn = $GLOBALS['conn'];
 mysqli_set_charset($conn, 'utf8mb4');
 $ROOT = dirname(__DIR__);
 
+/* ── النطاقُ المعلَن (DEF-005 · update0009): لا قفزَ صامتًا ──────────────────
+   الشاشاتُ غيرُ الجدولية (لا رؤوسَ مقارنةٍ فيها) تُستثنى بقائمةٍ معلَنةٍ بسببها —
+   وأيُّ شاشةٍ تسقط من الفحص وليست هنا تُحسب مخالفةَ نطاقٍ لا سكوتًا. */
+$DECLARED_EXCLUDED = array(
+    'messages.php'        => 'محادثات — لا جدولَ مستند',
+    'org_structure.php'   => 'مخططُ هيكلٍ تفاعلي — لا جدولَ مستند',
+    'dept_achievement.php' => 'لوحةُ مؤشرات — لا جدولَ مستند',
+    'readiness.php'       => 'لوحةُ جاهزية — لا جدولَ مستند',
+    'ticket_open.php'     => 'نموذجُ إبلاغٍ سياقي — لا جدولَ مستند',
+    'reports_index.php'   => 'مركزُ تقارير — بوابةُ روابطَ لا جدول',
+    'accountant_desk.php' => 'مكتبُ مهامَّ يومية — بطاقاتٌ لا جدول',
+    'my_evaluation.php'   => 'عرضُ تقييمٍ شخصي — لا جدولَ مستند',
+    'change_password.php' => 'نموذجُ إعداداتٍ — لا جدولَ مستند',
+);
+
 $screens = cmp03_doc_screens($ROOT);
 $map = cmp03_file_map($conn);
-$bad = 0; $checked = 0;
+$bad = 0; $checked = 0; $excluded = 0; $undeclared = array();
 foreach ($screens as $cf => $sc) {
-    if (!isset($map[$cf]) || $map[$cf]['state'] === 'soon' || !$map[$cf]['real_path']) { continue; }
+    if (!isset($map[$cf]) || $map[$cf]['state'] === 'soon' || !$map[$cf]['real_path']) {
+        if (!isset($DECLARED_EXCLUDED[$cf])) { $undeclared[] = "$cf (بلا وجهة حية)"; } else { $excluded++; }
+        continue;
+    }
     $heads = cmp03_extract_heads($ROOT . '/' . $map[$cf]['real_path']);
-    if ($heads === null || !$heads) { continue; } // لوحة — لا تُقارن
+    if ($heads === null || !$heads) { // لا رؤوسَ مقارنةٍ — يُقبل بإعلانٍ فقط
+        if (!isset($DECLARED_EXCLUDED[$cf])) { $undeclared[] = "$cf ({$sc['title']} → {$map[$cf]['real_path']})"; } else { $excluded++; }
+        continue;
+    }
     $checked++;
     $j = cmp03_judge($sc['cols'], $heads);
     if ($j['missGov']) {
@@ -28,7 +49,12 @@ foreach ($screens as $cf => $sc) {
         echo "✘ {$sc['title']} ($cf → {$map[$cf]['real_path']}): ناقصُ الحوكمة = " . implode(' · ', $j['missGov']) . "\n";
     }
 }
+foreach ($undeclared as $u) { echo "✘ خارجَ النطاقِ بلا إعلان: $u\n"; }
 echo "────────────────────────────────────────\n";
+echo 'النطاق: ' . count($screens) . " شاشةً قانونية = $checked فُحصت + $excluded مستثناةٌ معلَنةٌ بسببها"
+   . (count($undeclared) ? ' + ' . count($undeclared) . ' سقطت بلا إعلان' : '') . "\n";
 echo "شاشاتٌ فُحصت: $checked · مخالفة: $bad\n";
-echo $bad === 0 ? "الحكم: ✔ لا شاشةَ مستندٍ بلا حوكمتها الحاكمة\n" : "الحكم: ✘ حوكمةٌ ناقصة\n";
-exit($bad === 0 ? 0 : 1);
+$fail = ($bad > 0 || count($undeclared) > 0);
+echo !$fail ? "الحكم: ✔ لا شاشةَ مستندٍ بلا حوكمتها الحاكمة — والنطاقُ معلَنٌ كاملًا\n"
+            : "الحكم: ✘ حوكمةٌ ناقصةٌ أو نطاقٌ غيرُ معلَن\n";
+exit(!$fail ? 0 : 1);

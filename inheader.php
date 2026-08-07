@@ -52,8 +52,12 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
     <!-- شريط الرحلة الموحّد (الدستور §5) — مكوّنٌ واحدٌ للطلب والبلاغ والوحدة -->
     <link rel="stylesheet" href="/ems/assets/css/ems-journey.css<?php echo ems_css_ver('ems-journey.css'); ?>">
+    <!-- قشرة التطبيق الموحدة (UXR-01 · AS-01..08) — تُحمَّل بعد الهوية فتحكم القياسات -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-shell.css<?php echo ems_css_ver('ems-shell.css'); ?>">
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js<?php $__uijs=__DIR__.'/assets/js/ui-unification.js'; echo is_file($__uijs)?('?v='.filemtime($__uijs)):''; ?>" defer></script>
+    <!-- نواة مكونات الواجهة (UXR-01 UI-01..20): الحالات والبطاقات وحارس صفر الأعمدة -->
+    <script src="/ems/assets/js/ems-components.js<?php $__cmpjs=__DIR__.'/assets/js/ems-components.js'; echo is_file($__cmpjs)?('?v='.filemtime($__cmpjs)):''; ?>" defer></script>
     <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->
     <script src="/ems/assets/js/column-groups.js" defer></script>
     <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
@@ -72,4 +76,39 @@ if (!function_exists('ems_css_ver')) {
     }
     ?>
 </head>
-<body class="ems-site">
+<body class="ems-site"<?php
+/* CM-00 (DEC-E · update0010): بذرُ محاورِ الغلافِ الحاكم من الخادم — الشاشةُ
+   المتبنيةُ تملأ $GLOBALS['EMS_AX'] قبل تضمين inheader (العون ems_shell_axes
+   في screen_contract.php) — وEmsScreenShell.seed() يلتقطها من data-ems-ax-*.
+   لا شيءَ يُطبع لغير المتبنية — فالتبني يُقاس لا يُفترض (القرار الحاكم ١). */
+if (!empty($GLOBALS['EMS_AX']) && is_array($GLOBALS['EMS_AX'])) {
+    foreach ($GLOBALS['EMS_AX'] as $axK => $axV) {
+        if (preg_match('/^[a-z-]+$/', (string) $axK) && preg_match('/^[a-z-]+$/', (string) $axV)) {
+            echo ' data-ems-ax-' . $axK . '="' . $axV . '"';
+        }
+    }
+}
+?>>
+<?php
+/* UI-DEF-06 → UI-13 (Error State): رسائلُ الحوكمة تُعرض داخل الشاشة لا في
+   الرابط — الحارسُ يودعها الجلسةَ (ems_gov_flash_redirect) وهذا الحاملُ
+   المركزيُّ يعرضها مرةً واحدةً ثم يمسحها: ما حدث + كيف يُصحَّح + رمزُ الخطأ. */
+if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) {
+    echo '<div id="emsGovFlash" style="position:sticky;top:0;z-index:2000">';
+    foreach (array_slice($_SESSION['ems_flash_gov'], 0, 3) as $emsFg) {
+        $fgText = htmlspecialchars((string) ($emsFg['text'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $fgHint = htmlspecialchars((string) ($emsFg['hint'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $fgCode = htmlspecialchars((string) ($emsFg['code'] ?? 'GOV-403'), ENT_QUOTES, 'UTF-8');
+        echo '<div dir="rtl" style="display:flex;align-items:center;gap:10px;background:#7f1d1d;color:#fef2f2;'
+           . 'padding:10px 16px;font-size:14px;border-bottom:1px solid #991b1b">'
+           . '<i class="fas fa-shield-halved" aria-hidden="true"></i>'
+           . '<span style="flex:1"><strong>' . $fgText . '</strong>'
+           . ($fgHint !== '' ? ' — ' . $fgHint : '') . '</span>'
+           . '<code style="background:rgba(255,255,255,.12);border-radius:4px;padding:2px 8px;font-size:12px">' . $fgCode . '</code>'
+           . '<button type="button" onclick="this.closest(\'#emsGovFlash\').remove()" '
+           . 'style="background:none;border:0;color:inherit;font-size:16px;cursor:pointer" aria-label="إغلاق">&times;</button>'
+           . '</div>';
+    }
+    echo '</div>';
+    unset($_SESSION['ems_flash_gov']);
+}

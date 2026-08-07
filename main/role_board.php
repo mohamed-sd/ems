@@ -97,16 +97,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <p class="text-muted" style="margin:4px 2px 10px"><i class="fas fa-mug-hot"></i> أسئلةُ أول اليوم لدورك — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
 
-    <!-- ① مؤشرات اليوم -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px">
+    <!-- ① مؤشرات اليوم — بطاقة KPI السباعية (UI-07: صفر رقم بلا عقده السبعة).
+         الوحدة «سجل» حقيقية (الاستعلامات COUNT) والفترة «لحظي» حقيقية (تُقرأ الآن)،
+         والمقارنة تُعلن غيابها صراحةً بدل ادعائها — أول تعميم للمكوّن (17 لوحة). -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px">
         <?php foreach ($rb_cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
-            $color = $tone === 'ok' ? '#166534' : ($tone === 'err' ? '#991b1b' : ($tone === 'warn' ? '#b45309' : '#92400e')); ?>
-        <a href="<?php echo htmlspecialchars($href); ?>" style="text-decoration:none;color:inherit">
-            <div class="card" style="height:100%"><div class="card-body" style="text-align:center">
-                <i class="fas <?php echo htmlspecialchars($icon); ?>" style="font-size:20px;opacity:.65"></i>
-                <div style="font-size:22px;font-weight:800;margin:6px 0;color:<?php echo $color; ?>"><?php echo htmlspecialchars((string)$val); ?></div>
-                <div class="text-muted" style="font-size:13px"><?php echo htmlspecialchars($lbl); ?></div>
-            </div></div>
+            $kpiTone = $tone === 'ok' ? 'ems-kpi-ok' : ($tone === 'err' ? 'ems-kpi-err' : ($tone === 'warn' ? 'ems-kpi-warn' : '')); ?>
+        <a class="ems-kpi-card <?php echo $kpiTone; ?>" href="<?php echo htmlspecialchars($href); ?>" title="تعمّق: <?php echo htmlspecialchars($lbl); ?>">
+            <div class="ems-kpi-title"><i class="fas <?php echo htmlspecialchars($icon); ?>" style="opacity:.6"></i> <?php echo htmlspecialchars($lbl); ?></div>
+            <div class="ems-kpi-value"><?php echo htmlspecialchars((string)$val); ?> <small>سجل</small></div>
+            <div class="ems-kpi-meta"><span>لحظي (<?php echo $today; ?>)</span><span>بلا مقارنة معلنة</span></div>
         </a>
         <?php endforeach; ?>
     </div>

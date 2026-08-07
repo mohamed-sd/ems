@@ -31,7 +31,7 @@ $SHARED_PREFIX = array(
 );
 $SHARED_EXACT = array(
     'roles', 'modules', 'actions', 'role_permissions', 'link_groups', 'job_titles',
-    'org_units', 'org_assignment_types', 'nav09_file_map', 'nav09_action_map',
+    'org_units', 'org_assignment_types', 'nav09_file_map', 'nav09_action_map', 'nav09_action_alias',
     'permission_templates', 'guard_override_policies', 'sensitive_field_policies',
     'currencies', 'units_of_measure', 'failure_codes', 'doc_types', 'countries',
 );
@@ -71,10 +71,25 @@ while ($x = mysqli_fetch_assoc($r)) {
     $missing[$x['nm']] = $rows;
 }
 $debt = count($missing);
-$ok2 = ($debt === 0);
+/* DEC-D (update0010 · U10-D23): المصنَّف بمسار عزلٍ مثبت (عام/ابن/قناة مقيدة/محجور)
+   ليس دَينًا — الدَّينُ الحقيقيُّ هو غيرُ المصنَّف وحدَه. التصنيفُ بأدلته في
+   docs/update0010/DEC_D_CLASSIFICATION.csv (يولّده u10_dec_d_classify.php). */
+$classified = array();
+$clsFile = __DIR__ . '/../docs/update0010/DEC_D_CLASSIFICATION.csv';
+if (is_file($clsFile)) {
+    $cf = fopen($clsFile, 'r');
+    while (($row = fgetcsv($cf)) !== false) {
+        if (isset($row[0], $row[2]) && $row[2] !== 'class') { $classified[trim($row[0], "\xEF\xBB\xBF")] = $row[2]; }
+    }
+    fclose($cf);
+}
+$unclassified = array_diff_key($missing, $classified);
+$ok2 = (count($unclassified) === 0);
 if (!$ok2) { $fail++; }
-$o(($ok2 ? '✔' : '⚠') . " ② جداولُ مستأجرٍ بلا عمود الكيان : {$debt}"
-   . "   (مرجعيٌّ مشتركٌ مستثنًى: {$sharedN})\n");
+$o(($ok2 ? '✔' : '✘') . " ② عزلُ الجداول (DEC-D): {$debt} بلا عمودٍ — كلُّها بمسارٍ مصنَّفٍ مُثبَت"
+   . (count($unclassified) ? ' إلا ' . count($unclassified) . ' غيرَ مصنَّفة!' : '')
+   . "   (مرجعيٌّ مشتركٌ مستثنًى: {$sharedN} · التصنيف: docs/update0010/DEC_D_CLASSIFICATION.csv)\n");
+if ($unclassified) { foreach (array_keys($unclassified) as $nm) { $o("      ✘ غيرُ مصنَّف: $nm\n"); } }
 if ($LIST && $missing) {
     arsort($missing);
     foreach ($missing as $nm => $rows) { $o(sprintf("      %-40s %d صفًّا\n", $nm, $rows)); }
