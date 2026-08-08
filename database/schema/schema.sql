@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-07 04:55:31
--- الجداول: 468 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-08 21:48:55
+-- الجداول: 492 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -3260,6 +3260,54 @@ CREATE TABLE `fin_bank_statement_lines` (
   CONSTRAINT `fk_fin_bsl_acct` FOREIGN KEY (`bank_account_id`) REFERENCES `fin_bank_accounts` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: fin_budget_change_requests ──
+CREATE TABLE `fin_budget_change_requests` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `req_code` varchar(16) NOT NULL COMMENT 'BCR-000001',
+  `budget_id` int(11) NOT NULL,
+  `budget_line_id` int(11) DEFAULT NULL,
+  `dept_module` varchar(64) NOT NULL DEFAULT '' COMMENT 'الإدارةُ الطالبة',
+  `current_amount` decimal(18,2) NOT NULL,
+  `requested_amount` decimal(18,2) NOT NULL,
+  `impact_note` text DEFAULT NULL COMMENT 'بيانُ الأثر — إلزاميٌّ قبل الاعتماد',
+  `state` enum('submitted','approved','rejected','withdrawn') NOT NULL DEFAULT 'submitted',
+  `decided_reason` varchar(190) NOT NULL DEFAULT '',
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'رقمُ الموازنة الأم',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_bcr_code` (`company_id`,`req_code`),
+  KEY `ix_bcr_budget` (`company_id`,`budget_id`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 budget.request: الطلبُ يدخل سلّمَ الاعتماد ببيان أثره — ولا يُعدَّل السقفُ قبله';
+
+-- ── Table: fin_budget_commitments ──
+CREATE TABLE `fin_budget_commitments` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `commit_code` varchar(16) NOT NULL COMMENT 'CMT-000001',
+  `budget_id` int(11) NOT NULL COMMENT 'fin_budgets.id',
+  `budget_line_id` int(11) DEFAULT NULL COMMENT 'fin_budget_lines.id',
+  `source_kind` enum('payment_request','purchase_order','contract','other') NOT NULL,
+  `source_ref` varchar(64) NOT NULL COMMENT 'مرجعُ المصدر — طلبُ الدفعِ أو أمرُ الشراء',
+  `amount` decimal(18,2) NOT NULL,
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `available_before` decimal(18,2) DEFAULT NULL COMMENT 'المتاحُ قبل الحجز (حساس)',
+  `state` enum('committed','consumed','released') NOT NULL DEFAULT 'committed',
+  `released_reason` varchar(190) NOT NULL DEFAULT '' COMMENT 'العكس: تحريرٌ عند الإلغاء بسببه',
+  `released_at` datetime DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idempotency_key` varchar(80) NOT NULL COMMENT '(المصدرُ ونوعُه) — لا حجزَ مزدوجًا',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cmtb_code` (`company_id`,`commit_code`),
+  UNIQUE KEY `uq_cmtb_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_cmtb_budget` (`company_id`,`budget_id`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 budget.commit: الالتزامُ يخفض المتاحَ قبل الصرف — والتحريرُ عكسُه';
+
 -- ── Table: fin_budget_lines ──
 CREATE TABLE `fin_budget_lines` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3344,13 +3392,63 @@ CREATE TABLE `fin_cash_forecasts` (
   KEY `ix_fin_cf_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: fin_cashflow ──
+CREATE TABLE `fin_cashflow` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `cf_code` varchar(16) NOT NULL COMMENT 'CFS-000001',
+  `period` varchar(10) NOT NULL,
+  `net_profit` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'نقطةُ البدءِ — النتيجة',
+  `adj_depreciation` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'تسوياتٌ غيرُ نقدية',
+  `adj_provisions` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `adj_other` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `wc_receivables` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'التغيرُ في رأسِ المالِ العامل',
+  `wc_inventory` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `wc_payables` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `wc_other` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `operating_net` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'التدفقُ التشغيلي',
+  `investing_net` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'الاستثماري — من cashflow_activity',
+  `financing_net` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'التمويلي',
+  `net_change` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'صافي التغير المحسوب',
+  `cash_open` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'نقديةُ أولِ المدةِ من 1101+1102',
+  `cash_close` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'نقديةُ آخرِ المدةِ الفعلية',
+  `actual_change` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'التغيرُ الفعليُّ = الختاميُّ − الافتتاحي',
+  `balance_diff` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT '◆ الفرقُ — والتوليدُ يُرفض إن تجاوز الحد',
+  `balance_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT '◆ تتوازن أو تُرفض',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `lines_json` mediumtext DEFAULT NULL,
+  `state` enum('generated','superseded') NOT NULL DEFAULT 'generated',
+  `supersedes_id` int(10) unsigned DEFAULT NULL,
+  `generated_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cfs_code` (`company_id`,`cf_code`),
+  UNIQUE KEY `uq_cfs_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_cfs_period` (`company_id`,`period`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 S4: الطريقةُ غيرُ المباشرةِ — وتتوازن مع تغيرِ النقديةِ الفعليِّ أو تُرفض';
+
 -- ── Table: fin_chart_of_accounts ──
 CREATE TABLE `fin_chart_of_accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `company_id` int(11) NOT NULL,
   `code` varchar(30) NOT NULL COMMENT 'رقم الحساب',
   `name` varchar(160) NOT NULL,
+  `name_en` varchar(190) NOT NULL DEFAULT '' COMMENT 'الاسمُ الإنجليزيُّ من الوثيقة',
   `account_type` enum('asset','liability','equity','revenue','expense') NOT NULL,
+  `acc_level` tinyint(3) unsigned NOT NULL DEFAULT 4 COMMENT 'COA §01: أربعةُ مستوياتٍ — 1 جذرٌ · 2 تجميعيٌّ · 3 يُقيَّد عليه · 4 تفصيليٌّ موروث',
+  `parent_code` varchar(30) NOT NULL DEFAULT '' COMMENT 'الأبُ بالكودِ — الشجرةُ تُبنى بالكودِ لا بالمعرّفِ وحدَه',
+  `balance_nature` enum('debit','credit') NOT NULL DEFAULT 'debit' COMMENT 'طبيعةُ الرصيد — مدينٌ أو دائن',
+  `statement_code` varchar(8) NOT NULL DEFAULT '' COMMENT 'S1..S5: المركزُ · دخلُ الشركةِ · دخلُ المشروعِ · التدفقاتُ · حقوقُ الملكية',
+  `statement_line` varchar(190) NOT NULL DEFAULT '' COMMENT 'بندُ القائمة',
+  `cashflow_activity` enum('operating','investing','financing','none') NOT NULL DEFAULT 'none' COMMENT 'R4: بدونه لا تُنتَج قائمةُ التدفقاتِ إلا يدويًّا',
+  `required_dims` varchar(64) NOT NULL DEFAULT '' COMMENT 'R9: الأبعادُ التي يلزمها هذا الحسابُ — D1,D2,D5 …',
+  `is_canonical` tinyint(1) NOT NULL DEFAULT 0 COMMENT '◆ 1 = من شجرةِ الوثيقةِ المعادِ هيكلتُها · 0 = موروثٌ محجورٌ بخريطة',
+  `coa_note` varchar(255) NOT NULL DEFAULT '',
   `parent_id` int(11) DEFAULT NULL COMMENT 'مرجع ذاتي — أب الحساب',
   `is_postable` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'هل يقبل قيداً مباشراً',
   `active` tinyint(1) NOT NULL DEFAULT 1,
@@ -3364,8 +3462,48 @@ CREATE TABLE `fin_chart_of_accounts` (
   UNIQUE KEY `uq_fin_acc_code` (`company_id`,`code`),
   KEY `ix_fin_acc_type` (`company_id`,`account_type`),
   KEY `ix_fin_acc_parent` (`parent_id`),
+  KEY `ix_coa_canon` (`company_id`,`is_canonical`,`acc_level`),
+  KEY `ix_coa_stmt` (`company_id`,`statement_code`),
   CONSTRAINT `fk_fin_coa_parent` FOREIGN KEY (`parent_id`) REFERENCES `fin_chart_of_accounts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_client_statements ──
+CREATE TABLE `fin_client_statements` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `stmt_code` varchar(16) NOT NULL COMMENT 'CST-000001 — رقمُ الكشف',
+  `client_id` int(11) NOT NULL,
+  `period_from` date NOT NULL,
+  `period_to` date NOT NULL,
+  `opening_balance` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'رصيدُ أول المدة (حساس)',
+  `invoices_total` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `credit_notes_total` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `collections_total` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `advance_deduction` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'خصمُ المقدم',
+  `retention_held` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'محتجزُ الضمان',
+  `closing_balance` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'رصيدُ آخر المدة (حساس)',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `base_equiv` decimal(18,2) DEFAULT NULL COMMENT 'المعادلُ بعملة الدفاتر',
+  `oldest_unpaid_date` date DEFAULT NULL COMMENT 'أقدمُ فاتورةٍ غيرِ مسدَّدة',
+  `overdue_days` int(11) NOT NULL DEFAULT 0,
+  `client_match_state` enum('بانتظار المطابقة','طابق العميل','نزاع') NOT NULL DEFAULT 'بانتظار المطابقة',
+  `layers_json` mediumtext DEFAULT NULL COMMENT 'طبقاتُ الكشف من ClientStatementService — لقطةٌ مثبتة',
+  `state` enum('issued','superseded') NOT NULL DEFAULT 'issued',
+  `supersedes_id` int(10) unsigned DEFAULT NULL COMMENT 'العكس: النسخةُ الجديدةُ تشير للسابقة',
+  `issued_by` int(11) NOT NULL COMMENT '§9-1 المُنشئ — أصدره',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL COMMENT 'اعتمده',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'المرجعُ الأب — العميل أو العقد',
+  `idempotency_key` varchar(80) NOT NULL COMMENT '(العميل×الفترة×النسخة)',
+  `cost_center_id` int(11) DEFAULT NULL,
+  `fx_note` varchar(64) NOT NULL DEFAULT '' COMMENT 'سعرُ الصرف ومصدره',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cst_code` (`company_id`,`stmt_code`),
+  UNIQUE KEY `uq_cst_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_cst_client` (`company_id`,`client_id`,`period_to`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 الشاشة ١٦: كشفُ حساب العميل — تثبيتُ رصيدٍ والعكسُ نسخةٌ جديدة';
 
 -- ── Table: fin_closing_items ──
 CREATE TABLE `fin_closing_items` (
@@ -3384,6 +3522,28 @@ CREATE TABLE `fin_closing_items` (
   KEY `fk_fin_ci_period` (`period_id`),
   CONSTRAINT `fk_fin_ci_period` FOREIGN KEY (`period_id`) REFERENCES `fin_financial_periods` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_coa_migration ──
+CREATE TABLE `fin_coa_migration` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `old_account_id` int(11) DEFAULT NULL COMMENT 'معرّفُ الحسابِ الموروثِ — يبقى ولا يُحذف',
+  `old_code` varchar(40) NOT NULL COMMENT 'الكودُ قبل الوسمِ الموروث',
+  `old_name` varchar(190) NOT NULL DEFAULT '',
+  `new_account_id` int(11) DEFAULT NULL COMMENT 'الحسابُ القانونيُّ من الشجرةِ المعادِ هيكلتُها',
+  `new_code` varchar(30) NOT NULL,
+  `dim_key` varchar(8) NOT NULL DEFAULT '' COMMENT 'البُعدُ الذي حلَّ محلَّ التفصيل — D5 · D6 …',
+  `dim_value` varchar(190) NOT NULL DEFAULT '' COMMENT 'قيمتُه — اسمُ الطرفِ أو المعدة',
+  `balance_before` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'مدين − دائن قبلَ الترحيل',
+  `balance_after` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'مدين − دائن بعدَه على الحسابِ الجديد',
+  `lines_moved` int(11) NOT NULL DEFAULT 0 COMMENT 'سطورُ القيدِ التي أُعيد توجيهُها',
+  `rule_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'قاعدةُ الترحيل: R2 · R8 · مطابقةٌ دلالية',
+  `migrated_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_coamig` (`company_id`,`old_code`),
+  KEY `ix_coamig_new` (`company_id`,`new_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='COA R10: الترحيلُ بخريطةٍ لا بحذف — وتقريرٌ يثبت تساوي الأرصدة';
 
 -- ── Table: fin_collection_allocations ──
 CREATE TABLE `fin_collection_allocations` (
@@ -3413,6 +3573,25 @@ CREATE TABLE `fin_collection_allocations` (
   CONSTRAINT `fk_alloc_payment` FOREIGN KEY (`payment_id`) REFERENCES `fin_payments` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_alloc_receivable` FOREIGN KEY (`receivable_id`) REFERENCES `fin_receivables` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_contract_types ──
+CREATE TABLE `fin_contract_types` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `type_code` varchar(12) NOT NULL COMMENT 'EC-01..08 · FC-01..10',
+  `family` enum('employee','financier') NOT NULL,
+  `name_ar` varchar(190) NOT NULL,
+  `name_en` varchar(190) NOT NULL DEFAULT '',
+  `accounts_csv` varchar(120) NOT NULL DEFAULT '' COMMENT 'أكوادُ الحساباتِ التي يُقيَّد عليها',
+  `cost_nature` varchar(190) NOT NULL DEFAULT '',
+  `accounting_rule` varchar(400) NOT NULL DEFAULT '' COMMENT 'الحكمُ المحاسبيُّ نصًّا من الوثيقة',
+  `capitalizes` tinyint(1) NOT NULL DEFAULT 0 COMMENT '◆ الإجارةُ المنتهيةُ بالتمليكِ تُرسمَل والتشغيليُّ لا',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ctype` (`company_id`,`type_code`),
+  KEY `ix_ctype_family` (`company_id`,`family`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='COA §03/§04: ثمانيةُ عقودِ موظفينَ وعشرةُ عقودِ ممولينَ — البُعد D9';
 
 -- ── Table: fin_cost_centers ──
 CREATE TABLE `fin_cost_centers` (
@@ -3490,6 +3669,42 @@ CREATE TABLE `fin_currencies` (
   KEY `ix_currency_base` (`company_id`,`is_base`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ العملات — عملةُ الأساس وما يُقاس بها (FES-01 §3.3)';
 
+-- ── Table: fin_cycle_time_metrics ──
+CREATE TABLE `fin_cycle_time_metrics` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `metric_code` varchar(16) NOT NULL COMMENT 'CYC-000001',
+  `period` varchar(7) NOT NULL,
+  `request_type` varchar(64) NOT NULL COMMENT 'نوعُ الطلب',
+  `dept_module` varchar(64) NOT NULL DEFAULT '' COMMENT 'الإدارة',
+  `requests_count` int(11) NOT NULL DEFAULT 0,
+  `avg_ring1_hours` decimal(10,2) DEFAULT NULL COMMENT 'متوسطُ زمن الحلقة الأولى',
+  `avg_ring2_hours` decimal(10,2) DEFAULT NULL,
+  `avg_ring3_hours` decimal(10,2) DEFAULT NULL,
+  `total_cycle_hours` decimal(10,2) DEFAULT NULL COMMENT 'إجماليُّ زمن الدورة',
+  `target_hours` decimal(10,2) DEFAULT NULL COMMENT 'المستهدف — من قواعد التوجيه',
+  `variance_hours` decimal(10,2) DEFAULT NULL COMMENT 'الانحراف',
+  `longest_ring` varchar(24) NOT NULL DEFAULT '' COMMENT 'أطولُ حلقة',
+  `slowest_approver_id` int(11) DEFAULT NULL COMMENT 'المعتمِدُ الأبطأ',
+  `breach_count` int(11) NOT NULL DEFAULT 0 COMMENT 'عددُ المتجاوز للمهلة',
+  `compliance_pct` decimal(9,4) DEFAULT NULL COMMENT 'نسبةُ الالتزام',
+  `action_note` varchar(190) NOT NULL DEFAULT '' COMMENT 'الإجراء',
+  `state` enum('measured','superseded') NOT NULL DEFAULT 'measured',
+  `computed_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(96) NOT NULL COMMENT '(الفترة×النوع×الإدارة)',
+  `cost_center_id` int(11) DEFAULT NULL,
+  `fx_note` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cyc_code` (`company_id`,`metric_code`),
+  UNIQUE KEY `uq_cyc_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_cyc_period` (`company_id`,`period`,`request_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 الشاشة ٢٣: قياسُ زمن الدورة بالحلقة والمعتمِد — والتقريرُ دوري';
+
 -- ── Table: fin_depreciation ──
 CREATE TABLE `fin_depreciation` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3565,6 +3780,110 @@ CREATE TABLE `fin_effect_map` (
   UNIQUE KEY `uq_effect_map` (`company_id`,`source_kind`,`effect_type`),
   KEY `ix_effect_source` (`company_id`,`source_kind`,`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D05 §6.1: خريطة تفريع الأثر — قواعد المروحة بياناتٍ لا كودًا';
+
+-- ── Table: fin_entitlement_gate_log ──
+CREATE TABLE `fin_entitlement_gate_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `gate_code` varchar(16) NOT NULL COMMENT 'GTE-000001 — رقمُ البوابة',
+  `period` varchar(7) NOT NULL,
+  `contract_id` int(11) DEFAULT NULL,
+  `unit_record_id` int(11) NOT NULL COMMENT 'الواقعةُ المرجعية',
+  `chain_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT '① سلسلةُ الاعتماد مكتملة؟',
+  `period_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT '② الفترةُ المحاسبية مفتوحة؟',
+  `contract_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT '③ العقدُ نافذ؟',
+  `quota_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT '④ الحصةُ متاحة؟',
+  `result` enum('pass','reject') NOT NULL COMMENT 'نتيجةُ الفحص',
+  `reject_code` varchar(24) NOT NULL DEFAULT '' COMMENT 'سببُ الرد المحكوم: GATE-CHAIN · GATE-PERIOD · GATE-CONTRACT · GATE-QUOTA',
+  `client_ruling` varchar(32) NOT NULL DEFAULT '',
+  `supplier_ruling` varchar(32) NOT NULL DEFAULT '',
+  `operator_ruling` varchar(32) NOT NULL DEFAULT '',
+  `impact_amount` decimal(18,2) DEFAULT NULL COMMENT 'قيمةُ الأثر (حساس)',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `fx_note` varchar(64) NOT NULL DEFAULT '' COMMENT 'سعرُ الصرف ومصدره',
+  `fact_event_id` int(11) DEFAULT NULL COMMENT 'رقمُ الحدثِ المولَّد إن مرّت',
+  `journal_ref` varchar(32) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(80) NOT NULL COMMENT '(الوحدة×المحاولة اليومية) — الإعادةُ ترجع الأول',
+  `state` enum('logged','superseded') NOT NULL DEFAULT 'logged',
+  `created_by` int(11) NOT NULL COMMENT '§9-1 المُنشئ',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_gate_code` (`company_id`,`gate_code`),
+  UNIQUE KEY `uq_gate_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_gate_unit` (`company_id`,`unit_record_id`,`result`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 الشاشة ٢٦: بوابةُ الاستحقاقِ الرباعية — إخفاقُ فحصٍ يردُّ الواقعةَ بسببٍ محكوم';
+
+-- ── Table: fin_entitlements ──
+CREATE TABLE `fin_entitlements` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `entitle_code` varchar(16) NOT NULL COMMENT 'ENT-000001 — رقمُ المحضر',
+  `period` varchar(7) NOT NULL COMMENT 'YYYY-MM — الفترة',
+  `contract_id` int(11) DEFAULT NULL COMMENT 'العقد',
+  `unit_record_id` int(11) NOT NULL COMMENT 'الواقعةُ المرجعية — fin_unit_records.id',
+  `client_ruling` varchar(32) NOT NULL DEFAULT '' COMMENT 'حكمُ العميل — يُفوتر أو سببُ الامتناع',
+  `client_amount` decimal(18,2) DEFAULT NULL COMMENT 'قيمةُ إيراد العميل (حقلٌ حساس)',
+  `supplier_ruling` varchar(32) NOT NULL DEFAULT '' COMMENT 'حكمُ المورد',
+  `supplier_amount` decimal(18,2) DEFAULT NULL COMMENT 'قيمةُ استحقاق المورد (حساس)',
+  `operator_ruling` varchar(32) NOT NULL DEFAULT '' COMMENT 'حكمُ المشغّل',
+  `operator_amount` decimal(18,2) DEFAULT NULL COMMENT 'قيمةُ أجر المشغّل (حساس)',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `fx_rate` decimal(18,6) DEFAULT NULL COMMENT 'سعرُ الصرف (حساس) — base=amount×rate',
+  `chain_completed_at` datetime DEFAULT NULL COMMENT 'تاريخُ اكتمال السلسلة الخماسية',
+  `fact_event_id` int(11) DEFAULT NULL COMMENT 'رقمُ الحدث — ems_business_events.id',
+  `journal_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'رقمُ القيد إن نُشر',
+  `effects_json` text DEFAULT NULL COMMENT 'مخرجُ المروحة: آثارٌ ومتخطًّى بأسبابه (لا تلفيق)',
+  `state` enum('generated','approved','reversed') NOT NULL DEFAULT 'generated',
+  `generated_by` int(11) NOT NULL COMMENT '§9-1 المُنشئ',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL COMMENT '§9-1 المعتمِد — المديرُ المالي',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجعُ التفويض',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT '§9-1 المرجعُ الأب — رقمُ الوحدة',
+  `idempotency_key` varchar(80) NOT NULL COMMENT 'AR-04: (الشركة×الوحدة) — لا محضرَ ثانيًا',
+  `effect_grade` varchar(16) NOT NULL DEFAULT 'مالي' COMMENT 'درجةُ الأثر',
+  `reversed_by_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'معكوسٌ بـ — قيدٌ عاكسٌ بمرجعه',
+  `reverses_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'عكسٌ عن',
+  `cost_center_id` int(11) DEFAULT NULL COMMENT 'مركزُ التكلفة (حساس)',
+  `ruleset_version` varchar(32) NOT NULL DEFAULT '' COMMENT 'نسخةُ القاعدةِ المستعملة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ent_code` (`company_id`,`entitle_code`),
+  UNIQUE KEY `uq_ent_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_ent_period` (`company_id`,`period`),
+  KEY `ix_ent_unit` (`company_id`,`unit_record_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 الشاشة ٢: توليدُ المستحق — محضرٌ بأحكامٍ ثلاثةٍ مستقلة';
+
+-- ── Table: fin_equity ──
+CREATE TABLE `fin_equity` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `eq_code` varchar(16) NOT NULL COMMENT 'EQS-000001',
+  `period` varchar(10) NOT NULL,
+  `component_code` varchar(30) NOT NULL COMMENT 'كودُ بندِ حقوقِ الملكية — 3101 · 3201 …',
+  `component_name` varchar(190) NOT NULL DEFAULT '',
+  `opening_balance` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `additions` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'زياداتُ رأسِ المالِ والأرباح',
+  `deductions` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'التوزيعاتُ والخسائر',
+  `transfers` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'التحويلُ للاحتياطيات',
+  `closing_balance` decimal(20,2) NOT NULL DEFAULT 0.00,
+  `computed_closing` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'الافتتاحيُّ + الحركات',
+  `balance_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT '◆ الختاميُّ = الافتتاحيُّ + الحركاتُ أو تُرفض',
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `state` enum('generated','superseded') NOT NULL DEFAULT 'generated',
+  `supersedes_id` int(10) unsigned DEFAULT NULL,
+  `generated_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_eqs_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_eqs_period` (`company_id`,`period`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 S5: الختاميُّ = الافتتاحيُّ + الحركاتُ لكل بندٍ أو تُرفض';
 
 -- ── Table: fin_event_effects ──
 CREATE TABLE `fin_event_effects` (
@@ -3891,12 +4210,20 @@ CREATE TABLE `fin_journal_lines` (
   `company_id` int(11) NOT NULL,
   `entry_id` int(11) NOT NULL,
   `account_id` int(11) NOT NULL COMMENT 'fin_chart_of_accounts.id',
+  `legacy_account_id` int(11) DEFAULT NULL COMMENT '◆ التصنيفُ الأصليُّ قبل ترحيلِ الشجرة — فالترحيلُ يُعكس ولا يُمحى',
+  `posting_rule_code` varchar(16) NOT NULL DEFAULT '' COMMENT 'صفُّ مصفوفةِ الترحيلِ الذي اشتقَّ الحسابَ — ولا يُختار يدويًّا',
   `debit` decimal(16,2) NOT NULL DEFAULT 0.00,
   `credit` decimal(16,2) NOT NULL DEFAULT 0.00,
   `project_id` int(11) DEFAULT NULL COMMENT 'project.id (بُعد، مرجع مرن)',
   `equipment_id` int(11) DEFAULT NULL COMMENT 'equipments.id (بُعد، مرجع مرن)',
+  `site_id` int(11) DEFAULT NULL COMMENT 'D3 الموقعُ — إلزاميٌّ في القيودِ الميدانية',
   `cost_center_id` int(11) DEFAULT NULL COMMENT 'M-38: مركزُ التكلفة من الدليل — بديلُ النص الحر cost_center',
   `cost_center` varchar(60) DEFAULT NULL,
+  `counterparty_type` varchar(24) NOT NULL DEFAULT '' COMMENT 'D6 نوعُ الطرفِ: client · supplier · employee · financier · partner',
+  `counterparty_id` int(11) DEFAULT NULL COMMENT '◆ D6 يحلُّ محلَّ أسماءِ الأشخاصِ في الشجرة (R2)',
+  `business_model` varchar(16) NOT NULL DEFAULT '' COMMENT 'D7 نموذجُ العمل: hour · ton · meter — يُنتج ربحيةَ كل نموذج',
+  `contract_id` int(11) DEFAULT NULL COMMENT 'D8 العقدُ — إلزاميٌّ في الإيرادِ والجزاءات',
+  `contract_type_code` varchar(12) NOT NULL DEFAULT '' COMMENT 'D9 نوعُ العقد: EC-01..08 للموظفينَ · FC-01..10 للممولين',
   `memo` varchar(200) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -3906,6 +4233,9 @@ CREATE TABLE `fin_journal_lines` (
   KEY `fk_fin_jl_acc` (`account_id`),
   KEY `ix_jl_cost_center` (`company_id`,`cost_center_id`),
   KEY `fk_fin_jl_cc` (`cost_center_id`),
+  KEY `ix_jl_dims` (`company_id`,`contract_id`,`business_model`),
+  KEY `ix_jl_party` (`company_id`,`counterparty_type`,`counterparty_id`),
+  KEY `ix_jl_legacy` (`legacy_account_id`),
   CONSTRAINT `fk_fin_jl_acc` FOREIGN KEY (`account_id`) REFERENCES `fin_chart_of_accounts` (`id`),
   CONSTRAINT `fk_fin_jl_cc` FOREIGN KEY (`cost_center_id`) REFERENCES `fin_cost_centers` (`id`),
   CONSTRAINT `fk_fin_jl_entry` FOREIGN KEY (`entry_id`) REFERENCES `fin_journal_entries` (`id`) ON DELETE CASCADE
@@ -3957,6 +4287,44 @@ CREATE TABLE `fin_maint_provisions` (
   KEY `ix_mprov_period` (`company_id`,`period_ref`),
   KEY `ix_mprov_event` (`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_margin_analysis ──
+CREATE TABLE `fin_margin_analysis` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `run_code` varchar(16) NOT NULL COMMENT 'MRG-000001',
+  `period` varchar(7) NOT NULL,
+  `contract_id` int(11) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `unit_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'الوحدةُ إن كان الحسابُ بواقعة',
+  `revenue_recognized` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'الإيرادُ المعترَف به',
+  `cost_operators` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT '(حساس)',
+  `cost_fuel` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `cost_maintenance` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `cost_inventory` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `cost_transfer` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `cost_financing` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `depreciation` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `total_cost` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `margin` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT '(حساس)',
+  `margin_pct` decimal(9,4) DEFAULT NULL,
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `state` enum('computed','superseded') NOT NULL DEFAULT 'computed',
+  `supersedes_id` int(10) unsigned DEFAULT NULL COMMENT 'إعادةُ احتسابٍ بعد تصحيح — نسخةٌ تشير لسابقتها',
+  `computed_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(96) NOT NULL COMMENT '(الفترة×العقد×الوحدة×النسخة)',
+  `cost_center_id` int(11) DEFAULT NULL,
+  `fx_note` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mrg_code` (`company_id`,`run_code`),
+  UNIQUE KEY `uq_mrg_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_mrg_scope` (`company_id`,`period`,`contract_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 الشاشة ١٤: الهامشُ محسوبٌ من الاعترافات الثلاثة — وتظهر العقودُ الخاسرة';
 
 -- ── Table: fin_notifications ──
 CREATE TABLE `fin_notifications` (
@@ -4025,6 +4393,118 @@ CREATE TABLE `fin_payments` (
   KEY `ix_fin_pay_state` (`company_id`,`state`),
   KEY `ix_fin_pay_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_posting_matrix ──
+CREATE TABLE `fin_posting_matrix` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `rule_code` varchar(16) NOT NULL COMMENT 'OPS · SIT · MNT · WRK · TRP · PRC · INV · SAL · SUP · FLT · CAP · HRM · GOV …',
+  `dept_ar` varchar(120) NOT NULL,
+  `source_event` varchar(190) NOT NULL COMMENT 'الحدثُ المصدرُ الذي يولّد القيد',
+  `revenue_accounts` varchar(190) NOT NULL DEFAULT '' COMMENT 'أكوادُ الإيرادِ بحسب النموذج',
+  `cost_accounts` varchar(190) NOT NULL DEFAULT '' COMMENT 'أكوادُ التكلفة',
+  `required_dims` varchar(64) NOT NULL DEFAULT '' COMMENT 'الأبعادُ الإلزاميةُ لهذا الصف',
+  `gate_ar` varchar(190) NOT NULL DEFAULT '' COMMENT 'البوابةُ قبل الترحيل',
+  `governing_rule` varchar(400) NOT NULL DEFAULT '' COMMENT 'الحكمُ الحاكمُ نصًّا',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `version_no` smallint(5) unsigned NOT NULL DEFAULT 1 COMMENT 'العكس: المصفوفةُ السابقةُ تُستعاد بنسختها',
+  `updated_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_pmatrix` (`company_id`,`rule_code`,`version_no`),
+  KEY `ix_pmatrix_active` (`company_id`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MAP-7 الورقة 37: الحسابُ يُشتق من نوعِ الواقعةِ ونموذجِ العملِ ونوعِ العقد — ولا يُختار يدويًّا';
+
+-- ── Table: fin_project_pl ──
+CREATE TABLE `fin_project_pl` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `pl_code` varchar(16) NOT NULL COMMENT 'PPL-000001',
+  `project_id` int(11) NOT NULL,
+  `period` varchar(10) NOT NULL,
+  `revenue_total` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'من 41 و42 بالبُعد D2',
+  `direct_cost_total` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'من 51 بالبُعد D2',
+  `allocated_overhead` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'حصةٌ محمَّلةٌ من 52 بأساسِ تحميلٍ معلَن',
+  `allocation_basis` varchar(190) NOT NULL DEFAULT '' COMMENT '◆ أساسُ التحميلِ يُعلَن ولا يُخترع',
+  `gross_margin` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'M2 على المشروع',
+  `operating_profit` decimal(20,2) NOT NULL DEFAULT 0.00 COMMENT 'M3 على المشروع',
+  `margin_pct` decimal(9,4) DEFAULT NULL,
+  `currency` varchar(8) NOT NULL DEFAULT 'SDG',
+  `lines_json` mediumtext DEFAULT NULL COMMENT 'بنودُ القائمةِ بأكوادها — أساسُ التعمّق',
+  `state` enum('generated','superseded') NOT NULL DEFAULT 'generated',
+  `supersedes_id` int(10) unsigned DEFAULT NULL,
+  `generated_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المحاسبُ يولّد والمديرُ الماليُّ يراجع',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ppl_code` (`company_id`,`pl_code`),
+  UNIQUE KEY `uq_ppl_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_ppl_proj` (`company_id`,`project_id`,`period`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 S3: قائمةُ دخلِ المشروعِ تُنتَج من الأبعادِ لا من شجرةٍ منفصلة';
+
+-- ── Table: fin_ratio_targets ──
+CREATE TABLE `fin_ratio_targets` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `ratio_code` varchar(12) NOT NULL COMMENT 'FR-01..FR-44',
+  `group_code` varchar(12) NOT NULL DEFAULT '' COMMENT 'RG-1..RG-11',
+  `name_ar` varchar(190) NOT NULL,
+  `name_en` varchar(190) NOT NULL DEFAULT '',
+  `formula_ar` varchar(400) NOT NULL DEFAULT '' COMMENT 'الصيغةُ نصًّا كما في الوثيقة',
+  `numerator_codes` varchar(190) NOT NULL DEFAULT '' COMMENT 'أكوادُ البسطِ من الشجرة',
+  `denominator_codes` varchar(190) NOT NULL DEFAULT '' COMMENT 'أكوادُ المقام',
+  `unit_ar` varchar(24) NOT NULL DEFAULT '' COMMENT 'مرة · ٪ · يوم · عملة',
+  `warn_op` enum('lt','gt','lte','gte','none') NOT NULL DEFAULT 'none' COMMENT 'اتجاهُ حدِّ الإنذار',
+  `warn_value` decimal(18,4) DEFAULT NULL COMMENT 'حدُّ الإنذار',
+  `critical_value` decimal(18,4) DEFAULT NULL COMMENT 'الحدُّ الحرج',
+  `target_value` decimal(18,4) DEFAULT NULL COMMENT 'الهدفُ المعتمد',
+  `limit_text` varchar(190) NOT NULL DEFAULT '' COMMENT 'نصُّ الحدِّ من الوثيقة',
+  `cadence` varchar(24) NOT NULL DEFAULT 'شهريًّا' COMMENT 'يوميًّا · أسبوعيًّا · شهريًّا · ربعَ سنويّ',
+  `owner_role` varchar(120) NOT NULL DEFAULT '' COMMENT '◆ لكل نسبةٍ مالكٌ — ولا نسبةَ بلا حد',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `approved_by` int(11) DEFAULT NULL COMMENT '◆ نائبُ الرئيس للشؤون المالية والاستثمار',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'الحدُّ السابقُ — والعكسُ إعادتُه بقرار',
+  `version_no` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `created_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_rtarget` (`company_id`,`ratio_code`,`version_no`),
+  KEY `ix_rtarget_grp` (`company_id`,`group_code`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 fin.ratio.target: لكل نسبةٍ حدُّ إنذارٍ وحدٌّ حرجٌ ومالكٌ ودورية';
+
+-- ── Table: fin_ratio_values ──
+CREATE TABLE `fin_ratio_values` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `ratio_code` varchar(12) NOT NULL,
+  `period` varchar(10) NOT NULL COMMENT 'YYYY-MM أو YYYY-Qn أو YYYY',
+  `scope_kind` varchar(16) NOT NULL DEFAULT 'company' COMMENT 'company · project · contract · equipment',
+  `scope_ref` varchar(40) NOT NULL DEFAULT '' COMMENT 'قيمةُ البُعدِ عند النطاقِ غيرِ الشركة',
+  `numerator_value` decimal(20,4) DEFAULT NULL COMMENT 'قيمةُ البسطِ المحسوبةُ من القيود',
+  `denominator_value` decimal(20,4) DEFAULT NULL,
+  `result_value` decimal(20,4) DEFAULT NULL COMMENT 'النتيجة — والمقامُ صفرٌ يعطي NULL لا صفرًا كاذبًا',
+  `unit_ar` varchar(24) NOT NULL DEFAULT '',
+  `status_flag` enum('ok','warn','critical','unmeasured') NOT NULL DEFAULT 'unmeasured' COMMENT '◆ unmeasured حين يغيب المقام — شرطةٌ لا صفر',
+  `trend_direction` enum('up','down','flat','na') NOT NULL DEFAULT 'na',
+  `source_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'مصدرُ الحساب: أكوادُ الشجرةِ والفترة',
+  `entries_count` int(11) NOT NULL DEFAULT 0 COMMENT 'عددُ القيودِ المكوِّنةِ — أساسُ التعمّق',
+  `computed_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `supersedes_id` int(10) unsigned DEFAULT NULL COMMENT 'إعادةُ الحسابِ نسخةٌ تشير لسابقتها',
+  `state` enum('computed','superseded') NOT NULL DEFAULT 'computed',
+  `idempotency_key` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_rval` (`company_id`,`idempotency_key`),
+  KEY `ix_rval_scope` (`company_id`,`ratio_code`,`period`,`state`),
+  KEY `ix_rval_flag` (`company_id`,`status_flag`,`period`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 fin.ratio.compute: النسبُ محسوبةٌ من القيودِ لا من إدخالٍ يدوي';
 
 -- ── Table: fin_receivables ──
 CREATE TABLE `fin_receivables` (
@@ -4185,6 +4665,27 @@ CREATE TABLE `fin_requests` (
   CONSTRAINT `fk_req_parent` FOREIGN KEY (`parent_request_id`) REFERENCES `fin_requests` (`id`),
   CONSTRAINT `fk_req_settlement` FOREIGN KEY (`settlement_id`) REFERENCES `settlements` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_signal_rules ──
+CREATE TABLE `fin_signal_rules` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `signal_code` varchar(12) NOT NULL COMMENT 'FS-01..FS-16',
+  `name_ar` varchar(255) NOT NULL,
+  `rule_expr` varchar(190) NOT NULL COMMENT 'القاعدةُ نصًّا: FR-05 < 0 · FR-09 ↓ ×3',
+  `ratio_code` varchar(12) NOT NULL DEFAULT '' COMMENT 'النسبةُ التي تُقاس',
+  `operator` enum('lt','gt','lte','gte','decline_streak','delta_gt','none') NOT NULL DEFAULT 'none',
+  `threshold` decimal(18,4) DEFAULT NULL,
+  `streak_periods` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'تراجعٌ متتالٍ — ثلاثةُ أشهرٍ مثلًا',
+  `severity` enum('حرج','مرتفع','متوسط','منخفض') NOT NULL DEFAULT 'متوسط',
+  `destination_ar` varchar(190) NOT NULL DEFAULT '' COMMENT 'الوجهةُ: الرئيسُ والنائبُ المالي …',
+  `cadence` varchar(24) NOT NULL DEFAULT 'شهريًّا',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_fsrule` (`company_id`,`signal_code`),
+  KEY `ix_fsrule_active` (`company_id`,`active`,`cadence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MAP-7 الورقة 36: كلُّ إشارةٍ تُنشر لإدارةِ المخاطرِ فتدخل الفرزَ الرباعي';
 
 -- ── Table: fin_tax_codes ──
 CREATE TABLE `fin_tax_codes` (
@@ -4667,6 +5168,56 @@ CREATE TABLE `founding_mode` (
   PRIMARY KEY (`mode_id`),
   UNIQUE KEY `uq_fm_mode` (`mode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: gov_approval_decisions ──
+CREATE TABLE `gov_approval_decisions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `decision_code` varchar(16) NOT NULL COMMENT 'APD-000001',
+  `source_kind` enum('fin_request','supplier_settlement','journal_entry','period_close','other') NOT NULL COMMENT 'الصندوقُ الموحَّد يجمع من مصادرَ أربعة — والقرارُ بخدمة مصدره',
+  `source_ref` varchar(64) NOT NULL COMMENT 'مرجعُ المستند في مصدره',
+  `decision` enum('rejected','returned','withdrawn_decision') NOT NULL COMMENT 'rejected: رفضٌ بسبب · returned: إعادةٌ للتصحيح',
+  `reason_code` varchar(32) NOT NULL DEFAULT '' COMMENT 'السببُ المحكوم: RSN-BUDGET · RSN-DOCS · RSN-AUTH · RSN-DUP · RSN-DATA · RSN-OTHER',
+  `reason_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'بيانُ السبب — إلزاميٌّ مع RSN-OTHER',
+  `ring_no` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT 'الحلقةُ في السلسلة عند القرار',
+  `decided_by` int(11) NOT NULL COMMENT 'المعتمِدُ صاحبُ القرار',
+  `decided_capacity` varchar(120) NOT NULL DEFAULT '' COMMENT 'صفتُه من المسمى الحي — لا الاسم',
+  `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجعُ التفويض',
+  `parent_ref` varchar(64) NOT NULL DEFAULT '' COMMENT 'المرجعُ الأب — المستندُ المقرَّرُ فيه',
+  `event_id` int(11) DEFAULT NULL COMMENT 'ApprovalRejected/ApprovalReturned في الممر المحايد',
+  `state` enum('effective','superseded') NOT NULL DEFAULT 'effective',
+  `superseded_by_ref` varchar(16) NOT NULL DEFAULT '' COMMENT 'إعادةُ رفعٍ بعد التصحيح — دورةٌ جديدة',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `idempotency_key` varchar(96) NOT NULL COMMENT '(المصدرُ×المرجعُ×القرارُ×الحلقة)',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_apd_code` (`company_id`,`decision_code`),
+  UNIQUE KEY `uq_apd_idem` (`company_id`,`idempotency_key`),
+  KEY `ix_apd_source` (`company_id`,`source_kind`,`source_ref`),
+  KEY `ix_apd_reason` (`company_id`,`reason_code`) COMMENT 'السببُ يُقاس في تحليل الاختناقات'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-14 approval.reject/return: القرارُ بسببٍ محكومٍ يُقاس — وسجلُّه لا يُعدَّل';
+
+-- ── Table: gov_denial_reviews ──
+CREATE TABLE `gov_denial_reviews` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `review_code` varchar(16) NOT NULL COMMENT 'DNR-000001',
+  `denial_id` int(11) NOT NULL COMMENT 'guard_denials.deny_id — المحاولةُ المرصودة',
+  `guard_code` varchar(64) NOT NULL DEFAULT '' COMMENT 'رمزُ الحارس الذي منع',
+  `classification` enum('يحتاج استثناءً','خطأ تصنيف حماية','محاولة تجاوز','عابر — لا إجراء') NOT NULL COMMENT 'التصنيفُ الثلاثي + العابر — §7-2 denial.review',
+  `decision_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'قرارُ المراجعة وتسبيبه',
+  `follow_up_ref` varchar(64) NOT NULL DEFAULT '' COMMENT 'الأثرُ التالي: رقمُ طلب استثناءٍ أو تصحيحِ تصنيفٍ أو بلاغ',
+  `state` enum('open','closed') NOT NULL DEFAULT 'open',
+  `reviewed_by` int(11) NOT NULL COMMENT '§9-1 المُنشئ — المراجِع',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `closed_by` int(11) DEFAULT NULL,
+  `closed_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'المرجعُ الأب — رقمُ المحاولة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_dnr_code` (`company_id`,`review_code`),
+  UNIQUE KEY `uq_dnr_denial` (`company_id`,`denial_id`) COMMENT 'مراجعةٌ واحدةٌ للمحاولة — والتحديثُ عليها',
+  KEY `ix_dnr_state` (`company_id`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-14 denial.review: المنعُ المتكرر يُراجَع ويُصنَّف — لا يُترك صامتًا';
 
 -- ── Table: governance_flags ──
 CREATE TABLE `governance_flags` (
@@ -5353,6 +5904,12 @@ CREATE TABLE `nav09_action_map` (
   `reverse_text` varchar(255) DEFAULT NULL,
   `live_code` varchar(80) DEFAULT NULL,
   `state` enum('alias','pending','bound_page','declared_unbuilt') NOT NULL DEFAULT 'pending',
+  `guard_verified` enum('pending','yes','no','n_a') NOT NULL DEFAULT 'pending' COMMENT '⑤ أيمنعه حارسٌ في الخادم؟ — شاهدُه محاولةٌ غيرُ مخوَّلةٍ تُرفض برمز',
+  `guard_evidence` varchar(190) NOT NULL DEFAULT '' COMMENT 'دليلُ حكمِ الحارس — رمزُ الرفضِ أو مسارُ الفحص',
+  `idempotency_verified` enum('pending','yes','no','n_a') NOT NULL DEFAULT 'pending' COMMENT '⑩ أتُرفض إعادةُ النداء؟ — الإعادةُ ترجع مرجعَ الأول',
+  `idempotency_evidence` varchar(190) NOT NULL DEFAULT '',
+  `uat_verified` enum('pending','yes','no','n_a') NOT NULL DEFAULT 'pending' COMMENT '⑫ أاجتاز رحلةً حيةً بمستخدمٍ حقيقي؟ — محضرُ UAT موقَّع',
+  `uat_evidence` varchar(190) NOT NULL DEFAULT '',
   `write_class` enum('read_only','domain_write','governance_write','external_side_effect') DEFAULT NULL COMMENT 'U10 ورقة 21 — تصنيف الكتابة ولازم التدقيق',
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`canonical_code`),
@@ -5610,6 +6167,31 @@ CREATE TABLE `org_assignments` (
   CONSTRAINT `fk_asg_type` FOREIGN KEY (`assignment_type_code`) REFERENCES `org_assignment_types` (`type_code`),
   CONSTRAINT `fk_asg_unit` FOREIGN KEY (`org_unit_id`) REFERENCES `org_units` (`unit_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ORG-01 §2/§7: التكليفُ سجلٌّ تنظيميٌّ بنطاقٍ ومدةٍ وسقفٍ ونائبٍ — ويسقط آليًّا بانتهائه';
+
+-- ── Table: org_structure_versions ──
+CREATE TABLE `org_structure_versions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `version_code` varchar(16) NOT NULL COMMENT 'ORG-000001',
+  `change_kind` enum('إنشاء وحدة','تعديل وحدة','تعطيل وحدة','نقل تبعية','تعديل مسمى','رجوع لنسخة') NOT NULL,
+  `unit_id` int(11) DEFAULT NULL COMMENT 'org_units.unit_id المتأثرة',
+  `decision_ref` varchar(64) NOT NULL COMMENT 'قرارُ الإنشاء أو التعديل — مرجعيٌّ إلزامي',
+  `effective_date` date NOT NULL,
+  `snapshot_json` mediumtext NOT NULL COMMENT 'لقطةُ الهيكل قبل التغيير — أساسُ الرجوع',
+  `change_json` text DEFAULT NULL COMMENT 'ما تغيّر بالضبط — قبلَ وبعد',
+  `assignments_review_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'التكليفاتُ القائمةُ تُراجَع — نتيجةُ المراجعة',
+  `state` enum('applied','reverted') NOT NULL DEFAULT 'applied',
+  `reverted_by_ref` varchar(16) NOT NULL DEFAULT '' COMMENT 'العكس: نسخةُ الرجوع التي نقضتها',
+  `changed_by` int(11) NOT NULL COMMENT '§9-1 المُنشئ',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL COMMENT '§9-1 المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'النسخةُ السابقة في السلسلة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_orgv_code` (`company_id`,`version_code`),
+  KEY `ix_orgv_unit` (`company_id`,`unit_id`,`effective_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-14 org.change: كلُّ تغييرِ هيكلٍ نسخةٌ بلقطتها وقرارها — والرجوعُ بقرارٍ لا محوًا';
 
 -- ── Table: org_units ──
 CREATE TABLE `org_units` (
@@ -7052,10 +7634,15 @@ CREATE TABLE `risk_acceptances` (
   `risk_id` int(10) unsigned NOT NULL,
   `level_at_acceptance` enum('منخفض','متوسط','مرتفع','حرج') NOT NULL COMMENT 'المحظور لا يُقبل بحال — غائب عمدًا من القائمة',
   `authority` enum('risk_owner','owner_with_analyst','deputy','ceo') NOT NULL COMMENT 'مصفوفة السلطة (ورقة 27) — تفرضها الخدمة على المستوى',
+  `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجع التفويض — بأي صفة اعتمد',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT '§9-1 المرجع الأب — رمز الخطر',
   `accepted_by` int(11) NOT NULL,
   `analyst_review_by` int(11) DEFAULT NULL COMMENT 'للمتوسط: مراجعة محلل المخاطر',
   `review_due` date NOT NULL COMMENT 'مهلة المراجعة — القبول ليس إهمالًا',
   `note` text DEFAULT NULL,
+  `compensating_ctl` varchar(255) NOT NULL DEFAULT '' COMMENT '§7-2 ضوابط معوِّضة',
+  `withdrawn_by` int(11) DEFAULT NULL COMMENT 'سحبُ القبولِ من الجهة نفسها أو أعلى',
+  `withdrawn_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_risk` (`company_id`,`risk_id`,`created_at`)
@@ -7073,6 +7660,10 @@ CREATE TABLE `risk_appetite` (
   `immutable_floor` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = لا تتغير بحال (السلامة · القانون · تسرب البيانات)',
   `plan_mode` enum('النمو والتوسع','التثبيت والكفاءة','الحماية والانكماش') DEFAULT NULL COMMENT 'NULL = السطر الأساسي؛ وإلا فتعديل نمط خطة',
   `updated_by` int(11) DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL COMMENT '§13-1 الرئيسُ التنفيذيُّ حصرًا',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `prev_appetite_ar` varchar(255) NOT NULL DEFAULT '' COMMENT '§7-1: اعتمادُ شهيةٍ جديدةٍ يحفظ السابقة',
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_domain` (`company_id`,`domain`,`plan_mode`)
@@ -7093,11 +7684,55 @@ CREATE TABLE `risk_assessments` (
   `technique` varchar(48) NOT NULL DEFAULT 'مصفوفة الخطر' COMMENT 'تقنية التقييم (ورقة 25)',
   `assessed_by` int(11) NOT NULL,
   `challenged_by` int(11) DEFAULT NULL COMMENT 'تحدي المخاطر المستقل (المرحلتان 5/8)',
+  `approved_by` int(11) DEFAULT NULL COMMENT '§9-1 المعتمِد — الاسم والصفة',
+  `approved_at` datetime DEFAULT NULL COMMENT '§9-1 تاريخ الاعتماد',
+  `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجع التفويض',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT '§9-1 المرجع الأب — النسخة السابقة',
   `note` text DEFAULT NULL,
   `assessed_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_risk_type` (`company_id`,`risk_id`,`assess_type`,`assessed_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16: تقييمات مؤرخة لا تُكتب فوقها (RK-03) — إدراج فقط';
+
+-- ── Table: risk_committee ──
+CREATE TABLE `risk_committee` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `minute_code` varchar(16) NOT NULL COMMENT 'CMT-000001',
+  `meeting_date` date NOT NULL,
+  `cycle_ar` varchar(32) NOT NULL DEFAULT 'ربع سنوي',
+  `attendees_ar` text DEFAULT NULL COMMENT 'الحاضرون بصفاتهم',
+  `agenda_ar` text DEFAULT NULL,
+  `resolutions_ar` text DEFAULT NULL COMMENT 'القراراتُ — مخرَجُ المرحلة ٨: محضرُ لجنة',
+  `risks_reviewed` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `appetite_id` int(10) unsigned DEFAULT NULL COMMENT 'الشهيةُ المعتمدةُ في هذا المحضر',
+  `state` enum('draft','approved') NOT NULL DEFAULT 'draft' COMMENT 'RK: المعتمدُ لا يُعدَّل — والتصحيحُ محضرٌ جديدٌ بمرجعه',
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL COMMENT '§9-1 المعتمِد — الرئيسُ التنفيذي',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'المحضرُ السابقُ في السلسلة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cmt` (`company_id`,`minute_code`),
+  KEY `ix_cmt_date` (`company_id`,`meeting_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16 §6-1 الشاشة ١٤: لجنةُ المخاطرِ ومحاضرُها';
+
+-- ── Table: risk_committee_items ──
+CREATE TABLE `risk_committee_items` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `minute_id` int(10) unsigned NOT NULL,
+  `risk_id` int(10) unsigned DEFAULT NULL,
+  `item_ar` varchar(255) NOT NULL,
+  `resolution_ar` varchar(255) NOT NULL DEFAULT '',
+  `owner_user_id` int(11) DEFAULT NULL,
+  `due_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_cmti_minute` (`company_id`,`minute_id`),
+  KEY `ix_cmti_risk` (`company_id`,`risk_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16: بنودُ محضرِ اللجنةِ وقراراتُها بمسؤولٍ ومهلة';
 
 -- ── Table: risk_control_evidence ──
 CREATE TABLE `risk_control_evidence` (
@@ -7149,6 +7784,11 @@ CREATE TABLE `risk_controls` (
   `verifier_user_id` int(11) DEFAULT NULL COMMENT 'حرج: متحقق مستقل ≠ المالك (يفرضه الحارس)',
   `fail_action` varchar(255) DEFAULT NULL COMMENT 'حرج: الإجراء الفوري والتصعيد عند الفشل',
   `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(11) DEFAULT NULL COMMENT '§9-1 المُنشئ',
+  `approved_by` int(11) DEFAULT NULL COMMENT '§9-1 المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'الخطر الأب أو الضابط المستبدَل',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -7171,6 +7811,58 @@ CREATE TABLE `risk_escalations` (
   KEY `ix_open` (`company_id`,`to_authority`,`acknowledged_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16: الخطر الحرج لا يختفي عن الرئيس (RK-08) — تصعيد آلي';
 
+-- ── Table: risk_export_log ──
+CREATE TABLE `risk_export_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `exported_by` int(11) NOT NULL COMMENT '① المصدِّر',
+  `actor_capacity` varchar(120) NOT NULL DEFAULT '' COMMENT '② بصفته',
+  `screen_code` varchar(64) NOT NULL COMMENT '③ الشاشة',
+  `view_key` varchar(48) NOT NULL DEFAULT 'default' COMMENT '④ المنظر',
+  `columns_text` text DEFAULT NULL COMMENT '⑤ الأعمدة المصدَّرة',
+  `filters_text` text DEFAULT NULL COMMENT '⑥ الفلاتر المطبَّقة',
+  `blocked_text` text DEFAULT NULL COMMENT '⑦ المستبعَدُ بالصلاحية — الحقولُ الحساسةُ المحجوبة',
+  `row_count` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '⑧ عددُ الصفوف',
+  `exported_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT '⑨ الوقت',
+  `fmt` varchar(12) NOT NULL DEFAULT 'xlsx',
+  PRIMARY KEY (`id`),
+  KEY `ix_rxl_who` (`company_id`,`exported_by`,`exported_at`),
+  KEY `ix_rxl_screen` (`company_id`,`screen_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16 §9-4: سجلُّ التصديرِ — تسعةُ بنودٍ لكلِّ ملفٍّ يخرج';
+
+-- ── Table: risk_incidents ──
+CREATE TABLE `risk_incidents` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `incident_code` varchar(16) NOT NULL COMMENT 'INC-000001',
+  `itype` enum('واقعة','واقعة كادت تقع','واقعة خسارة') NOT NULL COMMENT '§11-2: Incident · Near Miss · Loss Event — لا تُخلط',
+  `ru_id` int(10) unsigned DEFAULT NULL COMMENT 'وحدة المخاطر المرشَّحة',
+  `title` varchar(255) NOT NULL,
+  `details` text DEFAULT NULL,
+  `occurred_at` datetime NOT NULL COMMENT 'وقتُ الواقعة لا وقتُ التسجيل',
+  `site_id` int(11) DEFAULT NULL,
+  `equipment_id` int(11) DEFAULT NULL,
+  `entity_type` varchar(40) NOT NULL DEFAULT '' COMMENT 'الكيان المتأثر — نوعُه',
+  `entity_id` int(11) DEFAULT NULL,
+  `root_cause` varchar(255) NOT NULL DEFAULT '' COMMENT 'تحليلُ السبب الجذري',
+  `injury_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `downtime_hours` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `loss_estimate` decimal(18,2) DEFAULT NULL COMMENT 'تعرضٌ مقدَّرٌ — لا قيدَ ماليًّا (RK-06)',
+  `currency` varchar(8) NOT NULL DEFAULT '',
+  `realized_risk_id` int(10) unsigned DEFAULT NULL COMMENT 'خطرٌ قائمٌ تحقّق — يُعاد تقييمُه',
+  `signal_id` int(10) unsigned DEFAULT NULL COMMENT 'الإشارةُ التي وُلدت منها (SG-14)',
+  `state` enum('logged','investigated','linked','closed') NOT NULL DEFAULT 'logged',
+  `corrected_by_ref` varchar(32) NOT NULL DEFAULT '' COMMENT 'RK: التصحيحُ بمرجعٍ لا حذفًا — رمزُ الواقعةِ المصحِّحة',
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_inc` (`company_id`,`incident_code`),
+  KEY `ix_inc_risk` (`company_id`,`realized_risk_id`),
+  KEY `ix_inc_when` (`company_id`,`occurred_at`),
+  KEY `ix_inc_type` (`company_id`,`itype`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16 §6-1 الشاشة ١٢: الحوادث والوقائع — ثلاثةُ أنواعٍ لا تُخلط';
+
 -- ── Table: risk_kris ──
 CREATE TABLE `risk_kris` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -7181,9 +7873,15 @@ CREATE TABLE `risk_kris` (
   `warn_threshold_ar` varchar(160) NOT NULL COMMENT 'حد الإنذار',
   `critical_threshold_ar` varchar(160) NOT NULL COMMENT 'الحد الحرج',
   `source_ar` varchar(160) NOT NULL COMMENT 'المصدر في النظام',
+  `source_key` varchar(48) NOT NULL DEFAULT '' COMMENT 'مفتاحُ القارئ في محرّك المؤشرات',
+  `read_mode` enum('آلي','يدوي') NOT NULL DEFAULT 'يدوي' COMMENT 'المرحلة ١٢: الآليُّ يُقرأ من النظام — والالتزامُ يُقاس ولا يُدَّعى',
+  `warn_num` decimal(18,4) DEFAULT NULL COMMENT 'حدُّ الإنذار رقمًا للمقارنة الآلية',
+  `critical_num` decimal(18,4) DEFAULT NULL COMMENT 'الحدُّ الحرج رقمًا',
+  `direction` enum('تصاعدي','تنازلي') NOT NULL DEFAULT 'تصاعدي' COMMENT 'أيُّ الاتجاهين يُعدُّ تجاوزًا',
   `current_value` varchar(64) DEFAULT NULL,
   `kri_state` enum('ok','warn','critical','unread') NOT NULL DEFAULT 'unread',
   `last_read_at` timestamp NULL DEFAULT NULL,
+  `last_read_by` int(11) DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_kri` (`company_id`,`dept_ar`,`name_ar`)
@@ -7208,6 +7906,13 @@ CREATE TABLE `risk_register` (
   `dedup_key` char(40) NOT NULL DEFAULT '' COMMENT 'sha1(ru|entity|root_cause_norm|scope) — النافذة تُفحص زمنيًّا',
   `state` enum('classified','owner_assigned','inherent_assessed','controls_linked','controls_evaluated','residual_assessed','appetite_compared','treatment_planned','accepted','monitoring','reassessment','closed','reopened') NOT NULL DEFAULT 'classified',
   `current_level` enum('منخفض','متوسط','مرتفع','حرج','محظور') DEFAULT NULL COMMENT 'آخر مستوى متبقٍّ معتمد — عليه مصفوفة السلطة',
+  `appetite_verdict` enum('داخل الشهية','فوق الشهية','فوق حد التحمل','محظور') DEFAULT NULL COMMENT 'المرحلة ٩: حكمُ شهيةٍ آليٌّ — لا يُدخَل يدويًّا',
+  `appetite_checked_at` datetime DEFAULT NULL,
+  `exposure_amount` decimal(18,2) DEFAULT NULL COMMENT '§6-2: التعرضُ الماليُّ المقدَّر — تقديرٌ لا قيد (RK-06)',
+  `exposure_currency` varchar(8) NOT NULL DEFAULT '',
+  `target_level` varchar(16) NOT NULL DEFAULT '' COMMENT '§12-3: الخطرُ المستهدفُ — يُقاس عند الإغلاق',
+  `control_effectiveness` varchar(24) NOT NULL DEFAULT '' COMMENT '§12-3: فعاليةُ الضوابطِ المجمَّعة',
+  `confidence` varchar(16) NOT NULL DEFAULT '' COMMENT '§12-3: درجةُ الثقةِ — تُعلَن ولا تُخفى',
   `velocity` enum('فوري','أيام','أسابيع','أشهر','سنوات') DEFAULT NULL COMMENT 'سرعة التحقق',
   `horizon` enum('قصير','متوسط','طويل') DEFAULT NULL COMMENT 'الأفق الزمني',
   `review_due` date DEFAULT NULL COMMENT 'موعد المراجعة بحسب المستوى (شهري للحرج..سنوي للمنخفض)',
@@ -7222,11 +7927,37 @@ CREATE TABLE `risk_register` (
   KEY `ix_owner_unit` (`company_id`,`owner_unit_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16: السجل المركزي الواحد للمخاطر (RK-02) — لا حذف إطلاقًا';
 
+-- ── Table: risk_reviews ──
+CREATE TABLE `risk_reviews` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `risk_id` int(10) unsigned NOT NULL,
+  `review_code` varchar(16) NOT NULL COMMENT 'RVW-000001',
+  `trigger_kind` enum('دورية','حدث','فشل ضابط','تجاوز مؤشر') NOT NULL DEFAULT 'دورية' COMMENT 'المرحلة ١٣: دوريًّا أو عند حدثٍ أو فشلِ ضابطٍ أو تجاوزِ مؤشر',
+  `level_before` varchar(16) NOT NULL DEFAULT '',
+  `level_after` varchar(16) NOT NULL DEFAULT '',
+  `decision` enum('استمرار','إغلاق','تصعيد') NOT NULL COMMENT 'مخرَجُ المرحلة ١٣: قرارُ استمرارٍ أو إغلاقٍ أو تصعيد',
+  `findings_ar` text DEFAULT NULL COMMENT 'ما وُجد — شاهدُ المراجعة',
+  `assessment_id` int(10) unsigned DEFAULT NULL COMMENT 'التقييمُ الذي أنتجته هذه المراجعة',
+  `next_review_due` date DEFAULT NULL,
+  `reviewed_by` int(11) NOT NULL COMMENT 'محللُ المخاطر — §14-1 لا يملك الخطرَ ولا يقبله',
+  `approved_by` int(11) DEFAULT NULL COMMENT '§9-1 المعتمِد — الاسمُ والصفة',
+  `approved_at` datetime DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجعُ التفويض',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT '§9-1 المرجعُ الأب — المراجعةُ السابقة',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_rvw` (`company_id`,`review_code`),
+  KEY `ix_rvw_risk` (`company_id`,`risk_id`,`created_at`),
+  KEY `ix_rvw_due` (`company_id`,`next_review_due`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16 المرحلة ١٣: المراجعاتُ الدورية — الجديدةُ تحفظ السابقة';
+
 -- ── Table: risk_signals ──
 CREATE TABLE `risk_signals` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `company_id` int(11) NOT NULL,
   `sg_code` varchar(8) DEFAULT NULL COMMENT 'SG-01..SG-16 للآلية · NULL ليدوية/ميدانية',
+  `rule_key` varchar(64) DEFAULT NULL COMMENT '§13-5: مفتاحُ عطالةِ القاعدةِ الآلية — NULL لليدوية',
   `source` enum('auto','manual','field') NOT NULL DEFAULT 'manual',
   `title` varchar(255) NOT NULL,
   `details` text DEFAULT NULL,
@@ -7250,6 +7981,7 @@ CREATE TABLE `risk_signals` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sync` (`sync_uuid`),
+  UNIQUE KEY `uq_sig_rule` (`company_id`,`rule_key`),
   KEY `ix_state` (`company_id`,`state`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-16: إشارات الخطر قبل الفرز (RK-05) — ليس كل حدث خطرًا';
 
@@ -7266,6 +7998,8 @@ CREATE TABLE `risk_treatments` (
   `done_evidence` text DEFAULT NULL COMMENT 'دليل الإنجاز — الإغلاق بقبول المتحقق',
   `verified_by` int(11) DEFAULT NULL,
   `verified_at` timestamp NULL DEFAULT NULL,
+  `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجع التفويض',
+  `parent_ref` varchar(32) NOT NULL DEFAULT '' COMMENT '§9-1 المرجع الأب — رمز الخطر',
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),

@@ -67,6 +67,9 @@ class EventPublisher
         'sales', 'suppliers', 'workforce', 'procurement', 'warehouse', 'maintenance',
         'projects', 'revenue', 'assets', 'treasury', 'movement', 'finance', 'transport', 'system',
         'capacity', // update0005 · CAP-29: مجالُ القدرات — أحداثُ CAP-01 §14 الستة
+        'risk',     // M-16 §10-1: إدارةُ المخاطرِ تنشر ٢٦ حدثًا — والتكاملُ بالأحداثِ
+                    // لا بالنداءِ المباشر. أحداثُها حقائقُ محايدةٌ بلا إسقاطٍ ماليٍّ
+                    // (RK-06: تقييمُ الخطرِ لا يُنشئ قيدًا) — فتُنشر بـpublishFact حصرًا.
     );
 
     /** الحقول المرجعية: مفاتيح رقمية إلى الجداول المالكة — لا نسخ بيانات. */

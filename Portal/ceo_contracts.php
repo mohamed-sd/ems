@@ -23,7 +23,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=غير+مصرح");
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -32,12 +32,11 @@ $__pp = check_page_permissions($conn, 'Portal/ceo_contracts.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
     require_once __DIR__ . '/../includes/perm_explain_live.php';
     $__why = ems_deny_message($conn, intval($_SESSION['user']['role'] ?? 0), 'Portal/ceo_contracts.php');
-    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    ems_gov_flash_redirect('../main/dashboard.php', $__why, 'GOV-INFO-200', '');
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    http_response_code(403);
-    exit('غير مصرح بالكتابة في هذه الشاشة');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -91,9 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     if ($in['signing_date'] !== '' && $in['contract_no'] !== '') {
         $blockNote = m00_review_block($conn, $company_id, $in['contract_no']);
         if ($blockNote !== null) {
-            header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
-                'BR-CEO-02: التوقيع محجوبٌ — ملاحظةٌ حرجةٌ مفتوحة (' . $blockNote
-                . ') على العقد ' . $in['contract_no'] . ' · تُقفل بمستند معالجةٍ أولًا ولا تُرفع شفهيًّا ❌'));
+            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-02: التوقيع محجوبٌ — ملاحظةٌ حرجةٌ مفتوحة (' . $blockNote
+                . ') على العقد ' . $in['contract_no'] . ' · تُقفل بمستند معالجةٍ أولًا ولا تُرفع شفهيًّا ❌', 'GOV-FAIL-409', '');
             exit();
         }
     }
@@ -118,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $status, $uid, $creator);
     $ok = $st->execute();
     $st->close();
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -128,11 +126,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
  * الحقيقيُّ المرتبط يوقَّع عبر آلة الحالة فيقع أثرُه الرباعي (نفاذ · سجل
  * موحَّد · حاوية · التزامٌ بالمروحة) ويُنشر ContractSigned من نقطة الخنق. */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'sign') {
-    $goBack = function ($m) { header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($m)); exit(); };
+    $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
     if (!$is_super_admin && $actorRole !== '9') {
-        http_response_code(403);
-        exit('التوقيعُ على العقود قرارُ الإدارة التنفيذية وحدها — BR-CEO-01');
+        ems_gov_flash_redirect('../main/dashboard.php', 'التوقيعُ على العقود قرارُ الإدارة التنفيذية وحدها — BR-CEO-01 ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
     }
     $rowId = intval($_POST['row'] ?? 0);
     $authorityRef = trim((string) ($_POST['authority_ref'] ?? ''));
@@ -265,6 +262,9 @@ function m00_cell_at($idx, $row, $entityName, $COLDB) {
 }
 
 $page_title = 'إيكوبيشن | توقيع العقود والالتزامات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

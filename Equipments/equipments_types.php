@@ -13,20 +13,22 @@ $perms = get_page_permissions($conn);
 
 // التحقق من صلاحية عرض هذه الصفحة
 if (!$perms['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية لعرض هذه الصفحة'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا توجد صلاحية لعرض هذه الصفحة', 'GOV-PERM-403', '');
     exit();
 }
 
 
 $page_title = "إيكوبيشن | أنواع المعدات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /* حذف النوع معطل (Backend) */
 if (isset($_GET['delete_id'])) {
-    http_response_code(403);
-    exit('Deletion is temporarily disabled.');
+    ems_gov_flash_redirect('../main/dashboard.php', 'Deletion is temporarily disabled. ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 
 /* جلب بيانات التعديل */

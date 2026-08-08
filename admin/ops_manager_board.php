@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * admin/ops_manager_board.php — لوحة مدير التشغيل (update0004 · ORG-18)
  * ───────────────────────────────────────────────────────────────────────────
@@ -30,7 +31,7 @@ if (!$is_super_admin) {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية للوحة مدير التشغيل ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية للوحة مدير التشغيل ❌', 'GOV-PERM-403', ''); exit(); }
 
 $q1 = function ($sql) use ($conn) { $r = $conn->query($sql); return $r ? $r->fetch_assoc() : null; };
 $qa = function ($sql) use ($conn) { $r = $conn->query($sql); return $r ? $r->fetch_all(MYSQLI_ASSOC) : array(); };
@@ -94,6 +95,9 @@ $totalWaitH = 0;
 foreach ($pending as $x) { $totalWaitH += max(0, intval($x['wait_h'])); }
 
 $page_title = 'إيكوبيشن | لوحة مدير التشغيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 

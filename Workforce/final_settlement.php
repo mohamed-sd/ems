@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Workforce/final_settlement.php — تصفيةُ إنهاء خدمة الموظف (M-22)
  * ───────────────────────────────────────────────────────────────────────────
@@ -23,7 +24,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -46,12 +47,12 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+تصفية+إنهاء+الخدمة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض تصفية إنهاء الخدمة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('final settlement super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: final_settlement.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('final_settlement.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 $action = strval($_POST['fs_action'] ?? '');
 
@@ -101,6 +102,9 @@ $LINE_LABEL = array('dues' => 'المستحقُّ حتى تاريخ الأثر',
 $ST_LABEL   = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'cancelled' => 'ملغاة');
 
 $page_title = 'إيكوبيشن | تصفية إنهاء خدمة الموظف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

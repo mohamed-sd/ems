@@ -26,13 +26,13 @@ if (!function_exists('fc_e')) {
 }
 if (!function_exists('fc_back')) {
     function fc_back($msg, $q = '') {
-        header('Location: fleet_calendar.php?' . ($q !== '' ? $q . '&' : '') . 'msg=' . urlencode($msg));
+        ems_gov_redirect('Location: fleet_calendar.php?' . ($q !== '' ? $q . '&' : '') . 'msg=' . urlencode($msg));
         exit();
     }
 }
 
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-if ($company_id <= 0) { header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.')); exit(); }
+if ($company_id <= 0) { ems_gov_flash_redirect('../login.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', ''); exit(); }
 $uid = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 $fc_gate = ems_tenant_db();
@@ -212,6 +212,9 @@ $tot_all = 0; $tot_free = 0;
 foreach ($capacity as $c) { $tot_all += $c['total']; $tot_free += $c['free']; }
 
 $page_title = 'إيكوبيشن | تقويم الأسطول والحجز';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

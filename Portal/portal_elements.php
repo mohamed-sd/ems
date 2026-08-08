@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-685 · SCN-687 · SCN-689 · SCN-690
 /**
  * Portal/portal_elements.php — مكوّناتُ البوابة (H-16 · الشاشة 184)
@@ -38,9 +39,9 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ لمكوّنات البوابة ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ لمكوّنات البوابة ❌', 'GOV-PERM-403', ''); exit(); }
 
-$redirect = function ($msg) { header("Location: portal_elements.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('portal_elements.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['pe_action'] ?? '') === 'toggle') {
     if (!$can_edit) { $redirect('القاموسُ لمدير البوابة وحدَه ❌'); }
@@ -62,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['pe_action'] ?? '') === 'to
 $elements = VPS::elements($conn);
 
 $page_title = 'إيكوبيشن | مكوّنات البوابة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

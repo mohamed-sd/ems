@@ -12,8 +12,10 @@ $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['rol
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
+/* UI-13: المنعُ يُقال برمزٍ محكومٍ ووجهةٍ فيها طريقُ رجوعٍ — لا صفحةَ نصٍّ عارية. */
 if (!$is_super_admin && $company_id <= 0) {
-    die('معرّف الشركة غير متوفر');
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة لحسابك ❌',
+        'GOV-SCOPE-403', 'ادخل بحسابٍ مرتبطٍ بشركة');
 }
 
 // العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة الخمسة وبُناة
@@ -33,8 +35,13 @@ try {
         WHERE {TENANT_SCOPE} AND e.id = ?", array($equipment_id));
 } catch (\Throwable $t) { $equipment_rows = array(); }
 $equipment = !empty($equipment_rows) ? $equipment_rows[0] : null;
+/* UI-13: مرجعٌ مفقودٌ أو خارجَ النطاقِ يُقال برمزٍ محكومٍ ووجهةٍ فيها رجوعٌ —
+   وهذه الشاشةُ تُفتح بمعرّفِ معدةٍ في الرابط، ففتحُها بلا معرّفٍ حالةٌ متوقَّعة. */
 if (!$equipment) {
-    die('المعدة غير موجودة أو خارج نطاق الشركة');
+    require_once __DIR__ . '/../includes/permissions_helper.php';
+    ems_gov_flash_redirect('../Equipments/equipments.php',
+        'المعدةُ غيرُ موجودةٍ أو خارجَ نطاقِ شركتك ❌',
+        'GOV-REF-404', 'افتح ربطَ المشغّلين من صفِّ المعدةِ في سجلِّ المعدات');
 }
 
 // جلب المشغلين المرتبطين مسبقًا
@@ -54,6 +61,9 @@ foreach ($linked_rows as $r) {
 }
 
 $page_title = "إيكوبيشن | مشغّلو المعدة";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 ?>
 

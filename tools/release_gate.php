@@ -137,10 +137,17 @@ if (!($ex && mysqli_fetch_row($ex))) {
                 'من مُشغِّل الترحيلات (status)', ?, ?, ?, 'جاهز — التراجع بلقطات ما قبل التنفيذ',
                 'مُشغِّل البوابات — آليًّا (BR-GOV-08)', ?, ?, 0, 0, 'release_gate آليًّا')");
     $no = 'REL-' . date('Ymd-Hi');
-    $comp = $gateFailed === null ? 'docs/RELEASE_GATE_LAST_ar.md — عبور كامل' : 'متوقف عند ' . $gateFailed;
+    /* عبورٌ بتخطي فحصِ محضرِ القبولِ ليس نشرًا: البوابةُ الرابعةُ بيدِ المستخدمين
+       نصًّا («العرضُ ليس قبولًا»)، وختمُ «منشور» على إصدارٍ لم يشهد له مستخدمٌ
+       هو بعينِه الأخضرُ الكاذبُ الذي تمنعه هذه البوابات. فالحالةُ الثالثةُ تُقال
+       صراحةً: مشروطٌ بقبولِ المستخدم. */
+    $comp = $gateFailed === null
+        ? 'docs/RELEASE_GATE_LAST_ar.md — عبور كامل' . ($SKIP_UAT_DOC ? ' (④ بتخطٍّ معلَن)' : '')
+        : 'متوقف عند ' . $gateFailed;
     $tp = $gateFailed === null ? 'البوابات الخمس' : 'حتى ما قبل ' . $gateFailed;
     $tf = $gateFailed === null ? '0' : $gateFailed;
-    $stt = $gateFailed === null ? 'منشور' : 'متوقف';
+    $stt = $gateFailed !== null ? 'متوقف'
+         : ($SKIP_UAT_DOC ? 'مشروط بقبول المستخدم' : 'منشور');
     $st->bind_param('sssssss', $no, $fp, $comp, $tp, $tf, $stt, $stt);
     $st->execute();
     $st->close();

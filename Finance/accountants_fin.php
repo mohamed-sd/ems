@@ -13,70 +13,73 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/accountants_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المحاسبين+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المحاسبين ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $modules_lbl = fin_source_modules();
 
 // ── حفظ وحدة مالية ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unit_code'])) {
-    if (!$can_add) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('accountants_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $code = trim($_POST['unit_code'] ?? ''); $name = trim($_POST['unit_name'] ?? ''); $note = trim($_POST['role_note'] ?? '');
-    if ($code === '' || $name === '') { header("Location: accountants_fin.php?msg=بيانات+الوحدة+غير+مكتملة+❌"); exit(); }
+    if ($code === '' || $name === '') { ems_gov_flash_redirect('accountants_fin.php', 'بيانات الوحدة غير مكتملة ❌', 'GOV-FAIL-409', ''); exit(); }
     try {
         fin_gate($is_super_admin)->insert('fin_units', array(
             'code' => $code, 'name' => $name, 'role_note' => $note, 'created_by' => $current_user_id,
         ));
     } catch (\App\Core\TenantGateException $e) {
         // نمط 1062 المعتمد (M2b): التكرار برسالته، وغيره يُسجَّل
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: accountants_fin.php?msg=كود+الوحدة+مكرر+❌"); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('accountants_fin.php', 'كود الوحدة مكرر ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('fin_units insert refused: ' . $e->getMessage());
-        header("Location: accountants_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('accountants_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: accountants_fin.php?msg=تمت+إضافة+الوحدة+✅"); exit();
+    ems_gov_flash_redirect('accountants_fin.php', 'تمت إضافة الوحدة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ محاسب إدارة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_module'])) {
-    if (!$can_add) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('accountants_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $emp = intval($_POST['employee_id'] ?? 0);
     $mod = isset($modules_lbl[$_POST['admin_module'] ?? '']) ? $_POST['admin_module'] : '';
     $unit = intval($_POST['finance_unit_id'] ?? 0);
     $spec = trim($_POST['specialization'] ?? '');
     $limit = ($_POST['review_limit_usd'] ?? '') === '' ? null : round(floatval($_POST['review_limit_usd']), 2);
-    if ($emp <= 0 || $mod === '' || $unit <= 0) { header("Location: accountants_fin.php?msg=بيانات+المحاسب+غير+مكتملة+❌"); exit(); }
+    if ($emp <= 0 || $mod === '' || $unit <= 0) { ems_gov_flash_redirect('accountants_fin.php', 'بيانات المحاسب غير مكتملة ❌', 'GOV-FAIL-409', ''); exit(); }
     try {
         fin_gate($is_super_admin)->insert('fin_accountants', array(
             'employee_id' => $emp, 'admin_module' => $mod, 'finance_unit_id' => $unit,
             'specialization' => $spec, 'review_limit_usd' => $limit, 'created_by' => $current_user_id,
         ));
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: accountants_fin.php?msg=المحاسب+مُسنَد+لهذه+الإدارة+مسبقاً+❌"); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('accountants_fin.php', 'المحاسب مُسنَد لهذه الإدارة مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('fin_accountants insert refused: ' . $e->getMessage());
-        header("Location: accountants_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('accountants_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: accountants_fin.php?msg=تمت+إضافة+المحاسب+✅"); exit();
+    ems_gov_flash_redirect('accountants_fin.php', 'تمت إضافة المحاسب ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['del_unit'])) {
-    if (!$can_delete) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('accountants_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['del_unit']);
     fin_gate($is_super_admin)->softDelete('fin_units', $d);
-    header("Location: accountants_fin.php?msg=تم+حذف+الوحدة+✅"); exit();
+    ems_gov_flash_redirect('accountants_fin.php', 'تم حذف الوحدة ✅', 'GOV-OK-200', ''); exit();
 }
 if (isset($_GET['del_acct'])) {
-    if (!$can_delete) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('accountants_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['del_acct']);
     fin_gate($is_super_admin)->softDelete('fin_accountants', $d);
-    header("Location: accountants_fin.php?msg=تم+حذف+المحاسب+✅"); exit();
+    ems_gov_flash_redirect('accountants_fin.php', 'تم حذف المحاسب ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | المحاسبون والوحدات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

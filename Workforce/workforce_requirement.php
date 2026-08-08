@@ -12,11 +12,11 @@ require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $pp = check_page_permissions($conn, 'Workforce/workforce_requirement.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $wr_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('workforce requirement super') : ems_tenant_db();
 $PRIORITY=['عادية','عالية','حرجة']; $STAGES=['مفتوح','استقطاب','ترشيح واعتماد','تعاقد','تحرّك','مُلبّى'];
@@ -29,7 +29,7 @@ function ems_req_derive($required,$available){
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $id=intval($_POST['id']??0); $is_editing=$id>0;
-    if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) { header("Location: workforce_requirement.php?msg=لا+صلاحية+❌"); exit(); }
+    if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) { ems_gov_flash_redirect('workforce_requirement.php', 'لا صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $project_id=!empty($_POST['project_id'])?intval($_POST['project_id']):null;
     $category=trim($_POST['worker_category']??'مشغّل/سائق');
     $required=intval($_POST['required_qty']??0);
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
                 'fulfillment_stage' => $stage, 'state' => $state, 'candidates_note' => $candidates,
                 'notes' => $notes, 'created_by' => $user_id));
         } catch (\Throwable $t) { error_log('workforce_requirement.php insert: ' . $t->getMessage()); }
-        header("Location: workforce_requirement.php?msg=✅+تم+الحفظ"); exit();
+        ems_gov_flash_redirect('workforce_requirement.php', '✅ تم الحفظ', 'GOV-OK-200', ''); exit();
     } else {
         try {
             $wr_gate->update('workforce_requirement', array(
@@ -68,13 +68,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
                 'fulfillment_stage' => $stage, 'state' => $state, 'candidates_note' => $candidates,
                 'notes' => $notes), array('id' => $id));
         } catch (\Throwable $t) { error_log('workforce_requirement.php update: ' . $t->getMessage()); }
-        header("Location: workforce_requirement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
+        ems_gov_redirect("Location: workforce_requirement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
 if (($_GET['delete']??'')!=='' && $can_delete) { $d=intval($_GET['delete']);
     try { $wr_gate->deleteRow('workforce_requirement', $d, 'workforce requirement delete'); }
     catch (\Throwable $t) { error_log('workforce_requirement.php delete: ' . $t->getMessage()); }
-    header("Location: workforce_requirement.php?msg=✅+تم+الحذف"); exit(); }
+    ems_gov_flash_redirect('workforce_requirement.php', '✅ تم الحذف', 'GOV-OK-200', ''); exit(); }
 
 $edit=null; $edit_id=intval($_GET['edit']??0);
 if ($edit_id>0) {
@@ -94,7 +94,11 @@ if ($edit && !empty($edit['project_id']) && !empty($edit['worker_category'])) {
     $auto_preview = ems_planning_available($conn, intval($edit['project_id']), $edit['worker_category'], $is_super_admin?null:$company_id);
 }
 
-$page_title="إيكوبيشن | احتياج القوى والتخطيط"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | احتياج القوى والتخطيط"; 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
+include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/commercial_board.php — اللوحة التجارية للعقود (P-12)
  * ───────────────────────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['r
 $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $MODULE_CODE = 'Contracts/commercial_board.php';
@@ -35,7 +36,7 @@ else {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = (intval($row['can_view']) === 1); }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+اللوحة+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض اللوحة ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('board super') : ems_tenant_db();
 $ALL  = isset($_GET['all']) && $_GET['all'] === '1';
@@ -47,6 +48,9 @@ $GAPS = CBD::GAP_OWNERS;
 $STATE_AR = CBS::STATE_AR;
 
 $page_title = 'إيكوبيشن | اللوحة التجارية للعقود';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

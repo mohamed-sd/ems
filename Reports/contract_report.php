@@ -65,6 +65,9 @@ if (!isset($_SESSION['user'])) {
 <body>
 
 <?php
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
@@ -140,10 +143,14 @@ if ($contract_filter > 0) {
 
 <div class="main">
     <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fa-solid fa-file-contract"></i></div>
-            تقرير إحصائية العقود
-        </h1>
+        <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
+$header_icon = 'fa-solid fa-file-contract';
+$header_title_html = htmlspecialchars('تقرير إحصائية العقود', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="reports.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
@@ -290,7 +297,20 @@ if ($contract_filter > 0) {
 
         <script>
         const ctx = document.getElementById('chart');
-        new Chart(ctx, {
+        /* UI-DEF-07 (L4): لا رسمَ بلا بياناتٍ بمحاورَ افتراضية — حالةٌ مفسَّرة */
+        function emsChartGuard(c, seriesArrays, renderFn) {
+            var t = 0;
+            (seriesArrays || []).forEach(function (a) { (a || []).forEach(function (v) { t += Math.abs(parseFloat(v) || 0); }); });
+            if (t > 0) { return renderFn(); }
+            var host = c && c.parentNode ? c.parentNode : null;
+            if (host) {
+                host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">'
+                    + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+            }
+            return null;
+        }
+        emsChartGuard(ctx, [<?php echo json_encode($actual); ?>, <?php echo json_encode($target); ?>], function () {
+        return new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: <?php echo json_encode($labels); ?>,
@@ -329,6 +349,7 @@ if ($contract_filter > 0) {
                     }
                 }
             }
+        });
         });
         </script>
     <?php } ?>

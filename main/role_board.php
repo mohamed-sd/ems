@@ -19,7 +19,7 @@ $current_role    = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['
 $is_super_admin  = ($current_role === '-1');
 $company_id      = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 // الدورُ الفعّال للوحة: دورُ الجلسة، أو أبوه إن كان فرعيًّا بلا إعدادٍ خاص
 $rb_rid = intval($current_role);
@@ -38,7 +38,7 @@ if ($rb_cfg === null) { header("Location: ../main/dashboard.php"); exit(); }
 // الحارس: شاشةٌ مسجَّلةٌ بمنحٍ صريحةٍ لكل دورٍ عام — لا افتراضَ سماح
 $page_permissions = check_page_permissions($conn, 'main/role_board.php');
 $can_view = $is_super_admin ? true : $page_permissions['can_view'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+لوحة+الدور+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض لوحة الدور ❌', 'GOV-PERM-403', ''); exit(); }
 
 $rb_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('role board super') : ems_tenant_db();
 $today = date('Y-m-d');
@@ -84,6 +84,9 @@ for ($d = 6; $d >= 0; $d--) {
 }
 
 $page_title = 'إيكوبيشن | ' . $rb_cfg['title'];
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -104,7 +107,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php foreach ($rb_cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
             $kpiTone = $tone === 'ok' ? 'ems-kpi-ok' : ($tone === 'err' ? 'ems-kpi-err' : ($tone === 'warn' ? 'ems-kpi-warn' : '')); ?>
         <a class="ems-kpi-card <?php echo $kpiTone; ?>" href="<?php echo htmlspecialchars($href); ?>" title="تعمّق: <?php echo htmlspecialchars($lbl); ?>">
-            <div class="ems-kpi-title"><i class="fas <?php echo htmlspecialchars($icon); ?>" style="opacity:.6"></i> <?php echo htmlspecialchars($lbl); ?></div>
+            <div class="ems-kpi-title"><i class="fas <?php echo htmlspecialchars($icon); ?>"></i> <?php echo htmlspecialchars($lbl); ?></div>
             <div class="ems-kpi-value"><?php echo htmlspecialchars((string)$val); ?> <small>سجل</small></div>
             <div class="ems-kpi-meta"><span>لحظي (<?php echo $today; ?>)</span><span>بلا مقارنة معلنة</span></div>
         </a>

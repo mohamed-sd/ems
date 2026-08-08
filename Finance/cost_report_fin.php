@@ -13,26 +13,26 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-INFO-200', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/cost_report_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التكاليف+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التكاليف ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $cost_types = fin_cost_types();
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: cost_report_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('cost_report_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->softDelete('fin_cost_records', $d);
-    header("Location: cost_report_fin.php?msg=تم+حذف+سجلّ+التكلفة+✅"); exit();
+    ems_gov_flash_redirect('cost_report_fin.php', 'تم حذف سجلّ التكلفة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ سجلّ تكلفة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
-    if (!$can_add) { header("Location: cost_report_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('cost_report_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $cost_type  = trim($_POST['cost_type'] ?? '');
     $project_id = intval($_POST['project_id'] ?? 0) ?: null;
     $equip_id   = intval($_POST['equipment_id'] ?? 0) ?: null;
@@ -41,17 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
     $unit_cost  = ($_POST['unit_cost'] ?? '') === '' ? null : round(floatval($_POST['unit_cost']), 4);
     $total_cost = round(floatval($_POST['total_cost'] ?? 0), 2);
     $revenue    = ($_POST['revenue'] ?? '') === '' ? null : round(floatval($_POST['revenue']), 2);
-    if (!isset($cost_types[$cost_type]) || $total_cost < 0) { header("Location: cost_report_fin.php?msg=بيانات+غير+صحيحة+❌"); exit(); }
+    if (!isset($cost_types[$cost_type]) || $total_cost < 0) { ems_gov_flash_redirect('cost_report_fin.php', 'بيانات غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
 
     fin_gate($is_super_admin)->insert('fin_cost_records', array(
         'cost_type' => $cost_type, 'equipment_id' => $equip_id, 'project_id' => $project_id,
         'period_ref' => date('Y-m'), 'qty' => $qty, 'unit' => $unit, 'unit_cost' => $unit_cost,
         'total_cost' => $total_cost, 'revenue' => $revenue, 'created_by' => $current_user_id,
     ));
-    header("Location: cost_report_fin.php?msg=تمت+إضافة+سجلّ+التكلفة+✅"); exit();
+    ems_gov_flash_redirect('cost_report_fin.php', 'تمت إضافة سجلّ التكلفة ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | التكاليف والربحية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

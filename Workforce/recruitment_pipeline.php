@@ -111,12 +111,23 @@ $r = mysqli_query($conn, "SELECT a.*, v.vacancy_no, v.title_text FROM rec_applic
 if ($r) while ($x = mysqli_fetch_assoc($r)) $apps[] = $x;
 
 $page_title = 'دورة التوظيف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-user-plus"></i> دورةُ التوظيف — عشرُ خطواتٍ من الشاغر إلى التثبيت</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-user-plus';
+$header_title_html = htmlspecialchars('دورةُ التوظيف — عشرُ خطواتٍ من الشاغر إلى التثبيت', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
   <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px">

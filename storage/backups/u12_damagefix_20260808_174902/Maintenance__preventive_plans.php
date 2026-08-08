@@ -1,0 +1,729 @@
+<?php
+/**
+ * Maintenance/preventive_plans.php — الخطة الوقائية.
+ * - الاستحقاق بالساعات يُحتسب من ساعات التشغيل الفعلية في التايم‌شيت (القرار DEC-08).
+ * - قائمة «مستحقة الآن» + زر «توليد أمر» يدوي ينشئ mnt_order بنوع وقائي (DEC-09، بلا cron).
+ */
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/mnt_helpers.php';
+
+$current_role    = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin  = ($current_role === '-1');
+$company_id      = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
+
+$page_permissions = check_page_permissions($conn, 'Maintenance/preventive_plans.php');
+$can_view   = $is_super_admin ? true : $page_permissions['can_view'];
+$can_add    = $is_super_admin ? true : $page_permissions['can_add'];
+$can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
+$can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الخطة الوقائية ❌', 'GOV-PERM-403', ''); exit(); }
+
+$company_scope_sql = $is_super_admin ? "1=1" : "pl.company_id = " . intval($company_id);
+
+$trigger_bases = array('ساعات', 'زمن');
+$states = array('نشطة', 'متوقفة');
+
+function mnt_fetch_plan($conn, $id, $company_id, $is_super_admin) {
+    // عبر البوابة: العزل بالشركة يُحقن؛ super→كل الشركات؛ is_deleted مستبعَد تلقائيًّا
+    $g = $is_super_admin ? ems_tenant_db()->forAllTenants('preventive plan super view') : ems_tenant_db();
+    return $g->selectOne('mnt_plan', array('where' => array('id' => intval($id))));
+}
+
+function mnt_pl_task_count($conn, $pid, $company_id) {
+    return ems_tenant_db()->count('mnt_plan_task', array('where' => array('plan_id' => intval($pid))));
+}
+function mnt_pl_json($data) {
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ══ AJAX: مهام الخطة (إضافة/حذف) دون إعادة تحميل الصفحة ══
+$is_ajax = (isset($_POST['ajax']) && $_POST['ajax'] === '1');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action'] ?? '', array('add_task', 'del_task'), true)) {
+    if (!$can_edit) { mnt_pl_json(array('success' => false, 'message' => 'لا توجد صلاحية للتعديل')); }
+    $pid = intval($_POST['plan_id'] ?? 0);
+    $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
+    if (!$plan) { mnt_pl_json(array('success' => false, 'message' => 'الخطة غير موجودة')); }
+
+    if ($_POST['action'] === 'add_task') {
+        $name = trim($_POST['task_name'] ?? '');
+        if ($name === '') { mnt_pl_json(array('success' => false, 'message' => 'اسم المهمة مطلوب')); }
+        $task_type = !empty($_POST['task_type']) ? intval($_POST['task_type']) : null;
+        $component = trim($_POST['component'] ?? '');
+        $est_hours = floatval($_POST['est_hours'] ?? 0);
+        $taskId = ems_tenant_db()->insert('mnt_plan_task', array(
+            'plan_id' => $pid, 'name' => $name, 'task_type' => $task_type,
+            'component' => $component, 'est_hours' => $est_hours));
+        $type_name = '';
+        if ($task_type) {
+            $lk = ems_tenant_db()->selectOne('mnt_lookup', array('columns' => array('name'), 'where' => array('id' => $task_type)));
+            $type_name = $lk ? $lk['name'] : '';
+        }
+        mnt_pl_json(array('success' => true, 'task' => array('id' => $taskId, 'name' => $name, 'type_name' => $type_name, 'component' => $component, 'est_hours' => $est_hours), 'count' => mnt_pl_task_count($conn, $pid, $company_id)));
+    }
+
+    if ($_POST['action'] === 'del_task') {
+        $tid = intval($_POST['task_id'] ?? 0);
+        // حذف صلبٌ لصفٍّ واحد عبر deleteChild (نطاق مزدوج: الشركة + الأب المملوك)
+        ems_tenant_db()->deleteChild('mnt_plan_task', $tid, 'mnt_plan', $pid, 'plan_id', 'plan task delete (ajax)');
+        mnt_pl_json(array('success' => true, 'count' => mnt_pl_task_count($conn, $pid, $company_id)));
+    }
+}
+
+// ── إنشاء خطة جديدة (يُحفظ فقط عند إرسال الفورم — لا سجلّ فارغ عند فتح الفورم) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_plan') {
+    if (!$can_add) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('preventive_plans.php', 'لا يمكن الإنشاء بلا شركة ❌', 'GOV-FAIL-409', ''); exit(); }
+
+    $name = trim($_POST['name'] ?? '');
+    if ($name === '') { $name = 'خطة بلا اسم'; }
+    $equipment_id   = !empty($_POST['equipment_id']) ? intval($_POST['equipment_id']) : null;
+    $category_id    = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
+    $trigger_basis  = in_array($_POST['trigger_basis'] ?? '', $trigger_bases, true) ? $_POST['trigger_basis'] : 'ساعات';
+    $interval_value = ($_POST['interval_value'] ?? '') !== '' ? intval($_POST['interval_value']) : null;
+
+    // تمهيد موعد الاستحقاق عند الإنشاء حتى تصبح الخطة قابلة للاستحقاق بلا حفظ يدوي لاحق
+    $last_done_date  = date('Y-m-d');
+    $last_done_meter = null;
+    $next_due_date   = null;
+    $next_due_meter  = null;
+    if ($interval_value !== null && $interval_value > 0) {
+        if ($trigger_basis === 'زمن') {
+            $next_due_date = date('Y-m-d', strtotime('+' . intval($interval_value) . ' day'));
+        } elseif ($trigger_basis === 'ساعات' && $equipment_id) {
+            $last_done_meter = mnt_equipment_actual_hours($conn, intval($equipment_id), $company_id);
+            $next_due_meter  = $last_done_meter + intval($interval_value);
+        }
+    }
+
+    $code = mnt_next_code($conn, 'mnt_plan', 'PLN', $company_id);
+    $new_id = ems_tenant_db()->insert('mnt_plan', array(
+        'code' => $code, 'name' => $name, 'equipment_id' => $equipment_id, 'category_id' => $category_id,
+        'trigger_basis' => $trigger_basis, 'interval_value' => $interval_value,
+        'last_done_date' => $last_done_date, 'last_done_meter' => $last_done_meter,
+        'next_due_date' => $next_due_date, 'next_due_meter' => $next_due_meter,
+        'state' => 'نشطة', 'created_by' => $current_user_id));
+    ems_gov_redirect("Location: preventive_plans.php?id=" . intval($new_id) . "&msg=تم+إنشاء+الخطة+✅"); exit();
+}
+
+// ── حفظ رأس الخطة ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_plan') {
+    if (!$can_edit) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    $pid = intval($_POST['id'] ?? 0);
+    $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
+    if (!$plan) { ems_gov_flash_redirect('preventive_plans.php', 'الخطة غير موجودة ❌', 'GOV-REF-404', ''); exit(); }
+
+    $name = trim($_POST['name'] ?? '');
+    $scope = trim($_POST['scope'] ?? '');
+    $equipment_id = !empty($_POST['equipment_id']) ? intval($_POST['equipment_id']) : null;
+    $category_id  = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
+    $trigger_basis = in_array($_POST['trigger_basis'] ?? '', $trigger_bases, true) ? $_POST['trigger_basis'] : 'ساعات';
+    $interval_value = ($_POST['interval_value'] ?? '') !== '' ? intval($_POST['interval_value']) : null;
+    $tolerance = ($_POST['tolerance'] ?? '') !== '' ? intval($_POST['tolerance']) : null;
+    $last_done_date = !empty($_POST['last_done_date']) ? $_POST['last_done_date'] : null;
+    $last_done_meter = ($_POST['last_done_meter'] ?? '') !== '' ? floatval($_POST['last_done_meter']) : null;
+    $next_due_date = !empty($_POST['next_due_date']) ? $_POST['next_due_date'] : null;
+    $next_due_meter = ($_POST['next_due_meter'] ?? '') !== '' ? floatval($_POST['next_due_meter']) : null;
+    $state = in_array($_POST['state'] ?? '', $states, true) ? $_POST['state'] : 'نشطة';
+
+    if ($name === '') { $name = 'خطة بلا اسم'; }
+
+    ems_tenant_db()->update('mnt_plan', array(
+        'name' => $name, 'scope' => $scope, 'equipment_id' => $equipment_id, 'category_id' => $category_id,
+        'trigger_basis' => $trigger_basis, 'interval_value' => $interval_value, 'tolerance' => $tolerance,
+        'last_done_date' => $last_done_date, 'last_done_meter' => $last_done_meter,
+        'next_due_date' => $next_due_date, 'next_due_meter' => $next_due_meter, 'state' => $state,
+    ), array('id' => $pid));
+    ems_gov_redirect("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تم+حفظ+الخطة+✅"); exit();
+}
+
+// ── مهام الخطة ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_task') {
+    if (!$can_edit) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
+    $pid = intval($_POST['plan_id'] ?? 0);
+    $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
+    if ($plan) {
+        $name = trim($_POST['task_name'] ?? '');
+        $task_type = !empty($_POST['task_type']) ? intval($_POST['task_type']) : null;
+        $component = trim($_POST['component'] ?? '');
+        $est_hours = floatval($_POST['est_hours'] ?? 0);
+        if ($name !== '') {
+            ems_tenant_db()->insert('mnt_plan_task', array(
+                'plan_id' => $pid, 'name' => $name, 'task_type' => $task_type,
+                'component' => $component, 'est_hours' => $est_hours));
+        }
+    }
+    ems_gov_redirect("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تمت+إضافة+المهمة+✅"); exit();
+}
+if (isset($_GET['del_task'], $_GET['plan_id'])) {
+    if ($can_edit) {
+        $tid = intval($_GET['del_task']); $pid = intval($_GET['plan_id']);
+        // حذف صلبٌ لصفٍّ واحد عبر deleteChild (نطاق مزدوج: الشركة + الأب المملوك)
+        ems_tenant_db()->deleteChild('mnt_plan_task', $tid, 'mnt_plan', $pid, 'plan_id', 'plan task delete');
+        ems_gov_redirect("Location: preventive_plans.php?id=" . $pid . "&msg=تم+حذف+المهمة+✅"); exit();
+    }
+}
+
+// ── E-16: تأجيلُ خطةٍ زمنيةٍ **بسبب** — يوثَّق في التدقيق ولا يمرّ صامتًا ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'postpone_plan') {
+    if (!$can_edit) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
+    $pid = intval($_POST['plan_id'] ?? 0);
+    $days = max(1, min(90, intval($_POST['days'] ?? 7)));
+    $reason = trim((string)($_POST['reason'] ?? ''));
+    if ($reason === '') { ems_gov_flash_redirect('preventive_plans.php', 'التأجيلُ بسببٍ مكتوبٍ — لا تأجيلَ صامتًا ❌', 'GOV-FAIL-409', ''); exit(); }
+    $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
+    if (!$plan || $plan['next_due_date'] === null) { ems_gov_flash_redirect('preventive_plans.php', 'خطةٌ غير صالحة للتأجيل ❌', 'GOV-FAIL-409', ''); exit(); }
+    $newDue = date('Y-m-d', strtotime($plan['next_due_date'] . ' +' . $days . ' day'));
+    ems_tenant_db()->update('mnt_plan', array('next_due_date' => $newDue), array('id' => $pid));
+    require_once '../includes/audit_trail.php';
+    ems_audit_change($conn, 'maintenance', 'mnt_plan', 'postpone', $pid,
+        array('next_due_date' => (string)$plan['next_due_date']),
+        array('next_due_date' => $newDue, 'days' => $days, 'reason' => $reason),
+        array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
+    ems_gov_flash_redirect('preventive_plans.php', 'أُجّلت \' . $days . \' يومًا بسببها الموثَّق ✅', 'GOV-OK-200', ''); exit();
+}
+
+// ── توليد أمر صيانة وقائي من خطة (يدوي) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_order') {
+    if (!$can_add) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية توليد أمر ❌', 'GOV-PERM-403', ''); exit(); }
+    $pid = intval($_POST['plan_id'] ?? 0);
+    $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
+    if (!$plan) { ems_gov_flash_redirect('preventive_plans.php', 'الخطة غير موجودة ❌', 'GOV-REF-404', ''); exit(); }
+    $code = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
+    $eq = $plan['equipment_id'] !== null ? intval($plan['equipment_id']) : null;
+    // M-36 (SPEC-04 بطاقة 3): مفتاحُ (معدة × خدمة × دورة) يمنع توليدَ الدورة
+    // مرتين — الدورةُ = استحقاقُها القائم، والفريدُ في القاعدة هو الحكم.
+    $cycle_key = 'plan:' . $pid . ':eq:' . intval($eq ?: 0)
+               . ':due:' . strval($plan['next_due_date'] ?: date('Y-m-d'));
+    $dup = $conn->query("SELECT id FROM mnt_order WHERE pm_cycle_key = '"
+         . $conn->real_escape_string($cycle_key) . "' LIMIT 1");
+    if ($dup && ($dx = $dup->fetch_assoc())) {
+        ems_gov_redirect("Location: orders.php?id=" . intval($dx['id'])
+             . "&msg=" . rawurlencode('هذه الدورةُ ولّدت أمرَها سلفًا #' . $dx['id'] . ' — لا توليدَ مرتين (M-36) ❌'));
+        exit();
+    }
+    $new_id = ems_tenant_db()->insert('mnt_order', array(
+        'code' => $code, 'plan_id' => $pid, 'equipment_id' => $eq, 'pm_cycle_key' => $cycle_key,
+        'source' => 'وقائي', 'maint_type' => 'صيانة وقائية', 'state' => 'بلاغ', 'created_by' => $current_user_id));
+    if (!$new_id) { // الفريدُ حكمٌ عند التزاحم — mysqli لا يرمي (گوتشا config)
+        ems_gov_flash_redirect('preventive_plans.php', 'رفض الفريدُ التوليدَ — الدورةُ مولَّدةٌ سلفًا (M-36) ❌', 'GOV-FAIL-409', '');
+        exit();
+    }
+    ems_gov_redirect("Location: orders.php?id=" . intval($new_id) . "&msg=تم+توليد+أمر+وقائي+من+الخطة+✅"); exit();
+}
+
+// ── حذف ناعم ──
+if (isset($_GET['delete_id'])) {
+    if (!$can_delete) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
+    $did = intval($_GET['delete_id']);
+    ems_tenant_db()->softDelete('mnt_plan', $did); // حذف ناعم معزول بالشركة تلقائيًّا
+    ems_gov_flash_redirect('preventive_plans.php', 'تم حذف الخطة ✅', 'GOV-OK-200', ''); exit();
+}
+
+$edit_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$plan = $edit_id > 0 ? mnt_fetch_plan($conn, $edit_id, $company_id, $is_super_admin) : null;
+
+$equipments = array(); $categories = array(); $task_types = array();
+if ($plan || $edit_id === 0) {
+    $mnt_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('preventive plans super view') : ems_tenant_db();
+    $equipments = $mnt_gate->select('equipments', array('columns' => array('id', 'name', 'code'), 'orderBy' => 'name'));
+    // equipments_types عامّ (لا عزل شركة)
+    $categories = $mnt_gate->select('equipments_types', array('columns' => array('id', 'type'), 'where' => array('status' => 'active'), 'orderBy' => 'type'));
+    $task_types = mnt_lookup_options($conn, $company_id, 'نوع مهمة');
+}
+
+$page_title = 'إيكوبيشن | الصيانة الوقائية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include '../inheader.php';
+include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+function mnt_opt($value, $label, $selected) {
+    return "<option value='" . htmlspecialchars((string) $value, ENT_QUOTES) . "'" . ($selected ? " selected" : "") . ">" . htmlspecialchars((string) $label) . "</option>";
+}
+?>
+<div class="main mnt-plans-main ems-unified-page-shell">
+
+    <?php if (!empty($_GET['msg'])):
+        $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>" style="margin-bottom:12px;">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+            <?php echo htmlspecialchars($_GET['msg']); ?>
+        </div>
+    <?php endif; ?>
+
+<?php if ($plan): // ── تحرير خطة ──
+    // مهام الخطة عبر scopedQuery (§10): عزل على t + إثراء LEFT بأسماء الأنواع
+    $tasks = ($is_super_admin ? ems_tenant_db()->forAllTenants('plan tasks super view') : ems_tenant_db())->scopedQuery(
+        array('scope' => array('t' => 'mnt_plan_task'), 'enrich' => array('lk' => 'mnt_lookup')),
+        "SELECT t.id, t.name, t.component, t.est_hours, lk.name AS task_type_name
+         FROM mnt_plan_task t LEFT JOIN mnt_lookup lk ON lk.id=t.task_type
+         WHERE {TENANT_SCOPE} AND t.plan_id=? ORDER BY t.id", array($edit_id));
+    // العدّاد الحالي من التايم‌شيت
+    $current_meter = $plan['equipment_id'] ? mnt_equipment_actual_hours($conn, intval($plan['equipment_id']), $company_id) : 0;
+?>
+    <?php
+    $header_title_html = 'خطة وقائية: <strong>' . htmlspecialchars((string) $plan['code']) . '</strong>';
+    $header_icon = 'fa fa-calendar-check';
+    $header_actions = array();
+    $header_actions[] = array('id' => 'togglePlanForm', 'class' => 'add-btn', 'icon' => 'fas fa-pen-to-square', 'label' => 'بيانات الخطة');
+    $header_back = array(
+        array('tag' => 'a', 'href' => 'preventive_plans.php', 'class' => '', 'icon' => 'fas fa-list', 'label' => 'كل الخطط'),
+        array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
+    );
+    include('../includes/page_header.php');
+    ?>
+    <form method="post" action="" class="allforms allforms-visible" id="planForm">
+        <input type="hidden" name="action" value="save_plan">
+        <input type="hidden" name="id" value="<?php echo intval($plan['id']); ?>">
+        <div class="card-header"><h5><i class="fas fa-calendar-check"></i> بيانات الخطة</h5></div>
+        <div class="card"><div class="card-body">
+            <div class="form-section"><div class="form-grid">
+                <div class="form-group"><label>اسم الخطة</label><input type="text" name="name" value="<?php echo htmlspecialchars((string) $plan['name']); ?>"></div>
+                <div class="form-group"><label>النطاق</label>
+                    <select name="scope"><option value="">-- اختر --</option>
+                        <?php foreach (array('معدة', 'فئة') as $sc) echo mnt_opt($sc, $sc, $plan['scope'] === $sc); ?>
+                    </select>
+                </div>
+                <div class="form-group"><label>المعدة</label>
+                    <select name="equipment_id"><option value="">-- اختر --</option>
+                        <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($plan['equipment_id']) === intval($e['id'])); ?>
+                    </select>
+                </div>
+                <div class="form-group"><label>الفئة (نوع المعدة)</label>
+                    <select name="category_id"><option value="">-- اختر --</option>
+                        <?php foreach ($categories as $c) echo mnt_opt($c['id'], $c['type'], intval($plan['category_id']) === intval($c['id'])); ?>
+                    </select>
+                </div>
+                <div class="form-group"><label>أساس التكرار</label>
+                    <select name="trigger_basis"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $plan['trigger_basis'] === $tb); ?></select>
+                </div>
+                <div class="form-group"><label>الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" value="<?php echo htmlspecialchars((string) $plan['interval_value']); ?>"></div>
+                <div class="form-group"><label>هامش السماح</label><input type="number" name="tolerance" value="<?php echo htmlspecialchars((string) $plan['tolerance']); ?>"></div>
+                <div class="form-group"><label>آخر تنفيذ (تاريخ)</label><input type="date" name="last_done_date" value="<?php echo htmlspecialchars((string) $plan['last_done_date']); ?>"></div>
+                <div class="form-group"><label>عدّاد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>"></div>
+                <div class="form-group"><label>الاستحقاق القادم (تاريخ)</label><input type="date" name="next_due_date" value="<?php echo htmlspecialchars((string) $plan['next_due_date']); ?>"></div>
+                <div class="form-group"><label>الاستحقاق القادم (عدّاد)</label><input type="number" step="0.01" name="next_due_meter" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>"></div>
+                <div class="form-group"><label>الحالة</label>
+                    <select name="state"><?php foreach ($states as $s) echo mnt_opt($s, $s, $plan['state'] === $s); ?></select>
+                </div>
+            </div></div>
+            <div class="form-actions">
+                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الخطة</button>
+                <button type="button" class="btn-cancel" id="collapsePlanForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
+            </div>
+        </div></div>
+    </form>
+
+    <div class="card"><div class="card-body">
+        <div class="mnt-cost-summary">
+            <div class="mnt-cost-box"><span>عدّاد التشغيل الفعلي (تايم‌شيت)</span><strong><?php echo number_format((float) $current_meter, 1); ?></strong></div>
+            <div class="mnt-cost-box"><span>الاستحقاق القادم (عدّاد)</span><strong><?php echo $plan['next_due_meter'] !== null ? number_format((float) $plan['next_due_meter'], 1) : '—'; ?></strong></div>
+            <div class="mnt-cost-box"><span>الاستحقاق القادم (تاريخ)</span><strong><?php echo htmlspecialchars((string) ($plan['next_due_date'] ?? '—')); ?></strong></div>
+        </div>
+    </div></div>
+
+    <!-- مهام الخطة -->
+    <div class="card mnt-lines-card">
+        <div class="card-header mnt-lines-head">
+            <h5><i class="fas fa-list-check"></i> مهام الخطة <span class="mnt-count" id="taskCount"><?php echo count($tasks); ?></span></h5>
+            <?php if ($can_edit): ?><button type="button" class="mnt-add-toggle" data-target="taskForm"><i class="fas fa-plus"></i> إضافة مهمة</button><?php endif; ?>
+        </div>
+        <div class="card-body">
+            <?php if ($can_edit): ?>
+            <form class="mnt-line-form" id="taskForm" onsubmit="return false;" style="display:none;">
+                <input type="hidden" name="action" value="add_task">
+                <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
+                <div class="mnt-line-grid">
+                    <div class="form-group"><label>المهمة</label><input type="text" name="task_name" placeholder="مثال: تغيير زيت المحرك"></div>
+                    <div class="form-group"><label>نوع المهمة</label><select name="task_type"><option value="">-- اختر --</option><?php foreach ($task_types as $id => $nm) echo mnt_opt($id, $nm, false); ?></select></div>
+                    <div class="form-group"><label>المكوّن</label><input type="text" name="component" placeholder="مثال: المحرك"></div>
+                    <div class="form-group"><label>ساعات تقديرية</label><input type="number" step="0.01" name="est_hours" value="0"></div>
+                </div>
+                <div class="mnt-line-actions">
+                    <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إضافة المهمة</button>
+                    <button type="button" class="btn-cancel mnt-line-cancel" data-target="taskForm"><i class="fas fa-times"></i> إلغاء</button>
+                </div>
+            </form>
+            <?php endif; ?>
+            <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="taskTable" style="width:100%">
+                <thead><tr><th>المهمة</th><th>نوع المعدة</th><th>المكوّن</th><th>ساعات تقديرية</th><?php if ($can_edit) echo '<th></th>'; ?></tr></thead>
+                <tbody>
+                    <?php foreach ($tasks as $t): ?>
+                    <tr data-line="<?php echo intval($t['id']); ?>">
+                        <td><?php echo htmlspecialchars((string) $t['name']); ?></td>
+                        <td><?php echo htmlspecialchars((string) ($t['task_type_name'] ?? '—')); ?></td>
+                        <td><?php echo htmlspecialchars((string) ($t['component'] ?? '')); ?></td>
+                        <td class="mnt-num"><?php echo htmlspecialchars((string) $t['est_hours']); ?></td>
+                        <?php if ($can_edit): ?><td><button type="button" class="action-btn delete mnt-del-line" data-line="<?php echo intval($t['id']); ?>" title="حذف"><i class="fas fa-trash-alt"></i></button></td><?php endif; ?>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table></div>
+            <div class="mnt-empty-line" id="taskEmpty" style="<?php echo empty($tasks) ? '' : 'display:none'; ?>"><i class="fas fa-list-check"></i><span>لا توجد مهام بعد</span></div>
+        </div>
+    </div>
+
+<?php else: // ── قائمة الخطط + المستحقة الآن ──
+    $header_title  = 'الصيانة الوقائية';
+    $header_icon   = 'fa fa-calendar-check';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'togglePlanCreateForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus', 'label' => 'خطة جديدة');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+?>
+    <?php if ($can_add): ?>
+    <!-- فورم إنشاء خطة (نمط العملاء/المشاريع: يُفتح بزر «خطة جديدة»، ولا يُحفظ شيء إلا عند الإرسال) -->
+    <form method="post" action="" class="allforms" id="planCreateForm">
+        <input type="hidden" name="action" value="new_plan">
+        <div class="card-header"><h5><i class="fas fa-calendar-check"></i> إنشاء خطة وقائية جديدة</h5></div>
+        <div class="card"><div class="card-body">
+            <div class="form-section"><div class="form-grid">
+                <div class="form-group"><label>اسم الخطة</label><input type="text" name="name" placeholder="مثال: تغيير زيت كل 250 ساعة"></div>
+                <div class="form-group"><label>المعدة</label>
+                    <select name="equipment_id"><option value="">-- اختر --</option>
+                        <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), false); ?>
+                    </select>
+                </div>
+                <div class="form-group"><label>الفئة (نوع المعدة)</label>
+                    <select name="category_id"><option value="">-- اختر --</option>
+                        <?php foreach ($categories as $c) echo mnt_opt($c['id'], $c['type'], false); ?>
+                    </select>
+                </div>
+                <div class="form-group"><label>أساس التكرار</label>
+                    <select name="trigger_basis"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $tb === 'ساعات'); ?></select>
+                </div>
+                <div class="form-group"><label>الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" placeholder="مثال: 250"></div>
+            </div></div>
+            <div class="form-actions">
+                <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إنشاء الخطة</button>
+                <button type="button" class="btn-cancel" id="cancelPlanCreateForm"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div></div>
+    </form>
+    <?php endif; ?>
+<?php
+    // جلب الخطط النشطة عبر scopedQuery (§10): عزل على pl + إثراء LEFT (equipments_types عامّ)
+    $rows = ($is_super_admin ? ems_tenant_db()->forAllTenants('preventive plans list super') : ems_tenant_db())->scopedQuery(
+        array('scope' => array('pl' => 'mnt_plan'), 'enrich' => array('e' => 'equipments')),
+        "SELECT pl.*, e.name AS equipment_name, ct.type AS category_name FROM mnt_plan pl
+         LEFT JOIN equipments e ON e.id = pl.equipment_id
+         LEFT JOIN equipments_types ct ON ct.id = pl.category_id
+         WHERE {TENANT_SCOPE} AND COALESCE(pl.is_deleted,0)=0
+         ORDER BY pl.id DESC");
+
+    $today = date('Y-m-d');
+    $due_rows = array();
+    foreach ($rows as $r) {
+        $is_due = false;
+        if ($r['state'] === 'نشطة') {
+            $tol = isset($r['tolerance']) && $r['tolerance'] !== null ? intval($r['tolerance']) : 0;
+            if ($r['trigger_basis'] === 'ساعات' && $r['next_due_meter'] !== null && $r['equipment_id']) {
+                $meter = mnt_equipment_actual_hours($conn, intval($r['equipment_id']), $company_id);
+                // هامش السماح (ساعات) يجعل الخطة مستحقة مبكّراً قبل بلوغ العدّاد الهدف
+                if ($meter >= (floatval($r['next_due_meter']) - $tol)) { $is_due = true; }
+            } elseif ($r['trigger_basis'] === 'زمن' && $r['next_due_date'] !== null) {
+                // هامش السماح (أيام) يقدّم تاريخ الاستحقاق للإنذار المبكر
+                $threshold = $tol > 0 ? date('Y-m-d', strtotime('+' . $tol . ' day', strtotime($today))) : $today;
+                if ($r['next_due_date'] <= $threshold) { $is_due = true; }
+            }
+        }
+        if ($is_due) {
+            // E-16 (SPEC-04 بطاقة 3): وسمُ «متأخر» = تجاوز تاريخَه بلا هامش ·
+            // و«هذا الأسبوع» = يستحق خلال 7 أيام — فلترةٌ لا حسابٌ جديد
+            $r['e16_late'] = ($r['trigger_basis'] === 'زمن' && $r['next_due_date'] !== null
+                              && $r['next_due_date'] < $today);
+            $r['e16_week'] = ($r['trigger_basis'] === 'زمن' && $r['next_due_date'] !== null
+                              && $r['next_due_date'] >= $today
+                              && $r['next_due_date'] <= date('Y-m-d', strtotime('+7 day')));
+            $due_rows[] = $r;
+        }
+    }
+    // E-16: الفلاتر — الكل · متأخرة · هذا الأسبوع
+    $e16_filter = in_array(strval($_GET['due_filter'] ?? 'all'), array('all', 'late', 'week'), true)
+                ? strval($_GET['due_filter'] ?? 'all') : 'all';
+    if ($e16_filter !== 'all') {
+        $due_rows = array_values(array_filter($due_rows, function ($r) use ($e16_filter) {
+            return $e16_filter === 'late' ? !empty($r['e16_late']) : !empty($r['e16_week']);
+        }));
+    }
+?>
+    <?php if (!empty($due_rows) || $e16_filter !== 'all'): ?>
+    <div class="card"><div class="card-header"><h5><i class="fas fa-bell"></i> خطط مستحقة الآن (<?php echo count($due_rows); ?>)
+        <span style="margin-inline-start:12px">
+        <?php foreach (array('all' => 'الكل', 'late' => 'متأخرة', 'week' => 'هذا الأسبوع') as $fk => $fl): ?>
+            <a href="?due_filter=<?php echo $fk; ?>" class="btn btn-sm"
+               style="border:1px solid #ddd;border-radius:6px;padding:2px 8px;<?php
+                   echo $fk === $e16_filter ? 'background:#e2b93b;font-weight:800' : ''; ?>"><?php echo $fl; ?></a>
+        <?php endforeach; ?></span></h5></div><div class="card-body">
+        <div class="table-container"><table class="display nowrap alltables no-datatable" style="width:100%">
+            <thead><tr><th>توليد أمر</th><th>مرجع التفويض</th><th>رقم الخطة</th><th>كود المعدة</th><th>الأساس</th><th>تاريخ الاستحقاق المتوقع</th></tr></thead>
+            <tbody>
+                <?php foreach ($due_rows as $r): ?>
+                <tr>
+                    <td>
+                        <?php if ($can_add): ?>
+                        <form method="post" action="" style="display:inline" onsubmit="return confirm('توليد أمر صيانة وقائي من هذه الخطة؟')">
+                            <input type="hidden" name="action" value="generate_order">
+                            <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
+                            <button type="submit" class="add-btn" title="توليد أمر"><i class="fas fa-wrench"></i> توليد أمر</button>
+                        </form>
+                        <?php endif; ?>
+                    </td>
+                    <td><strong><?php echo htmlspecialchars((string) $r['code']); ?></strong>
+                        <?php if (!empty($r['e16_late'])): ?><span class="badge badge-danger">متأخرة</span>
+                        <?php elseif (!empty($r['e16_week'])): ?><span class="badge badge-warning">هذا الأسبوع</span><?php endif; ?></td>
+                    <td><?php echo htmlspecialchars((string) $r['name']); ?></td>
+                    <td><?php echo htmlspecialchars((string) ($r['equipment_name'] ?? '-')); ?></td>
+                    <td><?php echo htmlspecialchars((string) $r['trigger_basis']); ?></td>
+                    <td><?php echo $r['trigger_basis'] === 'ساعات' ? ('عدّاد: ' . htmlspecialchars((string) $r['next_due_meter'])) : ('تاريخ: ' . htmlspecialchars((string) $r['next_due_date'])); ?>
+                        <?php if ($can_edit && $r['trigger_basis'] === 'زمن'): ?>
+                        <form method="post" style="display:inline-flex;gap:4px;margin-inline-start:6px"
+                              onsubmit="return this.reason.value.trim() !== '' || (alert('السببُ إلزامي'), false)">
+                            <input type="hidden" name="action" value="postpone_plan">
+                            <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
+                            <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل">
+                            <input type="text" name="reason" placeholder="سببُ التأجيل *" style="width:130px" required>
+                            <button type="submit" class="btn-save" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
+                        </form>
+                        <?php endif; ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table></div>
+    </div></div>
+    <?php endif; ?>
+
+    <div class="card"><div class="card-body">
+        <div class="table-container">
+            <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <thead><tr><th>الإجراءات</th><th>المرجع</th><th>الخطة</th><th>المعدة</th><th>الأساس</th><th>الفاصل</th><th>الاستحقاق القادم</th><th>الحالة</th>
+              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+              <th class="ems-fn-th" data-fn="1">نوع الخدمة</th>
+              <th class="ems-fn-th" data-fn="1">دورية الساعات</th>
+              <th class="ems-fn-th" data-fn="1">العدّاد عند آخر خدمة</th>
+              <th class="ems-fn-th" data-fn="1">العدّاد الحالي</th>
+              <th class="ems-fn-th" data-fn="1">الساعات المتبقية</th>
+              <th class="ems-fn-th" data-fn="1">القطع المطلوبة</th>
+              <th class="ems-fn-th" data-fn="1">الكمية</th>
+              <th class="ems-fn-th" data-fn="1">حالة توفر القطع</th>
+              <th class="ems-fn-th" data-fn="1">أمر العمل المولَّد</th>
+              <th class="ems-fn-th" data-fn="1">المسؤول</th>
+              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
+              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              </tr></thead>
+                <tbody>
+                    <?php foreach ($rows as $row):
+                        $st = (string) $row['state'];
+                        $da =
+                            "data-code='"      . htmlspecialchars((string) $row['code'], ENT_QUOTES) . "' " .
+                            "data-name='"      . htmlspecialchars((string) $row['name'], ENT_QUOTES) . "' " .
+                            "data-scope='"     . htmlspecialchars((string) ($row['scope'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-equipment='" . htmlspecialchars((string) ($row['equipment_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-category='"  . htmlspecialchars((string) ($row['category_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-basis='"     . htmlspecialchars((string) $row['trigger_basis'], ENT_QUOTES) . "' " .
+                            "data-interval='"  . htmlspecialchars((string) ($row['interval_value'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-tolerance='" . htmlspecialchars((string) ($row['tolerance'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-lastdate='"  . htmlspecialchars((string) ($row['last_done_date'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-lastmeter='" . htmlspecialchars((string) ($row['last_done_meter'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-duedate='"   . htmlspecialchars((string) ($row['next_due_date'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-duemeter='"  . htmlspecialchars((string) ($row['next_due_meter'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-state='"     . htmlspecialchars($st, ENT_QUOTES) . "'";
+                        echo "<tr>";
+                        echo "<td><div class='action-btns'>";
+                        echo "<a href='javascript:void(0)' class='viewBtn action-btn view' $da title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
+                        if ($can_edit) echo "<a href='preventive_plans.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
+                        if ($can_delete) echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف الخطة؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                        echo "</div></td>";
+                        echo "<td><strong>" . htmlspecialchars((string) $row['code']) . "</strong></td>";
+                        echo "<td>" . htmlspecialchars((string) $row['name']) . "</td>";
+                        echo "<td>" . htmlspecialchars((string) ($row['equipment_name'] ?? '-')) . "</td>";
+                        echo "<td>" . htmlspecialchars((string) $row['trigger_basis']) . "</td>";
+                        echo "<td>" . htmlspecialchars((string) ($row['interval_value'] ?? '-')) . "</td>";
+                        $due = $row['trigger_basis'] === 'ساعات' ? (string) ($row['next_due_meter'] ?? '-') : (string) ($row['next_due_date'] ?? '-');
+                        echo "<td>" . htmlspecialchars($due) . "</td>";
+                        echo "<td><span class='action-btn'>" . htmlspecialchars((string) $row['state']) . "</span></td>";
+                        echo "</tr>";
+                    endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div></div>
+<?php endif; ?>
+</div>
+
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+<script>
+(function () {
+    $(document).ready(function () {
+        if ($('#mntTable').length) {
+            $('#mntTable').DataTable({
+                scrollX: true, autoWidth: false, stateSave: false, order: [[1, 'desc']],
+                dom: 'Bfrtip',
+                buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
+                "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
+            });
+        }
+
+        // ════════ نافذة العرض الموحّدة ════════
+        $(document).on('click', '.viewBtn', function () {
+            var d = $(this).data();
+            EmsDetailsModal.open({
+                title: 'تفاصيل الخطة الوقائية',
+                icon: 'fas fa-calendar-check',
+                fields: [
+                    { label: 'المرجع', value: d.code, icon: 'fas fa-hashtag' },
+                    { label: 'الحالة', value: d.state, icon: 'fas fa-flag', type: 'status' },
+                    { label: 'اسم الخطة', value: d.name, icon: 'fas fa-clipboard-list', size: 'lg' },
+                    { label: 'النطاق', value: d.scope, icon: 'fas fa-layer-group' },
+                    { label: 'المعدة', value: d.equipment, icon: 'fas fa-tractor' },
+                    { label: 'الفئة', value: d.category, icon: 'fas fa-tags' },
+                    { label: 'الأساس', value: d.basis, icon: 'fas fa-sliders' },
+                    { label: 'الفاصل', value: d.interval, icon: 'fas fa-ruler' },
+                    { label: 'السماحية', value: d.tolerance, icon: 'fas fa-arrows-left-right' },
+                    { label: 'آخر تنفيذ (تاريخ)', value: d.lastdate, icon: 'fas fa-calendar' },
+                    { label: 'آخر تنفيذ (عداد)', value: d.lastmeter, icon: 'fas fa-gauge' },
+                    { label: 'الاستحقاق القادم (تاريخ)', value: d.duedate, icon: 'fas fa-calendar-day' },
+                    { label: 'الاستحقاق القادم (عداد)', value: d.duemeter, icon: 'fas fa-gauge-high' }
+                ]
+            });
+        });
+    });
+
+    // ════════ صفحة التحرير: مهام الخطة عبر AJAX + فتح/إغلاق الفورم ════════
+    function esc(v){ return $('<div>').text(v == null ? '' : v).html(); }
+    function postLine(payload){ return fetch('preventive_plans.php', { method:'POST', headers:{'X-Requested-With':'XMLHttpRequest'}, body: payload }).then(function(r){ return r.json(); }); }
+
+    var $taskForm = $('#taskForm');
+    if ($taskForm.length) {
+        $taskForm.on('submit', function (e) {
+            e.preventDefault();
+            var fd = new FormData(this); fd.append('ajax','1');
+            postLine(new URLSearchParams(fd)).then(function(res){
+                if(!res.success){ alert(res.message || 'تعذّر إضافة المهمة'); return; }
+                var t = res.task;
+                var row = '<tr data-line="'+t.id+'">'
+                    + '<td>'+esc(t.name)+'</td><td>'+esc(t.type_name||'—')+'</td><td>'+esc(t.component||'')+'</td>'
+                    + '<td class="mnt-num">'+esc(t.est_hours)+'</td>'
+                    + '<td><button type="button" class="action-btn delete mnt-del-line" data-line="'+t.id+'" title="حذف"><i class="fas fa-trash-alt"></i></button></td></tr>';
+                $('#taskTable tbody').append(row);
+                $('#taskEmpty').hide();
+                $('#taskCount').text(res.count);
+                $taskForm[0].reset();
+            }).catch(function(){ alert('خطأ في الاتصال'); });
+        });
+    }
+
+    $(document).on('click', '.mnt-del-line', function () {
+        if (!confirm('حذف المهمة؟')) return;
+        var $btn = $(this), taskId = $btn.data('line');
+        var pid = ($('#taskForm input[name=plan_id]').val() || $('input[name=id]').val());
+        var body = new URLSearchParams({ ajax:'1', action:'del_task', plan_id: pid, task_id: taskId });
+        postLine(body).then(function(res){
+            if(!res.success){ alert(res.message || 'تعذّر الحذف'); return; }
+            var $tbody = $btn.closest('tbody'); $btn.closest('tr').remove();
+            $('#taskCount').text(res.count);
+            if ($tbody.find('tr').length === 0) { $('#taskEmpty').show(); }
+        }).catch(function(){ alert('خطأ في الاتصال'); });
+    });
+
+    // فتح/إغلاق فورم بيانات الخطة (نمط العملاء/المشاريع)
+    var $planForm = $('#planForm');
+    function openPlanForm(){ $planForm.addClass('allforms-visible').hide().stop(true, true).slideDown(220); }
+    function closePlanForm(){ $planForm.stop(true, true).slideUp(220, function(){ $planForm.removeClass('allforms-visible'); }); }
+    $('#togglePlanForm').on('click', function(){
+        if ($planForm.hasClass('allforms-visible')) { closePlanForm(); }
+        else { openPlanForm(); $('html, body').animate({ scrollTop: $planForm.offset().top - 90 }, 360); }
+    });
+    $('#collapsePlanForm').on('click', closePlanForm);
+
+    // فتح/إغلاق فورم إضافة مهمة
+    $(document).on('click', '.mnt-add-toggle', function(){
+        var $f = $('#' + $(this).data('target'));
+        if ($f.is(':visible')) { $f.stop(true, true).slideUp(180); }
+        else { $f.stop(true, true).slideDown(180); $f.find('select, input').not('[type=hidden]').first().trigger('focus'); }
+    });
+    $(document).on('click', '.mnt-line-cancel', function(){
+        $('#' + $(this).data('target')).stop(true, true).slideUp(180);
+    });
+
+    // قائمة الخطط: فتح/إغلاق فورم الإنشاء (بلا حفظ سجل فارغ)
+    var $createForm = $('#planCreateForm');
+    function closeCreateForm(){ $createForm.stop(true, true).slideUp(220, function(){ $createForm.removeClass('allforms-visible'); }); }
+    $('#togglePlanCreateForm').on('click', function(){
+        if ($createForm.hasClass('allforms-visible')) { closeCreateForm(); }
+        else { $createForm.addClass('allforms-visible').hide().stop(true, true).slideDown(220); $('html, body').animate({ scrollTop: $createForm.offset().top - 90 }, 360); }
+    });
+    $('#cancelPlanCreateForm').on('click', closeCreateForm);
+})();
+</script>
+<style>
+    /* ملخص العدّادات */
+    .mnt-plans-main .mnt-cost-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .mnt-plans-main .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(26,18,8,.06); }
+    .mnt-plans-main .mnt-cost-box span { display:block; color:var(--t2,#8a7a5c); font-size:.8rem; font-weight:700; margin-bottom:7px; }
+    .mnt-plans-main .mnt-cost-box strong { font-size:1.4rem; font-variant-numeric:tabular-nums; color:var(--t1,#1a1208); }
+
+    /* ══ لوحة مهام الخطة — تصميم قوي متّسق مع هوية الفورمات ══ */
+    .mnt-plans-main .mnt-lines-card { overflow:hidden; }
+    .mnt-plans-main .mnt-lines-card > .card-header.mnt-lines-head {
+        display:flex; align-items:center; justify-content:space-between; gap:10px;
+        background:linear-gradient(135deg,#1f4f7a,#2f6fa5); color:#fff; padding:13px 16px; border:none;
+    }
+    .mnt-plans-main .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:#fff; font-weight:800; font-size:1rem; }
+    .mnt-plans-main .mnt-lines-head h5 i { color:#ffd98a; }
+    .mnt-plans-main .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:rgba(255,255,255,.22); color:#fff; font-size:.76rem; font-weight:800; }
+    .mnt-plans-main .mnt-add-toggle {
+        display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
+        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:#1a1208;
+        background:linear-gradient(135deg,#E0AE2E,#f5d27e); box-shadow:0 2px 8px rgba(224,174,46,.4); transition:transform .15s, box-shadow .15s;
+    }
+    .mnt-plans-main .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(224,174,46,.5); }
+    .mnt-plans-main .mnt-line-form { background:linear-gradient(180deg,#fffdf7,#fbf6ea); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 #fff, 0 2px 8px rgba(26,18,8,.05); }
+    .mnt-plans-main .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; align-items:end; }
+    .mnt-plans-main .mnt-line-grid .form-group { margin:0; }
+    .mnt-plans-main .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; padding-top:12px; border-top:1px dashed var(--bdr,#e7dcc4); }
+    .mnt-plans-main .mnt-line-cancel { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+
+    /* جدول المهام */
+    .mnt-plans-main .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }
+    .mnt-plans-main .mnt-line-table thead th { background:#f3ede0; color:#6b5d3e; font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid #e7dcc4; }
+    .mnt-plans-main .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid #f0e9da; }
+    .mnt-plans-main .mnt-line-table tbody tr:hover { background:rgba(224,174,46,.07); }
+    .mnt-plans-main .mnt-line-table .mnt-num { font-variant-numeric:tabular-nums; font-weight:700; }
+    .mnt-plans-main .mnt-line-table td:last-child, .mnt-plans-main .mnt-line-table th:last-child { text-align:center; }
+    .mnt-plans-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:#b0a489; padding:24px 10px; }
+    .mnt-plans-main .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
+    .mnt-plans-main .mnt-empty-line span { font-size:.9rem; font-weight:600; }
+
+    @media (max-width:900px){ .mnt-plans-main .mnt-cost-summary{ grid-template-columns:1fr;} }
+</style>
+</body>
+</html>

@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = fin_page_perms($conn, 'Finance/events_list_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الأحداث+المالية+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الأحداث المالية ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -151,9 +151,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'dt') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: events_list_fin.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('events_list_fin.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('events_list_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('events_list_fin.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $event_type    = trim($_POST['event_type'] ?? '');
     $source_module = trim($_POST['source_module'] ?? '');
@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
 
     // تحقّق خادمي: النوع/المصدر ضمن القوائم البيضاء + مبلغ موجب
     if (!isset($event_types[$event_type]) || !isset($source_modules[$source_module]) || $amount <= 0) {
-        header("Location: events_list_fin.php?msg=بيانات+غير+صحيحة+(نوع/مصدر/مبلغ)+❌"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'بيانات غير صحيحة (نوع/مصدر/مبلغ) ❌', 'GOV-REF-404', ''); exit();
     }
     if (!in_array($currency, $currencies, true)) { $currency = 'SDG'; }
 
@@ -185,9 +185,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
             ), array('id' => $id), 'COALESCE(is_deleted,0)=0');
         } catch (\App\Core\TenantGateException $e) {
             error_log('events_list edit refused: ' . $e->getMessage());
-            header("Location: events_list_fin.php?msg=لا+يجوز+تعديل+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
+            ems_gov_flash_redirect('events_list_fin.php', 'لا يجوز تعديل حدثٍ منشورٍ على الناقل ❌', 'GOV-FAIL-409', ''); exit();
         }
-        header("Location: events_list_fin.php?msg=تم+تعديل+الحدث+المالي+بنجاح+✅"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'تم تعديل الحدث المالي بنجاح ✅', 'GOV-OK-200', ''); exit();
     } else {
         $event_no = fin_gen_code($conn, 'fin_financial_events', 'FIN-EV', $company_id);
         ems_tenant_db()->insert('fin_financial_events', array(
@@ -196,13 +196,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
             'project_id' => $project_id, 'supplier_entity_id' => $supplier_id, 'equipment_id' => $equipment_id,
             'notes' => $notes, 'state' => 'draft', 'created_by' => $current_user_id,
         ));
-        header("Location: events_list_fin.php?msg=تمت+إضافة+الحدث+المالي+بنجاح+✅"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'تمت إضافة الحدث المالي بنجاح ✅', 'GOV-OK-200', ''); exit();
     }
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('events_list_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     // A0 · حذف ناعم عبر البوابة المحصَّنة (§12): حذف حدثٍ منشورٍ مرفوض.
     try {
@@ -210,14 +210,14 @@ if (isset($_GET['delete_id'])) {
         $gate->softDelete('fin_financial_events', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('events_list delete refused: ' . $e->getMessage());
-        header("Location: events_list_fin.php?msg=لا+يجوز+حذف+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'لا يجوز حذف حدثٍ منشورٍ على الناقل ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: events_list_fin.php?msg=تم+حذف+الحدث+المالي+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('events_list_fin.php', 'تم حذف الحدث المالي بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── تقديم الحدث في دورة الاعتماد (صندوق الاعتماد المستقل) ──
 if (isset($_GET['advance_id'])) {
-    if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('events_list_fin.php', 'لا توجد صلاحية الاعتماد ❌', 'GOV-PERM-403', ''); exit(); }
     $aid = intval($_GET['advance_id']);
     $flow = fin_event_flow();
     // A0 · الحصانة (§12) تحرس **مضمون** الحدث المنشور لا موضعه في سير العمل:
@@ -230,7 +230,7 @@ if (isset($_GET['advance_id'])) {
         list($next, $lbl, $level) = $flow[$cur];
         // فصل الواجبات: هذا الانتقال يخصّ مستواه فقط
         if (!fin_can_perform($conn, $ctx['role'], $level)) {
-            header("Location: events_list_fin.php?msg=هذا+الإجراء+(" . urlencode($lbl) . ")+يخصّ+" . urlencode(fin_level_owner_label($level)) . "+❌"); exit();
+            ems_gov_flash_redirect(ems_flash_to('events_list_fin.php', urlencode($lbl) . ")+يخصّ+" . urlencode(fin_level_owner_label($level)) . "+❌"), 'هذا الإجراء (', 'GOV-INFO-200', ''); exit();
         }
 
         // (فجوة 1) الاعتماد النهائي يخضع لمصفوفة الاعتماد بالمبلغ
@@ -239,7 +239,7 @@ if (isset($_GET['advance_id'])) {
             list($allowed, $required) = fin_matrix_gate($conn, $company_id, $ctx['role'], $event['event_type'], $base);
             if (!$allowed) {
                 fin_notify($conn, $company_id, 'finance_manager', 'الحدث ' . $event['event_no'] . ' (' . number_format($base, 0) . ') يتطلب اعتماد ' . fin_matrix_level_label($required), 'events_list_fin.php?fstate=audited');
-                header("Location: events_list_fin.php?msg=المصفوفة:+هذا+المبلغ+يتطلب+اعتماد+(" . urlencode(fin_matrix_level_label($required)) . ")+—+المدير+الأعلى+❌"); exit();
+                ems_gov_flash_redirect(ems_flash_to('events_list_fin.php', urlencode(fin_matrix_level_label($required)) . ")+—+المدير+الأعلى+❌"), 'المصفوفة: هذا المبلغ يتطلب اعتماد (', 'GOV-INFO-200', ''); exit();
             }
         }
 
@@ -280,14 +280,14 @@ if (isset($_GET['advance_id'])) {
                 fin_notify($conn, $company_id, 'finance_manager', 'قيد آلي ' . $jno . ' جاهز للترحيل (من ' . $event['event_no'] . ')', 'journal_form_fin.php');
             }
         }
-        header("Location: events_list_fin.php?msg=تم+($lbl)+✅$auto_msg"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', "تم ($lbl) ✅$auto_msg", 'GOV-OK-200', ''); exit();
     }
-    header("Location: events_list_fin.php?msg=لا+انتقال+متاح+من+هذه+الحالة+❌"); exit();
+    ems_gov_flash_redirect('events_list_fin.php', 'لا انتقال متاح من هذه الحالة ❌', 'GOV-FAIL-409', ''); exit();
 }
 
 // ── رفض الحدث (يعود لمنشئه بسبب مسجَّل) ──
 if (isset($_GET['reject_id'])) {
-    if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الرفض+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('events_list_fin.php', 'لا توجد صلاحية الرفض ❌', 'GOV-PERM-403', ''); exit(); }
     $rid = intval($_GET['reject_id']);
     // الرفض نقلُ حالةٍ لا تعديلُ مضمون — يمرّ للمنشور واليدوي معًا (§12 + immutable_allow)
     $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state'), 'where' => array('id' => $rid)));
@@ -302,14 +302,14 @@ if (isset($_GET['reject_id'])) {
             ems_tenant_db(), $conn, $rid, 'ReturnedToSource', $current_user_id);
         if (!$fesSync['ok']) { error_log('events_list fes reject sync #' . $rid . ': ' . implode(' · ', $fesSync['reasons'])); }
         fin_notify($conn, $company_id, 'dept_accountant', 'حدث مرفوض أُعيد إليك للتصحيح', 'events_list_fin.php?fstate=rejected');
-        header("Location: events_list_fin.php?msg=تم+رفض+الحدث+✅"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'تم رفض الحدث ✅', 'GOV-OK-200', ''); exit();
     }
-    header("Location: events_list_fin.php?msg=لا+يمكن+رفض+هذه+الحالة+❌"); exit();
+    ems_gov_flash_redirect('events_list_fin.php', 'لا يمكن رفض هذه الحالة ❌', 'GOV-FAIL-409', ''); exit();
 }
 
 // ── إعادة الحدث المرفوض للدورة (يعود لمنشئه، إصلاح #8) ──
 if (isset($_GET['resume_id'])) {
-    if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('events_list_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $rid = intval($_GET['resume_id']);
     // الإعادة للدورة نقلُ حالةٍ لا تعديلُ مضمون — تمرّ للمنشور واليدوي معًا
     $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state'), 'where' => array('id' => $rid)));
@@ -322,12 +322,15 @@ if (isset($_GET['resume_id'])) {
         $fesSync = \App\Services\Finance\EventStateMachine::syncTo(
             ems_tenant_db(), $conn, $rid, 'Published', $current_user_id);
         if (!$fesSync['ok']) { error_log('events_list fes resume sync #' . $rid . ': ' . implode(' · ', $fesSync['reasons'])); }
-        header("Location: events_list_fin.php?msg=تمت+إعادة+الحدث+للدورة+(مسودة)+✅"); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'تمت إعادة الحدث للدورة (مسودة) ✅', 'GOV-OK-200', ''); exit();
     }
-    header("Location: events_list_fin.php?msg=لا+يمكن+إعادة+هذه+الحالة+❌"); exit();
+    ems_gov_flash_redirect('events_list_fin.php', 'لا يمكن إعادة هذه الحالة ❌', 'GOV-FAIL-409', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | المعاملات المالية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

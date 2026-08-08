@@ -19,14 +19,14 @@ use App\Services\Finance\PeriodicEventService as PES;
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $uid = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/periodic_events_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الدوريات+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الدوريات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = fin_gate($is_super_admin);
-$redirect = function ($msg) { header("Location: periodic_events_fin.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('periodic_events_fin.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 $period = (isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', (string) $_GET['period']))
           ? (string) $_GET['period'] : date('Y-m', strtotime('first day of last month'));
@@ -81,6 +81,9 @@ $insts = PES::dueInstallments($gate, date('Y-m-t', strtotime($period . '-01')));
 $rets  = PES::returnsOf($gate);
 
 $page_title = 'إيكوبيشن | الدوريات المالية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

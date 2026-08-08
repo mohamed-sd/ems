@@ -15,10 +15,10 @@ require_once __DIR__ . '/tkt_helpers.php';
 $ctx = tkt_ctx();
 $is_super_admin = $ctx['is_super'];
 $company_id = $ctx['company_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 $perms = tkt_page_perms($conn, 'Tickets/ticket_recurrence.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+القوالب+الدورية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض القوالب الدورية ❌', 'GOV-PERM-403', ''); exit(); }
 
 $units = array('day' => 'يوم', 'week' => 'أسبوع', 'month' => 'شهر', 'year' => 'سنة');
 $priorities = tkt_priorities();
@@ -27,9 +27,9 @@ $roles_map = tkt_roles_map();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = intval($_POST['id'] ?? 0);
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: ticket_recurrence.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: ticket_recurrence.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: ticket_recurrence.php?msg=لا+يمكن+الحفظ+بلا+شركة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('ticket_recurrence.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('ticket_recurrence.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('ticket_recurrence.php', 'لا يمكن الحفظ بلا شركة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     $type_id = intval($_POST['ticket_type_id'] ?? 0);
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     if (!array_key_exists($unit, $units)) { $unit = 'month'; }
     if (!array_key_exists($priority, $priorities)) { $priority = 'normal'; }
     if ($name === '' || $type_id <= 0 || $next === '' || strtotime($next) === false) {
-        header("Location: ticket_recurrence.php?msg=الاسم+والنوع+وتاريخ+التوليد+التالي+إلزامية+❌"); exit();
+        ems_gov_flash_redirect('ticket_recurrence.php', 'الاسم والنوع وتاريخ التوليد التالي إلزامية ❌', 'GOV-FAIL-409', ''); exit();
     }
     $data = array('name' => $name, 'ticket_type_id' => $type_id, 'equipment_id' => $equipment_id,
                   'recurrence_interval' => $interval, 'recurrence_unit' => $unit,
@@ -51,16 +51,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
                   'lead_time_days' => $lead, 'default_priority' => $priority, 'active' => $active);
     try {
         if ($is_editing) { tkt_gate(false)->update('ticket_recurrence_templates', $data, array('id' => $id));
-            header("Location: ticket_recurrence.php?msg=تم+تعديل+القالب+✅"); exit(); }
+            ems_gov_flash_redirect('ticket_recurrence.php', 'تم تعديل القالب ✅', 'GOV-OK-200', ''); exit(); }
         tkt_gate(false)->insert('ticket_recurrence_templates', $data);
-        header("Location: ticket_recurrence.php?msg=تمت+إضافة+القالب+✅"); exit();
+        ems_gov_flash_redirect('ticket_recurrence.php', 'تمت إضافة القالب ✅', 'GOV-OK-200', ''); exit();
     } catch (\App\Core\TenantGateException $e) {
         error_log('recurrence template save refused: ' . $e->getMessage());
-        header("Location: ticket_recurrence.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('ticket_recurrence.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 $page_title = 'إيكوبيشن | البلاغات الدورية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

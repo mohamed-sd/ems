@@ -15,7 +15,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -24,7 +24,7 @@ $emp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('employee profile s
 
 $employee_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($employee_id <= 0) {
-    header("Location: employees.php?msg=معرف+السائق+غير+صحيح+❌");
+    ems_gov_flash_redirect('employees.php', 'معرف السائق غير صحيح ❌', 'GOV-REF-404', '');
     exit();
 }
 
@@ -41,7 +41,7 @@ try {
 } catch (\Throwable $t) { error_log('employee_profile card: ' . $t->getMessage()); }
 
 if (!$driver) {
-    header("Location: employees.php?msg=السائق+غير+موجود+او+خارج+نطاق+الشركة+❌");
+    ems_gov_flash_redirect('employees.php', 'السائق غير موجود او خارج نطاق الشركة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -59,9 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['account_action'] ?? '') ==
             array('id' => $target_uid, 'employee_id' => $employee_id));
     } catch (\Throwable $t) { error_log('employee_profile revoke: ' . $t->getMessage()); }
     if ($revoked > 0) {
-        header("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('✅ تم سحب الحساب من الموظف وتعطيله'));
+        ems_gov_redirect("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('✅ تم سحب الحساب من الموظف وتعطيله'));
     } else {
-        header("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('❌ تعذّر سحب الحساب أو لا توجد صلاحية'));
+        ems_gov_redirect("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('❌ تعذّر سحب الحساب أو لا توجد صلاحية'));
     }
     exit();
 }
@@ -263,6 +263,9 @@ $driver_status_class = (isset($driver['status']) && strval($driver['status']) ==
 $driver_status_text = (isset($driver['status']) && strval($driver['status']) === '1') ? 'مفعل في النظام' : 'موقوف في النظام';
 
 $page_title = "إيكوبيشن | بطاقة السائق";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -727,8 +730,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         const hasEquipmentData = equipmentLabels.length > 0;
         const hasProjectData = projectLabels.length > 0;
 
+        /* UI-DEF-07 (L4): لا رسمَ بمحاورَ افتراضيةٍ وبياناتٍ صفرية — حالةٌ
+           فارغةٌ مفسَّرةٌ بدلَه (emsChartGuard يستعمل EmsUI متى حضر). */
+        function emsChartGuard(ctx, hasData, renderFn) {
+            if (hasData) { return renderFn(); }
+            var host = ctx && ctx.parentNode ? ctx.parentNode : null;
+            if (!host) { return null; }
+            if (window.EmsUI && EmsUI.emptyState) {
+                host.innerHTML = '';
+                host.appendChild(EmsUI.emptyState({ reason: 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية' }));
+            } else {
+                host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">'
+                    + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+            }
+            return null;
+        }
+
         const monthlyCtx = document.getElementById('monthlyHoursChart');
-        new Chart(monthlyCtx, {
+        emsChartGuard(monthlyCtx, hasMonthlyData, function () {
+        return new Chart(monthlyCtx, {
             type: 'bar',
             data: {
                 labels: hasMonthlyData ? monthlyLabels : ['لا توجد بيانات'],
@@ -764,9 +784,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 }
             }
         });
+        });
 
         const equipmentCtx = document.getElementById('equipmentHoursChart');
-        new Chart(equipmentCtx, {
+        emsChartGuard(equipmentCtx, hasEquipmentData, function () {
+        return new Chart(equipmentCtx, {
             type: 'doughnut',
             data: {
                 labels: hasEquipmentData ? equipmentLabels : ['لا توجد بيانات'],
@@ -785,9 +807,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 }
             }
         });
+        });
 
         const projectsCtx = document.getElementById('projectsChart');
-        new Chart(projectsCtx, {
+        emsChartGuard(projectsCtx, hasProjectData, function () {
+        return new Chart(projectsCtx, {
             type: 'line',
             data: {
                 labels: hasProjectData ? projectLabels : ['لا توجد بيانات'],
@@ -831,6 +855,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                 }
             }
+        });
         });
     })();
 </script>

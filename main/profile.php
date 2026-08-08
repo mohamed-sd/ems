@@ -254,6 +254,9 @@ $settings_url = function_exists('ems_url') ? ems_url('Settings/settings.php') : 
 $logout_url = function_exists('ems_url') ? ems_url('logout.php') : '../logout.php';
 
 $page_title = "إيكويبيشن | الملف الشخصي";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -1015,10 +1018,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         var goldPalette = ['#D9AB32', '#F4C542', '#1E3A5F', '#6e6e6e', '#15803d', '#b8860b', '#C2941C', '#9aa0a8', '#b91c1c', '#3b82f6'];
 
+        /* UI-DEF-07 (L4): الكتلةُ محكومةٌ خادميًّا بـact_total>0 — والحارسُ
+           النصيُّ يوحّد العقدَ: لا رسمَ بلا بياناتٍ بمحاورَ افتراضية. */
+        function emsChartGuard(c, seriesArrays, renderFn) {
+            var t = 0;
+            (seriesArrays || []).forEach(function (a) { (a || []).forEach(function (v) { t += Math.abs(parseFloat(v) || 0); }); });
+            if (t > 0) { return renderFn(); }
+            var host = c && c.parentNode ? c.parentNode : null;
+            if (host) {
+                host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">'
+                    + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+            }
+            return null;
+        }
+
         // الاتجاه خلال 14 يوماً
         var trendCtx = document.getElementById('activityTrendChart');
         if (trendCtx) {
-            new Chart(trendCtx, {
+            emsChartGuard(trendCtx, [<?php echo json_encode($act_days_values); ?>], function () {
+            return new Chart(trendCtx, {
                 type: 'bar',
                 data: {
                     labels: <?php echo json_encode($act_days_labels, JSON_UNESCAPED_UNICODE); ?>,
@@ -1041,12 +1059,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                 }
             });
+            });
         }
 
         // توزيع الأنواع
         var typeCtx = document.getElementById('activityTypeChart');
         if (typeCtx) {
-            new Chart(typeCtx, {
+            emsChartGuard(typeCtx, [<?php echo json_encode(array_values($act_by_type)); ?>], function () {
+            return new Chart(typeCtx, {
                 type: 'doughnut',
                 data: {
                     labels: <?php echo json_encode(array_map('act_label', array_keys($act_by_type)), JSON_UNESCAPED_UNICODE); ?>,
@@ -1065,6 +1085,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         legend: { position: 'bottom', labels: { font: { family: 'IBM Plex Sans Arabic, Tajawal, Cairo, sans-serif' }, padding: 12, boxWidth: 14 } }
                     }
                 }
+            });
             });
         }
     })();

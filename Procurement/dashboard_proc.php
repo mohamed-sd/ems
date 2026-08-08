@@ -18,13 +18,13 @@ $is_super_admin  = $ctx['is_super'];
 $company_id      = $ctx['company_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = proc_page_perms($conn, 'Procurement/dashboard_proc.php', $is_super_admin);
 if (!$perms['can_view']) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+لوحة+المشتريات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض لوحة المشتريات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -76,6 +76,9 @@ $rb_pulse_title  = 'نبض الأداء — طلباتٌ واردة مقابل �
 $rb_pulse_series = array('طلبات واردة', 'صرفيات');
 
 $page_title = 'إيكوبيشن | لوحة المشتريات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

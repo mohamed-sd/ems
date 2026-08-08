@@ -1,0 +1,1335 @@
+<?php
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../login.php");
+    exit();
+}
+require_once '../config.php';
+$page_title = 'تفاصيل الوحدة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include '../inheader.php';
+include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+?>
+
+<style>
+        :root {
+            --primary: #161008;
+            --primary-light: #2a1b0c;
+            --accent: #f7931a;
+            --surface: #fffaf2;
+            --surface-2: #ffffff;
+            --text-primary: #1f1509;
+            --text-secondary: #7a4a12;
+            --text-muted: #c4a57b;
+            --border: #ede5d8;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --warning-border: #fde68a;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --danger-border: #fca5a5;
+            --info: #0369a1;
+            --info-bg: #eff6ff;
+            --info-border: #bae6fd;
+            --shadow-sm: 0 1px 3px rgba(22,16,8,0.07), 0 1px 2px rgba(22,16,8,0.04);
+            --shadow-md: 0 4px 16px rgba(22,16,8,0.09), 0 2px 6px rgba(22,16,8,0.05);
+            --shadow-lg: 0 10px 40px rgba(22,16,8,0.13), 0 4px 12px rgba(22,16,8,0.07);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            direction: rtl;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* ========== LAYOUT ========== */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+            min-height: 100vh;
+        }
+
+        /* ========== PAGE HERO ========== */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, #3d2817 100%);
+            border-radius: var(--radius-lg);
+            padding: 32px 40px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 220px; height: 220px;
+            background: rgba(232,184,75,0.10);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: 120px;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .page-hero-inner {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+            justify-content: space-between;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.28);
+            border-radius: 12px;
+            padding: 9px 20px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-back:hover {
+            background: rgba(232,184,75,0.22);
+            border-color: rgba(232,184,75,0.55);
+            color: #fff;
+        }
+
+        .hero-icon {
+            width: 64px; height: 64px;
+            background: rgba(232,184,75,0.18);
+            border: 2px solid rgba(232,184,75,0.38);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .hero-title {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        /* ========== SECTION BLOCK ========== */
+        .section-block {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header-icon {
+            width: 38px; height: 38px;
+            background: rgba(232,184,75,0.18);
+            border: 1.5px solid rgba(232,184,75,0.38);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .section-header h4 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        /* ========== CARDS GRID ========== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            padding: 24px;
+        }
+
+        /* ========== DETAIL CARD ========== */
+        .detail-card {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: box-shadow 0.22s, transform 0.22s;
+        }
+
+        .detail-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .detail-card-header {
+            padding: 13px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-card-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .detail-card-icon.primary  { background: #eef2ff; color: var(--primary); }
+        .detail-card-icon.success  { background: var(--success-bg); color: var(--success); }
+        .detail-card-icon.warning  { background: var(--warning-bg); color: var(--warning); }
+        .detail-card-icon.danger   { background: var(--danger-bg); color: var(--danger); }
+        .detail-card-icon.info     { background: var(--info-bg); color: var(--info); }
+
+        .detail-card-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .detail-card-body { padding: 14px 16px; }
+
+        /* ========== DETAIL ROW ========== */
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+            gap: 12px;
+        }
+
+        .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .detail-row:first-child { padding-top: 0; }
+
+        .detail-label {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: left;
+            word-break: break-word;
+        }
+
+        .detail-value.mono {
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value.note-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: right;
+            line-height: 1.7;
+        }
+
+        /* ========== HIGHLIGHT CHIPS ========== */
+        .chip-total {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .chip-success {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1.5px solid var(--success-border);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .chip-warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1.5px solid var(--warning-border);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .chip-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1.5px solid var(--danger-border);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .chip-info {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1.5px solid var(--info-border);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .chip-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        /* Shift badge */
+        .shift-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .shift-badge.day {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1.5px solid #fde047;
+        }
+
+        .shift-badge.night {
+            background: #eef2ff;
+            color: var(--primary);
+            border: 1.5px solid #c7d2fe;
+        }
+
+        /* Counter display */
+        .counter-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 0 4px;
+        }
+
+        .counter-seg {
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            min-width: 46px;
+            text-align: center;
+        }
+
+        .counter-sep {
+            color: var(--text-muted);
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 2px;
+        }
+
+        /* Empty / no notes */
+        .no-data {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .main { padding: 14px 12px 48px; }
+            .page-hero { padding: 22px 18px; border-radius: var(--radius-md); }
+            .hero-title { font-size: 20px; }
+            .hero-icon { width: 50px; height: 50px; font-size: 20px; }
+            .cards-grid { padding: 16px; gap: 14px; }
+            .section-header { padding: 14px 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .cards-grid { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+            .hero-title { font-size: 17px; }
+        }
+
+        @media (min-width: 1200px) {
+            .cards-grid.grid-4 { grid-template-columns: repeat(4, 1fr); }
+            .cards-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
+            .cards-grid.grid-5 { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .cards-grid.grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .cards-grid.grid-5 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface); }
+        ::-webkit-scrollbar-thumb { background: #c1cfe0; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+
+<div class="main timesheet-main timesheet-details-page ems-unified-page-shell">
+<div class="page-wrapper">
+
+    <!-- ===== PAGE HERO ===== -->
+    <div class="page-hero">
+        <div class="page-hero-inner">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div class="hero-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h1 class="hero-title" style="color: #fff;">تفاصيل الوحدة</h1>
+                    <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
+                </div>
+            </div>
+            <a href="javascript:history.back()" class="btn-back">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
+    </div>
+
+<?php
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die('Unauthorized company context');
+}
+
+$project = intval($_GET['id']);
+
+// العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
+$tsdet_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('timesheet details super') : ems_tenant_db();
+
+$result = array();
+try {
+    $result = $tsdet_gate->scopedQuery(
+        array('scope' => array('t' => 'timesheet', 'd' => 'employees', 'o' => 'operations', 'e' => 'equipments', 'p' => 'project')),
+        "SELECT  * , t.id,
+               d.name AS driver_name,
+               e.code AS equipment_name,
+               e.name AS equipment_fullname,
+               p.name AS project_name,
+               t.shift,
+               t.date
+        FROM timesheet t
+        JOIN employees d ON t.employee_id = d.id
+        JOIN operations o ON t.operator = o.id
+        JOIN equipments e ON o.equipment = e.id
+        JOIN project p ON o.project_id = p.id
+        WHERE t.id = ? AND {TENANT_SCOPE}
+        ORDER BY t.date DESC", array($project));
+} catch (\Throwable $t) { error_log('timesheet_details main: ' . $t->getMessage()); }
+
+// Pre-load fault records from bridge table
+$ts_fault_records = [];
+try {
+    $ts_fault_records = $tsdet_gate->select('timesheet_failure_hours', array(
+        'where' => array('timesheet_id' => intval($project), 'status' => 1), 'orderBy' => 'id ASC'));
+} catch (\Throwable $t) { error_log('timesheet_details faults: ' . $t->getMessage()); }
+
+// Pre-load approval notes
+$ts_approval_notes = [];
+try {
+    $ts_approval_notes = $tsdet_gate->select('timesheet_approval_notes', array(
+        'where' => array('timesheet_id' => intval($project), 'status' => 1), 'orderBy' => 'created_at ASC'));
+} catch (\Throwable $t) { error_log('timesheet_details notes: ' . $t->getMessage()); }
+
+// ── شريطُ رحلة الوحدة (E-09 · UX-01 §6 · UX-03 §8.2) ──────────────────────
+// «فيرى المبتدئ أين هو وماذا بعد». صفرُ جدولٍ جديد: الرحلةُ إسقاطُ حالةِ
+// الواقعة وسجلِّها الإلحاقي. والمصدرُ هو السجلُّ القانوني `unit_entries`
+// موصولًا بصفّ الدوام عبر جسر `ts:` — فلا يُعرض شريطٌ لصفٍّ بلا مرآة.
+$ts_journey = null;
+try {
+    require_once __DIR__ . '/_ts_journey.php';
+    $ts_uuid = 'ts:' . intval($project);
+    $ts_entry_rows = $tsdet_gate->select('unit_entries', array(
+        'whereRaw' => 'sync_uuid = ?', 'params' => array($ts_uuid), 'limit' => 1));
+    if ($ts_entry_rows) {
+        $ts_entry = $ts_entry_rows[0];
+        $ts_apps = $tsdet_gate->select('unit_approvals', array(
+            'where' => array('entry_id' => intval($ts_entry['id'])), 'orderBy' => 'id ASC'));
+        $ts_journey = unit_journey($tsdet_gate, $ts_entry, $ts_apps);
+    }
+} catch (\Throwable $t) { error_log('timesheet_details journey: ' . $t->getMessage()); }
+
+if ($ts_journey !== null) {
+    echo '<div class="section-block">';
+    ems_journey_bar($ts_journey);
+    echo '</div>';
+}
+
+if ($result) foreach ($result as $row) {
+    $shift_display = $row['shift'] == "D" ? "صباح" : "مساء";
+    $shift_class   = $row['shift'] == "D" ? "day" : "night";
+    $shift_icon    = $row['shift'] == "D" ? "fas fa-sun" : "fas fa-moon";
+?>
+
+    <!-- ============================= 1. المعلومات العامة ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-info-circle"></i></div>
+            <h4>المعلومات العامة</h4>
+        </div>
+        <div class="cards-grid grid-4">
+
+            <!-- المشغل -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-user-tie"></i></div>
+                    <span class="detail-card-title">بيانات المشغل</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-id-card"></i> اسم المشغل</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($row['driver_name']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المعدة -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-truck-moving"></i></div>
+                    <span class="detail-card-title">بيانات المعدة</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-barcode"></i> الكود</span>
+                        <span class="detail-value chip-info"><?php echo htmlspecialchars($row['equipment_name']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-tag"></i> الاسم</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($row['equipment_fullname']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المشروع -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-project-diagram"></i></div>
+                    <span class="detail-card-title">بيانات المشروع</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-building"></i> اسم المشروع</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($row['project_name']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الوردية والتاريخ -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-calendar-alt"></i></div>
+                    <span class="detail-card-title">الوردية والتاريخ</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="<?php echo $shift_icon; ?>"></i> الوردية</span>
+                        <span class="detail-value">
+                            <span class="shift-badge <?php echo $shift_class; ?>">
+                                <i class="<?php echo $shift_icon; ?>"></i>
+                                <?php echo $shift_display; ?>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-calendar-day"></i> التاريخ</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($row['date']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================= 2. ساعات العمل ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-business-time"></i></div>
+            <h4>ساعات العمل</h4>
+        </div>
+        <div class="cards-grid grid-4">
+
+            <!-- ساعات الوردية -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-clock"></i></div>
+                    <span class="detail-card-title">ساعات الوردية</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-hourglass-start"></i> ساعات الوردية</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['shift_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-check-circle"></i> المنفذة</span>
+                        <span class="detail-value"><span class="chip-success"><?php echo htmlspecialchars($row['executed_hours']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ساعات معدات إضافية -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-tools"></i></div>
+                    <span class="detail-card-title">ساعات معدات إضافية</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-box"></i> الجردل</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['bucket_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-wrench"></i> الجاكمر</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['jackhammer_hours']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الساعات الإضافية -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-plus-circle"></i></div>
+                    <span class="detail-card-title">الساعات الإضافية</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-plus"></i> إضافية</span>
+                        <span class="detail-value"><span class="chip-warning"><?php echo htmlspecialchars($row['extra_hours']); ?></span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-calculator"></i> مجموع الإضافي</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['extra_hours_total']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ساعات الاستعداد -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-pause-circle"></i></div>
+                    <span class="detail-card-title">ساعات الاستعداد</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-user-clock"></i> استعداد العميل</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['standby_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-check-double"></i> استعداد اعتماد</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['dependence_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-sigma"></i> مجموع ساعات العمل</span>
+                        <span class="detail-value"><span class="chip-total"><?php echo htmlspecialchars($row['total_work_hours']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================= 3. ساعات الأعطال ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h4>ساعات الأعطال والتعطل</h4>
+        </div>
+        <div class="cards-grid grid-5">
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-user-times"></i></div>
+                    <span class="detail-card-title">عطل HR</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['hr_fault']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-wrench"></i></div>
+                    <span class="detail-card-title">عطل الصيانة</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['maintenance_fault']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-chart-line"></i></div>
+                    <span class="detail-card-title">عطل التسويق</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['marketing_fault']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-clipboard-check"></i></div>
+                    <span class="detail-card-title">عطل الاعتماد</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['approval_fault']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <?php
+            // D02 §2.6 — الكمية المفوترة: بطاقتا الطن والمتر أدناه مشروطتان بنوع
+            // المعدة (2 و3)، فكميةُ معدةٍ من نوعٍ آخر على عقدٍ يفوتر بالطن أو
+            // المتر تبقى غيرَ مرئية. تُعرض هنا متى وُجدت ولم تعرضها بطاقتُها.
+            $eqType = isset($row['type']) ? (string) $row['type'] : '';
+            $showTon   = (float) ($row['tons_count'] ?? 0) > 0 && $eqType !== '2';
+            $showMeter = (float) ($row['meters_count'] ?? 0) > 0 && $eqType !== '3';
+            if ($showTon || $showMeter): ?>
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <span class="detail-card-title">الكمية المفوترة (وحدة العقد)</span>
+                </div>
+                <div class="detail-card-body">
+                    <?php if ($showMeter): ?>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-ruler-horizontal"></i> الأمتار المنفذة</span>
+                        <span class="detail-value"><span class="chip-primary"><?php echo number_format((float) $row['meters_count'], 2); ?> متر</span></span>
+                    </div>
+                    <?php endif; ?>
+                    <?php if ($showTon): ?>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-weight-hanging"></i> الأطنان المنفذة</span>
+                        <span class="detail-value"><span class="chip-success"><?php echo number_format((float) $row['tons_count'], 2); ?> طن</span></span>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-ellipsis-h"></i></div>
+                    <span class="detail-card-title">أعطال أخرى</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات أخرى</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['other_fault_hours']); ?></span>
+                    </div>
+                    <?php
+                    // D02 §3.5 — الحالات الثلاث لكلٍّ حكمٌ تعاقديٌّ مستقل. بلا عرضها
+                    // يظهر «مجموع التعطل» رقمًا لا تفسّره الخاناتُ المعروضة، فيبدو خللًا.
+                    foreach (array(
+                        'ts_supplier_stop_hours' => array('توقف على المورد', 'fa-truck'),
+                        'ts_planned_stop_hours'  => array('توقف مخطط', 'fa-calendar-check'),
+                        'ts_force_majeure_hours' => array('قوة قاهرة', 'fa-cloud-showers-heavy'),
+                    ) as $col => $meta) {
+                        if (!isset($row[$col])) { continue; }
+                        ?>
+                        <div class="detail-row">
+                            <span class="detail-label"><i class="fas <?php echo $meta[1]; ?>"></i> <?php echo $meta[0]; ?></span>
+                            <span class="detail-value mono"><?php echo htmlspecialchars($row[$col]); ?></span>
+                        </div>
+                    <?php } ?>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-sigma"></i> مجموع التعطل</span>
+                        <span class="detail-value"><span class="chip-total"><?php echo htmlspecialchars($row['total_fault_hours']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================= 4. عداد الساعات ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-tachometer-alt"></i></div>
+            <h4>عداد الساعات</h4>
+        </div>
+        <div class="cards-grid grid-3">
+
+            <!-- عداد البداية -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-play-circle"></i></div>
+                    <span class="detail-card-title">عداد البداية</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="counter-display">
+                        <span class="counter-seg"><?php echo str_pad($row['start_hours'],2,'0',STR_PAD_LEFT); ?></span>
+                        <span class="counter-sep">:</span>
+                        <span class="counter-seg"><?php echo str_pad($row['start_minutes'],2,'0',STR_PAD_LEFT); ?></span>
+                        <span class="counter-sep">:</span>
+                        <span class="counter-seg"><?php echo str_pad($row['start_seconds'],2,'0',STR_PAD_LEFT); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عداد النهاية -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-stop-circle"></i></div>
+                    <span class="detail-card-title">عداد النهاية</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="counter-display">
+                        <span class="counter-seg"><?php echo str_pad($row['end_hours'],2,'0',STR_PAD_LEFT); ?></span>
+                        <span class="counter-sep">:</span>
+                        <span class="counter-seg"><?php echo str_pad($row['end_minutes'],2,'0',STR_PAD_LEFT); ?></span>
+                        <span class="counter-sep">:</span>
+                        <span class="counter-seg"><?php echo str_pad($row['end_seconds'],2,'0',STR_PAD_LEFT); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- فرق العداد -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-calculator"></i></div>
+                    <span class="detail-card-title">فرق العداد</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row" style="padding-top: 10px; padding-bottom: 10px; justify-content: center;">
+                        <span class="chip-total" style="font-size: 18px; padding: 8px 28px;">
+                            <i class="fas fa-minus"></i>
+                            <?php echo htmlspecialchars($row['counter_diff']); ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================= 5. تفاصيل الأعطال (منظومة الأعطال) ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-clipboard-list"></i></div>
+            <h4>تفاصيل الأعطال المصنفة</h4>
+        </div>
+        <div style="padding: 20px 24px;">
+            <?php if (!empty($ts_fault_records)): ?>
+                <div style="overflow-x:auto;">
+                    <table class="table table-sm table-hover table-bordered" data-no-dt="1" style="font-size:13.5px;">
+                        <thead>
+                            <tr style="background:var(--primary);color:#fff;">
+                                <th style="padding:8px 12px;">#</th>
+                                <th style="padding:8px 12px;">الكود الكامل</th>
+                                <th style="padding:8px 12px;">نوع الحدث</th>
+                                <th style="padding:8px 12px;">الفئة الرئيسية</th>
+                                <th style="padding:8px 12px;">الفئة الفرعية</th>
+                                <th style="padding:8px 12px;">تفصيل العطل</th>
+                                                <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
+                    <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
+</tr>
+                        </thead>
+                        <tbody>
+                            <?php $fi = 1; foreach ($ts_fault_records as $_flt): ?>
+                            <tr>
+                                <td style="padding:7px 12px;"><?= $fi++ ?></td>
+                                <td style="padding:7px 12px;">
+                                    <span style="background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">
+                                        <?= htmlspecialchars($_flt['full_code'] ?? '—') ?>
+                                    </span>
+                                </td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['event_type_name'] ?? '—') ?></td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['main_category_name'] ?? '—') ?></td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['sub_category'] ?? '—') ?></td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['failure_detail'] ?? '—') ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php elseif (!empty($row['fault_type']) || !empty($row['fault_part']) || !empty($row['fault_details'])): ?>
+                <div class="cards-grid grid-3" style="padding:0;">
+                    <?php if (!empty($row['fault_type'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-icon danger"><i class="fas fa-bug"></i></div>
+                            <span class="detail-card-title">نوع العطل</span>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
+                                <span class="detail-value"><span class="chip-danger"><?= htmlspecialchars($row['fault_type']) ?></span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (!empty($row['fault_part'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-icon danger"><i class="fas fa-cogs"></i></div>
+                            <span class="detail-card-title">الجزء المعطل</span>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-puzzle-piece"></i> الجزء</span>
+                                <span class="detail-value"><span class="chip-danger"><?= htmlspecialchars($row['fault_part']) ?></span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (!empty($row['fault_details'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-icon danger"><i class="fas fa-file-alt"></i></div>
+                            <span class="detail-card-title">تفاصيل العطل</span>
+                        </div>
+                        <div class="detail-card-body">
+                            <span class="detail-value note-text"><?= htmlspecialchars($row['fault_details']) ?></span>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <p style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+                    <i class="fas fa-info-circle"></i> هذه بيانات من النظام القديم. الأعطال المصنفة من المنظومة الجديدة ستظهر هنا عند إدخالها.
+                </p>
+            <?php else: ?>
+                <div style="text-align:center;padding:32px;color:var(--text-muted);">
+                    <i class="fas fa-check-circle" style="font-size:36px;color:var(--success);display:block;margin-bottom:12px;"></i>
+                    <p style="font-size:14px;font-weight:600;">لا توجد أعطال مصنفة لهذا السجل</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- ============================= 6. ساعات المشغل ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-user-clock"></i></div>
+            <h4>ساعات المشغل</h4>
+        </div>
+        <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px,1fr));">
+
+            <!-- ساعات عمل المشغل -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-user-check"></i></div>
+                    <span class="detail-card-title">ساعات عمل المشغل</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات العمل</span>
+                        <span class="detail-value"><span class="chip-success"><?php echo htmlspecialchars($row['operator_hours']); ?></span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-plus-circle"></i> ساعات إضافية</span>
+                        <span class="detail-value"><span class="chip-warning"><?php echo htmlspecialchars($row['extra_operator_hours']); ?></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ساعات الاستعداد -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-pause-circle"></i></div>
+                    <span class="detail-card-title">ساعات الاستعداد</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-truck"></i> استعداد الآلية</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['machine_standby_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-wrench"></i> استعداد الجاكمر</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['jackhammer_standby_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-box"></i> استعداد الجردل</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['bucket_standby_hours']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-user-clock"></i> استعداد المشغل</span>
+                        <span class="detail-value mono"><?php echo htmlspecialchars($row['operator_standby_hours']); ?></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================= 7. الملاحظات ============================= -->
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-sticky-note"></i></div>
+            <h4>الملاحظات</h4>
+        </div>
+        <div class="cards-grid grid-3" style="grid-template-columns: repeat(auto-fit, minmax(240px,1fr));">
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-comment-dots"></i></div>
+                    <span class="detail-card-title">ملاحظات ساعات العمل</span>
+                </div>
+                <div class="detail-card-body">
+                    <span class="detail-value note-text">
+                        <?php echo htmlspecialchars($row['work_notes'] ? $row['work_notes'] : 'لا توجد ملاحظات'); ?>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon danger"><i class="fas fa-comment-alt"></i></div>
+                    <span class="detail-card-title">ملاحظات ساعات التعطل</span>
+                </div>
+                <div class="detail-card-body">
+                    <span class="detail-value note-text">
+                        <?php echo htmlspecialchars($row['fault_notes'] ? $row['fault_notes'] : 'لا توجد ملاحظات'); ?>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-user-edit"></i></div>
+                    <span class="detail-card-title">ملاحظات المشغل</span>
+                </div>
+                <div class="detail-card-body">
+                    <span class="detail-value note-text">
+                        <?php echo htmlspecialchars($row['operator_notes'] ? $row['operator_notes'] : 'لا توجد ملاحظات'); ?>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-user-tie"></i></div>
+                    <span class="detail-card-title">ملاحظات مشرفي الساعات</span>
+                </div>
+                <div class="detail-card-body">
+                    <span class="detail-value note-text">
+                        <?php echo htmlspecialchars($row['time_notes'] ? $row['time_notes'] : 'لا توجد ملاحظات'); ?>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-clipboard"></i></div>
+                    <span class="detail-card-title">ملاحظات عامة</span>
+                </div>
+                <div class="detail-card-body">
+                    <span class="detail-value note-text">
+                        <?php echo htmlspecialchars($row['general_notes'] ? $row['general_notes'] : 'لا توجد ملاحظات'); ?>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ملاحظات الاعتماد المسجلة -->
+    <?php if (!empty($ts_approval_notes)): ?>
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-clipboard-check"></i></div>
+            <h4>الملاحظات المسجلة أثناء الاعتماد</h4>
+        </div>
+        <div style="padding: 20px 24px;">
+            <div style="overflow-x:auto;">
+                <table class="table table-sm table-hover table-bordered" data-no-dt="1" style="font-size:13.5px;margin-bottom:0;">
+                    <thead>
+                        <tr style="background:var(--primary);color:#fff;">
+                            <th style="padding:8px 12px;width:15%;">#</th>
+                            <th style="padding:8px 12px;width:20%;">الحقل المعدّل</th>
+                            <th style="padding:8px 12px;width:35%;">الملاحظة</th>
+                            <th style="padding:8px 12px;width:15%;">المعدِّل</th>
+                            <th style="padding:8px 12px;width:15%;">التاريخ والوقت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $an_idx = 1; foreach ($ts_approval_notes as $_note): ?>
+                        <tr>
+                            <td style="padding:8px 12px;text-align:center;"><?= $an_idx++ ?></td>
+                            <td style="padding:8px 12px;">
+                                <span style="background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;">
+                                    <?= htmlspecialchars($_note['column_label'] ?? $_note['column_name'] ?? '—') ?>
+                                </span>
+                            </td>
+                            <td style="padding:8px 12px;line-height:1.6;"><?= htmlspecialchars($_note['note_text'] ?? '—') ?></td>
+                            <td style="padding:8px 12px;">
+                                <i class="fas fa-user"></i> <?= htmlspecialchars($_note['created_by_name'] ?? '—') ?>
+                            </td>
+                            <td style="padding:8px 12px;white-space:nowrap;font-size:12px;">
+                                <i class="fas fa-calendar-alt"></i> <?= htmlspecialchars(isset($_note['created_at']) ? date('Y-m-d H:i', strtotime($_note['created_at'])) : '—') ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- ============================= 8. الأطنان والنقلات (النوع 2 فقط) ============================= -->
+    <?php if(isset($row['type']) && $row['type'] == '2'): ?>
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-truck-loading"></i></div>
+            <h4>الأطنان والنقلات</h4>
+        </div>
+        <div class="cards-grid grid-3">
+
+            <!-- نوع النقل -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-exchange-alt"></i></div>
+                    <span class="detail-card-title">نوع النقل</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
+                        <span class="detail-value">
+                            <?php
+                            $transport_type = isset($row['transport_type']) && !empty($row['transport_type']) ? $row['transport_type'] : 'غير محدد';
+                            $transport_class = '';
+                            $transport_icon = '';
+                            if($transport_type === 'Waste') {
+                                $transport_class = 'chip-danger';
+                                $transport_icon = '<i class="fas fa-trash"></i> ';
+                                $transport_label = 'Waste (نفايات)';
+                            } elseif($transport_type === 'Ore') {
+                                $transport_class = 'chip-success';
+                                $transport_icon = '<i class="fas fa-gem"></i> ';
+                                $transport_label = 'Ore (خام)';
+                            } else {
+                                $transport_class = 'chip-secondary';
+                                $transport_icon = '<i class="fas fa-question"></i> ';
+                                $transport_label = 'غير محدد';
+                            }
+                            ?>
+                            <span class="<?php echo $transport_class; ?>"><?php echo $transport_icon . htmlspecialchars($transport_label); ?></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- وزن القلاب -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-weight-hanging"></i></div>
+                    <span class="detail-card-title">وزن القلاب</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-balance-scale"></i> الوزن</span>
+                        <span class="detail-value">
+                            <span class="chip-success"><?php echo htmlspecialchars($row['tons_count'] ? number_format($row['tons_count'], 2) : '0.00'); ?> طن</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عدد النقلات -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-truck"></i></div>
+                    <span class="detail-card-title">عدد النقلات</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-road"></i> النقلات</span>
+                        <span class="detail-value">
+                            <span class="chip-info"><?php echo htmlspecialchars($row['trips_count'] ? $row['trips_count'] : '0'); ?> نقلة</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- ============================= 9. الأمتار (النوع 3 فقط) ============================= -->
+    <?php if(isset($row['type']) && $row['type'] == '3'): ?>
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-ruler-vertical"></i></div>
+            <h4>الأمتار والحفر</h4>
+        </div>
+        <div class="cards-grid grid-4">
+
+            <!-- نوع الأمتار -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-tools"></i></div>
+                    <span class="detail-card-title">نوع الأمتار</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-cog"></i> النوع</span>
+                        <span class="detail-value">
+                            <span class="chip-warning"><?php echo htmlspecialchars($row['meters_type'] ? $row['meters_type'] : 'غير محدد'); ?></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عدد الأمتار -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-ruler-combined"></i></div>
+                    <span class="detail-card-title">عدد الأمتار</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-ruler"></i> الأمتار</span>
+                        <span class="detail-value">
+                            <span class="chip-primary"><?php echo htmlspecialchars($row['meters_count'] ? number_format($row['meters_count'], 2) : '0.00'); ?> متر</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عدد الحفر المخرمة -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-hammer"></i></div>
+                    <span class="detail-card-title">عدد الحفر المخرمة</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-circle-notch"></i> الحفر</span>
+                        <span class="detail-value">
+                            <span class="chip-success"><?php echo htmlspecialchars($row['drilling_holes_count'] ? $row['drilling_holes_count'] : '0'); ?> حفرة</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أعماق الحفر -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-arrows-alt-v"></i></div>
+                    <span class="detail-card-title">أعماق الحفر</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-long-arrow-alt-down"></i> العمق</span>
+                        <span class="detail-value">
+                            <span class="chip-info"><?php echo htmlspecialchars($row['drilling_depth'] ? number_format($row['drilling_depth'], 2) : '0.00'); ?> متر</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php endif; ?>
+
+<?php } ?>
+
+</div><!-- end .page-wrapper -->
+</div><!-- end .main -->
+
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -15,7 +15,7 @@ $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['r
 $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $page_permissions = check_page_permissions($conn, 'Employees/job_titles.php');
@@ -23,7 +23,7 @@ $can_view   = $page_permissions['can_view'];
 $can_add    = $page_permissions['can_add'];
 $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المسميات+الوظيفية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المسميات الوظيفية ❌', 'GOV-PERM-403', ''); exit(); }
 
 // بوابة العزل — بعد تعبئة M6 لا صفوف عامّة (NULL)، فنمط «عامّ أو مِلكي» القديم
 // يكافئ عزل البوابة المباشر. السوبر → عابرٌ مُسجَّل يدير الكل.
@@ -45,13 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $jt_data = array('name' => $name, 'description' => $desc, 'is_operator' => $is_operator, 'status' => $status, 'sort_order' => $sort_order);
         try {
             if ($id > 0) {
-                if (!$can_edit) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+                if (!$can_edit) { ems_gov_flash_redirect('job_titles.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
                 $jt_gate->update('job_titles', $jt_data, array('id' => $id));
             } else {
-                if (!$can_add) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+                if (!$can_add) { ems_gov_flash_redirect('job_titles.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
                 $jt_gate->insert('job_titles', $jt_data);
             }
-            header("Location: job_titles.php?msg=✅+تم+حفظ+المسمى+الوظيفي+بنجاح"); exit();
+            ems_gov_flash_redirect('job_titles.php', '✅ تم حفظ المسمى الوظيفي بنجاح', 'GOV-OK-200', ''); exit();
         } catch (\Throwable $e) {
             $dup = (strpos($e->getMessage(), 'Duplicate') !== false);
             $error_msg = $dup ? 'هذا المسمى موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($e->getMessage()) . ' ❌');
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ── حذف (مع منع الحذف إذا كان مستخدماً) ───────────────────────────────────────
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: job_titles.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('job_titles.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $id = (int) $_GET['delete_id'];
     // حارس الاستخدام معزولٌ بالشركة، والحذف الصلب عبر deleteRow (كيانٌ بلا أبٍ إلزاميّ)
     $used = 0; $ok = false;
@@ -72,9 +72,9 @@ if (isset($_GET['delete_id'])) {
         }
     } catch (\Throwable $e) { /* غير مملوك/سياق ناقص → تعذّر */ }
     if ($used > 0) {
-        header("Location: job_titles.php?msg=لا+يمكن+حذف+مسمى+مستخدمٍ+من+قِبل+$used+موظف+❌");
+        ems_gov_flash_redirect('job_titles.php', "لا يمكن حذف مسمى مستخدمٍ من قِبل $used موظف ❌", 'GOV-FAIL-409', '');
     } else {
-        header("Location: job_titles.php?msg=" . ($ok ? "✅+تم+حذف+المسمى+الوظيفي" : "تعذّر+الحذف+(خارج+نطاق+شركتك)+❌"));
+        ems_gov_flash_redirect('job_titles.php', $ok ? 'تم حذف المسمى الوظيفي ✅' : 'تعذّر الحذف (خارج نطاق شركتك) ❌', $ok ? 'GOV-OK-200' : 'GOV-SCOPE-403', '');
     }
     exit();
 }
@@ -91,6 +91,9 @@ if (isset($_GET['edit_id'])) {
 }
 
 $page_title = "إيكوبيشن | المسميات الوظيفية";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

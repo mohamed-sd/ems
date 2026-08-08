@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Tickets/watchtower.php — برج المراقبة: المؤشرات وتقرير المتأخرين
  * (update0004 · TKT-17 · TKT-01 §10/§11)
@@ -29,11 +30,11 @@ if (!$is_super_admin) {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية لبرج المراقبة ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية لبرج المراقبة ❌', 'GOV-PERM-403', ''); exit(); }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['issue_report'])) {
     $r = WT::issuePeriodicReport($conn, $company_id, intval($_SESSION['user']['id'] ?? 0));
-    header("Location: watchtower.php?msg=" . rawurlencode($r['summary'] . ' — أُصدر ✅'));
+    ems_gov_flash_redirect('watchtower.php', $r['summary'] . ' — أُصدر ✅', 'GOV-OK-200', '');
     exit();
 }
 
@@ -42,6 +43,9 @@ $ind = WT::indicators($conn, $company_id);
 $late = WT::latenessReport($conn, $company_id);
 
 $page_title = 'إيكوبيشن | برج المراقبة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

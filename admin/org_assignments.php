@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-769 · SCN-770 · SCN-771 · SCN-773 · SCN-774
 /**
  * admin/org_assignments.php — شاشة التكليفات التنظيمية (update0004 · ORG-15)
@@ -39,13 +40,13 @@ if (!$is_super_admin) {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية لشاشة التكليفات ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية لشاشة التكليفات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $msg = strval($_GET['msg'] ?? '');
 
 // ── الأفعال — POST عادي (نمط Maintenance/orders.php) وكل حارس في الخدمة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['org_action'])) {
-    if (!$can_edit) { header("Location: org_assignments.php?msg=" . rawurlencode('لا صلاحية تعديل ❌')); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('org_assignments.php', 'لا صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
     $act = strval($_POST['org_action']);
 
     if ($act === 'create') {
@@ -70,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['org_action'])) {
             'deputy_person_id' => ($_POST['deputy_person_id'] ?? '') !== '' ? intval($_POST['deputy_person_id']) : null,
             'reporting_lines' => $lines,
         ));
-        header("Location: org_assignments.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_flash_redirect('org_assignments.php', $r['reason'] . ($r['ok'] ? ' ✅' : ' ❌'), 'GOV-OK-200', '');
         exit();
     }
     if ($act === 'end' || $act === 'suspend') {
@@ -78,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['org_action'])) {
         $r = $act === 'end'
             ? ASV::end($conn, $asgId, $uid, strval($_POST['reason'] ?? ''))
             : ASV::suspend($conn, $asgId, $uid, strval($_POST['reason'] ?? ''));
-        header("Location: org_assignments.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_flash_redirect('org_assignments.php', $r['reason'] . ($r['ok'] ? ' ✅' : ' ❌'), 'GOV-OK-200', '');
         exit();
     }
 }
@@ -128,6 +129,9 @@ if ($auditFor > 0) {
 }
 
 $page_title = 'إيكوبيشن | التكليفات التنظيمية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = proc_page_perms($conn, 'Procurement/reordering_proc.php', $is_super_adm
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+قواعد+إعادة+الطلب+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قواعد إعادة الطلب ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -39,9 +39,9 @@ $modes = array('يدوي', 'تلقائي');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['item_id'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: reordering_proc.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: reordering_proc.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: reordering_proc.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('reordering_proc.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('reordering_proc.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('reordering_proc.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $item_id = intval($_POST['item_id'] ?? 0);
     $warehouse_id = ($_POST['warehouse_id'] ?? '') !== '' ? intval($_POST['warehouse_id']) : null;
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['item_id'])) {
     $mode = trim($_POST['mode'] ?? 'يدوي');
 
     if ($item_id <= 0 || !in_array($mode, $modes, true)) {
-        header("Location: reordering_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('reordering_proc.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // K9-M1 ذيل: الكتابة عبر البوابة
@@ -64,25 +64,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['item_id'])) {
     try {
         if ($is_editing) {
             proc_gate(false)->update('proc_orderpoint', $data, array('id' => $id, 'is_deleted' => 0));
-            header("Location: reordering_proc.php?msg=تم+تعديل+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('reordering_proc.php', 'تم تعديل قاعدة إعادة الطلب بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             $data['created_by'] = $current_user_id;
             proc_gate(false)->insert('proc_orderpoint', $data);
-            header("Location: reordering_proc.php?msg=تمت+إضافة+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('reordering_proc.php', 'تمت إضافة قاعدة إعادة الطلب بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('reordering save refused: ' . $e->getMessage());
-        header("Location: reordering_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('reordering_proc.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: reordering_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('reordering_proc.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try { proc_gate(false)->softDelete('proc_orderpoint', $delete_id); }
     catch (\App\Core\TenantGateException $e) { error_log('reordering softDelete refused: ' . $e->getMessage()); }
-    header("Location: reordering_proc.php?msg=تم+حذف+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('reordering_proc.php', 'تم حذف قاعدة إعادة الطلب بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── تعبئة نموذج التعديل عبر ?edit_id (السيليكتات) ──
@@ -99,6 +99,9 @@ $sel_item      = $edit_row ? intval($edit_row['item_id']) : 0;
 $sel_warehouse = $edit_row ? intval($edit_row['warehouse_id']) : 0;
 
 $page_title = 'إيكوبيشن | حدود إعادة الطلب';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

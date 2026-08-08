@@ -14,13 +14,13 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header('Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌');
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $project_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($project_id <= 0) {
-    header('Location: projects.php?msg=معرف+المشروع+غير+صحيح+❌');
+    ems_gov_flash_redirect('projects.php', 'معرف المشروع غير صحيح ❌', 'GOV-REF-404', '');
     exit();
 }
 
@@ -40,7 +40,7 @@ try {
 } catch (\Throwable $t) { error_log('project_profile.php load: ' . $t->getMessage()); }
 
 if (!$project) {
-    header('Location: projects.php?msg=المشروع+غير+موجود+او+خارج+نطاق+الشركة+❌');
+    ems_gov_flash_redirect('projects.php', 'المشروع غير موجود او خارج نطاق الشركة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -104,6 +104,9 @@ try {
 } catch (\Throwable $t) { error_log('project_profile.php breakdown: ' . $t->getMessage()); }
 
 $page_title = 'إيكوبيشن | بطاقة المشروع';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

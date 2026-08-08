@@ -22,11 +22,11 @@ $current_role    = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['
 $is_super_admin  = ($current_role === '-1');
 $company_id      = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $page_permissions = check_page_permissions($conn, 'Maintenance/dashboard_mnt.php');
 $can_view = $is_super_admin ? true : $page_permissions['can_view'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+لوحة+الصيانة+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض لوحة الصيانة ❌', 'GOV-PERM-403', ''); exit(); }
 
 $rb_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('mnt board super') : ems_tenant_db();
 $today = date('Y-m-d');
@@ -90,6 +90,9 @@ $rb_pulse_title  = 'نبض الأداء — أوامرُ أُنشئت مقابل
 $rb_pulse_series = array('أُنشئت', 'أُغلقت');
 
 $page_title = 'إيكوبيشن | لوحة إدارة الصيانة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

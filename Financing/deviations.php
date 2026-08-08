@@ -19,7 +19,7 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { http_response_code(403); die('المجالُ المقيَّد (FIN-01 §1.1)'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
 $msg = '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['close_dev'])) {
@@ -64,12 +64,23 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 $types = array('no_movement' => 'عقدٌ بلا حركة', 'payment_gap' => 'فروقُ سداد', 'unrecorded_exit' => 'خروجٌ غيرُ مسجَّل');
 
 $page_title = 'الانحرافات الثلاث';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-exclamation-triangle"></i> الانحرافاتُ الثلاث</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-exclamation-triangle';
+$header_title_html = htmlspecialchars('الانحرافاتُ الثلاث', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الصنف</th><th>الموضوع</th><th>الوصف</th><th>الأولوية</th><th>الحالة</th><th>الإغلاقُ بقرار</th>

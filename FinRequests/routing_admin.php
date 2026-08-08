@@ -19,7 +19,7 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('fin routing admin super') : 
 
 $__pp = check_page_permissions($conn, 'FinRequests/routing_admin.php');
 if (!$is_super && !($__pp['can_view'] && $role === '17')) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ إدارة التوجيه للمدير المالي حصرًا'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ إدارة التوجيه للمدير المالي حصرًا', 'GOV-FAIL-409', '');
     exit();
 }
 
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $manager = intval($_POST['manager_role_id'] ?? 0);
     $active = isset($_POST['is_active']) ? 1 : 0;
     if ($sm === '' || $requester_roles === '' || $reviewer <= 0 || $manager <= 0) {
-        header('Location: routing_admin.php?msg=' . urlencode('❌ أكمل الإدارة والأدوار الثلاثة'));
+        ems_gov_flash_redirect('routing_admin.php', '❌ أكمل الإدارة والأدوار الثلاثة', 'GOV-FAIL-409', '');
         exit();
     }
     try {
@@ -61,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (function_exists('log_security_event')) {
             log_security_event('finreq_routing_change', 'module=' . $sm . ' active=' . $active . ' by=' . $user_id);
         }
-        header('Location: routing_admin.php?msg=' . urlencode('✅ حُفظ توجيه ' . $modules_all[$sm]));
+        ems_gov_flash_redirect('routing_admin.php', '✅ حُفظ توجيه ' . $modules_all[$sm], 'GOV-OK-200', '');
         exit();
     } catch (\Throwable $t) {
         error_log('finreq routing save: ' . $t->getMessage());
-        header('Location: routing_admin.php?msg=' . urlencode('❌ تعذّر الحفظ'));
+        ems_gov_flash_redirect('routing_admin.php', '❌ تعذّر الحفظ', 'GOV-FAIL-409', '');
         exit();
     }
 }
@@ -85,6 +85,9 @@ try {
 } catch (\Throwable $t) { /* عرض */ }
 
 $page_title = 'إيكوبيشن | قواعد توجيه الطلبات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

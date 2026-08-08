@@ -14,7 +14,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -47,7 +47,7 @@ $can_delete = $page_permissions['can_delete'];
 
 // منع الوصول إذا لم تكن صلاحية عرض
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المشغلين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المشغلين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -60,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $is_editing = $id > 0;
 
     if ($is_editing && !$can_edit) {
-        header("Location: employees.php?msg=لا+توجد+صلاحية+تعديل+المشغلين+❌");
+        ems_gov_flash_redirect('employees.php', 'لا توجد صلاحية تعديل المشغلين ❌', 'GOV-PERM-403', '');
         exit();
     } elseif (!$is_editing && !$can_add) {
-        header("Location: employees.php?msg=لا+توجد+صلاحية+إضافة+مشغلين+جدد+❌");
+        ems_gov_flash_redirect('employees.php', 'لا توجد صلاحية إضافة مشغلين جدد ❌', 'GOV-PERM-403', '');
         exit();
     }
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         if ($id > 0) { $dupWhere .= " AND id != ?"; $dupParams[] = $id; }
         $dup = $emp_gate->selectOne('employees', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
         if ($dup) {
-            header("Location: employees.php?msg=كود+المشغل+موجود+مسبقاً+❌");
+            ems_gov_flash_redirect('employees.php', 'كود المشغل موجود مسبقاً ❌', 'GOV-FAIL-409', '');
             exit;
         }
     }
@@ -140,23 +140,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
         ems_save_employee_extra($conn, $saved_emp_id, $emp_scope); // employee_type + المسمى/الدور + الحقول العامة (بلا حقول الرخصة)
         ems_sync_equipment_operator($conn, $saved_emp_id, $emp_scope); // إنشاء/تحديث سجل المشغّل تلقائياً إن كان سائقاً/مشغّلاً
-        header("Location: employees.php?msg=$ok_msg");
+        ems_gov_flash_redirect('employees.php', "$ok_msg", 'GOV-INFO-200', '');
         exit;
     } catch (\Throwable $e) {
-        header("Location: employees.php?msg=" . urlencode("حدث خطأ أثناء الحفظ ❌: " . $e->getMessage()));
+        ems_gov_flash_redirect('employees.php', "حدث خطأ أثناء الحفظ ❌: " . $e->getMessage(), 'GOV-FAIL-409', '');
         exit;
     }
 }
 
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) {
-        header("Location: employees.php?msg=لا+توجد+صلاحية+حذف+المشغلين+❌");
+        ems_gov_flash_redirect('employees.php', 'لا توجد صلاحية حذف المشغلين ❌', 'GOV-PERM-403', '');
         exit();
     }
 
     $delete_id = intval($_GET['delete_id']);
     if ($delete_id <= 0) {
-        header("Location: employees.php?msg=معرف+المشغل+غير+صحيح+❌");
+        ems_gov_flash_redirect('employees.php', 'معرف المشغل غير صحيح ❌', 'GOV-REF-404', '');
         exit();
     }
 
@@ -173,7 +173,7 @@ if (isset($_GET['delete_id'])) {
     } catch (\Throwable $e) { /* سياق ناقص → يحسمه deleteRow أدناه (0 صفوف) */ }
 
     if ($active_contracts > 0 || $active_equipment_assignments > 0) {
-        header("Location: employees.php?msg=لا+يمكن+حذف+المشغل+لارتباطه+بعقود+أو+تشغيل+نشط+❌");
+        ems_gov_flash_redirect('employees.php', 'لا يمكن حذف المشغل لارتباطه بعقود أو تشغيل نشط ❌', 'GOV-FAIL-409', '');
         exit();
     }
 
@@ -181,15 +181,18 @@ if (isset($_GET['delete_id'])) {
     // مقيَّدٌ بشركة السياق ومُسجَّل (البوابة ترفض DELETE الخام).
     try {
         if ($emp_gate->deleteRow('employees', $delete_id, 'employees screen delete') > 0) {
-            header("Location: employees.php?msg=تم+حذف+المشغل+بنجاح+✅");
+            ems_gov_flash_redirect('employees.php', 'تم حذف المشغل بنجاح ✅', 'GOV-OK-200', '');
             exit();
         }
     } catch (\Throwable $e) { /* يسقط لرسالة التعذّر */ }
 
-    header("Location: employees.php?msg=تعذر+حذف+المشغل+أو+أنه+خارج+نطاق+الشركة+❌");
+    ems_gov_flash_redirect('employees.php', 'تعذر حذف المشغل أو أنه خارج نطاق الشركة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 ?>
 

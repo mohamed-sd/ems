@@ -7,6 +7,9 @@ $user_role = approval_get_user_role();
 $user_id = approval_get_user_id();
 
 $page_title = 'إيكوبيشن | صندوق موافقاتي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -25,18 +28,16 @@ $result = approval_fetch_requests_for_listing($status_filter, $user_role, $user_
 
 <div class="main">
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
-    <div class="header" data-ems-unified-header="1">
-        <div class="actions" style="display:none;"></div>
-        <div class="title">
-            <div class="title-content" style="display:flex;align-items:center;gap:12px;">
-                <div class="title-icon"><i class="fas fa-check-double"></i></div>
-                <h1>صندوق موافقاتي</h1>
-            </div>
-        </div>
-        <div class="back">
-            <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
+    <?php
+/* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ بدلَ الرأسِ اليدويِّ المُحاكي —
+   مصدرٌ واحدٌ للبنيةِ، والأفعالُ وزرُّ العودةِ منقولانِ كما هما. */
+$header_icon = 'fas fa-check-double';
+$header_title_html = htmlspecialchars('صندوق موافقاتي', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+ob_start(); ?><a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a><?php
+$header_back = array('raw' => trim((string) ob_get_clean()));
+include __DIR__ . '/../includes/page_header.php';
+?>
 
     <?php
     // احصائيات الطلبات — عبر قناة المحرّك

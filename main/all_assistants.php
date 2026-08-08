@@ -20,7 +20,7 @@ $users_not_deleted_sql = "(COALESCE(u.is_deleted,0)=0)";
 $_currentUserRole = intval($_SESSION['user']['role']);
 $is_super_admin = (strval($_SESSION['user']['role']) === '-1');
 if (!$is_super_admin && $current_company_id <= 0) {
-    header("Location: ../login.php?msg=الحساب+غير+مرتبط+بشركة+❌"); exit;
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة ❌', 'GOV-FAIL-409', ''); exit;
 }
 
 // بوابة الوصول: تعتمد على جدول صلاحيات هذه الشاشة (موديول main/all_assistants.php)
@@ -31,7 +31,7 @@ $can_add    = $is_super_admin ? true : !empty($pp['can_add']);
 $can_edit   = $is_super_admin ? true : !empty($pp['can_edit']);
 $can_delete = $is_super_admin ? true : !empty($pp['can_delete']);
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+لهذه+الشاشة+❌"); exit;
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض لهذه الشاشة ❌', 'GOV-PERM-403', ''); exit;
 }
 
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
@@ -94,9 +94,9 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete']) && $can_delete) {
         ), array('id' => $did), "parent_id<>'0' AND parent_id<>'' AND role<>'-1' AND COALESCE(is_deleted,0)=0"));
     } catch (\Throwable $t) { error_log('all_assistants.php delete: ' . $t->getMessage()); }
     if ($aa_deleted > 0) {
-        header("Location: all_assistants.php?msg=تم+حذف+المعاون+بنجاح+✅");
+        ems_gov_flash_redirect('all_assistants.php', 'تم حذف المعاون بنجاح ✅', 'GOV-OK-200', '');
     } else {
-        header("Location: all_assistants.php?msg=تعذّر+الحذف+أو+ليس+حساباً+فرعياً+❌");
+        ems_gov_flash_redirect('all_assistants.php', 'تعذّر الحذف أو ليس حساباً فرعياً ❌', 'GOV-FAIL-409', '');
     }
     exit;
 }
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
     $is_editing = $uid > 0;
     if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) {
-        header("Location: all_assistants.php?msg=لا+توجد+صلاحية+❌"); exit;
+        ems_gov_flash_redirect('all_assistants.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit;
     }
     $name = trim($_POST['name']);
     $username = trim($_POST['username']);
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     // 1) المدير الأب ضمن الشركة وعُلوي (النطاق عبر البوابة)
     $parent_role = aa_user_role($aa_gate, $parent_user);
-    if ($parent_user <= 0 || $parent_role <= 0) { header("Location: all_assistants.php?msg=اختر+مديراً+أباً+صالحاً+❌"); exit; }
+    if ($parent_user <= 0 || $parent_role <= 0) { ems_gov_flash_redirect('all_assistants.php', 'اختر مديراً أباً صالحاً ❌', 'GOV-FAIL-409', ''); exit; }
 
     // 2) الدور ابنٌ فعلاً لدور المدير الأب (roles مرجع عام — قراءة عبر البوابة)
     $aa_role_ok = null;
@@ -127,10 +127,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             'where' => array('id' => $role, 'parent_role_id' => $parent_role),
             'whereRaw' => "(status='1' OR status=1)"));
     } catch (\Throwable $t) { error_log('all_assistants.php role check: ' . $t->getMessage()); }
-    if ($aa_role_ok === null) { header("Location: all_assistants.php?msg=الدور+يجب+أن+يكون+تابعاً+للمدير+الأب+❌"); exit; }
+    if ($aa_role_ok === null) { ems_gov_flash_redirect('all_assistants.php', 'الدور يجب أن يكون تابعاً للمدير الأب ❌', 'GOV-FAIL-409', ''); exit; }
 
     // 3) ربط الموظف إلزامي + تحقّق الملكية/التفرّد
-    if ($users_has_employee_id && $employee_link_id <= 0) { header("Location: all_assistants.php?msg=يجب+إسناد+موظف+للحساب+❌"); exit; }
+    if ($users_has_employee_id && $employee_link_id <= 0) { ems_gov_flash_redirect('all_assistants.php', 'يجب إسناد موظف للحساب ❌', 'GOV-FAIL-409', ''); exit; }
     if ($employee_link_id > 0) {
         $aa_emp_ok = null; $aa_linked = null;
         try {
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 'whereRaw' => 'COALESCE(is_deleted,0)=0' . ($is_editing ? ' AND id != ' . intval($uid) : '')));
         } catch (\Throwable $t) { error_log('all_assistants.php employee check: ' . $t->getMessage()); }
         if ($aa_emp_ok === null || $aa_linked !== null) {
-            header("Location: all_assistants.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌"); exit;
+            ems_gov_flash_redirect('all_assistants.php', 'الموظف غير صالح أو مرتبط بحساب آخر ❌', 'GOV-FAIL-409', ''); exit;
         }
     }
 
@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $username_esc = mysqli_real_escape_string($conn, $username);
     $dupExcl = $is_editing ? " AND id != $uid" : "";
     $dup = mysqli_query($conn, "SELECT id FROM users WHERE username='$username_esc' $dupExcl AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    if ($dup && mysqli_num_rows($dup) > 0) { header("Location: all_assistants.php?msg=اسم+المستخدم+موجود+مسبقاً+❌"); exit; }
+    if ($dup && mysqli_num_rows($dup) > 0) { ems_gov_flash_redirect('all_assistants.php', 'اسم المستخدم موجود مسبقاً ❌', 'GOV-FAIL-409', ''); exit; }
 
     if ($is_editing) {
         $aa_data = array(
@@ -165,9 +165,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             $aa_gate->update('users', $aa_data, array('id' => $uid),
                 "parent_id<>'0' AND parent_id<>'' AND COALESCE(is_deleted,0)=0");
         } catch (\Throwable $t) { error_log('all_assistants.php update: ' . $t->getMessage()); }
-        header("Location: all_assistants.php?msg=تم+تعديل+المعاون+بنجاح+✅"); exit;
+        ems_gov_flash_redirect('all_assistants.php', 'تم تعديل المعاون بنجاح ✅', 'GOV-OK-200', ''); exit;
     } else {
-        if ($passwordRaw === '') { header("Location: all_assistants.php?msg=كلمة+المرور+مطلوبة+❌"); exit; }
+        if ($passwordRaw === '') { ems_gov_flash_redirect('all_assistants.php', 'كلمة المرور مطلوبة ❌', 'GOV-FAIL-409', ''); exit; }
         // company_id تحقنه البوابة من سياق الجلسة
         try {
             $aa_gate->insert('users', array(
@@ -178,11 +178,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 'employee_id' => $employee_link_id > 0 ? $employee_link_id : null,
             ));
         } catch (\Throwable $t) { error_log('all_assistants.php insert: ' . $t->getMessage()); }
-        header("Location: all_assistants.php?msg=تم+إضافة+المعاون+بنجاح+✅"); exit;
+        ems_gov_flash_redirect('all_assistants.php', 'تم إضافة المعاون بنجاح ✅', 'GOV-OK-200', ''); exit;
     }
 }
 
 $page_title = "إيكوبيشن | المعاونون";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

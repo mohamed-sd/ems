@@ -113,8 +113,9 @@ class TenantRegistry
         'sec_scopes' => array('type' => self::T_GLOBAL, 'soft' => false),
         'template_permission_dims' => array('type' => self::T_GLOBAL, 'soft' => false),
         'requests' => array('type' => self::T_TENANT, 'soft' => false),
-        // M-16 (update0011 · DEC-G): جداول إدارة المخاطر التسعة — كلها بعمود
-        // company_id (السجل المركزي الواحد RK-02 لكل مستأجر · لا حذف إطلاقًا)
+        // M-16 (update0011 · DEC-G — أُكملت في 2026_11_26): جداول إدارة المخاطر
+        // السبعة عشر — كلها بعمود company_id (السجل المركزي الواحد RK-02 لكل
+        // مستأجر · لا حذف إطلاقًا · التقييمات والمراجعات نسخ تاريخية RK-03)
         'risk_units' => array('type' => self::T_TENANT, 'soft' => false),
         'risk_register' => array('type' => self::T_TENANT, 'soft' => false),
         'risk_assessments' => array('type' => self::T_TENANT, 'soft' => false),
@@ -127,6 +128,11 @@ class TenantRegistry
         'risk_treatments' => array('type' => self::T_TENANT, 'soft' => false),
         'risk_acceptances' => array('type' => self::T_TENANT, 'soft' => false),
         'risk_escalations' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_incidents' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_reviews' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_committee' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_committee_items' => array('type' => self::T_TENANT, 'soft' => false),
+        'risk_export_log' => array('type' => self::T_TENANT, 'soft' => false),
         'task_assignments' => array('type' => self::T_TENANT, 'soft' => false),
         'task_dependencies' => array('type' => self::T_TENANT, 'soft' => false),
         'task_evidence' => array('type' => self::T_TENANT, 'soft' => false),

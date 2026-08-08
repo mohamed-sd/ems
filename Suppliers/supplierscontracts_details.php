@@ -16,7 +16,7 @@ $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+تفاصيل+عقود+الموردين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض تفاصيل عقود الموردين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -31,6 +31,9 @@ if (!$is_super_admin && $company_id <= 0) {
 $scd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contract details super') : ems_tenant_db();
 
 $page_title = 'الإيكوبيشن | ملف عقد المورد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -45,7 +48,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <i class="fas fa-file-contract"></i>
                     </div>
                     <div>
-                        <h1 class="hero-title">ملف عقد المورد</h1>
+                        <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
+$header_icon = 'fas fa-circle';
+$header_title_html = htmlspecialchars('ملف عقد المورد', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
                         <p class="hero-subtitle">عرض وإدارة بيانات عقد المورد والمعدات المرتبطة</p>
                     </div>
                 </div>

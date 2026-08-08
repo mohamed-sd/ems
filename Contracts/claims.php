@@ -25,14 +25,14 @@ if (!headers_sent()) { header('Content-Type: text/html; charset=UTF-8'); }
 
 function clm_e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 function clm_num($v) { return ($v === null || $v === '') ? '—' : number_format((float) $v, 2); }
-function clm_back($msg) { header('Location: claims.php?msg=' . urlencode($msg)); exit(); }
+function clm_back($msg) { ems_gov_flash_redirect('claims.php', $msg, 'GOV-INFO-200', ''); exit(); }
 
 $role           = strval($_SESSION['user']['role']);
 $is_super_admin = ($role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.')); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', ''); exit();
 }
 
 // ── فصلُ اليدين في طبقة المنح (قرارُ المالك 2026-07-28 · نمطُ تسويات الموردين) ──
@@ -44,7 +44,7 @@ $can_view   = $is_super_admin ? true : !empty($perms['can_view']);
 $can_add    = $is_super_admin ? true : !empty($perms['can_add']);
 $can_approve = $is_super_admin ? true : !empty($perms['can_edit']);
 if (!$can_view) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('لا توجد صلاحية عرض المستخلصات ❌')); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المستخلصات ❌', 'GOV-PERM-403', ''); exit();
 }
 
 $gate = claim_gate($is_super_admin);

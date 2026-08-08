@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/contract_obligations.php — مصفوفةُ التزامات عقد العميل (CON-02 §4 · §7-③)
  * ───────────────────────────────────────────────────────────────────────────
@@ -33,7 +34,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header('Location: ../login.php?msg=' . rawurlencode('لا توجد بيئة شركة صالحة للمستخدم ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -59,7 +60,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header('Location: ../main/dashboard.php?msg=' . rawurlencode('لا توجد صلاحية عرض مصفوفة الالتزامات ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مصفوفة الالتزامات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -72,7 +73,7 @@ if (!function_exists('obl_e')) {
 }
 if (!function_exists('obl_back')) {
     function obl_back($msg, $contract) {
-        header('Location: contract_obligations.php?contract=' . intval($contract) . '&msg=' . rawurlencode($msg));
+        ems_gov_redirect('Location: contract_obligations.php?contract=' . intval($contract) . '&msg=' . rawurlencode($msg));
         exit();
     }
 }
@@ -293,6 +294,9 @@ foreach ($rows as $r) {
 $covered = count($effective);
 
 $page_title = 'مصفوفة التزامات العقد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

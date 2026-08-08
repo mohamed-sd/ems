@@ -18,11 +18,11 @@ $is_super_admin = $ctx['is_super'];
 $company_id = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = trs_page_perms($conn, 'Transport/transfer_orders_list.php', $is_super_admin); // نفس موديول القائمة
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+أوامر+الترحيل+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض أوامر الترحيل ❌', 'GOV-PERM-403', ''); exit(); }
 
 $scope_val = $is_super_admin ? null : intval($company_id);
 $order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -60,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save_header') {
         $id = intval($_POST['id'] ?? 0);
         $is_editing = $id > 0;
-        if ($is_editing && !$can_edit) { header("Location: transfer_order_form.php?id=$id&msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-        if (!$is_editing && !$can_add) { header("Location: transfer_orders_list.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+        if ($is_editing && !$can_edit) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+        if (!$is_editing && !$can_add) { ems_gov_flash_redirect('transfer_orders_list.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
 
         $transfer_type_id = intval($_POST['transfer_type_id'] ?? 0);
         $direction = trim($_POST['direction'] ?? '');
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dirs = trs_directions(); $srcs = trs_source_modules();
         if ($transfer_type_id <= 0 || !array_key_exists($direction, $dirs) || !array_key_exists($source_module, $srcs) || $from_location_id <= 0 || $to_location_id <= 0) {
             $back = $is_editing ? "transfer_order_form.php?id=$id" : "transfer_order_form.php";
-            header("Location: $back&msg=بيانات+الرأس+غير+مكتملة+(النوع/الاتجاه/المصدر/المواقع)+❌"); exit();
+            ems_gov_redirect("Location: $back&msg=بيانات+الرأس+غير+مكتملة+(النوع/الاتجاه/المصدر/المواقع)+❌"); exit();
         }
 
         // حقول محسوبة: مدة المشروع + المتحمِّل الأولي
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cost_bearer = trs_compute_bearer($conn, $company_id, $direction, $project_days);
 
         if ($is_editing) {
-            if (!trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_orders_list.php?msg=أمر+غير+موجود+❌"); exit(); }
+            if (!trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_flash_redirect('transfer_orders_list.php', 'أمر غير موجود ❌', 'GOV-REF-404', ''); exit(); }
             trs_gate($is_super_admin)->update('transfer_orders', array(
                 'transfer_type_id' => $transfer_type_id, 'direction' => $direction, 'source_module' => $source_module,
                 'requested_by_user_id' => $requested_by_user_id, 'project_id' => $project_id,
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'project_days' => $project_days, 'cost_bearer' => $cost_bearer, 'notes' => $notes,
             ), array('id' => $id));
             trs_log_event($conn, $company_id, $id, 'note', 'تعديل رأس الأمر', null, null, $current_user_id, 'transport');
-            header("Location: transfer_order_form.php?id=$id&msg=تم+حفظ+رأس+الأمر+✅"); exit();
+            ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=تم+حفظ+رأس+الأمر+✅"); exit();
         } else {
             // كود الحركة من كود المركبة إن وُجدت
             // قراءة مرجعية معزولة: الأصل قرأ الكود بلا فلتر شركة — البوابة تحصرها
@@ -128,14 +128,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'notes' => $notes, 'created_by' => $current_user_id,
             ));
             trs_log_event($conn, $company_id, $new_id, 'system', "إنشاء أمر ترحيل ($order_no)", null, $stage, $current_user_id, 'transport');
-            header("Location: transfer_order_form.php?id=$new_id&msg=تم+إنشاء+الأمر+($order_no)+✅"); exit();
+            ems_gov_redirect("Location: transfer_order_form.php?id=$new_id&msg=تم+إنشاء+الأمر+($order_no)+✅"); exit();
         }
     }
 
     // ── إضافة عنصر منقول ──
     if ($action === 'add_line') {
         $id = intval($_POST['id'] ?? 0);
-        if (!$can_edit || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if (!$can_edit || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         $item_type = trim($_POST['item_type'] ?? '');
         $equipment_id = ($_POST['equipment_id'] ?? '') !== '' ? intval($_POST['equipment_id']) : null;
         $attachment_ref = trim($_POST['attachment_ref'] ?? '');
@@ -143,37 +143,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $employee_id = ($_POST['employee_id'] ?? '') !== '' ? intval($_POST['employee_id']) : null;
         $quantity = ($_POST['quantity'] ?? '') !== '' ? (float)$_POST['quantity'] : null;
         $note = trim($_POST['line_note'] ?? '');
-        if (!array_key_exists($item_type, trs_item_types())) { header("Location: transfer_order_form.php?id=$id&tab=lines&msg=نوع+عنصر+غير+صالح+❌"); exit(); }
+        if (!array_key_exists($item_type, trs_item_types())) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=lines&msg=نوع+عنصر+غير+صالح+❌"); exit(); }
         trs_gate($is_super_admin)->insert('transfer_lines', array(
             'order_id' => $id, 'item_type' => $item_type, 'equipment_id' => $equipment_id,
             'attachment_ref' => $attachment_ref, 'product_id' => $product_id,
             'employee_id' => $employee_id, 'quantity' => $quantity, 'note' => $note,
         ));
         trs_log_event($conn, $company_id, $id, 'note', 'إضافة عنصر منقول', null, null, $current_user_id, 'transport');
-        header("Location: transfer_order_form.php?id=$id&tab=lines&msg=تمت+إضافة+العنصر+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=lines&msg=تمت+إضافة+العنصر+✅"); exit();
     }
     if ($action === 'del_line') {
         $id = intval($_POST['id'] ?? 0); $line_id = intval($_POST['line_id'] ?? 0);
-        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         // أرشفة لا حذف (السياسة)؛ تحقّق الربط أولًا: السطر ينتمي لهذا الأمر
         // المملوك — يسدّ أرشفة سطرٍ عبر أمرٍ آخر (القناة id-only)
         $linked = trs_gate($is_super_admin)->selectOne('transfer_lines', array(
             'columns' => array('id'), 'where' => array('id' => $line_id, 'order_id' => $id)));
         if ($linked) { trs_gate($is_super_admin)->softDelete('transfer_lines', $line_id); }
-        header("Location: transfer_order_form.php?id=$id&tab=lines&msg=تم+حذف+العنصر+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=lines&msg=تم+حذف+العنصر+✅"); exit();
     }
 
     // ── إضافة بند تكلفة ──
     if ($action === 'add_cost') {
         $id = intval($_POST['id'] ?? 0);
-        if (!$can_edit || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if (!$can_edit || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         $cost_type = trim($_POST['cost_type'] ?? '');
         $amount_local = (float)($_POST['amount_local'] ?? 0);
         $currency = trim($_POST['currency'] ?? 'SDG');
         $fx_rate = ($_POST['fx_rate'] ?? '') !== '' ? (float)$_POST['fx_rate'] : null;
         $cost_bearer = trim($_POST['cost_bearer'] ?? 'client');
         $analytic_cost_center = trim($_POST['cl_center'] ?? '');
-        if (!array_key_exists($cost_type, trs_cost_types()) || !array_key_exists($cost_bearer, trs_bearers())) { header("Location: transfer_order_form.php?id=$id&tab=costs&msg=بيانات+التكلفة+غير+صالحة+❌"); exit(); }
+        if (!array_key_exists($cost_type, trs_cost_types()) || !array_key_exists($cost_bearer, trs_bearers())) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=costs&msg=بيانات+التكلفة+غير+صالحة+❌"); exit(); }
         // amount_usd = amount_local × fx_rate (أو المبلغ نفسه إن كانت العملة USD)
         $amount_usd = ($currency === 'USD') ? $amount_local : ($fx_rate ? $amount_local * $fx_rate : 0);
         // الزوج الذرّي (عقد §9): البند + المجموع المشتق لا ينفصلان — الأصل
@@ -187,11 +187,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             trs_recompute_actual($g, $id);
         }, 'transfer_order add_cost');
         trs_log_event($conn, $company_id, $id, 'note', 'إضافة بند تكلفة', null, null, $current_user_id, 'transport');
-        header("Location: transfer_order_form.php?id=$id&tab=costs&msg=تمت+إضافة+بند+التكلفة+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=costs&msg=تمت+إضافة+بند+التكلفة+✅"); exit();
     }
     if ($action === 'del_cost') {
         $id = intval($_POST['id'] ?? 0); $cid = intval($_POST['cost_id'] ?? 0);
-        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         // أرشفة لا حذف (السياسة) + الزوج الذرّي مع المجموع المشتق (عقد §9)؛
         // تحقّق الربط داخل المعاملة: البند ينتمي لهذا الأمر المملوك (القناة
         // id-only — الشرط الثلاثي الأصلي يُستوفى بالفحص لا بتوسيع القناة)
@@ -203,34 +203,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 trs_recompute_actual($g, $id);
             }
         }, 'transfer_order del_cost');
-        header("Location: transfer_order_form.php?id=$id&tab=costs&msg=تم+حذف+بند+التكلفة+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=costs&msg=تم+حذف+بند+التكلفة+✅"); exit();
     }
 
     // ── إضافة تصريح ──
     if ($action === 'add_permit') {
         $id = intval($_POST['id'] ?? 0);
-        if (!$can_edit || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if (!$can_edit || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         $permit_type = trim($_POST['permit_type'] ?? '');
         $authority = trim($_POST['authority'] ?? '');
         $issue_date = ($_POST['issue_date'] ?? '') !== '' ? trim($_POST['issue_date']) : null;
         $expiry_date = ($_POST['expiry_date'] ?? '') !== '' ? trim($_POST['expiry_date']) : null;
         $state = trim($_POST['permit_state'] ?? 'issuing');
-        if (!array_key_exists($permit_type, trs_permit_types()) || !array_key_exists($state, trs_permit_states())) { header("Location: transfer_order_form.php?id=$id&tab=permits&msg=بيانات+التصريح+غير+صالحة+❌"); exit(); }
+        if (!array_key_exists($permit_type, trs_permit_types()) || !array_key_exists($state, trs_permit_states())) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=permits&msg=بيانات+التصريح+غير+صالحة+❌"); exit(); }
         trs_gate($is_super_admin)->insert('transfer_permits', array(
             'order_id' => $id, 'permit_type' => $permit_type, 'authority' => $authority,
             'issue_date' => $issue_date, 'expiry_date' => $expiry_date, 'state' => $state,
         ));
         trs_log_event($conn, $company_id, $id, 'note', 'إضافة تصريح', null, null, $current_user_id, 'transport');
-        header("Location: transfer_order_form.php?id=$id&tab=permits&msg=تمت+إضافة+التصريح+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=permits&msg=تمت+إضافة+التصريح+✅"); exit();
     }
     if ($action === 'del_permit') {
         $id = intval($_POST['id'] ?? 0); $pid = intval($_POST['permit_id'] ?? 0);
-        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         // أرشفة لا حذف (السياسة)؛ تحقّق الربط كنمط del_line
         $linked = trs_gate($is_super_admin)->selectOne('transfer_permits', array(
             'columns' => array('id'), 'where' => array('id' => $pid, 'order_id' => $id)));
         if ($linked) { trs_gate($is_super_admin)->softDelete('transfer_permits', $pid); }
-        header("Location: transfer_order_form.php?id=$id&tab=permits&msg=تم+حذف+التصريح+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&tab=permits&msg=تم+حذف+التصريح+✅"); exit();
     }
 
     // ── دورة الحياة: انتقال بين المراحل (§6) — كتابة على transfer_orders/events/attachments فقط ──
@@ -239,16 +239,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $trans = trim($_POST['trans'] ?? '');
         $map = trs_transitions();
         if (!isset($map[$trans]) || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) {
-            header("Location: transfer_order_form.php?id=$id&msg=انتقال+غير+صالح+❌"); exit();
+            ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=انتقال+غير+صالح+❌"); exit();
         }
         $t = $map[$trans];
         $need_perm = ($t['need'] === 'delete') ? $can_delete : $can_edit;
-        if (!$need_perm) { header("Location: transfer_order_form.php?id=$id&msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+        if (!$need_perm) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
 
         // تحميل الأمر للتحقق من المرحلة والحرّاس
         $orow = trs_gate($is_super_admin)->selectOne('transfer_orders', array('where' => array('id' => $id)));
         if (!$orow || $orow['stage'] !== $t['from']) {
-            header("Location: transfer_order_form.php?id=$id&msg=المرحلة+الحالية+لا+تسمح+بهذا+الانتقال+❌"); exit();
+            ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=المرحلة+الحالية+لا+تسمح+بهذا+الانتقال+❌"); exit();
         }
 
         $err = '';              // رسالة الحارس إن فشل
@@ -292,31 +292,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         // reopen: بلا حارس (بيد صاحب صلاحية الحذف/المدير)
 
-        if ($err !== '') { header("Location: transfer_order_form.php?id=$id&msg=$err+❌"); exit(); }
+        if ($err !== '') { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=$err+❌"); exit(); }
 
         $to = $t['to'];
         trs_gate($is_super_admin)->update('transfer_orders',
             array_merge(array('stage' => $to), $set_extra), array('id' => $id));
         trs_log_event($conn, $company_of, $id, 'status_change', $t['label'], $t['from'], $to, $current_user_id, 'transport');
-        header("Location: transfer_order_form.php?id=$id&msg=تم:+" . rawurlencode($t['label']) . "+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=تم:+" . rawurlencode($t['label']) . "+✅"); exit();
     }
 
     // ── الإلغاء: حالة لا محو، بسببٍ إلزامي (§ب.7) ──
     if ($action === 'cancel') {
         $id = intval($_POST['id'] ?? 0);
         $reason = trim($_POST['reason'] ?? '');
-        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
-        if ($reason === '') { header("Location: transfer_order_form.php?id=$id&msg=الإلغاء+يتطلب+سبباً+❌"); exit(); }
+        if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
+        if ($reason === '') { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=الإلغاء+يتطلب+سبباً+❌"); exit(); }
         $orow = trs_gate($is_super_admin)->selectOne('transfer_orders', array(
             'columns' => array('stage', 'company_id'), 'where' => array('id' => $id),
         ));
         if (!$orow || in_array($orow['stage'], array('closed', 'cancelled'), true)) {
-            header("Location: transfer_order_form.php?id=$id&msg=لا+يمكن+إلغاء+أمرٍ+مغلقٍ+أو+ملغى+❌"); exit();
+            ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=لا+يمكن+إلغاء+أمرٍ+مغلقٍ+أو+ملغى+❌"); exit();
         }
         $cof = intval($orow['company_id']);
         trs_gate($is_super_admin)->update('transfer_orders', array('stage' => 'cancelled'), array('id' => $id));
         trs_log_event($conn, $cof, $id, 'status_change', 'إلغاء الأمر — السبب: ' . $reason, $orow['stage'], 'cancelled', $current_user_id, 'transport');
-        header("Location: transfer_order_form.php?id=$id&msg=تم+إلغاء+الأمر+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=تم+إلغاء+الأمر+✅"); exit();
     }
 }
 
@@ -346,7 +346,7 @@ if ($order_id > 0) {
         array($order_id)
     );
     $order = $order_rows ? $order_rows[0] : null;
-    if (!$order) { header("Location: transfer_orders_list.php?msg=الأمر+غير+موجود+❌"); exit(); }
+    if (!$order) { ems_gov_flash_redirect('transfer_orders_list.php', 'الأمر غير موجود ❌', 'GOV-REF-404', ''); exit(); }
 }
 
 $types_opt   = trs_type_options($conn, $is_super_admin, $company_id, $order['transfer_type_id'] ?? 0);
@@ -364,6 +364,9 @@ $permit_states = trs_permit_states(); $bearers = trs_bearers(); $currencies = tr
 $active_tab = $_GET['tab'] ?? 'header';
 
 $page_title = 'إيكوبيشن | أمر الترحيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

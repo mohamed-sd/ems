@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Suppliers/supplier_rules.php — قواعدُ تحميل المورد وجزاءاته (M-15)
  * ───────────────────────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -50,14 +51,14 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+قواعد+المورد+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قواعد المورد ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier rules super') : ems_tenant_db();
 
 $selected = intval($_GET['contract_id'] ?? 0);
-$redirect = function ($msg, $cid) { header("Location: supplier_rules.php?contract_id=" . intval($cid)
+$redirect = function ($msg, $cid) { ems_gov_redirect("Location: supplier_rules.php?contract_id=" . intval($cid)
     . "&msg=" . rawurlencode($msg)); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -115,6 +116,9 @@ $chargeRules  = $selected > 0 ? SRS::chargeRulesOf($gate, $selected) : array();
 $penaltyRules = $selected > 0 ? SRS::penaltyRulesOf($gate, $selected) : array();
 
 $page_title = 'إيكوبيشن | قواعد تحميل المورد وجزاءاته';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

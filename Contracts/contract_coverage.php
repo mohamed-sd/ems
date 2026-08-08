@@ -38,7 +38,7 @@ if ($module_info) {
     $can_view = $perms['can_view'];
 }
 if (!$can_view) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('لا توجد صلاحية عرض التغطية التعاقدية ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التغطية التعاقدية ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -124,6 +124,9 @@ $seatsOf = function ($oblId) use ($gate) {
 };
 
 $page_title = 'التغطية التعاقدية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

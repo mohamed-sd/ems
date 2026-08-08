@@ -16,11 +16,11 @@ $is_super_admin = $ctx['is_super'];
 $company_id = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = trs_page_perms($conn, 'Transport/transfer_requests.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+طلبات+الترحيل+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض طلبات الترحيل ❌', 'GOV-PERM-403', ''); exit(); }
 
 $scope = $is_super_admin ? '1=1' : ('r.company_id = ' . intval($company_id));
 $srcs = trs_source_modules(); $prios = trs_priorities(); $states = trs_request_states(); $dirs = trs_directions();
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'create';
 
     if ($action === 'create') {
-        if (!$can_add) { header("Location: transfer_requests.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+        if (!$can_add) { ems_gov_flash_redirect('transfer_requests.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
         $transfer_type_id = intval($_POST['transfer_type_id'] ?? 0);
         $source_module = trim($_POST['source_module'] ?? '');
         $requested_by_user_id = ($_POST['requested_by_user_id'] ?? '') !== '' ? intval($_POST['requested_by_user_id']) : $current_user_id;
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $reason = trim($_POST['reason'] ?? '');
         $priority = trim($_POST['priority'] ?? 'normal');
         if ($transfer_type_id <= 0 || !array_key_exists($source_module, $srcs) || $reason === '') {
-            header("Location: transfer_requests.php?msg=بيانات+الطلب+غير+مكتملة+(النوع/المصدر/المبرّر)+❌"); exit();
+            ems_gov_flash_redirect('transfer_requests.php', 'بيانات الطلب غير مكتملة (النوع/المصدر/المبرّر) ❌', 'GOV-FAIL-409', ''); exit();
         }
         $code = trs_gen_req_code($conn, $company_id);
         try {
@@ -63,14 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ));
         } catch (\App\Core\TenantGateException $e) {
             error_log('transfer_requests create refused: ' . $e->getMessage());
-            header("Location: transfer_requests.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+            ems_gov_flash_redirect('transfer_requests.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
         }
-        header("Location: transfer_requests.php?msg=تم+تقديم+الطلب+($code)+✅"); exit();
+        ems_gov_flash_redirect('transfer_requests.php', "تم تقديم الطلب ($code) ✅", 'GOV-OK-200', ''); exit();
     }
 
     // اعتماد / رفض
     if ($action === 'approve' || $action === 'reject') {
-        if (!$can_edit) { header("Location: transfer_requests.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+        if (!$can_edit) { ems_gov_flash_redirect('transfer_requests.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
         $rid = intval($_POST['request_id'] ?? 0);
         $new_state = ($action === 'approve') ? 'approved' : 'rejected';
         try {
@@ -80,24 +80,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log('transfer_requests state refused: ' . $e->getMessage());
         }
         $msg = ($action === 'approve') ? 'تم+اعتماد+الطلب+✅' : 'تم+رفض+الطلب+✅';
-        header("Location: transfer_requests.php?msg=$msg"); exit();
+        ems_gov_flash_redirect('transfer_requests.php', "$msg", 'GOV-INFO-200', ''); exit();
     }
 
     // تحويل الطلب المعتمد إلى أمر ترحيل
     if ($action === 'convert') {
-        if (!$can_edit) { header("Location: transfer_requests.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+        if (!$can_edit) { ems_gov_flash_redirect('transfer_requests.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
         $rid = intval($_POST['request_id'] ?? 0);
         $direction = trim($_POST['direction'] ?? '');
-        if (!array_key_exists($direction, $dirs)) { header("Location: transfer_requests.php?msg=الاتجاه+إلزامي+لتحويل+الطلب+أمراً+❌"); exit(); }
+        if (!array_key_exists($direction, $dirs)) { ems_gov_flash_redirect('transfer_requests.php', 'الاتجاه إلزامي لتحويل الطلب أمراً ❌', 'GOV-FAIL-409', ''); exit(); }
         // اجلب الطلب المعتمد (عبر البوابة — الكتابة التالية بشركة السياق حصرًا،
         // فالقراءة تُنطَّق بها أيضًا: تسدّ حافة super القديمة غير المتسقة)
         $req = trs_gate(false)->selectOne('transfer_requests', array(
             'where' => array('id' => $rid, 'state' => 'approved'),
         ));
-        if (!$req) { header("Location: transfer_requests.php?msg=الطلب+غير+معتمد+أو+غير+موجود+❌"); exit(); }
+        if (!$req) { ems_gov_flash_redirect('transfer_requests.php', 'الطلب غير معتمد أو غير موجود ❌', 'GOV-REF-404', ''); exit(); }
         $from_loc = intval($req['from_location_id'] ?? 0);
         $to_loc = intval($req['to_location_id'] ?? 0);
-        if ($from_loc <= 0 || $to_loc <= 0) { header("Location: transfer_requests.php?msg=الطلب+بلا+موقعَي+انطلاق/وصول+—+أكملهما+أولاً+❌"); exit(); }
+        if ($from_loc <= 0 || $to_loc <= 0) { ems_gov_flash_redirect('transfer_requests.php', 'الطلب بلا موقعَي انطلاق/وصول — أكملهما أولاً ❌', 'GOV-FAIL-409', ''); exit(); }
 
         $project_id = ($req['project_id'] !== null) ? intval($req['project_id']) : null;
         $project_days = trs_project_days($conn, $company_id, $project_id);
@@ -127,14 +127,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }, 'convert request#' . $rid);
         } catch (\App\Core\TenantGateException $e) {
             error_log('transfer_requests convert rolled back: ' . $e->getMessage());
-            header("Location: transfer_requests.php?msg=تعذّر+التحويل+❌"); exit();
+            ems_gov_flash_redirect('transfer_requests.php', 'تعذّر التحويل ❌', 'GOV-FAIL-409', ''); exit();
         }
         trs_log_event($conn, $company_id, $order_id, 'system', "تحويل الطلب {$req['code']} إلى أمر ($order_no)", 'submitted', $stage, $current_user_id, 'transport');
-        header("Location: transfer_order_form.php?id=$order_id&msg=تم+تحويل+الطلب+إلى+أمر+($order_no)+✅"); exit();
+        ems_gov_redirect("Location: transfer_order_form.php?id=$order_id&msg=تم+تحويل+الطلب+إلى+أمر+($order_no)+✅"); exit();
     }
 }
 
 $page_title = 'إيكوبيشن | موافقات الترحيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

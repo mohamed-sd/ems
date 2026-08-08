@@ -13,61 +13,61 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/tax_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الضرائب+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الضرائب ❌', 'GOV-PERM-403', ''); exit(); }
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $tax_types = array('output' => 'مخرجات (مبيعات)', 'input' => 'مدخلات (مشتريات)', 'both' => 'كلاهما');
 
 // ── حفظ رمز ضريبة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tax_code'])) {
-    if (!$can_add) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('tax_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $code = trim($_POST['tax_code'] ?? ''); $name = trim($_POST['tax_name'] ?? '');
     $rate = round(floatval($_POST['rate'] ?? 0), 2);
     $type = isset($tax_types[$_POST['tax_type'] ?? '']) ? $_POST['tax_type'] : 'both';
-    if ($code === '' || $name === '') { header("Location: tax_fin.php?msg=بيانات+الرمز+غير+مكتملة+❌"); exit(); }
+    if ($code === '' || $name === '') { ems_gov_flash_redirect('tax_fin.php', 'بيانات الرمز غير مكتملة ❌', 'GOV-FAIL-409', ''); exit(); }
     try {
         fin_gate($is_super_admin)->insert('fin_tax_codes', array(
             'code' => $code, 'name' => $name, 'rate' => $rate, 'tax_type' => $type, 'created_by' => $current_user_id,
         ));
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: tax_fin.php?msg=رمز+الضريبة+مكرر+❌"); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('tax_fin.php', 'رمز الضريبة مكرر ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('fin_tax_codes insert refused: ' . $e->getMessage());
-        header("Location: tax_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('tax_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: tax_fin.php?msg=تمت+إضافة+رمز+الضريبة+✅"); exit();
+    ems_gov_flash_redirect('tax_fin.php', 'تمت إضافة رمز الضريبة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ حركة ضريبية ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
-    if (!$can_add) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('tax_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $dir = ($_POST['direction'] ?? '') === 'input' ? 'input' : 'output';
     $tcid = intval($_POST['tax_code_id'] ?? 0) ?: null;
     $base = round(floatval($_POST['base_amount'] ?? 0), 2);
     $rate = round(floatval($_POST['tax_rate'] ?? 0), 2);
     $ref = trim($_POST['source_ref'] ?? '');
     $period = trim($_POST['period_ref'] ?? '') ?: date('Y-m');
-    if ($base <= 0) { header("Location: tax_fin.php?msg=الوعاء+غير+صحيح+❌"); exit(); }
+    if ($base <= 0) { ems_gov_flash_redirect('tax_fin.php', 'الوعاء غير صحيح ❌', 'GOV-REF-404', ''); exit(); }
     fin_gate($is_super_admin)->insert('fin_tax_transactions', array(
         'tax_code_id' => $tcid, 'direction' => $dir, 'base_amount' => $base, 'tax_rate' => $rate,
         'source_ref' => $ref, 'period_ref' => $period, 'created_by' => $current_user_id,
     ));
-    header("Location: tax_fin.php?msg=تمت+إضافة+الحركة+الضريبية+✅"); exit();
+    ems_gov_flash_redirect('tax_fin.php', 'تمت إضافة الحركة الضريبية ✅', 'GOV-OK-200', ''); exit();
 }
 
 if (isset($_GET['del_code'])) {
-    if (!$can_delete) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('tax_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['del_code']);
     fin_gate($is_super_admin)->softDelete('fin_tax_codes', $d);
-    header("Location: tax_fin.php?msg=تم+حذف+الرمز+✅"); exit();
+    ems_gov_flash_redirect('tax_fin.php', 'تم حذف الرمز ✅', 'GOV-OK-200', ''); exit();
 }
 if (isset($_GET['del_tx'])) {
-    if (!$can_delete) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('tax_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['del_tx']);
     fin_gate($is_super_admin)->softDelete('fin_tax_transactions', $d);
-    header("Location: tax_fin.php?msg=تم+حذف+الحركة+✅"); exit();
+    ems_gov_flash_redirect('tax_fin.php', 'تم حذف الحركة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // إقرار الضريبة للفترة المختارة (افتراضي: الشهر الحالي)
@@ -83,6 +83,9 @@ $in_tax  = $tax_ssum('input');
 $net_tax = $out_tax - $in_tax;
 
 $page_title = 'إيكوبيشن | الضرائب والقيمة المضافة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

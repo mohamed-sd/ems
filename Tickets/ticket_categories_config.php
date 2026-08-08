@@ -21,7 +21,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -29,7 +29,7 @@ $perms = tkt_page_perms($conn, 'Tickets/ticket_categories_config.php', $is_super
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التصنيف+الفني+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التصنيف الفني ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -37,16 +37,16 @@ if (!$can_view) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: ticket_categories_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: ticket_categories_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)          { header("Location: ticket_categories_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('ticket_categories_config.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('ticket_categories_config.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)          { ems_gov_flash_redirect('ticket_categories_config.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name       = trim($_POST['name'] ?? '');
     $applies_to = trim($_POST['applies_to'] ?? '');
     $active     = isset($_POST['active']) ? 1 : 0;
 
     if ($name === '') {
-        header("Location: ticket_categories_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('ticket_categories_config.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
     $applies_val = ($applies_to === '') ? null : mb_substr($applies_to, 0, 40);
 
@@ -56,26 +56,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
             $row = tkt_gate(false)->selectOne('ticket_categories', array(
                 'columns' => array('id', 'company_id'), 'where' => array('id' => $id)));
             if (!$row || $row['company_id'] === null) {
-                header("Location: ticket_categories_config.php?msg=التصنيفات+العامة+للقراءة+فقط+❌"); exit();
+                ems_gov_flash_redirect('ticket_categories_config.php', 'التصنيفات العامة للقراءة فقط ❌', 'GOV-FAIL-409', ''); exit();
             }
             tkt_gate(false)->update('ticket_categories',
                 array('name' => $name, 'applies_to' => $applies_val, 'active' => $active),
                 array('id' => $id));
-            header("Location: ticket_categories_config.php?msg=تم+تعديل+التصنيف+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('ticket_categories_config.php', 'تم تعديل التصنيف بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             $code = tkt_gen_code('ticket_categories');
             tkt_gate(false)->insert('ticket_categories', array(
                 'code' => $code, 'name' => $name, 'applies_to' => $applies_val, 'active' => $active,
             ));
-            header("Location: ticket_categories_config.php?msg=تمت+إضافة+التصنيف+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('ticket_categories_config.php', 'تمت إضافة التصنيف بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('ticket_categories save refused: ' . $e->getMessage());
-        header("Location: ticket_categories_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('ticket_categories_config.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 $page_title = 'إيكوبيشن | تصنيفات الأعطال والبلاغات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

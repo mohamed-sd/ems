@@ -23,7 +23,14 @@ require_once __DIR__ . '/tkt_helpers.php';
 if (!$IS_CLI) {
     $key = isset($_GET['key']) ? (string) $_GET['key'] : '';
     $expected = (string) ems_env('TICKETS_CRON_KEY', '');
-    if ($expected === '' || !hash_equals($expected, $key)) { http_response_code(403); exit('forbidden'); }
+    if ($expected === '' || !hash_equals($expected, $key)) {
+        // تنظيفُ المخازن قبل الردّ: حاقنُ الأرقام في config يفتح مخزنًا
+        // فيُذيّل «forbidden» بوسوم script — ردُّ الرفض يجب أن يكون نظيفًا.
+        while (ob_get_level()) { ob_end_clean(); }
+        http_response_code(403);
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('forbidden');
+    }
     header('Content-Type: text/plain; charset=UTF-8');
 }
 
@@ -146,12 +153,17 @@ foreach (array_keys($company_ids) as $cid) {
         ));
         if ($already > 0) { continue; }
 
-        $newNo = '';
+        // الرقم قبل المعاملة — ارتدادُها كان يتراجع بالعدّاد فيعلق التوليد الدوري.
+        try {
+            $newNo = tkt_next_ticket_no($conn, $cid);
+        } catch (\Throwable $e) {
+            error_log('tickets cron number allocation failed (tpl ' . $tplId . '): ' . $e->getMessage());
+            continue;
+        }
         try {
             $cycleGate->runInTransaction(function ($g) use (
-                $conn, $cid, $tpl, $tplId, $type, &$newNo
+                $conn, $cid, $tpl, $tplId, $type, $newNo
             ) {
-                $newNo = tkt_next_ticket_no($conn, $cid);
                 $tid = $g->insert('tickets', array(
                     'ticket_no' => $newNo, 'ticket_type_id' => intval($tpl['ticket_type_id']),
                     'category_id' => ($tpl['category_id'] !== null) ? intval($tpl['category_id']) : null,

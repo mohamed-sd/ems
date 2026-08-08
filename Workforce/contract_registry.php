@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-750 · SCN-751 · SCN-752
 /**
  * Workforce/contract_registry.php — سجلُّ العقود الموحّد (H-08-① · CON-01 §6 «سجل العقود»)
@@ -32,7 +33,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -57,7 +58,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+سجل+العقود+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سجل العقود ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -77,7 +78,7 @@ $SOURCES = array(
 
 // ── إنشاءُ رأسِ عقدٍ (مسودة) ───────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create') {
-    if (!$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('contract_registry.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $r = ECS::createHead($conn, $gate, $company_id, array(
         'employee_id'   => intval($_POST['employee_id'] ?? 0),
         'category'      => strval($_POST['category'] ?? ''),
@@ -91,12 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create') 
     ), $uid);
     $msg = $r['ok'] ? ('أُنشئ رأسُ العقد #' . intval($r['id']) . ' مسودةً ✅')
                     : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
-    header("Location: contract_registry.php?msg=" . rawurlencode($msg)); exit();
+    ems_gov_flash_redirect('contract_registry.php', $msg, 'GOV-INFO-200', ''); exit();
 }
 
 // ── انتقالُ حالةٍ / تعليقٌ-إعارةٌ / استئناف ────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('transition', 'hold', 'resume'), true)) {
-    if (!$can_edit) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('contract_registry.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $cid  = intval($_POST['contract_id'] ?? 0);
     $note = trim(strval($_POST['note'] ?? ''));
     $ver  = intval($_POST['version'] ?? 0);
@@ -109,12 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
         $r = ECSM::resume($conn, $gate, $company_id, $cid, $note, $uid);
     }
     $msg = $r['ok'] ? ($r['changed'] ? 'نُفّذ ✅' : ($r['reason'] . ' ✅')) : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
-    header("Location: contract_registry.php?msg=" . rawurlencode($msg)); exit();
+    ems_gov_flash_redirect('contract_registry.php', $msg, 'GOV-INFO-200', ''); exit();
 }
 
 // ── H-08-②: مكوّناتُ الأجر (إضافةٌ/تعديلٌ/إنهاء — الحكمُ في الخدمة) ────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('comp_add', 'comp_update', 'comp_end'), true)) {
-    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    if (!$can_edit && !$can_add) { ems_gov_flash_redirect('contract_registry.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $ctxContract = intval($_POST['contract_id'] ?? 0);
     $act = strval($_POST['do']);
     $compData = array(
@@ -138,12 +139,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
         $r = ECS::endComponent($conn, $gate, $company_id, intval($_POST['component_id'] ?? 0), strval($_POST['end_date'] ?? ''), $uid);
     }
     $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
-    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+    ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
 // ── H-08-③: قواعدُ الحوافز وتوزيعُها Σ=100 (الحكمُ في الخدمة) ─────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('inc_add', 'inc_end', 'inc_alloc'), true)) {
-    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    if (!$can_edit && !$can_add) { ems_gov_flash_redirect('contract_registry.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $ctxContract = intval($_POST['contract_id'] ?? 0);
     $act = strval($_POST['do']);
     if ($act === 'inc_add') {
@@ -177,12 +178,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
         $r = ECS::setIncentiveAllocations($conn, $gate, $company_id, intval($_POST['rule_id'] ?? 0), $allocRows, $uid);
     }
     $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
-    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+    ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
 // ── H-08-④: جهاتُ التحمّل Σ=100 (رفضُ الحفظ دون المئة — الحكمُ في الخدمة) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'bearer_set') {
-    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    if (!$can_edit && !$can_add) { ems_gov_flash_redirect('contract_registry.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $ctxContract = intval($_POST['contract_id'] ?? 0);
     $bearerRows = array();
     $types = (array) ($_POST['bearer_type'] ?? array());
@@ -196,12 +197,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'bearer_se
     $r = ECS::setCostBearers($conn, $gate, $company_id,
         strval($_POST['owner_type'] ?? ''), intval($_POST['owner_id'] ?? 0), $bearerRows, $uid);
     $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
-    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+    ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
 // ── H-10: الملاحقُ والنسخةُ الموقَّعة (الحكمُ في الخدمة) ───────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), array('amd_add', 'amd_approve', 'amd_reject', 'sign_attach'), true)) {
-    if (!$can_edit && !$can_add) { header("Location: contract_registry.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
+    if (!$can_edit && !$can_add) { ems_gov_flash_redirect('contract_registry.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $ctxContract = intval($_POST['contract_id'] ?? 0);
     $act = strval($_POST['do']);
     if ($act === 'amd_add') {
@@ -224,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     $msg = $r['ok'] ? 'نُفّذ ✅' . (isset($r['snapshot_invalidated_from']) && $r['snapshot_invalidated_from']
                         ? ' (أُبطلت اللقطاتُ من ' . $r['snapshot_invalidated_from'] . ')' : '')
                     : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
-    header("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
+    ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
 // ── القراءة ────────────────────────────────────────────────────────────────

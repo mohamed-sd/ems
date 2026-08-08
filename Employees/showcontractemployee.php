@@ -24,7 +24,11 @@ if (!isset($_SESSION['user'])) {
 </head>
 <body class="ems-site">
 
-<?php include('../insidebar.php'); ?>
+<?php 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include('../insidebar.php'); ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
 <div class="main">
@@ -32,7 +36,14 @@ if (!isset($_SESSION['user'])) {
     <div class="header">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="title-icon"><i class="fas fa-id-card"></i></div>
-            <h1 class="page-title">تفاصيل عقد السائق</h1>
+            <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
+$header_icon = 'fas fa-circle';
+$header_title_html = htmlspecialchars('تفاصيل عقد السائق', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
         </div>
         <a href="javascript:history.back()" class="back-btn">
             <i class="fas fa-arrow-right"></i> رجوع

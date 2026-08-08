@@ -12,7 +12,7 @@ require_once __DIR__ . '/../includes/security.php'; // validate_file_upload / ge
 
 $perms = get_page_permissions($conn);
 if (!$perms['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية لعرض هذه الصفحة'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا توجد صلاحية لعرض هذه الصفحة', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -23,7 +23,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $user_id        = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=" . urlencode('لا توجد بيئة شركة صالحة للمستخدم ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -88,7 +88,7 @@ $flash   = isset($_GET['msg']) ? $_GET['msg'] : '';
 // ── حذف ناعم (Soft delete: is_deleted=1 + status=inactive) ───────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     if (!$perms['can_delete']) {
-        header('Location: fleet_models.php?msg=' . urlencode('❌ لا توجد صلاحية للحذف'));
+        ems_gov_flash_redirect('fleet_models.php', '❌ لا توجد صلاحية للحذف', 'GOV-PERM-403', '');
         exit();
     }
     $del_id = (int) $_POST['delete_id'];
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     try {
         $fm_gate->update('fleet_model', array('is_deleted' => 1, 'status' => 'inactive'), array('id' => $del_id));
     } catch (\Throwable $e) { /* غير مملوك/سوبر بلا سياق → لا تغيير */ }
-    header('Location: fleet_models.php?msg=' . urlencode('🗑️ تم حذف الموديل (تعطيل ناعم)'));
+    ems_gov_flash_redirect('fleet_models.php', '🗑️ تم حذف الموديل (تعطيل ناعم)', 'GOV-OK-200', '');
     exit();
 }
 
@@ -202,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            header('Location: fleet_models.php?msg=' . urlencode($edit_id > 0 ? '✅ تم تحديث الموديل' : '✅ تم إضافة الموديل'));
+            ems_gov_flash_redirect('fleet_models.php', $edit_id > 0 ? '✅ تم تحديث الموديل' : '✅ تم إضافة الموديل', 'GOV-OK-200', '');
             exit();
         } catch (\Throwable $e) {
             $errors[] = 'تعذّر الحفظ: ' . $e->getMessage();
@@ -263,6 +263,9 @@ if ($has_dep_profile) {
 }
 
 $page_title = "إيكوبيشن | الأنواع والموديلات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

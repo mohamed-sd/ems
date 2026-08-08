@@ -15,7 +15,7 @@ $users_not_deleted_sql = "(COALESCE(u.is_deleted,0)=0)";
 $users_has_employee_id = true; // ربط المعاون بموظف (قاعدة: لا حساب بلا موظف)
 
 if ($current_company_id <= 0) {
-    header("Location: ../login.php?msg=الحساب+غير+مرتبط+بشركة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة ❌', 'GOV-FAIL-409', '');
     exit();
 }
 
@@ -53,7 +53,7 @@ if (!$module_id) {
 
 // منع الوصول إذا لم تكن هناك صلاحية عرض
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+صفحة+المشرفين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض صفحة المشرفين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -72,7 +72,7 @@ try {
 // ══════════════════════════════════════════════════════════════════════════════
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     if (!$can_delete) {
-        header("Location: project_users.php?msg=لا+توجد+صلاحية+حذف+المستخدمين+❌");
+        ems_gov_flash_redirect('project_users.php', 'لا توجد صلاحية حذف المستخدمين ❌', 'GOV-PERM-403', '');
         exit();
     }
     $deleteId = intval($_GET['delete']);
@@ -103,14 +103,14 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
             $pu_del_ok = true;
         } catch (\Throwable $t) { error_log('project_users.php delete: ' . $t->getMessage()); }
         if ($pu_del_ok) {
-            header("Location: project_users.php?msg=تم+حذف+المستخدم+بنجاح+✅");
+            ems_gov_flash_redirect('project_users.php', 'تم حذف المستخدم بنجاح ✅', 'GOV-OK-200', '');
             exit;
         } else {
-            header("Location: project_users.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+            ems_gov_flash_redirect('project_users.php', 'حدث خطأ أثناء الحذف ❌', 'GOV-FAIL-409', '');
             exit;
         }
     } else {
-        header("Location: project_users.php?msg=ليس+لديك+صلاحية+لحذف+هذا+المستخدم+❌");
+        ems_gov_flash_redirect('project_users.php', 'ليس لديك صلاحية لحذف هذا المستخدم ❌', 'GOV-PERM-403', '');
         exit;
     }
 }
@@ -120,7 +120,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit') {
     if (!$can_edit) {
-        header("Location: project_users.php?msg=لا+توجد+صلاحية+تعديل+المستخدمين+❌");
+        ems_gov_flash_redirect('project_users.php', 'لا توجد صلاحية تعديل المستخدمين ❌', 'GOV-PERM-403', '');
         exit();
     }
     $userId = intval($_POST['user_id']);
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'whereRaw' => "(status = '1' OR status = 1)"));
     } catch (\Throwable $t) { error_log('project_users.php role check: ' . $t->getMessage()); }
     if ($pu_role_ok === null) {
-        header("Location: project_users.php?msg=صلاحية+غير+مسموحة+❌");
+        ems_gov_flash_redirect('project_users.php', 'صلاحية غير مسموحة ❌', 'GOV-PERM-403', '');
         exit;
     }
     $userid = $_SESSION['user']['id'];
@@ -159,14 +159,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } catch (\Throwable $t) { error_log('project_users.php edit verify: ' . $t->getMessage()); }
 
     if (empty($verifyResult)) {
-        header("Location: project_users.php?msg=ليس+لديك+صلاحية+لتعديل+هذا+المستخدم+❌");
+        ems_gov_flash_redirect('project_users.php', 'ليس لديك صلاحية لتعديل هذا المستخدم ❌', 'GOV-PERM-403', '');
         exit;
     }
 
     // 🔗 ربط الموظف (إلزامي) عند التعديل
     $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
     if ($users_has_employee_id && $employee_link_id <= 0) {
-        header("Location: project_users.php?msg=يجب+إسناد+موظف+لهذا+الحساب+❌");
+        ems_gov_flash_redirect('project_users.php', 'يجب إسناد موظف لهذا الحساب ❌', 'GOV-FAIL-409', '');
         exit;
     }
     if ($employee_link_id > 0) {
@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'whereRaw' => 'id != ' . intval($userId) . ' AND COALESCE(is_deleted,0)=0'));
         } catch (\Throwable $t) { error_log('project_users.php employee check: ' . $t->getMessage()); }
         if ($pu_emp_ok === null || $pu_linked !== null) {
-            header("Location: project_users.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌");
+            ems_gov_flash_redirect('project_users.php', 'الموظف غير صالح أو مرتبط بحساب آخر ❌', 'GOV-FAIL-409', '');
             exit;
         }
     }
@@ -192,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } catch (\Throwable $t) { error_log('project_users.php dup check: ' . $t->getMessage()); }
 
     if ($pu_dup !== null) {
-        header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
+        ems_gov_flash_redirect('project_users.php', 'اسم المستخدم موجود مسبقاً ❌', 'GOV-FAIL-409', '');
         exit;
     }
 
@@ -210,10 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     catch (\Throwable $t) { error_log('project_users.php update: ' . $t->getMessage()); }
 
     if ($pu_upd_ok) {
-        header("Location: project_users.php?msg=تم+تعديل+المستخدم+بنجاح+✅");
+        ems_gov_flash_redirect('project_users.php', 'تم تعديل المستخدم بنجاح ✅', 'GOV-OK-200', '');
         exit;
     } else {
-        header("Location: project_users.php?msg=حدث+خطأ+أثناء+التعديل+❌");
+        ems_gov_flash_redirect('project_users.php', 'حدث خطأ أثناء التعديل ❌', 'GOV-FAIL-409', '');
         exit;
     }
 }
@@ -223,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($_POST['action']) || $_POST['action'] === 'add')) {
     if (!$can_add) {
-        header("Location: project_users.php?msg=لا+توجد+صلاحية+إضافة+مستخدمين+جدد+❌");
+        ems_gov_flash_redirect('project_users.php', 'لا توجد صلاحية إضافة مستخدمين جدد ❌', 'GOV-PERM-403', '');
         exit();
     }
     $name = trim($_POST['name']);
@@ -243,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
             'whereRaw' => "(status = '1' OR status = 1)"));
     } catch (\Throwable $t) { error_log('project_users.php add role check: ' . $t->getMessage()); }
     if ($pu_role_ok === null) {
-        header("Location: project_users.php?msg=صلاحية+غير+مسموحة+❌");
+        ems_gov_flash_redirect('project_users.php', 'صلاحية غير مسموحة ❌', 'GOV-PERM-403', '');
         exit;
     }
     $project = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
@@ -252,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     // 🔗 ربط الموظف (إلزامي): لا يوجد حساب معاون يعمل بلا موظف مُسنَد.
     $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
     if ($users_has_employee_id && $employee_link_id <= 0) {
-        header("Location: project_users.php?msg=يجب+إسناد+موظف+لهذا+الحساب+❌");
+        ems_gov_flash_redirect('project_users.php', 'يجب إسناد موظف لهذا الحساب ❌', 'GOV-FAIL-409', '');
         exit;
     }
     if ($employee_link_id > 0) {
@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
                 'whereRaw' => 'COALESCE(is_deleted,0)=0'));
         } catch (\Throwable $t) { error_log('project_users.php add employee check: ' . $t->getMessage()); }
         if ($pu_emp_ok === null || $pu_linked !== null) {
-            header("Location: project_users.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌");
+            ems_gov_flash_redirect('project_users.php', 'الموظف غير صالح أو مرتبط بحساب آخر ❌', 'GOV-FAIL-409', '');
             exit;
         }
     }
@@ -277,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     } catch (\Throwable $t) { error_log('project_users.php add dup check: ' . $t->getMessage()); }
 
     if ($pu_dup !== null) {
-        header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
+        ems_gov_flash_redirect('project_users.php', 'اسم المستخدم موجود مسبقاً ❌', 'GOV-FAIL-409', '');
         exit;
     }
 
@@ -294,10 +294,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     } catch (\Throwable $t) { error_log('project_users.php insert: ' . $t->getMessage()); }
 
     if ($pu_ins_ok) {
-        header("Location: project_users.php?msg=تم+إضافة+المستخدم+بنجاح+✅");
+        ems_gov_flash_redirect('project_users.php', 'تم إضافة المستخدم بنجاح ✅', 'GOV-OK-200', '');
         exit;
     } else {
-        header("Location: project_users.php?msg=حدث+خطأ+أثناء+الإضافة+❌");
+        ems_gov_flash_redirect('project_users.php', 'حدث خطأ أثناء الإضافة ❌', 'GOV-FAIL-409', '');
         exit;
     }
 }
@@ -324,6 +324,9 @@ if ($users_has_employee_id) {
 }
 
 $page_title = "إيكوبيشن | المشرفون";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

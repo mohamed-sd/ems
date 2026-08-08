@@ -13,11 +13,11 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/bank_reconciliation_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المطابقة+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المطابقة ❌', 'GOV-PERM-403', ''); exit(); }
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $sel_acct = isset($_GET['acct']) ? intval($_GET['acct']) : 0;
 
@@ -35,7 +35,7 @@ $h13_gate = fin_gate($is_super_admin);
 $h13_stmt = isset($_GET['stmt']) ? intval($_GET['stmt']) : 0;
 $h13_redirect = function ($msg, $stmt = 0) {
     $q = $stmt > 0 ? ('&stmt=' . $stmt) : '';
-    header("Location: bank_reconciliation_fin.php?msg=" . rawurlencode($msg) . $q);
+    ems_gov_flash_redirect(ems_flash_to('bank_reconciliation_fin.php', $q), $msg, 'GOV-INFO-200', '');
     exit();
 };
 
@@ -111,8 +111,8 @@ $h13_head  = $h13_stmt > 0 ? BRS::statementOf($h13_gate, $h13_stmt) : null;
 
 // ── مطابقة آلية بالمبلغ والاتجاه (CSRF) ──
 if (isset($_GET['automatch']) && $sel_acct > 0) {
-    if (!$can_edit) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!$can_edit) { ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=رمز+الحماية+غير+صالح+❌"); exit(); }
     // المطابقة الآلية: قراءتان معزولتان (بنود غير مطابَقة + مدفوعات مرشَّحة) تُدمجان
     // في PHP بدل NOT EXISTS مزدوج النطاق — كل قراءة عبر البوابة، وكل زوجٍ مطابَق ذرّي §9.
     $g = fin_gate($is_super_admin);
@@ -149,12 +149,12 @@ if (isset($_GET['automatch']) && $sel_acct > 0) {
             break;
         }
     }
-    header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تمت+مطابقة+$matched+بند+آليًا+✅"); exit();
+    ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تمت+مطابقة+$matched+بند+آليًا+✅"); exit();
 }
 
 // ── إلغاء مطابقة بند ──
 if (isset($_GET['unmatch_line'])) {
-    if (!$can_edit) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
     $lid = intval($_GET['unmatch_line']);
     $g = fin_gate($is_super_admin);
     $lineRow = $g->selectOne('fin_bank_statement_lines', array('columns' => array('matched_payment_id'), 'where' => array('id' => $lid)));
@@ -163,42 +163,42 @@ if (isset($_GET['unmatch_line'])) {
         $gate->update('fin_bank_statement_lines', array('matched_payment_id' => null, 'reconciled' => 0), array('id' => $lid));
         if ($pid > 0) { $gate->update('fin_payments', array('state' => 'executed'), array('id' => $pid), "state='reconciled'"); }
     }, 'bank recon: unmatch line');
-    header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تم+إلغاء+المطابقة+✅"); exit();
+    ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تم+إلغاء+المطابقة+✅"); exit();
 }
 
 // ── حفظ حساب بنكي ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bank_name'])) {
-    if (!$can_add) { header("Location: bank_reconciliation_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('bank_reconciliation_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $name = trim($_POST['acct_name'] ?? ''); $bank = trim($_POST['bank_name'] ?? '');
     $accno = trim($_POST['account_number'] ?? ''); $open = round(floatval($_POST['opening_balance'] ?? 0), 2);
-    if ($name === '') { header("Location: bank_reconciliation_fin.php?msg=اسم+الحساب+مطلوب+❌"); exit(); }
+    if ($name === '') { ems_gov_flash_redirect('bank_reconciliation_fin.php', 'اسم الحساب مطلوب ❌', 'GOV-FAIL-409', ''); exit(); }
     fin_gate($is_super_admin)->insert('fin_bank_accounts', array(
         'name' => $name, 'bank_name' => $bank, 'account_number' => $accno,
         'opening_balance' => $open, 'created_by' => $current_user_id,
     ));
-    header("Location: bank_reconciliation_fin.php?msg=تمت+إضافة+الحساب+البنكي+✅"); exit();
+    ems_gov_flash_redirect('bank_reconciliation_fin.php', 'تمت إضافة الحساب البنكي ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ بند كشف ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
-    if (!$can_add) { header("Location: bank_reconciliation_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('bank_reconciliation_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $ba = intval($_POST['bank_account_id'] ?? 0);
     $dir = ($_POST['direction'] ?? '') === 'withdrawal' ? 'withdrawal' : 'deposit';
     $date = trim($_POST['txn_date'] ?? '') ?: date('Y-m-d');
     $desc = trim($_POST['description'] ?? '');
     $amt = round(floatval($_POST['amount'] ?? 0), 2);
-    if ($ba <= 0 || $amt <= 0) { header("Location: bank_reconciliation_fin.php?acct=$ba&msg=بيانات+البند+غير+صحيحة+❌"); exit(); }
+    if ($ba <= 0 || $amt <= 0) { ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$ba&msg=بيانات+البند+غير+صحيحة+❌"); exit(); }
     fin_gate($is_super_admin)->insert('fin_bank_statement_lines', array(
         'bank_account_id' => $ba, 'txn_date' => $date, 'description' => $desc,
         'direction' => $dir, 'amount' => $amt, 'created_by' => $current_user_id,
     ));
-    header("Location: bank_reconciliation_fin.php?acct=$ba&msg=تمت+إضافة+البند+✅"); exit();
+    ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$ba&msg=تمت+إضافة+البند+✅"); exit();
 }
 
 if (isset($_GET['del_acct'])) {
-    if (!$can_delete) { header("Location: bank_reconciliation_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('bank_reconciliation_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     fin_gate($is_super_admin)->softDelete('fin_bank_accounts', intval($_GET['del_acct']));
-    header("Location: bank_reconciliation_fin.php?msg=تم+حذف+الحساب+✅"); exit();
+    ems_gov_flash_redirect('bank_reconciliation_fin.php', 'تم حذف الحساب ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ملخّص المطابقة للحساب المختار
@@ -230,6 +230,9 @@ if ($sel_acct > 0) {
 }
 
 $page_title = 'إيكوبيشن | المطابقة البنكية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

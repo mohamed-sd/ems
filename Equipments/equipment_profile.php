@@ -15,13 +15,13 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header('Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌');
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $equipment_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($equipment_id <= 0) {
-    header('Location: equipments.php?msg=معرف+المعدة+غير+صحيح+❌');
+    ems_gov_flash_redirect('equipments.php', 'معرف المعدة غير صحيح ❌', 'GOV-REF-404', '');
     exit();
 }
 
@@ -46,7 +46,7 @@ try {
 } catch (\Throwable $t) { error_log('equipment_profile card: ' . $t->getMessage()); }
 
 if (!$equipment) {
-    header('Location: equipments.php?msg=المعدة+غير+موجودة+او+خارج+نطاق+الشركة+❌');
+    ems_gov_flash_redirect('equipments.php', 'المعدة غير موجودة او خارج نطاق الشركة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -425,6 +425,9 @@ foreach ($compliance_rows as $cr) {
 $ee = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
 
 $page_title = 'إيكوبيشن | بطاقة المعدة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -61,7 +61,11 @@ WHERE 1=1$drv_filter AND {TENANT_SCOPE} GROUP BY d.name, p.name, e.name, t.date 
 </head>
 <body>
 
-<?php include('../insidebar.php'); ?>
+<?php 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include('../insidebar.php'); ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
 <div class="main reports-main driver-report-main">

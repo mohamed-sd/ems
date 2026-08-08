@@ -24,7 +24,7 @@ $ec_can_edit = $is_super_admin ? true : !empty($pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['employee_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
   $__pid = isset($_POST['id']) ? intval($_POST['id']) : 0;
   if (($__pid === 0 && !$ec_can_add) || ($__pid > 0 && !$ec_can_edit)) {
-    header('Location: employee_contracts.php?id=' . intval($_POST['employee_id']) . '&msg=' . urlencode('لا توجد صلاحية لهذا الإجراء ❌'));
+    ems_gov_redirect('Location: employee_contracts.php?id=' . intval($_POST['employee_id']) . '&msg=' . urlencode('لا توجد صلاحية لهذا الإجراء ❌'));
     exit;
   }
 }
@@ -71,7 +71,11 @@ if ($driver_owned === null) {
 
 <body class="ems-site">
 
-  <?php include('../insidebar.php'); ?>
+  <?php 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
+include('../insidebar.php'); ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
   <div class="main driver-contracts-main ems-unified-page-shell">

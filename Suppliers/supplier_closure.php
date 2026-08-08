@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Suppliers/supplier_closure.php — تصفيةُ إنهاء عقد المورد (M-18)
  * ───────────────────────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -49,12 +50,12 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+تصفية+العقود+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض تصفية العقود ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier closure super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: supplier_closure.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('supplier_closure.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = strval($_POST['cl_action'] ?? '');
@@ -103,6 +104,9 @@ try {
 } catch (\Throwable $t) { $endedContracts = array(); }
 
 $page_title = 'إيكوبيشن | تصفية إنهاء عقد المورد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -28,7 +28,7 @@ $company_id      = isset($_SESSION['user']['company_id']) ? intval($_SESSION['us
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -38,7 +38,7 @@ $can_add    = $is_super_admin ? true : $page_permissions['can_add'];
 $can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
 $can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+أوامر+الصيانة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض أوامر الصيانة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -162,8 +162,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
 // إنشاء أمر جديد (يُحفظ فقط عند إرسال الفورم — لا سجلّ فارغ عند فتح الفورم) ← يفتح صفحة التحرير
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_order') {
-    if (!$can_add) { header("Location: orders.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: orders.php?msg=لا+يمكن+الإنشاء+بلا+شركة+صالحة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('orders.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('orders.php', 'لا يمكن الإنشاء بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $equipment_id = !empty($_POST['equipment_id']) ? intval($_POST['equipment_id']) : null;
     $project_id   = !empty($_POST['project_id']) ? intval($_POST['project_id']) : null;
@@ -177,17 +177,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_o
         'code' => $code, 'equipment_id' => $equipment_id, 'project_id' => $project_id, 'source' => $source,
         'maint_type' => $maint_type, 'priority' => $priority, 'cost_party' => $cost_party,
         'state' => 'بلاغ', 'created_by' => $current_user_id));
-    header("Location: orders.php?id=" . intval($new_id) . "&msg=تم+إنشاء+أمر+صيانة+✅"); exit();
+    ems_gov_redirect("Location: orders.php?id=" . intval($new_id) . "&msg=تم+إنشاء+أمر+صيانة+✅"); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // حفظ رأس الأمر + تطبيق منطق الحالة
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_order') {
-    if (!$can_edit) { header("Location: orders.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('orders.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
     $oid = intval($_POST['id'] ?? 0);
     $order = mnt_fetch_order($conn, $oid, $company_id, $is_super_admin);
-    if (!$order) { header("Location: orders.php?msg=الأمر+غير+موجود+❌"); exit(); }
+    if (!$order) { ems_gov_flash_redirect('orders.php', 'الأمر غير موجود ❌', 'GOV-REF-404', ''); exit(); }
 
     $equipment_id  = !empty($_POST['equipment_id']) ? intval($_POST['equipment_id']) : null;
     $project_id    = !empty($_POST['project_id']) ? intval($_POST['project_id']) : null;
@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         $pg = ems_permit_gate($conn, $company_id, 'technician_site_entry',
             'TECH:' . $technician_id, $pg_site, intval($current_user_id ?? 0));
         if (!$pg['ok']) {
-            header("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode($pg['reason'] . ' ❌'));
+            ems_gov_redirect("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode($pg['reason'] . ' ❌'));
             exit();
         }
     }
@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     // منع إعادة فتح أمر مُغلق أو ملغى إلى حالة نشطة (سلامة آلة الحالة)
     if (in_array($order['state'], array('إغلاق', 'ملغى'), true)
         && in_array($requested_state, $active_states, true)) {
-        header("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('لا يمكن إعادة فتح أمر مُغلق أو ملغى ❌'));
+        ems_gov_redirect("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('لا يمكن إعادة فتح أمر مُغلق أو ملغى ❌'));
         exit();
     }
 
@@ -234,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         // عبر البوابة: العزل بالشركة يُحقن؛ صفر معدة بـNULL فالعزل الصارم مطابق
         $eq_ok = ems_tenant_db()->count('equipments', array('where' => array('id' => $equipment_id))) > 0;
         if (!$eq_ok) {
-            header("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('المعدة المختارة لا تتبع شركتك ❌'));
+            ems_gov_redirect("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('المعدة المختارة لا تتبع شركتك ❌'));
             exit();
         }
     }
@@ -369,7 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     } else {
         $msg = 'تم+حفظ+الأمر+بنجاح+✅';
     }
-    header("Location: orders.php?id=" . intval($oid) . "&msg=" . $msg); exit();
+    ems_gov_redirect("Location: orders.php?id=" . intval($oid) . "&msg=" . $msg); exit();
 }
 
 // ── أسطر العمالة/القطع: مسار احتياطي بلا JS (POST عادي يُعيد التوجيه) ──
@@ -416,10 +416,10 @@ if (isset($_GET['del_part'], $_GET['order_id']) && $can_edit) {
 
 // ── حذف ناعم لأمر ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: orders.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('orders.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $did = intval($_GET['delete_id']);
     ems_tenant_db()->softDelete('mnt_order', $did); // حذف ناعم معزول بالشركة تلقائيًّا
-    header("Location: orders.php?msg=تم+حذف+الأمر+✅"); exit();
+    ems_gov_flash_redirect('orders.php', 'تم حذف الأمر ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -479,6 +479,9 @@ $edit_eq_options = $order
     : array();
 
 $page_title = 'إيكوبيشن | أوامر الصيانة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -888,12 +891,32 @@ function mnt_state_class($st) {
         </div></div>
     </form>
     <?php endif; ?>
+    <?php
+    /* UI-07 (UXR-01 §٤-٤): «صفرُ رقمٍ بلا السبعة» — عنوانٌ · قيمةٌ · وحدةٌ ·
+       فترةٌ · مقارنةٌ · حالةٌ · تعمّق. كانت البطاقاتُ الأربعُ تحمل عنوانًا وقيمةً
+       فقط، فالرقمُ بلا مقامٍ ولا زمنٍ ولا بابٍ يُفتح منه. العقدُ هنا مُصرَّحٌ
+       صفًّا صفًّا، والمقارنةُ تُعلَن «غيرَ معلَنةٍ» صراحةً بدلَ إيهامِ وجودها. */
+    $mnt_scope = 'كلُّ الأوامرِ في نطاقِ شركتك';
+    $mnt_kpis = array(
+        array('إجمالي الأوامر', (string) $stats['total'], 'أمر', 'fa-wrench', '', '?status='),
+        array('أوامر مفتوحة', (string) $stats['open'], 'أمر', 'fa-spinner', 'ems-kpi-warn', '?status=open'),
+        array('أوامر مغلقة', (string) $stats['closed'], 'أمر', 'fa-check-circle', 'ems-kpi-ok', '?status=closed'),
+        array('إجمالي التكلفة', number_format($stats['cost'], 0), 'جنيه', 'fa-sack-dollar', '', '?status='),
+    );
+    ?>
     <div class="stats-section" id="ordersStats">
         <div class="stats-grid">
-            <div class="stats-card stats-primary"><div class="stats-icon"><i class="fas fa-wrench"></i></div><div class="stats-title">إجمالي الأوامر</div><div class="stats-value"><?php echo $stats['total']; ?></div></div>
-            <div class="stats-card stats-orange"><div class="stats-icon"><i class="fas fa-spinner"></i></div><div class="stats-title">أوامر مفتوحة</div><div class="stats-value"><?php echo $stats['open']; ?></div></div>
-            <div class="stats-card stats-success"><div class="stats-icon"><i class="fas fa-check-circle"></i></div><div class="stats-title">أوامر مغلقة</div><div class="stats-value"><?php echo $stats['closed']; ?></div></div>
-            <div class="stats-card stats-purple"><div class="stats-icon"><i class="fas fa-sack-dollar"></i></div><div class="stats-title">إجمالي التكلفة</div><div class="stats-value"><?php echo number_format($stats['cost'], 0); ?></div></div>
+            <?php foreach ($mnt_kpis as $k): ?>
+            <a class="ems-kpi-card <?php echo $k[4]; ?>" href="<?php echo htmlspecialchars($k[5], ENT_QUOTES, 'UTF-8'); ?>"
+               title="تعمّق: <?php echo htmlspecialchars($k[0], ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="ems-kpi-title"><i class="fas <?php echo $k[3]; ?>"></i>
+                    <?php echo htmlspecialchars($k[0], ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="ems-kpi-value"><?php echo htmlspecialchars($k[1], ENT_QUOTES, 'UTF-8'); ?>
+                    <small><?php echo htmlspecialchars($k[2], ENT_QUOTES, 'UTF-8'); ?></small></div>
+                <div class="ems-kpi-meta"><span>لحظي (<?php echo ems_fmt_now(); ?>)</span><span>بلا مقارنة معلنة</span></div>
+                <div class="ems-kpi-meta"><span><?php echo htmlspecialchars($mnt_scope, ENT_QUOTES, 'UTF-8'); ?></span></div>
+            </a>
+            <?php endforeach; ?>
         </div>
     </div>
 

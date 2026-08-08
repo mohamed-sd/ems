@@ -23,7 +23,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -31,7 +31,7 @@ $perms = proc_page_perms($conn, 'Procurement/issue_proc.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الصرف+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الصرف ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -54,9 +54,9 @@ unset($mor);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: issue_proc.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: issue_proc.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: issue_proc.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('issue_proc.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('issue_proc.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('issue_proc.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $warehouse_id = ($_POST['warehouse_id'] ?? '') !== '' ? intval($_POST['warehouse_id']) : null;
     $holder_name = trim($_POST['holder_name'] ?? '');
@@ -71,9 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     $notes = trim($_POST['notes'] ?? '');
 
     // قاعدة §15.8: لا صرف بلا مستلِم وبُعد تحميلٍ واحدٍ على الأقل
-    if ($holder_name === '') { header("Location: issue_proc.php?msg=المستلِم+إلزامي+❌"); exit(); }
+    if ($holder_name === '') { ems_gov_flash_redirect('issue_proc.php', 'المستلِم إلزامي ❌', 'GOV-FAIL-409', ''); exit(); }
     if ($equipment_id === null && $project_id === null && $maintenance_order_id === null) {
-        header("Location: issue_proc.php?msg=لا+صرف+بلا+بُعد+تحميل+(معدة/مشروع/أمر)+❌"); exit();
+        ems_gov_flash_redirect('issue_proc.php', 'لا صرف بلا بُعد تحميل (معدة/مشروع/أمر) ❌', 'GOV-FAIL-409', ''); exit();
     }
     if ($maint_type !== '' && !in_array($maint_type, $maint_types, true)) { $maint_type = ''; }
     if (!in_array($state, $states, true)) { $state = 'مسودة'; }
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     $pg_site = $project_id !== null ? ems_default_site_of_project($conn, $company_id, $project_id) : 0;
     $pg = ems_permit_gate($conn, $company_id, 'material_site_exit',
         'ISSUE:' . ($id > 0 ? $id : 'new'), $pg_site, intval($current_user_id ?? 0));
-    if (!$pg['ok']) { header('Location: issue_proc.php?msg=' . rawurlencode($pg['reason'] . ' ❌')); exit(); }
+    if (!$pg['ok']) { ems_gov_flash_redirect('issue_proc.php', $pg['reason'] . ' ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $parent = array(
         'warehouse_id' => $warehouse_id, 'holder_name' => $holder_name, 'issue_date' => $issue_date,
@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
         }, 'issue save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
         error_log('issue_proc save rolled back: ' . $e->getMessage());
-        header("Location: issue_proc.php?msg=تعذّر+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('issue_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
     // ① أثرُ الصرف المالي على أبعاده (معدة/مشروع/أمر) — من منبعه بعطالته.
     // لا يرمي: الصرفُ حقيقةٌ تشغيليةٌ لا تُفقد لتعثّرِ نشرٍ مالي.
@@ -201,12 +201,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     }
     $_SESSION['proc_shortage_flash'] = array('issue_ref' => 'ISS#' . intval($issue_saved_id ?? 0),
         'items' => $shortages);
-    header("Location: issue_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الصرف+بنجاح+✅' : 'تم+الصرف+بنجاح+✅')); exit();
+    ems_gov_redirect("Location: issue_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الصرف+بنجاح+✅' : 'تم+الصرف+بنجاح+✅')); exit();
 }
 
 // ── حذف ناعم (يبطل الرأس؛ الحركات/العهدة تبقى للأثر ما لم يُعاد الحفظ) ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: issue_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('issue_proc.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         proc_gate(false)->runInTransaction(function ($g) use ($delete_id) {
@@ -219,7 +219,7 @@ if (isset($_GET['delete_id'])) {
     } catch (\Throwable $e) {
         error_log('issue_proc delete rolled back: ' . $e->getMessage());
     }
-    header("Location: issue_proc.php?msg=تم+حذف+الصرف+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('issue_proc.php', 'تم حذف الصرف بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── تحميل للتعديل ──
@@ -235,6 +235,9 @@ if (isset($_GET['edit_id']) && $can_edit) {
 }
 
 $page_title = 'إيكوبيشن | صرف المخزون والعهدة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

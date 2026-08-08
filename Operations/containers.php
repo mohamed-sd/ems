@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Operations/containers.php — حاوياتُ العقود (H-01 المرحلة ② · OPM-01 §4)
  * ═══════════════════════════════════════════════════════════════════════════
@@ -34,7 +35,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 $uid        = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super && $company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة')); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة', 'GOV-INFO-200', ''); exit();
 }
 
 // ── صلاحيةٌ صارمة: الوحدةُ بكودها، وغيابُها منعٌ لا إذن ─────────────────────
@@ -55,7 +56,7 @@ else {
     $st->close();
 }
 if (!$can_view) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('لا توجد صلاحية عرض حاويات العقود ❌')); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض حاويات العقود ❌', 'GOV-PERM-403', ''); exit();
 }
 
 $gate = ems_tenant_db();
@@ -70,7 +71,7 @@ function cnt_csrf_ok() {
 }
 $contract = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 function cnt_back($msg, $c) {
-    header('Location: containers.php?contract=' . intval($c) . '&msg=' . rawurlencode($msg)); exit();
+    ems_gov_redirect('Location: containers.php?contract=' . intval($c) . '&msg=' . rawurlencode($msg)); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -195,6 +196,9 @@ $ROLES = array('مورد' => array(), 'معدة' => array('أساسية', 'اح�
                'مشغّل' => array('أساسي', 'بديل أول', 'بديل ثانٍ', 'مشترك'));
 
 $page_title = 'إيكوبيشن | حاويات العقود';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

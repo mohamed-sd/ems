@@ -86,14 +86,14 @@ $can_delete = $page_permissions['can_delete'];
 
 // منع الوصول إذا لم تكن صلاحية عرض
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المعدات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المعدات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 // معالجة حذف المعدة
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) {
-        header("Location: equipments_fleet.php?msg=لا+توجد+صلاحية+حذف+المعدات+❌");
+        ems_gov_flash_redirect('equipments_fleet.php', 'لا توجد صلاحية حذف المعدات ❌', 'GOV-PERM-403', '');
         exit();
     }
     $delete_id = intval($_GET['delete_id']);
@@ -108,7 +108,7 @@ if (isset($_GET['delete_id'])) {
     } catch (\Throwable $e) { /* سياق ناقص → يُعامل كصفر ويحسمه فحص الملكية أدناه */ }
 
     if ($ops_count > 0) {
-        header("Location: equipments_fleet.php?msg=لا+يمكن+حذف+المعدة+لأنها+بصدد+التشغيل+حالياً+❌");
+        ems_gov_flash_redirect('equipments_fleet.php', 'لا يمكن حذف المعدة لأنها بصدد التشغيل حالياً ❌', 'GOV-FAIL-409', '');
         exit();
     }
 
@@ -120,14 +120,14 @@ if (isset($_GET['delete_id'])) {
             'where'   => array('id' => $delete_id),
         ));
         if ($del_row === null) {
-            header("Location: equipments_fleet.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+            ems_gov_flash_redirect('equipments_fleet.php', 'حدث خطأ أثناء الحذف ❌', 'GOV-FAIL-409', '');
             exit();
         }
         $fleet_gate->deleteChild('equipments', $delete_id, 'suppliers', intval($del_row['suppliers']), 'suppliers', 'fleet hard delete');
-        header("Location: equipments_fleet.php?msg=تم+حذف+المعدة+بنجاح+✅");
+        ems_gov_flash_redirect('equipments_fleet.php', 'تم حذف المعدة بنجاح ✅', 'GOV-OK-200', '');
         exit();
     } catch (\Throwable $e) {
-        header("Location: equipments_fleet.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+        ems_gov_flash_redirect('equipments_fleet.php', 'حدث خطأ أثناء الحذف ❌', 'GOV-FAIL-409', '');
         exit();
     }
 }
@@ -196,6 +196,9 @@ if ($selected_project_id > 0) {
 // (أُزيل استعلام قائمة المشاريع الميت — نتيجته لا تُقرأ في أي موضع.)
 
 $page_title = "المعدات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -364,7 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         if (function_exists('ems_save_equipment_card_fields')) {
             ems_save_equipment_card_fields($conn, $card_eq_id, ($edit_id <= 0), $card_scope);
         }
-        header("Location: equipments_fleet.php?msg=$msg");
+        ems_gov_flash_redirect('equipments_fleet.php', "$msg", 'GOV-INFO-200', '');
         exit;
     } catch (\Throwable $e) {
         $success_msg = "خطأ في الحفظ: " . $e->getMessage();

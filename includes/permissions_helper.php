@@ -11,6 +11,120 @@
 // 🔒 التحقق من صلاحية محددة
 // ════════════════════════════════════════════════════════════════════════════
 
+if (!function_exists('ems_flash_to')) {
+    /**
+     * UI-13: يبني وجهةَ تحويلٍ نظيفةً بعد نزعِ الرسالةِ من الرابط.
+     * الوجهةُ الأصليةُ كانت «X?msg=…&a=1» فبقيتْ لواحقُها تبدأ بـ«&» — وهذه
+     * تصير أولَ معاملٍ فتُقلَب إلى «?». وإن كانت اللاحقةُ فارغةً رجعتِ الوجهةُ
+     * وحدَها. تُستدعى من المُرحِّل الآليِّ ومن الشيفرةِ اليدويةِ سواء.
+     *
+     * @param string $base  الوجهةُ بلا معاملات (أو بمعاملاتٍ سابقة)
+     * @param string $extra اللاحقةُ كما كانت («&a=1» أو «?a=1» أو '')
+     * @return string وجهةٌ صالحةٌ بلا رسالة
+     */
+    function ems_flash_to($base, $extra = '')
+    {
+        $b = (string) $base;
+        $e = (string) $extra;
+        if ($e === '') { return $b; }
+        $e = ltrim($e, '&?');
+        if ($e === '') { return $b; }
+        return $b . (strpos($b, '?') === false ? '?' : '&') . $e;
+    }
+}
+
+if (!function_exists('ems_gov_msg_code')) {
+    /**
+     * UI-13: رمزُ الرسالةِ يُشتق من نصِّها — واللونُ في الحاملِ يتبع الرمزَ لا
+     * النصَّ، فالمستخدمُ يقرأ الحكمَ قبل أن يقرأ الحرف. مصدرٌ واحدٌ للاشتقاق
+     * يستعمله الحاملُ والمُرحِّلاتُ وأدواتُ التدقيق.
+     */
+    function ems_gov_msg_code($m)
+    {
+        $m = (string) $m;
+        if ($m === '') { return 'GOV-INFO-200'; }
+        if (mb_strpos($m, '✅') !== false || mb_strpos($m, 'تمّ') !== false
+            || mb_strpos($m, 'تم ') !== false || mb_strpos($m, 'حُفظ') !== false) { return 'GOV-OK-200'; }
+        if (mb_strpos($m, 'صلاحي') !== false || mb_strpos($m, 'مصرح') !== false
+            || mb_strpos($m, 'مصرّح') !== false) { return 'GOV-PERM-403'; }
+        if (mb_strpos($m, 'نطاق') !== false || mb_strpos($m, 'بيئة شركة') !== false) { return 'GOV-SCOPE-403'; }
+        if (mb_strpos($m, 'غير موجود') !== false || mb_strpos($m, 'غير صحيح') !== false
+            || mb_strpos($m, 'لم يُعثر') !== false) { return 'GOV-REF-404'; }
+        if (mb_strpos($m, 'تعذّر') !== false || mb_strpos($m, 'تعذر') !== false
+            || mb_strpos($m, 'فشل') !== false || mb_strpos($m, 'خطأ') !== false
+            || mb_strpos($m, '❌') !== false) { return 'GOV-FAIL-409'; }
+        return 'GOV-INFO-200';
+    }
+}
+
+if (!function_exists('ems_gov_redirect')) {
+    /**
+     * UI-DEF-06 (المصبُّ الواحد): تحويلٌ ينزع الرسالةَ من الرابطِ وقتَ التنفيذ.
+     *
+     * لماذا هذا بدلَ جراحةِ التعبير: بقيةُ النداءاتِ الحيةِ تبني الوجهةَ بأشكالٍ
+     * لا يحكمها تفكيكٌ آمنٌ — شرطيّاتٌ داخلَ النصِّ ونصوصٌ مُقحَمةٌ ولواحقُ
+     * متغيّرة. فبدلَ أن يخمّن مُرحِّلٌ آليٌّ شكلَ التعبير، يمرُّ التعبيرُ كما هو
+     * على مصبٍّ واحدٍ يفصل msg عن بقيةِ المعاملات: الرسالةُ تذهب لحاملِ الشاشةِ
+     * برمزٍ مشتقٍّ، وبقيةُ المعاملاتِ تبقى في الوجهة. فلا يصل المتصفحَ msg أبدًا.
+     *
+     * @param string $location الوجهةُ كاملةً (بـ«Location: » أو بدونها)
+     */
+    function ems_gov_redirect($location)
+    {
+        $loc = preg_replace('~^\s*Location:\s*~i', '', (string) $location);
+        $hash = '';
+        if (($h = strpos($loc, '#')) !== false) { $hash = substr($loc, $h); $loc = substr($loc, 0, $h); }
+        $cut  = strpos($loc, '?');
+        $base = $cut === false ? $loc : substr($loc, 0, $cut);
+        $qs   = $cut === false ? '' : substr($loc, $cut + 1);
+        $msg  = '';
+        if ($qs !== '') {
+            $keep = array();
+            foreach (explode('&', $qs) as $kv) {
+                if ($kv === '') { continue; }
+                $p = explode('=', $kv, 2);
+                if (urldecode($p[0]) === 'msg') { $msg = isset($p[1]) ? urldecode($p[1]) : ''; continue; }
+                $keep[] = $kv;
+            }
+            $qs = implode('&', $keep);
+        }
+        $to = $base . ($qs !== '' ? '?' . $qs : '') . $hash;
+        $msg = trim($msg);
+        if ($msg !== '') { ems_gov_flash_redirect($to, $msg, ems_gov_msg_code($msg), ''); }
+        header('Location: ' . $to);
+        exit();
+    }
+}
+
+if (!function_exists('ems_absorb_url_msg')) {
+    /**
+     * UI-DEF-06 (الشقُّ المُستقبِل): أيُّ رسالةٍ وصلتْ في الرابطِ — من رابطٍ
+     * محفوظٍ أو مسارٍ لم يُرحَّل بعد — تُنقَل إلى حاملِ رسائلِ الشاشةِ وتُنزَع
+     * من $_GET، فلا تعرضها الكتلُ القديمةُ المتناثرةُ ولا تبقى في شريطِ العنوان.
+     * تُستدعى مرةً واحدةً عند تحميلِ هذا الملفِّ (يشمل كلَّ شاشةٍ حيةٍ عبر
+     * insidebar.php) — ولا تحذف شيفرةً قائمة، بل تُصيّرها خاملةً بلا ضرر.
+     */
+    function ems_absorb_url_msg()
+    {
+        if (PHP_SAPI === 'cli') { return; }
+        if (empty($_GET['msg']) || !is_scalar($_GET['msg'])) { return; }
+        $txt = trim((string) $_GET['msg']);
+        unset($_GET['msg'], $_REQUEST['msg']);
+        if ($txt === '' || session_status() !== PHP_SESSION_ACTIVE) { return; }
+        $code = 'GOV-INFO-200';
+        if (mb_strpos($txt, '✅') !== false) { $code = 'GOV-OK-200'; }
+        elseif (mb_strpos($txt, 'صلاحي') !== false) { $code = 'GOV-PERM-403'; }
+        elseif (mb_strpos($txt, '❌') !== false) { $code = 'GOV-FAIL-409'; }
+        if (!isset($_SESSION['ems_flash_gov']) || !is_array($_SESSION['ems_flash_gov'])) {
+            $_SESSION['ems_flash_gov'] = array();
+        }
+        $_SESSION['ems_flash_gov'][] = array(
+            'text' => $txt, 'code' => $code, 'hint' => '', 'at' => time(),
+        );
+    }
+    ems_absorb_url_msg();
+}
+
 if (!function_exists('ems_gov_flash_redirect')) {
     /**
      * UI-DEF-06 → UI-13: رسالةُ الحوكمة تُودَع الجلسةَ وتُعرض داخل الشاشة
@@ -640,8 +754,7 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         }
 
         if (!$has_reports_permission) {
-            ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض التقارير',
-                'GOV-RPT-403', 'اطلب منحة تقارير دورك من مدير الصلاحيات');
+            ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض التقارير', 'GOV-PERM-403', 'اطلب منحة تقارير دورك من مدير الصلاحيات');
         }
 
         return;
@@ -655,8 +768,7 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
     }
 
     if ($current['id'] !== null && !$current['can_view']) {
-        ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض هذه الصفحة',
-            'GOV-VIEW-403', 'اطلب منحة العرض من مدير الصلاحيات إن كانت ضمن عملك');
+        ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض هذه الصفحة', 'GOV-PERM-403', 'اطلب منحة العرض من مدير الصلاحيات إن كانت ضمن عملك');
     }
 }
 

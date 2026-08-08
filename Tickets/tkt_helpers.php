@@ -234,17 +234,17 @@ if (!function_exists('tkt_machine_conditions')) {
 
 if (!function_exists('tkt_next_ticket_no')) {
     /**
-     * رقم التذكرة بصيغة سنة-شهر-تسلسل (مثل 26-07-0001) — يُسنِده الخادم
-     * حصريًا عبر ServerId::nextNo (قفل صفٍّ ذرّي؛ بديلٌ آمنٌ عن COUNT+1
-     * المعرَّض للتسابق). المتتالية لكل شركة وسنة (متصلة عبر الأشهر، والشهر
-     * للعرض)، ويُستدعى داخل معاملة الإنشاء ليُمسَك القفل حتى إتمامها.
+     * رقم التذكرة بصيغة سنة-شهر-تسلسل (مثل 26-07-0001) — يفوّضه هذا الغلاف
+     * إلى TicketNumber، سلطةِ الترقيم الواحدة لكل كتّاب البلاغات.
+     *
+     * يُستدعى **خارج** معاملة الإنشاء لا بداخلها: التخصيص داخل المعاملة كان
+     * يجعل ارتدادَها يتراجع بالعدّاد، فتعلق الشاشة تطلب رقمًا محجوزًا أبدًا.
+     * التخصيصُ ذاتي الشفاء والفجوةُ عند الارتداد مقصودةٌ ومقبولة.
      */
     function tkt_next_ticket_no($conn, $company_id)
     {
-        $yy = date('y');
-        $mm = date('m');
-        $scope = 'tickets:c' . intval($company_id) . ':y' . $yy;
-        return \App\Core\ServerId::nextNo($conn, $scope, $yy . '-' . $mm, 4);
+        require_once dirname(__DIR__) . '/app/Services/Tickets/TicketNumber.php';
+        return \App\Services\Tickets\TicketNumber::allocateUnique($conn, $company_id);
     }
 }
 
@@ -404,28 +404,13 @@ if (!function_exists('tkt_match_sla_policy')) {
      */
     function tkt_match_sla_policy($ticket_type_id, $priority, $business_impact)
     {
-        $rows = tkt_gate(false)->select('ticket_sla_policies', array(
-            'where'   => array('active' => 1),
-            'orderBy' => 'id ASC',
-        ));
-        $best = null; $bestScore = -1;
-        foreach ($rows as $p) {
-            $score = 0;
-            if ($p['ticket_type_id'] !== null) {
-                if (intval($p['ticket_type_id']) !== intval($ticket_type_id)) { continue; }
-                $score += 4;
-            }
-            if ($p['priority'] !== null) {
-                if ((string)$p['priority'] !== (string)$priority) { continue; }
-                $score += 2;
-            }
-            if ($p['business_impact'] !== null) {
-                if ((string)$p['business_impact'] !== (string)$business_impact) { continue; }
-                $score += 1;
-            }
-            if ($score > $bestScore) { $bestScore = $score; $best = $p; }
-        }
-        return $best;
+        // القاعدة نفسها للجميع — التنفيذ في TicketSla ليبقى للمهلة مرجعٌ واحد
+        // تستعمله الشاشاتُ (عبر هذا الغلاف) والخدماتُ والكرون على السواء.
+        require_once dirname(__DIR__) . '/app/Services/Tickets/TicketSla.php';
+        global $conn;
+        $ctx = tkt_ctx();
+        return \App\Services\Tickets\TicketSla::match(
+            $conn, $ctx['company_id'], $ticket_type_id, $priority, $business_impact);
     }
 }
 
@@ -572,6 +557,11 @@ if (!function_exists('tkt_transitions')) {
     function tkt_transitions()
     {
         return array(
+            // التوجيه: المخرج الوحيد من الاستقبال إلى العمل. البلاغات القادمة
+            // من المسار البرمجي (الفتح السياقي · كسر الزجاج · التفتيش) تُولد
+            // في «جديدة»، وشاشة التصنيف تنقلها إلى «مصنّفة» — ولم يكن لأيٍّ
+            // منهما مخرجٌ إلى «محالة»، فكان البلاغ الميداني يُلغى ولا يُنجَز.
+            'route'    => array('from' => array('new', 'classified'), 'to' => 'routed', 'need' => 'edit', 'reason' => false, 'label' => 'توجيه للإدارة المختصة', 'icon' => 'fa-share',   'color' => '#0d6efd'),
             'start'    => array('from' => 'routed',      'to' => 'in_progress', 'need' => 'edit',   'reason' => false, 'label' => 'بدء التنفيذ',            'icon' => 'fa-play',           'color' => '#fd7e14'),
             'wait'     => array('from' => 'in_progress', 'to' => 'waiting',     'need' => 'edit',   'reason' => true,  'label' => 'تعليق (بانتظار جهة)',    'icon' => 'fa-hourglass-half', 'color' => '#b58900'),
             'follow'   => array('from' => 'waiting',     'to' => 'follow_up',   'need' => 'edit',   'reason' => false, 'label' => 'رفع المُعَوِّق (متابعة)', 'icon' => 'fa-rotate',         'color' => '#0dcaf0'),
@@ -581,6 +571,80 @@ if (!function_exists('tkt_transitions')) {
             'close'    => array('from' => 'done',        'to' => 'closed',      'need' => 'edit',   'reason' => false, 'label' => 'إغلاق التذكرة',          'icon' => 'fa-lock',           'color' => '#212529'),
             'reopen'   => array('from' => 'closed',      'to' => 'follow_up',   'need' => 'delete', 'reason' => true,  'label' => 'إعادة فتح',              'icon' => 'fa-lock-open',      'color' => '#6f42c1'),
         );
+    }
+}
+
+if (!function_exists('tkt_transition_allows')) {
+    /**
+     * هل يقبل هذا الانتقالُ المرحلةَ الحالية؟ الحقل `from` يقبل نصًّا واحدًا
+     * أو مصفوفةَ مراحل (التوجيه يخرج من «جديدة» و«مصنّفة» معًا).
+     */
+    function tkt_transition_allows(array $tr, $stage)
+    {
+        $from = $tr['from'];
+        return is_array($from) ? in_array((string) $stage, $from, true) : ((string) $stage === (string) $from);
+    }
+}
+
+if (!function_exists('tkt_sync_head_state')) {
+    /**
+     * مزامنة `head_state` مع الواقع — يُستدعى بعد كل انتقالٍ في دورة الحياة.
+     *
+     * للبلاغ نموذجا حالةٍ متعايشان: رأسٌ تقوده أزرارُ دورة الحياة (بلاغات
+     * الشاشة اليدوية، بلا مسارات)، ومساراتٌ متوازيةٌ يشتقّ منها
+     * TicketStateService الرأسَ (بلاغات المسار البرمجي). كان زرُّ الإغلاق
+     * يكتب `stage` وحده، فيبقى `head_state='open'` أبدًا ويظل البلاغ المغلق
+     * ظاهرًا في لوحة المسارات ومرشَّحًا في كاشف التكرار.
+     *
+     * القاعدة: ذو المسارات يشتقّ رأسه منها (الكاتب الأصلي يبقى سيّدًا)،
+     * وعديمُ المسارات يعكس رأسُه مرحلتَه مباشرةً.
+     */
+    function tkt_sync_head_state($gate, $ticket_id, $stage)
+    {
+        $ticket_id = intval($ticket_id);
+        $head = in_array((string) $stage, array('closed', 'cancelled'), true) ? 'closed' : 'open';
+
+        // ذو المسارات لا يُغلق رأسُه ومسارٌ إلزاميٌّ مفتوح — قاعدةُ نموذج
+        // المسارات نفسُها (423). حارسُ الإغلاق يمنع الوصول هنا أصلًا، وهذا
+        // دفاعٌ في العمق. الإلغاء الإداريُّ يُغلق مساراتِه أولًا فيمرّ.
+        if ($head === 'closed' && tkt_open_mandatory_ws_count($gate, $ticket_id) > 0) {
+            return false;
+        }
+        $gate->update('tickets', array('head_state' => $head), array('id' => $ticket_id));
+        return true;
+    }
+}
+
+if (!function_exists('tkt_open_mandatory_ws_count')) {
+    /** عددُ المسارات الإلزامية المفتوحة — صفرٌ أيضًا لبلاغٍ بلا مسارات أصلًا. */
+    function tkt_open_mandatory_ws_count($gate, $ticket_id)
+    {
+        return intval($gate->count('ticket_workstreams', array(
+            'whereRaw' => "tk_id = ? AND mandatory = 1 AND activation_state = 'opened'
+                           AND state NOT IN ('closed','admin_closed')",
+            'params'   => array(intval($ticket_id)),
+        )));
+    }
+}
+
+if (!function_exists('tkt_close_open_workstreams')) {
+    /**
+     * إقفالٌ إداريٌّ لما بقي مفتوحًا من مسارات البلاغ — للإلغاء وحده.
+     * إغلاقٌ لا حذف: الصفوف تبقى كاملةً للتدقيق وتُوسَم بسببها.
+     */
+    function tkt_close_open_workstreams($gate, $ticket_id)
+    {
+        $rows = $gate->select('ticket_workstreams', array(
+            'columns'  => array('ws_id'),
+            'whereRaw' => "tk_id = ? AND state NOT IN ('closed','admin_closed')",
+            'params'   => array(intval($ticket_id)),
+        ));
+        foreach ($rows as $w) {
+            $gate->update('ticket_workstreams',
+                array('state' => 'admin_closed', 'closed_at' => date('Y-m-d H:i:s')),
+                array('ws_id' => intval($w['ws_id'])));
+        }
+        return count($rows);
     }
 }
 

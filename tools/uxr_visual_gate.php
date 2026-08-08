@@ -159,6 +159,60 @@ foreach ($results as $r) {
     if ($r[2]) { $pass++; }
 }
 $total = count($results);
-echo str_repeat('─', 56) . "\n";
-echo "بوابة القبول البصري: $pass/$total\n";
+echo str_repeat('─', 60) . "\n";
+
+/* ══ ◆ القرارُ الحاكمُ الثاني (MD-04): البوابةُ تُقسَّم ثلاثًا ═══════════════
+ * «لا تُقرأ البوابةُ البنيويةُ نجاحًا لالتزامِ الشاشات» — فالبنيويةُ تسأل
+ * أتوجد الرموزُ والمكوناتُ في المكتبةِ والقشرة؟ والتبنّي يسأل أتستدعيها
+ * الشاشاتُ فعلًا؟ والتدقيقُ يسأل أفُحصت بالمعاييرِ الستةَ عشرَ بصريًّا؟
+ * ولا تُعلن G5 خضراءَ قبل الثلاثِ معًا — والإعلانُ بواحدةٍ مخالفةٌ حاكمة.
+ */
+$dirs = array('Approvals','Contracts','Employees','Equipments','Finance','FinRequests','Financing',
+    'Fleet','Governance','Maintenance','movement','Operations','Opportunities','Oprators','Portal',
+    'Procurement','Projects','Reports','Risk','Settings','Suppliers','Tickets','Timesheet',
+    'Transport','Workforce','main','admin','company','ActivityLogs','Clients','emsreports');
+$components = array('EmsUI.', 'ems_shell_axes', 'EmsDetailsModal',
+    'dept_risk_space.php', 'dept_gov_space.php', 'fin_analysis_shell.php');
+$adoptDen = 0; $adoptNum = 0;
+foreach ($dirs as $d) {
+    foreach (glob($root . '/' . $d . '/*.php') as $f) {
+        $src = (string) @file_get_contents($f);
+        if (strpos($src, 'insidebar') === false) { continue; } // ◆ المقامُ: الشاشاتُ الحيةُ بمظلة السايدبار
+        $adoptDen++;
+        foreach ($components as $c) {
+            if (strpos($src, $c) !== false) { $adoptNum++; break; }
+        }
+    }
+}
+$adoptPct = $adoptDen > 0 ? round($adoptNum / $adoptDen * 100, 1) : 0.0;
+
+/* G5-C: التدقيقُ البصريُّ — يحتاج بصرَ إنسانٍ أمام شاشة، ويُقرأ من محاضرِه
+   إن وُجدت. ولا يُدَّعى ما لم يُقَس (UXR-0131). */
+$auditDir = $root . '/docs/update0012/visual_audit';
+$audited = 0;
+if (is_dir($auditDir)) {
+    foreach (glob($auditDir . '/*.md') as $__m) {
+        /* الفهرسُ ليس محضرًا — وإلا صار المقياسُ 355/354 وهو عددٌ لا يُقرأ */
+        if (strtolower(basename($__m)) === 'readme.md') { continue; }
+        $audited++;
+    }
+}
+
+$gA = ($pass === $total);
+$gB = ($adoptNum === $adoptDen && $adoptDen > 0);
+$gC = ($audited >= $adoptDen && $adoptDen > 0);
+
+echo "◆ بوابةُ القبولِ البصريِّ مقسومةٌ ثلاثًا (القرارُ الحاكمُ الثاني · MD-04):\n\n";
+echo '  G5-A البنيوية  — أتوجد الرموزُ والمكوناتُ في المكتبةِ والقشرة؟   '
+   . ($gA ? '🟢' : '🔴') . "  {$pass}/{$total}\n";
+echo '  G5-B التبنّي    — أتستدعي الشاشاتُ المكوناتِ فعلًا؟              '
+   . ($gB ? '🟢' : '🔴') . "  {$adoptNum}/{$adoptDen} = {$adoptPct}٪\n";
+echo '  G5-C التدقيق   — أفُحصت بالمعاييرِ الستةَ عشرَ بصريًّا؟          '
+   . ($gC ? '🟢' : '🔴') . "  {$audited}/{$adoptDen}\n\n";
+echo '  ◆ الحكم: G5 ' . ($gA && $gB && $gC ? '🟢 خضراء — الثلاثُ معًا'
+    : '🕓 ليست خضراء — والبنيويةُ وحدَها لا تُقرأ نجاحًا للتبنّي (RSK-U5)') . "\n";
+echo '  ◆ المقامُ الكاملُ ' . $adoptDen . ' شاشةً حيةً — لا مقامَ مستبعِدًا (MD-01 مُغلق)' . "\n";
+echo "  ◆ G5-C بشريةٌ بطبيعتها — تُقاس بمحاضرِ تدقيقٍ في docs/update0012/visual_audit\n";
+echo str_repeat('─', 60) . "\n";
+echo "بوابة القبول البصري (G5-A البنيوية): $pass/$total\n";
 exit($pass === $total ? 0 : 1);

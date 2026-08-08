@@ -13,7 +13,7 @@ include '../includes/permissions_helper.php';
 $page_permissions = check_page_permissions($conn, 'Equipments/manage_failure_codes.php');
 
 if (!$page_permissions['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية لعرض هذه الصفحة'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا توجد صلاحية لعرض هذه الصفحة', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($del_id > 0) {
             // تعطيل ناعم (status=0) عبر البوابة — كتابةٌ محكومة بالـmanaged
             try { $fc_gate->update('failure_codes', array('status' => 0), array('id' => $del_id)); } catch (\Throwable $e) {}
-            header("Location: manage_failure_codes.php?msg=" . urlencode("تم حذف الكود بنجاح ✅"));
+            ems_gov_flash_redirect('manage_failure_codes.php', 'تم حذف الكود بنجاح ✅', 'GOV-OK-200', '');
             exit();
         }
         goto done;
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $res_id = intval($_POST['res_id']);
         if ($res_id > 0) {
             try { $fc_gate->update('failure_codes', array('status' => 1), array('id' => $res_id)); } catch (\Throwable $e) {}
-            header("Location: manage_failure_codes.php?msg=" . urlencode("تم استعادة الكود ✅"));
+            ems_gov_flash_redirect('manage_failure_codes.php', 'تم استعادة الكود ✅', 'GOV-OK-200', '');
             exit();
         }
         goto done;
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fc_gate->insert('failure_codes', $fc_data);
             $msg_ok = "تم إضافة الكود بنجاح ✅";
         }
-        header("Location: manage_failure_codes.php?msg=" . urlencode($msg_ok));
+        ems_gov_flash_redirect('manage_failure_codes.php', $msg_ok, 'GOV-INFO-200', '');
         exit();
     } catch (\Throwable $e) {
         $error_msg = "خطأ في الحفظ: " . $e->getMessage();
@@ -170,6 +170,9 @@ foreach ($fc_gate->select('failure_codes', array('columns' => array('main_catego
 }
 $mc_list_rows = array_values($mc_list_rows);
 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

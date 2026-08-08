@@ -26,6 +26,9 @@ $prj  = intval($_GET['project_id'] ?? 0);
 $rep = OBS::dailyUnitsReport($conn, $company_id, $from, $to, $prj);
 
 $page_title = 'إيكوبيشن | سجل الوحدات اليومية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

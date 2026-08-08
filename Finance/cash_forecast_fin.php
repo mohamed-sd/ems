@@ -14,11 +14,11 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/cash_forecast_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+السيولة+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض السيولة ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $horizons = fin_horizon_types(); $priorities = fin_cash_priorities();
@@ -36,7 +36,7 @@ function fin_gap_and_priority($position, $min_required)
 
 // ── توليد تنبؤ من البيانات الحية ──
 if (isset($_GET['generate'])) {
-    if (!$can_add) { header("Location: cash_forecast_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('cash_forecast_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $horizon = in_array($_GET['generate'], array('daily','weekly','monthly'), true) ? $_GET['generate'] : 'monthly';
     $win = array('daily' => 1, 'weekly' => 7, 'monthly' => 30);
     $days = $win[$horizon];
@@ -71,20 +71,20 @@ if (isset($_GET['generate'])) {
         'funding_gap' => $gap, 'cash_priority' => $prio, 'source' => 'manual',
         'note' => 'توليد آلي من البيانات الحية', 'created_by' => $current_user_id,
     ));
-    header("Location: cash_forecast_fin.php?msg=تم+توليد+تنبؤ+$horizon+(الوضع=" . number_format($position, 0) . ")+✅"); exit();
+    ems_gov_flash_redirect('cash_forecast_fin.php', 'تم توليد تنبؤ ' . $horizon . ' (الوضع=' . number_format($position, 0) . ') ✅', 'GOV-OK-200', '');
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: cash_forecast_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('cash_forecast_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->softDelete('fin_cash_forecasts', $d);
-    header("Location: cash_forecast_fin.php?msg=تم+حذف+التنبؤ+✅"); exit();
+    ems_gov_flash_redirect('cash_forecast_fin.php', 'تم حذف التنبؤ ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ تنبؤ يدوي ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['horizon_type'])) {
-    if (!$can_add) { header("Location: cash_forecast_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('cash_forecast_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $fdate   = trim($_POST['forecast_date'] ?? '') ?: date('Y-m-d');
     $horizon = in_array($_POST['horizon_type'] ?? '', array('daily','weekly','monthly'), true) ? $_POST['horizon_type'] : 'monthly';
     $opening = round(floatval($_POST['opening_cash'] ?? 0), 2);
@@ -100,10 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['horizon_type'])) {
         'funding_gap' => $gap, 'cash_priority' => $prio, 'source' => 'manual',
         'note' => trim($_POST['note'] ?? ''), 'created_by' => $current_user_id,
     ));
-    header("Location: cash_forecast_fin.php?msg=تم+حفظ+التنبؤ+✅"); exit();
+    ems_gov_flash_redirect('cash_forecast_fin.php', 'تم حفظ التنبؤ ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | السيولة والتنبؤ النقدي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -22,7 +22,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -30,7 +30,7 @@ $perms = tkt_page_perms($conn, 'Tickets/ticket_types_config.php', $is_super_admi
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+أنواع+البلاغات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض أنواع البلاغات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -43,9 +43,9 @@ $roles_map  = tkt_roles_map();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: ticket_types_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: ticket_types_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)          { header("Location: ticket_types_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('ticket_types_config.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('ticket_types_config.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)          { ems_gov_flash_redirect('ticket_types_config.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name           = trim($_POST['name'] ?? '');
     $owner_role_id  = intval($_POST['owner_role_id'] ?? 0);
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 
     if ($name === '' || !in_array($owner_role_id, $owner_ids, true) || !array_key_exists($default_nature, $natures)
         || ($ref_table !== '' && !array_key_exists($ref_table, $ref_tables))) {
-        header("Location: ticket_types_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('ticket_types_config.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
     $ref_table_val = ($ref_table === '') ? null : $ref_table;
 
@@ -65,24 +65,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
             $row = tkt_gate(false)->selectOne('ticket_types', array(
                 'columns' => array('id', 'company_id'), 'where' => array('id' => $id)));
             if (!$row || $row['company_id'] === null) {
-                header("Location: ticket_types_config.php?msg=الأنواع+العامة+للقراءة+فقط+❌"); exit();
+                ems_gov_flash_redirect('ticket_types_config.php', 'الأنواع العامة للقراءة فقط ❌', 'GOV-FAIL-409', ''); exit();
             }
             tkt_gate(false)->update('ticket_types',
                 array('name' => $name, 'owner_role_id' => $owner_role_id,
                       'default_nature' => $default_nature, 'ref_table' => $ref_table_val, 'active' => $active),
                 array('id' => $id));
-            header("Location: ticket_types_config.php?msg=تم+تعديل+النوع+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('ticket_types_config.php', 'تم تعديل النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             $code = tkt_gen_code('ticket_types');
             tkt_gate(false)->insert('ticket_types', array(
                 'code' => $code, 'name' => $name, 'owner_role_id' => $owner_role_id,
                 'default_nature' => $default_nature, 'ref_table' => $ref_table_val, 'active' => $active,
             ));
-            header("Location: ticket_types_config.php?msg=تمت+إضافة+النوع+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('ticket_types_config.php', 'تمت إضافة النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('ticket_types save refused: ' . $e->getMessage());
-        header("Location: ticket_types_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('ticket_types_config.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 

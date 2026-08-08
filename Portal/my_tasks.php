@@ -23,14 +23,14 @@ use App\Services\Work\WorkItemService as WI;
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
 $uid            = intval($_SESSION['user']['id'] ?? 0);
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=غير+مصرح"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', ''); exit(); }
 
 // حارس الشاشة (M-14 BR-GOV-01): can_view من modules — والسوبر يمر
 $__pp = check_page_permissions($conn, 'Portal/my_tasks.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
     require_once __DIR__ . '/../includes/perm_explain_live.php';
     $__why = ems_deny_message($conn, intval($_SESSION['user']['role'] ?? 0), 'Portal/my_tasks.php');
-    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    ems_gov_flash_redirect('../main/dashboard.php', $__why, 'GOV-INFO-200', '');
     exit();
 }
 
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'wi_tr
         $r = WI::transition($conn, $itemId, $to, $uid, $reason);
     }
     $msg = $r['ok'] ? 'نُفِّذ ✅' : ($r['reason'] . ' ❌');
-    header('Location: my_tasks.php?view=' . urlencode($VIEW) . '&msg=' . urlencode($msg));
+    ems_gov_redirect('Location: my_tasks.php?view=' . urlencode($VIEW) . '&msg=' . urlencode($msg));
     exit();
 }
 
@@ -127,6 +127,9 @@ $explain = null;
 if (isset($_GET['explain'])) { $explain = WI::explainAppearance($conn, intval($_GET['explain']), $uid); }
 
 $page_title = 'إيكوبيشن | مهامي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

@@ -27,6 +27,8 @@ require_once __DIR__ . '/includes/roles.php';
 // 1. تحميل نظام الأمان المركزي
 // ═══════════════════════════════════════════════════════════════════════════
 require_once __DIR__ . '/includes/security.php';
+// UI-DEF-11: تنسيقُ التاريخِ الموحَّدُ للعرض — دالةٌ واحدةٌ بدل استدعاءٍ متفرق
+require_once __DIR__ . '/includes/date_format.php';
 require_once __DIR__ . '/includes/performance.php';
 require_once __DIR__ . '/includes/employee_types.php'; // أنواع الموظفين + فلتر أنواع التشغيل (الموجة 1)
 require_once __DIR__ . '/includes/actor_helper.php';   // تسمية الفاعل الموحّدة (الموظف خلف الحساب)

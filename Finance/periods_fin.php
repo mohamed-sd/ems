@@ -13,11 +13,11 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/periods_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الفترات+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الفترات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $period_states = fin_period_states();
@@ -25,21 +25,21 @@ $closing_steps = fin_closing_steps();
 
 // ── انتقالات حالة الفترة ──
 if (isset($_GET['action']) && isset($_GET['pid'])) {
-    if (!$can_edit) { header("Location: periods_fin.php?msg=لا+توجد+صلاحية+الإجراء+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('periods_fin.php', 'لا توجد صلاحية الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_GET['pid']); $act = $_GET['action'];
     // انتقالات الحالة عبر البوابة — حراسة الحالة عبر whereRaw، والعزل يُحقن تلقائيًّا.
     $g = fin_gate($is_super_admin);
     $now = date('Y-m-d H:i:s');
     if ($act === 'open') {
         $g->update('fin_financial_periods', array('state'=>'open','posting_allowed'=>1), array('id'=>$pid), "state IN('planned','reopened')");
-        header("Location: periods_fin.php?msg=تم+فتح+الفترة+✅"); exit();
+        ems_gov_flash_redirect('periods_fin.php', 'تم فتح الفترة ✅', 'GOV-OK-200', ''); exit();
     } elseif ($act === 'soft_close') {
         $g->update('fin_financial_periods', array('state'=>'soft_closed','posting_allowed'=>0,'soft_closed_at'=>$now), array('id'=>$pid), "state='open'");
-        header("Location: periods_fin.php?msg=تم+الإقفال+المرحلي+✅"); exit();
+        ems_gov_flash_redirect('periods_fin.php', 'تم الإقفال المرحلي ✅', 'GOV-OK-200', ''); exit();
     } elseif ($act === 'close') {
         // قاعدة الإقفال: كل البنود الإلزامية يجب أن تكون منجَزة
         $n = $g->count('fin_closing_items', array('where'=>array('period_id'=>$pid,'required'=>1,'item_state'=>'pending')));
-        if ($n > 0) { header("Location: periods_fin.php?pid=$pid&msg=لا+إقفال:+بنود+إلزامية+غير+منجَزة+($n)+❌"); exit(); }
+        if ($n > 0) { ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=لا+إقفال:+بنود+إلزامية+غير+منجَزة+($n)+❌"); exit(); }
         // M-39 (SPEC-01 #14): «زرُّ الإقفال يمنع حين يوجد غيرُ مرحَّلٍ أو فرقٌ
         // مفتوح — بقائمة الموانع» — الفحصُ قبل Close لا بعده.
         require_once __DIR__ . '/../includes/period_guard.php';
@@ -47,19 +47,19 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
         if (!empty($blockers)) {
             $bl = array();
             foreach ($blockers as $b) { $bl[] = $b['label'] . ' (' . $b['count'] . ')'; }
-            header("Location: periods_fin.php?pid=$pid&msg=" . urlencode('لا إقفال — الموانع: ' . implode(' · ', $bl)) . "+❌"); exit();
+            ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=" . urlencode('لا إقفال — الموانع: ' . implode(' · ', $bl)) . "+❌"); exit();
         }
         $g->update('fin_financial_periods', array('state'=>'closed','posting_allowed'=>0,'closed_at'=>$now), array('id'=>$pid), "state IN('open','soft_closed')");
-        header("Location: periods_fin.php?msg=تم+إقفال+الفترة+✅"); exit();
+        ems_gov_flash_redirect('periods_fin.php', 'تم إقفال الفترة ✅', 'GOV-OK-200', ''); exit();
     } elseif ($act === 'lock') {
         $g->update('fin_financial_periods', array('state'=>'locked','locked_at'=>$now), array('id'=>$pid), "state='closed'");
-        header("Location: periods_fin.php?msg=تم+القفل+النهائي+✅"); exit();
+        ems_gov_flash_redirect('periods_fin.php', 'تم القفل النهائي ✅', 'GOV-OK-200', ''); exit();
     } elseif ($act === 'reopen') {
         // M-39 (SPEC-01 #14): «فتحُ فترةٍ مقفلةٍ قرارٌ أعلى موثَّق» — السببُ
         // إلزامٌ مكتوبٌ لا نصٌّ ثابت، وفاعلُه مختوم (reopened_by).
         $reason = trim((string) ($_GET['reason'] ?? ''));
         if ($reason === '') {
-            header("Location: periods_fin.php?pid=$pid&msg=" . urlencode('الفتحُ الاستثنائي يلزمه سببٌ موثَّق — اكتبه في نافذة التأكيد') . "+❌"); exit();
+            ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=" . urlencode('الفتحُ الاستثنائي يلزمه سببٌ موثَّق — اكتبه في نافذة التأكيد') . "+❌"); exit();
         }
         $g->update('fin_financial_periods', array('state'=>'reopened','posting_allowed'=>1,'reopen_reason'=>mb_substr($reason,0,200),'reopened_by'=>$current_user_id), array('id'=>$pid), "state IN('closed','soft_closed')");
         // N-02: قرارُ الفتح الاستثنائي يدخل سجلَّ التدقيق بسببه
@@ -67,25 +67,25 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
         ems_audit_change($conn, 'journal', 'periods_fin', 'reopen_period', $pid,
             array('posting_allowed' => 0), array('posting_allowed' => 1),
             array('company_id' => $company_id, 'user_id' => $current_user_id, 'note' => $reason));
-        header("Location: periods_fin.php?msg=تم+الفتح+الاستثنائي+✅"); exit();
+        ems_gov_flash_redirect('periods_fin.php', 'تم الفتح الاستثنائي ✅', 'GOV-OK-200', ''); exit();
     }
 }
 
 // ── إنجاز بند إقفال ──
 if (isset($_GET['done_item'])) {
-    if (!$can_edit) { header("Location: periods_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('periods_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $it = intval($_GET['done_item']); $pid = intval($_GET['pid'] ?? 0);
     fin_gate($is_super_admin)->update('fin_closing_items', array('item_state'=>'done','done_by'=>$current_user_id,'done_at'=>date('Y-m-d H:i:s')), array('id'=>$it));
-    header("Location: periods_fin.php?pid=$pid&msg=تم+إنجاز+البند+✅"); exit();
+    ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=تم+إنجاز+البند+✅"); exit();
 }
 
 // ── إنشاء فترة + بنود إقفالها ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fiscal_year'])) {
-    if (!$can_add) { header("Location: periods_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('periods_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $fy = intval($_POST['fiscal_year'] ?? 0);
     $ptype = ($_POST['period_type'] ?? '') === 'year' ? 'year' : 'month';
     $pno = $ptype === 'month' ? max(1, min(12, intval($_POST['period_no'] ?? 1))) : null;
-    if ($fy < 2000) { header("Location: periods_fin.php?msg=سنة+غير+صحيحة+❌"); exit(); }
+    if ($fy < 2000) { ems_gov_flash_redirect('periods_fin.php', 'سنة غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
     if ($ptype === 'year') { $start = "$fy-01-01"; $end = "$fy-12-31"; }
     else { $start = date('Y-m-01', mktime(0, 0, 0, $pno, 1, $fy)); $end = date('Y-m-t', mktime(0, 0, 0, $pno, 1, $fy)); }
 
@@ -113,17 +113,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fiscal_year'])) {
         }, 'periods: create period + seed closing items');
     } catch (\App\Core\TenantGateException $e) {
         if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-            header("Location: periods_fin.php?msg=الفترة+موجودة+مسبقاً+❌"); exit();
+            ems_gov_flash_redirect('periods_fin.php', 'الفترة موجودة مسبقاً ❌', 'GOV-FAIL-409', ''); exit();
         }
         throw $e;
     }
-    header("Location: periods_fin.php?pid=$pid&msg=تم+إنشاء+الفترة+وقائمة+إقفالها+✅"); exit();
+    ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=تم+إنشاء+الفترة+وقائمة+إقفالها+✅"); exit();
 }
 
 // الفترة المختارة لعرض قائمة الإقفال
 $sel_pid = isset($_GET['pid']) ? intval($_GET['pid']) : 0;
 
 $page_title = 'إيكوبيشن | إقفال الفترات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

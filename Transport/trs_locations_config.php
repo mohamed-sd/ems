@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = trs_page_perms($conn, 'Transport/trs_locations_config.php', $is_super_a
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المواقع+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المواقع ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -39,9 +39,9 @@ $loc_types = trs_location_types();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: trs_locations_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('trs_locations_config.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('trs_locations_config.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('trs_locations_config.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     $location_type = trim($_POST['location_type'] ?? 'base');
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $active = isset($_POST['active']) ? 1 : 0;
 
     if ($name === '' || !array_key_exists($location_type, $loc_types)) {
-        header("Location: trs_locations_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('trs_locations_config.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
     // المشروع يُربط فقط عندما يكون النوع مشروعاً
     if ($location_type !== 'project') { $project_id = null; }
@@ -59,35 +59,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
             trs_gate(false)->update('trs_locations',
                 array('name' => $name, 'location_type' => $location_type, 'project_id' => $project_id, 'active' => $active),
                 array('id' => $id));
-            header("Location: trs_locations_config.php?msg=تم+تعديل+الموقع+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('trs_locations_config.php', 'تم تعديل الموقع بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             trs_gate(false)->insert('trs_locations', array(
                 'code' => trs_gen_code($conn, 'trs_locations', 'LOC', $company_id),
                 'name' => $name, 'location_type' => $location_type,
                 'project_id' => $project_id, 'active' => $active,
             ));
-            header("Location: trs_locations_config.php?msg=تمت+إضافة+الموقع+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('trs_locations_config.php', 'تمت إضافة الموقع بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('trs_locations save refused: ' . $e->getMessage());
-        header("Location: trs_locations_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('trs_locations_config.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 // ── حذف — سياسة «الأرشفة لا الحذف» (نفس دلالة types الموثقة) ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('trs_locations_config.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         trs_gate(false)->softDelete('trs_locations', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('trs_locations softDelete refused: ' . $e->getMessage());
-        header("Location: trs_locations_config.php?msg=تعذّر+الحذف+❌"); exit();
+        ems_gov_flash_redirect('trs_locations_config.php', 'تعذّر الحذف ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: trs_locations_config.php?msg=تم+حذف+الموقع+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('trs_locations_config.php', 'تم حذف الموقع بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | المواقع';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -15,7 +15,7 @@ $users_has_employee_id = true; // رابط الحساب↔الموظف (الخي
 $users_not_deleted_sql = "(COALESCE(is_deleted,0)=0)";
 
 if ($current_company_id <= 0) {
-    echo "<script>alert('❌ الحساب غير مرتبط بشركة'); window.location.href='../login.php';</script>";
+    ems_gov_flash_redirect('../login.php', '❌ الحساب غير مرتبط بشركة', 'GOV-SCOPE-403', '');
     exit;
 }
 
@@ -231,7 +231,7 @@ if ($prefill_employee_id > 0 && $users_has_employee_id) {
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     // [ح-2] هذا المسار يسبق insidebar ⇒ يجب فحص can_delete صراحةً هنا.
     if ($us_perms['id'] !== null && !$us_perms['can_delete']) {
-        echo "<script>alert('❌ لا توجد صلاحية للحذف'); window.location.href='users.php';</script>";
+        ems_gov_flash_redirect('users.php', '❌ لا توجد صلاحية للحذف', 'GOV-PERM-403', '');
         exit;
     }
     $delete_id = intval($_GET['delete']);
@@ -246,15 +246,18 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     } catch (\Throwable $t) { error_log('users.php delete: ' . $t->getMessage()); }
 
     if ($us_deleted > 0) {
-        echo "<script>alert('✅ تم حذف المستخدم بنجاح'); window.location.href='users.php';</script>";
+        ems_gov_flash_redirect('users.php', '✅ تم حذف المستخدم بنجاح', 'GOV-SCOPE-403', '');
     } else {
-        echo "<script>alert('❌ حدث خطأ أثناء الحذف أو لا توجد صلاحية'); window.location.href='users.php';</script>";
+        ems_gov_flash_redirect('users.php', '❌ حدث خطأ أثناء الحذف أو لا توجد صلاحية', 'GOV-PERM-403', '');
     }
     exit;
 }
 // تعريف عنوان الصفحة
 $page_title = 'Equipation | المستخدمين';
 // تضمين الهيدر
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 // تضمين الشريط الجانبي
 include '../insidebar.php';
@@ -288,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     // المركزي يفحص can_view فقط، ومعالج POST هذا لا يفرّق بين الأفعال دونه.
     $us_write_perm = ($uid > 0) ? 'can_edit' : 'can_add';
     if ($us_perms['id'] !== null && !$us_perms[$us_write_perm]) {
-        echo "<script>alert('❌ لا توجد صلاحية لهذا الإجراء'); window.location.href='users.php';</script>";
+        ems_gov_flash_redirect('users.php', '❌ لا توجد صلاحية لهذا الإجراء', 'GOV-PERM-403', '');
         exit;
     }
 
@@ -298,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         ems_gov_log('ROLE_ESCALATION_BLOCKED',
             'screen=main/users.php actor_role=' . (isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '?')
             . ' target_role=' . $role . ' actor_uid=' . (isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0));
-        echo "<script>alert('❌ لا يمكنك إسناد دورٍ خارج نطاق دورك'); window.location.href='users.php';</script>";
+        ems_gov_flash_redirect('users.php', '❌ لا يمكنك إسناد دورٍ خارج نطاق دورك', 'GOV-SCOPE-403', '');
         exit;
     }
 
@@ -375,7 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             try { $us_gate->update('users', $us_data, array('id' => $uid), $users_not_deleted_sql); $us_upd_ok = true; }
             catch (\Throwable $t) { error_log('users.php update: ' . $t->getMessage()); }
             if ($us_upd_ok) {
-                echo "<script>alert('✅ تم التعديل بنجاح'); window.location.href='users.php';</script>";
+                ems_gov_flash_redirect('users.php', '✅ تم التعديل بنجاح', 'GOV-SCOPE-403', '');
             } else {
                 echo "<script>alert('❌ حدث خطأ أثناء التعديل');</script>";
             }
@@ -408,7 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     $us_ins_ok = true;
                 } catch (\Throwable $t) { error_log('users.php insert: ' . $t->getMessage()); }
                 if ($us_ins_ok) {
-                    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
+                    ems_gov_flash_redirect('users.php', '✅ تم الحفظ بنجاح', 'GOV-SCOPE-403', '');
                 } else {
                     echo "<script>alert('❌ حدث خطأ أثناء الحفظ');</script>";
                 }

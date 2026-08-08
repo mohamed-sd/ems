@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Projects/sites.php — مواقعُ التنفيذ (H-05 · OPM-01 §2-③)
  * ───────────────────────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -52,7 +53,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+مواقع+التنفيذ+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مواقع التنفيذ ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['site_name'])) {
     $sid        = intval($_POST['site_id'] ?? 0);
     $writePerm  = ($sid > 0) ? $can_edit : $can_add;
     if (!$writePerm) {
-        header("Location: sites.php?msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit();
+        ems_gov_flash_redirect('sites.php', 'لا توجد صلاحية لهذا الإجراء ❌', 'GOV-PERM-403', ''); exit();
     }
     $project_id = intval($_POST['project_id'] ?? 0);
     $name       = trim(strval($_POST['site_name'] ?? ''));
@@ -75,19 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['site_name'])) {
     $status     = (intval($_POST['status'] ?? 1) === 1) ? 1 : 0;
 
     if ($project_id <= 0 || $name === '') {
-        header("Location: sites.php?msg=المشروع+والاسم+إلزاميان+❌"); exit();
+        ems_gov_flash_redirect('sites.php', 'المشروع والاسم إلزاميان ❌', 'GOV-FAIL-409', ''); exit();
     }
     // المشروعُ من نطاق الشركة (البوابةُ ترفض الأجنبي)
     $proj = null;
     try { $proj = $gate->selectOne('project', array('columns' => array('id'), 'where' => array('id' => $project_id))); }
     catch (\Throwable $t) { $proj = null; }
-    if (!$proj) { header("Location: sites.php?msg=المشروع+غير+موجود+في+نطاقك+❌"); exit(); }
+    if (!$proj) { ems_gov_flash_redirect('sites.php', 'المشروع غير موجود في نطاقك ❌', 'GOV-SCOPE-403', ''); exit(); }
     // المسؤولُ من موظفي الشركة إن حُدّد
     if ($resp > 0) {
         $emp = null;
         try { $emp = $gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $resp))); }
         catch (\Throwable $t) { $emp = null; }
-        if (!$emp) { header("Location: sites.php?msg=المسؤول+غير+موجود+في+نطاقك+❌"); exit(); }
+        if (!$emp) { ems_gov_flash_redirect('sites.php', 'المسؤول غير موجود في نطاقك ❌', 'GOV-SCOPE-403', ''); exit(); }
     }
 
     $data = array(
@@ -98,25 +99,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['site_name'])) {
     try {
         if ($sid > 0) {
             $before = $gate->selectOne('sites', array('where' => array('id' => $sid)));
-            if (!$before) { header("Location: sites.php?msg=الموقع+غير+موجود+❌"); exit(); }
+            if (!$before) { ems_gov_flash_redirect('sites.php', 'الموقع غير موجود ❌', 'GOV-REF-404', ''); exit(); }
             if (intval($before['is_default']) === 1 && $status === 0) {
                 // الافتراضيُّ لا يُعطَّل — هو مرجعُ الترحيل الرجعي للعقود القائمة
-                header("Location: sites.php?msg=الموقع+الافتراضي+لا+يُعطَّل+—+هو+مرجع+الترحيل+❌"); exit();
+                ems_gov_flash_redirect('sites.php', 'الموقع الافتراضي لا يُعطَّل — هو مرجع الترحيل ❌', 'GOV-FAIL-409', ''); exit();
             }
             $gate->update('sites', $data, array('id' => $sid));
             ems_audit_change($conn, 'projects', 'Projects/sites.php', 'update', $sid,
                 array_intersect_key($before, $data), $data,
                 array('company_id' => $company_id, 'user_id' => $uid));
-            header("Location: sites.php?msg=تم+تعديل+الموقع+✅"); exit();
+            ems_gov_flash_redirect('sites.php', 'تم تعديل الموقع ✅', 'GOV-OK-200', ''); exit();
         } else {
             $newId = $gate->insert('sites', $data);
             ems_audit_change($conn, 'projects', 'Projects/sites.php', 'create', intval($newId),
                 array(), $data, array('company_id' => $company_id, 'user_id' => $uid));
-            header("Location: sites.php?msg=أُنشئ+الموقع+✅"); exit();
+            ems_gov_flash_redirect('sites.php', 'أُنشئ الموقع ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\Throwable $t) {
         // گوتشا مقيسة: خرقُ UNIQUE يعود false/يرمي بحسب الوضع — الرسالةُ تسمّي السبب الأرجح
-        header("Location: sites.php?msg=" . rawurlencode('تعذّر الحفظ — الاسم مكرر داخل المشروع؟') . "+❌"); exit();
+        ems_gov_flash_redirect(ems_flash_to('sites.php', "+❌"), 'تعذّر الحفظ — الاسم مكرر داخل المشروع؟', 'GOV-FAIL-409', ''); exit();
     }
 }
 
@@ -158,6 +159,9 @@ try {
 } catch (\Throwable $t) { $employees_options = array(); }
 
 $page_title = 'إيكوبيشن | مواقع التنفيذ';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

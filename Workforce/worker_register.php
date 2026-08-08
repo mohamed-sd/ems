@@ -25,7 +25,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $user_id        = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -36,7 +36,7 @@ $can_add    = $page_permissions['can_add'];
 $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+سجل+العامل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سجل العامل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save_worker') {
         $id          = isset($_POST['id']) ? intval($_POST['id']) : 0;
         $is_editing  = $id > 0;
-        if ($is_editing && !$can_edit) { header("Location: worker_register.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-        if (!$is_editing && !$can_add)  { header("Location: worker_register.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+        if ($is_editing && !$can_edit) { ems_gov_flash_redirect('worker_register.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+        if (!$is_editing && !$can_add)  { ems_gov_flash_redirect('worker_register.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
 
         $employee_id      = intval($_POST['employee_id'] ?? 0);
         $code             = trim($_POST['code'] ?? '');
@@ -80,11 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$is_editing) {
             // الموظف هو العامل: التصنيف = رفع علم is_workforce على سجل الموظف القائم
             // (فحص التكرار عبر البوابة = ضمن الشركة — موظف شركةٍ أخرى ليس شأن هذه الشاشة)
-            if ($employee_id <= 0) { header("Location: worker_register.php?msg=يجب+اختيار+موظف+❌"); exit(); }
+            if ($employee_id <= 0) { ems_gov_flash_redirect('worker_register.php', 'يجب اختيار موظف ❌', 'GOV-FAIL-409', ''); exit(); }
             $reg_dup = null;
             try { $reg_dup = $reg_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_id, 'is_workforce' => 1))); }
             catch (\Throwable $t) { error_log('worker_register.php dup check: ' . $t->getMessage()); }
-            if ($reg_dup !== null) { header("Location: worker_register.php?msg=الموظف+مصنّفٌ+عاملاً+مسبقاً+❌"); exit(); }
+            if ($reg_dup !== null) { ems_gov_flash_redirect('worker_register.php', 'الموظف مصنّفٌ عاملاً مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
             $target_id = $employee_id;
         } else {
             $target_id = $id;
@@ -104,9 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try { $reg_gate->update('employees', $reg_fields, array('id' => $target_id)); $ok = true; }
         catch (\Throwable $t) { error_log('worker_register.php save: ' . $t->getMessage()); }
         if ($is_editing) {
-            header("Location: worker_register.php?edit=" . $target_id . "&msg=" . ($ok ? "✅+تم+تحديث+بيانات+العامل" : "❌+تعذّر+التحديث"));
+            ems_gov_redirect("Location: worker_register.php?edit=" . $target_id . "&msg=" . ($ok ? "✅+تم+تحديث+بيانات+العامل" : "❌+تعذّر+التحديث"));
         } else {
-            header("Location: worker_register.php?msg=" . ($ok ? "✅+تم+تصنيف+الموظف+عاملاً+تشغيلياً" : "❌+تعذّر+الحفظ"));
+            ems_gov_redirect("Location: worker_register.php?msg=" . ($ok ? "✅+تم+تصنيف+الموظف+عاملاً+تشغيلياً" : "❌+تعذّر+الحفظ"));
         }
         exit();
     }
@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'alert_lead_days' => $alert_days, 'decision_ref' => $dec, 'created_by' => $user_id));
             } catch (\Throwable $t) { error_log('worker_register.php qual insert: ' . $t->getMessage()); }
         }
-        header("Location: worker_register.php?edit=" . $worker_id . "&tab=quals&msg=✅+تم+حفظ+الاعتماد");
+        ems_gov_redirect("Location: worker_register.php?edit=" . $worker_id . "&tab=quals&msg=✅+تم+حفظ+الاعتماد");
         exit();
     }
 
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $worker_id = intval($_POST['worker_id'] ?? 0);
         try { $reg_gate->deleteRow('worker_qualification', $qid, 'qualification delete'); }
         catch (\Throwable $t) { error_log('worker_register.php qual delete: ' . $t->getMessage()); }
-        header("Location: worker_register.php?edit=" . $worker_id . "&tab=quals&msg=✅+تم+حذف+الاعتماد");
+        ems_gov_redirect("Location: worker_register.php?edit=" . $worker_id . "&tab=quals&msg=✅+تم+حذف+الاعتماد");
         exit();
     }
 }
@@ -177,6 +177,9 @@ if ($edit_id > 0) {
 }
 
 $page_title = "إيكوبيشن | السجل التشغيلي للعامل";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

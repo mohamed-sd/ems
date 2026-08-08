@@ -14,7 +14,11 @@ require_once __DIR__ . '/tkt_helpers.php';
 $ctx = tkt_ctx();
 $company_id = $ctx['company_id'];
 $uid = $ctx['user_id'];
-if (intval($ctx['role']) !== 24 && !$ctx['is_super']) { http_response_code(403); die('التصنيفُ لمركز البلاغات (403)'); }
+/* UI-13: المنعُ يُقال داخلَ النظامِ برمزٍ محكومٍ ووجهةٍ فيها طريقُ رجوع. */
+if (intval($ctx['role']) !== 24 && !$ctx['is_super']) {
+    ems_gov_flash_redirect('../main/dashboard.php', 'التصنيفُ من عمل مركز البلاغات ❌',
+        'GOV-PERM-403', 'أرسل البلاغَ وسيصنّفه المركز');
+}
 $msg = '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['classify_tk'])) {
@@ -23,14 +27,35 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['classify_tk']
     $typ = intval($_POST['type_id'] ?? 0);
     if ($cat <= 0 || $typ <= 0) { $msg = 'الفئةُ والنوعُ إلزاميان (422)'; }
     else {
-        $st = mysqli_prepare($conn, "UPDATE tickets SET category_id = ?, ticket_type_id = ?, stage = 'classified'
-                                     WHERE id = ? AND company_id = ? AND stage IN ('new','classified')");
-        mysqli_stmt_bind_param($st, 'iiii', $cat, $typ, $tid, $company_id);
+        // التصنيف يوجّه فعلًا: النوعُ يحدّد الإدارةَ المالكة، والمرحلةُ تصير
+        // «محالة» — كانت تقف عند «مصنّفة» ولا مخرجَ لها، فيعلق البلاغُ حيًّا
+        // بلا سبيلٍ إلى الإنجاز رغم أن الشاشة تَعِد بالتوجيه الآلي.
+        $owner = 0;
+        $ot = mysqli_prepare($conn, "SELECT owner_role_id FROM ticket_types WHERE id = ? AND active = 1 LIMIT 1");
+        mysqli_stmt_bind_param($ot, 'i', $typ);
+        mysqli_stmt_execute($ot);
+        $orow = mysqli_stmt_get_result($ot)->fetch_assoc();
+        mysqli_stmt_close($ot);
+        $owner = $orow ? intval($orow['owner_role_id']) : 0;
+
+        $st = mysqli_prepare($conn, "UPDATE tickets
+                                        SET category_id = ?, ticket_type_id = ?, stage = 'routed',
+                                            owner_role_id = COALESCE(NULLIF(?, 0), owner_role_id)
+                                      WHERE id = ? AND company_id = ? AND stage IN ('new','classified')");
+        mysqli_stmt_bind_param($st, 'iiiii', $cat, $typ, $owner, $tid, $company_id);
         mysqli_stmt_execute($st);
         if (mysqli_stmt_affected_rows($st) > 0) {
-            mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id)
-                                 VALUES ($company_id, $tid, 'reclassified', 'صُنّف من شاشة الاستقبال', $uid)");
-            $msg = "صُنّف البلاغُ #$tid وسيُعاد توجيهُه آليًّا";
+            mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id, new_value)
+                                 VALUES ($company_id, $tid, 'reclassified', 'صُنّف من شاشة الاستقبال ووُجّه للإدارة المختصة', $uid, 'routed')");
+            // المهلة تُحسب عند التوجيه إن لم تكن حُسبت عند الإنشاء
+            $trow = mysqli_query($conn, "SELECT priority, business_impact, call_date, call_time, resolution_due_at
+                                           FROM tickets WHERE id = $tid AND company_id = $company_id");
+            $tk = $trow ? mysqli_fetch_assoc($trow) : null;
+            if ($tk && empty($tk['resolution_due_at'])) {
+                tkt_apply_sla(tkt_gate(false), $tid, $typ, $tk['priority'], $tk['business_impact'],
+                              $tk['call_date'], $tk['call_time']);
+            }
+            $msg = "صُنّف البلاغُ #$tid ووُجّه للإدارة المختصة ✅";
         } else { $msg = 'تجاوز مرحلةَ التصنيف (409)'; }
     }
 }
@@ -51,12 +76,23 @@ $r = mysqli_query($conn, "SELECT id, name FROM ticket_types WHERE active = 1 ORD
 if ($r) while ($x = mysqli_fetch_assoc($r)) $types[] = $x;
 
 $page_title = 'الاستقبال والتصنيف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-inbox"></i> الاستقبالُ والتصنيف — الجديدةُ وغيرُ المصنَّفة</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-inbox';
+$header_title_html = htmlspecialchars('الاستقبالُ والتصنيف — الجديدةُ وغيرُ المصنَّفة', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>البلاغ</th><th>الوصف</th><th>منذ</th><th>تصنيفُه الحالي</th><th>التصنيف</th>

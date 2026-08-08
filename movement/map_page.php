@@ -18,7 +18,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة");
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -54,9 +54,11 @@ if ($selected_project_id > 0) {
     }
 }
 
+/* UI-13: كان الحكمُ يُقال في نافذةِ alert من المتصفحِ ثم يقفز بالمستخدمِ —
+   لا رمزَ ولا أثرَ ولا طريقَ رجوعٍ يختاره. صار رسالةً محكومةً داخلَ اللوحة. */
 if (!$selected_project) {
-    echo "<script>alert('❌ لا يوجد مشروع مرتبط بهذه الجلسة'); window.location.href='../main/dashboard.php';</script>";
-    exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا يوجد مشروعٌ مرتبطٌ بهذه الجلسة ❌',
+        'GOV-SCOPE-403', 'اختر مشروعًا من شاشةِ اختيار المشروع ثم أعد فتح الخريطة');
 }
 
 // ============================================================
@@ -242,6 +244,9 @@ foreach ($suppliers_data as $sup) {
 }
 
 $page_title = "متابعة المشروع | " . htmlspecialchars($selected_project['name']);
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../inheader.php');
 // تصميم شاشة الخريطة معزول في ملف خاص (يُحمّل بعد الأنماط العامة، محصّن تحت .movement-map-page)
 echo '<link rel="stylesheet" href="/ems/assets/css/map-page.css?v=2026060603">' . "\n";

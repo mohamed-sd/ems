@@ -17,14 +17,14 @@ $is_super_admin  = ($current_role === '-1');
 $company_id      = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $page_permissions = check_page_permissions($conn, 'Maintenance/inspections.php');
 $can_view   = $is_super_admin ? true : $page_permissions['can_view'];
 $can_add    = $is_super_admin ? true : $page_permissions['can_add'];
 $can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
 $can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التفتيش+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التفتيش ❌', 'GOV-PERM-403', ''); exit(); }
 
 // صلاحيةُ توليد أمرِ صيانةٍ من التفتيش: تُقرأ من موديول **أوامر الصيانة** لا من التفتيش،
 // لأنّ المُنشَأ أمرٌ لا تفتيش — فلا يولّد الأمرَ من لا يملك إنشاءه في شاشته الأصلية.
@@ -182,12 +182,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
 // كان نصفُ المسار (تفتيش→أمر) منفَّذًا ونصفُه (تفتيش→بلاغ) مفقودًا — وهذا سدُّه.
 // عاطلٌ: البندُ المحوَّلُ سلفًا لا يتحوّل ثانيةً (`converted_ticket_id` هو الحكم).
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'convert_note_ticket') {
-    if (!$can_add) { header("Location: inspections.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('inspections.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $lid = intval($_POST['line_id'] ?? 0);
     $line = ems_tenant_db()->selectOne('mnt_inspection_line', array('where' => array('id' => $lid)));
-    if (!$line) { header("Location: inspections.php?msg=البند+غير+موجود+❌"); exit(); }
+    if (!$line) { ems_gov_flash_redirect('inspections.php', 'البند غير موجود ❌', 'GOV-REF-404', ''); exit(); }
     if (!empty($line['converted_ticket_id'])) {
-        header("Location: inspections.php?open=" . intval($line['inspection_id'])
+        ems_gov_redirect("Location: inspections.php?open=" . intval($line['inspection_id'])
              . "&msg=" . rawurlencode('الملاحظةُ محوَّلةٌ سلفًا إلى البلاغ #' . $line['converted_ticket_id'] . ' — لا تحويلَ مرتين ❌'));
         exit();
     }
@@ -197,13 +197,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
     $tt = $conn->query("SELECT id, owner_role_id, default_nature FROM ticket_types
                          WHERE active=1 ORDER BY (owner_role_id=13) DESC, id ASC LIMIT 1");
     $type = $tt ? $tt->fetch_assoc() : null;
-    if (!$type) { header("Location: inspections.php?msg=" . rawurlencode('لا نوعَ بلاغٍ فعّالًا — أنشئه أولًا ❌')); exit(); }
+    if (!$type) { ems_gov_flash_redirect('inspections.php', 'لا نوعَ بلاغٍ فعّالًا — أنشئه أولًا ❌', 'GOV-FAIL-409', ''); exit(); }
     $complaint = 'ملاحظةُ تفتيشٍ محوَّلة (NoteConverted): ' . strval($line['component'] ?? '')
                . ' — ' . strval($line['note'] ?? '') . ' · التوصية: ' . strval($line['recommendation'] ?? '');
     $new_tid = 0;
+    // الرقم قبل المعاملة — تخصيصه بداخلها يجعل الارتداد يتراجع بالعدّاد.
+    $tno = tkt_next_ticket_no($conn, $company_id);
     ems_tenant_db()->runInTransaction(function ($g) use ($conn, $company_id, $type, $line, $insp,
-                                                          $complaint, $current_user_id, $current_role, &$new_tid) {
-        $tno = tkt_next_ticket_no($conn, $company_id);
+                                                          $complaint, $current_user_id, $current_role, $tno, &$new_tid) {
         $new_tid = (int) $g->insert('tickets', array(
             'ticket_no' => $tno, 'ticket_type_id' => intval($type['id']),
             'stage' => 'routed', 'ticket_nature' => strval($type['default_nature']),
@@ -223,15 +224,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
         $g->update('mnt_inspection_line', array('converted_ticket_id' => $new_tid),
             array('id' => intval($line['id'])));
     }, 'convert inspection note to ticket');
-    header("Location: inspections.php?open=" . intval($line['inspection_id'])
+    ems_gov_redirect("Location: inspections.php?open=" . intval($line['inspection_id'])
          . "&msg=" . rawurlencode('حُوّلت الملاحظةُ بلاغًا #' . $new_tid . ' — والخيطُ موصولٌ بالاتجاهين ✅'));
     exit();
 }
 
 // ── إنشاء تفتيش جديد + نسخ بنود القالب ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_inspection') {
-    if (!$can_add) { header("Location: inspections.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: inspections.php?msg=لا+يمكن+الإنشاء+بلا+شركة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('inspections.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('inspections.php', 'لا يمكن الإنشاء بلا شركة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $inspection_type = in_array($_POST['inspection_type'] ?? '', $valid_types, true) ? $_POST['inspection_type'] : (count($valid_types) ? $valid_types[0] : 'دوري');
     $tpl = isset($templates[$inspection_type]) ? $templates[$inspection_type] : null;
@@ -257,15 +258,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_i
         $seed_def   = mnt_default_state($seed_scale, $seed_kind, $SCALES);
         mnt_seed_lines_from_template($conn, $new_id, $company_id, $template_id, $equipment_id, $header_type, $seed_def);
     }
-    header("Location: inspections.php?id=" . intval($new_id) . "&msg=تم+إنشاء+التفتيش+وتحميل+بنوده+✅"); exit();
+    ems_gov_redirect("Location: inspections.php?id=" . intval($new_id) . "&msg=تم+إنشاء+التفتيش+وتحميل+بنوده+✅"); exit();
 }
 
 // ── حفظ رأس التفتيش + بنوده دفعةً + حساب الدرجة + منطق الإكمال ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_inspection') {
-    if (!$can_edit) { header("Location: inspections.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('inspections.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
     $iid = intval($_POST['id'] ?? 0);
     $ins = mnt_fetch_inspection($conn, $iid, $company_id, $is_super_admin);
-    if (!$ins) { header("Location: inspections.php?msg=التفتيش+غير+موجود+❌"); exit(); }
+    if (!$ins) { ems_gov_flash_redirect('inspections.php', 'التفتيش غير موجود ❌', 'GOV-REF-404', ''); exit(); }
     $locked = ($ins['state'] === 'مكتمل' || $ins['state'] === 'مغلق');
 
     $tpl   = isset($templates_by_id[intval($ins['template_id'])]) ? $templates_by_id[intval($ins['template_id'])] : null;
@@ -329,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         mnt_apply_inspection_to_equipment($conn, $equipment_id, $company_id, $equipment_condition, $engine_condition);
     }
 
-    header("Location: inspections.php?id=" . intval($iid) . "&msg=تم+حفظ+التفتيش+✅"); exit();
+    ems_gov_redirect("Location: inspections.php?id=" . intval($iid) . "&msg=تم+حفظ+التفتيش+✅"); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -340,10 +341,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
 // لا يُلمَس هنا availability_status ولا equipment_health — دخولُ الصيانة حصريٌّ
 // لمسار move_oprators (القرار 4.5/6)، والأمرُ يبدأ بحالة «بلاغ» كتوليد الوقائية.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_order') {
-    if (!$can_gen_order) { header("Location: inspections.php?msg=" . urlencode('لا توجد صلاحية إنشاء أوامر الصيانة ❌')); exit(); }
+    if (!$can_gen_order) { ems_gov_flash_redirect('inspections.php', 'لا توجد صلاحية إنشاء أوامر الصيانة ❌', 'GOV-PERM-403', ''); exit(); }
     $iid = intval($_POST['inspection_id'] ?? 0);
     $ins_g = mnt_fetch_inspection($conn, $iid, $company_id, $is_super_admin);
-    if (!$ins_g) { header("Location: inspections.php?msg=التفتيش+غير+موجود+❌"); exit(); }
+    if (!$ins_g) { ems_gov_flash_redirect('inspections.php', 'التفتيش غير موجود ❌', 'GOV-REF-404', ''); exit(); }
 
     $back = "inspections.php?id=" . $iid . "&msg=";
 
@@ -398,17 +399,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
         'state'         => 'بلاغ',
         'created_by'    => $current_user_id,
     ));
-    header("Location: orders.php?id=" . intval($new_id) . "&msg=" . urlencode('تم توليد أمر صيانة من التفتيش ' . (string) $ins_g['code'] . ' ✅'));
+    ems_gov_redirect("Location: orders.php?id=" . intval($new_id) . "&msg=" . urlencode('تم توليد أمر صيانة من التفتيش ' . (string) $ins_g['code'] . ' ✅'));
     exit();
 }
 
 // ── إضافة بند إضافي (مسار non-AJAX احتياطي) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_line') {
-    if (!$can_edit) { header("Location: inspections.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('inspections.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $iid = intval($_POST['inspection_id'] ?? 0);
     $ins = mnt_fetch_inspection($conn, $iid, $company_id, $is_super_admin);
     if ($ins && ($ins['state'] === 'مكتمل' || $ins['state'] === 'مغلق')) {
-        header("Location: inspections.php?id=" . intval($iid) . "&msg=" . urlencode('لا يمكن تعديل بنود تفتيش مكتمل/مغلق ❌')); exit();
+        ems_gov_redirect("Location: inspections.php?id=" . intval($iid) . "&msg=" . urlencode('لا يمكن تعديل بنود تفتيش مكتمل/مغلق ❌')); exit();
     }
     if ($ins) {
         $component = trim($_POST['component'] ?? '');
@@ -420,30 +421,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_l
                 'applies_to' => 'عام', 'condition_state' => $cond, 'recommendation' => $rec, 'is_template' => 0));
         }
     }
-    header("Location: inspections.php?id=" . intval($iid) . "&msg=تمت+إضافة+البند+✅"); exit();
+    ems_gov_redirect("Location: inspections.php?id=" . intval($iid) . "&msg=تمت+إضافة+البند+✅"); exit();
 }
 if (isset($_GET['del_line'], $_GET['inspection_id'])) {
     if ($can_edit) {
         $lid = intval($_GET['del_line']); $iid = intval($_GET['inspection_id']);
         $ins_lock = mnt_fetch_inspection($conn, $iid, $company_id, $is_super_admin);
         if ($ins_lock && ($ins_lock['state'] === 'مكتمل' || $ins_lock['state'] === 'مغلق')) {
-            header("Location: inspections.php?id=" . $iid . "&msg=" . urlencode('لا يمكن حذف بنود تفتيش مكتمل/مغلق ❌')); exit();
+            ems_gov_redirect("Location: inspections.php?id=" . $iid . "&msg=" . urlencode('لا يمكن حذف بنود تفتيش مكتمل/مغلق ❌')); exit();
         }
         // حذف بندٍ يدويٍّ فقط (is_template=0): تحقّق قبليّ ثم deleteChild
         $ln = ems_tenant_db()->selectOne('mnt_inspection_line', array('columns' => array('is_template'), 'where' => array('id' => $lid, 'inspection_id' => $iid)));
         if ($ln && intval($ln['is_template']) === 0) {
             ems_tenant_db()->deleteChild('mnt_inspection_line', $lid, 'mnt_inspection', $iid, 'inspection_id', 'inspection line delete');
         }
-        header("Location: inspections.php?id=" . $iid . "&msg=تم+حذف+البند+✅"); exit();
+        ems_gov_redirect("Location: inspections.php?id=" . $iid . "&msg=تم+حذف+البند+✅"); exit();
     }
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: inspections.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('inspections.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $did = intval($_GET['delete_id']);
     ems_tenant_db()->softDelete('mnt_inspection', $did); // حذف ناعم معزول بالشركة تلقائيًّا
-    header("Location: inspections.php?msg=تم+حذف+التفتيش+✅"); exit();
+    ems_gov_flash_redirect('inspections.php', 'تم حذف التفتيش ✅', 'GOV-OK-200', ''); exit();
 }
 
 $edit_id = isset($_GET['id']) ? intval($_GET['id']) : 0;

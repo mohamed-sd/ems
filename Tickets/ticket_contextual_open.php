@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Tickets/ticket_contextual_open.php — نقطة الفتح السياقي (TKT-01 §2 · TKT-15)
  * ───────────────────────────────────────────────────────────────────────────
@@ -46,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tk_save'])) {
     }
     if (!empty($_POST['follow_ticket_id'])) {
         $r = DD::linkDuplicate($conn, intval($_POST['follow_ticket_id']), $uid);
-        header("Location: tickets_list.php?msg=" . rawurlencode('أُضفت متابعًا للبلاغ الأصل — ولا بلاغ ثانٍ ✅'));
+        ems_gov_flash_redirect('tickets_list.php', 'أُضفت متابعًا للبلاغ الأصل — ولا بلاغ ثانٍ ✅', 'GOV-OK-200', '');
         exit();
     }
     if (!$dupFound) {
@@ -60,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tk_save'])) {
             'context' => $ctx,
         ));
         if ($r['ok']) {
-            header("Location: tickets_list.php?msg=" . rawurlencode('بلاغ #' . $r['tk_id'] . ' — ' . $r['reason'] . ' ✅'));
+            ems_gov_flash_redirect('tickets_list.php', 'بلاغ #' . $r['tk_id'] . ' — ' . $r['reason'] . ' ✅', 'GOV-OK-200', '');
             exit();
         }
         $msg = $r['reason'] . ' ❌';
@@ -72,6 +73,9 @@ $r = $conn->query("SELECT code, name, category, nature FROM ticket_types WHERE a
 while ($r && ($x = $r->fetch_assoc())) { $types[] = $x; }
 
 $page_title = 'إيكوبيشن | بلاغ جديد — من موضع المشكلة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

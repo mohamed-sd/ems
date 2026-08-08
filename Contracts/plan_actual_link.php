@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/plan_actual_link.php — ربطُ الخطة بالفعلي (P-09)
  * ───────────────────────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $MODULE_CODE = 'Contracts/plan_actual_link.php';
@@ -39,15 +40,14 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الربط+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الربط ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('plan actual super') : ems_tenant_db();
 $CID  = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 $FROM = isset($_GET['from']) ? trim(strval($_GET['from'])) : '';
 $TO   = isset($_GET['to']) ? trim(strval($_GET['to'])) : '';
 $redirect = function ($msg, $c = 0) {
-    header("Location: plan_actual_link.php?msg=" . rawurlencode($msg)
-        . ($c > 0 ? ('&contract=' . $c) : ''));
+    ems_gov_flash_redirect(ems_flash_to('plan_actual_link.php', ($c > 0 ? ('&contract=' . $c) : '')), $msg, 'GOV-INFO-200', '');
     exit();
 };
 
@@ -93,6 +93,9 @@ if ($CID > 0) {
 }
 
 $page_title = 'إيكوبيشن | ربط الخطة بالفعلي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Portal/visibility_simulator.php — من يرى ماذا (H-16 · الشاشة 185)
  * ───────────────────────────────────────────────────────────────────────────
@@ -33,7 +34,7 @@ else {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ للمحاكاة ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للمحاكاة ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('visibility sim super') : ems_tenant_db();
 
@@ -67,6 +68,9 @@ if ($askElement !== '') {
 }
 
 $page_title = 'إيكوبيشن | من يرى ماذا';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

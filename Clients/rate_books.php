@@ -24,13 +24,13 @@ if (!headers_sent()) { header('Content-Type: text/html; charset=UTF-8'); }
 if (!function_exists('rb_e')) { function rb_e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); } }
 if (!function_exists('rb_back')) {
     function rb_back($msg, $q = '') {
-        header('Location: rate_books.php?' . ($q !== '' ? $q . '&' : '') . 'msg=' . urlencode($msg));
+        ems_gov_redirect('Location: rate_books.php?' . ($q !== '' ? $q . '&' : '') . 'msg=' . urlencode($msg));
         exit();
     }
 }
 
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-if ($company_id <= 0) { header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.')); exit(); }
+if ($company_id <= 0) { ems_gov_flash_redirect('../login.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', ''); exit(); }
 $uid = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 $rb_gate = ems_tenant_db();
@@ -211,6 +211,9 @@ if ($c_type > 0 && $c_days > 0) {
 }
 
 $page_title = 'إيكوبيشن | دفترُ الأسعار';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

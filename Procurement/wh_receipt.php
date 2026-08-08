@@ -24,13 +24,13 @@ $is_super_admin  = $ctx['is_super'];
 $company_id      = $ctx['company_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = proc_page_perms($conn, 'Procurement/receipt_custody_proc.php', $is_super_admin);
 if (!$perms['can_view']) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الاستلام+المؤقت+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الاستلام المؤقت ❌', 'GOV-PERM-403', '');
     exit();
 }
 

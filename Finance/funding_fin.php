@@ -13,27 +13,27 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/funding_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التمويل+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التمويل ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $ftypes = fin_facility_types(); $purposes = fin_facility_purposes(); $fstates = fin_facility_states();
 
 // ── تفعيل/إقفال التمويل ──
 if (isset($_GET['action']) && isset($_GET['fid'])) {
-    if (!$can_edit) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('funding_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $fid = intval($_GET['fid']); $act = $_GET['action'];
     if ($act === 'activate') fin_gate($is_super_admin)->update('fin_funding_facilities', array('state' => 'active'), array('id' => $fid), "state IN('draft','approved')");
     elseif ($act === 'settle') fin_gate($is_super_admin)->update('fin_funding_facilities', array('state' => 'settled'), array('id' => $fid), "state='active'");
-    header("Location: funding_fin.php?fid=$fid&msg=تم+تحديث+حالة+التمويل+✅"); exit();
+    ems_gov_redirect("Location: funding_fin.php?fid=$fid&msg=تم+تحديث+حالة+التمويل+✅"); exit();
 }
 
 // ── تسجيل سداد قسط ──
 if (isset($_GET['pay_inst'])) {
-    if (!$can_edit) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('funding_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $iid = intval($_GET['pay_inst']); $fid = intval($_GET['fid'] ?? 0);
     // paid_amount=total_due تعبيرٌ عمودي: نقرأ القسط ثم نضع القيمة (نفس النتيجة)
     $inst = fin_gate($is_super_admin)->selectOne('fin_funding_schedules', array('columns' => array('total_due'), 'where' => array('id' => $iid)));
@@ -41,22 +41,22 @@ if (isset($_GET['pay_inst'])) {
         fin_gate($is_super_admin)->update('fin_funding_schedules',
             array('paid_amount' => $inst['total_due'], 'state' => 'paid'), array('id' => $iid));
     }
-    header("Location: funding_fin.php?fid=$fid&msg=تم+تسجيل+سداد+القسط+✅"); exit();
+    ems_gov_redirect("Location: funding_fin.php?fid=$fid&msg=تم+تسجيل+سداد+القسط+✅"); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('funding_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->update('fin_funding_facilities',
         array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
         array('id' => $d), "state='draft'");
-    header("Location: funding_fin.php?msg=تم+حذف+التمويل+✅"); exit();
+    ems_gov_flash_redirect('funding_fin.php', 'تم حذف التمويل ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── إنشاء تمويل + توليد جدول السداد ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['facility_type'])) {
-    if (!$can_add) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('funding_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $ftype    = trim($_POST['facility_type'] ?? '');
     $purpose  = trim($_POST['purpose'] ?? '');
     $lender   = trim($_POST['lender_name'] ?? '');
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['facility_type'])) {
     $insts    = max(1, min(120, intval($_POST['installments'] ?? 1)));
 
     if (!isset($ftypes[$ftype]) || !isset($purposes[$purpose]) || $principal <= 0) {
-        header("Location: funding_fin.php?msg=بيانات+غير+صحيحة+(نوع/غرض/مبلغ)+❌"); exit();
+        ems_gov_flash_redirect('funding_fin.php', 'بيانات غير صحيحة (نوع/غرض/مبلغ) ❌', 'GOV-REF-404', ''); exit();
     }
     $end = date('Y-m-d', strtotime("$start +$insts months"));
     $facility_no = fin_gen_code($conn, 'fin_funding_facilities', 'FIN-FN', $company_id);
@@ -91,12 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['facility_type'])) {
         }
         return $fid;
     }, 'funding facility + schedule');
-    header("Location: funding_fin.php?fid=$fid&msg=تم+إنشاء+التمويل+وجدول+سداده+($insts+قسط)+✅"); exit();
+    ems_gov_redirect("Location: funding_fin.php?fid=$fid&msg=تم+إنشاء+التمويل+وجدول+سداده+($insts+قسط)+✅"); exit();
 }
 
 $sel_fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
 
 $page_title = 'إيكوبيشن | التمويل والالتزامات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

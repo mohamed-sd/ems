@@ -705,13 +705,12 @@ class ExcelRegistry
                     }
                 }
 
-                // ② رقم التذكرة: فارغٌ ⇒ يولّده الخادم بنفس آليّة الشاشة
-                //    (ServerId فوق ems_sequences — لا COUNT+1 سِباقي).
-                if (empty($data['ticket_no']) && class_exists('\\App\\Core\\ServerId')) {
-                    $cid = (int) $ctx['companyId'];
-                    $yy = date('y');
-                    $data['ticket_no'] = \App\Core\ServerId::nextNo(
-                        $conn, 'tickets:c' . $cid . ':y' . $yy, $yy . '-' . date('m'), 4
+                // ② رقم التذكرة: فارغٌ ⇒ يولّده الخادم من سلطة الترقيم الواحدة
+                //    (TicketNumber فوق ems_sequences — ذرّيٌّ وذاتي الشفاء).
+                if (empty($data['ticket_no'])) {
+                    require_once dirname(__DIR__) . '/Tickets/TicketNumber.php';
+                    $data['ticket_no'] = \App\Services\Tickets\TicketNumber::allocateUnique(
+                        $conn, (int) $ctx['companyId']
                     );
                 }
 

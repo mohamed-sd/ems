@@ -25,7 +25,7 @@ if (!function_exists('evt_e')) {
 if (!function_exists('evt_redirect_with_msg')) {
     function evt_redirect_with_msg($msg)
     {
-        header('Location: contract_events.php?msg=' . urlencode($msg));
+        ems_gov_flash_redirect('contract_events.php', $msg, 'GOV-INFO-200', '');
         exit();
     }
 }
@@ -35,7 +35,7 @@ if (!function_exists('evt_redirect_with_msg')) {
 // ══════════════════════════════════════════════════════════════════════════════
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if ($company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -95,7 +95,7 @@ if ($module_id) {
     $can_delete = $perms['can_delete'];
 }
 if (!$can_view) {
-    header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض سجل الأحداث التعاقدية ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سجل الأحداث التعاقدية ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -325,6 +325,9 @@ foreach ($evt_list as $row) {
 }
 
 $page_title = "سجل حركة العقد";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

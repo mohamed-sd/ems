@@ -70,6 +70,23 @@ function roleBoardRoute($roleId, $parentRoleId = null)
  * قياسٌ عدديٌّ معزول عبر البوابة — يعيد 0 عند أي فشلٍ ولا يرمي أبدًا:
  * لوحةُ الدور لا تتعطل لعطبِ مؤشرٍ واحد (نمط finreq_badges المثبَت).
  */
+/**
+ * عددُ الصفوف العائدة — لمؤشّرٍ سؤالُه «كم مجموعةً استوفت الشرط؟».
+ * البوابةُ تشترط WHERE عليا واحدة، فلا يُلَفُّ الاستعلامُ في جدولٍ مشتق
+ * (تصير WHERE داخلَ قوسٍ فتُرفض)؛ الحلُّ أن يُجمَّع بـGROUP BY/HAVING
+ * وتُعَدَّ الصفوفُ هنا بدل COUNT(*) على مشتقٍّ مرفوض.
+ */
+function roleBoardRowCount($gate, array $scope, $sql, array $params = array())
+{
+    try {
+        $r = $gate->scopedQuery($scope, $sql, $params);
+        return is_array($r) ? count($r) : 0;
+    } catch (\Throwable $t) {
+        error_log('role_board rowcount: ' . $t->getMessage());
+        return 0;
+    }
+}
+
 function roleBoardScalar($gate, array $scope, $sql, array $params = array())
 {
     try {
@@ -349,11 +366,13 @@ function roleBoardAlerts($conn, $gate, $roleId)
             'sla_broken' => array(array('t' => 'tickets', 'a' => 't'),
                 "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.resolution_due_at IS NOT NULL
                  AND t.resolution_due_at < NOW() AND t.stage NOT IN('closed','cancelled','done')"),
+            // صفٌّ لكل إدارةٍ تجاوزت بلاغين متأخّرين — والعدُّ على الصفوف
+            // ('rows')، فالجدولُ المشتقُّ يُخفي WHERE داخل قوسٍ فترفضه البوابة.
             'repeat_late_dept' => array(array('t' => 'tickets', 'a' => 't'),
-                "SELECT COUNT(*) FROM (SELECT t.owner_role_id FROM tickets t WHERE {TENANT_SCOPE}
+                "SELECT t.owner_role_id FROM tickets t WHERE {TENANT_SCOPE}
                  AND t.resolution_due_at IS NOT NULL AND t.resolution_due_at < NOW()
                  AND t.stage NOT IN('closed','cancelled','done')
-                 GROUP BY t.owner_role_id HAVING COUNT(*) > 1) d"),
+                 GROUP BY t.owner_role_id HAVING COUNT(*) > 1", 'rows'),
         ),
         12 => array(
             'contract_ending' => array(array('t' => 'contracts', 'a' => 'c'),
@@ -438,7 +457,9 @@ function roleBoardAlerts($conn, $gate, $roleId)
         foreach ($generic[$rid] as $key => $def) {
             $scopeArr = array('scope' => array($def[0]['a'] => $def[0]['t']));
             if (isset($def[0]['enrich'])) { $scopeArr['enrich'] = $def[0]['enrich']; }
-            $counts[$key] = (int) roleBoardScalar($gate, $scopeArr, $def[1]);
+            $counts[$key] = (isset($def[2]) && $def[2] === 'rows')
+                ? roleBoardRowCount($gate, $scopeArr, $def[1])
+                : (int) roleBoardScalar($gate, $scopeArr, $def[1]);
         }
         if ($rid === 15) {
             try {

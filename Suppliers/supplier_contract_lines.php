@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Suppliers/supplier_contract_lines.php — بنودُ عقد المورد (H-07 · CON-03 §2-②④)
  * ───────────────────────────────────────────────────────────────────────────
@@ -29,7 +30,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -54,7 +55,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+بنود+عقود+الموردين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض بنود عقود الموردين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -65,7 +66,7 @@ $BASIS_LABELS  = array('none' => 'لا استعداد', 'rate' => 'معدلُ س
 $LINE_STATES   = array('active' => 'نافذ', 'replaced' => 'مستبدَل', 'ended' => 'منتهٍ');
 
 $selected = intval($_GET['contract_id'] ?? 0);
-$redirect = function ($msg, $cid) { header("Location: supplier_contract_lines.php?contract_id=" . intval($cid)
+$redirect = function ($msg, $cid) { ems_gov_redirect("Location: supplier_contract_lines.php?contract_id=" . intval($cid)
     . "&msg=" . rawurlencode($msg)); exit(); };
 
 // ── الأفعالُ كلُّها عبر الخدمة ─────────────────────────────────────────────
@@ -179,6 +180,9 @@ if ($head !== null && intval($head['client_contract_id'] ?? 0) > 0) {
 }
 
 $page_title = 'إيكوبيشن | بنود عقد المورد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

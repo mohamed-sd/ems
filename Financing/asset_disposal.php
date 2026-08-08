@@ -20,7 +20,7 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { http_response_code(403); die('المجالُ المقيَّد (FIN-01 §1.1)'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
 $msg = '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
@@ -81,12 +81,23 @@ $r = mysqli_query($conn, "SELECT entity_id, legal_name FROM legal_entities ORDER
 if ($r) while ($x = mysqli_fetch_assoc($r)) $ents[] = $x;
 
 $page_title = 'التصرف في الأصل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-exchange-alt"></i> التصرفُ في الأصل — نقلُ حصة</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-exchange-alt';
+$header_title_html = htmlspecialchars('التصرفُ في الأصل — نقلُ حصة', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;max-width:900px">
     <div><label>الحصةُ السارية</label>

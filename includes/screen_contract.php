@@ -162,11 +162,15 @@ if (!function_exists('ems_shell_axes')) {
      */
     function ems_shell_axes($perms = null, array $override = array())
     {
-        $canView = is_array($perms) ? !empty($perms['can_view']) : true;
-        $canWrite = is_array($perms) && (!empty($perms['can_edit']) || !empty($perms['can_add']) || !empty($perms['can_delete']));
+        /* لا يُدَّعى ما لم يُقَس: شاشةٌ لم تمرِّر صلاحياتِها المحلولةَ لا يُنسب
+           إليها حكمُ صلاحيةٍ — المحورُ يعلن «غيرُ مقيس» فيُطوى في سطرِ السياقِ
+           بدلَ أن يُعرض «قراءة» بلا مصدر. */
+        $measured = is_array($perms);
+        $canView = $measured ? !empty($perms['can_view']) : true;
+        $canWrite = $measured && (!empty($perms['can_edit']) || !empty($perms['can_add']) || !empty($perms['can_delete']));
         $ax = array(
             'data' => 'data',
-            'permission' => $canWrite ? 'full' : ($canView ? 'partial' : 'none'),
+            'permission' => !$measured ? 'unmeasured' : ($canWrite ? 'full' : ($canView ? 'partial' : 'none')),
             'edit' => $canWrite ? 'editable' : 'readonly',
             'connection' => 'online',
             'freshness' => 'fresh',

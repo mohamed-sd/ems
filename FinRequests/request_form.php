@@ -17,7 +17,7 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('fin request form super') : e
 
 $__pp = check_page_permissions($conn, 'FinRequests/request_form.php');
 if (!$is_super && !$__pp['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية لبوابة الطلبات'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا صلاحية لبوابة الطلبات', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -52,6 +52,9 @@ $can_add = $is_super || !empty($__pp['can_add']);
 $form_visible = ($req !== null);
 
 $page_title = 'إيكوبيشن | الطلب المالي الموحّد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

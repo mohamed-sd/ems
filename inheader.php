@@ -99,9 +99,19 @@ if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) 
         $fgText = htmlspecialchars((string) ($emsFg['text'] ?? ''), ENT_QUOTES, 'UTF-8');
         $fgHint = htmlspecialchars((string) ($emsFg['hint'] ?? ''), ENT_QUOTES, 'UTF-8');
         $fgCode = htmlspecialchars((string) ($emsFg['code'] ?? 'GOV-403'), ENT_QUOTES, 'UTF-8');
-        echo '<div dir="rtl" style="display:flex;align-items:center;gap:10px;background:#7f1d1d;color:#fef2f2;'
-           . 'padding:10px 16px;font-size:14px;border-bottom:1px solid #991b1b">'
-           . '<i class="fas fa-shield-halved" aria-hidden="true"></i>'
+        /* اللونُ يتبع الرمزَ لا النصَّ: نجاحٌ أخضرُ وحوكمةٌ حمراءُ وخبرٌ رماديٌّ —
+           فالمستخدمُ يقرأ الحكمَ قبل أن يقرأ الحرف (UI-13). */
+        $fgKind = (strpos($fgCode, '-OK-') !== false) ? 'ok'
+            : ((strpos($fgCode, '-INFO-') !== false) ? 'info' : 'bad');
+        $fgSkin = array(
+            'ok'   => array('#14532d', '#166534', '#f0fdf4', 'fa-circle-check'),
+            'info' => array('#1e3a5f', '#1d4ed8', '#eff6ff', 'fa-circle-info'),
+            'bad'  => array('#7f1d1d', '#991b1b', '#fef2f2', 'fa-shield-halved'),
+        );
+        list($fgBg, $fgBd, $fgFg, $fgIcon) = $fgSkin[$fgKind];
+        echo '<div dir="rtl" role="status" style="display:flex;align-items:center;gap:10px;background:' . $fgBg
+           . ';color:' . $fgFg . ';padding:10px 16px;font-size:14px;border-bottom:1px solid ' . $fgBd . '">'
+           . '<i class="fas ' . $fgIcon . '" aria-hidden="true"></i>'
            . '<span style="flex:1"><strong>' . $fgText . '</strong>'
            . ($fgHint !== '' ? ' — ' . $fgHint : '') . '</span>'
            . '<code style="background:rgba(255,255,255,.12);border-radius:4px;padding:2px 8px;font-size:12px">' . $fgCode . '</code>'

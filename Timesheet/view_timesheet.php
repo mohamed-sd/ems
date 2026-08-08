@@ -17,14 +17,14 @@ $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['rol
 $is_site_manager = ($current_role === '5');
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=Unauthorized+company+context");
+    ems_gov_flash_redirect('../main/dashboard.php', 'Unauthorized company context', 'GOV-INFO-200', '');
     exit();
 }
 
 $page_permissions = check_page_permissions($conn, 'timesheet');
 $can_view = $page_permissions['can_view'];
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+ساعات+العمل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض ساعات العمل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -431,6 +431,9 @@ $export_params['export_all'] = '1';
 $export_all_url = 'view_timesheet.php?' . http_build_query($export_params);
 
 $page_title = "إيكوبيشن | سجل الوحدات اليومية";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -740,7 +743,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   font-weight: 900;
   font-variant-numeric: tabular-nums;
    margin-top: 10px;
-  font-size: 40px;
+  /* UI-11/21: كان هنا 40px يلغي 1.8rem أعلاه — رقمٌ خارجَ السلّمِ يصير «صفرًا
+     عملاقًا» حين لا ساعاتٍ مسجَّلة. القيمةُ عادت إلى السلّم، والصفرُ نفسُه صار
+     حالةً مفسَّرةً لا رقمًا أصمّ (انظر ts_stat_value أدناه). */
+  font-size: 1.8rem;
+}
+.stats-card .stats-empty {
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 10px;
 }
 
 /* Color variants */
@@ -829,25 +842,44 @@ include('../includes/page_header.php');
         </div>
     <?php } ?>
 
+    <?php
+    /* UI-11/21 (UXR-01): «لا صفرَ عملاقًا بلا تفسير». الصفرُ هنا مُحتملُ المعنى:
+       إمّا لا سطورَ في الكشفِ أصلًا، وإمّا سطورٌ لا تحمل هذا النوعَ من الساعات.
+       فالبطاقةُ تقول أيَّ الحالتين — لا ترمي رقمًا أصمَّ بحجمِ أربعين نقطة. */
+    if (!function_exists('ts_stat_value')) {
+        function ts_stat_value($value, $rowsCount)
+        {
+            $v = (float) $value;
+            if ($v != 0.0) {
+                return '<div class="stats-value">' . number_format($v, 2) . '</div>';
+            }
+            $why = ((int) $rowsCount === 0)
+                ? 'لا سطورَ في هذا الكشف بعد'
+                : 'سطورُ الكشفِ لا تحمل ساعاتٍ من هذا النوع';
+            return '<div class="stats-empty">0.00 — ' . $why . '</div>';
+        }
+    }
+    $__tsRows = isset($rows) && is_array($rows) ? count($rows) : (isset($stats['rows_count']) ? (int) $stats['rows_count'] : 0);
+    ?>
     <div class="stats-grid ts-stats-grid">
         <div class="stats-card ts-stats-executed">
             <div class="stats-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stats-value"><?= number_format((float) $stats['executed_sum'], 2) ?></div>
+            <?= ts_stat_value($stats['executed_sum'], $__tsRows) ?>
             <div class="stats-title">إجمالي الساعات المنفذة</div>
         </div>
         <div class="stats-card ts-stats-standby">
             <div class="stats-icon"><i class="fas fa-pause-circle"></i></div>
-             <div class="stats-value"><?= number_format((float) $stats['standby_sum'], 2) ?></div>
+            <?= ts_stat_value($stats['standby_sum'], $__tsRows) ?>
             <div class="stats-title">إجمالي ساعات الاستعداد</div>
         </div>
         <div class="stats-card ts-stats-fault">
             <div class="stats-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="stats-value"><?= number_format((float) $stats['fault_sum'], 2) ?></div>
+            <?= ts_stat_value($stats['fault_sum'], $__tsRows) ?>
             <div class="stats-title">إجمالي ساعات الأعطال</div>
         </div>
         <div class="stats-card ts-stats-total">
             <div class="stats-icon"><i class="fas fa-chart-pie"></i></div>
-             <div class="stats-value"><?= number_format((float) $stats['work_sum'], 2) ?></div>
+            <?= ts_stat_value($stats['work_sum'], $__tsRows) ?>
             <div class="stats-title">إجمالي ساعات العمل</div>
         </div>
     </div>

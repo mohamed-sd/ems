@@ -21,7 +21,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=غير+مصرح");
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -30,12 +30,11 @@ $__pp = check_page_permissions($conn, 'Portal/ceo_board.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
     require_once __DIR__ . '/../includes/perm_explain_live.php';
     $__why = ems_deny_message($conn, intval($_SESSION['user']['role'] ?? 0), 'Portal/ceo_board.php');
-    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    ems_gov_flash_redirect('../main/dashboard.php', $__why, 'GOV-INFO-200', '');
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    http_response_code(403);
-    exit('غير مصرح بالكتابة في هذه الشاشة');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -87,8 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $ok = $st->execute();
     $dup = !$ok && $conn->errno === 1062;
     $st->close();
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
-        $ok ? 'حُفظت اللقطة ✅' : ($dup ? 'لقطة هذه الفترة موجودة — الفترة الواحدة لقطة واحدة ❌' : 'تعذر الحفظ ❌')));
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظت اللقطة ✅' : ($dup ? 'لقطة هذه الفترة موجودة — الفترة الواحدة لقطة واحدة ❌' : 'تعذر الحفظ ❌'), 'GOV-OK-200', '');
     exit();
 }
 
@@ -116,6 +114,9 @@ function m00_cell_at($idx, $row, $entityName, $COLDB) {
 }
 
 $page_title = 'إيكوبيشن | لوحة المدير التنفيذي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

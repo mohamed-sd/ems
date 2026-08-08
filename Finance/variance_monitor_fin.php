@@ -24,14 +24,14 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = fin_page_perms($conn, 'Finance/variance_monitor_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+مراقبة+الانحراف+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مراقبة الانحراف ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -45,7 +45,7 @@ $var_tone     = array('open' => 'danger', 'in_progress' => 'warn', 'closed' => '
 
 // ── حفظ معالجة الانحراف (السبب · الإجراء · المالك · الحالة) على بند الموازنة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['line_id'])) {
-    if (!$can_edit) { header("Location: variance_monitor_fin.php?msg=لا+توجد+صلاحية+المعالجة+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('variance_monitor_fin.php', 'لا توجد صلاحية المعالجة ❌', 'GOV-PERM-403', ''); exit(); }
 
     $line_id     = intval($_POST['line_id']);
     $cause       = mb_substr(trim($_POST['cause'] ?? ''), 0, 200);
@@ -63,9 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['line_id'])) {
     ), array('id' => $line_id));
 
     if ($affected > 0) {
-        header("Location: variance_monitor_fin.php?msg=تم+حفظ+معالجة+الانحراف+✅"); exit();
+        ems_gov_flash_redirect('variance_monitor_fin.php', 'تم حفظ معالجة الانحراف ✅', 'GOV-OK-200', ''); exit();
     }
-    header("Location: variance_monitor_fin.php?msg=تعذّر+الحفظ+(بندٌ+غير+موجود+في+شركتك)+❌"); exit();
+    ems_gov_flash_redirect('variance_monitor_fin.php', 'تعذّر الحفظ (بندٌ غير موجود في شركتك) ❌', 'GOV-REF-404', ''); exit();
 }
 
 // ── تصفية العرض ──
@@ -107,6 +107,9 @@ if (isset($_GET['edit_id']) && $can_edit) {
 }
 
 $page_title = 'إيكوبيشن | متابعة الانحراف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

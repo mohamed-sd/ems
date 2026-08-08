@@ -33,7 +33,7 @@ if (!function_exists('opp_e')) {
 if (!function_exists('opp_redirect_with_msg')) {
     function opp_redirect_with_msg($msg)
     {
-        header('Location: opportunities.php?msg=' . urlencode($msg));
+        ems_gov_flash_redirect('opportunities.php', $msg, 'GOV-INFO-200', '');
         exit();
     }
 }
@@ -124,7 +124,7 @@ if (!function_exists('opp_build_requirements')) {
 // ══════════════════════════════════════════════════════════════════════════════
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if ($company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -212,7 +212,7 @@ if ($module_id) {
     $can_delete = $perms['can_delete'];
 }
 if (!$can_view) {
-    header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض الفرص ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الفرص ❌', 'GOV-PERM-403', '');
     exit();
 }
 

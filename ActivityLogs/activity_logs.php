@@ -29,7 +29,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=غير+مصرح");
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', '');
     exit();
 }
 

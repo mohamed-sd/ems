@@ -23,13 +23,13 @@ $company_id     = intval($_SESSION['user']['company_id'] ?? 0);
 $role           = intval($_SESSION['user']['role'] ?? 0);
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
-if (!$is_super_admin && $company_id <= 0) { header('Location: ../login.php?msg=غير+مصرح'); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', ''); exit(); }
 
 $__pp = check_page_permissions($conn, 'Portal/dept_board.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
     require_once __DIR__ . '/../includes/perm_explain_live.php';
     $__why = ems_deny_message($conn, $role, 'Portal/dept_board.php');
-    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    ems_gov_flash_redirect('../main/dashboard.php', $__why, 'GOV-INFO-200', '');
     exit();
 }
 
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dept_
         ));
         $msg = !empty($res['ok']) ? ('كُلّف وأُخطر ✅ #' . $res['id']) : (($res['reason'] ?? 'تعذر') . ' ❌');
     }
-    header('Location: dept_board.php?msg=' . urlencode($msg));
+    ems_gov_flash_redirect('dept_board.php', $msg, 'GOV-INFO-200', '');
     exit();
 }
 
@@ -145,6 +145,9 @@ if ($unit > 0) {
 }
 
 $page_title = 'ورقة الإدارة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -152,7 +155,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* ═══ الوضع الجامع: لوحة اكتمال الإدارات (التنفيذي 9 · الحوكمة 15 · السوبر) ═══ */
 if ($unit <= 0 && $isUmbrella): ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-table-cells-large"></i> لوحة الإدارات — الاكتمال التشغيلي فوق المحرك</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-table-cells-large';
+$header_title_html = htmlspecialchars('لوحة الإدارات — الاكتمال التشغيلي فوق المحرك', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <p style="color:#666">كل صفٍّ إدارةٌ من خريطة الـ17 — أرقامها حيةٌ من المحرّك (مهام · طلبات · إنجاز 30ي). تعمّق بنقرة الاسم.</p>
   <table class="table table-striped">
     <thead><tr>
@@ -183,7 +194,15 @@ if ($unit <= 0 && $isUmbrella): ?>
 /* ═══ وضع الإدارة الواحدة ═══════════════════════════════════════════════ */
 if ($unit <= 0): ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-table-cells-large"></i> ورقة الإدارة</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ في هذا الفرعِ أيضًا — الشاشةُ ثلاثةُ
+   فروعٍ، ولا يصحُّ أن يحمل الرأسَ فرعٌ ويُحرَم منه فرعان. */
+$header_icon = 'fa fa-table-cells-large';
+$header_title_html = htmlspecialchars('ورقة الإدارة', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <div class="alert alert-warning">دورك الحالي غير مربوطٍ بإدارةٍ في خريطة الـ17 — ورقة الإدارة تخص أدوار الإدارات التشغيلية، وللأدوار الجامعة لوحة الإدارات.</div>
 </div>
 <?php exit(); endif;
@@ -275,7 +294,14 @@ $attrLabel = function ($a) {
 };
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-table-cells-large"></i> ورقة الإدارة — <?= htmlspecialchars($deptName ?: $deptOwner) ?></h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ في فرعِ الإدارةِ الواحدة. */
+$header_icon = 'fa fa-table-cells-large';
+$header_title_html = htmlspecialchars('ورقة الإدارة — ' . ($deptName ?: $deptOwner), ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <?php if ($isUmbrella): ?>
     <p><a href="dept_board.php" class="btn btn-sm btn-outline-secondary">↩ لوحة الإدارات كلها</a></p>
   <?php endif; ?>

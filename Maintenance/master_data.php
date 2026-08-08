@@ -20,7 +20,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -32,7 +32,7 @@ $can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
 $can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
 
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+إعدادات+الصيانة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض إعدادات الصيانة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -50,14 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $is_editing = $id > 0;
 
     if ($is_editing && !$can_edit) {
-        header("Location: master_data.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit();
+        ems_gov_flash_redirect('master_data.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit();
     } elseif (!$is_editing && !$can_add) {
-        header("Location: master_data.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit();
+        ems_gov_flash_redirect('master_data.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit();
     }
 
     // لا إدراج/تعديل بلا شركة صالحة (عزل إجباري)
     if ($company_id <= 0) {
-        header("Location: master_data.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit();
+        ems_gov_flash_redirect('master_data.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     $type  = trim($_POST['type'] ?? '');
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $extra = trim($_POST['extra'] ?? '');
 
     if (!in_array($type, $mnt_lookup_types, true) || $name === '') {
-        header("Location: master_data.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('master_data.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     if ($is_editing) {
@@ -73,11 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         ems_tenant_db()->update('mnt_lookup',
             array('type' => $type, 'name' => $name, 'extra' => $extra),
             array('id' => $id), "COALESCE(is_deleted,0)=0");
-        header("Location: master_data.php?msg=تم+تعديل+العنصر+بنجاح+✅"); exit();
+        ems_gov_flash_redirect('master_data.php', 'تم تعديل العنصر بنجاح ✅', 'GOV-OK-200', ''); exit();
     } else {
         ems_tenant_db()->insert('mnt_lookup', array(
             'type' => $type, 'name' => $name, 'extra' => $extra, 'created_by' => $current_user_id));
-        header("Location: master_data.php?msg=تمت+إضافة+العنصر+بنجاح+✅"); exit();
+        ems_gov_flash_redirect('master_data.php', 'تمت إضافة العنصر بنجاح ✅', 'GOV-OK-200', ''); exit();
     }
 }
 
@@ -86,14 +86,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 // ══════════════════════════════════════════════════════════════════════════════
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) {
-        header("Location: master_data.php?msg=لا+توجد+صلاحية+حذف+❌"); exit();
+        ems_gov_flash_redirect('master_data.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit();
     }
     $delete_id = intval($_GET['delete_id']);
     ems_tenant_db()->softDelete('mnt_lookup', $delete_id); // حذف ناعم معزول بالشركة تلقائيًّا
-    header("Location: master_data.php?msg=تم+حذف+العنصر+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('master_data.php', 'تم حذف العنصر بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | إعدادات الصيانة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

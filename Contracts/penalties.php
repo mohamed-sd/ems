@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/penalties.php — احتسابُ الجزاءات والحوافز (CON-02 §6 · §7-⑤ · ق-17)
  * ───────────────────────────────────────────────────────────────────────────
@@ -30,7 +31,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header('Location: ../login.php?msg=' . rawurlencode('لا توجد بيئة شركة صالحة ❌')); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $MODULE_CODE = 'Contracts/penalties.php';
@@ -52,14 +53,14 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header('Location: ../main/dashboard.php?msg=' . rawurlencode('لا توجد صلاحية عرض الجزاءات ❌')); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الجزاءات ❌', 'GOV-PERM-403', ''); exit();
 }
 
 $gate = ems_tenant_db();
 if (!function_exists('pen_e')) { function pen_e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); } }
 if (!function_exists('pen_back')) {
     function pen_back($msg, $c, $f, $t) {
-        header('Location: penalties.php?contract=' . intval($c) . '&from=' . urlencode($f)
+        ems_gov_redirect('Location: penalties.php?contract=' . intval($c) . '&from=' . urlencode($f)
                . '&to=' . urlencode($t) . '&msg=' . rawurlencode($msg));
         exit();
     }
@@ -178,6 +179,9 @@ $STATE = array('computed' => 'محتسَب', 'reviewed' => 'روجِع', 'approv
 function pen_n($v) { return ($v === null) ? '—' : number_format((float) $v, 2); }
 
 $page_title = 'احتساب الجزاءات والحوافز';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

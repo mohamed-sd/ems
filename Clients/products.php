@@ -35,7 +35,7 @@ if (!function_exists('prod_money')) {
 if (!function_exists('prod_redirect_with_msg')) {
     function prod_redirect_with_msg($msg)
     {
-        header('Location: products.php?msg=' . urlencode($msg));
+        ems_gov_flash_redirect('products.php', $msg, 'GOV-INFO-200', '');
         exit();
     }
 }
@@ -45,7 +45,7 @@ if (!function_exists('prod_redirect_with_msg')) {
 // ══════════════════════════════════════════════════════════════════════════════
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if ($company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -109,7 +109,7 @@ if ($module_id) {
     $can_delete = $perms['can_delete'];
 }
 if (!$can_view) {
-    header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض المنتجات والخدمات ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المنتجات والخدمات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -309,6 +309,9 @@ foreach ($prod_list as $row) {
 }
 
 $page_title = "كتالوج المنتجات والخدمات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

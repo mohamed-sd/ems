@@ -81,15 +81,14 @@ class TicketRouter
         }
 
         $siteId = intval($ctx['site_id'] ?? 0);
+
+        // الرقم من سلطة الترقيم الواحدة وقبل فتح المعاملة — كان هذا المسار
+        // يمسح MAX+1 بنفسه، فيصطدم برقمٍ خصّصته المتتالية للشاشة اليدوية.
+        require_once __DIR__ . '/TicketNumber.php';
+        $no = TicketNumber::allocateUnique($conn, $co);
+
         $conn->begin_transaction();
         try {
-            // رقم البلاغ من أعلى لاحقةٍ رقميةٍ قائمةٍ +1 (لا COUNT — فالحذف يوقعه في تصادم UQ)
-            $prefix = date('y-m') . '-';
-            $maxRow = $conn->query("SELECT MAX(CAST(SUBSTRING_INDEX(ticket_no, '-', -1) AS UNSIGNED)) mx
-                                     FROM tickets WHERE ticket_no LIKE '" . $conn->real_escape_string($prefix) . "%'
-                                       AND ticket_no REGEXP '[0-9]+$'")->fetch_assoc();
-            $seq = max(8000, intval($maxRow['mx'] ?? 0)) + 1;
-            $no = $prefix . $seq;
             $stmt = $conn->prepare(
                 "INSERT INTO tickets (company_id, ticket_no, ticket_type_id, stage, ticket_nature, priority,
                     confidentiality, business_impact, call_date, reporting_person, reporter_user_id, is_anonymous,
@@ -121,13 +120,21 @@ class TicketRouter
             $typeId = intval($type['id']);
             $ownerRole = intval($type['owner_role_id']);
             $conf = (string) $type['default_confidentiality'];
-            $stmt->bind_param('isissssiissssiiiiiiiiii',
+            // ترتيب الأنواع مقابل الوسائط — كان الوسيطان ⑦ و⑨ متبادلَي النوع،
+            // فيُمرَّر نصُّ الشكوى بوصفه عددًا صحيحًا فينصهر إلى 0 ويضيع البلاغ.
+            //  co n  ty na pr cf rp an de su pv sc et ei pj si ci sh pe eq or rp rp
+            $stmt->bind_param('isisssiisssssiiiiiiiiii',
                 $co, $no, $typeId, $legacyNature, $priority, $conf, $reporter, $anon,
                 $desc, $summary, $private, $screen, $entityType, $entityId,
                 $projectId, $siteId, $contractId, $shiftNo, $periodNo, $equipmentId, $ownerRole, $reporter, $reporter);
             if (!$stmt->execute()) { throw new \Exception('فشل إدراج الرأس: ' . $conn->error); }
             $tkId = intval($conn->insert_id);
             $stmt->close();
+
+            // مهلةُ الرأس — بدونها يبقى البلاغ خارجَ حلقة التذكير والتصعيد
+            // (الكرون يفلتر «الموعد غير فارغ») وخارجَ حساب التأخّر أبدًا.
+            require_once __DIR__ . '/TicketSla.php';
+            TicketSla::applyHeader($conn, $co, $tkId, $typeId, $priority, 'admin', date('Y-m-d'), date('H:i'));
 
             // المشاركون: المبلغ
             if ($reporter > 0) {

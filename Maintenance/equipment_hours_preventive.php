@@ -39,12 +39,23 @@ $res = mysqli_query($conn, $sql);
 if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
 
 $page_title = 'ساعاتُ المعدة والوقائية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-stopwatch"></i> ساعاتُ المعدة مقابل جدول الغيار</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-stopwatch';
+$header_title_html = htmlspecialchars('ساعاتُ المعدة مقابل جدول الغيار', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <p class="text-muted" style="font-size:.9em">زاويةُ الصيانة للتايم شيت: المتراكمُ منذ آخر إنجازٍ مقابل الفترة — لا «من عمل اليوم».</p>
 
   <table class="table table-striped" data-no-dt>

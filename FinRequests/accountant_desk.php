@@ -17,7 +17,7 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('fin accountant desk super') 
 
 $__pp = check_page_permissions($conn, 'FinRequests/accountant_desk.php');
 if (!$is_super && !$__pp['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا صلاحية', 'GOV-PERM-403', '');
     exit();
 }
 

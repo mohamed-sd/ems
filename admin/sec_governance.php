@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * admin/sec_governance.php — مركز حوكمة الصلاحيات بمجموعاته الثماني
  * (update0004 · SEC-26 · SEC-01 §10.1)
@@ -42,7 +43,7 @@ if (!$is_super_admin) {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية لمركز الحوكمة ❌')); exit(); }
+if (!$can_view) { ems_gov_redirect("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية لمركز الحوكمة ❌')); exit(); }
 
 $msg = strval($_GET['msg'] ?? '');
 $explainResult = null;
@@ -56,16 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gov_action'])) {
     } elseif ($act === 'open_cycle' && $can_edit) {
         $r = PRS::openCycle($conn, $company_id, intval($_POST['org_unit_id'] ?? 0),
             strval($_POST['period'] ?? ''), intval($_POST['manager_person_id'] ?? 0));
-        header("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
         exit();
     } elseif ($act === 'decide_pcr' && $can_edit) {
         $r = PCW::decide($conn, intval($_POST['req_id'] ?? 0), $uid,
             strval($_POST['decision'] ?? 'approve'), 'من مركز الحوكمة');
-        header("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
         exit();
     } elseif ($act === 'apply_pcr' && $can_edit) {
         $r = PCW::apply($conn, intval($_POST['req_id'] ?? 0), $uid);
-        header("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
         exit();
     }
 }
@@ -112,6 +113,9 @@ $units = $qa("SELECT unit_id, name_ar FROM org_units WHERE company_id={$company_
 $usersList = $qa("SELECT id, name FROM users WHERE company_id={$company_id} ORDER BY name");
 
 $page_title = 'إيكوبيشن | مركز حوكمة الصلاحيات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

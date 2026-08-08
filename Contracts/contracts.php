@@ -22,7 +22,7 @@ $mines_has_is_deleted = db_table_has_column($conn, 'mines', 'is_deleted');
 $mines_has_deleted_at = db_table_has_column($conn, 'mines', 'deleted_at');
 
 if (!$is_super_admin && $company_id <= 0) {
-  header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+  ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
   exit();
 }
 
@@ -92,7 +92,7 @@ $can_delete = $page_permissions['can_delete'];
 
 // منع الوصول إذا لم تكن صلاحية عرض
 if (!$can_view) {
-  header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+العقود+❌");
+  ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض العقود ❌', 'GOV-PERM-403', '');
   exit();
 }
 
@@ -758,17 +758,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               $delete_csrf = isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '';
 
               if (!$can_delete) {
-                header("Location: contracts.php?msg=لا+توجد+صلاحية+حذف+العقود+❌");
+                ems_gov_flash_redirect('contracts.php', 'لا توجد صلاحية حذف العقود ❌', 'GOV-PERM-403', '');
                 exit;
               }
 
               if (empty($delete_csrf) || !hash_equals($contracts_csrf_token, $delete_csrf)) {
-                header("Location: contracts.php?msg=جلسة+الحذف+غير+صالحة+❌");
+                ems_gov_flash_redirect('contracts.php', 'جلسة الحذف غير صالحة ❌', 'GOV-FAIL-409', '');
                 exit;
               }
 
               if (!$contracts_has_is_deleted && !$contracts_has_deleted_at) {
-                header("Location: contracts.php?msg=تعذر+تفعيل+الحذف+الناعم+للعقود+❌");
+                ems_gov_flash_redirect('contracts.php', 'تعذر تفعيل الحذف الناعم للعقود ❌', 'GOV-FAIL-409', '');
                 exit;
               }
 
@@ -796,7 +796,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
               $posted_csrf = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
               if (empty($posted_csrf) || !hash_equals($contracts_csrf_token, $posted_csrf)) {
-                echo "<script>alert('❌ جلسة النموذج غير صالحة'); window.location.href='contracts.php';</script>";
+                ems_gov_flash_redirect('contracts.php', '❌ جلسة النموذج غير صالحة', 'GOV-SCOPE-403', '');
                 exit;
               }
 
@@ -810,16 +810,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   'where'   => array('id' => $posted_project_id),
                 ));
                 if ($owned_project === null) {
-                  echo "<script>alert('❌ لا يمكنك الوصول إلى هذا المشروع'); window.location.href='contracts.php';</script>";
+                  ems_gov_flash_redirect('contracts.php', '❌ لا يمكنك الوصول إلى هذا المشروع', 'GOV-SCOPE-403', '');
                   exit;
                 }
               }
 
               if ($id > 0 && !$can_edit) {
-                header("Location: contracts.php?msg=لا+توجد+صلاحية+تعديل+العقود+❌");
+                ems_gov_flash_redirect('contracts.php', 'لا توجد صلاحية تعديل العقود ❌', 'GOV-PERM-403', '');
                 exit;
               } elseif ($id <= 0 && !$can_add) {
-                header("Location: contracts.php?msg=لا+توجد+صلاحية+إضافة+عقود+جديدة+❌");
+                ems_gov_flash_redirect('contracts.php', 'لا توجد صلاحية إضافة عقود جديدة ❌', 'GOV-PERM-403', '');
                 exit;
               }
 
@@ -976,7 +976,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo "<script>window.location.href='contracts.php?id=$posted_project_id';</script>";
               } else {
                 $ems_save_err = !$result ? 'تعذّر حفظ بيانات العقد — لم يُحفظ' : 'حُفظ العقد لكن فشل حفظ بعض المعدات — يرجى مراجعتها';
-                echo "<script>alert('❌ " . $ems_save_err . "'); window.location.href='contracts.php?id=$posted_project_id';</script>";
+                ems_gov_flash_redirect("contracts.php?id=$posted_project_id", "❌ " . $ems_save_err . "", 'GOV-SCOPE-403', '');
               }
               exit;
             }

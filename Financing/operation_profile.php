@@ -21,7 +21,7 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { http_response_code(403); die('المجالُ المقيَّد — الوصولُ بمنحٍ فرديٍّ لا بدور (FIN-01 §1.1)'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد — الوصولُ بمنحٍ فرديٍّ لا بدور (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
 
 $op_id = intval($_GET['id'] ?? 0);
 $tab   = preg_replace('/[^a-z]/', '', $_GET['tab'] ?? 'terms');
@@ -35,19 +35,36 @@ $r = mysqli_query($conn, "SELECT o.*, le.legal_name AS financier
 if ($r) $op = mysqli_fetch_assoc($r);
 
 $page_title = 'ملف عملية التمويل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
   <?php if (!$op): ?>
+    <?php
+    /* AS-04/AS-05 (UXR-01): فرعُ «غيرُ موجودة» يحمل الرأسَ الموحَّدَ أيضًا —
+       شاشةُ الخطأِ شاشةٌ، ولا تُترك بلا عنوانٍ ولا سطرِ سياقٍ ولا طريقِ رجوع. */
+    $header_icon = 'fa fa-hand-holding-usd';
+    $header_title_html = htmlspecialchars('ملف عملية التمويل — غيرُ موجودة', ENT_QUOTES, 'UTF-8');
+    $header_actions = array();
+    $header_back = array('href' => 'financing_board.php', 'label' => 'رجوع');
+    include __DIR__ . '/../includes/page_header.php';
+    ?>
     <div class="alert alert-warning">عمليةٌ غيرُ موجودةٍ — <a href="financing_board.php">العودةُ للوحة</a></div>
   <?php else: ?>
-  <div class="ems-topbar">
-    <h4><i class="fa fa-hand-holding-usd"></i> عملية <?= htmlspecialchars($op['op_code'], ENT_QUOTES, 'UTF-8') ?>
-        — <?= htmlspecialchars($op['financier'] ?: 'ممول #' . $op['financier_entity_id'], ENT_QUOTES, 'UTF-8') ?></h4>
-    <span class="badge" style="background:#6610f2"><?= htmlspecialchars($op['state'], ENT_QUOTES, 'UTF-8') ?></span>
-  </div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-hand-holding-usd';
+$header_title_html = htmlspecialchars('عملية ' . (htmlspecialchars($op['op_code'], ENT_QUOTES, 'UTF-8')) . ' — ' . (htmlspecialchars($op['financier'] ?: 'ممول #' . $op['financier_entity_id'], ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8');
+ob_start(); ?><span class="badge" style="background:#6610f2"><?= htmlspecialchars($op['state'], ENT_QUOTES, 'UTF-8') ?></span><?php
+$header_actions = array(array('raw' => trim((string) ob_get_clean())));
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <?php $ff_op_id = $op_id; $ff_active = $tab === 'terms' ? 'terms' : $tab;
         include __DIR__ . '/../includes/financing_file_tabs.php'; ?>
 

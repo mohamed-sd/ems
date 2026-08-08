@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Governance/signing_authority.php — التفويض بالتوقيع (LEG-01 §8-③ · الشاشة 207)
  * ───────────────────────────────────────────────────────────────────────────
@@ -22,15 +23,13 @@ $role = strval($_SESSION['user']['role'] ?? '');
 // قراءةً فقط (FIN-26: ملكية الشاشة للحوكمة والدور 26 يطالعها — DEC-01 ②)
 $gov_write = ($role === '-1' || in_array($role, array('1', '19'), true));
 if (!$gov_write && $role !== EMS_ROLE_FINANCING_MGR) {
-    http_response_code(403);
-    exit('403 — باب الحوكمة خلف صلاحيته');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = $company_id ?: 4;
 
 $msg = ''; $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$gov_write) {
-    http_response_code(403);
-    exit('403 — الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19)');
+    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = strval($_POST['op'] ?? '');
@@ -83,6 +82,9 @@ $sites = $conn->query("SELECT id, name FROM sites ORDER BY name")->fetch_all(MYS
 $AUTH_AR = array('general' => 'عام', 'financial' => 'مالي', 'contractual' => 'تعاقدي', 'banking' => 'بنكي', 'operational' => 'تشغيلي (حركة — سقف نطاقي)');
 
 $page_title = 'إيكوبيشن | التفويض بالتوقيع';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

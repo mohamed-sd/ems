@@ -30,7 +30,7 @@ $current_role_id = intval($ctx['role']);
 $is_tickets_mgr  = ($ctx['role'] === EMS_ROLE_TICKETS_MGR);
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -59,9 +59,15 @@ $TABS = array(
     'closed'   => array('مغلقة', " AND t.stage IN ('closed','cancelled')"),
 );
 $tab = isset($_GET['tab']) && isset($TABS[$_GET['tab']]) ? strval($_GET['tab']) : 'open';
-$scope_sql .= $TABS[$tab][1];
+// مرشِّحُ التبويب منفصلٌ عن شرط النطاق: بطاقاتُ اللمحة تصف مركزَ البلاغات كلَّه
+// ولا تتبع التبويبَ المفتوح — خلطُهما كان يجعل «مفتوحة الآن» تعني «مفتوحة ضمن
+// هذا التبويب»، فتنقص عن الشارة واللوحة وتصير صفرًا في تبويب «مغلقة».
+$tab_sql = $TABS[$tab][1];
 
 $page_title = 'إيكوبيشن | البلاغات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -126,14 +132,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">
         <?php // E-13: التبويباتُ الأربعة — كلٌّ بعدّاده الحي
         foreach ($TABS as $tk => $tv):
+            // نطاقُ الرؤية من مصدرٍ واحد ($scope_sql) لا مُعادًا بناؤه هنا —
+            // ازدواجُ التعريف هو ما جعل الأرقام تتفارق أصلًا.
             $cnt_row = tkt_gate($is_super_admin)->scopedQuery(
                 array('scope' => array('t' => 'tickets')),
-                "SELECT COUNT(*) n FROM tickets t WHERE {TENANT_SCOPE}"
-                . ($is_super_admin || $is_tickets_mgr ? '' :
-                   " AND (t.owner_role_id IN (" . implode(',', array_map('intval', tkt_visible_owner_role_ids($current_role_id)))
-                   . ") OR t.reporter_user_id = " . intval($current_user_id)
-                   . " OR t.created_by = " . intval($current_user_id) . ")")
-                . $tv[1]);
+                "SELECT COUNT(*) n FROM tickets t WHERE {TENANT_SCOPE}" . $scope_sql . $tv[1]);
             $cnt = $cnt_row ? intval($cnt_row[0]['n']) : 0;
         ?>
             <a href="?tab=<?php echo $tk; ?>" class="btn btn-sm"
@@ -201,7 +204,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      LEFT JOIN ticket_types tt ON tt.id = t.ticket_type_id
                      LEFT JOIN equipments e ON e.id = t.equipment_id
                      LEFT JOIN project p ON p.id = t.project_id
-                     WHERE {TENANT_SCOPE}" . $scope_sql . "
+                     WHERE {TENANT_SCOPE}" . $scope_sql . $tab_sql . "
                      ORDER BY t.id DESC"
                 );
                 foreach ($rows as $row) {

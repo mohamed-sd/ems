@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = trs_page_perms($conn, 'Transport/transfer_types_config.php', $is_super_
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+أنواع+الترحيل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض أنواع الترحيل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -39,9 +39,9 @@ $bearers    = trs_bearers_rule();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: transfer_types_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: transfer_types_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: transfer_types_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('transfer_types_config.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('transfer_types_config.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('transfer_types_config.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     $operational_category = trim($_POST['operational_category'] ?? '');
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $active = isset($_POST['active']) ? 1 : 0;
 
     if ($name === '' || !array_key_exists($operational_category, $categories) || !array_key_exists($default_bearer, $bearers)) {
-        header("Location: transfer_types_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('transfer_types_config.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     try {
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
             trs_gate(false)->update('transfer_types',
                 array('name' => $name, 'operational_category' => $operational_category, 'default_bearer' => $default_bearer, 'active' => $active),
                 array('id' => $id));
-            header("Location: transfer_types_config.php?msg=تم+تعديل+النوع+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('transfer_types_config.php', 'تم تعديل النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             // كود تقني بسيط للأنواع المُضافة يدوياً
             $code = 'custom_' . trs_gen_code($conn, 'transfer_types', 'T', $company_id);
@@ -66,11 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
                 'code' => $code, 'name' => $name, 'operational_category' => $operational_category,
                 'default_bearer' => $default_bearer, 'active' => $active,
             ));
-            header("Location: transfer_types_config.php?msg=تمت+إضافة+النوع+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('transfer_types_config.php', 'تمت إضافة النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('transfer_types save refused: ' . $e->getMessage());
-        header("Location: transfer_types_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('transfer_types_config.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
@@ -79,18 +79,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 //    دائمًا: يختفي من القوائم (فلترة البوابة) وتبقى مراجع الأوامر التاريخية
 //    سليمة — فرقٌ دلاليٌّ مقصودٌ بالسياسة، موثَّق. ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: transfer_types_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('transfer_types_config.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         trs_gate(false)->softDelete('transfer_types', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('transfer_types softDelete refused: ' . $e->getMessage());
-        header("Location: transfer_types_config.php?msg=تعذّر+الحذف+❌"); exit();
+        ems_gov_flash_redirect('transfer_types_config.php', 'تعذّر الحذف ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: transfer_types_config.php?msg=تم+حذف+النوع+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('transfer_types_config.php', 'تم حذف النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | إعدادات الترحيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

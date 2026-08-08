@@ -10,18 +10,18 @@ require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $pp = check_page_permissions($conn, 'Workforce/worker_settlement.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $ws_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker settlement super') : ems_tenant_db();
 $STATES=['محتسب','معتمد','مدفوع'];
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $id=intval($_POST['id']??0); $is_editing=$id>0;
-    if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) { header("Location: worker_settlement.php?msg=لا+صلاحية+❌"); exit(); }
+    if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) { ems_gov_flash_redirect('worker_settlement.php', 'لا صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $worker_id=intval($_POST['worker_id']??0);
     $contract_id=!empty($_POST['worker_contract_id'])?intval($_POST['worker_contract_id']):null;
     $source=trim($_POST['source_type']??''); $source=$source!==''?$source:null;
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $state=trim($_POST['state']??'محتسب');
     $notes=trim($_POST['notes']??''); $notes=$notes!==''?$notes:null;
     if (!$is_editing) {
-        if ($worker_id<=0) { header("Location: worker_settlement.php?msg=يجب+اختيار+عامل+❌"); exit(); }
+        if ($worker_id<=0) { ems_gov_flash_redirect('worker_settlement.php', 'يجب اختيار عامل ❌', 'GOV-FAIL-409', ''); exit(); }
         $nid=0;
         try {
             // company_id تحقنه البوابة من سياق الجلسة، وتعيد المعرّف الوليد
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
                 'settlement_party' => $party, 'settlement_basis' => $basis, 'net_amount' => $net,
                 'net_finance_note' => $net_note, 'state' => $state, 'notes' => $notes, 'created_by' => $user_id)));
         } catch (\Throwable $t) { error_log('worker_settlement.php insert: ' . $t->getMessage()); }
-        header("Location: worker_settlement.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
+        ems_gov_redirect("Location: worker_settlement.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
     } else {
         try {
             $ws_gate->update('worker_settlement', array(
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
                 'settlement_basis' => $basis, 'net_amount' => $net, 'net_finance_note' => $net_note,
                 'state' => $state, 'notes' => $notes), array('id' => $id));
         } catch (\Throwable $t) { error_log('worker_settlement.php update: ' . $t->getMessage()); }
-        header("Location: worker_settlement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
+        ems_gov_redirect("Location: worker_settlement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_line' && $can_edit) {
@@ -62,14 +62,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_line' &
             try { $owned = ($ws_gate->selectOne('worker_settlement', array('columns'=>array('id'), 'where'=>array('id'=>$sid))) !== null); }
             catch (\Throwable $t) { $owned = false; error_log('worker_settlement.php add_line own: ' . $t->getMessage()); }
         }
-        if (!$owned) { header("Location: worker_settlement.php?msg=التسوية+خارج+نطاق+الشركة+❌"); exit(); }
+        if (!$owned) { ems_gov_flash_redirect('worker_settlement.php', 'التسوية خارج نطاق الشركة ❌', 'GOV-SCOPE-403', ''); exit(); }
         try {
             // ابن T_CHILD: البوابة تتحقق من ملكية الأب (settlement_id) قبل الإدراج
             $ws_gate->insert('worker_settlement_line', array(
                 'settlement_id' => $sid, 'line_type' => $lt, 'description' => $desc, 'amount' => $amt));
         } catch (\Throwable $t) { error_log('worker_settlement.php add_line: ' . $t->getMessage()); }
     }
-    header("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حفظ+البند"); exit();
+    ems_gov_redirect("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حفظ+البند"); exit();
 }
 if (($_GET['del_line']??'')!=='' && $can_delete) { $lid=intval($_GET['del_line']); $sid=intval($_GET['edit']??0);
     // عزل الشركة عبر التسوية الأب (worker_settlement_line بلا company_id): يُستحضَر أبو
@@ -81,11 +81,11 @@ if (($_GET['del_line']??'')!=='' && $can_delete) { $lid=intval($_GET['del_line']
                 'worker_settlement', intval($ws_line['settlement_id']), 'settlement_id', 'settlement line delete');
         }
     } catch (\Throwable $t) { error_log('worker_settlement.php del_line: ' . $t->getMessage()); }
-    header("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حذف+البند"); exit(); }
+    ems_gov_redirect("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حذف+البند"); exit(); }
 if (($_GET['delete']??'')!=='' && $can_delete) { $d=intval($_GET['delete']);
     try { $ws_gate->deleteRow('worker_settlement', $d, 'settlement delete'); }
     catch (\Throwable $t) { error_log('worker_settlement.php delete: ' . $t->getMessage()); }
-    header("Location: worker_settlement.php?msg=✅+تم+الحذف"); exit(); }
+    ems_gov_flash_redirect('worker_settlement.php', '✅ تم الحذف', 'GOV-OK-200', ''); exit(); }
 
 $edit=null; $lines=[]; $edit_id=intval($_GET['edit']??0);
 if ($edit_id>0) {
@@ -106,7 +106,11 @@ try {
     foreach($ws_workers as $w){$workers[$w['id']]=$w['name'];}
 } catch (\Throwable $t) { error_log('worker_settlement.php workers: ' . $t->getMessage()); }
 
-$page_title="إيكوبيشن | تسويات العاملين"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | تسويات العاملين"; 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
+include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">

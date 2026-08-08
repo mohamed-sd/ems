@@ -33,6 +33,9 @@ $TABS = array('1' => 'الرأس والحالة', '2' => 'البنود والق�
               '8' => 'المقاعد والفجوة');
 
 $page_title = 'إيكوبيشن | بطاقة العقد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

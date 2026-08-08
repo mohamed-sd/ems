@@ -15,14 +15,14 @@ include '../includes/permissions_helper.php';
 $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $page_permissions = check_page_permissions($conn, 'Employees/equipment_operators.php');
 $can_view   = $page_permissions['can_view'];
 $can_add    = $page_permissions['can_add'];
 $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المشغلين+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المشغلين ❌', 'GOV-PERM-403', ''); exit(); }
 
 // بوابة العزل — تستبدل نطاقات e/o/update اليدوية الثلاثة
 $op_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('equipment operators super') : ems_tenant_db();
@@ -63,8 +63,8 @@ function ems_op_sync_employee($conn, $emp_id, $vals, $scope) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id         = intval($_POST['id'] ?? 0);
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: equipment_operators.php?msg=لا+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add)  { header("Location: equipment_operators.php?msg=لا+صلاحية+إضافة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('equipment_operators.php', 'لا صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add)  { ems_gov_flash_redirect('equipment_operators.php', 'لا صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
 
     $employee_id = intval($_POST['employee_id'] ?? 0);
     $f = function ($k) { $v = trim($_POST[$k] ?? ''); return $v !== '' ? $v : null; };
@@ -81,17 +81,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status' => $status, 'notes' => $notes,
     );
     if (!$is_editing) {
-        if ($employee_id <= 0) { header("Location: equipment_operators.php?msg=يجب+اختيار+موظف+❌"); exit(); }
+        if ($employee_id <= 0) { ems_gov_flash_redirect('equipment_operators.php', 'يجب اختيار موظف ❌', 'GOV-FAIL-409', ''); exit(); }
         // امنع التكرار (employee_id فريد) — معزولًا بالشركة
         $dup = $op_gate->selectOne('equipment_operators', array('columns' => array('id'), 'where' => array('employee_id' => $employee_id)));
-        if ($dup) { header("Location: equipment_operators.php?msg=هذا+الموظف+مسجّلٌ+مشغّلاً+مسبقاً+❌"); exit(); }
+        if ($dup) { ems_gov_flash_redirect('equipment_operators.php', 'هذا الموظف مسجّلٌ مشغّلاً مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
         $ok = false;
         try {
             $op_data['employee_id'] = $employee_id;
             $ok = ((int) $op_gate->insert('equipment_operators', $op_data)) > 0;
         } catch (\Throwable $e) { $ok = false; }
         if ($ok) ems_op_sync_employee($conn, $employee_id, $sync, '');
-        header("Location: equipment_operators.php?msg=" . ($ok ? "✅+تم+تسجيل+المشغّل" : "❌+تعذّر+الحفظ")); exit();
+        ems_gov_flash_redirect('equipment_operators.php', $ok ? 'تم تسجيل المشغّل ✅' : 'تعذّر الحفظ ❌', $ok ? 'GOV-OK-200' : 'GOV-FAIL-409', '');
     } else {
         $ok = false;
         try {
@@ -101,13 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // اجلب employee_id للمزامنة (معزولًا)
         $erow = $op_gate->selectOne('equipment_operators', array('columns' => array('employee_id'), 'where' => array('id' => $id)));
         if ($ok && $erow) ems_op_sync_employee($conn, intval($erow['employee_id']), $sync, '');
-        header("Location: equipment_operators.php?edit=" . $id . "&msg=" . ($ok ? "✅+تم+تحديث+بيانات+المشغّل" : "❌+تعذّر+التحديث")); exit();
+        ems_gov_flash_redirect('equipment_operators.php?edit=' . $id, $ok ? 'تم تحديث بيانات المشغّل ✅' : 'تعذّر التحديث ❌', $ok ? 'GOV-OK-200' : 'GOV-FAIL-409', '');
     }
 }
 
 // ── حذف (سجل المشغّل فقط — لا يُحذف الموظف) ─────────────────────────────────────
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: equipment_operators.php?msg=لا+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('equipment_operators.php', 'لا صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $id = (int) $_GET['delete_id'];
     // حذفٌ صلبٌ عبر deleteChild (الشركة + الموظف الأب المملوك المتحقَّق)
     $ok = false;
@@ -117,7 +117,7 @@ if (isset($_GET['delete_id'])) {
             $ok = $op_gate->deleteChild('equipment_operators', $id, 'employees', intval($row['employee_id']), 'employee_id', 'operator delete') > 0;
         }
     } catch (\Throwable $e) { $ok = false; }
-    header("Location: equipment_operators.php?msg=" . ($ok ? "✅+تم+حذف+سجل+المشغّل" : "❌+تعذّر+الحذف")); exit();
+    ems_gov_flash_redirect('equipment_operators.php', $ok ? 'تم حذف سجل المشغّل ✅' : 'تعذّر الحذف ❌', $ok ? 'GOV-OK-200' : 'GOV-FAIL-409', '');
 }
 
 // ── تحميل صفٍّ للتعديل ─────────────────────────────────────────────────────────
@@ -147,6 +147,9 @@ if ($can_add && !$edit) {
 }
 
 $page_title = "إيكوبيشن | المشغّلون والسائقون";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

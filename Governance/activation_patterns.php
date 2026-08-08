@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-717 · SCN-719
 /**
  * Governance/activation_patterns.php — أنماط التفعيل (LEG-01 §7 · §8-⑤ · الشاشة 209)
@@ -16,8 +17,7 @@ require_once dirname(__DIR__) . '/app/Core/EntityGovernanceService.php';
 
 $role = strval($_SESSION['user']['role'] ?? '');
 if ($role !== '-1' && !in_array($role, array('1', '19'), true)) {
-    http_response_code(403);
-    exit('403 — باب الحوكمة خلف صلاحيته');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $uid = intval($_SESSION['user']['id'] ?? 0);
 
@@ -65,6 +65,9 @@ $flags = $conn->query(
 $entities = $conn->query("SELECT entity_id, legal_name FROM legal_entities WHERE state = 'active' ORDER BY is_tenant DESC, legal_name")->fetch_all(MYSQLI_ASSOC);
 
 $page_title = 'إيكوبيشن | أنماط التفعيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

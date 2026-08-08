@@ -19,14 +19,14 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=" . urlencode('لا توجد بيئة شركة صالحة'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة', 'GOV-SCOPE-403', '');
     exit();
 }
 
 // صلاحية العرض
 $perms = function_exists('check_page_permissions') ? check_page_permissions($conn, 'movement/client_tree.php') : ['can_view' => true];
 if (empty($perms['can_view'])) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية لعرض هذه الصفحة'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا توجد صلاحية لعرض هذه الصفحة', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -584,6 +584,9 @@ $shiftIcon = function ($s) {
 };
 
 $page_title = "إيكوبيشن | شجرة حسابات العميل";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include('../inheader.php');
 // CSS معزول خاص بهذه الشاشة فقط (محصور تحت .client-tree-page)
 $__ctcss = __DIR__ . '/../assets/css/client-tree.css';

@@ -16,11 +16,11 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/import_events_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+الاستيراد+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية الاستيراد ❌', 'GOV-PERM-403', ''); exit(); }
 $cid = intval($company_id);
 
 /**
@@ -122,19 +122,22 @@ function fin_import_mnt($conn, $gate, $uid)
 }
 
 if (isset($_GET['gen_proc'])) {
-    if (!$can_add) { header("Location: import_events_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: import_events_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('import_events_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('import_events_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); }
     $n = fin_import_proc($conn, ems_tenant_db(), $current_user_id);
-    header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+المشتريات+✅"); exit();
+    ems_gov_flash_redirect('import_events_fin.php', "تم توليد $n حدث من المشتريات ✅", 'GOV-OK-200', ''); exit();
 }
 if (isset($_GET['gen_mnt'])) {
-    if (!$can_add) { header("Location: import_events_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: import_events_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('import_events_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('import_events_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); }
     $n = fin_import_mnt($conn, ems_tenant_db(), $current_user_id);
-    header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+الصيانة+✅"); exit();
+    ems_gov_flash_redirect('import_events_fin.php', "تم توليد $n حدث من الصيانة ✅", 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | استقبال معاملات الإدارات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

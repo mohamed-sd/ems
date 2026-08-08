@@ -13,24 +13,24 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/payments_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المدفوعات+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المدفوعات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $directions = fin_payment_directions(); $methods = fin_payment_methods(); $party_types = fin_party_types();
 
 // ── تنفيذ الدفع/التحصيل (محرك الخزينة + حارس التسوية) ──
 if (isset($_GET['execute_id'])) {
-    if (!$can_edit) { header("Location: payments_fin.php?msg=لا+توجد+صلاحية+التنفيذ+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: payments_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); } // إصلاح #2
-    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { header("Location: payments_fin.php?msg=الصرف/التحصيل+يخصّ+أمين+الخزينة+فقط+❌"); exit(); } // فصل الواجبات
+    if (!$can_edit) { ems_gov_flash_redirect('payments_fin.php', 'لا توجد صلاحية التنفيذ ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('payments_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); } // إصلاح #2
+    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { ems_gov_flash_redirect('payments_fin.php', 'الصرف/التحصيل يخصّ أمين الخزينة فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
     $pid = intval($_GET['execute_id']);
     $gate = fin_gate($is_super_admin);
     $pay = $gate->selectOne('fin_payments', array('where' => array('id' => $pid)));
-    if (!$pay || $pay['state'] !== 'draft') { header("Location: payments_fin.php?msg=لا+يمكن+تنفيذ+هذا+الدفع+❌"); exit(); }
+    if (!$pay || $pay['state'] !== 'draft') { ems_gov_flash_redirect('payments_fin.php', 'لا يمكن تنفيذ هذا الدفع ❌', 'GOV-FAIL-409', ''); exit(); }
 
     // إصلاح #9: لا يتجاوز التحصيل المتبقّي على الذمّة
     $recv = null;
@@ -39,7 +39,7 @@ if (isset($_GET['execute_id'])) {
         $recv = $gate->selectOne('fin_receivables', array('columns' => array('outstanding', 'collected', 'amount'), 'where' => array('id' => $rid)));
         $out = $recv ? (float) $recv['outstanding'] : 0;
         if ((float)$pay['amount'] > $out + 0.01) {
-            header("Location: payments_fin.php?msg=لا+تنفيذ:+المبلغ+يتجاوز+المتبقّي+على+الذمّة+(" . number_format($out, 2) . ")+❌"); exit();
+            ems_gov_flash_redirect(ems_flash_to('payments_fin.php', number_format($out, 2) . ")+❌"), 'لا تنفيذ: المبلغ يتجاوز المتبقّي على الذمّة (', 'GOV-INFO-200', ''); exit();
         }
     }
 
@@ -47,7 +47,7 @@ if (isset($_GET['execute_id'])) {
     if ($pay['direction'] === 'disbursement' && $pay['party_type'] === 'supplier') {
         $sref = intval($pay['party_ref']);
         $n = $gate->count('fin_dues', array('where' => array('party_type' => 'supplier', 'party_ref' => $sref, 'settlement_state' => 'pending')));
-        if ($n > 0) { header("Location: payments_fin.php?msg=لا+صرف:+للمورد+مستحقات+غير+مُسوّاة+($n)+❌"); exit(); }
+        if ($n > 0) { ems_gov_flash_redirect('payments_fin.php', "لا صرف: للمورد مستحقات غير مُسوّاة ($n) ❌", 'GOV-FAIL-409', ''); exit(); }
     }
 
     // التنفيذ + أثره ذرّيًا (§9): الدفع + (تسوية المورد أو تحديث الذمّة) معًا
@@ -75,22 +75,22 @@ if (isset($_GET['execute_id'])) {
     // (فجوة 4) إشعار المدير المالي بحركة الخزينة
     $dir_lbl = $pay['direction'] === 'collection' ? 'تحصيل' : 'صرف';
     fin_notify($conn, $company_id, 'finance_manager', 'نُفِّذ ' . $dir_lbl . ' ' . $pay['payment_no'] . ' بمبلغ ' . number_format((float)$pay['amount'], 0), 'payments_fin.php');
-    header("Location: payments_fin.php?msg=تم+تنفيذ+الحركة+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('payments_fin.php', 'تم تنفيذ الحركة بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: payments_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('payments_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->update('fin_payments',
         array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
         array('id' => $d), "state='draft'");
-    header("Location: payments_fin.php?msg=تم+حذف+الحركة+✅"); exit();
+    ems_gov_flash_redirect('payments_fin.php', 'تم حذف الحركة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ حركة جديدة (مسودة) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
-    if (!$can_add) { header("Location: payments_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('payments_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $direction  = ($_POST['direction'] ?? '') === 'collection' ? 'collection' : 'disbursement';
     $party_type = in_array($_POST['party_type'] ?? '', array('supplier','customer','employee','other'), true) ? $_POST['party_type'] : 'other';
     $party_ref  = intval($_POST['party_ref'] ?? 0) ?: null;
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     $amount     = round(floatval($_POST['amount'] ?? 0), 2);
     $receivable_id = intval($_POST['receivable_id'] ?? 0) ?: null;
     $memo       = trim($_POST['memo'] ?? '');
-    if ($amount <= 0) { header("Location: payments_fin.php?msg=المبلغ+غير+صحيح+❌"); exit(); }
+    if ($amount <= 0) { ems_gov_flash_redirect('payments_fin.php', 'المبلغ غير صحيح ❌', 'GOV-REF-404', ''); exit(); }
 
     $payment_no = fin_gen_code($conn, 'fin_payments', 'FIN-PY', $company_id);
     fin_gate($is_super_admin)->insert('fin_payments', array(
@@ -106,10 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
         'party_ref' => $party_ref, 'method' => $method, 'amount' => $amount,
         'receivable_id' => $receivable_id, 'memo' => $memo, 'state' => 'draft', 'created_by' => $current_user_id,
     ));
-    header("Location: payments_fin.php?msg=تم+حفظ+الحركة+(مسودة)+✅"); exit();
+    ems_gov_flash_redirect('payments_fin.php', 'تم حفظ الحركة (مسودة) ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | المدفوعات والخزينة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

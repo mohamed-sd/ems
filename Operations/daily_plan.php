@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Operations/daily_plan.php — خطةُ عمل الغد: مساحةُ التوزيع (H-03 · UX-03 §2.2)
  * ───────────────────────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -51,7 +52,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+خطة+الغد+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض خطة الغد ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -62,7 +63,7 @@ $sel_date    = strval($_GET['date'] ?? $_POST['plan_date'] ?? date('Y-m-d', strt
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $sel_date)) { $sel_date = date('Y-m-d', strtotime('+1 day')); }
 
 $dp_back = function ($msg) use ($sel_project, $sel_date) {
-    header("Location: daily_plan.php?project={$sel_project}&date={$sel_date}&msg=" . rawurlencode($msg));
+    ems_gov_redirect("Location: daily_plan.php?project={$sel_project}&date={$sel_date}&msg=" . rawurlencode($msg));
     exit();
 };
 
@@ -152,6 +153,9 @@ $STATES = array('draft' => 'مسودة (توزيع)', 'approved' => 'معتمد�
 $editable = $plan && strval($plan['state']) === 'draft' && ($can_add || $can_edit);
 
 $page_title = 'إيكوبيشن | خطة عمل الغد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -15,7 +15,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -53,7 +53,7 @@ $can_delete = $page_permissions['can_delete'];
 
 // منع الوصول إذا لم تكن صلاحية عرض
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+المعدات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المعدات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -122,6 +122,9 @@ if ($selected_project_id > 0) {
 //  منتقي المشروع يأتي من صفحة select_project.php عبر ?project_id=.)
 
 $page_title = "إدارة المعدات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -256,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         if (function_exists('ems_save_equipment_card_fields')) {
             ems_save_equipment_card_fields($conn, $card_eq_id, ($edit_id <= 0), $card_scope);
         }
-        header("Location: equipments.php?msg=$msg");
+        ems_gov_flash_redirect('equipments.php', "$msg", 'GOV-INFO-200', '');
         exit;
     } catch (\Throwable $e) {
         $success_msg = "خطأ في الحفظ: " . $e->getMessage();
@@ -282,8 +285,12 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 <div class="main">
     <!-- عنوان الصفحة -->
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
-    <div class="header" data-ems-unified-header="1">
-        <div class="actions"<?php if ($_SESSION['user']['role'] == "10") echo ' style="display:none;"'; ?>>
+    <?php
+/* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ بدلَ الرأسِ اليدويِّ المُحاكي —
+   مصدرٌ واحدٌ للبنيةِ، والأفعالُ وزرُّ العودةِ منقولانِ كما هما. */
+$header_icon = 'fas fa-cogs';
+$header_title_html = htmlspecialchars('إدارة المعدات', ENT_QUOTES, 'UTF-8');
+ob_start(); ?>>
             <?php if ($_SESSION['user']['role'] != "10") { ?>
             <!-- ── نظام Excel الموحّد (Unified Excel Framework) ── -->
             <?php
@@ -302,20 +309,14 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
             </a>
-            <?php } ?>
-        </div>
-        <div class="title">
-            <h1 class="title-content">
-                <div class="title-icon"><i class="fas fa-cogs"></i></div>
-                إدارة المعدات
-            </h1>
-        </div>
-        <div class="back">
-            <a href="../main/dashboard.php" class="back-btn">
+            <?php } ?><?php
+$header_actions = array(array('raw' => trim((string) ob_get_clean())));
+ob_start(); ?><a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+            </a><?php
+$header_back = array('raw' => trim((string) ob_get_clean()));
+include __DIR__ . '/../includes/page_header.php';
+?>
 
     <?php if (!empty($success_msg)):
         $isSuccess = strpos($success_msg, '✅') !== false;

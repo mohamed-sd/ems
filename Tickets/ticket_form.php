@@ -31,7 +31,7 @@ $current_role_id = intval($ctx['role']);
 $is_tickets_mgr  = ($ctx['role'] === EMS_ROLE_TICKETS_MGR);
 
 if ($company_id <= 0 && !$is_super_admin) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+بيئة+شركة+صالحة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -53,7 +53,7 @@ $ticket = null;
 if ($ticket_id > 0) {
     $ticket = tkt_gate($is_super_admin)->selectOne('tickets', array('where' => array('id' => $ticket_id)));
     if (!$ticket || !tkt_can_view_ticket($ticket, $ctx)) {
-        header("Location: tickets_list.php?msg=التذكرة+غير+موجودة+أو+خارج+نطاقك+❌");
+        ems_gov_flash_redirect('tickets_list.php', 'التذكرة غير موجودة أو خارج نطاقك ❌', 'GOV-SCOPE-403', '');
         exit();
     }
 }
@@ -64,7 +64,7 @@ $is_final = $ticket && in_array($ticket['stage'], array('closed', 'cancelled'), 
 // ① إنشاء بلاغ (بلا id) — متاحٌ لكل مستخدم مسجّل
 // ══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket_id === 0 && isset($_POST['complaint'])) {
-    if ($company_id <= 0) { header("Location: ticket_form.php?msg=لا+يمكن+الإبلاغ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('ticket_form.php', 'لا يمكن الإبلاغ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
     $type_id          = intval($_POST['ticket_type_id'] ?? 0);
     $complaint        = trim($_POST['complaint'] ?? '');
     $reporting_person = trim($_POST['reporting_person'] ?? '');
@@ -77,21 +77,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket_id === 0 && isset($_POST['c
     $meter_val = ($meter_reading === '') ? null : floatval($meter_reading);
 
     if ($type_id <= 0 || $complaint === '' || $reporting_person === '') {
-        header("Location: ticket_form.php?msg=النوع+والوصف+واسم+المُبلِّغ+إلزامية+❌"); exit();
+        ems_gov_flash_redirect('ticket_form.php', 'النوع والوصف واسم المُبلِّغ إلزامية ❌', 'GOV-FAIL-409', ''); exit();
     }
     $type = tkt_gate(false)->selectOne('ticket_types', array(
         'columns' => array('id', 'owner_role_id', 'default_nature'),
         'where'   => array('id' => $type_id, 'active' => 1)));
-    if (!$type) { header("Location: ticket_form.php?msg=نوع+البلاغ+غير+صالح+❌"); exit(); }
+    if (!$type) { ems_gov_flash_redirect('ticket_form.php', 'نوع البلاغ غير صالح ❌', 'GOV-FAIL-409', ''); exit(); }
 
-    $ticket_no = '';
+    // الرقم يُخصَّص قبل المعاملة: تخصيصه بداخلها كان يجعل أيَّ ارتدادٍ
+    // يتراجع بالعدّاد فتعلق الشاشة تطلب رقمًا محجوزًا في كل محاولةٍ تالية.
+    try {
+        $ticket_no = tkt_next_ticket_no($conn, $company_id);
+    } catch (\Throwable $e) {
+        error_log('ticket number allocation failed: ' . $e->getMessage());
+        ems_gov_flash_redirect('ticket_form.php', 'تعذر إصدار رقم البلاغ ❌', 'GOV-FAIL-409', ''); exit();
+    }
     try {
         tkt_gate(false)->runInTransaction(function ($g) use (
             $conn, $company_id, $type, $type_id, $complaint, $reporting_person, $reporter_contact,
             $equipment_id, $project_id, $machine_condition, $meter_val,
-            $current_user_id, $current_role_id, &$ticket_no
+            $current_user_id, $current_role_id, $ticket_no
         ) {
-            $ticket_no = tkt_next_ticket_no($conn, $company_id);
             $tid = $g->insert('tickets', array(
                 'ticket_no' => $ticket_no, 'ticket_type_id' => $type_id,
                 'stage' => 'routed',   // التوجيه فوريٌّ بحسب النوع المختار
@@ -120,9 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket_id === 0 && isset($_POST['c
         }, 'create ticket (one-step routed)');
     } catch (\Throwable $e) {
         error_log('ticket create failed: ' . $e->getMessage());
-        header("Location: ticket_form.php?msg=حدث+خطأ+أثناء+تسجيل+البلاغ+❌"); exit();
+        ems_gov_flash_redirect('ticket_form.php', 'حدث خطأ أثناء تسجيل البلاغ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: tickets_list.php?msg=" . urlencode('تم تسجيل البلاغ ' . $ticket_no . ' وتوجيهه بنجاح ✅'));
+    ems_gov_flash_redirect('tickets_list.php', 'تم تسجيل البلاغ ' . $ticket_no . ' وتوجيهه بنجاح ✅', 'GOV-OK-200', '');
     exit();
 }
 
@@ -133,17 +139,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
     $do     = trim($_POST['do'] ?? '');
     $reason = trim($_POST['reason'] ?? '');
     $tr_map = tkt_transitions();
-    if (!isset($tr_map[$do])) { header("Location: $self_url&msg=انتقال+غير+معروف+❌"); exit(); }
+    if (!isset($tr_map[$do])) { ems_gov_redirect("Location: $self_url&msg=انتقال+غير+معروف+❌"); exit(); }
     $tr = $tr_map[$do];
     $allowed = ($tr['need'] === 'delete') ? $can_admin : $can_manage;
-    if (!$allowed) { header("Location: $self_url&msg=الانتقالات+بيد+فريق+البلاغات+❌"); exit(); }
-    if ($ticket['stage'] !== $tr['from']) { header("Location: $self_url&msg=المرحلة+الحالية+لا+تسمح+بهذا+الانتقال+❌"); exit(); }
-    if ($tr['reason'] && $reason === '') { header("Location: $self_url&msg=السبب+إلزامي+لهذا+الانتقال+❌"); exit(); }
+    if (!$allowed) { ems_gov_redirect("Location: $self_url&msg=الانتقالات+بيد+فريق+البلاغات+❌"); exit(); }
+    if (!tkt_transition_allows($tr, $ticket['stage'])) { ems_gov_redirect("Location: $self_url&msg=المرحلة+الحالية+لا+تسمح+بهذا+الانتقال+❌"); exit(); }
+    if ($tr['reason'] && $reason === '') { ems_gov_redirect("Location: $self_url&msg=السبب+إلزامي+لهذا+الانتقال+❌"); exit(); }
     // التذكرة الرئيسية لا تُغلق قبل فروعها — حارسٌ خادميٌّ لا واجهيّ
     if ($do === 'close') {
         $open_children = tkt_open_children_count($ticket_id);
         if ($open_children > 0) {
-            header("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_children . ' فرعًا ما زال مفتوحًا ❌')); exit();
+            ems_gov_redirect("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_children . ' فرعًا ما زال مفتوحًا ❌')); exit();
+        }
+        // ولا تُغلق ومسارٌ إلزاميٌّ مفتوح — وإلا انفصل رأسُ البلاغ عن تنفيذه
+        $open_ws = tkt_open_mandatory_ws_count(tkt_gate(false), $ticket_id);
+        if ($open_ws > 0) {
+            ems_gov_redirect("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_ws . ' مسارًا إلزاميًّا ما زال مفتوحًا ❌')); exit();
         }
     }
 
@@ -158,32 +169,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
                 $upd['close_time'] = date('H:i');
                 $upd['closed_by']  = $current_user_id;
             }
+            // التوجيه يستكمل ما ينقص البلاغ القادم من المسار البرمجي:
+            // إدارةً مالكةً من نوعه إن كان بلا مالك، ومهلةً إن لم تُحسب له.
+            if ($do === 'route' && intval($ticket['owner_role_id']) <= 0) {
+                $ty = $g->selectOne('ticket_types', array(
+                    'columns' => array('owner_role_id'),
+                    'where'   => array('id' => intval($ticket['ticket_type_id']))));
+                if ($ty && intval($ty['owner_role_id']) > 0) { $upd['owner_role_id'] = intval($ty['owner_role_id']); }
+            }
             $g->update('tickets', $upd, array('id' => $ticket_id));
+            if ($do === 'route' && empty($ticket['resolution_due_at'])) {
+                tkt_apply_sla($g, $ticket_id, intval($ticket['ticket_type_id']), $ticket['priority'],
+                              $ticket['business_impact'], $ticket['call_date'], $ticket['call_time']);
+            }
+            // الرأس يتبع المرحلة للبلاغات عديمة المسارات — وإلا بقي مفتوحًا بعد الإغلاق
+            tkt_sync_head_state($g, $ticket_id, $tr['to']);
             $g->insert('ticket_events', array(
                 'ticket_id' => $ticket_id, 'event_type' => 'status_change',
                 'actor_user_id' => $current_user_id, 'actor_role_id' => $current_role_id,
                 'body' => $tr['label'] . ($reason !== '' ? ' — السبب: ' . $reason : ''),
-                'old_value' => $tr['from'], 'new_value' => $tr['to'],
+                'old_value' => $ticket['stage'], 'new_value' => $tr['to'],
             ));
         }, 'ticket transition ' . $do);
     } catch (\Throwable $e) {
         error_log('ticket transition failed: ' . $e->getMessage());
-        header("Location: $self_url&msg=تعذر+تنفيذ+الانتقال+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=تعذر+تنفيذ+الانتقال+❌"); exit();
     }
-    header("Location: $self_url&msg=" . urlencode('تم: ' . $tr['label'] . ' ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('تم: ' . $tr['label'] . ' ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
 // ③ تحويل الملكية — قيدٌ دائمٌ بسببٍ إلزامي
 // ══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'transfer') {
-    if (!$can_manage) { header("Location: $self_url&msg=التحويل+بيد+فريق+البلاغات+❌"); exit(); }
-    if ($is_final)    { header("Location: $self_url&msg=لا+تحويل+بعد+الإغلاق/الإلغاء+❌"); exit(); }
+    if (!$can_manage) { ems_gov_redirect("Location: $self_url&msg=التحويل+بيد+فريق+البلاغات+❌"); exit(); }
+    if ($is_final)    { ems_gov_redirect("Location: $self_url&msg=لا+تحويل+بعد+الإغلاق/الإلغاء+❌"); exit(); }
     $to_role = intval($_POST['to_role_id'] ?? 0);
     $reason  = trim($_POST['reason'] ?? '');
-    if (!in_array($to_role, tkt_owner_role_ids(), true)) { header("Location: $self_url&msg=الإدارة+الهدف+غير+صالحة+❌"); exit(); }
-    if ($reason === '') { header("Location: $self_url&msg=سبب+التحويل+إلزامي+❌"); exit(); }
-    if ($to_role === intval($ticket['owner_role_id'])) { header("Location: $self_url&msg=التذكرة+لدى+هذه+الإدارة+أصلًا+❌"); exit(); }
+    if (!in_array($to_role, tkt_owner_role_ids(), true)) { ems_gov_redirect("Location: $self_url&msg=الإدارة+الهدف+غير+صالحة+❌"); exit(); }
+    if ($reason === '') { ems_gov_redirect("Location: $self_url&msg=سبب+التحويل+إلزامي+❌"); exit(); }
+    if ($to_role === intval($ticket['owner_role_id'])) { ems_gov_redirect("Location: $self_url&msg=التذكرة+لدى+هذه+الإدارة+أصلًا+❌"); exit(); }
 
     try {
         tkt_gate(false)->runInTransaction(function ($g) use ($ticket, $ticket_id, $to_role, $reason, $current_user_id, $current_role_id, $roles_map) {
@@ -204,22 +229,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         }, 'ticket ownership transfer');
     } catch (\Throwable $e) {
         error_log('ticket transfer failed: ' . $e->getMessage());
-        header("Location: $self_url&msg=تعذر+التحويل+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=تعذر+التحويل+❌"); exit();
     }
-    header("Location: $self_url&msg=" . urlencode('تم تحويل الملكية إلى ' . tkt_label($roles_map, $to_role) . ' ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('تم تحويل الملكية إلى ' . tkt_label($roles_map, $to_role) . ' ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
 // ④ إلغاء التذكرة — حالةٌ تُسجَّل لا محوٌ للسجل، بصلاحيةٍ أعلى وسببٍ إلزامي
 // ══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'cancel') {
-    if (!$can_admin) { header("Location: $self_url&msg=الإلغاء+بصلاحية+مدير+البلاغات+❌"); exit(); }
-    if ($is_final)   { header("Location: $self_url&msg=التذكرة+منتهية+أصلًا+❌"); exit(); }
+    if (!$can_admin) { ems_gov_redirect("Location: $self_url&msg=الإلغاء+بصلاحية+مدير+البلاغات+❌"); exit(); }
+    if ($is_final)   { ems_gov_redirect("Location: $self_url&msg=التذكرة+منتهية+أصلًا+❌"); exit(); }
     $reason = trim($_POST['reason'] ?? '');
-    if ($reason === '') { header("Location: $self_url&msg=سبب+الإلغاء+إلزامي+❌"); exit(); }
+    if ($reason === '') { ems_gov_redirect("Location: $self_url&msg=سبب+الإلغاء+إلزامي+❌"); exit(); }
     try {
         tkt_gate(false)->runInTransaction(function ($g) use ($ticket, $ticket_id, $reason, $current_user_id, $current_role_id) {
             $g->update('tickets', array('stage' => 'cancelled'), array('id' => $ticket_id));
+            // الإلغاء إجهاضٌ إداريٌّ يعلو على المسارات: تُقفَل إداريًّا (لا تُحذف)
+            // ليتّسق الرأسُ مع تنفيذه بدل أن يبقى مسارٌ حيًّا لبلاغٍ ملغى.
+            tkt_close_open_workstreams($g, $ticket_id);
+            tkt_sync_head_state($g, $ticket_id, 'cancelled');
             $g->insert('ticket_events', array(
                 'ticket_id' => $ticket_id, 'event_type' => 'status_change',
                 'actor_user_id' => $current_user_id, 'actor_role_id' => $current_role_id,
@@ -229,17 +258,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         }, 'ticket cancel');
     } catch (\Throwable $e) {
         error_log('ticket cancel failed: ' . $e->getMessage());
-        header("Location: $self_url&msg=تعذر+الإلغاء+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=تعذر+الإلغاء+❌"); exit();
     }
-    header("Location: $self_url&msg=" . urlencode('أُلغيت التذكرة (تبقى في السجل للتدقيق) ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أُلغيت التذكرة (تبقى في السجل للتدقيق) ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
 // ⑤ ضبط التصنيف والوزن والإسناد — فريق البلاغات، قبل إغلاق التذكرة
 // ══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'refine') {
-    if (!$can_manage) { header("Location: $self_url&msg=الصقل+بيد+فريق+البلاغات+❌"); exit(); }
-    if ($is_final)    { header("Location: $self_url&msg=الحقول+مقفولة+بعد+الإغلاق/الإلغاء+❌"); exit(); }
+    if (!$can_manage) { ems_gov_redirect("Location: $self_url&msg=الصقل+بيد+فريق+البلاغات+❌"); exit(); }
+    if ($is_final)    { ems_gov_redirect("Location: $self_url&msg=الحقول+مقفولة+بعد+الإغلاق/الإلغاء+❌"); exit(); }
     $category_id  = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
     $priority     = trim($_POST['priority'] ?? 'normal');
     $impact       = trim($_POST['business_impact'] ?? 'admin');
@@ -270,33 +299,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         }, 'ticket refine');
     } catch (\Throwable $e) {
         error_log('ticket refine failed: ' . $e->getMessage());
-        header("Location: $self_url&msg=تعذر+الحفظ+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=تعذر+الحفظ+❌"); exit();
     }
-    header("Location: $self_url&msg=" . urlencode('حُفظ التصنيف والإسناد ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('حُفظ التصنيف والإسناد ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
 // ⑤ب تفريع تذكرة — فرعٌ مربوطٌ بالأصل يُوجَّه بحسب نوعه الخاص
 // ══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'branch') {
-    if (!$can_manage) { header("Location: $self_url&msg=التفريع+بيد+فريق+البلاغات+❌"); exit(); }
-    if ($is_final)    { header("Location: $self_url&msg=لا+تفريع+بعد+الإغلاق/الإلغاء+❌"); exit(); }
-    if ($ticket['parent_id'] !== null) { header("Location: $self_url&msg=لا+تفريع+من+تذكرةٍ+فرعية+❌"); exit(); }
+    if (!$can_manage) { ems_gov_redirect("Location: $self_url&msg=التفريع+بيد+فريق+البلاغات+❌"); exit(); }
+    if ($is_final)    { ems_gov_redirect("Location: $self_url&msg=لا+تفريع+بعد+الإغلاق/الإلغاء+❌"); exit(); }
+    if ($ticket['parent_id'] !== null) { ems_gov_redirect("Location: $self_url&msg=لا+تفريع+من+تذكرةٍ+فرعية+❌"); exit(); }
     $child_type = intval($_POST['child_type_id'] ?? 0);
     $child_desc = trim($_POST['child_complaint'] ?? '');
-    if ($child_type <= 0 || $child_desc === '') { header("Location: $self_url&msg=نوع+الفرع+ووصفه+إلزاميان+❌"); exit(); }
+    if ($child_type <= 0 || $child_desc === '') { ems_gov_redirect("Location: $self_url&msg=نوع+الفرع+ووصفه+إلزاميان+❌"); exit(); }
     $ctype = tkt_gate(false)->selectOne('ticket_types', array(
         'columns' => array('id', 'owner_role_id', 'default_nature'),
         'where'   => array('id' => $child_type, 'active' => 1)));
-    if (!$ctype) { header("Location: $self_url&msg=نوع+الفرع+غير+صالح+❌"); exit(); }
+    if (!$ctype) { ems_gov_redirect("Location: $self_url&msg=نوع+الفرع+غير+صالح+❌"); exit(); }
 
-    $child_no = '';
+    // رقم الفرع يُخصَّص قبل المعاملة لذات سبب الإنشاء (ارتدادٌ = عدّادٌ متراجع).
+    try {
+        $child_no = tkt_next_ticket_no($conn, $company_id);
+    } catch (\Throwable $e) {
+        error_log('ticket branch number allocation failed: ' . $e->getMessage());
+        ems_gov_redirect("Location: $self_url&msg=تعذر+إصدار+رقم+الفرع+❌"); exit();
+    }
     try {
         tkt_gate(false)->runInTransaction(function ($g) use (
             $conn, $company_id, $ticket, $ticket_id, $ctype, $child_type, $child_desc,
-            $current_user_id, $current_role_id, &$child_no
+            $current_user_id, $current_role_id, $child_no
         ) {
-            $child_no = tkt_next_ticket_no($conn, $company_id);
             $cid_new = $g->insert('tickets', array(
                 'ticket_no' => $child_no, 'ticket_type_id' => $child_type,
                 'stage' => 'routed', 'ticket_nature' => $ctype['default_nature'],
@@ -330,9 +364,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         }, 'ticket branch (create child)');
     } catch (\Throwable $e) {
         error_log('ticket branch failed: ' . $e->getMessage());
-        header("Location: $self_url&msg=تعذر+التفريع+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=تعذر+التفريع+❌"); exit();
     }
-    header("Location: $self_url&msg=" . urlencode('أُنشئ الفرع ' . $child_no . ' ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أُنشئ الفرع ' . $child_no . ' ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -346,11 +380,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
     require_once __DIR__ . '/../Maintenance/mnt_helpers.php';
     $is_mnt_user = function_exists('mnt_user_is_maintenance') ? mnt_user_is_maintenance($conn) : false;
     if (!$can_manage && !$is_mnt_user) {
-        header("Location: $self_url&msg=إصدار+أمر+الصيانة+لفريق+البلاغات+أو+الصيانة+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=إصدار+أمر+الصيانة+لفريق+البلاغات+أو+الصيانة+❌"); exit();
     }
-    if ($is_final) { header("Location: $self_url&msg=لا+إصدار+بعد+الإغلاق/الإلغاء+❌"); exit(); }
+    if ($is_final) { ems_gov_redirect("Location: $self_url&msg=لا+إصدار+بعد+الإغلاق/الإلغاء+❌"); exit(); }
     if (!empty($ticket['linked_ref_id']) && $ticket['linked_ref_table'] === 'mnt_order') {
-        header("Location: $self_url&msg=التذكرة+مرتبطةٌ+بأمر+صيانة+مسبقًا+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=التذكرة+مرتبطةٌ+بأمر+صيانة+مسبقًا+❌"); exit();
     }
 
     $new_order_id = 0;
@@ -377,9 +411,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         }, 'issue maintenance order from ticket');
     } catch (\Throwable $e) {
         error_log('issue mnt order from ticket failed: ' . $e->getMessage());
-        header("Location: $self_url&msg=تعذر+إصدار+أمر+الصيانة+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=تعذر+إصدار+أمر+الصيانة+❌"); exit();
     }
-    header("Location: $self_url&msg=" . urlencode('صدر أمر الصيانة وارتبط بالبلاغ ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('صدر أمر الصيانة وارتبط بالبلاغ ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -388,7 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'comment') {
     $body = trim($_POST['body'] ?? '');
     $has_file = isset($_FILES['attachment']) && ($_FILES['attachment']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
-    if ($body === '' && !$has_file) { header("Location: $self_url&msg=اكتب+تعليقًا+أو+أرفق+ملفًا+❌"); exit(); }
+    if ($body === '' && !$has_file) { ems_gov_redirect("Location: $self_url&msg=اكتب+تعليقًا+أو+أرفق+ملفًا+❌"); exit(); }
     if ($body !== '') {
         tkt_log_event($ticket_id, 'communication', $body, null, null, $current_user_id, $current_role_id);
     }
@@ -398,10 +432,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
             tkt_log_event($ticket_id, 'attachment', 'أُرفق ملف: ' . $rel, null, null, $current_user_id, $current_role_id);
         }
     }
-    header("Location: $self_url&msg=" . urlencode('أُضيف إلى سجل التواصل ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أُضيف إلى سجل التواصل ✅')); exit();
 }
 
 $page_title = $ticket ? ('إيكوبيشن | تذكرة ' . $ticket['ticket_no']) : 'إيكوبيشن | بلاغ جديد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -577,7 +614,7 @@ endif; ?>
     // ③ سير العمل: أزرار الانتقالات المتاحة من المرحلة الحالية
     $avail = array();
     foreach (tkt_transitions() as $key => $tr) {
-        if ($tr['from'] !== $ticket['stage']) { continue; }
+        if (!tkt_transition_allows($tr, $ticket['stage'])) { continue; }
         $allowed = ($tr['need'] === 'delete') ? $can_admin : $can_manage;
         if ($allowed) { $avail[$key] = $tr; }
     }

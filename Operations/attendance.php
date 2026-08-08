@@ -21,7 +21,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=غير+مصرح");
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 

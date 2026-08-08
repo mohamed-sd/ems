@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Transport/transfer_tariffs.php — تعرفةُ الترحيل وتسعيرُ الأوامر (M-52)
  * ───────────────────────────────────────────────────────────────────────────
@@ -23,7 +24,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -46,12 +47,12 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+تعرفة+الترحيل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض تعرفة الترحيل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('transfer tariffs super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: transfer_tariffs.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('transfer_tariffs.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 $MODELS = TTS::MODEL_LABEL_AR;
 
@@ -150,6 +151,9 @@ $unpriced = 0;
 foreach ($orders as $o) { if ($o['tariff_amount'] === null && $o['charge_supplier_id'] !== null) { $unpriced++; } }
 
 $page_title = 'إيكوبيشن | تعرفة الترحيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

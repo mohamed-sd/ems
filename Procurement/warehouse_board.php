@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Procurement/warehouse_board.php — لوحةُ أمين المستودع (M-50 · الشاشة 199)
  * ───────────────────────────────────────────────────────────────────────────
@@ -20,7 +21,7 @@ $company_id = $ctx['company_id'];
 $is_super_admin = $ctx['is_super'];
 if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
 $perms = proc_page_perms($conn, 'Procurement/warehouse_board.php', $is_super_admin);
-if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ للوحة المستودع ❌')); exit(); }
+if (!$perms['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للوحة المستودع ❌', 'GOV-PERM-403', ''); exit(); }
 $co = intval($company_id);
 
 // ① الأصنافُ تحت الحد — الرصيدُ الحي مقابل min_qty (بعدّاد)
@@ -50,6 +51,9 @@ $cust = $conn->query("SELECT COUNT(*) n FROM proc_custody
                        WHERE company_id={$co} AND state NOT IN ('مُرجعة','مستهلكة','مغلقة')")->fetch_assoc();
 
 $page_title = 'إيكوبيشن | لوحة أمين المستودع';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

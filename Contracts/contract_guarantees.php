@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/contract_guarantees.php — ضمانات العقد (P-06)
  * ───────────────────────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $MODULE_CODE = 'Contracts/contract_guarantees.php';
@@ -39,13 +40,12 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الضمانات+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الضمانات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('guarantees super') : ems_tenant_db();
 $CID  = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 $redirect = function ($msg, $c = 0) {
-    header("Location: contract_guarantees.php?msg=" . rawurlencode($msg)
-        . ($c > 0 ? ('&contract=' . $c) : ''));
+    ems_gov_flash_redirect(ems_flash_to('contract_guarantees.php', ($c > 0 ? ('&contract=' . $c) : '')), $msg, 'GOV-INFO-200', '');
     exit();
 };
 
@@ -98,6 +98,9 @@ foreach ($contracts as $c) { if ((int) $c['id'] === $CID) { $head = $c; } }
 $KIND_AR = CGS::KIND_AR; $NATURE_AR = CGS::NATURE_AR; $STATE_AR = CGS::STATE_AR;
 
 $page_title = 'إيكوبيشن | ضمانات العقد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

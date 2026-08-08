@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = fin_page_perms($conn, 'Finance/budget_form_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الميزانيات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الميزانيات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -51,33 +51,33 @@ $allowed_depts = $is_super_admin ? array_keys($dept_modules) : fin_budget_owned_
 //  هو مَن يعتمد، وهو ما يمنعه الدستور.)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['bg_action'] ?? '', array('submit', 'approve', 'return'), true)) {
     $act = $_POST['bg_action'];
-    if (!$can_edit) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('budget_form_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $res = fin_budget_transition($conn, intval($_POST['id'] ?? 0), $act,
         $ctx['role'], $current_user_id, $is_super_admin, $_POST['reason'] ?? '');
     if ($res['status'] === 'ok') {
         $done = array('submit' => 'رُفعت الموازنة للمالية ✅',
                       'approve' => 'أُجيزت الموازنة — صارت مرجعًا حاكمًا ✅',
                       'return'  => 'أُعيدت الموازنة لإدارتها بسببها ✅');
-        header("Location: budget_form_fin.php?msg=" . urlencode($done[$act])); exit();
+        ems_gov_flash_redirect('budget_form_fin.php', $done[$act], 'GOV-INFO-200', ''); exit();
     }
-    header("Location: budget_form_fin.php?msg=" . urlencode(($res['reason'] !== '' ? $res['reason'] : 'تعذّر الإجراء') . ' ❌')); exit();
+    ems_gov_flash_redirect('budget_form_fin.php', ($res['reason'] !== '' ? $res['reason'] : 'تعذّر الإجراء') . ' ❌', 'GOV-FAIL-409', ''); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('budget_form_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     // حذف ناعم مشروط بالمسودة (عبر update لحفظ شرط state='draft' الأصلي — softDelete بلا شرط)
     $did = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->update('fin_budgets',
         array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
         array('id' => $did), "state='draft'");
-    header("Location: budget_form_fin.php?msg=تم+حذف+الميزانية+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('budget_form_fin.php', 'تم حذف الميزانية بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ ميزانية جديدة (رأس + بنود) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
-    if (!$can_add) { header("Location: budget_form_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: budget_form_fin.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('budget_form_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('budget_form_fin.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $dept    = trim($_POST['dept_module'] ?? '');
     $ptype   = trim($_POST['period_type'] ?? '');
@@ -89,12 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
     $planned = $_POST['planned'] ?? array();
 
     if (!isset($dept_modules[$dept]) || !isset($period_types[$ptype]) || $fyear < 2000) {
-        header("Location: budget_form_fin.php?msg=بيانات+غير+صحيحة+(إدارة/فترة/سنة)+❌"); exit();
+        ems_gov_flash_redirect('budget_form_fin.php', 'بيانات غير صحيحة (إدارة/فترة/سنة) ❌', 'GOV-REF-404', ''); exit();
     }
     // النطاقُ الصفّي: الصلاحيةُ على الشاشة لا تكفي — الإدارةُ تنشئ موازنةَ قسمها
     // وحده، وإلا لأنشأ مديرُ الصيانة موازنةَ الموارد البشرية.
     if (!in_array($dept, $allowed_depts, true)) {
-        header("Location: budget_form_fin.php?msg=" . urlencode('لا تُنشئ موازنةً لقسمٍ لا تديره ❌')); exit();
+        ems_gov_flash_redirect('budget_form_fin.php', 'لا تُنشئ موازنةً لقسمٍ لا تديره ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     $lines = array(); $t_rev = 0; $t_exp = 0;
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
         $lines[] = array('k' => $kind, 'c' => $cat, 'p' => $amt);
         if ($kind === 'revenue') { $t_rev += $amt; } else { $t_exp += $amt; }
     }
-    if (count($lines) < 1) { header("Location: budget_form_fin.php?msg=الميزانية+تحتاج+بنداً+واحداً+فأكثر+❌"); exit(); }
+    if (count($lines) < 1) { ems_gov_flash_redirect('budget_form_fin.php', 'الميزانية تحتاج بنداً واحداً فأكثر ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $budget_no = fin_gen_code($conn, 'fin_budgets', 'FIN-BG', $company_id);
     // الرأس + البنود زوجٌ مترابط ذرّيًا (رأسٌ بلا بنود = ميزانية مكسورة) — معاملة
@@ -125,14 +125,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
             }
         }, 'budget_form save head+lines');
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: budget_form_fin.php?msg=ميزانية+هذه+الفترة+موجودة+مسبقاً+❌"); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('budget_form_fin.php', 'ميزانية هذه الفترة موجودة مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('budget save refused: ' . $e->getMessage());
-        header("Location: budget_form_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('budget_form_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: budget_form_fin.php?msg=تم+حفظ+الميزانية+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('budget_form_fin.php', 'تم حفظ الميزانية بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | الميزانية والانحراف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

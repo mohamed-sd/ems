@@ -23,7 +23,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=غير+مصرح");
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -32,12 +32,11 @@ $__pp = check_page_permissions($conn, 'Portal/project_charter.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
     require_once __DIR__ . '/../includes/perm_explain_live.php';
     $__why = ems_deny_message($conn, intval($_SESSION['user']['role'] ?? 0), 'Portal/project_charter.php');
-    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    ems_gov_flash_redirect('../main/dashboard.php', $__why, 'GOV-INFO-200', '');
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    http_response_code(403);
-    exit('غير مصرح بالكتابة في هذه الشاشة');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -106,8 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             if ($in[$col] === '') { $missing[] = $lbl; }
         }
         if ($missing) {
-            header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode(
-                'BR-CEO-03: لا يُعرض قرارُ الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌'));
+            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-03: لا يُعرض قرارُ الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌', 'GOV-FAIL-409', '');
             exit();
         }
     }
@@ -134,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $status, $uid, $creator);
     $ok = $st->execute();
     $st->close();
-    header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌'));
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -145,11 +143,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
  * آليٌّ: project + fin_cost_centers + sites + مهمةُ حجز الموارد، ويُنشر
  * project.chartered بعطالة القرار. */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'charter') {
-    $goBack = function ($m) { header('Location: ' . basename(__FILE__) . '?msg=' . rawurlencode($m)); exit(); };
+    $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
     if (!$is_super_admin && $actorRole !== '9') {
-        http_response_code(403);
-        exit('اعتمادُ فتح المشروع قرارُ الإدارة التنفيذية وحدها');
+        ems_gov_flash_redirect('../main/dashboard.php', 'اعتمادُ فتح المشروع قرارُ الإدارة التنفيذية وحدها ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
     }
     $rowId = intval($_POST['row'] ?? 0);
     if ($rowId <= 0) { $goBack('اختر قرارًا للاعتماد ❌'); }
@@ -310,6 +307,9 @@ function m00_cell_at($idx, $row, $entityName, $COLDB) {
 }
 
 $page_title = 'إيكوبيشن | قرار فتح مشروع جديد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

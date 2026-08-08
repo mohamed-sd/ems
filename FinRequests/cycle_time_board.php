@@ -19,7 +19,7 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('fin cycle board super') : em
 
 $__pp = check_page_permissions($conn, 'FinRequests/cycle_time_board.php');
 if (!$is_super && !$__pp['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا صلاحية'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا صلاحية', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -122,6 +122,9 @@ $stage_labels = array(
 );
 
 $page_title = 'إيكوبيشن | زمن دورة الطلبات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

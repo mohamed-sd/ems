@@ -13,7 +13,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -36,7 +36,7 @@ $can_delete = $page_permissions['can_delete'];
 
 // منع الوصول إذا لم تكن هناك صلاحية عرض
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+الموردين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الموردين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -59,10 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $is_editing = $id > 0;
 
     if ($is_editing && !$can_edit) {
-        header("Location: suppliers.php?msg=لا+توجد+صلاحية+تعديل+الموردين+❌");
+        ems_gov_flash_redirect('suppliers.php', 'لا توجد صلاحية تعديل الموردين ❌', 'GOV-PERM-403', '');
         exit();
     } elseif (!$is_editing && !$can_add) {
-        header("Location: suppliers.php?msg=لا+توجد+صلاحية+إضافة+موردين+جدد+❌");
+        ems_gov_flash_redirect('suppliers.php', 'لا توجد صلاحية إضافة موردين جدد ❌', 'GOV-PERM-403', '');
         exit();
     }
 
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             $error_msg = ($id > 0)
                 ? "كود+المورد+موجود+مسبقاً+داخل+الشركة+❌"
                 : "لا+يمكن+إضافة+مورد+بنفس+الكود+داخل+الشركة+❌";
-            header("Location: suppliers.php?msg=$error_msg");
+            ems_gov_flash_redirect('suppliers.php', "$error_msg", 'GOV-INFO-200', '');
             exit();
         }
     }
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         } catch (\Throwable $t) {
             error_log('suppliers.php update failed: ' . $t->getMessage());
         }
-        header("Location: suppliers.php?msg=تم+تعديل+المورد+بنجاح+✅");
+        ems_gov_flash_redirect('suppliers.php', 'تم تعديل المورد بنجاح ✅', 'GOV-OK-200', '');
         exit;
     } else {
         // ── إضافة مورد جديد (company_id تحقنه البوابة) ────────────────────────
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         } catch (\Throwable $t) {
             error_log('suppliers.php insert failed: ' . $t->getMessage());
         }
-        header("Location: suppliers.php?msg=تمت+إضافة+المورد+بنجاح+✅");
+        ems_gov_flash_redirect('suppliers.php', 'تمت إضافة المورد بنجاح ✅', 'GOV-OK-200', '');
         exit;
     }
 }
@@ -158,7 +158,7 @@ if (isset($_GET['delete_id'])) {
 
     // التحقق من صلاحية الحذف
     if (!$can_delete) {
-        header("Location: suppliers.php?msg=لا+توجد+صلاحية+حذف+الموردين+❌");
+        ems_gov_flash_redirect('suppliers.php', 'لا توجد صلاحية حذف الموردين ❌', 'GOV-PERM-403', '');
         exit();
     }
 
@@ -169,7 +169,7 @@ if (isset($_GET['delete_id'])) {
         ));
     } catch (\Throwable $t) { $scope_check = null; }
     if (!$scope_check) {
-        header("Location: suppliers.php?msg=لا+يمكن+حذف+مورد+لا+يتبع+لشركتك+❌");
+        ems_gov_flash_redirect('suppliers.php', 'لا يمكن حذف مورد لا يتبع لشركتك ❌', 'GOV-FAIL-409', '');
         exit();
     }
 
@@ -182,7 +182,7 @@ if (isset($_GET['delete_id'])) {
     } catch (\Throwable $t) { $contracts_count = 0; }
 
     if ($equip_count > 0 || $contracts_count > 0) {
-        header("Location: suppliers.php?msg=لا+يمكن+حذف+المورد+لأنه+مرتبط+بمعدات+أو+عقود+موجودة+❌");
+        ems_gov_flash_redirect('suppliers.php', 'لا يمكن حذف المورد لأنه مرتبط بمعدات أو عقود موجودة ❌', 'GOV-FAIL-409', '');
         exit();
     }
 
@@ -195,10 +195,10 @@ if (isset($_GET['delete_id'])) {
             'status'     => 0,
             'updated_at' => date('Y-m-d H:i:s'),
         ), array('id' => $delete_id), 'COALESCE(is_deleted,0)=0');
-        header("Location: suppliers.php?msg=تم+حذف+المورد+بنجاح+✅");
+        ems_gov_flash_redirect('suppliers.php', 'تم حذف المورد بنجاح ✅', 'GOV-OK-200', '');
         exit();
     } catch (\Throwable $t) {
-        header("Location: suppliers.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+        ems_gov_flash_redirect('suppliers.php', 'حدث خطأ أثناء الحذف ❌', 'GOV-FAIL-409', '');
         exit();
     }
 }
@@ -250,6 +250,9 @@ if (!empty($cstats_rows)) {
 ?>
 <?php
 $page_title = 'إيكوبيشن | الموردون';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

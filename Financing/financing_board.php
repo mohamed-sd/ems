@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Financing/financing_board.php — لوحة إدارة التمويل (FIN-26 · الشاشة 214)
  * ───────────────────────────────────────────────────────────────────────────
@@ -24,8 +25,7 @@ $uid = intval($_SESSION['user']['id'] ?? 0);
 $is_super = ($role === '-1');
 // مسكن الدور 26 — ويفتحه أيضًا من يدخل باب التمويل أصلًا (1 · 19 · السوبر)
 if (!$is_super && !in_array($role, array(EMS_ROLE_FINANCING_MGR, '1', '19'), true)) {
-    http_response_code(403);
-    exit('403 — لوحة إدارة التمويل لدورها');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لوحة إدارة التمويل لدورها ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = $company_id ?: 4;
 
@@ -68,6 +68,9 @@ if ($granted) {
 }
 
 $page_title = 'إيكوبيشن | لوحة إدارة التمويل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/contract_lines.php — بنودُ عقد العميل وقيمتُه (P-02)
  * ───────────────────────────────────────────────────────────────────────────
@@ -20,7 +21,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $MODULE_CODE = 'Contracts/contract_lines.php';
@@ -40,14 +41,14 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+بنود+العقود+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض بنود العقود ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract lines super') : ems_tenant_db();
 $sel  = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 $asOf = (isset($_GET['as_of']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $_GET['as_of']))
         ? (string) $_GET['as_of'] : '';
 $redirect = function ($msg, $c = 0) {
-    header("Location: contract_lines.php?msg=" . rawurlencode($msg) . ($c > 0 ? '&contract=' . $c : ''));
+    ems_gov_flash_redirect(ems_flash_to('contract_lines.php', ($c > 0 ? '&contract=' . $c : '')), $msg, 'GOV-INFO-200', '');
     exit();
 };
 
@@ -102,6 +103,9 @@ $TAX_AR = array('taxable' => 'خاضع', 'exempt' => 'معفًى', 'zero_rated' 
 $ST_AR = array('draft' => 'مسودة', 'active' => 'نافذ', 'superseded' => 'مستبدَل', 'ended' => 'منتهٍ');
 
 $page_title = 'إيكوبيشن | بنود عقد العميل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

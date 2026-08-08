@@ -24,7 +24,7 @@ $current_user_id    = isset($_SESSION['user']['id']) ? intval($_SESSION['user'][
 $is_super_admin     = isset($_SESSION['user']['role']) && (string) $_SESSION['user']['role'] === '-1';
 
 if (!$is_super_admin && $current_company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -33,7 +33,7 @@ $can_view = !empty($doc_perm['can_view']);
 $can_add  = !empty($doc_perm['can_add']);
 $can_edit = !empty($doc_perm['can_edit']);
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+وثائق+المعدات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض وثائق المعدات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -44,20 +44,20 @@ $DOC_STATUSES = array('سارية', 'قيد التجديد', 'منتهية', 'م
 
 // ── إيقاف (soft) ──
 if (isset($_GET['stop_doc'])) {
-    if (!$can_edit) { header("Location: equipment_documents.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('equipment_documents.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     try {
         $doc_gate->softDelete('equipment_documents', intval($_GET['stop_doc']));
-        header("Location: equipment_documents.php?msg=أُلغيت+الوثيقة+✅");
+        ems_gov_flash_redirect('equipment_documents.php', 'أُلغيت الوثيقة ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('equipment_documents stop: ' . $t->getMessage());
-        header("Location: equipment_documents.php?msg=تعذّر+الإلغاء+❌");
+        ems_gov_flash_redirect('equipment_documents.php', 'تعذّر الإلغاء ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
 
 // ── إضافة/تجديد ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_doc'])) {
-    if (!$can_add && !$can_edit) { header("Location: equipment_documents.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_add && !$can_edit) { ems_gov_flash_redirect('equipment_documents.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 
     $subjectType = ($_POST['subject_type'] ?? '') === 'operator' ? 'operator' : 'equipment';
     $subjectId = intval($_POST['subject_id'] ?? 0);
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_doc'])) {
     if ($subjectId <= 0)  { $err = 'اختر+المعدة+أو+المشغّل'; }
     elseif ($docType === '') { $err = 'اختر+نوع+الوثيقة'; }
     elseif ($expiry !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry)) { $err = 'تاريخ+الانتهاء+غير+صحيح'; }
-    if ($err !== null) { header("Location: equipment_documents.php?msg={$err}+❌"); exit(); }
+    if ($err !== null) { ems_gov_flash_redirect('equipment_documents.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     $row = array(
         'subject_type' => $subjectType, 'subject_id' => $subjectId,
@@ -85,11 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_doc'])) {
     );
     try {
         $doc_gate->insert('equipment_documents', $row);
-        header("Location: equipment_documents.php?msg=أُضيفت+الوثيقة+✅");
+        ems_gov_flash_redirect('equipment_documents.php', 'أُضيفت الوثيقة ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('equipment_documents add: ' . $t->getMessage());
         $dup = (strpos($t->getMessage(), 'Duplicate') !== false);
-        header("Location: equipment_documents.php?msg=" . ($dup ? 'وثيقةٌ+مكررة+(نفس+الصاحب+والنوع+والرقم)+❌' : 'تعذّرت+الإضافة+❌'));
+        ems_gov_flash_redirect('equipment_documents.php', $dup ? 'وثيقةٌ مكررة (نفس الصاحب والنوع والرقم) ❌' : 'تعذّرت الإضافة ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -132,6 +132,9 @@ try {
 } catch (\Throwable $t) { /* المصدر العام */ }
 
 $page_title = 'إيكوبيشن | وثائق المعدات والمشغّلين';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

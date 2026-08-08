@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * admin/org_permits.php — شاشة أذونات المواقع (update0004 · ORG-17)
  * ───────────────────────────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ if (!$is_super_admin) {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية لشاشة الأذونات ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية لشاشة الأذونات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $msg = strval($_GET['msg'] ?? '');
 
@@ -54,16 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['permit_action'])) {
             'reason' => strval($_POST['reason'] ?? '') ?: null,
             'doc_ref' => strval($_POST['doc_ref'] ?? '') ?: null,
         ));
-        header("Location: org_permits.php?id=" . intval($r['req_id']) . "&msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_redirect("Location: org_permits.php?id=" . intval($r['req_id']) . "&msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
         exit();
     }
     if (($act === 'approve' || $act === 'reject') && $can_edit) {
         $r = PG::approve($conn, intval($_POST['req_id'] ?? 0), $uid,
             $act === 'reject' ? 'reject' : 'approve', strval($_POST['reason'] ?? '') ?: null);
-        header("Location: org_permits.php?id=" . intval($_POST['req_id'] ?? 0) . "&msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_redirect("Location: org_permits.php?id=" . intval($_POST['req_id'] ?? 0) . "&msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
         exit();
     }
-    header("Location: org_permits.php?msg=" . rawurlencode('لا صلاحية ❌'));
+    ems_gov_flash_redirect('org_permits.php', 'لا صلاحية ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -99,6 +100,9 @@ $stateLabels = array('draft' => 'مسودة', 'pending' => 'بانتظار ال�
     'rejected' => 'مرفوض', 'expired' => 'منتهي المدة', 'used' => 'مستعمَل');
 
 $page_title = 'إيكوبيشن | أذونات المواقع';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

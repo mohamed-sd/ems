@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Equipments/meter_readings.php — قراءاتُ العدّادات (M-25 · UX-10 §8)
  * ───────────────────────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -50,7 +51,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+قراءات+العدّادات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قراءات العدّادات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -61,7 +62,7 @@ $SOURCE_LABELS = array('manual' => 'يدوي', 'inspection' => 'فحص', 'timesh
 
 $selected = intval($_GET['equipment_id'] ?? 0);
 $mtype    = isset($_GET['meter_type']) && isset($TYPE_LABELS[$_GET['meter_type']]) ? $_GET['meter_type'] : 'hour';
-$redirect = function ($msg, $eid, $mt) { header("Location: meter_readings.php?equipment_id=" . intval($eid)
+$redirect = function ($msg, $eid, $mt) { ems_gov_redirect("Location: meter_readings.php?equipment_id=" . intval($eid)
     . "&meter_type=" . rawurlencode($mt) . "&msg=" . rawurlencode($msg)); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -115,6 +116,9 @@ $chain   = $selected > 0 ? MRS::chainOf($gate, $selected, $mtype) : array();
 $stale   = MRS::staleMeters($gate, 14);
 
 $page_title = 'إيكوبيشن | قراءات العدّادات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

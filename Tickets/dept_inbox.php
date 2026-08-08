@@ -25,7 +25,7 @@ $company_id      = $ctx['company_id'];
 $current_role_id = intval($ctx['role']);
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌"); exit();
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 /**
@@ -74,18 +74,27 @@ if ($res) {
 }
 
 $page_title = 'بلاغاتُ إدارتي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar">
-    <h4><i class="fa fa-bell"></i> بلاغاتُ إدارتي</h4>
-    <div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-bell';
+$header_title_html = htmlspecialchars('بلاغاتُ إدارتي', ENT_QUOTES, 'UTF-8');
+ob_start(); ?><div>
       <span class="badge" style="background:#fd7e14;font-size:.95em">المفتوح: <?= $open ?></span>
       <span class="badge" style="background:#dc3545;font-size:.95em">المتأخر: <?= $late ?></span>
-    </div>
-  </div>
+    </div><?php
+$header_actions = array(array('raw' => trim((string) ob_get_clean())));
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
 
   <?php if ($unit_id === 0): ?>
     <div class="alert alert-warning">دورُك بلا وحدةٍ تنظيميةٍ مربوطة — تُعرض البلاغاتُ الموجَّهةُ لدورك مباشرةً.</div>
@@ -133,4 +142,3 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </tbody>
   </table>
 </div>
-<?php include '../footer.php'; ?>

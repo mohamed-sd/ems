@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Workforce/employee_advances.php — بوابةُ السلفيات (H-09-④ · ENT-01 §4)
  * ───────────────────────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -49,7 +50,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+سلفيات+الموظفين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سلفيات الموظفين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -59,7 +60,7 @@ $TYPE_LABELS  = array('cash' => 'سلفةٌ نقدية', 'on_behalf' => 'دفع�
 $STATE_LABELS = array('draft' => 'مسودة', 'approved' => 'معتمَدة', 'active' => 'نشطة',
                       'settled' => 'مستردَّة', 'cancelled' => 'ملغاة');
 
-$redirect = function ($msg) { header("Location: employee_advances.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('employee_advances.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = strval($_POST['ad_action'] ?? '');
@@ -121,6 +122,9 @@ $nameOf = array();
 foreach ($people as $p) { $nameOf[(int) $p['id']] = (string) $p['name']; }
 
 $page_title = 'إيكوبيشن | سلفيات الموظفين';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

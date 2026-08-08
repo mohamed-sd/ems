@@ -11,7 +11,7 @@ include '../includes/permissions_helper.php';
 
 $perms = get_page_permissions($conn);
 if (!$perms['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية لعرض هذه الصفحة'));
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا توجد صلاحية لعرض هذه الصفحة', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -25,7 +25,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $user_id        = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=" . urlencode('لا توجد بيئة شركة صالحة للمستخدم ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 $company_val   = $is_super_admin ? null : $company_id;
@@ -72,7 +72,7 @@ $flash  = isset($_GET['msg']) ? $_GET['msg'] : '';
 // ── حذف ناعم (تعطيل) ─────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     if (!$perms['can_delete']) {
-        header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('❌ لا توجد صلاحية للحذف'));
+        ems_gov_flash_redirect('fleet_depreciation_profiles.php', '❌ لا توجد صلاحية للحذف', 'GOV-PERM-403', '');
         exit();
     }
     $del_id = (int) $_POST['delete_id'];
@@ -82,14 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
         $dep_gate->update('fleet_depreciation_profile', array('is_deleted' => 1), array('id' => $del_id));
         dep_audit($conn, $del_id, $company_val, 'disabled', $old, null, $user_id, 'تعطيل ناعم');
     }
-    header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('🗑️ تم تعطيل الملف'));
+    ems_gov_flash_redirect('fleet_depreciation_profiles.php', '🗑️ تم تعطيل الملف', 'GOV-OK-200', '');
     exit();
 }
 
 // ── اعتماد ───────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     if (!$can_approve) {
-        header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('❌ لا توجد صلاحية للاعتماد'));
+        ems_gov_flash_redirect('fleet_depreciation_profiles.php', '❌ لا توجد صلاحية للاعتماد', 'GOV-PERM-403', '');
         exit();
     }
     $app_id = (int) $_POST['approve_id'];
@@ -100,10 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
             array('id' => $app_id), "state = 'draft'");
         $new = dep_fetch($conn, $app_id, $company_scope);
         dep_audit($conn, $app_id, $company_val, 'approved', $old, $new, $user_id, 'اعتماد الملف');
-        header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('✅ تم اعتماد الملف'));
+        ems_gov_flash_redirect('fleet_depreciation_profiles.php', '✅ تم اعتماد الملف', 'GOV-OK-200', '');
         exit();
     }
-    header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('الملف معتمد مسبقاً'));
+    ems_gov_flash_redirect('fleet_depreciation_profiles.php', 'الملف معتمد مسبقاً', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $new_row = dep_fetch($conn, $edit_id, $company_scope);
             // أثر تدقيقي بأثر مستقبلي: لا حذف صامت للقيمة القديمة
             dep_audit($conn, $edit_id, $company_val, 'updated', $old_row, $new_row, $user_id, 'تعديل يسري مستقبلاً فقط');
-            header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('✅ تم تحديث الملف (يسري على الحساب اللاحق فقط)'));
+            ems_gov_flash_redirect('fleet_depreciation_profiles.php', '✅ تم تحديث الملف (يسري على الحساب اللاحق فقط)', 'GOV-OK-200', '');
             exit();
         } else {
             $code = dep_next_code($conn, $is_super_admin, $company_id);
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'state' => 'draft', 'created_by' => $user_id)); // company_id يُحقن بالبوابة
             $new_row = dep_fetch($conn, $new_id, $company_scope);
             dep_audit($conn, $new_id, $company_val, 'created', null, $new_row, $user_id, 'إنشاء ملف (مسودة)');
-            header('Location: fleet_depreciation_profiles.php?msg=' . urlencode('✅ تم إضافة الملف (مسودة)'));
+            ems_gov_flash_redirect('fleet_depreciation_profiles.php', '✅ تم إضافة الملف (مسودة)', 'GOV-OK-200', '');
             exit();
         }
     }
@@ -173,6 +173,9 @@ if ($has_model_table) {
 }
 
 $page_title = "إيكوبيشن | إعداد الإهلاك";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

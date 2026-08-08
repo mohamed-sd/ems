@@ -11,11 +11,11 @@ require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $pp = check_page_permissions($conn, 'Workforce/worker_evaluation.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $ev_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker evaluation super') : ems_tenant_db();
 $STATES=['مسودة','معتمد','مرحّل'];
@@ -48,7 +48,7 @@ function ems_eval_recompute_store($g,$eval_id) {
 // ── حفظ التقييم (إضافة/تعديل) ───────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $id=intval($_POST['id']??0); $is_editing=$id>0;
-    if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) { header("Location: worker_evaluation.php?msg=لا+صلاحية+❌"); exit(); }
+    if (($is_editing && !$can_edit) || (!$is_editing && !$can_add)) { ems_gov_flash_redirect('worker_evaluation.php', 'لا صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $worker_id=intval($_POST['worker_id']??0);
     $period=!empty($_POST['period'])?$_POST['period']:null;
     $score=$_POST['score']!==''?floatval($_POST['score']):null;
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $notes=trim($_POST['notes']??''); $notes=$notes!==''?$notes:null;
 
     if (!$is_editing) {
-        if ($worker_id<=0) { header("Location: worker_evaluation.php?msg=يجب+اختيار+عامل+❌"); exit(); }
+        if ($worker_id<=0) { ems_gov_flash_redirect('worker_evaluation.php', 'يجب اختيار عامل ❌', 'GOV-FAIL-409', ''); exit(); }
         $nid=0;
         try {
             // company_id تحقنه البوابة من سياق الجلسة، وتعيد المعرّف الوليد
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
                 'state' => $state, 'notes' => $notes, 'created_by' => $user_id)));
         } catch (\Throwable $t) { error_log('worker_evaluation.php insert: ' . $t->getMessage()); }
         // فتح وضع التعديل ليظهر لوح بنود المؤشّرات.
-        header("Location: worker_evaluation.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
+        ems_gov_redirect("Location: worker_evaluation.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
     } else {
         try {
             $ev_gate->update('worker_evaluation', array(
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
         } catch (\Throwable $t) { error_log('worker_evaluation.php update: ' . $t->getMessage()); }
         // إن وُجدت بنود مؤشّرات، تتقدّم الدرجة المحسوبة على المدخلة يدوياً.
         ems_eval_recompute_store($ev_gate,$id);
-        header("Location: worker_evaluation.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
+        ems_gov_redirect("Location: worker_evaluation.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
 
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_kpi' &&
         } catch (\Throwable $t) { error_log('worker_evaluation.php add_kpi: ' . $t->getMessage()); }
         ems_eval_recompute_store($ev_gate,$eid);
     }
-    header("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حفظ+البند"); exit();
+    ems_gov_redirect("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حفظ+البند"); exit();
 }
 if (($_GET['del_kpi']??'')!=='' && $can_delete) {
     $kid=intval($_GET['del_kpi']); $eid=intval($_GET['edit']??0);
@@ -128,7 +128,7 @@ if (($_GET['del_kpi']??'')!=='' && $can_delete) {
             if ($eid>0) ems_eval_recompute_store($ev_gate,$eid);
         }
     } catch (\Throwable $t) { error_log('worker_evaluation.php del_kpi: ' . $t->getMessage()); }
-    header("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حذف+البند"); exit();
+    ems_gov_redirect("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حذف+البند"); exit();
 }
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='set_state' && $can_edit) {
@@ -137,12 +137,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='set_state' 
         try { $ev_gate->update('worker_evaluation', array('state' => $ns), array('id' => $id)); }
         catch (\Throwable $t) { error_log('worker_evaluation.php set_state: ' . $t->getMessage()); }
     }
-    header("Location: worker_evaluation.php?msg=✅+تم+تحديث+الحالة"); exit();
+    ems_gov_flash_redirect('worker_evaluation.php', '✅ تم تحديث الحالة', 'GOV-OK-200', ''); exit();
 }
 if (($_GET['delete']??'')!=='' && $can_delete) { $d=intval($_GET['delete']);
     try { $ev_gate->deleteRow('worker_evaluation', $d, 'evaluation delete'); }
     catch (\Throwable $t) { error_log('worker_evaluation.php delete: ' . $t->getMessage()); }
-    header("Location: worker_evaluation.php?msg=✅+تم+الحذف"); exit(); }
+    ems_gov_flash_redirect('worker_evaluation.php', '✅ تم الحذف', 'GOV-OK-200', ''); exit(); }
 
 // ── تحميل تقييمٍ للتعديل + بنوده ──────────────────────────────────────────────────
 $edit=null; $kpis=[]; $edit_id=intval($_GET['edit']??0);
@@ -163,7 +163,11 @@ try {
     foreach($ev_workers as $w){$workers[$w['id']]=$w['name'];}
 } catch (\Throwable $t) { error_log('worker_evaluation.php workers: ' . $t->getMessage()); }
 
-$page_title="إيكوبيشن | تقييم الأداء"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | تقييم الأداء"; 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
+include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">

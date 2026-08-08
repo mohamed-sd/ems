@@ -25,20 +25,20 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = fin_page_perms($conn, 'Finance/operator_pay_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+وضع+دفع+المشغّل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض وضع دفع المشغّل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 // ── تبديل وضع مشغّل (بالراتب ⇄ بالمستحق) ──
 if (isset($_GET['toggle_emp'])) {
-    if (!$can_edit) { header("Location: operator_pay_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('operator_pay_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
     $eid  = intval($_GET['toggle_emp']);
     $mode = (($_GET['mode'] ?? '') === 'due') ? 'due' : 'salary';
     $gate = fin_gate($is_super_admin);
@@ -49,17 +49,17 @@ if (isset($_GET['toggle_emp'])) {
         $gate->insert('fin_operator_pay', array('employee_id' => $eid, 'pay_mode' => $mode, 'created_by' => $current_user_id));
     }
     $lbl = $mode === 'due' ? 'بالمستحق' : 'بالراتب';
-    header("Location: operator_pay_fin.php?msg=تم+ضبط+وضع+المشغّل:+$lbl+✅"); exit();
+    ems_gov_flash_redirect('operator_pay_fin.php', "تم ضبط وضع المشغّل: $lbl ✅", 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ معدّل مستحق المشغّل (يُكتب على صفَّي employee_due) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
-    if (!$can_edit) { header("Location: operator_pay_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('operator_pay_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
     $raw = trim($_POST['rate']);
     if ($raw === '') {
         $rate = 0.0;
     } elseif (!is_numeric($raw) || (float)$raw < 0) {
-        header("Location: operator_pay_fin.php?msg=المعدّل+يجب+أن+يكون+رقماً+غير+سالب+❌"); exit();
+        ems_gov_flash_redirect('operator_pay_fin.php', 'المعدّل يجب أن يكون رقماً غير سالب ❌', 'GOV-FAIL-409', ''); exit();
     } else {
         $rate = round((float)$raw, 4);
     }
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
     $msg = $rate > 0
         ? 'تم+ضبط+معدّل+مستحق+المشغّل+وتفعيله+✅'
         : 'تم+إفراغ+المعدّل+—+مستحق+المشغّل+معطّل+الآن+✅';
-    header("Location: operator_pay_fin.php?msg=$msg"); exit();
+    ems_gov_flash_redirect('operator_pay_fin.php', "$msg", 'GOV-INFO-200', ''); exit();
 }
 
 // المعدّل الحالي (من صف employee_due)
@@ -101,6 +101,9 @@ foreach ($operators as $op) { if (($mode_map[intval($op['employee_id'])] ?? 'sal
 $cnt_salary = count($operators) - $cnt_due;
 
 $page_title = 'إيكوبيشن | قواعد مستحقات المشغّلين';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

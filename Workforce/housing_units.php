@@ -9,11 +9,11 @@ require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $pp = check_page_permissions($conn, 'Workforce/housing_units.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 // العزل عبر بوابة المستأجر (TenantDb) — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $hu_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('housing units super') : ems_tenant_db();
 
@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='save' && 
             } catch (\Throwable $t) { error_log('housing_units.php insert: ' . $t->getMessage()); }
         }
     }
-    header("Location: housing_units.php?msg=✅+تم+الحفظ"); exit();
+    ems_gov_flash_redirect('housing_units.php', '✅ تم الحفظ', 'GOV-OK-200', ''); exit();
 }
 if (($_GET['delete'] ?? '') !== '' && $can_delete) {
     $d=intval($_GET['delete']);
     try { $hu_gate->deleteRow('housing_unit', $d, 'housing unit delete'); }
     catch (\Throwable $t) { error_log('housing_units.php delete: ' . $t->getMessage()); }
-    header("Location: housing_units.php?msg=✅+تم+الحذف"); exit();
+    ems_gov_flash_redirect('housing_units.php', '✅ تم الحذف', 'GOV-OK-200', ''); exit();
 }
 
 $projects = [];
@@ -58,6 +58,9 @@ try {
 } catch (\Throwable $t) { error_log('housing_units.php projects: ' . $t->getMessage()); }
 
 $page_title = "إيكوبيشن | السكن والإعاشة";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!isset($error_msg)) {
             if ($stmt->execute()) {
-                header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✅");
+                ems_gov_flash_redirect('modules.php', 'تم البحفاظ على البيانات بنجاح ✅', 'GOV-OK-200', '');
                 exit;
             } else {
                 $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
@@ -156,9 +157,9 @@ if (isset($_GET['delete_id'])) {
     $stmt = $conn->prepare("DELETE FROM `modules` WHERE `id` = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
-        header("Location: modules.php?msg=تم+حذف+الصفحة+بنجاح+✅");
+        ems_gov_flash_redirect('modules.php', 'تم حذف الصفحة بنجاح ✅', 'GOV-OK-200', '');
     } else {
-        header("Location: modules.php?msg=حدث+خطأ+في+الحذف+❌");
+        ems_gov_flash_redirect('modules.php', 'حدث خطأ في الحذف ❌', 'GOV-FAIL-409', '');
     }
     exit;
 }
@@ -171,6 +172,9 @@ try {
 } catch (\Throwable $t) { error_log('modules.php roles: ' . $t->getMessage()); }
 
 $page_title = "شاشات النظام والوحدات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -320,24 +324,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <div class="main">
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
-    <div class="header" data-ems-unified-header="1">
-        <div class="actions">
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+    <?php
+/* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ بدلَ الرأسِ اليدويِّ المُحاكي —
+   مصدرٌ واحدٌ للبنيةِ، والأفعالُ وزرُّ العودةِ منقولانِ كما هما. */
+$header_icon = 'fas fa-layer-group';
+$header_title_html = htmlspecialchars('إدارة الصفحات والموديولات', ENT_QUOTES, 'UTF-8');
+ob_start(); ?><a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة صفحة جديدة
-            </a>
-        </div>
-        <div class="title">
-            <h1 class="title-content">
-                <div class="title-icon"><i class="fas fa-layer-group"></i></div>
-                إدارة الصفحات والموديولات
-            </h1>
-        </div>
-        <div class="back">
-            <a href="settings.php" class="back-btn">
+            </a><?php
+$header_actions = array(array('raw' => trim((string) ob_get_clean())));
+ob_start(); ?><a href="settings.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+            </a><?php
+$header_back = array('raw' => trim((string) ob_get_clean()));
+include __DIR__ . '/../includes/page_header.php';
+?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

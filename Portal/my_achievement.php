@@ -50,6 +50,9 @@ $LABELS = array('requests' => '① الطلبات', 'approvals' => '② الاع
     'quality' => '⑦ الجودة والسلامة');
 
 $page_title = 'إيكوبيشن | إنجازي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

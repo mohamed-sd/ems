@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Tickets/ticket_workstreams_board.php — لوحة المسارات المتوازية
  * (update0004 · TKT-17 · TKT-01 §3/§5)
@@ -34,7 +35,7 @@ if (!$is_super_admin) {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; $can_edit = intval($row['can_edit']) === 1; }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية للوحة المسارات ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية للوحة المسارات ❌', 'GOV-PERM-403', ''); exit(); }
 
 $msg = strval($_GET['msg'] ?? '');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ws_action']) && $can_edit) {
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ws_action']) && $can_
     elseif ($act === 'done') { $r = TS::markDone($conn, $wsId, $uid); }
     elseif ($act === 'close') { $r = TS::closeWorkstream($conn, $wsId, $uid, strval($_POST['mode'] ?? 'reporter_confirm')); }
     elseif ($act === 'reopen') { $r = TS::reopen($conn, $wsId, $uid); $r['reason'] = isset($r['reopen_count']) ? ('أعيد فتحه — العداد ' . $r['reopen_count']) : ($r['reason'] ?? ''); }
-    header("Location: ticket_workstreams_board.php?tk=" . intval($_POST['tk'] ?? 0) . "&msg=" . rawurlencode(($r['reason'] ?? '') . (!empty($r['ok']) ? ' ✅' : ' ❌')));
+    ems_gov_redirect("Location: ticket_workstreams_board.php?tk=" . intval($_POST['tk'] ?? 0) . "&msg=" . rawurlencode(($r['reason'] ?? '') . (!empty($r['ok']) ? ' ✅' : ' ❌')));
     exit();
 }
 
@@ -75,6 +76,9 @@ $stateLabels = array('new' => 'جديد', 'received' => 'مستلَم', 'in_prog
     'reopened' => 'أعيد فتحه', 'admin_closed' => 'مغلق إداريًّا');
 
 $page_title = 'إيكوبيشن | لوحة مسارات البلاغات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

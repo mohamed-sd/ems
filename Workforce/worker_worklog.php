@@ -12,10 +12,10 @@ require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $pp = check_page_permissions($conn, 'Workforce/worker_worklog.php');
-if (!$pp['can_view']) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+if (!$pp['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $wl_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker worklog super') : ems_tenant_db();
 
@@ -24,7 +24,11 @@ $company_scope = $is_super_admin ? null : $company_id;
 $events_map    = ems_events_map($conn, $company_scope);          // [worker_id => incentive/penalty معتمد]
 $rotation_due  = ems_rotation_due_soon($conn, $company_scope, 14); // العقود التي اقترب تدويرها (14 يوماً)
 
-$page_title="إيكوبيشن | سجل الأحداث التشغيلية"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | سجل الأحداث التشغيلية"; 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
+include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">

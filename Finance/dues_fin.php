@@ -13,56 +13,56 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/dues_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الذمم+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الذمم ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $due_types = fin_due_types(); $settle_states = fin_settlement_states(); $party_types = fin_party_types();
 
 // ── تسوية مورد (محرك التسوية) ──
 if (isset($_GET['settle_supplier'])) {
-    if (!$can_edit) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+التسوية+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: dues_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); } // إصلاح #2
-    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { header("Location: dues_fin.php?msg=التسوية+تخصّ+أمين+الخزينة+فقط+❌"); exit(); } // فصل الواجبات
+    if (!$can_edit) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية التسوية ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('dues_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); } // إصلاح #2
+    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { ems_gov_flash_redirect('dues_fin.php', 'التسوية تخصّ أمين الخزينة فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
     $sid = intval($_GET['settle_supplier']);
     $net = fin_supplier_net($conn, $company_id, $sid);
     fin_gate($is_super_admin)->update('fin_dues',
         array('settlement_state' => 'settled'),
         array('party_type' => 'supplier', 'party_ref' => $sid),
         "settlement_state='pending' AND COALESCE(is_deleted,0)=0");
-    header("Location: dues_fin.php?msg=تمت+تسوية+المورد+(صافي=" . number_format($net, 2) . ")+✅"); exit();
+    ems_gov_flash_redirect(ems_flash_to('dues_fin.php', number_format($net, 2) . ")+✅"), 'تمت تسوية المورد (صافي=', 'GOV-INFO-200', ''); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_due'])) {
-    if (!$can_delete) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     // حذف ناعم مشروط (غير المصروف فقط) — عبر update حفظًا لشرط الأصل
     $d = intval($_GET['delete_due']);
     fin_gate($is_super_admin)->update('fin_dues',
         array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
         array('id' => $d), "settlement_state<>'paid'");
-    header("Location: dues_fin.php?msg=تم+حذف+المستحق+✅"); exit();
+    ems_gov_flash_redirect('dues_fin.php', 'تم حذف المستحق ✅', 'GOV-OK-200', ''); exit();
 }
 if (isset($_GET['delete_recv'])) {
-    if (!$can_delete) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_recv']);
     fin_gate($is_super_admin)->softDelete('fin_receivables', $d);
-    header("Location: dues_fin.php?msg=تم+حذف+الذمّة+✅"); exit();
+    ems_gov_flash_redirect('dues_fin.php', 'تم حذف الذمّة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ مستحق ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
-    if (!$can_add) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $party_type = ($_POST['party_type'] ?? '') === 'employee' ? 'employee' : 'supplier';
     $party_ref  = intval($party_type === 'employee' ? ($_POST['employee_ref'] ?? 0) : ($_POST['supplier_ref'] ?? 0));
     $due_type   = trim($_POST['due_type'] ?? '');
     $direction  = ($_POST['direction'] ?? 'credit') === 'debit' ? 'debit' : 'credit';
     $amount     = round(floatval($_POST['amount'] ?? 0), 2);
     if ($party_ref <= 0 || !isset($due_types[$due_type]) || $amount <= 0) {
-        header("Location: dues_fin.php?msg=بيانات+غير+صحيحة+(طرف/نوع/مبلغ)+❌"); exit();
+        ems_gov_flash_redirect('dues_fin.php', 'بيانات غير صحيحة (طرف/نوع/مبلغ) ❌', 'GOV-REF-404', ''); exit();
     }
 
     // ── M-11: لا خصمَ بلا مستندٍ يُنقر إليه ─────────────────────────────────
@@ -82,18 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
     if ($direction === 'debit') {
         if ($src_type === 'pending_source') {
             if (!in_array($due_type, $PENDING_OK, true)) {
-                header("Location: dues_fin.php?msg=" . rawurlencode(
-                    '«بلا مصدرٍ بعد» تُقبل للسلف والخصومات وحدَها — وهذا النوعُ له مستندٌ مبنيٌّ فاختره')
-                    . "+❌");
+                ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), '«بلا مصدرٍ بعد» تُقبل للسلف والخصومات وحدَها — وهذا النوعُ له مستندٌ مبنيٌّ فاختره', 'GOV-INFO-200', '');
                 exit();
             }
         } elseif (!in_array($src_type, $ALLOWED_SRC, true)) {
-            header("Location: dues_fin.php?msg=" . rawurlencode(
-                'كلُّ خصمٍ يلزمه مستندٌ مصدر — اختر نوعَه (سندُ صرفٍ · أمرُ صيانة · أمرُ نقل · احتسابُ جزاء · تسوية)') . "+❌");
+            ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), 'كلُّ خصمٍ يلزمه مستندٌ مصدر — اختر نوعَه (سندُ صرفٍ · أمرُ صيانة · أمرُ نقل · احتسابُ جزاء · تسوية)', 'GOV-INFO-200', '');
             exit();
         } elseif ($src_id <= 0) {
-            header("Location: dues_fin.php?msg=" . rawurlencode(
-                'رقمُ المستند المصدر إلزامي — الرقمُ الذي يُخصم يجب أن يُنقر إلى أصله') . "+❌");
+            ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), 'رقمُ المستند المصدر إلزامي — الرقمُ الذي يُخصم يجب أن يُنقر إلى أصله', 'GOV-INFO-200', '');
             exit();
         }
     }
@@ -106,18 +102,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
                              ? $src_id : null,
         'created_by' => $current_user_id,
     ));
-    header("Location: dues_fin.php?msg=تمت+إضافة+المستحق+✅"); exit();
+    ems_gov_flash_redirect('dues_fin.php', 'تمت إضافة المستحق ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ ذمّة عميل ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
-    if (!$can_add) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $cust = intval($_POST['customer_entity_id'] ?? 0);
     $doc_type = ($_POST['doc_type'] ?? '') === 'statement' ? 'statement' : 'invoice';
     $doc_ref  = trim($_POST['doc_ref'] ?? '');
     $amount   = round(floatval($_POST['r_amount'] ?? 0), 2);
     $due_date = trim($_POST['due_date'] ?? '') ?: null;
-    if ($cust <= 0 || $amount <= 0) { header("Location: dues_fin.php?msg=بيانات+الذمّة+غير+صحيحة+❌"); exit(); }
+    if ($cust <= 0 || $amount <= 0) { ems_gov_flash_redirect('dues_fin.php', 'بيانات الذمّة غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
     // P-08: **الذمّةُ بعملتها** — والافتراضُ عملةُ الأساس مُعلَنًا في الشاشة
     require_once __DIR__ . '/../app/Services/Finance/FxSettlementService.php';
     require_once __DIR__ . '/../includes/fx.php';
@@ -132,10 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
         'base_amount' => ($r_rate === null) ? null : round($amount * $r_rate, 2),
         'due_date' => $due_date, 'state' => 'open', 'created_by' => $current_user_id,
     ));
-    header("Location: dues_fin.php?msg=تمت+إضافة+الذمّة+✅"); exit();
+    ems_gov_flash_redirect('dues_fin.php', 'تمت إضافة الذمّة ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | الذمم والتحصيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

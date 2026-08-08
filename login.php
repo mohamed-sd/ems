@@ -471,6 +471,30 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   </style>
 </head>
 <body>
+<?php
+/* UI-DEF-06 → UI-13: شاشةُ الدخولِ وجهةُ ارتدادٍ لحارساتِ النطاقِ والجلسة، وكانت
+   الرسالةُ تُودَع الجلسةَ ولا تجد حاملًا هنا — فيرى المستخدمُ شاشةَ دخولٍ صامتةً
+   ولا يعرف لماذا خرج. هذا حاملُ الرسائلِ نفسُه بلغةِ هذه الشاشة: يعرض مرةً
+   واحدةً ثم يمسح. */
+if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) {
+    echo '<div id="emsGovFlash" dir="rtl" style="position:fixed;top:0;right:0;left:0;z-index:9999">';
+    foreach (array_slice($_SESSION['ems_flash_gov'], 0, 3) as $emsFg) {
+        $fgText = htmlspecialchars((string) ($emsFg['text'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $fgCode = htmlspecialchars((string) ($emsFg['code'] ?? 'GOV-403'), ENT_QUOTES, 'UTF-8');
+        $fgOk   = (strpos($fgCode, '-OK-') !== false);
+        echo '<div role="status" style="display:flex;align-items:center;gap:10px;font-family:inherit;'
+           . 'background:' . ($fgOk ? '#14532d' : '#7f1d1d') . ';color:#fff;padding:10px 18px;font-size:14px">'
+           . '<span style="flex:1"><strong>' . $fgText . '</strong></span>'
+           . '<code style="background:rgba(255,255,255,.14);border-radius:4px;padding:2px 8px;font-size:12px">'
+           . $fgCode . '</code>'
+           . '<button type="button" onclick="this.closest(\'#emsGovFlash\').remove()" '
+           . 'style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer" aria-label="إغلاق">&times;</button>'
+           . '</div>';
+    }
+    echo '</div>';
+    unset($_SESSION['ems_flash_gov']);
+}
+?>
 <div class="stage">
 
  <img class="logo" src="/ems/assets/images/logo 3.png" alt="Equipation logo">

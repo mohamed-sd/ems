@@ -20,7 +20,7 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { http_response_code(403); die('المجالُ المقيَّد (FIN-01 §1.1)'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
 
 /* توزيعُ ربح العملية على مشاريع أعيانها: أينما تعمل المعدةُ اليومَ (op_containers) */
 $rows = array();
@@ -48,7 +48,15 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-percentage"></i> توزيعُ تكلفة التمويل على المشاريع</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-percentage';
+$header_title_html = htmlspecialchars('توزيعُ تكلفة التمويل على المشاريع', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <p class="text-muted" style="font-size:.9em">الربحُ الشهريُّ لكل عمليةٍ (الإجماليُّ ÷ الأقساط) يوزَّع على مشروع كل عينٍ بنسبة حصتها — والتشغيلُ يرى تكلفةً محمَّلةً بلا مصدر.</p>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>عملية التمويل</th><th>العين المموَّلة</th><th>الحصة ٪</th><th>المشروع</th><th>ربحُ العملية شهريًّا</th><th>المحمَّلُ على المشروع</th>

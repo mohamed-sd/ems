@@ -43,8 +43,7 @@ function validate_csrf(): void
 {
     $token = $_POST['csrf_token'] ?? '';
     if (!hash_equals($_SESSION['csrf_token'], $token)) {
-        http_response_code(403);
-        exit('طلب غير صالح - CSRF validation failed');
+        ems_gov_flash_redirect('../main/dashboard.php', 'طلب غير صالح - CSRF validation failed ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
     }
 }
 
@@ -54,7 +53,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -72,7 +71,7 @@ $can_edit         = $page_permissions['can_edit'];
 $can_delete       = $page_permissions['can_delete'];
 
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التشغيل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -100,7 +99,7 @@ if ($is_role10) {
 }
 
 if ($selected_project_id === 0) {
-    echo "<script>alert('❌ لا يوجد مشروع مرتبط بحسابك في الجلسة'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا يوجد مشروع مرتبط بحسابك في الجلسة', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -112,7 +111,7 @@ try {
         FROM project
         WHERE {TENANT_SCOPE} AND id = ? AND status = 1", array($selected_project_id));
 } catch (\Throwable $t) {
-    echo "<script>alert('❌ خطأ في تحميل بيانات المشروع'); window.location.href='select_project.php';</script>";
+    ems_gov_flash_redirect('select_project.php', '❌ خطأ في تحميل بيانات المشروع', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -120,7 +119,7 @@ if (!empty($project_rows)) {
     $selected_project = $project_rows[0];
 } else {
     unset($_SESSION['operations_project_id']);
-    echo "<script>alert('❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -136,7 +135,7 @@ function redirect_to_page(string $msg = '', bool $success = true): void
     global $selected_project_id;
     $prefix = $success ? '✅+' : '❌+';
     $encoded = urlencode($msg);
-    header("Location: move_oprators.php?project_id={$selected_project_id}&msg={$prefix}{$encoded}");
+    ems_gov_redirect("Location: move_oprators.php?project_id={$selected_project_id}&msg={$prefix}{$encoded}");
     exit();
 }
 
@@ -577,7 +576,11 @@ function get_shift_info(string $code): array
 }
 
 ?>
-<?php include("../inheader.php"); ?>
+<?php 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include("../inheader.php"); ?>
 <?php include('../insidebar.php'); ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 

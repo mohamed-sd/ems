@@ -16,11 +16,11 @@ require_once __DIR__ . '/../includes/permissions_helper.php';
 // ════════════════════════════════════════════════════════════════════════════
 $roles_perms = get_current_page_permissions($conn);
 if ($roles_perms['id'] !== null && !$roles_perms['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('لا توجد صلاحية لهذه الصفحة ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية لهذه الصفحة ❌', 'GOV-PERM-403', '');
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $roles_perms['id'] !== null && !$roles_perms['can_edit']) {
-    header('Location: roles.php?msg=' . urlencode('لا توجد صلاحية للتعديل ❌'));
+    ems_gov_flash_redirect('roles.php', 'لا توجد صلاحية للتعديل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($stmt->execute()) {
-            header("Location: roles.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✅");
+            ems_gov_flash_redirect('roles.php', 'تم البحفاظ على البيانات بنجاح ✅', 'GOV-OK-200', '');
             exit;
         } else {
             $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
@@ -83,16 +83,16 @@ if (isset($_GET['delete_id'])) {
     catch (\Throwable $t) { error_log('roles.php delete check: ' . $t->getMessage()); }
 
     if ($children_count > 0) {
-        header("Location: roles.php?msg=لا+يمكن+حذف+هذا+الدور+لأنه+يمتلك+أدوار+فرعية+❌");
+        ems_gov_flash_redirect('roles.php', 'لا يمكن حذف هذا الدور لأنه يمتلك أدوار فرعية ❌', 'GOV-FAIL-409', '');
     } else {
         // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] كما في الحفظ أعلاه: الحذف يبقى خامًا
         // بانتظار قرار التحصين (deleteRow تعاقديًا لجداول المستأجر لا المراجع العامة).
         $stmt = $conn->prepare("DELETE FROM `roles` WHERE `id` = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
-            header("Location: roles.php?msg=تم+حذف+الدور+بنجاح+✅");
+            ems_gov_flash_redirect('roles.php', 'تم حذف الدور بنجاح ✅', 'GOV-OK-200', '');
         } else {
-            header("Location: roles.php?msg=حدث+خطأ+في+الحذف+❌");
+            ems_gov_flash_redirect('roles.php', 'حدث خطأ في الحذف ❌', 'GOV-FAIL-409', '');
         }
     }
     exit;
@@ -108,6 +108,9 @@ try {
 } catch (\Throwable $t) { error_log('roles.php parents: ' . $t->getMessage()); }
 
 $page_title = "الأدوار";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -123,24 +126,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <div class="main">
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
-    <div class="header" data-ems-unified-header="1">
-        <div class="actions">
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+    <?php
+/* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ بدلَ الرأسِ اليدويِّ المُحاكي —
+   مصدرٌ واحدٌ للبنيةِ، والأفعالُ وزرُّ العودةِ منقولانِ كما هما. */
+$header_icon = 'fas fa-shield-alt';
+$header_title_html = htmlspecialchars('إدارة الصلاحيات والأدوار', ENT_QUOTES, 'UTF-8');
+ob_start(); ?><a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة صلاحية جديدة
-            </a>
-        </div>
-        <div class="title">
-            <h1 class="title-content">
-                <div class="title-icon"><i class="fas fa-shield-alt"></i></div>
-                إدارة الصلاحيات والأدوار
-            </h1>
-        </div>
-        <div class="back">
-            <a href="settings.php" class="back-btn">
+            </a><?php
+$header_actions = array(array('raw' => trim((string) ob_get_clean())));
+ob_start(); ?><a href="settings.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+            </a><?php
+$header_back = array('raw' => trim((string) ob_get_clean()));
+include __DIR__ . '/../includes/page_header.php';
+?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

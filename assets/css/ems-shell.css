@@ -238,6 +238,9 @@
 .ems-kpi-warn { border-inline-start-color: #d97706; }
 .ems-kpi-err  { border-inline-start-color: #dc2626; }
 .ems-kpi-title { font-size: .8rem; color: #6b7280; font-weight: 700; }
+/* أيقونةُ العنوانِ خافتةٌ بحكمِ القشرةِ لا بنمطٍ موضعيٍّ في كلِّ بطاقة
+   (سقّاطةُ VT-01: كلُّ style= جديدٍ في الوسمِ رسوبٌ يوقف البناء). */
+.ems-kpi-title > i { opacity: .6; }
 .ems-kpi-value { font-size: 1.5rem; font-weight: 800; margin: var(--ems-sp-1) 0; }
 .ems-kpi-value small { font-size: .72rem; color: #6b7280; font-weight: 700; }
 .ems-kpi-meta { display: flex; justify-content: space-between; font-size: .74rem; color: #9ca3af; }

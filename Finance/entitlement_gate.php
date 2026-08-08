@@ -24,15 +24,24 @@ $res = mysqli_query($conn, $sql);
 if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
 
 $page_title = 'بوابة الاستحقاق المالي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar">
-    <h4><i class="fa fa-door-closed"></i> بوابةُ الاستحقاق المالي</h4>
-    <span class="badge" style="background:#fd7e14;font-size:.95em">بانتظار البوابة: <?= count($rows) ?></span>
-  </div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-door-closed';
+$header_title_html = htmlspecialchars('بوابةُ الاستحقاق المالي', ENT_QUOTES, 'UTF-8');
+ob_start(); ?><span class="badge" style="background:#fd7e14;font-size:.95em">بانتظار البوابة: <?= count($rows) ?></span><?php
+$header_actions = array(array('raw' => trim((string) ob_get_clean())));
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <p class="text-muted" style="font-size:.9em">الأثرُ الأوليُّ ينتظر اعتمادَ مدير الإدارة + المالية — ولا يصير Posted قبلهما (POL-01).</p>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم المحضر</th><th>الطرف</th><th>المبلغ</th><th>المصدر</th><th>الحالة</th><th>منذ</th><th>إجراء</th>

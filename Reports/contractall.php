@@ -92,7 +92,11 @@ if (!isset($_SESSION['user'])) {
 </head>
 
 <body>
-    <?php include('../insidebar.php');
+    <?php 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
     // العزل عبر بوابة المستأجر — والسوبر عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
@@ -256,10 +260,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="main">
         <div class="header">
-            <h1 class="page-title">
-                <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
-                تقارير تفصيلية للعقد
-            </h1>
+            <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
+$header_icon = 'fa-solid fa-chart-line';
+$header_title_html = htmlspecialchars('تقارير تفصيلية للعقد', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <a href="reports.php" class="back-btn">
                     <i class="fas fa-arrow-right"></i> رجوع

@@ -13,23 +13,23 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/management_accounting_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المحاسبة+الإدارية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المحاسبة الإدارية ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 $center_types = fin_center_types(); $alloc_types = fin_alloc_types(); $owner_modules = fin_dept_modules();
 
 // ── حفظ مركز تكلفة/ربح ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['center_code'])) {
-    if (!$can_add) { header("Location: management_accounting_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('management_accounting_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $code = trim($_POST['center_code'] ?? ''); $name = trim($_POST['center_name'] ?? '');
     $ctype = ($_POST['center_type'] ?? '') === 'profit' ? 'profit' : 'cost';
     $parent = intval($_POST['parent_id'] ?? 0) ?: null;
     $owner = isset($owner_modules[$_POST['owner_module'] ?? '']) ? $_POST['owner_module'] : null;
-    if ($code === '' || $name === '') { header("Location: management_accounting_fin.php?msg=بيانات+المركز+غير+مكتملة+❌"); exit(); }
+    if ($code === '' || $name === '') { ems_gov_flash_redirect('management_accounting_fin.php', 'بيانات المركز غير مكتملة ❌', 'GOV-FAIL-409', ''); exit(); }
     // حساب المستوى من الأب
     $level = 0;
     if ($parent) {
@@ -42,44 +42,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['center_code'])) {
             'owner_module' => $owner, 'level' => $level, 'created_by' => $current_user_id,
         ));
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: management_accounting_fin.php?msg=كود+المركز+مكرر+❌"); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('management_accounting_fin.php', 'كود المركز مكرر ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('fin_cost_centers insert refused: ' . $e->getMessage());
-        header("Location: management_accounting_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('management_accounting_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: management_accounting_fin.php?msg=تمت+إضافة+المركز+✅"); exit();
+    ems_gov_flash_redirect('management_accounting_fin.php', 'تمت إضافة المركز ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ تخصيص/تسوية ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['alloc_type'])) {
-    if (!$can_add) { header("Location: management_accounting_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('management_accounting_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $atype = ($_POST['alloc_type'] ?? '') === 'intercompany_settlement' ? 'intercompany_settlement' : 'internal_allocation';
     $from = intval($_POST['from_center_id'] ?? 0) ?: null;
     $to   = intval($_POST['to_center_id'] ?? 0) ?: null;
     $basis= trim($_POST['basis'] ?? '');
     $amount = round(floatval($_POST['amount'] ?? 0), 2);
-    if ($amount <= 0) { header("Location: management_accounting_fin.php?msg=مبلغ+غير+صحيح+❌"); exit(); }
+    if ($amount <= 0) { ems_gov_flash_redirect('management_accounting_fin.php', 'مبلغ غير صحيح ❌', 'GOV-REF-404', ''); exit(); }
     fin_gate($is_super_admin)->insert('fin_internal_allocations', array(
         'alloc_type' => $atype, 'from_center_id' => $from, 'to_center_id' => $to,
         'basis' => $basis, 'amount' => $amount, 'state' => 'draft', 'created_by' => $current_user_id,
     ));
-    header("Location: management_accounting_fin.php?msg=تمت+إضافة+الحركة+✅"); exit();
+    ems_gov_flash_redirect('management_accounting_fin.php', 'تمت إضافة الحركة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['del_center'])) {
-    if (!$can_delete) { header("Location: management_accounting_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('management_accounting_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['del_center']);
     fin_gate($is_super_admin)->softDelete('fin_cost_centers', $d);
-    header("Location: management_accounting_fin.php?msg=تم+حذف+المركز+✅"); exit();
+    ems_gov_flash_redirect('management_accounting_fin.php', 'تم حذف المركز ✅', 'GOV-OK-200', ''); exit();
 }
 if (isset($_GET['del_alloc'])) {
-    if (!$can_delete) { header("Location: management_accounting_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('management_accounting_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['del_alloc']);
     fin_gate($is_super_admin)->softDelete('fin_internal_allocations', $d);
-    header("Location: management_accounting_fin.php?msg=تم+حذف+الحركة+✅"); exit();
+    ems_gov_flash_redirect('management_accounting_fin.php', 'تم حذف الحركة ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | المحاسبة الإدارية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

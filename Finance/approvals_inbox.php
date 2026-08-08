@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Finance/approvals_inbox.php — صندوقُ الاعتمادات الموحّد (M-42 · الشاشة 192)
  * ───────────────────────────────────────────────────────────────────────────
@@ -33,7 +34,7 @@ else {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ للصندوق الموحد ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للصندوق الموحد ❌', 'GOV-PERM-403', ''); exit(); }
 
 $inbox = AIS::inbox($conn, $company_id);
 

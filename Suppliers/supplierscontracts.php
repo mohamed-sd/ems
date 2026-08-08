@@ -28,7 +28,7 @@ if ($spg_scope !== null) {
 }
 
 if (!$can_view) {
-  header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+عقود+الموردين+❌");
+  ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض عقود الموردين ❌', 'GOV-PERM-403', '');
   exit();
 }
 
@@ -116,7 +116,7 @@ foreach ($pf_rows as $project_filter_row) {
 
 if (isset($_GET['delete_id'])) {
   if (!$can_delete) {
-    header("Location: supplierscontracts.php?id=$supplier_id&msg=لا+توجد+صلاحية+حذف+عقود+الموردين+❌");
+    ems_gov_redirect("Location: supplierscontracts.php?id=$supplier_id&msg=لا+توجد+صلاحية+حذف+عقود+الموردين+❌");
     exit();
   }
 
@@ -141,19 +141,22 @@ if (isset($_GET['delete_id'])) {
           throw new \RuntimeException('contract delete matched 0 rows');
         }
       }, 'حذف عقد مورد متسلسل');
-      header("Location: supplierscontracts.php?id=$supplier_id&msg=تم+حذف+العقد+بنجاح+✅");
+      ems_gov_redirect("Location: supplierscontracts.php?id=$supplier_id&msg=تم+حذف+العقد+بنجاح+✅");
       exit();
     } catch (\Throwable $t) {
-      header("Location: supplierscontracts.php?id=$supplier_id&msg=تعذر+حذف+العقد+أو+أنه+خارج+النطاق+❌");
+      ems_gov_redirect("Location: supplierscontracts.php?id=$supplier_id&msg=تعذر+حذف+العقد+أو+أنه+خارج+النطاق+❌");
       exit();
     }
   }
 
-  header("Location: supplierscontracts.php?id=$supplier_id&msg=معرف+العقد+غير+صحيح+❌");
+  ems_gov_redirect("Location: supplierscontracts.php?id=$supplier_id&msg=معرف+العقد+غير+صحيح+❌");
   exit();
 }
 
 $page_title = 'إيكوبيشن | عقود المورد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -861,11 +864,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
             if ($id > 0 && !$can_edit) {
-              echo "<script>alert('❌ ليس لديك صلاحية تعديل عقود الموردين'); window.location.href='" . $redirect_after_save . "';</script>";
+              ems_gov_flash_redirect("" . $redirect_after_save . "", '❌ ليس لديك صلاحية تعديل عقود الموردين', 'GOV-PERM-403', '');
               exit();
             }
             if ($id === 0 && !$can_add) {
-              echo "<script>alert('❌ ليس لديك صلاحية إضافة عقود موردين'); window.location.href='" . $redirect_after_save . "';</script>";
+              ems_gov_flash_redirect("" . $redirect_after_save . "", '❌ ليس لديك صلاحية إضافة عقود موردين', 'GOV-PERM-403', '');
               exit();
             }
 

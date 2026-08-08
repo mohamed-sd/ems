@@ -44,11 +44,23 @@ $page_title = 'قريبًا';
    فيسقط المتصفّحُ في Quirks Mode ويقرأ العرضَ 981px على هاتفٍ عرضُه 375px —
    فلا تعمل @media (max-width:768px) أصلًا: لا لوحَ منزلقًا ولا زرَّ قائمةٍ،
    والشريطُ شريحةٌ بعرض 1px وطولِ 2122px بأيقوناتٍ فارغة. */
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
+<?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ — الشاشةُ كانت بلا رأسٍ معلَن. */
+$header_icon = 'fas fa-window-maximize';
+$header_title_html = htmlspecialchars('Soon', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
+
   <?php if (!$meta): ?>
     <div class="alert alert-warning">شاشةٌ غيرُ معروفةٍ في القاموس القانوني — <a href="dashboard.php">العودة</a></div>
   <?php else: ?>

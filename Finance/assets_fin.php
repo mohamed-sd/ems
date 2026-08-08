@@ -13,11 +13,11 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/assets_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الأصول+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الأصول ❌', 'GOV-PERM-403', ''); exit(); }
 $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 
 require_once __DIR__ . '/../app/Services/Finance/DepreciationService.php';
@@ -28,35 +28,35 @@ use App\Services\Finance\DepreciationService as DEP;
 // تجاهلًا تامًّا · ويحتسب **الشهرَ الحاضرَ جبرًا** فما فات لا يُدرَك · ولا يفحص
 // قفلَ الفترة ولا يُنتج حدثًا ماليًّا. فصار استدعاءً للخدمة، **والفترةُ مُدخَل**.
 if (isset($_GET['run_dep'])) {
-    if (!$can_edit) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+الاحتساب+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: assets_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('assets_fin.php', 'لا توجد صلاحية الاحتساب ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('assets_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); }
     $period = (isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', (string) $_GET['period']))
               ? (string) $_GET['period'] : date('Y-m', strtotime('first day of last month'));
     $r = DEP::runPeriod($conn, fin_gate($is_super_admin), $company_id, $period, $current_user_id, 'screen');
     $msg = $r['ok']
         ? ($r['reason'] . ' · أحداثٌ منشورة: ' . $r['events'] . ' ✅')
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
-    header("Location: assets_fin.php?msg=" . rawurlencode($msg)); exit();
+    ems_gov_flash_redirect('assets_fin.php', $msg, 'GOV-INFO-200', ''); exit();
 }
 
 // ── الاستدراك: من شهر الاقتناء حتى الشهر المنقضي ──
 if (isset($_GET['catch_up'])) {
-    if (!$can_edit) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+الاحتساب+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: assets_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('assets_fin.php', 'لا توجد صلاحية الاحتساب ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('assets_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); }
     $r = DEP::catchUp($conn, fin_gate($is_super_admin), $company_id, $current_user_id, null, 'screen');
-    header("Location: assets_fin.php?msg=" . rawurlencode($r['reason'] . ' ✅')); exit();
+    ems_gov_flash_redirect('assets_fin.php', $r['reason'] . ' ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ أصل ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
-    if (!$can_add) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('assets_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
     $code = trim($_POST['code'] ?? ''); $name = trim($_POST['name'] ?? ''); $cat = trim($_POST['category'] ?? '');
     $eqid = intval($_POST['equipment_id'] ?? 0) ?: null;
     $adate = trim($_POST['acquisition_date'] ?? '') ?: null;
     $cost = round(floatval($_POST['acquisition_cost'] ?? 0), 2);
     $salv = round(floatval($_POST['salvage_value'] ?? 0), 2);
     $life = max(1, intval($_POST['useful_life_months'] ?? 60));
-    if ($code === '' || $name === '' || $cost <= 0) { header("Location: assets_fin.php?msg=بيانات+الأصل+غير+مكتملة+❌"); exit(); }
+    if ($code === '' || $name === '' || $cost <= 0) { ems_gov_flash_redirect('assets_fin.php', 'بيانات الأصل غير مكتملة ❌', 'GOV-FAIL-409', ''); exit(); }
     try {
         fin_gate($is_super_admin)->insert('fin_assets', array(
             'code' => $code, 'name' => $name, 'category' => $cat, 'equipment_id' => $eqid,
@@ -64,22 +64,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
             'useful_life_months' => $life, 'created_by' => $current_user_id,
         ));
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: assets_fin.php?msg=كود+الأصل+مكرر+❌"); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('assets_fin.php', 'كود الأصل مكرر ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('fin_assets insert refused: ' . $e->getMessage());
-        header("Location: assets_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('assets_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: assets_fin.php?msg=تمت+إضافة+الأصل+✅"); exit();
+    ems_gov_flash_redirect('assets_fin.php', 'تمت إضافة الأصل ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('assets_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->softDelete('fin_assets', $d);
-    header("Location: assets_fin.php?msg=تم+حذف+الأصل+✅"); exit();
+    ems_gov_flash_redirect('assets_fin.php', 'تم حذف الأصل ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | الأصول والإهلاك';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

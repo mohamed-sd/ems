@@ -25,7 +25,7 @@ if (!function_exists('fu_e')) { function fu_e($v) { return htmlspecialchars((str
 if (!function_exists('fu_n')) { function fu_n($v, $d = 0) { return number_format((float) $v, $d); } }
 
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
-if ($company_id <= 0) { header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.')); exit(); }
+if ($company_id <= 0) { ems_gov_flash_redirect('../login.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', ''); exit(); }
 $fu_gate = ems_tenant_db();
 
 $vd = function ($s) { return is_string($s) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $s); };
@@ -49,6 +49,9 @@ $r = @mysqli_query($conn, "SELECT id, type FROM equipments_types ORDER BY type")
 while ($r && ($x = mysqli_fetch_assoc($r))) { $types[] = $x; }
 
 $page_title = 'إيكوبيشن | استغلالُ الأسطول ومردوده';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

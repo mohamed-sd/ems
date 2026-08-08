@@ -30,7 +30,7 @@ $__pp = check_page_permissions($conn, 'Approvals/hours_approval.php');
 if ($role !== '-1' && empty($__pp['can_view'])) {
     require_once __DIR__ . '/../includes/perm_explain_live.php';
     $__why = ems_deny_message($conn, intval($role), 'Approvals/hours_approval.php');
-    header('Location: ../main/dashboard.php?msg=' . urlencode($__why));
+    ems_gov_flash_redirect('../main/dashboard.php', $__why, 'GOV-INFO-200', '');
     exit();
 }
 $session_proj   = intval($_SESSION['user']['project_id'] ?? 0);
@@ -326,6 +326,9 @@ $column_labels = [
 // الأعمدة تُتحكم بها عبر أزرار إظهار/إخفاء المجموعات في الصفحة
 
 $page_title = 'اعتماد الوحدات التشغيلية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($__pp) ? $__pp : null);
 include('../inheader.php');
 ?>
 <!-- ============================================================

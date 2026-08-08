@@ -31,14 +31,14 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = fin_page_perms($conn, 'Finance/operator_pay_policies_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+سياسات+المشغّلين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سياسات المشغّلين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -48,45 +48,44 @@ $BASES  = array('actual' => 'تشغيل فعلي', 'standby' => 'استعداد'
 
 // ── إيقاف سياسة (soft — تبقى في السجل التاريخي) ──
 if (isset($_GET['stop_policy'])) {
-    if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('operator_pay_policies_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_GET['stop_policy']);
     try {
         fin_gate($is_super_admin)->softDelete('contract_hour_policies', $pid);
-        header("Location: operator_pay_policies_fin.php?msg=أُوقفت+السياسة+✅");
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'أُوقفت السياسة ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('operator_pay_policies stop: ' . $t->getMessage());
-        header("Location: operator_pay_policies_fin.php?msg=تعذّر+الإيقاف+❌");
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'تعذّر الإيقاف ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
 
 // ── تفعيلُ سياسةٍ مسودة (E-24) — وبه يقع الإخلاف ──
 if (isset($_GET['activate_policy'])) {
-    if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('operator_pay_policies_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
     $r = PPS::activate($conn, fin_gate($is_super_admin), $company_id,
                        intval($_GET['activate_policy']), $current_user_id);
     $m = $r['ok']
         ? ('فُعّلت السياسة ✅' . (count($r['superseded']) > 0
             ? (' · أُخلفت ' . count($r['superseded']) . ' سياسةً سابقةً بسريانها') : ''))
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
-    header("Location: operator_pay_policies_fin.php?msg=" . rawurlencode($m));
+    ems_gov_flash_redirect('operator_pay_policies_fin.php', $m, 'GOV-INFO-200', '');
     exit();
 }
 
 // ── إنهاءُ سياسةٍ بسببه (E-24) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expire_policy'])) {
-    if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('operator_pay_policies_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
     $r = PPS::expire($conn, fin_gate($is_super_admin), $company_id,
                      intval($_POST['policy_id'] ?? 0), strval($_POST['expire_reason'] ?? ''),
                      $current_user_id);
-    header("Location: operator_pay_policies_fin.php?msg="
-        . rawurlencode($r['ok'] ? 'أُنهيت السياسةُ بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌')));
+    ems_gov_flash_redirect('operator_pay_policies_fin.php', $r['ok'] ? 'أُنهيت السياسةُ بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), 'GOV-OK-200', '');
     exit();
 }
 
 // ── إضافة سياسة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
-    if (!$can_edit) { header("Location: operator_pay_policies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('operator_pay_policies_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
 
     $emp   = intval($_POST['employee_id'] ?? 0);
     $model = strval($_POST['work_model'] ?? '');
@@ -100,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
     elseif (!isset($BASES[$basis]))       { $err = 'اختر+أساس+الاستحقاق'; }
     elseif ($rateRaw === '' || !is_numeric($rateRaw) || (float) $rateRaw <= 0) { $err = 'المعدّل+رقمٌ+موجبٌ+إلزامي'; }
     elseif ($cur === '')                  { $err = 'العملة+إلزامية'; }
-    if ($err !== null) { header("Location: operator_pay_policies_fin.php?msg={$err}+❌"); exit(); }
+    if ($err !== null) { ems_gov_flash_redirect('operator_pay_policies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     $optNum = function ($k) {
         $v = trim(strval($_POST[$k] ?? ''));
@@ -139,10 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
     );
     try {
         fin_gate($is_super_admin)->insert('contract_hour_policies', $row);
-        header("Location: operator_pay_policies_fin.php?msg=حُفظت+مسودةُ+السياسة+—+فعّلها+لتسري+✅");
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'حُفظت مسودةُ السياسة — فعّلها لتسري ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('operator_pay_policies add: ' . $t->getMessage());
-        header("Location: operator_pay_policies_fin.php?msg=تعذّرت+الإضافة+❌");
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'تعذّرت الإضافة ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -195,6 +194,9 @@ foreach ($policies as $p) {
 }
 
 $page_title = 'إيكوبيشن | سياسات مستحقات المشغّلين';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

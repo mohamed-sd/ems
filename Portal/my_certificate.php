@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-001 · SCN-002 · SCN-003 · SCN-004 · SCN-005 · SCN-006 · SCN-007 · SCN-008 · SCN-009 · SCN-010 · SCN-011 · SCN-012 · SCN-013 · SCN-014 · SCN-015 · SCN-016 · SCN-017 · SCN-018
 /**
  * Portal/my_certificate.php — شهادةُ الإنجاز (H-18 · الشاشة 190)
@@ -23,7 +24,7 @@ $is_super   = (strval($_SESSION['user']['role'] ?? '') === '-1');
 if (!$is_super && $company_id <= 0) { header("Location: ../login.php"); exit(); }
 
 $gate = $is_super ? ems_tenant_db()->forAllTenants('my certificate super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: my_certificate.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('my_certificate.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['ct_action'] ?? '') === 'issue') {
     $evalId = intval($_POST['eval_id'] ?? 0);
@@ -75,6 +76,9 @@ $openCert = null;
 foreach ($certs as $c) { if (intval($c['id']) === $open) { $openCert = $c; } }
 
 $page_title = 'إيكوبيشن | شهادة الإنجاز';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

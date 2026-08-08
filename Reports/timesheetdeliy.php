@@ -96,6 +96,9 @@ WHERE 1=1$tsd_filter AND {TENANT_SCOPE}", $tsd_params);
     }
 
 $page_title = "إيكوبيشن | تقرير الوحدات اليومية";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

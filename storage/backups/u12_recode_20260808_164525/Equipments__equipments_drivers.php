@@ -1,0 +1,1692 @@
+<?php
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../login.php");
+    exit();
+}
+
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once '../includes/excel_ui.php'; // إطار Excel الموحّد (أزرار + نافذة المعالج)
+
+$equipment_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
+
+if (!function_exists('normalize_equipment_availability_state')) {
+    function normalize_equipment_availability_state($availability_state, $availability_status)
+    {
+        $availability_state  = trim((string) $availability_state);
+        $availability_status = trim((string) $availability_status);
+        if ($availability_state === 'متوفرة' || $availability_state === 'غير متوفرة') {
+            return $availability_state;
+        }
+        if ($availability_status === '' || $availability_status === 'متاحة للعمل' || $availability_status === 'قيد الاستخدام') {
+            return 'متوفرة';
+        }
+        return 'غير متوفرة';
+    }
+}
+
+if (!function_exists('normalize_equipment_availability_status')) {
+    function normalize_equipment_availability_status($availability_state, $availability_status)
+    {
+        $availability_state  = normalize_equipment_availability_state($availability_state, $availability_status);
+        $availability_status = trim((string) $availability_status);
+        if ($availability_state === 'متوفرة') {
+            return 'قيد الاستخدام';
+        }
+        $legacy_map = [
+            'موقوفة للصيانة' => 'تحت الصيانة',
+            'مبيعة/مسحوبة'         => 'مسحوبة',
+            'معطلة مؤقتاً'       => 'معطلة'
+        ];
+        if (isset($legacy_map[$availability_status])) {
+            return $legacy_map[$availability_status];
+        }
+        $valid = ['تحت الصيانة', 'محجوزة', 'مسحوبة', 'في المستودع', 'معطلة'];
+        return in_array($availability_status, $valid, true) ? $availability_status : 'تحت الصيانة';
+    }
+}
+
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin = ($current_role === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-INFO-200', '');
+    exit();
+}
+
+$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
+
+if (!$equipments_has_company) {
+    ems_runtime_ddl($conn, "ALTER TABLE equipments ADD COLUMN company_id INT(11) NULL DEFAULT NULL", 'Equipments/equipments_drivers.php');
+    ems_runtime_ddl($conn, "CREATE INDEX idx_equipments_company_id ON equipments (company_id)", 'Equipments/equipments_drivers.php');
+    $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+}
+
+// ملاحظة عزل (هجرة البوابة · 2026-07-13): كان هنا UPDATE عابرٌ للشركات يملأ
+// equipments.company_id من المورّد عند كل تحميل صفحة (نسخة من equipments.php).
+// أُزيل للسبب نفسه: العمود مملوءٌ كليًّا ويُحقَن آليًّا عند الإدراج عبر البوابة.
+
+if (!$is_super_admin && !$equipments_has_company) {
+    die('تعذر تفعيل عزل الشركات لجدول المعدات');
+}
+
+// بوابة العزل لهذه الشاشة (نفس نمط equipments.php): غيرُ السوبر → شركتُه؛
+// السوبر → عرضٌ عابرٌ مُسجَّل.
+$eq_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('equipments_drivers super view') : ems_tenant_db();
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
+$page_permissions = check_page_permissions($conn, 'equipments');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+// منع الوصول إذا لم تكن صلاحية عرض
+if (!$can_view) {
+    ems_gov_flash_redirect('../login.php', 'لا توجد صلاحية عرض المعدات ❌', 'GOV-PERM-403', '');
+    exit();
+}
+
+$is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
+$user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
+
+$selected_project_id = 0;
+$show_all_projects = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id'])) {
+    if ($is_role10) {
+        header("Location: equipments.php");
+        exit();
+    }
+    $selected_project_value = trim($_POST['selected_project_id']);
+    if ($selected_project_value === 'all') {
+        $_SESSION['equipments_project_id'] = 'all';
+    } elseif (is_numeric($selected_project_value) && intval($selected_project_value) > 0) {
+        $_SESSION['equipments_project_id'] = intval($selected_project_value);
+    } else {
+        unset($_SESSION['equipments_project_id']);
+    }
+    header("Location: equipments.php");
+    exit();
+}
+
+if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
+    if ($is_role10) {
+        header("Location: equipments.php");
+        exit();
+    }
+    $_SESSION['equipments_project_id'] = intval($_GET['project_id']);
+    header("Location: equipments.php");
+    exit();
+}
+
+if (isset($_SESSION['equipments_project_id'])) {
+    if ($_SESSION['equipments_project_id'] === 'all') {
+        $show_all_projects = true;
+        $selected_project_id = 0;
+    } else {
+        $selected_project_id = intval($_SESSION['equipments_project_id']);
+    }
+}
+
+if ($is_role10) {
+    $show_all_projects = false;
+    $selected_project_id = $user_project_id;
+}
+
+$selected_project = null;
+if ($selected_project_id > 0) {
+    // فحص ملكية المشروع المختار ضمن نطاق العزل (كان احتياطي created_by المكسور)
+    $selected_project = $eq_gate->selectOne('project', array(
+        'columns'  => array('id', 'name', 'project_code'),
+        'whereRaw' => "id = ? AND status = '1'",
+        'params'   => array($selected_project_id),
+    ));
+    if ($selected_project === null) {
+        unset($_SESSION['equipments_project_id']);
+        $selected_project_id = 0;
+    }
+}
+
+// (أُزيل استعلام قائمة المشاريع الميت — نتيجته لم تكن تُقرأ في أي موضع.)
+
+$page_title = "إدارة المعدات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
+include("../inheader.php");
+include("../insidebar.php");
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+
+// معالجة رسالة النجاح
+$success_msg = '';
+if (isset($_GET['msg'])) {
+    $success_msg = htmlspecialchars($_GET['msg']);
+}
+?>
+
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="../assets/css/admin-style.css">
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+
+<?php
+
+// معالجة الحفظ أو التعديل
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
+    if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
+        $success_msg = "❌ ليس لديك صلاحية لتعديل أو إضافة المعدات";
+        goto skip_save;
+    }
+    
+    // قيمٌ خام للبوابة (نفس نمط equipments.php) — الربط بالمعاملات يتكفّل بالهروب،
+    // والحقول الفارغة القابلة للإلغاء تُمرَّر NULL حقيقيًّا لا نصًّا 'NULL'.
+    $edit_id   = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
+    $suppliers = isset($_POST['suppliers']) ? $_POST['suppliers'] : '';   // يُستعمل أيضًا في فحص العقد
+    $type      = isset($_POST['type']) ? $_POST['type'] : '';
+
+    $S  = function ($k) { return trim($_POST[$k] ?? ''); };
+    $D  = function ($k, $def) { return isset($_POST[$k]) ? $_POST[$k] : $def; };
+    $Ni = function ($k) { return !empty($_POST[$k]) ? intval($_POST[$k]) : null; };
+    $Nf = function ($k) { return !empty($_POST[$k]) ? floatval($_POST[$k]) : null; };
+    $Nd = function ($k) { return !empty($_POST[$k]) ? $_POST[$k] : null; };
+
+    $data = array(
+        'suppliers'                     => $suppliers,
+        'code'                          => $S('code'),
+        'type'                          => $type,
+        'name'                          => $S('name'),
+        'status'                        => $D('status', ''),
+        'serial_number'                 => $S('serial_number'),
+        'chassis_number'                => $S('chassis_number'),
+        'manufacturer'                  => $S('manufacturer'),
+        'model'                         => $S('model'),
+        'manufacturing_year'            => $Ni('manufacturing_year'),
+        'import_year'                   => $Ni('import_year'),
+        'equipment_condition'           => $D('equipment_condition', 'في حالة جيدة'),
+        'operating_hours'               => $Ni('operating_hours'),
+        'engine_condition'              => $D('engine_condition', 'جيدة'),
+        'tires_condition'               => $D('tires_condition', 'N/A'),
+        // N-21: أعمدة المالك مهجورة — بيانات الملكية في المجال المقيَّد حصرًا
+        'license_number'                => $S('license_number'),
+        'license_authority'             => $S('license_authority'),
+        'license_expiry_date'           => $Nd('license_expiry_date'),
+        'inspection_certificate_number' => $S('inspection_certificate_number'),
+        'last_inspection_date'          => $Nd('last_inspection_date'),
+        'current_location'              => $S('current_location'),
+        'availability_status'           => $D('availability_status', 'متاحة للعمل'),
+        'estimated_value'               => $Nf('estimated_value'),
+        'daily_rental_price'            => $Nf('daily_rental_price'),
+        'monthly_rental_price'          => $Nf('monthly_rental_price'),
+        'insurance_status'              => $D('insurance_status', ''),
+        'general_notes'                 => $S('general_notes'),
+        'last_maintenance_date'         => $Nd('last_maintenance_date'),
+    );
+
+
+
+    // التحقق من عدم تجاوز العدد المتعاقد عليه (فقط عند الإضافة)
+    if ($edit_id == 0  && $suppliers && $type) {
+        // عقد المورّد لهذا النوع (معزولًا) — نفس نمط equipments.php
+        $contract_rows = $eq_gate->scopedQuery(array(
+            'scope'  => array('sc' => 'supplierscontracts'),
+            'enrich' => array('sce' => 'suppliercontractequipments'),
+        ),
+            "SELECT sc.id, sce.equip_count
+               FROM supplierscontracts sc
+               LEFT JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
+              WHERE {TENANT_SCOPE}
+                AND sc.supplier_id = ?
+                AND sce.equip_type = ?
+                AND sc.status = 1
+                AND sce.id IS NOT NULL
+              LIMIT 1",
+            array($suppliers, $type)
+        );
+
+        if (!empty($contract_rows)) {
+            $contracted_count = intval($contract_rows[0]['equip_count']);
+
+            // عدد المعدات المضافة حاليًا لنفس المورّد والنوع (معزولًا عبر البوابة)
+            $current_added = $eq_gate->count('equipments', array(
+                'whereRaw' => "suppliers = ? AND type = ? AND status = 1",
+                'params'   => array($suppliers, $type),
+            ));
+
+            // التحقق من عدم تجاوز العدد المتعاقد عليه
+            if ($current_added >= $contracted_count) {
+                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
+                goto skip_save;
+            }
+        }
+    }
+
+    try {
+        // الإدراج/التعديل عبر البوابة (نفس نمط equipments.php): تُحقن company_id آليًّا
+        // وتُعزَل الكتابة بالشركة؛ الوجهة equipments.php كسلوك الأصل.
+        if ($edit_id > 0) {
+            $eq_gate->update('equipments', $data, array('id' => $edit_id));
+            $msg = "تم+تعديل+المعدة+بنجاح+✅";
+        } else {
+            $eq_gate->insert('equipments', $data);
+            $msg = "تمت+إضافة+المعدة+بنجاح+✅";
+        }
+        ems_gov_flash_redirect('equipments.php', '$msg', 'GOV-INFO-200', '');
+        exit;
+    } catch (\Throwable $e) {
+        $success_msg = "خطأ في الحفظ: " . $e->getMessage();
+    }
+
+    skip_save:
+}
+
+// في حالة تعديل تجهيز البيانات
+$editData = [];
+if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && isset($_GET['edit'])) {
+    $success_msg = "❌ ليس لديك صلاحية لتعديل المعدات";
+} elseif (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
+    $editId = intval($_GET['edit']);
+    // جلب المعدة للتعديل ضمن نطاق العزل (السوبر: أيّ معدة)
+    $row = $eq_gate->selectOne('equipments', array('where' => array('id' => $editId)));
+    if ($row !== null) {
+        $editData = $row;
+    }
+}
+?>
+
+<div class="main">
+    <!-- عنوان الصفحة -->
+    <div class="header">
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-cogs"></i></div>
+            إدارة المعدات
+        </h1>
+        <div class="header -actions">
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+            <?php if ($_SESSION['user']['role'] != "10") { ?>
+            <!-- أزرار Excel الموحّدة (نموذج + تصدير + استيراد متعدد الخطوات) -->
+            <?php $__xlBase = function_exists('ems_excel_endpoint_url') ? ems_excel_endpoint_url() : '../excel.php'; ?>
+            <a href="<?php echo htmlspecialchars($__xlBase, ENT_QUOTES, 'UTF-8'); ?>?entity=equipments&action=template" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
+                <i class="fas fa-file-excel"></i> تحميل النموذج
+            </a>
+            <a href="<?php echo htmlspecialchars($__xlBase, ENT_QUOTES, 'UTF-8'); ?>?entity=equipments&action=export" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
+                <i class="fas fa-file-export"></i> تصدير Excel
+            </a>
+            <button type="button" data-ems-excel-import="equipments" data-ems-excel-title="المعدات" class="btn" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
+                <i class="fas fa-file-import"></i> استيراد من Excel
+            </button>
+            <?php } ?>
+        </div>
+    </div>
+
+    <?php if (!empty($success_msg)): 
+        $isSuccess = strpos($success_msg, '✅') !== false;
+    ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+            <?php echo $success_msg; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($_SESSION['user']['role'] != "10") { ?>
+    <!-- فورم إضافة / تعديل معدة -->
+    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-<?php echo !empty($editData) ? 'edit' : 'plus-circle'; ?>"></i>
+                    <?php echo !empty($editData) ? "تعديل الآلية" : "إضافة آلية جديدة"; ?>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <?php if (!empty($editData)) { ?>
+                        <input type="hidden" name="edit_id" value="<?php echo isset($editData['id']) ? $editData['id'] : ''; ?>">
+                    <?php } ?>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-truck-loading"></i>
+                            المورد <span class="required-indicator">*</span>
+                        </label>
+                        <select name="suppliers" id="suppliers" required>
+                            <option value="">-- اختر المورد --</option>
+                            <?php
+                            // موردو الشركة (السوبر: الكل) عبر البوابة
+                            $supplier_rows = $eq_gate->select('suppliers', array(
+                                'columns'  => array('id', 'name'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'name ASC',
+                            ));
+                            foreach ($supplier_rows as $supplier) {
+                                $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
+                                echo "<option value='" . intval($supplier['id']) . "' $selected>" . htmlspecialchars($supplier['name']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-barcode"></i>
+                            كود المعدة <span class="required-indicator">*</span>
+                        </label>
+                        <input type="text" name="code" id="code" placeholder="أدخل كود المعدة" 
+                               value="<?php echo isset($editData['code']) ? htmlspecialchars($editData['code']) : ''; ?>" required />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-list-alt"></i>
+                            نوع المعدة <span class="required-indicator">*</span>
+                        </label>
+                        <select name="type" id="type" required>
+                            <option value="">-- حدد نوع المعدة --</option>
+                            <?php
+                            // أنواع المعدات — كتالوج عام (managed) عبر البوابة
+                            $type_rows = $eq_gate->select('equipments_types', array(
+                                'columns'  => array('id', 'type'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'type ASC',
+                            ));
+                            foreach ($type_rows as $type_row) {
+                                $selected = (!empty($editData) && $editData['type'] == $type_row['id']) ? 'selected' : '';
+                                echo "<option value='" . intval($type_row['id']) . "' $selected>" . htmlspecialchars($type_row['type']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-tag"></i>
+                            اسم المعدة <span class="required-indicator">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" placeholder="أدخل اسم المعدة" 
+                               value="<?php echo isset($editData['name']) ? htmlspecialchars($editData['name']) : ''; ?>" required />
+                    </div>
+                    
+                    <!-- ================================= -->
+                    <!-- قسم: المعلومات الأساسية والتعريفية -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-id-card"></i> المعلومات الأساسية والتعريفية</h6>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-hashtag"></i>
+                            رقم المعدة/الرقم التسلسلي
+                        </label>
+                        <input type="text" name="serial_number" id="serial_number" placeholder="مثال: EXC-2024-001" 
+                               value="<?php echo isset($editData['serial_number']) ? htmlspecialchars($editData['serial_number']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-barcode"></i>
+                            رقم الهيكل/الهيكل الأساسي (VIN/Chassis)
+                        </label>
+                        <input type="text" name="chassis_number" id="chassis_number" placeholder="مثال: CAT320-ABC123456" 
+                               value="<?php echo isset($editData['chassis_number']) ? htmlspecialchars($editData['chassis_number']) : ''; ?>" />
+                    </div>
+                    
+                    <!-- ================================= -->
+                    <!-- قسم: بيانات الصنع والموديل -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-building"></i>
+                            الماركة/الشركة المصنعة
+                        </label>
+                        <input type="text" name="manufacturer" id="manufacturer" placeholder="مثال: كاتربيلر، كوماتسو، هيونداي" 
+                               value="<?php echo isset($editData['manufacturer']) ? htmlspecialchars($editData['manufacturer']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-car"></i>
+                            الموديل/الطراز
+                        </label>
+                        <input type="text" name="model" id="model" placeholder="مثال: 320D, PC200, HD1024" 
+                               value="<?php echo isset($editData['model']) ? htmlspecialchars($editData['model']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-calendar"></i>
+                            سنة الصنع
+                        </label>
+                        <input type="number" name="manufacturing_year" id="manufacturing_year" placeholder="مثال: 2018" min="1950" max="2099" 
+                               value="<?php echo isset($editData['manufacturing_year']) ? $editData['manufacturing_year'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-calendar-plus"></i>
+                            سنة الاستيراد/البدء
+                        </label>
+                        <input type="number" name="import_year" id="import_year" placeholder="مثال: 2020" min="1950" max="2099" 
+                               value="<?php echo isset($editData['import_year']) ? $editData['import_year'] : ''; ?>" />
+                    </div>
+                    
+                    <!-- ================================= -->
+                    <!-- قسم: الحالة الفنية والمواصفات -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h6>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-cogs"></i>
+                            حالة المعدة
+                        </label>
+                        <select name="equipment_condition" id="equipment_condition">
+                            <option value="جديدة (لم تستخدم)" <?php echo (!empty($editData) && $editData['equipment_condition']=="جديدة (لم تستخدم)") ? "selected" : ""; ?>>جديدة (لم تستخدم)</option>
+                            <option value="جديدة نسبياً (أقل من سنة استخدام)" <?php echo (!empty($editData) && $editData['equipment_condition']=="جديدة نسبياً (أقل من سنة استخدام)") ? "selected" : ""; ?>>جديدة نسبياً (أقل من سنة استخدام)</option>
+                            <option value="في حالة جيدة" <?php echo (empty($editData) || $editData['equipment_condition']=="في حالة جيدة") ? "selected" : ""; ?>>في حالة جيدة</option>
+                            <option value="في حالة متوسطة" <?php echo (!empty($editData) && $editData['equipment_condition']=="في حالة متوسطة") ? "selected" : ""; ?>>في حالة متوسطة</option>
+                            <option value="في حالة ضعيفة" <?php echo (!empty($editData) && $editData['equipment_condition']=="في حالة ضعيفة") ? "selected" : ""; ?>>في حالة ضعيفة</option>
+                            <option value="محتاجة إصلاح فوري" <?php echo (!empty($editData) && $editData['equipment_condition']=="محتاجة إصلاح فوري") ? "selected" : ""; ?>>محتاجة إصلاح فوري</option>
+                            <option value="معطلة مؤقتاً" <?php echo (!empty($editData) && $editData['equipment_condition']=="معطلة مؤقتاً") ? "selected" : ""; ?>>معطلة مؤقتاً</option>
+                            <option value="مستعملة بكثافة" <?php echo (!empty($editData) && $editData['equipment_condition']=="مستعملة بكثافة") ? "selected" : ""; ?>>مستعملة بكثافة</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-clock"></i>
+                            ساعات التشغيل (للمعدات الثقيلة)
+                        </label>
+                        <input type="number" name="operating_hours" id="operating_hours" placeholder="مثال: 5400 ساعة" min="0" 
+                               value="<?php echo isset($editData['operating_hours']) ? $editData['operating_hours'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-car-crash"></i>
+                            حالة المحرك
+                        </label>
+                        <select name="engine_condition" id="engine_condition">
+                            <option value="ممتازة" <?php echo (!empty($editData) && $editData['engine_condition']=="ممتازة") ? "selected" : ""; ?>>ممتازة</option>
+                            <option value="جيدة" <?php echo (empty($editData) || $editData['engine_condition']=="جيدة") ? "selected" : ""; ?>>جيدة</option>
+                            <option value="متوسطة" <?php echo (!empty($editData) && $editData['engine_condition']=="متوسطة") ? "selected" : ""; ?>>متوسطة</option>
+                            <option value="محتاجة صيانة" <?php echo (!empty($editData) && $editData['engine_condition']=="محتاجة صيانة") ? "selected" : ""; ?>>محتاجة صيانة</option>
+                            <option value="محتاجة إصلاح" <?php echo (!empty($editData) && $editData['engine_condition']=="محتاجة إصلاح") ? "selected" : ""; ?>>محتاجة إصلاح</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-circle-notch"></i>
+                            حالة الإطارات (للشاحنات)
+                        </label>
+                        <select name="tires_condition" id="tires_condition">
+                            <option value="N/A" <?php echo (empty($editData) || $editData['tires_condition']=="N/A") ? "selected" : ""; ?>>N/A</option>
+                            <option value="جديدة" <?php echo (!empty($editData) && $editData['tires_condition']=="جديدة") ? "selected" : ""; ?>>جديدة</option>
+                            <option value="جيدة" <?php echo (!empty($editData) && $editData['tires_condition']=="جيدة") ? "selected" : ""; ?>>جيدة</option>
+                            <option value="متوسطة" <?php echo (!empty($editData) && $editData['tires_condition']=="متوسطة") ? "selected" : ""; ?>>متوسطة</option>
+                            <option value="محتاجة تبديل" <?php echo (!empty($editData) && $editData['tires_condition']=="محتاجة تبديل") ? "selected" : ""; ?>>محتاجة تبديل</option>
+                        </select>
+                    </div>
+                    
+                    <!-- N-21: قسم بيانات الملكية نُزع — المجال المقيَّد (equipment_ownership_registry) حصرًا -->
+
+                    <!-- ================================= -->
+                    <!-- قسم: الوثائق والتسجيلات -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h6>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-address-card"></i>
+                            رقم الترخيص/التسجيل
+                        </label>
+                        <input type="text" name="license_number" id="license_number" placeholder="مثال: VEH-2024-12345" 
+                               value="<?php echo isset($editData['license_number']) ? htmlspecialchars($editData['license_number']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-landmark"></i>
+                            جهة الترخيص
+                        </label>
+                        <input type="text" name="license_authority" id="license_authority" placeholder="مثال: المرور، وزارة النقل" 
+                               value="<?php echo isset($editData['license_authority']) ? htmlspecialchars($editData['license_authority']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-calendar-times"></i>
+                            تاريخ انتهاء الترخيص
+                        </label>
+                        <input type="date" name="license_expiry_date" id="license_expiry_date" 
+                               value="<?php echo isset($editData['license_expiry_date']) ? $editData['license_expiry_date'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-certificate"></i>
+                            رقم شهادة الفحص
+                        </label>
+                        <input type="text" name="inspection_certificate_number" id="inspection_certificate_number" placeholder="رقم شهادة الفحص الفنية" 
+                               value="<?php echo isset($editData['inspection_certificate_number']) ? htmlspecialchars($editData['inspection_certificate_number']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-calendar-check"></i>
+                            تاريخ آخر فحص
+                        </label>
+                        <input type="date" name="last_inspection_date" id="last_inspection_date" 
+                               value="<?php echo isset($editData['last_inspection_date']) ? $editData['last_inspection_date'] : ''; ?>" />
+                    </div>
+                    
+                    <!-- ================================= -->
+                    <!-- قسم: الموقع والتوفر -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h6>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-location-arrow"></i>
+                            الموقع الحالي
+                        </label>
+                        <input type="text" name="current_location" id="current_location" placeholder="مثال: منجم الذهب الشرقي، مستودع الخرطوم" 
+                               value="<?php echo isset($editData['current_location']) ? htmlspecialchars($editData['current_location']) : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-traffic-light"></i>
+                            حالة التوفر
+                        </label>
+                        <select name="availability_status" id="availability_status">
+                            <option value="متاحة للعمل" <?php echo (empty($editData) || $editData['availability_status']=="متاحة للعمل") ? "selected" : ""; ?>>متاحة للعمل</option>
+                            <option value="قيد الاستخدام" <?php echo (!empty($editData) && $editData['availability_status']=="قيد الاستخدام") ? "selected" : ""; ?>>قيد الاستخدام</option>
+                            <option value="تحت الصيانة" <?php echo (!empty($editData) && $editData['availability_status']=="تحت الصيانة") ? "selected" : ""; ?>>تحت الصيانة</option>
+                            <option value="محجوزة" <?php echo (!empty($editData) && $editData['availability_status']=="محجوزة") ? "selected" : ""; ?>>محجوزة</option>
+                            <option value="معطلة" <?php echo (!empty($editData) && $editData['availability_status']=="معطلة") ? "selected" : ""; ?>>معطلة</option>
+                            <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status']=="في المستودع") ? "selected" : ""; ?>>في المستودع</option>
+                            <option value="مبيعة/مسحوبة" <?php echo (!empty($editData) && $editData['availability_status']=="مبيعة/مسحوبة") ? "selected" : ""; ?>>مبيعة/مسحوبة</option>
+                        </select>
+                    </div>
+                    
+                    <!-- ================================= -->
+                    <!-- قسم: البيانات المالية والقيمة -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h6>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-money-bill-wave"></i>
+                            القيمة المقدرة للمعدة (بالدولار)
+                        </label>
+                        <input type="number" name="estimated_value" id="estimated_value" placeholder="مثال: 150000" min="0" step="0.01" 
+                               value="<?php echo isset($editData['estimated_value']) ? $editData['estimated_value'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-calendar-day"></i>
+                            سعر التأجير اليومي (بالدولار)
+                        </label>
+                        <input type="number" name="daily_rental_price" id="daily_rental_price" placeholder="مثال: 500" min="0" step="0.01" 
+                               value="<?php echo isset($editData['daily_rental_price']) ? $editData['daily_rental_price'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-calendar-alt"></i>
+                            سعر التأجير الشهري (بالدولار)
+                        </label>
+                        <input type="number" name="monthly_rental_price" id="monthly_rental_price" placeholder="مثال: 10000" min="0" step="0.01" 
+                               value="<?php echo isset($editData['monthly_rental_price']) ? $editData['monthly_rental_price'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-shield-alt"></i>
+                            التأمين/الضمان
+                        </label>
+                        <select name="insurance_status" id="insurance_status">
+                            <option value="">-- اختر حالة التأمين --</option>
+                            <option value="مؤمن بالكامل" <?php echo (!empty($editData) && $editData['insurance_status']=="مؤمن بالكامل") ? "selected" : ""; ?>>مؤمن بالكامل</option>
+                            <option value="مؤمن جزئياً" <?php echo (!empty($editData) && $editData['insurance_status']=="مؤمن جزئياً") ? "selected" : ""; ?>>مؤمن جزئياً</option>
+                            <option value="غير مؤمن" <?php echo (!empty($editData) && $editData['insurance_status']=="غير مؤمن") ? "selected" : ""; ?>>غير مؤمن</option>
+                            <option value="جاري التأمين" <?php echo (!empty($editData) && $editData['insurance_status']=="جاري التأمين") ? "selected" : ""; ?>>جاري التأمين</option>
+                        </select>
+                    </div>
+                    
+                    <!-- ================================= -->
+                    <!-- قسم: ملاحظات وسجل الصيانة -->
+                    <!-- ================================= -->
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h6>
+                    </div>
+                    
+                    <div class="form-grid-full">
+                        <label>
+                            <i class="fas fa-comment-alt"></i>
+                            ملاحظات عامة
+                        </label>
+                        <textarea name="general_notes" id="general_notes" rows="3" placeholder="مثال: معدة موثوقة، تحتاج إلى صيانة دورية كل 3 أشهر"><?php echo isset($editData['general_notes']) ? htmlspecialchars($editData['general_notes']) : ''; ?></textarea>
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-wrench"></i>
+                            تاريخ آخر صيانة
+                        </label>
+                        <input type="date" name="last_maintenance_date" id="last_maintenance_date" 
+                               value="<?php echo isset($editData['last_maintenance_date']) ? $editData['last_maintenance_date'] : ''; ?>" />
+                    </div>
+                    
+                    <div>
+                        <label>
+                            <i class="fas fa-toggle-on"></i>
+                            الحالة <span class="required-indicator">*</span>
+                        </label>
+                        <select name="status" id="status" required>
+                            <option value="">-- اختر الحالة --</option>
+                            <option value="1" <?php echo (!empty($editData) && $editData['status']=="1") ? "selected" : ""; ?>>متاحة</option>
+                            <option value="0" <?php echo (!empty($editData) && $editData['status']=="0") ? "selected" : ""; ?>>مشغولة</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit">
+                            <i class="fas fa-save"></i>
+                            <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('projectForm').classList.remove('allforms-visible'); document.getElementById('projectForm').reset();">
+                            <i class="fas fa-times"></i>
+                            إلغاء
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <?php } ?>
+
+    <!-- جدول المعدات -->
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <i class="fas fa-list-alt"></i>
+                قائمة المعدات
+            </h5>
+        </div>
+        <div class="card-body">
+            <!-- نظام الفلاتر -->
+            <div class="filters-container">
+                <div class="filters-header">
+                    <h6><i class="fas fa-filter"></i> فلترة المعدات</h6>
+                    <button type="button" class="btn-clear-filters" id="clearFiltersBtn">
+                        <i class="fas fa-times-circle"></i> إلغاء الفلاتر
+                    </button>
+                </div>
+                
+                <div class="filters-grid">
+                    <div class="filter-item">
+                        <label><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
+                        <select id="filterSupplier" class="filter-select">
+                            <option value="">— جميع الموردين —</option>
+                            <?php
+                            // فلتر الموردين — نفس مصدر البوابة المعزول
+                            $supplier_filter_rows = $eq_gate->select('suppliers', array(
+                                'columns'  => array('id', 'name'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'name ASC',
+                            ));
+                            foreach ($supplier_filter_rows as $supplier) {
+                                echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
+                        <select id="filterType" class="filter-select">
+                            <option value="">— جميع الأنواع —</option>
+                            <?php
+                            // فلتر الأنواع — كتالوج عام عبر البوابة
+                            $type_filter_rows = $eq_gate->select('equipments_types', array(
+                                'columns'  => array('id', 'type'),
+                                'whereRaw' => "status = 1",
+                                'orderBy'  => 'type ASC',
+                            ));
+                            foreach ($type_filter_rows as $type_row) {
+                                echo "<option value='" . htmlspecialchars($type_row['type']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">— جميع الحالات —</option>
+                            <option value="متاحة">متاحة</option>
+                            <option value="تحت الصيانة">تحت الصيانة</option>
+                            <option value="محجوزة">محجوزة</option>
+                            <option value="معطلة">معطلة</option>
+                            <option value="مسحوبة">مسحوبة</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
+                        <select id="filterAvailability" class="filter-select">
+                            <option value="">— جميع حالات التوفر —</option>
+                            <option value="متوفرة">متوفرة</option>
+                            <option value="غير متوفرة">غير متوفرة</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filters-summary" id="filtersSummary" style="display: none;">
+                    <span class="summary-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="summary-text"></span>
+                </div>
+            </div>
+            
+            <!-- أزرار إظهار/إخفاء المجموعات -->
+            <div class="column-groups-toggle">
+                <button type="button" class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+                    <i class="fas fa-info-circle"></i> أساسية
+                </button>
+                <button type="button" class="btn-group-toggle active" data-group="identification" title="بيانات التعريف">
+                    <i class="fas fa-id-card"></i> التعريف
+                </button>
+                <button type="button" class="btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
+                    <i class="fas fa-industry"></i> الصنع
+                </button>
+                <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
+                    <i class="fas fa-wrench"></i> فنية
+                </button>
+                <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+                    <i class="fas fa-toggle-on"></i> الحالة
+                </button>
+                <button type="button" class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+                    <i class="fas fa-eye"></i> الكل
+                </button>
+            </div>
+            
+            <table id="projectsTable" class="display nowrap">
+                <thead>
+                    <tr>
+                        <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
+                        <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
+                        <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
+                        <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
+                        <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
+                        <th data-group="basic"><i class="fas fa-tag"></i> الاسم</th>
+                        <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
+                        <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
+                        <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
+                        <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
+                        <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
+                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
+                        <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                        <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                        <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // العزل مسؤولية البوابة عبر {TENANT_SCOPE} (نفس نمط equipments.php):
+                    // JOIN المورّد الداخلي → LEFT + s.id IS NOT NULL؛ فلترُ مشروع السوبر
+                    // يُلحَق بعد الرمز عبر EXISTS على operations (المعلَنة إثراءً).
+                    $list_extra  = " AND s.id IS NOT NULL";
+                    $list_params = array();
+                    if ($is_super_admin && $selected_project_id > 0) {
+                        $list_extra .= " AND EXISTS (SELECT 1 FROM operations so WHERE so.equipment = m.id AND so.project_id = ?)";
+                        $list_params[] = $selected_project_id;
+                    }
+
+                    $list_sql = "
+                        SELECT
+                            m.id,
+                            s.name AS supplier_name,
+                            m.type,
+                            m.code,
+                            m.name,
+                            m.status,
+                            m.serial_number,
+                            m.model,
+                            m.manufacturing_year,
+                            m.equipment_condition,
+                            m.availability_status,
+                            " . ($equipment_has_availability_state ? "m.availability_state," : "NULL AS availability_state,") . "
+                            o.project_id,
+                            o.status AS operation_status,
+                            COUNT(DISTINCT d.id) AS drivers_count
+                        FROM equipments m
+                        LEFT JOIN suppliers s ON m.suppliers = s.id
+                        LEFT JOIN operations o
+                            ON o.equipment = m.id
+                            AND o.status = '1'
+                        LEFT JOIN equipment_drivers ed
+                            ON ed.equipment_id = m.id
+                        LEFT JOIN employees d
+                            ON d.id = ed.employee_id
+                            AND ed.status = '1'
+                        WHERE {TENANT_SCOPE}$list_extra
+                        GROUP BY m.id
+                        ORDER BY m.id DESC
+                    ";
+                    $rows = $eq_gate->scopedQuery(array(
+                        'scope'  => array('m' => 'equipments'),
+                        'enrich' => array('s' => 'suppliers', 'o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees'),
+                    ), $list_sql, $list_params);
+                    $i = 1;
+                    foreach ($rows as $row) {
+                        echo "<tr>";
+                        echo "<td><strong>" . $i++ . "</strong></td>";
+                        echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
+                        echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
+                        
+                        // رقم تسلسلي
+                        $serial = !empty($row['serial_number'])
+                            ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
+                            : "<span class='text-muted'>غير محدد</span>";
+                        echo "<td>" . $serial . "</td>";
+
+                        // نوع المعدة
+                        $type_icon = $row['type'] == "1" ? "fa-tractor" : "fa-truck-moving";
+                        $type_text = $row['type'] == "1" ? "حفار" : "قلاب";
+                        echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
+
+                        // اسم المعدة (تهيئة المتغير)
+                        $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
+                        
+                        // المشروع النشط
+                        if (!empty($row['project'])) {
+                            $p = $eq_gate->selectOne('project', array(
+                                'columns' => array('name'),
+                                'where'   => array('id' => $row['project']),
+                            ));
+                            if ($p !== null) {
+                                $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
+                            }
+                        }
+
+                        // عدد السائقين النشطين
+                        if ($row['drivers_count'] > 0) {
+                            $name_display .= "<br><span class='extra-info'><i class='fas fa-users'></i> " . $row['drivers_count'] . " سائق</span>";
+                        }
+
+                        echo "<td>" . $name_display . "</td>";
+
+                        // الموديل
+                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
+                        echo "<td>" . $model . "</td>";
+                        
+                        // سنة الصنع
+                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>غير محدد</span>";
+                        echo "<td>" . $manufacturing_year . "</td>";
+                        
+                        // حالة المعدة
+                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
+                        echo "<td>" . $equipment_condition . "</td>";
+                        
+                        // N-21: عمود المالك نُزع — لا بُعد مالك في أي عرض تشغيلي
+
+                        // التوفر - نفس نمط equipments_fleet
+                        $avail_state_raw  = isset($row['availability_state'])  ? $row['availability_state']  : '';
+                        $avail_status_raw = isset($row['availability_status']) ? $row['availability_status'] : '';
+                        $row_availability_state  = normalize_equipment_availability_state($avail_state_raw, $avail_status_raw);
+                        $row_availability_status = normalize_equipment_availability_status($row_availability_state, $avail_status_raw);
+
+                        if ($row_availability_state === 'متوفرة') {
+                            echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متوفرة</span></td>";
+                        } else {
+                            echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
+                        }
+
+                        // حالة المعدة - نفس status_map من equipments_fleet
+                        $eq_status = isset($row['status']) ? intval($row['status']) : 0;
+                        $status_map = [
+                            0 => ["badge-working",  "fa-spinner fa-spin",         "متاحة"],
+                            1 => ["badge-busy",     "fa-tools",                   "تحت الصيانة"],
+                            2 => ["badge-type",     "fa-bookmark",                "محجوزة"],
+                            3 => ["badge-busy",     "fa-exclamation-triangle",    "معطلة"],
+                            5 => ["badge-busy",     "fa-arrow-alt-circle-down",   "مسحوبة"],
+                        ];
+                        $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
+                        echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
+
+                        // الإجراءات
+                                                echo "<td>";
+                                                echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                                                        <i class='fas fa-eye'></i>
+                                                    </a>";
+                                                
+                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
+                                                                        <i class='fas fa-user-cog'></i>
+                                                                    </a>";
+                                                
+                                                               
+                                                        // يمكن إضافة زر حذف هنا إذا لزم الأمر
+                                                
+                                                echo "</td>";
+
+                        echo "</tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<!-- Modal عرض تفاصيل المعدة -->
+<div id="viewEquipmentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5><i class="fas fa-eye"></i> عرض بيانات المعدة</h5>
+            <button class="close-modal" id="closeEquipmentModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="view-modal-body">
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المعدة</div>
+                    <div class="view-item-value" id="view_eq_code">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-tag"></i> اسم المعدة</div>
+                    <div class="view-item-value" id="view_eq_name">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-tools"></i> نوع المعدة</div>
+                    <div class="view-item-value" id="view_eq_type">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-truck-loading"></i> المورد</div>
+                    <div class="view-item-value" id="view_eq_supplier">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> المشروع</div>
+                    <div class="view-item-value" id="view_eq_project">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-mountain"></i> المنجم</div>
+                    <div class="view-item-value" id="view_eq_mine">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
+                    <div class="view-item-value" id="view_eq_serial">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-car"></i> رقم الهيكل</div>
+                    <div class="view-item-value" id="view_eq_chassis">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
+                    <div class="view-item-value" id="view_eq_manufacturer">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-car-side"></i> الموديل</div>
+                    <div class="view-item-value" id="view_eq_model">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
+                    <div class="view-item-value" id="view_eq_year">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
+                    <div class="view-item-value" id="view_eq_import_year">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
+                    <div class="view-item-value" id="view_eq_condition">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
+                    <div class="view-item-value" id="view_eq_hours">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
+                    <div class="view-item-value" id="view_eq_engine">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
+                    <div class="view-item-value" id="view_eq_tires">-</div>
+                </div>
+                <!-- N-21: حقول المالك نُزعت — المجال المقيَّد حصرًا -->
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
+                    <div class="view-item-value" id="view_eq_license">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
+                    <div class="view-item-value" id="view_eq_license_authority">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
+                    <div class="view-item-value" id="view_eq_license_expiry">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
+                    <div class="view-item-value" id="view_eq_inspection">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
+                    <div class="view-item-value" id="view_eq_last_inspection">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
+                    <div class="view-item-value" id="view_eq_location">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-traffic-light"></i> حالة التوفر</div>
+                    <div class="view-item-value" id="view_eq_availability">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
+                    <div class="view-item-value" id="view_eq_value">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
+                    <div class="view-item-value" id="view_eq_daily">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
+                    <div class="view-item-value" id="view_eq_monthly">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
+                    <div class="view-item-value" id="view_eq_insurance">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
+                    <div class="view-item-value" id="view_eq_notes">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
+                    <div class="view-item-value" id="view_eq_last_maintenance">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                    <div class="view-item-value" id="view_eq_status">-</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <?php if ($_SESSION['user']['role'] != "3" && $_SESSION['user']['role'] != "10") { ?>
+            <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
+                <i class="fas fa-edit"></i> تعديل المعدة
+            </a>
+            <?php } ?>
+            <button type="button" class="btn-modal btn-modal-cancel" id="closeEquipmentModalFooter">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<!-- DataTables JS -->
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+
+<script>
+    (function () {
+        $(document).ready(function () {
+            var table = $('#projectsTable').DataTable({
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy', text: 'نسخ' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv', text: 'تصدير CSV' },
+                    { extend: 'pdf', text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة' }
+                ],
+                "language": {
+                    "url": "https:/ems/assets/i18n/datatables/ar.json"
+                }
+            });
+            
+            // نظام إظهار/إخفاء المجموعات — خريطة الفهارس تُمرّر للوحدة الموحّدة.
+            // الحالة الافتراضية تؤخذ من كلاس active على الأزرار (الصنع/الفنية مخفيتان).
+            var columnGroups = {
+                'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
+                'identification': [3],            // رقم تسلسلي
+                'manufacturing': [6, 7],          // الموديل، سنة الصنع
+                'technical': [8, 9],              // حالة المعدة، التوفر
+                'status': [10, 11]                // الحالة، الإجراءات — N-21: عمود المالك نُزع
+            };
+            
+            // نظام الفلترة الاحترافي
+            var activeFilters = {
+                supplier: '',
+                type: '',
+                status: '',
+                availability: ''
+            };
+            
+            // تهيئة الفلاتر
+            $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').on('change', function() {
+                var filterType = $(this).attr('id').replace('filter', '').toLowerCase();
+                activeFilters[filterType] = $(this).val();
+                applyFilters();
+                updateFiltersSummary();
+            });
+            
+            // تطبيق الفلاتر
+            function applyFilters() {
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        // data[1] = المورد
+                        // data[4] = النوع (يحتوي على نص مثل "حفار" أو "قلاب")
+                        // data[11] = الحالة
+                        // data[10] = التوفر
+                        
+                        var supplierMatch = true;
+                        var typeMatch = true;
+                        var statusMatch = true;
+                        var availabilityMatch = true;
+                        
+                        // فلترة المورد
+                        if (activeFilters.supplier !== '') {
+                            supplierMatch = data[1].indexOf(activeFilters.supplier) !== -1;
+                        }
+                        
+                        // فلترة النوع
+                        if (activeFilters.type !== '') {
+                            typeMatch = data[4].indexOf(activeFilters.type) !== -1;
+                        }
+                        
+                        // فلترة الحالة
+                        if (activeFilters.status !== '') {
+                            statusMatch = data[11].indexOf(activeFilters.status) !== -1;
+                        }
+                        
+                        // فلترة التوفر (مطابقة دقيقة لتجنب تشابه "متوفرة" مع "غير متوفرة")
+                        if (activeFilters.availability !== '') {
+                            if (activeFilters.availability === 'متوفرة') {
+                                availabilityMatch = data[10].indexOf('غير متوفرة') === -1 && data[10].indexOf('متوفرة') !== -1;
+                            } else {
+                                availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                            }
+                        }
+                        
+                        return supplierMatch && typeMatch && statusMatch && availabilityMatch;
+                    }
+                );
+                
+                table.draw();
+                
+                // إزالة دالة البحث بعد التطبيق لتجنب التكرار
+                $.fn.dataTable.ext.search.pop();
+            }
+            
+            // تحديث ملخص الفلاتر
+            function updateFiltersSummary() {
+                var activeCount = 0;
+                var summaryParts = [];
+                
+                if (activeFilters.supplier) {
+                    activeCount++;
+                    summaryParts.push('المورد: ' + activeFilters.supplier);
+                }
+                if (activeFilters.type) {
+                    activeCount++;
+                    summaryParts.push('النوع: ' + activeFilters.type);
+                }
+                if (activeFilters.status) {
+                    activeCount++;
+                    summaryParts.push('الحالة: ' + activeFilters.status);
+                }
+                if (activeFilters.availability) {
+                    activeCount++;
+                    summaryParts.push('التوفر: ' + activeFilters.availability);
+                }
+                
+                var $summary = $('#filtersSummary');
+                if (activeCount > 0) {
+                    $summary.find('.summary-text').text(
+                        'تم تطبيق ' + activeCount + ' فلتر: ' + summaryParts.join(' | ')
+                    );
+                    $summary.slideDown(300);
+                } else {
+                    $summary.slideUp(300);
+                }
+            }
+            
+            // إلغاء جميع الفلاتر
+            $('#clearFiltersBtn').on('click', function() {
+                activeFilters = {
+                    supplier: '',
+                    type: '',
+                    status: '',
+                    availability: ''
+                };
+                
+                $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').val('');
+                applyFilters();
+                updateFiltersSummary();
+                
+                // تأثير بصري
+                $(this).addClass('btn-clear-active');
+                setTimeout(function() {
+                    $('#clearFiltersBtn').removeClass('btn-clear-active');
+                }, 300);
+            });
+            
+            // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
+            (function () {
+                function go() {
+                    if (window.EmsColumnGroups) {
+                        EmsColumnGroups.init({
+                            storageKey: 'equipmentDriversGroupStates',
+                            mode: 'datatable',
+                            table: table,
+                            columnMap: columnGroups
+                        });
+                    }
+                }
+                if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
+            })();
+        });
+
+        const toggleFormBtn = document.getElementById('toggleForm');
+        const equipmentForm = document.getElementById('projectForm');
+        const projectSelect = document.getElementById('selected_project_id');
+
+        if (toggleFormBtn && equipmentForm) {
+            toggleFormBtn.addEventListener('click', function () {
+                equipmentForm.classList.toggle('allforms-visible');
+            });
+        }
+
+        if (projectSelect) {
+            projectSelect.addEventListener('change', function () {
+                if (this.value) {
+                    document.getElementById('projectSelectForm').submit();
+                }
+            });
+        }
+        
+        // تحميل بيانات التعديل عند تحميل الصفحة
+        <?php if (!empty($editData)) { ?>
+        $(document).ready(function() {
+            // عرض الفورم
+            $('#projectForm').addClass('allforms-visible');
+            
+            // التمرير للفورم
+            $('html, body').animate({
+                scrollTop: $('#projectForm').offset().top - 100
+            }, 500);
+        });
+        <?php } ?>
+
+        // Equipment view modal
+        const viewEquipmentModal = document.getElementById('viewEquipmentModal');
+        const closeEquipmentModalBtn = document.getElementById('closeEquipmentModal');
+        const closeEquipmentModalFooter = document.getElementById('closeEquipmentModalFooter');
+
+        function setViewValue(elementId, value) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const safeValue = (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
+            el.textContent = safeValue;
+        }
+
+        function formatCurrency(value) {
+            if (value === null || value === undefined || value === '') return 'غير محدد';
+            const num = parseFloat(value);
+            if (Number.isNaN(num)) return value;
+            return '$' + num.toLocaleString();
+        }
+
+        function formatType(value) {
+            if (!value) return 'غير محدد';
+            return String(value) === '1' ? 'حفار' : 'قلاب';
+        }
+
+        function formatStatus(value) {
+            if (value === null || value === undefined || value === '') return 'غير محدد';
+            return String(value) === '1' ? 'متاحة' : 'مشغولة';
+        }
+
+        $(document).on('click', '.viewEquipmentBtn', function() {
+            const equipmentId = $(this).data('id');
+            if (!equipmentId || !viewEquipmentModal) return;
+
+            viewEquipmentModal.style.display = 'flex';
+
+            const loadingText = 'جار التحميل...';
+            [
+                'view_eq_code','view_eq_name','view_eq_type','view_eq_supplier','view_eq_project','view_eq_mine',
+                'view_eq_serial','view_eq_chassis','view_eq_manufacturer','view_eq_model','view_eq_year',
+                'view_eq_import_year','view_eq_condition','view_eq_hours','view_eq_engine','view_eq_tires',
+                'view_eq_license','view_eq_license_authority','view_eq_license_expiry','view_eq_inspection',
+                'view_eq_last_inspection','view_eq_location','view_eq_availability','view_eq_value',
+                'view_eq_daily','view_eq_monthly','view_eq_insurance','view_eq_notes','view_eq_last_maintenance',
+                'view_eq_status'
+            ].forEach(id => setViewValue(id, loadingText));
+
+            const editBtn = document.getElementById('viewEquipmentEditBtn');
+            if (editBtn) {
+                editBtn.setAttribute('href', 'equipments.php?edit=' + equipmentId);
+            }
+
+            $.ajax({
+                url: 'get_equipment_details.php',
+                type: 'GET',
+                data: { id: equipmentId },
+                dataType: 'json',
+                success: function(response) {
+                    if (!response.success || !response.data) {
+                        setViewValue('view_eq_name', 'تعذر تحميل البيانات');
+                        return;
+                    }
+
+                    const data = response.data;
+                    setViewValue('view_eq_code', data.code);
+                    setViewValue('view_eq_name', data.name);
+                    setViewValue('view_eq_type', formatType(data.type));
+                    setViewValue('view_eq_supplier', data.supplier_name);
+                    setViewValue('view_eq_project', data.project_name);
+                    setViewValue('view_eq_mine', data.mine_name);
+                    setViewValue('view_eq_serial', data.serial_number);
+                    setViewValue('view_eq_chassis', data.chassis_number);
+                    setViewValue('view_eq_manufacturer', data.manufacturer);
+                    setViewValue('view_eq_model', data.model);
+                    setViewValue('view_eq_year', data.manufacturing_year);
+                    setViewValue('view_eq_import_year', data.import_year);
+                    setViewValue('view_eq_condition', data.equipment_condition);
+                    setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' ساعة' : 'غير محدد');
+                    setViewValue('view_eq_engine', data.engine_condition);
+                    setViewValue('view_eq_tires', data.tires_condition);
+                    setViewValue('view_eq_license', data.license_number);
+                    setViewValue('view_eq_license_authority', data.license_authority);
+                    setViewValue('view_eq_license_expiry', data.license_expiry_date);
+                    setViewValue('view_eq_inspection', data.inspection_certificate_number);
+                    setViewValue('view_eq_last_inspection', data.last_inspection_date);
+                    setViewValue('view_eq_location', data.current_location);
+                    setViewValue('view_eq_availability', data.availability_status);
+                    setViewValue('view_eq_value', formatCurrency(data.estimated_value));
+                    setViewValue('view_eq_daily', formatCurrency(data.daily_rental_price));
+                    setViewValue('view_eq_monthly', formatCurrency(data.monthly_rental_price));
+                    setViewValue('view_eq_insurance', data.insurance_status);
+                    setViewValue('view_eq_notes', data.general_notes);
+                    setViewValue('view_eq_last_maintenance', data.last_maintenance_date);
+                    setViewValue('view_eq_status', formatStatus(data.status));
+                },
+                error: function() {
+                    setViewValue('view_eq_name', 'تعذر الاتصال بالخادم');
+                }
+            });
+        });
+
+        function closeEquipmentModal() {
+            if (viewEquipmentModal) {
+                viewEquipmentModal.style.display = 'none';
+            }
+        }
+
+        if (closeEquipmentModalBtn) {
+            closeEquipmentModalBtn.addEventListener('click', closeEquipmentModal);
+        }
+
+        if (closeEquipmentModalFooter) {
+            closeEquipmentModalFooter.addEventListener('click', closeEquipmentModal);
+        }
+
+        if (viewEquipmentModal) {
+            viewEquipmentModal.addEventListener('click', function(event) {
+                if (event.target === viewEquipmentModal) {
+                    closeEquipmentModal();
+                }
+            });
+        }
+        
+        // Toggle Form Functionality
+    })();
+</script>
+
+<!-- استيراد المعدات يتم عبر معالج إطار Excel الموحّد (يُطبع في نهاية الصفحة عبر ems_excel_render). -->
+
+<style>
+/* نظام الفلترة الاحترافي */
+.filters-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+}
+
+.filters-header h6 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filters-header h6 i {
+    color: var(--gold);
+    font-size: 1.2rem;
+}
+
+.btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    background: var(--red-soft);
+    color: var(--red);
+    border: 1.5px solid rgba(220,38,38,.18);
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all var(--ease);
+    font-family: 'Cairo', sans-serif;
+}
+
+.btn-clear-filters:hover {
+    background: var(--red);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(220,38,38,.35);
+}
+
+.btn-clear-active {
+    animation: btnClearPulse 0.3s ease;
+}
+
+@keyframes btnClearPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-item label {
+    font-weight: 700;
+    color: var(--txt);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+}
+
+.filter-item label i {
+    color: var(--gold);
+}
+
+.filter-select {
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+    font-family: 'Cairo', sans-serif;
+    transition: all var(--ease);
+    background: var(--surface);
+    color: var(--txt);
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.filter-select:hover {
+    border-color: var(--navy);
+}
+
+.filters-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--blue-soft);
+    border: 1.5px solid rgba(37,99,235,.25);
+    border-radius: var(--radius);
+    margin-top: 16px;
+    animation: slideDown 0.3s ease;
+}
+
+.filters-summary .summary-icon {
+    flex-shrink: 0;
+    color: var(--blue);
+    font-size: 1.1rem;
+}
+
+.filters-summary .summary-text {
+    color: var(--blue);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+#importExcelModal input[type="file"]:hover {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+}
+
+#importExcelModal button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(22,163,74,0.35);
+}
+
+#importExcelModal button[type="button"]:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+</style>
+
+<!-- استيراد المعدات القديم أُزيل — يتولّاه الآن معالج إطار Excel الموحّد (assets/js/ems-excel.js). -->
+
+</div> <!-- closing main div -->
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
+</body>
+</html>
+
+

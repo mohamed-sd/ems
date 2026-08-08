@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Approvals/attribution_board.php — لوحةُ الإسناد اليومي (CON-02 §5 · §7-④ · ق-6)
  * ───────────────────────────────────────────────────────────────────────────
@@ -33,7 +34,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header('Location: ../login.php?msg=' . rawurlencode('لا توجد بيئة شركة صالحة ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -56,7 +57,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header('Location: ../main/dashboard.php?msg=' . rawurlencode('لا توجد صلاحية عرض لوحة الإسناد ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض لوحة الإسناد ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -68,7 +69,7 @@ if (!function_exists('atb_e')) {
 }
 if (!function_exists('atb_back')) {
     function atb_back($msg, $day) {
-        header('Location: attribution_board.php?day=' . urlencode($day) . '&msg=' . rawurlencode($msg));
+        ems_gov_redirect('Location: attribution_board.php?day=' . urlencode($day) . '&msg=' . rawurlencode($msg));
         exit();
     }
 }
@@ -192,6 +193,9 @@ function atb_flag($v) {
 }
 
 $page_title = 'لوحة الإسناد اليومي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

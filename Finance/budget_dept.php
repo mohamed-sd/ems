@@ -36,12 +36,23 @@ $r = mysqli_query($conn, "SELECT b.id, b.budget_no, b.dept_module, b.period_no, 
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
 $page_title = 'ميزانية إدارتي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-coins"></i> ميزانيةُ إدارتي — <?= $isFinance ? 'كلُّ الإدارات (زاويةُ المالية)' : htmlspecialchars($dept !== '' ? ems_dept_label($dept) : 'دورُك بلا وحدة', ENT_QUOTES, 'UTF-8') ?></h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-coins';
+$header_title_html = htmlspecialchars('ميزانيةُ إدارتي — ' . ($isFinance ? 'كلُّ الإدارات (زاويةُ المالية)' : htmlspecialchars($dept !== '' ? ems_dept_label($dept) : 'دورُك بلا وحدة', ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <form method="get" style="margin-bottom:12px"><label>السنة</label>
     <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()"></form>
   <table class="table table-striped" data-no-dt>

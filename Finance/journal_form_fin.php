@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = fin_page_perms($conn, 'Finance/journal_form_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+القيود+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض القيود ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -36,9 +36,9 @@ $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 
 // ── ترحيل القيد (محرك التوازن) ──
 if (isset($_GET['post_id'])) {
-    if (!$can_edit) { header("Location: journal_form_fin.php?msg=لا+توجد+صلاحية+الترحيل+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: journal_form_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); } // إصلاح #2
-    if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { header("Location: journal_form_fin.php?msg=الترحيل+يخصّ+المدير+المالي+فقط+❌"); exit(); } // فصل الواجبات
+    if (!$can_edit) { ems_gov_flash_redirect('journal_form_fin.php', 'لا توجد صلاحية الترحيل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('journal_form_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); } // إصلاح #2
+    if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { ems_gov_flash_redirect('journal_form_fin.php', 'الترحيل يخصّ المدير المالي فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
     $pid = intval($_GET['post_id']);
     $gate = ems_tenant_db(); // الترحيل شركة الجلسة دومًا (كالأصل company_id=$company_id)
 
@@ -50,14 +50,14 @@ if (isset($_GET['post_id'])) {
         array($pid));
     $r = $chk ? $chk[0] : null;
     $n = $r ? intval($r['n']) : 0; $d = $r ? (float)$r['d'] : 0; $c = $r ? (float)$r['c'] : 0;
-    if ($n < 2) { header("Location: journal_form_fin.php?msg=لا+ترحيل:+القيد+يحتاج+سطرين+فأكثر+❌"); exit(); }
-    if (round($d, 2) !== round($c, 2)) { header("Location: journal_form_fin.php?msg=لا+ترحيل:+القيد+غير+متوازن+(مدين≠دائن)+❌"); exit(); }
+    if ($n < 2) { ems_gov_flash_redirect('journal_form_fin.php', 'لا ترحيل: القيد يحتاج سطرين فأكثر ❌', 'GOV-FAIL-409', ''); exit(); }
+    if (round($d, 2) !== round($c, 2)) { ems_gov_flash_redirect('journal_form_fin.php', 'لا ترحيل: القيد غير متوازن (مدين≠دائن) ❌', 'GOV-FAIL-409', ''); exit(); }
 
     // إصلاح #3: لا ترحيل في فترة مالية مقفلة — نقرأ التاريخ والحدث المرتبط معًا
     $entryRow = $gate->selectOne('fin_journal_entries', array('columns' => array('posting_date', 'event_id'), 'where' => array('id' => $pid)));
     $pdate = $entryRow ? $entryRow['posting_date'] : date('Y-m-d');
     if (!fin_period_posting_open($conn, $company_id, $pdate)) {
-        header("Location: journal_form_fin.php?msg=لا+ترحيل:+الفترة+المالية+مقفلة+لهذا+التاريخ+❌"); exit();
+        ems_gov_flash_redirect('journal_form_fin.php', 'لا ترحيل: الفترة المالية مقفلة لهذا التاريخ ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // زوجٌ كتابيٌّ مترابط (§9): ترحيل القيد (بحارس حالة draft) + نقل الحدث المرتبط
@@ -77,7 +77,7 @@ if (isset($_GET['post_id'])) {
         }, 'post journal entry + advance linked event');
     } catch (\App\Core\TenantGateException $e) {
         error_log('journal post refused: ' . $e->getMessage());
-        header("Location: journal_form_fin.php?msg=لا+يجوز+ترحيل+قيدٍ+مرتبطٍ+بحدثٍ+منشورٍ+على+الناقل+❌"); exit();
+        ems_gov_flash_redirect('journal_form_fin.php', 'لا يجوز ترحيل قيدٍ مرتبطٍ بحدثٍ منشورٍ على الناقل ❌', 'GOV-FAIL-409', ''); exit();
     }
     // §9.3: حقيقة finance.posted على الجذر — القيد رُحِّل لحدثِ طلبٍ (إن كان)
     $eidFact = $entryRow ? intval($entryRow['event_id']) : 0;
@@ -98,12 +98,12 @@ if (isset($_GET['post_id'])) {
 
     // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
     $fed = fin_recalc_budget_actuals($conn, $company_id);
-    header("Location: journal_form_fin.php?msg=تم+ترحيل+القيد+وتحدّث+فعلي+الموازنة+($fed+بند)+✅"); exit();
+    ems_gov_flash_redirect('journal_form_fin.php', "تم ترحيل القيد وتحدّث فعلي الموازنة ($fed بند) ✅", 'GOV-OK-200', ''); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: journal_form_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('journal_form_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $did = intval($_GET['delete_id']);
     // حذف ناعم مشروط بحالة draft → update بحارس whereRaw (softDelete بالـid فقط لا يحمل شرط الحالة)
     $affected = ems_tenant_db()->update('fin_journal_entries',
@@ -116,13 +116,13 @@ if (isset($_GET['delete_id'])) {
             array('is_deleted' => 0), array('is_deleted' => 1, 'deleted_by' => $current_user_id),
             array('company_id' => $company_id, 'user_id' => $current_user_id));
     }
-    header("Location: journal_form_fin.php?msg=تم+حذف+القيد+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('journal_form_fin.php', 'تم حذف القيد بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ قيد جديد (رأس + سطور) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
-    if (!$can_add) { header("Location: journal_form_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: journal_form_fin.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('journal_form_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('journal_form_fin.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $posting_date = trim($_POST['posting_date'] ?? '');
     $txn_date     = trim($_POST['txn_date'] ?? '');
@@ -135,19 +135,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     $lmemos   = $_POST['line_memo'] ?? array();
     $lccs     = $_POST['cost_center_id'] ?? array();
 
-    if ($posting_date === '') { header("Location: journal_form_fin.php?msg=تاريخ+الترحيل+مطلوب+❌"); exit(); }
+    if ($posting_date === '') { ems_gov_flash_redirect('journal_form_fin.php', 'تاريخ الترحيل مطلوب ❌', 'GOV-FAIL-409', ''); exit(); }
     // M-38: تاريخُ الحركة الفعلي إلزامٌ (بجانب تاريخ الترحيل) — SPEC-01 #13
     if ($txn_date === '') { $txn_date = $posting_date; }
     // M-39: لا كتابةَ ماليةً في فترةٍ مقفلة — حتى المسودةُ (423)
     require_once __DIR__ . '/../includes/period_guard.php';
     $pchk = ems_period_check($conn, $company_id, $posting_date);
-    if (!$pchk['ok']) { header("Location: journal_form_fin.php?msg=" . urlencode($pchk['reason']) . "+❌"); exit(); }
+    if (!$pchk['ok']) { ems_gov_flash_redirect(ems_flash_to('journal_form_fin.php', "+❌"), $pchk['reason'], 'GOV-INFO-200', ''); exit(); }
     // M-38: اليدويُّ الاستثنائي بسببٍ موثَّق إلزامًا (SPEC-01 #13: POST /journal/manual بسببٍ إلزامي)
-    if ($memo === '') { header("Location: journal_form_fin.php?msg=بيان+القيد+(السبب)+إلزامي+للقيد+اليدوي+❌"); exit(); }
+    if ($memo === '') { ems_gov_flash_redirect('journal_form_fin.php', 'بيان القيد (السبب) إلزامي للقيد اليدوي ❌', 'GOV-FAIL-409', ''); exit(); }
     // M-38: العملة من الدليل المسجَّل حصرًا
     require_once __DIR__ . '/../includes/fx.php';
     $jr_code = ems_fx_code($jr_currency !== '' ? $jr_currency : 'SDG');
-    if ($jr_code === null) { header("Location: journal_form_fin.php?msg=عملة+غير+مسجَّلة+❌"); exit(); }
+    if ($jr_code === null) { ems_gov_flash_redirect('journal_form_fin.php', 'عملة غير مسجَّلة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     // اجمع السطور الصالحة
     $lines = array(); $tot_d = 0; $tot_c = 0;
@@ -160,10 +160,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
                          'cc' => intval($lccs[$i] ?? 0) ?: null);
         $tot_d += $dv; $tot_c += $cv;
     }
-    if (count($lines) < 2) { header("Location: journal_form_fin.php?msg=القيد+يحتاج+سطرين+صالحين+فأكثر+❌"); exit(); }
+    if (count($lines) < 2) { ems_gov_flash_redirect('journal_form_fin.php', 'القيد يحتاج سطرين صالحين فأكثر ❌', 'GOV-FAIL-409', ''); exit(); }
     // M-38: توازنُ القيد شرطُ الحفظ (المتطلب النظامي SPEC-01 #13) — لا مسودةَ غيرَ متوازنة
     if (round($tot_d, 2) !== round($tot_c, 2)) {
-        header("Location: journal_form_fin.php?msg=لا+حفظ:+القيد+غير+متوازن+(مدين+" . $tot_d . "+≠+دائن+" . $tot_c . ")+❌"); exit();
+        ems_gov_flash_redirect(ems_flash_to('journal_form_fin.php', $tot_d . "+≠+دائن+" . $tot_c . ")+❌"), 'لا حفظ: القيد غير متوازن (مدين ', 'GOV-INFO-200', ''); exit();
     }
 
     // M-38: المعادلُ الموحّد من سجل الأسعار النافذ يومَ الحركة — NULL معلَنٌ إن لا سعر
@@ -189,10 +189,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
             ));
         }
     }, 'create journal entry + lines');
-    header("Location: journal_form_fin.php?msg=تم+حفظ+القيد+(متوازن)+✅"); exit();
+    ems_gov_flash_redirect('journal_form_fin.php', 'تم حفظ القيد (متوازن) ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | القيود اليومية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

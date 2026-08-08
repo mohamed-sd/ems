@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = proc_page_perms($conn, 'Procurement/items_proc.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+كتالوج+الأصناف+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض كتالوج الأصناف ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -46,9 +46,9 @@ $uoms = array_values(array_unique(array_merge(array('قطعة', 'لتر', 'كج�
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: items_proc.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: items_proc.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: items_proc.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('items_proc.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('items_proc.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('items_proc.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     $category = trim($_POST['category'] ?? '');
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $notes = trim($_POST['notes'] ?? '');
 
     if ($name === '' || !in_array($material_nature, $natures, true)) {
-        header("Location: items_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('items_proc.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // K9-M1: الكتابة عبر البوابة
@@ -77,32 +77,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     try {
         if ($is_editing) {
             proc_gate(false)->update('proc_item', $data, array('id' => $id, 'is_deleted' => 0));
-            header("Location: items_proc.php?msg=تم+تعديل+الصنف+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('items_proc.php', 'تم تعديل الصنف بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             $data['code'] = proc_gen_code($conn, 'proc_item', 'PRC-ITM', $company_id);
             $data['created_by'] = $current_user_id;
             proc_gate(false)->insert('proc_item', $data);
-            header("Location: items_proc.php?msg=تمت+إضافة+الصنف+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('items_proc.php', 'تمت إضافة الصنف بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('items_proc save refused: ' . $e->getMessage());
-        header("Location: items_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('items_proc.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: items_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('items_proc.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         proc_gate(false)->softDelete('proc_item', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('items_proc softDelete refused: ' . $e->getMessage());
     }
-    header("Location: items_proc.php?msg=تم+حذف+الصنف+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('items_proc.php', 'تم حذف الصنف بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | كتالوج الأصناف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

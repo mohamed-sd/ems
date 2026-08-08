@@ -18,7 +18,7 @@ $company_id = $ctx['company_id'];
 $is_super_admin = $ctx['is_super'];
 if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
 $perms = proc_page_perms($conn, 'Procurement/supplier_card_proc.php', $is_super_admin);
-if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ لبطاقة المورد ❌')); exit(); }
+if (!$perms['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ لبطاقة المورد ❌', 'GOV-PERM-403', ''); exit(); }
 
 $sid = intval($_GET['id'] ?? 0);
 $sup = $sid > 0 ? proc_gate($is_super_admin)->selectOne('proc_supplier',
@@ -32,6 +32,9 @@ $TABS = array('1' => 'البيانات', '2' => 'أوامرُ الشراء', '3'
               '8' => 'كشفُ الحساب');
 
 $page_title = 'إيكوبيشن | بطاقة مورد المشتريات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

@@ -3,7 +3,15 @@
  * Tickets/dept_inbox_map.php — خريطةُ الدور ← وحدتِه التنظيمية (org_units)
  * المصدر: ORG-01 v4 §1.1 + الأدوارُ الحقيقيةُ المقيسة (update0007 G-04).
  * مشتركةٌ بين «بلاغات إدارتي» و«إنجاز الإدارة» وكلِّ من يحتاج وحدةَ الدور.
+ *
+ * مكتبةٌ تُضمَّن ولا تُطلَب: الطلبُ المباشر يُردّ بـ404 فلا يبقى مسارٌ عامٌّ
+ * بلا وظيفة (سطحُ هجومٍ بلا مقابل).
  */
+if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
+    http_response_code(404);
+    exit();
+}
+
 if (!function_exists('ems_dept_unit_of_role')) {
     function ems_dept_unit_of_role($roleId)
     {

@@ -87,7 +87,7 @@ if (!function_exists('clients_redirect_with_msg')) {
     // إعادة التوجيه مع رسالة
     function clients_redirect_with_msg($msg)
     {
-        header('Location: clients.php?msg=' . urlencode($msg));
+        ems_gov_flash_redirect('clients.php', $msg, 'GOV-INFO-200', '');
         exit();
     }
 }
@@ -97,7 +97,7 @@ if (!function_exists('clients_redirect_with_msg')) {
 // ══════════════════════════════════════════════════════════════════════════════
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if ($company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -221,7 +221,7 @@ if ($module_id) {
 
 // منع الوصول إذا لم تكن هناك صلاحية عرض
 if (!$can_view) {
-    header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض العملاء ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض العملاء ❌', 'GOV-PERM-403', '');
     exit();
 }
 

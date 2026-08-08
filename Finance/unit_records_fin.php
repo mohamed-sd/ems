@@ -33,11 +33,11 @@ require_once __DIR__ . '/fin_helpers.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $perms = fin_page_perms($conn, 'Finance/unit_records_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+وحدات+الأطراف+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض وحدات الأطراف ❌', 'GOV-PERM-403', ''); exit(); }
 
 $work_models = fin_work_models(); $match_states = fin_match_states(); $downtime_causes = fin_downtime_causes();
 
@@ -51,8 +51,8 @@ $work_models = fin_work_models(); $match_states = fin_match_states(); $downtime_
 // ولحظةَ التحويل تُكتب أحكامُ الأطراف الثلاثة (party_award) مع المال ذرّيًّا.
 // ═══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'convert_units') {
-    if (!$can_edit) { header("Location: unit_records_fin.php?msg=" . rawurlencode('لا تملك صلاحية اعتماد الأحكام') . "+❌"); exit(); }
-    if (!fin_verify_action_token()) { header("Location: unit_records_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect(ems_flash_to('unit_records_fin.php', "+❌"), 'لا تملك صلاحية اعتماد الأحكام', 'GOV-PERM-403', ''); exit(); }
+    if (!fin_verify_action_token()) { ems_gov_flash_redirect('unit_records_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $ids = array();
     foreach (explode(',', (string) ($_POST['ids'] ?? '')) as $one) {
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
         if ($one > 0) { $ids[] = $one; }
     }
     $ids = array_slice(array_unique($ids), 0, 500); // سقفٌ معلَنٌ للدفعة الواحدة
-    if (!$ids) { header("Location: unit_records_fin.php?msg=لم+تحدّد+أي+يوم+للاعتماد+❌"); exit(); }
+    if (!$ids) { ems_gov_flash_redirect('unit_records_fin.php', 'لم تحدّد أي يوم للاعتماد ❌', 'GOV-FAIL-409', ''); exit(); }
 
     require_once __DIR__ . '/../app/Services/Finance/UnitConversionService.php';
     $okCount = 0; $effCount = 0; $failed = array(); $eligibleIds = array();
@@ -90,10 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
     }
     $msg = 'اعتُمدت أحكامُ ' . $okCount . ' يومًا (' . $effCount . ' أثرًا)';
     if ($failed) { $msg .= ' — تعذّر ' . count($failed) . ': ' . implode(' | ', array_slice($failed, 0, 3)); }
-    header("Location: unit_records_fin.php?msg=" . rawurlencode($msg) . ($okCount > 0 ? '+✅' : '+⚠️')); exit();
+    ems_gov_flash_redirect(ems_flash_to('unit_records_fin.php', ($okCount > 0 ? '+✅' : '+⚠️')), $msg, 'GOV-INFO-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | وحدات الأطراف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

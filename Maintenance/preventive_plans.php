@@ -16,14 +16,14 @@ $is_super_admin  = ($current_role === '-1');
 $company_id      = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $page_permissions = check_page_permissions($conn, 'Maintenance/preventive_plans.php');
 $can_view   = $is_super_admin ? true : $page_permissions['can_view'];
 $can_add    = $is_super_admin ? true : $page_permissions['can_add'];
 $can_edit   = $is_super_admin ? true : $page_permissions['can_edit'];
 $can_delete = $is_super_admin ? true : $page_permissions['can_delete'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الخطة+الوقائية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الخطة الوقائية ❌', 'GOV-PERM-403', ''); exit(); }
 
 $company_scope_sql = $is_super_admin ? "1=1" : "pl.company_id = " . intval($company_id);
 
@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
 
 // ── إنشاء خطة جديدة (يُحفظ فقط عند إرسال الفورم — لا سجلّ فارغ عند فتح الفورم) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_plan') {
-    if (!$can_add) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: preventive_plans.php?msg=لا+يمكن+الإنشاء+بلا+شركة+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('preventive_plans.php', 'لا يمكن الإنشاء بلا شركة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     if ($name === '') { $name = 'خطة بلا اسم'; }
@@ -112,15 +112,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_p
         'last_done_date' => $last_done_date, 'last_done_meter' => $last_done_meter,
         'next_due_date' => $next_due_date, 'next_due_meter' => $next_due_meter,
         'state' => 'نشطة', 'created_by' => $current_user_id));
-    header("Location: preventive_plans.php?id=" . intval($new_id) . "&msg=تم+إنشاء+الخطة+✅"); exit();
+    ems_gov_redirect("Location: preventive_plans.php?id=" . intval($new_id) . "&msg=تم+إنشاء+الخطة+✅"); exit();
 }
 
 // ── حفظ رأس الخطة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_plan') {
-    if (!$can_edit) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_POST['id'] ?? 0);
     $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
-    if (!$plan) { header("Location: preventive_plans.php?msg=الخطة+غير+موجودة+❌"); exit(); }
+    if (!$plan) { ems_gov_flash_redirect('preventive_plans.php', 'الخطة غير موجودة ❌', 'GOV-REF-404', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     $scope = trim($_POST['scope'] ?? '');
@@ -143,12 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         'last_done_date' => $last_done_date, 'last_done_meter' => $last_done_meter,
         'next_due_date' => $next_due_date, 'next_due_meter' => $next_due_meter, 'state' => $state,
     ), array('id' => $pid));
-    header("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تم+حفظ+الخطة+✅"); exit();
+    ems_gov_redirect("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تم+حفظ+الخطة+✅"); exit();
 }
 
 // ── مهام الخطة ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_task') {
-    if (!$can_edit) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_POST['plan_id'] ?? 0);
     $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
     if ($plan) {
@@ -162,26 +162,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_t
                 'component' => $component, 'est_hours' => $est_hours));
         }
     }
-    header("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تمت+إضافة+المهمة+✅"); exit();
+    ems_gov_redirect("Location: preventive_plans.php?id=" . intval($pid) . "&msg=تمت+إضافة+المهمة+✅"); exit();
 }
 if (isset($_GET['del_task'], $_GET['plan_id'])) {
     if ($can_edit) {
         $tid = intval($_GET['del_task']); $pid = intval($_GET['plan_id']);
         // حذف صلبٌ لصفٍّ واحد عبر deleteChild (نطاق مزدوج: الشركة + الأب المملوك)
         ems_tenant_db()->deleteChild('mnt_plan_task', $tid, 'mnt_plan', $pid, 'plan_id', 'plan task delete');
-        header("Location: preventive_plans.php?id=" . $pid . "&msg=تم+حذف+المهمة+✅"); exit();
+        ems_gov_redirect("Location: preventive_plans.php?id=" . $pid . "&msg=تم+حذف+المهمة+✅"); exit();
     }
 }
 
 // ── E-16: تأجيلُ خطةٍ زمنيةٍ **بسبب** — يوثَّق في التدقيق ولا يمرّ صامتًا ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'postpone_plan') {
-    if (!$can_edit) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_POST['plan_id'] ?? 0);
     $days = max(1, min(90, intval($_POST['days'] ?? 7)));
     $reason = trim((string)($_POST['reason'] ?? ''));
-    if ($reason === '') { header("Location: preventive_plans.php?msg=" . rawurlencode('التأجيلُ بسببٍ مكتوبٍ — لا تأجيلَ صامتًا ❌')); exit(); }
+    if ($reason === '') { ems_gov_flash_redirect('preventive_plans.php', 'التأجيلُ بسببٍ مكتوبٍ — لا تأجيلَ صامتًا ❌', 'GOV-FAIL-409', ''); exit(); }
     $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
-    if (!$plan || $plan['next_due_date'] === null) { header("Location: preventive_plans.php?msg=خطةٌ+غير+صالحة+للتأجيل+❌"); exit(); }
+    if (!$plan || $plan['next_due_date'] === null) { ems_gov_flash_redirect('preventive_plans.php', 'خطةٌ غير صالحة للتأجيل ❌', 'GOV-FAIL-409', ''); exit(); }
     $newDue = date('Y-m-d', strtotime($plan['next_due_date'] . ' +' . $days . ' day'));
     ems_tenant_db()->update('mnt_plan', array('next_due_date' => $newDue), array('id' => $pid));
     require_once '../includes/audit_trail.php';
@@ -189,15 +189,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'postp
         array('next_due_date' => (string)$plan['next_due_date']),
         array('next_due_date' => $newDue, 'days' => $days, 'reason' => $reason),
         array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
-    header("Location: preventive_plans.php?msg=" . rawurlencode('أُجّلت ' . $days . ' يومًا بسببها الموثَّق ✅')); exit();
+    ems_gov_flash_redirect('preventive_plans.php', 'أُجّلت ' . $days . ' يومًا بسببها الموثَّق ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── توليد أمر صيانة وقائي من خطة (يدوي) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_order') {
-    if (!$can_add) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+توليد+أمر+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية توليد أمر ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_POST['plan_id'] ?? 0);
     $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
-    if (!$plan) { header("Location: preventive_plans.php?msg=الخطة+غير+موجودة+❌"); exit(); }
+    if (!$plan) { ems_gov_flash_redirect('preventive_plans.php', 'الخطة غير موجودة ❌', 'GOV-REF-404', ''); exit(); }
     $code = mnt_next_code($conn, 'mnt_order', 'MNT', $company_id);
     $eq = $plan['equipment_id'] !== null ? intval($plan['equipment_id']) : null;
     // M-36 (SPEC-04 بطاقة 3): مفتاحُ (معدة × خدمة × دورة) يمنع توليدَ الدورة
@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
     $dup = $conn->query("SELECT id FROM mnt_order WHERE pm_cycle_key = '"
          . $conn->real_escape_string($cycle_key) . "' LIMIT 1");
     if ($dup && ($dx = $dup->fetch_assoc())) {
-        header("Location: orders.php?id=" . intval($dx['id'])
+        ems_gov_redirect("Location: orders.php?id=" . intval($dx['id'])
              . "&msg=" . rawurlencode('هذه الدورةُ ولّدت أمرَها سلفًا #' . $dx['id'] . ' — لا توليدَ مرتين (M-36) ❌'));
         exit();
     }
@@ -215,18 +215,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
         'code' => $code, 'plan_id' => $pid, 'equipment_id' => $eq, 'pm_cycle_key' => $cycle_key,
         'source' => 'وقائي', 'maint_type' => 'صيانة وقائية', 'state' => 'بلاغ', 'created_by' => $current_user_id));
     if (!$new_id) { // الفريدُ حكمٌ عند التزاحم — mysqli لا يرمي (گوتشا config)
-        header("Location: preventive_plans.php?msg=" . rawurlencode('رفض الفريدُ التوليدَ — الدورةُ مولَّدةٌ سلفًا (M-36) ❌'));
+        ems_gov_flash_redirect('preventive_plans.php', 'رفض الفريدُ التوليدَ — الدورةُ مولَّدةٌ سلفًا (M-36) ❌', 'GOV-FAIL-409', '');
         exit();
     }
-    header("Location: orders.php?id=" . intval($new_id) . "&msg=تم+توليد+أمر+وقائي+من+الخطة+✅"); exit();
+    ems_gov_redirect("Location: orders.php?id=" . intval($new_id) . "&msg=تم+توليد+أمر+وقائي+من+الخطة+✅"); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: preventive_plans.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('preventive_plans.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $did = intval($_GET['delete_id']);
     ems_tenant_db()->softDelete('mnt_plan', $did); // حذف ناعم معزول بالشركة تلقائيًّا
-    header("Location: preventive_plans.php?msg=تم+حذف+الخطة+✅"); exit();
+    ems_gov_flash_redirect('preventive_plans.php', 'تم حذف الخطة ✅', 'GOV-OK-200', ''); exit();
 }
 
 $edit_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -242,6 +242,9 @@ if ($plan || $edit_id === 0) {
 }
 
 $page_title = 'إيكوبيشن | الصيانة الوقائية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

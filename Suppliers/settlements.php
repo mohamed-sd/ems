@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Suppliers/settlements.php — تسويات الموردين (UX-05 §5.2 · UX-02 §15.3)
  * ───────────────────────────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -59,7 +60,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+التسويات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التسويات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -67,7 +68,7 @@ $gate = ems_tenant_db();
 
 // ── توليدُ تسوية ─────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
-    if (!$can_edit) { header("Location: settlements.php?msg=لا+توجد+صلاحية+الإعداد+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('settlements.php', 'لا توجد صلاحية الإعداد ❌', 'GOV-PERM-403', ''); exit(); }
     $party = intval($_POST['party_ref'] ?? 0);
     $from  = trim(strval($_POST['period_from'] ?? ''));
     $to    = trim(strval($_POST['period_to'] ?? ''));
@@ -79,10 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
         if (intval($res['unpriced']) > 0) {
             $m .= '+·+' . intval($res['unpriced']) . '+بندًا+بلا+سعرِ+صرف';
         }
-        header("Location: settlements.php?msg={$m}+✅&open=" . intval($res['settlement_id']));
+        ems_gov_redirect("Location: settlements.php?msg={$m}+✅&open=" . intval($res['settlement_id']));
     } else {
-        header("Location: settlements.php?msg=" . rawurlencode($res['reason']) . "+❌" .
-               ($res['settlement_id'] ? '&open=' . intval($res['settlement_id']) : ''));
+        ems_gov_flash_redirect(ems_flash_to('settlements.php', "+❌" . ($res['settlement_id'] ? '&open=' . intval($res['settlement_id']) : '')), $res['reason'], 'GOV-INFO-200', '');
     }
     exit();
 }
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $msg = $res['ok'] ? (($res['reason'] !== '') ? $res['reason'] . ' ✅' : 'تم ✅')
                       : ($res['reason'] . ' ❌');
-    header("Location: settlements.php?msg=" . rawurlencode($msg) . "&open={$sid}");
+    ems_gov_redirect("Location: settlements.php?msg=" . rawurlencode($msg) . "&open={$sid}");
     exit();
 }
 
@@ -185,6 +185,9 @@ $CHARGE_AR = array(
 );
 
 $page_title = 'إيكوبيشن | تسويات الموردين';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

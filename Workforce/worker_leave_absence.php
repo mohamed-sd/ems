@@ -11,11 +11,11 @@ require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $pp = check_page_permissions($conn, 'Workforce/worker_leave_absence.php');
 $can_view=$pp['can_view']; $can_add=$pp['can_add']; $can_edit=$pp['can_edit']; $can_delete=$pp['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $la_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker leave absence super') : ems_tenant_db();
 
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='save' && 
                 'created_by' => $user_id));
         } catch (\Throwable $t) { error_log('worker_leave_absence.php insert: ' . $t->getMessage()); }
     }
-    header("Location: worker_leave_absence.php?msg=✅+تم+الحفظ"); exit();
+    ems_gov_flash_redirect('worker_leave_absence.php', '✅ تم الحفظ', 'GOV-OK-200', ''); exit();
 }
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='set_state' && $can_edit) {
     $id=intval($_POST['id']??0); $ns=trim($_POST['new_state']??'');
@@ -57,13 +57,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action'] ?? '')==='set_state
         try { $la_gate->update('worker_leave_absence', array('state' => $ns), array('id' => $id)); }
         catch (\Throwable $t) { error_log('worker_leave_absence.php set_state: ' . $t->getMessage()); }
     }
-    header("Location: worker_leave_absence.php?msg=✅+تم+تحديث+الحالة"); exit();
+    ems_gov_flash_redirect('worker_leave_absence.php', '✅ تم تحديث الحالة', 'GOV-OK-200', ''); exit();
 }
 if (($_GET['delete']??'')!=='' && $can_delete) {
     $d=intval($_GET['delete']);
     try { $la_gate->deleteRow('worker_leave_absence', $d, 'leave absence delete'); }
     catch (\Throwable $t) { error_log('worker_leave_absence.php delete: ' . $t->getMessage()); }
-    header("Location: worker_leave_absence.php?msg=✅+تم+الحذف"); exit();
+    ems_gov_flash_redirect('worker_leave_absence.php', '✅ تم الحذف', 'GOV-OK-200', ''); exit();
 }
 
 $workers=[];
@@ -73,7 +73,11 @@ try {
     foreach($la_workers as $w){$workers[$w['id']]=$w['name'];}
 } catch (\Throwable $t) { error_log('worker_leave_absence.php workers: ' . $t->getMessage()); }
 
-$page_title="إيكوبيشن | الإجازات والغياب"; include '../inheader.php'; include '../insidebar.php';
+$page_title="إيكوبيشن | الإجازات والغياب"; 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($pp) ? $pp : null);
+include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">

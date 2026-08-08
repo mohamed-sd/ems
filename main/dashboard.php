@@ -492,6 +492,9 @@ $AC = [
 $page_title = 'Equipation | الرئيسية';
 // Dashboard exception: deep-yellow top bar + the wide logo (see includes/topbar.php).
 $ems_topbar_variant = 'dashboard';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -1038,6 +1041,15 @@ body.ems-site,
 </style>
 
 <div class="ems-dash main">
+<?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ — الشاشةُ كانت بلا رأسٍ معلَن. */
+$header_icon = 'fas fa-window-maximize';
+$header_title_html = htmlspecialchars('Dashboard', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
+
 
   <!-- التوببار المشترك يُعرض الآن من insidebar.php (includes/topbar.php) -->
 
@@ -1272,10 +1284,31 @@ body.ems-site,
   const gridColor = 'rgba(0,0,0,.08)';
   const tickColor = 'rgba(25,25,25,.70)';
 
+  /* UI-DEF-07 (سلّم الإغلاق L3): لا رسمَ بلا بياناتٍ يعرض محاورَ افتراضية —
+     حالةٌ فارغةٌ مفسَّرةٌ بدلَه (UXR-0084 · chartGuard على الشاشة المصابة نفسها).
+     المغلِّفُ يستعمل EmsUI.chartGuard متى حضر (defer) وإلا بديلَه المكافئ. */
+  function emsChartGuard(ctx, seriesArrays, renderFn) {
+    var total = 0;
+    (seriesArrays || []).forEach(function (arr) {
+      (arr || []).forEach(function (v) { total += Math.abs(parseFloat(v) || 0); });
+    });
+    if (total > 0) { return renderFn(); }
+    var host = ctx && ctx.parentNode ? ctx.parentNode : null;
+    if (!host) { return null; }
+    if (window.EmsUI && EmsUI.chartGuard) {
+      return EmsUI.chartGuard(host, [{ data: [] }], renderFn,
+        { reason: 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية' });
+    }
+    host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">' +
+      'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+    return null;
+  }
+
   /* ── Equipment Donut ── */
   const eqCtx = document.getElementById('chartEquipStatus');
   if (eqCtx) {
-    new Chart(eqCtx, {
+    emsChartGuard(eqCtx, [AP.equipmentStatus], function () {
+    return new Chart(eqCtx, {
       type: 'doughnut',
       data: {
         labels: ['نشطة', 'متوقفة'],
@@ -1298,12 +1331,14 @@ body.ems-site,
         }
       }
     });
+    });
   }
 
   /* ── Hours Bar ── */
   const hbCtx = document.getElementById('chartHoursBar');
   if (hbCtx) {
-    new Chart(hbCtx, {
+    emsChartGuard(hbCtx, [[parseFloat(AP.kpis[1]), parseFloat(AP.monthBreakdownHours)]], function () {
+    return new Chart(hbCtx, {
       type: 'bar',
       data: {
         labels: ['ساعات العمل', 'ساعات التعطل'],
@@ -1328,12 +1363,14 @@ body.ems-site,
         }
       }
     });
+    });
   }
 
-  /* ── Daily Trend ── */
+  /* ── Daily Trend — «مسار الأداء اليومي» الرسمُ المرصودُ في UI-DEF-07 نفسُه ── */
   const trCtx = document.getElementById('chartTrend');
   if (trCtx) {
-    new Chart(trCtx, {
+    emsChartGuard(trCtx, [AP.trendWork, AP.trendFault], function () {
+    return new Chart(trCtx, {
       type: 'line',
       data: {
         labels: AP.trendLabels,
@@ -1376,6 +1413,7 @@ body.ems-site,
           y: { grid: { color: gridColor }, ticks: { color: tickColor } }
         }
       }
+    });
     });
   }
 

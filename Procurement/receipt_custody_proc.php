@@ -19,7 +19,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -27,7 +27,7 @@ $perms = proc_page_perms($conn, 'Procurement/receipt_custody_proc.php', $is_supe
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+عهدة+الاستلام+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض عهدة الاستلام ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -50,9 +50,9 @@ unset($oor);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: receipt_custody_proc.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: receipt_custody_proc.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: receipt_custody_proc.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('receipt_custody_proc.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('receipt_custody_proc.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('receipt_custody_proc.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $holder_name = trim($_POST['holder_name'] ?? '');
     $receipt_date = ($_POST['receipt_date'] ?? '') !== '' ? trim($_POST['receipt_date']) : null;
@@ -64,12 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     $state = trim($_POST['state'] ?? 'مستلَمة');
     $notes = trim($_POST['notes'] ?? '');
 
-    if ($holder_name === '') { header("Location: receipt_custody_proc.php?msg=اسم+المستلِم+إلزامي+❌"); exit(); }
+    if ($holder_name === '') { ems_gov_flash_redirect('receipt_custody_proc.php', 'اسم المستلِم إلزامي ❌', 'GOV-FAIL-409', ''); exit(); }
     if (!in_array($expected_destination, $destinations, true)) { $expected_destination = 'مخزن'; }
     if (!in_array($state, $states, true)) { $state = 'مستلَمة'; }
     // §15.6: الوجهةُ المخزنية بلا مخزنِ إدخالٍ = رصيدٌ لا يتحرك — تُرفض
     if ($expected_destination === 'مخزن' && !$warehouse_id) {
-        header("Location: receipt_custody_proc.php?msg=حدد+مخزن+الإدخال+—+الوجهة+مخزن+❌"); exit();
+        ems_gov_flash_redirect('receipt_custody_proc.php', 'حدد مخزن الإدخال — الوجهة مخزن ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // K9-M1: الأب عبر البوابة، والسطور عبر قناة replaceChildren (عقد البوابة §8 —
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
         require_once dirname(__DIR__) . '/includes/permit_gate.php';
         $pg = ems_permit_gate($conn, $company_id, 'material_site_entry',
             'RCPT:' . ($order_id ?: 'direct'), 0, intval($current_user_id ?? 0));
-        if (!$pg['ok']) { header('Location: receipt_custody_proc.php?msg=' . rawurlencode($pg['reason'] . ' ❌')); exit(); }
+        if (!$pg['ok']) { ems_gov_flash_redirect('receipt_custody_proc.php', $pg['reason'] . ' ❌', 'GOV-FAIL-409', ''); exit(); }
     }
 
     try {
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
         }, 'receipt save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
         error_log('receipt_custody_proc save refused: ' . $e->getMessage());
-        header("Location: receipt_custody_proc.php?msg=تعذّر+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('receipt_custody_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // الحالةُ تتبع الواقعة (UX-09 §5.1-② · §8.2): تُعاد نسبةُ الاستلام من
@@ -144,12 +144,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     if ($order_id) {
         proc_sync_order_receipt($conn, $order_id, $current_user_id);
     }
-    header("Location: receipt_custody_proc.php?msg=" . ($is_editing ? 'تم+تعديل+العهدة+بنجاح+✅' : 'تمت+إضافة+العهدة+بنجاح+✅')); exit();
+    ems_gov_redirect("Location: receipt_custody_proc.php?msg=" . ($is_editing ? 'تم+تعديل+العهدة+بنجاح+✅' : 'تمت+إضافة+العهدة+بنجاح+✅')); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: receipt_custody_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('receipt_custody_proc.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     $del_order_id = null;
     try {
@@ -176,7 +176,7 @@ if (isset($_GET['delete_id'])) {
     }
     // الحالةُ تتبع الواقعة: حذفُ استلامٍ يعيد حسابَ نسبة الأمر (تقدُّمٌ لا نكوص)
     if ($del_order_id) { proc_sync_order_receipt($conn, $del_order_id, $current_user_id); }
-    header("Location: receipt_custody_proc.php?msg=تم+حذف+العهدة+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('receipt_custody_proc.php', 'تم حذف العهدة بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── تحميل للتعديل ──
@@ -192,6 +192,9 @@ if (isset($_GET['edit_id']) && $can_edit) {
 }
 
 $page_title = 'إيكوبيشن | الاستلام المؤقت';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

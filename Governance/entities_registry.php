@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-667 · SCN-668 · SCN-669 · SCN-671 · SCN-672 · SCN-673
 /**
  * Governance/entities_registry.php — سجل الكيانات (LEG-01 §8-① · الشاشة 206)
@@ -19,12 +20,10 @@ $role = strval($_SESSION['user']['role'] ?? '');
 // قراءةً فقط (FIN-26: ملكية الشاشة للحوكمة والدور 26 يطالعها — DEC-01 ②)
 $gov_write = ($role === '-1' || in_array($role, array('1', '19'), true));
 if (!$gov_write && $role !== EMS_ROLE_FINANCING_MGR) {
-    http_response_code(403);
-    exit('403 — باب الحوكمة خلف صلاحيته');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 if (!$gov_write && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    http_response_code(403);
-    exit('403 — الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19)');
+    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 
 $msg = ''; $err = '';
@@ -75,6 +74,9 @@ $rows = $conn->query(
 )->fetch_all(MYSQLI_ASSOC);
 
 $page_title = 'إيكوبيشن | سجل الكيانات';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

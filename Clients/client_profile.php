@@ -14,13 +14,13 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $client_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($client_id <= 0) {
-    header("Location: clients.php?msg=معرف+العميل+غير+صحيح+❌");
+    ems_gov_flash_redirect('clients.php', 'معرف العميل غير صحيح ❌', 'GOV-REF-404', '');
     exit();
 }
 
@@ -42,7 +42,7 @@ try {
 $client = !empty($client_rows) ? $client_rows[0] : null;
 
 if (!$client) {
-    header("Location: clients.php?msg=العميل+غير+موجود+او+خارج+نطاق+الشركة+❌");
+    ems_gov_flash_redirect('clients.php', 'العميل غير موجود او خارج نطاق الشركة ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -129,6 +129,9 @@ try {
 }
 
 $page_title = 'إيكوبيشن | بطاقة العميل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = fin_page_perms($conn, 'Finance/accounts_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+دليل+الحسابات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض دليل الحسابات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -39,9 +39,9 @@ $account_types = fin_account_types();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: accounts_fin.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: accounts_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: accounts_fin.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('accounts_fin.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('accounts_fin.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('accounts_fin.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $code         = trim($_POST['code'] ?? '');
     $name         = trim($_POST['name'] ?? '');
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
     $is_postable  = isset($_POST['is_postable']) ? 1 : 0;
 
     if ($code === '' || $name === '' || !isset($account_types[$account_type])) {
-        header("Location: accounts_fin.php?msg=بيانات+غير+مكتملة+(كود/اسم/نوع)+❌"); exit();
+        ems_gov_flash_redirect('accounts_fin.php', 'بيانات غير مكتملة (كود/اسم/نوع) ❌', 'GOV-FAIL-409', ''); exit();
     }
     // منع أن يكون الحساب أباً لنفسه
     if ($is_editing && $parent_id === $id) { $parent_id = null; }
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
             'code' => $code, 'name' => $name, 'account_type' => $account_type,
             'parent_id' => $parent_id, 'is_postable' => $is_postable,
         ), array('id' => $id), "COALESCE(is_deleted,0)=0");
-        header("Location: accounts_fin.php?msg=تم+تعديل+الحساب+بنجاح+✅"); exit();
+        ems_gov_flash_redirect('accounts_fin.php', 'تم تعديل الحساب بنجاح ✅', 'GOV-OK-200', ''); exit();
     } else {
         // insert عبر البوابة؛ التكرار 1062 يظهر TenantGateException (نمط trs_notify)
         try {
@@ -70,22 +70,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
             ));
         } catch (\App\Core\TenantGateException $e) {
             if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                header("Location: accounts_fin.php?msg=رقم+الحساب+مكرر+في+الشركة+❌"); exit();
+                ems_gov_flash_redirect('accounts_fin.php', 'رقم الحساب مكرر في الشركة ❌', 'GOV-FAIL-409', ''); exit();
             }
             error_log('accounts_fin insert refused: ' . $e->getMessage());
-            header("Location: accounts_fin.php?msg=تعذّرت+الإضافة+❌"); exit();
+            ems_gov_flash_redirect('accounts_fin.php', 'تعذّرت الإضافة ❌', 'GOV-FAIL-409', ''); exit();
         }
-        header("Location: accounts_fin.php?msg=تمت+إضافة+الحساب+بنجاح+✅"); exit();
+        ems_gov_flash_redirect('accounts_fin.php', 'تمت إضافة الحساب بنجاح ✅', 'GOV-OK-200', ''); exit();
     }
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: accounts_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('accounts_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try { fin_gate($is_super_admin)->softDelete('fin_chart_of_accounts', $delete_id); }
     catch (\App\Core\TenantGateException $e) { error_log('accounts_fin softDelete refused: ' . $e->getMessage()); }
-    header("Location: accounts_fin.php?msg=تم+حذف+الحساب+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('accounts_fin.php', 'تم حذف الحساب بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | دليل الحسابات';

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Suppliers/supplier_documents.php — وثائقُ المورد وحسابُه البنكي (M-19)
  * ───────────────────────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -50,14 +51,14 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+وثائق+الموردين+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض وثائق الموردين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier documents super') : ems_tenant_db();
 
 $selected = intval($_GET['supplier_id'] ?? 0);
-$redirect = function ($msg, $sid) { header("Location: supplier_documents.php?supplier_id=" . intval($sid)
+$redirect = function ($msg, $sid) { ems_gov_redirect("Location: supplier_documents.php?supplier_id=" . intval($sid)
     . "&msg=" . rawurlencode($msg)); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -111,6 +112,9 @@ $gateInfo = $selected > 0 ? SDS::gateFor($gate, $selected) : array('reasons' => 
 $audit = $selected > 0 ? SDS::auditOf($conn, $company_id, $selected, 60) : array();
 
 $page_title = 'إيكوبيشن | وثائق المورد وحسابه البنكي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

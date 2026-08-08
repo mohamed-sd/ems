@@ -170,7 +170,31 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
 <?php
 /* AS-04 (UXR-0037): سطرٌ ثانٍ صغيرٌ بالأرقام السياقية تحت العنوان — تملؤه
    الشاشة قبل التضمين بمصفوفة $header_context = ['التسمية' => 'القيمة', ...].
-   كلُّ رقمٍ معروضٍ هنا يذكر تسميتَه (نصف إعلان المقام — UI-DEF-03). */
+   كلُّ رقمٍ معروضٍ هنا يذكر تسميتَه (نصف إعلان المقام — UI-DEF-03).
+
+   وإن لم تملأه الشاشةُ، لم يبقَ السطرُ فارغًا: يُبنى من محاورِ الغلافِ الحاكمِ
+   CM-00 التي يبذرها ems_shell_axes في كلِّ شاشةٍ حية — الكيانُ الذي تنظر منه،
+   ومدى صلاحيتك فيه، ولحظةُ القراءة. فالمحاورُ كانت تُبذر ولا تُقرأ، وهذا هو
+   موضعُ قراءتها الظاهرُ للمستخدم. */
+if (empty($header_context) || !is_array($header_context)) {
+    $header_context = array();
+    $__ax = isset($GLOBALS['EMS_AX']) && is_array($GLOBALS['EMS_AX']) ? $GLOBALS['EMS_AX'] : null;
+    if ($__ax !== null) {
+        $__ent = '';
+        if (function_exists('ems_gov_ctx')) {
+            $__gc = ems_gov_ctx();
+            $__ent = isset($__gc['values']['entity']) ? (string) $__gc['values']['entity'] : '';
+        }
+        if ($__ent === '' && !empty($_SESSION['user']['company_id'])) {
+            $__ent = 'الكيان #' . (int) $_SESSION['user']['company_id'];
+        }
+        if ($__ent !== '') { $header_context['النطاق'] = $__ent; }
+        $__permMap = array('full' => 'تحرير', 'partial' => 'قراءة', 'none' => 'بلا صلاحية');
+        $__p = isset($__ax['permission']) ? $__ax['permission'] : 'unmeasured';
+        if (isset($__permMap[$__p])) { $header_context['صلاحيتك'] = $__permMap[$__p]; }
+        $header_context['لحظةُ القراءة'] = date('Y-m-d H:i');
+    }
+}
 if (!empty($header_context) && is_array($header_context)) {
     echo '<div class="ems-page-context" dir="rtl">';
     foreach ($header_context as $__ctxK => $__ctxV) {

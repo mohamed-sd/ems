@@ -17,12 +17,12 @@ $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['r
 $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $user_id        = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=بيئة+شركة+غير+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 $page_permissions = check_page_permissions($conn, 'Workforce/worker_contract.php');
 $can_view = $page_permissions['can_view']; $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit']; $can_delete = $page_permissions['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+العقود+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض العقود ❌', 'GOV-PERM-403', ''); exit(); }
 
 // العزل عبر بوابة المستأجر — والسوبر يمرّ عبر forAllTenants المسجَّل (سلوك الأصل: بلا تنطيق).
 $wc_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('worker contract super') : ems_tenant_db();
@@ -35,8 +35,8 @@ $STATES         = ['مسودة','نافذ','منتهٍ'];
 // ── معالجة الإرسال ────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_contract') {
     $id = intval($_POST['id'] ?? 0); $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: worker_contract.php?msg=لا+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add)  { header("Location: worker_contract.php?msg=لا+صلاحية+إضافة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('worker_contract.php', 'لا صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add)  { ems_gov_flash_redirect('worker_contract.php', 'لا صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
 
     $worker_id     = intval($_POST['worker_id'] ?? 0);
     $code          = trim($_POST['code'] ?? '');
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $bdtv = $bdt !== '' ? $bdt : null;
 
     if (!$is_editing) {
-        if ($worker_id <= 0) { header("Location: worker_contract.php?msg=يجب+اختيار+عامل+❌"); exit(); }
+        if ($worker_id <= 0) { ems_gov_flash_redirect('worker_contract.php', 'يجب اختيار عامل ❌', 'GOV-FAIL-409', ''); exit(); }
         $ok = false;
         try {
             // company_id تحقنه البوابة من سياق الجلسة
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                 'termination_terms' => $term, 'created_by' => $user_id));
             $ok = true;
         } catch (\Throwable $t) { error_log('worker_contract.php insert: ' . $t->getMessage()); }
-        header("Location: worker_contract.php?msg=" . ($ok ? "✅+تم+حفظ+العقد" : "❌+تعذّر+الحفظ"));
+        ems_gov_redirect("Location: worker_contract.php?msg=" . ($ok ? "✅+تم+حفظ+العقد" : "❌+تعذّر+الحفظ"));
         exit();
     } else {
         $ok = false;
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                 'termination_terms' => $term), array('id' => $id));
             $ok = true;
         } catch (\Throwable $t) { error_log('worker_contract.php update: ' . $t->getMessage()); }
-        header("Location: worker_contract.php?edit=" . $id . "&msg=" . ($ok ? "✅+تم+التحديث" : "❌+تعذّر+التحديث"));
+        ems_gov_redirect("Location: worker_contract.php?edit=" . $id . "&msg=" . ($ok ? "✅+تم+التحديث" : "❌+تعذّر+التحديث"));
         exit();
     }
 }
@@ -108,7 +108,7 @@ if (($_GET['delete'] ?? '') !== '' && $can_delete) {
     $del = intval($_GET['delete']);
     try { $wc_gate->deleteRow('worker_contract', $del, 'worker contract delete'); }
     catch (\Throwable $t) { error_log('worker_contract.php delete: ' . $t->getMessage()); }
-    header("Location: worker_contract.php?msg=✅+تم+الحذف"); exit();
+    ems_gov_flash_redirect('worker_contract.php', '✅ تم الحذف', 'GOV-OK-200', ''); exit();
 }
 
 // ── تحميل عقدٍ للتعديل ─────────────────────────────────────────────────────────
@@ -127,6 +127,9 @@ try {
 } catch (\Throwable $t) { error_log('worker_contract.php workers: ' . $t->getMessage()); }
 
 $page_title = "إيكوبيشن | عقود العاملين";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -27,7 +27,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -46,7 +46,7 @@ $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض التشغيل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -77,7 +77,7 @@ if ($is_role10) {
 
 // إذا لم يتم تحديد مشروع، إعادة التوجيه لصفحة الاختيار
 // if ($selected_project_id == 0) {
-//     echo "<script>alert('❌ لا يوجد مشروع مرتبط بحسابك في الجلسة'); window.location.href='../main/dashboard.php';</script>";
+//     ems_gov_flash_redirect('../main/dashboard.php', '❌ لا يوجد مشروع مرتبط بحسابك في الجلسة', 'GOV-SCOPE-403', '');
 //     exit();
 // }
 
@@ -87,7 +87,7 @@ try {
         'scope' => array('project' => 'project'),
     ), "SELECT id, name, project_code, location FROM project WHERE {TENANT_SCOPE} AND id = ? AND status = 1", array($selected_project_id));
 } catch (\Throwable $t) {
-    echo "<script>alert('❌ خطأ في تحميل بيانات المشروع'); window.location.href='select_project.php';</script>";
+    ems_gov_flash_redirect('select_project.php', '❌ خطأ في تحميل بيانات المشروع', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -96,7 +96,7 @@ if (!empty($project_rows)) {
 } else {
     // المشروع غير موجود أو غير نشط
     unset($_SESSION['operations_project_id']);
-    echo "<script>alert('❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -314,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        header("Location: oprators.php" . ($redirect_project ? "?project_id=$redirect_project&msg=" : "?msg=") . "لا+توجد+صلاحية+حذف+التشغيل+❌");
+        ems_gov_flash_redirect('oprators.php' . ($redirect_project ? '?project_id=' . $redirect_project : ''), 'لا توجد صلاحية حذف التشغيل ❌', 'GOV-PERM-403', '');
         exit();
     }
 
@@ -330,10 +330,10 @@ if (isset($_GET['delete_id'])) {
             if ($del_own) {
                 $opr_gate->deleteRow('operations', $delete_id, 'حذف تشغيل من شاشة التشغيل');
             }
-            header("Location: oprators.php?project_id=$selected_project_id&msg=تم+حذف+التشغيل+بنجاح+✅");
+            ems_gov_flash_redirect('oprators.php?project_id=' . $selected_project_id, 'تم حذف التشغيل بنجاح ✅', 'GOV-OK-200', '');
             exit();
         } catch (\Throwable $t) {
-            header("Location: oprators.php?project_id=$selected_project_id&msg=حدث+خطأ+أثناء+الحذف+❌");
+            ems_gov_flash_redirect('oprators.php?project_id=' . $selected_project_id, 'حدث خطأ أثناء الحذف ❌', 'GOV-FAIL-409', '');
             exit();
         }
     }
@@ -342,6 +342,9 @@ if (isset($_GET['delete_id'])) {
 ?>
 
 <?php
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -900,11 +903,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
 
                                 if ($operation_id > 0 && !$can_edit) {
-                                    echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                                    ems_gov_flash_redirect('oprators.php?project_id=$selected_project_id', '❌ ليس لديك صلاحية تعديل التشغيل', 'GOV-PERM-403', '');
                                     exit();
                                 }
                                 if ($operation_id === 0 && !$can_add) {
-                                    echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                                    ems_gov_flash_redirect('oprators.php?project_id=$selected_project_id', '❌ ليس لديك صلاحية إضافة تشغيل جديد', 'GOV-PERM-403', '');
                                     exit();
                                 }
 
@@ -943,7 +946,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                         ), "SELECT id FROM operations WHERE {TENANT_SCOPE} AND equipment = ? AND status = 1$exclude_sql LIMIT 1", $conflict_params);
                                     } catch (\Throwable $t) { $conflict_check = array(); }
                                     if (!empty($conflict_check)) {
-                                        echo "<script>alert('❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                                        ems_gov_flash_redirect('oprators.php?project_id=$selected_project_id', '❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر', 'GOV-SCOPE-403', '');
                                         exit();
                                     }
                                 }
@@ -972,7 +975,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     } catch (\Throwable $t) {
                                         error_log('oprators.php update failed: ' . $t->getMessage());
                                     }
-                                    echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                                    ems_gov_flash_redirect('oprators.php?project_id=$selected_project_id', '✅ تم التحديث بنجاح', 'GOV-SCOPE-403', '');
                                 } else {
                                     // إضافة سجل جديد (company_id تحقنه البوابة)
                                     $new_op_id = 0;
@@ -989,7 +992,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                         if (intval($company_id) > 0) { $ev_opts['company_id'] = intval($company_id); }
                                         log_equipment_event($conn, intval($equipment), 'إضافة لمشروع', $ev_opts);
                                     }
-                                    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                                    ems_gov_flash_redirect('oprators.php?project_id=$selected_project_id', '✅ تم الحفظ بنجاح', 'GOV-SCOPE-403', '');
                                 }
                             }
 

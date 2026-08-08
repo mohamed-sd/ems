@@ -216,6 +216,257 @@
         return true;
     };
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       UI-04 · منتقي المناظر المحفوظة (Saved Views)
+       ─────────────────────────────────────────────────────────────────────
+       الحكم (UXR-0051): «منتقي المنظرِ الشخصيِّ والمعتمَد — إلزاميٌّ في الشاشات
+       الطويلة». والمنظرُ حزمةُ حالةٍ لا زينةً: فلاترُ الشاشةِ وأعمدتُها الظاهرةُ
+       وترتيبُها. صنفان لا يختلطان:
+         · معتمَد (approved): يأتي من الخادمِ ولا يعدّله المستخدم — يُميَّز بوسم.
+         · شخصيّ (personal): يحفظه المستخدمُ لنفسِه في مخزنِ متصفّحه.
+       ولا يُسمّى منظرٌ باسمٍ مكرَّرٍ في صنفه، ولا يُحذف معتمَدٌ من الواجهة.
+       ═══════════════════════════════════════════════════════════════════════ */
+    var VIEWS_NS = 'emsViews:';
+
+    function viewsKey(screenKey) { return VIEWS_NS + String(screenKey || 'unknown'); }
+
+    function readPersonal(screenKey) {
+        try {
+            var raw = window.localStorage.getItem(viewsKey(screenKey));
+            var arr = raw ? JSON.parse(raw) : [];
+            return Object.prototype.toString.call(arr) === '[object Array]' ? arr : [];
+        } catch (e) { return []; }
+    }
+
+    function writePersonal(screenKey, list) {
+        try { window.localStorage.setItem(viewsKey(screenKey), JSON.stringify(list)); return true; }
+        catch (e) { return false; }
+    }
+
+    EmsUI.savedViews = function (opts) {
+        opts = opts || {};
+        var screenKey = opts.screenKey;
+        if (!screenKey) { throw new Error('EmsUI.savedViews: screenKey إلزامي — المنظر يخص شاشةً بعينها'); }
+        if (typeof opts.capture !== 'function' || typeof opts.apply !== 'function') {
+            throw new Error('EmsUI.savedViews: capture وapply إلزاميان — بلا التقاطٍ وتطبيقٍ لا منظرَ بل زينة');
+        }
+        var approved = opts.approved || [];   // [{name, state}] من الخادم
+
+        var el = h('div', 'ems-saved-views');
+        var sel = h('select', 'ems-views-select');
+        var btnSave = h('button', 'ems-views-save', '<i class="fa fa-bookmark"></i> احفظ المنظر');
+        var btnDel = h('button', 'ems-views-del', '<i class="fa fa-trash"></i> احذف');
+        btnSave.type = 'button'; btnDel.type = 'button';
+        btnDel.disabled = true;
+
+        function repaint(keep) {
+            var personal = readPersonal(screenKey);
+            sel.innerHTML = '<option value="">— المنظر الحالي (غير محفوظ) —</option>';
+            var i;
+            for (i = 0; i < approved.length; i++) {
+                sel.innerHTML += '<option value="a:' + i + '">◆ ' + esc(approved[i].name) + ' (معتمَد)</option>';
+            }
+            for (i = 0; i < personal.length; i++) {
+                sel.innerHTML += '<option value="p:' + i + '">' + esc(personal[i].name) + ' (شخصي)</option>';
+            }
+            if (keep) { sel.value = keep; }
+            btnDel.disabled = String(sel.value).charAt(0) !== 'p';
+        }
+
+        sel.addEventListener('change', function () {
+            var v = String(sel.value);
+            btnDel.disabled = v.charAt(0) !== 'p';
+            if (v === '') { return; }
+            var idx = parseInt(v.slice(2), 10);
+            var src = v.charAt(0) === 'a' ? approved : readPersonal(screenKey);
+            if (src[idx]) { opts.apply(src[idx].state); }
+        });
+
+        btnSave.addEventListener('click', function () {
+            var name = window.prompt('اسمُ المنظر (يظهر لك وحدَك):', '');
+            if (name === null) { return; }
+            name = String(name).trim();
+            if (name === '') { return; }
+            var personal = readPersonal(screenKey);
+            var at = -1, i;
+            for (i = 0; i < personal.length; i++) { if (personal[i].name === name) { at = i; break; } }
+            var entry = { name: name, state: opts.capture(), at: new Date().toISOString() };
+            if (at >= 0) { personal[at] = entry; } else { personal.push(entry); at = personal.length - 1; }
+            writePersonal(screenKey, personal);
+            repaint('p:' + at);
+        });
+
+        btnDel.addEventListener('click', function () {
+            var v = String(sel.value);
+            if (v.charAt(0) !== 'p') { return; }
+            var personal = readPersonal(screenKey);
+            personal.splice(parseInt(v.slice(2), 10), 1);
+            writePersonal(screenKey, personal);
+            repaint('');
+        });
+
+        el.appendChild(sel);
+        el.appendChild(btnSave);
+        el.appendChild(btnDel);
+        repaint('');
+        return el;
+    };
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       UI-19 · التأكيد اللحظي والترقيم
+       ─────────────────────────────────────────────────────────────────────
+       الحكم (UXR-0066): «تأكيدٌ لحظيٌّ · وترقيمٌ يُظهر الإجمالي · ولا معلومةَ
+       لا تتكرر في التوست». فالتوستُ يؤكّد فعلًا وقع، ولا يكون الحاملَ الوحيدَ
+       لمعلومةٍ لا تُقرأ في مكانٍ آخر — ولذلك يلزمه `echoedAt`: أين تُقرأ
+       المعلومةُ نفسُها بعد اختفائه. والترقيمُ يعلن الإجمالَ لا الصفحةَ وحدَها.
+       ═══════════════════════════════════════════════════════════════════════ */
+    function toastHost() {
+        var host = document.getElementById('emsToastHost');
+        if (!host) {
+            host = h('div', 'ems-toast-host');
+            host.id = 'emsToastHost';
+            host.setAttribute('role', 'status');
+            host.setAttribute('aria-live', 'polite');
+            document.body.appendChild(host);
+        }
+        return host;
+    }
+
+    EmsUI.toast = function (opts) {
+        opts = opts || {};
+        if (!opts.text) { throw new Error('EmsUI.toast: text إلزامي'); }
+        if (!opts.echoedAt) {
+            throw new Error('EmsUI.toast: echoedAt إلزامي — «لا معلومةَ لا تتكرر في التوست» (UI-19): '
+                + 'صرّح أين تُقرأ المعلومةُ نفسُها بعد اختفائه');
+        }
+        var kind = opts.kind === 'error' ? 'error' : (opts.kind === 'warn' ? 'warn' : 'ok');
+        var el = h('div', 'ems-toast ems-toast-' + kind,
+            '<i class="fa ' + (kind === 'ok' ? 'fa-circle-check' : (kind === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-xmark')) + '"></i>'
+            + '<span class="ems-toast-text">' + esc(opts.text) + '</span>'
+            + '<span class="ems-toast-echo">تجدها في: ' + esc(opts.echoedAt) + '</span>'
+            + (opts.code ? '<code class="ems-toast-code">' + esc(opts.code) + '</code>' : '')
+            + '<button type="button" class="ems-toast-close" aria-label="إغلاق">&times;</button>');
+        el.querySelector('.ems-toast-close').addEventListener('click', function () { el.remove(); });
+        toastHost().appendChild(el);
+        var ms = typeof opts.ms === 'number' ? opts.ms : 6000;
+        if (ms > 0) { window.setTimeout(function () { el.remove(); }, ms); }
+        return el;
+    };
+
+    EmsUI.pagination = function (opts) {
+        opts = opts || {};
+        var total = Number(opts.total);
+        if (!isFinite(total) || total < 0) {
+            throw new Error('EmsUI.pagination: total إلزامي ورقميّ — «ترقيمٌ يُظهر الإجمالي» (UI-19)');
+        }
+        var size = Math.max(1, Number(opts.pageSize) || 10);
+        var page = Math.max(1, Number(opts.page) || 1);
+        var pages = Math.max(1, Math.ceil(total / size));
+        if (page > pages) { page = pages; }
+        var from = total === 0 ? 0 : ((page - 1) * size) + 1;
+        var to = Math.min(total, page * size);
+
+        var el = h('div', 'ems-pagination',
+            '<span class="ems-pg-count">' + from + '–' + to + ' من <b>' + total + '</b>'
+            + (opts.totalLabel ? ' ' + esc(opts.totalLabel) : ' سجلًّا') + '</span>'
+            + '<button type="button" class="ems-pg-prev"' + (page <= 1 ? ' disabled' : '') + '>السابق</button>'
+            + '<span class="ems-pg-pos">صفحة ' + page + ' من ' + pages + '</span>'
+            + '<button type="button" class="ems-pg-next"' + (page >= pages ? ' disabled' : '') + '>التالي</button>');
+        function go(p) { if (typeof opts.onPage === 'function') { opts.onPage(p); } }
+        el.querySelector('.ems-pg-prev').addEventListener('click', function () { go(page - 1); });
+        el.querySelector('.ems-pg-next').addEventListener('click', function () { go(page + 1); });
+        return el;
+    };
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       UI-20 · لوحة التصدير والاستيراد
+       ─────────────────────────────────────────────────────────────────────
+       الحكم (UXR-0067 · UX-01 §١١-٢/٣): الخياراتُ الثمانيةُ الواعيةُ بالمنظر ·
+       والفحوصُ الثمانيةَ عشرَ بمعاينةٍ تصنّف كلَّ صفٍّ · وسجلُّ تصديرٍ بتسعةِ
+       بنودٍ إلزامًا. اللوحةُ هنا تعلن الثلاثةَ صراحةً: تعرض الخياراتِ المسموحةَ
+       بصلاحيةِ المستخدمِ لا كلَّها، وتبني سجلَّ التصديرِ التساعيَّ قبل التنفيذ،
+       وترفض استيرادًا بلا معاينةٍ مصنَّفة.
+       ═══════════════════════════════════════════════════════════════════════ */
+    EmsUI.EXPORT_OPTIONS = [
+        { key: 'selected',    label: 'السجلاتُ المحددة',                 perm: 'PRM-EXP' },
+        { key: 'filtered',    label: 'نتائجُ البحثِ والفلاترِ الحالية',   perm: 'PRM-EXP' },
+        { key: 'visibleCols', label: 'الأعمدةُ الظاهرةُ في العرض الحالي', perm: 'PRM-EXP' },
+        { key: 'viewCols',    label: 'أعمدةُ المنظرِ المختار',            perm: 'PRM-EXP' },
+        { key: 'allCols',     label: 'جميعُ الأعمدةِ المسموحة',           perm: 'PRM-EXP' },
+        { key: 'template',    label: 'قالبُ تصديرٍ محفوظ',                perm: 'PRM-EXP' },
+        { key: 'external',    label: 'ملفٌّ خارجيٌّ منقَّح',              perm: 'PRM-EXPX' },
+        { key: 'archive',     label: 'الملفُّ الكاملُ للأرشفة',           perm: 'PRM-EXPB' }
+    ];
+
+    EmsUI.IMPORT_CHECKS = [
+        'المعرّفات والمفاتيح', 'الحقول الإلزامية', 'أنواع البيانات', 'تنسيق التواريخ',
+        'العملات والوحدات', 'القوائم المرجعية', 'منع التكرار بمفاتيح المطابقة',
+        'العلاقات مع سجلات أخرى', 'صلاحية المستخدم', 'نطاق الكيان والمشروع والموقع',
+        'سريان العقود والوثائق', 'الحقول الحساسة', 'السجلات المقفلة',
+        'الفترات المحاسبية المقفلة', 'التعارض بين الصفوف', 'الترتيب المنطقي للتواريخ',
+        'السجل التابع بلا أم', 'حرّاس الشاشة كلها بالرمز نفسه'
+    ];
+
+    EmsUI.IMPORT_CLASSES = ['سليم', 'تحذير', 'مرفوض', 'مكرّر', 'ناقص', 'خارج النطاق'];
+
+    /** سجلُّ التصديرِ التساعيُّ — يُبنى قبل التنفيذِ ويرفض النقص */
+    EmsUI.exportManifest = function (m) {
+        m = m || {};
+        var need = ['viewName', 'columns', 'filters', 'period', 'selection',
+                    'user', 'at', 'opId', 'excludedByPermission'];
+        var missing = [];
+        for (var i = 0; i < need.length; i++) {
+            if (m[need[i]] === undefined || m[need[i]] === null) { missing.push(need[i]); }
+        }
+        if (missing.length) {
+            throw new Error('EmsUI.exportManifest: سجلُّ التصديرِ تسعةُ بنودٍ إلزامًا — الناقص: ' + missing.join('، '));
+        }
+        return {
+            viewName: m.viewName, columns: m.columns, filters: m.filters, period: m.period,
+            selection: m.selection, user: m.user, at: m.at, opId: m.opId,
+            excludedByPermission: m.excludedByPermission
+        };
+    };
+
+    EmsUI.ioPanel = function (opts) {
+        opts = opts || {};
+        var grants = opts.grants || [];       // ['PRM-EXP', ...]
+        var el = h('div', 'ems-io-panel');
+        var allowed = [], denied = [];
+        for (var i = 0; i < EmsUI.EXPORT_OPTIONS.length; i++) {
+            var o = EmsUI.EXPORT_OPTIONS[i];
+            (grants.indexOf(o.perm) >= 0 ? allowed : denied).push(o);
+        }
+        var html = '<div class="ems-io-title"><i class="fa fa-file-export"></i> التصدير — الخيارات الثمانية</div>'
+                 + '<div class="ems-io-opts">';
+        for (i = 0; i < allowed.length; i++) {
+            html += '<label><input type="radio" name="emsIoOpt" value="' + esc(allowed[i].key) + '"> '
+                 + esc(allowed[i].label) + '</label>';
+        }
+        html += '</div>';
+        if (denied.length) {
+            /* UI-14: لا يُخفى الممنوعُ صامتًا — يُقال ومن يمنحه */
+            html += '<div class="ems-io-denied">خيارات خلف صلاحية: ';
+            for (i = 0; i < denied.length; i++) {
+                html += '<span>' + esc(denied[i].label) + ' <code>' + esc(denied[i].perm) + '</code></span>';
+            }
+            html += ' — يمنحها مدير الصلاحيات</div>';
+        }
+        html += '<div class="ems-io-manifest">كلُّ ملفٍ مصدَّر يحمل سجلَّه التساعي: المنظر · الأعمدة · '
+              + 'الفلاتر · الفترة · السجلات وعددها · المستخدم وصفته · وقت التصدير · رقم العملية · '
+              + 'الحقول المستبعَدة بالصلاحية.</div>'
+              + '<div class="ems-io-title"><i class="fa fa-file-import"></i> الاستيراد — '
+              + EmsUI.IMPORT_CHECKS.length + ' فحصًا ولا استيرادَ بلا معاينة</div>'
+              + '<ol class="ems-io-checks">';
+        for (i = 0; i < EmsUI.IMPORT_CHECKS.length; i++) {
+            html += '<li>' + esc(EmsUI.IMPORT_CHECKS[i]) + '</li>';
+        }
+        html += '</ol><div class="ems-io-classes">المعاينةُ تصنّف كلَّ صفٍّ إلى: '
+              + esc(EmsUI.IMPORT_CLASSES.join(' · ')) + '</div>';
+        el.innerHTML = html;
+        return el;
+    };
+
     window.EmsUI = EmsUI;
 
     /* لغة UI-12 لجداول DataTables المهيأة بعدنا (تكامل غير كاسر):

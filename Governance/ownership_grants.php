@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Governance/ownership_grants.php — منح المجال المقيَّد (FIN-26 · الشاشة 213)
  * ───────────────────────────────────────────────────────────────────────────
@@ -24,8 +25,7 @@ $role = strval($_SESSION['user']['role'] ?? '');
 $is_super = ($role === '-1');
 // خلف الصلاحية: الإدارة العليا والمالية العليا حصرًا (1 · 19 · -1)
 if (!$is_super && !in_array($role, array('1', '19'), true)) {
-    http_response_code(403);
-    exit('403 — منح المجال المقيَّد خلف صلاحية مقيَّدة');
+    ems_gov_flash_redirect('../main/dashboard.php', 'منح المجال المقيَّد خلف صلاحية مقيَّدة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = $company_id ?: 4;
 $uid = intval($_SESSION['user']['id'] ?? 0);
@@ -109,6 +109,9 @@ $users = $conn->query(
 )->fetch_all(MYSQLI_ASSOC);
 
 $page_title = 'إيكوبيشن | منح المجال المقيَّد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

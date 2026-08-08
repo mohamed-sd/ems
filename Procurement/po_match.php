@@ -28,20 +28,20 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = proc_page_perms($conn, 'Procurement/po_match.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المطابقة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المطابقة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 // ── تسجيلُ الفاتورة والمطابقة (المحرك الواحد proc_match_invoice) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match_invoice') {
-    if (!$can_edit) { header("Location: po_match.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('po_match.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $mid = intval($_POST['order_id'] ?? 0);
     $res = proc_match_invoice(
         $conn, $mid,
@@ -58,12 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
     } else {
         $msg = 'تعذّرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
     }
-    header("Location: po_match.php?msg=" . urlencode($msg)); exit();
+    ems_gov_flash_redirect('po_match.php', $msg, 'GOV-INFO-200', ''); exit();
 }
 
 // ── حسمُ الفرق المعلَّق بقرارٍ موثَّق (proc_match_resolve) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resolve_variance') {
-    if (!$can_edit) { header("Location: po_match.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('po_match.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $rid = intval($_POST['order_id'] ?? 0);
     $res = proc_match_resolve($conn, $rid, $_POST['decision'] ?? '', $_POST['reason'] ?? '', $current_user_id);
     if ($res['status'] === 'resolved') {
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
     } else {
         $msg = 'تعذّر الحسم: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
     }
-    header("Location: po_match.php?msg=" . urlencode($msg)); exit();
+    ems_gov_flash_redirect('po_match.php', $msg, 'GOV-INFO-200', ''); exit();
 }
 
 // ── البيانات: الأوامر التي بلغت الاستلام (أضلاع المطابقة قائمة) ──
@@ -150,6 +150,9 @@ if (isset($_GET['resolve_id']) && $can_edit) {
 }
 
 $page_title = 'إيكوبيشن | مطابقة الفاتورة بالأمر والاستلام';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -16,7 +16,7 @@ $current_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['r
 $is_super_admin = ($current_role === '-1');
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit();
 }
 
 $page_permissions = check_page_permissions($conn, 'Employees/employee_roles.php');
@@ -24,7 +24,7 @@ $can_view   = $page_permissions['can_view'];
 $can_add    = $page_permissions['can_add'];
 $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
-if (!$can_view) { header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+أدوار+الموظفين+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض أدوار الموظفين ❌', 'GOV-PERM-403', ''); exit(); }
 
 // بوابة العزل — بعد M6 نمط «عامّ أو مِلكي» يكافئ عزل البوابة (توأم job_titles)
 $er_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('employee roles super manage') : ems_tenant_db();
@@ -44,13 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $er_data = array('name' => $name, 'description' => $desc, 'status' => $status, 'sort_order' => $sort_order);
         try {
             if ($id > 0) {
-                if (!$can_edit) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+                if (!$can_edit) { ems_gov_flash_redirect('employee_roles.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
                 $er_gate->update('employee_roles', $er_data, array('id' => $id));
             } else {
-                if (!$can_add) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+                if (!$can_add) { ems_gov_flash_redirect('employee_roles.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
                 $er_gate->insert('employee_roles', $er_data);
             }
-            header("Location: employee_roles.php?msg=✅+تم+حفظ+الدور+بنجاح"); exit();
+            ems_gov_flash_redirect('employee_roles.php', '✅ تم حفظ الدور بنجاح', 'GOV-OK-200', ''); exit();
         } catch (\Throwable $e) {
             $dup = (strpos($e->getMessage(), 'Duplicate') !== false);
             $error_msg = $dup ? 'هذا الدور موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($e->getMessage()) . ' ❌');
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ── حذف (مع منع الحذف إذا كان مستخدماً) ───────────────────────────────────────
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: employee_roles.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('employee_roles.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $id = (int) $_GET['delete_id'];
     // حارس الاستخدام معزول، والحذف الصلب عبر deleteRow
     $used = 0; $ok = false;
@@ -71,9 +71,9 @@ if (isset($_GET['delete_id'])) {
         }
     } catch (\Throwable $e) { /* غير مملوك → تعذّر */ }
     if ($used > 0) {
-        header("Location: employee_roles.php?msg=لا+يمكن+حذف+دورٍ+مستخدمٍ+من+قِبل+$used+موظف+❌");
+        ems_gov_flash_redirect('employee_roles.php', "لا يمكن حذف دورٍ مستخدمٍ من قِبل $used موظف ❌", 'GOV-FAIL-409', '');
     } else {
-        header("Location: employee_roles.php?msg=" . ($ok ? "✅+تم+حذف+الدور" : "تعذّر+الحذف+(خارج+نطاق+شركتك)+❌"));
+        ems_gov_flash_redirect('employee_roles.php', $ok ? 'تم حذف الدور ✅' : 'تعذّر الحذف (خارج نطاق شركتك) ❌', $ok ? 'GOV-OK-200' : 'GOV-SCOPE-403', '');
     }
     exit();
 }
@@ -89,6 +89,9 @@ if (isset($_GET['edit_id'])) {
 }
 
 $page_title = "إيكوبيشن | الأدوار الوظيفية";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

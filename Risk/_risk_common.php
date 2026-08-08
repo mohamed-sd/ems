@@ -74,8 +74,7 @@ function risk_guard_screen($conn, $is_super_admin)
     $script = 'Risk/' . basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
     $pp = check_page_permissions($conn, $script);
     if (!$is_super_admin && empty($pp['can_view'])) {
-        ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض شاشة المخاطر هذه',
-            'GOV-VIEW-403', 'صلاحيات المخاطر يمنحها مدير الصلاحيات — والإدارات ترى زاويتها من مساحة مخاطر الإدارة');
+        ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض شاشة المخاطر هذه', 'GOV-PERM-403', 'صلاحيات المخاطر يمنحها مدير الصلاحيات — والإدارات ترى زاويتها من مساحة مخاطر الإدارة');
     }
     return $pp;
 }

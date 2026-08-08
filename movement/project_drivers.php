@@ -17,7 +17,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 $is_movement_manager = ($current_role === '6');
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -32,7 +32,7 @@ $can_view = !empty($page_permissions['can_view']);
 $can_edit = !empty($page_permissions['can_edit']);
 
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+شاشة+سائقي+المشروع+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض شاشة سائقي المشروع ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -50,7 +50,7 @@ if (isset($_GET['project_id']) && intval($_GET['project_id']) > 0) {
 }
 
 if ($selected_project_id <= 0) {
-    echo "<script>alert('❌ لا يوجد مشروع مرتبط بالمستخدم في الجلسة'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا يوجد مشروع مرتبط بالمستخدم في الجلسة', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -61,7 +61,7 @@ try {
 } catch (\Throwable $t) { $project_rows = array(); }
 if (empty($project_rows)) {
     unset($_SESSION['operations_project_id']);
-    echo "<script>alert('❌ المشروع غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ المشروع غير متاح أو غير نشط', 'GOV-SCOPE-403', '');
     exit();
 }
 $selected_project = $project_rows[0];
@@ -665,6 +665,9 @@ if (!function_exists('get_shift_type_label')) {
 }
 
 $page_title = "توزيع المشغّلين";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

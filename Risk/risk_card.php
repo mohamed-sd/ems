@@ -8,7 +8,12 @@
 require_once __DIR__ . '/_risk_common.php';
 $__pp = risk_guard_screen($conn, $is_super_admin);
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/_risk_views.php';
 ems_shell_axes($__pp);
+
+// CM-09/CM-10 (§6-2): ٢٤ حقلًا في أقسامٍ — والمنظرُ يقلّل المعروضَ لا المحفوظ.
+// «الملخص» لمن يريد الحكمَ سريعًا · «كل الأقسام» لمن يراجع بالشواهدِ كاملةً.
+$view = risk_current_view('risk_card');
 
 $rid = intval($_GET['id'] ?? 0);
 $scopeSql = risk_scope_sql($RISK_FULL, $RISK_ORG_UNIT);
@@ -61,10 +66,18 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_context = array(
         'الوحدة' => $risk['ru_code'] . ' · ' . $risk['ru_name'],
         'المستوى الجاري' => $risk['current_level'] !== null && $risk['current_level'] !== '' ? $risk['current_level'] : 'لم يقيَّم',
+        'حكم الشهية' => (string) ($risk['appetite_verdict'] ?? '') !== '' ? (string) $risk['appetite_verdict'] : 'لم يُحكم',
         'الحالة' => $risk['state'],
         'المراجعة قبل' => (string) $risk['review_due'],
+        'المنظر' => $view === 'all' ? 'كل الأقسام' : 'الملخص',
     );
     include('../includes/page_header.php');
+    ems_screen_about(
+        'ملفُّ الخطرِ الواحد: تقييماتُه نسخًا تاريخيةً وضوابطُه بخريطتها وأدلتها ومعالجتُه بمهلةٍ '
+        . 'ومسؤولٍ وقبولُه بالسقفِ وإغلاقُه بحارسِ الدليلِ الثلاثي.',
+        array('التقييماتُ لا تُكتب فوقها — والنسخةُ الجديدةُ تشير إلى سابقتها (RK-03)',
+              'الخطرُ الواحدُ يُعرض لعدةِ إداراتٍ بزوايا مختلفةٍ ولا يُنسخ (RK-02)'));
+    risk_view_bar('risk_card', $view, array('id' => $rid));
     ?>
 
     <div class="ems-grid">
@@ -77,6 +90,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <span>النطاق: <b><?php echo htmlspecialchars($risk['scope_type']); ?></b></span>
                 <span>السبب الجذري: <b><?php echo htmlspecialchars($risk['root_cause']); ?></b></span>
             </div>
+            <?php if ($view === 'all'): ?>
+            <div class="ems-page-context" style="margin-top:6px">
+                <span>المستهدف: <b><?php echo htmlspecialchars((string) ($risk['target_level'] ?? '') ?: '—'); ?></b></span>
+                <span>فعالية الضوابط: <b><?php echo htmlspecialchars((string) ($risk['control_effectiveness'] ?? '') ?: 'غير مثبت'); ?></b></span>
+                <span>الثقة: <b><?php echo htmlspecialchars((string) ($risk['confidence'] ?? '') ?: '—'); ?></b></span>
+                <span>سرعة التحقق: <b><?php echo htmlspecialchars((string) ($risk['velocity'] ?? '') ?: '—'); ?></b></span>
+                <span>الأفق: <b><?php echo htmlspecialchars((string) ($risk['horizon'] ?? '') ?: '—'); ?></b></span>
+                <span>التعرض المقدَّر: <b><?php echo $risk['exposure_amount'] === null ? '—'
+                    : htmlspecialchars(number_format((float) $risk['exposure_amount'], 2) . ' ' . (string) $risk['exposure_currency']); ?></b>
+                    <small>(تقديرٌ لا قيد — RK-06)</small></span>
+                <span>مفتاح التكرار: <b style="font-family:monospace;font-size:.72rem"><?php echo htmlspecialchars(mb_substr((string) $risk['dedup_key'], 0, 12)); ?></b></span>
+                <span>المُنشئ وتاريخه: <b><?php echo htmlspecialchars((string) $risk['created_at']); ?></b></span>
+            </div>
+            <?php endif; ?>
         </div>
         <div class="ems-card ems-col-4">
             <h6>التصعيدات (RK-08 — لا تُخفى)</h6>

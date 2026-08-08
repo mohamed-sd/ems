@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = trs_page_perms($conn, 'Transport/transfer_cost_rules_config.php', $is_s
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+قواعد+المتحمِّل+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قواعد المتحمِّل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -40,9 +40,9 @@ $bearers        = trs_bearers();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['movement_type'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: transfer_cost_rules_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: transfer_cost_rules_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: transfer_cost_rules_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('transfer_cost_rules_config.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('transfer_cost_rules_config.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('transfer_cost_rules_config.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $movement_type = trim($_POST['movement_type'] ?? '');
     $duration_operator = trim($_POST['duration_operator'] ?? 'any');
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['movement_type'])) {
     $active = isset($_POST['active']) ? 1 : 0;
 
     if (!array_key_exists($movement_type, $movement_types) || !array_key_exists($duration_operator, $operators) || !array_key_exists($default_bearer, $bearers)) {
-        header("Location: transfer_cost_rules_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
+        ems_gov_flash_redirect('transfer_cost_rules_config.php', 'بيانات غير مكتملة ❌', 'GOV-FAIL-409', ''); exit();
     }
     if ($duration_operator === 'any') { $duration_threshold_days = null; }
 
@@ -64,31 +64,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['movement_type'])) {
     try {
         if ($is_editing) {
             trs_gate(false)->update('transfer_cost_rules', $data, array('id' => $id));
-            header("Location: transfer_cost_rules_config.php?msg=تم+تعديل+القاعدة+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تم تعديل القاعدة بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
             trs_gate(false)->insert('transfer_cost_rules', $data);
-            header("Location: transfer_cost_rules_config.php?msg=تمت+إضافة+القاعدة+بنجاح+✅"); exit();
+            ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تمت إضافة القاعدة بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {
         error_log('cost_rules save refused: ' . $e->getMessage());
-        header("Location: transfer_cost_rules_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('transfer_cost_rules_config.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 // ── حذف — سياسة «الأرشفة لا الحذف» (نفس دلالة types الموثقة) ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: transfer_cost_rules_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('transfer_cost_rules_config.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         trs_gate(false)->softDelete('transfer_cost_rules', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('cost_rules softDelete refused: ' . $e->getMessage());
-        header("Location: transfer_cost_rules_config.php?msg=تعذّر+الحذف+❌"); exit();
+        ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تعذّر الحذف ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: transfer_cost_rules_config.php?msg=تم+حذف+القاعدة+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تم حذف القاعدة بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | قواعد تحميل تكلفة الترحيل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

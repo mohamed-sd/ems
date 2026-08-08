@@ -38,7 +38,15 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
-  <div class="ems-topbar"><h4><i class="fa fa-truck"></i> خطةُ معدات المورد</h4></div>
+  <?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
+   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
+$header_icon = 'fa fa-truck';
+$header_title_html = htmlspecialchars('خطةُ معدات المورد', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
   <form method="get" class="ems-form" style="margin-bottom:14px">
     <select name="supplier_id" class="form-control" style="max-width:340px" onchange="this.form.submit()">
       <option value="">— اختر موردًا —</option>

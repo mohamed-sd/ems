@@ -48,6 +48,9 @@ $TABS = array('1' => 'البيانات', '2' => 'عقدُه وسجلُّه', '3'
               '4' => 'إنتاجُه', '5' => 'راتبُه وسلفُه', '6' => 'عهدُه', '7' => 'تقييمُه ونشاطُه');
 
 $page_title = 'إيكوبيشن | بطاقة الموظف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

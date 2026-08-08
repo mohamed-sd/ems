@@ -39,13 +39,17 @@ $u = $r->fetch_assoc();
 chk(3, 'وحدة المخاطر بالهيكل (DEC-G)', $u && (int) $u['active'] === 1 && (int) $u['company_id'] === 4 && $u['parent_unit_id'] === null,
     'active=' . ($u['active'] ?? '?') . ' co=' . ($u['company_id'] ?? '?') . ' parent=NULL (الرئيس مباشرة)');
 
-/* ④ البذر المرجعي: 11 وحدة · 8 شهية (3 أرضيات) · 36 مؤشرًا */
+/* ④ البذر المرجعي: 11 وحدة · 8 شهية (3 أرضيات) · 36 مؤشرًا يدويًّا من ورقة 26
+   المؤشراتُ تُقاس بخطِّ أساسِ الورقةِ لا بإجماليٍّ مجمَّد: إكمالُ 2026-08-08 أضاف
+   مؤشراتٍ آليةً للمرحلة ١٢ (source_key + read_mode='آلي')، فالمعيارُ بقاءُ الـ36
+   الموثَّقةِ لا منعُ الزيادةِ المشروعة. وحمايةُ الفحصِ باقيةٌ: نقصُ الأساسِ يُرصد. */
 $n1 = (int) $db->query("SELECT COUNT(*) c FROM risk_units WHERE company_id=4 AND active=1")->fetch_assoc()['c'];
-$n2 = (int) $db->query("SELECT COUNT(*) c FROM risk_appetite WHERE company_id=4 AND plan_mode IS NULL")->fetch_assoc()['c'];
+$n2 = (int) $db->query("SELECT COUNT(*) c FROM risk_appetite WHERE company_id=4 AND (plan_mode IS NULL OR plan_mode='')")->fetch_assoc()['c'];
 $n2f = (int) $db->query("SELECT COUNT(*) c FROM risk_appetite WHERE company_id=4 AND immutable_floor=1")->fetch_assoc()['c'];
-$n3 = (int) $db->query("SELECT COUNT(*) c FROM risk_kris WHERE company_id=4 AND active=1")->fetch_assoc()['c'];
+$n3 = (int) $db->query("SELECT COUNT(*) c FROM risk_kris WHERE company_id=4 AND active=1 AND read_mode='يدوي'")->fetch_assoc()['c'];
+$n3a = (int) $db->query("SELECT COUNT(*) c FROM risk_kris WHERE company_id=4 AND active=1 AND read_mode='آلي'")->fetch_assoc()['c'];
 chk(4, 'البذر: الوحدات والشهية والمؤشرات', $n1 === 11 && $n2 === 8 && $n2f === 3 && $n3 === 36,
-    "وحدات $n1/11 · شهية $n2/8 (أرضيات $n2f/3) · مؤشرات $n3/36");
+    "وحدات $n1/11 · شهية $n2/8 (أرضيات $n2f/3) · مؤشرات الورقة 26 يدويًّا $n3/36 · آلية مضافة $n3a");
 
 /* ⑤ R2: الدوران بثلاثيتهما (دور + حساب بموظف ومسمى) */
 $r = $db->query("SELECT u.role, COUNT(*) c FROM users u JOIN employees e ON e.id = u.employee_id
@@ -65,9 +69,29 @@ $deptGrants = (int) $db->query("SELECT COUNT(DISTINCT rp.role_id) c FROM role_pe
 chk(6, 'سجل الشاشات والصلاحيات', $mods >= 10 && $grants28 >= 10 && $deptGrants >= 14,
     "شاشات $mods/10 · منح المدير $grants28 · إدارات ترى زاويتها $deptGrants/15");
 
-/* ⑦ R7: الأفعال الـ28 بعقودها وwrite_class */
-$acts = (int) $db->query("SELECT COUNT(*) c FROM nav09_action_map WHERE canonical_code LIKE 'RSK-%' AND write_class IS NOT NULL")->fetch_assoc()['c'];
-chk(7, 'الأفعال الـ28 في القاموس بعقودها', $acts === 28, "$acts/28 بwrite_class");
+/* ⑦ R7: الأفعال الـ28 الأصلية بعقودها وwrite_class — بأسمائها لا بعددها.
+   إكمالُ 2026-08-08 أضاف 12 فعلًا لأفعالِ الوثيقةِ الناقصة (المراجعةُ والواقعةُ
+   والشهيةُ والتصنيفُ والتصديرُ والميدانُ والحوكمة)، فالعدُّ المجمَّدُ يرسب زورًا.
+   والمعيارُ هنا أدقُّ من العدِّ: كلُّ رمزٍ من الثمانيةِ والعشرينَ الأصليةِ حاضرٌ
+   بعقدِه — فيُرصد الحذفُ والانحرافُ ولا يُعاقب الإكمالُ المشروع. */
+$BASE28 = array('RSK-SIG-CREATE','RSK-SIG-DISMISS','RSK-SIG-LINK','RSK-SIG-CONVERT','RSK-SIG-ESCALATE',
+    'RSK-CREATE','RSK-CLASSIFY','RSK-ASSIGN-OWNER','RSK-ASSESS-INHERENT','RSK-ASSESS-RESIDUAL',
+    'RSK-ASSESS-TARGET','RSK-CTL-CREATE','RSK-CTL-LINK','RSK-CTL-EVIDENCE','RSK-CTL-VERIFY',
+    'RSK-TREAT-CREATE','RSK-TREAT-PROGRESS','RSK-TREAT-VERIFY','RSK-ACCEPT','RSK-CLOSE','RSK-REOPEN',
+    'RSK-MERGE','RSK-KRI-UPDATE','RSK-ESC-ACK','RSK-VIEW-BOARD','RSK-VIEW-REGISTER','RSK-VIEW-DEPT',
+    'RSK-VIEW-APPETITE');
+$have28 = array();
+$r = $db->query("SELECT canonical_code FROM nav09_action_map
+                  WHERE canonical_code LIKE 'RSK-%' AND write_class IS NOT NULL AND write_class <> ''");
+while ($x = $r->fetch_row()) { $have28[$x[0]] = true; }
+$missBase = array();
+foreach ($BASE28 as $c) { if (!isset($have28[$c])) { $missBase[] = $c; } }
+$actsAll = (int) $db->query("SELECT COUNT(*) c FROM nav09_action_map
+                             WHERE (canonical_code LIKE 'RSK-%' OR canonical_code LIKE 'GOV-RSK-%')
+                               AND write_class IS NOT NULL AND write_class <> ''")->fetch_assoc()['c'];
+chk(7, 'الأفعال الـ28 في القاموس بعقودها', empty($missBase),
+    (28 - count($missBase)) . "/28 من الأساس بعقودها · إجمالي أفعال M-16 اليوم $actsAll"
+    . (empty($missBase) ? '' : ' — الغائب: ' . implode(', ', $missBase)));
 
 /* ⑧ R8: NAV v6 — تنقل الدورين + رابط زاوية الإدارات + صفر تكرار */
 $nav28 = (int) $db->query("SELECT COUNT(*) c FROM nav_items WHERE role_id=28 AND route LIKE 'Risk/%' AND active=1")->fetch_assoc()['c'];

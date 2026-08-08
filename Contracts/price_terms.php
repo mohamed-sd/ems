@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/price_terms.php — شروطُ تعديل السعر (M-09 · CON-02 §2-③)
  * ───────────────────────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -49,7 +50,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+شروط+تعديل+السعر+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض شروط تعديل السعر ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -63,7 +64,7 @@ $OUTCOME_LABELS = array('amended' => 'تعديلٌ مولَّد', 'capped' => '�
                         'no_base_price' => 'لا سعرَ أساسٍ للبند');
 
 $selected = intval($_GET['contract_id'] ?? 0);
-$redirect = function ($msg, $cid) { header("Location: price_terms.php?contract_id=" . intval($cid)
+$redirect = function ($msg, $cid) { ems_gov_redirect("Location: price_terms.php?contract_id=" . intval($cid)
     . "&msg=" . rawurlencode($msg)); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -151,6 +152,9 @@ try {
 } catch (\Throwable $t) { $readings = array(); }
 
 $page_title = 'إيكوبيشن | شروط تعديل السعر';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

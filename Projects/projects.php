@@ -34,7 +34,7 @@ require_login();
 
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if ($company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -47,7 +47,7 @@ $prj_gate = ems_tenant_db();
 
 function projects_redirect_with_msg($msg)
 {
-    header('Location: projects.php?msg=' . urlencode($msg));
+    ems_gov_flash_redirect('projects.php', $msg, 'GOV-INFO-200', '');
     exit();
 }
 
@@ -68,7 +68,7 @@ $can_delete = $page_permissions['can_delete'];
 
 // منع الوصول إذا لم تكن هناك صلاحية عرض
 if (!$can_view) {
-    header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض المشاريع ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض المشاريع ❌', 'GOV-PERM-403', '');
     exit();
 }
 

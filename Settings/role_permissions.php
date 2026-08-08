@@ -19,11 +19,11 @@ $page_title = "صلاحيات الأدوار";
 // ════════════════════════════════════════════════════════════════════════════
 $rp_perms = get_current_page_permissions($conn);
 if ($rp_perms['id'] !== null && !$rp_perms['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('لا توجد صلاحية لهذه الصفحة ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية لهذه الصفحة ❌', 'GOV-PERM-403', '');
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $rp_perms['id'] !== null && !$rp_perms['can_edit']) {
-    header('Location: role_permissions.php?msg=' . urlencode('لا توجد صلاحية للتعديل ❌'));
+    ems_gov_flash_redirect('role_permissions.php', 'لا توجد صلاحية للتعديل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -321,6 +321,9 @@ foreach ($all_permissions as $perm) {
     ];
 }
 
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($permissions) ? $permissions : null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -634,6 +637,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </style>
 
 <div class="main">
+<?php
+/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ — الشاشةُ كانت بلا رأسٍ معلَن. */
+$header_icon = 'fas fa-window-maximize';
+$header_title_html = htmlspecialchars('صلاحيات الأدوار', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = false;
+include __DIR__ . '/../includes/page_header.php';
+?>
+
     <!-- الرأس -->
     <div class="header-title">
         <i class="fas fa-lock-open"></i> إدارة صلاحيات الأدوار

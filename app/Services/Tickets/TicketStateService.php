@@ -141,6 +141,12 @@ class TicketStateService
     public static function recomputeHead(\mysqli $conn, $tkId)
     {
         $tkId = intval($tkId);
+        // البلاغُ بلا مسارٍ واحدٍ أصلًا (بلاغاتُ الشاشة اليدوية) ليس «مكتملَ
+        // المسارات» بل خارجَ هذا النموذج — واعتبارُه مكتملًا كان يغلقه فورًا
+        // بغير حق. رأسُه يتبع مرحلتَه عبر tkt_sync_head_state لا هذا المشتقّ.
+        $total = intval($conn->query(
+            "SELECT COUNT(*) c FROM ticket_workstreams WHERE tk_id = {$tkId}")->fetch_assoc()['c']);
+        if ($total === 0) { return 0; }
         $open = intval($conn->query(
             "SELECT COUNT(*) c FROM ticket_workstreams
               WHERE tk_id = {$tkId} AND mandatory = 1 AND activation_state = 'opened'

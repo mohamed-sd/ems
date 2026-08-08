@@ -32,14 +32,14 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = fin_page_perms($conn, 'Finance/currencies_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+العملات+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض العملات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -104,7 +104,7 @@ function fx_revalue_pending($conn, $company_id, $code)
 
 // ── إضافة عملة ───────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_currency'])) {
-    if (!$can_edit) { header("Location: currencies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('currencies_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
 
     $code = strtoupper(trim(strval($_POST['code'] ?? '')));
     $name = trim(strval($_POST['name_ar'] ?? ''));
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_currency'])) {
     $err = null;
     if ($code === '' || !preg_match('/^[A-Z]{3}$/', $code)) { $err = 'الرمز+ثلاثةُ+أحرفٍ+لاتينية+(ISO)'; }
     elseif ($name === '')                                   { $err = 'اسمُ+العملة+إلزامي'; }
-    if ($err !== null) { header("Location: currencies_fin.php?msg={$err}+❌"); exit(); }
+    if ($err !== null) { ems_gov_flash_redirect('currencies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     try {
         fin_gate($is_super_admin)->insert('fin_currencies', array(
@@ -127,18 +127,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_currency'])) {
             'created_by' => $current_user_id,
         ));
         ems_fx_cache_clear();
-        header("Location: currencies_fin.php?msg=سُجّلت+العملة+{$code}+—+أدخِل+سعرَ+صرفها+✅");
+        ems_gov_flash_redirect('currencies_fin.php', "سُجّلت العملة {$code} — أدخِل سعرَ صرفها ✅", 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('currencies add: ' . $t->getMessage());
         $dup = (strpos($t->getMessage(), 'Duplicate') !== false);
-        header("Location: currencies_fin.php?msg=" . ($dup ? 'العملةُ+مسجَّلةٌ+سلفًا' : 'تعذّر+التسجيل') . "+❌");
+        ems_gov_flash_redirect('currencies_fin.php', ($dup ? 'العملةُ مسجَّلةٌ سلفًا' : 'تعذّر التسجيل') . ' ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
 
 // ── إضافة سعر صرف ────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
-    if (!$can_edit) { header("Location: currencies_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('currencies_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
 
     $code    = strtoupper(trim(strval($_POST['currency_code'] ?? '')));
     $rateRaw = trim(strval($_POST['rate_to_base'] ?? ''));
@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
     elseif ($rate === null)                          { $err = 'السعرُ+رقمٌ+—+يُقبل+الكسرُ+العشري+(مثال+0.00166667)'; }
     elseif ($rate <= 0)                              { $err = 'السعرُ+رقمٌ+موجب'; }
     elseif ($from === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $err = 'تاريخُ+السريان+إلزامي'; }
-    if ($err !== null) { header("Location: currencies_fin.php?msg={$err}+❌"); exit(); }
+    if ($err !== null) { ems_gov_flash_redirect('currencies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     try {
         fin_gate($is_super_admin)->insert('fin_fx_rates', array(
@@ -174,12 +174,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
         if ($done['events'] > 0 || $done['dues'] > 0) {
             $msg .= '+—+وقُيّم+' . intval($done['events']) . '+حدثًا+و' . intval($done['dues']) . '+ذمّة';
         }
-        header("Location: currencies_fin.php?msg={$msg}");
+        ems_gov_flash_redirect('currencies_fin.php', "{$msg}", 'GOV-INFO-200', '');
     } catch (\Throwable $t) {
         error_log('fx rate add: ' . $t->getMessage());
         $dup = (strpos($t->getMessage(), 'Duplicate') !== false);
-        header("Location: currencies_fin.php?msg=" .
-               ($dup ? 'لهذه+العملة+سعرٌ+بهذا+التاريخ+سلفًا' : 'تعذّر+التسجيل') . "+❌");
+        ems_gov_flash_redirect('currencies_fin.php', ($dup ? 'لهذه العملة سعرٌ بهذا التاريخ سلفًا' : 'تعذّر التسجيل') . ' ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -231,6 +230,9 @@ $pendingTotal = 0;
 foreach ($pending as $p) { $pendingTotal += (isset($p['events']) ? $p['events'] : 0) + (isset($p['dues']) ? $p['dues'] : 0); }
 
 $page_title = 'إيكوبيشن | العملات وأسعار الصرف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

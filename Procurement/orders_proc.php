@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = proc_page_perms($conn, 'Procurement/orders_proc.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+أوامر+الشراء+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض أوامر الشراء ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -54,7 +54,7 @@ unset($ror);
 // «لا استحقاقَ بلا مطابقة»: تُقارن الفاتورةُ بالأمر وبالاستلام، فإن كانت ضمن
 // السماح فُتح دَينُ المورد، وإلا وقفت بفرقها حتى قرارٍ موثَّق.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match_invoice') {
-    if (!$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $mid = intval($_POST['id'] ?? 0);
     $res = proc_match_invoice(
         $conn, $mid,
@@ -70,14 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
     } else {
         $msg = 'تعذّرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
     }
-    header("Location: orders_proc.php?edit_id=" . $mid . "&msg=" . urlencode($msg)); exit();
+    ems_gov_redirect("Location: orders_proc.php?edit_id=" . $mid . "&msg=" . urlencode($msg)); exit();
 }
 
 // ── ② التكلفة الوصولية: إضافة/أرشفة مصروف وصولٍ على الأمر ──
 // «سعرُ القطعة الحقيقي لا سعرُ فاتورتها»: تُرسمَل على تكلفة الاستلام توزيعًا
 // بقيمة البنود (ProcCostingService::repriceOrderReceipts) وتنشر مصروفَها بعطالته.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_landed_cost') {
-    if (!$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $lo_id = intval($_POST['id'] ?? 0);
     $doc_no = trim($_POST['lc_doc_no'] ?? '');
     $cost_type = trim($_POST['lc_type'] ?? 'شحن');
@@ -88,13 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_l
     if (!in_array($cost_type, array('شحن', 'جمارك', 'تخليص', 'نقل داخلي', 'أخرى'), true)) { $cost_type = 'أخرى'; }
     if ($lc_fx <= 0) { $lc_fx = 1; }
     if ($lo_id <= 0 || $doc_no === '' || $amount <= 0) {
-        header("Location: orders_proc.php?edit_id=$lo_id&msg=مستندُ+المصروف+ورقمُه+وقيمتُه+إلزامية+❌"); exit();
+        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=مستندُ+المصروف+ورقمُه+وقيمتُه+إلزامية+❌"); exit();
     }
     $lo = proc_gate(false)->selectOne('proc_order', array('where' => array('id' => $lo_id)));
-    if (!$lo) { header("Location: orders_proc.php?msg=الأمرُ+غير+موجود+❌"); exit(); }
+    if (!$lo) { ems_gov_flash_redirect('orders_proc.php', 'الأمرُ غير موجود ❌', 'GOV-REF-404', ''); exit(); }
     // لا ترسملَ قبل وصول البضاعة — المصاريفُ تُعرف عند الوصول (نفسُ بوابة المصروف)
     if (!in_array((string)$lo['state'], proc_order_expense_states(), true)) {
-        header("Location: orders_proc.php?edit_id=$lo_id&msg=لا+تكلفةَ+وصوليةً+قبل+الاستلام+النهائي+❌"); exit();
+        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=لا+تكلفةَ+وصوليةً+قبل+الاستلام+النهائي+❌"); exit();
     }
     try {
         $landed_id = proc_gate(false)->runInTransaction(function ($g) use ($lo_id, $doc_no, $cost_type, $amount, $lc_currency, $lc_fx, $lc_supplier, $current_user_id) {
@@ -110,13 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_l
         }, 'landed cost add PO#' . $lo_id);
     } catch (\Throwable $e) {
         error_log('landed cost add refused: ' . $e->getMessage());
-        header("Location: orders_proc.php?edit_id=$lo_id&msg=تعذّرت+إضافة+التكلفة+الوصولية+❌"); exit();
+        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=تعذّرت+إضافة+التكلفة+الوصولية+❌"); exit();
     }
     proc_publish_landed_cost($conn, intval($landed_id), $current_user_id);
-    header("Location: orders_proc.php?edit_id=$lo_id&msg=رُسملت+التكلفة+الوصولية+على+الاستلام+✅"); exit();
+    ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=رُسملت+التكلفة+الوصولية+على+الاستلام+✅"); exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archive_landed_cost') {
-    if (!$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $lo_id = intval($_POST['id'] ?? 0);
     $lid = intval($_POST['landed_id'] ?? 0);
     try {
@@ -126,16 +126,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archi
             \App\Services\Procurement\ProcCostingService::repriceOrderReceipts($g, $lo_id);   // نصيبُها يخرج من التكلفة
         }, 'landed cost archive#' . $lid);
     } catch (\Throwable $e) { error_log('landed archive refused: ' . $e->getMessage()); }
-    header("Location: orders_proc.php?edit_id=$lo_id&msg=أُرشفت+التكلفة+وأُعيد+الاحتساب+✅"); exit();
+    ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=أُرشفت+التكلفة+وأُعيد+الاحتساب+✅"); exit();
 }
 
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: orders_proc.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('orders_proc.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $supplier_id = ($_POST['supplier_id'] ?? '') !== '' ? intval($_POST['supplier_id']) : null;
     $request_id  = ($_POST['request_id'] ?? '') !== '' ? intval($_POST['request_id']) : null;
@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
 
     // قاعدة §14: لا يصدر أمر (يغادر مسودة) بلا مرجع اعتماد مالي
     if ($state !== 'مسودة' && $fin_approval_ref === '') {
-        header("Location: orders_proc.php?msg=لا+يصدر+الأمر+بلا+مرجع+اعتماد+مالي+❌"); exit();
+        ems_gov_flash_redirect('orders_proc.php', 'لا يصدر الأمر بلا مرجع اعتماد مالي ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // احسب السطور والإجمالي
@@ -209,21 +209,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
         $g->replaceChildren('proc_order', $order_id, 'proc_order_line', 'order_id', $line_rows, 'order lines rewrite');
     } catch (\Throwable $e) {
         error_log('orders_proc save refused: ' . $e->getMessage());
-        header("Location: orders_proc.php?msg=تعذّر+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('orders_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: orders_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الأمر+بنجاح+✅' : 'تمت+إضافة+الأمر+بنجاح+✅')); exit();
+    ems_gov_redirect("Location: orders_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الأمر+بنجاح+✅' : 'تمت+إضافة+الأمر+بنجاح+✅')); exit();
 }
 
 // ── حذف ناعم ──
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         proc_gate(false)->softDelete('proc_order', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('orders_proc softDelete refused: ' . $e->getMessage());
     }
-    header("Location: orders_proc.php?msg=تم+حذف+الأمر+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('orders_proc.php', 'تم حذف الأمر بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── تحميل أمر للتعديل ──
@@ -239,6 +239,9 @@ if (isset($_GET['edit_id']) && $can_edit) {
 }
 
 $page_title = 'إيكوبيشن | أوامر الشراء';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

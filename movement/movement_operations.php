@@ -16,7 +16,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -35,7 +35,7 @@ $can_add = (!empty($ops_perm['can_add']) || !empty($drv_perm['can_add']));
 $can_edit = (!empty($ops_perm['can_edit']) || !empty($drv_perm['can_edit']));
 
 if (!$can_view) {
-    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+الشاشة+الموحدة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الشاشة الموحدة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -55,7 +55,7 @@ if (isset($_GET['project_id']) && intval($_GET['project_id']) > 0) {
 }
 
 if ($selected_project_id <= 0) {
-    echo "<script>alert('❌ لا يوجد مشروع مرتبط بالمستخدم'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا يوجد مشروع مرتبط بالمستخدم', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -67,7 +67,7 @@ try {
 } catch (\Throwable $t) { $project_rows = array(); }
 if (empty($project_rows)) {
     unset($_SESSION['operations_project_id']);
-    echo "<script>alert('❌ المشروع غير متاح'); window.location.href='../main/dashboard.php';</script>";
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ المشروع غير متاح', 'GOV-SCOPE-403', '');
     exit();
 }
 $selected_project = $project_rows[0];
@@ -800,6 +800,9 @@ foreach ($operations_rows as $op) {
 }
 
 $page_title = "الورديات";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

@@ -25,7 +25,7 @@ if (!function_exists('rdl_e')) {
 if (!function_exists('rdl_redirect_with_msg')) {
     function rdl_redirect_with_msg($msg)
     {
-        header('Location: readiness_lines.php?msg=' . urlencode($msg));
+        ems_gov_flash_redirect('readiness_lines.php', $msg, 'GOV-INFO-200', '');
         exit();
     }
 }
@@ -80,7 +80,7 @@ $RDL_SOURCE_HINT = array(
 // ══════════════════════════════════════════════════════════════════════════════
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 if ($company_id <= 0) {
-    header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة.', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -132,7 +132,7 @@ if ($module_id) {
     $can_delete = $perms['can_delete'];
 }
 if (!$can_view) {
-    header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض فحص الجاهزية ❌'));
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض فحص الجاهزية ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -366,6 +366,9 @@ foreach ($rdl_list as $row) {
 $stat_ready_contracts = count($ready_contracts);
 
 $page_title = "جاهزية العروض";
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

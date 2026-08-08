@@ -16,10 +16,10 @@ require_once __DIR__ . '/tkt_helpers.php';
 $ctx = tkt_ctx();
 $is_super_admin = $ctx['is_super'];
 $company_id = $ctx['company_id'];
-if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 $perms = tkt_page_perms($conn, 'Tickets/ticket_escalation_config.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit'];
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+سلّم+التصعيد+❌"); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سلّم التصعيد ❌', 'GOV-PERM-403', ''); exit(); }
 
 $levels = array(
     'responsible'  => 'المسؤول / الإدارة المالكة',
@@ -33,9 +33,9 @@ $channels = array('in_app' => 'داخل النظام', 'email' => 'بريد', 'b
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $id = intval($_POST['id'] ?? 0);
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: ticket_escalation_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: ticket_escalation_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0) { header("Location: ticket_escalation_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('ticket_escalation_config.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('ticket_escalation_config.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0) { ems_gov_flash_redirect('ticket_escalation_config.php', 'لا يمكن الحفظ بلا شركة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $name = trim($_POST['name'] ?? '');
     $level_no = intval($_POST['level_no'] ?? 1);
@@ -46,22 +46,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     if (!array_key_exists($to_role, $levels)) { $to_role = ''; }
     if (!array_key_exists($channel, $channels)) { $channel = 'in_app'; }
     if ($name === '' || $to_role === '' || $after <= 0 || $level_no < 1 || $level_no > 5) {
-        header("Location: ticket_escalation_config.php?msg=بيانات+غير+مكتملة+(المستوى+1..5)+❌"); exit();
+        ems_gov_flash_redirect('ticket_escalation_config.php', 'بيانات غير مكتملة (المستوى 1..5) ❌', 'GOV-FAIL-409', ''); exit();
     }
     $data = array('name' => $name, 'level_no' => $level_no, 'escalate_after_hours' => $after,
                   'escalate_to_role' => $to_role, 'notify_channel' => $channel, 'active' => $active);
     try {
         if ($is_editing) { tkt_gate(false)->update('ticket_escalation_rules', $data, array('id' => $id));
-            header("Location: ticket_escalation_config.php?msg=تم+تعديل+القاعدة+✅"); exit(); }
+            ems_gov_flash_redirect('ticket_escalation_config.php', 'تم تعديل القاعدة ✅', 'GOV-OK-200', ''); exit(); }
         tkt_gate(false)->insert('ticket_escalation_rules', $data);
-        header("Location: ticket_escalation_config.php?msg=تمت+إضافة+القاعدة+✅"); exit();
+        ems_gov_flash_redirect('ticket_escalation_config.php', 'تمت إضافة القاعدة ✅', 'GOV-OK-200', ''); exit();
     } catch (\App\Core\TenantGateException $e) {
         error_log('escalation rule save refused: ' . $e->getMessage());
-        header("Location: ticket_escalation_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('ticket_escalation_config.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 }
 
 $page_title = 'إيكوبيشن | سلّم التصعيد';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

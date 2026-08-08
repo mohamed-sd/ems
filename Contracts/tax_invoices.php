@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Contracts/tax_invoices.php — الفاتورةُ الضريبية (M-03)
  * ───────────────────────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -48,12 +49,12 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الفواتير+الضريبية+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الفواتير الضريبية ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('tax invoices super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: tax_invoices.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('tax_invoices.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['ti_action'] ?? '') === 'cancel') {
     if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
@@ -69,6 +70,9 @@ foreach ($invoices as $i) { if (intval($i['id']) === $open) { $openInv = $i; bre
 if ($openInv === null && $invoices) { $openInv = $invoices[0]; }
 
 $page_title = 'إيكوبيشن | الفاتورة الضريبية';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

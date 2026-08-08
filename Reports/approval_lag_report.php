@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Reports/approval_lag_report.php — مؤشرا DEC-01 ⑦ و⑧ (الشاشة 212)
  * ───────────────────────────────────────────────────────────────────────────
@@ -19,8 +20,7 @@ $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role = strval($_SESSION['user']['role'] ?? '');
 // FIN-26: إدارة التمويل (26) تطالع المؤشر عرضًا — الشاشة قراءة كلها فلا حجب POST يلزم
 if ($role !== '-1' && !in_array($role, array('1', '17', '19', EMS_ROLE_FINANCING_MGR), true)) {
-    http_response_code(403);
-    exit('403 — المؤشر لمدير الحركة والإدارة العليا والمالية والتمويل');
+    ems_gov_flash_redirect('../main/dashboard.php', 'المؤشر لمدير الحركة والإدارة العليا والمالية والتمويل ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = $company_id ?: 4;
 
@@ -96,6 +96,9 @@ $trend = $conn->query(
 )->fetch_all(MYSQLI_ASSOC);
 
 $page_title = 'إيكوبيشن | الاعتمادات المتأخرة والوثائق';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

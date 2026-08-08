@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-019 · SCN-020 · SCN-021 · SCN-023 · SCN-024 · SCN-025 · SCN-026 · SCN-027 · SCN-028 · SCN-029 · SCN-030 · SCN-031 · SCN-032 · SCN-033 · SCN-034 · SCN-035 · SCN-036 · SCN-037
 /**
  * Portal/my_evaluation.php — التقييمُ الثنائي (H-18 · الشاشة 189)
@@ -24,7 +25,7 @@ if (!$is_super && $company_id <= 0) { header("Location: ../login.php"); exit(); 
 
 $gate = $is_super ? ems_tenant_db()->forAllTenants('my evaluation super') : ems_tenant_db();
 $redirect = function ($msg, $extra = '') {
-    header("Location: my_evaluation.php?{$extra}" . ($extra !== '' ? '&' : '') . "msg=" . rawurlencode($msg)); exit();
+    ems_gov_redirect("Location: my_evaluation.php?{$extra}" . ($extra !== '' ? '&' : '') . "msg=" . rawurlencode($msg)); exit();
 };
 
 $AXES = array('quality' => 'جودةُ العمل', 'commitment' => 'الالتزامُ بالمهل',
@@ -79,6 +80,9 @@ $to   = preg_match('/^\d{4}-\d{2}-\d{2}$/', strval($_GET['to'] ?? '')) ? $_GET['
 $ev = $capId > 0 ? EVS::find($gate, $capId, $from, $to) : null;
 
 $page_title = 'إيكوبيشن | التقييم الثنائي';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

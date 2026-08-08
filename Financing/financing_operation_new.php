@@ -24,9 +24,13 @@ $co = $company_id ?: 4;
 
 // بوابة المجال المقيَّد — الإنشاء يتطلب رؤية شروط التمويل تحديدًا
 $granted = ($role === '-1') || OwnershipDomainGuard::hasGrant($conn, $co, $uid, OwnershipDomainGuard::PERM_TERMS);
+/* UI-13: المنعُ يُقال داخلَ النظامِ برمزٍ محكومٍ ووجهةٍ فيها طريقُ رجوعٍ —
+   لا صفحةَ نصٍّ عاريةٍ بلا قشرةٍ ولا رجوع. */
 if (!$granted) {
-    http_response_code(403);
-    exit('403 — إنشاء عمليات التمويل يتطلب منحة ownership.finance_terms الفردية (FIN-01 §1.1)');
+    require_once __DIR__ . '/../includes/permissions_helper.php';
+    ems_gov_flash_redirect('financing_board.php',
+        'إنشاءُ عمليات التمويل خلف منحةٍ فرديةٍ (شروطُ التمويل) ❌',
+        'GOV-PERM-403', 'اطلب منحة ownership.finance_terms من مدير الصلاحيات');
 }
 
 $msg = ''; $err = '';
@@ -64,6 +68,9 @@ $financiers = $conn->query(
 )->fetch_all(MYSQLI_ASSOC);
 
 $page_title = 'إيكوبيشن | إنشاء عملية تمويل';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * admin/sec_employee_wizard.php — معالج إعداد الموظف: إحدى عشرة خطوة
  * (update0004 · SEC-26 · SEC-01 §10.1)
@@ -40,7 +41,7 @@ if (!$is_super_admin) {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية للمعالج ❌')); exit(); }
+if (!$can_view) { ems_gov_redirect("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحية للمعالج ❌')); exit(); }
 
 $msg = strval($_GET['msg'] ?? '');
 $preview = null;
@@ -82,13 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wz_action']) && $can_
         }
         $sg = SGG::checkGrant($conn, $uid, $personId, $company_id, 'wizard');
         if (!$sg['ok']) {
-            header("Location: sec_employee_wizard.php?msg=" . rawurlencode($sg['reason'] . ' ❌'));
+            ems_gov_redirect("Location: sec_employee_wizard.php?msg=" . rawurlencode($sg['reason'] . ' ❌'));
             exit();
         }
         $d['person_id'] = $personId;
         if (!empty($_POST['end_previous_p_id'])) { $d['end_previous_p_id'] = intval($_POST['end_previous_p_id']); }
         $r = PS::submit($conn, $d);
-        header("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
         exit();
     }
 }
@@ -105,6 +106,9 @@ $personsList = $qa("SELECT person_id, full_name FROM persons WHERE active=1 ORDE
 $assignments = $qa("SELECT a.asg_id, t.name_ar FROM org_assignments a JOIN org_assignment_types t ON t.type_code=a.assignment_type_code WHERE a.company_id={$company_id} AND a.state='active' LIMIT 100");
 
 $page_title = 'إيكوبيشن | معالج إعداد الموظف';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 

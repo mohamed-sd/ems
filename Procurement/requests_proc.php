@@ -20,7 +20,7 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -28,7 +28,7 @@ $perms = proc_page_perms($conn, 'Procurement/requests_proc.php', $is_super_admin
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+طلبات+الشراء+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض طلبات الشراء ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -42,7 +42,7 @@ $fin_states     = array('بانتظار', 'معتمد مالياً', 'مرفوض
 // ── ③ توليدُ الاحتياج الآن: جسرُ الصيانة + كنّاسُ حدود الطلب — يدويًّا ──
 // (القناةُ الدورية cron_proc_replenish.php؛ والزرُّ لمن لا ينتظر الساعة)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_needs') {
-    if (!$can_add) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_add) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
     require_once __DIR__ . '/../app/Services/Procurement/MntProcBridgeService.php';
     $gn_gate = proc_gate(false);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
     $r2 = \App\Services\Procurement\ProcReorderService::run($conn, $gn_gate, $company_id, $current_user_id, false);
     $n = count($b['generated']) + count($r2['generated']);
     $sk = count($b['skipped']) + count($r2['skipped']);
-    header("Location: requests_proc.php?msg=" . urlencode(
+    ems_gov_redirect("Location: requests_proc.php?msg=" . urlencode(
         $n > 0 ? "وُلّد $n طلبًا (صيانة: " . count($b['generated']) . " · حد الطلب: " . count($r2['generated']) . ")"
                . ($sk ? " — وتُخطي $sk بعطالته" : '') . " ✅"
                : "لا احتياجَ جديدًا — كلُّ المفتوح مغطًّى بطلبه" . ($sk ? " ($sk بعطالته)" : '') . " ✅"
@@ -61,9 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    if ($is_editing && !$can_edit) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
-    if (!$is_editing && !$can_add) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
-    if ($company_id <= 0)         { header("Location: requests_proc.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+    if ($is_editing && !$can_edit) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية تعديل ❌', 'GOV-PERM-403', ''); exit(); }
+    if (!$is_editing && !$can_add) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية إضافة ❌', 'GOV-PERM-403', ''); exit(); }
+    if ($company_id <= 0)         { ems_gov_flash_redirect('requests_proc.php', 'لا يمكن الحفظ بلا شركة صالحة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $need_source = trim($_POST['need_source'] ?? '');
     $source_ref  = trim($_POST['source_ref'] ?? '');
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
     $notes        = trim($_POST['notes'] ?? '');
 
     if (!in_array($need_source, $need_sources, true) || !in_array($op_classification, $classifications, true)) {
-        header("Location: requests_proc.php?msg=بيانات+غير+مكتملة+(المصدر+والتصنيف+إلزاميان)+❌"); exit();
+        ems_gov_flash_redirect('requests_proc.php', 'بيانات غير مكتملة (المصدر والتصنيف إلزاميان) ❌', 'GOV-FAIL-409', ''); exit();
     }
     if (!in_array($priority, $priorities, true)) { $priority = 'عادي'; }
     if (!in_array($state, $states, true)) { $state = 'مسودة'; }
@@ -123,32 +123,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
         $g->replaceChildren('proc_request', $req_id, 'proc_request_line', 'request_id', $line_rows, 'request lines rewrite');
     } catch (\Throwable $e) {
         error_log('requests_proc save refused: ' . $e->getMessage());
-        header("Location: requests_proc.php?msg=تعذّر+الحفظ+❌"); exit();
+        ems_gov_flash_redirect('requests_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
-    header("Location: requests_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الطلب+بنجاح+✅' : 'تمت+إضافة+الطلب+بنجاح+✅')); exit();
+    ems_gov_redirect("Location: requests_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الطلب+بنجاح+✅' : 'تمت+إضافة+الطلب+بنجاح+✅')); exit();
 }
 
 // ── حذف ناعم (السطور تُحذف بالـ CASCADE عند الحذف الصلب، لكن هنا حذف ناعم للرأس فقط) ──
 // E-21 (UX-00 §4.3): **ثلاثيةُ القرار الموحّدة** على صندوق طلبات الشراء —
 // اعتمادٌ · إعادةٌ للاستكمال بسبب · رفضٌ بسبب (كانت الحالةُ قائمةً منسدلةً حرة)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_decide') {
-    if (!$can_edit) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $rid = intval($_POST['request_id'] ?? 0);
     $decision = strval($_POST['decision'] ?? '');
     $reason = trim((string)($_POST['reason'] ?? ''));
     $req = proc_gate(false)->selectOne('proc_request', array('where' => array('id' => $rid)));
     if (!$req || (string)$req['state'] !== 'مقدَّم') {
-        header("Location: requests_proc.php?msg=" . rawurlencode('القرارُ على «مقدَّم» وحدَه — الحالُ: ' . ($req['state'] ?? 'غير موجود') . ' ❌')); exit();
+        ems_gov_flash_redirect('requests_proc.php', 'القرارُ على «مقدَّم» وحدَه — الحالُ: ' . ($req['state'] ?? 'غير موجود') . ' ❌', 'GOV-REF-404', ''); exit();
     }
     // M-45: من أنشأ لا يعتمد — الحارسُ العام
     if ($decision === 'approve') {
         require_once __DIR__ . '/../includes/self_approval_guard.php';
         $blocked = ems_no_self_approval($conn, intval($req['created_by']), $current_user_id,
             'طلب الشراء ' . strval($req['code']), $company_id);
-        if ($blocked !== null) { header("Location: requests_proc.php?msg=" . rawurlencode($blocked['reason'] . ' ❌')); exit(); }
+        if ($blocked !== null) { ems_gov_flash_redirect('requests_proc.php', $blocked['reason'] . ' ❌', 'GOV-FAIL-409', ''); exit(); }
     }
     if (in_array($decision, array('return', 'reject'), true) && $reason === '') {
-        header("Location: requests_proc.php?msg=" . rawurlencode('الإعادةُ والرفضُ بسببٍ مكتوبٍ إلزامًا ❌')); exit();
+        ems_gov_flash_redirect('requests_proc.php', 'الإعادةُ والرفضُ بسببٍ مكتوبٍ إلزامًا ❌', 'GOV-FAIL-409', ''); exit();
     }
     $to = $decision === 'approve' ? 'اعتماد المشتريات'
         : ($decision === 'return' ? 'مسودة' : 'مرفوض');
@@ -159,18 +159,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
     ems_audit_change($conn, 'procurement', 'proc_request', 'e21_' . $decision, $rid,
         array('state' => 'مقدَّم'), array('state' => $to, 'reason' => $reason),
         array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
-    header("Location: requests_proc.php?msg=" . rawurlencode('قرارٌ بالثلاثية: ' . $to . ' ✅')); exit();
+    ems_gov_flash_redirect('requests_proc.php', 'قرارٌ بالثلاثية: ' . $to . ' ✅', 'GOV-OK-200', ''); exit();
 }
 
 if (isset($_GET['delete_id'])) {
-    if (!$can_delete) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    if (!$can_delete) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $delete_id = intval($_GET['delete_id']);
     try {
         proc_gate(false)->softDelete('proc_request', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('requests_proc softDelete refused: ' . $e->getMessage());
     }
-    header("Location: requests_proc.php?msg=تم+حذف+الطلب+بنجاح+✅"); exit();
+    ems_gov_flash_redirect('requests_proc.php', 'تم حذف الطلب بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── تحميل طلب للتعديل ──
@@ -186,6 +186,9 @@ if (isset($_GET['edit_id']) && $can_edit) {
 }
 
 $page_title = 'إيكوبيشن | طلبات الشراء';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

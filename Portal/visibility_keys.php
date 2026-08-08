@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Portal/visibility_keys.php — مفاتيحُ الظهور (H-16 · الشاشة 183)
  * ───────────────────────────────────────────────────────────────────────────
@@ -37,10 +38,10 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { header("Location: ../main/dashboard.php?msg=" . rawurlencode('لا صلاحيةَ عرضٍ لمفاتيح الظهور ❌')); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ لمفاتيح الظهور ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('visibility keys super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: visibility_keys.php?msg=" . rawurlencode($msg)); exit(); };
+$redirect = function ($msg) { ems_gov_flash_redirect('visibility_keys.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['vk_action'] ?? '') === 'set') {
     if (!$can_edit) { $redirect('لا صلاحيةَ ضبطٍ — المفاتيحُ لشؤون الموظفين ❌'); }
@@ -60,6 +61,9 @@ $elements = VPS::elements($conn);
 $keys = VPS::keys($gate, 500);
 
 $page_title = 'إيكوبيشن | مفاتيح الظهور';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

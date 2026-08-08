@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
  * Workforce/payroll_runs.php — مسيّرُ الرواتب: بوابةُ اللقطة (H-09-①)
  * ───────────────────────────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
@@ -58,7 +59,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+مسيّر+الرواتب+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مسيّر الرواتب ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -70,7 +71,7 @@ $STATE_LABELS = array('Open' => 'مفتوحة', 'Calculated' => 'محتسَبة'
                       'Review' => 'مراجعة', 'Approved' => 'معتمَدة', 'Paid' => 'مدفوعة', 'Closed' => 'مقفلة');
 
 $selected = intval($_GET['run_id'] ?? 0);
-$redirect = function ($msg, $rid) { header("Location: payroll_runs.php?run_id=" . intval($rid)
+$redirect = function ($msg, $rid) { ems_gov_redirect("Location: payroll_runs.php?run_id=" . intval($rid)
     . "&msg=" . rawurlencode($msg)); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -160,6 +161,9 @@ foreach ($lines as $l) {
 }
 
 $page_title = 'إيكوبيشن | مسيّر الرواتب';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }

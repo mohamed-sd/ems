@@ -25,26 +25,26 @@ $company_id      = $ctx['company_id'];
 $current_user_id = $ctx['user_id'];
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة للمستخدم ❌', 'GOV-SCOPE-403', '');
     exit();
 }
 
 $perms = fin_page_perms($conn, 'Finance/maintenance_provision_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+مخصّص+الصيانة+❌");
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مخصّص الصيانة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 // ── حفظ المعدّل (يُكتب على صفَّي metric_update: الدوام والوحدة) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
-    if (!$can_edit) { header("Location: maintenance_provision_fin.php?msg=لا+توجد+صلاحية+الضبط+❌"); exit(); }
+    if (!$can_edit) { ems_gov_flash_redirect('maintenance_provision_fin.php', 'لا توجد صلاحية الضبط ❌', 'GOV-PERM-403', ''); exit(); }
     $raw = trim($_POST['rate']);
     // الحقل الفارغ = تعطيل (لا مخصّص). قيمةٌ موجبة = تفعيل بالمعدّل.
     if ($raw === '') {
         $rate = 0.0;
     } elseif (!is_numeric($raw) || (float)$raw < 0) {
-        header("Location: maintenance_provision_fin.php?msg=المعدّل+يجب+أن+يكون+رقماً+غير+سالب+❌"); exit();
+        ems_gov_flash_redirect('maintenance_provision_fin.php', 'المعدّل يجب أن يكون رقماً غير سالب ❌', 'GOV-FAIL-409', ''); exit();
     } else {
         $rate = round((float)$raw, 4);
     }
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
     $msg = $rate > 0
         ? 'تم+ضبط+معدّل+مخصّص+الصيانة+وتفعيله+(' . rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.') . '/ساعة)+✅'
         : 'تم+إفراغ+المعدّل+—+مخصّص+الصيانة+معطّل+الآن+✅';
-    header("Location: maintenance_provision_fin.php?msg=$msg"); exit();
+    ems_gov_flash_redirect('maintenance_provision_fin.php', "$msg", 'GOV-INFO-200', ''); exit();
 }
 
 // المعدّل الحالي (من أول صف metric_update للشركة)
@@ -72,6 +72,9 @@ $cur_rate_display = $cur_rate > 0 ? rtrim(rtrim(number_format($cur_rate, 4, '.',
 $effects = fin_gate($is_super_admin)->select('fin_effect_map', array('orderBy' => 'source_kind ASC, display_order ASC'));
 
 $page_title = 'إيكوبيشن | قواعد مخصص الصيانة';
+// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
