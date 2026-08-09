@@ -181,6 +181,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <th>الحالة</th><th>المُنشئ — الاسم والصفة</th><th>تاريخ الإنشاء</th>
                 <th>مرجع التفويض</th><th>المرجع الأب</th><th>مفتاح منع التكرار</th>
                 <th>درجة الأثر</th><th>معكوس بـ</th><th>نسخة القاعدة</th>
+                <?php /* الأعمدةُ الحاكمةُ الخمسةُ التي يطلبها تصميمُ الشاشة (CMP-03) —
+                         كلُّها من أعمدةِ `fin_entitlements` نفسِها لا مُلفَّقة:
+                         company_id · fx_rate · cost_center_id · reverses_ref ·
+                         وjournal_ref مستندُ الإثباتِ المحاسبيِّ للمحضر. */ ?>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
+                <th class="ems-gov-th" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
+                <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+                <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             </tr></thead>
             <tbody>
             <?php foreach ($generated as $g): ?>
@@ -207,6 +216,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars($g['effect_grade']); ?></td>
                     <td><?php echo $g['reversed_by_ref'] !== '' ? htmlspecialchars($g['reversed_by_ref']) : '—'; ?></td>
                     <td style="font-size:.72rem"><?php echo htmlspecialchars($g['ruleset_version']); ?></td>
+                    <td><?php echo (int) $g['company_id']; ?></td>
+                    <td style="font-family:monospace"><?php echo $g['reverses_ref'] !== '' && $g['reverses_ref'] !== null
+                        ? htmlspecialchars((string) $g['reverses_ref']) : '—'; ?></td>
+                    <td><?php echo $g['fx_rate'] !== null ? number_format((float) $g['fx_rate'], 6) : '—'; ?></td>
+                    <td><?php echo $g['cost_center_id'] !== null ? (int) $g['cost_center_id'] : '—'; ?></td>
+                    <td style="font-family:monospace;font-size:.72rem"><?php echo $g['journal_ref'] !== '' && $g['journal_ref'] !== null
+                        ? htmlspecialchars((string) $g['journal_ref']) : '—'; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

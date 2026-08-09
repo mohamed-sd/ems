@@ -83,6 +83,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'where' => array('role_id' => intval($role_id), 'module_id' => intval($module_id))));
         } catch (\Throwable $t) { error_log('role_permissions.php existing: ' . $t->getMessage()); }
 
+        // ═══ update0013 · حارسُ سريانِ التكليف (CEO-Y0121) ═══════════════════
+        // «◆ ولا يسري تكليفُ شخصٍ على أيِّ مسمًّى قياديٍّ أو رقابيٍّ في المنصةِ
+        //   كلِّها قبلَ موافقةِ الرئيسِ الموثَّقة · **ولا يمنح التكليفُ صلاحيةً
+        //   واحدةً قبلها**.»
+        //
+        // فهنا موضعُ الحراسة: منحُ صلاحيةٍ لدورٍ قياديٍّ أو رقابيٍّ **بلا موافقةٍ
+        // ساريةٍ لحامله** يُنشئ سلطةً لم يقرَّها الرئيس. والفحصُ على حاملي الدورِ
+        // الفعليين — فالمنحةُ للدورِ لا للشخص، وسريانُها يُقاس بحامليه.
+        //
+        // ◆ `monitor` يُسجِّل و`enforce` يمنع — والانتقالُ قرارُ مالكٍ بعد استكمالِ
+        //   موافقاتِ التكليفِ للأدوارِ القائمة.
+        $__u13AsgMode = function_exists('ems_env') ? (string) ems_env('EMS_U13_ASSIGNMENT_GATE', 'monitor') : 'monitor';
+        if ($__u13AsgMode !== 'off' && intval($can_view) + intval($can_add) + intval($can_edit) + intval($can_delete) > 0) {
+            require_once __DIR__ . '/../app/Services/Exec/AssignmentGate.php';
+            $__kind = \App\Services\Exec\AssignmentGate::kindOfRole(intval($role_id));
+            if (in_array($__kind, \App\Services\Exec\AssignmentGate::NEEDS_APPROVAL, true)) {
+                $__co = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+                $__holders = array();
+                $__hq = $conn->prepare("SELECT id FROM users
+                                         WHERE company_id = ? AND (role_id = ? OR role = ?)
+                                           AND COALESCE(is_deleted,0) = 0 AND status = 'active'");
+                if ($__hq) {
+                    $__rs = (string) $role_id;
+                    $__rid = intval($role_id);
+                    $__hq->bind_param('iis', $__co, $__rid, $__rs);
+                    $__hq->execute();
+                    $__r = $__hq->get_result();
+                    while ($__x = $__r->fetch_assoc()) { $__holders[] = intval($__x['id']); }
+                    $__hq->close();
+                }
+                $__unapproved = array();
+                foreach ($__holders as $__uid) {
+                    $__eff = \App\Services\Exec\AssignmentGate::isEffective($conn, $__co, $__uid, $__rid);
+                    if (empty($__eff['ok'])) { $__unapproved[] = $__uid; }
+                }
+                if ($__unapproved) {
+                    $__msg = 'الدورُ ' . $__kind . ' وحاملوه بلا موافقةِ تكليفٍ سارية: #'
+                           . implode(' · #', array_slice($__unapproved, 0, 5));
+                    if (function_exists('log_security_event')) {
+                        log_security_event('U13_ASSIGNMENT_NOT_EFFECTIVE',
+                            'role=' . $__rid . ' module=' . intval($module_id) . ' — ' . $__msg . ' [' . $__u13AsgMode . ']');
+                    }
+                    if ($__u13AsgMode === 'enforce') {
+                        $error_msg = 'لا تُمنح صلاحية: تكليفٌ بلا موافقةِ الرئيسِ لا يمنح صلاحيةً واحدة (CEO-Y0121) — ' . $__msg;
+                    }
+                }
+            }
+        }
+
         // [مُستثنى موثَّق — كتابة RBAC مجمَّدة] role_permissions مرجعٌ عام جمَّد عقدُ البوابة
         // كتابته على المدير الأعلى حصرًا، والشاشة الحالية تتيحه لمديري الشركات (ثغرة UAT §15
         // المفتوحة). حفاظًا على السلوك حرفيًا تبقى كتابات هذه الشاشة الأربع خامًا بانتظار

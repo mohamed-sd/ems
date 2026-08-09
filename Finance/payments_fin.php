@@ -50,6 +50,33 @@ if (isset($_GET['execute_id'])) {
         if ($n > 0) { ems_gov_flash_redirect('payments_fin.php', "لا صرف: للمورد مستحقات غير مُسوّاة ($n) ❌", 'GOV-FAIL-409', ''); exit(); }
     }
 
+    // ═══ update0013 · حارسُ الاعتمادِ الرباعيِّ قبلَ التنفيذ ═══════════════════
+    // FACC-0044: «لا يُعتبر أيٌّ منها بديلًا عن الآخر» · وشاهدُ القبولِ في
+    // PROP-01 §٧-٢ ③: «**صفرُ طلبٍ يُنفَّذ باعتمادٍ واحدٍ من الأربعة**».
+    // وFACC-0043: «الخزينةُ تنفّذ ما اعتُمد ولا تعتمد ما تنفّذ» — فالتنفيذُ هنا
+    // (APR-4) لا يقع قبلَ اكتمالِ APR-1 و APR-2 و APR-3 على المستندِ نفسِه.
+    //
+    // ◆ fail-closed **بعلمٍ صريح**: الحارسُ يُنفَّذ حين `EMS_U13_APPROVAL_GATE=enforce`.
+    //   وفي `monitor` يُسجَّل النقصُ ولا يُوقف الصرف — فبوابةٌ تُغلق مسارَ دفعٍ
+    //   قائمًا بلا سلاسلَ مُدخَلةٍ بعدُ توقف العملَ لا تحرسه. والانتقالُ إلى
+    //   الإنفاذِ قرارُ مالكٍ بعد إدخالِ السلاسل.
+    $__u13Mode = function_exists('ems_env') ? (string) ems_env('EMS_U13_APPROVAL_GATE', 'monitor') : 'monitor';
+    if ($__u13Mode !== 'off') {
+        require_once __DIR__ . '/../app/Services/Finance/ApprovalGate.php';
+        $__chain = \App\Services\Finance\ApprovalGate::assertComplete(
+            $conn, intval($pay['company_id'] ?? $company_id), 'fin_payment', 'PAY-' . $pid);
+        if (empty($__chain['ok'])) {
+            if (function_exists('log_security_event')) {
+                log_security_event('U13_APPROVAL_CHAIN_INCOMPLETE',
+                    'PAY-' . $pid . ' — ' . (string) $__chain['reason'] . ' [' . $__u13Mode . ']');
+            }
+            if ($__u13Mode === 'enforce') {
+                ems_gov_flash_redirect('payments_fin.php',
+                    'لا تنفيذ: ' . (string) $__chain['reason'], 'GOV-FAIL-409', ''); exit();
+            }
+        }
+    }
+
     // التنفيذ + أثره ذرّيًا (§9): الدفع + (تسوية المورد أو تحديث الذمّة) معًا
     $gate->runInTransaction(function ($g) use ($pid, $current_user_id, $pay, $recv) {
         $g->update('fin_payments', array('state' => 'executed', 'paid_at' => date('Y-m-d H:i:s'), 'executed_by' => $current_user_id), array('id' => $pid));

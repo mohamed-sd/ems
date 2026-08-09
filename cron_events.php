@@ -122,6 +122,18 @@ $financeHandler = function (array $event, \mysqli $conn) {
 $maxRow = $conn->query('SELECT COALESCE(MAX(id), 0) FROM fin_financial_events')->fetch_row();
 $dispatcher->register('finance', $financeHandler, intval($maxRow[0]));
 
+// ═══ update0013 · مستهلكُ التوجيهِ المالي (OBL-0002) ═══════════════════════
+// «التوجيهُ يقع بحدثٍ منشورٍ لا بنداءٍ مباشرٍ — والإدارةُ المصدرُ تنشر والماليةُ
+// تستهلك.» فهنا موضعُ الاستهلاك: كلُّ واقعةٍ ماليةٍ منشورةٍ تُوجَّه إلى محاسبِ
+// تخصصِها وتظهر في مهامِّه (OBL-0003)، وما لا مسارَ خاصَّ له يلتقطه الحكمُ
+// الجامعُ RT-17. والعطالةُ في `fin_routing_log` بمفتاحِه الفريد.
+require_once __DIR__ . '/app/Services/Finance/RoutingConsumer.php';
+$dispatcher->register(
+    \App\Services\Finance\RoutingConsumer::NAME,
+    \App\Services\Finance\RoutingConsumer::handler(),
+    intval($maxRow[0])
+);
+
 $stats = $dispatcher->runOnce();
 foreach ($stats as $consumer => $s) {
     echo "[events-cron " . date('Y-m-d H:i:s') . "] {$consumer}: processed={$s['processed']} failed={$s['failed']} dead_lettered={$s['dead_lettered']} cursor={$s['cursor']}\n";

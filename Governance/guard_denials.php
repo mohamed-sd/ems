@@ -28,7 +28,7 @@ ems_shell_axes($__pp);
 
 /* ① المحاولاتُ الممنوعةُ من سجل الحارس المخصص (guard_denials) */
 $denials = array();
-$res = $conn->query("SELECT d.deny_id, d.guard_code, d.person_id, d.attempted_ref, d.reason_code, d.at,
+$res = $conn->query("SELECT d.deny_id, d.company_id, d.guard_code, d.person_id, d.attempted_ref, d.reason_code, d.at,
                             u.name person_name, r.review_code, r.classification, r.decision_note, r.created_at review_at
                        FROM guard_denials d
                        LEFT JOIN users u ON u.id = d.person_id
@@ -109,7 +109,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <thead><tr>
                 <th>#</th><th>رمز الحارس</th><th>المحاوِل</th><th>المرجع المحاوَل</th>
                 <th>رمز السبب</th><th>الوقت</th>
-                <th>المراجعة</th><th>التصنيف</th><th>قرار المراجعة</th><th>تاريخ المراجعة</th><th></th>
+                <th>المراجعة</th><th>التصنيف</th><th>قرار المراجعة</th><th>تاريخ المراجعة</th>
+                <?php /* الأعمدةُ الحاكمةُ التي يطلبها تصميمُ الشاشة (CMP-03) — بنمطِ السجلِّ
+                         المركزي `ems_gov_registry()`: الحالةُ مشتقةٌ من وجودِ المراجعة،
+                         والكيانُ من عمودِ العزلِ نفسِه لا من الجلسة. */ ?>
+                <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th></th>
             </tr></thead>
             <tbody>
             <?php foreach ($denials as $d): ?>
@@ -125,6 +131,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         ? '<span class="badge badge-info">' . htmlspecialchars($d['classification']) . '</span>' : '—'; ?></td>
                     <td style="font-size:.76rem"><?php echo htmlspecialchars((string) ($d['decision_note'] ?: '—')); ?></td>
                     <td><small><?php echo htmlspecialchars((string) ($d['review_at'] ?: '—')); ?></small></td>
+                    <td><?php echo empty($d['review_code'])
+                        ? '<span class="badge badge-warning">تنتظر المراجعة</span>'
+                        : '<span class="badge badge-success">مُراجَعة</span>'; ?></td>
+                    <td><?php echo (int) $d['company_id']; ?></td>
                     <td>
                         <?php if ($canReview && empty($d['review_code'])): ?>
                         <button class="ems-btn-primary" onclick="dnrReview(<?php echo (int) $d['deny_id']; ?>)">مراجعة</button>
