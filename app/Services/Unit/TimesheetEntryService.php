@@ -37,6 +37,8 @@
 
 namespace App\Services\Unit;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/CapacityGuard.php';
 require_once __DIR__ . '/DocumentGuard.php';
 require_once __DIR__ . '/../../Core/EventPublisher.php';
@@ -456,7 +458,7 @@ class TimesheetEntryService
                     \App\Services\Capacity\CapacityContextResolver::lockSnapshot($gate, $entryId);
                     \App\Services\Operations\ContainerGate::consumeForEntry($conn, $gate, $companyId, $fresh);
                 }
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الخصمُ أثرٌ تابعٌ لا شرطُ صحةٍ للاعتماد — يُسجَّل ولا يُسقطه');
                 // الخصمُ أثرٌ تابعٌ لا شرطُ صحةٍ للاعتماد — يُسجَّل ولا يُسقطه
                 error_log('capacity consume on chain completion #' . $entryId . ': ' . $t->getMessage());
             }
@@ -1072,7 +1074,7 @@ class TimesheetEntryService
                 'idempotency_key' => $eventKey . ':unit_entry:' . $entryId . ':r' . (isset($payload['round']) ? $payload['round'] : 1),
                 'payload' => $payload,
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الحدثُ إشهارٌ لا شرطُ صحة — فشلُه يُسجَّل ولا يُسقط العملية');
             // الحدثُ إشهارٌ لا شرطُ صحة — فشلُه يُسجَّل ولا يُسقط العملية
             error_log('TimesheetEntryService publish ' . $eventKey . ': ' . $t->getMessage());
         }

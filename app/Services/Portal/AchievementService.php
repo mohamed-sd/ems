@@ -17,6 +17,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class AchievementService
 {
     /**
@@ -40,7 +42,7 @@ class AchievementService
 
         $cap = null;
         try { $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $capacityId))); }
-        catch (\Throwable $t) { $cap = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
         if (!$cap) { $out['code'] = 404; $out['reason'] = 'الصفةُ غيرُ موجودةٍ في نطاقك'; return $out; }
 
         $accountId = (int) $cap['account_id'];
@@ -145,7 +147,7 @@ class AchievementService
                         'metrics_json' => $json, 'source_fingerprint' => $fp,
                     ));
                 }
-            } catch (\Throwable $e) { /* اللقطةُ اختيارية — والحسابُ صحيحٌ بذاته */ }
+            } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'اللقطةُ اختيارية — والحسابُ صحيحٌ بذاته'); /* اللقطةُ اختيارية — والحسابُ صحيحٌ بذاته */ }
         }
         return $out;
     }

@@ -19,6 +19,8 @@
 
 namespace App\Services\Payroll;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once dirname(__DIR__) . '/Contract/ContractSnapshotService.php';
 require_once dirname(__DIR__) . '/Contract/EmployeeContractStateMachine.php';
 
@@ -137,7 +139,7 @@ class PayrollRunService
         try {
             $conn->query("DELETE FROM payroll_lines WHERE run_id = " . $runId);
             $conn->query("DELETE FROM payroll_run_blocks WHERE run_id = " . $runId);
-        } catch (\Throwable $t) { /* لا يوقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا يوقف'); /* لا يوقف */ }
 
         $contracts = self::eligibleContracts($gate, $run);
         $persons = array(); $lines = 0; $blocked = 0; $excluded = 0;
@@ -225,7 +227,7 @@ class PayrollRunService
                 'blocked_count' => $blocked, 'state' => $state,
                 'version' => (int) $run['version'] + 1,
             ), array('id' => $runId));
-        } catch (\Throwable $t) { /* الأسطرُ كُتبت — الرأسُ يُحدَّث بأفضل جهد */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الأسطرُ كُتبت — الرأسُ يُحدَّث بأفضل جهد'); /* الأسطرُ كُتبت — الرأسُ يُحدَّث بأفضل جهد */ }
 
         self::audit($conn, $companyId, $actor, 'bind_snapshots', $runId,
             array('state' => $run['state']),
@@ -331,7 +333,7 @@ class PayrollRunService
             $rows = $gate->scopedQuery(array('scope' => array('l' => 'payroll_lines')),
                 "SELECT l.id, l.snapshot_id FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ?", array((int) $runId));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
         $out['lines'] = count($rows);
         $seen = array();
         foreach ($rows as $r) {
@@ -419,7 +421,7 @@ class PayrollRunService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
         if (!$s) { return null; }
         $p = json_decode((string) $s['snapshot_json'], true);
         return is_array($p) ? $p : null;
@@ -440,7 +442,7 @@ class PayrollRunService
                 'block_code' => (string) $code, 'block_http' => (int) $http,
                 'reason' => mb_substr((string) $reason, 0, 255),
             ));
-        } catch (\Throwable $t) { /* المفتاحُ الفريد يمنع التكرار */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'المفتاحُ الفريد يمنع التكرار'); /* المفتاحُ الفريد يمنع التكرار */ }
     }
 
     private static function audit($conn, $companyId, $actor, $action, $rowId, $before, $after)

@@ -14,6 +14,8 @@
 
 namespace App\Core;
 
+require_once __DIR__ . '/../../includes/catch_log.php';
+
 class OwnershipDomainGuard
 {
     const PERM_OWNER = 'ownership.owner_view';
@@ -140,7 +142,7 @@ class OwnershipDomainGuard
             $stmt->bind_param('ississ', $personId, $elementCode, $subjectType, $subjectId, $ip, $result);
             $stmt->execute();
             $stmt->close();
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, '[OwnershipDomainGuard] read-log failed');
             error_log('[OwnershipDomainGuard] read-log failed: ' . $t->getMessage());
         }
     }

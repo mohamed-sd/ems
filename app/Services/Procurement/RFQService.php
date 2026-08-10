@@ -23,6 +23,8 @@
 
 namespace App\Services\Procurement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class RFQService
 {
     /** الحالاتُ التي تُقبل فيها العروض. */
@@ -197,7 +199,7 @@ class RFQService
         try {
             $ex = $gate->selectOne('rfq_quotes', array(
                 'whereRaw' => 'line_id = ? AND supplier_id = ?', 'params' => array((int) $lineId, $supplierId)));
-        } catch (\Throwable $t) { $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
 
         try {
             if ($ex) {
@@ -246,7 +248,7 @@ class RFQService
                 "SELECT q.* FROM rfq_quotes q
                   WHERE {TENANT_SCOPE} AND q.rfq_id = ? AND q.supplier_id = ?
                   ORDER BY q.line_id", array((int) $rfqId, $asking));
-        } catch (\Throwable $t) { $out['rows'] = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $out[\'rows\'] = array()'); $out['rows'] = array(); }
         $out['ok'] = true; $out['code'] = 200;
         return $out;
     }
@@ -334,7 +336,7 @@ class RFQService
                         $quote = $g->selectOne('rfq_quotes', array(
                             'whereRaw' => 'line_id = ? AND supplier_id = ?',
                             'params' => array($lid, $sup)));
-                    } catch (\Throwable $t) { $quote = null; }
+                    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $quote'); $quote = null; }
                     if (!$quote) {
                         throw new \RuntimeException('لا عرضَ لهذا المورد في البند ' . $lid
                             . ' — **ولا تُرسى كميةٌ بلا عرضٍ مقدَّم**');
@@ -474,7 +476,7 @@ class RFQService
                   WHERE {TENANT_SCOPE} AND e.supplier_id = ? AND e.state = 'approved'
                   ORDER BY e.id DESC LIMIT 1", array((int) $supplierId));
             if ($r && $r[0]['score'] !== null) { return round((float) $r[0]['score'] / 20.0, 2); }
-        } catch (\Throwable $t) { /* لا تقييمَ مقروء */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا تقييمَ مقروء'); /* لا تقييمَ مقروء */ }
         return null;
     }
 
@@ -490,7 +492,7 @@ class RFQService
                 'created_by' => (int) $actor ?: 1, 'idempotency_key' => (string) $idem,
                 'payload' => $payload,
             ));
-        } catch (\Throwable $t) { error_log('H-21 fact ' . $key . ': ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'H-21 fact'); error_log('H-21 fact ' . $key . ': ' . $t->getMessage()); }
     }
 
     private static function audit($conn, $companyId, $actor, $action, $rowId, $before, $after)

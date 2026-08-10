@@ -19,6 +19,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/ContractStateMachine.php';
 
 class PriceAdjustmentService
@@ -47,7 +49,7 @@ class PriceAdjustmentService
 
         $contract = null;
         try { $contract = $gate->selectOne('contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { $contract = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $contract'); $contract = null; }
         if (!$contract) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجودٍ في نطاقك'; return $out; }
 
         $trigger = isset($args['trigger_kind']) ? trim((string) $args['trigger_kind']) : '';
@@ -90,7 +92,7 @@ class PriceAdjustmentService
         if ($itemId > 0) {
             $it = null;
             try { $it = $gate->selectOne('contractequipments', array('where' => array('id' => $itemId))); }
-            catch (\Throwable $t) { $it = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $it'); $it = null; }
             if (!$it || (int) $it['contract_id'] !== $contractId) {
                 $out['code'] = 422; $out['reason'] = 'بندُ التسعير لا ينتمي لهذا العقد'; return $out;
             }
@@ -101,7 +103,7 @@ class PriceAdjustmentService
         if ($termId > 0) {
             $cur = null;
             try { $cur = $gate->selectOne('contract_price_terms', array('where' => array('id' => $termId))); }
-            catch (\Throwable $t) { $cur = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cur'); $cur = null; }
             if (!$cur || (int) $cur['contract_id'] !== $contractId) {
                 $out['code'] = 404; $out['reason'] = 'الشرطُ غيرُ موجودٍ في هذا العقد'; return $out;
             }
@@ -111,7 +113,7 @@ class PriceAdjustmentService
                     "SELECT COUNT(*) n FROM contract_price_revisions r
                       WHERE {TENANT_SCOPE} AND r.term_id = ? AND r.approved_at IS NOT NULL", array($termId));
                 $used = $rows ? (int) $rows[0]['n'] : 0;
-            } catch (\Throwable $t) { $used = 0; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $used'); $used = 0; }
             if ($used > 0) {
                 $out['code'] = 423;
                 $out['reason'] = 'للشرط ' . $used . ' مراجعةً معتمَدةً حرّكت سعرًا — لا تُبدَّل معادلتُه بأثرٍ رجعي: '
@@ -376,7 +378,7 @@ class PriceAdjustmentService
                     "SELECT r.id FROM contract_price_revisions r
                       WHERE {TENANT_SCOPE} AND r.term_id = ? AND r.period_key = ? AND r.contract_item_id = ?",
                     array($p['term_id'], $p['period_key'], $p['contract_item_id']));
-            } catch (\Throwable $t) { $exists = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $exists'); $exists = array(); }
             if ($exists) {
                 $out['skipped']++;
                 $out['rows'][] = array('revision_id' => (int) $exists[0]['id'], 'outcome' => 'idempotent');
@@ -419,7 +421,7 @@ class PriceAdjustmentService
                     ));
                     return true;
                 }, 'M-09 price revision term#' . $p['term_id']);
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مراجعةُ سعرِ بندٍ واحدٍ فشلت — بقيةُ البنودِ تُراجَع، والفاشلُ يبقى بسعرِه القديم');
                 $out['ok'] = false;
                 $out['rows'][] = array('revision_id' => null, 'outcome' => 'error', 'reason' => $t->getMessage());
                 continue;
@@ -442,7 +444,7 @@ class PriceAdjustmentService
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $rev = null;
         try { $rev = $gate->selectOne('contract_price_revisions', array('where' => array('id' => (int) $revisionId))); }
-        catch (\Throwable $t) { $rev = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $rev'); $rev = null; }
         if (!$rev) { $out['code'] = 404; $out['reason'] = 'المراجعةُ غيرُ موجودةٍ في نطاقك'; return $out; }
         if ($rev['approved_at'] !== null) { $out['code'] = 422; $out['reason'] = 'معتمَدةٌ سلفًا'; return $out; }
         if (!in_array((string) $rev['outcome'], array('amended', 'capped'), true)) {

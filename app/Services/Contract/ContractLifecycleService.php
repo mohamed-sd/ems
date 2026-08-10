@@ -33,6 +33,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/PlanActualLinkService.php';
 
 class ContractLifecycleService
@@ -151,7 +153,7 @@ class ContractLifecycleService
         }
         $c = null;
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
 
         // ④ **ولا أثرَ رجعي** — والتاريخُ إلزامي

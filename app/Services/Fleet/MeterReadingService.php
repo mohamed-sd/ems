@@ -19,6 +19,8 @@
 
 namespace App\Services\Fleet;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class MeterReadingService
 {
     /** UX-10 §8 نصًّا — لا ثالثَ لهما. */
@@ -68,7 +70,7 @@ class MeterReadingService
         // المعدةُ من النطاق (البوابةُ ترفض الأجنبية)
         $eq = null;
         try { $eq = $gate->selectOne('equipments', array('columns' => array('id'), 'where' => array('id' => $equipmentId))); }
-        catch (\Throwable $t) { $eq = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $eq'); $eq = null; }
         if (!$eq) { $out['code'] = 422; $out['reason'] = 'المعدةُ غيرُ موجودةٍ في نطاقك'; return $out; }
 
         // «409 قراءةُ اليوم قائمة» — بمرجعها لا برفضٍ أصمّ
@@ -175,7 +177,7 @@ class MeterReadingService
 
         $eq = null;
         try { $eq = $gate->selectOne('equipments', array('columns' => array('id'), 'where' => array('id' => $equipmentId))); }
-        catch (\Throwable $t) { $eq = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $eq'); $eq = null; }
         if (!$eq) { $out['code'] = 422; $out['reason'] = 'المعدةُ غيرُ موجودةٍ في نطاقك'; return $out; }
 
         $same = self::readingOn($gate, $equipmentId, $type, $date);
@@ -249,7 +251,7 @@ class MeterReadingService
             $eq = $gate->selectOne('equipments', array(
                 'columns' => array('id', 'opening_meter', 'operating_hours'),
                 'where' => array('id' => $equipmentId)));
-        } catch (\Throwable $t) { $eq = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $eq'); $eq = null; }
 
         if ($eq && $eq['opening_meter'] !== null && (float) $eq['opening_meter'] > 0) {
             return array('value' => (float) $eq['opening_meter'], 'source' => 'opening',

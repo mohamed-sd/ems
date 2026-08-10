@@ -19,6 +19,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/ContractStateMachine.php';
 
 class SupplierContractService
@@ -82,14 +84,14 @@ class SupplierContractService
         // الموردُ من النطاق
         $sup = null;
         try { $sup = $gate->selectOne('suppliers', array('columns' => array('id'), 'where' => array('id' => $supplierId))); }
-        catch (\Throwable $t) { $sup = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $sup'); $sup = null; }
         if (!$sup) { $out['code'] = 422; $out['reason'] = 'الموردُ غيرُ موجودٍ في نطاقك'; return $out; }
 
         // وصلةُ L1 — عقدُ العميل الذي تُقتطع منه الحصة
         if ($clientRef !== null) {
             $cc = null;
             try { $cc = $gate->selectOne('contracts', array('columns' => array('id'), 'where' => array('id' => $clientRef))); }
-            catch (\Throwable $t) { $cc = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cc'); $cc = null; }
             if (!$cc) { $out['code'] = 422; $out['reason'] = 'عقدُ العميل (L1) غيرُ موجودٍ في نطاقك'; return $out; }
         }
 
@@ -383,7 +385,7 @@ class SupplierContractService
         }
         $cur = null;
         try { $cur = $gate->selectOne('supplier_contract_lines', array('where' => array('id' => (int) $lineId))); }
-        catch (\Throwable $t) { $cur = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cur'); $cur = null; }
         if (!$cur || (int) $cur['contract_id'] !== (int) $contractId) {
             $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في هذا العقد'; return $out;
         }

@@ -21,6 +21,8 @@
 
 namespace App\Services\Finance;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class BankReconService
 {
     /** نافذةُ التسامح في التاريخ للمضاهاة بالمبلغ (§19: «التاريخ ± أيامٍ»). */
@@ -70,7 +72,7 @@ class BankReconService
             $stmt = $gate->selectOne('bank_statements', array(
                 'whereRaw' => 'bank_account_id = ? AND statement_ref = ?',
                 'params' => array($acc, $ref)));
-        } catch (\Throwable $t) { $stmt = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $stmt'); $stmt = null; }
 
         if ($stmt && (string) $stmt['state'] === 'closed') {
             $out['code'] = 423; $out['statement_id'] = (int) $stmt['id'];
@@ -105,7 +107,7 @@ class BankReconService
                 "SELECT COALESCE(MAX(l.line_no),0) AS m FROM bank_statement_lines l
                   WHERE {TENANT_SCOPE} AND l.statement_id = ?", array($sid));
             $no = $mx ? (int) $mx[0]['m'] : 0;
-        } catch (\Throwable $t) { $no = 0; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $no'); $no = 0; }
 
         foreach ($lines as $l) {
             $no++;
@@ -137,7 +139,7 @@ class BankReconService
                     'match_state' => 'unmatched',
                 ));
                 $out['inserted']++;
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UQ على `line_key` — «الملفُّ نفسُه يُستورد مرارًا بصفر سطرٍ مكرر»');
                 // UQ على `line_key` — «الملفُّ نفسُه يُستورد مرارًا بصفر سطرٍ مكرر»
                 $out['skipped']++;
             }
@@ -146,7 +148,7 @@ class BankReconService
         try {
             $n = $gate->count('bank_statement_lines', array('where' => array('statement_id' => $sid)));
             $gate->update('bank_statements', array('lines_count' => (int) $n), array('id' => $sid));
-        } catch (\Throwable $t) { /* عدّادٌ لا يوقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'عدّادٌ لا يوقف'); /* عدّادٌ لا يوقف */ }
 
         self::audit($conn, $companyId, $actor, 'import', $sid, array(),
             array('inserted' => $out['inserted'], 'skipped' => $out['skipped'],
@@ -181,7 +183,7 @@ class BankReconService
                 "SELECT l.* FROM bank_statement_lines l
                   WHERE {TENANT_SCOPE} AND l.statement_id = ? AND l.match_state = 'unmatched'
                   ORDER BY l.line_no", array((int) $statementId));
-        } catch (\Throwable $t) { $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
 
         foreach ($lines as $l) {
             $cand = self::findCounterpart($gate, $l);
@@ -202,7 +204,7 @@ class BankReconService
         }
 
         try { $gate->update('bank_statements', array('state' => 'matching'), array('id' => (int) $statementId)); }
-        catch (\Throwable $t) { /* لا يوقف */ }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا يوقف'); /* لا يوقف */ }
 
         self::audit($conn, $companyId, $actor, 'auto_match', (int) $statementId, array(),
             array('matched' => $out['matched'], 'differences' => $out['differences'], 'none' => $out['none']));
@@ -365,7 +367,7 @@ class BankReconService
                    LEFT JOIN bank_statement_lines l ON l.id = m.statement_line_id
                   WHERE {TENANT_SCOPE} AND l.statement_id = ? AND m.state = 'open_difference'
                   ORDER BY l.line_no", array((int) $statementId));
-        } catch (\Throwable $t) { $open = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $open'); $open = array(); }
 
         // «كشفٌ نصفُ مضاهًى ليس مقفلًا»: كلُّ سطرٍ غيرِ `matched` مانعٌ —
         // غيرُ المضاهى · وذو الفرق الذي لم يُبتّ · وبلا النظير.
@@ -376,7 +378,7 @@ class BankReconService
                   WHERE {TENANT_SCOPE} AND l.statement_id = ? AND l.match_state <> 'matched'",
                 array((int) $statementId));
             $pending = $u ? (int) $u[0]['n'] : 0;
-        } catch (\Throwable $t) { $pending = 0; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $pending'); $pending = 0; }
 
         if ($open || $pending > 0) {
             $out['code'] = 423; $out['open'] = $open;
@@ -432,7 +434,7 @@ class BankReconService
                   WHERE {TENANT_SCOPE} AND l2.statement_id = ? AND m.state = 'open_difference'",
                 array((int) $statementId));
             $out['open_diff'] = $d ? (int) $d[0]['n'] : 0;
-        } catch (\Throwable $t) { /* قراءةٌ لا توقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ لا توقف'); /* قراءةٌ لا توقف */ }
         if ($out['lines'] > 0) { $out['rate'] = round($out['matched'] * 100.0 / $out['lines'], 2); }
         return $out;
     }
@@ -502,7 +504,7 @@ class BankReconService
                 $taken = $gate->selectOne('bank_recon_matches', array(
                     'whereRaw' => 'payment_id = ? AND state <> ?',
                     'params' => array((int) $r['id'], 'rejected')));
-            } catch (\Throwable $t) { $taken = null; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $taken'); $taken = null; }
             if (!$taken) { return $r; }
         }
         return null;
@@ -538,7 +540,7 @@ class BankReconService
         try {
             $gate->update('bank_statement_lines', array('match_state' => $lineState),
                 array('id' => (int) $line['id']));
-        } catch (\Throwable $t) { /* لا يوقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا يوقف'); /* لا يوقف */ }
         return true;
     }
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * مساعد التحقق من الصلاحيات - Permission Check Helper
  * استخدم هذه الدوال في صفحاتك للتحقق من صلاحيات المستخدم
@@ -826,7 +827,7 @@ function ems_log_auditor_access($conn, $relative_script) {
             'scope_ref'  => $rel,
             'purpose'    => 'اطّلاعٌ رقابيٌّ ضمنَ مهامِّ المراجعةِ الداخلية',
         ));
-    } catch (\Throwable $e) {
+    } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'ems_log_auditor_access');
         error_log('ems_log_auditor_access: ' . $e->getMessage());
     }
 }
@@ -989,7 +990,7 @@ function ems_log_permission_denial($reason = 'unresolved_module') {
         if (@file_put_contents($dir . '/permission_denials.log', '[' . date('c') . "] {$line}\n", FILE_APPEND | LOCK_EX) === false) {
             error_log('EMS permission denial log write failed: ' . $line);
         }
-    } catch (\Throwable $e) {
+    } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'EMS permission denial log error');
         error_log('EMS permission denial log error: ' . $e->getMessage() . ' | ' . $line);
     }
 }

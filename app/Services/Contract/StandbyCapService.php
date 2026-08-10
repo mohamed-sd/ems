@@ -17,6 +17,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 use App\Services\ActivityLogService;
 
 class StandbyCapService
@@ -149,7 +151,7 @@ class StandbyCapService
                 'record_id'   => isset($ctx['record_id']) ? (int) $ctx['record_id'] : null,
                 'new_value'   => array('side' => $side, 'code' => 422, 'reason' => $out['reason']),
             ));
-        } catch (\Throwable $t) { /* التسجيلُ لا يُسقط الحكم */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التسجيلُ لا يُسقط الحكم'); /* التسجيلُ لا يُسقط الحكم */ }
         return $out;
     }
 }

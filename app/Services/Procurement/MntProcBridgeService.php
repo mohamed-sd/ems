@@ -16,6 +16,8 @@
 
 namespace App\Services\Procurement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class MntProcBridgeService
 {
     /** حالاتُ أمر الصيانة المفتوحة (قائمةُ سماحٍ — بذورُ الحالات الفاسدة خارجها تلقائيًا). */
@@ -113,7 +115,7 @@ class MntProcBridgeService
                         }
                     }, 'mnt bridge request ' . $ref);
                     $plan['request_id'] = $reqId;
-                } catch (\Throwable $t) {
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'جسرُ الصيانةِ إلى المشترياتِ فشل — أمرُ الصيانةِ قائمٌ والطلبُ يُنشأ يدويًّا');
                     $out['skipped'][] = array('mnt' => (string) $mo['code'],
                         'reason' => 'تعذّر التوليد: ' . $t->getMessage());
                     continue;

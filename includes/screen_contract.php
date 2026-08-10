@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * includes/screen_contract.php — عقدُ الشاشة الموحّد (M-44)
  * ───────────────────────────────────────────────────────────────────────────
@@ -90,7 +91,7 @@ if (!function_exists('ems_screen_about')) {
                             ems_screen_about((string) $row['description'], array(), '', array('src' => 'registry'));
                         }
                     }
-                } catch (\Throwable $t) { /* السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة */ }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة'); /* السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة */ }
             }
         }
 
@@ -231,7 +232,7 @@ if (!function_exists('ems_screen_about_auto')) {
                     if ($name === '') { $name = trim((string) $d['title_ar']); }
                 }
                 $st->close();
-            } catch (\Throwable $t) { /* التعريفُ إرشادٌ — لا يُسقط الشاشة */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعريفُ إرشادٌ — لا يُسقط الشاشة'); /* التعريفُ إرشادٌ — لا يُسقط الشاشة */ }
 
             if ($name === '') { $name = basename($rel, '.php'); }
             $text = 'شاشة «' . $name . '»' . ($dept !== '' ? ' — ضمن نطاق ' . $dept : '') . '.';

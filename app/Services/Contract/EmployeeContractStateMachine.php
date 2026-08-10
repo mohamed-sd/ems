@@ -22,6 +22,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class EmployeeContractStateMachine
 {
     const DRAFT      = 'draft';
@@ -319,7 +321,7 @@ class EmployeeContractStateMachine
             require_once __DIR__ . '/ContractSnapshotService.php';
             ContractSnapshotService::invalidateFrom($conn, $gate, $companyId, $contractId,
                 date('Y-m-d'), $reason, $actor);
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'EmployeeContractStateMachine invalidateSnapshots #');
             error_log('EmployeeContractStateMachine invalidateSnapshots #' . $contractId . ': ' . $t->getMessage());
         }
     }
@@ -378,7 +380,7 @@ class EmployeeContractStateMachine
                     'readable' => self::isReadable($to),
                 ),
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'EmployeeContractStateMachine emit #');
             error_log('EmployeeContractStateMachine emit #' . $contractId . ': ' . $t->getMessage());
         }
     }

@@ -49,6 +49,8 @@
 
 namespace App\Core;
 
+require_once __DIR__ . '/../../includes/catch_log.php';
+
 require_once __DIR__ . '/ServerId.php';
 require_once __DIR__ . '/EventValidationException.php';
 
@@ -293,7 +295,7 @@ class EventPublisher
                         $h->execute();
                         $h->close();
                         $preRow['root_event_id'] = $healRoot;
-                    } catch (\Throwable $t) {
+                    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'EventPublisher pre-dup heal');
                         error_log('EventPublisher pre-dup heal: ' . $t->getMessage());
                     }
                 }

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 04:30:17
+-- المصدر: equipation_manage · التوليد: 2026-08-10 07:56:02
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -4066,7 +4066,8 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (3931,'الرقابة والإشراف','n9o_fin3_r33',33,'fa fa-circle-dot',40,3,'ثالثًا: الإشراف والجودة والحدود',1),
 (3932,'الالتزامات والاستحقاق','n9o_fin4_r33',33,'fa fa-circle-dot',50,4,'رابعًا: سجل الالتزامات',1),
 (3933,'الخزينة والسلطة','n9o_fin5_r33',33,'fa fa-circle-dot',60,5,'خامسًا: السقوف وفصل الواجبات',1),
-(3934,'تقارير الجهة المشرفة','n9o_fin7_r33',33,'fa fa-circle-dot',80,7,'سابعًا: التقارير للجهة المشرفة',1);
+(3934,'تقارير الجهة المشرفة','n9o_fin7_r33',33,'fa fa-circle-dot',80,7,'سابعًا: التقارير للجهة المشرفة',1),
+(3935,'أخرى — للمراجعة','n9s99_others_r9',9,'fa fa-box-archive',9900,99,'خارج الوثيقة — بانتظار قرار المالك',1);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -5585,20 +5586,20 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6890,1,'RISK',2084,339,'مخاطرُ الميدان','Risk/risk_field.php','fa fa-triangle-exclamation',95,NULL,'Risk/risk_field.php',1,'2026-08-08 21:45:17','2026-08-08 21:45:17'),
 (6891,6,'RISK',2088,339,'مخاطرُ الميدان','Risk/risk_field.php','fa fa-triangle-exclamation',95,NULL,'Risk/risk_field.php',1,'2026-08-08 21:45:17','2026-08-08 21:45:17'),
 (6892,24,'RISK',2104,339,'مخاطرُ الميدان','Risk/risk_field.php','fa fa-triangle-exclamation',95,NULL,'Risk/risk_field.php',1,'2026-08-08 21:45:17','2026-08-08 21:45:17'),
-(6893,17,'main',NULL,357,'سجل الالتزامات','Finance/ob_register.php','fa fa-file-contract',100,NULL,'Finance/ob_register.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6894,17,'main',NULL,358,'جدول الاستحقاقات','Finance/ob_schedule.php','fa fa-calendar-days',101,NULL,'Finance/ob_schedule.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6895,17,'main',NULL,359,'المستحق قريبًا والتذكيرات','Finance/ob_due_soon.php','fa fa-bell',102,NULL,'Finance/ob_due_soon.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6896,17,'main',NULL,360,'الالتزامات المتأخرة والذمم الدائنة','Finance/ob_overdue.php','fa fa-triangle-exclamation',103,NULL,'Finance/ob_overdue.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6897,17,'main',NULL,361,'آفاق الالتزامات الثلاثة','Finance/ob_horizon.php','fa fa-timeline',104,NULL,'Finance/ob_horizon.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6898,17,'main',NULL,362,'الملتزَم به وأثره في الموازنة','Finance/ob_commitments.php','fa fa-scale-balanced',105,NULL,'Finance/ob_commitments.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6899,17,'main',NULL,363,'الالتزامات المحتملة والإفصاح','Finance/ob_contingent.php','fa fa-file-shield',106,NULL,'Finance/ob_contingent.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6900,9,'main',NULL,364,'تقارير المراجعة الداخلية','Portal/ceo_audit_reports.php','fa fa-file-shield',6,NULL,'Portal/ceo_audit_reports.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6901,9,'main',NULL,365,'موافقات التكليف','Portal/ceo_assignments.php','fa fa-user-shield',7,NULL,'Portal/ceo_assignments.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6902,18,'main',NULL,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-list-check',81,NULL,'Finance/acc_my_day.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6905,18,'main',NULL,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-reply-all',82,NULL,'Finance/acc_backflow.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6906,18,'main',NULL,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-list-ol',83,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 02:14:26','2026-08-10 04:10:14'),
-(6930,21,'main',NULL,394,'مراحل دورتي الدفع والقبض','Finance/tre_cycle_stages.php','fa fa-diagram-successor',81,NULL,'Finance/tre_cycle_stages.php',1,'2026-08-09 03:13:59','2026-08-10 04:10:14'),
-(6931,21,'main',NULL,395,'الأدوار الثمانية داخل وحدة الخزينة','Finance/tre_unit_roles.php','fa fa-user-group',82,NULL,'Finance/tre_unit_roles.php',1,'2026-08-09 03:13:59','2026-08-10 04:10:14'),
+(6893,17,'DAILY',2097,357,'سجل الالتزامات','Finance/ob_register.php','fa fa-file-contract',100,NULL,'Finance/ob_register.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6894,17,'DAILY',2097,358,'جدول الاستحقاقات','Finance/ob_schedule.php','fa fa-calendar-days',101,NULL,'Finance/ob_schedule.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6895,17,'DAILY',2097,359,'المستحق قريبًا والتذكيرات','Finance/ob_due_soon.php','fa fa-bell',102,NULL,'Finance/ob_due_soon.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6896,17,'DAILY',2097,360,'الالتزامات المتأخرة والذمم الدائنة','Finance/ob_overdue.php','fa fa-triangle-exclamation',103,NULL,'Finance/ob_overdue.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6897,17,'DAILY',2097,361,'آفاق الالتزامات الثلاثة','Finance/ob_horizon.php','fa fa-timeline',104,NULL,'Finance/ob_horizon.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6898,17,'DAILY',2097,362,'الملتزَم به وأثره في الموازنة','Finance/ob_commitments.php','fa fa-scale-balanced',105,NULL,'Finance/ob_commitments.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6899,17,'DAILY',2097,363,'الالتزامات المحتملة والإفصاح','Finance/ob_contingent.php','fa fa-file-shield',106,NULL,'Finance/ob_contingent.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6900,9,'DAILY',3935,364,'تقارير المراجعة الداخلية','Portal/ceo_audit_reports.php','fa fa-file-shield',6,NULL,'Portal/ceo_audit_reports.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6901,9,'DAILY',3935,365,'موافقات التكليف','Portal/ceo_assignments.php','fa fa-user-shield',7,NULL,'Portal/ceo_assignments.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6902,18,'DAILY',2098,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-list-check',81,NULL,'Finance/acc_my_day.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6905,18,'DAILY',2098,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-reply-all',82,NULL,'Finance/acc_backflow.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6906,18,'DAILY',2098,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-list-ol',83,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6930,21,'DAILY',2101,394,'مراحل دورتي الدفع والقبض','Finance/tre_cycle_stages.php','fa fa-diagram-successor',81,NULL,'Finance/tre_cycle_stages.php',1,'2026-08-09 03:13:59','2026-08-10 07:23:40'),
+(6931,21,'DAILY',2101,395,'الأدوار الثمانية داخل وحدة الخزينة','Finance/tre_unit_roles.php','fa fa-user-group',82,NULL,'Finance/tre_unit_roles.php',1,'2026-08-09 03:13:59','2026-08-10 07:23:40'),
 (6934,9,'REC',3905,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',10,NULL,'main/project_users.php',1,'2026-08-09 18:14:57','2026-08-09 18:14:57'),
 (6935,12,'REC',3906,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',10,NULL,'main/project_users.php',1,'2026-08-09 18:14:57','2026-08-09 18:14:57'),
 (6936,13,'REC',3907,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',10,NULL,'main/project_users.php',1,'2026-08-09 18:14:57','2026-08-09 18:14:57'),
@@ -5672,7 +5673,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7004,33,'GOV',3929,384,'ردود الإدارات على الملاحظات','Audit/iaf_responses.php','fa fa-circle-dot',14,NULL,'Audit/iaf_responses.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7005,33,'GOV',3929,379,'الكون الرقابي','Audit/iaf_universe.php','fa fa-circle-dot',15,NULL,'Audit/iaf_universe.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7006,33,'GOV',3929,382,'أوراق العمل والأدلة','Audit/iaf_workpapers.php','fa fa-circle-dot',16,NULL,'Audit/iaf_workpapers.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
-(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-10 04:14:31'),
+(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-10 07:55:19'),
 (7008,33,'DAILY',3930,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-circle-dot',2,NULL,'Finance/acc_backflow.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7009,33,'DAILY',3930,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-circle-dot',3,NULL,'Finance/acc_my_day.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7010,33,'DAILY',3930,368,'مصفوفة التوجيه لمحاسبي التخصصات','Finance/acc_routing_matrix.php','fa fa-circle-dot',4,NULL,'Finance/acc_routing_matrix.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * عُدّةُ شاشاتِ update0013 — u13_screen_kit
  * ═══════════════════════════════════════════════════════════════════════════
@@ -194,7 +195,7 @@ if ($u13Actions && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['u13_ac
             if (function_exists('log_security_event')) {
                 log_security_event('U13_ACTION', $code . ' — ' . mb_substr($u13Msg, 0, 160));
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'نصُّ الاستثناءِ يُعرض للمستخدمِ في رسالةِ الشاشةِ — فالفشلُ ظاهرٌ لا مبتلَع');
             $u13Msg = '✗ ' . $e->getMessage();
         }
     }

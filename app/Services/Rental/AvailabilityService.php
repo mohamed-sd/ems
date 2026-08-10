@@ -18,6 +18,8 @@
 
 namespace App\Services\Rental;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class AvailabilityService
 {
     /** نهايةٌ مفتوحة — تُعامَل أقصى تاريخ. */
@@ -58,7 +60,7 @@ class AvailabilityService
                   ORDER BY o.start",
                 array($equipmentId, $to, self::OPEN_END, $from)
             );
-        } catch (\Throwable $t) { error_log('AvailabilityService ops: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'AvailabilityService ops'); error_log('AvailabilityService ops: ' . $t->getMessage()); }
 
         // ② حجوزاتٌ متقاطعة
         $ignore = (int) $ignoreReservationId;
@@ -78,7 +80,7 @@ class AvailabilityService
                   ORDER BY r.start_date",
                 array($equipmentId, $ignore, $to, $from)
             );
-        } catch (\Throwable $t) { error_log('AvailabilityService res: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'AvailabilityService res'); error_log('AvailabilityService res: ' . $t->getMessage()); }
 
         return $out;
     }
@@ -179,7 +181,7 @@ class AvailabilityService
                 $tail = substr((string) $rows[0]['reservation_no'], strlen($prefix));
                 $n = (int) $tail;
             }
-        } catch (\Throwable $t) { error_log('AvailabilityService no: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'AvailabilityService no'); error_log('AvailabilityService no: ' . $t->getMessage()); }
         return $prefix . str_pad((string) ($n + 1), 4, '0', STR_PAD_LEFT);
     }
 

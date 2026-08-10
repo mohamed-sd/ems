@@ -16,6 +16,8 @@
 
 namespace App\Services\Operations;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class RotationSwapService
 {
     const SWAPPABLE_LEVELS = array('معدة', 'مشغّل');
@@ -43,7 +45,7 @@ class RotationSwapService
 
         $c = null;
         try { $c = $gate->selectOne('op_containers', array('where' => array('id' => $containerId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { $out['code'] = 404; $out['reason'] = 'الحاويةُ غير موجودةٍ في نطاقك'; return $out; }
         $level = (string) $c['level'];
         if (!in_array($level, self::SWAPPABLE_LEVELS, true)) {
@@ -63,7 +65,7 @@ class RotationSwapService
         $refTable = $level === 'معدة' ? 'equipments' : 'employees';
         $refRow = null;
         try { $refRow = $gate->selectOne($refTable, array('columns' => array('id'), 'where' => array('id' => $inRef))); }
-        catch (\Throwable $t) { $refRow = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $refRow'); $refRow = null; }
         if (!$refRow) { $out['code'] = 422; $out['reason'] = 'الحائزُ الداخل غيرُ موجودٍ في نطاقك'; return $out; }
 
         // المتبقي = الرصيدُ الحي — «لا تُفقد وحدةٌ ولا تُحتسب مرتين»
@@ -85,7 +87,7 @@ class RotationSwapService
                  ORDER BY o.id LIMIT 1",
                 array((int) $c['parent_id'], $level, $inRef));
             $sibling = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { $sibling = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $sibling'); $sibling = null; }
 
         $toId = null; $swapId = null;
         try {
@@ -192,7 +194,7 @@ class RotationSwapService
                  WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.level = 'معدة'
                    AND c.state = 'نشطة' AND COALESCE(c.is_deleted,0)=0
                  ORDER BY c.id", array($projectId));
-        } catch (\Throwable $t) { $eqs = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $eqs'); $eqs = array(); }
 
         foreach ($eqs as $eq) {
             $eqId = (int) $eq['id'];
@@ -209,7 +211,7 @@ class RotationSwapService
                      WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
                        AND o.state = 'نشطة' AND COALESCE(o.is_deleted,0)=0
                      ORDER BY o.id", array($eqId));
-            } catch (\Throwable $t) { $actives = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $actives'); $actives = array(); }
             if (count($actives) !== 1) {
                 if (count($actives) > 1) {
                     $out['skipped'][] = 'معدة#' . $eqId . ': ' . count($actives)
@@ -258,7 +260,7 @@ class RotationSwapService
                  WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
                    AND o.state <> 'مقفلة' AND COALESCE(o.is_deleted,0)=0
                  ORDER BY o.id", array((int) $equipmentContainerId));
-        } catch (\Throwable $t) { $ops = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $ops'); $ops = array(); }
 
         foreach ($ops as $o) {
             $rot = null;
@@ -266,7 +268,7 @@ class RotationSwapService
                 $rot = $gate->selectOne('operator_rotations', array(
                     'whereRaw' => "container_id = ? AND (valid_to IS NULL OR valid_to >= ?)",
                     'params' => array((int) $o['id'], (string) $date)));
-            } catch (\Throwable $t) { $rot = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $rot'); $rot = null; }
 
             $duty = true; $why = 'بلا دورةٍ — مناوبٌ دائمًا (الغيابُ لا يُخترع له نمط)';
             if ($rot) {

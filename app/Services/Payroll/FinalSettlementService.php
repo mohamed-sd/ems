@@ -22,6 +22,8 @@
 
 namespace App\Services\Payroll;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once dirname(__DIR__) . '/Contract/ContractSnapshotService.php';
 
 use App\Services\Contract\ContractSnapshotService;
@@ -459,7 +461,7 @@ class FinalSettlementService
                   WHERE {TENANT_SCOPE} AND a.person_id = ? AND COALESCE(a.is_deleted,0)=0
                     AND a.state IN ('active','approved') AND a.recovered < a.amount
                   ORDER BY a.issued_date, a.id", array((int) $employeeId));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
 
         $done = 0.0;
         foreach ($rows as $a) {
@@ -513,7 +515,7 @@ class FinalSettlementService
                     'fingerprint'      => (string) $s['snapshot_fingerprint'],
                 ),
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'M-22 finalizedFact #');
             error_log('M-22 finalizedFact #' . (int) $s['id'] . ': ' . $t->getMessage());
         }
     }

@@ -30,6 +30,8 @@
 
 namespace App\Services\Finance;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class FxSettlementService
 {
     const DIFF_KINDS = array('unpaid_balance', 'realized', 'unrealized', 'overpayment');
@@ -64,7 +66,7 @@ class FxSettlementService
         try {
             $c = $gate->selectOne('contracts', array('where' => array('id' => (int) $contractId)));
             if ($c) { $contract = (string) ems_fx_code($c['price_currency_contract']); }
-        } catch (\Throwable $t) { $contract = ''; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ \'\' — $contract'); $contract = ''; }
         if ($contract === '') { $contract = $functional; }
         $set = ($settlement !== null && trim((string) $settlement) !== '')
                ? (string) ems_fx_code($settlement) : null;
@@ -207,7 +209,7 @@ class FxSettlementService
                    FROM fin_receivables r
                   WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding > 0
                   ORDER BY r.id");
-        } catch (\Throwable $t) { $open = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $open'); $open = array(); }
 
         foreach ($open as $r) {
             $cur = (string) $r['currency'];
@@ -262,7 +264,7 @@ class FxSettlementService
                   WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding > 0" . $w . "
                   GROUP BY r.currency", $p);
             foreach ($rows as $x) { $o['unpaid'][(string) $x['currency']] = round((float) $x['s'], 2); }
-        } catch (\Throwable $t) { /* لا ذمّةَ = فراغ */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا ذمّةَ = فراغ'); /* لا ذمّةَ = فراغ */ }
 
         // ②③ الفرقان المخزَّنان
         try {
@@ -272,7 +274,7 @@ class FxSettlementService
                 "SELECT d.kind, ROUND(SUM(d.amount),2) AS s FROM fin_fx_differences d
                   WHERE {TENANT_SCOPE}" . $w . " GROUP BY d.kind", $p);
             foreach ($rows as $x) { $o[(string) $x['kind']] = round((float) $x['s'], 2); }
-        } catch (\Throwable $t) { /* لا فرق = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا فرق = صفر'); /* لا فرق = صفر */ }
 
         // ④ زيادةُ السداد — **من عمود P-07 لا من حسابٍ ثانٍ**
         try {
@@ -283,7 +285,7 @@ class FxSettlementService
                   WHERE {TENANT_SCOPE} AND p.direction = 'collection'
                     AND COALESCE(p.is_deleted,0)=0 AND p.unallocated_amount > 0" . $w, $p);
             $o['overpayment'] = $rows ? round((float) $rows[0]['s'], 2) : 0.0;
-        } catch (\Throwable $t) { $o['overpayment'] = 0.0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $o[\'overpayment\'] = 0.0'); $o['overpayment'] = 0.0; }
 
         $parts = array();
         foreach ($o['unpaid'] as $cur => $v) { $parts[] = $v . ' ' . $cur; }

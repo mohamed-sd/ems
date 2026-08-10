@@ -1,6 +1,8 @@
 <?php
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 use App\Core\EventPublisher;
 
 require_once __DIR__ . '/../../Core/EventPublisher.php';
@@ -594,7 +596,7 @@ class PenaltyService
                 'idempotency_key' => $key . ':' . substr(sha1(json_encode($payload)), 0, 16),
                 'payload' => $payload,
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'PenaltyService publish');
             error_log('PenaltyService publish ' . $key . ': ' . $t->getMessage());
         }
     }

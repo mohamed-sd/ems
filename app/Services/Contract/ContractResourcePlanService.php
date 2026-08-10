@@ -27,6 +27,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/ContractLineService.php';
 
 class ContractResourcePlanService
@@ -425,7 +427,7 @@ class ContractResourcePlanService
             $r = $gate->select('equipments_types',
                 array('where' => array('status' => 'active'), 'orderBy' => 'type'));
             foreach ($r as $x) { $o[(int) $x['id']] = (string) $x['type']; }
-        } catch (\Throwable $t) { error_log('P-04 activeTypes: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'P-04 activeTypes'); error_log('P-04 activeTypes: ' . $t->getMessage()); }
         return $o;
     }
 

@@ -11,6 +11,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/EmployeeContractStateMachine.php';
 
 class EmployeeContractService
@@ -59,7 +61,7 @@ class EmployeeContractService
         // الشخصُ من نطاق الشركة (البوابةُ ترفض الأجنبي)
         $emp = null;
         try { $emp = $gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employeeId))); }
-        catch (\Throwable $t) { $emp = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $emp'); $emp = null; }
         if (!$emp) { $out['code'] = 422; $out['reason'] = 'الشخصُ غير موجودٍ في نطاقك'; return $out; }
 
         // «نموذجٌ غيرُ مذكورٍ في القائمة الخمس عشرة → 422» — الكتالوجُ المحكوم حصرًا
@@ -71,7 +73,7 @@ class EmployeeContractService
         if ($projectId > 0) {
             $proj = null;
             try { $proj = $gate->selectOne('project', array('columns' => array('id'), 'where' => array('id' => $projectId))); }
-            catch (\Throwable $t) { $proj = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $proj'); $proj = null; }
             if (!$proj) { $out['code'] = 422; $out['reason'] = 'المشروعُ غير موجودٍ في نطاقك'; return $out; }
         }
 
@@ -131,7 +133,7 @@ class EmployeeContractService
 
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
 
         $src = trim((string) ($c['source_table'] ?? ''));
@@ -178,7 +180,7 @@ class EmployeeContractService
             if ($pid > 0) {
                 $proj = null;
                 try { $proj = $gate->selectOne('project', array('columns' => array('id'), 'where' => array('id' => $pid))); }
-                catch (\Throwable $t) { $proj = null; }
+                catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $proj'); $proj = null; }
                 if (!$proj) { $out['code'] = 422; $out['reason'] = 'المشروعُ غير موجودٍ في نطاقك'; return $out; }
             }
             $upd['project_id'] = $pid > 0 ? $pid : null;
@@ -220,7 +222,7 @@ class EmployeeContractService
         if ($fileRef === '') { $out['code'] = 422; $out['reason'] = 'مرجعُ الملف إلزامي'; return $out; }
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
         if (trim((string) ($c['source_table'] ?? '')) !== '') {
             $out['code'] = 423; $out['reason'] = 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم'; return $out;
@@ -367,7 +369,7 @@ class EmployeeContractService
     {
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { return array('ok' => false, 'err' => array('code' => 404, 'reason' => 'العقدُ غير موجود')); }
         $src = trim((string) ($c['source_table'] ?? ''));
         if ($src !== '') {
@@ -658,7 +660,7 @@ class EmployeeContractService
                 $tbl = $bt === 'project' ? 'project' : 'contracts';
                 $ref = null;
                 try { $ref = $gate->selectOne($tbl, array('columns' => array('id'), 'where' => array('id' => $bid))); }
-                catch (\Throwable $t) { $ref = null; }
+                catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ref'); $ref = null; }
                 if (!$ref) {
                     $out['code'] = 422; $out['reason'] = self::COST_BEARER_TYPES[$bt] . ' #' . $bid . ' غيرُ موجودٍ في نطاقك'; return $out;
                 }

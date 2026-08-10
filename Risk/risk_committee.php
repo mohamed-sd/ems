@@ -30,34 +30,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cmt_do'])) {
     if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         $flash = '✘ RSK-CSRF: رمز الجلسة غير صالح — حدّث الصفحة';
     } elseif ($_POST['cmt_do'] === 'create' && $canAdd) {
+        // CS-05 / AC-F6 — الكتابةُ في الخدمة، والسطحُ يجمع المدخلَ ويعرض النتيجة.
         require_once __DIR__ . '/../app/Services/Risk/RiskService.php';
-        $code = \App\Services\Risk\RiskService::nextCode($conn, $company_id, 'risk_committee', 'minute_code', 'CMT-', 5);
-        $st = $conn->prepare('INSERT INTO risk_committee
-            (company_id, minute_code, meeting_date, cycle_ar, attendees_ar, agenda_ar, resolutions_ar,
-             risks_reviewed, parent_ref, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?)');
-        $md = (string) $_POST['meeting_date']; $cy = (string) ($_POST['cycle_ar'] ?? 'ربع سنوي');
-        $at = (string) ($_POST['attendees_ar'] ?? ''); $ag = (string) ($_POST['agenda_ar'] ?? '');
-        $rs = (string) ($_POST['resolutions_ar'] ?? ''); $rv = (int) ($_POST['risks_reviewed'] ?? 0);
-        $prev = (string) ($conn->query("SELECT COALESCE(MAX(minute_code),'') c FROM risk_committee WHERE company_id = {$company_id}")->fetch_assoc()['c']);
-        $st->bind_param('issssssisi', $company_id, $code, $md, $cy, $at, $ag, $rs, $rv, $prev, $uid);
-        $st->execute(); $st->close();
-        $flash = '✔ أُنشئ المحضر ' . $code . ' مسوَّدةً — والاعتمادُ للرئيس التنفيذي';
+        $code = \App\Services\Risk\RiskService::createCommitteeMinute($conn, $company_id, array(
+            'meeting_date'   => $_POST['meeting_date'] ?? '',
+            'cycle_ar'       => $_POST['cycle_ar'] ?? 'ربع سنوي',
+            'attendees_ar'   => $_POST['attendees_ar'] ?? '',
+            'agenda_ar'      => $_POST['agenda_ar'] ?? '',
+            'resolutions_ar' => $_POST['resolutions_ar'] ?? '',
+            'risks_reviewed' => $_POST['risks_reviewed'] ?? 0,
+        ), $uid);
+        $flash = ($code !== null)
+            ? '✔ أُنشئ المحضر ' . $code . ' مسوَّدةً — والاعتمادُ للرئيس التنفيذي'
+            : '✘ RSK-500: تعذّر إنشاءُ المحضر';
     } elseif ($_POST['cmt_do'] === 'approve') {
         if (!$isCeo) {
             $flash = '✘ RSK-403: اعتمادُ محضرِ اللجنةِ للرئيسِ التنفيذيِّ حصرًا (المرحلة ٨)';
         } else {
             $mid = (int) $_POST['minute_id'];
-            $st = $conn->prepare("UPDATE risk_committee
-                                     SET state = 'approved', approved_by = ?, approved_at = NOW(),
-                                         authority_ref = 'الرئيس التنفيذي — المرحلة ٨'
-                                   WHERE id = ? AND company_id = ? AND state = 'draft'");
-            $st->bind_param('iii', $uid, $mid, $company_id);
-            $st->execute();
-            $flash = $conn->affected_rows > 0
+            require_once __DIR__ . '/../app/Services/Risk/RiskService.php';
+            $flash = \App\Services\Risk\RiskService::approveCommitteeMinute($conn, $company_id, $mid, $uid)
                 ? '✔ اعتُمد المحضر — والمعتمدُ لا يُعدَّل بعدها'
                 : '✘ RSK-409: المعتمدُ لا يُعتمد مرتين';
-            $st->close();
         }
     } else {
         $flash = '✘ RSK-403: لا صلاحية';

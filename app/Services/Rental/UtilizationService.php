@@ -21,6 +21,8 @@
 
 namespace App\Services\Rental;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class UtilizationService
 {
     /**
@@ -71,7 +73,7 @@ class UtilizationService
                 array(AvailabilityService::OPEN_END, $to, $from, $to, AvailabilityService::OPEN_END, $from)
             );
             foreach ($ops as $r) { $rented[(int) $r['equipment']] = max(0, (int) $r['d']); }
-        } catch (\Throwable $t) { error_log('UtilizationService ops: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UtilizationService ops'); error_log('UtilizationService ops: ' . $t->getMessage()); }
 
         // ③ الاعترافُ الثلاثي — إيرادُ العميل وتكلفةُ المورد لكل معدة
         //    unit_party_awards لا يحمل equipment مباشرةً، فنعبر إلى الوقائع المالية
@@ -99,7 +101,7 @@ class UtilizationService
                 if ($r['event_type'] === 'revenue') { $rev[$eid] = ($rev[$eid] ?? 0) + (float) $r['amt']; }
                 else { $cost[$eid] = ($cost[$eid] ?? 0) + (float) $r['amt']; }
             }
-        } catch (\Throwable $t) { error_log('UtilizationService fe: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UtilizationService fe'); error_log('UtilizationService fe: ' . $t->getMessage()); }
 
         // ④ التركيب
         $out = array();

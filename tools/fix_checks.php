@@ -33,7 +33,21 @@ if (!function_exists('fix_sql_write_lines')) {
             if ($t[0] !== T_CONSTANT_ENCAPSED_STRING && $t[0] !== T_ENCAPSED_AND_WHITESPACE
                 && $t[0] !== T_INLINE_HTML && !(defined('T_HEREDOC') && $t[0] === T_HEREDOC)) { continue; }
             if ($t[0] === T_INLINE_HTML) { continue; } // HTML ليس SQL
-            if (preg_match('/\b(INSERT\s+INTO|UPDATE\s+[`"\']?[A-Za-z_][A-Za-z0-9_]*|DELETE\s+FROM|REPLACE\s+INTO)\b/i', $t[1], $m)) {
+            /* ◆ `UPDATE` وحدَها ليست دليلًا: النصُّ `'... update failed: '` في
+               `error_log` كان يُقرأ عبارةَ كتابةٍ فيُتَّهم سطحٌ بريء. وكلُّ
+               UPDATE حقيقيةٍ يتلوها `SET` — فاشتراطُه يُسقط الكاذبَ ولا يُفلت
+               صادقًا. وكذلك INSERT/REPLACE يتلوهما جدولٌ ثم `(` أو `VALUES`
+               أو `SELECT`. */
+            $pat = '/\b(?:'
+                 . 'INSERT\s+INTO\s+[`"\']?[A-Za-z_]\w*[\s\S]{0,200}?(?:\(|VALUES|SELECT|SET)'
+                 . '|REPLACE\s+INTO\s+[`"\']?[A-Za-z_]\w*[\s\S]{0,200}?(?:\(|VALUES|SELECT|SET)'
+                 // ◆ النافذةُ واسعةٌ عمدًا: `UPDATE … JOIN … ON …` تُبعد `SET`
+                 //   مئاتِ الأحرف، ونافذةُ 400 أسقطت `currencies_fin` — سلبيٌّ
+                 //   كاذبٌ أخطرُ من الإيجابيِّ الكاذبِ لأنه يُعلن نظافةً كاذبة.
+                 . '|UPDATE\s+[`"\']?[A-Za-z_]\w*[\s\S]{0,8000}?\bSET\b'
+                 . '|DELETE\s+FROM\s+[`"\']?[A-Za-z_]\w*'
+                 . ')/i';
+            if (preg_match($pat, $t[1], $m)) {
                 $hits[] = array('line' => (int) $t[2], 'sql' => trim(preg_replace('/\s+/', ' ', mb_substr($m[0], 0, 60))));
             }
         }
@@ -346,7 +360,16 @@ if (!function_exists('fix_catch_blocks')) {
                 if ($s === '}') { $depth--; if ($depth === 0) { break; } }
                 if ($depth >= 1) { $body .= $s; }
             }
-            $out[] = array('line' => $line, 'body' => $body);
+            /* ما يلي الكتلةَ مباشرةً — النمطُ الغالبُ يضع الحكمَ **بعدها** لا
+               فيها: `catch { $x = null; }` ثم `if (!$x) { return 404; }`.
+               وفاحصٌ ينظر داخلَ الكتلةِ وحدَها يرى ابتلاعًا حيث يوجد تصعيد. */
+            $after = ''; $k = $j + 1; $seen = 0;
+            for (; $k < $n && $seen < 220; $k++) {
+                $x = $toks[$k];
+                $s = is_array($x) ? $x[1] : $x;
+                $after .= $s; $seen += strlen($s);
+            }
+            $out[] = array('line' => $line, 'body' => $body, 'after' => $after);
         }
         return $out;
     }
@@ -364,9 +387,66 @@ if (!function_exists('fix_check_no_swallowed_catch')) {
             foreach ($scope as $d) { if (strpos($rel, $d) === 0) { $inScope = true; break; } }
             foreach (fix_catch_blocks($src) as $c) {
                 $b = trim($c['body']);
-                $swallowed = ($b === '')
-                    || !preg_match('/\b(throw|return|exit|die|http_response_code|rollback)\b/i', $b);
-                if (!$swallowed) { continue; }
+                if ($b === '') {                       // فارغٌ — ابتلاعٌ بلا جدال
+                    if ($inScope) { $bad[] = $rel . ':' . $c['line']; } else { $outside++; }
+                    continue;
+                }
+                /* ── تعريفُ «المبتلَع» — مقصدُ FIXA-0013 لا حرفُه وحدَه ────────
+                   نصُّ الحكم: «لا catch فارغٍ ولا catch يكتب سجلًّا ويكمل»،
+                   ونمطُه الصحيح: تراجعٌ ← تسجيلٌ ← **إرجاعُ خطأ**. والجوهرُ في
+                   (د): «صفرُ catch يبتلع ثم يعرض نجاحًا» — أي **ألّا يختفيَ
+                   الفشل**.
+
+                   والتطبيقُ الحرفيُّ لـ«يلزم return/throw» يُجرّم نمطًا سليمًا
+                   قائمًا في النواة: `EventDispatcher` و`CapacityOutbox` تكتبان
+                   `last_error` وتزيدان `attempts` وتجدولان إعادةَ المحاولةِ
+                   أُسّيًّا. هذا **معالجةٌ** لا ابتلاع: الفشلُ صار حالةً في
+                   القاعدةِ يراها المشغّلُ ويتصرّف بها — وهو أقوى من إرجاعِ رمزٍ
+                   لمن لا يقرؤه. وتجريمُه يدفع إلى رميٍ يُسقط دفعةً كاملةً
+                   لأجلِ صفٍّ واحد.
+
+                   فالمبتلَعُ ما لا يفعل شيئًا من ثلاثة:
+                     ① يُصعّد الفشل   — throw/return/exit/die/http_response_code
+                     ② يتراجع        — rollback
+                     ③ يُثبّت الفشلَ حالةً — يمسّ متغيّرَ الاستثناءِ **ويكتب**
+                        (‎last_error/attempts/failed/dead‎ أو كتابةٌ فعلية).
+                   ◆ و`error_log` وحدَه **لا يكفي** التزامًا بنصِّ (ب) صراحةً. */
+                $propagates = (bool) preg_match('/\b(throw|return|exit|die|http_response_code)\b/i', $b);
+                $rollsBack  = (bool) preg_match('/\brollback\b/i', $b);
+                $touchesExc = (bool) preg_match('/\$(e|t|ex|err|exc|throwable)\b/i', $b);
+                $persists   = $touchesExc && (bool) preg_match(
+                    '/\b(last_error|attempts|is_dead|failed_at|->exec\s*\(|->query\s*\(|->prepare\s*\(|->update\s*\(|->insert\s*\()/i', $b);
+
+                /* ④ سقّاطةٌ مُسجَّلةٌ ومفحوصةٌ بعدها — النمطُ الغالبُ في الخدمات:
+                     catch (\Throwable $t) { ems_catch_log($t, __METHOD__); $x = null; }
+                     if (!$x) { return array('code' => 404, ...); }
+                   هذا هو نمطُ FIXA-0013-ج نفسُه موزَّعًا على سطرين: تسجيلٌ ثم
+                   إرجاعُ خطأ. ويلزم **الشرطان معًا**: التسجيلُ وحدَه ابتلاعٌ
+                   بنصِّ (ب)، والفحصُ وحدَه يُضيّع سببَ الفشل. */
+                /* ⑤ تجاهلٌ **مُعلَنٌ بسببه** — `ems_catch_ignored($e,…,'لماذا')`.
+                   بعضُ الفشلِ تجاهلُه هو الصواب: إدراجٌ عاطلٌ يصطدم بمفتاحٍ
+                   مكرَّرٍ فالصفُّ موجودٌ سلفًا، وإخطارٌ جانبيٌّ يفشل فلا يصحُّ
+                   أن يُسقط معاملةً نجحت. فلا يُمنع التجاهلُ — يُمنع **كتمانُه**.
+                   ◆ والسببُ الفارغُ لا يمرّ: وسمٌ بلا تبريرٍ تصديقٌ على النفس. */
+                if (preg_match('/\bems_catch_ignored\s*\(\s*\$\w+\s*,[^,]*,\s*([\'"])(.*?)\1/us', $b, $ig)) {
+                    if (trim($ig[2]) !== '') { continue; }
+                    if ($inScope) { $bad[] = $rel . ':' . $c['line'] . ' (تجاهلٌ بلا سبب)'; } else { $outside++; }
+                    continue;
+                }
+
+                $logged = (bool) preg_match('/\bems_catch_log\s*\(/', $b);
+                $sentinelOk = false;
+                if ($logged && preg_match_all('/\$(\w+)\s*=/', $b, $vm)) {
+                    $tail = (string) ($c['after'] ?? '');
+                    foreach (array_unique($vm[1]) as $v) {
+                        if ($v === 'e' || $v === 't' || $v === 'ex') { continue; }
+                        if (preg_match('/\$' . preg_quote($v, '/') . '\b[\s\S]{0,160}?\b(return|throw)\b/', $tail)) {
+                            $sentinelOk = true; break;
+                        }
+                    }
+                }
+
+                if ($propagates || $rollsBack || $persists || $sentinelOk) { continue; }
                 if ($inScope) { $bad[] = $rel . ':' . $c['line']; } else { $outside++; }
             }
         }

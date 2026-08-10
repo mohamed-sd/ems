@@ -23,6 +23,8 @@
 
 namespace App\Services\Procurement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ProcCostingService
 {
     /** هل طبقةُ التكاليف حية؟ (rollback: EMS_PROC_COSTING=off في .env) */
@@ -66,7 +68,7 @@ class ProcCostingService
                   WHERE {TENANT_SCOPE} AND lc.order_id = ? AND COALESCE(lc.is_deleted,0) = 0",
                 array($order_id));
             $landedBase = $lr ? (float) $lr[0]['s'] : 0.0;
-        } catch (\Throwable $t) { /* الجدولُ الوليد قد يغيب في بيئة قديمة — بلا وصولي */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الجدولُ الوليد قد يغيب في بيئة قديمة — بلا وصولي'); /* الجدولُ الوليد قد يغيب في بيئة قديمة — بلا وصولي */ }
 
         foreach ($per as $iid => $p) {
             if ($p['qty'] <= 0) { continue; }

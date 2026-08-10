@@ -14,6 +14,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/VisibilityPolicyService.php';
 require_once __DIR__ . '/CapacityService.php';
 
@@ -133,7 +135,7 @@ class VisibilityGuard
                         AND c.scope_type = ? AND c.scope_id = ? LIMIT 1",
                     array($subjectAcc, $vScopeT, (int) $vScopeI));
                 if ($rows) { return 'scope'; }
-            } catch (\Throwable $t) { /* لا نطاقَ مشتركًا يُثبت */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا نطاقَ مشتركًا يُثبت'); /* لا نطاقَ مشتركًا يُثبت */ }
         }
 
         return 'none';

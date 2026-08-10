@@ -20,6 +20,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class CapacityService
 {
     const CAPACITY_TYPES = array('employee', 'project_employee', 'operator', 'technician',
@@ -92,7 +94,7 @@ class CapacityService
                             AND COALESCE(c.is_deleted,0)=0
                           ORDER BY c.start_date DESC LIMIT 1", array((int) $u['employee_id']));
                     $ec = $rows ? $rows[0] : null;
-                } catch (\Throwable $t) { $ec = null; }
+                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ec'); $ec = null; }
 
                 if ($ec) {
                     $cat = (string) $ec['category'];
@@ -162,7 +164,7 @@ class CapacityService
                         'state' => 'active',
                         'created_by' => (int) $actor ?: null,
                     ));
-                } catch (\Throwable $t) { $out['skipped']++; continue; }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'خطةُ قدرةٍ واحدةٍ فشلت — تُحصى متخطاةً وتستمرُّ البقية'); $out['skipped']++; continue; }
             }
             $out['created']++;
         }
@@ -238,7 +240,7 @@ class CapacityService
                     return 'عقدُ المصدر #' . $cap['source_id'] . ' لم يعد نشطًا (حالُه: '
                          . $rows[0]['state'] . ') — الصفةُ تسقط بسقوط مصدرها';
                 }
-            } catch (\Throwable $t) { /* تعذّر القياس ⇒ لا تجميدَ بالظن */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذّر القياس ⇒ لا تجميدَ بالظن'); /* تعذّر القياس ⇒ لا تجميدَ بالظن */ }
         }
         return null;
     }
@@ -302,7 +304,7 @@ class CapacityService
         $cap = null;
         try {
             $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $capacityId)));
-        } catch (\Throwable $t) { $cap = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
         if (!$cap) { $out['code'] = 404; $out['reason'] = 'الصفةُ غيرُ موجودةٍ في نطاقك'; return $out; }
 
         if ((int) $cap['account_id'] !== (int) $accountId) {

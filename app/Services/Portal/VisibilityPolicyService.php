@@ -18,6 +18,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/CapacityService.php';
 
 class VisibilityPolicyService
@@ -106,7 +108,7 @@ class VisibilityPolicyService
         try {
             $old = $gate->selectOne('visibility_keys', array('where' => array(
                 'element_code' => $code, 'scope_type' => $scopeType, 'scope_id' => $scopeId)));
-        } catch (\Throwable $t) { $old = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $old'); $old = null; }
 
         try {
             if ($old) {
@@ -204,7 +206,7 @@ class VisibilityPolicyService
                 $k = $gate->selectOne('visibility_keys', array('where' => array(
                     'element_code' => (string) $elementCode,
                     'scope_type' => $w[0], 'scope_id' => $w[1])));
-            } catch (\Throwable $t) { $k = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $k'); $k = null; }
             if (!$k || (string) $k['mode'] === 'inherit') { continue; }
 
             // D5: الانتهاءُ الكسول — المنتهي مغلقٌ فورًا ويُقيَّد
@@ -218,7 +220,7 @@ class VisibilityPolicyService
                     self::logRow($conn, $companyId, (string) $elementCode, $w[0], $w[1],
                         'open', 'grant_expired', 0,
                         'انتهاءُ مدةِ منحٍ — إغلاقٌ آليٌّ بلا تدخل (D5)', null, 0);
-                } catch (\Throwable $t) { /* الإغلاقُ المنطقي ماضٍ ولو تعذّر القيد */ }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الإغلاقُ المنطقي ماضٍ ولو تعذّر القيد'); /* الإغلاقُ المنطقي ماضٍ ولو تعذّر القيد */ }
                 $k['mode'] = 'closed';
             }
 
@@ -260,7 +262,7 @@ class VisibilityPolicyService
             $caps = $gate->scopedQuery(array('scope' => array('c' => 'user_capacities')),
                 "SELECT c.account_id, c.capacity_type, c.scope_type, c.scope_id
                    FROM user_capacities c WHERE {TENANT_SCOPE} AND c.state = 'active'");
-        } catch (\Throwable $t) { $caps = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $caps'); $caps = array(); }
         foreach ($caps as $c) {
             $ctx = array('account_id' => (int) $c['account_id'],
                          'capacity_type' => (string) $c['capacity_type']);

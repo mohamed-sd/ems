@@ -13,6 +13,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/CapacityService.php';
 
 class WorkspaceFeedService
@@ -216,7 +218,7 @@ class WorkspaceFeedService
                     default:
                         $unavailable = 'غيرُ متاحٍ — بطاقةٌ بلا باني (مالكُها ' . $meta['owner_doc'] . ')';
                 }
-            } catch (\Throwable $t) { $unavailable = 'تعذّرت القراءةُ من المصدر'; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الفشلُ يُعرض للمستخدمِ نصًّا في البطاقةِ «تعذّرت القراءة» — فلا يختفي'); $unavailable = 'تعذّرت القراءةُ من المصدر'; }
 
             $out['cards'][] = array(
                 'code' => (string) $code,

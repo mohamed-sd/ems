@@ -15,6 +15,8 @@
 
 namespace App\Services\Operations;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class DailyPlanService
 {
     /**
@@ -32,7 +34,7 @@ class DailyPlanService
 
         $proj = null;
         try { $proj = $gate->selectOne('project', array('columns' => array('id'), 'where' => array('id' => $projectId))); }
-        catch (\Throwable $t) { $proj = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $proj'); $proj = null; }
         if (!$proj) { $out['code'] = 404; $out['reason'] = 'المشروعُ غير موجودٍ في نطاقك'; return $out; }
 
         // حاوياتُ المعدات النشطةُ للمشروع — مصدرُ الاحتياج
@@ -43,7 +45,7 @@ class DailyPlanService
                  WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.level = 'معدة'
                    AND c.state = 'نشطة' AND COALESCE(c.is_deleted,0)=0
                  ORDER BY c.id", array($projectId));
-        } catch (\Throwable $t) { $eqContainers = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $eqContainers'); $eqContainers = array(); }
         if (!$eqContainers) {
             $out['code'] = 422;
             $out['reason'] = 'لا حاوياتِ معداتٍ نشطةً للمشروع — الاحتياجُ يُشتق منها لا من اليد (ابدأ بالحاويات)';
@@ -58,7 +60,7 @@ class DailyPlanService
                     'project_id' => $projectId, 'plan_date' => $date,
                     'state' => 'draft', 'created_by' => (int) $actor ?: null,
                 ));
-            } catch (\Throwable $t) { $pid = 0; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $pid'); $pid = 0; }
             $plan = $pid > 0 ? self::planOf($gate, $projectId, $date) : null;
             if (!$plan) { $out['code'] = 422; $out['reason'] = 'تعذّر إنشاءُ الخطة'; return $out; }
         }
@@ -80,7 +82,7 @@ class DailyPlanService
                      WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
                        AND o.state = 'نشطة' AND COALESCE(o.is_deleted,0)=0", array($ecId));
                 foreach ($rows as $r) { $shifts[] = (int) $r['s']; }
-            } catch (\Throwable $t) { $shifts = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $shifts'); $shifts = array(); }
             if (!$shifts) { $shifts = array(1); }
 
             foreach ($shifts as $shift) {
@@ -89,7 +91,7 @@ class DailyPlanService
                     $exists = $gate->selectOne('daily_plan_lines', array(
                         'whereRaw' => 'plan_id = ? AND equipment_container_id = ? AND shift_no = ?',
                         'params' => array($planId, $ecId, $shift)));
-                } catch (\Throwable $t) { $exists = null; }
+                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $exists'); $exists = null; }
                 if ($exists) { $out['existing']++; continue; }
                 try {
                     $gate->insert('daily_plan_lines', array(
@@ -99,7 +101,7 @@ class DailyPlanService
                         'shift_no' => $shift,
                     ));
                     $out['created']++;
-                } catch (\Throwable $t) { $out['existing']++; }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'سطرُ الخطةِ موجودٌ سلفًا (مفتاحٌ مكرَّر) — يُحصى قائمًا لا منشأً، وهذا عينُ المطلوب'); $out['existing']++; }
             }
         }
 
@@ -118,11 +120,11 @@ class DailyPlanService
 
         $line = null;
         try { $line = $gate->selectOne('daily_plan_lines', array('where' => array('id' => $lineId))); }
-        catch (\Throwable $t) { $line = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $line'); $line = null; }
         if (!$line) { $out['code'] = 404; $out['reason'] = 'سطرُ الخطة غير موجود'; return $out; }
         $plan = null;
         try { $plan = $gate->selectOne('daily_plans', array('where' => array('id' => (int) $line['plan_id']))); }
-        catch (\Throwable $t) { $plan = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $plan'); $plan = null; }
         if (!$plan) { $out['code'] = 404; $out['reason'] = 'خطةُ السطر غير موجودة'; return $out; }
         if ((string) $plan['state'] !== 'draft') {
             $out['code'] = 423;
@@ -142,7 +144,7 @@ class DailyPlanService
                      ORDER BY o.id LIMIT 1",
                     array((int) $line['equipment_container_id'], $operatorId));
                 $opContainer = $rows ? (int) $rows[0]['id'] : null;
-            } catch (\Throwable $t) { $opContainer = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $opContainer'); $opContainer = null; }
             if ($opContainer === null) {
                 $out['code'] = 422;
                 $out['reason'] = 'لا تخصيصَ خارج حاوية (OPM-01 §4) — المشغّلُ #' . $operatorId
@@ -165,7 +167,7 @@ class DailyPlanService
                     ORDER BY l.id LIMIT 1",
                     array($operatorId, (int) $line['shift_no'], $lineId, (string) $plan['plan_date']));
                 $clash = $rows ? $rows[0] : null;
-            } catch (\Throwable $t) { $clash = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $clash'); $clash = null; }
             if ($clash) {
                 $out['code'] = 409;
                 $out['reason'] = 'تعارضٌ فوري: المشغّلُ موزَّعٌ في الوردية نفسِها على السطر #'
@@ -237,7 +239,7 @@ class DailyPlanService
                 $missing[] = 'السطر #' . (int) $r['id'] . ': معدة #' . (int) $r['equipment_id']
                            . ' وردية ' . (int) $r['shift_no'] . ' بلا مشغّل';
             }
-        } catch (\Throwable $t) { /* قائمةٌ فارغة = لا نواقصَ مقروءة */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قائمةٌ فارغة = لا نواقصَ مقروءة'); /* قائمةٌ فارغة = لا نواقصَ مقروءة */ }
         if ($missing) {
             $out['code'] = 422;
             $out['reason'] = 'لا يُفتح موقعٌ ناقصُ التخصيص — ' . count($missing) . ' سطرًا بلا مشغّل';
@@ -266,7 +268,7 @@ class DailyPlanService
                                    'project_id' => (int) $plan['project_id'],
                                    'plan_date' => (string) $plan['plan_date']),
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'DailyPlanService open publish #');
             error_log('DailyPlanService open publish #' . $planId . ': ' . $t->getMessage());
         }
         $out['ok'] = true; $out['code'] = 200;

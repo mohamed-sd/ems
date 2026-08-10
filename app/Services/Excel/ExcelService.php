@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace App\Services\Excel;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -197,7 +199,7 @@ class ExcelService
                 $cols, $blocked, $filters, $rowCount, $fmt);
             if (!$st->execute()) { throw new \RuntimeException('execute: ' . $st->error); }
             $st->close();
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'EMS gov_export_log failed');
             error_log('EMS gov_export_log failed: ' . $e->getMessage());
         }
     }

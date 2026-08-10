@@ -11,6 +11,8 @@
 
 namespace App\Services\Tickets;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once dirname(__DIR__) . '/Org/OrgAuthorityResolver.php';
 require_once dirname(__DIR__) . '/Org/DeputyResolver.php';
 
@@ -214,7 +216,7 @@ class TicketRouter
                                 'due_at' => date('Y-m-d H:i:s', time() + $dueMin * 60),
                                 'created_by' => 0, 'parent_ref' => 'TKT-' . intval($tkId),
                             ));
-                        } catch (\Throwable $wx) {
+                        } catch (\Throwable $wx) { ems_catch_ignored($wx, __METHOD__, 'SRC-06 work item for ticket');
                             error_log('SRC-06 work item for ticket ' . $tkId . ': ' . $wx->getMessage());
                         }
                     }

@@ -97,13 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     }
     $status = $payload['الحالة'] ?? 'مسودة';
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    $st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, 0, ?, ?)");
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $st->bind_param('isssis', $company_id, $CANONICAL, $json, $status, $uid, $creator);
-    $ok = $st->execute();
-    $st->close();
+    // CS-05 / AC-F6 — الكتابةُ في مخزنِ CMP-03، والسطحُ يجمع الحمولةَ فقط.
+    require_once __DIR__ . '/../includes/cmp03_local_store.php';
+    $ok = cmp03_stage_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
     ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }

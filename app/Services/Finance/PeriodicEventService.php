@@ -17,6 +17,8 @@
 
 namespace App\Services\Finance;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class PeriodicEventService
 {
     /** حالاتُ الوحدة التي **يُعتدّ بها** — «من وحدات المعدة **المعتمدة**». */
@@ -145,7 +147,7 @@ class PeriodicEventService
                     ));
                     if ($rowId <= 0) { throw new \RuntimeException('تعذّر إدراجُ المخصص'); }
                 }, 'مخصص صيانة ' . $eid . ' ' . $period);
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مخصصُ صيانةِ معدةٍ واحدةٍ فشل — بقيةُ المعداتِ تستمرّ، والفاشلُ يُستدرَك بالدورةِ التالية');
                 $out['skipped'][] = array('equipment_id' => $eid, 'code' => 422, 'reason' => $t->getMessage());
                 continue;
             }
@@ -229,7 +231,7 @@ class PeriodicEventService
                         array('event_id' => $eventId, 'accrued_at' => date('Y-m-d H:i:s')),
                         array('id' => $sid));
                 }, 'استحقاق قسط ' . $sid);
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'استحقاقُ قسطِ تمويلٍ واحدٍ فشل — بقيةُ الأقساطِ تستمرّ، والفاشلُ يُستدرَك بالدورةِ التالية');
                 $out['skipped'][] = array('schedule_id' => $sid, 'code' => 422, 'reason' => $t->getMessage());
                 continue;
             }
@@ -263,7 +265,7 @@ class PeriodicEventService
                 "SELECT t.id, t.state, t.net_tax FROM fin_tax_returns t
                   WHERE {TENANT_SCOPE} AND t.period_ref = ? LIMIT 1", array((string) $period));
             $ex = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
         if ($ex && (string) $ex['state'] === 'filed') {
             $out['code'] = 409; $out['return_id'] = (int) $ex['id'];
             $out['net'] = round((float) $ex['net_tax'], 2);

@@ -27,6 +27,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/PlanActualLinkService.php';
 require_once __DIR__ . '/ContractBaselineService.php';
 
@@ -95,7 +97,7 @@ class CommercialBoardService
                 $o['billed'] = round((float) $r[0]['billed'], 2);
                 $o['collected'] = round((float) $r[0]['collected'], 2);
             }
-        } catch (\Throwable $t) { /* لا مستخلصَ = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مستخلصَ = صفر'); /* لا مستخلصَ = صفر */ }
 
         // ── الفجواتُ الثلاثُ **بمالكيها** ───────────────────────────────────
         $o['gaps'] = array(
@@ -142,7 +144,7 @@ class CommercialBoardService
                    FROM contracts c
                   WHERE {TENANT_SCOPE} AND COALESCE(c.is_deleted,0)=0" . $w . "
                   ORDER BY c.id DESC LIMIT " . (int) $limit);
-        } catch (\Throwable $t) { $contracts = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $contracts'); $contracts = array(); }
         foreach ($contracts as $c) {
             $r = self::row($gate, (int) $c['id']);
             $r['second_party'] = (string) $c['second_party'];

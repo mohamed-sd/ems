@@ -18,6 +18,8 @@
 
 namespace App\Services\Settlement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class SupplierStatementService
 {
     /** الطبقاتُ الخمس بترتيب سلسلة القيمة (§1). */
@@ -75,7 +77,7 @@ class SupplierStatementService
                     AND s.period_to BETWEEN ? AND ?
                   ORDER BY s.period_from, l.id",
                 array($supplierId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
 
         foreach ($lines as $l) {
             $isCharge = ((string) $l['line_kind'] === 'charge');
@@ -117,7 +119,7 @@ class SupplierStatementService
                     AND DATE(r.created_at) BETWEEN ? AND ?
                   ORDER BY r.id",
                 array($supplierId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { $recs = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $recs'); $recs = array(); }
         foreach ($recs as $r) {
             $out['layers']['advances']['rows'][] = self::row(
                 'استردادُ سلفةٍ #' . (int) $r['advance_id'] . ' — سند ' . $r['doc_ref']
@@ -141,7 +143,7 @@ class SupplierStatementService
                     AND DATE(COALESCE(p.paid_at, p.created_at)) BETWEEN ? AND ?
                   ORDER BY p.id",
                 array($supplierId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { $pays = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $pays'); $pays = array(); }
         foreach ($pays as $p) {
             $row = self::row(
                 'سدادٌ ' . $p['payment_no'] . ' (' . $p['state'] . ' · ' . $p['method'] . ')'

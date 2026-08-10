@@ -23,6 +23,8 @@
 
 namespace App\Services\Payroll;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class PayPolicyStateMachine
 {
     const DRAFT      = 'draft';
@@ -284,7 +286,7 @@ class PayPolicyStateMachine
                                           . ' — تصريحٌ بما وقع لا قرارٌ جديد',
                 ), array('id' => (int) $r['id']));
                 $n++;
-            } catch (\Throwable $t) { error_log('E-24 sweepExpired #' . $r['id'] . ': ' . $t->getMessage()); }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'E-24 sweepExpired #'); error_log('E-24 sweepExpired #' . $r['id'] . ': ' . $t->getMessage()); }
         }
         return $n;
     }

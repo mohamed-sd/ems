@@ -25,16 +25,11 @@ $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['arrive_id'])) {
+    // CS-05 / AC-F6 — التقدُّمُ والواقعةُ في الخدمة، والسطحُ يعرض الرسالة.
     $oid = intval($_POST['arrive_id']);
-    $st = mysqli_prepare($conn, "UPDATE transfer_orders SET stage='arrived', arrival_datetime=NOW()
-                                 WHERE id=? AND company_id=? AND stage='in_transit'");
-    mysqli_stmt_bind_param($st, 'ii', $oid, $company_id);
-    mysqli_stmt_execute($st);
-    if (mysqli_stmt_affected_rows($st) > 0) {
-        mysqli_query($conn, "INSERT INTO transfer_events (company_id, order_id, event_type, body, actor_user_id)
-                             VALUES ($company_id, $oid, 'arrived', 'وصولٌ مؤكَّدٌ من شاشة الحركة في الطريق', $uid)");
-        $msg = "سُجّل وصولُ الأمر #$oid — انتقل إلى «الوصول والتسليم»";
-    } else { $msg = 'لم يتقدم — الأمرُ ليس في الطريق (409)'; }
+    require_once __DIR__ . '/../app/Services/Transport/TransferDeliveryService.php';
+    $res = \App\Services\Transport\TransferDeliveryService::confirmArrival($conn, $company_id, $oid, $uid);
+    $msg = $res['msg'];
 }
 
 $rows = array();

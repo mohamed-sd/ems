@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * includes/fx.php — العملة ومعادلُها الموحّد (FES-01 §3.1 · §3.3)
  * ───────────────────────────────────────────────────────────────────────────
@@ -316,7 +317,7 @@ if (!function_exists('ems_fx_revalue_open_dues')) {
             $row = fin_gate(false)->selectOne('fin_chart_of_accounts', array(
                 'columns' => array('id'), 'where' => array('code' => '5900', 'is_postable' => 1)));
             $fxAcc = $row ? intval($row['id']) : null;
-        } catch (\Throwable $t) { $fxAcc = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $fxAcc'); $fxAcc = null; }
         if ($fxAcc === null) {
             $out['status'] = 'skipped_no_account';
             $out['reason'] = 'لا حسابَ «فروق عملة» (5900) في الدليل — أضِفه ثم أعد التقييم (لا يُخترع حساب)';

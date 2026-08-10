@@ -12,6 +12,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/VisibilityGuard.php';
 
 class PortalFeedService
@@ -27,7 +29,7 @@ class PortalFeedService
                      'cards' => array(), 'hidden_sections' => array());
         $cap = null;
         try { $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $capacityId))); }
-        catch (\Throwable $t) { $cap = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
         if (!$cap || (int) $cap['account_id'] !== (int) $accountId) {
             $out['code'] = 403; $out['reason'] = 'الصفةُ ليست لهذا الحساب'; return $out;
         }
@@ -166,7 +168,7 @@ class PortalFeedService
                 $out['hidden_sections'][] = $code;
                 continue;
             }
-            try { $data = $fn(); } catch (\Throwable $t) { $data = array('value' => '—', 'period' => '', 'link' => null); }
+            try { $data = $fn(); } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'بانيةُ بطاقةٍ واحدةٍ فشلت — تُعرض بقيمةٍ محايدةٍ وبقيةُ البطاقاتِ تعمل'); $data = array('value' => '—', 'period' => '', 'link' => null); }
             $out['cards'][] = array(
                 'code' => $code,
                 'title' => isset($titles[$code]) ? $titles[$code] : $code,

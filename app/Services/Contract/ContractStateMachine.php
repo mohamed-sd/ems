@@ -29,6 +29,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ContractStateMachine
 {
     /** الحالاتُ الاثنتا عشرة — نصُّ ENUM حرفًا بحرف (خلافُه يبتلعه ENUM صامتًا). */
@@ -204,7 +206,7 @@ class ContractStateMachine
                     $rs = mysqli_query($conn, 'SELECT role_id FROM users WHERE id = ' . (int) $actor);
                     $u = $rs ? mysqli_fetch_assoc($rs) : null;
                     $actorRole = $u ? strval($u['role_id']) : '';
-                } catch (\Throwable $t) { $actorRole = ''; }
+                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ \'\' — $actorRole'); $actorRole = ''; }
             }
             $isExec = ($actorRole === '9' || $actorRole === '-1');
             if ($isExec && $authorityRef === '') { $authorityRef = 'سلطة أصلية'; }
@@ -234,7 +236,7 @@ class ContractStateMachine
                     'currency' => $opts['currency'] ?? null,
                     'actor'    => (int) $actor,
                 ));
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'ContractSignedEffects #');
                 error_log('ContractSignedEffects #' . $contractId . ': ' . $t->getMessage());
             }
         }
@@ -389,7 +391,7 @@ class ContractStateMachine
                     ),
                 ));
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'ContractStateMachine emit #');
             error_log('ContractStateMachine emit #' . $contractId . ': ' . $t->getMessage());
         }
     }

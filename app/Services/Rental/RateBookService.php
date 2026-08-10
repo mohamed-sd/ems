@@ -19,6 +19,8 @@
 
 namespace App\Services\Rental;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class RateBookService
 {
     /** شرائحُ المدة المقترحة (بالأيام) — مشتقةٌ من توزيع مددهم الفعلي. */
@@ -143,7 +145,7 @@ class RateBookService
                 array($prefix . '%')
             );
             if (count($rows)) { $n = (int) substr((string) $rows[0]['book_code'], strlen($prefix)); }
-        } catch (\Throwable $t) { error_log('RateBookService code: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'RateBookService code'); error_log('RateBookService code: ' . $t->getMessage()); }
         return $prefix . str_pad((string) ($n + 1), 3, '0', STR_PAD_LEFT);
     }
 }

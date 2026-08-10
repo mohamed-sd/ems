@@ -22,6 +22,8 @@
 
 namespace App\Services\Payroll;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/PayrollRunService.php';
 require_once __DIR__ . '/OffsetService.php';
 
@@ -91,7 +93,7 @@ class PayrollStateMachine
                 "SELECT COUNT(*) n FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.calc_state <> 'computed'", array($runId));
             $out['pending'] = $r ? (int) $r[0]['n'] : 0;
-        } catch (\Throwable $t) { $out['pending'] = 0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $out[\'pending\'] = 0'); $out['pending'] = 0; }
         if ($out['pending'] > 0) {
             $out['reasons'][] = $out['pending'] . ' سطرًا لم يكتمل احتسابُه (`pending_slice`) — '
                               . '«صفٌّ بلا احتسابٍ تامٍّ لا يُعتمد»';
@@ -103,7 +105,7 @@ class PayrollStateMachine
                 "SELECT COUNT(*) n FROM payroll_run_blocks b
                   WHERE {TENANT_SCOPE} AND b.run_id = ? AND b.kind = 'blocked'", array($runId));
             $out['blocked'] = $r ? (int) $r[0]['n'] : 0;
-        } catch (\Throwable $t) { $out['blocked'] = 0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $out[\'blocked\'] = 0'); $out['blocked'] = 0; }
         if ($out['blocked'] > 0) {
             $out['reasons'][] = $out['blocked'] . ' مانعًا مفتوحًا — «لا احتسابَ ناقصٌ صامت»';
         }
@@ -236,7 +238,7 @@ class PayrollStateMachine
                    FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ?
                   GROUP BY l.person_id", array((int) $run['id']));
-        } catch (\Throwable $t) { $persons = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $persons'); $persons = array(); }
 
         $n = 0;
         foreach ($persons as $p) {
@@ -268,7 +270,7 @@ class PayrollStateMachine
                     ),
                 ));
                 $n++;
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'H-09-5 publish person#');
                 error_log('H-09-5 publish person#' . $pid . ': ' . $t->getMessage());
             }
         }
@@ -297,7 +299,7 @@ class PayrollStateMachine
                 "SELECT l.* FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.person_id = ?
                   ORDER BY l.line_kind, l.id", array($runId, $personId));
-        } catch (\Throwable $t) { $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
 
         // الطبقاتُ الأربعُ بأسمائها من النص
         $map = array(
@@ -326,7 +328,7 @@ class PayrollStateMachine
                 "SELECT d.* FROM payroll_deductions d
                   WHERE {TENANT_SCOPE} AND d.run_id = ? AND d.person_id = ?
                   ORDER BY d.id", array($runId, $personId));
-        } catch (\Throwable $t) { $ded = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $ded'); $ded = array(); }
         if ($ded) {
             $out['layers']['الخصوماتُ بمراجعها'] = array('rows' => $ded, 'total' => 0.0);
             foreach ($ded as $d) {
@@ -360,7 +362,7 @@ class PayrollStateMachine
                    FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ?
                   GROUP BY l.person_id ORDER BY l.person_id", array($runId));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
 
         foreach ($rows as $i => $r) {
             $pid = (int) $r['person_id'];

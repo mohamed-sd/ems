@@ -15,6 +15,8 @@
 
 namespace App\Services\Workforce;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class AttendanceService
 {
     // ═════════════════ ① الفترات ═════════════════
@@ -379,7 +381,7 @@ class AttendanceService
                 'title' => mb_substr($title, 0, 250),
                 'link' => 'Employees/employee_settlements.php',
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, '[AttendanceService] worker notify failed');
             error_log('[AttendanceService] worker notify failed: ' . $t->getMessage());
         }
     }

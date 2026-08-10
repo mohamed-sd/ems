@@ -2,6 +2,8 @@
 
 namespace App\Services\Risk;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/RiskEvents.php';
 
 /**
@@ -1010,7 +1012,7 @@ class RiskService
                 $r = self::createSignal($db, $companyId, $it, $userId);
                 if (!empty($r['idempotent'])) { $idempotent[] = array('sync_uuid' => $it['sync_uuid'], 'id' => $r['id']); }
                 else { $created[] = array('sync_uuid' => $it['sync_uuid'], 'id' => $r['id']); }
-            } catch (\Throwable $ex) {
+            } catch (\Throwable $ex) { ems_catch_ignored($ex, __METHOD__, 'مزامنةُ إشارةٍ ميدانيةٍ واحدةٍ فشلت — بقيةُ الدفعةِ تُزامَن، والفاشلةُ تُعاد بمعرِّفها');
                 $failed[] = array('i' => $i, 'reason' => $ex->getMessage());
             }
         }
@@ -1097,5 +1099,119 @@ class RiskService
             'is_auto' => true, 'suppressible' => false, // §7-2: «لا يملك أحدٌ منعَه»
         ), $userId, (string) $escId);
         return $escId;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       ما استُخرج من الأسطحِ امتثالًا لـCS-05 «لا عبارةَ كتابةٍ في ملفِّ سطح»
+       (AC-F6). المنطقُ كما كان حرفًا بحرف — التغييرُ في **موضعِه** لا في أثره.
+       ═══════════════════════════════════════════════════════════════════════ */
+
+    /**
+     * كنسُ المعالجاتِ المتأخرة — من `Risk/risk_treatments.php`.
+     *
+     * ◆ عاطلٌ بطبعِه: الشرطُ `state IN ('planned','in_progress')` يجعل النداءَ
+     *   المتكرِّرَ بلا أثرٍ إضافيّ، فيُستدعى عند كلِّ فتحٍ للشاشةِ بلا ضرر.
+     * ◆ ولا يمسُّ المنجَزَ ولا الملغى: التأخُّرُ حالةٌ لِما لم يُنجَز بعد.
+     *
+     * @return int عددُ ما تحوّل إلى «متأخر»
+     */
+    public static function sweepOverdueTreatments($conn, $companyId)
+    {
+        $st = $conn->prepare(
+            "UPDATE risk_treatments
+                SET state = 'overdue'
+              WHERE company_id = ?
+                AND state IN ('planned','in_progress')
+                AND due_date < CURDATE()"
+        );
+        if (!$st) { error_log('RiskService::sweepOverdueTreatments prepare: ' . $conn->error); return 0; }
+        $cid = (int) $companyId;
+        $st->bind_param('i', $cid);
+        if (!$st->execute()) {
+            error_log('RiskService::sweepOverdueTreatments execute: ' . $st->error);
+            $st->close();
+            return 0;
+        }
+        $n = $st->affected_rows;
+        $st->close();
+        return (int) $n;
+    }
+
+    /**
+     * إنشاءُ محضرِ لجنةِ مخاطرَ مسوَّدةً — من `Risk/risk_committee.php`.
+     *
+     * ◆ `parent_ref` يحمل رمزَ المحضرِ السابقِ فتنتظم السلسلةُ زمنيًّا —
+     *   وهو ما يجعل «المحاضرَ» سجلًّا متصلًا لا صفوفًا متفرقة.
+     *
+     * @return string|null رمزُ المحضرِ المُنشأ، أو null عند الفشل
+     */
+    public static function createCommitteeMinute($conn, $companyId, array $in, $userId)
+    {
+        $cid  = (int) $companyId;
+        $code = self::nextCode($conn, $cid, 'risk_committee', 'minute_code', 'CMT-', 5);
+
+        $prevSt = $conn->prepare(
+            "SELECT COALESCE(MAX(minute_code),'') c FROM risk_committee WHERE company_id = ?"
+        );
+        $prev = '';
+        if ($prevSt) {
+            $prevSt->bind_param('i', $cid);
+            if ($prevSt->execute()) {
+                $row = $prevSt->get_result()->fetch_assoc();
+                $prev = (string) ($row['c'] ?? '');
+            }
+            $prevSt->close();
+        }
+
+        $st = $conn->prepare(
+            'INSERT INTO risk_committee
+                (company_id, minute_code, meeting_date, cycle_ar, attendees_ar, agenda_ar,
+                 resolutions_ar, risks_reviewed, parent_ref, created_by)
+             VALUES (?,?,?,?,?,?,?,?,?,?)'
+        );
+        if (!$st) { error_log('RiskService::createCommitteeMinute prepare: ' . $conn->error); return null; }
+
+        $md = (string) ($in['meeting_date']   ?? '');
+        $cy = (string) ($in['cycle_ar']       ?? 'ربع سنوي');
+        $at = (string) ($in['attendees_ar']   ?? '');
+        $ag = (string) ($in['agenda_ar']      ?? '');
+        $rs = (string) ($in['resolutions_ar'] ?? '');
+        $rv = (int)    ($in['risks_reviewed'] ?? 0);
+        $uid = (int) $userId;
+
+        $st->bind_param('issssssisi', $cid, $code, $md, $cy, $at, $ag, $rs, $rv, $prev, $uid);
+        $ok = $st->execute();
+        if (!$ok) { error_log('RiskService::createCommitteeMinute execute: ' . $st->error); }
+        $st->close();
+        return $ok ? $code : null;
+    }
+
+    /**
+     * اعتمادُ محضرٍ — من `Risk/risk_committee.php`.
+     *
+     * ◆ الشرطُ `state='draft'` هو حارسُ «المعتمَدُ لا يُعتمد مرتين»: يُنفَّذ في
+     *   الجملةِ نفسِها لا بفحصٍ سابقٍ عليها، فلا تتسلّل مسابقةٌ زمنيةٌ بينهما.
+     *
+     * @return bool true إن تحوّل صفٌّ فعلًا
+     */
+    public static function approveCommitteeMinute($conn, $companyId, $minuteId, $approverId)
+    {
+        $st = $conn->prepare(
+            "UPDATE risk_committee
+                SET state = 'approved', approved_by = ?, approved_at = NOW(),
+                    authority_ref = 'الرئيس التنفيذي — المرحلة ٨'
+              WHERE id = ? AND company_id = ? AND state = 'draft'"
+        );
+        if (!$st) { error_log('RiskService::approveCommitteeMinute prepare: ' . $conn->error); return false; }
+        $aid = (int) $approverId; $mid = (int) $minuteId; $cid = (int) $companyId;
+        $st->bind_param('iii', $aid, $mid, $cid);
+        if (!$st->execute()) {
+            error_log('RiskService::approveCommitteeMinute execute: ' . $st->error);
+            $st->close();
+            return false;
+        }
+        $n = $st->affected_rows;
+        $st->close();
+        return $n > 0;
     }
 }

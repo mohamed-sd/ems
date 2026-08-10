@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * Shared top bar component (.ems-topbar)
  * ---------------------------------------------------------------------------
@@ -195,7 +196,7 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
                     try {
                         $ems_tb_wsItems = \App\Services\Finance\ApprovalsInboxService::inbox($GLOBALS['conn'], intval($_SESSION['user']['company_id'] ?? 0));
                         $ems_tb_wsCount = is_array($ems_tb_wsItems) ? count($ems_tb_wsItems) : 0;
-                    } catch (\Throwable $e) { $ems_tb_wsCount = 0; }
+                    } catch (\Throwable $e) { ems_catch_log($e, __METHOD__); ems_catch_ignored($e, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $ems_tb_wsCount'); $ems_tb_wsCount = 0; }
                 }
                 $_SESSION['ems_ws_badge'] = array('n' => $ems_tb_wsCount, 'at' => time());
             }

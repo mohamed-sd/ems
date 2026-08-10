@@ -20,6 +20,8 @@
 
 namespace App\Services\Settlement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class SupplierAdvanceService
 {
     const TYPES = array('cash', 'on_behalf', 'custody');
@@ -66,7 +68,7 @@ class SupplierAdvanceService
 
         $s = null;
         try { $s = $gate->selectOne('suppliers', array('columns' => array('id'), 'where' => array('id' => $sup))); }
-        catch (\Throwable $t) { $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
         if (!$s) { $out['code'] = 422; $out['reason'] = 'الموردُ غيرُ موجودٍ في نطاقك'; return $out; }
 
         try {
@@ -174,7 +176,7 @@ class SupplierAdvanceService
                 "SELECT l.source_ref, l.amount FROM settlement_lines l
                   WHERE {TENANT_SCOPE} AND l.settlement_id = ? AND l.source_kind = 'supplier_advance'",
                 array((int) $settlementId));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
 
         foreach ($rows as $r) {
             $advId = (int) $r['source_ref'];
@@ -193,7 +195,7 @@ class SupplierAdvanceService
                     'note' => 'استردادٌ باعتماد التسوية #' . (int) $settlementId,
                     'created_by' => (int) $actor ?: null,
                 ));
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UQ: استُرد بهذه التسوية سلفًا — لا ضجيج');
                 continue;   // UQ: استُرد بهذه التسوية سلفًا — لا ضجيج
             }
 
@@ -201,7 +203,7 @@ class SupplierAdvanceService
             $data = array('recovered' => $rec);
             if ($rec >= (float) $a['amount']) { $data['state'] = 'settled'; }
             try { $gate->update('supplier_advance_requests', $data, array('id' => $advId)); }
-            catch (\Throwable $t) { error_log('M-12 recovery #' . $advId . ': ' . $t->getMessage()); }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'M-12 recovery #'); error_log('M-12 recovery #' . $advId . ': ' . $t->getMessage()); }
 
             $out['applied']++; $out['total'] = round($out['total'] + $take, 2);
         }

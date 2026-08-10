@@ -31,6 +31,8 @@
 
 namespace App\Services;
 
+require_once __DIR__ . '/../../includes/catch_log.php';
+
 require_once __DIR__ . '/../Core/EventPublisher.php';
 
 use App\Core\EventPublisher;
@@ -266,7 +268,7 @@ class EffectFanout
             )) as $l) {
                 $out[strval($l['effect_type'])] = $l;
             }
-        } catch (\Throwable $t) { /* لا روابط = لا آثار */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا روابط = لا آثار'); /* لا روابط = لا آثار */ }
         return $out;
     }
 
@@ -974,7 +976,7 @@ class EffectFanout
             $revLink = $done['revenue_event'];
             $old = null;
             try { $old = $gate->selectOne('fin_financial_events', array('where' => array('id' => intval($revLink['target_id'])), 'includeDeleted' => true)); }
-            catch (\Throwable $t) { /* قراءة حارسٍ فقط */ }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة حارسٍ فقط'); /* قراءة حارسٍ فقط */ }
             $nowQty = $ruledQty('client');
             if ($old && round((float) $old['quantity'], 2) !== round($nowQty, 2)) {
                 $out['revision_pending'] = true;
@@ -1287,7 +1289,7 @@ class EffectFanout
                     try {
                         $pm = $gate->selectOne('fin_operator_pay', array('columns' => array('pay_mode'), 'where' => array('employee_id' => $empId)));
                         if ($pm) { $mode = strval($pm['pay_mode']); }
-                    } catch (\Throwable $t) { /* غياب الصف = بالراتب */ }
+                    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'غياب الصف = بالراتب'); /* غياب الصف = بالراتب */ }
                     if ($mode !== 'due') {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
                             'reason' => 'المشغّل «بالراتب» — لا مستحقَ من المروحة (تدفعه الرواتب)');

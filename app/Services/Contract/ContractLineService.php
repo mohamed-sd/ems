@@ -24,6 +24,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ContractLineService
 {
     /**
@@ -64,7 +66,7 @@ class ContractLineService
         if ($srcId !== null) {
             $cm = null;
             try { $cm = $gate->selectOne('contract_commitments', array('where' => array('id' => $srcId))); }
-            catch (\Throwable $t) { $cm = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cm'); $cm = null; }
             if (!$cm) { $out['code'] = 422; $out['reason'] = 'الالتزامُ غيرُ موجودٍ في نطاقك'; return $out; }
             if ((int) $cm['contract_ref'] !== (int) $contractId) {
                 $out['code'] = 422; $out['reason'] = 'الالتزامُ يخصُّ عقدًا آخر'; return $out;
@@ -121,7 +123,7 @@ class ContractLineService
             }
             $tc = null;
             try { $tc = $gate->selectOne('fin_tax_codes', array('where' => array('id' => $taxCode))); }
-            catch (\Throwable $t) { $tc = null; }
+            catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $tc'); $tc = null; }
             if (!$tc) {
                 $out['code'] = 422;
                 $out['reason'] = 'الرمزُ الضريبيُّ غيرُ مسجَّلٍ في نطاقك — ولا يُخترع';
@@ -279,7 +281,7 @@ class ContractLineService
                 $p = array((int) $contractId);
             }
             $rows = $gate->scopedQuery(array('scope' => array('l' => 'client_contract_lines')), $sql, $p);
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
 
         foreach ($rows as $r) {
             $cur = (string) $r['currency'];
@@ -313,7 +315,7 @@ class ContractLineService
                     'why' => '**طاقةٌ لا تُفوتَر** — بيتُها خطةُ الموارد (P-04) ولا تدخل القيمة',
                 );
             }
-        } catch (\Throwable $t) { /* الاستبعادُ يُعلَن حين يُقرأ */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الاستبعادُ يُعلَن حين يُقرأ'); /* الاستبعادُ يُعلَن حين يُقرأ */ }
 
         $parts = array();
         foreach ($out['by_currency'] as $cur => $v) { $parts[] = $v . ' ' . $cur; }
@@ -394,7 +396,7 @@ class ContractLineService
                 if ($to !== null && (string) $r['valid_from'] > $to) { continue; }
                 return $r;
             }
-        } catch (\Throwable $t) { error_log('P-02 overlapping: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'P-02 overlapping'); error_log('P-02 overlapping: ' . $t->getMessage()); }
         return null;
     }
 

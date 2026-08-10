@@ -28,6 +28,8 @@
 
 namespace App\Services\Operations;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/OperationalTransformService.php';
 
 use App\Services\Operations\OperationalTransformService as OTS;
@@ -185,7 +187,7 @@ class ContainerGate
                     'user_id'     => 0,
                     'contract_id' => (int) ($ctx['contract_id'] ?? 0),
                 ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'ContainerGate logWouldBlock');
             error_log('ContainerGate logWouldBlock: ' . $t->getMessage());
         }
         if (function_exists('log_security_event')) {
@@ -298,7 +300,7 @@ class ContainerGate
         try {
             $orig = $gate->selectOne('container_consumption', array(
                 'whereRaw' => 'idem_key = ?', 'params' => array($key)));
-        } catch (\Throwable $t) { $orig = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $orig'); $orig = null; }
         if (!$orig) { $out['reason'] = 'لا خصمَ لهذه الجولة — لا شيءَ يُردّ'; return $out; }
 
         $r = OTS::consume($conn, $gate, $companyId, (int) $orig['container_id'],

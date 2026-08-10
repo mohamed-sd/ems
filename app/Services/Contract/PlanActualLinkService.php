@@ -23,6 +23,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/ContractLineService.php';
 require_once __DIR__ . '/ContractMonthlyPlanService.php';
 
@@ -98,7 +100,7 @@ class PlanActualLinkService
                 "SELECT s.id FROM contract_operational_sites s
                   WHERE {TENANT_SCOPE} AND s.contract_id = ? AND COALESCE(s.is_deleted,0)=0
                     AND s.state <> 'closed' ORDER BY s.id", array($contractId));
-        } catch (\Throwable $t) { $sites = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $sites'); $sites = array(); }
         $ids = array();
         foreach ($sites as $s) { $ids[] = (int) $s['id']; }
         if ((int) $siteId > 0 && in_array((int) $siteId, $ids, true)) {
@@ -137,7 +139,7 @@ class PlanActualLinkService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'keys' => array());
         $row = null;
         try { $row = $gate->selectOne($table, array('where' => array('id' => (int) $id))); }
-        catch (\Throwable $t) { $row = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $row'); $row = null; }
         if (!$row) { $out['code'] = 404; $out['reason'] = 'الصفُّ غيرُ موجودٍ في نطاقك'; return $out; }
 
         // العقدُ والتاريخُ من الصفِّ نفسِه — ولكلِّ جدولٍ اسمُه
@@ -148,7 +150,7 @@ class PlanActualLinkService
         } else {
             $claim = null;
             try { $claim = $gate->selectOne('claims', array('where' => array('id' => (int) $row['claim_id']))); }
-            catch (\Throwable $t) { $claim = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $claim'); $claim = null; }
             if (!$claim) { $out['code'] = 404; $out['reason'] = 'مستخلصُ السطر غيرُ موجود'; return $out; }
             $contractId = (int) $claim['contract_id'];
             $day = ($row['work_date'] !== null && (string) $row['work_date'] !== '')
@@ -187,7 +189,7 @@ class PlanActualLinkService
         if ($periodId > 0) {
             $pr = null;
             try { $pr = $gate->selectOne('contract_monthly_plan', array('where' => array('id' => $periodId))); }
-            catch (\Throwable $t) { $pr = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $pr'); $pr = null; }
             if (!$pr) { $out['code'] = 404; $out['reason'] = 'شهرُ الخطة غيرُ موجود'; return $out; }
             if ((int) $pr['line_id'] !== $lineId) {
                 $out['code'] = 422;
@@ -198,7 +200,7 @@ class PlanActualLinkService
         if ($siteId > 0) {
             $st = null;
             try { $st = $gate->selectOne('contract_operational_sites', array('where' => array('id' => $siteId))); }
-            catch (\Throwable $t) { $st = null; }
+            catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $st'); $st = null; }
             if (!$st || (int) $st['contract_id'] !== $contractId) {
                 $out['code'] = 422;
                 $out['reason'] = '**النطاقُ #' . $siteId . ' ليس من نطاقات هذا العقد**'; return $out;
@@ -237,7 +239,7 @@ class PlanActualLinkService
                 "SELECT u.id FROM unit_entries u
                   WHERE {TENANT_SCOPE} AND u.contract_id = ? AND u.contract_line_id IS NULL
                   ORDER BY u.id LIMIT 500", array((int) $contractId));
-        } catch (\Throwable $t) { $units = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $units'); $units = array(); }
         foreach ($units as $u) {
             if (!$apply) { $o['units']++; continue; }
             $r = self::linkUnit($conn, $gate, $companyId, (int) $u['id'], array(), $actor, true);
@@ -253,7 +255,7 @@ class PlanActualLinkService
                    LEFT JOIN claims c ON c.id = l.claim_id
                   WHERE {TENANT_SCOPE} AND c.contract_id = ? AND l.contract_line_id IS NULL
                   ORDER BY l.id LIMIT 500", array((int) $contractId));
-        } catch (\Throwable $t) { $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
         foreach ($lines as $l) {
             if (!$apply) { $o['claim_lines']++; continue; }
             $r = self::linkClaimLine($conn, $gate, $companyId, (int) $l['id'], array(), $actor, true);
@@ -285,7 +287,7 @@ class PlanActualLinkService
                 "SELECT COUNT(*) AS t, SUM(CASE WHEN u.contract_line_id IS NOT NULL THEN 1 ELSE 0 END) AS l
                    FROM unit_entries u WHERE {TENANT_SCOPE}" . $w, $p);
             if ($r) { $o['units_total'] = (int) $r[0]['t']; $o['units_linked'] = (int) $r[0]['l']; }
-        } catch (\Throwable $t) { /* صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'صفر'); /* صفر */ }
         try {
             $w = ((int) $contractId > 0) ? ' AND c.contract_id = ?' : '';
             $p = ((int) $contractId > 0) ? array((int) $contractId) : array();
@@ -295,7 +297,7 @@ class PlanActualLinkService
                    FROM claim_lines l LEFT JOIN claims c ON c.id = l.claim_id
                   WHERE {TENANT_SCOPE}" . $w, $p);
             if ($r) { $o['claims_total'] = (int) $r[0]['t']; $o['claims_linked'] = (int) $r[0]['l']; }
-        } catch (\Throwable $t) { /* صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'صفر'); /* صفر */ }
         $o['note'] = 'وحداتٌ ' . $o['units_linked'] . '/' . $o['units_total']
             . ' · أسطرُ مستخلصٍ ' . $o['claims_linked'] . '/' . $o['claims_total']
             . ' — **وغيرُ الموصول يُعدّ ولا يُخفى**';
@@ -389,7 +391,7 @@ class PlanActualLinkService
                    LEFT JOIN unit_entries u ON u.id = e.entity_id AND e.entity_type = 'unit_entry'
                   WHERE {TENANT_SCOPE} AND e.contract_line_id IS NULL
                     AND u.contract_line_id IS NOT NULL LIMIT 500");
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
         $o['candidates'] = count($rows);
         foreach ($rows as $r) {
             if (!$apply) { continue; }
@@ -398,7 +400,7 @@ class PlanActualLinkService
                     array('contract_line_id' => (int) $r['contract_line_id']),
                     array('id' => (int) $r['id']));
                 $o['filled']++;
-            } catch (\Throwable $t) { /* حدثٌ لا يُكتب لا يُسقط الباقي */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'حدثٌ لا يُكتب لا يُسقط الباقي'); /* حدثٌ لا يُكتب لا يُسقط الباقي */ }
         }
         $o['note'] = ($apply ? 'مُلئ ' : 'مرشَّحٌ ') . ($apply ? $o['filled'] : $o['candidates'])
             . ' حدثًا — **ووعدُ `contract_line_id` منذ 2026-08-08 يجد مرجعَه**';

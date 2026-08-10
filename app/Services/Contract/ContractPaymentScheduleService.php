@@ -29,6 +29,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/ContractMonthlyPlanService.php';
 
 class ContractPaymentScheduleService
@@ -519,7 +521,7 @@ class ContractPaymentScheduleService
                     $gate->update('contract_payment_schedule', array('state' => $st),
                         array('id' => (int) $r['id']));
                     $n++;
-                } catch (\Throwable $t) { /* حالةٌ لا تُكتب لا تُسقط الباقي */ }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'حالةٌ لا تُكتب لا تُسقط الباقي'); /* حالةٌ لا تُكتب لا تُسقط الباقي */ }
             }
         }
         return $n;

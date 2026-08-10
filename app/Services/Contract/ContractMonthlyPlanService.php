@@ -22,6 +22,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/ContractLineService.php';
 
 class ContractMonthlyPlanService
@@ -201,7 +203,7 @@ class ContractMonthlyPlanService
                   ORDER BY p.effective_from DESC, p.plan_version DESC LIMIT 1",
                 array((int) $lineId, $day));
             if ($r) { $ver = (int) $r[0]['plan_version']; }
-        } catch (\Throwable $t) { $ver = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ver'); $ver = null; }
         if ($ver === null) { return array('version' => null, 'rows' => array()); }
         return array('version' => $ver, 'rows' => self::rowsOf($gate, $lineId, $ver));
     }

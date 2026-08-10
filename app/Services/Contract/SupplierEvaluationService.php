@@ -20,6 +20,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class SupplierEvaluationService
 {
     /** مؤشراتُ §4-التقييم الخمسةُ نصًّا. */
@@ -149,7 +151,7 @@ class SupplierEvaluationService
             $ex = $gate->selectOne('supplier_evaluations', array(
                 'whereRaw' => 'supplier_id = ? AND period_from = ? AND period_to = ?',
                 'params'   => array($supplierId, (string) $from, (string) $to)));
-        } catch (\Throwable $t) { $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
         if ($ex && (string) $ex['state'] === 'decided') {
             $out['code'] = 423;
             $out['reason'] = 'تقييمُ هذه الفترة **معتمَدٌ** — لا يُعاد توليدُه (التصحيحُ بتقييمِ فترةٍ تالية)';
@@ -451,7 +453,7 @@ class SupplierEvaluationService
                 $out['supplier'] = round((float) $rows[0]['sup'], 2);
                 $out['operator'] = round((float) $rows[0]['opr'], 2);
             }
-        } catch (\Throwable $t) { /* يُعلَن صفرًا لا يُختلق */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'يُعلَن صفرًا لا يُختلق'); /* يُعلَن صفرًا لا يُختلق */ }
         return $out;
     }
 

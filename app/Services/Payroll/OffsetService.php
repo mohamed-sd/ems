@@ -22,6 +22,8 @@
 
 namespace App\Services\Payroll;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/PayrollRunService.php';
 
 class OffsetService
@@ -80,7 +82,7 @@ class OffsetService
         // المستفيدُ من النطاق
         $emp = null;
         try { $emp = $gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $person))); }
-        catch (\Throwable $t) { $emp = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $emp'); $emp = null; }
         if (!$emp) { $out['code'] = 422; $out['reason'] = 'المستفيدُ غيرُ موجودٍ في نطاقك'; return $out; }
 
         try {
@@ -174,7 +176,7 @@ class OffsetService
                   WHERE {TENANT_SCOPE} AND l.run_id = ?
                   GROUP BY l.person_id", array($runId));
             foreach ($rows as $r) { $totals[(int) $r['person_id']] = (float) $r['gross']; }
-        } catch (\Throwable $t) { $totals = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $totals'); $totals = array(); }
         if (!$totals) {
             $out['ok'] = true; $out['code'] = 200;
             $out['reason'] = 'لا أسطرَ محتسَبةً — لا مقاصّة';
@@ -253,14 +255,14 @@ class OffsetService
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.person_id = ?",
                 array((int) $runId, (int) $personId));
             $gross = $r ? (float) $r[0]['g'] : 0.0;
-        } catch (\Throwable $t) { $gross = 0.0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0.0 — $gross'); $gross = 0.0; }
         try {
             $r = $gate->scopedQuery(array('scope' => array('d' => 'payroll_deductions')),
                 "SELECT ROUND(SUM(d.amount),2) s FROM payroll_deductions d
                   WHERE {TENANT_SCOPE} AND d.run_id = ? AND d.person_id = ?",
                 array((int) $runId, (int) $personId));
             $ded = $r && $r[0]['s'] !== null ? (float) $r[0]['s'] : 0.0;
-        } catch (\Throwable $t) { $ded = 0.0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0.0 — $ded'); $ded = 0.0; }
         return round($gross - $ded, 2);
     }
 
@@ -275,7 +277,7 @@ class OffsetService
             $rows = $gate->scopedQuery(array('scope' => array('s' => 'payroll_settings')),
                 "SELECT s.protection_percent p FROM payroll_settings s WHERE {TENANT_SCOPE} LIMIT 1");
             if ($rows && $rows[0]['p'] !== null) { return round((float) $rows[0]['p'], 2); }
-        } catch (\Throwable $t) { /* لا حدَّ مقروءًا */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا حدَّ مقروءًا'); /* لا حدَّ مقروءًا */ }
         return null;
     }
 
@@ -354,7 +356,7 @@ class OffsetService
         $data = array('recovered' => $rec);
         if ($rec >= (float) $a['amount']) { $data['state'] = 'settled'; }
         try { $gate->update('employee_advances', $data, array('id' => (int) $advanceId)); }
-        catch (\Throwable $t) { error_log('H-09-4 recovery #' . $advanceId . ': ' . $t->getMessage()); }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'H-09-4 recovery #'); error_log('H-09-4 recovery #' . $advanceId . ': ' . $t->getMessage()); }
     }
 
     /** عكسُ خصوم دورةٍ عن الأرصدة ثم كنسُها — عطالةُ إعادة التشغيل. */
@@ -371,10 +373,10 @@ class OffsetService
                 $gate->update('employee_advances',
                     array('recovered' => $rec, 'state' => $rec >= (float) $a['amount'] ? 'settled' : 'active'),
                     array('id' => (int) $a['id']));
-            } catch (\Throwable $t) { /* أفضلُ جهد */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'أفضلُ جهد'); /* أفضلُ جهد */ }
         }
         try { $conn->query("DELETE FROM payroll_deductions WHERE run_id = " . (int) $runId); }
-        catch (\Throwable $t) { /* لا يوقف */ }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا يوقف'); /* لا يوقف */ }
     }
 
     private static function audit($conn, $companyId, $actor, $table, $action, $rowId, $before, $after)

@@ -18,6 +18,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class SupplierClosureService
 {
     /** الحالاتُ التي تُفتح منها التصفية — «عند الإنهاء». */
@@ -172,7 +174,7 @@ class SupplierClosureService
             try {
                 $gate->update('supplier_contract_closures', array('advances_balance' => $balance),
                     array('id' => (int) $cl['id']));
-            } catch (\Throwable $t) { /* القراءةُ تُعلن ولو تعذّر الوسم */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القراءةُ تُعلن ولو تعذّر الوسم'); /* القراءةُ تُعلن ولو تعذّر الوسم */ }
             $out['code'] = 423;
             $out['reason'] = 'رصيدُ سلفٍ مفتوحٌ ' . $balance . ' — **يُسترد أو يُحوَّل ذمّةً مدينةً '
                            . 'قبل الإخلاء** (ENT-02 §4: «تسويةُ العهد والسلف»)';

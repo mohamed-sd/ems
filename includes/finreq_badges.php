@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * شارات بوابة الطلب المالي D05 للقائمة الجانبية — عدّاداتٌ خفيفة معزولة بالبوابة:
  * صندوق الإدارة (تحت المراجعة لإدارات الدور) · مكتب المحاسب (بانتظار ولادة الحدث) ·
@@ -56,7 +57,7 @@ if (!function_exists('ems_finreq_nav_links')) {
                 $out['FinRequests/cycle_time_board.php'] = array('label' => 'زمن دورة الطلبات', 'icon' => 'fa fa-stopwatch');
                 $out['FinRequests/requests_reports.php'] = array('label' => 'تقارير الطلبات المالية', 'icon' => 'fa fa-chart-column');
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشلٍ هنا');
             // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
         }
         return $out;
@@ -99,7 +100,7 @@ if (!function_exists('ems_finance_nav_links')) {
                 $out[strval($m['code'])] = array('label' => strval($m['name']), 'icon' => strval($m['icon']));
             }
             $q->close();
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشلٍ هنا');
             // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
         }
         return $out;
@@ -147,7 +148,7 @@ if (!function_exists('ems_finreq_nav_badges')) {
                 'params' => array($uid, $uid),
             )));
             if ($n > 0) { $out['FinRequests/my_requests.php'] = $n; }
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'شاراتٌ فقط — الواجهة لا تتأثر بأي فشل');
             // شاراتٌ فقط — الواجهة لا تتأثر بأي فشل
         }
         return $out;

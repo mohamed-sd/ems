@@ -19,6 +19,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ContractSiteService
 {
     const STATES = array('planned', 'active', 'paused', 'closed');
@@ -49,7 +51,7 @@ class ContractSiteService
         if ($siteId <= 0) { $out['code'] = 422; $out['reason'] = 'الموقعُ إلزامي'; return $out; }
         $site = null;
         try { $site = $gate->selectOne('sites', array('where' => array('id' => $siteId))); }
-        catch (\Throwable $t) { $site = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $site'); $site = null; }
         if (!$site) { $out['code'] = 422; $out['reason'] = 'الموقعُ غيرُ موجودٍ في نطاقك'; return $out; }
 
         $name = trim((string) (isset($args['scope_name']) ? $args['scope_name'] : ''));
@@ -67,7 +69,7 @@ class ContractSiteService
             $ex = $gate->selectOne('contract_operational_sites', array(
                 'whereRaw' => 'contract_id = ? AND site_id = ?',
                 'params' => array((int) $contractId, $siteId)));
-        } catch (\Throwable $t) { $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
         if ($ex) {
             $out['code'] = 409; $out['scope_id'] = (int) $ex['id'];
             $out['reason'] = 'للموقع نطاقٌ قائمٌ في هذا العقد #' . (int) $ex['id']
@@ -261,7 +263,7 @@ class ContractSiteService
         try {
             $cur = $g->selectOne('contract_operational_sites', array(
                 'whereRaw' => 'contract_id = ? AND is_primary = 1', 'params' => array((int) $contractId)));
-        } catch (\Throwable $t) { $cur = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cur'); $cur = null; }
         if ($cur) {
             $g->update('contract_operational_sites', array('is_primary' => 0),
                 array('id' => (int) $cur['id']));

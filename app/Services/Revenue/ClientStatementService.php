@@ -23,6 +23,8 @@
 
 namespace App\Services\Revenue;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 // مواءمةُ PLAN-03 §5: طبقةُ المخطَّط تقرأ خطَّ الأساس من خدماته لا تستنسخه
 require_once dirname(__DIR__) . '/Contract/PlanActualLinkService.php';
 
@@ -80,7 +82,7 @@ class ClientStatementService
                     AND COALESCE(c.is_deleted,0)=0", array($clientId)) as $x) {
                 if ((int) $x['contract_id'] > 0) { $contractIds[] = (int) $x['contract_id']; }
             }
-        } catch (\Throwable $t) { $contractIds = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $contractIds'); $contractIds = array(); }
 
         // ── ⓪ المخطَّط — مواءمةُ PLAN-03 §5: من `contract_monthly_plan` × سعرِ
         //     بندِه (نمطُ اللوحة التجارية P-12 نفسُه) — **مقارِنٌ لا ذمة**،
@@ -98,7 +100,7 @@ class ClientStatementService
                 }
                 $pv = \App\Services\Contract\PlanActualLinkService::planVsActual(
                     $gate, $cid, $fromMonth, $toMonth);
-            } catch (\Throwable $t) { continue; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'line_id => [qty, months]'); continue; }
             $agg = array(); // line_id => [qty, months]
             foreach ($pv['rows'] as $r) {
                 $lid = (int) $r['line_id'];
@@ -130,7 +132,7 @@ class ClientStatementService
                     AND c.period_to BETWEEN ? AND ?
                   ORDER BY c.period_from, c.id",
                 array($clientId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { $claims = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $claims'); $claims = array(); }
 
         $claimIds = array();
         foreach ($claims as $c) {
@@ -163,7 +165,7 @@ class ClientStatementService
                        LEFT JOIN claims c ON c.id = t.claim_id
                       WHERE {TENANT_SCOPE} AND t.claim_id IN ({$in})
                       ORDER BY t.id");
-            } catch (\Throwable $t) { $invoices = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $invoices'); $invoices = array(); }
         }
         foreach ($invoices as $i) {
             $cancelled = ((string) $i['state'] === 'cancelled');
@@ -190,7 +192,7 @@ class ClientStatementService
                     AND DATE(p.created_at) BETWEEN ? AND ?
                   ORDER BY p.id",
                 array($clientId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { $collections = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $collections'); $collections = array(); }
         foreach ($collections as $p) {
             self::push($out, 'collections', self::row(
                 'تحصيل ' . $p['payment_no'] . ' (' . $p['state'] . ')'
@@ -212,7 +214,7 @@ class ClientStatementService
                       WHERE {TENANT_SCOPE} AND a.contract_id IN ({$cin})
                         AND COALESCE(a.is_deleted,0)=0
                       ORDER BY a.id");
-            } catch (\Throwable $t) { $advances = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $advances'); $advances = array(); }
         } else {
             $out['notes'][] = 'ℹ لا عقدَ مربوطًا بمستخلصات هذا العميل — **فطبقةُ الدفعة المقدمة تُقرأ فارغةً وتُعلَن** '
                             . '(`contracts` بلا عمود عميل، والرابطُ الموثوقُ `claims.contract_id`)';
@@ -234,7 +236,7 @@ class ClientStatementService
                         . ' — المستقطَع ' . $ab['recovered']
                         . ' — **الرصيدُ المتبقي ' . $ab['balance'] . '**';
                 }
-            } catch (\Throwable $t) { /* لا مقدمَ = لا سطر */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مقدمَ = لا سطر'); /* لا مقدمَ = لا سطر */ }
         }
 
         // مواءمةُ PLAN-03 §5: المحتجزُ **بتاريخ ردّه** من سجل الضمانات (P-06) —
@@ -252,7 +254,7 @@ class ClientStatementService
                       WHERE {TENANT_SCOPE} AND g.contract_id IN ({$cin})
                         AND COALESCE(g.is_deleted,0)=0 AND g.state IN ('active','expired')
                       ORDER BY g.contract_id, g.id");
-            } catch (\Throwable $t) { $guarantees = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $guarantees'); $guarantees = array(); }
             foreach ($guarantees as $g) {
                 if ((string) $g['kind'] === 'cash_retention') {
                     $out['notes'][] = 'ℹ محتجزُ عقد #' . (int) $g['contract_id']

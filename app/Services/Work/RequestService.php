@@ -16,6 +16,8 @@
 
 namespace App\Services\Work;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/WorkItemService.php';
 require_once __DIR__ . '/AchievementService.php';
 
@@ -320,7 +322,7 @@ class RequestService
                         ),
                     ));
                 }
-            } catch (\Throwable $t) { error_log('RequestService exec fact #' . $id . ': ' . $t->getMessage()); }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'RequestService exec fact #'); error_log('RequestService exec fact #' . $id . ': ' . $t->getMessage()); }
         }
 
         $msg = array('approved' => 'اعتُمد طلبُك — والخطوةُ التالية التنفيذ',

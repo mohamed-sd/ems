@@ -16,6 +16,8 @@
 
 namespace App\Services\Policy;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/../../Core/AuthorityGuard.php';
 require_once __DIR__ . '/../../Core/EventPublisher.php';
 
@@ -118,7 +120,7 @@ class UnitJourneyService
             $stmt->bind_param('iisssiii', $co, $uid, $lr, $domain, $reasonCode, $pid, $sid, $per);
             $stmt->execute();
             $stmt->close();
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, '[UnitJourneyService] objection log failed');
             error_log('[UnitJourneyService] objection log failed: ' . $t->getMessage());
         }
         return array('ok' => true, 'code' => 200,

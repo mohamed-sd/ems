@@ -15,6 +15,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ClientAmendmentEffects
 {
     /** قوائمُ CON-02 §8 المحكومة — مرايا ENUMات contract_obligations. */
@@ -54,7 +56,7 @@ class ClientAmendmentEffects
 
         $contract = null;
         try { $contract = $gate->selectOne('contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { $contract = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $contract'); $contract = null; }
         if (!$contract) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجودٍ في نطاقك'; return $out; }
 
         // الملتزمُ النافذُ الحالي للبند — «قبل» الصادق في الملحق
@@ -66,7 +68,7 @@ class ClientAmendmentEffects
                    AND o.approval_state = 'approved' AND COALESCE(o.is_deleted,0)=0
                  ORDER BY o.valid_from DESC LIMIT 1", array($contractId, $otype));
             $current = $rows ? (string) $rows[0]['obligor'] : null;
-        } catch (\Throwable $t) { $current = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $current'); $current = null; }
         if ($current !== null && $current === $obligor) {
             $out['code'] = 422; $out['reason'] = 'الملتزمُ الجديد هو النافذُ نفسُه — لا ملحقَ بلا تغيير'; return $out;
         }
@@ -143,13 +145,13 @@ class ClientAmendmentEffects
                    AND o.valid_from < ?
                    AND (o.valid_to IS NULL OR o.valid_to >= ?)",
                 array($cid, $otype, $oid, $from, $from));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
         $n = 0;
         foreach ($rows as $r) {
             try {
                 $gate->update('contract_obligations', array('valid_to' => $cut), array('id' => (int) $r['id']));
                 $n++;
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'ClientAmendmentEffects closePredecessors #');
                 error_log('ClientAmendmentEffects closePredecessors #' . $r['id'] . ': ' . $t->getMessage());
             }
         }
@@ -176,7 +178,7 @@ class ClientAmendmentEffects
                    AND c.unit_type = 'hour' AND c.origin = 'عقد'
                    AND c.state <> 'مقفلة' AND COALESCE(c.is_deleted,0)=0
                  ORDER BY c.id", array((int) $contract['id']));
-        } catch (\Throwable $t) { $roots = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $roots'); $roots = array(); }
 
         if (!$roots) {
             $out['note'] = 'لا جذرَ حاويةٍ ساعيًّا لهذا العقد — لا موازنةَ (مُعلَن)';

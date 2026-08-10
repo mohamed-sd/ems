@@ -2,6 +2,8 @@
 
 namespace App\Services\Risk;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/RiskService.php';
 
 /**
@@ -48,7 +50,7 @@ class RiskSignalEngine
             $code = strtoupper(substr($m, 0, 2)) . '-' . substr($m, 2);
             try {
                 $report[$code] = self::$m($db, $companyId, $userId, $dry);
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مِرقابُ إشاراتٍ واحدٌ فشل — بقيةُ المراقيبِ تعمل، ونتيجتُه تغيب من تقريرِ الجولة');
                 $report[$code] = array('ok' => false, 'raised' => 0, 'reason' => $t->getMessage());
             }
         }

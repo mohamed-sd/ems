@@ -28,6 +28,8 @@
 
 namespace App\Core;
 
+require_once __DIR__ . '/../../includes/catch_log.php';
+
 class EventDispatcher
 {
     /** @var \mysqli */
@@ -189,7 +191,7 @@ class EventDispatcher
                 "INSERT INTO `fin_notifications` (`company_id`, `target_level`, `title`, `link`) VALUES (?, 'finance_manager', ?, ?)",
                 'iss', array($companyId > 0 ? $companyId : 1, $title, $link)
             );
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, '[dispatcher] dead-letter alert failed');
             error_log('[dispatcher] dead-letter alert failed: ' . $t->getMessage());
         }
     }

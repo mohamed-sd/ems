@@ -19,6 +19,8 @@
 
 namespace App\Services\Finance;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class DepreciationService
 {
     /** الحالةُ التي يقع عليها الإهلاك. */
@@ -179,7 +181,7 @@ class DepreciationService
                   WHERE {TENANT_SCOPE} AND d.asset_id = ? AND d.period_ref = ? LIMIT 1",
                 array($aid, (string) $period));
             $ex = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
         if ($ex) {
             $out['code'] = 409;
             $out['reason'] = 'محتسَبٌ سلفًا للفترة ' . $period . ' (صف #' . (int) $ex['id'] . ')';
@@ -391,7 +393,7 @@ class DepreciationService
             if (!empty($lines) && abs($allocated - $amount) > 0.001) {
                 $lines[0]['amount'] = round($lines[0]['amount'] + ($amount - $allocated), 2);
             }
-        } catch (\Throwable $t) { $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
         if (empty($lines)) {
             $lines[] = array('bearer_kind' => 'tenant', 'ref' => null, 'pct' => 100.0, 'amount' => round((float) $amount, 2));
         }

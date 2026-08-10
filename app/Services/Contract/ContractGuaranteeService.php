@@ -25,6 +25,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ContractGuaranteeService
 {
     const KINDS = array('cash_retention', 'bank_guarantee', 'insurance', 'surety', 'pledge', 'other');
@@ -65,7 +67,7 @@ class ContractGuaranteeService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'id' => 0);
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
 
         $kind = (string) (isset($a['kind']) ? $a['kind'] : '');
@@ -193,7 +195,7 @@ class ContractGuaranteeService
                   WHERE {TENANT_SCOPE} AND c.contract_id = ? AND COALESCE(c.is_deleted,0)=0",
                 array((int) $contractId));
             $o['withheld'] = $r ? round((float) $r[0]['s'], 2) : 0.0;
-        } catch (\Throwable $t) { /* لا مستخلصَ = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مستخلصَ = صفر'); /* لا مستخلصَ = صفر */ }
         try {
             $r = $gate->scopedQuery(
                 array('scope' => array('l' => 'claim_lines'), 'enrich' => array('c' => 'claims')),
@@ -202,7 +204,7 @@ class ContractGuaranteeService
                   WHERE {TENANT_SCOPE} AND c.contract_id = ? AND l.source_kind = 'retention_release'",
                 array((int) $contractId));
             $o['released'] = $r ? round((float) $r[0]['s'], 2) : 0.0;
-        } catch (\Throwable $t) { /* لا ردَّ = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا ردَّ = صفر'); /* لا ردَّ = صفر */ }
         $o['balance'] = round($o['withheld'] - $o['released'], 2);
         $o['note'] = 'محتجزٌ ' . $o['withheld'] . ' · مردودٌ ' . $o['released']
             . ' · **الرصيدُ ' . $o['balance'] . '** — مقروءًا من المستخلصات لا من سجل الضمانات';

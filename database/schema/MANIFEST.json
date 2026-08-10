@@ -1,15 +1,15 @@
 {
-    "generated_at": "2026-08-10 04:30:17",
+    "generated_at": "2026-08-10 07:56:02",
     "source_db": "equipation_manage",
     "server_version": "11.4.9-MariaDB",
     "files": {
         "schema.sql": {
-            "sha1": "fbcf0ed05773cea17e8eabd1b91f97c77a953280",
+            "sha1": "281502c3f18df77a53f96f65781bd662f86dc490",
             "bytes": 877568
         },
         "seed_reference.sql": {
-            "sha1": "30befa5d6bf2523ba14f7da2fd55987d1f799ce7",
-            "bytes": 726142
+            "sha1": "9d4c584ddc2afd8b053abe0197e598ff59a55d86",
+            "bytes": 726313
         }
     },
     "schema": {
@@ -17,12 +17,12 @@
         "views": 4
     },
     "seed": {
-        "rows": 6467,
+        "rows": 6468,
         "tables": {
             "roles": 35,
             "modules": 431,
             "role_permissions": 2420,
-            "link_groups": 1134,
+            "link_groups": 1135,
             "nav_items": 1623,
             "equipments_types": 30,
             "failure_codes": 402,

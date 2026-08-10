@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * لوحة الدور — المكوّنات السبعة (UX-00 §7 · UX-01 §5)
  * ─────────────────────────────────────────────────────────────────────────
@@ -467,7 +468,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
                     AND NOT EXISTS (SELECT 1 FROM role_permissions p WHERE p.role_id = ro.id AND p.can_view = 1)
                     AND NOT EXISTS (SELECT 1 FROM modules m WHERE m.owner_role_id = ro.id)");
                 $counts['role_no_screens'] = $r ? intval($r->fetch_row()[0]) : 0;
-            } catch (\Throwable $t) { $counts['role_no_screens'] = 0; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $counts[\'role_no_screens\'] = 0'); $counts['role_no_screens'] = 0; }
         }
         // ── §8.7 عدّادا المبيعات — من `claim_helpers` لا باستعلامٍ منسوخ ──────
         // خارجَ الجدول التصريحي عمدًا: تعريفُ «الجاهز للفوترة» ثلاثُ وصلاتٍ
@@ -479,7 +480,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
                 require_once dirname(__DIR__) . '/Contracts/claim_helpers.php';
                 $counts['unbilled_units'] = claim_unbilled_days($gate);
                 $counts['claim_pending']  = claim_pending_count($gate);
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذّرٌ يُسجَّل ويُطفئ التنبيهَ — ولا يُخترع له رقم');
                 // تعذّرٌ يُسجَّل ويُطفئ التنبيهَ — ولا يُخترع له رقم
                 error_log('role_board sales counters: ' . $t->getMessage());
                 $counts['unbilled_units'] = 0;
@@ -544,7 +545,7 @@ function roleBoardRecent($conn, $userId, $limit = 6)
             $out[] = $r;
         }
         $q->close();
-    } catch (\Throwable $t) { error_log('role_board recent: ' . $t->getMessage()); }
+    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'role_board recent'); error_log('role_board recent: ' . $t->getMessage()); }
     return $out;
 }
 
@@ -574,7 +575,7 @@ function roleBoardQuickActions($conn, $roleId, $userId, $limit = 3)
         while ($r = $res->fetch_assoc()) { $rows[] = $r; }
         $q->close();
         $out = $rows;
-    } catch (\Throwable $t) { error_log('role_board quick: ' . $t->getMessage()); }
+    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'role_board quick'); error_log('role_board quick: ' . $t->getMessage()); }
     return $out;
 }
 

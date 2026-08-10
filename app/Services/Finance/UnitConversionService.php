@@ -20,6 +20,8 @@
 
 namespace App\Services\Finance;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once dirname(__DIR__) . '/EffectFanout.php';
 require_once dirname(__DIR__, 2) . '/Core/TenantGateException.php';
 require_once dirname(__DIR__, 2) . '/Core/TenantRegistry.php';
@@ -104,7 +106,7 @@ class UnitConversionService
                         . ' adopted=' . $out['adopted'] . ' actor=' . intval($actor));
                 }
             }, 'unit chain conversion ts ' . $tsId);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'تحويلُ سلسلةِ وحدةٍ واحدةٍ فشل — بقيةُ السلاسلِ تُحوَّل، والفاشلةُ تبقى غيرَ محوَّلة');
             $out['ok'] = false;
             $out['reason'] = $e->getMessage();
         }

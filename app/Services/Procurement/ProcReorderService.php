@@ -17,6 +17,8 @@
 
 namespace App\Services\Procurement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ProcReorderService
 {
     const AUTO_SOURCE = 'إعادة طلب';
@@ -134,7 +136,7 @@ class ProcReorderService
                         ));
                     }, 'auto reorder request');
                     $plan['request_id'] = $reqId;
-                } catch (\Throwable $t) {
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'طلبُ إعادةِ طلبٍ آليٍّ فشل — حدُّ إعادةِ الطلبِ يبقى قائمًا فيُعاد في الدورةِ التالية');
                     $out['skipped'][] = array('item' => (string) $p['item_name'],
                         'reason' => 'تعذّر التوليد: ' . $t->getMessage());
                     continue;

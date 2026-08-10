@@ -15,6 +15,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/EmployeeContractStateMachine.php';
 require_once __DIR__ . '/ContractSnapshotService.php';
 
@@ -203,7 +205,7 @@ class EmployeeContractAmendmentService
                 'payload' => array('contract_id' => (int) $c['id'], 'amendment_id' => (int) $a['id'],
                                    'effective_from' => $eff, 'changes' => $changes),
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'EmployeeContractAmendmentService publish #');
             error_log('EmployeeContractAmendmentService publish #' . $a['id'] . ': ' . $t->getMessage());
         }
 

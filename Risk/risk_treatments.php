@@ -17,7 +17,9 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes($__pp);
 
 $canVerify = $RISK_FULL && (!empty($__pp['can_edit']) || $is_super_admin);
-$conn->query("UPDATE risk_treatments SET state='overdue' WHERE company_id={$company_id} AND state IN ('planned','in_progress') AND due_date < CURDATE()");
+// CS-05 / AC-F6 — كنسُ المتأخرِ خدمةٌ لا عبارةٌ في السطح.
+require_once __DIR__ . '/../app/Services/Risk/RiskService.php';
+\App\Services\Risk\RiskService::sweepOverdueTreatments($conn, $company_id);
 
 $rows = array();
 $r = $conn->query("SELECT t.*, rr.risk_code, rr.title risk_title, u.name action_owner

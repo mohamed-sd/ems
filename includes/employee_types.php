@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * أنواع الموظفين الموحّدة (الموجة 1) ومساعد فلترة أنواع التشغيل.
  *
@@ -64,7 +65,7 @@ if (!function_exists('ems_save_employee_extra')) {
 
         try {
             ems_employee_helper_gate()->update('employees', $data, ['id' => $emp_id]);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'كالأصل: فشل الحفظ الإضافي لا يقطع حفظ الموظف الرئيس');
             // كالأصل: فشل الحفظ الإضافي لا يقطع حفظ الموظف الرئيس
         }
     }
@@ -123,7 +124,7 @@ if (!function_exists('ems_sync_equipment_operator')) {
                 if ($op) {
                     $gate->deleteChild('equipment_operators', intval($op['id']), 'employees', $emp_id, 'employee_id', 'operator unsync');
                 }
-            } catch (\Throwable $t) { /* لا سجل/غير مملوك → لا شيء */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا سجل/غير مملوك → لا شيء'); /* لا سجل/غير مملوك → لا شيء */ }
             return;
         }
 
@@ -153,7 +154,7 @@ if (!function_exists('ems_sync_equipment_operator')) {
                 }
                 $gate->insert('equipment_operators', $op_data);
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'كالأصل: فشل المزامنة لا يقطع حفظ الموظف');
             // كالأصل: فشل المزامنة لا يقطع حفظ الموظف
         }
     }

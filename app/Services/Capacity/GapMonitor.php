@@ -15,6 +15,8 @@
 
 namespace App\Services\Capacity;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/../../Core/EventPublisher.php';
 
 use App\Core\EventPublisher;
@@ -135,7 +137,7 @@ class GapMonitor
                                     . (isset($payload['to']) ? ':' . $payload['to'] : '')
                                     . (isset($payload['closed_on']) ? $payload['closed_on'] : ''), 0, 64),
             ));
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'GapMonitor emit');
             error_log('GapMonitor emit ' . $key . ': ' . $t->getMessage());
         }
     }

@@ -20,6 +20,8 @@
 
 namespace App\Services\Payroll;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/PayrollRunService.php';
 
 class ProductionPathService
@@ -76,7 +78,7 @@ class ProductionPathService
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.path = 'project'
                     AND l.line_kind = 'component'
                   ORDER BY l.person_id, l.id", array($runId));
-        } catch (\Throwable $t) { $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
         if (!$lines) {
             $out['ok'] = true; $out['code'] = 200;
             $out['reason'] = 'لا أسطرَ مشروعيةً في هذه الدورة — لا شيءَ للمسار الإنتاجي';
@@ -87,7 +89,7 @@ class ProductionPathService
         try {
             $conn->query("DELETE FROM payroll_lines WHERE run_id = {$runId}
                            AND line_kind IN ('production','incentive')");
-        } catch (\Throwable $t) { /* لا يوقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا يوقف'); /* لا يوقف */ }
 
         $byPerson = array();
         foreach ($lines as $l) { $byPerson[(int) $l['person_id']][] = $l; }
@@ -254,7 +256,7 @@ class ProductionPathService
                     AND e.entry_date BETWEEN ? AND ?
                   ORDER BY a.id",
                 array((int) $personId, (string) $unit, (string) $pFrom, (string) $pTo));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
 
         if (!$rows) {
             $out['why'] = 'لا وحداتٍ مسجَّلةً لهذا المشغّل بهذه الوحدة في الفترة';
@@ -328,7 +330,7 @@ class ProductionPathService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
         if (!$s) { return null; }
         $p = json_decode((string) $s['snapshot_json'], true);
         return is_array($p) ? $p : null;
@@ -351,7 +353,7 @@ class ProductionPathService
                 'calc_state' => (string) $calcState,
                 'note' => mb_substr((string) $note, 0, 255),
             ));
-        } catch (\Throwable $t) { error_log('H-09-3 addLine: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'H-09-3 addLine'); error_log('H-09-3 addLine: ' . $t->getMessage()); }
     }
 
     private static function audit($conn, $companyId, $actor, $runId, $produced, $incentives, $declared)

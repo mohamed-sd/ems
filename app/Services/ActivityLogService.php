@@ -24,6 +24,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+require_once __DIR__ . '/../../includes/catch_log.php';
+
 use App\Repositories\ActivityLogRepository;
 
 class ActivityLogService
@@ -149,7 +151,7 @@ class ActivityLogService
         try {
             self::$pending[] = self::buildEntry($data);
             self::registerShutdown();
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, '[ActivityLogService] Exception');
             error_log('[ActivityLogService] Exception: ' . $e->getMessage());
         }
     }
@@ -178,7 +180,7 @@ class ActivityLogService
         foreach (self::$pending as $entry) {
             try {
                 $repo->insert($entry);
-            } catch (\Throwable $e) {
+            } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, '[ActivityLogService] Insert failed');
                 error_log('[ActivityLogService] Insert failed: ' . $e->getMessage());
             }
         }

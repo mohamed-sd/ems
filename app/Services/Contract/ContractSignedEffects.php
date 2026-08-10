@@ -17,6 +17,8 @@
 
 namespace App\Services\Contract;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class ContractSignedEffects
 {
     /**
@@ -33,7 +35,7 @@ class ContractSignedEffects
 
         $c = null;
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
         if (!$c) { return $out; }
 
         /* ── ③ الحاوية الرئيسية — عطالة بوحدانية (company · contract · رئيسية) ── */
@@ -62,7 +64,7 @@ class ContractSignedEffects
                 if (mysqli_stmt_execute($st)) { $out['container_id'] = (int) mysqli_insert_id($conn); }
                 mysqli_stmt_close($st);
             }
-        } catch (\Throwable $t) { error_log('SignedEffects container #' . $contractId . ': ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'SignedEffects container'); error_log('SignedEffects container #' . $contractId . ': ' . $t->getMessage()); }
 
         /* ── ④ الالتزام بنمط المروحة — الخريطة ثم الأثر ثم وصلة العطالة ────── */
         try {
@@ -124,7 +126,7 @@ class ContractSignedEffects
             } else {
                 mysqli_stmt_close($st);
             }
-        } catch (\Throwable $t) { error_log('SignedEffects commitment #' . $contractId . ': ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'SignedEffects commitment'); error_log('SignedEffects commitment #' . $contractId . ': ' . $t->getMessage()); }
 
         /* ── ⑤ محرّكُ الالتزامات (update0013 · OR-01) ──────────────────────────
            «◆ الالتزامُ يُنشأ عند **اعتمادِ العقدِ** لا عند أولِ دفعة — فالعقدُ
@@ -229,7 +231,7 @@ class ContractSignedEffects
                     else { error_log('SignedEffects obligation #' . $contractId . ': ' . (string) $r['reason']); }
                 }
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'SignedEffects obligation #');
             error_log('SignedEffects obligation #' . $contractId . ': ' . $t->getMessage());
         }
 

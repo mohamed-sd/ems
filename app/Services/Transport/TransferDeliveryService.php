@@ -200,4 +200,58 @@ class TransferDeliveryService
             return array('ok' => false, 'replay' => false, 'msg' => 'تعذّر الإقفال — لم يُكتب شيء (ERR-TRS-1046)');
         }
     }
+
+    /**
+     * تأكيدُ وصولِ أمرِ نقل — استُخرج من `Transport/transfer_in_transit.php`
+     * امتثالًا لـCS-05 (AC-F6).
+     *
+     * ◆ التقدُّمُ مشروطٌ في الجملةِ نفسِها (`stage='in_transit'`) لا بفحصٍ
+     *   سابقٍ عليها: نقرتان متزامنتان لا تُنتجان وصولَين، و`affected_rows`
+     *   هو الحَكَم.
+     * ◆ وواقعةُ الوصولِ تُكتب **فقط** إن تقدّم الأمرُ فعلًا — وإلا امتلأ سجلُّ
+     *   الوقائعِ بوصولاتٍ لم تقع. وكانت في الأصلَ تُبنى بالوصلِ النصيِّ
+     *   للمتغيّرات، فصارت مُعامَلاتٍ مربوطة.
+     *
+     * @return array{ok:bool,msg:string}
+     */
+    public static function confirmArrival($conn, $companyId, $orderId, $userId)
+    {
+        $cid = (int) $companyId; $oid = (int) $orderId; $uid = (int) $userId;
+
+        $st = $conn->prepare(
+            "UPDATE transfer_orders
+                SET stage = 'arrived', arrival_datetime = NOW()
+              WHERE id = ? AND company_id = ? AND stage = 'in_transit'"
+        );
+        if (!$st) {
+            error_log('TransferDeliveryService::confirmArrival prepare: ' . $conn->error);
+            return array('ok' => false, 'msg' => 'تعذّر تسجيلُ الوصول (ERR-TRS-PREP)');
+        }
+        $st->bind_param('ii', $oid, $cid);
+        if (!$st->execute()) {
+            error_log('TransferDeliveryService::confirmArrival execute: ' . $st->error);
+            $st->close();
+            return array('ok' => false, 'msg' => 'تعذّر تسجيلُ الوصول (ERR-TRS-EXEC)');
+        }
+        $advanced = $st->affected_rows > 0;
+        $st->close();
+
+        if (!$advanced) {
+            return array('ok' => false, 'msg' => 'لم يتقدم — الأمرُ ليس في الطريق (409)');
+        }
+
+        $ev = $conn->prepare(
+            "INSERT INTO transfer_events (company_id, order_id, event_type, body, actor_user_id)
+             VALUES (?, ?, 'arrived', 'وصولٌ مؤكَّدٌ من شاشة الحركة في الطريق', ?)"
+        );
+        if ($ev) {
+            $ev->bind_param('iii', $cid, $oid, $uid);
+            if (!$ev->execute()) { error_log('TransferDeliveryService::confirmArrival event: ' . $ev->error); }
+            $ev->close();
+        } else {
+            error_log('TransferDeliveryService::confirmArrival event prepare: ' . $conn->error);
+        }
+
+        return array('ok' => true, 'msg' => "سُجّل وصولُ الأمر #{$oid} — انتقل إلى «الوصول والتسليم»");
+    }
 }

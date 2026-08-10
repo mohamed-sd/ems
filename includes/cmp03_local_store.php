@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * includes/cmp03_local_store.php — محوّل شاشات CMP-03 إلى جداولها الأصلية (الموجة ٢)
  * ───────────────────────────────────────────────────────────────────────────
@@ -59,6 +60,40 @@ if (!function_exists('cmp03_store_insert')) {
         $st->bind_param($types, ...$vals);
         $ok = $st->execute();
         if (!$ok) { error_log("cmp03_local_store: execute فشل — " . $st->error); }
+        $st->close();
+        return (bool) $ok;
+    }
+}
+
+if (!function_exists('cmp03_stage_insert')) {
+    /**
+     * حفظُ صفٍّ في **المخزنِ البينيِّ** `cmp03_screen_rows` — لا في جدولِ
+     * الشاشةِ الأصليِّ (ذاك شأنُ `cmp03_store_insert`). والفرقُ جوهريّ: البينيُّ
+     * يقبل حمولةً حرةً بتسمياتٍ عربية، والأصليُّ يشترط خريطةَ أعمدةٍ مسجَّلة.
+     *
+     * ◆ استُخرجت من `Suppliers/supplier_bank.php` امتثالًا لـCS-05 «لا عبارةَ
+     *   كتابةٍ في ملفِّ سطح» (AC-F6). سطحٌ واحدٌ كان يكتبها، والباقي أدوات —
+     *   فالموضعُ الطبيعيُّ لها مخزنُ CMP-03 لا الشاشة.
+     *
+     * @return bool
+     */
+    function cmp03_stage_insert(mysqli $conn, $companyId, $canonical, array $payload, $status, $uid, $creatorName)
+    {
+        $st = $conn->prepare(
+            'INSERT INTO cmp03_screen_rows
+                (company_id, canonical_file, payload, status, is_seed, created_by, created_by_name)
+             VALUES (?, ?, ?, ?, 0, ?, ?)'
+        );
+        if (!$st) { error_log('cmp03_stage_insert: prepare فشل — ' . $conn->error); return false; }
+        $cid  = (int) $companyId;
+        $can  = (string) $canonical;
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $stt  = (string) $status;
+        $u    = (int) $uid;
+        $who  = (string) $creatorName;
+        $st->bind_param('isssis', $cid, $can, $json, $stt, $u, $who);
+        $ok = $st->execute();
+        if (!$ok) { error_log('cmp03_stage_insert: execute فشل — ' . $st->error); }
         $st->close();
         return (bool) $ok;
     }
@@ -284,7 +319,7 @@ if (!function_exists('cmp03_store_audit')) {
                 $co, $user, $roleId, $roleNm, $screen, $module, $act, $fields, $rec, $old, $new);
             $st->execute();
             $st->close();
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'CS-12: لا يُبتلع — يُسجَّل ولا يُوقف الأثرَ (السجلُّ تابعٌ لا شرط).');
             // CS-12: لا يُبتلع — يُسجَّل ولا يُوقف الأثرَ (السجلُّ تابعٌ لا شرط).
             error_log('cmp03_store_audit failed: ' . $e->getMessage());
         }

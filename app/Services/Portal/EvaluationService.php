@@ -13,6 +13,8 @@
 
 namespace App\Services\Portal;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class EvaluationService
 {
     // ═════════════════════════════════════════════════════════════════════
@@ -132,7 +134,7 @@ class EvaluationService
         // لا اعتمادَ للذات — صاحبُ الصفة لا يعتمد تقييمَه
         $cap = null;
         try { $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $ev['capacity_id']))); }
-        catch (\Throwable $t) { $cap = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
         if ($cap && (int) $cap['account_id'] === (int) $approver) {
             return array('ok' => false, 'code' => 403,
                 'reason' => '**لا اعتمادَ للذات** — صاحبُ الصفة لا يعتمد تقييمَه (USR-01 §8-④)');
@@ -159,7 +161,7 @@ class EvaluationService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'serial_no' => null, 'verify_code' => null);
         $snap = null;
         try { $snap = $gate->selectOne('achievement_snapshots', array('where' => array('id' => (int) $snapId))); }
-        catch (\Throwable $t) { $snap = null; }
+        catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $snap'); $snap = null; }
         if (!$snap) {
             $out['code'] = 422;
             $out['reason'] = '**لا شهادةَ لفترةٍ لم تُقفل بلقطة** — الشهادةُ من الأرقام المقاسة لا من كتابةٍ حرة (U7)';
@@ -195,7 +197,7 @@ class EvaluationService
             $out['ok'] = true; $out['code'] = 200;
             $out['serial_no'] = $serial; $out['verify_code'] = $verify;
             $out['cert_id'] = $certId;
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'إصدارُ شهادةِ تقييمٍ فشل — التقييمُ محفوظٌ والشهادةُ تُعاد بطلبٍ جديد');
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
                 $out['code'] = 409;
                 $out['reason'] = '**لا تُصدَر الشهادةُ مرتين بالمفتاح نفسِه** — للقطةِ شهادتُها الصادرة (U7)';

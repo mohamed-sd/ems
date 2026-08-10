@@ -27,6 +27,8 @@
 
 namespace App\Services\Settlement;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class SettlementService
 {
     /** الحالاتُ الست بحروف §15.3. */
@@ -266,7 +268,7 @@ class SettlementService
                         'currency'    => 'SDG',
                     );
                 }
-            } catch (\Throwable $t) { error_log('settlement employee advances: ' . $t->getMessage()); }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement employee advances'); error_log('settlement employee advances: ' . $t->getMessage()); }
         }
 
         // التحميلان المباشران للمورد وحده (العاملُ لا تُصرف له قطعٌ ولا أوامرُ صيانة)
@@ -280,7 +282,7 @@ class SettlementService
             foreach (SupplierAdvanceService::chargeLines($gate, $partyRef, $from, $to) as $adv) {
                 $lines[] = $adv;
             }
-        } catch (\Throwable $t) { error_log('settlement supplier advances: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement supplier advances'); error_log('settlement supplier advances: ' . $t->getMessage()); }
 
         // ── ② قطعُ الغيار من الصرف بعمودِ التحميل الصريح ────────────────────
         try {
@@ -315,7 +317,7 @@ class SettlementService
                                      ? (string) $x['currency'] : 'SDG',
                 );
             }
-        } catch (\Throwable $t) { error_log('settlement parts: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement parts'); error_log('settlement parts: ' . $t->getMessage()); }
 
         // ── ③ الصيانة من أمرها بعمودِ التحميل الصريح ────────────────────────
         try {
@@ -347,7 +349,7 @@ class SettlementService
                     'currency'    => 'SDG',   // أمرُ الصيانة بلا عمود عملة — عملةُ التشغيل
                 );
             }
-        } catch (\Throwable $t) { error_log('settlement maintenance: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement maintenance'); error_log('settlement maintenance: ' . $t->getMessage()); }
 
         // ── ④ M-52 · الترحيلُ من أمره المسلَّم بتعرفته ───────────────────────
         // ENT-02 §3-④: «**أمرُ الترحيل المسلَّم · بتعرفته**» — والمبلغُ يُقرأ من
@@ -359,7 +361,7 @@ class SettlementService
                          $gate, $partyRef, $from, $to) as $trp) {
                 $lines[] = $trp;
             }
-        } catch (\Throwable $t) { error_log('settlement transport: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement transport'); error_log('settlement transport: ' . $t->getMessage()); }
 
         // ── ⑤ M-16 · جزاءُ الجاهزية والتغطية من بطاقة الطاقة ────────────────
         // CON-03 §6.1-Q3: «جاهزيةُ شهرٍ 81٪ والحد 85٪ ← جزاءٌ محسوبٌ بقاعدته
@@ -383,7 +385,7 @@ class SettlementService
                     $lines[] = $p;
                 }
             }
-        } catch (\Throwable $t) { error_log('settlement capacity penalty: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement capacity penalty'); error_log('settlement capacity penalty: ' . $t->getMessage()); }
 
         return $lines;
     }
@@ -616,7 +618,7 @@ class SettlementService
             try {
                 require_once __DIR__ . '/SupplierAdvanceService.php';
                 SupplierAdvanceService::applyRecoveries($conn, $gate, $company, $sid, $userId);
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement advance recovery #');
                 error_log('settlement advance recovery #' . $sid . ': ' . $t->getMessage());
             }
         }
@@ -641,7 +643,7 @@ class SettlementService
                     'source_doc_id'   => $sid,
                     'created_by'    => $userId,
                 ));
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement receivable #');
                 error_log('settlement receivable #' . $sid . ': ' . $t->getMessage());
             }
         }
@@ -867,7 +869,7 @@ class SettlementService
 
             $out['id'] = intval($id);
             $out['no'] = $no;
-        } catch (\Throwable $t) {
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعذّرُ يُسجَّل ولا يُسقط اعتمادَ التسوية — الحدثُ نُشر والذمّةُ قُيّدت،');
             // التعذّرُ يُسجَّل ولا يُسقط اعتمادَ التسوية — الحدثُ نُشر والذمّةُ قُيّدت،
             // ويبقى توليدُ الطلب قابلًا للإعادة من الشاشة.
             error_log('settlement payment request #' . $st['id'] . ': ' . $t->getMessage());

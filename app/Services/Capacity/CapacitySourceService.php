@@ -10,6 +10,8 @@
 
 namespace App\Services\Capacity;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/BalanceCalculator.php';
 
 class CapacitySourceService
@@ -60,7 +62,7 @@ class CapacitySourceService
                     'noted_on'        => self::dbToday($conn),
                     'detail'          => 'ظلُّ الاستهلاك — المخزَّنُ لا يساوي الدفتر',
                 ));
-            } catch (\Throwable $t) {
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'uq_shadow_daily: فرقُ اليوم مسجَّلٌ سلفًا — يكفي صفٌّ يوميٌّ واحد');
                 // uq_shadow_daily: فرقُ اليوم مسجَّلٌ سلفًا — يكفي صفٌّ يوميٌّ واحد
             }
         }

@@ -24,6 +24,8 @@
 
 namespace App\Services\Operations;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 require_once __DIR__ . '/../Contract/ContractStateMachine.php';
 require_once __DIR__ . '/../Capacity/CapacityLedgerService.php';
 require_once __DIR__ . '/../Capacity/BalanceCalculator.php';
@@ -279,7 +281,7 @@ class OperationalTransformService
         try {
             $ex = $gate->selectOne('container_consumption', array(
                 'whereRaw' => 'idem_key = ?', 'params' => array($idemKey)));
-        } catch (\Throwable $t) { $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true;
             $out['reason'] = 'مسجَّلٌ سلفًا بهذا المفتاح';
@@ -592,7 +594,7 @@ class OperationalTransformService
                   WHERE {TENANT_SCOPE} AND COALESCE(c.is_deleted,0)=0
                     AND c.origin = 'مشتقّة' AND c.origin_ack_by IS NULL{$extra}
                   ORDER BY c.contract_id, c.level, c.id", $params);
-        } catch (\Throwable $t) { error_log('containers recon derived: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'containers recon derived'); error_log('containers recon derived: ' . $t->getMessage()); }
 
         // وحداتٌ لها وقائعُ ولا حاويةَ رئيسيةً بوحدتها.
         // ⚠️ المرشِّحُ يسري على الشقّين: عرضُ عقودٍ أخرى تحت عنوان عقدٍ مختارٍ
@@ -611,7 +613,7 @@ class OperationalTransformService
                     AND e.state NOT IN ('rejected','cancelled','reversed','superseded'){$extra2}
                   GROUP BY e.contract_id, e.unit_type
                   ORDER BY e.contract_id, e.unit_type", $params2);
-        } catch (\Throwable $t) { error_log('containers recon unmatched: ' . $t->getMessage()); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'containers recon unmatched'); error_log('containers recon unmatched: ' . $t->getMessage()); }
 
         return $out;
     }
@@ -751,7 +753,7 @@ class OperationalTransformService
                 'columns' => array('container_no'),
                 'whereRaw' => "container_no LIKE ?", 'params' => array('CNT-' . $year . '-%'),
                 'orderBy' => 'id DESC', 'limit' => 1, 'includeDeleted' => true));
-        } catch (\Throwable $t) { $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
         $seq = 1;
         if ($rows && preg_match('~-(\d+)$~', (string) $rows[0]['container_no'], $m)) {
             $seq = (int) $m[1] + 1;

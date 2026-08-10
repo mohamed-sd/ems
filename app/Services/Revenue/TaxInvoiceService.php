@@ -21,6 +21,8 @@
 
 namespace App\Services\Revenue;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class TaxInvoiceService
 {
     /** حالاتُ المستخلص التي تُصدَر منها فاتورة — «مستخلصٌ معتمد». */
@@ -86,7 +88,7 @@ class TaxInvoiceService
             try {
                 $tc = $gate->selectOne('fin_tax_codes',
                     array('whereRaw' => 'code = ?', 'params' => array($taxCode)));
-            } catch (\Throwable $t) { $tc = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $tc'); $tc = null; }
             if (!$tc) {
                 $out['code'] = 422;
                 $out['reason'] = 'رمزٌ ضريبيٌّ غيرُ مسجَّل: ' . $taxCode
@@ -175,7 +177,7 @@ class TaxInvoiceService
         try {
             $r = $conn->query("SELECT * FROM admin_companies WHERE id = " . (int) $companyId . " LIMIT 1");
             $co = $r ? $r->fetch_assoc() : null;
-        } catch (\Throwable $t) { $co = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $co'); $co = null; }
         $f['seller_name'] = $co ? (string) self::pick($co, array('company_name', 'name', 'title')) : '';
         $f['seller_tax_no'] = $co ? (string) self::pick($co, array('tax_number', 'tax_no', 'vat_number')) : '';
         if ($f['seller_name'] === '') { $f['_missing'][] = 'اسمُ البائع (بيانات الشركة)'; }
@@ -183,7 +185,7 @@ class TaxInvoiceService
         $client = null;
         try {
             $client = $gate->selectOne('clients', array('where' => array('id' => (int) $claim['client_id'])));
-        } catch (\Throwable $t) { $client = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $client'); $client = null; }
         $f['buyer_name'] = $client ? (string) self::pick($client, array('name', 'client_name', 'company_name')) : '';
         $f['buyer_tax_no'] = $client ? (string) self::pick($client, array('tax_number', 'tax_no', 'vat_number')) : '';
         $f['buyer_address'] = $client ? (string) self::pick($client, array('address', 'full_address')) : '';

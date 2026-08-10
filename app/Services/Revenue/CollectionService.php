@@ -20,6 +20,8 @@
 
 namespace App\Services\Revenue;
 
+require_once __DIR__ . '/../../../includes/catch_log.php';
+
 class CollectionService
 {
     /** وسمُ الموروث — يُعلَن ولا يُقبل لقبضٍ جديد. */
@@ -67,7 +69,7 @@ class CollectionService
                 'columns'  => array('id', 'payment_no'),
                 'whereRaw' => "direction = 'collection' AND bank_ref = ? AND amount = ? AND received_on = ?",
                 'params'   => array($ref, $amount, $on)));
-        } catch (\Throwable $t) { $dup = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $dup'); $dup = null; }
         if ($dup) {
             $out['code'] = 409; $out['payment_id'] = (int) $dup['id'];
             $out['reason'] = 'قبضٌ بالمرجع نفسِه والمبلغ نفسِه في اليوم نفسِه مسجَّلٌ سلفًا: '
@@ -195,7 +197,7 @@ class CollectionService
                   ORDER BY c.id DESC LIMIT 1",
                 array((int) $receivableId, (string) $recv['doc_ref']));
             $claim = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { $claim = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $claim'); $claim = null; }
         if (!$claim) { return null; }
 
         $collected = round((float) $recv['collected'], 2);
@@ -247,7 +249,7 @@ class CollectionService
                      'unallocated' => 0.0, 'rows' => array());
         $p = null;
         try { $p = $gate->selectOne('fin_payments', array('where' => array('id' => (int) $paymentId))); }
-        catch (\Throwable $t) { $p = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $p'); $p = null; }
         if (!$p) { $out['code'] = 404; $out['reason'] = 'السندُ غيرُ موجودٍ في نطاقك'; return $out; }
         if ((string) $p['direction'] !== 'collection') {
             $out['code'] = 422;
@@ -430,7 +432,7 @@ class CollectionService
         if ($kind === 'invoice') {
             $r = null;
             try { $r = $gate->selectOne('fin_receivables', array('where' => array('id' => (int) $ref))); }
-            catch (\Throwable $t) { $r = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $r'); $r = null; }
             if (!$r) { $o['code'] = 404; $o['reason'] = 'الذمّةُ #' . $ref . ' غيرُ موجودة'; return $o; }
             $outst = round((float) $r['outstanding'], 2);
             if ($outst <= 0.004) {
@@ -453,7 +455,7 @@ class CollectionService
         // الأهدافُ الأربعةُ الأخرى **أسطرُ خطةِ الدفع** (P-05) — لا جدولَ ثالث
         $r = null;
         try { $r = $gate->selectOne('contract_payment_schedule', array('where' => array('id' => (int) $ref))); }
-        catch (\Throwable $t) { $r = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $r'); $r = null; }
         if (!$r) { $o['code'] = 404; $o['reason'] = 'سطرُ خطة الدفع #' . $ref . ' غيرُ موجود'; return $o; }
         if ($r['effective_to'] !== null) {
             $o['code'] = 423;
@@ -612,7 +614,7 @@ class CollectionService
                 "SELECT COUNT(*) AS n FROM fin_payments p
                   WHERE {TENANT_SCOPE} AND p.payment_no LIKE ?", array('RCT-' . $year . '-%'));
             $n = $rows ? ((int) $rows[0]['n'] + 1) : 1;
-        } catch (\Throwable $t) { $n = 1; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذّر عدُّ الإيصالاتِ فيبدأ الترقيمُ من ١ — والتفرُّدُ محروسٌ بقيدِ القاعدةِ لا بالعدّ'); $n = 1; }
         return 'RCT-' . $year . '-' . str_pad((string) $n, 4, '0', STR_PAD_LEFT);
     }
 }
