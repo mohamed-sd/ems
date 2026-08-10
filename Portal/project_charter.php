@@ -26,6 +26,7 @@ if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
 }
 require_once '../includes/gov_columns.php';
 require_once '../includes/m00_exec_helpers.php';
+require_once '../includes/audit_trail.php';   // INJ-0131: أثرُ أفعالِ القمّة
 
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
@@ -234,6 +235,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $st->bind_param('iisssi', $projectId, $ccId, $ccCode, $apprName, $apprDate, $rowId);
         if (!$st->execute()) { throw new \RuntimeException('charter: ' . $st->error); }
         $st->close();
+
+        /* INJ-0131 — أثرُ تدقيقٍ لفعلِ القمّة: «بعد كلِّ فعلٍ من أفعالِ القمةِ
+           يوجد صفُّ تدقيقٍ واحدٌ على الأقل يحمل الجدولَ والمعرّفَ والقيمَ».
+           ◆ وداخلَ المعاملةِ لا بعدَها: قرارٌ يُرتَدُّ يجب ألّا يترك أثرًا يقول
+             إنه وقع. والأثرُ يحمل الخماسيَّ المولَّدَ كلَّه لا حالةَ الصفِّ وحدَها. */
+        ems_audit_change($conn, 'governance', 'Portal/project_charter.php', 'charter_open', (int) $rowId,
+            array('status' => (string) ($row['status'] ?? ''), 'project_id' => null, 'cost_center_id' => null),
+            array('status' => 'مفتوح', 'project_id' => $projectId, 'cost_center_id' => $ccId,
+                  'cost_center' => $ccCode, 'approver_name' => $apprName, 'approval_date' => $apprDate),
+            array('company_id' => $rowCo, 'user_id' => $uid,
+                  'note' => 'فتحُ مشروعٍ بالأثرِ الخماسي — قرار ' . (string) ($row['decision_no'] ?? '')));
 
         $conn->commit();
     } catch (\Throwable $t) {

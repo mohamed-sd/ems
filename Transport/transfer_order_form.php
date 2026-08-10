@@ -12,6 +12,7 @@ if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/trs_helpers.php';
+require_once __DIR__ . '/../includes/self_approval_guard.php';  // INJ-0323: من أنشأ لا يعتمد
 
 $ctx = trs_ctx();
 $is_super_admin = $ctx['is_super'];
@@ -254,6 +255,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $err = '';              // رسالة الحارس إن فشل
         $set_extra = array();   // أعمدة زمنية إضافية (كانت NOW() نصية — الآن ساعة PHP لنفس المضيف)
         $company_of = intval($orow['company_id']);
+
+        /* INJ-0323 — «منشئُ الأمرِ لا يستطيع اعتمادَه ولا إقفالَه».
+           ◆ الحارسُ المركزيُّ مبنيٌّ في الحزمة (P1-B) وهذه الشاشةُ لم تكن تتبنّاه —
+             وبناءٌ بلا تبنٍّ لا يحرس أحدًا (MD-05). فيُتبنّى هنا على الانتقالَين
+             الحاكمَين وحدَهما: `plan` اعتمادٌ و`close` إقفال. وبقيةُ الانتقالاتِ
+             تنفيذٌ ميدانيٌّ (مغادرةٌ · وصول) يقوم به المنشئُ بحقّ.
+           ◆ والمنعُ يسمّي سببَه ولا يصمت. */
+        if ($trans === 'plan' || $trans === 'close') {
+            $selfDeny = ems_assert_not_self_approval($conn, 'transfer_orders', 'id', $id,
+                'أمرُ الترحيل ' . (string) ($orow['order_no'] ?? $id), $company_of);
+            if ($selfDeny !== null) {
+                $why = (string) ($selfDeny['reason'] ?? 'لا يجوز اعتمادُ ما أنشأتَه بنفسك');
+                ems_gov_redirect('Location: transfer_order_form.php?id=' . $id
+                    . '&msg=' . rawurlencode($why) . '+❌');
+                exit();
+            }
+        }
 
         if ($trans === 'plan') {
             // ربط بمشروع/مركز تكلفة قبل الاعتماد (§ب.8)

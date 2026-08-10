@@ -99,10 +99,17 @@ $P['INJ-0282'] = function () use ($db) {
     return array($n !== null && $n > 0, 'صفُّ تنقّلٍ لساعاتِ الوقائية: ' . var_export($n, true));
 };
 
+/* ◆ اختبارُ القبولِ نصَّ على «منشئُ الأمرِ لا يستطيع اعتمادَه ولا إقفالَه» —
+     وهو حارسُ منعِ اعتمادِ الذات، لا حارسُ صلاحيةِ الكتابةِ الذي كان المِسبارُ
+     يفتّش عنه. والفاحصُ الذي يقيس غيرَ ما نصَّ عليه حكمُه يشهد على غيرِ بابِه. */
 $P['INJ-0323'] = function () use ($ROOT) {
-    $ok = has($ROOT, 'Transport/transfer_order_form.php', 'ems_enforce_write_permission')
-       || has($ROOT, 'Transport/transfer_order_form.php', 'ems_guard');
-    return array($ok, 'حارسُ انتقالاتِ أمرِ الترحيل: ' . ($ok ? 'موصول' : 'غائب'));
+    $s = src($ROOT, 'Transport/transfer_order_form.php');
+    $loaded = strpos($s, 'self_approval_guard.php') !== false;
+    $called = strpos($s, 'ems_assert_not_self_approval') !== false;
+    $onBoth = preg_match("/\\\$trans\\s*===\\s*'plan'[^\\n]{0,40}\\\$trans\\s*===\\s*'close'/u", $s);
+    return array($loaded && $called && $onBoth,
+        'محمَّل: ' . ($loaded ? 'نعم' : 'لا') . ' · منادًى: ' . ($called ? 'نعم' : 'لا')
+        . ' · على الاعتمادِ والإقفال: ' . ($onBoth ? 'نعم' : 'لا'));
 };
 
 $P['INJ-0331'] = function () use ($db) {

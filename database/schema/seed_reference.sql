@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 12:55:12
+-- المصدر: equipation_manage · التوليد: 2026-08-10 18:32:29
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -5527,7 +5527,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6831,29,'RISK',3872,327,'شهية المخاطر وحدودها','Risk/risk_appetite.php','fa fa-circle-dot',1,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6832,29,'RISK',3872,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-circle-dot',2,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6833,1,'RISK',2084,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
-(6834,2,'RISK',2085,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
+(6834,2,'RISK',2085,330,'مخاطر إدارة الموردين','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-10 18:31:00'),
 (6835,3,'RISK',2086,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6836,4,'RISK',2087,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6837,6,'RISK',2088,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
@@ -5536,7 +5536,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6840,16,'RISK',2096,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6841,17,'RISK',2097,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6842,19,'RISK',2099,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
-(6843,23,'RISK',2103,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
+(6843,23,'RISK',2103,330,'مخاطر النقل والترحيل','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-10 18:31:00'),
 (6844,24,'RISK',2104,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6845,25,'RISK',2105,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
 (6846,26,'RISK',2106,330,'مساحة مخاطر الإدارة','Risk/dept_risk_space.php','fa fa-building-shield',99,NULL,NULL,1,'2026-08-07 05:13:27','2026-08-07 05:13:27'),
@@ -5673,7 +5673,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7004,33,'GOV',3929,384,'ردود الإدارات على الملاحظات','Audit/iaf_responses.php','fa fa-circle-dot',14,NULL,'Audit/iaf_responses.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7005,33,'GOV',3929,379,'الكون الرقابي','Audit/iaf_universe.php','fa fa-circle-dot',15,NULL,'Audit/iaf_universe.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7006,33,'GOV',3929,382,'أوراق العمل والأدلة','Audit/iaf_workpapers.php','fa fa-circle-dot',16,NULL,'Audit/iaf_workpapers.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
-(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-10 12:52:19'),
+(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-10 17:40:26'),
 (7008,33,'DAILY',3930,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-circle-dot',2,NULL,'Finance/acc_backflow.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7009,33,'DAILY',3930,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-circle-dot',3,NULL,'Finance/acc_my_day.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7010,33,'DAILY',3930,368,'مصفوفة التوجيه لمحاسبي التخصصات','Finance/acc_routing_matrix.php','fa fa-circle-dot',4,NULL,'Finance/acc_routing_matrix.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),

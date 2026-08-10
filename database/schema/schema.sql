@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 12:55:12
+-- المصدر: equipation_manage · التوليد: 2026-08-10 18:32:29
 -- الجداول: 549 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -7028,8 +7028,8 @@ CREATE TABLE `nav_items` (
   KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
   KEY `ix_nav_group` (`group_id`),
   KEY `ix_nav_module` (`module_id`),
-  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
-  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav_redirects ──

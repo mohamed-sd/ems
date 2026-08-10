@@ -83,6 +83,26 @@ foreach ($refFiles as $f) {
     if ($code !== 0) { $bad[] = array($f, 'php -l: ' . trim(implode(' ', $out))); $refBad++; }
 }
 
+/* ══ هجرةٌ لا تُنفَّذ وتُسجَّل ناجحة ═══════════════════════════════════════
+   ◆ گوتشا كلّفتني جولةً كاملة: المُرحِّلُ يشغّل كلَّ هجرةٍ **سكربتًا مستقلًّا في
+     عمليةٍ منفصلة** و«النجاحُ = رمزُ خروجٍ صفر». فملفٌّ كُتب بصيغةِ
+     `return array('up' => …, 'down' => …)` يخرج بصفرٍ **بلا أن ينفّذ حرفًا**،
+     فيُسجَّل مطبَّقًا وهو لم يمسَّ القاعدة.
+   ◆ ولا يكشفه شيءٌ آخر: التركيبُ سليم · و`php -l` يمرّ · والمُرحِّلُ يقول «نجح».
+     ولم أكتشفه إلا لأن مِسبارًا مستقلًّا قرأ الصفوفَ على حالِها القديم.
+   ◆ فالقاعدة: ملفُّ هجرةٍ يجب أن **يفعل** لا أن يعود بوصفةٍ لا يقرؤها أحد. */
+$migDir = $ROOT . '/database/migrations';
+if (is_dir($migDir)) {
+    foreach ((array) glob($migDir . '/*.php') as $mf) {
+        $ms = (string) @file_get_contents($mf);
+        if (preg_match('/^\s*return\s+array\s*\(\s*[\'"]up[\'"]/m', $ms)
+            || preg_match('/^\s*return\s*\[\s*[\'"]up[\'"]/m', $ms)) {
+            $bad[] = array('database/migrations/' . basename($mf),
+                'هجرةٌ تعود بمصفوفةِ up/down — المُرحِّلُ يشغّلها سكربتًا فلا تُنفَّذ وتُسجَّل ناجحة');
+        }
+    }
+}
+
 echo str_repeat('═', 70) . "\n";
 printf("مُحلَّلٌ %d ملفًّا · مرجعيٌّ (php -l) %d · معيبٌ %d\n", $n, count($refFiles), count($bad));
 foreach (array_slice($bad, 0, 25) as $b) { echo '  ✗ ' . $b[0] . ' — ' . mb_substr($b[1], 0, 80) . "\n"; }
