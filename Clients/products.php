@@ -10,6 +10,14 @@ include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -384,21 +392,21 @@ function prod_revenue_label($model, $map)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle prod-info-icon"></i></label>
+                        <label for="generated_prod_code"><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle prod-info-icon"></i></label>
                         <input type="text" id="generated_prod_code" class="generated-code-field" value="<?php echo prod_e($next_prod_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل الكود" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> الكود *</label>
+                        <label for="product_code"><i class="fas fa-barcode"></i> الكود *</label>
                         <input type="text" name="product_code" id="product_code" placeholder="مثال: PRD-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-heading"></i> اسم المنتج/الخدمة *</label>
+                        <label for="name"><i class="fas fa-heading"></i> اسم المنتج/الخدمة *</label>
                         <input type="text" name="name" id="name" placeholder="اسم المنتج/الخدمة" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-tag"></i> النوع</label>
+                        <label for="product_type"><i class="fas fa-tag"></i> النوع</label>
                         <select name="product_type" id="product_type">
                             <?php foreach ($PROD_TYPES as $t): ?>
                                 <option value="<?php echo prod_e($t); ?>" <?php echo $t === 'خدمة' ? 'selected' : ''; ?>><?php echo prod_e($t); ?></option>
@@ -406,7 +414,7 @@ function prod_revenue_label($model, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-diagram-project"></i> نموذج الإيراد</label>
+                        <label for="revenue_model"><i class="fas fa-diagram-project"></i> نموذج الإيراد</label>
                         <select name="revenue_model" id="revenue_model">
                             <option value="">-- غير محدد --</option>
                             <?php foreach ($PROD_REVENUE_MODELS as $k => $v): ?>
@@ -415,15 +423,15 @@ function prod_revenue_label($model, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-ruler"></i> وحدة القياس الافتراضية</label>
+                        <label for="default_uom"><i class="fas fa-ruler"></i> وحدة القياس الافتراضية</label>
                         <input type="text" name="default_uom" id="default_uom" placeholder="مثال: ساعة / طن / متر" />
                     </div>
                     <div>
-                        <label><i class="fas fa-money-bill-wave"></i> السعر المرجعي</label>
+                        <label for="standard_price"><i class="fas fa-money-bill-wave"></i> السعر المرجعي</label>
                         <input type="number" step="0.01" name="standard_price" id="standard_price" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-coins"></i> العملة</label>
+                        <label for="currency"><i class="fas fa-coins"></i> العملة</label>
                         <select name="currency" id="currency">
                             <?php foreach ($PROD_CURRENCIES as $cur): ?>
                                 <option value="<?php echo prod_e($cur); ?>" <?php echo $cur === 'USD' ? 'selected' : ''; ?>><?php echo prod_e($cur); ?></option>
@@ -431,7 +439,7 @@ function prod_revenue_label($model, $map)
                         </select>
                     </div>
                     <div class="prod-col-full">
-                        <label><i class="fas fa-align-left"></i> الوصف</label>
+                        <label for="description"><i class="fas fa-align-left"></i> الوصف</label>
                         <textarea name="description" id="description" rows="2" placeholder="أي وصف إضافي"></textarea>
                     </div>
                 </div>
@@ -450,13 +458,13 @@ function prod_revenue_label($model, $map)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-tag"></i> النوع</label>
+                <label for="filterType"><i class="fa fa-tag"></i> النوع</label>
                 <select id="filterType" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-diagram-project"></i> نموذج الإيراد</label>
+                <label for="filterModel"><i class="fa fa-diagram-project"></i> نموذج الإيراد</label>
                 <select id="filterModel" class="form-control">
                     <option value="">-- كل النماذج --</option>
                 </select>

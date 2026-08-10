@@ -164,60 +164,60 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — دورات التناوب والإجازة الميدانية</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الدورة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>كود المشغّل</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الموقع</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>المعدة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>نمط التناوب</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>نوع الإجازة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الدخول</label>
-                    <input type="date" name="f6"></div>
-                <div class="form-group"><label>تاريخ الخروج</label>
-                    <input type="date" name="f7"></div>
-                <div class="form-group"><label>أيام العمل</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>أيام الإجازة</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>المناوب المتبادل</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>حالة التبادل</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ تبادل المناوب</label>
-                    <input type="date" name="f12"></div>
-                <div class="form-group"><label>البديل عند تعذّر التبادل</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>رحلة الدخول</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>رحلة الخروج</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>رصيد الإجازة قبل</label>
-                    <input type="text" inputmode="decimal" name="f16" placeholder="0"></div>
-                <div class="form-group"><label>رصيد الإجازة بعد</label>
-                    <input type="text" inputmode="decimal" name="f17" placeholder="0"></div>
-                <div class="form-group"><label>جدولها</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f19"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f20" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f21"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f22" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f23" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f24" maxlength="190"></div>
-                <div class="form-group"><label>مركز التكلفة</label>
-                    <input type="text" inputmode="decimal" name="f25" placeholder="0"></div>
-                <div class="form-group"><label>سعر الصرف ومصدره</label>
-                    <input type="text" inputmode="decimal" name="f26" placeholder="0"></div>
+                <div class="form-group"><label for="emsf_1791_ede6d">رقم الدورة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1791_ede6d"></div>
+                <div class="form-group"><label for="emsf_1792_2d248">كود المشغّل</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1792_2d248"></div>
+                <div class="form-group"><label for="emsf_1793_758a3">الموقع</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1793_758a3"></div>
+                <div class="form-group"><label for="emsf_1794_a84e3">المعدة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1794_a84e3"></div>
+                <div class="form-group"><label for="emsf_1795_ad563">نمط التناوب</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1795_ad563"></div>
+                <div class="form-group"><label for="emsf_1796_05c02">نوع الإجازة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1796_05c02"></div>
+                <div class="form-group"><label for="emsf_1797_14345">تاريخ الدخول</label>
+                    <input type="date" name="f6" id="emsf_1797_14345"></div>
+                <div class="form-group"><label for="emsf_1798_7b4f6">تاريخ الخروج</label>
+                    <input type="date" name="f7" id="emsf_1798_7b4f6"></div>
+                <div class="form-group"><label for="emsf_1799_3cbef">أيام العمل</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1799_3cbef"></div>
+                <div class="form-group"><label for="emsf_1800_5a163">أيام الإجازة</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1800_5a163"></div>
+                <div class="form-group"><label for="emsf_1801_7a232">المناوب المتبادل</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1801_7a232"></div>
+                <div class="form-group"><label for="emsf_1802_14bfc">حالة التبادل</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1802_14bfc"></div>
+                <div class="form-group"><label for="emsf_1803_7bc58">تاريخ تبادل المناوب</label>
+                    <input type="date" name="f12" id="emsf_1803_7bc58"></div>
+                <div class="form-group"><label for="emsf_1804_927ea">البديل عند تعذّر التبادل</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1804_927ea"></div>
+                <div class="form-group"><label for="emsf_1805_54a26">رحلة الدخول</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1805_54a26"></div>
+                <div class="form-group"><label for="emsf_1806_f2c64">رحلة الخروج</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1806_f2c64"></div>
+                <div class="form-group"><label for="emsf_1807_48611">رصيد الإجازة قبل</label>
+                    <input type="text" inputmode="decimal" name="f16" placeholder="0" id="emsf_1807_48611"></div>
+                <div class="form-group"><label for="emsf_1808_dac51">رصيد الإجازة بعد</label>
+                    <input type="text" inputmode="decimal" name="f17" placeholder="0" id="emsf_1808_dac51"></div>
+                <div class="form-group"><label for="emsf_1809_ecf90">جدولها</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_1809_ecf90"></div>
+                <div class="form-group"><label for="emsf_1810_f9e6b">الحالة</label>
+                    <select name="f19" id="emsf_1810_f9e6b"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1811_85fa1">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f20" maxlength="190" id="emsf_1811_85fa1"></div>
+                <div class="form-group"><label for="emsf_1812_59ba0">تاريخ الاعتماد</label>
+                    <input type="date" name="f21" id="emsf_1812_59ba0"></div>
+                <div class="form-group"><label for="emsf_1813_e0c2e">مرجع التفويض</label>
+                    <input type="text" name="f22" maxlength="190" id="emsf_1813_e0c2e"></div>
+                <div class="form-group"><label for="emsf_1814_f653b">المرجع الأب</label>
+                    <input type="text" name="f23" maxlength="190" id="emsf_1814_f653b"></div>
+                <div class="form-group"><label for="emsf_1815_dced8">المرفق</label>
+                    <input type="text" name="f24" maxlength="190" id="emsf_1815_dced8"></div>
+                <div class="form-group"><label for="emsf_1816_7ebee">مركز التكلفة</label>
+                    <input type="text" inputmode="decimal" name="f25" placeholder="0" id="emsf_1816_7ebee"></div>
+                <div class="form-group"><label for="emsf_1817_f6202">سعر الصرف ومصدره</label>
+                    <input type="text" inputmode="decimal" name="f26" placeholder="0" id="emsf_1817_f6202"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

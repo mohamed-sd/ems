@@ -210,7 +210,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-body">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-user-tie"></i> المدير الأب *</label>
+                        <label for="parent_id"><i class="fas fa-user-tie"></i> المدير الأب *</label>
                         <select name="parent_id" id="parent_id" required>
                             <option value="">-- اختر المدير --</option>
                             <?php foreach ($managers as $m): ?>
@@ -221,31 +221,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-shield-alt"></i> الدور (تابع للمدير) *</label>
+                        <label for="role"><i class="fas fa-shield-alt"></i> الدور (تابع للمدير) *</label>
                         <select name="role" id="role" required>
                             <option value="">-- اختر المدير أولاً --</option>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-user"></i> الاسم ثلاثي *</label>
+                        <label for="name"><i class="fas fa-user"></i> الاسم ثلاثي *</label>
                         <input type="text" name="name" id="name" placeholder="الاسم ثلاثي" required>
                     </div>
                     <div>
-                        <label><i class="fas fa-at"></i> اسم المستخدم *</label>
+                        <label for="username"><i class="fas fa-at"></i> اسم المستخدم *</label>
                         <input type="text" name="username" id="username" placeholder="اسم المستخدم" required autocomplete="off">
                     </div>
                     <div>
-                        <label><i class="fas fa-lock"></i> كلمة المرور <span id="pwReq">*</span></label>
+                        <label for="password"><i class="fas fa-lock"></i> كلمة المرور <span id="pwReq">*</span></label>
                         <input type="password" name="password" id="password" placeholder="كلمة المرور">
                         <small id="pwHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بالحالية عند التعديل</small>
                     </div>
                     <div>
-                        <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
+                        <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف *</label>
                         <input type="tel" name="phone" id="phone" placeholder="رقم الهاتف" required>
                     </div>
                     <?php if ($users_has_employee_id): ?>
                     <div>
-                        <label><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
+                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
                         <select name="employee_id" id="employee_id_link" required>
                             <option value="">— اختر الموظف —</option>
                             <?php foreach ($employees_for_link as $emp): ?>
@@ -344,7 +344,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script>
 (function(){
     const CHILD_ROLES = <?= json_encode($child_roles, JSON_UNESCAPED_UNICODE) ?>;
@@ -378,7 +377,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     });
 
     document.addEventListener('DOMContentLoaded', function(){
-        if (window.jQuery) $('#aTable').DataTable({ responsive:true, language:{ url:'/ems/assets/i18n/datatables/ar.json' } });
+        if (window.jQuery) $('#aTable').DataTable({ language:{ url:'/ems/assets/i18n/datatables/ar.json' } });
         const tgl = document.getElementById('toggleForm');
         if (tgl) tgl.addEventListener('click', function(){ resetForm(); form.classList.toggle('allforms-visible'); });
 

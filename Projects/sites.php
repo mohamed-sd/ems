@@ -187,7 +187,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body"><div class="form-grid">
             <input type="hidden" name="site_id" id="f_site_id" value="">
             <div class="form-group">
-                <label>المشروع <span style="color:#c00">*</span></label>
+                <label for="f_project_id">المشروع <span style="color:#c00">*</span></label>
                 <select name="project_id" id="f_project_id" required>
                     <option value="">— اختر المشروع —</option>
                     <?php foreach ($projects_options as $p): ?>
@@ -196,11 +196,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="form-group">
-                <label>اسم الموقع <span style="color:#c00">*</span></label>
+                <label for="f_site_name">اسم الموقع <span style="color:#c00">*</span></label>
                 <input type="text" name="site_name" id="f_site_name" required maxlength="190" placeholder="مثال: منجم أ — الواجهة الشمالية">
             </div>
             <div class="form-group">
-                <label>النوع</label>
+                <label for="f_site_kind">النوع</label>
                 <select name="site_kind" id="f_site_kind">
                     <?php foreach ($KINDS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -208,7 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="form-group">
-                <label>مسؤول الموقع</label>
+                <label for="f_resp">مسؤول الموقع</label>
                 <select name="responsible_employee_id" id="f_resp">
                     <option value="">— بلا —</option>
                     <?php foreach ($employees_options as $e): ?>
@@ -217,11 +217,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="form-group">
-                <label>الوصف المكاني</label>
+                <label for="f_loc">الوصف المكاني</label>
                 <input type="text" name="location_text" id="f_loc" maxlength="255">
             </div>
             <div class="form-group">
-                <label>الحالة</label>
+                <label for="f_status">الحالة</label>
                 <select name="status" id="f_status">
                     <option value="1">نشط</option>
                     <option value="0">معطَّل</option>

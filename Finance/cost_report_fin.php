@@ -72,15 +72,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="finForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-edit"></i> سجلّ تكلفة</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>نوع التكلفة <span class="required">*</span></label>
-                <select name="cost_type"><?php foreach ($cost_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>المشروع</label><select name="project_id"><?php echo fin_project_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>المعدة</label><select name="equipment_id"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="qty"></div>
-            <div class="form-group"><label>الوحدة</label><input type="text" name="unit" placeholder="ساعة/طن/لتر"></div>
-            <div class="form-group"><label>تكلفة الوحدة</label><input type="number" step="0.0001" name="unit_cost"></div>
-            <div class="form-group"><label>إجمالي التكلفة <span class="required">*</span></label><input type="number" step="0.01" min="0" name="total_cost" required></div>
-            <div class="form-group"><label>الإيراد المقابل</label><input type="number" step="0.01" name="revenue"></div>
+            <div class="form-group"><label for="emsf_359_17864">نوع التكلفة <span class="required">*</span></label>
+                <select name="cost_type" id="emsf_359_17864"><?php foreach ($cost_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_360_7e23b">المشروع</label><select name="project_id" id="emsf_360_7e23b"><?php echo fin_project_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_361_9b8a3">المعدة</label><select name="equipment_id" id="emsf_361_9b8a3"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_362_d9914">الكمية</label><input type="number" step="0.01" name="qty" id="emsf_362_d9914"></div>
+            <div class="form-group"><label for="emsf_363_5913a">الوحدة</label><input type="text" name="unit" placeholder="ساعة/طن/لتر" id="emsf_363_5913a"></div>
+            <div class="form-group"><label for="emsf_364_a2d3c">تكلفة الوحدة</label><input type="number" step="0.0001" name="unit_cost" id="emsf_364_a2d3c"></div>
+            <div class="form-group"><label for="emsf_365_947f3">إجمالي التكلفة <span class="required">*</span></label><input type="number" step="0.01" min="0" name="total_cost" required id="emsf_365_947f3"></div>
+            <div class="form-group"><label for="emsf_366_8d8fe">الإيراد المقابل</label><input type="number" step="0.01" name="revenue" id="emsf_366_8d8fe"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

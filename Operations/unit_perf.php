@@ -165,60 +165,60 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — الأداء الشهري للوحدة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الشهر</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>العقد</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الوحدة التعاقدية</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الساعات التعاقدية</label>
-                    <input type="text" inputmode="decimal" name="f4" placeholder="0"></div>
-                <div class="form-group"><label>ساعات التشغيل</label>
-                    <input type="text" inputmode="decimal" name="f5" placeholder="0"></div>
-                <div class="form-group"><label>ساعات الاستعداد المفوتر</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0"></div>
-                <div class="form-group"><label>ساعات التوقف — عميل</label>
-                    <input type="text" inputmode="decimal" name="f7" placeholder="0"></div>
-                <div class="form-group"><label>ساعات التوقف — مورد</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>ساعات التوقف — نحن</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>فاقد غير منفَّذ</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>توقف صيانة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>توقف موارد بشرية</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>توقف تسويات</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>قوة قاهرة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>صيانة مجدولة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>إجمالي التعطل</label>
-                    <input type="text" inputmode="decimal" name="f16" placeholder="0"></div>
-                <div class="form-group"><label>الطرف المتحمل الأغلب</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>نسبة الجاهزية</label>
-                    <input type="text" inputmode="decimal" name="f18" placeholder="0"></div>
-                <div class="form-group"><label>العجز عن التعاقدي</label>
-                    <input type="text" name="f19" maxlength="190"></div>
-                <div class="form-group"><label>بند الجزاء</label>
-                    <input type="text" name="f20" maxlength="190"></div>
-                <div class="form-group"><label>قيمة الجزاء</label>
-                    <input type="text" inputmode="decimal" name="f21" placeholder="0"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f22"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>درجة الأثر</label>
-                    <input type="text" name="f23" maxlength="190"></div>
-                <div class="form-group"><label>مركز التكلفة</label>
-                    <input type="text" inputmode="decimal" name="f24" placeholder="0"></div>
-                <div class="form-group"><label>سعر الصرف ومصدره</label>
-                    <input type="text" inputmode="decimal" name="f25" placeholder="0"></div>
-                <div class="form-group"><label>نسخة القاعدة المستعملة</label>
-                    <input type="text" name="f26" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_1026_df042">الشهر</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1026_df042"></div>
+                <div class="form-group"><label for="emsf_1027_b788b">العقد</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1027_b788b"></div>
+                <div class="form-group"><label for="emsf_1028_14e54">الوحدة التعاقدية</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1028_14e54"></div>
+                <div class="form-group"><label for="emsf_1029_8fbb2">كود المعدة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1029_8fbb2"></div>
+                <div class="form-group"><label for="emsf_1030_1f2f8">الساعات التعاقدية</label>
+                    <input type="text" inputmode="decimal" name="f4" placeholder="0" id="emsf_1030_1f2f8"></div>
+                <div class="form-group"><label for="emsf_1031_0366d">ساعات التشغيل</label>
+                    <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_1031_0366d"></div>
+                <div class="form-group"><label for="emsf_1032_e9de2">ساعات الاستعداد المفوتر</label>
+                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_1032_e9de2"></div>
+                <div class="form-group"><label for="emsf_1033_c04a2">ساعات التوقف — عميل</label>
+                    <input type="text" inputmode="decimal" name="f7" placeholder="0" id="emsf_1033_c04a2"></div>
+                <div class="form-group"><label for="emsf_1034_75a73">ساعات التوقف — مورد</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1034_75a73"></div>
+                <div class="form-group"><label for="emsf_1035_58ee3">ساعات التوقف — نحن</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_1035_58ee3"></div>
+                <div class="form-group"><label for="emsf_1036_d0d34">فاقد غير منفَّذ</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1036_d0d34"></div>
+                <div class="form-group"><label for="emsf_1037_5f649">توقف صيانة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1037_5f649"></div>
+                <div class="form-group"><label for="emsf_1038_a89de">توقف موارد بشرية</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1038_a89de"></div>
+                <div class="form-group"><label for="emsf_1039_ce984">توقف تسويات</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1039_ce984"></div>
+                <div class="form-group"><label for="emsf_1040_4951d">قوة قاهرة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1040_4951d"></div>
+                <div class="form-group"><label for="emsf_1041_92dfb">صيانة مجدولة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1041_92dfb"></div>
+                <div class="form-group"><label for="emsf_1042_d8b78">إجمالي التعطل</label>
+                    <input type="text" inputmode="decimal" name="f16" placeholder="0" id="emsf_1042_d8b78"></div>
+                <div class="form-group"><label for="emsf_1043_78871">الطرف المتحمل الأغلب</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_1043_78871"></div>
+                <div class="form-group"><label for="emsf_1044_5cfc3">نسبة الجاهزية</label>
+                    <input type="text" inputmode="decimal" name="f18" placeholder="0" id="emsf_1044_5cfc3"></div>
+                <div class="form-group"><label for="emsf_1045_27e50">العجز عن التعاقدي</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_1045_27e50"></div>
+                <div class="form-group"><label for="emsf_1046_abad1">بند الجزاء</label>
+                    <input type="text" name="f20" maxlength="190" id="emsf_1046_abad1"></div>
+                <div class="form-group"><label for="emsf_1047_99b0f">قيمة الجزاء</label>
+                    <input type="text" inputmode="decimal" name="f21" placeholder="0" id="emsf_1047_99b0f"></div>
+                <div class="form-group"><label for="emsf_1048_23209">الحالة</label>
+                    <select name="f22" id="emsf_1048_23209"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1049_4c55b">درجة الأثر</label>
+                    <input type="text" name="f23" maxlength="190" id="emsf_1049_4c55b"></div>
+                <div class="form-group"><label for="emsf_1050_ca144">مركز التكلفة</label>
+                    <input type="text" inputmode="decimal" name="f24" placeholder="0" id="emsf_1050_ca144"></div>
+                <div class="form-group"><label for="emsf_1051_acab0">سعر الصرف ومصدره</label>
+                    <input type="text" inputmode="decimal" name="f25" placeholder="0" id="emsf_1051_acab0"></div>
+                <div class="form-group"><label for="emsf_1052_7b07d">نسخة القاعدة المستعملة</label>
+                    <input type="text" name="f26" maxlength="190" id="emsf_1052_7b07d"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

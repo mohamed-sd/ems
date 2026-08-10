@@ -12,6 +12,14 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once __DIR__ . '/../app/Services/Security/PositionService.php';
 require_once __DIR__ . '/../app/Services/Security/SelfGrantGuard.php';
@@ -132,46 +140,46 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
         <input type="hidden" name="wz_action" value="preview" id="wzAction">
         <?php wz_step('①', 'هوية الشخص ونوع العلاقة'); ?>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-            <div class="form-group"><label>شخص قائم (أو اتركه واكتب اسمًا)</label>
-                <select name="person_id"><option value="0">— جديد —</option>
+            <div class="form-group"><label for="emsf_1991_7a2c4">شخص قائم (أو اتركه واكتب اسمًا)</label>
+                <select name="person_id" id="emsf_1991_7a2c4"><option value="0">— جديد —</option>
                     <?php foreach ($personsList as $p) { echo '<option value="' . intval($p['person_id']) . '">' . htmlspecialchars($p['full_name']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>الاسم الكامل (للجديد)</label><input type="text" name="full_name"></div>
-            <div class="form-group"><label>نوع العلاقة *</label>
-                <select name="relation_code" required><?php foreach ($relations as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_1992_f9f7a">الاسم الكامل (للجديد)</label><input type="text" name="full_name" id="emsf_1992_f9f7a"></div>
+            <div class="form-group"><label for="emsf_1993_4bb1a">نوع العلاقة *</label>
+                <select name="relation_code" required id="emsf_1993_4bb1a"><?php foreach ($relations as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
         </div>
         <?php wz_step('②–④', 'العائلة الوظيفية · المستوى · المسمى'); ?>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-            <div class="form-group"><label>العائلة * (لا موظف بلا عائلة)</label>
-                <select name="family_code" required><?php foreach ($families as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>المستوى *</label>
-                <select name="level_code" required><?php foreach ($levels as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>المسمى *</label>
-                <select name="title_code" required><?php foreach ($titles as $x) { echo '<option value="' . htmlspecialchars($x['title_code']) . '">' . htmlspecialchars($x['name']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_1994_bed48">العائلة * (لا موظف بلا عائلة)</label>
+                <select name="family_code" required id="emsf_1994_bed48"><?php foreach ($families as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_1995_1ba1c">المستوى *</label>
+                <select name="level_code" required id="emsf_1995_1ba1c"><?php foreach ($levels as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_1996_bf6bd">المسمى *</label>
+                <select name="title_code" required id="emsf_1996_bf6bd"><?php foreach ($titles as $x) { echo '<option value="' . htmlspecialchars($x['title_code']) . '">' . htmlspecialchars($x['name']) . '</option>'; } ?></select></div>
         </div>
         <?php wz_step('⑤–⑥', 'الجهة · المدير والتبعيتان'); ?>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-            <div class="form-group"><label>الوحدة التنظيمية</label>
-                <select name="org_unit_id"><option value="0">—</option><?php foreach ($units as $x) { echo '<option value="' . intval($x['unit_id']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>المدير المباشر</label>
-                <select name="manager_person_id"><option value="0">—</option><?php foreach ($usersList as $x) { echo '<option value="' . intval($x['id']) . '">' . htmlspecialchars($x['name']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_1997_c7c5f">الوحدة التنظيمية</label>
+                <select name="org_unit_id" id="emsf_1997_c7c5f"><option value="0">—</option><?php foreach ($units as $x) { echo '<option value="' . intval($x['unit_id']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_1998_8bed3">المدير المباشر</label>
+                <select name="manager_person_id" id="emsf_1998_8bed3"><option value="0">—</option><?php foreach ($usersList as $x) { echo '<option value="' . intval($x['id']) . '">' . htmlspecialchars($x['name']) . '</option>'; } ?></select></div>
         </div>
         <?php wz_step('⑦', 'النطاق التشغيلي — إلزامي'); ?>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-            <div class="form-group"><label>نوع النطاق *</label>
-                <select name="scope_type" required>
+            <div class="form-group"><label for="emsf_1999_1cc51">نوع النطاق *</label>
+                <select name="scope_type" required id="emsf_1999_1cc51">
                     <option value="site">موقع</option><option value="project">مشروع</option>
                     <option value="company">شركة</option><option value="shift">وردية</option>
                     <option value="own_records">سجلاته هو</option>
                 </select></div>
-            <div class="form-group"><label>الموقع/المعرف *</label>
-                <select name="scope_id" required><option value="0">0 (شركة/عام)</option>
+            <div class="form-group"><label for="emsf_2000_8e88c">الموقع/المعرف *</label>
+                <select name="scope_id" required id="emsf_2000_8e88c"><option value="0">0 (شركة/عام)</option>
                     <?php foreach ($sitesList as $s) { echo '<option value="' . intval($s['id']) . '">' . htmlspecialchars($s['name']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>من * / إلى</label>
-                <input type="date" name="valid_from" required style="margin-bottom:4px"><input type="date" name="valid_to"></div>
+            <div class="form-group"><label for="emsf_2001_1f175">من * / إلى</label>
+                <input type="date" name="valid_from" required style="margin-bottom:4px" id="emsf_2001_1f175"><input type="date" name="valid_to"></div>
         </div>
         <?php wz_step('⑧', 'التكليف (اختياري — بيته ORG-01)'); ?>
-        <div class="form-group"><label>تكليف نافذ مرتبط</label>
-            <select name="linked_asg"><option value="">— بلا —</option>
+        <div class="form-group"><label for="emsf_2002_0f1ee">تكليف نافذ مرتبط</label>
+            <select name="linked_asg" id="emsf_2002_0f1ee"><option value="">— بلا —</option>
                 <?php foreach ($assignments as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar']) . '</option>'; } ?></select>
             <small style="color:#888">التكليف يُنشأ ويُدار من شاشة التكليفات — وهنا إحالة قراءة.</small></div>
 

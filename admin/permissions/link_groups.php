@@ -122,7 +122,6 @@ require_once __DIR__ . '/../includes/layout_head.php';
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 
 <style>
 .page-shell {
@@ -267,13 +266,13 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                 <input type="hidden" name="edit_id" id="edit_id" value="<?= htmlspecialchars($editData['id'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-folder"></i> اسم المجموعة *</label>
+                        <label for="name"><i class="fas fa-folder"></i> اسم المجموعة *</label>
                         <input type="text" name="name" id="name" placeholder="مثال: علاقات العملاء"
                                value="<?= htmlspecialchars($editData['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required />
                     </div>
 
                     <div>
-                        <label><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
+                        <label for="owner_role_id"><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
                         <select name="owner_role_id" id="owner_role_id" required>
                             <option value="">-- اختر الدور المسؤول --</option>
                             <?php foreach ($roles as $role): ?>
@@ -287,7 +286,7 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                     </div>
 
                     <div>
-                        <label><i class="fas fa-sort-numeric-down"></i> الترتيب</label>
+                        <label for="display_order"><i class="fas fa-sort-numeric-down"></i> الترتيب</label>
                         <input type="number" name="display_order" id="display_order" placeholder="0" min="0" step="1"
                                value="<?= htmlspecialchars($editData['display_order'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>" />
                         <small style="color:#666; display:block; margin-top:5px;">
@@ -466,7 +465,6 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
 <script>
 $(document).ready(function () {
     var groupsTable = $('#groupsTable').DataTable({
-        responsive: true,
         language: { url: "/ems/assets/i18n/datatables/ar.json" },
         order: [[1, 'asc']],
         columnDefs: [{ "orderable": false, "targets": [7] }]

@@ -128,19 +128,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $editData ? 'تعديل دور' : 'إضافة دور' ?></h5></div>
         <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">
             <div class="field">
-                <label><i class="fas fa-tag"></i> اسم الدور *</label>
+                <label for="name"><i class="fas fa-tag"></i> اسم الدور *</label>
                 <input type="text" name="name" id="name" required value="<?= htmlspecialchars($editData['name'] ?? '') ?>" placeholder="مثال: مشرف، مراقب، عمالة مساندة">
             </div>
             <div class="field">
-                <label><i class="fas fa-align-right"></i> الوصف</label>
+                <label for="description"><i class="fas fa-align-right"></i> الوصف</label>
                 <input type="text" name="description" id="description" value="<?= htmlspecialchars($editData['description'] ?? '') ?>" placeholder="اختياري">
             </div>
             <div class="field">
-                <label><i class="fas fa-sort-numeric-down"></i> ترتيب العرض</label>
+                <label for="sort_order"><i class="fas fa-sort-numeric-down"></i> ترتيب العرض</label>
                 <input type="number" name="sort_order" id="sort_order" value="<?= intval($editData['sort_order'] ?? 0) ?>">
             </div>
             <div class="field">
-                <label><i class="fas fa-toggle-on"></i> الحالة *</label>
+                <label for="status"><i class="fas fa-toggle-on"></i> الحالة *</label>
                 <select name="status" id="status" required>
                     <option value="1" <?= (($editData['status'] ?? 1) == 1) ? 'selected' : '' ?>>نشط ✅</option>
                     <option value="0" <?= (($editData['status'] ?? 1) == 0) ? 'selected' : '' ?>>غير نشط ⏸</option>

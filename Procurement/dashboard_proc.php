@@ -145,13 +145,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-layer-group"></i> الفئة</label>
+                <label for="filterCategory"><i class="fa fa-layer-group"></i> الفئة</label>
                 <select id="filterCategory" class="form-control">
                     <option value="">-- كل الفئات --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-magnifying-glass"></i> بحث بالكود / الصنف</label>
+                <label for="filterSearch"><i class="fa fa-magnifying-glass"></i> بحث بالكود / الصنف</label>
                 <input type="text" id="filterSearch" class="form-control" placeholder="اكتب للبحث...">
             </div>
             <div class="filter-actions">

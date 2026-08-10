@@ -586,7 +586,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                     <input type="hidden" name="role_id" id="effectiveRoleId" value="<?php echo $selected_role_id ? (int)$selected_role_id : ''; ?>">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                         <div>
-                            <label class="form-label"><i class="fas fa-layer-group"></i> الدور الأساسي</label>
+                            <label class="form-label" for="baseRoleSelect"><i class="fas fa-layer-group"></i> الدور الأساسي</label>
                             <select id="baseRoleSelect" class="form-select">
                                 <option value="">-- اختر الدور الأساسي --</option>
                                 <?php foreach ($base_roles as $role): ?>
@@ -598,7 +598,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                             </select>
                         </div>
                         <div>
-                            <label class="form-label"><i class="fas fa-user-shield"></i> المشرف التابع
+                            <label class="form-label" for="childRoleSelect"><i class="fas fa-user-shield"></i> المشرف التابع
                                 <span style="font-weight:400;color:#777;">(اختياري)</span></label>
                             <select id="childRoleSelect" class="form-select">
                                 <!-- تُملأ ديناميكياً حسب الدور الأساسي المختار -->

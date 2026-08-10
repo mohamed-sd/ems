@@ -149,46 +149,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — جدول عمل المنجم — الأسبوعي والشهري</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الجدول</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الموقع</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>المشروع</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>العقد</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الشهر</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الأسبوع</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>أيام العمل المخططة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>أيام التوقف المخطط</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>سبب التوقف</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>ساعات التشغيل اليومية</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>عدد الورديات</label>
-                    <input type="text" inputmode="decimal" name="f10" placeholder="0"></div>
-                <div class="form-group"><label>الكمية المستهدفة الشهرية</label>
-                    <input type="text" inputmode="decimal" name="f11" placeholder="0"></div>
-                <div class="form-group"><label>الكمية المستهدفة الأسبوعية</label>
-                    <input type="text" inputmode="decimal" name="f12" placeholder="0"></div>
-                <div class="form-group"><label>المعدات المخصَّصة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>المشغّلون المطلوبون</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>نوافذ الوقائية</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f17"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f19"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_978_bfac4">رقم الجدول</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_978_bfac4"></div>
+                <div class="form-group"><label for="emsf_979_0a4a7">الموقع</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_979_0a4a7"></div>
+                <div class="form-group"><label for="emsf_980_d6074">المشروع</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_980_d6074"></div>
+                <div class="form-group"><label for="emsf_981_2be9e">العقد</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_981_2be9e"></div>
+                <div class="form-group"><label for="emsf_982_8ba84">الشهر</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_982_8ba84"></div>
+                <div class="form-group"><label for="emsf_983_92c4f">الأسبوع</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_983_92c4f"></div>
+                <div class="form-group"><label for="emsf_984_8be69">أيام العمل المخططة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_984_8be69"></div>
+                <div class="form-group"><label for="emsf_985_3d532">أيام التوقف المخطط</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_985_3d532"></div>
+                <div class="form-group"><label for="emsf_986_c807f">سبب التوقف</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_986_c807f"></div>
+                <div class="form-group"><label for="emsf_987_4c1ab">ساعات التشغيل اليومية</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_987_4c1ab"></div>
+                <div class="form-group"><label for="emsf_988_d1650">عدد الورديات</label>
+                    <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_988_d1650"></div>
+                <div class="form-group"><label for="emsf_989_db532">الكمية المستهدفة الشهرية</label>
+                    <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_989_db532"></div>
+                <div class="form-group"><label for="emsf_990_53b08">الكمية المستهدفة الأسبوعية</label>
+                    <input type="text" inputmode="decimal" name="f12" placeholder="0" id="emsf_990_53b08"></div>
+                <div class="form-group"><label for="emsf_991_e68c9">المعدات المخصَّصة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_991_e68c9"></div>
+                <div class="form-group"><label for="emsf_992_cc9fe">المشغّلون المطلوبون</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_992_cc9fe"></div>
+                <div class="form-group"><label for="emsf_993_f7566">نوافذ الوقائية</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_993_f7566"></div>
+                <div class="form-group"><label for="emsf_994_d10d5">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_994_d10d5"></div>
+                <div class="form-group"><label for="emsf_995_cbd01">تاريخ الاعتماد</label>
+                    <input type="date" name="f17" id="emsf_995_cbd01"></div>
+                <div class="form-group"><label for="emsf_996_9b4fe">مرجع التفويض</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_996_9b4fe"></div>
+                <div class="form-group"><label for="emsf_997_b3681">الحالة</label>
+                    <select name="f19" id="emsf_997_b3681"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

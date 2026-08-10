@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -341,25 +349,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle uom-info-icon"></i></label>
+                        <label for="generated_uom_code"><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle uom-info-icon"></i></label>
                         <input type="text" id="generated_uom_code" class="generated-code-field" value="<?php echo uom_e($next_uom_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل الكود" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> الكود *</label>
+                        <label for="uom_code"><i class="fas fa-barcode"></i> الكود *</label>
                         <input type="text" name="uom_code" id="uom_code" placeholder="مثال: UOM-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-heading"></i> اسم الوحدة *</label>
+                        <label for="name"><i class="fas fa-heading"></i> اسم الوحدة *</label>
                         <input type="text" name="name" id="name" placeholder="اسم الوحدة" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-tag"></i> الرمز</label>
+                        <label for="symbol"><i class="fas fa-tag"></i> الرمز</label>
                         <input type="text" name="symbol" id="symbol" placeholder="مثال: س / طن / م" />
                     </div>
                     <div>
-                        <label><i class="fas fa-layer-group"></i> الفئة</label>
+                        <label for="category"><i class="fas fa-layer-group"></i> الفئة</label>
                         <select name="category" id="category">
                             <?php foreach ($UOM_CATEGORIES as $cat): ?>
                                 <option value="<?php echo uom_e($cat); ?>" <?php echo $cat === 'عدد' ? 'selected' : ''; ?>><?php echo uom_e($cat); ?></option>
@@ -367,11 +375,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-calculator"></i> معامل التحويل</label>
+                        <label for="factor"><i class="fas fa-calculator"></i> معامل التحويل</label>
                         <input type="number" step="0.0001" name="factor" id="factor" placeholder="1" value="1" />
                     </div>
                     <div class="uom-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -390,7 +398,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-layer-group"></i> الفئة</label>
+                <label for="filterCategory"><i class="fa fa-layer-group"></i> الفئة</label>
                 <select id="filterCategory" class="form-control">
                     <option value="">-- كل الفئات --</option>
                 </select>

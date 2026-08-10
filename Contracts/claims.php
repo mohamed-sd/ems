@@ -341,8 +341,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="action" value="generate">
             <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
             <div class="form-section">
-                <div class="form-group"><label>العقد <span class="mnt-req-hint">(العميلُ يُشتق منه)</span></label>
-                    <select name="contract_id" required>
+                <div class="form-group"><label for="emsf_21_efbd2">العقد <span class="mnt-req-hint">(العميلُ يُشتق منه)</span></label>
+                    <select name="contract_id" required id="emsf_21_efbd2">
                         <option value="">— اختر العقد —</option>
                         <?php foreach ($contract_rows as $c): ?>
                             <option value="<?php echo intval($c['id']); ?>">
@@ -352,10 +352,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>من تاريخ</label>
-                    <input type="date" name="period_from" required></div>
-                <div class="form-group"><label>إلى تاريخ</label>
-                    <input type="date" name="period_to" required></div>
+                <div class="form-group"><label for="emsf_22_d5984">من تاريخ</label>
+                    <input type="date" name="period_from" required id="emsf_22_d5984"></div>
+                <div class="form-group"><label for="emsf_23_cac2e">إلى تاريخ</label>
+                    <input type="date" name="period_to" required id="emsf_23_cac2e"></div>
             </div>
             <div style="margin-top:10px">
                 <button type="submit" class="btn-save"><i class="fas fa-bolt"></i> ولّد المستخلص</button>
@@ -482,7 +482,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="rejected">رُدَّ الاعتراض (البند يعود)</option>
                                     <option value="upheld">أُقرَّ الاعتراض (البند يسقط)</option>
                                 </select>
-                                <input type="text" name="resolution_note" placeholder="سببُ الحسم" required>
+                                <input type="text" name="resolution_note" placeholder="سببُ الحسم" required aria-label="سببُ الحسم">
                                 <button type="submit" class="btn-save">احسِم</button>
                             </form>
                             <?php endif; ?>
@@ -497,8 +497,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                 <input type="hidden" name="action" value="dispute_raise">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
-                                <input type="text" name="dispute_reason" placeholder="سببُ الاعتراض" required>
-                                <input type="text" name="dispute_doc_ref" placeholder="مستندُه" required>
+                                <input type="text" name="dispute_reason" placeholder="سببُ الاعتراض" required aria-label="سببُ الاعتراض">
+                                <input type="text" name="dispute_doc_ref" placeholder="مستندُه" required aria-label="مستندُه">
                                 <button type="submit" class="btn-save">ارفع نزاعًا</button>
                             </form>
                         <?php else: ?>
@@ -567,15 +567,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="contract_id" value="<?php echo $adv_cid; ?>">
                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                 <div class="form-section"><div class="form-grid">
-                    <div class="form-group"><label>المبلغ المقبوض *
+                    <div class="form-group"><label for="emsf_24_3ce23">المبلغ المقبوض *
                         <span class="mnt-req-hint">(من سند القبض — لا يُشتق من نسبة)</span></label>
-                        <input type="number" step="0.01" min="0.01" name="amount" required></div>
-                    <div class="form-group"><label>تاريخ القبض *</label>
-                        <input type="date" name="received_date" required></div>
-                    <div class="form-group"><label>مرجعُ السند *</label>
-                        <input type="text" name="doc_ref" maxlength="120" required></div>
-                    <div class="form-group"><label>ملاحظة</label>
-                        <input type="text" name="note" maxlength="255"></div>
+                        <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_24_3ce23"></div>
+                    <div class="form-group"><label for="emsf_25_085b3">تاريخ القبض *</label>
+                        <input type="date" name="received_date" required id="emsf_25_085b3"></div>
+                    <div class="form-group"><label for="emsf_26_a8c63">مرجعُ السند *</label>
+                        <input type="text" name="doc_ref" maxlength="120" required id="emsf_26_a8c63"></div>
+                    <div class="form-group"><label for="emsf_27_e5f9e">ملاحظة</label>
+                        <input type="text" name="note" maxlength="255" id="emsf_27_e5f9e"></div>
                 </div></div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fas fa-receipt"></i> سجّل قبضَ الدفعة</button>
@@ -676,17 +676,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="claim_id" value="<?php echo $open_id; ?>">
                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                 <div class="form-section"><div class="form-grid">
-                    <div class="form-group"><label>الاتجاه *</label>
-                        <select name="note_kind" required>
+                    <div class="form-group"><label for="emsf_28_e0c6a">الاتجاه *</label>
+                        <select name="note_kind" required id="emsf_28_e0c6a">
                             <?php foreach ($note_kinds as $k => $lbl): ?>
                                 <option value="<?php echo clm_e($k); ?>"><?php echo clm_e($lbl); ?></option>
                             <?php endforeach; ?>
                         </select></div>
-                    <div class="form-group"><label>المبلغ *
+                    <div class="form-group"><label for="emsf_29_6d8df">المبلغ *
                         <span class="mnt-req-hint">(موجبٌ دائمًا — الاتجاهُ يحمل الإشارة)</span></label>
-                        <input type="number" step="0.01" min="0.01" name="amount" required></div>
-                    <div class="form-group"><label>السطر <span class="mnt-req-hint">(اختياري)</span></label>
-                        <select name="claim_line_id">
+                        <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_29_6d8df"></div>
+                    <div class="form-group"><label for="emsf_30_6e755">السطر <span class="mnt-req-hint">(اختياري)</span></label>
+                        <select name="claim_line_id" id="emsf_30_6e755">
                             <option value="">المستخلص كلُّه</option>
                             <?php foreach ($open_lines as $l): ?>
                                 <option value="<?php echo intval($l['id']); ?>">
@@ -694,12 +694,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     · <?php echo clm_num($l['amount']); ?></option>
                             <?php endforeach; ?>
                         </select></div>
-                    <div class="form-group"><label>السبب *</label>
+                    <div class="form-group"><label for="emsf_31_3aaaf">السبب *</label>
                         <input type="text" name="reason" maxlength="255" required
-                               placeholder="لماذا يُصحَّح؟"></div>
-                    <div class="form-group"><label>مرجعُ المستند *</label>
+                               placeholder="لماذا يُصحَّح؟" id="emsf_31_3aaaf"></div>
+                    <div class="form-group"><label for="emsf_32_0b3ca">مرجعُ المستند *</label>
                         <input type="text" name="doc_ref" maxlength="120" required
-                               placeholder="رقمُ المستند المؤيِّد"></div>
+                               placeholder="رقمُ المستند المؤيِّد" id="emsf_32_0b3ca"></div>
                 </div></div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fas fa-file-circle-plus"></i> أنشئ الإشعار</button>

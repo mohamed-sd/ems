@@ -11,8 +11,83 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Policy/UnitJourneyService.php';
+
+// CS-01 — الحارسُ فوقَ المعالج.
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
+$uid = intval($_SESSION['user']['id'] ?? 0);
+$msg = '';
+
+/* ══ FN-03 — «شاشةُ فحصِ شروطِ الاستحقاقِ بلا معالجٍ إطلاقًا» ══════════════
+   كان رأسُ الملفِّ يعلن «الاعتمادُ عبر خدمةِ الرحلة — لا كتابةَ مباشرة» ولا
+   يوجد فيه معالجٌ ولا نداءٌ للخدمة، وعمودُ الإجراءِ يحمل رابطًا واحدًا يُحيل
+   إلى شاشةٍ أخرى. و«رأسٌ يعلن ما لا يفعله أسوأُ من شاشةٍ فارغة — فالفارغةُ
+   تُرى والكاذبةُ تُصدَّق».
+   الآن: **فعلان محروسان** بالعقدِ السبعيِّ ينادِيان الخدمةَ المالكة:
+     ① اعتمادُ الاستحقاق (يمرُّ بـUnitJourneyService::postEntitlement)
+     ② ردُّه بسببٍ محكومٍ من قائمةٍ مغلقة — لا نصٍّ حر. */
+$REJECT_REASONS = array(
+    'no_evidence'      => 'بلا دليلٍ يُثبت الواقعة',
+    'wrong_period'     => 'الفترةُ خاطئةٌ أو مقفلة',
+    'duplicate'        => 'استحقاقٌ مكرَّرٌ لواقعةٍ واحدة',
+    'quantity_dispute' => 'الكميةُ محلُّ خلافٍ مع الميدان',
+    'contract_mismatch' => 'لا يطابق شروطَ العقد',
+);
+
+$__pcApprove = ems_post_contract($conn, array(
+    'action'  => 'fin.entitlement.approve',
+    'perm'    => 'can_edit',
+    'trigger' => 'approve_pe',
+    'idem'    => array('pe' => intval($_POST['approve_pe'] ?? 0)),
+    'validate' => function (array $in) {
+        $pe = intval($in['approve_pe'] ?? 0);
+        $dm = intval($in['dept_manager_id'] ?? 0);
+        $fm = intval($in['finance_manager_id'] ?? 0);
+        if ($pe <= 0) { return array('ok' => false, 'msg' => 'أثرٌ ماليٌّ غيرُ صالح (422)'); }
+        if ($dm <= 0 || $fm <= 0) {
+            return array('ok' => false, 'msg' => 'لا استحقاقَ بلا اعتمادِ مديرِ الإدارةِ والماليةِ معًا (403)');
+        }
+        if ($dm === $fm) { return array('ok' => false, 'msg' => 'الاعتمادان من شخصٍ واحد — استقلالُ الموافقاتِ شرطُ صحتها (403)'); }
+        return array('ok' => true, 'data' => array('pe' => $pe, 'dm' => $dm, 'fm' => $fm));
+    },
+));
+if (!$__pcApprove['ok'] && $__pcApprove['msg'] !== '') { $msg = $__pcApprove['msg']; }
+if ($__pcApprove['replay'])                            { $msg = $__pcApprove['msg']; }
+if ($__pcApprove['run'] && $__pcApprove['ok']) {
+    $res = \App\Services\Policy\UnitJourneyService::postEntitlement(
+        $conn, $company_id, (int) $__pcApprove['data']['pe'],
+        (int) $__pcApprove['data']['dm'], (int) $__pcApprove['data']['fm'], $uid);
+    $msg = ($res['ok'] ? '✅ ' : '❌ ') . $res['reason'] . ' (' . $res['code'] . ')';
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pcApprove['idem'], $__pcApprove['code'], 'unit_effects#' . (int) $__pcApprove['data']['pe']); }
+}
+
+$__pcReject = ems_post_contract($conn, array(
+    'action'  => 'fin.entitlement.reject',
+    'perm'    => 'can_edit',
+    'trigger' => 'reject_pe',
+    'idem'    => array('pe' => intval($_POST['reject_pe'] ?? 0), 'why' => (string) ($_POST['reason_code'] ?? '')),
+    'validate' => function (array $in) use ($REJECT_REASONS) {
+        $pe = intval($in['reject_pe'] ?? 0);
+        $rc = (string) ($in['reason_code'] ?? '');
+        if ($pe <= 0) { return array('ok' => false, 'msg' => 'أثرٌ ماليٌّ غيرُ صالح (422)'); }
+        // ◆ السببُ **محكومٌ** من قائمةٍ مغلقة — لا نصٌّ حرٌّ يُفسد التصنيف.
+        if (!isset($REJECT_REASONS[$rc])) { return array('ok' => false, 'msg' => 'سببُ الردِّ غيرُ محكوم — اختر من القائمة (422)'); }
+        return array('ok' => true, 'data' => array('pe' => $pe, 'rc' => $rc));
+    },
+));
+if (!$__pcReject['ok'] && $__pcReject['msg'] !== '') { $msg = $__pcReject['msg']; }
+if ($__pcReject['replay'])                           { $msg = $__pcReject['msg']; }
+if ($__pcReject['run'] && $__pcReject['ok']) {
+    $res = \App\Services\Policy\UnitJourneyService::rejectEntitlement(
+        $conn, $company_id, (int) $__pcReject['data']['pe'],
+        (string) $__pcReject['data']['rc'], (string) $REJECT_REASONS[$__pcReject['data']['rc']], $uid);
+    $msg = ($res['ok'] ? '✅ ' : '❌ ') . $res['reason'] . ' (' . $res['code'] . ')';
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pcReject['idem'], $__pcReject['code'], 'unit_effects#' . (int) $__pcReject['data']['pe']); }
+}
+
 $rows = array();
 $sql = "SELECT d.id, d.due_no, d.party_kind, d.beneficiary_ref, d.amount, d.currency,
                d.state, d.source_kind, d.created_at
@@ -43,6 +118,11 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
   <p class="text-muted" style="font-size:.9em">الأثرُ الأوليُّ ينتظر اعتمادَ مدير الإدارة + المالية — ولا يصير Posted قبلهما (POL-01).</p>
+  <?php if ($msg !== ''): ?>
+    <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
+      <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?>
+    </div>
+  <?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم المحضر</th><th>الطرف</th><th>المبلغ</th><th>المصدر</th><th>الحالة</th><th>منذ</th><th>إجراء</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -100,7 +180,33 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($r['source_kind'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($r['state'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars(substr($r['created_at'], 0, 10), ENT_QUOTES, 'UTF-8') ?></td>
-        <td><a class="action-btn" href="../Finance/approvals_inbox.php">افتح في صندوق الاعتماد</a></td>
+        <td>
+          <?php $eid = intval($r['id']); ?>
+          <!-- FN-03 · FIXC-0017: فعلان محروسان بالعقدِ السبعيّ — لا رابطٌ يُحيل
+               إلى شاشةٍ أخرى ثم يُقال «الاعتمادُ عبر الخدمة». -->
+          <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+            <input type="hidden" name="approve_pe" value="<?= $eid ?>">
+            <label class="visually-hidden" for="eg_dm_<?= $eid ?>">مدير الإدارة المعتمِد</label>
+            <input id="eg_dm_<?= $eid ?>" type="number" name="dept_manager_id" required min="1"
+                   class="form-control form-control-sm" placeholder="مدير الإدارة" style="max-width:110px">
+            <label class="visually-hidden" for="eg_fm_<?= $eid ?>">المالية المعتمِدة</label>
+            <input id="eg_fm_<?= $eid ?>" type="number" name="finance_manager_id" required min="1"
+                   class="form-control form-control-sm" placeholder="المالية" style="max-width:100px">
+            <button class="action-btn" type="submit"><i class="fa fa-check"></i> اعتمد</button>
+          </form>
+          <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px">
+            <input type="hidden" name="reject_pe" value="<?= $eid ?>">
+            <label class="visually-hidden" for="eg_rc_<?= $eid ?>">سببُ الرد</label>
+            <select id="eg_rc_<?= $eid ?>" name="reason_code" required class="form-control form-control-sm" style="max-width:190px">
+              <option value="">— سببُ الردِّ المحكوم —</option>
+              <?php foreach ($REJECT_REASONS as $k => $v): ?>
+                <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option>
+              <?php endforeach; ?>
+            </select>
+            <button class="action-btn" type="submit"><i class="fa fa-rotate-left"></i> ردّ</button>
+          </form>
+          <a class="action-btn" style="margin-top:4px;display:inline-block" href="../Finance/approvals_inbox.php">صندوق الاعتماد ←</a>
+        </td>
       </tr>
     <?php endforeach; ?>
     </tbody>

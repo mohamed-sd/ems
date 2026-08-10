@@ -154,50 +154,50 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — استهلاك المعدة ومعدله</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم السجل</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الفترة</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>نوع المعدة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الموقع</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الوحدة التعاقدية</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>ساعات التشغيل</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0"></div>
-                <div class="form-group"><label>صنف الاستهلاك</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>الكمية المصروفة</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>الوحدة</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>معدل الاستهلاك للساعة</label>
-                    <input type="text" inputmode="decimal" name="f10" placeholder="0"></div>
-                <div class="form-group"><label>المعدل المرجعي للموديل</label>
-                    <input type="text" inputmode="decimal" name="f11" placeholder="0"></div>
-                <div class="form-group"><label>الانحراف</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>نسبة الانحراف</label>
-                    <input type="text" inputmode="decimal" name="f13" placeholder="0"></div>
-                <div class="form-group"><label>حد الشذوذ</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>حالة الشذوذ</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>السبب المرجَّح</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>البلاغ المفتوح</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>تكلفة الاستهلاك</label>
-                    <input type="text" inputmode="decimal" name="f18" placeholder="0"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f19" maxlength="190"></div>
-                <div class="form-group"><label>مركز التكلفة</label>
-                    <input type="text" inputmode="decimal" name="f20" placeholder="0"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f21"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1255_ae451">رقم السجل</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1255_ae451"></div>
+                <div class="form-group"><label for="emsf_1256_5566b">الفترة</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1256_5566b"></div>
+                <div class="form-group"><label for="emsf_1257_cfaf6">كود المعدة</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1257_cfaf6"></div>
+                <div class="form-group"><label for="emsf_1258_b3c03">نوع المعدة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1258_b3c03"></div>
+                <div class="form-group"><label for="emsf_1259_9db98">الموقع</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1259_9db98"></div>
+                <div class="form-group"><label for="emsf_1260_74f0d">الوحدة التعاقدية</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1260_74f0d"></div>
+                <div class="form-group"><label for="emsf_1261_b0264">ساعات التشغيل</label>
+                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_1261_b0264"></div>
+                <div class="form-group"><label for="emsf_1262_9e234">صنف الاستهلاك</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1262_9e234"></div>
+                <div class="form-group"><label for="emsf_1263_4f64d">الكمية المصروفة</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1263_4f64d"></div>
+                <div class="form-group"><label for="emsf_1264_5dcac">الوحدة</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1264_5dcac"></div>
+                <div class="form-group"><label for="emsf_1265_7da18">معدل الاستهلاك للساعة</label>
+                    <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_1265_7da18"></div>
+                <div class="form-group"><label for="emsf_1266_b2a7e">المعدل المرجعي للموديل</label>
+                    <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_1266_b2a7e"></div>
+                <div class="form-group"><label for="emsf_1267_ddbf9">الانحراف</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1267_ddbf9"></div>
+                <div class="form-group"><label for="emsf_1268_11b60">نسبة الانحراف</label>
+                    <input type="text" inputmode="decimal" name="f13" placeholder="0" id="emsf_1268_11b60"></div>
+                <div class="form-group"><label for="emsf_1269_49f09">حد الشذوذ</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1269_49f09"></div>
+                <div class="form-group"><label for="emsf_1270_45075">حالة الشذوذ</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1270_45075"></div>
+                <div class="form-group"><label for="emsf_1271_f3ed5">السبب المرجَّح</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_1271_f3ed5"></div>
+                <div class="form-group"><label for="emsf_1272_431ae">البلاغ المفتوح</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_1272_431ae"></div>
+                <div class="form-group"><label for="emsf_1273_61ed9">تكلفة الاستهلاك</label>
+                    <input type="text" inputmode="decimal" name="f18" placeholder="0" id="emsf_1273_61ed9"></div>
+                <div class="form-group"><label for="emsf_1274_17332">العملة</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_1274_17332"></div>
+                <div class="form-group"><label for="emsf_1275_25463">مركز التكلفة</label>
+                    <input type="text" inputmode="decimal" name="f20" placeholder="0" id="emsf_1275_25463"></div>
+                <div class="form-group"><label for="emsf_1276_71296">الحالة</label>
+                    <select name="f21" id="emsf_1276_71296"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

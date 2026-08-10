@@ -155,8 +155,8 @@ include '../insidebar.php';
             <form method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
                 <input type="hidden" name="action" value="rq_submit">
                 <?php if ($is_super_admin && $company_id <= 0): ?><input type="hidden" name="company_id" value="4"><?php endif; ?>
-                <div style="min-width:280px"><label style="font-size:.85rem">نوع الطلب</label>
-                    <select name="type_code" class="form-control" required onchange="rqHint(this)">
+                <div style="min-width:280px"><label style="font-size:.85rem" for="emsf_1202_ee646">نوع الطلب</label>
+                    <select name="type_code" class="form-control" required onchange="rqHint(this)" id="emsf_1202_ee646">
                         <option value="">— اختر —</option>
                         <?php foreach ($types as $t): ?>
                         <option value="<?php echo htmlspecialchars($t['code']); ?>"
@@ -164,10 +164,10 @@ include '../insidebar.php';
                             <?php echo htmlspecialchars($t['code'] . ' · ' . $t['name_ar']); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div style="flex:1;min-width:220px"><label style="font-size:.85rem">الموضوع</label>
-                    <input name="title" class="form-control" required maxlength="300"></div>
-                <div style="flex:1;min-width:220px"><label style="font-size:.85rem">التفاصيل</label>
-                    <input name="details" class="form-control" maxlength="500"></div>
+                <div style="flex:1;min-width:220px"><label style="font-size:.85rem" for="emsf_1203_03af9">الموضوع</label>
+                    <input name="title" class="form-control" required maxlength="300" id="emsf_1203_03af9"></div>
+                <div style="flex:1;min-width:220px"><label style="font-size:.85rem" for="emsf_1204_8fe54">التفاصيل</label>
+                    <input name="details" class="form-control" maxlength="500" id="emsf_1204_8fe54"></div>
                 <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> تقديم</button>
             </form>
             <div id="rqHint" class="text-muted" style="margin-top:8px;font-size:.85rem"></div>
@@ -197,16 +197,16 @@ include '../insidebar.php';
                             <details style="display:inline-block"><summary class="btn btn-sm btn-outline-danger" style="display:inline-block">رفض/إعادة</summary>
                                 <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
                                     <select name="decision" class="form-control form-control-sm" style="margin-bottom:4px"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
-                                    <input name="note" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي)" required>
+                                    <input name="note" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي)" required aria-label="السبب (إلزامي)">
                                     <button class="btn btn-sm btn-danger">تأكيد</button></form></details>
                         <?php elseif ($q['status'] === 'approved'): ?>
                             <details><summary class="btn btn-sm btn-primary">تنفيذ وإغلاق (الرد التسعة)</summary>
                                 <form method="post" style="margin-top:4px;max-width:300px"><input type="hidden" name="action" value="rq_execute"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                                    <input name="result_doc_ref" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑦ المستند الناتج (إلزامي)" required>
-                                    <input name="executed_summary" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required>
-                                    <input name="action_required" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑥ ما يجب فعله">
-                                    <input name="next_step" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑨ الخطوة اللاحقة">
-                                    <input name="notes" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑤ الملاحظات">
+                                    <input name="result_doc_ref" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑦ المستند الناتج (إلزامي)" required aria-label="?? المستند الناتج (إلزامي)">
+                                    <input name="executed_summary" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required aria-label="?? التنفيذ الذي تم (إلزامي)">
+                                    <input name="action_required" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑥ ما يجب فعله" aria-label="?? ما يجب فعله">
+                                    <input name="next_step" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑨ الخطوة اللاحقة" aria-label="?? الخطوة اللاحقة">
+                                    <input name="notes" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑤ الملاحظات" aria-label="?? الملاحظات">
                                     <button class="btn btn-sm btn-primary">إغلاق بالرد الكامل</button></form></details>
                         <?php endif; ?>
                     </td>
@@ -253,7 +253,7 @@ include '../insidebar.php';
                 <td><?php if (in_array($q['status'], array('submitted', 'routed', 'returned'), true)): ?>
                     <details><summary class="btn btn-sm btn-outline-danger" style="display:inline-block">سحب</summary>
                         <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="rq_cancel"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                            <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب" required>
+                            <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب" required aria-label="السبب">
                             <button class="btn btn-sm btn-danger">تأكيد السحب</button></form></details>
                     <?php endif; ?></td>
             </tr>

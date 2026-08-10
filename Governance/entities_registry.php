@@ -12,6 +12,14 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../includes/screen_contract.php';
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
@@ -145,13 +153,13 @@ include '../insidebar.php';
         <h4>كيان جديد — ابحث بالثلاثية أولًا فالسجل واحد لا يتكرر</h4>
         <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
             <input type="hidden" name="op" value="create">
-            <input type="text" name="legal_name" placeholder="الاسم القانوني الكامل *" required>
-            <input type="text" name="legal_form" placeholder="الشكل النظامي (ذ.م.م …)">
-            <input type="text" name="country" placeholder="البلد *" required>
-            <input type="text" name="registry_authority" placeholder="جهة التسجيل *" required>
-            <input type="text" name="commercial_reg" placeholder="رقم السجل التجاري *" required>
-            <input type="text" name="tax_no" placeholder="الرقم الضريبي">
-            <input type="text" name="base_currency" placeholder="العملة الأساسية" value="SDG">
+            <input type="text" name="legal_name" placeholder="الاسم القانوني الكامل *" required aria-label="الاسم القانوني الكامل">
+            <input type="text" name="legal_form" placeholder="الشكل النظامي (ذ.م.م …)" aria-label="الشكل النظامي (ذ.م.م …)">
+            <input type="text" name="country" placeholder="البلد *" required aria-label="البلد">
+            <input type="text" name="registry_authority" placeholder="جهة التسجيل *" required aria-label="جهة التسجيل">
+            <input type="text" name="commercial_reg" placeholder="رقم السجل التجاري *" required aria-label="رقم السجل التجاري">
+            <input type="text" name="tax_no" placeholder="الرقم الضريبي" aria-label="الرقم الضريبي">
+            <input type="text" name="base_currency" placeholder="العملة الأساسية" value="SDG" aria-label="العملة الأساسية">
             <select name="entity_role" required>
                 <option value="">— الصفة *</option>
                 <option value="client">عميل</option><option value="supplier">مورد</option>

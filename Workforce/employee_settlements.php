@@ -272,8 +272,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="generate" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>الموظف *</label>
-                    <select name="party_ref" required>
+                    <label for="emsf_1685_d632b">الموظف *</label>
+                    <select name="party_ref" required id="emsf_1685_d632b">
                         <option value="">— اختر —</option>
                         <?php foreach ($employees as $e) {
                             $nm = ($e['name'] !== null && $e['name'] !== '')
@@ -285,10 +285,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         } ?>
                     </select>
                 </div>
-                <div class="form-group"><label>من *</label>
-                    <input type="date" name="period_from" required></div>
-                <div class="form-group"><label>إلى *</label>
-                    <input type="date" name="period_to" required></div>
+                <div class="form-group"><label for="emsf_1686_96bca">من *</label>
+                    <input type="date" name="period_from" required id="emsf_1686_96bca"></div>
+                <div class="form-group"><label for="emsf_1687_5f1c3">إلى *</label>
+                    <input type="date" name="period_to" required id="emsf_1687_5f1c3"></div>
             </div></div>
             <div style="margin-top:10px;">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولّد التسوية</button>
@@ -431,7 +431,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <input type="hidden" name="sid" value="<?php echo $open; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="text" name="note" placeholder="سبب الاعتراض" required
-                                   style="width:150px;padding:3px 6px;font-size:12px;">
+                                   style="width:150px;padding:3px 6px;font-size:12px;" aria-label="سبب الاعتراض">
                             <button class="btn btn-sm btn-warning" type="submit">اعتراض</button>
                         </form>
                         <?php elseif ($can_edit): ?>

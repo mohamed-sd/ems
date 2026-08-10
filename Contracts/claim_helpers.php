@@ -1008,6 +1008,17 @@ if (!function_exists('claim_approve')) {
         }
         if (!$c) { $out['reason'] = 'المستخلصُ غير موجود'; return $out; }
 
+        /* ══ P1-B — «من أنشأ لا يعتمد» على المستخلص ═══════════════════════════
+           كان الختمُ يُكتب (`approved_by`) بلا مقارنةِ المُعِدِّ بالمعتمِد —
+           والمستخلصُ هو ما يُفوتَر عليه العميل. **العطالةُ قبلَ الحارس**: المعتمَدُ
+           سلفًا يُرجَع كما هو ولا يُقرأ «اعتمادَ ذاتٍ» جديدًا. */
+        if ((string) $c['state'] === 'review' || (string) $c['state'] === 'submitted') {
+            require_once __DIR__ . '/../includes/self_approval_guard.php';
+            $__sa = ems_no_self_approval($conn, intval($c['created_by'] ?? 0), intval($uid),
+                'مستخلصٌ #' . $claim_id, intval($c['company_id'] ?? 0));
+            if ($__sa !== null) { $out['reason'] = $__sa['reason']; return $out; }
+        }
+
         if (in_array((string) $c['state'], array('approved', 'invoiced', 'collected'), true)) {
             $out['status'] = 'exists';
             $out['invoice_no'] = (string) $c['invoice_no'];

@@ -28,5 +28,20 @@ $U13 = array(
     'rule'       => 'IAF-0044: لا مهمةَ بلا خطةٍ ولا خطةَ بلا كونٍ رقابيٍّ ولا كونَ بلا ميثاق',
     'empty_hint' => 'لا خطةَ معتمدةٌ بعدُ',
     'order'       => 'plan_year DESC',
+
+    'actions'    => array(
+        'approve' => array(
+            'code'  => 'iaf.plan.approve',
+            'label' => 'اعتمادُ الخطةِ السنوية',
+            'rule'  => 'IAF-0044: لا خطةَ بلا كونٍ رقابيٍّ مبنيّ',
+            'fields' => array('plan_year' => 'سنةُ الخطة', 'title' => 'عنوانُ الخطة', 'basis' => 'الأساس'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::approvePlan($conn, array(
+                    'company_id' => $co, 'plan_year' => (int) ($in['plan_year'] ?? 0), 'title' => (string) ($in['title'] ?? ''),
+                    'basis' => (string) ($in['basis'] ?? ''), 'actor' => $uid));
+            }),
+    ),
+
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

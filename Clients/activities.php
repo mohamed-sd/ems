@@ -10,6 +10,14 @@ include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -458,17 +466,17 @@ function act_entity_label($type, $map)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود النشاط المولد <i class="fas fa-info-circle act-info-icon"></i></label>
+                        <label for="generated_act_code"><i class="fas fa-magic"></i> كود النشاط المولد <i class="fas fa-info-circle act-info-icon"></i></label>
                         <input type="text" id="generated_act_code" class="generated-code-field" value="<?php echo act_e($next_act_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود النشاط" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود النشاط *</label>
+                        <label for="activity_code"><i class="fas fa-barcode"></i> كود النشاط *</label>
                         <input type="text" name="activity_code" id="activity_code" placeholder="مثال: ACT-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-list-check"></i> نوع النشاط *</label>
+                        <label for="activity_type"><i class="fas fa-list-check"></i> نوع النشاط *</label>
                         <select name="activity_type" id="activity_type" required>
                             <?php foreach ($ACT_TYPES as $t): ?>
                                 <option value="<?php echo act_e($t); ?>"><?php echo act_e($t); ?></option>
@@ -476,7 +484,7 @@ function act_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-link"></i> نوع الارتباط</label>
+                        <label for="entity_type"><i class="fas fa-link"></i> نوع الارتباط</label>
                         <select name="entity_type" id="entity_type">
                             <?php foreach ($ACT_ENTITY_TYPES as $k => $v): ?>
                                 <option value="<?php echo act_e($k); ?>"><?php echo act_e($v); ?></option>
@@ -484,21 +492,21 @@ function act_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-folder-tree"></i> السجل المرتبط</label>
+                        <label for="entity_id"><i class="fas fa-folder-tree"></i> السجل المرتبط</label>
                         <select name="entity_id" id="entity_id">
                             <option value="">-- بدون / غير محدد --</option>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-heading"></i> الموضوع</label>
+                        <label for="subject"><i class="fas fa-heading"></i> الموضوع</label>
                         <input type="text" name="subject" id="subject" placeholder="موضوع النشاط والمخرجات" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-day"></i> تاريخ النشاط</label>
+                        <label for="activity_date"><i class="fas fa-calendar-day"></i> تاريخ النشاط</label>
                         <input type="date" name="activity_date" id="activity_date" />
                     </div>
                     <div>
-                        <label><i class="fas fa-user-check"></i> المسؤول</label>
+                        <label for="assigned_user_id"><i class="fas fa-user-check"></i> المسؤول</label>
                         <select name="assigned_user_id" id="assigned_user_id">
                             <option value="">-- غير محدد --</option>
                             <?php foreach ($users_options as $uid => $uname): ?>
@@ -507,18 +515,18 @@ function act_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-comments-dollar"></i> جولة تفاوض؟</label>
+                        <label for="is_negotiation"><i class="fas fa-comments-dollar"></i> جولة تفاوض؟</label>
                         <select name="is_negotiation" id="is_negotiation">
                             <option value="0">لا</option>
                             <option value="1">نعم</option>
                         </select>
                     </div>
                     <div class="act-col-full">
-                        <label><i class="fas fa-clipboard-check"></i> المخرجات / ما اتُّفق عليه</label>
+                        <label for="outcome"><i class="fas fa-clipboard-check"></i> المخرجات / ما اتُّفق عليه</label>
                         <textarea name="outcome" id="outcome" rows="2" placeholder="الحضور وما اتُّفق عليه"></textarea>
                     </div>
                     <div class="act-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -537,13 +545,13 @@ function act_entity_label($type, $map)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-list-check"></i> نوع النشاط</label>
+                <label for="filterType"><i class="fa fa-list-check"></i> نوع النشاط</label>
                 <select id="filterType" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-link"></i> نوع الارتباط</label>
+                <label for="filterEntity"><i class="fa fa-link"></i> نوع الارتباط</label>
                 <select id="filterEntity" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

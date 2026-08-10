@@ -10,6 +10,14 @@ include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -388,21 +396,21 @@ function pl_revenue_label($model, $map)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle pl-info-icon"></i></label>
+                        <label for="generated_pl_code"><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle pl-info-icon"></i></label>
                         <input type="text" id="generated_pl_code" class="generated-code-field" value="<?php echo pl_e($next_pl_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل الكود" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> الكود *</label>
+                        <label for="pricelist_code"><i class="fas fa-barcode"></i> الكود *</label>
                         <input type="text" name="pricelist_code" id="pricelist_code" placeholder="مثال: PL-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-heading"></i> اسم قائمة الأسعار *</label>
+                        <label for="name"><i class="fas fa-heading"></i> اسم قائمة الأسعار *</label>
                         <input type="text" name="name" id="name" placeholder="اسم قائمة الأسعار" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-coins"></i> العملة</label>
+                        <label for="currency"><i class="fas fa-coins"></i> العملة</label>
                         <select name="currency" id="currency">
                             <?php foreach ($PL_CURRENCIES as $cur): ?>
                                 <option value="<?php echo pl_e($cur); ?>" <?php echo $cur === 'USD' ? 'selected' : ''; ?>><?php echo pl_e($cur); ?></option>
@@ -410,7 +418,7 @@ function pl_revenue_label($model, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-diagram-project"></i> نموذج التسعير</label>
+                        <label for="revenue_model"><i class="fas fa-diagram-project"></i> نموذج التسعير</label>
                         <select name="revenue_model" id="revenue_model">
                             <option value="">-- غير محدد --</option>
                             <?php foreach ($PL_REVENUE_MODELS as $k => $v): ?>
@@ -419,27 +427,27 @@ function pl_revenue_label($model, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-money-bill-wave"></i> السعر الأساس</label>
+                        <label for="base_price"><i class="fas fa-money-bill-wave"></i> السعر الأساس</label>
                         <input type="number" step="0.01" name="base_price" id="base_price" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-route"></i> أثر المسافة</label>
+                        <label for="distance_factor"><i class="fas fa-route"></i> أثر المسافة</label>
                         <input type="number" step="0.001" name="distance_factor" id="distance_factor" placeholder="" />
                     </div>
                     <div>
-                        <label><i class="fas fa-business-time"></i> أثر الورديات</label>
+                        <label for="shift_factor"><i class="fas fa-business-time"></i> أثر الورديات</label>
                         <input type="number" step="0.001" name="shift_factor" id="shift_factor" placeholder="" />
                     </div>
                     <div>
-                        <label><i class="fas fa-cubes"></i> أثر الحجم</label>
+                        <label for="volume_factor"><i class="fas fa-cubes"></i> أثر الحجم</label>
                         <input type="number" step="0.001" name="volume_factor" id="volume_factor" placeholder="" />
                     </div>
                     <div>
-                        <label><i class="fas fa-hourglass-half"></i> أثر المدة</label>
+                        <label for="duration_factor"><i class="fas fa-hourglass-half"></i> أثر المدة</label>
                         <input type="number" step="0.001" name="duration_factor" id="duration_factor" placeholder="" />
                     </div>
                     <div class="pl-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -458,13 +466,13 @@ function pl_revenue_label($model, $map)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-diagram-project"></i> النموذج</label>
+                <label for="filterModel"><i class="fa fa-diagram-project"></i> النموذج</label>
                 <select id="filterModel" class="form-control">
                     <option value="">-- كل النماذج --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-coins"></i> العملة</label>
+                <label for="filterCurrency"><i class="fa fa-coins"></i> العملة</label>
                 <select id="filterCurrency" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

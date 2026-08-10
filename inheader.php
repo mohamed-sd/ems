@@ -40,7 +40,8 @@ if (!function_exists('ems_css_ver')) {
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+    <!-- إضافةُ Responsive مرفوعةٌ من النظام (قرار المالك 2026-08-09): لا طيَّ أعمدةٍ
+         تحت سهمٍ — كلُّ الأعمدة جنبًا إلى جنبٍ بتمريرٍ أفقيٍّ كالإكسل (ems-tables.css). -->
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
     <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
@@ -52,8 +53,14 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
     <!-- شريط الرحلة الموحّد (الدستور §5) — مكوّنٌ واحدٌ للطلب والبلاغ والوحدة -->
     <link rel="stylesheet" href="/ems/assets/css/ems-journey.css<?php echo ems_css_ver('ems-journey.css'); ?>">
+    <!-- نظام الرسائل الموحّد: توست عابر + لافتة سطرية بلغةٍ بصريةٍ واحدة -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-alerts.css<?php echo ems_css_ver('ems-alerts.css'); ?>">
     <!-- قشرة التطبيق الموحدة (UXR-01 · AS-01..08) — تُحمَّل بعد الهوية فتحكم القياسات -->
     <link rel="stylesheet" href="/ems/assets/css/ems-shell.css<?php echo ems_css_ver('ems-shell.css'); ?>">
+    <!-- نظام الرسائل الموحّد — بلا defer عمدًا: 50 رسالةً يطبعها الخادمُ داخل
+         <script>alert(…)</script> في متن الصفحة، ولو تأخّر التقاطُ alert()
+         لسبقتنا وخرجت بنافذة المتصفح الحاجزة. التوستُ يُصفُّ حتى يجهز body. -->
+    <script src="/ems/assets/js/ems-alerts.js<?php $__altjs=__DIR__.'/assets/js/ems-alerts.js'; echo is_file($__altjs)?('?v='.filemtime($__altjs)):''; ?>"></script>
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js<?php $__uijs=__DIR__.'/assets/js/ui-unification.js'; echo is_file($__uijs)?('?v='.filemtime($__uijs)):''; ?>" defer></script>
     <!-- نواة مكونات الواجهة (UXR-01 UI-01..20): الحالات والبطاقات وحارس صفر الأعمدة -->
@@ -62,6 +69,9 @@ if (!function_exists('ems_css_ver')) {
     <script src="/ems/assets/js/column-groups.js" defer></script>
     <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
     <script src="/ems/assets/js/ems-details-modal.js" defer></script>
+    <!-- بطاقة «عن الشاشة» الموحّدة: تبني القالبَ الصادرَ من screen_contract.php
+         في موضعه الصحيح (تحت الرأس) وتزرع زرَّه — راجع رأس الملف للعلّة. -->
+    <script src="/ems/assets/js/ems-screen-about.js<?php $__abtjs=__DIR__.'/assets/js/ems-screen-about.js'; echo is_file($__abtjs)?('?v='.filemtime($__abtjs)):''; ?>" defer></script>
     <!-- Unified Custom Select dropdown for forms (نظام القوائم المنسدلة الموحّد) -->
     <script src="/ems/assets/js/ems-select.js<?php $__emsjs=__DIR__.'/assets/js/ems-select.js'; echo is_file($__emsjs)?('?v='.filemtime($__emsjs)):''; ?>" defer></script>
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->
@@ -92,33 +102,45 @@ if (!empty($GLOBALS['EMS_AX']) && is_array($GLOBALS['EMS_AX'])) {
 <?php
 /* UI-DEF-06 → UI-13 (Error State): رسائلُ الحوكمة تُعرض داخل الشاشة لا في
    الرابط — الحارسُ يودعها الجلسةَ (ems_gov_flash_redirect) وهذا الحاملُ
-   المركزيُّ يعرضها مرةً واحدةً ثم يمسحها: ما حدث + كيف يُصحَّح + رمزُ الخطأ. */
+   المركزيُّ يعرضها مرةً واحدةً ثم يمسحها: ما حدث + كيف يُصحَّح + رمزُ الخطأ.
+
+   2026-08-09: كان يُرسم شريطًا لاصقًا بأنماطٍ داخليةٍ صفًّا مرنًا، فإذا ضاقت
+   حاويتُه انكسر النصُّ كلمةً في كل سطرٍ وتقطّع الرمزُ نفسُه (GOV- / INFO- /
+   200) — بلّغ به المالكُ بلقطةٍ حيّة. صار يمرُّ على نظام الرسائل الموحَّد:
+   توستٌ ثابتُ الموضع (position:fixed) لا تحكمه حاويةٌ أصلًا، فزال سببُ العطب
+   لا عرضُه، واتّحد شكلُه مع بقية رسائل النظام. */
 if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) {
-    echo '<div id="emsGovFlash" style="position:sticky;top:0;z-index:2000">';
+    $emsFgPayload = array();
     foreach (array_slice($_SESSION['ems_flash_gov'], 0, 3) as $emsFg) {
-        $fgText = htmlspecialchars((string) ($emsFg['text'] ?? ''), ENT_QUOTES, 'UTF-8');
-        $fgHint = htmlspecialchars((string) ($emsFg['hint'] ?? ''), ENT_QUOTES, 'UTF-8');
-        $fgCode = htmlspecialchars((string) ($emsFg['code'] ?? 'GOV-403'), ENT_QUOTES, 'UTF-8');
-        /* اللونُ يتبع الرمزَ لا النصَّ: نجاحٌ أخضرُ وحوكمةٌ حمراءُ وخبرٌ رماديٌّ —
-           فالمستخدمُ يقرأ الحكمَ قبل أن يقرأ الحرف (UI-13). */
-        $fgKind = (strpos($fgCode, '-OK-') !== false) ? 'ok'
-            : ((strpos($fgCode, '-INFO-') !== false) ? 'info' : 'bad');
-        $fgSkin = array(
-            'ok'   => array('#14532d', '#166534', '#f0fdf4', 'fa-circle-check'),
-            'info' => array('#1e3a5f', '#1d4ed8', '#eff6ff', 'fa-circle-info'),
-            'bad'  => array('#7f1d1d', '#991b1b', '#fef2f2', 'fa-shield-halved'),
+        $fgText = trim((string) ($emsFg['text'] ?? ''));
+        if ($fgText === '') { continue; }
+        $fgCode = (string) ($emsFg['code'] ?? 'GOV-403');
+        /* النوعُ من الرمز، إلا GOV-INFO-200 فهو حاملٌ عامٌّ تُرسَل به رسائلُ
+           النجاح والمنعِ معًا (تم الحذف بنجاح · الحساب غير مرتبط بشركة) —
+           فيُستنتج نوعُه من نصِّه وإلا خرج نجاحٌ بلون خبرٍ محايد. */
+        if (strpos($fgCode, '-OK-') !== false)        { $fgType = 'success'; }
+        elseif (strpos($fgCode, '-INFO-') !== false)  { $fgType = ''; }
+        else                                          { $fgType = 'error'; }
+        $emsFgPayload[] = array(
+            'type' => $fgType,
+            'text' => $fgText,
+            'hint' => trim((string) ($emsFg['hint'] ?? '')),
+            'code' => $fgCode,
         );
-        list($fgBg, $fgBd, $fgFg, $fgIcon) = $fgSkin[$fgKind];
-        echo '<div dir="rtl" role="status" style="display:flex;align-items:center;gap:10px;background:' . $fgBg
-           . ';color:' . $fgFg . ';padding:10px 16px;font-size:14px;border-bottom:1px solid ' . $fgBd . '">'
-           . '<i class="fas ' . $fgIcon . '" aria-hidden="true"></i>'
-           . '<span style="flex:1"><strong>' . $fgText . '</strong>'
-           . ($fgHint !== '' ? ' — ' . $fgHint : '') . '</span>'
-           . '<code style="background:rgba(255,255,255,.12);border-radius:4px;padding:2px 8px;font-size:12px">' . $fgCode . '</code>'
-           . '<button type="button" onclick="this.closest(\'#emsGovFlash\').remove()" '
-           . 'style="background:none;border:0;color:inherit;font-size:16px;cursor:pointer" aria-label="إغلاق">&times;</button>'
-           . '</div>';
     }
-    echo '</div>';
     unset($_SESSION['ems_flash_gov']);
+    if ($emsFgPayload) {
+        echo '<script>(function(){var f=' . json_encode($emsFgPayload, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+           . ';f.forEach(function(m){window.EmsAlert.show({type:m.type||undefined,text:m.text,hint:m.hint||undefined,code:m.code});});})();</script>';
+        // بلا جافاسكربت: لافتةٌ سطريةٌ بالتصميم الموحَّد نفسِه — لا تُفقد الرسالة
+        echo '<noscript>';
+        foreach ($emsFgPayload as $m) {
+            $cls = $m['type'] === 'success' ? 'alert-success' : ($m['type'] === 'error' ? 'alert-danger' : 'alert-info');
+            echo '<div class="alert ' . $cls . '" role="status" style="margin:12px">'
+               . htmlspecialchars($m['text'], ENT_QUOTES, 'UTF-8')
+               . ($m['hint'] !== '' ? ' — ' . htmlspecialchars($m['hint'], ENT_QUOTES, 'UTF-8') : '')
+               . ' <code>' . htmlspecialchars($m['code'], ENT_QUOTES, 'UTF-8') . '</code></div>';
+        }
+        echo '</noscript>';
+    }
 }

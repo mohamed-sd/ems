@@ -320,20 +320,20 @@ include __DIR__ . '/../includes/page_header.php';
     <i class="fa fa-user-plus"></i> تكليف عضوٍ من إدارتي (SRC-01)</summary>
     <form method="post" class="ems-form" style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:10px">
       <input type="hidden" name="action" value="dept_assign">
-      <div><label>المكلَّف</label>
-        <select name="to_user" class="form-control" required>
+      <div><label for="emsf_1170_47df2">المكلَّف</label>
+        <select name="to_user" class="form-control" required id="emsf_1170_47df2">
           <?php $r = mysqli_query($conn, 'SELECT id, name FROM users WHERE id IN (' . implode(',', array_map('intval', $members)) . ') ORDER BY name');
           while ($r && ($u = mysqli_fetch_assoc($r))): if (intval($u['id']) === $uid) { continue; } ?>
             <option value="<?= intval($u['id']) ?>"><?= htmlspecialchars($u['name']) ?></option>
           <?php endwhile; ?>
         </select></div>
-      <div style="flex:2;min-width:220px"><label>المهمة</label>
-        <input type="text" name="title" class="form-control" required maxlength="300"></div>
-      <div style="flex:1;min-width:160px"><label>المخرج المطلوب</label>
-        <input type="text" name="deliverable" class="form-control" maxlength="300"></div>
-      <div><label>المهلة</label><input type="date" name="due_date" class="form-control"></div>
-      <div><label>الأولوية</label>
-        <select name="priority" class="form-control">
+      <div style="flex:2;min-width:220px"><label for="emsf_1171_6a5e4">المهمة</label>
+        <input type="text" name="title" class="form-control" required maxlength="300" id="emsf_1171_6a5e4"></div>
+      <div style="flex:1;min-width:160px"><label for="emsf_1172_eff16">المخرج المطلوب</label>
+        <input type="text" name="deliverable" class="form-control" maxlength="300" id="emsf_1172_eff16"></div>
+      <div><label for="emsf_1173_5ada4">المهلة</label><input type="date" name="due_date" class="form-control" id="emsf_1173_5ada4"></div>
+      <div><label for="emsf_1174_bb9ed">الأولوية</label>
+        <select name="priority" class="form-control" id="emsf_1174_bb9ed">
           <option>P3</option><option>P2</option><option>P1</option><option>P0</option><option>P4</option>
         </select></div>
       <button class="btn btn-primary">كلِّف</button>

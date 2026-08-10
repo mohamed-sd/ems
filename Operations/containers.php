@@ -269,10 +269,10 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                     <input type="hidden" name="container_id" value="<?php echo $id; ?>">
                     <input type="hidden" name="contract_id" value="<?php echo (int) $contract; ?>">
                     <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
-                    <input type="number" name="cycle_on_days" min="1" placeholder="أيام عمل" style="width:80px" required>
-                    <input type="number" name="cycle_off_days" min="0" placeholder="أيام راحة" style="width:80px" required>
+                    <input type="number" name="cycle_on_days" min="1" placeholder="أيام عمل" style="width:80px" required aria-label="أيام عمل">
+                    <input type="number" name="cycle_off_days" min="0" placeholder="أيام راحة" style="width:80px" required aria-label="أيام راحة">
                     <input type="date" name="cycle_start" required>
-                    <input type="text" name="note" placeholder="ملاحظة" style="width:100px">
+                    <input type="text" name="note" placeholder="ملاحظة" style="width:100px" aria-label="ملاحظة">
                     <button class="btn btn-sm btn-warning">سجّل الدورة</button>
                 </form>
             </details>
@@ -313,8 +313,8 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         </p>
         <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
             <div class="form-group" style="min-width:280px">
-                <label>العقد</label>
-                <select name="contract" onchange="this.form.submit()">
+                <label for="emsf_799_342fc">العقد</label>
+                <select name="contract" onchange="this.form.submit()" id="emsf_799_342fc">
                     <option value="">— اختر عقدًا —</option>
                     <?php foreach ($contracts as $c):
                         $eff = CSM::isEffective($c['contract_status']); ?>
@@ -471,17 +471,17 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             <input type="hidden" name="parent_id" id="allocParent">
             <input type="hidden" name="child_level" id="allocLevel">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>المستوى</label>
+                <div class="form-group"><label for="allocLevelTxt">المستوى</label>
                     <input type="text" id="allocLevelTxt" disabled></div>
-                <div class="form-group"><label>مرجعُ الطرف *
+                <div class="form-group"><label for="emsf_800_c5dd9">مرجعُ الطرف *
                     <span class="mnt-req-hint">(رقمُ المورد/المعدة/الموظف)</span></label>
-                    <input type="number" min="1" name="child_ref" required></div>
-                <div class="form-group"><label>الحصة *</label>
-                    <input type="number" step="0.01" min="0.01" name="qty" required></div>
-                <div class="form-group"><label>الدور</label>
+                    <input type="number" min="1" name="child_ref" required id="emsf_800_c5dd9"></div>
+                <div class="form-group"><label for="emsf_801_79d3f">الحصة *</label>
+                    <input type="number" step="0.01" min="0.01" name="qty" required id="emsf_801_79d3f"></div>
+                <div class="form-group"><label for="allocRole">الدور</label>
                     <select name="role_kind" id="allocRole"><option value="">—</option></select></div>
-                <div class="form-group"><label>النوبة</label>
-                    <input type="number" min="1" max="3" name="shift_no"></div>
+                <div class="form-group"><label for="emsf_802_82d58">النوبة</label>
+                    <input type="number" min="1" max="3" name="shift_no" id="emsf_802_82d58"></div>
             </div></div>
             <div style="margin-top:10px">
                 <button class="btn btn-primary"><i class="fa fa-check"></i> وزّع</button>
@@ -500,17 +500,17 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             <input type="hidden" name="container_id" id="swapContainer">
             <input type="hidden" name="swap_kind" id="swapKind">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الخارج</label>
-                    <input type="number" min="1" name="out_ref"></div>
-                <div class="form-group"><label>الداخل</label>
-                    <input type="number" min="1" name="in_ref"></div>
-                <div class="form-group"><label>من تاريخ *</label>
-                    <input type="date" name="effective_from" required></div>
-                <div class="form-group"><label>السبب *
+                <div class="form-group"><label for="emsf_803_36593">الخارج</label>
+                    <input type="number" min="1" name="out_ref" id="emsf_803_36593"></div>
+                <div class="form-group"><label for="emsf_804_42ce1">الداخل</label>
+                    <input type="number" min="1" name="in_ref" id="emsf_804_42ce1"></div>
+                <div class="form-group"><label for="emsf_805_975a5">من تاريخ *</label>
+                    <input type="date" name="effective_from" required id="emsf_805_975a5"></div>
+                <div class="form-group"><label for="emsf_806_cdd4c">السبب *
                     <span class="mnt-req-hint">(إلزام — لا تبديلَ بلا سبب)</span></label>
-                    <input type="text" name="reason" maxlength="255" required></div>
-                <div class="form-group"><label>مرجعُ المستند</label>
-                    <input type="text" name="doc_ref" maxlength="120"></div>
+                    <input type="text" name="reason" maxlength="255" required id="emsf_806_cdd4c"></div>
+                <div class="form-group"><label for="emsf_807_86c6c">مرجعُ المستند</label>
+                    <input type="text" name="doc_ref" maxlength="120" id="emsf_807_86c6c"></div>
             </div></div>
             <div style="margin-top:10px">
                 <button class="btn btn-primary"><i class="fa fa-check"></i> سجّل التبديل</button>

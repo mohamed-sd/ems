@@ -721,7 +721,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <div style="min-width:220px;">
-          <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المشروع</label>
+          <label style="font-weight:700; margin-bottom:6px; display:block;" for="sc_filter_project_select">فلتر المشروع</label>
           <select name="filter_project_id" id="sc_filter_project_select" class="form-control">
             <option value="0">كل المشاريع</option>
             <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
@@ -1200,7 +1200,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1478,25 +1477,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>عدد الورديات</label>
-              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2"></div>
+              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" aria-label="مثال: 2"></div>
             </div>
 
             <!-- أوقات الورديات -->
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00"></div>
+              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00" aria-label="مثال: 08:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
+              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
+              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00"></div>
+              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00" aria-label="مثال: 00:00"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1518,7 +1517,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الساعات يومياً</label>
-              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
@@ -1527,7 +1526,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
-              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
@@ -1541,7 +1540,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="field md-3 sm-6">
               <label>السعر</label>
-              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" aria-label="0.00"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -2023,7 +2022,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الورديات</label>
-                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
+                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}" aria-label="مثال: 2"></div>
                       </div>
 
                       <!-- أوقات الورديات -->
@@ -2063,7 +2062,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي الساعات يومياً</label>
-                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}"></div>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="يُحتسب تلقائياً"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
@@ -2071,7 +2070,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
-                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}"></div>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="يُحتسب تلقائياً"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>
@@ -2085,7 +2084,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>السعر</label>
-                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}"></div>
+                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}" aria-label="0.00"></div>
                       </div>
 
                       <div class="field md-3 sm-6">

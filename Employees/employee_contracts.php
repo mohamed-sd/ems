@@ -60,7 +60,6 @@ if ($driver_owned === null) {
 
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
   <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
   <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
   <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
@@ -211,7 +210,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
-                  placeholder="عدد الأيام"></div>
+                  placeholder="عدد الأيام" aria-label="عدد الأيام"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -235,7 +234,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
-                  min="0" placeholder="يُحتسب تلقائياً" readonly></div>
+                  min="0" placeholder="يُحتسب تلقائياً" readonly aria-label="يُحتسب تلقائياً"></div>
             </div>
 
 
@@ -291,7 +290,7 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label>عدد الورديات للعقد </label>
-              <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2">
+              <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2" aria-label="مثال: 2">
               </div>
             </div>
 
@@ -317,7 +316,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>مدراء الموقع </label>
               <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
-                  placeholder="مثال: 3"></div>
+                  placeholder="مثال: 3" aria-label="مثال: 3"></div>
             </div>
 
 
@@ -398,7 +397,7 @@ include('../insidebar.php'); ?>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>حجم المعدة (Size)</label>
-                    <div class="control"><input name="equip_size_1" type="number" placeholder="مثال: 340"></div>
+                    <div class="control"><input name="equip_size_1" type="number" placeholder="مثال: 340" aria-label="مثال: 340"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المعدات</label>
@@ -430,24 +429,24 @@ include('../insidebar.php'); ?>
 
                   <div class="field md-3 sm-6">
                     <label>عدد الورديات</label>
-                    <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
+                    <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2" aria-label="مثال: 2"></div>
                   </div>
                   <!-- أوقات الورديات -->
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-                    <div class="control"><input name="shift1_start_1" type="time" placeholder="مثال: 08:00"></div>
+                    <div class="control"><input name="shift1_start_1" type="time" placeholder="مثال: 08:00" aria-label="مثال: 08:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-                    <div class="control"><input name="shift1_end_1" type="time" placeholder="مثال: 16:00"></div>
+                    <div class="control"><input name="shift1_end_1" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-                    <div class="control"><input name="shift2_start_1" type="time" placeholder="مثال: 16:00"></div>
+                    <div class="control"><input name="shift2_start_1" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-                    <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
+                    <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00" aria-label="مثال: 00:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
@@ -469,7 +468,7 @@ include('../insidebar.php'); ?>
                   <div class="field md-3 sm-6">
                     <label>إجمالي الوحدات يومياً</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً"></div>
+                        placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدات العمل في الشهر</label>
@@ -480,7 +479,7 @@ include('../insidebar.php'); ?>
                   <div class="field md-3 sm-6">
                     <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً"></div>
+                        placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
                   </div>
 
 
@@ -497,7 +496,7 @@ include('../insidebar.php'); ?>
                   <div class="field md-3 sm-6">
                     <label>السعر\للوحدة</label>
                     <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
-                        placeholder="0.00"></div>
+                        placeholder="0.00" aria-label="0.00"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
@@ -542,7 +541,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6 drivercontracts-hidden">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
-                  placeholder="مثال: 8" value="20"></div>
+                  placeholder="مثال: 8" value="20" aria-label="مثال: 8"></div>
             </div>
             <!-- Orgnization Break  -->
 
@@ -551,7 +550,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>الطرف الأول </label>
               <div class="control"><input type="text" name="first_party" id="first_party"
-                  placeholder="اسم الطرف الاول ">
+                  placeholder="اسم الطرف الاول " aria-label="اسم الطرف الاول">
               </div>
             </div>
 
@@ -560,7 +559,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>الطرف الثاني </label>
               <div class="control"><input type="text" name="second_party" id="second_party"
-                  placeholder="اسم الطرف الثاني ">
+                  placeholder="اسم الطرف الثاني " aria-label="اسم الطرف الثاني">
               </div>
             </div>
 
@@ -569,13 +568,13 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
               <div class="control"><input type="text" name="witness_one" id="witness_one"
-                  placeholder="اسم الشاهد الأول">
+                  placeholder="اسم الشاهد الأول" aria-label="اسم الشاهد الأول">
               </div>
             </div>
             <div class="field md-3 sm-6">
               <label>الشاهد الثاني</label>
               <div class="control"><input type="text" name="witness_two" id="witness_two"
-                  placeholder="اسم الشاهد الثاني">
+                  placeholder="اسم الشاهد الثاني" aria-label="اسم الشاهد الثاني">
               </div>
             </div>
           </div>
@@ -1018,7 +1017,6 @@ include('../insidebar.php'); ?>
   <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
   <!-- DataTables JS -->
   <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1182,7 +1180,7 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>حجم المعدة (Size)</label>
-              <div class="control"><input name="equip_size_${equipmentIndex}" type="number" placeholder="مثال: 340"></div>
+              <div class="control"><input name="equip_size_${equipmentIndex}" type="number" placeholder="مثال: 340" aria-label="مثال: 340"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المعدات</label>
@@ -1208,25 +1206,25 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label>عدد الورديات</label>
-              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2"></div>
+              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" aria-label="مثال: 2"></div>
             </div>
 
             <!-- أوقات الورديات -->
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00"></div>
+              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00" aria-label="مثال: 08:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
+              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
+              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00"></div>
+              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00" aria-label="مثال: 00:00"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1248,7 +1246,7 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الساعات يومياً</label>
-              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
@@ -1257,7 +1255,7 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
-              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
@@ -1271,7 +1269,7 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>السعر</label>
-              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" aria-label="0.00"></div>
             </div>
             <div class="field md-3 sm-6">
             </div>
@@ -1592,7 +1590,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>حجم المعدة (Size)</label>
-                        <div class="control"><input name="equip_size_${equipmentIndex}" type="number" placeholder="مثال: 340" value="${equip.equip_size}"></div>
+                        <div class="control"><input name="equip_size_${equipmentIndex}" type="number" placeholder="مثال: 340" value="${equip.equip_size}" aria-label="مثال: 340"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المعدات</label>
@@ -1612,7 +1610,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الورديات</label>
-                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
+                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}" aria-label="مثال: 2"></div>
                       </div>
 
                       <!-- أوقات الورديات -->
@@ -1652,7 +1650,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي الساعات يومياً</label>
-                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}"></div>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="يُحتسب تلقائياً"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
@@ -1660,7 +1658,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
-                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}"></div>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="يُحتسب تلقائياً"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>
@@ -1674,7 +1672,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>السعر</label>
-                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}"></div>
+                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}" aria-label="0.00"></div>
                       </div>
                        <div class="field md-3 sm-6">
                       </div>

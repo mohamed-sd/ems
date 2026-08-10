@@ -142,8 +142,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-header"><h5><i class="fa fa-money-bill-transfer"></i> سلفةٌ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label>المورد <span style="color:#c00">*</span></label>
-                <select name="supplier_id" required>
+                <label for="emsf_1396_5d86b">المورد <span style="color:#c00">*</span></label>
+                <select name="supplier_id" required id="emsf_1396_5d86b">
                     <option value="">— اختر —</option>
                     <?php foreach ($suppliers as $s): ?>
                         <option value="<?php echo intval($s['id']); ?>">
@@ -153,28 +153,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="form-group">
-                <label>النوع</label>
-                <select name="advance_type">
+                <label for="emsf_1397_6b9e9">النوع</label>
+                <select name="advance_type" id="emsf_1397_6b9e9">
                     <?php foreach (SAS::TYPE_LABELS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>المبلغ <span style="color:#c00">*</span></label>
-                <input type="number" step="0.01" min="0.01" name="amount" required></div>
-            <div class="form-group"><label>العملة</label><input type="text" name="currency" maxlength="8"></div>
-            <div class="form-group"><label>سند الصرف <span style="color:#c00">*</span>
+            <div class="form-group"><label for="emsf_1398_77be1">المبلغ <span style="color:#c00">*</span></label>
+                <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_1398_77be1"></div>
+            <div class="form-group"><label for="emsf_1399_9ea11">العملة</label><input type="text" name="currency" maxlength="8" id="emsf_1399_9ea11"></div>
+            <div class="form-group"><label for="emsf_1400_708c5">سند الصرف <span style="color:#c00">*</span>
                     <small>— «ما لا مستندَ له لا يُحمَّل»</small></label>
-                <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2051/77"></div>
-            <div class="form-group"><label>تاريخ الصرف <span style="color:#c00">*</span></label>
-                <input type="date" name="issued_date" required></div>
-            <div class="form-group"><label>عدد الأقساط</label>
-                <input type="number" min="1" name="installments_count" value="1"></div>
-            <div class="form-group"><label>قسط التسوية <small>— فارغٌ = المبلغ ÷ الأقساط</small></label>
-                <input type="number" step="0.01" min="0.01" name="installment_amount"></div>
-            <div class="form-group"><label>أول فترة استرداد</label>
-                <input type="date" name="first_recovery_period"></div>
-            <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="255"></div>
+                <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2051/77" id="emsf_1400_708c5"></div>
+            <div class="form-group"><label for="emsf_1401_6c205">تاريخ الصرف <span style="color:#c00">*</span></label>
+                <input type="date" name="issued_date" required id="emsf_1401_6c205"></div>
+            <div class="form-group"><label for="emsf_1402_9f0db">عدد الأقساط</label>
+                <input type="number" min="1" name="installments_count" value="1" id="emsf_1402_9f0db"></div>
+            <div class="form-group"><label for="emsf_1403_c70f5">قسط التسوية <small>— فارغٌ = المبلغ ÷ الأقساط</small></label>
+                <input type="number" step="0.01" min="0.01" name="installment_amount" id="emsf_1403_c70f5"></div>
+            <div class="form-group"><label for="emsf_1404_10b6b">أول فترة استرداد</label>
+                <input type="date" name="first_recovery_period" id="emsf_1404_10b6b"></div>
+            <div class="form-group"><label for="emsf_1405_824a7">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1405_824a7"></div>
         </div>
         <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> فتح السلفة</button></div>
         </div></div>

@@ -81,7 +81,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valid_to' => ($vt !== '' ? $vt : null), 'state' => $st,
             'client_id' => ($cid > 0 ? $cid : null),
             'note' => trim((string) ($_POST['note'] ?? '')), 'updated_at' => date('Y-m-d H:i:s'));
-        if ($st === 'معتمد') { $data['approved_by'] = $uid; $data['approved_at'] = date('Y-m-d H:i:s'); }
+
+        /* ══ INJ-0030 (P1) — «من أنشأ لا يعتمد»، والاعتمادُ كان **حقلَ حالةٍ في
+             النموذجِ نفسِه**: يختار المستخدمُ «معتمد» في قائمةِ الحالةِ فيُختَم
+             الدفترُ باسمِه في اللحظةِ نفسِها التي أنشأه فيها. فالاعتمادُ صار
+             خانةً لا فعلًا، ولا يدَ ثانيةَ فيه.
+           ◆ العلاج: الاعتمادُ يُمنع في مسارِ الحفظِ إن كان المُعتمِدُ هو المُنشئ —
+             ويبقى الدفترُ في حالتِه السابقةِ حتى تعتمده يدٌ ثانية. */
+        if ($st === 'معتمد') {
+            require_once __DIR__ . '/../includes/self_approval_guard.php';
+            if ($bid > 0) {
+                $__sa = ems_assert_not_self_approval($conn, 'rate_books', 'id', $bid,
+                    'دفترُ أسعارٍ #' . $bid, intval($_SESSION['user']['company_id'] ?? 0));
+                if ($__sa !== null) { rb_back($__sa['reason'], $qs); }
+            } else {
+                // دفترٌ جديدٌ: مُنشئُه هو الفاعلُ قطعًا — فلا يُولد معتمَدًا.
+                rb_back('**من أنشأ لا يعتمد** — يُحفظ الدفترُ مسودةً ثم تعتمده يدٌ ثانية (UI-01 §8)', $qs);
+            }
+            $data['approved_by'] = $uid;
+            $data['approved_at'] = date('Y-m-d H:i:s');
+        }
 
         try {
             if ($bid > 0) {

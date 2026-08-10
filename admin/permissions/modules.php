@@ -155,7 +155,6 @@ require_once __DIR__ . '/../includes/layout_head.php';
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 
 <style>
@@ -371,21 +370,21 @@ input[type="radio"] {
                 <div class="form-grid">
                     <!-- اسم الصفحة -->
                     <div>
-                        <label><i class="fas fa-book"></i> اسم الصفحة *</label>
+                        <label for="name"><i class="fas fa-book"></i> اسم الصفحة *</label>
                         <input type="text" name="name" id="name" placeholder="مثال: إدارة العملاء" 
                                value="<?= htmlspecialchars($editData['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required />
                     </div>
 
                     <!-- كود الصفحة -->
                     <div>
-                        <label><i class="fas fa-code"></i> كود الصفحة *</label>
+                        <label for="code"><i class="fas fa-code"></i> كود الصفحة *</label>
                         <input type="text" name="code" id="code" placeholder="مثال: clients" 
                                value="<?= htmlspecialchars($editData['code'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required />
                     </div>
 
                     <!-- الدور المسؤول -->
                     <div>
-                        <label><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
+                        <label for="owner_role_id"><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
                         <select name="owner_role_id" id="owner_role_id" required>
                             <option value="">-- اختر الدور المسؤول --</option>
                             <?php foreach ($roles as $role): ?>
@@ -400,7 +399,7 @@ input[type="radio"] {
 
                     <!-- مجموعة الرابط -->
                     <div>
-                        <label><i class="fas fa-folder-tree"></i> المجموعة</label>
+                        <label for="group_id"><i class="fas fa-folder-tree"></i> المجموعة</label>
                         <select name="group_id" id="group_id">
                             <option value="" data-role="">— بلا مجموعة (المستوى الأعلى) —</option>
                             <?php foreach ($link_groups as $lg): ?>
@@ -509,7 +508,7 @@ input[type="radio"] {
         <div class="card-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
             <h5 style="margin:0;"><i class="fas fa-list"></i> جميع الصفحات والمديولات</h5>
             <div style="display:flex; align-items:center; gap:10px;">
-                <label style="font-weight:700; margin:0;"><i class="fas fa-user-tie"></i> فلترة حسب الدور:</label>
+                <label style="font-weight:700; margin:0;" for="roleFilterSelect"><i class="fas fa-user-tie"></i> فلترة حسب الدور:</label>
                 <select id="roleFilterSelect" style="padding:7px 14px; border:1.5px solid var(--border); border-radius:var(--radius); font-family:'Cairo',sans-serif; font-size:.88rem; min-width:180px;">
                     <option value="">-- جميع الأدوار --</option>
                     <?php foreach ($roles as $role): ?>
@@ -653,7 +652,6 @@ input[type="radio"] {
 $(document).ready(function () {
     // تهيئة DataTable
     var modulesTable = $('#modulesTable').DataTable({
-        responsive: true,
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
         },

@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -441,17 +449,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود الملحق المولد <i class="fas fa-info-circle amd-info-icon"></i></label>
+                        <label for="generated_amd_code"><i class="fas fa-magic"></i> كود الملحق المولد <i class="fas fa-info-circle amd-info-icon"></i></label>
                         <input type="text" id="generated_amd_code" class="generated-code-field" value="<?php echo amd_e($next_amd_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود الملحق" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود الملحق *</label>
+                        <label for="amendment_code"><i class="fas fa-barcode"></i> كود الملحق *</label>
                         <input type="text" name="amendment_code" id="amendment_code" placeholder="مثال: AMD-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-contract"></i> العقد المرتبط</label>
+                        <label for="contract_id"><i class="fas fa-file-contract"></i> العقد المرتبط</label>
                         <select name="contract_id" id="contract_id">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($contract_options as $co): ?>
@@ -460,7 +468,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-list"></i> نوع التعديل</label>
+                        <label for="amend_type"><i class="fas fa-list"></i> نوع التعديل</label>
                         <select name="amend_type" id="amend_type">
                             <?php foreach ($AMD_TYPES as $t): ?>
                                 <option value="<?php echo amd_e($t); ?>"><?php echo amd_e($t); ?></option>
@@ -468,11 +476,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-day"></i> تاريخ التعديل</label>
+                        <label for="amend_date"><i class="fas fa-calendar-day"></i> تاريخ التعديل</label>
                         <input type="date" name="amend_date" id="amend_date" />
                     </div>
                     <div>
-                        <label><i class="fas fa-user-tie"></i> الجهة الطالبة</label>
+                        <label for="requested_by"><i class="fas fa-user-tie"></i> الجهة الطالبة</label>
                         <select name="requested_by" id="requested_by">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($user_options as $uo): ?>
@@ -481,31 +489,31 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-arrow-left-long"></i> القيمة قبل</label>
+                        <label for="old_value"><i class="fas fa-arrow-left-long"></i> القيمة قبل</label>
                         <input type="text" name="old_value" id="old_value" placeholder="القيمة قبل التعديل" />
                     </div>
                     <div>
-                        <label><i class="fas fa-arrow-right-long"></i> القيمة بعد</label>
+                        <label for="new_value"><i class="fas fa-arrow-right-long"></i> القيمة بعد</label>
                         <input type="text" name="new_value" id="new_value" placeholder="القيمة بعد التعديل" />
                     </div>
                     <div>
-                        <label><i class="fas fa-money-bill-wave"></i> الأثر على السعر</label>
+                        <label for="effect_price"><i class="fas fa-money-bill-wave"></i> الأثر على السعر</label>
                         <input type="number" step="0.01" name="effect_price" id="effect_price" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-boxes-stacked"></i> الأثر على الكمية</label>
+                        <label for="effect_qty"><i class="fas fa-boxes-stacked"></i> الأثر على الكمية</label>
                         <input type="number" step="0.01" name="effect_qty" id="effect_qty" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-plus"></i> الأثر على المدة (أيام)</label>
+                        <label for="effect_duration"><i class="fas fa-calendar-plus"></i> الأثر على المدة (أيام)</label>
                         <input type="number" step="1" name="effect_duration" id="effect_duration" placeholder="0" />
                     </div>
                     <div class="amd-col-full">
-                        <label><i class="fas fa-comment-dots"></i> سبب التغيير</label>
+                        <label for="reason"><i class="fas fa-comment-dots"></i> سبب التغيير</label>
                         <textarea name="reason" id="reason" rows="2" placeholder="سبب التغيير"></textarea>
                     </div>
                     <div class="amd-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملخص الأثر</label>
+                        <label for="effect_summary"><i class="fas fa-note-sticky"></i> ملخص الأثر</label>
                         <textarea name="effect_summary" id="effect_summary" rows="2" placeholder="ملخص الأثر"></textarea>
                     </div>
                 </div>
@@ -524,7 +532,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-list"></i> نوع التعديل</label>
+                <label for="filterType"><i class="fa fa-list"></i> نوع التعديل</label>
                 <select id="filterType" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>

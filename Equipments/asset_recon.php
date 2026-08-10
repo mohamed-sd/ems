@@ -138,36 +138,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — مطابقة سجل الأصول بالتشغيل</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم المحضر</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الفترة</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>الساعات حسب سجل الأصول</label>
-                    <input type="text" inputmode="decimal" name="f3" placeholder="0"></div>
-                <div class="form-group"><label>الساعات حسب التايم شيت</label>
-                    <input type="text" inputmode="decimal" name="f4" placeholder="0"></div>
-                <div class="form-group"><label>الفرق</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>نسبة الفرق</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0"></div>
-                <div class="form-group"><label>تصنيف الفرق</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>تفسير الفرق</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>التصحيح المعتمد</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>أثر التصحيح على الإهلاك</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>طابقه</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>اعتمده</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإقفال</label>
-                    <input type="date" name="f13"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f14"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_133_403ed">رقم المحضر</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_133_403ed"></div>
+                <div class="form-group"><label for="emsf_134_c0c6b">الفترة</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_134_c0c6b"></div>
+                <div class="form-group"><label for="emsf_135_b7bf6">كود المعدة</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_135_b7bf6"></div>
+                <div class="form-group"><label for="emsf_136_be90d">الساعات حسب سجل الأصول</label>
+                    <input type="text" inputmode="decimal" name="f3" placeholder="0" id="emsf_136_be90d"></div>
+                <div class="form-group"><label for="emsf_137_b7da5">الساعات حسب التايم شيت</label>
+                    <input type="text" inputmode="decimal" name="f4" placeholder="0" id="emsf_137_b7da5"></div>
+                <div class="form-group"><label for="emsf_138_b326e">الفرق</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_138_b326e"></div>
+                <div class="form-group"><label for="emsf_139_f1837">نسبة الفرق</label>
+                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_139_f1837"></div>
+                <div class="form-group"><label for="emsf_140_01ea0">تصنيف الفرق</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_140_01ea0"></div>
+                <div class="form-group"><label for="emsf_141_341a4">تفسير الفرق</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_141_341a4"></div>
+                <div class="form-group"><label for="emsf_142_20832">التصحيح المعتمد</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_142_20832"></div>
+                <div class="form-group"><label for="emsf_143_a0903">أثر التصحيح على الإهلاك</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_143_a0903"></div>
+                <div class="form-group"><label for="emsf_144_36267">طابقه</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_144_36267"></div>
+                <div class="form-group"><label for="emsf_145_d68a4">اعتمده</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_145_d68a4"></div>
+                <div class="form-group"><label for="emsf_146_ae92a">تاريخ الإقفال</label>
+                    <input type="date" name="f13" id="emsf_146_ae92a"></div>
+                <div class="form-group"><label for="emsf_147_ccd36">الحالة</label>
+                    <select name="f14" id="emsf_147_ccd36"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

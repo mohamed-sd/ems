@@ -14,6 +14,14 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once dirname(__DIR__) . '/app/Core/AuthorityGuard.php';
 require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
@@ -148,7 +156,7 @@ include '../insidebar.php';
                     <?php endforeach; ?>
                 </select></div>
             <div><label>السبب (إلزامي لقيمة الشراء)</label><br>
-                <input type="text" name="reason" style="width:220px" placeholder="قرار المنح وسنده"></div>
+                <input type="text" name="reason" style="width:220px" placeholder="قرار المنح وسنده" aria-label="قرار المنح وسنده"></div>
             <div><label>من</label><br><input type="date" name="valid_from"></div>
             <div><label>إلى</label><br><input type="date" name="valid_to"></div>
             <button class="btn-save" type="submit">منح</button>
@@ -188,7 +196,7 @@ include '../insidebar.php';
                       onsubmit="return confirm('إلغاء المنحة يحجب الباب عن صاحبها فورًا — أتؤكد بقرار موثَّق؟');">
                     <input type="hidden" name="op" value="revoke">
                     <input type="hidden" name="grant_id" value="<?php echo intval($g['grant_id']); ?>">
-                    <input type="text" name="revoke_reason" placeholder="سبب الإلغاء — إلزامي" style="width:150px">
+                    <input type="text" name="revoke_reason" placeholder="سبب الإلغاء — إلزامي" style="width:150px" aria-label="سبب الإلغاء — إلزامي">
                     <button class="btn-save" type="submit">إلغاء</button>
                 </form>
                 <?php else: ?>—<?php endif; ?>

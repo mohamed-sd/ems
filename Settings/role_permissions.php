@@ -8,6 +8,14 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 require_once __DIR__ . '/../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 $page_title = "صلاحيات الأدوار";
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -765,8 +773,8 @@ include __DIR__ . '/../includes/page_header.php';
                     <div class="filters-section">
                         <form method="GET" class="row">
                             <div class="col-md-6">
-                                <label class="form-label">الدور</label>
-                                <select name="role_id" class="form-select" onchange="this.form.submit()">
+                                <label class="form-label" for="emsf_469_d5aff">الدور</label>
+                                <select name="role_id" class="form-select" onchange="this.form.submit()" id="emsf_469_d5aff">
                                     <option value="">-- اختر الدور --</option>
                                     <?php foreach ($roles as $role): ?>
                                         <option value="<?php echo $role['id']; ?>" 
@@ -984,8 +992,8 @@ include __DIR__ . '/../includes/page_header.php';
                             <form method="POST">
                                 <input type="hidden" name="action" value="revoke_all">
                                 <div class="mb-3">
-                                    <label class="form-label">اختر الدور</label>
-                                    <select name="role_id" class="form-select" required>
+                                    <label class="form-label" for="emsf_470_22ae4">اختر الدور</label>
+                                    <select name="role_id" class="form-select" required id="emsf_470_22ae4">
                                         <option value="">-- اختر الدور --</option>
                                         <?php foreach ($roles as $role): ?>
                                             <option value="<?php echo $role['id']; ?>">

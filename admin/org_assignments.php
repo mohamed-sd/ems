@@ -160,41 +160,41 @@ include '../insidebar.php';
         <input type="hidden" name="org_action" value="create">
         <h5>تكليف جديد — المدة والنطاق إلزاميان (ORG-01 §2)</h5>
         <div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-            <div class="form-group"><label>الشخص *</label>
-                <select name="person_id" required><option value="">— اختر —</option>
+            <div class="form-group"><label for="emsf_1967_68680">الشخص *</label>
+                <select name="person_id" required id="emsf_1967_68680"><option value="">— اختر —</option>
                     <?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>نوع التكليف *</label>
+            <div class="form-group"><label for="asgType">نوع التكليف *</label>
                 <select name="assignment_type_code" id="asgType" required><option value="">— اختر —</option>
                     <?php foreach ($types as $t) { echo '<option value="' . htmlspecialchars($t['type_code']) . '" data-func="' . intval($t['requires_functional_line']) . '">' . htmlspecialchars($t['name_ar']) . ' (' . ($t['level'] === 'site' ? 'موقعي' : 'مركزي') . ')</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>الوحدة *</label>
-                <select name="org_unit_id" required><option value="">— اختر —</option>
+            <div class="form-group"><label for="emsf_1968_08d71">الوحدة *</label>
+                <select name="org_unit_id" required id="emsf_1968_08d71"><option value="">— اختر —</option>
                     <?php foreach ($units as $u) { echo '<option value="' . intval($u['unit_id']) . '">' . htmlspecialchars($u['name_ar']) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>مرجع القرار</label><input type="text" name="decision_ref" placeholder="OPS-2026-…"></div>
-            <div class="form-group"><label>نوع النطاق *</label>
-                <select name="scope_type" required>
+            <div class="form-group"><label for="emsf_1969_89812">مرجع القرار</label><input type="text" name="decision_ref" placeholder="OPS-2026-…" id="emsf_1969_89812"></div>
+            <div class="form-group"><label for="emsf_1970_20242">نوع النطاق *</label>
+                <select name="scope_type" required id="emsf_1970_20242">
                     <option value="site">موقع</option><option value="project">مشروع</option>
                     <option value="site_group">مجموعة مواقع (0 = الكل)</option>
                 </select></div>
-            <div class="form-group"><label>الموقع / معرف النطاق *</label>
-                <select name="scope_id" required>
+            <div class="form-group"><label for="emsf_1971_bd7eb">الموقع / معرف النطاق *</label>
+                <select name="scope_id" required id="emsf_1971_bd7eb">
                     <option value="0">— كل المواقع (site_group) —</option>
                     <?php foreach ($sitesList as $s) { echo '<option value="' . intval($s['id']) . '">' . htmlspecialchars($s['name']) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>من *</label><input type="date" name="valid_from" required></div>
-            <div class="form-group"><label>إلى * (لا تكليف مفتوح المدة)</label><input type="date" name="valid_to" required></div>
-            <div class="form-group"><label>النائب المعتمد</label>
-                <select name="deputy_person_id"><option value="">— بلا —</option>
+            <div class="form-group"><label for="emsf_1972_f3d79">من *</label><input type="date" name="valid_from" required id="emsf_1972_f3d79"></div>
+            <div class="form-group"><label for="emsf_1973_4e79b">إلى * (لا تكليف مفتوح المدة)</label><input type="date" name="valid_to" required id="emsf_1973_4e79b"></div>
+            <div class="form-group"><label for="emsf_1974_7cb9e">النائب المعتمد</label>
+                <select name="deputy_person_id" id="emsf_1974_7cb9e"><option value="">— بلا —</option>
                     <?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>الخط التشغيلي (للموقعي *)</label>
-                <select name="line_operational"><option value="">— اختر تكليفًا —</option>
+            <div class="form-group"><label for="emsf_1975_1a648">الخط التشغيلي (للموقعي *)</label>
+                <select name="line_operational" id="emsf_1975_1a648"><option value="">— اختر تكليفًا —</option>
                     <?php foreach ($activeAsg as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar'] . ' — ' . ($a['person'] ?: '')) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>الخط الفني (للموقعي *)</label>
-                <select name="line_functional"><option value="">— اختر تكليفًا —</option>
+            <div class="form-group"><label for="emsf_1976_2e11c">الخط الفني (للموقعي *)</label>
+                <select name="line_functional" id="emsf_1976_2e11c"><option value="">— اختر تكليفًا —</option>
                     <?php foreach ($activeAsg as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar'] . ' — ' . ($a['person'] ?: '')) . '</option>'; } ?>
                 </select></div>
         </div>

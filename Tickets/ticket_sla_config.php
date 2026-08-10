@@ -97,23 +97,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="s_id" value="">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>اسم السياسة <span class="required">*</span></label>
+                <div class="form-group"><label for="s_name">اسم السياسة <span class="required">*</span></label>
                     <input type="text" name="name" id="s_name" required></div>
-                <div class="form-group"><label>النوع (فارغ = الكل)</label>
+                <div class="form-group"><label for="s_type">النوع (فارغ = الكل)</label>
                     <select name="ticket_type_id" id="s_type"><?php echo tkt_type_options(); ?></select></div>
-                <div class="form-group"><label>الأولوية (فارغ = الكل)</label>
+                <div class="form-group"><label for="s_priority">الأولوية (فارغ = الكل)</label>
                     <select name="priority" id="s_priority"><option value="">— الكل —</option>
                         <?php foreach ($priorities as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>الوزن (فارغ = الكل)</label>
+                <div class="form-group"><label for="s_impact">الوزن (فارغ = الكل)</label>
                     <select name="business_impact" id="s_impact"><option value="">— الكل —</option>
                         <?php foreach ($impacts as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>ساعات الاستجابة <span class="required">*</span></label>
+                <div class="form-group"><label for="s_resp">ساعات الاستجابة <span class="required">*</span></label>
                     <input type="number" step="0.5" min="0.5" name="response_hours" id="s_resp" required></div>
-                <div class="form-group"><label>ساعات الإنجاز <span class="required">*</span></label>
+                <div class="form-group"><label for="s_reso">ساعات الإنجاز <span class="required">*</span></label>
                     <input type="number" step="0.5" min="0.5" name="resolution_hours" id="s_reso" required></div>
-                <div class="form-group"><label>التذكير قبل (ساعات)</label>
+                <div class="form-group"><label for="s_remind">التذكير قبل (ساعات)</label>
                     <input type="number" step="0.5" min="0" name="remind_before_hours" id="s_remind"></div>
                 <div class="form-group"><label>مفعّلة؟</label>
                     <label class="switch-inline"><input type="checkbox" name="active" id="s_active" value="1" checked> نعم</label></div>

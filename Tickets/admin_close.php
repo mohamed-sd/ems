@@ -9,6 +9,14 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/tkt_helpers.php';
 
 $ctx = tkt_ctx();
@@ -108,8 +116,8 @@ include __DIR__ . '/../includes/page_header.php';
         <td>
           <form method="post" style="display:flex;gap:6px">
             <input type="hidden" name="aclose_tk" value="<?= intval($t['id']) ?>">
-            <input type="text" name="reason" class="form-control form-control-sm" placeholder="السببُ المكتوب" style="max-width:170px" required>
-            <input type="number" name="duplicate_of" class="form-control form-control-sm" placeholder="مكررٌ من #" style="max-width:110px">
+            <input type="text" name="reason" class="form-control form-control-sm" placeholder="السببُ المكتوب" style="max-width:170px" required aria-label="السببُ المكتوب">
+            <input type="number" name="duplicate_of" class="form-control form-control-sm" placeholder="مكررٌ من #" style="max-width:110px" aria-label="مكررٌ من #">
             <button class="action-btn" type="submit" style="color:#dc3545">أغلق إداريًّا</button>
           </form>
         </td>

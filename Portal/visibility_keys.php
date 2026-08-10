@@ -89,16 +89,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="post" class="ems-form">
             <input type="hidden" name="vk_action" value="set">
             <div class="form-grid">
-                <div class="form-group"><label>العنصر *</label>
-                    <select name="element_code" required>
+                <div class="form-group"><label for="emsf_1249_f8679">العنصر *</label>
+                    <select name="element_code" required id="emsf_1249_f8679">
                         <?php foreach ($elements as $e): ?>
                             <option value="<?php echo htmlspecialchars($e['element_code']); ?>">
                                 <?php echo htmlspecialchars($e['title_ar'] . ' (' . $e['element_code'] . ')'
                                     . ((string)$e['sensitivity'] === 'sensitive' ? ' — حساس' : '')); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>نوع النطاق *</label>
-                    <select name="scope_type" required>
+                <div class="form-group"><label for="emsf_1250_a823d">نوع النطاق *</label>
+                    <select name="scope_type" required id="emsf_1250_a823d">
                         <option value="account">حسابٌ بعينه</option>
                         <option value="capacity_type">فئةُ صفة (H-15)</option>
                         <option value="department">إدارة</option>
@@ -106,19 +106,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <option value="supplier">مورد</option>
                         <option value="client">عميل</option>
                     </select></div>
-                <div class="form-group"><label>معرّف النطاق *
+                <div class="form-group"><label for="emsf_1251_463b4">معرّف النطاق *
                     <span class="mnt-req-hint">(رقمٌ — أو كودُ الفئة مثل operator)</span></label>
-                    <input type="text" name="scope_id" required></div>
-                <div class="form-group"><label>الوضع *</label>
-                    <select name="mode" required>
+                    <input type="text" name="scope_id" required id="emsf_1251_463b4"></div>
+                <div class="form-group"><label for="emsf_1252_70802">الوضع *</label>
+                    <select name="mode" required id="emsf_1252_70802">
                         <option value="open">مفتوح</option>
                         <option value="closed">مغلق</option>
                         <option value="inherit">موروث</option>
                     </select></div>
-                <div class="form-group"><label>السبب <span class="mnt-req-hint">(إلزاميٌّ لغير الموروث)</span></label>
-                    <input type="text" name="reason" maxlength="255"></div>
-                <div class="form-group"><label>ينتهي في <span class="mnt-req-hint">(إلزاميٌّ لفتح الحساس)</span></label>
-                    <input type="datetime-local" name="expires_at"></div>
+                <div class="form-group"><label for="emsf_1253_e95e8">السبب <span class="mnt-req-hint">(إلزاميٌّ لغير الموروث)</span></label>
+                    <input type="text" name="reason" maxlength="255" id="emsf_1253_e95e8"></div>
+                <div class="form-group"><label for="emsf_1254_03a5c">ينتهي في <span class="mnt-req-hint">(إلزاميٌّ لفتح الحساس)</span></label>
+                    <input type="datetime-local" name="expires_at" id="emsf_1254_03a5c"></div>
             </div>
             <div style="margin-top:10px"><button type="submit" class="btn-save">
                 <i class="fa fa-check"></i> احفظ — وسيُعلَن عددُ المتأثرين</button></div>

@@ -52,15 +52,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="filter">
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
         <div class="filter-body">
-            <div class="filter-field"><label><i class="fa fa-flag"></i> المرحلة</label>
+            <div class="filter-field"><label for="fStage"><i class="fa fa-flag"></i> المرحلة</label>
                 <select id="fStage" class="form-control"><option value="">-- الكل --</option></select></div>
-            <div class="filter-field"><label><i class="fa fa-tag"></i> النوع</label>
+            <div class="filter-field"><label for="fType"><i class="fa fa-tag"></i> النوع</label>
                 <select id="fType" class="form-control"><option value="">-- الكل --</option></select></div>
-            <div class="filter-field"><label><i class="fa fa-arrows-turn-right"></i> الاتجاه</label>
+            <div class="filter-field"><label for="fDir"><i class="fa fa-arrows-turn-right"></i> الاتجاه</label>
                 <select id="fDir" class="form-control"><option value="">-- الكل --</option></select></div>
-            <div class="filter-field"><label><i class="fa fa-hand-holding-dollar"></i> المتحمِّل</label>
+            <div class="filter-field"><label for="fBearer"><i class="fa fa-hand-holding-dollar"></i> المتحمِّل</label>
                 <select id="fBearer" class="form-control"><option value="">-- الكل --</option></select></div>
-            <div class="filter-field"><label><i class="fa fa-diagram-project"></i> المشروع</label>
+            <div class="filter-field"><label for="fProject"><i class="fa fa-diagram-project"></i> المشروع</label>
                 <select id="fProject" class="form-control"><option value="">-- الكل --</option></select></div>
             <div class="filter-actions">
                 <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>

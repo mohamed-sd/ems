@@ -10,6 +10,14 @@ include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -430,21 +438,21 @@ function tnd_result_tone($result)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود المناقصة المولد <i class="fas fa-info-circle tnd-info-icon"></i></label>
+                        <label for="generated_tnd_code"><i class="fas fa-magic"></i> كود المناقصة المولد <i class="fas fa-info-circle tnd-info-icon"></i></label>
                         <input type="text" id="generated_tnd_code" class="generated-code-field" value="<?php echo tnd_e($next_tnd_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود المناقصة" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود المناقصة *</label>
+                        <label for="tender_code"><i class="fas fa-barcode"></i> كود المناقصة *</label>
                         <input type="text" name="tender_code" id="tender_code" placeholder="مثال: TND-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-heading"></i> رقم الدعوة / العنوان *</label>
+                        <label for="name"><i class="fas fa-heading"></i> رقم الدعوة / العنوان *</label>
                         <input type="text" name="name" id="name" placeholder="رقم الدعوة أو عنوان المناقصة" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-building"></i> الجهة الطارحة</label>
+                        <label for="authority_id"><i class="fas fa-building"></i> الجهة الطارحة</label>
                         <select name="authority_id" id="authority_id">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($authority_options as $au): ?>
@@ -453,7 +461,7 @@ function tnd_result_tone($result)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-lightbulb"></i> الفرصة المرتبطة</label>
+                        <label for="opportunity_id"><i class="fas fa-lightbulb"></i> الفرصة المرتبطة</label>
                         <select name="opportunity_id" id="opportunity_id">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($opp_options as $op): ?>
@@ -462,11 +470,11 @@ function tnd_result_tone($result)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-xmark"></i> تاريخ الإغلاق</label>
+                        <label for="closing_date"><i class="fas fa-calendar-xmark"></i> تاريخ الإغلاق</label>
                         <input type="date" name="closing_date" id="closing_date" />
                     </div>
                     <div>
-                        <label><i class="fas fa-flag"></i> حالة المشاركة</label>
+                        <label for="participation_state"><i class="fas fa-flag"></i> حالة المشاركة</label>
                         <select name="participation_state" id="participation_state">
                             <?php foreach ($TND_PARTICIPATION as $ps): ?>
                                 <option value="<?php echo tnd_e($ps); ?>"><?php echo tnd_e($ps); ?></option>
@@ -474,7 +482,7 @@ function tnd_result_tone($result)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-award"></i> النتيجة</label>
+                        <label for="result"><i class="fas fa-award"></i> النتيجة</label>
                         <select name="result" id="result">
                             <?php foreach ($TND_RESULT as $rs): ?>
                                 <option value="<?php echo tnd_e($rs); ?>"><?php echo tnd_e($rs); ?></option>
@@ -482,11 +490,11 @@ function tnd_result_tone($result)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-comment-dots"></i> سبب النتيجة</label>
+                        <label for="result_reason"><i class="fas fa-comment-dots"></i> سبب النتيجة</label>
                         <input type="text" name="result_reason" id="result_reason" placeholder="سبب النتيجة" />
                     </div>
                     <div class="tnd-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -505,13 +513,13 @@ function tnd_result_tone($result)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-flag"></i> حالة المشاركة</label>
+                <label for="filterParticipation"><i class="fa fa-flag"></i> حالة المشاركة</label>
                 <select id="filterParticipation" class="form-control">
                     <option value="">-- كل الحالات --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-award"></i> النتيجة</label>
+                <label for="filterResult"><i class="fa fa-award"></i> النتيجة</label>
                 <select id="filterResult" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

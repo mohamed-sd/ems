@@ -116,11 +116,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم النوع <span class="required">*</span></label>
+                        <label for="t_name">اسم النوع <span class="required">*</span></label>
                         <input type="text" name="name" id="t_name" required>
                     </div>
                     <div class="form-group">
-                        <label>الإدارة المالكة (التوجيه) <span class="required">*</span></label>
+                        <label for="t_owner">الإدارة المالكة (التوجيه) <span class="required">*</span></label>
                         <select name="owner_role_id" id="t_owner" required>
                             <?php foreach ($owner_ids as $rid): ?>
                                 <option value="<?php echo intval($rid); ?>"><?php echo htmlspecialchars(tkt_label($roles_map, $rid)); ?></option>
@@ -128,7 +128,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الطبيعة الافتراضية <span class="required">*</span></label>
+                        <label for="t_nature">الطبيعة الافتراضية <span class="required">*</span></label>
                         <select name="default_nature" id="t_nature" required>
                             <?php foreach ($natures as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -136,7 +136,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>نموذج التنفيذ المرتبط</label>
+                        <label for="t_ref">نموذج التنفيذ المرتبط</label>
                         <select name="ref_table" id="t_ref">
                             <option value="">— بلا نموذج —</option>
                             <?php foreach ($ref_tables as $k => $v): ?>

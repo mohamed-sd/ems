@@ -103,11 +103,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="centerForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-sitemap"></i> مركز تكلفة/ربح</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>الكود <span class="required">*</span></label><input type="text" name="center_code" required></div>
-            <div class="form-group"><label>الاسم <span class="required">*</span></label><input type="text" name="center_name" required></div>
-            <div class="form-group"><label>النوع</label><select name="center_type"><?php foreach ($center_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>المركز الأب</label><select name="parent_id"><?php echo fin_center_options($conn, $is_super_admin, $company_id, 0, '— بلا أب (جذر) —'); ?></select></div>
-            <div class="form-group"><label>الإدارة المالكة</label><select name="owner_module"><option value="">— بلا —</option><?php foreach ($owner_modules as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_391_76b8e">الكود <span class="required">*</span></label><input type="text" name="center_code" required id="emsf_391_76b8e"></div>
+            <div class="form-group"><label for="emsf_392_b21ab">الاسم <span class="required">*</span></label><input type="text" name="center_name" required id="emsf_392_b21ab"></div>
+            <div class="form-group"><label for="emsf_393_3ad61">النوع</label><select name="center_type" id="emsf_393_3ad61"><?php foreach ($center_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_394_7c029">المركز الأب</label><select name="parent_id" id="emsf_394_7c029"><?php echo fin_center_options($conn, $is_super_admin, $company_id, 0, '— بلا أب (جذر) —'); ?></select></div>
+            <div class="form-group"><label for="emsf_395_cd169">الإدارة المالكة</label><select name="owner_module" id="emsf_395_cd169"><option value="">— بلا —</option><?php foreach ($owner_modules as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#centerForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -117,11 +117,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="allocForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-arrows-turn-to-dots"></i> تخصيص داخلي / تسوية بينية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>النوع</label><select name="alloc_type"><?php foreach ($alloc_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>من مركز</label><select name="from_center_id"><?php echo fin_center_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>إلى مركز</label><select name="to_center_id"><?php echo fin_center_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>الأساس</label><input type="text" name="basis" placeholder="ساعات / استخدام / عدد"></div>
-            <div class="form-group"><label>المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required></div>
+            <div class="form-group"><label for="emsf_396_be607">النوع</label><select name="alloc_type" id="emsf_396_be607"><?php foreach ($alloc_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_397_5a88a">من مركز</label><select name="from_center_id" id="emsf_397_5a88a"><?php echo fin_center_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_398_391ac">إلى مركز</label><select name="to_center_id" id="emsf_398_391ac"><?php echo fin_center_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_399_5389c">الأساس</label><input type="text" name="basis" placeholder="ساعات / استخدام / عدد" id="emsf_399_5389c"></div>
+            <div class="form-group"><label for="emsf_400_47ab9">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_400_47ab9"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#allocForm').removeClass('allforms-visible')">إلغاء</button></div>

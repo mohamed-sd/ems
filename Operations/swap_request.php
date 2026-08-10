@@ -20,6 +20,14 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid        = intval($_SESSION['user']['id'] ?? 0);
 $site       = intval($_REQUEST['site'] ?? 0);
@@ -93,8 +101,8 @@ include __DIR__ . '/../includes/page_header.php';
     <input type="hidden" name="site" value="<?= $site ?>">
     <input type="hidden" name="equipment" value="<?= $equipment ?>">
     <div class="form-group">
-      <label>السببُ — من قائمةٍ محكومةٍ لا نصٍّ حر</label>
-      <select name="reason_code" class="form-control" required>
+      <label for="emsf_998_3378c">السببُ — من قائمةٍ محكومةٍ لا نصٍّ حر</label>
+      <select name="reason_code" class="form-control" required id="emsf_998_3378c">
         <option value="">— اختر —</option>
         <option value="breakdown">عطل</option>
         <option value="scheduled_maintenance">صيانةٌ مجدولة</option>
@@ -103,18 +111,18 @@ include __DIR__ . '/../includes/page_header.php';
         <option value="operator_shortage">نقصُ مشغّل</option>
       </select>
     </div>
-    <div class="form-group"><label>المعدةُ البديلة (احتياطيُّ الموقع)</label>
-      <select name="substitute_equipment" class="form-control"><option value="0">—</option>
+    <div class="form-group"><label for="emsf_999_051ff">المعدةُ البديلة (احتياطيُّ الموقع)</label>
+      <select name="substitute_equipment" class="form-control" id="emsf_999_051ff"><option value="0">—</option>
         <?php foreach ($subEq as $e): ?><option value="<?= intval($e['id']) ?>"><?= htmlspecialchars($e['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
       </select></div>
-    <div class="form-group"><label>المشغّلُ البديل</label>
-      <select name="substitute_operator" class="form-control"><option value="0">—</option>
+    <div class="form-group"><label for="emsf_1000_69769">المشغّلُ البديل</label>
+      <select name="substitute_operator" class="form-control" id="emsf_1000_69769"><option value="0">—</option>
         <?php foreach ($subOp as $o): ?><option value="<?= intval($o['id']) ?>"><?= htmlspecialchars($o['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
       </select></div>
-    <div class="form-group"><label>حتى تاريخ — إلزامي</label>
-      <input type="date" name="valid_until" class="form-control" required></div>
-    <div class="form-group"><label>الساعاتُ المقدَّرةُ المتأثرة (الأثرُ يُعرض على الموافقين)</label>
-      <input type="number" step="0.5" name="estimated_hours" class="form-control" value="0"></div>
+    <div class="form-group"><label for="emsf_1001_a275b">حتى تاريخ — إلزامي</label>
+      <input type="date" name="valid_until" class="form-control" required id="emsf_1001_a275b"></div>
+    <div class="form-group"><label for="emsf_1002_98ab4">الساعاتُ المقدَّرةُ المتأثرة (الأثرُ يُعرض على الموافقين)</label>
+      <input type="number" step="0.5" name="estimated_hours" class="form-control" value="0" id="emsf_1002_98ab4"></div>
     <button type="submit" class="btn btn-primary">إرسالُ الطلب لصندوق الاعتماد</button>
   </form>
   <p class="text-muted" style="font-size:.85em;margin-top:10px">

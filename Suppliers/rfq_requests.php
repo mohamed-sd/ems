@@ -148,12 +148,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="post" class="ems-form">
             <input type="hidden" name="rfq_action" value="open">
             <div class="form-grid">
-                <div class="form-group"><label>عقدُ العميل <span style="color:#c00">*</span>
+                <div class="form-group"><label for="emsf_1379_7d57e">عقدُ العميل <span style="color:#c00">*</span>
                     <small>— «فتحُ الاحتياج» من العقد</small></label>
-                    <input type="number" name="contract_id" min="1" required></div>
-                <div class="form-group"><label>موعدُ الإقفال <span style="color:#c00">*</span></label>
-                    <input type="date" name="due_date" required></div>
-                <div class="form-group"><label>عنوانٌ</label><input type="text" name="title" maxlength="160"></div>
+                    <input type="number" name="contract_id" min="1" required id="emsf_1379_7d57e"></div>
+                <div class="form-group"><label for="emsf_1380_f9346">موعدُ الإقفال <span style="color:#c00">*</span></label>
+                    <input type="date" name="due_date" required id="emsf_1380_f9346"></div>
+                <div class="form-group"><label for="emsf_1381_01a35">عنوانٌ</label><input type="text" name="title" maxlength="160" id="emsf_1381_01a35"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save">
                 <i class="fa fa-file-circle-plus"></i> افتح طلبًا من التزامات العقد</button></div>
@@ -250,7 +250,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="rfq_action" value="award">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
                 <input type="text" name="award_reason" maxlength="200" style="width:260px"
-                       placeholder="حجّةُ الاختيار حين لا يكون الأرخص">
+                       placeholder="حجّةُ الاختيار حين لا يكون الأرخص" aria-label="حجّةُ الاختيار حين لا يكون الأرخص">
                 <button type="submit" class="btn-save"><i class="fa fa-gavel"></i> ترسية</button>
             </form>
             <?php endif; ?>
@@ -261,18 +261,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                 <div class="form-grid">
-                    <div class="form-group"><label>المورد</label>
-                        <select name="supplier_id" required><?php foreach ($suppliers as $s): ?>
+                    <div class="form-group"><label for="emsf_1382_16d98">المورد</label>
+                        <select name="supplier_id" required id="emsf_1382_16d98"><?php foreach ($suppliers as $s): ?>
                             <option value="<?php echo intval($s['id']); ?>"><?php echo htmlspecialchars((string)$s['name']); ?></option>
                         <?php endforeach; ?></select></div>
-                    <div class="form-group"><label>السعر/وحدة</label>
-                        <input type="number" name="unit_price" step="0.0001" min="0.0001" required></div>
-                    <div class="form-group"><label>الكمية المعروضة</label>
-                        <input type="number" name="qty_offered" step="0.01" min="0.01" required></div>
-                    <div class="form-group"><label>الجاهزية (يوم)</label>
-                        <input type="number" name="readiness_days" min="0"></div>
-                    <div class="form-group"><label>العملة</label>
-                        <input type="text" name="currency" value="SDG" maxlength="8"></div>
+                    <div class="form-group"><label for="emsf_1383_581e9">السعر/وحدة</label>
+                        <input type="number" name="unit_price" step="0.0001" min="0.0001" required id="emsf_1383_581e9"></div>
+                    <div class="form-group"><label for="emsf_1384_70782">الكمية المعروضة</label>
+                        <input type="number" name="qty_offered" step="0.01" min="0.01" required id="emsf_1384_70782"></div>
+                    <div class="form-group"><label for="emsf_1385_63053">الجاهزية (يوم)</label>
+                        <input type="number" name="readiness_days" min="0" id="emsf_1385_63053"></div>
+                    <div class="form-group"><label for="emsf_1386_46935">العملة</label>
+                        <input type="text" name="currency" value="SDG" maxlength="8" id="emsf_1386_46935"></div>
                 </div>
                 <div style="margin-top:8px"><button type="submit" class="btn-save">
                     <i class="fa fa-plus"></i> سجّل عرضًا</button></div>

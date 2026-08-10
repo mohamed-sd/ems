@@ -268,7 +268,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <script>
         $(document).ready(function () {
             $('#projectsTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
                     { extend: 'copy',  text: 'نسخ' },

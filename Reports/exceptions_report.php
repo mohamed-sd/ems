@@ -43,8 +43,8 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <label>الحالة</label>
-            <select name="state">
+            <label for="emsf_1366_f63a6">الحالة</label>
+            <select name="state" id="emsf_1366_f63a6">
                 <option value="">الكل</option>
                 <?php foreach (array('Pending','Active','Expired','Rejected','Revoked') as $s): ?>
                 <option value="<?php echo $s; ?>" <?php echo $s === $state ? 'selected' : ''; ?>><?php echo $s; ?></option>

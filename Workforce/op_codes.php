@@ -142,38 +142,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — أرقام المشغّلين الشاغرة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الرقم</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>حالة الرقم</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>المشغّل السابق</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإخلاء</label>
-                    <input type="date" name="f3"></div>
-                <div class="form-group"><label>سبب الإخلاء</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>مدة الشغور بالأيام</label>
-                    <input type="text" inputmode="decimal" name="f5" placeholder="0"></div>
-                <div class="form-group"><label>المشغّل الجديد</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ التخصيص الجديد</label>
-                    <input type="date" name="f7"></div>
-                <div class="form-group"><label>قرار الإدارة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>خصّصه</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f10"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f12"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f15" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_1696_129b9">الرقم</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1696_129b9"></div>
+                <div class="form-group"><label for="emsf_1697_5f937">حالة الرقم</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1697_5f937"></div>
+                <div class="form-group"><label for="emsf_1698_04563">المشغّل السابق</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1698_04563"></div>
+                <div class="form-group"><label for="emsf_1699_6533a">تاريخ الإخلاء</label>
+                    <input type="date" name="f3" id="emsf_1699_6533a"></div>
+                <div class="form-group"><label for="emsf_1700_73c88">سبب الإخلاء</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1700_73c88"></div>
+                <div class="form-group"><label for="emsf_1701_551b4">مدة الشغور بالأيام</label>
+                    <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_1701_551b4"></div>
+                <div class="form-group"><label for="emsf_1702_1885a">المشغّل الجديد</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1702_1885a"></div>
+                <div class="form-group"><label for="emsf_1703_16a64">تاريخ التخصيص الجديد</label>
+                    <input type="date" name="f7" id="emsf_1703_16a64"></div>
+                <div class="form-group"><label for="emsf_1704_64173">قرار الإدارة</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1704_64173"></div>
+                <div class="form-group"><label for="emsf_1705_c3255">خصّصه</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1705_c3255"></div>
+                <div class="form-group"><label for="emsf_1706_2f205">الحالة</label>
+                    <select name="f10" id="emsf_1706_2f205"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1707_7eda0">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1707_7eda0"></div>
+                <div class="form-group"><label for="emsf_1708_616e8">تاريخ الاعتماد</label>
+                    <input type="date" name="f12" id="emsf_1708_616e8"></div>
+                <div class="form-group"><label for="emsf_1709_8f2ed">مرجع التفويض</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1709_8f2ed"></div>
+                <div class="form-group"><label for="emsf_1710_cd6b0">المرجع الأب</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1710_cd6b0"></div>
+                <div class="form-group"><label for="emsf_1711_65dcb">المرفق</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1711_65dcb"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

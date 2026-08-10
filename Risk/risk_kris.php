@@ -53,7 +53,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <td><?php echo htmlspecialchars((string) $k['last_read_at'] ?: '—'); ?></td>
                 <?php if ($canWrite): ?>
                 <td style="min-width:230px">
-                    <input class="kriVal form-control form-control-sm" style="display:inline-block;width:90px" placeholder="القيمة">
+                    <input class="kriVal form-control form-control-sm" style="display:inline-block;width:90px" placeholder="القيمة" aria-label="القيمة">
                     <select class="kriState form-control form-control-sm" style="display:inline-block;width:80px">
                         <option value="ok">سليم</option><option value="warn">إنذار</option><option value="critical">حرج</option>
                     </select>

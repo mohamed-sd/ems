@@ -27,6 +27,30 @@ $closing_steps = fin_closing_steps();
 if (isset($_GET['action']) && isset($_GET['pid'])) {
     if (!$can_edit) { ems_gov_flash_redirect('periods_fin.php', 'لا توجد صلاحية الإجراء ❌', 'GOV-PERM-403', ''); exit(); }
     $pid = intval($_GET['pid']); $act = $_GET['action'];
+
+    /* ══ INJ-0042 (P1) — إقفالُ الفترةِ بلا مستوى «المدير المالي» ولا يدٍ ثانية ══
+       ① كان أيُّ حاملِ `can_edit` يُقفل الفترةَ ويعيد فتحَها — بلا فحصِ مستوى
+          (`fin_can_perform` = صفرُ نداءٍ في الملف). والإقفالُ مستندُ المرحلةِ
+          السابعةِ ومعتمِدُه القيادةُ المالية.
+       ② والأفعالُ الحاسمةُ (close · lock · reopen) لا يجوز أن ينفّذها منشئُ
+          الفترةِ نفسُه — والحدُّ في سجلِّ السلطاتِ يمنعه. */
+    if (in_array($act, array('close', 'lock', 'reopen'), true)) {
+        if (function_exists('fin_can_perform') && !fin_can_perform($conn, $ctx['role'], 'finance_manager')) {
+            ems_gov_flash_redirect('periods_fin.php',
+                'إقفالُ الفترةِ وفتحُها وقفلُها للقيادةِ الماليةِ حصرًا — لا يكفي إذنُ التعديل ❌',
+                'GOV-PERM-403', 'اطلبْه من المدير المالي');
+            exit();
+        }
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $__sa = ems_assert_not_self_approval($conn, 'fin_financial_periods', 'id', $pid,
+            'فترةٌ محاسبيةٌ #' . $pid, $company_id);
+        if ($__sa !== null) {
+            ems_gov_flash_redirect('periods_fin.php', $__sa['reason'], 'GOV-PERM-403',
+                'الإقفالُ يدٌ ثانيةٌ غيرُ يدِ الإنشاء');
+            exit();
+        }
+    }
+
     // انتقالات الحالة عبر البوابة — حراسة الحالة عبر whereRaw، والعزل يُحقن تلقائيًّا.
     $g = fin_gate($is_super_admin);
     $now = date('Y-m-d H:i:s');

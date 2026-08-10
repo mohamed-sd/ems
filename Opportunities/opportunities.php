@@ -596,21 +596,21 @@ function opp_stage_tone($stage)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود الفرصة المولد <i class="fas fa-info-circle opp-info-icon"></i></label>
+                        <label for="generated_opp_code"><i class="fas fa-magic"></i> كود الفرصة المولد <i class="fas fa-info-circle opp-info-icon"></i></label>
                         <input type="text" id="generated_opp_code" class="generated-code-field" value="<?php echo opp_e($next_opp_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود الفرصة" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود الفرصة *</label>
+                        <label for="opp_code"><i class="fas fa-barcode"></i> كود الفرصة *</label>
                         <input type="text" name="opp_code" id="opp_code" placeholder="مثال: OPP-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-lightbulb"></i> عنوان الفرصة *</label>
+                        <label for="title"><i class="fas fa-lightbulb"></i> عنوان الفرصة *</label>
                         <input type="text" name="title" id="title" placeholder="وصف مختصر للفرصة" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-user-tie"></i> العميل المستهدف</label>
+                        <label for="client_id"><i class="fas fa-user-tie"></i> العميل المستهدف</label>
                         <select name="client_id" id="client_id">
                             <option value="">-- بدون / عميل محتمل --</option>
                             <?php foreach ($clients_options as $cl): ?>
@@ -619,7 +619,7 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-signs-post"></i> مصدر الفرصة</label>
+                        <label for="source"><i class="fas fa-signs-post"></i> مصدر الفرصة</label>
                         <select name="source" id="source">
                             <option value="">-- اختر المصدر --</option>
                             <?php foreach ($OPP_SOURCES as $s): ?>
@@ -628,7 +628,7 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-layer-group"></i> مرحلة المسار *</label>
+                        <label for="stage"><i class="fas fa-layer-group"></i> مرحلة المسار *</label>
                         <select name="stage" id="stage" required>
                             <?php foreach ($OPP_STAGES as $s): ?>
                                 <option value="<?php echo opp_e($s); ?>"><?php echo opp_e($s); ?></option>
@@ -636,7 +636,7 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-coins"></i> نموذج الإيراد</label>
+                        <label for="revenue_model"><i class="fas fa-coins"></i> نموذج الإيراد</label>
                         <select name="revenue_model" id="revenue_model">
                             <option value="">-- اختر النموذج --</option>
                             <?php foreach ($OPP_REVENUE_MODELS as $k => $v): ?>
@@ -645,7 +645,7 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-industry"></i> تصنيف القطاع</label>
+                        <label for="sector_category"><i class="fas fa-industry"></i> تصنيف القطاع</label>
                         <select name="sector_category" id="sector_category">
                             <option value="">-- اختر التصنيف --</option>
                             <option value="تعدين">تعدين</option>
@@ -658,30 +658,30 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-map-location-dot"></i> الولاية / الموقع</label>
+                        <label for="state_region"><i class="fas fa-map-location-dot"></i> الولاية / الموقع</label>
                         <input type="text" name="state_region" id="state_region" placeholder="مثال: نهر النيل" />
                     </div>
                     <div>
-                        <label><i class="fas fa-money-bill-wave"></i> القيمة التقديرية</label>
+                        <label for="expected_revenue"><i class="fas fa-money-bill-wave"></i> القيمة التقديرية</label>
                         <input type="number" step="0.01" min="0" name="expected_revenue" id="expected_revenue" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-coins"></i> العملة</label>
+                        <label for="currency"><i class="fas fa-coins"></i> العملة</label>
                         <select name="currency" id="currency">
                             <option value="USD">دولار (USD)</option>
                             <option value="SDG">جنيه (SDG)</option>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-percent"></i> احتمال الفوز (%)</label>
+                        <label for="probability"><i class="fas fa-percent"></i> احتمال الفوز (%)</label>
                         <input type="number" step="0.1" min="0" max="100" name="probability" id="probability" placeholder="يُشتق من المرحلة إن تُرك فارغاً" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-day"></i> تاريخ الإغلاق المتوقع</label>
+                        <label for="expected_close_date"><i class="fas fa-calendar-day"></i> تاريخ الإغلاق المتوقع</label>
                         <input type="date" name="expected_close_date" id="expected_close_date" />
                     </div>
                     <div>
-                        <label><i class="fas fa-fire"></i> الجاذبية</label>
+                        <label for="attractiveness"><i class="fas fa-fire"></i> الجاذبية</label>
                         <select name="attractiveness" id="attractiveness">
                             <option value="">-- غير محددة --</option>
                             <?php foreach ($OPP_ATTRACT as $a): ?>
@@ -690,7 +690,7 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-bullseye"></i> التوافق الاستراتيجي</label>
+                        <label for="strategy_fit"><i class="fas fa-bullseye"></i> التوافق الاستراتيجي</label>
                         <select name="strategy_fit" id="strategy_fit">
                             <option value="">-- غير محدد --</option>
                             <?php foreach ($OPP_FIT as $f): ?>
@@ -699,7 +699,7 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-clipboard-check"></i> قرار الدراسة</label>
+                        <label for="study_decision"><i class="fas fa-clipboard-check"></i> قرار الدراسة</label>
                         <select name="study_decision" id="study_decision">
                             <option value="">-- لم يُتخذ --</option>
                             <?php foreach ($OPP_DECISION as $d): ?>
@@ -708,11 +708,48 @@ function opp_stage_tone($stage)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-hand-holding-dollar"></i> الحاجة للتمويل</label>
+                        <label for="funding_needed"><i class="fas fa-hand-holding-dollar"></i> الحاجة للتمويل</label>
                         <input type="number" step="0.01" min="0" name="funding_needed" id="funding_needed" placeholder="0.00" />
                     </div>
                     <div class="opp-col-full opp-req-block">
-                        <label class="opp-req-title"><i class="fas fa-boxes-stacked"></i> المتطلبات المبدئية <span class="opp-req-hint">— قدّر ما تحتاجه هذه الفرصة لو فازت</span></label>
+                        <label class="opp-req-title" for="req_operators"><i class="fas fa-boxes-stacked"></i> المتطلبات المبدئية <span class="opp-req-hint">— قدّر ما تحتاجه هذه الفرصة لو فازت</span></label>
+                        <div class="opp-req-panel">
+                            <div class="opp-req-summary" aria-live="polite">
+                                <div class="opp-req-sumcard">
+                                    <span class="opp-req-sumicon"><i class="fas fa-truck-monster"></i></span>
+                                    <span class="opp-req-sumnum" id="reqSumEquip">0</span>
+                                    <span class="opp-req-sumlbl">معدات</span>
+                                </div>
+                                <div class="opp-req-sumcard">
+                                    <span class="opp-req-sumicon"><i class="fas fa-user-gear"></i></span>
+                                    <span class="opp-req-sumnum" id="reqSumOps">0</span>
+                                    <span class="opp-req-sumlbl">مشغّلون</span>
+                                </div>
+                                <div class="opp-req-sumcard">
+                                    <span class="opp-req-sumicon"><i class="fas fa-industry"></i></span>
+                                    <span class="opp-req-sumnum" id="reqSumSupp">0</span>
+                                    <span class="opp-req-sumlbl">موردون</span>
+                                </div>
+                            </div>
+
+                            <div id="reqLegacyNote" class="opp-req-legacy opp-req-hidden">
+                                <i class="fas fa-clock-rotate-left"></i> متطلبات قديمة (نصّ حرّ): <span id="reqLegacyText"></span>
+                                <div class="opp-req-legacy-hint">أعد إدخالها بالحقول أدناه لتُحفظ بشكلٍ مُهيكل.</div>
+                            </div>
+
+                            <div class="opp-req-main">
+                                <div class="opp-req-eqsec">
+                                    <div class="opp-req-seclbl"><i class="fas fa-truck-monster"></i> المعدات المطلوبة (بالنوع)</div>
+                                    <div id="reqEquipRows" class="opp-req-rows"></div>
+                                    <div id="reqEquipEmpty" class="opp-req-empty">لم تُضف أنواع معدات بعد — اضغط «أضف نوع معدة».</div>
+                                    <button type="button" id="reqAddEquip" class="opp-req-add"><i class="fas fa-plus"></i> أضف نوع معدة</button>
+                                </div>
+
+                                <div class="opp-req-counts">
+                                    <div class="opp-req-seclbl"><i class="fas fa-users-gear"></i> الطاقم والموردون</div>
+                                    <div class="opp-req-countgrid">
+                                        <div class="opp-req-countfield">
+                                            <label><i class="fas fa-user-gear"></i> عدد المشغّلين</label>
                         <div class="opp-req-panel">
                             <div class="opp-req-summary" aria-live="polite">
                                 <div class="opp-req-sumcard">
@@ -754,7 +791,7 @@ function opp_stage_tone($stage)
                                             <div class="opp-req-fieldhint" id="reqOpsHint">مقترح ≥ عدد المعدات</div>
                                         </div>
                                         <div class="opp-req-countfield">
-                                            <label><i class="fas fa-industry"></i> عدد الموردين</label>
+                                            <label for="req_suppliers"><i class="fas fa-industry"></i> عدد الموردين</label>
                                             <input type="number" min="0" step="1" name="req_suppliers" id="req_suppliers" placeholder="0" />
                                             <div class="opp-req-fieldhint">جهات تأجير/تمليك خارجية</div>
                                         </div>
@@ -764,19 +801,19 @@ function opp_stage_tone($stage)
                         </div>
                     </div>
                     <div>
-                        <label><i class="fas fa-trophy"></i> سبب الفوز</label>
+                        <label for="win_reason"><i class="fas fa-trophy"></i> سبب الفوز</label>
                         <input type="text" name="win_reason" id="win_reason" placeholder="عند الفوز" />
                     </div>
                     <div>
-                        <label><i class="fas fa-circle-xmark"></i> سبب الخسارة</label>
+                        <label for="lost_reason"><i class="fas fa-circle-xmark"></i> سبب الخسارة</label>
                         <input type="text" name="lost_reason" id="lost_reason" placeholder="عند الخسارة" />
                     </div>
                     <div class="opp-col-full">
-                        <label><i class="fas fa-clipboard-list"></i> ملاحظات المراجعة (بعد الحسم)</label>
+                        <label for="review_notes"><i class="fas fa-clipboard-list"></i> ملاحظات المراجعة (بعد الحسم)</label>
                         <textarea name="review_notes" id="review_notes" rows="2" placeholder="خلاصة مراجعة ما بعد الفوز/الخسارة"></textarea>
                     </div>
                     <div class="opp-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات عامة</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات عامة</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -795,13 +832,13 @@ function opp_stage_tone($stage)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-layer-group"></i> مرحلة المسار</label>
+                <label for="filterStage"><i class="fa fa-layer-group"></i> مرحلة المسار</label>
                 <select id="filterStage" class="form-control">
                     <option value="">-- كل المراحل --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-industry"></i> تصنيف القطاع</label>
+                <label for="filterSector"><i class="fa fa-industry"></i> تصنيف القطاع</label>
                 <select id="filterSector" class="form-control">
                     <option value="">-- كل القطاعات --</option>
                 </select>

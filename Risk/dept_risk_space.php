@@ -128,8 +128,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         $r = $conn->query("SELECT id, title, source, state, created_at FROM risk_signals
                             WHERE company_id={$company_id} AND created_by = {$uid} ORDER BY created_at DESC LIMIT 100");
         echo '<h6>إشاراتك المبلَّغة (الإبلاغ حقك — والفرز لإدارة المخاطر)</h6>';
-        echo '<form id="deptSigForm" class="ems-toolbar"><input name="title" class="form-control" placeholder="عنوان الإشارة *" style="max-width:280px" required>'
-           . '<input name="root_cause" class="form-control" placeholder="السبب الجذري" style="max-width:200px">'
+        echo '<form id="deptSigForm" class="ems-toolbar"><input name="title" class="form-control" placeholder="عنوان الإشارة *" style="max-width:280px" required aria-label="عنوان الإشارة">'
+           . '<input name="root_cause" class="form-control" placeholder="السبب الجذري" style="max-width:200px" aria-label="السبب الجذري">'
            . '<button class="ems-btn-primary" type="submit">إبلاغ</button><span id="deptSigMsg"></span></form>';
         echo '<table class="table table-sm table-striped"><thead><tr><th>#</th><th>العنوان</th><th>المصدر</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>';
         $n = 0;

@@ -830,7 +830,7 @@ include("../inheader.php"); ?>
                         </select>
 
                         <div>
-                            <label><i class="fas fa-check-circle"></i> فئة المعدة</label>
+                            <label for="equipment_category"><i class="fas fa-check-circle"></i> فئة المعدة</label>
                             <select name="equipment_category" id="equipment_category" required>
                                 <option value="">-- أساسي / احتياطي --</option>
                                 <option value="أساسي">أساسي</option>
@@ -840,32 +840,32 @@ include("../inheader.php"); ?>
                         </div>
 
                         <input type="date" name="start" id="start_date" required
-                               placeholder="تاريخ البداية">
+                               placeholder="تاريخ البداية" aria-label="تاريخ البداية">
                         <input type="date" name="end"   id="end_date"   required
-                               placeholder="تاريخ النهاية">
+                               placeholder="تاريخ النهاية" aria-label="تاريخ النهاية">
                         <input type="hidden" name="hours" value="0">
 
                         <div>
-                            <label><i class="fa fa-clock"></i> عدد ساعات العمل للآلية</label>
+                            <label for="total_equipment_hours"><i class="fa fa-clock"></i> عدد ساعات العمل للآلية</label>
                             <input type="number" name="total_equipment_hours"
                                    id="total_equipment_hours" step="0.01"
                                    placeholder="إجمالي ساعات العمل" value="0" required min="0">
                         </div>
 
                         <div>
-                            <label><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
+                            <label for="shift_hours"><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
                             <input type="number" name="shift_hours" id="shift_hours"
                                    step="0.01" placeholder="ساعات الوردية" value="0" required min="0">
                         </div>
 
                         <div>
-                            <label><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
+                            <label for="target_daily_hours"><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
                             <input type="number" name="target_daily_hours" id="target_daily_hours"
                                    step="0.01" placeholder="الهدف اليومي للآلية" value="0" min="0">
                         </div>
 
                         <div>
-                            <label><i class="fa fa-sync-alt"></i> نظام الوردية</label>
+                            <label for="shift_type"><i class="fa fa-sync-alt"></i> نظام الوردية</label>
                             <select name="shift_type" id="shift_type" required>
                                 <option value="D">☀️ نهاري فقط</option>
                                 <option value="N">🌙 ليلي فقط</option>
@@ -1170,7 +1170,6 @@ include("../inheader.php"); ?>
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>

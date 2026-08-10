@@ -163,23 +163,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form method="post" class="allforms allforms-visible">
                 <div class="form-grid">
                     <div>
-                        <label>الإدارة *</label>
-                        <select name="source_module" required>
+                        <label for="emsf_316_4d667">الإدارة *</label>
+                        <select name="source_module" required id="emsf_316_4d667">
                             <?php foreach ($modules_all as $k => $v): ?>
                                 <option value="<?php echo $k; ?>"><?php echo $v; ?> (<?php echo $k; ?>)</option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div><label>أدوار الإنشاء (أرقامًا بفواصل) *</label><input type="text" name="requester_roles" placeholder="13,14" required></div>
+                    <div><label for="emsf_317_dd1d7">أدوار الإنشاء (أرقامًا بفواصل) *</label><input type="text" name="requester_roles" placeholder="13,14" required id="emsf_317_dd1d7"></div>
                     <div>
-                        <label>دور المراجع (الرئيس المباشر) *</label>
-                        <select name="reviewer_role_id" required>
+                        <label for="emsf_318_30edd">دور المراجع (الرئيس المباشر) *</label>
+                        <select name="reviewer_role_id" required id="emsf_318_30edd">
                             <?php foreach ($roles_map as $rid => $rname): ?><option value="<?php echo $rid; ?>"><?php echo htmlspecialchars($rname); ?></option><?php endforeach; ?>
                         </select>
                     </div>
                     <div>
-                        <label>دور المعتمد (مدير الإدارة) *</label>
-                        <select name="manager_role_id" required>
+                        <label for="emsf_319_8ceec">دور المعتمد (مدير الإدارة) *</label>
+                        <select name="manager_role_id" required id="emsf_319_8ceec">
                             <?php foreach ($roles_map as $rid => $rname): ?><option value="<?php echo $rid; ?>"><?php echo htmlspecialchars($rname); ?></option><?php endforeach; ?>
                         </select>
                     </div>

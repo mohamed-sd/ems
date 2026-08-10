@@ -77,6 +77,19 @@ if (isset($_GET['execute_id'])) {
         }
     }
 
+    /* ══ INJ-0041 (P1) — «اعتمادُ الدفعِ × تنفيذُ الدفعِ: من أنشأ لا ينفّذ» ══
+       كان منشئُ أمرِ الدفعِ ينفّذه بنفسِه: الإنشاءُ يضع `created_by` والتنفيذُ
+       يضع `executed_by` — وكلاهما المستخدمُ نفسُه بلا مانع. الحارسُ مبنيٌّ في
+       `includes/self_approval_guard.php` ولم يكن يُنادى هنا. */
+    require_once __DIR__ . '/../includes/self_approval_guard.php';
+    $__sa = ems_assert_not_self_approval($conn, 'fin_payments', 'id', $pid,
+        'أمرُ دفعٍ ' . (string) ($pay['payment_no'] ?? ('#' . $pid)),
+        intval($pay['company_id'] ?? $company_id));
+    if ($__sa !== null) {
+        ems_gov_flash_redirect('payments_fin.php', $__sa['reason'], 'GOV-PERM-403', 'التنفيذُ يدٌ ثانيةٌ غيرُ يدِ الإنشاء');
+        exit();
+    }
+
     // التنفيذ + أثره ذرّيًا (§9): الدفع + (تسوية المورد أو تحديث الذمّة) معًا
     $gate->runInTransaction(function ($g) use ($pid, $current_user_id, $pay, $recv) {
         $g->update('fin_payments', array('state' => 'executed', 'paid_at' => date('Y-m-d H:i:s'), 'executed_by' => $current_user_id), array('id' => $pid));
@@ -157,23 +170,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="finForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-money-bill-transfer"></i> حركة صرف / تحصيل</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>الاتجاه <span class="required">*</span></label>
-                <select name="direction"><?php foreach ($directions as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>نوع الطرف</label>
+            <div class="form-group"><label for="emsf_416_bccf5">الاتجاه <span class="required">*</span></label>
+                <select name="direction" id="emsf_416_bccf5"><?php foreach ($directions as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="p_ptype">نوع الطرف</label>
                 <select name="party_type" id="p_ptype"><?php foreach ($party_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>المورد</label><select name="party_ref" id="p_sup"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>طريقة الدفع</label>
-                <select name="method"><?php foreach ($methods as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required></div>
-            <div class="form-group"><label>ذمّة عميل (للتحصيل)</label>
-                <select name="receivable_id"><option value="">— بلا —</option>
+            <div class="form-group"><label for="p_sup">المورد</label><select name="party_ref" id="p_sup"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_417_988b5">طريقة الدفع</label>
+                <select name="method" id="emsf_417_988b5"><?php foreach ($methods as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_418_17729">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_418_17729"></div>
+            <div class="form-group"><label for="emsf_419_792aa">ذمّة عميل (للتحصيل)</label>
+                <select name="receivable_id" id="emsf_419_792aa"><option value="">— بلا —</option>
                 <?php
                 $recv_opts = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('r' => 'fin_receivables')),
                     "SELECT r.id, CONCAT(COALESCE(r.doc_ref,CONCAT('ذمّة #',r.id)),' — متبقّي ',r.outstanding) AS label
                      FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 ORDER BY r.id DESC");
                 foreach ($recv_opts as $x) { echo "<option value='" . intval($x['id']) . "'>" . htmlspecialchars($x['label']) . "</option>"; }
                 ?></select></div>
-            <div class="form-group" style="grid-column:1/-1"><label>بيان</label><input type="text" name="memo"></div>
+            <div class="form-group" style="grid-column:1/-1"><label for="emsf_420_78aa0">بيان</label><input type="text" name="memo" id="emsf_420_78aa0"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

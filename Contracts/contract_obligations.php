@@ -167,6 +167,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
             ));
             if (!$cur) { obl_back('البندُ غير موجود أو خارج نطاق شركتك ❌', $cid); }
             if ($cur['approval_state'] === 'approved') { obl_back('البندُ مُجازٌ سلفًا', $cid); }
+            // P1-B — «من أنشأ لا يعتمد»: البندُ التعاقديُّ يُلزم الشركةَ، فإجازتُه يدٌ ثانية.
+            require_once __DIR__ . '/../includes/self_approval_guard.php';
+            $__sa = ems_no_self_approval($conn, intval($cur['created_by'] ?? 0), intval($uid),
+                'بندُ التزامٍ تعاقديٍّ #' . $oid, intval($cur['company_id'] ?? 0));
+            if ($__sa !== null) { obl_back($__sa['reason'], $cid); }
             $gate->update('contract_obligations', array(
                 'approval_state' => 'approved', 'approved_by' => $uid, 'approved_at' => $now,
             ), array('id' => $oid), 'is_deleted = 0');
@@ -344,8 +349,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <div class="filter-body">
             <form method="get" action="" class="obl-picker">
                 <div class="filter-field">
-                    <label><i class="fa fa-file-contract"></i> العقد</label>
-                    <select name="contract" class="form-control" onchange="this.form.submit()">
+                    <label for="emsf_85_05820"><i class="fa fa-file-contract"></i> العقد</label>
+                    <select name="contract" class="form-control" onchange="this.form.submit()" id="emsf_85_05820">
                         <option value="">-- اختر العقد --</option>
                         <?php foreach ($contracts as $c):
                             $cid = intval($c['id']);
@@ -406,7 +411,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="card-body">
                     <div class="form-grid">
                         <div>
-                            <label><i class="fas fa-list-check"></i> بندُ الالتزام *</label>
+                            <label for="obligation_type"><i class="fas fa-list-check"></i> بندُ الالتزام *</label>
                             <select name="obligation_type" id="obligation_type" required>
                                 <?php foreach ($OBL_TYPES as $k => $v): ?>
                                     <option value="<?php echo obl_e($k); ?>"><?php echo obl_e($v); ?></option>
@@ -414,7 +419,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             </select>
                         </div>
                         <div>
-                            <label><i class="fas fa-user-shield"></i> الطرفُ الملتزم *</label>
+                            <label for="obligor"><i class="fas fa-user-shield"></i> الطرفُ الملتزم *</label>
                             <select name="obligor" id="obligor" required>
                                 <?php foreach ($OBL_OBLIGORS as $k => $v): ?>
                                     <option value="<?php echo obl_e($k); ?>" <?php echo $k === 'company' ? 'selected' : ''; ?>><?php echo obl_e($v); ?></option>
@@ -423,7 +428,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <small class="obl-hint">ما لم يُنص عليه يُعدُّ التزامَ الشركة (§4)</small>
                         </div>
                         <div>
-                            <label><i class="fas fa-file-invoice-dollar"></i> أثرُ الإخلال على الفوترة *</label>
+                            <label for="effect_on_billing"><i class="fas fa-file-invoice-dollar"></i> أثرُ الإخلال على الفوترة *</label>
                             <select name="effect_on_billing" id="effect_on_billing" required>
                                 <?php foreach ($OBL_EFFECTS as $k => $v): ?>
                                     <option value="<?php echo obl_e($k); ?>" <?php echo $k === 'per_clause' ? 'selected' : ''; ?>><?php echo obl_e($v); ?></option>
@@ -431,11 +436,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             </select>
                         </div>
                         <div>
-                            <label><i class="fas fa-calendar-day"></i> يسري من *</label>
+                            <label for="valid_from"><i class="fas fa-calendar-day"></i> يسري من *</label>
                             <input type="date" name="valid_from" id="valid_from" required>
                         </div>
                         <div>
-                            <label><i class="fas fa-calendar-xmark"></i> حتى (اختياري)</label>
+                            <label for="valid_to"><i class="fas fa-calendar-xmark"></i> حتى (اختياري)</label>
                             <input type="date" name="valid_to" id="valid_to">
                             <small class="obl-hint">فارغٌ أي مفتوحُ السريان</small>
                         </div>

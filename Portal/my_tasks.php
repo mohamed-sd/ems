@@ -15,6 +15,14 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once '../includes/resolve_manager.php';
 require_once '../app/Services/Work/WorkItemService.php';
 
@@ -271,14 +279,14 @@ include '../insidebar.php';
                                 <button class="btn btn-sm btn-success" title="الدليل: <?php echo htmlspecialchars((string) $t['evidence_ref']); ?>">قبول وإغلاق</button></form>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-outline-danger" style="display:inline-block">إعادة</summary>
                                 <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="returned">
-                                    <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="سبب الإعادة (إلزامي)" required>
+                                    <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="سبب الإعادة (إلزامي)" required aria-label="سبب الإعادة (إلزامي)">
                                     <button class="btn btn-sm btn-danger">إعادة للمنفِّذ</button></form></details>
                         <?php endif; ?>
                         <?php if ($isOwner && in_array($s, array('assigned', 'accepted', 'in_progress', 'blocked', 'overdue'), true)): ?>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-outline-secondary" style="display:inline-block">نقل</summary>
                                 <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="reassign">
-                                    <input name="to_user" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="معرّف المنفِّذ الجديد" required>
-                                    <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي — العدُّ يستمر)" required>
+                                    <input name="to_user" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="معرّف المنفِّذ الجديد" required aria-label="معرّف المنفِّذ الجديد">
+                                    <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي — العدُّ يستمر)" required aria-label="السبب (إلزامي — العدُّ يستمر)">
                                     <button class="btn btn-sm btn-secondary">نقل</button></form></details>
                         <?php endif; ?>
                     </td>

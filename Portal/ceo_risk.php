@@ -15,6 +15,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once '../includes/gov_columns.php';
 require_once '../includes/m00_exec_helpers.php';
 
@@ -217,38 +225,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — المخاطر والقرارات العليا</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم القرار</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الرفع</label>
-                    <input type="date" name="f1"></div>
-                <div class="form-group"><label>الجهة الرافعة</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>نوع القضية</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>وصف القضية</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الأثر المقدَّر</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>الخيارات المطروحة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>الخيار المختار</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>مبرر الاختيار</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الجهة المكلَّفة بالتنفيذ</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>مهلة التنفيذ</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ المتابعة</label>
-                    <input type="date" name="f12"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ القرار</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f15"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="قيد الحسم">قيد الحسم</option><option value="محسوم">محسوم</option><option value="قيد المتابعة">قيد المتابعة</option><option value="مغلق بعد المعالجة">مغلق بعد المعالجة</option><option value="مؤجل">مؤجل</option></select></div>
+                <div class="form-group"><label for="emsf_1132_ecd25">رقم القرار</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1132_ecd25"></div>
+                <div class="form-group"><label for="emsf_1133_581f0">تاريخ الرفع</label>
+                    <input type="date" name="f1" id="emsf_1133_581f0"></div>
+                <div class="form-group"><label for="emsf_1134_bfd54">الجهة الرافعة</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1134_bfd54"></div>
+                <div class="form-group"><label for="emsf_1135_82468">نوع القضية</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1135_82468"></div>
+                <div class="form-group"><label for="emsf_1136_922be">وصف القضية</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1136_922be"></div>
+                <div class="form-group"><label for="emsf_1137_a4955">الأثر المقدَّر</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1137_a4955"></div>
+                <div class="form-group"><label for="emsf_1138_ba77d">العملة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1138_ba77d"></div>
+                <div class="form-group"><label for="emsf_1139_f6b78">الخيارات المطروحة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1139_f6b78"></div>
+                <div class="form-group"><label for="emsf_1140_e1634">الخيار المختار</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1140_e1634"></div>
+                <div class="form-group"><label for="emsf_1141_13b95">مبرر الاختيار</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1141_13b95"></div>
+                <div class="form-group"><label for="emsf_1142_a1d06">الجهة المكلَّفة بالتنفيذ</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1142_a1d06"></div>
+                <div class="form-group"><label for="emsf_1143_037e7">مهلة التنفيذ</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1143_037e7"></div>
+                <div class="form-group"><label for="emsf_1144_9332f">تاريخ المتابعة</label>
+                    <input type="date" name="f12" id="emsf_1144_9332f"></div>
+                <div class="form-group"><label for="emsf_1145_f28fd">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1145_f28fd"></div>
+                <div class="form-group"><label for="emsf_1146_e5e79">تاريخ القرار</label>
+                    <input type="date" name="f14" id="emsf_1146_e5e79"></div>
+                <div class="form-group"><label for="emsf_1147_44369">الحالة</label>
+                    <select name="f15" id="emsf_1147_44369"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="قيد الحسم">قيد الحسم</option><option value="محسوم">محسوم</option><option value="قيد المتابعة">قيد المتابعة</option><option value="مغلق بعد المعالجة">مغلق بعد المعالجة</option><option value="مؤجل">مؤجل</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

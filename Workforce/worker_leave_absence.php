@@ -92,20 +92,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="save">
         <div class="card-header"><h5><i class="fas fa-plus"></i> إجازة / غياب</h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>الموظف</label><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>التصنيف</label><select name="event_class"><option value="مخطّط">مخطّط (إجازة/تناوب)</option><option value="طارئ">طارئ (غياب)</option></select></div>
-            <div class="field"><label>النوع</label><select name="event_type" required>
+            <div class="field"><label for="emsf_1856_cdcec">الموظف</label><select name="worker_id" required id="emsf_1856_cdcec"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1857_c08d3">التصنيف</label><select name="event_class" id="emsf_1857_c08d3"><option value="مخطّط">مخطّط (إجازة/تناوب)</option><option value="طارئ">طارئ (غياب)</option></select></div>
+            <div class="field"><label for="emsf_1858_1c6c2">النوع</label><select name="event_type" required id="emsf_1858_1c6c2">
                 <optgroup label="مخطّط"><option>تبادلية</option><option>اعتيادية</option><option>مأمورية</option></optgroup>
                 <optgroup label="طارئ"><option>غياب مفاجئ</option><option>انقطاع عن العمل</option><option>هروب من الموقع</option><option>مرض مفاجئ</option><option>إصابة</option><option>ظرف أسري طارئ</option><option>وفاة</option></optgroup>
             </select></div>
-            <div class="field"><label>الحالة</label><select name="state"><?php foreach($STATES as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>من</label><input type="date" name="date_from"></div>
-            <div class="field"><label>إلى</label><input type="date" name="date_to"></div>
-            <div class="field"><label>البديل</label><select name="substitute_id"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>أثر التغطية</label><select name="coverage_impact"><option value="">—</option><option>مغطًّى</option><option>فجوة جزئية</option><option>فجوة حرجة</option></select></div>
-            <div class="field"><label>الاستحقاق القادم</label><input type="date" name="next_due_date"></div>
-            <div class="field"><label>النتيجة</label><select name="outcome"><option value="">—</option><option>عودة للعمل</option><option>تحويل لإجازة</option><option>إنهاء وتسوية</option></select></div>
-            <div class="field" style="grid-column:1/-1;"><label>السبب/ملاحظات</label><input type="text" name="reason"></div>
+            <div class="field"><label for="emsf_1859_f0a3f">الحالة</label><select name="state" id="emsf_1859_f0a3f"><?php foreach($STATES as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1860_cfebe">من</label><input type="date" name="date_from" id="emsf_1860_cfebe"></div>
+            <div class="field"><label for="emsf_1861_517b0">إلى</label><input type="date" name="date_to" id="emsf_1861_517b0"></div>
+            <div class="field"><label for="emsf_1862_01550">البديل</label><select name="substitute_id" id="emsf_1862_01550"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1863_63f44">أثر التغطية</label><select name="coverage_impact" id="emsf_1863_63f44"><option value="">—</option><option>مغطًّى</option><option>فجوة جزئية</option><option>فجوة حرجة</option></select></div>
+            <div class="field"><label for="emsf_1864_da617">الاستحقاق القادم</label><input type="date" name="next_due_date" id="emsf_1864_da617"></div>
+            <div class="field"><label for="emsf_1865_33bec">النتيجة</label><select name="outcome" id="emsf_1865_33bec"><option value="">—</option><option>عودة للعمل</option><option>تحويل لإجازة</option><option>إنهاء وتسوية</option></select></div>
+            <div class="field" style="grid-column:1/-1;"><label for="emsf_1866_9bedf">السبب/ملاحظات</label><input type="text" name="reason" id="emsf_1866_9bedf"></div>
         </div>
         <div style="padding:0 14px 16px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>

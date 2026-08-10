@@ -28,5 +28,20 @@ $U13 = array(
     'rule'       => 'IAF-0009: ولا تكليفَ بمهمةٍ بلا إقرارٍ سارٍ قبلَه',
     'empty_hint' => 'لا إقراراتِ استقلالٍ مسجَّلة',
     'order'       => 'declared_at DESC',
+
+    'actions'    => array(
+        'declare' => array(
+            'code'  => 'iaf.independence.declare',
+            'label' => 'إقرارُ استقلالٍ وتعارضِ مصالح',
+            'rule'  => 'IAF-0009: لا تكليفَ بمهمةٍ بلا إقرارِ استقلالٍ سارٍ',
+            'fields' => array('auditor_id' => 'رقمُ المراجع', 'scope_ref' => 'النطاق', 'valid_until' => 'سارٍ حتى'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::declareIndependence($conn, array(
+                    'company_id' => $co, 'auditor_id' => (int) ($in['auditor_id'] ?? 0), 'scope_ref' => (string) ($in['scope_ref'] ?? ''),
+                    'valid_until' => (string) ($in['valid_until'] ?? ''), 'has_conflict' => !empty($in['has_conflict'])));
+            }),
+    ),
+
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

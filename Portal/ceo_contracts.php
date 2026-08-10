@@ -16,6 +16,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once '../includes/gov_columns.php';
 require_once '../includes/m00_exec_helpers.php';
 
@@ -291,52 +299,52 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — توقيع العقود والالتزامات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم العقد</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>نوع العقد</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الطرف الآخر</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>نوع الطرف</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>القيمة</label>
-                    <input type="text" inputmode="decimal" name="f4" placeholder="0"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>المدة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>نموذج العمل</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>وحدة التعاقد</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>عدد الوحدات</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الكفالة المطلوبة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>قيمة الكفالة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>مراجعة قانونية</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>مراجعة مالية</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>الموقّع عنّا</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>صفته (الموقّع عنّا)</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>مرجع سلطته</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ التوقيع</label>
-                    <input type="date" name="f17"></div>
-                <div class="form-group"><label>الموقّع عن الطرف الآخر</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>صفته (الطرف الآخر)</label>
-                    <input type="text" name="f19" maxlength="190"></div>
-                <div class="form-group"><label>مستند تخويله</label>
-                    <input type="text" name="f20" maxlength="190"></div>
-                <div class="form-group"><label>سُجّل في السجل الموحَّد؟</label>
-                    <input type="text" name="f21" maxlength="190" placeholder="لا"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f22"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="جاهز للتوقيع">جاهز للتوقيع</option><option value="محجوب بملاحظة حرجة">محجوب بملاحظة حرجة</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1106_99680">رقم العقد</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1106_99680"></div>
+                <div class="form-group"><label for="emsf_1107_ef722">نوع العقد</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1107_ef722"></div>
+                <div class="form-group"><label for="emsf_1108_68453">الطرف الآخر</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1108_68453"></div>
+                <div class="form-group"><label for="emsf_1109_2f1b7">نوع الطرف</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1109_2f1b7"></div>
+                <div class="form-group"><label for="emsf_1110_d8f55">القيمة</label>
+                    <input type="text" inputmode="decimal" name="f4" placeholder="0" id="emsf_1110_d8f55"></div>
+                <div class="form-group"><label for="emsf_1111_f6a45">العملة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1111_f6a45"></div>
+                <div class="form-group"><label for="emsf_1112_427b2">المدة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1112_427b2"></div>
+                <div class="form-group"><label for="emsf_1113_41d44">نموذج العمل</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1113_41d44"></div>
+                <div class="form-group"><label for="emsf_1114_ede66">وحدة التعاقد</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1114_ede66"></div>
+                <div class="form-group"><label for="emsf_1115_de9e2">عدد الوحدات</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1115_de9e2"></div>
+                <div class="form-group"><label for="emsf_1116_28cae">الكفالة المطلوبة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1116_28cae"></div>
+                <div class="form-group"><label for="emsf_1117_0de05">قيمة الكفالة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1117_0de05"></div>
+                <div class="form-group"><label for="emsf_1118_14653">مراجعة قانونية</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1118_14653"></div>
+                <div class="form-group"><label for="emsf_1119_c8b16">مراجعة مالية</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1119_c8b16"></div>
+                <div class="form-group"><label for="emsf_1120_c5faf">الموقّع عنّا</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1120_c5faf"></div>
+                <div class="form-group"><label for="emsf_1121_ce9f6">صفته (الموقّع عنّا)</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1121_ce9f6"></div>
+                <div class="form-group"><label for="emsf_1122_d588e">مرجع سلطته</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_1122_d588e"></div>
+                <div class="form-group"><label for="emsf_1123_d79fd">تاريخ التوقيع</label>
+                    <input type="date" name="f17" id="emsf_1123_d79fd"></div>
+                <div class="form-group"><label for="emsf_1124_1ee7b">الموقّع عن الطرف الآخر</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_1124_1ee7b"></div>
+                <div class="form-group"><label for="emsf_1125_57e18">صفته (الطرف الآخر)</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_1125_57e18"></div>
+                <div class="form-group"><label for="emsf_1126_a3d14">مستند تخويله</label>
+                    <input type="text" name="f20" maxlength="190" id="emsf_1126_a3d14"></div>
+                <div class="form-group"><label for="emsf_1127_4aff3">سُجّل في السجل الموحَّد؟</label>
+                    <input type="text" name="f21" maxlength="190" placeholder="لا" id="emsf_1127_4aff3"></div>
+                <div class="form-group"><label for="emsf_1128_1538b">الحالة</label>
+                    <select name="f22" id="emsf_1128_1538b"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="جاهز للتوقيع">جاهز للتوقيع</option><option value="محجوب بملاحظة حرجة">محجوب بملاحظة حرجة</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
@@ -359,8 +367,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-pen-fancy"></i> التوقيع — بالسلطة الأصلية أو تفويض موثَّق (BR-CEO-01)</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>العقد المعروض للتوقيع</label>
-                    <select name="row" required>
+                <div class="form-group"><label for="emsf_1129_59cbc">العقد المعروض للتوقيع</label>
+                    <select name="row" required id="emsf_1129_59cbc">
                         <?php foreach ($signable as $d):
                             $lbl = 'EXCS-' . intval($d['id'])
                                  . ' — ' . (string) $d['contract_no']
@@ -369,10 +377,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($lbl, ENT_QUOTES, 'UTF-8'); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>مرجع السلطة (فارغ = سلطة أصلية)</label>
-                    <input type="text" name="authority_ref" maxlength="120" placeholder="سلطة أصلية"></div>
-                <div class="form-group"><label>ربط عقد حقيقي (اختياري — يوقَّع عبر آلة الحالة بأثره الرباعي)</label>
-                    <select name="link_contract">
+                <div class="form-group"><label for="emsf_1130_5a477">مرجع السلطة (فارغ = سلطة أصلية)</label>
+                    <input type="text" name="authority_ref" maxlength="120" placeholder="سلطة أصلية" id="emsf_1130_5a477"></div>
+                <div class="form-group"><label for="emsf_1131_9f40b">ربط عقد حقيقي (اختياري — يوقَّع عبر آلة الحالة بأثره الرباعي)</label>
+                    <select name="link_contract" id="emsf_1131_9f40b">
                         <option value="0">— بلا ربط</option>
                         <?php foreach ($signableContracts as $rc):
                             $lbl = '#' . intval($rc['id']) . ' — ' . (string) ($rc['second_party'] ?: $rc['first_party'])

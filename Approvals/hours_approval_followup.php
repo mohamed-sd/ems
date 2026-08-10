@@ -362,7 +362,7 @@ include('../inheader.php');
 
   <div class="filters-wrap">
     <div class="fg">
-      <label>نوع المعدة</label>
+      <label for="f-equipment-type">نوع المعدة</label>
       <select id="f-equipment-type">
         <option value="">الكل</option>
         <option value="1">حفارات</option>
@@ -371,7 +371,7 @@ include('../inheader.php');
       </select>
     </div>
     <div class="fg">
-      <label>فلتر المشروع (قيد المتابعة)</label>
+      <label for="f-project">فلتر المشروع (قيد المتابعة)</label>
       <select id="f-project">
         <option value="">الكل</option>
         <?php foreach ($filter_projects as $v): ?>
@@ -380,7 +380,7 @@ include('../inheader.php');
       </select>
     </div>
     <div class="fg">
-      <label>فلتر المورد</label>
+      <label for="f-supplier">فلتر المورد</label>
       <select id="f-supplier">
         <option value="">الكل</option>
         <?php foreach ($filter_suppliers as $v): ?>
@@ -389,7 +389,7 @@ include('../inheader.php');
       </select>
     </div>
     <div class="fg">
-      <label>فلتر السائق / المشغل</label>
+      <label for="f-driver">فلتر السائق / المشغل</label>
       <select id="f-driver">
         <option value="">الكل</option>
         <?php foreach ($filter_drivers as $v): ?>
@@ -398,7 +398,7 @@ include('../inheader.php');
       </select>
     </div>
     <div class="fg">
-      <label>فلتر الآلية</label>
+      <label for="f-equip">فلتر الآلية</label>
       <select id="f-equip">
         <option value="">الكل</option>
         <?php foreach ($filter_equips as $v): ?>
@@ -407,11 +407,11 @@ include('../inheader.php');
       </select>
     </div>
     <div class="fg">
-      <label>من تاريخ</label>
+      <label for="f-date-from">من تاريخ</label>
       <input type="date" id="f-date-from">
     </div>
     <div class="fg">
-      <label>إلى تاريخ</label>
+      <label for="f-date-to">إلى تاريخ</label>
       <input type="date" id="f-date-to">
     </div>
     <div class="btns">
@@ -525,7 +525,7 @@ include('../inheader.php');
 
     <div class="filters-wrap" style="margin-bottom: 12px;">
       <div class="fg">
-        <label>نوع المعدة</label>
+        <label for="ff-equipment-type">نوع المعدة</label>
         <select id="ff-equipment-type">
           <option value="">الكل</option>
           <option value="1">حفارات</option>
@@ -534,7 +534,7 @@ include('../inheader.php');
         </select>
       </div>
       <div class="fg">
-        <label>فلتر المشروع (الاعتماد النهائي)</label>
+        <label for="ff-project">فلتر المشروع (الاعتماد النهائي)</label>
         <select id="ff-project">
           <option value="">الكل</option>
           <?php foreach ($filter_projects_final as $v): ?>
@@ -543,7 +543,7 @@ include('../inheader.php');
         </select>
       </div>
       <div class="fg">
-        <label>فلتر المورد</label>
+        <label for="ff-supplier">فلتر المورد</label>
         <select id="ff-supplier">
           <option value="">الكل</option>
           <?php foreach ($filter_suppliers_final as $v): ?>
@@ -552,7 +552,7 @@ include('../inheader.php');
         </select>
       </div>
       <div class="fg">
-        <label>فلتر السائق / المشغل</label>
+        <label for="ff-driver">فلتر السائق / المشغل</label>
         <select id="ff-driver">
           <option value="">الكل</option>
           <?php foreach ($filter_drivers_final as $v): ?>
@@ -561,7 +561,7 @@ include('../inheader.php');
         </select>
       </div>
       <div class="fg">
-        <label>فلتر الآلية</label>
+        <label for="ff-equip">فلتر الآلية</label>
         <select id="ff-equip">
           <option value="">الكل</option>
           <?php foreach ($filter_equips_final as $v): ?>
@@ -570,11 +570,11 @@ include('../inheader.php');
         </select>
       </div>
       <div class="fg">
-        <label>من تاريخ</label>
+        <label for="ff-date-from">من تاريخ</label>
         <input type="date" id="ff-date-from">
       </div>
       <div class="fg">
-        <label>إلى تاريخ</label>
+        <label for="ff-date-to">إلى تاريخ</label>
         <input type="date" id="ff-date-to">
       </div>
       <div class="btns">
@@ -685,7 +685,7 @@ include('../inheader.php');
         <hr>
         <div class="row g-2">
           <div class="col-md-4">
-            <label class="form-label fw-semibold">العمود</label>
+            <label class="form-label fw-semibold" for="note-col-select">العمود</label>
             <select class="form-select form-select-sm" id="note-col-select">
               <?php foreach ($column_labels as $col_key => $col_lbl): ?>
               <option value="<?= htmlspecialchars($col_key) ?>" data-label="<?= htmlspecialchars($col_lbl) ?>"><?= htmlspecialchars($col_lbl) ?></option>
@@ -694,7 +694,7 @@ include('../inheader.php');
             </select>
           </div>
           <div class="col-md-8">
-            <label class="form-label fw-semibold">نص الملاحظة</label>
+            <label class="form-label fw-semibold" for="note-text-input">نص الملاحظة</label>
             <textarea id="note-text-input" class="form-control form-control-sm" rows="3" placeholder="اكتب الملاحظة..."></textarea>
           </div>
         </div>
@@ -778,7 +778,6 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 $(function() {
   var opts = {
     language: { url: '/ems/assets/i18n/datatables/ar.json' },
-    responsive: true,
     pageLength: 25,
     order: [[1, 'desc']]
   };

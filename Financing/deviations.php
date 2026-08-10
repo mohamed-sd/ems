@@ -11,6 +11,14 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $role = intval($_SESSION['user']['role'] ?? 0);
@@ -155,8 +163,8 @@ include __DIR__ . '/../includes/page_header.php';
           <?php if ($open): ?>
           <form method="post" style="display:flex;gap:6px">
             <input type="hidden" name="close_dev" value="<?= intval($d['dev_id']) ?>">
-            <input type="text" name="decision" class="form-control form-control-sm" placeholder="القرار" style="max-width:160px" required>
-            <input type="text" name="decision_doc" class="form-control form-control-sm" placeholder="مرجعُ المستند" style="max-width:120px">
+            <input type="text" name="decision" class="form-control form-control-sm" placeholder="القرار" style="max-width:160px" required aria-label="القرار">
+            <input type="text" name="decision_doc" class="form-control form-control-sm" placeholder="مرجعُ المستند" style="max-width:120px" aria-label="مرجعُ المستند">
             <button class="action-btn" type="submit">أغلق</button>
           </form>
           <?php else: ?><?= htmlspecialchars($d['decision'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?>

@@ -642,9 +642,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       try {
         const tablesApi = window.jQuery.fn.dataTable.tables({ visible: true, api: true });
         tablesApi.columns.adjust();
-        if (typeof tablesApi.responsive === 'function') {
-          tablesApi.responsive.recalc();
-        }
+        // إضافةُ Responsive مرفوعة: لا recalc — التمرير الأفقي يتكفّل بالعرض.
       } catch (e) {
         if (window.console && console.debug) { console.debug('refreshPageLayout skipped:', e.message); }
       }

@@ -156,52 +156,52 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — الحضور والانصراف</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الشهر</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>كود الموظف</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>التاريخ</label>
-                    <input type="date" name="f2"></div>
-                <div class="form-group"><label>رمز الحالة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>وصف الحالة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>وقت الدخول</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>وقت الخروج</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>ساعات الدوام</label>
-                    <input type="text" inputmode="decimal" name="f7" placeholder="0"></div>
-                <div class="form-group"><label>تأخير بالدقائق</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>أثر الراتب</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>أثر الحافز</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>أثر التواجد</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>أثر الفوترة</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>أثر استحقاق المورد</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>المستند المؤيد</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>سجّله</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f16"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f18"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f19" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f20" maxlength="190"></div>
-                <div class="form-group"><label>مركز التكلفة</label>
-                    <input type="text" inputmode="decimal" name="f21" placeholder="0"></div>
-                <div class="form-group"><label>سعر الصرف ومصدره</label>
-                    <input type="text" inputmode="decimal" name="f22" placeholder="0"></div>
+                <div class="form-group"><label for="emsf_776_4545a">الشهر</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_776_4545a"></div>
+                <div class="form-group"><label for="emsf_777_7d3ab">كود الموظف</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_777_7d3ab"></div>
+                <div class="form-group"><label for="emsf_778_24c85">التاريخ</label>
+                    <input type="date" name="f2" id="emsf_778_24c85"></div>
+                <div class="form-group"><label for="emsf_779_afa46">رمز الحالة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_779_afa46"></div>
+                <div class="form-group"><label for="emsf_780_c7b66">وصف الحالة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_780_c7b66"></div>
+                <div class="form-group"><label for="emsf_781_38aa2">وقت الدخول</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_781_38aa2"></div>
+                <div class="form-group"><label for="emsf_782_3d51c">وقت الخروج</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_782_3d51c"></div>
+                <div class="form-group"><label for="emsf_783_ec93a">ساعات الدوام</label>
+                    <input type="text" inputmode="decimal" name="f7" placeholder="0" id="emsf_783_ec93a"></div>
+                <div class="form-group"><label for="emsf_784_69d90">تأخير بالدقائق</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_784_69d90"></div>
+                <div class="form-group"><label for="emsf_785_070c7">أثر الراتب</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_785_070c7"></div>
+                <div class="form-group"><label for="emsf_786_69217">أثر الحافز</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_786_69217"></div>
+                <div class="form-group"><label for="emsf_787_2254c">أثر التواجد</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_787_2254c"></div>
+                <div class="form-group"><label for="emsf_788_cdc27">أثر الفوترة</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_788_cdc27"></div>
+                <div class="form-group"><label for="emsf_789_be208">أثر استحقاق المورد</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_789_be208"></div>
+                <div class="form-group"><label for="emsf_790_728f7">المستند المؤيد</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_790_728f7"></div>
+                <div class="form-group"><label for="emsf_791_12115">سجّله</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_791_12115"></div>
+                <div class="form-group"><label for="emsf_792_e0a86">الحالة</label>
+                    <select name="f16" id="emsf_792_e0a86"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_793_2fd3b">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_793_2fd3b"></div>
+                <div class="form-group"><label for="emsf_794_e776a">تاريخ الاعتماد</label>
+                    <input type="date" name="f18" id="emsf_794_e776a"></div>
+                <div class="form-group"><label for="emsf_795_787da">مرجع التفويض</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_795_787da"></div>
+                <div class="form-group"><label for="emsf_796_3f743">المرجع الأب</label>
+                    <input type="text" name="f20" maxlength="190" id="emsf_796_3f743"></div>
+                <div class="form-group"><label for="emsf_797_297f1">مركز التكلفة</label>
+                    <input type="text" inputmode="decimal" name="f21" placeholder="0" id="emsf_797_297f1"></div>
+                <div class="form-group"><label for="emsf_798_43cc5">سعر الصرف ومصدره</label>
+                    <input type="text" inputmode="decimal" name="f22" placeholder="0" id="emsf_798_43cc5"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

@@ -30,6 +30,18 @@ $U13 = array(
     'order'       => 'raised_at DESC',
 
     'actions'    => array(
+        'raise' => array(
+            'code'  => 'iaf.finding.raise',
+            'label' => 'رفعُ ملاحظة',
+            'rule'  => 'IAF-0025: رفعُ الملاحظةِ للمراجعِ الداخليِّ حصرًا — ولا ملاحظةَ بلا مهمة',
+            'fields' => array('engagement_no' => 'رقمُ المهمة', 'title' => 'عنوانُ الملاحظة', 'severity' => 'الخطورة', 'auditee_dept' => 'الإدارةُ المُلاحَظة'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::raiseFinding($conn, array(
+                    'company_id' => $co, 'engagement_no' => (string) ($in['engagement_no'] ?? ''), 'title' => (string) ($in['title'] ?? ''),
+                    'severity' => (string) ($in['severity'] ?? ''), 'auditee_dept' => (string) ($in['auditee_dept'] ?? ''),
+                    'actor' => $uid));
+            }),
         'accept_evidence' => array(
             'code'  => 'iaf.evidence.accept',
             'label' => 'قبولُ دليلٍ على ملاحظة',

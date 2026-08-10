@@ -105,11 +105,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم التصنيف <span class="required">*</span></label>
+                        <label for="c_name">اسم التصنيف <span class="required">*</span></label>
                         <input type="text" name="name" id="c_name" required>
                     </div>
                     <div class="form-group">
-                        <label>ينطبق على (اختياري)</label>
+                        <label for="c_applies">ينطبق على (اختياري)</label>
                         <input type="text" name="applies_to" id="c_applies" maxlength="40" placeholder="مثال: حفّارات · شاحنات">
                     </div>
                     <div class="form-group">

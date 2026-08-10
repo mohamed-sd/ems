@@ -8,6 +8,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -336,15 +344,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <h6><i class="fas fa-info-circle"></i> المعلومات الأساسية والتعريفية</h6>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>اسم المورد <span class="required">*</span></label>
+                            <label for="supplier_name">اسم المورد <span class="required">*</span></label>
                             <input type="text" name="name" id="supplier_name" required value="مورد" />
                         </div>
                         <div class="form-group">
-                            <label>الرمز/الكود للمورد</label>
+                            <label for="supplier_code">الرمز/الكود للمورد</label>
                             <input type="text" name="supplier_code" id="supplier_code" value="MOR1" />
                         </div>
                         <div class="form-group">
-                            <label>نوع المورد <span class="required">*</span></label>
+                            <label for="supplier_type">نوع المورد <span class="required">*</span></label>
                             <select name="supplier_type" id="supplier_type" required>
                                 <option value="">-- اختر --</option>
                                 <option value="فرد">فرد</option>
@@ -355,7 +363,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>طبيعة التعامل <span class="required">*</span></label>
+                            <label for="dealing_nature">طبيعة التعامل <span class="required">*</span></label>
                             <select name="dealing_nature" id="dealing_nature" required>
                                 <option value="">-- اختر --</option>
                                 <option value="متعاقد مباشر">متعاقد مباشر</option>
@@ -369,7 +377,57 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                     <!-- أنواع المعدات (يمكن اختيار أكثر من نوع) -->
                     <div class="form-group allforms-span-full">
-                        <label>المعدات (يمكن اختيار أكثر من نوع)</label>
+                        <label for="commercial_registration">المعدات (يمكن اختيار أكثر من نوع)</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="حفارات" checked>
+                                <span>حفارات</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="مكنات تخريم">
+                                <span>مكنات تخريم</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="دوازر">
+                                <span>دوازر</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="شاحنات قلابة">
+                                <span>شاحنات قلابة</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="شاحنات تناكر">
+                                <span>شاحنات تناكر</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="جرافات">
+                                <span>جرافات</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="معدات معالجة">
+                                <span>معدات معالجة</span>
+                            </label>
+
+                             <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات">
+                                <span> السيارات والكرفانات</span>
+                            </label>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى">
+                                    <span>معدات أخرى</span>
+                            </label>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. البيانات القانونية والتعريفية -->
+                <div class="form-section">
+                    <h6><i class="fas fa-file-contract"></i> البيانات القانونية والتعريفية</h6>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>رقم التسجيل التجاري/الرخصة</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="equipment_types[]" value="حفارات" checked>
@@ -423,7 +481,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <input type="text" name="commercial_registration" id="commercial_registration" />
                         </div>
                         <div class="form-group">
-                            <label>نوع الهوية</label>
+                            <label for="identity_type">نوع الهوية</label>
                             <select name="identity_type" id="identity_type">
                                 <option value="">-- اختر --</option>
                                 <option value="بطاقة هوية وطنية">بطاقة هوية وطنية</option>
@@ -434,11 +492,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>رقم الهوية/التسجيل</label>
+                            <label for="identity_number">رقم الهوية/التسجيل</label>
                             <input type="text" name="identity_number" id="identity_number" />
                         </div>
                         <div class="form-group">
-                            <label>تاريخ انتهاء الهوية</label>
+                            <label for="identity_expiry_date">تاريخ انتهاء الهوية</label>
                             <input type="date" name="identity_expiry_date" id="identity_expiry_date" />
                         </div>
                     </div>
@@ -449,27 +507,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <h6><i class="fas fa-address-book"></i>  بيانات التواصل</h6>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>البريد الإلكتروني الرئيسي</label>
+                            <label for="supplier_email">البريد الإلكتروني الرئيسي</label>
                             <input type="email" name="email" id="supplier_email" />
                         </div>
                         <div class="form-group">
-                            <label>رقم الهاتف الأساسي <span class="required">*</span></label>
+                            <label for="supplier_phone">رقم الهاتف الأساسي <span class="required">*</span></label>
                             <input type="text" name="phone" id="supplier_phone" required value="092899930030" />
                         </div>
                         <div class="form-group">
-                            <label>رقم هاتف بديل</label>
+                            <label for="phone_alternative">رقم هاتف بديل</label>
                             <input type="text" name="phone_alternative" id="phone_alternative" />
                         </div>
                         <div class="form-group">
-                            <label>اسم الشخص المفوض</label>
+                            <label for="contact_person_name">اسم الشخص المفوض</label>
                             <input type="text" name="contact_person_name" id="contact_person_name" />
                         </div>
                         <div class="form-group">
-                            <label>هاتف الشخص المفوض</label>
+                            <label for="contact_person_phone">هاتف الشخص المفوض</label>
                             <input type="text" name="contact_person_phone" id="contact_person_phone" />
                         </div>
                         <div class="form-group">
-                            <label>حالة التسجيل المالي</label>
+                            <label for="financial_registration_status">حالة التسجيل المالي</label>
                             <select name="financial_registration_status" id="financial_registration_status">
                                 <option value="">-- اختر --</option>
                                 <option value="مسجل رسمياً">مسجل رسمياً</option>
@@ -479,11 +537,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>العنوان الكامل</label>
+                            <label for="full_address">العنوان الكامل</label>
                             <textarea name="full_address" id="full_address" rows="3"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>الحالة <span class="required">*</span></label>
+                            <label for="supplier_status">الحالة <span class="required">*</span></label>
                             <select name="status" id="supplier_status" required>
                                 <option value="">اختر الحالة</option>
                                 <option value="1">نشط</option>

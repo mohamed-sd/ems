@@ -5,31 +5,59 @@
  * الرصيدُ الدفتريُّ يُحسب من الحركات (لا عمودَ رصيدٍ يُعدَّل) — والجردُ
  * الفعليُّ يُدخل، والفرقُ يُسوّى بحركةِ «تسوية زيادة/عجز» بسببٍ موثَّق.
  */
+// ═══ CS-01 · ترتيبُ الملفِّ الإلزاميّ ═══════════════════════════════════════
+// جلسةٌ ← إعدادٌ ← حارسُ شاشةٍ ← حارسُ فعلٍ (العقدُ السبعي) ← معالجُ POST ←
+// استعلاماتُ العرضِ ← ترويسةٌ ← سايدبارٌ ← جسم.
+// ◆ RF-02: كان الإدراجُ في السطرِ 29 و‎insidebar‎ (الذي يُنفِّذ حارسَ العرض) في
+//   السطرِ 56 — فيُرحَّل الأثرُ ثم يُقال للمستخدم «لا صلاحية». الحارسُ الآن فوقَه.
 require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Procurement/StockMoveService.php';
+
+// ③ حارسُ الشاشةِ — قبلَ أيِّ معالجٍ وقبلَ أيِّ استعلام.
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $wh  = intval($_REQUEST['wh'] ?? 0);
 $msg = '';
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['adjust_item'])) {
-    $item   = intval($_POST['adjust_item']);
-    $actual = floatval($_POST['actual_qty'] ?? 0);
-    $book   = floatval($_POST['book_qty'] ?? 0);
-    $why    = trim($_POST['reason'] ?? '');
-    $diff   = $actual - $book;
-    if ($why === '') { $msg = 'سببُ التسوية إلزامي (422)'; }
-    elseif (abs($diff) < 0.001) { $msg = 'لا فرقَ — لا تسويةَ تُكتب'; }
-    else {
-        $type = $diff > 0 ? 'تسوية زيادة' : 'تسوية عجز';
-        $ok = mysqli_query($conn, "INSERT INTO proc_stock_move (company_id,item_id,warehouse_id,move_type,qty,ref_type,note,moved_at,created_by)
-              VALUES ($company_id,$item,$wh,'$type'," . abs($diff) . ",'stock_count','" . mysqli_real_escape_string($conn, $why) . "',NOW(),$uid)");
-        $msg = $ok ? "سُوّي الفرق (" . ($diff > 0 ? '+' : '−') . abs($diff) . ") بحركة «{$type}»" : 'فشل: ' . mysqli_error($conn);
-    }
+// ④+⑤ العقدُ السبعيُّ ثم الأثر — والخروجُ عند أيِّ فشلٍ قبلَ أيِّ كتابة.
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'proc.stock.count_adjust',
+    'perm'    => 'can_edit',
+    'trigger' => 'adjust_item',
+    'idem'    => array(
+        'item'   => intval($_POST['adjust_item'] ?? 0),
+        'wh'     => $wh,
+        'actual' => (string) floatval($_POST['actual_qty'] ?? 0),
+        'book'   => (string) floatval($_POST['book_qty'] ?? 0),
+        'reason' => trim($_POST['reason'] ?? ''),
+    ),
+    'validate' => function (array $in) {
+        $why  = trim($in['reason'] ?? '');
+        $diff = floatval($in['actual_qty'] ?? 0) - floatval($in['book_qty'] ?? 0);
+        if ($why === '')            { return array('ok' => false, 'msg' => 'سببُ التسوية إلزامي (422)'); }
+        if (abs($diff) < 0.001)     { return array('ok' => false, 'msg' => 'لا فرقَ — لا تسويةَ تُكتب'); }
+        if (intval($in['adjust_item'] ?? 0) <= 0) { return array('ok' => false, 'msg' => 'صنفٌ غيرُ صالح (422)'); }
+        return array('ok' => true, 'data' => array(
+            'item' => intval($in['adjust_item']), 'diff' => $diff, 'why' => $why,
+        ));
+    },
+));
+if ($__pc['run'] === false && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
+if ($__pc['run'] && !$__pc['ok'])                  { $msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    // CS-05: الشاشةُ لا تكتب جدولًا — تنادي خدمةَ نطاقها (الحكمُ والمعاملةُ فيها).
+    $svc = new \App\Services\Procurement\StockMoveService($conn);
+    $res = $svc->adjustCount($company_id, (int) $__pc['data']['item'], $wh,
+        (float) $__pc['data']['diff'], (string) $__pc['data']['why'], $uid);
+    $msg = $res['msg'];
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'proc_stock_move#' . $res['move_id']); }
 }
 
 $whs = array(); $rows = array();
@@ -68,7 +96,7 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="get" class="ems-form" style="display:flex;gap:10px;align-items:end;margin-bottom:14px">
-    <div><label>المخزن</label><select name="wh" class="form-control" onchange="this.form.submit()"><option value="">—</option>
+    <div><label for="emsf_1349_f75ee">المخزن</label><select name="wh" class="form-control" onchange="this.form.submit()" id="emsf_1349_f75ee"><option value="">—</option>
       <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>" <?= $w['id'] == $wh ? 'selected' : '' ?>><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
   </form>
   <?php if ($wh > 0): ?>
@@ -115,7 +143,7 @@ include __DIR__ . '/../includes/page_header.php';
           <input type="hidden" name="adjust_item" value="<?= intval($it['id']) ?>">
           <input type="hidden" name="book_qty" value="<?= floatval($it['book']) ?>">
           <td><input type="number" step="0.01" name="actual_qty" class="form-control form-control-sm" value="<?= floatval($it['book']) ?>" style="max-width:110px"></td>
-          <td><input type="text" name="reason" class="form-control form-control-sm" placeholder="سببُ الفرق"></td>
+          <td><input type="text" name="reason" class="form-control form-control-sm" placeholder="سببُ الفرق" aria-label="سببُ الفرق"></td>
           <td><button class="action-btn" type="submit">سوِّ</button></td>
         </form>
       </tr>

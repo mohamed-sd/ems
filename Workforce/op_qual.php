@@ -146,42 +146,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — تأهيل المشغّلين على أنواع المعدات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم التأهيل</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>كود المشغّل</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>نوع المعدة</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>الموديل</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>مستوى التأهيل</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>جهة التأهيل</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>رقم الشهادة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإصدار</label>
-                    <input type="date" name="f7"></div>
-                <div class="form-group"><label>تاريخ الانتهاء</label>
-                    <input type="date" name="f8"></div>
-                <div class="form-group"><label>ساعات الخبرة على النوع</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>المقيِّم</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ آخر تقييم</label>
-                    <input type="date" name="f11"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f12"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f17" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_1733_2074c">رقم التأهيل</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1733_2074c"></div>
+                <div class="form-group"><label for="emsf_1734_8b75b">كود المشغّل</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1734_8b75b"></div>
+                <div class="form-group"><label for="emsf_1735_a505e">نوع المعدة</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1735_a505e"></div>
+                <div class="form-group"><label for="emsf_1736_7a468">الموديل</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1736_7a468"></div>
+                <div class="form-group"><label for="emsf_1737_8a6f1">مستوى التأهيل</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1737_8a6f1"></div>
+                <div class="form-group"><label for="emsf_1738_fccc4">جهة التأهيل</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1738_fccc4"></div>
+                <div class="form-group"><label for="emsf_1739_be963">رقم الشهادة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1739_be963"></div>
+                <div class="form-group"><label for="emsf_1740_8b906">تاريخ الإصدار</label>
+                    <input type="date" name="f7" id="emsf_1740_8b906"></div>
+                <div class="form-group"><label for="emsf_1741_e8fa4">تاريخ الانتهاء</label>
+                    <input type="date" name="f8" id="emsf_1741_e8fa4"></div>
+                <div class="form-group"><label for="emsf_1742_41562">ساعات الخبرة على النوع</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_1742_41562"></div>
+                <div class="form-group"><label for="emsf_1743_1116a">المقيِّم</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1743_1116a"></div>
+                <div class="form-group"><label for="emsf_1744_f2405">تاريخ آخر تقييم</label>
+                    <input type="date" name="f11" id="emsf_1744_f2405"></div>
+                <div class="form-group"><label for="emsf_1745_9abe2">الحالة</label>
+                    <select name="f12" id="emsf_1745_9abe2"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1746_9bffa">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1746_9bffa"></div>
+                <div class="form-group"><label for="emsf_1747_910fe">تاريخ الاعتماد</label>
+                    <input type="date" name="f14" id="emsf_1747_910fe"></div>
+                <div class="form-group"><label for="emsf_1748_a49ec">مرجع التفويض</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1748_a49ec"></div>
+                <div class="form-group"><label for="emsf_1749_57612">المرجع الأب</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_1749_57612"></div>
+                <div class="form-group"><label for="emsf_1750_5dbb7">المرفق</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_1750_5dbb7"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

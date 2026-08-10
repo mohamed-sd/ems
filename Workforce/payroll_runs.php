@@ -200,13 +200,13 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
         <input type="hidden" name="pr_action" value="open_run">
         <div class="card"><div class="card-header"><h5><i class="fa fa-calendar"></i> دورةُ مسيّرٍ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
-            <div class="form-group"><label>من <span style="color:#c00">*</span></label>
-                <input type="date" name="period_from" required></div>
-            <div class="form-group"><label>إلى <span style="color:#c00">*</span></label>
-                <input type="date" name="period_to" required></div>
+            <div class="form-group"><label for="emsf_1751_f3df5">من <span style="color:#c00">*</span></label>
+                <input type="date" name="period_from" required id="emsf_1751_f3df5"></div>
+            <div class="form-group"><label for="emsf_1752_32b51">إلى <span style="color:#c00">*</span></label>
+                <input type="date" name="period_to" required id="emsf_1752_32b51"></div>
             <div class="form-group">
-                <label>الفئة</label>
-                <select name="category_filter">
+                <label for="emsf_1753_3f066">الفئة</label>
+                <select name="category_filter" id="emsf_1753_3f066">
                     <?php foreach ($CAT_LABELS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                     <?php endforeach; ?>
@@ -272,7 +272,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                     <input type="hidden" name="to_state" value="<?php echo htmlspecialchars($to); ?>">
                     <?php if ($to === PSM::PAID): ?>
                         <input type="text" name="payment_ref" placeholder="مرجع الصرف (إلزامي)"
-                               required style="max-width:200px">
+                               required style="max-width:200px" aria-label="مرجع الصرف (إلزامي)">
                     <?php endif; ?>
                     <button type="submit" class="btn-save">→ <?php echo htmlspecialchars(PSM::labelAr($to)); ?></button>
                 </form>
@@ -340,22 +340,22 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
             <input type="hidden" name="pr_action" value="time_input">
             <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>رقم الشخص <span style="color:#c00">*</span></label>
-                    <input type="number" name="person_id" min="1" required></div>
+                <div class="form-group"><label for="emsf_1754_c6a9e">رقم الشخص <span style="color:#c00">*</span></label>
+                    <input type="number" name="person_id" min="1" required id="emsf_1754_c6a9e"></div>
                 <div class="form-group">
-                    <label>النوع <span style="color:#c00">*</span></label>
-                    <select name="kind" required>
+                    <label for="emsf_1755_df58c">النوع <span style="color:#c00">*</span></label>
+                    <select name="kind" required id="emsf_1755_df58c">
                         <option value="overtime_hours">ساعاتُ إضافي</option>
                         <option value="night_shifts">ورديّاتٌ ليلية</option>
                         <option value="unpaid_days">أيامٌ غيرُ مدفوعة</option>
                     </select>
                 </div>
-                <div class="form-group"><label>الكمية <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.01" min="0.01" name="qty" required></div>
-                <div class="form-group"><label>مرجع المستند <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1756_dd6a7">الكمية <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0.01" name="qty" required id="emsf_1756_dd6a7"></div>
+                <div class="form-group"><label for="emsf_1757_ed8d0">مرجع المستند <span style="color:#c00">*</span></label>
                     <input type="text" name="doc_ref" required maxlength="120"
-                           placeholder="إذنُ عملٍ إضافي 2047/114"></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="input_note" maxlength="255"></div>
+                           placeholder="إذنُ عملٍ إضافي 2047/114" id="emsf_1757_ed8d0"></div>
+                <div class="form-group"><label for="emsf_1758_457e2">ملاحظة</label><input type="text" name="input_note" maxlength="255" id="emsf_1758_457e2"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>

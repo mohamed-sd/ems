@@ -137,7 +137,6 @@ if (isset($_GET['msg'])) {
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
@@ -344,7 +343,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <?php } ?>
 
                     <div>
-                        <label>
+                        <label for="suppliers">
                             <i class="fas fa-truck-loading"></i>
                             المورد <span class="required-indicator">*</span>
                         </label>
@@ -366,7 +365,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="code">
                             <i class="fas fa-barcode"></i>
                             كود المعدة <span class="required-indicator">*</span>
                         </label>
@@ -375,7 +374,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="type">
                             <i class="fas fa-list-alt"></i>
                             نوع المعدة <span class="required-indicator">*</span>
                         </label>
@@ -397,7 +396,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="name">
                             <i class="fas fa-tag"></i>
                             اسم المعدة <span class="required-indicator">*</span>
                         </label>
@@ -413,7 +412,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="serial_number">
                             <i class="fas fa-hashtag"></i>
                             رقم المعدة/الرقم التسلسلي
                         </label>
@@ -422,7 +421,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="chassis_number">
                             <i class="fas fa-barcode"></i>
                             رقم الهيكل/الهيكل الأساسي (VIN/Chassis)
                         </label>
@@ -439,7 +438,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                     <?php if ($equipments_has_model_id): ?>
                     <div>
-                        <label>
+                        <label for="model_id">
                             <i class="fas fa-clipboard-list"></i>
                             الموديل المرجعي (سجل النوع والموديل)
                         </label>
@@ -471,7 +470,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <?php endif; ?>
 
                     <div>
-                        <label>
+                        <label for="manufacturer">
                             <i class="fas fa-building"></i>
                             الماركة/الشركة المصنعة
                         </label>
@@ -480,7 +479,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="model">
                             <i class="fas fa-car"></i>
                             الموديل/الطراز
                         </label>
@@ -489,7 +488,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="manufacturing_year">
                             <i class="fas fa-calendar"></i>
                             سنة الصنع
                         </label>
@@ -498,7 +497,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="import_year">
                             <i class="fas fa-calendar-plus"></i>
                             سنة الاستيراد/البدء
                         </label>
@@ -521,7 +520,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="equipment_condition">
                             <i class="fas fa-cogs"></i>
                             حالة المعدة
                         </label>
@@ -538,7 +537,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="operating_hours">
                             <i class="fas fa-clock"></i>
                             ساعات التشغيل (للمعدات الثقيلة)
                         </label>
@@ -547,7 +546,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="engine_condition">
                             <i class="fas fa-car-crash"></i>
                             حالة المحرك
                         </label>
@@ -561,7 +560,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="tires_condition">
                             <i class="fas fa-circle-notch"></i>
                             حالة الإطارات (للشاحنات)
                         </label>
@@ -583,7 +582,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="license_number">
                             <i class="fas fa-address-card"></i>
                             رقم الترخيص/التسجيل
                         </label>
@@ -592,7 +591,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="license_authority">
                             <i class="fas fa-landmark"></i>
                             جهة الترخيص
                         </label>
@@ -601,7 +600,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="license_expiry_date">
                             <i class="fas fa-calendar-times"></i>
                             تاريخ انتهاء الترخيص
                         </label>
@@ -610,7 +609,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="inspection_certificate_number">
                             <i class="fas fa-certificate"></i>
                             رقم شهادة الفحص
                         </label>
@@ -619,7 +618,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="last_inspection_date">
                             <i class="fas fa-calendar-check"></i>
                             تاريخ آخر فحص
                         </label>
@@ -635,7 +634,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="current_location">
                             <i class="fas fa-location-arrow"></i>
                             الموقع الحالي
                         </label>
@@ -644,7 +643,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="availability_status">
                             <i class="fas fa-traffic-light"></i>
                             حالة التوفر
                         </label>
@@ -667,7 +666,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="estimated_value">
                             <i class="fas fa-money-bill-wave"></i>
                             القيمة المقدرة للمعدة (بالدولار)
                         </label>
@@ -676,7 +675,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="daily_rental_price">
                             <i class="fas fa-calendar-day"></i>
                             سعر التأجير اليومي (بالدولار)
                         </label>
@@ -685,7 +684,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="monthly_rental_price">
                             <i class="fas fa-calendar-alt"></i>
                             سعر التأجير الشهري (بالدولار)
                         </label>
@@ -694,7 +693,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="insurance_status">
                             <i class="fas fa-shield-alt"></i>
                             التأمين/الضمان
                         </label>
@@ -715,7 +714,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div class="form-grid-full">
-                        <label>
+                        <label for="general_notes">
                             <i class="fas fa-comment-alt"></i>
                             ملاحظات عامة
                         </label>
@@ -723,7 +722,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="last_maintenance_date">
                             <i class="fas fa-wrench"></i>
                             تاريخ آخر صيانة
                         </label>
@@ -732,7 +731,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div>
-                        <label>
+                        <label for="status">
                             <i class="fas fa-toggle-on"></i>
                             الحالة <span class="required-indicator">*</span>
                         </label>
@@ -779,7 +778,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                 <div class="filters-grid">
                     <div class="filter-item">
-                        <label><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
+                        <label for="filterSupplier"><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
                         <select id="filterSupplier" class="filter-select">
                             <option value="">— جميع الموردين —</option>
                             <?php
@@ -797,7 +796,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div class="filter-item">
-                        <label><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
+                        <label for="filterType"><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
                         <select id="filterType" class="filter-select">
                             <option value="">— جميع الأنواع —</option>
                             <?php
@@ -815,7 +814,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div class="filter-item">
-                        <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
+                        <label for="filterStatus"><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
                             <option value="">— جميع الحالات —</option>
                             <option value="نشط">نشط</option>
@@ -824,7 +823,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div class="filter-item">
-                        <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
+                        <label for="filterAvailability"><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
                         <select id="filterAvailability" class="filter-select">
                             <option value="">— جميع حالات التوفر —</option>
                             <option value="متاحة للعمل">متاحة للعمل</option>
@@ -1085,7 +1084,6 @@ include __DIR__ . '/../includes/page_header.php';
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1097,7 +1095,6 @@ include __DIR__ . '/../includes/page_header.php';
     (function () {
         $(document).ready(function () {
             var table = $('#projectsTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
                     { extend: 'copy', text: 'نسخ' },

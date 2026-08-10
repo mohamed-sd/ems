@@ -12,6 +12,14 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
@@ -133,19 +141,19 @@ include __DIR__ . '/../includes/page_header.php';
   <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px">
     <form method="post" class="ems-form" style="display:flex;gap:8px;align-items:end">
       <input type="hidden" name="new_vacancy" value="1">
-      <div><label>① طلبُ شاغرٍ جديد</label><input type="text" name="title_text" class="form-control" placeholder="المسمّى" required></div>
-      <div><label>السبب</label><input type="text" name="reason" class="form-control"></div>
+      <div><label for="emsf_1785_5c43b">① طلبُ شاغرٍ جديد</label><input type="text" name="title_text" class="form-control" placeholder="المسمّى" required id="emsf_1785_5c43b"></div>
+      <div><label for="emsf_1786_048c7">السبب</label><input type="text" name="reason" class="form-control" id="emsf_1786_048c7"></div>
       <button class="btn btn-primary">افتح وانشر</button>
     </form>
     <form method="post" class="ems-form" style="display:flex;gap:8px;align-items:end">
       <input type="hidden" name="new_applicant" value="1">
-      <div><label>③ سيرةٌ لمتقدم</label>
-        <select name="vac_id" class="form-control" required><option value="">— الشاغر —</option>
+      <div><label for="emsf_1787_75453">③ سيرةٌ لمتقدم</label>
+        <select name="vac_id" class="form-control" required id="emsf_1787_75453"><option value="">— الشاغر —</option>
           <?php foreach ($vacs as $v): ?><option value="<?= intval($v['vac_id']) ?>"><?= htmlspecialchars($v['vacancy_no'] . ' — ' . $v['title_text'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
         </select></div>
-      <div><label>الاسم</label><input type="text" name="applicant_name" class="form-control" required></div>
-      <div><label>الهاتف</label><input type="text" name="applicant_phone" class="form-control" style="max-width:130px"></div>
-      <div><label>مرجعُ السيرة</label><input type="text" name="cv_ref" class="form-control" style="max-width:130px"></div>
+      <div><label for="emsf_1788_6b93b">الاسم</label><input type="text" name="applicant_name" class="form-control" required id="emsf_1788_6b93b"></div>
+      <div><label for="emsf_1789_0744a">الهاتف</label><input type="text" name="applicant_phone" class="form-control" style="max-width:130px" id="emsf_1789_0744a"></div>
+      <div><label for="emsf_1790_cebd8">مرجعُ السيرة</label><input type="text" name="cv_ref" class="form-control" style="max-width:130px" id="emsf_1790_cebd8"></div>
       <button class="btn btn-primary">سجّل</button>
     </form>
   </div>
@@ -198,12 +206,12 @@ include __DIR__ . '/../includes/page_header.php';
           <form method="post" style="display:flex;gap:6px">
             <input type="hidden" name="advance_app" value="<?= intval($a2['app_id']) ?>">
             <?php if ($a2['stage'] === 'practical_test'): ?>
-              <input type="number" step="0.5" name="test_score" class="form-control form-control-sm" placeholder="الدرجة" style="max-width:90px">
+              <input type="number" step="0.5" name="test_score" class="form-control form-control-sm" placeholder="الدرجة" style="max-width:90px" aria-label="الدرجة">
             <?php endif; ?>
             <?php if ($ORDER[$idx + 1] === 'onboarded'): ?>
-              <input type="number" name="employee_id" class="form-control form-control-sm" placeholder="رقم الموظف" style="max-width:110px" required>
+              <input type="number" name="employee_id" class="form-control form-control-sm" placeholder="رقم الموظف" style="max-width:110px" required aria-label="رقم الموظف">
             <?php endif; ?>
-            <input type="text" name="stage_note" class="form-control form-control-sm" placeholder="ملاحظة" style="max-width:130px">
+            <input type="text" name="stage_note" class="form-control form-control-sm" placeholder="ملاحظة" style="max-width:130px" aria-label="ملاحظة">
             <button class="action-btn" type="submit">← <?= $nextLabel ?></button>
           </form>
           <?php else: ?>—<?php endif; ?>
@@ -211,7 +219,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td>
           <form method="post" style="display:flex;gap:4px">
             <input type="hidden" name="reject_app" value="<?= intval($a2['app_id']) ?>">
-            <input type="text" name="reject_reason" class="form-control form-control-sm" placeholder="السبب" style="max-width:110px" required>
+            <input type="text" name="reject_reason" class="form-control form-control-sm" placeholder="السبب" style="max-width:110px" required aria-label="السبب">
             <button class="action-btn" type="submit" style="color:#dc3545">رفض</button>
           </form>
         </td>

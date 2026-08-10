@@ -154,38 +154,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — سجل أنواع المستندات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>كود النوع</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>اسم المستند</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الإدارة المالكة</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>نمط الترقيم</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>بادئة الترقيم</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>دورية التسلسل</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>آلة الحالة المرتبطة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>يحتاج اعتمادًا؟</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>عدد حلقات الاعتماد</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>له أثر مالي؟</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>قابل للعكس؟</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>نمط العكس</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>مدة الحفظ النظامية</label>
-                    <input type="text" inputmode="decimal" name="f12" placeholder="0"></div>
-                <div class="form-group"><label>سياسة الأرشفة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ السريان</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f15"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_560_4a678">كود النوع</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_560_4a678"></div>
+                <div class="form-group"><label for="emsf_561_ea8a3">اسم المستند</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_561_ea8a3"></div>
+                <div class="form-group"><label for="emsf_562_aaad9">الإدارة المالكة</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_562_aaad9"></div>
+                <div class="form-group"><label for="emsf_563_498a7">نمط الترقيم</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_563_498a7"></div>
+                <div class="form-group"><label for="emsf_564_c8067">بادئة الترقيم</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_564_c8067"></div>
+                <div class="form-group"><label for="emsf_565_f6532">دورية التسلسل</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_565_f6532"></div>
+                <div class="form-group"><label for="emsf_566_f8ae5">آلة الحالة المرتبطة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_566_f8ae5"></div>
+                <div class="form-group"><label for="emsf_567_e96e9">يحتاج اعتمادًا؟</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_567_e96e9"></div>
+                <div class="form-group"><label for="emsf_568_53c9a">عدد حلقات الاعتماد</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_568_53c9a"></div>
+                <div class="form-group"><label for="emsf_569_f00c6">له أثر مالي؟</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_569_f00c6"></div>
+                <div class="form-group"><label for="emsf_570_b04f3">قابل للعكس؟</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_570_b04f3"></div>
+                <div class="form-group"><label for="emsf_571_3bcee">نمط العكس</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_571_3bcee"></div>
+                <div class="form-group"><label for="emsf_572_8af5d">مدة الحفظ النظامية</label>
+                    <input type="text" inputmode="decimal" name="f12" placeholder="0" id="emsf_572_8af5d"></div>
+                <div class="form-group"><label for="emsf_573_9eede">سياسة الأرشفة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_573_9eede"></div>
+                <div class="form-group"><label for="emsf_574_262af">تاريخ السريان</label>
+                    <input type="date" name="f14" id="emsf_574_262af"></div>
+                <div class="form-group"><label for="emsf_575_b7a8e">الحالة</label>
+                    <select name="f15" id="emsf_575_b7a8e"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

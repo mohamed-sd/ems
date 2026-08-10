@@ -89,17 +89,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="r_id" value="">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>اسم القالب <span class="required">*</span></label><input type="text" name="name" id="r_name" required></div>
-                <div class="form-group"><label>نوع التذكرة المُولَّدة <span class="required">*</span></label>
+                <div class="form-group"><label for="r_name">اسم القالب <span class="required">*</span></label><input type="text" name="name" id="r_name" required></div>
+                <div class="form-group"><label for="r_type">نوع التذكرة المُولَّدة <span class="required">*</span></label>
                     <select name="ticket_type_id" id="r_type" required><?php echo tkt_type_options(); ?></select></div>
-                <div class="form-group"><label>المعدة المستهدفة (اختياري)</label>
+                <div class="form-group"><label for="r_equipment">المعدة المستهدفة (اختياري)</label>
                     <select name="equipment_id" id="r_equipment"><?php echo tkt_equipment_options(); ?></select></div>
-                <div class="form-group"><label>كل (مقدار) <span class="required">*</span></label><input type="number" min="1" name="recurrence_interval" id="r_interval" value="1" required></div>
-                <div class="form-group"><label>الوحدة <span class="required">*</span></label>
+                <div class="form-group"><label for="r_interval">كل (مقدار) <span class="required">*</span></label><input type="number" min="1" name="recurrence_interval" id="r_interval" value="1" required></div>
+                <div class="form-group"><label for="r_unit">الوحدة <span class="required">*</span></label>
                     <select name="recurrence_unit" id="r_unit"><?php foreach ($units as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
-                <div class="form-group"><label>التوليد التالي <span class="required">*</span></label><input type="date" name="next_occurrence_date" id="r_next" required></div>
-                <div class="form-group"><label>التوليد قبل الموعد بـ (أيام)</label><input type="number" min="0" name="lead_time_days" id="r_lead" value="0"></div>
-                <div class="form-group"><label>أولوية التذكرة المُولَّدة</label>
+                <div class="form-group"><label for="r_next">التوليد التالي <span class="required">*</span></label><input type="date" name="next_occurrence_date" id="r_next" required></div>
+                <div class="form-group"><label for="r_lead">التوليد قبل الموعد بـ (أيام)</label><input type="number" min="0" name="lead_time_days" id="r_lead" value="0"></div>
+                <div class="form-group"><label for="r_priority">أولوية التذكرة المُولَّدة</label>
                     <select name="default_priority" id="r_priority"><?php foreach ($priorities as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
                 <div class="form-group"><label>مفعّل؟</label><label class="switch-inline"><input type="checkbox" name="active" id="r_active" value="1" checked> نعم</label></div>
             </div></div>

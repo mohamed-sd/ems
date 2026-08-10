@@ -10,6 +10,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -738,7 +746,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                     <!-- ══ حقل الكود المولد تلقائياً (قراءة فقط - لا يُرسَل لقاعدة البيانات) ══ -->
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود العميل المولد <i
+                        <label for="generated_client_code"><i class="fas fa-magic"></i> كود العميل المولد <i
                                 class="fas fa-info-circle clients-info-icon"></i></label>
                         <input type="text" id="generated_client_code" class="generated-code-field"
                             value="<?php echo clients_e($next_client_code); ?>" readonly tabindex="-1"
@@ -750,7 +758,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <!-- ══════════════════════════════════════════════════════ -->
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود العميل *</label>
+                        <label for="client_name"><i class="fas fa-barcode"></i> كود العميل *</label>
+                        <!-- الكودُ المولَّدُ مكتوبٌ سلفًا **وقابلٌ للتعديل** (طلبُ المالك):
+                             فأكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه.
+                             ووضعُه في السمة `value` لا بجافاسكربت مقصود: `resetClientForm()`
+                             تستدعي `reset()` الأصليّ، وهو يعيد كلَّ حقلٍ إلى سمته — فيعود
+                             الكودُ المولَّدُ تلقائيًّا بعد كل إلغاءٍ أو خروجٍ من وضع التعديل. -->
+                        <input type="text" name="client_code" id="client_code" placeholder="مثال: CL-001" required
+                            value="<?php echo clients_e($next_client_code); ?>"
+                            pattern="[A-Za-z0-9_\-]+" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-user"></i> اسم العميل *</label>
                         <!-- الكودُ المولَّدُ مكتوبٌ سلفًا **وقابلٌ للتعديل** (طلبُ المالك):
                              فأكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه.
                              ووضعُه في السمة `value` لا بجافاسكربت مقصود: `resetClientForm()`
@@ -765,7 +784,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="client_name" id="client_name" placeholder="أدخل اسم العميل" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-building"></i> نوع الكيان</label>
+                        <label for="entity_type"><i class="fas fa-building"></i> نوع الكيان</label>
                         <select name="entity_type" id="entity_type">
                             <option value="">-- اختر نوع الكيان --</option>
                             <option value="حكومي">حكومي</option>
@@ -776,7 +795,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-industry"></i> تصنيف القطاع</label>
+                        <label for="sector_category"><i class="fas fa-industry"></i> تصنيف القطاع</label>
                         <select name="sector_category" id="sector_category">
                             <option value="">-- اختر التصنيف --</option>
                             <option value="بنية تحتية">بنية تحتية</option>
@@ -794,19 +813,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-phone"></i> رقم الهاتف</label>
+                        <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف</label>
                         <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789" />
                     </div>
                     <div>
-                        <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                        <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
                         <input type="email" name="email" id="email" placeholder="example@company.com" />
                     </div>
                     <div>
-                        <label><i class="fab fa-whatsapp"></i> واتساب</label>
+                        <label for="whatsapp"><i class="fab fa-whatsapp"></i> واتساب</label>
                         <input type="tel" name="whatsapp" id="whatsapp" placeholder="مثال: +249123456789" />
                     </div>
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> حالة العميل *</label>
+                        <label for="status"><i class="fas fa-toggle-on"></i> حالة العميل *</label>
                         <select name="status" id="status" required>
                             <option value="نشط" selected>نشط ✅</option>
                             <option value="متوقف">متوقف ⏸</option>
@@ -832,13 +851,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-calendar"></i> نوع الكيان </label>
+                <label for="filterEntityType"><i class="fa fa-calendar"></i> نوع الكيان </label>
                <select id="filterEntityType" class="form-control" placeholder="">
                         <option value="">-- حدد نوع الكيان --</option>
                     </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-calendar"></i> تصنيف القطاع</label>
+                <label for="filterSectorCategory"><i class="fa fa-calendar"></i> تصنيف القطاع</label>
                 <select id="filterSectorCategory" class="form-control">
                         <option value=""> -- حدد تصنيف القطاع -- </option>
                     </select>

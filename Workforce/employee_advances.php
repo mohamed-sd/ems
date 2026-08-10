@@ -16,6 +16,14 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../app/Services/Payroll/OffsetService.php';
 
 use App\Services\Payroll\OffsetService as OFS;
@@ -172,8 +180,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-header"><h5><i class="fa fa-hand-holding-dollar"></i> سلفةٌ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label>المستفيد <span style="color:#c00">*</span></label>
-                <select name="person_id" required>
+                <label for="emsf_1675_61b58">المستفيد <span style="color:#c00">*</span></label>
+                <select name="person_id" required id="emsf_1675_61b58">
                     <option value="">— اختر —</option>
                     <?php foreach ($people as $p): ?>
                         <option value="<?php echo intval($p['id']); ?>">
@@ -183,28 +191,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="form-group">
-                <label>النوع</label>
-                <select name="advance_type">
+                <label for="emsf_1676_f721b">النوع</label>
+                <select name="advance_type" id="emsf_1676_f721b">
                     <?php foreach ($TYPE_LABELS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>المبلغ <span style="color:#c00">*</span></label>
-                <input type="number" step="0.01" min="0.01" name="amount" required></div>
-            <div class="form-group"><label>العملة</label><input type="text" name="currency" maxlength="8"></div>
-            <div class="form-group"><label>مستند الصرف <span style="color:#c00">*</span>
+            <div class="form-group"><label for="emsf_1677_95bc0">المبلغ <span style="color:#c00">*</span></label>
+                <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_1677_95bc0"></div>
+            <div class="form-group"><label for="emsf_1678_244f8">العملة</label><input type="text" name="currency" maxlength="8" id="emsf_1678_244f8"></div>
+            <div class="form-group"><label for="emsf_1679_3b65c">مستند الصرف <span style="color:#c00">*</span>
                     <small>— «كلٌّ بمستنده»</small></label>
-                <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2049/221"></div>
-            <div class="form-group"><label>تاريخ الصرف <span style="color:#c00">*</span></label>
-                <input type="date" name="issued_date" required></div>
-            <div class="form-group"><label>عدد الأقساط</label>
-                <input type="number" min="1" name="installments_count" value="1"></div>
-            <div class="form-group"><label>قسط الفترة <small>— فارغٌ = المبلغ ÷ الأقساط</small></label>
-                <input type="number" step="0.01" min="0.01" name="installment_amount"></div>
-            <div class="form-group"><label>أول فترة خصم</label>
-                <input type="date" name="first_deduction_period"></div>
-            <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="255"></div>
+                <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2049/221" id="emsf_1679_3b65c"></div>
+            <div class="form-group"><label for="emsf_1680_f09a4">تاريخ الصرف <span style="color:#c00">*</span></label>
+                <input type="date" name="issued_date" required id="emsf_1680_f09a4"></div>
+            <div class="form-group"><label for="emsf_1681_8f91d">عدد الأقساط</label>
+                <input type="number" min="1" name="installments_count" value="1" id="emsf_1681_8f91d"></div>
+            <div class="form-group"><label for="emsf_1682_8818a">قسط الفترة <small>— فارغٌ = المبلغ ÷ الأقساط</small></label>
+                <input type="number" step="0.01" min="0.01" name="installment_amount" id="emsf_1682_8818a"></div>
+            <div class="form-group"><label for="emsf_1683_dd69b">أول فترة خصم</label>
+                <input type="date" name="first_deduction_period" id="emsf_1683_dd69b"></div>
+            <div class="form-group"><label for="emsf_1684_dd952">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1684_dd952"></div>
         </div>
         <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> فتح السلفة</button></div>
         </div></div>

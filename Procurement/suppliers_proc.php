@@ -121,35 +121,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم المورد <span class="required">*</span></label>
+                        <label for="p_name">اسم المورد <span class="required">*</span></label>
                         <input type="text" name="name" id="p_name" required>
                     </div>
                     <div class="form-group">
-                        <label>طبيعة التعامل</label>
+                        <label for="p_dealing">طبيعة التعامل</label>
                         <input type="text" name="dealing_nature" id="p_dealing" placeholder="قطع / زيوت / فلاتر / خدمات إصلاح">
                     </div>
                     <div class="form-group">
-                        <label>الشخص المسؤول</label>
+                        <label for="p_contact">الشخص المسؤول</label>
                         <input type="text" name="contact_person" id="p_contact">
                     </div>
                     <div class="form-group">
-                        <label>الهاتف</label>
+                        <label for="p_phone">الهاتف</label>
                         <input type="text" name="phone" id="p_phone">
                     </div>
                     <div class="form-group">
-                        <label>البريد الإلكتروني</label>
+                        <label for="p_email">البريد الإلكتروني</label>
                         <input type="email" name="email" id="p_email">
                     </div>
                     <div class="form-group">
-                        <label>شروط السداد</label>
+                        <label for="p_payment">شروط السداد</label>
                         <input type="text" name="payment_terms" id="p_payment">
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>العنوان</label>
+                        <label for="p_address">العنوان</label>
                         <input type="text" name="address" id="p_address">
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
+                        <label for="p_notes">ملاحظات</label>
                         <input type="text" name="notes" id="p_notes">
                     </div>
                 </div>

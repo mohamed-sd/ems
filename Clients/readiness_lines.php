@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -434,17 +442,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود البند المولد <i class="fas fa-info-circle rdl-info-icon"></i></label>
+                        <label for="generated_rdl_code"><i class="fas fa-magic"></i> كود البند المولد <i class="fas fa-info-circle rdl-info-icon"></i></label>
                         <input type="text" id="generated_rdl_code" class="generated-code-field" value="<?php echo rdl_e($next_rdl_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود البند" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود البند *</label>
+                        <label for="readiness_code"><i class="fas fa-barcode"></i> كود البند *</label>
                         <input type="text" name="readiness_code" id="readiness_code" placeholder="مثال: RDL-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-contract"></i> العقد المرتبط *</label>
+                        <label for="contract_ref"><i class="fas fa-file-contract"></i> العقد المرتبط *</label>
                         <select name="contract_ref" id="contract_ref" required>
                             <option value="">-- اختر العقد --</option>
                             <?php foreach ($contract_options as $co): ?>
@@ -453,7 +461,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-list-check"></i> بند الجاهزية</label>
+                        <label for="name"><i class="fas fa-list-check"></i> بند الجاهزية</label>
                         <select name="name" id="name">
                             <?php foreach ($RDL_NAMES as $nm): ?>
                                 <option value="<?php echo rdl_e($nm); ?>" data-src="<?php echo rdl_e($RDL_SOURCE_HINT[$nm]); ?>"><?php echo rdl_e($nm); ?></option>
@@ -461,7 +469,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-traffic-light"></i> الحالة</label>
+                        <label for="state"><i class="fas fa-traffic-light"></i> الحالة</label>
                         <select name="state" id="state">
                             <?php foreach ($RDL_STATES as $st): $sel = $st === 'قيد المعالجة' ? 'selected' : ''; ?>
                                 <option value="<?php echo rdl_e($st); ?>" <?php echo $sel; ?>><?php echo rdl_e($st); ?></option>
@@ -469,19 +477,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-building-user"></i> الإدارة المصدر</label>
+                        <label for="source_ref"><i class="fas fa-building-user"></i> الإدارة المصدر</label>
                         <input type="text" name="source_ref" id="source_ref" maxlength="60" placeholder="مثال: S03 / الموقع" />
                     </div>
                     <div>
-                        <label><i class="fas fa-clipboard"></i> المطلوب (من بنود العقد)</label>
+                        <label for="required"><i class="fas fa-clipboard"></i> المطلوب (من بنود العقد)</label>
                         <input type="text" name="required" id="required" maxlength="255" placeholder="مثال: 6 حفّارات جاهزة" />
                     </div>
                     <div>
-                        <label><i class="fas fa-boxes-packing"></i> المتاح (من نظام الإدارة)</label>
+                        <label for="available"><i class="fas fa-boxes-packing"></i> المتاح (من نظام الإدارة)</label>
                         <input type="text" name="available" id="available" maxlength="255" placeholder="مثال: 5 حفّارات متاحة" />
                     </div>
                     <div class="rdl-col-full">
-                        <label><i class="fas fa-comment-dots"></i> وصف الفجوة وخطة التغطية</label>
+                        <label for="gap_note"><i class="fas fa-comment-dots"></i> وصف الفجوة وخطة التغطية</label>
                         <textarea name="gap_note" id="gap_note" rows="2" placeholder="وصف الفجوة وخطة معالجتها إن وُجدت"></textarea>
                     </div>
                 </div>
@@ -500,13 +508,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-list-check"></i> البند</label>
+                <label for="filterName"><i class="fa fa-list-check"></i> البند</label>
                 <select id="filterName" class="form-control">
                     <option value="">-- كل البنود --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-traffic-light"></i> الحالة</label>
+                <label for="filterState"><i class="fa fa-traffic-light"></i> الحالة</label>
                 <select id="filterState" class="form-control">
                     <option value="">-- كل الحالات --</option>
                 </select>

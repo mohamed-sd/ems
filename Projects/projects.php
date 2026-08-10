@@ -4,6 +4,14 @@ include '../config.php';
 require_once '../includes/approval_workflow.php';
 require_once '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -456,7 +464,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-user-tie"></i> اسم العميل (اختياري)</label>
+                        <label for="client_id"><i class="fas fa-user-tie"></i> اسم العميل (اختياري)</label>
                         <select name="client_id" id="client_id" required>
                             <option value="">-- اختر العميل --</option>
                             <?php
@@ -473,14 +481,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <!-- ══ الكودُ المولَّد (عرضٌ فقط · يُخفى في وضع التعديل) — نظيرُ شاشة العملاء ══ -->
                     <div id="generated_project_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود المشروع المولد <i
+                        <label for="generated_project_code"><i class="fas fa-magic"></i> كود المشروع المولد <i
                                 class="fas fa-info-circle clients-info-icon"></i></label>
                         <input type="text" id="generated_project_code" class="generated-code-field"
                             value="<?php echo e($next_project_code); ?>" readonly tabindex="-1"
                             title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود المشروع" />
                     </div>
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود المشروع</label>
+                        <label for="mine_code"><i class="fas fa-barcode"></i> كود المشروع</label>
+                        <!-- مكتوبٌ سلفًا بالكود المولَّد **وقابلٌ للتعديل** (نظيرُ كود العميل):
+                             أكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه. -->
+                        <input type="text" name="project_code" placeholder="كود المشروع" id="project_code"
+                            value="<?php echo e($next_project_code); ?>" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-mountain"></i> كود المنجم</label>
                         <!-- مكتوبٌ سلفًا بالكود المولَّد **وقابلٌ للتعديل** (نظيرُ كود العميل):
                              أكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه. -->
                         <input type="text" name="project_code" placeholder="كود المشروع" id="project_code"
@@ -491,45 +506,45 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="mine_code" placeholder="كود المنجم" id="mine_code" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-signature"></i> اسم المشروع</label>
+                        <label for="project_name"><i class="fas fa-file-signature"></i> اسم المشروع</label>
                         <input type="text" name="project_name" id="project_name" placeholder="أدخل اسم المشروع"
                             required />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marker-alt"></i> موقع المشروع</label>
+                        <label for="project_location"><i class="fas fa-map-marker-alt"></i> موقع المشروع</label>
                         <input type="text" name="location" placeholder="أدخل موقع المشروع" id="project_location" />
                         <input type="hidden" name="total" value="0" />
                     </div>
                     <div>
-                        <label><i class="fas fa-layer-group"></i> الفئة</label>
+                        <label for="project_category"><i class="fas fa-layer-group"></i> الفئة</label>
                         <input type="text" name="category" placeholder="الفئة" id="project_category" />
                     </div>
                     <div>
-                        <label><i class="fas fa-industry"></i> القطاع الفرعي</label>
+                        <label for="project_sub_sector"><i class="fas fa-industry"></i> القطاع الفرعي</label>
                         <input type="text" name="sub_sector" placeholder="القطاع الفرعي" id="project_sub_sector" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marked-alt"></i> الولاية</label>
+                        <label for="project_state"><i class="fas fa-map-marked-alt"></i> الولاية</label>
                         <input type="text" name="state" placeholder="الولاية" id="project_state" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-pin"></i> المنطقة</label>
+                        <label for="project_region"><i class="fas fa-map-pin"></i> المنطقة</label>
                         <input type="text" name="region" placeholder="المنطقة" id="project_region" />
                     </div>
                     <div>
-                        <label><i class="fas fa-store"></i> أقرب سوق</label>
+                        <label for="project_nearest_market"><i class="fas fa-store"></i> أقرب سوق</label>
                         <input type="text" name="nearest_market" placeholder="أقرب سوق" id="project_nearest_market" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marker"></i> خط العرض</label>
+                        <label for="project_latitude"><i class="fas fa-map-marker"></i> خط العرض</label>
                         <input type="text" name="latitude" placeholder="خط العرض" id="project_latitude" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marker"></i> خط الطول</label>
+                        <label for="project_longitude"><i class="fas fa-map-marker"></i> خط الطول</label>
                         <input type="text" name="longitude" placeholder="خط الطول" id="project_longitude" />
                     </div>
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> حالة المشروع</label>
+                        <label for="project_status"><i class="fas fa-toggle-on"></i> حالة المشروع</label>
                         <select name="status" id="project_status" required>
                             <option value="">-- اختر الحالة --</option>
                             <option value="1">✅ نشط</option>

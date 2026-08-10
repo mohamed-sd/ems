@@ -374,8 +374,8 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             <option value="<?php echo $bk; ?>"><?php echo $bl; ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <input type="number" name="bearer_id[]" placeholder="المعرّف" style="width:70px">
-                    <input type="number" step="0.01" name="bearer_pct[]" placeholder="٪" style="width:60px">
+                    <input type="number" name="bearer_id[]" placeholder="المعرّف" style="width:70px" aria-label="المعرّف">
+                    <input type="number" step="0.01" name="bearer_pct[]" placeholder="٪" style="width:60px" aria-label="٪">
                 </div>
                 <?php endfor; ?>
                 <button type="submit" class="btn-save">حفظ التحمّل (Σ=100)</button>
@@ -469,33 +469,33 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>النوع <span style="color:#c00">*</span></label>
-                        <select name="component_type" required>
+                        <label for="emsf_1617_ebd93">النوع <span style="color:#c00">*</span></label>
+                        <select name="component_type" required id="emsf_1617_ebd93">
                             <?php foreach (ECS::COMPONENT_TYPES as $k => $lbl): ?>
                                 <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>طريقة الاحتساب <span style="color:#c00">*</span></label>
-                        <select name="calc_method" required>
+                        <label for="emsf_1618_52334">طريقة الاحتساب <span style="color:#c00">*</span></label>
+                        <select name="calc_method" required id="emsf_1618_52334">
                             <?php foreach (ECS::CALC_METHODS as $k => $lbl): ?>
                                 <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group"><label>المبلغ (للمبلغ الثابت)</label><input type="number" step="0.01" min="0" name="value"></div>
-                    <div class="form-group"><label>المعدل (للنسب وعن-الوحدة)</label><input type="number" step="0.01" name="rate"></div>
+                    <div class="form-group"><label for="emsf_1619_37074">المبلغ (للمبلغ الثابت)</label><input type="number" step="0.01" min="0" name="value" id="emsf_1619_37074"></div>
+                    <div class="form-group"><label for="emsf_1620_c47db">المعدل (للنسب وعن-الوحدة)</label><input type="number" step="0.01" name="rate" id="emsf_1620_c47db"></div>
                     <div class="form-group">
-                        <label>الدورية</label>
-                        <select name="periodicity">
+                        <label for="emsf_1621_7be79">الدورية</label>
+                        <select name="periodicity" id="emsf_1621_7be79">
                             <option value="monthly">شهري</option><option value="periodic">دوري</option><option value="once">لمرة</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>سريان من</label><input type="date" name="valid_from"></div>
-                    <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
+                    <div class="form-group"><label for="emsf_1622_e5161">سريان من</label><input type="date" name="valid_from" id="emsf_1622_e5161"></div>
+                    <div class="form-group"><label for="emsf_1623_26ebc">سريان إلى</label><input type="date" name="valid_to" id="emsf_1623_26ebc"></div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>يدخل في:</label>
+                        <label for="emsf_1624_1402c">يدخل في:</label>
                         <?php foreach ($FLAG_LBL as $fk => $fl): ?>
                             <label style="margin-inline-end:12px;font-weight:normal">
                                 <input type="checkbox" name="<?php echo $fk; ?>" value="1"> <?php echo $fl; ?>
@@ -593,32 +593,129 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
                     <div class="form-group"><label>اسم الحافز <span style="color:#c00">*</span></label>
-                        <input type="text" name="incentive_type" required maxlength="50" placeholder="مثال: حافز إنتاج الطن"></div>
-                    <div class="form-group"><label>الأساس <span style="color:#c00">*</span></label>
-                        <select name="basis" required>
+                        <?php foreach ($FLAG_LBL as $fk => $fl): ?>
+                            <label style="margin-inline-end:12px;font-weight:normal">
+                                <input type="checkbox" name="<?php echo $fk; ?>" value="1"> <?php echo $fl; ?>
+                            </label>
+                        <?php endforeach; ?>
+                        <label style="margin-inline-end:12px;font-weight:normal">
+                            <input type="checkbox" name="is_variable" value="1"> متغيّر
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                </div>
+            </form>
+            <?php endif; ?>
+
+            <!-- ── H-08-③: قواعدُ الحوافز وتوزيعُها Σ=100 (تدمج M-23) ── -->
+            <h6 style="margin-top:18px"><i class="fa fa-bullseye"></i> قواعدُ الحوافز — التوزيعُ بمجموع 100٪ قيدًا</h6>
+            <div class="table-container">
+                <table class="alltables display no-datatable" style="width:100%">
+                    <thead><tr>
+                        <th>#</th><th>الحافز</th><th>الأساس</th><th>المعدل</th><th>العتبة</th>
+                        <th>السقف/الأدنى</th><th>التوزيع</th><th>التحمّل</th><th>السريان</th><th>الحالة</th>
+                        <?php if ($vc_editable): ?><th>إجراء</th><?php endif; ?>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($view_rules as $vr): $rid = intval($vr['id']); ?>
+                        <tr>
+                            <td><?php echo $rid; ?></td>
+                            <td><strong><?php echo htmlspecialchars($vr['incentive_type']); ?></strong></td>
+                            <td><?php echo htmlspecialchars(ECS::INCENTIVE_BASES[$vr['basis']] ?? $vr['basis']); ?></td>
+                            <td><?php echo $vr['rate'] !== null ? htmlspecialchars($vr['rate']) : '—'; ?></td>
+                            <td><?php echo $vr['threshold'] !== null ? htmlspecialchars($vr['threshold']) : '—'; ?></td>
+                            <td><?php echo ($vr['cap'] !== null ? htmlspecialchars($vr['cap']) : '—') . ' / '
+                                          . ($vr['floor'] !== null ? htmlspecialchars($vr['floor']) : '—'); ?></td>
+                            <td>
+                                <?php $als = $view_allocs[$rid] ?? array();
+                                if (!$als) { echo '<span class="badge badge-secondary" title="التوزيعُ الغائب = كلُّه لصاحب العقد">100٪ لصاحب العقد</span>'; }
+                                else { foreach ($als as $al) {
+                                    echo '<span class="badge badge-info">'
+                                        . ($al['beneficiary_type'] === 'employee' ? 'موظف' : 'مسمًّى') . ' #'
+                                        . intval($al['beneficiary_id']) . ' · ' . htmlspecialchars($al['percent']) . '٪</span> ';
+                                } } ?>
+                            </td>
+                            <td><?php $bearerCell('rule', $rid); ?></td>
+                            <td><?php echo htmlspecialchars(($vr['valid_from'] ?: '؟') . ' → ' . ($vr['valid_to'] ?: 'مفتوح')); ?></td>
+                            <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
+                                                 'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
+                                                 'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$vr['state']] ?? htmlspecialchars($vr['state']); ?></td>
+                            <?php if ($vc_editable): ?>
+                            <td>
+                                <?php if ($vr['state'] === 'active'): ?>
+                                <details style="display:inline-block">
+                                    <summary class="action-btn edit" style="cursor:pointer" title="توزيع">توزيع</summary>
+                                    <form method="post" style="margin-top:6px">
+                                        <input type="hidden" name="do" value="inc_alloc">
+                                        <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                        <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
+                                        <?php for ($ai = 0; $ai < 3; $ai++): ?>
+                                        <div style="display:flex;gap:4px;margin-bottom:4px">
+                                            <select name="alloc_type[]">
+                                                <option value="">—</option>
+                                                <option value="employee">موظف</option>
+                                                <option value="job_title">مسمًّى وظيفي</option>
+                                            </select>
+                                            <input type="number" name="alloc_id[]" placeholder="المعرّف" style="width:70px">
+                                            <input type="number" step="0.01" name="alloc_pct[]" placeholder="٪" style="width:60px">
+                                        </div>
+                                        <?php endfor; ?>
+                                        <button type="submit" class="btn-save">حفظ التوزيع (Σ=100)</button>
+                                    </form>
+                                </details>
+                                <form method="post" style="display:inline-flex;gap:4px">
+                                    <input type="hidden" name="do" value="inc_end">
+                                    <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                                    <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
+                                    <input type="date" name="end_date" required>
+                                    <button type="submit" class="action-btn" title="إنهاء"><i class="fas fa-stop"></i></button>
+                                </form>
+                                <?php endif; ?>
+                            </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$view_rules): ?>
+                        <tr><td colspan="11">لا قواعدَ حوافزَ بعد</td></tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($vc_editable): ?>
+            <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+                <input type="hidden" name="do" value="inc_add">
+                <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
+                <div class="form-grid">
+                    <div class="form-group"><label>اسم الحافز <span style="color:#c00">*</span></label>
+                        <input type="text" name="incentive_type" required maxlength="50" placeholder="مثال: حافز إنتاج الطن" id="emsf_1624_1402c"></div>
+                    <div class="form-group"><label for="emsf_1625_a33b5">الأساس <span style="color:#c00">*</span></label>
+                        <select name="basis" required id="emsf_1625_a33b5">
                             <?php foreach (ECS::INCENTIVE_BASES as $k => $lbl): ?>
                                 <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                             <?php endforeach; ?>
                         </select></div>
-                    <div class="form-group"><label>المعدل</label><input type="number" step="0.0001" min="0" name="rate"></div>
-                    <div class="form-group"><label>العتبة</label><input type="number" step="0.01" name="threshold"></div>
-                    <div class="form-group"><label>السقف</label><input type="number" step="0.01" name="cap"></div>
-                    <div class="form-group"><label>الحد الأدنى</label><input type="number" step="0.01" name="floor"></div>
-                    <div class="form-group"><label>الدورية</label>
-                        <select name="periodicity">
+                    <div class="form-group"><label for="emsf_1626_1a2df">المعدل</label><input type="number" step="0.0001" min="0" name="rate" id="emsf_1626_1a2df"></div>
+                    <div class="form-group"><label for="emsf_1627_0cf97">العتبة</label><input type="number" step="0.01" name="threshold" id="emsf_1627_0cf97"></div>
+                    <div class="form-group"><label for="emsf_1628_70a20">السقف</label><input type="number" step="0.01" name="cap" id="emsf_1628_70a20"></div>
+                    <div class="form-group"><label for="emsf_1629_02ca6">الحد الأدنى</label><input type="number" step="0.01" name="floor" id="emsf_1629_02ca6"></div>
+                    <div class="form-group"><label for="emsf_1630_3435e">الدورية</label>
+                        <select name="periodicity" id="emsf_1630_3435e">
                             <option value="monthly">شهري</option><option value="periodic">دوري</option><option value="once">لمرة</option>
                         </select></div>
-                    <div class="form-group"><label>شرط الاستحقاق</label><input type="text" name="condition_text" maxlength="255"></div>
-                    <div class="form-group"><label>النطاق</label>
-                        <select name="scope_type">
+                    <div class="form-group"><label for="emsf_1631_60df1">شرط الاستحقاق</label><input type="text" name="condition_text" maxlength="255" id="emsf_1631_60df1"></div>
+                    <div class="form-group"><label for="emsf_1632_16629">النطاق</label>
+                        <select name="scope_type" id="emsf_1632_16629">
                             <option value="">— عام —</option>
                             <option value="project">مشروع</option>
                             <option value="equipment_type">نوع معدة</option>
                             <option value="site">موقع</option>
                         </select></div>
-                    <div class="form-group"><label>معرّف النطاق</label><input type="number" name="scope_id"></div>
-                    <div class="form-group"><label>سريان من</label><input type="date" name="valid_from"></div>
-                    <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
+                    <div class="form-group"><label for="emsf_1633_94e48">معرّف النطاق</label><input type="number" name="scope_id" id="emsf_1633_94e48"></div>
+                    <div class="form-group"><label for="emsf_1634_e529f">سريان من</label><input type="date" name="valid_from" id="emsf_1634_e529f"></div>
+                    <div class="form-group"><label for="emsf_1635_a81ce">سريان إلى</label><input type="date" name="valid_to" id="emsf_1635_a81ce"></div>
                 </div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة قاعدة حافز</button>
@@ -687,7 +784,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                     <input type="hidden" name="do" value="amd_reject">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="amendment_id" value="<?php echo $aid; ?>">
-                                    <input type="text" name="reason" placeholder="سبب الرفض (إلزامي)" style="width:120px">
+                                    <input type="text" name="reason" placeholder="سبب الرفض (إلزامي)" style="width:120px" aria-label="سبب الرفض (إلزامي)">
                                     <button type="submit" class="action-btn" title="رفض"><i class="fas fa-times"></i></button>
                                 </form>
                                 <?php else: ?>—<?php endif; ?>
@@ -708,19 +805,19 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <input type="hidden" name="version" value="<?php echo intval($view_contract['version']); ?>">
                 <div class="form-grid">
-                    <div class="form-group"><label>نوع الملحق <span style="color:#c00">*</span></label>
-                        <select name="amend_type" required>
+                    <div class="form-group"><label for="emsf_1636_ce6c7">نوع الملحق <span style="color:#c00">*</span></label>
+                        <select name="amend_type" required id="emsf_1636_ce6c7">
                             <?php foreach (ECAS::AMEND_TYPES as $k => $lbl): ?>
                                 <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                             <?php endforeach; ?>
                         </select></div>
-                    <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                        <input type="date" name="effective_from" required></div>
-                    <div class="form-group"><label>الحقل المستهدف <span style="color:#c00">*</span>
+                    <div class="form-group"><label for="emsf_1637_3c05b">سريان من <span style="color:#c00">*</span></label>
+                        <input type="date" name="effective_from" required id="emsf_1637_3c05b"></div>
+                    <div class="form-group"><label for="emsf_1638_43c95">الحقل المستهدف <span style="color:#c00">*</span>
                         <small>(head:end_date · component:ID:value · rule:ID:rate …)</small></label>
-                        <input type="text" name="amd_field" required placeholder="head:end_date"></div>
-                    <div class="form-group"><label>القيمة بعد («قبل» يُلتقط من الواقع)</label>
-                        <input type="text" name="amd_after"></div>
+                        <input type="text" name="amd_field" required placeholder="head:end_date" id="emsf_1638_43c95"></div>
+                    <div class="form-group"><label for="emsf_1639_9303d">القيمة بعد («قبل» يُلتقط من الواقع)</label>
+                        <input type="text" name="amd_after" id="emsf_1639_9303d"></div>
                 </div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إنشاء ملحق (مسودة)</button>
@@ -733,9 +830,9 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <input type="hidden" name="do" value="sign_attach">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
-                    <div class="form-group"><label>مرجع النسخة الموقَّعة <span style="color:#c00">*</span>
+                    <div class="form-group"><label for="emsf_1640_5f6ab">مرجع النسخة الموقَّعة <span style="color:#c00">*</span>
                         <small>(ثابتةٌ لا تُستبدل — التصحيحُ ملحقٌ يوضّح)</small></label>
-                        <input type="text" name="signed_file_ref" required maxlength="255" placeholder="uploads/contracts/....pdf"></div>
+                        <input type="text" name="signed_file_ref" required maxlength="255" placeholder="uploads/contracts/....pdf" id="emsf_1640_5f6ab"></div>
                 </div>
                 <div style="margin-top:10px">
                     <button type="submit" class="btn-save"><i class="fa fa-file-signature"></i> تثبيت النسخة الموقَّعة</button>
@@ -752,8 +849,8 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
         <div class="card"><div class="card-header"><h5><i class="fa fa-file-signature"></i> رأسُ عقدٍ جديد (مسودة — المكوّناتُ والحوافزُ والتحمّل مع الشرائح التالية)</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label>الشخص <span style="color:#c00">*</span></label>
-                <select name="employee_id" required>
+                <label for="emsf_1641_fccec">الشخص <span style="color:#c00">*</span></label>
+                <select name="employee_id" required id="emsf_1641_fccec">
                     <option value="">— اختر —</option>
                     <?php foreach ($employees_options as $e): ?>
                         <option value="<?php echo intval($e['id']); ?>"><?php echo htmlspecialchars($e['name']); ?></option>
@@ -761,16 +858,16 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 </select>
             </div>
             <div class="form-group">
-                <label>الفئة <span style="color:#c00">*</span></label>
-                <select name="category" required>
+                <label for="emsf_1642_e2a3b">الفئة <span style="color:#c00">*</span></label>
+                <select name="category" required id="emsf_1642_e2a3b">
                     <?php foreach ($CATEGORIES as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
-                <label>نموذج الأجر <span style="color:#c00">*</span> <small>(اختيارٌ مستقلٌّ لا يُشتق من الوظيفة)</small></label>
-                <select name="pay_model_id" required>
+                <label for="emsf_1643_71877">نموذج الأجر <span style="color:#c00">*</span> <small>(اختيارٌ مستقلٌّ لا يُشتق من الوظيفة)</small></label>
+                <select name="pay_model_id" required id="emsf_1643_71877">
                     <option value="">— من القائمة الخمس عشرة —</option>
                     <?php foreach ($pay_models as $pm): ?>
                         <option value="<?php echo intval($pm['id']); ?>"><?php echo htmlspecialchars($pm['label_ar']); ?></option>
@@ -778,19 +875,19 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 </select>
             </div>
             <div class="form-group">
-                <label>المشروع (لفئة «مشروع»)</label>
-                <select name="project_id">
+                <label for="emsf_1644_a3194">المشروع (لفئة «مشروع»)</label>
+                <select name="project_id" id="emsf_1644_a3194">
                     <option value="">— بلا —</option>
                     <?php foreach ($projects_options as $p): ?>
                         <option value="<?php echo intval($p['id']); ?>"><?php echo htmlspecialchars($p['name']); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>بداية المدة</label><input type="date" name="start_date"></div>
-            <div class="form-group"><label>نهاية المدة</label><input type="date" name="end_date"></div>
-            <div class="form-group"><label>نهاية التجربة</label><input type="date" name="probation_end"></div>
-            <div class="form-group"><label>طبيعة الارتباط</label><input type="text" name="relation_type" maxlength="50"></div>
-            <div class="form-group"><label>العملة</label><input type="text" name="currency" maxlength="8" placeholder="SDG"></div>
+            <div class="form-group"><label for="emsf_1645_ca118">بداية المدة</label><input type="date" name="start_date" id="emsf_1645_ca118"></div>
+            <div class="form-group"><label for="emsf_1646_58223">نهاية المدة</label><input type="date" name="end_date" id="emsf_1646_58223"></div>
+            <div class="form-group"><label for="emsf_1647_01afd">نهاية التجربة</label><input type="date" name="probation_end" id="emsf_1647_01afd"></div>
+            <div class="form-group"><label for="emsf_1648_7b2f2">طبيعة الارتباط</label><input type="text" name="relation_type" maxlength="50" id="emsf_1648_7b2f2"></div>
+            <div class="form-group"><label for="emsf_1649_bce68">العملة</label><input type="text" name="currency" maxlength="8" placeholder="SDG" id="emsf_1649_bce68"></div>
         </div>
         <div style="margin-top:12px">
             <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ مسودة</button>
@@ -876,7 +973,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                             <option value="<?php echo $to; ?>">← <?php echo ECSM::labelAr($to); ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <input type="text" name="note" placeholder="ملاحظة" style="width:90px">
+                                    <input type="text" name="note" placeholder="ملاحظة" style="width:90px" aria-label="ملاحظة">
                                     <button type="submit" class="action-btn edit" title="نقل الحالة"><i class="fas fa-arrow-left"></i></button>
                                 </form>
                                 <?php endif; ?>
@@ -888,7 +985,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                         <option value="suspended">تعليق</option>
                                         <option value="seconded">إعارة</option>
                                     </select>
-                                    <input type="text" name="note" placeholder="السبب (إلزامي)" style="width:110px">
+                                    <input type="text" name="note" placeholder="السبب (إلزامي)" style="width:110px" aria-label="السبب (إلزامي)">
                                     <button type="submit" class="action-btn" title="تعليق/إعارة"><i class="fas fa-pause"></i></button>
                                 </form>
                                 <?php elseif ($state === ECSM::SUSPENDED || $state === ECSM::SECONDED): ?>

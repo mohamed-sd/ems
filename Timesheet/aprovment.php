@@ -117,7 +117,7 @@ include __DIR__ . '/../includes/page_header.php';
         <div>
             <input name="t" type="hidden" value="<?= $_GET['t']; ?>"/>
             <textarea name="time_notes" required placeholder="أدخل ملاحظاتك هنا" 
-                      style="width:100%; height:150px; padding:10px; font-size:16px; border-radius:8px;"></textarea>
+                      style="width:100%; height:150px; padding:10px; font-size:16px; border-radius:8px;" aria-label="أدخل ملاحظاتك هنا"></textarea>
         </div>
         <div style="margin-top:20px;">
             <button type="submit" 

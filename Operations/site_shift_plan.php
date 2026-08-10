@@ -149,46 +149,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — جدول الورديات — النهار والليل</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الجدول</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الموقع</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>التاريخ</label>
-                    <input type="date" name="f2"></div>
-                <div class="form-group"><label>الوردية</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>من الساعة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>إلى الساعة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>نوع المعدة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>المشغّل المكلَّف</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>المشغّل البديل</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>فحص التأهيل</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>فحص الرخصة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>فحص الجاهزية</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>جبهة العمل</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>الهدف الإنتاجي</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>نافذة الصيانة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f17"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f19"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_958_d7c7f">رقم الجدول</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_958_d7c7f"></div>
+                <div class="form-group"><label for="emsf_959_e590d">الموقع</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_959_e590d"></div>
+                <div class="form-group"><label for="emsf_960_17c6a">التاريخ</label>
+                    <input type="date" name="f2" id="emsf_960_17c6a"></div>
+                <div class="form-group"><label for="emsf_961_24bda">الوردية</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_961_24bda"></div>
+                <div class="form-group"><label for="emsf_962_0a89d">من الساعة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_962_0a89d"></div>
+                <div class="form-group"><label for="emsf_963_a973e">إلى الساعة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_963_a973e"></div>
+                <div class="form-group"><label for="emsf_964_8baf7">كود المعدة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_964_8baf7"></div>
+                <div class="form-group"><label for="emsf_965_ae340">نوع المعدة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_965_ae340"></div>
+                <div class="form-group"><label for="emsf_966_b2480">المشغّل المكلَّف</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_966_b2480"></div>
+                <div class="form-group"><label for="emsf_967_3fa5a">المشغّل البديل</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_967_3fa5a"></div>
+                <div class="form-group"><label for="emsf_968_737b7">فحص التأهيل</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_968_737b7"></div>
+                <div class="form-group"><label for="emsf_969_fb7b1">فحص الرخصة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_969_fb7b1"></div>
+                <div class="form-group"><label for="emsf_970_fd987">فحص الجاهزية</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_970_fd987"></div>
+                <div class="form-group"><label for="emsf_971_706aa">جبهة العمل</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_971_706aa"></div>
+                <div class="form-group"><label for="emsf_972_d3233">الهدف الإنتاجي</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_972_d3233"></div>
+                <div class="form-group"><label for="emsf_973_d162d">نافذة الصيانة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_973_d162d"></div>
+                <div class="form-group"><label for="emsf_974_69a88">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_974_69a88"></div>
+                <div class="form-group"><label for="emsf_975_ed060">تاريخ الاعتماد</label>
+                    <input type="date" name="f17" id="emsf_975_ed060"></div>
+                <div class="form-group"><label for="emsf_976_b1700">مرجع التفويض</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_976_b1700"></div>
+                <div class="form-group"><label for="emsf_977_b630e">الحالة</label>
+                    <select name="f19" id="emsf_977_b630e"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

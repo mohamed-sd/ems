@@ -118,24 +118,24 @@ include '../insidebar.php';
         <h4>② العملية — رأس المال والعائد والأقساط</h4>
         <form method="post" id="opform" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
             <input type="hidden" name="model_code" id="model_code" value="">
-            <input type="text" name="op_code" placeholder="كود العملية *" required>
+            <input type="text" name="op_code" placeholder="كود العملية *" required aria-label="كود العملية">
             <select name="financier_entity_id" required>
                 <option value="">— الممول *</option>
                 <?php foreach ($financiers as $f): ?>
                 <option value="<?php echo intval($f['entity_id']); ?>"><?php echo htmlspecialchars($f['legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <input type="text" name="currency" placeholder="العملة *" required>
+            <input type="text" name="currency" placeholder="العملة *" required aria-label="العملة">
             <input type="date" name="signed_date" value="<?php echo date('Y-m-d'); ?>">
-            <input type="number" step="0.01" name="capital" placeholder="رأس المال *" required>
-            <input type="number" step="0.01" name="purchase_value" placeholder="قيمة شراء العين">
-            <input type="number" step="0.01" name="down_payment" placeholder="المقدم" value="0">
-            <input type="number" step="0.01" name="profit_rate" placeholder="نسبة الأرباح ٪">
-            <input type="number" step="0.01" name="profit_amount" placeholder="قيمة الأرباح">
-            <input type="number" name="installments_no" placeholder="عدد الأقساط">
-            <input type="number" step="0.01" name="installment_amount" placeholder="قيمة القسط (تُحسب إن تُركت)">
-            <input type="date" name="first_due" title="استحقاق أول قسط — لتوليد الجدول آليًّا">
-            <input type="date" name="maturity_date" title="تاريخ النهاية">
+            <input type="number" step="0.01" name="capital" placeholder="رأس المال *" required aria-label="رأس المال">
+            <input type="number" step="0.01" name="purchase_value" placeholder="قيمة شراء العين" aria-label="قيمة شراء العين">
+            <input type="number" step="0.01" name="down_payment" placeholder="المقدم" value="0" aria-label="المقدم">
+            <input type="number" step="0.01" name="profit_rate" placeholder="نسبة الأرباح ٪" aria-label="نسبة الأرباح ٪">
+            <input type="number" step="0.01" name="profit_amount" placeholder="قيمة الأرباح" aria-label="قيمة الأرباح">
+            <input type="number" name="installments_no" placeholder="عدد الأقساط" aria-label="عدد الأقسا?">
+            <input type="number" step="0.01" name="installment_amount" placeholder="قيمة القسط (تُحسب إن تُركت)" aria-label="قيمة القسط (تُحسب إن تُركت)">
+            <input type="date" name="first_due" title="استحقاق أول قسط — لتوليد الجدول آليًّا" aria-label="استحقاق أول قسط — لتوليد الجدول آليًّا">
+            <input type="date" name="maturity_date" title="تاريخ النهاية" aria-label="تاريخ النهاية">
             <button class="btn-save" type="submit" style="grid-column:span 4"
                     onclick="if(!document.getElementById('model_code').value){alert('النموذج أولًا — اختره من الجدول أعلاه');return false;}">
                 إنشاء العملية وتوليد أقساطها

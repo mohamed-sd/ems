@@ -156,52 +156,52 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — علاقات الملكية بين الكيانات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم العلاقة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الكيان المالك</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>نوع المالك</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>الكيان المملوك</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>نوع الملكية</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>النسبة</label>
-                    <input type="text" inputmode="decimal" name="f5" placeholder="0"></div>
-                <div class="form-group"><label>من تاريخ</label>
-                    <input type="date" name="f6"></div>
-                <div class="form-group"><label>إلى تاريخ</label>
-                    <input type="date" name="f7"></div>
-                <div class="form-group"><label>تاريخ التخارج</label>
-                    <input type="date" name="f8"></div>
-                <div class="form-group"><label>المالك المشتري</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>مستند التخارج</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>مستند الملكية</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>اكتمال الملكية</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>مجموع النسب النشطة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>حالة قيد المئة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>تضارب مصالح مكتشف؟</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>سجّلها</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f17"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f19"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f20" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f21" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f22" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_484_8d961">رقم العلاقة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_484_8d961"></div>
+                <div class="form-group"><label for="emsf_485_e264b">الكيان المالك</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_485_e264b"></div>
+                <div class="form-group"><label for="emsf_486_fa727">نوع المالك</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_486_fa727"></div>
+                <div class="form-group"><label for="emsf_487_42a13">الكيان المملوك</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_487_42a13"></div>
+                <div class="form-group"><label for="emsf_488_69145">نوع الملكية</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_488_69145"></div>
+                <div class="form-group"><label for="emsf_489_441bf">النسبة</label>
+                    <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_489_441bf"></div>
+                <div class="form-group"><label for="emsf_490_fa29a">من تاريخ</label>
+                    <input type="date" name="f6" id="emsf_490_fa29a"></div>
+                <div class="form-group"><label for="emsf_491_02c19">إلى تاريخ</label>
+                    <input type="date" name="f7" id="emsf_491_02c19"></div>
+                <div class="form-group"><label for="emsf_492_94cef">تاريخ التخارج</label>
+                    <input type="date" name="f8" id="emsf_492_94cef"></div>
+                <div class="form-group"><label for="emsf_493_547f2">المالك المشتري</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_493_547f2"></div>
+                <div class="form-group"><label for="emsf_494_3b9e8">مستند التخارج</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_494_3b9e8"></div>
+                <div class="form-group"><label for="emsf_495_c2c2f">مستند الملكية</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_495_c2c2f"></div>
+                <div class="form-group"><label for="emsf_496_3e86f">اكتمال الملكية</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_496_3e86f"></div>
+                <div class="form-group"><label for="emsf_497_d5af1">مجموع النسب النشطة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_497_d5af1"></div>
+                <div class="form-group"><label for="emsf_498_4c646">حالة قيد المئة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_498_4c646"></div>
+                <div class="form-group"><label for="emsf_499_e561d">تضارب مصالح مكتشف؟</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_499_e561d"></div>
+                <div class="form-group"><label for="emsf_500_9a542">سجّلها</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_500_9a542"></div>
+                <div class="form-group"><label for="emsf_501_a101f">الحالة</label>
+                    <select name="f17" id="emsf_501_a101f"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_502_15269">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_502_15269"></div>
+                <div class="form-group"><label for="emsf_503_6dc3d">تاريخ الاعتماد</label>
+                    <input type="date" name="f19" id="emsf_503_6dc3d"></div>
+                <div class="form-group"><label for="emsf_504_42a99">مرجع التفويض</label>
+                    <input type="text" name="f20" maxlength="190" id="emsf_504_42a99"></div>
+                <div class="form-group"><label for="emsf_505_f9d9c">المرجع الأب</label>
+                    <input type="text" name="f21" maxlength="190" id="emsf_505_f9d9c"></div>
+                <div class="form-group"><label for="emsf_506_b7f82">المرفق</label>
+                    <input type="text" name="f22" maxlength="190" id="emsf_506_b7f82"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

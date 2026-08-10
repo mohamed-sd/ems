@@ -165,6 +165,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
                 $upd['first_action_at'] = date('Y-m-d H:i:s');          // لقياس زمن الاستجابة
             }
             if ($tr['to'] === 'closed') {
+                /* P1-B — «من رفع البلاغَ لا يُقفله»: الإقفالُ شهادةُ معالجةٍ من
+                   الجهةِ المعالِجة، لا من المُبلِّغ. (ونمطُ «لا تُغلق من الإدارةِ
+                   نفسِها» هو عينُه في ملاحظاتِ المراجعة.) */
+                require_once __DIR__ . '/../includes/self_approval_guard.php';
+                $__sa = ems_no_self_approval($conn, intval($ticket['created_by'] ?? 0), intval($current_user_id),
+                    'بلاغٌ ' . (string) ($ticket['ticket_no'] ?? ('#' . ($ticket['id'] ?? ''))),
+                    intval($ticket['company_id'] ?? 0));
+                if ($__sa !== null) {
+                    ems_gov_flash_redirect('tickets_list.php', $__sa['reason'], 'GOV-PERM-403',
+                        'الإقفالُ من الجهةِ المعالِجةِ لا من المُبلِّغ');
+                    exit();
+                }
                 $upd['close_date'] = date('Y-m-d');
                 $upd['close_time'] = date('H:i');
                 $upd['closed_by']  = $current_user_id;

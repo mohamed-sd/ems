@@ -49,7 +49,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 
 <?php
@@ -426,8 +425,7 @@ $(document).ready(function() {
         lengthMenu: [[25, 50, 100, 250], [25, 50, 100, 250]],
         searchDelay: 350,
         deferRender: true,
-        stateSave: true,
-        responsive: true
+        stateSave: true
     });
 
     $('#quickTableSearch').on('keyup', function() {

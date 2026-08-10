@@ -10,6 +10,14 @@ include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -457,21 +465,21 @@ function risk_entity_label($type, $map)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود الخطر المولد <i class="fas fa-info-circle risk-info-icon"></i></label>
+                        <label for="generated_risk_code"><i class="fas fa-magic"></i> كود الخطر المولد <i class="fas fa-info-circle risk-info-icon"></i></label>
                         <input type="text" id="generated_risk_code" class="generated-code-field" value="<?php echo risk_e($next_risk_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود الخطر" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود الخطر *</label>
+                        <label for="risk_code"><i class="fas fa-barcode"></i> كود الخطر *</label>
                         <input type="text" name="risk_code" id="risk_code" placeholder="مثال: RSK-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-heading"></i> وصف الخطر *</label>
+                        <label for="name"><i class="fas fa-heading"></i> وصف الخطر *</label>
                         <input type="text" name="name" id="name" placeholder="وصف موجز للخطر" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-list-check"></i> نوع الخطر *</label>
+                        <label for="risk_type"><i class="fas fa-list-check"></i> نوع الخطر *</label>
                         <select name="risk_type" id="risk_type" required>
                             <?php foreach ($RISK_TYPES as $t): ?>
                                 <option value="<?php echo risk_e($t); ?>"><?php echo risk_e($t); ?></option>
@@ -479,7 +487,7 @@ function risk_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-gauge-high"></i> الخطورة *</label>
+                        <label for="severity"><i class="fas fa-gauge-high"></i> الخطورة *</label>
                         <select name="severity" id="severity" required>
                             <?php foreach ($RISK_SEVERITIES as $s): ?>
                                 <option value="<?php echo risk_e($s); ?>" <?php echo $s === 'متوسطة' ? 'selected' : ''; ?>><?php echo risk_e($s); ?></option>
@@ -487,7 +495,7 @@ function risk_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-flag"></i> الحالة *</label>
+                        <label for="state"><i class="fas fa-flag"></i> الحالة *</label>
                         <select name="state" id="state" required>
                             <?php foreach ($RISK_STATES as $st): ?>
                                 <option value="<?php echo risk_e($st); ?>" <?php echo $st === 'مفتوح' ? 'selected' : ''; ?>><?php echo risk_e($st); ?></option>
@@ -495,7 +503,7 @@ function risk_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-link"></i> نوع الارتباط</label>
+                        <label for="entity_type"><i class="fas fa-link"></i> نوع الارتباط</label>
                         <select name="entity_type" id="entity_type">
                             <?php foreach ($RISK_ENTITY_TYPES as $k => $v): ?>
                                 <option value="<?php echo risk_e($k); ?>"><?php echo risk_e($v); ?></option>
@@ -503,13 +511,13 @@ function risk_entity_label($type, $map)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-folder-tree"></i> السجل المرتبط</label>
+                        <label for="entity_id"><i class="fas fa-folder-tree"></i> السجل المرتبط</label>
                         <select name="entity_id" id="entity_id">
                             <option value="">-- بدون / غير محدد --</option>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-user-check"></i> المسؤول</label>
+                        <label for="owner_user_id"><i class="fas fa-user-check"></i> المسؤول</label>
                         <select name="owner_user_id" id="owner_user_id">
                             <option value="">-- غير محدد --</option>
                             <?php foreach ($users_options as $uid => $uname): ?>
@@ -518,11 +526,11 @@ function risk_entity_label($type, $map)
                         </select>
                     </div>
                     <div class="risk-col-full">
-                        <label><i class="fas fa-clipboard-check"></i> خطة المعالجة</label>
+                        <label for="mitigation"><i class="fas fa-clipboard-check"></i> خطة المعالجة</label>
                         <textarea name="mitigation" id="mitigation" rows="2" placeholder="خطة المعالجة والإجراءات المتخذة"></textarea>
                     </div>
                     <div class="risk-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -541,19 +549,19 @@ function risk_entity_label($type, $map)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-list-check"></i> نوع الخطر</label>
+                <label for="filterType"><i class="fa fa-list-check"></i> نوع الخطر</label>
                 <select id="filterType" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-gauge-high"></i> الخطورة</label>
+                <label for="filterSeverity"><i class="fa fa-gauge-high"></i> الخطورة</label>
                 <select id="filterSeverity" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-flag"></i> الحالة</label>
+                <label for="filterState"><i class="fa fa-flag"></i> الحالة</label>
                 <select id="filterState" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

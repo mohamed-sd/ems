@@ -171,7 +171,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; if (empty($controls)): ?><small class="text-muted">لا ضوابط مربوطة — الدرجة لا تنخفض بلا ضابط مثبَت</small><?php endif; ?>
             <?php if ($canWrite): ?>
             <form id="rskLinkForm" class="ems-toolbar" style="margin-top:8px">
-                <input type="number" name="control_id" class="form-control" placeholder="رقم الضابط" style="max-width:140px" required>
+                <input type="number" name="control_id" class="form-control" placeholder="رقم الضابط" style="max-width:140px" required aria-label="رقم الضاب?">
                 <button class="ems-btn-secondary" type="submit">ربط ضابط</button>
                 <a class="ems-btn-tertiary" href="risk_controls.php">سجل الضوابط ↗</a>
             </form>
@@ -193,8 +193,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <form id="rskTreatForm" class="allforms" style="margin-top:8px">
                 <div class="row">
                     <div class="col-md-3"><select name="ttype" class="form-control"><option>تقليل</option><option>تجنب</option><option>نقل</option><option>قبول</option></select></div>
-                    <div class="col-md-4"><input name="plan_ar" class="form-control" placeholder="الخطة" required></div>
-                    <div class="col-md-2"><input name="action_owner_user_id" type="number" class="form-control" placeholder="مسؤول (user)" required></div>
+                    <div class="col-md-4"><input name="plan_ar" class="form-control" placeholder="الخطة" required aria-label="الخطة"></div>
+                    <div class="col-md-2"><input name="action_owner_user_id" type="number" class="form-control" placeholder="مسؤول (user)" required aria-label="مسؤول (user)"></div>
                     <div class="col-md-3"><input name="due_date" type="date" class="form-control" required></div>
                 </div>
                 <button class="ems-btn-secondary" type="submit">إسناد معالجة</button>

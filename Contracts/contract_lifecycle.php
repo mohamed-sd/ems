@@ -167,8 +167,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card-body">
         <form method="get" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
             <input type="hidden" name="contract" value="<?php echo $CID; ?>">
-            <div class="form-group"><label>الحالة</label>
-                <select name="state">
+            <div class="form-group"><label for="emsf_63_75fee">الحالة</label>
+                <select name="state" id="emsf_63_75fee">
                     <?php foreach ($STATE_AR as $k => $v): ?>
                         <option value="<?php echo $k; ?>" <?php echo $k === $SEL ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($v); ?></option>
@@ -212,26 +212,26 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6><i class="fa fa-plus"></i> سجّل واقعةً — <strong>وأثرُها يُكتب من الجدول لا من الطلب</strong></h6>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <div class="form-group"><label>الحالة</label>
-                    <select name="state">
+                <div class="form-group"><label for="emsf_64_c388f">الحالة</label>
+                    <select name="state" id="emsf_64_c388f">
                         <?php foreach ($STATE_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>تاريخُ الأثر <span style="color:#c00">*</span></label>
-                    <input type="date" name="effect_date" required></div>
-                <div class="form-group"><label>مرجعُ القرار <small>(إلزاميٌّ للإنهاء والإلغاء)</small></label>
-                    <input type="text" name="decision_ref" maxlength="120" style="width:170px"></div>
-                <div class="form-group"><label>تعويض/غرامة</label>
-                    <input type="number" step="0.01" name="claim_amount" style="width:130px"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="claim_currency" maxlength="8" style="width:80px"></div>
-                <div class="form-group" style="min-width:280px"><label>مادةُ العقد الحاكمة
+                <div class="form-group"><label for="emsf_65_20b95">تاريخُ الأثر <span style="color:#c00">*</span></label>
+                    <input type="date" name="effect_date" required id="emsf_65_20b95"></div>
+                <div class="form-group"><label for="emsf_66_8f235">مرجعُ القرار <small>(إلزاميٌّ للإنهاء والإلغاء)</small></label>
+                    <input type="text" name="decision_ref" maxlength="120" style="width:170px" id="emsf_66_8f235"></div>
+                <div class="form-group"><label for="emsf_67_6fd1a">تعويض/غرامة</label>
+                    <input type="number" step="0.01" name="claim_amount" style="width:130px" id="emsf_67_6fd1a"></div>
+                <div class="form-group"><label for="emsf_68_a0e1a">العملة</label>
+                    <input type="text" name="claim_currency" maxlength="8" style="width:80px" id="emsf_68_a0e1a"></div>
+                <div class="form-group" style="min-width:280px"><label for="emsf_69_47131">مادةُ العقد الحاكمة
                     <small>(إلزاميةٌ مع أيِّ مبلغ)</small></label>
-                    <input type="text" name="contract_article" maxlength="200"></div>
-                <div class="form-group"><label>مستندُ الحساب</label>
-                    <input type="text" name="claim_doc_ref" maxlength="120" style="width:150px"></div>
-                <div class="form-group" style="min-width:220px"><label>ملاحظة</label>
-                    <input type="text" name="note" maxlength="255"></div>
+                    <input type="text" name="contract_article" maxlength="200" id="emsf_69_47131"></div>
+                <div class="form-group"><label for="emsf_70_c95a7">مستندُ الحساب</label>
+                    <input type="text" name="claim_doc_ref" maxlength="120" style="width:150px" id="emsf_70_c95a7"></div>
+                <div class="form-group" style="min-width:220px"><label for="emsf_71_96ae0">ملاحظة</label>
+                    <input type="text" name="note" maxlength="255" id="emsf_71_96ae0"></div>
             </div>
             <button type="submit" class="btn-save"><i class="fa fa-save"></i> سجّل الواقعة</button>
         </form>

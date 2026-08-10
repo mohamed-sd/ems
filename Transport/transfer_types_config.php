@@ -120,11 +120,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم النوع <span class="required">*</span></label>
+                        <label for="t_name">اسم النوع <span class="required">*</span></label>
                         <input type="text" name="name" id="t_name" required>
                     </div>
                     <div class="form-group">
-                        <label>الفئة التشغيلية <span class="required">*</span></label>
+                        <label for="t_category">الفئة التشغيلية <span class="required">*</span></label>
                         <select name="operational_category" id="t_category" required>
                             <?php foreach ($categories as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -132,7 +132,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>المتحمِّل الافتراضي <span class="required">*</span></label>
+                        <label for="t_bearer">المتحمِّل الافتراضي <span class="required">*</span></label>
                         <select name="default_bearer" id="t_bearer" required>
                             <?php foreach ($bearers as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>

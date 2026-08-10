@@ -268,22 +268,157 @@ require_once __DIR__ . '/includes/layout_head.php';
                 <input type="hidden" name="action" value="create">
 
                 <div class="form-group">
-                    <label class="form-label">الاسم *</label>
-                    <input class="form-ctrl" name="name" maxlength="100" required>
+                    <label class="form-label" for="emsf_1964_964db">الاسم *</label>
+                    <input class="form-ctrl" name="name" maxlength="100" required id="emsf_1964_964db">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">البريد الإلكتروني *</label>
-                    <input class="form-ctrl" name="email" type="email" maxlength="150" required>
+                    <label class="form-label" for="emsf_1965_08b10">البريد الإلكتروني *</label>
+                    <input class="form-ctrl" name="email" type="email" maxlength="150" required id="emsf_1965_08b10">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">كلمة المرور *</label>
-                    <input class="form-ctrl" name="password" type="password" maxlength="255" required autocomplete="new-password">
+                    <label class="form-label" for="emsf_1966_a7306">كلمة المرور *</label>
+                    <input class="form-ctrl" name="password" type="password" maxlength="255" required autocomplete="new-password" id="emsf_1966_a7306">
                     <p class="form-hint">الحد الأدنى 12 حرف ويجب أن تحتوي على حروف كبيرة وصغيرة وأرقام ورمز خاص.</p>
                 </div>
                 <div class="form-group">
-                    <label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;">
+                    <label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;" for="editName">
                         <input type="checkbox" name="is_active" value="1" checked style="width:auto;"> تفعيل الحساب فوراً
                     </label>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> إنشاء الحساب</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-hd">
+            <span class="card-hd-title"><i class="fas fa-shield-halved" style="color:var(--gold);margin-left:6px;"></i>ضوابط الحماية</span>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:10px;">
+                <i class="fas fa-lock"></i>
+                <div>كل عمليات الإدارة محمية بـ CSRF + جلسة موثقة ببصمة المستخدم.</div>
+            </div>
+            <div class="alert alert-warning" style="margin-bottom:10px;">
+                <i class="fas fa-user-shield"></i>
+                <div>لا يمكن حذف أو تعطيل الحساب الحالي، ولا حذف آخر مدير نشط في النظام.</div>
+            </div>
+            <div class="alert alert-success" style="margin-bottom:0;">
+                <i class="fas fa-scroll"></i>
+                <div>كل العمليات (إضافة/تعديل/حذف) تُسجّل في سجل المراجعة الإداري.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top:18px;">
+    <form method="get" class="filter-bar">
+        <div class="input-icon-wrap" style="flex:1;min-width:220px;">
+            <i class="fas fa-search"></i>
+            <input class="form-ctrl form-ctrl-sm" style="width:100%;padding-right:32px;" name="q" value="<?php echo e($search); ?>" placeholder="بحث بالاسم أو البريد...">
+        </div>
+        <select name="status" class="form-ctrl-sm">
+            <option value="">كل الحالات</option>
+            <option value="active" <?php echo $status === 'active' ? 'selected' : ''; ?>>نشط</option>
+            <option value="inactive" <?php echo $status === 'inactive' ? 'selected' : ''; ?>>غير نشط</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> تصفية</button>
+        <?php if ($search !== '' || $status !== ''): ?>
+        <a href="<?php echo e(super_admin_url('managers')); ?>" class="btn btn-ghost btn-sm"><i class="fas fa-times"></i> مسح</a>
+        <?php endif; ?>
+    </form>
+
+    <?php if (empty($managers)): ?>
+    <div class="empty-state">
+        <i class="fas fa-users-slash"></i>
+        <p>لا توجد حسابات مطابقة لخيارات البحث</p>
+    </div>
+    <?php else: ?>
+    <div class="tbl-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>الاسم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>الحالة</th>
+                    <th>آخر تسجيل دخول</th>
+                    <th>تاريخ الإنشاء</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($managers as $i => $m): ?>
+                <tr>
+                    <td class="text-muted"><?php echo $offset + $i + 1; ?></td>
+                    <td style="font-weight:700;"><?php echo e($m['name']); ?></td>
+                    <td><?php echo e($m['email']); ?></td>
+                    <td>
+                        <?php if (intval($m['is_active']) === 1): ?>
+                        <span class="badge bg-green">نشط</span>
+                        <?php else: ?>
+                        <span class="badge bg-red">غير نشط</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-muted"><?php echo $m['last_login_at'] ? e(date('d/m/Y H:i', strtotime($m['last_login_at']))) : '—'; ?></td>
+                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($m['created_at']))); ?></td>
+                    <td>
+                        <div class="flex" style="flex-wrap:wrap;gap:6px;">
+                            <button type="button"
+                                    class="btn btn-ghost btn-sm edit-btn"
+                                    data-id="<?php echo intval($m['id']); ?>"
+                                    data-name="<?php echo e($m['name']); ?>"
+                                    data-email="<?php echo e($m['email']); ?>"
+                                    data-active="<?php echo intval($m['is_active']); ?>">
+                                <i class="fas fa-pen"></i>
+                            </button>
+
+                            <form method="post" action="" onsubmit="return confirm('هل أنت متأكد من حذف هذا الحساب؟');" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="<?php echo intval($m['id']); ?>">
+                                <button type="submit" class="btn btn-danger btn-sm" <?php echo intval($m['id']) === intval($admin['id']) ? 'disabled' : ''; ?>>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <?php if ($totalPages > 1): ?>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--line);">
+        <span class="text-muted">الصفحة <?php echo $page; ?> من <?php echo $totalPages; ?></span>
+        <div class="flex" style="gap:6px;flex-wrap:wrap;">
+            <?php for ($pg = max(1, $page - 2); $pg <= min($totalPages, $page + 2); $pg++): ?>
+            <a href="?p=<?php echo $pg; ?>&q=<?php echo urlencode($search); ?>&status=<?php echo urlencode($status); ?>"
+               class="btn btn-sm <?php echo $pg === $page ? 'btn-primary' : 'btn-ghost'; ?>"
+               style="min-width:36px;justify-content:center;">
+                <?php echo $pg; ?>
+            </a>
+            <?php endfor; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php endif; ?>
+</div>
+
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="font-size:1rem;font-weight:800;">تعديل بيانات المدير</h3>
+            <button type="button" onclick="closeEditModal()" style="background:none;border:none;color:var(--muted);font-size:1.15rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <form method="post" action="" style="padding:20px 22px;">
+            <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="id" id="editId" value="">
+
+            <div class="form-group">
+                <label class="form-label">الاسم *</label>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> إنشاء الحساب</button>
             </form>
@@ -422,11 +557,11 @@ require_once __DIR__ . '/includes/layout_head.php';
                 <input class="form-ctrl" name="name" id="editName" maxlength="100" required>
             </div>
             <div class="form-group">
-                <label class="form-label">البريد الإلكتروني *</label>
+                <label class="form-label" for="editEmail">البريد الإلكتروني *</label>
                 <input class="form-ctrl" name="email" id="editEmail" type="email" maxlength="150" required>
             </div>
             <div class="form-group">
-                <label class="form-label">كلمة مرور جديدة (اختياري)</label>
+                <label class="form-label" for="editPassword">كلمة مرور جديدة (اختياري)</label>
                 <input class="form-ctrl" name="new_password" id="editPassword" type="password" maxlength="255" autocomplete="new-password">
                 <p class="form-hint">اتركه فارغاً إذا لا تريد تغيير كلمة المرور.</p>
             </div>

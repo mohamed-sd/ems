@@ -67,24 +67,67 @@ $FIELDS = array (
   14 => 'المرفق',
 );
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
-    }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
-    $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
-    exit();
+/* ══ INJ-0003 (P0) — «لكلِّ بيانٍ موضعٌ واحدٌ يُنشأ فيه ويُعدَّل» ═══════════
+   كانت هذه الشاشةُ تكتب وتقرأ من المخزنِ البينيِّ `scr_fin_models`، بينما
+   **جدولُ المجال** `financing_models` هو الذي يقرؤه منشئُ العملية
+   (`financing_operation_new.php:62`) ويتحقق منه `FinancingService::createOperation`
+   ويرفض 422 إن لم يجد النموذج ⇒ **نموذجٌ يُضاف من شاشتِه لا يوجد حين يُنشأ به
+   عملية**. الآن: مخزنٌ واحدٌ هو جدولُ المجال، والقيمُ محكومةٌ بقوائمِ ENUM
+   (والخارجُ عنها يُرفض برسالةٍ — فـENUM يبتلع الغريبَ صامتًا). */
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Financing/FinancingModelService.php';
+
+// CS-01 — الحارسُ فوقَ المعالج.
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
+
+$fm_svc = new \App\Services\Financing\FinancingModelService($conn);
+$fm_msg = '';
+
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'fin.model.upsert',
+    'perm'    => 'can_add',
+    'trigger' => 'model_code',
+    'idem'    => array('code' => trim((string) ($_POST['model_code'] ?? ''))),
+    'validate' => function (array $in) {
+        if (trim((string) ($in['model_code'] ?? '')) === '') {
+            return array('ok' => false, 'msg' => 'رمزُ النموذجِ إلزامي (422)');
+        }
+        return array('ok' => true, 'data' => $in);
+    },
+));
+if (!$__pc['ok'] && $__pc['msg'] !== '') { $fm_msg = $__pc['msg']; }
+if ($__pc['replay'])                     { $fm_msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    $res = $fm_svc->upsert($__pc['data'], $uid);
+    $fm_msg = $res['msg'];
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'financing_models:' . $res['code']); }
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
-// الموجة ٢: القراءة من الجدول الأصلي — الشكل القديم نفسه (id·payload·status·…)
-$rows = cmp03_store_rows($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+/* ── القراءة: من **جدولِ المجالِ** لا من المخزنِ البينيِّ ─────────────────
+   وتُعاد بشكلِ الشاشةِ القديم (id·payload·status) فلا تُعاد كتابةُ الجدول. */
+$fm_models = $fm_svc->all(false);
+$rows = array();
+foreach ($fm_models as $i => $m) {
+    $rows[] = array(
+        'id' => $i + 1,
+        'payload' => array(
+            'رمز النموذج'        => $m['model_code'],
+            'اسم النموذج'        => $m['name_ar'],
+            'المالك القانوني'    => \App\Services\Financing\FinancingModelService::LEGAL_OWNER[$m['legal_owner_effect']] ?? $m['legal_owner_effect'],
+            'المنتفع الاقتصادي'  => \App\Services\Financing\FinancingModelService::BENEFICIARY[$m['economic_beneficiary']] ?? $m['economic_beneficiary'],
+            'الاعتراف المحاسبي'  => \App\Services\Financing\FinancingModelService::RECOGNITION[$m['accounting_recognition']] ?? $m['accounting_recognition'],
+            'حامل الإهلاك'       => $m['depreciation_bearer'],
+            'مرتهن الضمان'       => $m['security_interest_holder'] ?: '—',
+            'المرجع المحاسبي'    => $m['policy_doc_ref'],
+            'اعتمده المراجع'     => $m['approved_by'] ? ('#' . $m['approved_by']) : '—',
+            'تاريخ الاعتماد'     => $m['approved_at'] ?: '—',
+        ),
+        'status'          => ((int) $m['active'] === 1 ? 'نافذ' : 'معطَّل'),
+        'created_by_name' => $m['approved_by'] ? ('#' . $m['approved_by']) : '—',
+        'created_at'      => $m['approved_at'] ?: '',
+        'is_seed'         => 0,
+    );
+}
 
 $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';
@@ -134,43 +177,57 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     ?>
 
-    <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
+    <?php if ($fm_msg !== ''): ?>
+      <div class="alert <?= (mb_strpos($fm_msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
+        <?= htmlspecialchars($fm_msg, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
+
+    <!-- INJ-0003: الحقولُ صارت أسماءَ أعمدةِ **جدولِ المجال**، والمحكومةُ منها
+         قوائمَ مغلقةً — فـENUM يبتلع القيمةَ الغريبةَ صامتًا، والنصُّ الحرُّ كان
+         يُكتب في مخزنٍ بينيٍّ لا يقرؤه أحد. -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
-        <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — نماذج التمويل ومعالجتها</h5>
+            <h5><i class="fa fa-plus"></i> إضافة/تحديث — نماذج التمويل ومعالجتها</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رمز النموذج</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>اسم النموذج</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>المالك القانوني</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>المنتفع الاقتصادي</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الاعتراف المحاسبي</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>حامل الإهلاك</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>مرتهن الضمان</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>معالجة الالتزام</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>معالجة العائد</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>المرجع المحاسبي</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>اعتمده المراجع</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f11"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f12"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f14" maxlength="190"></div>
+                <?php $FMS = '\\App\\Services\\Financing\\FinancingModelService'; ?>
+                <div class="form-group"><label for="fm_code">رمز النموذج <small>(لاتينيٌّ صغيرٌ وأرقامٌ و_)</small></label>
+                    <input type="text" name="model_code" required maxlength="32" pattern="[a-z0-9_]{2,32}" id="fm_code"></div>
+                <div class="form-group"><label for="fm_name">اسم النموذج</label>
+                    <input type="text" name="name_ar" required maxlength="120" id="fm_name"></div>
+                <div class="form-group"><label for="fm_owner">أثرُ الملكية القانونية</label>
+                    <select name="legal_owner_effect" required id="fm_owner">
+                        <option value="">— اختر —</option>
+                        <?php foreach ($FMS::LEGAL_OWNER as $k => $v): ?>
+                          <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select></div>
+                <div class="form-group"><label for="fm_benef">المنتفع الاقتصادي</label>
+                    <select name="economic_beneficiary" required id="fm_benef">
+                        <option value="">— اختر —</option>
+                        <?php foreach ($FMS::BENEFICIARY as $k => $v): ?>
+                          <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select></div>
+                <div class="form-group"><label for="fm_recog">الاعتراف المحاسبي</label>
+                    <select name="accounting_recognition" required id="fm_recog">
+                        <option value="">— اختر —</option>
+                        <?php foreach ($FMS::RECOGNITION as $k => $v): ?>
+                          <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option>
+                        <?php endforeach; ?>
+                    </select></div>
+                <div class="form-group"><label for="fm_bearer">حامل الإهلاك</label>
+                    <input type="text" name="depreciation_bearer" required maxlength="60" id="fm_bearer"></div>
+                <div class="form-group"><label for="fm_holder">مرتهن الضمان <small>(اختياري)</small></label>
+                    <input type="text" name="security_interest_holder" maxlength="60" id="fm_holder"></div>
+                <div class="form-group"><label for="fm_policy">المرجع المحاسبي — سندُ السياسة</label>
+                    <input type="text" name="policy_doc_ref" required maxlength="160" id="fm_policy"></div>
+                <div class="form-group"><label for="fm_active">الحالة</label>
+                    <select name="active" id="fm_active">
+                        <option value="1">نافذ</option>
+                        <option value="0">معطَّل</option>
+                    </select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

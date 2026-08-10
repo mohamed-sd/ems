@@ -133,11 +133,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم الصنف <span class="required">*</span></label>
+                        <label for="p_name">اسم الصنف <span class="required">*</span></label>
                         <input type="text" name="name" id="p_name" required>
                     </div>
                     <div class="form-group">
-                        <label>الفئة</label>
+                        <label for="p_category">الفئة</label>
                         <select name="category" id="p_category">
                             <option value="">— اختر —</option>
                             <?php foreach ($categories as $c): ?>
@@ -146,7 +146,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>طبيعة المادة <span class="required">*</span></label>
+                        <label for="p_nature">طبيعة المادة <span class="required">*</span></label>
                         <select name="material_nature" id="p_nature" required>
                             <?php foreach ($natures as $n): ?>
                                 <option value="<?php echo htmlspecialchars($n); ?>"><?php echo htmlspecialchars($n); ?></option>
@@ -154,7 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>وحدة القياس</label>
+                        <label for="p_uom">وحدة القياس</label>
                         <select name="uom" id="p_uom">
                             <?php foreach ($uoms as $u): ?>
                                 <option value="<?php echo htmlspecialchars($u); ?>"><?php echo htmlspecialchars($u); ?></option>
@@ -162,33 +162,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الحد الأدنى (Min)</label>
+                        <label for="p_min">الحد الأدنى (Min)</label>
                         <input type="number" step="0.01" name="min_qty" id="p_min" value="0">
                     </div>
                     <div class="form-group">
-                        <label>الحد الأقصى (Max)</label>
+                        <label for="p_max">الحد الأقصى (Max)</label>
                         <input type="number" step="0.01" name="max_qty" id="p_max" value="0">
                     </div>
                     <div class="form-group">
-                        <label>مخزون الأمان</label>
+                        <label for="p_safety">مخزون الأمان</label>
                         <input type="number" step="0.01" name="safety_stock" id="p_safety" value="0">
                     </div>
                     <div class="form-group">
-                        <label>مدة التوريد (أيام)</label>
+                        <label for="p_lead">مدة التوريد (أيام)</label>
                         <input type="number" name="lead_time_days" id="p_lead" value="0">
                     </div>
                     <div class="form-group">
-                        <label>المعدة المخدومة</label>
+                        <label for="p_equip">المعدة المخدومة</label>
                         <select name="served_equipment_id" id="p_equip">
                             <?php echo proc_equipment_options($conn, $is_super_admin, $company_id, 0); ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>العائلة المخدومة</label>
+                        <label for="p_served_cat">العائلة المخدومة</label>
                         <input type="text" name="served_category" id="p_served_cat">
                     </div>
                     <div class="form-group">
-                        <label>قطعة حرجة؟</label>
+                        <label for="p_notes">قطعة حرجة؟</label>
+                        <label class="switch-inline"><input type="checkbox" name="is_critical" id="p_critical" value="1"> نعم، قطعة حرجة</label>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label>ملاحظات</label>
                         <label class="switch-inline"><input type="checkbox" name="is_critical" id="p_critical" value="1"> نعم، قطعة حرجة</label>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
@@ -212,19 +216,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-layer-group"></i> الفئة</label>
+                <label for="filterCategory"><i class="fa fa-layer-group"></i> الفئة</label>
                 <select id="filterCategory" class="form-control">
                     <option value="">-- كل الفئات --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-box"></i> طبيعة المادة</label>
+                <label for="filterNature"><i class="fa fa-box"></i> طبيعة المادة</label>
                 <select id="filterNature" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-triangle-exclamation"></i> قطعة حرجة</label>
+                <label for="filterCritical"><i class="fa fa-triangle-exclamation"></i> قطعة حرجة</label>
                 <select id="filterCritical" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

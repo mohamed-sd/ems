@@ -212,8 +212,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <div class="card"><div class="card-header"><h5><i class="fa fa-handshake"></i> عقدُ مورد جديد (يُنشأ مسودةً)</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label>المورد <span style="color:#c00">*</span></label>
-                <select name="supplier_id" required>
+                <label for="emsf_1437_0825d">المورد <span style="color:#c00">*</span></label>
+                <select name="supplier_id" required id="emsf_1437_0825d">
                     <option value="">— اختر المورد —</option>
                     <?php foreach ($suppliers_options as $s): ?>
                         <option value="<?php echo intval($s['id']); ?>"><?php echo htmlspecialchars($s['name']); ?></option>
@@ -221,8 +221,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </select>
             </div>
             <div class="form-group">
-                <label>عقد العميل (L1) <small>— الحصةُ تُقتطع منه</small></label>
-                <select name="client_contract_id">
+                <label for="emsf_1438_c7d1e">عقد العميل (L1) <small>— الحصةُ تُقتطع منه</small></label>
+                <select name="client_contract_id" id="emsf_1438_c7d1e">
                     <option value="">— بلا —</option>
                     <?php foreach ($client_contracts as $c): ?>
                         <option value="<?php echo intval($c['id']); ?>">
@@ -232,19 +232,19 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>تاريخ البدء <span style="color:#c00">*</span></label>
-                <input type="date" name="start_date" required></div>
-            <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" name="end_date"></div>
+            <div class="form-group"><label for="emsf_1439_c99c8">تاريخ البدء <span style="color:#c00">*</span></label>
+                <input type="date" name="start_date" required id="emsf_1439_c99c8"></div>
+            <div class="form-group"><label for="emsf_1440_a35df">تاريخ الانتهاء</label><input type="date" name="end_date" id="emsf_1440_a35df"></div>
             <div class="form-group">
-                <label>العملة</label>
-                <select name="currency">
+                <label for="emsf_1441_ff415">العملة</label>
+                <select name="currency" id="emsf_1441_ff415">
                     <option value="">— بلا —</option>
                     <?php foreach (SCS::CURRENCIES as $cur): ?>
                         <option value="<?php echo $cur; ?>"><?php echo $cur; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>ملاحظات</label><input type="text" name="notes" maxlength="255"></div>
+            <div class="form-group"><label for="emsf_1442_2a0d8">ملاحظات</label><input type="text" name="notes" maxlength="255" id="emsf_1442_2a0d8"></div>
         </div>
         <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button></div>
         </div></div>
@@ -364,7 +364,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> بندٌ جديد / تعديل</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div class="form-group">
-                    <label>نموذج التشغيل <span style="color:#c00">*</span></label>
+                    <label for="f_model">نموذج التشغيل <span style="color:#c00">*</span></label>
                     <select name="work_model" id="f_model" required>
                         <?php foreach ($MODEL_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?> (<?php echo $k; ?>)</option>
@@ -372,13 +372,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>الوحدة <span style="color:#c00">*</span> <small>— كما يقرؤها محرّكُ الفوترة</small></label>
+                    <label for="f_unit">الوحدة <span style="color:#c00">*</span> <small>— كما يقرؤها محرّكُ الفوترة</small></label>
                     <select name="unit" id="f_unit" required></select>
                 </div>
-                <div class="form-group"><label>سعر الوحدة <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="f_price">سعر الوحدة <span style="color:#c00">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="unit_price" id="f_price" required></div>
                 <div class="form-group">
-                    <label>العملة</label>
+                    <label for="f_currency">العملة</label>
                     <select name="currency" id="f_currency">
                         <option value="">— من الرأس —</option>
                         <?php foreach (SCS::CURRENCIES as $cur): ?>
@@ -387,7 +387,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>أساس الاستعداد</label>
+                    <label for="f_basis">أساس الاستعداد</label>
                     <select name="standby_basis" id="f_basis">
                         <?php foreach ($BASIS_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -395,16 +395,16 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>معدل الاستعداد <small>— إلزاميٌّ متى أُعلن أساس</small></label>
+                    <label for="f_rate">معدل الاستعداد <small>— إلزاميٌّ متى أُعلن أساس</small></label>
                     <input type="number" step="0.0001" min="0" name="standby_rate" id="f_rate">
                 </div>
-                <div class="form-group"><label>سريان من</label><input type="date" name="valid_from" id="f_from"></div>
-                <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
+                <div class="form-group"><label for="f_from">سريان من</label><input type="date" name="valid_from" id="f_from"></div>
+                <div class="form-group"><label for="f_to">سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
                 <div class="form-group" style="grid-column:1/-1;border-top:1px dashed #bbb;padding-top:10px">
                     <strong><i class="fa fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (CAP-01 §8.2)</strong>
                 </div>
                 <div class="form-group">
-                    <label>التزام نوع المعدة في عقد العميل <small>— لا حصةَ بلا التزام</small></label>
+                    <label for="f_obl">التزام نوع المعدة في عقد العميل <small>— لا حصةَ بلا التزام</small></label>
                     <select name="contract_obligation_ref" id="f_obl">
                         <option value="">— غير مرتبط —</option>
                         <?php foreach ($obligation_options as $ob): ?>
@@ -416,19 +416,19 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label>رمز نوع المعدة</label>
+                <div class="form-group"><label for="f_etype">رمز نوع المعدة</label>
                     <input type="text" name="equipment_type_code" id="f_etype" pattern="[A-Za-z0-9_\-]+" placeholder="EXCAVATOR"></div>
-                <div class="form-group"><label>الأساسية الملتزَم بها</label>
+                <div class="form-group"><label for="f_pcommit">الأساسية الملتزَم بها</label>
                     <input type="number" step="1" min="0" name="primary_units_committed" id="f_pcommit"></div>
-                <div class="form-group"><label>الاحتياطي المطلوب منه</label>
+                <div class="form-group"><label for="f_sbreq">الاحتياطي المطلوب منه</label>
                     <input type="number" step="1" min="0" name="standby_units_required" id="f_sbreq"></div>
-                <div class="form-group"><label>سقفه الأقصى للاحتياطي</label>
+                <div class="form-group"><label for="f_sbalw">سقفه الأقصى للاحتياطي</label>
                     <input type="number" step="1" min="0" name="standby_units_allowed" id="f_sbalw"></div>
-                <div class="form-group"><label>مهلة الإحلال (ساعات)</label>
+                <div class="form-group"><label for="f_sla">مهلة الإحلال (ساعات)</label>
                     <input type="number" step="0.5" min="0" name="replacement_sla_hours" id="f_sla"></div>
-                <div class="form-group"><label>شروط تفعيل احتياطيّه</label>
+                <div class="form-group"><label for="f_sbact">شروط تفعيل احتياطيّه</label>
                     <input type="text" name="standby_activation_terms" id="f_sbact" maxlength="255"></div>
-                <div class="form-group"><label>مقابل احتياطيّه <small>— فارغٌ = لم يُنَصَّ ولا يُفترض</small></label>
+                <div class="form-group"><label for="f_sbpay">مقابل احتياطيّه <small>— فارغٌ = لم يُنَصَّ ولا يُفترض</small></label>
                     <input type="text" name="standby_payment_terms" id="f_sbpay" maxlength="255"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ البند</button></div>

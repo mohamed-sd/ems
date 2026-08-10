@@ -199,7 +199,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <div class="col-md-4"><label>النطاق<select name="scope_type" class="form-control">
                     <option>إداري</option><option>مؤسسي</option><option>مشروعي</option><option>موقعي</option>
                 </select></label></div>
-                <div class="col-md-4"><label>الإدارة المالكة (وحدة الهيكل)<input name="owner_unit_id" type="number" class="form-control" placeholder="unit_id"></label></div>
+                <div class="col-md-4"><label>الإدارة المالكة (وحدة الهيكل)<input name="owner_unit_id" type="number" class="form-control" placeholder="unit_id" aria-label="unit_id"></label></div>
                 <div class="col-md-4"><label>السبب الجذري *<input name="root_cause" class="form-control" required></label></div>
                 <div class="col-md-12"><label>الوصف<textarea name="description" class="form-control"></textarea></label></div>
             </div>

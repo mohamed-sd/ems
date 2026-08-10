@@ -11,36 +11,50 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Transport/TransferDeliveryService.php';
+
+// CS-01 · RF-02 — الحارسُ فوقَ المعالج (كان ‎UPDATE‎ في السطرِ 25 و‎insidebar‎ في 55).
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['close_id'])) {
-    $oid  = intval($_POST['close_id']);
-    $cost = floatval($_POST['actual_cost'] ?? 0);
-    if ($cost <= 0) {
-        $msg = 'التكلفةُ الفعليةُ إلزاميةٌ للإقفال — ولا إقفالَ بتكلفةٍ صفر (422)';
-    } else {
-        $st = mysqli_prepare($conn, "UPDATE transfer_orders SET stage='closed', actual_cost_usd=?
-                                     WHERE id=? AND company_id=? AND stage='arrived'");
-        mysqli_stmt_bind_param($st, 'dii', $cost, $oid, $company_id);
-        mysqli_stmt_execute($st);
-        if (mysqli_stmt_affected_rows($st) > 0) {
-            mysqli_query($conn, "INSERT INTO transfer_events (company_id, order_id, event_type, body, actor_user_id)
-                                 VALUES ($company_id, $oid, 'closed', 'أُقفل بتكلفةٍ فعلية $cost\$', $uid)");
-            // سطرُ التكلفة المحمَّل — transfer_cost_lines هو دفترُ التحميل
-            mysqli_query($conn, "INSERT INTO transfer_cost_lines (company_id, order_id, cost_type, amount_usd, currency, cost_bearer, analytic_cost_center)
-                                 VALUES ($company_id, $oid, 'actual_total', $cost, 'USD', 'project', 'PRJ')");
-            $msg = "أُقفل الأمرُ #$oid بتكلفة $cost\$ محمَّلةً على مشروعه";
-        } else { $msg = 'لم يُقفل — الأمرُ ليس واصلًا (409)'; }
-    }
+/* ══ FN-08 خطوة ④ — «ولا إقفالَ بتكلفةٍ قبلَ تخزينِ مستندِ التسليم» ═══════
+   الحارسُ الترتيبيُّ داخلَ الخدمة: تُحمَّل تكلفةٌ على مشروعٍ **بسندٍ يُثبت
+   وصولَ البضاعةِ** لا بادعاءِ مرحلة. */
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'trs.transfer.close_with_cost',
+    'perm'    => 'can_edit',
+    'trigger' => 'close_id',
+    'idem'    => array(
+        'order' => intval($_POST['close_id'] ?? 0),
+        'cost'  => (string) floatval($_POST['actual_cost'] ?? 0),
+    ),
+    'validate' => function (array $in) {
+        $oid  = intval($in['close_id'] ?? 0);
+        $cost = floatval($in['actual_cost'] ?? 0);
+        if ($oid <= 0)  { return array('ok' => false, 'msg' => 'أمرٌ غيرُ صالح (422)'); }
+        if ($cost <= 0) { return array('ok' => false, 'msg' => 'التكلفةُ الفعليةُ إلزاميةٌ للإقفال — ولا إقفالَ بتكلفةٍ صفر (422)'); }
+        return array('ok' => true, 'data' => array('oid' => $oid, 'cost' => $cost));
+    },
+));
+if (!$__pc['ok'] && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
+if ($__pc['replay'])                     { $msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    $svc = new \App\Services\Transport\TransferDeliveryService($conn);
+    $res = $svc->closeWithCost($company_id, (int) $__pc['data']['oid'], (float) $__pc['data']['cost'], $uid);
+    $msg = $res['msg'];
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'transfer_orders#' . (int) $__pc['data']['oid']); }
 }
 
 $rows = array();
 $r = mysqli_query($conn,
     "SELECT o.id, o.order_no, o.estimated_cost_usd, o.actual_cost_usd, o.project_id,
-            p.name AS project_name, o.arrival_datetime
+            p.name AS project_name, o.arrival_datetime,
+            (SELECT d.doc_ref FROM transfer_delivery_docs d
+              WHERE d.company_id = o.company_id AND d.order_id = o.id ORDER BY d.id DESC LIMIT 1) AS doc_ref
      FROM transfer_orders o
      LEFT JOIN project p ON p.id = o.project_id
      WHERE o.company_id = $company_id AND o.is_deleted = 0 AND o.stage = 'arrived'
@@ -102,12 +116,23 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($o['project_name'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= number_format(floatval($o['estimated_cost_usd']), 2) ?></td>
         <td>
+          <?php $rid = intval($o['id']); if (!$o['doc_ref']): ?>
+            <!-- FIXC-0048: لا نموذجَ إقفالٍ أصلًا قبلَ تخزينِ مستندِ التسليم —
+                 والحارسُ في الخدمةِ يرفضه ولو أُرسل يدويًّا (لا اتكالَ على العرض). -->
+            <span class="text-muted">لا مستندَ تسليمٍ مخزَّن —
+              <a href="transfer_arrival.php">وثّقِ التسليمَ أولًا</a></span>
+        </td>
+        <td>—</td>
+          <?php else: ?>
           <form method="post" style="display:flex;gap:6px">
-            <input type="hidden" name="close_id" value="<?= intval($o['id']) ?>">
-            <input type="number" step="0.01" name="actual_cost" class="form-control form-control-sm"
+            <input type="hidden" name="close_id" value="<?= $rid ?>">
+            <label class="visually-hidden" for="cls_cost_<?= $rid ?>">التكلفةُ الفعلية</label>
+            <input id="cls_cost_<?= $rid ?>" type="number" step="0.01" min="0.01" name="actual_cost" class="form-control form-control-sm"
                    value="<?= htmlspecialchars($o['actual_cost_usd'] ?: $o['estimated_cost_usd'], ENT_QUOTES, 'UTF-8') ?>" style="max-width:130px" required>
+            <small class="text-muted">سند: <?= htmlspecialchars($o['doc_ref'], ENT_QUOTES, 'UTF-8') ?></small>
         </td>
         <td><button class="action-btn" type="submit"><i class="fa fa-lock"></i> أقفل وحمّل</button></form></td>
+          <?php endif; ?>
       </tr>
     <?php endforeach; ?>
     </tbody>

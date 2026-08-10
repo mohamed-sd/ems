@@ -143,40 +143,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — نماذج العمل ووحدات القياس</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>كود النموذج</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>اسم النموذج</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>وحدة العمل</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>وحدة القياس</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>طريقة القياس الميدانية</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>المستند المُثبت</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>أساس التسعير</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>أنواع المعدات المنطبقة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>وحدة عدّاد المعدة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>وحدة حاوية المورد</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>وحدة تعاقد المورد</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>أساس استحقاق المورد</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>أساس أجر المشغّل</label>
-                    <input type="text" inputmode="decimal" name="f12" placeholder="0"></div>
-                <div class="form-group"><label>دورة الإقفال</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ السريان</label>
-                    <input type="date" name="f15"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f16"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1053_e90c7">كود النموذج</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1053_e90c7"></div>
+                <div class="form-group"><label for="emsf_1054_e4797">اسم النموذج</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1054_e4797"></div>
+                <div class="form-group"><label for="emsf_1055_8f56c">وحدة العمل</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1055_8f56c"></div>
+                <div class="form-group"><label for="emsf_1056_00d6a">وحدة القياس</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1056_00d6a"></div>
+                <div class="form-group"><label for="emsf_1057_a3b4a">طريقة القياس الميدانية</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1057_a3b4a"></div>
+                <div class="form-group"><label for="emsf_1058_2050e">المستند المُثبت</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1058_2050e"></div>
+                <div class="form-group"><label for="emsf_1059_e21e0">أساس التسعير</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1059_e21e0"></div>
+                <div class="form-group"><label for="emsf_1060_34ae0">أنواع المعدات المنطبقة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1060_34ae0"></div>
+                <div class="form-group"><label for="emsf_1061_58c3d">وحدة عدّاد المعدة</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1061_58c3d"></div>
+                <div class="form-group"><label for="emsf_1062_517ee">وحدة حاوية المورد</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1062_517ee"></div>
+                <div class="form-group"><label for="emsf_1063_9fd14">وحدة تعاقد المورد</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1063_9fd14"></div>
+                <div class="form-group"><label for="emsf_1064_b859c">أساس استحقاق المورد</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1064_b859c"></div>
+                <div class="form-group"><label for="emsf_1065_a958c">أساس أجر المشغّل</label>
+                    <input type="text" inputmode="decimal" name="f12" placeholder="0" id="emsf_1065_a958c"></div>
+                <div class="form-group"><label for="emsf_1066_7ed1d">دورة الإقفال</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1066_7ed1d"></div>
+                <div class="form-group"><label for="emsf_1067_24252">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1067_24252"></div>
+                <div class="form-group"><label for="emsf_1068_8dbd1">تاريخ السريان</label>
+                    <input type="date" name="f15" id="emsf_1068_8dbd1"></div>
+                <div class="form-group"><label for="emsf_1069_803e6">الحالة</label>
+                    <select name="f16" id="emsf_1069_803e6"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

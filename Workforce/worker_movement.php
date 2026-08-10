@@ -120,32 +120,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fas fa-plus"></i> أمر تحرّك / نقل</h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
             <!-- صف 1: الأساسيات -->
-            <div class="field"><label>الموظف</label><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>نوع الحركة</label><select name="direction"><?php foreach($DIRECTIONS as $d): ?><option value="<?= $d ?>"><?= $d ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>الحالة</label><select name="state"><?php foreach($STATES as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>وسيلة النقل</label><select name="transport_mode"><option value="">—</option><option>بري</option><option>جوي</option><option>ترتيب مورد</option></select></div>
+            <div class="field"><label for="emsf_1867_78531">الموظف</label><select name="worker_id" required id="emsf_1867_78531"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1868_ccba3">نوع الحركة</label><select name="direction" id="emsf_1868_ccba3"><?php foreach($DIRECTIONS as $d): ?><option value="<?= $d ?>"><?= $d ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1869_c383d">الحالة</label><select name="state" id="emsf_1869_c383d"><?php foreach($STATES as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1870_b8be8">وسيلة النقل</label><select name="transport_mode" id="emsf_1870_b8be8"><option value="">—</option><option>بري</option><option>جوي</option><option>ترتيب مورد</option></select></div>
 
             <!-- صف 2: الموقع (الانطلاق والوجهة) -->
-            <div class="field"><label>الانطلاق — الولاية</label><input type="text" name="origin_state" placeholder="الولاية"></div>
-            <div class="field"><label>الانطلاق — المدينة</label><input type="text" name="origin_city" placeholder="المدينة"></div>
-            <div class="field"><label>الوجهة — الولاية</label><input type="text" name="destination_state" placeholder="الولاية"></div>
-            <div class="field"><label>الوجهة — المدينة</label><input type="text" name="destination_city" placeholder="المدينة"></div>
+            <div class="field"><label for="emsf_1871_98511">الانطلاق — الولاية</label><input type="text" name="origin_state" placeholder="الولاية" id="emsf_1871_98511"></div>
+            <div class="field"><label for="emsf_1872_3107a">الانطلاق — المدينة</label><input type="text" name="origin_city" placeholder="المدينة" id="emsf_1872_3107a"></div>
+            <div class="field"><label for="emsf_1873_4f06c">الوجهة — الولاية</label><input type="text" name="destination_state" placeholder="الولاية" id="emsf_1873_4f06c"></div>
+            <div class="field"><label for="emsf_1874_9993a">الوجهة — المدينة</label><input type="text" name="destination_city" placeholder="المدينة" id="emsf_1874_9993a"></div>
 
             <!-- صف 3: الوجهة (المشروع) واللوجستيات -->
-            <div class="field"><label>الوجهة — المشروع</label><select name="destination_project_id"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>"><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>السكن</label><select name="housing_unit_id"><option value="">—</option><?php foreach($housing as $hid=>$hn): ?><option value="<?= intval($hid) ?>"><?= htmlspecialchars($hn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>منطقة العمل</label><input type="text" name="site_zone"></div>
-            <div class="field"><label>نوع النقل (للنقل)</label><select name="transfer_type"><option value="">—</option><option>مؤقت</option><option>دائم</option><option>إعادة تخصيص</option></select></div>
+            <div class="field"><label for="emsf_1875_d9fcf">الوجهة — المشروع</label><select name="destination_project_id" id="emsf_1875_d9fcf"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>"><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1876_47dab">السكن</label><select name="housing_unit_id" id="emsf_1876_47dab"><option value="">—</option><?php foreach($housing as $hid=>$hn): ?><option value="<?= intval($hid) ?>"><?= htmlspecialchars($hn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1877_1e552">منطقة العمل</label><input type="text" name="site_zone" id="emsf_1877_1e552"></div>
+            <div class="field"><label for="emsf_1878_fc238">نوع النقل (للنقل)</label><select name="transfer_type" id="emsf_1878_fc238"><option value="">—</option><option>مؤقت</option><option>دائم</option><option>إعادة تخصيص</option></select></div>
 
             <!-- صف 4: التواريخ وزمن الرحلة -->
-            <div class="field"><label>تاريخ التحرك</label><input type="date" name="departure_date" id="dep_date" onchange="emsCalcTrip()"></div>
-            <div class="field"><label>الوصول المتوقع</label><input type="date" name="expected_arrival"></div>
-            <div class="field"><label>الوصول الفعلي</label><input type="date" name="actual_arrival" id="act_date" onchange="emsCalcTrip()"></div>
-            <div class="field"><label>زمن الرحلة (محسوب)</label><input type="text" id="trip_days" readonly placeholder="يُحسب من التحرك → الوصول الفعلي"></div>
+            <div class="field"><label for="dep_date">تاريخ التحرك</label><input type="date" name="departure_date" id="dep_date" onchange="emsCalcTrip()"></div>
+            <div class="field"><label for="emsf_1879_9054c">الوصول المتوقع</label><input type="date" name="expected_arrival" id="emsf_1879_9054c"></div>
+            <div class="field"><label for="act_date">الوصول الفعلي</label><input type="date" name="actual_arrival" id="act_date" onchange="emsCalcTrip()"></div>
+            <div class="field"><label for="trip_days">زمن الرحلة (محسوب)</label><input type="text" id="trip_days" readonly placeholder="يُحسب من التحرك → الوصول الفعلي"></div>
 
             <!-- صف 5: الجاهزية والاستلام -->
-            <div class="field"><label>تاريخ الجاهزية</label><input type="date" name="ready_date"></div>
-            <div class="field"><label>المستلِم (موظف #)</label><input type="number" name="received_by"></div>
+            <div class="field"><label for="emsf_1880_54aa5">تاريخ الجاهزية</label><input type="date" name="ready_date" id="emsf_1880_54aa5"></div>
+            <div class="field"><label for="emsf_1881_6cf45">المستلِم (موظف #)</label><input type="number" name="received_by" id="emsf_1881_6cf45"></div>
             <div class="field" style="grid-column:span 2;display:flex;align-items:center;gap:8px;"><input type="checkbox" name="safety_kit_received" id="skr" value="1"><label for="skr" style="margin:0;">استلام معدات السلامة</label></div>
 
             <!-- صف 6: الملاحظات (عرض كامل) -->

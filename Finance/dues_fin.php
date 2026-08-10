@@ -156,19 +156,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="dueForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-hand-holding-dollar"></i> إضافة مستحق (مورد/موظف)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>نوع الطرف <span class="required">*</span></label>
+            <div class="form-group"><label for="d_ptype">نوع الطرف <span class="required">*</span></label>
                 <select name="party_type" id="d_ptype"><option value="supplier">مورد</option><option value="employee">موظف</option></select></div>
-            <div class="form-group" id="d_supwrap"><label>المورد</label>
+            <div class="form-group" id="d_supwrap"><label for="d_sup">المورد</label>
                 <select name="supplier_ref" id="d_sup"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group" id="d_empwrap" style="display:none"><label>الموظف</label>
+            <div class="form-group" id="d_empwrap" style="display:none"><label for="d_emp">الموظف</label>
                 <select name="employee_ref" id="d_emp"><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>نوع المستحق <span class="required">*</span></label>
-                <select name="due_type"><?php foreach ($due_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>الاتجاه</label>
+            <div class="form-group"><label for="emsf_374_337c4">نوع المستحق <span class="required">*</span></label>
+                <select name="due_type" id="emsf_374_337c4"><?php foreach ($due_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="d_dir">الاتجاه</label>
                 <select name="direction" id="d_dir"><option value="credit">له (دائن)</option><option value="debit">عليه (مدين)</option></select></div>
             <?php /* M-11: مصدرُ الخصم — يظهر مع «عليه» وحدَه، فالاستحقاقُ مصدرُه حدثُ المروحة */ ?>
             <div class="form-group" id="d_srcwrap" style="display:none">
-                <label>مستندُ الخصم <span class="required">*</span>
+                <label for="d_srctype">مستندُ الخصم <span class="required">*</span>
                     <span class="mnt-req-hint">(كلُّ خصمٍ ينقر إلى أصله)</span></label>
                 <select name="source_doc_type" id="d_srctype">
                     <option value="">— اختر نوعَ المستند —</option>
@@ -184,10 +184,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     فتُعلَن الفجوةُ ولا تُخبَّأ. وما له مستندٌ مبنيٌّ يُرفض بدونه.
                 </small></div>
             <div class="form-group" id="d_srcidwrap" style="display:none">
-                <label>رقمُ المستند <span class="required">*</span></label>
+                <label for="d_srcid">رقمُ المستند <span class="required">*</span></label>
                 <input type="number" min="1" name="source_doc_id" id="d_srcid"></div>
-            <div class="form-group"><label>المبلغ <span class="required">*</span></label>
-                <input type="number" step="0.01" min="0" name="amount" required></div>
+            <div class="form-group"><label for="emsf_375_f6091">المبلغ <span class="required">*</span></label>
+                <input type="number" step="0.01" min="0" name="amount" required id="emsf_375_f6091"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#dueForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -198,24 +198,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="recvForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-file-invoice"></i> إضافة ذمّة عميل</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>العميل <span class="required">*</span></label>
-                <select name="customer_entity_id" required><?php echo fin_client_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>نوع المستند</label>
-                <select name="doc_type"><option value="invoice">فاتورة</option><option value="statement">مستخلص</option></select></div>
-            <div class="form-group"><label>مرجع المستند</label><input type="text" name="doc_ref"></div>
-            <div class="form-group"><label>المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="r_amount" required></div>
+            <div class="form-group"><label for="emsf_376_24d3e">العميل <span class="required">*</span></label>
+                <select name="customer_entity_id" required id="emsf_376_24d3e"><?php echo fin_client_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_377_71362">نوع المستند</label>
+                <select name="doc_type" id="emsf_377_71362"><option value="invoice">فاتورة</option><option value="statement">مستخلص</option></select></div>
+            <div class="form-group"><label for="emsf_378_43c86">مرجع المستند</label><input type="text" name="doc_ref" id="emsf_378_43c86"></div>
+            <div class="form-group"><label for="emsf_379_b505f">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="r_amount" required id="emsf_379_b505f"></div>
             <?php // P-08: **الذمّةُ بعملتها** — ومبلغٌ بلا عملةٍ لا يُعرف بأيِّ عملةٍ هو
                   require_once __DIR__ . '/../includes/fx.php';
                   $__base = (string) ems_fx_base_currency(); ?>
-            <div class="form-group"><label>العملة</label>
-                <select name="r_currency">
+            <div class="form-group"><label for="emsf_380_1ef44">العملة</label>
+                <select name="r_currency" id="emsf_380_1ef44">
                     <?php foreach (ems_fx_currencies() as $__c => $__row): ?>
                         <option value="<?php echo htmlspecialchars((string)$__c); ?>"
                             <?php echo ((string)$__c === $__base) ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars((string)$__c . ' — ' . $__row['name_ar']); ?></option>
                     <?php endforeach; ?>
                 </select></div>
-            <div class="form-group"><label>تاريخ الاستحقاق</label><input type="date" name="due_date"></div>
+            <div class="form-group"><label for="emsf_381_dc1bc">تاريخ الاستحقاق</label><input type="date" name="due_date" id="emsf_381_dc1bc"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#recvForm').removeClass('allforms-visible')">إلغاء</button></div>

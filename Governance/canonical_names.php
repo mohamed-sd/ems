@@ -156,40 +156,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — سجل الأسماء المعتمدة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم السجل</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>نوع الكيان</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الاسم المعتمد</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>الاسم القانوني الكامل</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>المرادفات المسجَّلة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>عدد المرادفات</label>
-                    <input type="text" inputmode="decimal" name="f5" placeholder="0"></div>
-                <div class="form-group"><label>الاسم في السجل التجاري</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>الرقم الضريبي</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>كود الكيان الموحَّد</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>حالة الفحص</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>تكرار مكتشف</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>قرار الدمج</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>السجلات المحوَّلة</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الدمج</label>
-                    <input type="date" name="f13"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f15"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f16"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_543_0e0ad">رقم السجل</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_543_0e0ad"></div>
+                <div class="form-group"><label for="emsf_544_af64f">نوع الكيان</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_544_af64f"></div>
+                <div class="form-group"><label for="emsf_545_54b64">الاسم المعتمد</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_545_54b64"></div>
+                <div class="form-group"><label for="emsf_546_150b2">الاسم القانوني الكامل</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_546_150b2"></div>
+                <div class="form-group"><label for="emsf_547_22598">المرادفات المسجَّلة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_547_22598"></div>
+                <div class="form-group"><label for="emsf_548_70bdf">عدد المرادفات</label>
+                    <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_548_70bdf"></div>
+                <div class="form-group"><label for="emsf_549_fc4ee">الاسم في السجل التجاري</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_549_fc4ee"></div>
+                <div class="form-group"><label for="emsf_550_23e01">الرقم الضريبي</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_550_23e01"></div>
+                <div class="form-group"><label for="emsf_551_3b0ae">كود الكيان الموحَّد</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_551_3b0ae"></div>
+                <div class="form-group"><label for="emsf_552_54334">حالة الفحص</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_552_54334"></div>
+                <div class="form-group"><label for="emsf_553_3301a">تكرار مكتشف</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_553_3301a"></div>
+                <div class="form-group"><label for="emsf_554_59684">قرار الدمج</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_554_59684"></div>
+                <div class="form-group"><label for="emsf_555_e0d4d">السجلات المحوَّلة</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_555_e0d4d"></div>
+                <div class="form-group"><label for="emsf_556_8e6bb">تاريخ الدمج</label>
+                    <input type="date" name="f13" id="emsf_556_8e6bb"></div>
+                <div class="form-group"><label for="emsf_557_3da1c">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_557_3da1c"></div>
+                <div class="form-group"><label for="emsf_558_051eb">تاريخ الاعتماد</label>
+                    <input type="date" name="f15" id="emsf_558_051eb"></div>
+                <div class="form-group"><label for="emsf_559_e8561">الحالة</label>
+                    <select name="f16" id="emsf_559_e8561"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

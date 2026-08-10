@@ -223,36 +223,36 @@ require_once __DIR__ . '/includes/layout_head.php';
 
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">اسم الخطة *</label>
+                    <label class="form-label" for="fPlanName">اسم الخطة *</label>
                     <input class="form-ctrl" name="plan_name" id="fPlanName" required placeholder="مثال: Professional">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">السعر الشهري ($)</label>
+                    <label class="form-label" for="fPrice">السعر الشهري ($)</label>
                     <input class="form-ctrl" name="price" id="fPrice" type="number" min="0" step="0.01" value="0">
                 </div>
             </div>
             <div class="g3">
                 <div class="form-group">
-                    <label class="form-label">أقصى مستخدمين</label>
+                    <label class="form-label" for="fMaxUsers">أقصى مستخدمين</label>
                     <input class="form-ctrl" name="max_users" id="fMaxUsers" type="number" min="0" value="0">
                     <p class="form-hint">0 = غير محدود</p>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">أقصى مشاريع</label>
+                    <label class="form-label" for="fMaxProj">أقصى مشاريع</label>
                     <input class="form-ctrl" name="max_projects" id="fMaxProj" type="number" min="0" value="0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">أقصى معدات</label>
+                    <label class="form-label" for="fMaxEquip">أقصى معدات</label>
                     <input class="form-ctrl" name="max_equipments" id="fMaxEquip" type="number" min="0" value="0">
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">المزايا (سطر لكل ميزة)</label>
+                <label class="form-label" for="fFeatures">المزايا (سطر لكل ميزة)</label>
                 <textarea class="form-ctrl" name="features" id="fFeatures" rows="4" placeholder="تقارير متقدمة&#10;دعم فني 24/7&#10;تصدير البيانات"></textarea>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">ترتيب العرض</label>
+                    <label class="form-label" for="fSort">ترتيب العرض</label>
                     <input class="form-ctrl" name="sort_order" id="fSort" type="number" min="0" value="0">
                 </div>
                 <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:4px;">

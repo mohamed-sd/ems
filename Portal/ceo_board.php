@@ -15,6 +15,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once '../includes/gov_columns.php';
 
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -185,36 +193,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — لوحة المدير التنفيذي</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الفترة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>العقود النافذة</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>قيمة المحفظة</label>
-                    <input type="text" inputmode="decimal" name="f2" placeholder="0"></div>
-                <div class="form-group"><label>الإيراد المعترف</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>التحصيل</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الذمم المتأخرة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>التدفق المتوقع</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>التزامات التمويل</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>المعدات العاملة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>نسبة الجاهزية</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>الوحدات المعتمدة</label>
-                    <input type="text" inputmode="decimal" name="f10" placeholder="0"></div>
-                <div class="form-group"><label>الهامش</label>
-                    <input type="text" inputmode="decimal" name="f11" placeholder="0"></div>
-                <div class="form-group"><label>المخاطر المفتوحة</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>الاعتمادات المعلَّقة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>آخر تحديث</label>
-                    <input type="text" name="f14" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_1091_a86fb">الفترة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1091_a86fb"></div>
+                <div class="form-group"><label for="emsf_1092_4ec25">العقود النافذة</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1092_4ec25"></div>
+                <div class="form-group"><label for="emsf_1093_3a74f">قيمة المحفظة</label>
+                    <input type="text" inputmode="decimal" name="f2" placeholder="0" id="emsf_1093_3a74f"></div>
+                <div class="form-group"><label for="emsf_1094_432e7">الإيراد المعترف</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1094_432e7"></div>
+                <div class="form-group"><label for="emsf_1095_372bb">التحصيل</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1095_372bb"></div>
+                <div class="form-group"><label for="emsf_1096_0cc85">الذمم المتأخرة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1096_0cc85"></div>
+                <div class="form-group"><label for="emsf_1097_8436d">التدفق المتوقع</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1097_8436d"></div>
+                <div class="form-group"><label for="emsf_1098_256b5">التزامات التمويل</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1098_256b5"></div>
+                <div class="form-group"><label for="emsf_1099_a5db7">المعدات العاملة</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1099_a5db7"></div>
+                <div class="form-group"><label for="emsf_1100_21f38">نسبة الجاهزية</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_1100_21f38"></div>
+                <div class="form-group"><label for="emsf_1101_07779">الوحدات المعتمدة</label>
+                    <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_1101_07779"></div>
+                <div class="form-group"><label for="emsf_1102_d1848">الهامش</label>
+                    <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_1102_d1848"></div>
+                <div class="form-group"><label for="emsf_1103_bff73">المخاطر المفتوحة</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1103_bff73"></div>
+                <div class="form-group"><label for="emsf_1104_48417">الاعتمادات المعلَّقة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1104_48417"></div>
+                <div class="form-group"><label for="emsf_1105_88267">آخر تحديث</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1105_88267"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

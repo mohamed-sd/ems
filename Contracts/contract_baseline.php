@@ -205,22 +205,22 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <form method="post" style="display:flex;gap:6px;align-items:flex-end">
                 <input type="hidden" name="bl_action" value="state">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <div class="form-group"><label>إلى حال</label>
-                    <select name="to">
+                <div class="form-group"><label for="emsf_48_99ab5">إلى حال</label>
+                    <select name="to" id="emsf_48_99ab5">
                         <?php foreach ($STATE_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>ملاحظة/سبب</label>
-                    <input type="text" name="note" maxlength="255" style="width:220px"></div>
+                <div class="form-group"><label for="emsf_49_f9441">ملاحظة/سبب</label>
+                    <input type="text" name="note" maxlength="255" style="width:220px" id="emsf_49_f9441"></div>
                 <button type="submit" class="btn-save"><i class="fa fa-forward"></i> انتقل</button>
             </form>
             <form method="post" style="display:flex;gap:6px;align-items:flex-end">
                 <input type="hidden" name="bl_action" value="amend">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <div class="form-group"><label>سببُ الملحق <span style="color:#c00">*</span></label>
-                    <input type="text" name="note" maxlength="255" required style="width:220px"></div>
-                <div class="form-group"><label>رقمُ الملحق</label>
-                    <input type="number" name="amendment_id" style="width:110px"></div>
+                <div class="form-group"><label for="emsf_50_55026">سببُ الملحق <span style="color:#c00">*</span></label>
+                    <input type="text" name="note" maxlength="255" required style="width:220px" id="emsf_50_55026"></div>
+                <div class="form-group"><label for="emsf_51_164a9">رقمُ الملحق</label>
+                    <input type="number" name="amendment_id" style="width:110px" id="emsf_51_164a9"></div>
                 <button type="submit" class="btn-save"><i class="fa fa-code-branch"></i>
                     ملحقٌ — <strong>نسخةٌ جديدةٌ والقديمةُ تبقى</strong></button>
             </form>

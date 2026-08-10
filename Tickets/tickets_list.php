@@ -150,15 +150,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="filter">
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
         <div class="filter-body">
-            <div class="filter-field"><label><i class="fa fa-flag"></i> المرحلة</label>
+            <div class="filter-field"><label for="fStage"><i class="fa fa-flag"></i> المرحلة</label>
                 <select id="fStage" class="form-control"><option value="">-- الكل --</option>
                     <?php foreach ($stages_map as $k => $v): ?><option value="<?php echo htmlspecialchars($v); ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                 </select></div>
-            <div class="filter-field"><label><i class="fa fa-building"></i> الإدارة المالكة</label>
+            <div class="filter-field"><label for="fOwner"><i class="fa fa-building"></i> الإدارة المالكة</label>
                 <select id="fOwner" class="form-control"><option value="">-- الكل --</option>
                     <?php foreach (tkt_owner_role_ids() as $rid): ?><option value="<?php echo htmlspecialchars(tkt_label($roles_map, $rid)); ?>"><?php echo htmlspecialchars(tkt_label($roles_map, $rid)); ?></option><?php endforeach; ?>
                 </select></div>
-            <div class="filter-field"><label><i class="fa fa-tag"></i> الطبيعة</label>
+            <div class="filter-field"><label for="fNature"><i class="fa fa-tag"></i> الطبيعة</label>
                 <select id="fNature" class="form-control"><option value="">-- الكل --</option>
                     <?php foreach ($natures as $k => $v): ?><option value="<?php echo htmlspecialchars($v); ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                 </select></div>

@@ -176,12 +176,10 @@ include __DIR__ . '/../includes/page_header.php';
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script>
     (function () {
         $(document).ready(function () {
             $('#historyTable').DataTable({
-                responsive: true,
                 "language": {
                     "url": "https:/ems/assets/i18n/datatables/ar.json"
                 }

@@ -152,48 +152,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — مصدر المعدة ونمط تملّكها</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>نمط المصدر</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>المورد أو الممول</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>نموذج التمويل</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>عملية التمويل</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الدخول</label>
-                    <input type="date" name="f5"></div>
-                <div class="form-group"><label>تاريخ نقل الملكية المتوقع</label>
-                    <input type="date" name="f6"></div>
-                <div class="form-group"><label>المالك القانوني الحالي</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>المنتفع الاقتصادي</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>حامل الإهلاك</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>حامل الصيانة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>حامل التأمين</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>مرتهن الضمان</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>قيمة الأصل</label>
-                    <input type="text" inputmode="decimal" name="f13" placeholder="0"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>الالتزام القائم</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>المعالجة المحاسبية</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>درجة السرية</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f19"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f20"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_193_b80d2">كود المعدة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_193_b80d2"></div>
+                <div class="form-group"><label for="emsf_194_b27c6">نمط المصدر</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_194_b27c6"></div>
+                <div class="form-group"><label for="emsf_195_59ad1">المورد أو الممول</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_195_59ad1"></div>
+                <div class="form-group"><label for="emsf_196_90134">نموذج التمويل</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_196_90134"></div>
+                <div class="form-group"><label for="emsf_197_e51a7">عملية التمويل</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_197_e51a7"></div>
+                <div class="form-group"><label for="emsf_198_680ff">تاريخ الدخول</label>
+                    <input type="date" name="f5" id="emsf_198_680ff"></div>
+                <div class="form-group"><label for="emsf_199_59a98">تاريخ نقل الملكية المتوقع</label>
+                    <input type="date" name="f6" id="emsf_199_59a98"></div>
+                <div class="form-group"><label for="emsf_200_b1e4d">المالك القانوني الحالي</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_200_b1e4d"></div>
+                <div class="form-group"><label for="emsf_201_e6740">المنتفع الاقتصادي</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_201_e6740"></div>
+                <div class="form-group"><label for="emsf_202_3b203">حامل الإهلاك</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_202_3b203"></div>
+                <div class="form-group"><label for="emsf_203_81d9b">حامل الصيانة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_203_81d9b"></div>
+                <div class="form-group"><label for="emsf_204_8e933">حامل التأمين</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_204_8e933"></div>
+                <div class="form-group"><label for="emsf_205_8a66a">مرتهن الضمان</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_205_8a66a"></div>
+                <div class="form-group"><label for="emsf_206_6c511">قيمة الأصل</label>
+                    <input type="text" inputmode="decimal" name="f13" placeholder="0" id="emsf_206_6c511"></div>
+                <div class="form-group"><label for="emsf_207_0d726">العملة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_207_0d726"></div>
+                <div class="form-group"><label for="emsf_208_3a3a4">الالتزام القائم</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_208_3a3a4"></div>
+                <div class="form-group"><label for="emsf_209_800bc">المعالجة المحاسبية</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_209_800bc"></div>
+                <div class="form-group"><label for="emsf_210_a044b">درجة السرية</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_210_a044b"></div>
+                <div class="form-group"><label for="emsf_211_3fe8c">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_211_3fe8c"></div>
+                <div class="form-group"><label for="emsf_212_b455d">تاريخ الاعتماد</label>
+                    <input type="date" name="f19" id="emsf_212_b455d"></div>
+                <div class="form-group"><label for="emsf_213_1563c">الحالة</label>
+                    <select name="f20" id="emsf_213_1563c"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

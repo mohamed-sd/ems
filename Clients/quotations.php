@@ -10,6 +10,14 @@ include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -439,17 +447,17 @@ function quo_state_tone($state)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود العرض المولد <i class="fas fa-info-circle quo-info-icon"></i></label>
+                        <label for="generated_quo_code"><i class="fas fa-magic"></i> كود العرض المولد <i class="fas fa-info-circle quo-info-icon"></i></label>
                         <input type="text" id="generated_quo_code" class="generated-code-field" value="<?php echo quo_e($next_quo_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود العرض" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود العرض *</label>
+                        <label for="quotation_code"><i class="fas fa-barcode"></i> كود العرض *</label>
                         <input type="text" name="quotation_code" id="quotation_code" placeholder="مثال: QUO-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-user-tie"></i> العميل</label>
+                        <label for="client_id"><i class="fas fa-user-tie"></i> العميل</label>
                         <select name="client_id" id="client_id">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($clients_options as $cl): ?>
@@ -458,7 +466,7 @@ function quo_state_tone($state)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-lightbulb"></i> الفرصة المصدر</label>
+                        <label for="opportunity_id"><i class="fas fa-lightbulb"></i> الفرصة المصدر</label>
                         <select name="opportunity_id" id="opportunity_id">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($opp_options as $op): ?>
@@ -467,7 +475,7 @@ function quo_state_tone($state)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-money-bill-wave"></i> العملة</label>
+                        <label for="currency"><i class="fas fa-money-bill-wave"></i> العملة</label>
                         <select name="currency" id="currency">
                             <?php foreach ($QUO_CURRENCIES as $cur): ?>
                                 <option value="<?php echo quo_e($cur); ?>"><?php echo quo_e($cur); ?></option>
@@ -475,19 +483,19 @@ function quo_state_tone($state)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-coins"></i> إجمالي العرض</label>
+                        <label for="amount_total"><i class="fas fa-coins"></i> إجمالي العرض</label>
                         <input type="number" step="0.01" min="0" name="amount_total" id="amount_total" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-day"></i> صلاحية العرض</label>
+                        <label for="validity_date"><i class="fas fa-calendar-day"></i> صلاحية العرض</label>
                         <input type="date" name="validity_date" id="validity_date" />
                     </div>
                     <div>
-                        <label><i class="fas fa-hand-holding-usd"></i> شروط الدفع</label>
+                        <label for="payment_terms"><i class="fas fa-hand-holding-usd"></i> شروط الدفع</label>
                         <input type="text" name="payment_terms" id="payment_terms" placeholder="مثال: دفعة مقدمة 30%" />
                     </div>
                     <div>
-                        <label><i class="fas fa-flag"></i> الحالة</label>
+                        <label for="state"><i class="fas fa-flag"></i> الحالة</label>
                         <select name="state" id="state">
                             <?php foreach ($QUO_STATES as $st): ?>
                                 <option value="<?php echo quo_e($st); ?>"><?php echo quo_e($st); ?></option>
@@ -495,7 +503,7 @@ function quo_state_tone($state)
                         </select>
                     </div>
                     <div class="quo-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظات</label>
+                        <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
                         <textarea name="notes" id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
                     </div>
                 </div>
@@ -514,13 +522,13 @@ function quo_state_tone($state)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-flag"></i> الحالة</label>
+                <label for="filterState"><i class="fa fa-flag"></i> الحالة</label>
                 <select id="filterState" class="form-control">
                     <option value="">-- كل الحالات --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-money-bill-wave"></i> العملة</label>
+                <label for="filterCurrency"><i class="fa fa-money-bill-wave"></i> العملة</label>
                 <select id="filterCurrency" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

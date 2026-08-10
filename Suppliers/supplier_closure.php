@@ -239,7 +239,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <form method="post" style="margin:0;display:flex;gap:6px">
                         <input type="hidden" name="cl_action" value="quota">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <input type="text" name="reason" maxlength="255" placeholder="سببُ إقفال ما لم يُستهلك">
+                        <input type="text" name="reason" maxlength="255" placeholder="سببُ إقفال ما لم يُستهلك" aria-label="سببُ إقفال ما لم يُستهلك">
                         <button type="submit" class="btn-save">أقفِل الحصة</button>
                     </form>
                 <?php endif; ?></td>
@@ -286,7 +286,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <form method="post" style="margin:0;display:flex;gap:6px">
                         <input type="hidden" name="cl_action" value="close">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <input type="text" name="clearance_doc" maxlength="120" placeholder="مرجعُ شهادة الإخلاء" required>
+                        <input type="text" name="clearance_doc" maxlength="120" placeholder="مرجعُ شهادة الإخلاء" required aria-label="مرجعُ شهادة الإخلاء">
                         <button type="submit" class="btn-save">أقفِل بالشهادة</button>
                     </form>
                 <?php endif; ?></td>

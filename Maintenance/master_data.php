@@ -135,7 +135,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-section">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>النوع <span class="required">*</span></label>
+                            <label for="mnt_type">النوع <span class="required">*</span></label>
                             <select name="type" id="mnt_type" required>
                                 <option value="">-- اختر --</option>
                                 <?php foreach ($mnt_lookup_types as $t): ?>
@@ -144,11 +144,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>الاسم <span class="required">*</span></label>
+                            <label for="mnt_name">الاسم <span class="required">*</span></label>
                             <input type="text" name="name" id="mnt_name" required>
                         </div>
                         <div class="form-group">
-                            <label>وصف / تفصيل</label>
+                            <label for="mnt_extra">وصف / تفصيل</label>
                             <input type="text" name="extra" id="mnt_extra">
                         </div>
                     </div>
@@ -166,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>تصفية حسب النوع</label>
+                    <label for="filterType">تصفية حسب النوع</label>
                     <select id="filterType">
                         <option value="">كل الأنواع</option>
                         <?php foreach ($mnt_lookup_types as $t): ?>

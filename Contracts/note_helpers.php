@@ -271,6 +271,15 @@ if (!function_exists('cdnote_approve')) {
         if ((string) $n['state'] === 'cancelled') {
             $out['code'] = 422; $out['reason'] = 'الإشعارُ ملغى'; return $out;
         }
+
+        /* ══ P1-B — رأسُ هذا الملفِّ يعلن «`prepared_by ≠ approved_by` بنيويًّا»
+             ولم يكن في الشيفرةِ فحصٌ واحدٌ يفعله. والإشعارُ يحرّك ذمّةً — فاليدُ
+             الثانيةُ شرطُ صحته. (**العطالةُ فوقَه**: المعتمَدُ سلفًا رجع قبل هذا.) */
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $__sa = ems_no_self_approval($conn, intval($n['created_by'] ?? 0), intval($uid),
+            'إشعارٌ دائن/مدين ' . (string) ($n['note_no'] ?? ('#' . $note_id)),
+            intval($n['company_id'] ?? 0));
+        if ($__sa !== null) { $out['code'] = 403; $out['reason'] = $__sa['reason']; return $out; }
         if ((string) $n['state'] !== 'review') {
             $out['code'] = 422;
             $out['reason'] = 'لا يُجاز إلا إشعارٌ رُفع للمالية — حالتُه: ' . $n['state'];

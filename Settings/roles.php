@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once __DIR__ . '/../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // [ح-1] حصر شاشة إدارة الأدوار — نفس تصعيد الامتياز في role_permissions.php.
 // الشاشة الآن مسجَّلة موديولًا (owner 15). الفحص صريحٌ لأن معالج POST أدناه يسبق
@@ -117,7 +125,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
@@ -169,13 +176,13 @@ include __DIR__ . '/../includes/page_header.php';
                 <div class="form-grid">
                     <!-- اسم الصلاحية -->
                     <div>
-                        <label><i class="fas fa-tag"></i> اسم الصلاحية *</label>
+                        <label for="name"><i class="fas fa-tag"></i> اسم الصلاحية *</label>
                         <input type="text" name="name" id="name" placeholder="مثال: مدير المشاريع" required />
                     </div>
 
                     <!-- الدور الأب (الصلاحية الأب) -->
                     <div>
-                        <label><i class="fas fa-sitemap"></i> الدور الأب (اختياري)</label>
+                        <label for="parent_role_id"><i class="fas fa-sitemap"></i> الدور الأب (اختياري)</label>
                         <select id="parent_role_id" name="parent_role_id">
                             <option value="">-- بدون دور أب (مدير رئيسي) --</option>
                             <?php foreach ($parent_roles as $pRole): ?>
@@ -188,7 +195,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                     <!-- المستوى -->
                     <div>
-                        <label><i class="fas fa-layer-group"></i> مستوى الهرمية</label>
+                        <label for="level"><i class="fas fa-layer-group"></i> مستوى الهرمية</label>
                         <select name="level" id="level" required>
                             <option value="1" selected> مدير </option>
                             <option value="2"> مشرف </option>
@@ -197,7 +204,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                     <!-- الحالة -->
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> حالة الصلاحية *</label>
+                        <label for="status"><i class="fas fa-toggle-on"></i> حالة الصلاحية *</label>
                         <select name="status" id="status" required>
                             <option value="1" selected>نشطة ✅</option>
                             <option value="0">غير نشطة ⏸</option>
@@ -339,13 +346,11 @@ include __DIR__ . '/../includes/page_header.php';
 <!-- JS -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 
 
 <script>
     // تهيئة DataTable
     $('#rolesTable').DataTable({
-        responsive: true,
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
         },

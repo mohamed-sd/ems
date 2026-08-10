@@ -149,46 +149,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — أذون دخول وخروج المعدات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الإذن</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>نوع الإذن</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الموقع</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>نوع المعدة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>مصدر المعدة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>الجهة المرافقة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>سبب الحركة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>المستند المرجعي</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الحركة المخطط</label>
-                    <input type="date" name="f9"></div>
-                <div class="form-group"><label>تاريخ الحركة الفعلي</label>
-                    <input type="date" name="f10"></div>
-                <div class="form-group"><label>قراءة العدّاد عند الحركة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>رحلة الترحيل</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>حالة الجاهزية</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>حالة الوثائق</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>اعتماد مدير الموقع</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>اعتماد مدير التشغيل</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f17"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f19"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_918_79776">رقم الإذن</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_918_79776"></div>
+                <div class="form-group"><label for="emsf_919_f6962">نوع الإذن</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_919_f6962"></div>
+                <div class="form-group"><label for="emsf_920_b4541">الموقع</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_920_b4541"></div>
+                <div class="form-group"><label for="emsf_921_2ecbd">كود المعدة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_921_2ecbd"></div>
+                <div class="form-group"><label for="emsf_922_e7c5e">نوع المعدة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_922_e7c5e"></div>
+                <div class="form-group"><label for="emsf_923_0c1ad">مصدر المعدة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_923_0c1ad"></div>
+                <div class="form-group"><label for="emsf_924_8fbd9">الجهة المرافقة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_924_8fbd9"></div>
+                <div class="form-group"><label for="emsf_925_db269">سبب الحركة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_925_db269"></div>
+                <div class="form-group"><label for="emsf_926_4533a">المستند المرجعي</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_926_4533a"></div>
+                <div class="form-group"><label for="emsf_927_02305">تاريخ الحركة المخطط</label>
+                    <input type="date" name="f9" id="emsf_927_02305"></div>
+                <div class="form-group"><label for="emsf_928_43f14">تاريخ الحركة الفعلي</label>
+                    <input type="date" name="f10" id="emsf_928_43f14"></div>
+                <div class="form-group"><label for="emsf_929_c4e1e">قراءة العدّاد عند الحركة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_929_c4e1e"></div>
+                <div class="form-group"><label for="emsf_930_81e59">رحلة الترحيل</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_930_81e59"></div>
+                <div class="form-group"><label for="emsf_931_db271">حالة الجاهزية</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_931_db271"></div>
+                <div class="form-group"><label for="emsf_932_144db">حالة الوثائق</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_932_144db"></div>
+                <div class="form-group"><label for="emsf_933_206f3">اعتماد مدير الموقع</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_933_206f3"></div>
+                <div class="form-group"><label for="emsf_934_1a927">اعتماد مدير التشغيل</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_934_1a927"></div>
+                <div class="form-group"><label for="emsf_935_34aed">تاريخ الاعتماد</label>
+                    <input type="date" name="f17" id="emsf_935_34aed"></div>
+                <div class="form-group"><label for="emsf_936_273e1">مرجع التفويض</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_936_273e1"></div>
+                <div class="form-group"><label for="emsf_937_e155a">الحالة</label>
+                    <select name="f19" id="emsf_937_e155a"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

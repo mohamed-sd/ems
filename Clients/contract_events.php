@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -415,17 +423,17 @@ function evt_state_tone($state)
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود الحدث المولد <i class="fas fa-info-circle evt-info-icon"></i></label>
+                        <label for="generated_evt_code"><i class="fas fa-magic"></i> كود الحدث المولد <i class="fas fa-info-circle evt-info-icon"></i></label>
                         <input type="text" id="generated_evt_code" class="generated-code-field" value="<?php echo evt_e($next_evt_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود الحدث" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود الحدث *</label>
+                        <label for="event_code"><i class="fas fa-barcode"></i> كود الحدث *</label>
                         <input type="text" name="event_code" id="event_code" placeholder="مثال: EVT-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-contract"></i> العقد المرتبط</label>
+                        <label for="contract_id"><i class="fas fa-file-contract"></i> العقد المرتبط</label>
                         <select name="contract_id" id="contract_id">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($contract_options as $ct): ?>
@@ -434,7 +442,7 @@ function evt_state_tone($state)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-tags"></i> نوع الحدث *</label>
+                        <label for="event_type"><i class="fas fa-tags"></i> نوع الحدث *</label>
                         <select name="event_type" id="event_type" required>
                             <?php foreach ($EVT_TYPES as $tp): ?>
                                 <option value="<?php echo evt_e($tp); ?>"><?php echo evt_e($tp); ?></option>
@@ -442,7 +450,7 @@ function evt_state_tone($state)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-users"></i> الطرف</label>
+                        <label for="party"><i class="fas fa-users"></i> الطرف</label>
                         <select name="party" id="party">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($EVT_PARTIES as $pt): ?>
@@ -451,11 +459,11 @@ function evt_state_tone($state)
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-day"></i> تاريخ الحدث</label>
+                        <label for="event_date"><i class="fas fa-calendar-day"></i> تاريخ الحدث</label>
                         <input type="datetime-local" name="event_date" id="event_date" />
                     </div>
                     <div>
-                        <label><i class="fas fa-traffic-light"></i> الحالة</label>
+                        <label for="state"><i class="fas fa-traffic-light"></i> الحالة</label>
                         <select name="state" id="state">
                             <?php foreach ($EVT_STATES as $st): ?>
                                 <option value="<?php echo evt_e($st); ?>"><?php echo evt_e($st); ?></option>
@@ -463,7 +471,7 @@ function evt_state_tone($state)
                         </select>
                     </div>
                     <div class="evt-col-full">
-                        <label><i class="fas fa-align-left"></i> وصف الحدث وأثره</label>
+                        <label for="description"><i class="fas fa-align-left"></i> وصف الحدث وأثره</label>
                         <textarea name="description" id="description" rows="3" placeholder="وصف الحدث وأثره على العقد"></textarea>
                     </div>
                 </div>
@@ -482,13 +490,13 @@ function evt_state_tone($state)
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-tags"></i> نوع الحدث</label>
+                <label for="filterType"><i class="fa fa-tags"></i> نوع الحدث</label>
                 <select id="filterType" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-traffic-light"></i> الحالة</label>
+                <label for="filterState"><i class="fa fa-traffic-light"></i> الحالة</label>
                 <select id="filterState" class="form-control">
                     <option value="">-- الكل --</option>
                 </select>

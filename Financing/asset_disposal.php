@@ -12,6 +12,14 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $role = intval($_SESSION['user']['role'] ?? 0);
@@ -100,17 +108,17 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;max-width:900px">
-    <div><label>الحصةُ السارية</label>
-      <select name="share_id" class="form-control" required><option value="">—</option>
+    <div><label for="emsf_443_7b91c">الحصةُ السارية</label>
+      <select name="share_id" class="form-control" required id="emsf_443_7b91c"><option value="">—</option>
         <?php foreach ($shares as $s): ?>
           <option value="<?= intval($s['share_id']) ?>">
             <?= htmlspecialchars(($s['eq_name'] ?: '#' . $s['asset_id']) . ' — ' . ($s['financier'] ?: '؟') . ' (' . floatval($s['pct']) . '٪)', ENT_QUOTES, 'UTF-8') ?></option>
         <?php endforeach; ?></select></div>
-    <div><label>إلى الكيان</label>
-      <select name="to_entity" class="form-control" required><option value="">—</option>
+    <div><label for="emsf_444_3e542">إلى الكيان</label>
+      <select name="to_entity" class="form-control" required id="emsf_444_3e542"><option value="">—</option>
         <?php foreach ($ents as $e2): ?><option value="<?= intval($e2['entity_id']) ?>"><?= htmlspecialchars($e2['legal_name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label>النسبةُ المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control" required style="max-width:110px"></div>
-    <div><label>مرجعُ القرار — إلزامي</label><input type="text" name="doc_ref" class="form-control" required></div>
+    <div><label for="emsf_445_45aeb">النسبةُ المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control" required style="max-width:110px" id="emsf_445_45aeb"></div>
+    <div><label for="emsf_446_1045d">مرجعُ القرار — إلزامي</label><input type="text" name="doc_ref" class="form-control" required id="emsf_446_1045d"></div>
     <button class="btn btn-primary">انقل الحصة</button>
   </form>
   <p class="text-muted" style="font-size:.85em;margin-top:10px">القديمةُ تُغلق بتاريخٍ والجديدةُ صفٌّ — لا تعديلَ بأثرٍ رجعيٍّ وΣ لكل أصلٍ محفوظٌ في كل لحظة.</p>

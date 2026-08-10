@@ -118,11 +118,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم الموقع <span class="required">*</span></label>
+                        <label for="l_name">اسم الموقع <span class="required">*</span></label>
                         <input type="text" name="name" id="l_name" required>
                     </div>
                     <div class="form-group">
-                        <label>نوع الموقع <span class="required">*</span></label>
+                        <label for="l_type">نوع الموقع <span class="required">*</span></label>
                         <select name="location_type" id="l_type" required>
                             <?php foreach ($loc_types as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -130,13 +130,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group" id="l_project_wrap">
-                        <label>المشروع المرتبط (عند نوع «مشروع»)</label>
+                        <label for="l_project">المشروع المرتبط (عند نوع «مشروع»)</label>
                         <select name="project_id" id="l_project">
                             <?php echo trs_project_options($conn, $is_super_admin, $company_id, 0); ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>مفعّل؟</label>
+                        <label for="filterType">مفعّل؟</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="l_active" value="1" checked> نعم، مفعّل</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+                <button type="button" class="btn-cancel" onclick="trsToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div></div>
+    </form>
+
+    <!-- فلاتر البحث -->
+    <div class="filter">
+        <div class="filter-title">
+            <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+            فلاتر البحث
+        </div>
+        <div class="filter-body">
+            <div class="filter-field">
+                <label><i class="fa fa-map"></i> نوع الموقع</label>
                         <label class="switch-inline"><input type="checkbox" name="active" id="l_active" value="1" checked> نعم، مفعّل</label>
                     </div>
                 </div>

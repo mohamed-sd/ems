@@ -15,6 +15,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once '../includes/gov_columns.php';
 require_once '../includes/m00_exec_helpers.php';
 
@@ -137,6 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $goBack('الصفُّ مقرَّرٌ سلفًا (' . $row['status'] . ') — لا قرارَ على قرار ❌');
     }
 
+    /* ══ INJ-0017 (P1) — «حارسُ منعِ اعتمادِ الذات» لا يُستدعى هنا ═══════════
+       كان فرعُ القرارِ يقرأ الصفَّ ويحدّثه بلا مقارنةِ `created_by` بالمقرِّر —
+       فمن رفع الطلبَ يقرّره إن كان في الدور 9. والحارسُ مبنيٌّ منذ M-45. */
+    require_once __DIR__ . '/../includes/self_approval_guard.php';
+    $__sa = ems_assert_not_self_approval($conn, 'exec_approvals', 'id', $rowId,
+        'اعتمادٌ تنفيذيٌّ ' . (string) ($row['request_no'] ?? ('#' . $rowId)), $company_id);
+    if ($__sa !== null) { $goBack($__sa['reason']); }
+
     $actorName = (trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid)) . ' (الإدارة التنفيذية)';
     $decisionReason = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتمادٌ مطلق' : (string) ($row['decision_reason'] ?? ''));
     if ($decision === 'تأجيل') { $decisionReason = trim('مؤجل إلى ' . $until . ($reason !== '' ? ' — ' . $reason : '')); }
@@ -256,42 +272,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — اعتمادات المدير التنفيذي</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الطلب</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الورود</label>
-                    <input type="date" name="f1"></div>
-                <div class="form-group"><label>نوع المستند</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>المستند</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الإدارة الطالبة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>سبب الرفع للأعلى</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>القيمة</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>سقف الإدارة</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>التجاوز</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>المعتمِدون قبلي</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>المهلة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>قراري</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>سبب القرار</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ القرار</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f17"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1070_9b99e">رقم الطلب</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1070_9b99e"></div>
+                <div class="form-group"><label for="emsf_1071_48870">تاريخ الورود</label>
+                    <input type="date" name="f1" id="emsf_1071_48870"></div>
+                <div class="form-group"><label for="emsf_1072_15911">نوع المستند</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1072_15911"></div>
+                <div class="form-group"><label for="emsf_1073_9c4cb">المستند</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1073_9c4cb"></div>
+                <div class="form-group"><label for="emsf_1074_42a74">الإدارة الطالبة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1074_42a74"></div>
+                <div class="form-group"><label for="emsf_1075_842b2">سبب الرفع للأعلى</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1075_842b2"></div>
+                <div class="form-group"><label for="emsf_1076_0bf1a">القيمة</label>
+                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_1076_0bf1a"></div>
+                <div class="form-group"><label for="emsf_1077_da9da">العملة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1077_da9da"></div>
+                <div class="form-group"><label for="emsf_1078_f6fbb">سقف الإدارة</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1078_f6fbb"></div>
+                <div class="form-group"><label for="emsf_1079_d9c37">التجاوز</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_1079_d9c37"></div>
+                <div class="form-group"><label for="emsf_1080_cb8a3">المعتمِدون قبلي</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1080_cb8a3"></div>
+                <div class="form-group"><label for="emsf_1081_1b3d7">المهلة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1081_1b3d7"></div>
+                <div class="form-group"><label for="emsf_1082_3b324">قراري</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1082_3b324"></div>
+                <div class="form-group"><label for="emsf_1083_d8638">سبب القرار</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1083_d8638"></div>
+                <div class="form-group"><label for="emsf_1084_c76ef">تاريخ القرار</label>
+                    <input type="date" name="f14" id="emsf_1084_c76ef"></div>
+                <div class="form-group"><label for="emsf_1085_e0899">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1085_e0899"></div>
+                <div class="form-group"><label for="emsf_1086_e0b45">مرجع التفويض</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_1086_e0b45"></div>
+                <div class="form-group"><label for="emsf_1087_f3217">الحالة</label>
+                    <select name="f17" id="emsf_1087_f3217"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
@@ -314,8 +330,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-gavel"></i> قرار الاعتماد الأعلى — الخيارات الأربعة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الصف المعروض للبت</label>
-                    <select name="row" required>
+                <div class="form-group"><label for="emsf_1088_419e3">الصف المعروض للبت</label>
+                    <select name="row" required id="emsf_1088_419e3">
                         <?php foreach ($decidable as $d):
                             $lbl = 'EXAP-' . intval($d['id'])
                                  . ' — ' . (string) ($d['request_no'] ?? '؟')
@@ -324,17 +340,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($lbl, ENT_QUOTES, 'UTF-8'); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>قراري</label>
+                <div class="form-group"><label for="cmp03DecisionSel">قراري</label>
                     <select name="decision" id="cmp03DecisionSel" required>
                         <option value="اعتماد">اعتماد</option>
                         <option value="اعتماد بشرط">اعتماد بشرط</option>
                         <option value="رد">رد</option>
                         <option value="تأجيل">تأجيل</option>
                     </select></div>
-                <div class="form-group" id="cmp03ReasonWrap"><label id="cmp03ReasonLbl">سبب القرار (إلزامي للمشروط والرد)</label>
-                    <input type="text" name="reason" maxlength="300" placeholder="الشرط أو السبب"></div>
-                <div class="form-group" id="cmp03UntilWrap" style="display:none"><label>مؤجل إلى (إلزامي للتأجيل)</label>
-                    <input type="date" name="until"></div>
+                <div class="form-group" id="cmp03ReasonWrap"><label id="cmp03ReasonLbl" for="emsf_1089_ef825">سبب القرار (إلزامي للمشروط والرد)</label>
+                    <input type="text" name="reason" maxlength="300" placeholder="الشرط أو السبب" id="emsf_1089_ef825"></div>
+                <div class="form-group" id="cmp03UntilWrap" style="display:none"><label for="emsf_1090_e4372">مؤجل إلى (إلزامي للتأجيل)</label>
+                    <input type="date" name="until" id="emsf_1090_e4372"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-stamp"></i> قيد القرار</button>

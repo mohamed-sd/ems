@@ -28,5 +28,20 @@ $U13 = array(
     'rule'       => 'IAF-0037: سحبُ الأدلةِ وحفظُ نسخِ مراجعةٍ غيرِ قابلةٍ للتعديل',
     'empty_hint' => 'لا أوراقَ عملٍ ملتقَطة',
     'order'       => 'captured_at DESC',
+
+    'actions'    => array(
+        'attach' => array(
+            'code'  => 'iaf.workpaper.attach',
+            'label' => 'إرفاقُ ورقةِ عملٍ ببصمةِ دليل',
+            'rule'  => 'IAF-0037: نسخُ أدلةٍ غيرُ قابلةٍ للتعديلِ ببصمةِ كلٍّ — والبصمةُ تُحسب لا تُدخَل',
+            'fields' => array('engagement_no' => 'رقمُ المهمة', 'wp_ref' => 'مرجعُ الورقة', 'title' => 'عنوانُ الورقة'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::attachWorkpaper($conn, array(
+                    'company_id' => $co, 'engagement_no' => (string) ($in['engagement_no'] ?? ''), 'wp_ref' => (string) ($in['wp_ref'] ?? ''),
+                    'title' => (string) ($in['title'] ?? ''), 'actor' => $uid));
+            }),
+    ),
+
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

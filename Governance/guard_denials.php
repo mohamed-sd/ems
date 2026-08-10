@@ -182,10 +182,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 </select>
             </label>
             <label style="font-size:.8rem;display:block;margin-top:8px">قرار المراجعة وتسبيبه
-                <input type="text" id="dnrNote" class="form-control form-control-sm" placeholder="ما وُجد وما تقرر">
+                <input type="text" id="dnrNote" class="form-control form-control-sm" placeholder="ما وُجد وما تقرر" aria-label="ما وُجد وما تقرر">
             </label>
             <label style="font-size:.8rem;display:block;margin-top:8px">المرجع التالي (طلب استثناء · تصحيح تصنيف · بلاغ)
-                <input type="text" id="dnrFollow" class="form-control form-control-sm" placeholder="اختياري — EXC-000123">
+                <input type="text" id="dnrFollow" class="form-control form-control-sm" placeholder="اختياري — EXC-000123" aria-label="اختياري — EXC-000123">
             </label>
             <div style="display:flex;gap:8px;margin-top:12px">
                 <button class="ems-btn-primary" onclick="dnrSubmit()">تسجيل المراجعة</button>

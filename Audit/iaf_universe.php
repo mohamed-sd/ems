@@ -28,5 +28,20 @@ $U13 = array(
     'rule'       => 'IAF-0014: التقييمُ السنويُّ للمخاطرِ أساسُ الخطةِ لا الاجتهاد',
     'empty_hint' => 'لم يُبنَ الكونُ الرقابيُّ بعدُ — ولا خطةَ بلا كون',
     'order'       => 'risk_score DESC',
+
+    'actions'    => array(
+        'build' => array(
+            'code'  => 'iaf.universe.build',
+            'label' => 'إدراجُ مجالٍ في الكونِ الرقابي',
+            'rule'  => 'IAF-0044: لا كونَ بلا ميثاقٍ معتمد',
+            'fields' => array('area_code' => 'رمزُ المجال', 'area_name' => 'اسمُ المجال', 'owner_dept' => 'الإدارةُ المالكة', 'risk_score' => 'درجةُ الخطر'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::buildUniverse($conn, array(
+                    'company_id' => $co, 'area_code' => (string) ($in['area_code'] ?? ''), 'area_name' => (string) ($in['area_name'] ?? ''),
+                    'owner_dept' => (string) ($in['owner_dept'] ?? ''), 'risk_score' => (int) ($in['risk_score'] ?? 0)));
+            }),
+    ),
+
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

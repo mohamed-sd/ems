@@ -580,7 +580,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         <?php } ?>
 
                         <div>
-                            <label>
+                            <label for="suppliers">
                                 <i class="fas fa-truck-loading"></i>
                                 المورد <span class="required-indicator">*</span>
                             </label>
@@ -602,7 +602,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="code">
                                 <i class="fas fa-barcode"></i>
                                 كود المعدة <span class="required-indicator">*</span>
                             </label>
@@ -612,7 +612,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="type">
                                 <i class="fas fa-list-alt"></i>
                                 نوع المعدة <span class="required-indicator">*</span>
                             </label>
@@ -634,7 +634,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="name">
                                 <i class="fas fa-tag"></i>
                                 اسم المعدة <span class="required-indicator">*</span>
                             </label>
@@ -651,7 +651,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="serial_number">
                                 <i class="fas fa-hashtag"></i>
                                 رقم المعدة/الرقم التسلسلي
                             </label>
@@ -660,7 +660,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="chassis_number">
                                 <i class="fas fa-barcode"></i>
                                 رقم الهيكل/الهيكل الأساسي (VIN/Chassis)
                             </label>
@@ -670,7 +670,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="machine_number">
                                 <i class="fas fa-microchip"></i>
                                 رقم الماكينة
                             </label>
@@ -688,7 +688,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 
                         <?php if ($equipment_has_model_id): ?>
                         <div>
-                            <label>
+                            <label for="model_id">
                                 <i class="fas fa-clipboard-list"></i>
                                 الموديل المرجعي (سجل النوع والموديل)
                             </label>
@@ -719,7 +719,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         <?php endif; ?>
 
                         <div>
-                            <label>
+                            <label for="manufacturer">
                                 <i class="fas fa-building"></i>
                                 الماركة/الشركة المصنعة
                             </label>
@@ -729,7 +729,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="model">
                                 <i class="fas fa-car"></i>
                                 الموديل/الطراز
                             </label>
@@ -738,7 +738,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="manufacturing_year">
                                 <i class="fas fa-calendar"></i>
                                 سنة الصنع
                             </label>
@@ -748,7 +748,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="import_year">
                                 <i class="fas fa-calendar-plus"></i>
                                 سنة الاستيراد/البدء
                             </label>
@@ -772,7 +772,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="equipment_condition">
                                 <i class="fas fa-cogs"></i>
                                 حالة المعدة
                             </label>
@@ -796,7 +796,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="operating_hours">
                                 <i class="fas fa-clock"></i>
                                 ساعات التشغيل (للمعدات الثقيلة)
                             </label>
@@ -806,7 +806,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="engine_condition">
                                 <i class="fas fa-car-crash"></i>
                                 حالة المحرك
                             </label>
@@ -822,7 +822,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="tires_condition">
                                 <i class="fas fa-circle-notch"></i>
                                 حالة الإطارات (للشاحنات)
                             </label>
@@ -846,7 +846,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="license_number">
                                 <i class="fas fa-address-card"></i>
                                 رقم الترخيص/التسجيل
                             </label>
@@ -855,7 +855,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="license_authority">
                                 <i class="fas fa-landmark"></i>
                                 جهة الترخيص
                             </label>
@@ -865,7 +865,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="document_type">
                                 <i class="fas fa-file-alt"></i>
                                 نوع الوثيقة
                             </label>
@@ -879,7 +879,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="license_expiry_date">
                                 <i class="fas fa-calendar-times"></i>
                                 تاريخ انتهاء الترخيص
                             </label>
@@ -888,7 +888,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="inspection_certificate_number">
                                 <i class="fas fa-certificate"></i>
                                 رقم شهادة الفحص
                             </label>
@@ -898,7 +898,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="last_inspection_date">
                                 <i class="fas fa-calendar-check"></i>
                                 تاريخ آخر فحص
                             </label>
@@ -914,7 +914,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="current_location">
                                 <i class="fas fa-location-arrow"></i>
                                 الموقع الحالي
                             </label>
@@ -924,7 +924,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="availability_state">
                                 <i class="fas fa-traffic-light"></i>
                                 التوفر
                             </label>
@@ -936,7 +936,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="availability_status">
                                 <i class="fas fa-exclamation-circle"></i>
                                 الحالة الحالية
                             </label>
@@ -955,7 +955,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="site_supervisor_name">
                                 <i class="fas fa-user-hard-hat"></i>
                                 بيانات المهندس أو المشرف في الموقع
                             </label>
@@ -965,7 +965,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="site_supervisor_contact">
                                 <i class="fas fa-address-book"></i>
                                 بيانات الاتصال بالمشرف
                             </label>
@@ -982,7 +982,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="estimated_value">
                                 <i class="fas fa-money-bill-wave"></i>
                                 القيمة المقدرة للمعدة (بالدولار)
                             </label>
@@ -992,7 +992,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="daily_rental_price">
                                 <i class="fas fa-calendar-day"></i>
                                 سعر التأجير اليومي (بالدولار)
                             </label>
@@ -1002,7 +1002,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="monthly_rental_price">
                                 <i class="fas fa-calendar-alt"></i>
                                 سعر التأجير الشهري (بالدولار)
                             </label>
@@ -1012,7 +1012,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="insurance_status">
                                 <i class="fas fa-shield-alt"></i>
                                 التأمين/الضمان
                             </label>
@@ -1035,7 +1035,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div class="form-grid-full">
-                            <label>
+                            <label for="general_notes">
                                 <i class="fas fa-comment-alt"></i>
                                 ملاحظات عامة
                             </label>
@@ -1044,7 +1044,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="last_maintenance_date">
                                 <i class="fas fa-wrench"></i>
                                 تاريخ آخر صيانة
                             </label>
@@ -1053,7 +1053,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         </div>
 
                         <div>
-                            <label>
+                            <label for="status">
                                 <i class="fas fa-toggle-on"></i>
                                 حالة المعدة <span class="required-indicator">*</span>
                             </label>
@@ -1104,7 +1104,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 
                 <div class="filters-grid">
                     <div class="filter-item">
-                        <label><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
+                        <label for="filterSupplier"><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
                         <select id="filterSupplier" class="filter-select">
                             <option value="">— جميع الموردين —</option>
                             <?php
@@ -1122,7 +1122,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     </div>
 
                     <div class="filter-item">
-                        <label><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
+                        <label for="filterType"><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
                         <select id="filterType" class="filter-select">
                             <option value="">— جميع الأنواع —</option>
                             <?php
@@ -1140,7 +1140,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     </div>
 
                     <div class="filter-item">
-                        <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
+                        <label for="filterStatus"><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
                             <option value="">— جميع الحالات —</option>
                             <option value="متاحة">متاحة</option>
@@ -1152,7 +1152,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     </div>
 
                     <div class="filter-item">
-                        <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
+                        <label for="filterAvailability"><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
                         <select id="filterAvailability" class="filter-select">
                             <option value="">— جميع حالات التوفر —</option>
                             <option value="متوفرة">متوفرة</option>

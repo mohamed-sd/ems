@@ -11,37 +11,43 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Procurement/RfqAwardService.php';
+
+// CS-01 · RF-02 — الحارسُ فوقَ المعالج. كان ‎INSERT INTO rfq_awards‎ في السطرِ 33
+// و‎insidebar‎ (منفِّذُ حارسِ العرض) في السطرِ 66 — ترسيةٌ تُرحَّل ثم يُقال «لا صلاحية».
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $rfq = intval($_REQUEST['rfq'] ?? 0);
 $msg = '';
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['award_quote'])) {
-    $qid    = intval($_POST['award_quote']);
-    $reason = trim($_POST['award_reason'] ?? '');
-    if ($reason === '') { $msg = 'سببُ الترسية إلزامي — لا ترسيةَ صامتة (422)'; }
-    else {
-        $r = mysqli_query($conn, "SELECT q.rfq_id, q.line_id, q.supplier_id, q.unit_price, q.currency, q.qty_offered
-                                  FROM rfq_quotes q WHERE q.id = $qid AND q.company_id = $company_id");
-        if ($r && ($q = mysqli_fetch_assoc($r))) {
-            $dup = mysqli_query($conn, "SELECT id FROM rfq_awards WHERE rfq_id = {$q['rfq_id']} AND line_id " .
-                                       ($q['line_id'] === null ? 'IS NULL' : '= ' . intval($q['line_id'])));
-            if ($dup && mysqli_num_rows($dup) > 0) { $msg = 'البندُ مُرسًى من قبل — 409 بمرجع الترسية القائمة'; }
-            else {
-                mysqli_begin_transaction($conn);
-                $ok1 = mysqli_query($conn, "INSERT INTO rfq_awards (company_id, rfq_id, line_id, supplier_id, quote_id, qty_awarded, unit_price, currency, reason, awarded_by, awarded_at)
-                        VALUES ($company_id, {$q['rfq_id']}, " . ($q['line_id'] === null ? 'NULL' : intval($q['line_id'])) . ",
-                                {$q['supplier_id']}, $qid, " . floatval($q['qty_offered']) . ", " . floatval($q['unit_price']) . ",
-                                '" . mysqli_real_escape_string($conn, $q['currency']) . "',
-                                '" . mysqli_real_escape_string($conn, $reason) . "', $uid, NOW())");
-                $ok2 = mysqli_query($conn, "UPDATE supplier_rfqs SET state='awarded', awarded_at=NOW(), awarded_by=$uid
-                                            WHERE id = {$q['rfq_id']} AND company_id = $company_id");
-                if ($ok1 && $ok2) { mysqli_commit($conn); $msg = 'رُسّي العرضُ #' . $qid . ' بسببٍ موثَّق'; }
-                else { mysqli_rollback($conn); $msg = 'فشلت الترسيةُ فأُلغيت: ' . mysqli_error($conn); }
-            }
-        } else { $msg = 'عرضٌ غيرُ موجود (404)'; }
-    }
+// FN-05 · CS-05 — الحكمُ في خدمةِ النطاقِ المالكةِ لجدولِ الترسية، ومسارُ الكتابةِ
+// واحدٌ لا مساران (الشاشةُ الأخرى صارت منظرًا قارئًا).
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'proc.rfq.award',
+    'perm'    => 'can_add',
+    'trigger' => 'award_quote',
+    'idem'    => array(
+        'quote'  => intval($_POST['award_quote'] ?? 0),
+        'reason' => trim($_POST['award_reason'] ?? ''),
+    ),
+    'validate' => function (array $in) {
+        $qid = intval($in['award_quote'] ?? 0);
+        $why = trim($in['award_reason'] ?? '');
+        if ($qid <= 0) { return array('ok' => false, 'msg' => 'عرضٌ غيرُ صالح (422)'); }
+        if ($why === '') { return array('ok' => false, 'msg' => 'سببُ الترسية إلزامي — لا ترسيةَ صامتة (422)'); }
+        return array('ok' => true, 'data' => array('qid' => $qid, 'why' => $why));
+    },
+));
+if (!$__pc['ok'] && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
+if ($__pc['replay'])                     { $msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    $svc = new \App\Services\Procurement\RfqAwardService($conn);
+    $res = $svc->award($company_id, (int) $__pc['data']['qid'], (string) $__pc['data']['why'], $uid);
+    $msg = $res['msg'];
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'rfq_awards#' . $res['award_id']); }
 }
 
 $rfqs = array(); $quotes = array();
@@ -131,7 +137,7 @@ include __DIR__ . '/../includes/page_header.php';
           <form method="post" style="display:flex;gap:6px">
             <input type="hidden" name="rfq" value="<?= $rfq ?>">
             <input type="hidden" name="award_quote" value="<?= intval($q['id']) ?>">
-            <input type="text" name="award_reason" class="form-control form-control-sm" placeholder="سببُ الترسية" style="max-width:160px" required>
+            <input type="text" name="award_reason" class="form-control form-control-sm" placeholder="سببُ الترسية" style="max-width:160px" required aria-label="سببُ الترسية">
             <button class="action-btn" type="submit">رسِّ</button>
           </form>
         </td>

@@ -458,12 +458,12 @@ $csrf = generate_csrf_token();
             <input type="hidden" name="action" value="edit_user">
             <input type="hidden" name="edit_user_id" id="edit_user_id">
 
-            <div class="field"><label>الاسم الكامل *</label><input name="edit_name" id="edit_name" required maxlength="150"></div>
-            <div class="field"><label>البريد الإلكتروني *</label><input name="edit_email" id="edit_email" type="email" required maxlength="150"></div>
-            <div class="field"><label>الهاتف *</label><input name="edit_phone" id="edit_phone" required maxlength="30"></div>
+            <div class="field"><label for="edit_name">الاسم الكامل *</label><input name="edit_name" id="edit_name" required maxlength="150"></div>
+            <div class="field"><label for="edit_email">البريد الإلكتروني *</label><input name="edit_email" id="edit_email" type="email" required maxlength="150"></div>
+            <div class="field"><label for="edit_phone">الهاتف *</label><input name="edit_phone" id="edit_phone" required maxlength="30"></div>
 
             <div class="field">
-                <label>الدور *</label>
+                <label for="edit_role_id">الدور *</label>
                 <select name="edit_role_id" id="edit_role_id" required>
                     <option value="">— اختر الدور —</option>
                     <?php
@@ -486,7 +486,7 @@ $csrf = generate_csrf_token();
             </div>
 
             <div class="field">
-                <label>الحالة *</label>
+                <label for="edit_status">الحالة *</label>
                 <select name="edit_status" id="edit_status" required>
                     <option value="active">نشط</option>
                     <option value="inactive">غير نشط</option>
@@ -495,7 +495,7 @@ $csrf = generate_csrf_token();
             </div>
 
             <div class="field">
-                <label>كلمة المرور الجديدة <small style="color:#64748b;font-weight:400;">(اتركها فارغة للإبقاء على الحالية)</small></label>
+                <label for="edit_password">كلمة المرور الجديدة <small style="color:#64748b;font-weight:400;">(اتركها فارغة للإبقاء على الحالية)</small></label>
                 <input name="edit_password" id="edit_password" type="password" maxlength="255" placeholder="اختياري — 8 أحرف على الأقل">
             </div>
 

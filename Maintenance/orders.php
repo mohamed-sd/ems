@@ -20,6 +20,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 include '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/mnt_helpers.php';
 
 $current_role    = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
@@ -265,7 +273,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     } elseif ($effective_state !== 'قطعة منتظرة' && $order['state'] === 'قطعة منتظرة') {
         $ord_data['waiting_part_since'] = null;
     }
-    if ($closing_now) { $ord_data['closed_at'] = date('Y-m-d H:i:s'); $ord_data['closed_by'] = intval($current_user_id); }
+    /* P1-B — «من أنشأ لا يُقفل»: إقفالُ أمرِ الصيانةِ يُثبت الإنجازَ وتُحمَّل عليه
+       التكلفة، فيدُ الإقفالِ غيرُ يدِ الفتح. (والتحولاتُ الأخرى لا تُمَسّ.) */
+    if ($closing_now) {
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $__sa = ems_no_self_approval($conn, intval($order['created_by'] ?? 0), intval($current_user_id),
+            'أمرُ صيانةٍ #' . intval($oid), intval($company_id));
+        if ($__sa !== null) {
+            ems_gov_flash_redirect('orders.php', $__sa['reason'], 'GOV-PERM-403', 'الإقفالُ يدٌ ثانيةٌ غيرُ يدِ الفتح');
+            exit();
+        }
+        $ord_data['closed_at'] = date('Y-m-d H:i:s');
+        $ord_data['closed_by'] = intval($current_user_id);
+    }
     ems_tenant_db()->update('mnt_order', $ord_data, array('id' => $oid));
 
     mnt_recalc_order_totals($conn, $oid, $company_id);

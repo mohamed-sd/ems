@@ -233,6 +233,18 @@ if (isset($_GET['advance_id'])) {
             ems_gov_flash_redirect(ems_flash_to('events_list_fin.php', urlencode($lbl) . ")+يخصّ+" . urlencode(fin_level_owner_label($level)) . "+❌"), 'هذا الإجراء (', 'GOV-INFO-200', ''); exit();
         }
 
+        /* ══ INJ-0039 (P1) — «من أنشأ الحدثَ يعتمده في خطوةِ مستواه» ══════════
+           فصلُ الواجباتِ بالمستوى وحدَه لا يمنع اليدَ الواحدة: منشئُ الحدثِ إن
+           كان في مستوى الاعتمادِ اعتمد ما أنشأ. والحارسُ مبنيٌّ ولم يُنادَ هنا. */
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $__sa = ems_assert_not_self_approval($conn, 'fin_financial_events', 'id', $aid,
+            'حدثٌ ماليٌّ ' . (string) ($event['event_no'] ?? ('#' . $aid)), $company_id);
+        if ($__sa !== null) {
+            ems_gov_flash_redirect('events_list_fin.php', $__sa['reason'], 'GOV-PERM-403',
+                'الاعتمادُ يدٌ ثانيةٌ غيرُ يدِ الإنشاء');
+            exit();
+        }
+
         // (فجوة 1) الاعتماد النهائي يخضع لمصفوفة الاعتماد بالمبلغ
         if ($next === 'approved' && $event) {
             $base = round((float)$event['amount'] * (($event['currency'] === 'USD') ? (float)($event['fx_rate'] ?: 600) : 1), 2);
@@ -359,51 +371,51 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>نوع الحدث <span class="required">*</span></label>
+                        <label for="f_event_type">نوع الحدث <span class="required">*</span></label>
                         <select name="event_type" id="f_event_type" required>
                             <option value="">— اختر —</option>
                             <?php foreach ($event_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الإدارة المصدر <span class="required">*</span></label>
+                        <label for="f_source_module">الإدارة المصدر <span class="required">*</span></label>
                         <select name="source_module" id="f_source_module" required>
                             <option value="">— اختر —</option>
                             <?php foreach ($source_modules as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>المرجع التشغيلي</label>
+                        <label for="f_source_ref">المرجع التشغيلي</label>
                         <input type="text" name="source_ref" id="f_source_ref" placeholder="فاتورة / أمر / مستخلص">
                     </div>
                     <div class="form-group">
-                        <label>المبلغ <span class="required">*</span></label>
+                        <label for="f_amount">المبلغ <span class="required">*</span></label>
                         <input type="number" step="0.01" min="0" name="amount" id="f_amount" required>
                     </div>
                     <div class="form-group">
-                        <label>العملة</label>
+                        <label for="f_currency">العملة</label>
                         <select name="currency" id="f_currency">
                             <?php foreach ($currencies as $c) echo "<option value='" . htmlspecialchars($c) . "'>" . htmlspecialchars($c) . "</option>"; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>سعر الصرف (للدولار)</label>
+                        <label for="f_fx_rate">سعر الصرف (للدولار)</label>
                         <input type="number" step="0.000001" min="0" name="fx_rate" id="f_fx_rate" placeholder="اختياري">
                     </div>
                     <div class="form-group">
-                        <label>المشروع (بُعد تكلفة)</label>
+                        <label for="f_project_id">المشروع (بُعد تكلفة)</label>
                         <select name="project_id" id="f_project_id"><?php echo fin_project_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المورد</label>
+                        <label for="f_supplier_id">المورد</label>
                         <select name="supplier_entity_id" id="f_supplier_id"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المعدة (بُعد تكلفة)</label>
+                        <label for="f_equipment_id">المعدة (بُعد تكلفة)</label>
                         <select name="equipment_id" id="f_equipment_id"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
+                        <label for="f_notes">ملاحظات</label>
                         <input type="text" name="notes" id="f_notes">
                     </div>
                 </div>

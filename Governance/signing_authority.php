@@ -11,6 +11,14 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once dirname(__DIR__) . '/app/Core/AuthorityGuard.php';
 require_once dirname(__DIR__) . '/app/Services/Governance/UnitStateChangeService.php';
@@ -147,7 +155,7 @@ include '../insidebar.php';
         <h4>تعيين مدير الحركة والتشغيل أو نائبه (DEC-01 ① — سقف نطاقي)</h4>
         <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
             <input type="hidden" name="op" value="movement">
-            <input type="number" name="person_id" placeholder="users.id للمعيَّن *" required>
+            <input type="number" name="person_id" placeholder="users.id للمعيَّن *" required aria-label="users.id للمعيَّن">
             <select name="entity_id" required>
                 <option value="">— الكيان المفوِّض *</option>
                 <?php foreach ($entities as $e): ?>
@@ -160,10 +168,10 @@ include '../insidebar.php';
                 <option value="<?php echo intval($s['id']); ?>"><?php echo htmlspecialchars($s['name']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <input type="number" name="delegated_from" placeholder="نيابة عن تفويض # (للنائب)">
+            <input type="number" name="delegated_from" placeholder="نيابة عن تفويض # (للنائب)" aria-label="نيابة عن تفويض # (للنائب)">
             <input type="date" name="valid_from" value="<?php echo date('Y-m-d'); ?>" required>
-            <input type="date" name="valid_to" title="إلزامي للنائب — لا نيابة مفتوحة المدة">
-            <input type="text" name="doc_ref" placeholder="مستند التعيين *" required>
+            <input type="date" name="valid_to" title="إلزامي للنائب — لا نيابة مفتوحة المدة" aria-label="إلزامي للنائب — لا نيابة مفتوحة المدة">
+            <input type="text" name="doc_ref" placeholder="مستند التعيين *" required aria-label="مستند التعيين">
             <button class="btn-save" type="submit">تعيين — والسلسلة لا تتوقف بغيابه</button>
         </form>
     </div></div>
@@ -172,7 +180,7 @@ include '../insidebar.php';
         <h4>تفويض عام (مالي · تعاقدي · بنكي) — بسقفه النقدي</h4>
         <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
             <input type="hidden" name="op" value="general">
-            <input type="number" name="person_id" placeholder="users.id للمفوَّض *" required>
+            <input type="number" name="person_id" placeholder="users.id للمفوَّض *" required aria-label="users.id للمفوَّض">
             <select name="entity_id" required>
                 <option value="">— الكيان المفوِّض *</option>
                 <?php foreach ($entities as $e): ?>
@@ -183,11 +191,11 @@ include '../insidebar.php';
                 <option value="financial">مالي</option><option value="contractual">تعاقدي</option>
                 <option value="banking">بنكي</option><option value="general">عام</option>
             </select>
-            <input type="number" step="0.01" name="amount_cap" placeholder="السقف المالي">
-            <input type="text" name="currency" placeholder="العملة (USD…)">
+            <input type="number" step="0.01" name="amount_cap" placeholder="السقف المالي" aria-label="السقف المالي">
+            <input type="text" name="currency" placeholder="العملة (USD…)" aria-label="العملة (USD…)">
             <input type="date" name="valid_from" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="date" name="valid_to">
-            <input type="text" name="doc_ref" placeholder="مستند التفويض *" required>
+            <input type="text" name="doc_ref" placeholder="مستند التفويض *" required aria-label="مستند التفويض">
             <button class="btn-save" type="submit" style="grid-column:span 4">إنشاء التفويض</button>
         </form>
     </div></div>

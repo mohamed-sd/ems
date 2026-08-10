@@ -154,38 +154,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — حالات المستندات وانتقالاتها</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>كود الآلة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>نوع المستند</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>رقم الانتقال</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>من حالة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>إلى حالة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الفعل المُطلق</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>رمز الفعل</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>المخوَّل</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>الشرط المسبق</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>الحارس المطبَّق</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الحدث المنشور</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>قابل للعكس؟</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>فعل العكس</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ السريان</label>
-                    <input type="date" name="f13"></div>
-                <div class="form-group"><label>النسخة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f15"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_663_de4f5">كود الآلة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_663_de4f5"></div>
+                <div class="form-group"><label for="emsf_664_3a27e">نوع المستند</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_664_3a27e"></div>
+                <div class="form-group"><label for="emsf_665_6c1ea">رقم الانتقال</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_665_6c1ea"></div>
+                <div class="form-group"><label for="emsf_666_e6416">من حالة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_666_e6416"></div>
+                <div class="form-group"><label for="emsf_667_73f8b">إلى حالة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_667_73f8b"></div>
+                <div class="form-group"><label for="emsf_668_ae33c">الفعل المُطلق</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_668_ae33c"></div>
+                <div class="form-group"><label for="emsf_669_c3295">رمز الفعل</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_669_c3295"></div>
+                <div class="form-group"><label for="emsf_670_63d80">المخوَّل</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_670_63d80"></div>
+                <div class="form-group"><label for="emsf_671_f60ca">الشرط المسبق</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_671_f60ca"></div>
+                <div class="form-group"><label for="emsf_672_0a9e4">الحارس المطبَّق</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_672_0a9e4"></div>
+                <div class="form-group"><label for="emsf_673_0bb99">الحدث المنشور</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_673_0bb99"></div>
+                <div class="form-group"><label for="emsf_674_cc239">قابل للعكس؟</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_674_cc239"></div>
+                <div class="form-group"><label for="emsf_675_1b2be">فعل العكس</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_675_1b2be"></div>
+                <div class="form-group"><label for="emsf_676_9af51">تاريخ السريان</label>
+                    <input type="date" name="f13" id="emsf_676_9af51"></div>
+                <div class="form-group"><label for="emsf_677_27f98">النسخة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_677_27f98"></div>
+                <div class="form-group"><label for="emsf_678_ff8d5">الحالة</label>
+                    <select name="f15" id="emsf_678_ff8d5"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

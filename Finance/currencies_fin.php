@@ -23,6 +23,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 include '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/../includes/fx.php';
 
@@ -283,8 +291,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="add_rate" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>العملة *</label>
-                    <select name="currency_code" required>
+                    <label for="emsf_229_b9610">العملة *</label>
+                    <select name="currency_code" required id="emsf_229_b9610">
                         <option value="">— اختر —</option>
                         <?php foreach ($currencies as $code => $c) {
                             if (!empty($c['is_base'])) { continue; }   // الأساسُ سعرُه واحدٌ أبدًا
@@ -307,12 +315,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="effective_from" required value="<?php echo date('Y-m-d'); ?>">
                 </div>
                 <div class="form-group">
-                    <label>المصدر</label>
-                    <input type="text" name="source" maxlength="32" placeholder="بنك مركزي · قرار إداري">
+                    <label for="emsf_230_40a3b">المصدر</label>
+                    <input type="text" name="source" maxlength="32" placeholder="بنك مركزي · قرار إداري" id="emsf_230_40a3b">
                 </div>
                 <div class="form-group" style="grid-column:1/-1;">
-                    <label>ملاحظة</label>
-                    <input type="text" name="note" maxlength="255">
+                    <label for="emsf_231_486e6">ملاحظة</label>
+                    <input type="text" name="note" maxlength="255" id="emsf_231_486e6">
                 </div>
             </div></div>
             <div style="margin-top:10px;">
@@ -405,12 +413,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
             <input type="hidden" name="add_currency" value="1">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الرمز (ISO) *</label>
-                    <input type="text" name="code" required maxlength="3" placeholder="EUR" style="text-transform:uppercase;"></div>
-                <div class="form-group"><label>الاسم *</label>
-                    <input type="text" name="name_ar" required maxlength="64" placeholder="اليورو"></div>
-                <div class="form-group"><label>الرمز المختصر</label>
-                    <input type="text" name="symbol" maxlength="8" placeholder="€"></div>
+                <div class="form-group"><label for="emsf_232_537f9">الرمز (ISO) *</label>
+                    <input type="text" name="code" required maxlength="3" placeholder="EUR" style="text-transform:uppercase;" id="emsf_232_537f9"></div>
+                <div class="form-group"><label for="emsf_233_f36df">الاسم *</label>
+                    <input type="text" name="name_ar" required maxlength="64" placeholder="اليورو" id="emsf_233_f36df"></div>
+                <div class="form-group"><label for="emsf_234_171ec">الرمز المختصر</label>
+                    <input type="text" name="symbol" maxlength="8" placeholder="€" id="emsf_234_171ec"></div>
             </div></div>
             <div style="margin-top:10px;">
                 <button type="submit" class="btn btn-secondary"><i class="fas fa-save"></i> تسجيل العملة</button>

@@ -1054,7 +1054,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <h6 class="fw-bold mb-3"><i class="fa fa-plus-circle me-1 text-primary"></i> إضافة ملاحظة جديدة</h6>
           <div class="row g-3">
             <div class="col-md-5">
-              <label class="form-label fw-semibold">العمود / الحقل المعني</label>
+              <label class="form-label fw-semibold" for="note-col-select">العمود / الحقل المعني</label>
               <select class="form-select form-select-sm" id="note-col-select">
                 <option value="">— اختر العمود —</option>
                 <?php foreach ($column_labels as $col_key => $col_lbl): ?>
@@ -1066,7 +1066,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               </select>
             </div>
             <div class="col-md-7">
-              <label class="form-label fw-semibold">نص الملاحظة</label>
+              <label class="form-label fw-semibold" for="note-text-input">نص الملاحظة</label>
               <textarea class="form-control form-control-sm" id="note-text-input"
                         rows="3" placeholder="اكتب ملاحظتك هنا..."></textarea>
             </div>
@@ -1126,7 +1126,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <i class="fa fa-triangle-exclamation mt-1 flex-shrink-0"></i>
           <div>سيتم إعادة السجل إلى أول سلسلة الاعتماد. يجب كتابة سبب واضح للرفض.</div>
         </div>
-        <label class="form-label fw-bold">
+        <label class="form-label fw-bold" for="reject-reason-text">
           <i class="fa fa-comment-dots me-1 text-danger"></i>
           سبب الرفض <span class="text-danger">*</span>
         </label>
@@ -1165,7 +1165,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <i class="fa fa-triangle-exclamation mt-1 flex-shrink-0"></i>
           <div>سيتم إعادة السجل إلى أول سلسلة الاعتماد. يجب كتابة سبب واضح للرفض.</div>
         </div>
-        <label class="form-label fw-bold">
+        <label class="form-label fw-bold" for="reject-reason-text">
           <i class="fa fa-comment-dots me-1 text-danger"></i>
           سبب الرفض <span class="text-danger">*</span>
         </label>
@@ -1667,10 +1667,37 @@ function applyEquipTypeFilter() {
         نصّ §5.2: «صفُّ تجاوزِ طاقةٍ لا يُعتمد قبل: السبب · فحصُ التداخل ·
         تحديدُ المشغّل الثاني» — الفحصُ يجري آليًّا، والاثنان الباقيان إفصاحُك أنت.
       </p>
-      <label class="form-label fw-bold">سببُ التجاوز *</label>
+      <label class="form-label fw-bold" for="bx-clear-cause">سببُ التجاوز *</label>
       <textarea id="bx-clear-cause" class="form-control" rows="2"
                 placeholder="مثال: ورديةٌ مزدوجةٌ طارئةٌ بطلب العميل — تسليمُ شحنة"></textarea>
-      <label class="form-label fw-bold mt-3">هل عمل مشغّلٌ ثانٍ؟ *</label>
+      <label class="form-label fw-bold mt-3" for="bx-return-reason">هل عمل مشغّلٌ ثانٍ؟ *</label>
+      <div>
+        <label class="me-3"><input type="radio" name="bx-second" value="1"> نعم — مشغّلان تناوبا</label>
+        <label><input type="radio" name="bx-second" value="0"> لا — مشغّلٌ واحد</label>
+      </div>
+      <div id="bx-clear-err" class="text-danger mt-2" style="display:none;font-size:.85rem;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
+      <button class="btn btn-warning btn-sm fw-bold" id="bx-clear-go">
+        <i class="fa fa-unlock"></i> خلِّص باسمي</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal fade" id="bxReturnModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="background:#e0e7ff;">
+      <h6 class="modal-title"><i class="fa fa-rotate-left"></i>
+        إعادةٌ للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.85rem;color:#6b7280;">
+        تعود الواقعةُ لمُدخِلها <strong>بالرقم نفسه</strong> في جولةٍ جديدة —
+        يعدّلها ويعيد إرسالها، وتاريخُ الجولات كلِّه محفوظ (§8.2).
+      </p>
+      <label class="form-label fw-bold">سببُ الإعادة *</label>
       <div>
         <label class="me-3"><input type="radio" name="bx-second" value="1"> نعم — مشغّلان تناوبا</label>
         <label><input type="radio" name="bx-second" value="0"> لا — مشغّلٌ واحد</label>

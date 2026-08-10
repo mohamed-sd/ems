@@ -166,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>الإدارة المالكة <span class="required">*</span></label>
+                        <label for="b_dept">الإدارة المالكة <span class="required">*</span></label>
                         <select name="dept_module" id="b_dept" required>
                             <option value="">— اختر —</option>
                             <?php /* الأقسامُ المتاحةُ لدور المستخدم وحدها — لا يختار
@@ -178,21 +178,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>نوع الفترة <span class="required">*</span></label>
+                        <label for="b_ptype">نوع الفترة <span class="required">*</span></label>
                         <select name="period_type" id="b_ptype" required>
                             <?php foreach ($period_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>السنة المالية <span class="required">*</span></label>
+                        <label for="b_year">السنة المالية <span class="required">*</span></label>
                         <input type="number" name="fiscal_year" id="b_year" required value="<?php echo date('Y'); ?>">
                     </div>
                     <div class="form-group">
-                        <label>رقم الفترة (ربع/شهر)</label>
+                        <label for="b_pno">رقم الفترة (ربع/شهر)</label>
                         <input type="number" name="period_no" id="b_pno" min="1" max="12" placeholder="اختياري">
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظة</label>
+                        <label for="b_note">ملاحظة</label>
                         <input type="text" name="note" id="b_note">
                     </div>
                 </div>

@@ -123,7 +123,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>نوع الحركة <span class="required">*</span></label>
+                        <label for="r_movement">نوع الحركة <span class="required">*</span></label>
                         <select name="movement_type" id="r_movement" required>
                             <?php foreach ($movement_types as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -131,7 +131,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>عامل المدة <span class="required">*</span></label>
+                        <label for="r_operator">عامل المدة <span class="required">*</span></label>
                         <select name="duration_operator" id="r_operator" required>
                             <?php foreach ($operators as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -139,11 +139,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group" id="r_threshold_wrap">
-                        <label>عتبة المدة (أيام)</label>
+                        <label for="r_threshold">عتبة المدة (أيام)</label>
                         <input type="number" name="duration_threshold_days" id="r_threshold" value="" placeholder="مثال: 60">
                     </div>
                     <div class="form-group">
-                        <label>المتحمِّل <span class="required">*</span></label>
+                        <label for="r_bearer">المتحمِّل <span class="required">*</span></label>
                         <select name="default_bearer" id="r_bearer" required>
                             <?php foreach ($bearers as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -151,7 +151,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>الأساس / ملاحظة</label>
+                        <label for="r_basis">الأساس / ملاحظة</label>
                         <input type="text" name="basis_note" id="r_basis" placeholder="تعاقدي / قاعدة الستين / داخلي ...">
                     </div>
                     <div class="form-group">

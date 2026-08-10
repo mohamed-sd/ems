@@ -151,46 +151,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — اللوابد والمركبات الناقلة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>كود الناقل</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>النوع</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الوصف</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>الملكية</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>المالك</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>السعة القصوى</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>رقم اللوحة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>الرخصة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ انتهاء الرخصة</label>
-                    <input type="date" name="f8"></div>
-                <div class="form-group"><label>التأمين</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ انتهاء التأمين</label>
-                    <input type="date" name="f10"></div>
-                <div class="form-group"><label>السائق المكلَّف</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>التعرفة</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f14"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f16"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f19" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_1517_27254">كود الناقل</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1517_27254"></div>
+                <div class="form-group"><label for="emsf_1518_1a754">النوع</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1518_1a754"></div>
+                <div class="form-group"><label for="emsf_1519_c77af">الوصف</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1519_c77af"></div>
+                <div class="form-group"><label for="emsf_1520_514c4">الملكية</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1520_514c4"></div>
+                <div class="form-group"><label for="emsf_1521_dc42d">المالك</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1521_dc42d"></div>
+                <div class="form-group"><label for="emsf_1522_a1d07">السعة القصوى</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1522_a1d07"></div>
+                <div class="form-group"><label for="emsf_1523_a6b39">رقم اللوحة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1523_a6b39"></div>
+                <div class="form-group"><label for="emsf_1524_3dd8b">الرخصة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1524_3dd8b"></div>
+                <div class="form-group"><label for="emsf_1525_cf28c">تاريخ انتهاء الرخصة</label>
+                    <input type="date" name="f8" id="emsf_1525_cf28c"></div>
+                <div class="form-group"><label for="emsf_1526_b9dfc">التأمين</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1526_b9dfc"></div>
+                <div class="form-group"><label for="emsf_1527_8c844">تاريخ انتهاء التأمين</label>
+                    <input type="date" name="f10" id="emsf_1527_8c844"></div>
+                <div class="form-group"><label for="emsf_1528_a7c32">السائق المكلَّف</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1528_a7c32"></div>
+                <div class="form-group"><label for="emsf_1529_a839d">التعرفة</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1529_a839d"></div>
+                <div class="form-group"><label for="emsf_1530_7d546">العملة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1530_7d546"></div>
+                <div class="form-group"><label for="emsf_1531_96871">الحالة</label>
+                    <select name="f14" id="emsf_1531_96871"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1532_ae1ac">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1532_ae1ac"></div>
+                <div class="form-group"><label for="emsf_1533_ea667">تاريخ الاعتماد</label>
+                    <input type="date" name="f16" id="emsf_1533_ea667"></div>
+                <div class="form-group"><label for="emsf_1534_e9af5">مرجع التفويض</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_1534_e9af5"></div>
+                <div class="form-group"><label for="emsf_1535_24e57">المرجع الأب</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_1535_24e57"></div>
+                <div class="form-group"><label for="emsf_1536_fa3e9">المرفق</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_1536_fa3e9"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

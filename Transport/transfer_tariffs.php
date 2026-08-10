@@ -192,45 +192,45 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="post" class="ems-form">
             <input type="hidden" name="tar_action" value="add">
             <div class="form-grid">
-                <div class="form-group"><label>المورد <small>— فارغٌ = الأعمّ</small></label>
-                    <select name="supplier_id"><option value="0">— أي مورد —</option>
+                <div class="form-group"><label for="emsf_1605_f6ff7">المورد <small>— فارغٌ = الأعمّ</small></label>
+                    <select name="supplier_id" id="emsf_1605_f6ff7"><option value="0">— أي مورد —</option>
                         <?php foreach ($suppliers as $s): ?>
                             <option value="<?php echo intval($s['id']); ?>"><?php echo htmlspecialchars((string)$s['name']); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>نوعُ الترحيل</label>
-                    <select name="transfer_type_id"><option value="0">— أي نوع —</option>
+                <div class="form-group"><label for="emsf_1606_ba46b">نوعُ الترحيل</label>
+                    <select name="transfer_type_id" id="emsf_1606_ba46b"><option value="0">— أي نوع —</option>
                         <?php foreach ($types as $t): ?>
                             <option value="<?php echo intval($t['id']); ?>"><?php echo htmlspecialchars((string)$t['name']); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>من موقع</label>
-                    <select name="from_location_id"><option value="0">— أي مبدأ —</option>
+                <div class="form-group"><label for="emsf_1607_615c9">من موقع</label>
+                    <select name="from_location_id" id="emsf_1607_615c9"><option value="0">— أي مبدأ —</option>
                         <?php foreach ($locs as $l): ?>
                             <option value="<?php echo intval($l['id']); ?>"><?php echo htmlspecialchars((string)$l['name']); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>إلى موقع</label>
-                    <select name="to_location_id"><option value="0">— أي منتهى —</option>
+                <div class="form-group"><label for="emsf_1608_cee1e">إلى موقع</label>
+                    <select name="to_location_id" id="emsf_1608_cee1e"><option value="0">— أي منتهى —</option>
                         <?php foreach ($locs as $l): ?>
                             <option value="<?php echo intval($l['id']); ?>"><?php echo htmlspecialchars((string)$l['name']); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>نموذجُ التسعير <span style="color:#c00">*</span></label>
-                    <select name="pricing_model" required>
+                <div class="form-group"><label for="emsf_1609_7338d">نموذجُ التسعير <span style="color:#c00">*</span></label>
+                    <select name="pricing_model" required id="emsf_1609_7338d">
                         <?php foreach ($MODELS as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>المعدّل <span style="color:#c00">*</span></label>
-                    <input type="number" name="rate" step="0.0001" min="0.0001" required></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="currency" value="SDG" maxlength="8"></div>
-                <div class="form-group"><label>حدٌّ أدنى</label>
-                    <input type="number" name="min_amount" step="0.01" min="0"></div>
-                <div class="form-group"><label>حدٌّ أقصى</label>
-                    <input type="number" name="max_amount" step="0.01" min="0"></div>
-                <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                    <input type="date" name="effective_from" required></div>
-                <div class="form-group"><label>سريان إلى</label>
-                    <input type="date" name="effective_to"></div>
-                <div class="form-group"><label>مرجعُ التعرفة</label>
-                    <input type="text" name="note" maxlength="200" placeholder="بندُ العقد أو مرجعُ الاعتماد"></div>
+                <div class="form-group"><label for="emsf_1610_85521">المعدّل <span style="color:#c00">*</span></label>
+                    <input type="number" name="rate" step="0.0001" min="0.0001" required id="emsf_1610_85521"></div>
+                <div class="form-group"><label for="emsf_1611_d2458">العملة</label>
+                    <input type="text" name="currency" value="SDG" maxlength="8" id="emsf_1611_d2458"></div>
+                <div class="form-group"><label for="emsf_1612_f8b14">حدٌّ أدنى</label>
+                    <input type="number" name="min_amount" step="0.01" min="0" id="emsf_1612_f8b14"></div>
+                <div class="form-group"><label for="emsf_1613_68f63">حدٌّ أقصى</label>
+                    <input type="number" name="max_amount" step="0.01" min="0" id="emsf_1613_68f63"></div>
+                <div class="form-group"><label for="emsf_1614_de312">سريان من <span style="color:#c00">*</span></label>
+                    <input type="date" name="effective_from" required id="emsf_1614_de312"></div>
+                <div class="form-group"><label for="emsf_1615_7b9b2">سريان إلى</label>
+                    <input type="date" name="effective_to" id="emsf_1615_7b9b2"></div>
+                <div class="form-group"><label for="emsf_1616_b27a1">مرجعُ التعرفة</label>
+                    <input type="text" name="note" maxlength="200" placeholder="بندُ العقد أو مرجعُ الاعتماد" id="emsf_1616_b27a1"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> أضف التعرفة</button></div>
         </form>
@@ -329,7 +329,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="tar_action" value="distance">
                                 <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                                 <input type="number" name="distance_km" step="0.01" min="0.01"
-                                       style="width:80px" placeholder="كم">
+                                       style="width:80px" placeholder="كم" aria-label="كم">
                                 <button type="submit" class="badge badge-secondary" style="border:0;padding:5px 8px">حفظ</button>
                             </form>
                         <?php else: ?>—<?php endif; ?></td>
@@ -352,7 +352,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <input type="hidden" name="tar_action" value="price">
                             <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                             <input type="text" name="reprice_reason" maxlength="90" required
-                                   placeholder="حجّةُ إعادة التسعير" style="width:140px">
+                                   placeholder="حجّةُ إعادة التسعير" style="width:140px" aria-label="حجّةُ إعادة التسعير">
                             <button type="submit" class="badge badge-warning" style="border:0;padding:5px 10px">
                                 أعِد التسعير</button>
                         </form>

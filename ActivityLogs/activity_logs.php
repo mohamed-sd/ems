@@ -17,6 +17,14 @@ require_once '../config.php';
 require_once '../app/bootstrap.php';
 require_once '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 use App\Repositories\ActivityLogRepository;
 use App\Services\ActivityLogService;
 
@@ -409,7 +417,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
                         <!-- نوع الإجراء — يبحث على data-action في الـ <td> -->
                         <div class="form-group">
-                            <label>نوع الإجراء</label>
+                            <label for="f_action_type">نوع الإجراء</label>
                             <select id="f_action_type">
                                 <option value="">الكل</option>
                                 <?php foreach ($actionLabels as $k => $v): ?>
@@ -420,19 +428,19 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
                         <!-- من تاريخ -->
                         <div class="form-group">
-                            <label>من تاريخ</label>
+                            <label for="f_date_from">من تاريخ</label>
                             <input type="date" id="f_date_from">
                         </div>
 
                         <!-- إلى تاريخ -->
                         <div class="form-group">
-                            <label>إلى تاريخ</label>
+                            <label for="f_date_to">إلى تاريخ</label>
                             <input type="date" id="f_date_to">
                         </div>
 
                         <!-- نوع الميثود — column(9 hidden) -->
                         <div class="form-group">
-                            <label>طريقة HTTP</label>
+                            <label for="f_http_method">طريقة HTTP</label>
                             <select id="f_http_method">
                                 <option value="">الكل</option>
                                 <option value="GET">GET</option>
@@ -814,7 +822,6 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         var DT_BASE = '/ems/assets/vendor/datatables/js/';
         var DT_SCRIPTS = [
             DT_BASE + 'jquery.dataTables.min.js',
-            DT_BASE + 'dataTables.responsive.min.js',
             DT_BASE + 'dataTables.buttons.min.js',
             DT_BASE + 'buttons.html5.min.js',
             DT_BASE + 'buttons.print.min.js'
@@ -877,7 +884,6 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
         var logsTable = $('#logsTable').DataTable({
             language: { url: '/ems/assets/i18n/datatables/ar.json' },
-            responsive: true,
             autoWidth: false,
             // ── H-22 (UI-01 §4/§9): معالجةٌ خادمية — الترقيمُ والفرزُ والبحثُ
             //    في الخادم، صفحةُ 50، تأخيرُ البحث 400ms، ولا stateSave مع

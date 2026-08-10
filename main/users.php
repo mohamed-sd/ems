@@ -453,24 +453,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             <div class="card-body">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-user"></i> الاسم الثلاثي</label>
+                        <label for="name"><i class="fas fa-user"></i> الاسم الثلاثي</label>
                         <input type="text" name="name" id="name" placeholder="الاسم الثلاثي" value="مستخدم" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-id-badge"></i> اسم المستخدم</label>
+                        <label for="username"><i class="fas fa-id-badge"></i> اسم المستخدم</label>
                         <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)"
                             value="username" required autocomplete="off" />
                         <small id="usernameFeedback" class="pu-username-feedback"></small>
                     </div>
                     <div>
-                        <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                        <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
                         <input type="password" name="password" id="password" placeholder="كلمة المرور"
                             value="12345678" />
                         <small class="text-muted"><i class="fas fa-info-circle"></i> اتركه فارغاً إذا لا تريد تغييره
                             عند التعديل</small>
                     </div>
                     <div>
-                        <label><i class="fas fa-user-shield"></i> الإدارة / الصلاحية</label>
+                        <label for="role"><i class="fas fa-user-shield"></i> الإدارة / الصلاحية</label>
                         <select name="role" id="role" class="form-control" required>
                             <option value="">-- حدد الصلاحية --</option>
                             <?php foreach ($roles as $role_id => $role_name): ?>
@@ -481,13 +481,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-phone"></i> رقم الهاتف</label>
+                        <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف</label>
                         <input type="text" name="phone" id="phone" placeholder="رقم الهاتف" required
                             value="09209303903" />
                     </div>
 
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> حالة المستخدم</label>
+                        <label for="status"><i class="fas fa-toggle-on"></i> حالة المستخدم</label>
                         <select name="status" id="status" class="form-control" required>
                             <option value="active" selected>✅ نشط</option>
                             <option value="inactive">❌ غير نشط</option>
@@ -496,7 +496,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                     <?php if ($users_has_employee_id): ?>
                     <div>
-                        <label><i class="fas fa-id-card-alt"></i> الموظف المُسنَد <span class="pu-required-star">*</span></label>
+                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المُسنَد <span class="pu-required-star">*</span></label>
                         <select name="employee_id" id="employee_id_link" class="form-control" required>
                             <option value="">— اختر الموظف —</option>
                             <?php foreach ($employees_for_link as $emp): ?>
@@ -513,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     <?php endif; ?>
 
                     <div id="supplierDiv" class="pu-hidden">
-                        <label><i class="fas fa-truck-field"></i> المورد المرتبط <span class="pu-required-star">*</span></label>
+                        <label for="supplier_entity_id"><i class="fas fa-truck-field"></i> المورد المرتبط <span class="pu-required-star">*</span></label>
                         <select name="supplier_entity_id" id="supplier_entity_id" class="form-control">
                             <option value="">— اختر المورد —</option>
                             <?php foreach ($suppliers_for_link as $sup): ?>
@@ -526,7 +526,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </div>
 
                     <div id="projectDiv" class="pu-hidden">
-                        <label><i class="fas fa-project-diagram"></i> المشروع <span
+                        <label for="project_id"><i class="fas fa-project-diagram"></i> المشروع <span
                                 class="pu-required-star">*</span></label>
                         <select id="project_id" name="project_id" class="form-control">
                             <option value="">-- اختر المشروع --</option>
@@ -546,7 +546,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </div>
 
                     <div id="contractDiv" class="pu-hidden">
-                        <label><i class="fas fa-file-contract"></i> العقد <span
+                        <label for="contract_id"><i class="fas fa-file-contract"></i> العقد <span
                                 class="pu-required-star">*</span></label>
                         <select id="contract_id" name="contract_id" class="form-control">
                             <option value="">-- اختر العقد --</option>
@@ -572,19 +572,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-user-shield"></i> الإدارة</label>
+                <label for="filterRole"><i class="fa fa-user-shield"></i> الإدارة</label>
                 <select id="filterRole" class="form-control">
                     <option value="">-- كل الإدارات --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-toggle-on"></i> الحالة</label>
+                <label for="filterStatus"><i class="fa fa-toggle-on"></i> الحالة</label>
                 <select id="filterStatus" class="form-control">
                     <option value="">-- كل الحالات --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-id-card-alt"></i> الارتباط بموظف</label>
+                <label for="filterLinked"><i class="fa fa-id-card-alt"></i> الارتباط بموظف</label>
                 <select id="filterLinked" class="form-control">
                     <option value="">-- الكل --</option>
                     <option value="linked">مرتبط بموظف</option>

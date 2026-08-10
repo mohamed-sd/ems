@@ -91,8 +91,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="filter-body">
                 <div class="filter-field">
-                    <label><i class="fas fa-truck-loading"></i> المورد</label>
-                    <select name="supplier" class="form-control">
+                    <label for="emsf_1370_5561b"><i class="fas fa-truck-loading"></i> المورد</label>
+                    <select name="supplier" class="form-control" id="emsf_1370_5561b">
                         <option value="">-- الكل --</option>
                         <?php
                         $sup = array();
@@ -108,7 +108,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="filter-field">
-                    <label><i class="fas fa-project-diagram"></i> المشروع</label>
+                    <label for="projectSelect"><i class="fas fa-project-diagram"></i> المشروع</label>
                     <select name="project" id="projectSelect" class="form-control">
                         <option value="">-- الكل --</option>
                         <?php
@@ -125,7 +125,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="filter-field">
-                    <label><i class="fas fa-file-contract"></i> العقد</label>
+                    <label for="contractSelect"><i class="fas fa-file-contract"></i> العقد</label>
                     <select name="contract" id="contractSelect" class="form-control">
                         <option value="">-- الكل --</option>
                         <?php
@@ -207,7 +207,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         (function () {
             $(document).ready(function () {
                 $('#projectsTable table').DataTable({
-                    responsive: true,
                     dom: 'Bfrtip',
                     buttons: [
                         { extend: 'copy', text: 'نسخ' },

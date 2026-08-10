@@ -240,7 +240,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <input type="text" name="reason" placeholder="سبب الإرجاع (إلزامي)" style="width:160px">
+                    <input type="text" name="reason" placeholder="سبب الإرجاع (إلزامي)" style="width:160px" aria-label="سبب الإرجاع (إلزامي)">
                     <button type="submit" class="btn btn-sm btn-outline-warning">أرجِع للمسودة</button>
                 </form>
                 <?php endif; ?>

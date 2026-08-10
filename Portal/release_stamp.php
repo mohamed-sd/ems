@@ -143,40 +143,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — بصمة الإصدار وتقرير النشر</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الإصدار</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>بصمة الإصدار</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ النشر</label>
-                    <input type="date" name="f2"></div>
-                <div class="form-group"><label>نوع الإصدار</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الشاشات المضافة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الشاشات المعدَّلة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>الأعمدة المضافة</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0"></div>
-                <div class="form-group"><label>الأفعال المضافة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>القواعد المتغيرة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>الهجرات المنفَّذة</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>تقرير الاكتمال</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>الاختبارات المجتازة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>الاختبارات الراسبة</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>علَم الرجوع</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>الناشر — الاسم والصفة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f16"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1232_fac21">رقم الإصدار</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1232_fac21"></div>
+                <div class="form-group"><label for="emsf_1233_68bf3">بصمة الإصدار</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1233_68bf3"></div>
+                <div class="form-group"><label for="emsf_1234_88775">تاريخ النشر</label>
+                    <input type="date" name="f2" id="emsf_1234_88775"></div>
+                <div class="form-group"><label for="emsf_1235_e3066">نوع الإصدار</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1235_e3066"></div>
+                <div class="form-group"><label for="emsf_1236_4c202">الشاشات المضافة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1236_4c202"></div>
+                <div class="form-group"><label for="emsf_1237_13676">الشاشات المعدَّلة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1237_13676"></div>
+                <div class="form-group"><label for="emsf_1238_51cdc">الأعمدة المضافة</label>
+                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_1238_51cdc"></div>
+                <div class="form-group"><label for="emsf_1239_aa89b">الأفعال المضافة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1239_aa89b"></div>
+                <div class="form-group"><label for="emsf_1240_36a9d">القواعد المتغيرة</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_1240_36a9d"></div>
+                <div class="form-group"><label for="emsf_1241_a72aa">الهجرات المنفَّذة</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1241_a72aa"></div>
+                <div class="form-group"><label for="emsf_1242_3a8a8">تقرير الاكتمال</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1242_3a8a8"></div>
+                <div class="form-group"><label for="emsf_1243_8d856">الاختبارات المجتازة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1243_8d856"></div>
+                <div class="form-group"><label for="emsf_1244_316f1">الاختبارات الراسبة</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1244_316f1"></div>
+                <div class="form-group"><label for="emsf_1245_49296">علَم الرجوع</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1245_49296"></div>
+                <div class="form-group"><label for="emsf_1246_3bd9b">الناشر — الاسم والصفة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1246_3bd9b"></div>
+                <div class="form-group"><label for="emsf_1247_70386">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1247_70386"></div>
+                <div class="form-group"><label for="emsf_1248_06309">الحالة</label>
+                    <select name="f16" id="emsf_1248_06309"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

@@ -90,14 +90,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="e_id" value="">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>اسم القاعدة <span class="required">*</span></label><input type="text" name="name" id="e_name" required></div>
-                <div class="form-group"><label>المستوى (1..5) <span class="required">*</span></label><input type="number" min="1" max="5" name="level_no" id="e_level" value="1" required></div>
-                <div class="form-group"><label>يُصعَّد بعد (ساعات من تجاوز الإنجاز) <span class="required">*</span></label><input type="number" step="0.5" min="0.5" name="escalate_after_hours" id="e_after" required></div>
-                <div class="form-group"><label>الجهة المُصعَّد إليها <span class="required">*</span></label>
+                <div class="form-group"><label for="e_name">اسم القاعدة <span class="required">*</span></label><input type="text" name="name" id="e_name" required></div>
+                <div class="form-group"><label for="e_level">المستوى (1..5) <span class="required">*</span></label><input type="number" min="1" max="5" name="level_no" id="e_level" value="1" required></div>
+                <div class="form-group"><label for="e_after">يُصعَّد بعد (ساعات من تجاوز الإنجاز) <span class="required">*</span></label><input type="number" step="0.5" min="0.5" name="escalate_after_hours" id="e_after" required></div>
+                <div class="form-group"><label for="e_to">الجهة المُصعَّد إليها <span class="required">*</span></label>
                     <select name="escalate_to_role" id="e_to" required>
                         <?php foreach ($levels as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>قناة الإشعار</label>
+                <div class="form-group"><label for="e_channel">قناة الإشعار</label>
                     <select name="notify_channel" id="e_channel">
                         <?php foreach ($channels as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>

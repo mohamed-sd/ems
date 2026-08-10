@@ -16,6 +16,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once '../includes/gov_columns.php';
 require_once '../includes/m00_exec_helpers.php';
 
@@ -336,58 +344,58 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — قرار فتح مشروع جديد</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم القرار</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>اسم المشروع</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>العميل</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>العقد</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الموقع أو المواقع</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>نموذج العمل</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>وحدة العمل</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>الكمية المتعاقدة</label>
-                    <input type="text" inputmode="decimal" name="f7" placeholder="0"></div>
-                <div class="form-group"><label>تاريخ البدء المخطط</label>
-                    <input type="date" name="f8"></div>
-                <div class="form-group"><label>المدة</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>المعدات المطلوبة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>المشغّلون المطلوبون</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>مصدر المعدات</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>احتياج التمويل</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>مركز التكلفة</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>مدير الموقع المعيَّن</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>صلاحياته</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>إفادة التشغيل</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>إفادة المبيعات</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>إفادة القوى</label>
-                    <input type="text" name="f19" maxlength="190"></div>
-                <div class="form-group"><label>إفادة المالية</label>
-                    <input type="text" name="f20" maxlength="190"></div>
-                <div class="form-group"><label>إفادة الأسطول</label>
-                    <input type="text" name="f21" maxlength="190"></div>
-                <div class="form-group"><label>إفادة التمويل</label>
-                    <input type="text" name="f22" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f23" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f24"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f25"><option value="مسودة">مسودة</option><option value="قيد الإفادات">قيد الإفادات</option><option value="جاهز للقرار">جاهز للقرار</option><option value="مؤجل">مؤجل</option></select></div>
+                <div class="form-group"><label for="emsf_1205_e82c5">رقم القرار</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1205_e82c5"></div>
+                <div class="form-group"><label for="emsf_1206_58d40">اسم المشروع</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1206_58d40"></div>
+                <div class="form-group"><label for="emsf_1207_618f7">العميل</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1207_618f7"></div>
+                <div class="form-group"><label for="emsf_1208_11eba">العقد</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1208_11eba"></div>
+                <div class="form-group"><label for="emsf_1209_fd4c4">الموقع أو المواقع</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1209_fd4c4"></div>
+                <div class="form-group"><label for="emsf_1210_bc5ae">نموذج العمل</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1210_bc5ae"></div>
+                <div class="form-group"><label for="emsf_1211_f49a2">وحدة العمل</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1211_f49a2"></div>
+                <div class="form-group"><label for="emsf_1212_7d2ca">الكمية المتعاقدة</label>
+                    <input type="text" inputmode="decimal" name="f7" placeholder="0" id="emsf_1212_7d2ca"></div>
+                <div class="form-group"><label for="emsf_1213_9995c">تاريخ البدء المخطط</label>
+                    <input type="date" name="f8" id="emsf_1213_9995c"></div>
+                <div class="form-group"><label for="emsf_1214_d724e">المدة</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1214_d724e"></div>
+                <div class="form-group"><label for="emsf_1215_7b8c5">المعدات المطلوبة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1215_7b8c5"></div>
+                <div class="form-group"><label for="emsf_1216_86054">المشغّلون المطلوبون</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1216_86054"></div>
+                <div class="form-group"><label for="emsf_1217_3aeff">مصدر المعدات</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1217_3aeff"></div>
+                <div class="form-group"><label for="emsf_1218_e3383">احتياج التمويل</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1218_e3383"></div>
+                <div class="form-group"><label for="emsf_1219_6fd80">مركز التكلفة</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_1219_6fd80"></div>
+                <div class="form-group"><label for="emsf_1220_fc83c">مدير الموقع المعيَّن</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1220_fc83c"></div>
+                <div class="form-group"><label for="emsf_1221_aece1">صلاحياته</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_1221_aece1"></div>
+                <div class="form-group"><label for="emsf_1222_3450b">إفادة التشغيل</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_1222_3450b"></div>
+                <div class="form-group"><label for="emsf_1223_9339e">إفادة المبيعات</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_1223_9339e"></div>
+                <div class="form-group"><label for="emsf_1224_77bb6">إفادة القوى</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_1224_77bb6"></div>
+                <div class="form-group"><label for="emsf_1225_ec610">إفادة المالية</label>
+                    <input type="text" name="f20" maxlength="190" id="emsf_1225_ec610"></div>
+                <div class="form-group"><label for="emsf_1226_cec0d">إفادة الأسطول</label>
+                    <input type="text" name="f21" maxlength="190" id="emsf_1226_cec0d"></div>
+                <div class="form-group"><label for="emsf_1227_c1eb4">إفادة التمويل</label>
+                    <input type="text" name="f22" maxlength="190" id="emsf_1227_c1eb4"></div>
+                <div class="form-group"><label for="emsf_1228_0c41f">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f23" maxlength="190" id="emsf_1228_0c41f"></div>
+                <div class="form-group"><label for="emsf_1229_ae2f2">تاريخ الاعتماد</label>
+                    <input type="date" name="f24" id="emsf_1229_ae2f2"></div>
+                <div class="form-group"><label for="emsf_1230_eecd9">الحالة</label>
+                    <select name="f25" id="emsf_1230_eecd9"><option value="مسودة">مسودة</option><option value="قيد الإفادات">قيد الإفادات</option><option value="جاهز للقرار">جاهز للقرار</option><option value="مؤجل">مؤجل</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
@@ -415,8 +423,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-folder-open"></i> اعتماد الفتح — الأثر الخماسي: مشروع · مركز تكلفة · مواقع · مدير · حجز</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>القرار المكتمل إفاداتُه الخمس</label>
-                    <select name="row" required>
+                <div class="form-group"><label for="emsf_1231_3ccda">القرار المكتمل إفاداتُه الخمس</label>
+                    <select name="row" required id="emsf_1231_3ccda">
                         <?php foreach ($charterable as $d):
                             $lbl = 'EXPC-' . intval($d['id'])
                                  . ' — ' . (string) $d['decision_no']

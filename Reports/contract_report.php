@@ -165,8 +165,8 @@ include __DIR__ . '/../includes/page_header.php';
         <div class="card-body">
             <form method="GET" class="form-grid" style="align-items:end;">
                 <div>
-                    <label><i class="fas fa-file-signature"></i> اختر العقد</label>
-                    <select name="contract">
+                    <label for="emsf_1354_a59d4"><i class="fas fa-file-signature"></i> اختر العقد</label>
+                    <select name="contract" id="emsf_1354_a59d4">
                         <option value="">-- اختر --</option>
                         <?php foreach ($contracts as $row) {
                             $selected = ($contract_filter == $row['id']) ? "selected" : "";

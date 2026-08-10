@@ -578,7 +578,6 @@ $(document).ready(function () {
         lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, 'الكل']],
         searchDelay: 300,
         deferRender: true,
-        responsive: true,
         columnDefs: [
             { orderable: false, targets: -1 }
         ]

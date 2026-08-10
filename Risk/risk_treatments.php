@@ -4,6 +4,14 @@
  * كل إجراء بمسؤول ومهلة — والمتأخر يظهر ويُصعَّد، والإغلاق بقبول المتحقق.
  */
 require_once __DIR__ . '/_risk_common.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 $__pp = risk_guard_screen($conn, $is_super_admin);
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes($__pp);

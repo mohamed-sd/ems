@@ -10,24 +10,52 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Transport/TransferDeliveryService.php';
+
+// CS-01 · RF-02 — الحارسُ فوقَ المعالج (كان الإدراجُ في السطرِ 22 و‎insidebar‎ في 43).
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['deliver_id'])) {
-    $oid = intval($_POST['deliver_id']);
-    $note = trim($_POST['delivery_note'] ?? '');
-    // التسليمُ حدثٌ موثَّقٌ — والمرحلةُ تبقى arrived حتى الإقفال بتكلفتها
-    mysqli_query($conn, "INSERT INTO transfer_events (company_id, order_id, event_type, body, actor_user_id)
-                         VALUES ($company_id, $oid, 'delivered', '" . mysqli_real_escape_string($conn, $note ?: 'تسليمٌ مؤكَّد') . "', $uid)");
-    $msg = "وُثّق تسليمُ الأمر #$oid — أتمّ الدورةَ من شاشة الإقفال وتحميل التكلفة";
+/* ══ FN-08 (P0) — «مستندُ التسليمِ لا يُخزَّن وتكرارُ الإرسالِ يُدرج صفًّا» ══
+   الحكمُ انتقل إلى خدمةِ النطاق: مستندٌ مخزَّنٌ بمرجعِه ووقتِه وشاهدِه، وحدثٌ
+   واحدٌ مهما تكرر الإرسال (فريدٌ مركَّبٌ في القاعدةِ لا فحصٌ في التطبيق). */
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'trs.transfer.confirm_delivery',
+    'perm'    => 'can_edit',
+    'trigger' => 'deliver_id',
+    'idem'    => array('order' => intval($_POST['deliver_id'] ?? 0)),
+    'validate' => function (array $in) {
+        $oid = intval($in['deliver_id'] ?? 0);
+        $wit = trim($in['witness_name'] ?? '');
+        if ($oid <= 0) { return array('ok' => false, 'msg' => 'أمرٌ غيرُ صالح (422)'); }
+        if ($wit === '') { return array('ok' => false, 'msg' => 'شاهدُ التسليم إلزاميّ (422)'); }
+        return array('ok' => true, 'data' => array(
+            'oid' => $oid, 'note' => trim($in['delivery_note'] ?? ''), 'witness' => $wit,
+        ));
+    },
+));
+if (!$__pc['ok'] && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
+if ($__pc['replay'])                     { $msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    $svc = new \App\Services\Transport\TransferDeliveryService($conn);
+    $res = $svc->confirmDelivery($company_id, (int) $__pc['data']['oid'],
+        (string) $__pc['data']['note'], (string) $__pc['data']['witness'], $uid);
+    $msg = $res['msg'];
+    if (!empty($res['ok']) && empty($res['replay'])) {
+        ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'transfer_delivery_docs#' . $res['doc_id']);
+    }
 }
 
 $rows = array();
 $r = mysqli_query($conn,
     "SELECT o.id, o.order_no, o.arrival_datetime, tl.name AS to_loc, e.name AS vehicle,
-            (SELECT COUNT(*) FROM transfer_events ev WHERE ev.order_id = o.id AND ev.event_type = 'delivered') AS delivered
+            (SELECT COUNT(*) FROM transfer_events ev WHERE ev.order_id = o.id AND ev.event_type = 'delivered') AS delivered,
+            (SELECT d.doc_ref FROM transfer_delivery_docs d
+              WHERE d.company_id = o.company_id AND d.order_id = o.id ORDER BY d.id DESC LIMIT 1) AS doc_ref
      FROM transfer_orders o
      LEFT JOIN trs_locations tl ON tl.id = o.to_location_id
      LEFT JOIN equipments e ON e.id = o.vehicle_id
@@ -74,15 +102,24 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($o['to_loc'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($o['vehicle'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($o['arrival_datetime'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= $o['delivered'] ? '<span class="badge" style="background:#198754">مُسلَّم</span>' : '<span class="badge" style="background:#6c757d">بانتظار التسليم</span>' ?></td>
+        <td><?= $o['doc_ref']
+              ? '<span class="badge" style="background:#198754">مُسلَّم</span> <small class="text-muted">' . htmlspecialchars($o['doc_ref'], ENT_QUOTES, 'UTF-8') . '</small>'
+              : '<span class="badge" style="background:#6c757d">بانتظار التسليم</span>' ?></td>
         <td>
-          <?php if (!$o['delivered']): ?>
-          <form method="post" style="display:flex;gap:6px">
-            <input type="hidden" name="deliver_id" value="<?= intval($o['id']) ?>">
-            <input type="text" name="delivery_note" class="form-control form-control-sm" placeholder="ملاحظةُ التسليم" style="max-width:180px">
+          <?php if (!$o['doc_ref']): ?>
+          <?php $rid = intval($o['id']); ?>
+          <form method="post" style="display:flex;gap:6px;flex-wrap:wrap">
+            <input type="hidden" name="deliver_id" value="<?= $rid ?>">
+            <label class="visually-hidden" for="dlv_wit_<?= $rid ?>">شاهدُ التسليم</label>
+            <input id="dlv_wit_<?= $rid ?>" type="text" name="witness_name" required
+                   class="form-control form-control-sm" placeholder="شاهدُ التسليم *" style="max-width:150px">
+            <label class="visually-hidden" for="dlv_note_<?= $rid ?>">ملاحظةُ التسليم</label>
+            <input id="dlv_note_<?= $rid ?>" type="text" name="delivery_note"
+                   class="form-control form-control-sm" placeholder="ملاحظةُ التسليم" style="max-width:180px">
             <button class="action-btn" type="submit">تأكيدُ التسليم</button>
           </form>
           <?php else: ?>
+          <!-- FIXC-0047: الرابطُ المباشرُ للإقفالِ يظهر **بعدَ** تأكيدِ الوصولِ لا قبلَه -->
           <a class="action-btn" href="transfer_close_cost.php?id=<?= intval($o['id']) ?>">أقفل بتكلفته ←</a>
           <?php endif; ?>
         </td>

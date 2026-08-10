@@ -130,19 +130,19 @@ include '../insidebar.php';
         <input type="hidden" name="permit_action" value="request">
         <h5>طلب إذن جديد</h5>
         <div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-            <div class="form-group"><label>نوع الإذن *</label>
-                <select name="permit_type_code" required><option value="">— اختر —</option>
+            <div class="form-group"><label for="emsf_1977_c41c7">نوع الإذن *</label>
+                <select name="permit_type_code" required id="emsf_1977_c41c7"><option value="">— اختر —</option>
                     <?php foreach ($ptypes as $t) { echo '<option value="' . htmlspecialchars($t['permit_type_code']) . '">' . htmlspecialchars($t['name_ar']) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>مرجع الموضوع * (EQ:12 · EMP:7 …)</label>
-                <input type="text" name="subject_ref" required placeholder="EQ:12"></div>
-            <div class="form-group"><label>الموقع *</label>
-                <select name="site_id" required><option value="">— اختر —</option>
+            <div class="form-group"><label for="emsf_1978_03e31">مرجع الموضوع * (EQ:12 · EMP:7 …)</label>
+                <input type="text" name="subject_ref" required placeholder="EQ:12" id="emsf_1978_03e31"></div>
+            <div class="form-group"><label for="emsf_1979_549da">الموقع *</label>
+                <select name="site_id" required id="emsf_1979_549da"><option value="">— اختر —</option>
                     <option value="0">مركزي (مخزن/شركة)</option>
                     <?php foreach ($sitesList as $s) { echo '<option value="' . intval($s['id']) . '">' . htmlspecialchars($s['name']) . '</option>'; } ?>
                 </select></div>
-            <div class="form-group"><label>السبب</label><input type="text" name="reason"></div>
-            <div class="form-group"><label>مستند مرجعي</label><input type="text" name="doc_ref"></div>
+            <div class="form-group"><label for="emsf_1980_a6baa">السبب</label><input type="text" name="reason" id="emsf_1980_a6baa"></div>
+            <div class="form-group"><label for="emsf_1981_dfd26">مستند مرجعي</label><input type="text" name="doc_ref" id="emsf_1981_dfd26"></div>
         </div>
         <button type="submit" class="btn-save">رفع الطلب</button>
     </form>

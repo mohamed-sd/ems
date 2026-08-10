@@ -155,40 +155,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — دورة المراجعة الدورية للصلاحيات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الدورة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الفترة</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإطلاق</label>
-                    <input type="date" name="f2"></div>
-                <div class="form-group"><label>الإدارة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>عدد الحسابات المراجَعة</label>
-                    <input type="text" inputmode="decimal" name="f4" placeholder="0"></div>
-                <div class="form-group"><label>المؤكَّدة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>المطلوب سحبها</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>المسحوبة آليًّا</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>الحسابات الخاملة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>المعطَّلة</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>تعارضات واجبات مكتشفة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>استثناءات قائمة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>نسبة الاستجابة</label>
-                    <input type="text" inputmode="decimal" name="f12" placeholder="0"></div>
-                <div class="form-group"><label>مراجع الإدارة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإقفال</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f16"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_509_38274">رقم الدورة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_509_38274"></div>
+                <div class="form-group"><label for="emsf_510_b0573">الفترة</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_510_b0573"></div>
+                <div class="form-group"><label for="emsf_511_b810c">تاريخ الإطلاق</label>
+                    <input type="date" name="f2" id="emsf_511_b810c"></div>
+                <div class="form-group"><label for="emsf_512_4a2f5">الإدارة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_512_4a2f5"></div>
+                <div class="form-group"><label for="emsf_513_c57fc">عدد الحسابات المراجَعة</label>
+                    <input type="text" inputmode="decimal" name="f4" placeholder="0" id="emsf_513_c57fc"></div>
+                <div class="form-group"><label for="emsf_514_52f42">المؤكَّدة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_514_52f42"></div>
+                <div class="form-group"><label for="emsf_515_dc8d1">المطلوب سحبها</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_515_dc8d1"></div>
+                <div class="form-group"><label for="emsf_516_f1f57">المسحوبة آليًّا</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_516_f1f57"></div>
+                <div class="form-group"><label for="emsf_517_6ab67">الحسابات الخاملة</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_517_6ab67"></div>
+                <div class="form-group"><label for="emsf_518_822fb">المعطَّلة</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_518_822fb"></div>
+                <div class="form-group"><label for="emsf_519_62a4d">تعارضات واجبات مكتشفة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_519_62a4d"></div>
+                <div class="form-group"><label for="emsf_520_90045">استثناءات قائمة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_520_90045"></div>
+                <div class="form-group"><label for="emsf_521_e43ac">نسبة الاستجابة</label>
+                    <input type="text" inputmode="decimal" name="f12" placeholder="0" id="emsf_521_e43ac"></div>
+                <div class="form-group"><label for="emsf_522_f977e">مراجع الإدارة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_522_f977e"></div>
+                <div class="form-group"><label for="emsf_523_e693c">تاريخ الإقفال</label>
+                    <input type="date" name="f14" id="emsf_523_e693c"></div>
+                <div class="form-group"><label for="emsf_524_c9143">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_524_c9143"></div>
+                <div class="form-group"><label for="emsf_525_bb8a2">الحالة</label>
+                    <select name="f16" id="emsf_525_bb8a2"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

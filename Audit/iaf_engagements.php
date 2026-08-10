@@ -28,5 +28,20 @@ $U13 = array(
     'rule'       => 'IAF-0006: ولا يصبح المراجعُ جزءًا مما سيراجعه لاحقًا',
     'empty_hint' => 'لا مهامَّ مراجعةٍ مفتوحة',
     'order'       => 'id DESC',
+
+    'actions'    => array(
+        'open' => array(
+            'code'  => 'iaf.engagement.open',
+            'label' => 'فتحُ مهمةِ مراجعة',
+            'rule'  => 'IAF-0044 + IAF-0009: لا مهمةَ بلا خطةٍ معتمدةٍ ولا بلا إقرارِ استقلالٍ سارٍ',
+            'fields' => array('plan_id' => 'رقمُ الخطة', 'area_code' => 'رمزُ المجال', 'title' => 'عنوانُ المهمة', 'lead_auditor' => 'المراجعُ المكلَّف'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::openEngagement($conn, array(
+                    'company_id' => $co, 'plan_id' => (int) ($in['plan_id'] ?? 0), 'area_code' => (string) ($in['area_code'] ?? ''),
+                    'title' => (string) ($in['title'] ?? ''), 'lead_auditor' => (int) ($in['lead_auditor'] ?? 0)));
+            }),
+    ),
+
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

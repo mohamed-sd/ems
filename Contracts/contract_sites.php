@@ -197,7 +197,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                                 <input type="hidden" name="scope_id" value="<?php echo intval($s['id']); ?>">
                                 <input type="text" name="close_reason" required maxlength="200"
-                                       placeholder="سببُ الإقفال" style="width:130px">
+                                       placeholder="سببُ الإقفال" style="width:130px" aria-label="سببُ الإقفال">
                                 <button type="submit" class="badge badge-danger" style="border:0;padding:5px 8px">أقفل</button>
                             </form>
                         <?php endif; ?>
@@ -215,23 +215,24 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="cs_action" value="add">
             <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>الموقع <span style="color:#c00">*</span></label>
-                    <select name="site_id" required>
+                <div class="form-group"><label for="emsf_104_49f39">الموقع <span style="color:#c00">*</span></label>
+                    <select name="site_id" required id="emsf_104_49f39">
                         <?php foreach ($sites as $s): ?>
                             <option value="<?php echo intval($s['id']); ?>">
                                 <?php echo htmlspecialchars((string)$s['name']); ?>
                                 (<?php echo (string)$s['site_kind'] === 'mine' ? 'منجم' : 'موقع'; ?>)</option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>اسمُ النطاق <small>— فارغٌ = اسمُ الموقع</small></label>
-                    <input type="text" name="scope_name" maxlength="190"></div>
-                <div class="form-group"><label>من تاريخ</label><input type="date" name="start_date"></div>
-                <div class="form-group"><label>إلى تاريخ</label><input type="date" name="end_date"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="state"><option value="active">نافذ</option>
+                <div class="form-group"><label for="emsf_105_4b108">اسمُ النطاق <small>— فارغٌ = اسمُ الموقع</small></label>
+                    <input type="text" name="scope_name" maxlength="190" id="emsf_105_4b108"></div>
+                <div class="form-group"><label for="emsf_106_1593e">من تاريخ</label><input type="date" name="start_date" id="emsf_106_1593e"></div>
+                <div class="form-group"><label for="emsf_107_66d13">إلى تاريخ</label><input type="date" name="end_date" id="emsf_107_66d13"></div>
+                <div class="form-group"><label for="emsf_108_4d681">الحالة</label>
+                    <select name="state" id="emsf_108_4d681"><option value="active">نافذ</option>
                         <option value="planned">مخطط</option><option value="paused">موقوف</option></select></div>
-                <div class="form-group"><label style="display:flex;align-items:center;gap:8px">
+                <div class="form-group"><label style="display:flex;align-items:center;gap:8px" for="emsf_109_b3899">
                     <input type="checkbox" name="is_primary" value="1" style="width:auto"> نطاقٌ رئيسي</label></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="200"></div>
+                <div class="form-group"><label>ملاحظة</label></div>
+                <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="200" id="emsf_109_b3899"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save">
                 <i class="fa fa-plus"></i> أضف نطاقًا</button></div>

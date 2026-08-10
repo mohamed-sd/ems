@@ -1412,6 +1412,13 @@ if (!function_exists('fin_budget_transition')) {
             if ($state !== 'submitted') {
                 $out['status'] = 'state'; $out['reason'] = 'لا تُجاز إلا موازنةٌ مرفوعة'; return $out;
             }
+            /* P1-B — الفصلُ القائمُ هنا **إداريٌّ** (`fin_budget_self_owned`: لا
+               تُجيز موازنةَ قسمٍ تديره) وهو لا يمنع **الشخصَ** من إجازةِ ما رفعه
+               هو في قسمٍ آخر. والحكمُ «من أنشأ لا يعتمد» على الشخصِ لا القسم. */
+            require_once __DIR__ . '/../includes/self_approval_guard.php';
+            $__sa = ems_assert_not_self_approval($conn, 'fin_budgets', 'id', $budget_id,
+                'موازنةٌ #' . $budget_id, intval($b['company_id'] ?? 0));
+            if ($__sa !== null) { $out['status'] = 'denied'; $out['reason'] = $__sa['reason']; return $out; }
             $data = array('state' => 'approved', 'approved_by' => intval($user_id), 'approved_at' => $now);
         } elseif ($action === 'return') {
             if (!fin_budget_is_approver($role, $is_super)) {

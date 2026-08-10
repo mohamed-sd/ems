@@ -973,7 +973,7 @@ include("../inheader.php");
                 <div class="form-grid">
                     <div class="driver-form-check-row" style="grid-column: 1 / -1;">
                         <i class="fas fa-info-circle" style="color: var(--blue);"></i>
-                        <label class="driver-form-check-label" style="margin:0;">
+                        <label class="driver-form-check-label" style="margin:0;" for="emsf_2047_8d699">
                             تُحتسب تواريخ بداية/نهاية التشغيل تلقائياً من عقد المشغل الساري؛
                             وإن لم يوجد عقد ساري تبدأ من تاريخ اليوم وتبقى مفتوحة حتى إنهاء العمل.
                         </label>
@@ -983,7 +983,13 @@ include("../inheader.php");
                         <label>
                             <i class="fas fa-sync-alt"></i> نظام الوردية <span style="color: red;">*</span>
                         </label>
-                        <select name="shift_type" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-sync-alt"></i> نظام الوردية <span style="color: red;">*</span>
+                        </label>
+                        <select name="shift_type" required id="emsf_2047_8d699">
                             <option value="D">نهاري فقط</option>
                             <option value="N">ليلي فقط</option>
                             <option value="B" selected>نهاري + ليلي</option>
@@ -1006,7 +1012,7 @@ include("../inheader.php");
                         <div class="selection-header">
                             <div class="search-box">
                                 <input type="text" id="driverSearch" placeholder="ابحث عن مشغل بالاسم أو رقم الهاتف..."
-                                    autocomplete="off">
+                                    autocomplete="off" aria-label="ابحث عن مشغل بالاسم أو رقم الهاتف...">
                                 <i class="fas fa-search"></i>
                             </div>
 
@@ -1215,7 +1221,6 @@ include("../inheader.php");
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
 <!-- Responsive extension -->
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 
 <!-- Export dependencies -->
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
@@ -1233,7 +1238,6 @@ include("../inheader.php");
         // تهيئة DataTable
         <?php if (count($linked) > 0): ?>
             $('#projectsTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
                     { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ' },

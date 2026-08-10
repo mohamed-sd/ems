@@ -10,37 +10,76 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Procurement/StockReturnService.php';
+
+// CS-01 · RF-02 — الحارسُ فوقَ المعالج.
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-    $issue = intval($_POST['issue_id'] ?? 0);
-    $qty   = floatval($_POST['qty'] ?? 0);
-    $why   = trim($_POST['reason'] ?? '');
-    if ($issue <= 0 || $qty <= 0 || $why === '') { $msg = 'سندُ الصرف والكميةُ والسببُ إلزامية (422)'; }
-    else {
-        // أصلُ الصرف: صنفُه ومخزنُه وكميتُه — والمرتجعُ لا يتجاوز المصروف
-        $r = mysqli_query($conn, "SELECT il.item_id, i.warehouse_id, il.qty
-                                  FROM proc_issue_line il JOIN proc_issue i ON i.id = il.issue_id
-                                  WHERE il.issue_id = $issue AND i.company_id = $company_id LIMIT 1");
-        if (!$r || !($src = mysqli_fetch_assoc($r))) { $msg = 'سندُ صرفٍ غيرُ موجود (404)'; }
-        elseif ($qty > floatval($src['qty'])) { $msg = 'المرتجعُ يتجاوز المصروفَ الأصلي — يُرفض 409'; }
-        else {
-            $ok = mysqli_query($conn, "INSERT INTO proc_stock_move (company_id,item_id,warehouse_id,move_type,qty,ref_type,ref_id,note,moved_at,created_by)
-                  VALUES ($company_id,{$src['item_id']},{$src['warehouse_id']},'مرتجع',$qty,'issue',$issue,'" . mysqli_real_escape_string($conn, $why) . "',NOW(),$uid)");
-            $msg = $ok ? "أُرجع $qty بمرجع سند الصرف #$issue" : 'فشل: ' . mysqli_error($conn);
+/* ══ FN-07 (P0) — «المرتجعُ يقارن سطرًا واحدًا ولا يطرح ما سبق» ═══════════
+   كان التحققُ يقرأ **سطرًا واحدًا** من سندِ الصرف (‎LIMIT 1‎) ويقارن به، ولا
+   يطرح ما أُرجع قبلَه — فيمكن إرجاعُ أكثرَ من المصروفِ بتكرارِ الإرجاع، وهي
+   ثغرةُ كميةٍ تُخرج مخزونًا بلا سند. الحكمُ الآن في خدمةِ النطاقِ (CS-05):
+   مجموعُ المصروفِ للصنفِ في السند − مجموعُ ما أُرجع = المتاحُ للإرجاع.
+   وقيدُ القاعدةِ (قادحٌ) يرفض التجاوزَ ولو تُجوِّز التطبيق (RSK-M3). */
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'proc.stock.return_to_warehouse',
+    'perm'    => 'can_add',
+    'trigger' => 'issue_line',
+    'idem'    => array(
+        'line'   => (string) ($_POST['issue_line'] ?? ''),
+        'qty'    => (string) floatval($_POST['qty'] ?? 0),
+        'reason' => trim($_POST['reason'] ?? ''),
+    ),
+    'validate' => function (array $in) {
+        $line = (string) ($in['issue_line'] ?? '');
+        $qty  = floatval($in['qty'] ?? 0);
+        $why  = trim($in['reason'] ?? '');
+        if ($line === '' || $qty <= 0 || $why === '') {
+            return array('ok' => false, 'msg' => 'سندُ الصرف والكميةُ والسببُ إلزامية (422)');
         }
-    }
+        $p = explode(':', $line);
+        if (count($p) !== 2 || (int) $p[0] <= 0 || (int) $p[1] <= 0) {
+            return array('ok' => false, 'msg' => 'مرجعُ سطرِ الصرف غيرُ صالح (422)');
+        }
+        return array('ok' => true, 'data' => array(
+            'issue' => (int) $p[0], 'item' => (int) $p[1], 'qty' => $qty, 'why' => $why,
+        ));
+    },
+));
+if (!$__pc['ok'] && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
+if ($__pc['replay'])                     { $msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    $svc = new \App\Services\Procurement\StockReturnService($conn);
+    $res = $svc->returnToWarehouse(
+        $company_id, (int) $__pc['data']['issue'], (int) $__pc['data']['item'],
+        (float) $__pc['data']['qty'], (string) $__pc['data']['why'], $uid
+    );
+    $msg = $res['msg'];
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'proc_stock_move#' . $res['move_id']); }
 }
 
+/* قائمةُ سطورِ الصرفِ مع **المتاحِ للإرجاع** لكلِّ سطرٍ — فالرقمُ يُرى قبلَ
+   المحاولةِ لا بعدَ الرفض. والقيمةُ ‎سند:صنف‎ لأن السندَ قد يحمل الصنفَ في
+   أكثرَ من سطر (وكانت القائمةُ تُكرِّر السندَ بقيمةٍ واحدةٍ فتُخلَط السطور). */
 $issues = array();
-$r = mysqli_query($conn, "SELECT i.id, i.issue_no, it.name item, il.qty
-                          FROM proc_issue i JOIN proc_issue_line il ON il.issue_id=i.id
-                          JOIN proc_item it ON it.id=il.item_id
-                          WHERE i.company_id=$company_id ORDER BY i.id DESC LIMIT 40");
-if ($r) while ($x = mysqli_fetch_assoc($r)) $issues[] = $x;
+$r = mysqli_query($conn, "SELECT i.id, i.issue_no, il.item_id, it.name item,
+                                 SUM(il.qty) issued,
+                                 COALESCE((SELECT SUM(m.qty) FROM proc_stock_move m
+                                            WHERE m.company_id = i.company_id AND m.move_type='مرتجع'
+                                              AND m.ref_type='issue' AND m.ref_id = i.id
+                                              AND m.item_id = il.item_id),0) returned
+                          FROM proc_issue i
+                          JOIN proc_issue_line il ON il.issue_id = i.id
+                          JOIN proc_item it ON it.id = il.item_id
+                          WHERE i.company_id = $company_id
+                          GROUP BY i.id, i.issue_no, il.item_id, it.name
+                          ORDER BY i.id DESC LIMIT 40");
+if ($r) while ($x = mysqli_fetch_assoc($r)) { $x['available'] = floatval($x['issued']) - floatval($x['returned']); $issues[] = $x; }
 $recent = array();
 $r = mysqli_query($conn, "SELECT m.moved_at, i.name item, m.qty, m.ref_id, m.note
                           FROM proc_stock_move m JOIN proc_item i ON i.id=m.item_id
@@ -67,12 +106,17 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
-    <div><label>سندُ الصرف الأصلي</label><select name="issue_id" class="form-control" required><option value="">—</option>
-      <?php foreach ($issues as $i): ?>
-        <option value="<?= intval($i['id']) ?>"><?= htmlspecialchars(($i['issue_no'] ?: '#' . $i['id']) . ' — ' . $i['item'] . ' (' . $i['qty'] . ')', ENT_QUOTES, 'UTF-8') ?></option>
+    <div><label for="wr_issue_line">سطرُ سندِ الصرف الأصلي</label>
+      <select id="wr_issue_line" name="issue_line" class="form-control" required><option value="">—</option>
+      <?php foreach ($issues as $i): if ($i['available'] <= 0) { continue; } ?>
+        <option value="<?= intval($i['id']) ?>:<?= intval($i['item_id']) ?>"><?= htmlspecialchars(
+            ($i['issue_no'] ?: '#' . $i['id']) . ' — ' . $i['item']
+            . ' · مصروف ' . (float) $i['issued']
+            . ' · أُرجع ' . (float) $i['returned']
+            . ' · المتاح ' . (float) $i['available'], ENT_QUOTES, 'UTF-8') ?></option>
       <?php endforeach; ?></select></div>
-    <div><label>الكميةُ المرتجعة</label><input type="number" step="0.01" name="qty" class="form-control" required style="max-width:110px"></div>
-    <div><label>السبب</label><input type="text" name="reason" class="form-control" required></div>
+    <div><label for="wr_qty">الكميةُ المرتجعة</label><input id="wr_qty" type="number" step="0.01" min="0.01" name="qty" class="form-control" required style="max-width:110px"></div>
+    <div><label for="wr_reason">السبب</label><input id="wr_reason" type="text" name="reason" class="form-control" required></div>
     <button class="btn btn-primary">أرجع</button>
   </form>
   <h6>آخرُ المرتجعات</h6>

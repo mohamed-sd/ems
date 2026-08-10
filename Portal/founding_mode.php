@@ -150,36 +150,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — وضع التأسيس وإغلاقه</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الوضع</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الفتح</label>
-                    <input type="date" name="f1"></div>
-                <div class="form-group"><label>سبب الفتح</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>النطاق المسموح</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الجداول المتأثرة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>المدة المصرَّح بها</label>
-                    <input type="text" inputmode="decimal" name="f5" placeholder="0"></div>
-                <div class="form-group"><label>تاريخ الإغلاق المخطط</label>
-                    <input type="date" name="f6"></div>
-                <div class="form-group"><label>تاريخ الإغلاق الفعلي</label>
-                    <input type="date" name="f7"></div>
-                <div class="form-group"><label>عدد السجلات المُدخَلة</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>وسم السجلات</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>المُدخِلون</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>الموافق على الفتح</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>الموافق على الإغلاق</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>تقرير المراجعة بعد الإغلاق</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f14"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1175_81fee">رقم الوضع</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1175_81fee"></div>
+                <div class="form-group"><label for="emsf_1176_ad8a6">تاريخ الفتح</label>
+                    <input type="date" name="f1" id="emsf_1176_ad8a6"></div>
+                <div class="form-group"><label for="emsf_1177_ee3f6">سبب الفتح</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_1177_ee3f6"></div>
+                <div class="form-group"><label for="emsf_1178_39c1d">النطاق المسموح</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1178_39c1d"></div>
+                <div class="form-group"><label for="emsf_1179_8c86e">الجداول المتأثرة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1179_8c86e"></div>
+                <div class="form-group"><label for="emsf_1180_0a2d0">المدة المصرَّح بها</label>
+                    <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_1180_0a2d0"></div>
+                <div class="form-group"><label for="emsf_1181_93e14">تاريخ الإغلاق المخطط</label>
+                    <input type="date" name="f6" id="emsf_1181_93e14"></div>
+                <div class="form-group"><label for="emsf_1182_a0439">تاريخ الإغلاق الفعلي</label>
+                    <input type="date" name="f7" id="emsf_1182_a0439"></div>
+                <div class="form-group"><label for="emsf_1183_44c6e">عدد السجلات المُدخَلة</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1183_44c6e"></div>
+                <div class="form-group"><label for="emsf_1184_d9722">وسم السجلات</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1184_d9722"></div>
+                <div class="form-group"><label for="emsf_1185_f1bd5">المُدخِلون</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1185_f1bd5"></div>
+                <div class="form-group"><label for="emsf_1186_36236">الموافق على الفتح</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1186_36236"></div>
+                <div class="form-group"><label for="emsf_1187_8bb0d">الموافق على الإغلاق</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1187_8bb0d"></div>
+                <div class="form-group"><label for="emsf_1188_f2001">تقرير المراجعة بعد الإغلاق</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1188_f2001"></div>
+                <div class="form-group"><label for="emsf_1189_d00d1">الحالة</label>
+                    <select name="f14" id="emsf_1189_d00d1"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

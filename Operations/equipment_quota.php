@@ -159,54 +159,54 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — توزيع وحدات المورد على معداته</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الحاوية</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>المورد</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>العقد العميل</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>عقد المورد</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>نموذج العمل</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>وحدة العمل</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>نوع المعدة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>كود المعدة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>دور المعدة</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>حصة المورد الكلية</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الحصة المخصَّصة للمعدة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>عدد الورديات</label>
-                    <input type="text" inputmode="decimal" name="f11" placeholder="0"></div>
-                <div class="form-group"><label>وحدات الوردية</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>الوحدات الشهرية للمعدة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>مجموع حصص معدات المورد</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>المتبقي من حصة المورد</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>المنفَّذ فعليًّا</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>الفارق</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>سبب الفارق</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ السريان</label>
-                    <input type="date" name="f19"></div>
-                <div class="form-group"><label>تاريخ الانتهاء</label>
-                    <input type="date" name="f20"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f21" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f22"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f23"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_809_041ac">رقم الحاوية</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_809_041ac"></div>
+                <div class="form-group"><label for="emsf_810_aba42">المورد</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_810_aba42"></div>
+                <div class="form-group"><label for="emsf_811_f09d2">العقد العميل</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_811_f09d2"></div>
+                <div class="form-group"><label for="emsf_812_e1d72">عقد المورد</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_812_e1d72"></div>
+                <div class="form-group"><label for="emsf_813_cc398">نموذج العمل</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_813_cc398"></div>
+                <div class="form-group"><label for="emsf_814_515cc">وحدة العمل</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_814_515cc"></div>
+                <div class="form-group"><label for="emsf_815_fa0e6">نوع المعدة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_815_fa0e6"></div>
+                <div class="form-group"><label for="emsf_816_f539a">كود المعدة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_816_f539a"></div>
+                <div class="form-group"><label for="emsf_817_c4750">دور المعدة</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_817_c4750"></div>
+                <div class="form-group"><label for="emsf_818_015a4">حصة المورد الكلية</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_818_015a4"></div>
+                <div class="form-group"><label for="emsf_819_4dbe7">الحصة المخصَّصة للمعدة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_819_4dbe7"></div>
+                <div class="form-group"><label for="emsf_820_1bbbd">عدد الورديات</label>
+                    <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_820_1bbbd"></div>
+                <div class="form-group"><label for="emsf_821_84f20">وحدات الوردية</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_821_84f20"></div>
+                <div class="form-group"><label for="emsf_822_52de3">الوحدات الشهرية للمعدة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_822_52de3"></div>
+                <div class="form-group"><label for="emsf_823_41d11">مجموع حصص معدات المورد</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_823_41d11"></div>
+                <div class="form-group"><label for="emsf_824_2e0dd">المتبقي من حصة المورد</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_824_2e0dd"></div>
+                <div class="form-group"><label for="emsf_825_3d32b">المنفَّذ فعليًّا</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_825_3d32b"></div>
+                <div class="form-group"><label for="emsf_826_99c99">الفارق</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_826_99c99"></div>
+                <div class="form-group"><label for="emsf_827_8f3fd">سبب الفارق</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_827_8f3fd"></div>
+                <div class="form-group"><label for="emsf_828_04740">تاريخ السريان</label>
+                    <input type="date" name="f19" id="emsf_828_04740"></div>
+                <div class="form-group"><label for="emsf_829_e527f">تاريخ الانتهاء</label>
+                    <input type="date" name="f20" id="emsf_829_e527f"></div>
+                <div class="form-group"><label for="emsf_830_cd476">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f21" maxlength="190" id="emsf_830_cd476"></div>
+                <div class="form-group"><label for="emsf_831_968a9">تاريخ الاعتماد</label>
+                    <input type="date" name="f22" id="emsf_831_968a9"></div>
+                <div class="form-group"><label for="emsf_832_f2366">الحالة</label>
+                    <select name="f23" id="emsf_832_f2366"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

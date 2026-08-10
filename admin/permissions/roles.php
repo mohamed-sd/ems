@@ -94,7 +94,6 @@ require_once __DIR__ . '/../includes/layout_head.php';
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../../assets/css/admin-style.css">
 
@@ -300,14 +299,14 @@ require_once __DIR__ . '/../includes/layout_head.php';
                 <div class="form-grid">
                     <!-- اسم الدور -->
                     <div>
-                        <label><i class="fas fa-tag"></i> اسم الدور *</label>
+                        <label for="name"><i class="fas fa-tag"></i> اسم الدور *</label>
                         <input type="text" name="name" id="name" placeholder="مثال: مدير المشاريع" 
                                value="<?= htmlspecialchars($editData['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required />
                     </div>
 
                     <!-- الدور الأب (الصلاحية الأب) -->
                     <div>
-                        <label><i class="fas fa-sitemap"></i> الدور الأب (اختياري)</label>
+                        <label for="parent_role_id"><i class="fas fa-sitemap"></i> الدور الأب (اختياري)</label>
                         <select id="parent_role_id" name="parent_role_id">
                             <option value="">-- بدون دور أب (مدير رئيسي) --</option>
                             <?php foreach ($parent_roles as $pRole): ?>
@@ -321,7 +320,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 
                     <!-- المستوى -->
                     <div>
-                        <label><i class="fas fa-layer-group"></i> مستوى الأهمية</label>
+                        <label for="level"><i class="fas fa-layer-group"></i> مستوى الأهمية</label>
                         <select name="level" id="level" required>
                             <option value="1" <?= (empty($editData) || $editData['level'] == 1) ? 'selected' : ''; ?>>مدير</option>
                             <option value="2" <?= (!empty($editData) && $editData['level'] == 2) ? 'selected' : ''; ?>>مشرف</option>
@@ -330,7 +329,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 
                     <!-- نطاق الدور -->
                     <div>
-                        <label><i class="fas fa-globe"></i> نطاق الدور *</label>
+                        <label for="role_scope"><i class="fas fa-globe"></i> نطاق الدور *</label>
                         <select name="role_scope" id="role_scope" required>
                             <option value="gloable" <?= (empty($editData) || ($editData['role_scope'] ?? 'gloable') === 'gloable') ? 'selected' : ''; ?>>عام (gloable)</option>
                             <option value="mine" <?= (!empty($editData) && ($editData['role_scope'] ?? 'gloable') === 'mine') ? 'selected' : ''; ?>>منجم محدد (mine)</option>
@@ -339,7 +338,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 
                     <!-- الحالة -->
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> حالة الدور *</label>
+                        <label for="status"><i class="fas fa-toggle-on"></i> حالة الدور *</label>
                         <select name="status" id="status" required>
                             <option value="1" <?= (empty($editData) || $editData['status'] == 1) ? 'selected' : ''; ?>>نشط ✔</option>
                             <option value="0" <?= (!empty($editData) && $editData['status'] == 0) ? 'selected' : ''; ?>>غير نشط ✖</option>
@@ -452,7 +451,6 @@ require_once __DIR__ . '/../includes/layout_head.php';
 $(document).ready(function () {
     // تهيئة DataTable
     $('#rolesTable').DataTable({
-        responsive: true,
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
         },

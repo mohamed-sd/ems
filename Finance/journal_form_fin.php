@@ -60,6 +60,20 @@ if (isset($_GET['post_id'])) {
         ems_gov_flash_redirect('journal_form_fin.php', 'لا ترحيل: الفترة المالية مقفلة لهذا التاريخ ❌', 'GOV-FAIL-409', ''); exit();
     }
 
+    /* ══ INJ-0040 (P1) — «اعتمادُ قيدٍ أعده بنفسه» ═══════════════════════════
+       مسارُ الترحيلِ كان يفحص المستوى (`fin_can_perform`) ولا يقارن `created_by`
+       بالمُرحِّل — فيُرحِّل المحاسبُ قيدَه بنفسِه. والحدُّ LIMIT-06 في سجلِّ
+       السلطاتِ يمنعه نصًّا (**مشروطٌ** لا يُوصَل برمزِ فعلٍ — FN-09)، فموضعُ
+       إنفاذِه الخدمةُ لا الحارس. */
+    require_once __DIR__ . '/../includes/self_approval_guard.php';
+    $__sa = ems_assert_not_self_approval($conn, 'fin_journal_entries', 'id', $pid,
+        'قيدٌ يوميٌّ #' . $pid, $company_id);
+    if ($__sa !== null) {
+        ems_gov_flash_redirect('journal_form_fin.php', $__sa['reason'], 'GOV-PERM-403',
+            'الترحيلُ يدٌ ثانيةٌ غيرُ يدِ الإعداد');
+        exit();
+    }
+
     // زوجٌ كتابيٌّ مترابط (§9): ترحيل القيد (بحارس حالة draft) + نقل الحدث المرتبط
     // إلى «مقيَّد» ذرّيًّا. حارس الحصانة (§12) يرفض تعديل حدثٍ منشورٍ على الناقل —
     // فينكفئ الترحيل كله (rollback) بدل تباعد جذر/مشتق (المسار اليدوي بلا idempotency يمرّ).
@@ -221,21 +235,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>تاريخ الترحيل <span class="required">*</span></label>
+                        <label for="j_date">تاريخ الترحيل <span class="required">*</span></label>
                         <input type="date" name="posting_date" id="j_date" required value="<?php echo date('Y-m-d'); ?>">
                     </div>
                     <div class="form-group">
-                        <label>تاريخ الحركة الفعلي <span class="required">*</span></label>
+                        <label for="j_txn_date">تاريخ الحركة الفعلي <span class="required">*</span></label>
                         <input type="date" name="txn_date" id="j_txn_date" required value="<?php echo date('Y-m-d'); ?>">
                     </div>
                     <div class="form-group">
-                        <label>العملة <span class="required">*</span></label>
+                        <label for="j_currency">العملة <span class="required">*</span></label>
                         <select name="currency" id="j_currency" required>
                             <?php echo fin_currency_options($conn, $is_super_admin, $company_id, 'SDG'); ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الحدث المرتبط (اختياري)</label>
+                        <label for="j_event">الحدث المرتبط (اختياري)</label>
                         <select name="event_id" id="j_event">
                             <option value="">— بلا حدث —</option>
                             <?php
@@ -250,7 +264,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>بيان القيد</label>
+                        <label for="j_memo">بيان القيد</label>
                         <input type="text" name="memo" id="j_memo" placeholder="وصف القيد">
                     </div>
                 </div>

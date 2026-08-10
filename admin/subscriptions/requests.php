@@ -606,7 +606,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
         <div style="padding:24px;">
             <div id="reviewModalBody" class="alert alert-info" style="margin-bottom:16px;"></div>
             <div class="form-group">
-                <label class="form-label">ملاحظة (اختياري)</label>
+                <label class="form-label" for="reviewNote">ملاحظة (اختياري)</label>
                 <textarea id="reviewNote" class="form-ctrl" placeholder="أضف ملاحظة للشركة..."></textarea>
             </div>
             <div style="display:flex;gap:10px;justify-content:flex-end;">

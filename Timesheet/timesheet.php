@@ -801,7 +801,6 @@ try {
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
@@ -938,7 +937,7 @@ try {
         <div class="card-body">
           <div class="form-grid">
             <div>
-              <label>الوردية</label>
+              <label for="shift">الوردية</label>
               <select name="shift" id="shift" required>
                 <option value="">-- اختر الوردية --</option>
                 <option value="D">☀️ صباحية</option>
@@ -946,11 +945,11 @@ try {
               </select>
             </div>
             <div>
-              <label>المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
-              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني">
+              <label for="emsf_1502_07ad4">المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1502_07ad4">
             </div>
             <div>
-              <label>الالية</label>
+              <label for="operator">الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
                 <?php
@@ -980,7 +979,7 @@ try {
             <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
 
             <div>
-              <label>السائق</label>
+              <label for="driver">السائق</label>
               <select id="driver" name="employee_id" required>
                 <option value="">-- اختر السائق --</option>
               </select>
@@ -993,13 +992,50 @@ try {
             <!-- ********************************************************** -->
 
             <div>
-              <label>ساعات الوردية</label>
+              <label for="shift_hours">ساعات الوردية</label>
               <input type="number" name="shift_hours" id="shift_hours" value="0">
             </div>
 
 
             <div>
-              <label> ⏱️ عداد البداية</label>
+              <label for="billing_meters_count"> ⏱️ عداد البداية</label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00"
+                    required>
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00"
+                    required>
+                  <span>ثواني</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ الكمية المفوترة — تظهر بوحدة عقد هذا التشغيل (D02 §2.6) ══
+                 الساعات تُسجَّل دائمًا للتشغيل والصيانة والمشغّل؛ أما ما يُفوتر
+                 فتحدّده وحدةُ العقد لا نوعُ المعدة. فمعدةٌ من النوع 1 على عقدٍ
+                 يفوتر بالمتر كانت بلا خانةٍ تسجّل فيها أمتارها — فلا تُسعَّر. -->
+            <!-- ⚠️ display:none !important إلزامي: ems-forms.css يفرض
+                 `.form-grid > div { display:block !important }`، فتخسر أمامه
+                 القيمةُ السطرية العادية وكذلك jQuery .hide()/.show(). ولهذا
+                 يبدّل الجافاسكربت العرضَ بـsetProperty(...,'important'). -->
+            <div id="billing_qty_block" style="grid-column:1/-1; display:none !important; margin:16px 0 8px;
+                 border:2px solid #d4a017; border-radius:10px; padding:14px 16px; background:#fffdf5;">
+              <h3 style="text-align:right; color:#8a6d00; margin:0 0 10px; font-weight:700; font-size:1rem;">
+                <i class="fas fa-file-invoice-dollar"></i> الكمية المفوترة —
+                <span id="billing_unit_label" style="color:#b8860b;"></span>
+              </h3>
+              <div id="billing_qty_fields" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+                <div id="billing_field_meter" style="display:none;">
+                  <label>عدد الأمتار المنفذة <span style="color:#c00;">*</span></label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1040,7 +1076,7 @@ try {
                   <input type="number" step="0.01" min="0" name="meters_count" id="billing_meters_count" value="0">
                 </div>
                 <div id="billing_field_ton" style="display:none;">
-                  <label>عدد الأطنان المنفذة <span style="color:#c00;">*</span></label>
+                  <label for="billing_tons_count">عدد الأطنان المنفذة <span style="color:#c00;">*</span></label>
                   <input type="number" step="0.01" min="0" name="tons_count" id="billing_tons_count" value="0">
                 </div>
               </div>
@@ -1052,41 +1088,41 @@ try {
               ساعات العمل </h3>
 
             <div>
-              <label>الساعات المنفذة (محسوبة تلقائياً)</label>
+              <label for="executed_hours">الساعات المنفذة (محسوبة تلقائياً)</label>
               <input type="number" name="executed_hours" id="executed_hours" value="0" readonly
                 style="background-color: #f0f0f0; cursor: not-allowed;">
             </div>
             <div>
-              <label>ساعات جردل</label>
+              <label for="bucket_hours">ساعات جردل</label>
               <input type="number" name="bucket_hours" id="bucket_hours" value="0">
             </div>
             <div>
-              <label>ساعات جاك همر</label>
+              <label for="jackhammer_hours">ساعات جاك همر</label>
               <input type="number" name="jackhammer_hours" id="jackhammer_hours" value="0">
             </div>
             <div>
-              <label>ساعات إضافية</label>
+              <label for="extra_hours">ساعات إضافية</label>
               <input type="number" name="extra_hours" id="extra_hours" value="0">
             </div>
             <div>
-              <label>مجموع الساعات الإضافية</label>
+              <label for="extra_hours_total">مجموع الساعات الإضافية</label>
               <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
             </div>
             <div>
-              <label>ساعات الاستعداد (بسبب العميل)</label>
+              <label for="standby_hours">ساعات الاستعداد (بسبب العميل)</label>
               <input type="number" name="standby_hours" id="standby_hours" value="0">
             </div>
             <div>
-              <label>ساعات الاستعداد ( اعتماد )</label>
+              <label for="dependence_hours">ساعات الاستعداد ( اعتماد )</label>
               <input type="number" name="dependence_hours" id="dependence_hours" value="0">
             </div>
             <div>
-              <label>مجموع ساعات العمل</label>
+              <label for="total_work_hours">مجموع ساعات العمل</label>
               <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
             </div>
             <div>
-              <label>ملاحظات ساعات العمل</label>
-              <textarea name="work_notes"></textarea>
+              <label for="emsf_1503_c406e">ملاحظات ساعات العمل</label>
+              <textarea name="work_notes" id="emsf_1503_c406e"></textarea>
             </div>
             <h3
               style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
@@ -1120,52 +1156,72 @@ try {
             </div>
 
             <div>
-              <label>عطل HR</label>
+              <label for="hr_fault">عطل HR</label>
               <input type="number" name="hr_fault" id="hr_fault" value="0">
             </div>
             <div>
-              <label>عطل صيانة</label>
+              <label for="maintenance_fault">عطل صيانة</label>
               <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
             </div>
             <div>
-              <label>عطل تسويق</label>
+              <label for="marketing_fault">عطل تسويق</label>
               <input type="number" name="marketing_fault" id="marketing_fault" value="0">
             </div>
             <div>
-              <label>عطل اعتماد</label>
+              <label for="approval_fault">عطل اعتماد</label>
               <input type="number" name="approval_fault" id="approval_fault" value="0">
             </div>
             <div>
-              <label>ساعات أعطال أخرى</label>
+              <label for="other_fault_hours">ساعات أعطال أخرى</label>
               <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
             </div>
             <!-- D02 §3.5 — ثلاثُ حالاتٍ لكلٍّ حكمٌ تعاقديٌّ مستقل؛ كانت تُبتلع
                  في «أعطال أخرى» فتضيع مسؤوليتُها ولا تستطيع سياسةُ الاستحقاق
                  أن تحكم على ما لا تميّزه. -->
             <div>
-              <label>توقف على المورد</label>
+              <label for="ts_supplier_stop_hours">توقف على المورد</label>
               <input type="number" step="0.01" min="0" name="ts_supplier_stop_hours" id="ts_supplier_stop_hours" value="0">
             </div>
             <div>
-              <label>توقف مخطط (صيانة دورية)</label>
+              <label for="ts_planned_stop_hours">توقف مخطط (صيانة دورية)</label>
               <input type="number" step="0.01" min="0" name="ts_planned_stop_hours" id="ts_planned_stop_hours" value="0">
             </div>
             <div>
-              <label>قوة قاهرة</label>
+              <label for="ts_force_majeure_hours">قوة قاهرة</label>
               <input type="number" step="0.01" min="0" name="ts_force_majeure_hours" id="ts_force_majeure_hours" value="0">
             </div>
             <div>
-              <label> مجموع ساعات التعطل</label>
+              <label for="total_fault_hours"> مجموع ساعات التعطل</label>
               <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
             </div>
             <div>
-              <label>ملاحظات ساعات الأعطال</label>
-              <textarea name="fault_notes"></textarea>
+              <label for="emsf_1504_87dac">ملاحظات ساعات الأعطال</label>
+              <textarea name="fault_notes" id="emsf_1504_87dac"></textarea>
             </div>
 
 
             <div>
-              <label> ⏱️ عداد النهاية </label>
+              <label for="counter_diff_display"> ⏱️ عداد النهاية </label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
+                  <span>ثواني</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label>⚡ فرق العداد</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
@@ -1198,28 +1254,28 @@ try {
               style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
               <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_event_type">📋 نوع الحدث</label>
                   <select id="fc_event_type"
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_main_cat">🔧 الفئة الرئيسية</label>
                   <select id="fc_main_cat" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_sub_cat">⚙️ الجزء / السبب</label>
                   <select id="fc_sub_cat" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_detail">📝 تفصيل العطل</label>
                   <select id="fc_detail" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر التفصيل --</option>
@@ -1272,7 +1328,7 @@ try {
             </div>
 
             <div style="grid-column: 1/-1;">
-              <label>ملاحظات عامة</label>
+              <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
 
@@ -1281,31 +1337,31 @@ try {
               ساعات عمل المشغل </h3>
 
             <div>
-              <label>⏱️ ساعات عمل المشغل</label>
+              <label for="operator_hours">⏱️ ساعات عمل المشغل</label>
               <input type="text" name="operator_hours" id="operator_hours" value="0">
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الآلية</label>
+              <label for="machine_standby_hours">⚙️ ساعات استعداد الآلية</label>
               <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الجاك همر</label>
+              <label for="jackhammer_standby_hours">⚙️ ساعات استعداد الجاك همر</label>
               <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الجردل</label>
+              <label for="bucket_standby_hours">⚙️ ساعات استعداد الجردل</label>
               <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
             </div>
             <div>
-              <label>➕ الساعات الإضافية</label>
+              <label for="extra_operator_hours">➕ الساعات الإضافية</label>
               <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
             </div>
             <div>
-              <label>ðŸ‘· ساعات استعداد المشغل</label>
+              <label for="operator_standby_hours">ðŸ‘· ساعات استعداد المشغل</label>
               <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
             </div>
             <div>
-              <label>ðŸ“ ملاحظات المشغل</label>
+              <label for="operator_notes">ðŸ“ ملاحظات المشغل</label>
               <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
 
             </div>
@@ -1329,7 +1385,7 @@ try {
         <div class="card-body">
           <div class="form-grid">
             <div>
-              <label>الوردية</label>
+              <label for="shift">الوردية</label>
               <select name="shift" id="shift" required>
                 <option value="">-- اختر الوردية --</option>
                 <option value="D">☀️ صباحية</option>
@@ -1337,11 +1393,11 @@ try {
               </select>
             </div>
             <div>
-              <label>المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
-              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني">
+              <label for="emsf_1505_4eb0d">المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1505_4eb0d">
             </div>
             <div>
-              <label>الالية</label>
+              <label for="operator">الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
                 <?php
@@ -1371,7 +1427,32 @@ try {
             <input type="hidden" name="id" id="timesheet_id" value="">
             <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
             <div>
-              <label>السائق</label>
+              <label for="date">السائق</label>
+              <!-- <select name="employee_id"  required>
+            <option value="">-- اختر السائق --</option>
+            <?php
+            // (كتلة معطَّلة في الواجهة — الاستعلام يبقى منفَّذًا عبر البوابة حفاظًا على البايتات داخل التعليق)
+            $dr_res = array();
+            try {
+              $dr_res = $ts_gate->scopedQuery(array('scope' => array('employees' => 'employees')),
+                "SELECT id, name FROM employees WHERE 1=1" . ems_operation_types_in_sql($conn, '') . " AND {TENANT_SCOPE}");
+            } catch (\Throwable $t) { error_log('timesheet drivers list: ' . $t->getMessage()); }
+            foreach ($dr_res as $dr) {
+              echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
+            }
+            ?>
+          </select> -->
+
+
+
+              <select id="driver" name="employee_id" required>
+                <option value="">-- اختر السائق --</option>
+              </select>
+
+
+            </div>
+            <div>
+              <label> التاريخ </label>
               <!-- <select name="employee_id"  required>
             <option value="">-- اختر السائق --</option>
             <?php
@@ -1404,12 +1485,32 @@ try {
             <!-- ********************************************************** -->
 
             <div>
-              <label>ساعات الوردية</label>
+              <label for="shift_hours">ساعات الوردية</label>
               <input type="number" name="shift_hours" id="shift_hours" value="0">
             </div>
 
             <div>
-              <label> ⏱️ عداد البداية</label>
+              <label for="executed_hours"> ⏱️ عداد البداية</label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+              </div>
+              <input type="hidden" value="0" id="start_minutes" name="start_minutes" min="0" max="59" required>
+              <input type="hidden" value="0" id="start_seconds" name="start_seconds" min="0" max="59" required>
+            </div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              الساعات </h3>
+            <div>
+              <label>الساعات المنفذة</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1437,29 +1538,29 @@ try {
             <input type="hidden" name="bucket_hours" id="bucket_hours" value="0">
             <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
             <div>
-              <label>ساعات إضافية </label>
+              <label for="extra_hours">ساعات إضافية </label>
               <input type="number" name="extra_hours" id="extra_hours" value="0">
             </div>
 
             <div>
-              <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+              <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
               <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly
                 style="background-color: #f0f0f0; cursor: not-allowed;">
             </div>
             <div>
-              <label>ساعات الاستعداد (بسبب العميل)</label>
+              <label for="standby_hours">ساعات الاستعداد (بسبب العميل)</label>
               <input type="number" name="standby_hours" id="standby_hours" value="0">
             </div>
             <div>
-              <label>ساعات الاستعداد ( اعتماد )</label>
+              <label for="dependence_hours">ساعات الاستعداد ( اعتماد )</label>
               <input type="number" name="dependence_hours" id="dependence_hours" value="0">
             </div>
             <div>
-              <label>مجموع ساعات العمل</label>
+              <label for="total_work_hours">مجموع ساعات العمل</label>
               <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
             </div>
             <div>
-              <label>ملاحظات ساعات العمل</label>
+              <label for="work_notes">ملاحظات ساعات العمل</label>
               <textarea name="work_notes" id="work_notes"></textarea>
             </div>
 
@@ -1468,7 +1569,7 @@ try {
               style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
               🚚 الأوزان والنقلات </h3>
             <div>
-              <label>🔄 نوع النقل</label>
+              <label for="transport_type">🔄 نوع النقل</label>
               <select name="transport_type" id="transport_type">
                 <option value="">-- اختر نوع النقل --</option>
                 <option value="Waste">Waste (نفايات)</option>
@@ -1476,11 +1577,11 @@ try {
               </select>
             </div>
             <div>
-              <label>⚖️ وزن القلاب</label>
+              <label for="tons_count">⚖️ وزن القلاب</label>
               <input type="number" step="0.01" name="tons_count" id="tons_count" value="0" placeholder="0.00">
             </div>
             <div>
-              <label>🚛 عدد النقلات</label>
+              <label for="trips_count">🚛 عدد النقلات</label>
               <input type="number" name="trips_count" id="trips_count" value="0" placeholder="0">
             </div>
 
@@ -1518,51 +1619,63 @@ try {
             </div>
 
             <div>
-              <label>عطل HR</label>
+              <label for="hr_fault">عطل HR</label>
               <input type="number" name="hr_fault" id="hr_fault" value="0">
             </div>
             <div>
-              <label>عطل صيانة</label>
+              <label for="maintenance_fault">عطل صيانة</label>
               <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
             </div>
             <div>
-              <label>عطل تسويق</label>
+              <label for="marketing_fault">عطل تسويق</label>
               <input type="number" name="marketing_fault" id="marketing_fault" value="0">
             </div>
             <div>
-              <label>عطل اعتماد</label>
+              <label for="approval_fault">عطل اعتماد</label>
               <input type="number" name="approval_fault" id="approval_fault" value="0">
             </div>
             <div>
-              <label>ساعات أعطال أخرى</label>
+              <label for="other_fault_hours">ساعات أعطال أخرى</label>
               <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
             </div>
             <!-- D02 §3.5 — ثلاثُ حالاتٍ لكلٍّ حكمٌ تعاقديٌّ مستقل؛ كانت تُبتلع
                  في «أعطال أخرى» فتضيع مسؤوليتُها ولا تستطيع سياسةُ الاستحقاق
                  أن تحكم على ما لا تميّزه. -->
             <div>
-              <label>توقف على المورد</label>
+              <label for="ts_supplier_stop_hours">توقف على المورد</label>
               <input type="number" step="0.01" min="0" name="ts_supplier_stop_hours" id="ts_supplier_stop_hours" value="0">
             </div>
             <div>
-              <label>توقف مخطط (صيانة دورية)</label>
+              <label for="ts_planned_stop_hours">توقف مخطط (صيانة دورية)</label>
               <input type="number" step="0.01" min="0" name="ts_planned_stop_hours" id="ts_planned_stop_hours" value="0">
             </div>
             <div>
-              <label>قوة قاهرة</label>
+              <label for="ts_force_majeure_hours">قوة قاهرة</label>
               <input type="number" step="0.01" min="0" name="ts_force_majeure_hours" id="ts_force_majeure_hours" value="0">
             </div>
             <div>
-              <label> مجموع ساعات التعطل</label>
+              <label for="total_fault_hours"> مجموع ساعات التعطل</label>
               <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
             </div>
             <div>
-              <label>ملاحظات ساعات الأعطال</label>
+              <label for="fault_notes">ملاحظات ساعات الأعطال</label>
               <textarea name="fault_notes" id="fault_notes"></textarea>
             </div>
 
             <div>
-              <label> ⏱️ عداد النهاية </label>
+              <label for="counter_diff_display"> ⏱️ عداد النهاية </label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+              </div>
+              <input type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59">
+              <input type="hidden" value="0" id="end_seconds" name="end_seconds" min="0" max="59">
+            </div>
+
+            <div>
+              <label>⚡ فرق العداد</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
@@ -1591,7 +1704,7 @@ try {
               <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_event_type_edit">📋 نوع الحدث</label>
                   <select id="fc_event_type_edit"
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
                     <option value="">-- اختر نوع الحدث --</option>
@@ -1599,7 +1712,7 @@ try {
                 </div>
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_main_cat_edit">🔧 الفئة الرئيسية</label>
                   <select id="fc_main_cat_edit" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر الفئة --</option>
@@ -1607,7 +1720,7 @@ try {
                 </div>
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_sub_cat_edit">⚙️ الجزء / السبب</label>
                   <select id="fc_sub_cat_edit" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر الجزء --</option>
@@ -1615,7 +1728,7 @@ try {
                 </div>
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_detail_edit">📝 تفصيل العطل</label>
                   <select id="fc_detail_edit" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر التفصيل --</option>
@@ -1670,7 +1783,7 @@ try {
             </div>
 
             <div style="grid-column: 1/-1;">
-              <label>ملاحظات عامة</label>
+              <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
 
@@ -1684,22 +1797,22 @@ try {
             <div></div>
 
             <div>
-              <label>⏱️ ساعات عمل المشغل</label>
+              <label for="operator_hours">⏱️ ساعات عمل المشغل</label>
               <input type="text" name="operator_hours" id="operator_hours" value="0">
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الآلية</label>
-              <input type="text" name="machine_standby_hours" value="0" readonly>
+              <label for="emsf_1506_60539">⚙️ ساعات استعداد الآلية</label>
+              <input type="text" name="machine_standby_hours" value="0" readonly id="emsf_1506_60539">
             </div>
             <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
             <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
             <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
             <div>
-              <label>ðŸ‘· ساعات استعداد المشغل</label>
-              <input type="text" name="operator_standby_hours" class="form-control" value="0">
+              <label for="emsf_1507_11f90">ðŸ‘· ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" class="form-control" value="0" id="emsf_1507_11f90">
             </div>
             <div>
-              <label>ðŸ“ ملاحظات المشغل</label>
+              <label for="operator_notes">ðŸ“ ملاحظات المشغل</label>
               <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
             </div>
 
@@ -1726,7 +1839,7 @@ try {
         <div class="card-body">
           <div class="form-grid">
             <div>
-              <label>الوردية</label>
+              <label for="shift">الوردية</label>
               <select name="shift" id="shift" required>
                 <option value="">-- اختر الوردية --</option>
                 <option value="D">☀️ صباحية</option>
@@ -1734,11 +1847,11 @@ try {
               </select>
             </div>
             <div>
-              <label>المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
-              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني">
+              <label for="emsf_1508_b0080">المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1508_b0080">
             </div>
             <div>
-              <label>الالية</label>
+              <label for="operator">الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
                 <?php
@@ -1768,7 +1881,7 @@ try {
             <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
 
             <div>
-              <label>السائق</label>
+              <label for="driver">السائق</label>
               <select id="driver" name="employee_id" required>
                 <option value="">-- اختر السائق --</option>
               </select>
@@ -1781,13 +1894,39 @@ try {
             <!-- ********************************************************** -->
 
             <div>
-              <label>ساعات الوردية</label>
+              <label for="shift_hours">ساعات الوردية</label>
               <input type="number" name="shift_hours" id="shift_hours" value="0">
             </div>
 
 
             <div>
-              <label> ⏱️ عداد البداية</label>
+              <label for="executed_hours"> ⏱️ عداد البداية</label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00"
+                    required>
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00"
+                    required>
+                  <span>ثواني</span>
+                </div>
+              </div>
+            </div>
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              ساعات العمل </h3>
+
+            <div>
+              <label>الساعات المنفذة</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1822,35 +1961,35 @@ try {
             <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
 
             <div>
-              <label>ساعات إضافية</label>
+              <label for="extra_hours">ساعات إضافية</label>
               <input type="number" name="extra_hours" id="extra_hours" value="0">
             </div>
             <div>
-              <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+              <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
               <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly
                 style="background-color: #f0f0f0; cursor: not-allowed;">
             </div>
             <div>
-              <label>ساعات الاستعداد (بسبب العميل)</label>
+              <label for="standby_hours">ساعات الاستعداد (بسبب العميل)</label>
               <input type="number" name="standby_hours" id="standby_hours" value="0">
             </div>
             <div>
-              <label>ساعات الاستعداد ( اعتماد )</label>
+              <label for="dependence_hours">ساعات الاستعداد ( اعتماد )</label>
               <input type="number" name="dependence_hours" id="dependence_hours" value="0">
             </div>
             <div>
-              <label>مجموع ساعات العمل</label>
+              <label for="total_work_hours">مجموع ساعات العمل</label>
               <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
             </div>
             <div>
-              <label>ملاحظات ساعات العمل</label>
-              <textarea name="work_notes"></textarea>
+              <label for="emsf_1509_43bac">ملاحظات ساعات العمل</label>
+              <textarea name="work_notes" id="emsf_1509_43bac"></textarea>
             </div>
             <h3
               style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
               📏 الأمتار </h3>
             <div>
-              <label>🔧 نوع الأمتار</label>
+              <label for="meters_type">🔧 نوع الأمتار</label>
               <select name="meters_type" id="meters_type">
                 <option value="">-- اختر نوع الأمتار --</option>
                 <option value="أمتار الخام">أمتار الخام</option>
@@ -1859,16 +1998,16 @@ try {
               </select>
             </div>
             <div>
-              <label>📐 عدد الأمتار (محسوبة تلقائياً)</label>
+              <label for="meters_count">📐 عدد الأمتار (محسوبة تلقائياً)</label>
               <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly
                 style="background-color: #f0f0f0; cursor: not-allowed;">
             </div>
             <div>
-              <label>⛏️ عدد الحفر المخرمة</label>
+              <label for="drilling_holes_count">⛏️ عدد الحفر المخرمة</label>
               <input type="number" name="drilling_holes_count" id="drilling_holes_count" value="0" placeholder="0">
             </div>
             <div>
-              <label>📊 أعماق الحفر (متر)</label>
+              <label for="drilling_depth">📊 أعماق الحفر (متر)</label>
               <input type="number" step="0.01" name="drilling_depth" id="drilling_depth" value="0" placeholder="0.00">
             </div>
             <h3
@@ -1903,52 +2042,72 @@ try {
             </div>
 
             <div>
-              <label>عطل HR</label>
+              <label for="hr_fault">عطل HR</label>
               <input type="number" name="hr_fault" id="hr_fault" value="0">
             </div>
             <div>
-              <label>عطل صيانة</label>
+              <label for="maintenance_fault">عطل صيانة</label>
               <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
             </div>
             <div>
-              <label>عطل تسويق</label>
+              <label for="marketing_fault">عطل تسويق</label>
               <input type="number" name="marketing_fault" id="marketing_fault" value="0">
             </div>
             <div>
-              <label>عطل اعتماد</label>
+              <label for="approval_fault">عطل اعتماد</label>
               <input type="number" name="approval_fault" id="approval_fault" value="0">
             </div>
             <div>
-              <label>ساعات أعطال أخرى</label>
+              <label for="other_fault_hours">ساعات أعطال أخرى</label>
               <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
             </div>
             <!-- D02 §3.5 — ثلاثُ حالاتٍ لكلٍّ حكمٌ تعاقديٌّ مستقل؛ كانت تُبتلع
                  في «أعطال أخرى» فتضيع مسؤوليتُها ولا تستطيع سياسةُ الاستحقاق
                  أن تحكم على ما لا تميّزه. -->
             <div>
-              <label>توقف على المورد</label>
+              <label for="ts_supplier_stop_hours">توقف على المورد</label>
               <input type="number" step="0.01" min="0" name="ts_supplier_stop_hours" id="ts_supplier_stop_hours" value="0">
             </div>
             <div>
-              <label>توقف مخطط (صيانة دورية)</label>
+              <label for="ts_planned_stop_hours">توقف مخطط (صيانة دورية)</label>
               <input type="number" step="0.01" min="0" name="ts_planned_stop_hours" id="ts_planned_stop_hours" value="0">
             </div>
             <div>
-              <label>قوة قاهرة</label>
+              <label for="ts_force_majeure_hours">قوة قاهرة</label>
               <input type="number" step="0.01" min="0" name="ts_force_majeure_hours" id="ts_force_majeure_hours" value="0">
             </div>
             <div>
-              <label> مجموع ساعات التعطل</label>
+              <label for="total_fault_hours"> مجموع ساعات التعطل</label>
               <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
             </div>
             <div>
-              <label>ملاحظات ساعات الأعطال</label>
-              <textarea name="fault_notes"></textarea>
+              <label for="emsf_1510_1e4f9">ملاحظات ساعات الأعطال</label>
+              <textarea name="fault_notes" id="emsf_1510_1e4f9"></textarea>
             </div>
 
 
             <div>
-              <label> ⏱️ عداد النهاية </label>
+              <label for="counter_diff_display"> ⏱️ عداد النهاية </label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
+                  <span>ثواني</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label>⚡ فرق العداد</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
@@ -1981,28 +2140,28 @@ try {
               style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
               <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_event_type_f3">📋 نوع الحدث</label>
                   <select id="fc_event_type_f3"
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_main_cat_f3">🔧 الفئة الرئيسية</label>
                   <select id="fc_main_cat_f3" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_sub_cat_f3">⚙️ الجزء / السبب</label>
                   <select id="fc_sub_cat_f3" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                  <label style="font-size:0.85rem; font-weight:600;" for="fc_detail_f3">📝 تفصيل العطل</label>
                   <select id="fc_detail_f3" disabled
                     style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
                     <option value="">-- اختر التفصيل --</option>
@@ -2055,7 +2214,7 @@ try {
             </div>
 
             <div style="grid-column: 1/-1;">
-              <label>ملاحظات عامة</label>
+              <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
 
@@ -2064,31 +2223,31 @@ try {
               ساعات عمل المشغل </h3>
 
             <div>
-              <label>⏱️ ساعات عمل المشغل</label>
+              <label for="operator_hours">⏱️ ساعات عمل المشغل</label>
               <input type="text" name="operator_hours" id="operator_hours" value="0">
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الآلية</label>
+              <label for="machine_standby_hours">⚙️ ساعات استعداد الآلية</label>
               <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الجاك همر</label>
+              <label for="jackhammer_standby_hours">⚙️ ساعات استعداد الجاك همر</label>
               <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
             </div>
             <div>
-              <label>⚙️ ساعات استعداد الجردل</label>
+              <label for="bucket_standby_hours">⚙️ ساعات استعداد الجردل</label>
               <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
             </div>
             <div>
-              <label>➕ الساعات الإضافية</label>
+              <label for="extra_operator_hours">➕ الساعات الإضافية</label>
               <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
             </div>
             <div>
-              <label>ðŸ'· ساعات استعداد المشغل</label>
+              <label for="operator_standby_hours">ðŸ'· ساعات استعداد المشغل</label>
               <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
             </div>
             <div>
-              <label>ðŸ" ملاحظات المشغل</label>
+              <label for="operator_notes">ðŸ" ملاحظات المشغل</label>
               <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
             </div>
 
@@ -2216,7 +2375,6 @@ try {
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -3270,7 +3428,7 @@ try {
         + '<td style="width:130px;"><select data-i="' + i + '" data-k="resp_party">'
         + RESPS.map(function (r) { return '<option value="' + r.v + '"' + (r.v === l.resp_party ? ' selected' : '') + '>' + r.t + '</option>'; }).join('')
         + '</select></td>'
-        + '<td><input type="text" maxlength="190" placeholder="المرجع/السبب (WO-5511…)" value="' + (l.cause_note || '') + '" data-i="' + i + '" data-k="cause_note"></td>'
+        + '<td><input type="text" maxlength="190" placeholder="المرجع/السبب (WO-5511…)" value="' + (l.cause_note || '') + '" data-i="' + i + '" data-k="cause_note" aria-label="المرجع/السبب (WO-5511…)"></td>'
         + '<td style="width:44px;text-align:center;"><a href="#" data-del="' + i + '" style="color:#dc2626;"><i class="fas fa-trash"></i></a></td>';
       tb.appendChild(tr);
     });

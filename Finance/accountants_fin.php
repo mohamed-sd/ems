@@ -100,9 +100,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="unitForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-building-columns"></i> وحدة مالية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>الكود <span class="required">*</span></label><input type="text" name="unit_code" required placeholder="gl / ar / ap / treasury"></div>
-            <div class="form-group"><label>الاسم <span class="required">*</span></label><input type="text" name="unit_name" required></div>
-            <div class="form-group" style="grid-column:1/-1"><label>دور الوحدة</label><input type="text" name="role_note"></div>
+            <div class="form-group"><label for="emsf_320_a5811">الكود <span class="required">*</span></label><input type="text" name="unit_code" required placeholder="gl / ar / ap / treasury" id="emsf_320_a5811"></div>
+            <div class="form-group"><label for="emsf_321_37a48">الاسم <span class="required">*</span></label><input type="text" name="unit_name" required id="emsf_321_37a48"></div>
+            <div class="form-group" style="grid-column:1/-1"><label for="emsf_322_9e127">دور الوحدة</label><input type="text" name="role_note" id="emsf_322_9e127"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#unitForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -112,11 +112,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="acctForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-user-tie"></i> محاسب إدارة (تبعيّة مزدوجة)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>الموظف المحاسب <span class="required">*</span></label><select name="employee_id" required><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>الإدارة المتبوعة <span class="required">*</span></label><select name="admin_module" required><option value="">— اختر —</option><?php foreach ($modules_lbl as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>الوحدة المالية <span class="required">*</span></label><select name="finance_unit_id" required><?php echo fin_unit_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>التخصص</label><input type="text" name="specialization" placeholder="مبيعات/موردين/قوى..."></div>
-            <div class="form-group"><label>حد المراجعة (USD)</label><input type="number" step="0.01" name="review_limit_usd"></div>
+            <div class="form-group"><label for="emsf_323_77a22">الموظف المحاسب <span class="required">*</span></label><select name="employee_id" required id="emsf_323_77a22"><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_324_ffb09">الإدارة المتبوعة <span class="required">*</span></label><select name="admin_module" required id="emsf_324_ffb09"><option value="">— اختر —</option><?php foreach ($modules_lbl as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_325_34494">الوحدة المالية <span class="required">*</span></label><select name="finance_unit_id" required id="emsf_325_34494"><?php echo fin_unit_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_326_01cdf">التخصص</label><input type="text" name="specialization" placeholder="مبيعات/موردين/قوى..." id="emsf_326_01cdf"></div>
+            <div class="form-group"><label for="emsf_327_122d1">حد المراجعة (USD)</label><input type="number" step="0.01" name="review_limit_usd" id="emsf_327_122d1"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#acctForm').removeClass('allforms-visible')">إلغاء</button></div>

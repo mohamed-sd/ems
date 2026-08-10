@@ -160,23 +160,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="create">
         <div class="card-header"><h5><i class="fas fa-edit"></i> طلب ترحيل جديد</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>نوع الترحيل <span class="required">*</span></label>
-                <select name="transfer_type_id" required><?php echo trs_type_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-            <div class="form-group"><label>الإدارة المصدر <span class="required">*</span></label>
-                <select name="source_module" required><option value="">— اختر —</option>
+            <div class="form-group"><label for="emsf_1596_2176e">نوع الترحيل <span class="required">*</span></label>
+                <select name="transfer_type_id" required id="emsf_1596_2176e"><?php echo trs_type_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+            <div class="form-group"><label for="emsf_1597_ea58c">الإدارة المصدر <span class="required">*</span></label>
+                <select name="source_module" required id="emsf_1597_ea58c"><option value="">— اختر —</option>
                 <?php foreach ($srcs as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>الجهة الطالبة</label>
-                <select name="requested_by_user_id"><?php echo trs_user_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-            <div class="form-group"><label>المشروع</label>
-                <select name="project_id"><?php echo trs_project_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-            <div class="form-group"><label>من موقع</label>
-                <select name="from_location_id"><?php echo trs_location_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-            <div class="form-group"><label>إلى موقع</label>
-                <select name="to_location_id"><?php echo trs_location_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-            <div class="form-group"><label>الأولوية</label>
-                <select name="priority"><?php foreach ($prios as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group" style="grid-column:1/-1"><label>مبرّر الاحتياج <span class="required">*</span></label>
-                <input type="text" name="reason" required placeholder="سبب الترحيل ومصدره"></div>
+            <div class="form-group"><label for="emsf_1598_bb195">الجهة الطالبة</label>
+                <select name="requested_by_user_id" id="emsf_1598_bb195"><?php echo trs_user_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+            <div class="form-group"><label for="emsf_1599_9d0f5">المشروع</label>
+                <select name="project_id" id="emsf_1599_9d0f5"><?php echo trs_project_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+            <div class="form-group"><label for="emsf_1600_0bada">من موقع</label>
+                <select name="from_location_id" id="emsf_1600_0bada"><?php echo trs_location_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+            <div class="form-group"><label for="emsf_1601_02058">إلى موقع</label>
+                <select name="to_location_id" id="emsf_1601_02058"><?php echo trs_location_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+            <div class="form-group"><label for="emsf_1602_e56fc">الأولوية</label>
+                <select name="priority" id="emsf_1602_e56fc"><?php foreach ($prios as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group" style="grid-column:1/-1"><label for="emsf_1603_27f33">مبرّر الاحتياج <span class="required">*</span></label>
+                <input type="text" name="reason" required placeholder="سبب الترحيل ومصدره" id="emsf_1603_27f33"></div>
         </div></div>
         <div class="form-actions">
             <button type="submit" class="btn-save"><i class="fas fa-save"></i> تقديم الطلب</button>
@@ -260,8 +260,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form method="post">
       <input type="hidden" name="action" value="convert">
       <input type="hidden" name="request_id" id="convert_rid" value="">
-      <div class="form-group"><label>الاتجاه (إلزامي) <span class="required">*</span></label>
-        <select name="direction" required style="width:100%;padding:8px">
+      <div class="form-group"><label for="emsf_1604_5b717">الاتجاه (إلزامي) <span class="required">*</span></label>
+        <select name="direction" required style="width:100%;padding:8px" id="emsf_1604_5b717">
           <option value="">— اختر الاتجاه —</option>
           <?php foreach ($dirs as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?>
         </select></div>

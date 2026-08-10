@@ -15,6 +15,15 @@
 
 require_once __DIR__ . '/config.php';
 
+/*
+ * FIX-01 · RF-03 خطوة ① (FIXA-0027) — طبقةُ الصلاحياتِ تُحمَّل **في الرأسِ قبلَ
+ * أيِّ نداءٍ للتصريح**. كان ‎config.php‎ لا يحمّلها، فيسقط ‎ExcelService::authorize‎
+ * في فرعِه المفتوح ‎(!function_exists(...)) return;‎ ويمرُّ التصديرُ الموحَّدُ بلا
+ * أيِّ فحصِ تفويضٍ لكلِّ كيانٍ في المنصة. والفرعُ المفتوحُ أُغلق أيضًا — فالتحميلُ
+ * وحدَه لا يكفي: لو غاب لسببٍ ما يجب أن يُقرأ منعًا لا سماحًا (CS-02).
+ */
+require_once __DIR__ . '/includes/permissions_helper.php';
+
 use App\Services\Excel\ExcelService;
 
 /*

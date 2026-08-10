@@ -11,6 +11,14 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
@@ -78,7 +86,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= intval($o['status']) === 1 ? 'عاملة' : 'متوقفة' ?></td>
         <form method="post">
           <input type="hidden" name="rts_order" value="<?= intval($o['id']) ?>">
-          <td><input type="text" name="readiness_note" class="form-control form-control-sm" placeholder="فُحصت وجاهزة — التوقيع الفني" required></td>
+          <td><input type="text" name="readiness_note" class="form-control form-control-sm" placeholder="فُحصت وجاهزة — التوقيع الفني" required aria-label="فُحصت وجاهزة — التوقيع الفني"></td>
           <td><button class="action-btn" type="submit"><i class="fa fa-undo"></i> أعد للخدمة وأقفل</button></td>
         </form>
       </tr>

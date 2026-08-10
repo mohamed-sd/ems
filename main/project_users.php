@@ -35,26 +35,118 @@ try {
 } catch (\Throwable $t) { error_log('project_users.php module: ' . $t->getMessage()); }
 $module_id = $module_info ? $module_info['id'] : null;
 
-// إذا لم يوجد سجل خاص بهذا الدور، افترض جميع الصلاحيات (للتوافق مع الأدوار القديمة)
-if (!$module_id) {
-    $can_view = $can_add = $can_edit = $can_delete = true;
-} else {
-    $can_view = false;
-    $can_add = false;
-    $can_edit = false;
-    $can_delete = false;
-
+if ($module_id) {
+    // للدور وحدتُه الخاصة — صلاحياتُه منها
     $perms = get_module_permissions($conn, $module_id);
-    $can_view = $perms['can_view'];
-    $can_add = $perms['can_add'];
-    $can_edit = $perms['can_edit'];
-    $can_delete = $perms['can_delete'];
+} else {
+    /* ◆ ثغرةٌ أُغلقت (2026-08-09): كان الغيابُ يعني «افترض جميع الصلاحيات»،
+       فأيُّ دورٍ بلا صفِّ وحدةٍ خاصٍّ به يفتح الشاشةَ بصلاحياتٍ كاملة — وهو
+       عينُ ما نقضه قرارُ المالك 2026-08-05 في `check_page_permissions`
+       («الشاشةُ غيرُ المسجَّلةِ تُرفض»). الآن يُرتدّ إلى الوحدة الحاكمة
+       للمسار فيُحسم الأمرُ بصفِّ صلاحيةٍ حقيقيٍّ أو يُغلق. وُسِّع الرابطُ إلى
+       تسعةَ عشرَ دورًا رئيسيًّا — ولا يُوسَّع بابٌ وحارسُه يفترض الإذن. */
+    $perms = check_page_permissions($conn, 'main/project_users.php');
 }
+$can_view   = !empty($perms['can_view']);
+$can_add    = !empty($perms['can_add']);
+$can_edit   = !empty($perms['can_edit']);
+$can_delete = !empty($perms['can_delete']);
 
 // منع الوصول إذا لم تكن هناك صلاحية عرض
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض صفحة المشرفين ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض صفحة المعاونين ❌', 'GOV-PERM-403', '');
     exit();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 🔎 قناةُ «ما الذي يفتحه هذا الدور؟» — معلومةٌ قبلَ الإسناد لا بعده
+// ──────────────────────────────────────────────────────────────────────────────
+// تُخدَم من الشاشة نفسِها (نمطُ `Clients/clients.php?ajax=…`) لا من معالجٍ مستقل:
+// فترثُ حارسَ الشاشةِ أعلاه حرفيًّا، ولا تفتح سطحًا جديدًا يحتاج تسجيلًا في
+// `action_guard` (وهو fail-closed — والمعالجُ غيرُ المسجَّل يُحجب).
+//
+// ◆ الحدُّ الحاكم: لا يُكشف نطاقُ دورٍ إلا إن كان **ابنًا لدور الجلسة** — وهو
+//   عينُ الشرط الذي يفرضه الحفظُ عند الإضافة والتعديل. ولولاه لصار مربّعُ
+//   الاختيار بابًا لقراءة خريطةِ صلاحياتِ كلِّ أدوار المنصّة.
+// ══════════════════════════════════════════════════════════════════════════════
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'role_scope') {
+    while (ob_get_level()) { ob_end_clean(); }
+    header('Content-Type: application/json; charset=UTF-8');
+
+    $scopeRoleId = isset($_GET['role_id']) ? intval($_GET['role_id']) : 0;
+    $roleRow = null;
+    if ($scopeRoleId > 0) {
+        try {
+            $roleRow = $pu_gate->selectOne('roles', array('columns' => array('id', 'name'),
+                'where' => array('id' => $scopeRoleId, 'parent_role_id' => $_currentUserRole),
+                'whereRaw' => "(status = '1' OR status = 1)"));
+        } catch (\Throwable $t) { error_log('project_users.php role_scope: ' . $t->getMessage()); }
+    }
+    if ($roleRow === null) {
+        http_response_code(403);
+        echo json_encode(array('ok' => false, 'message' => 'هذا الدور ليس من الأدوار التابعة لإدارتك'), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    /* الشاشاتُ كما يراها الدورُ فعلًا: صفُّ تبعيةٍ حيٌّ في `nav_items` × صلاحيةُ
+       عرضٍ على وحدته — وهو الشرطُ نفسُه الذي يُصيِّر به `unified_nav` القائمة،
+       فما يُعرض هنا هو ما سيراه المعاونُ حرفيًّا لا ما يُظنّ أنه سيراه.
+       (`nav_items`/`link_groups`/`role_permissions` مراجعُ عامةٌ لا مستأجَرة —
+       فتُقرأ إثراءً، ونطاقُ الشركةِ يُثبَّت على `users` صفِّ الجلسةِ نفسِه.) */
+    $scopeScreens = array();
+    $scopeWrite = 0;
+    try {
+        $scopeScreens = $pu_gate->scopedQuery(
+            array('scope' => array('u' => 'users'),
+                  'enrich' => array('ni' => 'nav_items', 'lg' => 'link_groups', 'rp' => 'role_permissions')),
+            "SELECT ni.label_ar, ni.route, lg.name AS group_name, lg.stage_title,
+                    lg.display_order AS gord, ni.sort_order AS sord,
+                    COALESCE(rp.can_add, 0)    AS can_add,
+                    COALESCE(rp.can_edit, 0)   AS can_edit,
+                    COALESCE(rp.can_delete, 0) AS can_delete
+               FROM users u
+               LEFT JOIN nav_items ni ON ni.role_id = " . $scopeRoleId . " AND ni.active = 1
+               LEFT JOIN link_groups lg ON lg.id = ni.group_id
+               LEFT JOIN role_permissions rp ON rp.module_id = ni.module_id AND rp.role_id = ni.role_id
+              WHERE u.id = " . intval($_SESSION['user']['id']) . " AND {TENANT_SCOPE}
+                AND ni.id IS NOT NULL
+                AND (ni.permission_code IS NULL OR COALESCE(rp.can_view, 0) = 1)
+              ORDER BY gord, sord, ni.id");
+    } catch (\Throwable $t) { error_log('project_users.php role_scope screens: ' . $t->getMessage()); }
+
+    $out = array();
+    foreach ($scopeScreens as $s) {
+        if (intval($s['can_add']) || intval($s['can_edit']) || intval($s['can_delete'])) { $scopeWrite++; }
+        $place = trim((string) $s['stage_title']);
+        if ($place === '') { $place = trim((string) $s['group_name']); }
+        $out[] = array(
+            'label'  => (string) $s['label_ar'],
+            'route'  => (string) $s['route'],
+            'group'  => $place,
+            'add'    => intval($s['can_add']),
+            'edit'   => intval($s['can_edit']),
+            'delete' => intval($s['can_delete']),
+        );
+    }
+
+    // كم معاونًا يحمل هذا الدور اليوم داخل الشركة
+    $scopeHolders = 0;
+    try {
+        $h = $pu_gate->scopedQuery(array('scope' => array('u' => 'users')),
+            "SELECT COUNT(*) n FROM users u
+              WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.role = ?",
+            array(strval($scopeRoleId)));
+        $scopeHolders = $h ? intval($h[0]['n']) : 0;
+    } catch (\Throwable $t) { error_log('project_users.php role_scope holders: ' . $t->getMessage()); }
+
+    echo json_encode(array(
+        'ok'      => true,
+        'role'    => array('id' => $scopeRoleId, 'name' => (string) $roleRow['name']),
+        'holders' => $scopeHolders,
+        'screens' => $out,
+        'write'   => $scopeWrite,
+    ), JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 $page_title = "إيكوبيشن | المشرفون";
@@ -305,10 +397,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
 // قائمة الموظفين المتاحين للربط (موظفو الشركة + معرّف الحساب المرتبط إن وُجد).
 $employees_for_link = array();
 $emp_name_by_id = array();
+$emp_code_by_id = array();
 if ($users_has_employee_id) {
     try {
         $pu_emps = $pu_gate->scopedQuery(array('scope' => array('e' => 'employees'), 'enrich' => array('u2' => 'users')),
-            "SELECT e.id, e.name, e.phone,
+            "SELECT e.id, e.name, e.phone, e.employee_code,
                        (SELECT u2.id FROM users u2 WHERE u2.employee_id = e.id AND COALESCE(u2.is_deleted,0)=0 LIMIT 1) AS linked_uid
                 FROM employees e WHERE 1=1 AND {TENANT_SCOPE} ORDER BY e.name ASC");
         foreach ($pu_emps as $er) {
@@ -316,32 +409,93 @@ if ($users_has_employee_id) {
                 'id'         => intval($er['id']),
                 'name'       => $er['name'],
                 'phone'      => $er['phone'],
+                'code'       => (string) $er['employee_code'],
                 'linked_uid' => ($er['linked_uid'] !== null) ? intval($er['linked_uid']) : 0,
             );
             $emp_name_by_id[intval($er['id'])] = $er['name'];
+            $emp_code_by_id[intval($er['id'])] = (string) $er['employee_code'];
         }
     } catch (\Throwable $t) { error_log('project_users.php employees: ' . $t->getMessage()); }
 }
 
-$page_title = "إيكوبيشن | المشرفون";
+/* الأدوارُ التابعةُ لدور الجلسة — مصدرٌ واحدٌ تقرأ منه القائمةُ المنسدلةُ
+   ولافتةُ «لا أدوارَ تابعة» معًا. كانت تُجلب داخلَ الـ<select> فلا يعرف بقيةُ
+   الصفحةِ أفارغةٌ هي أم لا، فتُعرض شاشةُ إضافةٍ لا تستطيع أن تُضيف شيئًا. */
+$pu_child_roles = array();
+try {
+    $pu_child_roles = $pu_gate->select('roles', array(
+        'columns'  => array('id', 'name'),
+        'where'    => array('parent_role_id' => $_currentUserRole),
+        'whereRaw' => "(status = '1' OR status = 1)",
+        'orderBy'  => 'id ASC'));
+} catch (\Throwable $t) { error_log('project_users.php child roles: ' . $t->getMessage()); }
+
+$page_title = "إيكوبيشن | إدارة المعاونين";
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
-require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+/* تعريفُ الشاشة بالمكوِّن الموحَّد نفسِه الذي تستعمله الشاشاتُ كلُّها: النصُّ
+   هنا مصوغٌ باليد (أبلغُ من المشتقِّ آليًّا لشاشةٍ لها دورةُ عملٍ واضحة)،
+   والموضعُ والسلوكُ يتولاهما `assets/js/ems-screen-about.js` — فلا نسخةَ
+   ثانيةٌ من المكوِّن في هذا الملف. */
+ems_screen_about(
+    'من هنا تبني فريقَ إدارتك: حسابٌ لكلِّ معاونٍ أو مشرفٍ تابعٍ لك، بدورٍ محدَّدٍ '
+  . 'يرسم ما يراه وما يستطيع فعلَه، ومربوطٌ بموظفٍ في سجلِّ الموارد البشرية.',
+    array(
+        'اختر الموظف — لا حسابَ يعمل بلا موظفٍ مُسنَد، فتُملأ بياناتُه تلقائيًّا.',
+        'اختر الدور — واقرأ لوحةَ «ما يفتحه هذا الدور» التي تظهر تحته قبلَ الحفظ.',
+        'سلّم بيانات الدخول — ثم تابع من الجدول: أيُّهم دخل، وأيُّهم لم يدخل بعد.',
+    ),
+    'لا تُسنَد إلا الأدوارُ التابعةُ لدورك — والمنعُ يقع عند الحفظ في الخادم، لا بإخفاء الخيار.'
+);
 ?>
 
 <div class="main project-users-main ems-unified-page-shell">
 
     <?php
+    // ── جلبُ الفريق مرةً واحدةً قبلَ التصيير: المؤشراتُ والجدولُ من مصدرٍ واحد ──
+    // (كان الاستعلامُ داخلَ <tbody> فلا سبيلَ لعدِّ شيءٍ قبله — ومؤشرٌ يُحسب من
+    //  استعلامٍ ثانٍ يفترق عن جدوله عند أول تغيّرِ شرط.)
+    $userid      = $_SESSION['user']['id'];
+    $currentRole = $_SESSION['user']['role'];
+    $result = array();
+    try {
+        $result = $pu_gate->scopedQuery(array('scope' => array('u' => 'users')),
+            "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.employee_id,
+                    u.created_at, u.last_login_at, u.status, ro.name AS role_name
+             FROM users u
+             LEFT JOIN roles ro ON ro.id = u.role
+             WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND (
+                   u.parent_id = ?
+                OR u.role IN (
+                   SELECT r.id FROM roles r
+                    WHERE r.parent_role_id = " . intval($currentRole) . "
+                      AND (r.status = '1' OR r.status = 1)
+                )
+             )
+             ORDER BY u.id DESC", array(strval($userid)));
+    } catch (\Throwable $t) { error_log('project_users.php list: ' . $t->getMessage()); }
+
+    $kpi_total = count($result);
+    $kpi_active = 0; $kpi_linked = 0; $kpi_never = 0;
+    $kpi_roles = array();
+    foreach ($result as $r0) {
+        if ((string) $r0['status'] === 'active') { $kpi_active++; }
+        if (intval($r0['employee_id']) > 0) { $kpi_linked++; }
+        if (empty($r0['last_login_at'])) { $kpi_never++; }
+        if (!empty($r0['role'])) { $kpi_roles[(string) $r0['role']] = 1; }
+    }
+
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
-    $header_icon       = 'fas fa-users-cog';
-    $header_title_html = 'إدارة مشرفين ' . (!empty($roleName) ? '- ' . $roleName : '');
+    $header_icon       = 'fas fa-users-gear';
+    $header_title_html = 'إدارة المعاونين' . (!empty($roleName) ? ' — ' . $roleName : '');
     $header_actions = array();
     if ($can_add) {
-        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشرف جديد');
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-user-plus', 'label' => 'إضافة معاون جديد');
     }
+    // زرُّ «عن الشاشة» يزرعه المكوِّنُ الموحَّد في `.head_actions` — لا يُكتب هنا
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -351,9 +505,52 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
-            <?php echo htmlspecialchars($_GET['msg']); ?>
+            <?php echo htmlspecialchars((string) $_GET['msg']); ?>
         </div>
     <?php endif; ?>
+
+    <?php if (empty($pu_child_roles)): ?>
+        <!-- لافتةُ الحدِّ الحقيقي: شاشةُ إضافةٍ بلا أدوارٍ تابعةٍ لا تستطيع أن تضيف
+             شيئًا — تُقال صراحةً بدل أن يكتشفها المستخدمُ من قائمةٍ فارغة. -->
+        <div class="pu-notice pu-notice--warn">
+            <i class="fas fa-triangle-exclamation"></i>
+            <div>
+                <b>لا توجد أدوارٌ تابعةٌ لإدارتك بعد.</b>
+                يمكنك عرضُ من يتبعك ومتابعتُهم، ولا يمكن إضافةُ معاونٍ جديد حتى يُنشأ دورٌ تابعٌ لدورك
+                <?= (!empty($roleName) ? '«' . htmlspecialchars($roleName, ENT_QUOTES, 'UTF-8') . '»' : '') ?>
+                من <b>إدارة الصلاحيات</b> — فالخادمُ يرفض إسنادَ أيِّ دورٍ ليس ابنًا لدورك.
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <!-- ═══ مؤشراتُ الفريق ═══ -->
+    <div class="pu-kpis">
+        <div class="pu-kpi" data-tone="main">
+            <span class="pu-kpi__ico"><i class="fas fa-users"></i></span>
+            <span class="pu-kpi__val"><?= $kpi_total ?></span>
+            <span class="pu-kpi__lbl">إجمالي الفريق</span>
+        </div>
+        <div class="pu-kpi" data-tone="ok">
+            <span class="pu-kpi__ico"><i class="fas fa-circle-check"></i></span>
+            <span class="pu-kpi__val"><?= $kpi_active ?></span>
+            <span class="pu-kpi__lbl">حساباتٌ نشطة</span>
+        </div>
+        <div class="pu-kpi" data-tone="info">
+            <span class="pu-kpi__ico"><i class="fas fa-shield-halved"></i></span>
+            <span class="pu-kpi__val"><?= count($kpi_roles) ?></span>
+            <span class="pu-kpi__lbl">أدوارٌ مستعملة</span>
+        </div>
+        <div class="pu-kpi" data-tone="<?= ($kpi_total > 0 && $kpi_linked < $kpi_total) ? 'warn' : 'ok' ?>">
+            <span class="pu-kpi__ico"><i class="fas fa-id-card-alt"></i></span>
+            <span class="pu-kpi__val"><?= $kpi_linked ?>/<?= $kpi_total ?></span>
+            <span class="pu-kpi__lbl">مربوطٌ بموظف</span>
+        </div>
+        <div class="pu-kpi" data-tone="<?= $kpi_never > 0 ? 'warn' : 'ok' ?>">
+            <span class="pu-kpi__ico"><i class="fas fa-hourglass-half"></i></span>
+            <span class="pu-kpi__val"><?= $kpi_never ?></span>
+            <span class="pu-kpi__lbl">لم يسجّل دخولًا بعد</span>
+        </div>
+    </div>
 
     <!-- فورم إضافة / تعديل مستخدم -->
     <form id="projectForm" action="" method="post" class="allforms">
@@ -366,56 +563,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-body">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-user"></i> الاسم ثلاثي *</label>
+                        <label for="name"><i class="fas fa-user"></i> الاسم ثلاثي *</label>
                         <input type="text" name="name" id="name" placeholder="أدخل الاسم ثلاثي" value="" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-at"></i> اسم المستخدم *</label>
+                        <label for="username"><i class="fas fa-at"></i> اسم المستخدم *</label>
                         <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" value=""
                             required autocomplete="off" />
                         <small id="usernameFeedback" class="pu-username-feedback"></small>
                     </div>
                     <div>
-                        <label><i class="fas fa-lock"></i> كلمة المرور <span id="passwordRequired">*</span></label>
+                        <label for="password"><i class="fas fa-lock"></i> كلمة المرور <span id="passwordRequired">*</span></label>
                         <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value="" />
                         <small id="passwordHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بكلمة المرور
                             الحالية</small>
                     </div>
                     <div>
-                        <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
+                        <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف *</label>
                         <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789" required value="" />
                     </div>
                     <div>
-                        <label><i class="fas fa-shield-alt"></i> الصلاحية / الدور *</label>
+                        <label for="role"><i class="fas fa-shield-alt"></i> الصلاحية / الدور *</label>
                         <select name="role" id="role" required>
                             <option value="">-- اختر الصلاحية --</option>
                             <?php
-                            // جلب الأدوار التابعة للدور الحالي (roles مرجع عام — عبر البوابة)
-                            $currentRole = $_SESSION['user']['role'];
-                            $rolesResult = array();
-                            try {
-                                $rolesResult = $pu_gate->select('roles', array(
-                                    'columns' => array('id', 'name'),
-                                    'where' => array('parent_role_id' => intval($currentRole)),
-                                    'whereRaw' => "(status = '1' OR status = 1)",
-                                    'orderBy' => 'id ASC'));
-                            } catch (\Throwable $t) { error_log('project_users.php roles options: ' . $t->getMessage()); }
-
-                            if (!empty($rolesResult)) {
-                                foreach ($rolesResult as $roleRow) {
-                                    echo '<option value="' . $roleRow['id'] . '">' .
-                                        htmlspecialchars($roleRow['name'], ENT_QUOTES, 'UTF-8') .
+                            if (!empty($pu_child_roles)) {
+                                foreach ($pu_child_roles as $roleRow) {
+                                    echo '<option value="' . intval($roleRow['id']) . '">' .
+                                        htmlspecialchars((string) $roleRow['name'], ENT_QUOTES, 'UTF-8') .
                                         '</option>';
                                 }
                             } else {
-                                echo '<option value="" disabled>لا توجد صلاحيات متاحة</option>';
+                                echo '<option value="" disabled>لا توجد أدوار تابعة لإدارتك</option>';
                             }
                             ?>
                         </select>
+                        <small class="pu-password-hint">اختر الدور لتظهر لك الشاشاتُ التي سيفتحها هذا المعاون.</small>
                     </div>
                     <?php if ($users_has_employee_id): ?>
                     <div>
-                        <label><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
+                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
                         <select name="employee_id" id="employee_id_link" required>
                             <option value="">— اختر الموظف —</option>
                             <?php foreach ($employees_for_link as $emp): ?>
@@ -423,13 +610,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     data-linked-uid="<?= intval($emp['linked_uid']) ?>"
                                     data-name="<?= htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8') ?>"
                                     data-phone="<?= htmlspecialchars((string) $emp['phone'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <?= htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8') ?>
+                                    <?= htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8') ?><?= $emp['code'] !== '' ? ' — ' . htmlspecialchars($emp['code'], ENT_QUOTES, 'UTF-8') : '' ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                         <small class="pu-password-hint">إلزامي — لا حساب يعمل بلا موظف مُسنَد. تُعبّأ بيانات الموظف تلقائياً عند الاختيار.</small>
                     </div>
                     <?php endif; ?>
+                </div>
+
+                <!-- ═══ لوحةُ «ما يفتحه هذا الدور» ═══
+                     معلومةٌ قبلَ القرار لا تقريرٌ بعده: تظهر تحت الحقلِ عند اختيار
+                     الدور، ولا تحجب النموذجَ ولا تنتزع التركيز (لا نافذةَ حاجزة). -->
+                <div class="pu-rolescope" id="puRoleScope" hidden>
+                    <div class="pu-rolescope__head">
+                        <span><i class="fas fa-shield-halved"></i> ما الذي يفتحه دور <b id="puRoleScopeName">—</b>؟</span>
+                        <span class="pu-rolescope__pills" id="puRoleScopePills"></span>
+                        <button type="button" class="pu-rolescope__close" id="puRoleScopeClose" title="إخفاء"><i class="fas fa-xmark"></i></button>
+                    </div>
+                    <div class="pu-rolescope__body" id="puRoleScopeBody"></div>
                 </div>
                 <div class="pu-form-actions">
                     <button type="submit" class="btn-submit">
@@ -449,14 +648,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="usersTable" class="display nowrap">
                 <thead>
                     <tr>
+                        <!-- الإجراءاتُ أولًا (قرارُ المالك 2026-08-09): الفعلُ يُطلب قبل
+                             القراءةِ في شاشةِ إدارةٍ — فلا يُقطع الصفُّ بحثًا عن زرِّه. -->
+                        <th class="pu-col-actions">الإجراءات</th>
                         <th>#</th>
                         <th>الاسم</th>
                         <th>اسم المستخدم</th>
                         <th>رقم الهاتف</th>
                         <th>الصلاحية</th>
                         <th>الموظف المرتبط</th>
+                        <th>الحالة</th>
+                        <th>آخر دخول</th>
                         <th>تاريخ الإنشاء</th>
-                        <th>الإجراءات</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -469,70 +672,83 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </thead>
                 <tbody>
                     <?php
-                    // جلب المستخدمين التابعين للمدير الحالي
-                    // 1. المستخدمون الذين parent_id = المستخدم الحالي
-                    // 2. المستخدمون من الأدوار التابعة للدور الحالي
-                    $userid = $_SESSION['user']['id'];
-                    $currentRole = $_SESSION['user']['role'];
-
-                    $result = array();
-                    try {
-                        $result = $pu_gate->scopedQuery(array('scope' => array('u' => 'users')),
-                            "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.employee_id, u.created_at, ro.name AS role_name
-                             FROM users u
-                             LEFT JOIN roles ro ON ro.id = u.role
-                                                  WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND (
-                                          u.parent_id = ?
-                                OR u.role IN (
-                                   SELECT r.id FROM roles r
-                                   WHERE r.parent_role_id = " . intval($currentRole) . "
-                                   AND (r.status = '1' OR r.status = 1)
-                                )
-                                      )
-                                      ORDER BY u.id DESC", array(strval($userid)));
-                    } catch (\Throwable $t) { error_log('project_users.php list: ' . $t->getMessage()); }
+                    /* الصفوفُ من `$result` المجلوبِ أعلاه (مصدرٌ واحدٌ مع المؤشرات).
+                       ◆ كلُّ قيمةٍ تُغلَّف بـ(string) قبل htmlspecialchars: عمودُ
+                         الهاتف يقبل NULL، و PHP 8.1+ يرمي Deprecated على كل صفٍّ
+                         (كان يملأ php_errors.log فعلًا من هذا الملف بالذات). */
+                    $pu_e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
                     $i = 1;
-
-                    if ($result) {
                     foreach ($result as $row) {
                         $roleText = !empty($row['role_name'])
-                            ? htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8')
+                            ? $pu_e($row['role_name'])
                             : '<span class="pu-text-muted">غير معروف</span>';
-                        $createdDate = date('Y-m-d', strtotime($row['created_at']));
-
-                        echo "<tr>";
-                        echo "<td>" . $i++ . "</td>";
-                        echo "<td><strong>" . htmlspecialchars($row['name']) . "</strong></td>";
-                        echo "<td><code class='pu-code'>" . htmlspecialchars($row['username']) . "</code></td>";
-                        echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
-                        echo "<td>" . $roleText . "</td>";
+                        $createdDate = !empty($row['created_at']) ? date('Y-m-d', strtotime($row['created_at'])) : '—';
+                        $lastLogin   = !empty($row['last_login_at']) ? date('Y-m-d H:i', strtotime($row['last_login_at'])) : '';
+                        $status      = (string) $row['status'];
                         $linked_emp_id = isset($row['employee_id']) ? intval($row['employee_id']) : 0;
-                        if ($linked_emp_id > 0 && isset($emp_name_by_id[$linked_emp_id])) {
-                            echo "<td><a class='client-name-link' href='../Employees/employee_profile.php?id=" . $linked_emp_id . "'><i class='fas fa-id-card-alt'></i> " . htmlspecialchars($emp_name_by_id[$linked_emp_id], ENT_QUOTES, 'UTF-8') . "</a></td>";
-                        } else {
-                            echo "<td><span class='pu-text-muted'>— غير مرتبط —</span></td>";
-                        }
-                        echo "<td>" . $createdDate . "</td>";
+                        $empName = ($linked_emp_id > 0 && isset($emp_name_by_id[$linked_emp_id])) ? (string) $emp_name_by_id[$linked_emp_id] : '';
+                        $empCode = ($linked_emp_id > 0 && isset($emp_code_by_id[$linked_emp_id])) ? (string) $emp_code_by_id[$linked_emp_id] : '';
 
-                        $action_btns = "<td><div class='action-btns'>";
+                        $statusMap = array(
+                            'active'    => array('نشط',   'pu-pill pu-pill--ok',   'fa-circle-check'),
+                            'inactive'  => array('موقوف', 'pu-pill pu-pill--mute', 'fa-circle-pause'),
+                            'suspended' => array('معلَّق', 'pu-pill pu-pill--err',  'fa-circle-xmark'),
+                        );
+                        $sm = isset($statusMap[$status]) ? $statusMap[$status] : array($status !== '' ? $status : '—', 'pu-pill pu-pill--mute', 'fa-circle');
+
+                        echo '<tr>';
+
+                        // ① الإجراءات — أولَ عمود
+                        echo "<td class='pu-col-actions'><div class='action-btns'>";
+                        echo "<a href='javascript:void(0)' class='action-btn view puViewBtn'"
+                            . " data-id='" . intval($row['id']) . "'"
+                            . " data-name='" . $pu_e($row['name']) . "'"
+                            . " data-username='" . $pu_e($row['username']) . "'"
+                            . " data-phone='" . $pu_e($row['phone']) . "'"
+                            . " data-role='" . intval($row['role']) . "'"
+                            . " data-rolename='" . $pu_e($row['role_name']) . "'"
+                            . " data-empid='" . $linked_emp_id . "'"
+                            . " data-empname='" . $pu_e($empName) . "'"
+                            . " data-empcode='" . $pu_e($empCode) . "'"
+                            . " data-status='" . $pu_e($sm[0]) . "'"
+                            . " data-statuskey='" . $pu_e($status) . "'"
+                            . " data-lastlogin='" . $pu_e($lastLogin) . "'"
+                            . " data-created='" . $pu_e($createdDate) . "'"
+                            . " title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
                         if ($can_edit) {
-                            $action_btns .= "<a href='javascript:void(0)'
-                                       class='action-btn edit'
-                                       onclick='editUser({$row['id']}, \"" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "\", \""
-                                . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "\", \""
-                                . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "\", {$row['role']}, " . intval($row['employee_id']) . ")'
-                                       title='تعديل'><i class='fas fa-edit'></i></a>";
+                            echo "<a href='javascript:void(0)' class='action-btn edit puEditBtn'"
+                                . " data-id='" . intval($row['id']) . "'"
+                                . " data-name='" . $pu_e($row['name']) . "'"
+                                . " data-username='" . $pu_e($row['username']) . "'"
+                                . " data-phone='" . $pu_e($row['phone']) . "'"
+                                . " data-role='" . intval($row['role']) . "'"
+                                . " data-empid='" . $linked_emp_id . "'"
+                                . " title='تعديل'><i class='fas fa-edit'></i></a>";
                         }
                         if ($can_delete) {
-                            $action_btns .= "<a href='project_users.php?delete={$row['id']}'
-                                       class='action-btn delete'
-                                       onclick=\"return confirm('هل أنت متأكد من حذف هذا المستخدم؟')\"
-                                       title='حذف'><i class='fas fa-trash'></i></a>";
+                            echo "<a href='project_users.php?delete=" . intval($row['id']) . "'"
+                                . " class='action-btn delete'"
+                                . " onclick=\"return confirm('هل أنت متأكد من حذف حساب «" . $pu_e($row['name']) . "»؟')\""
+                                . " title='حذف'><i class='fas fa-trash'></i></a>";
                         }
-                        $action_btns .= "</div></td>";
-                        echo $action_btns;
-                        echo "</tr>";
-                    }
+                        echo '</div></td>';
+
+                        echo '<td>' . $i++ . '</td>';
+                        echo '<td><strong>' . $pu_e($row['name']) . '</strong></td>';
+                        echo "<td><code class='pu-code'>" . $pu_e($row['username']) . '</code></td>';
+                        echo '<td>' . ($row['phone'] !== null && $row['phone'] !== '' ? $pu_e($row['phone']) : '<span class="pu-text-muted">—</span>') . '</td>';
+                        echo '<td>' . $roleText . '</td>';
+                        if ($empName !== '') {
+                            echo "<td><a class='client-name-link' href='../Employees/employee_profile.php?id=" . $linked_emp_id . "'>"
+                                . "<i class='fas fa-id-card-alt'></i> " . $pu_e($empName) . '</a></td>';
+                        } else {
+                            echo "<td><span class='pu-pill pu-pill--warn'><i class='fas fa-link-slash'></i> غير مرتبط</span></td>";
+                        }
+                        echo "<td><span class='" . $sm[1] . "'><i class='fas " . $sm[2] . "'></i> " . $pu_e($sm[0]) . '</span></td>';
+                        echo '<td>' . ($lastLogin !== '' ? $pu_e($lastLogin)
+                                     : "<span class='pu-pill pu-pill--mute'>لم يدخل بعد</span>") . '</td>';
+                        echo '<td>' . $pu_e($createdDate) . '</td>';
+                        echo '</tr>';
                     }
                     ?>
                 </tbody>
@@ -548,7 +764,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -562,20 +777,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         // تشغيل DataTable بالعربية
         $(document).ready(function () {
             $('#usersTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
-                buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
+                order: [[1, 'asc']],   // العمود 0 صار الإجراءات — الترتيب على المسلسل
+                columnDefs: [
+                    // الإجراءاتُ لا تُرتَّب ولا تُبحث ولا تُصدَّر (أزرارٌ لا بيانات)
+                    { targets: 0, orderable: false, searchable: false, className: 'pu-col-actions' }
                 ],
+                buttons: [
+                    { extend: 'copy',  text: 'نسخ',          exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
+                    { extend: 'excel', text: 'تصدير Excel',  exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
+                    { extend: 'csv',   text: 'تصدير CSV',    exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
+                    { extend: 'pdf',   text: 'تصدير PDF',    exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
+                    { extend: 'print', text: 'طباعة',        exportOptions: { columns: ':visible:not(.pu-col-actions)' } }
+                ],
+                // گوتشا tn/18: performance-boost.js يفعّل stateSave عمومياً — وقد
+                // تغيّر عددُ أعمدة هذا الجدول (نُقلت الإجراءاتُ وأُضيف عمودان)،
+                // فالحالةُ المحفوظةُ من زيارةٍ سابقةٍ ترمي «Incorrect column count».
+                // نرفض المحفوظَ إن خالف عددُ أعمدته الجدولَ الحالي (نفسُ حارس
+                // ui-unification.js — لأن هذا الجدول يهيّئ نفسَه فلا يمرّ عليه).
+                stateLoadParams: function (settings, data) {
+                    if (data && data.columns && settings.aoColumns &&
+                        data.columns.length !== settings.aoColumns.length) {
+                        return false;
+                    }
+                },
                 "language": {
                     "url": "/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
+
 
         // التحكم في إظهار وإخفاء الفورم
         const toggleFormBtn = document.getElementById('toggleForm');
@@ -616,6 +847,150 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 }
             });
         }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // «ما الذي يفتحه هذا الدور؟» — لوحةُ معلومةٍ عند اختيار الدور
+        // ───────────────────────────────────────────────────────────────────
+        // ليست نافذةً حاجزة: لا تسرق التركيزَ ولا تُغلق بـEscape ولا تُوقف
+        // الكتابة — لأن المستخدم في منتصف نموذج، ونافذةٌ modal هنا تقطع عملَه
+        // لتخبره بمعلومة. تظهر تحت الحقلِ نفسِه فتُقرأ في مكان القرار.
+        // ═══════════════════════════════════════════════════════════════════
+        var roleSelect = document.getElementById('role');
+        var rsBox   = document.getElementById('puRoleScope');
+        var rsName  = document.getElementById('puRoleScopeName');
+        var rsPills = document.getElementById('puRoleScopePills');
+        var rsBody  = document.getElementById('puRoleScopeBody');
+        var rsClose = document.getElementById('puRoleScopeClose');
+        var rsCache = {};
+        var rsSeq   = 0;
+
+        function rsEsc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function rsRender(data) {
+            rsName.textContent = data.role.name;
+            var writeTxt = data.write > 0
+                ? '<span class="pu-chip pu-chip--write"><i class="fas fa-pen"></i> ' + data.write + ' شاشةَ تعديل</span>'
+                : '<span class="pu-chip pu-chip--read"><i class="fas fa-eye"></i> قراءةٌ فقط</span>';
+            rsPills.innerHTML =
+                '<span class="pu-chip"><i class="fas fa-window-restore"></i> ' + data.screens.length + ' شاشة</span>' +
+                writeTxt +
+                '<span class="pu-chip"><i class="fas fa-user-group"></i> ' + data.holders + ' يحملونه الآن</span>';
+
+            if (!data.screens.length) {
+                rsBody.innerHTML = '<div class="pu-rolescope__empty">'
+                    + '<i class="fas fa-inbox"></i> لا شاشاتٍ مسنَدةً لهذا الدور بعد — المعاونُ عليه لن يرى قائمةً.'
+                    + ' تُسنَد الشاشاتُ من <b>إدارة الصلاحيات</b>.</div>';
+                return;
+            }
+            // تجميعٌ بالمرحلة/المجموعة كما تظهر في القائمة — لا قائمةً مسطَّحة
+            var groups = {}, order = [];
+            data.screens.forEach(function (s) {
+                var g = s.group || 'غير مُصنَّف';
+                if (!groups[g]) { groups[g] = []; order.push(g); }
+                groups[g].push(s);
+            });
+            var html = '';
+            order.forEach(function (g) {
+                html += '<div class="pu-rolescope__grp"><span class="pu-rolescope__gname">' + rsEsc(g) + '</span><ul>';
+                groups[g].forEach(function (s) {
+                    var marks = '';
+                    if (s.add)    { marks += '<i class="fas fa-plus"   title="إضافة"></i>'; }
+                    if (s.edit)   { marks += '<i class="fas fa-pen"    title="تعديل"></i>'; }
+                    if (s.delete) { marks += '<i class="fas fa-trash"  title="حذف"></i>'; }
+                    if (marks === '') { marks = '<i class="fas fa-eye" title="عرض فقط"></i>'; }
+                    html += '<li><span>' + rsEsc(s.label) + '</span>'
+                          + '<span class="pu-rolescope__marks">' + marks + '</span></li>';
+                });
+                html += '</ul></div>';
+            });
+            rsBody.innerHTML = html;
+        }
+
+        function rsLoad(roleId) {
+            if (!rsBox) return;
+            if (!roleId) { rsBox.hidden = true; return; }
+            rsBox.hidden = false;
+            if (rsCache[roleId]) { rsRender(rsCache[roleId]); return; }
+
+            rsName.textContent = '…';
+            rsPills.innerHTML = '';
+            rsBody.innerHTML = '<div class="pu-rolescope__empty"><i class="fas fa-spinner fa-spin"></i> جارٍ قراءة نطاق الدور…</div>';
+
+            var mySeq = ++rsSeq;   // تجاهلُ ردٍّ متأخِّرٍ لاختيارٍ سابق
+            fetch('project_users.php?ajax=role_scope&role_id=' + encodeURIComponent(roleId), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin'
+            })
+                .then(function (r) { return r.json().catch(function () { return { ok: false }; }); })
+                .then(function (d) {
+                    if (mySeq !== rsSeq) { return; }
+                    if (!d || !d.ok) {
+                        rsBody.innerHTML = '<div class="pu-rolescope__empty pu-rolescope__empty--err">'
+                            + '<i class="fas fa-triangle-exclamation"></i> '
+                            + rsEsc((d && d.message) || 'تعذّرت قراءة نطاق الدور') + '</div>';
+                        return;
+                    }
+                    rsCache[roleId] = d;
+                    rsRender(d);
+                })
+                .catch(function () {
+                    if (mySeq !== rsSeq) { return; }
+                    rsBody.innerHTML = '<div class="pu-rolescope__empty pu-rolescope__empty--err">'
+                        + '<i class="fas fa-triangle-exclamation"></i> تعذّر الاتصال — أعد المحاولة</div>';
+                });
+        }
+
+        if (roleSelect) { roleSelect.addEventListener('change', function () { rsLoad(this.value); }); }
+        if (rsClose)    { rsClose.addEventListener('click', function () { rsBox.hidden = true; }); }
+
+        // ═══ نافذةُ تفاصيل المعاون — النظامُ الموحَّد نفسُه (EmsDetailsModal) ═══
+        $(document).on('click', '.puViewBtn', function () {
+            var d = this.dataset;
+            var tone = (d.statuskey === 'active') ? 'active' : 'inactive';
+            var empVal = d.empid && parseInt(d.empid, 10) > 0
+                ? '<a class="client-name-link" href="../Employees/employee_profile.php?id=' + encodeURIComponent(d.empid) + '">'
+                  + '<i class="fas fa-id-card-alt"></i> ' + rsEsc(d.empname || '—')
+                  + (d.empcode ? ' <small>(' + rsEsc(d.empcode) + ')</small>' : '') + '</a>'
+                : '<span class="pu-pill pu-pill--warn"><i class="fas fa-link-slash"></i> غير مرتبط بموظف</span>';
+
+            var actions = [];
+            <?php if ($can_edit): ?>
+            actions.push({
+                label: 'تعديل البيانات', icon: 'fas fa-edit', variant: 'primary',
+                onClick: function () {
+                    EmsDetailsModal.close();
+                    window.editUser(d.id, d.name, d.username, d.phone, d.role, d.empid);
+                }
+            });
+            <?php endif; ?>
+            actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
+
+            EmsDetailsModal.open({
+                title: 'تفاصيل المعاون',
+                icon: 'fas fa-user-shield',
+                fields: [
+                    { label: 'الاسم', value: d.name, icon: 'fas fa-user', size: 'lg' },
+                    { label: 'اسم المستخدم', value: d.username, icon: 'fas fa-at' },
+                    { label: 'رقم الهاتف', value: d.phone, icon: 'fas fa-phone' },
+                    { label: 'الدور المسنَد', value: d.rolename, icon: 'fas fa-shield-halved', size: 'lg' },
+                    { label: 'الموظف المرتبط', value: empVal, icon: 'fas fa-id-card-alt', type: 'html', size: 'lg' },
+                    { label: 'حالة الحساب', value: d.status, icon: 'fas fa-toggle-on', type: 'status', tone: tone },
+                    { label: 'آخر دخول', value: d.lastlogin || 'لم يسجّل دخولًا بعد', icon: 'fas fa-right-to-bracket' },
+                    { label: 'تاريخ الإنشاء', value: d.created, icon: 'fas fa-calendar-plus' }
+                ],
+                actions: actions
+            });
+        });
+
+        // زرُّ التعديل صار بالبيانات لا بنصٍّ مُقحَمٍ في onclick
+        // (اسمٌ فيه علامةُ اقتباسٍ كان يكسر السطرَ المولَّد ويقتل الزر).
+        $(document).on('click', '.puEditBtn', function () {
+            var d = this.dataset;
+            window.editUser(d.id, d.name, d.username, d.phone, d.role, d.empid);
+        });
 
         function setUsernameFeedback(state, message) {
             usernameFeedback.className = 'pu-username-feedback pu-feedback-' + state;
@@ -694,9 +1069,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 employeeSelect.value = (employeeId && parseInt(employeeId, 10) > 0) ? String(employeeId) : '';
             }
 
+            // لوحةُ نطاق الدور تتبع القيمةَ المحمَّلة (لا تبقى على دورٍ سابق)
+            rsLoad(document.getElementById('role').value);
+
             // تغيير نص الفورم والزر ليدل على التعديل
-            document.getElementById('formTitle').textContent = 'تعديل المستخدم';
-            document.getElementById('submitBtnText').textContent = 'تحديث المستخدم';
+            document.getElementById('formTitle').textContent = 'تعديل بيانات المعاون';
+            document.getElementById('submitBtnText').textContent = 'تحديث المعاون';
             document.getElementById('action').value = 'edit';
 
             // إعادة تعيين حالة التحقق من اسم المستخدم
@@ -720,8 +1098,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             document.getElementById('projectForm').reset();
             document.getElementById('user_id').value = '';
             document.getElementById('action').value = 'add';
-            document.getElementById('formTitle').textContent = 'إضافة مستخدم جديد';
-            document.getElementById('submitBtnText').textContent = 'حفظ المستخدم';
+            document.getElementById('formTitle').textContent = 'إضافة معاون جديد';
+            document.getElementById('submitBtnText').textContent = 'حفظ المعاون';
             document.getElementById('passwordRequired').classList.remove('pu-hidden');
             document.getElementById('passwordHint').classList.add('pu-hidden');
             document.getElementById('password').setAttribute('required', 'required');
@@ -731,6 +1109,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             usernameInput.classList.remove('pu-input-warn', 'pu-input-success', 'pu-input-error');
             usernameValid = true;
 
+            if (rsBox) { rsBox.hidden = true; }
             if (employeeSelect) { employeeSelect.value = ''; refreshEmployeeOptions(0); }
         };
 

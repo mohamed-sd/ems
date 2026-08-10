@@ -682,7 +682,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                             <!-- العقود -->
                             <div>
-                                <label><i class="fas fa-file-contract"></i> العقد</label>
+                                <label for="contract_id"><i class="fas fa-file-contract"></i> العقد</label>
                                 <select name="contract_id" id="contract_id" required>
                                     <option value="">-- اختر العقد --</option>
                                 </select>
@@ -690,14 +690,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                             <!-- المورد -->
                             <div>
-                                <label><i class="fas fa-truck"></i> المورد</label>
+                                <label for="supplier_id"><i class="fas fa-truck"></i> المورد</label>
                                 <select name="supplier_id" id="supplier_id" required>
                                     <option value="">-- اختر المورد --</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label><i class="fas fa-cogs"></i> نوع المعدة</label>
+                                <label for="type"><i class="fas fa-cogs"></i> نوع المعدة</label>
                                 <select name="type" id="type" required>
                                     <option value=""> -- حدد نوع المعدة --- </option>
                                     <?php
@@ -716,7 +716,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label><i class="fas fa-tractor"></i> المعدة</label>
+                                <label for="equipment"><i class="fas fa-tractor"></i> المعدة</label>
                                 <select name="equipment" id="equipment" required>
                                     <option value="">-- اختر المعدة --</option>
                                     <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
@@ -724,7 +724,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label><i class="fas fa-check-circle"></i> فئة المعدة</label>
+                                <label for="equipment_category"><i class="fas fa-check-circle"></i> فئة المعدة</label>
                                 <select name="equipment_category" id="equipment_category" required>
                                     <option value="">-- أساسي / احتياطي --</option>
                                     <option value="أساسي"> أساسي</option>
@@ -733,37 +733,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label><i class="fas fa-calendar-alt"></i> تاريخ البداية</label>
+                                <label for="start_date"><i class="fas fa-calendar-alt"></i> تاريخ البداية</label>
                                 <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
                             </div>
 
                             <div>
-                                <label><i class="fas fa-calendar-check"></i> تاريخ النهاية</label>
+                                <label for="end_date"><i class="fas fa-calendar-check"></i> تاريخ النهاية</label>
                                 <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
                             </div>
 
                             <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
 
                             <div>
-                                <label><i class="fa fa-clock"></i> عدد ساعات العمل للآلية</label>
+                                <label for="total_equipment_hours"><i class="fa fa-clock"></i> عدد ساعات العمل للآلية</label>
                                 <input type="number" name="total_equipment_hours" id="total_equipment_hours" step="0.01"
                                     placeholder="إجمالي ساعات العمل" value="0" required />
                             </div>
 
                             <div>
-                                <label><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
+                                <label for="shift_hours"><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
                                 <input type="number" name="shift_hours" id="shift_hours" step="0.01"
                                     placeholder="ساعات الوردية" value="0" required />
                             </div>
 
                             <div>
-                                <label><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
+                                <label for="target_daily_hours"><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
                                 <input type="number" name="target_daily_hours" id="target_daily_hours" step="0.01"
                                     placeholder="الهدف اليومي للآلية" value="0" />
                             </div>
 
                             <div>
-                                <label><i class="fa fa-sync-alt"></i> نظام الوردية</label>
+                                <label for="shift_type"><i class="fa fa-sync-alt"></i> نظام الوردية</label>
                                 <select name="shift_type" id="shift_type" required>
                                     <option value="D">نهاري فقط</option>
                                     <option value="N">ليلي فقط</option>
@@ -772,7 +772,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label><i class="fas fa-toggle-on"></i> الحالة</label>
+                                <label for="status"><i class="fas fa-toggle-on"></i> الحالة</label>
                                 <select name="status" id="status" required>
                                     <option value="1">ساري</option>
                                     <option value="0">منتهي</option>
@@ -1293,7 +1293,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <!-- إضافات DataTables للاستجابة والأزرار -->
-        <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
         <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
         <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
         <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>

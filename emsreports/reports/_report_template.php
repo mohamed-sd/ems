@@ -1930,7 +1930,6 @@ body {
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>

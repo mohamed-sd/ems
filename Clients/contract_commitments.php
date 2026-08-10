@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
@@ -541,17 +549,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="card-body">
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
-                        <label><i class="fas fa-magic"></i> كود الالتزام المولد <i class="fas fa-info-circle cmt-info-icon"></i></label>
+                        <label for="generated_cmt_code"><i class="fas fa-magic"></i> كود الالتزام المولد <i class="fas fa-info-circle cmt-info-icon"></i></label>
                         <input type="text" id="generated_cmt_code" class="generated-code-field" value="<?php echo cmt_e($next_cmt_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود الالتزام" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود الالتزام *</label>
+                        <label for="commitment_code"><i class="fas fa-barcode"></i> كود الالتزام *</label>
                         <input type="text" name="commitment_code" id="commitment_code" placeholder="مثال: CMT-001" required pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-contract"></i> العقد المرتبط *</label>
+                        <label for="contract_ref"><i class="fas fa-file-contract"></i> العقد المرتبط *</label>
                         <select name="contract_ref" id="contract_ref" required>
                             <option value="">-- اختر العقد --</option>
                             <?php foreach ($contract_options as $co): ?>
@@ -560,7 +568,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-user-group"></i> الطرف الملتزَم له</label>
+                        <label for="party_scope"><i class="fas fa-user-group"></i> الطرف الملتزَم له</label>
                         <select name="party_scope" id="party_scope">
                             <?php foreach ($CMT_PARTY_SCOPE as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -568,7 +576,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-list-check"></i> نوع الالتزام</label>
+                        <label for="commitment_type"><i class="fas fa-list-check"></i> نوع الالتزام</label>
                         <select name="commitment_type" id="commitment_type">
                             <?php foreach ($CMT_TYPE as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -576,7 +584,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-ruler"></i> وحدة القياس</label>
+                        <label for="unit_type"><i class="fas fa-ruler"></i> وحدة القياس</label>
                         <select name="unit_type" id="unit_type">
                             <option value="">-- بدون / غير محدد --</option>
                             <?php foreach ($CMT_UNIT as $k => $v): ?>
@@ -585,11 +593,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-hashtag"></i> الكمية</label>
+                        <label for="qty"><i class="fas fa-hashtag"></i> الكمية</label>
                         <input type="number" step="0.01" min="0" name="qty" id="qty" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-week"></i> الدورية</label>
+                        <label for="period"><i class="fas fa-calendar-week"></i> الدورية</label>
                         <select name="period" id="period">
                             <?php foreach ($CMT_PERIOD as $k => $v): $sel = $k === 'monthly' ? 'selected' : ''; ?>
                                 <option value="<?php echo cmt_e($k); ?>" <?php echo $sel; ?>><?php echo cmt_e($v); ?></option>
@@ -597,7 +605,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-user-shield"></i> الجهة الملتزِمة</label>
+                        <label for="obliged_party"><i class="fas fa-user-shield"></i> الجهة الملتزِمة</label>
                         <select name="obliged_party" id="obliged_party">
                             <?php foreach ($CMT_OBLIGED as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -605,7 +613,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-arrow-trend-down"></i> حكم العجز</label>
+                        <label for="shortfall_rule"><i class="fas fa-arrow-trend-down"></i> حكم العجز</label>
                         <select name="shortfall_rule" id="shortfall_rule">
                             <?php foreach ($CMT_SHORTFALL as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -613,7 +621,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-arrow-trend-up"></i> حكم الزيادة</label>
+                        <label for="surplus_rule"><i class="fas fa-arrow-trend-up"></i> حكم الزيادة</label>
                         <select name="surplus_rule" id="surplus_rule">
                             <?php foreach ($CMT_SURPLUS as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -624,27 +632,27 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <i class="fas fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (يُملأ لالتزامات أنواع المعدات)
                     </div>
                     <div>
-                        <label><i class="fas fa-truck-monster"></i> رمز نوع المعدة</label>
+                        <label for="equipment_type_code"><i class="fas fa-truck-monster"></i> رمز نوع المعدة</label>
                         <input type="text" name="equipment_type_code" id="equipment_type_code" placeholder="مثال: EXCAVATOR" pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-cubes"></i> الوحدات الأساسية المتعاقد عليها</label>
+                        <label for="primary_units_contracted"><i class="fas fa-cubes"></i> الوحدات الأساسية المتعاقد عليها</label>
                         <input type="number" step="1" min="0" name="primary_units_contracted" id="primary_units_contracted" placeholder="—" />
                     </div>
                     <div>
-                        <label><i class="fas fa-life-ring"></i> الاحتياطيات المطلوبة (إلزام العميل)</label>
+                        <label for="standby_units_required"><i class="fas fa-life-ring"></i> الاحتياطيات المطلوبة (إلزام العميل)</label>
                         <input type="number" step="1" min="0" name="standby_units_required" id="standby_units_required" placeholder="—" />
                     </div>
                     <div>
-                        <label><i class="fas fa-arrows-up-to-line"></i> سقف الاحتياطيات المسموح</label>
+                        <label for="standby_units_allowed"><i class="fas fa-arrows-up-to-line"></i> سقف الاحتياطيات المسموح</label>
                         <input type="number" step="1" min="0" name="standby_units_allowed" id="standby_units_allowed" placeholder="—" />
                     </div>
                     <div>
-                        <label><i class="fas fa-gauge-high"></i> كمية الوحدة الأساسية شهريًّا</label>
+                        <label for="qty_per_primary_unit_month"><i class="fas fa-gauge-high"></i> كمية الوحدة الأساسية شهريًّا</label>
                         <input type="number" step="0.01" min="0" name="qty_per_primary_unit_month" id="qty_per_primary_unit_month" placeholder="—" />
                     </div>
                     <div>
-                        <label><i class="fas fa-scale-balanced"></i> مقياس الكمية</label>
+                        <label for="measure_code"><i class="fas fa-scale-balanced"></i> مقياس الكمية</label>
                         <select name="measure_code" id="measure_code">
                             <option value="">-- غير محدد --</option>
                             <?php foreach ($CMT_MEASURE as $k => $v): ?>
@@ -653,7 +661,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-hand-holding-dollar"></i> مقابل الاحتياطي (لا يُفترض)</label>
+                        <label for="standby_compensation_type"><i class="fas fa-hand-holding-dollar"></i> مقابل الاحتياطي (لا يُفترض)</label>
                         <select name="standby_compensation_type" id="standby_compensation_type">
                             <option value="">— لم يُنَصَّ في العقد —</option>
                             <?php foreach ($CMT_STANDBY_COMP as $k => $v): ?>
@@ -662,7 +670,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-hourglass-half"></i> معالجة ساعات الاحتياطي المفعَّل</label>
+                        <label for="standby_hours_treatment"><i class="fas fa-hourglass-half"></i> معالجة ساعات الاحتياطي المفعَّل</label>
                         <select name="standby_hours_treatment" id="standby_hours_treatment">
                             <option value="">— لم تُحدَّد —</option>
                             <?php foreach ($CMT_STANDBY_TREAT as $k => $v): ?>
@@ -671,19 +679,19 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div class="cmt-col-full">
-                        <label><i class="fas fa-bolt"></i> قاعدة تفعيل الاحتياطي (متى وبإذن من ولأي مدة)</label>
+                        <label for="standby_activation_rule"><i class="fas fa-bolt"></i> قاعدة تفعيل الاحتياطي (متى وبإذن من ولأي مدة)</label>
                         <input type="text" name="standby_activation_rule" id="standby_activation_rule" maxlength="255" placeholder="نصُّ العقد — مثال: عند تعطل أساسية بإذن مدير الحركة لمدة لا تتجاوز مهلة الإحلال" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-day"></i> سريان الالتزام من</label>
+                        <label for="valid_from"><i class="fas fa-calendar-day"></i> سريان الالتزام من</label>
                         <input type="date" name="valid_from" id="valid_from" />
                     </div>
                     <div>
-                        <label><i class="fas fa-calendar-xmark"></i> إلى</label>
+                        <label for="valid_to"><i class="fas fa-calendar-xmark"></i> إلى</label>
                         <input type="date" name="valid_to" id="valid_to" />
                     </div>
                     <div class="cmt-col-full">
-                        <label><i class="fas fa-note-sticky"></i> ملاحظة (بند العقد / سبب الحكم)</label>
+                        <label for="note"><i class="fas fa-note-sticky"></i> ملاحظة (بند العقد / سبب الحكم)</label>
                         <textarea name="note" id="note" rows="2" maxlength="160" placeholder="بندُ العقد أو سببُ الحكم (حتى 160 حرفًا)"></textarea>
                     </div>
                 </div>
@@ -702,13 +710,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-user-group"></i> الطرف</label>
+                <label for="filterParty"><i class="fa fa-user-group"></i> الطرف</label>
                 <select id="filterParty" class="form-control">
                     <option value="">-- كل الأطراف --</option>
                 </select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-list-check"></i> نوع الالتزام</label>
+                <label for="filterType"><i class="fa fa-list-check"></i> نوع الالتزام</label>
                 <select id="filterType" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>

@@ -168,29 +168,29 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>نوع التحميل <span style="color:#c00">*</span></label>
-                    <select name="charge_type" required>
+                    <label for="emsf_1463_9c647">نوع التحميل <span style="color:#c00">*</span></label>
+                    <select name="charge_type" required id="emsf_1463_9c647">
                         <?php foreach (SRS::CHARGE_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>طريقة التسعير <span style="color:#c00">*</span></label>
-                    <select name="pricing" required>
+                    <label for="emsf_1464_13b98">طريقة التسعير <span style="color:#c00">*</span></label>
+                    <select name="pricing" required id="emsf_1464_13b98">
                         <?php foreach (SRS::PRICING_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label>المعدل <small>— نسبةٌ أو مبلغٌ بحسب الطريقة</small></label>
-                    <input type="number" step="0.001" min="0" name="rate"></div>
-                <div class="form-group"><label>السقف <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
-                    <input type="number" step="0.01" min="0" name="cap"></div>
-                <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                    <input type="date" name="valid_from" required></div>
-                <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="255"></div>
+                <div class="form-group"><label for="emsf_1465_2ea0c">المعدل <small>— نسبةٌ أو مبلغٌ بحسب الطريقة</small></label>
+                    <input type="number" step="0.001" min="0" name="rate" id="emsf_1465_2ea0c"></div>
+                <div class="form-group"><label for="emsf_1466_59356">السقف <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
+                    <input type="number" step="0.01" min="0" name="cap" id="emsf_1466_59356"></div>
+                <div class="form-group"><label for="emsf_1467_e006f">سريان من <span style="color:#c00">*</span></label>
+                    <input type="date" name="valid_from" required id="emsf_1467_e006f"></div>
+                <div class="form-group"><label for="emsf_1468_495a4">سريان إلى</label><input type="date" name="valid_to" id="emsf_1468_495a4"></div>
+                <div class="form-group"><label for="emsf_1469_989cd">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1469_989cd"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
         </form>
@@ -253,45 +253,47 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>نوع الجزاء <span style="color:#c00">*</span></label>
-                    <select name="kind" required>
+                    <label for="emsf_1470_bba4c">نوع الجزاء <span style="color:#c00">*</span></label>
+                    <select name="kind" required id="emsf_1470_bba4c">
                         <?php foreach (SRS::PENALTY_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label>الحد/العتبة <small>— نسبةُ جاهزيةٍ دنيا · ساعاتُ إحلال …</small></label>
-                    <input type="number" step="0.001" name="threshold"></div>
-                <div class="form-group"><label>المعدل <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.001" min="0.001" name="prate" required></div>
+                <div class="form-group"><label for="emsf_1471_0ffcb">الحد/العتبة <small>— نسبةُ جاهزيةٍ دنيا · ساعاتُ إحلال …</small></label>
+                    <input type="number" step="0.001" name="threshold" id="emsf_1471_0ffcb"></div>
+                <div class="form-group"><label for="emsf_1472_69e56">المعدل <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.001" min="0.001" name="prate" required id="emsf_1472_69e56"></div>
                 <div class="form-group">
-                    <label>أساس المعدل</label>
-                    <select name="rate_basis">
+                    <label for="emsf_1473_03214">أساس المعدل</label>
+                    <select name="rate_basis" id="emsf_1473_03214">
                         <option value="per_unit">لكل وحدةِ عجز</option>
                         <option value="percent_of_base">نسبةٌ من الأساس</option>
                     </select>
                 </div>
-                <div class="form-group"><label>سقف الجزاء ٪ <small>— فارغٌ = بلا سقفٍ مكتوب (يُعلَن)</small></label>
-                    <input type="number" step="0.01" min="0" max="100" name="cap_percent"></div>
+                <div class="form-group"><label for="emsf_1474_a9a6f">سقف الجزاء ٪ <small>— فارغٌ = بلا سقفٍ مكتوب (يُعلَن)</small></label>
+                    <input type="number" step="0.01" min="0" max="100" name="cap_percent" id="emsf_1474_a9a6f"></div>
                 <div class="form-group">
-                    <label>الدورية</label>
-                    <select name="periodicity">
+                    <label for="emsf_1475_b189e">الدورية</label>
+                    <select name="periodicity" id="emsf_1475_b189e">
                         <option value="monthly">شهري</option>
                         <option value="daily">يومي</option>
                         <option value="contract">للعقد</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><input type="checkbox" name="inherits" value="1" checked>
+                    <label for="emsf_1476_89fd5"><input type="checkbox" name="inherits" value="1" checked>
                         يرث إسنادَ عقد العميل (CON-02)</label>
                 </div>
                 <div class="form-group"><label>سبب نقض الإسناد <small>— إلزاميٌّ متى نُقض</small></label>
-                    <input type="text" name="override_reason" maxlength="255"></div>
-                <div class="form-group"><label>توثيقُ الصيغة <small>— نصٌّ لا يُقيَّم</small></label>
-                    <input type="text" name="formula_note" maxlength="255"></div>
-                <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                    <input type="date" name="pvalid_from" required></div>
-                <div class="form-group"><label>سريان إلى</label><input type="date" name="pvalid_to"></div>
+                </div>
+                <div class="form-group"><label>سبب نقض الإسناد <small>— إلزاميٌّ متى نُقض</small></label>
+                    <input type="text" name="override_reason" maxlength="255" id="emsf_1476_89fd5"></div>
+                <div class="form-group"><label for="emsf_1477_c87f9">توثيقُ الصيغة <small>— نصٌّ لا يُقيَّم</small></label>
+                    <input type="text" name="formula_note" maxlength="255" id="emsf_1477_c87f9"></div>
+                <div class="form-group"><label for="emsf_1478_8080c">سريان من <span style="color:#c00">*</span></label>
+                    <input type="date" name="pvalid_from" required id="emsf_1478_8080c"></div>
+                <div class="form-group"><label for="emsf_1479_62c2a">سريان إلى</label><input type="date" name="pvalid_to" id="emsf_1479_62c2a"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
         </form>

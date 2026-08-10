@@ -81,8 +81,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <option value="dismiss">يُهمل بوسم</option>
                         <option value="escalate">يُصعَّد فورًا</option>
                     </select>
-                    <input class="sigReason form-control form-control-sm" placeholder="السبب المكتوب *" style="display:inline-block;width:150px">
-                    <input class="sigExtra form-control form-control-sm" placeholder="رقم الخطر/الوحدة" style="display:inline-block;width:110px">
+                    <input class="sigReason form-control form-control-sm" placeholder="السبب المكتوب *" style="display:inline-block;width:150px" aria-label="السبب المكتوب">
+                    <input class="sigExtra form-control form-control-sm" placeholder="رقم الخطر/الوحدة" style="display:inline-block;width:110px" aria-label="رقم الخطر/الوحدة">
                     <button class="btn btn-sm btn-dark sigGo">نفّذ</button>
                 </td>
                 <?php endif; ?>

@@ -217,7 +217,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                         <form method="post" style="display:flex;gap:4px">
                             <input type="hidden" name="cap_action" value="freeze">
                             <input type="hidden" name="capacity_id" value="<?php echo intval($c['id']); ?>">
-                            <input type="text" name="reason" placeholder="السبب *" required style="width:120px">
+                            <input type="text" name="reason" placeholder="السبب *" required style="width:120px" aria-label="السبب">
                             <button type="submit" class="btn-save">جمّد</button>
                         </form>
                     <?php endif; ?></td>

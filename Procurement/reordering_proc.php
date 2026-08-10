@@ -174,35 +174,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>الصنف <span class="required">*</span></label>
+                        <label for="p_item">الصنف <span class="required">*</span></label>
                         <select name="item_id" id="p_item" required>
                             <?php echo proc_items_options($conn, $is_super_admin, $company_id, $sel_item); ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>المخزن</label>
+                        <label for="p_warehouse">المخزن</label>
                         <select name="warehouse_id" id="p_warehouse">
                             <?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $sel_warehouse); ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الحد الأدنى (Min)</label>
+                        <label for="p_min">الحد الأدنى (Min)</label>
                         <input type="number" step="0.01" name="min_qty" id="p_min" value="<?php echo $edit_row ? htmlspecialchars((string)$edit_row['min_qty'], ENT_QUOTES) : '0'; ?>">
                     </div>
                     <div class="form-group">
-                        <label>الحد الأقصى (Max)</label>
+                        <label for="p_max">الحد الأقصى (Max)</label>
                         <input type="number" step="0.01" name="max_qty" id="p_max" value="<?php echo $edit_row ? htmlspecialchars((string)$edit_row['max_qty'], ENT_QUOTES) : '0'; ?>">
                     </div>
                     <div class="form-group">
-                        <label>نقطة إعادة الطلب (ROP)</label>
+                        <label for="p_trigger">نقطة إعادة الطلب (ROP)</label>
                         <input type="number" step="0.01" name="trigger_qty" id="p_trigger" value="<?php echo $edit_row ? htmlspecialchars((string)$edit_row['trigger_qty'], ENT_QUOTES) : '0'; ?>">
                     </div>
                     <div class="form-group">
-                        <label>مخزون الأمان</label>
+                        <label for="p_safety">مخزون الأمان</label>
                         <input type="number" step="0.01" name="safety_stock" id="p_safety" value="<?php echo $edit_row ? htmlspecialchars((string)$edit_row['safety_stock'], ENT_QUOTES) : '0'; ?>">
                     </div>
                     <div class="form-group">
-                        <label>الوضع</label>
+                        <label for="p_mode">الوضع</label>
                         <select name="mode" id="p_mode">
                             <?php foreach ($modes as $m): ?>
                                 <option value="<?php echo htmlspecialchars($m); ?>"<?php echo ($edit_row && $edit_row['mode'] === $m) ? ' selected' : ''; ?>><?php echo htmlspecialchars($m); ?></option>

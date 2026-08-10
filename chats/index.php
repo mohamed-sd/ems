@@ -161,7 +161,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
             </div>
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="contactSearch" placeholder="ابحث عن مستخدم...">
+                <input type="text" id="contactSearch" placeholder="ابحث عن مستخدم..." aria-label="ابحث عن مستخدم...">
             </div>
         </div>
 
@@ -270,7 +270,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                           placeholder="اكتب رسالتك هنا..."
                           rows="1"
                           onkeydown="handleInputKey(event)"
-                          oninput="autoResize(this)"></textarea>
+                          oninput="autoResize(this)" aria-label="اكتب رسالتك هنا..."></textarea>
             </div>
 
         </div>
@@ -291,10 +291,51 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         <div class="broadcast-body">
             <!-- اختيار نوع المستلمين -->
             <div class="recipients-type">
-                <label>
+                <label for="broadcastMessage">
                     <i class="fas fa-users"></i>
                     المستلمين
                 </label>
+                <div class="recipients-type-options">
+                    <div class="type-option active" data-type="all" onclick="selectRecipientType('all')">
+                        <i class="fas fa-users"></i>
+                        الكل (<?php echo count($contacts); ?>)
+                    </div>
+                    <div class="type-option" data-type="specific" onclick="selectRecipientType('specific')">
+                        <i class="fas fa-user-check"></i>
+                        تحديد مستخدمين
+                    </div>
+                </div>
+            </div>
+
+            <!-- قائمة المستخدمين -->
+            <div class="recipients-list" id="recipientsList">
+                <div class="select-actions">
+                    <button class="select-btn" onclick="selectAllRecipients()"><i class="fas fa-check-double"></i> تحديد الكل</button>
+                    <button class="select-btn" onclick="deselectAllRecipients()"><i class="fas fa-times"></i> إلغاء الكل</button>
+                </div>
+                <input type="text" class="recipients-search" id="recipientsSearch" placeholder="ابحث عن مستخدم...">
+                <div id="recipientsContainer">
+                    <?php foreach ($contacts as $contact): ?>
+                        <div class="recipient-item" data-name="<?php echo htmlspecialchars($contact['name']); ?>" data-role="<?php echo htmlspecialchars($contact['role_name']); ?>" onclick="toggleRecipient(<?php echo $contact['id']; ?>)">
+                            <input type="checkbox" value="<?php echo $contact['id']; ?>" class="recipient-checkbox" onclick="event.stopPropagation();">
+                            <div class="recipient-avatar" style="background: <?php echo htmlspecialchars($contact['role_color']); ?>">
+                                <?php echo htmlspecialchars($contact['avatar']); ?>
+                            </div>
+                            <div class="recipient-info">
+                                <div class="recipient-name"><?php echo htmlspecialchars($contact['name']); ?></div>
+                                <div class="recipient-role"><?php echo htmlspecialchars($contact['role_name']); ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="selected-count" id="selectedCount">تم تحديد 0 مستخدم</div>
+            </div>
+
+            <!-- الرسالة -->
+            <label style="margin-top: 20px;">
+                <i class="fas fa-envelope"></i>
+                الرسالة
+            </label>
                 <div class="recipients-type-options">
                     <div class="type-option active" data-type="all" onclick="selectRecipientType('all')">
                         <i class="fas fa-users"></i>

@@ -77,11 +77,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="0">
         <div class="card-header"><h5><i class="fas fa-plus"></i> وحدة سكن/مخيم</h5></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>الاسم</label><input type="text" name="name" required></div>
-            <div class="field"><label>المشروع</label><select name="project_id"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>"><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>السعة</label><input type="number" name="capacity"></div>
-            <div class="field"><label>الموقع</label><input type="text" name="location"></div>
-            <div class="field" style="grid-column:2/-1;"><label>ملاحظات</label><input type="text" name="notes"></div>
+            <div class="field"><label for="emsf_1691_9fea7">الاسم</label><input type="text" name="name" required id="emsf_1691_9fea7"></div>
+            <div class="field"><label for="emsf_1692_96689">المشروع</label><select name="project_id" id="emsf_1692_96689"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>"><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1693_c8a14">السعة</label><input type="number" name="capacity" id="emsf_1693_c8a14"></div>
+            <div class="field"><label for="emsf_1694_d94c8">الموقع</label><input type="text" name="location" id="emsf_1694_d94c8"></div>
+            <div class="field" style="grid-column:2/-1;"><label for="emsf_1695_9e268">ملاحظات</label><input type="text" name="notes" id="emsf_1695_9e268"></div>
         </div>
         <div style="padding:0 14px 16px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>

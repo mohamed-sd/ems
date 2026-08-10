@@ -27,5 +27,19 @@ $U13 = array(
     'intro'      => 'الغرضُ والسلطةُ والمسؤوليةُ والاستقلال — معتمدًا من الجهةِ المشرفة',
     'rule'       => 'IAF-0004: لا تتبع الماليةَ ولا رئيسَ الحساباتِ ولا الحوكمةَ في إصدارِ أحكامها',
     'empty_hint' => 'لا ميثاقَ معتمدٌ بعدُ — ولا كونَ رقابيٌّ بلا ميثاق',
+
+    'actions'    => array(
+        'approve' => array(
+            'code'  => 'iaf.charter.approve',
+            'label' => 'اعتمادُ الميثاق',
+            'rule'  => 'IAF-0044: ولا كونَ رقابيٌّ بلا ميثاقٍ معتمد',
+            'fields' => array('version' => 'نسخةُ الميثاق'),
+            'run' => function ($conn, $co, $uid, $in) {
+                require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
+                return \App\Services\Audit\InternalAuditService::approveCharter($conn, array(
+                    'company_id' => $co, 'version' => (string) ($in['version'] ?? ''), 'actor' => $uid));
+            }),
+    ),
+
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

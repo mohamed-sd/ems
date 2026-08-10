@@ -182,14 +182,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="add_doc" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>صاحب الوثيقة *</label>
+                    <label for="docSubjectType">صاحب الوثيقة *</label>
                     <select name="subject_type" id="docSubjectType" required>
                         <option value="equipment">معدة</option>
                         <option value="operator">مشغّل</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>المعدة / المشغّل *</label>
+                    <label for="docSubjectEq">المعدة / المشغّل *</label>
                     <select name="subject_id" id="docSubjectEq" required>
                         <option value="">— اختر المعدة —</option>
                         <?php foreach ($equipments as $e) {
@@ -204,29 +204,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>نوع الوثيقة *</label>
-                    <select name="doc_type" required>
+                    <label for="emsf_165_87d31">نوع الوثيقة *</label>
+                    <select name="doc_type" required id="emsf_165_87d31">
                         <?php foreach ($DOC_TYPES as $t) { echo "<option>" . $t . "</option>"; } ?>
                     </select>
                 </div>
-                <div class="form-group"><label>رقم الوثيقة</label>
-                    <input type="text" name="doc_no" maxlength="100"></div>
-                <div class="form-group"><label>جهة الإصدار</label>
-                    <input type="text" name="issuer" maxlength="255"></div>
-                <div class="form-group"><label>تاريخ الإصدار</label>
-                    <input type="date" name="issue_date"></div>
-                <div class="form-group"><label>تاريخ الانتهاء</label>
-                    <input type="date" name="expiry_date"></div>
-                <div class="form-group"><label>التنبيه قبل (أيام)</label>
-                    <input type="number" name="alert_days" min="0" max="365" value="30"></div>
+                <div class="form-group"><label for="emsf_166_4709e">رقم الوثيقة</label>
+                    <input type="text" name="doc_no" maxlength="100" id="emsf_166_4709e"></div>
+                <div class="form-group"><label for="emsf_167_10d98">جهة الإصدار</label>
+                    <input type="text" name="issuer" maxlength="255" id="emsf_167_10d98"></div>
+                <div class="form-group"><label for="emsf_168_fa0c9">تاريخ الإصدار</label>
+                    <input type="date" name="issue_date" id="emsf_168_fa0c9"></div>
+                <div class="form-group"><label for="emsf_169_5da4f">تاريخ الانتهاء</label>
+                    <input type="date" name="expiry_date" id="emsf_169_5da4f"></div>
+                <div class="form-group"><label for="emsf_170_53d79">التنبيه قبل (أيام)</label>
+                    <input type="number" name="alert_days" min="0" max="365" value="30" id="emsf_170_53d79"></div>
                 <div class="form-group">
-                    <label>الحالة</label>
-                    <select name="status">
+                    <label for="emsf_171_c7ad5">الحالة</label>
+                    <select name="status" id="emsf_171_c7ad5">
                         <?php foreach ($DOC_STATUSES as $s) { echo "<option>" . $s . "</option>"; } ?>
                     </select>
                 </div>
-                <div class="form-group"><label>ملاحظة</label>
-                    <input type="text" name="note" maxlength="200"></div>
+                <div class="form-group"><label for="emsf_172_55096">ملاحظة</label>
+                    <input type="text" name="note" maxlength="200" id="emsf_172_55096"></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الوثيقة</button>

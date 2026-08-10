@@ -64,6 +64,7 @@ function role_label_ar($role_id) {
 // ─────────────────────────────────────────────────────────────
 // اعتماد سجل / مجموعة سجلات
 // ─────────────────────────────────────────────────────────────
+require_once __DIR__ . '/../includes/self_approval_guard.php';   // INJ-0024
 if ($action === 'approve') {
     if (!isset($role_level_map[$role])) {
         die(json_encode(['success' => false, 'message' => 'الأدمن لا يعتمد مباشرة'], JSON_UNESCAPED_UNICODE));
@@ -83,6 +84,7 @@ if ($action === 'approve') {
 
     $approved  = 0;
     $skipped   = 0;
+    $selfBlocked = array();   // INJ-0024: صفوفٌ مُنعت لأن معتمِدَها منشئُها
     $blocked   = array();   // §5.2: المعلَّمُ الموقوف بأسبابه — يُعلَن لا يُبلَع في skipped
     $escaped_name = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غير معروف');
 
@@ -108,6 +110,15 @@ if ($action === 'approve') {
         try { $chk = $th_gate->selectOne('timesheet', array('columns' => array('id'), 'where' => array('id' => $ts_id))); }
         catch (\Throwable $t) { $chk = null; error_log('hours_approval approve chk: ' . $t->getMessage()); }
         if ($chk === null) { $skipped++; continue; }
+
+        /* ══ INJ-0024 (P1) — «حارسُ منعِ اعتمادِ الذات على كلِّ معتمِد» ═══════
+           كان المعالجُ يفحص عضويةَ الدورِ في ثابتٍ ثم يعتمد — بلا مقارنةِ
+           مُدخِلِ صفِّ التايم شيت بالمعتمِد. فمن أدخل الساعاتِ يعتمدها، وهي
+           شهادةُ الإنجازِ التي تُبنى عليها الفاتورة. **يُتخطّى الصفُّ ولا
+           تُوقَف الدفعةُ كلُّها** — فالباقي مشروعٌ اعتمادُه. */
+        $__sa = ems_assert_not_self_approval($conn, 'timesheet', 'id', $ts_id,
+            'صفُّ تايم شيت #' . $ts_id, $company_id);
+        if ($__sa !== null) { $skipped++; $selfBlocked[] = $ts_id; continue; }
 
         // §5.2: المستوى الأول لا يعتمد صفًّا معلَّمًا غيرَ مخلَّص
         if ($box_on && $my_level === 1) {
@@ -205,6 +216,12 @@ if ($action === 'approve') {
     $__gate_on = function_exists('ems_env')
         && strtolower((string) ems_env('EMS_UNIT_CONVERT_GATE', 'off')) === 'on';
     $__msg = "تم اعتماد $approved سجل" . ($skipped ? " (تم تخطي $skipped)" : '');
+    // INJ-0024: سببُ التخطي يُعلَن لا يُبلَع — «من أدخل لا يعتمد» حكمٌ يُقرأ لا رقمٌ.
+    if (!empty($selfBlocked)) {
+        $__msg .= ' — منها ' . count($selfBlocked) . ' لم تُعتمد لأنك مُدخِلُها:'
+                . ' #' . implode('، #', array_slice($selfBlocked, 0, 8))
+                . ' (من أدخل لا يعتمد · UI-01 §8)';
+    }
     if ($__gate_on && $my_level === 4 && $approved > 0) {
         $__msg .= ' — اكتمل الاعتماد التشغيلي، وبانتظار التحويل المالي';
     }

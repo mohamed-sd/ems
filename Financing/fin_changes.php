@@ -155,50 +155,50 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — تغيّرات عقود التمويل</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم المحضر</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>عملية التمويل</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ التغيير</label>
-                    <input type="date" name="f2"></div>
-                <div class="form-group"><label>نوع التغيير</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الصيغة قبل</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الصيغة بعد</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>رأس المال قبل</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0"></div>
-                <div class="form-group"><label>رأس المال بعد</label>
-                    <input type="text" inputmode="decimal" name="f7" placeholder="0"></div>
-                <div class="form-group"><label>عدد الأقساط قبل</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>عدد الأقساط بعد</label>
-                    <input type="text" inputmode="decimal" name="f9" placeholder="0"></div>
-                <div class="form-group"><label>قيمة القسط قبل</label>
-                    <input type="text" inputmode="decimal" name="f10" placeholder="0"></div>
-                <div class="form-group"><label>قيمة القسط بعد</label>
-                    <input type="text" inputmode="decimal" name="f11" placeholder="0"></div>
-                <div class="form-group"><label>سبب التغيير</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>مستند التغيير</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>اعتمده</label>
-                    <input type="text" name="f14" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f15"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f16"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f18" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f19" maxlength="190"></div>
-                <div class="form-group"><label>مركز التكلفة</label>
-                    <input type="text" inputmode="decimal" name="f20" placeholder="0"></div>
-                <div class="form-group"><label>سعر الصرف ومصدره</label>
-                    <input type="text" inputmode="decimal" name="f21" placeholder="0"></div>
+                <div class="form-group"><label for="emsf_447_7baea">رقم المحضر</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_447_7baea"></div>
+                <div class="form-group"><label for="emsf_448_06111">عملية التمويل</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_448_06111"></div>
+                <div class="form-group"><label for="emsf_449_64b17">تاريخ التغيير</label>
+                    <input type="date" name="f2" id="emsf_449_64b17"></div>
+                <div class="form-group"><label for="emsf_450_5f32e">نوع التغيير</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_450_5f32e"></div>
+                <div class="form-group"><label for="emsf_451_d3363">الصيغة قبل</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_451_d3363"></div>
+                <div class="form-group"><label for="emsf_452_8ad33">الصيغة بعد</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_452_8ad33"></div>
+                <div class="form-group"><label for="emsf_453_f3a57">رأس المال قبل</label>
+                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_453_f3a57"></div>
+                <div class="form-group"><label for="emsf_454_8a88f">رأس المال بعد</label>
+                    <input type="text" inputmode="decimal" name="f7" placeholder="0" id="emsf_454_8a88f"></div>
+                <div class="form-group"><label for="emsf_455_95c53">عدد الأقساط قبل</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_455_95c53"></div>
+                <div class="form-group"><label for="emsf_456_5ba43">عدد الأقساط بعد</label>
+                    <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_456_5ba43"></div>
+                <div class="form-group"><label for="emsf_457_4b621">قيمة القسط قبل</label>
+                    <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_457_4b621"></div>
+                <div class="form-group"><label for="emsf_458_0df2e">قيمة القسط بعد</label>
+                    <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_458_0df2e"></div>
+                <div class="form-group"><label for="emsf_459_ef254">سبب التغيير</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_459_ef254"></div>
+                <div class="form-group"><label for="emsf_460_39e72">مستند التغيير</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_460_39e72"></div>
+                <div class="form-group"><label for="emsf_461_9fc4a">اعتمده</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_461_9fc4a"></div>
+                <div class="form-group"><label for="emsf_462_c97f7">الحالة</label>
+                    <select name="f15" id="emsf_462_c97f7"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_463_58a9a">تاريخ الاعتماد</label>
+                    <input type="date" name="f16" id="emsf_463_58a9a"></div>
+                <div class="form-group"><label for="emsf_464_beb3e">مرجع التفويض</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_464_beb3e"></div>
+                <div class="form-group"><label for="emsf_465_cfb71">المرجع الأب</label>
+                    <input type="text" name="f18" maxlength="190" id="emsf_465_cfb71"></div>
+                <div class="form-group"><label for="emsf_466_f602a">المرفق</label>
+                    <input type="text" name="f19" maxlength="190" id="emsf_466_f602a"></div>
+                <div class="form-group"><label for="emsf_467_6e80f">مركز التكلفة</label>
+                    <input type="text" inputmode="decimal" name="f20" placeholder="0" id="emsf_467_6e80f"></div>
+                <div class="form-group"><label for="emsf_468_9808f">سعر الصرف ومصدره</label>
+                    <input type="text" inputmode="decimal" name="f21" placeholder="0" id="emsf_468_9808f"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

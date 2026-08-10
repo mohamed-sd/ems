@@ -94,6 +94,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     }
     $app_id = (int) $_POST['approve_id'];
     $old = dep_fetch($conn, $app_id, $company_scope);
+    // P1-B — «من أنشأ لا يعتمد»: ملفُّ الإهلاكِ يحكم قيمةَ الأصلِ في الدفاتر.
+    if ($old && $old['state'] !== 'approved') {
+        require_once __DIR__ . '/../includes/self_approval_guard.php';
+        $__sa = ems_no_self_approval($conn, intval($old['created_by'] ?? 0), intval($user_id),
+            'ملفُّ إهلاكٍ #' . $app_id, intval($old['company_id'] ?? 0));
+        if ($__sa !== null) {
+            ems_gov_flash_redirect('fleet_depreciation_profiles.php', $__sa['reason'], 'GOV-PERM-403', '');
+            exit();
+        }
+    }
     if ($old && $old['state'] !== 'approved') {
         $dep_gate->update('fleet_depreciation_profile',
             array('state' => 'approved', 'approved_by' => $user_id, 'approved_at' => date('Y-m-d H:i:s')),

@@ -159,42 +159,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — تصنيف قواعد المنع</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رمز الحارس</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>اسم الحماية</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الصنف</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>سبب التصنيف</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>الشاشات المتأثرة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>الأفعال الممنوعة</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>رسالة المنع</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>درجة الخطورة</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>الموافقات المطلوبة للاستثناء</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>حالة العلَم</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ قلب العلَم</label>
-                    <input type="date" name="f10"></div>
-                <div class="form-group"><label>صنّفها</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f12"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>مرجع التفويض</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>المرجع الأب</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>المرفق</label>
-                    <input type="text" name="f17" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_597_aa837">رمز الحارس</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_597_aa837"></div>
+                <div class="form-group"><label for="emsf_598_2c763">اسم الحماية</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_598_2c763"></div>
+                <div class="form-group"><label for="emsf_599_b97fe">الصنف</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_599_b97fe"></div>
+                <div class="form-group"><label for="emsf_600_8376b">سبب التصنيف</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_600_8376b"></div>
+                <div class="form-group"><label for="emsf_601_c8c71">الشاشات المتأثرة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_601_c8c71"></div>
+                <div class="form-group"><label for="emsf_602_cebe8">الأفعال الممنوعة</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_602_cebe8"></div>
+                <div class="form-group"><label for="emsf_603_a2bb2">رسالة المنع</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_603_a2bb2"></div>
+                <div class="form-group"><label for="emsf_604_05b4c">درجة الخطورة</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_604_05b4c"></div>
+                <div class="form-group"><label for="emsf_605_dd4d3">الموافقات المطلوبة للاستثناء</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_605_dd4d3"></div>
+                <div class="form-group"><label for="emsf_606_4eb74">حالة العلَم</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_606_4eb74"></div>
+                <div class="form-group"><label for="emsf_607_b5362">تاريخ قلب العلَم</label>
+                    <input type="date" name="f10" id="emsf_607_b5362"></div>
+                <div class="form-group"><label for="emsf_608_b1be0">صنّفها</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_608_b1be0"></div>
+                <div class="form-group"><label for="emsf_609_6271c">الحالة</label>
+                    <select name="f12" id="emsf_609_6271c"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_610_4078a">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_610_4078a"></div>
+                <div class="form-group"><label for="emsf_611_7f699">تاريخ الاعتماد</label>
+                    <input type="date" name="f14" id="emsf_611_7f699"></div>
+                <div class="form-group"><label for="emsf_612_8af2c">مرجع التفويض</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_612_8af2c"></div>
+                <div class="form-group"><label for="emsf_613_b95ac">المرجع الأب</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_613_b95ac"></div>
+                <div class="form-group"><label for="emsf_614_043a0">المرفق</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_614_043a0"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

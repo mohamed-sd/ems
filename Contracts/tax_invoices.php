@@ -241,8 +241,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="ti_action" value="cancel">
             <input type="hidden" name="invoice_id" value="<?php echo intval($openInv['id']); ?>">
             <div class="form-grid">
-                <div class="form-group"><label>سبب الإلغاء الضريبي <span style="color:#c00">*</span></label>
-                    <input type="text" name="cancel_reason" maxlength="255" required></div>
+                <div class="form-group"><label for="emsf_122_ab841">سبب الإلغاء الضريبي <span style="color:#c00">*</span></label>
+                    <input type="text" name="cancel_reason" maxlength="255" required id="emsf_122_ab841"></div>
             </div>
             <p style="color:#a15c00">الإلغاءُ لا يمحو صفًّا و<strong>لا يُعيد استعمال رقمه</strong> —
                 والتصحيحُ العاديُّ <strong>بإشعار</strong> لا بإلغاء.</p>

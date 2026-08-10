@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // [ح-01] بوابةُ الحوكمة — كان حارسُ هذه الشاشة «أنك مسجَّلُ الدخول» وحدَه، وهي
 // سجلُّ الشاشات نفسُه: عمودُ code هو مفتاحُ حلِّ الصلاحية لكل الأدوار، ومن
@@ -181,7 +189,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
@@ -367,18 +374,62 @@ include __DIR__ . '/../includes/page_header.php';
                 <div class="form-grid">
                     <!-- اسم الصفحة -->
                     <div>
-                        <label><i class="fas fa-book"></i> اسم الصفحة *</label>
+                        <label for="name"><i class="fas fa-book"></i> اسم الصفحة *</label>
                         <input type="text" name="name" id="name" placeholder="مثال: إدارة العملاء" required />
                     </div>
 
                     <!-- كود الصفحة -->
                     <div>
-                        <label><i class="fas fa-code"></i> كود الصفحة *</label>
+                        <label for="code"><i class="fas fa-code"></i> كود الصفحة *</label>
                         <input type="text" name="code" id="code" placeholder="مثال: clients" required />
                     </div>
 
                     <div style="grid-column: 1 / -1;">
-                        <label><i class="fas fa-icons"></i> أيقونة القائمة</label>
+                        <label for="owner_role_id"><i class="fas fa-icons"></i> أيقونة القائمة</label>
+                        <div class="icon-picker-shell">
+                            <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>" />
+                            <input type="hidden" id="icon_manually_selected" value="0" />
+
+                            <div class="icon-preview-card">
+                                <div class="icon-preview-box"><i id="icon_preview" class="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>"></i></div>
+                                <div class="icon-preview-meta">
+                                    <strong>الأيقونة المختارة للـ sidebar</strong>
+                                    <span id="icon_preview_text"><?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?></span>
+                                </div>
+                            </div>
+
+                            <div class="icon-picker-toolbar">
+                                <input type="text" id="iconSearch" class="icon-picker-search" placeholder="ابحث باسم الأيقونة أو معناها مثل: تقارير، مستخدمين، معدات" />
+                                <button type="button" id="autoSuggestIcon" class="back-btn icon-suggest-btn">
+                                    <i class="fas fa-wand-magic-sparkles"></i> اقتراح تلقائي
+                                </button>
+                            </div>
+
+                            <div id="iconGrid" class="icon-grid">
+                                <?php foreach ($common_sidebar_icons as $sidebar_icon): ?>
+                                    <button type="button"
+                                            class="icon-option"
+                                            data-icon="<?= htmlspecialchars($sidebar_icon['class'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            data-label="<?= htmlspecialchars($sidebar_icon['label'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            data-search="<?= htmlspecialchars($sidebar_icon['label'] . ' ' . $sidebar_icon['class'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <i class="<?= htmlspecialchars($sidebar_icon['class'], ENT_QUOTES, 'UTF-8'); ?>"></i>
+                                        <span><?= htmlspecialchars($sidebar_icon['label'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <div class="icon-picker-note">
+                                يتم عرض أشهر أيقونات الشريط الجانبي الجاهزة للاختيار السريع، مع اقتراح تلقائي حسب اسم الصفحة ومسارها.
+                                <?php if (!$module_has_icon_column): ?>
+                                    <br>ملاحظة: قاعدة البيانات الحالية لا تحتوي بعد على عمود `icon`، لذا ستظهر الأيقونة بعد تنفيذ ملف التحديث داخل مجلد `database`.
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الدور المسؤول -->
+                    <div>
+                        <label><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
                         <div class="icon-picker-shell">
                             <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>" />
                             <input type="hidden" id="icon_manually_selected" value="0" />
@@ -597,14 +648,12 @@ include __DIR__ . '/../includes/page_header.php';
 <!-- JS -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 
 
 <script>
 $(document).ready(function () {
     // تهيئة DataTable
     var modulesTable = $('#modulesTable').DataTable({
-        responsive: true,
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
         },

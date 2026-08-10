@@ -130,19 +130,21 @@ include '../insidebar.php';
         <input type="hidden" name="tk_save" value="1">
         <?php foreach ($ctx as $k => $v) { echo '<input type="hidden" name="ctx_' . htmlspecialchars($k) . '" value="' . htmlspecialchars((string) $v) . '">'; } ?>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-            <div class="form-group"><label>النوع * (الفئة ← النوع)</label>
-                <select name="type_code" required><option value="">— اختر —</option>
+            <div class="form-group"><label for="emsf_1481_2d469">النوع * (الفئة ← النوع)</label>
+                <select name="type_code" required id="emsf_1481_2d469"><option value="">— اختر —</option>
                 <?php foreach ($types as $t) {
                     echo '<option value="' . htmlspecialchars($t['code']) . '">'
                         . htmlspecialchars($t['category'] . ' / ' . $t['name']) . '</option>';
                 } ?></select></div>
-            <div class="form-group"><label>الأولوية (ترفعها ولا تخفضها)</label>
-                <select name="priority"><option value="">اقتراح النظام</option>
+            <div class="form-group"><label for="emsf_1482_71e9e">الأولوية (ترفعها ولا تخفضها)</label>
+                <select name="priority" id="emsf_1482_71e9e"><option value="">اقتراح النظام</option>
                     <option value="high">عالٍ</option><option value="critical">حرج</option></select></div>
-            <div class="form-group"><label><input type="checkbox" name="is_anonymous" value="1"> بلا كشف هوية (للأنواع التي تقبله)</label></div>
+            <div class="form-group"><label for="emsf_1483_2e0f1"><input type="checkbox" name="is_anonymous" value="1"> بلا كشف هوية (للأنواع التي تقبله)</label></div>
+        </div>
+        <div class="form-group"><label>الوصف * — الحقل الحر الوحيد</label></div>
         </div>
         <div class="form-group"><label>الوصف * — الحقل الحر الوحيد</label>
-            <textarea name="description" rows="3" required></textarea></div>
+            <textarea name="description" rows="3" required id="emsf_1483_2e0f1"></textarea></div>
         <button type="submit" class="btn-save">رفع البلاغ — يوجَّه آليًّا خلال ثانية</button>
     </form>
 </div>

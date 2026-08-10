@@ -155,7 +155,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="id" id="lk_id" value="">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>النوع <span class="required">*</span></label>
+                    <label for="lk_type">النوع <span class="required">*</span></label>
                     <select name="type" id="lk_type" required>
                         <option value="">— اختر —</option>
                         <?php foreach ($lookup_types as $t): ?>
@@ -164,11 +164,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>الاسم <span class="required">*</span></label>
+                    <label for="lk_name">الاسم <span class="required">*</span></label>
                     <input type="text" name="name" id="lk_name" required>
                 </div>
                 <div class="form-group">
-                    <label>وصف / تفصيل</label>
+                    <label for="lk_extra">وصف / تفصيل</label>
                     <input type="text" name="extra" id="lk_extra">
                 </div>
             </div></div>
@@ -183,7 +183,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fas fa-list"></i> القيم المرجعية</h5></div>
         <div class="form-grid">
             <div class="form-group">
-                <label>تصفية حسب النوع</label>
+                <label for="filterLookupType">تصفية حسب النوع</label>
                 <select id="filterLookupType">
                     <option value="">كل الأنواع</option>
                     <?php foreach ($lookup_types as $t): ?>
@@ -238,11 +238,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="id" id="wh_id" value="">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>اسم المخزن <span class="required">*</span></label>
+                    <label for="wh_name">اسم المخزن <span class="required">*</span></label>
                     <input type="text" name="name" id="wh_name" required>
                 </div>
                 <div class="form-group">
-                    <label>النوع <span class="required">*</span></label>
+                    <label for="wh_type">النوع <span class="required">*</span></label>
                     <select name="type" id="wh_type" required>
                         <?php foreach ($warehouse_types as $t): ?>
                             <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
@@ -250,11 +250,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>الموقع</label>
+                    <label for="wh_location">الموقع</label>
                     <input type="text" name="location" id="wh_location">
                 </div>
                 <div class="form-group" style="grid-column:1/-1">
-                    <label>ملاحظات</label>
+                    <label for="wh_notes">ملاحظات</label>
                     <input type="text" name="notes" id="wh_notes">
                 </div>
             </div></div>

@@ -117,7 +117,7 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-layer-group"></i> الفئة التشغيلية
+            <label for="operating_category"><i class="fas fa-layer-group"></i> الفئة التشغيلية
                 <span class="ems-inherit-hint" style="font-size:11px;color:#16a34a;font-weight:700" title="تُملأ تلقائياً من الموديل وقابلة للتعديل">(موروثة من الموديل)</span>
             </label>
             <input type="text" name="operating_category" id="operating_category"
@@ -125,29 +125,29 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-globe"></i> بلد الصنع</label>
+            <label for="origin_country"><i class="fas fa-globe"></i> بلد الصنع</label>
             <input type="text" name="origin_country" id="origin_country" value="<?= $g('origin_country'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-cog"></i> رقم الموتور</label>
+            <label for="engine_no"><i class="fas fa-cog"></i> رقم الموتور</label>
             <input type="text" name="engine_no" id="engine_no" value="<?= $g('engine_no'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-id-card-alt"></i> رقم اللوحة</label>
+            <label for="plate_no"><i class="fas fa-id-card-alt"></i> رقم اللوحة</label>
             <input type="text" name="plate_no" id="plate_no" value="<?= $g('plate_no'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-weight-hanging"></i> السعة / القدرة / الحمولة
+            <label for="capacity"><i class="fas fa-weight-hanging"></i> السعة / القدرة / الحمولة
                 <span class="ems-inherit-hint" style="font-size:11px;color:#16a34a;font-weight:700" title="تُملأ تلقائياً من الموديل وقابلة للتعديل">(موروثة)</span>
             </label>
             <input type="number" step="0.01" name="capacity" id="capacity" value="<?= $g('capacity'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-ruler"></i> وحدة السعة</label>
+            <label for="capacity_uom"><i class="fas fa-ruler"></i> وحدة السعة</label>
             <select name="capacity_uom" id="capacity_uom">
                 <option value="">-- اختر --</option>
                 <?php foreach ($lists['capacity_uom'] as $o) echo $opt($o, $g('capacity_uom')); ?>
@@ -155,12 +155,12 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-vector-square"></i> المقاسات الفنية (طول·عرض·ارتفاع·وزن)</label>
+            <label for="dimensions"><i class="fas fa-vector-square"></i> المقاسات الفنية (طول·عرض·ارتفاع·وزن)</label>
             <input type="text" name="dimensions" id="dimensions" placeholder="مثال: 9.5م × 3م × 3.2م / 22طن" value="<?= $g('dimensions'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-handshake"></i> نوع المصدر</label>
+            <label for="source_type"><i class="fas fa-handshake"></i> نوع المصدر</label>
             <select name="source_type" id="source_type">
                 <option value="">-- اختر --</option>
                 <?php foreach ($lists['source_type'] as $o) echo $opt($o, $g('source_type')); ?>
@@ -168,17 +168,17 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-calendar-day"></i> تاريخ دخول المعدة</label>
+            <label for="entry_date"><i class="fas fa-calendar-day"></i> تاريخ دخول المعدة</label>
             <input type="date" name="entry_date" id="entry_date" value="<?= $g('entry_date'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-money-check-dollar"></i> تكلفة الشراء</label>
+            <label for="acquisition_cost"><i class="fas fa-money-check-dollar"></i> تكلفة الشراء</label>
             <input type="number" step="0.01" name="acquisition_cost" id="acquisition_cost" value="<?= $g('acquisition_cost'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-coins"></i> عملة التكلفة</label>
+            <label for="acquisition_currency"><i class="fas fa-coins"></i> عملة التكلفة</label>
             <select name="acquisition_currency" id="acquisition_currency">
                 <option value="">-- اختر --</option>
                 <?php foreach ($lists['acquisition_currency'] as $o) echo $opt($o, $g('acquisition_currency')); ?>
@@ -191,12 +191,20 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-gauge"></i> العدّاد الافتتاحي</label>
+            <label for="opening_meter"><i class="fas fa-gauge"></i> العدّاد الافتتاحي</label>
             <input type="number" step="0.01" name="opening_meter" id="opening_meter" value="<?= $g('opening_meter'); ?>" />
         </div>
 
         <div>
-            <label><i class="fas fa-ruler-horizontal"></i> وحدة العدّاد</label>
+            <label for="meter_source"><i class="fas fa-ruler-horizontal"></i> وحدة العدّاد</label>
+            <?php $mu = $g('meter_uom'); if ($mu === '') $mu = 'ساعات'; ?>
+            <select name="meter_uom" id="meter_uom">
+                <?php foreach ($lists['meter_uom'] as $o) echo $opt($o, $mu); ?>
+            </select>
+        </div>
+
+        <div>
+            <label><i class="fas fa-satellite-dish"></i> مصدر العدّاد</label>
             <?php $mu = $g('meter_uom'); if ($mu === '') $mu = 'ساعات'; ?>
             <select name="meter_uom" id="meter_uom">
                 <?php foreach ($lists['meter_uom'] as $o) echo $opt($o, $mu); ?>

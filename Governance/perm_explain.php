@@ -164,16 +164,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5><i class="fa fa-question-circle"></i> لماذا يرى هذا الدورُ هذه الشاشة — أو لا يراها؟</h5>
     </div><div class="card-body">
         <form method="get" action="" class="ems-form" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-            <div class="form-group" style="min-width:220px"><label>الدور</label>
-                <select name="px_role" class="form-control">
+            <div class="form-group" style="min-width:220px"><label for="emsf_615_52acc">الدور</label>
+                <select name="px_role" class="form-control" id="emsf_615_52acc">
                     <option value="">— اختر —</option>
                     <?php foreach ($px_roles as $r0): ?>
                     <option value="<?php echo (int) $r0['id']; ?>"<?php echo $px_role === (int) $r0['id'] ? ' selected' : ''; ?>>
                         <?php echo htmlspecialchars($r0['id'] . ' — ' . $r0['name'], ENT_QUOTES, 'UTF-8'); ?></option>
                     <?php endforeach; ?>
                 </select></div>
-            <div class="form-group" style="min-width:320px"><label>الشاشة</label>
-                <select name="px_screen" class="form-control">
+            <div class="form-group" style="min-width:320px"><label for="emsf_616_5b519">الشاشة</label>
+                <select name="px_screen" class="form-control" id="emsf_616_5b519">
                     <option value="">— اختر —</option>
                     <?php foreach ($px_screens as $s0): ?>
                     <option value="<?php echo htmlspecialchars($s0['code'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo $px_screen === $s0['code'] ? ' selected' : ''; ?>>
@@ -211,36 +211,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — تفسير مصدر الصلاحية</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الحساب</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الشاشة</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الفعل</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>النتيجة النهائية</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>مصدر المنح 1</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>حكمه</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>مصدر المنح 2</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>حكمه</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>مصدر المنع</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>حكمه</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>قاعدة الدمج المطبَّقة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>النطاق الناتج</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>السقف الناتج</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الفحص</label>
-                    <input type="date" name="f13"></div>
-                <div class="form-group"><label>الفاحص</label>
-                    <input type="text" name="f14" maxlength="190"></div>
+                <div class="form-group"><label for="emsf_617_adfae">الحساب</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_617_adfae"></div>
+                <div class="form-group"><label for="emsf_618_75295">الشاشة</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_618_75295"></div>
+                <div class="form-group"><label for="emsf_619_e2c2f">الفعل</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_619_e2c2f"></div>
+                <div class="form-group"><label for="emsf_620_b659f">النتيجة النهائية</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_620_b659f"></div>
+                <div class="form-group"><label for="emsf_621_c8fc0">مصدر المنح 1</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_621_c8fc0"></div>
+                <div class="form-group"><label for="emsf_622_c6ab2">حكمه</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_622_c6ab2"></div>
+                <div class="form-group"><label for="emsf_623_a8ad5">مصدر المنح 2</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_623_a8ad5"></div>
+                <div class="form-group"><label for="emsf_624_20f1c">حكمه</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_624_20f1c"></div>
+                <div class="form-group"><label for="emsf_625_29f5a">مصدر المنع</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_625_29f5a"></div>
+                <div class="form-group"><label for="emsf_626_36d52">حكمه</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_626_36d52"></div>
+                <div class="form-group"><label for="emsf_627_9e844">قاعدة الدمج المطبَّقة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_627_9e844"></div>
+                <div class="form-group"><label for="emsf_628_26056">النطاق الناتج</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_628_26056"></div>
+                <div class="form-group"><label for="emsf_629_71981">السقف الناتج</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_629_71981"></div>
+                <div class="form-group"><label for="emsf_630_a3acf">تاريخ الفحص</label>
+                    <input type="date" name="f13" id="emsf_630_a3acf"></div>
+                <div class="form-group"><label for="emsf_631_6c20b">الفاحص</label>
+                    <input type="text" name="f14" maxlength="190" id="emsf_631_6c20b"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

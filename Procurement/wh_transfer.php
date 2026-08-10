@@ -10,35 +10,46 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../app/Services/Procurement/StockMoveService.php';
+
+// CS-01 · RF-02 — حارسُ الشاشةِ فوقَ المعالج. كانت الحركتان تُكتبان في السطرين
+// 34 و36 و‎insidebar‎ (منفِّذُ الحارس) في السطرِ 60 — أثرٌ قبلَ إذن.
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-    $item = intval($_POST['item_id'] ?? 0);
-    $from = intval($_POST['from_wh'] ?? 0);
-    $to   = intval($_POST['to_wh'] ?? 0);
-    $qty  = floatval($_POST['qty'] ?? 0);
-    if ($item <= 0 || $from <= 0 || $to <= 0 || $qty <= 0) { $msg = 'الصنفُ والمخزنان والكميةُ إلزامية (422)'; }
-    elseif ($from === $to) { $msg = 'المصدرُ والوجهةُ مخزنٌ واحد (422)'; }
-    else {
-        // الرصيدُ المتاحُ في المصدر يُحسب من الحركات — لا عمودَ رصيدٍ يُعدَّل
-        $r = mysqli_query($conn, "SELECT COALESCE(SUM(CASE WHEN move_type IN ('استلام','تحويل وارد','مرتجع','تسوية زيادة') THEN qty ELSE -qty END),0) b
-                                  FROM proc_stock_move WHERE company_id=$company_id AND item_id=$item AND warehouse_id=$from");
-        $bal = $r ? floatval(mysqli_fetch_assoc($r)['b']) : 0;
-        if ($bal < $qty) { $msg = "الرصيدُ المتاحُ في المصدر $bal فقط — والتحويلُ يُرفض 409"; }
-        else {
-            mysqli_begin_transaction($conn);
-            $ref = 'TRF-' . date('ymd-His');
-            $ok1 = mysqli_query($conn, "INSERT INTO proc_stock_move (company_id,item_id,warehouse_id,move_type,qty,ref_type,note,moved_at,created_by)
-                    VALUES ($company_id,$item,$from,'تحويل صادر',$qty,'wh_transfer','$ref',NOW(),$uid)");
-            $ok2 = mysqli_query($conn, "INSERT INTO proc_stock_move (company_id,item_id,warehouse_id,move_type,qty,ref_type,note,moved_at,created_by)
-                    VALUES ($company_id,$item,$to,'تحويل وارد',$qty,'wh_transfer','$ref',NOW(),$uid)");
-            if ($ok1 && $ok2) { mysqli_commit($conn); $msg = "حُوّل $qty بمرجع $ref — حركتان ذريّتان"; }
-            else { mysqli_rollback($conn); $msg = 'فشلت المعاملةُ فأُلغيت الحركتان معًا: ' . mysqli_error($conn); }
+$__pc = ems_post_contract($conn, array(
+    'action'  => 'proc.stock.warehouse_transfer',
+    'perm'    => 'can_edit',
+    'trigger' => 'item_id',
+    'idem'    => array(
+        'item' => intval($_POST['item_id'] ?? 0),
+        'from' => intval($_POST['from_wh'] ?? 0),
+        'to'   => intval($_POST['to_wh'] ?? 0),
+        'qty'  => (string) floatval($_POST['qty'] ?? 0),
+    ),
+    'validate' => function (array $in) {
+        $item = intval($in['item_id'] ?? 0); $from = intval($in['from_wh'] ?? 0);
+        $to   = intval($in['to_wh'] ?? 0);   $qty  = floatval($in['qty'] ?? 0);
+        if ($item <= 0 || $from <= 0 || $to <= 0 || $qty <= 0) {
+            return array('ok' => false, 'msg' => 'الصنفُ والمخزنان والكميةُ إلزامية (422)');
         }
-    }
+        if ($from === $to) { return array('ok' => false, 'msg' => 'المصدرُ والوجهةُ مخزنٌ واحد (422)'); }
+        return array('ok' => true, 'data' => compact('item', 'from', 'to', 'qty'));
+    },
+));
+if (!$__pc['ok'] && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
+if ($__pc['replay'])                     { $msg = $__pc['msg']; }
+if ($__pc['run'] && $__pc['ok']) {
+    // CS-05: الحكمُ والمعاملةُ والقفلُ في خدمةِ النطاقِ لا في السطح.
+    $svc = new \App\Services\Procurement\StockMoveService($conn);
+    $res = $svc->transfer($company_id, (int) $__pc['data']['item'], (int) $__pc['data']['from'],
+        (int) $__pc['data']['to'], (float) $__pc['data']['qty'], $__pc['idem'], $uid);
+    $msg = $res['msg'];
+    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], $res['ref']); }
 }
 
 $items = array(); $whs = array();
@@ -72,13 +83,13 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
-    <div><label>الصنف</label><select name="item_id" class="form-control" required><option value="">—</option>
+    <div><label for="emsf_1350_8dfe1">الصنف</label><select name="item_id" class="form-control" required id="emsf_1350_8dfe1"><option value="">—</option>
       <?php foreach ($items as $i): ?><option value="<?= intval($i['id']) ?>"><?= htmlspecialchars($i['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label>من مخزن</label><select name="from_wh" class="form-control" required><option value="">—</option>
+    <div><label for="emsf_1351_042e3">من مخزن</label><select name="from_wh" class="form-control" required id="emsf_1351_042e3"><option value="">—</option>
       <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>"><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label>إلى مخزن</label><select name="to_wh" class="form-control" required><option value="">—</option>
+    <div><label for="emsf_1352_887b9">إلى مخزن</label><select name="to_wh" class="form-control" required id="emsf_1352_887b9"><option value="">—</option>
       <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>"><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label>الكمية</label><input type="number" step="0.01" name="qty" class="form-control" required style="max-width:110px"></div>
+    <div><label for="emsf_1353_4bc3c">الكمية</label><input type="number" step="0.01" name="qty" class="form-control" required style="max-width:110px" id="emsf_1353_4bc3c"></div>
     <button class="btn btn-primary">حوّل</button>
   </form>
   <h6>آخرُ التحويلات</h6>

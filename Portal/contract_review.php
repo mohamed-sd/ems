@@ -149,46 +149,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — مراجعة العقود وملاحظاتها</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم الملاحظة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>العقد</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الرصد</label>
-                    <input type="date" name="f2"></div>
-                <div class="form-group"><label>نوع الملاحظة</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>درجة الملاحظة</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>البند المتأثر</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>وصف الملاحظة</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>الأثر المحتمل</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>القيمة المعرَّضة</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0"></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>الجهة الراصدة</label>
-                    <input type="text" name="f10" maxlength="190"></div>
-                <div class="form-group"><label>الإجراء المطلوب</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>المسؤول</label>
-                    <input type="text" name="f12" maxlength="190"></div>
-                <div class="form-group"><label>مهلة المعالجة</label>
-                    <input type="text" name="f13" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ المعالجة</label>
-                    <input type="date" name="f14"></div>
-                <div class="form-group"><label>مستند المعالجة</label>
-                    <input type="text" name="f15" maxlength="190"></div>
-                <div class="form-group"><label>يحجب الاعتماد؟</label>
-                    <input type="text" name="f16" maxlength="190"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f17" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الإقفال</label>
-                    <input type="date" name="f18"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f19"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_1148_c5e15">رقم الملاحظة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_1148_c5e15"></div>
+                <div class="form-group"><label for="emsf_1149_7ca62">العقد</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_1149_7ca62"></div>
+                <div class="form-group"><label for="emsf_1150_c8a24">تاريخ الرصد</label>
+                    <input type="date" name="f2" id="emsf_1150_c8a24"></div>
+                <div class="form-group"><label for="emsf_1151_14ed9">نوع الملاحظة</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_1151_14ed9"></div>
+                <div class="form-group"><label for="emsf_1152_ac764">درجة الملاحظة</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_1152_ac764"></div>
+                <div class="form-group"><label for="emsf_1153_3d765">البند المتأثر</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_1153_3d765"></div>
+                <div class="form-group"><label for="emsf_1154_65de2">وصف الملاحظة</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_1154_65de2"></div>
+                <div class="form-group"><label for="emsf_1155_e86d7">الأثر المحتمل</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_1155_e86d7"></div>
+                <div class="form-group"><label for="emsf_1156_fcaba">القيمة المعرَّضة</label>
+                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1156_fcaba"></div>
+                <div class="form-group"><label for="emsf_1157_fcfef">العملة</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_1157_fcfef"></div>
+                <div class="form-group"><label for="emsf_1158_35703">الجهة الراصدة</label>
+                    <input type="text" name="f10" maxlength="190" id="emsf_1158_35703"></div>
+                <div class="form-group"><label for="emsf_1159_4eb54">الإجراء المطلوب</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_1159_4eb54"></div>
+                <div class="form-group"><label for="emsf_1160_dbe6e">المسؤول</label>
+                    <input type="text" name="f12" maxlength="190" id="emsf_1160_dbe6e"></div>
+                <div class="form-group"><label for="emsf_1161_f4e77">مهلة المعالجة</label>
+                    <input type="text" name="f13" maxlength="190" id="emsf_1161_f4e77"></div>
+                <div class="form-group"><label for="emsf_1162_ff732">تاريخ المعالجة</label>
+                    <input type="date" name="f14" id="emsf_1162_ff732"></div>
+                <div class="form-group"><label for="emsf_1163_14623">مستند المعالجة</label>
+                    <input type="text" name="f15" maxlength="190" id="emsf_1163_14623"></div>
+                <div class="form-group"><label for="emsf_1164_8a010">يحجب الاعتماد؟</label>
+                    <input type="text" name="f16" maxlength="190" id="emsf_1164_8a010"></div>
+                <div class="form-group"><label for="emsf_1165_e32a7">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f17" maxlength="190" id="emsf_1165_e32a7"></div>
+                <div class="form-group"><label for="emsf_1166_a129d">تاريخ الإقفال</label>
+                    <input type="date" name="f18" id="emsf_1166_a129d"></div>
+                <div class="form-group"><label for="emsf_1167_b9b60">الحالة</label>
+                    <select name="f19" id="emsf_1167_b9b60"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

@@ -314,6 +314,35 @@ require_once __DIR__ . '/../includes/layout_head.php';
             </div>
         </a>
 
+        <!-- دليل الشاشات — نصُّ «عن الشاشة» الذي يقرؤه المستخدم -->
+        <a href="screen_guide.php" class="permission-card modules">
+            <div class="permission-card-header">
+                <div class="permission-card-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <div class="permission-card-title">دليل الشاشات</div>
+                    <div class="permission-card-subtitle">تعريفات ما يظهر للمستخدم</div>
+                </div>
+            </div>
+            <div class="permission-card-body">
+                <p class="permission-card-desc">
+                    حرّر النصَّ الذي يقرؤه المستخدمُ في بطاقة «عن الشاشة» عند فتحِ أيِّ شاشة — دليلٌ ثابتٌ لكلِّ العملاء.
+                </p>
+                <ul class="permission-card-features">
+                    <li>تحرير تعريف كل شاشة</li>
+                    <li>معاينة البطاقة كما يراها المستخدم</li>
+                    <li>تسمية الشاشات بلا اسم معتمد</li>
+                    <li>قياس تغطية الدليل ونقصه</li>
+                </ul>
+                <div class="permission-card-footer">
+                    <div class="permission-card-link">
+                        <i class="fas fa-arrow-left"></i> إدارة الدليل
+                    </div>
+                </div>
+            </div>
+        </a>
+
         <!-- مجموعات الروابط -->
         <a href="link_groups.php" class="permission-card modules">
             <div class="permission-card-header">

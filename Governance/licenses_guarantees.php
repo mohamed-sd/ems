@@ -11,6 +11,14 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../includes/screen_contract.php';
 
 $role = strval($_SESSION['user']['role'] ?? '');
@@ -151,7 +159,7 @@ include '../insidebar.php';
                     <input type="hidden" name="op" value="renew">
                     <input type="hidden" name="lic_id" value="<?php echo intval($l['lic_id']); ?>">
                     <input type="date" name="new_expiry" required>
-                    <input type="text" name="doc_ref" placeholder="مستند التجديد" required style="width:120px">
+                    <input type="text" name="doc_ref" placeholder="مستند التجديد" required style="width:120px" aria-label="مستند التجديد">
                     <button class="btn-save" type="submit">تجديد</button>
                 </form>
                 <?php else: ?>—<?php endif; ?>
@@ -192,11 +200,11 @@ include '../insidebar.php';
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="lic_type" placeholder="النوع (سجل تجاري · رخصة نشاط…) *" required>
-                <input type="text" name="issuer" placeholder="الجهة المصدرة">
-                <input type="text" name="lic_no" placeholder="الرقم">
+                <input type="text" name="lic_type" placeholder="النوع (سجل تجاري · رخصة نشاط…) *" required aria-label="النوع (سجل تجاري · رخصة نشاط…)">
+                <input type="text" name="issuer" placeholder="الجهة المصدرة" aria-label="الجهة المصدرة">
+                <input type="text" name="lic_no" placeholder="الرقم" aria-label="الرقم">
                 <input type="date" name="expiry_date" required>
-                <input type="number" name="alert_days" value="30" title="التنبيه قبل الانتهاء بأيام">
+                <input type="number" name="alert_days" value="30" title="التنبيه قبل الانتهاء بأيام" aria-label="التنبيه قبل الانتهاء بأيام">
                 <button class="btn-save" type="submit">تسجيل</button>
             </form>
         </div></div>
@@ -220,12 +228,12 @@ include '../insidebar.php';
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="gtee_type" placeholder="النوع (حسن تنفيذ · دفعة مقدمة…)">
-                <input type="text" name="bank" placeholder="البنك المصدر">
-                <input type="number" step="0.01" name="amount" placeholder="القيمة *" required>
+                <input type="text" name="gtee_type" placeholder="النوع (حسن تنفيذ · دفعة مقدمة…)" aria-label="النوع (حسن تنفيذ · دفعة مقدمة…)">
+                <input type="text" name="bank" placeholder="البنك المصدر" aria-label="البنك المصدر">
+                <input type="number" step="0.01" name="amount" placeholder="القيمة *" required aria-label="القيمة">
                 <input type="text" name="currency" value="USD">
                 <input type="date" name="expiry_date" required>
-                <input type="text" name="doc_ref" placeholder="مرجع المستند *" required>
+                <input type="text" name="doc_ref" placeholder="مرجع المستند *" required aria-label="مرجع المستند">
                 <button class="btn-save" type="submit">تسجيل</button>
             </form>
         </div></div>

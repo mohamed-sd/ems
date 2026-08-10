@@ -150,34 +150,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-plus"></i> إضافة — سياسات الحقول الحساسة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>رقم السياسة</label>
-                    <input type="text" name="f0" required maxlength="190"></div>
-                <div class="form-group"><label>الجدول</label>
-                    <input type="text" name="f1" maxlength="190"></div>
-                <div class="form-group"><label>الحقل</label>
-                    <input type="text" name="f2" maxlength="190"></div>
-                <div class="form-group"><label>تصنيف الحساسية</label>
-                    <input type="text" name="f3" maxlength="190"></div>
-                <div class="form-group"><label>سبب التصنيف</label>
-                    <input type="text" name="f4" maxlength="190"></div>
-                <div class="form-group"><label>من يراه</label>
-                    <input type="text" name="f5" maxlength="190"></div>
-                <div class="form-group"><label>سياسة الإخفاء</label>
-                    <input type="text" name="f6" maxlength="190"></div>
-                <div class="form-group"><label>يُسجَّل الاطّلاع؟</label>
-                    <input type="text" name="f7" maxlength="190"></div>
-                <div class="form-group"><label>يُصدَّر؟</label>
-                    <input type="text" name="f8" maxlength="190"></div>
-                <div class="form-group"><label>الأساس النظامي</label>
-                    <input type="text" name="f9" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ السريان</label>
-                    <input type="date" name="f10"></div>
-                <div class="form-group"><label>المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f11" maxlength="190"></div>
-                <div class="form-group"><label>تاريخ الاعتماد</label>
-                    <input type="date" name="f12"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="f13"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                <div class="form-group"><label for="emsf_649_b50c9">رقم السياسة</label>
+                    <input type="text" name="f0" required maxlength="190" id="emsf_649_b50c9"></div>
+                <div class="form-group"><label for="emsf_650_2a2ea">الجدول</label>
+                    <input type="text" name="f1" maxlength="190" id="emsf_650_2a2ea"></div>
+                <div class="form-group"><label for="emsf_651_bdc2a">الحقل</label>
+                    <input type="text" name="f2" maxlength="190" id="emsf_651_bdc2a"></div>
+                <div class="form-group"><label for="emsf_652_2e720">تصنيف الحساسية</label>
+                    <input type="text" name="f3" maxlength="190" id="emsf_652_2e720"></div>
+                <div class="form-group"><label for="emsf_653_756f0">سبب التصنيف</label>
+                    <input type="text" name="f4" maxlength="190" id="emsf_653_756f0"></div>
+                <div class="form-group"><label for="emsf_654_18f34">من يراه</label>
+                    <input type="text" name="f5" maxlength="190" id="emsf_654_18f34"></div>
+                <div class="form-group"><label for="emsf_655_c9bc8">سياسة الإخفاء</label>
+                    <input type="text" name="f6" maxlength="190" id="emsf_655_c9bc8"></div>
+                <div class="form-group"><label for="emsf_656_be227">يُسجَّل الاطّلاع؟</label>
+                    <input type="text" name="f7" maxlength="190" id="emsf_656_be227"></div>
+                <div class="form-group"><label for="emsf_657_a6ae6">يُصدَّر؟</label>
+                    <input type="text" name="f8" maxlength="190" id="emsf_657_a6ae6"></div>
+                <div class="form-group"><label for="emsf_658_32404">الأساس النظامي</label>
+                    <input type="text" name="f9" maxlength="190" id="emsf_658_32404"></div>
+                <div class="form-group"><label for="emsf_659_fc420">تاريخ السريان</label>
+                    <input type="date" name="f10" id="emsf_659_fc420"></div>
+                <div class="form-group"><label for="emsf_660_55799">المعتمِد — الاسم والصفة</label>
+                    <input type="text" name="f11" maxlength="190" id="emsf_660_55799"></div>
+                <div class="form-group"><label for="emsf_661_46f31">تاريخ الاعتماد</label>
+                    <input type="date" name="f12" id="emsf_661_46f31"></div>
+                <div class="form-group"><label for="emsf_662_e982b">الحالة</label>
+                    <select name="f13" id="emsf_662_e982b"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
                 <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>

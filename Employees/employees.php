@@ -88,8 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         'supplier_id'            => !empty($_POST['supplier_id']) ? intval($_POST['supplier_id']) : null,
         'project_id'             => !empty($_POST['project_id']) ? intval($_POST['project_id']) : null,
         'employment_affiliation' => $_POST['employment_affiliation'],
-        'salary_type'            => $_POST['salary_type'],
-        'monthly_salary'         => !empty($_POST['monthly_salary']) ? floatval($_POST['monthly_salary']) : null,
         'email'                  => trim($_POST['email']),
         'phone'                  => trim($_POST['phone']),
         'phone_alternative'      => trim($_POST['phone_alternative']),
@@ -113,6 +111,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         'start_date'             => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
         'status'                 => $_POST['status'],
     );
+
+    /* ══ INJ-0004 (P0) — حقولُ الأجورِ **لا تُكتب إلا بمنحٍ صريح** ═══════════
+       ◆ گوتشا خطيرةٌ يفتحها الحجبُ نفسُه: بعدَ حجبِ الراتبِ عن غيرِ المخوَّل
+         يصل نموذجُ التعديلِ بحقلٍ فارغ — فلو أُدرج في التحديثِ كما كان لمَحا
+         الراتبَ الحقيقيَّ بـNULL صامتًا. أي أن الحمايةَ نفسَها تصير محوًا.
+       ◆ فالحقلُ يُدرج في الحمولةِ **فقط** حين يملك الفاعلُ منحةَ الأجور؛ ولغيرِه
+         يُترك خارجَها فيبقى المخزَّنُ كما هو (لا يُقرأ ولا يُكتب). */
+    $emp_payroll_allowed = false;
+    try {
+        require_once __DIR__ . '/../app/Services/Portal/VisibilityGuard.php';
+        if (class_exists('\\App\\Services\\Portal\\VisibilityGuard')) {
+            $emp_v = \App\Services\Portal\VisibilityGuard::check(
+                $conn, $emp_gate, intval($_SESSION['user']['company_id'] ?? 0),
+                array('account_id' => intval($_SESSION['user']['id'] ?? 0),
+                      'role' => strval($_SESSION['user']['role'] ?? ''),
+                      'capacity_type' => 'employee', 'scope_type' => '', 'scope_id' => null),
+                'card.payroll', array('account_id' => $id));
+            $emp_payroll_allowed = (($emp_v['decision'] ?? '') === 'allow');
+        }
+    } catch (\Throwable $t) {
+        error_log('employees.php payroll guard: ' . $t->getMessage());  // فشلٌ مغلق
+    }
+    if ($emp_payroll_allowed) {
+        $data['salary_type']    = $_POST['salary_type'] ?? null;
+        $data['monthly_salary'] = !empty($_POST['monthly_salary']) ? floatval($_POST['monthly_salary']) : null;
+        require_once __DIR__ . '/../includes/sensitive_read_log.php';
+        ems_log_sensitive_read($conn, 'salary', 'employee:' . $id, 'Employees/employees.php');
+    }
 
     // التحقق من فرادة كود المشغل على مستوى الشركة (البوابة تعزل تلقائيًّا)
     if (!empty($employee_code)) {
@@ -476,21 +502,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-user"></i> اسم المشغل/السائق <span
+                                <label for="name"><i class="fas fa-user"></i> اسم المشغل/السائق <span
                                         style="color: red;">*</span></label>
                                 <input type="text" name="name" id="name" placeholder="مثال: محمد أحمد علي" required />
                             </div>
                             <div>
-                                <label><i class="fas fa-barcode"></i> الرمز/الكود الفريد</label>
+                                <label for="employee_code"><i class="fas fa-barcode"></i> الرمز/الكود الفريد</label>
                                 <input type="text" name="employee_code" id="employee_code"
                                     placeholder="مثال: OPR-001-2026" />
                             </div>
                             <div>
-                                <label><i class="fas fa-signature"></i> اسم الشهرة/الكنية</label>
+                                <label for="nickname"><i class="fas fa-signature"></i> اسم الشهرة/الكنية</label>
                                 <input type="text" name="nickname" id="nickname" placeholder="مثال: أبو محمد" />
                             </div>
                             <div>
-                                <label><i class="fas fa-user-tag"></i> نوع الموظف <span style="color: red;">*</span></label>
+                                <label for="employee_type"><i class="fas fa-user-tag"></i> نوع الموظف <span style="color: red;">*</span></label>
                                 <select name="employee_type" id="employee_type" onchange="emsToggleEmpType()" required>
                                     <?php foreach (ems_employee_types() as $__et) {
                                         echo '<option value="' . htmlspecialchars($__et, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($__et, ENT_QUOTES, 'UTF-8') . '</option>';
@@ -498,7 +524,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-id-badge"></i> المسمى الوظيفي
+                                <label for="job_title_id"><i class="fas fa-id-badge"></i> المسمى الوظيفي
                                     <a href="job_titles.php" target="_blank" title="إدارة المسميات" style="font-size:.75rem;margin-inline-start:6px;"><i class="fas fa-gear"></i></a>
                                 </label>
                                 <select name="job_title_id" id="job_title_id">
@@ -511,7 +537,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-people-arrows"></i> دور الموظف
+                                <label for="employee_role_id"><i class="fas fa-people-arrows"></i> دور الموظف
                                     <a href="employee_roles.php" target="_blank" title="إدارة الأدوار" style="font-size:.75rem;margin-inline-start:6px;"><i class="fas fa-gear"></i></a>
                                 </label>
                                 <select name="employee_role_id" id="employee_role_id">
@@ -524,31 +550,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-calendar-day"></i> تاريخ الميلاد</label>
+                                <label for="birth_date"><i class="fas fa-calendar-day"></i> تاريخ الميلاد</label>
                                 <input type="date" name="birth_date" id="birth_date" />
                             </div>
                             <div>
-                                <label><i class="fas fa-flag"></i> الجنسية</label>
+                                <label for="nationality"><i class="fas fa-flag"></i> الجنسية</label>
                                 <input type="text" name="nationality" id="nationality" placeholder="مثال: سوداني" />
                             </div>
                             <div>
-                                <label><i class="fas fa-droplet"></i> فصيلة الدم</label>
+                                <label for="blood_type"><i class="fas fa-droplet"></i> فصيلة الدم</label>
                                 <input type="text" name="blood_type" id="blood_type" placeholder="مثال: O+" />
                             </div>
                             <div>
-                                <label><i class="fab fa-whatsapp"></i> واتساب</label>
+                                <label for="whatsapp"><i class="fab fa-whatsapp"></i> واتساب</label>
                                 <input type="text" name="whatsapp" id="whatsapp" placeholder="مثال: +249912345678" />
                             </div>
                             <div>
-                                <label><i class="fas fa-user-shield"></i> جهة الطوارئ (الاسم)</label>
+                                <label for="emergency_contact_name"><i class="fas fa-user-shield"></i> جهة الطوارئ (الاسم)</label>
                                 <input type="text" name="emergency_contact_name" id="emergency_contact_name" />
                             </div>
                             <div>
-                                <label><i class="fas fa-people-arrows"></i> صلة جهة الطوارئ</label>
+                                <label for="emergency_contact_relation"><i class="fas fa-people-arrows"></i> صلة جهة الطوارئ</label>
                                 <input type="text" name="emergency_contact_relation" id="emergency_contact_relation" placeholder="مثال: أخ" />
                             </div>
                             <div>
-                                <label><i class="fas fa-phone-volume"></i> هاتف الطوارئ</label>
+                                <label for="emergency_contact_phone"><i class="fas fa-phone-volume"></i> هاتف الطوارئ</label>
                                 <input type="text" name="emergency_contact_phone" id="emergency_contact_phone" />
                             </div>
                         </div>
@@ -565,7 +591,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-address-card"></i> نوع الهوية</label>
+                                <label for="identity_type"><i class="fas fa-address-card"></i> نوع الهوية</label>
                                 <select name="identity_type" id="identity_type">
                                     <option value="">-- اختر نوع الهوية --</option>
                                     <option value="بطاقة هوية وطنية">بطاقة هوية وطنية</option>
@@ -576,21 +602,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-hashtag"></i> رقم الهوية</label>
+                                <label for="identity_number"><i class="fas fa-hashtag"></i> رقم الهوية</label>
                                 <input type="text" name="identity_number" id="identity_number"
                                     placeholder="مثال: 123456789123" />
                             </div>
                             <div>
-                                <label><i class="fas fa-calendar-times"></i> تاريخ انتهاء الهوية</label>
+                                <label for="identity_expiry_date"><i class="fas fa-calendar-times"></i> تاريخ انتهاء الهوية</label>
                                 <input type="date" name="identity_expiry_date" id="identity_expiry_date" />
                             </div>
                             <div>
-                                <label><i class="fas fa-camera"></i> صورة السائق ( تحت التجهيز)</label>
+                                <label for="employee_photo"><i class="fas fa-camera"></i> صورة السائق ( تحت التجهيز)</label>
                                 <input type="text" name="employee_photo" id="employee_photo"
                                     placeholder="سيتم تفعيل رفع صورة السائق لاحقاً" readonly />
                             </div>
                             <div>
-                                <label><i class="fas fa-id-card"></i> صورة هوية السائق ( تحت التجهيز)</label>
+                                <label for="identity_photo"><i class="fas fa-id-card"></i> صورة هوية السائق ( تحت التجهيز)</label>
                                 <input type="text" name="identity_photo" id="identity_photo"
                                     placeholder="سيتم تفعيل رفع صورة الهوية لاحقاً" readonly />
                             </div>
@@ -626,17 +652,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-briefcase"></i> سنوات العمل في المجال</label>
+                                <label for="years_in_field"><i class="fas fa-briefcase"></i> سنوات العمل في المجال</label>
                                 <input type="number" name="years_in_field" id="years_in_field" placeholder="مثال: 8"
                                     min="0" max="50" />
                             </div>
                             <div>
-                                <label><i class="fas fa-wrench"></i> سنوات العمل على هذه المعدات</label>
+                                <label for="years_on_equipment"><i class="fas fa-wrench"></i> سنوات العمل على هذه المعدات</label>
                                 <input type="number" name="years_on_equipment" id="years_on_equipment"
                                     placeholder="مثال: 5" min="0" max="50" />
                             </div>
                             <div>
-                                <label><i class="fas fa-star"></i> مستوى الكفاءة المهنية</label>
+                                <label for="skill_level"><i class="fas fa-star"></i> مستوى الكفاءة المهنية</label>
                                 <select name="skill_level" id="skill_level">
                                     <option value="">-- اختر المستوى --</option>
                                     <option value="مبتدئ (أقل من سنة)">مبتدئ (أقل من سنة)</option>
@@ -647,7 +673,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div style="grid-column: 1 / -1;">
-                                <label><i class="fas fa-graduation-cap"></i> الشهادات والتدريبات</label>
+                                <label for="certificates"><i class="fas fa-graduation-cap"></i> الشهادات والتدريبات</label>
                                 <textarea name="certificates" id="certificates" rows="3"
                                     placeholder="مثال: شهادة تشغيل حفارات من معهد التعدين، دورة السلامة الصناعية"></textarea>
                             </div>
@@ -665,12 +691,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-user-tie"></i> اسم المالك/المشرف المباشر</label>
+                                <label for="owner_supervisor"><i class="fas fa-user-tie"></i> اسم المالك/المشرف المباشر</label>
                                 <input type="text" name="owner_supervisor" id="owner_supervisor"
                                     placeholder="مثال: محمد علي (مالك المعدة)" />
                             </div>
                             <div>
-                                <label><i class="fas fa-building"></i> المورد الذي يعمل معه</label>
+                                <label for="supplier_id"><i class="fas fa-building"></i> المورد الذي يعمل معه</label>
                                 <select name="supplier_id" id="supplier_id">
                                     <option value="">-- اختر المورد --</option>
                                     <?php
@@ -682,7 +708,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-project-diagram"></i> المشروع المرتبط</label>
+                                <label for="project_id"><i class="fas fa-project-diagram"></i> المشروع المرتبط</label>
                                 <select name="project_id" id="project_id">
                                     <option value="">-- اختر المشروع --</option>
                                     <?php
@@ -699,7 +725,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-sitemap"></i> تبعية المشغل</label>
+                                <label for="employment_affiliation"><i class="fas fa-sitemap"></i> تبعية المشغل</label>
                                 <select name="employment_affiliation" id="employment_affiliation">
                                     <option value="">-- اختر التبعية --</option>
                                     <option value="تابع لمالك المعدة مباشرة">تابع لمالك المعدة مباشرة</option>
@@ -708,8 +734,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="مقاول مستقل">مقاول مستقل</option>
                                 </select>
                             </div>
+                            <?php
+                            /* INJ-0004: قسمُ الأجورِ لا يُصيَّر أصلًا لغيرِ المخوَّل — والحجبُ
+                               في الخادمِ فوقَه (الحقلُ لا يُقرأ ولا يُكتب)، فهذا إعلانٌ للمستخدم
+                               لا حماية. ◆ ولا يُصيَّر «معطَّلًا» بل يُحذف: الحقلُ المعطَّلُ
+                               يُرسَل فارغًا فيُقرأ محوًا. */
+                            $emp_form_payroll = false;
+                            try {
+                                require_once __DIR__ . '/../app/Services/Portal/VisibilityGuard.php';
+                                if (class_exists('\\App\\Services\\Portal\\VisibilityGuard')) {
+                                    $__fv = \App\Services\Portal\VisibilityGuard::check(
+                                        $conn, $emp_gate, intval($_SESSION['user']['company_id'] ?? 0),
+                                        array('account_id' => intval($_SESSION['user']['id'] ?? 0),
+                                              'role' => strval($_SESSION['user']['role'] ?? ''),
+                                              'capacity_type' => 'employee', 'scope_type' => '', 'scope_id' => null),
+                                        'card.payroll', array('account_id' => 0));
+                                    $emp_form_payroll = (($__fv['decision'] ?? '') === 'allow');
+                                }
+                            } catch (\Throwable $t) { error_log('employees form payroll guard: ' . $t->getMessage()); }
+                            if ($emp_form_payroll): ?>
                             <div>
-                                <label><i class="fas fa-money-bill-wave"></i> نوع الراتب/الأجر</label>
+                                <label for="salary_type"><i class="fas fa-money-bill-wave"></i> نوع الراتب/الأجر</label>
                                 <select name="salary_type" id="salary_type">
                                     <option value="">-- اختر النوع --</option>
                                     <option value="يومي">يومي</option>
@@ -720,10 +765,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-dollar-sign"></i> المبلغ الشهري التقريبي</label>
+                                <label for="monthly_salary"><i class="fas fa-dollar-sign"></i> المبلغ الشهري التقريبي</label>
                                 <input type="number" step="0.01" name="monthly_salary" id="monthly_salary"
                                     placeholder="مثال: 1500" />
                             </div>
+                            <?php else: ?>
+                            <div class="alert alert-warning" style="grid-column:1/-1">
+                                <i class="fa fa-lock"></i> قسمُ الأجورِ محجوبٌ — يُفتح بمنحٍ صريحٍ على عنصرِ
+                                <code>card.payroll</code> من لوحة الظهور (M-14 · SCN-872).
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -738,21 +789,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                                <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
                                 <input type="email" name="email" id="email" placeholder="operator@example.com" />
                             </div>
                             <div>
-                                <label><i class="fas fa-phone"></i> رقم الهاتف الأساسي <span
+                                <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف الأساسي <span
                                         style="color: red;">*</span></label>
                                 <input type="tel" name="phone" id="phone" placeholder="+249-9-123-4567" required />
                             </div>
                             <div>
-                                <label><i class="fas fa-phone-alt"></i> رقم هاتف بديل</label>
+                                <label for="phone_alternative"><i class="fas fa-phone-alt"></i> رقم هاتف بديل</label>
                                 <input type="tel" name="phone_alternative" id="phone_alternative"
                                     placeholder="+249-9-765-4321" />
                             </div>
                             <div style="grid-column: 1 / -1;">
-                                <label><i class="fas fa-map-marker-alt"></i> العنوان</label>
+                                <label for="address"><i class="fas fa-map-marker-alt"></i> العنوان</label>
                                 <textarea name="address" id="address" rows="2"
                                     placeholder="مثال: شارع النيل، الخرطوم"></textarea>
                             </div>
@@ -770,7 +821,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-chart-line"></i> تقييم الكفاءة التشغيلية</label>
+                                <label for="performance_rating"><i class="fas fa-chart-line"></i> تقييم الكفاءة التشغيلية</label>
                                 <select name="performance_rating" id="performance_rating">
                                     <option value="">-- اختر التقييم --</option>
                                     <option value="ممتاز">⭐⭐⭐⭐⭐ ممتاز</option>
@@ -782,7 +833,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-user-check"></i> سجل السلوك والانضباط</label>
+                                <label for="behavior_record"><i class="fas fa-user-check"></i> سجل السلوك والانضباط</label>
                                 <select name="behavior_record" id="behavior_record">
                                     <option value="">-- اختر السجل --</option>
                                     <option value="ممتاز (لا توجد شكاوى)">✅ ممتاز (لا توجد شكاوى)</option>
@@ -793,7 +844,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-exclamation-triangle"></i> سجل الحوادث والأعطال</label>
+                                <label for="accident_record"><i class="fas fa-exclamation-triangle"></i> سجل الحوادث والأعطال</label>
                                 <select name="accident_record" id="accident_record">
                                     <option value="">-- اختر السجل --</option>
                                     <option value="نظيف (لا توجد حوادث)">✅ نظيف (لا توجد حوادث)</option>
@@ -817,7 +868,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-heart"></i> الحالة الصحية</label>
+                                <label for="health_status"><i class="fas fa-heart"></i> الحالة الصحية</label>
                                 <select name="health_status" id="health_status">
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="سليم تماماً">✅ سليم تماماً</option>
@@ -828,7 +879,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-syringe"></i> التطعيمات والفحوصات</label>
+                                <label for="vaccinations_status"><i class="fas fa-syringe"></i> التطعيمات والفحوصات</label>
                                 <select name="vaccinations_status" id="vaccinations_status">
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="محدثة">✅ محدثة</option>
@@ -838,7 +889,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div style="grid-column: 1 / -1;">
-                                <label><i class="fas fa-notes-medical"></i> المشاكل الصحية المعروفة</label>
+                                <label for="health_issues"><i class="fas fa-notes-medical"></i> المشاكل الصحية المعروفة</label>
                                 <textarea name="health_issues" id="health_issues" rows="2"
                                     placeholder="مثال: ضعف البصر الطفيف، مشاكل الظهر"></textarea>
                             </div>
@@ -856,22 +907,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-building"></i> اسم جهة التوظيف السابقة</label>
+                                <label for="previous_employer"><i class="fas fa-building"></i> اسم جهة التوظيف السابقة</label>
                                 <input type="text" name="previous_employer" id="previous_employer"
                                     placeholder="مثال: شركة الذهب للتعدين" />
                             </div>
                             <div>
-                                <label><i class="fas fa-clock"></i> مدة العمل معهم</label>
+                                <label for="employment_duration"><i class="fas fa-clock"></i> مدة العمل معهم</label>
                                 <input type="text" name="employment_duration" id="employment_duration"
                                     placeholder="مثال: 3 سنوات" />
                             </div>
                             <div style="grid-column: 1 / -1;">
-                                <label><i class="fas fa-user-friends"></i> مرجع للاتصال</label>
+                                <label for="reference_contact"><i class="fas fa-user-friends"></i> مرجع للاتصال</label>
                                 <input type="text" name="reference_contact" id="reference_contact"
                                     placeholder="مثال: محمود أحمد - مدير الأسطول (09-123-4567)" />
                             </div>
                             <div style="grid-column: 1 / -1;">
-                                <label><i class="fas fa-comment-dots"></i> ملاحظات عامة</label>
+                                <label for="general_notes"><i class="fas fa-comment-dots"></i> ملاحظات عامة</label>
                                 <textarea name="general_notes" id="general_notes" rows="3"
                                     placeholder="مثال: مشغل موثوق وذو كفاءة عالية، يحتاج إلى تدريب على السلامة"></textarea>
                             </div>
@@ -889,7 +940,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-user-tag"></i> تصنيف الموظف</label>
+                                <label for="employment_classification"><i class="fas fa-user-tag"></i> تصنيف الموظف</label>
                                 <select name="employment_classification" id="employment_classification">
                                     <option value="">-- اختر التصنيف --</option>
                                     <option value="مرشح">📝 مرشح</option>
@@ -904,7 +955,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </small>
                             </div>
                             <div>
-                                <label><i class="fas fa-info-circle"></i> حالة المشغل <span
+                                <label for="employee_status"><i class="fas fa-info-circle"></i> حالة المشغل <span
                                         style="color: red;">*</span></label>
                                 <select name="employee_status" id="employee_status" required>
                                     <option value="">-- اختر الحالة --</option>
@@ -916,11 +967,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                             </div>
                             <div>
-                                <label><i class="fas fa-calendar-check"></i> تاريخ البدء الفعلي</label>
+                                <label for="start_date"><i class="fas fa-calendar-check"></i> تاريخ البدء الفعلي</label>
                                 <input type="date" name="start_date" id="start_date" />
                             </div>
                             <div>
-                                <label><i class="fas fa-power-off"></i> حالة النظام <span
+                                <label for="status"><i class="fas fa-power-off"></i> حالة النظام <span
                                         style="color: red;">*</span></label>
                                 <select name="status" id="status" required>
                                     <option value="">-- اختر الحالة --</option>
@@ -959,47 +1010,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="filter-body">
             <div class="filter-field">
-                <label><i class="fa fa-user-tag"></i> نوع الموظف</label>
+                <label for="empFilterType"><i class="fa fa-user-tag"></i> نوع الموظف</label>
                 <select id="empFilterType" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-id-badge"></i> المسمى الوظيفي</label>
+                <label for="empFilterJobTitle"><i class="fa fa-id-badge"></i> المسمى الوظيفي</label>
                 <select id="empFilterJobTitle" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-people-arrows"></i> دور الموظف</label>
+                <label for="empFilterEmpRole"><i class="fa fa-people-arrows"></i> دور الموظف</label>
                 <select id="empFilterEmpRole" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-star"></i> مستوى المهارة</label>
+                <label for="empFilterSkill"><i class="fa fa-star"></i> مستوى المهارة</label>
                 <select id="empFilterSkill" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-briefcase"></i> جهة التوظيف</label>
+                <label for="empFilterAffiliation"><i class="fa fa-briefcase"></i> جهة التوظيف</label>
                 <select id="empFilterAffiliation" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-money-bill-wave"></i> نوع الراتب</label>
+                <label for="empFilterSalaryType"><i class="fa fa-money-bill-wave"></i> نوع الراتب</label>
                 <select id="empFilterSalaryType" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-truck-field"></i> المورد</label>
+                <label for="empFilterSupplier"><i class="fa fa-truck-field"></i> المورد</label>
                 <select id="empFilterSupplier" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-folder-open"></i> المشروع</label>
+                <label for="empFilterProject"><i class="fa fa-folder-open"></i> المشروع</label>
                 <select id="empFilterProject" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-user-tag"></i> التصنيف</label>
+                <label for="empFilterEmpClass"><i class="fa fa-user-tag"></i> التصنيف</label>
                 <select id="empFilterEmpClass" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-user-check"></i> حالة الموظف</label>
+                <label for="empFilterEmpStatus"><i class="fa fa-user-check"></i> حالة الموظف</label>
                 <select id="empFilterEmpStatus" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-field">
-                <label><i class="fa fa-toggle-on"></i> الحالة</label>
+                <label for="empFilterStatus"><i class="fa fa-toggle-on"></i> الحالة</label>
                 <select id="empFilterStatus" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-actions">
@@ -1177,7 +1228,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1372,8 +1422,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         $("#supplier_id").val(driver.supplier_id);
                         $("#project_id").val(driver.project_id);
                         $("#employment_affiliation").val(driver.employment_affiliation);
-                        $("#salary_type").val(driver.salary_type);
-                        $("#monthly_salary").val(driver.monthly_salary);
+                        // INJ-0004: الحقلُ الحساسُ قد يكون محذوفًا من الاستجابةِ أصلًا —
+                        // فلا يُملأ إلا إن وصل، وإلا كتب undefined فوقَ قيمةٍ صحيحة.
+                        if (driver.salary_type !== undefined) { $("#salary_type").val(driver.salary_type); }
+                        if (driver.monthly_salary !== undefined) { $("#monthly_salary").val(driver.monthly_salary); }
                         $("#email").val(driver.email);
                         $("#phone").val(driver.phone);
                         $("#phone_alternative").val(driver.phone_alternative);

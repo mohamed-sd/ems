@@ -15,7 +15,7 @@ $FA_SCREEN = array(
   0 => 'البسطُ والمقامُ أكوادُ شجرةٍ معلنةٌ لا صيغةٌ خفية',
 ),
     'context' => array(),
-    'filters' => '<label style="font-size:.8rem">النسبة <input type="text" name="ratio" value="" class="form-control form-control-sm" placeholder="FR-01"></label>',
+    'filters' => '<label style="font-size:.8rem">النسبة <input type="text" name="ratio" value="" class="form-control form-control-sm" placeholder="FR-01" aria-label="FR-01"></label>',
 );
 
 /** جسمُ الشاشةِ — تُستدعى من القشرةِ بعد الحارسِ والغلاف */

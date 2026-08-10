@@ -358,7 +358,7 @@ include __DIR__ . '/../includes/page_header.php';
                             </label>
                             <div class="control">
                                 <input type="password" name="old_password" id="old_password"
-                                       required placeholder="أدخل كلمة السر الحالية">
+                                       required placeholder="أدخل كلمة السر الحالية" aria-label="أدخل كلمة السر الحالية">
                                 <i class="fas fa-eye toggle-password" data-target="old_password"></i>
                             </div>
                         </div>
@@ -371,7 +371,7 @@ include __DIR__ . '/../includes/page_header.php';
                             </label>
                             <div class="control">
                                 <input type="password" name="new_password" id="new_password"
-                                       required placeholder="أدخل كلمة السر الجديدة" minlength="6">
+                                       required placeholder="أدخل كلمة السر الجديدة" minlength="6" aria-label="أدخل كلمة السر الجديدة">
                                 <i class="fas fa-eye toggle-password" data-target="new_password"></i>
                             </div>
                             <!-- شريط قوة كلمة المرور -->
@@ -400,7 +400,7 @@ include __DIR__ . '/../includes/page_header.php';
                             </label>
                             <div class="control">
                                 <input type="password" name="confirm_password" id="confirm_password"
-                                       required placeholder="أعد إدخال كلمة السر الجديدة">
+                                       required placeholder="أعد إدخال كلمة السر الجديدة" aria-label="أعد إدخال كلمة السر الجديدة">
                                 <i class="fas fa-eye toggle-password" data-target="confirm_password"></i>
                             </div>
                             <div id="match-message" style="font-size: 0.82rem; margin-top: 6px; font-weight: 600;"></div>

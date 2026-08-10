@@ -118,22 +118,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>رقم الحساب <span class="required">*</span></label>
+                        <label for="a_code">رقم الحساب <span class="required">*</span></label>
                         <input type="text" name="code" id="a_code" required placeholder="مثال: 1100">
                     </div>
                     <div class="form-group">
-                        <label>اسم الحساب <span class="required">*</span></label>
+                        <label for="a_name">اسم الحساب <span class="required">*</span></label>
                         <input type="text" name="name" id="a_name" required>
                     </div>
                     <div class="form-group">
-                        <label>نوع الحساب <span class="required">*</span></label>
+                        <label for="a_type">نوع الحساب <span class="required">*</span></label>
                         <select name="account_type" id="a_type" required>
                             <option value="">— اختر —</option>
                             <?php foreach ($account_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الحساب الأب</label>
+                        <label for="a_parent">الحساب الأب</label>
                         <select name="parent_id" id="a_parent"><?php echo fin_account_parent_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group">

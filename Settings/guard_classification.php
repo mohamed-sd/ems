@@ -12,6 +12,14 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
+// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
+// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once dirname(__DIR__) . '/app/Core/AuthorityGuard.php';
 
@@ -115,7 +123,7 @@ include '../insidebar.php';
                         <option value="<?php echo $ck; ?>" <?php echo $ck === $g['guard_class'] ? 'selected' : ''; ?>><?php echo $cl; ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <input type="text" name="reason" placeholder="سبب التغيير — إلزامي" style="width:180px">
+                    <input type="text" name="reason" placeholder="سبب التغيير — إلزامي" style="width:180px" aria-label="سبب التغيير — إلزامي">
                     <button class="btn-save" type="submit">حفظ</button>
                 </form>
             </td>

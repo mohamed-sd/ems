@@ -607,7 +607,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- شريط الأدوات: بحث + فتح/طيّ الكل (فلتر الفترة محذوف؛ الافتراضي «هذا الشهر») -->
     <div class="ctree-toolbar">
         <div class="ctree-tool ctree-search-wrap">
-            <label><i class="fas fa-search"></i> بحث</label>
+            <label for="ctreeSearch"><i class="fas fa-search"></i> بحث</label>
             <input type="text" id="ctreeSearch" placeholder="ابحث باسم/كود العميل أو المشروع أو المعدّة أو المشغّل..." autocomplete="off">
         </div>
         <div class="ctree-tool">

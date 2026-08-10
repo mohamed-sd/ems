@@ -246,13 +246,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- JS -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 
 <script>
     $(document).ready(function () {
 
         $('#projectsTable').DataTable({
-            responsive: true,
             language: {
                 url: "/ems/assets/i18n/datatables/ar.json"
             }
