@@ -66,6 +66,48 @@ echo "════════════════════════�
 echo " بوابةُ FIX-02 — القشرةُ والنظامُ التصميميُّ · " . date('Y-m-d H:i') . "\n";
 echo "══════════════════════════════════════════════════════════════════════\n\n";
 
+/* ══ AC-U0 · بنيةُ الصفحةِ سليمةٌ — لا محتوى خارجَ قالبها ══════════════════
+   ◆ عطلٌ حقيقيٌّ أحدثتُه ثم رآه المالكُ بعينه قبل أن يراه أيُّ فاحصٍ عندي:
+     تحويلٌ آليٌّ أقحم `</div>` زائدًا في `Contracts/contracts.php`، فأُغلق
+     `.main` مبكرًا وانسكب النموذجُ والبطاقةُ إلى مستوى `body`. و`body.ems-site`
+     شبكةٌ **أفقية**، فصارا عمودَين يزاحمان المحتوى: **1343 بكسلًا ← 251**.
+   ◆ ولم يكشفه شيءٌ مما بنيتُ: التركيبُ سليمٌ (PHP صحيح) · الروابطُ تعمل ·
+     الألوانُ صحيحة · صفرُ انزلاقٍ أفقيّ. **الصفحةُ تُصيَّر ويبدو كلُّ فاحصٍ
+     أخضرَ وهي مبهدَلة.**
+   ◆ فالمقياسُ الغائب: **توازنُ الوسومِ نفسُه**، مقارنًا بالحالِ المرجعيّ.
+     وإغلاقٌ زائدٌ واحدٌ يكفي لإخراجِ نصفِ الشاشةِ من قالبها.
+   ◆ ولا يُقارَن بالصفرِ المطلق: بعضُ الأسطحِ فيها اختلالٌ قديمٌ مقصودٌ أو
+     موروثٌ (`gov_reports.php` بـ16). المقياسُ **ألّا يزيدَ الاختلالُ عمّا كان**. */
+$imbalance = array();
+foreach (fix_surface_files($ROOT) as $rel) {
+    $src = (string) @file_get_contents($ROOT . '/' . $rel);
+    if ($src === '') { continue; }
+    if (strpos($src, 'class="main ') === false && strpos($src, "class='main ") === false) { continue; }
+    $open  = substr_count($src, '<div');
+    $close = substr_count($src, '</div>');
+    if ($close > $open) { $imbalance[$rel] = $close - $open; }
+}
+arsort($imbalance);
+/* الأسطحُ ذاتُ الاختلالِ الموروثِ — تُعدَّد صراحةً فلا تُخفي جديدًا. */
+$KNOWN_IMBALANCE = array(
+    'Governance/gov_reports.php'               => 16,
+    'Contracts/contracts_details.php'          => 1,
+    'Suppliers/supplierscontracts_details.php' => 1,
+);
+$newImbalance = array();
+foreach ($imbalance as $rel => $n) {
+    $was = $KNOWN_IMBALANCE[$rel] ?? 0;
+    if ($n > $was) { $newImbalance[$rel] = $n . ' (كان ' . $was . ')'; }
+}
+u('AC-U0', 'صفرُ سطحٍ يُخرج محتواه خارجَ قالبِ الصفحة',
+    'يوازن وسومَ <div> في كلِّ سطحٍ يفتح `.main` ويقارنه بالاختلالِ الموروثِ المُعدَّد',
+    'لا يقيس الوسومَ التي تُبنى بمتغيّرٍ أو حلقة — ولا يضمن صحةَ التداخل، فقط عددَه',
+    empty($newImbalance),
+    empty($newImbalance)
+        ? ('صفرُ اختلالٍ جديد · موروثٌ مُعدَّدٌ: ' . count($KNOWN_IMBALANCE) . ' سطحًا')
+        : ('اختلالٌ جديد: ' . implode(' · ', array_map(function ($f, $v) { return "{$f}: {$v}"; },
+            array_keys($newImbalance), $newImbalance))));
+
 /* ══ AC-U1 · ملفٌّ واحدٌ يُصدِر الترويسة ═══════════════════════════════════ */
 $htmlEmitters = array();
 foreach (ui_files($ROOT, array('php')) as $rel) {

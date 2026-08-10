@@ -900,12 +900,27 @@
         }
 
         function mountPicker(tb, head) {
-            var host = tb.closest('.card, .panel, .ems-table-wrap, .table-responsive') || tb.parentElement;
-            if (!host || host.querySelector('.ems-view-picker')) { return; }
+            /* ══ الإدراجُ **قبل الجدولِ نفسِه** لا في حاويةٍ بعيدة ══════════════
+               ◆ عطلٌ حقيقيٌّ أحدثتُه: كنتُ أصعد بـ`closest()` إلى أقربِ بطاقةٍ أو
+                 غلاف، وحين لا يوجد أيٌّ منها كنت أقع على `parentElement` — وقد
+                 كان في شاشةِ العقودِ عنصرًا على مستوى الجسم. و`body.ems-site`
+                 شبكةٌ **أفقية** (محتوًى + شريطٌ جانبيّ)، فصار المنتقي عنصرًا
+                 ثالثًا فيها يسرق 1004 بكسلات ويضغط المحتوى من 1357 إلى **265**.
+               ◆ القاعدة: **مكوِّنٌ يُحقن وقتَ التصييرِ يلتصق بما يخدمه**، ولا
+                 يصعد في الشجرةِ بحثًا عن حاويةٍ قد تكون قالبَ الصفحةِ كلِّها.
+               ◆ ويُرفض الإدراجُ إن كان الأبُ صفًّا مرنًا (`flex-direction: row`)
+                 أو شبكة — فذاك تخطيطُ قشرةٍ لا موضعُ محتوى. */
+            var parent = tb.parentElement;
+            if (!parent || parent === document.body) { return; }
+            var pcs = getComputedStyle(parent);
+            if ((pcs.display === 'flex' && pcs.flexDirection.indexOf('row') === 0)
+                || pcs.display === 'grid') { return; }
+            if (parent.querySelector('.ems-view-picker')) { return; }
+            var host = parent;
 
             var wrap = document.createElement('div');
             wrap.className = 'ems-view-picker';
-            wrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap';
+            wrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap;width:100%';
 
             var lab = document.createElement('label');
             lab.textContent = 'المنظر:';
