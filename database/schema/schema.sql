@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-09 20:51:53
--- الجداول: 545 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-10 04:30:17
+-- الجداول: 548 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2550,6 +2550,19 @@ CREATE TABLE `ems_job_queue` (
   KEY `idx_jq_claim` (`state`,`next_attempt_at`),
   KEY `idx_jq_company` (`company_id`,`state`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-24: «قيد المعالجة» ثم إشعار الاكتمال — والصفحة لا تتجمد أبدًا';
+
+-- ── Table: ems_post_idempotency ──
+CREATE TABLE `ems_post_idempotency` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `idem_key` char(40) NOT NULL,
+  `action_code` varchar(120) NOT NULL DEFAULT '',
+  `actor_user_id` int(11) NOT NULL DEFAULT 0,
+  `result_ref` varchar(190) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_post_idem_key` (`idem_key`),
+  KEY `idx_post_idem_action` (`action_code`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CS-07 · عطالةُ معالجاتِ POST بمفتاحٍ من محتوى الطلب';
 
 -- ── Table: ems_processed_events ──
 CREATE TABLE `ems_processed_events` (
@@ -5847,6 +5860,8 @@ CREATE TABLE `gov_authority_limits` (
   `action_codes` varchar(400) NOT NULL DEFAULT '' COMMENT 'رموزُ الأفعالِ التي يمنعها هذا الحدُّ — والفارغُ لا يمنع فعلًا بعينِه',
   `enforced_by` varchar(200) NOT NULL DEFAULT '' COMMENT '◆ المُنفِذُ الحي — والفارغُ دعوى لا قيد',
   `enforce_kind` enum('service','guard','schema','permission','manual','none') NOT NULL DEFAULT 'none',
+  `limit_kind` enum('absolute','conditional') NOT NULL DEFAULT 'conditional' COMMENT 'FN-09 · مطلقٌ يُوصَل برمزِ فعلٍ · مشروطٌ لا يُوصَل ويُفحص شرطُه في الخدمة',
+  `condition_note` varchar(300) NOT NULL DEFAULT '' COMMENT 'الشرطُ الذي يجعل الفعلَ ممنوعًا — يُفحص في الخدمةِ لا في الحارس',
   `accept_test` varchar(300) NOT NULL DEFAULT '',
   `doc_ref` varchar(24) NOT NULL DEFAULT '',
   `active` tinyint(1) NOT NULL DEFAULT 1,
@@ -5854,7 +5869,8 @@ CREATE TABLE `gov_authority_limits` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_lim` (`company_id`,`doc_code`,`code`),
-  KEY `ix_enf` (`enforce_kind`,`active`)
+  KEY `ix_enf` (`enforce_kind`,`active`),
+  CONSTRAINT `chk_gal_conditional_unwired` CHECK (`limit_kind` <> 'conditional' or `action_codes` is null or `action_codes` = '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الوثائقُ الخمس — الحدودُ الصريحةُ «ما لا يملكه» بمُنفِذِ كلٍّ';
 
 -- ── Table: gov_data_classes ──
@@ -5963,6 +5979,26 @@ CREATE TABLE `gov_doc_variance` (
   UNIQUE KEY `uq_var` (`company_id`,`variance_code`),
   KEY `ix_doc` (`doc_code`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='update0013 — مخالفاتُ الوثائقِ وحسمُها بأساسٍ مكتوبٍ يُفحص كلَّ بوابة';
+
+-- ── Table: gov_export_log ──
+CREATE TABLE `gov_export_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `exported_by` int(11) NOT NULL DEFAULT 0,
+  `actor_capacity` varchar(120) NOT NULL DEFAULT '',
+  `entity_key` varchar(64) NOT NULL DEFAULT '',
+  `screen_code` varchar(190) NOT NULL DEFAULT '',
+  `columns_text` text DEFAULT NULL,
+  `blocked_text` text DEFAULT NULL,
+  `filters_text` text DEFAULT NULL,
+  `row_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `fmt` varchar(12) NOT NULL DEFAULT 'xlsx',
+  `exported_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_gel_company_time` (`company_id`,`exported_at`),
+  KEY `idx_gel_actor` (`exported_by`,`exported_at`),
+  KEY `idx_gel_entity` (`entity_key`,`exported_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RF-03 · سجلُّ التصديرِ الحوكميِّ بتسعةِ بنودٍ ومنها المستبعَد';
 
 -- ── Table: gov_field_class ──
 CREATE TABLE `gov_field_class` (
@@ -6972,7 +7008,9 @@ CREATE TABLE `nav_items` (
   UNIQUE KEY `uq_nav_role_route` (`role_id`,`route`),
   KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
   KEY `ix_nav_group` (`group_id`),
-  KEY `ix_nav_module` (`module_id`)
+  KEY `ix_nav_module` (`module_id`),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav_redirects ──
@@ -8200,7 +8238,8 @@ CREATE TABLE `proc_stock_move` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_proc_move_company` (`company_id`),
-  KEY `idx_proc_move_item_wh` (`item_id`,`warehouse_id`)
+  KEY `idx_proc_move_item_wh` (`item_id`,`warehouse_id`),
+  CONSTRAINT `chk_psm_return_needs_ref` CHECK (`move_type` <> 'مرتجع' or `ref_type` = 'issue' and `ref_id` is not null and `ref_id` > 0 or `note` like '%legacy_no_ref%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: proc_supplier ──
@@ -12219,6 +12258,23 @@ CREATE TABLE `transfer_cost_rules` (
   KEY `ix_rule` (`company_id`,`movement_type`,`active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: transfer_delivery_docs ──
+CREATE TABLE `transfer_delivery_docs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `doc_ref` varchar(64) NOT NULL,
+  `doc_note` varchar(500) NOT NULL DEFAULT '',
+  `witness_name` varchar(160) NOT NULL DEFAULT '',
+  `delivered_at` datetime NOT NULL,
+  `created_by` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tdd_order` (`company_id`,`order_id`),
+  UNIQUE KEY `uq_tdd_ref` (`doc_ref`),
+  KEY `idx_tdd_time` (`delivered_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FN-08 · مستندُ تسليمِ أمرِ الترحيل — مرجعٌ ووقتٌ وشاهد';
+
 -- ── Table: transfer_events ──
 CREATE TABLE `transfer_events` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -12230,12 +12286,13 @@ CREATE TABLE `transfer_events` (
   `body` text DEFAULT NULL,
   `old_value` varchar(60) DEFAULT NULL,
   `new_value` varchar(60) DEFAULT NULL,
-  `sync_uuid` char(36) DEFAULT NULL,
+  `sync_uuid` varchar(120) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_te_sync_uuid` (`sync_uuid`),
   KEY `ix_order_time` (`company_id`,`order_id`,`created_at`),
   KEY `fk_ev_order` (`order_id`),
   CONSTRAINT `fk_ev_order` FOREIGN KEY (`order_id`) REFERENCES `transfer_orders` (`id`) ON DELETE CASCADE

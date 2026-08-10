@@ -228,6 +228,39 @@ neg('AC-M1', 'كاشفُ القائمةِ الفارغة — يرسب على د�
     })()
 );
 
+/* ── ⑦ AC-N1 · مِسبارُ الروابط: وجِّهْ رابطًا إلى ملفٍّ غيرِ قائمٍ وأثبتْ الرسوب ─
+   الإفسادُ هنا في **القاعدةِ لا في ملف**، ولا يمكن أن يكون بإعادةِ البادئةِ
+   النسبيةِ لأن `chk_nav_route_not_relative` صار يمنعها — وهذا في ذاته شاهدٌ
+   على أن القيدَ حيّ. فيُفسَد بالوجهةِ بدلَ الصيغة: مسارٌ سليمُ الشكلِ إلى ملفٍّ
+   غيرِ موجود. والمِسبارُ يقيس **حلَّ الرابطِ على القرص** لا شكلَه، فيجب أن يرسب. */
+neg('AC-N1', 'مِسبارُ الروابطِ الحيُّ — يرسب إن أشار رابطٌ إلى ملفٍّ غيرِ قائم',
+    function () use ($db) {
+        $row = $db->query("SELECT id, route FROM nav_items
+                            WHERE active=1 AND route LIKE '%.php' AND role_id=33 LIMIT 1")->fetch_assoc();
+        if (!$row) { throw new RuntimeException('لم يُعثر على صفِّ تنقُّلٍ للإفساد'); }
+        $id = (int) $row['id'];
+        $orig = $row['route'];
+        $db->query("UPDATE nav_items SET route='Audit/__neg_test_missing__.php' WHERE id={$id}");
+        return function () use ($db, $id, $orig) {
+            $st = $db->prepare('UPDATE nav_items SET route=? WHERE id=?');
+            $st->bind_param('si', $orig, $id);
+            $st->execute();
+            $st->close();
+        };
+    },
+    function () use ($ROOT) {
+        $out = (string) @shell_exec(escapeshellarg(PHP_BINARY) . ' '
+             . escapeshellarg($ROOT . '/tools/fix_nav_href_probe.php') . ' --role=33 --json 2>&1');
+        $j = json_decode($out, true);
+        if (!is_array($j) || !isset($j['bad'], $j['total'])) {
+            return array('ok' => false, 'evidence' => 'تعذّرت قراءةُ مخرجِ المِسبار');
+        }
+        // «٠ مكسورٍ من ٠» ليست نجاحًا — الفاحصُ يرسب على الخواء أيضًا.
+        $ok = ($j['bad'] === 0 && $j['total'] > 0 && empty($j['fatal']) && empty($j['empty']));
+        return array('ok' => $ok, 'evidence' => 'مكسور ' . $j['bad'] . ' من ' . $j['total']);
+    }
+);
+
 /* ── الحصيلة ───────────────────────────────────────────────────────────── */
 $valid = 0; $invalid = array();
 foreach ($RESULTS as $r) { if ($r['valid']) { $valid++; } else { $invalid[] = $r['code']; } }
