@@ -1753,7 +1753,7 @@ table.dataTable.no-footer { border: none !important; }
 /* ══════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════ */
-@media (max-width: 1366px) {
+@media (max-width: 1399.98px) {
     .page-title {
         font-size: 1.25rem;
     }
@@ -1769,7 +1769,7 @@ table.dataTable.no-footer { border: none !important; }
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199.98px) {
     .page-title {
         font-size: 1.15rem;
     }
@@ -1817,7 +1817,7 @@ table.dataTable.no-footer { border: none !important; }
     border: 1px solid var(--c-rgba2203838022);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .main {
         padding: 14px;
         padding-top: 80px;

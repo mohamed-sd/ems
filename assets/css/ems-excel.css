@@ -155,7 +155,7 @@
 .ems-xl-btn.ghost { background: var(--gray-200, var(--c-line-200)); color: var(--gray-700, var(--c-44403c)); }
 .ems-xl-btn.ghost:hover { background: var(--gray-300, var(--c-d6d3d1)); }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .ems-xl-cards { grid-template-columns: repeat(2, 1fr); }
   .ems-xl-steps li { font-size: 11px; }
 }

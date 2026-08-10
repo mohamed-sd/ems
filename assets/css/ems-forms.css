@@ -232,17 +232,17 @@
     flex-basis: 100% !important;
     flex-grow: 1 !important;
 }
-@media (min-width: 992px) and (max-width: 1366px) {
+@media (min-width: 992px) and (max-width: 1399.98px) {
     :is(.allforms, .ems-form) .form-grid > * {
         flex-basis: calc((100% - 42px) / 4) !important;   /* 4 أعمدة (3 فجوات) */
     }
 }
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
     :is(.allforms, .ems-form) .form-grid > * {
         flex-basis: calc((100% - 14px) / 2) !important;   /* عمودان (فجوة واحدة) */
     }
 }
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
     :is(.allforms, .ems-form) .form-grid > * {
         flex-basis: 100% !important;                       /* عمود واحد */
     }
@@ -569,7 +569,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
 }
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
     :is(.allforms, .ems-form) .form-grid-modal {
         grid-template-columns: 1fr;
     }

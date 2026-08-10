@@ -497,7 +497,7 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
 }
 
 /* ========== MOBILE RESPONSIVE ========== */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .display thead th,
     .modern-table thead th,
     .contracts-table thead th {
@@ -756,7 +756,7 @@ body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
   color: var(--c-111111) !important;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   body.ems-site .dataTables_wrapper :is(.dataTables_filter, .dataTables_length) {
     width: 100% !important;
     margin-bottom: 6px !important;
@@ -1097,7 +1097,7 @@ body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.clos
 }
 
 /* موبايل: الأزرار تأخذ سطراً كاملاً */
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   body.ems-site .main .filter .filter-field { flex: 1 1 100% !important; }
   body.ems-site .main .filter .filter-actions { width: 100% !important; justify-content: flex-start !important; }
 }

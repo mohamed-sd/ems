@@ -172,7 +172,7 @@
 .ems-journey-banner .ems-jb-action:hover { background: var(--brand-orange-bright, var(--c-e67e00)); color: var(--c-surface); }
 
 /* ── الهاتف: المراحل قائمةً رأسيةً والحرجُ مقروء ──────────────────────── */
-@media (max-width: 720px) {
+@media (max-width: 767.98px) {
     .ems-journey-track { display: block; overflow-x: visible; }
     .ems-jstep {
         display: flex;

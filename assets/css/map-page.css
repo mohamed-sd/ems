@@ -364,16 +364,16 @@
 /* ============================================================
    استجابة
    ============================================================ */
-@media (max-width: 1100px) {
+@media (max-width: 1199.98px) {
   .movement-map-page .stats-row { grid-template-columns: repeat(3, 1fr); }
 }
-@media (max-width: 760px) {
+@media (max-width: 767.98px) {
   .movement-map-page .stats-row { grid-template-columns: repeat(2, 1fr); }
   .movement-map-page .eq-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .movement-map-page .mss-item { font-size: 11px; }
   .movement-map-page .mss-n { font-size: 18px; }
 }
-@media (max-width: 480px) {
+@media (max-width: 575.98px) {
   .movement-map-page .stats-row { grid-template-columns: 1fr 1fr; }
   .movement-map-page .tt-box { width: 200px; }
 }

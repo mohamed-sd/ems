@@ -326,7 +326,7 @@ textarea:focus,
   font-size: 12px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 991.98px) {
   .admin-dashboard-brand .brand-hero {
     flex-direction: column;
     align-items: flex-start;

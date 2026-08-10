@@ -436,21 +436,21 @@ samp,
 }
 
 /* Layout target: 3 fields per row on laptop screens */
-@media (min-width: 992px) and (max-width: 1366px) {
+@media (min-width: 992px) and (max-width: 1399.98px) {
   .contracts-main .form-grid,
   .supplier-contracts-main .form-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   .contracts-main .form-grid,
   .supplier-contracts-main .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .contracts-main .form-grid,
   .supplier-contracts-main .form-grid {
     grid-template-columns: 1fr;
@@ -579,7 +579,7 @@ samp,
   border: 1px dashed var(--c-rgba25118210022);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 991.98px) {
   .contracts-main .totals,
   .supplier-contracts-main .totals {
     grid-template-columns: 1fr;
@@ -920,7 +920,7 @@ samp,
   visibility: visible;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .ems-site .sidebar:not(.closed) .nav-count-badge {
     position: static;
     top: auto;
@@ -983,7 +983,7 @@ samp,
 }
 
 /* Desktop collapsed mode: center actions and preserve quick scanability. */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .ems-site .sidebar.closed ul li a {
     justify-content: center;
     padding-right: 0;
@@ -1022,7 +1022,7 @@ samp,
 }
 
 /* Mobile sidebar as an off-canvas layer to keep content performance stable. */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-site {
     flex-direction: column;
   }
@@ -1120,7 +1120,7 @@ samp,
   }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .ems-site .mobile-menu-btn {
     display: none;
   }
@@ -1773,7 +1773,7 @@ table.d-bd {
 }
 
 /* ── DASHBOARD RESPONSIVE ── */
-@media (max-width: 960px) {
+@media (max-width: 991.98px) {
   .d-body { grid-template-columns: 1fr; overflow: visible; }
   .dash   { height: auto; overflow: visible; }
   .d-left { overflow: visible; }
@@ -1793,7 +1793,7 @@ table.d-bd {
   .d-chart-wrap { height: 200px; }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 575.98px) {
   .d-tiles { grid-template-columns: 1fr 1fr; }
   .d-top-mid .d-badge:not(.d-badge-role) { display: none; }
   .d-hero-deco { display: none; }
@@ -2065,13 +2065,13 @@ table.d-bd {
 }
 
 /* ── Responsive ── */
-@media (max-width: 980px) {
+@media (max-width: 991.98px) {
   .timesheet-type-page .ts-type-cards { grid-template-columns: repeat(2, 1fr); }
   .timesheet-type-page .tst-steps { grid-template-columns: 1fr; }
   .timesheet-type-page .tst-step + .tst-step { border-right: 0; padding-right: 0; }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767.98px) {
   .timesheet-type-page .ts-type-cards { grid-template-columns: 1fr; }
   .timesheet-type-page .tst-hero { flex-direction: column-reverse; text-align: center; }
   .timesheet-type-page .tst-hero-sub { margin-inline: auto; }
@@ -3293,7 +3293,7 @@ table.d-bd {
   margin-bottom: 10px;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   .movement-map-page .mines-grid {
     grid-template-columns: 1fr;
   }
@@ -3309,7 +3309,7 @@ table.d-bd {
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 991.98px) {
   .movement-page .ems-hero,
   .movement-map-page .map-header,
   .movement-topbar {
@@ -4061,7 +4061,7 @@ table.d-bd {
 }
 
 /* ── CHAT RESPONSIVE ── */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .contacts-panel             { width: 100%; min-width: unset; display: none; }
   .contacts-panel.mobile-show { display: flex; }
   .chat-panel                 { display: flex; }
@@ -4462,7 +4462,7 @@ table.d-bd {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .equipments-fleet-main .filters-grid { grid-template-columns: 1fr; }
   .equipments-fleet-main .filters-header { flex-direction: column; align-items: stretch; gap: 12px; }
   .equipments-fleet-main .btn-clear-filters { width: 100%; justify-content: center; }
@@ -4656,7 +4656,7 @@ table.d-bd {
   color: var(--err);
 }
 
-@media (max-width: 920px) {
+@media (max-width: 991.98px) {
   .equipments-fleet-main .page-header {
     flex-direction: column;
     align-items: stretch;
@@ -4835,13 +4835,13 @@ table.d-bd {
   line-height: 1.3;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1199.98px) {
   .fc-stats { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
 }
-@media (max-width: 700px) {
+@media (max-width: 767.98px) {
   .fc-stats { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
 }
-@media (max-width: 480px) {
+@media (max-width: 575.98px) {
   .fc-stats { grid-template-columns: 1fr; }
 }
 
@@ -5252,7 +5252,7 @@ table.d-bd {
   color: var(--dark-blue, var(--c-brand-navy));
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-about__body { padding-inline-start: 0; }
   .ems-about__steps li { flex: 1 1 100%; }
 }
@@ -5501,7 +5501,7 @@ table.d-bd {
   color: var(--c-surface);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .project-users-main .pu-rolescope__body { grid-template-columns: 1fr; max-height: 220px; }
 }
 
@@ -5715,7 +5715,7 @@ table.d-bd {
   unicode-bidi: isolate;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -5755,7 +5755,7 @@ table.d-bd {
   margin-bottom: 1px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-unified-page-shell {
     padding: 10px;
     gap: 10px;
@@ -5926,7 +5926,7 @@ table.d-bd {
   border-color: var(--c-rgba24419766048);
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   .main .allheaders {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -6463,7 +6463,7 @@ table.d-bd {
   font-family: 'Tajawal', 'Cairo', sans-serif;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 991.98px) {
   .suppliers-main .page-header {
     flex-direction: column;
     align-items: stretch;
@@ -7032,12 +7032,12 @@ table.d-bd {
 }
 
 /* --- Responsive collapse (flex min-widths do most of the work) -- */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-dmodal__title { min-width: 0; gap: 12px; padding: 6px 10px 6px 6px; }
   .ems-dmodal__title-text { font-size: .9rem; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 575.98px) {
   .ems-dmodal__grid .ems-dcard,
   .ems-dmodal__grid .ems-dcard--w-sm,
   .ems-dmodal__grid .ems-dcard--w-md,
@@ -7340,7 +7340,7 @@ table.d-bd {
   font-weight: 700;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 991.98px) {
   .projects-main .page-header.projects-header-shell {
     flex-direction: column;
     align-items: stretch;
@@ -8428,7 +8428,7 @@ table.d-bd {
   border-right: 3px solid var(--success);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .contracts-details-page .page-wrapper { padding: 16px 12px; }
   .contracts-details-page .page-hero { padding: 24px 20px; border-radius: var(--radius-md); }
   .contracts-details-page .hero-title { font-size: 20px; }
@@ -8445,7 +8445,7 @@ table.d-bd {
   .contracts-details-page .modern-table tbody td { padding: 10px 10px; font-size: 12.5px; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 575.98px) {
   .contracts-details-page .cards-grid { grid-template-columns: 1fr; }
   .contracts-details-page .detail-grid { grid-template-columns: 1fr; padding: 14px; }
   .contracts-details-page .back-btn { padding: 8px 14px; font-size: 13px; }
@@ -8681,7 +8681,7 @@ table.d-bd {
   font-weight: 800 !important;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   .ems-site .main .page-header.allheaders {
     overflow-x: auto !important;
     overflow-y: hidden !important;
@@ -8853,7 +8853,7 @@ table.d-bd {
   flex-wrap: wrap !important;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   .ems-site .main .header {
     grid-template-columns: 1fr !important;
     gap: 8px !important;
@@ -9061,7 +9061,7 @@ body.ems-site .main .main_head .head_back:has(> .ems-head-circle:only-child) {
   border-radius: 50% !important;
 }
 
-@media (max-width: 991px){
+@media (max-width: 991.98px){
   .main_head{
     grid-template-columns: 1fr;
     gap: 8px;
@@ -9088,7 +9088,7 @@ body.ems-site .main .main_head .head_back:has(> .ems-head-circle:only-child) {
   }
 }
 
-@media (max-width: 640px){
+@media (max-width: 767.98px){
   .main_head .head_actions{
     overflow-x: auto;
     flex-wrap: nowrap;
@@ -9306,14 +9306,14 @@ body.ems-site .main .main_head .head_back:has(> .ems-head-circle:only-child) {
   }
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1199.98px) {
   .activity-logs-main .role-card-wrap {
     flex-basis: calc(50% - 10px);
     max-width: calc(50% - 7px);
   }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 575.98px) {
   .activity-logs-main .activity-role-banner {
     align-items: flex-start;
     flex-wrap: wrap;
@@ -9839,7 +9839,7 @@ body.ems-site {
   color: var(--white) !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-site .main .header,
   .ems-site .main .page-header,
   .ems-site .main .main_head,
@@ -10161,7 +10161,7 @@ body.ems-site {
   border: 1px solid var(--c-d1d5db);
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
   .driver-profile-page .id-grid {
     grid-template-columns: 1fr;
   }
@@ -10698,11 +10698,11 @@ body.ems-site {
   color: var(--c-surface);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199.98px) {
   .hours-approval-followup-main .quick-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .hours-approval-main .page-wrapper,
   .hours-approval-followup-main .page-wrapper,
   .timesheet-daily-main { padding: 10px; }
@@ -10710,7 +10710,7 @@ body.ems-site {
   .hours-approval-main .approval-steps { display: none; }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .hours-approval-followup-main .quick-stats { grid-template-columns: 1fr; }
   .hours-approval-followup-main .filters-wrap .fg { min-width: 100%; flex: 1 1 100%; }
   .hours-approval-followup-main .filters-wrap .btns { width: 100%; }
@@ -10854,7 +10854,7 @@ body.ems-site {
   margin-top: 1.5rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .fleet-failures-main .summary-card { min-height: 96px; }
   .fleet-failures-main .search-toolbar .search-input-wrap { max-width: 100%; }
   .driver-report-main .driver-table-wrap { padding: .8rem; }
@@ -11961,13 +11961,13 @@ body.ems-site:has(.ems-dash) {
 .ems-chip2 i { color: var(--gold); font-size: .68rem; }
 
 /* ─── Responsive ─── */
-@media (max-width: 1024px) {
+@media (max-width: 1199.98px) {
   .ems-hero { grid-template-columns: 1fr; gap: 1.25rem; }
   .ems-charts { grid-template-columns: 1fr; }
   .ems-chart-card.wide { grid-column: span 1; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-hero { padding: 1.25rem; }
   .ems-body { padding: 1rem 1.25rem 2rem; }
   .ems-nav { padding: 0 1rem; height: 54px; }
@@ -11977,7 +11977,7 @@ body.ems-site:has(.ems-dash) {
   .ems-links { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 575.98px) {
   .ems-nav-clock { display: none; }
   .ems-kpi-grid { grid-template-columns: 1fr 1fr; }
   .ems-stats { grid-template-columns: 1fr 1fr; }
@@ -12434,7 +12434,7 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-
   flex-wrap: wrap !important;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
     grid-template-columns: 1fr !important;
     gap: 9px !important;
@@ -12458,7 +12458,7 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions) {
     overflow-x: auto !important;
     flex-wrap: nowrap !important;
@@ -12582,7 +12582,7 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .a
 }
 
 
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
   body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
     grid-template-columns: 1fr !important;
   }
@@ -12996,7 +12996,7 @@ body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip
   color: var(--ems-ui-info-text) !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting,
   body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc,
   body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc,
@@ -13192,7 +13192,7 @@ a.ems-topbar-icon.ems-topbar-icon--power:hover {
   line-height: 1;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 991.98px) {
   .ems-topbar {
     grid-template-columns: auto 1fr auto;
     padding: 0 10px;

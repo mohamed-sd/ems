@@ -453,7 +453,7 @@ table {
 }
 
 /* ================== Responsive Sidebar ================== */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   body {
     flex-direction: column;
   }
@@ -534,7 +534,7 @@ table {
 
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .mobile-menu-btn {
     display: none;
   }
@@ -831,7 +831,7 @@ label {
   background-color: var(--c-fff8e8);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .ems-top-action-btn {
     min-height: 40px;
     padding: 8px 12px;

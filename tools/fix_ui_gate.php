@@ -293,7 +293,11 @@ u('AC-U9', 'صفرُ إعلانِ اتجاهٍ من اليسارِ في الشر
 /* ══ AC-U11 · خمسُ نقاطِ كسر ══════════════════════════════════════════════ */
 $bp = array();
 foreach (ui_files($ROOT, array('css')) as $rel) {
-    $src = (string) @file_get_contents($ROOT . '/' . $rel);
+    /* ◆ المكتباتُ مستثناةٌ كما في AC-U2: بوتستراب يعرّف حدودَه ولا نحرّرها. */
+    $isV = false;
+    foreach ($VENDOR_CSS as $v) { if (stripos($rel, $v) !== false) { $isV = true; break; } }
+    if ($isV) { continue; }
+    $src = preg_replace('#/\*.*?\*/#su', '', (string) @file_get_contents($ROOT . '/' . $rel));
     if (preg_match_all('/@media[^{]*?\(\s*(?:min|max)-width\s*:\s*(\d+)\s*px/i', $src, $m)) {
         foreach ($m[1] as $px) { $bp[(int) $px] = ($bp[(int) $px] ?? 0) + 1; }
     }

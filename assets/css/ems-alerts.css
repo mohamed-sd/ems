@@ -243,7 +243,7 @@
 }
 
 /* ── الجوال: بطاقةٌ بعرض الشاشة تحت الشريط ──────────────────────────── */
-@media (max-width: 640px) {
+@media (max-width: 767.98px) {
   .ems-toast-host { padding: 0 10px; gap: 8px; }
   .ems-toast { width: 100%; padding: 11px 12px; }
   .ems-toast__text { font-size: .82rem; }

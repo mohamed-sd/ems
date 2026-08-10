@@ -168,11 +168,11 @@
 .ems-col-12 { grid-column: span 12; } .ems-col-9 { grid-column: span 9; }
 .ems-col-8 { grid-column: span 8; }  .ems-col-6 { grid-column: span 6; }
 .ems-col-4 { grid-column: span 4; }  .ems-col-3 { grid-column: span 3; }
-@media (max-width: 1024px) {
+@media (max-width: 1199.98px) {
     .ems-col-3, .ems-col-4 { grid-column: span 6; }
     .ems-col-6, .ems-col-8, .ems-col-9 { grid-column: span 12; }
 }
-@media (max-width: 640px) { .ems-grid > * { grid-column: span 12; } }
+@media (max-width: 767.98px) { .ems-grid > * { grid-column: span 12; } }
 .ems-card { background: var(--c-surface); border: 1px solid var(--c-e5e7eb); border-radius: 12px; padding: var(--ems-sp-5) var(--ems-sp-6); }
 
 /* صفر تمرير أفقي للصفحة على 1280 فأعلى (UXR-0044): العريض يمرَّر داخل حاويته */
