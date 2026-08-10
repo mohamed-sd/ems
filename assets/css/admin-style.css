@@ -3,7 +3,7 @@
   @import url('/ems/assets/css/local-fonts.css');
 
   :root {
-      --border-color: #e0e0e0;
+      --border-color: var(--c-e0e0e0);
   }
 
   * {
@@ -25,32 +25,32 @@
       min-height: 40px !important;
       padding: 9px 18px !important;
       border-radius: 999px !important;
-      border: 1.5px solid rgba(26, 26, 26, 0.16) !important;
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a) !important;
-      color: #ffffff !important;
+      border: 1.5px solid var(--c-rgba262626016) !important;
+      background: linear-gradient(135deg, var(--c-1a1a1a), var(--c-2a2a2a)) !important;
+      color: var(--c-surface) !important;
       font-size: 0.84rem !important;
       font-weight: 700 !important;
       text-decoration: none !important;
       white-space: nowrap !important;
       cursor: pointer !important;
-      box-shadow: 0 4px 14px rgba(26, 26, 26, 0.22) !important;
+      box-shadow: 0 4px 14px var(--c-rgba262626022) !important;
       transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
     }
 
     a.back-btn i,
     a.btn-back i,
     a.back i {
-      color: #e5a82e !important;
+      color: var(--c-e5a82e) !important;
       transition: transform 0.2s ease !important;
     }
 
     a.back-btn:hover,
     a.btn-back:hover,
     a.back:hover {
-      background: linear-gradient(135deg, #242424, #343434) !important;
-      color: #ffffff !important;
+      background: linear-gradient(135deg, var(--c-242424), var(--c-343434)) !important;
+      color: var(--c-surface) !important;
       transform: translateY(-1px) !important;
-      box-shadow: 0 8px 20px rgba(26, 26, 26, 0.28) !important;
+      box-shadow: 0 8px 20px var(--c-rgba262626028) !important;
     }
 
     a.back-btn:hover i,

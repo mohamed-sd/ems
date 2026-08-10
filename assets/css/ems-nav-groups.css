@@ -40,7 +40,7 @@
      حجمُ النصّ المرئيّ 0.86rem على .nav-group-name كما في الروابط المفردة. */
   font-size: inherit;
   font-weight: 700;
-  color: #555;
+  color: var(--c-555555);
   cursor: pointer;
   text-align: inherit;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -56,7 +56,7 @@
   text-align: center;
   /* نفس درجة رمادي أيقونات الروابط المفردة حرفيًّا (#4b5563 لا #6b7280)
      كي لا يتمايز صفّان في الشريط المطويّ بفارقِ درجةٍ لا معنى له. */
-  color: #4b5563 !important;
+  color: var(--c-4b5563) !important;
   margin-left: 10px;
   flex-shrink: 0;
   transition: color 0.2s ease, transform 0.2s ease;
@@ -74,13 +74,13 @@
 
 /* نفس شدّة خلفية التحويم في بقية الشريط (0.14 هي القاعدة الأخيرة الفائزة) */
 .ems-site .sidebar .nav-group-head:hover {
-  background: rgba(244, 197, 66, 0.14);
-  color: #1f1f1f;
+  background: var(--c-rgba24419766014);
+  color: var(--c-ink-900);
 }
 
 /* نفس ذهبيّ التحويم في بقية الشريط (--yellow-deep = #E0AE2E) لا #F4C542 */
 .ems-site .sidebar .nav-group-head:hover > i {
-  color: #E0AE2E !important;
+  color: var(--c-e0ae2e) !important;
   transform: translateY(-1px);
 }
 
@@ -92,7 +92,7 @@
   bottom: 8px;
   width: 3px;
   border-radius: 999px;
-  background: #F4C542;
+  background: var(--c-brand-gold);
   opacity: 0;
   transform: scaleY(0.25);
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -108,16 +108,16 @@
    أن الكل مطويّ، ولولا ذلك لَما عرف المستخدم أين هو. */
 .ems-site .sidebar li.nav-group.has-active > .nav-group-head,
 .ems-site .sidebar li.nav-group.has-active > .nav-group-head .nav-group-name {
-  color: #E0AE2E;
+  color: var(--c-e0ae2e);
 }
 
 .ems-site .sidebar li.nav-group.has-active > .nav-group-head > i:first-child {
-  color: #E0AE2E !important;
+  color: var(--c-e0ae2e) !important;
 }
 
 /* المجموعة التي تقود بلاطات الوصول السريع حاليًّا */
 .ems-site .sidebar li.nav-group.is-selected > .nav-group-head {
-  background: rgba(244, 197, 66, 0.16);
+  background: var(--c-rgba24419766016);
 }
 
 /* ── ③ سهم الطيّ ────────────────────────────────────────────────────────── */
@@ -127,14 +127,14 @@
   width: auto;
   margin: 0;
   font-size: 0.7rem;
-  color: #9ca3af !important;   /* السهم أيضًا <i> فيقع تحت الـ!important نفسه */
+  color: var(--c-9ca3af) !important;   /* السهم أيضًا <i> فيقع تحت الـ!important نفسه */
   flex-shrink: 0;
   transition: transform 0.25s ease, color 0.2s ease;
 }
 
 .ems-site .sidebar li.nav-group.open > .nav-group-head > i.nav-group-caret {
   transform: rotate(180deg);
-  color: #E0AE2E !important;
+  color: var(--c-e0ae2e) !important;
 }
 
 /* ── ④ القائمة المنسدلة ─────────────────────────────────────────────────── */
@@ -219,7 +219,7 @@
 }
 .ems-site .sidebar .nav-subhead span {
   display: block;
-  border-bottom: 1px dashed rgba(255, 255, 255, .18);
+  border-bottom: 1px dashed var(--c-rgba255255255018);
   padding-bottom: 3px;
 }
 /* السايدبار المطويّ: الفاصل نصٌّ محض فلا معنى له — يُزال من التدفّق */

@@ -9,43 +9,43 @@
 
 /* رموز الهوية — مقصورة على حاوية الصفحة فقط */
 .movement-map-page {
-  --mp-ink:        #0F1115;
-  --mp-ink-2:      #1C2026;
-  --mp-gold:       #F2AA2A;
-  --mp-gold-deep:  #E0921A;
-  --mp-orange:     #F7931A;
-  --mp-cream:      #FFF5E8;
-  --mp-green:      #5B7F1E;
-  --mp-green-soft: #6E9A28;
-  --mp-red:        #991B1B;
-  --mp-red-soft:   #B23232;
-  --mp-info:       #475569;
-  --mp-plum:       #6B4E8F;
+  --mp-ink:        var(--c-ink-950);
+  --mp-ink-2:      var(--c-1c2026);
+  --mp-gold:       var(--c-f2aa2a);
+  --mp-gold-deep:  var(--c-e0921a);
+  --mp-orange:     var(--c-f7931a);
+  --mp-cream:      var(--c-fff5e8);
+  --mp-green:      var(--c-5b7f1e);
+  --mp-green-soft: var(--c-6e9a28);
+  --mp-red:        var(--c-991b1b);
+  --mp-red-soft:   var(--c-b23232);
+  --mp-info:       var(--c-ink-600);
+  --mp-plum:       var(--c-6b4e8f);
 
-  --mp-bg:         #F5F1E8;
-  --mp-bg-2:       #EFEADF;
-  --mp-surface:    #FFFFFF;
-  --mp-surface-2:  #FBF8F2;
-  --mp-line:       rgba(15,17,21,.08);
-  --mp-line-2:     rgba(15,17,21,.05);
+  --mp-bg:         var(--c-f5f1e8);
+  --mp-bg-2:       var(--c-efeadf);
+  --mp-surface:    var(--c-surface);
+  --mp-surface-2:  var(--c-fbf8f2);
+  --mp-line:       var(--c-rgba151721008);
+  --mp-line-2:     var(--c-rgba151721005);
 
-  --mp-t-1: #14171C;
-  --mp-t-2: #5A5750;
-  --mp-t-3: #8A867C;
+  --mp-t-1: var(--c-14171c);
+  --mp-t-2: var(--c-5a5750);
+  --mp-t-3: var(--c-8a867c);
 
-  --mp-green-tint: rgba(91,127,30,.10);
-  --mp-green-line: rgba(91,127,30,.28);
-  --mp-red-tint:   rgba(153,27,27,.07);
-  --mp-red-line:   rgba(153,27,27,.24);
-  --mp-gold-tint:  rgba(242,170,42,.12);
-  --mp-gold-line:  rgba(242,170,42,.40);
+  --mp-green-tint: var(--c-rgba911273001);
+  --mp-green-line: var(--c-rgba9112730028);
+  --mp-red-tint:   var(--c-rgba1532727007);
+  --mp-red-line:   var(--c-rgba1532727024);
+  --mp-gold-tint:  var(--c-rgba24217042012);
+  --mp-gold-line:  var(--c-rgba2421704204);
 
   --mp-r-6: 6px; --mp-r-8: 8px; --mp-r-12: 12px; --mp-r-16: 16px; --mp-r-20: 20px;
 
-  --mp-sh-1: 0 1px 2px rgba(15,17,21,.04);
-  --mp-sh-2: 0 1px 2px rgba(15,17,21,.05), 0 10px 26px -16px rgba(15,17,21,.20);
-  --mp-sh-3: 0 2px 6px rgba(15,17,21,.06), 0 20px 48px -22px rgba(15,17,21,.30);
-  --mp-sh-tt: 0 10px 40px -8px rgba(15,17,21,.45), 0 2px 8px rgba(15,17,21,.30);
+  --mp-sh-1: 0 1px 2px var(--c-rgba151721004);
+  --mp-sh-2: 0 1px 2px var(--c-rgba151721005), 0 10px 26px -16px var(--c-rgba15172102);
+  --mp-sh-3: 0 2px 6px var(--c-rgba151721006), 0 20px 48px -22px var(--c-rgba15172103);
+  --mp-sh-tt: 0 10px 40px -8px var(--c-rgba151721045), 0 2px 8px var(--c-rgba15172103);
 
   --mp-s-1:4px; --mp-s-2:8px; --mp-s-3:12px; --mp-s-4:16px; --mp-s-5:20px;
   --mp-s-6:24px; --mp-s-8:32px; --mp-s-10:40px; --mp-s-12:48px; --mp-s-16:64px;
@@ -54,7 +54,7 @@
 
   /* خلفية الصفحة الدافئة (لا نلمس .main العام — نطبّقها على جذر الشاشة فقط) */
   background:
-    radial-gradient(1200px 600px at 90% -10%, rgba(242,170,42,.07), transparent 60%),
+    radial-gradient(1200px 600px at 90% -10%, var(--c-rgba24217042007), transparent 60%),
     var(--mp-bg);
   /* هامش حول المحتوى الرئيسي (آمن: .main يستخدم flex لا margin للسايدبار) */
   margin: 15px;
@@ -104,10 +104,10 @@
   box-shadow: none;
 }
 .movement-map-page .stat-tile-icon.c-gold   { background: var(--mp-gold-tint);            color: var(--mp-gold-deep); }
-.movement-map-page .stat-tile-icon.c-blue   { background: rgba(71,85,105,.12);            color: var(--mp-info); }
+.movement-map-page .stat-tile-icon.c-blue   { background: var(--c-rgba7185105012);            color: var(--mp-info); }
 .movement-map-page .stat-tile-icon.c-green  { background: var(--mp-green-tint);           color: var(--mp-green); }
 .movement-map-page .stat-tile-icon.c-red    { background: var(--mp-red-tint);             color: var(--mp-red); }
-.movement-map-page .stat-tile-icon.c-purple { background: rgba(107,78,143,.12);           color: var(--mp-plum); }
+.movement-map-page .stat-tile-icon.c-purple { background: var(--c-rgba10778143012);           color: var(--mp-plum); }
 .movement-map-page .stat-tile-val { font-size: 30px; font-weight: 800; color: var(--mp-ink); line-height: 1; letter-spacing: -.5px; }
 .movement-map-page .stat-tile-lbl { font-size: 13px; font-weight: 600; color: var(--mp-t-2); margin-top: 5px; }
 .movement-map-page .slow-spin { animation: mpSpin 4.5s linear infinite; }
@@ -150,7 +150,7 @@
   --mp-accent: var(--mp-gold);
   --mp-accent-deep: var(--mp-gold-deep);
 }
-.movement-map-page .mine-card.mine-accent-0 { --mp-accent:#F2AA2A; --mp-accent-deep:#E0921A; }
+.movement-map-page .mine-card.mine-accent-0 { --mp-accent:var(--c-f2aa2a); --mp-accent-deep:var(--c-e0921a); }
 .movement-map-page .mine-card.mine-accent-1 { --mp-accent:oklch(.60 .11 215); --mp-accent-deep:oklch(.52 .11 215); }
 .movement-map-page .mine-card.mine-accent-2 { --mp-accent:oklch(.55 .13 285); --mp-accent-deep:oklch(.48 .13 285); }
 .movement-map-page .mine-card.mine-accent-3 { --mp-accent:oklch(.58 .13 350); --mp-accent-deep:oklch(.50 .13 350); }
@@ -182,7 +182,7 @@
 .movement-map-page .mine-hdr-icon {
   width: 46px; height: 46px; border-radius: var(--mp-r-12); flex: none;
   background: linear-gradient(150deg, var(--mp-accent), var(--mp-accent-deep));
-  color: #fff; display: grid; place-items: center; font-size: 19px;
+  color: var(--c-surface); display: grid; place-items: center; font-size: 19px;
   box-shadow: 0 6px 14px -8px var(--mp-accent);
 }
 .movement-map-page .mine-card.mine-accent-0 .mine-hdr-icon { color: var(--mp-ink); }
@@ -259,7 +259,7 @@
   box-shadow: 0 0 0 4px var(--mp-st-tint);
 }
 .movement-map-page .eq-card.working .eq-status-dot { animation: mpDotPulse 2.4s var(--mp-ease) infinite; }
-@keyframes mpDotPulse { 0%,100% { box-shadow: 0 0 0 4px var(--mp-st-tint); } 50% { box-shadow: 0 0 0 7px rgba(91,127,30,.05); } }
+@keyframes mpDotPulse { 0%,100% { box-shadow: 0 0 0 4px var(--mp-st-tint); } 50% { box-shadow: 0 0 0 7px var(--c-rgba9112730005); } }
 
 .movement-map-page .eq-inner { padding: 0; }
 .movement-map-page .eq-card .eq-top-bar { height: 4px; border-radius: var(--mp-r-16) var(--mp-r-16) 0 0; background: var(--mp-st); opacity: .9; }
@@ -285,7 +285,7 @@
   border: 2px solid var(--mp-surface); transition: .16s var(--mp-ease);
 }
 .movement-map-page .op-av:hover { transform: translateY(-2px) scale(1.06); z-index: 6; }
-.movement-map-page .op-av.active { background: linear-gradient(150deg, var(--mp-ink-2), var(--mp-ink)); color: var(--mp-gold); border-color: var(--mp-surface); box-shadow: 0 4px 10px -4px rgba(15,17,21,.5); }
+.movement-map-page .op-av.active { background: linear-gradient(150deg, var(--mp-ink-2), var(--mp-ink)); color: var(--mp-gold); border-color: var(--mp-surface); box-shadow: 0 4px 10px -4px var(--c-rgba15172105); }
 .movement-map-page .op-av .op-avatar-icon { font-size: 14px; }
 .movement-map-page .op-av.reserve {
   background: repeating-linear-gradient(45deg, var(--mp-bg-2), var(--mp-bg-2) 4px, var(--mp-surface) 4px, var(--mp-surface) 8px);
@@ -338,7 +338,7 @@
   position: absolute; bottom: calc(100% + 12px); inset-inline-end: 50%;
   transform: translateX(50%) translateY(6px); width: 248px; max-width: 320px; min-width: 0; z-index: 99999;
   background: linear-gradient(180deg, var(--mp-ink-2), var(--mp-ink));
-  border: 1px solid rgba(242,170,42,.22); border-radius: var(--mp-r-12);
+  border: 1px solid var(--c-rgba24217042022); border-radius: var(--mp-r-12);
   box-shadow: var(--mp-sh-tt); padding: 13px 14px;
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity .16s var(--mp-ease), transform .16s var(--mp-ease);
@@ -353,13 +353,13 @@
 .movement-map-page .tt-box.tt-below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--mp-ink-2); }
 .movement-map-page .tt-title {
   display: flex; align-items: center; gap: 8px;
-  font-size: 14px; font-weight: 800; color: #E0921A;
-  padding-bottom: 9px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.10);
+  font-size: 14px; font-weight: 800; color: var(--c-e0921a);
+  padding-bottom: 9px; margin-bottom: 8px; border-bottom: 1px solid var(--c-rgba25525525501);
 }
 .movement-map-page .tt-title i { font-size: 13px; }
 .movement-map-page .tt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 3.5px 0; grid-template-columns: none; }
-.movement-map-page .tt-k { font-size: 12px; font-weight: 600; color: #ffffff !important; }
-.movement-map-page .tt-v { font-size: 12.5px; font-weight: 700; color: #ccc !important;  text-align: start; }
+.movement-map-page .tt-k { font-size: 12px; font-weight: 600; color: var(--c-surface) !important; }
+.movement-map-page .tt-v { font-size: 12.5px; font-weight: 700; color: var(--c-cccccc) !important;  text-align: start; }
 
 /* ============================================================
    استجابة

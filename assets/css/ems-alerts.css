@@ -17,7 +17,7 @@
 
 :root {
   --ems-alert-radius: 12px;
-  --ems-alert-shadow: 0 10px 30px rgba(15, 17, 21, .14), 0 2px 6px rgba(15, 17, 21, .06);
+  --ems-alert-shadow: 0 10px 30px var(--c-rgba151721014), 0 2px 6px var(--c-rgba151721006);
   --ems-alert-z: 100000;
 }
 
@@ -45,9 +45,9 @@
   align-items: flex-start;
   gap: 12px;
   padding: 12px 14px;
-  background: var(--white, #fff);
-  border: 1px solid var(--gray-200, #E7E5E4);
-  border-inline-start: 4px solid var(--ems-tone, #475569);
+  background: var(--white, var(--c-surface));
+  border: 1px solid var(--gray-200, var(--c-line-200));
+  border-inline-start: 4px solid var(--ems-tone, var(--c-ink-600));
   border-radius: var(--ems-alert-radius);
   box-shadow: var(--ems-alert-shadow);
   font-family: var(--font-ar, inherit);
@@ -61,8 +61,8 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--ems-tone-soft, #E5E8EE);
-  color: var(--ems-tone, #475569);
+  background: var(--ems-tone-soft, var(--c-e5e8ee));
+  color: var(--ems-tone, var(--c-ink-600));
   font-size: 14px;
   line-height: 1;
 }
@@ -79,7 +79,7 @@
   margin: 0 0 2px;
   font-size: .88rem;
   font-weight: 800;
-  color: var(--ems-tone-deep, #334155);
+  color: var(--ems-tone-deep, var(--c-334155));
   line-height: 1.35;
 }
 
@@ -87,7 +87,7 @@
   margin: 0;
   font-size: .86rem;
   font-weight: 600;
-  color: var(--gray-700, #44403C);
+  color: var(--gray-700, var(--c-44403c));
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
@@ -97,7 +97,7 @@
   margin: 4px 0 0;
   font-size: .8rem;
   font-weight: 600;
-  color: var(--gray-500, #78716C);
+  color: var(--gray-500, var(--c-78716c));
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -110,9 +110,9 @@
   margin-top: 6px;
   padding: 2px 8px;
   border-radius: 5px;
-  background: var(--gray-100, #F5F5F4);
-  border: 1px solid var(--gray-200, #E7E5E4);
-  color: var(--gray-500, #78716C);
+  background: var(--gray-100, var(--c-f5f5f4));
+  border: 1px solid var(--gray-200, var(--c-line-200));
+  color: var(--gray-500, var(--c-78716c));
   font-family: var(--font-mono, monospace);
   font-size: .68rem;
   font-weight: 700;
@@ -127,8 +127,8 @@
   margin-inline-start: 6px;
   padding: 1px 7px;
   border-radius: 999px;
-  background: var(--ems-tone-soft, #E5E8EE);
-  color: var(--ems-tone-deep, #334155);
+  background: var(--ems-tone-soft, var(--c-e5e8ee));
+  color: var(--ems-tone-deep, var(--c-334155));
   font-size: .72rem;
   font-weight: 800;
 }
@@ -143,14 +143,14 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: var(--gray-500, #78716C);
+  color: var(--gray-500, var(--c-78716c));
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
   transition: background .15s ease, color .15s ease;
 }
-.ems-toast__close:hover { background: var(--gray-100, #F5F5F4); color: var(--gray-900, #1C1917); }
-.ems-toast__close:focus-visible { outline: 2px solid var(--ems-tone, #475569); outline-offset: 1px; }
+.ems-toast__close:hover { background: var(--gray-100, var(--c-f5f5f4)); color: var(--gray-900, var(--c-1c1917)); }
+.ems-toast__close:focus-visible { outline: 2px solid var(--ems-tone, var(--c-ink-600)); outline-offset: 1px; }
 
 /* شريطُ العمر: يُظهر متى يختفي التوست — يتجمّد عند المرور بالفأرة */
 .ems-toast__life {
@@ -159,7 +159,7 @@
   inset-inline-start: 0;
   height: 3px;
   width: 100%;
-  background: var(--ems-tone, #475569);
+  background: var(--ems-tone, var(--c-ink-600));
   opacity: .35;
   transform-origin: inset-inline-start;
   animation: ems-toast-life linear forwards;
@@ -172,24 +172,24 @@
 
 /* ── ① النتيجة: الأنواع الأربعة ──────────────────────────────────────── */
 .ems-toast[data-type="success"], .ems-inline-alert[data-type="success"] {
-  --ems-tone: var(--success-600, #5B7F1E);
-  --ems-tone-soft: var(--success-100, #ECF1DE);
-  --ems-tone-deep: var(--success-deep, #365314);
+  --ems-tone: var(--success-600, var(--c-5b7f1e));
+  --ems-tone-soft: var(--success-100, var(--c-ecf1de));
+  --ems-tone-deep: var(--success-deep, var(--c-365314));
 }
 .ems-toast[data-type="error"], .ems-inline-alert[data-type="error"] {
-  --ems-tone: var(--danger-600, #991B1B);
-  --ems-tone-soft: var(--danger-100, #F5DCDC);
-  --ems-tone-deep: var(--danger-deep, #7F1D1D);
+  --ems-tone: var(--danger-600, var(--c-991b1b));
+  --ems-tone-soft: var(--danger-100, var(--c-f5dcdc));
+  --ems-tone-deep: var(--danger-deep, var(--c-7f1d1d));
 }
 .ems-toast[data-type="warning"], .ems-inline-alert[data-type="warning"] {
-  --ems-tone: var(--warning-600, #A8541C);
-  --ems-tone-soft: var(--warning-100, #F4E5D3);
-  --ems-tone-deep: var(--warning-deep, #7C2D12);
+  --ems-tone: var(--warning-600, var(--c-a8541c));
+  --ems-tone-soft: var(--warning-100, var(--c-f4e5d3));
+  --ems-tone-deep: var(--warning-deep, var(--c-7c2d12));
 }
 .ems-toast[data-type="info"], .ems-inline-alert[data-type="info"] {
-  --ems-tone: var(--info-600, #475569);
-  --ems-tone-soft: var(--info-100, #E5E8EE);
-  --ems-tone-deep: var(--info-deep, #334155);
+  --ems-tone: var(--info-600, var(--c-ink-600));
+  --ems-tone-soft: var(--info-100, var(--c-e5e8ee));
+  --ems-tone-deep: var(--info-deep, var(--c-334155));
 }
 
 /* ══ ② الفعل: إضافةٌ ≠ تعديلٌ ≠ حذف ═════════════════════════════════════
@@ -206,29 +206,29 @@
    معًا — فالمتأخِّرُ يفوز. لو سبقت هذه الكتلةُ كتلةَ الأنواع لابتلع الأخضرُ
    نغماتِ الفعل الثلاثَ وعاد العطبُ كما كان. */
 .ems-toast[data-tone="create"] {
-  --ems-tone: var(--success-600, #5B7F1E);
-  --ems-tone-soft: var(--success-100, #ECF1DE);
-  --ems-tone-deep: var(--success-deep, #365314);
+  --ems-tone: var(--success-600, var(--c-5b7f1e));
+  --ems-tone-soft: var(--success-100, var(--c-ecf1de));
+  --ems-tone-deep: var(--success-deep, var(--c-365314));
 }
 .ems-toast[data-tone="update"] {
-  --ems-tone: #1D4ED8;
-  --ems-tone-soft: #E3EAFD;
-  --ems-tone-deep: #1E3A8A;
+  --ems-tone: var(--c-state-info-deep);
+  --ems-tone-soft: var(--c-e3eafd);
+  --ems-tone-deep: var(--c-1e3a8a);
 }
 .ems-toast[data-tone="remove"] {
-  --ems-tone: #57534E;                 /* حجريٌّ داكن — محايدٌ لا ينذر */
-  --ems-tone-soft: var(--gray-100, #F5F5F4);
-  --ems-tone-deep: var(--gray-900, #1C1917);
+  --ems-tone: var(--c-57534e);                 /* حجريٌّ داكن — محايدٌ لا ينذر */
+  --ems-tone-soft: var(--gray-100, var(--c-f5f5f4));
+  --ems-tone-deep: var(--gray-900, var(--c-1c1917));
 }
 .ems-toast[data-tone="restore"] {
-  --ems-tone: #0F766E;                 /* تركوازيٌّ — عودةٌ لا إنشاء */
-  --ems-tone-soft: #DCF2EF;
-  --ems-tone-deep: #115E59;
+  --ems-tone: var(--c-0f766e);                 /* تركوازيٌّ — عودةٌ لا إنشاء */
+  --ems-tone-soft: var(--c-dcf2ef);
+  --ems-tone-deep: var(--c-115e59);
 }
 .ems-toast[data-tone="send"] {
-  --ems-tone: #4F46E5;
-  --ems-tone-soft: #E7E5FC;
-  --ems-tone-deep: #3730A3;
+  --ems-tone: var(--c-4f46e5);
+  --ems-tone-soft: var(--c-e7e5fc);
+  --ems-tone-deep: var(--c-3730a3);
 }
 
 /* ── الحركة: دخولٌ وخروجٌ هادئان، ويُلغَيان لمن يطلب تقليل الحركة ───── */
@@ -264,12 +264,12 @@ body.ems-site .success-message {
   gap: 10px !important;
   padding: 11px 14px !important;
   margin: 0 0 14px !important;
-  background: var(--white, #fff) !important;
-  border: 1px solid var(--gray-200, #E7E5E4) !important;
-  border-inline-start: 4px solid var(--ems-tone, #475569) !important;
+  background: var(--white, var(--c-surface)) !important;
+  border: 1px solid var(--gray-200, var(--c-line-200)) !important;
+  border-inline-start: 4px solid var(--ems-tone, var(--c-ink-600)) !important;
   border-radius: var(--ems-alert-radius) !important;
-  box-shadow: 0 1px 3px rgba(15, 17, 21, .05) !important;
-  color: var(--gray-700, #44403C) !important;
+  box-shadow: 0 1px 3px var(--c-rgba151721005) !important;
+  color: var(--gray-700, var(--c-44403c)) !important;
   font-size: .88rem !important;
   font-weight: 600 !important;
   line-height: 1.6 !important;
@@ -284,25 +284,25 @@ body.ems-site [data-ems-done][hidden] { display: none !important; }
 /* ربطُ أصناف bootstrap بالنغمات — الصنفُ يحدّد اللون لا العكس */
 body.ems-site .alert.alert-success, body.ems-site .alert.alert-ok,
 body.ems-site .success-message.is-success {
-  --ems-tone: var(--success-600, #5B7F1E);
-  --ems-tone-soft: var(--success-100, #ECF1DE);
-  --ems-tone-deep: var(--success-deep, #365314);
+  --ems-tone: var(--success-600, var(--c-5b7f1e));
+  --ems-tone-soft: var(--success-100, var(--c-ecf1de));
+  --ems-tone-deep: var(--success-deep, var(--c-365314));
 }
 body.ems-site .alert.alert-danger, body.ems-site .alert.alert-err,
 body.ems-site .success-message.is-error {
-  --ems-tone: var(--danger-600, #991B1B);
-  --ems-tone-soft: var(--danger-100, #F5DCDC);
-  --ems-tone-deep: var(--danger-deep, #7F1D1D);
+  --ems-tone: var(--danger-600, var(--c-991b1b));
+  --ems-tone-soft: var(--danger-100, var(--c-f5dcdc));
+  --ems-tone-deep: var(--danger-deep, var(--c-7f1d1d));
 }
 body.ems-site .alert.alert-warning {
-  --ems-tone: var(--warning-600, #A8541C);
-  --ems-tone-soft: var(--warning-100, #F4E5D3);
-  --ems-tone-deep: var(--warning-deep, #7C2D12);
+  --ems-tone: var(--warning-600, var(--c-a8541c));
+  --ems-tone-soft: var(--warning-100, var(--c-f4e5d3));
+  --ems-tone-deep: var(--warning-deep, var(--c-7c2d12));
 }
 body.ems-site .alert.alert-info {
-  --ems-tone: var(--info-600, #475569);
-  --ems-tone-soft: var(--info-100, #E5E8EE);
-  --ems-tone-deep: var(--info-deep, #334155);
+  --ems-tone: var(--info-600, var(--c-ink-600));
+  --ems-tone-soft: var(--info-100, var(--c-e5e8ee));
+  --ems-tone-deep: var(--info-deep, var(--c-334155));
 }
 
 /* أيقونةُ اللافتة: تُحقن بـ::before فلا يلزم تعديلُ ترميز الشاشات.
@@ -318,8 +318,8 @@ body.ems-site [data-ems-glyph]::before {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--ems-tone-soft, #E5E8EE);
-  color: var(--ems-tone, #475569);
+  background: var(--ems-tone-soft, var(--c-e5e8ee));
+  color: var(--ems-tone, var(--c-ink-600));
   font-size: 12px;
   font-weight: 900;
   line-height: 1;
@@ -330,6 +330,6 @@ body.ems-site .alert.alert-success > i, body.ems-site .alert.alert-ok > i,
 body.ems-site .alert.alert-danger > i, body.ems-site .alert.alert-err > i,
 body.ems-site .alert.alert-warning > i, body.ems-site .alert.alert-info > i,
 body.ems-site .success-message > i {
-  color: var(--ems-tone, #475569) !important;
+  color: var(--ems-tone, var(--c-ink-600)) !important;
   margin-top: 2px;
 }

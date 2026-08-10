@@ -63,15 +63,15 @@
     height: 38px;
     border-radius: 12px;
     font-size: 1rem;
-    background: var(--primary-yellow, #F4C542) !important;
-    color: #1F1F1F !important;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 1px 2px rgba(15, 17, 21, 0.14);
+    background: var(--primary-yellow, var(--c-brand-gold)) !important;
+    color: var(--c-ink-900) !important;
+    border: 1px solid var(--c-rgba000008);
+    box-shadow: 0 1px 2px var(--c-rgba151721014);
     transition: background-color 0.18s ease, transform 0.18s ease;
   }
 
   .ems-site .mobile-menu-btn:active {
-    background: var(--yellow-deep, #E0AE2E) !important;
+    background: var(--yellow-deep, var(--c-e0ae2e)) !important;
     transform: scale(0.94);
   }
 
@@ -191,14 +191,14 @@
     font-size: 11px;
     margin-inline-end: 5px;
     flex-shrink: 0;
-    color: #121212;
+    color: var(--c-121212);
   }
 
   .ems-topbar-pill::after {
     content: attr(data-value);
     font-size: 11.5px;
     font-weight: 700;
-    color: #121212;
+    color: var(--c-121212);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -208,35 +208,35 @@
   /* حالةُ «غير مرتبطٍ بموظف» تحتفظ برماديّها الباهت المقصود */
   .ems-topbar-pill--muted > i,
   .ems-topbar-pill--muted::after {
-    color: #8A8A8A;
+    color: var(--c-8a8a8a);
   }
 
   /* حاويّةُ «الصفة» رابطٌ لا نصّ — تُميَّز بحدٍّ ذهبيٍّ كي تُقرأ قابلةً للنقر */
   a.ems-topbar-pill {
-    border-color: var(--yellow-deep, #E0AE2E);
-    background: #FFFDF6;
+    border-color: var(--yellow-deep, var(--c-e0ae2e));
+    background: var(--c-fffdf6);
   }
 
   a.ems-topbar-pill:active {
-    background: rgba(244, 197, 66, 0.24);
+    background: var(--c-rgba24419766024);
   }
 
   /* ── ⑤ لمسةُ الهويّة ──────────────────────────────────────────────────── */
   /* خطٌّ ذهبيٌّ رفيعٌ أسفلَ الشريط: يفصل الشريطَ عن المحتوى بوضوحٍ على شاشةٍ
      صغيرةٍ لا هوامشَ فيها، وهو لونُ النظام نفسُه لا لونٌ جديد. */
   .ems-topbar {
-    border-bottom: 2px solid var(--primary-yellow, #F4C542);
-    box-shadow: 0 2px 8px rgba(15, 17, 21, 0.08);
+    border-bottom: 2px solid var(--primary-yellow, var(--c-brand-gold));
+    box-shadow: 0 2px 8px var(--c-rgba151721008);
   }
 
   .ems-topbar.ems-topbar--dash {
-    border-bottom-color: #d4a500;
+    border-bottom-color: var(--c-brand-gold-deep);
   }
 
   /* السايدبارُ المفتوحُ يغطّي الشريطَ كلَّه (z:1000 مقابل 130) — فلا حاجةَ
      لإخفاء زرِّ القائمة، لكنّ حالتَه المنطقيّة تبقى معلَنةً للوصولية. */
   .ems-site .mobile-menu-btn[aria-expanded="true"] {
-    background: var(--yellow-deep, #E0AE2E) !important;
+    background: var(--yellow-deep, var(--c-e0ae2e)) !important;
   }
 }
 

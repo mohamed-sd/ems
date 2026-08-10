@@ -80,11 +80,33 @@ u('AC-U1', 'ملفٌّ واحدٌ يُصدِر الترويسةَ لا سبعة'
     count($htmlEmitters) . ' ملفًّا يُصدِر <html>' . ($htmlEmitters ? ': ' . implode(' · ', array_slice($htmlEmitters, 0, 8)) : ''));
 
 /* ══ AC-U2 · صفرُ لونٍ حرفيٍّ خارجَ ملفِّ الرموز ══════════════════════════ */
+/* ◆ النطاق: **نظامُنا التصميميُّ** لا ملفاتُ المكتبات. `bootstrap.min.css`
+     وأخواتُها ليست من تأليفنا ولا تُحرَّر، وتحويلُ ألوانِها إلى رموزٍ يجعل كلَّ
+     ترقيةٍ للمكتبةِ تمحو العمل. والمعيارُ عن **مصدرِ حقيقةٍ واحدٍ لألوانِ
+     النظام** — والمكتبةُ مصدرُها هي.
+   ◆ ويُعلَن ما استُثني بعددِه فلا يُسكت عنه. */
 $tokenFile = 'assets/css/design-tokens.css';
-$colorHits = 0; $colorFiles = array(); $distinct = array();
+$VENDOR_CSS = array('bootstrap', 'jquery', 'datatables', 'fontawesome', 'select2',
+                    'flatpickr', 'chart', 'leaflet', 'swiper', 'animate', '.min.css');
+$colorHits = 0; $colorFiles = array(); $distinct = array(); $vendorHits = 0;
 foreach (ui_files($ROOT, array('css')) as $rel) {
     if ($rel === $tokenFile) { continue; }
+    $isVendor = false;
+    foreach ($VENDOR_CSS as $v) { if (stripos($rel, $v) !== false) { $isVendor = true; break; } }
+    if ($isVendor) {
+        $vs = (string) @file_get_contents($ROOT . '/' . $rel);
+        if (preg_match_all('/#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(/', $vs, $vm)) { $vendorHits += count($vm[0]); }
+        continue;
+    }
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
+    /* ◆ التعليقاتُ تُجرَّد: أغلبُ ما بقي بعد التحويلِ كان **توثيقًا للوحة**
+         («الأصفر #F4C542 والذهبيّ العميق #E0AE2E») وكتلًا معطَّلةً بالتعليق.
+         شرحُ اللونِ ليس إعلانَه، وعدُّه يُنتج دَينًا وهميًّا — وهي الگوتشا
+         نفسُها التي تكرّرت في فحصِ SQL وعدِّ الحرّاسِ واتجاهِ الشريط.
+       ◆ و`rgba(var(--x, 244,197,66), .12)` ليست لونًا حرفيًّا بل **بديلَ رمزٍ**
+         داخلَ `var()` — تُستثنى بإسقاطِ ما فيه `var(`. */
+    $src = preg_replace('#/\*.*?\*/#su', '', $src);
+    $src = preg_replace('/\brgba?\s*\(\s*var\([^)]*\)[^)]*\)/i', '', $src);
     if (preg_match_all('/#[0-9a-fA-F]{3,8}\b|\brgba?\s*\(/', $src, $m)) {
         $colorHits += count($m[0]);
         $colorFiles[$rel] = count($m[0]);
@@ -94,9 +116,10 @@ foreach (ui_files($ROOT, array('css')) as $rel) {
 arsort($colorFiles);
 u('AC-U2', 'صفرُ قيمةٍ لونيةٍ حرفيةٍ خارجَ ملفِّ الرموز',
     'يعدُّ قيمَ الألوانِ الحرفيةَ في كلِّ ملفاتِ CSS الحيةِ عدا ملفِّ الرموز',
-    'لا يقيس الألوانَ داخلَ سماتِ style في HTML/PHP — تُقاس في AC-U12',
+    'لا يقيس ملفاتِ المكتبات (لا نؤلّفها) ولا سماتِ style في HTML/PHP — تُقاس في AC-U12',
     $colorHits === 0,
-    "{$colorHits} قيمةً لونيةً حرفيةً · متمايزٌ منها " . count($distinct)
+    "{$colorHits} قيمةً لونيةً حرفيةً في نظامِنا · متمايزٌ منها " . count($distinct)
+        . ' · ◆ في المكتباتِ (مستثناةٌ مُعلَنةٌ لا مسكوتٌ عنها): ' . $vendorHits
         . ' · أكثرُها: ' . implode(' · ', array_map(function ($f, $n) { return "{$f}({$n})"; },
             array_slice(array_keys($colorFiles), 0, 3), array_slice($colorFiles, 0, 3))));
 

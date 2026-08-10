@@ -20,18 +20,18 @@
 ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-    --emsf-yellow: #f4c542;
-    --emsf-yellow-d: #eab92f;
-    --emsf-panel: #e6e6e6;
-    --emsf-field-bg: #ffffff;
-    --emsf-field-bdr: #999999;
-    --emsf-pill-bg: #ddd;
-    --emsf-pill-txt: #2b2f36;
-    --emsf-ico: #1e3a5f;
-    --emsf-text: #1f2227;
+    --emsf-yellow: var(--c-brand-gold);
+    --emsf-yellow-d: var(--c-eab92f);
+    --emsf-panel: var(--c-e6e6e6);
+    --emsf-field-bg: var(--c-surface);
+    --emsf-field-bdr: var(--c-999999);
+    --emsf-pill-bg: var(--c-dddddd);
+    --emsf-pill-txt: var(--c-2b2f36);
+    --emsf-ico: var(--c-brand-navy);
+    --emsf-text: var(--c-1f2227);
     --emsf-radius: 16px; /* حواف الحقول مستديرة باعتدال */
-    --emsf-auto-bg: #ffe6c7;  /* عنوان حقل محسوب تلقائياً — برتقالي فاتح */
-    --emsf-auto-bdr: #FAE29A; /* حدّ العنوان البرتقالي */
+    --emsf-auto-bg: var(--c-ffe6c7);  /* عنوان حقل محسوب تلقائياً — برتقالي فاتح */
+    --emsf-auto-bdr: var(--c-fae29a); /* حدّ العنوان البرتقالي */
 }
 
 /* ── 0) الإظهار/الإخفاء — على .allforms فقط ──────────────────────────────── */
@@ -67,16 +67,16 @@
 .allforms.card,
 .ems-form.card {
     background: var(--emsf-panel) !important;
-    border: 1px solid #e3e6ea !important;
+    border: 1px solid var(--c-e3e6ea) !important;
     border-radius: 20px !important;
-    box-shadow: 0 6px 22px rgba(20, 24, 31, 0.07) !important;
+    box-shadow: 0 6px 22px var(--c-rgba202431007) !important;
     overflow: visible !important;
 
 }
 :is(.allforms, .ems-form) .card-body,
 .allforms.card .card-body,
 .ems-form.card .card-body {
-    background: #f1f1f1 !important;
+    background: var(--c-f1f1f1) !important;
     background-image: none !important;
     padding: 30px 24px 24px !important;
     position: relative; /* يفعّل z-index كي يطغى الجسم على العنوان */
@@ -113,7 +113,7 @@
 :is(.allforms, .ems-form) .card-header h3 {
     margin: 0 !important;
     background-color: var(--emsf-yellow) !important;
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
     width: 350px !important;
     max-width: 100%;
     padding: 2px 20px 20px !important;
@@ -126,7 +126,7 @@
     z-index: 1; /* أقل من الجسم (1000) فيظهر خلفه */
 }
 :is(.allforms, .ems-form) .card-header :is(h5, h4, h3) i {
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
 }
 
 /* ── 3) عناوين الأقسام — أيقونة محاطة يمين + نص أسود + شارة رقم محاطة يسار ─────
@@ -145,7 +145,7 @@
 :is(.allforms, .ems-form) .form-section {
     padding: 10px !important;
     border-radius: 25px !important;
-    background: #fff !important;
+    background: var(--c-surface) !important;
 }
 :is(.allforms, .ems-form) .form-section > h6,
 :is(.allforms, .ems-form) .form-section-header,
@@ -155,11 +155,11 @@
     gap: 10px;
     flex-direction: row !important;
     justify-content: flex-start !important;
-    background: #fff !important;
-    border: solid #999 1px !important;
+    background: var(--c-surface) !important;
+    border: solid var(--c-999999) 1px !important;
     border-radius: 25px !important;
     padding: 5px;
-    color: #000 !important;
+    color: var(--c-ink-max) !important;
     font-size: 1.05rem;
     margin: 0 0 16px 0 !important;
     font-weight: 800;
@@ -181,7 +181,7 @@
     font-size: 1rem !important; */
     width: 30px !important;
     hight: 30px !important;
-    border: 1px solid #999 !important;
+    border: 1px solid var(--c-999999) !important;
     padding: 5px !important;
     border-radius: 20px !important;
 }
@@ -193,15 +193,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #000;
-    background: #fff;
-    border: 1.5px solid #000;
+    color: var(--c-ink-max);
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-ink-max);
     border-radius: 12px;
     padding: 8px 16px;
     line-height: 1;
     width: 30px !important;
     hight: 30px !important;
-    border: 1px solid #999 !important;
+    border: 1px solid var(--c-999999) !important;
     padding: 5px !important;
     border-radius: 20px !important;
     font-weight: 400;
@@ -271,24 +271,24 @@
     width: fit-content !important;
     margin: 0 !important;
     padding: 4px 15px 15px !important;
-    background: #e6e6e6 !important;
-    border: 1px solid #b1b1b1 !important;
+    background: var(--c-e6e6e6) !important;
+    border: 1px solid var(--c-b1b1b1) !important;
     border-radius: 20px 20px 0 0 !important;
     font-size: 0.8rem !important;
     font-weight: 800 !important;
     line-height: 1.2;
-    color: #000 !important;
+    color: var(--c-ink-max) !important;
     white-space: nowrap;
     cursor: default;
 }
 :is(.allforms, .ems-form) label i {
-    color: #000 !important;
+    color: var(--c-ink-max) !important;
     font-size: 0.78rem;
 }
 :is(.allforms, .ems-form) label .required,
 :is(.allforms, .ems-form) label .required-indicator,
 :is(.allforms, .ems-form) label span[style*="red"] {
-    color: #dc2626 !important;
+    color: var(--c-state-danger) !important;
     font-weight: 900;
 }
 
@@ -297,10 +297,10 @@
 :is(.allforms, .ems-form) .field.emsf-accent > label {
     background: var(--emsf-yellow) !important;
     border-color: var(--emsf-yellow) !important;
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
 }
 :is(.allforms, .ems-form) .emsf-accent label i {
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
 }
 
 /* حقل محسوب تلقائياً (.auto): عنوان برتقالي فاتح يميّزه عن الحقول العادية الرمادية.
@@ -313,7 +313,7 @@
 :is(.allforms, .ems-form) .field > label.auto {
     background: var(--emsf-auto-bg) !important;
     border-color: var(--emsf-auto-bdr) !important;
-    color: #000 !important;
+    color: var(--c-ink-max) !important;
 }
 
 /* ── 7) الحقول نفسها — بيضاء، حواف دائرية تماماً، أمام العنوان ────────────── */
@@ -333,7 +333,7 @@
     box-sizing: border-box !important; /* عرض موحّد لكل أنواع الحقول */
     min-width: 0 !important; /* يمنع الحقول الرقمية من أن تكون أضيق */
     max-width: 100% !important;
-    background: #ffffff !important; /* خلفية بيضاء سادة */
+    background: var(--c-surface) !important; /* خلفية بيضاء سادة */
     border: 1.5px solid var(--emsf-field-bdr) !important;
     border-radius: var(--emsf-radius) !important; /* 999px — دائري تماماً */
     padding: 10px 22px !important;
@@ -344,7 +344,7 @@
     font-family: "Tajawal", "Cairo", sans-serif;
     color: var(--emsf-text) !important;
     text-align: center !important;
-    box-shadow: inset 0 1px 2px rgba(20, 24, 31, 0.03) !important;
+    box-shadow: inset 0 1px 2px var(--c-rgba202431003) !important;
     position: relative !important; /* أمام العنوان في z-index */
     z-index: 2;
     transition:
@@ -381,7 +381,7 @@
 }
 :is(.allforms, .ems-form) input::placeholder,
 :is(.allforms, .ems-form) textarea::placeholder {
-    color: #9aa0a8;
+    color: var(--c-9aa0a8);
     font-weight: 600;
 }
 
@@ -408,9 +408,9 @@
 :is(.allforms, .ems-form) .field > select:focus,
 :is(.allforms, .ems-form) .field > textarea:focus {
     outline: none !important;
-    background: #fff !important;
+    background: var(--c-surface) !important;
     border-color: var(--emsf-yellow) !important;
-    box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.22) !important;
+    box-shadow: 0 0 0 3px var(--c-rgba24419766022) !important;
 }
 :is(.allforms, .ems-form) .form-grid > div > input:disabled,
 :is(.allforms, .ems-form) .form-grid > div > select:disabled,
@@ -420,8 +420,8 @@
 :is(.allforms, .ems-form) .field .control input[readonly],
 :is(.allforms, .ems-form) .field > input:disabled,
 :is(.allforms, .ems-form) .field > input[readonly] {
-    background: #e7e9ed !important;
-    color: #8b8f96 !important;
+    background: var(--c-e7e9ed) !important;
+    color: var(--c-8b8f96) !important;
     cursor: not-allowed;
 }
 
@@ -440,16 +440,16 @@
     padding: 9px 13px;
     border: 1.5px solid var(--emsf-field-bdr);
     border-radius: 10px;
-    background: #fff;
+    background: var(--c-surface);
     cursor: pointer;
     font-weight: 700;
-    color: #41464d;
+    color: var(--c-41464d);
     transition: all 0.15s ease;
 }
 :is(.allforms, .ems-form) .checkbox-label:hover {
     border-color: var(--emsf-yellow);
-    background: #fffdf4;
-    color: #1f1f1f;
+    background: var(--c-fffdf4);
+    color: var(--c-ink-900);
 }
 :is(.allforms, .ems-form) .checkbox-label input[type="checkbox"] {
     width: 16px;
@@ -467,7 +467,7 @@
     padding-top: 13px;
 }
 :is(.allforms, .ems-form) .generated-code-field {
-    background: #fff7df !important;
+    background: var(--c-fff7df) !important;
     border: 1.5px dashed var(--emsf-yellow) !important;
     font-weight: 800 !important;
     letter-spacing: 0.5px;
@@ -496,7 +496,7 @@
 }
 :is(.allforms, .ems-form) .counter-separator {
     font-weight: 800;
-    color: #6b7178;
+    color: var(--c-6b7178);
 }
 
 :is(.allforms, .ems-form) .toggle-password {
@@ -507,7 +507,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #7a8089;
+    color: var(--c-7a8089);
     font-size: 1rem;
     z-index: 4;
     padding: 4px;
@@ -522,7 +522,7 @@
 :is(.allforms, .ems-form) .strength-bar {
     height: 6px;
     border-radius: 6px;
-    background: #e7e9ed;
+    background: var(--c-e7e9ed);
     overflow: hidden;
 }
 :is(.allforms, .ems-form) .strength-bar > span {
@@ -535,7 +535,7 @@
 }
 :is(.allforms, .ems-form) .strength-weak > span {
     width: 33%;
-    background: #dc2626;
+    background: var(--c-state-danger);
 }
 :is(.allforms, .ems-form) .strength-medium > span {
     width: 66%;
@@ -543,7 +543,7 @@
 }
 :is(.allforms, .ems-form) .strength-strong > span {
     width: 100%;
-    background: #16a34a;
+    background: var(--c-state-ok);
 }
 :is(.allforms, .ems-form) .password-requirements {
     list-style: none;
@@ -557,11 +557,11 @@
     align-items: center;
     gap: 8px;
     font-size: 0.82rem;
-    color: #7a8089;
+    color: var(--c-7a8089);
     font-weight: 600;
 }
 :is(.allforms, .ems-form) .requirement-item.met {
-    color: #16a34a;
+    color: var(--c-state-ok);
 }
 
 :is(.allforms, .ems-form) .form-grid-modal {
@@ -598,7 +598,7 @@
     justify-content: center;
     gap: 8px;
     background: var(--emsf-yellow) !important;
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
     border: none !important;
     border-radius: 12px !important;
     font-weight: 800 !important;
@@ -606,7 +606,7 @@
     padding: 13px 26px !important;
     min-height: 0 !important;
     cursor: pointer;
-    box-shadow: 0 6px 15px rgba(244, 197, 66, 0.42) !important;
+    box-shadow: 0 6px 15px var(--c-rgba24419766042) !important;
     transition: all 0.2s ease;
 }
 :is(.allforms, .ems-form) .btn-save:hover,
@@ -615,13 +615,13 @@
 :is(.allforms, .ems-form) .btn-submit-contract:hover,
 :is(.allforms, .ems-form) button[type="submit"]:hover {
     background: var(--emsf-yellow-d) !important;
-    box-shadow: 0 8px 20px rgba(244, 197, 66, 0.5) !important;
+    box-shadow: 0 8px 20px var(--c-rgba2441976605) !important;
     transform: translateY(-2px);
 }
 :is(.allforms, .ems-form) .btn-save i,
 :is(.allforms, .ems-form) .btn-submit i,
 :is(.allforms, .ems-form) button[type="submit"] i {
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
 }
 
 :is(.allforms, .ems-form) .btn-cancel,
@@ -634,8 +634,8 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #141414 !important;
-    color: #fff !important;
+    background: var(--c-141414) !important;
+    color: var(--c-surface) !important;
     border: none !important;
     border-radius: 12px !important;
     font-weight: 800 !important;
@@ -651,13 +651,13 @@
 :is(.allforms, .ems-form) .btn-reset-contract:hover,
 :is(.allforms, .ems-form) .btn-modal-cancel:hover,
 :is(.allforms, .ems-form) button[type="reset"]:hover {
-    background: #000 !important;
-    color: #fff !important;
+    background: var(--c-ink-max) !important;
+    color: var(--c-surface) !important;
 }
 :is(.allforms, .ems-form) .btn-cancel i,
 :is(.allforms, .ems-form) .btn-close i,
 :is(.allforms, .ems-form) button[type="reset"] i {
-    color: #fff !important;
+    color: var(--c-surface) !important;
 }
 
 /* رفع الأولوية فوق محرّك الأزرار العام في ems.main: أزرار <button> يطالها المحرّك
@@ -666,30 +666,30 @@
 :is(.allforms, .ems-form):not(#_)
     :is(.btn-save, .btn-submit, .btn-modal-save, .btn-submit-contract, button[type="submit"]) {
     background: var(--emsf-yellow) !important;
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
     border: none !important;
-    box-shadow: 0 6px 15px rgba(244, 197, 66, 0.42) !important;
+    box-shadow: 0 6px 15px var(--c-rgba24419766042) !important;
 }
 :is(.allforms, .ems-form):not(#_) :is(.btn-save, .btn-submit, button[type="submit"]):hover {
     background: var(--emsf-yellow-d) !important;
 }
 :is(.allforms, .ems-form):not(#_) :is(.btn-save, .btn-submit, button[type="submit"]) i {
-    color: #1f1f1f !important;
+    color: var(--c-ink-900) !important;
 }
 
 :is(.allforms, .ems-form):not(#_)
     :is(.btn-cancel, .btn-close, .btn-reset, .btn-reset-contract, .btn-modal-cancel, button[type="reset"]) {
-    background: #141414 !important;
-    color: #fff !important;
+    background: var(--c-141414) !important;
+    color: var(--c-surface) !important;
     border: none !important;
     box-shadow: none !important;
 }
 :is(.allforms, .ems-form):not(#_)
     :is(.btn-cancel, .btn-close, .btn-reset, .btn-reset-contract, .btn-modal-cancel, button[type="reset"]):hover {
-    background: #000 !important;
+    background: var(--c-ink-max) !important;
 }
 :is(.allforms, .ems-form):not(#_) :is(.btn-cancel, .btn-close, button[type="reset"]) i {
-    color: #fff !important;
+    color: var(--c-surface) !important;
 }
 
 /* ── 11) مساعدات العرض / امتداد الأعمدة ──────────────────────────────────── */
@@ -783,7 +783,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    background: #fff !important; /* أبيض رغم محرّك الأزرار العام */
+    background: var(--c-surface) !important; /* أبيض رغم محرّك الأزرار العام */
     border: 1.5px solid var(--emsf-field-bdr) !important;
     border-radius: var(--emsf-radius) !important; /* حواف دائرية رغم محرّك الأزرار */
     height: 40px !important;
@@ -803,7 +803,7 @@
 }
 :is(.allforms, .ems-form) .emsf-select-trigger:hover {
     transform: none !important;
-    background: #fff !important;
+    background: var(--c-surface) !important;
 }
 :is(.allforms, .ems-form) .emsf-select-trigger .emsf-select-text {
     flex: 1;
@@ -813,23 +813,23 @@
     white-space: nowrap;
 }
 :is(.allforms, .ems-form) .emsf-select-trigger.is-placeholder .emsf-select-text {
-    color: #9aa0a8;
+    color: var(--c-9aa0a8);
     font-weight: 600;
 }
 :is(.allforms, .ems-form) .emsf-select-trigger.is-disabled {
-    background: #e7e9ed;
-    color: #8b8f96;
+    background: var(--c-e7e9ed);
+    color: var(--c-8b8f96);
     cursor: not-allowed;
 }
 :is(.allforms, .ems-form) .emsf-select-arrow {
-    color: #666;
+    color: var(--c-666666);
     font-size: 0.8rem;
     transition: transform 0.18s ease;
     flex-shrink: 0;
 }
 :is(.allforms, .ems-form) .emsf-select-wrap.is-open .emsf-select-trigger {
     border-color: var(--emsf-yellow) !important;
-    box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.22) !important;
+    box-shadow: 0 0 0 3px var(--c-rgba24419766022) !important;
 }
 :is(.allforms, .ems-form) .emsf-select-wrap.is-open .emsf-select-arrow {
     transform: rotate(180deg);
@@ -843,10 +843,10 @@
     position: fixed;
     z-index: 2147483000;              /* فوق كل شيء */
     display: none;
-    background: #fff !important;       /* خلفية القائمة بيضاء */
-    border: 1px solid #e3e6ea !important;
+    background: var(--c-surface) !important;       /* خلفية القائمة بيضاء */
+    border: 1px solid var(--c-e3e6ea) !important;
     border-radius: 20px !important;   /* حواف القائمة دائرية */
-    box-shadow: 0 14px 34px rgba(20, 24, 31, 0.18);
+    box-shadow: 0 14px 34px var(--c-rgba202431018);
     padding: 6px;
     max-height: 264px;
     overflow-y: auto;
@@ -862,23 +862,23 @@
     cursor: pointer;
     font-size: 0.88rem;
     font-weight: 600;
-    color: #1f2227;
+    color: var(--c-1f2227);
     text-align: center;
     transition: background-color 0.12s ease;
 }
 /* العنصر عند المرور بالماوس — خلفية صفراء عميقة خفيفة */
 .emsf-select-option:hover {
-    background: #fbe6a8;
+    background: var(--c-fbe6a8);
 }
 .emsf-select-option.is-selected {
-    background: rgba(244, 197, 66, 0.42);
+    background: var(--c-rgba24419766042);
     font-weight: 800;
 }
 .emsf-select-option.is-placeholder {
-    color: #9aa0a8;
+    color: var(--c-9aa0a8);
 }
 .emsf-select-option.is-disabled {
-    color: #b8bcc2;
+    color: var(--c-b8bcc2);
     cursor: not-allowed;
 }
 .emsf-select-option.is-disabled:hover {
@@ -886,47 +886,47 @@
 }
 /* العنصر المميّز أثناء التنقّل بالأسهم من صندوق البحث */
 .emsf-select-option.is-active {
-    background: #fbe6a8;
+    background: var(--c-fbe6a8);
 }
 /* ── صندوق البحث داخل القائمة (يظهر للقوائم الطويلة عبر ems-select.js) ──────── */
 .emsf-select-search {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: #fff;
+    background: var(--c-surface);
     padding: 2px 2px 8px;
     margin: -2px -2px 4px;              /* يملأ padding القائمة كي لا تظهر عناصرٌ خلفه */
-    border-bottom: 1px solid #eef0f3;
+    border-bottom: 1px solid var(--c-eef0f3);
 }
 .emsf-select-search-input {
     width: 100%;
     box-sizing: border-box;
     height: 38px;
-    border: 1.5px solid var(--emsf-field-bdr, #d7dbe0);
+    border: 1.5px solid var(--emsf-field-bdr, var(--c-d7dbe0));
     border-radius: 12px;
     padding: 8px 14px;
     font-size: 0.88rem;
     font-weight: 600;
     font-family: "Tajawal", "Cairo", sans-serif;
-    color: #1f2227;
+    color: var(--c-1f2227);
     text-align: center;
     outline: none;
-    background: #fff;
+    background: var(--c-surface);
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 .emsf-select-search-input::placeholder {
-    color: #9aa0a8;
+    color: var(--c-9aa0a8);
     font-weight: 600;
 }
 .emsf-select-search-input:focus {
-    border-color: var(--emsf-yellow, #f4c542);
-    box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.22);
+    border-color: var(--emsf-yellow, var(--c-brand-gold));
+    box-shadow: 0 0 0 3px var(--c-rgba24419766022);
 }
 /* حالة «لا نتائج» */
 .emsf-select-empty {
     padding: 14px;
     text-align: center;
-    color: #9aa0a8;
+    color: var(--c-9aa0a8);
     font-size: 0.85rem;
     font-weight: 600;
 }

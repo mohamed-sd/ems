@@ -44,7 +44,10 @@ if (!function_exists('ems_css_ver')) {
          تحت سهمٍ — كلُّ الأعمدة جنبًا إلى جنبٍ بتمريرٍ أفقيٍّ كالإكسل (ems-tables.css). -->
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
-    <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
+    <!-- لوحةُ الألوانِ: تُحمَّل أولًا وكلُّ لونٍ في النظامِ يشير إليها. وكاسرُ
+         الذاكرةِ إلزاميٌّ هنا كما لأخواتها — بدونه يخدم المتصفحُ نسخةً قديمةً
+         فتسقط كلُّ `var()` إلى الافتراضيّ والنظامُ بلا ألوان. -->
+    <link rel="stylesheet" href="/ems/assets/css/design-tokens.css<?php echo ems_css_ver('design-tokens.css'); ?>">
     <!-- Unified page styles: Dashboard + Chat -->
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css<?php echo ems_css_ver('ems.main.all.style.css'); ?>">
     <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->

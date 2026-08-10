@@ -47,7 +47,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 
     var cssFiles = [
       '/ems/assets/css/local-fonts.css',
-      '/ems/assets/css/design-tokens.css',
+      // كاسرُ الذاكرةِ إلزاميّ — بدونه تُخدَم لوحةُ ألوانٍ قديمةٌ فتسقط كلُّ var()
+      '/ems/assets/css/design-tokens.css<?php echo $__sb_ver('design-tokens.css'); ?>',
       '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
       '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>',
       '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>',

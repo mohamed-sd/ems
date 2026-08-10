@@ -23,20 +23,20 @@
 
 /* ========== ROOT VARIABLES ========== */
 :root {
-    --gold: #f7931a;
-    --gold-dark: #da7c05;
-    --gold-light: #fff8ec;
-    --gold-vlight: #fffaf2;
-    --text-primary: #1f1509;
-    --text-muted: #7a4a12;
-    --border-color: rgba(247, 147, 26, 0.22);
-    --border-accent: rgba(247, 147, 26, 0.28);
-    --red: #c81f24;
-    --red-dark: #a01818;
-    --green: #10a860;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --gold: var(--c-f7931a);
+    --gold-dark: var(--c-da7c05);
+    --gold-light: var(--c-fff8ec);
+    --gold-vlight: var(--c-fffaf2);
+    --text-primary: var(--c-1f1509);
+    --text-muted: var(--c-7a4a12);
+    --border-color: var(--c-rgba24714726022);
+    --border-accent: var(--c-rgba24714726028);
+    --red: var(--c-c81f24);
+    --red-dark: var(--c-a01818);
+    --green: var(--c-10a860);
+    --shadow-sm: 0 2px 8px var(--c-rgba000008);
+    --shadow-md: 0 4px 12px var(--c-rgba000012);
+    --shadow-lg: 0 8px 24px var(--c-rgba000015);
 }
 
 /* ========== ACTION BUTTONS STYLING ========== */
@@ -70,9 +70,9 @@ a[title*="عرض"]:hover,
 a[title*="مشاهدة"]:hover,
 a[title*="view"]:hover,
 a.view-icon:hover {
-    color: #fff;
+    color: var(--c-surface);
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    border-color: rgba(247, 147, 26, 0.7);
+    border-color: var(--c-rgba2471472607);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -117,9 +117,9 @@ button.edit-btn-small {
 a[title*="تعديل"]:hover,
 a[title*="edit"]:hover,
 button.edit-btn-small:hover {
-    color: #fff;
+    color: var(--c-surface);
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    border-color: rgba(247, 147, 26, 0.7);
+    border-color: var(--c-rgba2471472607);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -147,8 +147,8 @@ button.delete-btn-small {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(220, 38, 38, 0.22);
-    background: linear-gradient(135deg, #fff3f4 0%, #ffe7ea 100%);
+    border: 1px solid var(--c-rgba2203838022);
+    background: linear-gradient(135deg, var(--c-fff3f4) 0%, var(--c-ffe7ea) 100%);
     color: var(--red);
     font-weight: 700;
     font-size: 0.85rem;
@@ -164,9 +164,9 @@ button.delete-btn-small {
 a[title*="حذف"]:hover,
 a[title*="delete"]:hover,
 button.delete-btn-small:hover {
-    color: #fff;
-    background: linear-gradient(135deg, #dc2626 0%, var(--red-dark) 100%);
-    border-color: rgba(185, 28, 28, 0.78);
+    color: var(--c-surface);
+    background: linear-gradient(135deg, var(--c-state-danger) 0%, var(--red-dark) 100%);
+    border-color: var(--c-rgba1852828078);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -202,23 +202,23 @@ span[class*="badge-"] {
 }
 
 .badge-count {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f6 100%);
-    color: #1565c0;
+    background: linear-gradient(135deg, var(--c-e3f2fd) 0%, var(--c-f3f4f6) 100%);
+    color: var(--c-1565c0);
 }
 
 .badge-basic {
-    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-    color: #059669;
+    background: linear-gradient(135deg, var(--c-f0fdf4) 0%, var(--c-ecfdf5) 100%);
+    color: var(--c-059669);
 }
 
 .badge-backup {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #d97706;
+    background: linear-gradient(135deg, var(--c-fef3c7) 0%, var(--c-fde68a) 100%);
+    color: var(--c-d97706);
 }
 
 .badge-shifts {
-    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-    color: #be185d;
+    background: linear-gradient(135deg, var(--c-fce7f3) 0%, var(--c-fbcfe8) 100%);
+    color: var(--c-be185d);
 }
 
 /* Global hard override for table headers across the whole system */
@@ -226,8 +226,8 @@ table thead,
 .table thead,
 table.dataTable thead,
 .dataTables_scrollHead table thead {
-    background: #eeeeee !important;
-    color: #000000 !important;
+    background: var(--c-eeeeee) !important;
+    color: var(--c-ink-max) !important;
     background-image: none !important;
 }
 
@@ -239,8 +239,8 @@ table.dataTable thead th,
 table.dataTable thead td,
 .dataTables_scrollHead table thead th,
 .dataTables_scrollHead table thead td {
-    background: #eeeeee !important;
-    color: #000000 !important;
+    background: var(--c-eeeeee) !important;
+    color: var(--c-ink-max) !important;
     background-image: none !important;
 }
 
@@ -254,7 +254,7 @@ table.dataTable thead .sorting_asc::before,
 table.dataTable thead .sorting_asc::after,
 table.dataTable thead .sorting_desc::before,
 table.dataTable thead .sorting_desc::after {
-    color: #000000 !important;
+    color: var(--c-ink-max) !important;
 }
 
 /* ========== PRICE CHIPS ========== */
@@ -283,15 +283,15 @@ table.dataTable thead .sorting_desc::after {
 }
 
 .status-badge.active {
-    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-    color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.22);
+    background: linear-gradient(135deg, var(--c-f0fdf4) 0%, var(--c-ecfdf5) 100%);
+    color: var(--c-059669);
+    border: 1px solid var(--c-rgba16185129022);
 }
 
 .status-badge.inactive {
-    background: linear-gradient(135deg, #fef2f2 0%, #fce7f3 100%);
+    background: linear-gradient(135deg, var(--c-fef2f2) 0%, var(--c-fce7f3) 100%);
     color: var(--red);
-    border: 1px solid rgba(200, 31, 36, 0.22);
+    border: 1px solid var(--c-rgba2003136022);
 }
 
 /* ========== EMPTY STATE ========== */
@@ -333,7 +333,7 @@ table.dataTable thead .sorting_desc::after {
 /* ========== FILTER AND CONTROL SECTIONS ========== */
 .contracts-table-filter-wrap,
 .contracts-group-toolbar-wrap {
-    background: linear-gradient(135deg, #fffaf2 0%, #fff4e4 100%);
+    background: linear-gradient(135deg, var(--c-fffaf2) 0%, var(--c-fff4e4) 100%);
     border-radius: 9px;
     margin-bottom: 16px;
     border: 1px solid var(--border-accent);
@@ -392,9 +392,9 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1.5px solid #6d6d6d !important;
-    background: #6d6d6d !important;
-    color: #000 !important;
+    border: 1.5px solid var(--c-6d6d6d) !important;
+    background: var(--c-6d6d6d) !important;
+    color: var(--c-ink-max) !important;
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
@@ -403,23 +403,23 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
 }
 
 .btn-group-toggle:hover {
-    border-color: #D9AB32 !important;
-    color: #ffffff !important;
-    background: #7d7d7d !important;
+    border-color: var(--c-d9ab32) !important;
+    color: var(--c-surface) !important;
+    background: var(--c-7d7d7d) !important;
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
 .btn-group-toggle.active {
-    background: #f5c64f !important;
-    color: #2A2010 !important;
-    border-color: #C2941C !important;
+    background: var(--c-f5c64f) !important;
+    color: var(--c-2a2010) !important;
+    border-color: var(--c-c2941c) !important;
     box-shadow: var(--shadow-md);
 }
 
 .btn-group-toggle.active:hover {
-    background: #e8b637 !important;
-    color: #2A2010 !important;
+    background: var(--c-e8b637) !important;
+    color: var(--c-2a2010) !important;
 }
 
 .btn-group-toggle-all {
@@ -428,9 +428,9 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1.5px solid #6d6d6d !important;
-    background: #6d6d6d !important;
-    color: #000 !important;
+    border: 1.5px solid var(--c-6d6d6d) !important;
+    background: var(--c-6d6d6d) !important;
+    color: var(--c-ink-max) !important;
     font-weight: 700;
     cursor: pointer;
     font-size: 0.85rem;
@@ -440,17 +440,17 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
 }
 
 .btn-group-toggle-all:hover {
-    border-color: #D9AB32 !important;
-    color: #000 !important;
-    background: #7d7d7d !important;
+    border-color: var(--c-d9ab32) !important;
+    color: var(--c-ink-max) !important;
+    background: var(--c-7d7d7d) !important;
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
 .btn-group-toggle-all.active {
-    background: #D9AB32 !important;
-    color: #2A2010 !important;
-    border-color: #C2941C !important;
+    background: var(--c-d9ab32) !important;
+    color: var(--c-2a2010) !important;
+    border-color: var(--c-c2941c) !important;
     box-shadow: var(--shadow-md);
 }
 
@@ -458,21 +458,21 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
       الذي كان يطمس ألوان أزرار المجموعات وحالة active. نرفع التخصيص بـ .ems-site .main ── */
 .ems-site .main .btn-group-toggle,
 .ems-site .main .btn-group-toggle-all {
-    background: #e6e6e6 !important;
-    color: #000 !important;
-    border: 1.5px solid #6d6d6d !important;
+    background: var(--c-e6e6e6) !important;
+    color: var(--c-ink-max) !important;
+    border: 1.5px solid var(--c-6d6d6d) !important;
 }
 .ems-site .main .btn-group-toggle:hover,
 .ems-site .main .btn-group-toggle-all:hover {
-    background: #D9AB32 !important;
-    border-color: #D9AB32 !important;
-    color: #000 !important;
+    background: var(--c-d9ab32) !important;
+    border-color: var(--c-d9ab32) !important;
+    color: var(--c-ink-max) !important;
 }
 .ems-site .main .btn-group-toggle.active,
 .ems-site .main .btn-group-toggle-all.active {
-    background: #D9AB32 !important;
-    color: #2A2010 !important;
-    border-color: #C2941C !important;
+    background: var(--c-d9ab32) !important;
+    color: var(--c-2a2010) !important;
+    border-color: var(--c-c2941c) !important;
 }
 
 /* ========== PRINT STYLES ========== */
@@ -481,14 +481,14 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
     .modern-table,
     .contracts-table {
         box-shadow: none;
-        border: 1px solid #ddd;
+        border: 1px solid var(--c-dddddd);
     }
 
     .display thead,
     .modern-table thead,
     .contracts-table thead {
-        background: #f5f5f5 !important;
-        color: #000 !important;
+        background: var(--c-f5f5f5) !important;
+        color: var(--c-ink-max) !important;
     }
 
     .action-btn {
@@ -558,18 +558,18 @@ table.display tbody td > a:not(.action-btn):hover,
 table.dataTable tbody td > a:not(.action-btn):hover {
   background: var(--dark-blue) !important;
   border-color: var(--dark-blue) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 14px rgba(30, 58, 95, 0.22) !important;
+  color: var(--c-surface) !important;
+  box-shadow: 0 6px 14px var(--c-rgba305895022) !important;
 }
 
 /* DataTables and unified tables */
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) {
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  border: 1px solid #ECEEF1 !important;
+  border: 1px solid var(--c-eceef1) !important;
   border-radius: 12px !important;
   overflow: hidden !important;
-  background: #ffffff !important;
+  background: var(--c-surface) !important;
   box-shadow: none !important;
 }
 
@@ -577,10 +577,10 @@ body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .al
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead tr,
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
   background: var(--ref-head-bg) !important;
-  color: #ffffff !important;
+  color: var(--c-surface) !important;
   background-image: none !important;
-  border-color: #999 !important;
-  background: #999 !important;
+  border-color: var(--c-999999) !important;
+  background: var(--c-999999) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
@@ -598,7 +598,7 @@ body.ems-site table.dataTable thead .sorting_asc::before,
 body.ems-site table.dataTable thead .sorting_asc::after,
 body.ems-site table.dataTable thead .sorting_desc::before,
 body.ems-site table.dataTable thead .sorting_desc::after {
-  color: #ffffff !important;
+  color: var(--c-surface) !important;
   opacity: 0.9 !important;
 }
 
@@ -609,42 +609,42 @@ body.ems-site table.dataTable thead th.sorting_desc,
 body.ems-site table.dataTable thead td.sorting,
 body.ems-site table.dataTable thead td.sorting_asc,
 body.ems-site table.dataTable thead td.sorting_desc {
-  background: #999 !important;
-  color: #ffffff !important;
+  background: var(--c-999999) !important;
+  color: var(--c-surface) !important;
 }
 
 /* DataTables scrollX clones the header into .dataTables_scrollHead — keep it dark too */
 body.ems-site .dataTables_scrollHead table thead th,
 body.ems-site .dataTables_scrollHead table thead td,
 body.ems-site .dataTables_scrollHeadInner table thead th {
-  background: #3D3D3D !important;
-  color: #ffffff !important;
+  background: var(--c-ink-700) !important;
+  color: var(--c-surface) !important;
   background-image: none !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(odd) {
-  background: #FFFFFF !important;
+  background: var(--c-surface) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(even) {
-  background: #e6e6e6 !important;
+  background: var(--c-e6e6e6) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover,
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover td {
-  background: #FCF3D6 !important;
+  background: var(--c-fcf3d6) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td {
-  color: #161616 !important;
+  color: var(--c-161616) !important;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
   padding: 9px 12px !important;
-  border-bottom: 1px solid #ECEEF1 !important;
+  border-bottom: 1px solid var(--c-eceef1) !important;
   border-left: 0 !important;
   text-align: center !important;
   vertical-align: middle !important;
-   border: 1px solid #ccc !important;
+   border: 1px solid var(--c-cccccc) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td:last-child {
@@ -681,8 +681,8 @@ body.ems-site .main.ems-unified-page-shell > .card > .card-body.table-container 
 /* ── عنوان البطاقة الموحّد: h2.card-title داخل .card-body ──
    خلفية رمادية غامقة وخط 20px، قابل لإعادة الاستخدام في كل الصفحات. */
 body.ems-site .card .card-body > h2.card-title {
-  background: #ddd !important;
-  color: #000 !important;
+  background: var(--c-dddddd) !important;
+  color: var(--c-ink-max) !important;
   font-size: 20px !important;
   font-weight: 700 !important;
   line-height: 1.3 !important;
@@ -694,50 +694,50 @@ body.ems-site .card .card-body > h2.card-title {
   gap: 10px !important;
 }
 body.ems-site .card .card-body > h2.card-title > i {
-  color: #000 !important;   /* أيقونة بلون الثيم الأصفر */
+  color: var(--c-ink-max) !important;   /* أيقونة بلون الثيم الأصفر */
 }
 
 body.ems-site .dataTables_wrapper :is(.dataTables_filter, .dataTables_length, .dataTables_info, .dataTables_paginate) {
-  color: #242424 !important;
+  color: var(--c-242424) !important;
   font-size: 0.9rem !important;
   font-weight: 700 !important;
 }
 
 body.ems-site .dataTables_wrapper .dataTables_filter input,
 body.ems-site .dataTables_wrapper .dataTables_length select {
-  background: #f3f3f3 !important;
-  border: 1px solid #c5c5c5 !important;
+  background: var(--c-f3f3f3) !important;
+  border: 1px solid var(--c-c5c5c5) !important;
   border-radius: 999px !important;
   min-height: 34px !important;
   padding: 6px 12px !important;
-  color: #181818 !important;
+  color: var(--c-181818) !important;
 }
 
 body.ems-site .dataTables_wrapper .dataTables_filter input:focus,
 body.ems-site .dataTables_wrapper .dataTables_length select:focus {
-  border-color: #9b9b9b !important;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+  border-color: var(--c-9b9b9b) !important;
+  box-shadow: 0 0 0 2px var(--c-rgba000008) !important;
 }
 
 body.ems-site .dataTables_wrapper .dt-buttons .dt-button {
-  border: 1px solid #8f8f8f !important;
+  border: 1px solid var(--c-8f8f8f) !important;
   border-radius: 999px !important;
-  background: #f5f5f5 !important;
-  color: #202020 !important;
+  background: var(--c-f5f5f5) !important;
+  color: var(--c-202020) !important;
   font-weight: 800 !important;
   box-shadow: none !important;
 }
 
 body.ems-site .dataTables_wrapper .dt-buttons .dt-button:hover {
-  background: #ebebeb !important;
-  border-color: #7e7e7e !important;
+  background: var(--c-ebebeb) !important;
+  border-color: var(--c-7e7e7e) !important;
 }
 
 body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button {
-  border: 1px solid #c3c3c3 !important;
+  border: 1px solid var(--c-c3c3c3) !important;
   border-radius: 999px !important;
-  background: #f3f3f3 !important;
-  color: #222 !important;
+  background: var(--c-f3f3f3) !important;
+  color: var(--c-222222) !important;
   margin: 0 2px !important;
   min-width: 32px !important;
 }
@@ -746,14 +746,14 @@ body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button.current,
 body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   background: linear-gradient(180deg, var(--ref-yellow-1) 0%, var(--ref-yellow-2) 100%) !important;
   border-color: var(--ref-yellow-border) !important;
-  color: #161616 !important;
+  color: var(--c-161616) !important;
   font-weight: 900 !important;
 }
 
 body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #e9e9e9 !important;
-  border-color: #b4b4b4 !important;
-  color: #111 !important;
+  background: var(--c-e9e9e9) !important;
+  border-color: var(--c-b4b4b4) !important;
+  color: var(--c-111111) !important;
 }
 
 @media (max-width: 991px) {
@@ -802,14 +802,14 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   min-width: 30px !important;
   padding: 5px 8px !important;
   border-radius: 999px !important;
-  border: 1px solid #8d8d8d !important;
-  background: linear-gradient(180deg, #f8f8f8 0%, #ececec 100%) !important;
-  color: #1a1a1a !important;
+  border: 1px solid var(--c-8d8d8d) !important;
+  background: linear-gradient(180deg, var(--c-f8f8f8) 0%, var(--c-ececec) 100%) !important;
+  color: var(--c-1a1a1a) !important;
   text-decoration: none !important;
   font-size: 0.78rem !important;
   font-weight: 800 !important;
   line-height: 1 !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11) !important;
+  box-shadow: 0 1px 2px var(--c-rgba000011) !important;
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
 }
 
@@ -840,11 +840,11 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   [title*="approve"],
   [title*="cancel"]
 ):hover {
-  background: #e5e5e5 !important;
-  border-color: #707070 !important;
-  color: #111 !important;
+  background: var(--c-e5e5e5) !important;
+  border-color: var(--c-707070) !important;
+  color: var(--c-111111) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 3px 8px var(--c-rgba000015) !important;
 }
 
 body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
@@ -875,7 +875,7 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   [title*="cancel"]
 ):active {
   transform: translateY(0) !important;
-  background: #dbdbdb !important;
+  background: var(--c-dbdbdb) !important;
 }
 
 body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
@@ -905,7 +905,7 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   [title*="approve"],
   [title*="cancel"]
 ):focus-visible {
-  outline: 2px solid rgba(0, 0, 0, 0.4) !important;
+  outline: 2px solid var(--c-rgba00004) !important;
   outline-offset: 1px !important;
 }
 
@@ -942,13 +942,13 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
 
 /* Make semantic variants subtle while keeping one visual system */
 body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]) {
-  border-color: #a15b5b !important;
-  color: #6d1d1d !important;
+  border-color: var(--c-a15b5b) !important;
+  color: var(--c-6d1d1d) !important;
 }
 
 body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]):hover {
-  background: #f0dfdf !important;
-  border-color: #8b4444 !important;
+  background: var(--c-f0dfdf) !important;
+  border-color: var(--c-8b4444) !important;
 }
 
 /* ════════════════════════════════════════════════════════════════════
@@ -982,8 +982,8 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
 
 /* الحاوية الخارجية — رمادي فاتح #eee + خط علوي أصفر */
 body.ems-site .main .filter {
-  background: #eee !important;
-  border: 1px solid #ddd !important;
+  background: var(--c-eeeeee) !important;
+  border: 1px solid var(--c-dddddd) !important;
   border-radius: 25px !important;
   margin-bottom: 5px !important;
   overflow: hidden !important;
@@ -993,7 +993,7 @@ body.ems-site .main .filter {
 
 /* شريط العنوان + الأيقونة (العنوان لليمين في RTL = flex-start) */
 body.ems-site .main .filter .filter-title {
-  background: #e6e6e6 !important;
+  background: var(--c-e6e6e6) !important;
   border-radius:25px !important;
   display: flex !important;
   align-items: center !important;
@@ -1003,7 +1003,7 @@ body.ems-site .main .filter .filter-title {
   padding: 5px !important;
   font-size: 20px !important;
   font-weight: 800 !important;
-  color: #2c2c2c !important;
+  color: var(--c-2c2c2c) !important;
   margin-bottom: 10px !important;
 }
 
@@ -1029,9 +1029,9 @@ body.ems-site .main .filter .filter-field {
 
 
 body.ems-site .main .filter .filter-field :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):focus {
-  border-color: #F4C542 !important;
-  background: #fffdf5 !important;
-  box-shadow: 0 0 0 3px rgba(244, 197, 66, .25) !important;
+  border-color: var(--c-brand-gold) !important;
+  background: var(--c-fffdf5) !important;
+  box-shadow: 0 0 0 3px var(--c-rgba24419766025) !important;
   outline: none !important;
   border-radius: 20px !important;
 }
@@ -1056,17 +1056,17 @@ body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):
   padding: 0 22px !important;
   border: none !important;
   border-radius: 999px !important;
-  background: #F4C542 !important;
+  background: var(--c-brand-gold) !important;
   background-image: none !important;
-  color: #2a2300 !important;
+  color: var(--c-2a2300) !important;
   font-size: 14px !important;
   font-weight: 800 !important;
   cursor: pointer !important;
-  box-shadow: 0 2px 6px rgba(244, 197, 66, .45) !important;
+  box-shadow: 0 2px 6px var(--c-rgba24419766045) !important;
   transition: background .18s ease, transform .18s ease !important;
 }
 body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):not(.dt-button):hover {
-  background: #e6b52f !important;
+  background: var(--c-e6b52f) !important;
   background-image: none !important;
   transform: translateY(-1px) !important;
 }
@@ -1081,18 +1081,18 @@ body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.clos
   min-height: 42px !important;
   box-sizing: border-box !important;
   padding: 0 !important;
-  border: 1px solid #cfcfcf !important;
+  border: 1px solid var(--c-cfcfcf) !important;
   border-radius: 50% !important;
-  background: #fff !important;
+  background: var(--c-surface) !important;
   background-image: none !important;
-  color: #555 !important;
+  color: var(--c-555555) !important;
   font-size: 15px !important;
   cursor: pointer !important;
   transition: background .18s ease, color .18s ease, transform .25s ease !important;
 }
 body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.close):not(.dt-button):hover {
-  background: #f0f0f0 !important;
-  color: #222 !important;
+  background: var(--c-f0f0f0) !important;
+  color: var(--c-222222) !important;
   transform: rotate(-90deg) !important;
 }
 
@@ -1116,13 +1116,13 @@ body.ems-site table th[data-gov]::before {
   bottom: 0;
   width: 3px;
   border-radius: 2px;
-  background: #c9a227; /* شريحة ① الأعمدة الحاكمة — ذهبي النظام */
+  background: var(--c-c9a227); /* شريحة ① الأعمدة الحاكمة — ذهبي النظام */
   opacity: .55;
 }
-body.ems-site table th[data-gov][data-slice="2"]::before { background: #8e44ad; } /* ② الأثر والعكس */
-body.ems-site table th[data-gov][data-slice="3"]::before { background: #2e86c1; } /* ③ المال والإثبات */
+body.ems-site table th[data-gov][data-slice="2"]::before { background: var(--c-8e44ad); } /* ② الأثر والعكس */
+body.ems-site table th[data-gov][data-slice="3"]::before { background: var(--c-2e86c1); } /* ③ المال والإثبات */
 body.ems-site table td.ems-gov-empty {
-  color: #9aa0a6;
+  color: var(--c-9aa0a6);
   text-align: center;
 }
 
@@ -1142,9 +1142,9 @@ body.ems-site .ems-xscroll {
   scrollbar-width: thin;
 }
 body.ems-site .ems-xscroll::-webkit-scrollbar { height: 10px; }
-body.ems-site .ems-xscroll::-webkit-scrollbar-track { background: #f1f2f4; border-radius: 6px; }
-body.ems-site .ems-xscroll::-webkit-scrollbar-thumb { background: #b9bec5; border-radius: 6px; }
-body.ems-site .ems-xscroll::-webkit-scrollbar-thumb:hover { background: #9aa0a6; }
+body.ems-site .ems-xscroll::-webkit-scrollbar-track { background: var(--c-f1f2f4); border-radius: 6px; }
+body.ems-site .ems-xscroll::-webkit-scrollbar-thumb { background: var(--c-b9bec5); border-radius: 6px; }
+body.ems-site .ems-xscroll::-webkit-scrollbar-thumb:hover { background: var(--c-9aa0a6); }
 
 /* الجدولُ يأخذ عرضَ محتواه ولا ينكمش دون عرض الحاوية */
 body.ems-site .ems-xscroll > table {

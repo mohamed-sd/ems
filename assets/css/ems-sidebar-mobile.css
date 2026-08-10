@@ -83,10 +83,10 @@
     width: min(86vw, 340px) !important;
     flex-basis: min(86vw, 340px) !important;
     max-width: 340px;
-    background: #FFFFFF !important;
+    background: var(--c-surface) !important;
     border-left: 0 !important;
     border-radius: 20px 0 0 20px;
-    box-shadow: -18px 0 44px rgba(15, 17, 21, 0.28) !important;
+    box-shadow: -18px 0 44px var(--c-rgba151721028) !important;
     /* الحوافُّ الآمنةُ في هواتف الشقّ العلويّ وشريط الإيماءة السفليّ */
     padding-bottom: env(safe-area-inset-bottom, 0px);
     justify-content: flex-start;
@@ -134,8 +134,8 @@
     gap: 10px;
     flex: 0 0 auto;
     padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 14px;
-    background: linear-gradient(135deg, rgba(244, 197, 66, 0.22), rgba(244, 197, 66, 0.05));
-    border-bottom: 1px solid #E3E6EA;
+    background: linear-gradient(135deg, var(--c-rgba24419766022), var(--c-rgba24419766005));
+    border-bottom: 1px solid var(--c-e3e6ea);
     position: relative;
     z-index: 2;
   }
@@ -157,7 +157,7 @@
     display: block;
     font-size: 15px;
     font-weight: 800;
-    color: #1F2933;
+    color: var(--c-1f2933);
     letter-spacing: 0.2px;
   }
 
@@ -165,7 +165,7 @@
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: #6B7280;
+    color: var(--c-ink-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -178,10 +178,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #E3E6EA;
+    border: 1px solid var(--c-e3e6ea);
     border-radius: 12px;
-    background: #FFFFFF;
-    color: #44403C;
+    background: var(--c-surface);
+    color: var(--c-44403c);
     font-size: 16px;
     cursor: pointer;
     padding: 0;
@@ -189,8 +189,8 @@
   }
 
   .ems-site .sidebar .sidebar-mobile-close:active {
-    background: rgba(244, 197, 66, 0.22);
-    color: #1F2933;
+    background: var(--c-rgba24419766022);
+    color: var(--c-1f2933);
   }
 
   .ems-site .sidebar .sidebar-mobile-close i {
@@ -258,7 +258,7 @@
   .ems-site .sidebar ul.nav-group-items {
     margin: 2px 6px 6px 4px;
     padding-right: 10px;
-    border-right: 2px solid rgba(244, 197, 66, 0.35);
+    border-right: 2px solid var(--c-rgba24419766035);
   }
 
   .ems-site .sidebar ul.nav-group-items > li {
@@ -286,13 +286,13 @@
     padding: 12px 12px 5px;
     font-size: 12px;
     font-weight: 700;
-    color: #8A8F98;
+    color: var(--c-8a8f98);
     opacity: 1;
     letter-spacing: 0.2px;
   }
 
   .ems-site .sidebar .nav-subhead span {
-    border-bottom: 1px dashed #E3E6EA;
+    border-bottom: 1px dashed var(--c-e3e6ea);
     padding-bottom: 4px;
   }
 
@@ -301,13 +301,13 @@
      الصفُّ ملوَّنًا بعد النقر لأن المتصفّح يبقيه في حالة hover وهميّة. */
   .ems-site .sidebar ul li a:active,
   .ems-site .sidebar .nav-group-head:active {
-    background: rgba(244, 197, 66, 0.18) !important;
-    color: #1F2933 !important;
+    background: var(--c-rgba24419766018) !important;
+    color: var(--c-1f2933) !important;
   }
 
   .ems-site .sidebar ul li.active > a,
   .ems-site .sidebar ul li.active:hover > a {
-    background: rgba(244, 197, 66, 0.28) !important;
+    background: var(--c-rgba24419766028) !important;
     font-weight: 800;
   }
 
@@ -316,12 +316,12 @@
     width: 4px;
     top: 10px;
     bottom: 10px;
-    background: #E0AE2E !important;
+    background: var(--c-e0ae2e) !important;
   }
 
   /* البابُ الحاوي للصفحة الحاليّة يبقى مميَّزًا وهو مطويّ */
   .ems-site .sidebar li.nav-group.has-active > .nav-group-head {
-    background: rgba(244, 197, 66, 0.14);
+    background: var(--c-rgba24419766014);
   }
 
   /* «المجموعةُ المختارة» مفهومُ حاسوبٍ (تقود بلاطاتِ لوحة التحكّم) —
@@ -334,7 +334,7 @@
   /* زرُّ فتح اللوح لم يعد عائمًا هنا: انتقل إلى داخل الشريط العلويّ،
      وتصميمُه صار في ems-topbar-mobile.css — مالكٌ واحدٌ لكل شأن. */
   .ems-site .sidebar-overlay {
-    background: rgba(15, 17, 21, 0.5);
+    background: var(--c-rgba15172105);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     opacity: 0;
@@ -351,7 +351,7 @@
     justify-content: center !important;
     font-size: 13px !important;
     font-weight: 700;
-    color: #6B7280;
+    color: var(--c-ink-500);
   }
 
   .ems-site .sidebar li.nav-more-toggle > .nav-group-head::after {

@@ -10,8 +10,8 @@
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 .ems-journey {
-    background: var(--white, #fff);
-    border: 1px solid var(--gray-200, #E7E5E4);
+    background: var(--white, var(--c-surface));
+    border: 1px solid var(--gray-200, var(--c-line-200));
     border-radius: 10px;
     padding: 14px 16px 12px;
     margin-bottom: 14px;
@@ -26,7 +26,7 @@
     padding-bottom: 4px;
 }
 .ems-journey-track::-webkit-scrollbar { height: 6px; }
-.ems-journey-track::-webkit-scrollbar-thumb { background: var(--gray-300, #D6D3D1); border-radius: 3px; }
+.ems-journey-track::-webkit-scrollbar-thumb { background: var(--gray-300, var(--c-d6d3d1)); border-radius: 3px; }
 
 .ems-jstep {
     flex: 1 1 0;
@@ -45,7 +45,7 @@
     inset-inline-end: 50%;
     width: 100%;
     height: 2px;
-    background: var(--gray-300, #D6D3D1);
+    background: var(--gray-300, var(--c-d6d3d1));
     z-index: 0;
 }
 .ems-jstep:first-child::before { display: none; }
@@ -58,21 +58,21 @@
     line-height: 26px;
     margin: 0 auto 6px;
     border-radius: 50%;
-    background: var(--gray-100, #F5F5F4);
-    border: 2px solid var(--gray-300, #D6D3D1);
-    color: var(--gray-500, #78716C);
+    background: var(--gray-100, var(--c-f5f5f4));
+    border: 2px solid var(--gray-300, var(--c-d6d3d1));
+    color: var(--gray-500, var(--c-78716c));
     font-size: 12px;
     font-weight: 800;
 }
 .ems-jlabel {
     font-size: 13px;
     font-weight: 700;
-    color: var(--gray-700, #44403C);
+    color: var(--gray-700, var(--c-44403c));
     line-height: 1.35;
 }
 .ems-jmeta {
     font-size: 11px;
-    color: var(--gray-500, #78716C);
+    color: var(--gray-500, var(--c-78716c));
     margin-top: 3px;
     line-height: 1.5;
 }
@@ -80,36 +80,36 @@
 
 /* ── منجَزة ───────────────────────────────────────────────────────────── */
 .ems-jstep.is-done .ems-jdot {
-    background: var(--success-100, #ECF1DE);
-    border-color: var(--success-600, #5B7F1E);
-    color: var(--success-deep, #365314);
+    background: var(--success-100, var(--c-ecf1de));
+    border-color: var(--success-600, var(--c-5b7f1e));
+    color: var(--success-deep, var(--c-365314));
 }
 .ems-jstep.is-done + .ems-jstep::before,
-.ems-jstep.is-done::before { background: var(--success-600, #5B7F1E); }
-.ems-jstep.is-done .ems-jlabel { color: var(--success-deep, #365314); }
+.ems-jstep.is-done::before { background: var(--success-600, var(--c-5b7f1e)); }
+.ems-jstep.is-done .ems-jlabel { color: var(--success-deep, var(--c-365314)); }
 
 /* ── الحالية (مضاءة) ──────────────────────────────────────────────────── */
 .ems-jstep.is-current .ems-jdot {
-    background: var(--brand-amber, #F2AA2A);
-    border-color: var(--brand-orange-bright, #E67E00);
-    color: var(--brand-black, #0F1115);
-    box-shadow: 0 0 0 4px rgba(242, 170, 42, .22);
+    background: var(--brand-amber, var(--c-f2aa2a));
+    border-color: var(--brand-orange-bright, var(--c-e67e00));
+    color: var(--brand-black, var(--c-ink-950));
+    box-shadow: 0 0 0 4px var(--c-rgba24217042022);
 }
 .ems-jstep.is-current .ems-jlabel {
-    color: var(--brand-black, #0F1115);
+    color: var(--brand-black, var(--c-ink-950));
     font-weight: 800;
 }
 /* المتأخرة عن مهلتها تتقدم بصريًّا بثبات (الدستور §9: «الحرجُ يتقدم بصريًّا») */
 .ems-jstep.is-current.is-overdue .ems-jdot {
-    background: var(--danger-100, #F5DCDC);
-    border-color: var(--danger-600, #991B1B);
-    color: var(--danger-deep, #7F1D1D);
-    box-shadow: 0 0 0 4px rgba(153, 27, 27, .18);
+    background: var(--danger-100, var(--c-f5dcdc));
+    border-color: var(--danger-600, var(--c-991b1b));
+    color: var(--danger-deep, var(--c-7f1d1d));
+    box-shadow: 0 0 0 4px var(--c-rgba1532727018);
 }
-.ems-jstep.is-current.is-overdue .ems-jlabel { color: var(--danger-deep, #7F1D1D); }
+.ems-jstep.is-current.is-overdue .ems-jlabel { color: var(--danger-deep, var(--c-7f1d1d)); }
 
 /* ── لم تبدأ ──────────────────────────────────────────────────────────── */
-.ems-jstep.is-todo .ems-jlabel { color: var(--gray-500, #78716C); font-weight: 600; }
+.ems-jstep.is-todo .ems-jlabel { color: var(--gray-500, var(--c-78716c)); font-weight: 600; }
 
 /* ── مسارٌ توقف (رفض/سحب/إلغاء…): ما بعده يُطفأ ───────────────────────── */
 .ems-jstep.is-off { opacity: .45; }
@@ -122,13 +122,13 @@
     gap: 8px;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed var(--gray-200, #E7E5E4);
+    border-top: 1px dashed var(--gray-200, var(--c-line-200));
     font-size: 13px;
-    color: var(--gray-700, #44403C);
+    color: var(--gray-700, var(--c-44403c));
 }
-.ems-journey-next .ems-jnext-owner { font-weight: 800; color: var(--brand-black, #0F1115); }
-.ems-journey-next .ems-jage { color: var(--gray-500, #78716C); }
-.ems-journey-next .ems-jage.is-overdue { color: var(--danger-deep, #7F1D1D); font-weight: 800; }
+.ems-journey-next .ems-jnext-owner { font-weight: 800; color: var(--brand-black, var(--c-ink-950)); }
+.ems-journey-next .ems-jage { color: var(--gray-500, var(--c-78716c)); }
+.ems-journey-next .ems-jage.is-overdue { color: var(--danger-deep, var(--c-7f1d1d)); font-weight: 800; }
 
 /* ── لافتة الإعادة (سببٌ بارزٌ فوق الحقول الناقصة — §4.3) ─────────────── */
 .ems-journey-banner {
@@ -145,31 +145,31 @@
 .ems-journey-banner .ems-jb-title { font-weight: 800; }
 .ems-journey-banner .ems-jb-meta { font-size: 12px; opacity: .85; }
 .ems-journey-banner.is-return {
-    background: var(--warning-100, #F4E5D3);
-    border: 1px solid var(--warning-600, #A8541C);
-    color: var(--warning-deep, #7C2D12);
+    background: var(--warning-100, var(--c-f4e5d3));
+    border: 1px solid var(--warning-600, var(--c-a8541c));
+    color: var(--warning-deep, var(--c-7c2d12));
 }
 .ems-journey-banner.is-stop {
-    background: var(--danger-100, #F5DCDC);
-    border: 1px solid var(--danger-600, #991B1B);
-    color: var(--danger-deep, #7F1D1D);
+    background: var(--danger-100, var(--c-f5dcdc));
+    border: 1px solid var(--danger-600, var(--c-991b1b));
+    color: var(--danger-deep, var(--c-7f1d1d));
 }
 .ems-journey-banner.is-done {
-    background: var(--success-100, #ECF1DE);
-    border: 1px solid var(--success-600, #5B7F1E);
-    color: var(--success-deep, #365314);
+    background: var(--success-100, var(--c-ecf1de));
+    border: 1px solid var(--success-600, var(--c-5b7f1e));
+    color: var(--success-deep, var(--c-365314));
 }
 .ems-journey-banner .ems-jb-action {
     margin-inline-start: auto;
-    background: var(--brand-black, #0F1115);
-    color: var(--white, #fff);
+    background: var(--brand-black, var(--c-ink-950));
+    color: var(--white, var(--c-surface));
     border-radius: 6px;
     padding: 5px 14px;
     font-weight: 700;
     text-decoration: none;
     white-space: nowrap;
 }
-.ems-journey-banner .ems-jb-action:hover { background: var(--brand-orange-bright, #E67E00); color: #fff; }
+.ems-journey-banner .ems-jb-action:hover { background: var(--brand-orange-bright, var(--c-e67e00)); color: var(--c-surface); }
 
 /* ── الهاتف: المراحل قائمةً رأسيةً والحرجُ مقروء ──────────────────────── */
 @media (max-width: 720px) {
