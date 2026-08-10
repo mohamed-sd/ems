@@ -46,20 +46,15 @@ JOIN project p ON o.project_id = p.id
 WHERE 1=1$drv_filter AND {TENANT_SCOPE} GROUP BY d.name, p.name, e.name, t.date ORDER BY t.date, d.name", $drv_params);
 } catch (\Throwable $t) { error_log('deriver.php main: ' . $t->getMessage()); }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تقارير السائقين</title>
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'إيكوبيشن | تقارير السائقين';
+include __DIR__ . '/../inheader.php';
+?>
 
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
-    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
-</head>
-<body>
 
 <?php 
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير

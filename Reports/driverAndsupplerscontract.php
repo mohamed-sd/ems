@@ -7,28 +7,19 @@ if (!isset($_SESSION['user'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تقرير وحدات المشغّلين</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-
-    <link rel="stylesheet" href="../assets/css/admin-style.css">
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-
-    <!-- ملف التصميم القديم -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-
-    <style>
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'إيكوبيشن | تقرير وحدات المشغّلين';
+include __DIR__ . '/../inheader.php';
+?>
+<!-- أنماطٌ تنفرد بها هذه الشاشة (لا يحمّلها inheader) -->
+<link rel="stylesheet" href="../assets/css/admin-style.css">
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+<style>
         .main { font-family: 'Cairo', sans-serif; }
 
         .report-table thead th {
@@ -56,9 +47,7 @@ if (!isset($_SESSION['user'])) {
 
         .form-grid { align-items: end; }
     </style>
-</head>
 
-<body>
 
 <?php
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير

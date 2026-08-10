@@ -18,22 +18,18 @@ if (!$is_super_admin && $company_id <= 0) {
 // بوابة العزل — تستبدل سُلَّم النطاق اليدوي (وفيه احتياطي project/users القديم)
 $dcd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('driver contract details super') : ems_tenant_db();
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | ملف عقد الموظف</title>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-
-    <style>
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'إيكوبيشن | ملف عقد الموظف';
+include __DIR__ . '/../inheader.php';
+?>
+<!-- أنماطٌ تنفرد بها هذه الشاشة (لا يحمّلها inheader) -->
+<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+<link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+<style>
         @import url('/ems/assets/css/local-fonts.css');
 
         * {
@@ -382,8 +378,7 @@ $dcd_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('driver contract de
             }
         }
     </style>
-</head>
-<body>
+
 
 <?php 
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير

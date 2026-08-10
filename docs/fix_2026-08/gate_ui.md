@@ -1,9 +1,9 @@
-# بوابةُ FIX-02 — 2026-08-10 10:15
+# بوابةُ FIX-02 — 2026-08-10 10:38
 
 | المعيار | الحكم | الشاهد |
 |---|---|---|
 | AC-U0 | ✔ | صفرُ اختلالٍ جديد · موروثٌ مُعدَّدٌ: 3 سطحًا |
-| AC-U1 | ✘ | 39 ملفًّا يُصدِر <html>: Employees/employee_contracts.php · Employees/employee_contracts_details.php · Employees/showcontractemployee.php · Reports/contract_report.php · Reports/contractall.php · Reports/deliy.php · Reports/deriver.php · Reports/driverAndsupplerscontract.php |
+| AC-U1 | ✔ | 0 سطحًا يُصدِر <html> بنفسه · ◆ خارجَ قشرةِ التطبيق (مُعلَنٌ لا مسكوتٌ عنه): 23 |
 | AC-U2 | ✔ | 0 قيمةً لونيةً حرفيةً في نظامِنا · متمايزٌ منها 0 · ◆ في المكتباتِ (مستثناةٌ مُعلَنةٌ لا مسكوتٌ عنها): 1128 · أكثرُها:  |
 | AC-U3 | ✔ | 4 نمطًا دلاليًّا عبرَ 1549 استعمالًا · ◆ أحجامٌ وأغلفةٌ (لا تُعَدّ): 400 · btn-secondary · btn-primary · btn-danger · btn-ghost |
 | AC-U5 | ✔ | جدولُ المناظر: موجود · صفوفٌ مبذورة: 736 · المنتقي: محمَّل |
@@ -13,4 +13,4 @@
 | AC-U11 | ✔ | 3 نقطةً متمايزة: 768، 992، 1200 |
 | AC-U12 | ✘ | 3677 نمطًا موضعيًّا في 326 سطحًا · أكثرُها: Timesheet/timesheet.php(205) · Employees/employee_contracts_details.php(138) · Suppliers/supplierscontracts_details.php(96) |
 
-**7/10**
+**8/10**

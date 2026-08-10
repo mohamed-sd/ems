@@ -18,19 +18,13 @@ foreach ($available as $report) {
     $byCategory[$report['category']][] = $report;
 }
 
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ. كان هنا رأسٌ محليٌّ برأسِه وأنماطِه، و**وسمُ
+   `<body>` بعد تضمينِ السايدبار** — ترتيبٌ يعمل بتسامحِ المتصفحِ لا بصحةِ
+   البناء. صار `inheader.php` مصدرَ القشرةِ وترتيبُها الصحيحُ: رأسٌ ← جسمٌ ←
+   شريطٌ ← سايدبار ← محتوى. وأنماطُ الشاشةِ الخاصةُ محفوظةٌ أدناه كما هي. */
 $page_title = 'التقارير';
+include __DIR__ . '/../inheader.php';
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="../assets/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="../assets/css/all.min.css">
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
     <style>
         :root {
             --navy: #1a1208;
@@ -232,15 +226,12 @@ $page_title = 'التقارير';
             }
         }
     </style>
-</head>
 <?php
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../insidebar.php';
 ?>
-
-<body class="ems-site">
 
     <div class="main ems-unified-page-shell reports-shell">
 

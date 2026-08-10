@@ -63,16 +63,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تغيير كلمة السر</title>
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-    <style>
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'إيكوبيشن | تغيير كلمة السر';
+include __DIR__ . '/../inheader.php';
+?>
+<!-- أنماطٌ تنفرد بها هذه الشاشة (لا يحمّلها inheader) -->
+<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+<link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+<style>
         .main {
             padding: 20px;
             max-width: 600px;
@@ -289,8 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     </style>
-</head>
-<body>
+
 
     <?php 
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير

@@ -26,26 +26,19 @@ $equipments = $conn->query("
 ");
 ?>
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <title>تقرير المعدات</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap + DataTables -->
-    <link rel="stylesheet" href="/ems/assets/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.bootstrap5.min.css">
-
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-
-    <!-- Local style -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-
-    <style>
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'تقرير المعدات';
+include __DIR__ . '/../inheader.php';
+?>
+<!-- أنماطٌ تنفرد بها هذه الشاشة (لا يحمّلها inheader) -->
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.bootstrap5.min.css">
+<link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+<style>
         .cards {
             display: flex;
             flex-wrap: wrap;
@@ -112,9 +105,7 @@ $equipments = $conn->query("
             }
         }
     </style>
-</head>
 
-<body>
     <?php 
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';

@@ -47,28 +47,15 @@ if ($driver_owned === null) {
   exit();
 }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'إيكوبيشن | عقود السائق';
+include __DIR__ . '/../inheader.php';
+?>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إيكوبيشن | عقود السائق</title>
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- Call bootstrap 5 -->
-  <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
-  <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
-  <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
-  <!-- Unified column-groups module (this page uses insidebar, not inheader) -->
-  <script src="/ems/assets/js/column-groups.js"></script>
-</head>
-
-<body class="ems-site">
 
   <?php 
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير

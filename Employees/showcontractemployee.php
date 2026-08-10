@@ -6,23 +6,19 @@ if (!isset($_SESSION['user'])) {
   exit();
 }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تفاصيل العقد</title>
+<?php
+/* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
+   و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
+   هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
+   وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
+$page_title = 'إيكوبيشن | تفاصيل العقد';
+include __DIR__ . '/../inheader.php';
+?>
+<!-- أنماطٌ تنفرد بها هذه الشاشة (لا يحمّلها inheader) -->
+<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+<link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+<link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-           <!-- Bootstrab 5 -->
-  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-</head>
-<body class="ems-site">
 
 <?php 
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير

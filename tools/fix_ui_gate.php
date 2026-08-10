@@ -109,17 +109,29 @@ u('AC-U0', 'صفرُ سطحٍ يُخرج محتواه خارجَ قالبِ ال
             array_keys($newImbalance), $newImbalance))));
 
 /* ══ AC-U1 · ملفٌّ واحدٌ يُصدِر الترويسة ═══════════════════════════════════ */
+/* ◆ النطاق: **قشرةُ التطبيق** — الشاشاتُ خلفَ الدخولِ بشريطٍ وسايدبار.
+     والمعيارُ عن «قشرةٍ واحدةٍ للتطبيق» لا عن «صفرِ ‎<html>‎ في الشجرة»:
+     ثلاثةٌ وعشرون ملفًّا تُصدِرها بحقّ — صفحاتُ الدخولِ **قبل** المصادقةِ
+     (لا سايدبارَ لها أصلًا) · المثبِّتُ الذي يعمل قبل وجودِ التطبيق · قوالبُ
+     الطباعةِ والتصدير · كونسولُ المزوّدِ بقشرتِه · و`inheader` نفسُها.
+     وعدُّها معًا يجعل المعيارَ أحمرَ إلى الأبد فيُتدرَّب على تجاهله.
+   ◆ ويُعلَن المستثنى بعددِه — لا يُسكت عنه. */
 $htmlEmitters = array();
+$surfaceSet = array();
+foreach (fix_surface_files($ROOT) as $r) { $surfaceSet[$r] = true; }
+$outsideShell = 0;
 foreach (ui_files($ROOT, array('php')) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
-    if ($src === '') { continue; }
-    if (preg_match('/<html\b/i', $src)) { $htmlEmitters[] = $rel; }
+    if ($src === '' || !preg_match('/<html\b/i', $src)) { continue; }
+    if (isset($surfaceSet[$rel])) { $htmlEmitters[] = $rel; } else { $outsideShell++; }
 }
 u('AC-U1', 'ملفٌّ واحدٌ يُصدِر الترويسةَ لا سبعة',
-    'يعدُّ ملفاتِ PHP التي تُصدِر وسمَ <html> نصًّا',
-    'لا يقيس القوالبَ التي تُصدِرها بمتغيّرٍ مركَّب',
-    count($htmlEmitters) <= 1,
-    count($htmlEmitters) . ' ملفًّا يُصدِر <html>' . ($htmlEmitters ? ': ' . implode(' · ', array_slice($htmlEmitters, 0, 8)) : ''));
+    'يعدُّ **أسطحَ التطبيقِ الحيةَ** التي تُصدِر <html> بنفسها بدل قشرةِ inheader',
+    'لا يقيس صفحاتِ ما قبلَ الدخولِ ولا المثبِّتَ ولا قوالبَ الطباعةِ — لها قشراتُها بحقّ',
+    count($htmlEmitters) === 0,
+    count($htmlEmitters) . ' سطحًا يُصدِر <html> بنفسه'
+        . ($htmlEmitters ? ': ' . implode(' · ', array_slice($htmlEmitters, 0, 6)) : '')
+        . ' · ◆ خارجَ قشرةِ التطبيق (مُعلَنٌ لا مسكوتٌ عنه): ' . $outsideShell);
 
 /* ══ AC-U2 · صفرُ لونٍ حرفيٍّ خارجَ ملفِّ الرموز ══════════════════════════ */
 /* ◆ النطاق: **نظامُنا التصميميُّ** لا ملفاتُ المكتبات. `bootstrap.min.css`
