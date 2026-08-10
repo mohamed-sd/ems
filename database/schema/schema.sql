@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 18:53:47
+-- المصدر: equipation_manage · التوليد: 2026-08-10 20:34:47
 -- الجداول: 549 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -2034,9 +2034,13 @@ CREATE TABLE `deduction_proposals` (
   `waiver_ref` int(11) DEFAULT NULL COMMENT 'قرار الإعفاء المستقل (waivers_reversals) — والأصل باقٍ',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `proposed_by` int(11) DEFAULT NULL COMMENT 'من اقترحَ الخصم (users.id) — أساسُ منعِ اعتمادِ الذات',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'من اعتمدَه — يدٌ تخالف المراجعَ والمقترح',
   PRIMARY KEY (`ded_id`),
   UNIQUE KEY `uq_dp_source` (`person_id`,`period`,`source`,`source_ref`),
-  KEY `ix_dp_state` (`company_id`,`period`,`state`)
+  KEY `ix_dp_state` (`company_id`,`period`,`state`),
+  CONSTRAINT `chk_ded_prop_two_hands` CHECK (`approved_by` is null or `proposed_by` is null or `approved_by` <> `proposed_by`),
+  CONSTRAINT `chk_ded_prop_review_hand` CHECK (`approved_by` is null or `reviewed_by` is null or `approved_by` <> `reviewed_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: deduction_types ──
@@ -7028,8 +7032,8 @@ CREATE TABLE `nav_items` (
   KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
   KEY `ix_nav_group` (`group_id`),
   KEY `ix_nav_module` (`module_id`),
-  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0),
-  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%')
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav_redirects ──
@@ -9475,8 +9479,17 @@ CREATE TABLE `scr_deductions` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `proposal_ref` bigint(20) unsigned DEFAULT NULL COMMENT 'مقترحُ الخصم — لا خصمَ معتمدًا بلا مقترحه (deduction_proposals.ded_id)',
+  `approval_request_ref` int(11) DEFAULT NULL COMMENT 'طلبُ سلّمِ الموافقاتِ المكتمل (approval_requests.id)',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِدُ — يدٌ ثانيةٌ تخالف المنشئ (users.id)',
+  `approved_at` datetime DEFAULT NULL COMMENT 'لحظةُ الاعتماد — يكتبها منفّذُ السلّم لا الشاشة',
   PRIMARY KEY (`id`),
-  KEY `ix_deductions_live` (`company_id`,`status`)
+  KEY `ix_deductions_live` (`company_id`,`status`),
+  KEY `idx_scr_ded_proposal` (`proposal_ref`),
+  KEY `idx_scr_ded_request` (`approval_request_ref`),
+  CONSTRAINT `fk_scr_ded_proposal` FOREIGN KEY (`proposal_ref`) REFERENCES `deduction_proposals` (`ded_id`),
+  CONSTRAINT `fk_scr_ded_request` FOREIGN KEY (`approval_request_ref`) REFERENCES `approval_requests` (`id`),
+  CONSTRAINT `chk_scr_ded_approved_evidence` CHECK (`is_seed` = 1 or `status`  not like '%معتمد%' or `proposal_ref` is not null and `approval_request_ref` is not null and `approved_by` is not null and `created_by` is not null and `created_by` > 0 and `approved_by` <> `created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة deductions.php';
 
 -- ── Table: scr_doc_types ──

@@ -26,8 +26,31 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 require_once __DIR__ . '/../includes/cmp03_local_store.php'; // الموجة ٢ — الجدول الأصلي
+/* INJ-0219 — سلّمُ الموافقاتِ قناةً واحدةً: هذه الشاشةُ **لا تكتب** «معتمد»
+   إطلاقًا؛ يكتبها منفّذُ السلّمِ عند اكتمالِه بحمولةٍ أُنشئت وقتَ الطلب. */
+require_once __DIR__ . '/../includes/approval_workflow.php';
+require_once __DIR__ . '/../includes/self_approval_guard.php';
 
 $CANONICAL = 'deductions.php';
+/* رمزا الفعلَين مسجَّلان في `actions` (الحارسُ enforce) — هجرة 2027_01_29 */
+const INJ0219_ACT_REQUEST = 'screen.workforce.deduction.request_approval';
+const INJ0219_ACT_APPROVE = 'screen.workforce.deduction.approve_step';
+
+/**
+ * بلاغُ نتيجةٍ برمزٍ يطابقها — لا نجاحٌ بلونِ فشلٍ ولا فشلٌ بلونِ نجاح.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ كُشف بالتصييرِ الحيّ: `inheader.php` يستنتج **لونَ** الرسالةِ من رمزِها
+ *   (`-OK-` ⇒ أخضر · غيرُه ⇒ أحمر)، وكانت كلُّ نداءاتِ هذه الشاشةِ تمرّر
+ *   `GOV-OK-200` ثابتًا. فظهر «❌ ليس لديك صلاحية…» **أخضرَ نجاحٍ** — والرسالةُ
+ *   تقول شيئًا ولونُها يقول نقيضَه، واللونُ أسرعُ إلى العين من النص.
+ * ◆ ويشمل الإصلاحُ فعلَ «الإضافة» القائمَ قبلَ هذه الحزمة: «تعذر الحفظ ❌» كان
+ *   يخرج أخضرَ هو أيضًا. (السطرُ نفسُه، فتصحيحُه هنا لا تركُه لأنه ليس بندي.)
+ */
+function inj0219_flash($ok, $message, $hint = '')
+{
+    ems_gov_flash_redirect(basename(__FILE__), $message,
+        $ok ? 'GOV-OK-200' : 'GOV-ERR-409', $hint);
+}
 $COLS   = array (
   0 => 'رقم القرار',
   1 => 'كود الموظف',
@@ -99,7 +122,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    /* INJ-0219: الطبقةُ تحطُّ الحالةَ النهائيةَ وتُعلن السبب — يُنقل نصًّا لا يُبتلع */
+    $notice = cmp03_store_notice();
+    inj0219_flash($ok, $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', $notice);
+    exit();
+}
+
+/* ── INJ-0219 ①: طلبُ الاعتماد — يفتح السلّمَ ولا يعتمد شيئًا ─────────────── */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'request_approval') {
+    $rowId    = intval($_POST['row_id'] ?? 0);
+    $proposal = intval($_POST['proposal_ref'] ?? 0);
+    $msg = '';
+    $row = $rowId > 0 ? cmp03_store_row($conn, $CANONICAL, $company_id, $rowId) : null;
+
+    if (!$row) {
+        $msg = 'صفٌّ غيرُ موجودٍ في كيانك (404)';
+    } elseif (cmp03_status_is_terminal($row['status'])) {
+        $msg = 'الصفُّ معتمدٌ سلفًا — لا سلّمَ لما تمَّ (409)';
+    } elseif ($proposal <= 0) {
+        /* «لا خصمَ بلا مستند» (M-11): المقترحُ هو مستندُ هذا القرار، فلا يُطلب
+           اعتمادُ خصمٍ لا يشير إلى ما تولَّد عنه. */
+        $msg = 'مقترحُ الخصمِ إلزاميٌّ — لا اعتمادَ لخصمٍ بلا مقترحه (422)';
+    } else {
+        /* المقترحُ من كيانِ المستخدمِ نفسِه — عزلُ الشركاتِ لا يُخترق بمعرّفٍ مُرسَل */
+        $st = $conn->prepare('SELECT ded_id, state, proposed_amount FROM deduction_proposals
+                               WHERE ded_id = ? AND company_id = ? LIMIT 1');
+        $st->bind_param('ii', $proposal, $company_id);
+        $st->execute();
+        $ded = $st->get_result()->fetch_assoc();
+        $st->close();
+        if (!$ded) {
+            $msg = 'مقترحٌ غيرُ موجودٍ في كيانك (404)';
+        } else {
+            /* الحمولةُ: ما سيكتبه **منفّذُ السلّمِ** عند الاكتمال لا الشاشة.
+               والرموزُ يملؤها المحرّكُ لحظتَها (رقمُ الطلبِ · المعتمِدُ الأخيرُ ·
+               اللحظة) — فلا يُكتب سندٌ قبل وجودِه. */
+            $payload = array(
+                'summary' => array(
+                    'table' => 'scr_deductions', 'operation' => 'approve',
+                    'old_values' => array('الحالة' => (string) $row['status']),
+                    'new_values' => array('الحالة' => 'معتمد', 'مقترح الخصم' => '#' . (int) $ded['ded_id'],
+                                          'المبلغ المقترح' => (string) $ded['proposed_amount']),
+                ),
+                'operations' => array(array(
+                    'db_action' => 'update', 'table' => 'scr_deductions',
+                    'where' => array('id' => $rowId, 'company_id' => $company_id),
+                    'data' => array(
+                        'status' => 'معتمد', 'status_label' => 'معتمد',
+                        'proposal_ref' => (int) $ded['ded_id'],
+                        'approval_request_ref' => '{{request_id}}',
+                        'approved_by' => '{{final_approver}}',
+                        'approved_at' => '{{now}}',
+                        'approved_date' => '{{today}}',
+                    ),
+                )),
+            );
+            $res = approval_create_request('scr_deductions', $rowId, 'approve', $payload, $uid, $conn);
+            $ok = !empty($res['success']);
+            $msg = ($ok ? '✅ ' : '❌ ') . $res['message'];
+        }
+    }
+    inj0219_flash(isset($ok) && $ok, $msg);
+    exit();
+}
+
+/* ── INJ-0219 ②: اعتمادُ خطوةٍ — يدٌ واحدةٌ لخطوةٍ واحدةٍ وليست يدَ المنشئ ─── */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'approve_step') {
+    $rowId  = intval($_POST['row_id'] ?? 0);
+    $reqId  = intval($_POST['request_id'] ?? 0);
+    $note   = trim((string) ($_POST['note'] ?? ''));
+    $msg = '';
+    $row = $rowId > 0 ? cmp03_store_row($conn, $CANONICAL, $company_id, $rowId) : null;
+    if (!$row || $reqId <= 0) {
+        $msg = '❌ صفٌّ أو طلبٌ غيرُ موجودٍ في كيانك (404)';
+    } else {
+        /* «من أنشأ لا يعتمد» بنيويًّا في الخادم (UI-01 §8) — والمنعُ 403 مسجَّلٌ.
+           والحارسُ يقرأ المنشئَ من الصفِّ نفسِه فلا يُمرَّر خطأً. */
+        $deny = ems_assert_not_self_approval($conn, 'scr_deductions', 'id', $rowId,
+            'قرارُ خصمٍ #' . $rowId . ' (' . (string) ($row['no_decision'] ?? '') . ')', $company_id);
+        if ($deny !== null) {
+            $msg = '❌ ' . $deny['reason'];
+        } else {
+            $res = approval_approve_request($reqId, $uid, $conn, $note);
+            $ok = !empty($res['success']);
+            $msg = ($ok ? '✅ ' : '❌ ') . $res['message'];
+        }
+    }
+    inj0219_flash(isset($ok) && $ok, $msg);
     exit();
 }
 
@@ -107,11 +216,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
 // الموجة ٢: القراءة من الجدول الأصلي — الشكل القديم نفسه (id·payload·status·…)
 $rows = cmp03_store_rows($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
 
+/* ── INJ-0219: سندُ القرارِ وسلّمُه — مقروءان من مصدرِهما لا من نصٍّ حرّ ──────
+   أعمدةُ السلسلةِ الخمسةُ في هذه الشاشةِ كانت `varchar(300)` يكتبها المنشئُ بيده،
+   فكانت **سلسلةً مرسومة**. صارت الآن **إسقاطًا** لخطواتِ `approval_steps`: من
+   وقّع فعلًا ومتى — ومن لم يوقّع فخانتُه «بانتظار …» لا اسمٌ مكتوب.
+   ولا عمودَ جديدًا في الجدول: عقدُ الأعمدةِ الثلاثين محفوظٌ كما هو (CMP-03). */
+$SPINE = array();   // id ← سندُ القرار
+$CHAIN = array();   // id ← الطلبُ وخطواتُه
+if ($rows) {
+    $ids = array();
+    foreach ($rows as $r) { $ids[] = (int) $r['id']; }
+    $in = implode(',', array_map('intval', $ids));
+    $rs = mysqli_query($conn, "SELECT id, proposal_ref, approval_request_ref, approved_by, approved_at, created_by
+                                 FROM scr_deductions WHERE id IN ({$in})");
+    while ($rs && ($x = mysqli_fetch_assoc($rs))) { $SPINE[(int) $x['id']] = $x; }
+
+    $rs = mysqli_query($conn,
+        "SELECT ar.id, ar.entity_id, ar.status, ar.requested_by, ar.approved_at, ar.payload,
+                ru.username AS requester_name,
+                s.step_order, s.role_required, s.status AS step_status, s.approved_by AS step_by,
+                s.approved_at AS step_at, u.username AS step_user
+           FROM approval_requests ar
+           JOIN approval_steps s ON s.request_id = ar.id
+           LEFT JOIN users u  ON u.id  = s.approved_by
+           LEFT JOIN users ru ON ru.id = ar.requested_by
+          WHERE ar.entity_type = 'scr_deductions' AND ar.action = 'approve'
+            AND ar.entity_id IN ({$in})
+          ORDER BY ar.entity_id, ar.id DESC, s.step_order ASC");
+    while ($rs && ($x = mysqli_fetch_assoc($rs))) {
+        $eid = (int) $x['entity_id'];
+        if (!isset($CHAIN[$eid])) {
+            /* المقترحُ **المختارُ** يعيش في حمولةِ الطلبِ حتى يكتبَه منفّذُ السلّم.
+               وبلا قراءتِه هنا كان اللوحُ يقول «بلا مقترح» عن طلبٍ اختير مقترحُه
+               فعلًا — نصٌّ يكذّب الواقعَ وإن كان العمودُ فارغًا بحقّ (كُشف حيًّا). */
+            $pl = json_decode((string) $x['payload'], true);
+            $pending = null;
+            if (is_array($pl) && isset($pl['operations'][0]['data']['proposal_ref'])) {
+                $pending = (int) $pl['operations'][0]['data']['proposal_ref'];
+            }
+            $CHAIN[$eid] = array('id' => (int) $x['id'], 'status' => $x['status'],
+                                 'requested_by' => (int) $x['requested_by'],
+                                 'requester_name' => $x['requester_name'],
+                                 'payload_proposal' => $pending, 'steps' => array());
+        }
+        if ($CHAIN[$eid]['id'] !== (int) $x['id']) { continue; }   // الأحدثُ وحدَه
+        $CHAIN[$eid]['steps'][(int) $x['step_order']] = $x;
+    }
+}
+
+/** الخطوةُ المعلَّقةُ الأولى — دورُها ومن مشى قبلها (يُقرأ من الخطواتِ لا يُخمَّن). */
+function inj0219_pending_step($chain)
+{
+    if (!$chain) { return null; }
+    foreach ($chain['steps'] as $so => $s) {
+        if ($s['step_status'] === 'pending') { return array('order' => (int) $so, 'role' => (string) $s['role_required']); }
+    }
+    return null;
+}
+/** أمشى هذا المستخدمُ خطوةً في هذا السلّمِ سلفًا؟ (قاعدةُ «لا يدَ تمشي خطوتين») */
+function inj0219_already_walked($chain, $uid)
+{
+    if (!$chain || $uid <= 0) { return false; }
+    foreach ($chain['steps'] as $s) {
+        if ($s['step_status'] === 'approved' && (int) $s['step_by'] === (int) $uid) { return true; }
+    }
+    return false;
+}
+
 $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';
 
+/** خانةُ موقّعٍ من خطوةِ سلّمِها — «بانتظار» لا فراغٌ ولا اسمٌ مُخترَع. */
+function inj0219_signer($chain, $stepOrder) {
+    if (!$chain || !isset($chain['steps'][$stepOrder])) { return '—'; }
+    $s = $chain['steps'][$stepOrder];
+    if ($s['step_status'] === 'approved') {
+        return ($s['step_user'] !== null ? $s['step_user'] : ('مستخدم #' . (int) $s['step_by']))
+             . ' · ' . substr((string) $s['step_at'], 0, 16);
+    }
+    if ($s['step_status'] === 'rejected') { return '✖ مرفوضة'; }
+    return 'بانتظار الدور ' . $s['role_required'];
+}
+
 /** قيمة خلية العمود من الصف — الحوكمة الآلية حية وسائرها من الحمولة أو «—» */
-function cmp03_cell($col, $row, $entityName) {
+function cmp03_cell($col, $row, $entityName, $spine = null, $chain = null) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
     if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
@@ -120,9 +308,49 @@ function cmp03_cell($col, $row, $entityName) {
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
     if ($n === cmp03_screen_norm('الحالة')) { return $row['status']; }
     if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
+
+    /* ── الإسقاطاتُ الحية (INJ-0219) — تسبق الحمولةَ فلا يغلب النصُّ الحرُّ السندَ ── */
+    if ($n === cmp03_screen_norm('اقترحه')) {
+        /* اسمُ الطالبِ لا رقمُه: عمودٌ يقرؤه المستخدمُ فلا يُعرض فيه معرّفٌ خام
+           (كُشف حيًّا: كان «طلبه مستخدم #7»). والرقمُ احتياطٌ إن حُذف الحساب. */
+        if (!$chain) { return $row['created_by_name'] ?: '—'; }
+        return 'طلبه ' . ($chain['requester_name'] !== null
+            ? $chain['requester_name'] : ('مستخدم #' . $chain['requested_by']));
+    }
+    if ($n === cmp03_screen_norm('راجعته الموارد'))       { return inj0219_signer($chain, 1); }
+    if ($n === cmp03_screen_norm('اعتماد الإدارة'))        { return inj0219_signer($chain, 2); }
+    if ($n === cmp03_screen_norm('الاعتماد المالي'))       { return inj0219_signer($chain, 3); }
+    if ($n === cmp03_screen_norm('اعتماد الإدارة العامة')) {
+        return ($chain && $chain['status'] === 'approved') ? 'سلّمٌ مكتملٌ #' . $chain['id'] : '—';
+    }
+    if ($n === cmp03_screen_norm('مرجع التفويض')) {
+        return ($spine && $spine['approval_request_ref'])
+            ? ('طلبُ سلّمٍ #' . (int) $spine['approval_request_ref']) : '—';
+    }
+    if ($n === cmp03_screen_norm('المستند المؤيد')) {
+        if ($spine && $spine['proposal_ref']) { return 'مقترحُ خصمٍ #' . (int) $spine['proposal_ref']; }
+        return (isset($row['payload'][$col]) && $row['payload'][$col] !== '') ? $row['payload'][$col] : '—';
+    }
+    if ($n === cmp03_screen_norm('تاريخ الاعتماد')) {
+        if ($spine && $spine['approved_at']) { return substr((string) $spine['approved_at'], 0, 16); }
+        return (isset($row['payload'][$col]) && $row['payload'][$col] !== '') ? $row['payload'][$col] : '—';
+    }
+
     if (isset($row['payload'][$col]) && $row['payload'][$col] !== '') { return $row['payload'][$col]; }
     return '—';
 }
+
+/* المقترحاتُ المتاحةُ للربط — ما لم يُرحَّل بعد (Posted نهايةُ رحلته) */
+$OPEN_PROPOSALS = array();
+$rsP = mysqli_query($conn,
+    "SELECT d.ded_id, d.period, d.source, d.source_ref, d.proposed_amount, d.state,
+            COALESCE(e.name, CONCAT('شخص #', d.person_id)) AS person_name
+       FROM deduction_proposals d
+       LEFT JOIN employees e ON e.id = d.person_id
+      WHERE d.company_id = " . intval($company_id) . "
+        AND d.state IN ('Proposed','Reviewed','Approved')
+      ORDER BY d.ded_id DESC LIMIT 200");
+while ($rsP && ($x = mysqli_fetch_assoc($rsP))) { $OPEN_PROPOSALS[] = $x; }
 /** تطبيع محلي خفيف (مرآة cmp03_norm دون جر مكتبة الأدوات للويب) */
 function cmp03_screen_norm($s) {
     $s = preg_replace('/\s+/u', ' ', trim((string) $s));
@@ -199,7 +427,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1667_ab63c">المسيّر</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_1667_ab63c"></div>
                 <div class="form-group"><label for="emsf_1668_33208">الحالة</label>
-                    <select name="f18" id="emsf_1668_33208"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
+                    <?php /* INJ-0219: «معتمد» مرفوعةٌ من منتقي الإنشاء — لا تُنال بمنتقٍ
+                              في يدِ المنشئ بل بسلّمِ الموافقاتِ أدناه. والطبقةُ تحطُّ
+                              أيَّ حالةٍ نهائيةٍ مُرسَلةٍ يدويًّا، فالمنعُ في الخادمِ
+                              والرفعُ من القائمةِ إعلانٌ له لا اكتفاءٌ به. */ ?>
+                    <select name="f18" id="emsf_1668_33208" aria-describedby="inj0219_status_hint"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select>
+                    <small id="inj0219_status_hint" class="text-muted">«معتمد» لا تُختار — تُكتسب بسلّمِ الموافقاتِ بيدين مختلفتين.</small></div>
                 <div class="form-group"><label for="emsf_1669_842f5">تاريخ الاعتماد</label>
                     <input type="date" name="f19" id="emsf_1669_842f5"></div>
                 <div class="form-group"><label for="emsf_1670_a4f09">مرجع التفويض</label>
@@ -258,9 +491,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tbody>
             <?php if (!$rows): ?>
                 <tr><td colspan="30" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
+            <?php else: foreach ($rows as $r): $rid = (int) $r['id'];
+                    $sp = isset($SPINE[$rid]) ? $SPINE[$rid] : null;
+                    $ch = isset($CHAIN[$rid]) ? $CHAIN[$rid] : null; ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
+                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName, $sp, $ch); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
                 </tr>
@@ -268,6 +503,112 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tbody>
         </table>
         </div>
+    </div></div>
+
+    <?php /* ══ INJ-0219 · سلّمُ الاعتماد ══════════════════════════════════════
+       ◆ لماذا لوحٌ مستقلٌّ لا عمودُ أفعالٍ في الجدول: عقدُ الأعمدةِ الثلاثين
+         مقيسٌ بفاحصٍ (CMP-03)، وزيادةُ عمودٍ تكسره. والقرارُ يُدار من موضعِه
+         الطبيعيّ: من ينتظر يدًا، وأيَّ يدٍ ينتظر.
+       ◆ ولا يُخفى زرٌّ اكتفاءً بالإخفاء: الخادمُ هو من يفصل (الحارسُ + قاعدةُ
+         «لا يدَ تمشي خطوتين» + قيدُ القاعدة) — والإخفاءُ زينةٌ فوق منعٍ قائم. */ ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-list-check"></i> سلّمُ اعتمادِ قراراتِ الخصم
+            <small class="text-muted" style="font-weight:400">— ثلاثُ خطواتٍ بثلاثِ أيدٍ: مراجعةُ الموارد ← اعتمادُ الإدارة ← الاعتمادُ المالي</small></h5>
+    </div><div class="card-body">
+        <?php
+        $pending = array();
+        foreach ($rows as $r) {
+            if (cmp03_status_is_terminal($r['status'])) { continue; }
+            if (in_array(cmp03_screen_norm((string) $r['status']), array(cmp03_screen_norm('ملغي')), true)) { continue; }
+            $pending[] = $r;
+        }
+        if (!$pending): ?>
+            <p class="text-muted">لا قرارَ خصمٍ ينتظر سلّمًا — كلُّ ما في السجلِّ إما معتمدٌ بسندِه أو ملغى.</p>
+        <?php else: ?>
+        <table class="table table-sm" data-no-dt>
+            <thead><tr><th>#</th><th>رقم القرار</th><th>الحالة</th><th>سندُ القرار</th><th>الفعل</th></tr></thead>
+            <tbody>
+            <?php foreach ($pending as $r): $rid = (int) $r['id'];
+                    $sp = isset($SPINE[$rid]) ? $SPINE[$rid] : null;
+                    $ch = isset($CHAIN[$rid]) ? $CHAIN[$rid] : null;
+                    $isMine = $sp && intval($sp['created_by']) === $uid && $uid > 0; ?>
+              <tr>
+                <td><?php echo $rid; ?></td>
+                <td><?php echo htmlspecialchars((string) ($r['payload']['رقم القرار'] ?? '—'), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars((string) $r['status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td style="font-size:.88em">
+                    <?php if ($sp && $sp['proposal_ref']): ?>
+                        مقترحٌ #<?php echo (int) $sp['proposal_ref']; ?>
+                    <?php elseif ($ch && !empty($ch['payload_proposal'])): ?>
+                        مقترحٌ #<?php echo (int) $ch['payload_proposal']; ?>
+                        <span class="text-muted">(مختارٌ في الطلب — يُثبَّت عند اكتمالِ السلّم)</span>
+                    <?php else: ?>
+                        <span class="text-muted">بلا مقترح</span>
+                    <?php endif; ?>
+                    <?php if ($ch): ?>
+                        · طلبٌ #<?php echo (int) $ch['id']; ?> (<?php echo htmlspecialchars($ch['status'], ENT_QUOTES, 'UTF-8'); ?>)
+                        <?php foreach ($ch['steps'] as $so => $s): ?>
+                            <br><span style="opacity:.8">خطوة <?php echo (int) $so; ?>: <?php echo htmlspecialchars(inj0219_signer($ch, (int) $so), ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </td>
+                <td>
+                <?php if (!$ch || $ch['status'] === 'rejected'): ?>
+                    <form method="post" action="" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                        <input type="hidden" name="cmp03_action" value="request_approval">
+                        <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
+                        <select name="proposal_ref" required style="max-width:340px">
+                            <option value="">— اختر مقترحَ الخصم (إلزامي) —</option>
+                            <?php foreach ($OPEN_PROPOSALS as $p): ?>
+                            <option value="<?php echo (int) $p['ded_id']; ?>">#<?php echo (int) $p['ded_id']; ?>
+                                · <?php echo htmlspecialchars((string) $p['person_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                · <?php echo htmlspecialchars((string) $p['period'], ENT_QUOTES, 'UTF-8'); ?>
+                                · <?php echo number_format((float) $p['proposed_amount'], 2); ?>
+                                · <?php echo htmlspecialchars((string) $p['state'], ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="submit" class="btn-primary"><i class="fa fa-paper-plane"></i> طلبُ الاعتماد</button>
+                    </form>
+                    <?php if (!$OPEN_PROPOSALS): ?>
+                        <small class="text-muted">لا مقترحَ خصمٍ مفتوحًا في كيانك — يُنشأ من مصدرِه (الحضورُ · السلف) لا من هنا.</small>
+                    <?php endif; ?>
+                <?php elseif ($ch['status'] === 'pending'):
+                        /* لا يُعرض زرٌّ لمن لا تنتظره الخطوة. الخادمُ يفصل على أيِّ حال
+                           (الدورُ · «لا يدَ تمشي خطوتين» · حارسُ المنشئ · قيدُ القاعدة)،
+                           لكن زرًّا يفشل حتمًا هو **وعدٌ كاذب** — كُشف حيًّا: عُرض الزرُّ
+                           لدورِ الموارد والخطوةُ المعلَّقةُ لدورِ التشغيل، فردَّ الخادمُ
+                           «ليس لديك صلاحية». والصوابُ أن يُعلَن من تنتظره لا أن يُجَرَّب. */
+                        $ps = inj0219_pending_step($ch);
+                        $roleOk = $ps && ($is_super_admin || in_array((string) ($_SESSION['user']['role'] ?? ''),
+                                          array_map('trim', explode(',', $ps['role'])), true));
+                        $walked = inj0219_already_walked($ch, $uid); ?>
+                    <?php if ($isMine): ?>
+                        <span class="text-muted">أنشأتَ هذا القرارَ — الاعتمادُ يدٌ ثانية (UI-01 §8)</span>
+                    <?php elseif ($walked): ?>
+                        <span class="text-muted">مشيتَ خطوةً في هذا السلّمِ — الباقيةُ ليدٍ أخرى</span>
+                    <?php elseif (!$roleOk): ?>
+                        <span class="text-muted">الخطوةُ <?php echo $ps ? (int) $ps['order'] : '؟'; ?>
+                            تنتظر الدورَ <?php echo $ps ? htmlspecialchars($ps['role'], ENT_QUOTES, 'UTF-8') : '؟'; ?>
+                            — لا يدَك</span>
+                    <?php else: ?>
+                    <form method="post" action="" style="display:flex;gap:6px;align-items:center">
+                        <input type="hidden" name="cmp03_action" value="approve_step">
+                        <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
+                        <input type="hidden" name="request_id" value="<?php echo (int) $ch['id']; ?>">
+                        <input type="text" name="note" maxlength="190" placeholder="ملاحظةُ الاعتماد">
+                        <button type="submit" class="btn-primary"><i class="fa fa-check"></i>
+                            اعتمادُ خطوتي (<?php echo (int) $ps['order']; ?>)</button>
+                    </form>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <span class="text-muted">—</span>
+                <?php endif; ?>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
     </div></div>
 </div>
 

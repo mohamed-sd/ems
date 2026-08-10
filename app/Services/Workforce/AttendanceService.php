@@ -273,11 +273,17 @@ class AttendanceService
             }
         }
         try {
+            /* INJ-0219: يدُ المقترحِ تُكتب هنا أو لا تُعرف أبدًا — وعليها يقوم
+               منعُ اعتمادِ الذات في `transitionDeduction`. المصدرُ: المُمرَّرُ
+               صراحةً، وإلا الجلسةُ إن وُجدت (المسارُ الآليُّ من الدوريات بلا يد). */
+            $proposedBy = isset($a['proposed_by']) ? (int) $a['proposed_by']
+                : (isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0);
             $id = (int) $gate->insert('deduction_proposals', array(
                 'person_id' => (int) $a['person_id'], 'period' => (string) $a['period'],
                 'source' => (string) $a['source'], 'source_ref' => (string) $a['source_ref'],
                 'proposed_amount' => round((float) $a['proposed_amount'], 2),
                 'is_voluntary' => !empty($a['is_voluntary']) ? 1 : 0,
+                'proposed_by' => $proposedBy > 0 ? $proposedBy : null,
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
@@ -287,6 +293,117 @@ class AttendanceService
         }
         return array('ok' => true, 'code' => 201, 'ded_id' => $id, 'state' => 'Proposed',
             'reason' => 'خصم مقترح — ولا ترحيل قبل سلّم GOV-01');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+     * INJ-0219 — وسطُ الآلةِ المفقود: Proposed → Reviewed → Approved
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ العطلُ المقيس: `deduction_proposals.state` خمسُ حالاتٍ في القاعدة، و**لا
+     *   مسارَ إنتاجيًّا يبلّغ Reviewed ولا Approved**. المُنشئُ يكتب Proposed،
+     *   و`postDeduction` يشترط Approved — فبينهما فراغ. الحالاتُ الثلاثُ
+     *   الموجودةُ في القاعدةِ كلُّها بذرُ عرضٍ، والاختباراتُ وحدَها كتبت Approved.
+     *   فآلةُ الحالاتِ **معلَنةٌ في المخطَّطِ ومقطوعةٌ في التنفيذ**: عمودُ ENUM
+     *   لا يصنع آلةً، والانتقالُ الذي لا يملك دالةً لا يقع.
+     * ◆ وبهذا كان اختبارُ القبولِ «يظهر في مقاصّاتِ المسيّر» **غيرَ قابلٍ للبلوغ
+     *   أصلًا** لا مؤجَّلًا: `posted_run_id` يُكتب من Approved وحدَها.
+     * ◆ ولكلِّ انتقالٍ يدٌ مسجَّلةٌ تخالف من قبلَها — «بيدين مختلفتين» في الآلةِ
+     *   نفسِها لا في الشاشةِ وحدَها، فلا يكفي حارسُ سطحٍ لآلةٍ تُنادى من غيرِه.
+     * ═══════════════════════════════════════════════════════════════════════ */
+
+    /** الانتقالاتُ المسموحة — قائمةُ سماحٍ لا قائمةُ منع (سابقةُ H-02). */
+    private static $DED_ALLOWED = array(
+        'Proposed' => array('Reviewed', 'Waived'),
+        'Reviewed' => array('Approved', 'Waived'),
+        'Approved' => array('Posted', 'Waived'),
+        'Posted'   => array(),
+        'Waived'   => array(),
+    );
+
+    /**
+     * انتقالُ حالةِ مقترحِ خصمٍ بيدٍ مسجَّلةٍ تخالف اليدَ التي سبقتها.
+     *
+     * @param string $to      الحالةُ المقصودة (Reviewed · Approved · Waived)
+     * @param int    $byUser  اليدُ الحاضرة (users.id) — إلزاميةٌ: لا انتقالَ بيدٍ مجهولة
+     * @param array  $extra   حقولٌ إضافيةٌ للحالةِ (مثل approvals_ref للاعتماد)
+     * @return array{ok:bool,code:int,reason:string,state:string}
+     */
+    public static function transitionDeduction($gate, $companyId, $dedId, $to, $byUser, array $extra = array())
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'state' => '');
+        $dedId = (int) $dedId;
+        $byUser = (int) $byUser;
+        if ($byUser <= 0) {
+            $out['code'] = 422;
+            $out['reason'] = 'يدٌ مجهولةٌ لا تنقل حالةً — معرّفُ المستخدمِ إلزاميٌّ للأثرِ التدقيقي';
+            return $out;
+        }
+        $rows = $gate->scopedQuery(array('scope' => array('d' => 'deduction_proposals')),
+            "SELECT d.* FROM deduction_proposals d WHERE {TENANT_SCOPE} AND d.ded_id = ?", array($dedId));
+        if (!$rows) { $out['code'] = 404; $out['reason'] = 'المقترح غير موجود'; return $out; }
+        $d = $rows[0];
+        $from = (string) $d['state'];
+        $out['state'] = $from;
+
+        if ($from === $to) { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'الحالُ هي هي — فعلٌ عاطل'; return $out; }
+        if (!isset(self::$DED_ALLOWED[$from]) || !in_array($to, self::$DED_ALLOWED[$from], true)) {
+            $out['code'] = 409;
+            $out['reason'] = 'انتقالٌ غيرُ مسموح: ' . $from . ' ← ' . $to
+                . ' (المسموحُ من «' . $from . '»: ' . (implode('، ', self::$DED_ALLOWED[$from] ?: array('لا شيء'))) . ')';
+            return $out;
+        }
+
+        /* «بيدين مختلفتين» في الآلةِ: من راجع لا يعتمد. والمنشئُ يُقاس بالعمودِ
+           الذي كُتب حين الاقتراح — فإن كان مجهولًا (بذرٌ قديم) فُصل بمن راجع. */
+        $prior = array();
+        if ($d['proposed_by'] !== null) { $prior['المقترح'] = (int) $d['proposed_by']; }
+        if ($d['reviewed_by'] !== null) { $prior['المراجع'] = (int) $d['reviewed_by']; }
+        if ($to === 'Approved' && isset($prior['المراجع']) && $prior['المراجع'] === $byUser) {
+            $out['code'] = 403;
+            $out['reason'] = '**من راجع لا يعتمد** — راجعتَ هذا المقترحَ بنفسِك، والاعتمادُ يدٌ ثالثة (UI-01 §8)';
+            return $out;
+        }
+        if (isset($prior['المقترح']) && $prior['المقترح'] === $byUser && $to !== 'Waived') {
+            $out['code'] = 403;
+            $out['reason'] = '**من أنشأ لا يعتمد** — أنت مقترحُ هذا الخصم؛ نقلُ حالتِه يدٌ أخرى (UI-01 §8)';
+            return $out;
+        }
+
+        $set = array('state' => $to);
+        if ($to === 'Reviewed') { $set['reviewed_by'] = $byUser; }
+        if ($to === 'Approved') {
+            if (!isset($extra['approvals_ref']) || trim((string) $extra['approvals_ref']) === '') {
+                $out['code'] = 422;
+                $out['reason'] = 'مرجعُ سلّمِ الموافقاتِ إلزاميٌّ للاعتماد — لا اعتمادَ بلا سندِ سلّمِه';
+                return $out;
+            }
+            $set['approvals_ref'] = (string) $extra['approvals_ref'];
+            $set['approved_by'] = $byUser;
+        }
+        if ($to === 'Waived') {
+            if (!isset($extra['waiver_ref']) || (int) $extra['waiver_ref'] <= 0) {
+                $out['code'] = 422; $out['reason'] = 'مرجعُ الإعفاءِ إلزاميٌّ — لا إعفاءَ بلا قرارِه';
+                return $out;
+            }
+            $set['waiver_ref'] = (int) $extra['waiver_ref'];
+        }
+        $gate->update('deduction_proposals', $set, array('ded_id' => $dedId));
+
+        $out['ok'] = true; $out['code'] = 200; $out['state'] = $to;
+        $out['reason'] = 'انتقل ' . $from . ' ← ' . $to . ' بيدِ المستخدم #' . $byUser;
+        return $out;
+    }
+
+    /** مراجعةُ الموارد البشرية — الخطوةُ الأولى في السلّم. */
+    public static function reviewDeduction($gate, $companyId, $dedId, $byUser)
+    {
+        return self::transitionDeduction($gate, $companyId, $dedId, 'Reviewed', $byUser);
+    }
+
+    /** الاعتماد — بمرجعِ سلّمِه حصرًا، وبيدٍ غيرِ يدِ المراجعِ والمقترح. */
+    public static function approveDeduction($gate, $companyId, $dedId, $byUser, $approvalsRef)
+    {
+        return self::transitionDeduction($gate, $companyId, $dedId, 'Approved', $byUser,
+            array('approvals_ref' => $approvalsRef));
     }
 
     /**

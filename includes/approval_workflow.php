@@ -320,6 +320,54 @@ if (!function_exists('approval_execute_db_operation')) {
     }
 }
 
+if (!function_exists('approval_payload_tokens')) {
+    /**
+     * INJ-0219 — رموزُ ما لا يُعرَف وقتَ إنشاءِ الطلب
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ العطل: الحمولةُ تُجمَّد وقتَ **إنشاءِ** الطلب، والمعتمِدُ الأخيرُ ورقمُ
+     *   الطلبِ ولحظةُ الاكتمالِ لا تُعرَف إلا وقتَ **الاكتمال**. فمن أراد أن
+     *   يكتب «اعتمده فلان» اضطُرَّ إلى مسارٍ ثانٍ يكتبه بعد المحرّك — وهذا هو
+     *   المسارُ الموازي الذي تمنعه ترويسةُ هذا الملف نصًّا.
+     * ◆ فالحلُّ أن يملأها **المحرّكُ نفسُه** لحظةَ التنفيذ: تبقى الكتابةُ في
+     *   يدٍ واحدةٍ — يدِ السلّمِ المكتمل — ولا يُنشأ مسارٌ موازٍ.
+     *
+     * @return array<string,mixed> رمزٌ ← قيمةٌ (المعتمِدُ عددٌ لا نصٌّ فيُقيَّد i)
+     */
+    function approval_payload_tokens($request, $conn) {
+        $request_id = intval($request['id']);
+        /* المعتمِدُ الأخيرُ: صاحبُ أعلى خطوةٍ معتمَدةٍ — لا أوّلُ من وقّع */
+        $sql = "SELECT approved_by FROM approval_steps
+                WHERE request_id = $request_id AND status = 'approved' AND approved_by IS NOT NULL
+                ORDER BY step_order DESC LIMIT 1";
+        $res = mysqli_query($conn, $sql);
+        $row = $res ? mysqli_fetch_assoc($res) : null;
+        return [
+            '{{request_id}}'    => $request_id,
+            '{{final_approver}}' => $row ? intval($row['approved_by']) : null,
+            '{{requested_by}}'  => intval($request['requested_by']),
+            '{{now}}'           => approval_now(),
+            /* عمودُ تاريخٍ (DATE) لا يقبل لحظةً كاملةً في النمطِ الصارم — رمزٌ خاصٌّ به */
+            '{{today}}'         => date('Y-m-d'),
+        ];
+    }
+}
+
+if (!function_exists('approval_substitute_tokens')) {
+    /** استبدالُ الرموزِ في قيمِ عمليةٍ واحدة — **مطابقةٌ تامةٌ لا داخلَ نصّ**،
+     *  فقيمةٌ نصيةٌ تحوي الرمزَ عرضًا لا تُمسّ، ورمزٌ بلا قيمةٍ يُعلن ولا يُخمَّن. */
+    function approval_substitute_tokens(array $operation, array $tokens, &$missing) {
+        foreach (['data', 'where'] as $part) {
+            if (!isset($operation[$part]) || !is_array($operation[$part])) { continue; }
+            foreach ($operation[$part] as $k => $v) {
+                if (!is_string($v) || !array_key_exists($v, $tokens)) { continue; }
+                if ($tokens[$v] === null) { $missing[] = $v; continue; }
+                $operation[$part][$k] = $tokens[$v];
+            }
+        }
+        return $operation;
+    }
+}
+
 if (!function_exists('approval_execute_payload')) {
     function approval_execute_payload($request, $conn) {
         $payload = json_decode($request['payload'], true);
@@ -332,7 +380,15 @@ if (!function_exists('approval_execute_payload')) {
             return approval_response(false, 'لا توجد عمليات لتنفيذها');
         }
 
+        $tokens = approval_payload_tokens($request, $conn);
         foreach ($operations as $operation) {
+            $missing = [];
+            $operation = approval_substitute_tokens($operation, $tokens, $missing);
+            if (!empty($missing)) {
+                /* fail-closed: رمزٌ لم يُحَلَّ يعني كتابةً ناقصةَ السند — تُرفض
+                   ولا تُكتب بقيمةٍ مخترعة، والقيدُ البنيويُّ كان سيرفضها لاحقًا. */
+                return approval_response(false, 'سندٌ ناقصٌ لا يُخمَّن: ' . implode('، ', array_unique($missing)));
+            }
             $result = approval_execute_db_operation($operation, $conn);
             if (empty($result['success'])) {
                 return $result;
@@ -516,6 +572,33 @@ if (!function_exists('approval_approve_request')) {
             $user_role = approval_get_user_role();
             if (!approval_user_can_match_role($step['role_required'], $user_role)) {
                 throw new Exception('ليس لديك صلاحية لاعتماد هذه المرحلة');
+            }
+
+            /* INJ-0219 — «بيدين مختلفتين»: لا يدَ تمشي خطوتين في سلّمٍ واحد.
+               ═══════════════════════════════════════════════════════════════
+               ◆ العطل المقيس: `approval_user_can_match_role` تُرجع true للسوبر
+                 على **أيِّ** خطوة، و`approval_create_request` تعتمد الخطوةَ
+                 الأولى تلقائيًّا لمنشئِ الطلبِ إن طابق دورَها. فسلّمٌ من ثلاثِ
+                 خطواتٍ يمشيه شخصٌ واحدٌ من أوّله إلى آخره — والسلّمُ حينها
+                 عددُ نقراتٍ لا عددُ أيدٍ.
+               ◆ والقاعدةُ عامةٌ لا خاصةٌ بالخصوم: اعتمادُ خطوتين بيدٍ واحدةٍ لم
+                 يكن مقصودًا في أيِّ نوعِ كيان. وهي **آمنةٌ للسلاليمِ ذاتِ
+                 الخطوةِ الواحدة** (لا خطوةَ سابقةً فلا رفض)، فلا تنقلب على
+                 العشرين مسارًا القائمة.
+               ◆ وبها يصير عددُ الأيدي = عددَ الخطواتِ المسجَّلةِ بنيويًّا؛
+                 فتسجيلُ ثلاثِ خطواتٍ للخصمِ يعني ثلاثَ أيدٍ لا واحدة. */
+            $priorSql = "SELECT step_order FROM approval_steps
+                         WHERE request_id = $request_id AND status = 'approved'
+                           AND approved_by = $approved_by LIMIT 1";
+            $priorRes = mysqli_query($conn, $priorSql);
+            if ($priorRes === false) {
+                throw new Exception('تعذّر فحصُ أيدي السلّم: ' . mysqli_error($conn));
+            }
+            $prior = mysqli_fetch_assoc($priorRes);
+            if ($prior) {
+                throw new Exception('يدٌ واحدةٌ لا تمشي خطوتين في سلّمٍ واحد — اعتمدتَ الخطوةَ '
+                    . intval($prior['step_order']) . ' من هذا الطلب، والخطوةُ '
+                    . intval($step['step_order']) . ' ليدٍ أخرى (403)');
             }
 
             $step_id = intval($step['id']);

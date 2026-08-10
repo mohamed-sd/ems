@@ -81,11 +81,46 @@ $P['INJ-0193'] = function () use ($db) {
     return array($n !== null && $n > 0, 'أفعالٌ مسجَّلةٌ في `actions`: ' . var_export($n, true));
 };
 
-$P['INJ-0219'] = function () use ($db) {
-    $n = q1($db, "SELECT COUNT(*) FROM information_schema.COLUMNS
-                   WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'payroll_deduction%'
-                     AND COLUMN_NAME IN ('state','status','approval_state')");
-    return array($n !== null && $n > 0, 'عمودُ حالةٍ في جدولِ الخصومات: ' . var_export($n, true));
+/* ◆ المِسبارُ الأولُ شهد على غيرِ بابِه: فتّش عن عمودِ حالةٍ في
+     `payroll_deduction%`. والتحققُ المضادُّ في السجلِّ (العمود 23) يقول:
+     «الإصلاحُ المقترحُ يستهدف جدولًا خاطئًا» — الشاشةُ تكتب `scr_deductions`،
+     و`payroll_deductions` يكتبها OffsetService من سلفِ العاملين. فأعلن «مفتوح»
+     بحقٍّ وبدليلٍ لا يخصُّ الحكم.
+   ◆ ويُقاس هنا **نصُّ اختبارِ القبولِ** بشقوقِه الثلاثة:
+     ① لا «معتمد» إلا بسلّمٍ **بيدين مختلفتين** — قيدٌ في القاعدةِ يُجَسُّ حيًّا
+        (لا يكفي وجودُه في information_schema)، وسلّمٌ بثلاثِ خطواتٍ مسجَّلة،
+        وقاعدةُ «لا يدَ تمشي خطوتين» في المحرّك.
+     ② وكلُّ معتمدٍ **يشير إلى مقترحه** — صفرُ مخالفٍ حيّ.
+     ③ ويظهر في **مقاصّاتِ المسيّر** — أي أن Approved صارت قابلةَ البلوغ،
+        فـ`postDeduction` يشترطها ولم يكن أحدٌ يصنعها. */
+$P['INJ-0219'] = function () use ($db, $ROOT) {
+    /* ① القيدُ يُجَسُّ حيًّا: إدراجٌ «معتمد» بلا سندٍ داخلَ معاملةٍ ثم تراجُع */
+    $db->query('START TRANSACTION');
+    $blocked = ($db->query("INSERT INTO scr_deductions
+        (company_id, no_decision, status, is_seed, created_by, created_by_name, created_at, updated_at)
+        VALUES (4, 'PROBE-OD19', 'معتمد', 0, 7, 'مِسبار', NOW(), NOW())") === false);
+    $db->query('ROLLBACK');
+
+    $steps = q1($db, "SELECT COUNT(*) FROM approval_workflow_rules
+                       WHERE entity_type = 'scr_deductions' AND action = 'approve' AND is_active = 1");
+    /* ② صفرُ معتمدٍ حيٍّ بلا سندٍ كامل */
+    $bad = q1($db, "SELECT COUNT(*) FROM scr_deductions
+                     WHERE is_seed = 0 AND status LIKE '%معتمد%'
+                       AND (proposal_ref IS NULL OR approval_request_ref IS NULL
+                            OR approved_by IS NULL OR approved_by = created_by)");
+    /* ③ وسطُ الآلةِ موصولٌ + حاجزُ اليدِ في المحرّك + حطُّ الميلادِ معتمدًا */
+    $mid   = has($ROOT, 'app/Services/Workforce/AttendanceService.php', "'Approved'")
+          && has($ROOT, 'app/Services/Workforce/AttendanceService.php', 'transitionDeduction');
+    $hands = has($ROOT, 'includes/approval_workflow.php', 'لا تمشي خطوتين');
+    $clamp = has($ROOT, 'includes/cmp03_local_store.php', 'cmp03_status_is_terminal');
+
+    return array($blocked && $steps >= 3 && $bad === 0 && $mid && $hands && $clamp,
+        'قيدٌ مجسوسٌ يرفض الميلادَ معتمدًا: ' . ($blocked ? 'نعم' : 'لا')
+        . ' · خطواتُ السلّم: ' . var_export($steps, true) . '/3'
+        . ' · معتمدٌ حيٌّ بلا سند: ' . var_export($bad, true)
+        . ' · وسطُ الآلة (Reviewed→Approved): ' . ($mid ? 'موصول' : 'مقطوع')
+        . ' · «لا يدَ تمشي خطوتين»: ' . ($hands ? 'نعم' : 'لا')
+        . ' · حطُّ الحالةِ النهائيةِ عند الإدراج: ' . ($clamp ? 'نعم' : 'لا'));
 };
 
 $P['INJ-0224'] = function () use ($ROOT) {
