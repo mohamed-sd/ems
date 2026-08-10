@@ -59,9 +59,19 @@ $P['INJ-0131'] = function () use ($ROOT) {
     return array($ok, 'نداءُ التدقيقِ في ميثاقِ المشروع: ' . ($ok ? 'موجود' : 'غائب'));
 };
 
-$P['INJ-0171'] = function () use ($ROOT) {
-    $ok = is_file($ROOT . '/Governance/gov_dept.php');
-    return array($ok, 'مكوّنُ حوكمةِ الإدارةِ الموحَّد: ' . ($ok ? 'موجود' : 'غير موجود'));
+/* ◆ وجودُ الملفِّ ليس شرطَ القبول: «بدور ٣ **يفتح الرابطُ** شاشةً…» — فالرابطُ
+     والمنحُ والوحدةُ ثلاثتُها لازمة، وإلا كان ملفًّا لا يبلغه أحد. */
+$P['INJ-0171'] = function () use ($ROOT, $db) {
+    $file = is_file($ROOT . '/Governance/gov_dept.php');
+    $reg  = is_file($ROOT . '/includes/dept_gov_registry.php');
+    $mod  = q1($db, "SELECT COUNT(*) FROM modules WHERE code = 'Governance/gov_dept.php'");
+    $perm = q1($db, "SELECT COUNT(*) FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
+                      WHERE m.code = 'Governance/gov_dept.php' AND rp.role_id = 3 AND rp.can_view = 1");
+    $nav  = q1($db, "SELECT COUNT(*) FROM nav_items WHERE role_id = 3 AND route = 'Governance/gov_dept.php'");
+    return array($file && $reg && $mod > 0 && $perm > 0 && $nav > 0,
+        'ملفٌّ: ' . ($file ? 'نعم' : 'لا') . ' · سجلُّ النطاقات: ' . ($reg ? 'نعم' : 'لا')
+        . ' · وحدةٌ: ' . var_export($mod, true) . ' · منحُ الدور 3: ' . var_export($perm, true)
+        . ' · صفُّ تنقّل: ' . var_export($nav, true));
 };
 
 /* ◆ لا جدولَ باسم `act_action_contracts` في هذه القاعدة؛ وسجلُّ عقودِ الأفعالِ

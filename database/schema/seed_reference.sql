@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 18:32:29
+-- المصدر: equipation_manage · التوليد: 2026-08-10 18:53:47
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -487,7 +487,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (438,'إيكوبيشن | بطاقة المستخدم','main/user_profile.php',1,NULL,0,0,'fa fa-file-lines',900),
 (439,'إيكوبيشن | مشغّلو المعدة','movement/add_drivers.php',3,NULL,0,0,'fa fa-file-lines',900),
 (440,'إيكوبيشن | شجرة حسابات العميل','movement/client_tree.php',1,NULL,0,0,'fa fa-file-lines',900),
-(441,'إيكوبيشن | غرفة عمليات التشغيل','movement/move_oprators.php',6,NULL,0,0,'fa fa-file-lines',900);
+(441,'إيكوبيشن | غرفة عمليات التشغيل','movement/move_oprators.php',6,NULL,0,0,'fa fa-file-lines',900),
+(442,'حوكمة الإدارة (عام)','Governance/gov_dept.php',NULL,NULL,0,0,'',0);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -2923,7 +2924,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2766,19,430,1,0,0,0),
 (2767,20,430,1,0,0,0),
 (2768,21,430,1,0,0,0),
-(2769,22,430,1,0,0,0);
+(2769,22,430,1,0,0,0),
+(2770,3,442,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -4067,7 +4069,8 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (3932,'الالتزامات والاستحقاق','n9o_fin4_r33',33,'fa fa-circle-dot',50,4,'رابعًا: سجل الالتزامات',1),
 (3933,'الخزينة والسلطة','n9o_fin5_r33',33,'fa fa-circle-dot',60,5,'خامسًا: السقوف وفصل الواجبات',1),
 (3934,'تقارير الجهة المشرفة','n9o_fin7_r33',33,'fa fa-circle-dot',80,7,'سابعًا: التقارير للجهة المشرفة',1),
-(3935,'أخرى — للمراجعة','n9s99_others_r9',9,'fa fa-box-archive',9900,99,'خارج الوثيقة — بانتظار قرار المالك',1);
+(3935,'أخرى — للمراجعة','n9s99_others_r9',9,'fa fa-box-archive',9900,99,'خارج الوثيقة — بانتظار قرار المالك',1),
+(3936,'التقارير والتصدير','n9o_reports_r9',9,'fa fa-file-lines',800,8,'ثامنًا: التقارير والتصدير',1);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -5702,7 +5705,12 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7032,33,'HOME',3928,437,'قريبًا','main/soon.php','fa fa-circle-dot',4,NULL,'main/soon.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7033,33,'HOME',3928,438,'إيكوبيشن | بطاقة المستخدم','main/user_profile.php','fa fa-circle-dot',5,NULL,'main/user_profile.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7034,33,'REP',3934,365,'موافقات التكليف','Portal/ceo_assignments.php','fa fa-circle-dot',1,NULL,'Portal/ceo_assignments.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
-(7035,33,'REP',3934,364,'تقارير المراجعة الداخلية','Portal/ceo_audit_reports.php','fa fa-circle-dot',2,NULL,'Portal/ceo_audit_reports.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25');
+(7035,33,'REP',3934,364,'تقارير المراجعة الداخلية','Portal/ceo_audit_reports.php','fa fa-circle-dot',2,NULL,'Portal/ceo_audit_reports.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
+(7097,3,'',3536,442,'حوكمة إدارة الأسطول','Governance/gov_dept.php',NULL,0,NULL,NULL,1,'2026-08-10 18:49:27','2026-08-10 18:49:27'),
+(7098,9,'',3936,254,'تقارير الإدارة التنفيذية','Portal/ceo_reports.php','fa fa-file-lines',10,NULL,NULL,1,'2026-08-10 18:53:31','2026-08-10 18:53:31'),
+(7099,9,'',3936,253,'تقارير الحوكمة','Governance/gov_reports.php','fa fa-file-lines',20,NULL,NULL,1,'2026-08-10 18:53:31','2026-08-10 18:53:31'),
+(7100,9,'',3936,388,'تقارير المراجعة للجهة المشرفة','Audit/iaf_reports.php','fa fa-file-lines',30,NULL,NULL,1,'2026-08-10 18:53:31','2026-08-10 18:53:31'),
+(7101,9,'',3936,337,'تقارير المخاطر والتحليلات','Risk/risk_reports.php','fa fa-file-lines',40,NULL,NULL,1,'2026-08-10 18:53:31','2026-08-10 18:53:31');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
