@@ -290,6 +290,56 @@ u('AC-U4', 'صفرُ جدولٍ يبلغ صفرَ أعمدة — ومحاولة�
         . ($u4Bad ? ' · غيرُ متبنٍّ: ' . implode(' · ', $u4Bad) : '')
         . ' · ◆ مقيسٌ حيًّا: بلا حارسٍ 0 عمودًا · به 39 ولافتةٌ تبيّن السبب');
 
+/* ══ AC-U10 · صفرُ بطاقةِ مؤشرٍ بأقلَّ من سبعةِ حقول ═══════════════════════
+   «المكوّنُ يرفض التصييرَ بأقلَّ من السبعةِ فيصير الحكمُ بالبناء» — فالمقياسُ
+   شرطان: أن يرفضَ المكوّنُ فعلًا، وألّا يكتبَ سطحٌ ماركَبَ البطاقةِ بيدِه
+   (وإلا التفَّ على العقدِ من حولِ المكوّن).
+   ◆ وكان في النظامِ `EmsUI.kpiCard` بالعقدِ نفسِه بصفرِ مستهلك — والثلاثةُ
+     الذين يعرضون بطاقاتٍ يكتبونها بأيديهم. والسببُ بنيويٌّ: مكوّنٌ في المتصفحِ
+     لا تبلغه شاشةٌ تصيّر خادميًّا. فوُضع المكوّنُ حيثُ يُصيَّر الرقمُ فعلًا. */
+$kpiPhp = (string) @file_get_contents($ROOT . '/includes/kpi_card.php');
+$kpiJs  = (string) @file_get_contents($ROOT . '/assets/js/ems-components.js');
+
+/* ① أيرفض المكوّنُ فعلًا؟ يُستدعى بعقدٍ ناقصٍ ويُنظر في مخرَجِه — لا يُفتَّش
+     عن نصِّ شرطٍ في المصدر (فحصُ النصِّ يصادق على النية لا على السلوك). */
+$kpiRejects = false; $kpiRenders = false; $kpiDeclares = false;
+if ($kpiPhp !== '') {
+    require_once $ROOT . '/includes/kpi_card.php';
+    if (function_exists('ems_kpi_card')) {
+        $whole = array('title' => 'ت', 'value' => '0', 'unit' => 'و', 'period' => 'ف',
+                       'status' => 'ok', 'drill' => '#');
+        $out   = ems_kpi_card($whole);
+        $kpiRenders  = (strpos($out, 'ناقصةُ العقد') === false);
+        $kpiDeclares = (strpos($out, 'بلا مقارنة معلنة') !== false);
+        $kpiRejects  = true;
+        foreach (array_keys($whole) as $f) {
+            $lack = $whole; unset($lack[$f]);
+            if (strpos(ems_kpi_card($lack), 'ناقصةُ العقد') === false) { $kpiRejects = false; break; }
+        }
+    }
+}
+
+/* ② صفرُ سطحٍ يكتب ماركَبَ البطاقةِ بيدِه — الالتفافُ على المكوّنِ يُبطله. */
+$kpiHandWritten = array();
+foreach (ui_files($ROOT, array('php')) as $rel) {
+    if (strpos($rel, 'includes/kpi_card.php') === 0) { continue; }
+    $src = fix_blank_comments((string) @file_get_contents($ROOT . '/' . $rel));
+    if (preg_match_all('/class\s*=\s*("|\')[^"\']*\bems-kpi-title\b/i', $src, $mm)) {
+        $kpiHandWritten[$rel] = count($mm[0]);
+    }
+}
+arsort($kpiHandWritten);
+
+u('AC-U10', 'صفرُ بطاقةِ مؤشرٍ بأقلَّ من سبعةِ حقول',
+    'يستدعي المكوّنَ بعقدٍ ناقصٍ ويقرأ مخرَجَه، ويمسح الأسطحَ بحثًا عن ماركَبٍ مكتوبٍ بيد',
+    'لا يقيس صدقَ الرقمِ نفسِه — يقيس اكتمالَ عقدِه: أثمة مقامٌ وزمنٌ وبابٌ يُفتح منه',
+    ($kpiRejects && $kpiRenders && $kpiDeclares && !$kpiHandWritten),
+    'المكوّنُ يرفض الناقصَ: ' . ($kpiRejects ? 'نعم للحقولِ الستةِ كلِّها' : 'لا')
+        . ' · يصيّر الكاملَ: ' . ($kpiRenders ? 'نعم' : 'لا')
+        . ' · المقارنةُ الغائبةُ تُعلَن لا تُلفَّق: ' . ($kpiDeclares ? 'نعم' : 'لا')
+        . ' · أسطحٌ تكتب الماركَبَ بيدِها: ' . count($kpiHandWritten)
+        . ($kpiHandWritten ? ' (' . implode(' · ', array_slice(array_keys($kpiHandWritten), 0, 4)) . ')' : ''));
+
 /* ══ AC-U5/U6 · المناظرُ المحفوظةُ وحالاتُ الفراغ ═════════════════════════ */
 $db = fix_db();
 $viewsTable = (int) fix_one($db, "SELECT COUNT(*) FROM information_schema.TABLES

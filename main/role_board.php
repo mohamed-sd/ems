@@ -103,15 +103,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- ① مؤشرات اليوم — بطاقة KPI السباعية (UI-07: صفر رقم بلا عقده السبعة).
          الوحدة «سجل» حقيقية (الاستعلامات COUNT) والفترة «لحظي» حقيقية (تُقرأ الآن)،
          والمقارنة تُعلن غيابها صراحةً بدل ادعائها — أول تعميم للمكوّن (17 لوحة). -->
+    <?php require_once __DIR__ . '/../includes/kpi_card.php'; ?>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px">
         <?php foreach ($rb_cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
-            $kpiTone = $tone === 'ok' ? 'ems-kpi-ok' : ($tone === 'err' ? 'ems-kpi-err' : ($tone === 'warn' ? 'ems-kpi-warn' : '')); ?>
-        <a class="ems-kpi-card <?php echo $kpiTone; ?>" href="<?php echo htmlspecialchars($href); ?>" title="تعمّق: <?php echo htmlspecialchars($lbl); ?>">
-            <div class="ems-kpi-title"><i class="fas <?php echo htmlspecialchars($icon); ?>"></i> <?php echo htmlspecialchars($lbl); ?></div>
-            <div class="ems-kpi-value"><?php echo htmlspecialchars((string)$val); ?> <small>سجل</small></div>
-            <div class="ems-kpi-meta"><span>لحظي (<?php echo $today; ?>)</span><span>بلا مقارنة معلنة</span></div>
-        </a>
-        <?php endforeach; ?>
+            echo ems_kpi_card(array(
+                'title'  => $lbl,
+                'value'  => (string) $val,
+                'unit'   => 'سجل',
+                'period' => 'لحظي (' . $today . ')',
+                'status' => in_array($tone, array('ok', 'warn', 'err'), true) ? $tone : 'neutral',
+                'drill'  => $href,
+                'icon'   => $icon,
+            ));
+        endforeach; ?>
     </div>
 
     <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>

@@ -134,24 +134,36 @@
         return renderFn();
     };
 
-    /* ── UI-07: KPI Card — السبعة إلزامًا: صفر رقم بلا مقامه ومصدره ─────── */
+    /* ── UI-07: KPI Card — السبعة إلزامًا: صفر رقم بلا مقامه ومصدره ─────────
+       ◆ العقدُ نفسُه في `includes/kpi_card.php` — وهو الطريقُ الحيُّ (الشاشاتُ
+         تصيّر خادميًّا). وهذه صيغتُه للمتصيَّرِ في المتصفح، وقد سُوّيت به:
+         ① القيمةُ «0» قيمةٌ صحيحةٌ لا غياب — والفحصُ بالغيابِ لا بالخوائ.
+         ② المقارنةُ الغائبةُ **تُعلَن** «بلا مقارنة معلنة» ولا تمنع التصييرَ
+            ولا تُلفَّق — نصُّ الحكمِ حرفيًّا. والستةُ الباقيةُ تمنع غيبتُها.
+         ③ الحالةُ تُكتب نصًّا مع لونِها — اللونُ وحدَه إشارةٌ لا يراها كلُّ قارئ. */
+    var KPI_TONES = { ok: ['ems-kpi-ok', 'سليم'], warn: ['ems-kpi-warn', 'إنذار'],
+                      err: ['ems-kpi-err', 'حرج'], neutral: ['', 'محايد'] };
     EmsUI.kpiCard = function (k) {
         k = k || {};
-        var missing = ['title', 'value', 'unit', 'period', 'comparison', 'status', 'drillHref']
-            .filter(function (f) { return k[f] === undefined || k[f] === null || k[f] === ''; });
+        function blank(v) { return v === undefined || v === null || (typeof v === 'string' && v.trim() === ''); }
+        var LBL = { title: 'العنوان', value: 'القيمة', unit: 'الوحدة',
+                    period: 'الفترة', status: 'الحالة', drillHref: 'التعمّق' };
+        var missing = Object.keys(LBL).filter(function (f) { return blank(k[f]); }).map(function (f) { return LBL[f]; });
+        if (!missing.length && !KPI_TONES[k.status]) { missing.push('الحالة (نغمةٌ غيرُ معلنة)'); }
         if (missing.length) {
-            // الحكم UXR-0054: لا يُصيَّر رقم ناقص العقد — تُعرض حالة خطأ مطوّر
             return EmsUI.errorState({
                 text: 'بطاقة مؤشر ناقصة العقد',
                 hint: 'الحقول الغائبة: ' + missing.join('، ') + ' — املأ السبعة كاملة',
                 code: 'UI-07-CONTRACT'
             });
         }
-        var toneCls = { ok: 'ems-kpi-ok', warn: 'ems-kpi-warn', err: 'ems-kpi-err', neutral: '' }[k.status] || '';
-        var card = h('a', 'ems-kpi-card ' + toneCls,
+        var tone = KPI_TONES[k.status];
+        var comparison = blank(k.comparison) ? 'بلا مقارنة معلنة' : k.comparison;
+        var card = h('a', 'ems-kpi-card ' + tone[0],
             '<div class="ems-kpi-title">' + esc(k.title) + '</div>' +
             '<div class="ems-kpi-value">' + esc(k.value) + ' <small>' + esc(k.unit) + '</small></div>' +
-            '<div class="ems-kpi-meta"><span>' + esc(k.period) + '</span><span>' + esc(k.comparison) + '</span></div>');
+            '<div class="ems-kpi-meta"><span>' + esc(k.period) + '</span><span>' + esc(comparison) + '</span></div>' +
+            '<div class="ems-kpi-meta"><span class="ems-kpi-state">' + esc(tone[1]) + '</span><span></span></div>');
         card.href = k.drillHref;
         card.title = 'تعمّق: ' + k.title;
         return card;

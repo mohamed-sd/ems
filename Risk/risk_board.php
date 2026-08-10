@@ -60,14 +60,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('مؤشرات بلغت الحد الحرج', $kKri, 'مؤشر', $kKri > 0 ? 'err' : 'ok', 'risk_kris.php'),
     );
     ?>
+    <?php require_once __DIR__ . '/../includes/kpi_card.php'; ?>
     <div class="ems-grid">
-        <?php foreach ($kpis as $k): ?>
-        <a class="ems-kpi-card ems-col-4 ems-kpi-<?php echo $k[3]; ?>" href="<?php echo $k[4]; ?>" title="تعمّق: <?php echo $k[0]; ?>">
-            <div class="ems-kpi-title"><?php echo $k[0]; ?></div>
-            <div class="ems-kpi-value"><?php echo $k[1]; ?> <small><?php echo $k[2]; ?></small></div>
-            <div class="ems-kpi-meta"><span>لحظي (<?php echo $today; ?>)</span><span>بلا مقارنة معلنة</span></div>
-        </a>
-        <?php endforeach; ?>
+        <?php foreach ($kpis as $k) {
+            // ◆ كانت الحقولُ تُطبع بلا تهريبٍ هنا — والمكوّنُ يهرّب كلَّ حقلٍ حتمًا.
+            echo ems_kpi_card(array(
+                'title'  => $k[0],
+                'value'  => (string) $k[1],
+                'unit'   => $k[2],
+                'period' => 'لحظي (' . $today . ')',
+                'status' => $k[3],
+                'drill'  => $k[4],
+                'class'  => 'ems-col-4',
+            ));
+        } ?>
     </div>
 
     <div class="ems-grid" style="margin-top:16px">

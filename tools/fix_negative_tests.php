@@ -336,6 +336,51 @@ neg('AC-U4/تبنٍّ', 'حارسُ الأعمدة — يرسب إن عاد طر
         return neg_swap($abs, $broken);
     }, $u4check);
 
+/* ══ AC-U10 · بطاقةُ المؤشرِ السباعية ══════════════════════════════════════
+   ثلاثةُ إفساداتٍ لثلاثةِ أوجه: أن يرفضَ المكوّنُ الناقصَ · أن يُعلنَ المقارنةَ
+   الغائبةَ ولا يلفّقَها · وألّا يلتفَّ سطحٌ على المكوّنِ فيكتبَ الماركَبَ بيدِه. */
+$u10check = function () use ($ROOT) {
+    $out = (string) @shell_exec(escapeshellarg(PHP_BINARY) . ' '
+         . escapeshellarg($ROOT . '/tools/fix_ui_gate.php') . ' 2>&1');
+    if (strpos($out, 'AC-U10') === false) {
+        return array('ok' => false, 'evidence' => 'المعيارُ غائبٌ عن البوابة');
+    }
+    $ok = (strpos($out, '✔ AC-U10') !== false);
+    return array('ok' => $ok, 'evidence' => $ok ? 'العقدُ مفروضٌ ومتبنًّى' : 'العقدُ مخروق');
+};
+
+neg('AC-U10/رفض', 'بطاقةُ المؤشر — ترسب إن صيَّر المكوّنُ رقمًا بلا وحدةٍ أو تعمّق',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/includes/kpi_card.php';
+        $src = (string) file_get_contents($abs);
+        // إفسادٌ مطابقٌ للحالِ قبلَ العقد: الوحدةُ والتعمّقُ يصيران اختياريين
+        $broken = str_replace(
+            array("'unit'   => 'الوحدة',", "'drill'  => 'التعمّق',"), '', $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على قائمةِ الواجب'); }
+        return neg_swap($abs, $broken);
+    }, $u10check);
+
+neg('AC-U10/إعلان', 'بطاقةُ المؤشر — ترسب إن لُفِّقت المقارنةُ الغائبةُ بدل إعلانِها',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/includes/kpi_card.php';
+        $src = (string) file_get_contents($abs);
+        $broken = str_replace("? 'بلا مقارنة معلنة'", "? 'مستقرٌّ مقارنةً بالأمس'", $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على إعلانِ الغياب'); }
+        return neg_swap($abs, $broken);
+    }, $u10check);
+
+neg('AC-U10/التفاف', 'بطاقةُ المؤشر — ترسب إن كتب سطحٌ الماركَبَ بيدِه حولَ المكوّن',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/Risk/risk_board.php';
+        $src = (string) file_get_contents($abs);
+        $needle = '<div class="ems-grid">';
+        $at = strpos($src, $needle);
+        if ($at === false) { throw new RuntimeException('لم يُعثر على مرساةِ الشبكة'); }
+        $hand = $needle . "\n<a class=\"ems-kpi-card\" href=\"#\"><div class=\"ems-kpi-title\">"
+              . "NEG-TEST</div><div class=\"ems-kpi-value\">1</div></a>";
+        return neg_swap($abs, substr_replace($src, $hand, $at, strlen($needle)));
+    }, $u10check);
+
 /* ── الحصيلة ───────────────────────────────────────────────────────────── */
 $valid = 0; $invalid = array();
 foreach ($RESULTS as $r) { if ($r['valid']) { $valid++; } else { $invalid[] = $r['code']; } }

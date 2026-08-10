@@ -36,7 +36,20 @@ $u = $st->get_result()->fetch_assoc();
 $st->close();
 if (!$u) { exit("لا مستخدمَ بهذا المعرِّف.\n"); }
 
-$sid  = 'uiverify' . substr(sha1((string) $uid . '|ui-verify'), 0, 18);
+/* ◆ تجاوزُ الدورِ للتصييرِ وحدَه: `php … <uid> --role=14`
+     الحاجةُ إليه واقعةٌ مقيسة: أدوارُ الصيانةِ (13/14) والمخاطرِ (28-30) **بلا
+     مستخدمٍ واحد** في القاعدة، فشاشاتُها لا يفتحها أحدٌ — ولا سبيلَ لتصييرِها.
+     والبديلان أسوأ: صفٌّ جديدٌ في `users` أثرٌ دائمٌ لأجلِ فحصٍ عابر، ومنحُ
+     صلاحيةٍ لدورٍ آخرَ تغييرُ حوكمةٍ لأجلِ لقطة. أما الجلسةُ فملفٌّ محليٌّ يزول.
+   ◆ ولا يمنح هذا صلاحيةً: الحارسُ يقرأ `role_permissions` للدورِ المُمرَّر،
+     فإن لم يكن للدورِ حقُّ العرضِ رُدَّت الجلسةُ كما تُردُّ جلسةُ أيِّ مستخدم. */
+$roleOverride = null;
+foreach ($argv as $a) {
+    if (strpos($a, '--role=') === 0) { $roleOverride = (int) substr($a, 7); }
+}
+$role = $roleOverride !== null ? (string) $roleOverride : (string) $u['role'];
+
+$sid  = 'uiverify' . substr(sha1((string) $uid . '|' . $role . '|ui-verify'), 0, 18);
 $path = session_save_path();
 if ($path === '') { $path = sys_get_temp_dir(); }
 
@@ -44,7 +57,7 @@ $payload = 'user|' . serialize(array(
     'id'         => (int) $u['id'],
     'username'   => (string) $u['username'],
     'name'       => (string) $u['name'],
-    'role'       => (string) $u['role'],
+    'role'       => $role,
     'company_id' => (int) $u['company_id'],
 ));
 
@@ -55,4 +68,6 @@ if (@file_put_contents($file, $payload) === false) {
 
 echo "معرِّفُ الجلسة: {$sid}\n";
 echo "الملف: {$file}\n";
-echo "المستخدم: " . $u['name'] . " · الدور " . $u['role'] . " · الشركة " . $u['company_id'] . "\n";
+echo "المستخدم: " . $u['name'] . " · الدور " . $role
+   . ($roleOverride !== null ? ' (متجاوَزٌ للتصيير — الأصل ' . $u['role'] . ')' : '')
+   . " · الشركة " . $u['company_id'] . "\n";

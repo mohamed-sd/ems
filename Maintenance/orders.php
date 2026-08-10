@@ -918,25 +918,27 @@ function mnt_state_class($st) {
        صفًّا صفًّا، والمقارنةُ تُعلَن «غيرَ معلَنةٍ» صراحةً بدلَ إيهامِ وجودها. */
     $mnt_scope = 'كلُّ الأوامرِ في نطاقِ شركتك';
     $mnt_kpis = array(
-        array('إجمالي الأوامر', (string) $stats['total'], 'أمر', 'fa-wrench', '', '?status='),
-        array('أوامر مفتوحة', (string) $stats['open'], 'أمر', 'fa-spinner', 'ems-kpi-warn', '?status=open'),
-        array('أوامر مغلقة', (string) $stats['closed'], 'أمر', 'fa-check-circle', 'ems-kpi-ok', '?status=closed'),
-        array('إجمالي التكلفة', number_format($stats['cost'], 0), 'جنيه', 'fa-sack-dollar', '', '?status='),
+        array('إجمالي الأوامر', (string) $stats['total'], 'أمر', 'fa-wrench', 'neutral', '?status='),
+        array('أوامر مفتوحة', (string) $stats['open'], 'أمر', 'fa-spinner', 'warn', '?status=open'),
+        array('أوامر مغلقة', (string) $stats['closed'], 'أمر', 'fa-check-circle', 'ok', '?status=closed'),
+        array('إجمالي التكلفة', number_format($stats['cost'], 0), 'جنيه', 'fa-sack-dollar', 'neutral', '?status='),
     );
+    require_once __DIR__ . '/../includes/kpi_card.php';
     ?>
     <div class="stats-section" id="ordersStats">
         <div class="stats-grid">
-            <?php foreach ($mnt_kpis as $k): ?>
-            <a class="ems-kpi-card <?php echo $k[4]; ?>" href="<?php echo htmlspecialchars($k[5], ENT_QUOTES, 'UTF-8'); ?>"
-               title="تعمّق: <?php echo htmlspecialchars($k[0], ENT_QUOTES, 'UTF-8'); ?>">
-                <div class="ems-kpi-title"><i class="fas <?php echo $k[3]; ?>"></i>
-                    <?php echo htmlspecialchars($k[0], ENT_QUOTES, 'UTF-8'); ?></div>
-                <div class="ems-kpi-value"><?php echo htmlspecialchars($k[1], ENT_QUOTES, 'UTF-8'); ?>
-                    <small><?php echo htmlspecialchars($k[2], ENT_QUOTES, 'UTF-8'); ?></small></div>
-                <div class="ems-kpi-meta"><span>لحظي (<?php echo ems_fmt_now(); ?>)</span><span>بلا مقارنة معلنة</span></div>
-                <div class="ems-kpi-meta"><span><?php echo htmlspecialchars($mnt_scope, ENT_QUOTES, 'UTF-8'); ?></span></div>
-            </a>
-            <?php endforeach; ?>
+            <?php foreach ($mnt_kpis as $k) {
+                echo ems_kpi_card(array(
+                    'title'  => $k[0],
+                    'value'  => $k[1],
+                    'unit'   => $k[2],
+                    'period' => 'لحظي (' . ems_fmt_now() . ')',
+                    'status' => $k[4],
+                    'drill'  => $k[5],
+                    'icon'   => $k[3],
+                    'scope'  => $mnt_scope,
+                ));
+            } ?>
         </div>
     </div>
 
