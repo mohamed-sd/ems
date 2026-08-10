@@ -471,6 +471,28 @@ neg('AC-U8/وصول', 'دورةُ المفاتيح — ترسب إن لم يُح
         return neg_swap($abs, $broken);
     }, $u8check);
 
+/* ══ SH-02/صف · أبناءُ الشريطِ العلويِّ على صفٍّ مُعلَن ═════════════════════
+   عطلٌ بلّغ به المالكُ بعينه («طائرون في الهواء») — فيُثبَّت بحارسٍ يرسب عند عودتِه. */
+neg('SH-02/صف', 'صفُّ الشريطِ العلويِّ — يرسب إن أُعلن مسارٌ بلا صفّ',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/assets/css/ems.main.all.style.css';
+        $src = (string) file_get_contents($abs);
+        // إفسادٌ مطابقٌ للعطلِ الأصلي: مسارٌ بلا صفٍّ ⇒ توضيعٌ تلقائيٌّ ينزل صفًّا
+        $broken = str_replace("  grid-column: 1;\n  grid-row: 1;\n  justify-self: start;",
+                              "  grid-column: 1;\n  justify-self: start;", $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على قاعدةِ الأفعال'); }
+        return neg_swap($abs, $broken);
+    },
+    function () use ($ROOT) {
+        $out = (string) @shell_exec(escapeshellarg(PHP_BINARY) . ' '
+             . escapeshellarg($ROOT . '/tools/fix_ui_gate.php') . ' 2>&1');
+        if (strpos($out, 'SH-02/صف') === false) {
+            return array('ok' => false, 'evidence' => 'المعيارُ غائبٌ عن البوابة');
+        }
+        $ok = (strpos($out, '✔ SH-02/صف') !== false);
+        return array('ok' => $ok, 'evidence' => $ok ? 'كلُّ مسارٍ بصفِّه' : 'مسارٌ بلا صفّ');
+    });
+
 /* ── الحصيلة ───────────────────────────────────────────────────────────── */
 $valid = 0; $invalid = array();
 foreach ($RESULTS as $r) { if ($r['valid']) { $valid++; } else { $invalid[] = $r['code']; } }
