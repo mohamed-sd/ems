@@ -863,11 +863,100 @@
         }
     }
 
+    /* ══ AC-U5 · SH-06 — منتقي المناظرِ للشاشاتِ العريضة ══════════════════
+       ◆ 102 شاشةً تتجاوز عشرينَ عمودًا وأعرضُها ثمانيةٌ وثلاثون. وجدولٌ بهذا
+         العرضِ لا يُقرأ: يُمسح أفقيًّا بحثًا عن عمودَين، في كلِّ مرة.
+       ◆ ولا يظهر المنتقي إلا حيث يلزم — دونَ العشرينَ لا شيء. فمكوِّنٌ يظهر
+         حيث لا حاجةَ له ضجيجٌ يُدرَّب المستخدمُ على تجاهله.
+       ◆ والاختيارُ يُحفظ **لصاحبه** لا للجميع، والافتراضيُّ لدورِه يخدم من لم
+         يخصّص — فحاجةُ المحاسبِ للأعمدةِ غيرُ حاجةِ المشرف. */
+    var VIEW_MIN_COLS = 20;
+
+    function bootSavedViews() {
+        var tables = document.querySelectorAll('table');
+        for (var i = 0; i < tables.length; i++) {
+            var tb = tables[i];
+            var head = tb.querySelector('thead tr');
+            if (!head || head.children.length < VIEW_MIN_COLS) { continue; }
+            if (tb.getAttribute('data-ems-views') === 'off') { continue; }
+            mountPicker(tb, head);
+        }
+
+        function mountPicker(tb, head) {
+            var host = tb.closest('.card, .panel, .ems-table-wrap, .table-responsive') || tb.parentElement;
+            if (!host || host.querySelector('.ems-view-picker')) { return; }
+
+            var wrap = document.createElement('div');
+            wrap.className = 'ems-view-picker';
+            wrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap';
+
+            var lab = document.createElement('label');
+            lab.textContent = 'المنظر:';
+            lab.style.fontWeight = '600';
+
+            var sel = document.createElement('select');
+            sel.className = 'form-select';
+            sel.style.maxWidth = '260px';
+            var id = 'emsview_' + Math.abs(Date.now() % 100000);
+            sel.id = id;
+            lab.setAttribute('for', id);
+
+            var opt = document.createElement('option');
+            opt.value = ''; opt.textContent = 'كل الأعمدة (' + head.children.length + ')';
+            sel.appendChild(opt);
+
+            wrap.appendChild(lab);
+            wrap.appendChild(sel);
+            host.insertBefore(wrap, host.firstChild);
+
+            function applyColumns(cols) {
+                var show = (cols === null) ? null : {};
+                if (cols) { for (var k = 0; k < cols.length; k++) { show[cols[k]] = true; } }
+                var rows = tb.querySelectorAll('tr');
+                for (var r = 0; r < rows.length; r++) {
+                    var cells = rows[r].children;
+                    for (var c = 0; c < cells.length; c++) {
+                        cells[c].style.display = (show === null || show[c]) ? '' : 'none';
+                    }
+                }
+            }
+
+            sel.addEventListener('change', function () {
+                var o = sel.options[sel.selectedIndex];
+                var raw = o.getAttribute('data-cols');
+                applyColumns(raw ? JSON.parse(raw) : null);
+            });
+
+            var screen = (location.pathname.replace(/^\/ems\//, '') || '').split('?')[0];
+            fetch('/ems/includes/saved_views_endpoint.php?do=list&screen=' + encodeURIComponent(screen),
+                  { credentials: 'same-origin' })
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    if (!j || !j.ok || !j.data || !j.data.length) { return; }
+                    var toApply = null;
+                    j.data.forEach(function (v) {
+                        if (v.columns === null) { return; }        // «الكل» موجودٌ سلفًا
+                        var o = document.createElement('option');
+                        o.value = String(v.id);
+                        o.textContent = v.name + (v.mine ? '' : ' (الدور)');
+                        o.setAttribute('data-cols', JSON.stringify(v.columns));
+                        sel.appendChild(o);
+                        if (v.default && toApply === null) { toApply = o; }
+                    });
+                    if (toApply) { sel.value = toApply.value; sel.dispatchEvent(new Event('change')); }
+                })
+                .catch(function (e) {
+                    // تعذُّرُ جلبِ المناظرِ يترك «كلَّ الأعمدة» عاملًا — لا يُعطَّل الجدول.
+                });
+        }
+    }
+
     function boot() {
         bootUnifiedHeaders();
         bootUnifiedTables();
         try { bootFieldLabels(); } catch (eFl) { /* الوصولية لا تُسقط الشاشة */ }
         try { bootEmptyStates(); } catch (eEs) { /* حالةُ الفراغِ لا تُسقط الشاشة */ }
+        try { bootSavedViews(); } catch (eSv) { /* المنتقي لا يُسقط الجدول */ }
         try { bootFiveStates(); } catch (eFs) { /* لا يعطل التوحيد */ }
         try { bootShellCss(); window.EmsScreenShell.seed(); } catch (eSh) { /* CM-00 لا يعطل القائم */ }
     }

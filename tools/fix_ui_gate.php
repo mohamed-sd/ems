@@ -142,11 +142,15 @@ $db = fix_db();
 $viewsTable = (int) fix_one($db, "SELECT COUNT(*) FROM information_schema.TABLES
                                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'ems_saved_views'");
 $viewRows = $viewsTable ? (int) fix_one($db, "SELECT COUNT(*) FROM ems_saved_views") : 0;
+$uiJsForViews = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
 u('AC-U5', 'كلُّ شاشةٍ فوقَ عشرينَ عمودًا لها منظرٌ افتراضيٌّ ومنتقٍ',
     'وجودُ جدولِ المناظرِ المحفوظةِ وعددُ صفوفِه المبذورة',
-    'لا يقيس أن المنتقيَ مُصيَّرٌ في كلِّ شاشةٍ — ذاك يحتاج تصييرًا لكلِّ شاشةٍ طويلة',
-    ($viewsTable > 0 && $viewRows > 0),
-    'جدولُ المناظر: ' . ($viewsTable ? 'موجود' : 'غير موجود') . ' · صفوفٌ مبذورة: ' . $viewRows);
+    'لا يقيس أن المستخدمَ استعمله — يقيس وجودَ المنظرِ والمنتقي لا تبنّي المستخدمِ لهما',
+    // ◆ ثلاثةُ شروطٍ لا اثنان: الجدولُ · مناظرُ مبذورةٌ · **ومنتقٍ محمَّلٌ في boot()**.
+    //   جدولٌ مليءٌ بمناظرَ لا يعرضها أحدٌ هو خطأُ MD-05 نفسُه: البناءُ ليس تبنّيًا.
+    ($viewsTable > 0 && $viewRows > 0 && strpos(ems_ui_boot_body($uiJsForViews), 'bootSavedViews(') !== false),
+    'جدولُ المناظر: ' . ($viewsTable ? 'موجود' : 'غير موجود') . ' · صفوفٌ مبذورة: ' . $viewRows
+        . ' · المنتقي: ' . (strpos(ems_ui_boot_body($uiJsForViews), 'bootSavedViews(') !== false ? 'محمَّل' : 'غيرُ محمَّل'));
 
 /* الحاقنُ حيٌّ؟ — يُفحص مرةً واحدةً قبل الحلقة. */
 $emptyInjectorLive = false;

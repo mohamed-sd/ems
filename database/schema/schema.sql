@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 08:41:09
--- الجداول: 548 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-10 12:10:26
+-- الجداول: 549 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2573,6 +2573,25 @@ CREATE TABLE `ems_processed_events` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_processed` (`consumer`,`event_uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عطالة استهلاك موزّعة (عقد قابلية التوزيع) — يُفعَّل عند تعدّد الموزّعات';
+
+-- ── Table: ems_saved_views ──
+CREATE TABLE `ems_saved_views` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `screen` varchar(160) NOT NULL COMMENT 'المسار النسبي للشاشة',
+  `view_name` varchar(80) NOT NULL COMMENT 'اسم المنظر كما يراه المستخدم',
+  `owner_kind` enum('role','user') NOT NULL DEFAULT 'role',
+  `owner_id` int(11) NOT NULL COMMENT 'رقم الدور أو المستخدم بحسب owner_kind',
+  `columns_json` longtext DEFAULT NULL COMMENT 'فهارس الأعمدة الظاهرة — NULL = الكل',
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_view` (`company_id`,`screen`,`owner_kind`,`owner_id`,`view_name`),
+  KEY `ix_screen` (`company_id`,`screen`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ems_sequences ──
 CREATE TABLE `ems_sequences` (
