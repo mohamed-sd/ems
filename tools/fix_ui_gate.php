@@ -302,7 +302,7 @@ $inputs = 0; $labeled = 0; $aria = 0; $byBinder = 0; $unlabeledFiles = array();
 foreach (ui_files($ROOT, array('php')) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if ($src === '') { continue; }
-    $n = preg_match_all('/<(input|select|textarea)\b([^>]*)>/i', $src, $m, PREG_SET_ORDER);
+    $n = preg_match_all('/<(input|select|textarea)\b((?:<\?(?:php|=)[\s\S]*?\?>|[^>])*)>/i', $src, $m, PREG_SET_ORDER);
     if (!$n) { continue; }
     $forIds = array();
     if (preg_match_all('/<label\b[^>]*\bfor=("|\')([^"\']+)\1/i', $src, $lm)) { $forIds = array_flip($lm[2]); }
@@ -318,6 +318,19 @@ foreach (ui_files($ROOT, array('php')) as $rel) {
         $hasFor = ($id !== null && isset($forIds[$id]));
         if ($hasFor) { $labeled++; continue; }
         if ($hasAria) { $aria++; continue; }
+
+        /* ◆ **الحقلُ داخلَ `<label>` معنونٌ ضمنًا** — معيارُ HTML نفسُه: الوسمُ
+             المحيطُ يربط بلا حاجةٍ إلى `for`. وهو نمطُ أزرارِ الاختيارِ الشائع:
+             `<label><input type="radio"> نعم — مشغّلان</label>`.
+             وعدُّها «بلا عنوان» يُنتج دَينًا وهميًّا: عشرون حقلًا معنونةً بحقّ.
+           ◆ ويُتحقَّق بأن أقربَ `<label>` قبلَه لم يُغلَق بعد. */
+        $atTag = strpos($src, $tag[0]);
+        if ($atTag !== false) {
+            $pre = substr($src, 0, $atTag);
+            $lOpen  = strripos($pre, '<label');
+            $lClose = strripos($pre, '</label>');
+            if ($lOpen !== false && ($lClose === false || $lClose < $lOpen)) { $labeled++; continue; }
+        }
 
         /* بلا ربطٍ ساكن — أيبلغه الرابطُ المركزيّ؟ يبلغه إن كان الحقلُ داخلَ
            غلافٍ معروفٍ يسبقه عنوانٌ مكتوبٌ في المصدرِ نفسِه. */

@@ -1,4 +1,4 @@
-# بوابةُ FIX-02 — 2026-08-10 11:03
+# بوابةُ FIX-02 — 2026-08-10 11:18
 
 | المعيار | الحكم | الشاهد |
 |---|---|---|
@@ -8,7 +8,7 @@
 | AC-U3 | ✔ | 4 نمطًا دلاليًّا عبرَ 1549 استعمالًا · ◆ أحجامٌ وأغلفةٌ (لا تُعَدّ): 400 · btn-secondary · btn-primary · btn-danger · btn-ghost |
 | AC-U5 | ✔ | جدولُ المناظر: موجود · صفوفٌ مبذورة: 736 · المنتقي: محمَّل |
 | AC-U6 | ✔ | 327/327 سطحَ جدولٍ بحالةِ فراغ (100٪) |
-| AC-U7 | ✘ | 3565/3851 مرتبطٌ (93٪) — منها 2723 بعنوانٍ و187 بوسمٍ وصفيّ · أكثرُ الملفاتِ نقصًا: install/index.php(15) · FinRequests/request_form.php(14) · Workforce/contract_registry.php(9) |
+| AC-U7 | ✘ | 3726/3851 مرتبطٌ (97٪) — منها 3129 بعنوانٍ و205 بوسمٍ وصفيّ · أكثرُ الملفاتِ نقصًا: Workforce/contract_registry.php(9) · Governance/licenses_guarantees.php(8) · Governance/signing_authority.php(7) |
 | AC-U9 | ✔ | صفر |
 | AC-U11 | ✔ | 3 نقطةً متمايزة: 768، 992، 1200 |
 | AC-U12 | ✘ | 3677 نمطًا موضعيًّا في 326 سطحًا · أكثرُها: Timesheet/timesheet.php(205) · Employees/employee_contracts_details.php(138) · Suppliers/supplierscontracts_details.php(96) |
