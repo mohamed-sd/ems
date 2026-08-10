@@ -215,7 +215,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
             <input type="hidden" name="preview" value="<?php echo $previewFor; ?>">
             <label for="emsf_569_22ab0">تاريخُ الأثر:</label>
             <input type="date" name="as_of" value="<?php echo htmlspecialchars($previewOn); ?>" id="emsf_569_22ab0">
-            <button type="submit" class="btn-save"><i class="fa fa-rotate"></i> أعِد الاحتساب</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> أعِد الاحتساب</button>
         </form>
 
         <?php if (!$preview['ok']): ?>
@@ -274,7 +274,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                 <input type="hidden" name="fs_action" value="open">
                 <input type="hidden" name="contract_id" value="<?php echo $previewFor; ?>">
                 <input type="hidden" name="effective_date" value="<?php echo htmlspecialchars($previewOn); ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-file-signature"></i>
+                <button type="submit" class="btn-primary"><i class="fa fa-file-signature"></i>
                     افتح التصفيةَ بهذه الأرقام</button>
             </form>
             <?php endif; ?>
@@ -342,7 +342,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                                 <input type="text" name="clearance_doc" maxlength="120" required
                                        placeholder="مرجعُ محضر الإخلاء" id="emsf_570_4f3bf"></div>
                         </div>
-                        <button type="submit" class="btn-save"><i class="fa fa-check"></i>
+                        <button type="submit" class="btn-primary"><i class="fa fa-check"></i>
                             اعتمد التصفية</button>
                         <small style="color:#666">— والاعتمادُ يولّد <strong>الحدثَ الماليَّ الواحد</strong>
                             ويسترد السلفَ فعليًّا.</small>
@@ -356,7 +356,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                             <div class="form-group"><label for="emsf_571_348a7">سببُ الإلغاء <span style="color:#c00">*</span></label>
                                 <input type="text" name="cancel_reason" maxlength="255" required id="emsf_571_348a7"></div>
                         </div>
-                        <button type="submit" class="btn-cancel"><i class="fa fa-ban"></i> ألغِ المسودة</button>
+                        <button type="submit" class="btn-secondary"><i class="fa fa-ban"></i> ألغِ المسودة</button>
                     </form>
                     <?php endif; ?>
                 <?php elseif ((string)$s['state'] === 'approved'): ?>

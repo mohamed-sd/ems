@@ -602,7 +602,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card primary">
             <h5>
                 <i class="fas fa-project-diagram"></i> معلومات المشروع
-                <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-secondary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -625,7 +625,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card success">
             <h5>
                 <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
-                <button class="btn btn-sm btn-outline-success ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-primary ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -651,7 +651,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card info">
             <h5>
                 <i class="fas fa-users"></i> أطراف العقد
-                <button class="btn btn-sm btn-outline-info ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-secondary ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -677,7 +677,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card warning">
             <h5>
                 <i class="fas fa-money-bill-wave"></i> البيانات المالية
-                <button class="btn btn-sm btn-outline-warning ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-secondary ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -1538,7 +1538,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn btn-success" id="saveServices">
+                <button type="button" class="btn btn-primary" id="saveServices">
                     <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
@@ -1590,7 +1590,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn btn-info" id="saveParties">
+                <button type="button" class="btn btn-secondary" id="saveParties">
                     <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
@@ -1657,7 +1657,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn btn-warning" id="savePayment">
+                <button type="button" class="btn btn-secondary" id="savePayment">
                     <i class="fas fa-save"></i> حفظ
                 </button>
             </div>

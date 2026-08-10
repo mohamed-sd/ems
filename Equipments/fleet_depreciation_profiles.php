@@ -306,8 +306,8 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                 </div>
 
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> حفظ</button>
-                    <button type="button" id="depFormCancel" class="btn-cancel"<?= !empty($editData) ? ' data-redirect="fleet_depreciation_profiles.php"' : ''; ?>>
+                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                    <button type="button" id="depFormCancel" class="btn-secondary"<?= !empty($editData) ? ' data-redirect="fleet_depreciation_profiles.php"' : ''; ?>>
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>

@@ -53,7 +53,9 @@ if (!function_exists('ems_css_ver')) {
     <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->
     <link rel="stylesheet" href="/ems/assets/css/ems-tables.css<?php echo ems_css_ver('ems-tables.css'); ?>">
     <!-- Unified Form Styles — loaded LAST so ems-forms.css is the single authoritative source for ALL form design -->
-    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>
+    <!-- أنماطُ الأزرارِ الأربعةُ — تُحمَّل بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-buttons.css<?php echo ems_css_ver('ems-buttons.css'); ?>">">
     <!-- شريط الرحلة الموحّد (الدستور §5) — مكوّنٌ واحدٌ للطلب والبلاغ والوحدة -->
     <link rel="stylesheet" href="/ems/assets/css/ems-journey.css<?php echo ems_css_ver('ems-journey.css'); ?>">
     <!-- نظام الرسائل الموحّد: توست عابر + لافتة سطرية بلغةٍ بصريةٍ واحدة -->

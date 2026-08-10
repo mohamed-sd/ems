@@ -101,7 +101,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php echo htmlspecialchars((string)$e['title_ar']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <button type="submit" class="btn-save"><i class="fa fa-magnifying-glass"></i> أجب</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i> أجب</button>
         </form>
     </div></div>
 

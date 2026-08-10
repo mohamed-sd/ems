@@ -50,7 +50,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo $d['risk_code']; ?></td>
                     <td><?php echo $d['current_level'] ?: '—'; ?></td>
                     <td><?php echo $d['review_due']; ?></td>
-                    <td><a class="btn btn-sm btn-outline-dark" href="risk_card.php?id=<?php echo (int) $d['id']; ?>">إعادة تقييم</a></td>
+                    <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $d['id']; ?>">إعادة تقييم</a></td>
                 </tr>
                 <?php endforeach; if (empty($due)): ?><tr><td colspan="4" class="text-muted">لا مستحقات</td></tr><?php endif; ?></tbody>
             </table>

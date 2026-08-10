@@ -505,11 +505,11 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                 </div>
 
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i>
                         <span><?= !empty($editData) ? 'تحديث الموديل' : 'حفظ الموديل'; ?></span>
                     </button>
-                    <button type="button" id="projectFormCancelBtn" class="btn-cancel">
+                    <button type="button" id="projectFormCancelBtn" class="btn-secondary">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>

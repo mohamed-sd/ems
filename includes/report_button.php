@@ -26,7 +26,7 @@ if (!function_exists('ems_report_button')) {
         $GLOBALS['__ems_rb_rendered'] = true; // يُعلم الاحتياطيَّ العالميَّ فلا يزدوج
         // النموذج POST عادي إلى نقطة الفتح السياقي — السياق محمول لا مُدخَل
         echo '<form method="post" action="' . htmlspecialchars(ems_report_button_base()) . '/Tickets/ticket_contextual_open.php"'
-            . ' style="display:inline" class="ems-report-btn-form">'
+            . ' style="display:inline" class="ems-report-btn-secondary">'
             . $fields
             . '<button type="submit" class="action-btn" title="' . htmlspecialchars($label) . '"'
             . ' style="color:#c0392b"><i class="fas fa-bullhorn"></i> ' . htmlspecialchars($label) . '</button>'

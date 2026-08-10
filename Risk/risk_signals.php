@@ -83,7 +83,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     </select>
                     <input class="sigReason form-control form-control-sm" placeholder="السبب المكتوب *" style="display:inline-block;width:150px" aria-label="السبب المكتوب">
                     <input class="sigExtra form-control form-control-sm" placeholder="رقم الخطر/الوحدة" style="display:inline-block;width:110px" aria-label="رقم الخطر/الوحدة">
-                    <button class="btn btn-sm btn-dark sigGo">نفّذ</button>
+                    <button class="btn btn-sm btn-secondary sigGo">نفّذ</button>
                 </td>
                 <?php endif; ?>
                 <?php if ($fState !== 'pending'): ?>

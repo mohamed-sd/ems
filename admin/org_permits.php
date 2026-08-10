@@ -144,7 +144,7 @@ include '../insidebar.php';
             <div class="form-group"><label for="emsf_1980_a6baa">السبب</label><input type="text" name="reason" id="emsf_1980_a6baa"></div>
             <div class="form-group"><label for="emsf_1981_dfd26">مستند مرجعي</label><input type="text" name="doc_ref" id="emsf_1981_dfd26"></div>
         </div>
-        <button type="submit" class="btn-save">رفع الطلب</button>
+        <button type="submit" class="btn-primary">رفع الطلب</button>
     </form>
     <?php endif; ?>
 
@@ -170,7 +170,7 @@ include '../insidebar.php';
                         <form method="post" style="display:inline">
                             <input type="hidden" name="permit_action" value="approve">
                             <input type="hidden" name="req_id" value="<?php echo intval($detail['req_id']); ?>">
-                            <button type="submit" class="btn-save">أوافق (بدوري)</button>
+                            <button type="submit" class="btn-primary">أوافق (بدوري)</button>
                         </form>
                         <form method="post" style="display:inline">
                             <input type="hidden" name="permit_action" value="reject">
@@ -224,7 +224,7 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars($stateLabels[$x['state']] ?? $x['state']); ?></td>
                     <td><?php echo htmlspecialchars($x['valid_until'] ?: '—'); ?></td>
                     <td><small><?php echo htmlspecialchars($x['created_at']); ?></small></td>
-                    <td><a class="btn-save" href="?id=<?php echo intval($x['req_id']); ?>">الموافقات ▸</a></td>
+                    <td><a class="btn-primary" href="?id=<?php echo intval($x['req_id']); ?>">الموافقات ▸</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

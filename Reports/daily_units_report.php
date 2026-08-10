@@ -48,7 +48,7 @@ include '../insidebar.php';
             <label for="emsf_453_8f10a">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_453_8f10a">
             <label for="emsf_454_5931c">المشروع</label><input type="number" name="project_id" min="0"
                 value="<?php echo $prj ?: ''; ?>" placeholder="الكل" style="width:100px" id="emsf_454_5931c">
-            <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اعرض</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">
             <?php foreach ($rep['totals_by_unit'] as $ut => $q): ?>

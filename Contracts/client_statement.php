@@ -94,7 +94,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
             <label for="emsf_21_8b3c3">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_21_8b3c3">
             <label for="emsf_22_eabe1">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_22_eabe1">
-            <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اقرأ الكشف</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اقرأ الكشف</button>
         </form>
         <p style="color:#666;margin-top:10px">
             <strong>كلُّ رقمٍ برابط مصدره</strong> — ومن لا مصدرَ له <strong>يُعلَن</strong> ولا يُخفى.

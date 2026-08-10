@@ -103,10 +103,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         && !((int) $c['is_critical'] === 1 && (int) $c['owner_user_id'] === $uid);
                     ?>
                     <?php if ($canEvid): ?>
-                    <button class="btn btn-sm btn-outline-dark ctlEvid" data-id="<?php echo (int) $c['id']; ?>">دليل تنفيذ</button>
+                    <button class="btn btn-sm btn-secondary ctlEvid" data-id="<?php echo (int) $c['id']; ?>">دليل تنفيذ</button>
                     <?php endif; ?>
                     <?php if ($canVerifyThis): ?>
-                    <button class="btn btn-sm btn-outline-success ctlVerify" data-id="<?php echo (int) $c['id']; ?>">تحقق</button>
+                    <button class="btn btn-sm btn-primary ctlVerify" data-id="<?php echo (int) $c['id']; ?>">تحقق</button>
                     <?php elseif ($canWrite): ?>
                     <span style="font-size:.74rem;color:#b02a37" title="RK-07">مالكه — لا يتحقق</span>
                     <?php endif; ?>

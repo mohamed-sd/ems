@@ -390,7 +390,7 @@ if (function_exists('ems_screen_about')) {
               <input type="hidden" name="csrf_token" value="<?php echo fc_e($fc_csrf); ?>">
               <input type="hidden" name="fc_action" value="cancel">
               <input type="hidden" name="res_id" value="<?php echo (int) $r['id']; ?>">
-              <button type="submit" class="btn btn-sm btn-outline-danger" title="إلغاء">
+              <button type="submit" class="btn btn-sm btn-danger" title="إلغاء">
                 <i class="fa fa-ban"></i></button>
             </form>
             <?php else: ?>—<?php endif; ?>

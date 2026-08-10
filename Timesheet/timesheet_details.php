@@ -105,7 +105,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             justify-content: space-between;
         }
 
-        .btn-back {
+        .btn-secondary {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -124,7 +124,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             flex-shrink: 0;
         }
 
-        .btn-back:hover {
+        .btn-secondary:hover {
             background: rgba(232,184,75,0.22);
             border-color: rgba(232,184,75,0.55);
             color: #fff;
@@ -471,7 +471,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
                 </div>
             </div>
-            <a href="javascript:history.back()" class="btn-back">
+            <a href="javascript:history.back()" class="btn-secondary">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>

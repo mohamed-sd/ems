@@ -159,7 +159,7 @@ include '../insidebar.php';
                 <input type="text" name="reason" style="width:220px" placeholder="قرار المنح وسنده" aria-label="قرار المنح وسنده"></div>
             <div><label>من</label><br><input type="date" name="valid_from"></div>
             <div><label>إلى</label><br><input type="date" name="valid_to"></div>
-            <button class="btn-save" type="submit">منح</button>
+            <button class="btn-primary" type="submit">منح</button>
         </form>
     </div></div>
 
@@ -197,7 +197,7 @@ include '../insidebar.php';
                     <input type="hidden" name="op" value="revoke">
                     <input type="hidden" name="grant_id" value="<?php echo intval($g['grant_id']); ?>">
                     <input type="text" name="revoke_reason" placeholder="سبب الإلغاء — إلزامي" style="width:150px" aria-label="سبب الإلغاء — إلزامي">
-                    <button class="btn-save" type="submit">إلغاء</button>
+                    <button class="btn-primary" type="submit">إلغاء</button>
                 </form>
                 <?php else: ?>—<?php endif; ?>
             </td>

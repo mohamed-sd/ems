@@ -229,7 +229,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="note" maxlength="200" id="emsf_172_55096"></div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الوثيقة</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ الوثيقة</button>
             </div>
         </form>
     </div></div>

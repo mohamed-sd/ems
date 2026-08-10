@@ -219,7 +219,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                                 <input type="hidden" name="id" value="<?php echo intval($co['id']); ?>">
                                 <input type="hidden" name="action" value="suspend">
                                 <input type="hidden" name="redirect_to" value="companies">
-                                <button class="btn btn-orange btn-sm" title="تعليق" onclick="return confirm('تعليق الشركة؟')">
+                                <button class="btn btn-secondary btn-sm" title="تعليق" onclick="return confirm('تعليق الشركة؟')">
                                     <i class="fas fa-pause"></i>
                                 </button>
                             </form>
@@ -229,7 +229,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                                 <input type="hidden" name="id" value="<?php echo intval($co['id']); ?>">
                                 <input type="hidden" name="action" value="activate">
                                 <input type="hidden" name="redirect_to" value="companies">
-                                <button class="btn btn-success btn-sm" title="تفعيل" onclick="return confirm('تفعيل الشركة؟')">
+                                <button class="btn btn-primary btn-sm" title="تفعيل" onclick="return confirm('تفعيل الشركة؟')">
                                     <i class="fas fa-play"></i>
                                 </button>
                             </form>

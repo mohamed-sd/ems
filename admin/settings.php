@@ -407,7 +407,7 @@ $db_name = ems_dbtool_db_name();
                     <form method="post">
                         <input type="hidden" name="action" value="db_backup">
                         <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
-                        <button type="submit" class="btn btn-success"><i class="fas fa-download"></i> إنشاء وتنزيل نسخة الآن</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> إنشاء وتنزيل نسخة الآن</button>
                     </form>
                 </div>
             </div>
@@ -431,7 +431,7 @@ $db_name = ems_dbtool_db_name();
                             <input type="checkbox" name="confirm_replace" value="1" required>
                             <span style="font-size:0.83rem;">أفهم أن هذا سيستبدل البيانات الحالية</span>
                         </label>
-                        <button type="submit" class="btn btn-orange"><i class="fas fa-upload"></i> استيراد الآن</button>
+                        <button type="submit" class="btn btn-secondary"><i class="fas fa-upload"></i> استيراد الآن</button>
                     </form>
                 </div>
             </div>
@@ -461,7 +461,7 @@ $db_name = ems_dbtool_db_name();
                                     </form>
                                     <form method="post" style="display:inline;margin:0;" onsubmit="return confirm('ستُستبدَل القاعدة الحالية بمحتوى هذه النسخة (مع نسخة وقائية أولًا). متابعة؟');">
                                         <input type="hidden" name="action" value="db_restore"><input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>"><input type="hidden" name="file" value="<?php echo e($b['name']); ?>"><input type="hidden" name="confirm_replace" value="1">
-                                        <button class="btn btn-orange btn-sm" title="استعادة"><i class="fas fa-rotate-left"></i></button>
+                                        <button class="btn btn-secondary btn-sm" title="استعادة"><i class="fas fa-rotate-left"></i></button>
                                     </form>
                                     <form method="post" style="display:inline;margin:0;" onsubmit="return confirm('حذف هذه النسخة نهائيًا؟');">
                                         <input type="hidden" name="action" value="db_delete"><input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>"><input type="hidden" name="file" value="<?php echo e($b['name']); ?>">

@@ -552,10 +552,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-save">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> حفظ المورد
                     </button>
-                    <button type="button" class="btn-cancel" onclick="toggleForm()">
+                    <button type="button" class="btn-secondary" onclick="toggleForm()">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>

@@ -163,7 +163,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php foreach ($natures as $k => $v): ?><option value="<?php echo htmlspecialchars($v); ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                 </select></div>
             <div class="filter-actions">
-                <button type="button" class="btn-reset" id="fReset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+                <button type="button" class="btn-secondary" id="fReset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
             </div>
         </div>
     </div>

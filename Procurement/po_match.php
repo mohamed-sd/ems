@@ -215,8 +215,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-scale-balanced"></i> مطابقة</button>
-                <a href="po_match.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-scale-balanced"></i> مطابقة</button>
+                <a href="po_match.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>
@@ -256,8 +256,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-gavel"></i> حسم</button>
-                <a href="po_match.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-gavel"></i> حسم</button>
+                <a href="po_match.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>

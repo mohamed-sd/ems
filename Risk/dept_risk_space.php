@@ -90,7 +90,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             echo '<tr><td>' . $x['control_code'] . '</td><td>' . htmlspecialchars($x['name_ar']) . '</td><td>' . $x['ctype']
                . '</td><td>' . htmlspecialchars((string) $x['owner_name']) . '</td><td>' . ((int) $x['is_critical'] === 1 ? 'حرج' : '—')
                . '</td><td>' . $x['effectiveness'] . '</td>'
-               . '<td>' . ((int) $x['owner_user_id'] === $uid ? '<button class="btn btn-sm btn-outline-dark ctlEvid" data-id="' . (int) $x['id'] . '">دليل تنفيذ</button>' : '') . '</td></tr>';
+               . '<td>' . ((int) $x['owner_user_id'] === $uid ? '<button class="btn btn-sm btn-secondary ctlEvid" data-id="' . (int) $x['id'] . '">دليل تنفيذ</button>' : '') . '</td></tr>';
         }
         if ($n === 0) { echo '<tr><td colspan="7" class="text-muted">لا ضوابط</td></tr>'; }
         echo '</tbody></table>';
@@ -120,7 +120,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             echo '<tr><td>' . $x['risk_code'] . '</td><td>' . $x['ttype'] . '</td><td>' . htmlspecialchars(mb_substr($x['plan_ar'], 0, 60))
                . '</td><td>' . $x['due_date'] . '</td><td>' . $x['state'] . '</td>'
                . '<td>' . (in_array($x['state'], array('planned', 'in_progress'), true)
-                    ? '<button class="btn btn-sm btn-outline-success treatDone" data-id="' . (int) $x['id'] . '">إنجاز بدليل</button>' : '') . '</td></tr>';
+                    ? '<button class="btn btn-sm btn-primary treatDone" data-id="' . (int) $x['id'] . '">إنجاز بدليل</button>' : '') . '</td></tr>';
         }
         if ($n === 0) { echo '<tr><td colspan="6" class="text-muted">لا إجراءات مسندة</td></tr>'; }
         echo '</tbody></table>';

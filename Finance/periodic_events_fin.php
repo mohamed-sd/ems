@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <label for="emsf_254_00734">الفترة:</label>
             <input type="month" name="period" value="<?php echo htmlspecialchars($period); ?>" id="emsf_254_00734">
-            <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اعرض</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
         <?php if ($can_edit): ?>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form method="post" style="display:inline">
                 <input type="hidden" name="per_action" value="<?php echo $k; ?>">
                 <input type="hidden" name="period" value="<?php echo htmlspecialchars($period); ?>">
-                <button type="submit" class="btn-save"><i class="fa <?php echo $v[1]; ?>"></i>
+                <button type="submit" class="btn-primary"><i class="fa <?php echo $v[1]; ?>"></i>
                     شغّل <?php echo $v[0]; ?></button>
             </form>
             <?php endforeach; ?>
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="effective_from" required id="emsf_260_e7a32"></div>
                 <div class="form-group"><label for="emsf_261_3ad4a">مرجعُ القاعدة</label><input type="text" name="note" maxlength="200" id="emsf_261_3ad4a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> أضف القاعدة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف القاعدة</button></div>
         </form>
     </div></div>
     <?php endif; ?>

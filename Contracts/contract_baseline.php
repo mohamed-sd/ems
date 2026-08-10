@@ -199,7 +199,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <?php if (!$cur): ?>
             <form method="post"><input type="hidden" name="bl_action" value="open">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-folder-open"></i> افتح خطَّ الأساس</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-folder-open"></i> افتح خطَّ الأساس</button>
             </form>
             <?php else: ?>
             <form method="post" style="display:flex;gap:6px;align-items:flex-end">
@@ -212,7 +212,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php endforeach; ?></select></div>
                 <div class="form-group"><label for="emsf_49_f9441">ملاحظة/سبب</label>
                     <input type="text" name="note" maxlength="255" style="width:220px" id="emsf_49_f9441"></div>
-                <button type="submit" class="btn-save"><i class="fa fa-forward"></i> انتقل</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-forward"></i> انتقل</button>
             </form>
             <form method="post" style="display:flex;gap:6px;align-items:flex-end">
                 <input type="hidden" name="bl_action" value="amend">
@@ -221,7 +221,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="text" name="note" maxlength="255" required style="width:220px" id="emsf_50_55026"></div>
                 <div class="form-group"><label for="emsf_51_164a9">رقمُ الملحق</label>
                     <input type="number" name="amendment_id" style="width:110px" id="emsf_51_164a9"></div>
-                <button type="submit" class="btn-save"><i class="fa fa-code-branch"></i>
+                <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
                     ملحقٌ — <strong>نسخةٌ جديدةٌ والقديمةُ تبقى</strong></button>
             </form>
             <?php endif; ?>

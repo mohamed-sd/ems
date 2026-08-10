@@ -193,7 +193,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <form method="post" style="margin:0">
                             <input type="hidden" name="cl_action" value="open">
                             <input type="hidden" name="contract_id" value="<?php echo intval($c['id']); ?>">
-                            <button type="submit" class="btn-save"><i class="fa fa-play"></i> افتح التصفية</button>
+                            <button type="submit" class="btn-primary"><i class="fa fa-play"></i> افتح التصفية</button>
                         </form>
                     </td>
                 </tr>
@@ -240,7 +240,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <input type="hidden" name="cl_action" value="quota">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
                         <input type="text" name="reason" maxlength="255" placeholder="سببُ إقفال ما لم يُستهلك" aria-label="سببُ إقفال ما لم يُستهلك">
-                        <button type="submit" class="btn-save">أقفِل الحصة</button>
+                        <button type="submit" class="btn-primary">أقفِل الحصة</button>
                     </form>
                 <?php endif; ?></td>
             </tr>
@@ -254,7 +254,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <form method="post" style="margin:0">
                         <input type="hidden" name="cl_action" value="advances">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <button type="submit" class="btn-save">تحقّق وسوِّ</button>
+                        <button type="submit" class="btn-primary">تحقّق وسوِّ</button>
                     </form>
                 <?php endif; ?></td>
             </tr>
@@ -272,7 +272,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <form method="post" style="margin:0">
                         <input type="hidden" name="cl_action" value="guarantee">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <button type="submit" class="btn-save">ردَّ الضمان</button>
+                        <button type="submit" class="btn-primary">ردَّ الضمان</button>
                     </form>
                 <?php endif; ?></td>
             </tr>
@@ -287,7 +287,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <input type="hidden" name="cl_action" value="close">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
                         <input type="text" name="clearance_doc" maxlength="120" placeholder="مرجعُ شهادة الإخلاء" required aria-label="مرجعُ شهادة الإخلاء">
-                        <button type="submit" class="btn-save">أقفِل بالشهادة</button>
+                        <button type="submit" class="btn-primary">أقفِل بالشهادة</button>
                     </form>
                 <?php endif; ?></td>
             </tr>

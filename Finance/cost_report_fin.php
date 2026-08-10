@@ -82,8 +82,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_365_947f3">إجمالي التكلفة <span class="required">*</span></label><input type="number" step="0.01" min="0" name="total_cost" required id="emsf_365_947f3"></div>
             <div class="form-group"><label for="emsf_366_8d8fe">الإيراد المقابل</label><input type="number" step="0.01" name="revenue" id="emsf_366_8d8fe"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

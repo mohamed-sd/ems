@@ -149,7 +149,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </select>
             <label for="emsf_501_419f9">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($pFrom); ?>" id="emsf_501_419f9">
             <label for="emsf_502_5b9fd">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($pTo); ?>" id="emsf_502_5b9fd">
-            <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اضبط الفترة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اضبط الفترة</button>
         </form>
         <p style="color:#666;margin-top:10px">
             «دوريٌّ <strong>بمؤشراتٍ من سجلات النظام لا انطباعًا</strong>» (§4) — فلا حقلَ هنا
@@ -184,7 +184,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <input type="number" step="0.01" min="0" name="scale_max" id="emsf_505_1f9c5"></div>
                 <div class="form-group"><label for="emsf_506_2aa6a">ملاحظة</label><input type="text" name="wnote" maxlength="255" id="emsf_506_2aa6a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ الوزن</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الوزن</button></div>
         </form>
         <?php endif; ?>
         <div class="table-container" style="margin-top:12px">
@@ -212,7 +212,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($pFrom); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($pTo); ?>">
-            <button type="submit" class="btn-save"><i class="fa fa-gears"></i>
+            <button type="submit" class="btn-primary"><i class="fa fa-gears"></i>
                 ولّد تقييمَ <?php echo htmlspecialchars($pFrom); ?> → <?php echo htmlspecialchars($pTo); ?></button>
             <span style="color:#666">— يُقرأ من السجلات، ولا يُكتب رقمٌ يدويًّا</span>
         </form>
@@ -265,7 +265,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         ? htmlspecialchars(SES::RENEWAL_LABELS[$e['renewal_flag']] ?? (string)$e['renewal_flag'])
                         : '—'; ?></td>
                     <td><small><?php echo htmlspecialchars((string)($e['decision_note'] ?? '')); ?></small></td>
-                    <td><a class="btn-save" href="supplier_evaluation.php?supplier_id=<?php echo $selected; ?>&open=<?php echo intval($e['id']); ?>&from=<?php echo htmlspecialchars($pFrom); ?>&to=<?php echo htmlspecialchars($pTo); ?>">المؤشرات</a></td>
+                    <td><a class="btn-primary" href="supplier_evaluation.php?supplier_id=<?php echo $selected; ?>&open=<?php echo intval($e['id']); ?>&from=<?php echo htmlspecialchars($pFrom); ?>&to=<?php echo htmlspecialchars($pTo); ?>">المؤشرات</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -319,7 +319,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </div>
             <p style="color:#a15c00">الرقمُ يخبر و<strong>الإنسانُ يقرّر</strong> — والقرارُ يصير
                 <strong>شرطًا في التجديد</strong> بعد اعتماده، ولا يُعاد.</p>
-            <div><button type="submit" class="btn-save"><i class="fa fa-gavel"></i> اعتمد القرار</button></div>
+            <div><button type="submit" class="btn-primary"><i class="fa fa-gavel"></i> اعتمد القرار</button></div>
         </form>
         <?php endif; ?>
     </div></div>

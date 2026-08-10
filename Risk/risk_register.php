@@ -179,7 +179,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars((string) $x['review_due']); ?></td><?php endif; ?>
                     <?php if ($V('created_at')): ?>
                     <td><?php echo htmlspecialchars((string) $x['created_at']); ?></td><?php endif; ?>
-                    <td><a class="btn btn-sm btn-outline-dark" href="risk_card.php?id=<?php echo (int) $x['id']; ?>">ملف الخطر</a></td>
+                    <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['id']; ?>">ملف الخطر</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

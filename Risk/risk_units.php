@@ -90,7 +90,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><span class="badge <?php echo (int) $x['active'] === 1 ? 'badge-success' : 'badge-secondary'; ?>">
                         <?php echo (int) $x['active'] === 1 ? 'نشطة' : 'معطَّلة'; ?></span></td>
                     <?php if ($canEdit): ?>
-                    <td><button class="btn btn-sm btn-outline-dark ruEdit"
+                    <td><button class="btn btn-sm btn-secondary ruEdit"
                         data-id="<?php echo (int) $x['id']; ?>"
                         data-code="<?php echo htmlspecialchars($x['ru_code']); ?>"
                         data-name="<?php echo htmlspecialchars($x['name_ar']); ?>"

@@ -172,8 +172,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="pt">النوع</label><select name="period_type" id="pt"><option value="month">شهر</option><option value="year">سنة</option></select></div>
             <div class="form-group" id="pnowrap"><label for="emsf_263_737be">رقم الشهر</label><input type="number" name="period_no" min="1" max="12" value="1" id="emsf_263_737be"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إنشاء</button>
-            <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> إنشاء</button>
+            <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

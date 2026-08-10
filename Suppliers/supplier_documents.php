@@ -196,7 +196,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <input type="text" name="bank_doc_ref" maxlength="120" required
                            placeholder="شهادةٌ بنكيةٌ أو شيكٌ ملغًى" id="emsf_492_c50a7"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-shield-halved"></i> وثِّق الحساب</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> وثِّق الحساب</button></div>
         </form>
         <?php endif; ?>
     </div></div>
@@ -227,7 +227,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="emsf_499_a39a7">المرفق</label><input type="text" name="file_ref" maxlength="255" id="emsf_499_a39a7"></div>
                 <div class="form-group"><label for="emsf_500_49c69">ملاحظة</label><input type="text" name="dnote" maxlength="200" id="emsf_500_49c69"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ الوثيقة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الوثيقة</button></div>
         </form>
     </div></div>
     <?php endif; ?>

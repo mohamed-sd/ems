@@ -138,7 +138,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo (int) $c['is_critical'] === 1 ? '<span class="badge badge-danger">حرج</span>' : '—'; ?></td>
                     <td><?php echo htmlspecialchars((string) $c['effectiveness']); ?></td>
                     <td><?php echo htmlspecialchars((string) $c['last_verified_at'] ?: '—'); ?></td>
-                    <td><button class="btn btn-sm btn-outline-primary fieldEv"
+                    <td><button class="btn btn-sm btn-secondary fieldEv"
                         data-id="<?php echo (int) $c['id']; ?>"
                         data-code="<?php echo htmlspecialchars($c['control_code']); ?>">دليل تنفيذ</button></td>
                 </tr>
@@ -165,7 +165,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars((string) $t['due_date']); ?>
                         <?php echo $late ? ' <span class="badge badge-warning">متأخر</span>' : ''; ?></td>
                     <td><?php echo htmlspecialchars((string) $t['state']); ?></td>
-                    <td><button class="btn btn-sm btn-outline-primary fieldAct"
+                    <td><button class="btn btn-sm btn-secondary fieldAct"
                         data-id="<?php echo (int) $t['id']; ?>"
                         data-code="<?php echo htmlspecialchars($t['risk_code']); ?>">دليل إنجاز</button></td>
                 </tr>

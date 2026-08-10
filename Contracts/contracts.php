@@ -653,10 +653,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 
           <div class="pu-form-actions">
-            <button type="submit" class="btn-submit">
+            <button type="submit" class="btn-primary">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
-            <button type="button" id="contractFormCancelBtn" class="btn-cancel">
+            <button type="button" id="contractFormCancelBtn" class="btn-secondary">
               <i class="fas fa-times"></i> إلغاء
             </button>
           </div>
@@ -1088,10 +1088,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 
           <div class="pu-form-actions">
-            <button type="submit" class="btn-submit">
+            <button type="submit" class="btn-primary">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
-            <button type="button" id="contractFormCancelBtn" class="btn-cancel">
+            <button type="button" id="contractFormCancelBtn" class="btn-secondary">
               <i class="fas fa-times"></i> إلغاء
             </button>
           </div>
@@ -1119,8 +1119,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <!-- كرّر .filter-field بقدر ما تريد من الحقول -->
         <div class="filter-actions">
-          <button type="submit" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-          <button type="button" class="btn-reset" title="إعادة تعيين"><a href="contracts.php"
+          <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php"
               style="text-decoration: none; color: inherit;"><i class="fa fa-rotate-right"></i></a></button>
         </div>
       </div>

@@ -577,7 +577,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     <?php if ($tab === 'pending'): ?>
                     <td>
                         <div class="flex">
-                            <button class="btn btn-success btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'approve', '<?php echo e($req['company_name']); ?>')">
+                            <button class="btn btn-primary btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'approve', '<?php echo e($req['company_name']); ?>')">
                                 <i class="fas fa-check"></i> قبول
                             </button>
                             <button class="btn btn-danger btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'reject', '<?php echo e($req['company_name']); ?>')">
@@ -649,7 +649,7 @@ function reviewRequest(id, action, name) {
     body.innerHTML = '<i class="fas fa-' + (action === 'approve' ? 'check-circle' : 'times-circle') + '"></i>' +
                      '<span>سيتم <strong>' + (action === 'approve' ? 'قبول' : 'رفض') + '</strong> طلب الشركة: ' + name + '</span>';
     var btn = document.getElementById('reviewConfirmBtn');
-    btn.className = 'btn ' + (action === 'approve' ? 'btn-success' : 'btn-danger');
+    btn.className = 'btn ' + (action === 'approve' ? 'btn-primary' : 'btn-danger');
     btn.textContent = action === 'approve' ? 'قبول الطلب' : 'رفض الطلب';
     modal.style.display = 'flex';
 }

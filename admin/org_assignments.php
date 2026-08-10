@@ -198,7 +198,7 @@ include '../insidebar.php';
                     <?php foreach ($activeAsg as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar'] . ' — ' . ($a['person'] ?: '')) . '</option>'; } ?>
                 </select></div>
         </div>
-        <button type="submit" class="btn-save">حفظ التكليف</button>
+        <button type="submit" class="btn-primary">حفظ التكليف</button>
     </form>
     <?php endif; ?>
 

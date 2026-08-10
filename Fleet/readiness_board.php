@@ -50,7 +50,7 @@ include '../insidebar.php';
                 value="<?php echo $prj ?: ''; ?>" placeholder="الكل" id="emsf_276_15f26">
             <label for="emsf_277_43fd1">النوع</label><input type="text" name="type" style="width:120px"
                 value="<?php echo htmlspecialchars($type); ?>" placeholder="الكل" id="emsf_277_43fd1">
-            <button type="submit" class="btn-save">رشّح</button>
+            <button type="submit" class="btn-primary">رشّح</button>
         </form>
         <div class="badge <?php echo ($grid['readiness_pct'] ?? 0) >= 70 ? 'badge-success' : 'badge-danger'; ?>"
              style="font-size:16px;padding:8px 16px">

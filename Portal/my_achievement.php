@@ -75,7 +75,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
             <label for="emsf_370_07324">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_370_07324">
             <label for="emsf_371_48875">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_371_48875">
-            <button type="submit" class="btn-save"><i class="fa fa-calculator"></i> قِس</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> قِس</button>
             <small style="color:#888">اختصارات:
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>">يوم</a> ·
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d', strtotime('-7 days')); ?>&to=<?php echo date('Y-m-d'); ?>">أسبوع</a> ·

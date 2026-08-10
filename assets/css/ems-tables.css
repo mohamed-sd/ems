@@ -93,7 +93,7 @@ a.view-icon i {
 .edit-icon,
 a[title*="تعديل"],
 a[title*="edit"],
-button.edit-btn-small {
+button.edit-btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -116,7 +116,7 @@ button.edit-btn-small {
 .edit-icon:hover,
 a[title*="تعديل"]:hover,
 a[title*="edit"]:hover,
-button.edit-btn-small:hover {
+button.edit-btn-secondary:hover {
     color: var(--c-surface);
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
     border-color: var(--c-rgba2471472607);
@@ -129,7 +129,7 @@ button.edit-btn-small:hover {
 .edit-icon i,
 a[title*="تعديل"] i,
 a[title*="edit"] i,
-button.edit-btn-small i {
+button.edit-btn-secondary i {
     color: inherit;
     font-size: 1rem;
 }
@@ -140,7 +140,7 @@ button.edit-btn-small i {
 .delete-icon,
 a[title*="حذف"],
 a[title*="delete"],
-button.delete-btn-small {
+button.delete-btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -163,7 +163,7 @@ button.delete-btn-small {
 .delete-icon:hover,
 a[title*="حذف"]:hover,
 a[title*="delete"]:hover,
-button.delete-btn-small:hover {
+button.delete-btn-secondary:hover {
     color: var(--c-surface);
     background: linear-gradient(135deg, var(--c-state-danger) 0%, var(--red-dark) 100%);
     border-color: var(--c-rgba1852828078);
@@ -176,7 +176,7 @@ button.delete-btn-small:hover {
 .delete-icon i,
 a[title*="حذف"] i,
 a[title*="delete"] i,
-button.delete-btn-small i {
+button.delete-btn-secondary i {
     color: inherit;
     font-size: 1rem;
 }
@@ -775,9 +775,9 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   .edit-icon,
   .delete-icon,
   .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
+  .btn-secondary,
+  .btn-danger,
+  .btn-secondary,
   [title*="عرض"],
   [title*="مشاهدة"],
   [title*="تعديل"],
@@ -821,9 +821,9 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   .edit-icon,
   .delete-icon,
   .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
+  .btn-secondary,
+  .btn-danger,
+  .btn-secondary,
   [title*="عرض"],
   [title*="مشاهدة"],
   [title*="تعديل"],
@@ -855,9 +855,9 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   .edit-icon,
   .delete-icon,
   .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
+  .btn-secondary,
+  .btn-danger,
+  .btn-secondary,
   [title*="عرض"],
   [title*="مشاهدة"],
   [title*="تعديل"],
@@ -886,9 +886,9 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   .edit-icon,
   .delete-icon,
   .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
+  .btn-secondary,
+  .btn-danger,
+  .btn-secondary,
   [title*="عرض"],
   [title*="مشاهدة"],
   [title*="تعديل"],
@@ -917,9 +917,9 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
   .edit-icon,
   .delete-icon,
   .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
+  .btn-secondary,
+  .btn-danger,
+  .btn-secondary,
   [title*="عرض"],
   [title*="مشاهدة"],
   [title*="تعديل"],
@@ -968,8 +968,8 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
        </div>
        <!-- ... المزيد من .filter-field حسب الحاجة ... -->
        <div class="filter-actions">           <!-- دائماً في الأخير -->
-         <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-         <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+         <button type="button" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+         <button type="button" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
        </div>
      </div>
    </div>
@@ -1045,7 +1045,7 @@ body.ems-site .main .filter .filter-actions {
 }
 
 /* زر تطبيق الفلتر — أصفر (الحُرّاس :not ترفع الخصوصية فوق موحّد الأزرار) */
-body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):not(.dt-button) {
+body.ems-site .main .filter .filter-actions .btn-primary:not(.btn-close):not(.close):not(.dt-button) {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1065,14 +1065,14 @@ body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):
   box-shadow: 0 2px 6px var(--c-rgba24419766045) !important;
   transition: background .18s ease, transform .18s ease !important;
 }
-body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):not(.dt-button):hover {
+body.ems-site .main .filter .filter-actions .btn-primary:not(.btn-close):not(.close):not(.dt-button):hover {
   background: var(--c-e6b52f) !important;
   background-image: none !important;
   transform: translateY(-1px) !important;
 }
 
 /* زر إعادة تعيين الفلتر — دائري */
-body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.close):not(.dt-button) {
+body.ems-site .main .filter .filter-actions .btn-secondary:not(.btn-close):not(.close):not(.dt-button) {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1090,7 +1090,7 @@ body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.clos
   cursor: pointer !important;
   transition: background .18s ease, color .18s ease, transform .25s ease !important;
 }
-body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.close):not(.dt-button):hover {
+body.ems-site .main .filter .filter-actions .btn-secondary:not(.btn-close):not(.close):not(.dt-button):hover {
   background: var(--c-f0f0f0) !important;
   color: var(--c-222222) !important;
   transform: rotate(-90deg) !important;

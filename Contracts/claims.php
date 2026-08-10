@@ -358,7 +358,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="period_to" required id="emsf_23_cac2e"></div>
             </div>
             <div style="margin-top:10px">
-                <button type="submit" class="btn-save"><i class="fas fa-bolt"></i> ولّد المستخلص</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-bolt"></i> ولّد المستخلص</button>
             </div>
         </div></div>
     </form>
@@ -483,7 +483,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="upheld">أُقرَّ الاعتراض (البند يسقط)</option>
                                 </select>
                                 <input type="text" name="resolution_note" placeholder="سببُ الحسم" required aria-label="سببُ الحسم">
-                                <button type="submit" class="btn-save">احسِم</button>
+                                <button type="submit" class="btn-primary">احسِم</button>
                             </form>
                             <?php endif; ?>
                         <?php elseif ($dstate === 'resolved'): ?>
@@ -499,7 +499,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                 <input type="text" name="dispute_reason" placeholder="سببُ الاعتراض" required aria-label="سببُ الاعتراض">
                                 <input type="text" name="dispute_doc_ref" placeholder="مستندُه" required aria-label="مستندُه">
-                                <button type="submit" class="btn-save">ارفع نزاعًا</button>
+                                <button type="submit" class="btn-primary">ارفع نزاعًا</button>
                             </form>
                         <?php else: ?>
                             <span class="text-muted">—</span>
@@ -578,7 +578,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="note" maxlength="255" id="emsf_27_e5f9e"></div>
                 </div></div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fas fa-receipt"></i> سجّل قبضَ الدفعة</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-receipt"></i> سجّل قبضَ الدفعة</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -702,7 +702,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                placeholder="رقمُ المستند المؤيِّد" id="emsf_32_0b3ca"></div>
                 </div></div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fas fa-file-circle-plus"></i> أنشئ الإشعار</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-file-circle-plus"></i> أنشئ الإشعار</button>
                 </div>
             </form>
             <?php elseif ($can_add): ?>

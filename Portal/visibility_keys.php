@@ -120,7 +120,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1254_03a5c">ينتهي في <span class="mnt-req-hint">(إلزاميٌّ لفتح الحساس)</span></label>
                     <input type="datetime-local" name="expires_at" id="emsf_1254_03a5c"></div>
             </div>
-            <div style="margin-top:10px"><button type="submit" class="btn-save">
+            <div style="margin-top:10px"><button type="submit" class="btn-primary">
                 <i class="fa fa-check"></i> احفظ — وسيُعلَن عددُ المتأثرين</button></div>
         </form>
     </div></div>

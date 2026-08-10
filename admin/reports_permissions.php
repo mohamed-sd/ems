@@ -170,7 +170,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                     <i class="fas fa-check" style="color:var(--green);"></i>
                     <span id="cnt-val-<?php echo $role['id']; ?>"><?php echo $grantedCount; ?></span> / <?php echo $totalReports; ?> تقرير مفعّل
                 </span>
-                <button class="btn btn-sm btn-success" onclick="selectAll(<?php echo $role['id']; ?>)" type="button">
+                <button class="btn btn-sm btn-primary" onclick="selectAll(<?php echo $role['id']; ?>)" type="button">
                     <i class="fas fa-check-double"></i> تحديد الكل
                 </button>
                 <button class="btn btn-sm btn-ghost" onclick="deselectAll(<?php echo $role['id']; ?>)" type="button">

@@ -173,7 +173,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <option value="<?php echo $k; ?>" <?php echo $k === $SEL ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($v); ?></option>
                     <?php endforeach; ?></select></div>
-            <button type="submit" class="btn-save"><i class="fa fa-calculator"></i> احسب الأثر</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> احسب الأثر</button>
         </form>
 
         <?php if ($plan !== null && $plan['ok']): ?>
@@ -233,7 +233,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="form-group" style="min-width:220px"><label for="emsf_71_96ae0">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_71_96ae0"></div>
             </div>
-            <button type="submit" class="btn-save"><i class="fa fa-save"></i> سجّل الواقعة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجّل الواقعة</button>
         </form>
         <?php endif; ?>
     </div></div>

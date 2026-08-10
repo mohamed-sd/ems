@@ -26,7 +26,7 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
         .title h1{margin:0;font-size:1.5rem}
         .title p{margin:4px 0 0;color:#627791}
         .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:800;font-size:.9rem}
-        .btn-main{background:linear-gradient(135deg,var(--ink),#1f4f77);color:#fff}
+        .btn-primary{background:linear-gradient(135deg,var(--ink),#1f4f77);color:#fff}
         .btn-ghost{border:1px solid var(--line);color:var(--ink2);background:#fff}
         .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
         .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 24px rgba(16,36,67,.08)}
@@ -45,7 +45,7 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
             <p>شركة: <?php echo e($companyName); ?> | الباقة: <?php echo e($planName); ?></p>
         </div>
         <div class="links">
-            <a class="btn btn-main" href="<?php echo e(ems_url('main/dashboard.php')); ?>"><i class="fas fa-gauge-high"></i> لوحة النظام</a>
+            <a class="btn btn-primary" href="<?php echo e(ems_url('main/dashboard.php')); ?>"><i class="fas fa-gauge-high"></i> لوحة النظام</a>
             <a class="btn btn-ghost" href="<?php echo e(company_url('logout.php')); ?>"><i class="fas fa-right-from-bracket"></i> تسجيل الخروج</a>
         </div>
     </div>
@@ -56,7 +56,7 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
             <div class="meta">يمكن للمدير العام (مدير المشاريع) إضافة بقية المدراء والمستخدمين داخل نفس الشركة مع تحديد الدور والحالة.</div>
             <div class="links" style="margin-top:14px;">
                 <?php if ($isManager): ?>
-                    <a class="btn btn-main" href="<?php echo e(company_url('team.php')); ?>"><i class="fas fa-user-plus"></i> إدارة فريق الشركة</a>
+                    <a class="btn btn-primary" href="<?php echo e(company_url('team.php')); ?>"><i class="fas fa-user-plus"></i> إدارة فريق الشركة</a>
                 <?php else: ?>
                     <span class="btn btn-ghost"><i class="fas fa-lock"></i> متاح للمدير العام فقط</span>
                 <?php endif; ?>
@@ -67,7 +67,7 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
             <h2><i class="fas fa-diagram-project" style="color:#d97706"></i> إدارة الكيانات</h2>
             <div class="meta">بعد الدخول يمكنك استخدام شاشات النظام الحالية لإضافة العملاء والمشاريع والمناجم وبقية الكيانات حسب صلاحيات الدور.</div>
             <div class="links" style="margin-top:14px;">
-                <a class="btn btn-main" href="<?php echo e(ems_url('main/dashboard.php')); ?>"><i class="fas fa-arrow-left"></i> متابعة إلى لوحة النظام</a>
+                <a class="btn btn-primary" href="<?php echo e(ems_url('main/dashboard.php')); ?>"><i class="fas fa-arrow-left"></i> متابعة إلى لوحة النظام</a>
             </div>
         </div>
     </div>

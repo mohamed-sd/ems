@@ -378,7 +378,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     <input type="number" step="0.01" name="bearer_pct[]" placeholder="٪" style="width:60px" aria-label="٪">
                 </div>
                 <?php endfor; ?>
-                <button type="submit" class="btn-save">حفظ التحمّل (Σ=100)</button>
+                <button type="submit" class="btn-primary">حفظ التحمّل (Σ=100)</button>
             </form>
         </details>
     <?php }
@@ -507,7 +507,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     </div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة مكوّن</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -565,7 +565,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                             <input type="number" step="0.01" name="alloc_pct[]" placeholder="٪" style="width:60px">
                                         </div>
                                         <?php endfor; ?>
-                                        <button type="submit" class="btn-save">حفظ التوزيع (Σ=100)</button>
+                                        <button type="submit" class="btn-primary">حفظ التوزيع (Σ=100)</button>
                                     </form>
                                 </details>
                                 <form method="post" style="display:inline-flex;gap:4px">
@@ -604,7 +604,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     </div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة مكوّن</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -662,7 +662,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                             <input type="number" step="0.01" name="alloc_pct[]" placeholder="٪" style="width:60px">
                                         </div>
                                         <?php endfor; ?>
-                                        <button type="submit" class="btn-save">حفظ التوزيع (Σ=100)</button>
+                                        <button type="submit" class="btn-primary">حفظ التوزيع (Σ=100)</button>
                                     </form>
                                 </details>
                                 <form method="post" style="display:inline-flex;gap:4px">
@@ -718,7 +718,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     <div class="form-group"><label for="emsf_1635_a81ce">سريان إلى</label><input type="date" name="valid_to" id="emsf_1635_a81ce"></div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إضافة قاعدة حافز</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة قاعدة حافز</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -820,7 +820,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         <input type="text" name="amd_after" id="emsf_1639_9303d"></div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fa fa-plus"></i> إنشاء ملحق (مسودة)</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إنشاء ملحق (مسودة)</button>
                 </div>
             </form>
             <?php elseif (trim(strval($view_contract['source_table'] ?? '')) === ''
@@ -835,7 +835,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         <input type="text" name="signed_file_ref" required maxlength="255" placeholder="uploads/contracts/....pdf" id="emsf_1640_5f6ab"></div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="btn-save"><i class="fa fa-file-signature"></i> تثبيت النسخة الموقَّعة</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-file-signature"></i> تثبيت النسخة الموقَّعة</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -890,7 +890,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
             <div class="form-group"><label for="emsf_1649_bce68">العملة</label><input type="text" name="currency" maxlength="8" placeholder="SDG" id="emsf_1649_bce68"></div>
         </div>
         <div style="margin-top:12px">
-            <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ مسودة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ مسودة</button>
         </div>
         </div></div>
     </form>

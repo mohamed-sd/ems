@@ -68,7 +68,7 @@ include '../insidebar.php';
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <label for="emsf_278_59478">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_278_59478">
             <label for="emsf_279_abf93">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_279_abf93">
-            <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اعرض</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
     </div></div>
 

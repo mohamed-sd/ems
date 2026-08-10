@@ -372,7 +372,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <form action="" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="approve">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
-                            <button class="btn btn-sm btn-success" type="submit">إجازة</button>
+                            <button class="btn btn-sm btn-primary" type="submit">إجازة</button>
                         </form>
                         <?php endif; ?>
                     </td>
@@ -432,7 +432,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="text" name="note" placeholder="سبب الاعتراض" required
                                    style="width:150px;padding:3px 6px;font-size:12px;" aria-label="سبب الاعتراض">
-                            <button class="btn btn-sm btn-warning" type="submit">اعتراض</button>
+                            <button class="btn btn-sm btn-secondary" type="submit">اعتراض</button>
                         </form>
                         <?php elseif ($can_edit): ?>
                         <form action="" method="post" style="display:inline;">

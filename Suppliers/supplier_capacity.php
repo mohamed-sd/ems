@@ -153,7 +153,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </select>
             <label for="emsf_479_f7ce7">القياس من</label><input type="date" name="from" value="<?php echo htmlspecialchars($mFrom); ?>" id="emsf_479_f7ce7">
             <label for="emsf_480_e0019">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($mTo); ?>" id="emsf_480_e0019">
-            <button type="submit" class="btn-save"><i class="fa fa-magnifying-glass"></i> اقرأ القياس</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i> اقرأ القياس</button>
         </form>
         <p style="color:#a15c00;margin-top:10px;background:#fff8e6;padding:10px;border-radius:6px">
             <i class="fa fa-triangle-exclamation"></i>
@@ -204,7 +204,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="emsf_487_58350">سريان إلى</label><input type="date" name="valid_to" id="emsf_487_58350"></div>
                 <div class="form-group"><label for="emsf_488_d5d66">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_488_d5d66"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ البطاقة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البطاقة</button></div>
         </form>
     </div></div>
     <?php endif; ?>

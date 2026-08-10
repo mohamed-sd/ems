@@ -153,7 +153,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars((string) $x['assessed_at']); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'parent_ref')): ?>
                     <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: 'أول نسخة'); ?></td><?php endif; ?>
-                    <td><a class="btn btn-sm btn-outline-dark" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a></td>
+                    <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

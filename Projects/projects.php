@@ -405,7 +405,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <i class="fas fa-plus-circle"></i> إضافة مشروع
                 </a>
             <?php else: ?>
-                <button class="add-btn projects-btn-disabled" disabled>
+                <button class="add-btn projects-btn-secondary" disabled>
                     <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
                 </button>
             <?php endif; ?>
@@ -553,10 +553,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                 </div>
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> <span id="submitBtnText">حفظ المشروع</span>
                     </button>
-                    <button type="button" id="projectFormCancelBtn" class="btn-cancel">
+                    <button type="button" id="projectFormCancelBtn" class="btn-secondary">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>

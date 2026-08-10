@@ -189,8 +189,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ المعالجة</button>
-                <a href="variance_monitor_fin.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ المعالجة</button>
+                <a href="variance_monitor_fin.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>

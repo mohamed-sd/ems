@@ -189,7 +189,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                     <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                     <input type="hidden" name="action" value="toggle">
                     <input type="hidden" name="tog_id" value="<?php echo intval($plan['id']); ?>">
-                    <button class="btn btn-sm <?php echo $active ? 'btn-orange' : 'btn-success'; ?>" title="<?php echo $active ? 'تعطيل' : 'تفعيل'; ?>">
+                    <button class="btn btn-sm <?php echo $active ? 'btn-secondary' : 'btn-primary'; ?>" title="<?php echo $active ? 'تعطيل' : 'تفعيل'; ?>">
                         <i class="fas fa-<?php echo $active ? 'eye-slash' : 'eye'; ?>"></i>
                     </button>
                 </form>

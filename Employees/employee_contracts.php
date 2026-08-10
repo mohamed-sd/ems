@@ -581,10 +581,10 @@ include('../insidebar.php'); ?>
 
 
           <div class="form-actions-row">
-            <button type="reset" class="btn-reset-contract">
+            <button type="reset" class="btn-secondary">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
-            <button type="submit" class="primary btn-submit-contract">
+            <button type="submit" class="primary btn-primary">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
           </div>

@@ -255,7 +255,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         . '<div class="form-group"><label for="emsf_381_fafc5">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_381_fafc5"></div>'
         . '<div class="form-group"><label for="emsf_382_16b8d">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_382_16b8d"></div>'
         . '<div class="form-group"><label for="emsf_383_3f8fe">تكلفة الوحدة <small>(صنفُ الكتالوج يُحتسب آليًّا بالمتوسط المرجح)</small></label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '" id="emsf_383_3f8fe"></div>'
-        . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
+        . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
 ?>
@@ -284,7 +284,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         <strong><i class="fa fa-triangle-exclamation"></i> نقصُ مخزونٍ بعد الصرف
             (<?php echo htmlspecialchars((string)$psf['issue_ref']); ?>):</strong>
         <?php foreach ($psf['items'] as $sh): ?>
-            <a class="btn-save" style="margin:0 4px"
+            <a class="btn-primary" style="margin:0 4px"
                href="requests_proc.php?prefill_item=<?php echo intval($sh['item_id']); ?>&need_source=<?php
                    echo rawurlencode('نقص مخزون'); ?>&source_ref=<?php echo rawurlencode((string)$psf['issue_ref']); ?>">
                 <i class="fa fa-cart-plus"></i> طلبُ شراءٍ بمرجع الأمر —
@@ -372,8 +372,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الصرف</button>
-                <a href="issue_proc.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ الصرف</button>
+                <a href="issue_proc.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>

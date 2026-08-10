@@ -151,7 +151,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                         <form method="post" style="display:inline">
                             <input type="hidden" name="cap_action" value="switch">
                             <input type="hidden" name="capacity_id" value="<?php echo intval($c['id']); ?>">
-                            <button type="submit" class="btn-save">البس هذه الصفة</button>
+                            <button type="submit" class="btn-primary">البس هذه الصفة</button>
                         </form>
                     <?php endif; ?></td>
                 </tr>
@@ -169,9 +169,9 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
             <strong>«تفويضًا موروثًا»</strong> ولا يُلفَّق. <strong>الإعادةُ لا تكرّر صفًّا.</strong></p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
             <form method="post"><input type="hidden" name="cap_action" value="derive_dry">
-                <button type="submit" class="btn-save"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
             <form method="post"><input type="hidden" name="cap_action" value="derive_apply">
-                <button type="submit" class="btn-save"><i class="fa fa-play"></i> اشتقّ فعلًا</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-play"></i> اشتقّ فعلًا</button></form>
         </div>
     </div></div>
 
@@ -218,7 +218,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                             <input type="hidden" name="cap_action" value="freeze">
                             <input type="hidden" name="capacity_id" value="<?php echo intval($c['id']); ?>">
                             <input type="text" name="reason" placeholder="السبب *" required style="width:120px" aria-label="السبب">
-                            <button type="submit" class="btn-save">جمّد</button>
+                            <button type="submit" class="btn-primary">جمّد</button>
                         </form>
                     <?php endif; ?></td>
                 </tr>

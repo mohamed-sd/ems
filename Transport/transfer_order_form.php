@@ -434,7 +434,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="gps_lat" placeholder="GPS lat" style="width:90px" aria-label="GPS lat">
                         <input type="text" name="gps_lng" placeholder="GPS lng" style="width:90px" aria-label="GPS lng">
                     <?php endif; ?>
-                    <button type="submit" class="btn-save" style="background:<?php echo $tt['color']; ?>"><i class="fa fa-check"></i> تأكيد</button>
+                    <button type="submit" class="btn-primary" style="background:<?php echo $tt['color']; ?>"><i class="fa fa-check"></i> تأكيد</button>
                 </form>
                 <?php else: ?>
                 <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" style="display:inline"
@@ -442,7 +442,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="action" value="transition">
                     <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
                     <input type="hidden" name="trans" value="<?php echo $k; ?>">
-                    <button type="submit" class="btn-save" style="background:<?php echo $tt['color']; ?>"><i class="fa <?php echo $tt['icon']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></button>
+                    <button type="submit" class="btn-primary" style="background:<?php echo $tt['color']; ?>"><i class="fa <?php echo $tt['icon']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></button>
                 </form>
                 <?php endif; ?>
             <?php endforeach; ?>
@@ -453,7 +453,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="action" value="cancel">
                 <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
                 <input type="text" name="reason" placeholder="سبب الإلغاء (إلزامي)" required style="width:200px" aria-label="سبب الإلغاء (إلزامي)">
-                <button type="submit" class="btn-cancel"><i class="fa fa-ban"></i> إلغاء الأمر</button>
+                <button type="submit" class="btn-secondary"><i class="fa fa-ban"></i> إلغاء الأمر</button>
             </form>
             <?php endif; ?>
 
@@ -466,11 +466,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- تبويبات -->
     <div class="card" style="margin-bottom:14px"><div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap">
-        <button type="button" class="btn-ok trs-tab-btn" data-tab="header"><i class="fa fa-circle-info"></i> الرأس والتجهيز</button>
-        <button type="button" class="btn-ok trs-tab-btn" data-tab="lines"><i class="fa fa-boxes-stacked"></i> العناصر المنقولة</button>
-        <button type="button" class="btn-ok trs-tab-btn" data-tab="costs"><i class="fa fa-hand-holding-dollar"></i> بنود التكلفة</button>
-        <button type="button" class="btn-ok trs-tab-btn" data-tab="permits"><i class="fa fa-file-shield"></i> التصاريح</button>
-        <button type="button" class="btn-ok trs-tab-btn" data-tab="events"><i class="fa fa-clock-rotate-left"></i> سجلّ الأحداث</button>
+        <button type="button" class="btn-primary trs-tab-btn" data-tab="header"><i class="fa fa-circle-info"></i> الرأس والتجهيز</button>
+        <button type="button" class="btn-primary trs-tab-btn" data-tab="lines"><i class="fa fa-boxes-stacked"></i> العناصر المنقولة</button>
+        <button type="button" class="btn-primary trs-tab-btn" data-tab="costs"><i class="fa fa-hand-holding-dollar"></i> بنود التكلفة</button>
+        <button type="button" class="btn-primary trs-tab-btn" data-tab="permits"><i class="fa fa-file-shield"></i> التصاريح</button>
+        <button type="button" class="btn-primary trs-tab-btn" data-tab="events"><i class="fa fa-clock-rotate-left"></i> سجلّ الأحداث</button>
     </div></div>
     <?php endif; ?>
 
@@ -536,8 +536,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <?php endif; ?>
             <div class="form-actions">
-                <?php if ($can_add || $can_edit): ?><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الرأس</button><?php endif; ?>
-                <a href="transfer_orders_list.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <?php if ($can_add || $can_edit): ?><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ الرأس</button><?php endif; ?>
+                <a href="transfer_orders_list.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>
@@ -561,7 +561,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_556_6252b">الكمية</label><input type="number" step="0.01" name="quantity" value="" id="emsf_556_6252b"></div>
                 <div class="form-group" style="grid-column:1/-1"><label for="emsf_557_419d9">ملاحظة</label><input type="text" name="line_note" id="emsf_557_419d9"></div>
             </div></div>
-            <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة</button></div>
+            <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
         </form>
         <?php endif; ?>
@@ -625,7 +625,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <select name="cost_bearer" required id="emsf_562_00122"><?php foreach ($bearers as $k => $v) { $sel = ($order['cost_bearer'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
                 <div class="form-group"><label for="emsf_563_d49af">مركز التكلفة</label><input type="text" name="cl_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>" id="emsf_563_d49af"></div>
             </div></div>
-            <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة</button></div>
+            <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
         </form>
         <?php endif; ?>
@@ -673,7 +673,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_568_2ebc8">الحالة</label>
                     <select name="permit_state" id="emsf_568_2ebc8"><?php foreach ($permit_states as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
             </div></div>
-            <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة</button></div>
+            <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
         </form>
         <?php endif; ?>

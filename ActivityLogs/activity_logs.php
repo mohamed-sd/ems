@@ -452,10 +452,10 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
                         <!-- أزرار -->
                         <div class="form-group allforms-span-full activity-filter-actions">
-                            <button type="button" class="btn-cancel" id="resetFiltersBtn">
+                            <button type="button" class="btn-secondary" id="resetFiltersBtn">
                                 <i class="fa fa-times me-1"></i>إعادة
                             </button>
-                            <button type="button" class="btn-save activity-clear-btn" id="clearLogsBtn"
+                            <button type="button" class="btn-primary activity-clear-btn" id="clearLogsBtn"
                                 data-role-id="<?= intval($selectedRoleId) ?>"
                                 data-role-name="<?= htmlspecialchars($currentRoleCard['role_name'] ?? 'الدور #' . $selectedRoleId, ENT_QUOTES) ?>">
                                 <i class="fa fa-trash me-1"></i>تفريغ السجلات
@@ -794,7 +794,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         <div class="modal-content border-danger">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title"><i class="fa fa-exclamation-triangle me-2"></i>تأكيد تفريغ السجلات</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p class="mb-1">سيتم حذف جميع سجلات نشاط الدور:</p>
@@ -925,7 +925,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                         // CSV يعمل بدون JSZip ويُفتح مباشرة في Excel
                         extend: 'csvHtml5',
                         text: '<i class="fa fa-file-excel-o me-1"></i> تصدير CSV',
-                        className: 'btn-outline-success',
+                        className: 'btn-primary',
                         title: 'سجل_النشاطات',
                         fieldSeparator: ',',
                         charset: 'utf-8',
@@ -935,7 +935,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                     {
                         extend: 'print',
                         text: '<i class="fa fa-print me-1"></i> طباعة',
-                        className: 'btn-outline-secondary',
+                        className: 'btn-secondary',
                         title: 'سجل النشاطات',
                         exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8] }
                     }

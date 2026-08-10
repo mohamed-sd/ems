@@ -135,8 +135,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_228_23bf9">الحد الأدنى المطلوب</label><input type="number" step="0.01" name="min_required" value="5000000" id="emsf_228_23bf9"></div>
             <div class="form-group" style="grid-column:1/-1"><label for="emsf_229_75dfb">ملاحظة</label><input type="text" name="note" id="emsf_229_75dfb"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

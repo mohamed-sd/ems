@@ -174,7 +174,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
                 <p style="font-size:26px;margin:8px 0"><strong><?php echo $proc_pending; ?></strong></p>
                 <p class="text-muted">أمر شراء لم يُولّد له حدث بعد</p>
                 <?php if ($can_add && $proc_pending > 0): ?>
-                    <a href="?gen_proc=1&_t=<?php echo fin_action_token(); ?>" class="btn-save" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
+                    <a href="?gen_proc=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
                 <?php elseif ($proc_pending === 0): ?>
                     <span class="badge badge-success">لا جديد — كل الأوامر مستوردة</span>
                 <?php endif; ?>
@@ -185,7 +185,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
                 <p style="font-size:26px;margin:8px 0"><strong><?php echo $mnt_pending; ?></strong></p>
                 <p class="text-muted">أمر صيانة بتكلفة لم يُولّد له حدث بعد</p>
                 <?php if ($can_add && $mnt_pending > 0): ?>
-                    <a href="?gen_mnt=1&_t=<?php echo fin_action_token(); ?>" class="btn-save" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
+                    <a href="?gen_mnt=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
                 <?php elseif ($mnt_pending === 0): ?>
                     <span class="badge badge-success">لا جديد — كل الأوامر مستوردة</span>
                 <?php endif; ?>

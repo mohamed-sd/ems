@@ -79,7 +79,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php echo intval($r['duplicate_flag']) === 1 ? '<span class="badge bg-warning">⚠️ تكرار محتمل</span>' : ''; ?>
                     <?php echo $docs_ok ? '<span class="badge bg-success">مستنداته مكتملة</span>' : '<span class="badge bg-danger">بلا مستند إلزامي</span>'; ?>
                 </h5>
-                <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-outline-primary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
+                <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-secondary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
             </div>
             <div class="card-body">
                 <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;">
@@ -96,7 +96,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">
                         <input type="text" name="reason" placeholder="سبب الإعادة للاستكمال" required style="min-width:200px;" aria-label="سبب الإعادة للاستكمال">
-                        <button type="submit" class="btn btn-outline-warning"><i class="fa fa-rotate-left"></i> إعادة</button>
+                        <button type="submit" class="btn btn-secondary"><i class="fa fa-rotate-left"></i> إعادة</button>
                     </form>
                     <?php endif; ?>
                     <?php if ($can_approve): ?>
@@ -117,7 +117,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php foreach ($rej_classes as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo $v; ?></option><?php endforeach; ?>
                         </select>
                         <input type="text" name="reason" placeholder="سبب الرفض (إلزامي)" required style="min-width:180px;" aria-label="سبب الرفض (إلزامي)">
-                        <button type="submit" class="btn btn-outline-danger"><i class="fa fa-ban"></i> رفض</button>
+                        <button type="submit" class="btn btn-danger"><i class="fa fa-ban"></i> رفض</button>
                     </form>
                     <?php endif; ?>
                 </div>

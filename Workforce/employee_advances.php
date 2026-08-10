@@ -169,7 +169,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="number" step="0.01" min="0" max="100" name="protection_percent"
                    value="<?php echo $protection === null ? '' : htmlspecialchars((string)$protection); ?>"
                    placeholder="فارغٌ = غيرُ مقرَّر" style="max-width:180px" aria-label="فارغٌ = غيرُ مقرَّر">
-            <button type="submit" class="btn-save"><i class="fa fa-shield-halved"></i> حفظ الحد</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> حفظ الحد</button>
         </form>
         <?php endif; ?>
     </div></div>
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="date" name="first_deduction_period" id="emsf_1683_dd69b"></div>
             <div class="form-group"><label for="emsf_1684_dd952">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1684_dd952"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> فتح السلفة</button></div>
+        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح السلفة</button></div>
         </div></div>
     </form>
     <?php endif; ?>

@@ -117,8 +117,8 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
             <div class="form-group"><label for="emsf_205_1a728">القيمة التخريدية</label><input type="number" step="0.01" min="0" name="salvage_value" value="0" id="emsf_205_1a728"></div>
             <div class="form-group"><label for="emsf_206_d25e1">العمر الإنتاجي (شهر)</label><input type="number" min="1" name="useful_life_months" value="60" id="emsf_206_d25e1"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

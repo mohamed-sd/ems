@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* زر الحفظ */
-        .btn-save {
+        .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* تأثير وميض ذهبي عند التحويم */
-        .btn-save::before {
+        .btn-primary::before {
             content: '';
             position: absolute;
             top: 0;
@@ -208,25 +208,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: left 0.5s ease;
         }
 
-        .btn-save:hover::before { left: 100%; }
+        .btn-primary:hover::before { left: 100%; }
 
-        .btn-save:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(12, 28, 62, 0.35);
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
             color: var(--navy);
         }
 
-        .btn-save:active {
+        .btn-primary:active {
             transform: translateY(0);
             box-shadow: 0 2px 8px rgba(12, 28, 62, 0.2);
         }
 
-        .btn-save i { font-size: 1.05rem; transition: transform var(--ease); }
-        .btn-save:hover i { transform: scale(1.15); }
+        .btn-primary i { font-size: 1.05rem; transition: transform var(--ease); }
+        .btn-primary:hover i { transform: scale(1.15); }
 
         /* زر إعادة التعيين */
-        .btn-reset {
+        .btn-secondary {
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -243,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 2px 8px rgba(12, 28, 62, 0.08);
         }
 
-        .btn-reset:hover {
+        .btn-secondary:hover {
             background: var(--red-soft);
             border-color: var(--red);
             color: var(--red);
@@ -251,21 +251,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2);
         }
 
-        .btn-reset:active {
+        .btn-secondary:active {
             transform: translateY(0);
             box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15);
         }
 
-        .btn-reset i { font-size: 1rem; transition: transform var(--ease); }
-        .btn-reset:hover i { transform: rotate(-180deg); }
+        .btn-secondary i { font-size: 1rem; transition: transform var(--ease); }
+        .btn-secondary:hover i { transform: rotate(-180deg); }
 
         /* ── حالة التحميل لزر الإرسال ── */
-        .btn-save.loading {
+        .btn-primary.loading {
             pointer-events: none;
             opacity: 0.7;
         }
 
-        .btn-save.loading i { animation: spin 1s linear infinite; }
+        .btn-primary.loading i { animation: spin 1s linear infinite; }
 
         /* ── الحركات ── */
         @keyframes slideUp {
@@ -281,8 +281,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* ── استجابة الشاشات الصغيرة ── */
         @media (max-width: 600px) {
             .form-actions { flex-direction: column; }
-            .btn-save,
-            .btn-reset {
+            .btn-primary,
+            .btn-secondary {
                 width: 100%;
                 justify-content: center;
                 padding: 13px 24px;
@@ -410,11 +410,11 @@ include __DIR__ . '/../includes/page_header.php';
 
                     <!-- أزرار الفورم -->
                     <div class="form-actions">
-                        <button type="submit" class="btn-save" id="submitBtn">
+                        <button type="submit" class="btn-primary" id="submitBtn">
                             <i class="fas fa-save"></i>
                             <span>حفظ كلمة السر الجديدة</span>
                         </button>
-                        <button type="reset" class="btn-reset">
+                        <button type="reset" class="btn-secondary">
                             <i class="fas fa-redo"></i>
                             <span>إعادة تعيين</span>
                         </button>
@@ -571,7 +571,7 @@ include __DIR__ . '/../includes/page_header.php';
         // ════════════════════════════════════════════════
         // إعادة تعيين الفورم
         // ════════════════════════════════════════════════
-        document.querySelector('.btn-reset').addEventListener('click', function () {
+        document.querySelector('.btn-secondary').addEventListener('click', function () {
             setTimeout(function () {
                 strengthBar.style.display = 'none';
                 strengthText.textContent  = '';

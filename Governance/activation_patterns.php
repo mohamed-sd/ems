@@ -150,7 +150,7 @@ include '../insidebar.php';
                 <option value="0">تعطيل (بسبب)</option>
             </select>
             <input type="text" name="reason" placeholder="السبب — إلزامي للتعطيل" style="grid-column:span 2" aria-label="السبب — إلزامي للتعطيل">
-            <button class="btn-save" type="submit" style="grid-column:span 3">حفظ العلم</button>
+            <button class="btn-primary" type="submit" style="grid-column:span 3">حفظ العلم</button>
         </form>
     </div></div>
 </div>

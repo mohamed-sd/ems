@@ -124,18 +124,34 @@ u('AC-U2', 'صفرُ قيمةٍ لونيةٍ حرفيةٍ خارجَ ملفِّ 
             array_slice(array_keys($colorFiles), 0, 3), array_slice($colorFiles, 0, 3))));
 
 /* ══ AC-U3 · أربعةُ أصنافِ أزرار ══════════════════════════════════════════ */
-$btnClasses = array(); $btnUses = 0;
+/* ◆ **الأحجامُ والأغلفةُ ليست أنماطًا**: `btn-sm` حجمٌ و`btn-group` غلافُ
+ تخطيطٍ و`btn-close` زرُّ إغلاقِ نافذةٍ من بوتستراب. والمعيارُ عن الأنماطِ
+ **الدلاليةِ** — كم إشارةً بصريةً على المستخدمِ أن يتعلّمها — لا عن كلِّ
+ صنفٍ يبدأ بـbtn. وعدُّها معًا يخلط ما لا يُخلط.
+ ◆ وملفاتُ المكتباتِ مستثناةٌ كما في AC-U2. */
+$BTN_NON_VARIANT = array('btn-sm', 'btn-lg', 'btn-block', 'btn-close', 'btn-check',
+    'btn-toolbar', 'btn-group', 'btn-group-vertical', 'btn-group-sm', 'btn-group-lg',
+    'btn-group-toggle', 'btn-group-toggle-all');
+$btnClasses = array(); $btnUses = 0; $btnSkipped = 0;
 foreach (ui_files($ROOT, array('php', 'css', 'js')) as $rel) {
+    $isV = false;
+    foreach ($VENDOR_CSS as $v) { if (stripos($rel, $v) !== false) { $isV = true; break; } }
+    if ($isV) { continue; }
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if (preg_match_all('/\bbtn-[a-z0-9_-]+/i', $src, $m)) {
-        foreach ($m[0] as $c) { $btnClasses[strtolower($c)] = ($btnClasses[strtolower($c)] ?? 0) + 1; $btnUses++; }
+        foreach ($m[0] as $c) {
+            $c = strtolower($c);
+            if (in_array($c, $BTN_NON_VARIANT, true)) { $btnSkipped++; continue; }
+            $btnClasses[$c] = ($btnClasses[$c] ?? 0) + 1; $btnUses++;
+        }
     }
 }
 u('AC-U3', 'أربعةُ أصنافِ أزرارٍ لا مئةٌ وأربعةٌ وثمانون',
     'يعدُّ الأصنافَ المتمايزةَ بنمطِ btn-* في كلِّ الشجرةِ الحية',
-    'لا يقيس الأزرارَ المبنيةَ بأصنافٍ خارجَ هذا النمط (action-btn وأخواتها)',
+    'لا يقيس الأحجامَ والأغلفةَ (btn-sm · btn-group) — ليست أنماطًا دلالية · ولا المكتبات',
     count($btnClasses) <= 4,
-    count($btnClasses) . ' صنفًا عبرَ ' . $btnUses . ' استعمالًا');
+    count($btnClasses) . ' نمطًا دلاليًّا عبرَ ' . $btnUses . ' استعمالًا · ◆ أحجامٌ وأغلفةٌ (لا تُعَدّ): ' . $btnSkipped
+        . ($btnClasses ? ' · ' . implode(' · ', array_slice(array_keys($btnClasses), 0, 8)) : ''));
 
 /* ══ AC-U5/U6 · المناظرُ المحفوظةُ وحالاتُ الفراغ ═════════════════════════ */
 $db = fix_db();

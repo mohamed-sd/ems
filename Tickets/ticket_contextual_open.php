@@ -103,7 +103,7 @@ include '../insidebar.php';
             <input type="hidden" name="type_code" value="<?php echo htmlspecialchars($_POST['type_code'] ?? ''); ?>">
             <input type="hidden" name="follow_ticket_id" value="<?php echo intval($d['id']); ?>">
             <span><strong><?php echo htmlspecialchars($d['ticket_no']); ?></strong> — <?php echo htmlspecialchars(mb_substr((string) $d['complaint'], 0, 80)); ?></span>
-            <button type="submit" class="btn-save">أتابعه</button>
+            <button type="submit" class="btn-primary">أتابعه</button>
         </form>
         <?php endforeach; ?>
         <form method="post">
@@ -145,7 +145,7 @@ include '../insidebar.php';
         </div>
         <div class="form-group"><label>الوصف * — الحقل الحر الوحيد</label>
             <textarea name="description" rows="3" required id="emsf_1483_2e0f1"></textarea></div>
-        <button type="submit" class="btn-save">رفع البلاغ — يوجَّه آليًّا خلال ثانية</button>
+        <button type="submit" class="btn-primary">رفع البلاغ — يوجَّه آليًّا خلال ثانية</button>
     </form>
 </div>
 

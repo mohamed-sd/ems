@@ -52,6 +52,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
       '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>',
       '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>',
+      // أنماطُ الأزرارِ الأربعةُ — بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة
+      '/ems/assets/css/ems-buttons.css<?php echo $__sb_ver('ems-buttons.css'); ?>',
       '/ems/assets/css/ems-nav-groups.css<?php echo $__sb_ver('ems-nav-groups.css'); ?>',
       // واجهةُ الجوّال — آخرُ الملفات كي تفوز على طبقات التجاوز المتراكمة،
       // وكلُّ ما فيها محبوسٌ في @media (max-width:768px) فلا تمسّ الحاسوب.

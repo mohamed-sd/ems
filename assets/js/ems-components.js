@@ -44,7 +44,7 @@
             '<div class="ems-state-title">لا بيانات بعد</div>' +
             '<div class="ems-state-reason">' + esc(opts.reason || 'لم يُنشأ أي سجل في هذا النطاق حتى الآن') + '</div>' +
             (opts.createHref
-                ? '<a class="ems-btn-create" href="' + esc(opts.createHref) + '"><i class="fa fa-plus"></i> ' + esc(opts.createLabel || 'إنشاء أول سجل') + '</a>'
+                ? '<a class="ems-btn-primary" href="' + esc(opts.createHref) + '"><i class="fa fa-plus"></i> ' + esc(opts.createLabel || 'إنشاء أول سجل') + '</a>'
                 : ''));
     };
 
@@ -55,8 +55,8 @@
             '<i class="fas fa-magnifying-glass-minus" aria-hidden="true"></i>' +
             '<div class="ems-state-title">لا نتائج لبحثك</div>' +
             '<div class="ems-state-reason">جرّب توسيع البحث أو تفريغ الفلاتر المفعَّلة</div>' +
-            '<button type="button" class="ems-btn-clear-filters">تفريغ الفلاتر</button>');
-        el.querySelector('.ems-btn-clear-filters').addEventListener('click', function () {
+            '<button type="button" class="ems-btn-secondary">تفريغ الفلاتر</button>');
+        el.querySelector('.ems-btn-secondary').addEventListener('click', function () {
             if (typeof opts.onClear === 'function') { opts.onClear(); }
         });
         return el;

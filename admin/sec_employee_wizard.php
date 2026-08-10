@@ -184,9 +184,9 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
             <small style="color:#888">التكليف يُنشأ ويُدار من شاشة التكليفات — وهنا إحالة قراءة.</small></div>
 
         <div style="display:flex;gap:10px;margin-top:14px">
-            <button type="submit" class="btn-save" onclick="document.getElementById('wzAction').value='preview'">⑨ معاينة الصلاحيات بمصادرها</button>
+            <button type="submit" class="btn-primary" onclick="document.getElementById('wzAction').value='preview'">⑨ معاينة الصلاحيات بمصادرها</button>
             <?php if ($can_add): ?>
-            <button type="submit" class="btn-save" onclick="document.getElementById('wzAction').value='submit'"
+            <button type="submit" class="btn-primary" onclick="document.getElementById('wzAction').value='submit'"
                     style="background:#27ae60">⑩ إرسال للموافقة (والتفعيل ⑪ آلي بعدها)</button>
             <?php endif; ?>
         </div>

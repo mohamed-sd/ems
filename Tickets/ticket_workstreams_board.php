@@ -147,14 +147,14 @@ include '../insidebar.php';
                             <input type="hidden" name="tk" value="<?php echo $tk; ?>">
                             <input type="hidden" name="ws_id" value="<?php echo intval($w['ws_id']); ?>">
                             <?php if ($w['ws_state'] === 'new'): ?>
-                                <button name="ws_action" value="receive" class="btn-save">أستلم</button>
+                                <button name="ws_action" value="receive" class="btn-primary">أستلم</button>
                             <?php elseif (in_array($w['ws_state'], array('received', 'reopened'), true)): ?>
-                                <button name="ws_action" value="start" class="btn-save">أبدأ</button>
+                                <button name="ws_action" value="start" class="btn-primary">أبدأ</button>
                             <?php elseif ($w['ws_state'] === 'in_progress'): ?>
-                                <button name="ws_action" value="effect" class="btn-save" title="أثر reply">سجّل أثرًا</button>
-                                <button name="ws_action" value="done" class="btn-save">أنجزت</button>
+                                <button name="ws_action" value="effect" class="btn-primary" title="أثر reply">سجّل أثرًا</button>
+                                <button name="ws_action" value="done" class="btn-primary">أنجزت</button>
                             <?php elseif ($w['ws_state'] === 'done_pending'): ?>
-                                <button name="ws_action" value="close" class="btn-save">أؤكد الإغلاق (مبلّغًا)</button>
+                                <button name="ws_action" value="close" class="btn-primary">أؤكد الإغلاق (مبلّغًا)</button>
                                 <button name="ws_action" value="reopen" class="action-btn delete">أعد فتحه</button>
                             <?php endif; ?>
                         </form>

@@ -124,7 +124,7 @@ include '../insidebar.php';
                         <?php endforeach; ?>
                     </select>
                     <input type="text" name="reason" placeholder="سبب التغيير — إلزامي" style="width:180px" aria-label="سبب التغيير — إلزامي">
-                    <button class="btn-save" type="submit">حفظ</button>
+                    <button class="btn-primary" type="submit">حفظ</button>
                 </form>
             </td>
         </tr>

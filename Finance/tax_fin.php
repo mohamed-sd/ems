@@ -134,8 +134,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_266_7c1b2">النسبة %</label><input type="number" step="0.01" name="rate" value="15" id="emsf_266_7c1b2"></div>
             <div class="form-group"><label for="emsf_267_8c5cd">النوع</label><select name="tax_type" id="emsf_267_8c5cd"><?php foreach ($tax_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#codeForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#codeForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 
@@ -156,8 +156,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_270_84ddc">المرجع</label><input type="text" name="source_ref" placeholder="فاتورة/أمر" id="emsf_270_84ddc"></div>
             <div class="form-group"><label for="emsf_271_8602e">الفترة</label><input type="month" name="period_ref" value="<?php echo date('Y-m'); ?>" id="emsf_271_8602e"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#txForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#txForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

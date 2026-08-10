@@ -136,7 +136,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                 <input type="hidden" name="id" value="<?php echo $id; ?>">
                 <input type="hidden" name="action" value="suspend">
                 <input type="hidden" name="redirect_to" value="companies/<?php echo $id; ?>">
-                <button class="btn btn-orange btn-sm" onclick="return confirm('تعليق هذه الشركة؟')">
+                <button class="btn btn-secondary btn-sm" onclick="return confirm('تعليق هذه الشركة؟')">
                     <i class="fas fa-pause"></i> تعليق
                 </button>
             </form>
@@ -146,7 +146,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                 <input type="hidden" name="id" value="<?php echo $id; ?>">
                 <input type="hidden" name="action" value="activate">
                 <input type="hidden" name="redirect_to" value="companies/<?php echo $id; ?>">
-                <button class="btn btn-success btn-sm" onclick="return confirm('تفعيل هذه الشركة؟')">
+                <button class="btn btn-primary btn-sm" onclick="return confirm('تفعيل هذه الشركة؟')">
                     <i class="fas fa-play"></i> تفعيل
                 </button>
             </form>

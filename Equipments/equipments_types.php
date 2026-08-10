@@ -142,10 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> <?= !empty($editData) ? 'تحديث' : 'حفظ'; ?>
                     </button>
-                    <button type="button" id="equipmentTypeFormCancelBtn" class="btn-cancel">
+                    <button type="button" id="equipmentTypeFormCancelBtn" class="btn-secondary">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>

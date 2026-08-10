@@ -141,8 +141,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </h5>
             <?php if ($can_edit && $queue): ?>
             <div style="display:flex;gap:8px;">
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qSelectAll(true)"><i class="fas fa-check-double"></i> حدّد الكل</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qSelectAll(false)">إلغاء التحديد</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="qSelectAll(true)"><i class="fas fa-check-double"></i> حدّد الكل</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="qSelectAll(false)">إلغاء التحديد</button>
                 <button type="button" class="btn btn-sm btn-primary" onclick="qConvert()"><i class="fas fa-gavel"></i> اعتماد أحكام المحدد (<span id="qCount">0</span>)</button>
             </div>
             <?php endif; ?>
@@ -163,7 +163,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div><label style="font-size:.85rem">الشهر</label><br>
                     <input type="month" name="q_period" value="<?php echo htmlspecialchars($q_period); ?>" onchange="this.form.submit()"></div>
                 <?php if ($q_project || $q_period !== ''): ?>
-                    <a href="unit_records_fin.php" class="btn btn-sm btn-outline-secondary">مسح المرشّحات</a>
+                    <a href="unit_records_fin.php" class="btn btn-sm btn-secondary">مسح المرشّحات</a>
                 <?php endif; ?>
             </form>
 
@@ -339,7 +339,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if (empty($entries)): ?>
                         — <strong>لا واقعةَ بهذا الرقم ضمن نطاقك</strong> (قد تكون في مشروعٍ خارج صلاحيتك).
                     <?php endif; ?></span>
-                <a class="btn btn-sm btn-outline-secondary" href="unit_records_fin.php">اعرض كلَّ الوقائع</a>
+                <a class="btn btn-sm btn-secondary" href="unit_records_fin.php">اعرض كلَّ الوقائع</a>
             </div>
         <?php endif; ?>
         <h5 style="margin:0 0 6px;"><i class="fas fa-scale-balanced"></i> وقائعُ السجل القانوني وأحكامُ أطرافها

@@ -105,7 +105,7 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars((string)$li['avg_daily']); ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$li['suggested']); ?></strong>
                         <small style="color:#888">(متوسط×مهلة+أمان)</small></td>
-                    <td><a class="btn-save" href="reordering_proc.php">قواعدُ إعادة الطلب ▸</a></td>
+                    <td><a class="btn-primary" href="reordering_proc.php">قواعدُ إعادة الطلب ▸</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody></table></div>

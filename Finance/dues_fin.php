@@ -189,8 +189,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_375_f6091">المبلغ <span class="required">*</span></label>
                 <input type="number" step="0.01" min="0" name="amount" required id="emsf_375_f6091"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#dueForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#dueForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 
@@ -217,8 +217,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select></div>
             <div class="form-group"><label for="emsf_381_dc1bc">تاريخ الاستحقاق</label><input type="date" name="due_date" id="emsf_381_dc1bc"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#recvForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#recvForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

@@ -512,7 +512,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 /* Button styling */
-.btn-submit {
+.btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -530,12 +530,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
 }
 
-.btn-submit:hover {
+.btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
 }
 
-.btn-cancel {
+.btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -552,7 +552,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   text-decoration: none;
 }
 
-.btn-cancel:hover {
+.btn-secondary:hover {
   border-color: #a07848;
   background: #fdf8f0;
   color: #1a1208;
@@ -955,10 +955,10 @@ include('../includes/page_header.php');
                 </div>
             </form>
             <div class="pu-form-actions">
-                <button type="submit" form="timesheetFilterForm" class="btn-submit">
+                <button type="submit" form="timesheetFilterForm" class="btn-primary">
                     <i class="fas fa-search"></i> تطبيق
                 </button>
-                <a href="view_timesheet.php" class="btn-cancel">
+                <a href="view_timesheet.php" class="btn-secondary">
                     <i class="fas fa-redo"></i> مسح الفلاتر
                 </a>
             </div>
@@ -1106,7 +1106,7 @@ include('../includes/page_header.php');
                             $_legacy_has = !empty($row['fault_type']) || !empty($row['fault_part']);
                             $_badge_cnt = $_fc_cnt > 0 ? $_fc_cnt : ($_legacy_has ? 1 : 0);
                             if ($_badge_cnt > 0) {
-                                echo '<td style="text-align:center;"><button class="btn-fault-badge" data-ts-id="' . intval($row['id']) . '" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;"><i class="fas fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i> <span class="badge rounded-pill" style="background:#dc3545;color:#fff;font-size:.68rem;">' . $_badge_cnt . '</span></button></td>';
+                                echo '<td style="text-align:center;"><button class="btn-ghost" data-ts-id="' . intval($row['id']) . '" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;"><i class="fas fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i> <span class="badge rounded-pill" style="background:#dc3545;color:#fff;font-size:.68rem;">' . $_badge_cnt . '</span></button></td>';
                             } else {
                                 echo '<td style="text-align:center;" title="لا توجد أعطال"><i class="fas fa-check-circle" style="color:#059669;font-size:.9rem;"></i></td>';
                             }
@@ -1254,7 +1254,7 @@ $(document).ready(function () {
 </div>
 
 <script>
-$(document).on('click', '.btn-fault-badge', function() {
+$(document).on('click', '.btn-ghost', function() {
     var tsId = $(this).data('ts-id');
     $('#faultModal_ts_id').text(tsId);
     $('#faultModalBody').html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>');

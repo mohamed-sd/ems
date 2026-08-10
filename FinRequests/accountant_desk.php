@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if (intval($r['is_exception']) === 1): ?><span class="badge bg-danger">🚨 استثناء طارئ معتمد</span><?php endif; ?>
                     <?php if (strval($r['need_class']) === 'urgent'): ?><span class="badge bg-warning">⚡ عاجل — نصف المدد</span><?php endif; ?>
                 </h5>
-                <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-outline-primary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
+                <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-secondary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
             </div>
             <div class="card-body">
                 <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;">
@@ -135,7 +135,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
                         <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required style="min-width:240px;" aria-label="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)">
-                        <button type="submit" class="btn btn-outline-warning"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
+                        <button type="submit" class="btn btn-secondary"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
                     </form>
                     <?php if (intval($r['duplicate_flag']) === 1): ?>
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
@@ -144,7 +144,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="back" value="accountant_desk.php">
                         <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required style="min-width:160px;" aria-label="رقم الطلب الأصل FR-…">
                         <input type="text" name="reason" placeholder="سبب الدمج" required style="min-width:150px;" aria-label="سبب الدمج">
-                        <button type="submit" class="btn btn-outline-secondary"><i class="fa fa-code-merge"></i> دمج المكرّر</button>
+                        <button type="submit" class="btn btn-secondary"><i class="fa fa-code-merge"></i> دمج المكرّر</button>
                     </form>
                     <?php endif; ?>
                 </div>

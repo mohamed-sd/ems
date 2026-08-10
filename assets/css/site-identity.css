@@ -182,13 +182,13 @@ button,
 .add,
 .add-btn,
 #toggleForm,
-.btn-success,
-.btn-warning,
+.btn-primary,
+.btn-secondary,
 .btn-danger,
-.btn-info,
+.btn-secondary,
 .dt-buttons .dt-button,
 a.back-btn,
-a.btn-back,
+a.btn-secondary,
 a.back {
   display: inline-flex;
   align-items: center;
@@ -206,8 +206,8 @@ a.back {
 }
 
 .btn-primary,
-.btn-warning,
-.btn-success,
+.btn-secondary,
+.btn-primary,
 .add,
 .add-btn,
 #toggleForm,
@@ -218,7 +218,7 @@ button[type="submit"] {
   border-color: var(--c-rgba2301260065) !important;
 }
 
-.btn-success,
+.btn-primary,
 #resumeBtn,
 .status-active {
   background: linear-gradient(135deg, var(--site-success), var(--site-success-deep)) !important;
@@ -226,7 +226,7 @@ button[type="submit"] {
   border-color: var(--c-rgba2112861065) !important;
 }
 
-.btn-warning,
+.btn-secondary,
 #pauseBtn {
   background: linear-gradient(135deg, var(--site-warning), var(--site-warning-deep)) !important;
   color: var(--c-surface) !important;
@@ -242,7 +242,7 @@ button[type="submit"] {
   border-color: var(--c-rgba1852828066) !important;
 }
 
-.btn-info,
+.btn-secondary,
 #renewalBtn,
 #completeBtn {
   background: linear-gradient(135deg, var(--site-info), var(--site-info-deep)) !important;
@@ -258,18 +258,18 @@ button[type="submit"] {
 }
 
 a.back-btn,
-a.btn-back,
+a.btn-secondary,
 a.back,
-.btn-back {
+.btn-secondary {
   background: var(--c-surface) !important;
   color: var(--site-text) !important;
   border-color: var(--c-cfd8e4) !important;
 }
 
 a.back-btn:hover,
-a.btn-back:hover,
+a.btn-secondary:hover,
 a.back:hover,
-.btn-back:hover {
+.btn-secondary:hover {
   background: var(--c-f5f8fd) !important;
   color: var(--site-black) !important;
   box-shadow: 0 10px 20px var(--c-rgba151721014) !important;
@@ -282,7 +282,7 @@ button:hover,
 #toggleForm:hover,
 .dt-buttons .dt-button:hover,
 a.back-btn:hover,
-a.btn-back:hover,
+a.btn-secondary:hover,
 a.back:hover {
   transform: translateY(-1px);
   filter: brightness(0.97);

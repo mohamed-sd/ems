@@ -631,10 +631,10 @@ ems_screen_about(
                     <div class="pu-rolescope__body" id="puRoleScopeBody"></div>
                 </div>
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> <span id="submitBtnText">حفظ المستخدم</span>
                     </button>
-                    <button type="button" class="btn-cancel"
+                    <button type="button" class="btn-secondary"
                         onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>

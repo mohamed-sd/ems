@@ -118,7 +118,7 @@ include '../insidebar.php';
                 <tr>
                     <td><?php echo htmlspecialchars($r['label']); ?></td>
                     <td><small><?php echo htmlspecialchars($r['since']); ?></small></td>
-                    <td><a class="btn-save" href="<?php echo htmlspecialchars($r['link']); ?>">
+                    <td><a class="btn-primary" href="<?php echo htmlspecialchars($r['link']); ?>">
                         اذهب إلى موضع الفعل ▸</a></td>
                 </tr>
             <?php endforeach; ?>

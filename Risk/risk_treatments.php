@@ -61,10 +61,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <td><?php echo htmlspecialchars(mb_substr((string) $t['done_evidence'], 0, 50)) ?: '—'; ?></td>
                 <td>
                     <?php if (in_array($t['state'], array('planned', 'in_progress', 'overdue'), true) && ((int) $t['action_owner_user_id'] === $uid || $canVerify)): ?>
-                    <button class="btn btn-sm btn-outline-dark treatDone" data-id="<?php echo (int) $t['id']; ?>">إنجاز بدليل</button>
+                    <button class="btn btn-sm btn-secondary treatDone" data-id="<?php echo (int) $t['id']; ?>">إنجاز بدليل</button>
                     <?php endif; ?>
                     <?php if ($t['state'] === 'done' && $canVerify): ?>
-                    <button class="btn btn-sm btn-outline-success treatVerify" data-id="<?php echo (int) $t['id']; ?>">قبول المتحقق</button>
+                    <button class="btn btn-sm btn-primary treatVerify" data-id="<?php echo (int) $t['id']; ?>">قبول المتحقق</button>
                     <?php endif; ?>
                 </td>
             </tr>

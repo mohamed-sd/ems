@@ -88,7 +88,7 @@ include '../insidebar.php';
             echo '<tr><th>وقائعُ دورة الحياة (P-11)</th><td>' . intval($lc['n'])
                . ' — <a href="contract_lifecycle.php">الشاشة ▸</a></td></tr>';
             echo '</tbody></table></div>'
-               . '<p><a class="btn-save" href="contracts_details.php?id=' . $cid . '">التفاصيل الكاملة ▸</a></p>';
+               . '<p><a class="btn-primary" href="contracts_details.php?id=' . $cid . '">التفاصيل الكاملة ▸</a></p>';
             break;
         case '2':
             $rows = array();
@@ -111,7 +111,7 @@ include '../insidebar.php';
                    . '<td>' . htmlspecialchars($x['valid_from'] . ' → ' . ($x['valid_to'] ?: 'مفتوح')) . '</td></tr>';
             }
             echo '</tbody></table></div>'
-               . '<p><a class="btn-save" href="contract_lines.php?contract_id=' . $cid . '">شاشة البنود ▸</a></p>';
+               . '<p><a class="btn-primary" href="contract_lines.php?contract_id=' . $cid . '">شاشة البنود ▸</a></p>';
             break;
         case '3':
             foreach (array(
@@ -205,7 +205,7 @@ include '../insidebar.php';
                    . $lbl . ': <strong>' . htmlspecialchars((string)$row[$k]) . '</strong></div>';
             }
             echo '</div><p style="margin-top:10px;color:#666">' . htmlspecialchars((string)$row['note'])
-               . '</p><p><a class="btn-save" href="commercial_board.php">اللوحة التجارية الكاملة ▸</a></p>';
+               . '</p><p><a class="btn-primary" href="commercial_board.php">اللوحة التجارية الكاملة ▸</a></p>';
             break;
         case '8':
             // N-20 لوحة العقد الكاملة: المقاعد والفجوة والتعاقب + ترويسة الأرقام الأربعة —

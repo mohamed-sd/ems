@@ -158,9 +158,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="decision" value="deny">
                     <input type="hidden" name="id" value="<?php echo intval($xq['id']); ?>">
                     <input type="hidden" name="reason" value="">
-                    <button type="submit" class="btn btn-sm btn-outline-secondary">رفض</button>
+                    <button type="submit" class="btn btn-sm btn-secondary">رفض</button>
                 </form>
-                <a href="request_form.php?id=<?php echo intval($xq['id']); ?>" class="btn btn-sm btn-outline-primary">التفاصيل</a>
+                <a href="request_form.php?id=<?php echo intval($xq['id']); ?>" class="btn btn-sm btn-secondary">التفاصيل</a>
             </div>
             <?php endforeach; ?>
         </div>

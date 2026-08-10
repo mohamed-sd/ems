@@ -197,13 +197,13 @@ ul{list-style:none}
 .nav-mid a:hover{color:var(--tx1);background:rgba(232,144,10,.10)}
 
 .nav-end{display:flex;align-items:center;gap:8px}
-.btn-ng{
+.btn-secondary{
   font-size:.82rem;font-weight:600;color:var(--tx2);
   padding:9px 15px;border-radius:var(--r-sm);
   border:1px solid rgba(0,0,0,.12);transition:all var(--T);
 }
-.btn-ng:hover{color:var(--tx1);border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.04)}
-.btn-np{
+.btn-secondary:hover{color:var(--tx1);border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.04)}
+.btn-secondary{
   display:inline-flex;align-items:center;gap:8px;
   font-size:.83rem;font-weight:800;color:#0f0800;letter-spacing:.02em;
   padding:10px 20px;border-radius:9px;
@@ -211,8 +211,8 @@ ul{list-style:none}
   box-shadow:0 4px 20px var(--glow-au),inset 0 1px 0 rgba(255,240,160,.3);
   transition:all var(--T);
 }
-.btn-np svg{width:15px;height:15px}
-.btn-np:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(232,144,10,.5)}
+.btn-secondary svg{width:15px;height:15px}
+.btn-secondary:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(232,144,10,.5)}
 
 .ham{display:none;flex-direction:column;gap:5px;padding:9px;border-radius:var(--r-sm);border:1px solid rgba(0,0,0,.12);transition:all var(--T)}
 .ham:hover{border-color:var(--br-au);background:rgba(232,144,10,.08)}
@@ -289,7 +289,7 @@ ul{list-style:none}
 
 .hero-cta{margin-top:34px;display:flex;gap:12px;flex-wrap:wrap;animation:up .7s .2s var(--ease) both}
 
-.btn-gold{
+.btn-primary{
   display:inline-flex;align-items:center;gap:10px;
   font-weight:800;font-size:.95rem;color:#0f0800;letter-spacing:.02em;
   padding:13px 26px;border-radius:8px;
@@ -297,17 +297,17 @@ ul{list-style:none}
   box-shadow:0 4px 26px var(--glow-au),inset 0 1px 0 rgba(255,240,160,.35);
   transition:all var(--T);
 }
-.btn-gold svg{width:17px;height:17px}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(232,144,10,.55)}
+.btn-primary svg{width:17px;height:17px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(232,144,10,.55)}
 
-.btn-wire{
+.btn-secondary{
   display:inline-flex;align-items:center;gap:10px;
   font-weight:700;font-size:.95rem;color:var(--tx1);
   padding:13px 24px;border-radius:8px;
   background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.15);transition:all var(--T);
 }
-.btn-wire svg{width:14px;height:14px;color:var(--tx2)}
-.btn-wire:hover{background:rgba(255,255,255,.08);border-color:rgba(180,130,20,.35);transform:translateY(-1px)}
+.btn-secondary svg{width:14px;height:14px;color:var(--tx2)}
+.btn-secondary:hover{background:rgba(255,255,255,.08);border-color:rgba(180,130,20,.35);transform:translateY(-1px)}
 
 /* Trust row */
 .hero-trust{margin-top:40px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;animation:up .7s .27s var(--ease) both}
@@ -733,14 +733,14 @@ ul{list-style:none}
 .pc-icon svg{width:22px;height:22px}
 .pc h3{font-family:'Tajawal',sans-serif;font-size:1.06rem;font-weight:800;margin-bottom:7px}
 .pc p{font-size:.83rem;color:var(--tx2);line-height:1.8;flex:1;margin-bottom:20px;font-family:'Tajawal',sans-serif}
-.btn-pc{
+.btn-secondary{
   display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
   font-size:.81rem;font-weight:600;color:var(--tx2);
   padding:9px 14px;border-radius:6px;border:1px solid rgba(0,0,0,.12);background:rgba(0,0,0,.03);
   font-family:'Tajawal',sans-serif;transition:all var(--T);
 }
-.btn-pc svg{width:12px;height:12px}
-.btn-pc:hover{color:var(--tx1);border-color:rgba(180,120,0,.35);background:rgba(232,144,10,.08);transform:translateX(-3px)}
+.btn-secondary svg{width:12px;height:12px}
+.btn-secondary:hover{color:var(--tx1);border-color:rgba(180,120,0,.35);background:rgba(232,144,10,.08);transform:translateX(-3px)}
 
 /* ══ CTA BANNER ══════════════════════════════════════ */
 .cta-wrap{
@@ -784,7 +784,7 @@ ul{list-style:none}
   .sudan-flag-vert{display:none}
 }
 @media(max-width:860px){
-  .nav-mid,.btn-ng{display:none}.ham{display:flex}
+  .nav-mid,.btn-secondary{display:none}.ham{display:flex}
   .proof-row{grid-template-columns:repeat(2,1fr)}.proof-cell:nth-child(3)::before{display:none}
   .steps-grid{grid-template-columns:1fr}.timeline-rail{display:none}
   .portals{grid-template-columns:1fr}
@@ -868,8 +868,8 @@ ul{list-style:none}
     </nav>
 
     <div class="nav-end">
-      <a class="btn-ng" href="<?php echo e(landing_url('company/login.php')); ?>">بوابة الشركات</a>
-      <a class="btn-np" href="<?php echo e(landing_url('login.php')); ?>">
+      <a class="btn-secondary" href="<?php echo e(landing_url('company/login.php')); ?>">بوابة الشركات</a>
+      <a class="btn-secondary" href="<?php echo e(landing_url('login.php')); ?>">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         دخول النظام
       </a>
@@ -910,11 +910,11 @@ ul{list-style:none}
         </p>
 
         <div class="hero-cta">
-          <a class="btn-gold" href="<?php echo e(landing_url('company/register.php')); ?>">
+          <a class="btn-primary" href="<?php echo e(landing_url('company/register.php')); ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             تسجيل شركتك الآن
           </a>
-          <a class="btn-wire" href="#features">
+          <a class="btn-secondary" href="#features">
             اكتشف النظام
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           </a>
@@ -1102,7 +1102,7 @@ ul{list-style:none}
         <h2 class="sec-h">ثلاث خطوات للانطلاق</h2>
         <p class="sec-sub" style="max-width:480px">من لحظة تسجيل شركتك حتى إدارة أول منجم كاملاً — في وقت قياسي بدون تعقيد أو أيام انتظار.</p>
       </div>
-      <a class="btn-gold" href="<?php echo e(landing_url('company/register.php')); ?>" style="align-self:center">
+      <a class="btn-primary" href="<?php echo e(landing_url('company/register.php')); ?>" style="align-self:center">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
         ابدأ الآن
       </a>
@@ -1258,7 +1258,7 @@ ul{list-style:none}
         </div>
         <h3>تسجيل شركة تعدين جديدة</h3>
         <p>ابدأ رحلتك مع إنجاز بإنشاء حساب شركتك. اضبط المواقع والمناجم والفرق خلال دقائق — جاهز للتشغيل الفعلي من اليوم الأول.</p>
-        <a class="btn-pc" href="<?php echo e(landing_url('company/register.php')); ?>">
+        <a class="btn-secondary" href="<?php echo e(landing_url('company/register.php')); ?>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
           إنشاء حساب
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -1271,7 +1271,7 @@ ul{list-style:none}
         </div>
         <h3>بوابة مستخدمي الشركات</h3>
         <p>للموظفين والفرق التشغيلية — مشرفو المواقع، المهندسون، فرق المتابعة — للوصول لمشاريعهم وعقودهم ومهامهم اليومية.</p>
-        <a class="btn-pc" href="<?php echo e(landing_url('company/login.php')); ?>">
+        <a class="btn-secondary" href="<?php echo e(landing_url('company/login.php')); ?>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
           دخول بوابة الشركات
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -1284,7 +1284,7 @@ ul{list-style:none}
         </div>
         <h3>دخول نظام التشغيل الميداني</h3>
         <p>للمشغلين الميدانيين وسائقي المعدات لإدخال ساعات العمل والأعطال ومتابعة المهام اليومية بواجهة مبسطة تعمل في الموقع.</p>
-        <a class="btn-pc" href="<?php echo e(landing_url('login.php')); ?>">
+        <a class="btn-secondary" href="<?php echo e(landing_url('login.php')); ?>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
           دخول نظام التشغيل
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -1297,7 +1297,7 @@ ul{list-style:none}
         </div>
         <h3>لوحة الإدارة العليا</h3>
         <p>للمديرين التنفيذيين ومسؤولي النظام — تحكم كامل في الشركات والصلاحيات والتقارير التنفيذية وإعدادات النظام.</p>
-        <a class="btn-pc" href="<?php echo e(landing_url('admin/login.php')); ?>">
+        <a class="btn-secondary" href="<?php echo e(landing_url('admin/login.php')); ?>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
           دخول الإدارة
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -1317,11 +1317,11 @@ ul{list-style:none}
       <p>منصة واحدة لجميع عمليات شركتك — من الحفارة حتى التقرير التنفيذي. لا تعقيد، لا إعداد طويل، جاهز من اليوم الأول.</p>
     </div>
     <div class="cta-btns">
-      <a class="btn-gold" href="<?php echo e(landing_url('company/register.php')); ?>">
+      <a class="btn-primary" href="<?php echo e(landing_url('company/register.php')); ?>">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
         تسجيل شركة تعدين
       </a>
-      <a class="btn-wire" href="<?php echo e(landing_url('admin/login.php')); ?>">
+      <a class="btn-secondary" href="<?php echo e(landing_url('admin/login.php')); ?>">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         لوحة الإدارة
       </a>

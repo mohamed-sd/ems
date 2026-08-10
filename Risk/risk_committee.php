@@ -142,7 +142,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <form method="post" style="display:inline">
                             <input type="hidden" name="cmt_do" value="approve">
                             <input type="hidden" name="minute_id" value="<?php echo (int) $x['id']; ?>">
-                            <button class="btn btn-sm btn-outline-success" type="submit">اعتماد</button>
+                            <button class="btn btn-sm btn-primary" type="submit">اعتماد</button>
                         </form>
                         <?php else: ?>—<?php endif; ?></td>
                     <?php endif; ?>

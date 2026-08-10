@@ -783,10 +783,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </div>
 
                         <div class="pu-form-actions">
-                            <button type="submit" name="save_operation_submit" id="save_operation_submit" class="btn-submit">
+                            <button type="submit" name="save_operation_submit" id="save_operation_submit" class="btn-primary">
                                 <i class="fas fa-save"></i> <span>حفظ التشغيل</span>
                             </button>
-                            <button type="button" id="operationFormCancel" class="btn-cancel">
+                            <button type="button" id="operationFormCancel" class="btn-secondary">
                                 <i class="fas fa-times"></i> إلغاء
                             </button>
                         </div>
@@ -1074,7 +1074,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                                 $action_buttons = "";
                                 if ($status_value === 1 && $_SESSION['user']['role'] != "10" && $can_edit) {
-                                    $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
+                                    $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                                 } elseif ($status_value === 0 && $can_edit) {
                                     $action_buttons .= "<form method='post' class='operation-inline-form'>
                                     <input type='hidden' name='action' value='change_status'>

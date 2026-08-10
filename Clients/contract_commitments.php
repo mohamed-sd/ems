@@ -696,8 +696,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     </div>
                 </div>
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> <span id="submitBtnText">حفظ الالتزام</span></button>
-                    <button type="button" id="cmtFormCancelBtn" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> <span id="submitBtnText">حفظ الالتزام</span></button>
+                    <button type="button" id="cmtFormCancelBtn" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</button>
                 </div>
             </div>
         </div>
@@ -722,8 +722,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 </select>
             </div>
             <div class="filter-actions">
-                <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-                <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+                <button type="button" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
             </div>
         </div>
     </div>

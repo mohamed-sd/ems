@@ -209,14 +209,14 @@ include("../inheader.php");
     }
 
     .btn-primary,
-    .btn-success {
+    .btn-primary {
         background: var(--gold-soft);
         color: var(--navy);
         border-color: rgba(232, 184, 0, .28);
     }
 
     .btn-primary:hover,
-    .btn-success:hover {
+    .btn-primary:hover {
         background: var(--gold);
         color: var(--navy);
         box-shadow: 0 5px 16px rgba(232, 184, 0, .35);
@@ -939,7 +939,7 @@ include("../inheader.php");
                 </p>
             </span>';
     $header_actions = array(
-        array('id' => 'toggleForm', 'class' => 'btn btn-success', 'icon' => 'fas fa-user-plus', 'label' => 'إسناد مشغل جديد'),
+        array('id' => 'toggleForm', 'class' => 'btn btn-primary', 'icon' => 'fas fa-user-plus', 'label' => 'إسناد مشغل جديد'),
     );
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
@@ -1087,7 +1087,7 @@ include("../inheader.php");
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> حفظ الإسناد
                     </button>
                     <button type="button" class="btn btn-secondary"
@@ -1205,7 +1205,7 @@ include("../inheader.php");
                     <i class="fas fa-user-slash"></i>
                     <h3>لا يوجد مشغلون مسندون لهذه المعدة</h3>
                     <p>ابدأ بإضافة مشغلين للمعدة باستخدام الزر أعلاه</p>
-                    <button onclick="document.getElementById('toggleForm').click()" class="btn btn-success">
+                    <button onclick="document.getElementById('toggleForm').click()" class="btn btn-primary">
                         <i class="fas fa-user-plus"></i> إسناد مشغل الآن
                     </button>
                 </div>

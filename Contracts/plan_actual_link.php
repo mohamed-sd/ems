@@ -160,7 +160,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="form-group"><label for="emsf_82_2cd30">إلى شهر</label>
                 <input type="text" name="to" placeholder="2091-12" style="width:110px"
                        value="<?php echo htmlspecialchars($TO); ?>" id="emsf_82_2cd30"></div>
-            <div style="align-self:flex-end"><button type="submit" class="btn-save">
+            <div style="align-self:flex-end"><button type="submit" class="btn-primary">
                 <i class="fa fa-filter"></i> اعرض</button></div>
         </form>
 
@@ -212,13 +212,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <form method="post" style="display:inline">
                 <input type="hidden" name="pal_action" value="dry">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-magnifying-glass"></i>
+                <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i>
                     اعرض المرشَّح <strong>(بلا كتابة)</strong></button>
             </form>
             <form method="post" style="display:inline">
                 <input type="hidden" name="pal_action" value="link_all">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-link"></i>
+                <button type="submit" class="btn-primary"><i class="fa fa-link"></i>
                     صِل ما يمكن وصلُه — <strong>والملتبسُ يُعلَن</strong></button>
             </form>
         </div>

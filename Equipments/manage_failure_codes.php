@@ -199,7 +199,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
     if ($can_add) {
         $header_actions[] = array('tag' => 'button', 'id' => 'toggleFormBtn', 'class' => 'add-btn', 'attrs' => 'onclick="toggleForm()"', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة كود جديد', 'label_class' => '');
     }
-    $header_actions[] = array('href' => 'fleet_failures.php', 'class' => 'btn-gold', 'icon' => 'fas fa-chart-line', 'label' => 'تقرير الاخطاء');
+    $header_actions[] = array('href' => 'fleet_failures.php', 'class' => 'btn-primary', 'icon' => 'fas fa-chart-line', 'label' => 'تقرير الاخطاء');
     // ── نظام Excel الموحّد (Unified Excel Framework) ──
     require_once __DIR__ . '/../includes/excel_ui.php';
     foreach (ems_excel_header_actions('failure_codes', 'أكواد الأعطال', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
@@ -304,10 +304,10 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
                 </div>
                 <div class="pu-form-actions">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> <span id="fcSubmitText"><?= $edit_data ? 'حفظ التعديلات' : 'إضافة الكود' ?></span>
                     </button>
-                    <button type="button" class="btn-cancel" onclick="hideFcForm()">
+                    <button type="button" class="btn-secondary" onclick="hideFcForm()">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
@@ -355,9 +355,9 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                     </span>
                 </h5>
                 <div class="fc-status-switch">
-                    <a href="manage_failure_codes.php?f_stat=1" class="btn btn-sm <?= $filter_stat===1?'btn-primary':'btn-light border' ?>">نشط</a>
-                    <a href="manage_failure_codes.php?f_stat=0" class="btn btn-sm <?= $filter_stat===0?'btn-danger':'btn-light border' ?>">معطل</a>
-                    <a href="manage_failure_codes.php?f_stat=-1" class="btn btn-sm <?= $filter_stat===-1?'btn-secondary':'btn-light border' ?>">الكل</a>
+                    <a href="manage_failure_codes.php?f_stat=1" class="btn btn-sm <?= $filter_stat===1?'btn-primary':'btn-secondary border' ?>">نشط</a>
+                    <a href="manage_failure_codes.php?f_stat=0" class="btn btn-sm <?= $filter_stat===0?'btn-danger':'btn-secondary border' ?>">معطل</a>
+                    <a href="manage_failure_codes.php?f_stat=-1" class="btn btn-sm <?= $filter_stat===-1?'btn-secondary':'btn-secondary border' ?>">الكل</a>
                 </div>
             </div>
         </div>
@@ -479,7 +479,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                             <td>
                                 <div class="fc-row-actions">
                                     <?php if ($can_edit): ?>
-                                    <button class="btn-edit-row"
+                                    <button class="btn-secondary"
                                             onclick="editRow(<?= htmlspecialchars(json_encode($row), ENT_QUOTES) ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -489,13 +489,13 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                                         <form method="POST" class="fc-inline-form" onsubmit="return confirm('تأكيد تعطيل هذا الكود؟')">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="del_id" value="<?= $row['id'] ?>">
-                                            <button type="submit" class="btn-del-row"><i class="fas fa-ban"></i></button>
+                                            <button type="submit" class="btn-danger"><i class="fas fa-ban"></i></button>
                                         </form>
                                         <?php else: ?>
                                         <form method="POST" class="fc-inline-form">
                                             <input type="hidden" name="action" value="restore">
                                             <input type="hidden" name="res_id" value="<?= $row['id'] ?>">
-                                            <button type="submit" class="btn-restore-row"><i class="fas fa-redo"></i></button>
+                                            <button type="submit" class="btn-secondary"><i class="fas fa-redo"></i></button>
                                         </form>
                                         <?php endif; ?>
                                     <?php endif; ?>
@@ -553,7 +553,7 @@ $(document).ready(function () {
             {
                 extend: 'excelHtml5',
                 text: '<i class="fas fa-file-excel"></i> Excel',
-                className: 'btn btn-success btn-sm',
+                className: 'btn btn-primary btn-sm',
                 title: 'أكواد الأعطال',
                 exportOptions: { columns: ':not(:last-child)' }
             },
@@ -569,7 +569,7 @@ $(document).ready(function () {
             {
                 extend: 'print',
                 text: '<i class="fas fa-print"></i> طباعة',
-                className: 'btn btn-info btn-sm',
+                className: 'btn btn-secondary btn-sm',
                 exportOptions: { columns: ':not(:last-child)' }
             }
         ],

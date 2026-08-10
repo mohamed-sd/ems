@@ -118,7 +118,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
                     <td><?php echo !empty($x['withdrawn_at'])
                             ? '<span class="badge badge-secondary">مسحوب</span>' : '<span class="badge badge-success">نافذ</span>'; ?></td>
-                    <td><a class="btn btn-sm btn-outline-dark" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a></td>
+                    <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

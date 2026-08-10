@@ -213,7 +213,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
         . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" value="' . $qty . '"></div>'
         . '<div class="form-group"><label>تصنيف السطر</label><select name="line_class[]">' . $clsopts . '</select></div>'
         . '<div class="form-group"><label>ملاحظة</label><input type="text" name="line_note[]" value="' . $note . '"></div>'
-        . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
+        . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
 ?>
@@ -340,8 +340,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <a href="requests_proc.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <a href="requests_proc.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>
@@ -425,19 +425,19 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='approve'>"
-                               . "<button type='submit' class='btn-save' title='اعتماد'>✓</button></form>"
+                               . "<button type='submit' class='btn-primary' title='اعتماد'>✓</button></form>"
                                . "<form method='post' style='display:inline-flex;gap:2px'>"
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='return'>"
                                . "<input type='text' name='reason' placeholder='سببُ الإعادة *' required style='width:90px'>"
-                               . "<button type='submit' class='btn-save' title='إعادةٌ للاستكمال'>↩</button></form>"
+                               . "<button type='submit' class='btn-primary' title='إعادةٌ للاستكمال'>↩</button></form>"
                                . "<form method='post' style='display:inline-flex;gap:2px'>"
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='reject'>"
                                . "<input type='text' name='reason' placeholder='سببُ الرفض *' required style='width:90px'>"
-                               . "<button type='submit' class='btn-save' title='رفض'>✗</button></form></div>";
+                               . "<button type='submit' class='btn-primary' title='رفض'>✗</button></form></div>";
                         }
                         echo "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['fin_approval_state']) . "</td>";

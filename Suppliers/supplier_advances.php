@@ -176,7 +176,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="date" name="first_recovery_period" id="emsf_1404_10b6b"></div>
             <div class="form-group"><label for="emsf_1405_824a7">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1405_824a7"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> فتح السلفة</button></div>
+        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح السلفة</button></div>
         </div></div>
     </form>
     <?php endif; ?>

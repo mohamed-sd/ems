@@ -98,7 +98,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <strong>تحقّق من شهادة:</strong>
             <input type="text" name="verify" placeholder="رمز التحقق" value="<?php echo htmlspecialchars($verify); ?>" aria-label="رمز التحقق">
-            <button type="submit" class="btn-save">تحقّق</button>
+            <button type="submit" class="btn-primary">تحقّق</button>
             <?php if ($verify !== ''): ?>
                 <?php if ($verified): ?>
                     <span class="badge badge-success">صحيحة — <?php echo htmlspecialchars((string)$verified['serial_no']); ?>
@@ -119,7 +119,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="eval_id" value="<?php echo intval($e['id']); ?>">
                 <span>تقييمُ <?php echo htmlspecialchars($e['period_from'] . ' → ' . $e['period_to']); ?>
                     بدرجة <strong><?php echo htmlspecialchars((string)$e['final_score']); ?></strong></span>
-                <button type="submit" class="btn-save"><i class="fa fa-certificate"></i> أصدر الشهادة</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-certificate"></i> أصدر الشهادة</button>
             </form>
         <?php endforeach; ?>
     </div></div>
@@ -157,7 +157,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo htmlspecialchars($c['period_from'] . ' → ' . $c['period_to']); ?></td>
                     <td><code><?php echo htmlspecialchars((string)$c['verify_code']); ?></code></td>
                     <td><small><?php echo htmlspecialchars((string)$c['issued_at']); ?></small></td>
-                    <td><a class="btn-save" href="?open=<?php echo intval($c['id']); ?>">اعرضها للطباعة</a></td>
+                    <td><a class="btn-primary" href="?open=<?php echo intval($c['id']); ?>">اعرضها للطباعة</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -186,7 +186,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <p><small>أُصدرت في <?php echo htmlspecialchars((string)$openCert['issued_at']); ?> —
             وتُتحقَّق برمزها في هذه الشاشة</small></p>
     </div></div>
-    <div style="margin:10px 0"><button type="button" class="btn-save" onclick="window.print()">
+    <div style="margin:10px 0"><button type="button" class="btn-primary" onclick="window.print()">
         <i class="fa fa-print"></i> الطباعة الرسمية</button></div>
     <?php endif; ?>
 </div>

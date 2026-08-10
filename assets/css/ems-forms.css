@@ -587,10 +587,10 @@
     margin-top: 24px;
     grid-column: 1 / -1;
 }
-:is(.allforms, .ems-form) .btn-save,
-:is(.allforms, .ems-form) .btn-submit,
-:is(.allforms, .ems-form) .btn-modal-save,
-:is(.allforms, .ems-form) .btn-submit-contract,
+:is(.allforms, .ems-form) .btn-primary,
+:is(.allforms, .ems-form) .btn-primary,
+:is(.allforms, .ems-form) .btn-primary,
+:is(.allforms, .ems-form) .btn-primary,
 :is(.allforms, .ems-form) button[type="submit"],
 :is(.allforms, .ems-form) .control button[type="submit"] {
     display: inline-flex;
@@ -609,26 +609,26 @@
     box-shadow: 0 6px 15px var(--c-rgba24419766042) !important;
     transition: all 0.2s ease;
 }
-:is(.allforms, .ems-form) .btn-save:hover,
-:is(.allforms, .ems-form) .btn-submit:hover,
-:is(.allforms, .ems-form) .btn-modal-save:hover,
-:is(.allforms, .ems-form) .btn-submit-contract:hover,
+:is(.allforms, .ems-form) .btn-primary:hover,
+:is(.allforms, .ems-form) .btn-primary:hover,
+:is(.allforms, .ems-form) .btn-primary:hover,
+:is(.allforms, .ems-form) .btn-primary:hover,
 :is(.allforms, .ems-form) button[type="submit"]:hover {
     background: var(--emsf-yellow-d) !important;
     box-shadow: 0 8px 20px var(--c-rgba2441976605) !important;
     transform: translateY(-2px);
 }
-:is(.allforms, .ems-form) .btn-save i,
-:is(.allforms, .ems-form) .btn-submit i,
+:is(.allforms, .ems-form) .btn-primary i,
+:is(.allforms, .ems-form) .btn-primary i,
 :is(.allforms, .ems-form) button[type="submit"] i {
     color: var(--c-ink-900) !important;
 }
 
-:is(.allforms, .ems-form) .btn-cancel,
+:is(.allforms, .ems-form) .btn-secondary,
 :is(.allforms, .ems-form) .btn-close,
-:is(.allforms, .ems-form) .btn-reset,
-:is(.allforms, .ems-form) .btn-reset-contract,
-:is(.allforms, .ems-form) .btn-modal-cancel,
+:is(.allforms, .ems-form) .btn-secondary,
+:is(.allforms, .ems-form) .btn-secondary,
+:is(.allforms, .ems-form) .btn-secondary,
 :is(.allforms, .ems-form) button[type="reset"] {
     display: inline-flex;
     align-items: center;
@@ -645,16 +645,16 @@
     cursor: pointer;
     transition: all 0.2s ease;
 }
-:is(.allforms, .ems-form) .btn-cancel:hover,
+:is(.allforms, .ems-form) .btn-secondary:hover,
 :is(.allforms, .ems-form) .btn-close:hover,
-:is(.allforms, .ems-form) .btn-reset:hover,
-:is(.allforms, .ems-form) .btn-reset-contract:hover,
-:is(.allforms, .ems-form) .btn-modal-cancel:hover,
+:is(.allforms, .ems-form) .btn-secondary:hover,
+:is(.allforms, .ems-form) .btn-secondary:hover,
+:is(.allforms, .ems-form) .btn-secondary:hover,
 :is(.allforms, .ems-form) button[type="reset"]:hover {
     background: var(--c-ink-max) !important;
     color: var(--c-surface) !important;
 }
-:is(.allforms, .ems-form) .btn-cancel i,
+:is(.allforms, .ems-form) .btn-secondary i,
 :is(.allforms, .ems-form) .btn-close i,
 :is(.allforms, .ems-form) button[type="reset"] i {
     color: var(--c-surface) !important;
@@ -664,31 +664,31 @@
    بمحدّد عالٍ (0,6,2)!important فيلوّنها رماديًّا. :not(#_) يرفع المحدّد لمستوى ID
    فيتجاوز المحرّك ويثبّت ألوان الحفظ الذهبي / الإلغاء الأسود في كل الفورمات. */
 :is(.allforms, .ems-form):not(#_)
-    :is(.btn-save, .btn-submit, .btn-modal-save, .btn-submit-contract, button[type="submit"]) {
+    :is(.btn-primary, .btn-primary, .btn-primary, .btn-primary, button[type="submit"]) {
     background: var(--emsf-yellow) !important;
     color: var(--c-ink-900) !important;
     border: none !important;
     box-shadow: 0 6px 15px var(--c-rgba24419766042) !important;
 }
-:is(.allforms, .ems-form):not(#_) :is(.btn-save, .btn-submit, button[type="submit"]):hover {
+:is(.allforms, .ems-form):not(#_) :is(.btn-primary, .btn-primary, button[type="submit"]):hover {
     background: var(--emsf-yellow-d) !important;
 }
-:is(.allforms, .ems-form):not(#_) :is(.btn-save, .btn-submit, button[type="submit"]) i {
+:is(.allforms, .ems-form):not(#_) :is(.btn-primary, .btn-primary, button[type="submit"]) i {
     color: var(--c-ink-900) !important;
 }
 
 :is(.allforms, .ems-form):not(#_)
-    :is(.btn-cancel, .btn-close, .btn-reset, .btn-reset-contract, .btn-modal-cancel, button[type="reset"]) {
+    :is(.btn-secondary, .btn-close, .btn-secondary, .btn-secondary, .btn-secondary, button[type="reset"]) {
     background: var(--c-141414) !important;
     color: var(--c-surface) !important;
     border: none !important;
     box-shadow: none !important;
 }
 :is(.allforms, .ems-form):not(#_)
-    :is(.btn-cancel, .btn-close, .btn-reset, .btn-reset-contract, .btn-modal-cancel, button[type="reset"]):hover {
+    :is(.btn-secondary, .btn-close, .btn-secondary, .btn-secondary, .btn-secondary, button[type="reset"]):hover {
     background: var(--c-ink-max) !important;
 }
-:is(.allforms, .ems-form):not(#_) :is(.btn-cancel, .btn-close, button[type="reset"]) i {
+:is(.allforms, .ems-form):not(#_) :is(.btn-secondary, .btn-close, button[type="reset"]) i {
     color: var(--c-surface) !important;
 }
 

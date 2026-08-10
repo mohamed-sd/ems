@@ -191,9 +191,9 @@
                     a.classList.contains('eye-btn') ||
                     a.classList.contains('edit-btn') ||
                     a.classList.contains('delete-btn') ||
-                    a.classList.contains('btn-view') ||
-                    a.classList.contains('btn-edit') ||
-                    a.classList.contains('btn-delete')
+                    a.classList.contains('btn-secondary') ||
+                    a.classList.contains('btn-secondary') ||
+                    a.classList.contains('btn-danger')
                 ) {
                     return;
                 }
@@ -824,7 +824,7 @@
             }
 
             // زرُّ إنشاءٍ قائمٌ في الصفحة — يُعاد استعمالُه ولا يُخترَع
-            var addBtn = document.querySelector('a[href*="add"], a[href*="new"], a[href*="create"], .btn-add, [data-ems-action="add"]');
+            var addBtn = document.querySelector('a[href*="add"], a[href*="new"], a[href*="create"], .btn-primary, [data-ems-action="add"]');
 
             var tr = document.createElement('tr');
             tr.className = 'ems-state-empty';

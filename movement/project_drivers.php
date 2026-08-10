@@ -871,7 +871,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                             <div class="driver-form-actions">
                                 <button type="button" id="cancelAddDriverForm" class="btn btn-secondary">إلغاء</button>
-                                <button type="submit" class="btn btn-success">حفظ التشغيل</button>
+                                <button type="submit" class="btn btn-primary">حفظ التشغيل</button>
                             </div>
                         </div>
                     </div>
@@ -963,7 +963,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="modal-header">
                         <h5 class="modal-title"><i class="fas fa-exchange-alt"></i> إدارة السائقين للآلية: <span id="manageEqLabel">-</span></h5>
                         <div class="manage-modal-actions">
-                            <button type="submit" form="manageDriversForm" class="btn btn-success btn-sm"><i class="fas fa-save"></i> اتمام التعديل</button>
+                            <button type="submit" form="manageDriversForm" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> اتمام التعديل</button>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                     </div>
@@ -1021,7 +1021,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                            <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> حفظ التحديثات</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ التحديثات</button>
                         </div>
                     </form>
                 </div>

@@ -389,7 +389,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 <span class="detail-card-title">معلومات المنجم</span>
                             </div>
                             <?php if ($can_edit): ?>
-                            <button class="edit-btn-small" id="editProjectInfoBtn">
+                            <button class="edit-btn-secondary" id="editProjectInfoBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
                             <?php endif; ?>
@@ -418,7 +418,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 <span class="detail-card-title">الخدمات المقدمة</span>
                             </div>
                             <?php if ($can_edit): ?>
-                            <button class="edit-btn-small" id="editServicesBtn">
+                            <button class="edit-btn-secondary" id="editServicesBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
                             <?php endif; ?>
@@ -451,7 +451,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 <span class="detail-card-title">أطراف العقد</span>
                             </div>
                             <?php if ($can_edit): ?>
-                            <button class="edit-btn-small" id="editPartiesBtn">
+                            <button class="edit-btn-secondary" id="editPartiesBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
                             <?php endif; ?>
@@ -484,7 +484,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 <span class="detail-card-title">البيانات المالية</span>
                             </div>
                             <?php if ($can_edit): ?>
-                            <button class="edit-btn-small" id="editPaymentBtn">
+                            <button class="edit-btn-secondary" id="editPaymentBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
                             <?php endif; ?>
@@ -807,7 +807,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="renewalModalLabel">
                         <i class="fas fa-sync-alt"></i> تجديد العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" role="alert">
@@ -838,7 +838,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmRenewal"
-                        class="cd-btn-gradient">
+                        class="cd-btn-primary">
                         <i class="fas fa-check"></i> تجديد
                     </button>
                 </div>
@@ -854,7 +854,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="settlementModalLabel">
                         <i class="fas fa-balance-scale"></i> تسوية العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" role="alert">
@@ -889,7 +889,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmSettlement"
-                        class="cd-btn-gradient">
+                        class="cd-btn-primary">
                         <i class="fas fa-check"></i> تسوية
                     </button>
                 </div>
@@ -905,7 +905,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="pauseModalLabel">
                         <i class="fas fa-pause-circle"></i> إيقاف العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-warning" role="alert">
@@ -929,7 +929,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn cd-btn-pause-confirm" id="confirmPause">
+                    <button type="button" class="btn cd-btn-primary" id="confirmPause">
                         <i class="fas fa-pause-circle"></i> إيقاف
                     </button>
                 </div>
@@ -945,7 +945,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="resumeModalLabel">
                         <i class="fas fa-play-circle"></i> استئناف العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-success" role="alert">
@@ -1022,7 +1022,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn cd-btn-resume-confirm" id="confirmResume">
+                    <button type="button" class="btn cd-btn-primary" id="confirmResume">
                         <i class="fas fa-play-circle"></i> استئناف
                     </button>
                 </div>
@@ -1038,7 +1038,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="terminateModalLabel">
                         <i class="fas fa-times-circle"></i> إنهاء العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger" role="alert">
@@ -1082,7 +1082,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="mergeModalLabel">
                         <i class="fas fa-object-group"></i> دمج العقود
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" role="alert">
@@ -1170,7 +1170,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmMerge"
-                        class="cd-btn-gradient">
+                        class="cd-btn-primary">
                         <i class="fas fa-object-group"></i> دمج العقد
                     </button>
                 </div>
@@ -1186,7 +1186,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="completeModalLabel">
                         <i class="fas fa-check-circle"></i> انتهاء العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-success" role="alert">
@@ -1205,7 +1205,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmComplete"
-                        class="cd-btn-gradient">
+                        class="cd-btn-primary">
                         <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                     </button>
                 </div>
@@ -1221,7 +1221,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="editProjectInfoLabel">
                         <i class="fas fa-edit"></i> تعديل معلومات المشروع
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -1257,7 +1257,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="editServicesLabel">
                         <i class="fas fa-edit"></i> تعديل الخدمات
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -1309,7 +1309,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn btn-success" id="saveServices">
+                    <button type="button" class="btn btn-primary" id="saveServices">
                         <i class="fas fa-save"></i> حفظ
                     </button>
                 </div>
@@ -1325,7 +1325,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="editPartiesLabel">
                         <i class="fas fa-edit"></i> تعديل أطراف العقد
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -1357,7 +1357,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn btn-info" id="saveParties">
+                    <button type="button" class="btn btn-secondary" id="saveParties">
                         <i class="fas fa-save"></i> حفظ
                     </button>
                 </div>
@@ -1373,7 +1373,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <h5 class="modal-title" id="editPaymentLabel">
                         <i class="fas fa-edit"></i> تعديل البيانات المالية
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -1419,7 +1419,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn btn-warning" id="savePayment">
+                    <button type="button" class="btn btn-secondary" id="savePayment">
                         <i class="fas fa-save"></i> حفظ
                     </button>
                 </div>

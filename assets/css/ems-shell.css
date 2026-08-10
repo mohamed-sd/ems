@@ -125,11 +125,11 @@
     border-radius: 8px; padding: 7px 14px; font-weight: 700; font-size: .84rem;
     cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
 }
-.ems-toolbar .ems-btn-tertiary {
+.ems-toolbar .ems-btn-ghost {
     background: none; border: 0; color: var(--c-ink-500); padding: 7px 9px;
     border-radius: 8px; cursor: pointer; font-size: .9rem;
 }
-.ems-toolbar .ems-btn-tertiary:hover,
+.ems-toolbar .ems-btn-ghost:hover,
 .ems-toolbar .ems-btn-secondary:hover { background: var(--c-f3f4f6); }
 .ems-toolbar .ems-toolbar-search { margin-inline-start: auto; }
 
@@ -194,12 +194,12 @@
 }
 .ems-state-error > i { color: var(--c-state-danger); opacity: .8; }
 .ems-state-access > i { color: var(--c-b45309); opacity: .8; }
-.ems-state .ems-btn-create {
+.ems-state .ems-btn-primary {
     display: inline-flex; align-items: center; gap: 6px; margin-top: var(--ems-sp-2);
     background: var(--ems-topbar-bg, var(--c-f5b301)); color: var(--c-1f2937); border-radius: 8px;
     padding: 8px 18px; font-weight: 800; font-size: .86rem; text-decoration: none;
 }
-.ems-state .ems-btn-clear-filters {
+.ems-state .ems-btn-secondary {
     margin-top: var(--ems-sp-2); background: none; border: 1px solid var(--c-d1d5db);
     border-radius: 8px; padding: 6px 16px; font-weight: 700; font-size: .82rem; cursor: pointer;
 }

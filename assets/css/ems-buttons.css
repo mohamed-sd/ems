@@ -1,0 +1,114 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ * assets/css/ems-buttons.css — أنماطُ الأزرارِ الأربعةُ (AC-U3 · SH-04)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ كانت 81 صنفًا من تأليفنا عبر 1104 استعمالًا. والمستخدمُ لا يتعلّم إحدى
+ *   وثمانين إشارةً بصريّة — يتعلّم أربعًا:
+ *
+ *     ① مُنفِّذ   `btn-primary`    ذهبيُّ العلامة — الفعلُ الملتزِمُ في الشاشة
+ *     ② ثانويّ   `btn-secondary`  محايدٌ بحدٍّ — تراجعٌ · تنقُّلٌ · ترشيحٌ · عرض
+ *     ③ مُتلِف    `btn-danger`     أحمرُ — حذفٌ · رفضٌ · إنهاء
+ *     ④ خفيف     `btn-ghost`      بلا خلفيةٍ — فعلٌ داخلَ سطرٍ لا يزاحم محتواه
+ *
+ * ◆ والألوانُ من لوحةِ النظامِ لا من بوتستراب: الملفُّ يُحمَّل **بعده** فيَغلب
+ *   أزرقَه بذهبيِّ العلامة. ولولا ذلك لصار الفعلُ الملتزِمُ أزرقَ غريبًا عن
+ *   هويةِ النظامِ كلِّها.
+ *
+ * ◆ والأحجامُ (`btn-sm`/`btn-lg`) والأغلفةُ (`btn-group`) تبقى لبوتستراب —
+ *   فهي ليست أنماطًا دلاليةً وتتركّب مع الأربعةِ بلا تعارض.
+ *
+ * ◆ والتمييزُ لا يقوم على اللونِ وحدَه: لكلِّ نمطٍ **وزنُ خطٍّ وحدٌّ** مختلفان،
+ *   فمن لا يميّز الألوانَ يقرأ الفرقَ أيضًا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+body .btn-primary,
+body .btn-secondary,
+body .btn-danger,
+body .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+/* ① مُنفِّذ — ذهبيُّ العلامةِ بنصٍّ داكنٍ عاليِ التباين */
+body .btn-primary,
+body .btn-primary:not(:disabled):not(.disabled) {
+  background: var(--c-brand-gold);
+  border-color: var(--c-brand-gold-deep, var(--c-brand-gold));
+  color: var(--c-ink-900);
+  font-weight: 700;
+}
+body .btn-primary:hover,
+body .btn-primary:focus-visible {
+  background: var(--c-brand-gold-deep, var(--c-brand-gold));
+  border-color: var(--c-brand-gold-ink, var(--c-brand-gold-deep));
+  color: var(--c-ink-900);
+}
+
+/* ② ثانويّ — محايدٌ بحدٍّ ظاهر */
+body .btn-secondary,
+body .btn-secondary:not(:disabled):not(.disabled) {
+  background: var(--c-surface);
+  border-color: var(--c-line-200);
+  color: var(--c-ink-700);
+  font-weight: 600;
+}
+body .btn-secondary:hover,
+body .btn-secondary:focus-visible {
+  background: var(--c-line-200);
+  border-color: var(--c-ink-500);
+  color: var(--c-ink-900);
+}
+
+/* ③ مُتلِف — أحمرُ صريحٌ لا يلتبس بغيره */
+body .btn-danger,
+body .btn-danger:not(:disabled):not(.disabled) {
+  background: var(--c-state-danger);
+  border-color: var(--c-state-danger);
+  color: var(--c-surface);
+  font-weight: 700;
+}
+body .btn-danger:hover,
+body .btn-danger:focus-visible {
+  background: var(--c-ink-900);
+  border-color: var(--c-state-danger);
+  color: var(--c-surface);
+}
+
+/* ④ خفيف — بلا خلفيةٍ ولا حدّ، للفعلِ داخلَ السطر */
+body .btn-ghost,
+body .btn-ghost:not(:disabled):not(.disabled) {
+  background: transparent;
+  border-color: transparent;
+  color: var(--c-ink-600);
+  font-weight: 600;
+}
+body .btn-ghost:hover,
+body .btn-ghost:focus-visible {
+  background: var(--c-line-200);
+  color: var(--c-ink-900);
+}
+
+/* المعطَّلُ يُقرأ معطَّلًا في الأنماطِ الأربعةِ سواءً.
+   ◆ و`body` تتكرر على **كلِّ** مُحدِّدٍ لا على أولِ السطر: المُحدِّداتُ المفصولةُ
+     بفاصلةٍ مستقلةٌ تمامًا، ورفعُ أخصّيةِ الأولِ لا يرفع أخواتِه. */
+body .btn-primary:disabled, body .btn-secondary:disabled,
+body .btn-danger:disabled,  body .btn-ghost:disabled,
+body .btn-primary.disabled, body .btn-secondary.disabled,
+body .btn-danger.disabled,  body .btn-ghost.disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* بؤرةُ لوحةِ المفاتيحِ ظاهرةٌ دائمًا — التنقُّلُ بالمفاتيحِ حقٌّ لا خيار */
+body .btn-primary:focus-visible, body .btn-secondary:focus-visible,
+body .btn-danger:focus-visible,  body .btn-ghost:focus-visible {
+  outline: 2px solid var(--c-brand-navy);
+  outline-offset: 2px;
+}

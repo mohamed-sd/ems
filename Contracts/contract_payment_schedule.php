@@ -242,7 +242,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="text" name="adv_basis_text" maxlength="255"
                            placeholder="البند 7-3: رسومُ التعبئة غيرُ مستردة…" id="emsf_65_00dd6"></div>
             </div>
-            <button type="submit" class="btn-save"><i class="fa fa-wand-magic-sparkles"></i> ولّد الخطة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> ولّد الخطة</button>
         </form>
         <?php endif; ?>
 
@@ -345,7 +345,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <div class="form-group" style="min-width:240px"><label for="emsf_73_ddeb5">نصُّ العقد الحاكم</label>
                         <input type="text" name="row_adv_basis" maxlength="255" id="emsf_73_ddeb5"></div>
                 </div>
-                <button type="submit" class="btn-save"><i class="fa fa-plus"></i> أضف السطر</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> أضف السطر</button>
             </form>
 
             <form method="post" class="ems-form" style="min-width:280px">
@@ -356,14 +356,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="date" name="effective_from" required id="emsf_74_2ae97"></div>
                 <div class="form-group"><label for="emsf_75_d54e3">رقمُ الملحق (اختياري)</label>
                     <input type="number" name="amendment_id" style="width:120px" id="emsf_75_d54e3"></div>
-                <button type="submit" class="btn-save"><i class="fa fa-code-branch"></i>
+                <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
                     افتح نسخةً — <strong>والقديمةُ محفوظة</strong></button>
             </form>
 
             <form method="post" style="align-self:flex-end">
                 <input type="hidden" name="ps_action" value="refresh">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-rotate"></i> حدّث الحالات</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> حدّث الحالات</button>
             </form>
         </div>
         <?php endif; ?>

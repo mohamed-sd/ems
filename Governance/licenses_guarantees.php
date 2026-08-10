@@ -160,7 +160,7 @@ include '../insidebar.php';
                     <input type="hidden" name="lic_id" value="<?php echo intval($l['lic_id']); ?>">
                     <input type="date" name="new_expiry" required>
                     <input type="text" name="doc_ref" placeholder="مستند التجديد" required style="width:120px" aria-label="مستند التجديد">
-                    <button class="btn-save" type="submit">تجديد</button>
+                    <button class="btn-primary" type="submit">تجديد</button>
                 </form>
                 <?php else: ?>—<?php endif; ?>
             </td>
@@ -205,7 +205,7 @@ include '../insidebar.php';
                 <input type="text" name="lic_no" placeholder="الرقم" aria-label="الرقم">
                 <input type="date" name="expiry_date" required>
                 <input type="number" name="alert_days" value="30" title="التنبيه قبل الانتهاء بأيام" aria-label="التنبيه قبل الانتهاء بأيام">
-                <button class="btn-save" type="submit">تسجيل</button>
+                <button class="btn-primary" type="submit">تسجيل</button>
             </form>
         </div></div>
         <div class="card" style="flex:1;min-width:340px"><div class="card-body">
@@ -234,7 +234,7 @@ include '../insidebar.php';
                 <input type="text" name="currency" value="USD">
                 <input type="date" name="expiry_date" required>
                 <input type="text" name="doc_ref" placeholder="مرجع المستند *" required aria-label="مرجع المستند">
-                <button class="btn-save" type="submit">تسجيل</button>
+                <button class="btn-primary" type="submit">تسجيل</button>
             </form>
         </div></div>
     </div>

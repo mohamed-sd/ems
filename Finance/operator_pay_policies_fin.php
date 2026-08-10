@@ -314,7 +314,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="checkbox" name="is_trial" value="1" style="width:auto;"> سياسةٌ تجريبية (توسم ولا تُعتمد للأجر الحقيقي)</label></div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة السياسة</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة السياسة</button>
             </div>
         </form>
     </div></div>

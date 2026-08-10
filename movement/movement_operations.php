@@ -929,7 +929,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         white-space: nowrap;
     }
 
-    .movement-unified-page .btn-save-row {
+    .movement-unified-page .btn-primary {
         background: #0b4c8c;
         color: #fff;
         border: none;
@@ -940,11 +940,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         font-weight: 600;
     }
 
-    .movement-unified-page .btn-save-row:hover {
+    .movement-unified-page .btn-primary:hover {
         background: #083a63;
     }
 
-    .movement-unified-page .btn-end-row {
+    .movement-unified-page .btn-secondary {
         background: #dc2626;
         color: #fff;
         border: none;
@@ -956,11 +956,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         margin-right: 4px;
     }
 
-    .movement-unified-page .btn-end-row:hover {
+    .movement-unified-page .btn-secondary:hover {
         background: #b91c1c;
     }
 
-    .movement-unified-page .btn-maint-row {
+    .movement-unified-page .btn-secondary {
         background: #d97706;
         color: #fff;
         border: none;
@@ -972,7 +972,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         margin-right: 4px;
     }
 
-    .movement-unified-page .btn-maint-row:hover {
+    .movement-unified-page .btn-secondary:hover {
         background: #b45309;
     }
 
@@ -984,9 +984,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         align-items: center;
     }
 
-    .movement-unified-page .row-actions .btn-save-row,
-    .movement-unified-page .row-actions .btn-maint-row,
-    .movement-unified-page .row-actions .btn-end-row {
+    .movement-unified-page .row-actions .btn-primary,
+    .movement-unified-page .row-actions .btn-secondary,
+    .movement-unified-page .row-actions .btn-secondary {
         margin-right: 0;
         white-space: nowrap;
     }
@@ -1073,7 +1073,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         font-size: 13px;
     }
 
-    .movement-unified-page .btn-bulk-save {
+    .movement-unified-page .btn-primary {
         background: #28a745;
         color: #fff;
         border: none;
@@ -1085,7 +1085,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         margin-top: 12px;
     }
 
-    .movement-unified-page .btn-bulk-save:hover {
+    .movement-unified-page .btn-primary:hover {
         background: #218838;
     }
 
@@ -1175,7 +1175,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         background: #fff;
     }
 
-    .movement-unified-page .btn-drivers-toggle {
+    .movement-unified-page .btn-secondary {
         background: #0b4c8c;
         color: #fff;
         border: none;
@@ -1191,16 +1191,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         white-space: nowrap;
     }
 
-    .movement-unified-page .btn-drivers-toggle:hover {
+    .movement-unified-page .btn-secondary:hover {
         background: #083a63;
     }
 
-    .movement-unified-page .btn-drivers-toggle .toggle-icon {
+    .movement-unified-page .btn-secondary .toggle-icon {
         transition: transform 0.25s;
         font-size: 10px;
     }
 
-    .movement-unified-page .btn-drivers-toggle.open .toggle-icon {
+    .movement-unified-page .btn-secondary.open .toggle-icon {
         transform: rotate(180deg);
     }
 
@@ -1416,7 +1416,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <?php if ($show_drivers): ?>
                                     <td>
                                         <button type="button"
-                                                class="btn-drivers-toggle"
+                                                class="btn-secondary"
                                                 id="toggle_btn_<?php echo $tkey; ?>_<?php echo $op_id; ?>"
                                                 onclick="toggleDrivers('<?php echo $tkey; ?>', <?php echo $op_id; ?>)">
                                             <i class="fas fa-users"></i>
@@ -1442,9 +1442,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                     <option value="تعمل" <?php echo $op_state === 'تعمل' ? 'selected' : ''; ?>>تعمل</option>
                                                     <option value="جاهزة" <?php echo $op_state === 'جاهزة' ? 'selected' : ''; ?>>جاهزة</option>
                                                 </select>
-                                                <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-save"></i> حفظ</button>
-                                                <button type="button" class="btn-maint-row" onclick="setMaintenance(<?php echo $eq_id; ?>, this)" title="تحويل المعدة إلى وضع الصيانة (يفتح أمر صيانة تلقائي)"><i class="fas fa-wrench"></i> صيانة</button>
-                                                <button type="button" class="btn-end-row" onclick="endOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-stop-circle"></i> إنهاء</button>
+                                                <button type="button" class="btn-primary" onclick="saveOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-save"></i> حفظ</button>
+                                                <button type="button" class="btn-secondary" onclick="setMaintenance(<?php echo $eq_id; ?>, this)" title="تحويل المعدة إلى وضع الصيانة (يفتح أمر صيانة تلقائي)"><i class="fas fa-wrench"></i> صيانة</button>
+                                                <button type="button" class="btn-secondary" onclick="endOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-stop-circle"></i> إنهاء</button>
                                             </div>
                                         <?php else: ?>
                                             <span>-</span>
@@ -1502,8 +1502,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                             </td>
                                                             <td>
                                                                 <?php if ($is_active && $can_edit): ?>
-                                                                    <button type="button" class="btn-save-row" onclick="saveDriver(<?php echo $rel_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
-                                                                    <button type="button" class="btn-end-row"  onclick="endDriver(<?php echo $rel_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
+                                                                    <button type="button" class="btn-primary" onclick="saveDriver(<?php echo $rel_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
+                                                                    <button type="button" class="btn-secondary"  onclick="endDriver(<?php echo $rel_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
                                                                 <?php else: ?>
                                                                     <span>-</span>
                                                                 <?php endif; ?>
@@ -1547,7 +1547,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                         </div>
                                                         <div class="form-group" style="justify-content:flex-end;">
                                                             <label>&nbsp;</label>
-                                                            <button type="submit" class="btn-bulk-save" style="padding:8px 16px;font-size:13px;margin-top:0;"><i class="fas fa-plus"></i> إضافة</button>
+                                                            <button type="submit" class="btn-primary" style="padding:8px 16px;font-size:13px;margin-top:0;"><i class="fas fa-plus"></i> إضافة</button>
                                                         </div>
                                                     </div>
                                                 </form>

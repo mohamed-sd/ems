@@ -16,7 +16,7 @@
 
     /* Unified back navigation button across the project */
     a.back-btn,
-    a.btn-back,
+    a.btn-secondary,
     a.back {
       display: inline-flex !important;
       align-items: center !important;
@@ -38,14 +38,14 @@
     }
 
     a.back-btn i,
-    a.btn-back i,
+    a.btn-secondary i,
     a.back i {
       color: var(--c-e5a82e) !important;
       transition: transform 0.2s ease !important;
     }
 
     a.back-btn:hover,
-    a.btn-back:hover,
+    a.btn-secondary:hover,
     a.back:hover {
       background: linear-gradient(135deg, var(--c-242424), var(--c-343434)) !important;
       color: var(--c-surface) !important;
@@ -54,29 +54,29 @@
     }
 
     a.back-btn:hover i,
-    a.btn-back:hover i,
+    a.btn-secondary:hover i,
     a.back:hover i {
       transform: translateX(3px) !important;
     }
 
     .page-header a.back-btn,
-    .page-header a.btn-back,
+    .page-header a.btn-secondary,
     .page-header a.back,
     .page-header-actions a.back-btn,
-    .page-header-actions a.btn-back,
+    .page-header-actions a.btn-secondary,
     .page-header-actions a.back,
     .header-actions a.back-btn,
-    .header-actions a.btn-back,
+    .header-actions a.btn-secondary,
     .header-actions a.back,
     .page-hero a.back-btn,
-    .page-hero a.btn-back,
+    .page-hero a.btn-secondary,
     .page-hero a.back {
       order: -10 !important;
     }
 
     @media (max-width: 767.98px) {
       a.back-btn,
-      a.btn-back,
+      a.btn-secondary,
       a.back {
         min-height: 38px !important;
         padding: 8px 14px !important;

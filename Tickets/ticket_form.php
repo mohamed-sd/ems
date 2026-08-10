@@ -541,8 +541,8 @@ endif; ?>
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-paper-plane"></i> تسجيل البلاغ</button>
-                <a href="tickets_list.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> تسجيل البلاغ</button>
+                <a href="tickets_list.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>
@@ -617,7 +617,7 @@ endif; ?>
             </div>
             <div class="form-group"><label for="emsf_521_49bd2">حالة المعالجة (تُقرأ من الإدارة المنفِّذة)</label>
                 <textarea name="issue_status" rows="2" id="emsf_521_49bd2"><?php echo htmlspecialchars((string)$ticket['issue_status']); ?></textarea></div>
-            <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ التصنيف</button></div>
+            <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ التصنيف</button></div>
         </div></div>
     </form>
     <?php endif; ?>
@@ -643,7 +643,7 @@ endif; ?>
                     <?php if ($tr['reason']): ?>
                         <input type="text" name="reason" required placeholder="السبب (إلزامي)" style="margin-inline-end:6px;" aria-label="السبب (إلزامي)">
                     <?php endif; ?>
-                    <button type="submit" class="btn-save" style="background:<?php echo $tr['color']; ?>;">
+                    <button type="submit" class="btn-primary" style="background:<?php echo $tr['color']; ?>;">
                         <i class="fas <?php echo $tr['icon']; ?>"></i> <?php echo htmlspecialchars($tr['label']); ?>
                     </button>
                 </form>
@@ -662,7 +662,7 @@ endif; ?>
                 <?php endforeach; ?>
             </select>
             <input type="text" name="reason" required placeholder="سبب التحويل (إلزامي — يُقيَّد في السجل)" style="min-width:280px;" aria-label="سبب التحويل (إلزامي — يُقيَّد في السجل)">
-            <button type="submit" class="btn-save"><i class="fas fa-right-left"></i> تحويل</button>
+            <button type="submit" class="btn-primary"><i class="fas fa-right-left"></i> تحويل</button>
         </form>
         <?php endif; ?>
 
@@ -689,7 +689,7 @@ endif; ?>
                 <input type="hidden" name="action" value="issue_mnt_order">
                 <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
                 <label style="font-weight:700;"><i class="fas fa-wrench"></i> التنفيذ في الصيانة:</label>
-                <button type="submit" class="btn-save" style="background:#0d6efd;"><i class="fas fa-wrench"></i> إصدار أمر صيانة</button>
+                <button type="submit" class="btn-primary" style="background:#0d6efd;"><i class="fas fa-wrench"></i> إصدار أمر صيانة</button>
             </form>
         <?php endif; ?>
         <?php endif; ?>
@@ -702,7 +702,7 @@ endif; ?>
             <label style="font-weight:700;"><i class="fas fa-code-branch"></i> تفريع تذكرة:</label>
             <select name="child_type_id" required style="min-width:200px;"><?php echo tkt_type_options(); ?></select>
             <input type="text" name="child_complaint" required placeholder="وصف الفرع (ما المطلوب من الإدارة الأخرى؟)" style="min-width:300px;" aria-label="وصف الفرع (ما المطلوب من الإدارة الأخرى؟)">
-            <button type="submit" class="btn-save"><i class="fas fa-code-branch"></i> إنشاء فرع</button>
+            <button type="submit" class="btn-primary"><i class="fas fa-code-branch"></i> إنشاء فرع</button>
         </form>
         <?php endif; ?>
 
@@ -714,7 +714,7 @@ endif; ?>
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
             <label style="font-weight:700;color:#c0392b;" for="emsf_523_187bf"><i class="fas fa-ban"></i> إلغاء التذكرة (مكررة/غير صحيحة):</label>
             <input type="text" name="reason" required placeholder="سبب الإلغاء (إلزامي)" style="min-width:280px;" id="emsf_523_187bf">
-            <button type="submit" class="btn-cancel"><i class="fas fa-ban"></i> إلغاء التذكرة</button>
+            <button type="submit" class="btn-secondary"><i class="fas fa-ban"></i> إلغاء التذكرة</button>
         </form>
         <?php endif; ?>
     </div></div>
@@ -818,7 +818,7 @@ endif; ?>
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
             <input type="text" name="body" placeholder="أضف تعليقًا/تواصلًا يظهر لكل الأطراف..." style="flex:1;min-width:260px;" aria-label="أضف تعليقًا/تواصلًا يظهر لكل الأطراف...">
             <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.webp,.pdf" style="max-width:220px;">
-            <button type="submit" class="btn-save"><i class="fas fa-comment-dots"></i> إضافة</button>
+            <button type="submit" class="btn-primary"><i class="fas fa-comment-dots"></i> إضافة</button>
         </form>
     </div></div>
 <?php endif; ?>

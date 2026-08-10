@@ -271,7 +271,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="form-group" style="min-width:220px"><label for="emsf_45_cd491">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_45_cd491"></div>
             </div>
-            <button type="submit" class="btn-save"><i class="fa fa-plus"></i> سجّل الأداة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> سجّل الأداة</button>
         </form>
         <?php endif; ?>
     </div></div>

@@ -182,7 +182,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_29_eff92">الطريقة</label><input type="text" name="method" value="bank" maxlength="30" id="emsf_29_eff92"></div>
                 <div class="form-group"><label for="emsf_30_6854a">بيان</label><input type="text" name="memo" maxlength="200" id="emsf_30_6854a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> سجّل القبض</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجّل القبض</button></div>
         </form>
     </div></div>
     <?php endif; ?>
@@ -433,7 +433,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="t_note[<?php echo $i; ?>]" maxlength="255" id="emsf_34_03ed0"></div>
             </div>
             <?php endfor; ?>
-            <button type="submit" class="btn-save"><i class="fa fa-scale-balanced"></i>
+            <button type="submit" class="btn-primary"><i class="fa fa-scale-balanced"></i>
                 خصّص — <strong>وΣ لا تتجاوز السند</strong></button>
         </form>
         <?php endif; ?>

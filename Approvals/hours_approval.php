@@ -374,7 +374,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_title   = 'اعتماد الوحدات التشغيلية';
   $header_icon    = 'fa fa-check-double';
   $header_actions = array(
-      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-outline-secondary btn-sm fw-semibold', 'icon' => 'fa fa-home me-1', 'label' => 'لوحة التحكم'),
+      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-secondary btn-sm fw-semibold', 'icon' => 'fa fa-home me-1', 'label' => 'لوحة التحكم'),
       array('href' => 'hours_approval_followup.php', 'class' => 'btn btn-primary btn-sm fw-semibold', 'icon' => 'fa fa-route me-1', 'label' => 'متابعة الاعتمادات المنقولة'),
       array('raw' => '<span class="badge bg-light text-dark border">فلتر نوع المعدة: ' . htmlspecialchars($equip_type_label) . '</span>'),
   );
@@ -394,7 +394,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               onclick="document.getElementById('blocked-panel').classList.add('d-none');"></button>
     </div>
     <ul id="blocked-list" class="mb-2 ps-3"></ul>
-    <button type="button" class="btn btn-sm btn-outline-secondary"
+    <button type="button" class="btn btn-sm btn-secondary"
             onclick="location.reload();"><i class="fa fa-rotate me-1"></i> حدِّث الجدول</button>
   </div>
 
@@ -486,7 +486,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <i class="fa fa-filter me-1"></i> تطبيق
       </button>
       <?php if ($equip_type_filter !== 0): ?>
-      <a href="hours_approval.php" class="btn btn-sm btn-outline-secondary">
+      <a href="hours_approval.php" class="btn btn-sm btn-secondary">
         <i class="fa fa-rotate-left me-1"></i> إلغاء الفلتر
       </a>
       <?php endif; ?>
@@ -564,8 +564,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       </div>
 
       <div class="filter-actions">
-        <button type="button" class="btn-ok" onclick="applyFilters()"><i class="fa fa-search"></i> تطبيق</button>
-        <button type="button" class="btn-reset" title="إعادة تعيين" onclick="resetFilters()"><i class="fa fa-rotate-left"></i></button>
+        <button type="button" class="btn-primary" onclick="applyFilters()"><i class="fa fa-search"></i> تطبيق</button>
+        <button type="button" class="btn-secondary" title="إعادة تعيين" onclick="resetFilters()"><i class="fa fa-rotate-left"></i></button>
       </div>
 
       <span class="active-filters-info" id="active-filters-info" style="flex-basis:100%;">
@@ -599,13 +599,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- شريط الأدوات -->
     <?php if (!$is_admin && !$is_site_manager): ?>
     <div class="toolbar-row">
-      <button class="btn btn-sm btn-success fw-bold" onclick="approveSelected()" id="btn-approve-sel">
+      <button class="btn btn-sm btn-primary fw-bold" onclick="approveSelected()" id="btn-primary">
         <i class="fa fa-check me-1"></i> اعتماد المحدد
       </button>
-      <button class="btn btn-sm btn-outline-secondary" onclick="selectAllPending()" id="btn-sel-all">
+      <button class="btn btn-sm btn-secondary" onclick="selectAllPending()" id="btn-secondary">
         <i class="fa fa-check-square me-1"></i> تحديد الكل
       </button>
-      <button class="btn btn-sm btn-outline-danger" onclick="deselectAllPending()">
+      <button class="btn btn-sm btn-danger" onclick="deselectAllPending()">
         <i class="fa fa-times me-1"></i> إلغاء التحديد
       </button>
       <span class="text-muted small ms-auto" id="sel-count-label">لا توجد سجلات محددة</span>
@@ -741,7 +741,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ?>
             <td style="text-align:center;">
               <?php if ($_bc > 0): ?>
-                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
                   <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
                   <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc ?></span>
                 </button>
@@ -759,7 +759,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= floatval($row['counter_diff'] ?? 0) ?></td>
             <td style="text-align:center;">
               <?php if ($_bc > 0): ?>
-                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
                   <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
                   <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc ?></span>
                 </button>
@@ -770,7 +770,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
             <td>
-              <button class="btn-note" onclick="openNotes(<?= $row['id'] ?>)"
+              <button class="btn-ghost" onclick="openNotes(<?= $row['id'] ?>)"
                       title="عرض / إضافة ملاحظة">
                 <i class="fa fa-comment-dots" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
@@ -923,7 +923,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ?>
             <td style="text-align:center;">
               <?php if ($_bc2 > 0): ?>
-                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
                   <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
                   <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc2 ?></span>
                 </button>
@@ -941,7 +941,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= floatval($row['counter_diff'] ?? 0) ?></td>
             <td style="text-align:center;">
               <?php if ($_bc2 > 0): ?>
-                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
                   <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
                   <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc2 ?></span>
                 </button>
@@ -984,7 +984,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               </span>
             </td>
             <td>
-              <button class="btn-note" onclick="openNotes(<?= $row['id'] ?>)"
+              <button class="btn-ghost" onclick="openNotes(<?= $row['id'] ?>)"
                       title="عرض الملاحظات">
                 <i class="fa fa-comment-dots" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
@@ -1075,7 +1075,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <button class="btn btn-primary btn-sm fw-bold" onclick="submitNote()">
               <i class="fa fa-save me-1"></i> حفظ الملاحظة
             </button>
-            <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">إغلاق</button>
+            <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إغلاق</button>
           </div>
         </div>
 
@@ -1100,10 +1100,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <p id="confirm-approve-msg" class="mb-0"></p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-success fw-bold" id="btn-confirm-approve">
+        <button class="btn btn-primary fw-bold" id="btn-primary">
           <i class="fa fa-check me-1"></i> نعم، اعتمد
         </button>
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
       </div>
     </div>
   </div>
@@ -1138,10 +1138,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger fw-bold" id="btn-confirm-reject">
+        <button class="btn btn-danger fw-bold" id="btn-danger">
           <i class="fa fa-xmark me-1"></i> تأكيد الرفض
         </button>
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
       </div>
     </div>
   </div>
@@ -1176,10 +1176,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger fw-bold" id="btn-confirm-reject">
+        <button class="btn btn-danger fw-bold" id="btn-danger">
           <i class="fa fa-xmark me-1"></i> تأكيد الرفض
         </button>
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
       </div>
     </div>
   </div>
@@ -1190,7 +1190,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <div id="approvalToast" class="toast align-items-center text-white border-0" role="alert">
     <div class="d-flex">
       <div class="toast-body fw-bold" id="toast-msg"></div>
-      <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+      <button type="button" class="btn-close btn-secondary ms-auto me-2" data-bs-dismiss="toast"></button>
     </div>
   </div>
 </div>
@@ -1258,7 +1258,7 @@ $(function () {
   $('#total-notes-count').text(totalNotes);
 
   // ── زر تأكيد الاعتماد ───────────────────────────────────────
-  $('#btn-confirm-approve').on('click', function () {
+  $('#btn-primary').on('click', function () {
     if (pendingApproveIds.length === 0) return;
     var btn = this;
     btn.disabled = true;
@@ -1342,7 +1342,7 @@ function rejectSingle(id) {
 }
 
 $(function() {
-  $('#btn-confirm-reject').on('click', function() {
+  $('#btn-danger').on('click', function() {
     var reason = $('#reject-reason-text').val().trim();
     if (!reason) {
       $('#reject-reason-error').show();
@@ -1492,7 +1492,7 @@ function submitNote() {
 
 function updateNoteCountBadge(tsId, delta) {
   // نحدّث عداد الملاحظة في زر الملاحظة في الجدول
-  $('tr[data-id="' + tsId + '"]').find('.btn-note').each(function(){
+  $('tr[data-id="' + tsId + '"]').find('.btn-ghost').each(function(){
     const cntEl = $(this).find('.note-cnt');
     let current = parseInt(cntEl.text()) || 0;
     const newVal = Math.max(0, current + delta);
@@ -1554,7 +1554,7 @@ function escHtml(str) {
 }
 
 // ── الأعطال badge handler ────────────────────────────────────
-$(document).on('click', '.btn-fault-badge', function() {
+$(document).on('click', '.btn-ghost', function() {
   var tsId = $(this).data('ts-id');
   $('#faultModal_ts_id_ha').text(tsId);
   $('#faultModalBody_ha').html('<div class="text-center py-4"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>');
@@ -1679,7 +1679,7 @@ function applyEquipTypeFilter() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
-      <button class="btn btn-warning btn-sm fw-bold" id="bx-clear-go">
+      <button class="btn btn-secondary btn-sm fw-bold" id="bx-clear-go">
         <i class="fa fa-unlock"></i> خلِّص باسمي</button>
     </div>
   </div></div>
@@ -1706,7 +1706,7 @@ function applyEquipTypeFilter() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
-      <button class="btn btn-warning btn-sm fw-bold" id="bx-clear-go">
+      <button class="btn btn-secondary btn-sm fw-bold" id="bx-clear-go">
         <i class="fa fa-unlock"></i> خلِّص باسمي</button>
     </div>
   </div></div>

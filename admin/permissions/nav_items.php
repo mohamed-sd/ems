@@ -226,8 +226,8 @@ require_once __DIR__ . '/../includes/layout_head.php';
 .badge-off { background:#e5e7eb; color:#475569; }
 .btn { padding:.45rem .9rem; border-radius:6px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; border:none; cursor:pointer; font-size:.85rem; }
 .btn-primary { background:var(--blue); color:#fff; }
-.btn-warn { background:#f59e0b; color:#fff; }
-.btn-ok { background:#059669; color:#fff; }
+.btn-danger { background:#f59e0b; color:#fff; }
+.btn-primary { background:#059669; color:#fff; }
 .btn-danger { background:#ef4444; color:#fff; }
 .back-btn { background:#e5e7eb; color:var(--navy); }
 table.navtbl { width:100%; border-collapse:collapse; }
@@ -375,7 +375,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
                     echo '<td class="route-code">' . htmlspecialchars($it['counter_source'] ?? '—') . '</td>';
                     echo '<td>' . $state . '</td>';
                     echo '<td style="white-space:nowrap;">';
-                    echo '<a class="btn ' . (intval($it['active']) === 1 ? 'btn-warn' : 'btn-ok') . '" href="?toggle_id=' . intval($it['id']) . '&role_id=' . $selected_role_id . '">'
+                    echo '<a class="btn ' . (intval($it['active']) === 1 ? 'btn-danger' : 'btn-primary') . '" href="?toggle_id=' . intval($it['id']) . '&role_id=' . $selected_role_id . '">'
                         . (intval($it['active']) === 1 ? '<i class="fa fa-eye-slash"></i> تعطيل' : '<i class="fa fa-eye"></i> تفعيل') . '</a> ';
                     echo '<a class="btn btn-primary" href="?edit_id=' . intval($it['id']) . '"><i class="fa fa-pen"></i></a> ';
                     echo '<a class="btn btn-danger" href="?delete_id=' . intval($it['id']) . '&role_id=' . $selected_role_id . '" onclick="return confirm(\'حذف العنصر من قائمة الدور؟\')"><i class="fa fa-trash"></i></a>';

@@ -46,7 +46,7 @@ include '../insidebar.php';
         <form method="get" style="display:flex;gap:8px;align-items:center">
             <input type="hidden" name="tab" value="<?php echo $tab; ?>">
             <label for="emsf_367_f6b4e">اليوم</label><input type="date" name="date" value="<?php echo htmlspecialchars($date); ?>" id="emsf_367_f6b4e">
-            <button type="submit" class="btn-save">اعرض</button>
+            <button type="submit" class="btn-primary">اعرض</button>
         </form>
         <span style="margin-inline-start:auto">
         <?php foreach (array('1' => '① الورديات واليوم', '2' => '② التايم شيت',
@@ -87,7 +87,7 @@ include '../insidebar.php';
                         : ("<span class='badge badge-success'>" . intval($s['raised_today']) . " وحدة</span>"); ?></td>
                     <td><small><?php echo htmlspecialchars((string)($s['last_at'] ?? '—')); ?></small></td>
                     <td><?php if ($s['late']): ?>
-                        <a class="btn-save" href="../Tickets/ticket_form.php?subject=<?php
+                        <a class="btn-primary" href="../Tickets/ticket_form.php?subject=<?php
                             echo rawurlencode('مطالبة رفع الوحدات — ' . $s['project']); ?>">مطالبةٌ فورية ▸</a>
                     <?php endif; ?></td>
                 </tr>

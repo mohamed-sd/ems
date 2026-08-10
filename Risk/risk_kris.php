@@ -57,7 +57,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <select class="kriState form-control form-control-sm" style="display:inline-block;width:80px">
                         <option value="ok">سليم</option><option value="warn">إنذار</option><option value="critical">حرج</option>
                     </select>
-                    <button class="btn btn-sm btn-dark kriGo" data-id="<?php echo (int) $k['id']; ?>">حفظ</button>
+                    <button class="btn btn-sm btn-secondary kriGo" data-id="<?php echo (int) $k['id']; ?>">حفظ</button>
                 </td>
                 <?php endif; ?>
             </tr>

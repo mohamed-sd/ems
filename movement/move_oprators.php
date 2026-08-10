@@ -1101,7 +1101,7 @@ include("../inheader.php"); ?>
                                 </div>
 
                                 <?php if ($status_value === 1 && !$is_role10 && $can_edit): ?>
-                                <a href="#" class="end-service-btn btn btn-sm btn-outline-secondary"
+                                <a href="#" class="end-service-btn btn btn-sm btn-secondary"
                                    data-bs-toggle="modal" data-bs-target="#endServiceModal"
                                    data-id="<?= intval($row['id']) ?>">
                                     إنهاء خدمة

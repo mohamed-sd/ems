@@ -3445,7 +3445,7 @@ try {
     box.innerHTML =
       '<div class="tsl-head"><i class="fas fa-stream" style="color:#b8860b;"></i> توزيعُ زمن الوردية سطورًا '
       + '<span style="font-weight:400;color:#6b7280;font-size:13px;">(كلُّ سطرٍ: ساعات · حالة · مسؤول · مرجع — والخاناتُ القديمة تُملأ تلقائيًّا)</span>'
-      + '<button type="button" id="tslAdd" class="btn-save" style="margin-inline-start:auto;padding:6px 14px;"><i class="fas fa-plus"></i> سطر زمن</button></div>'
+      + '<button type="button" id="tslAdd" class="btn-primary" style="margin-inline-start:auto;padding:6px 14px;"><i class="fas fa-plus"></i> سطر زمن</button></div>'
       // ق-4 «الكاتبُ يقترح والمشرفُ يعتمد»: هذا العمودُ **اقتراحٌ** مشتقٌّ من
       // حالة الساعة، والقرارُ في «لوحة الإسناد اليومي» حيث يُسنَد كلُّ توقفٍ إلى
       // بندِ التزامٍ من مصفوفة العقد ومنه تُشتق الأحكامُ الثلاثة (CON-02 §5).

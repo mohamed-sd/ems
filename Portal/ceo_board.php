@@ -225,8 +225,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f14" maxlength="190" id="emsf_1105_88267"></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
-                <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
+                <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

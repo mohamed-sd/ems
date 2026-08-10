@@ -172,7 +172,7 @@ include '../insidebar.php';
             <input type="date" name="valid_from" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="date" name="valid_to" title="إلزامي للنائب — لا نيابة مفتوحة المدة" aria-label="إلزامي للنائب — لا نيابة مفتوحة المدة">
             <input type="text" name="doc_ref" placeholder="مستند التعيين *" required aria-label="مستند التعيين">
-            <button class="btn-save" type="submit">تعيين — والسلسلة لا تتوقف بغيابه</button>
+            <button class="btn-primary" type="submit">تعيين — والسلسلة لا تتوقف بغيابه</button>
         </form>
     </div></div>
 
@@ -196,7 +196,7 @@ include '../insidebar.php';
             <input type="date" name="valid_from" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="date" name="valid_to">
             <input type="text" name="doc_ref" placeholder="مستند التفويض *" required aria-label="مستند التفويض">
-            <button class="btn-save" type="submit" style="grid-column:span 4">إنشاء التفويض</button>
+            <button class="btn-primary" type="submit" style="grid-column:span 4">إنشاء التفويض</button>
         </form>
     </div></div>
     <?php endif; ?>

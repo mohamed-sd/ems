@@ -210,7 +210,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
         . '<div class="form-group"><label for="emsf_425_33703">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_425_33703">' . $opts . '</select></div>'
         . '<div class="form-group"><label for="emsf_426_df271">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_426_df271"></div>'
         . '<div class="form-group"><label for="emsf_427_93e88">الكمية</label><input type="number" step="0.01" name="line_qty[]" value="' . $qty . '" id="emsf_427_93e88"></div>'
-        . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
+        . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
 ?>
@@ -297,8 +297,8 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <a href="receipt_custody_proc.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <a href="receipt_custody_proc.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>

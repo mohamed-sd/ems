@@ -133,9 +133,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <?php if ($selfOwner): ?>
                         <span style="font-size:.74rem;color:#b02a37" title="RK-07">مالكه — لا يتحقق</span>
                         <?php else: ?>
-                        <button class="btn btn-sm btn-outline-success cvDo" data-id="<?php echo (int) $x['id']; ?>"
+                        <button class="btn btn-sm btn-primary cvDo" data-id="<?php echo (int) $x['id']; ?>"
                             data-code="<?php echo htmlspecialchars($x['control_code']); ?>">تحقق</button>
-                        <button class="btn btn-sm btn-outline-danger cvFail" data-id="<?php echo (int) $x['id']; ?>"
+                        <button class="btn btn-sm btn-danger cvFail" data-id="<?php echo (int) $x['id']; ?>"
                             data-code="<?php echo htmlspecialchars($x['control_code']); ?>">فشل</button>
                         <?php endif; ?>
                     </td>

@@ -984,16 +984,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <div class="pu-form-actions">
-                    <button type="button" class="btn-submit" onclick="expandAllSections()">
+                    <button type="button" class="btn-primary" onclick="expandAllSections()">
                         <i class="fas fa-expand-alt"></i> فتح جميع المجموعات
                     </button>
-                    <button type="button" class="btn-submit" onclick="collapseAllSections()">
+                    <button type="button" class="btn-primary" onclick="collapseAllSections()">
                         <i class="fas fa-compress-alt"></i> إغلاق جميع المجموعات
                     </button>
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> حفظ المشغل
                     </button>
-                    <button type="button" class="btn-cancel"
+                    <button type="button" class="btn-secondary"
                         onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
@@ -1054,8 +1054,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <select id="empFilterStatus" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
             </div>
             <div class="filter-actions">
-                <button type="button" class="btn-ok" id="empFilterApply"><i class="fa fa-search"></i> تطبيق</button>
-                <button type="button" class="btn-reset" id="empFilterReset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+                <button type="button" class="btn-primary" id="empFilterApply"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-secondary" id="empFilterReset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
             </div>
         </div>
     </div>

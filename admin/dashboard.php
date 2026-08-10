@@ -63,7 +63,7 @@ require_once __DIR__ . '/includes/layout_head.php';
         <a href="<?php echo e(super_admin_url('companies')); ?>" class="btn btn-primary btn-sm">
             <i class="fas fa-building"></i> إدارة الشركات
         </a>
-        <a href="<?php echo e(super_admin_url('subscriptions/requests')); ?>" class="btn btn-gold btn-sm">
+        <a href="<?php echo e(super_admin_url('subscriptions/requests')); ?>" class="btn btn-primary btn-sm">
             <i class="fas fa-file-circle-check"></i> الطلبات
             <?php if ($cnt_pending > 0): ?>
                 <span style="background:rgba(255,255,255,0.25);border-radius:999px;padding:1px 7px;font-size:0.72rem;"><?php echo $cnt_pending; ?></span>

@@ -232,7 +232,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1616_b27a1">مرجعُ التعرفة</label>
                     <input type="text" name="note" maxlength="200" placeholder="بندُ العقد أو مرجعُ الاعتماد" id="emsf_1616_b27a1"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> أضف التعرفة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف التعرفة</button></div>
         </form>
     </div></div>
     <?php endif; ?>

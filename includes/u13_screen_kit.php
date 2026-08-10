@@ -273,7 +273,7 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
                            maxlength="190" <?php echo empty($spec['optional'][$fk] ?? false) ? 'required' : ''; ?>>
                 </div>
                 <?php endforeach; ?>
-                <button type="submit" class="btn-save"><i class="fa fa-check"></i> تنفيذ</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-check"></i> تنفيذ</button>
             </div>
         </form>
         <?php endforeach; ?>
@@ -317,9 +317,9 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
     <div class="card"><div class="card-body">
         <?php if (count($u13Views) > 1): /* CM-09 منتقي المنظر · CM-10 إظهار الكل */ ?>
         <div class="u13-views">
-            <button type="button" class="btn-view is-active" data-view="all">إظهار كل الأعمدة</button>
+            <button type="button" class="btn-secondary is-active" data-view="all">إظهار كل الأعمدة</button>
             <?php foreach ($u13Views as $v): ?>
-            <button type="button" class="btn-view" data-view="<?php echo $v['key']; ?>">
+            <button type="button" class="btn-secondary" data-view="<?php echo $v['key']; ?>">
                 <?php echo htmlspecialchars($v['label'], ENT_QUOTES, 'UTF-8'); ?>
                 <span style="opacity:.55">(<?php echo count($v['cols']); ?>)</span>
             </button>
@@ -364,9 +364,9 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
 
 <style>
 .u13-views{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.u13-views .btn-view{border:1px solid var(--ems-border,#d8dbe0);background:transparent;border-radius:8px;
+.u13-views .btn-secondary{border:1px solid var(--ems-border,#d8dbe0);background:transparent;border-radius:8px;
   padding:6px 14px;cursor:pointer;font-size:.9em;font-family:inherit;color:inherit}
-.u13-views .btn-view.is-active{background:var(--ems-primary,#f5c518);border-color:transparent;font-weight:600;color:#111}
+.u13-views .btn-secondary.is-active{background:var(--ems-primary,#f5c518);border-color:transparent;font-weight:600;color:#111}
 </style>
 <script>
 (function () {
@@ -378,9 +378,9 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
     var table = card ? card.querySelector('table') : null;
     if (!table) { return; }
     wrap.addEventListener('click', function (e) {
-        var b = e.target.closest('.btn-view');
+        var b = e.target.closest('.btn-secondary');
         if (!b) { return; }
-        wrap.querySelectorAll('.btn-view').forEach(function (x) { x.classList.remove('is-active'); });
+        wrap.querySelectorAll('.btn-secondary').forEach(function (x) { x.classList.remove('is-active'); });
         b.classList.add('is-active');
         var v = b.getAttribute('data-view');
         table.querySelectorAll('[data-view]').forEach(function (cell) {

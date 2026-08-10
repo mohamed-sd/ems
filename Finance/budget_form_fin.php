@@ -205,12 +205,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <thead><tr><th>النوع</th><th>الفئة</th><th>المبلغ المخطّط</th><th></th></tr></thead>
                     <tbody id="b_lines_body"></tbody>
                 </table>
-                <button type="button" class="btn-cancel" onclick="bAddLine()"><i class="fas fa-plus"></i> إضافة بند</button>
+                <button type="button" class="btn-secondary" onclick="bAddLine()"><i class="fas fa-plus"></i> إضافة بند</button>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الميزانية</button>
-                <button type="button" class="btn-cancel" onclick="finToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ الميزانية</button>
+                <button type="button" class="btn-secondary" onclick="finToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

@@ -179,8 +179,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="text" name="reason" required placeholder="سبب الترحيل ومصدره" id="emsf_1603_27f33"></div>
         </div></div>
         <div class="form-actions">
-            <button type="submit" class="btn-save"><i class="fas fa-save"></i> تقديم الطلب</button>
-            <button type="button" class="btn-cancel" onclick="trsToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+            <button type="submit" class="btn-primary"><i class="fas fa-save"></i> تقديم الطلب</button>
+            <button type="button" class="btn-secondary" onclick="trsToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
         </div>
         </div></div>
     </form>
@@ -266,8 +266,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <?php foreach ($dirs as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?>
         </select></div>
       <div style="display:flex;gap:8px;margin-top:16px">
-        <button type="submit" class="btn-save"><i class="fas fa-check"></i> تحويل</button>
-        <button type="button" class="btn-cancel" onclick="document.getElementById('convertModal').style.display='none'"><i class="fas fa-times"></i> إلغاء</button>
+        <button type="submit" class="btn-primary"><i class="fas fa-check"></i> تحويل</button>
+        <button type="button" class="btn-secondary" onclick="document.getElementById('convertModal').style.display='none'"><i class="fas fa-times"></i> إلغاء</button>
       </div>
     </form>
   </div>

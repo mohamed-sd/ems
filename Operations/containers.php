@@ -245,25 +245,25 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                 <input type="hidden" name="container_id" value="<?php echo $id; ?>">
                 <input type="hidden" name="contract_id" value="<?php echo (int) $contract; ?>">
                 <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
-                <button class="btn btn-sm btn-success" title="أقرّ الحصةَ المشتقّة">أقرّ</button>
+                <button class="btn btn-sm btn-primary" title="أقرّ الحصةَ المشتقّة">أقرّ</button>
             </form>
             <?php endif; ?>
             <?php if ($can_manage && $LEVEL_NEXT[(string) $n['level']] !== null): ?>
-            <button class="btn btn-sm btn-outline-primary cnt-alloc-btn"
+            <button class="btn btn-sm btn-secondary cnt-alloc-btn"
                     data-parent="<?php echo $id; ?>"
                     data-level="<?php echo cnt_e($LEVEL_NEXT[(string) $n['level']]); ?>"
                     data-free="<?php echo cnt_n($free); ?>"
                     data-no="<?php echo cnt_e($n['container_no']); ?>">وزّع</button>
             <?php endif; ?>
             <?php if ($can_manage && in_array((string) $n['level'], array('معدة', 'مشغّل'), true)): ?>
-            <button class="btn btn-sm btn-outline-secondary cnt-swap-btn"
+            <button class="btn btn-sm btn-secondary cnt-swap-btn"
                     data-container="<?php echo $id; ?>"
                     data-kind="<?php echo cnt_e($n['level']); ?>">بدّل</button>
             <?php endif; ?>
             <?php if ($can_manage && (string) $n['level'] === 'مشغّل'): ?>
             <!-- H-01-③: مقبضُ الدورات — شرطُ بوابة الحصص الثالث (كان طريقًا مسدودًا) -->
             <details style="display:inline-block">
-                <summary class="btn btn-sm btn-outline-warning" style="cursor:pointer">دورة</summary>
+                <summary class="btn btn-sm btn-secondary" style="cursor:pointer">دورة</summary>
                 <form method="post" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
                     <input type="hidden" name="cnt_action" value="rotation">
                     <input type="hidden" name="container_id" value="<?php echo $id; ?>">
@@ -273,7 +273,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                     <input type="number" name="cycle_off_days" min="0" placeholder="أيام راحة" style="width:80px" required aria-label="أيام راحة">
                     <input type="date" name="cycle_start" required>
                     <input type="text" name="note" placeholder="ملاحظة" style="width:100px" aria-label="ملاحظة">
-                    <button class="btn btn-sm btn-warning">سجّل الدورة</button>
+                    <button class="btn btn-sm btn-secondary">سجّل الدورة</button>
                 </form>
             </details>
             <?php endif; ?>
@@ -346,7 +346,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                 <input type="hidden" name="cnt_action" value="derive">
                 <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
                 <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
-                <button class="btn btn-sm btn-outline-primary"><i class="fa fa-diagram-project"></i>
+                <button class="btn btn-sm btn-secondary"><i class="fa fa-diagram-project"></i>
                     ولّد الشجرةَ من صفوف التشغيل (مشتقّة)</button>
             </form>
         </div>

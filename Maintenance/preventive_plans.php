@@ -319,8 +319,8 @@ function mnt_opt($value, $label, $selected) {
                 </div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ الخطة</button>
-                <button type="button" class="btn-cancel" id="collapsePlanForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ الخطة</button>
+                <button type="button" class="btn-secondary" id="collapsePlanForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
             </div>
         </div></div>
     </form>
@@ -351,8 +351,8 @@ function mnt_opt($value, $label, $selected) {
                     <div class="form-group"><label for="emsf_345_6d6e3">ساعات تقديرية</label><input type="number" step="0.01" name="est_hours" value="0" id="emsf_345_6d6e3"></div>
                 </div>
                 <div class="mnt-line-actions">
-                    <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إضافة المهمة</button>
-                    <button type="button" class="btn-cancel mnt-line-cancel" data-target="taskForm"><i class="fas fa-times"></i> إلغاء</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إضافة المهمة</button>
+                    <button type="button" class="btn-secondary mnt-line-cancel" data-target="taskForm"><i class="fas fa-times"></i> إلغاء</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -408,8 +408,8 @@ function mnt_opt($value, $label, $selected) {
                 <div class="form-group"><label for="emsf_350_c5c0f">الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" placeholder="مثال: 250" id="emsf_350_c5c0f"></div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إنشاء الخطة</button>
-                <button type="button" class="btn-cancel" id="cancelPlanCreateForm"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إنشاء الخطة</button>
+                <button type="button" class="btn-secondary" id="cancelPlanCreateForm"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>
@@ -496,7 +496,7 @@ function mnt_opt($value, $label, $selected) {
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
                             <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل" aria-label="أيام التأجيل">
                             <input type="text" name="reason" placeholder="سببُ التأجيل *" style="width:130px" required aria-label="سببُ التأجيل">
-                            <button type="submit" class="btn-save" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
+                            <button type="submit" class="btn-primary" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
                         </form>
                         <?php endif; ?></td>
                 </tr>

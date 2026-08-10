@@ -63,8 +63,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="filter-field"><label for="fProject"><i class="fa fa-diagram-project"></i> المشروع</label>
                 <select id="fProject" class="form-control"><option value="">-- الكل --</option></select></div>
             <div class="filter-actions">
-                <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-                <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+                <button type="button" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
             </div>
         </div>
     </div>
@@ -187,8 +187,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             });
         }
         bindCol('#fType', 2); bindCol('#fDir', 3); bindCol('#fStage', 4); bindCol('#fProject', 5); bindCol('#fBearer', 8);
-        $('.filter .btn-ok').on('click', function () { t.draw(); });
-        $('.filter .btn-reset').on('click', function () {
+        $('.filter .btn-primary').on('click', function () { t.draw(); });
+        $('.filter .btn-secondary').on('click', function () {
             $('#fType,#fDir,#fStage,#fProject,#fBearer').val('');
             t.column(2).search('').column(3).search('').column(4).search('').column(5).search('').column(8).search('').draw();
         });

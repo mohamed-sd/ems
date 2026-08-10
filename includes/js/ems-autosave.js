@@ -54,10 +54,10 @@
         bar.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px';
         bar.innerHTML = '<span>📝 لديك مسودةٌ محفوظةٌ محليًّا (' + savedAt + ') — لم يضِع ما كتبت.</span>';
         var use = document.createElement('button');
-        use.type = 'button'; use.className = 'btn-save'; use.textContent = 'استرجعها';
+        use.type = 'button'; use.className = 'btn-primary'; use.textContent = 'استرجعها';
         use.onclick = function () { restore(form, data); bar.remove(); };
         var drop = document.createElement('button');
-        drop.type = 'button'; drop.className = 'btn-save'; drop.textContent = 'تجاهلها';
+        drop.type = 'button'; drop.className = 'btn-primary'; drop.textContent = 'تجاهلها';
         drop.onclick = function () { localStorage.removeItem(key); bar.remove(); };
         bar.appendChild(use); bar.appendChild(drop);
         form.parentNode.insertBefore(bar, form);

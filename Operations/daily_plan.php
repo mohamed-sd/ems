@@ -196,7 +196,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="dp_action" value="generate">
                 <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                 <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-bolt"></i> ولّد احتياجَ اليوم</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-bolt"></i> ولّد احتياجَ اليوم</button>
             </form>
             <?php endif; ?>
         <?php else: ?>
@@ -216,14 +216,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="dp_action" value="generate">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <button type="submit" class="btn btn-sm btn-outline-primary">حدّث الاحتياج</button>
+                    <button type="submit" class="btn btn-sm btn-secondary">حدّث الاحتياج</button>
                 </form>
                 <form method="post" style="display:inline">
                     <input type="hidden" name="dp_action" value="approve">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <button type="submit" class="btn btn-sm btn-info" title="لا اعتمادَ لمن أنشأ">اعتمادُ الحركة</button>
+                    <button type="submit" class="btn btn-sm btn-secondary" title="لا اعتمادَ لمن أنشأ">اعتمادُ الحركة</button>
                 </form>
                 <?php elseif ($plan['state'] === 'approved' && $can_edit): ?>
                 <form method="post" style="display:inline">
@@ -231,7 +231,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <button type="submit" class="btn btn-sm btn-success" title="لا يُفتح موقعٌ ناقصُ التخصيص">افتح يومَ الغد</button>
+                    <button type="submit" class="btn btn-sm btn-primary" title="لا يُفتح موقعٌ ناقصُ التخصيص">افتح يومَ الغد</button>
                 </form>
                 <?php endif; ?>
                 <?php if (in_array(strval($plan['state']), array('approved', 'opened'), true) && $can_edit): ?>
@@ -241,7 +241,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
                     <input type="text" name="reason" placeholder="سبب الإرجاع (إلزامي)" style="width:160px" aria-label="سبب الإرجاع (إلزامي)">
-                    <button type="submit" class="btn btn-sm btn-outline-warning">أرجِع للمسودة</button>
+                    <button type="submit" class="btn btn-sm btn-secondary">أرجِع للمسودة</button>
                 </form>
                 <?php endif; ?>
             </div>

@@ -424,7 +424,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <?php if ($can_decide && !$noMatrix): ?>
                         <div class="pu-form-actions atb-actions">
-                            <button type="submit" class="btn-submit"><i class="fas fa-stamp"></i> اعتماد الإسناد</button>
+                            <button type="submit" class="btn-primary"><i class="fas fa-stamp"></i> اعتماد الإسناد</button>
                         </div>
                     <?php endif; ?>
                 </form>
@@ -462,8 +462,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="atb-modal-actions">
-                <button type="submit" class="btn-submit"><i class="fas fa-check"></i> تأكيد</button>
-                <button type="button" class="btn-cancel" id="atbCancel"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-check"></i> تأكيد</button>
+                <button type="button" class="btn-secondary" id="atbCancel"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </form>
     </div>

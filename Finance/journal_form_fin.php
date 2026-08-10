@@ -281,12 +281,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <th colspan="2"><span id="j_balance" class="badge badge-secondary">—</span></th>
                     </tr></tfoot>
                 </table>
-                <button type="button" class="btn-cancel" onclick="jAddLine()"><i class="fas fa-plus"></i> إضافة سطر</button>
+                <button type="button" class="btn-secondary" onclick="jAddLine()"><i class="fas fa-plus"></i> إضافة سطر</button>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ القيد</button>
-                <button type="button" class="btn-cancel" onclick="finToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ القيد</button>
+                <button type="button" class="btn-secondary" onclick="finToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

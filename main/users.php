@@ -557,7 +557,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     <button type="reset" class="btn btn-secondary">
                         <i class="fas fa-eraser"></i> مسح الحقول
                     </button>
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> حفظ المستخدم
                     </button>
                 </div>
@@ -592,8 +592,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 </select>
             </div>
             <div class="filter-actions">
-                <button type="button" id="usersFilterApply" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-                <button type="button" id="usersFilterReset" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+                <button type="button" id="usersFilterApply" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" id="usersFilterReset" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
             </div>
         </div>
     </div>

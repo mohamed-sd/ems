@@ -139,7 +139,7 @@ include '../insidebar.php';
     <?php if ($explainRq): ?>
     <div class="card" style="margin-bottom:12px;border-right:4px solid #6c5ce7;">
         <div class="card-header"><strong><i class="fas fa-circle-question"></i> لماذا يظهر لي هذا الطلب؟</strong>
-            <a class="btn btn-sm btn-outline-secondary" style="float:left" href="my_requests.php">إغلاق</a></div>
+            <a class="btn btn-sm btn-secondary" style="float:left" href="my_requests.php">إغلاق</a></div>
         <div class="card-body">
             <?php foreach ($explainRq['steps'] as $i => $s): ?>
                 <div style="margin:4px 0"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
@@ -193,8 +193,8 @@ include '../insidebar.php';
                     <td style="min-width:220px">
                         <?php if (in_array($q['status'], array('submitted', 'routed', 'in_approval'), true)): ?>
                             <form method="post" style="display:inline"><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>"><input type="hidden" name="decision" value="approve">
-                                <button class="btn btn-sm btn-success">اعتماد</button></form>
-                            <details style="display:inline-block"><summary class="btn btn-sm btn-outline-danger" style="display:inline-block">رفض/إعادة</summary>
+                                <button class="btn btn-sm btn-primary">اعتماد</button></form>
+                            <details style="display:inline-block"><summary class="btn btn-sm btn-danger" style="display:inline-block">رفض/إعادة</summary>
                                 <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
                                     <select name="decision" class="form-control form-control-sm" style="margin-bottom:4px"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
                                     <input name="note" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي)" required aria-label="السبب (إلزامي)">
@@ -251,7 +251,7 @@ include '../insidebar.php';
                         <?php if ($q['next_step']): ?>· التالي: <?php echo htmlspecialchars((string) $q['next_step']); ?><?php endif; ?>
                     <?php else: ?>—<?php endif; ?></td>
                 <td><?php if (in_array($q['status'], array('submitted', 'routed', 'returned'), true)): ?>
-                    <details><summary class="btn btn-sm btn-outline-danger" style="display:inline-block">سحب</summary>
+                    <details><summary class="btn btn-sm btn-danger" style="display:inline-block">سحب</summary>
                         <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="rq_cancel"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
                             <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب" required aria-label="السبب">
                             <button class="btn btn-sm btn-danger">تأكيد السحب</button></form></details>

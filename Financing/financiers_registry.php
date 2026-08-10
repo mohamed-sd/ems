@@ -138,7 +138,7 @@ include '../insidebar.php';
         <tr><td colspan="6">لا كيانات بصفة «ممول» — تُنشأ في <a href="../Governance/entities_registry.php">سجل الكيانات</a> بصفتها</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-        <p style="margin-top:10px"><a href="financing_operation_new.php" class="btn-save">+ إنشاء عملية تمويل (النموذج أولًا)</a></p>
+        <p style="margin-top:10px"><a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولًا)</a></p>
     </div></div>
 </div>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

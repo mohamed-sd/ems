@@ -277,7 +277,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </div>
             <?php if ($can_edit): ?>
             <div style="margin-top:12px">
-                <button type="submit" class="btn-save"><i class="fa fa-save"></i> احفظ الخطة</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-save"></i> احفظ الخطة</button>
             </div>
             <?php endif; ?>
         </form>

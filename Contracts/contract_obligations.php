@@ -394,7 +394,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                       onsubmit="return confirm('إجازةُ كل المسودات؟ المُجازُ نافذٌ لا يُعدَّل بعدها.')">
                     <input type="hidden" name="approve_action" value="all">
                     <input type="hidden" name="client_contract_id" value="<?php echo $sel_contract; ?>">
-                    <button type="submit" class="btn-ok"><i class="fas fa-stamp"></i> إجازةُ كل المسودات (<?php echo $draft_count; ?>)</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-stamp"></i> إجازةُ كل المسودات (<?php echo $draft_count; ?>)</button>
                 </form>
             <?php endif; ?>
         </div>
@@ -446,8 +446,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </div>
                     </div>
                     <div class="pu-form-actions">
-                        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> <span id="submitBtnText">حفظ المسودة</span></button>
-                        <button type="button" id="oblCancelBtn" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> <span id="submitBtnText">حفظ المسودة</span></button>
+                        <button type="button" id="oblCancelBtn" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</button>
                     </div>
                 </div>
             </div>

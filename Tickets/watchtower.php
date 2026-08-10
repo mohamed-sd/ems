@@ -85,7 +85,7 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-header"><h5>⑧ من يتأخر ومن لا يستجيب — بالاسم والإدارة</h5>
-        <form method="post" style="display:inline"><button type="submit" name="issue_report" value="1" class="btn-save">أصدر التقرير الدوري</button></form>
+        <form method="post" style="display:inline"><button type="submit" name="issue_report" value="1" class="btn-primary">أصدر التقرير الدوري</button></form>
     </div>
     <div class="card-body">
         <?php if (!$late) { ems_state_empty('لا متأخر ولا غير مستجيب في النافذة — نظيف ✨'); } else { ?>

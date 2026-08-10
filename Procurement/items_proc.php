@@ -202,8 +202,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" onclick="procToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <button type="button" class="btn-secondary" onclick="procToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>
@@ -234,8 +234,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="filter-actions">
-                <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-                <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+                <button type="button" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
             </div>
         </div>
     </div>
@@ -373,10 +373,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         });
 
         // زر «تطبيق» (البحث فوري عند التغيير؛ يعيد الرسم فقط)
-        $('.filter .btn-ok').on('click', function () { procTable.draw(); });
+        $('.filter .btn-primary').on('click', function () { procTable.draw(); });
 
         // زر «إعادة تعيين»
-        $('.filter .btn-reset').on('click', function () {
+        $('.filter .btn-secondary').on('click', function () {
             $('#filterCategory, #filterNature, #filterCritical').val('');
             procTable.column(3).search('').column(4).search('').column(6).search('').draw();
         });

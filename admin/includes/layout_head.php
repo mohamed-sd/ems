@@ -293,18 +293,18 @@ tbody tr:hover { background: #fafbfd; }
 }
 .btn-primary { background: #0f2240; color: #fff; }
 .btn-primary:hover { background: #1a3a5c; color: #fff; }
-.btn-gold    { background: #d6a700; color: #fff; }
-.btn-gold:hover { background: #b89008; }
+.btn-primary    { background: #d6a700; color: #fff; }
+.btn-primary:hover { background: #b89008; }
 .btn-danger  { background: #dc2626; color: #fff; }
 .btn-danger:hover { background: #b91c1c; }
-.btn-success { background: #059669; color: #fff; }
-.btn-success:hover { background: #047857; }
-.btn-orange  { background: #d97706; color: #fff; }
-.btn-orange:hover { background: #b45309; }
+.btn-primary { background: #059669; color: #fff; }
+.btn-primary:hover { background: #047857; }
+.btn-secondary  { background: #d97706; color: #fff; }
+.btn-secondary:hover { background: #b45309; }
 .btn-ghost   { background: transparent; color: var(--ink-2); border: 1px solid var(--line); }
 .btn-ghost:hover { background: var(--surface); }
 .btn-sm { padding: 5px 11px; font-size: 0.77rem; border-radius: 7px; }
-.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: 8px; }
+.btn-ghost { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: 8px; }
 
 /* ═══════════════════════════ FORM ELEMENTS ═══════════════════════════ */
 .form-group { margin-bottom: 16px; }

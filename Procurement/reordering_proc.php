@@ -142,9 +142,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if ($can_add): ?>
         <div style="display:flex;gap:8px">
             <form method="post"><input type="hidden" name="reorder_action" value="dry">
-                <button type="submit" class="btn-save"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
             <form method="post"><input type="hidden" name="reorder_action" value="apply">
-                <button type="submit" class="btn-save"><i class="fa fa-play"></i> ولّد فعلًا</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-play"></i> ولّد فعلًا</button></form>
         </div>
         <?php endif; ?>
         <?php if ($reorderResult !== null): ?>
@@ -216,8 +216,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </p>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" onclick="procToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <button type="button" class="btn-secondary" onclick="procToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

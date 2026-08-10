@@ -570,7 +570,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
                             <input type="hidden" name="return" value="equipment_profile.php">
                             <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
-                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-circle-check"></i> اعتماد الكرت</button>
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-circle-check"></i> اعتماد الكرت</button>
                         </form>
                     <?php endif; ?>
                 <?php endif; ?>
@@ -865,7 +865,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div><label for="emsf_102_9c6af">مرفق (صورة/PDF)</label><input type="file" name="attachment" accept="image/*,application/pdf" id="emsf_102_9c6af"></div>
                     <div style="display:flex;align-items:center;gap:6px;margin-top:22px;"><input type="checkbox" name="is_critical" id="doc_crit" value="1"><label for="doc_crit" style="margin:0;">وثيقة حرجة</label></div>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
             </form>
             <?php endif; ?>
             <div class="table-container">
@@ -913,7 +913,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div><label for="emsf_109_d5915">مرتبط بوثيقة (للتأمين)</label><select name="compliance_id" id="emsf_109_d5915"><option value="">-- بدون --</option><?php foreach ($compliance_rows as $cr) echo '<option value="' . (int) $cr['id'] . '">' . $ee($cr['doc_type'] . ($cr['reference'] ? ' — ' . $cr['reference'] : '')) . '</option>'; ?></select></div>
                     <div><label for="emsf_110_ee635">مرفق</label><input type="file" name="attachment" accept="image/*,application/pdf" id="emsf_110_ee635"></div>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
             </form>
             <?php endif; ?>
             <div class="table-container">
@@ -957,7 +957,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div><label for="emsf_113_11c52">تاريخ التركيب</label><input type="date" name="install_date" id="emsf_113_11c52"></div>
                     <div style="display:flex;align-items:center;gap:6px;margin-top:22px;"><input type="checkbox" name="is_current" id="comp_cur" value="1" checked><label for="comp_cur" style="margin:0;">مُركَّب حالياً</label></div>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
             </form>
             <?php endif; ?>
             <div class="table-container">
@@ -1001,7 +1001,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div><label for="emsf_116_87147">تاريخ دخول/خروج</label><input type="date" name="in_out_date" id="emsf_116_87147"></div>
                     <div style="grid-column:1/-1;"><label for="emsf_117_53545">ملاحظة</label><input type="text" name="note" id="emsf_117_53545"></div>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> تسجيل</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> تسجيل</button>
             </form>
             <?php endif; ?>
             <?php if (empty($history_rows)): ?>

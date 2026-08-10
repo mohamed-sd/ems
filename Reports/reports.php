@@ -145,8 +145,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="filter-actions">
-                    <button type="submit" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-                    <a href="reports.php" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>
+                    <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+                    <a href="reports.php" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>
                 </div>
             </div>
         </form>

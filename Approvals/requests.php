@@ -249,19 +249,19 @@ include __DIR__ . '/../includes/page_header.php';
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-outline-info viewPayloadBtn" 
+                                        <button type="button" class="btn btn-secondary viewPayloadBtn" 
                                                 data-payload="<?php echo e($payload_preview); ?>"
                                                 title="عرض التفاصيل">
                                             <i class="fas fa-eye"></i> عرض
                                         </button>
 
                                         <?php if ($can_act): ?>
-                                            <button type="button" class="btn btn-outline-success approveBtn" 
+                                            <button type="button" class="btn btn-primary approveBtn" 
                                                     data-id="<?php echo intval($row['id']); ?>"
                                                     title="الموافقة على الطلب">
                                                 <i class="fas fa-check"></i> اعتماد
                                             </button>
-                                            <button type="button" class="btn btn-outline-danger rejectBtn" 
+                                            <button type="button" class="btn btn-danger rejectBtn" 
                                                     data-id="<?php echo intval($row['id']); ?>"
                                                     title="رفض الطلب">
                                                 <i class="fas fa-ban"></i> رفض
@@ -468,7 +468,7 @@ $(function () {
             $('#decisionMessage').html('<i class="fas fa-info-circle text-info"></i> يرجى تأكيد اعتماد هذا الطلب');
             $('#decisionHeader').removeClass().addClass('modal-header bg-success text-white');
             $('#submitBtnText').text('اعتماد');
-            $('#submitDecisionBtn').removeClass().addClass('btn btn-success');
+            $('#submitDecisionBtn').removeClass().addClass('btn btn-primary');
         } else {
             $('#decisionTitle').html('<i class="fas fa-ban text-danger"></i> رفض الطلب');
             $('#decisionMessage').html('<i class="fas fa-warning text-warning"></i> يرجى تحديد سبب الرفض');

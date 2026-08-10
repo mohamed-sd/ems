@@ -550,7 +550,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         flex: 1;
     }
 
-    .btn-save {
+    .btn-primary {
         background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
         color: white;
         border: none;
@@ -562,7 +562,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         transition: all 0.3s ease;
     }
 
-    .btn-save:hover {
+    .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
@@ -804,7 +804,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 <form method="POST" style="margin: 0;">
                                     <input type="hidden" name="action" value="grant_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
-                                    <button type="submit" class="btn btn-sm btn-success" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); color: white; border: none;">
+                                    <button type="submit" class="btn btn-sm btn-primary" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); color: white; border: none;">
                                         <i class="fas fa-check-circle"></i> منح الكل
                                     </button>
                                 </form>
@@ -867,7 +867,7 @@ include __DIR__ . '/../includes/page_header.php';
                                                 </label>
                                             </div>
 
-                                            <button type="submit" class="btn-save">
+                                            <button type="submit" class="btn-primary">
                                                 <i class="fas fa-save"></i> حفظ
                                             </button>
                                         </form>
@@ -974,7 +974,7 @@ include __DIR__ . '/../includes/page_header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-save" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); margin-top: 0.5rem;"
+                                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); margin-top: 0.5rem;"
                                     onclick="return confirm('سيتم منح جميع الصلاحيات. هل أنت متأكد؟')">
                                     <i class="fas fa-check-circle"></i> منح الكل
                                 </button>
@@ -1002,7 +1002,7 @@ include __DIR__ . '/../includes/page_header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-save" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); margin-top: 0.5rem;"
+                                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); margin-top: 0.5rem;"
                                     onclick="return confirm('سيتم سحب جميع الصلاحيات. هل أنت متأكد؟')">
                                     <i class="fas fa-ban"></i> سحب الكل
                                 </button>

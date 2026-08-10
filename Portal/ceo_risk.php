@@ -259,8 +259,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <select name="f15" id="emsf_1147_44369"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="قيد الحسم">قيد الحسم</option><option value="محسوم">محسوم</option><option value="قيد المتابعة">قيد المتابعة</option><option value="مغلق بعد المعالجة">مغلق بعد المعالجة</option><option value="مؤجل">مؤجل</option></select></div>
             </div></div>
             <div style="margin-top:12px;display:flex;gap:10px">
-                <button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
+                <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

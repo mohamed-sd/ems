@@ -101,7 +101,7 @@
 .add-btn,
 .add,
 #toggleForm,
-.btn-warning {
+.btn-secondary {
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -120,7 +120,7 @@
 
 .add,
 #toggleForm,
-.btn-warning,
+.btn-secondary,
 .add-btn:not([style]) {
     background: var(--gold-soft);
     color: var(--navy);
@@ -129,7 +129,7 @@
 
 .add:hover,
 #toggleForm:hover,
-.btn-warning:hover,
+.btn-secondary:hover,
 .add-btn:not([style]):hover {
     background: var(--gold);
     color: var(--navy);
@@ -664,12 +664,12 @@
     font-family: 'Cairo', sans-serif;
 }
 
-.btn-success {
+.btn-primary {
     background: linear-gradient(135deg, var(--brand-black), var(--brand-black-soft));
     color: var(--c-surface);
     box-shadow: 0 4px 16px var(--c-rgba262626022);
 }
-.btn-success:hover {
+.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 7px 22px var(--c-rgba262626028);
 }
@@ -1289,14 +1289,14 @@ table.dataTable.no-footer { border: none !important; }
 
 .action-btn.mines,
 .action-btn.contracts,
-.action-btn.btn-driver,
+.action-btn.btn-secondary,
 .action-btn.driver {
     background: var(--blue-soft);
     color: var(--blue);
 }
 .action-btn.mines:hover,
 .action-btn.contracts:hover,
-.action-btn.btn-driver:hover,
+.action-btn.btn-secondary:hover,
 .action-btn.driver:hover {
     background: var(--blue);
     color: var(--c-surface);
@@ -1304,12 +1304,12 @@ table.dataTable.no-footer { border: none !important; }
     box-shadow: var(--shadow-sm);
 }
 
-.action-btn.btn-edit {
+.action-btn.btn-secondary {
     background: var(--c-rgba122862008);
     color: var(--navy);
 }
 
-.action-btn.btn-edit:hover {
+.action-btn.btn-secondary:hover {
     background: var(--navy);
     color: var(--c-surface);
     transform: translateY(-2px);
@@ -1338,7 +1338,7 @@ table.dataTable.no-footer { border: none !important; }
     box-shadow: var(--shadow-sm);
 }
 
-.btn-action {
+.btn-secondary {
     padding: 6px 10px;
     border-radius: 8px;
     text-decoration: none;
@@ -1353,34 +1353,34 @@ table.dataTable.no-footer { border: none !important; }
     box-shadow: var(--shadow-sm);
 }
 
-.btn-action i { margin: 0; }
+.btn-secondary i { margin: 0; }
 
-.btn-action-edit {
+.btn-secondary {
     background: linear-gradient(135deg, var(--navy), var(--navy-l));
     color: var(--gold);
 }
 
-.btn-action-edit:hover {
+.btn-secondary:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
-.btn-action-delete {
+.btn-danger {
     background: linear-gradient(135deg, var(--red), var(--c-c82333));
     color: var(--c-surface);
 }
 
-.btn-action-delete:hover {
+.btn-danger:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
-.btn-action-view {
+.btn-secondary {
     background: linear-gradient(135deg, var(--green), var(--c-20c997));
     color: var(--c-surface);
 }
 
-.btn-action-view:hover {
+.btn-secondary:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -1604,7 +1604,7 @@ table.dataTable.no-footer { border: none !important; }
 }
 
 /* modal buttons */
-.btn-modal {
+.btn-secondary {
     flex: 1;
     padding: 11px 20px;
     border: none;
@@ -1618,22 +1618,22 @@ table.dataTable.no-footer { border: none !important; }
     justify-content: center;
     gap: 8px;
 }
-.btn-modal-save {
+.btn-primary {
     background: linear-gradient(135deg, var(--navy), var(--navy-l));
     color: var(--c-surface);
     box-shadow: 0 4px 14px var(--c-rgba122862022);
 }
-.btn-modal-save:hover {
+.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 7px 20px var(--c-rgba12286203);
     background: linear-gradient(135deg, var(--gold), var(--gold-l));
     color: var(--navy);
 }
-.btn-modal-cancel {
+.btn-secondary {
     background: var(--c-rgba10011613901);
     color: var(--sub);
 }
-.btn-modal-cancel:hover {
+.btn-secondary:hover {
     background: var(--sub);
     color: var(--c-surface);
     transform: translateY(-2px);
@@ -1760,7 +1760,7 @@ table.dataTable.no-footer { border: none !important; }
     .add,
     .add-btn,
     #toggleForm,
-    .btn-warning {
+    .btn-secondary {
         padding: 8px 16px;
         font-size: .78rem;
     }

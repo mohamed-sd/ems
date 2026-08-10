@@ -109,8 +109,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_394_7c029">المركز الأب</label><select name="parent_id" id="emsf_394_7c029"><?php echo fin_center_options($conn, $is_super_admin, $company_id, 0, '— بلا أب (جذر) —'); ?></select></div>
             <div class="form-group"><label for="emsf_395_cd169">الإدارة المالكة</label><select name="owner_module" id="emsf_395_cd169"><option value="">— بلا —</option><?php foreach ($owner_modules as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#centerForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#centerForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 
@@ -123,8 +123,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_399_5389c">الأساس</label><input type="text" name="basis" placeholder="ساعات / استخدام / عدد" id="emsf_399_5389c"></div>
             <div class="form-group"><label for="emsf_400_47ab9">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_400_47ab9"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#allocForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#allocForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

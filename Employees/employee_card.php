@@ -92,7 +92,7 @@ include '../insidebar.php';
                 }
             }
             echo '</tbody></table></div>'
-               . '<p><a class="btn-save" href="employee_profile.php?id=' . $eid . '">الملفُّ الكامل ▸</a></p>';
+               . '<p><a class="btn-primary" href="employee_profile.php?id=' . $eid . '">الملفُّ الكامل ▸</a></p>';
             break;
         case '2':
             $rows = array();

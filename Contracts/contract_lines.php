@@ -161,7 +161,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="contract" value="<?php echo $sel; ?>">
             <label for="emsf_46_ee666">القيمةُ بتاريخ:</label>
             <input type="date" name="as_of" value="<?php echo htmlspecialchars($asOf); ?>" id="emsf_46_ee666">
-            <button type="submit" class="btn-save"><i class="fa fa-calculator"></i> احسب</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> احسب</button>
             <small style="color:#6b7280">— فارغٌ = القيمةُ النافذةُ اليوم · وبتاريخٍ = <strong>ما حكم ذلك اليوم</strong></small>
         </form>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
@@ -291,7 +291,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endforeach; ?></select></div>
             <div class="form-group"><label for="emsf_57_93be6">ملاحظة</label><input type="text" name="note" maxlength="200" id="emsf_57_93be6"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-save">
+        <div style="margin-top:12px"><button type="submit" class="btn-primary">
             <i class="fa fa-plus"></i> أضف بندَ بيع</button></div>
     </form>
     <?php endif; ?>

@@ -771,7 +771,7 @@ include __DIR__ . '/../includes/page_header.php';
             <div class="filters-container">
                 <div class="filters-header">
                     <h6><i class="fas fa-filter"></i> فلترة المعدات</h6>
-                    <button type="button" class="btn-clear-filters" id="clearFiltersBtn">
+                    <button type="button" class="btn-secondary" id="clearFiltersBtn">
                         <i class="fas fa-times-circle"></i> إلغاء الفلاتر
                     </button>
                 </div>
@@ -1045,11 +1045,11 @@ include __DIR__ . '/../includes/page_header.php';
                                                         <i class='fas fa-eye'></i>
                                                     </a>";
                                                 if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
-                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
+                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-secondary' title='إدارة المشغلين'>
                                                                         <i class='fas fa-user-cog'></i>
                                                                     </a>";
                                                 } else {
-                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-secondary' title='تعديل'>
                                                                         <i class='fas fa-edit'></i>
                                                                     </a>";
                                                         // يمكن إضافة زر حذف هنا إذا لزم الأمر
@@ -1225,9 +1225,9 @@ include __DIR__ . '/../includes/page_header.php';
                 updateFiltersSummary();
 
                 // تأثير بصري
-                $(this).addClass('btn-clear-active');
+                $(this).addClass('btn-secondary');
                 setTimeout(function() {
-                    $('#clearFiltersBtn').removeClass('btn-clear-active');
+                    $('#clearFiltersBtn').removeClass('btn-secondary');
                 }, 300);
             });
 
@@ -1472,7 +1472,7 @@ include __DIR__ . '/../includes/page_header.php';
     font-size: 1.2rem;
 }
 
-.btn-clear-filters {
+.btn-secondary {
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -1488,14 +1488,14 @@ include __DIR__ . '/../includes/page_header.php';
     font-family: 'Cairo', sans-serif;
 }
 
-.btn-clear-filters:hover {
+.btn-secondary:hover {
     background: var(--red);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 5px 16px rgba(220,38,38,.35);
 }
 
-.btn-clear-active {
+.btn-secondary {
     animation: btnClearPulse 0.3s ease;
 }
 
@@ -1599,7 +1599,7 @@ include __DIR__ . '/../includes/page_header.php';
         gap: 12px;
     }
 
-    .btn-clear-filters {
+    .btn-secondary {
         width: 100%;
         justify-content: center;
     }

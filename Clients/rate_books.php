@@ -396,7 +396,7 @@ if (function_exists('ems_screen_about')) {
           <td><span style="font-weight:700;color:<?php echo $b['state'] === 'معتمد' ? '#2C6749' : '#8A5712'; ?>">
               <?php echo rb_e($b['state']); ?></span></td>
           <td><?php echo (int) $b['lines_n']; ?></td>
-          <td><a class="btn btn-sm btn-outline-primary" href="rate_books.php?book=<?php echo (int) $b['id']; ?>">
+          <td><a class="btn btn-sm btn-secondary" href="rate_books.php?book=<?php echo (int) $b['id']; ?>">
               <i class="fa fa-list"></i> البنود</a></td>
         </tr>
       <?php endforeach; ?>

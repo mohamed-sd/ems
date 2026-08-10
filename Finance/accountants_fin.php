@@ -104,8 +104,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_321_37a48">الاسم <span class="required">*</span></label><input type="text" name="unit_name" required id="emsf_321_37a48"></div>
             <div class="form-group" style="grid-column:1/-1"><label for="emsf_322_9e127">دور الوحدة</label><input type="text" name="role_note" id="emsf_322_9e127"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#unitForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#unitForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 
@@ -118,8 +118,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_326_01cdf">التخصص</label><input type="text" name="specialization" placeholder="مبيعات/موردين/قوى..." id="emsf_326_01cdf"></div>
             <div class="form-group"><label for="emsf_327_122d1">حد المراجعة (USD)</label><input type="number" step="0.01" name="review_limit_usd" id="emsf_327_122d1"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#acctForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#acctForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

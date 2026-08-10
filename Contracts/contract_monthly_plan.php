@@ -241,7 +241,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </div>
             <?php if ($can_edit): ?>
             <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-                <button type="submit" class="btn-save"><i class="fa fa-save"></i> احفظ النسخة <?php echo $VER; ?></button>
+                <button type="submit" class="btn-primary"><i class="fa fa-save"></i> احفظ النسخة <?php echo $VER; ?></button>
             </div>
             <?php endif; ?>
         </form>
@@ -252,10 +252,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <input type="hidden" name="mp_action" value="seal">
                 <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
                 <input type="hidden" name="plan_version" value="<?php echo $VER; ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-stamp"></i>
+                <button type="submit" class="btn-primary"><i class="fa fa-stamp"></i>
                     اختم النسخة <?php echo $VER; ?></button>
             </form>
-            <a class="btn-save" style="text-decoration:none"
+            <a class="btn-primary" style="text-decoration:none"
                href="?line=<?php echo $LID; ?>&v=<?php echo $VER + 1; ?>">
                 <i class="fa fa-copy"></i> نسخةٌ جديدة (<?php echo $VER + 1; ?>)</a>
         </div>

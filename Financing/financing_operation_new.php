@@ -136,7 +136,7 @@ include '../insidebar.php';
             <input type="number" step="0.01" name="installment_amount" placeholder="قيمة القسط (تُحسب إن تُركت)" aria-label="قيمة القسط (تُحسب إن تُركت)">
             <input type="date" name="first_due" title="استحقاق أول قسط — لتوليد الجدول آليًّا" aria-label="استحقاق أول قسط — لتوليد الجدول آليًّا">
             <input type="date" name="maturity_date" title="تاريخ النهاية" aria-label="تاريخ النهاية">
-            <button class="btn-save" type="submit" style="grid-column:span 4"
+            <button class="btn-primary" type="submit" style="grid-column:span 4"
                     onclick="if(!document.getElementById('model_code').value){alert('النموذج أولًا — اختره من الجدول أعلاه');return false;}">
                 إنشاء العملية وتوليد أقساطها
             </button>

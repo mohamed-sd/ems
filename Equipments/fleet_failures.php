@@ -249,7 +249,7 @@ $event_types_rows = $ff_gate->scopedQuery(
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search"></i> بحث
                             </button>
-                            <a href="fleet_failures.php" class="btn btn-light border">
+                            <a href="fleet_failures.php" class="btn btn-secondary border">
                                 <i class="fas fa-redo"></i> إعادة تعيين
                             </a>
                         </div>
@@ -393,7 +393,7 @@ $(document).ready(function() {
             {
                 extend: 'excelHtml5',
                 text: '<i class="fas fa-file-excel"></i> تصدير Excel',
-                className: 'btn btn-success',
+                className: 'btn btn-primary',
                 title: 'تقرير الأعطال',
                 exportOptions: {
                     columns: ':visible'
@@ -417,7 +417,7 @@ $(document).ready(function() {
             {
                 extend: 'print',
                 text: '<i class="fas fa-print"></i> طباعة',
-                className: 'btn btn-info'
+                className: 'btn btn-secondary'
             }
         ],
         order: [[1, 'desc']],

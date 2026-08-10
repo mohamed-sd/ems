@@ -83,7 +83,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><span class="badge badge-<?php echo in_array($t['current_level'], array('حرج', 'محظور'), true) ? 'danger' : 'secondary'; ?>">
                         <?php echo $t['current_level'] !== null && $t['current_level'] !== '' ? $t['current_level'] : 'لم يقيَّم'; ?></span></td>
                     <td><?php echo $t['state']; ?></td>
-                    <td><a href="risk_card.php?id=<?php echo (int) $t['id']; ?>" class="btn btn-sm btn-outline-dark">فتح</a></td></tr>
+                    <td><a href="risk_card.php?id=<?php echo (int) $t['id']; ?>" class="btn btn-sm btn-secondary">فتح</a></td></tr>
                 <?php endforeach; ?></tbody>
             </table></div>
             <?php if (empty($top)): ?><div id="rbEmpty"></div>
@@ -99,7 +99,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <b><?php echo htmlspecialchars($e['reason_ar']); ?></b>
                 <div class="text-muted"><?php echo ($e['risk_code'] ?: 'إشارة') . ' · إلى: ' . $e['to_authority'] . ' · ' . $e['created_at']; ?></div>
                 <?php if ($RISK_AUTHORITY === 'ceo' || $RISK_FULL): ?>
-                <button class="btn btn-sm btn-outline-success escAck" data-id="<?php echo (int) $e['id']; ?>">استلام</button>
+                <button class="btn btn-sm btn-primary escAck" data-id="<?php echo (int) $e['id']; ?>">استلام</button>
                 <?php endif; ?>
             </div>
             <?php endforeach; if (empty($escRows)): ?><small class="text-muted">لا تصعيدات تنتظر</small><?php endif; ?>

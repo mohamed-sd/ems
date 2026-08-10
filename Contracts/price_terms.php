@@ -249,7 +249,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="form-group"><label for="f_to">سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
             <div class="form-group"><label for="f_note">ملاحظة</label><input type="text" name="note" id="f_note" maxlength="255"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ الشرط</button></div>
+        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الشرط</button></div>
         </div></div>
     </form>
     <?php endif; ?>
@@ -337,7 +337,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                            placeholder="نشرةُ الأسعار الرسمية 2026/07 — ص3" id="emsf_86_62a3f"></div>
                 <div class="form-group"><label for="emsf_87_8b313">ملاحظة</label><input type="text" name="reading_note" maxlength="255" id="emsf_87_8b313"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل القراءة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل القراءة</button></div>
         </form>
         <div class="table-container" style="margin-top:14px">
             <table class="alltables display nowrap" style="width:100%">
@@ -365,7 +365,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div><label for="emsf_88_50f0f">تاريخ المراجعة</label>
                 <input type="date" name="as_of" value="<?php echo date('Y-m-d'); ?>" required id="emsf_88_50f0f"></div>
-            <button type="submit" class="btn-save"><i class="fa fa-play"></i> شغّل المراجعة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-play"></i> شغّل المراجعة</button>
             <span style="color:#666">تُولّد مراجعةً وملحقًا بسريانه — والاعتمادُ بيدٍ أخرى.</span>
         </form>
         <?php endif; ?>

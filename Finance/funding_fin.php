@@ -128,8 +128,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_236_4d9af">تاريخ البداية</label><input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_236_4d9af"></div>
             <div class="form-group"><label for="emsf_237_a0d82">عدد الأقساط <span class="required">*</span></label><input type="number" min="1" max="120" name="installments" value="12" required id="emsf_237_a0d82"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

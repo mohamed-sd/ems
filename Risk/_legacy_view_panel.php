@@ -27,7 +27,7 @@ if ($lv_res) { while ($lv_x = $lv_res->fetch_assoc()) { $lv_rows[] = $lv_x; } }
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <b><i class="fas fa-triangle-exclamation"></i> منظر نطاقي على السجل المركزي للمخاطر</b>
         <small class="text-muted"><?php echo htmlspecialchars(isset($legacy_view_note) ? $legacy_view_note : 'الخطر يُسجَّل مركزيًّا ويُعرض هنا بزاويته — هذه الشاشة ليست مصدرًا (M-16 ورقة 32)'); ?></small>
-        <a class="btn btn-sm btn-outline-dark" style="margin-inline-start:auto" href="../Risk/risk_register.php">السجل المركزي ↗</a>
+        <a class="btn btn-sm btn-secondary" style="margin-inline-start:auto" href="../Risk/risk_register.php">السجل المركزي ↗</a>
     </div>
     <?php if (empty($lv_rows)): ?>
         <div class="text-muted" style="font-size:.82rem;margin-top:6px">لا مخاطر مفتوحة في هذه الزاوية</div>

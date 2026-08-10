@@ -127,7 +127,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <form method="post" style="display:inline">
                             <input type="hidden" name="pe_action" value="toggle">
                             <input type="hidden" name="element_code" value="<?php echo htmlspecialchars((string)$e['element_code']); ?>">
-                            <button type="submit" class="btn-save">
+                            <button type="submit" class="btn-primary">
                                 <?php echo intval($e['active']) === 1 ? 'أوقفه' : 'فعّله'; ?></button>
                         </form>
                     <?php endif; ?></td>

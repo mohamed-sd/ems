@@ -1359,19 +1359,19 @@ body {
     border: 1px solid rgba(247,147,26,.24);
 }
 .rpt-filter .fc-filter-label { min-width: 100%; }
-.btn-filter {
+.btn-secondary {
     background: linear-gradient(120deg, var(--blue), var(--blue-l));
     border: none; color: #fff; border-radius: 10px; font-weight: 700;
     min-height: 38px; padding: 0 20px; font-size: .84rem;
     display: inline-flex; align-items: center; gap: 6px;
 }
-.btn-reset {
+.btn-secondary {
     background: #f1f5f9; border: 1px solid var(--line); color: var(--muted);
     border-radius: 10px; font-weight: 700; min-height: 38px;
     padding: 0 14px; font-size: .84rem; text-decoration: none;
     display: inline-flex; align-items: center; gap: 5px; transition: all .18s;
 }
-.btn-reset:hover { background: #e2e8f0; color: var(--txt); }
+.btn-secondary:hover { background: #e2e8f0; color: var(--txt); }
 
 /* ── KPI Grid — مطابقة لكاردات إحصائيات صفحة العملاء (.clients-main .stats-card) ── */
 .rpt-kpi-grid {
@@ -1461,10 +1461,10 @@ body {
 }
 .rpt-export-group { display: flex; gap: 6px; }
 .rpt-export-group .btn { border-radius: 999px; font-weight: 700; font-size: .8rem; padding: 5px 14px; }
-.btn-excel { background: linear-gradient(120deg, #16a34a, #4ade80); border: none; color: #fff; }
-.btn-excel:hover { background: linear-gradient(120deg, #15803d, #22c55e); color: #fff; }
-.btn-pdf   { background: linear-gradient(120deg, var(--red), #f87171); border: none; color: #fff; }
-.btn-pdf:hover { background: linear-gradient(120deg, #b91c1c, #ef4444); color: #fff; }
+.btn-secondary { background: linear-gradient(120deg, #16a34a, #4ade80); border: none; color: #fff; }
+.btn-secondary:hover { background: linear-gradient(120deg, #15803d, #22c55e); color: #fff; }
+.btn-secondary   { background: linear-gradient(120deg, var(--red), #f87171); border: none; color: #fff; }
+.btn-secondary:hover { background: linear-gradient(120deg, #b91c1c, #ef4444); color: #fff; }
 .rpt-data-body { padding: 6px 8px 8px; }
 .rpt-table-wrap { width: 100%; }
 
@@ -1833,10 +1833,10 @@ body {
             <?php endif; ?>
 
             <div class="col-auto d-flex gap-2 align-items-end fc-filter-actions">
-                <button type="submit" class="btn-filter btn">
+                <button type="submit" class="btn-secondary btn">
                     <i class="fas fa-search"></i> تطبيق
                 </button>
-                <a href="<?php echo rr(strtok($_SERVER['REQUEST_URI'], '?')); ?>" class="btn-reset">
+                <a href="<?php echo rr(strtok($_SERVER['REQUEST_URI'], '?')); ?>" class="btn-secondary">
                     <i class="fas fa-redo-alt"></i>
                 </a>
             </div>
@@ -1879,10 +1879,10 @@ body {
             </div>
             <?php if (!empty($rows) && !empty($headers)): ?>
             <form method="POST" action="?<?php echo rr($exportQs); ?>" class="rpt-export-group">
-                <button name="export_format" value="excel" type="submit" class="btn btn-excel">
+                <button name="export_format" value="excel" type="submit" class="btn btn-secondary">
                     <i class="fas fa-file-excel me-1"></i> Excel
                 </button>
-                <button name="export_format" value="pdf" type="submit" class="btn btn-pdf">
+                <button name="export_format" value="pdf" type="submit" class="btn btn-secondary">
                     <i class="fas fa-file-pdf me-1"></i> PDF
                 </button>
             </form>
@@ -1955,13 +1955,13 @@ $(function(){
                 {
                     extend: 'copyHtml5',
                     text: '<i class="fas fa-copy me-1"></i> نسخ',
-                    className: 'btn btn-sm btn-outline-secondary',
+                    className: 'btn btn-sm btn-secondary',
                     exportOptions: { columns: ':visible' }
                 },
                 {
                     extend: 'excelHtml5',
                     text: '<i class="fas fa-file-excel me-1"></i> Excel',
-                    className: 'btn btn-sm btn-success',
+                    className: 'btn btn-sm btn-primary',
                     exportOptions: { columns: ':visible' },
                     title: '<?php echo addslashes($page_title); ?>'
                 },
@@ -1977,7 +1977,7 @@ $(function(){
                 {
                     extend: 'print',
                     text: '<i class="fas fa-print me-1"></i> طباعة',
-                    className: 'btn btn-sm btn-outline-secondary',
+                    className: 'btn btn-sm btn-secondary',
                     exportOptions: { columns: ':visible' }
                 }
             ]

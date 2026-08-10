@@ -52,7 +52,7 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
             <?php if (empty($rb_quick)): ?>
                 <p class="text-muted" style="font-size:13px;margin:0">—</p>
             <?php else: foreach ($rb_quick as $qk): ?>
-                <a href="../<?php echo htmlspecialchars($qk['route']); ?>" class="btn-save" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px;padding:8px">
+                <a href="../<?php echo htmlspecialchars($qk['route']); ?>" class="btn-primary" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px;padding:8px">
                     <i class="<?php echo htmlspecialchars($qk['icon'] ?: 'fa fa-link'); ?>"></i> <?php echo htmlspecialchars($qk['label_ar']); ?>
                 </a>
             <?php endforeach; endif; ?>

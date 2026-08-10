@@ -173,8 +173,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" onclick="procToggleForm('lookupForm')"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <button type="button" class="btn-secondary" onclick="procToggleForm('lookupForm')"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>
@@ -259,8 +259,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <button type="button" class="btn-cancel" onclick="procToggleForm('whForm')"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <button type="button" class="btn-secondary" onclick="procToggleForm('whForm')"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

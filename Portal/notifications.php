@@ -117,7 +117,7 @@ include '../insidebar.php';
                 <span class="text-muted" style="font-size:.8rem">— الاحتفاظ 90 يومًا (قرار 8)</span></h6>
             <?php if ($unread): ?>
             <form method="post"><input type="hidden" name="action" value="ntf_read_all">
-                <button class="btn btn-sm btn-outline-secondary">تعليم الكل مقروءًا</button></form>
+                <button class="btn btn-sm btn-secondary">تعليم الكل مقروءًا</button></form>
             <?php endif; ?>
         </div>
         <div class="table-responsive">
@@ -147,11 +147,11 @@ include '../insidebar.php';
                     <td>
                         <?php if ($isUnread): ?>
                         <form method="post" style="display:inline"><input type="hidden" name="action" value="ntf_read"><input type="hidden" name="notif_id" value="<?php echo $nid; ?>">
-                            <button class="btn btn-sm btn-outline-secondary">قُرئ</button></form>
+                            <button class="btn btn-sm btn-secondary">قُرئ</button></form>
                         <?php endif; ?>
                         <?php if ($n['requires_action']): ?>
                             <?php if (!empty($n['task_item_id'])): ?>
-                                <a class="btn btn-sm btn-outline-primary" href="my_tasks.php?view=today">WI-<?php echo intval($n['task_item_id']); ?></a>
+                                <a class="btn btn-sm btn-secondary" href="my_tasks.php?view=today">WI-<?php echo intval($n['task_item_id']); ?></a>
                             <?php else: ?>
                             <form method="post" style="display:inline"><input type="hidden" name="action" value="ntf_to_task"><input type="hidden" name="notif_id" value="<?php echo $nid; ?>">
                                 <button class="btn btn-sm btn-primary" title="WF-06: التنبيه ذو الفعل يتحول مهمة">تحويل لمهمة</button></form>

@@ -693,8 +693,8 @@ function mnt_state_class($st) {
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ بيانات الأمر</button>
-                <button type="button" class="btn-cancel" id="collapseOrderForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ بيانات الأمر</button>
+                <button type="button" class="btn-secondary" id="collapseOrderForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
             </div>
         </div></div>
     </form>
@@ -755,8 +755,8 @@ function mnt_state_class($st) {
                         <div class="form-group"><label for="emsf_320_14024">تكلفة الساعة</label><input type="number" step="0.01" name="hourly_rate" value="0" id="emsf_320_14024"></div>
                     </div>
                     <div class="mnt-line-actions">
-                        <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إضافة السطر</button>
-                        <button type="button" class="btn-cancel mnt-line-cancel" data-target="laborForm"><i class="fas fa-times"></i> إلغاء</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إضافة السطر</button>
+                        <button type="button" class="btn-secondary mnt-line-cancel" data-target="laborForm"><i class="fas fa-times"></i> إلغاء</button>
                     </div>
                 </form>
                 <?php endif; ?>
@@ -800,8 +800,8 @@ function mnt_state_class($st) {
                         <div class="form-group"><label>مكوّن رئيسي؟</label><label class="mnt-major-chk"><input type="checkbox" name="is_major_component" value="1"><span>نعم، مكوّن رئيسي</span></label></div>
                     </div>
                     <div class="mnt-line-actions">
-                        <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إضافة السطر</button>
-                        <button type="button" class="btn-cancel mnt-line-cancel" data-target="partForm"><i class="fas fa-times"></i> إلغاء</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إضافة السطر</button>
+                        <button type="button" class="btn-secondary mnt-line-cancel" data-target="partForm"><i class="fas fa-times"></i> إلغاء</button>
                     </div>
                 </form>
                 <?php endif; ?>
@@ -905,8 +905,8 @@ function mnt_state_class($st) {
                 </div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إنشاء الأمر</button>
-                <button type="button" class="btn-cancel" id="cancelOrderCreateForm"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إنشاء الأمر</button>
+                <button type="button" class="btn-secondary" id="cancelOrderCreateForm"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

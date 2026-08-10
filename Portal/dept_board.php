@@ -303,7 +303,7 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($isUmbrella): ?>
-    <p><a href="dept_board.php" class="btn btn-sm btn-outline-secondary">↩ لوحة الإدارات كلها</a></p>
+    <p><a href="dept_board.php" class="btn btn-sm btn-secondary">↩ لوحة الإدارات كلها</a></p>
   <?php endif; ?>
   <p style="color:#666" title="لماذا أرى هذا؟">
     العضوية من الهيكل لا من قوائم: أدوار الوحدة «<?= htmlspecialchars($deptOwner) ?>» في خريطة الـ17

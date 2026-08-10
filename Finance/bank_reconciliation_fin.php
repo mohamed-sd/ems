@@ -289,7 +289,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     placeholder="2026-07-01 | تحصيل عميل | deposit | 1000.00 | REF-001" id="emsf_213_646db"></textarea>
                 <small style="color:#6b7280">سطرٌ <strong>بلا مرجعٍ بنكيٍّ يُرفض ويُعلَن</strong> — ولا يُخترع له مفتاح.</small>
             </div></div>
-            <div class="form-actions"><button type="submit" class="btn-save">
+            <div class="form-actions"><button type="submit" class="btn-primary">
                 <i class="fas fa-file-import"></i> استورد الكشف</button></div>
         </form>
         <?php endif; ?>
@@ -338,12 +338,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form method="post" style="display:inline">
                 <input type="hidden" name="h13" value="automatch">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-wand-magic-sparkles"></i> مضاهاةٌ آلية</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> مضاهاةٌ آلية</button>
             </form>
             <form method="post" style="display:inline">
                 <input type="hidden" name="h13" value="close">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                <button type="submit" class="btn-save"><i class="fa fa-lock"></i> أقفل الكشف</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-lock"></i> أقفل الكشف</button>
             </form>
         </div>
         <?php endif; ?>
@@ -445,7 +445,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <strong><i class="fas fa-building-columns"></i> الحساب البنكي:</strong>
             <select name="acct" onchange="this.form.submit()" style="min-width:240px"><?php echo fin_bank_account_options($conn, $is_super_admin, $company_id, $sel_acct); ?></select>
             <?php if ($sel_acct > 0 && $can_edit): ?>
-                <a href="?acct=<?php echo $sel_acct; ?>&automatch=1&_t=<?php echo fin_action_token(); ?>" class="btn-save" style="text-decoration:none" onclick="return confirm('مطابقة آلية بالمبلغ والاتجاه؟')"><i class="fas fa-wand-magic-sparkles"></i> مطابقة آلية</a>
+                <a href="?acct=<?php echo $sel_acct; ?>&automatch=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary" style="text-decoration:none" onclick="return confirm('مطابقة آلية بالمبلغ والاتجاه؟')"><i class="fas fa-wand-magic-sparkles"></i> مطابقة آلية</a>
             <?php endif; ?>
         </form>
         <?php if ($sel_acct > 0): ?>
@@ -466,8 +466,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_216_dd679">رقم الحساب</label><input type="text" name="account_number" id="emsf_216_dd679"></div>
             <div class="form-group"><label for="emsf_217_4b4a7">الرصيد الافتتاحي</label><input type="number" step="0.01" name="opening_balance" value="0" id="emsf_217_4b4a7"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#acctForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#acctForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 
@@ -481,8 +481,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_220_77d51">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_220_77d51"></div>
             <div class="form-group" style="grid-column:1/-1"><label for="emsf_221_2b7d1">الوصف</label><input type="text" name="description" id="emsf_221_2b7d1"></div>
         </div></div>
-        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-            <button type="button" class="btn-cancel" onclick="$('#lineForm').removeClass('allforms-visible')">إلغاء</button></div>
+        <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-secondary" onclick="$('#lineForm').removeClass('allforms-visible')">إلغاء</button></div>
         </div></div>
     </form>
 

@@ -193,8 +193,8 @@ $stage_colors = array(
                 <div class="filter-field"><label for="emsf_509_54a4d">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_509_54a4d"></div>
                 <div class="filter-field"><label for="emsf_510_a5f1b">إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_510_a5f1b"></div>
                 <div class="filter-actions">
-                    <button type="submit" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
-                    <a href="ticket_dashboard.php" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>
+                    <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+                    <a href="ticket_dashboard.php" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>
                 </div>
             </form>
         </div>

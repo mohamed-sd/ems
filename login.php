@@ -352,7 +352,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       cursor: pointer;
     }
 
-    .btn-submit {
+    .btn-primary {
       width: 100%;
       height: 43px;
       border: 0;
@@ -371,12 +371,12 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       transition: transform .16s ease, box-shadow .16s ease;
     }
 
-    .btn-submit:hover {
+    .btn-primary:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 18px rgba(159, 133, 0, 0.42);
     }
 
-    .btn-submit:disabled {
+    .btn-primary:disabled {
       opacity: .76;
       cursor: not-allowed;
       transform: none;
@@ -465,7 +465,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       .title { font-size: 30px; }
       .subtitle { font-size: 14px; }
       .input-wrap input { font-size: 21px; }
-      .btn-submit { font-size: 26px; }
+      .btn-primary { font-size: 26px; }
       .p-link { font-size: 15px; }
     }
   </style>
@@ -536,7 +536,7 @@ if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) 
 
       <input type="hidden" name="csrf_token" value="<?php echo $csrfH; ?>">
 
-      <button type="submit" class="btn-submit" id="submitBtn">
+      <button type="submit" class="btn-primary" id="submitBtn">
         <i class="fas fa-arrow-left"></i>
         <span>دخول النظام</span>
       </button>

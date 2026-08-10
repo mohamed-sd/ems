@@ -189,7 +189,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
                 <div class="form-group"><label for="emsf_160_5f7c8">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_160_5f7c8"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>
     </div></div>
     <?php endif; ?>
@@ -269,7 +269,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="reset_doc_ref" required maxlength="120"
                            placeholder="محضرُ ورشة 2026/114" id="emsf_164_59aff"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-rotate-left"></i> تصفير</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-rotate-left"></i> تصفير</button></div>
         </form>
     </div></div>
     <?php endif; ?>

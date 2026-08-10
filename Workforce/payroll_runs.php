@@ -213,7 +213,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                 </select>
             </div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> فتح</button></div>
+        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح</button></div>
         </div></div>
     </form>
     <?php endif; ?>
@@ -237,7 +237,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                 <form method="post" style="display:inline">
                     <input type="hidden" name="pr_action" value="bind">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-save"><i class="fa fa-link"></i> اربط اللقطات</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-link"></i> اربط اللقطات</button>
                 </form>
             <?php else: ?></form><?php endif; ?>
             <?php if ($run !== null && $can_edit
@@ -245,17 +245,17 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                 <form method="post" style="display:inline">
                     <input type="hidden" name="pr_action" value="time_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-save"><i class="fa fa-clock"></i> المسارُ الزمني</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-clock"></i> المسارُ الزمني</button>
                 </form>
                 <form method="post" style="display:inline">
                     <input type="hidden" name="pr_action" value="production_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-save"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
                 </form>
                 <form method="post" style="display:inline">
                     <input type="hidden" name="pr_action" value="offsets">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-save"><i class="fa fa-scale-balanced"></i> المقاصّة</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-scale-balanced"></i> المقاصّة</button>
                 </form>
             <?php endif; ?>
 
@@ -274,7 +274,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                         <input type="text" name="payment_ref" placeholder="مرجع الصرف (إلزامي)"
                                required style="max-width:200px" aria-label="مرجع الصرف (إلزامي)">
                     <?php endif; ?>
-                    <button type="submit" class="btn-save">→ <?php echo htmlspecialchars(PSM::labelAr($to)); ?></button>
+                    <button type="submit" class="btn-primary">→ <?php echo htmlspecialchars(PSM::labelAr($to)); ?></button>
                 </form>
             <?php endforeach; ?>
             <?php if (!$allowed): ?><span style="color:#666">حالةٌ نهائية — التصحيحُ بحدثٍ عاكسٍ لا بتعديل</span><?php endif; ?>
@@ -357,7 +357,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                            placeholder="إذنُ عملٍ إضافي 2047/114" id="emsf_1757_ed8d0"></div>
                 <div class="form-group"><label for="emsf_1758_457e2">ملاحظة</label><input type="text" name="input_note" maxlength="255" id="emsf_1758_457e2"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>
     </div></div>
     <?php endif; ?>

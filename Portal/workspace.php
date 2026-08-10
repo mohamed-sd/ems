@@ -131,7 +131,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <h6 style="margin-top:14px"><i class="fa fa-gavel"></i> ما يحتاج قرارًا
                     <small style="color:#888">(القرارُ في صندوق مالكه لا هنا)</small></h6>
                 <?php foreach ($feed['decisions'] as $d): ?>
-                    <a class="btn-save" href="../<?php echo htmlspecialchars($d['link']); ?>">
+                    <a class="btn-primary" href="../<?php echo htmlspecialchars($d['link']); ?>">
                         <?php echo htmlspecialchars($d['box']); ?> — <?php echo intval($d['count']); ?></a>
                 <?php endforeach; ?>
                 <?php endif; ?>

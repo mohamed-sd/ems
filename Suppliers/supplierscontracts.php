@@ -685,10 +685,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 
             <div class="pu-form-actions">
-              <button type="submit" class="btn-submit">
+              <button type="submit" class="btn-primary">
                 <i class="fas fa-save"></i> حفظ البيانات
               </button>
-              <button type="button" id="contractFormCancelBtn" class="btn-cancel">
+              <button type="button" id="contractFormCancelBtn" class="btn-secondary">
                 <i class="fas fa-times"></i> إلغاء
               </button>
             </div>

@@ -155,7 +155,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="due_date" required id="emsf_1380_f9346"></div>
                 <div class="form-group"><label for="emsf_1381_01a35">عنوانٌ</label><input type="text" name="title" maxlength="160" id="emsf_1381_01a35"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save">
+            <div style="margin-top:12px"><button type="submit" class="btn-primary">
                 <i class="fa fa-file-circle-plus"></i> افتح طلبًا من التزامات العقد</button></div>
         </form>
         <?php endif; ?>
@@ -201,7 +201,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form method="post" style="display:inline">
                 <input type="hidden" name="rfq_action" value="<?php echo $a; ?>">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
-                <button type="submit" class="btn-save"><?php echo $lbl; ?></button>
+                <button type="submit" class="btn-primary"><?php echo $lbl; ?></button>
             </form>
             <?php endforeach; ?>
         </div>
@@ -251,7 +251,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
                 <input type="text" name="award_reason" maxlength="200" style="width:260px"
                        placeholder="حجّةُ الاختيار حين لا يكون الأرخص" aria-label="حجّةُ الاختيار حين لا يكون الأرخص">
-                <button type="submit" class="btn-save"><i class="fa fa-gavel"></i> ترسية</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-gavel"></i> ترسية</button>
             </form>
             <?php endif; ?>
 
@@ -274,7 +274,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label for="emsf_1386_46935">العملة</label>
                         <input type="text" name="currency" value="SDG" maxlength="8" id="emsf_1386_46935"></div>
                 </div>
-                <div style="margin-top:8px"><button type="submit" class="btn-save">
+                <div style="margin-top:8px"><button type="submit" class="btn-primary">
                     <i class="fa fa-plus"></i> سجّل عرضًا</button></div>
             </form>
             <?php endif; ?>

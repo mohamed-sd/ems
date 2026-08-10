@@ -1069,11 +1069,11 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     </div>
 
                     <div class="pu-form-actions">
-                        <button type="submit" class="btn-submit">
+                        <button type="submit" class="btn-primary">
                             <i class="fas fa-save"></i>
                             <span><?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?></span>
                         </button>
-                        <button type="button" id="equipmentFormCancelBtn" class="btn-cancel"
+                        <button type="button" id="equipmentFormCancelBtn" class="btn-secondary"
                             onclick="document.getElementById('projectForm').classList.remove('allforms-visible'); document.getElementById('projectForm').reset();">
                             <i class="fas fa-times"></i>
                             إلغاء
@@ -1097,7 +1097,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
             <div class="filters-container">
                 <div class="filters-header">
                     <h6><i class="fas fa-filter"></i> فلترة المعدات</h6>
-                    <button type="button" class="btn-clear-filters" id="clearFiltersBtn">
+                    <button type="button" class="btn-secondary" id="clearFiltersBtn">
                         <i class="fas fa-times-circle"></i> إلغاء الفلاتر
                     </button>
                 </div>
@@ -1272,7 +1272,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                                                         <i class='fas fa-eye'></i>
                                                     </a>";
                             if ($can_edit) {
-                                echo "<a href='equipments_fleet.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                                echo "<a href='equipments_fleet.php?edit=" . $row['id'] . "' class='action-btn btn-secondary' title='تعديل'>
                                                                         <i class='fas fa-edit'></i>
                                                                     </a>";
                             }
@@ -1547,9 +1547,9 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     updateFiltersSummary();
 
                     // تأثير بصري
-                    $(this).addClass('btn-clear-active');
+                    $(this).addClass('btn-secondary');
                     setTimeout(function () {
-                        $('#clearFiltersBtn').removeClass('btn-clear-active');
+                        $('#clearFiltersBtn').removeClass('btn-secondary');
                     }, 300);
                 });
 

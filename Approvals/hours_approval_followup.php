@@ -301,8 +301,8 @@ include('../inheader.php');
   $header_title   = 'متابعة الاعتمادات المنقولة';
   $header_icon    = 'fa fa-route';
   $header_actions = array(
-      array('href' => 'hours_approval.php', 'class' => 'add-btn btn btn-light btn-sm fw-bold', 'icon' => 'fa fa-arrow-right', 'label' => 'شاشة الاعتماد'),
-      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-outline-light btn-sm fw-bold', 'icon' => 'fa fa-home', 'label' => 'لوحة التحكم'),
+      array('href' => 'hours_approval.php', 'class' => 'add-btn btn btn-secondary btn-sm fw-bold', 'icon' => 'fa fa-arrow-right', 'label' => 'شاشة الاعتماد'),
+      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-secondary btn-sm fw-bold', 'icon' => 'fa fa-home', 'label' => 'لوحة التحكم'),
   );
   $header_back = array();
   include('../includes/page_header.php');
@@ -333,7 +333,7 @@ include('../inheader.php');
         <i class="fa fa-filter me-1"></i> تطبيق الفلتر
       </button>
       <?php if ($equip_type_filter > 0): ?>
-        <a href="?" class="btn btn-sm btn-outline-secondary">
+        <a href="?" class="btn btn-sm btn-secondary">
           <i class="fa fa-times me-1"></i> إلغاء الفلتر
         </a>
       <?php endif; ?>
@@ -416,7 +416,7 @@ include('../inheader.php');
     </div>
     <div class="btns">
       <button type="button" class="btn btn-primary" onclick="applyFollowupFilters()"><i class="fa fa-filter"></i> تطبيق</button>
-      <button type="button" class="btn btn-outline-secondary" onclick="resetFollowupFilters()"><i class="fa fa-rotate-left"></i> إلغاء</button>
+      <button type="button" class="btn btn-secondary" onclick="resetFollowupFilters()"><i class="fa fa-rotate-left"></i> إلغاء</button>
     </div>
   </div>
 
@@ -509,7 +509,7 @@ include('../inheader.php');
               </button>
             </td>
             <td>
-              <a class="btn btn-sm btn-outline-primary" target="_blank" href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>">
+              <a class="btn btn-sm btn-secondary" target="_blank" href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>">
                 <i class="fa fa-eye"></i>
               </a>
             </td>
@@ -579,7 +579,7 @@ include('../inheader.php');
       </div>
       <div class="btns">
         <button type="button" class="btn btn-primary" onclick="applyFinalFilters()"><i class="fa fa-filter"></i> تطبيق</button>
-        <button type="button" class="btn btn-outline-secondary" onclick="resetFinalFilters()"><i class="fa fa-rotate-left"></i> إلغاء</button>
+        <button type="button" class="btn btn-secondary" onclick="resetFinalFilters()"><i class="fa fa-rotate-left"></i> إلغاء</button>
       </div>
     </div>
 
@@ -645,7 +645,7 @@ include('../inheader.php');
               </button>
             </td>
             <td>
-              <a class="btn btn-sm btn-outline-primary" target="_blank" href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>">
+              <a class="btn btn-sm btn-secondary" target="_blank" href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>">
                 <i class="fa fa-eye"></i>
               </a>
             </td>
@@ -664,7 +664,7 @@ include('../inheader.php');
     <div class="modal-content" dir="rtl">
       <div class="modal-header" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;">
         <h5 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle me-2"></i> تفاصيل الأعطال — التايم شيت #<span id="fup-fault-ts-id">—</span></h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" id="fupFaultModalBody">
         <div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>
@@ -700,7 +700,7 @@ include('../inheader.php');
         </div>
         <div class="mt-3 d-flex gap-2">
           <button type="button" class="btn btn-primary btn-sm" onclick="submitNote()"><i class="fa fa-save"></i> حفظ</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">إغلاق</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إغلاق</button>
         </div>
       </div>
     </div>

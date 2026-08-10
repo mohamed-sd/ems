@@ -159,7 +159,7 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
     if (empty($header_no_report) && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'ticket_contextual_open.php') {
         $__rbScreen = trim(str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
         $__rbScreen = basename($__rbScreen) . '/' . basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
-        echo '<form method="post" action="../Tickets/ticket_contextual_open.php" style="display:inline" class="ems-report-btn-form">'
+        echo '<form method="post" action="../Tickets/ticket_contextual_open.php" style="display:inline" class="ems-report-btn-secondary">'
             . '<input type="hidden" name="ctx_screen" value="' . htmlspecialchars($__rbScreen, ENT_QUOTES, 'UTF-8') . '">'
             . '<button type="submit" class="head_back ems-head-circle" title="أبلغ عن مشكلة" '
             . 'style="border:0;background:transparent;cursor:pointer;color:#c0392b">'

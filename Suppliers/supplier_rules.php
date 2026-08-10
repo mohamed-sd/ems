@@ -192,7 +192,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="emsf_1468_495a4">سريان إلى</label><input type="date" name="valid_to" id="emsf_1468_495a4"></div>
                 <div class="form-group"><label for="emsf_1469_989cd">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1469_989cd"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
@@ -295,7 +295,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <input type="date" name="pvalid_from" required id="emsf_1478_8080c"></div>
                 <div class="form-group"><label for="emsf_1479_62c2a">سريان إلى</label><input type="date" name="pvalid_to" id="emsf_1479_62c2a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
         </form>
     </div></div>
     <?php endif; ?>

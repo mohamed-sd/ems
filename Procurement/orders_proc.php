@@ -266,7 +266,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
         . '<div class="form-group"><label for="emsf_397_095f6">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_397_095f6"></div>'
         . '<div class="form-group"><label for="emsf_398_1f5e1">سعر الوحدة</label><input type="number" step="0.01" name="line_price[]" class="line-price" value="' . $price . '" id="emsf_398_1f5e1"></div>'
         . '<div class="form-group"><label for="emsf_399_cdfeb">تصنيف السطر</label><select name="line_class[]" id="emsf_399_cdfeb">' . $clsopts . '</select></div>'
-        . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
+        . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
 ?>
@@ -331,7 +331,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <div class="form-group"><label for="emsf_402_52f9c">قيمتها</label>
                         <input type="number" step="0.01" name="invoice_amount" required
                                value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>" id="emsf_402_52f9c"></div>
-                    <button type="submit" class="btn-save"><i class="fas fa-scale-balanced"></i> طابِق</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-scale-balanced"></i> طابِق</button>
                 </form>
             <?php endif; ?>
         </div>
@@ -371,7 +371,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                                     <input type="hidden" name="action" value="archive_landed_cost">
                                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
                                     <input type="hidden" name="landed_id" value="<?php echo intval($__l['id']); ?>">
-                                    <button type="submit" class="btn-cancel" style="padding:2px 8px" title="أرشفة"><i class="fas fa-box-archive"></i></button>
+                                    <button type="submit" class="btn-secondary" style="padding:2px 8px" title="أرشفة"><i class="fas fa-box-archive"></i></button>
                                 </form>
                                 <?php endif; ?>
                             </td>
@@ -397,7 +397,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <input type="number" step="0.0001" min="0.0001" name="lc_fx" value="<?php echo htmlspecialchars((string)$edit['fx_rate']); ?>" id="emsf_407_2ec27"></div>
                 <div class="form-group"><label for="emsf_408_b1808">مقدم الخدمة</label>
                     <select name="lc_supplier_id" id="emsf_408_b1808"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-                <button type="submit" class="btn-save"><i class="fas fa-ship"></i> رسملة</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-ship"></i> رسملة</button>
             </form>
             <?php elseif (!$__gated): ?>
                 <div class="alert alert-info" style="margin:0">تُرسمَل بعد بلوغ الأمر الاستلامَ النهائي — المصاريفُ تُعرف عند الوصول.</div>
@@ -491,8 +491,8 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <a href="orders_proc.php" class="btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                <a href="orders_proc.php" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</a>
             </div>
         </div></div>
     </form>

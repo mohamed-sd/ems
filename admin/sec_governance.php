@@ -191,7 +191,7 @@ include '../insidebar.php';
                 <select name="person_id" id="emsf_696_6318c"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '"' . (isset($_POST['person_id']) && intval($_POST['person_id']) === intval($u['id']) ? ' selected' : '') . '>' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_697_c288a">الصلاحية</label><input type="text" name="permission_code" value="<?php echo htmlspecialchars($_POST['permission_code'] ?? ''); ?>" placeholder="unit.approve" required id="emsf_697_c288a"></div>
             <div class="form-group"><label for="emsf_698_d6fe5">النطاق</label><input type="text" name="scope" value="<?php echo htmlspecialchars($_POST['scope'] ?? ''); ?>" placeholder="site:18" required id="emsf_698_d6fe5"></div>
-            <button type="submit" class="btn-save">فسّر</button>
+            <button type="submit" class="btn-primary">فسّر</button>
         </form>
         <?php if ($explainResult !== null): ?>
         <pre style="direction:ltr;text-align:left;background:#f7f7f7;padding:12px;border-radius:8px;max-height:320px;overflow:auto"><?php
@@ -233,11 +233,11 @@ include '../insidebar.php';
                         <form method="post" style="display:inline"><input type="hidden" name="gov_action" value="decide_pcr">
                             <input type="hidden" name="req_id" value="<?php echo intval($x['req_id']); ?>">
                             <input type="hidden" name="decision" value="approve">
-                            <button class="btn-save" type="submit">أوافق (بدوري)</button></form>
+                            <button class="btn-primary" type="submit">أوافق (بدوري)</button></form>
                     <?php elseif ($can_edit && $x['state'] === 'approved'): ?>
                         <form method="post" style="display:inline"><input type="hidden" name="gov_action" value="apply_pcr">
                             <input type="hidden" name="req_id" value="<?php echo intval($x['req_id']); ?>">
-                            <button class="btn-save" type="submit">طبّق</button></form>
+                            <button class="btn-primary" type="submit">طبّق</button></form>
                     <?php endif; ?>
                     </td></tr>
             <?php endforeach; ?>
@@ -265,7 +265,7 @@ include '../insidebar.php';
             <div class="form-group"><label for="emsf_700_fe2f8">الفترة</label><input type="text" name="period" placeholder="2026-H2" required id="emsf_700_fe2f8"></div>
             <div class="form-group"><label for="emsf_701_1e14c">المدير الموقِّع</label>
                 <select name="manager_person_id" id="emsf_701_1e14c"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
-            <button type="submit" class="btn-save">افتح مراجعة نصف سنوية</button>
+            <button type="submit" class="btn-primary">افتح مراجعة نصف سنوية</button>
         </form>
         <?php endif; ?>
         <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
@@ -300,11 +300,11 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-body">
-        <strong>② العمل اليومي:</strong> <a class="btn-save" href="sec_employee_wizard.php">معالج إعداد موظف — إحدى عشرة خطوة ▸</a>
+        <strong>② العمل اليومي:</strong> <a class="btn-primary" href="sec_employee_wizard.php">معالج إعداد موظف — إحدى عشرة خطوة ▸</a>
         &nbsp; <strong>③ السجلات:</strong>
-        <a class="btn-save" href="org_assignments.php">التكليفات ▸</a>
-        <a class="btn-save" href="../admin/permissions/">قوالب الصلاحيات القديمة ▸</a>
-        <a class="btn-save" href="../Governance/signing_authority.php">التفويضات ▸</a>
+        <a class="btn-primary" href="org_assignments.php">التكليفات ▸</a>
+        <a class="btn-primary" href="../admin/permissions/">قوالب الصلاحيات القديمة ▸</a>
+        <a class="btn-primary" href="../Governance/signing_authority.php">التفويضات ▸</a>
     </div></div>
 </div>
 

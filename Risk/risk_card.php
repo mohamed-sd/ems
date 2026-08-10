@@ -173,7 +173,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <form id="rskLinkForm" class="ems-toolbar" style="margin-top:8px">
                 <input type="number" name="control_id" class="form-control" placeholder="رقم الضابط" style="max-width:140px" required aria-label="رقم الضاب?">
                 <button class="ems-btn-secondary" type="submit">ربط ضابط</button>
-                <a class="ems-btn-tertiary" href="risk_controls.php">سجل الضوابط ↗</a>
+                <a class="ems-btn-ghost" href="risk_controls.php">سجل الضوابط ↗</a>
             </form>
             <?php endif; ?>
         </div>
@@ -185,7 +185,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     · <?php echo htmlspecialchars($t['action_owner'] ?: ''); ?> · قبل <?php echo $t['due_date']; ?>
                     · <span class="badge badge-<?php echo $t['state'] === 'verified' ? 'success' : 'secondary'; ?>"><?php echo $t['state']; ?></span>
                     <?php if ($canWrite && $t['state'] === 'done'): ?>
-                    <button class="btn btn-sm btn-outline-success rskVerifyTreat" data-id="<?php echo (int) $t['id']; ?>">قبول الدليل</button>
+                    <button class="btn btn-sm btn-primary rskVerifyTreat" data-id="<?php echo (int) $t['id']; ?>">قبول الدليل</button>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

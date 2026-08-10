@@ -131,7 +131,7 @@ if (!function_exists('ems_state_empty')) {
            . '<i class="fa fa-inbox" style="font-size:2rem;color:#d9cfae"></i>'
            . '<p style="margin:10px 0">' . htmlspecialchars((string) $message) . '</p>';
         if ($ctaLabel !== '' && $ctaHref !== '') {
-            echo '<a class="btn-save" href="' . htmlspecialchars((string) $ctaHref) . '">'
+            echo '<a class="btn-primary" href="' . htmlspecialchars((string) $ctaHref) . '">'
                . '<i class="fa fa-plus"></i> ' . htmlspecialchars((string) $ctaLabel) . '</a>';
         }
         echo '</div>';
@@ -147,7 +147,7 @@ if (!function_exists('ems_state_error')) {
            . htmlspecialchars((string) $message) . '</span>';
         if ($ctaLabel !== '') {
             $href = $ctaHref !== '' ? $ctaHref : ($_SERVER['REQUEST_URI'] ?? '');
-            echo '<a class="btn-save" href="' . htmlspecialchars((string) $href) . '">'
+            echo '<a class="btn-primary" href="' . htmlspecialchars((string) $href) . '">'
                . htmlspecialchars((string) $ctaLabel) . '</a>';
         }
         echo '</div>';

@@ -119,9 +119,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ المعدّل</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ المعدّل</button>
                 <?php if ($cur_active): ?>
-                <button type="submit" name="rate" value="" class="btn-cancel" onclick="return confirm('إفراغ المعدّل يوقف احتساب مخصّص الصيانة. متابعة؟')"><i class="fas fa-eraser"></i> إفراغ (تعطيل)</button>
+                <button type="submit" name="rate" value="" class="btn-secondary" onclick="return confirm('إفراغ المعدّل يوقف احتساب مخصّص الصيانة. متابعة؟')"><i class="fas fa-eraser"></i> إفراغ (تعطيل)</button>
                 <?php endif; ?>
             </div>
         </form>

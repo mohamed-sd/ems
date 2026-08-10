@@ -167,7 +167,7 @@ include '../insidebar.php';
                 <option value="holding">قابضة</option><option value="project">مشروعية</option>
                 <option value="government">جهة حكومية</option>
             </select>
-            <button class="btn-save" type="submit" style="grid-column:span 4">إنشاء الكيان بصفته</button>
+            <button class="btn-primary" type="submit" style="grid-column:span 4">إنشاء الكيان بصفته</button>
         </form>
     </div></div>
     <?php endif; ?>

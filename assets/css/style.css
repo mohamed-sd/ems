@@ -11,9 +11,9 @@
   /* Background base */
   --text-color: var(--c-131722);
   /* Text */
-  --btn-color: var(--c-f7931a);
+  --btn-secondary: var(--c-f7931a);
   /* Buttons */
-  --btn-hover: var(--c-e67e00);
+  --btn-secondary: var(--c-e67e00);
   /* Darker button */
   --gray-color: var(--c-7a4a00);
   /* Sidebar hover */
@@ -51,7 +51,7 @@ body {
 .login-container h2 {
   text-align: center;
   margin-bottom: 25px;
-  color: var(--btn-color);
+  color: var(--btn-secondary);
 }
 
 .login-container input {
@@ -66,7 +66,7 @@ body {
 }
 
 .login-container input:focus {
-  border-color: var(--btn-color);
+  border-color: var(--btn-secondary);
   box-shadow: 0 0 4px var(--c-rgba2551705105);
   outline: none;
   text-align: center;
@@ -75,7 +75,7 @@ body {
 .login-container button {
   width: 100%;
   padding: 12px;
-  background-color: var(--btn-color);
+  background-color: var(--btn-secondary);
   border: none;
   color: var(--c-surface);
   font-size: 18px;
@@ -86,7 +86,7 @@ body {
 }
 
 .login-container button:hover {
-  background-color: var(--btn-hover);
+  background-color: var(--btn-secondary);
 }
 
 .login-container .forgot {
@@ -96,7 +96,7 @@ body {
 }
 
 .login-container .forgot a {
-  color: var(--btn-color);
+  color: var(--btn-secondary);
   text-decoration: none;
 }
 
@@ -387,7 +387,7 @@ body {
 .main h2 {
   margin-right: 35px;
   color: var(--brand-black);
-  background-color: var(--btn-color);
+  background-color: var(--btn-secondary);
   padding: 10px 20px;
   border-radius: 20px;
   font-size: 23px;
@@ -766,7 +766,7 @@ label {
 .main input[type="button"],
 .main a.add,
 .main .add,
-.ems-btn-unified {
+.ems-btn-primary {
   border-radius: 10px;
   font-weight: 700;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -778,29 +778,29 @@ label {
 .main input[type="button"]:hover,
 .main a.add:hover,
 .main .add:hover,
-.ems-btn-unified:hover {
+.ems-btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 16px var(--c-rgba152342012);
 }
 
-.ems-btn-add {
+.ems-btn-primary {
   background-color: var(--ems-success) !important;
   color: var(--c-surface) !important;
   border-color: var(--ems-success) !important;
 }
 
-.ems-btn-add:hover {
+.ems-btn-primary:hover {
   background-color: var(--ems-success-hover) !important;
   border-color: var(--ems-success-hover) !important;
 }
 
-.ems-btn-back {
+.ems-btn-secondary {
   background-color: var(--ems-accent) !important;
   color: var(--ems-ink) !important;
   border-color: var(--ems-accent) !important;
 }
 
-.ems-btn-back:hover {
+.ems-btn-secondary:hover {
   background-color: var(--ems-accent-hover) !important;
   border-color: var(--ems-accent-hover) !important;
 }

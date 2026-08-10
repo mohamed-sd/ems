@@ -158,7 +158,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo (string)$i['state'] === 'issued'
                         ? "<span class='badge badge-success'>صادرة</span>"
                         : "<span class='badge badge-danger' title='" . htmlspecialchars((string)$i['cancel_reason']) . "'>ملغاة</span>"; ?></td>
-                    <td><a class="btn-save" href="tax_invoices.php?open=<?php echo intval($i['id']); ?>">اعرضها</a></td>
+                    <td><a class="btn-primary" href="tax_invoices.php?open=<?php echo intval($i['id']); ?>">اعرضها</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -231,8 +231,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
         <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-            <button type="button" class="btn-save" onclick="window.print()"><i class="fa fa-print"></i> الطباعة الرسمية</button>
-            <a class="btn-save" href="notes.php?invoice_no=<?php echo rawurlencode((string)$openInv['serial_no']); ?>">
+            <button type="button" class="btn-primary" onclick="window.print()"><i class="fa fa-print"></i> الطباعة الرسمية</button>
+            <a class="btn-primary" href="notes.php?invoice_no=<?php echo rawurlencode((string)$openInv['serial_no']); ?>">
                 <i class="fa fa-file-circle-plus"></i> إشعار دائن/مدين (التصحيح)</a>
         </div>
 
@@ -246,7 +246,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <p style="color:#a15c00">الإلغاءُ لا يمحو صفًّا و<strong>لا يُعيد استعمال رقمه</strong> —
                 والتصحيحُ العاديُّ <strong>بإشعار</strong> لا بإلغاء.</p>
-            <div><button type="submit" class="btn-save"><i class="fa fa-ban"></i> ألغِ ضريبيًّا</button></div>
+            <div><button type="submit" class="btn-primary"><i class="fa fa-ban"></i> ألغِ ضريبيًّا</button></div>
         </form>
         <?php endif; ?>
     </div></div>

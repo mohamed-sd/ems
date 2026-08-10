@@ -233,7 +233,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="date" name="from" value="<?php echo pen_e($from); ?>" class="form-control" id="emsf_78_9c216"></div>
                 <div class="filter-field"><label for="emsf_79_cd642"><i class="fa fa-calendar"></i> إلى</label>
                     <input type="date" name="to" value="<?php echo pen_e($to); ?>" class="form-control" id="emsf_79_cd642"></div>
-                <div class="filter-actions"><button type="submit" class="btn-ok"><i class="fa fa-search"></i> عرض</button></div>
+                <div class="filter-actions"><button type="submit" class="btn-primary"><i class="fa fa-search"></i> عرض</button></div>
             </form>
         </div>
     </div>
@@ -261,7 +261,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
                     <input type="hidden" name="to" value="<?php echo pen_e($to); ?>">
-                    <button type="submit" class="btn-ok pen-release"><i class="fas fa-unlock"></i> ردُّ الضمان</button>
+                    <button type="submit" class="btn-primary pen-release"><i class="fas fa-unlock"></i> ردُّ الضمان</button>
                 </form>
             <?php endif; ?>
             <?php if ($can_assess): ?>
@@ -270,7 +270,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
                     <input type="hidden" name="to" value="<?php echo pen_e($to); ?>">
-                    <button type="submit" class="btn-ok"><i class="fas fa-calculator"></i> احتسِب الفترة</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-calculator"></i> احتسِب الفترة</button>
                 </form>
             <?php endif; ?>
         </div>
@@ -404,8 +404,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <label for="emsf_80_5121b">سببُ الإعفاء *</label>
             <textarea name="reason" rows="3" maxlength="255" required placeholder="لماذا يُعفى هذا البند؟" id="emsf_80_5121b"></textarea>
             <div class="pen-modal-actions">
-                <button type="submit" class="btn-submit"><i class="fas fa-check"></i> تأكيدُ الإعفاء</button>
-                <button type="button" class="btn-cancel" id="penWaiveCancel"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-check"></i> تأكيدُ الإعفاء</button>
+                <button type="button" class="btn-secondary" id="penWaiveCancel"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </form>
     </div>

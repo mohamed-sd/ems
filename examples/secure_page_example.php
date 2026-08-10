@@ -409,7 +409,7 @@ if (isset($_GET['edit'])) {
                                 </td>
                                 <td>
                                     <a href="?edit=<?php echo e($row['id']); ?>" 
-                                       class="btn btn-sm btn-warning" 
+                                       class="btn btn-sm btn-secondary" 
                                        title="تعديل">
                                         <i class="fas fa-edit"></i>
                                     </a>

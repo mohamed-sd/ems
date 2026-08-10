@@ -123,7 +123,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                         <input type="hidden" name="back" value="request_form.php">
                         <input type="hidden" name="reason" value="">
-                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-bolt"></i> طلب تنفيذٍ طارئ (§8.3)</button>
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-bolt"></i> طلب تنفيذٍ طارئ (§8.3)</button>
                     </form>
                 <?php endif; ?>
             </div>
@@ -391,7 +391,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <input type="hidden" name="action" value="delete_line">
                                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                                     <input type="hidden" name="line_id" value="<?php echo intval($L['id']); ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('حذف البند؟');"><i class="fa fa-trash"></i></button>
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('حذف البند؟');"><i class="fa fa-trash"></i></button>
                                 </form>
                                 <?php endif; ?>
                             </td>
@@ -432,7 +432,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <input type="hidden" name="back" value="request_form.php">
                     <input type="text" name="reason" placeholder="سبب السحب (إلزامي)" required style="min-width:220px;" aria-label="سبب السحب (إلزامي)">
-                    <button type="submit" class="btn btn-outline-danger"><i class="fa fa-box-archive"></i> سحب الطلب</button>
+                    <button type="submit" class="btn btn-danger"><i class="fa fa-box-archive"></i> سحب الطلب</button>
                 </form>
             </div>
         </div>

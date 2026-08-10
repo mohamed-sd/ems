@@ -75,7 +75,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                     <td style="font-size:.76rem"><?php echo htmlspecialchars($x['owner_role']); ?></td>
                     <td><?php echo $x['numerator_value'] !== null ? number_format((float)$x['numerator_value'], 2) : '—'; ?></td>
                     <td><?php echo $x['denominator_value'] !== null ? number_format((float)$x['denominator_value'], 2) : '—'; ?></td>
-                    <td><a class="btn-save" href="fin_ratio_detail.php?ratio=<?php echo urlencode($x['ratio_code']); ?>&period=<?php echo urlencode($period); ?>">تعمّق ▸</a></td>
+                    <td><a class="btn-primary" href="fin_ratio_detail.php?ratio=<?php echo urlencode($x['ratio_code']); ?>&period=<?php echo urlencode($period); ?>">تعمّق ▸</a></td>
                     <td><?php echo (int) $company_id; ?></td>
                     <td><?php echo htmlspecialchars($period); ?></td>
                 </tr>

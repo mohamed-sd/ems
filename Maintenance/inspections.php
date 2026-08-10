@@ -664,8 +664,8 @@ function mnt_seg_kind($c) {
                         <div class="form-group"><label for="xl_rec">التوصية</label><input type="text" id="xl_rec"></div>
                     </div>
                     <div class="mnt-line-actions">
-                        <button type="button" class="btn-save" id="xlAdd"><i class="fas fa-plus"></i> إضافة البند</button>
-                        <button type="button" class="btn-cancel mnt-line-cancel" data-target="lineForm"><i class="fas fa-times"></i> إلغاء</button>
+                        <button type="button" class="btn-primary" id="xlAdd"><i class="fas fa-plus"></i> إضافة البند</button>
+                        <button type="button" class="btn-secondary mnt-line-cancel" data-target="lineForm"><i class="fas fa-times"></i> إلغاء</button>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -773,7 +773,7 @@ function mnt_seg_kind($c) {
 
         <?php if (!$locked && $can_edit): ?>
         <div class="form-actions" style="margin-top:14px;">
-            <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ التفتيش والبنود</button>
+            <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ التفتيش والبنود</button>
         </div>
         <?php endif; ?>
     </form>
@@ -828,8 +828,8 @@ function mnt_seg_kind($c) {
                 </div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إنشاء وتحميل البنود</button>
-                <button type="button" class="btn-cancel" id="cancelCreateForm"><i class="fas fa-times"></i> إلغاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إنشاء وتحميل البنود</button>
+                <button type="button" class="btn-secondary" id="cancelCreateForm"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div></div>
     </form>

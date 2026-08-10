@@ -246,7 +246,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </div>
             <div class="form-group"><label for="emsf_1442_2a0d8">ملاحظات</label><input type="text" name="notes" maxlength="255" id="emsf_1442_2a0d8"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ</button></div>
+        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button></div>
         </div></div>
     </form>
     <?php endif; ?>
@@ -431,7 +431,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="f_sbpay">مقابل احتياطيّه <small>— فارغٌ = لم يُنَصَّ ولا يُفترض</small></label>
                     <input type="text" name="standby_payment_terms" id="f_sbpay" maxlength="255"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ البند</button></div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البند</button></div>
             </div></div>
         </form>
         <?php endif; ?>

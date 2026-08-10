@@ -106,7 +106,7 @@ function ems_board_tile($title, $value, $action, $link)
     echo '<div style="border:1px solid #ddd;border-radius:8px;padding:12px 16px;min-width:200px;flex:1">'
         . '<div style="color:#666;font-size:13px">' . htmlspecialchars($title) . '</div>'
         . '<div style="font-size:26px;font-weight:bold">' . $value . '</div>'
-        . '<a class="btn-save" style="font-size:12px" href="' . htmlspecialchars($link) . '">' . htmlspecialchars($action) . ' ▸</a>'
+        . '<a class="btn-primary" style="font-size:12px" href="' . htmlspecialchars($link) . '">' . htmlspecialchars($action) . ' ▸</a>'
         . '</div>';
 }
 ?>
@@ -146,7 +146,7 @@ function ems_board_tile($title, $value, $action, $link)
                 <tr>
                     <td><?php echo htmlspecialchars($x['label']); ?></td>
                     <td><strong><?php echo max(0, intval($x['wait_h'])); ?></strong></td>
-                    <td><a class="btn-save" href="<?php echo htmlspecialchars($x['link']); ?>">إلى موضع الفعل ▸</a></td>
+                    <td><a class="btn-primary" href="<?php echo htmlspecialchars($x['link']); ?>">إلى موضع الفعل ▸</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

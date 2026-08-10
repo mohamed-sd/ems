@@ -177,8 +177,8 @@ include '../insidebar.php';
             </tbody></table></div>
         <?php endif; ?>
         <p style="margin-top:10px">
-            <a href="financiers_registry.php" class="btn-save">سجل الممولين ▸</a>
-            <a href="financing_operation_new.php" class="btn-save">+ إنشاء عملية تمويل (النموذج أولًا)</a>
+            <a href="financiers_registry.php" class="btn-primary">سجل الممولين ▸</a>
+            <a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولًا)</a>
         </p>
     </div></div>
     <?php endif; ?>

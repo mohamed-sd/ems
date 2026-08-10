@@ -50,7 +50,7 @@ include '../insidebar.php';
                 <option value="<?php echo $s; ?>" <?php echo $s === $state ? 'selected' : ''; ?>><?php echo $s; ?></option>
                 <?php endforeach; ?>
             </select>
-            <button class="btn-save" type="submit">عرض</button>
+            <button class="btn-primary" type="submit">عرض</button>
         </form>
     </div></div>
     <div class="card"><div class="card-body">

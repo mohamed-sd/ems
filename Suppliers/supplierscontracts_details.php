@@ -74,25 +74,25 @@ include __DIR__ . '/../includes/page_header.php';
             </div>
             <?php if ($can_edit): ?>
             <div class="action-bar">
-                <button class="add-btn cd-btn-renewal" id="renewalBtn" title="تجديد مدة العقد">
+                <button class="add-btn cd-btn-secondary" id="renewalBtn" title="تجديد مدة العقد">
                     <i class="fas fa-sync-alt"></i> تجديد العقد
                 </button>
-                <button class="add-btn cd-btn-settlement" id="settlementBtn" title="تسوية الساعات المتبقية">
+                <button class="add-btn cd-btn-secondary" id="settlementBtn" title="تسوية الساعات المتبقية">
                     <i class="fas fa-balance-scale"></i> تسوية
                 </button>
-                <button class="add-btn cd-btn-pause" id="pauseBtn" title="إيقاف مؤقت للعقد">
+                <button class="add-btn cd-btn-secondary" id="pauseBtn" title="إيقاف مؤقت للعقد">
                     <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
-                <button class="add-btn cd-btn-resume" id="resumeBtn" title="استئناف العقد المتوقف">
+                <button class="add-btn cd-btn-secondary" id="resumeBtn" title="استئناف العقد المتوقف">
                     <i class="fas fa-play-circle"></i> استئناف
                 </button>
-                <button class="add-btn cd-btn-terminate" id="terminateBtn" title="إنهاء العقد">
+                <button class="add-btn cd-btn-danger" id="terminateBtn" title="إنهاء العقد">
                     <i class="fas fa-times-circle"></i> إنهاء
                 </button>
-                <button class="add-btn cd-btn-merge" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
+                <button class="add-btn cd-btn-primary" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
                     <i class="fas fa-object-group"></i> دمج
                 </button>
-                <button class="add-btn cd-btn-complete" id="completeBtn" title="تسجيل انتهاء العقد">
+                <button class="add-btn cd-btn-primary" id="completeBtn" title="تسجيل انتهاء العقد">
                     <i class="fas fa-check-circle"></i> انتهاء العقد
                 </button>
             </div>
@@ -264,7 +264,7 @@ foreach ($scd_rows as $row) {
                         <span class="detail-card-title">معلومات المورد والمشروع</span>
                     </div>
                     <?php if ($can_edit): ?>
-                    <button class="edit-btn-small" id="editProjectInfoBtn">
+                    <button class="edit-btn-secondary" id="editProjectInfoBtn">
                         <i class="fas fa-pen"></i> تعديل
                     </button>
                     <?php endif; ?>
@@ -300,7 +300,7 @@ foreach ($scd_rows as $row) {
                         <span class="detail-card-title">الخدمات المقدمة</span>
                     </div>
                     <?php if ($can_edit): ?>
-                    <button class="edit-btn-small" id="editServicesBtn">
+                    <button class="edit-btn-secondary" id="editServicesBtn">
                         <i class="fas fa-pen"></i> تعديل
                     </button>
                     <?php endif; ?>
@@ -332,7 +332,7 @@ foreach ($scd_rows as $row) {
                         <span class="detail-card-title">أطراف العقد</span>
                     </div>
                     <?php if ($can_edit): ?>
-                    <button class="edit-btn-small" id="editPartiesBtn">
+                    <button class="edit-btn-secondary" id="editPartiesBtn">
                         <i class="fas fa-pen"></i> تعديل
                     </button>
                     <?php endif; ?>
@@ -364,7 +364,7 @@ foreach ($scd_rows as $row) {
                         <span class="detail-card-title">البيانات المالية</span>
                     </div>
                     <?php if ($can_edit): ?>
-                    <button class="edit-btn-small" id="editPaymentBtn">
+                    <button class="edit-btn-secondary" id="editPaymentBtn">
                         <i class="fas fa-pen"></i> تعديل
                     </button>
                     <?php endif; ?>
@@ -747,7 +747,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> الغاء
                 </button>
-                <button type="button" class="btn cd-btn-renewal-confirm" id="confirmRenewal">
+                <button type="button" class="btn cd-btn-primary" id="confirmRenewal">
                     <i class="fas fa-check"></i> تجديد
                 </button>
             </div>
@@ -801,7 +801,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn cd-btn-settlement-confirm" id="confirmSettlement">
+                <button type="button" class="btn cd-btn-primary" id="confirmSettlement">
                     <i class="fas fa-check"></i> تسوية
                 </button>
             </div>
@@ -844,7 +844,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn cd-btn-pause-confirm" id="confirmPause">
+                <button type="button" class="btn cd-btn-primary" id="confirmPause">
                     <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
             </div>
@@ -949,7 +949,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn cd-btn-resume-confirm" id="confirmResume">
+                <button type="button" class="btn cd-btn-primary" id="confirmResume">
                     <i class="fas fa-play-circle"></i> استئناف
                 </button>
             </div>
@@ -1099,7 +1099,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn cd-btn-merge" id="confirmMerge">
+                <button type="button" class="btn cd-btn-primary" id="confirmMerge">
                     <i class="fas fa-object-group"></i> دمج العقد
                 </button>
             </div>
@@ -1135,7 +1135,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn cd-btn-complete" id="confirmComplete">
+                <button type="button" class="btn cd-btn-primary" id="confirmComplete">
                     <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                 </button>
             </div>
@@ -1245,7 +1245,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn btn-success" id="saveServices">
+                <button type="button" class="btn btn-primary" id="saveServices">
                     <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
@@ -1297,7 +1297,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn btn-info" id="saveParties">
+                <button type="button" class="btn btn-secondary" id="saveParties">
                     <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
@@ -1364,7 +1364,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn btn-warning" id="savePayment">
+                <button type="button" class="btn btn-secondary" id="savePayment">
                     <i class="fas fa-save"></i> حفظ
                 </button>
             </div>

@@ -479,7 +479,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     flex: 1;
 }
 
-.btn-save {
+.btn-primary {
     background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
     color: white;
     border: none;
@@ -492,7 +492,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     cursor: pointer;
 }
 
-.btn-save:hover {
+.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
@@ -565,7 +565,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     background: #d1d5db;
 }
 
-.btn-success {
+.btn-primary {
     background: linear-gradient(135deg, var(--teal) 0%, #059669 100%);
     color: white;
 }
@@ -671,7 +671,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                         <form method="POST">
                             <input type="hidden" name="action" value="grant_all">
                             <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
-                            <button type="submit" class="btn btn-success btn-sm">
+                            <button type="submit" class="btn btn-primary btn-sm">
                                 <i class="fas fa-check-circle"></i> منح الكل
                             </button>
                         </form>
@@ -734,7 +734,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         </label>
                                     </div>
 
-                                    <button type="submit" class="btn-save">
+                                    <button type="submit" class="btn-primary">
                                         <i class="fas fa-save"></i> حفظ
                                     </button>
                                 </form>
