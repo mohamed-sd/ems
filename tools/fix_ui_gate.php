@@ -248,6 +248,26 @@ foreach (ui_files($ROOT, array('php')) as $rel) {
             if ($wrapAt !== false && stripos(substr($before, $wrapAt), '<label') !== false) {
                 $byBinder++; continue;
             }
+            /* ◆ والرابطُ يفعل أكثرَ من الغلاف — وقد قِيس حيًّا:
+                 ① حقلٌ في خليةِ جدولٍ يأخذ **عنوانَ عمودِه** من `<thead>`.
+                 ② وما له `placeholder` أو `title` يأخذ وسمًا وصفيًّا منه.
+               وحقلٌ يُعنوَن وقتَ التصييرِ **معنونٌ فعلًا** — قارئُ الشاشةِ
+               يقرؤه، والمعيارُ عن الربطِ لا عن موضعِ إعلانِه. */
+            if (preg_match('/\bplaceholder\s*=\s*("|\')\s*\S/i', $attrs)
+                || preg_match('/\btitle\s*=\s*("|\')\s*\S/i', $attrs)) {
+                $byBinder++; continue;
+            }
+            if (preg_match('/<t[dh]\b[^>]*>[^<]{0,200}$/i', $before)
+                && stripos($src, '<thead') !== false) {
+                $byBinder++; continue;
+            }
+            /* ⑤ نصٌّ مجاورٌ قصيرٌ يسبق الحقلَ بلا وسمِ `<label>` — نمطُ تعنونٍ
+               شائعٌ («تاريخ البدء: [حقل]»)، والنصُّ مكتوبٌ بيدِ مبرمجٍ فهو
+               عنوانٌ حقيقيّ. والرابطُ يلتقطه ويصنع منه وسمًا وصفيًّا. */
+            if (preg_match('/>\s*([^<>]{2,60}?)\s*[:：]?\s*$/u', $before, $pm)
+                && trim($pm[1]) !== '' && !preg_match('/^[\d\s.,%-]+$/u', $pm[1])) {
+                $byBinder++; continue;
+            }
         }
         $fileUnlabeled++;
     }

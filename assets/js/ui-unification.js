@@ -774,6 +774,23 @@
                 var any = wrap.querySelector('label');
                 if (any) { txt = any.textContent.trim(); }
             }
+            /* ④ نصٌّ مجاورٌ يسبق الحقلَ بلا وسمِ `<label>` — نمطُ تعنونٍ شائعٌ
+                 في النماذجِ القديمة: «تاريخ البدء: [حقل]». والنصُّ **مكتوبٌ
+                 بيدِ مبرمجٍ فهو عنوانٌ حقيقيّ**، وتركُه يعني حقلًا صامتًا لقارئِ
+                 الشاشةِ بينما العنوانُ أمامَ عينِ المبصر.
+               ◆ ويُشترط قِصرُه (≤60 حرفًا): فقرةٌ طويلةٌ سابقةٌ شرحٌ لا عنوان. */
+            if (txt === '') {
+                var prev = el.previousSibling;
+                var hops = 0;
+                while (prev && hops++ < 3) {
+                    var t = (prev.nodeType === 3 ? prev.nodeValue
+                          : (prev.nodeType === 1 && !prev.querySelector('input,select,textarea')
+                             ? prev.textContent : '')) || '';
+                    t = t.replace(/\s+/g, ' ').trim().replace(/[:：]\s*$/, '');
+                    if (t !== '' && t.length <= 60) { txt = t; break; }
+                    prev = prev.previousSibling;
+                }
+            }
             txt = txt.replace(/\s*\*\s*$/, '').replace(/\s+/g, ' ').trim();
             if (txt !== '') { el.setAttribute('aria-label', txt); }
         }
