@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-09 05:10:38
--- الجداول: 544 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-09 20:51:53
+-- الجداول: 545 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -10510,6 +10510,21 @@ CREATE TABLE `scr_workshop` (
   PRIMARY KEY (`id`),
   KEY `ix_workshop_live` (`company_id`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة workshop.php';
+
+-- ── Table: screen_about ──
+CREATE TABLE `screen_about` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `screen_path` varchar(190) NOT NULL COMMENT 'المسار النسبي للشاشة — مفتاح المطابقة',
+  `title_ar` varchar(190) NOT NULL DEFAULT '' COMMENT 'اسم الشاشة كما يُعرَف',
+  `description` text NOT NULL COMMENT 'النص التعريفي — فقرة أو فقرتان',
+  `source` enum('authored','composed','derived') NOT NULL DEFAULT 'derived' COMMENT 'authored=مكتوب بيد · composed=مركَّب من مصادر النظام · derived=اسمٌ وإدارةٌ فقط',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_screen_about_path` (`screen_path`),
+  KEY `ix_screen_about_source` (`source`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تعريفات الشاشات لبطاقة «عن الشاشة» — محتوًى يُحرَّر لا شيفرة';
 
 -- ── Table: screen_view_rows ──
 CREATE TABLE `screen_view_rows` (
