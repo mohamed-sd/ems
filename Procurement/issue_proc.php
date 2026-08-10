@@ -251,10 +251,10 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     $cost = $line ? htmlspecialchars((string)$line['unit_cost'], ENT_QUOTES) : '0';
     $opts = proc_items_options($conn, $is_super_admin, $company_id, $iid);
     return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
-        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item">' . $opts . '</select></div>'
-        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required></div>'
-        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '"></div>'
-        . '<div class="form-group"><label>تكلفة الوحدة <small>(صنفُ الكتالوج يُحتسب آليًّا بالمتوسط المرجح)</small></label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '"></div>'
+        . '<div class="form-group"><label for="emsf_380_a0417">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_380_a0417">' . $opts . '</select></div>'
+        . '<div class="form-group"><label for="emsf_381_fafc5">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_381_fafc5"></div>'
+        . '<div class="form-group"><label for="emsf_382_16b8d">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_382_16b8d"></div>'
+        . '<div class="form-group"><label for="emsf_383_3f8fe">تكلفة الوحدة <small>(صنفُ الكتالوج يُحتسب آليًّا بالمتوسط المرجح)</small></label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '" id="emsf_383_3f8fe"></div>'
         . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
@@ -300,32 +300,32 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>المخزن المصروف منه</label>
-                        <select name="warehouse_id"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
+                        <label for="emsf_384_d97b8">المخزن المصروف منه</label>
+                        <select name="warehouse_id" id="emsf_384_d97b8"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المستلِم <span class="required">*</span></label>
-                        <input type="text" name="holder_name" value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>" required>
+                        <label for="emsf_385_945c4">المستلِم <span class="required">*</span></label>
+                        <input type="text" name="holder_name" value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>" required id="emsf_385_945c4">
                     </div>
                     <div class="form-group">
-                        <label>تاريخ الصرف</label>
-                        <input type="date" name="issue_date" value="<?php echo $edit ? htmlspecialchars((string)$edit['issue_date']) : ''; ?>">
+                        <label for="emsf_386_49337">تاريخ الصرف</label>
+                        <input type="date" name="issue_date" value="<?php echo $edit ? htmlspecialchars((string)$edit['issue_date']) : ''; ?>" id="emsf_386_49337">
                     </div>
                     <div class="form-group">
-                        <label>المعدة <small>(بُعد تكلفة)</small></label>
-                        <select name="equipment_id"><?php echo proc_equipment_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['equipment_id']) : 0); ?></select>
+                        <label for="emsf_387_0ed6d">المعدة <small>(بُعد تكلفة)</small></label>
+                        <select name="equipment_id" id="emsf_387_0ed6d"><?php echo proc_equipment_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['equipment_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المشروع <small>(بُعد تكلفة)</small></label>
-                        <select name="project_id"><?php echo proc_project_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['project_id']) : 0); ?></select>
+                        <label for="emsf_388_2789a">المشروع <small>(بُعد تكلفة)</small></label>
+                        <select name="project_id" id="emsf_388_2789a"><?php echo proc_project_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['project_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>أمر الصيانة <small>(بُعد تكلفة)</small></label>
-                        <select name="maintenance_order_id"><?php echo proc_options_from_rows($mnt_order_option_rows, $edit ? intval($edit['maintenance_order_id']) : 0, '— بلا أمر صيانة —'); ?></select>
+                        <label for="emsf_389_14730">أمر الصيانة <small>(بُعد تكلفة)</small></label>
+                        <select name="maintenance_order_id" id="emsf_389_14730"><?php echo proc_options_from_rows($mnt_order_option_rows, $edit ? intval($edit['maintenance_order_id']) : 0, '— بلا أمر صيانة —'); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>نوع الصيانة</label>
-                        <select name="maint_type">
+                        <label for="emsf_390_ab006">نوع الصيانة</label>
+                        <select name="maint_type" id="emsf_390_ab006">
                             <option value="">— بلا —</option>
                             <?php foreach ($maint_types as $mt): $sel = ($edit && $edit['maint_type'] === $mt) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($mt); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($mt); ?></option>
@@ -333,24 +333,24 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>المورد التشغيلي</label>
-                        <select name="supplier_id"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
+                        <label for="emsf_391_7e80d">المورد التشغيلي</label>
+                        <select name="supplier_id" id="emsf_391_7e80d"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>معرّف العقد (اختياري)</label>
-                        <input type="number" name="contract_id" value="<?php echo $edit && $edit['contract_id'] !== null ? intval($edit['contract_id']) : ''; ?>">
+                        <label for="emsf_392_9d977">معرّف العقد (اختياري)</label>
+                        <input type="number" name="contract_id" value="<?php echo $edit && $edit['contract_id'] !== null ? intval($edit['contract_id']) : ''; ?>" id="emsf_392_9d977">
                     </div>
                     <div class="form-group">
-                        <label>الحالة</label>
-                        <select name="state">
+                        <label for="emsf_393_baf02">الحالة</label>
+                        <select name="state" id="emsf_393_baf02">
                             <?php foreach ($states as $st): $sel = ($edit && $edit['state'] === $st) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($st); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($st); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
+                        <label for="emsf_394_01563">ملاحظات</label>
+                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>" id="emsf_394_01563">
                     </div>
                 </div>
             </div>

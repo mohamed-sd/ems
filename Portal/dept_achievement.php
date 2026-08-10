@@ -119,8 +119,8 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
   <form method="get" class="ems-form" style="display:flex;gap:8px;align-items:end;margin-bottom:14px">
-    <div><label>من</label><input type="date" name="from" class="form-control" value="<?= htmlspecialchars($from) ?>"></div>
-    <div><label>إلى</label><input type="date" name="to" class="form-control" value="<?= htmlspecialchars($to) ?>"></div>
+    <div><label for="emsf_368_d3c6f">من</label><input type="date" name="from" class="form-control" value="<?= htmlspecialchars($from) ?>" id="emsf_368_d3c6f"></div>
+    <div><label for="emsf_369_142f6">إلى</label><input type="date" name="to" class="form-control" value="<?= htmlspecialchars($to) ?>" id="emsf_369_142f6"></div>
     <button class="btn btn-primary">عرض</button>
   </form>
   <?php $allZero = true; foreach ($metrics as $m2) if ($m2[1] > 0) { $allZero = false; break; }

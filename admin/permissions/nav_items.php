@@ -258,8 +258,8 @@ table.navtbl tr:hover td { background:#f8fafc; }
     <div class="card">
         <div class="card-body" style="display:flex;gap:1rem;align-items:end;flex-wrap:wrap;">
             <div style="min-width:260px;">
-                <label style="font-weight:600;color:var(--navy);display:block;margin-bottom:.4rem;">الدور</label>
-                <select onchange="location='nav_items.php?role_id='+this.value" style="width:100%;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:8px;">
+                <label style="font-weight:600;color:var(--navy);display:block;margin-bottom:.4rem;" for="emsf_687_b59a5">الدور</label>
+                <select onchange="location='nav_items.php?role_id='+this.value" style="width:100%;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:8px;" id="emsf_687_b59a5">
                     <?php foreach ($roles as $r): ?>
                         <option value="<?php echo intval($r['id']); ?>" <?php echo intval($r['id']) === $selected_role_id ? 'selected' : ''; ?>>
                             <?php echo intval($r['id']) . ' — ' . htmlspecialchars($r['name']); ?>
@@ -288,16 +288,16 @@ table.navtbl tr:hover td { background:#f8fafc; }
                 <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
                 <div class="form-grid">
                     <div>
-                        <label>الباب *</label>
-                        <select name="door" required>
+                        <label for="emsf_688_59bf8">الباب *</label>
+                        <select name="door" required id="emsf_688_59bf8">
                             <?php foreach ($NAV_DOORS as $k => $v): ?>
                                 <option value="<?php echo $k; ?>" <?php echo ($editData && $editData['door'] === $k) ? 'selected' : ''; ?>><?php echo $v; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div>
-                        <label>المجموعة (فاصلٌ داخل الباب)</label>
-                        <select name="group_id">
+                        <label for="emsf_689_b5688">المجموعة (فاصلٌ داخل الباب)</label>
+                        <select name="group_id" id="emsf_689_b5688">
                             <option value="">— بلا مجموعة —</option>
                             <?php foreach ($role_groups as $g): ?>
                                 <option value="<?php echo intval($g['id']); ?>" <?php echo ($editData && intval($editData['group_id'] ?? 0) === intval($g['id'])) ? 'selected' : ''; ?>>
@@ -307,12 +307,12 @@ table.navtbl tr:hover td { background:#f8fafc; }
                         </select>
                     </div>
                     <div>
-                        <label>اسم العرض *</label>
-                        <input type="text" name="label_ar" required value="<?php echo htmlspecialchars($editData['label_ar'] ?? ''); ?>" placeholder="بلغة المهمة — لا مصطلحَ معماريًّا">
+                        <label for="emsf_690_8d38d">اسم العرض *</label>
+                        <input type="text" name="label_ar" required value="<?php echo htmlspecialchars($editData['label_ar'] ?? ''); ?>" placeholder="بلغة المهمة — لا مصطلحَ معماريًّا" id="emsf_690_8d38d">
                     </div>
                     <div>
-                        <label>المسار *</label>
-                        <input type="text" name="route" list="routes" required dir="ltr" value="<?php echo htmlspecialchars($editData['route'] ?? ''); ?>" placeholder="Finance/example.php">
+                        <label for="emsf_691_02116">المسار *</label>
+                        <input type="text" name="route" list="routes" required dir="ltr" value="<?php echo htmlspecialchars($editData['route'] ?? ''); ?>" placeholder="Finance/example.php" id="emsf_691_02116">
                         <datalist id="routes">
                             <?php foreach ($module_routes as $code => $name): ?>
                                 <option value="<?php echo htmlspecialchars($code); ?>"><?php echo htmlspecialchars($name); ?></option>
@@ -320,20 +320,20 @@ table.navtbl tr:hover td { background:#f8fafc; }
                         </datalist>
                     </div>
                     <div>
-                        <label>الأيقونة</label>
-                        <input type="text" name="icon" dir="ltr" value="<?php echo htmlspecialchars($editData['icon'] ?? 'fa fa-link'); ?>">
+                        <label for="emsf_692_b0af7">الأيقونة</label>
+                        <input type="text" name="icon" dir="ltr" value="<?php echo htmlspecialchars($editData['icon'] ?? 'fa fa-link'); ?>" id="emsf_692_b0af7">
                     </div>
                     <div>
-                        <label>الترتيب</label>
-                        <input type="number" name="sort_order" value="<?php echo intval($editData['sort_order'] ?? 0); ?>">
+                        <label for="emsf_693_c424f">الترتيب</label>
+                        <input type="number" name="sort_order" value="<?php echo intval($editData['sort_order'] ?? 0); ?>" id="emsf_693_c424f">
                     </div>
                     <div>
-                        <label>مصدر العدّاد (اختياري)</label>
-                        <input type="text" name="counter_source" dir="ltr" value="<?php echo htmlspecialchars($editData['counter_source'] ?? ''); ?>" placeholder="hours_approval">
+                        <label for="emsf_694_43bc6">مصدر العدّاد (اختياري)</label>
+                        <input type="text" name="counter_source" dir="ltr" value="<?php echo htmlspecialchars($editData['counter_source'] ?? ''); ?>" placeholder="hours_approval" id="emsf_694_43bc6">
                     </div>
                     <div>
-                        <label>الحالة</label>
-                        <select name="active">
+                        <label for="emsf_695_dac58">الحالة</label>
+                        <select name="active" id="emsf_695_dac58">
                             <option value="1" <?php echo (!$editData || intval($editData['active']) === 1) ? 'selected' : ''; ?>>نشط (تابعٌ للدور)</option>
                             <option value="0" <?php echo ($editData && intval($editData['active']) === 0) ? 'selected' : ''; ?>>معطَّل</option>
                         </select>

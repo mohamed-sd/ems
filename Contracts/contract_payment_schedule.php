@@ -215,32 +215,32 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <h6 style="margin:0 0 10px"><i class="fa fa-wand-magic-sparkles"></i>
                 توليدٌ آليٌّ من الرأس والجدول الشهري</h6>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <div class="form-group"><label>النمط</label>
-                    <select name="pattern">
+                <div class="form-group"><label for="emsf_59_524ba">النمط</label>
+                    <select name="pattern" id="emsf_59_524ba">
                         <?php foreach ($PATTERN_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>مهلةُ السداد (يومًا)</label>
-                    <input type="number" name="due_days" value="30" min="0" style="width:110px"></div>
-                <div class="form-group"><label>نوعُ المقدم (اختياري)</label>
-                    <select name="adv_type">
+                <div class="form-group"><label for="emsf_60_9d874">مهلةُ السداد (يومًا)</label>
+                    <input type="number" name="due_days" value="30" min="0" style="width:110px" id="emsf_60_9d874"></div>
+                <div class="form-group"><label for="emsf_61_5e04e">نوعُ المقدم (اختياري)</label>
+                    <select name="adv_type" id="emsf_61_5e04e">
                         <option value="">— بلا مقدم —</option>
                         <?php foreach ($ADV_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>نسبتُه %</label>
-                    <input type="number" step="0.001" name="adv_percent" style="width:100px"></div>
-                <div class="form-group"><label>تاريخُ استحقاقه</label>
-                    <input type="date" name="adv_due"></div>
-                <div class="form-group"><label>معالجتُه (للتعبئة وحدَها)</label>
-                    <select name="adv_treatment">
+                <div class="form-group"><label for="emsf_62_d9bbb">نسبتُه %</label>
+                    <input type="number" step="0.001" name="adv_percent" style="width:100px" id="emsf_62_d9bbb"></div>
+                <div class="form-group"><label for="emsf_63_7a62a">تاريخُ استحقاقه</label>
+                    <input type="date" name="adv_due" id="emsf_63_7a62a"></div>
+                <div class="form-group"><label for="emsf_64_f5a33">معالجتُه (للتعبئة وحدَها)</label>
+                    <select name="adv_treatment" id="emsf_64_f5a33">
                         <option value="">— محكومةٌ بالنوع —</option>
                         <option value="liability">التزام (دَين)</option>
                         <option value="revenue">إيراد</option>
                     </select></div>
-                <div class="form-group" style="min-width:280px"><label>نصُّ العقد الحاكم (للتعبئة)</label>
+                <div class="form-group" style="min-width:280px"><label for="emsf_65_00dd6">نصُّ العقد الحاكم (للتعبئة)</label>
                     <input type="text" name="adv_basis_text" maxlength="255"
-                           placeholder="البند 7-3: رسومُ التعبئة غيرُ مستردة…"></div>
+                           placeholder="البند 7-3: رسومُ التعبئة غيرُ مستردة…" id="emsf_65_00dd6"></div>
             </div>
             <button type="submit" class="btn-save"><i class="fa fa-wand-magic-sparkles"></i> ولّد الخطة</button>
         </form>
@@ -296,9 +296,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="ps_action" value="receive">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="number" step="0.01" name="amount" placeholder="المبلغ" required style="width:100px">
+                            <input type="number" step="0.01" name="amount" placeholder="المبلغ" required style="width:100px" aria-label="المبلغ">
                             <input type="date" name="received_date" required style="width:140px">
-                            <input type="text" name="doc_ref" placeholder="سندُ القبض" required style="width:130px">
+                            <input type="text" name="doc_ref" placeholder="سندُ القبض" required style="width:130px" aria-label="سندُ القبض">
                             <button type="submit" class="action-btn"><i class="fa fa-hand-holding-dollar"></i> اقبض</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
@@ -314,36 +314,36 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <h6><i class="fa fa-plus"></i> سطرٌ يدويّ — <strong>للمعالم والدفعات الخاصة</strong></h6>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
-                    <div class="form-group"><label>النوع</label>
-                        <select name="kind">
+                    <div class="form-group"><label for="emsf_66_2cc1e">النوع</label>
+                        <select name="kind" id="emsf_66_2cc1e">
                             <option value="milestone">معلَم</option>
                             <option value="final">ختامية</option>
                             <option value="single">دفعةٌ واحدة</option>
                             <option value="advance">مقدَّم</option>
                         </select></div>
-                    <div class="form-group"><label>المبلغ</label>
-                        <input type="number" step="0.01" name="amount" style="width:120px"></div>
-                    <div class="form-group"><label>العملة</label>
+                    <div class="form-group"><label for="emsf_67_a326d">المبلغ</label>
+                        <input type="number" step="0.01" name="amount" style="width:120px" id="emsf_67_a326d"></div>
+                    <div class="form-group"><label for="emsf_68_1dc6e">العملة</label>
                         <input type="text" name="currency" maxlength="8" style="width:80px"
-                               value="<?php echo htmlspecialchars((string)$rows[0]['currency']); ?>"></div>
-                    <div class="form-group"><label>تاريخُ الاستحقاق</label>
-                        <input type="date" name="due_date"></div>
-                    <div class="form-group" style="min-width:220px"><label>أو شرطُه</label>
-                        <input type="text" name="due_condition" maxlength="200"></div>
-                    <div class="form-group"><label>نوعُ المقدم (إن كان مقدمًا)</label>
-                        <select name="row_adv_type">
+                               value="<?php echo htmlspecialchars((string)$rows[0]['currency']); ?>" id="emsf_68_1dc6e"></div>
+                    <div class="form-group"><label for="emsf_69_10456">تاريخُ الاستحقاق</label>
+                        <input type="date" name="due_date" id="emsf_69_10456"></div>
+                    <div class="form-group" style="min-width:220px"><label for="emsf_70_a103a">أو شرطُه</label>
+                        <input type="text" name="due_condition" maxlength="200" id="emsf_70_a103a"></div>
+                    <div class="form-group"><label for="emsf_71_e8e8a">نوعُ المقدم (إن كان مقدمًا)</label>
+                        <select name="row_adv_type" id="emsf_71_e8e8a">
                             <option value="">—</option>
                             <?php foreach ($ADV_AR as $k => $v): ?>
                                 <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                             <?php endforeach; ?></select></div>
-                    <div class="form-group"><label>معالجتُه (للتعبئة)</label>
-                        <select name="row_adv_treatment">
+                    <div class="form-group"><label for="emsf_72_f41b4">معالجتُه (للتعبئة)</label>
+                        <select name="row_adv_treatment" id="emsf_72_f41b4">
                             <option value="">— محكومةٌ بالنوع —</option>
                             <option value="liability">التزام</option>
                             <option value="revenue">إيراد</option>
                         </select></div>
-                    <div class="form-group" style="min-width:240px"><label>نصُّ العقد الحاكم</label>
-                        <input type="text" name="row_adv_basis" maxlength="255"></div>
+                    <div class="form-group" style="min-width:240px"><label for="emsf_73_ddeb5">نصُّ العقد الحاكم</label>
+                        <input type="text" name="row_adv_basis" maxlength="255" id="emsf_73_ddeb5"></div>
                 </div>
                 <button type="submit" class="btn-save"><i class="fa fa-plus"></i> أضف السطر</button>
             </form>
@@ -352,10 +352,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <input type="hidden" name="ps_action" value="new_version">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <h6><i class="fa fa-code-branch"></i> نسخةٌ جديدةٌ بملحق</h6>
-                <div class="form-group"><label>سريانُها</label>
-                    <input type="date" name="effective_from" required></div>
-                <div class="form-group"><label>رقمُ الملحق (اختياري)</label>
-                    <input type="number" name="amendment_id" style="width:120px"></div>
+                <div class="form-group"><label for="emsf_74_2ae97">سريانُها</label>
+                    <input type="date" name="effective_from" required id="emsf_74_2ae97"></div>
+                <div class="form-group"><label for="emsf_75_d54e3">رقمُ الملحق (اختياري)</label>
+                    <input type="number" name="amendment_id" style="width:120px" id="emsf_75_d54e3"></div>
                 <button type="submit" class="btn-save"><i class="fa fa-code-branch"></i>
                     افتح نسخةً — <strong>والقديمةُ محفوظة</strong></button>
             </form>

@@ -192,21 +192,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
             </div>
             <div class="field"><label><i class="fas fa-hashtag"></i> رقم الرخصة</label><input type="text" name="license_number" value="<?= htmlspecialchars($edit['license_number'] ?? '') ?>"></div>
-            <div class="field"><label><i class="fas fa-id-card"></i> نوع/فئة الرخصة</label><input type="text" name="license_type" value="<?= htmlspecialchars($edit['license_type'] ?? '') ?>"></div>
-            <div class="field"><label><i class="fas fa-ranking-star"></i> درجة الرخصة</label><input type="text" name="license_grade" value="<?= htmlspecialchars($edit['license_grade'] ?? '') ?>"></div>
-            <div class="field"><label><i class="fas fa-building-shield"></i> جهة الإصدار</label><input type="text" name="license_issuer" value="<?= htmlspecialchars($edit['license_issuer'] ?? '') ?>"></div>
-            <div class="field"><label><i class="fas fa-calendar-plus"></i> تاريخ الإصدار</label><input type="date" name="license_issue_date" value="<?= htmlspecialchars($edit['license_issue_date'] ?? '') ?>"></div>
-            <div class="field"><label><i class="fas fa-calendar-xmark"></i> تاريخ الانتهاء</label><input type="date" name="license_expiry_date" value="<?= htmlspecialchars($edit['license_expiry_date'] ?? '') ?>"></div>
-            <div class="field"><label><i class="fas fa-truck-monster"></i> فئات التشغيل/المعدات</label><input type="text" name="operating_categories" value="<?= htmlspecialchars($edit['operating_categories'] ?? '') ?>" placeholder="مثال: حفّارات، شيولات"></div>
-            <div class="field"><label><i class="fas fa-key"></i> صلاحيات القيادة/التشغيل</label><input type="text" name="driving_authorizations" value="<?= htmlspecialchars($edit['driving_authorizations'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_89_b5109"><i class="fas fa-id-card"></i> نوع/فئة الرخصة</label><input type="text" name="license_type" value="<?= htmlspecialchars($edit['license_type'] ?? '') ?>" id="emsf_89_b5109"></div>
+            <div class="field"><label for="emsf_90_50da8"><i class="fas fa-ranking-star"></i> درجة الرخصة</label><input type="text" name="license_grade" value="<?= htmlspecialchars($edit['license_grade'] ?? '') ?>" id="emsf_90_50da8"></div>
+            <div class="field"><label for="emsf_91_17293"><i class="fas fa-building-shield"></i> جهة الإصدار</label><input type="text" name="license_issuer" value="<?= htmlspecialchars($edit['license_issuer'] ?? '') ?>" id="emsf_91_17293"></div>
+            <div class="field"><label for="emsf_92_847b4"><i class="fas fa-calendar-plus"></i> تاريخ الإصدار</label><input type="date" name="license_issue_date" value="<?= htmlspecialchars($edit['license_issue_date'] ?? '') ?>" id="emsf_92_847b4"></div>
+            <div class="field"><label for="emsf_93_771d1"><i class="fas fa-calendar-xmark"></i> تاريخ الانتهاء</label><input type="date" name="license_expiry_date" value="<?= htmlspecialchars($edit['license_expiry_date'] ?? '') ?>" id="emsf_93_771d1"></div>
+            <div class="field"><label for="emsf_94_02c94"><i class="fas fa-truck-monster"></i> فئات التشغيل/المعدات</label><input type="text" name="operating_categories" value="<?= htmlspecialchars($edit['operating_categories'] ?? '') ?>" placeholder="مثال: حفّارات، شيولات" id="emsf_94_02c94"></div>
+            <div class="field"><label for="emsf_95_4c8c5"><i class="fas fa-key"></i> صلاحيات القيادة/التشغيل</label><input type="text" name="driving_authorizations" value="<?= htmlspecialchars($edit['driving_authorizations'] ?? '') ?>" id="emsf_95_4c8c5"></div>
             <div class="field">
-                <label><i class="fas fa-toggle-on"></i> الحالة</label>
-                <select name="status">
+                <label for="emsf_96_2c24f"><i class="fas fa-toggle-on"></i> الحالة</label>
+                <select name="status" id="emsf_96_2c24f">
                     <option value="1" <?= (($edit['status'] ?? 1) == 1) ? 'selected' : '' ?>>نشط ✅</option>
                     <option value="0" <?= (($edit['status'] ?? 1) == 0) ? 'selected' : '' ?>>غير نشط ⏸</option>
                 </select>
             </div>
-            <div class="field" style="grid-column:1/-1;"><label><i class="fas fa-align-right"></i> ملاحظات</label><textarea name="notes" rows="2"><?= htmlspecialchars($edit['notes'] ?? '') ?></textarea></div>
+            <div class="field" style="grid-column:1/-1;"><label for="emsf_97_fae6a"><i class="fas fa-align-right"></i> ملاحظات</label><textarea name="notes" rows="2" id="emsf_97_fae6a"><?= htmlspecialchars($edit['notes'] ?? '') ?></textarea></div>
         </div>
         <div style="padding:0 14px 16px;display:flex;gap:10px;">
             <button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button>

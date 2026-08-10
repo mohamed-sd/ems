@@ -127,13 +127,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="finForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-edit"></i> تنبؤ نقدي يدوي</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>التاريخ</label><input type="date" name="forecast_date" value="<?php echo date('Y-m-d'); ?>"></div>
-            <div class="form-group"><label>الأفق</label><select name="horizon_type"><?php foreach ($horizons as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>النقد الافتتاحي</label><input type="number" step="0.01" name="opening_cash" value="0"></div>
-            <div class="form-group"><label>التدفّق الداخل</label><input type="number" step="0.01" name="expected_inflow" value="0"></div>
-            <div class="form-group"><label>التدفّق الخارج</label><input type="number" step="0.01" name="expected_outflow" value="0"></div>
-            <div class="form-group"><label>الحد الأدنى المطلوب</label><input type="number" step="0.01" name="min_required" value="5000000"></div>
-            <div class="form-group" style="grid-column:1/-1"><label>ملاحظة</label><input type="text" name="note"></div>
+            <div class="form-group"><label for="emsf_223_28a4f">التاريخ</label><input type="date" name="forecast_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_223_28a4f"></div>
+            <div class="form-group"><label for="emsf_224_7bd28">الأفق</label><select name="horizon_type" id="emsf_224_7bd28"><?php foreach ($horizons as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_225_57965">النقد الافتتاحي</label><input type="number" step="0.01" name="opening_cash" value="0" id="emsf_225_57965"></div>
+            <div class="form-group"><label for="emsf_226_cea84">التدفّق الداخل</label><input type="number" step="0.01" name="expected_inflow" value="0" id="emsf_226_cea84"></div>
+            <div class="form-group"><label for="emsf_227_48b1e">التدفّق الخارج</label><input type="number" step="0.01" name="expected_outflow" value="0" id="emsf_227_48b1e"></div>
+            <div class="form-group"><label for="emsf_228_23bf9">الحد الأدنى المطلوب</label><input type="number" step="0.01" name="min_required" value="5000000" id="emsf_228_23bf9"></div>
+            <div class="form-group" style="grid-column:1/-1"><label for="emsf_229_75dfb">ملاحظة</label><input type="text" name="note" id="emsf_229_75dfb"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

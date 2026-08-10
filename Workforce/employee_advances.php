@@ -168,7 +168,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="ad_action" value="set_protection">
             <input type="number" step="0.01" min="0" max="100" name="protection_percent"
                    value="<?php echo $protection === null ? '' : htmlspecialchars((string)$protection); ?>"
-                   placeholder="فارغٌ = غيرُ مقرَّر" style="max-width:180px">
+                   placeholder="فارغٌ = غيرُ مقرَّر" style="max-width:180px" aria-label="فارغٌ = غيرُ مقرَّر">
             <button type="submit" class="btn-save"><i class="fa fa-shield-halved"></i> حفظ الحد</button>
         </form>
         <?php endif; ?>

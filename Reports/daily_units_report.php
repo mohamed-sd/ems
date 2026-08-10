@@ -44,10 +44,10 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <label>من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>">
-            <label>إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>">
-            <label>المشروع</label><input type="number" name="project_id" min="0"
-                value="<?php echo $prj ?: ''; ?>" placeholder="الكل" style="width:100px">
+            <label for="emsf_452_2098b">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_452_2098b">
+            <label for="emsf_453_8f10a">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_453_8f10a">
+            <label for="emsf_454_5931c">المشروع</label><input type="number" name="project_id" min="0"
+                value="<?php echo $prj ?: ''; ?>" placeholder="الكل" style="width:100px" id="emsf_454_5931c">
             <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اعرض</button>
         </form>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">

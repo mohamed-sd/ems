@@ -113,20 +113,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل احتياج':'احتياج جديد' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>المشروع</label><select name="project_id"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>" <?= (intval($edit['project_id']??0)===intval($pid))?'selected':'' ?>><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>الفئة</label><select name="worker_category"><?php foreach(ems_worker_categories() as $c): ?><option value="<?= $c ?>" <?= (($edit['worker_category']??'')===$c)?'selected':'' ?>><?= $c ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>المطلوب</label><input type="number" name="required_qty" value="<?= htmlspecialchars($edit['required_qty'] ?? '0') ?>"></div>
-            <div class="field"><label>المتوفّر <small style="color:#888;">(يُحسَب آلياً)</small></label>
-                <input type="number" name="available_qty" value="<?= htmlspecialchars($edit['available_qty'] ?? '0') ?>">
+            <div class="field"><label for="emsf_634_3d483">المشروع</label><select name="project_id" id="emsf_634_3d483"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>" <?= (intval($edit['project_id']??0)===intval($pid))?'selected':'' ?>><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_635_6db6c">الفئة</label><select name="worker_category" id="emsf_635_6db6c"><?php foreach(ems_worker_categories() as $c): ?><option value="<?= $c ?>" <?= (($edit['worker_category']??'')===$c)?'selected':'' ?>><?= $c ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_636_beefe">المطلوب</label><input type="number" name="required_qty" value="<?= htmlspecialchars($edit['required_qty'] ?? '0') ?>" id="emsf_636_beefe"></div>
+            <div class="field"><label for="emsf_637_4aad4">المتوفّر <small style="color:#888;">(يُحسَب آلياً)</small></label>
+                <input type="number" name="available_qty" value="<?= htmlspecialchars($edit['available_qty'] ?? '0') ?>" id="emsf_637_4aad4">
                 <label style="display:flex;align-items:center;gap:6px;font-weight:400;margin-top:4px;font-size:.85rem;"><input type="checkbox" name="manual_available" value="1"> إدخال يدوي للمتوفّر (تجاوز)</label>
                 <?php if($auto_preview!==null): ?><small style="color:#b9770e;">المحسوب آلياً الآن من التخصيصات النشطة: <strong><?= intval($auto_preview) ?></strong></small><?php endif; ?>
             </div>
             <div class="field"><label>الأولوية</label><select name="priority"><?php foreach($PRIORITY as $p): ?><option value="<?= $p ?>" <?= (($edit['priority']??'عادية')===$p)?'selected':'' ?>><?= $p ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>تاريخ الحاجة</label><input type="date" name="need_date" value="<?= htmlspecialchars($edit['need_date'] ?? '') ?>"></div>
-            <div class="field"><label>مرحلة التلبية</label><select name="fulfillment_stage"><?php foreach($STAGES as $s): ?><option value="<?= $s ?>" <?= (($edit['fulfillment_stage']??'مفتوح')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_638_3e1af">تاريخ الحاجة</label><input type="date" name="need_date" value="<?= htmlspecialchars($edit['need_date'] ?? '') ?>" id="emsf_638_3e1af"></div>
+            <div class="field"><label for="emsf_639_5cba4">مرحلة التلبية</label><select name="fulfillment_stage" id="emsf_639_5cba4"><?php foreach($STAGES as $s): ?><option value="<?= $s ?>" <?= (($edit['fulfillment_stage']??'مفتوح')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" name="is_critical" id="crit" value="1" <?= (intval($edit['is_critical']??0)===1)?'checked':'' ?>><label for="crit" style="margin:0;">وظيفة حرجة</label></div>
             <div class="field" style="grid-column:1/-1;"><label>المرشّحون (إدخال يدوي)</label><input type="text" name="candidates_note" value="<?= htmlspecialchars($edit['candidates_note'] ?? '') ?>"></div>
-            <div class="field" style="grid-column:1/-1;"><label>ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
+            <div class="field" style="grid-column:1/-1;"><label for="emsf_640_318d4">ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_640_318d4"></div>
         </div>
         <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ (يحسب المتوفّر والعجز/الفائض)</button><a href="workforce_requirement.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>

@@ -1095,14 +1095,14 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="company_name">اسم الشركة (عربي) *</label>
                             <div class="fw">
-                                <input id="company_name" name="company_name" maxlength="200" required placeholder="شركة المعدات الثقيلة" value="<?php echo isset($_POST['company_name']) ? e($_POST['company_name']) : ''; ?>">
+                                <input id="company_name" name="company_name" maxlength="200" required placeholder="شركة المعدات الثقيلة" value="<?php echo isset($_POST['company_name']) ? e($_POST['company_name']) : ''; ?>" aria-label="شركة المعدات الثقيلة">
                                 <i class="fas fa-building ico"></i>
                             </div>
                         </div>
                         <div class="field">
                             <label for="company_name_en">اسم الشركة (إنجليزي)</label>
                             <div class="fw">
-                                <input id="company_name_en" name="company_name_en" maxlength="200" placeholder="Heavy Equipment Co." value="<?php echo isset($_POST['company_name_en']) ? e($_POST['company_name_en']) : ''; ?>">
+                                <input id="company_name_en" name="company_name_en" maxlength="200" placeholder="Heavy Equipment Co." value="<?php echo isset($_POST['company_name_en']) ? e($_POST['company_name_en']) : ''; ?>" aria-label="Heavy Equipment Co.">
                                 <i class="fas fa-building ico"></i>
                             </div>
                         </div>
@@ -1111,7 +1111,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="commercial_registration">السجل التجاري *</label>
                             <div class="fw">
-                                <input id="commercial_registration" name="commercial_registration" maxlength="120" required placeholder="1234567890" value="<?php echo isset($_POST['commercial_registration']) ? e($_POST['commercial_registration']) : ''; ?>">
+                                <input id="commercial_registration" name="commercial_registration" maxlength="120" required placeholder="1234567890" value="<?php echo isset($_POST['commercial_registration']) ? e($_POST['commercial_registration']) : ''; ?>" aria-label="1234567890">
                                 <i class="fas fa-file-alt ico"></i>
                             </div>
                         </div>
@@ -1132,14 +1132,14 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="country">الدولة *</label>
                             <div class="fw">
-                                <input id="country" name="country" maxlength="100" required placeholder="المملكة العربية السعودية" value="<?php echo isset($_POST['country']) ? e($_POST['country']) : ''; ?>">
+                                <input id="country" name="country" maxlength="100" required placeholder="المملكة العربية السعودية" value="<?php echo isset($_POST['country']) ? e($_POST['country']) : ''; ?>" aria-label="المملكة العربية السعودية">
                                 <i class="fas fa-globe ico"></i>
                             </div>
                         </div>
                         <div class="field">
                             <label for="city">المدينة *</label>
                             <div class="fw">
-                                <input id="city" name="city" maxlength="100" required placeholder="الرياض" value="<?php echo isset($_POST['city']) ? e($_POST['city']) : ''; ?>">
+                                <input id="city" name="city" maxlength="100" required placeholder="الرياض" value="<?php echo isset($_POST['city']) ? e($_POST['city']) : ''; ?>" aria-label="الرياض">
                                 <i class="fas fa-map-marker-alt ico"></i>
                             </div>
                         </div>
@@ -1160,14 +1160,14 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="company_email">البريد الرسمي للشركة *</label>
                             <div class="fw">
-                                <input id="company_email" name="company_email" type="email" maxlength="150" required placeholder="info@company.com" value="<?php echo isset($_POST['company_email']) ? e($_POST['company_email']) : ''; ?>">
+                                <input id="company_email" name="company_email" type="email" maxlength="150" required placeholder="info@company.com" value="<?php echo isset($_POST['company_email']) ? e($_POST['company_email']) : ''; ?>" aria-label="info@company.com">
                                 <i class="fas fa-envelope ico"></i>
                             </div>
                         </div>
                         <div class="field">
                             <label for="phone">هاتف الشركة *</label>
                             <div class="fw">
-                                <input id="phone" name="phone" maxlength="30" required placeholder="+966 50 xxx xxxx" value="<?php echo isset($_POST['phone']) ? e($_POST['phone']) : ''; ?>">
+                                <input id="phone" name="phone" maxlength="30" required placeholder="+966 50 xxx xxxx" value="<?php echo isset($_POST['phone']) ? e($_POST['phone']) : ''; ?>" aria-label="+966 50 xxx xxxx">
                                 <i class="fas fa-phone ico"></i>
                             </div>
                         </div>
@@ -1175,7 +1175,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                     <div class="field">
                         <label for="postal_address">العنوان البريدي</label>
                         <div class="fw">
-                            <textarea id="postal_address" name="postal_address" maxlength="400" placeholder="العنوان التفصيلي للشركة..."><?php echo isset($_POST['postal_address']) ? e($_POST['postal_address']) : ''; ?></textarea>
+                            <textarea id="postal_address" name="postal_address" maxlength="400" placeholder="العنوان التفصيلي للشركة..." aria-label="العنوان التفصيلي للشركة..."><?php echo isset($_POST['postal_address']) ? e($_POST['postal_address']) : ''; ?></textarea>
                             <i class="fas fa-map ico" style="top:14px;"></i>
                         </div>
                     </div>
@@ -1183,7 +1183,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="tax_number">الرقم الضريبي</label>
                             <div class="fw">
-                                <input id="tax_number" name="tax_number" maxlength="100" placeholder="3001234567890" value="<?php echo isset($_POST['tax_number']) ? e($_POST['tax_number']) : ''; ?>">
+                                <input id="tax_number" name="tax_number" maxlength="100" placeholder="3001234567890" value="<?php echo isset($_POST['tax_number']) ? e($_POST['tax_number']) : ''; ?>" aria-label="3001234567890">
                                 <i class="fas fa-receipt ico"></i>
                             </div>
                         </div>
@@ -1198,14 +1198,14 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="manager_name">اسم المدير العام *</label>
                             <div class="fw">
-                                <input id="manager_name" name="manager_name" maxlength="150" required placeholder="محمد أحمد" value="<?php echo isset($_POST['manager_name']) ? e($_POST['manager_name']) : ''; ?>">
+                                <input id="manager_name" name="manager_name" maxlength="150" required placeholder="محمد أحمد" value="<?php echo isset($_POST['manager_name']) ? e($_POST['manager_name']) : ''; ?>" aria-label="محمد أحمد">
                                 <i class="fas fa-user-tie ico"></i>
                             </div>
                         </div>
                         <div class="field">
                             <label for="manager_email">بريد المدير العام *</label>
                             <div class="fw">
-                                <input id="manager_email" name="manager_email" type="email" maxlength="150" required placeholder="manager@company.com" value="<?php echo isset($_POST['manager_email']) ? e($_POST['manager_email']) : ''; ?>">
+                                <input id="manager_email" name="manager_email" type="email" maxlength="150" required placeholder="manager@company.com" value="<?php echo isset($_POST['manager_email']) ? e($_POST['manager_email']) : ''; ?>" aria-label="manager@company.com">
                                 <i class="fas fa-envelope ico"></i>
                             </div>
                         </div>
@@ -1214,7 +1214,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="manager_phone">هاتف المدير العام *</label>
                             <div class="fw">
-                                <input id="manager_phone" name="manager_phone" maxlength="30" required placeholder="+966 55 xxx xxxx" value="<?php echo isset($_POST['manager_phone']) ? e($_POST['manager_phone']) : ''; ?>">
+                                <input id="manager_phone" name="manager_phone" maxlength="30" required placeholder="+966 55 xxx xxxx" value="<?php echo isset($_POST['manager_phone']) ? e($_POST['manager_phone']) : ''; ?>" aria-label="+966 55 xxx xxxx">
                                 <i class="fas fa-mobile-alt ico"></i>
                             </div>
                         </div>
@@ -1224,14 +1224,14 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="manager_password">كلمة مرور المدير العام *</label>
                             <div class="fw">
-                                <input id="manager_password" name="manager_password" type="password" maxlength="100" placeholder="8 أحرف على الأقل" value="">
+                                <input id="manager_password" name="manager_password" type="password" maxlength="100" placeholder="8 أحرف على الأقل" value="" aria-label="8 أحرف على الأقل">
                                 <i class="fas fa-lock ico"></i>
                             </div>
                         </div>
                         <div class="field">
                             <label for="manager_password_confirm">تأكيد كلمة المرور *</label>
                             <div class="fw">
-                                <input id="manager_password_confirm" name="manager_password_confirm" type="password" maxlength="100" placeholder="أعد كتابة كلمة المرور" value="">
+                                <input id="manager_password_confirm" name="manager_password_confirm" type="password" maxlength="100" placeholder="أعد كتابة كلمة المرور" value="" aria-label="أعد كتابة كلمة المرور">
                                 <i class="fas fa-shield-alt ico"></i>
                             </div>
                         </div>
@@ -1335,7 +1335,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <div class="field">
                             <label for="modules_enabled">الوحدات المطلوبة</label>
                             <div class="fw">
-                                <input id="modules_enabled" name="modules_enabled" maxlength="255" placeholder="projects,timesheet,reports" value="<?php echo isset($_POST['modules_enabled']) ? e($_POST['modules_enabled']) : ''; ?>">
+                                <input id="modules_enabled" name="modules_enabled" maxlength="255" placeholder="projects,timesheet,reports" value="<?php echo isset($_POST['modules_enabled']) ? e($_POST['modules_enabled']) : ''; ?>" aria-label="projects,timesheet,reports">
                                 <i class="fas fa-puzzle-piece ico"></i>
                             </div>
                         </div>

@@ -213,8 +213,8 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
     <div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
             <input type="hidden" name="preview" value="<?php echo $previewFor; ?>">
-            <label>تاريخُ الأثر:</label>
-            <input type="date" name="as_of" value="<?php echo htmlspecialchars($previewOn); ?>">
+            <label for="emsf_569_22ab0">تاريخُ الأثر:</label>
+            <input type="date" name="as_of" value="<?php echo htmlspecialchars($previewOn); ?>" id="emsf_569_22ab0">
             <button type="submit" class="btn-save"><i class="fa fa-rotate"></i> أعِد الاحتساب</button>
         </form>
 
@@ -338,9 +338,9 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                         <input type="hidden" name="fs_action" value="approve">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
-                            <div class="form-group"><label>مرفقُ الإخلاء <span style="color:#c00">*</span></label>
+                            <div class="form-group"><label for="emsf_570_4f3bf">مرفقُ الإخلاء <span style="color:#c00">*</span></label>
                                 <input type="text" name="clearance_doc" maxlength="120" required
-                                       placeholder="مرجعُ محضر الإخلاء"></div>
+                                       placeholder="مرجعُ محضر الإخلاء" id="emsf_570_4f3bf"></div>
                         </div>
                         <button type="submit" class="btn-save"><i class="fa fa-check"></i>
                             اعتمد التصفية</button>
@@ -353,8 +353,8 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                         <input type="hidden" name="fs_action" value="cancel">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
-                            <div class="form-group"><label>سببُ الإلغاء <span style="color:#c00">*</span></label>
-                                <input type="text" name="cancel_reason" maxlength="255" required></div>
+                            <div class="form-group"><label for="emsf_571_348a7">سببُ الإلغاء <span style="color:#c00">*</span></label>
+                                <input type="text" name="cancel_reason" maxlength="255" required id="emsf_571_348a7"></div>
                         </div>
                         <button type="submit" class="btn-cancel"><i class="fa fa-ban"></i> ألغِ المسودة</button>
                     </form>

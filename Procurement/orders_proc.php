@@ -261,11 +261,11 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
         $clsopts .= '<option value="' . htmlspecialchars($c) . '"' . $sel . '>' . htmlspecialchars($c) . '</option>';
     }
     return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
-        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item">' . $opts . '</select></div>'
-        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required></div>'
-        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '"></div>'
-        . '<div class="form-group"><label>سعر الوحدة</label><input type="number" step="0.01" name="line_price[]" class="line-price" value="' . $price . '"></div>'
-        . '<div class="form-group"><label>تصنيف السطر</label><select name="line_class[]">' . $clsopts . '</select></div>'
+        . '<div class="form-group"><label for="emsf_395_abccb">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_395_abccb">' . $opts . '</select></div>'
+        . '<div class="form-group"><label for="emsf_396_383f8">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_396_383f8"></div>'
+        . '<div class="form-group"><label for="emsf_397_095f6">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_397_095f6"></div>'
+        . '<div class="form-group"><label for="emsf_398_1f5e1">سعر الوحدة</label><input type="number" step="0.01" name="line_price[]" class="line-price" value="' . $price . '" id="emsf_398_1f5e1"></div>'
+        . '<div class="form-group"><label for="emsf_399_cdfeb">تصنيف السطر</label><select name="line_class[]" id="emsf_399_cdfeb">' . $clsopts . '</select></div>'
         . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
@@ -322,15 +322,15 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                 <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
                     <input type="hidden" name="action" value="match_invoice">
                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
-                    <div class="form-group"><label>رقم الفاتورة</label>
+                    <div class="form-group"><label for="emsf_400_90de2">رقم الفاتورة</label>
                         <input type="text" name="invoice_no" required
-                               value="<?php echo htmlspecialchars((string)($edit['invoice_no'] ?? '')); ?>"></div>
-                    <div class="form-group"><label>تاريخها</label>
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_no'] ?? '')); ?>" id="emsf_400_90de2"></div>
+                    <div class="form-group"><label for="emsf_401_d5a4a">تاريخها</label>
                         <input type="date" name="invoice_date"
-                               value="<?php echo htmlspecialchars((string)($edit['invoice_date'] ?? '')); ?>"></div>
-                    <div class="form-group"><label>قيمتها</label>
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_date'] ?? '')); ?>" id="emsf_401_d5a4a"></div>
+                    <div class="form-group"><label for="emsf_402_52f9c">قيمتها</label>
                         <input type="number" step="0.01" name="invoice_amount" required
-                               value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>"></div>
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>" id="emsf_402_52f9c"></div>
                     <button type="submit" class="btn-save"><i class="fas fa-scale-balanced"></i> طابِق</button>
                 </form>
             <?php endif; ?>
@@ -385,18 +385,18 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
                 <input type="hidden" name="action" value="add_landed_cost">
                 <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
-                <div class="form-group"><label>رقم المستند <span class="required">*</span></label>
-                    <input type="text" name="lc_doc_no" required maxlength="60" placeholder="بوليصة / إيصال جمركي"></div>
-                <div class="form-group"><label>النوع</label>
-                    <select name="lc_type"><option>شحن</option><option>جمارك</option><option>تخليص</option><option>نقل داخلي</option><option>أخرى</option></select></div>
-                <div class="form-group"><label>المبلغ <span class="required">*</span></label>
-                    <input type="number" step="0.01" min="0.01" name="lc_amount" required></div>
-                <div class="form-group"><label>العملة</label>
-                    <input type="text" name="lc_currency" value="<?php echo htmlspecialchars((string)$edit['currency']); ?>" maxlength="8"></div>
-                <div class="form-group"><label>سعر الصرف (للمعادل)</label>
-                    <input type="number" step="0.0001" min="0.0001" name="lc_fx" value="<?php echo htmlspecialchars((string)$edit['fx_rate']); ?>"></div>
-                <div class="form-group"><label>مقدم الخدمة</label>
-                    <select name="lc_supplier_id"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+                <div class="form-group"><label for="emsf_403_f20f4">رقم المستند <span class="required">*</span></label>
+                    <input type="text" name="lc_doc_no" required maxlength="60" placeholder="بوليصة / إيصال جمركي" id="emsf_403_f20f4"></div>
+                <div class="form-group"><label for="emsf_404_35838">النوع</label>
+                    <select name="lc_type" id="emsf_404_35838"><option>شحن</option><option>جمارك</option><option>تخليص</option><option>نقل داخلي</option><option>أخرى</option></select></div>
+                <div class="form-group"><label for="emsf_405_8adff">المبلغ <span class="required">*</span></label>
+                    <input type="number" step="0.01" min="0.01" name="lc_amount" required id="emsf_405_8adff"></div>
+                <div class="form-group"><label for="emsf_406_624e4">العملة</label>
+                    <input type="text" name="lc_currency" value="<?php echo htmlspecialchars((string)$edit['currency']); ?>" maxlength="8" id="emsf_406_624e4"></div>
+                <div class="form-group"><label for="emsf_407_2ec27">سعر الصرف (للمعادل)</label>
+                    <input type="number" step="0.0001" min="0.0001" name="lc_fx" value="<?php echo htmlspecialchars((string)$edit['fx_rate']); ?>" id="emsf_407_2ec27"></div>
+                <div class="form-group"><label for="emsf_408_b1808">مقدم الخدمة</label>
+                    <select name="lc_supplier_id" id="emsf_408_b1808"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
                 <button type="submit" class="btn-save"><i class="fas fa-ship"></i> رسملة</button>
             </form>
             <?php elseif (!$__gated): ?>
@@ -413,64 +413,64 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>المورد التشغيلي</label>
-                        <select name="supplier_id"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
+                        <label for="emsf_409_e5244">المورد التشغيلي</label>
+                        <select name="supplier_id" id="emsf_409_e5244"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>مرجع طلب الشراء</label>
-                        <select name="request_id"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— بلا طلب —'); ?></select>
+                        <label for="emsf_410_7f092">مرجع طلب الشراء</label>
+                        <select name="request_id" id="emsf_410_7f092"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— بلا طلب —'); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>مرجع الاعتماد المالي <span class="required">*</span> <small>(شرط الإصدار)</small></label>
-                        <input type="text" name="fin_approval_ref" value="<?php echo $edit ? htmlspecialchars((string)$edit['fin_approval_ref']) : ''; ?>">
+                        <label for="emsf_411_ccb3f">مرجع الاعتماد المالي <span class="required">*</span> <small>(شرط الإصدار)</small></label>
+                        <input type="text" name="fin_approval_ref" value="<?php echo $edit ? htmlspecialchars((string)$edit['fin_approval_ref']) : ''; ?>" id="emsf_411_ccb3f">
                     </div>
                     <div class="form-group">
-                        <label>التصنيف التشغيلي</label>
-                        <select name="op_classification">
+                        <label for="emsf_412_f5bab">التصنيف التشغيلي</label>
+                        <select name="op_classification" id="emsf_412_f5bab">
                             <?php foreach ($classifications as $c): $sel = ($edit && $edit['op_classification'] === $c) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($c); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($c); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>العملة</label>
-                        <select name="currency">
+                        <label for="emsf_413_31454">العملة</label>
+                        <select name="currency" id="emsf_413_31454">
                             <?php foreach ($currencies as $c): $sel = ($edit && $edit['currency'] === $c) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($c); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($c); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>سعر الصرف</label>
-                        <input type="number" step="0.0001" name="fx_rate" value="<?php echo $edit ? htmlspecialchars((string)$edit['fx_rate']) : '1'; ?>">
+                        <label for="emsf_414_ca3d0">سعر الصرف</label>
+                        <input type="number" step="0.0001" name="fx_rate" value="<?php echo $edit ? htmlspecialchars((string)$edit['fx_rate']) : '1'; ?>" id="emsf_414_ca3d0">
                     </div>
                     <div class="form-group">
-                        <label>وقت الدفع</label>
-                        <select name="payment_time">
+                        <label for="emsf_415_4133d">وقت الدفع</label>
+                        <select name="payment_time" id="emsf_415_4133d">
                             <?php foreach ($pay_times as $p): $sel = ($edit && $edit['payment_time'] === $p) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($p); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($p); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>نوع الاستلام المتوقع</label>
-                        <select name="expected_receipt_type">
+                        <label for="emsf_416_046ef">نوع الاستلام المتوقع</label>
+                        <select name="expected_receipt_type" id="emsf_416_046ef">
                             <?php foreach ($recv_types as $rt): $sel = ($edit && $edit['expected_receipt_type'] === $rt) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($rt); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($rt); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>حالة الأمر</label>
-                        <select name="state">
+                        <label for="emsf_417_defae">حالة الأمر</label>
+                        <select name="state" id="emsf_417_defae">
                             <?php foreach ($states as $st): $sel = ($edit && $edit['state'] === $st) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($st); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($st); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
+                        <label for="emsf_418_4c0b7">ملاحظات</label>
+                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>" id="emsf_418_4c0b7">
                     </div>
                 </div>
             </div>

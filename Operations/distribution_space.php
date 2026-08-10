@@ -43,7 +43,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <form method="get" style="display:flex;gap:8px;align-items:center">
-            <label>اليوم</label><input type="date" name="date" value="<?php echo htmlspecialchars($date); ?>">
+            <label for="emsf_351_e5768">اليوم</label><input type="date" name="date" value="<?php echo htmlspecialchars($date); ?>" id="emsf_351_e5768">
             <button type="submit" class="btn-save">اعرض الشبكة</button>
         </form>
     </div></div>

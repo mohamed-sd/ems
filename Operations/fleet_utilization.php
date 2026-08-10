@@ -73,10 +73,10 @@ if (function_exists('ems_screen_about')) {
 ?>
   <div class="card"><div class="card-body">
     <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
-      <div><label>من</label><input type="date" name="from" value="<?php echo fu_e($from); ?>" class="form-control"></div>
-      <div><label>إلى</label><input type="date" name="to" value="<?php echo fu_e($to); ?>" class="form-control"></div>
-      <div><label>الفئة</label>
-        <select name="type" class="form-control">
+      <div><label for="emsf_364_d11dc">من</label><input type="date" name="from" value="<?php echo fu_e($from); ?>" class="form-control" id="emsf_364_d11dc"></div>
+      <div><label for="emsf_365_be9da">إلى</label><input type="date" name="to" value="<?php echo fu_e($to); ?>" class="form-control" id="emsf_365_be9da"></div>
+      <div><label for="emsf_366_1e7d1">الفئة</label>
+        <select name="type" class="form-control" id="emsf_366_1e7d1">
           <option value="0">— كل الفئات —</option>
           <?php foreach ($types as $t): ?>
             <option value="<?php echo (int) $t['id']; ?>" <?php echo $type_filter === (int) $t['id'] ? 'selected' : ''; ?>>

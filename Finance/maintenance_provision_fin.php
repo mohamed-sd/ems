@@ -113,8 +113,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>معدّل مخصّص الصيانة لكل ساعة تشغيل (SDG)</label>
-                        <input type="number" name="rate" step="0.0001" min="0" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله">
+                        <label for="emsf_238_562ad">معدّل مخصّص الصيانة لكل ساعة تشغيل (SDG)</label>
+                        <input type="number" name="rate" step="0.0001" min="0" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_238_562ad">
                     </div>
                 </div>
             </div>

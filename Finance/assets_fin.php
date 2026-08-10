@@ -108,14 +108,14 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     <form id="finForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة أصل ثابت</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>الكود <span class="required">*</span></label><input type="text" name="code" required></div>
-            <div class="form-group"><label>اسم الأصل <span class="required">*</span></label><input type="text" name="name" required></div>
-            <div class="form-group"><label>الفئة</label><input type="text" name="category" placeholder="معدات/مباني/سيارات"></div>
-            <div class="form-group"><label>المعدة المرتبطة</label><select name="equipment_id"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label>تاريخ الاقتناء</label><input type="date" name="acquisition_date" value="<?php echo date('Y-m-d'); ?>"></div>
-            <div class="form-group"><label>تكلفة الاقتناء <span class="required">*</span></label><input type="number" step="0.01" min="0" name="acquisition_cost" required></div>
-            <div class="form-group"><label>القيمة التخريدية</label><input type="number" step="0.01" min="0" name="salvage_value" value="0"></div>
-            <div class="form-group"><label>العمر الإنتاجي (شهر)</label><input type="number" min="1" name="useful_life_months" value="60"></div>
+            <div class="form-group"><label for="emsf_199_0b09d">الكود <span class="required">*</span></label><input type="text" name="code" required id="emsf_199_0b09d"></div>
+            <div class="form-group"><label for="emsf_200_b6b52">اسم الأصل <span class="required">*</span></label><input type="text" name="name" required id="emsf_200_b6b52"></div>
+            <div class="form-group"><label for="emsf_201_d1522">الفئة</label><input type="text" name="category" placeholder="معدات/مباني/سيارات" id="emsf_201_d1522"></div>
+            <div class="form-group"><label for="emsf_202_b8ed1">المعدة المرتبطة</label><select name="equipment_id" id="emsf_202_b8ed1"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label for="emsf_203_c79d2">تاريخ الاقتناء</label><input type="date" name="acquisition_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_203_c79d2"></div>
+            <div class="form-group"><label for="emsf_204_98031">تكلفة الاقتناء <span class="required">*</span></label><input type="number" step="0.01" min="0" name="acquisition_cost" required id="emsf_204_98031"></div>
+            <div class="form-group"><label for="emsf_205_1a728">القيمة التخريدية</label><input type="number" step="0.01" min="0" name="salvage_value" value="0" id="emsf_205_1a728"></div>
+            <div class="form-group"><label for="emsf_206_d25e1">العمر الإنتاجي (شهر)</label><input type="number" min="1" name="useful_life_months" value="60" id="emsf_206_d25e1"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

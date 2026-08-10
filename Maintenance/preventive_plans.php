@@ -289,33 +289,33 @@ function mnt_opt($value, $label, $selected) {
         <div class="card-header"><h5><i class="fas fa-calendar-check"></i> بيانات الخطة</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>اسم الخطة</label><input type="text" name="name" value="<?php echo htmlspecialchars((string) $plan['name']); ?>"></div>
-                <div class="form-group"><label>النطاق</label>
-                    <select name="scope"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_330_c7181">اسم الخطة</label><input type="text" name="name" value="<?php echo htmlspecialchars((string) $plan['name']); ?>" id="emsf_330_c7181"></div>
+                <div class="form-group"><label for="emsf_331_020f7">النطاق</label>
+                    <select name="scope" id="emsf_331_020f7"><option value="">-- اختر --</option>
                         <?php foreach (array('معدة', 'فئة') as $sc) echo mnt_opt($sc, $sc, $plan['scope'] === $sc); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>المعدة</label>
-                    <select name="equipment_id"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_332_338c0">المعدة</label>
+                    <select name="equipment_id" id="emsf_332_338c0"><option value="">-- اختر --</option>
                         <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($plan['equipment_id']) === intval($e['id'])); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>الفئة (نوع المعدة)</label>
-                    <select name="category_id"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_333_4215d">الفئة (نوع المعدة)</label>
+                    <select name="category_id" id="emsf_333_4215d"><option value="">-- اختر --</option>
                         <?php foreach ($categories as $c) echo mnt_opt($c['id'], $c['type'], intval($plan['category_id']) === intval($c['id'])); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>أساس التكرار</label>
-                    <select name="trigger_basis"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $plan['trigger_basis'] === $tb); ?></select>
+                <div class="form-group"><label for="emsf_334_e64bd">أساس التكرار</label>
+                    <select name="trigger_basis" id="emsf_334_e64bd"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $plan['trigger_basis'] === $tb); ?></select>
                 </div>
-                <div class="form-group"><label>الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" value="<?php echo htmlspecialchars((string) $plan['interval_value']); ?>"></div>
-                <div class="form-group"><label>هامش السماح</label><input type="number" name="tolerance" value="<?php echo htmlspecialchars((string) $plan['tolerance']); ?>"></div>
-                <div class="form-group"><label>آخر تنفيذ (تاريخ)</label><input type="date" name="last_done_date" value="<?php echo htmlspecialchars((string) $plan['last_done_date']); ?>"></div>
-                <div class="form-group"><label>عدّاد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>"></div>
-                <div class="form-group"><label>الاستحقاق القادم (تاريخ)</label><input type="date" name="next_due_date" value="<?php echo htmlspecialchars((string) $plan['next_due_date']); ?>"></div>
-                <div class="form-group"><label>الاستحقاق القادم (عدّاد)</label><input type="number" step="0.01" name="next_due_meter" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="state"><?php foreach ($states as $s) echo mnt_opt($s, $s, $plan['state'] === $s); ?></select>
+                <div class="form-group"><label for="emsf_335_3578a">الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" value="<?php echo htmlspecialchars((string) $plan['interval_value']); ?>" id="emsf_335_3578a"></div>
+                <div class="form-group"><label for="emsf_336_4795a">هامش السماح</label><input type="number" name="tolerance" value="<?php echo htmlspecialchars((string) $plan['tolerance']); ?>" id="emsf_336_4795a"></div>
+                <div class="form-group"><label for="emsf_337_1ddc7">آخر تنفيذ (تاريخ)</label><input type="date" name="last_done_date" value="<?php echo htmlspecialchars((string) $plan['last_done_date']); ?>" id="emsf_337_1ddc7"></div>
+                <div class="form-group"><label for="emsf_338_2a157">عدّاد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>" id="emsf_338_2a157"></div>
+                <div class="form-group"><label for="emsf_339_44363">الاستحقاق القادم (تاريخ)</label><input type="date" name="next_due_date" value="<?php echo htmlspecialchars((string) $plan['next_due_date']); ?>" id="emsf_339_44363"></div>
+                <div class="form-group"><label for="emsf_340_40caf">الاستحقاق القادم (عدّاد)</label><input type="number" step="0.01" name="next_due_meter" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>" id="emsf_340_40caf"></div>
+                <div class="form-group"><label for="emsf_341_330e5">الحالة</label>
+                    <select name="state" id="emsf_341_330e5"><?php foreach ($states as $s) echo mnt_opt($s, $s, $plan['state'] === $s); ?></select>
                 </div>
             </div></div>
             <div class="form-actions">
@@ -345,10 +345,10 @@ function mnt_opt($value, $label, $selected) {
                 <input type="hidden" name="action" value="add_task">
                 <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                 <div class="mnt-line-grid">
-                    <div class="form-group"><label>المهمة</label><input type="text" name="task_name" placeholder="مثال: تغيير زيت المحرك"></div>
-                    <div class="form-group"><label>نوع المهمة</label><select name="task_type"><option value="">-- اختر --</option><?php foreach ($task_types as $id => $nm) echo mnt_opt($id, $nm, false); ?></select></div>
-                    <div class="form-group"><label>المكوّن</label><input type="text" name="component" placeholder="مثال: المحرك"></div>
-                    <div class="form-group"><label>ساعات تقديرية</label><input type="number" step="0.01" name="est_hours" value="0"></div>
+                    <div class="form-group"><label for="emsf_342_a9a44">المهمة</label><input type="text" name="task_name" placeholder="مثال: تغيير زيت المحرك" id="emsf_342_a9a44"></div>
+                    <div class="form-group"><label for="emsf_343_0ac85">نوع المهمة</label><select name="task_type" id="emsf_343_0ac85"><option value="">-- اختر --</option><?php foreach ($task_types as $id => $nm) echo mnt_opt($id, $nm, false); ?></select></div>
+                    <div class="form-group"><label for="emsf_344_e3ddd">المكوّن</label><input type="text" name="component" placeholder="مثال: المحرك" id="emsf_344_e3ddd"></div>
+                    <div class="form-group"><label for="emsf_345_6d6e3">ساعات تقديرية</label><input type="number" step="0.01" name="est_hours" value="0" id="emsf_345_6d6e3"></div>
                 </div>
                 <div class="mnt-line-actions">
                     <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إضافة المهمة</button>
@@ -391,21 +391,21 @@ function mnt_opt($value, $label, $selected) {
         <div class="card-header"><h5><i class="fas fa-calendar-check"></i> إنشاء خطة وقائية جديدة</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>اسم الخطة</label><input type="text" name="name" placeholder="مثال: تغيير زيت كل 250 ساعة"></div>
-                <div class="form-group"><label>المعدة</label>
-                    <select name="equipment_id"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_346_826a3">اسم الخطة</label><input type="text" name="name" placeholder="مثال: تغيير زيت كل 250 ساعة" id="emsf_346_826a3"></div>
+                <div class="form-group"><label for="emsf_347_ca65f">المعدة</label>
+                    <select name="equipment_id" id="emsf_347_ca65f"><option value="">-- اختر --</option>
                         <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), false); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>الفئة (نوع المعدة)</label>
-                    <select name="category_id"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_348_5fb80">الفئة (نوع المعدة)</label>
+                    <select name="category_id" id="emsf_348_5fb80"><option value="">-- اختر --</option>
                         <?php foreach ($categories as $c) echo mnt_opt($c['id'], $c['type'], false); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>أساس التكرار</label>
-                    <select name="trigger_basis"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $tb === 'ساعات'); ?></select>
+                <div class="form-group"><label for="emsf_349_aee55">أساس التكرار</label>
+                    <select name="trigger_basis" id="emsf_349_aee55"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $tb === 'ساعات'); ?></select>
                 </div>
-                <div class="form-group"><label>الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" placeholder="مثال: 250"></div>
+                <div class="form-group"><label for="emsf_350_c5c0f">الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" placeholder="مثال: 250" id="emsf_350_c5c0f"></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-save"><i class="fas fa-plus"></i> إنشاء الخطة</button>
@@ -494,8 +494,8 @@ function mnt_opt($value, $label, $selected) {
                               onsubmit="return this.reason.value.trim() !== '' || (alert('السببُ إلزامي'), false)">
                             <input type="hidden" name="action" value="postpone_plan">
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل">
-                            <input type="text" name="reason" placeholder="سببُ التأجيل *" style="width:130px" required>
+                            <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل" aria-label="أيام التأجيل">
+                            <input type="text" name="reason" placeholder="سببُ التأجيل *" style="width:130px" required aria-label="سببُ التأجيل">
                             <button type="submit" class="btn-save" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
                         </form>
                         <?php endif; ?></td>

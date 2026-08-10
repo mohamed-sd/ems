@@ -162,22 +162,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
                 <div class="form-grid">
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>سبب الانحراف</label>
-                        <input type="text" name="cause" maxlength="200" value="<?php echo htmlspecialchars($editLine['cause'] ?? ''); ?>" placeholder="ما الذي سبّب الفرق بين المخطّط والفعلي؟">
+                        <label for="emsf_272_3ca83">سبب الانحراف</label>
+                        <input type="text" name="cause" maxlength="200" value="<?php echo htmlspecialchars($editLine['cause'] ?? ''); ?>" placeholder="ما الذي سبّب الفرق بين المخطّط والفعلي؟" id="emsf_272_3ca83">
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>الإجراء التصحيحي</label>
-                        <input type="text" name="corrective_action" maxlength="200" value="<?php echo htmlspecialchars($editLine['corrective_action'] ?? ''); ?>" placeholder="ما الإجراء المتّخذ لمعالجته؟">
+                        <label for="emsf_273_0f631">الإجراء التصحيحي</label>
+                        <input type="text" name="corrective_action" maxlength="200" value="<?php echo htmlspecialchars($editLine['corrective_action'] ?? ''); ?>" placeholder="ما الإجراء المتّخذ لمعالجته؟" id="emsf_273_0f631">
                     </div>
                     <div class="form-group">
-                        <label>المسؤول (المالك)</label>
-                        <select name="responsible_id">
+                        <label for="emsf_274_dcb83">المسؤول (المالك)</label>
+                        <select name="responsible_id" id="emsf_274_dcb83">
                             <?php echo fin_employee_options($conn, $is_super_admin, $company_id, intval($editLine['responsible_id'] ?? 0)); ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الحالة</label>
-                        <select name="var_state">
+                        <label for="emsf_275_a2950">الحالة</label>
+                        <select name="var_state" id="emsf_275_a2950">
                             <?php
                             $cur = $editLine['var_state'] ?? 'open';
                             foreach ($var_states as $k => $v) {

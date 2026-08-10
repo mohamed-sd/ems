@@ -322,22 +322,22 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
             <h4 style="margin-bottom:10px;color:var(--ink-2);">بيانات الهوية والتواصل</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">اسم الشركة (عربي) *</label>
-                    <input class="form-ctrl" name="company_name" required value="<?php echo e($displayName); ?>">
+                    <label class="form-label" for="emsf_665_cfc23">اسم الشركة (عربي) *</label>
+                    <input class="form-ctrl" name="company_name" required value="<?php echo e($displayName); ?>" id="emsf_665_cfc23">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">اسم الشركة (إنجليزي)</label>
-                    <input class="form-ctrl" name="company_name_en" value="<?php echo e(isset($company['company_name_en']) ? $company['company_name_en'] : ''); ?>">
+                    <label class="form-label" for="emsf_666_22470">اسم الشركة (إنجليزي)</label>
+                    <input class="form-ctrl" name="company_name_en" value="<?php echo e(isset($company['company_name_en']) ? $company['company_name_en'] : ''); ?>" id="emsf_666_22470">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">رقم السجل التجاري *</label>
-                    <input class="form-ctrl" name="commercial_registration" required value="<?php echo e(isset($company['commercial_registration']) ? $company['commercial_registration'] : ''); ?>">
+                    <label class="form-label" for="emsf_667_f2373">رقم السجل التجاري *</label>
+                    <input class="form-ctrl" name="commercial_registration" required value="<?php echo e(isset($company['commercial_registration']) ? $company['commercial_registration'] : ''); ?>" id="emsf_667_f2373">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">قطاع النشاط *</label>
-                    <select class="form-ctrl" name="sector" required>
+                    <label class="form-label" for="emsf_668_6b977">قطاع النشاط *</label>
+                    <select class="form-ctrl" name="sector" required id="emsf_668_6b977">
                         <option value="">— اختر —</option>
                         <option value="تعدين" <?php echo (isset($company['sector']) && $company['sector'] === 'تعدين') ? 'selected' : ''; ?>>تعدين</option>
                         <option value="مقاولات" <?php echo (isset($company['sector']) && $company['sector'] === 'مقاولات') ? 'selected' : ''; ?>>مقاولات</option>
@@ -347,44 +347,44 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">الدولة *</label>
-                    <input class="form-ctrl" name="country" required value="<?php echo e(isset($company['country']) ? $company['country'] : ''); ?>">
+                    <label class="form-label" for="emsf_669_51bc2">الدولة *</label>
+                    <input class="form-ctrl" name="country" required value="<?php echo e(isset($company['country']) ? $company['country'] : ''); ?>" id="emsf_669_51bc2">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">المدينة *</label>
-                    <input class="form-ctrl" name="city" required value="<?php echo e(isset($company['city']) ? $company['city'] : ''); ?>">
-                </div>
-            </div>
-            <div class="g2">
-                <div class="form-group">
-                    <label class="form-label">الرقم الضريبي</label>
-                    <input class="form-ctrl" name="tax_number" value="<?php echo e(isset($company['tax_number']) ? $company['tax_number'] : ''); ?>">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">مسار الشعار</label>
-                    <input class="form-ctrl" name="logo_path" value="<?php echo e(isset($company['logo_path']) ? $company['logo_path'] : ''); ?>">
+                    <label class="form-label" for="emsf_670_9c4cb">المدينة *</label>
+                    <input class="form-ctrl" name="city" required value="<?php echo e(isset($company['city']) ? $company['city'] : ''); ?>" id="emsf_670_9c4cb">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">البريد الإلكتروني *</label>
-                    <input class="form-ctrl" name="email" type="email" required value="<?php echo e($company['email']); ?>">
+                    <label class="form-label" for="emsf_671_67d57">الرقم الضريبي</label>
+                    <input class="form-ctrl" name="tax_number" value="<?php echo e(isset($company['tax_number']) ? $company['tax_number'] : ''); ?>" id="emsf_671_67d57">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">رقم الهاتف *</label>
-                    <input class="form-ctrl" name="phone" required value="<?php echo e(isset($company['phone']) ? $company['phone'] : ''); ?>">
+                    <label class="form-label" for="emsf_672_9b180">مسار الشعار</label>
+                    <input class="form-ctrl" name="logo_path" value="<?php echo e(isset($company['logo_path']) ? $company['logo_path'] : ''); ?>" id="emsf_672_9b180">
+                </div>
+            </div>
+            <div class="g2">
+                <div class="form-group">
+                    <label class="form-label" for="emsf_673_3754b">البريد الإلكتروني *</label>
+                    <input class="form-ctrl" name="email" type="email" required value="<?php echo e($company['email']); ?>" id="emsf_673_3754b">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="emsf_674_ed59d">رقم الهاتف *</label>
+                    <input class="form-ctrl" name="phone" required value="<?php echo e(isset($company['phone']) ? $company['phone'] : ''); ?>" id="emsf_674_ed59d">
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">العنوان البريدي</label>
-                <textarea class="form-ctrl" name="postal_address" rows="2"><?php echo e(isset($company['postal_address']) ? $company['postal_address'] : ''); ?></textarea>
+                <label class="form-label" for="emsf_675_6610b">العنوان البريدي</label>
+                <textarea class="form-ctrl" name="postal_address" rows="2" id="emsf_675_6610b"><?php echo e(isset($company['postal_address']) ? $company['postal_address'] : ''); ?></textarea>
             </div>
 
             <h4 style="margin:8px 0 10px;color:var(--ink-2);">الاشتراك والإعدادات</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">نوع الباقة</label>
-                    <select class="form-ctrl" name="plan_id">
+                    <label class="form-label" for="emsf_676_9de37">نوع الباقة</label>
+                    <select class="form-ctrl" name="plan_id" id="emsf_676_9de37">
                         <option value="">— اختر خطة —</option>
                         <?php
                         try {
@@ -399,38 +399,38 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">الوحدات المفعلة</label>
-                    <input class="form-ctrl" name="modules_enabled" value="<?php echo e(isset($company['modules_enabled']) ? $company['modules_enabled'] : ''); ?>">
+                    <label class="form-label" for="emsf_677_03a24">الوحدات المفعلة</label>
+                    <input class="form-ctrl" name="modules_enabled" value="<?php echo e(isset($company['modules_enabled']) ? $company['modules_enabled'] : ''); ?>" id="emsf_677_03a24">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">تاريخ البدء</label>
-                    <input class="form-ctrl" type="date" name="subscription_start" value="<?php echo e(isset($company['subscription_start']) ? $company['subscription_start'] : ''); ?>">
+                    <label class="form-label" for="emsf_678_25053">تاريخ البدء</label>
+                    <input class="form-ctrl" type="date" name="subscription_start" value="<?php echo e(isset($company['subscription_start']) ? $company['subscription_start'] : ''); ?>" id="emsf_678_25053">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">تاريخ الانتهاء</label>
-                    <input class="form-ctrl" type="date" name="subscription_end" value="<?php echo e(isset($company['subscription_end']) ? $company['subscription_end'] : ''); ?>">
+                    <label class="form-label" for="emsf_679_61041">تاريخ الانتهاء</label>
+                    <input class="form-ctrl" type="date" name="subscription_end" value="<?php echo e(isset($company['subscription_end']) ? $company['subscription_end'] : ''); ?>" id="emsf_679_61041">
                 </div>
             </div>
             <div class="g3">
                 <div class="form-group">
-                    <label class="form-label">حد المستخدمين</label>
-                    <input class="form-ctrl" type="number" min="0" name="max_users" value="<?php echo intval(isset($company['max_users']) ? $company['max_users'] : 0); ?>">
+                    <label class="form-label" for="emsf_680_214c9">حد المستخدمين</label>
+                    <input class="form-ctrl" type="number" min="0" name="max_users" value="<?php echo intval(isset($company['max_users']) ? $company['max_users'] : 0); ?>" id="emsf_680_214c9">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">حد الآليات</label>
-                    <input class="form-ctrl" type="number" min="0" name="max_equipments" value="<?php echo intval(isset($company['max_equipments']) ? $company['max_equipments'] : 0); ?>">
+                    <label class="form-label" for="emsf_681_273ec">حد الآليات</label>
+                    <input class="form-ctrl" type="number" min="0" name="max_equipments" value="<?php echo intval(isset($company['max_equipments']) ? $company['max_equipments'] : 0); ?>" id="emsf_681_273ec">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">حد المشاريع</label>
-                    <input class="form-ctrl" type="number" min="0" name="max_projects" value="<?php echo intval(isset($company['max_projects']) ? $company['max_projects'] : 0); ?>">
+                    <label class="form-label" for="emsf_682_7c6f3">حد المشاريع</label>
+                    <input class="form-ctrl" type="number" min="0" name="max_projects" value="<?php echo intval(isset($company['max_projects']) ? $company['max_projects'] : 0); ?>" id="emsf_682_7c6f3">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">العملة</label>
-                    <select class="form-ctrl" name="currency">
+                    <label class="form-label" for="emsf_683_ea880">العملة</label>
+                    <select class="form-ctrl" name="currency" id="emsf_683_ea880">
                         <option value="SAR" <?php echo (isset($company['currency']) && $company['currency'] === 'SAR') ? 'selected' : ''; ?>>SAR</option>
                         <option value="USD" <?php echo (isset($company['currency']) && $company['currency'] === 'USD') ? 'selected' : ''; ?>>USD</option>
                         <option value="EGP" <?php echo (isset($company['currency']) && $company['currency'] === 'EGP') ? 'selected' : ''; ?>>EGP</option>
@@ -438,13 +438,13 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">المنطقة الزمنية</label>
-                    <input class="form-ctrl" name="timezone" value="<?php echo e(isset($company['timezone']) && $company['timezone'] !== '' ? $company['timezone'] : 'Asia/Riyadh'); ?>">
+                    <label class="form-label" for="emsf_684_6fb41">المنطقة الزمنية</label>
+                    <input class="form-ctrl" name="timezone" value="<?php echo e(isset($company['timezone']) && $company['timezone'] !== '' ? $company['timezone'] : 'Asia/Riyadh'); ?>" id="emsf_684_6fb41">
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">الحالة</label>
-                <select class="form-ctrl" name="status">
+                <label class="form-label" for="emsf_685_0fc72">الحالة</label>
+                <select class="form-ctrl" name="status" id="emsf_685_0fc72">
                     <option value="pending" <?php echo $st === 'pending' ? 'selected' : ''; ?>>قيد المراجعة</option>
                     <option value="active" <?php echo $st === 'active' ? 'selected' : ''; ?>>نشط</option>
                     <option value="suspended" <?php echo $st === 'suspended' ? 'selected' : ''; ?>>موقوف</option>
@@ -476,7 +476,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
             <input type="hidden" name="user_id" value="<?php echo $password_target_user ? intval($password_target_user['id']) : 0; ?>">
 
             <div class="form-group" style="margin-bottom:10px;">
-                <label class="form-label">المستخدم المستهدف</label>
+                <label class="form-label" for="emsf_686_87ccc">المستخدم المستهدف</label>
                 <input class="form-ctrl" disabled value="<?php
                     if ($password_target_user) {
                         $target_name = (isset($password_target_user['name']) && trim($password_target_user['name']) !== '') ? $password_target_user['name'] : $password_target_user['username'];
@@ -485,17 +485,17 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     } else {
                         echo 'لا يوجد مستخدم متاح';
                     }
-                ?>">
+                ?>" id="emsf_686_87ccc">
             </div>
 
             <div class="form-group">
-                <label class="form-label">كلمة المرور الجديدة *</label>
+                <label class="form-label" for="newPassword">كلمة المرور الجديدة *</label>
                 <input id="newPassword" class="form-ctrl" type="password" name="new_password" minlength="8" required placeholder="8 أحرف على الأقل">
                 <small class="text-muted">يفضل أن تحتوي على أحرف كبيرة وصغيرة وأرقام.</small>
             </div>
 
             <div class="form-group" style="margin-top:10px;">
-                <label class="form-label">تأكيد كلمة المرور *</label>
+                <label class="form-label" for="confirmPassword">تأكيد كلمة المرور *</label>
                 <input id="confirmPassword" class="form-ctrl" type="password" name="confirm_password" minlength="8" required placeholder="أعد إدخال كلمة المرور">
             </div>
 

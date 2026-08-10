@@ -168,9 +168,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="finForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء فترة مالية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required value="<?php echo date('Y'); ?>"></div>
-            <div class="form-group"><label>النوع</label><select name="period_type" id="pt"><option value="month">شهر</option><option value="year">سنة</option></select></div>
-            <div class="form-group" id="pnowrap"><label>رقم الشهر</label><input type="number" name="period_no" min="1" max="12" value="1"></div>
+            <div class="form-group"><label for="emsf_262_63abd">السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required value="<?php echo date('Y'); ?>" id="emsf_262_63abd"></div>
+            <div class="form-group"><label for="pt">النوع</label><select name="period_type" id="pt"><option value="month">شهر</option><option value="year">سنة</option></select></div>
+            <div class="form-group" id="pnowrap"><label for="emsf_263_737be">رقم الشهر</label><input type="number" name="period_no" min="1" max="12" value="1" id="emsf_263_737be"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إنشاء</button>
             <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

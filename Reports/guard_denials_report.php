@@ -46,7 +46,7 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center">
-            <label>آخر</label><input type="number" name="days" min="1" max="365" value="<?php echo $days; ?>" style="width:90px"><label>يومًا</label>
+            <label for="emsf_462_55a08">آخر</label><input type="number" name="days" min="1" max="365" value="<?php echo $days; ?>" style="width:90px" id="emsf_462_55a08"><label>يومًا</label>
             <button class="btn-save" type="submit">عرض</button>
         </form>
     </div></div>

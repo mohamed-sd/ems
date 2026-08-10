@@ -156,21 +156,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="post" class="ems-form">
             <input type="hidden" name="col_action" value="record">
             <div class="form-grid">
-                <div class="form-group"><label>العميل <span style="color:#c00">*</span></label>
-                    <select name="client_id" required>
+                <div class="form-group"><label for="emsf_23_0534f">العميل <span style="color:#c00">*</span></label>
+                    <select name="client_id" required id="emsf_23_0534f">
                         <?php foreach ($clients as $c): ?>
                             <option value="<?php echo intval($c['id']); ?>">
                                 <?php echo htmlspecialchars((string)$c['client_name']); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>المبلغ <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.01" min="0.01" name="amount" required></div>
-                <div class="form-group"><label>المرجع البنكي / السند <span style="color:#c00">*</span></label>
-                    <input type="text" name="bank_ref" maxlength="120" required></div>
-                <div class="form-group"><label>تاريخ القبض <span style="color:#c00">*</span></label>
-                    <input type="date" name="received_on" required></div>
-                <div class="form-group"><label>ذمّةٌ بعينها <small>— فارغٌ = أقدمُ فاتورةٍ أولًا</small></label>
-                    <select name="receivable_id">
+                <div class="form-group"><label for="emsf_24_d4bcc">المبلغ <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_24_d4bcc"></div>
+                <div class="form-group"><label for="emsf_25_6ef1f">المرجع البنكي / السند <span style="color:#c00">*</span></label>
+                    <input type="text" name="bank_ref" maxlength="120" required id="emsf_25_6ef1f"></div>
+                <div class="form-group"><label for="emsf_26_c982c">تاريخ القبض <span style="color:#c00">*</span></label>
+                    <input type="date" name="received_on" required id="emsf_26_c982c"></div>
+                <div class="form-group"><label for="emsf_27_b0555">ذمّةٌ بعينها <small>— فارغٌ = أقدمُ فاتورةٍ أولًا</small></label>
+                    <select name="receivable_id" id="emsf_27_b0555">
                         <option value="0">— أقدمُ فاتورةٍ أولًا —</option>
                         <?php foreach ($ageing as $r): if ((float)$r['outstanding'] <= 0) { continue; } ?>
                             <option value="<?php echo intval($r['id']); ?>">
@@ -178,9 +178,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 — متبقٍّ <?php echo htmlspecialchars((string)$r['outstanding']); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>العملة</label><input type="text" name="currency" value="USD" maxlength="8"></div>
-                <div class="form-group"><label>الطريقة</label><input type="text" name="method" value="bank" maxlength="30"></div>
-                <div class="form-group"><label>بيان</label><input type="text" name="memo" maxlength="200"></div>
+                <div class="form-group"><label for="emsf_28_b6d68">العملة</label><input type="text" name="currency" value="USD" maxlength="8" id="emsf_28_b6d68"></div>
+                <div class="form-group"><label for="emsf_29_eff92">الطريقة</label><input type="text" name="method" value="bank" maxlength="30" id="emsf_29_eff92"></div>
+                <div class="form-group"><label for="emsf_30_6854a">بيان</label><input type="text" name="memo" maxlength="200" id="emsf_30_6854a"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> سجّل القبض</button></div>
         </form>
@@ -190,8 +190,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock"></i> الذممُ بأعمارها</h5></div>
     <div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
-            <label>ترشيحٌ بعميل:</label>
-            <select name="client_id" onchange="this.form.submit()">
+            <label for="emsf_31_90b71">ترشيحٌ بعميل:</label>
+            <select name="client_id" onchange="this.form.submit()" id="emsf_31_90b71">
                 <option value="0">— الكل —</option>
                 <?php foreach ($clients as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo $filterClient === intval($c['id']) ? 'selected' : ''; ?>>
@@ -424,13 +424,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php echo $k === 'invoice' ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>مرجعُه</label>
+                <div class="form-group"><label for="emsf_32_b6d12">مرجعُه</label>
                     <input type="number" name="t_ref[<?php echo $i; ?>]" style="width:120px"
-                           placeholder="رقمُ الذمّة أو سطرِ الخطة"></div>
-                <div class="form-group"><label>المبلغ</label>
-                    <input type="number" step="0.01" name="t_amount[<?php echo $i; ?>]" style="width:120px"></div>
-                <div class="form-group" style="min-width:200px"><label>ملاحظة</label>
-                    <input type="text" name="t_note[<?php echo $i; ?>]" maxlength="255"></div>
+                           placeholder="رقمُ الذمّة أو سطرِ الخطة" id="emsf_32_b6d12"></div>
+                <div class="form-group"><label for="emsf_33_60a7d">المبلغ</label>
+                    <input type="number" step="0.01" name="t_amount[<?php echo $i; ?>]" style="width:120px" id="emsf_33_60a7d"></div>
+                <div class="form-group" style="min-width:200px"><label for="emsf_34_03ed0">ملاحظة</label>
+                    <input type="text" name="t_note[<?php echo $i; ?>]" maxlength="255" id="emsf_34_03ed0"></div>
             </div>
             <?php endfor; ?>
             <button type="submit" class="btn-save"><i class="fa fa-scale-balanced"></i>

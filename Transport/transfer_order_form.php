@@ -431,8 +431,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <label style="font-weight:600;font-size:13px"><i class="fa <?php echo $tt['icon']; ?>" style="color:<?php echo $tt['color']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></label>
                     <input type="file" name="proof" accept="image/*,application/pdf" required style="max-width:190px">
                     <?php if ($k === 'confirm_arrival'): ?>
-                        <input type="text" name="gps_lat" placeholder="GPS lat" style="width:90px">
-                        <input type="text" name="gps_lng" placeholder="GPS lng" style="width:90px">
+                        <input type="text" name="gps_lat" placeholder="GPS lat" style="width:90px" aria-label="GPS lat">
+                        <input type="text" name="gps_lng" placeholder="GPS lng" style="width:90px" aria-label="GPS lng">
                     <?php endif; ?>
                     <button type="submit" class="btn-save" style="background:<?php echo $tt['color']; ?>"><i class="fa fa-check"></i> تأكيد</button>
                 </form>
@@ -452,7 +452,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   style="display:flex;gap:6px;align-items:center" onsubmit="return confirm('إلغاء الأمر نهائياً (مع تسجيل السبب)؟');">
                 <input type="hidden" name="action" value="cancel">
                 <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
-                <input type="text" name="reason" placeholder="سبب الإلغاء (إلزامي)" required style="width:200px">
+                <input type="text" name="reason" placeholder="سبب الإلغاء (إلزامي)" required style="width:200px" aria-label="سبب الإلغاء (إلزامي)">
                 <button type="submit" class="btn-cancel"><i class="fa fa-ban"></i> إلغاء الأمر</button>
             </form>
             <?php endif; ?>
@@ -483,55 +483,55 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-body">
             <div class="form-section">
                 <div class="form-grid">
-                    <div class="form-group"><label>نوع الترحيل <span class="required">*</span></label>
-                        <select name="transfer_type_id" required><?php echo $types_opt; ?></select></div>
-                    <div class="form-group"><label>الاتجاه <span class="required">*</span></label>
-                        <select name="direction" required>
+                    <div class="form-group"><label for="emsf_530_fbe1c">نوع الترحيل <span class="required">*</span></label>
+                        <select name="transfer_type_id" required id="emsf_530_fbe1c"><?php echo $types_opt; ?></select></div>
+                    <div class="form-group"><label for="emsf_531_dac95">الاتجاه <span class="required">*</span></label>
+                        <select name="direction" required id="emsf_531_dac95">
                             <option value="">— اختر —</option>
                             <?php foreach ($dirs as $k => $v) { $sel = ($order && $order['direction'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?>
                         </select></div>
-                    <div class="form-group"><label>الإدارة المصدر <span class="required">*</span></label>
-                        <select name="source_module" required>
+                    <div class="form-group"><label for="emsf_532_8329f">الإدارة المصدر <span class="required">*</span></label>
+                        <select name="source_module" required id="emsf_532_8329f">
                             <option value="">— اختر —</option>
                             <?php foreach ($srcs as $k => $v) { $sel = ($order && $order['source_module'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?>
                         </select></div>
-                    <div class="form-group"><label>الجهة الطالبة</label>
-                        <select name="requested_by_user_id"><?php echo $user_opt; ?></select></div>
-                    <div class="form-group"><label>المشروع</label>
-                        <select name="project_id"><?php echo $proj_opt; ?></select></div>
-                    <div class="form-group"><label>من موقع <span class="required">*</span></label>
-                        <select name="from_location_id" required><?php echo $loc_opt_from; ?></select></div>
-                    <div class="form-group"><label>إلى موقع <span class="required">*</span></label>
-                        <select name="to_location_id" required><?php echo $loc_opt_to; ?></select></div>
-                    <div class="form-group"><label>تاريخ الطلب <span class="required">*</span></label>
-                        <input type="date" name="request_date" value="<?php echo htmlspecialchars($order['request_date'] ?? date('Y-m-d')); ?>" required></div>
-                    <div class="form-group"><label>التاريخ المخطط</label>
-                        <input type="date" name="planned_date" value="<?php echo htmlspecialchars($order['planned_date'] ?? ''); ?>"></div>
-                    <div class="form-group"><label>الأولوية</label>
-                        <select name="priority"><?php foreach ($prios as $k => $v) { $sel = ($order && $order['priority'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
-                    <div class="form-group"><label>المركبة الناقلة</label>
-                        <select name="vehicle_id"><?php echo $veh_opt; ?></select></div>
-                    <div class="form-group"><label>نوع الناقل</label>
-                        <select name="carrier_type"><option value="">—</option><?php foreach ($carriers as $k => $v) { $sel = ($order && $order['carrier_type'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
-                    <div class="form-group"><label>المقاول الناقل</label>
-                        <select name="carrier_entity_id"><?php echo $carrier_opt; ?></select></div>
-                    <div class="form-group"><label>السائق</label>
-                        <select name="driver_id"><?php echo $drv_opt; ?></select></div>
-                    <div class="form-group"><label>المسار</label>
-                        <input type="text" name="route" value="<?php echo htmlspecialchars($order['route'] ?? ''); ?>" placeholder="عطبرة ← الموقع"></div>
-                    <div class="form-group"><label>مركز التكلفة</label>
-                        <input type="text" name="analytic_cost_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>" placeholder="المشروع/الإدارة/المكتب"></div>
-                    <div class="form-group" style="grid-column:1/-1"><label>ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo htmlspecialchars($order['notes'] ?? ''); ?>"></div>
+                    <div class="form-group"><label for="emsf_533_3525e">الجهة الطالبة</label>
+                        <select name="requested_by_user_id" id="emsf_533_3525e"><?php echo $user_opt; ?></select></div>
+                    <div class="form-group"><label for="emsf_534_899c6">المشروع</label>
+                        <select name="project_id" id="emsf_534_899c6"><?php echo $proj_opt; ?></select></div>
+                    <div class="form-group"><label for="emsf_535_b4304">من موقع <span class="required">*</span></label>
+                        <select name="from_location_id" required id="emsf_535_b4304"><?php echo $loc_opt_from; ?></select></div>
+                    <div class="form-group"><label for="emsf_536_dba8e">إلى موقع <span class="required">*</span></label>
+                        <select name="to_location_id" required id="emsf_536_dba8e"><?php echo $loc_opt_to; ?></select></div>
+                    <div class="form-group"><label for="emsf_537_dbb06">تاريخ الطلب <span class="required">*</span></label>
+                        <input type="date" name="request_date" value="<?php echo htmlspecialchars($order['request_date'] ?? date('Y-m-d')); ?>" required id="emsf_537_dbb06"></div>
+                    <div class="form-group"><label for="emsf_538_2e819">التاريخ المخطط</label>
+                        <input type="date" name="planned_date" value="<?php echo htmlspecialchars($order['planned_date'] ?? ''); ?>" id="emsf_538_2e819"></div>
+                    <div class="form-group"><label for="emsf_539_4a4e4">الأولوية</label>
+                        <select name="priority" id="emsf_539_4a4e4"><?php foreach ($prios as $k => $v) { $sel = ($order && $order['priority'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
+                    <div class="form-group"><label for="emsf_540_85f72">المركبة الناقلة</label>
+                        <select name="vehicle_id" id="emsf_540_85f72"><?php echo $veh_opt; ?></select></div>
+                    <div class="form-group"><label for="emsf_541_15943">نوع الناقل</label>
+                        <select name="carrier_type" id="emsf_541_15943"><option value="">—</option><?php foreach ($carriers as $k => $v) { $sel = ($order && $order['carrier_type'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
+                    <div class="form-group"><label for="emsf_542_7e4e2">المقاول الناقل</label>
+                        <select name="carrier_entity_id" id="emsf_542_7e4e2"><?php echo $carrier_opt; ?></select></div>
+                    <div class="form-group"><label for="emsf_543_f0948">السائق</label>
+                        <select name="driver_id" id="emsf_543_f0948"><?php echo $drv_opt; ?></select></div>
+                    <div class="form-group"><label for="emsf_544_93fc1">المسار</label>
+                        <input type="text" name="route" value="<?php echo htmlspecialchars($order['route'] ?? ''); ?>" placeholder="عطبرة ← الموقع" id="emsf_544_93fc1"></div>
+                    <div class="form-group"><label for="emsf_545_b25c5">مركز التكلفة</label>
+                        <input type="text" name="analytic_cost_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>" placeholder="المشروع/الإدارة/المكتب" id="emsf_545_b25c5"></div>
+                    <div class="form-group" style="grid-column:1/-1"><label for="emsf_546_968bb">ملاحظات</label>
+                        <input type="text" name="notes" value="<?php echo htmlspecialchars($order['notes'] ?? ''); ?>" id="emsf_546_968bb"></div>
                 </div>
             </div>
             <?php if ($order): ?>
             <div class="form-section">
                 <div class="form-grid">
-                    <div class="form-group"><label>كود الحركة (محسوب)</label><input type="text" value="<?php echo htmlspecialchars($order['order_no']); ?>" disabled></div>
-                    <div class="form-group"><label>مدة المشروع (يوم — محسوب)</label><input type="text" value="<?php echo htmlspecialchars((string)($order['project_days'] ?? '—')); ?>" disabled></div>
-                    <div class="form-group"><label>المتحمِّل (محسوب من القواعد)</label><input type="text" value="<?php echo htmlspecialchars($order['cost_bearer'] ? trs_label($bearers, $order['cost_bearer']) : '—'); ?>" disabled></div>
-                    <div class="form-group"><label>التكلفة الفعلية (USD — محسوب)</label><input type="text" value="<?php echo number_format((float)($order['actual_cost_usd'] ?? 0), 2); ?>" disabled></div>
+                    <div class="form-group"><label for="emsf_547_7b262">كود الحركة (محسوب)</label><input type="text" value="<?php echo htmlspecialchars($order['order_no']); ?>" disabled id="emsf_547_7b262"></div>
+                    <div class="form-group"><label for="emsf_548_7bc79">مدة المشروع (يوم — محسوب)</label><input type="text" value="<?php echo htmlspecialchars((string)($order['project_days'] ?? '—')); ?>" disabled id="emsf_548_7bc79"></div>
+                    <div class="form-group"><label for="emsf_549_761eb">المتحمِّل (محسوب من القواعد)</label><input type="text" value="<?php echo htmlspecialchars($order['cost_bearer'] ? trs_label($bearers, $order['cost_bearer']) : '—'); ?>" disabled id="emsf_549_761eb"></div>
+                    <div class="form-group"><label for="emsf_550_1b8a2">التكلفة الفعلية (USD — محسوب)</label><input type="text" value="<?php echo number_format((float)($order['actual_cost_usd'] ?? 0), 2); ?>" disabled id="emsf_550_1b8a2"></div>
                 </div>
             </div>
             <?php endif; ?>
@@ -552,14 +552,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
             <div class="card-header"><h5><i class="fas fa-plus"></i> إضافة عنصر منقول</h5></div>
             <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>نوع العنصر <span class="required">*</span></label>
-                    <select name="item_type" required><?php foreach ($item_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-                <div class="form-group"><label>المعدة</label><select name="equipment_id"><?php echo trs_equipment_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-                <div class="form-group"><label>مرجع المرفق</label><input type="text" name="attachment_ref" placeholder="جردل / جاك همر ..."></div>
-                <div class="form-group"><label>الصنف (مخزون)</label><select name="product_id"><?php echo trs_item_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-                <div class="form-group"><label>الموظف/المشغّل</label><select name="employee_id"><?php echo trs_employee_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-                <div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="quantity" value=""></div>
-                <div class="form-group" style="grid-column:1/-1"><label>ملاحظة</label><input type="text" name="line_note"></div>
+                <div class="form-group"><label for="emsf_551_6ed12">نوع العنصر <span class="required">*</span></label>
+                    <select name="item_type" required id="emsf_551_6ed12"><?php foreach ($item_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+                <div class="form-group"><label for="emsf_552_1c57b">المعدة</label><select name="equipment_id" id="emsf_552_1c57b"><?php echo trs_equipment_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+                <div class="form-group"><label for="emsf_553_2a720">مرجع المرفق</label><input type="text" name="attachment_ref" placeholder="جردل / جاك همر ..." id="emsf_553_2a720"></div>
+                <div class="form-group"><label for="emsf_554_385e4">الصنف (مخزون)</label><select name="product_id" id="emsf_554_385e4"><?php echo trs_item_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+                <div class="form-group"><label for="emsf_555_5038e">الموظف/المشغّل</label><select name="employee_id" id="emsf_555_5038e"><?php echo trs_employee_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+                <div class="form-group"><label for="emsf_556_6252b">الكمية</label><input type="number" step="0.01" name="quantity" value="" id="emsf_556_6252b"></div>
+                <div class="form-group" style="grid-column:1/-1"><label for="emsf_557_419d9">ملاحظة</label><input type="text" name="line_note" id="emsf_557_419d9"></div>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
@@ -616,14 +616,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
             <div class="card-header"><h5><i class="fas fa-plus"></i> إضافة بند تكلفة</h5></div>
             <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>نوع التكلفة <span class="required">*</span></label>
-                    <select name="cost_type" required><?php foreach ($cost_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-                <div class="form-group"><label>المبلغ (محلي) <span class="required">*</span></label><input type="number" step="0.01" name="amount_local" required></div>
-                <div class="form-group"><label>العملة</label><select name="currency"><?php foreach ($currencies as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-                <div class="form-group"><label>سعر الصرف → USD</label><input type="number" step="0.000001" name="fx_rate" placeholder="مثال: 0.00166"></div>
-                <div class="form-group"><label>المتحمِّل <span class="required">*</span></label>
-                    <select name="cost_bearer" required><?php foreach ($bearers as $k => $v) { $sel = ($order['cost_bearer'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
-                <div class="form-group"><label>مركز التكلفة</label><input type="text" name="cl_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>"></div>
+                <div class="form-group"><label for="emsf_558_138a1">نوع التكلفة <span class="required">*</span></label>
+                    <select name="cost_type" required id="emsf_558_138a1"><?php foreach ($cost_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+                <div class="form-group"><label for="emsf_559_3b97e">المبلغ (محلي) <span class="required">*</span></label><input type="number" step="0.01" name="amount_local" required id="emsf_559_3b97e"></div>
+                <div class="form-group"><label for="emsf_560_64439">العملة</label><select name="currency" id="emsf_560_64439"><?php foreach ($currencies as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+                <div class="form-group"><label for="emsf_561_21354">سعر الصرف → USD</label><input type="number" step="0.000001" name="fx_rate" placeholder="مثال: 0.00166" id="emsf_561_21354"></div>
+                <div class="form-group"><label for="emsf_562_00122">المتحمِّل <span class="required">*</span></label>
+                    <select name="cost_bearer" required id="emsf_562_00122"><?php foreach ($bearers as $k => $v) { $sel = ($order['cost_bearer'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
+                <div class="form-group"><label for="emsf_563_d49af">مركز التكلفة</label><input type="text" name="cl_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>" id="emsf_563_d49af"></div>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
@@ -665,13 +665,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
             <div class="card-header"><h5><i class="fas fa-plus"></i> إضافة تصريح</h5></div>
             <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>نوع التصريح <span class="required">*</span></label>
-                    <select name="permit_type" required><?php foreach ($permit_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-                <div class="form-group"><label>الجهة المصدِرة</label><input type="text" name="authority"></div>
-                <div class="form-group"><label>تاريخ الإصدار</label><input type="date" name="issue_date"></div>
-                <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" name="expiry_date"></div>
-                <div class="form-group"><label>الحالة</label>
-                    <select name="permit_state"><?php foreach ($permit_states as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+                <div class="form-group"><label for="emsf_564_08e0b">نوع التصريح <span class="required">*</span></label>
+                    <select name="permit_type" required id="emsf_564_08e0b"><?php foreach ($permit_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+                <div class="form-group"><label for="emsf_565_09db3">الجهة المصدِرة</label><input type="text" name="authority" id="emsf_565_09db3"></div>
+                <div class="form-group"><label for="emsf_566_7ac79">تاريخ الإصدار</label><input type="date" name="issue_date" id="emsf_566_7ac79"></div>
+                <div class="form-group"><label for="emsf_567_415f8">تاريخ الانتهاء</label><input type="date" name="expiry_date" id="emsf_567_415f8"></div>
+                <div class="form-group"><label for="emsf_568_2ebc8">الحالة</label>
+                    <select name="permit_state" id="emsf_568_2ebc8"><?php foreach ($permit_states as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>

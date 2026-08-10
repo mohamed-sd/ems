@@ -55,7 +55,7 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
   <form method="get" class="ems-form" style="display:flex;gap:8px;max-width:440px;margin-bottom:16px">
-    <input type="text" name="q" class="form-control" placeholder="رقمُ البلاغ (TK-… أو #)" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" required>
+    <input type="text" name="q" class="form-control" placeholder="رقمُ البلاغ (TK-… أو #)" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" required aria-label="رقمُ البلاغ (TK-… أو #)">
     <button class="btn btn-primary">أين وقف؟</button>
   </form>
 

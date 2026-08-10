@@ -243,31 +243,31 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                 <div class="form-grid">
                     <?php if (!empty($editData)): ?>
                     <div>
-                        <label>كود الملف</label>
-                        <input type="text" value="<?= $e($editData['code']); ?>" readonly style="background:#f5f5f5">
+                        <label for="emsf_121_5c01c">كود الملف</label>
+                        <input type="text" value="<?= $e($editData['code']); ?>" readonly style="background:#f5f5f5" id="emsf_121_5c01c">
                     </div>
                     <?php else: ?>
                     <div>
-                        <label>كود الملف</label>
-                        <input type="text" value="(يُولّد تلقائياً)" readonly style="background:#f5f5f5;color:#888">
+                        <label for="emsf_122_6d615">كود الملف</label>
+                        <input type="text" value="(يُولّد تلقائياً)" readonly style="background:#f5f5f5;color:#888" id="emsf_122_6d615">
                     </div>
                     <?php endif; ?>
 
                     <div>
-                        <label>فئة الأصل <span style="color:#c0392b">*</span></label>
+                        <label for="emsf_123_c0aa3">فئة الأصل <span style="color:#c0392b">*</span></label>
                         <input type="text" name="asset_category" required
                                placeholder="مثال: حفّار 22ط جديد"
-                               value="<?= $e($editData['asset_category'] ?? ''); ?>">
+                               value="<?= $e($editData['asset_category'] ?? ''); ?>" id="emsf_123_c0aa3">
                     </div>
 
                     <div>
-                        <label>الماركة (اختياري)</label>
-                        <input type="text" name="brand" value="<?= $e($editData['brand'] ?? ''); ?>">
+                        <label for="emsf_124_da80e">الماركة (اختياري)</label>
+                        <input type="text" name="brand" value="<?= $e($editData['brand'] ?? ''); ?>" id="emsf_124_da80e">
                     </div>
 
                     <div>
-                        <label>الموديل المرتبط (اختياري)</label>
-                        <select name="model_id">
+                        <label for="emsf_125_6bf97">الموديل المرتبط (اختياري)</label>
+                        <select name="model_id" id="emsf_125_6bf97">
                             <option value="">-- بدون --</option>
                             <?php foreach ($models as $m): ?>
                                 <option value="<?= (int) $m['id']; ?>"
@@ -279,7 +279,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     </div>
 
                     <div>
-                        <label>طريقة الإهلاك <span style="color:#c0392b">*</span></label>
+                        <label for="methodSelect">طريقة الإهلاك <span style="color:#c0392b">*</span></label>
                         <select name="method" id="methodSelect" required>
                             <option value="uop" <?= (!empty($editData) && $editData['method'] === 'uop') ? 'selected' : ''; ?>>بالساعة التشغيلية (UOP)</option>
                             <option value="sl"  <?= (!empty($editData) && $editData['method'] === 'sl') ? 'selected' : ''; ?>>زمني بالسنوات (SL)</option>
@@ -287,21 +287,21 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     </div>
 
                     <div>
-                        <label id="usefulLifeLabel">العمر الإنتاجي <span style="color:#c0392b">*</span></label>
+                        <label id="usefulLifeLabel" for="emsf_126_93c46">العمر الإنتاجي <span style="color:#c0392b">*</span></label>
                         <input type="number" step="0.01" min="0.01" name="useful_life" required
-                               value="<?= $e($editData['useful_life'] ?? ''); ?>">
+                               value="<?= $e($editData['useful_life'] ?? ''); ?>" id="emsf_126_93c46">
                     </div>
 
                     <div>
-                        <label>نسبة التخريد (0 إلى 1) <span style="color:#c0392b">*</span></label>
+                        <label for="emsf_127_6b647">نسبة التخريد (0 إلى 1) <span style="color:#c0392b">*</span></label>
                         <input type="number" step="0.0001" min="0" max="1" name="salvage_pct" required
                                placeholder="مثال: 0.08"
-                               value="<?= $e($editData['salvage_pct'] ?? ''); ?>">
+                               value="<?= $e($editData['salvage_pct'] ?? ''); ?>" id="emsf_127_6b647">
                     </div>
 
                     <div style="grid-column:1/-1">
-                        <label>ملاحظات / سياسات مالية</label>
-                        <textarea name="notes" rows="2"><?= $e($editData['notes'] ?? ''); ?></textarea>
+                        <label for="emsf_128_508e5">ملاحظات / سياسات مالية</label>
+                        <textarea name="notes" rows="2" id="emsf_128_508e5"><?= $e($editData['notes'] ?? ''); ?></textarea>
                     </div>
                 </div>
 

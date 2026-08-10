@@ -159,8 +159,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card-body">
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
             <input type="hidden" name="contract" value="<?php echo $sel; ?>">
-            <label>القيمةُ بتاريخ:</label>
-            <input type="date" name="as_of" value="<?php echo htmlspecialchars($asOf); ?>">
+            <label for="emsf_46_ee666">القيمةُ بتاريخ:</label>
+            <input type="date" name="as_of" value="<?php echo htmlspecialchars($asOf); ?>" id="emsf_46_ee666">
             <button type="submit" class="btn-save"><i class="fa fa-calculator"></i> احسب</button>
             <small style="color:#6b7280">— فارغٌ = القيمةُ النافذةُ اليوم · وبتاريخٍ = <strong>ما حكم ذلك اليوم</strong></small>
         </form>
@@ -229,7 +229,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="number" name="new_price" step="0.0001" min="0.0001" required
-                                   placeholder="سعر" style="width:90px">
+                                   placeholder="سعر" style="width:90px" aria-label="سعر">
                             <input type="date" name="effective_from" required style="width:140px">
                             <button type="submit" class="badge badge-info" style="border:0;padding:5px 8px">أخلِف</button>
                         </form>
@@ -247,8 +247,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <input type="hidden" name="cl_action" value="add">
         <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
         <div class="form-grid">
-            <div class="form-group"><label>مشتقٌّ من التزام <small>— الكمياتُ وحدَها</small></label>
-                <select name="source_commitment_id">
+            <div class="form-group"><label for="emsf_47_02dd8">مشتقٌّ من التزام <small>— الكمياتُ وحدَها</small></label>
+                <select name="source_commitment_id" id="emsf_47_02dd8">
                     <option value="0">— بلا اشتقاق —</option>
                     <?php foreach ($split['billable'] as $m): ?>
                         <option value="<?php echo intval($m['id']); ?>">
@@ -263,33 +263,33 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php $names = array(); foreach ($split['capacity'] as $m) { $names[] = (string)$m['commitment_code']; }
                           echo htmlspecialchars(implode(' · ', $names)); ?></small>
                 <?php endif; ?></div>
-            <div class="form-group"><label>النموذج <span style="color:#c00">*</span></label>
-                <select name="pricing_model" required>
+            <div class="form-group"><label for="emsf_48_04c07">النموذج <span style="color:#c00">*</span></label>
+                <select name="pricing_model" required id="emsf_48_04c07">
                     <?php foreach ($MODEL_AR as $k => $v): ?>
                         <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                     <?php endforeach; ?></select></div>
-            <div class="form-group"><label>الوصف</label><input type="text" name="description" maxlength="200"></div>
-            <div class="form-group"><label>الكمية <span style="color:#c00">*</span></label>
-                <input type="number" name="qty_contracted" step="0.01" min="0.01" required></div>
-            <div class="form-group"><label>سعرُ الوحدة <span style="color:#c00">*</span></label>
-                <input type="number" name="unit_price" step="0.0001" min="0.0001" required></div>
-            <div class="form-group"><label>العملة</label><input type="text" name="currency" value="SDG" maxlength="8"></div>
-            <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                <input type="date" name="valid_from" required></div>
-            <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
-            <div class="form-group"><label>الحالةُ الضريبية</label>
-                <select name="tax_status">
+            <div class="form-group"><label for="emsf_49_156b9">الوصف</label><input type="text" name="description" maxlength="200" id="emsf_49_156b9"></div>
+            <div class="form-group"><label for="emsf_50_5ed2f">الكمية <span style="color:#c00">*</span></label>
+                <input type="number" name="qty_contracted" step="0.01" min="0.01" required id="emsf_50_5ed2f"></div>
+            <div class="form-group"><label for="emsf_51_1ad79">سعرُ الوحدة <span style="color:#c00">*</span></label>
+                <input type="number" name="unit_price" step="0.0001" min="0.0001" required id="emsf_51_1ad79"></div>
+            <div class="form-group"><label for="emsf_52_ff69f">العملة</label><input type="text" name="currency" value="SDG" maxlength="8" id="emsf_52_ff69f"></div>
+            <div class="form-group"><label for="emsf_53_0548a">سريان من <span style="color:#c00">*</span></label>
+                <input type="date" name="valid_from" required id="emsf_53_0548a"></div>
+            <div class="form-group"><label for="emsf_54_bc668">سريان إلى</label><input type="date" name="valid_to" id="emsf_54_bc668"></div>
+            <div class="form-group"><label for="emsf_55_127c2">الحالةُ الضريبية</label>
+                <select name="tax_status" id="emsf_55_127c2">
                     <?php foreach ($TAX_AR as $k => $v): ?>
                         <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                     <?php endforeach; ?></select></div>
-            <div class="form-group"><label>الرمزُ الضريبي <small>— إلزاميٌّ للخاضع</small></label>
-                <select name="tax_code_id"><option value="0">—</option>
+            <div class="form-group"><label for="emsf_56_0fe40">الرمزُ الضريبي <small>— إلزاميٌّ للخاضع</small></label>
+                <select name="tax_code_id" id="emsf_56_0fe40"><option value="0">—</option>
                     <?php foreach ($taxes as $t): ?>
                         <option value="<?php echo intval($t['id']); ?>">
                             <?php echo htmlspecialchars((string)$t['code']); ?>
                             (<?php echo htmlspecialchars((string)$t['rate']); ?>%)</option>
                     <?php endforeach; ?></select></div>
-            <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="200"></div>
+            <div class="form-group"><label for="emsf_57_93be6">ملاحظة</label><input type="text" name="note" maxlength="200" id="emsf_57_93be6"></div>
         </div>
         <div style="margin-top:12px"><button type="submit" class="btn-save">
             <i class="fa fa-plus"></i> أضف بندَ بيع</button></div>

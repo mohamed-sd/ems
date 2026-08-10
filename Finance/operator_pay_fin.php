@@ -140,8 +140,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;margin-top:10px;">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>معدّل مستحق المشغّل لكل ساعة (SDG)</label>
-                    <input type="number" name="rate" step="0.0001" min="0" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله">
+                    <label for="emsf_239_29635">معدّل مستحق المشغّل لكل ساعة (SDG)</label>
+                    <input type="number" name="rate" step="0.0001" min="0" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_239_29635">
                 </div>
             </div></div>
             <div class="form-actions">

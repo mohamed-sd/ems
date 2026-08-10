@@ -193,24 +193,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </p>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>رقم فاتورة المورد <span class="required">*</span></label>
+                        <label for="emsf_419_9d561">رقم فاتورة المورد <span class="required">*</span></label>
                         <input type="text" name="invoice_no" required
-                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_no'] ?? '')); ?>">
+                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_no'] ?? '')); ?>" id="emsf_419_9d561">
                     </div>
                     <div class="form-group">
-                        <label>تاريخ الفاتورة</label>
+                        <label for="emsf_420_dfa98">تاريخ الفاتورة</label>
                         <input type="date" name="invoice_date"
-                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_date'] ?? '')); ?>">
+                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_date'] ?? '')); ?>" id="emsf_420_dfa98">
                     </div>
                     <div class="form-group">
-                        <label>قيمة الفاتورة (إجمالي) <span class="required">*</span></label>
+                        <label for="emsf_421_08b7b">قيمة الفاتورة (إجمالي) <span class="required">*</span></label>
                         <input type="number" step="0.01" min="0.01" name="invoice_amount" required
-                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_amount'] ?? '')); ?>">
+                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_amount'] ?? '')); ?>" id="emsf_421_08b7b">
                     </div>
                     <div class="form-group">
-                        <label>الضريبة ضمن القيمة <small>(تُفصل — المطابقة على الصافي)</small></label>
+                        <label for="emsf_422_1bb58">الضريبة ضمن القيمة <small>(تُفصل — المطابقة على الصافي)</small></label>
                         <input type="number" step="0.01" min="0" name="invoice_tax"
-                               value="<?php echo htmlspecialchars((string) ($match_order['tax_amount'] ?? '0')); ?>">
+                               value="<?php echo htmlspecialchars((string) ($match_order['tax_amount'] ?? '0')); ?>" id="emsf_422_1bb58">
                     </div>
                 </div>
             </div>
@@ -242,16 +242,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </p>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>القرار <span class="required">*</span></label>
-                        <select name="decision" required>
+                        <label for="emsf_423_e84a9">القرار <span class="required">*</span></label>
+                        <select name="decision" required id="emsf_423_e84a9">
                             <option value="قبول الفرق">قبول الفرق — الذمّة بقيمة الفاتورة كاملة</option>
                             <option value="إشعار دائن">إشعار دائن — الذمّة بقيمة الأمر والفرق يُنتظر له إشعار المورد</option>
                             <option value="رفض الفاتورة">رفض الفاتورة — لا ذمّة، وتسجيل فاتورة بديلة متاح</option>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>تفسير القرار <span class="required">*</span> <small>(لا حسمَ بلا تفسير — يُختم باسمك ولحظته)</small></label>
-                        <input type="text" name="reason" required maxlength="255">
+                        <label for="emsf_424_beb57">تفسير القرار <span class="required">*</span> <small>(لا حسمَ بلا تفسير — يُختم باسمك ولحظته)</small></label>
+                        <input type="text" name="reason" required maxlength="255" id="emsf_424_beb57">
                     </div>
                 </div>
             </div>

@@ -73,8 +73,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php echo htmlspecialchars(CAP::CAPACITY_AR[$c['capacity_type']] ?? $c['capacity_type']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <label>من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>">
-            <label>إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>">
+            <label for="emsf_370_07324">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_370_07324">
+            <label for="emsf_371_48875">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_371_48875">
             <button type="submit" class="btn-save"><i class="fa fa-calculator"></i> قِس</button>
             <small style="color:#888">اختصارات:
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>">يوم</a> ·

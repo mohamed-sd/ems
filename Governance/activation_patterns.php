@@ -144,12 +144,12 @@ include '../insidebar.php';
                 <option value="contract">على عقد (يغلب الكيان)</option>
             </select>
             <input type="number" name="scope_id" placeholder="رقم الكيان أو العقد *" required
-                   title="الكيانات: <?php foreach (array_slice($entities, 0, 6) as $e) { echo '#' . intval($e['entity_id']) . ' ' . htmlspecialchars($e['legal_name']) . ' · '; } ?>">
+                   title="الكيانات: <?php foreach (array_slice($entities, 0, 6) as $e) { echo '#' . intval($e['entity_id']) . ' ' . htmlspecialchars($e['legal_name']) . ' · '; } ?>" aria-label="رقم الكيان أو العقد">
             <select name="enable">
                 <option value="1">تفعيل</option>
                 <option value="0">تعطيل (بسبب)</option>
             </select>
-            <input type="text" name="reason" placeholder="السبب — إلزامي للتعطيل" style="grid-column:span 2">
+            <input type="text" name="reason" placeholder="السبب — إلزامي للتعطيل" style="grid-column:span 2" aria-label="السبب — إلزامي للتعطيل">
             <button class="btn-save" type="submit" style="grid-column:span 3">حفظ العلم</button>
         </form>
     </div></div>

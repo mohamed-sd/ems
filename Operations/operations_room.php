@@ -45,7 +45,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <form method="get" style="display:flex;gap:8px;align-items:center">
             <input type="hidden" name="tab" value="<?php echo $tab; ?>">
-            <label>اليوم</label><input type="date" name="date" value="<?php echo htmlspecialchars($date); ?>">
+            <label for="emsf_367_f6b4e">اليوم</label><input type="date" name="date" value="<?php echo htmlspecialchars($date); ?>" id="emsf_367_f6b4e">
             <button type="submit" class="btn-save">اعرض</button>
         </form>
         <span style="margin-inline-start:auto">

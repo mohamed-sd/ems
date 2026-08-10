@@ -46,10 +46,10 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <form method="get" style="display:flex;gap:8px;align-items:center">
-            <label>المشروع</label><input type="number" name="project_id" min="0" style="width:90px"
-                value="<?php echo $prj ?: ''; ?>" placeholder="الكل">
-            <label>النوع</label><input type="text" name="type" style="width:120px"
-                value="<?php echo htmlspecialchars($type); ?>" placeholder="الكل">
+            <label for="emsf_276_15f26">المشروع</label><input type="number" name="project_id" min="0" style="width:90px"
+                value="<?php echo $prj ?: ''; ?>" placeholder="الكل" id="emsf_276_15f26">
+            <label for="emsf_277_43fd1">النوع</label><input type="text" name="type" style="width:120px"
+                value="<?php echo htmlspecialchars($type); ?>" placeholder="الكل" id="emsf_277_43fd1">
             <button type="submit" class="btn-save">رشّح</button>
         </form>
         <div class="badge <?php echo ($grid['readiness_pct'] ?? 0) >= 70 ? 'badge-success' : 'badge-danger'; ?>"

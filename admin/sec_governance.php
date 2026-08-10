@@ -187,10 +187,10 @@ include '../insidebar.php';
     <div class="card-body">
         <form method="post" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
             <input type="hidden" name="gov_action" value="explain">
-            <div class="form-group"><label>الشخص</label>
-                <select name="person_id"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '"' . (isset($_POST['person_id']) && intval($_POST['person_id']) === intval($u['id']) ? ' selected' : '') . '>' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>الصلاحية</label><input type="text" name="permission_code" value="<?php echo htmlspecialchars($_POST['permission_code'] ?? ''); ?>" placeholder="unit.approve" required></div>
-            <div class="form-group"><label>النطاق</label><input type="text" name="scope" value="<?php echo htmlspecialchars($_POST['scope'] ?? ''); ?>" placeholder="site:18" required></div>
+            <div class="form-group"><label for="emsf_696_6318c">الشخص</label>
+                <select name="person_id" id="emsf_696_6318c"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '"' . (isset($_POST['person_id']) && intval($_POST['person_id']) === intval($u['id']) ? ' selected' : '') . '>' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_697_c288a">الصلاحية</label><input type="text" name="permission_code" value="<?php echo htmlspecialchars($_POST['permission_code'] ?? ''); ?>" placeholder="unit.approve" required id="emsf_697_c288a"></div>
+            <div class="form-group"><label for="emsf_698_d6fe5">النطاق</label><input type="text" name="scope" value="<?php echo htmlspecialchars($_POST['scope'] ?? ''); ?>" placeholder="site:18" required id="emsf_698_d6fe5"></div>
             <button type="submit" class="btn-save">فسّر</button>
         </form>
         <?php if ($explainResult !== null): ?>
@@ -260,11 +260,11 @@ include '../insidebar.php';
         <?php if ($can_edit): ?>
         <form method="post" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
             <input type="hidden" name="gov_action" value="open_cycle">
-            <div class="form-group"><label>الوحدة</label>
-                <select name="org_unit_id"><?php foreach ($units as $u) { echo '<option value="' . intval($u['unit_id']) . '">' . htmlspecialchars($u['name_ar']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label>الفترة</label><input type="text" name="period" placeholder="2026-H2" required></div>
-            <div class="form-group"><label>المدير الموقِّع</label>
-                <select name="manager_person_id"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_699_5d543">الوحدة</label>
+                <select name="org_unit_id" id="emsf_699_5d543"><?php foreach ($units as $u) { echo '<option value="' . intval($u['unit_id']) . '">' . htmlspecialchars($u['name_ar']) . '</option>'; } ?></select></div>
+            <div class="form-group"><label for="emsf_700_fe2f8">الفترة</label><input type="text" name="period" placeholder="2026-H2" required id="emsf_700_fe2f8"></div>
+            <div class="form-group"><label for="emsf_701_1e14c">المدير الموقِّع</label>
+                <select name="manager_person_id" id="emsf_701_1e14c"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
             <button type="submit" class="btn-save">افتح مراجعة نصف سنوية</button>
         </form>
         <?php endif; ?>

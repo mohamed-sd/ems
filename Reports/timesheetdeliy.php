@@ -122,13 +122,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body fc-filter-body">
             <form method="GET" class="fc-filter-bar">
                 <div>
-                    <label class="fc-filter-label"><i class="fas fa-calendar-day"></i> التاريخ:</label>
-                    <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
+                    <label class="fc-filter-label" for="emsf_465_8d756"><i class="fas fa-calendar-day"></i> التاريخ:</label>
+                    <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>" id="emsf_465_8d756">
                 </div>
 
                 <div>
-                    <label class="fc-filter-label"><i class="fas fa-diagram-project"></i> المشروع</label>
-                    <select name="project" class="form-select">
+                    <label class="fc-filter-label" for="emsf_466_cc937"><i class="fas fa-diagram-project"></i> المشروع</label>
+                    <select name="project" class="form-select" id="emsf_466_cc937">
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = array();
@@ -144,8 +144,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <div>
-                    <label class="fc-filter-label"><i class="fas fa-truck"></i> المورد</label>
-                    <select name="supplier" class="form-select">
+                    <label class="fc-filter-label" for="emsf_467_b9c8f"><i class="fas fa-truck"></i> المورد</label>
+                    <select name="supplier" class="form-select" id="emsf_467_b9c8f">
                         <option value="">-- الكل --</option>
                         <?php
                         $sup = array();
@@ -161,8 +161,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <div>
-                    <label class="fc-filter-label"><i class="fas fa-clock"></i> الوردية</label>
-                    <select name="shift" class="form-select">
+                    <label class="fc-filter-label" for="emsf_468_0d818"><i class="fas fa-clock"></i> الوردية</label>
+                    <select name="shift" class="form-select" id="emsf_468_0d818">
                         <option value="">-- الكل --</option>
                         <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
                         <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
@@ -170,8 +170,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <div>
-                    <label class="fc-filter-label"><i class="fas fa-cogs"></i> نوع الآلية</label>
-                    <select name="type" class="form-select">
+                    <label class="fc-filter-label" for="emsf_469_a5abe"><i class="fas fa-cogs"></i> نوع الآلية</label>
+                    <select name="type" class="form-select" id="emsf_469_a5abe">
                         <option value="">-- الكل --</option>
                         <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>حفار</option>
                         <option value="2" <?php if ($type_filter == "2") echo "selected"; ?>>قلاب</option>

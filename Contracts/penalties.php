@@ -220,8 +220,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <div class="filter-body">
             <form method="get" action="" class="pen-filter">
                 <div class="filter-field">
-                    <label><i class="fa fa-file-contract"></i> العقد</label>
-                    <select name="contract" class="form-control">
+                    <label for="emsf_77_2f103"><i class="fa fa-file-contract"></i> العقد</label>
+                    <select name="contract" class="form-control" id="emsf_77_2f103">
                         <option value="">-- اختر --</option>
                         <?php foreach ($contracts as $c): ?>
                             <option value="<?php echo intval($c['id']); ?>" <?php echo intval($c['id']) === $sel ? 'selected' : ''; ?>>
@@ -229,10 +229,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="filter-field"><label><i class="fa fa-calendar"></i> من</label>
-                    <input type="date" name="from" value="<?php echo pen_e($from); ?>" class="form-control"></div>
-                <div class="filter-field"><label><i class="fa fa-calendar"></i> إلى</label>
-                    <input type="date" name="to" value="<?php echo pen_e($to); ?>" class="form-control"></div>
+                <div class="filter-field"><label for="emsf_78_9c216"><i class="fa fa-calendar"></i> من</label>
+                    <input type="date" name="from" value="<?php echo pen_e($from); ?>" class="form-control" id="emsf_78_9c216"></div>
+                <div class="filter-field"><label for="emsf_79_cd642"><i class="fa fa-calendar"></i> إلى</label>
+                    <input type="date" name="to" value="<?php echo pen_e($to); ?>" class="form-control" id="emsf_79_cd642"></div>
                 <div class="filter-actions"><button type="submit" class="btn-ok"><i class="fa fa-search"></i> عرض</button></div>
             </form>
         </div>
@@ -401,8 +401,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="to" value="<?php echo pen_e($to); ?>">
             <h5><i class="fas fa-ban"></i> إعفاءٌ من الجزاء</h5>
             <p class="pen-muted">الإعفاءُ قرارٌ ماليٌّ موثَّق — والسببُ إلزاميٌّ يبقى في السجل (ق-13).</p>
-            <label>سببُ الإعفاء *</label>
-            <textarea name="reason" rows="3" maxlength="255" required placeholder="لماذا يُعفى هذا البند؟"></textarea>
+            <label for="emsf_80_5121b">سببُ الإعفاء *</label>
+            <textarea name="reason" rows="3" maxlength="255" required placeholder="لماذا يُعفى هذا البند؟" id="emsf_80_5121b"></textarea>
             <div class="pen-modal-actions">
                 <button type="submit" class="btn-submit"><i class="fas fa-check"></i> تأكيدُ الإعفاء</button>
                 <button type="button" class="btn-cancel" id="penWaiveCancel"><i class="fas fa-times"></i> إلغاء</button>

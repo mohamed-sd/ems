@@ -107,8 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <div>
-                        <label>الفئة</label>
-                        <select name="form" required>
+                        <label for="emsf_118_0060a">الفئة</label>
+                        <select name="form" required id="emsf_118_0060a">
                             <option value="">-- اختر الفئة --</option>
                             <option value="1" <?= (!empty($editData) && $editData['form'] === '1') ? 'selected' : ''; ?>>
                                 معدات ثقيلة </option>
@@ -121,14 +121,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div>
 
-                        <label>نوع المعدة</label>
+                        <label for="emsf_119_f9c75">نوع المعدة</label>
                         <input type="text" name="type" required
-                            value="<?= htmlspecialchars($editData['type'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                            value="<?= htmlspecialchars($editData['type'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" id="emsf_119_f9c75">
                     </div>
 
                     <div>
-                        <label>الحالة</label>
-                        <select name="status" required>
+                        <label for="emsf_120_e6c9e">الحالة</label>
+                        <select name="status" required id="emsf_120_e6c9e">
                             <option value="">-- اختر الحالة --</option>
                             <option value="active" <?= (!empty($editData) && $editData['status'] === 'active') ? 'selected' : ''; ?>>
                                 نشط

@@ -226,7 +226,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <?php foreach ($STATE_AR as $k => $v): ?>
                                     <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                                 <?php endforeach; ?></select>
-                            <input type="text" name="state_reason" placeholder="السبب" style="width:130px">
+                            <input type="text" name="state_reason" placeholder="السبب" style="width:130px" aria-label="السبب">
                             <input type="date" name="state_at" style="width:140px">
                             <button type="submit" class="action-btn"><i class="fa fa-check"></i></button>
                         </form>
@@ -244,32 +244,32 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <h6><i class="fa fa-plus"></i> أداةُ ضمانٍ جديدة —
                 <strong>والنوعُ يحسم الطبيعةَ وقابليةَ الخصم</strong></h6>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <div class="form-group"><label>النوع</label>
-                    <select name="kind">
+                <div class="form-group"><label for="emsf_35_741f3">النوع</label>
+                    <select name="kind" id="emsf_35_741f3">
                         <?php foreach ($KIND_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label>القيمة</label>
-                    <input type="number" step="0.01" name="amount" style="width:130px"></div>
-                <div class="form-group"><label>النسبة %</label>
-                    <input type="number" step="0.001" name="percent_value" style="width:100px"></div>
-                <div class="form-group"><label>العملة</label>
+                <div class="form-group"><label for="emsf_36_4f9e4">القيمة</label>
+                    <input type="number" step="0.01" name="amount" style="width:130px" id="emsf_36_4f9e4"></div>
+                <div class="form-group"><label for="emsf_37_afa0b">النسبة %</label>
+                    <input type="number" step="0.001" name="percent_value" style="width:100px" id="emsf_37_afa0b"></div>
+                <div class="form-group"><label for="emsf_38_b0f47">العملة</label>
                     <input type="text" name="currency" maxlength="8" style="width:80px"
-                           value="<?php echo htmlspecialchars((string)$head['price_currency_contract']); ?>"></div>
-                <div class="form-group"><label>المُصدر</label>
-                    <input type="text" name="issuer" maxlength="190" style="width:200px"></div>
-                <div class="form-group"><label>رقمُ الخطاب/الوثيقة</label>
-                    <input type="text" name="instrument_ref" maxlength="120" style="width:150px"></div>
-                <div class="form-group"><label>تاريخُ الإصدار</label>
-                    <input type="date" name="issue_date"></div>
-                <div class="form-group"><label>انتهاءُ السريان <small>(لغير المحتجَز)</small></label>
-                    <input type="date" name="expiry_date"></div>
-                <div class="form-group"><label>تاريخُ ردِّ المحتجَز</label>
-                    <input type="date" name="due_release_date"></div>
-                <div class="form-group" style="min-width:260px"><label>أو شرطُ الرد</label>
-                    <input type="text" name="release_condition" maxlength="200"></div>
-                <div class="form-group" style="min-width:220px"><label>ملاحظة</label>
-                    <input type="text" name="note" maxlength="255"></div>
+                           value="<?php echo htmlspecialchars((string)$head['price_currency_contract']); ?>" id="emsf_38_b0f47"></div>
+                <div class="form-group"><label for="emsf_39_1693c">المُصدر</label>
+                    <input type="text" name="issuer" maxlength="190" style="width:200px" id="emsf_39_1693c"></div>
+                <div class="form-group"><label for="emsf_40_d6e85">رقمُ الخطاب/الوثيقة</label>
+                    <input type="text" name="instrument_ref" maxlength="120" style="width:150px" id="emsf_40_d6e85"></div>
+                <div class="form-group"><label for="emsf_41_c32f3">تاريخُ الإصدار</label>
+                    <input type="date" name="issue_date" id="emsf_41_c32f3"></div>
+                <div class="form-group"><label for="emsf_42_def6e">انتهاءُ السريان <small>(لغير المحتجَز)</small></label>
+                    <input type="date" name="expiry_date" id="emsf_42_def6e"></div>
+                <div class="form-group"><label for="emsf_43_97f1d">تاريخُ ردِّ المحتجَز</label>
+                    <input type="date" name="due_release_date" id="emsf_43_97f1d"></div>
+                <div class="form-group" style="min-width:260px"><label for="emsf_44_7e7b1">أو شرطُ الرد</label>
+                    <input type="text" name="release_condition" maxlength="200" id="emsf_44_7e7b1"></div>
+                <div class="form-group" style="min-width:220px"><label for="emsf_45_cd491">ملاحظة</label>
+                    <input type="text" name="note" maxlength="255" id="emsf_45_cd491"></div>
             </div>
             <button type="submit" class="btn-save"><i class="fa fa-plus"></i> سجّل الأداة</button>
         </form>

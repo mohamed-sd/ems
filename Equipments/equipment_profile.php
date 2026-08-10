@@ -858,11 +858,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form id="add-docs" class="child-add-form ems-form" method="post" action="equipment_child_save.php" enctype="multipart/form-data" style="display:none;margin-bottom:14px;">
                 <input type="hidden" name="entity" value="compliance"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
-                    <div><label>نوع الوثيقة *</label><select name="doc_type" required><option value="">-- اختر --</option><?php foreach ($DOC_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
-                    <div><label>الرقم/المرجع</label><input type="text" name="reference"></div>
-                    <div><label>تاريخ الإصدار</label><input type="date" name="issue_date"></div>
-                    <div><label>تاريخ الانتهاء</label><input type="date" name="expiry_date"></div>
-                    <div><label>مرفق (صورة/PDF)</label><input type="file" name="attachment" accept="image/*,application/pdf"></div>
+                    <div><label for="emsf_98_e8d4a">نوع الوثيقة *</label><select name="doc_type" required id="emsf_98_e8d4a"><option value="">-- اختر --</option><?php foreach ($DOC_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
+                    <div><label for="emsf_99_7d40f">الرقم/المرجع</label><input type="text" name="reference" id="emsf_99_7d40f"></div>
+                    <div><label for="emsf_100_2cab9">تاريخ الإصدار</label><input type="date" name="issue_date" id="emsf_100_2cab9"></div>
+                    <div><label for="emsf_101_a2db1">تاريخ الانتهاء</label><input type="date" name="expiry_date" id="emsf_101_a2db1"></div>
+                    <div><label for="emsf_102_9c6af">مرفق (صورة/PDF)</label><input type="file" name="attachment" accept="image/*,application/pdf" id="emsf_102_9c6af"></div>
                     <div style="display:flex;align-items:center;gap:6px;margin-top:22px;"><input type="checkbox" name="is_critical" id="doc_crit" value="1"><label for="doc_crit" style="margin:0;">وثيقة حرجة</label></div>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
@@ -904,14 +904,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="entity" value="protection"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
                     <div><label>نوع الحماية *</label><select name="protection_type" required><option value="">-- اختر --</option><?php foreach ($PROTECTION_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
-                    <div><label>الوصف</label><input type="text" name="description"></div>
-                    <div><label>تاريخ التركيب/البدء</label><input type="date" name="start_date"></div>
-                    <div><label>التكلفة</label><input type="number" step="0.01" name="cost"></div>
-                    <div><label>الحالة</label><select name="state"><option value="">-- اختر --</option><?php foreach ($PROTECTION_STATES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
-                    <div><label>تاريخ التجديد</label><input type="date" name="renewal_date"></div>
-                    <div><label>المنفّذ/المورد</label><input type="text" name="partner_name" autocomplete="off" placeholder="اكتب اسم المنفّذ/المورد (إدخال يدوي)"></div>
-                    <div><label>مرتبط بوثيقة (للتأمين)</label><select name="compliance_id"><option value="">-- بدون --</option><?php foreach ($compliance_rows as $cr) echo '<option value="' . (int) $cr['id'] . '">' . $ee($cr['doc_type'] . ($cr['reference'] ? ' — ' . $cr['reference'] : '')) . '</option>'; ?></select></div>
-                    <div><label>مرفق</label><input type="file" name="attachment" accept="image/*,application/pdf"></div>
+                    <div><label for="emsf_103_b2238">الوصف</label><input type="text" name="description" id="emsf_103_b2238"></div>
+                    <div><label for="emsf_104_d3982">تاريخ التركيب/البدء</label><input type="date" name="start_date" id="emsf_104_d3982"></div>
+                    <div><label for="emsf_105_2422f">التكلفة</label><input type="number" step="0.01" name="cost" id="emsf_105_2422f"></div>
+                    <div><label for="emsf_106_132b7">الحالة</label><select name="state" id="emsf_106_132b7"><option value="">-- اختر --</option><?php foreach ($PROTECTION_STATES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
+                    <div><label for="emsf_107_788c4">تاريخ التجديد</label><input type="date" name="renewal_date" id="emsf_107_788c4"></div>
+                    <div><label for="emsf_108_fcdfc">المنفّذ/المورد</label><input type="text" name="partner_name" autocomplete="off" placeholder="اكتب اسم المنفّذ/المورد (إدخال يدوي)" id="emsf_108_fcdfc"></div>
+                    <div><label for="emsf_109_d5915">مرتبط بوثيقة (للتأمين)</label><select name="compliance_id" id="emsf_109_d5915"><option value="">-- بدون --</option><?php foreach ($compliance_rows as $cr) echo '<option value="' . (int) $cr['id'] . '">' . $ee($cr['doc_type'] . ($cr['reference'] ? ' — ' . $cr['reference'] : '')) . '</option>'; ?></select></div>
+                    <div><label for="emsf_110_ee635">مرفق</label><input type="file" name="attachment" accept="image/*,application/pdf" id="emsf_110_ee635"></div>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
             </form>
@@ -952,9 +952,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form id="add-comp" class="child-add-form ems-form" method="post" action="equipment_child_save.php" style="display:none;margin-bottom:14px;">
                 <input type="hidden" name="entity" value="component"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
-                    <div><label>نوع المكوّن *</label><select name="component_type" required><option value="">-- اختر --</option><?php foreach ($COMPONENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
-                    <div><label>الرقم التسلسلي</label><input type="text" name="serial_no"></div>
-                    <div><label>تاريخ التركيب</label><input type="date" name="install_date"></div>
+                    <div><label for="emsf_111_0499d">نوع المكوّن *</label><select name="component_type" required id="emsf_111_0499d"><option value="">-- اختر --</option><?php foreach ($COMPONENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
+                    <div><label for="emsf_112_4aed5">الرقم التسلسلي</label><input type="text" name="serial_no" id="emsf_112_4aed5"></div>
+                    <div><label for="emsf_113_11c52">تاريخ التركيب</label><input type="date" name="install_date" id="emsf_113_11c52"></div>
                     <div style="display:flex;align-items:center;gap:6px;margin-top:22px;"><input type="checkbox" name="is_current" id="comp_cur" value="1" checked><label for="comp_cur" style="margin:0;">مُركَّب حالياً</label></div>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> حفظ</button>
@@ -996,10 +996,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="hidden" name="entity" value="history"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
                     <div><label>نوع الحدث *</label><select name="event_type" required><option value="">-- اختر --</option><?php foreach ($EVENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
-                    <div><label>التاريخ والوقت *</label><input type="datetime-local" name="event_date" value="<?= date('Y-m-d\TH:i'); ?>" required></div>
-                    <div><label>الموقع</label><input type="text" name="site_id"></div>
-                    <div><label>تاريخ دخول/خروج</label><input type="date" name="in_out_date"></div>
-                    <div style="grid-column:1/-1;"><label>ملاحظة</label><input type="text" name="note"></div>
+                    <div><label for="emsf_114_ac19e">التاريخ والوقت *</label><input type="datetime-local" name="event_date" value="<?= date('Y-m-d\TH:i'); ?>" required id="emsf_114_ac19e"></div>
+                    <div><label for="emsf_115_0d700">الموقع</label><input type="text" name="site_id" id="emsf_115_0d700"></div>
+                    <div><label for="emsf_116_87147">تاريخ دخول/خروج</label><input type="date" name="in_out_date" id="emsf_116_87147"></div>
+                    <div style="grid-column:1/-1;"><label for="emsf_117_53545">ملاحظة</label><input type="text" name="note" id="emsf_117_53545"></div>
                 </div>
                 <button type="submit" class="btn btn-success btn-sm" style="margin-top:10px;"><i class="fa-solid fa-save"></i> تسجيل</button>
             </form>

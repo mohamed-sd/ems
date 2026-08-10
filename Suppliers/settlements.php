@@ -227,8 +227,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="generate" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>المورّد *</label>
-                    <select name="party_ref" required>
+                    <label for="emsf_470_fe909">المورّد *</label>
+                    <select name="party_ref" required id="emsf_470_fe909">
                         <option value="">— اختر —</option>
                         <?php foreach ($suppliers as $s) {
                             echo "<option value='" . intval($s['id']) . "'>"
@@ -236,10 +236,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         } ?>
                     </select>
                 </div>
-                <div class="form-group"><label>من *</label>
-                    <input type="date" name="period_from" required></div>
-                <div class="form-group"><label>إلى *</label>
-                    <input type="date" name="period_to" required></div>
+                <div class="form-group"><label for="emsf_471_744bc">من *</label>
+                    <input type="date" name="period_from" required id="emsf_471_744bc"></div>
+                <div class="form-group"><label for="emsf_472_bb57c">إلى *</label>
+                    <input type="date" name="period_to" required id="emsf_472_bb57c"></div>
             </div></div>
             <div style="margin-top:10px;">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولّد التسوية</button>
@@ -390,19 +390,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="action" value="invoice">
             <input type="hidden" name="sid" value="<?php echo $open; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>رقم الفاتورة <span style="color:#c00">*</span></label>
-                    <input type="text" name="invoice_no" required maxlength="64"></div>
-                <div class="form-group"><label>تاريخ الفاتورة <span style="color:#c00">*</span></label>
-                    <input type="date" name="invoice_date" required></div>
-                <div class="form-group"><label>مبلغ الفاتورة <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.01" min="0" name="invoice_amount" required></div>
-                <div class="form-group"><label>العملة</label>
+                <div class="form-group"><label for="emsf_473_3a766">رقم الفاتورة <span style="color:#c00">*</span></label>
+                    <input type="text" name="invoice_no" required maxlength="64" id="emsf_473_3a766"></div>
+                <div class="form-group"><label for="emsf_474_de030">تاريخ الفاتورة <span style="color:#c00">*</span></label>
+                    <input type="date" name="invoice_date" required id="emsf_474_de030"></div>
+                <div class="form-group"><label for="emsf_475_e17b1">مبلغ الفاتورة <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0" name="invoice_amount" required id="emsf_475_e17b1"></div>
+                <div class="form-group"><label for="emsf_476_5bec7">العملة</label>
                     <input type="text" name="invoice_currency" maxlength="8"
-                           value="<?php echo htmlspecialchars((string) $openRow['currency']); ?>"></div>
-                <div class="form-group"><label>سبب الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
-                    <input type="text" name="diff_reason" maxlength="255"></div>
-                <div class="form-group"><label>مستند الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
-                    <input type="text" name="diff_doc_ref" maxlength="120"></div>
+                           value="<?php echo htmlspecialchars((string) $openRow['currency']); ?>" id="emsf_476_5bec7"></div>
+                <div class="form-group"><label for="emsf_477_7d79c">سبب الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
+                    <input type="text" name="diff_reason" maxlength="255" id="emsf_477_7d79c"></div>
+                <div class="form-group"><label for="emsf_478_9a61b">مستند الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
+                    <input type="text" name="diff_doc_ref" maxlength="120" id="emsf_478_9a61b"></div>
             </div>
             <div style="margin-top:12px">
                 <button class="btn btn-sm btn-warning" type="submit">تسجيلُ الفاتورة ومطابقتُها</button>
@@ -479,7 +479,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <input type="hidden" name="sid" value="<?php echo $open; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="text" name="note" placeholder="سبب الاعتراض" required
-                                   style="width:150px;padding:3px 6px;font-size:12px;">
+                                   style="width:150px;padding:3px 6px;font-size:12px;" aria-label="سبب الاعتراض">
                             <button class="btn btn-sm btn-warning" type="submit">اعتراض</button>
                         </form>
                         <?php elseif ($can_edit): ?>

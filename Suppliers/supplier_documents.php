@@ -183,18 +183,18 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="sd_action" value="bank">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>البنك</label>
+                <div class="form-group"><label for="emsf_489_fccd8">البنك</label>
                     <input type="text" name="bank_name" maxlength="150"
-                           value="<?php echo htmlspecialchars((string)($sup['bank_name'] ?? '')); ?>"></div>
-                <div class="form-group"><label>رقم الحساب <span style="color:#c00">*</span></label>
+                           value="<?php echo htmlspecialchars((string)($sup['bank_name'] ?? '')); ?>" id="emsf_489_fccd8"></div>
+                <div class="form-group"><label for="emsf_490_14be2">رقم الحساب <span style="color:#c00">*</span></label>
                     <input type="text" name="bank_account_no" maxlength="60" required
-                           value="<?php echo htmlspecialchars((string)($sup['bank_account_no'] ?? '')); ?>"></div>
-                <div class="form-group"><label>IBAN</label>
+                           value="<?php echo htmlspecialchars((string)($sup['bank_account_no'] ?? '')); ?>" id="emsf_490_14be2"></div>
+                <div class="form-group"><label for="emsf_491_5d559">IBAN</label>
                     <input type="text" name="bank_iban" maxlength="60"
-                           value="<?php echo htmlspecialchars((string)($sup['bank_iban'] ?? '')); ?>"></div>
-                <div class="form-group"><label>مستند التوثيق <span style="color:#c00">*</span></label>
+                           value="<?php echo htmlspecialchars((string)($sup['bank_iban'] ?? '')); ?>" id="emsf_491_5d559"></div>
+                <div class="form-group"><label for="emsf_492_c50a7">مستند التوثيق <span style="color:#c00">*</span></label>
                     <input type="text" name="bank_doc_ref" maxlength="120" required
-                           placeholder="شهادةٌ بنكيةٌ أو شيكٌ ملغًى"></div>
+                           placeholder="شهادةٌ بنكيةٌ أو شيكٌ ملغًى" id="emsf_492_c50a7"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-shield-halved"></i> وثِّق الحساب</button></div>
         </form>
@@ -211,21 +211,21 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="sd_action" value="document">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>النوع <span style="color:#c00">*</span></label>
-                    <select name="doc_type" required>
+                <div class="form-group"><label for="emsf_493_99820">النوع <span style="color:#c00">*</span></label>
+                    <select name="doc_type" required id="emsf_493_99820">
                         <?php foreach (SDS::SUPPLIER_DOC_TYPES as $t): ?>
                             <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>الرقم <span style="color:#c00">*</span></label>
-                    <input type="text" name="doc_no" maxlength="100" required></div>
-                <div class="form-group"><label>جهة الإصدار</label><input type="text" name="issuer" maxlength="255"></div>
-                <div class="form-group"><label>تاريخ الإصدار</label><input type="date" name="issue_date"></div>
-                <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" name="expiry_date"></div>
-                <div class="form-group"><label>التنبيه قبل (أيام)</label>
-                    <input type="number" min="1" step="1" name="alert_days" value="30"></div>
-                <div class="form-group"><label>المرفق</label><input type="text" name="file_ref" maxlength="255"></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="dnote" maxlength="200"></div>
+                <div class="form-group"><label for="emsf_494_c741d">الرقم <span style="color:#c00">*</span></label>
+                    <input type="text" name="doc_no" maxlength="100" required id="emsf_494_c741d"></div>
+                <div class="form-group"><label for="emsf_495_73e9e">جهة الإصدار</label><input type="text" name="issuer" maxlength="255" id="emsf_495_73e9e"></div>
+                <div class="form-group"><label for="emsf_496_8b0ef">تاريخ الإصدار</label><input type="date" name="issue_date" id="emsf_496_8b0ef"></div>
+                <div class="form-group"><label for="emsf_497_e0b7f">تاريخ الانتهاء</label><input type="date" name="expiry_date" id="emsf_497_e0b7f"></div>
+                <div class="form-group"><label for="emsf_498_e8577">التنبيه قبل (أيام)</label>
+                    <input type="number" min="1" step="1" name="alert_days" value="30" id="emsf_498_e8577"></div>
+                <div class="form-group"><label for="emsf_499_a39a7">المرفق</label><input type="text" name="file_ref" maxlength="255" id="emsf_499_a39a7"></div>
+                <div class="form-group"><label for="emsf_500_49c69">ملاحظة</label><input type="text" name="dnote" maxlength="200" id="emsf_500_49c69"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ الوثيقة</button></div>
         </form>

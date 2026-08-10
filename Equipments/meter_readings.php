@@ -175,19 +175,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="equipment_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="meter_type" value="<?php echo htmlspecialchars($mtype); ?>">
             <div class="form-grid">
-                <div class="form-group"><label>تاريخ القراءة <span style="color:#c00">*</span></label>
-                    <input type="date" name="reading_date" required value="<?php echo date('Y-m-d'); ?>"></div>
-                <div class="form-group"><label>القيمة <span style="color:#c00">*</span>
+                <div class="form-group"><label for="emsf_157_8f657">تاريخ القراءة <span style="color:#c00">*</span></label>
+                    <input type="date" name="reading_date" required value="<?php echo date('Y-m-d'); ?>" id="emsf_157_8f657"></div>
+                <div class="form-group"><label for="emsf_158_d1eb7">القيمة <span style="color:#c00">*</span>
                         <small>— لا تقلّ عن آخرِ قراءة</small></label>
-                    <input type="number" step="0.01" min="0" name="value" required></div>
+                    <input type="number" step="0.01" min="0" name="value" required id="emsf_158_d1eb7"></div>
                 <div class="form-group">
-                    <label>المصدر</label>
-                    <select name="source">
+                    <label for="emsf_159_8f981">المصدر</label>
+                    <select name="source" id="emsf_159_8f981">
                         <option value="manual">يدوي</option>
                         <option value="inspection">فحص</option>
                     </select>
                 </div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="255"></div>
+                <div class="form-group"><label for="emsf_160_5f7c8">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_160_5f7c8"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>
@@ -258,16 +258,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="equipment_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="meter_type" value="<?php echo htmlspecialchars($mtype); ?>">
             <div class="form-grid">
-                <div class="form-group"><label>تاريخ التصفير <span style="color:#c00">*</span></label>
-                    <input type="date" name="reading_date" required></div>
-                <div class="form-group"><label>قيمةُ بداية السلسلة <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.01" min="0" name="value" required value="0"></div>
-                <div class="form-group"><label>السبب <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_161_b922e">تاريخ التصفير <span style="color:#c00">*</span></label>
+                    <input type="date" name="reading_date" required id="emsf_161_b922e"></div>
+                <div class="form-group"><label for="emsf_162_1d017">قيمةُ بداية السلسلة <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0" name="value" required value="0" id="emsf_162_1d017"></div>
+                <div class="form-group"><label for="emsf_163_87043">السبب <span style="color:#c00">*</span></label>
                     <input type="text" name="reset_reason" required maxlength="255"
-                           placeholder="استبدالُ عدّادٍ معطوب"></div>
-                <div class="form-group"><label>مرجع المستند <span style="color:#c00">*</span></label>
+                           placeholder="استبدالُ عدّادٍ معطوب" id="emsf_163_87043"></div>
+                <div class="form-group"><label for="emsf_164_59aff">مرجع المستند <span style="color:#c00">*</span></label>
                     <input type="text" name="reset_doc_ref" required maxlength="120"
-                           placeholder="محضرُ ورشة 2026/114"></div>
+                           placeholder="محضرُ ورشة 2026/114" id="emsf_164_59aff"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-rotate-left"></i> تصفير</button></div>
         </form>

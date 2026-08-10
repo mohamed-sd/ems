@@ -263,57 +263,57 @@ if (isset($_GET['edit'])) {
                         
                         <!-- الاسم -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">الاسم *</label>
+                            <label class="form-label" for="emsf_715_994b8">الاسم *</label>
                             <input type="text" 
                                    name="name" 
                                    class="form-control" 
                                    value="<?php echo $edit_record ? e($edit_record['name']) : ''; ?>"
-                                   required>
+                                   required id="emsf_715_994b8">
                         </div>
                         
                         <!-- البريد الإلكتروني -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">البريد الإلكتروني</label>
+                            <label class="form-label" for="emsf_716_e14c9">البريد الإلكتروني</label>
                             <input type="email" 
                                    name="email" 
                                    class="form-control"
-                                   value="<?php echo $edit_record ? e($edit_record['email']) : ''; ?>">
+                                   value="<?php echo $edit_record ? e($edit_record['email']) : ''; ?>" id="emsf_716_e14c9">
                         </div>
                         
                         <!-- رقم الهاتف -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">رقم الهاتف</label>
+                            <label class="form-label" for="emsf_717_0717d">رقم الهاتف</label>
                             <input type="text" 
                                    name="phone" 
                                    class="form-control"
-                                   value="<?php echo $edit_record ? e($edit_record['phone']) : ''; ?>">
+                                   value="<?php echo $edit_record ? e($edit_record['phone']) : ''; ?>" id="emsf_717_0717d">
                         </div>
                         
                         <!-- العمر -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">العمر</label>
+                            <label class="form-label" for="emsf_718_30d9a">العمر</label>
                             <input type="number" 
                                    name="age" 
                                    class="form-control" 
                                    min="18" 
                                    max="100"
-                                   value="<?php echo $edit_record ? e($edit_record['age']) : ''; ?>">
+                                   value="<?php echo $edit_record ? e($edit_record['age']) : ''; ?>" id="emsf_718_30d9a">
                         </div>
                         
                         <!-- السعر -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">السعر</label>
+                            <label class="form-label" for="emsf_719_67ff4">السعر</label>
                             <input type="number" 
                                    name="price" 
                                    class="form-control" 
                                    step="0.01"
-                                   value="<?php echo $edit_record ? e($edit_record['price']) : ''; ?>">
+                                   value="<?php echo $edit_record ? e($edit_record['price']) : ''; ?>" id="emsf_719_67ff4">
                         </div>
                         
                         <!-- الفئة -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">الفئة</label>
-                            <select name="category" class="form-control">
+                            <label class="form-label" for="emsf_720_36f60">الفئة</label>
+                            <select name="category" class="form-control" id="emsf_720_36f60">
                                 <option value="">اختر...</option>
                                 <option value="فئة أ" <?php echo ($edit_record && $edit_record['category'] == 'فئة أ') ? 'selected' : ''; ?>>فئة أ</option>
                                 <option value="فئة ب" <?php echo ($edit_record && $edit_record['category'] == 'فئة ب') ? 'selected' : ''; ?>>فئة ب</option>
@@ -323,17 +323,17 @@ if (isset($_GET['edit'])) {
                         
                         <!-- تاريخ البدء -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">تاريخ البدء</label>
+                            <label class="form-label" for="emsf_721_cc189">تاريخ البدء</label>
                             <input type="date" 
                                    name="start_date" 
                                    class="form-control"
-                                   value="<?php echo $edit_record ? e($edit_record['start_date']) : ''; ?>">
+                                   value="<?php echo $edit_record ? e($edit_record['start_date']) : ''; ?>" id="emsf_721_cc189">
                         </div>
                         
                         <!-- الحالة -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">الحالة</label>
-                            <select name="status" class="form-control">
+                            <label class="form-label" for="emsf_722_db15d">الحالة</label>
+                            <select name="status" class="form-control" id="emsf_722_db15d">
                                 <option value="1" <?php echo ($edit_record && $edit_record['status'] == 1) ? 'selected' : ''; ?>>نشط</option>
                                 <option value="0" <?php echo ($edit_record && $edit_record['status'] == 0) ? 'selected' : ''; ?>>غير نشط</option>
                             </select>
@@ -341,10 +341,10 @@ if (isset($_GET['edit'])) {
                         
                         <!-- الوصف -->
                         <div class="col-12 mb-3">
-                            <label class="form-label">الوصف</label>
+                            <label class="form-label" for="emsf_723_9ae10">الوصف</label>
                             <textarea name="description" 
                                       class="form-control" 
-                                      rows="3"><?php echo $edit_record ? e($edit_record['description']) : ''; ?></textarea>
+                                      rows="3" id="emsf_723_9ae10"><?php echo $edit_record ? e($edit_record['description']) : ''; ?></textarea>
                         </div>
                         
                     </div>

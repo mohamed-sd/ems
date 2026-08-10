@@ -1438,7 +1438,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                             <span class="op-maint-note"><i class="fas fa-wrench"></i> في الصيانة</span>
                                         <?php elseif ($is_running && $can_edit): ?>
                                             <div class="row-actions">
-                                                <select class="op_state_sel" data-op="<?php echo $op_id; ?>" onchange="setOpState(<?php echo $op_id; ?>, this.value)" title="الحالة التشغيلية">
+                                                <select class="op_state_sel" data-op="<?php echo $op_id; ?>" onchange="setOpState(<?php echo $op_id; ?>, this.value)" title="الحالة التشغيلية" aria-label="الحالة التشغيلية">
                                                     <option value="تعمل" <?php echo $op_state === 'تعمل' ? 'selected' : ''; ?>>تعمل</option>
                                                     <option value="جاهزة" <?php echo $op_state === 'جاهزة' ? 'selected' : ''; ?>>جاهزة</option>
                                                 </select>
@@ -1520,8 +1520,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                 <form class="add-driver-form" onsubmit="submitAddDriver(event, this, <?php echo $eq_id; ?>)">
                                                     <div class="inline-form-row">
                                                         <div class="form-group">
-                                                            <label>السائق *</label>
-                                                            <select name="employee_id" required>
+                                                            <label for="emsf_737_5def5">السائق *</label>
+                                                            <select name="employee_id" required id="emsf_737_5def5">
                                                                 <option value="">-- اختر السائق --</option>
                                                                 <?php foreach ($all_drivers as $d): ?>
                                                                     <?php if (in_array(intval($d['id']), $active_driver_ids)) continue; ?>
@@ -1530,20 +1530,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                             </select>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label>الوردية</label>
-                                                            <select name="shift_type">
+                                                            <label for="emsf_738_ad75c">الوردية</label>
+                                                            <select name="shift_type" id="emsf_738_ad75c">
                                                                 <option value="D">نهاري</option>
                                                                 <option value="N">ليلي</option>
                                                                 <option value="B" selected>نهاري + ليلي</option>
                                                             </select>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label>بداية التعيين</label>
-                                                            <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>">
+                                                            <label for="emsf_739_b2962">بداية التعيين</label>
+                                                            <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_739_b2962">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label>نهاية التعيين</label>
-                                                            <input type="date" name="end_date">
+                                                            <label for="emsf_740_46196">نهاية التعيين</label>
+                                                            <input type="date" name="end_date" id="emsf_740_46196">
                                                         </div>
                                                         <div class="form-group" style="justify-content:flex-end;">
                                                             <label>&nbsp;</label>

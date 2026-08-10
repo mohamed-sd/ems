@@ -233,8 +233,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="filter-body">
             <form method="get" action="">
                 <div class="filter-field">
-                    <label><i class="fa fa-calendar"></i> التاريخ</label>
-                    <input type="date" name="day" value="<?php echo atb_e($day); ?>" onchange="this.form.submit()" class="form-control">
+                    <label for="emsf_1_0b552"><i class="fa fa-calendar"></i> التاريخ</label>
+                    <input type="date" name="day" value="<?php echo atb_e($day); ?>" onchange="this.form.submit()" class="form-control" id="emsf_1_0b552">
                 </div>
             </form>
         </div>
@@ -333,7 +333,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                         <input type="text" name="qty_note" maxlength="200"
                                placeholder="السبب — إلزامٌ عند المنع"
-                               value="<?php echo atb_e((string) $e['qty_ruling_note']); ?>">
+                               value="<?php echo atb_e((string) $e['qty_ruling_note']); ?>" aria-label="السبب — إلزامٌ عند المنع">
                         <button type="submit" class="btn btn-sm btn-primary">احكم على الكمية</button>
                     </form>
                     <?php endif; ?>
@@ -439,9 +439,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="line_id" id="atbLine" value="">
             <h5 id="atbTitle"><i class="fas fa-flag"></i> اعتراضٌ على الإسناد</h5>
             <div id="atbObjFields">
-                <label>سببُ الاعتراض *</label>
+                <label for="atbReason">سببُ الاعتراض *</label>
                 <textarea name="reason" id="atbReason" rows="3" maxlength="255" placeholder="لماذا تعترض على هذا الإسناد؟"></textarea>
-                <label>المرجع (محضر / مستند)</label>
+                <label for="atbRef">المرجع (محضر / مستند)</label>
                 <input type="text" name="ref" id="atbRef" maxlength="60" placeholder="مثال: محضر-2026-07-15">
             </div>
             <div id="atbResFields" hidden>

@@ -122,8 +122,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <form method="get" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
                 <div style="min-width:280px;">
-                    <label>رقم الطلب (FR-…) · الحدث (#N) · أو كشف الوحدة (FIN-UR-…)</label>
-                    <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001 · #11 · FIN-UR-0001">
+                    <label for="emsf_170_531d9">رقم الطلب (FR-…) · الحدث (#N) · أو كشف الوحدة (FIN-UR-…)</label>
+                    <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001 · #11 · FIN-UR-0001" id="emsf_170_531d9">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fa fa-magnifying-glass"></i> تتبّع الخيط</button>
             </form>

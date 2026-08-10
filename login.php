@@ -518,7 +518,7 @@ if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) 
       <div class="field">
         <label for="username">اسم المستخدم</label>
         <div class="input-wrap">
-          <input type="text" id="username" name="username" placeholder="اسم المستخدم" value="<?php echo $postU; ?>" required autocomplete="username">
+          <input type="text" id="username" name="username" placeholder="اسم المستخدم" value="<?php echo $postU; ?>" required autocomplete="username" aria-label="اسم المستخدم">
           <span class="icon-r"><i class="fas fa-user"></i></span>
         </div>
       </div>
@@ -526,7 +526,7 @@ if (!empty($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) 
       <div class="field">
         <label for="password">كلمة المرور</label>
         <div class="input-wrap">
-          <input type="password" id="password" name="password" placeholder="........" required autocomplete="current-password" value="12345678">
+          <input type="password" id="password" name="password" placeholder="........" required autocomplete="current-password" value="12345678" aria-label="........">
           <button type="button" class="eye-btn" id="togglePassword" aria-label="إظهار أو إخفاء كلمة المرور">
             <i class="fas fa-eye"></i>
           </button>

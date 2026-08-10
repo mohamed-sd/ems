@@ -262,25 +262,25 @@ if (function_exists('ems_screen_about')) {
     <h5 style="margin:0 0 10px"><i class="fa fa-calculator"></i> حاسبةُ أفضل سعر</h5>
     <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
       <input type="hidden" name="book" value="<?php echo (int) $sel_book; ?>">
-      <div><label>الفئة</label>
-        <select name="c_type" class="form-control">
+      <div><label for="emsf_2_44625">الفئة</label>
+        <select name="c_type" class="form-control" id="emsf_2_44625">
           <option value="0">— اختر —</option>
           <?php foreach ($types as $t): ?>
             <option value="<?php echo (int) $t['id']; ?>" <?php echo $c_type === (int) $t['id'] ? 'selected' : ''; ?>>
               <?php echo rb_e($t['type']); ?></option>
           <?php endforeach; ?>
         </select></div>
-      <div><label>نموذجُ العمل</label>
-        <select name="c_model" class="form-control">
+      <div><label for="emsf_3_d90df">نموذجُ العمل</label>
+        <select name="c_model" class="form-control" id="emsf_3_d90df">
           <?php foreach (RB::WORK_MODELS as $k => $v): ?>
             <option value="<?php echo rb_e($k); ?>" <?php echo $c_model === $k ? 'selected' : ''; ?>>
               <?php echo rb_e($v); ?></option>
           <?php endforeach; ?>
         </select></div>
-      <div><label>المدة (أيام)</label>
-        <input type="number" name="c_days" min="1" value="<?php echo $c_days ?: ''; ?>" class="form-control" style="width:120px"></div>
-      <div><label>العميل (اختياري)</label>
-        <select name="c_client" class="form-control">
+      <div><label for="emsf_4_89926">المدة (أيام)</label>
+        <input type="number" name="c_days" min="1" value="<?php echo $c_days ?: ''; ?>" class="form-control" style="width:120px" id="emsf_4_89926"></div>
+      <div><label for="emsf_5_9b848">العميل (اختياري)</label>
+        <select name="c_client" class="form-control" id="emsf_5_9b848">
           <option value="0">— الدفترُ العام —</option>
           <?php foreach ($clients as $c): ?>
             <option value="<?php echo (int) $c['id']; ?>" <?php echo $c_client === (int) $c['id'] ? 'selected' : ''; ?>>
@@ -355,23 +355,23 @@ if (function_exists('ems_screen_about')) {
       <input type="hidden" name="rb_action" value="save_book">
       <input type="hidden" name="book_id" value="0">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
-        <div><label>اسمُ الدفتر *</label><input type="text" name="name" required maxlength="160" class="form-control"
-             placeholder="تسعيرة 2026 — تعدين"></div>
-        <div><label>العملة</label><select name="currency" class="form-control">
+        <div><label for="emsf_6_e1a0e">اسمُ الدفتر *</label><input type="text" name="name" required maxlength="160" class="form-control"
+             placeholder="تسعيرة 2026 — تعدين" id="emsf_6_e1a0e"></div>
+        <div><label for="emsf_7_afaa9">العملة</label><select name="currency" class="form-control" id="emsf_7_afaa9">
             <?php foreach ($RB_CURR as $c): ?><option value="<?php echo $c; ?>"><?php echo $c; ?></option><?php endforeach; ?>
           </select></div>
-        <div><label>يسري من *</label><input type="date" name="valid_from" required value="<?php echo date('Y-m-d'); ?>" class="form-control"></div>
-        <div><label>إلى (اتركه فارغًا = مفتوح)</label><input type="date" name="valid_to" class="form-control"></div>
-        <div><label>الحالة</label><select name="state" class="form-control">
+        <div><label for="emsf_8_1f145">يسري من *</label><input type="date" name="valid_from" required value="<?php echo date('Y-m-d'); ?>" class="form-control" id="emsf_8_1f145"></div>
+        <div><label for="emsf_9_eacd5">إلى (اتركه فارغًا = مفتوح)</label><input type="date" name="valid_to" class="form-control" id="emsf_9_eacd5"></div>
+        <div><label for="emsf_10_d59c8">الحالة</label><select name="state" class="form-control" id="emsf_10_d59c8">
             <?php foreach ($RB_STATES as $s): ?><option value="<?php echo rb_e($s); ?>"><?php echo rb_e($s); ?></option><?php endforeach; ?>
           </select><small class="text-muted">المعتمدُ وحدَه يُستعمل في التسعير</small></div>
-        <div><label>خاصٌّ بعميل (اختياري)</label><select name="client_id" class="form-control">
+        <div><label for="emsf_11_4be6c">خاصٌّ بعميل (اختياري)</label><select name="client_id" class="form-control" id="emsf_11_4be6c">
             <option value="0">— دفترٌ عام —</option>
             <?php foreach ($clients as $c): ?>
               <option value="<?php echo (int) $c['id']; ?>"><?php echo rb_e($c['client_name']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div style="grid-column:1/-1"><label>ملاحظات</label><input type="text" name="note" maxlength="255" class="form-control"></div>
+        <div style="grid-column:1/-1"><label for="emsf_12_80c07">ملاحظات</label><input type="text" name="note" maxlength="255" class="form-control" id="emsf_12_80c07"></div>
       </div>
       <div style="margin-top:12px">
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> احفظ</button>
@@ -418,23 +418,23 @@ if (function_exists('ems_screen_about')) {
       <input type="hidden" name="book_id" value="<?php echo (int) $sel_book; ?>">
       <input type="hidden" name="line_id" value="0">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-        <div><label>الفئة *</label><select name="equipment_type_id" required class="form-control">
+        <div><label for="emsf_13_f6970">الفئة *</label><select name="equipment_type_id" required class="form-control" id="emsf_13_f6970">
             <option value="">— اختر —</option>
             <?php foreach ($types as $t): ?>
               <option value="<?php echo (int) $t['id']; ?>"><?php echo rb_e($t['type']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>نموذجُ العمل *</label><select name="work_model" class="form-control">
+        <div><label for="emsf_14_34529">نموذجُ العمل *</label><select name="work_model" class="form-control" id="emsf_14_34529">
             <?php foreach (RB::WORK_MODELS as $k => $v): ?>
               <option value="<?php echo rb_e($k); ?>"><?php echo rb_e($v); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>من (يوم) *</label><input type="number" name="tier_from_days" min="1" value="1" required class="form-control"></div>
-        <div><label>إلى (فارغ = فأكثر)</label><input type="number" name="tier_to_days" min="1" class="form-control"></div>
-        <div><label>سعرُ الوحدة *</label><input type="number" step="0.01" min="0" name="unit_price" required class="form-control"></div>
-        <div><label>حدٌّ أدنى (أيام)</label><input type="number" name="min_hire_days" min="1" value="1" class="form-control"></div>
-        <div><label>حدٌّ أدنى ساعات/يوم</label><input type="number" step="0.5" min="0" name="min_hours_per_day" class="form-control"></div>
-        <div><label>رسمُ الترحيل</label><input type="number" step="0.01" min="0" name="mobilization_fee" value="0" class="form-control"></div>
+        <div><label for="emsf_15_7438d">من (يوم) *</label><input type="number" name="tier_from_days" min="1" value="1" required class="form-control" id="emsf_15_7438d"></div>
+        <div><label for="emsf_16_0965e">إلى (فارغ = فأكثر)</label><input type="number" name="tier_to_days" min="1" class="form-control" id="emsf_16_0965e"></div>
+        <div><label for="emsf_17_c0e04">سعرُ الوحدة *</label><input type="number" step="0.01" min="0" name="unit_price" required class="form-control" id="emsf_17_c0e04"></div>
+        <div><label for="emsf_18_60077">حدٌّ أدنى (أيام)</label><input type="number" name="min_hire_days" min="1" value="1" class="form-control" id="emsf_18_60077"></div>
+        <div><label for="emsf_19_8846f">حدٌّ أدنى ساعات/يوم</label><input type="number" step="0.5" min="0" name="min_hours_per_day" class="form-control" id="emsf_19_8846f"></div>
+        <div><label for="emsf_20_68ffe">رسمُ الترحيل</label><input type="number" step="0.01" min="0" name="mobilization_fee" value="0" class="form-control" id="emsf_20_68ffe"></div>
         <div style="display:flex;align-items:end;gap:14px">
           <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" name="operator_included" value="1" checked> بمشغّل</label>
           <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" name="fuel_included" value="1"> بوقود</label>

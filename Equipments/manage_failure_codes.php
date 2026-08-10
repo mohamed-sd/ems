@@ -231,7 +231,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
                     <!-- نوع المعدة -->
                     <div>
-                        <label><i class="fas fa-cog"></i> نوع المعدة <span class="required-indicator">*</span></label>
+                        <label for="f_equipment_type"><i class="fas fa-cog"></i> نوع المعدة <span class="required-indicator">*</span></label>
                         <select name="equipment_type" id="f_equipment_type" required>
                             <option value="">-- اختر --</option>
                             <option value="1" <?= ($edit_data['equipment_type']??'')=='1' ? 'selected':'' ?>>حفار (Excavator)</option>
@@ -242,51 +242,51 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
                     <!-- كود نوع الحدث -->
                     <div>
-                           <label><i class="fas fa-tag"></i> كود نوع الحدث <span class="required-indicator">*</span></label>
+                           <label for="emsf_147_a264c"><i class="fas fa-tag"></i> كود نوع الحدث <span class="required-indicator">*</span></label>
                         <input type="text" name="event_type_code" maxlength="10" placeholder="مثال: EQF"
                                value="<?= htmlspecialchars($edit_data['event_type_code'] ?? '') ?>"
-                               class="fc-uppercase" required>
+                               class="fc-uppercase" required id="emsf_147_a264c">
                     </div>
 
                     <!-- اسم نوع الحدث -->
                     <div>
-                        <label><i class="fas fa-align-right"></i> اسم نوع الحدث <span class="required-indicator">*</span></label>
+                        <label for="emsf_148_ff873"><i class="fas fa-align-right"></i> اسم نوع الحدث <span class="required-indicator">*</span></label>
                         <input type="text" name="event_type_name" maxlength="100" placeholder="مثال: عطل معدة"
-                               value="<?= htmlspecialchars($edit_data['event_type_name'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($edit_data['event_type_name'] ?? '') ?>" required id="emsf_148_ff873">
                     </div>
 
                     <!-- كود الفئة الرئيسية -->
                     <div>
-                           <label><i class="fas fa-folder"></i> كود الفئة الرئيسية <span class="required-indicator">*</span></label>
+                           <label for="emsf_149_8649f"><i class="fas fa-folder"></i> كود الفئة الرئيسية <span class="required-indicator">*</span></label>
                         <input type="text" name="main_category_code" maxlength="10" placeholder="مثال: MEC"
                                value="<?= htmlspecialchars($edit_data['main_category_code'] ?? '') ?>"
-                               class="fc-uppercase" required>
+                               class="fc-uppercase" required id="emsf_149_8649f">
                     </div>
 
                     <!-- اسم الفئة الرئيسية -->
                     <div>
-                        <label><i class="fas fa-folder-open"></i> اسم الفئة الرئيسية <span class="required-indicator">*</span></label>
+                        <label for="emsf_150_d53c7"><i class="fas fa-folder-open"></i> اسم الفئة الرئيسية <span class="required-indicator">*</span></label>
                         <input type="text" name="main_category_name" maxlength="100" placeholder="مثال: أعطال الميكانيكا"
-                               value="<?= htmlspecialchars($edit_data['main_category_name'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($edit_data['main_category_name'] ?? '') ?>" required id="emsf_150_d53c7">
                     </div>
 
                     <!-- الفئة الفرعية -->
                     <div>
-                        <label><i class="fas fa-sitemap"></i> الفئة الفرعية (الجزء المعطل) <span class="required-indicator">*</span></label>
+                        <label for="emsf_151_c589b"><i class="fas fa-sitemap"></i> الفئة الفرعية (الجزء المعطل) <span class="required-indicator">*</span></label>
                         <input type="text" name="sub_category" maxlength="100" placeholder="مثال: المحرك"
-                               value="<?= htmlspecialchars($edit_data['sub_category'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($edit_data['sub_category'] ?? '') ?>" required id="emsf_151_c589b">
                     </div>
 
                     <!-- تفصيل العطل -->
                     <div class="span2">
-                        <label><i class="fas fa-info-circle"></i> تفصيل العطل <span class="required-indicator">*</span></label>
+                        <label for="emsf_152_d9ea1"><i class="fas fa-info-circle"></i> تفصيل العطل <span class="required-indicator">*</span></label>
                         <input type="text" name="failure_detail" maxlength="200" placeholder="مثال: منظومة الهواء"
-                               value="<?= htmlspecialchars($edit_data['failure_detail'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($edit_data['failure_detail'] ?? '') ?>" required id="emsf_152_d9ea1">
                     </div>
 
                     <!-- الكود الكامل -->
                     <div>
-                           <label><i class="fas fa-barcode"></i> الكود الكامل <span class="required-indicator">*</span></label>
+                           <label for="f_full_code"><i class="fas fa-barcode"></i> الكود الكامل <span class="required-indicator">*</span></label>
                         <input type="text" name="full_code" id="f_full_code" maxlength="30"
                                placeholder="مثال: EX-EQF-MEC-01-01"
                                value="<?= htmlspecialchars($edit_data['full_code'] ?? '') ?>"
@@ -295,8 +295,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
                     <!-- الحالة -->
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> الحالة</label>
-                        <select name="status">
+                        <label for="emsf_153_5695e"><i class="fas fa-toggle-on"></i> الحالة</label>
+                        <select name="status" id="emsf_153_5695e">
                             <option value="1" <?= ($edit_data['status']??1)==1 ? 'selected':'' ?>>نشط</option>
                             <option value="0" <?= ($edit_data['status']??1)==0 ? 'selected':'' ?>>غير نشط</option>
                         </select>
@@ -367,8 +367,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
             <form method="GET" action="" class="fc-filter-bar" id="filterBarForm">
                 <input type="hidden" name="f_stat" value="<?= $filter_stat ?>">
                 <div>
-                    <label class="fc-filter-label">نوع المعدة</label>
-                    <select name="f_eq" onchange="this.form.submit()">
+                    <label class="fc-filter-label" for="emsf_154_04aa8">نوع المعدة</label>
+                    <select name="f_eq" onchange="this.form.submit()" id="emsf_154_04aa8">
                         <option value="0">-- الكل --</option>
                         <option value="1" <?= $filter_eq==1?'selected':'' ?>>حفار</option>
                         <option value="2" <?= $filter_eq==2?'selected':'' ?>>قلاب</option>
@@ -376,8 +376,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                     </select>
                 </div>
                 <div>
-                    <label class="fc-filter-label">نوع الحدث</label>
-                    <select name="f_evt" onchange="this.form.submit()">
+                    <label class="fc-filter-label" for="emsf_155_ba779">نوع الحدث</label>
+                    <select name="f_evt" onchange="this.form.submit()" id="emsf_155_ba779">
                         <option value="">-- الكل --</option>
                         <?php foreach ($evt_list_rows as $e): ?>
                             <option value="<?= htmlspecialchars($e['event_type_code']) ?>"
@@ -388,8 +388,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                     </select>
                 </div>
                 <div>
-                    <label class="fc-filter-label">الفئة الرئيسية</label>
-                    <select name="f_mc" onchange="this.form.submit()">
+                    <label class="fc-filter-label" for="emsf_156_f008f">الفئة الرئيسية</label>
+                    <select name="f_mc" onchange="this.form.submit()" id="emsf_156_f008f">
                         <option value="">-- الكل --</option>
                         <?php foreach ($mc_list_rows as $m): ?>
                             <option value="<?= htmlspecialchars($m['main_category_code']) ?>"

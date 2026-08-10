@@ -108,10 +108,10 @@ function kpi_card($label, $value, $link, $hint = '')
 
     ?>
     <form method="get" style="display:flex;gap:10px;align-items:end;margin-bottom:12px;flex-wrap:wrap">
-        <div><label style="font-size:.85rem">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>"></div>
-        <div><label style="font-size:.85rem">إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>"></div>
-        <?php if ($team): ?><div><label style="font-size:.85rem">عمق الفريق</label>
-            <select name="depth" class="form-control"><option value="1" <?php echo $depth === 1 ? 'selected' : ''; ?>>مباشر</option>
+        <div><label style="font-size:.85rem" for="emsf_377_da0ec">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_377_da0ec"></div>
+        <div><label style="font-size:.85rem" for="emsf_378_7cf8e">إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_378_7cf8e"></div>
+        <?php if ($team): ?><div><label style="font-size:.85rem" for="emsf_379_76884">عمق الفريق</label>
+            <select name="depth" class="form-control" id="emsf_379_76884"><option value="1" <?php echo $depth === 1 ? 'selected' : ''; ?>>مباشر</option>
             <option value="2" <?php echo $depth === 2 ? 'selected' : ''; ?>>مستويان</option></select></div><?php endif; ?>
         <button class="btn btn-primary">تحديث</button>
     </form>

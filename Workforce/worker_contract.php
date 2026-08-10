@@ -156,31 +156,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php foreach ($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?>
             </div>
             <div class="field"><label>كود العقد</label><input type="text" name="code" value="<?= htmlspecialchars($edit['code'] ?? '') ?>"></div>
-            <div class="field"><label>نوع العقد (11)</label><select name="contract_type"><?php foreach ($CONTRACT_TYPES as $t): ?><option value="<?= $t ?>" <?= (($edit['contract_type']??'')===$t)?'selected':'' ?>><?= $t ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>الحالة</label><select name="state"><?php foreach ($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_572_03329">نوع العقد (11)</label><select name="contract_type" id="emsf_572_03329"><?php foreach ($CONTRACT_TYPES as $t): ?><option value="<?= $t ?>" <?= (($edit['contract_type']??'')===$t)?'selected':'' ?>><?= $t ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_573_2e0cb">الحالة</label><select name="state" id="emsf_573_2e0cb"><?php foreach ($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
 
-            <div class="field"><label>الأجر (مالي — يدوي)</label><input type="number" step="0.01" name="wage" value="<?= htmlspecialchars($edit['wage'] ?? '') ?>"></div>
-            <div class="field"><label>تعليق مالي (للمالية لاحقاً)</label><input type="text" name="wage_finance_note" value="<?= htmlspecialchars($edit['wage_finance_note'] ?? '') ?>"></div>
-            <div class="field"><label>طريقة الأجر</label><select name="wage_method"><?php foreach ($WAGE_METHODS as $m): ?><option value="<?= $m ?>" <?= (($edit['wage_method']??'شهري')===$m)?'selected':'' ?>><?= $m ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>نسبة الأجر الثابت %</label><input type="number" step="0.01" name="fixed_wage_ratio" value="<?= htmlspecialchars($edit['fixed_wage_ratio'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_574_83d3d">الأجر (مالي — يدوي)</label><input type="number" step="0.01" name="wage" value="<?= htmlspecialchars($edit['wage'] ?? '') ?>" id="emsf_574_83d3d"></div>
+            <div class="field"><label for="emsf_575_03035">تعليق مالي (للمالية لاحقاً)</label><input type="text" name="wage_finance_note" value="<?= htmlspecialchars($edit['wage_finance_note'] ?? '') ?>" id="emsf_575_03035"></div>
+            <div class="field"><label for="emsf_576_cc00d">طريقة الأجر</label><select name="wage_method" id="emsf_576_cc00d"><?php foreach ($WAGE_METHODS as $m): ?><option value="<?= $m ?>" <?= (($edit['wage_method']??'شهري')===$m)?'selected':'' ?>><?= $m ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_577_ea1e4">نسبة الأجر الثابت %</label><input type="number" step="0.01" name="fixed_wage_ratio" value="<?= htmlspecialchars($edit['fixed_wage_ratio'] ?? '') ?>" id="emsf_577_ea1e4"></div>
 
-            <div class="field"><label>بداية</label><input type="date" name="date_start" value="<?= htmlspecialchars($edit['date_start'] ?? '') ?>"></div>
-            <div class="field"><label>نهاية</label><input type="date" name="date_end" value="<?= htmlspecialchars($edit['date_end'] ?? '') ?>"></div>
-            <div class="field"><label>نمط التناوب</label><select name="rotation_pattern"><?php foreach ($ROTATIONS as $r): ?><option value="<?= $r ?>" <?= (($edit['rotation_pattern']??'بلا')===$r)?'selected':'' ?>><?= $r ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>الاستحقاق القادم</label><input type="date" name="next_rotation_date" value="<?= htmlspecialchars($edit['next_rotation_date'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_578_e3600">بداية</label><input type="date" name="date_start" value="<?= htmlspecialchars($edit['date_start'] ?? '') ?>" id="emsf_578_e3600"></div>
+            <div class="field"><label for="emsf_579_06462">نهاية</label><input type="date" name="date_end" value="<?= htmlspecialchars($edit['date_end'] ?? '') ?>" id="emsf_579_06462"></div>
+            <div class="field"><label for="emsf_580_c6174">نمط التناوب</label><select name="rotation_pattern" id="emsf_580_c6174"><?php foreach ($ROTATIONS as $r): ?><option value="<?= $r ?>" <?= (($edit['rotation_pattern']??'بلا')===$r)?'selected':'' ?>><?= $r ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_581_b7738">الاستحقاق القادم</label><input type="date" name="next_rotation_date" value="<?= htmlspecialchars($edit['next_rotation_date'] ?? '') ?>" id="emsf_581_b7738"></div>
 
-            <div class="field"><label>أيام العمل</label><input type="number" name="work_days" value="<?= htmlspecialchars($edit['work_days'] ?? '') ?>"></div>
-            <div class="field"><label>أيام الإجازة</label><input type="number" name="leave_days" value="<?= htmlspecialchars($edit['leave_days'] ?? '') ?>"></div>
-            <div class="field"><label>الساعات الشهرية المعيارية</label><input type="number" name="monthly_hours_base" value="<?= htmlspecialchars($edit['monthly_hours_base'] ?? '') ?>"></div>
-            <div class="field"><label>معاملة التوقّف</label><select name="billable_downtime"><option value="">—</option><?php foreach (['استعداد العميل','+ عطل الصيانة','حسب الحدث'] as $b): ?><option value="<?= $b ?>" <?= (($edit['billable_downtime']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_582_7004e">أيام العمل</label><input type="number" name="work_days" value="<?= htmlspecialchars($edit['work_days'] ?? '') ?>" id="emsf_582_7004e"></div>
+            <div class="field"><label for="emsf_583_68ab6">أيام الإجازة</label><input type="number" name="leave_days" value="<?= htmlspecialchars($edit['leave_days'] ?? '') ?>" id="emsf_583_68ab6"></div>
+            <div class="field"><label for="emsf_584_757fc">الساعات الشهرية المعيارية</label><input type="number" name="monthly_hours_base" value="<?= htmlspecialchars($edit['monthly_hours_base'] ?? '') ?>" id="emsf_584_757fc"></div>
+            <div class="field"><label for="emsf_585_cdf21">معاملة التوقّف</label><select name="billable_downtime" id="emsf_585_cdf21"><option value="">—</option><?php foreach (['استعداد العميل','+ عطل الصيانة','حسب الحدث'] as $b): ?><option value="<?= $b ?>" <?= (($edit['billable_downtime']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
 
-            <div class="field"><label>بدل سكن</label><input type="number" step="0.01" name="allow_housing" value="<?= htmlspecialchars($edit['allow_housing'] ?? '') ?>"></div>
-            <div class="field"><label>بدل إعاشة</label><input type="number" step="0.01" name="allow_food" value="<?= htmlspecialchars($edit['allow_food'] ?? '') ?>"></div>
-            <div class="field"><label>بدل موقع</label><input type="number" step="0.01" name="allow_site" value="<?= htmlspecialchars($edit['allow_site'] ?? '') ?>"></div>
-            <div class="field"><label>بدل نقل</label><input type="number" step="0.01" name="allow_transport" value="<?= htmlspecialchars($edit['allow_transport'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_586_deeb7">بدل سكن</label><input type="number" step="0.01" name="allow_housing" value="<?= htmlspecialchars($edit['allow_housing'] ?? '') ?>" id="emsf_586_deeb7"></div>
+            <div class="field"><label for="emsf_587_7a4b2">بدل إعاشة</label><input type="number" step="0.01" name="allow_food" value="<?= htmlspecialchars($edit['allow_food'] ?? '') ?>" id="emsf_587_7a4b2"></div>
+            <div class="field"><label for="emsf_588_39f58">بدل موقع</label><input type="number" step="0.01" name="allow_site" value="<?= htmlspecialchars($edit['allow_site'] ?? '') ?>" id="emsf_588_39f58"></div>
+            <div class="field"><label for="emsf_589_d711c">بدل نقل</label><input type="number" step="0.01" name="allow_transport" value="<?= htmlspecialchars($edit['allow_transport'] ?? '') ?>" id="emsf_589_d711c"></div>
 
-            <div class="field" style="grid-column:1/3;"><label>تعليق البدلات (للمالية لاحقاً)</label><input type="text" name="allow_finance_note" value="<?= htmlspecialchars($edit['allow_finance_note'] ?? '') ?>"></div>
-            <div class="field" style="grid-column:3/-1;"><label>شروط الإنهاء</label><input type="text" name="termination_terms" value="<?= htmlspecialchars($edit['termination_terms'] ?? '') ?>"></div>
+            <div class="field" style="grid-column:1/3;"><label for="emsf_590_d16c7">تعليق البدلات (للمالية لاحقاً)</label><input type="text" name="allow_finance_note" value="<?= htmlspecialchars($edit['allow_finance_note'] ?? '') ?>" id="emsf_590_d16c7"></div>
+            <div class="field" style="grid-column:3/-1;"><label for="emsf_591_22177">شروط الإنهاء</label><input type="text" name="termination_terms" value="<?= htmlspecialchars($edit['termination_terms'] ?? '') ?>" id="emsf_591_22177"></div>
         </div>
         <div style="padding:0 14px 16px;display:flex;gap:10px;">
             <button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button>

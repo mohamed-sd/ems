@@ -154,12 +154,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card-body">
         <form method="get" class="ems-form" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
             <input type="hidden" name="contract" value="<?php echo $CID; ?>">
-            <div class="form-group"><label>من شهر</label>
+            <div class="form-group"><label for="emsf_81_e9776">من شهر</label>
                 <input type="text" name="from" placeholder="2091-01" style="width:110px"
-                       value="<?php echo htmlspecialchars($FROM); ?>"></div>
-            <div class="form-group"><label>إلى شهر</label>
+                       value="<?php echo htmlspecialchars($FROM); ?>" id="emsf_81_e9776"></div>
+            <div class="form-group"><label for="emsf_82_2cd30">إلى شهر</label>
                 <input type="text" name="to" placeholder="2091-12" style="width:110px"
-                       value="<?php echo htmlspecialchars($TO); ?>"></div>
+                       value="<?php echo htmlspecialchars($TO); ?>" id="emsf_82_2cd30"></div>
             <div style="align-self:flex-end"><button type="submit" class="btn-save">
                 <i class="fa fa-filter"></i> اعرض</button></div>
         </form>
@@ -244,7 +244,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_kind" value="unit">
                             <input type="hidden" name="row_id" value="<?php echo intval($u['id']); ?>">
-                            <input type="number" name="line_id" placeholder="بندٌ صريح (اختياري)" style="width:150px">
+                            <input type="number" name="line_id" placeholder="بندٌ صريح (اختياري)" style="width:150px" aria-label="بندٌ صريح (اختياري)">
                             <button type="submit" class="action-btn"><i class="fa fa-link"></i> صِل</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>

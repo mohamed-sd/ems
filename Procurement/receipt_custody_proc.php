@@ -207,9 +207,9 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
     $qty = $line ? htmlspecialchars((string)$line['qty'], ENT_QUOTES) : '1';
     $opts = proc_items_options($conn, $is_super_admin, $company_id, $iid);
     return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
-        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item">' . $opts . '</select></div>'
-        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required></div>'
-        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" value="' . $qty . '"></div>'
+        . '<div class="form-group"><label for="emsf_425_33703">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_425_33703">' . $opts . '</select></div>'
+        . '<div class="form-group"><label for="emsf_426_df271">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_426_df271"></div>'
+        . '<div class="form-group"><label for="emsf_427_93e88">الكمية</label><input type="number" step="0.01" name="line_qty[]" value="' . $qty . '" id="emsf_427_93e88"></div>'
         . '<div class="form-group"><button type="button" class="btn-cancel removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
@@ -236,48 +236,48 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>المستلِم <span class="required">*</span></label>
-                        <input type="text" name="holder_name" value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>" required>
+                        <label for="emsf_428_f73e2">المستلِم <span class="required">*</span></label>
+                        <input type="text" name="holder_name" value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>" required id="emsf_428_f73e2">
                     </div>
                     <div class="form-group">
-                        <label>تاريخ الاستلام</label>
-                        <input type="date" name="receipt_date" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_date']) : ''; ?>">
+                        <label for="emsf_429_0803c">تاريخ الاستلام</label>
+                        <input type="date" name="receipt_date" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_date']) : ''; ?>" id="emsf_429_0803c">
                     </div>
                     <div class="form-group">
-                        <label>المورد التشغيلي</label>
-                        <select name="supplier_id"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
+                        <label for="emsf_430_02608">المورد التشغيلي</label>
+                        <select name="supplier_id" id="emsf_430_02608"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المرجع الشرائي (أمر شراء)</label>
-                        <select name="order_id"><?php echo proc_options_from_rows($order_option_rows, $edit ? intval($edit['order_id']) : 0, '— بلا أمر —'); ?></select>
+                        <label for="emsf_431_9db2b">المرجع الشرائي (أمر شراء)</label>
+                        <select name="order_id" id="emsf_431_9db2b"><?php echo proc_options_from_rows($order_option_rows, $edit ? intval($edit['order_id']) : 0, '— بلا أمر —'); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>موقع الاستلام</label>
-                        <input type="text" name="receipt_location" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_location']) : ''; ?>" placeholder="عطبرة / موقع المورد …">
+                        <label for="emsf_432_d4311">موقع الاستلام</label>
+                        <input type="text" name="receipt_location" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_location']) : ''; ?>" placeholder="عطبرة / موقع المورد …" id="emsf_432_d4311">
                     </div>
                     <div class="form-group">
-                        <label>مخزن الإدخال <span class="required">*</span> <small>(إلزامي حين الوجهة «مخزن» — يحرّك الرصيد)</small></label>
-                        <select name="warehouse_id"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
+                        <label for="emsf_433_f6614">مخزن الإدخال <span class="required">*</span> <small>(إلزامي حين الوجهة «مخزن» — يحرّك الرصيد)</small></label>
+                        <select name="warehouse_id" id="emsf_433_f6614"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>الوجهة النهائية المتوقعة</label>
-                        <select name="expected_destination">
+                        <label for="emsf_434_6322a">الوجهة النهائية المتوقعة</label>
+                        <select name="expected_destination" id="emsf_434_6322a">
                             <?php foreach ($destinations as $d): $sel = ($edit && $edit['expected_destination'] === $d) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($d); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($d); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الحالة</label>
-                        <select name="state">
+                        <label for="emsf_435_c3556">الحالة</label>
+                        <select name="state" id="emsf_435_c3556">
                             <?php foreach ($states as $st): $sel = ($edit && $edit['state'] === $st) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($st); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($st); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
+                        <label for="emsf_436_27cf5">ملاحظات</label>
+                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>" id="emsf_436_27cf5">
                     </div>
                 </div>
             </div>

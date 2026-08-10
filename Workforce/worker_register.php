@@ -265,7 +265,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-layer-group"></i> الفئة التشغيلية</label>
+                <label for="worker_category"><i class="fas fa-layer-group"></i> الفئة التشغيلية</label>
                 <select name="worker_category" id="worker_category" required>
                     <?php foreach (ems_worker_categories() as $cat): ?>
                         <option value="<?= htmlspecialchars($cat) ?>" <?= (($edit_worker['worker_category'] ?? '') === $cat) ? 'selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
@@ -274,7 +274,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-sitemap"></i> مصدر التبعية</label>
+                <label for="source_type"><i class="fas fa-sitemap"></i> مصدر التبعية</label>
                 <select name="source_type" id="source_type" onchange="emsToggleSupplier()">
                     <?php foreach (['شركة','مورد','مقاول'] as $st): ?>
                         <option value="<?= $st ?>" <?= (($edit_worker['source_type'] ?? 'شركة') === $st) ? 'selected' : '' ?>><?= $st ?></option>
@@ -283,8 +283,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field" id="supplierField" style="<?= (($edit_worker['source_type'] ?? 'شركة') === 'شركة') ? 'display:none;' : '' ?>">
-                <label><i class="fas fa-truck"></i> المورد/المقاول</label>
-                <select name="supplier_id">
+                <label for="emsf_608_9e84e"><i class="fas fa-truck"></i> المورد/المقاول</label>
+                <select name="supplier_id" id="emsf_608_9e84e">
                     <option value="">—</option>
                     <?php foreach ($supplier_options as $sid => $sname): ?>
                         <option value="<?= intval($sid) ?>" <?= (intval($edit_worker['supplier_id'] ?? 0) === intval($sid)) ? 'selected' : '' ?>><?= htmlspecialchars($sname) ?></option>
@@ -293,8 +293,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-shield-halved"></i> موقع القوة</label>
-                <select name="workforce_class">
+                <label for="emsf_609_991cb"><i class="fas fa-shield-halved"></i> موقع القوة</label>
+                <select name="workforce_class" id="emsf_609_991cb">
                     <?php foreach (['أساسي','احتياطي','بديل مؤقت','تغطية إجازة','تجاري مؤقت'] as $wc): ?>
                         <option value="<?= $wc ?>" <?= (($edit_worker['workforce_class'] ?? 'أساسي') === $wc) ? 'selected' : '' ?>><?= $wc ?></option>
                     <?php endforeach; ?>
@@ -302,8 +302,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-ranking-star"></i> الدرجة المهنية</label>
-                <select name="job_grade">
+                <label for="emsf_610_a0fe2"><i class="fas fa-ranking-star"></i> الدرجة المهنية</label>
+                <select name="job_grade" id="emsf_610_a0fe2">
                     <option value="">—</option>
                     <?php foreach (ems_worker_job_grades() as $g): ?>
                         <option value="<?= $g ?>" <?= (($edit_worker['job_grade'] ?? '') === $g) ? 'selected' : '' ?>><?= $g ?></option>
@@ -312,8 +312,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-diagram-project"></i> الحالة</label>
-                <select name="state">
+                <label for="emsf_611_4cb3e"><i class="fas fa-diagram-project"></i> الحالة</label>
+                <select name="state" id="emsf_611_4cb3e">
                     <?php foreach (['مرشّح','مسجّل','مؤهّل','متعاقد','مخصّص','في إجازة','منتهٍ'] as $stt): ?>
                         <option value="<?= $stt ?>" <?= (($edit_worker['state'] ?? 'مسجّل') === $stt) ? 'selected' : '' ?>><?= $stt ?></option>
                     <?php endforeach; ?>
@@ -321,8 +321,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-heart-pulse"></i> اللياقة الطبية <small>(تُحدَّث من 8.2 لاحقاً)</small></label>
-                <select name="medical_fitness_status">
+                <label for="emsf_612_38167"><i class="fas fa-heart-pulse"></i> اللياقة الطبية <small>(تُحدَّث من 8.2 لاحقاً)</small></label>
+                <select name="medical_fitness_status" id="emsf_612_38167">
                     <option value="">—</option>
                     <?php foreach (['لائق للعمل','لائق بشروط','موقوف طبيًّا','يحتاج إعادة تقييم'] as $mf): ?>
                         <option value="<?= $mf ?>" <?= (($edit_worker['medical_fitness_status'] ?? '') === $mf) ? 'selected' : '' ?>><?= $mf ?></option>
@@ -331,13 +331,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-notes-medical"></i> شروط اللياقة</label>
-                <input type="text" name="fitness_conditions" value="<?= htmlspecialchars($edit_worker['fitness_conditions'] ?? '') ?>" placeholder="عند «لائق بشروط»">
+                <label for="emsf_613_a34d6"><i class="fas fa-notes-medical"></i> شروط اللياقة</label>
+                <input type="text" name="fitness_conditions" value="<?= htmlspecialchars($edit_worker['fitness_conditions'] ?? '') ?>" placeholder="عند «لائق بشروط»" id="emsf_613_a34d6">
             </div>
 
             <div class="field">
-                <label><i class="fas fa-user-shield"></i> البديل الأساسي</label>
-                <select name="primary_backup_id">
+                <label for="emsf_614_50772"><i class="fas fa-user-shield"></i> البديل الأساسي</label>
+                <select name="primary_backup_id" id="emsf_614_50772">
                     <option value="">—</option>
                     <?php foreach ($backup_options as $bid => $bname):
                         if ($edit_worker && intval($bid) === intval($edit_worker['id'])) continue; ?>
@@ -370,21 +370,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form action="" method="post" class="form-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
             <input type="hidden" name="action" value="save_qualification">
             <input type="hidden" name="worker_id" value="<?= intval($edit_worker['id']) ?>">
-            <div class="field"><label>النوع</label>
-                <select name="record_type"><?php foreach (['رخصة','مؤهل','خبرة','ترقية'] as $rt): ?><option value="<?= $rt ?>"><?= $rt ?></option><?php endforeach; ?></select>
+            <div class="field"><label for="emsf_615_b4a08">النوع</label>
+                <select name="record_type" id="emsf_615_b4a08"><?php foreach (['رخصة','مؤهل','خبرة','ترقية'] as $rt): ?><option value="<?= $rt ?>"><?= $rt ?></option><?php endforeach; ?></select>
             </div>
-            <div class="field"><label>الاسم/العنوان</label><input type="text" name="title" required></div>
-            <div class="field"><label>الجهة المانحة</label><input type="text" name="issuer"></div>
-            <div class="field"><label>نوع المعدة</label><input type="text" name="equipment_type"></div>
-            <div class="field"><label>تاريخ الإصدار</label><input type="date" name="issue_date"></div>
-            <div class="field"><label>تاريخ الانتهاء</label><input type="date" name="expiry_date"></div>
-            <div class="field"><label>فئة الاعتماد</label>
-                <select name="accreditation_category"><option value="">—</option><?php foreach (['مهارة معدة','اعتماد فني','دورة','شهادة','سلامة','فحص طبي','اعتماد موقع','تصريح'] as $ac): ?><option value="<?= $ac ?>"><?= $ac ?></option><?php endforeach; ?></select>
+            <div class="field"><label for="emsf_616_e2e1e">الاسم/العنوان</label><input type="text" name="title" required id="emsf_616_e2e1e"></div>
+            <div class="field"><label for="emsf_617_b9424">الجهة المانحة</label><input type="text" name="issuer" id="emsf_617_b9424"></div>
+            <div class="field"><label for="emsf_618_e0702">نوع المعدة</label><input type="text" name="equipment_type" id="emsf_618_e0702"></div>
+            <div class="field"><label for="emsf_619_1090e">تاريخ الإصدار</label><input type="date" name="issue_date" id="emsf_619_1090e"></div>
+            <div class="field"><label for="emsf_620_e712b">تاريخ الانتهاء</label><input type="date" name="expiry_date" id="emsf_620_e712b"></div>
+            <div class="field"><label for="emsf_621_c21af">فئة الاعتماد</label>
+                <select name="accreditation_category" id="emsf_621_c21af"><option value="">—</option><?php foreach (['مهارة معدة','اعتماد فني','دورة','شهادة','سلامة','فحص طبي','اعتماد موقع','تصريح'] as $ac): ?><option value="<?= $ac ?>"><?= $ac ?></option><?php endforeach; ?></select>
             </div>
-            <div class="field"><label>مستوى الكفاءة</label>
-                <select name="proficiency_level"><option value="">—</option><?php foreach (['مبتدئ','متوسط','متقدم','خبير'] as $pl): ?><option value="<?= $pl ?>"><?= $pl ?></option><?php endforeach; ?></select>
+            <div class="field"><label for="emsf_622_a12ca">مستوى الكفاءة</label>
+                <select name="proficiency_level" id="emsf_622_a12ca"><option value="">—</option><?php foreach (['مبتدئ','متوسط','متقدم','خبير'] as $pl): ?><option value="<?= $pl ?>"><?= $pl ?></option><?php endforeach; ?></select>
             </div>
-            <div class="field"><label>مدة التنبيه (يوم)</label><input type="number" name="alert_lead_days" value="30" min="0"></div>
+            <div class="field"><label for="emsf_623_74024">مدة التنبيه (يوم)</label><input type="number" name="alert_lead_days" value="30" min="0" id="emsf_623_74024"></div>
             <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" name="is_critical" id="is_critical_q" value="1"><label for="is_critical_q" style="margin:0;">اعتماد حرج (يمنع التخصيص عند انتهائه)</label></div>
             <div class="field"><label>مرجع القرار (للترقية)</label><input type="text" name="decision_ref"></div>
             <div class="field" style="display:flex;align-items:flex-end;"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة</button></div>

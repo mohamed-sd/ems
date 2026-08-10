@@ -712,9 +712,83 @@
     }
 
     /* ── Boot ───────────────────────────────────────────────── */
+    /* ══ AC-U7 · SH-08 — ربطُ الحقلِ بعنوانِه وقتَ التصيير ═══════════════════
+       ◆ لماذا وقتَ التشغيلِ لا في الملفات: القياسُ الحيُّ كشف ما لا يراه الفحصُ
+         الساكن — 98 حقلًا في شاشةِ العقودِ و3 معنونةٌ فقط. والسببُ أن العنوانَ
+         **موجودٌ ومكتوب** لكنه شقيقُ غلافِ الحقلِ لا جارُه:
+           <div class="field"><label>المشروع *</label>
+             <div class="control"><select …></div></div>
+         فالأداةُ الساكنةُ تبحث عن `<label>` ملاصقٍ للحقلِ فلا تجده، بينما
+         قارئُ الشاشةِ لا يجده أيضًا — العيبُ حقيقيٌّ والعنوانُ حاضر.
+       ◆ وموضعٌ واحدٌ هنا يغطي كلَّ شاشةٍ تحمّل هذا الملف، بدل تعديلِ مئاتِ
+         الملفات — وهو النمطُ نفسُه الذي أعطى زرَّ التصديرِ لـ305 شاشةٍ بصفرِ
+         ملفِّ شاشة.
+       ◆ ولا يُغيَّر شكلٌ ولا نصّ: يُضاف `for`/`id` أو `aria-label` فقط. */
+    function bootFieldLabels() {
+        var CTRL = 'input, select, textarea';
+        var seq = 0;
+
+        function labelled(el) {
+            if (el.getAttribute('aria-label') || el.getAttribute('aria-labelledby')) { return true; }
+            if (el.closest('label')) { return true; }
+            if (el.id) {
+                try { if (document.querySelector('label[for="' + CSS.escape(el.id) + '"]')) { return true; } }
+                catch (e) { /* معرِّفٌ لا يقبل الهروب — يُعامَل غيرَ مرتبط */ }
+            }
+            return false;
+        }
+
+        var nodes = document.querySelectorAll(CTRL);
+        for (var i = 0; i < nodes.length; i++) {
+            var el = nodes[i];
+            var t = (el.type || '').toLowerCase();
+            if (t === 'hidden' || t === 'submit' || t === 'button' || t === 'reset' || t === 'image') { continue; }
+            if (labelled(el)) { continue; }
+
+            // ① عنوانٌ مكتوبٌ في غلافِ الحقل — يُربط بـfor/id (الأفضلُ دلاليًّا)
+            var wrap = el.closest('.field, .form-group, .ems-field, .col-form, .mb-3');
+            var lab = wrap ? wrap.querySelector('label:not([for])') : null;
+            if (lab && lab.textContent.trim() !== '') {
+                if (!el.id) { el.id = 'emsl_' + (++seq) + '_' + Math.abs(hash(el.name || String(i))); }
+                lab.setAttribute('for', el.id);
+                continue;
+            }
+
+            // ② حقلٌ داخلَ خليةِ جدول — عنوانُ عمودِه هو عنوانُه
+            //    (نمطُ شاشاتِ التحريرِ الشبكيّ: صفٌّ لكلِّ سجلٍّ وحقلٌ لكلِّ عمود،
+            //     والعنوانُ المكتوبُ مرةً في الترويسةِ لا يتكرر في كلِّ خلية.)
+            var td = el.closest('td');
+            if (td && td.parentElement) {
+                var tbl = td.closest('table');
+                var idx = Array.prototype.indexOf.call(td.parentElement.children, td);
+                var th  = tbl ? tbl.querySelectorAll('thead th')[idx] : null;
+                if (th && th.textContent.trim() !== '') {
+                    el.setAttribute('aria-label', th.textContent.trim().replace(/\s+/g, ' '));
+                    continue;
+                }
+            }
+
+            // ③ لا عنوانَ مكتوبًا — وسمٌ وصفيٌّ من أقربِ نصٍّ متاح
+            var txt = (el.getAttribute('placeholder') || el.getAttribute('title') || '').trim();
+            if (txt === '' && wrap) {
+                var any = wrap.querySelector('label');
+                if (any) { txt = any.textContent.trim(); }
+            }
+            txt = txt.replace(/\s*\*\s*$/, '').replace(/\s+/g, ' ').trim();
+            if (txt !== '') { el.setAttribute('aria-label', txt); }
+        }
+
+        function hash(s) {
+            var h = 0;
+            for (var k = 0; k < s.length; k++) { h = ((h << 5) - h + s.charCodeAt(k)) | 0; }
+            return h;
+        }
+    }
+
     function boot() {
         bootUnifiedHeaders();
         bootUnifiedTables();
+        try { bootFieldLabels(); } catch (eFl) { /* الوصولية لا تُسقط الشاشة */ }
         try { bootFiveStates(); } catch (eFs) { /* لا يعطل التوحيد */ }
         try { bootShellCss(); window.EmsScreenShell.seed(); } catch (eSh) { /* CM-00 لا يعطل القائم */ }
     }

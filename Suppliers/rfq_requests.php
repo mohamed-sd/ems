@@ -238,7 +238,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ($can_edit): ?>
                         <td><input form="awardForm<?php echo intval($l['id']); ?>" type="number" step="0.01" min="0"
                             name="award_qty[<?php echo intval($l['id']); ?>:<?php echo intval($q['supplier_id']); ?>]"
-                            style="width:110px" placeholder="0"></td>
+                            style="width:110px" placeholder="0" aria-label="0"></td>
                         <?php endif; ?></tr>
                 <?php endforeach; ?>
                 <?php if (!$cmp): ?><tr><td colspan="6"><em>لا عروضَ بعد لهذا البند</em></td></tr><?php endif; ?>

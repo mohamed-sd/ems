@@ -105,13 +105,13 @@ include('../insidebar.php'); ?>
 		<div class="card-body">
 			<form method="GET" class="form-grid fc-filter-grid">
 				<div>
-					<label class="fc-filter-label"><i class="fas fa-calendar-day"></i> التاريخ</label>
-					<input type="date" name="date" value="<?php echo $date_filter; ?>">
+					<label class="fc-filter-label" for="emsf_455_dd138"><i class="fas fa-calendar-day"></i> التاريخ</label>
+					<input type="date" name="date" value="<?php echo $date_filter; ?>" id="emsf_455_dd138">
 				</div>
 
 				<div>
-					<label class="fc-filter-label"><i class="fas fa-cogs"></i> الآلية</label>
-					<select name="equipment">
+					<label class="fc-filter-label" for="emsf_456_3d787"><i class="fas fa-cogs"></i> الآلية</label>
+					<select name="equipment" id="emsf_456_3d787">
 						<option value="">-- الكل --</option>
 						<?php
 						// الآليات في تشغيلٍ نشط — خطوتان معزولتان (الاستعلام الفرعي على operations يُعزَل مستقلًّا عبر البوابة).
@@ -139,8 +139,8 @@ include('../insidebar.php'); ?>
 				</div>
 
 				<div>
-					<label class="fc-filter-label"><i class="fas fa-diagram-project"></i> المشروع</label>
-					<select name="project">
+					<label class="fc-filter-label" for="emsf_457_93ae0"><i class="fas fa-diagram-project"></i> المشروع</label>
+					<select name="project" id="emsf_457_93ae0">
 						<option value="">-- الكل --</option>
 						<?php
 						$prj = array();

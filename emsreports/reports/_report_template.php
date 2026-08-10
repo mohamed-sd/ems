@@ -1677,19 +1677,19 @@ body {
 
             <?php if ($showDates): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-calendar-alt me-1" style="color:var(--blue)"></i>من تاريخ</label>
-                <input type="date" name="date_from" class="form-control" value="<?php echo rr($fDateFrom); ?>">
+                <label class="fc-filter-label" for="emsf_704_7ecf1"><i class="fas fa-calendar-alt me-1" style="color:var(--blue)"></i>من تاريخ</label>
+                <input type="date" name="date_from" class="form-control" value="<?php echo rr($fDateFrom); ?>" id="emsf_704_7ecf1">
             </div>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-calendar-check me-1" style="color:var(--teal)"></i>إلى تاريخ</label>
-                <input type="date" name="date_to" class="form-control" value="<?php echo rr($fDateTo); ?>">
+                <label class="fc-filter-label" for="emsf_705_a0fe6"><i class="fas fa-calendar-check me-1" style="color:var(--teal)"></i>إلى تاريخ</label>
+                <input type="date" name="date_to" class="form-control" value="<?php echo rr($fDateTo); ?>" id="emsf_705_a0fe6">
             </div>
             <?php endif; ?>
 
             <?php if ($showProject): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-project-diagram me-1" style="color:var(--blue)"></i>المشروع</label>
-                <select name="project_id" class="form-select">
+                <label class="fc-filter-label" for="emsf_706_aa05e"><i class="fas fa-project-diagram me-1" style="color:var(--blue)"></i>المشروع</label>
+                <select name="project_id" class="form-select" id="emsf_706_aa05e">
                     <?php echo rptSelectOptions($projectsList, 'id', 'name', $fProjectId, 'project_code'); ?>
                 </select>
             </div>
@@ -1697,8 +1697,8 @@ body {
 
             <?php if ($showSupplier): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-truck me-1" style="color:var(--teal)"></i>المورد</label>
-                <select name="supplier_id" class="form-select">
+                <label class="fc-filter-label" for="emsf_707_b1bdd"><i class="fas fa-truck me-1" style="color:var(--teal)"></i>المورد</label>
+                <select name="supplier_id" class="form-select" id="emsf_707_b1bdd">
                     <?php echo rptSelectOptions($suppliersList, 'id', 'name', $fSupplierId); ?>
                 </select>
             </div>
@@ -1706,8 +1706,8 @@ body {
 
             <?php if ($showEquip && !empty($equipsList)): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
-                <select name="equip_id" class="form-select">
+                <label class="fc-filter-label" for="emsf_708_dbe04"><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
+                <select name="equip_id" class="form-select" id="emsf_708_dbe04">
                     <option value="0">— كل المعدات —</option>
                     <?php foreach ($equipsList as $eq): ?>
                     <option value="<?php echo intval($eq['id']); ?>" <?php echo $fEquipId === intval($eq['id']) ? 'selected' : ''; ?>>
@@ -1720,8 +1720,8 @@ body {
 
             <?php if ($showDriver): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-id-badge me-1" style="color:var(--purple)"></i>المشغل</label>
-                <select name="employee_id" class="form-select">
+                <label class="fc-filter-label" for="emsf_709_fe759"><i class="fas fa-id-badge me-1" style="color:var(--purple)"></i>المشغل</label>
+                <select name="employee_id" class="form-select" id="emsf_709_fe759">
                     <?php echo rptSelectOptions($driversList, 'id', 'name', $fDriverId, 'employee_code'); ?>
                 </select>
             </div>
@@ -1729,8 +1729,8 @@ body {
 
             <?php if ($showShift): ?>
             <div class="col-xl-1 col-md-3 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-sun me-1" style="color:var(--gold)"></i>الوردية</label>
-                <select name="shift" class="form-select">
+                <label class="fc-filter-label" for="emsf_710_2345e"><i class="fas fa-sun me-1" style="color:var(--gold)"></i>الوردية</label>
+                <select name="shift" class="form-select" id="emsf_710_2345e">
                     <option value="" <?php echo $fShift === '' ? 'selected' : ''; ?>>الكل</option>
                     <option value="D" <?php echo $fShift === 'D' ? 'selected' : ''; ?>>نهاري</option>
                     <option value="N" <?php echo $fShift === 'N' ? 'selected' : ''; ?>>ليلي</option>
@@ -1740,8 +1740,8 @@ body {
 
             <?php if ($showContractStatus): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-info-circle me-1" style="color:var(--blue)"></i>حالة العقد</label>
-                <select name="contract_status" class="form-select">
+                <label class="fc-filter-label" for="emsf_711_ec39c"><i class="fas fa-info-circle me-1" style="color:var(--blue)"></i>حالة العقد</label>
+                <select name="contract_status" class="form-select" id="emsf_711_ec39c">
                     <option value="" <?php echo $fContractStatus === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php /* H-02: خياراتُ المرشِّح من الآلة نفسِها — فلا قائمةٌ
                              ثانيةٌ تفترق عنها يوم تُضاف حالة. */
@@ -1757,7 +1757,7 @@ body {
 
             <?php if ($showEquipType): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-tag me-1" style="color:var(--teal)"></i>نوع المعدة</label>
+                <label class="fc-filter-label" for="equip_type_filter"><i class="fas fa-tag me-1" style="color:var(--teal)"></i>نوع المعدة</label>
                 <select name="category" id="equip_type_filter" class="form-select">
                     <option value="" <?php echo $fCategory === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php
@@ -1781,7 +1781,7 @@ body {
 
             <?php if ($showEquipName): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
+                <label class="fc-filter-label" for="equip_name_filter"><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
                 <select name="equip_id" id="equip_name_filter" class="form-select">
                     <option value="0">— كل المعدات —</option>
                     <?php foreach ($fleetEquipsList as $feq): ?>
@@ -1795,8 +1795,8 @@ body {
 
             <?php if ($REPORT_CODE === 'project_detailed'): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-layer-group me-1" style="color:var(--blue)"></i>الفئة</label>
-                <select name="category" class="form-select">
+                <label class="fc-filter-label" for="emsf_712_c790a"><i class="fas fa-layer-group me-1" style="color:var(--blue)"></i>الفئة</label>
+                <select name="category" class="form-select" id="emsf_712_c790a">
                     <option value="" <?php echo $fCategory === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php
                     $catQ = "SELECT DISTINCT p.category FROM project p WHERE p.category IS NOT NULL AND p.category!='' AND {TENANT_SCOPE} ORDER BY p.category";
@@ -1815,16 +1815,16 @@ body {
 
             <?php if ($showSearch): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-search me-1"></i>بحث</label>
+                <label class="fc-filter-label" for="emsf_713_7722f"><i class="fas fa-search me-1"></i>بحث</label>
                 <input type="text" name="search" class="form-control"
-                       placeholder="اسم أو كود..." value="<?php echo rr($fSearch); ?>">
+                       placeholder="اسم أو كود..." value="<?php echo rr($fSearch); ?>" id="emsf_713_7722f">
             </div>
             <?php endif; ?>
 
             <?php if ($showStatus): ?>
             <div class="col-xl-1 col-md-3 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-toggle-on me-1"></i>الحالة</label>
-                <select name="status" class="form-select">
+                <label class="fc-filter-label" for="emsf_714_42a57"><i class="fas fa-toggle-on me-1"></i>الحالة</label>
+                <select name="status" class="form-select" id="emsf_714_42a57">
                     <option value="" <?php echo $fStatus < 0 ? 'selected' : ''; ?>>الكل</option>
                     <option value="1" <?php echo $fStatus === 1 ? 'selected' : ''; ?>>نشط</option>
                     <option value="0" <?php echo $fStatus === 0 ? 'selected' : ''; ?>>غير نشط</option>

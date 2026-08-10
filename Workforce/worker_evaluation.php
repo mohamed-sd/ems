@@ -184,18 +184,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
             <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
             <div class="field"><label>الفترة</label><input type="date" name="period" value="<?= htmlspecialchars($edit['period'] ?? '') ?>"></div>
-            <div class="field"><label>الدرجة <?= !empty($kpis)?'(محسوبةٌ من البنود)':'' ?></label><input type="number" step="0.01" name="score" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تُحتسَب آلياً من بنود المؤشّرات"':'' ?>></div>
-            <div class="field"><label>الحالة</label><select name="state"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>النوع</label><select name="incentive_penalty_type"><?php foreach(['بلا','حافز','جزاء'] as $t): ?><option value="<?= $t ?>" <?= (($edit['incentive_penalty_type']??'بلا')===$t)?'selected':'' ?>><?= $t ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>المبلغ (مالي — يدوي)</label><input type="number" step="0.01" name="amount" value="<?= htmlspecialchars($edit['amount'] ?? '') ?>"></div>
-            <div class="field" style="grid-column:3/-1;"><label>تعليق مالي (للمالية لاحقاً)</label><input type="text" name="amount_finance_note" value="<?= htmlspecialchars($edit['amount_finance_note'] ?? '') ?>"></div>
-            <div class="field"><label>ساعات التشغيل</label><input type="number" step="0.01" name="operating_hours" value="<?= htmlspecialchars($edit['operating_hours'] ?? '') ?>"></div>
-            <div class="field"><label>الالتزام بالحضور %</label><input type="number" step="0.01" name="attendance_rate" value="<?= htmlspecialchars($edit['attendance_rate'] ?? '') ?>"></div>
-            <div class="field"><label>الإنتاجية</label><input type="number" step="0.01" name="productivity" value="<?= htmlspecialchars($edit['productivity'] ?? '') ?>"></div>
-            <div class="field"><label>أعطال سوء التشغيل</label><input type="number" name="misuse_faults" value="<?= htmlspecialchars($edit['misuse_faults'] ?? '') ?>"></div>
-            <div class="field"><label>استهلاك الوقود</label><input type="number" step="0.01" name="fuel_consumption" value="<?= htmlspecialchars($edit['fuel_consumption'] ?? '') ?>"></div>
-            <div class="field"><label>التزام السلامة</label><input type="number" step="0.01" name="safety_score" value="<?= htmlspecialchars($edit['safety_score'] ?? '') ?>"></div>
-            <div class="field" style="grid-column:1/-1;"><label>ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_592_91c89">الدرجة <?= !empty($kpis)?'(محسوبةٌ من البنود)':'' ?></label><input type="number" step="0.01" name="score" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تُحتسَب آلياً من بنود المؤشّرات"':'' ?> id="emsf_592_91c89"></div>
+            <div class="field"><label for="emsf_593_670b4">الحالة</label><select name="state" id="emsf_593_670b4"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_594_b3e3a">النوع</label><select name="incentive_penalty_type" id="emsf_594_b3e3a"><?php foreach(['بلا','حافز','جزاء'] as $t): ?><option value="<?= $t ?>" <?= (($edit['incentive_penalty_type']??'بلا')===$t)?'selected':'' ?>><?= $t ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_595_7abb8">المبلغ (مالي — يدوي)</label><input type="number" step="0.01" name="amount" value="<?= htmlspecialchars($edit['amount'] ?? '') ?>" id="emsf_595_7abb8"></div>
+            <div class="field" style="grid-column:3/-1;"><label for="emsf_596_c617b">تعليق مالي (للمالية لاحقاً)</label><input type="text" name="amount_finance_note" value="<?= htmlspecialchars($edit['amount_finance_note'] ?? '') ?>" id="emsf_596_c617b"></div>
+            <div class="field"><label for="emsf_597_5d4f1">ساعات التشغيل</label><input type="number" step="0.01" name="operating_hours" value="<?= htmlspecialchars($edit['operating_hours'] ?? '') ?>" id="emsf_597_5d4f1"></div>
+            <div class="field"><label for="emsf_598_354bd">الالتزام بالحضور %</label><input type="number" step="0.01" name="attendance_rate" value="<?= htmlspecialchars($edit['attendance_rate'] ?? '') ?>" id="emsf_598_354bd"></div>
+            <div class="field"><label for="emsf_599_c13e5">الإنتاجية</label><input type="number" step="0.01" name="productivity" value="<?= htmlspecialchars($edit['productivity'] ?? '') ?>" id="emsf_599_c13e5"></div>
+            <div class="field"><label for="emsf_600_932f7">أعطال سوء التشغيل</label><input type="number" name="misuse_faults" value="<?= htmlspecialchars($edit['misuse_faults'] ?? '') ?>" id="emsf_600_932f7"></div>
+            <div class="field"><label for="emsf_601_4efa8">استهلاك الوقود</label><input type="number" step="0.01" name="fuel_consumption" value="<?= htmlspecialchars($edit['fuel_consumption'] ?? '') ?>" id="emsf_601_4efa8"></div>
+            <div class="field"><label for="emsf_602_13d3d">التزام السلامة</label><input type="number" step="0.01" name="safety_score" value="<?= htmlspecialchars($edit['safety_score'] ?? '') ?>" id="emsf_602_13d3d"></div>
+            <div class="field" style="grid-column:1/-1;"><label for="emsf_603_2af5b">ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_603_2af5b"></div>
         </div>
         <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><?php if($edit): ?><a href="worker_evaluation.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a><?php endif; ?></div>
     </form>
@@ -211,10 +211,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if($can_edit): ?>
         <form action="" method="post" style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr auto;gap:12px;padding:14px;align-items:flex-end;">
             <input type="hidden" name="action" value="add_kpi"><input type="hidden" name="evaluation_id" value="<?= intval($edit['id']) ?>">
-            <div class="field"><label>اسم المؤشّر</label><input type="text" name="kpi_name" required></div>
-            <div class="field"><label>الوزن</label><input type="number" step="0.01" name="weight" placeholder="مثال 30"></div>
-            <div class="field"><label>الدرجة</label><input type="number" step="0.01" name="kpi_score" placeholder="0-100"></div>
-            <div class="field"><label>ملاحظة</label><input type="text" name="kpi_note"></div>
+            <div class="field"><label for="emsf_604_ddef9">اسم المؤشّر</label><input type="text" name="kpi_name" required id="emsf_604_ddef9"></div>
+            <div class="field"><label for="emsf_605_a8e92">الوزن</label><input type="number" step="0.01" name="weight" placeholder="مثال 30" id="emsf_605_a8e92"></div>
+            <div class="field"><label for="emsf_606_ececd">الدرجة</label><input type="number" step="0.01" name="kpi_score" placeholder="0-100" id="emsf_606_ececd"></div>
+            <div class="field"><label for="emsf_607_210d7">ملاحظة</label><input type="text" name="kpi_note" id="emsf_607_210d7"></div>
             <div class="field"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة بند</button></div>
         </form>
         <?php endif; ?>

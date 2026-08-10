@@ -504,40 +504,40 @@ endif; ?>
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>نوع البلاغ <span class="required">*</span></label>
+                        <label for="f_type">نوع البلاغ <span class="required">*</span></label>
                         <select name="ticket_type_id" id="f_type" required><?php echo tkt_type_options(); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>اسم المُبلِّغ <span class="required">*</span></label>
-                        <input type="text" name="reporting_person" required value="<?php echo htmlspecialchars((string)($_SESSION['user']['name'] ?? '')); ?>">
+                        <label for="emsf_511_b950d">اسم المُبلِّغ <span class="required">*</span></label>
+                        <input type="text" name="reporting_person" required value="<?php echo htmlspecialchars((string)($_SESSION['user']['name'] ?? '')); ?>" id="emsf_511_b950d">
                     </div>
                     <div class="form-group">
-                        <label>رقم التواصل</label>
-                        <input type="text" name="reporter_contact" value="<?php echo htmlspecialchars((string)($_SESSION['user']['phone'] ?? '')); ?>">
+                        <label for="emsf_512_b0d62">رقم التواصل</label>
+                        <input type="text" name="reporter_contact" value="<?php echo htmlspecialchars((string)($_SESSION['user']['phone'] ?? '')); ?>" id="emsf_512_b0d62">
                     </div>
                     <div class="form-group">
-                        <label>المعدة (اختياري)</label>
-                        <select name="equipment_id"><?php echo tkt_equipment_options(); ?></select>
+                        <label for="emsf_513_f69dc">المعدة (اختياري)</label>
+                        <select name="equipment_id" id="emsf_513_f69dc"><?php echo tkt_equipment_options(); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المشروع/الموقع (اختياري)</label>
-                        <select name="project_id"><?php echo tkt_project_options(); ?></select>
+                        <label for="emsf_514_30189">المشروع/الموقع (اختياري)</label>
+                        <select name="project_id" id="emsf_514_30189"><?php echo tkt_project_options(); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>حالة المعدة وقت البلاغ</label>
-                        <select name="machine_condition">
+                        <label for="emsf_515_d6c7b">حالة المعدة وقت البلاغ</label>
+                        <select name="machine_condition" id="emsf_515_d6c7b">
                             <option value="">— غير محدد —</option>
                             <?php foreach ($conditions as $k => $v): ?><option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>قراءة العدّاد</label>
-                        <input type="number" step="0.01" min="0" name="meter_reading" placeholder="مثال: 12450.5">
+                        <label for="emsf_516_8c811">قراءة العدّاد</label>
+                        <input type="number" step="0.01" min="0" name="meter_reading" placeholder="مثال: 12450.5" id="emsf_516_8c811">
                     </div>
                 </div>
                 <div class="form-group" style="margin-top:10px;">
-                    <label>وصف المشكلة / الطلب كما ورد <span class="required">*</span></label>
-                    <textarea name="complaint" rows="4" required placeholder="صف المشكلة أو الطلب بوضوح..."></textarea>
+                    <label for="emsf_517_77a94">وصف المشكلة / الطلب كما ورد <span class="required">*</span></label>
+                    <textarea name="complaint" rows="4" required placeholder="صف المشكلة أو الطلب بوضوح..." id="emsf_517_77a94"></textarea>
                 </div>
             </div>
             <div class="form-actions">
@@ -600,23 +600,23 @@ endif; ?>
                         }
                         ?>
                     </select></div>
-                <div class="form-group"><label>الأولوية</label>
-                    <select name="priority"><?php foreach ($priorities as $k => $v): ?><option value="<?php echo $k; ?>"<?php echo $ticket['priority'] === $k ? ' selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
-                <div class="form-group"><label>الوزن التشغيلي</label>
-                    <select name="business_impact"><?php foreach ($impacts as $k => $v): ?><option value="<?php echo $k; ?>"<?php echo $ticket['business_impact'] === $k ? ' selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
+                <div class="form-group"><label for="emsf_518_11300">الأولوية</label>
+                    <select name="priority" id="emsf_518_11300"><?php foreach ($priorities as $k => $v): ?><option value="<?php echo $k; ?>"<?php echo $ticket['priority'] === $k ? ' selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
+                <div class="form-group"><label for="emsf_519_4395b">الوزن التشغيلي</label>
+                    <select name="business_impact" id="emsf_519_4395b"><?php foreach ($impacts as $k => $v): ?><option value="<?php echo $k; ?>"<?php echo $ticket['business_impact'] === $k ? ' selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
                 <div class="form-group"><label>يوقف الإنتاج؟</label>
                     <label class="switch-inline"><input type="checkbox" name="production_critical" value="1"<?php echo intval($ticket['production_critical']) === 1 ? ' checked' : ''; ?>> نعم</label></div>
                 <div class="form-group"><label>المسؤول المُسنَد</label>
                     <select name="assigned_user_id"><?php echo tkt_user_options(intval($ticket['assigned_user_id'])); ?></select></div>
-                <div class="form-group"><label>فريق المعالجة</label>
-                    <select name="service_team">
+                <div class="form-group"><label for="emsf_520_70558">فريق المعالجة</label>
+                    <select name="service_team" id="emsf_520_70558">
                         <option value="">— غير محدد —</option>
                         <option value="internal"<?php echo $ticket['service_team'] === 'internal' ? ' selected' : ''; ?>>داخلي</option>
                         <option value="external_workshop"<?php echo $ticket['service_team'] === 'external_workshop' ? ' selected' : ''; ?>>ورشة خارجية</option>
                     </select></div>
             </div>
-            <div class="form-group"><label>حالة المعالجة (تُقرأ من الإدارة المنفِّذة)</label>
-                <textarea name="issue_status" rows="2"><?php echo htmlspecialchars((string)$ticket['issue_status']); ?></textarea></div>
+            <div class="form-group"><label for="emsf_521_49bd2">حالة المعالجة (تُقرأ من الإدارة المنفِّذة)</label>
+                <textarea name="issue_status" rows="2" id="emsf_521_49bd2"><?php echo htmlspecialchars((string)$ticket['issue_status']); ?></textarea></div>
             <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ التصنيف</button></div>
         </div></div>
     </form>
@@ -641,7 +641,7 @@ endif; ?>
                     <input type="hidden" name="do" value="<?php echo htmlspecialchars($key); ?>">
                     <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
                     <?php if ($tr['reason']): ?>
-                        <input type="text" name="reason" required placeholder="السبب (إلزامي)" style="margin-inline-end:6px;">
+                        <input type="text" name="reason" required placeholder="السبب (إلزامي)" style="margin-inline-end:6px;" aria-label="السبب (إلزامي)">
                     <?php endif; ?>
                     <button type="submit" class="btn-save" style="background:<?php echo $tr['color']; ?>;">
                         <i class="fas <?php echo $tr['icon']; ?>"></i> <?php echo htmlspecialchars($tr['label']); ?>
@@ -655,13 +655,13 @@ endif; ?>
         <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
             <input type="hidden" name="action" value="transfer">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
-            <label style="font-weight:700;"><i class="fas fa-right-left"></i> تحويل الملكية إلى:</label>
-            <select name="to_role_id" required>
+            <label style="font-weight:700;" for="emsf_522_086d6"><i class="fas fa-right-left"></i> تحويل الملكية إلى:</label>
+            <select name="to_role_id" required id="emsf_522_086d6">
                 <?php foreach (tkt_owner_role_ids() as $rid): ?>
                     <option value="<?php echo $rid; ?>"<?php echo intval($ticket['owner_role_id']) === $rid ? ' disabled' : ''; ?>><?php echo htmlspecialchars(tkt_label($roles_map, $rid)); ?></option>
                 <?php endforeach; ?>
             </select>
-            <input type="text" name="reason" required placeholder="سبب التحويل (إلزامي — يُقيَّد في السجل)" style="min-width:280px;">
+            <input type="text" name="reason" required placeholder="سبب التحويل (إلزامي — يُقيَّد في السجل)" style="min-width:280px;" aria-label="سبب التحويل (إلزامي — يُقيَّد في السجل)">
             <button type="submit" class="btn-save"><i class="fas fa-right-left"></i> تحويل</button>
         </form>
         <?php endif; ?>
@@ -701,7 +701,7 @@ endif; ?>
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
             <label style="font-weight:700;"><i class="fas fa-code-branch"></i> تفريع تذكرة:</label>
             <select name="child_type_id" required style="min-width:200px;"><?php echo tkt_type_options(); ?></select>
-            <input type="text" name="child_complaint" required placeholder="وصف الفرع (ما المطلوب من الإدارة الأخرى؟)" style="min-width:300px;">
+            <input type="text" name="child_complaint" required placeholder="وصف الفرع (ما المطلوب من الإدارة الأخرى؟)" style="min-width:300px;" aria-label="وصف الفرع (ما المطلوب من الإدارة الأخرى؟)">
             <button type="submit" class="btn-save"><i class="fas fa-code-branch"></i> إنشاء فرع</button>
         </form>
         <?php endif; ?>
@@ -712,8 +712,8 @@ endif; ?>
               onsubmit="return confirm('إلغاء التذكرة؟ تبقى في السجل للتدقيق ولا تُحذف.');">
             <input type="hidden" name="action" value="cancel">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
-            <label style="font-weight:700;color:#c0392b;"><i class="fas fa-ban"></i> إلغاء التذكرة (مكررة/غير صحيحة):</label>
-            <input type="text" name="reason" required placeholder="سبب الإلغاء (إلزامي)" style="min-width:280px;">
+            <label style="font-weight:700;color:#c0392b;" for="emsf_523_187bf"><i class="fas fa-ban"></i> إلغاء التذكرة (مكررة/غير صحيحة):</label>
+            <input type="text" name="reason" required placeholder="سبب الإلغاء (إلزامي)" style="min-width:280px;" id="emsf_523_187bf">
             <button type="submit" class="btn-cancel"><i class="fas fa-ban"></i> إلغاء التذكرة</button>
         </form>
         <?php endif; ?>
@@ -816,7 +816,7 @@ endif; ?>
         <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" enctype="multipart/form-data" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
             <input type="hidden" name="action" value="comment">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
-            <input type="text" name="body" placeholder="أضف تعليقًا/تواصلًا يظهر لكل الأطراف..." style="flex:1;min-width:260px;">
+            <input type="text" name="body" placeholder="أضف تعليقًا/تواصلًا يظهر لكل الأطراف..." style="flex:1;min-width:260px;" aria-label="أضف تعليقًا/تواصلًا يظهر لكل الأطراف...">
             <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.webp,.pdf" style="max-width:220px;">
             <button type="submit" class="btn-save"><i class="fas fa-comment-dots"></i> إضافة</button>
         </form>

@@ -53,8 +53,8 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
-  <form method="get" style="margin-bottom:12px"><label>السنة</label>
-    <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()"></form>
+  <form method="get" style="margin-bottom:12px"><label for="emsf_222_9326f">السنة</label>
+    <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()" id="emsf_222_9326f"></form>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>المخطط</th><th>المصروف الفعلي</th><th>الانحراف</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->

@@ -567,73 +567,73 @@ function mnt_seg_kind($c) {
         <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> بيانات التفتيش</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>نوع التفتيش</label>
-                    <input type="text" value="<?php echo htmlspecialchars((string) $ins['inspection_type']); ?>" readonly>
+                <div class="form-group"><label for="emsf_280_3cbf1">نوع التفتيش</label>
+                    <input type="text" value="<?php echo htmlspecialchars((string) $ins['inspection_type']); ?>" readonly id="emsf_280_3cbf1">
                     <input type="hidden" name="inspection_type" value="<?php echo htmlspecialchars((string) $ins['inspection_type'], ENT_QUOTES); ?>">
                 </div>
 
                 <?php if ($header_type === 'equipment'): ?>
-                <div class="form-group"><label>المشروع</label>
-                    <select name="project_id" class="mnt-proj"><option value="">— اختر المشروع —</option>
+                <div class="form-group"><label for="emsf_281_c2504">المشروع</label>
+                    <select name="project_id" class="mnt-proj" id="emsf_281_c2504"><option value="">— اختر المشروع —</option>
                         <?php foreach ($projects as $p) echo mnt_opt($p['id'], $p['name'], intval($ins['project_id']) === intval($p['id'])); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>المعدة</label>
-                    <select name="equipment_id" class="mnt-eq" data-selected="<?php echo intval($ins['equipment_id']); ?>"><option value="">— اختر المشروع أولاً —</option>
+                <div class="form-group"><label for="emsf_282_33223">المعدة</label>
+                    <select name="equipment_id" class="mnt-eq" data-selected="<?php echo intval($ins['equipment_id']); ?>" id="emsf_282_33223"><option value="">— اختر المشروع أولاً —</option>
                         <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($ins['equipment_id']) === intval($e['id'])); ?>
                     </select>
                 </div>
                 <?php elseif ($header_type === 'supplier'): ?>
-                <div class="form-group"><label>المورّد</label>
-                    <select name="supplier_id"><option value="">— اختر المورّد —</option>
+                <div class="form-group"><label for="emsf_283_f42ad">المورّد</label>
+                    <select name="supplier_id" id="emsf_283_f42ad"><option value="">— اختر المورّد —</option>
                         <?php foreach ($suppliers as $sp) echo mnt_opt($sp['id'], $sp['name'], intval($ins['supplier_id']) === intval($sp['id'])); ?>
                     </select>
                 </div>
                 <?php else: // external ?>
-                <div class="form-group"><label>المعدة المعروضة (وصف)</label>
-                    <input type="text" name="external_equipment" value="<?php echo htmlspecialchars((string) ($ins['external_equipment'] ?? '')); ?>" placeholder="النوع/الماركة/الموديل">
+                <div class="form-group"><label for="emsf_284_725c7">المعدة المعروضة (وصف)</label>
+                    <input type="text" name="external_equipment" value="<?php echo htmlspecialchars((string) ($ins['external_equipment'] ?? '')); ?>" placeholder="النوع/الماركة/الموديل" id="emsf_284_725c7">
                 </div>
-                <div class="form-group"><label>المالك / البائع</label>
-                    <select name="supplier_id"><option value="">— اختر —</option>
+                <div class="form-group"><label for="emsf_285_d0a7b">المالك / البائع</label>
+                    <select name="supplier_id" id="emsf_285_d0a7b"><option value="">— اختر —</option>
                         <?php foreach ($suppliers as $sp) echo mnt_opt($sp['id'], $sp['name'], intval($ins['supplier_id']) === intval($sp['id'])); ?>
                     </select>
                 </div>
                 <?php endif; ?>
 
-                <div class="form-group"><label>الفاحص</label>
-                    <select name="inspector_id"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_286_56300">الفاحص</label>
+                    <select name="inspector_id" id="emsf_286_56300"><option value="">-- اختر --</option>
                         <?php foreach ($users_list as $u) echo mnt_opt($u['id'], $u['name'], intval($ins['inspector_id']) === intval($u['id'])); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>تاريخ التفتيش</label>
-                    <input type="date" name="scheduled_date" value="<?php echo htmlspecialchars((string) $ins['scheduled_date']); ?>">
+                <div class="form-group"><label for="emsf_287_047a0">تاريخ التفتيش</label>
+                    <input type="date" name="scheduled_date" value="<?php echo htmlspecialchars((string) $ins['scheduled_date']); ?>" id="emsf_287_047a0">
                 </div>
-                <div class="form-group"><label>الدرجة (تُحسب تلقائيًا)</label>
+                <div class="form-group"><label for="scoreReadout">الدرجة (تُحسب تلقائيًا)</label>
                     <input type="text" id="scoreReadout" value="<?php echo $cnt_app > 0 ? $cnt_score . '%' : '—'; ?>" readonly>
                 </div>
-                <div class="form-group"><label>الجاهزية الفنية</label>
-                    <select name="tech_readiness_state"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_288_e0dcd">الجاهزية الفنية</label>
+                    <select name="tech_readiness_state" id="emsf_288_e0dcd"><option value="">-- اختر --</option>
                         <?php foreach ($readiness as $rd) echo mnt_opt($rd, $rd, $ins['tech_readiness_state'] === $rd); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>النتيجة العامة</label>
-                    <input type="text" name="overall_result" value="<?php echo htmlspecialchars((string) $ins['overall_result']); ?>">
+                <div class="form-group"><label for="emsf_289_f702c">النتيجة العامة</label>
+                    <input type="text" name="overall_result" value="<?php echo htmlspecialchars((string) $ins['overall_result']); ?>" id="emsf_289_f702c">
                 </div>
-                <div class="form-group"><label>حالة المعدة (تُكتب للكرت عند الإكمال)</label>
-                    <select name="equipment_condition"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_290_56253">حالة المعدة (تُكتب للكرت عند الإكمال)</label>
+                    <select name="equipment_condition" id="emsf_290_56253"><option value="">-- اختر --</option>
                         <?php foreach ($conditions as $c) echo mnt_opt($c, $c, $ins['equipment_condition'] === $c); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>حالة المحرك (تُكتب للكرت عند الإكمال)</label>
-                    <select name="engine_condition"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_291_9ca88">حالة المحرك (تُكتب للكرت عند الإكمال)</label>
+                    <select name="engine_condition" id="emsf_291_9ca88"><option value="">-- اختر --</option>
                         <?php foreach ($conditions as $c) echo mnt_opt($c, $c, $ins['engine_condition'] === $c); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>الحالة (المرحلة)</label>
-                    <select name="state"><?php foreach ($states as $s) echo mnt_opt($s, $s, $st === $s); ?></select>
+                <div class="form-group"><label for="emsf_292_de6ee">الحالة (المرحلة)</label>
+                    <select name="state" id="emsf_292_de6ee"><?php foreach ($states as $s) echo mnt_opt($s, $s, $st === $s); ?></select>
                 </div>
-                <div class="form-group allforms-span-full"><label>ملاحظات</label>
-                    <textarea name="notes" rows="2"><?php echo htmlspecialchars((string) $ins['notes']); ?></textarea>
+                <div class="form-group allforms-span-full"><label for="emsf_293_8981e">ملاحظات</label>
+                    <textarea name="notes" rows="2" id="emsf_293_8981e"><?php echo htmlspecialchars((string) $ins['notes']); ?></textarea>
                 </div>
             </div></div>
         </div></div>
@@ -657,11 +657,11 @@ function mnt_seg_kind($c) {
                 <?php if (!$locked && $can_edit): ?>
                 <div class="mnt-line-form" id="lineForm" style="display:none;">
                     <div class="mnt-line-grid">
-                        <div class="form-group"><label>البند</label><input type="text" id="xl_component" placeholder="بند خارج القالب"></div>
-                        <div class="form-group"><label>الحالة</label><select id="xl_condition"><?php foreach ($scale_opts as $lc) echo mnt_opt($lc, $lc, false); ?></select></div>
-                        <div class="form-group"><label>القيمة المقاسة</label><input type="text" id="xl_measured"></div>
-                        <div class="form-group"><label>الملاحظة</label><input type="text" id="xl_note"></div>
-                        <div class="form-group"><label>التوصية</label><input type="text" id="xl_rec"></div>
+                        <div class="form-group"><label for="xl_component">البند</label><input type="text" id="xl_component" placeholder="بند خارج القالب"></div>
+                        <div class="form-group"><label for="xl_condition">الحالة</label><select id="xl_condition"><?php foreach ($scale_opts as $lc) echo mnt_opt($lc, $lc, false); ?></select></div>
+                        <div class="form-group"><label for="xl_measured">القيمة المقاسة</label><input type="text" id="xl_measured"></div>
+                        <div class="form-group"><label for="xl_note">الملاحظة</label><input type="text" id="xl_note"></div>
+                        <div class="form-group"><label for="xl_rec">التوصية</label><input type="text" id="xl_rec"></div>
                     </div>
                     <div class="mnt-line-actions">
                         <button type="button" class="btn-save" id="xlAdd"><i class="fas fa-plus"></i> إضافة البند</button>
@@ -725,9 +725,9 @@ function mnt_seg_kind($c) {
                                 <?php if (!$locked && $can_edit): ?>
                                     <div class="mnt-detail">
                                         <input type="text" class="mnt-d-measured" name="line[<?php echo intval($l['id']); ?>][measured_value]" value="<?php echo htmlspecialchars((string) ($l['measured_value'] ?? '')); ?>" placeholder="<?php echo $ref !== '' ? 'القيمة المقاسة (الحد: ' . htmlspecialchars($ref, ENT_QUOTES) . ')' : 'القيمة المقاسة'; ?>">
-                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][note]" value="<?php echo htmlspecialchars((string) ($l['note'] ?? '')); ?>" placeholder="ملاحظة">
-                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][recommendation]" value="<?php echo htmlspecialchars((string) ($l['recommendation'] ?? '')); ?>" placeholder="توصية">
-                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][photo_ref]" value="<?php echo htmlspecialchars((string) ($l['photo_ref'] ?? '')); ?>" placeholder="مرجع الصورة (M-34)">
+                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][note]" value="<?php echo htmlspecialchars((string) ($l['note'] ?? '')); ?>" placeholder="ملاحظة" aria-label="ملاحظة">
+                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][recommendation]" value="<?php echo htmlspecialchars((string) ($l['recommendation'] ?? '')); ?>" placeholder="توصية" aria-label="توصية">
+                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][photo_ref]" value="<?php echo htmlspecialchars((string) ($l['photo_ref'] ?? '')); ?>" placeholder="مرجع الصورة (M-34)" aria-label="مرجع الصورة (M-34)">
                                     </div>
                                     <?php // M-34: تحويلُ الملاحظة بلاغًا بنقرة — والمحوَّلُ يعرض بلاغَه (الخيطُ بالاتجاهين)
                                     if (!empty($l['converted_ticket_id'])): ?>
@@ -794,7 +794,7 @@ function mnt_seg_kind($c) {
         <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> إنشاء تفتيش جديد</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>نوع التفتيش</label>
+                <div class="form-group"><label for="createType">نوع التفتيش</label>
                     <select name="inspection_type" id="createType">
                         <?php $first = true; foreach ($templates as $itype => $t) {
                             echo mnt_opt($itype, $t['name'], $first, "data-header='" . htmlspecialchars($t['header_type'], ENT_QUOTES) . "'");
@@ -802,29 +802,29 @@ function mnt_seg_kind($c) {
                         } ?>
                     </select>
                 </div>
-                <div class="form-group hdr-equipment"><label>المشروع</label>
-                    <select name="project_id" class="mnt-proj"><option value="">— اختر المشروع —</option>
+                <div class="form-group hdr-equipment"><label for="emsf_294_dae26">المشروع</label>
+                    <select name="project_id" class="mnt-proj" id="emsf_294_dae26"><option value="">— اختر المشروع —</option>
                         <?php foreach ($projects as $p) echo mnt_opt($p['id'], $p['name'], false); ?>
                     </select>
                 </div>
-                <div class="form-group hdr-equipment"><label>المعدة</label>
-                    <select name="equipment_id" class="mnt-eq" data-selected=""><option value="">— اختر المشروع أولاً —</option></select>
+                <div class="form-group hdr-equipment"><label for="emsf_295_6fbe0">المعدة</label>
+                    <select name="equipment_id" class="mnt-eq" data-selected="" id="emsf_295_6fbe0"><option value="">— اختر المشروع أولاً —</option></select>
                 </div>
-                <div class="form-group hdr-supplier hdr-external" style="display:none"><label>المورّد / البائع</label>
-                    <select name="supplier_id"><option value="">— اختر المورّد —</option>
+                <div class="form-group hdr-supplier hdr-external" style="display:none"><label for="emsf_296_3b5ac">المورّد / البائع</label>
+                    <select name="supplier_id" id="emsf_296_3b5ac"><option value="">— اختر المورّد —</option>
                         <?php foreach ($suppliers as $sp) echo mnt_opt($sp['id'], $sp['name'], false); ?>
                     </select>
                 </div>
-                <div class="form-group hdr-external" style="display:none"><label>المعدة المعروضة (وصف)</label>
-                    <input type="text" name="external_equipment" placeholder="النوع/الماركة/الموديل">
+                <div class="form-group hdr-external" style="display:none"><label for="emsf_297_c9854">المعدة المعروضة (وصف)</label>
+                    <input type="text" name="external_equipment" placeholder="النوع/الماركة/الموديل" id="emsf_297_c9854">
                 </div>
-                <div class="form-group"><label>الفاحص</label>
-                    <select name="inspector_id"><option value="">-- اختر --</option>
+                <div class="form-group"><label for="emsf_298_d4165">الفاحص</label>
+                    <select name="inspector_id" id="emsf_298_d4165"><option value="">-- اختر --</option>
                         <?php foreach ($users_list as $u) echo mnt_opt($u['id'], $u['name'], false); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>تاريخ التفتيش</label>
-                    <input type="date" name="scheduled_date">
+                <div class="form-group"><label for="emsf_299_cd200">تاريخ التفتيش</label>
+                    <input type="date" name="scheduled_date" id="emsf_299_cd200">
                 </div>
             </div></div>
             <div class="form-actions">
@@ -836,7 +836,7 @@ function mnt_seg_kind($c) {
     <?php endif; ?>
     <div class="card"><div class="card-body">
         <div class="form-grid">
-            <div class="form-group"><label>تصفية حسب الحالة</label>
+            <div class="form-group"><label for="filterState">تصفية حسب الحالة</label>
                 <select id="filterState"><option value="">كل الحالات</option>
                     <?php foreach ($states as $s) echo "<option value='" . htmlspecialchars($s, ENT_QUOTES) . "'>" . htmlspecialchars($s) . "</option>"; ?>
                 </select>

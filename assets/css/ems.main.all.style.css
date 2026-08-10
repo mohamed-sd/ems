@@ -13058,7 +13058,11 @@ body.ems-site {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 0 18px;
-  direction: ltr;
+  /* AC-U9 · SH-02 — كان هنا `direction: ltr` يقلب الشريطَ كلَّه ليأتيَ المسارُ ①
+     على اليسار. والقلبُ لم يكن لازمًا: أبناؤه الأربعةُ مُسنَدون بمساراتٍ صريحةٍ
+     في الشبكة، فيكفي **تبديلُ المسارَين ① و③** ليبقى الشعارُ يسارًا والأفعالُ
+     يمينًا مع اتجاهٍ عربيٍّ سليم. وقلبُ الاتجاهِ كان يُجبر كلَّ ابنٍ على إعلانِ
+     `direction: rtl` لنفسِه — ومَن يَنسَ يخرج نصُّه معكوسًا. */
   background: var(--ems-topbar-bg);
   border-bottom: 1px solid var(--ems-topbar-border);
   box-sizing: border-box;
@@ -13067,9 +13071,10 @@ body.ems-site {
 .ems-topbar-logo {
   display: flex;
   align-items: center;
-  grid-column: 1;
-  justify-self: start;
-  direction: ltr;
+  /* المسارُ ③ في RTL هو الأيسر، و`end` تدفع إلى حافةِ النهايةِ أي اليسار —
+     فالشعارُ يبقى حيث كان بالضبط (x=18) بلا قلبِ اتجاه. */
+  grid-column: 3;
+  justify-self: end;
 }
 
 .ems-topbar-logo img {
@@ -13144,9 +13149,10 @@ body.ems-site {
   display: flex;
   align-items: center;
   gap: 8px;
-  grid-column: 3;
-  justify-self: end;
-  direction: rtl;
+  /* المسارُ ① في RTL هو الأيمن، و`start` تدفع إلى حافةِ البداية أي اليمين.
+     و`direction: rtl` سقط لأنه صار موروثًا — لا معلَنًا لتصحيحِ قلبٍ فوقَه. */
+  grid-column: 1;
+  justify-self: start;
 }
 
 .ems-topbar-icon {

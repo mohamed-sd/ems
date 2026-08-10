@@ -98,7 +98,7 @@ require_once __DIR__ . '/includes/layout_head.php';
         <div class="input-icon-wrap" style="flex:1;min-width:200px;">
             <i class="fas fa-search"></i>
             <input class="form-ctrl form-ctrl-sm" style="width:100%;" name="q"
-                   placeholder="بحث بالاسم أو البريد..." value="<?php echo e($search); ?>">
+                   placeholder="بحث بالاسم أو البريد..." value="<?php echo e($search); ?>" aria-label="بحث بالاسم أو البريد...">
         </div>
         <select name="status" class="form-ctrl-sm">
             <option value="">كل الحالات</option>
@@ -287,22 +287,22 @@ require_once __DIR__ . '/includes/layout_head.php';
             <h4 style="margin-bottom:10px;color:var(--ink-2);">1) بيانات الهوية</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">اسم الشركة (عربي) *</label>
-                    <input class="form-ctrl" name="company_name" required placeholder="شركة …">
+                    <label class="form-label" for="emsf_641_0b13d">اسم الشركة (عربي) *</label>
+                    <input class="form-ctrl" name="company_name" required placeholder="شركة …" id="emsf_641_0b13d">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">اسم الشركة (إنجليزي)</label>
-                    <input class="form-ctrl" name="company_name_en" placeholder="Company Name">
+                    <label class="form-label" for="emsf_642_604ec">اسم الشركة (إنجليزي)</label>
+                    <input class="form-ctrl" name="company_name_en" placeholder="Company Name" id="emsf_642_604ec">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">رقم السجل التجاري *</label>
-                    <input class="form-ctrl" name="commercial_registration" required placeholder="CR-...">
+                    <label class="form-label" for="emsf_643_25ca9">رقم السجل التجاري *</label>
+                    <input class="form-ctrl" name="commercial_registration" required placeholder="CR-..." id="emsf_643_25ca9">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">قطاع النشاط *</label>
-                    <select class="form-ctrl" name="sector" required>
+                    <label class="form-label" for="emsf_644_6fc9c">قطاع النشاط *</label>
+                    <select class="form-ctrl" name="sector" required id="emsf_644_6fc9c">
                         <option value="">— اختر —</option>
                         <option value="تعدين">تعدين</option>
                         <option value="مقاولات">مقاولات</option>
@@ -312,46 +312,46 @@ require_once __DIR__ . '/includes/layout_head.php';
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">الدولة *</label>
-                    <input class="form-ctrl" name="country" required placeholder="السعودية">
+                    <label class="form-label" for="emsf_645_42f1f">الدولة *</label>
+                    <input class="form-ctrl" name="country" required placeholder="السعودية" id="emsf_645_42f1f">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">المدينة *</label>
-                    <input class="form-ctrl" name="city" required placeholder="الرياض">
+                    <label class="form-label" for="emsf_646_9fb00">المدينة *</label>
+                    <input class="form-ctrl" name="city" required placeholder="الرياض" id="emsf_646_9fb00">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">الرقم الضريبي</label>
-                    <input class="form-ctrl" name="tax_number" placeholder="Tax ID">
+                    <label class="form-label" for="emsf_647_2782a">الرقم الضريبي</label>
+                    <input class="form-ctrl" name="tax_number" placeholder="Tax ID" id="emsf_647_2782a">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">مسار الشعار (PNG/SVG)</label>
-                    <input class="form-ctrl" name="logo_path" placeholder="assets/images/company-logo.png">
+                    <label class="form-label" for="emsf_648_6189a">مسار الشعار (PNG/SVG)</label>
+                    <input class="form-ctrl" name="logo_path" placeholder="assets/images/company-logo.png" id="emsf_648_6189a">
                 </div>
             </div>
 
             <h4 style="margin:8px 0 10px;color:var(--ink-2);">2) بيانات التواصل</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">البريد الإلكتروني الرسمي *</label>
-                    <input class="form-ctrl" name="email" type="email" required placeholder="info@...">
+                    <label class="form-label" for="emsf_649_bf4b4">البريد الإلكتروني الرسمي *</label>
+                    <input class="form-ctrl" name="email" type="email" required placeholder="info@..." id="emsf_649_bf4b4">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">رقم الهاتف (مع رمز الدولة) *</label>
-                    <input class="form-ctrl" name="phone" required placeholder="+966...">
+                    <label class="form-label" for="emsf_650_c84bf">رقم الهاتف (مع رمز الدولة) *</label>
+                    <input class="form-ctrl" name="phone" required placeholder="+966..." id="emsf_650_c84bf">
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">العنوان البريدي</label>
-                <textarea class="form-ctrl" name="postal_address" rows="2" placeholder="العنوان الكامل..."></textarea>
+                <label class="form-label" for="emsf_651_05c31">العنوان البريدي</label>
+                <textarea class="form-ctrl" name="postal_address" rows="2" placeholder="العنوان الكامل..." id="emsf_651_05c31"></textarea>
             </div>
 
             <h4 style="margin:8px 0 10px;color:var(--ink-2);">3) الاشتراك والباقة</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">نوع الباقة</label>
-                    <select class="form-ctrl" name="plan_id">
+                    <label class="form-label" for="emsf_652_585dc">نوع الباقة</label>
+                    <select class="form-ctrl" name="plan_id" id="emsf_652_585dc">
                         <option value="">— اختر خطة —</option>
                         <?php
                         try {
@@ -365,57 +365,57 @@ require_once __DIR__ . '/includes/layout_head.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">الوحدات المفعلة (comma separated)</label>
-                    <input class="form-ctrl" name="modules_enabled" placeholder="projects,timesheet,reports">
+                    <label class="form-label" for="emsf_653_95543">الوحدات المفعلة (comma separated)</label>
+                    <input class="form-ctrl" name="modules_enabled" placeholder="projects,timesheet,reports" id="emsf_653_95543">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">تاريخ بدء الاشتراك</label>
-                    <input class="form-ctrl" type="date" name="subscription_start">
+                    <label class="form-label" for="emsf_654_24bb2">تاريخ بدء الاشتراك</label>
+                    <input class="form-ctrl" type="date" name="subscription_start" id="emsf_654_24bb2">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">تاريخ انتهاء الاشتراك</label>
-                    <input class="form-ctrl" type="date" name="subscription_end">
+                    <label class="form-label" for="emsf_655_8fd27">تاريخ انتهاء الاشتراك</label>
+                    <input class="form-ctrl" type="date" name="subscription_end" id="emsf_655_8fd27">
                 </div>
             </div>
             <div class="g3">
                 <div class="form-group">
-                    <label class="form-label">حد المستخدمين</label>
-                    <input class="form-ctrl" type="number" min="0" name="max_users" value="0">
+                    <label class="form-label" for="emsf_656_8f8a6">حد المستخدمين</label>
+                    <input class="form-ctrl" type="number" min="0" name="max_users" value="0" id="emsf_656_8f8a6">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">حد الآليات</label>
-                    <input class="form-ctrl" type="number" min="0" name="max_equipments" value="0">
+                    <label class="form-label" for="emsf_657_3dfc1">حد الآليات</label>
+                    <input class="form-ctrl" type="number" min="0" name="max_equipments" value="0" id="emsf_657_3dfc1">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">حد المشاريع</label>
-                    <input class="form-ctrl" type="number" min="0" name="max_projects" value="0">
+                    <label class="form-label" for="emsf_658_40cab">حد المشاريع</label>
+                    <input class="form-ctrl" type="number" min="0" name="max_projects" value="0" id="emsf_658_40cab">
                 </div>
             </div>
 
             <h4 style="margin:8px 0 10px;color:var(--ink-2);">4) حساب المدير العام</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">الاسم الكامل *</label>
-                    <input class="form-ctrl" name="manager_name" required placeholder="الاسم الكامل">
+                    <label class="form-label" for="emsf_659_48075">الاسم الكامل *</label>
+                    <input class="form-ctrl" name="manager_name" required placeholder="الاسم الكامل" id="emsf_659_48075">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">بريد المدير *</label>
-                    <input class="form-ctrl" name="manager_email" type="email" required placeholder="admin@company.com">
+                    <label class="form-label" for="emsf_660_2e35f">بريد المدير *</label>
+                    <input class="form-ctrl" name="manager_email" type="email" required placeholder="admin@company.com" id="emsf_660_2e35f">
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">كلمة مرور مؤقتة *</label>
-                <input class="form-ctrl" name="temp_password" type="text" required placeholder="Temp#12345">
+                <label class="form-label" for="emsf_661_a8d3f">كلمة مرور مؤقتة *</label>
+                <input class="form-ctrl" name="temp_password" type="text" required placeholder="Temp#12345" id="emsf_661_a8d3f">
                 <p class="form-hint">سيتم إجبار المدير على تغييرها عند أول تسجيل دخول.</p>
             </div>
 
             <h4 style="margin:8px 0 10px;color:var(--ink-2);">5) الإعدادات الافتراضية</h4>
             <div class="g3">
                 <div class="form-group">
-                    <label class="form-label">العملة</label>
-                    <select class="form-ctrl" name="currency">
+                    <label class="form-label" for="emsf_662_10577">العملة</label>
+                    <select class="form-ctrl" name="currency" id="emsf_662_10577">
                         <option value="SAR">SAR</option>
                         <option value="USD">USD</option>
                         <option value="EGP">EGP</option>
@@ -423,12 +423,12 @@ require_once __DIR__ . '/includes/layout_head.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">المنطقة الزمنية</label>
-                    <input class="form-ctrl" name="timezone" value="Asia/Riyadh">
+                    <label class="form-label" for="emsf_663_8d555">المنطقة الزمنية</label>
+                    <input class="form-ctrl" name="timezone" value="Asia/Riyadh" id="emsf_663_8d555">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">الحالة الابتدائية</label>
-                    <select class="form-ctrl" name="status">
+                    <label class="form-label" for="emsf_664_709f6">الحالة الابتدائية</label>
+                    <select class="form-ctrl" name="status" id="emsf_664_709f6">
                         <option value="pending" selected>pending (مراجعة)</option>
                     </select>
                 </div>
@@ -459,21 +459,21 @@ require_once __DIR__ . '/includes/layout_head.php';
             <h4 style="margin-bottom:10px;color:var(--ink-2);">بيانات الهوية والتواصل</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">اسم الشركة (عربي) *</label>
+                    <label class="form-label" for="editCompanyName">اسم الشركة (عربي) *</label>
                     <input class="form-ctrl" id="editCompanyName" name="company_name" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">اسم الشركة (إنجليزي)</label>
+                    <label class="form-label" for="editCompanyNameEn">اسم الشركة (إنجليزي)</label>
                     <input class="form-ctrl" id="editCompanyNameEn" name="company_name_en">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">رقم السجل التجاري *</label>
+                    <label class="form-label" for="editCommercialRegistration">رقم السجل التجاري *</label>
                     <input class="form-ctrl" id="editCommercialRegistration" name="commercial_registration" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">قطاع النشاط *</label>
+                    <label class="form-label" for="editSector">قطاع النشاط *</label>
                     <select class="form-ctrl" id="editSector" name="sector" required>
                         <option value="">— اختر —</option>
                         <option value="تعدين">تعدين</option>
@@ -484,43 +484,43 @@ require_once __DIR__ . '/includes/layout_head.php';
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">الدولة *</label>
+                    <label class="form-label" for="editCountry">الدولة *</label>
                     <input class="form-ctrl" id="editCountry" name="country" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">المدينة *</label>
+                    <label class="form-label" for="editCity">المدينة *</label>
                     <input class="form-ctrl" id="editCity" name="city" required>
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">الرقم الضريبي</label>
+                    <label class="form-label" for="editTaxNumber">الرقم الضريبي</label>
                     <input class="form-ctrl" id="editTaxNumber" name="tax_number">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">مسار الشعار</label>
+                    <label class="form-label" for="editLogoPath">مسار الشعار</label>
                     <input class="form-ctrl" id="editLogoPath" name="logo_path">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">البريد الرسمي *</label>
+                    <label class="form-label" for="editEmail">البريد الرسمي *</label>
                     <input class="form-ctrl" id="editEmail" name="email" type="email" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">رقم الهاتف *</label>
+                    <label class="form-label" for="editPhone">رقم الهاتف *</label>
                     <input class="form-ctrl" id="editPhone" name="phone" required>
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">العنوان البريدي</label>
+                <label class="form-label" for="editPostalAddress">العنوان البريدي</label>
                 <textarea class="form-ctrl" id="editPostalAddress" name="postal_address" rows="2"></textarea>
             </div>
 
             <h4 style="margin:8px 0 10px;color:var(--ink-2);">الاشتراك والإعدادات</h4>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">نوع الباقة</label>
+                    <label class="form-label" for="editPlanId">نوع الباقة</label>
                     <select class="form-ctrl" id="editPlanId" name="plan_id">
                         <option value="">— اختر خطة —</option>
                         <?php
@@ -535,37 +535,37 @@ require_once __DIR__ . '/includes/layout_head.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">الوحدات المفعلة</label>
+                    <label class="form-label" for="editModulesEnabled">الوحدات المفعلة</label>
                     <input class="form-ctrl" id="editModulesEnabled" name="modules_enabled" placeholder="projects,timesheet,reports">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">تاريخ البدء</label>
+                    <label class="form-label" for="editSubscriptionStart">تاريخ البدء</label>
                     <input class="form-ctrl" id="editSubscriptionStart" type="date" name="subscription_start">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">تاريخ الانتهاء</label>
+                    <label class="form-label" for="editSubscriptionEnd">تاريخ الانتهاء</label>
                     <input class="form-ctrl" id="editSubscriptionEnd" type="date" name="subscription_end">
                 </div>
             </div>
             <div class="g3">
                 <div class="form-group">
-                    <label class="form-label">حد المستخدمين</label>
+                    <label class="form-label" for="editMaxUsers">حد المستخدمين</label>
                     <input class="form-ctrl" id="editMaxUsers" type="number" min="0" name="max_users" value="0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">حد الآليات</label>
+                    <label class="form-label" for="editMaxEquipments">حد الآليات</label>
                     <input class="form-ctrl" id="editMaxEquipments" type="number" min="0" name="max_equipments" value="0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">حد المشاريع</label>
+                    <label class="form-label" for="editMaxProjects">حد المشاريع</label>
                     <input class="form-ctrl" id="editMaxProjects" type="number" min="0" name="max_projects" value="0">
                 </div>
             </div>
             <div class="g2">
                 <div class="form-group">
-                    <label class="form-label">العملة</label>
+                    <label class="form-label" for="editCurrency">العملة</label>
                     <select class="form-ctrl" id="editCurrency" name="currency">
                         <option value="SAR">SAR</option>
                         <option value="USD">USD</option>
@@ -574,12 +574,12 @@ require_once __DIR__ . '/includes/layout_head.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">المنطقة الزمنية</label>
+                    <label class="form-label" for="editTimezone">المنطقة الزمنية</label>
                     <input class="form-ctrl" id="editTimezone" name="timezone" value="Asia/Riyadh">
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">الحالة</label>
+                <label class="form-label" for="editStatus">الحالة</label>
                 <select class="form-ctrl" id="editStatus" name="status">
                     <option value="pending">قيد المراجعة</option>
                     <option value="active">نشط</option>

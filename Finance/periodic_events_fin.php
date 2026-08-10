@@ -107,8 +107,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ولا يقع شيءٌ منها في <strong>فترةٍ مقفلة</strong>.
         </p>
         <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <label>الفترة:</label>
-            <input type="month" name="period" value="<?php echo htmlspecialchars($period); ?>">
+            <label for="emsf_254_00734">الفترة:</label>
+            <input type="month" name="period" value="<?php echo htmlspecialchars($period); ?>" id="emsf_254_00734">
             <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اعرض</button>
         </form>
         <?php if ($can_edit): ?>
@@ -135,18 +135,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="post" class="ems-form">
             <input type="hidden" name="per_action" value="add_rule">
             <div class="form-grid">
-                <div class="form-group"><label>معدةٌ بعينها <small>— 0 = الأعمّ</small></label>
-                    <input type="number" name="equipment_id" min="0" value="0"></div>
-                <div class="form-group"><label>نوعُ المعدة <small>— 0 = أي نوع</small></label>
-                    <input type="number" name="equipment_type" min="0" value="0"></div>
-                <div class="form-group"><label>الأساس</label>
-                    <select name="basis"><option value="hour">ساعة</option><option value="unit">وحدة</option></select></div>
-                <div class="form-group"><label>المعدّل <span style="color:#c00">*</span></label>
-                    <input type="number" name="rate" step="0.0001" min="0.0001" required></div>
-                <div class="form-group"><label>العملة</label><input type="text" name="currency" value="SDG" maxlength="8"></div>
-                <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                    <input type="date" name="effective_from" required></div>
-                <div class="form-group"><label>مرجعُ القاعدة</label><input type="text" name="note" maxlength="200"></div>
+                <div class="form-group"><label for="emsf_255_f7046">معدةٌ بعينها <small>— 0 = الأعمّ</small></label>
+                    <input type="number" name="equipment_id" min="0" value="0" id="emsf_255_f7046"></div>
+                <div class="form-group"><label for="emsf_256_a476e">نوعُ المعدة <small>— 0 = أي نوع</small></label>
+                    <input type="number" name="equipment_type" min="0" value="0" id="emsf_256_a476e"></div>
+                <div class="form-group"><label for="emsf_257_a43c9">الأساس</label>
+                    <select name="basis" id="emsf_257_a43c9"><option value="hour">ساعة</option><option value="unit">وحدة</option></select></div>
+                <div class="form-group"><label for="emsf_258_b3336">المعدّل <span style="color:#c00">*</span></label>
+                    <input type="number" name="rate" step="0.0001" min="0.0001" required id="emsf_258_b3336"></div>
+                <div class="form-group"><label for="emsf_259_38d9e">العملة</label><input type="text" name="currency" value="SDG" maxlength="8" id="emsf_259_38d9e"></div>
+                <div class="form-group"><label for="emsf_260_e7a32">سريان من <span style="color:#c00">*</span></label>
+                    <input type="date" name="effective_from" required id="emsf_260_e7a32"></div>
+                <div class="form-group"><label for="emsf_261_3ad4a">مرجعُ القاعدة</label><input type="text" name="note" maxlength="200" id="emsf_261_3ad4a"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> أضف القاعدة</button></div>
         </form>

@@ -151,8 +151,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </option>
                 <?php endforeach; ?>
             </select>
-            <label>القياس من</label><input type="date" name="from" value="<?php echo htmlspecialchars($mFrom); ?>">
-            <label>إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($mTo); ?>">
+            <label for="emsf_479_f7ce7">القياس من</label><input type="date" name="from" value="<?php echo htmlspecialchars($mFrom); ?>" id="emsf_479_f7ce7">
+            <label for="emsf_480_e0019">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($mTo); ?>" id="emsf_480_e0019">
             <button type="submit" class="btn-save"><i class="fa fa-magnifying-glass"></i> اقرأ القياس</button>
         </form>
         <p style="color:#a15c00;margin-top:10px;background:#fff8e6;padding:10px;border-radius:6px">
@@ -175,8 +175,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>المعدة <span style="color:#c00">*</span></label>
-                    <select name="equipment_id" required>
+                    <label for="emsf_481_2cc73">المعدة <span style="color:#c00">*</span></label>
+                    <select name="equipment_id" required id="emsf_481_2cc73">
                         <?php foreach ($equipments as $e): ?>
                             <option value="<?php echo intval($e['id']); ?>">
                                 <?php echo htmlspecialchars((string)$e['name']); ?>
@@ -186,23 +186,23 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>نموذج الطاقة <span style="color:#c00">*</span></label>
-                    <select name="work_model" required>
+                    <label for="emsf_482_2ecb4">نموذج الطاقة <span style="color:#c00">*</span></label>
+                    <select name="work_model" required id="emsf_482_2ecb4">
                         <?php foreach (SCAP::WORK_MODEL_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label>الطاقة النظرية اليومية <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.01" min="0.01" name="theoretical_daily" required></div>
-                <div class="form-group"><label>نسبة الجاهزية الدنيا ٪ <small>— فارغٌ = لم يُشترط (يُعلَن)</small></label>
-                    <input type="number" step="0.01" min="0" max="100" name="min_readiness_percent"></div>
-                <div class="form-group"><label>مهلة الإحلال (ساعات) <small>— فارغٌ = لا مهلةَ مكتوبة</small></label>
-                    <input type="number" step="1" min="1" name="replace_hours"></div>
-                <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
-                    <input type="date" name="valid_from" required></div>
-                <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to"></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="255"></div>
+                <div class="form-group"><label for="emsf_483_91e41">الطاقة النظرية اليومية <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0.01" name="theoretical_daily" required id="emsf_483_91e41"></div>
+                <div class="form-group"><label for="emsf_484_0af35">نسبة الجاهزية الدنيا ٪ <small>— فارغٌ = لم يُشترط (يُعلَن)</small></label>
+                    <input type="number" step="0.01" min="0" max="100" name="min_readiness_percent" id="emsf_484_0af35"></div>
+                <div class="form-group"><label for="emsf_485_75cf7">مهلة الإحلال (ساعات) <small>— فارغٌ = لا مهلةَ مكتوبة</small></label>
+                    <input type="number" step="1" min="1" name="replace_hours" id="emsf_485_75cf7"></div>
+                <div class="form-group"><label for="emsf_486_96b94">سريان من <span style="color:#c00">*</span></label>
+                    <input type="date" name="valid_from" required id="emsf_486_96b94"></div>
+                <div class="form-group"><label for="emsf_487_58350">سريان إلى</label><input type="date" name="valid_to" id="emsf_487_58350"></div>
+                <div class="form-group"><label for="emsf_488_d5d66">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_488_d5d66"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ البطاقة</button></div>
         </form>

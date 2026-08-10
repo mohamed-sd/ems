@@ -97,7 +97,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ولكلِّ شهادةٍ رقمٌ تسلسليٌّ ورمزُ تحققٍ يمنع التزوير.</p>
         <form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <strong>تحقّق من شهادة:</strong>
-            <input type="text" name="verify" placeholder="رمز التحقق" value="<?php echo htmlspecialchars($verify); ?>">
+            <input type="text" name="verify" placeholder="رمز التحقق" value="<?php echo htmlspecialchars($verify); ?>" aria-label="رمز التحقق">
             <button type="submit" class="btn-save">تحقّق</button>
             <?php if ($verify !== ''): ?>
                 <?php if ($verified): ?>

@@ -104,8 +104,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php echo htmlspecialchars(CAP::CAPACITY_AR[$c['capacity_type']] ?? $c['capacity_type']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <label>من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>">
-            <label>إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>">
+            <label for="emsf_372_ccc0a">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_372_ccc0a">
+            <label for="emsf_373_beed6">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_373_beed6">
             <button type="submit" class="btn-save">افتح الفترة</button>
         </form>
         <p style="color:#666;margin-top:8px">المعالج: <strong>ذاتيٌّ ← إقفالٌ ← مديرٌ ← مناقشةٌ ← اعتماد</strong> —
@@ -166,9 +166,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label><?php echo htmlspecialchars($lbl); ?> (1–5)</label>
                         <input type="number" step="0.5" min="1" max="5" name="score_<?php echo $k; ?>"></div>
                 <?php endforeach; ?>
-                <div class="form-group"><label>تعليقُ المدير
+                <div class="form-group"><label for="emsf_374_89ed5">تعليقُ المدير
                     <span class="mnt-req-hint">(إلزاميٌّ عند فارقٍ ≥ درجتين)</span></label>
-                    <input type="text" name="mgr_comment" maxlength="500"></div>
+                    <input type="text" name="mgr_comment" maxlength="500" id="emsf_374_89ed5"></div>
             </div>
             <div style="margin-top:10px"><button type="submit" class="btn-save">سجّل تقييمَ المدير</button></div>
         </form>
@@ -183,8 +183,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="capacity_id" value="<?php echo $capId; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($from); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($to); ?>">
-            <div class="form-group"><label>نقاطُ الاتفاق والاختلاف وخطةُ التطوير *</label>
-                <textarea name="notes" rows="3" required></textarea></div>
+            <div class="form-group"><label for="emsf_375_2542a">نقاطُ الاتفاق والاختلاف وخطةُ التطوير *</label>
+                <textarea name="notes" rows="3" required id="emsf_375_2542a"></textarea></div>
             <div style="margin-top:10px"><button type="submit" class="btn-save">سجّل الجلسة</button></div>
         </form>
         <?php endif; ?>
@@ -198,8 +198,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="capacity_id" value="<?php echo $capId; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($from); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($to); ?>">
-            <div class="form-group"><label>الدرجةُ النهائية (بأوزان المحاور) *</label>
-                <input type="number" step="0.01" min="0.01" max="5" name="final_score" required></div>
+            <div class="form-group"><label for="emsf_376_1f165">الدرجةُ النهائية (بأوزان المحاور) *</label>
+                <input type="number" step="0.01" min="0.01" max="5" name="final_score" required id="emsf_376_1f165"></div>
             <div style="margin-top:10px"><button type="submit" class="btn-save">اعتمِد</button></div>
         </form>
         <?php endif; ?>

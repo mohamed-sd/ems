@@ -59,7 +59,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                 <i class="fas fa-building"></i>
                 <input class="form-ctrl" style="width:100%;padding-right:34px;" name="lookup"
                        value="<?php echo e($lookup); ?>"
-                       placeholder="ابحث باسم الشركة أو البريد الإلكتروني...">
+                       placeholder="ابحث باسم الشركة أو البريد الإلكتروني..." aria-label="ابحث باسم الشركة أو البريد الإلكتروني...">
             </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> بحث</button>
             <?php if ($lookup): ?>

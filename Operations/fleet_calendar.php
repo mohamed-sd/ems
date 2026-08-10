@@ -244,10 +244,10 @@ if (function_exists('ems_screen_about')) {
 
   <div class="card"><div class="card-body">
     <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
-      <div><label>من</label><input type="date" name="from" value="<?php echo fc_e($from); ?>" class="form-control"></div>
-      <div><label>إلى</label><input type="date" name="to" value="<?php echo fc_e($to); ?>" class="form-control"></div>
-      <div><label>الفئة</label>
-        <select name="type" class="form-control">
+      <div><label for="emsf_352_b1438">من</label><input type="date" name="from" value="<?php echo fc_e($from); ?>" class="form-control" id="emsf_352_b1438"></div>
+      <div><label for="emsf_353_96e8a">إلى</label><input type="date" name="to" value="<?php echo fc_e($to); ?>" class="form-control" id="emsf_353_96e8a"></div>
+      <div><label for="emsf_354_2685f">الفئة</label>
+        <select name="type" class="form-control" id="emsf_354_2685f">
           <option value="0">— كل الفئات —</option>
           <?php foreach ($types as $t): ?>
             <option value="<?php echo (int) $t['id']; ?>" <?php echo $type_filter === (int) $t['id'] ? 'selected' : ''; ?>>
@@ -297,7 +297,7 @@ if (function_exists('ems_screen_about')) {
       <input type="hidden" name="fc_action" value="save">
       <input type="hidden" name="res_id" id="fc_res_id" value="0">
       <div class="form-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
-        <div><label>المعدة (حجزٌ بعينها)</label>
+        <div><label for="fc_eq">المعدة (حجزٌ بعينها)</label>
           <select name="equipment_id" id="fc_eq" class="form-control">
             <option value="0">— بلا تحديد (احجز فئةً) —</option>
             <?php foreach ($free as $e): ?>
@@ -308,39 +308,39 @@ if (function_exists('ems_screen_about')) {
           </select>
           <small class="text-muted">القائمةُ تعرض المتاحَ في النافذة أعلاه فقط</small>
         </div>
-        <div><label>أو الفئة</label>
-          <select name="equipment_type_id" class="form-control">
+        <div><label for="emsf_355_71993">أو الفئة</label>
+          <select name="equipment_type_id" class="form-control" id="emsf_355_71993">
             <option value="0">— بلا فئة —</option>
             <?php foreach ($types as $t): ?>
               <option value="<?php echo (int) $t['id']; ?>"><?php echo fc_e($t['type']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>العدد (عند حجز الفئة)</label>
-          <input type="number" name="qty" min="1" value="1" class="form-control"></div>
-        <div><label>من *</label><input type="date" name="start_date" required value="<?php echo fc_e($from); ?>" class="form-control"></div>
-        <div><label>إلى *</label><input type="date" name="end_date" required value="<?php echo fc_e($to); ?>" class="form-control"></div>
-        <div><label>الحالة</label>
-          <select name="state" class="form-control">
+        <div><label for="emsf_356_39caa">العدد (عند حجز الفئة)</label>
+          <input type="number" name="qty" min="1" value="1" class="form-control" id="emsf_356_39caa"></div>
+        <div><label for="emsf_357_05f5f">من *</label><input type="date" name="start_date" required value="<?php echo fc_e($from); ?>" class="form-control" id="emsf_357_05f5f"></div>
+        <div><label for="emsf_358_9f085">إلى *</label><input type="date" name="end_date" required value="<?php echo fc_e($to); ?>" class="form-control" id="emsf_358_9f085"></div>
+        <div><label for="emsf_359_1ef82">الحالة</label>
+          <select name="state" class="form-control" id="emsf_359_1ef82">
             <?php foreach (array('مبدئي', 'مؤكَّد') as $s): ?>
               <option value="<?php echo fc_e($s); ?>"><?php echo fc_e($s); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>العميل</label>
-          <select name="client_id" class="form-control">
+        <div><label for="emsf_360_48ba1">العميل</label>
+          <select name="client_id" class="form-control" id="emsf_360_48ba1">
             <option value="0">— بلا عميل —</option>
             <?php foreach ($clients as $c): ?>
               <option value="<?php echo (int) $c['id']; ?>"><?php echo fc_e($c['client_name']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>الفرصة</label>
-          <select name="opportunity_id" class="form-control">
+        <div><label for="emsf_361_72578">الفرصة</label>
+          <select name="opportunity_id" class="form-control" id="emsf_361_72578">
             <option value="0">— بلا فرصة —</option>
             <?php foreach ($opps as $o): ?>
               <option value="<?php echo (int) $o['id']; ?>"><?php echo fc_e($o['opp_code'] . ' — ' . $o['title']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>الغرض/الموقع</label><input type="text" name="purpose" class="form-control" maxlength="160"></div>
-        <div style="grid-column:1/-1"><label>ملاحظات</label><input type="text" name="note" class="form-control" maxlength="255"></div>
+        <div><label for="emsf_362_6e589">الغرض/الموقع</label><input type="text" name="purpose" class="form-control" maxlength="160" id="emsf_362_6e589"></div>
+        <div style="grid-column:1/-1"><label for="emsf_363_9b12c">ملاحظات</label><input type="text" name="note" class="form-control" maxlength="255" id="emsf_363_9b12c"></div>
       </div>
       <div style="margin-top:12px">
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> احجز</button>

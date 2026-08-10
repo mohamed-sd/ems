@@ -190,8 +190,8 @@ $stage_colors = array(
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> المدى الزمني (تاريخ البلاغ)</div>
         <div class="filter-body">
             <form method="get" action="" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;width:100%">
-                <div class="filter-field"><label>من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>"></div>
-                <div class="filter-field"><label>إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>"></div>
+                <div class="filter-field"><label for="emsf_509_54a4d">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_509_54a4d"></div>
+                <div class="filter-field"><label for="emsf_510_a5f1b">إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_510_a5f1b"></div>
                 <div class="filter-actions">
                     <button type="submit" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
                     <a href="ticket_dashboard.php" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>

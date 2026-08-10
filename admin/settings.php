@@ -372,8 +372,8 @@ $db_name = ems_dbtool_db_name();
                             <input class="form-ctrl" type="number" name="interval_days" min="1" max="365" value="<?php echo intval($sched['interval_days']); ?>" style="width:120px;">
                         </div>
                         <div class="form-group" style="margin:0;">
-                            <label class="form-label">الاحتفاظ بآخر (نُسخ)</label>
-                            <input class="form-ctrl" type="number" name="retention" min="1" max="365" value="<?php echo intval($sched['retention']); ?>" style="width:140px;">
+                            <label class="form-label" for="emsf_702_af672">الاحتفاظ بآخر (نُسخ)</label>
+                            <input class="form-ctrl" type="number" name="retention" min="1" max="365" value="<?php echo intval($sched['retention']); ?>" style="width:140px;" id="emsf_702_af672">
                         </div>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ الجدولة</button>
                     </form>
@@ -424,8 +424,8 @@ $db_name = ems_dbtool_db_name();
                         <input type="hidden" name="action" value="db_import">
                         <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                         <div class="form-group">
-                            <label class="form-label">ملف SQL بصيغة .sql</label>
-                            <input class="form-ctrl" type="file" name="sqlfile" accept=".sql" required>
+                            <label class="form-label" for="emsf_703_ce84c">ملف SQL بصيغة .sql</label>
+                            <input class="form-ctrl" type="file" name="sqlfile" accept=".sql" required id="emsf_703_ce84c">
                         </div>
                         <label class="flex" style="gap:8px;cursor:pointer;margin-bottom:14px;">
                             <input type="checkbox" name="confirm_replace" value="1" required>

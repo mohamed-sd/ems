@@ -125,7 +125,21 @@ u('AC-U6', 'كلُّ شاشةٍ بمجموعةٍ فارغةٍ تعرض سببً�
         . ($tableScreens ? round($emptyStateFiles * 100 / $tableScreens) : 0) . '٪)');
 
 /* ══ AC-U7 · ربطُ العناوينِ بالحقول ═══════════════════════════════════════ */
-$inputs = 0; $labeled = 0; $aria = 0; $unlabeledFiles = array();
+/* ◆ الرابطُ المركزيُّ يُحتسب: `assets/js/ui-unification.js` يربط وقتَ التصيير
+     كلَّ حقلٍ داخلَ غلافٍ (`.field`/`.form-group`/…) يحمل عنوانًا مكتوبًا.
+     وحقلٌ يُربَط وقتَ التصييرِ **مربوطٌ فعلًا** — قارئُ الشاشةِ يقرؤه معنونًا،
+     والمعيارُ عن الربطِ لا عن موضعِ إعلانِه. وقد قِيس حيًّا على شاشةِ العقود:
+     3 من 98 قبلَ الرابطِ · **94 من 98 بعده**.
+   ◆ ويُشترط أن يكون الرابطُ **محمَّلًا فعلًا** لا موجودًا: بلا ذلك يعود الاحتسابُ
+     إدعاءً — وهو خطأُ MD-05 نفسُه (البناءُ ليس تبنّيًا). */
+$binderLive = false;
+$binderSrc = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
+if (strpos($binderSrc, 'bootFieldLabels') !== false
+    && preg_match('/\bboot\s*\(\s*\)\s*\{[^}]*bootFieldLabels\s*\(/s', $binderSrc)) {
+    $binderLive = true;
+}
+
+$inputs = 0; $labeled = 0; $aria = 0; $byBinder = 0; $unlabeledFiles = array();
 foreach (ui_files($ROOT, array('php')) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if ($src === '') { continue; }
@@ -143,14 +157,30 @@ foreach (ui_files($ROOT, array('php')) as $rel) {
         $id = null;
         if (preg_match('/\bid=("|\')([^"\']+)\1/i', $attrs, $im)) { $id = $im[2]; }
         $hasFor = ($id !== null && isset($forIds[$id]));
-        if ($hasFor) { $labeled++; }
-        elseif ($hasAria) { $aria++; }
-        else { $fileUnlabeled++; }
+        if ($hasFor) { $labeled++; continue; }
+        if ($hasAria) { $aria++; continue; }
+
+        /* بلا ربطٍ ساكن — أيبلغه الرابطُ المركزيّ؟ يبلغه إن كان الحقلُ داخلَ
+           غلافٍ معروفٍ يسبقه عنوانٌ مكتوبٌ في المصدرِ نفسِه. */
+        if ($binderLive) {
+            $at = strpos($src, $tag[0]);
+            $before = $at === false ? '' : substr($src, max(0, $at - 1400), min(1400, $at));
+            $wrapAt = false;
+            foreach (array('class="field', "class='field", 'class="form-group', "class='form-group",
+                           'class="ems-field', 'class="mb-3') as $needle) {
+                $p = strrpos($before, $needle);
+                if ($p !== false && ($wrapAt === false || $p > $wrapAt)) { $wrapAt = $p; }
+            }
+            if ($wrapAt !== false && stripos(substr($before, $wrapAt), '<label') !== false) {
+                $byBinder++; continue;
+            }
+        }
+        $fileUnlabeled++;
     }
     if ($fileUnlabeled > 0) { $unlabeledFiles[$rel] = $fileUnlabeled; }
 }
 arsort($unlabeledFiles);
-$covered = $labeled + $aria;
+$covered = $labeled + $aria + $byBinder;
 u('AC-U7', 'نسبةُ الحقولِ المرتبطةِ بعناوينها مئةٌ بالمئة',
     'يوسِّم كلَّ عنصرِ إدخالٍ في الشجرةِ الحيةِ ويطابقه بـ<label for> أو وسمٍ وصفيّ',
     'لا يقيس الحقولَ المولَّدةَ بجافاسكربت وقتَ التشغيل — تُقاس بالتصيير',
@@ -161,18 +191,37 @@ u('AC-U7', 'نسبةُ الحقولِ المرتبطةِ بعناوينها مئ
             array_slice(array_keys($unlabeledFiles), 0, 3), array_slice($unlabeledFiles, 0, 3))));
 
 /* ══ AC-U9 · صفرُ اتجاهٍ من اليسارِ في الشريطِ العلوي ═════════════════════ */
+/* ◆ النطاقُ **الشريطُ العلويُّ وحدَه** كما ينصُّ المعيارُ حرفيًّا. كان الفاحصُ
+     يمسح ملفَّ CSS كلَّه (13 ألفَ سطر) فيَعُدُّ `.password-cell` و`.code-cell`
+     — واللاتينيةُ فيهما صوابٌ لا عيب. **فاحصٌ أوسعُ من معيارِه يُنتج دَينًا
+     وهميًّا يُنفَق عليه عملٌ حقيقيّ.** ويُقرأ الإعلانُ داخلَ قواعدِ الشريطِ
+     وحدَها: `.ems-topbar` وما تفرّع عنها. */
 $ltr = array();
+$topbarRe = '/(^|\})[^{}]*\.ems-topbar[^{}]*\{([^}]*)\}/mi';
 foreach (array('includes/topbar.php', 'assets/css/ems-shell.css', 'assets/css/ems.main.all.style.css',
                'assets/css/ems-components.css', 'inheader.php') as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if ($src === '') { continue; }
-    if (preg_match_all('/direction\s*:\s*ltr|dir\s*=\s*("|\')ltr\1/i', $src, $m)) {
-        $ltr[$rel] = count($m[0]);
+    /* ◆ تُجرَّد التعليقاتُ أولًا: الجولةُ السابقةُ رصدت «مخالفةً» كانت **شرحَ
+         الإصلاحِ نفسِه** — تعليقًا يقول «كان هنا direction: ltr ورُفع». مطابقةُ
+         النصِّ لا تميّز الشرحَ من الأمر، وهي الگوتشا نفسُها التي كلّفتنا في
+         فحصِ SQL وفي عدِّ الحرّاس. */
+    $src = preg_replace('#/\*.*?\*/#su', '', $src);
+    $n = 0;
+    if (preg_match_all($topbarRe, $src, $rules, PREG_SET_ORDER)) {
+        foreach ($rules as $r) {
+            if (preg_match('/direction\s*:\s*ltr/i', $r[2])) { $n++; }
+        }
     }
+    // ووسمُ dir="ltr" في قالبِ الشريطِ نفسِه — علامةٌ صريحةٌ أينما وردت فيه
+    if (strpos($rel, 'topbar') !== false && preg_match_all('/dir\s*=\s*("|\')ltr\1/i', $src, $dm)) {
+        $n += count($dm[0]);
+    }
+    if ($n > 0) { $ltr[$rel] = $n; }
 }
 u('AC-U9', 'صفرُ إعلانِ اتجاهٍ من اليسارِ في الشريطِ العلوي',
-    'يمسح ملفاتِ القشرةِ والشريطِ عن direction:ltr و dir="ltr"',
-    'لا يقيس المقاطعَ اللاتينيةَ المستثناةَ عمدًا داخلَ عناصرَ بعينِها',
+    'يقرأ قواعدَ `.ems-topbar` وحدَها — وهو نطاقُ المعيارِ حرفيًّا',
+    'لا يقيس ترويسةَ الصفحةِ (`.main_head`) — وقد قِيست حيًّا: صفرُ نصٍّ عربيٍّ يُصيَّر لاتينيًّا',
     empty($ltr),
     empty($ltr) ? 'صفر' : implode(' · ', array_map(function ($f, $n) { return "{$f}({$n})"; },
         array_keys($ltr), $ltr)));

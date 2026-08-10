@@ -263,30 +263,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
             <input type="hidden" name="h13" value="import">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label>الحساب البنكي <span class="required">*</span></label>
-                    <select name="bank_account_id" required>
+                <div class="form-group"><label for="emsf_207_78620">الحساب البنكي <span class="required">*</span></label>
+                    <select name="bank_account_id" required id="emsf_207_78620">
                         <?php
                         $accs = $h13_gate->select('fin_bank_accounts', array('orderBy' => 'name ASC'));
                         foreach ($accs as $a) {
                             echo "<option value='" . intval($a['id']) . "'>" . htmlspecialchars((string)$a['name']) . "</option>";
                         } ?>
                     </select></div>
-                <div class="form-group"><label>مرجع الكشف <span class="required">*</span></label>
-                    <input type="text" name="statement_ref" required maxlength="60" placeholder="من البنك"></div>
-                <div class="form-group"><label>من تاريخ <span class="required">*</span></label>
-                    <input type="date" name="period_from" required></div>
-                <div class="form-group"><label>إلى تاريخ <span class="required">*</span></label>
-                    <input type="date" name="period_to" required></div>
-                <div class="form-group"><label>رصيدٌ افتتاحي</label>
-                    <input type="number" step="0.01" name="opening_balance" value="0"></div>
-                <div class="form-group"><label>رصيدٌ ختامي</label>
-                    <input type="number" step="0.01" name="closing_balance" value="0"></div>
+                <div class="form-group"><label for="emsf_208_dbbfd">مرجع الكشف <span class="required">*</span></label>
+                    <input type="text" name="statement_ref" required maxlength="60" placeholder="من البنك" id="emsf_208_dbbfd"></div>
+                <div class="form-group"><label for="emsf_209_613dc">من تاريخ <span class="required">*</span></label>
+                    <input type="date" name="period_from" required id="emsf_209_613dc"></div>
+                <div class="form-group"><label for="emsf_210_780de">إلى تاريخ <span class="required">*</span></label>
+                    <input type="date" name="period_to" required id="emsf_210_780de"></div>
+                <div class="form-group"><label for="emsf_211_616ad">رصيدٌ افتتاحي</label>
+                    <input type="number" step="0.01" name="opening_balance" value="0" id="emsf_211_616ad"></div>
+                <div class="form-group"><label for="emsf_212_024c7">رصيدٌ ختامي</label>
+                    <input type="number" step="0.01" name="closing_balance" value="0" id="emsf_212_024c7"></div>
             </div>
             <div class="form-group" style="margin-top:10px">
-                <label>أسطرُ الكشف — سطرٌ لكل حركة:
+                <label for="emsf_213_646db">أسطرُ الكشف — سطرٌ لكل حركة:
                     <code>التاريخ | الوصف | deposit أو withdrawal | المبلغ | المرجع البنكي</code></label>
                 <textarea name="lines_raw" rows="5" style="width:100%;direction:ltr"
-                    placeholder="2026-07-01 | تحصيل عميل | deposit | 1000.00 | REF-001"></textarea>
+                    placeholder="2026-07-01 | تحصيل عميل | deposit | 1000.00 | REF-001" id="emsf_213_646db"></textarea>
                 <small style="color:#6b7280">سطرٌ <strong>بلا مرجعٍ بنكيٍّ يُرفض ويُعلَن</strong> — ولا يُخترع له مفتاح.</small>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-save">
@@ -402,7 +402,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="h13" value="open_diff">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                                <input type="text" name="why" required maxlength="200" placeholder="سببُ الفرق" style="width:130px">
+                                <input type="text" name="why" required maxlength="200" placeholder="سببُ الفرق" style="width:130px" aria-label="سببُ الفرق">
                                 <button type="submit" class="badge badge-warning" style="border:0;padding:5px 8px">افتح فرقًا</button>
                             </form>
                         <?php elseif ($mid > 0 && $mrs === 'open_difference'): ?>
@@ -411,7 +411,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
                                 <select name="decision"><option value="adjust">قيدُ تسوية</option><option value="reject">رفض</option></select>
-                                <input type="text" name="why" required maxlength="200" placeholder="قرارٌ بسببه" style="width:120px">
+                                <input type="text" name="why" required maxlength="200" placeholder="قرارٌ بسببه" style="width:120px" aria-label="قرارٌ بسببه">
                                 <button type="submit" class="badge badge-success" style="border:0;padding:5px 8px">احسم</button>
                             </form>
                         <?php elseif ($ms !== 'matched'): ?>
@@ -461,10 +461,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="acctForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-building-columns"></i> حساب بنكي</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>اسم الحساب <span class="required">*</span></label><input type="text" name="acct_name" required></div>
-            <div class="form-group"><label>البنك</label><input type="text" name="bank_name"></div>
-            <div class="form-group"><label>رقم الحساب</label><input type="text" name="account_number"></div>
-            <div class="form-group"><label>الرصيد الافتتاحي</label><input type="number" step="0.01" name="opening_balance" value="0"></div>
+            <div class="form-group"><label for="emsf_214_ebac3">اسم الحساب <span class="required">*</span></label><input type="text" name="acct_name" required id="emsf_214_ebac3"></div>
+            <div class="form-group"><label for="emsf_215_190a4">البنك</label><input type="text" name="bank_name" id="emsf_215_190a4"></div>
+            <div class="form-group"><label for="emsf_216_dd679">رقم الحساب</label><input type="text" name="account_number" id="emsf_216_dd679"></div>
+            <div class="form-group"><label for="emsf_217_4b4a7">الرصيد الافتتاحي</label><input type="number" step="0.01" name="opening_balance" value="0" id="emsf_217_4b4a7"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#acctForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -476,10 +476,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="bank_account_id" value="<?php echo $sel_acct; ?>">
         <div class="card-header"><h5><i class="fas fa-file-lines"></i> بند كشف حساب</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>التاريخ</label><input type="date" name="txn_date" value="<?php echo date('Y-m-d'); ?>"></div>
-            <div class="form-group"><label>النوع</label><select name="direction"><option value="deposit">إيداع</option><option value="withdrawal">سحب</option></select></div>
-            <div class="form-group"><label>المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required></div>
-            <div class="form-group" style="grid-column:1/-1"><label>الوصف</label><input type="text" name="description"></div>
+            <div class="form-group"><label for="emsf_218_edc49">التاريخ</label><input type="date" name="txn_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_218_edc49"></div>
+            <div class="form-group"><label for="emsf_219_5b23f">النوع</label><select name="direction" id="emsf_219_5b23f"><option value="deposit">إيداع</option><option value="withdrawal">سحب</option></select></div>
+            <div class="form-group"><label for="emsf_220_77d51">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_220_77d51"></div>
+            <div class="form-group" style="grid-column:1/-1"><label for="emsf_221_2b7d1">الوصف</label><input type="text" name="description" id="emsf_221_2b7d1"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#lineForm').removeClass('allforms-visible')">إلغاء</button></div>

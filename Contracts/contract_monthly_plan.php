@@ -211,9 +211,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <input type="hidden" name="plan_version" value="<?php echo $VER; ?>">
             <div class="form-group" style="max-width:280px;margin-bottom:12px">
-                <label>سريانُ النسخة <span style="color:#c00">*</span></label>
+                <label for="emsf_58_73c4b">سريانُ النسخة <span style="color:#c00">*</span></label>
                 <input type="date" name="effective_from" required
-                       value="<?php echo htmlspecialchars((string)($rows ? $rows[0]['effective_from'] : $line['valid_from'])); ?>">
+                       value="<?php echo htmlspecialchars((string)($rows ? $rows[0]['effective_from'] : $line['valid_from'])); ?>" id="emsf_58_73c4b">
             </div>
             <div class="table-container">
             <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">

@@ -207,9 +207,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="rp_action" value="save">
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <div class="form-group" style="max-width:280px;margin-bottom:12px">
-                <label>سريانُ الخطة</label>
+                <label for="emsf_76_afeca">سريانُ الخطة</label>
                 <input type="date" name="valid_from"
-                       value="<?php echo htmlspecialchars((string)($live ? $live[0]['valid_from'] : $line['valid_from'])); ?>">
+                       value="<?php echo htmlspecialchars((string)($live ? $live[0]['valid_from'] : $line['valid_from'])); ?>" id="emsf_76_afeca">
             </div>
             <div class="table-container">
             <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
@@ -306,7 +306,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="rp_action" value="end_row">
                             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="text" name="end_reason" placeholder="سببُ الإنهاء" required style="width:150px">
+                            <input type="text" name="end_reason" placeholder="سببُ الإنهاء" required style="width:150px" aria-label="سببُ الإنهاء">
                             <button type="submit" class="action-btn"><i class="fa fa-ban"></i> أنهِ</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>

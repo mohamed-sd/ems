@@ -821,8 +821,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="card-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-id-card"></i> السائقون * (يمكن اختيار أكثر من سائق)</label>
-                                <select name="driver_ids[]" multiple required size="8">
+                                <label for="emsf_741_3b518"><i class="fas fa-id-card"></i> السائقون * (يمكن اختيار أكثر من سائق)</label>
+                                <select name="driver_ids[]" multiple required size="8" id="emsf_741_3b518">
                                     <?php foreach ($available_drivers as $drv): ?>
                                         <option value="<?php echo intval($drv['id']); ?>">
                                             <?php echo htmlspecialchars($drv['name'] . ' - ' . $drv['phone'], ENT_QUOTES, 'UTF-8'); ?>
@@ -833,8 +833,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label><i class="fas fa-truck"></i> الآلية *</label>
-                                <select name="equipment_id" required>
+                                <label for="emsf_742_ad26e"><i class="fas fa-truck"></i> الآلية *</label>
+                                <select name="equipment_id" required id="emsf_742_ad26e">
                                     <option value="">-- اختر الآلية --</option>
                                     <?php foreach ($project_equipments as $eq): ?>
                                         <?php $eqLabel = trim((string) $eq['code']) . ' - ' . trim((string) $eq['name']); ?>
@@ -845,18 +845,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label><i class="fas fa-calendar-plus"></i> تاريخ البداية *</label>
-                                <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required>
+                                <label for="emsf_743_02e54"><i class="fas fa-calendar-plus"></i> تاريخ البداية *</label>
+                                <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required id="emsf_743_02e54">
                             </div>
 
                             <div>
-                                <label><i class="fas fa-calendar-times"></i> تاريخ النهاية (اختياري)</label>
-                                <input type="date" name="end_date" value="">
+                                <label for="emsf_744_21c43"><i class="fas fa-calendar-times"></i> تاريخ النهاية (اختياري)</label>
+                                <input type="date" name="end_date" value="" id="emsf_744_21c43">
                             </div>
 
                             <div>
-                                <label><i class="fas fa-sync-alt"></i> نظام الوردية *</label>
-                                <select name="shift_type" required>
+                                <label for="emsf_745_ba2a3"><i class="fas fa-sync-alt"></i> نظام الوردية *</label>
+                                <select name="shift_type" required id="emsf_745_ba2a3">
                                     <option value="D">نهاري فقط</option>
                                     <option value="N">ليلي فقط</option>
                                     <option value="B" selected>نهاري + ليلي</option>
@@ -978,8 +978,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <input type="date" class="form-control" name="effective_date" value="<?php echo date('Y-m-d'); ?>" required>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">وردية السائقين المضافين</label>
-                                    <select name="add_shift_type" class="form-control" required>
+                                    <label class="form-label" for="emsf_746_ab2a1">وردية السائقين المضافين</label>
+                                    <select name="add_shift_type" class="form-control" required id="emsf_746_ab2a1">
                                         <option value="D">نهاري فقط</option>
                                         <option value="N">ليلي فقط</option>
                                         <option value="B" selected>نهاري + ليلي</option>

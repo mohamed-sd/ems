@@ -147,8 +147,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </option>
                 <?php endforeach; ?>
             </select>
-            <label>من</label><input type="date" name="from" value="<?php echo htmlspecialchars($pFrom); ?>">
-            <label>إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($pTo); ?>">
+            <label for="emsf_501_419f9">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($pFrom); ?>" id="emsf_501_419f9">
+            <label for="emsf_502_5b9fd">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($pTo); ?>" id="emsf_502_5b9fd">
             <button type="submit" class="btn-save"><i class="fa fa-filter"></i> اضبط الفترة</button>
         </form>
         <p style="color:#666;margin-top:10px">
@@ -172,17 +172,17 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="ev_action" value="weight">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>المؤشر <span style="color:#c00">*</span></label>
-                    <select name="indicator" required>
+                <div class="form-group"><label for="emsf_503_295f9">المؤشر <span style="color:#c00">*</span></label>
+                    <select name="indicator" required id="emsf_503_295f9">
                         <?php foreach (SES::INDICATOR_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>الوزن ٪ <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.01" min="0.01" max="100" name="weight" required></div>
-                <div class="form-group"><label>المقياس <small>— للحوادث: العددُ الذي تبلغ عنده النتيجةُ صفرًا</small></label>
-                    <input type="number" step="0.01" min="0" name="scale_max"></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="wnote" maxlength="255"></div>
+                <div class="form-group"><label for="emsf_504_462de">الوزن ٪ <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.01" min="0.01" max="100" name="weight" required id="emsf_504_462de"></div>
+                <div class="form-group"><label for="emsf_505_1f9c5">المقياس <small>— للحوادث: العددُ الذي تبلغ عنده النتيجةُ صفرًا</small></label>
+                    <input type="number" step="0.01" min="0" name="scale_max" id="emsf_505_1f9c5"></div>
+                <div class="form-group"><label for="emsf_506_2aa6a">ملاحظة</label><input type="text" name="wnote" maxlength="255" id="emsf_506_2aa6a"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ الوزن</button></div>
         </form>
@@ -308,14 +308,14 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="evaluation_id" value="<?php echo intval($openEval['id']); ?>">
             <div class="form-grid">
-                <div class="form-group"><label>قرار التجديد <span style="color:#c00">*</span></label>
-                    <select name="renewal_flag" required>
+                <div class="form-group"><label for="emsf_507_b93ae">قرار التجديد <span style="color:#c00">*</span></label>
+                    <select name="renewal_flag" required id="emsf_507_b93ae">
                         <?php foreach (SES::RENEWAL_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>السبب <small>— إلزاميٌّ عند منع التجديد</small></label>
-                    <input type="text" name="decision_note" maxlength="255"></div>
+                <div class="form-group"><label for="emsf_508_d31f7">السبب <small>— إلزاميٌّ عند منع التجديد</small></label>
+                    <input type="text" name="decision_note" maxlength="255" id="emsf_508_d31f7"></div>
             </div>
             <p style="color:#a15c00">الرقمُ يخبر و<strong>الإنسانُ يقرّر</strong> — والقرارُ يصير
                 <strong>شرطًا في التجديد</strong> بعد اعتماده، ولا يُعاد.</p>

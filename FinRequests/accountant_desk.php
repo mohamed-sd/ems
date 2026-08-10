@@ -97,8 +97,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                     <div class="form-grid">
                         <div>
-                            <label>الحساب من الدليل * (قاعدة الحساب §5)</label>
-                            <select name="account_id" required>
+                            <label for="emsf_165_22162">الحساب من الدليل * (قاعدة الحساب §5)</label>
+                            <select name="account_id" required id="emsf_165_22162">
                                 <option value="">— اختر الحساب —</option>
                                 <?php foreach ($accounts as $a): ?>
                                     <option value="<?php echo intval($a['id']); ?>"><?php echo htmlspecialchars($a['code'] . ' — ' . $a['name']); ?></option>
@@ -106,8 +106,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </select>
                         </div>
                         <div>
-                            <label>بند الموازنة (بوابة ② — التجاوز يستلزم استثناء §8.3)</label>
-                            <select name="budget_line_id">
+                            <label for="emsf_166_f0eb7">بند الموازنة (بوابة ② — التجاوز يستلزم استثناء §8.3)</label>
+                            <select name="budget_line_id" id="emsf_166_f0eb7">
                                 <option value="">— خارج الموازنة (يُدوَّن بقرارك) —</option>
                                 <?php
                                 $suggest = finreq_budget_category_for($r['request_type'], $r['source_module']);
@@ -121,9 +121,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div><label>مركز التكلفة</label><input type="text" name="cost_center" maxlength="60" value="<?php echo htmlspecialchars($r['cost_center'] ?? ''); ?>"></div>
-                        <div><label>المشروع</label><input type="number" name="project_id" min="1" value="<?php echo htmlspecialchars($r['project_id'] ?? ''); ?>"></div>
-                        <div><label>المعدة</label><input type="number" name="equipment_id" min="1" value="<?php echo htmlspecialchars($r['equipment_id'] ?? ''); ?>"></div>
+                        <div><label for="emsf_167_981ed">مركز التكلفة</label><input type="text" name="cost_center" maxlength="60" value="<?php echo htmlspecialchars($r['cost_center'] ?? ''); ?>" id="emsf_167_981ed"></div>
+                        <div><label for="emsf_168_6e530">المشروع</label><input type="number" name="project_id" min="1" value="<?php echo htmlspecialchars($r['project_id'] ?? ''); ?>" id="emsf_168_6e530"></div>
+                        <div><label for="emsf_169_8be43">المعدة</label><input type="number" name="equipment_id" min="1" value="<?php echo htmlspecialchars($r['equipment_id'] ?? ''); ?>" id="emsf_169_8be43"></div>
                         <div style="align-self:end;">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-baby-carriage"></i> ولادة الحدث المالي (D04)</button>
                         </div>
@@ -134,7 +134,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="action" value="return_request">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
-                        <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required style="min-width:240px;">
+                        <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required style="min-width:240px;" aria-label="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)">
                         <button type="submit" class="btn btn-outline-warning"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
                     </form>
                     <?php if (intval($r['duplicate_flag']) === 1): ?>
@@ -142,8 +142,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="action" value="merge">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
-                        <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required style="min-width:160px;">
-                        <input type="text" name="reason" placeholder="سبب الدمج" required style="min-width:150px;">
+                        <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required style="min-width:160px;" aria-label="رقم الطلب الأصل FR-…">
+                        <input type="text" name="reason" placeholder="سبب الدمج" required style="min-width:150px;" aria-label="سبب الدمج">
                         <button type="submit" class="btn btn-outline-secondary"><i class="fa fa-code-merge"></i> دمج المكرّر</button>
                     </form>
                     <?php endif; ?>

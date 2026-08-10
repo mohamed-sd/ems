@@ -129,10 +129,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="codeForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-percent"></i> رمز ضريبة</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>الكود <span class="required">*</span></label><input type="text" name="tax_code" required placeholder="VAT15"></div>
-            <div class="form-group"><label>الاسم <span class="required">*</span></label><input type="text" name="tax_name" required></div>
-            <div class="form-group"><label>النسبة %</label><input type="number" step="0.01" name="rate" value="15"></div>
-            <div class="form-group"><label>النوع</label><select name="tax_type"><?php foreach ($tax_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_264_b25b3">الكود <span class="required">*</span></label><input type="text" name="tax_code" required placeholder="VAT15" id="emsf_264_b25b3"></div>
+            <div class="form-group"><label for="emsf_265_eb5f1">الاسم <span class="required">*</span></label><input type="text" name="tax_name" required id="emsf_265_eb5f1"></div>
+            <div class="form-group"><label for="emsf_266_7c1b2">النسبة %</label><input type="number" step="0.01" name="rate" value="15" id="emsf_266_7c1b2"></div>
+            <div class="form-group"><label for="emsf_267_8c5cd">النوع</label><select name="tax_type" id="emsf_267_8c5cd"><?php foreach ($tax_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#codeForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -143,18 +143,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="txForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-receipt"></i> حركة ضريبية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>النوع</label><select name="direction"><option value="output">مخرجات (مبيعات)</option><option value="input">مدخلات (مشتريات)</option></select></div>
-            <div class="form-group"><label>رمز الضريبة</label>
+            <div class="form-group"><label for="emsf_268_d88f3">النوع</label><select name="direction" id="emsf_268_d88f3"><option value="output">مخرجات (مبيعات)</option><option value="input">مدخلات (مشتريات)</option></select></div>
+            <div class="form-group"><label for="tx_code">رمز الضريبة</label>
                 <select name="tax_code_id" id="tx_code"><option value="">— بلا —</option>
                 <?php $code_opts = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('t' => 'fin_tax_codes')),
                     "SELECT t.id, CONCAT(t.code,' (',t.rate,'%)') AS label, t.rate FROM fin_tax_codes t
                      WHERE {TENANT_SCOPE} AND COALESCE(t.is_deleted,0)=0 AND t.active=1 ORDER BY t.code");
                 foreach ($code_opts as $x) { echo "<option value='" . intval($x['id']) . "' data-rate='" . htmlspecialchars($x['rate']) . "'>" . htmlspecialchars($x['label']) . "</option>"; } ?>
                 </select></div>
-            <div class="form-group"><label>الوعاء الضريبي <span class="required">*</span></label><input type="number" step="0.01" min="0" name="base_amount" required></div>
-            <div class="form-group"><label>النسبة %</label><input type="number" step="0.01" name="tax_rate" id="tx_rate" value="15"></div>
-            <div class="form-group"><label>المرجع</label><input type="text" name="source_ref" placeholder="فاتورة/أمر"></div>
-            <div class="form-group"><label>الفترة</label><input type="month" name="period_ref" value="<?php echo date('Y-m'); ?>"></div>
+            <div class="form-group"><label for="emsf_269_687c2">الوعاء الضريبي <span class="required">*</span></label><input type="number" step="0.01" min="0" name="base_amount" required id="emsf_269_687c2"></div>
+            <div class="form-group"><label for="tx_rate">النسبة %</label><input type="number" step="0.01" name="tax_rate" id="tx_rate" value="15"></div>
+            <div class="form-group"><label for="emsf_270_84ddc">المرجع</label><input type="text" name="source_ref" placeholder="فاتورة/أمر" id="emsf_270_84ddc"></div>
+            <div class="form-group"><label for="emsf_271_8602e">الفترة</label><input type="month" name="period_ref" value="<?php echo date('Y-m'); ?>" id="emsf_271_8602e"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#txForm').removeClass('allforms-visible')">إلغاء</button></div>

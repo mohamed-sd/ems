@@ -146,8 +146,8 @@ include __DIR__ . '/../includes/page_header.php';
         <div class="card-body">
             <form method="GET" class="form-grid">
                 <div>
-                    <label><i class="fas fa-diagram-project"></i> المشروع</label>
-                    <select name="project">
+                    <label for="emsf_458_82abe"><i class="fas fa-diagram-project"></i> المشروع</label>
+                    <select name="project" id="emsf_458_82abe">
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = array();
@@ -163,8 +163,8 @@ include __DIR__ . '/../includes/page_header.php';
                 </div>
 
                 <div>
-                    <label><i class="fas fa-user-gear"></i> السائق</label>
-                    <select name="driver">
+                    <label for="emsf_459_17b1a"><i class="fas fa-user-gear"></i> السائق</label>
+                    <select name="driver" id="emsf_459_17b1a">
                         <option value="">-- الكل --</option>
                         <?php
                         $drv = array();
@@ -180,13 +180,13 @@ include __DIR__ . '/../includes/page_header.php';
                 </div>
 
                 <div>
-                    <label><i class="fas fa-calendar-day"></i> من</label>
-                    <input type="date" name="start_date" value="<?php echo $start_date; ?>">
+                    <label for="emsf_460_b5a51"><i class="fas fa-calendar-day"></i> من</label>
+                    <input type="date" name="start_date" value="<?php echo $start_date; ?>" id="emsf_460_b5a51">
                 </div>
 
                 <div>
-                    <label><i class="fas fa-calendar-check"></i> إلى</label>
-                    <input type="date" name="end_date" value="<?php echo $end_date; ?>">
+                    <label for="emsf_461_a0061"><i class="fas fa-calendar-check"></i> إلى</label>
+                    <input type="date" name="end_date" value="<?php echo $end_date; ?>" id="emsf_461_a0061">
                 </div>
 
                 <button type="submit"><i class="fa fa-search"></i> بحث</button>

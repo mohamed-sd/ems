@@ -172,8 +172,8 @@ $event_types_rows = $ff_gate->scopedQuery(
             <form method="GET" action="" id="filterForm">
             <div class="row fc-filter-bar">
                     <div class="col-md-3 mb-3">
-                        <label class="form-label fc-filter-label">نوع المعدة</label>
-                        <select name="equipment_type" class="form-select">
+                        <label class="form-label fc-filter-label" for="emsf_129_c5f87">نوع المعدة</label>
+                        <select name="equipment_type" class="form-select" id="emsf_129_c5f87">
                             <option value="">-- الكل --</option>
                             <option value="1" <?php echo ($filter_equipment_type == 1) ? 'selected' : ''; ?>>حفار</option>
                             <option value="2" <?php echo ($filter_equipment_type == 2) ? 'selected' : ''; ?>>قلاب</option>
@@ -182,8 +182,8 @@ $event_types_rows = $ff_gate->scopedQuery(
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label fc-filter-label">المشروع</label>
-                        <select name="project_id" class="form-select">
+                        <label class="form-label fc-filter-label" for="emsf_130_87149">المشروع</label>
+                        <select name="project_id" class="form-select" id="emsf_130_87149">
                             <option value="">-- الكل --</option>
                             <?php
                             foreach ($projects_rows as $proj):
@@ -199,8 +199,8 @@ $event_types_rows = $ff_gate->scopedQuery(
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label fc-filter-label">نوع الحدث</label>
-                        <select name="event_type" class="form-select">
+                        <label class="form-label fc-filter-label" for="emsf_131_41a0b">نوع الحدث</label>
+                        <select name="event_type" class="form-select" id="emsf_131_41a0b">
                             <option value="">-- الكل --</option>
                             <?php
                             foreach ($event_types_rows as $et):
@@ -216,8 +216,8 @@ $event_types_rows = $ff_gate->scopedQuery(
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label fc-filter-label">الفئة الرئيسية</label>
-                        <select name="main_category" class="form-select">
+                        <label class="form-label fc-filter-label" for="emsf_132_fff92">الفئة الرئيسية</label>
+                        <select name="main_category" class="form-select" id="emsf_132_fff92">
                             <option value="">-- الكل --</option>
                             <?php
                             foreach ($main_categories_rows as $mc):
@@ -233,15 +233,15 @@ $event_types_rows = $ff_gate->scopedQuery(
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label fc-filter-label">التاريخ من</label>
+                        <label class="form-label fc-filter-label" for="emsf_133_a9f70">التاريخ من</label>
                         <input type="date" name="date_from" class="form-control"
-                            value="<?php echo htmlspecialchars($filter_date_from); ?>">
+                            value="<?php echo htmlspecialchars($filter_date_from); ?>" id="emsf_133_a9f70">
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label fc-filter-label">التاريخ إلى</label>
+                        <label class="form-label fc-filter-label" for="emsf_134_22878">التاريخ إلى</label>
                         <input type="date" name="date_to" class="form-control"
-                            value="<?php echo htmlspecialchars($filter_date_to); ?>">
+                            value="<?php echo htmlspecialchars($filter_date_to); ?>" id="emsf_134_22878">
                     </div>
 
                     <div class="col-md-3 mb-3 d-flex align-items-end">
@@ -308,7 +308,7 @@ $event_types_rows = $ff_gate->scopedQuery(
             <div class="search-toolbar">
                 <div class="search-input-wrap">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="quickTableSearch" class="form-control" placeholder="بحث سريع داخل النتائج المعروضة...">
+                    <input type="text" id="quickTableSearch" class="form-control" placeholder="بحث سريع داخل النتائج المعروضة..." aria-label="بحث سريع داخل النتائج المعروضة...">
                 </div>
             </div>
             <div class="table-responsive">

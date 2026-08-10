@@ -432,7 +432,7 @@ body.ems-site .main.gs-page .gs-btn {
           <i class="fas fa-magnifying-glass"></i>
           <input type="text" name="q" class="gs-input"
                  placeholder="اكتب اسمًا أو كودًا… معدةٌ · موظفٌ · عقدٌ · بلاغٌ · وحدة"
-                 value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" autofocus>
+                 value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" autofocus aria-label="اكتب اسمًا أو كودًا… معدةٌ · موظفٌ · عقدٌ · بلاغٌ · وحدة">
         </div>
         <button type="submit" class="search-btn gs-btn"><i class="fas fa-magnifying-glass"></i> ابحث</button>
       </div>

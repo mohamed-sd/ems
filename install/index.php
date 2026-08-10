@@ -244,18 +244,18 @@ $passed = !empty($checks) && Installer::passed($checks);
 <div class="card">
   <h2>رمزُ التثبيت</h2>
   <div class="row">
-    <label>محتوى <code>install/install.token</code></label>
-    <input type="password" name="install_token" value="<?php echo h($in['install_token']); ?>" required>
+    <label for="emsf_724_15ce6">محتوى <code>install/install.token</code></label>
+    <input type="password" name="install_token" value="<?php echo h($in['install_token']); ?>" required id="emsf_724_15ce6">
   </div>
 </div>
 
 <div class="card">
   <h2>قاعدة البيانات</h2>
   <div class="grid">
-    <div class="row"><label>المضيف</label><input type="text" name="db_host" value="<?php echo h($in['db_host']); ?>" required></div>
-    <div class="row"><label>اسم القاعدة</label><input type="text" name="db_name" value="<?php echo h($in['db_name']); ?>" required></div>
-    <div class="row"><label>المستخدم</label><input type="text" name="db_user" value="<?php echo h($in['db_user']); ?>" required></div>
-    <div class="row"><label>كلمة المرور</label><input type="password" name="db_pass" value="<?php echo h($in['db_pass']); ?>"></div>
+    <div class="row"><label for="emsf_725_5e32f">المضيف</label><input type="text" name="db_host" value="<?php echo h($in['db_host']); ?>" required id="emsf_725_5e32f"></div>
+    <div class="row"><label for="emsf_726_2751d">اسم القاعدة</label><input type="text" name="db_name" value="<?php echo h($in['db_name']); ?>" required id="emsf_726_2751d"></div>
+    <div class="row"><label for="emsf_727_72e47">المستخدم</label><input type="text" name="db_user" value="<?php echo h($in['db_user']); ?>" required id="emsf_727_72e47"></div>
+    <div class="row"><label for="emsf_728_73c78">كلمة المرور</label><input type="password" name="db_pass" value="<?php echo h($in['db_pass']); ?>" id="emsf_728_73c78"></div>
   </div>
   <label class="chk"><input type="checkbox" name="db_create" value="1" <?php echo $in['db_create'] !== '' ? 'checked' : ''; ?>>
     أنشئ القاعدة إن لم تكن موجودة</label>
@@ -265,9 +265,9 @@ $passed = !empty($checks) && Installer::passed($checks);
   <h2>الشركة</h2>
   <div class="grid">
     <div class="row"><label>الاسم</label><input type="text" name="company_name" value="<?php echo h($in['company_name']); ?>" required></div>
-    <div class="row"><label>البريد</label><input type="email" name="company_email" value="<?php echo h($in['company_email']); ?>" required></div>
-    <div class="row"><label>العملة</label><input type="text" name="company_currency" value="<?php echo h($in['company_currency']); ?>"></div>
-    <div class="row"><label>المنطقة الزمنية</label><input type="text" name="company_timezone" value="<?php echo h($in['company_timezone']); ?>"></div>
+    <div class="row"><label for="emsf_729_0857a">البريد</label><input type="email" name="company_email" value="<?php echo h($in['company_email']); ?>" required id="emsf_729_0857a"></div>
+    <div class="row"><label for="emsf_730_a3355">العملة</label><input type="text" name="company_currency" value="<?php echo h($in['company_currency']); ?>" id="emsf_730_a3355"></div>
+    <div class="row"><label for="emsf_731_f7978">المنطقة الزمنية</label><input type="text" name="company_timezone" value="<?php echo h($in['company_timezone']); ?>" id="emsf_731_f7978"></div>
   </div>
 </div>
 
@@ -275,11 +275,11 @@ $passed = !empty($checks) && Installer::passed($checks);
   <h2>حسابُ الدخول الأوّل</h2>
   <p class="hint">يُنشأ موظّفٌ مربوطٌ بالحساب — النظامُ يرفض أيَّ حسابٍ بلا موظّفٍ مُسنَد.</p>
   <div class="grid">
-    <div class="row"><label>الاسم الكامل</label><input type="text" name="admin_name" value="<?php echo h($in['admin_name']); ?>" required></div>
-    <div class="row"><label>اسم الدخول</label><input type="text" name="admin_username" value="<?php echo h($in['admin_username']); ?>" required></div>
-    <div class="row"><label>البريد</label><input type="email" name="admin_email" value="<?php echo h($in['admin_email']); ?>"></div>
-    <div class="row"><label>الهاتف</label><input type="text" name="admin_phone" value="<?php echo h($in['admin_phone']); ?>"></div>
-    <div class="row"><label>كلمة المرور (٨ محارف فأكثر)</label><input type="password" name="admin_password" value="<?php echo h($in['admin_password']); ?>" required></div>
+    <div class="row"><label for="emsf_732_bc9b8">الاسم الكامل</label><input type="text" name="admin_name" value="<?php echo h($in['admin_name']); ?>" required id="emsf_732_bc9b8"></div>
+    <div class="row"><label for="emsf_733_27206">اسم الدخول</label><input type="text" name="admin_username" value="<?php echo h($in['admin_username']); ?>" required id="emsf_733_27206"></div>
+    <div class="row"><label for="emsf_734_57491">البريد</label><input type="email" name="admin_email" value="<?php echo h($in['admin_email']); ?>" id="emsf_734_57491"></div>
+    <div class="row"><label for="emsf_735_e9c3e">الهاتف</label><input type="text" name="admin_phone" value="<?php echo h($in['admin_phone']); ?>" id="emsf_735_e9c3e"></div>
+    <div class="row"><label for="emsf_736_f787a">كلمة المرور (٨ محارف فأكثر)</label><input type="password" name="admin_password" value="<?php echo h($in['admin_password']); ?>" required id="emsf_736_f787a"></div>
   </div>
 </div>
 

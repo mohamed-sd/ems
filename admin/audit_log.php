@@ -90,7 +90,7 @@ require_once __DIR__ . '/includes/layout_head.php';
         <div class="input-icon-wrap" style="flex:1;min-width:180px;">
             <i class="fas fa-search"></i>
             <input class="form-ctrl form-ctrl-sm" style="width:100%;padding-right:32px;" name="q"
-                   value="<?php echo e($f_q); ?>" placeholder="بحث في الوصف أو الاسم...">
+                   value="<?php echo e($f_q); ?>" placeholder="بحث في الوصف أو الاسم..." aria-label="بحث في الوصف أو الاسم...">
         </div>
         <select name="action_type" class="form-ctrl-sm">
             <option value="">كل الأنواع</option>
@@ -100,8 +100,8 @@ require_once __DIR__ . '/includes/layout_head.php';
             </option>
             <?php endforeach; ?>
         </select>
-        <input type="date" name="date_from" class="form-ctrl-sm" value="<?php echo e($f_date_from); ?>" title="من تاريخ">
-        <input type="date" name="date_to"   class="form-ctrl-sm" value="<?php echo e($f_date_to); ?>"   title="إلى تاريخ">
+        <input type="date" name="date_from" class="form-ctrl-sm" value="<?php echo e($f_date_from); ?>" title="من تاريخ" aria-label="من تاريخ">
+        <input type="date" name="date_to"   class="form-ctrl-sm" value="<?php echo e($f_date_to); ?>"   title="إلى تاريخ" aria-label="إلى تاريخ">
         <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> تصفية</button>
         <?php if ($f_q || $f_action || $f_date_from || $f_date_to): ?>
         <a href="<?php echo e(super_admin_url('audit-log')); ?>" class="btn btn-ghost btn-sm">

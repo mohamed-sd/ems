@@ -203,7 +203,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <div class="card"><div class="card-header"><h5><i class="fa fa-arrow-trend-up"></i> شرطُ تعديل السعر</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label>المحفِّز <span style="color:#c00">*</span></label>
+                <label for="f_trigger">المحفِّز <span style="color:#c00">*</span></label>
                 <select name="trigger_kind" id="f_trigger" required>
                     <?php foreach ($TRIGGER_LABELS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -211,12 +211,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 </select>
             </div>
             <div class="form-group">
-                <label>رمز المؤشر <span style="color:#c00">*</span>
+                <label for="f_index">رمز المؤشر <span style="color:#c00">*</span>
                     <small>— للصرف: رمزُ العملة (المصدر fin_fx_rates)</small></label>
                 <input type="text" name="index_code" id="f_index" required maxlength="32" placeholder="DIESEL_SD · CPI_SD · SDG">
             </div>
             <div class="form-group">
-                <label>بند التسعير</label>
+                <label for="f_item">بند التسعير</label>
                 <select name="contract_item_id" id="f_item">
                     <option value="">— كلُّ بنود العقد —</option>
                     <?php foreach ($items as $it): ?>
@@ -227,27 +227,27 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>القيمة المرجعية <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="f_base">القيمة المرجعية <span style="color:#c00">*</span></label>
                 <input type="number" step="0.00000001" min="0.00000001" name="base_index" id="f_base" required></div>
-            <div class="form-group"><label>تاريخ المرجع</label><input type="date" name="base_date" id="f_basedate"></div>
-            <div class="form-group"><label>عتبة التفعيل ٪ <small>— دونها لا تعديل</small></label>
+            <div class="form-group"><label for="f_basedate">تاريخ المرجع</label><input type="date" name="base_date" id="f_basedate"></div>
+            <div class="form-group"><label for="f_threshold">عتبة التفعيل ٪ <small>— دونها لا تعديل</small></label>
                 <input type="number" step="0.001" min="0" name="threshold_percent" id="f_threshold" value="0"></div>
-            <div class="form-group"><label>نسبة التمرير ٪ <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="f_pass">نسبة التمرير ٪ <span style="color:#c00">*</span></label>
                 <input type="number" step="0.001" min="0.001" max="100" name="pass_through_percent" id="f_pass" value="100" required></div>
-            <div class="form-group"><label>سقف المراجعة ٪ <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
+            <div class="form-group"><label for="f_cap">سقف المراجعة ٪ <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
                 <input type="number" step="0.001" min="0.001" name="cap_percent" id="f_cap"></div>
             <div class="form-group">
-                <label>دورية المراجعة</label>
+                <label for="f_period">دورية المراجعة</label>
                 <select name="periodicity" id="f_period">
                     <?php foreach ($PERIOD_LABELS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>" <?php echo $k === 'quarterly' ? 'selected' : ''; ?>><?php echo $lbl; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label>سريان من <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="f_from">سريان من <span style="color:#c00">*</span></label>
                 <input type="date" name="valid_from" id="f_from" required></div>
-            <div class="form-group"><label>سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
-            <div class="form-group"><label>ملاحظة</label><input type="text" name="note" id="f_note" maxlength="255"></div>
+            <div class="form-group"><label for="f_to">سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
+            <div class="form-group"><label for="f_note">ملاحظة</label><input type="text" name="note" id="f_note" maxlength="255"></div>
         </div>
         <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> حفظ الشرط</button></div>
         </div></div>
@@ -325,17 +325,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="pt_action" value="add_reading">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label>رمز المؤشر <span style="color:#c00">*</span></label>
-                    <input type="text" name="index_code" required maxlength="32"></div>
-                <div class="form-group"><label>تاريخ القراءة <span style="color:#c00">*</span></label>
-                    <input type="date" name="reading_date" required></div>
-                <div class="form-group"><label>القيمة <span style="color:#c00">*</span></label>
-                    <input type="number" step="0.00000001" min="0.00000001" name="value" required></div>
-                <div class="form-group"><label>مرجع المستند <span style="color:#c00">*</span>
+                <div class="form-group"><label for="emsf_83_98116">رمز المؤشر <span style="color:#c00">*</span></label>
+                    <input type="text" name="index_code" required maxlength="32" id="emsf_83_98116"></div>
+                <div class="form-group"><label for="emsf_84_f121b">تاريخ القراءة <span style="color:#c00">*</span></label>
+                    <input type="date" name="reading_date" required id="emsf_84_f121b"></div>
+                <div class="form-group"><label for="emsf_85_5dad8">القيمة <span style="color:#c00">*</span></label>
+                    <input type="number" step="0.00000001" min="0.00000001" name="value" required id="emsf_85_5dad8"></div>
+                <div class="form-group"><label for="emsf_86_62a3f">مرجع المستند <span style="color:#c00">*</span>
                         <small>— رقمٌ بلا مرجعٍ يحرّك مالًا مرفوض</small></label>
                     <input type="text" name="source_ref" required maxlength="160"
-                           placeholder="نشرةُ الأسعار الرسمية 2026/07 — ص3"></div>
-                <div class="form-group"><label>ملاحظة</label><input type="text" name="reading_note" maxlength="255"></div>
+                           placeholder="نشرةُ الأسعار الرسمية 2026/07 — ص3" id="emsf_86_62a3f"></div>
+                <div class="form-group"><label for="emsf_87_8b313">ملاحظة</label><input type="text" name="reading_note" maxlength="255" id="emsf_87_8b313"></div>
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-save"><i class="fa fa-save"></i> تسجيل القراءة</button></div>
         </form>
@@ -363,8 +363,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <form method="post" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
             <input type="hidden" name="pt_action" value="run_review">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
-            <div><label>تاريخ المراجعة</label>
-                <input type="date" name="as_of" value="<?php echo date('Y-m-d'); ?>" required></div>
+            <div><label for="emsf_88_50f0f">تاريخ المراجعة</label>
+                <input type="date" name="as_of" value="<?php echo date('Y-m-d'); ?>" required id="emsf_88_50f0f"></div>
             <button type="submit" class="btn-save"><i class="fa fa-play"></i> شغّل المراجعة</button>
             <span style="color:#666">تُولّد مراجعةً وملحقًا بسريانه — والاعتمادُ بيدٍ أخرى.</span>
         </form>

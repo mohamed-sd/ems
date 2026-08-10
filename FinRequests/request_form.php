@@ -158,8 +158,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="action" value="split_request">
                         <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                         <input type="hidden" name="back" value="request_form.php">
-                        <div><label>وصف الفرع *</label><input type="text" name="child_label" placeholder="دفعة مقدّمة 30%" required style="min-width:200px;"></div>
-                        <div><label>مبلغ الفرع *</label><input type="number" step="0.01" min="0.01" name="child_amount" required style="min-width:140px;"></div>
+                        <div><label for="emsf_171_b0863">وصف الفرع *</label><input type="text" name="child_label" placeholder="دفعة مقدّمة 30%" required style="min-width:200px;" id="emsf_171_b0863"></div>
+                        <div><label for="emsf_172_3f743">مبلغ الفرع *</label><input type="number" step="0.01" min="0.01" name="child_amount" required style="min-width:140px;" id="emsf_172_3f743"></div>
                         <button type="submit" class="btn btn-primary"><i class="fa fa-code-branch"></i> تفريع دفعة</button>
                     </form>
                     <p style="margin-top:8px;color:#6b4e2a;font-size:.9em;">💡 الفرع يرث مستندات أصله وبواباته الإدارية، ويولد لدى محاسب الإدارة — ولا يُغلق الأصل وفروعه معلّقة.</p>
@@ -188,8 +188,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-header"><h5><i class="fa fa-scale-balanced"></i> بوابة التبرير — قبل الإنشاء (3.0)</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div>
-                    <label>الإدارة صاحبة الاحتياج *</label>
-                    <select name="source_module" required <?php echo $req ? 'disabled' : ''; ?>>
+                    <label for="emsf_173_c599f">الإدارة صاحبة الاحتياج *</label>
+                    <select name="source_module" required <?php echo $req ? 'disabled' : ''; ?> id="emsf_173_c599f">
                         <?php foreach ($my_departments as $d): ?>
                             <option value="<?php echo htmlspecialchars($d['source_module']); ?>" <?php echo ($req && $req['source_module'] === $d['source_module']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($d['module_label']); ?>
@@ -199,8 +199,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if ($req): ?><input type="hidden" name="source_module" value="<?php echo htmlspecialchars($req['source_module']); ?>"><?php endif; ?>
                 </div>
                 <div>
-                    <label>نوع الطلب *</label>
-                    <select name="request_type" required <?php echo $req ? 'disabled' : ''; ?>>
+                    <label for="emsf_174_4439f">نوع الطلب *</label>
+                    <select name="request_type" required <?php echo $req ? 'disabled' : ''; ?> id="emsf_174_4439f">
                         <?php foreach ($catalog as $tkey => $t): if (!$t['active']) continue; ?>
                             <option value="<?php echo $tkey; ?>" <?php echo ($req && $req['request_type'] === $tkey) ? 'selected' : ''; ?>><?php echo htmlspecialchars($t['label']); ?></option>
                         <?php endforeach; ?>
@@ -208,29 +208,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if ($req): ?><input type="hidden" name="request_type" value="<?php echo htmlspecialchars($req['request_type']); ?>"><?php endif; ?>
                 </div>
                 <div>
-                    <label>لماذا نحتاج هذا الآن؟ (المبرّر) *</label>
-                    <input type="text" name="justification" maxlength="255" required value="<?php echo htmlspecialchars($req['justification'] ?? ''); ?>" placeholder="لا طلب بلا لماذا">
+                    <label for="emsf_175_3421b">لماذا نحتاج هذا الآن؟ (المبرّر) *</label>
+                    <input type="text" name="justification" maxlength="255" required value="<?php echo htmlspecialchars($req['justification'] ?? ''); ?>" placeholder="لا طلب بلا لماذا" id="emsf_175_3421b">
                 </div>
                 <div>
-                    <label>تصنيف الحاجة *</label>
-                    <select name="need_class">
+                    <label for="emsf_176_1cbe3">تصنيف الحاجة *</label>
+                    <select name="need_class" id="emsf_176_1cbe3">
                         <?php foreach (array('planned' => 'مخطط', 'unplanned' => 'غير مخطط', 'urgent' => 'عاجل', 'emergency' => 'طارئ') as $k => $v): ?>
                             <option value="<?php echo $k; ?>" <?php echo ($req && $req['need_class'] === $k) ? 'selected' : ''; ?>><?php echo $v; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div>
-                    <label>المرجع المصدري (أمر شراء/بلاغ/عقد)</label>
-                    <input type="text" name="source_ref" maxlength="60" value="<?php echo htmlspecialchars($req['source_ref'] ?? ''); ?>">
+                    <label for="emsf_177_2393b">المرجع المصدري (أمر شراء/بلاغ/عقد)</label>
+                    <input type="text" name="source_ref" maxlength="60" value="<?php echo htmlspecialchars($req['source_ref'] ?? ''); ?>" id="emsf_177_2393b">
                 </div>
                 <div>
-                    <label>البديل المدروس إن وُجد (ملاحظات)</label>
-                    <input type="text" name="notes" maxlength="255" value="<?php echo htmlspecialchars($req['notes'] ?? ''); ?>">
+                    <label for="emsf_178_6febc">البديل المدروس إن وُجد (ملاحظات)</label>
+                    <input type="text" name="notes" maxlength="255" value="<?php echo htmlspecialchars($req['notes'] ?? ''); ?>" id="emsf_178_6febc">
                 </div>
                 <?php if (!$req && $company_users): ?>
                 <div>
-                    <label>الإدخال نيابةً عن (اختياري — يُوثَّق الطرفان §13.1)</label>
-                    <select name="requester_id">
+                    <label for="emsf_179_5d929">الإدخال نيابةً عن (اختياري — يُوثَّق الطرفان §13.1)</label>
+                    <select name="requester_id" id="emsf_179_5d929">
                         <option value="">— أنا صاحب الطلب —</option>
                         <?php foreach ($company_users as $cu): if (intval($cu['id']) === $user_id) { continue; } ?>
                             <option value="<?php echo intval($cu['id']); ?>"><?php echo htmlspecialchars($cu['username']); ?></option>
@@ -245,32 +245,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-header"><h5><i class="fa fa-user-tag"></i> بيانات الطلب والمستفيد (§5)</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div>
-                    <label>نوع المستفيد *</label>
-                    <select name="beneficiary_type">
+                    <label for="emsf_180_63fe2">نوع المستفيد *</label>
+                    <select name="beneficiary_type" id="emsf_180_63fe2">
                         <?php foreach (array('supplier' => 'مورد', 'employee' => 'موظف', 'customer' => 'عميل', 'internal' => 'داخلي', 'other' => 'آخر') as $k => $v): ?>
                             <option value="<?php echo $k; ?>" <?php echo ($req && $req['beneficiary_type'] === $k) ? 'selected' : ''; ?>><?php echo $v; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div>
-                    <label>اسم الجهة المستفيدة</label>
-                    <input type="text" name="beneficiary_name" maxlength="160" value="<?php echo htmlspecialchars($req['beneficiary_name'] ?? ''); ?>">
+                    <label for="emsf_181_cf074">اسم الجهة المستفيدة</label>
+                    <input type="text" name="beneficiary_name" maxlength="160" value="<?php echo htmlspecialchars($req['beneficiary_name'] ?? ''); ?>" id="emsf_181_cf074">
                 </div>
                 <div>
-                    <label>مرجع المستفيد (معرّف المورد/الموظف)</label>
-                    <input type="number" name="beneficiary_ref" min="1" value="<?php echo htmlspecialchars($req['beneficiary_ref'] ?? ''); ?>">
+                    <label for="emsf_182_c391e">مرجع المستفيد (معرّف المورد/الموظف)</label>
+                    <input type="number" name="beneficiary_ref" min="1" value="<?php echo htmlspecialchars($req['beneficiary_ref'] ?? ''); ?>" id="emsf_182_c391e">
                 </div>
                 <div>
-                    <label>المبلغ *</label>
-                    <input type="number" step="0.01" min="0.01" name="amount" required value="<?php echo htmlspecialchars($req['amount'] ?? ''); ?>">
+                    <label for="emsf_183_6701d">المبلغ *</label>
+                    <input type="number" step="0.01" min="0.01" name="amount" required value="<?php echo htmlspecialchars($req['amount'] ?? ''); ?>" id="emsf_183_6701d">
                 </div>
                 <div>
-                    <label>العملة</label>
-                    <input type="text" name="currency" maxlength="8" value="<?php echo htmlspecialchars($req['currency'] ?? 'SDG'); ?>">
+                    <label for="emsf_184_b3d0b">العملة</label>
+                    <input type="text" name="currency" maxlength="8" value="<?php echo htmlspecialchars($req['currency'] ?? 'SDG'); ?>" id="emsf_184_b3d0b">
                 </div>
                 <div>
-                    <label>طريقة الدفع المقترحة</label>
-                    <select name="payment_method">
+                    <label for="emsf_185_c942d">طريقة الدفع المقترحة</label>
+                    <select name="payment_method" id="emsf_185_c942d">
                         <option value="">— تقرّرها الخزينة —</option>
                         <?php foreach (array('cash' => 'نقدًا', 'bank' => 'بنكي', 'transfer' => 'تحويل', 'cheque' => 'شيك') as $k => $v): ?>
                             <option value="<?php echo $k; ?>" <?php echo ($req && ($req['payment_method'] ?? '') === $k) ? 'selected' : ''; ?>><?php echo $v; ?></option>
@@ -278,32 +278,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div>
-                    <label>البيان</label>
-                    <input type="text" name="statement" maxlength="255" value="<?php echo htmlspecialchars($req['statement'] ?? ''); ?>">
+                    <label for="emsf_186_ea366">البيان</label>
+                    <input type="text" name="statement" maxlength="255" value="<?php echo htmlspecialchars($req['statement'] ?? ''); ?>" id="emsf_186_ea366">
                 </div>
                 <div>
-                    <label>تاريخ الاستحقاق المطلوب</label>
-                    <input type="date" name="needed_by" value="<?php echo htmlspecialchars($req['needed_by'] ?? ''); ?>">
+                    <label for="emsf_187_e60a0">تاريخ الاستحقاق المطلوب</label>
+                    <input type="date" name="needed_by" value="<?php echo htmlspecialchars($req['needed_by'] ?? ''); ?>" id="emsf_187_e60a0">
                 </div>
                 <div>
-                    <label>الأولوية</label>
-                    <select name="priority">
+                    <label for="emsf_188_4e044">الأولوية</label>
+                    <select name="priority" id="emsf_188_4e044">
                         <?php foreach (array('normal' => 'اعتيادية', 'high' => 'مرتفعة', 'critical' => 'حرجة') as $k => $v): ?>
                             <option value="<?php echo $k; ?>" <?php echo ($req && $req['priority'] === $k) ? 'selected' : ''; ?>><?php echo $v; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div>
-                    <label>المشروع (اختياري)</label>
-                    <input type="number" name="project_id" min="1" value="<?php echo htmlspecialchars($req['project_id'] ?? ''); ?>">
+                    <label for="emsf_189_3f6bd">المشروع (اختياري)</label>
+                    <input type="number" name="project_id" min="1" value="<?php echo htmlspecialchars($req['project_id'] ?? ''); ?>" id="emsf_189_3f6bd">
                 </div>
                 <div>
-                    <label>المعدة (اختياري)</label>
-                    <input type="number" name="equipment_id" min="1" value="<?php echo htmlspecialchars($req['equipment_id'] ?? ''); ?>">
+                    <label for="emsf_190_c5077">المعدة (اختياري)</label>
+                    <input type="number" name="equipment_id" min="1" value="<?php echo htmlspecialchars($req['equipment_id'] ?? ''); ?>" id="emsf_190_c5077">
                 </div>
                 <div>
-                    <label>مركز التكلفة (اختياري)</label>
-                    <input type="text" name="cost_center" maxlength="60" value="<?php echo htmlspecialchars($req['cost_center'] ?? ''); ?>">
+                    <label for="emsf_191_85665">مركز التكلفة (اختياري)</label>
+                    <input type="text" name="cost_center" maxlength="60" value="<?php echo htmlspecialchars($req['cost_center'] ?? ''); ?>" id="emsf_191_85665">
                 </div>
             </div>
             <div style="margin-top:14px;">
@@ -340,16 +340,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <div class="form-grid">
                         <div>
-                            <label>نوع المستند</label>
-                            <select name="doc_type">
+                            <label for="emsf_192_401e7">نوع المستند</label>
+                            <select name="doc_type" id="emsf_192_401e7">
                                 <?php foreach ($doc_types as $k => $v): ?>
                                     <option value="<?php echo $k; ?>" <?php echo in_array($k, $catalog[$req['request_type']]['docs'], true) ? 'selected' : ''; ?>><?php echo $v; ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div>
-                            <label>الملف (صور/PDF · 5MB)</label>
-                            <input type="file" name="doc_file" accept=".jpg,.jpeg,.png,.webp,.pdf" required>
+                            <label for="emsf_193_eb0ac">الملف (صور/PDF · 5MB)</label>
+                            <input type="file" name="doc_file" accept=".jpg,.jpeg,.png,.webp,.pdf" required id="emsf_193_eb0ac">
                         </div>
                         <div style="align-self:end;">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-upload"></i> إرفاق</button>
@@ -405,10 +405,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="action" value="add_line">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <div class="form-grid">
-                        <div><label>البند *</label><input type="text" name="item" maxlength="200" required></div>
-                        <div><label>الكمية *</label><input type="number" step="0.01" min="0.01" name="qty" value="1" required></div>
-                        <div><label>الوحدة</label><input type="text" name="unit" maxlength="20"></div>
-                        <div><label>سعر الوحدة</label><input type="number" step="0.01" min="0" name="unit_price" value="0"></div>
+                        <div><label for="emsf_194_490eb">البند *</label><input type="text" name="item" maxlength="200" required id="emsf_194_490eb"></div>
+                        <div><label for="emsf_195_cf39a">الكمية *</label><input type="number" step="0.01" min="0.01" name="qty" value="1" required id="emsf_195_cf39a"></div>
+                        <div><label for="emsf_196_1ae28">الوحدة</label><input type="text" name="unit" maxlength="20" id="emsf_196_1ae28"></div>
+                        <div><label for="emsf_197_2f1b7">سعر الوحدة</label><input type="number" step="0.01" min="0" name="unit_price" value="0" id="emsf_197_2f1b7"></div>
                         <div style="align-self:end;"><button type="submit" class="btn btn-primary"><i class="fa fa-plus"></i> إضافة بند</button></div>
                     </div>
                 </form>
@@ -431,7 +431,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="action" value="withdraw">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <input type="hidden" name="back" value="request_form.php">
-                    <input type="text" name="reason" placeholder="سبب السحب (إلزامي)" required style="min-width:220px;">
+                    <input type="text" name="reason" placeholder="سبب السحب (إلزامي)" required style="min-width:220px;" aria-label="سبب السحب (إلزامي)">
                     <button type="submit" class="btn btn-outline-danger"><i class="fa fa-box-archive"></i> سحب الطلب</button>
                 </form>
             </div>

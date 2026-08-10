@@ -117,16 +117,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="finForm" action="" method="post" class="allforms">
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة تمويل (يولّد جدول السداد آليّاً)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label>نوع التمويل <span class="required">*</span></label>
-                <select name="facility_type"><?php foreach ($ftypes as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>الغرض <span class="required">*</span></label>
-                <select name="purpose"><?php foreach ($purposes as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group"><label>الممول</label><input type="text" name="lender_name" placeholder="اسم البنك/الممول"></div>
-            <div class="form-group"><label>أصل التمويل <span class="required">*</span></label><input type="number" step="0.01" min="0" name="principal" required></div>
-            <div class="form-group"><label>هامش الربح %</label><input type="number" step="0.01" name="profit_rate" placeholder="مثال 12"></div>
-            <div class="form-group"><label>العملة</label><select name="currency"><option value="SDG">SDG</option><option value="USD">USD</option></select></div>
-            <div class="form-group"><label>تاريخ البداية</label><input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>"></div>
-            <div class="form-group"><label>عدد الأقساط <span class="required">*</span></label><input type="number" min="1" max="120" name="installments" value="12" required></div>
+            <div class="form-group"><label for="emsf_230_c6d01">نوع التمويل <span class="required">*</span></label>
+                <select name="facility_type" id="emsf_230_c6d01"><?php foreach ($ftypes as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_231_d3008">الغرض <span class="required">*</span></label>
+                <select name="purpose" id="emsf_231_d3008"><?php foreach ($purposes as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label for="emsf_232_4f0b7">الممول</label><input type="text" name="lender_name" placeholder="اسم البنك/الممول" id="emsf_232_4f0b7"></div>
+            <div class="form-group"><label for="emsf_233_21a6f">أصل التمويل <span class="required">*</span></label><input type="number" step="0.01" min="0" name="principal" required id="emsf_233_21a6f"></div>
+            <div class="form-group"><label for="emsf_234_b703a">هامش الربح %</label><input type="number" step="0.01" name="profit_rate" placeholder="مثال 12" id="emsf_234_b703a"></div>
+            <div class="form-group"><label for="emsf_235_3b31f">العملة</label><select name="currency" id="emsf_235_3b31f"><option value="SDG">SDG</option><option value="USD">USD</option></select></div>
+            <div class="form-group"><label for="emsf_236_4d9af">تاريخ البداية</label><input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_236_4d9af"></div>
+            <div class="form-group"><label for="emsf_237_a0d82">عدد الأقساط <span class="required">*</span></label><input type="number" min="1" max="120" name="installments" value="12" required id="emsf_237_a0d82"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

@@ -317,15 +317,15 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
                 <div class="form-grid">
                     <div>
-                        <label>كود الموديل <span style="color:#c0392b">*</span></label>
+                        <label for="emsf_135_ba4fc">كود الموديل <span style="color:#c0392b">*</span></label>
                         <input type="text" name="code" required
-                               value="<?= $e($editData['code'] ?? ''); ?>">
+                               value="<?= $e($editData['code'] ?? ''); ?>" id="emsf_135_ba4fc">
                     </div>
 
                     <div>
-                        <label>الصانع / الماركة</label>
+                        <label for="emsf_136_273df">الصانع / الماركة</label>
                         <input type="text" name="manufacturer" list="manufacturerList" autocomplete="off"
-                               value="<?= $e($editData['manufacturer'] ?? ''); ?>">
+                               value="<?= $e($editData['manufacturer'] ?? ''); ?>" id="emsf_136_273df">
                         <datalist id="manufacturerList">
                             <?php foreach ($manufacturers as $m): ?>
                                 <option value="<?= $e($m); ?>"></option>
@@ -334,14 +334,14 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
 
                     <div>
-                        <label>اسم / رقم الموديل <span style="color:#c0392b">*</span></label>
+                        <label for="emsf_137_79fe7">اسم / رقم الموديل <span style="color:#c0392b">*</span></label>
                         <input type="text" name="model_name" required
-                               value="<?= $e($editData['model_name'] ?? ''); ?>">
+                               value="<?= $e($editData['model_name'] ?? ''); ?>" id="emsf_137_79fe7">
                     </div>
 
                     <div>
-                        <label>نوع المعدة</label>
-                        <select name="equipment_type_id">
+                        <label for="emsf_138_f8ede">نوع المعدة</label>
+                        <select name="equipment_type_id" id="emsf_138_f8ede">
                             <option value="">-- اختر النوع --</option>
                             <?php foreach ($equipment_types as $t): ?>
                                 <option value="<?= (int) $t['id']; ?>"
@@ -353,8 +353,8 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
 
                     <div>
-                        <label>فئة التشغيل</label>
-                        <select name="operating_category">
+                        <label for="emsf_139_f35c2">فئة التشغيل</label>
+                        <select name="operating_category" id="emsf_139_f35c2">
                             <option value="">-- اختر الفئة --</option>
                             <?php foreach ($operating_categories as $c): ?>
                                 <option value="<?= $e($c); ?>"
@@ -366,8 +366,8 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
 
                     <div>
-                        <label>نوع الوقود</label>
-                        <select name="fuel_type">
+                        <label for="emsf_140_fdc6e">نوع الوقود</label>
+                        <select name="fuel_type" id="emsf_140_fdc6e">
                             <option value="">-- اختر الوقود --</option>
                             <?php foreach ($fuel_types as $f): ?>
                                 <option value="<?= $e($f); ?>"
@@ -379,14 +379,14 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
 
                     <div>
-                        <label>السعة / القدرة القياسية</label>
+                        <label for="emsf_141_4fa8d">السعة / القدرة القياسية</label>
                         <input type="number" step="0.01" name="std_capacity"
-                               value="<?= $e($editData['std_capacity'] ?? ''); ?>">
+                               value="<?= $e($editData['std_capacity'] ?? ''); ?>" id="emsf_141_4fa8d">
                     </div>
 
                     <div>
-                        <label>وحدة القياس</label>
-                        <select name="std_capacity_uom">
+                        <label for="emsf_142_6b67c">وحدة القياس</label>
+                        <select name="std_capacity_uom" id="emsf_142_6b67c">
                             <option value="">-- اختر الوحدة --</option>
                             <?php foreach ($capacity_uoms as $u): ?>
                                 <option value="<?= $e($u); ?>"
@@ -398,16 +398,16 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
 
                     <div>
-                        <label>المورد الافتراضي</label>
+                        <label for="emsf_143_3b4c8">المورد الافتراضي</label>
                         <input type="text" name="default_supplier_name" autocomplete="off"
                                placeholder="اكتب اسم المورد (إدخال يدوي)"
-                               value="<?= $e($editData['default_supplier_name'] ?? ''); ?>">
+                               value="<?= $e($editData['default_supplier_name'] ?? ''); ?>" id="emsf_143_3b4c8">
                     </div>
 
                     <?php if ($has_dep_profile): ?>
                     <div>
-                        <label><i class="fas fa-coins"></i> ملف الافتراضات المالية (معتمد)</label>
-                        <select name="depreciation_profile_id">
+                        <label for="emsf_144_ce6c2"><i class="fas fa-coins"></i> ملف الافتراضات المالية (معتمد)</label>
+                        <select name="depreciation_profile_id" id="emsf_144_ce6c2">
                             <option value="">-- بدون --</option>
                             <?php foreach ($dep_profiles as $dp): ?>
                                 <option value="<?= (int) $dp['id']; ?>"
@@ -421,14 +421,14 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     <?php endif; ?>
 
                     <div>
-                        <label>مرجع فني / كتالوج</label>
+                        <label for="emsf_145_075cb">مرجع فني / كتالوج</label>
                         <input type="text" name="tech_reference"
-                               value="<?= $e($editData['tech_reference'] ?? ''); ?>">
+                               value="<?= $e($editData['tech_reference'] ?? ''); ?>" id="emsf_145_075cb">
                     </div>
 
                     <div>
-                        <label>الحالة</label>
-                        <select name="status">
+                        <label for="emsf_146_13383">الحالة</label>
+                        <select name="status" id="emsf_146_13383">
                             <option value="active"   <?= (!empty($editData) && $editData['status'] === 'active') ? 'selected' : ''; ?>>نشط</option>
                             <option value="inactive" <?= (!empty($editData) && $editData['status'] === 'inactive') ? 'selected' : ''; ?>>غير نشط</option>
                         </select>
@@ -467,7 +467,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                     <tr class="spec-row">
                                         <td>
                                             <input type="text" name="spec_item_type[]" list="specItemTypes"
-                                                   value="<?= $iv('item_type'); ?>" placeholder="فلتر / زيت ...">
+                                                   value="<?= $iv('item_type'); ?>" placeholder="فلتر / زيت ..." aria-label="فلتر / زيت ...">
                                         </td>
                                         <td><input type="text" name="spec_recommended_ref[]" value="<?= $iv('recommended_ref'); ?>"></td>
                                         <td><input type="number" step="0.01" name="spec_qty[]" value="<?= $iv('qty'); ?>" style="max-width:90px"></td>
@@ -714,7 +714,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 <!-- قالب سطر مواصفة جديد (لإضافته عبر JS) -->
 <template id="specRowTemplate">
     <tr class="spec-row">
-        <td><input type="text" name="spec_item_type[]" list="specItemTypes" placeholder="فلتر / زيت ..."></td>
+        <td><input type="text" name="spec_item_type[]" list="specItemTypes" placeholder="فلتر / زيت ..." aria-label="فلتر / زيت ..."></td>
         <td><input type="text" name="spec_recommended_ref[]"></td>
         <td><input type="number" step="0.01" name="spec_qty[]" style="max-width:90px"></td>
         <td><input type="text" name="spec_uom[]" list="specUoms" style="max-width:100px"></td>

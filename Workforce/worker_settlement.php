@@ -146,13 +146,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
             <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
             <div class="field"><label>المصدر</label><select name="source_type"><option value="">—</option><?php foreach(['شركة','مورد','مقاول'] as $s): ?><option value="<?= $s ?>" <?= (($edit['source_type']??'')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>أساس التسوية</label><select name="settlement_basis"><option value="">—</option><?php foreach(['عمالة شركة','فاتورة مورد','مستخلص مقاول'] as $b): ?><option value="<?= $b ?>" <?= (($edit['settlement_basis']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>الحالة</label><select name="state"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'محتسب')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label>جهة التسوية</label><input type="text" name="settlement_party" value="<?= htmlspecialchars($edit['settlement_party'] ?? '') ?>"></div>
-            <div class="field"><label>عقد مرتبط (#)</label><input type="number" name="worker_contract_id" value="<?= htmlspecialchars($edit['worker_contract_id'] ?? '') ?>"></div>
-            <div class="field"><label>الصافي (مالي — يدوي)</label><input type="number" step="0.01" name="net_amount" value="<?= htmlspecialchars($edit['net_amount'] ?? '') ?>"></div>
-            <div class="field"><label>تعليق مالي</label><input type="text" name="net_finance_note" value="<?= htmlspecialchars($edit['net_finance_note'] ?? '') ?>"></div>
-            <div class="field" style="grid-column:1/-1;"><label>ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_624_8d8b1">أساس التسوية</label><select name="settlement_basis" id="emsf_624_8d8b1"><option value="">—</option><?php foreach(['عمالة شركة','فاتورة مورد','مستخلص مقاول'] as $b): ?><option value="<?= $b ?>" <?= (($edit['settlement_basis']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_625_12a01">الحالة</label><select name="state" id="emsf_625_12a01"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'محتسب')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_626_d9937">جهة التسوية</label><input type="text" name="settlement_party" value="<?= htmlspecialchars($edit['settlement_party'] ?? '') ?>" id="emsf_626_d9937"></div>
+            <div class="field"><label for="emsf_627_607ef">عقد مرتبط (#)</label><input type="number" name="worker_contract_id" value="<?= htmlspecialchars($edit['worker_contract_id'] ?? '') ?>" id="emsf_627_607ef"></div>
+            <div class="field"><label for="emsf_628_39c52">الصافي (مالي — يدوي)</label><input type="number" step="0.01" name="net_amount" value="<?= htmlspecialchars($edit['net_amount'] ?? '') ?>" id="emsf_628_39c52"></div>
+            <div class="field"><label for="emsf_629_386b4">تعليق مالي</label><input type="text" name="net_finance_note" value="<?= htmlspecialchars($edit['net_finance_note'] ?? '') ?>" id="emsf_629_386b4"></div>
+            <div class="field" style="grid-column:1/-1;"><label for="emsf_630_ac9d5">ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_630_ac9d5"></div>
         </div>
         <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><a href="worker_settlement.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>
@@ -162,9 +162,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fas fa-list"></i> بنود المستحقات والخصومات — الصافي المحسوب: <?= number_format($sum,2) ?></h5></div>
         <form action="" method="post" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
             <input type="hidden" name="action" value="add_line"><input type="hidden" name="settlement_id" value="<?= intval($edit['id']) ?>">
-            <div class="field"><label>النوع</label><select name="line_type"><option>مستحق</option><option>خصم</option></select></div>
-            <div class="field"><label>الوصف</label><input type="text" name="description"></div>
-            <div class="field"><label>المبلغ</label><input type="number" step="0.01" name="amount"></div>
+            <div class="field"><label for="emsf_631_06f0f">النوع</label><select name="line_type" id="emsf_631_06f0f"><option>مستحق</option><option>خصم</option></select></div>
+            <div class="field"><label for="emsf_632_4e9a8">الوصف</label><input type="text" name="description" id="emsf_632_4e9a8"></div>
+            <div class="field"><label for="emsf_633_c75a6">المبلغ</label><input type="number" step="0.01" name="amount" id="emsf_633_c75a6"></div>
             <div class="field" style="display:flex;align-items:flex-end;"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة بند</button></div>
         </form>
         <table class="data-table" style="width:100%;"><thead><tr><th>النوع</th><th>الوصف</th><th>المبلغ</th><th></th></tr></thead><tbody>

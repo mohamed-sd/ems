@@ -271,7 +271,7 @@ include '../insidebar.php';
                                     <button class="btn btn-sm btn-warning">تأكيد التوقف</button></form></details>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-outline-success" style="display:inline-block">إكمال</summary>
                                 <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="done_pending_verify">
-                                    <input name="evidence" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="دليل الإنجاز (إلزامي منطقًا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required>
+                                    <input name="evidence" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="دليل الإنجاز (إلزامي منطقًا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required aria-label="دليل الإنجاز (إلزامي منطقًا: )">
                                     <button class="btn btn-sm btn-success">تقديم للتحقق</button></form></details>
                         <?php endif; ?>
                         <?php if ($isVerifier && $s === 'done_pending_verify'): ?>

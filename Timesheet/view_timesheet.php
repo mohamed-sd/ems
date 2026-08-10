@@ -890,7 +890,7 @@ include('../includes/page_header.php');
         <div class="card-body">
             <form method="GET" class="form-grid" id="timesheetFilterForm">
                 <div class="form-group">
-                    <label><i class="fas fa-cogs"></i> نوع الآلية</label>
+                    <label for="equipment_type_filter"><i class="fas fa-cogs"></i> نوع الآلية</label>
                     <select name="equipment_type" id="equipment_type_filter">
                         <option value="">-- اختر نوع الآلية --</option>
                         <option value="1" <?= $equipment_type === '1' ? 'selected' : '' ?>>معدات ثقيلة</option>
@@ -899,7 +899,7 @@ include('../includes/page_header.php');
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-truck-moving"></i> الآلية</label>
+                    <label for="operation_filter"><i class="fas fa-truck-moving"></i> الآلية</label>
                     <select name="operation_id" id="operation_filter">
                         <option value=""><?= ($equipment_type === '1' || $equipment_type === '2') ? '-- اختر الآلية --' : '-- اختر نوع الآلية أولاً --' ?></option>
                         <?php foreach ($operations as $op) { ?>
@@ -910,15 +910,15 @@ include('../includes/page_header.php');
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-sun"></i> الوردية</label>
-                    <select name="shift">
+                    <label for="emsf_524_a7f59"><i class="fas fa-sun"></i> الوردية</label>
+                    <select name="shift" id="emsf_524_a7f59">
                         <option value="">-- الكل --</option>
                         <option value="D" <?= $shift_filter === 'D' ? 'selected' : '' ?>>☀️ صباحية</option>
                         <option value="N" <?= $shift_filter === 'N' ? 'selected' : '' ?>>🌙 مسائية</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> المشغل (السائق)</label>
+                    <label for="driver_filter"><i class="fas fa-user"></i> المشغل (السائق)</label>
                     <select name="employee_id" id="driver_filter">
                         <option value=""><?= $operation_id > 0 ? '-- اختر السائق --' : '-- اختر الآلية أولاً --' ?></option>
                         <?php foreach ($drivers as $driver) { ?>
@@ -929,24 +929,24 @@ include('../includes/page_header.php');
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-calendar-day"></i> تاريخ محدد</label>
-                    <input type="date" name="filter_date" value="<?= htmlspecialchars($filter_date) ?>" />
+                    <label for="emsf_525_44920"><i class="fas fa-calendar-day"></i> تاريخ محدد</label>
+                    <input type="date" name="filter_date" value="<?= htmlspecialchars($filter_date) ?>" / id="emsf_525_44920">
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-calendar"></i> من تاريخ</label>
-                    <input type="date" name="start_date" value="<?= htmlspecialchars($start_date) ?>" />
+                    <label for="emsf_526_90bf6"><i class="fas fa-calendar"></i> من تاريخ</label>
+                    <input type="date" name="start_date" value="<?= htmlspecialchars($start_date) ?>" / id="emsf_526_90bf6">
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-calendar"></i> إلى تاريخ</label>
-                    <input type="date" name="end_date" value="<?= htmlspecialchars($end_date) ?>" />
+                    <label for="emsf_527_24253"><i class="fas fa-calendar"></i> إلى تاريخ</label>
+                    <input type="date" name="end_date" value="<?= htmlspecialchars($end_date) ?>" / id="emsf_527_24253">
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-calendar-alt"></i> الشهر</label>
-                    <input type="month" name="month" value="<?= htmlspecialchars($month_filter) ?>" />
+                    <label for="emsf_528_b119d"><i class="fas fa-calendar-alt"></i> الشهر</label>
+                    <input type="month" name="month" value="<?= htmlspecialchars($month_filter) ?>" / id="emsf_528_b119d">
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-toggle-on"></i> حالة السجل</label>
-                    <select name="status">
+                    <label for="emsf_529_4b5c6"><i class="fas fa-toggle-on"></i> حالة السجل</label>
+                    <select name="status" id="emsf_529_4b5c6">
                         <option value="">-- الكل --</option>
                         <option value="1" <?= $status_filter === '1' ? 'selected' : '' ?>>قيد المراجعة</option>
                         <option value="2" <?= $status_filter === '2' ? 'selected' : '' ?>>معتمد</option>
