@@ -1126,19 +1126,54 @@ body.ems-site table td.ems-gov-empty {
   text-align: center;
 }
 
-/* CMP-03 توصية ①: الأعمدة المحقونة المطوية وزر إظهارها */
-.ems-xcol-off { display: none !important; }
-body.ems-site .ems-xcol-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 6px 0;
-  padding: 4px 12px;
-  border: 1px dashed #c9a227;
-  border-radius: 8px;
-  background: #fffbeb;
-  color: #7a5c00;
-  font-size: .8rem;
-  cursor: pointer;
+/* ═══ جدولٌ كالإكسل: كل الأعمدة ظاهرةٌ وتمريرٌ أفقيّ ═══════════════════
+   قرار المالك 2026-08-09: أُزيلت إضافةُ Responsive من كل الشاشات، فلم يعد
+   ثمّة سهمُ فتحٍ وإغلاقٍ يخفي الأعمدةَ الفائضة تحت سطرٍ تابع. الجدولُ يمتدُّ
+   بعرض محتواه ويُمرَّر أفقيًّا داخل غلافٍ يبنيه ui-unification.js حول <table>
+   وحدَه — فيبقى صندوقُ البحث وأزرارُ التصدير ثابتةً بينما تنزلق الأعمدة.
+   الرؤوسُ المحقونةُ التي كانت تحمل class="none" (طيُّ CMP-03) صارت أعمدةً
+   عاديةً ظاهرة، فلا قاعدةَ إخفاءٍ لها هنا. */
+body.ems-site .ems-xscroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  width: 100%;
+  max-width: 100%;
+  /* شريطُ تمريرٍ رفيعٌ لا يقتطع من ارتفاع الصف */
+  scrollbar-width: thin;
 }
-body.ems-site .ems-xcol-toggle:hover { background: #fef3c7; }
+body.ems-site .ems-xscroll::-webkit-scrollbar { height: 10px; }
+body.ems-site .ems-xscroll::-webkit-scrollbar-track { background: #f1f2f4; border-radius: 6px; }
+body.ems-site .ems-xscroll::-webkit-scrollbar-thumb { background: #b9bec5; border-radius: 6px; }
+body.ems-site .ems-xscroll::-webkit-scrollbar-thumb:hover { background: #9aa0a6; }
+
+/* الجدولُ يأخذ عرضَ محتواه ولا ينكمش دون عرض الحاوية */
+body.ems-site .ems-xscroll > table {
+  width: max-content !important;
+  min-width: 100% !important;
+  /* border-radius مع overflow:hidden يقصُّ الأعمدةَ الفائضة — نلغيه هنا */
+  overflow: visible !important;
+}
+
+/* سقفُ عرضٍ للخلية: عمودُ ملاحظاتٍ طويلٍ لا يمطّ الجدولَ آلافَ البكسلات،
+   وما دونه يبقى سطرًا واحدًا كخلية الإكسل. */
+body.ems-site .ems-xscroll > table tbody td {
+  max-width: 340px;
+}
+
+/* .dataTables_wrapper أبٌ للغلاف لا ابنٌ له: عرضُه عرضُ الشاشة، والانزلاقُ
+   داخلَه — فلا يُجَرُّ البحثُ ولا الترقيمُ مع الأعمدة. */
+body.ems-site .dataTables_wrapper { min-width: 0; max-width: 100%; }
+body.ems-site .main .ems-xscroll { max-width: 100%; }
+
+/* ═══ زرُّ التصدير إلى إكسل المُلحق مركزيًّا (ui-unification.js) ═══════════
+   يُحقن فوق الجدولِ في الشاشات التي لا تبني أزرارَها بنفسها؛ الشاشاتُ ذاتُ
+   dom:'Bfrtip' تحتفظ بأزرارِها ولا يُضاعَف عليها.
+   الشكلُ متروكٌ لقاعدة النظام القائمة `.dataTables_wrapper .dt-buttons
+   .dt-button` (حبّةٌ رماديةٌ بحوافَّ دائرية) — فالزرُّ المحقونُ يطابق أزرارَ
+   الشاشات الستّين التي تبنيه بنفسها، ولا لغةَ بصريةَ ثانيةً في النظام. */
+body.ems-site .ems-auto-buttons {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 8px;
+}
+body.ems-site .ems-auto-buttons .dt-buttons { float: none; margin: 0; }

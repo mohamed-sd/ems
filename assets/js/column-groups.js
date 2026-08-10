@@ -135,7 +135,7 @@
   Controller.prototype.dtRefresh = function () {
     this.tables().forEach(function (dt) {
       try { dt.columns.adjust(); } catch (e) {}
-      if (dt.responsive && dt.responsive.recalc) { try { dt.responsive.recalc(); } catch (e) {} }
+      // إضافةُ Responsive مرفوعةٌ من النظام — لا recalc تُستدعى.
     });
   };
 

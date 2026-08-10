@@ -5070,6 +5070,441 @@ table.d-bd {
 
 .project-users-main .action-btns { display: flex; gap: 6px; }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   بطاقةُ «عن الشاشة» الموحَّدة  —  .ems-about   (2026-08-09 · قرار المالك)
+   ───────────────────────────────────────────────────────────────────────────
+   مكوِّنٌ واحدٌ لـ358 شاشة. الترميزُ يبنيه assets/js/ems-screen-about.js من
+   قالبٍ يُصدره includes/screen_contract.php — وهنا الشكلُ وحدَه.
+
+   قواعدُ التصميم المتَّبعة:
+   • هويةُ النظام: الذهبيُّ حدًّا مضيئًا والأزرقُ الداكنُ للعناوين — بلا لونٍ
+     جديدٍ يُخترع لمكوِّنٍ إرشادي.
+   • البساطة: بطاقةٌ مسطَّحةٌ في مجرى الصفحة، بلا ظلٍّ ثقيلٍ ولا حاجزٍ modal —
+     المستخدمُ يقرأ ويُكمل، ولا يُطالَب بالتخلّص من حاجزٍ قبل أن يعمل.
+   • الموضع: تحتَ الرأس مباشرةً وفوقَ أولِ محتوى — حيث تقع العينُ أولًا.
+   • الحركةُ خفيفةٌ وتُحترم `prefers-reduced-motion`.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ems-about {
+  position: relative;
+  background: linear-gradient(135deg, #FFFDF7 0%, #FFF9E8 100%);
+  border: 1px solid #F0E2B4;
+  border-inline-start: 4px solid var(--primary-yellow, #F4C542);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 0 0 14px;
+}
+
+.ems-about[hidden] { display: none !important; }
+
+.ems-about.is-open { animation: emsAboutIn .22s ease-out; }
+
+@keyframes emsAboutIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ems-about.is-open { animation: none; }
+}
+
+.ems-about__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ems-about__ico {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--primary-yellow, #F4C542);
+  color: var(--dark-blue, #1E3A5F);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+}
+
+.ems-about__title {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--dark-blue, #1E3A5F);
+  line-height: 1.4;
+}
+
+.ems-about__close {
+  margin-inline-start: auto;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #E8D9A8;
+  background: rgba(255, 255, 255, .75);
+  color: #8A7433;
+  border-radius: 7px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: background .18s, color .18s, border-color .18s;
+}
+
+.ems-about__close:hover,
+.ems-about__close:focus-visible {
+  background: var(--primary-yellow, #F4C542);
+  color: var(--dark-blue, #1E3A5F);
+  border-color: var(--primary-yellow, #F4C542);
+}
+
+.ems-about__body { padding-inline-start: 40px; }
+
+.ems-about__purpose {
+  margin: 0;
+  font-size: .86rem;
+  line-height: 1.75;
+  color: #55503f;
+  max-width: 80ch;
+}
+
+.ems-about__steps {
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  counter-reset: emsabout;
+}
+
+.ems-about__steps li {
+  counter-increment: emsabout;
+  position: relative;
+  flex: 1 1 230px;
+  background: rgba(255, 255, 255, .8);
+  border: 1px solid #F1E7CB;
+  border-radius: 9px;
+  padding: 8px 11px;
+  padding-inline-start: 36px;
+  font-size: .8rem;
+  line-height: 1.6;
+  color: #4A463C;
+}
+
+.ems-about__steps li::before {
+  content: counter(emsabout);
+  position: absolute;
+  inset-inline-start: 9px;
+  top: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--dark-blue, #1E3A5F);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ems-about__steps li b { color: var(--dark-blue, #1E3A5F); }
+
+.ems-about__rule {
+  margin: 10px 0 0;
+  font-size: .79rem;
+  line-height: 1.7;
+  color: #6B6555;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.ems-about__rule i { color: var(--dark-blue, #1E3A5F); margin-top: 3px; }
+
+/* شريطُ الزرِّ الاحتياطي — شاشةٌ بلا رأسٍ موحَّد (نادرة) */
+.ems-about__floatbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+/* الزرُّ في الرأس: يرث دائريةَ .ems-head-circle، ويتميّز بلونٍ هادئ لأنه
+   إرشادٌ لا فعلٌ على البيانات — فلا يزاحم زرَّ الإضافة بصريًّا. */
+.main_head .head_actions .ems-about-btn {
+  background: rgba(255, 255, 255, .14);
+  border: 1px solid rgba(255, 255, 255, .28);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.main_head .head_actions .ems-about-btn:hover,
+.main_head .head_actions .ems-about-btn:focus-visible {
+  background: var(--primary-yellow, #F4C542);
+  border-color: var(--primary-yellow, #F4C542);
+  color: var(--dark-blue, #1E3A5F);
+}
+
+.main_head .head_actions .ems-about-btn[aria-expanded="true"] {
+  background: var(--primary-yellow, #F4C542);
+  border-color: var(--primary-yellow, #F4C542);
+  color: var(--dark-blue, #1E3A5F);
+}
+
+@media (max-width: 768px) {
+  .ems-about__body { padding-inline-start: 0; }
+  .ems-about__steps li { flex: 1 1 100%; }
+}
+
+@media print {
+  .ems-about, .ems-about-btn { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   إدارة المعاونين — طبقةُ «صفحة فريقٍ متكاملة» (2026-08-09 · قرار المالك)
+   ───────────────────────────────────────────────────────────────────────────
+   الهويةُ من المتغيّرات القائمة (--primary-yellow · --dark-blue · --t1..t3)
+   لا من ألوانٍ مقحَمة، فتتبع الثيمَ كما تتبعه بقيةُ الشاشات.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── لافتةٌ حاكمة ── */
+.project-users-main .pu-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 13px 16px;
+  margin-bottom: 16px;
+  font-size: .86rem;
+  line-height: 1.7;
+}
+
+.project-users-main .pu-notice--warn {
+  background: #FFF8E8;
+  border: 1px solid #F3DFA4;
+  border-inline-start: 4px solid #D4A017;
+  color: #6B5416;
+}
+
+.project-users-main .pu-notice--warn i { color: #D4A017; font-size: 1.05rem; margin-top: 2px; }
+.project-users-main .pu-notice b { color: #4A3A0C; }
+
+/* ── مؤشراتُ الفريق ── */
+.project-users-main .pu-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.project-users-main .pu-kpi {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--bdr2, #E8EBEF);
+  border-radius: 12px;
+  padding: 14px 16px 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "ico val" "ico lbl";
+  column-gap: 12px;
+  align-items: center;
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.project-users-main .pu-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(26, 18, 8, .08);
+}
+
+.project-users-main .pu-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--pu-tone, var(--primary-yellow, #F4C542));
+}
+
+.project-users-main .pu-kpi[data-tone="ok"]   { --pu-tone: #16A34A; }
+.project-users-main .pu-kpi[data-tone="warn"] { --pu-tone: #D97706; }
+.project-users-main .pu-kpi[data-tone="info"] { --pu-tone: #1E3A5F; }
+.project-users-main .pu-kpi[data-tone="main"] { --pu-tone: #F4C542; }
+
+.project-users-main .pu-kpi__ico {
+  grid-area: ico;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--pu-tone, #F4C542) 14%, transparent);
+  color: var(--pu-tone, #B98F17);
+  font-size: .95rem;
+}
+
+.project-users-main .pu-kpi__val {
+  grid-area: val;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--t1, #121212);
+  font-variant-numeric: tabular-nums;
+}
+
+.project-users-main .pu-kpi__lbl {
+  grid-area: lbl;
+  font-size: .76rem;
+  color: var(--t3, #6B7280);
+}
+
+/* ── لوحةُ «ما يفتحه هذا الدور» ── */
+.project-users-main .pu-rolescope {
+  margin-top: 14px;
+  border: 1px solid #D9E2EC;
+  border-radius: 12px;
+  background: #F8FAFC;
+  overflow: hidden;
+}
+
+.project-users-main .pu-rolescope__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--dark-blue, #1E3A5F);
+  color: #fff;
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.project-users-main .pu-rolescope__head b { color: var(--primary-yellow, #F4C542); }
+.project-users-main .pu-rolescope__pills { display: flex; flex-wrap: wrap; gap: 6px; margin-inline-start: auto; }
+
+.project-users-main .pu-rolescope__close {
+  border: none;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.project-users-main .pu-rolescope__close:hover { background: rgba(255, 255, 255, .3); }
+
+.project-users-main .pu-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+}
+
+.project-users-main .pu-chip--write { background: var(--primary-yellow, #F4C542); color: var(--dark-blue, #1E3A5F); }
+.project-users-main .pu-chip--read  { background: rgba(255, 255, 255, .9); color: var(--dark-blue, #1E3A5F); }
+
+.project-users-main .pu-rolescope__body {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.project-users-main .pu-rolescope__grp {
+  background: #fff;
+  border: 1px solid #E5EAF0;
+  border-radius: 10px;
+  padding: 9px 11px;
+}
+
+.project-users-main .pu-rolescope__gname {
+  display: block;
+  font-size: .73rem;
+  font-weight: 800;
+  color: var(--dark-blue, #1E3A5F);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #E5EAF0;
+}
+
+.project-users-main .pu-rolescope__grp ul { list-style: none; margin: 0; padding: 0; }
+
+.project-users-main .pu-rolescope__grp li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: .79rem;
+  color: #3F4854;
+  padding: 3px 0;
+}
+
+.project-users-main .pu-rolescope__marks { display: flex; gap: 5px; color: #94A3B8; font-size: .68rem; }
+.project-users-main .pu-rolescope__marks .fa-pen { color: #D97706; }
+.project-users-main .pu-rolescope__marks .fa-plus { color: #16A34A; }
+.project-users-main .pu-rolescope__marks .fa-trash { color: #DC2626; }
+
+.project-users-main .pu-rolescope__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 18px;
+  font-size: .84rem;
+  color: var(--t3, #6B7280);
+}
+
+.project-users-main .pu-rolescope__empty--err { color: #DC2626; }
+
+/* ── شارات الحالة داخل الجدول ── */
+.project-users-main .pu-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .74rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.project-users-main .pu-pill--ok   { background: #E8F6ED; color: #16A34A; }
+.project-users-main .pu-pill--warn { background: #FFF4E0; color: #B45309; }
+.project-users-main .pu-pill--err  { background: #FDEAEA; color: #DC2626; }
+.project-users-main .pu-pill--mute { background: #F1F3F5; color: #6B7280; }
+
+/* ── عمودُ الإجراءات صار أولَ عمود: عرضٌ ثابتٌ لا يتمدّد بالمحتوى ── */
+.project-users-main td.pu-col-actions,
+.project-users-main th.pu-col-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.project-users-main .action-btn.view {
+  background: #EEF4FB;
+  color: var(--dark-blue, #1E3A5F);
+}
+
+.project-users-main .action-btn.view:hover {
+  background: var(--dark-blue, #1E3A5F);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .project-users-main .pu-rolescope__body { grid-template-columns: 1fr; max-height: 220px; }
+}
+
 .project-users-main .role-badge {
   display: inline-block;
   padding: 8px 14px;

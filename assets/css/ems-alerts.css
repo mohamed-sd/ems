@@ -1,0 +1,335 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   نظام الرسائل الموحَّد — EMS Alerts
+   قرار المالك 2026-08-09: كلُّ رسالةٍ تظهر للمستخدم (حفظ · تعديل · حذف ·
+   صلاحية · دور · تنبيه) بتصميمٍ واحدٍ ولونٍ يدلُّ على نوعها.
+
+   سطحان لا ثالثَ لهما، بلغةٍ بصريةٍ واحدة:
+   ① التوست (.ems-toast) — ردُّ فعلٍ عابرٌ على فعلٍ قام به المستخدم. يطفو
+      أسفل الشريط العلوي في وسط الشاشة، لا يزيح المحتوى ولا يعيد تخطيطه.
+   ② اللافتة السطرية (.alert / .success-message) — سياقٌ دائمٌ داخل الصفحة
+      (شرحٌ · تحذيرُ حالةٍ · نتيجةُ تحقّق). تبقى مكانَها وتُعاد صياغتُها
+      بالألوان والأيقونات نفسِها فيقرأها المستخدم لغةً واحدة.
+
+   الألوان من رموز التصميم (design-tokens.css) لا من bootstrap: بطاقةٌ بيضاء
+   وحافةٌ مُلوَّنةٌ في بداية السطر وأيقونةٌ مُظلَّلة — أوضحُ وأخفُّ من بطاقةٍ
+   مصمتةِ اللون، وهو العرفُ العالميُّ السائد في لوحات التحكم.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ems-alert-radius: 12px;
+  --ems-alert-shadow: 0 10px 30px rgba(15, 17, 21, .14), 0 2px 6px rgba(15, 17, 21, .06);
+  --ems-alert-z: 100000;
+}
+
+/* ── ① حاوية التوست ─────────────────────────────────────────────────── */
+.ems-toast-host {
+  position: fixed;
+  inset-block-start: calc(var(--ems-topbar-height, 50px) + 12px);
+  inset-inline: 0;
+  z-index: var(--ems-alert-z);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  /* الحاوية شفافةٌ للنقر — التوست وحدَه يلتقطه */
+  pointer-events: none;
+}
+
+.ems-toast {
+  pointer-events: auto;
+  position: relative;
+  box-sizing: border-box;
+  width: min(560px, 100%);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--white, #fff);
+  border: 1px solid var(--gray-200, #E7E5E4);
+  border-inline-start: 4px solid var(--ems-tone, #475569);
+  border-radius: var(--ems-alert-radius);
+  box-shadow: var(--ems-alert-shadow);
+  font-family: var(--font-ar, inherit);
+  overflow: hidden;
+}
+
+.ems-toast__icon {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ems-tone-soft, #E5E8EE);
+  color: var(--ems-tone, #475569);
+  font-size: 14px;
+  line-height: 1;
+}
+/* الأيقونةُ متجهةٌ داخليةٌ ترث لونَ النغمة (stroke="currentColor") */
+.ems-toast__icon svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+
+.ems-toast__body { flex: 1 1 auto; min-width: 0; }
+
+.ems-toast__title {
+  margin: 0 0 2px;
+  font-size: .88rem;
+  font-weight: 800;
+  color: var(--ems-tone-deep, #334155);
+  line-height: 1.35;
+}
+
+.ems-toast__text {
+  margin: 0;
+  font-size: .86rem;
+  font-weight: 600;
+  color: var(--gray-700, #44403C);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* «كيف يُصحَّح» بعد «ما حدث» — عقد UI-13 لرسائل الحوكمة */
+.ems-toast__hint {
+  margin: 4px 0 0;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--gray-500, #78716C);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* رمزُ الحوكمة: يُذكر للدعم فيُعرف الموضع. `inline-block` بلا انكماشٍ كي لا
+   ينكسر الرمزُ حرفًا حرفًا حين تضيق البطاقة — وهو عينُ ما كان يقع في الشريط
+   القديم داخل صفٍّ مرنٍ ضيّق. */
+.ems-toast__code {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--gray-100, #F5F5F4);
+  border: 1px solid var(--gray-200, #E7E5E4);
+  color: var(--gray-500, #78716C);
+  font-family: var(--font-mono, monospace);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+/* رسالةٌ تكرّرت: عدّادٌ بدل تكديس بطاقاتٍ متطابقة */
+.ems-toast__count {
+  display: none;
+  margin-inline-start: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ems-tone-soft, #E5E8EE);
+  color: var(--ems-tone-deep, #334155);
+  font-size: .72rem;
+  font-weight: 800;
+}
+.ems-toast[data-count]:not([data-count="1"]) .ems-toast__count { display: inline-block; }
+
+.ems-toast__close {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gray-500, #78716C);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.ems-toast__close:hover { background: var(--gray-100, #F5F5F4); color: var(--gray-900, #1C1917); }
+.ems-toast__close:focus-visible { outline: 2px solid var(--ems-tone, #475569); outline-offset: 1px; }
+
+/* شريطُ العمر: يُظهر متى يختفي التوست — يتجمّد عند المرور بالفأرة */
+.ems-toast__life {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--ems-tone, #475569);
+  opacity: .35;
+  transform-origin: inset-inline-start;
+  animation: ems-toast-life linear forwards;
+  animation-duration: var(--ems-toast-life, 4000ms);
+}
+@keyframes ems-toast-life { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.ems-toast:hover .ems-toast__life,
+.ems-toast:focus-within .ems-toast__life { animation-play-state: paused; }
+.ems-toast[data-sticky="1"] .ems-toast__life { display: none; }
+
+/* ── ① النتيجة: الأنواع الأربعة ──────────────────────────────────────── */
+.ems-toast[data-type="success"], .ems-inline-alert[data-type="success"] {
+  --ems-tone: var(--success-600, #5B7F1E);
+  --ems-tone-soft: var(--success-100, #ECF1DE);
+  --ems-tone-deep: var(--success-deep, #365314);
+}
+.ems-toast[data-type="error"], .ems-inline-alert[data-type="error"] {
+  --ems-tone: var(--danger-600, #991B1B);
+  --ems-tone-soft: var(--danger-100, #F5DCDC);
+  --ems-tone-deep: var(--danger-deep, #7F1D1D);
+}
+.ems-toast[data-type="warning"], .ems-inline-alert[data-type="warning"] {
+  --ems-tone: var(--warning-600, #A8541C);
+  --ems-tone-soft: var(--warning-100, #F4E5D3);
+  --ems-tone-deep: var(--warning-deep, #7C2D12);
+}
+.ems-toast[data-type="info"], .ems-inline-alert[data-type="info"] {
+  --ems-tone: var(--info-600, #475569);
+  --ems-tone-soft: var(--info-100, #E5E8EE);
+  --ems-tone-deep: var(--info-deep, #334155);
+}
+
+/* ══ ② الفعل: إضافةٌ ≠ تعديلٌ ≠ حذف ═════════════════════════════════════
+   النتيجةُ لونٌ والفعلُ لونٌ أدقُّ داخلَه. ثلاثتُها نجاحٌ، فكانت تخرج بلونٍ
+   واحدٍ وعلامةِ صحٍّ واحدة فلا يفرّق المستخدمُ بينها.
+     · إضافة  → أخضرُ ونموّ            (＋)
+     · تعديل  → أزرقُ وتغييرٌ محايد     (قلم)
+     · حذف    → رماديٌّ حجريٌّ محايد    (سلّة)
+   الحذفُ الناجحُ **ليس أحمرَ**: الأحمرُ محجوزٌ للفشل وحدَه، وإلا قرأ المستخدمُ
+   حذفَه الناجحَ خطأً. هذا عرفُ Gmail وNotion وLinear وGitHub.
+
+   **ترتيبُ الكتلتين مُلزِم**: محدِّدُ الفعل `.ems-toast[data-tone=…]` يساوي
+   محدِّدَ النوع `.ems-toast[data-type=…]` تخصيصًا، والبطاقةُ تحمل السمتين
+   معًا — فالمتأخِّرُ يفوز. لو سبقت هذه الكتلةُ كتلةَ الأنواع لابتلع الأخضرُ
+   نغماتِ الفعل الثلاثَ وعاد العطبُ كما كان. */
+.ems-toast[data-tone="create"] {
+  --ems-tone: var(--success-600, #5B7F1E);
+  --ems-tone-soft: var(--success-100, #ECF1DE);
+  --ems-tone-deep: var(--success-deep, #365314);
+}
+.ems-toast[data-tone="update"] {
+  --ems-tone: #1D4ED8;
+  --ems-tone-soft: #E3EAFD;
+  --ems-tone-deep: #1E3A8A;
+}
+.ems-toast[data-tone="remove"] {
+  --ems-tone: #57534E;                 /* حجريٌّ داكن — محايدٌ لا ينذر */
+  --ems-tone-soft: var(--gray-100, #F5F5F4);
+  --ems-tone-deep: var(--gray-900, #1C1917);
+}
+.ems-toast[data-tone="restore"] {
+  --ems-tone: #0F766E;                 /* تركوازيٌّ — عودةٌ لا إنشاء */
+  --ems-tone-soft: #DCF2EF;
+  --ems-tone-deep: #115E59;
+}
+.ems-toast[data-tone="send"] {
+  --ems-tone: #4F46E5;
+  --ems-tone-soft: #E7E5FC;
+  --ems-tone-deep: #3730A3;
+}
+
+/* ── الحركة: دخولٌ وخروجٌ هادئان، ويُلغَيان لمن يطلب تقليل الحركة ───── */
+@keyframes ems-toast-in  { from { opacity: 0; transform: translateY(-10px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes ems-toast-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-8px) scale(.98); } }
+.ems-toast { animation: ems-toast-in .22s cubic-bezier(.2, .8, .3, 1); }
+.ems-toast.is-leaving { animation: ems-toast-out .18s ease forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ems-toast, .ems-toast.is-leaving { animation: none; }
+  .ems-toast__life { animation-duration: var(--ems-toast-life, 4000ms); }
+}
+
+/* ── الجوال: بطاقةٌ بعرض الشاشة تحت الشريط ──────────────────────────── */
+@media (max-width: 640px) {
+  .ems-toast-host { padding: 0 10px; gap: 8px; }
+  .ems-toast { width: 100%; padding: 11px 12px; }
+  .ems-toast__text { font-size: .82rem; }
+}
+
+@media print { .ems-toast-host { display: none !important; } }
+
+/* ═══ ② اللافتة السطرية: اللغةُ نفسُها داخل الصفحة ═══════════════════
+   تُطبَّق على لافتات bootstrap القائمة (.alert alert-*) وعلى .success-message
+   الموروثة — بلا تعديل ملفِّ شاشةٍ واحد. `!important` ضرورةٌ لا زينة: قواعدُ
+   bootstrap.min.css تعرّف الخلفيةَ والحدَّ بالتخصيص نفسِه وتُحمَّل قبلَنا. */
+body.ems-site .alert.alert-success, body.ems-site .alert.alert-danger,
+body.ems-site .alert.alert-warning, body.ems-site .alert.alert-info,
+body.ems-site .alert.alert-err,     body.ems-site .alert.alert-ok,
+body.ems-site .success-message {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  padding: 11px 14px !important;
+  margin: 0 0 14px !important;
+  background: var(--white, #fff) !important;
+  border: 1px solid var(--gray-200, #E7E5E4) !important;
+  border-inline-start: 4px solid var(--ems-tone, #475569) !important;
+  border-radius: var(--ems-alert-radius) !important;
+  box-shadow: 0 1px 3px rgba(15, 17, 21, .05) !important;
+  color: var(--gray-700, #44403C) !important;
+  font-size: .88rem !important;
+  font-weight: 600 !important;
+  line-height: 1.6 !important;
+}
+
+/* `display:flex !important` أعلاه يهزم [hidden] وinline style — واللافتةُ
+   المُحوَّلةُ توستًا تبقى ظاهرةً فتُعرض الرسالةُ مرتين. الإخفاءُ يسبقُ الشكل. */
+body.ems-site .success-message[hidden],
+body.ems-site .alert[hidden],
+body.ems-site [data-ems-done][hidden] { display: none !important; }
+
+/* ربطُ أصناف bootstrap بالنغمات — الصنفُ يحدّد اللون لا العكس */
+body.ems-site .alert.alert-success, body.ems-site .alert.alert-ok,
+body.ems-site .success-message.is-success {
+  --ems-tone: var(--success-600, #5B7F1E);
+  --ems-tone-soft: var(--success-100, #ECF1DE);
+  --ems-tone-deep: var(--success-deep, #365314);
+}
+body.ems-site .alert.alert-danger, body.ems-site .alert.alert-err,
+body.ems-site .success-message.is-error {
+  --ems-tone: var(--danger-600, #991B1B);
+  --ems-tone-soft: var(--danger-100, #F5DCDC);
+  --ems-tone-deep: var(--danger-deep, #7F1D1D);
+}
+body.ems-site .alert.alert-warning {
+  --ems-tone: var(--warning-600, #A8541C);
+  --ems-tone-soft: var(--warning-100, #F4E5D3);
+  --ems-tone-deep: var(--warning-deep, #7C2D12);
+}
+body.ems-site .alert.alert-info {
+  --ems-tone: var(--info-600, #475569);
+  --ems-tone-soft: var(--info-100, #E5E8EE);
+  --ems-tone-deep: var(--info-deep, #334155);
+}
+
+/* أيقونةُ اللافتة: تُحقن بـ::before فلا يلزم تعديلُ ترميز الشاشات.
+   الاستثناءُ (شاشةٌ تضع <i class="fa…"> بنفسها فلا تزدوج الأيقونة) يقرّره
+   ems-alerts.js بعدم وضع data-ems-glyph أصلًا — لا `:has()`: لو لم يدعمها
+   متصفّحٌ لسقطت قائمةُ المحدّدات كلُّها فلا أيقونةَ لأيِّ لافتة. */
+body.ems-site [data-ems-glyph]::before {
+  content: attr(data-ems-glyph);
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ems-tone-soft, #E5E8EE);
+  color: var(--ems-tone, #475569);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* أيقونةُ الشاشة إن وُجدت: تأخذ لونَ النغمة فتتّسق */
+body.ems-site .alert.alert-success > i, body.ems-site .alert.alert-ok > i,
+body.ems-site .alert.alert-danger > i, body.ems-site .alert.alert-err > i,
+body.ems-site .alert.alert-warning > i, body.ems-site .alert.alert-info > i,
+body.ems-site .success-message > i {
+  color: var(--ems-tone, #475569) !important;
+  margin-top: 2px;
+}

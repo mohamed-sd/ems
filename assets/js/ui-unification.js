@@ -254,104 +254,48 @@
         });
     }
 
-    /* ── CMP-03 توصية المالك ①: طي الأعمدة المحقونة فوق 22 ─────────────
-       الرؤوس المحقونة الفائضة تحمل class="none":
-       - جدول DataTables بإضافة Responsive الحية → Responsive نفسها تطويها
-         لسطرٍ تابعٍ (زر التوسيع أول الصف) — لا نتدخل.
-       - جدول DataTables بلا Responsive (تهيئة ذاتية قديمة) → نطويها عبر
-         column().visible(false) ونضع زرَّ «الأعمدة المطوية» فوق الجدول.
-       - جدول ساكن → نطويها بصنف CSS وبالزر نفسه. */
-    function collapseInjectedOverflow(tableEl) {
-        var overs = tableEl.querySelectorAll('th.none[data-gov], th.none[data-fn]');
-        if (!overs.length) return;
-        var $ = window.jQuery;
-        var isDT = $ && $.fn && $.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable(tableEl);
-        if (isDT) {
-            var api = $(tableEl).DataTable();
-            if (api.responsive) { tableEl.dataset.emsXcol = 'responsive'; return; }
-            if (tableEl.dataset.emsXcol === 'api') return;
-            tableEl.dataset.emsXcol = 'api';
-            /* الفهارس لا العقد: column().visible(false) ينزع الرأس من الـDOM
-               فتموت العقدة المخزنة — الفهرس ثابت في نموذج DataTables */
-            var idxs = [];
-            var headerRow = overs[0].parentNode;
-            Array.prototype.forEach.call(overs, function (th) {
-                idxs.push(Array.prototype.indexOf.call(headerRow.cells, th));
-            });
-            tableEl.dataset.emsXcolIdxs = idxs.join(',');
-            idxs.forEach(function (i) { try { api.column(i).visible(false, false); } catch (e) {} });
-            try { api.columns.adjust(); } catch (e) {}
-            ensureOverflowToggle(tableEl, overs.length);
-        } else {
-            if (tableEl.dataset.emsXcol) return;
-            tableEl.dataset.emsXcol = 'css';
-            cssToggleOverflow(tableEl, overs, false);
-            ensureOverflowToggle(tableEl, overs.length);
-        }
-    }
+    /* ── جدولٌ كالإكسل: كل الأعمدة جنبًا إلى جنبٍ وتمريرٌ أفقي ──────────
+       أُزيلت إضافةُ Responsive من النظام كلِّه (قرار المالك 2026-08-09)، ومعها
+       طيُّ CMP-03 الذي كان يخفي الأعمدةَ المحقونةَ الفائضة (class="none") إما
+       لسطرٍ تابعٍ تحت سهمٍ وإما بـcolumn().visible(false). لا شيء يُخفى الآن:
+       الجدولُ يمتدُّ بعرض محتواه ويلفُّه هذا الغلافُ بتمريرٍ أفقيّ.
 
-    function cssToggleOverflow(tableEl, overs, show) {
-        var headerRow = overs[0].parentNode;
-        var idxs = Array.prototype.map.call(overs, function (th) {
-            return Array.prototype.indexOf.call(headerRow.cells, th);
-        });
-        Array.prototype.forEach.call(overs, function (th) { th.classList.toggle('ems-xcol-off', !show); });
-        var sections = Array.prototype.slice.call(tableEl.tBodies);
-        if (tableEl.tFoot) sections.push(tableEl.tFoot);
-        sections.forEach(function (section) {
-            for (var r = 0; r < section.rows.length; r++) {
-                var row = section.rows[r];
-                if (row.cells.length !== headerRow.cells.length) continue;
-                idxs.forEach(function (i) { row.cells[i].classList.toggle('ems-xcol-off', !show); });
+       الغلافُ أبٌ مباشرٌ لـ<table> دائمًا — لا يلفُّ .dataTables_wrapper — كي
+       يبقى صندوقُ البحث وحبّةُ عدد المدخلات والترقيمُ ثابتةً بينما تنزلق
+       الأعمدةُ وحدَها. وهذا يفرض تصحيحًا: نحن نلفُّ الجدولَ قبل أن يهيّئه
+       DataTables، فإن تهيّأ بعدها أدخل بيننا .dataTables_wrapper فصار غلافُنا
+       خارجَه — نفكُّ القديمَ ونعيد اللفَّ داخلَه. */
+    /* أيُّ ems-xscroll فوق الجدولِ ليس أباه المباشر فهو غلافٌ أزاحه إدراجُ
+       .dataTables_wrapper بعد لفِّنا — يُفكُّ ويُعاد اللفُّ داخلَ الغلاف. */
+    function unwrapStaleScrollers(tableEl) {
+        var node = tableEl.parentNode;
+        var direct = tableEl.parentNode;
+        while (node && node !== document.body) {
+            var up = node.parentNode;
+            if (node !== direct && node.classList && node.classList.contains('ems-xscroll') && up) {
+                while (node.firstChild) up.insertBefore(node.firstChild, node);
+                up.removeChild(node);
             }
-        });
-    }
-
-    function xcolLabel(btn, shown, count) {
-        btn.innerHTML = '<i class="fa fa-columns"></i> ' +
-            (shown ? 'طيّ الأعمدة الإضافية' : 'الأعمدة المطوية (' + count + ')');
-    }
-
-    function ensureOverflowToggle(tableEl, count) {
-        if (tableEl.dataset.emsXcolBtn) return;
-        tableEl.dataset.emsXcolBtn = '1';
-        var host = tableEl.parentNode;
-        var wrapper = window.jQuery ? window.jQuery(tableEl).closest('.dataTables_wrapper')[0] : null;
-        if (wrapper) host = wrapper.parentNode;
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'ems-xcol-toggle';
-        btn.dataset.emsXcolCount = String(count);
-        btn.__emsXcolTable = tableEl; // ربط مباشر — التفويض يقرأه
-        xcolLabel(btn, false, count);
-        host.insertBefore(btn, wrapper || tableEl);
-    }
-
-    /* تفويض على الوثيقة: يصمد أمام أي إعادة رسمٍ أو التصاق مستمعين */
-    document.addEventListener('click', function (ev) {
-        var btn = ev.target && ev.target.closest ? ev.target.closest('.ems-xcol-toggle') : null;
-        if (!btn) return;
-        ev.preventDefault();
-        var tableEl = btn.__emsXcolTable;
-        if (!tableEl) return;
-        var count = parseInt(btn.dataset.emsXcolCount || '0', 10);
-        var shown = btn.dataset.emsXcolShown === '1';
-        shown = !shown;
-        btn.dataset.emsXcolShown = shown ? '1' : '0';
-        if (tableEl.dataset.emsXcol === 'api' && window.jQuery && window.jQuery.fn.dataTable &&
-            window.jQuery.fn.dataTable.isDataTable(tableEl)) {
-            var api = window.jQuery(tableEl).DataTable();
-            (tableEl.dataset.emsXcolIdxs || '').split(',').forEach(function (s) {
-                if (s === '') return;
-                try { api.column(parseInt(s, 10)).visible(shown, false); } catch (e) {}
-            });
-            try { api.columns.adjust(); } catch (e) {}
-        } else {
-            var overs = tableEl.querySelectorAll('th.none[data-gov], th.none[data-fn]');
-            cssToggleOverflow(tableEl, overs, shown);
+            node = up;
         }
-        xcolLabel(btn, shown, count);
-    }, true);
+    }
+
+    function ensureHorizontalScroll(tableEl) {
+        if (!tableEl.parentNode) return;
+        // جداولٌ لها غلافُ تمريرٍ خاصٌّ بها سلفًا — لا نضاعفه
+        if (tableEl.closest && tableEl.closest('.table-responsive-wrapper, .dataTables_scrollBody')) return;
+
+        unwrapStaleScrollers(tableEl);
+
+        var host = tableEl.parentNode;
+        if (!host) return;
+        if (host.classList && host.classList.contains('ems-xscroll')) return;
+
+        var box = document.createElement('div');
+        box.className = 'ems-xscroll';
+        host.insertBefore(box, tableEl);
+        box.appendChild(tableEl);
+    }
 
     function normalizeAllTables() {
         document.querySelectorAll('table').forEach(function (tableEl) {
@@ -359,7 +303,7 @@
             normalizeSortableHeaders(tableEl);
             normalizeTableSemanticCells(tableEl);
             try { padGovernanceCells(tableEl); } catch (eGov) { /* لا يعطل التوحيد */ }
-            try { collapseInjectedOverflow(tableEl); } catch (eXc) { /* لا يعطل التوحيد */ }
+            try { ensureHorizontalScroll(tableEl); } catch (eXs) { /* لا يعطل التوحيد */ }
         });
     }
 
@@ -427,7 +371,6 @@
             $table.addClass('display');
             try {
                 $table.DataTable({
-                    responsive: true,
                     autoWidth: false,
                     language: { url: '/ems/assets/i18n/datatables/ar.json' },
                     // إصلاح tn/18 من stateSave: performance-boost.js يفعّل stateSave عمومياً،
@@ -442,6 +385,133 @@
                     }
                 });
             } catch (e) { /* legacy tables may be initialized later */ }
+        });
+    }
+
+    /* ══ زرُّ التصدير إلى إكسل لكلِّ جدولِ DataTables ══════════════════════
+       قرار المالك 2026-08-09: كلُّ جدولٍ يستعمل DataTables يعرض زرَّ إكسل.
+       60 شاشةً كانت تبنيه بنفسها في تهيئتها (`buttons: [...]` مع dom:'Bfrtip')
+       و305 شاشاتٍ بلا زرٍّ أصلًا — 253 منها لا تهيّئ جدولَها بنفسها بل تعتمد
+       التهيئةَ المركزيةَ هنا. فالموضعُ الصحيحُ للحلِّ هذا الملفُّ وحدَه: نُلحق
+       الزرَّ بأيِّ نسخةِ DataTable لا تملكه، فلا يُلمس ملفُّ شاشةٍ واحد.
+
+       تحميلٌ كسول: مكتباتُ الأزرار وJSZip لا تُجلب إلا إذا وُجد جدولٌ يحتاجها،
+       والفحصُ على المتغيّرات العامّة لا على وسمِ <script> — لأن 518 شاشةً تحمّل
+       هذه الملفاتِ بنفسها، ووسمًا نُفِّذ سلفًا لا يُطلق حدثَ load مرةً أخرى. */
+    var vendorState = {};
+    function loadVendorOnce(src, done) {
+        var st = vendorState[src];
+        if (st && st.done) { done(); return; }
+        if (st) { st.queue.push(done); return; }
+        vendorState[src] = st = { done: false, queue: [done] };
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = false;
+        s.onload = s.onerror = function () {
+            st.done = true;
+            var q = st.queue; st.queue = [];
+            q.forEach(function (fn) { try { fn(); } catch (e) {} });
+        };
+        document.head.appendChild(s);
+    }
+
+    function ensureExcelDepsReady(done) {
+        var $ = window.jQuery;
+        if (!$ || !$.fn || !$.fn.dataTable) return;
+        var V = '/ems/assets/vendor/';
+        if (!window.JSZip) { loadVendorOnce(V + 'jszip/jszip.min.js', function () { ensureExcelDepsReady(done); }); return; }
+        if (!$.fn.dataTable.Buttons) { loadVendorOnce(V + 'datatables/js/dataTables.buttons.min.js', function () { ensureExcelDepsReady(done); }); return; }
+        if (!($.fn.dataTable.ext.buttons && $.fn.dataTable.ext.buttons.excelHtml5)) {
+            loadVendorOnce(V + 'datatables/js/buttons.html5.min.js', function () { ensureExcelDepsReady(done); }); return;
+        }
+        done();
+    }
+
+    /* أعمدةُ الأفعال لا تُصدَّر: خلاياها أزرارٌ وروابطُ لا بيانات. */
+    var ACTION_HEAD = /^(الإجراءات|إجراءات|العمليات|عمليات|الخيارات|خيارات|أدوات|الأدوات|التحكم|actions?|options?|tools?|manage)$/i;
+    function isExportableColumn(api, idx) {
+        var th = api.column(idx).header();
+        if (!th) return true;
+        if (th.classList && (th.classList.contains('no-export') || th.hasAttribute('data-no-export'))) return false;
+        return !ACTION_HEAD.test((th.textContent || '').trim());
+    }
+
+    function exportBaseName() {
+        var head = document.querySelector('.main_head h1, .main_head h2, .main_head');
+        var name = head ? (head.textContent || '').trim().split('\n')[0].trim() : '';
+        if (!name) name = (document.title || 'تصدير').split('|')[0].trim();
+        return name.replace(/[\\\/\[\]\*\?:]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 28) || 'تصدير';
+    }
+
+    function ensureExcelButton(tableEl) {
+        var $ = window.jQuery;
+        if (!$ || !$.fn.dataTable || !$.fn.dataTable.isDataTable(tableEl)) return;
+        if (tableEl.dataset.emsXlsx === '1') return;
+        var api = $(tableEl).DataTable();
+        var container = api.table().container();
+        // زرُّ إكسل موجودٌ سلفًا من تهيئة الشاشة — لا نضاعفه
+        if (container && container.querySelector('.buttons-excel')) { tableEl.dataset.emsXlsx = 'own'; return; }
+        if (!$.fn.dataTable.Buttons) return;
+        tableEl.dataset.emsXlsx = '1';
+
+        var title = exportBaseName();
+        var btns = new $.fn.dataTable.Buttons(api, {
+            buttons: [{
+                extend: 'excelHtml5',
+                text: '📊 Excel',
+                className: 'ems-xlsx-btn',
+                title: title,
+                filename: title,
+                exportOptions: {
+                    columns: function (idx) { return isExportableColumn(api, idx); },
+                    stripHtml: true,
+                    trim: true
+                },
+                customize: function (xlsx) {
+                    /* ورقةٌ من اليمين لليسار — البياناتُ عربيةٌ في كل الشاشات.
+                       قالبُ excelHtml5 لا يُصدِر <sheetViews> أصلًا، فضبطُ الخاصية
+                       على عنصرٍ موجودٍ لا يفعل شيئًا صامتًا — يلزم إنشاؤه وإدراجُه
+                       قبل <cols> لأن ترتيبَ عناصر OOXML مُلزِم. */
+                    try {
+                        var doc = xlsx.xl.worksheets['sheet1.xml'];
+                        var existing = doc.getElementsByTagName('sheetView')[0];
+                        if (existing) { existing.setAttribute('rightToLeft', '1'); return; }
+                        var ws = doc.getElementsByTagName('worksheet')[0];
+                        if (!ws) return;
+                        var NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+                        var views = doc.createElementNS(NS, 'sheetViews');
+                        var view = doc.createElementNS(NS, 'sheetView');
+                        view.setAttribute('workbookViewId', '0');
+                        view.setAttribute('rightToLeft', '1');
+                        views.appendChild(view);
+                        ws.insertBefore(views, ws.firstChild);
+                    } catch (e) { /* التصدير يتم بلا اتجاه — لا نُفشله */ }
+                }
+            }]
+        });
+        var host = document.createElement('div');
+        host.className = 'ems-auto-buttons';
+        /* المرساةُ .dataTables_wrapper لا .ems-xscroll: غلافُ التمرير يُفكُّ
+           ويُعاد بناؤه داخل الوعاء بعد التهيئة (unwrapStaleScrollers)، فزرٌّ
+           مُعلَّقٌ عليه يبقى يتيمًا في .main حين يزول. الوعاءُ ثابت. */
+        container = api.table().container();
+        if (!container) { tableEl.dataset.emsXlsx = ''; return; }
+        container.insertBefore(host, container.firstChild);
+        $(host).append(btns.container());
+    }
+
+    function attachExcelButtons() {
+        var $ = window.jQuery;
+        if (!$ || !$.fn || !$.fn.dataTable) return;
+        var pending = [];
+        $('table').each(function () {
+            if ($.fn.dataTable.isDataTable(this) && this.dataset.emsXlsx !== '1' && this.dataset.emsXlsx !== 'own') {
+                pending.push(this);
+            }
+        });
+        if (!pending.length) return;
+        ensureExcelDepsReady(function () {
+            pending.forEach(function (t) { try { ensureExcelButton(t); } catch (e) { /* لا يعطل الصفحة */ } });
         });
     }
 
@@ -465,30 +535,31 @@
         if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) { done(); return; }
         var jquerySrc = '/ems/assets/vendor/jquery-3.7.1.min.js';
         var dtSrc = '/ems/assets/vendor/datatables/js/jquery.dataTables.min.js';
-        var dtResponsiveSrc = '/ems/assets/vendor/datatables/js/dataTables.responsive.min.js';
+        // إضافةُ Responsive مرفوعةٌ من النظام: لا تُحمَّل ولا يُنتظر تحميلُها.
         var loadDataTables = function () {
-            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
-                // CMP-03 ①(توصية): صفحةٌ حمّلت DataTables بنفسها بلا إضافة Responsive —
-                // نحمّلها كي يعمل انهيارُ class="none" لسطرٍ تابعٍ في الجداول المهيأة لاحقًا.
-                if (!window.jQuery.fn.dataTable.Responsive) { loadScriptOnce(dtResponsiveSrc, done); return; }
-                done(); return;
-            }
-            loadScriptOnce(dtSrc, function () { loadScriptOnce(dtResponsiveSrc, done); });
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) { done(); return; }
+            loadScriptOnce(dtSrc, done);
         };
         if (!window.jQuery) { loadScriptOnce(jquerySrc, loadDataTables); return; }
         loadDataTables();
     }
 
-    function bootUnifiedTables() {
+    function sweepTables() {
         normalizeAllTables();
-        ensureDataTablesReady(initializeMissingDataTables);
-        setTimeout(function () { normalizeAllTables(); ensureDataTablesReady(initializeMissingDataTables); }, 250);
-        setTimeout(function () { normalizeAllTables(); ensureDataTablesReady(initializeMissingDataTables); }, 900);
+        ensureDataTablesReady(function () {
+            initializeMissingDataTables();
+            // بعد التهيئة لا قبلَها: الزرُّ يُلحق بنسخةٍ قائمة — وهذا يشمل
+            // الجداولَ التي هيّأتها الشاشةُ بنفسها لا التهيئةَ المركزيةَ فقط.
+            attachExcelButtons();
+        });
+    }
+
+    function bootUnifiedTables() {
+        sweepTables();
+        setTimeout(sweepTables, 250);
+        setTimeout(sweepTables, 900);
         if (window.MutationObserver) {
-            var observer = new MutationObserver(function () {
-                normalizeAllTables();
-                ensureDataTablesReady(initializeMissingDataTables);
-            });
+            var observer = new MutationObserver(sweepTables);
             observer.observe(document.body, { childList: true, subtree: true });
         }
     }
@@ -552,7 +623,11 @@
             if (!window.jQuery || !window.jQuery.fn) { return false; }
             window.jQuery(document).ajaxError(function (ev, xhr, settings) {
                 if (xhr && xhr.statusText === 'abort') { return; }
-                err.textContent = 'تعذر الطلب (' + (xhr && xhr.status ? xhr.status : 'شبكة') + ') — أعد المحاولة أو أبلغ الدعم';
+                var text = 'تعذر الطلب (' + (xhr && xhr.status ? xhr.status : 'شبكة') + ') — أعد المحاولة أو أبلغ الدعم';
+                // مصدرٌ واحدٌ للرسائل: نظام التوست الموحّد إن حضر، واللافتةُ
+                // القديمة احتياطًا فحسب — لا لغتان بصريتان لخطأٍ واحد.
+                if (window.EmsAlert && window.EmsAlert.error) { window.EmsAlert.error(text); return; }
+                err.textContent = text;
                 err.style.display = 'block';
                 setTimeout(function () { err.style.display = 'none'; }, 6000);
             });
