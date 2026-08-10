@@ -292,6 +292,50 @@ neg('AC-U0', 'حارسُ بنيةِ الصفحة — يرسب عند إغلاق�
     }
 );
 
+/* ══ AC-U4 · حارسُ الحدِّ الأدنى للأعمدة ═══════════════════════════════════
+   ثلاثةُ إفساداتٍ لثلاثةِ أوجهٍ من الحكمِ الواحد: أن يبيّنَ الحارسُ السببَ ·
+   أن يتراجعَ فعلًا · وأن يتبنّاه الطريقُ الحيُّ (المجموعاتُ على 96 شاشة).
+   ◆ وأولُ صيغةٍ من الفاحصِ نجت من الإفسادِ الأول: كانت تكتفي بذكرِ `EmsAlert`
+     في الملف، فنزعُ النداءِ نفسِه لم يُسقطها. أرسبها هذا الاختبارُ فشُدّت. */
+$u4check = function () use ($ROOT) {
+    $out = (string) @shell_exec(escapeshellarg(PHP_BINARY) . ' '
+         . escapeshellarg($ROOT . '/tools/fix_ui_gate.php') . ' 2>&1');
+    if (strpos($out, 'AC-U4') === false) {
+        return array('ok' => false, 'evidence' => 'المعيارُ غائبٌ عن البوابة');
+    }
+    $ok = (strpos($out, '✔ AC-U4') !== false);
+    return array('ok' => $ok, 'evidence' => $ok ? 'الطرقُ الثلاثُ متبنّية' : 'طريقٌ بلا حارس');
+};
+
+neg('AC-U4/بيان', 'حارسُ الأعمدة — يرسب إن منع بلا أن يبيّن السبب',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/assets/js/ems-column-floor.js';
+        $src = (string) file_get_contents($abs);
+        $broken = str_replace('window.EmsAlert.warning(text);', '/* NEG-TEST */', $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على نداءِ التنبيه'); }
+        return neg_swap($abs, $broken);
+    }, $u4check);
+
+neg('AC-U4/تراجع', 'حارسُ الأعمدة — يرسب إن اكتفى بالبيانِ بلا تراجع',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/assets/js/ems-column-floor.js';
+        $src = (string) file_get_contents($abs);
+        $broken = str_replace("if (typeof opts.revert === 'function') { opts.revert(); }", '', $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على نداءِ التراجع'); }
+        return neg_swap($abs, $broken);
+    }, $u4check);
+
+neg('AC-U4/تبنٍّ', 'حارسُ الأعمدة — يرسب إن عاد طريقٌ حيٌّ يُخفي بلا حارس',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/assets/js/column-groups.js';
+        $src = (string) file_get_contents($abs);
+        // إفسادٌ مطابقٌ للحالِ قبلَ العلاج: `setAll` تُخفي مباشرةً بلا حارس
+        $broken = preg_replace('/return this\.guarded\(function \(\) \{\s*self\.groups\.forEach/',
+                               'self.groups.forEach', $src, 1);
+        if ($broken === null || $broken === $src) { throw new RuntimeException('لم يُعثر على setAll المحروسة'); }
+        return neg_swap($abs, $broken);
+    }, $u4check);
+
 /* ── الحصيلة ───────────────────────────────────────────────────────────── */
 $valid = 0; $invalid = array();
 foreach ($RESULTS as $r) { if ($r['valid']) { $valid++; } else { $invalid[] = $r['code']; } }

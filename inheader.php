@@ -68,12 +68,14 @@ if (!function_exists('ems_css_ver')) {
     <script src="/ems/assets/js/ems-alerts.js<?php $__altjs=__DIR__.'/assets/js/ems-alerts.js'; echo is_file($__altjs)?('?v='.filemtime($__altjs)):''; ?>"></script>
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js<?php $__uijs=__DIR__.'/assets/js/ui-unification.js'; echo is_file($__uijs)?('?v='.filemtime($__uijs)):''; ?>" defer></script>
+    <!-- حارس الحد الأدنى للأعمدة (AC-U4): مصدرٌ واحدٌ يقيس ويبيّن — يسبق مستهلكيه -->
+    <script src="/ems/assets/js/ems-column-floor.js<?php $__cfjs=__DIR__.'/assets/js/ems-column-floor.js'; echo is_file($__cfjs)?('?v='.filemtime($__cfjs)):''; ?>"></script>
     <!-- نواة مكونات الواجهة (UXR-01 UI-01..20): الحالات والبطاقات وحارس صفر الأعمدة -->
     <script src="/ems/assets/js/ems-components.js<?php $__cmpjs=__DIR__.'/assets/js/ems-components.js'; echo is_file($__cmpjs)?('?v='.filemtime($__cmpjs)):''; ?>" defer></script>
     <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->
-    <script src="/ems/assets/js/column-groups.js" defer></script>
+    <script src="/ems/assets/js/column-groups.js<?php $__cgjs=__DIR__.'/assets/js/column-groups.js'; echo is_file($__cgjs)?('?v='.filemtime($__cgjs)):''; ?>" defer></script>
     <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
-    <script src="/ems/assets/js/ems-details-modal.js" defer></script>
+    <script src="/ems/assets/js/ems-details-modal.js<?php $__dmjs=__DIR__.'/assets/js/ems-details-modal.js'; echo is_file($__dmjs)?('?v='.filemtime($__dmjs)):''; ?>" defer></script>
     <!-- بطاقة «عن الشاشة» الموحّدة: تبني القالبَ الصادرَ من screen_contract.php
          في موضعه الصحيح (تحت الرأس) وتزرع زرَّه — راجع رأس الملف للعلّة. -->
     <script src="/ems/assets/js/ems-screen-about.js<?php $__abtjs=__DIR__.'/assets/js/ems-screen-about.js'; echo is_file($__abtjs)?('?v='.filemtime($__abtjs)):''; ?>" defer></script>

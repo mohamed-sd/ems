@@ -193,25 +193,42 @@
         return wrap;
     };
 
-    /* ── U6: حارس صفر الأعمدة (UI-05/06) — على DataTables وEmsColumnGroups ─ */
+    /* ── U6: حارس صفر الأعمدة (UI-05/06 · AC-U4 · SH-05/3) ─────────────────
+       ◆ كان هذا الحارسُ مبنيًّا غيرَ متبنًّى — عيبُ MD-05 حرفيًّا: `guardColumnVisibility`
+         مصدَّرةٌ بصفرِ مستهلك، ومستعمِلوها الوحيدون أداتان تفحصان أنها **بُنيت**.
+         وفي الوقتِ نفسِه كان الطريقُ الحيُّ — `EmsColumnGroups` على 96 شاشة —
+         بلا حدٍّ أدنى أصلًا، و`setAll(false)` يبلغ الصفرَ بنقرةٍ واحدة.
+       ◆ وكان أضيقَ من حكمِه في وجهين: يغطي DataTables وحدَه دونَ الطريقين
+         الآخرين (صنفُ `group-hidden` · و`display:none` في منتقي المناظر)،
+         و«يبيّن السبب» في `console.warn` — أي لا يبيّنه لمن يحتاجه.
+       ◆ فصار القياسُ والبيانُ في `EmsColumnFloor` مصدرًا واحدًا، وهذا الخطّاف
+         يبقى لأنه يمسك طريقًا ثالثًا: تبديلَ الرؤيةِ من DataTables مباشرة. */
     function visibleColCount(api) {
         var n = 0;
         api.columns().every(function () { if (this.visible()) { n++; } });
         return n;
     }
+    function floorOf() {
+        return (window.EmsColumnFloor && window.EmsColumnFloor.FLOOR) || 1;
+    }
+    function sayFloor(reason) {
+        var text = 'لا يمكن إخفاءُ كلِّ الأعمدة: يبقى عمودٌ واحدٌ على الأقلّ وإلا صار '
+                 + 'الجدولُ فارغًا' + (reason ? ' (' + reason + ')' : '') + '.';
+        if (window.EmsAlert && window.EmsAlert.warning) { window.EmsAlert.warning(text); }
+        else if (window.console) { console.warn(text); }
+    }
     if (window.jQuery && jQuery.fn && jQuery.fn.dataTable) {
         jQuery(document).on('column-visibility.dt', function (e, settings, column, state) {
             if (state !== false) { return; }
             var api = new jQuery.fn.dataTable.Api(settings);
-            if (visibleColCount(api) === 0) {
-                // الحارس: أعد إظهار العمود فورًا — لا يُسمح ببلوغ صفر أعمدة
-                api.column(column).visible(true);
-                if (window.console) { console.warn('EmsUI: حارس صفر الأعمدة أعاد العمود ' + column); }
+            if (visibleColCount(api) < floorOf()) {
+                api.column(column).visible(true);   // أعِد العمودَ فورًا
+                sayFloor('إخفاء عمود');
             }
         });
     }
     EmsUI.guardColumnVisibility = function (api, columnIdx, wantVisible) {
-        if (!wantVisible && visibleColCount(api) <= 1) { return false; }
+        if (!wantVisible && visibleColCount(api) <= floorOf()) { sayFloor('إخفاء عمود'); return false; }
         api.column(columnIdx).visible(wantVisible);
         return true;
     };

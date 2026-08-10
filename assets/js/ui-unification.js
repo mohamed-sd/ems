@@ -1017,10 +1017,31 @@
                 }
             }
 
+            /* حارسُ الحدِّ الأدنى (AC-U4): منظرٌ محفوظٌ بأعمدةٍ كلُّها خارجَ هذا
+               الجدولِ (شاشةٌ تغيّرت أعمدتُها بعدَ بذرِ المنظر) يُفرغ الجدولَ.
+               فيُطبَّق ثم يُقاس، وإن هبط عن الحدِّ عاد المنتقي لسابقِ اختياره. */
+            var lastPick = sel.selectedIndex;
             sel.addEventListener('change', function () {
                 var o = sel.options[sel.selectedIndex];
                 var raw = o.getAttribute('data-cols');
-                applyColumns(raw ? JSON.parse(raw) : null);
+                var prev = lastPick;
+                var kept = true;
+                if (window.EmsColumnFloor) {
+                    kept = window.EmsColumnFloor.attempt({
+                        tables: [tb],
+                        reason: 'منظرٌ محفوظ',
+                        apply: function () { applyColumns(raw ? JSON.parse(raw) : null); },
+                        revert: function () {
+                            sel.selectedIndex = prev;
+                            var po = sel.options[prev];
+                            var praw = po ? po.getAttribute('data-cols') : null;
+                            applyColumns(praw ? JSON.parse(praw) : null);
+                        }
+                    });
+                } else {
+                    applyColumns(raw ? JSON.parse(raw) : null);
+                }
+                if (kept) { lastPick = sel.selectedIndex; }
             });
 
             var screen = (location.pathname.replace(/^\/ems\//, '') || '').split('?')[0];

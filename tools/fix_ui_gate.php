@@ -238,6 +238,58 @@ u('AC-U3', 'أربعةُ أصنافِ أزرارٍ لا مئةٌ وأربعةٌ 
     count($btnClasses) . ' نمطًا دلاليًّا عبرَ ' . $btnUses . ' استعمالًا · ◆ أحجامٌ وأغلفةٌ (لا تُعَدّ): ' . $btnSkipped
         . ($btnClasses ? ' · ' . implode(' · ', array_slice(array_keys($btnClasses), 0, 8)) : ''));
 
+/* ══ AC-U4 · صفرُ جدولٍ يبلغ صفرَ أعمدة ═══════════════════════════════════
+   الحكم: «محاولةُ إخفاءِ الكلِّ تُرفض» — ومعه شرطُ SH-05/3: «حارسٌ يمنع النزولَ
+   تحتَ حدٍّ أدنى **ويبيّن السبب**». فالمقياسُ **تبنٍّ** لا وجود (MD-05): كان
+   في النظامِ حارسٌ مبنيٌّ بصفرِ مستهلك — مستعمِلوه الوحيدون أداتان تفحصان أنه
+   بُني — بينما الطريقُ الحيُّ (`EmsColumnGroups` على 96 شاشة) بلا حدٍّ أصلًا.
+   فتُعدُّ الطرقُ الثلاثُ التي تُخفي أعمدةً، ويُشترط أن يمرَّ كلٌّ منها بالحارس.
+   ◆ وقد قِيس حيًّا على شاشةِ المعدات: بلا حارسٍ يبلغ الجدولُ **صفرَ أعمدة**؛
+     وبه يعود إلى 39 وتظهر لافتةٌ تبيّن السبب — في طريقِ المجموعاتِ والمنتقي معًا. */
+$floorSrc = (string) @file_get_contents($ROOT . '/assets/js/ems-column-floor.js');
+$cgSrc    = (string) @file_get_contents($ROOT . '/assets/js/column-groups.js');
+$cmpSrc   = (string) @file_get_contents($ROOT . '/assets/js/ems-components.js');
+$uiSrc    = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
+$hdrSrc   = (string) @file_get_contents($ROOT . '/inheader.php');
+
+/* الحارسُ يقيس **ويبيّن**: قياسٌ بلا بيانٍ منعٌ صامتٌ — عطلٌ آخرُ لا علاج.
+   ◆ ولا يكفي ذكرُ `EmsAlert`: أرسبَ الاختبارُ السلبيُّ صيغةً أولى كانت تكتفي
+     بالذكر، فنزعُ النداءِ نفسِه لم يُسقطها. فيُشترط **نداءٌ فعليٌّ** بقناةِ
+     التنبيه، وتراجعٌ فعليٌّ (`revert`) — لا مجردُ اسمٍ في الملف. */
+$floorOk = ($floorSrc !== ''
+    && strpos($floorSrc, 'window.EmsColumnFloor') !== false
+    && preg_match('/EmsAlert\.warning\s*\(/', $floorSrc)
+    && preg_match('/opts\.revert\s*\(\s*\)/', $floorSrc));
+
+$U4_PATHS = array(
+    'مجموعاتُ الأعمدة (setAll/toggleGroup)' =>
+        (strpos($cgSrc, 'EmsColumnFloor') !== false
+         && preg_match('/toggleGroup\s*=\s*function[\s\S]{0,220}?guarded\s*\(/', $cgSrc)
+         && preg_match('/setAll\s*=\s*function[\s\S]{0,220}?guarded\s*\(/', $cgSrc)),
+    'منتقي المناظرِ المحفوظة' =>
+        (strpos($uiSrc, 'EmsColumnFloor') !== false
+         && preg_match('/addEventListener\(\s*[\'"]change[\'"][\s\S]{0,400}?EmsColumnFloor/', $uiSrc)),
+    'تبديلُ رؤيةِ عمودٍ من DataTables' =>
+        (strpos($cmpSrc, 'column-visibility.dt') !== false
+         && strpos($cmpSrc, 'sayFloor') !== false),
+);
+$u4Bad = array();
+foreach ($U4_PATHS as $name => $ok) { if (!$ok) { $u4Bad[] = $name; } }
+
+/* ومحمَّلٌ في القشرةِ بمُبطِلِ ذاكرةٍ مؤقتة — وإلا خدم المتصفحُ نسخةً قديمةً
+   بلا حارس، وهو عطلٌ وقعنا فيه من قبلُ مع ملفِّ الرموز. */
+$floorLoaded = (bool) preg_match('#ems-column-floor\.js<\?php[^>]*filemtime#', $hdrSrc);
+
+u('AC-U4', 'صفرُ جدولٍ يبلغ صفرَ أعمدة — ومحاولةُ إخفاءِ الكلِّ تُرفض بسببٍ مُبيَّن',
+    'يعدُّ طرقَ إخفاءِ الأعمدةِ الثلاثَ ويشترط مرورَ كلٍّ منها بحارسِ الحدِّ الأدنى المحمَّلِ في القشرة',
+    'لا يقيس شاشةً تُخفي أعمدةً برمزٍ خاصٍّ بها خارجَ الطرقِ الثلاث — تُقاس بالتصيير',
+    ($floorOk && $floorLoaded && !$u4Bad),
+    'الحارس: ' . ($floorOk ? 'يقيس ويبيّن' : 'ناقص')
+        . ' · محمَّلٌ في القشرة: ' . ($floorLoaded ? 'نعم بمُبطِلِ ذاكرة' : 'لا')
+        . ' · طرقٌ متبنّيةٌ: ' . (count($U4_PATHS) - count($u4Bad)) . '/' . count($U4_PATHS)
+        . ($u4Bad ? ' · غيرُ متبنٍّ: ' . implode(' · ', $u4Bad) : '')
+        . ' · ◆ مقيسٌ حيًّا: بلا حارسٍ 0 عمودًا · به 39 ولافتةٌ تبيّن السبب');
+
 /* ══ AC-U5/U6 · المناظرُ المحفوظةُ وحالاتُ الفراغ ═════════════════════════ */
 $db = fix_db();
 $viewsTable = (int) fix_one($db, "SELECT COUNT(*) FROM information_schema.TABLES

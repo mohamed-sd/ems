@@ -187,20 +187,56 @@
     }
   };
 
-  Controller.prototype.toggleGroup = function (group) {
-    this.state[group] = this.state[group] === false; // flip
-    this.applyGroup(group, true);
+  // عناصرُ الجداولِ في نطاقِ هذا المتحكّم — يقيس عليها حارسُ الحدِّ الأدنى.
+  Controller.prototype.tableEls = function () {
+    return asArray(this.scope.querySelectorAll('table'));
+  };
+
+  /**
+   * ينفّذ تغييرَ رؤيةٍ خلفَ حارسِ الحدِّ الأدنى (AC-U4): إن بلغ الجدولُ صفرَ
+   * أعمدةٍ تراجَع الحارسُ وبيّن السبب. والحالةُ لا تُحفظ إلا إن بقي التغيير —
+   * وإلا عاد الإخفاءُ الممنوعُ مع أولِ تحميثٍ للصفحة.
+   */
+  Controller.prototype.guarded = function (mutate, reason) {
+    var self = this;
+    var before = JSON.parse(JSON.stringify(this.state));
+    var kept = true;
+
+    if (window.EmsColumnFloor) {
+      kept = window.EmsColumnFloor.attempt({
+        tables: this.tableEls(),
+        reason: reason,
+        apply: mutate,
+        revert: function () {
+          self.state = before;
+          self.groups.forEach(function (g) { self.applyGroup(g, false); });
+          if (self.mode === 'datatable') self.dtRefresh();
+        }
+      });
+    } else {
+      mutate();   // الحارسُ غيرُ محمَّل — لا نشلُّ الشاشة
+    }
+
     this.syncAllButton();
-    this.saveState();
+    if (kept) this.saveState();
+    return kept;
+  };
+
+  Controller.prototype.toggleGroup = function (group) {
+    var self = this;
+    return this.guarded(function () {
+      self.state[group] = self.state[group] === false; // flip
+      self.applyGroup(group, true);
+    }, 'إخفاء مجموعة');
   };
 
   Controller.prototype.setAll = function (visible) {
     var self = this;
-    this.groups.forEach(function (g) { self.state[g] = visible; });
-    this.groups.forEach(function (g) { self.applyGroup(g, false); });
-    if (this.mode === 'datatable') this.dtRefresh();
-    this.syncAllButton();
-    this.saveState();
+    return this.guarded(function () {
+      self.groups.forEach(function (g) { self.state[g] = visible; });
+      self.groups.forEach(function (g) { self.applyGroup(g, false); });
+      if (self.mode === 'datatable') self.dtRefresh();
+    }, 'إخفاء الكل');
   };
 
   Controller.prototype.bind = function () {
