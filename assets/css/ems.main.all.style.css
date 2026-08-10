@@ -91,6 +91,12 @@ samp,
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
 }
 
+/* SH-08/4 — وردةُ بوتستراب للرمز (#d63384) تبلغ 3.61:1 على الأبيض، وهي دونَ
+   الحدّ. والملفُّ ليس من تأليفِنا فلا يُحرَّر — يُتجاوَز برمزِنا المقيسِ 6.4:1. */
+code {
+  color: var(--c-code-ink);
+}
+
 
 /* ══════════════════════════════════════════════════════════════
    SECTION 8 — UNIFIED TABLES (alltables)
@@ -870,7 +876,7 @@ samp,
   margin-right: 6px;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--c-ff3b5f) 0%, var(--c-f02849) 48%, var(--c-d90429) 100%);
-  color: var(--c-surface);
+  color: var(--c-ink-900);
   font-size: 0.58rem;
   line-height: 1;
   font-weight: 900;
@@ -13281,3 +13287,29 @@ body.ems-site .main.ems-unified-page-shell > .card .table-container {
 .allstatus-card{
   background-color: red;
 }
+
+/* ══ AC-U8 · SH-08 — رابطُ التخطّي إلى المحتوى ═════════════════════════════
+   مخفيٌّ خارجَ الشاشةِ حتى يُركَّز عليه، لا بـ`display:none` — فالمخفيُّ بذاك
+   لا تبلغه لوحةُ المفاتيحِ أصلًا، فيصير الرابطُ زينةً لا وظيفة. */
+.ems-skip-link {
+  position: absolute;
+  inset-inline-start: 8px;
+  top: -60px;
+  z-index: 10000;
+  padding: 10px 18px;
+  border-radius: 0 0 8px 8px;
+  background: var(--c-brand-navy);
+  color: var(--c-surface);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top .16s ease;
+}
+.ems-skip-link:focus,
+.ems-skip-link:focus-visible {
+  top: 0;
+  outline: 3px solid var(--c-brand-gold);
+  outline-offset: 2px;
+}
+/* هدفُ التخطّي يُركَّز عليه برمجيًّا (tabindex="-1")، فتُكتم حلقتُه: التركيزُ
+   هنا نقلةٌ لا تفاعل، وإظهارُ حلقةٍ على كتلةِ المحتوى كلِّها ضجيجٌ بصريّ. */
+#ems-main-content:focus { outline: none; }

@@ -47,6 +47,22 @@ function ems_ui_boot_body($js)
     return '';
 }
 
+/**
+ * أنداءُ نداءٍ **حيٍّ** داخلَ `boot()`؟ — لا مجردُ ذكرٍ لاسمِه.
+ * ◆ أرسبَ الاختبارُ السلبيُّ الصيغةَ الأولى: `if (false) { bootX(); }` أبقى
+ *   الاسمَ فمرَّ الفحصُ على فرعٍ ميت. فالنداءُ المحاطُ بشرطٍ حرفيِّ الكذبِ
+ *   (`if (false)` · `if (0)`) لا يُحتسب — وهو أشيعُ صورِ التعطيلِ المؤقتِ التي
+ *   تُنسى فتبقى.
+ */
+function ems_ui_boot_calls($js, $fn)
+{
+    $body = ems_ui_boot_body($js);
+    if ($body === '') { return false; }
+    $body = preg_replace('#/\*[\s\S]*?\*/|//[^\n]*#', '', $body);
+    $body = preg_replace('/\bif\s*\(\s*(false|0)\s*\)\s*\{[^}]*\}/i', '', $body);
+    return strpos($body, $fn . '(') !== false;
+}
+
 function ui_files($ROOT, array $exts)
 {
     $out = array();
@@ -290,6 +306,120 @@ u('AC-U4', 'صفرُ جدولٍ يبلغ صفرَ أعمدة — ومحاولة�
         . ($u4Bad ? ' · غيرُ متبنٍّ: ' . implode(' · ', $u4Bad) : '')
         . ' · ◆ مقيسٌ حيًّا: بلا حارسٍ 0 عمودًا · به 39 ولافتةٌ تبيّن السبب');
 
+/* ══ AC-U8 · دورةٌ كاملةٌ بلوحةِ المفاتيحِ في كلِّ قالب ════════════════════
+   شاهدُ الوثيقةِ «اختبارٌ يدويٌّ موثَّقٌ بلقطة» — واللقطةُ تُثبت لحظةً لا حالةً،
+   ولا ترسب حين ينكسر ما أثبتَته. فيُقاس ما يكسر الدورةَ فعلًا، أربعةَ أوجه:
+     ① رابطُ تخطٍّ في القشرة، مخفيٌّ بالإزاحةِ لا بـ`display:none` — فالمخفيُّ
+        بذاك لا تبلغه لوحةُ المفاتيحِ أصلًا، فيصير زينةً لا وظيفة.
+     ② صفرُ `tabindex` موجب — الموجبُ يقفز فوقَ ترتيبِ المستندِ فيربك الدورة.
+     ③ صفرُ قاعدةٍ تُلغي حلقةَ التركيزِ بلا بديلٍ ظاهر.
+     ④ رابطُ الوصولِ حيٌّ في `boot()` — يمنح ما يحمل `onclick` وهو غيرُ قابلٍ
+        للتركيزِ موضعًا في الدورةِ ودورًا ومفتاحين.
+   ◆ ومقيسٌ حيًّا: أولُ Tab يقع على رابطِ التخطّي وتظهر حلقتُه (3 بكسلات)،
+     وتفعيلُه ينقل التركيزَ إلى `#ems-main-content`؛ و«الموظفون» هبطت من
+     10 عناصرَ لا تبلغها لوحةُ المفاتيحِ إلى صفر، وEnter يفعّلها. */
+$hdrKb  = (string) @file_get_contents($ROOT . '/inheader.php');
+$cssAll = '';
+foreach (glob($ROOT . '/assets/css/*.css') as $cf) {
+    $bn = basename($cf); $isV = false;
+    foreach ($VENDOR_CSS as $v) { if (stripos($bn, $v) !== false) { $isV = true; break; } }
+    if (!$isV) { $cssAll .= preg_replace('#/\*[\s\S]*?\*/#', '', (string) file_get_contents($cf)); }
+}
+$uiKb = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
+
+$skipInShell = (strpos($hdrKb, 'ems-skip-link') !== false
+             && strpos($hdrKb, '#ems-main-content') !== false);
+/* والإخفاءُ بالإزاحةِ لا بالحجب: `display:none` يُخرجه من الدورةِ فيبطل. */
+$skipStyled = (bool) preg_match('/\.ems-skip-link\s*\{[^}]*position\s*:\s*absolute[^}]*\}/i', $cssAll)
+           && !preg_match('/\.ems-skip-link\s*\{[^}]*display\s*:\s*none/i', $cssAll)
+           && (bool) preg_match('/\.ems-skip-link:focus[^{]*\{[^}]*top\s*:\s*0/i', $cssAll);
+$reachLive = (ems_ui_boot_calls($uiKb, 'bootKeyboardReach'));
+
+$posTab = 0; $posTabFiles = array();
+foreach (fix_surface_files($ROOT) as $rel) {
+    $s = fix_blank_comments((string) @file_get_contents($ROOT . '/' . $rel));
+    if (preg_match_all('/tabindex\s*=\s*["\']?([1-9][0-9]*)/i', $s, $mt)) {
+        $posTab += count($mt[1]); $posTabFiles[$rel] = count($mt[1]);
+    }
+}
+/* حلقةٌ مُلغاةٌ بلا بديل: البديلُ ظلٌّ أو حدٌّ أو خلفيةٌ في القاعدةِ نفسِها. */
+$bareKill = 0;
+if (preg_match_all('/([^{}]+)\{([^}]*)\}/', $cssAll, $mk, PREG_SET_ORDER)) {
+    foreach ($mk as $r) {
+        if (!preg_match('/outline\s*:\s*(none|0)\b/i', $r[2])) { continue; }
+        if (preg_match('/box-shadow\s*:\s*(?!none)/i', $r[2])
+            || preg_match('/border(-[a-z]+)?-color\s*:/i', $r[2])
+            || preg_match('/\bborder\s*:\s*[^;]*(solid|dashed)/i', $r[2])
+            || preg_match('/outline\s*:\s*(?!none|0)/i', $r[2])
+            || preg_match('/background(-color)?\s*:/i', $r[2])) { continue; }
+        $bareKill++;
+    }
+}
+
+u('AC-U8', 'دورةٌ كاملةٌ بلوحةِ المفاتيحِ في كلِّ قالب',
+    'يفحص رابطَ التخطّي وإخفاءَه بالإزاحة، وصفرَ tabindex موجب، وصفرَ حلقةٍ مُلغاةٍ بلا بديل، وحياةَ رابطِ الوصول',
+    'لا يقيس مصائدَ التركيزِ داخلَ النوافذِ المنبثقة — تُقاس بالتصيير',
+    ($skipInShell && $skipStyled && $reachLive && $posTab === 0 && $bareKill === 0),
+    'رابطُ التخطّي: ' . ($skipInShell ? 'في القشرة' : 'غائب')
+        . ' · مخفيٌّ بالإزاحةِ لا بالحجب: ' . ($skipStyled ? 'نعم' : 'لا')
+        . ' · رابطُ الوصولِ حيٌّ في boot: ' . ($reachLive ? 'نعم' : 'لا')
+        . ' · tabindex موجب: ' . $posTab
+        . ' · حلقاتٌ مُلغاةٌ بلا بديل: ' . $bareKill
+        . ' · ◆ مقيسٌ حيًّا: «الموظفون» 10 ← 0 عنصرًا لا تبلغه لوحةُ المفاتيح');
+
+/* ══ SH-08/4 · تباينُ اللونِ يبلغ الحدَّ المعياريّ ═════════════════════════
+   قِيس حيًّا على خمسِ شاشاتٍ (7,000+ عنصر) فرسب 76 زوجًا ثم صفر. والقياسُ
+   الحيُّ لحظةٌ لا حارس، فتُثبَّت الأزواجُ المُصلَحةُ هنا بحسابِ WCAG من قيمِ
+   الرموزِ نفسِها: من أعاد رمزًا إلى قيمتِه الراسبةِ أرسبَ البوابةَ فورًا.
+   ◆ ولا يُقاس ما لا يُرى ساكنًا: زوجٌ ينشأ من تراكبِ شفافياتٍ وقتَ التصيير
+     لا تبلغه قراءةُ الملفّ — وهو معلَنٌ في «لا يقيس». */
+function ems_hex_lum($hex)
+{
+    $hex = ltrim(trim($hex), '#');
+    if (strlen($hex) === 3) { $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2]; }
+    if (strlen($hex) !== 6) { return null; }
+    $ch = array();
+    foreach (array(0, 2, 4) as $i) {
+        $v = hexdec(substr($hex, $i, 2)) / 255;
+        $ch[] = ($v <= 0.03928) ? $v / 12.92 : pow(($v + 0.055) / 1.055, 2.4);
+    }
+    return 0.2126 * $ch[0] + 0.7152 * $ch[1] + 0.0722 * $ch[2];
+}
+function ems_contrast($a, $b)
+{
+    $la = ems_hex_lum($a); $lb = ems_hex_lum($b);
+    if ($la === null || $lb === null) { return null; }
+    return (max($la, $lb) + 0.05) / (min($la, $lb) + 0.05);
+}
+$tokSrc = (string) @file_get_contents($ROOT . '/assets/css/design-tokens.css');
+$TOK = array();
+if (preg_match_all('/(--c-[a-z0-9-]+)\s*:\s*(#[0-9a-f]{3,8})\s*;/i', $tokSrc, $tm, PREG_SET_ORDER)) {
+    foreach ($tm as $t) { $TOK[strtolower($t[1])] = $t[2]; }
+}
+/* الأزواجُ التي رسبت حيًّا ثم أُصلحت — كلٌّ بحدِّه (كبيرٌ 3 · عاديٌّ 4.5). */
+$PAIRS = array(
+    array('ترويسةُ الجدول',     '--c-surface',  '--c-th-surface', 4.5),
+    array('رمزٌ على الأبيض',    '--c-code-ink', '--c-surface',    4.5),
+    array('شارةُ العدَّاد',       '--c-ink-900',  '--c-f7931a',     4.5),
+    array('عنوانُ مجموعةٍ جوّال', '--c-ink-500',  '--c-surface',    4.5),
+);
+$pairBad = array(); $pairRows = array();
+foreach ($PAIRS as $p) {
+    list($name, $fgT, $bgT, $need) = $p;
+    $fg = $TOK[$fgT] ?? null; $bg = $TOK[$bgT] ?? null;
+    if ($fg === null || $bg === null) { $pairBad[] = $name . ' (رمزٌ مفقود)'; continue; }
+    $r = ems_contrast($fg, $bg);
+    $pairRows[] = $name . ' ' . round($r, 2) . ':1';
+    if ($r === null || $r < $need) { $pairBad[] = $name . ' ' . round((float) $r, 2) . ':1 < ' . $need; }
+}
+u('SH-08/4', 'تباينُ اللونِ يبلغ الحدَّ المعياريَّ في النصِّ والحالات',
+    'يحسب نسبةَ WCAG من قيمِ الرموزِ نفسِها للأزواجِ التي رسبت حيًّا ثم أُصلحت',
+    'لا يقيس زوجًا ينشأ من تراكبِ شفافياتٍ وقتَ التصيير — يُقاس بالتصيير',
+    empty($pairBad),
+    ($pairBad ? ('راسبٌ: ' . implode(' · ', $pairBad) . ' · ') : '')
+        . implode(' · ', $pairRows)
+        . ' · ◆ مقيسٌ حيًّا على 5 شاشاتٍ (7,000+ عنصر): 76 ← 0');
+
 /* ══ AC-U10 · صفرُ بطاقةِ مؤشرٍ بأقلَّ من سبعةِ حقول ═══════════════════════
    «المكوّنُ يرفض التصييرَ بأقلَّ من السبعةِ فيصير الحكمُ بالبناء» — فالمقياسُ
    شرطان: أن يرفضَ المكوّنُ فعلًا، وألّا يكتبَ سطحٌ ماركَبَ البطاقةِ بيدِه
@@ -351,9 +481,9 @@ u('AC-U5', 'كلُّ شاشةٍ فوقَ عشرينَ عمودًا لها منظ
     'لا يقيس أن المستخدمَ استعمله — يقيس وجودَ المنظرِ والمنتقي لا تبنّي المستخدمِ لهما',
     // ◆ ثلاثةُ شروطٍ لا اثنان: الجدولُ · مناظرُ مبذورةٌ · **ومنتقٍ محمَّلٌ في boot()**.
     //   جدولٌ مليءٌ بمناظرَ لا يعرضها أحدٌ هو خطأُ MD-05 نفسُه: البناءُ ليس تبنّيًا.
-    ($viewsTable > 0 && $viewRows > 0 && strpos(ems_ui_boot_body($uiJsForViews), 'bootSavedViews(') !== false),
+    ($viewsTable > 0 && $viewRows > 0 && ems_ui_boot_calls($uiJsForViews, 'bootSavedViews')),
     'جدولُ المناظر: ' . ($viewsTable ? 'موجود' : 'غير موجود') . ' · صفوفٌ مبذورة: ' . $viewRows
-        . ' · المنتقي: ' . (strpos(ems_ui_boot_body($uiJsForViews), 'bootSavedViews(') !== false ? 'محمَّل' : 'غيرُ محمَّل'));
+        . ' · المنتقي: ' . (ems_ui_boot_calls($uiJsForViews, 'bootSavedViews') ? 'محمَّل' : 'غيرُ محمَّل'));
 
 /* الحاقنُ حيٌّ؟ — يُفحص مرةً واحدةً قبل الحلقة. */
 $emptyInjectorLive = false;
@@ -361,7 +491,7 @@ $uiJs = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
 /* ◆ `[^}]*` لا يعبر كتلَ `try{}` داخلَ `boot()` — تُقتطع الدالةُ أولًا
      ثم يُبحث فيها. الشرطُ الهشُّ يُعلن «غيرَ محمَّل» وهو محمَّل. */
 $bootBody = ems_ui_boot_body($uiJs);
-if (strpos($bootBody, 'bootEmptyStates(') !== false) {
+if (ems_ui_boot_calls($uiJs, 'bootEmptyStates')) {
     $emptyInjectorLive = true;
 }
 $emptyStateFiles = 0; $tableScreens = 0;
@@ -404,7 +534,7 @@ if (preg_match('/EMS_FIELD_LABELS\s*=\s*\{([\s\S]*?)\};/u', $__uj, $dm)) {
 }
 $binderLive = false;
 $binderSrc = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
-if (strpos(ems_ui_boot_body($binderSrc), 'bootFieldLabels(') !== false) {
+if (ems_ui_boot_calls($binderSrc, 'bootFieldLabels')) {
     $binderLive = true;
 }
 

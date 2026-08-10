@@ -38,3 +38,4 @@ database/backups/env_history/
 .installed
 install/install.token
 **/~$*.xlsx
+storage/neg_pending/

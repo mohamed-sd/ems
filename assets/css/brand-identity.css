@@ -137,11 +137,14 @@ textarea:focus,
   box-shadow: 0 0 0 0.2rem var(--c-rgba24714726018);
 }
 
+/* SH-08/4 — أبيضُ على البرتقاليِّ الهُويّةِ بلغ 2.3:1 وهو أسوأُ زوجٍ في الشجرة.
+   والبرتقاليُّ لونُ هُويةٍ لا يُمَسّ، فالمتغيّرُ النصُّ لا الخلفية: الحبرُ الداكنُ
+   عليه 8.9:1 — تُحفَظ الهُويةُ ويُبلَغ الحدّ. */
 .nav-count-badge,
 .badge.bg-danger,
 .sb-badge {
   background: var(--ems-orange) !important;
-  color: var(--c-surface) !important;
+  color: var(--c-ink-900) !important;
 }
 
 .main h1,

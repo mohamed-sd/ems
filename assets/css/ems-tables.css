@@ -579,8 +579,8 @@ body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .al
   background: var(--ref-head-bg) !important;
   color: var(--c-surface) !important;
   background-image: none !important;
-  border-color: var(--c-999999) !important;
-  background: var(--c-999999) !important;
+  border-color: var(--c-th-surface) !important;
+  background: var(--c-th-surface) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
@@ -609,7 +609,7 @@ body.ems-site table.dataTable thead th.sorting_desc,
 body.ems-site table.dataTable thead td.sorting,
 body.ems-site table.dataTable thead td.sorting_asc,
 body.ems-site table.dataTable thead td.sorting_desc {
-  background: var(--c-999999) !important;
+  background: var(--c-th-surface) !important;
   color: var(--c-surface) !important;
 }
 

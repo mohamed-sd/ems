@@ -1068,9 +1068,48 @@
         }
     }
 
+    /* ══ AC-U8 · دورةٌ كاملةٌ بلوحةِ المفاتيح ═══════════════════════════════
+       عطلان مقيسان يكسران «الدورةَ الكاملة»:
+       ① هدفُ التخطّي: رابطُ التخطّي في القشرةِ يحتاج مرسًى، و`.main` هو المحتوى
+          في كلِّ سطح. يُوسَم مرةً واحدةً هنا بدل تعديلِ 356 ملفًّا.
+       ② خمسةٌ وأربعون عنصرًا يحمل `onclick` وهو غيرُ قابلٍ للتركيزِ أصلًا (div ·
+          span · td · i): يبلغه الفأرُ ولا تبلغه لوحةُ المفاتيح. وهو **عنصرُ
+          تحكّمٍ** بحكمِ حملِه معالجَ نقر، فيُمنح ما يجعله كذلك: موضعًا في الدورةِ
+          ودورًا مُعلَنًا ومفتاحين يعملان عملَ النقر.
+       ◆ ويُستثنى ما يحوي عنصرًا قابلًا للتركيزِ في داخلِه: الغلافُ الذي يلتقط
+         النقرَ نيابةً عن رابطٍ بداخلِه ليس عنصرَ تحكّمٍ ثانيًا — وجعلُه كذلك
+         يُدخل محطةً مكرَّرةً في الدورةِ ويربك القارئ. */
+    var KB_NATIVE = 'a[href],button,input,select,textarea,summary,[contenteditable="true"]';
+    function bootKeyboardReach() {
+        var main = document.querySelector('.main');
+        if (main && !main.id) {
+            main.id = 'ems-main-content';
+            main.setAttribute('tabindex', '-1');   // هدفٌ برمجيٌّ لا محطةٌ في الدورة
+        }
+
+        var all = document.querySelectorAll('div[onclick],span[onclick],td[onclick],tr[onclick],li[onclick],i[onclick],img[onclick],p[onclick],h1[onclick],h2[onclick],h3[onclick],h4[onclick],h5[onclick],h6[onclick]');
+        for (var i = 0; i < all.length; i++) {
+            var el = all[i];
+            if (el.hasAttribute('tabindex')) { continue; }
+            if (el.getAttribute('aria-hidden') === 'true') { continue; }
+            if (el.querySelector(KB_NATIVE)) { continue; }      // الغلافُ ليس تحكّمًا ثانيًا
+            if (el.closest('[aria-hidden="true"]')) { continue; }
+
+            el.setAttribute('tabindex', '0');
+            if (!el.getAttribute('role')) { el.setAttribute('role', 'button'); }
+            el.addEventListener('keydown', function (ev) {
+                if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') { return; }
+                // المسافةُ تُمرِّر الصفحةَ افتراضًا — وهي هنا تفعيلٌ لا تمرير
+                ev.preventDefault();
+                this.click();
+            });
+        }
+    }
+
     function boot() {
         bootUnifiedHeaders();
         bootUnifiedTables();
+        try { bootKeyboardReach(); } catch (eKb) { /* الوصولية لا تُسقط الشاشة */ }
         try { bootFieldLabels(); } catch (eFl) { /* الوصولية لا تُسقط الشاشة */ }
         try { bootEmptyStates(); } catch (eEs) { /* حالةُ الفراغِ لا تُسقط الشاشة */ }
         try { bootSavedViews(); } catch (eSv) { /* المنتقي لا يُسقط الجدول */ }

@@ -499,10 +499,13 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 .ems-site .sidebar ul li.active > a .sidebar-link-text,
 .ems-site .sidebar ul li.active > a span:not(.nav-count-badge) { color: #E0AE2E !important; }
 .ems-site .sidebar ul li.active > a i { color: #E0AE2E !important; }
-/* عدّاد الرقم (الرسائل/الاعتمادات) يبقى أبيض دائماً (عادي + hover + active) كي يظل ظاهراً */
+/* عدّاد الرقم (الرسائل/الاعتمادات) يبقى بلونٍ ثابت (عادي + hover + active) كي يظل ظاهراً.
+   SH-08/4: كان أبيضَ على البرتقاليِّ = 2.3:1 — أسوأُ زوجٍ في الشجرة، ونصُّه رقمٌ
+   يُقرأ لا زخرفة. والبرتقاليُّ لونُ هُويةٍ لا يُمَسّ، فتغيّر الحبرُ إلى الداكن:
+   8.9:1. ويبقى `!important` لأن قواعدَ الحالةِ أعلاه تلوّن كلَّ span في الصف. */
 .ems-site .sidebar ul li .nav-count-badge,
 .ems-site .sidebar ul li:hover .nav-count-badge,
-.ems-site .sidebar ul li.active .nav-count-badge { color: #fff !important; }
+.ems-site .sidebar ul li.active .nav-count-badge { color: #1f1f1f !important; }
 </style>
 
 <script>

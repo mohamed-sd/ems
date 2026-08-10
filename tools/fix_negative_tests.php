@@ -63,16 +63,65 @@ function neg($code, $title, callable $break, callable $check)
 }
 
 /** يبدّل محتوى ملفٍّ مؤقتًا ويُرجع دالةَ استعادة. */
+/**
+ * ◆ خطرٌ وقع فعلًا: `finally` لا يعمل إذا قُتلت العمليةُ (مهلةٌ أو إيقافٌ يدويّ).
+ *   فبقي إفسادُ AC-F3 في الشجرةِ الحيّة — **فرعُ تخويلٍ مفتوحٌ في خدمةِ التصدير**
+ *   — ولم يكشفه إلا رسوبُ الاختبارِ نفسِه على الشجرةِ السليمةِ في الجولةِ التالية.
+ * ◆ فصار الإفسادُ يترك أثرًا على القرص: ملفُّ ذمّةٍ فيه المسارُ والأصلُ. وأولُ ما
+ *   يفعله هذا السكربتُ استرجاعُ كلِّ ذمّةٍ عالقةٍ من جولةٍ ماتت قبل أن يبدأ.
+ * ◆ والاسترجاعُ من الملفِّ لا من git: قد يكون الأصلُ غيرَ ملتزَمٍ بعد.
+ */
+function neg_pending_dir()
+{
+    $d = dirname(__DIR__) . '/storage/neg_pending';
+    if (!is_dir($d)) { @mkdir($d, 0777, true); }
+    return $d;
+}
+
+function neg_recover_stale()
+{
+    $n = 0;
+    foreach ((array) glob(neg_pending_dir() . '/*.json') as $f) {
+        $rec = json_decode((string) @file_get_contents($f), true);
+        if (is_array($rec) && !empty($rec['abs']) && array_key_exists('orig', $rec)) {
+            file_put_contents($rec['abs'], $rec['orig']);
+            echo "  ↺ استُرجع من جولةٍ ماتت: " . basename($rec['abs']) . "\n";
+            $n++;
+        }
+        @unlink($f);
+    }
+    return $n;
+}
+
 function neg_swap($abs, $newContent)
 {
     $orig = (string) file_get_contents($abs);
+    $tag  = neg_pending_dir() . '/' . sha1($abs) . '.json';
+    file_put_contents($tag, json_encode(array('abs' => $abs, 'orig' => $orig)));
     file_put_contents($abs, $newContent);
-    return function () use ($abs, $orig) { file_put_contents($abs, $orig); };
+    return function () use ($abs, $orig, $tag) {
+        file_put_contents($abs, $orig);
+        @unlink($tag);
+    };
 }
 
 echo "══════════════════════════════════════════════════════════════════════\n";
 echo " الاختباراتُ السلبيةُ — «الفحصُ الذي لا يرسب عند الإفسادِ يُحذف»\n";
 echo "══════════════════════════════════════════════════════════════════════\n\n";
+
+/* ◆ جولةٌ واحدةٌ لا جولتان: شغّلتُ اثنتين معًا فبدّلت كلٌّ منهما ملفًّا تحتَ
+     الأخرى، فأعلنت إحداهما أن `AC-F5` تصادق على نفسِها وما كان بها عيب.
+     والقفلُ يمنع التداخلَ من أصلِه بدل تفسيرِ نتائجِه. */
+$__lock = fopen(neg_pending_dir() . '/run.lock', 'c');
+if (!$__lock || !flock($__lock, LOCK_EX | LOCK_NB)) {
+    exit("جولةٌ أخرى تعمل الآن — الشجرةُ مُبدَّلةٌ تحتَها. انتظرْ انتهاءَها.\n");
+}
+register_shutdown_function(function () use ($__lock) { @flock($__lock, LOCK_UN); @fclose($__lock); });
+
+$__recovered = neg_recover_stale();
+if ($__recovered > 0) {
+    echo "◆ استُرجع {$__recovered} ملفًّا من جولةٍ سابقةٍ ماتت قبل استعادتِها.\n\n";
+}
 
 /* ── ① AC-F1 · الفشلُ مغلقًا: أعِدْ فرعًا سامحًا وأثبتْ رسوبَ الفحص ─────── */
 neg('AC-F1', 'حارسٌ يفشل مغلقًا — يرسب إن عاد فرعٌ سامح',
@@ -380,6 +429,47 @@ neg('AC-U10/التفاف', 'بطاقةُ المؤشر — ترسب إن كتب �
               . "NEG-TEST</div><div class=\"ems-kpi-value\">1</div></a>";
         return neg_swap($abs, substr_replace($src, $hand, $at, strlen($needle)));
     }, $u10check);
+
+/* ══ AC-U8 · دورةُ لوحةِ المفاتيح ══════════════════════════════════════════
+   ثلاثةُ إفساداتٍ لثلاثةِ أوجهٍ يكسر كلٌّ منها الدورةَ بطريقةٍ مختلفة. */
+$u8check = function () use ($ROOT) {
+    $out = (string) @shell_exec(escapeshellarg(PHP_BINARY) . ' '
+         . escapeshellarg($ROOT . '/tools/fix_ui_gate.php') . ' 2>&1');
+    if (strpos($out, 'AC-U8') === false) {
+        return array('ok' => false, 'evidence' => 'المعيارُ غائبٌ عن البوابة');
+    }
+    $ok = (strpos($out, '✔ AC-U8') !== false);
+    return array('ok' => $ok, 'evidence' => $ok ? 'الدورةُ سالكة' : 'الدورةُ مكسورة');
+};
+
+neg('AC-U8/تخطٍّ', 'دورةُ المفاتيح — ترسب إن غاب رابطُ التخطّي من القشرة',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/inheader.php';
+        $src = (string) file_get_contents($abs);
+        $broken = str_replace('<a class="ems-skip-link" href="#ems-main-content">', '<a href="#none">', $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على رابطِ التخطّي'); }
+        return neg_swap($abs, $broken);
+    }, $u8check);
+
+neg('AC-U8/حجب', 'دورةُ المفاتيح — ترسب إن أُخفي رابطُ التخطّي بالحجبِ لا بالإزاحة',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/assets/css/ems.main.all.style.css';
+        $src = (string) file_get_contents($abs);
+        // `display:none` يُخرج الرابطَ من الدورةِ فيبطل — وهو الخطأُ الشائع
+        $broken = str_replace(".ems-skip-link {\n  position: absolute;",
+                              ".ems-skip-link {\n  display: none;\n  position: absolute;", $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على قاعدةِ رابطِ التخطّي'); }
+        return neg_swap($abs, $broken);
+    }, $u8check);
+
+neg('AC-U8/وصول', 'دورةُ المفاتيح — ترسب إن لم يُحمَّل رابطُ الوصولِ في boot',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/assets/js/ui-unification.js';
+        $src = (string) file_get_contents($abs);
+        $broken = str_replace('try { bootKeyboardReach(); }', 'if (false) { bootKeyboardReach(); }', $src);
+        if ($broken === $src) { throw new RuntimeException('لم يُعثر على نداءِ رابطِ الوصول'); }
+        return neg_swap($abs, $broken);
+    }, $u8check);
 
 /* ── الحصيلة ───────────────────────────────────────────────────────────── */
 $valid = 0; $invalid = array();
