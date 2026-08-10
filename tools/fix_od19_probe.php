@@ -128,11 +128,23 @@ $P['INJ-0331'] = function () use ($db) {
     return array($n !== null && $n > 0, 'خريطةُ proc_supplier.supplier_id: ' . ($n ? 'موجودة' : 'غير موجودة'));
 };
 
+/* ◆ مسدودٌ بمصدرٍ مفقودٍ لا بعملٍ مؤجَّل — بُحث عنه ولم يوجد:
+     · `03_UX_Screens_Sidebar_Audit.xlsx` و`07_Master_Findings_Register.xlsx`
+       يعطيان العددَ (23) والدليلَ `frd_readable.md:211` — وهو **استخراجُ المدقِّق**
+       ولا وجودَ له في المستودع.
+     · و`INJAZ-FRD-01` الأمُّ تُعلن العددَ في جدولِ الشاشاتِ ([339]-[340]:
+       `ceo_approvals.php` = 23) و**لا تُعدِّد الأسماء** في أيِّ موضع.
+   ◆ فاختراعُ ثلاثةِ أعمدةٍ في شاشةِ اعتماداتٍ تنفيذيةٍ — مع هجرةِ قاعدةٍ لها —
+     تلفيقٌ يُفسد التتبع، والوثيقةُ تمنعه نصًّا. المطلوب: `frd_readable.md`
+     أو أسماءُ الأعمدةِ الثلاثة. */
 $P['INJ-0416'] = function () use ($ROOT) {
     $s = src($ROOT, 'Portal/ceo_approvals.php');
     $cnt = 0;
-    if (preg_match('/\$COLS\s*=\s*array\(([\s\S]*?)\);/u', $s, $m)) { $cnt = substr_count($m[1], "'") / 2; }
-    return array($cnt >= 23, 'أعمدةُ شاشةِ اعتماداتِ الرئيس: ' . (int) $cnt . ' (المطلوب 23)');
+    if (preg_match('/\$COLS\s*=\s*array\s*\(([\s\S]*?)\n\);/u', $s, $m)) {
+        $cnt = preg_match_all("/^\s*\d+\s*=>\s*'/m", $m[1]);
+    }
+    return array($cnt >= 23, 'أعمدةُ شاشةِ اعتماداتِ الرئيس: ' . (int) $cnt
+        . ' من 23 · مسدودٌ بمصدرٍ مفقود: الوثيقةُ تُعلن العددَ ولا تُعدِّد الأسماء، و`frd_readable.md` ليس في المستودع');
 };
 
 $P['INJ-0422'] = function () use ($ROOT) {
