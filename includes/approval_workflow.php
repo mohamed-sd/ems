@@ -152,6 +152,31 @@ if (!function_exists('approval_get_workflow_rules')) {
             return $rules;
         }
 
+        /* ═══════════════════════════════════════════════════════════════════
+         * INJ/WF — «سلّمٌ بلا قاعدةٍ مسجَّلةٍ سلّمٌ مخترَع»
+         * ═══════════════════════════════════════════════════════════════════
+         * ◆ العطلُ المقيس: `approval_workflow_rules` فيه 23 صفًّا نشطًا
+         *   **عشرون منها نصوصُ ملاحظاتِ UAT** حُشرت في خاناتِ
+         *   `entity_type`/`action`/`role_required`؛ فلا قاعدةَ حقيقيةً تُطابِق
+         *   أيَّ نوعِ كيانٍ حيّ. والأنواعُ الجاريةُ فعلًا (`timesheet:approve`
+         *   بـ12 طلبًا · `contract:renewal` · `project:update`) **كلُّها تسقط
+         *   هنا** فتصير سلّمًا من **خطوةٍ واحدة**؛ ومنشئُ الطلبِ يُعتمَد له
+         *   تلقائيًّا إن طابق دورَها ⇒ **اعتمادُ ذاتٍ في نقرةٍ واحدة**.
+         * ◆ ولا يُقلَب هذا فجأةً: ثمانيةُ مساراتٍ حيةٍ تتوقف. فيُحكَم بعلمٍ
+         *   على نمطِ البيتِ (`off` · `monitor` · `enforce`) كما في
+         *   `EMS_ORG_AUTHORITY` و`EMS_U13_*`:
+         *     off      — الاحتياطُ كما كان بلا أثر.
+         *     monitor  — الاحتياطُ يعمل **وكلُّ استعمالٍ له يُسجَّل** في
+         *                `guard_denials` فيصير الدَّينُ مقيسًا لا مُخمَّنًا. (الافتراض)
+         *     enforce  — لا سلّمَ بلا قاعدةٍ مسجَّلة: تُرجع الدالةُ فراغًا،
+         *                و`approval_create_request` يرفض («لا توجد مراحل
+         *                موافقة معرفة») — fail-closed.
+         * ◆ والقلبُ إلى enforce **قرارُ مالكٍ** يسبقه تسجيلُ قواعدَ للأزواجِ
+         *   الثمانيةِ: كم يدًا لكلٍّ؟ وهو سؤالُ سياسةٍ لا سؤالُ كود.
+         * ═══════════════════════════════════════════════════════════════════ */
+        $mode = function_exists('ems_env') ? strtolower((string) ems_env('EMS_APPROVAL_RULES', 'monitor')) : 'monitor';
+        $lookup_key = trim($entity_type) . ':' . trim($action);
+
         $fallback_map = [
             'equipment:deactivate_equipment' => '4,-1',
             'equipment:reactivate_equipment' => '4,-1',
@@ -159,9 +184,17 @@ if (!function_exists('approval_get_workflow_rules')) {
             'driver:deactivate_driver' => '3,-1',
             'driver:reactivate_driver' => '3,-1'
         ];
+        $named = isset($fallback_map[$lookup_key]);
 
-        $lookup_key = trim($entity_type) . ':' . trim($action);
-        if (isset($fallback_map[$lookup_key])) {
+        if ($mode === 'enforce') {
+            approval_record_rule_gap($conn, $lookup_key, 'enforce_denied');
+            return [];   // المُنادي يرفض — ولا يُخترع سلّم
+        }
+        if ($mode !== 'off') {
+            approval_record_rule_gap($conn, $lookup_key, $named ? 'fallback_named' : 'fallback_default');
+        }
+
+        if ($named) {
             return [
                 ['role_required' => $fallback_map[$lookup_key], 'step_order' => 1]
             ];
@@ -170,6 +203,34 @@ if (!function_exists('approval_get_workflow_rules')) {
         return [
             ['role_required' => EMS_ROLE_SUPER_ADMIN, 'step_order' => 1]
         ];
+    }
+}
+
+if (!function_exists('approval_record_rule_gap')) {
+    /**
+     * تسجيلُ «سلّمٌ بلا قاعدة» في `guard_denials` — ليُقاس الدَّينُ لا يُوصَف.
+     * ◆ لا يُوقف المسارَ ولا يُبتلع: تعذّرُ التسجيلِ يُكتب في سجلِّ الأخطاء
+     *   (السجلُّ تابعٌ لا شرط — CS-12).
+     */
+    function approval_record_rule_gap($conn, $lookupKey, $reason) {
+        $prev = mysqli_report(MYSQLI_REPORT_OFF);
+        try {
+            $stmt = mysqli_prepare($conn,
+                'INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code, at)
+                 VALUES (?, ?, ?, ?, ?, NOW())');
+            if (!$stmt) { throw new RuntimeException(mysqli_error($conn)); }
+            $co     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+            $guard  = 'approval_rules_missing';
+            $person = approval_get_user_id();
+            $ref    = mb_substr((string) $lookupKey, 0, 120);
+            $rc     = (string) $reason;
+            mysqli_stmt_bind_param($stmt, 'isiss', $co, $guard, $person, $ref, $rc);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+        } catch (\Throwable $e) {
+            error_log('approval_record_rule_gap: ' . $e->getMessage());
+        }
+        mysqli_report($prev);
     }
 }
 
@@ -200,15 +261,46 @@ if (!function_exists('approval_get_next_pending_step')) {
 }
 
 if (!function_exists('approval_are_all_steps_approved')) {
+    /**
+     * أكلُّ خطواتِ السلّمِ معتمدة؟
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **العطلُ المقيس — صدقٌ خلوًّا (vacuous truth):** كان الشرطُ
+     *   `COUNT(status <> 'approved') = 0` وحدَه، وهو **صادقٌ على صفرِ خطوة**.
+     *   فطلبٌ بلا أيِّ توقيعٍ يُقرأ «كلُّ خطواتِه معتمدة» ⇒ `finalize` ينفّذ
+     *   حمولتَه ويَسِمُه `approved`. **اعتمادٌ كاملٌ بصفرِ يد.**
+     * ◆ والأثرُ ليس نظريًّا: في القاعدةِ الآن **أربعةُ طلباتٍ بلا خطوةٍ واحدة**،
+     *   اثنان منها `approved` **و`executed_at` مكتوب** — أي أن حمولتَيهما
+     *   نُفِّذتا، وأحدُهما بتاريخِ 2024-01-28.
+     * ◆ والعلاجُ شرطٌ ثانٍ: **خطوةٌ واحدةٌ على الأقل**. فالسلّمُ الذي لا درجةَ
+     *   فيه ليس سلّمًا مكتملًا بل سلّمًا **غيرَ مبنيّ**.
+     * ◆ وفشلُ الاستعلامِ يعود `false` كما كان — لا يُقرأ إذنًا (fail-closed).
+     */
     function approval_are_all_steps_approved($request_id, $conn) {
         $request_id = intval($request_id);
-        $sql = "SELECT COUNT(*) AS cnt FROM approval_steps WHERE request_id = $request_id AND status <> 'approved'";
+        $sql = "SELECT COUNT(*) AS total,
+                       SUM(status = 'approved') AS ok
+                  FROM approval_steps WHERE request_id = $request_id";
         $result = mysqli_query($conn, $sql);
         if (!$result) {
             return false;
         }
         $row = mysqli_fetch_assoc($result);
-        return intval($row['cnt']) === 0;
+        $total = intval($row['total']);
+        if ($total === 0) {
+            return false;   // صفرُ خطوةٍ ليس اكتمالًا — وهذا عينُ ما كان يفلت
+        }
+        return intval($row['ok']) === $total;
+    }
+}
+
+if (!function_exists('approval_steps_count')) {
+    /** عددُ خطواتِ طلبٍ — يُستخدم في الرسالةِ التي تشرح المنع. */
+    function approval_steps_count($request_id, $conn) {
+        $request_id = intval($request_id);
+        $r = mysqli_query($conn, "SELECT COUNT(*) c FROM approval_steps WHERE request_id = $request_id");
+        if (!$r) { return -1; }
+        $row = mysqli_fetch_assoc($r);
+        return intval($row['c']);
     }
 }
 
@@ -411,6 +503,13 @@ if (!function_exists('approval_finalize_if_completed')) {
         }
 
         if (!approval_are_all_steps_approved($request_id, $conn)) {
+            /* ◆ التمييزُ بين «سلّمٌ لم يكتمل» و«سلّمٌ لم يُبنَ»: الأولُ حالٌ طبيعيةٌ
+                 تُنتظر، والثاني **عطلٌ** يجب أن يُعلن لا أن يُقرأ انتظارًا. */
+            $cnt = approval_steps_count($request_id, $conn);
+            if ($cnt === 0) {
+                return approval_response(false,
+                    'طلبٌ بلا أيِّ خطوةِ سلّمٍ — لا يُعتمد ولا يُنفَّذ (سلّمٌ غيرُ مبنيٍّ لا سلّمٌ مكتمل)');
+            }
             $next = approval_get_next_pending_step($request_id, $conn);
             $next_order = $next ? intval($next['step_order']) : null;
             mysqli_query($conn, "UPDATE approval_requests SET current_step = " . ($next_order === null ? 'NULL' : $next_order) . ", updated_at = NOW() WHERE id = " . intval($request_id));
