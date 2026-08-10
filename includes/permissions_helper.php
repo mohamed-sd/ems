@@ -618,14 +618,13 @@ function get_module_id_by_script_path($conn, $script_path = null) {
 function get_current_page_permissions($conn, $script_path = null) {
     $module_id = get_module_id_by_script_path($conn, $script_path);
 
+    // FIX-01 · RF-01 + CS-02 — الشاشةُ لا تُحَلُّ إلى موديول ⇒ منعٌ كاملٌ مُسجَّل.
+    // ◆ كان هذا الفرعُ يرجع كلَّ الصلاحياتِ true فيصير الحارسُ زخرفةً على
+    //   أربعينَ سطحًا حيًّا. سُجِّلت الأربعون في modules قبلَ هذا القلبِ
+    //   (الترحيلات 2027_01_08..10) — والفاحصُ tools/fix_rf01_surfaces.php
+    //   يرسب فوقَ صفر، فلا يعود سطحٌ غيرَ مسجَّلٍ بلا أن يُكشف.
     if (!$module_id) {
-        return [
-            'id' => null,
-            'can_view' => true,
-            'can_add' => true,
-            'can_edit' => true,
-            'can_delete' => true
-        ];
+        return _deny_all_permissions('unresolved_script_path');
     }
 
     $perms = get_module_permissions($conn, $module_id);
@@ -635,7 +634,8 @@ function get_current_page_permissions($conn, $script_path = null) {
         'can_view' => $perms['can_view'],
         'can_add' => $perms['can_add'],
         'can_edit' => $perms['can_edit'],
-        'can_delete' => $perms['can_delete']
+        'can_delete' => $perms['can_delete'],
+        'can_export' => $perms['can_view'],
     ];
 }
 
@@ -765,11 +765,144 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
     // REV-08 §5 — الشاشة لا تُحَلّ إلى موديول: صمّام Fail-Closed (إنفاذٌ/رصدٌ حسب البادئة).
     if ($current['id'] === null) {
         ems_failclosed_screen_guard($script_name);
+
+        // FIX-01 · RF-01 — وبعدَ الصمّامِ ذي البادئات: المنعُ **مطلقٌ** لا مشروط.
+        // ◆ كان الشرطُ ‎id !== null‎ يعني أن الشاشةَ غيرَ المسجَّلةِ تمرُّ بلا فحص
+        //   — فالحلُّ الفاشلُ كان يُقرأ سماحًا. الآن يُقرأ منعًا: الشاشةُ التي لا
+        //   تُحَلُّ إلى موديولٍ لا تُعرض، ويُسجَّل الرفضُ باسمِها ودورِها ووقتِه.
+        //   الأسطحُ الأربعون سُجِّلت قبلَ هذا (2027_01_08..10) وفاحصُ
+        //   tools/fix_rf01_surfaces.php يرسب فوقَ صفرٍ فلا تعود.
+        ems_gov_flash_redirect(
+            $redirect_path,
+            'شاشةٌ غيرُ مسجَّلةٍ في سجلِّ الوحدات — الوصولُ ممنوع',
+            'GOV-PERM-404-MODULE',
+            'أبلغْ مديرَ الصلاحيات لتسجيلِ الشاشةِ ومنحِ دورِها'
+        );
     }
 
-    if ($current['id'] !== null && !$current['can_view']) {
+    if (!$current['can_view']) {
         ems_gov_flash_redirect($redirect_path, 'لا تملك صلاحية عرض هذه الصفحة', 'GOV-PERM-403', 'اطلب منحة العرض من مدير الصلاحيات إن كانت ضمن عملك');
     }
+
+    // INJ-0062 — «الوظيفةُ الرقابيةُ مراقَبةٌ أيضًا»: اطّلاعُ المراجعِ يُسجَّل.
+    ems_log_auditor_access($conn, $relative_script);
+
+    // P1-A — وبعدَ إذنِ العرض: إذنُ **الكتابة** على الطلبِ الكاتب.
+    ems_enforce_write_permission($conn, $current, $redirect_path);
+}
+
+/**
+ * INJ-0062 · تبنّي `InternalAuditService::logAccess` — كان بصفرِ نداء.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * IAF-0036: «كلُّ اطّلاعٍ حساسٍ يُسجَّل — فالوظيفةُ الرقابيةُ مراقَبةٌ أيضًا».
+ * والمراجعُ الداخليُّ يرى سجلاتِ الإداراتِ كلَّها بحكمِ عمله؛ فبلا سجلِّ اطّلاعٍ
+ * لا يُعرف ما اطّلع عليه ولا متى — وهو نفسُه محلُّ مساءلةٍ أمام الجهةِ المشرفة.
+ *
+ * ◆ عطالةُ اليومِ الواحد: صفٌّ لكلِّ (مراجعٍ × شاشةٍ × يوم) لا لكلِّ تحديثِ صفحة —
+ *   وإلا أغرق السجلُّ نفسَه فصار غيرَ مقروء.
+ * ◆ ولا يُسجَّل اطّلاعُه على سجلِّه هو (`Audit/`): ذاك عملُه لا اطّلاعٌ عليه.
+ * ◆ ولا يبتلع فشلَه صامتًا (CS-12).
+ */
+function ems_log_auditor_access($conn, $relative_script) {
+    if (!isset($_SESSION['user']['role'])) { return; }
+    $guardFile = dirname(__DIR__) . '/app/Services/Audit/InternalAuditService.php';
+    if (!is_file($guardFile)) { return; }
+    require_once $guardFile;
+    if (intval($_SESSION['user']['role']) !== \App\Services\Audit\InternalAuditService::ROLE_AUDITOR) { return; }
+
+    $rel = (string) $relative_script;
+    if ($rel === '' || strpos($rel, 'Audit/') === 0) { return; }
+
+    $uid = intval($_SESSION['user']['id'] ?? 0);
+    $key = 'iaf_acc_' . md5($uid . '|' . $rel . '|' . date('Y-m-d'));
+    if (!empty($_SESSION[$key])) { return; }
+    $_SESSION[$key] = 1;
+
+    try {
+        \App\Services\Audit\InternalAuditService::logAccess($conn, array(
+            'company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+            'auditor_id' => $uid,
+            'scope_kind' => 'screen',
+            'scope_ref'  => $rel,
+            'purpose'    => 'اطّلاعٌ رقابيٌّ ضمنَ مهامِّ المراجعةِ الداخلية',
+        ));
+    } catch (\Throwable $e) {
+        error_log('ems_log_auditor_access: ' . $e->getMessage());
+    }
+}
+
+/**
+ * P1-A · حارسُ صلاحيةِ **الكتابة** المركزي — الجذرُ المشتركُ لعشرِ ملاحظاتٍ P1
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ العيبُ المقيس: **سبعون سطحًا يكتب بلا فحصِ ‎can_add/can_edit‎ إطلاقًا**.
+ *   و‎enforce_current_page_view_permission‎ يفحص ‎can_view‎ وحدَه — فمن يملك
+ *   العرضَ فقط يستطيع أن يُرسل ‎POST‎ فيكتب. أي أن «القراءةَ» كانت تُعطي
+ *   الكتابةَ في سبعين شاشة (INJ-0022 · 0023 · 0071 · 0093 · 0098 · 0100 …).
+ *
+ * ◆ الحكم: طلبٌ يغيّر الحالةَ لا يمرُّ بصلاحيةِ عرضٍ — بل بصلاحيةِ كتابةٍ
+ *   واحدةٍ على الأقلّ (‎can_add‎ أو ‎can_edit‎ أو ‎can_delete‎). والفشلُ مغلق.
+ *
+ * ◆ ولماذا مركزيًّا لا في كلِّ شاشة (CS-05): «فالحكمُ في موضعٍ واحدٍ يُختبر
+ *   مرةً واحدة» — وسبعون موضعًا تعني سبعين فرصةً للنسيان، وشاشةٌ جديدةٌ غدًا
+ *   تُولد بالعيبِ نفسِه. هنا يرثه كلُّ سطحٍ بلا سطرٍ واحد.
+ *
+ * ◆ وقيسَ الخطرُ قبلَ التنفيذ: **صفرُ نموذجِ ترشيحٍ بـPOST** في الشجرةِ كلِّها
+ *   (المرشِّحاتُ كلُّها ‎GET‎) — فلا يُحجب قارئٌ عن ترشيحِ قائمة.
+ *
+ * ◆ والإعفاءُ ممكنٌ ومُعلَن: سطحٌ يحتاج ‎POST‎ قرائيًّا يُعلن ذلك صراحةً قبلَ
+ *   الحارسِ بـ‎define('EMS_SCREEN_POST_IS_READONLY', true)‎ — إعلانٌ يُقرأ في
+ *   المراجعة، لا استثناءٌ صامت.
+ */
+function ems_enforce_write_permission($conn, array $current, $redirect_path = '../main/dashboard.php') {
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') { return; }
+    if (defined('EMS_SCREEN_POST_IS_READONLY') && EMS_SCREEN_POST_IS_READONLY) { return; }
+    if (!isset($_SESSION['user']['role'])) { return; }
+
+    // السوبر خارج الترشيح (كما في بقية الحرّاس).
+    if ((string) $_SESSION['user']['role'] === '-1') { return; }
+
+    /* ══ INJ-0062 · تبنّي `InternalAuditService::assertReadOnly` ═════════════
+       الحارسُ كان **مبنيًّا بصفرِ نداء** — واستقلالُ المراجعةِ يقوم عليه:
+       «المراجعُ الداخليُّ يقرأ ولا يكتب خارجَ سجلِّه» (IAF-0043). والدورُ 33
+       يملك منحًا واسعةً على شاشاتِ المالية، فبلا هذا الحارسِ يكتب فيها.
+       ◆ ويُنادى **الحارسُ المالكُ** لا يُعاد بناءُ حكمِه هنا: الرمزُ الممرَّرُ
+         `iaf_screen` لشاشاتِ `Audit/` (فيمرُّ ببادئةِ `iaf_`)، واسمُ مجلَّدِ
+         الشاشةِ لغيرِها (فلا يطابق بادئةً مسموحةً ⇒ 403 مغلقٌ صحيحًا). */
+    $__auditGuard = dirname(__DIR__) . '/app/Services/Audit/InternalAuditService.php';
+    if (is_file($__auditGuard)) {
+        require_once $__auditGuard;
+        $__rel = function_exists('ems_relative_path')
+            ? ems_relative_path((string) ($_SERVER['SCRIPT_NAME'] ?? ''))
+            : ltrim(str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        $__hint = (strpos($__rel, 'Audit/') === 0)
+            ? 'iaf_screen'
+            : strtolower(basename(dirname($__rel)));
+        $__ro = \App\Services\Audit\InternalAuditService::assertReadOnly(
+            intval($_SESSION['user']['role']), $__hint);
+        if (empty($__ro['ok'])) {
+            if (function_exists('log_security_event')) {
+                log_security_event('AUDITOR_WRITE_DENY', 'path=' . $__rel . ' — ' . (string) $__ro['reason']);
+            }
+            ems_gov_flash_redirect($redirect_path, (string) $__ro['reason'], 'GOV-PERM-403-AUDIT',
+                'استقلالُ المراجعةِ يمنعها من الكتابةِ خارجَ سجلِّها');
+        }
+    }
+
+    $mayWrite = !empty($current['can_add']) || !empty($current['can_edit']) || !empty($current['can_delete']);
+    if ($mayWrite) { return; }
+
+    if (function_exists('log_security_event')) {
+        log_security_event('WRITE_WITHOUT_PERMISSION_DENY',
+            'path=' . ($_SERVER['SCRIPT_NAME'] ?? '') . ' module=' . var_export($current['id'] ?? null, true)
+            . ' role=' . intval($_SESSION['user']['role'])
+            . ' user=' . intval($_SESSION['user']['id'] ?? 0));
+    }
+    ems_gov_flash_redirect(
+        $redirect_path,
+        'لا تملك صلاحية الكتابة في هذه الشاشة — صلاحيةُ العرضِ لا تكفي لتغيير البيانات',
+        'GOV-PERM-403-WRITE',
+        'اطلب منحةَ الإضافةِ أو التعديلِ من مدير الصلاحيات إن كانت ضمن عملك'
+    );
 }
 
 /**
@@ -801,20 +934,73 @@ function enforce_module_permission_json($conn, $module_code, $permission = 'view
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * دالة مساعدة داخلية - إرجاع الصلاحيات الكاملة الافتراضية
- * تُستخدم للتوافقية مع الصفحات غير المسجلة في قاعدة البيانات
- * 
+ * FIX-01 · RF-01 + CS-02 — الفشلُ مغلقٌ لا مفتوح.
+ * ───────────────────────────────────────────────────────────────────────────
+ * كان اسمُها ‎_default_full_permissions‎ وكانت ترجع كلَّ الصلاحياتِ true لأيِّ
+ * شاشةٍ لا صفَّ لها في ‎modules‎ — فأربعون سطحًا حيًّا (منها ملفُّ العميلِ وملفُّ
+ * الموردِ وملفُّ عمليةِ التمويل) كانت تُقرأ وتُكتب بلا تفويض. سُجِّلت الأربعون
+ * في ‎modules‎ بالترحيلاتِ 2027_01_08..10 **قبلَ** هذا القلب (RSK-F1).
+ *
+ * ◆ الحكم: أيُّ فرعٍ لا يجد سجلَّ صلاحيةٍ يرجع منعًا لا سماحًا · والافتراضُ
+ *   الأمنيُّ منعٌ دائمًا · وصفرُ فرعٍ يرجع true عند غيابِ الصف.
+ * ◆ ويُسجَّل كلُّ إخفاقٍ بالغيابِ باسمِ الشاشةِ والدورِ والوقت (FIXA-0016).
+ *
  * @internal لا تُستخدم مباشرة من خارج هذا الملف
+ * @param string $reason سببُ المنعِ — يدخل سجلَّ الرفض
  * @return array
  */
-function _default_full_permissions() {
+function _deny_all_permissions($reason = 'unresolved_module') {
+    ems_log_permission_denial($reason);
     return [
         'id'         => null,
-        'can_view'   => true,
-        'can_add'    => true,
-        'can_edit'   => true,
-        'can_delete' => true
+        'can_view'   => false,
+        'can_add'    => false,
+        'can_edit'   => false,
+        'can_delete' => false,
+        'can_export' => false,
     ];
+}
+
+/**
+ * FIX-01 · FIXA-0016 — سجلُّ الرفضِ عند إخفاقِ الحلِّ إلى موديول.
+ * يكتب اسمَ الشاشةِ والدورَ والوقتَ في القناةِ الأمنيةِ الموحّدة، ثم في ملفٍّ
+ * احتياطيٍّ إن غابت. ◆ ولا يبتلع فشلَه صامتًا (CS-12): إخفاقُ الكتابةِ يُسجَّل
+ * في ‎error_log‎ ولا يُوقف المنع — فالمنعُ أهمُّ من سجلِّه.
+ */
+function ems_log_permission_denial($reason = 'unresolved_module') {
+    static $seen = [];
+    $script = isset($_SERVER['SCRIPT_NAME']) ? (string) $_SERVER['SCRIPT_NAME'] : '(cli)';
+    $role   = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+    $user   = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+    $key    = $script . '|' . $role . '|' . $reason;
+    if (isset($seen[$key])) { return; }   // صفٌّ واحدٌ لكلِّ طلبٍ لا صفٌّ لكلِّ نداء
+    $seen[$key] = true;
+
+    $line = 'PERM_DENY_UNREGISTERED reason=' . $reason
+          . ' path=' . $script . ' role=' . $role . ' user=' . $user
+          . ' at=' . date('Y-m-d H:i:s');
+    try {
+        if (function_exists('log_security_event')) {
+            log_security_event('PERM_DENY_UNREGISTERED', $line);
+            return;
+        }
+        $dir = defined('EMS_LOGS_DIR') ? EMS_LOGS_DIR : dirname(__DIR__) . '/storage/logs';
+        if (!is_dir($dir)) { @mkdir($dir, 0750, true); }
+        if (@file_put_contents($dir . '/permission_denials.log', '[' . date('c') . "] {$line}\n", FILE_APPEND | LOCK_EX) === false) {
+            error_log('EMS permission denial log write failed: ' . $line);
+        }
+    } catch (\Throwable $e) {
+        error_log('EMS permission denial log error: ' . $e->getMessage() . ' | ' . $line);
+    }
+}
+
+/**
+ * توافقيةٌ خلفيةٌ للاسمِ القديم — يرجع المنعَ الكاملَ لا السماح.
+ * ◆ يبقى الاسمُ ليُكسر البناءُ لا الاستدعاء: أيُّ نداءٍ قديمٍ يرث الفشلَ المغلق.
+ * @deprecated استعملْ _deny_all_permissions
+ */
+function _default_full_permissions() {
+    return _deny_all_permissions('legacy_default_call');
 }
 
 /**
@@ -852,7 +1038,7 @@ function get_page_permissions($conn, $url = null ) {
     }
 
     if (empty($url)) {
-        return _default_full_permissions();
+        return _deny_all_permissions('empty_url');
     }
 
     // تنظيف الرابط - إزالة query string و fragment
@@ -871,7 +1057,7 @@ function get_page_permissions($conn, $url = null ) {
     $basename = basename($relative_path);
 
     if (empty($basename)) {
-        return _default_full_permissions();
+        return _deny_all_permissions('empty_basename');
     }
 
     // الدور الحالي للمستخدم (المالك المطلوب مطابقته أولاً)
@@ -895,7 +1081,7 @@ function get_page_permissions($conn, $url = null ) {
     );
 
     if (!$stmt) {
-        return _default_full_permissions();
+        return _deny_all_permissions('prepare_failed');
     }
 
     $pattern_end = '%/' . $basename;      // مطابقة نهاية المسار   مثال: %/index.php
@@ -905,9 +1091,9 @@ function get_page_permissions($conn, $url = null ) {
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
-    // إذا لم توجد الوحدة في قاعدة البيانات، إرجاع كل الصلاحيات للتوافقية
+    // FIX-01 · RF-01: الوحدةُ غيرُ موجودةٍ ⇒ منعٌ كاملٌ مُسجَّلٌ لا سماحٌ صامت.
     if (!$result) {
-        return _default_full_permissions();
+        return _deny_all_permissions('module_not_found');
     }
 
     $module_id = intval($result['id']);
@@ -919,7 +1105,10 @@ function get_page_permissions($conn, $url = null ) {
         'can_view'   => $perms['can_view'],
         'can_add'    => $perms['can_add'],
         'can_edit'   => $perms['can_edit'],
-        'can_delete' => $perms['can_delete']
+        'can_delete' => $perms['can_delete'],
+        // CS-10: التصديرُ صلاحيةٌ مستقلةٌ منطقيًّا — لا عمودَ لها في الجدولِ بعد،
+        // فتُشتقّ من القراءةِ **تضييقًا لا توسيعًا** حتى يُضاف العمود.
+        'can_export' => $perms['can_view'],
     ];
 }
 ?>

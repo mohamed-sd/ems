@@ -19,6 +19,10 @@ database/baseline/
 database/backups/
 database/equipation_manage*.sql
 
+# نسخُ ما قبل التحويلِ الآليّ — أدواتُ tools/ تكتبها قبل كلِّ تعديلٍ جماعيّ
+# لتُتيح التراجعَ الفوريّ. عملٌ مؤقتٌ لا كود، ولا يدخل المستودع.
+storage/backups/
+
 # مخلفات أنظمة التشغيل وأدوات الاختبار المحلية
 .ssdiff/
 Thumbs.db

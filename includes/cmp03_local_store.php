@@ -103,3 +103,191 @@ if (!function_exists('cmp03_store_rows')) {
         return $out;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * FIX-03 · FN-04 — «طبقةُ التخزينِ المولَّدةِ بدالتين لا أربع»
+ * ═══════════════════════════════════════════════════════════════════════════
+ * كانت الطبقةُ تنفّذ **الإدراجَ والقراءةَ فقط**: لا تحديثَ ولا عكس. والوثيقةُ
+ * تشترط لكلِّ فعلٍ عقدًا يشمل التصحيحَ والعكس — «ولا مستندَ يُنشأ بلا مسارٍ
+ * لتصحيحه، فالمستندُ المسجونُ عيبٌ بنيويّ».
+ *
+ * ◆ وثلاثةُ أحكامٍ تحكم ما أُضيف:
+ *   ① **لا دالةَ حذفٍ إطلاقًا** (CS-08): العكسُ حركةٌ جديدةٌ بمرجعِها لا محو.
+ *   ② التحديثُ يسجّل **قبلَ وبعد** من طبقةٍ مشتركة (CS-09) لا من الشاشة.
+ *   ③ والعكسُ يُنشئ صفًّا جديدًا يشير إلى الأصلِ ويُعلن حالتَه «معكوس» —
+ *      والأصلُ يبقى كما هو، فالسجلُّ لا يُمحى.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+if (!function_exists('cmp03_store_row')) {
+    /** صفٌّ واحدٌ بمعرّفه — أساسُ «قبلَ» في سجلِّ التدقيق. */
+    function cmp03_store_row(mysqli $conn, $canonical, $companyId, $id)
+    {
+        $reg = cmp03_registry();
+        if (!isset($reg[$canonical])) { return null; }
+        $table = $reg[$canonical]['table'];
+        $st = $conn->prepare("SELECT * FROM `{$table}` WHERE id = ?" . (intval($companyId) > 0 ? ' AND company_id = ?' : '') . ' LIMIT 1');
+        if (!$st) { error_log('cmp03_store_row: prepare — ' . $conn->error); return null; }
+        $id = intval($id);
+        if (intval($companyId) > 0) { $co = intval($companyId); $st->bind_param('ii', $id, $co); }
+        else { $st->bind_param('i', $id); }
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        return $row ?: null;
+    }
+}
+
+if (!function_exists('cmp03_store_update')) {
+    /**
+     * تصحيحُ صفٍّ قائمٍ بمرجعِ الأصلِ وسجلِّ «قبلَ وبعد».
+     * ◆ المعتمدُ لا رجعيةَ فيه (CS-11): صفٌّ حالتُه «معتمد» يُرفض تصحيحُه —
+     *   والتصحيحُ عندئذٍ **عكسٌ ثم إنشاءٌ جديد** لا تعديلٌ في مكانه.
+     *
+     * @return array{ok:bool,msg:string,changed:array}
+     */
+    function cmp03_store_update(mysqli $conn, $companyId, $canonical, $id, array $payload, $uid, $actorName)
+    {
+        $reg = cmp03_registry();
+        if (!isset($reg[$canonical])) {
+            error_log("cmp03_store_update: شاشة خارج السجل — {$canonical}");
+            return array('ok' => false, 'msg' => 'شاشةٌ خارجَ السجل — لا تصحيحَ (409)', 'changed' => array());
+        }
+        $before = cmp03_store_row($conn, $canonical, $companyId, $id);
+        if ($before === null) { return array('ok' => false, 'msg' => 'صفٌّ غيرُ موجود (404)', 'changed' => array()); }
+        if (isset($before['status']) && mb_strpos((string) $before['status'], 'معتمد') !== false) {
+            return array('ok' => false, 'changed' => array(),
+                'msg' => 'مستندٌ معتمدٌ لا رجعيةَ فيه — صحّحْ بحركةٍ عاكسةٍ ثم إنشاءٍ جديد (CS-11 · 409)');
+        }
+
+        $table = $reg[$canonical]['table'];
+        $map   = $reg[$canonical]['map'];
+        $sets = array(); $vals = array(); $types = ''; $changed = array();
+        foreach ($payload as $label => $v) {
+            $n = cmp03_store_norm($label);
+            if (!isset($map[$n])) { error_log("cmp03_store_update: تسمية بلا عمود — «{$label}»"); continue; }
+            $col = $map[$n];
+            $new = trim((string) $v);
+            $old = isset($before[$col]) ? (string) $before[$col] : '';
+            if ($new === $old) { continue; }
+            $sets[] = "`{$col}` = ?";
+            $vals[] = ($new === '' ? null : $new);
+            $types .= 's';
+            $changed[$col] = array('before' => $old, 'after' => $new);
+        }
+        if (!$sets) { return array('ok' => true, 'msg' => 'لا تغييرَ — لم يُكتب شيء', 'changed' => array()); }
+
+        $sets[] = '`updated_at` = NOW()';
+        $sql = "UPDATE `{$table}` SET " . implode(', ', $sets) . ' WHERE id = ?';
+        $vals[] = intval($id); $types .= 'i';
+        if (intval($companyId) > 0) { $sql .= ' AND company_id = ?'; $vals[] = intval($companyId); $types .= 'i'; }
+
+        $st = $conn->prepare($sql);
+        if (!$st) { error_log('cmp03_store_update: prepare — ' . $conn->error); return array('ok' => false, 'msg' => 'تعذّر التصحيح (500)', 'changed' => array()); }
+        $st->bind_param($types, ...$vals);
+        $ok = $st->execute();
+        if (!$ok) { error_log('cmp03_store_update: execute — ' . $st->error); }
+        $st->close();
+        if (!$ok) { return array('ok' => false, 'msg' => 'تعذّر التصحيح (500)', 'changed' => array()); }
+
+        cmp03_store_audit($conn, $companyId, $canonical, $table, $id, 'update', $changed, $uid, $actorName);
+        return array('ok' => true, 'msg' => 'صُحِّح الصفُّ #' . intval($id) . ' — ' . count($changed) . ' حقلًا بسجلِّ قبلَ وبعد', 'changed' => $changed);
+    }
+}
+
+if (!function_exists('cmp03_store_reverse')) {
+    /**
+     * العكسُ حركةٌ جديدةٌ بمرجعِها — **ولا دالةَ حذفٍ في هذه الطبقة إطلاقًا**.
+     * يُنشئ صفًّا جديدًا بحمولةِ الأصلِ وحالةِ «عكس» ومرجعِ الأصلِ في التسمية،
+     * ويَسِمُ الأصلَ «معكوس» — فالأصلُ باقٍ والسلسلةُ مقروءة.
+     *
+     * @return array{ok:bool,msg:string,reversal_id:int}
+     */
+    function cmp03_store_reverse(mysqli $conn, $companyId, $canonical, $id, $reason, $uid, $actorName)
+    {
+        if (trim((string) $reason) === '') {
+            return array('ok' => false, 'msg' => 'سببُ العكس إلزامي (422)', 'reversal_id' => 0);
+        }
+        $reg = cmp03_registry();
+        if (!isset($reg[$canonical])) { return array('ok' => false, 'msg' => 'شاشةٌ خارجَ السجل (409)', 'reversal_id' => 0); }
+        $before = cmp03_store_row($conn, $canonical, $companyId, $id);
+        if ($before === null) { return array('ok' => false, 'msg' => 'صفٌّ غيرُ موجود (404)', 'reversal_id' => 0); }
+        if (isset($before['status']) && mb_strpos((string) $before['status'], 'معكوس') !== false) {
+            return array('ok' => false, 'msg' => 'الصفُّ معكوسٌ سلفًا — لا عكسَ للعكس (409)', 'reversal_id' => 0);
+        }
+
+        $table = $reg[$canonical]['table'];
+        $labels = $reg[$canonical]['labels'];
+        $payload = array();
+        foreach ($labels as $col => $normLabel) {
+            if (isset($before[$col]) && $before[$col] !== null && $before[$col] !== '') { $payload[$normLabel] = $before[$col]; }
+        }
+
+        $conn->begin_transaction();
+        try {
+            $okIns = cmp03_store_insert($conn, $companyId, $canonical, $payload,
+                'عكس — مرجع #' . intval($id), $uid, $actorName);
+            if (!$okIns) { throw new RuntimeException('تعذّر إنشاءُ الحركةِ العاكسة'); }
+            $revId = (int) $conn->insert_id;
+
+            $st = $conn->prepare("UPDATE `{$table}` SET `status` = ?, `updated_at` = NOW() WHERE id = ?");
+            if (!$st) { throw new RuntimeException('prepare: ' . $conn->error); }
+            $newStatus = 'معكوس — بالحركة #' . $revId;
+            $idI = intval($id);
+            $st->bind_param('si', $newStatus, $idI);
+            if (!$st->execute()) { throw new RuntimeException('mark reversed: ' . $st->error); }
+            $st->close();
+
+            $conn->commit();
+            cmp03_store_audit($conn, $companyId, $canonical, $table, $id, 'reverse',
+                array('status' => array('before' => (string) ($before['status'] ?? ''), 'after' => $newStatus),
+                      'reason' => array('before' => '', 'after' => (string) $reason)),
+                $uid, $actorName);
+            return array('ok' => true, 'reversal_id' => $revId,
+                'msg' => 'عُكس الصفُّ #' . $idI . ' بحركةٍ عاكسةٍ #' . $revId . ' — والأصلُ باقٍ');
+        } catch (\Throwable $e) {
+            $conn->rollback();
+            error_log('cmp03_store_reverse: ' . $e->getMessage());
+            return array('ok' => false, 'msg' => 'تعذّر العكس — لم يُكتب شيء (ERR-CMP-1049)', 'reversal_id' => 0);
+        }
+    }
+}
+
+if (!function_exists('cmp03_store_audit')) {
+    /**
+     * CS-09 — «التدقيقُ قبلَ وبعدَ من طبقةٍ مشتركةٍ لا من الشاشة · ولا اعتمادَ
+     * على قادحٍ وحدَه، فالقادحُ لا يعرف الفاعلَ ولا رمزَ الفعل».
+     */
+    function cmp03_store_audit(mysqli $conn, $companyId, $canonical, $table, $pk, $action, array $changed, $uid, $actorName)
+    {
+        $prev = mysqli_report(MYSQLI_REPORT_OFF);
+        try {
+            $st = $conn->prepare("INSERT INTO activity_logs
+                    (company_id, user_id, role_id, role_name, screen_name, module_name,
+                     action_type, field_name, record_id, old_value, new_value, created_at)
+                  VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())");
+            if (!$st) { throw new RuntimeException($conn->error); }
+            $co     = intval($companyId);
+            $user   = intval($uid);
+            $roleId = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+            $roleNm = (string) $actorName;
+            $screen = (string) $canonical;
+            $module = (string) $table;
+            $act    = (string) $action;
+            $fields = implode(',', array_keys($changed));
+            $rec    = intval($pk);
+            $old    = json_encode(array_map(static function ($c) { return $c['before']; }, $changed), JSON_UNESCAPED_UNICODE);
+            $new    = json_encode(array_map(static function ($c) { return $c['after']; }, $changed), JSON_UNESCAPED_UNICODE);
+            // الأنواعُ بترتيبِ الأعمدةِ حرفًا بحرف:
+            // company_id(i) user_id(i) role_id(i) role_name(s) screen_name(s)
+            // module_name(s) action_type(s) field_name(s) record_id(i) old(s) new(s)
+            $st->bind_param('iiisssssiss',
+                $co, $user, $roleId, $roleNm, $screen, $module, $act, $fields, $rec, $old, $new);
+            $st->execute();
+            $st->close();
+        } catch (\Throwable $e) {
+            // CS-12: لا يُبتلع — يُسجَّل ولا يُوقف الأثرَ (السجلُّ تابعٌ لا شرط).
+            error_log('cmp03_store_audit failed: ' . $e->getMessage());
+        }
+        mysqli_report($prev);
+    }
+}

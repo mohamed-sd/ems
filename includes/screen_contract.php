@@ -16,26 +16,109 @@
  */
 
 if (!function_exists('ems_screen_about')) {
-    /** «ما هذه الشاشة؟» — سطرُ غرضٍ وخطواتٌ قابلةٌ للطي، في رأس كل شاشة. */
-    function ems_screen_about($purpose, array $steps = array())
+    /**
+     * «عن الشاشة» — بطاقةُ تعريفٍ واحدةٌ لكل شاشة (UI-01 §3 · UX-00 §5).
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ العيبُ الذي عولج (قرار المالك 2026-08-09): كانت الدالةُ **تطبع بطاقةً
+     *   فورًا في موضع ندائها**. و312 شاشةً من أصل 358 تناديها **قبل فتح
+     *   `<div class="main">`، أي بعد `insidebar` مباشرةً — فتُصيَّر البطاقةُ
+     *   خارجَ عمودِ المحتوى فتلتصق بحافة الشاشة معلَّقةً، لا فوق الجدول حيث
+     *   تُقرأ. ونقلُ النداء في 312 ملفًّا عربيًّا مُرحِّلٌ آليٌّ يمسّ نصًّا —
+     *   وهو أخطرُ من العيب.
+     *
+     * ◆ العلاجُ بنيويٌّ لا تجميلي: تُصدِر الدالةُ الآن **`<template>`** لا
+     *   ترميزًا مرئيًّا. ومحتوى `<template>` **لا يُصيَّر أينما وُضع** بحكم
+     *   المواصفة — فموضعُ النداء صار بلا أثرٍ بنيويًّا في 358 شاشةً دفعةً
+     *   واحدةً بلا لمسِ ملفٍّ واحد. ثم يبني `assets/js/ems-screen-about.js`
+     *   البطاقةَ في موضعها الصحيح: تحتَ الرأس الموحَّد (`.main_head`) مباشرةً
+     *   وفوقَ أولِ محتوى — ويزرع زرَّ «عن الشاشة» في `.head_actions`.
+     *
+     * ◆ لماذا الرأسُ الموحَّد مرساةً موثوقة: قِيس فوُجد أن **357 من 358** شاشةً
+     *   تناديها تُضمّن `includes/page_header.php` (والوحيدةُ الشاذّةُ هي هذا
+     *   الملفُّ نفسُه). فالمرساةُ حاضرةٌ عمليًّا دائمًا، وللمُصيِّر ارتدادٌ إلى
+     *   أول عنصرٍ في `.main` إن غابت.
+     *
+     * ◆ **اليدويُّ يغلب المشتقَّ مهما كان ترتيبُ النداء** — وهذا ليس ترفًا:
+     *   أربعٌ وعشرون شاشةً تنادي `ems_screen_about_auto()` في صدرها (بعد
+     *   `insidebar` مباشرةً) ثم تنادي النصَّ المصوغَ باليد لاحقًا داخلَ
+     *   المحتوى. فقاعدةُ «أولُ نداءٍ يفوز» كانت **تبتلع النصَّ المصوغ** وتُبقي
+     *   العامَّ — انحدارٌ صامتٌ لا يظهر في الشاشة: بطاقةٌ سليمةُ الشكل بنصٍّ
+     *   أفقر. فيُصدَر القالبان موسومَين بمصدرِهما، ويختار المُصيِّرُ اليدويَّ
+     *   إن وُجد. (كشفه `tools/screen_about_audit.php` بعد أن مرّت عيّنةُ تسعِ
+     *   شاشاتٍ خضراءَ — والعيّنةُ لا تشهد للثلاثمئة.)
+     *
+     * ◆ **نصٌّ تعريفيٌّ فقط** (قرار المالك 2026-08-09): البطاقةُ دليلُ مستخدمٍ
+     *   مصغَّر — تشرح **ما هذه الشاشة وما فيها** لمن يفتحها أولَ مرة. ولا تذكر
+     *   مَن يعمل عليها ولا مهامَّها ولا الصلاحيات: تلك بياناتُ حوكمةٍ موضعُها
+     *   شاشاتُ الحوكمة، وإقحامُها هنا يحوّل التعريفَ إلى تقريرٍ يُتصفَّح.
+     *
+     * @param string $purpose النصُّ التعريفيُّ للشاشة
+     * @param array  $steps   (مهجورٌ — لا يُصيَّر؛ يبقى للتوافق مع 69 نداءً قائمًا)
+     * @param string $rule    (مهجورٌ — لا يُصيَّر؛ يبقى للتوافق)
+     * @param array  $opts    ['src' => 'manual'|'auto']
+     */
+    function ems_screen_about($purpose, array $steps = array(), $rule = '', $opts = array())
     {
-        static $printed = false;
-        $id = 'emsAbout' . substr(md5((string) $purpose), 0, 6);
-        echo '<div class="card" style="border-inline-start:4px solid #e2b93b;margin-bottom:12px">'
-           . '<div class="card-body" style="padding:10px 14px">'
-           . '<a href="#" onclick="var b=document.getElementById(\'' . $id . '\');'
-           . 'b.style.display=b.style.display===\'none\'?\'block\':\'none\';return false"'
-           . ' style="font-weight:800;text-decoration:none"><i class="fa fa-circle-question"></i>'
-           . ' ما هذه الشاشة؟</a>'
-           . '<div id="' . $id . '" style="display:none;margin-top:8px;color:#555">'
-           . '<p>' . htmlspecialchars((string) $purpose) . '</p>';
-        if ($steps) {
-            echo '<ol style="margin:6px 18px">';
-            foreach ($steps as $s) { echo '<li>' . htmlspecialchars((string) $s) . '</li>'; }
-            echo '</ol>';
+        static $emitted = array();
+        static $registryTried = false;
+        if (is_string($opts)) { $opts = array('src' => $opts); }   // توافقٌ مع النداء القديم
+        $src = isset($opts['src']) ? (string) $opts['src'] : 'manual';
+        if (!in_array($src, array('registry', 'manual', 'auto'), true)) { $src = 'manual'; }
+        if (isset($emitted[$src])) { return; }   // قالبٌ واحدٌ لكلِّ مصدر
+        $emitted[$src] = true;
+
+        /* ◆ السجلُّ هو المرجع (قرار المالك 2026-08-09): يُصدَر قالبُ `screen_about`
+           من أوّلِ نداءٍ **أيًّا كان مصدرُه** — فالشاشاتُ التي تصوغ نصَّها بيدها
+           ولا تنادي المشتقَّ أصلًا يبلغها السجلُّ أيضًا. وترتيبُ الترجيح عند
+           المُصيِّر: **السجل ← نصُّ الملف ← الاشتقاق**.
+           ◆ ولا يُحرَس «هل جُرِّب السجل؟» بـ`isset($emitted['registry'])`:
+             `isset()` على قيمةٍ `false` **تعود true**، فكان النداءُ العائدُ
+             يرتدّ فارغًا ولا يُصدِر السجلَّ أبدًا — علَمٌ مستقلٌّ أصدق. */
+        if ($src !== 'registry' && !$registryTried && isset($GLOBALS['conn'])) {
+            $registryTried = true;                             // محاولةٌ واحدةٌ لا أكثر
+            $relKey = trim(preg_replace('~^.*?/ems/~', '', strtr((string) ($_SERVER['SCRIPT_NAME'] ?? ''), '\\', '/')), '/');
+            if ($relKey !== '') {
+                try {
+                    $rs = $GLOBALS['conn']->prepare("SELECT description FROM screen_about
+                                                      WHERE screen_path = ? AND active = 1 LIMIT 1");
+                    if ($rs) {
+                        $rs->bind_param('s', $relKey);
+                        $rs->execute();
+                        $row = $rs->get_result()->fetch_assoc();
+                        $rs->close();
+                        if ($row && trim((string) $row['description']) !== '') {
+                            ems_screen_about((string) $row['description'], array(), '', array('src' => 'registry'));
+                        }
+                    }
+                } catch (\Throwable $t) { /* السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة */ }
+            }
         }
-        echo '</div></div></div>';
-        if (!$printed) { $printed = true; ems_state_offline_bar(); }
+
+        $purpose = trim((string) $purpose);
+        if ($purpose === '') { return; }
+
+        /* فقراتٌ تُفصل بسطرٍ فارغ — فالنصُّ الطويلُ يُقرأ مقاطعَ لا كتلةً واحدة */
+        $body = '';
+        foreach (preg_split('/\R{2,}/u', $purpose) as $para) {
+            $para = trim($para);
+            if ($para === '') { continue; }
+            $body .= '<p class="ems-about__purpose">'
+                   . htmlspecialchars($para, ENT_QUOTES, 'UTF-8') . '</p>';
+        }
+        if ($body === '') { return; }
+
+        /* مفتاحُ الذاكرة مسارُ الشاشة: «أولُ فتحٍ يشرح، وما بعده يُطوى» لكلِّ
+           شاشةٍ على حدة — لا علمًا واحدًا يكتم النظامَ كلَّه بعد أولِ صرف. */
+        $key = trim(preg_replace('~^.*?/ems/~', '', strtr((string) ($_SERVER['SCRIPT_NAME'] ?? ''), '\\', '/')), '/');
+
+        echo '<template class="ems-about-tpl" data-src="' . $src . '"'
+           . ' data-screen-key="'
+           . htmlspecialchars($key !== '' ? $key : 'screen', ENT_QUOTES, 'UTF-8') . '">'
+           . $body . '</template>';
+
+        /* شريطُ «دون اتصال» مرةً واحدةً للصفحة مهما تعدّدت القوالب */
+        static $bar = false;
+        if (!$bar) { $bar = true; ems_state_offline_bar(); }
     }
 }
 
@@ -108,46 +191,54 @@ if (!function_exists('ems_state_offline_bar')) {
 
 if (!function_exists('ems_screen_about_auto')) {
     /**
-     * «ما هذه الشاشة؟» مشتقًّا آليًّا (E-03 · الاكتساح) — من سجل الشاشة نفسه:
-     * اسمُ الموديول + موضعُها في قائمة الدور (المرحلة/المجموعة). الشاشاتُ ذات
-     * السطر المصوغ يدويًّا لا تستدعي هذا — اليدويُّ أبلغ حيث وُجد.
+     * تعريفُ الشاشة من **سجلِّ التعريفات** `screen_about` — نصٌّ مكتوبٌ لكلِّ
+     * شاشة، يشرح ما هي وما فيها كدليلِ مستخدمٍ مصغَّر.
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ لماذا سجلٌّ في القاعدة لا نصٌّ في كلِّ ملف: التعريفاتُ **محتوًى يُحرَّر**
+     *   لا شيفرةٌ تُنشر — فمراجعتُها وتصحيحُها لا يحتاجان لمسَ 358 ملفًّا ولا
+     *   إعادةَ نشر. والسجلُّ يُولَّد من مصادرِ النظام الحية بـ
+     *   `tools/screen_about_generate.php` ثم يُنقَّح، ولكلِّ صفٍّ **مصدرُه
+     *   معلَنٌ** (`source`) فيُعرف المكتوبُ بيدٍ من المشتقّ.
+     *
+     * ◆ الارتدادُ عند غياب الصفّ: تعريفٌ أدنى من اسم الشاشة وإدارتِها — ولا
+     *   تُخترع لها وظيفةٌ لا مصدرَ لها.
      */
     function ems_screen_about_auto($conn)
     {
         $script = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
         $rel = ltrim(preg_replace('~^.*?/ems/~', '', strtr($script, chr(92), '/')), '/');
         if ($rel === '') { return; }
-        $name = ''; $place = '';
-        try {
-            $st = $conn->prepare("SELECT id, name FROM modules WHERE code = ? OR code LIKE ?
-                                   ORDER BY (code = ?) DESC, CHAR_LENGTH(code) ASC LIMIT 1");
-            $tail = '%/' . basename($rel);
-            $st->bind_param('sss', $rel, $tail, $rel);
-            $st->execute();
-            $m = $st->get_result()->fetch_assoc();
-            $st->close();
-            if ($m) { $name = (string) $m['name']; }
-            $role = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
-            if ($role > 0) {
-                $st = $conn->prepare("SELECT lg.stage_title, lg.name gname FROM nav_items ni
-                                       JOIN link_groups lg ON lg.id = ni.group_id
-                                      WHERE ni.role_id = ? AND ni.route = ? AND ni.active = 1 LIMIT 1");
-                $st->bind_param('is', $role, $rel);
+
+        /* السجلُّ يُصدَر من `ems_screen_about` نفسِها لكلِّ نداءٍ أوّل — فلا
+           يُكرَّر هنا. ما يبقى لهذه الدالة: **الارتدادُ** حين لا صفَّ للشاشة. */
+        $text = '';
+        {
+            $name = ''; $dept = '';
+            try {
+                $st = $conn->prepare("SELECT name FROM modules WHERE code = ? OR code LIKE ?
+                                       ORDER BY (code = ?) DESC, CHAR_LENGTH(code) ASC LIMIT 1");
+                $tail = '%/' . basename($rel);
+                $st->bind_param('sss', $rel, $tail, $rel);
                 $st->execute();
-                $g = $st->get_result()->fetch_assoc();
+                if ($m = $st->get_result()->fetch_assoc()) { $name = trim((string) $m['name']); }
                 $st->close();
-                if ($g) {
-                    $place = trim((string) $g['stage_title']);
-                    if ((string) $g['gname'] !== '' && (string) $g['gname'] !== $place) {
-                        $place .= ($place !== '' ? ' ← ' : '') . $g['gname'];
-                    }
+
+                $st = $conn->prepare("SELECT owner_dept, title_ar FROM nav09_file_map WHERE real_path = ? LIMIT 1");
+                $st->bind_param('s', $rel);
+                $st->execute();
+                if ($d = $st->get_result()->fetch_assoc()) {
+                    $dept = trim((string) $d['owner_dept']);
+                    if ($name === '') { $name = trim((string) $d['title_ar']); }
                 }
-            }
-        } catch (\Throwable $t) { /* السطر إرشاد — لا يُسقط الشاشة */ }
-        if ($name === '') { $name = basename($rel, '.php'); }
-        $purpose = 'شاشة «' . $name . '»' . ($place !== '' ? ' — ضمن ' . $place . ' في قائمتك' : '')
-                 . '. البياناتُ فيها تخضع لعزل شركتك وصلاحياتِ دورك.';
-        ems_screen_about($purpose);
+                $st->close();
+            } catch (\Throwable $t) { /* التعريفُ إرشادٌ — لا يُسقط الشاشة */ }
+
+            if ($name === '') { $name = basename($rel, '.php'); }
+            $text = 'شاشة «' . $name . '»' . ($dept !== '' ? ' — ضمن نطاق ' . $dept : '') . '.';
+        }
+
+        // مصدرٌ «مشتق»: يُصيَّر فقط إن لم تُصغ الشاشةُ تعريفَها بيدها (أيًّا كان الترتيب)
+        ems_screen_about($text, array(), '', array('src' => 'auto'));
     }
 }
 

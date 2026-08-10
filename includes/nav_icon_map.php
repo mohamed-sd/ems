@@ -503,6 +503,8 @@ function ems_nav_stage_icon($stageNo, $stageTitle) {
         'إدخال'     => 'fa fa-database',
         'الموارد'   => 'fa fa-boxes-stacked',
         'إصدار'     => 'fa fa-rocket',
+        'فريق'      => 'fa fa-users-gear',
+        'معاون'     => 'fa fa-users-gear',
     );
     foreach ($rules as $kw => $icon) {
         if (mb_strpos((string) $stageTitle, $kw) !== false) { return $icon; }

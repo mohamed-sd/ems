@@ -238,7 +238,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
         <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
             <label style="font-size:.78rem">ملاحظة التصديق
-                <input type="text" id="govAttestNote" class="form-control form-control-sm" style="min-width:280px" placeholder="راجعتُ القائمةَ وأشهد بصحتها">
+                <input type="text" id="govAttestNote" class="form-control form-control-sm" style="min-width:280px" placeholder="راجعتُ القائمةَ وأشهد بصحتها" aria-label="راجعتُ القائمةَ وأشهد بصحتها">
             </label>
             <button class="ems-btn-primary" onclick="govDeptAttest()">أُصدّق على قائمة الفريق (<?php echo count($team); ?>)</button>
         </div>

@@ -559,6 +559,8 @@ class TenantRegistry
         'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
         'link_groups' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_items' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // تعريفُ الشاشة خاصيةُ الشاشة لا بياناتُ شركة — مرجعٌ عامٌّ كأخواته
+        'screen_about' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_redirects' => array('type' => self::T_GLOBAL, 'soft' => false),
         'role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
         // لقطةُ تراجع حزمة SEC-GOV 2026-08-06 (نسخة role_permissions قبل القصّ) —
@@ -567,6 +569,10 @@ class TenantRegistry
         // التكلفة الوصولية لأوامر الشراء (إضافات الدور 16 · 2026-08-06)
         'proc_landed_cost' => array('type' => self::T_TENANT, 'soft' => true),
         'report_role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // FIX-01 · CS-07 — سجلُّ عطالةِ معالجاتِ POST. عالميٌّ بطبيعتِه: المفتاحُ
+        // بصمةُ (فاعلٍ × فعلٍ × محتوى) لا صفٌّ يخصُّ كيانًا، والفاعلُ نفسُه يحمل
+        // كيانَه. حصرُه بشركةٍ يفتح ثغرةَ تكرارٍ عبرَ تبديلِ سياقِ الكيان.
+        'ems_post_idempotency' => array('type' => self::T_GLOBAL, 'soft' => false),
         'equipments_types' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
         'failure_codes' => array('type' => self::T_GLOBAL, 'managed' => true, 'soft' => false),
         'admin_subscription_plans' => array('type' => self::T_GLOBAL, 'soft' => false),
