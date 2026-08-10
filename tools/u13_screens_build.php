@@ -212,10 +212,23 @@ foreach ($MAN as $s) {
     if (!$apply) { skip("سيُدرَج — $rel (دور {$s['role']})"); continue; }
     $so = (int) (@$db->query("SELECT COALESCE(MAX(sort_order),0)+1 FROM nav_items
                                WHERE role_id = " . (int) $s['role'])->fetch_row()[0] ?? 1);
-    $st = $db->prepare("INSERT INTO nav_items (role_id, door, label_ar, route, icon, sort_order, permission_code, active, created_at)
-                        VALUES (?,'main',?,?,?,?,?,1,NOW())");
+    /* ◆ FN-01/FN-02 (حزمة FIX) — صفُّ التنقلِ **يُوصَل بوحدتِه** وبابٍ معروف:
+       ① `module_id` إلزاميٌّ متى وُجد `permission_code` — والقيدُ
+          `chk_nav_items_module_or_code` في القاعدةِ يرفض غيرَه. فالصفُّ بوحدةٍ
+          فارغةٍ ورمزٍ غيرِ فارغٍ **يسقط في الفحصِ صامتًا** (41 صفًّا ميتًا).
+       ② والبابُ `main` ليس من الأبوابِ الثمانيةِ المعروفة، فلا يُصيَّر أصلًا —
+          والبابُ الصحيحُ لشاشاتِ الحوكمةِ والمراجعةِ هو `GOV`.
+       ③ والمسارُ بلا بادئةٍ نسبية: المُصيِّرُ يُلحقها بنفسه. */
+    $mid = (int) (@$db->query("SELECT id FROM modules WHERE code = '" . $db->real_escape_string($rel) . "'
+                                ORDER BY (owner_role_id = " . (int) $s['role'] . ") DESC, id ASC LIMIT 1")
+                     ->fetch_row()[0] ?? 0);
+    if ($mid <= 0) { bad("nav $rel — لا وحدةَ صلاحياتٍ مسجَّلةٌ لهذه الشاشة (الصفُّ يُترك ولا يُنشأ ميتًا)"); continue; }
+    $door = 'GOV';
+    $st = $db->prepare("INSERT INTO nav_items (role_id, door, module_id, label_ar, route, icon, sort_order, permission_code, active, created_at)
+                        VALUES (?,?,?,?,?,?,?,?,1,NOW())");
     if (!$st) { bad('prepare nav: ' . $db->error); continue; }
-    $st->bind_param('isssis', $s['role'], $s['title'], $route, $s['icon'], $so, $rel);
+    // الأنواعُ بترتيبِ الأعمدة: role(i) door(s) module(i) label(s) route(s) icon(s) sort(i) code(s)
+    $st->bind_param('isisssis', $s['role'], $door, $mid, $s['title'], $route, $s['icon'], $so, $rel);
     if (!$st->execute()) { bad("nav $rel — " . $st->error); }
     else { $navAdded++; }
     $st->close();

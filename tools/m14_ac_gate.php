@@ -162,24 +162,26 @@ $LONG = array('approvals_inbox.php','entities.php','ownership_links.php','delega
     'exceptions.php','audit.php','contract_registry.php','org_structure.php','org_assignments.php',
     'portal_users.php','assistants.php','break_glass.php','access_review.php','release_stamp.php',
     'canonical_names.php','risk_dept_gov.php');
+/* ◆ GT-01 (FIXA-0032/0034) — أُبطل الشرطُ الخاوي نفسُه هنا: كان يمرُّ على
+   ‎'table'‎ أو ‎'card'‎ وكلاهما في كلِّ ملف. البديلُ تصييرٌ حيٌّ وتحليلُ الناتج
+   عبر الموضعِ الواحد ‎fix_screen_view_evidence‎. */
+require_once __DIR__ . '/fix_lib.php';
 $longOk = 0; $longMiss = array();
 foreach ($LONG as $cf) {
     $rp = $paths[$cf] ?? '';
-    if ($rp === '' || !is_file($ROOT . '/' . $rp)) { $longMiss[] = $cf; continue; }
-    $src = (string) file_get_contents($ROOT . '/' . $rp);
-    if (strpos($src, 'dept_risk_space.php') !== false) {
-        $src .= (string) @file_get_contents($ROOT . '/Risk/dept_risk_space.php');
-    }
-    if (strpos($src, 'dept_gov_space.php') !== false) {
-        $src .= (string) @file_get_contents($ROOT . '/includes/dept_gov_space.php');
-    }
-    // الجداولُ الموحدة أو المناظرُ البطاقية الطبقية (الهيكلُ يُعرض طبقاتٍ ثلاثًا)
-    if (strpos($src, 'alltables') !== false || strpos($src, 'table') !== false
-        || strpos($src, 'byLayer') !== false || strpos($src, 'card') !== false) { $longOk++; }
-    else { $longMiss[] = $cf; }
+    if ($rp === '' || !is_file($ROOT . '/' . $rp)) { $longMiss[] = $cf . ' (لا ملف)'; continue; }
+    $ownerRole = one($db, "SELECT rp.role_id FROM role_permissions rp
+                             JOIN modules m ON m.id = rp.module_id
+                            WHERE m.code = '" . $db->real_escape_string($rp) . "' AND rp.can_view = 1
+                            ORDER BY rp.role_id LIMIT 1");
+    if ($ownerRole === null) { $longMiss[] = $cf . ' (بلا دورٍ مانحٍ فلا تُصيَّر)'; continue; }
+    $ev = fix_screen_view_evidence($ROOT, $rp, (string) $ownerRole);
+    if (!empty($ev['ok'])) { $longOk++; } else { $longMiss[] = $cf . ' — ' . $ev['reason']; }
 }
-ac('AC-05', 'صفر شاشة طويلة بلا مناظر', empty($longMiss),
-    "{$longOk}/22 طويلةً بجداول إطار العرض الموحد" . (empty($longMiss) ? '' : ' — الناقص: ' . implode(' · ', $longMiss)));
+$LONG_N = count($LONG);
+ac('AC-05', 'صفر شاشة طويلة بلا مناظر (تصييرٌ حيٌّ لا مطابقةُ نص)', empty($longMiss),
+    "{$longOk}/{$LONG_N} صُيِّرت بجدولٍ حقيقيٍّ ومنتقي منظرٍ فعّال"
+    . (empty($longMiss) ? '' : ' — الناقص: ' . implode(' · ', array_slice($longMiss, 0, 6))));
 
 /* ══ AC-06 · الحقولُ الحساسةُ (18 شاشة §6-3) ══════════════════════════════ */
 $polCount = (int) one($db, "SELECT COUNT(*) FROM scr_sensitive_fields

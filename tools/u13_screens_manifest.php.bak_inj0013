@@ -328,20 +328,7 @@ function u13_screens_manifest()
           'basis' => 'derived', 'doc' => 'IAF-01 §4-1', 'doc_ref' => 'IAF-0007',
           'intro' => 'الغرضُ والسلطةُ والمسؤوليةُ والاستقلال — معتمدًا من الجهةِ المشرفة',
           'rule'  => 'IAF-0004: لا تتبع الماليةَ ولا رئيسَ الحساباتِ ولا الحوكمةَ في إصدارِ أحكامها',
-          'empty' => 'لا ميثاقَ معتمدٌ بعدُ — ولا كونَ رقابيٌّ بلا ميثاق',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'approve\' => array(
-            \'code\'  => \'iaf.charter.approve\',
-            \'label\' => \'اعتمادُ الميثاق\',
-            \'rule\'  => \'IAF-0044: ولا كونَ رقابيٌّ بلا ميثاقٍ معتمد\',
-            \'fields\' => array(\'version\' => \'نسخةُ الميثاق\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::approveCharter($conn, array(
-                    \'company_id\' => $co, \'version\' => (string) ($in[\'version\'] ?? \'\'), \'actor\' => $uid));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا ميثاقَ معتمدٌ بعدُ — ولا كونَ رقابيٌّ بلا ميثاق'),
 
     array('code' => 'iaf_independence', 'dir' => 'Audit', 'file' => 'iaf_independence.php',
           'title' => 'إقرارات الاستقلال وتعارض المصالح', 'icon' => 'fa fa-user-check',
@@ -350,21 +337,7 @@ function u13_screens_manifest()
           'order' => 'declared_at DESC',
           'intro' => 'إقرارٌ سنويٌّ لكلِّ مراجعٍ وقبلَ كلِّ تكليف',
           'rule'  => 'IAF-0009: ولا تكليفَ بمهمةٍ بلا إقرارٍ سارٍ قبلَه',
-          'empty' => 'لا إقراراتِ استقلالٍ مسجَّلة',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'declare\' => array(
-            \'code\'  => \'iaf.independence.declare\',
-            \'label\' => \'إقرارُ استقلالٍ وتعارضِ مصالح\',
-            \'rule\'  => \'IAF-0009: لا تكليفَ بمهمةٍ بلا إقرارِ استقلالٍ سارٍ\',
-            \'fields\' => array(\'auditor_id\' => \'رقمُ المراجع\', \'scope_ref\' => \'النطاق\', \'valid_until\' => \'سارٍ حتى\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::declareIndependence($conn, array(
-                    \'company_id\' => $co, \'auditor_id\' => (int) ($in[\'auditor_id\'] ?? 0), \'scope_ref\' => (string) ($in[\'scope_ref\'] ?? \'\'),
-                    \'valid_until\' => (string) ($in[\'valid_until\'] ?? \'\'), \'has_conflict\' => !empty($in[\'has_conflict\'])));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا إقراراتِ استقلالٍ مسجَّلة'),
 
     array('code' => 'iaf_universe', 'dir' => 'Audit', 'file' => 'iaf_universe.php',
           'title' => 'الكون الرقابي', 'icon' => 'fa fa-globe',
@@ -373,21 +346,7 @@ function u13_screens_manifest()
           'order' => 'risk_score DESC',
           'intro' => 'نطاقاتُ المراجعةِ كلُّها بدرجةِ خطرِ كلٍّ وتاريخِ آخرِ مراجعة',
           'rule'  => 'IAF-0014: التقييمُ السنويُّ للمخاطرِ أساسُ الخطةِ لا الاجتهاد',
-          'empty' => 'لم يُبنَ الكونُ الرقابيُّ بعدُ — ولا خطةَ بلا كون',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'build\' => array(
-            \'code\'  => \'iaf.universe.build\',
-            \'label\' => \'إدراجُ مجالٍ في الكونِ الرقابي\',
-            \'rule\'  => \'IAF-0044: لا كونَ بلا ميثاقٍ معتمد\',
-            \'fields\' => array(\'area_code\' => \'رمزُ المجال\', \'area_name\' => \'اسمُ المجال\', \'owner_dept\' => \'الإدارةُ المالكة\', \'risk_score\' => \'درجةُ الخطر\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::buildUniverse($conn, array(
-                    \'company_id\' => $co, \'area_code\' => (string) ($in[\'area_code\'] ?? \'\'), \'area_name\' => (string) ($in[\'area_name\'] ?? \'\'),
-                    \'owner_dept\' => (string) ($in[\'owner_dept\'] ?? \'\'), \'risk_score\' => (int) ($in[\'risk_score\'] ?? 0)));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لم يُبنَ الكونُ الرقابيُّ بعدُ — ولا خطةَ بلا كون'),
 
     array('code' => 'iaf_plan', 'dir' => 'Audit', 'file' => 'iaf_plan.php',
           'title' => 'خطة المراجعة السنوية', 'icon' => 'fa fa-calendar-check',
@@ -396,21 +355,7 @@ function u13_screens_manifest()
           'order' => 'plan_year DESC',
           'intro' => 'خطةٌ مبنيةٌ على المخاطرِ معتمدةٌ من الجهةِ المشرفة',
           'rule'  => 'IAF-0044: لا مهمةَ بلا خطةٍ ولا خطةَ بلا كونٍ رقابيٍّ ولا كونَ بلا ميثاق',
-          'empty' => 'لا خطةَ معتمدةٌ بعدُ',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'approve\' => array(
-            \'code\'  => \'iaf.plan.approve\',
-            \'label\' => \'اعتمادُ الخطةِ السنوية\',
-            \'rule\'  => \'IAF-0044: لا خطةَ بلا كونٍ رقابيٍّ مبنيّ\',
-            \'fields\' => array(\'plan_year\' => \'سنةُ الخطة\', \'title\' => \'عنوانُ الخطة\', \'basis\' => \'الأساس\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::approvePlan($conn, array(
-                    \'company_id\' => $co, \'plan_year\' => (int) ($in[\'plan_year\'] ?? 0), \'title\' => (string) ($in[\'title\'] ?? \'\'),
-                    \'basis\' => (string) ($in[\'basis\'] ?? \'\'), \'actor\' => $uid));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا خطةَ معتمدةٌ بعدُ'),
 
     array('code' => 'iaf_engagements', 'dir' => 'Audit', 'file' => 'iaf_engagements.php',
           'title' => 'مهام المراجعة', 'icon' => 'fa fa-briefcase',
@@ -419,21 +364,7 @@ function u13_screens_manifest()
           'order' => 'id DESC',
           'intro' => 'مراجعاتٌ ماليةٌ وتشغيليةٌ وتقنيةٌ والتزامية',
           'rule'  => 'IAF-0006: ولا يصبح المراجعُ جزءًا مما سيراجعه لاحقًا',
-          'empty' => 'لا مهامَّ مراجعةٍ مفتوحة',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'open\' => array(
-            \'code\'  => \'iaf.engagement.open\',
-            \'label\' => \'فتحُ مهمةِ مراجعة\',
-            \'rule\'  => \'IAF-0044 + IAF-0009: لا مهمةَ بلا خطةٍ معتمدةٍ ولا بلا إقرارِ استقلالٍ سارٍ\',
-            \'fields\' => array(\'plan_id\' => \'رقمُ الخطة\', \'area_code\' => \'رمزُ المجال\', \'title\' => \'عنوانُ المهمة\', \'lead_auditor\' => \'المراجعُ المكلَّف\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::openEngagement($conn, array(
-                    \'company_id\' => $co, \'plan_id\' => (int) ($in[\'plan_id\'] ?? 0), \'area_code\' => (string) ($in[\'area_code\'] ?? \'\'),
-                    \'title\' => (string) ($in[\'title\'] ?? \'\'), \'lead_auditor\' => (int) ($in[\'lead_auditor\'] ?? 0)));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا مهامَّ مراجعةٍ مفتوحة'),
 
     array('code' => 'iaf_workpapers', 'dir' => 'Audit', 'file' => 'iaf_workpapers.php',
           'title' => 'أوراق العمل والأدلة', 'icon' => 'fa fa-folder-open',
@@ -442,21 +373,7 @@ function u13_screens_manifest()
           'order' => 'captured_at DESC',
           'intro' => 'نسخُ أدلةٍ غيرُ قابلةٍ للتعديلِ ببصمةِ كلٍّ',
           'rule'  => 'IAF-0037: سحبُ الأدلةِ وحفظُ نسخِ مراجعةٍ غيرِ قابلةٍ للتعديل',
-          'empty' => 'لا أوراقَ عملٍ ملتقَطة',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'attach\' => array(
-            \'code\'  => \'iaf.workpaper.attach\',
-            \'label\' => \'إرفاقُ ورقةِ عملٍ ببصمةِ دليل\',
-            \'rule\'  => \'IAF-0037: نسخُ أدلةٍ غيرُ قابلةٍ للتعديلِ ببصمةِ كلٍّ — والبصمةُ تُحسب لا تُدخَل\',
-            \'fields\' => array(\'engagement_no\' => \'رقمُ المهمة\', \'wp_ref\' => \'مرجعُ الورقة\', \'title\' => \'عنوانُ الورقة\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::attachWorkpaper($conn, array(
-                    \'company_id\' => $co, \'engagement_no\' => (string) ($in[\'engagement_no\'] ?? \'\'), \'wp_ref\' => (string) ($in[\'wp_ref\'] ?? \'\'),
-                    \'title\' => (string) ($in[\'title\'] ?? \'\'), \'actor\' => $uid));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا أوراقَ عملٍ ملتقَطة'),
 
     array('code' => 'iaf_findings', 'dir' => 'Audit', 'file' => 'iaf_findings.php',
           'title' => 'ملاحظات المراجعة', 'icon' => 'fa fa-flag',
@@ -467,20 +384,7 @@ function u13_screens_manifest()
           'rule'  => 'لا تُغلق ملاحظةٌ بلا دليلٍ يقبله المراجعُ — ولا تُغلق من الإدارةِ نفسِها',
           'empty' => 'لا ملاحظاتٍ مفتوحة',
           'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'raise\' => array(
-            \'code\'  => \'iaf.finding.raise\',
-            \'label\' => \'رفعُ ملاحظة\',
-            \'rule\'  => \'IAF-0025: رفعُ الملاحظةِ للمراجعِ الداخليِّ حصرًا — ولا ملاحظةَ بلا مهمة\',
-            \'fields\' => array(\'engagement_no\' => \'رقمُ المهمة\', \'title\' => \'عنوانُ الملاحظة\', \'severity\' => \'الخطورة\', \'auditee_dept\' => \'الإدارةُ المُلاحَظة\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \App\Services\Audit\InternalAuditService::raiseFinding($conn, array(
-                    \'company_id\' => $co, \'engagement_no\' => (string) ($in[\'engagement_no\'] ?? \'\'), \'title\' => (string) ($in[\'title\'] ?? \'\'),
-                    \'severity\' => (string) ($in[\'severity\'] ?? \'\'), \'auditee_dept\' => (string) ($in[\'auditee_dept\'] ?? \'\'),
-                    \'actor\' => $uid));
-            }),
-'
-. "        'accept_evidence' => array(\n"
+            . "        'accept_evidence' => array(\n"
             . "            'code'  => 'iaf.evidence.accept',\n"
             . "            'label' => 'قبولُ دليلٍ على ملاحظة',\n"
             . "            'rule'  => 'الدليلُ يقبله المراجعُ — وقبولُه شرطُ الإغلاق',\n"
@@ -506,51 +410,23 @@ function u13_screens_manifest()
 
     array('code' => 'iaf_responses', 'dir' => 'Audit', 'file' => 'iaf_responses.php',
           'title' => 'ردود الإدارات على الملاحظات', 'icon' => 'fa fa-comments',
-          'table' => 'iaf_findings', 'nature' => 'document', 'role' => 33,
+          'table' => 'iaf_findings', 'nature' => 'read', 'role' => 33,
           'basis' => 'derived', 'doc' => 'IAF-01 §4-3', 'doc_ref' => 'IAF-0027',
           'where' => "state IN ('responded','in_remediation','evidence_submitted')",
           'order' => 'responded_at DESC',
           'intro' => 'ردُّ الإدارةِ إلزاميٌّ بمهلة — والسكوتُ يُصعَّد للجهةِ المشرفة',
           'rule'  => 'BF-15: والردُّ إلزاميٌّ بمهلةٍ · والسكوتُ يُصعَّد',
-          'empty' => 'لا ردودَ واردةً بعدُ',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'submit\' => array(
-            \'code\'  => \'iaf.response.submit\',
-            \'label\' => \'ردُّ الإدارةِ على ملاحظة\',
-            \'rule\'  => \'فصلُ الواجبات: الردُّ فعلُ الإدارةِ المُلاحَظِ عليها لا فعلُ المراجع\',
-            \'fields\' => array(\'finding_no\' => \'رقمُ الملاحظة\', \'response_text\' => \'نصُّ الرد\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::submitResponse($conn, array(
-                    \'company_id\' => $co, \'finding_no\' => (string) ($in[\'finding_no\'] ?? \'\'), \'response_text\' => (string) ($in[\'response_text\'] ?? \'\'),
-                    \'actor\' => $uid));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا ردودَ واردةً بعدُ'),
 
     array('code' => 'iaf_action_plans', 'dir' => 'Audit', 'file' => 'iaf_action_plans.php',
           'title' => 'خطط المعالجة ومتابعتها', 'icon' => 'fa fa-list-check',
-          'table' => 'iaf_findings', 'nature' => 'document', 'role' => 33,
+          'table' => 'iaf_findings', 'nature' => 'read', 'role' => 33,
           'basis' => 'derived', 'doc' => 'IAF-01 §4-3', 'doc_ref' => 'IAF-0028',
           'where' => "action_plan IS NOT NULL AND state <> 'closed'",
           'order' => 'action_due ASC',
           'intro' => 'الاتفاقُ على خططِ المعالجةِ ومتابعةُ تنفيذها بمهلةِ كلٍّ',
           'rule'  => 'IAF-0028: المتابعةُ للمراجعِ — والإدارةُ تنفّذ ولا تشهد على نفسها',
-          'empty' => 'لا خططَ معالجةٍ قائمة',
-          'actions_src' => "\n    'actions'    => array(\n"
-            . '        \'set\' => array(
-            \'code\'  => \'iaf.actionplan.set\',
-            \'label\' => \'ضبطُ خطةِ المعالجةِ ومالكِها ومهلتِها\',
-            \'rule\'  => \'IAF-0044: لا خطةَ معالجةٍ بلا ردِّ إدارةٍ سابق\',
-            \'fields\' => array(\'finding_no\' => \'رقمُ الملاحظة\', \'action_plan\' => \'خطةُ المعالجة\', \'action_owner\' => \'مالكُ الإجراء\', \'action_due\' => \'المهلة\'),
-            \'run\' => function ($conn, $co, $uid, $in) {
-                require_once __DIR__ . \'/../app/Services/Audit/InternalAuditService.php\';
-                return \\App\\Services\\Audit\\InternalAuditService::setActionPlan($conn, array(
-                    \'company_id\' => $co, \'finding_no\' => (string) ($in[\'finding_no\'] ?? \'\'), \'action_plan\' => (string) ($in[\'action_plan\'] ?? \'\'),
-                    \'action_owner\' => (string) ($in[\'action_owner\'] ?? \'\'), \'action_due\' => (string) ($in[\'action_due\'] ?? \'\')));
-            }),
-'
-            . "    ),\n"),
+          'empty' => 'لا خططَ معالجةٍ قائمة'),
 
     array('code' => 'iaf_closure', 'dir' => 'Audit', 'file' => 'iaf_closure.php',
           'title' => 'محاضر الإغلاق', 'icon' => 'fa fa-circle-check',

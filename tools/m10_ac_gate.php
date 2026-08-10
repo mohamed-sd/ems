@@ -175,26 +175,31 @@ $LONG = array('entitlement.php','invoices.php','receivables.php','payables.php',
     'budget_master.php','margin.php','client_statement.php','tax_invoices.php','cash_forecast.php',
     'fin_statements.php','cost_report.php','maint_provision.php','routing_admin.php','cycle_time.php',
     'entitlement_gate.php','risk_dept_fin.php','fin_ratio_detail.php'); // ◆ 24 في v5
+/* ◆ GT-01 (FIXA-0032/0034) — أُبطل الشرطُ الخاوي.
+   كان الحكمُ: ‎strpos($src,'table') !== false‎ — أي «هل في ملفِّ PHP الحروفُ
+   t-a-b-l-e؟». وكلُّ ملفٍّ يحتويها، فالمعيارُ يمرُّ أخضرَ على كلِّ شيءٍ ولا
+   يرسب على شيء — وكلُّ تقريرِ جاهزيةٍ بُني عليه ليس دليلًا.
+   البديلُ: **تصييرٌ حيٌّ** للشاشةِ بدورِ مالكها ثم تحليلُ **الناتج**: جدولٌ
+   حقيقيٌّ · أعمدةٌ فوقَ الصفر · منتقي منظرٍ فعّال. والتفصيلُ في
+   ‎tools/fix_lib.php::fix_screen_view_evidence‎ (موضعٌ واحدٌ يُختبر مرةً واحدة)،
+   واختبارُه السلبيُّ في ‎tools/fix_negative_tests.php‎. */
+require_once __DIR__ . '/fix_lib.php';
 $longOk = 0; $longMiss = array();
 foreach ($LONG as $cf) {
     $rp = $paths[$cf] ?? '';
-    if ($rp === '' || !is_file($ROOT . '/' . $rp)) { $longMiss[] = $cf; continue; }
-    $src = (string) file_get_contents($ROOT . '/' . $rp);
-    // الغلافُ الرقيقُ يُقاس بمضمَّنه — فالمناظرُ في المكوّن النطاقي لا الغلاف
-    if (strpos($src, 'dept_risk_space.php') !== false) {
-        $src .= (string) @file_get_contents($ROOT . '/Risk/dept_risk_space.php');
-    }
-    if (strpos($src, 'dept_gov_space.php') !== false) {
-        $src .= (string) @file_get_contents($ROOT . '/includes/dept_gov_space.php');
-    }
-    // منتقي المنظر وزرُّ إظهار الكل عبر إطار الجداول الموحد (alltables ⇒ DT colvis)
-    // أو مناظرُ مبنيةٌ (تبويبات المكوّن النطاقي السبعة) — الغيابُ التام رسوب
-    if (strpos($src, 'alltables') !== false || strpos($src, 'table') !== false) { $longOk++; }
-    else { $longMiss[] = $cf; }
+    if ($rp === '' || !is_file($ROOT . '/' . $rp)) { $longMiss[] = $cf . ' (لا ملف)'; continue; }
+    $ownerRole = one($db, "SELECT rp.role_id FROM role_permissions rp
+                             JOIN modules m ON m.id = rp.module_id
+                            WHERE m.code = '" . $db->real_escape_string($rp) . "' AND rp.can_view = 1
+                            ORDER BY rp.role_id LIMIT 1");
+    if ($ownerRole === null) { $longMiss[] = $cf . ' (بلا دورٍ مانحٍ فلا تُصيَّر)'; continue; }
+    $ev = fix_screen_view_evidence($ROOT, $rp, (string) $ownerRole);
+    if (!empty($ev['ok'])) { $longOk++; } else { $longMiss[] = $cf . ' — ' . $ev['reason']; }
 }
-ac('AC-05', 'صفر شاشة طويلة بلا مناظر', empty($longMiss),
-    "{$longOk}/24 طويلةً بجدولٍ عبر إطار الجداول الموحد (منتقي الأعمدة وإظهار الكل)"
-    . (empty($longMiss) ? '' : ' — الناقص: ' . implode(' · ', $longMiss)));
+$LONG_N = count($LONG);
+ac('AC-05', 'صفر شاشة طويلة بلا مناظر (تصييرٌ حيٌّ لا مطابقةُ نص)', empty($longMiss),
+    "{$longOk}/{$LONG_N} صُيِّرت بجدولٍ حقيقيٍّ وأعمدةٍ فوقَ الصفرِ ومنتقي منظرٍ فعّال"
+    . (empty($longMiss) ? '' : ' — الناقص: ' . implode(' · ', array_slice($longMiss, 0, 6))));
 
 /* ══ AC-06 · صفرُ حقلٍ حساسٍ يُرسَل لغير المخوَّل ══════════════════════════ */
 $polCount = (int) one($db, "SELECT COUNT(*) FROM scr_sensitive_fields
@@ -355,11 +360,29 @@ $compJs = '';
 foreach (array('assets/js/ems-components.js', 'includes/js/ems-components.js', 'assets/ems-components.js') as $p) {
     if (is_file($ROOT . '/' . $p)) { $compJs = (string) file_get_contents($ROOT . '/' . $p); break; }
 }
-$hasSyncComponent = $compJs !== '' && (strpos($compJs, 'sync') !== false || strpos($compJs, 'مزامنة') !== false);
-$fxIncludesShell = strpos($fxSrc, 'inheader') !== false;
-ac('AC-11', 'الشاشة الميدانية بحالة مزامنة ظاهرة', $fxIncludesShell && $hasSyncComponent,
-    "fx_rates → {$fxPath}: تضمينُ القشرة " . ($fxIncludesShell ? '✓' : '✘')
-    . ' · شريحةُ المزامنة في نواة المكونات ' . ($hasSyncComponent ? '✓ (EmsUI تقرأ محور AX-4)' : '✘'));
+/* ◆ GT-01 — أُبطل شرطان خاويان هنا أيضًا:
+   ‎strpos($compJs,'sync')‎ و‎strpos($fxSrc,'inheader')‎ — كلمتان عامّتان تردان في
+   أيِّ ملف. البديلُ: **تصييرٌ حيٌّ** للشاشةِ ثم البحثُ عن أثرِ القشرةِ وشريحةِ
+   المزامنةِ في **الناتج** لا في المصدر. */
+require_once __DIR__ . '/fix_lib.php';
+$fxOwner = one($db, "SELECT rp.role_id FROM role_permissions rp
+                       JOIN modules m ON m.id = rp.module_id
+                      WHERE m.code = '" . $db->real_escape_string($fxPath) . "' AND rp.can_view = 1
+                      ORDER BY rp.role_id LIMIT 1");
+$fxRender = $fxOwner === null ? array('body' => '', 'bytes' => 0, 'fatal' => 'بلا دورٍ مانح')
+                              : fix_render_screen($ROOT, $fxPath, (string) $fxOwner);
+$fxBody = (string) $fxRender['body'];
+$fxIncludesShell = ($fxRender['bytes'] > 0)
+    && (strpos($fxBody, 'ems-unified-page-shell') !== false || strpos($fxBody, '<div class="main"') !== false);
+// شريحةُ المزامنة: عنصرٌ مُصيَّرٌ يحمل محورَ الحالةِ AX-4 أو وسمَ المزامنةِ الصريح
+$hasSyncComponent = (strpos($fxBody, 'data-ax-4') !== false)
+    || (strpos($fxBody, 'ems-sync') !== false)
+    || (strpos($fxBody, 'data-sync-state') !== false)
+    || (preg_match('/<[^>]+class="[^"]*\bems-badge\b[^"]*"[^>]*>[^<]*مزامن/u', $fxBody) === 1);
+ac('AC-11', 'الشاشة الميدانية بحالة مزامنة ظاهرة (تصييرٌ حيّ)', $fxIncludesShell && $hasSyncComponent,
+    "fx_rates → {$fxPath} (دور {$fxOwner} · " . $fxRender['bytes'] . " بايت): القشرةُ في الناتج "
+    . ($fxIncludesShell ? '✓' : '✘')
+    . ' · شريحةُ المزامنةِ مُصيَّرة ' . ($hasSyncComponent ? '✓' : '✘'));
 
 /* ══ AC-12 · دليلُ الحساباتِ المعادُ هيكلتُه (COA-01) ═════════════════════ */
 $canon = (int) one($db, "SELECT COUNT(*) FROM fin_chart_of_accounts
