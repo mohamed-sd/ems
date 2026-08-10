@@ -95,15 +95,30 @@ foreach (fix_php_files($ROOT) as $rel) {
             }
             continue;
         }
-        // نداءٌ ثابتٌ  Cls::method(  ·  إنشاءُ كائنٍ  new Cls(  ·  اسمٌ مؤهَّلٌ في use
-        $used = false;
-        if (preg_match_all('/\b' . preg_quote($cls, '/') . '\s*::\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(/', $code, $cm)) {
-            $used = true;
-            foreach ($cm[1] as $fn) {
-                if (isset($guards[$cls]['methods'][$fn])) { $guards[$cls]['methods'][$fn]++; }
-            }
+        /* ══ الأسماءُ المستعارةُ تُحلُّ قبل العدّ ══════════════════════════════
+           `use App\…\GovernanceM14Service as M14;` ثم `M14::decideApproval(…)`
+           تبنٍّ كامل، والعدُّ بالاسمِ الصريحِ وحدَه يراه صفرًا. أعلنت البوابةُ
+           صنفَين «بلا مستهلك» وكلاهما مُتبنًّى في شاشتِه منذ زمن — والفرقُ بين
+           عيبٍ حقيقيٍّ وعيبٍ في المقياسِ هو ما يُهدر عليه العمل.
+           ◆ ويُستخرج الاسمُ المستعارُ من الكودِ المنزوعِ التعليقِ لا من النصِّ
+             الخام، فسطرُ `use` في شرحٍ ليس استيرادًا. */
+        $names = array($cls);
+        if (preg_match_all('/\buse\s+[A-Za-z0-9_\\\\]*\\\\' . preg_quote($cls, '/')
+                           . '\s+as\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/i', $code, $am)) {
+            foreach ($am[1] as $alias) { $names[] = $alias; }
         }
-        if (preg_match('/\bnew\s+(?:\\\\[A-Za-z0-9_\\\\]*)?' . preg_quote($cls, '/') . '\s*\(/', $code)) { $used = true; }
+
+        // نداءٌ ثابتٌ  Cls::method(  ·  إنشاءُ كائنٍ  new Cls(
+        $used = false;
+        foreach (array_unique($names) as $nm) {
+            if (preg_match_all('/\b' . preg_quote($nm, '/') . '\s*::\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(/', $code, $cm)) {
+                $used = true;
+                foreach ($cm[1] as $fn) {
+                    if (isset($guards[$cls]['methods'][$fn])) { $guards[$cls]['methods'][$fn]++; }
+                }
+            }
+            if (preg_match('/\bnew\s+(?:\\\\[A-Za-z0-9_\\\\]*)?' . preg_quote($nm, '/') . '\s*\(/', $code)) { $used = true; }
+        }
         if ($used) { $guards[$cls]['consumers'][] = $rel; }
     }
 }

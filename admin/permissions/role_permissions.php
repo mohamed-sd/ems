@@ -20,7 +20,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $can_edit = isset($_POST['can_edit']) ? 1 : 0;
     $can_delete = isset($_POST['can_delete']) ? 1 : 0;
 
-    if (!$role_id || !$module_id) {
+    /* ══ MD-05 · تبنّي `SegregationOfDutiesGuard` — «يُفحص عند حساب الصلاحية
+       لا بعد الوقوع» (SEC-01 §5) ═══════════════════════════════════════════
+       كان الحارسُ مبنيًّا **بصفرِ نداء**، وهذه شاشةُ المنحِ نفسُها — أي أنه
+       بُني ليُفحص هنا ولم يُفحص. واجتماعُ طرفَي تعارضٍ في شخصٍ واحدٍ يُردُّ
+       بـ409 مع عرضِ التعارضِ، ولا يُطبَّق. والاستثناءُ بموافقةٍ ورقابةٍ
+       تعويضيةٍ معلَنةٍ لا صامتًا — ولذلك العلمُ صريحٌ في الطلبِ لا افتراضيّ. */
+    $sod_conflict = null;
+    if ($role_id && $module_id) {
+        $__sod = dirname(__DIR__, 2) . '/app/Services/Security/SegregationOfDutiesGuard.php';
+        if (is_file($__sod)) {
+            require_once $__sod;
+            require_once dirname(__DIR__, 2) . '/includes/catch_log.php';
+            try {
+                $__codes = array();
+                foreach (array('can_view' => $can_view, 'can_add' => $can_add,
+                               'can_edit' => $can_edit, 'can_delete' => $can_delete) as $__a => $__on) {
+                    if ($__on) { $__codes[] = 'module:' . (int) $module_id . ':' . $__a; }
+                }
+                if ($__codes) {
+                    $__r = \App\Services\Security\SegregationOfDutiesGuard::check(
+                        $conn,
+                        (int) $role_id,
+                        (int) ($_SESSION['user']['company_id'] ?? 0),
+                        $__codes,
+                        !empty($_POST['sod_compensating'])
+                    );
+                    if (is_array($__r) && empty($__r['ok'])) {
+                        $sod_conflict = (string) ($__r['message'] ?? 'تعارضُ فصلِ واجباتٍ يمنع هذا المنح');
+                    }
+                }
+            } catch (\Throwable $__se) {
+                // فشلُ الفاحصِ لا يمنح ولا يمنع صامتًا — يُسجَّل ويُعلَن للمشغّل.
+                ems_catch_ignored($__se, __FILE__,
+                    'تعذّر فحصُ فصلِ الواجبات — المنحُ يستمرُّ والفحصُ يُعاد في مراجعةِ الدورة');
+            }
+        }
+    }
+
+    if ($sod_conflict !== null) {
+        $error_msg = '⛔ ' . $sod_conflict . ' (SEC-409-SOD)';
+    } elseif (!$role_id || !$module_id) {
         $error_msg = 'الدور والصفحة مطلوبان ❌';
     } else {
         // كونسول المزوّد: كتابة RBAC بهوية المدير الأعلى العابرة = الموضع الشرعي للعقد
@@ -54,6 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 array('role_id' => intval($role_id), 'module_id' => intval($module_id),
                       'can_view' => $can_view, 'can_add' => $can_add,
                       'can_edit' => $can_edit, 'can_delete' => $can_delete));
+
+            /* ◆ لا نداءَ لـ`PermissionExplainService` هنا — وقد أضفتُه ثم رفعتُه:
+                 توقيعُها `explain($conn, $personId, …)` ينتظر **معرِّفَ شخص**،
+                 وهذه الشاشةُ تمنح لـ**دور**. تمريرُ معرِّفِ الدورِ مكانَه يُنتج
+                 تفسيرًا لشخصٍ لا وجودَ له فيبدو صحيحًا وهو عدم. وهي متبنّاةٌ
+                 في موضعِها الصحيح: `admin/sec_governance.php` (بالاسم `PEX`). */
         } else {
             $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
         }

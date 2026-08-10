@@ -6,6 +6,32 @@ $admin        = super_admin_current();
 $page_title   = 'إدارة الصلاحيات والأدوار';
 $current_page = 'permissions';
 
+/* ══ MD-05 · تبنّي أربعِ خدماتِ حوكمةٍ كانت مبنيةً بصفرِ نداء ═══════════════
+   ◆ هذه الشاشةُ مركزُ الصلاحياتِ — فهي البيتُ الطبيعيُّ لحالةِ حوكمتِها.
+     وخدمةٌ لا تُنادى من موضعٍ يعرضها للمشغّلِ تبقى نيّةً لا حارسًا.
+   ◆ وكلُّ نداءٍ معزولٌ عن أخيه: تعذُّرُ خدمةٍ يُخفي بطاقتَها ولا يُسقط الصفحة،
+     والسببُ يُسجَّل ولا يُبتلع. فلوحةُ حالةٍ تُسقط مركزَ الصلاحياتِ حين تعطب
+     إحدى قارئاتِها أسوأُ من غيابها. */
+require_once __DIR__ . '/../../includes/catch_log.php';
+
+/* ◆ **قارئاتٌ فقط.** كدتُ أنادي `PermissionChangeWorkflow::open()` و
+     `PermissionTemplateService::impactPreview()` من لوحةِ حالةٍ لأُسكت بوابةَ
+     التبنّي — والأولى **تُنشئ طلبَ تغييرٍ حقيقيًّا** والثانيةُ تُستدعى بمعرِّفِ
+     نسخةٍ مُلفَّق. ذاك تزييفُ تبنٍّ لا تبنٍّ، وهو عينُ ما تُنشئ MD-05 لمنعه:
+     نداءٌ يُرضي عدّادًا ولا يخدم مستخدمًا. فأفعالُ الكتابةِ تُوصَل بمشغّلاتها
+     الحقيقيةِ في شاشاتِها، والكنّاساتُ الدوريةُ بالدورية — لا هنا. */
+$founding_banner = null;
+$__fm = dirname(__DIR__, 2) . '/app/Services/Security/FoundingModeService.php';
+if (is_file($__fm)) {
+    require_once $__fm;
+    try {
+        $founding_banner = \App\Services\Security\FoundingModeService::activeBanner($conn ?? ($GLOBALS['conn'] ?? null));
+    } catch (\Throwable $__fe) {
+        ems_catch_ignored($__fe, 'admin/permissions/index',
+            'لافتةُ وضعِ التأسيسِ تعذّرت — تُخفى ولا تُسقط مركزَ الصلاحيات');
+    }
+}
+
 require_once __DIR__ . '/../includes/layout_head.php';
 ?>
 

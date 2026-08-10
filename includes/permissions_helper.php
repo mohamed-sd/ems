@@ -889,6 +889,63 @@ function ems_enforce_write_permission($conn, array $current, $redirect_path = '.
         }
     }
 
+    /* ══ MD-05 · تبنّي `GuardResolver` — «يُستدعى من داخل الحارس نفسه» ═══════
+       نصُّ توثيقِه (GOV-01 §10-①) يحدّد موضعَه، وكان **بصفرِ نداء**: صنفُ
+       الحمايةِ يُفحص ثم يُبحث عن استثناءٍ نافذٍ يغطي النطاقَ والوقت، و**يُسجَّل
+       العبورُ أو المنعُ دائمًا**. فبلا نداءٍ لا استثناءَ نافذًا يُعتدُّ به ولا
+       سجلَّ عبورٍ يُراجَع — والاستثناءاتُ المعتمدةُ حبرٌ على ورق.
+       ◆ ويُنادى **قبل** فحصِ المنحة: `absolute` يمنع مهما بلغت الصلاحيات،
+         و`allow_by_exception` يسمح لمن لا منحةَ له باستثناءٍ نافذ. وترتيبُه
+         بعدَ فحصِ المنحةِ يُلغي الحالتين معًا. */
+    $__resolver = dirname(__DIR__) . '/app/Services/Governance/GuardResolver.php';
+    if (is_file($__resolver)) {
+        require_once $__resolver;
+        $__relPath = function_exists('ems_relative_path')
+            ? ems_relative_path((string) ($_SERVER['SCRIPT_NAME'] ?? ''))
+            : ltrim(str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        /* ◆ الرمزُ **يُقرأ من `guard_policies` ولا يُخترَع.** أول محاولةٍ مرّرت
+             رمزًا مُركَّبًا `screen_write:<path>` لا وجودَ له في الجدول، وسياسةُ
+             الخدمةِ أن المجهولَ يُمنع مغلقًا — فصار كلُّ سطحٍ «حمايةً بلا صنف».
+             و`GuardResolver` مصمَّمةٌ لعملياتٍ **مصنَّفةٍ** بأسمائها، لا لرمزٍ
+             لكلِّ ملفّ. فإن لم يُصنَّف السطحُ حارسًا فلا شأنَ لها به، ويحكم
+             فحصُ المنحةِ وحدَه — وهو fail-closed أصلًا. */
+        $__gc = null;
+        $__gp = $conn->prepare('SELECT guard_code FROM guard_policies WHERE guard_code = ? LIMIT 1');
+        if ($__gp) {
+            $__try = 'screen_write:' . $__relPath;
+            $__gp->bind_param('s', $__try);
+            if ($__gp->execute()) {
+                $__gr = $__gp->get_result()->fetch_assoc();
+                if ($__gr) { $__gc = $__try; }
+            }
+            $__gp->close();
+        }
+        try {
+            if ($__gc === null) { goto __guardDone; }   // لا حارسَ مصنَّفًا لهذا السطح
+            $__verdict = \App\Services\Governance\GuardResolver::resolve(
+                $conn,
+                intval($_SESSION['user']['company_id'] ?? 0),
+                $__gc,
+                intval($_SESSION['user']['id'] ?? 0),
+                array('path' => $__relPath, 'module_id' => $current['id'] ?? null)
+            );
+            $__d = is_array($__verdict) ? (string) ($__verdict['decision'] ?? '') : '';
+            if ($__d === 'deny') {
+                ems_gov_flash_redirect($redirect_path,
+                    (string) ($__verdict['reason'] ?? 'حمايةٌ مطلقةٌ تمنع الكتابةَ في هذه الشاشة'),
+                    'GOV-GUARD-403', 'صنفُ الحمايةِ مطلقٌ — ولا مسارَ استثناءٍ له');
+            }
+            // استثناءٌ نافذٌ يعبر بمن لا منحةَ له — وقد سُجِّل استعمالُه في الخدمة
+            if ($__d === 'allow_by_exception') { return; }
+        } catch (\Throwable $__ge) {
+            // فشلُ المُحكِّم لا يفتح البابَ: يُسجَّل ويستمرُّ الفحصُ بالمنحةِ وحدَها.
+            require_once __DIR__ . '/catch_log.php';
+            ems_catch_ignored($__ge, __FUNCTION__,
+                'تعذّر تحكيمُ صنفِ الحماية — يستمرُّ الفحصُ بالمنحةِ وحدَها ولا يُفتح الباب');
+        }
+        __guardDone:
+    }
+
     $mayWrite = !empty($current['can_add']) || !empty($current['can_edit']) || !empty($current['can_delete']);
     if ($mayWrite) { return; }
 

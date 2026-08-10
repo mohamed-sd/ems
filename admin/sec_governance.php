@@ -16,10 +16,12 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 require_once __DIR__ . '/../app/Services/Security/PermissionExplainService.php';
 require_once __DIR__ . '/../app/Services/Security/PermissionReviewService.php';
 require_once __DIR__ . '/../app/Services/Security/PermissionChangeWorkflow.php';
+require_once __DIR__ . '/../app/Services/Security/PermissionTemplateService.php';
 
 use App\Services\Security\PermissionExplainService as PEX;
 use App\Services\Security\PermissionReviewService as PRS;
 use App\Services\Security\PermissionChangeWorkflow as PCW;
+use App\Services\Security\PermissionTemplateService as PTS;
 
 $current_role   = strval($_SESSION['user']['role'] ?? '');
 $is_super_admin = ($current_role === '-1');
@@ -67,6 +69,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gov_action'])) {
     } elseif ($act === 'apply_pcr' && $can_edit) {
         $r = PCW::apply($conn, intval($_POST['req_id'] ?? 0), $uid);
         ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌')));
+        exit();
+
+    /* ══ MD-05 · تبنّي `PermissionTemplateService` — آخرُ حارسٍ بلا مستهلك ═══
+       بُنيت بخمسِ دوالٍّ ونُودِيت في `tests/` وحدَها — واختبارٌ ينادي خدمةً لا
+       يجعلها مُتبنّاة: البناءُ ليس تبنّيًا، والاختبارُ يُثبت أنها **تعمل** لا
+       أنها **تُستعمل**. وموضعُها هذا الكونسولُ حيث تعيش شقيقتاها.
+       ◆ ودورةُ حياةِ القالبِ محفوظةٌ بترتيبها: إنشاءُ نسخةٍ ← معاينةُ الأثرِ
+         ← وسمُ الاختبارِ ← النشرُ بمرجعِ اعتماد. والنشرُ **يشترط المرجع** —
+         فقالبٌ يُنشر بلا اعتمادٍ يمنح صلاحياتٍ لم يُقرّها أحد. */
+    } elseif ($act === 'tpl_create' && $can_edit) {
+        $perms = json_decode(strval($_POST['permissions_json'] ?? '[]'), true);
+        $r = PTS::createVersion($conn, strval($_POST['tpl_kind'] ?? ''), strval($_POST['key_code'] ?? ''),
+            is_array($perms) ? $perms : array(), strval($_POST['change_ref'] ?? ''));
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
+            (is_array($r) ? strval($r['reason'] ?? 'أُنشئت نسخةُ القالب') : 'أُنشئت نسخةُ القالب')
+            . (is_array($r) && empty($r['ok']) ? ' ❌' : ' ✅')));
+        exit();
+    } elseif ($act === 'tpl_preview' && $can_view) {
+        // معاينةٌ لا كتابة — تُعرض في الصفحةِ ولا تُعيد التوجيه
+        $tplPreview = PTS::impactPreview($conn, intval($_POST['ver_id'] ?? 0));
+    } elseif ($act === 'tpl_tested' && $can_edit) {
+        $r = PTS::markTested($conn, intval($_POST['ver_id'] ?? 0), strval($_POST['test_ref'] ?? ''));
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
+            (is_array($r) ? strval($r['reason'] ?? 'وُسِم القالبُ مُختبَرًا') : 'وُسِم القالبُ مُختبَرًا')
+            . (is_array($r) && empty($r['ok']) ? ' ❌' : ' ✅')));
+        exit();
+    } elseif ($act === 'tpl_publish' && $can_edit) {
+        $approvalRef = trim(strval($_POST['approval_ref'] ?? ''));
+        if ($approvalRef === '') {
+            ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
+                'مرجعُ الاعتمادِ إلزاميٌّ للنشر — ولا يُنشر قالبٌ بلا مَن أقرّه ❌'));
+            exit();
+        }
+        $r = PTS::publish($conn, intval($_POST['ver_id'] ?? 0), $approvalRef);
+        ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
+            (is_array($r) ? strval($r['reason'] ?? 'نُشر القالب') : 'نُشر القالب')
+            . (is_array($r) && empty($r['ok']) ? ' ❌' : ' ✅')));
         exit();
     }
 }
