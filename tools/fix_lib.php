@@ -245,6 +245,29 @@ if (!function_exists('fix_strip_comments')) {
     }
 }
 
+if (!function_exists('fix_blank_comments')) {
+    /**
+     * كـ‏fix_strip_comments‎ لكنه يحفظ **طولَ النصِّ بالبايت** أيضًا: يستبدل بكلِّ
+     * بايتِ تعليقٍ مسافةً ويُبقي الأسطر. فتبقى كلُّ مواضعِ البايتِ صالحةً بعده.
+     *
+     * الحاجةُ إليه: نصٌّ في تعليقِ PHP لا يبلغ المتصفّحَ قطُّ، فعدُّه HTML يخلق
+     * دَينًا وهميًّا — مثالٌ حيّ: `<input.md>` في شرحِ استعمالِ سكربتٍ سطريّ.
+     */
+    function fix_blank_comments($src)
+    {
+        $out = '';
+        foreach (@token_get_all($src) as $t) {
+            $txt = is_array($t) ? $t[1] : $t;
+            if (is_array($t) && ($t[0] === T_COMMENT || $t[0] === T_DOC_COMMENT)) {
+                $out .= preg_replace('/[^\n]/', ' ', $txt);
+                continue;
+            }
+            $out .= $txt;
+        }
+        return (strlen($out) === strlen($src)) ? $out : $src;   // فشلُ التوسيمِ ⇒ الأصلُ سالمًا
+    }
+}
+
 if (!function_exists('fix_line_of')) {
     /** رقمُ السطرِ (1-based) لموضعِ بايتٍ في نصّ. */
     function fix_line_of($src, $pos) { return substr_count(substr($src, 0, $pos), "\n") + 1; }

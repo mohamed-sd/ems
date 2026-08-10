@@ -1022,7 +1022,7 @@ include("../inheader.php"); ?>
                                     <?= $shift_info['label'] ?>
                                 </span>
                                 <select class="shift-edit-select" style="display:none;"
-                                        data-operation-id="<?= intval($row['id']) ?>">
+                                        data-operation-id="<?= intval($row['id']) ?>" aria-label="وردية المشغّل">
                                     <option value="D" <?= $shift_code === 'D' ? 'selected' : '' ?>>☀️ نهاري فقط</option>
                                     <option value="N" <?= $shift_code === 'N' ? 'selected' : '' ?>>🌙 ليلي فقط</option>
                                     <option value="B" <?= $shift_code === 'B' ? 'selected' : '' ?>>🔄 نهاري + ليلي</option>

@@ -1299,7 +1299,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         </div>
                         <?php endforeach; ?>
                     </div>
-                    <select class="plan-select-fallback" id="plan_id_fallback">
+                    <select class="plan-select-fallback" id="plan_id_fallback" aria-label="اختيار الباقة">
                         <?php foreach ($plans as $p): ?>
                         <option value="<?php echo intval($p['id']); ?>" <?php echo $selectedPlan === intval($p['id']) ? 'selected' : ''; ?>><?php echo e($p['plan_name']); ?></option>
                         <?php endforeach; ?>

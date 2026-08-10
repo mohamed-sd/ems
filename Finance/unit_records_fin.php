@@ -190,7 +190,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <tr class="<?php echo $ready ? '' : 'table-warning'; ?>">
                             <?php if ($can_edit): ?>
                             <td><?php if ($ready): ?>
-                                <input type="checkbox" class="q-chk" value="<?php echo $tid; ?>" onchange="qCount()">
+                                <input type="checkbox" class="q-chk" value="<?php echo $tid; ?>" onchange="qCount()" aria-label="تحديد السجل للتحويل">
                             <?php else: ?><span title="غير قابلٍ للتحويل">—</span><?php endif; ?></td>
                             <?php endif; ?>
                             <td><?php echo htmlspecialchars((string) $row['work_date']); ?></td>

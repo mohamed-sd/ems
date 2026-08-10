@@ -267,9 +267,11 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
                     <?php endif; ?>
                 </div>
                 <?php foreach (($spec['fields'] ?? array()) as $fk => $fl): ?>
+                <?php /* معرّفٌ فريدٌ يربط العنوانَ بحقلِه: المفتاحان معًا لأن الشاشةَ تعرض أفعالًا عدة */
+                      $u13Fid = 'u13f_' . preg_replace('/[^A-Za-z0-9_]/', '_', $key . '_' . $fk); ?>
                 <div class="u13-act-field">
-                    <label><?php echo htmlspecialchars($fl, ENT_QUOTES, 'UTF-8'); ?></label>
-                    <input type="text" name="<?php echo htmlspecialchars($fk, ENT_QUOTES, 'UTF-8'); ?>"
+                    <label for="<?php echo $u13Fid; ?>"><?php echo htmlspecialchars($fl, ENT_QUOTES, 'UTF-8'); ?></label>
+                    <input type="text" id="<?php echo $u13Fid; ?>" name="<?php echo htmlspecialchars($fk, ENT_QUOTES, 'UTF-8'); ?>"
                            maxlength="190" <?php echo empty($spec['optional'][$fk] ?? false) ? 'required' : ''; ?>>
                 </div>
                 <?php endforeach; ?>

@@ -1484,7 +1484,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                             <td><?php echo htmlspecialchars($drv['driver_phone'] ?? '-'); ?></td>
                                                             <td>
                                                                 <?php if ($is_active && $can_edit): ?>
-                                                                    <select class="drv_shift" data-rel="<?php echo $rel_id; ?>">
+                                                                    <select class="drv_shift" data-rel="<?php echo $rel_id; ?>" aria-label="وردية السائق">
                                                                         <option value="D" <?php echo $drv_shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
                                                                         <option value="N" <?php echo $drv_shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
                                                                         <option value="B" <?php echo $drv_shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>

@@ -292,6 +292,14 @@ u('AC-U6', 'كلُّ شاشةٍ بمجموعةٍ فارغةٍ تعرض سببً�
      3 من 98 قبلَ الرابطِ · **94 من 98 بعده**.
    ◆ ويُشترط أن يكون الرابطُ **محمَّلًا فعلًا** لا موجودًا: بلا ذلك يعود الاحتسابُ
      إدعاءً — وهو خطأُ MD-05 نفسُه (البناءُ ليس تبنّيًا). */
+/* القاموسُ يُقرأ من `ui-unification.js` — مصدرٌ واحدٌ للحقيقة. */
+$FIELD_DICT = array();
+$__uj = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
+if (preg_match('/EMS_FIELD_LABELS\s*=\s*\{([\s\S]*?)\};/u', $__uj, $dm)) {
+    if (preg_match_all("/([A-Za-z_][A-Za-z0-9_]*)\\s*:\\s*'([^']+)'/u", $dm[1], $km, PREG_SET_ORDER)) {
+        foreach ($km as $kv) { $FIELD_DICT[$kv[1]] = $kv[2]; }
+    }
+}
 $binderLive = false;
 $binderSrc = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
 if (strpos(ems_ui_boot_body($binderSrc), 'bootFieldLabels(') !== false) {
@@ -302,6 +310,10 @@ $inputs = 0; $labeled = 0; $aria = 0; $byBinder = 0; $unlabeledFiles = array();
 foreach (ui_files($ROOT, array('php')) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if ($src === '') { continue; }
+    /* ◆ التعليقاتُ تُفرَّغ قبلَ الفحصِ: نصٌّ في تعليقِ PHP لا يبلغ المتصفّحَ قطُّ
+         فليس حقلًا. وقد أنتج عدُّه دَينًا وهميًّا: `<input.md>` في شرحِ استعمالِ
+         سكربتٍ سطريّ عُدَّ حقلًا بلا عنوان. والتفريغُ يحفظ مواضعَ البايتِ كلَّها. */
+    $src = fix_blank_comments($src);
     $n = preg_match_all('/<(input|select|textarea)\b((?:<\?(?:php|=)[\s\S]*?\?>|[^>])*)>/i', $src, $m, PREG_SET_ORDER);
     if (!$n) { continue; }
     $forIds = array();
@@ -362,9 +374,25 @@ foreach (ui_files($ROOT, array('php')) as $rel) {
             /* ⑤ نصٌّ مجاورٌ قصيرٌ يسبق الحقلَ بلا وسمِ `<label>` — نمطُ تعنونٍ
                شائعٌ («تاريخ البدء: [حقل]»)، والنصُّ مكتوبٌ بيدِ مبرمجٍ فهو
                عنوانٌ حقيقيّ. والرابطُ يلتقطه ويصنع منه وسمًا وصفيًّا. */
-            if (preg_match('/>\s*([^<>]{2,60}?)\s*[:：]?\s*$/u', $before, $pm)
-                && trim($pm[1]) !== '' && !preg_match('/^[\d\s.,%-]+$/u', $pm[1])) {
+            /* ◆ التقريبُ الساكنُ لقاعدةِ «النصُّ المجاور» كان أضيقَ من الرابط:
+                 يشترط النصَّ ملاصقًا للوسمِ، فلا يرى «فلترة حسب الدور:» لأن
+                 بينهما `</label>`. والرابطُ وقتَ التصييرِ يعبر الأشقّاءَ ويأخذ
+                 نصَّهم. فيُقاس ما يقيسه: **أثمة نصٌّ ظاهرٌ قبلَ الحقلِ مباشرة؟**
+                 تُجرَّد الوسومُ من آخرِ 220 حرفًا ويُنظر في الباقي. */
+            /* ◆ القصُّ بـ‏mb_substr‎ لا ‎substr‎: القصُّ بالبايت يشطر حرفًا عربيًّا
+                 نصفين، فيردُّ `preg_replace` بمعدِّلِ `/u` قيمةَ null على نصٍّ
+                 معطوب، فيصير النصُّ المجاورُ فارغًا — فيُتَّهم حقلٌ معنونٌ بحقّ. */
+            $near = strip_tags(mb_substr($before, -220));
+            $near = trim((string) preg_replace('/\s+/u', ' ', $near));
+            $near = (string) preg_replace('/[:：*]\s*$/u', '', $near);
+            if ($near !== '' && mb_strlen($near) >= 2 && !preg_match('/^[\d\s.,%\-\/]+$/u', $near)) {
                 $byBinder++; continue;
+            }
+            /* ⑥ قاموسُ الأسماءِ الدلاليةِ المؤلَّفِ بيد — يُقرأ من الملفِّ نفسِه
+               فلا تنفصل البوابةُ عن الرابطِ إذا نُقّح أحدُهما. */
+            if ($FIELD_DICT && preg_match('/\bname\s*=\s*("|\')([^"\']+)\1/i', $attrs, $nmm)) {
+                $k = preg_replace('/\[.*$/', '', $nmm[2]);
+                if (isset($FIELD_DICT[$k])) { $byBinder++; continue; }
             }
         }
         $fileUnlabeled++;

@@ -1173,7 +1173,7 @@ include("../inheader.php");
                                         <span class="shift-badge <?php echo $shift_class; ?>">
                                             <?php echo $shift_label; ?>
                                         </span>
-                                        <select class="shift-edit-select" style="display:none;" data-relation-id="<?php echo $row['id']; ?>">
+                                        <select class="shift-edit-select" style="display:none;" data-relation-id="<?php echo $row['id']; ?>" aria-label="وردية السائق">
                                             <option value="D" <?php echo $shift_type === 'D' ? 'selected' : ''; ?>>☀️ نهاري فقط</option>
                                             <option value="N" <?php echo $shift_type === 'N' ? 'selected' : ''; ?>>🌙 ليلي فقط</option>
                                             <option value="B" <?php echo $shift_type === 'B' ? 'selected' : ''; ?>>🔄 نهاري + ليلي</option>

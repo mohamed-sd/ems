@@ -54,7 +54,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php if ($canWrite): ?>
                 <td style="min-width:230px">
                     <input class="kriVal form-control form-control-sm" style="display:inline-block;width:90px" placeholder="القيمة" aria-label="القيمة">
-                    <select class="kriState form-control form-control-sm" style="display:inline-block;width:80px">
+                    <select class="kriState form-control form-control-sm" style="display:inline-block;width:80px" aria-label="حالة المؤشر">
                         <option value="ok">سليم</option><option value="warn">إنذار</option><option value="critical">حرج</option>
                     </select>
                     <button class="btn btn-sm btn-secondary kriGo" data-id="<?php echo (int) $k['id']; ?>">حفظ</button>
