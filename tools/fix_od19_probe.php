@@ -122,10 +122,23 @@ $P['INJ-0323'] = function () use ($ROOT) {
         . ' · على الاعتمادِ والإقفال: ' . ($onBoth ? 'نعم' : 'لا'));
 };
 
+/* ◆ قياسٌ غيّر المواصفة: الحكمُ يفترض **سجلَّي مورّدينَ متكرّرَين** يُوحَّدان
+     بخريطةِ ربط. والقياسُ الحيُّ يقول غيرَ ذلك:
+       suppliers = 70 · proc_supplier = 20 · **صفرُ تطابقٍ بالاسمِ والشركة**.
+     فهما مجموعتان **متباينتان** لا نسختان: الثانويةُ قطعُ غيارٍ وزيوتٌ وفلاترُ
+     وورشٌ، والرئيسةُ موردو التشغيل. فالتوحيدُ **استيرادٌ** لا مطابقة.
+   ◆ وذممُ `fin_dues` المشيرةُ إلى الثانويِّ **صفّان فقط** (party_ref=591،
+     والصفُّ قائمٌ فليست يتيمة) — فنطاقُ الترحيلِ صغيرٌ ومحدَّد.
+   ◆ يُقاس هنا الشقُّ الأولُ (خريطةُ الربط)؛ والاستيرادُ وترحيلُ الصفّين عملٌ
+     مأذونٌ به لم يُنفَّذ بعد. */
 $P['INJ-0331'] = function () use ($db) {
-    $n = q1($db, "SELECT COUNT(*) FROM information_schema.COLUMNS
-                   WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'proc_supplier' AND COLUMN_NAME = 'supplier_id'");
-    return array($n !== null && $n > 0, 'خريطةُ proc_supplier.supplier_id: ' . ($n ? 'موجودة' : 'غير موجودة'));
+    $col  = q1($db, "SELECT COUNT(*) FROM information_schema.COLUMNS
+                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'proc_supplier' AND COLUMN_NAME = 'supplier_id'");
+    $left = q1($db, "SELECT COUNT(*) FROM fin_dues WHERE party_type = 'proc_supplier'");
+    return array($col !== null && $col > 0 && $left === 0,
+        'خريطةُ proc_supplier.supplier_id: ' . ($col ? 'موجودة' : 'غير موجودة')
+        . ' · ذممٌ ما زالت على السجلِّ الثانوي: ' . var_export($left, true)
+        . ' · ◆ مقيس: 70 مقابل 20 بصفرِ تطابقٍ بالاسم — مجموعتان متباينتان فالتوحيدُ استيرادٌ لا مطابقة');
 };
 
 /* ◆ مسدودٌ بمصدرٍ مفقودٍ لا بعملٍ مؤجَّل — بُحث عنه ولم يوجد:
