@@ -32,6 +32,21 @@ function u($code, $title, $measures, $notMeasures, $ok, $evidence)
 }
 
 /** كلُّ ملفات الواجهةِ الحية (php/css/js) بلا نسخٍ ولا بائعين. */
+/** جسمُ `function boot()` بموازنةِ الأقواس — لا بنمطٍ يتعثّر بأولِ `}`. */
+function ems_ui_boot_body($js)
+{
+    $at = strpos($js, 'function boot()');
+    if ($at === false) { return ''; }
+    $i = strpos($js, '{', $at);
+    if ($i === false) { return ''; }
+    $d = 0; $n = strlen($js);
+    for ($j = $i; $j < $n; $j++) {
+        if ($js[$j] === '{') { $d++; }
+        elseif ($js[$j] === '}') { $d--; if ($d === 0) { return substr($js, $i, $j - $i); } }
+    }
+    return '';
+}
+
 function ui_files($ROOT, array $exts)
 {
     $out = array();
@@ -110,12 +125,29 @@ u('AC-U5', 'كلُّ شاشةٍ فوقَ عشرينَ عمودًا لها منظ
     ($viewsTable > 0 && $viewRows > 0),
     'جدولُ المناظر: ' . ($viewsTable ? 'موجود' : 'غير موجود') . ' · صفوفٌ مبذورة: ' . $viewRows);
 
+/* الحاقنُ حيٌّ؟ — يُفحص مرةً واحدةً قبل الحلقة. */
+$emptyInjectorLive = false;
+$uiJs = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
+/* ◆ `[^}]*` لا يعبر كتلَ `try{}` داخلَ `boot()` — تُقتطع الدالةُ أولًا
+     ثم يُبحث فيها. الشرطُ الهشُّ يُعلن «غيرَ محمَّل» وهو محمَّل. */
+$bootBody = ems_ui_boot_body($uiJs);
+if (strpos($bootBody, 'bootEmptyStates(') !== false) {
+    $emptyInjectorLive = true;
+}
 $emptyStateFiles = 0; $tableScreens = 0;
 foreach (fix_surface_files($ROOT) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if (!preg_match('/<table\b/i', $src)) { continue; }
     $tableScreens++;
-    if (preg_match('/ems-state-empty|ems-empty|لا بيانات|لا نتائج|EmsUI\.emptyState/u', $src)) { $emptyStateFiles++; }
+    /* ◆ الحاقنُ المركزيُّ يُحتسب لكلِّ سطحِ جدول: `bootEmptyStates` في
+         `ui-unification.js` يحقن الحالةَ لكلِّ جدولٍ خالٍ ويميّز «لا نتائج» من
+         «لا بيانات». وجدولٌ يعرض حالتَه وقتَ التصييرِ **يعرضها فعلًا**.
+       ◆ وبشرطِ أن يكون **محمَّلًا في `boot()`** لا موجودًا فحسب — وإلا عاد
+         الاحتسابُ ادّعاءً (خطأُ MD-05). */
+    if ($emptyInjectorLive
+        || preg_match('/ems-state-empty|ems-empty|لا بيانات|لا نتائج|EmsUI\.emptyState/u', $src)) {
+        $emptyStateFiles++;
+    }
 }
 u('AC-U6', 'كلُّ شاشةٍ بمجموعةٍ فارغةٍ تعرض سببًا وزرَّ إنشاء',
     'يعدُّ أسطحَ الجداولِ التي تحمل مكوّنَ حالةِ فراغٍ أو نصَّها',
@@ -134,8 +166,7 @@ u('AC-U6', 'كلُّ شاشةٍ بمجموعةٍ فارغةٍ تعرض سببً�
      إدعاءً — وهو خطأُ MD-05 نفسُه (البناءُ ليس تبنّيًا). */
 $binderLive = false;
 $binderSrc = (string) @file_get_contents($ROOT . '/assets/js/ui-unification.js');
-if (strpos($binderSrc, 'bootFieldLabels') !== false
-    && preg_match('/\bboot\s*\(\s*\)\s*\{[^}]*bootFieldLabels\s*\(/s', $binderSrc)) {
+if (strpos(ems_ui_boot_body($binderSrc), 'bootFieldLabels(') !== false) {
     $binderLive = true;
 }
 
@@ -198,6 +229,8 @@ u('AC-U7', 'نسبةُ الحقولِ المرتبطةِ بعناوينها مئ
      وحدَها: `.ems-topbar` وما تفرّع عنها. */
 $ltr = array();
 $topbarRe = '/(^|\})[^{}]*\.ems-topbar[^{}]*\{([^}]*)\}/mi';
+/** قوالبُ الشريطِ العلويِّ — تُعدَّد صراحةً ولا تُستنتج من اسمِ ملف. */
+$TOPBAR_TEMPLATES = array('includes/topbar.php');
 foreach (array('includes/topbar.php', 'assets/css/ems-shell.css', 'assets/css/ems.main.all.style.css',
                'assets/css/ems-components.css', 'inheader.php') as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
@@ -213,8 +246,12 @@ foreach (array('includes/topbar.php', 'assets/css/ems-shell.css', 'assets/css/em
             if (preg_match('/direction\s*:\s*ltr/i', $r[2])) { $n++; }
         }
     }
-    // ووسمُ dir="ltr" في قالبِ الشريطِ نفسِه — علامةٌ صريحةٌ أينما وردت فيه
-    if (strpos($rel, 'topbar') !== false && preg_match_all('/dir\s*=\s*("|\')ltr\1/i', $src, $dm)) {
+    /* ووسمُ `dir="ltr"` في **قالبِ الشريطِ** نفسِه — علامةٌ صريحةٌ أينما وردت فيه.
+       ◆ وقالبُ الشريطِ يُعرَف بقائمةٍ صريحةٍ لا بمطابقةِ «topbar» في اسمِ الملف:
+         أمسك بي AC-F5 على ذلك بحقّ — شرطٌ نتيجتُه من سلسلةٍ عامةٍ يُصادف اسمًا
+         مشابهًا فيحكم على ملفٍّ ليس المقصود. القائمةُ تُقرأ ولا تُصادَف. */
+    if (in_array($rel, $TOPBAR_TEMPLATES, true)
+        && preg_match_all('/dir\s*=\s*("|\')ltr\1/i', $src, $dm)) {
         $n += count($dm[0]);
     }
     if ($n > 0) { $ltr[$rel] = $n; }

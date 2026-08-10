@@ -785,10 +785,89 @@
         }
     }
 
+    /* ══ AC-U6 · SH-07 — حالةُ الفراغِ مكوِّنًا واحدًا ═══════════════════════
+       ◆ «الجدولُ الخالي» ثالثُ الحالاتِ الخمسِ ولم تكن مغطاة: 65 سطحًا من 327.
+         والجدولُ الخالي بلا رسالةٍ يُقرأ عطلًا: المستخدمُ لا يعرف أبيانات ناقصةٌ
+         أم فلترٌ ضيّقٌ أم صلاحيةٌ حاجبة — فيفتح بلاغًا عن عطلٍ غيرِ موجود.
+       ◆ ويُميَّز سببان لا واحد، وهو ما تشترطه الوثيقة:
+           **لا نتائج** — ثمة فلترٌ أو بحثٌ فعّال ⇒ العلاجُ توسيعُ الفلتر.
+           **لا بيانات** — لا فلترَ أصلًا ⇒ العلاجُ إنشاءُ أولِ سجل.
+         والخلطُ بينهما يرسل المستخدمَ في الاتجاهِ الخطأ.
+       ◆ ولا يظهر إلا على جدولٍ **خالٍ فعلًا**، فأثرُه على الشاشاتِ العامرةِ صفر.
+       ◆ ويُترك ما له حالةُ فراغٍ مكتوبةٌ سلفًا — لا يُزاحَم عملٌ يدويٌّ قائم. */
+    function bootEmptyStates() {
+        var tables = document.querySelectorAll('table');
+        for (var i = 0; i < tables.length; i++) {
+            var tb = tables[i];
+            var body = tb.tBodies && tb.tBodies[0];
+            if (!body) { continue; }
+            if (body.rows.length > 0) { continue; }
+            if (tb.getAttribute('data-ems-empty') === 'off') { continue; }
+
+            // حالةٌ مكتوبةٌ سلفًا في محيطِ الجدول — تُحترم ولا تُكرَّر
+            var host = tb.closest('.card, .panel, .ems-table-wrap, .table-responsive') || tb.parentElement;
+            if (host && host.querySelector('.ems-state-empty, .ems-empty')) { continue; }
+
+            var cols = 1;
+            var hr = tb.querySelector('thead tr');
+            if (hr) { cols = Math.max(1, hr.children.length); }
+
+            // أفلترٌ فعّالٌ الآن؟ — يميّز «لا نتائج» من «لا بيانات»
+            var filtered = false;
+            var scope = tb.closest('form, .card, .panel, section, .main') || document;
+            var ctrls = scope.querySelectorAll('input[type=search], input[type=text], input[type=date], select');
+            for (var k = 0; k < ctrls.length; k++) {
+                var c = ctrls[k];
+                if (c.closest('table') === tb) { continue; }          // حقولُ الجدولِ نفسِه لا تُحتسب
+                var v = (c.value || '').trim();
+                if (v !== '' && v !== '0' && v.toLowerCase() !== 'all') { filtered = true; break; }
+            }
+
+            // زرُّ إنشاءٍ قائمٌ في الصفحة — يُعاد استعمالُه ولا يُخترَع
+            var addBtn = document.querySelector('a[href*="add"], a[href*="new"], a[href*="create"], .btn-add, [data-ems-action="add"]');
+
+            var tr = document.createElement('tr');
+            tr.className = 'ems-state-empty';
+            var td = document.createElement('td');
+            td.colSpan = cols;
+            td.style.textAlign = 'center';
+            td.style.padding = '34px 16px';
+            td.style.color = '#6b7280';
+
+            var title = document.createElement('div');
+            title.style.fontWeight = '700';
+            title.style.marginBottom = '6px';
+            title.textContent = filtered ? 'لا نتائجَ مطابقة' : 'لا بياناتٍ بعد';
+
+            var hint = document.createElement('div');
+            hint.style.fontSize = '14px';
+            hint.textContent = filtered
+                ? 'الفلترُ الحاليُّ لا يطابق أيَّ سجلّ — وسّعْ المدى أو امسحِ البحث.'
+                : 'لم يُسجَّل شيءٌ في هذه الشاشة حتى الآن.';
+
+            td.appendChild(title);
+            td.appendChild(hint);
+
+            if (!filtered && addBtn && addBtn.getAttribute('href')) {
+                var a = document.createElement('a');
+                a.href = addBtn.getAttribute('href');
+                a.textContent = 'إضافةُ أولِ سجل';
+                a.style.display = 'inline-block';
+                a.style.marginTop = '12px';
+                a.className = addBtn.className || '';
+                td.appendChild(a);
+            }
+
+            tr.appendChild(td);
+            body.appendChild(tr);
+        }
+    }
+
     function boot() {
         bootUnifiedHeaders();
         bootUnifiedTables();
         try { bootFieldLabels(); } catch (eFl) { /* الوصولية لا تُسقط الشاشة */ }
+        try { bootEmptyStates(); } catch (eEs) { /* حالةُ الفراغِ لا تُسقط الشاشة */ }
         try { bootFiveStates(); } catch (eFs) { /* لا يعطل التوحيد */ }
         try { bootShellCss(); window.EmsScreenShell.seed(); } catch (eSh) { /* CM-00 لا يعطل القائم */ }
     }
