@@ -241,6 +241,54 @@ class UnitJourneyService
         return $out;
     }
 
+    /**
+     * FN-03 · «ردُّ الاستحقاقِ بسببٍ محكوم» — الفعلُ المقابلُ للاعتماد.
+     * ◆ لا حذفَ ولا محو (CS-08): الأثرُ يُنقل إلى حالةِ «مردود» بسببٍ من قائمةٍ
+     *   مغلقةٍ ومرجعِ رادِّه — فالسجلُّ يبقى ويُقرأ.
+     * ◆ والمقيَّدُ (Posted) لا يُردّ: تصحيحُه حركةٌ عاكسةٌ لا ردٌّ بأثرٍ رجعيّ.
+     *
+     * @return array{ok:bool,code:int,reason:string}
+     */
+    public static function rejectEntitlement(\mysqli $conn, $companyId, $peId, $reasonCode, $reasonText, $actor)
+    {
+        $companyId = intval($companyId); $peId = intval($peId);
+        $stmt = $conn->prepare("SELECT state FROM unit_effects
+                                 WHERE company_id = ? AND pe_id = ? AND stage = 'financial' LIMIT 1");
+        if (!$stmt) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذّر الاستعلام'); }
+        $stmt->bind_param('ii', $companyId, $peId);
+        $stmt->execute();
+        $pe = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if (!$pe) { return array('ok' => false, 'code' => 404, 'reason' => 'لا أثر ماليًّا مقترحًا بهذا المعرف'); }
+        if ((string) $pe['state'] === 'Posted') {
+            return array('ok' => false, 'code' => 409,
+                'reason' => 'مقيَّدٌ سلفًا — لا يُردّ بأثرٍ رجعيّ، والتصحيحُ حركةٌ عاكسة (CS-08)');
+        }
+        if ((string) $pe['state'] === 'Rejected') {
+            return array('ok' => true, 'code' => 200, 'reason' => 'مردودٌ سلفًا — عاطل');
+        }
+
+        $note = 'مردود: ' . (string) $reasonCode . ' — ' . (string) $reasonText;
+        $stmt = $conn->prepare("UPDATE unit_effects SET state = 'Rejected', approved_by = ?, approved_at = NOW()
+                                 WHERE company_id = ? AND pe_id = ? AND stage = 'financial'");
+        if (!$stmt) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذّر التحديث'); }
+        $a = intval($actor);
+        $stmt->bind_param('iii', $a, $companyId, $peId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        if (!$ok) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذّر تسجيلُ الرد'); }
+
+        EventPublisher::publishFact($conn, array(
+            'event_key' => 'policy.entitlement.rejected',
+            'category' => 'financial', 'source_module' => 'finance',
+            'company_id' => $companyId, 'entity_type' => 'unit_effect', 'entity_id' => $peId,
+            'occurred_at' => gmdate('Y-m-d H:i:s'), 'created_by' => intval($actor) ?: 1,
+            'idempotency_key' => 'entitlement:reject:' . $peId,
+            'payload' => array('reason_code' => (string) $reasonCode, 'reason_text' => (string) $reasonText),
+        ));
+        return array('ok' => true, 'code' => 200, 'reason' => 'EntitlementRejected — ' . $note);
+    }
+
     // ═════════════════════════ ⑤ الخصومات ═════════════════════════
 
     /** DeductionEngine — يُنشئ الخصم Proposed حصرًا؛ الترحيل بسلّم GOV-01 (deduction_proposals القادمة في WRK-01). */

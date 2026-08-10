@@ -19,10 +19,18 @@ class Exporter
     /**
      * @param EntityDefinition $def
      * @param array[]          $rows  صفوف مفتاحها اسم الحقل (field => value).
+     * @param string[]         $blockedFields حقولٌ حساسةٌ بلا منح — **يُحذف عمودُها
+     *        كاملًا من الملف** لا يُترك فارغًا (RF-03: «ملفٌّ مصدَّرٌ بحسابٍ غيرِ
+     *        مخوَّلٍ لا يحمل عمودًا حساسًا واحدًا»).
      */
-    public static function build(EntityDefinition $def, array $rows, array $criteria = []): Spreadsheet
+    public static function build(EntityDefinition $def, array $rows, array $criteria = [], array $blockedFields = []): Spreadsheet
     {
         $columns = $def->exportColumns();
+        if ($blockedFields) {
+            $columns = array_values(array_filter($columns, static function (Column $c) use ($blockedFields) {
+                return !in_array($c->field, $blockedFields, true);
+            }));
+        }
         $colCount = count($columns);
 
         $spreadsheet = Styler::newSpreadsheet('قائمة ' . $def->title, $def->title);

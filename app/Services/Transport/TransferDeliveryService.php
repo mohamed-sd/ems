@@ -1,0 +1,203 @@
+<?php
+/**
+ * TransferDeliveryService — تسليمُ أمرِ الترحيلِ وإقفالُه (FN-08 · CS-05/CS-07)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ العيبُ المُصحَّح (P0 · FIXC-0044):
+ *   ① **مستندُ التسليمِ لا يُخزَّن** — كان النصُّ يُلقى في جسمِ الحدثِ بلا مرجعٍ
+ *      ولا وقتٍ ولا شاهد، فلا يُستدعى ولا يُدقَّق.
+ *   ② **تكرارُ الإرسالِ يُدرج حدثًا كلَّ مرة** — لا مفتاحَ عطالةٍ إطلاقًا، فثلاثُ
+ *      نقراتٍ = ثلاثةُ أحداثِ تسليمٍ لأمرٍ واحد.
+ *   ③ **الإقفالُ يقع بلا مستندِ تسليمٍ مخزَّن** — فتُحمَّل تكلفةٌ على مشروعٍ بلا
+ *      سندٍ يُثبت وصولَ البضاعة.
+ *
+ * ◆ العلاج: مستندٌ مخزَّنٌ بمرجعِه ووقتِه وشاهده · ومفتاحُ عطالةٍ **مركَّبٌ** على
+ *   (أمر × نوعِ الحدث) بفريدٍ في القاعدةِ لا بفحصٍ في التطبيق · وحارسُ إقفالٍ
+ *   يرفض الإقفالَ قبلَ تخزينِ المستند.
+ */
+
+declare(strict_types=1);
+
+namespace App\Services\Transport;
+
+class TransferDeliveryService
+{
+    /** @var \mysqli */
+    private $conn;
+
+    public function __construct(\mysqli $conn)
+    {
+        $this->conn = $conn;
+    }
+
+    /** أخُزِّن مستندُ تسليمٍ لهذا الأمر؟ (الشاهدُ الذي يفتح بابَ الإقفال) */
+    public function deliveryDocOf(int $companyId, int $orderId): ?array
+    {
+        $st = $this->conn->prepare(
+            "SELECT id, doc_ref, doc_note, witness_name, delivered_at, created_by
+               FROM transfer_delivery_docs
+              WHERE company_id = ? AND order_id = ? ORDER BY id DESC LIMIT 1");
+        if (!$st) { return null; }
+        $st->bind_param('ii', $companyId, $orderId);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        return $row ?: null;
+    }
+
+    /**
+     * يُوثِّق التسليم: مستندٌ مخزَّنٌ + حدثٌ واحدٌ مهما تكرر الإرسال.
+     *
+     * @return array{ok:bool,msg:string,replay:bool,doc_id:int}
+     */
+    public function confirmDelivery(int $companyId, int $orderId, string $note, string $witness, int $actorId): array
+    {
+        if ($orderId <= 0) { return array('ok' => false, 'msg' => 'أمرٌ غيرُ صالح (422)', 'replay' => false, 'doc_id' => 0); }
+        if (trim($witness) === '') {
+            return array('ok' => false, 'msg' => 'شاهدُ التسليم إلزاميّ — لا تسليمَ بلا شاهدٍ مسمًّى (422)', 'replay' => false, 'doc_id' => 0);
+        }
+
+        // الأمرُ موجودٌ وواصلٌ ويخصُّ هذا الكيان.
+        $st = $this->conn->prepare("SELECT stage FROM transfer_orders
+                                     WHERE id = ? AND company_id = ? AND is_deleted = 0 LIMIT 1");
+        if (!$st) { return array('ok' => false, 'msg' => 'خطأٌ داخلي (500)', 'replay' => false, 'doc_id' => 0); }
+        $st->bind_param('ii', $orderId, $companyId);
+        $st->execute();
+        $ord = $st->get_result()->fetch_assoc();
+        $st->close();
+        if (!$ord) { return array('ok' => false, 'msg' => 'أمرُ ترحيلٍ غيرُ موجود (404)', 'replay' => false, 'doc_id' => 0); }
+        if ($ord['stage'] !== 'arrived') {
+            return array('ok' => false, 'msg' => 'الأمرُ ليس واصلًا — لا تسليمَ قبلَ الوصول (409)', 'replay' => false, 'doc_id' => 0);
+        }
+
+        // ◆ العطالة: المستندُ موجودٌ سلفًا ⇒ لا حدثَ ثانٍ ولا صفَّ ثانٍ.
+        $existing = $this->deliveryDocOf($companyId, $orderId);
+        if ($existing !== null) {
+            return array('ok' => true, 'replay' => true, 'doc_id' => (int) $existing['id'],
+                'msg' => 'سُجِّل التسليمُ سلفًا بالمرجع ' . $existing['doc_ref']
+                       . ' في ' . $existing['delivered_at'] . ' — لم يُكرَّر الحدث');
+        }
+
+        $this->conn->begin_transaction();
+        try {
+            $docRef = 'DLV-' . $orderId . '-' . date('ymdHis');
+            $ins = $this->conn->prepare(
+                "INSERT INTO transfer_delivery_docs
+                   (company_id, order_id, doc_ref, doc_note, witness_name, delivered_at, created_by, created_at)
+                 VALUES (?,?,?,?,?,NOW(),?,NOW())");
+            if (!$ins) { throw new \RuntimeException('doc prepare: ' . $this->conn->error); }
+            $n = ($note !== '' ? $note : 'تسليمٌ مؤكَّد');
+            $ins->bind_param('iisssi', $companyId, $orderId, $docRef, $n, $witness, $actorId);
+            if (!$ins->execute()) { throw new \RuntimeException('doc insert: ' . $ins->error); }
+            $docId = (int) $this->conn->insert_id;
+            $ins->close();
+
+            // الحدثُ بمفتاحٍ مركَّبٍ فريدٍ: (أمر × نوع) — الفريدُ في القاعدةِ هو
+            // الحكم؛ الفحصُ في التطبيقِ وحدَه يمرّره طلبان متزامنان.
+            $ev = $this->conn->prepare(
+                "INSERT INTO transfer_events (company_id, order_id, event_type, body, actor_user_id, sync_uuid)
+                 VALUES (?,?,'delivered',?,?,?)");
+            if (!$ev) { throw new \RuntimeException('event prepare: ' . $this->conn->error); }
+            $body = 'مستندُ تسليم ' . $docRef . ' · شاهد: ' . $witness . ' · ' . $n;
+            $uuid = 'dlv:' . $companyId . ':' . $orderId;   // مركَّبٌ وفريدٌ في القاعدة
+            // الأنواعُ بترتيبِ الأعمدةِ حرفًا بحرف: i i s i s
+            $ev->bind_param('iisis', $companyId, $orderId, $body, $actorId, $uuid);
+            if (!$ev->execute()) { throw new \RuntimeException('event insert: ' . $ev->error); }
+            $ev->close();
+
+            $this->conn->commit();
+            return array('ok' => true, 'replay' => false, 'doc_id' => $docId,
+                'msg' => 'وُثّق تسليمُ الأمر #' . $orderId . ' بالمرجع ' . $docRef
+                       . ' — أتمّ الدورةَ من شاشة الإقفال وتحميل التكلفة');
+        } catch (\Throwable $e) {
+            $this->conn->rollback();
+            error_log('TransferDeliveryService::confirmDelivery: ' . $e->getMessage());
+            if (stripos($e->getMessage(), 'Duplicate') !== false || $this->conn->errno === 1062) {
+                $d = $this->deliveryDocOf($companyId, $orderId);
+                return array('ok' => true, 'replay' => true, 'doc_id' => $d ? (int) $d['id'] : 0,
+                    'msg' => 'سُجِّل التسليمُ سلفًا — لم يُكرَّر الحدث');
+            }
+            return array('ok' => false, 'replay' => false, 'doc_id' => 0,
+                'msg' => 'تعذّر توثيقُ التسليم — لم يُكتب شيء (ERR-TRS-1045)');
+        }
+    }
+
+    /**
+     * الإقفالُ بتكلفةٍ — **مرفوضٌ بلا مستندِ تسليمٍ مخزَّن** (FIXC-0048).
+     *
+     * @return array{ok:bool,msg:string,replay:bool}
+     */
+    public function closeWithCost(int $companyId, int $orderId, float $cost, int $actorId): array
+    {
+        if ($cost <= 0) {
+            return array('ok' => false, 'replay' => false,
+                'msg' => 'التكلفةُ الفعليةُ إلزاميةٌ للإقفال — ولا إقفالَ بتكلفةٍ صفر (422)');
+        }
+
+        // ◆ الحارسُ الترتيبيُّ: لا إقفالَ قبلَ تخزينِ مستندِ التسليم.
+        $doc = $this->deliveryDocOf($companyId, $orderId);
+        if ($doc === null) {
+            return array('ok' => false, 'replay' => false,
+                'msg' => 'لا إقفالَ بتكلفةٍ قبلَ تخزينِ مستندِ التسليم — وثّقِ التسليمَ أولًا (409)');
+        }
+
+        $this->conn->begin_transaction();
+        try {
+            /* ══ INJ-0062 · تبنّي `App\Core\ProcessedOperations` ══════════════
+               الصنفُ كان **مبنيًّا بصفرِ مستهلك**. وهو الطبقةُ الثالثةُ من
+               العطالة — «عطالةُ المستهلكِ على (المستندِ × الأثر): صمامُ الأمانِ
+               عند إعادةِ التشغيلِ أو تكرارِ الحدثِ لمستندٍ واحد» (N-06 ركن ③) —
+               وهي غيرُ عطالةِ الطلبِ في `ems_post_idempotency` (فاعلٌ × فعلٌ ×
+               محتوى) وغيرُ عطالةِ المروحةِ في `fin_event_links`. الطبقاتُ ثلاثٌ
+               لا تُخلط، وهذه كانت غائبةً كلَّها.
+               ◆ الأثرُ المحروسُ هنا: **تحميلُ التكلفةِ الفعليةِ على المشروع** —
+                 وتكرارُه يُضاعف تكلفةَ مشروعٍ بلا سند. والادعاءُ **داخلَ
+                 المعاملةِ** كما تُلزم الوثيقةُ، فيرتدُّ معها إن فشل الإقفال. */
+            require_once dirname(__DIR__, 2) . '/Core/ProcessedOperations.php';
+            if (!\App\Core\ProcessedOperations::claim(
+                    $this->conn, 'transport', 'transfer_order', $orderId, 'actual_cost')) {
+                $this->conn->rollback();
+                return array('ok' => true, 'replay' => true,
+                    'msg' => 'حُمِّلت تكلفةُ هذا الأمرِ سلفًا — لم تُضاعَف (عطالةُ المستند)');
+            }
+
+            $up = $this->conn->prepare("UPDATE transfer_orders SET stage='closed', actual_cost_usd=?
+                                         WHERE id=? AND company_id=? AND stage='arrived'");
+            if (!$up) { throw new \RuntimeException('close prepare: ' . $this->conn->error); }
+            $up->bind_param('dii', $cost, $orderId, $companyId);
+            if (!$up->execute()) { throw new \RuntimeException('close: ' . $up->error); }
+            $affected = $up->affected_rows;
+            $up->close();
+            if ($affected <= 0) {
+                $this->conn->rollback();
+                return array('ok' => false, 'replay' => true, 'msg' => 'لم يُقفل — الأمرُ ليس واصلًا أو أُقفل سلفًا (409)');
+            }
+
+            $ev = $this->conn->prepare(
+                "INSERT INTO transfer_events (company_id, order_id, event_type, body, actor_user_id, sync_uuid)
+                 VALUES (?,?,'closed',?,?,?)");
+            if (!$ev) { throw new \RuntimeException('event prepare: ' . $this->conn->error); }
+            $body = 'أُقفل بتكلفةٍ فعلية ' . $cost . '$ · بسندِ التسليم ' . $doc['doc_ref'];
+            $uuid = 'cls:' . $companyId . ':' . $orderId;
+            $ev->bind_param('iisis', $companyId, $orderId, $body, $actorId, $uuid);
+            if (!$ev->execute()) { throw new \RuntimeException('event insert: ' . $ev->error); }
+            $ev->close();
+
+            $cl = $this->conn->prepare(
+                "INSERT INTO transfer_cost_lines
+                   (company_id, order_id, cost_type, amount_usd, currency, cost_bearer, analytic_cost_center)
+                 VALUES (?,?,'actual_total',?,'USD','project','PRJ')");
+            if (!$cl) { throw new \RuntimeException('cost prepare: ' . $this->conn->error); }
+            $cl->bind_param('iid', $companyId, $orderId, $cost);
+            if (!$cl->execute()) { throw new \RuntimeException('cost insert: ' . $cl->error); }
+            $cl->close();
+
+            $this->conn->commit();
+            return array('ok' => true, 'replay' => false,
+                'msg' => 'أُقفل الأمرُ #' . $orderId . ' بتكلفة ' . $cost . '$ محمَّلةً على مشروعه — بسندِ التسليم ' . $doc['doc_ref']);
+        } catch (\Throwable $e) {
+            $this->conn->rollback();
+            error_log('TransferDeliveryService::closeWithCost: ' . $e->getMessage());
+            return array('ok' => false, 'replay' => false, 'msg' => 'تعذّر الإقفال — لم يُكتب شيء (ERR-TRS-1046)');
+        }
+    }
+}

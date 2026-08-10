@@ -139,6 +139,226 @@ class InternalAuditService
     /**
      * قبولُ الدليل — **المراجعُ حصرًا**. ولا الرئيسُ ولا الإدارةُ المُراجَعة.
      */
+    /* ═══════════════════════════════════════════════════════════════════════
+       INJ-0013 (P0) — أفعالُ السلسلةِ السبعِ التي كانت **غائبةً كلَّها**
+       ═══════════════════════════════════════════════════════════════════════
+       من الشاشاتِ الستَّ عشرةَ في `Audit/` كانت **شاشةٌ واحدةٌ فقط** تحمل أفعالًا
+       (`iaf_findings`)، ودالةُ `assertCycle` — حارسُ «لا مهمةَ بلا خطةٍ ولا خطةَ
+       بلا كونٍ ولا كونَ بلا ميثاق» (IAF-0044) — **بلا نداءٍ واحد**. فلا سبيلَ
+       لإنشاءِ ميثاقٍ ولا اعتمادِه ولا بناءِ كونٍ ولا خطةٍ ولا مهمةٍ ولا ورقةِ
+       عملٍ ولا حتى **رفعِ ملاحظة**. كلُّ فعلٍ أدناه يُنادي `assertCycle` أولًا
+       فيستحيل القفزُ في الترتيب.
+       ═══════════════════════════════════════════════════════════════════════ */
+
+    /** ① اعتمادُ الميثاق — أولُ الحلقةِ ولا شيءَ قبلَه. */
+    public static function approveCharter(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $by = intval($ctx['actor'] ?? 0);
+        $ver = trim((string) ($ctx['version'] ?? ''));
+        if ($co <= 0 || $by <= 0 || $ver === '') { return self::fail(422, 'الاعتمادُ يحتاج نسخةَ الميثاقِ وفاعلَه'); }
+        $st = $conn->prepare("UPDATE iaf_charter SET state='approved', approved_by=?, approved_at=NOW()
+                               WHERE company_id=? AND version=?");
+        if (!$st) { return self::fail(500, 'تعذّر اعتمادُ الميثاق'); }
+        $st->bind_param('iis', $by, $co, $ver);
+        $st->execute();
+        $n = $st->affected_rows;
+        $st->close();
+        if ($n <= 0) { return self::fail(404, 'لا ميثاقَ بهذه النسخة: ' . $ver); }
+        return array('ok' => true, 'code' => 200, 'reason' => 'اعتُمد ميثاقُ المراجعةِ نسخة ' . $ver);
+    }
+
+    /** ② بناءُ الكونِ الرقابي — **لا كونَ بلا ميثاقٍ معتمد**. */
+    public static function buildUniverse(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $g = self::assertCycle($conn, $co, 'universe');
+        if (!empty($g) && empty($g['ok'])) { return $g; }
+        $code = trim((string) ($ctx['area_code'] ?? ''));
+        $name = trim((string) ($ctx['area_name'] ?? ''));
+        if ($co <= 0 || $code === '' || $name === '') { return self::fail(422, 'الكونُ يحتاج رمزَ المجالِ واسمَه'); }
+        $st = $conn->prepare("INSERT INTO iaf_universe (company_id, area_code, area_name, owner_dept, risk_score, active, created_at)
+                              VALUES (?,?,?,?,?,1,NOW())
+                              ON DUPLICATE KEY UPDATE area_name=VALUES(area_name), owner_dept=VALUES(owner_dept),
+                                                      risk_score=VALUES(risk_score), active=1");
+        if (!$st) { return self::fail(500, 'تعذّر بناءُ الكون'); }
+        $dept = mb_substr((string) ($ctx['owner_dept'] ?? ''), 0, 120);
+        $risk = (int) ($ctx['risk_score'] ?? 0);
+        $st->bind_param('isssi', $co, $code, $name, $dept, $risk);
+        $st->execute();
+        $st->close();
+        return array('ok' => true, 'code' => 200, 'reason' => 'أُدرج مجالُ «' . $name . '» في الكونِ الرقابي');
+    }
+
+    /** ③ اعتمادُ الخطةِ السنوية — **لا خطةَ بلا كونٍ مبنيّ**. */
+    public static function approvePlan(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $g = self::assertCycle($conn, $co, 'plan');
+        if (!empty($g) && empty($g['ok'])) { return $g; }
+        $year = (int) ($ctx['plan_year'] ?? 0);
+        $title = trim((string) ($ctx['title'] ?? ''));
+        $by = intval($ctx['actor'] ?? 0);
+        if ($co <= 0 || $year <= 0 || $title === '' || $by <= 0) { return self::fail(422, 'الخطةُ تحتاج سنتَها وعنوانَها وفاعلَها'); }
+        $charter = (int) self::scalar($conn, "SELECT id FROM iaf_charter
+                                               WHERE company_id={$co} AND state='approved' ORDER BY id DESC LIMIT 1");
+        $st = $conn->prepare("INSERT INTO iaf_plan (company_id, plan_year, charter_id, title, basis, approved_by, approved_at, state, created_at)
+                              VALUES (?,?,?,?,?,?,NOW(),'approved',NOW())");
+        if (!$st) { return self::fail(500, 'تعذّر اعتمادُ الخطة'); }
+        $basis = mb_substr((string) ($ctx['basis'] ?? 'مبنيةٌ على الكونِ الرقابيِّ ودرجاتِ الخطر'), 0, 300);
+        $st->bind_param('iiissi', $co, $year, $charter, $title, $basis, $by);
+        $st->execute();
+        $id = (int) $conn->insert_id;
+        $st->close();
+        return array('ok' => true, 'code' => 200, 'reason' => 'اعتُمدت خطةُ ' . $year . ' (#' . $id . ')');
+    }
+
+    /** ④ فتحُ مهمة — **لا مهمةَ بلا خطةٍ معتمدةٍ وإقرارِ استقلالٍ سارٍ**. */
+    public static function openEngagement(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $plan = (int) ($ctx['plan_id'] ?? 0);
+        $lead = intval($ctx['lead_auditor'] ?? 0);
+        $g = self::assertCycle($conn, $co, 'engagement', array('plan_id' => $plan, 'lead_auditor' => $lead));
+        if (!empty($g) && empty($g['ok'])) { return $g; }
+        $area = trim((string) ($ctx['area_code'] ?? ''));
+        $title = trim((string) ($ctx['title'] ?? ''));
+        if ($co <= 0 || $area === '' || $title === '') { return self::fail(422, 'المهمةُ تحتاج مجالَها وعنوانَها'); }
+        $no = 'ENG-' . $co . '-' . date('ymdHis');
+        $st = $conn->prepare("INSERT INTO iaf_engagements
+                                (company_id, engagement_no, plan_id, area_code, title, lead_auditor, audit_kind, started_at, state, created_at)
+                              VALUES (?,?,?,?,?,?,?,NOW(),'open',NOW())");
+        if (!$st) { return self::fail(500, 'تعذّر فتحُ المهمة'); }
+        $kind = mb_substr((string) ($ctx['audit_kind'] ?? 'التزام'), 0, 60);
+        $st->bind_param('isissis', $co, $no, $plan, $area, $title, $lead, $kind);
+        $st->execute();
+        $st->close();
+        return array('ok' => true, 'code' => 200, 'reason' => 'فُتحت المهمة ' . $no);
+    }
+
+    /** ⑤ إرفاقُ ورقةِ عمل — **لا ورقةَ بلا مهمةٍ مفتوحة**. */
+    public static function attachWorkpaper(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $eng = trim((string) ($ctx['engagement_no'] ?? ''));
+        $ref = trim((string) ($ctx['wp_ref'] ?? ''));
+        $title = trim((string) ($ctx['title'] ?? ''));
+        $by = intval($ctx['actor'] ?? 0);
+        if ($co <= 0 || $eng === '' || $ref === '' || $title === '') { return self::fail(422, 'الورقةُ تحتاج مهمتَها ومرجعَها وعنوانَها'); }
+        $eid = (int) self::scalar($conn, "SELECT id FROM iaf_engagements
+                                           WHERE company_id={$co} AND engagement_no='" . $conn->real_escape_string($eng) . "' LIMIT 1");
+        if ($eid <= 0) { return self::fail(409, 'لا ورقةَ عملٍ بلا مهمةٍ مفتوحة (IAF-0044): ' . $eng); }
+        // بصمةُ الدليلِ تُحسب ولا تُدخَل — فالمُدخَلةُ تُزوَّر
+        $hash = hash('sha256', $co . '|' . $eng . '|' . $ref . '|' . $title);
+        $st = $conn->prepare("INSERT INTO iaf_workpapers (company_id, engagement_id, wp_ref, title, evidence_hash, captured_at, captured_by, frozen)
+                              VALUES (?,?,?,?,?,NOW(),?,0)");
+        if (!$st) { return self::fail(500, 'تعذّر إرفاقُ الورقة'); }
+        $st->bind_param('iisssi', $co, $eid, $ref, $title, $hash, $by);
+        $st->execute();
+        $st->close();
+        return array('ok' => true, 'code' => 200, 'reason' => 'أُرفقت ورقةُ العمل ' . $ref . ' ببصمةِ دليلٍ محسوبة');
+    }
+
+    /** ⑥ رفعُ ملاحظة — **لا ملاحظةَ بلا مهمةٍ**، وهي مدخلُ دورةِ الرد والإغلاق. */
+    public static function raiseFinding(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $eng = trim((string) ($ctx['engagement_no'] ?? ''));
+        $title = trim((string) ($ctx['title'] ?? ''));
+        $by = intval($ctx['actor'] ?? 0);
+        if ($co <= 0 || $eng === '' || $title === '' || $by <= 0) { return self::fail(422, 'الملاحظةُ تحتاج مهمتَها وعنوانَها وفاعلَها'); }
+        if (self::roleOf($conn, $by) !== self::ROLE_AUDITOR) {
+            return self::fail(403, 'رفعُ الملاحظةِ للمراجعِ الداخليِّ حصرًا (IAF-0025)');
+        }
+        $eid = (int) self::scalar($conn, "SELECT id FROM iaf_engagements
+                                           WHERE company_id={$co} AND engagement_no='" . $conn->real_escape_string($eng) . "' LIMIT 1");
+        if ($eid <= 0) { return self::fail(409, 'لا ملاحظةَ بلا مهمةٍ مفتوحة (IAF-0044): ' . $eng); }
+        $no = 'FND-' . $co . '-' . date('ymdHis');
+        $sev = mb_substr((string) ($ctx['severity'] ?? 'متوسطة'), 0, 40);
+        $area = mb_substr((string) ($ctx['area_code'] ?? ''), 0, 60);
+        $dept = mb_substr((string) ($ctx['auditee_dept'] ?? ''), 0, 120);
+        $detail = mb_substr((string) ($ctx['detail'] ?? ''), 0, 2000);
+        $due = (string) ($ctx['response_due'] ?? date('Y-m-d', strtotime('+14 days')));
+        $st = $conn->prepare("INSERT INTO iaf_findings
+                                (company_id, finding_no, engagement_id, area_code, auditee_dept, title, detail,
+                                 severity, raised_by, raised_at, response_due, evidence_accepted, state, created_at)
+                              VALUES (?,?,?,?,?,?,?,?,?,NOW(),?,0,'open',NOW())");
+        if (!$st) { return self::fail(500, 'تعذّر رفعُ الملاحظة'); }
+        $st->bind_param('isisssssis', $co, $no, $eid, $area, $dept, $title, $detail, $sev, $by, $due);
+        $st->execute();
+        $st->close();
+        return array('ok' => true, 'code' => 200, 'reason' => 'رُفعت الملاحظة ' . $no . ' بمهلةِ ردٍّ حتى ' . $due);
+    }
+
+    /** ⑦ ردُّ الإدارةِ على ملاحظة — **الردُّ من المُلاحَظِ عليه لا من المراجع**. */
+    public static function submitResponse(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $no = trim((string) ($ctx['finding_no'] ?? ''));
+        $txt = trim((string) ($ctx['response_text'] ?? ''));
+        $by = intval($ctx['actor'] ?? 0);
+        if ($co <= 0 || $no === '' || $txt === '' || $by <= 0) { return self::fail(422, 'الردُّ يحتاج الملاحظةَ ونصَّه وفاعلَه'); }
+        // ◆ فصلُ الواجبات: المراجعُ لا يردُّ على ملاحظتِه — الردُّ فعلُ الإدارة.
+        if (self::roleOf($conn, $by) === self::ROLE_AUDITOR) {
+            return self::fail(403, 'الردُّ فعلُ الإدارةِ المُلاحَظِ عليها لا فعلُ المراجع (فصلُ الواجبات)');
+        }
+        $st = $conn->prepare("UPDATE iaf_findings SET response_text=?, responded_by=?, responded_at=NOW(), state='responded'
+                               WHERE company_id=? AND finding_no=?");
+        if (!$st) { return self::fail(500, 'تعذّر تسجيلُ الرد'); }
+        $st->bind_param('siis', $txt, $by, $co, $no);
+        $st->execute();
+        $n = $st->affected_rows;
+        $st->close();
+        if ($n <= 0) { return self::fail(404, 'ملاحظةٌ غيرُ موجودة: ' . $no); }
+        return array('ok' => true, 'code' => 200, 'reason' => 'سُجِّل ردُّ الإدارةِ على ' . $no);
+    }
+
+    /** ⑧ خطةُ المعالجةِ ومتابعتُها — **لا خطةَ معالجةٍ بلا ردٍّ سابق**. */
+    public static function setActionPlan(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $no = trim((string) ($ctx['finding_no'] ?? ''));
+        $plan = trim((string) ($ctx['action_plan'] ?? ''));
+        $owner = trim((string) ($ctx['action_owner'] ?? ''));
+        $due = (string) ($ctx['action_due'] ?? '');
+        if ($co <= 0 || $no === '' || $plan === '' || $owner === '' || $due === '') {
+            return self::fail(422, 'خطةُ المعالجةِ تحتاج نصَّها ومالكَها ومهلتَها');
+        }
+        $f = self::finding($conn, $co, $no);
+        if ($f === null) { return self::fail(404, 'ملاحظةٌ غيرُ موجودة: ' . $no); }
+        if (trim((string) ($f['response_text'] ?? '')) === '') {
+            return self::fail(409, 'لا خطةَ معالجةٍ بلا ردِّ إدارةٍ سابق (IAF-0044)');
+        }
+        $st = $conn->prepare("UPDATE iaf_findings SET action_plan=?, action_owner=?, action_due=?
+                               WHERE company_id=? AND finding_no=?");
+        if (!$st) { return self::fail(500, 'تعذّر ضبطُ خطةِ المعالجة'); }
+        $st->bind_param('sssis', $plan, $owner, $due, $co, $no);
+        $st->execute();
+        $st->close();
+        return array('ok' => true, 'code' => 200, 'reason' => 'ضُبطت خطةُ معالجةِ ' . $no . ' بمالكٍ ومهلة');
+    }
+
+    /** ⓪ إقرارُ الاستقلال — شرطُ `assertCycle('engagement')` فلا مهمةَ بدونه. */
+    public static function declareIndependence(\mysqli $conn, array $ctx)
+    {
+        $co = intval($ctx['company_id'] ?? 0);
+        $aud = intval($ctx['auditor_id'] ?? 0);
+        if ($co <= 0 || $aud <= 0) { return self::fail(422, 'الإقرارُ يحتاج المراجعَ ونطاقَه'); }
+        $conflict = !empty($ctx['has_conflict']) ? 1 : 0;
+        $note = mb_substr((string) ($ctx['conflict_note'] ?? ''), 0, 300);
+        $scope = mb_substr((string) ($ctx['scope_ref'] ?? 'عام'), 0, 120);
+        $until = (string) ($ctx['valid_until'] ?? date('Y-m-d', strtotime('+1 year')));
+        $st = $conn->prepare("INSERT INTO iaf_independence
+                                (company_id, auditor_id, scope_ref, declared_at, has_conflict, conflict_note, valid_until)
+                              VALUES (?,?,?,NOW(),?,?,?)");
+        if (!$st) { return self::fail(500, 'تعذّر تسجيلُ الإقرار'); }
+        $st->bind_param('iisiss', $co, $aud, $scope, $conflict, $note, $until);
+        $st->execute();
+        $st->close();
+        return array('ok' => true, 'code' => 200,
+            'reason' => 'سُجِّل إقرارُ الاستقلالِ حتى ' . $until . ($conflict ? ' — **بتعارضٍ معلَن**' : ' بلا تعارض'));
+    }
+
     public static function acceptEvidence(\mysqli $conn, array $ctx)
     {
         $co   = intval($ctx['company_id'] ?? 0);

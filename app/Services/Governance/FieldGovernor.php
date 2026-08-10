@@ -233,6 +233,110 @@ class FieldGovernor
         'is_deleted', 'deleted_at', 'deleted_by', 'active', 'doc_ref', 'sort_order',
     );
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       ⑧ حجبُ الحقلِ الحساسِ في الخادم — CS-10 · RF-03 (FIXA-0011 · FIXA-0029)
+       ═══════════════════════════════════════════════════════════════════════
+       «الحقلُ الذي لا يملكه المستخدمُ **لا يُرسَل في الاستجابةِ أصلًا** ولا يُخفى
+        بأسلوبِ عرض.» ◆ والحقلُ الحساسُ يُعرَّف بالسجلِّ لا بالرأي: صفٌّ معتمدٌ في
+        ‎scr_sensitive_fields‎ (الجدولُ والحقلُ ورايةُ قابليةِ التصدير) — والمنحُ
+        **فرديٌّ** بأدوارٍ صريحةٍ في ‎sensitive_field_policies.allowed_roles_json‎.
+       ◆ والفشلُ مغلق: حقلٌ معتمدٌ «لا يُصدَّر» بلا سياسةِ منحٍ ⇒ يُحجب للجميع
+        إلا المدير الأعلى. فغيابُ المنحِ منعٌ لا سماح. */
+
+    /**
+     * أسماءُ الحقولِ الحساسةِ في جدولٍ — مع رايةِ قابليةِ التصديرِ لكلٍّ.
+     * @return array<string,array{exportable:bool,logged:bool,label:string}>
+     */
+    public static function sensitiveFieldsOf(\mysqli $conn, $table)
+    {
+        $out = array();
+        $st = $conn->prepare(
+            "SELECT field_name, exportable_flag, log_views_flag, classification_sensitivity
+               FROM scr_sensitive_fields
+              WHERE table_name = ? AND status = 'معتمد'");
+        if (!$st) { return $out; }
+        $st->bind_param('s', $table);
+        $st->execute();
+        $rs = $st->get_result();
+        while ($r = $rs->fetch_assoc()) {
+            $out[$r['field_name']] = array(
+                // ◆ «لا» صريحةٌ تمنع · وأيُّ قيمةٍ غيرِ «نعم» تُقرأ منعًا (فشلٌ مغلق).
+                'exportable' => (mb_strpos((string) $r['exportable_flag'], 'نعم') !== false),
+                'logged'     => (mb_strpos((string) $r['log_views_flag'], 'نعم') !== false),
+                'label'      => (string) $r['classification_sensitivity'],
+            );
+        }
+        $st->close();
+        return $out;
+    }
+
+    /**
+     * أيملك هذا الدورُ منحًا فرديًّا على الحقلِ ‎جدول.حقل‎؟
+     *
+     * ◆ INJ-0062 · تبنّي `SensitiveFieldGuard` — **مقيِّمُ السياسةِ واحدٌ لا ثلاثة**.
+     *   كان هنا تقييمٌ ثانٍ لـ`sensitive_field_policies` مكتوبٌ يدويًّا بينما
+     *   `SensitiveFieldGuard::readerAllowed` يقيّمها أصلًا **وبصفرِ مستهلك**.
+     *   ومقيِّمان لسياسةٍ واحدةٍ هو عينُ عيبِ «المسارين المتوازيين»: هذا يعرف
+     *   الأدوارَ وحدَها، وذاك يعرف الأدوارَ **والمنحَ الفرديةَ النافذة**
+     *   (`sensitive_access_grants`) والمديرَ الأعلى. فالتفويضُ إليه ليس تبنّيًا
+     *   شكليًّا — بل **يزيد الدقة** ويُلغي النسخة.
+     * ◆ وارتدادٌ مُعلَن: إن غاب الصنفُ لسببٍ ما يُقيَّم بالأدوارِ وحدَها — منعًا
+     *   لا سماحًا (فشلٌ مغلق).
+     */
+    public static function roleHasFieldGrant(\mysqli $conn, $table, $field, $roleId, $personId = 0, $companyId = 0)
+    {
+        $code = $table . '.' . $field;
+
+        $guardFile = dirname(__DIR__) . '/Security/SensitiveFieldGuard.php';
+        if (!class_exists('\\App\\Services\\Security\\SensitiveFieldGuard', false) && is_file($guardFile)) {
+            require_once $guardFile;
+        }
+        if (class_exists('\\App\\Services\\Security\\SensitiveFieldGuard', false)) {
+            $pol = \App\Services\Security\SensitiveFieldGuard::policy($conn, $code);
+            if (!$pol) { return false; }                // لا سياسةَ ⇒ لا منحَ ⇒ منع
+            $v = \App\Services\Security\SensitiveFieldGuard::readerAllowed(
+                $conn, $pol, (int) $personId, (string) $roleId, (int) $companyId, $code);
+            return !empty($v['ok']);
+        }
+
+        // ارتدادٌ مُعلَن: الأدوارُ وحدَها بلا المنحِ الفردي.
+        $st = $conn->prepare("SELECT allowed_roles_json FROM sensitive_field_policies
+                               WHERE field_code = ? LIMIT 1");
+        if (!$st) { return false; }
+        $st->bind_param('s', $code);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        if (!$row) { return false; }
+        $roles = json_decode((string) $row['allowed_roles_json'], true);
+        if (!is_array($roles)) { return false; }
+        foreach ($roles as $r) { if ((string) $r === (string) $roleId) { return true; } }
+        return false;
+    }
+
+    /**
+     * CS-10 · البابُ الوحيد: أيُّ أعمدةٍ يحقُّ لهذا الدورِ تصديرُها من هذا الجدول؟
+     *
+     * @param array $columns أسماءُ الأعمدةِ المطلوبة
+     * @return array{allowed:string[],blocked:string[],logged:string[]}
+     */
+    public static function exportableColumns(\mysqli $conn, $table, $roleId, array $columns, $isSuperAdmin = false)
+    {
+        $sensitive = self::sensitiveFieldsOf($conn, $table);
+        $allowed = array(); $blocked = array(); $logged = array();
+        foreach ($columns as $col) {
+            if (!isset($sensitive[$col])) { $allowed[] = $col; continue; }
+            if ($sensitive[$col]['logged']) { $logged[] = $col; }
+            if ($isSuperAdmin) { $allowed[] = $col; continue; }
+            $personId  = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0;
+            $companyId = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
+            $ok = $sensitive[$col]['exportable']
+                || self::roleHasFieldGrant($conn, $table, $col, $roleId, $personId, $companyId);
+            if ($ok) { $allowed[] = $col; } else { $blocked[] = $col; }
+        }
+        return array('allowed' => $allowed, 'blocked' => $blocked, 'logged' => $logged);
+    }
+
     /** أهذه الشاشةُ حاكمة؟ */
     public static function isGoverning(\mysqli $conn, $screen)
     {

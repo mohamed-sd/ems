@@ -52,14 +52,23 @@ class ExcelService
         return $def;
     }
 
-    /** فحص صلاحية الوحدة للإجراء المطلوب (view/add). */
+    /**
+     * فحص صلاحية الوحدة للإجراء المطلوب (view/add).
+     *
+     * FIX-01 · RF-03 + CS-02 — **الفشلُ مغلق**.
+     * ◆ كان هنا فرعٌ مفتوح: ‎if (!function_exists('check_page_permissions')) return;‎
+     *   و‎excel.php‎ لا يحمّل ‎permissions_helper‎ أصلًا — فكان التصديرُ الموحَّدُ
+     *   يمرُّ بلا أيِّ فحصِ تفويضٍ لكلِّ كيان. الآن: غيابُ الحارسِ **منعٌ** لا
+     *   سماح، والملفُّ الأماميُّ يحمّله في رأسِه (FIXA-0027 · FIXA-0028).
+     */
     private function authorize(EntityDefinition $def, string $action): void
     {
         if ($this->isSuperAdmin) {
             return;
         }
         if (!function_exists('check_page_permissions')) {
-            return; // التوافقية مع الصفحات القديمة.
+            // ◆ لا توافقيةَ مع غيابِ الحارس: الغيابُ خللٌ في التحميلِ لا حالةٌ عادية.
+            $this->fail(500, 'طبقةُ الصلاحياتِ غيرُ محمَّلةٍ — التصديرُ ممنوعٌ (فشلٌ مغلق)');
         }
         $perms = check_page_permissions($this->conn, $def->moduleCode);
         $allowed = ($action === 'add') ? !empty($perms['can_add']) : !empty($perms['can_view']);
@@ -88,11 +97,21 @@ class ExcelService
         $this->stream($spreadsheet, 'template_' . $def->key);
     }
 
-    /** بثّ تصدير البيانات. */
+    /**
+     * بثّ تصدير البيانات.
+     *
+     * FIX-01 · RF-03 خطوتا ③+④ — الأعمدةُ تمرُّ بحاكمِ الحقولِ قبلَ الاستعلام،
+     * والتصديرُ **كتابةُ حوكمةٍ** تكتب سجلًّا بتسعةِ بنودٍ ومنها المستبعَدة.
+     * ◆ الحجبُ في **الخادمِ قبلَ القراءة**: العمودُ الممنوعُ لا يدخل ‎SELECT‎
+     *   أصلًا فلا يُقرأ ولا يُبثّ — لا يُخفى بعدَ قراءته.
+     */
     public function export(EntityDefinition $def): void
     {
         $this->authorize($def, 'view');
-        $rows = $this->fetchRows($def);
+
+        $gov  = $this->governExportColumns($def);
+        $rows = $this->fetchRows($def, $gov['blocked']);
+
         // E-19: معاييرُ التصدير المطبَّقةُ فعلًا — تُعلَن في الملف لا تُضمَر
         $criteria = [];
         if (!$this->isSuperAdmin && $def->companyScoped) {
@@ -100,9 +119,87 @@ class ExcelService
         }
         if ($def->softDeleteColumn) { $criteria[] = 'بلا المحذوف'; }
         if (is_callable($def->exportRowScope)) { $criteria[] = 'نطاقُ رؤية الشاشة'; }
+        if ($gov['blocked']) {
+            // ◆ المستبعَدُ يُعلَن في وجهِ الملفِّ لا يُحذف صامتًا — فالصمتُ يُقرأ اكتمالًا.
+            $criteria[] = 'حقولٌ حساسةٌ مُستبعَدةٌ بلا منح: ' . implode('، ', $gov['blocked']);
+        }
         $criteria[] = 'عددُ الصفوف: ' . count($rows);
-        $spreadsheet = Exporter::build($def, $rows, $criteria);
+
+        $this->logGovernedExport($def, $gov, count($rows), $criteria);
+
+        $spreadsheet = Exporter::build($def, $rows, $criteria, $gov['blocked']);
         $this->stream($spreadsheet, 'export_' . $def->key);
+    }
+
+    /**
+     * CS-10 — يحسب الأعمدةَ المسموحةَ والمحجوبةَ لهذا الدورِ على جدولِ الكيان.
+     * @return array{allowed:string[],blocked:string[],logged:string[]}
+     */
+    private function governExportColumns(EntityDefinition $def): array
+    {
+        $wanted = [];
+        foreach ($def->exportColumns() as $c) { $wanted[] = $c->field; }
+
+        // ◆ تحميلٌ صريحٌ لا اتكالٌ على المحمِّل التلقائي: ‎app/bootstrap.php‎ لا
+        //   يُحمَّل في وضعِ CLI، فالاتكالُ عليه يجعل الحاكمَ غائبًا في الاختبارِ
+        //   الآليِّ ويُقرأ ذلك «سماحًا» — وهو بالضبط نمطُ العطلِ الذي نُصحِّحه.
+        $governorFile = dirname(__DIR__) . '/Governance/FieldGovernor.php';
+        if (!class_exists('\\App\\Services\\Governance\\FieldGovernor', false) && is_file($governorFile)) {
+            require_once $governorFile;
+        }
+
+        if (!class_exists('\\App\\Services\\Governance\\FieldGovernor', false)) {
+            // ◆ فشلٌ مغلق: غيابُ الحاكمِ يعني منعَ كلِّ حقلٍ حساسٍ لا السماحَ به.
+            // نستبعد ما هو مسجَّلٌ حساسًا مباشرةً من القاموسِ بلا وسيط.
+            $blocked = [];
+            $tbl = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $def->table);
+            $rs = $this->conn->query("SELECT field_name FROM scr_sensitive_fields
+                                       WHERE table_name = '" . $this->conn->real_escape_string($tbl) . "'
+                                         AND status = 'معتمد'");
+            while ($rs && ($r = $rs->fetch_assoc())) {
+                if (in_array($r['field_name'], $wanted, true)) { $blocked[] = $r['field_name']; }
+            }
+            return ['allowed' => array_values(array_diff($wanted, $blocked)), 'blocked' => $blocked, 'logged' => $blocked];
+        }
+
+        $roleId = isset($_SESSION['user']['role']) ? (int) $_SESSION['user']['role'] : 0;
+        return \App\Services\Governance\FieldGovernor::exportableColumns(
+            $this->conn, (string) $def->table, $roleId, $wanted, $this->isSuperAdmin
+        );
+    }
+
+    /**
+     * FIXA-0030 — التصديرُ فعلُ حوكمةٍ يكتب سجلًّا بتسعةِ بنود:
+     * ① من صدّر ② بصفتِه ③ الكيان/الشاشة ④ الوقت ⑤ الأعمدةُ المُصدَّرة
+     * ⑥ **الأعمدةُ المستبعَدة** ⑦ المرشِّحاتُ المطبَّقة ⑧ عددُ الصفوف ⑨ الصيغة.
+     * ◆ ولا يبتلع فشلَه صامتًا (CS-12): يُسجَّل في ‎error_log‎ ولا يُوقف المنع.
+     */
+    private function logGovernedExport(EntityDefinition $def, array $gov, int $rowCount, array $criteria): void
+    {
+        // ◆ گوتشا موثَّقة: انزياحُ حرفٍ واحدٍ في ‎bind_param‎ يمحو نصًّا إلى '0'
+        //   صامتًا. الترتيبُ هنا مطابقٌ للأعمدة حرفًا بحرف: i i s s s s s s i s.
+        try {
+            $st = $this->conn->prepare(
+                "INSERT INTO gov_export_log
+                   (company_id, exported_by, actor_capacity, entity_key, screen_code,
+                    columns_text, blocked_text, filters_text, row_count, fmt, exported_at)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,NOW())");
+            if (!$st) { throw new \RuntimeException('prepare: ' . $this->conn->error); }
+            $capacity = (string) ($_SESSION['user']['role_name'] ?? ('role#' . ($_SESSION['user']['role'] ?? '?')));
+            $cols     = implode(',', $gov['allowed']);
+            $blocked  = implode(',', $gov['blocked']);
+            $filters  = implode(' · ', $criteria);
+            $fmt      = 'xlsx';
+            $screen   = (string) $def->moduleCode;
+            $entity   = (string) $def->key;
+            $st->bind_param('iissssssis',
+                $this->companyId, $this->userId, $capacity, $entity, $screen,
+                $cols, $blocked, $filters, $rowCount, $fmt);
+            if (!$st->execute()) { throw new \RuntimeException('execute: ' . $st->error); }
+            $st->close();
+        } catch (\Throwable $e) {
+            error_log('EMS gov_export_log failed: ' . $e->getMessage());
+        }
     }
 
     /** المعاينة (JSON). */
@@ -130,18 +227,28 @@ class ExcelService
 
     // ── مساعدات داخلية ───────────────────────────────────────────────────
 
-    /** جلب صفوف التصدير مع تطبيق نطاق الشركة والحذف الناعم. */
-    private function fetchRows(EntityDefinition $def): array
+    /**
+     * جلب صفوف التصدير مع تطبيق نطاق الشركة والحذف الناعم.
+     *
+     * @param string[] $blockedFields حقولٌ حساسةٌ بلا منحٍ لهذا الدور — **لا تدخل
+     *        عبارةَ SELECT أصلًا** (CS-10: الحجبُ في الخادمِ قبلَ القراءة).
+     */
+    private function fetchRows(EntityDefinition $def, array $blockedFields = []): array
     {
         $columns = $def->exportColumns();
         $select = [];
         foreach ($columns as $c) {
+            if (in_array($c->field, $blockedFields, true)) { continue; }
             $col = preg_replace('/[^a-zA-Z0-9_]/', '', $c->field);
             if ($c->exportExpr) {
                 $select[] = $c->exportExpr . " AS `{$c->field}`";
             } else {
                 $select[] = "`{$col}`";
             }
+        }
+        if (!$select) {
+            // كلُّ الأعمدةِ محجوبة ⇒ لا تصديرَ يُبثّ. المنعُ صريحٌ لا ملفٌّ فارغ.
+            $this->fail(403, 'كلُّ أعمدةِ هذا الكيانِ حساسةٌ ولا منحَ لدورِك — لا يوجد ما يُصدَّر');
         }
         $table = preg_replace('/[^a-zA-Z0-9_]/', '', $def->table);
         $sql = 'SELECT ' . implode(', ', $select) . " FROM `{$table}` WHERE 1=1";
