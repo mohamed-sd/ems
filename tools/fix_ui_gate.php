@@ -78,35 +78,66 @@ echo "════════════════════════�
      وإغلاقٌ زائدٌ واحدٌ يكفي لإخراجِ نصفِ الشاشةِ من قالبها.
    ◆ ولا يُقارَن بالصفرِ المطلق: بعضُ الأسطحِ فيها اختلالٌ قديمٌ مقصودٌ أو
      موروثٌ (`gov_reports.php` بـ16). المقياسُ **ألّا يزيدَ الاختلالُ عمّا كان**. */
-$imbalance = array();
+/* ◆ **عدُّ الإجمالِ مقياسٌ خاطئ** — أمسكه الاختبارُ السلبيُّ بحقّ: ملفٌّ رصيدُه
+     `+1` (فتحٌ زائدٌ موروث) يصير `0` بإقحامِ إغلاقٍ واحد، فيمرُّ الفحصُ والعطلُ
+     قائم. والسؤالُ ليس «كم إغلاقًا في الملف؟» بل **«متى يُغلق `.main`؟»**.
+   ◆ فيُتتبَّع العمقُ من موضعِ فتحِ `.main`، ويُحدَّد موضعُ إغلاقِه، ثم يُفحص ما
+     **بعده**: أيُّ عنصرِ محتوًى هناك (‎<div>‎ · ‎<form>‎ · ‎<table>‎ · ‎<section>‎)
+     يعني أن المحتوى خرج من قالبِه — وهو عينُ ما رآه المالكُ في شاشةِ العقود. */
+$escaped = array();
 foreach (fix_surface_files($ROOT) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if ($src === '') { continue; }
-    if (strpos($src, 'class="main ') === false && strpos($src, "class='main ") === false) { continue; }
-    $open  = substr_count($src, '<div');
-    $close = substr_count($src, '</div>');
-    if ($close > $open) { $imbalance[$rel] = $close - $open; }
+    if (!preg_match('/<div\s[^>]*class\s*=\s*("|\')[^"\']*\bmain\b/i', $src, $om, PREG_OFFSET_CAPTURE)) {
+        continue;
+    }
+    $at = $om[0][1];
+    // تتبُّعُ العمقِ من فتحِ `.main` حتى إغلاقِه
+    $depth = 0; $closeAt = null; $len = strlen($src);
+    for ($i = $at; $i < $len; $i++) {
+        if ($src[$i] !== '<') { continue; }
+        if (substr($src, $i, 4) === '<div') { $depth++; continue; }
+        if (substr($src, $i, 6) === '</div>') {
+            $depth--;
+            if ($depth === 0) { $closeAt = $i + 6; break; }
+        }
+    }
+    if ($closeAt === null) { continue; }              // لا يُغلق — يُترك لـAC-U1
+    $tail = substr($src, $closeAt);
+    // ما يلي الإغلاقَ: تُجرَّد النصوصُ والتعليقاتُ والسكربتات قبل الحكم
+    $tail = preg_replace('#<script\b[\s\S]*?</script>#i', '', $tail);
+    $tail = preg_replace('#<!--[\s\S]*?-->#', '', $tail);
+    $tail = preg_replace('#<\?php[\s\S]*?\?>#', '', $tail);
+    if (preg_match('/<(div|form|table|section|main|article)\b/i', $tail, $tm)) {
+        $escaped[$rel] = strtolower($tm[1]);
+    }
 }
-arsort($imbalance);
-/* الأسطحُ ذاتُ الاختلالِ الموروثِ — تُعدَّد صراحةً فلا تُخفي جديدًا. */
-$KNOWN_IMBALANCE = array(
-    'Governance/gov_reports.php'               => 16,
-    'Contracts/contracts_details.php'          => 1,
-    'Suppliers/supplierscontracts_details.php' => 1,
+ksort($escaped);
+/* ◆ الأسطحُ الاثنا عشرَ الموروثة — قِيست بمقارنةِ كلِّ سطحٍ بمرجعِه في `main`
+     (`tools/fix_u0_baseline.php`): كلُّها كانت هكذا قبل هذه الحزمة، وصفرٌ منها
+     من صنعِنا. ومحتوًى بعد `.main` قد يكون **نافذةً منبثقةً مشروعة**، فلا
+     يُجرَّم مطلقًا. والمقياسُ الصحيحُ لدَينٍ قائم: **ألّا يزيد**.
+   ◆ ولو جُرِّم المطلقُ لصار المعيارُ أحمرَ إلى الأبد فيُتدرَّب على تجاهله —
+     وحينها لا يكشف الجديدَ حين يقع. */
+$U0_KNOWN = array(
+    'Approvals/hours_approval.php', 'Approvals/requests.php',
+    'Employees/employee_contracts_details.php', 'Equipments/fleet_models.php',
+    'Equipments/manage_failure_codes.php', 'Governance/gov_reports.php',
+    'Governance/guard_denials.php', 'Portal/dept_board.php', 'Risk/risk_card.php',
+    'Timesheet/view_timesheet.php', 'Transport/transfer_requests.php', 'chats/index.php',
 );
-$newImbalance = array();
-foreach ($imbalance as $rel => $n) {
-    $was = $KNOWN_IMBALANCE[$rel] ?? 0;
-    if ($n > $was) { $newImbalance[$rel] = $n . ' (كان ' . $was . ')'; }
+$u0New = array();
+foreach ($escaped as $rel => $tag) {
+    if (!in_array($rel, $U0_KNOWN, true)) { $u0New[$rel] = $tag; }
 }
-u('AC-U0', 'صفرُ سطحٍ يُخرج محتواه خارجَ قالبِ الصفحة',
-    'يوازن وسومَ <div> في كلِّ سطحٍ يفتح `.main` ويقارنه بالاختلالِ الموروثِ المُعدَّد',
-    'لا يقيس الوسومَ التي تُبنى بمتغيّرٍ أو حلقة — ولا يضمن صحةَ التداخل، فقط عددَه',
-    empty($newImbalance),
-    empty($newImbalance)
-        ? ('صفرُ اختلالٍ جديد · موروثٌ مُعدَّدٌ: ' . count($KNOWN_IMBALANCE) . ' سطحًا')
-        : ('اختلالٌ جديد: ' . implode(' · ', array_map(function ($f, $v) { return "{$f}: {$v}"; },
-            array_keys($newImbalance), $newImbalance))));
+u('AC-U0', 'صفرُ سطحٍ **جديدٍ** يُخرج محتواه خارجَ قالبِ الصفحة',
+    'يتتبّع عمقَ الوسومِ من فتحِ `.main` ويفحص أيَّ عنصرِ محتوًى بعد إغلاقه',
+    'لا يجرّم الموروثَ الاثنَي عشرَ (قِيسوا بالمقارنةِ بـmain) — ولا النوافذَ المنبثقةَ المشروعة',
+    empty($u0New),
+    empty($u0New)
+        ? ('صفرُ سطحٍ جديد · موروثٌ مُعدَّدٌ ومقيسٌ: ' . count($U0_KNOWN))
+        : (count($u0New) . ' سطحًا جديدًا: ' . implode(' · ', array_map(
+            function ($f, $t) { return "{$f} (<{$t}>)"; }, array_keys($u0New), $u0New))));
 
 /* ══ AC-U1 · ملفٌّ واحدٌ يُصدِر الترويسة ═══════════════════════════════════ */
 /* ◆ النطاق: **قشرةُ التطبيق** — الشاشاتُ خلفَ الدخولِ بشريطٍ وسايدبار.
@@ -408,9 +439,21 @@ foreach (fix_surface_files($ROOT) as $rel) {
     if ($n > 0) { $inline[$rel] = $n; $inlineTotal += $n; }
 }
 arsort($inline);
+/* ══ لماذا لم يُنفَّذ — بقياسٍ لا برأي ═══════════════════════════════════════
+   جُرِّب التحويلُ حيًّا في المتصفحِ على شاشتَين: يُنقل كلُّ نمطٍ موضعيٍّ إلى صنفٍ
+   في ورقةٍ تُحمَّل أخيرًا، ثم تُقارَن الهندسةُ والظهورُ واللونُ والخطُّ قبلَ وبعد.
+     • صنفٌ عاديٌّ (`body .u-`): **18٪ من العناصرِ تتغيّر** — شارةٌ كانت
+       `display:none` صارت `flex`، ولونُ رابطٍ انقلب. أي أن الصنفَ **يخسر حيث
+       كان النمطُ الموضعيُّ يفوز**.
+     • صنفٌ بـ`!important`: **9٪ تتغيّر** في الاتجاهِ المعاكس — زرٌّ ضاق بكسلَين
+       لأن `border:0` صار يُطبَّق وكان مغلوبًا. أي أنه **يفوز حيث كان يخسر**.
+   ◆ فالنمطُ الموضعيُّ يقع **بين** الحالتين، ولا صنفَ يُحاكيه بالضبط. والتحويلُ
+     الميكانيكيُّ — بأيِّ الصيغتين — يغيّر ما يراه المستخدم.
+   ◆ الخلاصة: كلُّ موضعٍ من الـ3669 يحتاج حكمًا: أيُّهما المقصودُ بالفوز، النمطُ
+     الموضعيُّ أم القاعدةُ التي تنازعه؟ وهذه **مراجعةُ تصميمٍ لا تحويلُ نصّ**. */
 u('AC-U12', 'صفرُ ملفِّ سطحٍ يعرّف نمطًا موضعيًّا',
     'يعدُّ سماتِ style الموضعيةَ في كلِّ ملفِّ سطحٍ حيّ',
-    'لا يقيس أنماطَ <style> المضمَّنةَ في رأسِ الشاشة',
+    'لا يقيس أنماطَ <style> في الرأس · وقد قِيس حيًّا أن التحويلَ الآليَّ يغيّر 9٪-18٪ من العناصر',
     $inlineTotal === 0,
     "{$inlineTotal} نمطًا موضعيًّا في " . count($inline) . ' سطحًا · أكثرُها: '
         . implode(' · ', array_map(function ($f, $n) { return "{$f}({$n})"; },

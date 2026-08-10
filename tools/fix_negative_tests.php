@@ -264,6 +264,34 @@ neg('AC-N1', 'مِسبارُ الروابطِ الحيُّ — يرسب إن أ�
     }
 );
 
+/* ── ⑧ AC-U0 · بنيةُ الصفحة: أقحِمْ `</div>` زائدًا وأثبتْ الرسوب ──────────
+   الحارسُ الذي وُلد من عطلٍ رآه المالكُ قبل كلِّ فاحصٍ عندي. وقيمتُه كلُّها في
+   أن يرسب عند العطلِ نفسِه — وإلا فهو توثيقٌ لا حراسة. */
+neg('AC-U0', 'حارسُ بنيةِ الصفحة — يرسب عند إغلاقٍ زائدٍ يُخرج المحتوى من قالبه',
+    function () use ($ROOT) {
+        $abs = $ROOT . '/Contracts/contracts.php';
+        $src = (string) file_get_contents($abs);
+        // إفسادٌ مطابقٌ للعطلِ الأصلي: `</div>` زائدٌ يُنهي `.main` مبكرًا
+        $needle = '<div class="main contracts-main';
+        $at = strpos($src, $needle);
+        if ($at === false) { throw new RuntimeException('لم يُعثر على مرساةِ .main'); }
+        $eol = strpos($src, "\n", $at);
+        $broken = substr($src, 0, $eol + 1) . "</div><!-- NEG-TEST إغلاقٌ زائد -->\n"
+                . substr($src, $eol + 1);
+        return neg_swap($abs, $broken);
+    },
+    function () use ($ROOT) {
+        $out = (string) @shell_exec(escapeshellarg(PHP_BINARY) . ' '
+             . escapeshellarg($ROOT . '/tools/fix_ui_gate.php') . ' 2>&1');
+        if (strpos($out, 'AC-U0') === false) {
+            return array('ok' => false, 'evidence' => 'المعيارُ غائبٌ عن البوابة');
+        }
+        // يُقرأ سطرُ AC-U0 وحدَه: أخضرُ ⇒ الحارسُ لم يرَ الإفساد
+        $ok = (strpos($out, '✔ AC-U0') !== false);
+        return array('ok' => $ok, 'evidence' => $ok ? 'صفرُ اختلالٍ جديد' : 'رصد اختلالًا');
+    }
+);
+
 /* ── الحصيلة ───────────────────────────────────────────────────────────── */
 $valid = 0; $invalid = array();
 foreach ($RESULTS as $r) { if ($r['valid']) { $valid++; } else { $invalid[] = $r['code']; } }
