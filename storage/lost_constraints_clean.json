@@ -1,0 +1,106 @@
+{
+    "ck_container_alloc": {
+        "table": "op_containers",
+        "clause": "((`allocated_qty` >= 0) and (`allocated_qty` <= `cap_qty`))"
+    },
+    "ck_container_parent": {
+        "table": "op_containers",
+        "clause": "(((`level` = _utf8mb4'رئيسية') and (`parent_id` is null)) or ((`level` <> _utf8mb4'رئيسية') and (`parent_id` is not null)))"
+    },
+    "ck_container_consumed": {
+        "table": "op_containers",
+        "clause": "((`consumed_qty` >= 0) and (`consumed_qty` <= `cap_qty`))"
+    },
+    "ck_swap_differs": {
+        "table": "container_swaps",
+        "clause": "((`out_ref` is null) or (`in_ref` is null) or (`out_ref` <> `in_ref`))"
+    },
+    "ck_rotation_cycle": {
+        "table": "operator_rotations",
+        "clause": "(`cycle_on_days` > 0)"
+    },
+    "ck_sa_standby_zero": {
+        "table": "seat_assignments",
+        "clause": "((`activation_state` = _utf8mb4'active') or ((coalesce(`planned_qty_month`,0) = 0) and (coalesce(`planned_qty_total`,0) = 0)))"
+    },
+    "ck_chp_superseded": {
+        "table": "contract_hour_policies",
+        "clause": "((`policy_state` <> _utf8mb4'superseded') or (`superseded_by` is not null))"
+    },
+    "ck_sadv_inst": {
+        "table": "supplier_advance_requests",
+        "clause": "((`installments_count` >= 1) and (`installment_amount` > 0))"
+    },
+    "ck_je_balanced": {
+        "table": "fin_journal_entries",
+        "clause": "(round(`total_debit`,2) = round(`total_credit`,2))"
+    },
+    "ck_je_fx_pair": {
+        "table": "fin_journal_entries",
+        "clause": "(((`fx_rate` is null) and (`base_amount` is null)) or ((`fx_rate` is not null) and (`base_amount` = round((`total_debit` * `fx_rate`),2))))"
+    },
+    "ck_settlement_invoice_diff": {
+        "table": "settlements",
+        "clause": "((`invoice_diff` is null) or (abs(`invoice_diff`) < 0.005) or ((`invoice_diff_reason` is not null) and (char_length(trim(`invoice_diff_reason`)) > 0) and (`invoice_diff_doc_ref` is not null) and (char_length(trim(`invoice_diff_doc_ref`)) > 0)))"
+    },
+    "ck_led_qty_positive": {
+        "table": "capacity_consumption_ledger",
+        "clause": "(`qty` >= 0)"
+    },
+    "ck_sup_line_standby": {
+        "table": "supplier_contract_lines",
+        "clause": "(((`standby_basis` = _utf8mb4'none') and (`standby_rate` is null)) or ((`standby_basis` <> _utf8mb4'none') and (`standby_rate` is not null) and (`standby_rate` > 0)))"
+    },
+    "ck_alloc_target": {
+        "table": "fin_collection_allocations",
+        "clause": "((`target_ref` > 0) and (((`target_kind` = _utf8mb4'invoice') and (`receivable_id` is not null) and (`target_ref` = `receivable_id`)) or ((`target_kind` <> _utf8mb4'invoice') and (`receivable_id` is null))))"
+    },
+    "ck_cg_nature": {
+        "table": "contract_guarantees",
+        "clause": "(((`kind` = _utf8mb4'cash_retention') and (`nature` = _utf8mb4'asset')) or ((`kind` <> _utf8mb4'cash_retention') and (`nature` = _utf8mb4'off_balance')))"
+    },
+    "ck_cg_deduct": {
+        "table": "contract_guarantees",
+        "clause": "((`deductible_from_claim` = 0) or (`kind` = _utf8mb4'cash_retention'))"
+    },
+    "ck_cg_dates": {
+        "table": "contract_guarantees",
+        "clause": "(((`kind` = _utf8mb4'cash_retention') and ((`due_release_date` is not null) or (`release_condition` is not null))) or ((`kind` <> _utf8mb4'cash_retention') and (`expiry_date` is not null)))"
+    },
+    "ck_cg_state_reason": {
+        "table": "contract_guarantees",
+        "clause": "((`state` not in (_utf8mb4'released',_utf8mb4'called',_utf8mb4'expired')) or (`state_reason` is not null))"
+    },
+    "ck_cps_treatment": {
+        "table": "contract_payment_schedule",
+        "clause": "(((`advance_type` is null) and (`treatment` is null)) or ((`advance_type` = _utf8mb4'recoverable') and (`treatment` = _utf8mb4'liability')) or ((`advance_type` = _utf8mb4'non_refundable_booking') and (`treatment` = _utf8mb4'revenue')) or ((`advance_type` = _utf8mb4'milestone_earned') and (`treatment` = _utf8mb4'revenue')) or ((`advance_type` = _utf8mb4'mobilization') and (`treatment` is not null) and (`treatment_basis` is not null)))"
+    },
+    "ck_cps_advance_link": {
+        "table": "contract_payment_schedule",
+        "clause": "((`advance_id` is null) or (`treatment` = _utf8mb4'liability'))"
+    },
+    "ck_pay_fx_pair": {
+        "table": "fin_payments",
+        "clause": "(((`fx_rate` is null) and (`base_amount` is null)) or ((`fx_rate` is not null) and (`base_amount` = round((`amount` * `fx_rate`),2))))"
+    },
+    "ck_cb_actors": {
+        "table": "contract_baseline",
+        "clause": "(((`state` <> _utf8mb4'reviewed') or ((`reviewed_by` is not null) and (`reviewed_at` is not null))) and ((`state` not in (_utf8mb4'approved',_utf8mb4'locked')) or ((`approved_by` is not null) and (`approved_at` is not null))) and ((`state` <> _utf8mb4'locked') or ((`locked_by` is not null) and (`locked_at` is not null) and (`fingerprint` is not null))))"
+    },
+    "ck_cle_effects": {
+        "table": "contract_lifecycle_events",
+        "clause": "(((`state` = _utf8mb4'extension') and (`advance_effect` = _utf8mb4'continue') and (`retention_effect` = _utf8mb4'hold') and (`unbilled_effect` = _utf8mb4'bill_cycle') and (`penalty_effect` = _utf8mb4'continue') and (`container_effect` = _utf8mb4'extend')) or ((`state` = _utf8mb4'renewal') and (`advance_effect` = _utf8mb4'settle_and_new') and (`retention_effect` = _utf8mb4'release_after_grace') and (`unbilled_effect` = _utf8mb4'final_claim_old') and (`penalty_effect` = _utf8mb4'close_old_start_new') and (`container_effect` = _utf8mb4'new_tree')) or ((`state` = _utf8mb4'suspension') and (`advance_effect` = _utf8mb4'pause_recovery') and (`retention_effect` = _utf8mb4'hold') and (`unbilled_effect` = _utf8mb4'bill_before_pause') and (`penalty_effect` = _utf8mb4'pause_time_not_performance') and (`container_effect` = _utf8mb4'suspend')) or ((`state` = _utf8mb4'natural_end') and (`advance_effect` = _utf8mb4'consume_then_refund') and (`retention_effect` = _utf8mb4'release_after_grace') and (`unbilled_effect` = _utf8mb4'final_claim') and (`penalty_effect` = _utf8mb4'accrue_to_effect_date') and (`container_effect` = _utf8mb4'close_readonly')) or ((`state` = _utf8mb4'client_fault_end') and (`advance_effect` = _utf8mb4'refund_all_after_offset') and (`retention_effect` = _utf8mb4'release') and (`unbilled_effect` = _utf8mb4'bill_all') and (`penalty_effect` = _utf8mb4'company_claims_compensation') and (`container_effect` = _utf8mb4'close_with_ref')) or ((`state` = _utf8mb4'our_fault_end') and (`advance_effect` = _utf8mb4'refund_after_dues') and (`retention_effect` = _utf8mb4'may_forfeit') and (`unbilled_effect` = _utf8mb4'bill_accepted_only') and (`penalty_effect` = _utf8mb4'breach_penalties_capped') and (`container_effect` = _utf8mb4'close')) or ((`state` = _utf8mb4'pre_start_cancel') and (`advance_effect` = _utf8mb4'refund_full') and (`retention_effect` = _utf8mb4'release') and (`unbilled_effect` = _utf8mb4'none') and (`penalty_effect` = _utf8mb4'mobilization_cost_if_article') and (`container_effect` = _utf8mb4'cancel')) or ((`state` = _utf8mb4'dispute') and (`advance_effect` = _utf8mb4'freeze') and (`retention_effect` = _utf8mb4'hold') and (`unbilled_effect` = _utf8mb4'freeze_disputed_bill_rest') and (`penalty_effect` = _utf8mb4'suspend_until_resolution') and (`container_effect` = _utf8mb4'suspend')))"
+    },
+    "ck_cle_claim_article": {
+        "table": "contract_lifecycle_events",
+        "clause": "((`claim_amount` is null) or ((`contract_article` is not null) and (`claim_doc_ref` is not null) and (`claim_currency` is not null) and (`claim_amount` <> 0)))"
+    },
+    "ck_cle_decision": {
+        "table": "contract_lifecycle_events",
+        "clause": "((`state` not in (_utf8mb4'natural_end',_utf8mb4'client_fault_end',_utf8mb4'our_fault_end',_utf8mb4'pre_start_cancel')) or (`decision_ref` is not null))"
+    },
+    "ck_cle_cancel_tree": {
+        "table": "contract_lifecycle_events",
+        "clause": "((`container_effect` <> _utf8mb4'cancel') or (`state` = _utf8mb4'pre_start_cancel'))"
+    }
+}

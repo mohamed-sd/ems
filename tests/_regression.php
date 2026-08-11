@@ -69,7 +69,7 @@ $verify = static function (array $snap, $testName, array &$lines) {
     return $harmed;
 };
 
-$green = 0; $red = 0; $lines = array(); $harmedBy = array();
+$green = 0; $red = 0; $lines = array(); $harmedBy = array(); $unreadableList = array();
 foreach ($files as $t) {
     $path = $dir . '/' . $t . '.php';
     if (!is_file($path)) { $lines[] = sprintf('  %-42s  MISSING', $t); $red++; continue; }
@@ -80,15 +80,26 @@ foreach ($files as $t) {
     if ($h) { $harmedBy[$t] = $h; }
     $txt = implode("\n", $out);
     $p = 0; $f = 0;
-    // صيغتان مستعملتان في الحزم: «N نجاح · M فشل» و«N ناجح · M فاشل»
+    /* صيغُ الحزمِ الثلاث. و**الثالثةُ كانت عمياءَ**: خمسةُ اختباراتٍ على الأقلِّ
+       تطبع «PASS=N · FAIL=M» فسُجّلت `0/0` وهي تعمل وتُنتج نتائج
+       (org_structure 20/8 · permit_gate 13/11 · portability 7/2 ·
+        uat_hardening 17/1 · tkt_structure 33/2). فرمزُ الخروجِ كان صادقًا
+       والعدّادُ كاذبًا — ومُشغِّلٌ لا يعرف أن يعدَّ لا يُصادق على شيء. */
     if (preg_match('~النتيجة:\s*(\d+)\s*(?:نجاح|ناجح)\s*·\s*(\d+)\s*(?:فشل|فاشل)~u', $txt, $m)) {
+        $p = (int) $m[1]; $f = (int) $m[2];
+    } elseif (preg_match('~PASS\s*=\s*(\d+)\s*(?:·|\||,)?\s*FAIL\s*=\s*(\d+)~u', $txt, $m)) {
         $p = (int) $m[1]; $f = (int) $m[2];
     } elseif (preg_match('~(\d+)\s*(?:نجاح|ناجح|passed)\D{0,12}?(\d+)\s*(?:فشل|فاشل|failed)~u', $txt, $m)) {
         $p = (int) $m[1]; $f = (int) $m[2];
     }
+    /* ◆ ولا يُقرأ «صفرٌ وصفر» صمتًا: اختبارٌ يخرج بخطأٍ بلا عدّادٍ مقروءٍ إمّا
+         انفجر قبل ملخّصه وإمّا صيغتُه غيرُ معروفة — وكلٌّ منهما يستحق اسمًا. */
+    $unreadable = ($p === 0 && $f === 0 && $code !== 0);
     $mark = ($code === 0) ? '✔' : '✘';
     if ($code === 0) { $green++; } else { $red++; }
-    $lines[] = sprintf('  %s %-42s %3d/%-3d exit=%d', $mark, $t, $p, $f, $code);
+    $lines[] = sprintf('  %s %-42s %3d/%-3d exit=%d%s', $mark, $t, $p, $f, $code,
+        $unreadable ? '  ⟨عدّادٌ غيرُ مقروء — انفجارٌ قبل الملخّصِ أو صيغةٌ مجهولة⟩' : '');
+    if ($unreadable) { $unreadableList[] = $t; }
     if ($code !== 0) {
         foreach ($out as $l) { if (strpos($l, 'FAIL') !== false || stripos($l, 'error') !== false) { $lines[] = '      ' . $l; } }
     }
@@ -96,6 +107,17 @@ foreach ($files as $t) {
 echo implode("\n", $lines) . "\n";
 echo str_repeat('─', 70) . "\n";
 echo 'خضراء: ' . $green . ' · حمراء: ' . $red . ' · المجموع: ' . count($files) . "\n";
+/* مجموعُ الفحوصِ لا عددُ الملفاتِ وحدَه — فملفٌّ بفحصٍ ساقطٍ واحدٍ من ستين
+   ليس كملفٍّ ساقطٍ كلِّه، والرقمُ الواحدُ يخفي الفرق. */
+$sp = 0; $sf = 0;
+foreach ($lines as $l) {
+    if (preg_match('~^\s*[✔✘]\s+\S+\s+(\d+)/(\d+)~u', $l, $m)) { $sp += (int) $m[1]; $sf += (int) $m[2]; }
+}
+echo 'مجموعُ الفحوص: ناجحٌ ' . $sp . ' · ساقطٌ ' . $sf . "\n";
+if ($unreadableList) {
+    echo 'عدّادٌ غيرُ مقروءٍ في ' . count($unreadableList) . " اختبارًا — تُشخَّص منفردةً:\n  "
+       . implode(' · ', $unreadableList) . "\n";
+}
 if ($harmedBy) {
     echo 'اختباراتٌ مسَّت ملفاتٍ محميةً (استُعيدت): ' . count($harmedBy) . ' — '
        . implode('، ', array_keys($harmedBy)) . "\n";
