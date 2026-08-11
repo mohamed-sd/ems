@@ -47,12 +47,21 @@ if (!$claim) { exit("لا مستخلصَ مفوترًا للجسّ — يتعذ�
 $CLAIM_ID   = (int) $claim['id'];
 $ORIG_RECV  = ($claim['receivable_id'] !== null) ? (int) $claim['receivable_id'] : null;
 
-/* ذمّةٌ مِسبارية — لأن لا مستخلصَ في البذرةِ مربوطٌ بذمّة */
+/* ذمّةٌ مِسبارية — لأن لا مستخلصَ في البذرةِ مربوطٌ بذمّة.
+   ◆ **درسٌ مدفوعُ الثمن**: بعد `INJ-0036` لا تُدرَج ذمّةٌ بلا `source_doc_id`
+     (القيد `chk_recv_source_doc`). فسقطت هذه البذرةُ صامتةً (`insert_id = 0`)
+     وسقط معها ثلاثةُ فحوصٍ — **وشاهدُ INJ-0027 توقّف عن العمل بقيدٍ أضفتُه
+     أنا لاحقًا**. أصلحتُ ستَّ بذورِ اختبارٍ يومَها ونسيتُ بذرتي.
+     ودرسُه: **إغلاقُ بندٍ لا يحرس شاهدَه من بندٍ تالٍ — البوابةُ وحدَها تفعل.** */
+require_once dirname(__DIR__) . '/tests/_source_doc_seed.php';
+$TI = seed_source_invoice($conn, $CO, 'PROBE-INJ27-RECV', (int) $claim['client_id'],
+                          1000.00, 'SDG', $CLAIM_ID);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-                project_id, amount, currency, collected, due_date, state, is_deleted, created_by)
-              VALUES ({$CO}, " . (int) $claim['client_id'] . ", 'invoice', 'PROBE-INJ27-RECV',
+                source_doc_id, project_id, amount, currency, collected, due_date, state, is_deleted, created_by)
+              VALUES ({$CO}, " . (int) $claim['client_id'] . ", 'invoice', 'PROBE-INJ27-RECV', {$TI},
                       " . ((int) $claim['project_id'] ?: 'NULL') . ", 1000.00, 'SDG', 0, CURDATE(), 'open', 0, 0)");
 $RECV_ID = (int) $conn->insert_id;
+if ($RECV_ID <= 0) { echo '  ✘ تعذّر بذرُ الذمّة: ' . $conn->error . "\n"; }
 $conn->query("UPDATE claims SET receivable_id={$RECV_ID} WHERE id={$CLAIM_ID}");
 
 register_shutdown_function(static function () use ($conn, $CLAIM_ID, $RECV_ID, $ORIG_RECV) {
