@@ -77,6 +77,22 @@ function loc_msg($h) {
     }
     return '';
 }
+/* ◆ **رسالةُ الشاشةِ وميضُ جلسةٍ لا مُعامَلُ URL**: `ems_gov_flash_redirect`
+     (`includes/permissions_helper.php:139`) يخزّن النصَّ في
+     `$_SESSION['ems_flash_gov']` ثم يوجّه **بعنوانٍ مجرَّد**. فكان `loc_msg`
+     يعود فارغًا **دائمًا**، فيُقرأ صمتُ المُعامَلِ فشلًا في الفعل — والفعلُ
+     ناجحٌ ومالُه مولَّدٌ. فيُتبَع التوجيهُ ويُقرأ النصُّ من الصفحةِ التالية،
+     وهو عينُ ما يراه المستخدم. */
+function flash_text($h, $jar, $dir) {
+    global $BASE;
+    if (!preg_match('~Location:\s*(\S+)~i', $h, $m)) { return ''; }
+    $to = trim($m[1]);
+    if (strpos($to, 'http') !== 0) { $to = rtrim($dir, '/') . '/' . ltrim($to, '/'); }
+    list($c, $hh, $b) = hx($to, $jar);
+    // نصُّ الوميضِ يُصيَّر داخل الصفحة — يُستخرَج مُنقًّى من الوسوم
+    $plain = preg_replace('~\s+~u', ' ', strip_tags($b));
+    return (string) $plain;
+}
 
 // ── قاعدة البيانات ────────────────────────────────────────────────────────
 $conn = new mysqli(ems_env('DB_HOST'), ems_env('DB_APP_USER'), ems_env('DB_APP_PASS'), ems_env('DB_NAME'));
@@ -131,8 +147,13 @@ try {
 // ═══════════════════════════════════════════════════════════════════════════
 head('① بذرُ عالَمٍ كاملٍ مستقل (عميل · مشروع · مورد · معدة · مشغّل · عقدان)');
 // ═══════════════════════════════════════════════════════════════════════════
-$CL  = sq($root, "INSERT INTO clients (company_id, client_name, phone, status)
-                  VALUES ($CO, '$TAG-عميل', '000', 1)", $seed['client']);
+/* ◆ **البذرُ يملأ كلَّ عمودٍ يحمل قيدًا فريدًا.** `clients` عليه
+     `uq_clients_company_code (company_id, client_code)`، والبذرُ كان يُغفل
+     `client_code` فيأخذ `''` — فأولُ بذرةٍ تمرُّ **وكلُّ ما بعدها يُردّ**
+     بـ`Duplicate entry '4-'`. والقيدُ محقٌّ: عميلانِ بلا رمزٍ في شركةٍ واحدةٍ
+     لا يتمايزان. فيُوسَم الرمزُ بوسمِ الجولةِ كبقيةِ العالَمِ المبذور. */
+$CL  = sq($root, "INSERT INTO clients (company_id, client_name, client_code, phone, status)
+                  VALUES ($CO, '$TAG-عميل', '$TAG-CL', '000', 1)", $seed['client']);
 $SUP = sq($root, "INSERT INTO suppliers (company_id, name, phone, status)
                   VALUES ($CO, '$TAG-مورد', '000', 1)", $seed['supplier']);
 $PRJ = sq($root, "INSERT INTO project (company_id, name, client, client_id, location, total, status)
@@ -197,13 +218,19 @@ info('سطورُ الزمن: ' . implode(' · ', $tlTxt));
 check(count($tl) === 2, 'زمنُ الوردية موزَّعٌ على حالتيه (تشغيل فعلي · استعداد)');
 
 // ═══════════════════════════════════════════════════════════════════════════
-head('③ الاعتماداتُ الأربعة من الشاشة الحقيقية بحسابات أصحابها');
+head('③ الاعتماداتُ الخمسة من الشاشة الحقيقية بحسابات أصحابها');
 // ═══════════════════════════════════════════════════════════════════════════
+/* ◆ **اليدُ الخامسةُ أُضيفت لأنها وُصِلت في المنتج** (قرارُ المالك 2026-08-12):
+     كانت مرحلةُ `sales` مبنيةً في `TimesheetEntryService` بلا مُستهلِك، فما بلغ
+     يومٌ `sales_approved` من الشاشات — و«وحدات الأطراف» تشترطها للتحويل، فكان
+     هذا الفاحصُ يرسب عند ⑤ **بحقٍّ**: الطابورُ خالٍ لأن السلسلةَ لم تكتمل.
+     والمواصفةُ تنصُّ على خمسِ أيدٍ (`SPEC_TIMESHEET_CYCLE §TS-13`). */
 $approvers = array(
     1 => array('محمد',  'مدير المشاريع / التشغيل'),
     2 => array('مصعب',  'مدير الموردين'),
     3 => array('يسن',   'مدير الأسطول'),
     4 => array('اروينا', 'مدير المشغلين'),
+    5 => array('مشرف المبيعات', 'مدير المبيعات — بوابةُ §④ التجارية'),
 );
 foreach ($approvers as $lvl => $who) {
     $jar = $TMPD . "/e2e_ap{$lvl}_" . getmypid() . '.txt';
@@ -218,18 +245,18 @@ foreach ($approvers as $lvl => $who) {
     @unlink($jar);
 }
 $lv = $root->query("SELECT COUNT(*) n FROM timesheet_approvals WHERE timesheet_id=$TS AND status=1")->fetch_assoc();
-check(intval($lv['n']) === 4, 'أربعةُ اعتماداتٍ مسجَّلةٌ في السلسلة');
+check(intval($lv['n']) === 5, 'خمسةُ اعتماداتٍ مسجَّلةٌ في السلسلة');
 $mst = $root->query("SELECT state FROM unit_entries WHERE id=$ENTRY")->fetch_assoc();
 info('حالةُ الواقعة في السجل القانوني بعد المرآة: ' . $mst['state']);
 
 // ═══════════════════════════════════════════════════════════════════════════
-head('④ بوابةُ التحويل: هل خُلق مالٌ بمجرد الاعتماد الرابع؟');
+head('④ بوابةُ التحويل: هل خُلق مالٌ بمجرد اكتمالِ السلسلة؟');
 // ═══════════════════════════════════════════════════════════════════════════
 $c1 = snap($root);
 $preLinks = intval($root->query("SELECT COUNT(*) FROM fin_event_links
                                   WHERE parent_kind='timesheet' AND parent_ref=$TS")->fetch_row()[0]);
 check($c1['dues'] === $c0['dues'] && $c1['costs'] === $c0['costs'] && $preLinks === 0,
-    'لا مستحقَّ ولا تكلفةَ ولا رابطَ أثرٍ بعد الاعتماد الرابع — EMS_UNIT_CONVERT_GATE=on يحجز المال لختم المالية');
+    'لا مستحقَّ ولا تكلفةَ ولا رابطَ أثرٍ باكتمالِ السلسلة — EMS_UNIT_CONVERT_GATE=on يحجز المال لختم المالية');
 // الحقيقةُ المحايدة تُسقِط صفًّا دفتريًّا بمبلغ 0 (وصفُ الواقعة لا مالُها)
 $factProj = $root->query("SELECT event_type, amount, quantity, unit FROM fin_financial_events
                            WHERE entity_type='timesheet' AND entity_id=$TS")->fetch_assoc();
@@ -247,16 +274,34 @@ head('⑤ المدير الماليُّ يحوّل من شاشة «وحدات ا
 // ═══════════════════════════════════════════════════════════════════════════
 $fjar = $TMPD . '/e2e_fin_' . getmypid() . '.txt';
 login('مديرمالي', $fjar);   // دور 17 — المدير المالي (الحسابُ الحقيقي في القاعدة)
-list($c, $h, $b) = hx($BASE . '/Finance/unit_records_fin.php', $fjar);
+/* ◆ **الطابورُ صفحةٌ لا كونٌ**: `unit_records_fin.php:128` يطلبه بـ`limit => 200`
+     بلا مدًى زمنيٍّ افتراضيّ، وفي القاعدة **1500 واقعةٍ** بلغت `sales_approved`.
+     فيومُ البذرِ الجديدُ يقع خارج الصفحةِ الأولى — **والشاشةُ محقّةٌ**، والفاحصُ
+     كان يقرأ غيابَه عن صفحةٍ غيابًا عن الطابور. فيُطلَب الطابورُ بنطاقِ مشروعِ
+     البذرِ نفسِه (مُرشِّحٌ تدعمه الشاشةُ سلفًا: `q_project`) — قياسٌ محدَّدٌ لا
+     صيدٌ في مئتين. */
+$qs = '?q_project=' . $PRJ . '&q_period=' . date('Y-m', strtotime($WORK_DATE));
+list($c, $h, $b) = hx($BASE . '/Finance/unit_records_fin.php' . $qs, $fjar);
 check(strpos($b, 'TS-' . $TS) !== false || strpos($b, 'value="' . $TS . '"') !== false,
-    "اليومُ ظاهرٌ في طابور التحويل أمام المدير المالي (TS-$TS)");
+    "اليومُ ظاهرٌ في طابور التحويل أمام المدير المالي (TS-$TS · مشروع#$PRJ)");
 $ftok = tok($b);
 check($ftok !== '', 'رمزُ الحماية مُحقَنٌ في الشاشة');
 list($cc, $hh, $bb) = hx($BASE . '/Finance/unit_records_fin.php', $fjar,
     array('action' => 'convert_units', 'ids' => strval($TS), 'csrf_token' => $ftok));
-$msg = loc_msg($hh);
-info('رسالةُ الشاشة: ' . $msg);
-check(strpos($msg, '✅') !== false, 'التحويلُ نُفِّذ من الشاشة الحقيقية');
+/* ◆ **العلامةُ في المسارِ والرسالةُ في الوميض**: الشاشةُ تُلحق `✅` بعنوانِ
+     التحويلِ عبر `ems_flash_to(..., '+✅')` — مُعامَلًا في الـURL — وتضع النصَّ
+     في وميضِ الجلسة. فيُقاس الاثنان في موضعِهما. */
+$hasMark = (strpos($hh, '✅') !== false) || (strpos(rawurldecode($hh), '✅') !== false);
+$fflash  = flash_text($hh, $fjar, $BASE . '/Finance');
+$saidOne = (mb_strpos($fflash, 'اعتُمدت أحكامُ 1 يومًا') !== false);
+info('علامةُ الترويسة: ' . ($hasMark ? '✅' : '—') . ' · وميضُ الشاشة: '
+    . ($saidOne ? 'اعتُمدت أحكامُ 1 يومًا' : mb_substr(trim($fflash), 0, 120)));
+/* ◆ الشاهدُ هو **علامةُ فرعِ النجاحِ في الترويسة**: الشاشةُ لا تُلحق `✅` إلا
+     من فرعِ `$okCount > 0` (`unit_records_fin.php:92`) — فوجودُها إعلانُ الشاشةِ
+     نفسِها أنها حوّلت يومًا. ونصُّ الوميضِ يُطبع إعلامًا لا حكمًا، لأن تصييرَه
+     يمرُّ بطبقةِ التنبيهاتِ الموحَّدةِ وليست هي المفحوصَ هنا. والمالُ المولَّدُ
+     يُقاس موضوعيًّا في §⑥ صفًّا صفًّا. */
+check($hasMark, 'التحويلُ نُفِّذ من الشاشة الحقيقية — علامةُ فرعِ النجاحِ في ترويسةِ التوجيه');
 @unlink($fjar);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -351,11 +396,22 @@ $sjar = $TMPD . '/e2e_sales_' . getmypid() . '.txt';
 login('مبيعات', $sjar);
 list($c, $h, $b) = hx($BASE . '/Contracts/claims.php', $sjar);
 $ctok = tok($b, 'clm_csrf');
+/* ◆ **رمزان لا رمز**: الشاشةُ تحقن رمزَها `clm_csrf` **والرمزَ المركزيَّ**
+     `csrf_token` معًا، والحارسُ المركزيُّ (ADR-05) يقيس المركزيَّ حصرًا.
+     فطلبٌ يحمل رمزَ الشاشةِ وحدَه يُردُّ **403 «فشل التحقق الأمني»** بلا
+     وميضٍ ولا جسمٍ — فيُقرأ صمتُه «لم يُولَّد مستخلص» والفعلُ لم يبدأ أصلًا. */
+$gtok = tok($b);
 check($ctok !== '', 'شاشةُ المستخلصات مفتوحةٌ لمسؤول المبيعات (دور 12)');
 list($cg, $hg, $bg) = hx($BASE . '/Contracts/claims.php', $sjar, array(
     'action' => 'generate', 'contract_id' => strval($CCON),
-    'period_from' => '2026-07-01', 'period_to' => '2026-07-31', 'clm_csrf' => $ctok));
-info('توليدُ المستخلص: ' . loc_msg($hg));
+    'period_from' => '2026-07-01', 'period_to' => '2026-07-31',
+    'clm_csrf' => $ctok, 'csrf_token' => $gtok));
+$gflash = flash_text($hg, $sjar, $BASE . '/Contracts');
+if (preg_match('~(تعذّر[^.]{0,180}|لا يوجد[^.]{0,180}|وُلِّد[^.]{0,180}|أُنشئ[^.]{0,180})~u', $gflash, $gm)) {
+    info('توليدُ المستخلص: ' . trim($gm[1]));
+} else {
+    info('توليدُ المستخلص: (لا وميضَ مقروء · طولُ الصفحة ' . strlen($gflash) . ')');
+}
 $clm = $root->query("SELECT id, claim_no, state, gross_amount FROM claims
                       WHERE contract_id=$CCON ORDER BY id DESC LIMIT 1")->fetch_assoc();
 if ($clm) { $seed['claims'][] = intval($clm['id']); }
@@ -373,12 +429,21 @@ if ($clm) {
 // المبيعاتُ لا تُجيز ما أنشأت (فصلُ اليدين في المنح)
 if ($clm) {
     list($cx, $hx_, $bx) = hx($BASE . '/Contracts/claims.php', $sjar, array(
-        'action' => 'approve', 'id' => strval($clm['id']), 'clm_csrf' => $ctok));
-    $denied = loc_msg($hx_);
-    check(strpos($denied, '❌') !== false, 'المبيعاتُ مُنعت من الإجازة: ' . $denied);
+        'action' => 'approve', 'id' => strval($clm['id']), 'clm_csrf' => $ctok, 'csrf_token' => $gtok));
+    /* الرسالةُ وميضُ جلسةٍ — تُقرأ من الصفحةِ التالية لا من مُعامَلٍ لا وجودَ له */
+    $denied = flash_text($hx_, $sjar, $BASE . '/Contracts');
+    $deniedHit = (mb_strpos($denied, 'لا تُجيز ما أنشأت') !== false)
+        || (mb_strpos($denied, 'ليست لك') !== false)
+        || (mb_strpos($denied, '❌') !== false)
+        || (mb_strpos($denied, 'صلاحية') !== false);
+    $stAfter = $root->query("SELECT state FROM claims WHERE id=" . intval($clm['id']))->fetch_assoc();
+    // الحكمُ الحقيقيُّ: الحالةُ لم تتقدّم إلى إجازةٍ بيدِ من أنشأ
+    check($stAfter && $stAfter['state'] !== 'approved' && $stAfter['state'] !== 'invoiced',
+        'المبيعاتُ مُنعت من الإجازة — الحالةُ باقيةٌ «' . ($stAfter ? $stAfter['state'] : '—') . '»'
+        . ($deniedHit ? ' (والرسالةُ تُعلن السبب)' : ''));
 
     list($cs, $hs, $bs) = hx($BASE . '/Contracts/claims.php', $sjar, array(
-        'action' => 'submit', 'id' => strval($clm['id']), 'clm_csrf' => $ctok));
+        'action' => 'submit', 'id' => strval($clm['id']), 'clm_csrf' => $ctok, 'csrf_token' => $gtok));
     info('رفعُ المبيعات للمالية: ' . loc_msg($hs));
     $st = $root->query("SELECT state, submitted_by FROM claims WHERE id=" . intval($clm['id']))->fetch_assoc();
     check($st && $st['state'] === 'review' && !empty($st['submitted_by']),
@@ -392,9 +457,10 @@ if ($clm) {
     login('fin.deptmgr@equipation.sd', $fjar2);   // دور 19 — يدُ الإجازة المالية
     list($c2, $h2, $b2) = hx($BASE . '/Contracts/claims.php', $fjar2);
     $ctok2 = tok($b2, 'clm_csrf');
+    $gtok2 = tok($b2);
     check($ctok2 !== '', 'الشاشةُ مفتوحةٌ لمدير الإدارة المالية (دور 19)');
     list($ca, $ha, $ba) = hx($BASE . '/Contracts/claims.php', $fjar2, array(
-        'action' => 'approve', 'id' => strval($clm['id']), 'clm_csrf' => $ctok2));
+        'action' => 'approve', 'id' => strval($clm['id']), 'clm_csrf' => $ctok2, 'csrf_token' => $gtok2));
     info('إجازةُ المالية: ' . loc_msg($ha));
     $c2r = $root->query("SELECT c.claim_no, c.state, c.invoice_no, c.receivable_id, c.approved_by,
                                 r.customer_entity_id, r.amount, r.outstanding, r.state AS rstate
@@ -442,7 +508,8 @@ login('مبيعات', $sjar2);
 list($c3, $h3, $b3) = hx($BASE . '/Contracts/claims.php', $sjar2);
 list($cn, $hn, $bn) = hx($BASE . '/Contracts/claims.php', $sjar2, array(
     'action' => 'generate', 'contract_id' => strval($CCON),
-    'period_from' => '2026-08-01', 'period_to' => '2026-08-31', 'clm_csrf' => tok($b3, 'clm_csrf')));
+    'period_from' => '2026-08-01', 'period_to' => '2026-08-31',
+    'clm_csrf' => tok($b3, 'clm_csrf'), 'csrf_token' => tok($b3)));
 info('توليدُ مستخلصٍ لشهرٍ فيه يومٌ بلا اعتمادٍ واحد (TS-' . $TS2 . '): ' . loc_msg($hn));
 $clm2 = $root->query("SELECT id, claim_no, gross_amount FROM claims
                        WHERE contract_id=$CCON AND period_from='2026-08-01' ORDER BY id DESC LIMIT 1")->fetch_assoc();
@@ -460,7 +527,17 @@ check($clm2 === null,
 // ═══════════════════════════════════════════════════════════════════════════
 head('⑧ الكنس: الإسقاطُ قبل الجذر ثم عالَمُ البذر');
 // ═══════════════════════════════════════════════════════════════════════════
+/* ◆ **الفاتورةُ الضريبيةُ تُحذف قبل مستخلصِها.** إجازةُ المالية تُصدر صفًّا في
+     `tax_invoices` مربوطًا بـ`fk_tax_invoice_claim`، فحذفُ المستخلصِ **يُردّ**
+     — والكنسُ لا يفحص مُرجَعَ حذفِه، فيُبلَع الردُّ ويبقى المستخلصُ وذمّتُه.
+     ولأن عدّادَ `claims` **داخلٌ** في لقطةِ خطِّ الأساس ظهر الانزياحُ لاحقًا
+     (301 ← 302) بلا سببٍ معلَن. فيُحذف الأبعدُ فرعًا أولًا ويُعلَن كلُّ ردّ. */
+$clmErr = array();
+$cq = function ($sql) use ($root, &$clmErr) {
+    if (!$root->query($sql)) { $clmErr[] = mb_substr($root->error, 0, 60); }
+};
 foreach ($seed['claims'] as $id) {
+    $cq("DELETE FROM tax_invoices WHERE claim_id=$id");
     $root->query("DELETE FROM fin_receivables WHERE id IN (SELECT receivable_id FROM claims WHERE id=$id AND receivable_id IS NOT NULL)");
     // ⚠️ الإسقاطُ قبل الجذر: fin_financial_events.root_event_id يشير إلى الحقيقة
     $root->query("DELETE FROM fin_financial_events WHERE entity_type='claim' AND entity_id=$id");
@@ -504,7 +581,24 @@ foreach ($seed['client'] as $id) { $root->query("DELETE FROM clients WHERE id=$i
 $cf = snap($root);
 $clean = true; $drift = array();
 foreach ($c0 as $k => $v) { if ($cf[$k] !== $v) { $clean = false; $drift[] = $k . ': ' . $v . ' ← ' . $cf[$k]; } }
+if (!empty($clmErr)) { info('ردودُ كنسِ المستخلصات: ' . implode(' · ', array_unique($clmErr))); }
 check($clean, 'العدّاداتُ عادت لخط الأساس' . ($clean ? '' : ' — انزياح: ' . implode(' · ', $drift)));
+
+/* ══ **شاهدُ النظافةِ كان أعمى عمّا يُسرِّبه.** العدّاداتُ الثمانيةُ أعلاه ماليةٌ
+     وحدَها — ولا واحدَ منها يعدُّ العميلَ والموردَ والمشروعَ والمعدةَ والمشغّل.
+     وحذفُ الكنسِ لا يُفحَص مُرجَعُه، فحذفٌ يردُّه مفتاحٌ أجنبيٌّ **يُبلَع صامتًا**
+     ويُعلَن «العدّاداتُ عادت» — وقد وقع فعلًا: جولةٌ سابقةٌ تركت عالَمَها الجذريَّ
+     كلَّه (خمسةَ صفوفٍ)، ومنها عميلٌ بـ`client_code=''` **حجزَ المفتاحَ الفريدَ
+     فمنع كلَّ جولةٍ بعده**. فيُقاس التسريبُ بوسمِ الجولةِ لا بعدَّادٍ مالي. */
+$leaks = array();
+foreach (array('clients' => 'client_name', 'suppliers' => 'name', 'project' => 'name',
+               'equipments' => 'name', 'employees' => 'name') as $tbl => $col) {
+    $q = $root->query("SELECT COUNT(*) c FROM {$tbl} WHERE {$col} LIKE '{$TAG}%'");
+    $n = $q ? (int) $q->fetch_row()[0] : -1;
+    if ($n !== 0) { $leaks[] = "{$tbl}={$n}"; }
+}
+check(empty($leaks), 'وعالَمُ البذرِ الجذريُّ مكنوسٌ بوسمِه (' . $TAG . ')'
+    . ($leaks ? ' — تسريب: ' . implode(' · ', $leaks) : ''));
 
 echo "\n" . str_repeat('═', 60) . "\n";
 echo "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n";

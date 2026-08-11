@@ -55,13 +55,17 @@ if (!in_array($role, $allowed_roles)) {
 
 // ─── خريطة الأدوار ────────────────────────────────────────────
 // النظام الهرمي الرباعي مع الألوان والأيقونات المحددة في المواصفات
-$role_level_map  = ['1' => 1, '2' => 2, '3' => 3, '4' => 4];
+// **مشتقةٌ من `includes/roles.php`** — السلسلةُ خمسُ أيدٍ وآخرُها المبيعات
+// (قرارُ المالك 2026-08-12 · `SPEC_TIMESHEET_CYCLE §TS-13`).
+$role_level_map  = ems_hours_role_level_map();
 $level_role_name = [
     1 => ['label' => 'مدير المشاريع',   'color' => '#0B1E3F', 'icon' => 'fa-user-tie'],
     2 => ['label' => 'مدير الموردين',   'color' => '#A8541C', 'icon' => 'fa-truck-medical'],
     3 => ['label' => 'مدير الأسطول',    'color' => '#475569', 'icon' => 'fa-truck'],
     4 => ['label' => 'مدير المشغلين',   'color' => '#5B7F1E', 'icon' => 'fa-shield-halved'],
+    5 => ['label' => 'مدير المبيعات',   'color' => '#7C2D12', 'icon' => 'fa-file-signature'],
 ];
+$FINAL_LEVEL = EMS_HOURS_APPROVAL_FINAL_LEVEL;
 
 $my_level   = $role_level_map[$role] ?? 0;
 $is_admin   = ($role === '-1');
@@ -84,10 +88,10 @@ if ($is_site_manager) {
     // مدير الموقع يرى جميع سجلاته بغض النظر عن حالة الاعتماد
     $pending_condition = "1=1";
 } elseif ($is_admin) {
-    // الأدمن يرى كل ما لم يُعتمد نهائياً (level 4)
+    // الأدمن يرى كل ما لم يُعتمد نهائياً (آخرُ مستوًى في السلسلة)
     $pending_condition = "NOT EXISTS (
         SELECT 1 FROM timesheet_approvals ta2
-        WHERE ta2.timesheet_id = t.id AND ta2.approval_level = 4 AND ta2.status = 1
+        WHERE ta2.timesheet_id = t.id AND ta2.approval_level = {$FINAL_LEVEL} AND ta2.status = 1
     )";
 } elseif ($my_level === 1) {
     // مدير المشاريع يرى كل ما لم يعتمده بعد
@@ -161,7 +165,7 @@ $approved_sql = "
     FROM timesheet t
     INNER JOIN timesheet_approvals ta_final
            ON ta_final.timesheet_id = t.id
-           AND ta_final.approval_level = 4
+           AND ta_final.approval_level = {$FINAL_LEVEL}
            AND ta_final.status = 1
     LEFT JOIN operations    o ON o.id      = t.operator
     LEFT JOIN equipments    e ON e.id      = o.equipment
@@ -453,7 +457,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       <div class="stat-card" style="border-color:#0B1E3F;">
         <div class="stat-icon" style="background:#0B1E3F;"><i class="fa fa-layer-group"></i></div>
         <div>
-          <div class="stat-val"><?= $is_admin ? '4' : $my_level ?></div>
+          <div class="stat-val"><?= $is_admin ? $FINAL_LEVEL : $my_level ?></div>
           <div class="stat-label">مستوى الاعتماد الحالي</div>
         </div>
       </div>

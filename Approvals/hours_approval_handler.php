@@ -41,7 +41,9 @@ $th_gate = ems_tenant_db();
 $action = isset($_POST['action']) ? trim($_POST['action']) : '';
 
 // ── خريطة مستوى الاعتماد لكل دور ─────────────────────────
-$role_level_map = ['1' => 1, '2' => 2, '3' => 3, '4' => 4];
+// **مشتقةٌ من `includes/roles.php`** لا منسوخةٌ هنا: السلسلةُ خمسُ أيدٍ
+// (قرارُ المالك 2026-08-12 · `SPEC_TIMESHEET_CYCLE §TS-13`) وآخرُها المبيعات.
+$role_level_map = ems_hours_role_level_map();
 
 function role_label_ar($role_id) {
     $role_id = strval($role_id);
@@ -184,7 +186,9 @@ if ($action === 'approve') {
         // الاعتماد يكتمل دائمًا مهما جرى للنشر (خطة K5 §8.2 المُقرّة).
         // [الحدّ المقدّس] المعرّف الوليد الآن من البوابة بدل $conn->insert_id، والخطّاف
         // يُستدعى بـ$conn نفسه بلا مساس — الناقل غير مَمسوس.
-        if ($ins_id > 0 && $my_level === 4) {
+        // يبقى عند آخرِ مستوًى **تشغيليّ**: الحقيقةُ التشغيليةُ تكتمل بأيدي
+        // التشغيلِ الأربع، ويدُ المبيعاتِ بعدَها **تجاريةٌ لا تشغيلية**.
+        if ($ins_id > 0 && $my_level === EMS_HOURS_APPROVAL_OPS_LEVEL) {
             $__k5_gen = $ins_id;
             require_once __DIR__ . '/../includes/timesheet_event_hook.php';
             ems_timesheet_event_hook($conn, $ts_id, $__k5_gen, $user_id);
@@ -222,8 +226,11 @@ if ($action === 'approve') {
                 . ' #' . implode('، #', array_slice($selfBlocked, 0, 8))
                 . ' (من أدخل لا يعتمد · UI-01 §8)';
     }
-    if ($__gate_on && $my_level === 4 && $approved > 0) {
-        $__msg .= ' — اكتمل الاعتماد التشغيلي، وبانتظار التحويل المالي';
+    if ($__gate_on && $my_level === EMS_HOURS_APPROVAL_OPS_LEVEL && $approved > 0) {
+        $__msg .= ' — اكتمل الاعتماد التشغيلي، وبانتظار اعتماد المبيعات';
+    }
+    if ($__gate_on && $my_level === EMS_HOURS_APPROVAL_FINAL_LEVEL && $approved > 0) {
+        $__msg .= ' — اكتملت السلسلة باعتماد المبيعات، وبانتظار التحويل المالي';
     }
     if (!empty($blocked)) {
         // §5.2: الموقوفُ يُعلَن بأسبابه — لا يُبلَع في «تخطي».

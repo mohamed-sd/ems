@@ -55,7 +55,11 @@ class TimesheetEntryService
     /** خريطة مستويات الاعتماد القديمة → مراحل السجل القانوني (للمرآة حصرًا).
      *  الدلالة من hours_approval_handler: 1=مدير المشاريع · 2=الموردين ·
      *  3=الأسطول · 4=المشغلين — لا مرحلةَ مبيعاتٍ في المسار القديم، فلا تُلفَّق. */
-    const LEGACY_LEVEL_STAGE = array(1 => 'site', 2 => 'supplier', 3 => 'fleet', 4 => 'operator');
+    /* المستوى الخامس **وُصِل** بقرار المالك 2026-08-12: يدُ المبيعاتِ كانت
+       مبنيةً في هذه الخدمةِ بلا مُستهلِك، فما بلغ يومٌ `sales_approved` من
+       الشاشاتِ وكان تحويلُه إلى مالٍ مقطوعًا. (`SPEC_TIMESHEET_CYCLE §TS-13`) */
+    const LEGACY_LEVEL_STAGE = array(1 => 'site', 2 => 'supplier', 3 => 'fleet',
+                                     4 => 'operator', 5 => 'sales');
 
     /** ورديات الشاشات القديمة → ENUM الوردية القانوني. */
     const SHIFT_MAP = array('D' => 'day', 'N' => 'night', 'ص' => 'day', 'م' => 'night',

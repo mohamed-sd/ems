@@ -71,14 +71,45 @@ const EMS_ROLES_FINANCE = array(
 const EMS_ROLES_MAINTENANCE = array(
     EMS_ROLE_MAINTENANCE_MGR, EMS_ROLE_MAINTENANCE_SUPERVISOR,
 );
-// سلسلة اعتماد الساعات الرباعية + من يُسمح له بدخول شاشاتها.
+/* ══ سلسلةُ اعتمادِ الساعات — **خمسُ أيدٍ لا أربع** (قرارُ المالك 2026-08-12).
+     `SPEC_TIMESHEET_CYCLE §TS-13`: «المسارُ الداخليُّ حتى الأثرِ الأوليّ — خمسُ
+     أيدٍ: الموقع · **المبيعات** · الموردون · القوى · الحسابات». والمقيسُ أن يدَ
+     المبيعات كانت **مبنيةً بلا مُستهلِك**: `TimesheetEntryService` يعرف مرحلةَ
+     `sales` ويحرسها، ولا شاشةَ تستدعيها — فما بلغ يومٌ واحدٌ `sales_approved`
+     من الشاشات، و«وحدات الأطراف» تشترطها للتحويل، **فكان مسارُ المالِ مقطوعًا**
+     (الـ1500 حالةً الموجودةَ بذرٌ لا إنتاج).
+   ⇒ المستوياتُ تُعلَن **هنا وحدَها** مُرتَّبةً، ويشتقُّ منها المُشغِّلُ والشاشةُ
+     خريطتَهما وطولَ السلسلة — فلا رقمَ ٤ مبثوثًا في ستةِ مواضع يفترق. */
+const EMS_HOURS_APPROVAL_LEVELS = array(
+    1 => EMS_ROLE_OPERATIONS_MGR,   // مدير المشاريع/التشغيل — اعتمادُ الوقوع
+    2 => EMS_ROLE_SUPPLIERS_MGR,    // مدير الموردين — نطاقُه وحدَه
+    3 => EMS_ROLE_FLEET_MGR,        // مدير الأسطول — نطاقُه وحدَه
+    4 => EMS_ROLE_HR_MGR,           // مدير المشغلين/القوى — نطاقُه وحدَه
+    5 => EMS_ROLE_SALES_MGR,        // مدير المبيعات — بوابةُ §④ التجارية
+);
+/** آخرُ مستوًى في السلسلة — يُشتقُّ ولا يُكتب رقمًا. */
+const EMS_HOURS_APPROVAL_FINAL_LEVEL = 5;
+/** آخرُ مستوًى **تشغيليّ** — عنده تكتمل الحقيقةُ التشغيليةُ وتُنشر على الناقل. */
+const EMS_HOURS_APPROVAL_OPS_LEVEL = 4;
+
 const EMS_ROLES_HOURS_APPROVAL_CHAIN = array(
     EMS_ROLE_OPERATIONS_MGR, EMS_ROLE_SUPPLIERS_MGR, EMS_ROLE_FLEET_MGR, EMS_ROLE_HR_MGR,
+    EMS_ROLE_SALES_MGR,
 );
 const EMS_ROLES_HOURS_APPROVAL_ACCESS = array(
     EMS_ROLE_SUPER_ADMIN, EMS_ROLE_OPERATIONS_MGR, EMS_ROLE_SUPPLIERS_MGR,
-    EMS_ROLE_FLEET_MGR, EMS_ROLE_HR_MGR, EMS_ROLE_SITE_MGR,
+    EMS_ROLE_FLEET_MGR, EMS_ROLE_HR_MGR, EMS_ROLE_SITE_MGR, EMS_ROLE_SALES_MGR,
 );
+/** خريطةُ الدورِ ⇒ المستوى — مشتقةٌ من الإعلانِ أعلاه (لا نسخةَ ثانية). */
+function ems_hours_role_level_map()
+{
+    static $map = null;
+    if ($map === null) {
+        $map = array();
+        foreach (EMS_HOURS_APPROVAL_LEVELS as $lvl => $roleId) { $map[strval($roleId)] = $lvl; }
+    }
+    return $map;
+}
 
 // ── خريطة التحقق: الاسم المتوقع لكل رقم (مطابقة القاعدة الحية) ────────────────
 const EMS_ROLE_NAMES = array(
