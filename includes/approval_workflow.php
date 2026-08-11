@@ -213,6 +213,7 @@ if (!function_exists('approval_record_rule_gap')) {
      *   (السجلُّ تابعٌ لا شرط — CS-12).
      */
     function approval_record_rule_gap($conn, $lookupKey, $reason) {
+        require_once __DIR__ . '/catch_log.php';   // قناةُ إعلانِ التجاهلِ المقصود (CS-12)
         $prev = mysqli_report(MYSQLI_REPORT_OFF);
         try {
             $stmt = mysqli_prepare($conn,
@@ -228,7 +229,13 @@ if (!function_exists('approval_record_rule_gap')) {
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
         } catch (\Throwable $e) {
-            error_log('approval_record_rule_gap: ' . $e->getMessage());
+            /* ◆ انحدارٌ أحدثتُه أمسِ وكشفته بوابةُ AC-F10: كان هذا الجسمُ
+                 `error_log` وحدَه — و«كتلةُ استثناءٍ مبتلَعة» عيبٌ محكومٌ في هذا
+                 النطاق. والتجاهلُ **مقصودٌ** هنا (السجلُّ تابعٌ لا شرط: تعذّرُ
+                 تسجيلِ الدَّينِ لا يجوز أن يمنع سلّمَ اعتماد)، فيُعلَن بالقناةِ
+                 المسجَّلةِ لذلك لا بتعليقٍ حرّ. */
+            ems_catch_ignored($e, __FUNCTION__,
+                'CS-12: تسجيلُ دَينِ «سلّمٌ بلا قاعدة» تابعٌ لا شرط — لا يُوقف مسارَ الاعتماد.');
         }
         mysqli_report($prev);
     }
