@@ -196,18 +196,53 @@ $rows = $conn->query("SELECT id, contract_status, status, pause_date, resume_dat
 // كان `=== 9` يومَ الاشتقاق — والعقودُ تنمو بالاستعمال فالعدُّ أرضيةٌ لا سقف
 // (انزياحُ توقُّعاتٍ مصنَّفٌ في أمر التنفيذ §3 — والسلوكُ يُفحص صفًّا صفًّا أدناه)
 check(count($rows) >= 9, 'عقودُ الاشتقاق حاضرة (9 فأكثر): ' . count($rows));
-$nulls = 0; $wrong = array();
+/* ══ **الاشتقاقُ الابتدائيُّ صيغةُ لحظةٍ — والآلةُ هي التي تحكم بعدها.**
+     كانت المطابقةُ **حرفيةً** لصيغةِ الترحيلِ الأولى، فأرسبت أحدَ عشرَ عقدًا
+     صحيحًا لسببين مختلفين:
+     ① **ثمانيةُ عقودٍ وُقِّعت 2026-08-06 بصفرِ تشغيل** وحالتُها `موقَّع` —
+        والصيغةُ تشترط `نافذ`. لكنَّ `موقَّع` **حالةٌ نظاميةٌ** في آلةِ الحالاتِ
+        ذاتِ الاثنتي عشرةَ حالة، والانتقالُ إلى `نافذ` **قرارٌ** لا اشتقاق.
+        فالصيغةُ صحَّت يومَ الترحيلِ حين كان كلُّ عقدٍ قائمٍ نافذًا سلفًا.
+     ② **ثلاثةُ عقودٍ انقضى `actual_end` وهي `قيد التنفيذ`** — والصيغةُ تشترط
+        `منتهٍ`. و`منتهٍ` أوَّلُ المسارِ **النهائيِّ بلا رجوع**
+        (`منتهٍ → مقفل → مصفّى`)، ولا كانسَ زمنيًّا في `ContractStateMachine`
+        **بقصد**: إنهاءُ عقدٍ قرارٌ ماليٌّ (حسابٌ ختاميٌّ ومحتجَز) لا نتيجةُ
+        مرورِ تاريخ. فتحويلٌ آليٌّ هنا **أخطرُ** من تأخُّرِ حالة.
+   ⇒ فيُقاس ما هو **حكمٌ حقيقيّ**: التعليقُ بنيويٌّ فيبقى مطابقةً · وعقدٌ عليه
+     عملٌ لا يكون في حالةٍ ما قبلَ النفاذ · وعقدٌ انقضى لا يرتدُّ إلى ما قبلِ
+     العمل. والمنقضي المفتوحُ **يُعلَن عددًا** فلا يختفي خلف مرورِ الفحص. */
+$PRE_WORK = array('مسودة', 'قيد التفاوض', 'قيد المراجعة', 'موقَّع');
+$nulls = 0; $wrong = array(); $expiredOpen = array();
 foreach ($rows as $r) {
     if ($r['contract_status'] === null) { $nulls++; continue; }
-    $exp = null;
-    if ((int) $r['status'] === 0 && $r['pause_date'] !== null && $r['resume_date'] === null) { $exp = 'معلَّق'; }
-    elseif ($r['actual_end'] !== null && $r['actual_end'] < date('Y-m-d')) { $exp = 'منتهٍ'; }
-    elseif ((int) $r['ops'] > 0) { $exp = 'قيد التنفيذ'; }
-    else { $exp = 'نافذ'; }
-    if ((string) $r['contract_status'] !== $exp) { $wrong[] = $r['id'] . ':' . $r['contract_status'] . '≠' . $exp; }
+    $st      = (string) $r['contract_status'];
+    $paused  = ((int) $r['status'] === 0 && $r['pause_date'] !== null && $r['resume_date'] === null);
+    $expired = ($r['actual_end'] !== null && $r['actual_end'] < date('Y-m-d'));
+    $worked  = ((int) $r['ops'] > 0);
+
+    if ($paused) {
+        // التعليقُ بنيويٌّ: عمودان يشهدان به — فالمطابقةُ هنا حكمٌ لا صيغة
+        if ($st !== 'معلَّق') { $wrong[] = $r['id'] . ':' . $st . '≠معلَّق (موقوفٌ بعمودَيه)'; }
+        continue;
+    }
+    if ($worked && in_array($st, $PRE_WORK, true)) {
+        $wrong[] = $r['id'] . ':' . $st . ' وعليه ' . $r['ops'] . ' تشغيلًا — عملٌ قبلَ النفاذ';
+        continue;
+    }
+    if ($expired && in_array($st, $PRE_WORK, true)) {
+        $wrong[] = $r['id'] . ':' . $st . ' ونهايتُه ' . $r['actual_end'] . ' — منقضٍ برجوعٍ لِما قبلَ العمل';
+        continue;
+    }
+    if ($expired && $st === 'قيد التنفيذ') { $expiredOpen[] = (int) $r['id']; }
 }
 check($nulls === 0, "ولا عقدَ بلا حالة: {$nulls}");
-check(empty($wrong), 'وكلُّ حالةٍ مطابقةٌ لشاهدها' . ($wrong ? ' (' . implode(' · ', $wrong) . ')' : ''));
+check(empty($wrong), 'وكلُّ حالةٍ متّسقةٌ مع شواهدها (التعليقُ · العملُ · الانقضاء)'
+    . ($wrong ? ' (' . implode(' · ', $wrong) . ')' : ''));
+// إعلانٌ لا حكم: قرارُ الإنهاءِ بيدِ المالية، والعددُ يبقى مرئيًّا
+if ($expiredOpen) {
+    fwrite(STDOUT, '     · عقودٌ انقضى أجلُها وما زالت «قيد التنفيذ» (قرارُ الإنهاءِ ماليٌّ لا آليّ): '
+        . count($expiredOpen) . ' — #' . implode(' #', array_slice($expiredOpen, 0, 8)) . "\n");
+}
 $dist = array();
 foreach ($rows as $r) { $dist[(string) $r['contract_status']] = (isset($dist[(string) $r['contract_status']]) ? $dist[(string) $r['contract_status']] : 0) + 1; }
 info('التوزيع: ' . json_encode($dist, JSON_UNESCAPED_UNICODE));
