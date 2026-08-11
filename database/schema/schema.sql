@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 00:56:22
+-- المصدر: equipation_manage · التوليد: 2026-08-12 02:00:42
 -- الجداول: 549 · المناظير: 5
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -4266,13 +4266,15 @@ CREATE TABLE `fin_event_links` (
   `effect_type` enum('revenue_event','supplier_due','employee_due','cost_record','receivable','journal_entry','payment','metric_update','budget_consumption','party_award') NOT NULL,
   `target_table` varchar(40) NOT NULL,
   `target_id` int(10) unsigned DEFAULT NULL,
-  `event_id` int(10) unsigned DEFAULT NULL,
+  `event_id` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `void_reason` varchar(60) DEFAULT NULL COMMENT 'سببُ إبطالِ المرساة — الرابطُ باقٍ شاهدًا وevent_id ساقط',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_link_parent_effect` (`company_id`,`parent_kind`,`parent_ref`,`effect_type`),
   KEY `ix_parent` (`company_id`,`parent_kind`,`parent_ref`),
   KEY `ix_target` (`company_id`,`target_table`,`target_id`),
-  KEY `ix_event` (`event_id`)
+  KEY `ix_event` (`event_id`),
+  CONSTRAINT `fk_fel_event` FOREIGN KEY (`event_id`) REFERENCES `fin_financial_events` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_financial_events ──
@@ -5508,7 +5510,8 @@ CREATE TABLE `fin_unit_records` (
   KEY `ix_fin_ur_date` (`company_id`,`record_date`),
   KEY `ix_fin_ur_project` (`project_id`),
   KEY `ix_fin_ur_match` (`company_id`,`match_state`),
-  KEY `ix_fin_ur_deleted` (`is_deleted`)
+  KEY `ix_fin_ur_deleted` (`is_deleted`),
+  CONSTRAINT `chk_unit_approved_has_actor` CHECK (`match_state` <> 'approved' or `is_deleted` <> 0 or `created_by` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_units ──

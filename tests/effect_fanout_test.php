@@ -59,7 +59,15 @@ function make_unit($conn, $CO, $MARK, $model, $qty, $cprice, $sprice, $sup = 1) 
     $stmt->bind_param('isisdddd', $CO, $no, $sup, $model, $qty, $qty, $cprice, $sprice);
     $stmt->execute();
     $id = intval($conn->insert_id);
+    $err = (string) $stmt->error;
     $stmt->close();
+    /* ◆ **الإدراجُ المردودُ كان يمرُّ صامتًا.** `sql_mode` فارغٌ ولا فحصَ لمُرجَعِ
+         `execute()`، فقيدٌ يردُّ الصفَّ يُعطي `insert_id = 0`، ثم `selectOne`
+         تعود `null`، فيُقرأ العطلُ عند `forUnitRecord(): $unit must be array` —
+         **بعيدًا عن سببِه بأسطر**. فالبذرُ يُعلن رفضَه في موضعِه. */
+    if ($id === 0) {
+        throw new RuntimeException('make_unit: رُدَّ إدراجُ وحدةٍ (' . $model . ') — ' . ($err !== '' ? $err : 'بلا نصِّ خطأ'));
+    }
     return $id;
 }
 

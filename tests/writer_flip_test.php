@@ -24,7 +24,13 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 // موضوعُ الحزمة قلبُ الكاتب والمرآة لا وثائقُ الأهلية — والتحييدُ قبل config
 // (وقائعُ 2027 و2031 يحجبها حارسُ الوثائق بحقّ. انظر tests/_guard_env.php).
 require_once __DIR__ . '/_guard_env.php';
-ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'));
+/* ◆ **التحييدُ أُعلن لعمليةِ الفاحصِ وحدَها ولم يُعلن لـApache** — وحزمةُ هذا
+     الفاحصِ كلُّها **مسابيرُ HTTP**، فبقي `EMS_DOC_EXPIRY_GUARD=enforce` في
+     الخادمِ فحجب اعتمادَ المستوى الأولِ **بحقّ** (أُرجع `approved=0` مع
+     `success=true`) فتساقط ما بعده. والوسيطُ الثاني `true` هو ما يكتب التجاوزَ
+     في `.env` نفسِه ويستعيده بايت-مطابقًا في `register_shutdown_function`.
+     والنمطُ المعتمَدُ حاضرٌ في `approval_box_test.php:29` حرفيًّا. */
+ems_test_env_override(array('EMS_DOC_EXPIRY_GUARD' => 'off'), true);
 
 const BASE = 'http://localhost/ems';
 const WIN_FROM = '2027-04-01';

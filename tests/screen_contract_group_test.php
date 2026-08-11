@@ -53,10 +53,22 @@ fwrite(STDOUT, "\n══ عقدُ الشاشة — M-42 · M-44 · M-45 · M-46 
 // ═══ M-42 ═══
 head('M-42 — الصندوقُ الموحّد: أربعةُ صناديقَ في واحد');
 
+/* ══ **العددُ إحصاءٌ والتوحيدُ هو الحكم.** كان يشترط `=== 4` والخدمةُ نمت إلى
+     ستةٍ بقرارَين مسجَّلَين — **والرسالةُ نفسُها تطبع الستةَ فتُدين الفاحصَ لا
+     الخدمة**. والحكمُ المقصودُ (عنوانُ القسم): «أربعةُ صناديقَ في **واحد**» —
+     أي أن مصادرَ §5 الأربعةَ حاضرةٌ في صندوقٍ موحَّد، لا أن عددَها أربعةٌ أبدًا.
+   ⇒ يُقاس حضورُ المصادرِ الأربعةِ المسمّاةِ، ويُعلَن العددُ الكليُّ ولا يُجمَّد. */
 $before = AIS::inbox($conn, $CO);
-check($before['ok'] && count($before['boxes']) === 4,
-      '★ الصناديقُ الأربعة: ' . implode(' · ', array_map(function ($b) {
-          return $b['title'] . '(' . $b['count'] . ')'; }, $before['boxes'])));
+$boxTitles = array_map(function ($b) { return (string) $b['title']; }, $before['boxes']);
+$boxBlob = implode(' | ', $boxTitles);
+$need4 = array('الطلبات المالية', 'تسويات الموردين', 'القيود اليدوية', 'إقفال الفترات');
+$missing4 = array();
+foreach ($need4 as $nd) { if (mb_strpos($boxBlob, $nd) === false) { $missing4[] = $nd; } }
+check($before['ok'] && $missing4 === array(),
+      '★ مصادرُ §5 الأربعةُ في صندوقٍ واحد (والصناديقُ الآن '
+      . count($before['boxes']) . '): ' . implode(' · ', array_map(function ($b) {
+          return $b['title'] . '(' . $b['count'] . ')'; }, $before['boxes']))
+      . ($missing4 ? ' — الناقص: ' . implode(' · ', $missing4) : ''));
 
 $conn->query("INSERT INTO fin_requests (company_id, request_no, request_type, source_module,
               requester_id, beneficiary_type, beneficiary_ref, amount, currency, statement,

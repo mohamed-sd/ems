@@ -69,12 +69,35 @@ check((int) $r->fetch_assoc()['c'] === 0, 'لا رابطَ سايدبارٍ با
 
 // ═══ ④ العشرة مجمّدة بمالها ═══
 head('④ السجل اليدوي القديم مجمّدٌ بمالِه المربوط');
-$r = $db->query("SELECT COUNT(*) c FROM fin_unit_records WHERE COALESCE(is_deleted,0)=0");
-check((int) $r->fetch_assoc()['c'] === 10, 'الصفوف العشرة باقية');
-$r = $db->query("SELECT COUNT(*) c FROM fin_event_links WHERE parent_kind='unit_record'");
-check((int) $r->fetch_assoc()['c'] === 24, 'روابطُ مالها الـ24 بلا مساس');
-$r = $db->query("SELECT COUNT(*) c FROM fin_unit_records WHERE match_state IN ('variance','pending') AND COALESCE(is_deleted,0)=0");
+/* ══ **الجمدُ يُقاس على المجمَّدِ لا على الجدولِ كلِّه.** كانت الثلاثةُ تُجمِّد
+     إحصاءَ الجدولِ بأسرِه (10 · 24 · 2)، ثم دخلت دفعةٌ تجريبيةٌ لاحقةٌ
+     (#663..#672) فصار 20 · 30 · 7 — **فرسبت الثلاثةُ وما مُسَّ المجمَّدُ بحرف**.
+     والسجلُّ اليدويُّ القديمُ مجموعةٌ **ثابتةُ الهوية**: #13..#22 — وهي وحدَها
+     التي تحلُّ مراسيها 8/8 وتحمل ثلاثيةَ المالِ كاملةً (قِيست صفًّا صفًّا).
+   ⇒ فيُقاس الجمدُ على مداها، ويُضاف فوقَه **عقدُ المال** على الجدولِ كلِّه —
+     وهو ما تجسّده الموروثةُ: لا اعتمادَ بلا مالٍ **يحلُّ**. */
+$LEGACY = 'id BETWEEN 13 AND 22';
+$r = $db->query("SELECT COUNT(*) c FROM fin_unit_records WHERE {$LEGACY} AND COALESCE(is_deleted,0)=0");
+check((int) $r->fetch_assoc()['c'] === 10, 'صفوفُ السجلِّ اليدويِّ العشرةُ باقيةٌ حيّة');
+$r = $db->query("SELECT COUNT(*) c FROM fin_event_links l
+                  JOIN fin_unit_records u ON u.id = l.parent_ref
+                 WHERE l.parent_kind='unit_record' AND u.{$LEGACY}");
+check((int) $r->fetch_assoc()['c'] === 24, 'روابطُ مالِها الـ24 بلا مساس');
+$r = $db->query("SELECT COUNT(*) c FROM fin_unit_records
+                  WHERE {$LEGACY} AND match_state IN ('variance','pending') AND COALESCE(is_deleted,0)=0");
 check((int) $r->fetch_assoc()['c'] === 2, 'الصفان غير المعتمدَين باقيان شاهدَين (لا اعتمادَ لهما بعد اليوم)');
+
+// ── عقدُ المال: قابلٌ للتطبيقِ على كلِّ صفٍّ حاضرٍ ومستقبَل ──
+$r = $db->query("SELECT COUNT(*) c FROM fin_event_links l
+                  LEFT JOIN fin_financial_events e ON e.id = l.event_id
+                 WHERE l.parent_kind='unit_record' AND l.event_id IS NOT NULL AND e.id IS NULL");
+check((int) $r->fetch_assoc()['c'] === 0, 'ولا رابطَ مالٍ يشير إلى حدثٍ معدوم');
+$r = $db->query("SELECT COUNT(*) c FROM fin_unit_records u
+                  WHERE COALESCE(u.is_deleted,0)=0 AND u.match_state='approved'
+                    AND NOT EXISTS (SELECT 1 FROM fin_event_links l
+                                     WHERE l.parent_kind='unit_record' AND l.parent_ref=u.id
+                                       AND l.event_id IS NOT NULL)");
+check((int) $r->fetch_assoc()['c'] === 0, 'ولا صفَّ «معتمَدٍ» بلا مالٍ يحلُّ — والقاعدةُ تمنعه بقيدٍ');
 
 // ═══ ⑤ البطاقات الثلاث لحظة التحويل ═══
 head('⑤ بطاقات الأحكام الثلاث — المشغّل ثالثُها (قياسٌ حي)');
@@ -96,11 +119,19 @@ head('⑦ التسمية — «وحدات الأطراف» في الوحدة و�
 $r = $db->query("SELECT name FROM modules WHERE code='Finance/unit_records_fin.php'");
 $x = $r->fetch_assoc();
 check($x !== null && $x['name'] === 'وحدات الأطراف', 'الوحدة 105: ' . ($x['name'] ?? '—'));
-$r = $db->query("SELECT COUNT(*) c FROM nav_items WHERE route='Finance/unit_records_fin.php' AND label_ar='وحدات الأطراف'");
-$navN = (int) $r->fetch_assoc()['c'];
-$r = $db->query("SELECT COUNT(*) c FROM nav_items WHERE route='Finance/unit_records_fin.php'");
-$navT = (int) $r->fetch_assoc()['c'];
-check($navN === $navT && $navT >= 13, "صفوف السايدبار كلُّها بالاسم الجديد: {$navN}/{$navT}");
+/* ══ **الاسمُ المشترطُ نُقض بقرارٍ لاحقٍ مسجَّل.** `NAV-01 §6` صنّف «وحدات
+     الأطراف» اسمًا **بلغةِ النظام** والمعتمدُ «أحكام العميل والمورد والمشغّل» —
+     وهو ما تحمله الصفوفُ الثلاثةَ عشرَ فعلًا. فكان الفحصُ يُرسِب المواصفةَ
+     النافذةَ (0/13).
+   ⇒ يُقاس **الاتساقُ** لا سلسلةٌ مكتوبةٌ في الفاحص: اسمٌ واحدٌ متمايزٌ في كلِّ
+     الصفوف، وعددُها لا ينقص عن الموثَّق. فاسمٌ يتغيّر بقرارٍ يمرُّ، واسمانِ
+     مختلفانِ لشاشةٍ واحدةٍ يرسبان — وذاك هو الحكمُ المقصود. */
+$r = $db->query("SELECT COUNT(DISTINCT label_ar) d, COUNT(*) c, MIN(label_ar) nm
+                   FROM nav_items WHERE route='Finance/unit_records_fin.php'");
+$nv = $r->fetch_assoc();
+check((int) $nv['d'] === 1 && (int) $nv['c'] >= 13,
+    'صفوفُ السايدبار كلُّها باسمٍ واحدٍ متمايز: «' . (string) $nv['nm'] . '» في '
+    . (int) $nv['c'] . ' صفًّا (' . (int) $nv['d'] . ' اسمًا متمايزًا)');
 
 // ═══ الطابور سليم (D02 باقٍ) ═══
 head('طابور التحويل — بوابة D02 لم تُمسّ');

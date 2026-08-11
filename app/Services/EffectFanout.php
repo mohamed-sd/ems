@@ -57,7 +57,7 @@ class EffectFanout
      * @param \App\Core\TenantDb      $gate  البوابة داخل المعاملة نفسها
      * @param array                   $unit  صفّ fin_unit_records كاملًا
      * @param int                     $actor المستخدم الفاعل
-     * @return array{effects:array,skipped:array,adopted:array,fact_id:?int}
+     * @return array{effects:array,skipped:array,adopted:array,stale_anchors:array,fact_id:?int}
      * @throws \RuntimeException عند خرقٍ بنيويٍّ يوقف التوليد (قاعدة ④).
      */
     public static function forUnitRecord(\mysqli $conn, $gate, array $unit, $actor)
@@ -85,7 +85,34 @@ class EffectFanout
         $map = self::mapFor($gate, $company, self::SOURCE_UNIT_RECORD);
         $done = self::existingEffects($gate, $unitId);
 
-        $out = array('effects' => array(), 'skipped' => array(), 'adopted' => array(), 'fact_id' => null);
+        $out = array('effects' => array(), 'skipped' => array(), 'adopted' => array(),
+                     'stale_anchors' => array(), 'fact_id' => null);
+
+        /* ══ **التبنّي يتحقَّق قبل أن يثق.** فرعُ «توأمٌ ولّده المسارُ القديم» كان
+             يثق بـ`revenue_event_id`/`supplier_due_id` بلا مسٍّ للهدف: فإن حمل
+             الصفُّ مرساةً لحدثٍ **غيرِ موجود** تبنّاها — فربطَ رابطًا معلَّقًا
+             و**تخطّى نشرَ الحدثِ الحقيقيِّ** ثم أبلغ `adopted`، أي **نجاحًا**.
+             ومرساةٌ واحدةٌ فاسدةٌ تسري إلى خمسةِ مواضع: رابطُ التبنّي و
+             `fin_dues.event_id` و`fin_cost_records.event_id` مرتين.
+           ⇒ تُقاس المرساةُ **مرةً واحدةً** هنا: ما لا يحلُّ يصير `null` ويُعلَن
+             في `stale_anchors`، فيمضي المسارُ إلى النشرِ الحقيقيِّ ويصحِّح
+             المرساةَ بنفسِه — ولا يُكتَم الفسادُ خلفَ كلمةِ «تبنٍّ». */
+        foreach (array('revenue_event_id' => 'fin_financial_events',
+                       'supplier_due_id'  => 'fin_dues') as $anchorCol => $anchorTbl) {
+            if (empty($unit[$anchorCol])) { continue; }
+            $twin = $gate->selectOne($anchorTbl, array(
+                'columns' => array('id'),
+                'where'   => array('id' => intval($unit[$anchorCol])),
+            ));
+            if ($twin === null) {
+                $out['stale_anchors'][] = array(
+                    'column' => $anchorCol, 'value' => intval($unit[$anchorCol]), 'table' => $anchorTbl,
+                    'reason' => 'الهدفُ غيرُ موجودٍ في نطاق الشركة — لا تبنّيَ لتوأمٍ معدوم',
+                );
+                $unit[$anchorCol] = null;
+                $gate->update('fin_unit_records', array($anchorCol => null), array('id' => $unitId));
+            }
+        }
 
         // ── ⓪ الحقيقة المحايدة: الوحدة اعتُمدت (ADR-15) — قبل إسقاطاتها ──
         $fact = EventPublisher::publishFact($conn, array(
