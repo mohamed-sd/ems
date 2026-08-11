@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-10 22:27:12
+-- المصدر: equipation_manage · التوليد: 2026-08-11 12:23:51
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -275,7 +275,6 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (227,'بلاغ سياقي جديد','Tickets/ticket_contextual_open.php',NULL,NULL,0,0,'fa fa-bullhorn',322),
 (228,'مساحة عملي','main/my_workspace.php',NULL,NULL,0,0,'fa fa-user-circle',5),
 (229,'التغطية التعاقدية','Contracts/contract_coverage.php',NULL,NULL,0,0,'fas fa-shield-halved',330),
-(230,'بلاغاتُ إدارتي','Tickets/dept',24,NULL,1,0,'fa fa-bell',990),
 (231,'لوحة المدير التنفيذي','Portal/ceo_board.php',9,NULL,0,0,'fa fa-circle-dot',0),
 (232,'اعتمادات المدير التنفيذي','Portal/ceo_approvals.php',9,NULL,0,0,'fa fa-circle-dot',0),
 (233,'توقيع العقود والالتزامات','Portal/ceo_contracts.php',9,NULL,0,0,'fa fa-circle-dot',0),
@@ -455,9 +454,9 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (407,'التصرف في الأصل','Financing/asset_disposal.php',3,NULL,0,0,'fa fa-file-lines',900),
 (408,'ملف عملية التمويل','Financing/operation_profile.php',26,NULL,0,0,'fa fa-file-lines',900),
 (409,'ساعاتُ المعدة والوقائية','Maintenance/equipment_hours_preventive.php',NULL,NULL,0,0,'fa fa-file-lines',900),
-(410,'العودة للخدمة','Maintenance/return_to_service.php',NULL,NULL,0,0,'fa fa-file-lines',900);
+(410,'العودة للخدمة','Maintenance/return_to_service.php',NULL,NULL,0,0,'fa fa-file-lines',900),
+(411,'لوحة المواقع','Operations/sites_board.php',NULL,NULL,0,0,'fa fa-file-lines',900);
 INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`) VALUES
-(411,'لوحة المواقع','Operations/sites_board.php',NULL,NULL,0,0,'fa fa-file-lines',900),
 (412,'طلب تبديل','Operations/swap_request.php',NULL,NULL,0,0,'fa fa-file-lines',900),
 (413,'المرتجعات','Procurement/wh_returns.php',NULL,NULL,0,0,'fa fa-file-lines',900),
 (414,'إيكوبيشن | بطاقة المشروع','Projects/project_profile.php',1,NULL,0,0,'fa fa-file-lines',900),
@@ -488,7 +487,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (439,'إيكوبيشن | مشغّلو المعدة','movement/add_drivers.php',3,NULL,0,0,'fa fa-file-lines',900),
 (440,'إيكوبيشن | شجرة حسابات العميل','movement/client_tree.php',1,NULL,0,0,'fa fa-file-lines',900),
 (441,'إيكوبيشن | غرفة عمليات التشغيل','movement/move_oprators.php',6,NULL,0,0,'fa fa-file-lines',900),
-(442,'حوكمة الإدارة (عام)','Governance/gov_dept.php',NULL,NULL,0,0,'',0);
+(442,'حوكمة الإدارة (عام)','Governance/gov_dept.php',NULL,NULL,0,0,'',0),
+(443,'اختيار المشروع','Equipments/select_project.php',NULL,NULL,0,0,'fa fa-diagram-project',995);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -2925,7 +2925,23 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2767,20,430,1,0,0,0),
 (2768,21,430,1,0,0,0),
 (2769,22,430,1,0,0,0),
-(2770,3,442,1,0,0,0);
+(2770,3,442,1,0,0,0),
+(2771,1,443,1,0,0,0),
+(2772,2,443,1,0,0,0),
+(2773,3,443,1,0,0,0),
+(2774,4,443,1,0,0,0),
+(2775,5,443,1,0,0,0),
+(2776,6,443,1,0,0,0),
+(2777,7,443,1,0,0,0),
+(2778,8,443,1,0,0,0),
+(2779,10,443,1,0,0,0),
+(2780,11,443,1,0,0,0),
+(2781,12,443,1,0,0,0),
+(2782,13,443,1,0,0,0),
+(2783,14,443,1,0,0,0),
+(2784,23,443,1,0,0,0),
+(2785,26,443,1,0,0,0),
+(2786,27,443,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -4505,8 +4521,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (891,5,'DAILY',54,34,'متابعة المشروع','movement/map_page.php','fas fa-map-marked-alt',10,NULL,'movement/map_page.php',0,'2026-08-02 03:11:58','2026-08-06 00:14:05'),
 (892,5,'DAILY',51,30,'الورديات','movement/movement_operations.php','fa fa-tractor',20,NULL,'movement/movement_operations.php',0,'2026-08-02 03:11:58','2026-08-06 00:14:05'),
 (893,5,'DAILY',51,194,'مساحة التوزيع','Operations/distribution_space.php','fa fa-table-cells',6,NULL,'Operations/distribution_space.php',0,'2026-08-02 03:11:58','2026-08-06 00:14:05'),
-(903,5,'APPR',54,230,'بلاغاتُ إدارتي','Tickets/dept_inbox.php','fa fa-bell',5,'dept_tickets_late',NULL,0,'2026-08-02 14:40:49','2026-08-02 18:13:58'),
-(908,11,'APPR',94,230,'بلاغاتُ إدارتي','Tickets/dept_inbox.php','fa fa-bell',5,'dept_tickets_late',NULL,1,'2026-08-02 14:40:49','2026-08-02 14:49:39'),
+(903,5,'APPR',54,307,'بلاغاتُ إدارتي','Tickets/dept_inbox.php','fa fa-bell',5,'dept_tickets_late',NULL,0,'2026-08-02 14:40:49','2026-08-11 12:19:26'),
+(908,11,'APPR',94,307,'بلاغاتُ إدارتي','Tickets/dept_inbox.php','fa fa-bell',5,'dept_tickets_late',NULL,1,'2026-08-02 14:40:49','2026-08-11 12:19:26'),
 (921,24,'DAILY',2104,NULL,'بلاغاتُ إدارتي','Tickets/dept_inbox.php','fa fa-bell',50,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-03 13:35:07'),
 (932,8,'DAILY',2090,5,'أنواع المعدات','Equipments/equipments_types.php','fa fa-link',50,NULL,'Equipments/equipments_types.php',1,'2026-08-03 08:47:42','2026-08-06 00:14:05'),
 (933,8,'DAILY',2090,40,'الأنواع والموديلات','Equipments/fleet_models.php','fa fa-link',50,NULL,'Equipments/fleet_models.php',1,'2026-08-03 08:47:42','2026-08-06 00:14:05'),
@@ -5590,7 +5606,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6890,1,'RISK',2084,339,'مخاطرُ الميدان','Risk/risk_field.php','fa fa-triangle-exclamation',95,NULL,'Risk/risk_field.php',1,'2026-08-08 21:45:17','2026-08-08 21:45:17'),
 (6891,6,'RISK',2088,339,'مخاطرُ الميدان','Risk/risk_field.php','fa fa-triangle-exclamation',95,NULL,'Risk/risk_field.php',1,'2026-08-08 21:45:17','2026-08-08 21:45:17'),
 (6892,24,'RISK',2104,339,'مخاطرُ الميدان','Risk/risk_field.php','fa fa-triangle-exclamation',95,NULL,'Risk/risk_field.php',1,'2026-08-08 21:45:17','2026-08-08 21:45:17'),
-(6893,17,'DAILY',2097,357,'سجل الالتزامات','Finance/ob_register.php','fa fa-file-contract',100,NULL,'Finance/ob_register.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
+(6893,17,'DAILY',2097,357,'سجل الالتزامات','Finance/ob_register.php','fa fa-file-contract',100,NULL,'Finance/ob_register.php',1,'2026-08-09 02:14:26','2026-08-11 12:21:59'),
 (6894,17,'DAILY',2097,358,'جدول الاستحقاقات','Finance/ob_schedule.php','fa fa-calendar-days',101,NULL,'Finance/ob_schedule.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
 (6895,17,'DAILY',2097,359,'المستحق قريبًا والتذكيرات','Finance/ob_due_soon.php','fa fa-bell',102,NULL,'Finance/ob_due_soon.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
 (6896,17,'DAILY',2097,360,'الالتزامات المتأخرة والذمم الدائنة','Finance/ob_overdue.php','fa fa-triangle-exclamation',103,NULL,'Finance/ob_overdue.php',1,'2026-08-09 02:14:26','2026-08-10 07:23:40'),
@@ -5677,7 +5693,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7004,33,'GOV',3929,384,'ردود الإدارات على الملاحظات','Audit/iaf_responses.php','fa fa-circle-dot',14,NULL,'Audit/iaf_responses.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7005,33,'GOV',3929,379,'الكون الرقابي','Audit/iaf_universe.php','fa fa-circle-dot',15,NULL,'Audit/iaf_universe.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7006,33,'GOV',3929,382,'أوراق العمل والأدلة','Audit/iaf_workpapers.php','fa fa-circle-dot',16,NULL,'Audit/iaf_workpapers.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
-(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-10 21:09:47'),
+(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-11 11:44:19'),
 (7008,33,'DAILY',3930,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-circle-dot',2,NULL,'Finance/acc_backflow.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7009,33,'DAILY',3930,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-circle-dot',3,NULL,'Finance/acc_my_day.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7010,33,'DAILY',3930,368,'مصفوفة التوجيه لمحاسبي التخصصات','Finance/acc_routing_matrix.php','fa fa-circle-dot',4,NULL,'Finance/acc_routing_matrix.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
