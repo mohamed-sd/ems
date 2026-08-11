@@ -66,16 +66,32 @@ foreach ($scanDirs as $dir) {
     }
 }
 
-/* ── ③ الحكم ─────────────────────────────────────────────────────────────── */
-$missing = array(); $present = 0;
+/* ── ③ الحكم ───────────────────────────────────────────────────────────────
+   ◆ **الفاحصُ الأولُ لبس عليّ**: أعلن 38 مفقودًا وفيها ستةٌ ليست فقدًا —
+     `uq_stage_once` بادئةُ الحيِّ `uq_stage_once_per_round` · و`FK_VIOLATION`
+     **ثابتُ اختبارٍ** لا اسمُ قيدٍ · و`uq_sup_`/`fk_sup_` أطرافُ نصٍّ مبتورةٍ
+     في تسلسلِ سلاسل. وفاحصٌ يخلط هذه بالفقدِ الحقيقيِّ يُقرأ ضجيجًا فيُهمَل.
+   ◆ فيُصنَّف ثلاثةً: `MISSING` حقًّا · `PREFIX` بادئةُ حيٍّ أطول · `NOT_A_NAME`
+     ثابتٌ أو بادئةٌ مبتورةٌ لا تُقصد اسمًا. */
+$missing = array(); $prefix = array(); $notName = array(); $present = 0;
+$liveAll = $liveCheck + $liveUnique + $liveFk;
 foreach ($claims as $name => $where) {
     $kind = 'CHECK';
-    $exists = isset($liveCheck[$name]);
-    if (!$exists && (strpos($name, 'uq_') === 0)) { $kind = 'UNIQUE'; $exists = isset($liveUnique[$name]); }
-    if (!$exists && (strpos($name, 'fk_') === 0)) { $kind = 'FK';     $exists = isset($liveFk[$name]); }
-    /* اسمٌ قد يكون من أيِّ الحرّاسِ الثلاثة — لا نحكم بالبادئةِ وحدَها */
-    if (!$exists) { $exists = isset($liveUnique[$name]) || isset($liveFk[$name]) || isset($liveCheck[$name]); }
-    if ($exists) { $present++; continue; }
+    if (strpos($name, 'uq_') === 0) { $kind = 'UNIQUE'; }
+    if (strpos($name, 'fk_') === 0) { $kind = 'FK'; }
+    if (isset($liveAll[$name])) { $present++; continue; }
+
+    /* حرفٌ كبيرٌ كلُّه ⇒ ثابتُ شيفرةٍ لا اسمُ قيدٍ (اصطلاحُ التسميةِ هنا صغير) */
+    if ($name === strtoupper($name)) { $notName[$name] = 'ثابتُ شيفرةٍ لا اسمُ قيد'; continue; }
+    /* اسمٌ ينتهي بشرطةٍ سفليةٍ ⇒ طرفُ نصٍّ مبتورٌ في تسلسلِ سلاسل */
+    if (substr($name, -1) === '_') { $notName[$name] = 'بادئةٌ مبتورةٌ في تسلسلِ نصوص'; continue; }
+
+    $full = null;
+    foreach ($liveAll as $ln => $lt) {
+        if ($ln !== $name && strpos($ln, $name) === 0) { $full = $ln . ' [' . $lt . ']'; break; }
+    }
+    if ($full !== null) { $prefix[$name] = $full; continue; }
+
     $missing[$name] = array('kind' => $kind, 'where' => array_values(array_unique($where)));
 }
 
@@ -94,8 +110,19 @@ $L[] = '';
 $L[] = 'الحيُّ في القاعدة: **' . count($liveCheck) . '** CHECK · **' . count($liveUnique)
      . '** UNIQUE · **' . count($liveFk) . '** FK';
 $L[] = 'أسماءُ قيودٍ مذكورةٌ في الشجرة: **' . count($claims) . '** — منها **' . $present
-     . '** قائمةٌ و**' . count($missing) . '** مفقودة';
+     . '** قائمةٌ · **' . count($missing) . '** مفقودةٌ حقًّا · ' . count($prefix)
+     . ' بادئةُ اسمٍ حيٍّ أطول · ' . count($notName) . ' ليست اسمَ قيدٍ أصلًا';
 $L[] = '';
+if ($prefix) {
+    $L[] = '### بادئةُ اسمٍ حيٍّ (لا فقد — يُستحسن توحيدُ الاسمِ في الشيفرة)';
+    foreach ($prefix as $n => $full) { $L[] = '- `' . $n . '` ← الحيُّ `' . $full . '`'; }
+    $L[] = '';
+}
+if ($notName) {
+    $L[] = '### ليست اسمَ قيدٍ (ثابتٌ أو نصٌّ مبتور)';
+    foreach ($notName as $n => $why) { $L[] = '- `' . $n . '` — ' . $why; }
+    $L[] = '';
+}
 $L[] = '## قيودٌ تدّعي الشيفرةُ وجودَها وهي مفقودة';
 $L[] = '';
 if (!$missing) {
