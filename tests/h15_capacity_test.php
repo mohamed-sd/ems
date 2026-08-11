@@ -46,14 +46,26 @@ $CO    = 4;
 $ACTOR = 999151;
 $MARK  = 'H15T' . getmypid();
 
-$teardown = function () use ($conn, $MARK) {
-    $conn->query("DELETE c FROM user_capacities c JOIN users u ON u.id = c.account_id
-                   WHERE u.username LIKE '{$MARK}%'");
-    $conn->query("DELETE ec FROM employee_contracts ec JOIN employees e ON e.id = ec.employee_id
-                   WHERE e.name LIKE '%{$MARK}%'");
-    $conn->query("DELETE FROM users WHERE username LIKE '{$MARK}%'");
-    $conn->query("DELETE FROM employees WHERE name LIKE '%{$MARK}%'");
-    $conn->query("DELETE FROM suppliers WHERE name LIKE '%{$MARK}%'");
+/* ══ **الكنسُ كان يترك مشروعَه — فأرسبَ فاحصًا آخر.** هذا الفاحصُ يبذر مشروعًا
+     (سطر 71) ولا يكنسه، ووسمُه يحمل رقمَ العملية فلا تكنس جولةٌ ما تركته
+     سابقتُها. والمشروعُ المتروكُ **بلا موقعٍ افتراضيّ** (بذرٌ مباشرٌ يتخطّى
+     خطّافَ الشاشة)، فيرسب `sites_entity_test` على «صفرُ مشروعٍ حيٍّ بلا موقعٍ
+     افتراضي» — عطلٌ يُنسب إلى بنيةِ المواقعِ وسببُه كنسُ فاحصٍ آخر.
+   ⇒ يُكنَس المشروعُ (ومواقعُه)، **وبعائلةِ الوسمِ** لا بجولتِه وحدَها. */
+$FAMILY = 'H15T';
+$teardown = function () use ($conn, $MARK, $FAMILY) {
+    foreach (array($MARK, $FAMILY) as $tag) {
+        $conn->query("DELETE c FROM user_capacities c JOIN users u ON u.id = c.account_id
+                       WHERE u.username LIKE '{$tag}%'");
+        $conn->query("DELETE ec FROM employee_contracts ec JOIN employees e ON e.id = ec.employee_id
+                       WHERE e.name LIKE '%{$tag}%'");
+        $conn->query("DELETE FROM users WHERE username LIKE '{$tag}%'");
+        $conn->query("DELETE FROM employees WHERE name LIKE '%{$tag}%'");
+        $conn->query("DELETE FROM suppliers WHERE name LIKE '%{$tag}%'");
+        $conn->query("DELETE FROM sites WHERE project_id IN
+                        (SELECT id FROM project WHERE name LIKE '%{$tag}%')");
+        $conn->query("DELETE FROM project WHERE name LIKE '%{$tag}%'");
+    }
 };
 register_shutdown_function($teardown);
 $teardown();

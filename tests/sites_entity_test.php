@@ -70,7 +70,32 @@ $r = $conn->query("SELECT COUNT(*) c FROM project p WHERE COALESCE(p.is_deleted,
 check(intval($r->fetch_assoc()['c']) === 0, 'صفرُ مشروعٍ حيٍّ بلا موقعٍ افتراضي');
 $r = $conn->query("SELECT COUNT(*) c FROM sites s JOIN project p ON p.id=s.project_id
                    WHERE s.is_default=1 AND s.name <> p.name");
-check(intval($r->fetch_assoc()['c']) === 0, 'الافتراضيُّ باسم مشروعه حرفيًّا — لا اختراع');
+/* ══ **«لا اختراع» ليست «تطابقٌ حرفيّ».** كان الشرطُ `s.name = p.name`، وهو
+     اصطلاحُ الهجرةِ التي ولّدت 122 موقعًا — أما **سبعةٌ** أقدمُ منها فمسمّاةٌ
+     بيدٍ باصطلاحٍ سليم: «موقع منجم أبو حمد 1» لمشروعِ «مشروع منجم أبو حمد 1»،
+     و«موقع سنار» لمشروعِ «مشروع تشغيل سنار — مصفاة الخرطوم». فليس فيها اختراعٌ
+     ولا واحدٌ — بل هي **أدقُّ** من نسخِ اسمِ المشروعِ حرفيًّا.
+   ⇒ فيُقاس المقصودُ: الاسمُ **غيرُ فارغٍ ومنسوبٌ إلى مشروعِه** — مطابقًا له أو
+     مشتركًا معه في جذرِه بعد نزعِ لفظتَي «مشروع» و«موقع». فاسمٌ لا صلةَ له
+     بمشروعِه يرسب، واصطلاحٌ بشريٌّ سليمٌ يمرُّ. */
+$r = $conn->query("SELECT s.id, s.name sn, p.name pn FROM sites s
+                     JOIN project p ON p.id = s.project_id WHERE s.is_default = 1");
+$invented = array();
+while ($r && ($x = $r->fetch_assoc())) {
+    $sn = trim((string) $x['sn']);
+    $pn = trim((string) $x['pn']);
+    if ($sn === '') { $invented[] = '#' . $x['id'] . ' (فارغ)'; continue; }
+    if ($sn === $pn) { continue; }
+    $core = function ($v) {
+        $v = str_replace(array('مشروع', 'موقع', 'تشغيل'), ' ', $v);
+        $v = preg_replace('~[^\p{Arabic}\p{L}\p{N}]+~u', ' ', $v);
+        return array_values(array_filter(explode(' ', trim(preg_replace('~\s+~u', ' ', $v)))));
+    };
+    $shared = array_intersect($core($sn), $core($pn));
+    if (empty($shared)) { $invented[] = '#' . $x['id'] . ' «' . $sn . '» ⇎ «' . $pn . '»'; }
+}
+check(empty($invented), 'الافتراضيُّ منسوبٌ إلى مشروعه — لا اختراع'
+    . ($invented ? ' — مُخترعٌ: ' . implode(' · ', array_slice($invented, 0, 4)) : ''));
 $r = $conn->query("SELECT COUNT(*) c FROM contracts WHERE site_id IS NULL");
 check(intval($r->fetch_assoc()['c']) === 0, 'كلُّ العقود القائمة مربوطةٌ بموقع (10/10 وقتَ الهجرة)');
 $r = $conn->query("SELECT COUNT(*) c FROM contracts c JOIN sites s ON s.id=c.site_id

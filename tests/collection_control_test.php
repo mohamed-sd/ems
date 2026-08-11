@@ -42,9 +42,10 @@ $conn->set_charset('utf8mb4');
 $gate  = ems_tenant_db();
 $CO    = 4;
 $ACTOR = 999891;
-$MARK  = 'M05T' . getmypid();
+$MARK   = 'M05T' . getmypid();
+$FAMILY = 'M05T';   // عائلةُ وسمِ هذا الفاحصِ — يُكنَس بها ما تركته جولاتٌ ميتة
 
-$teardown = function () use ($conn, $MARK) {
+$teardown = function () use ($conn, $MARK, $FAMILY) {
     $conn->query("DELETE a FROM fin_collection_allocations a
                     JOIN fin_receivables r ON r.id = a.receivable_id
                    WHERE r.doc_ref LIKE '{$MARK}%'");
@@ -59,8 +60,33 @@ $teardown = function () use ($conn, $MARK) {
     $conn->query("DELETE FROM fin_payments WHERE bank_ref LIKE '{$MARK}%'
                     OR payment_no LIKE '{$MARK}%'");
     $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE '{$MARK}%'");
+    /* ◆ **الفاتورةُ الضريبيةُ تُكنَس قبل مستخلصِها**: `seed_source_invoice`
+         تُنشئ صفًّا في `tax_invoices` (INJ-0036: لا ذمّةَ بلا فاتورةٍ تقابلها)،
+         و`fk_tax_invoice_claim` يردُّ حذفَ المستخلص — والحذفُ لا يُفحَص مُرجَعُه
+         فيُبلَع الردُّ ويبقى المستخلص. */
+    $conn->query("DELETE FROM tax_invoices WHERE claim_id IN
+                    (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%')");
     $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$MARK}%'");
     $conn->query("DELETE FROM clients WHERE client_name LIKE '%{$MARK}%'");
+    /* ══ **الكنسُ يمسح عائلةَ الفاحصِ كلَّها لا جولتَه وحدَها.** الوسمُ يحمل
+         رقمَ العملية، فكلُّ جولةٍ تكنس **صفوفَها هي** وتترك صفوفَ الجولاتِ
+         الميتة. وعلى `claims` قيدٌ فريدٌ `uq_claim_period`
+         (شركة × عقد × من × إلى) والبذرُ يُغفل `contract_id` فيأخذ 0 والفترةَ
+         ثابتةً — **فمستخلصُ أيِّ جولةٍ ناجيةٍ يحجز مفتاحَ كلِّ جولةٍ بعده**.
+         فيُردُّ إدراجُ المستخلصِ صامتًا، ويحمل `insert_id` **معرّفَ الإدراجِ
+         السابقِ الناجحِ** فيمرُّ `$CLM > 0` كذبًا، ثم يرسب الارتدادُ — فيُقرأ
+         عطلٌ في خدمةٍ ماليةٍ **سليمةٍ تمامًا** (صفُّ البقايا نفسُه حالتُه
+         `collected` — أي أن الارتدادَ عمل في جولتِه). */
+    $conn->query("DELETE FROM tax_invoices WHERE claim_id IN
+                    (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%')");
+    $conn->query("DELETE a FROM fin_collection_allocations a
+                    JOIN fin_receivables r ON r.id = a.receivable_id
+                   WHERE r.doc_ref LIKE '{$FAMILY}%'");
+    $conn->query("DELETE FROM fin_payments WHERE bank_ref LIKE '{$FAMILY}%'
+                    OR payment_no LIKE '{$FAMILY}%'");
+    $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE '{$FAMILY}%'");
+    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$FAMILY}%'");
+    $conn->query("DELETE FROM clients WHERE client_name LIKE '%{$FAMILY}%'");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -90,13 +116,17 @@ $R_NEW = $mkRecv('NEW', 2000, '2099-03-31');
 check($R_OLD > 0 && $R_NEW > 0, 'وذمّتان: أقدمُ 1000 وأحدثُ 2000');
 
 // مستخلصٌ مربوطٌ بالذمّة الأقدم — لاختبار الارتداد
-$conn->query("INSERT INTO claims (company_id, claim_no, client_id, period_from, period_to,
+$clmIns = $conn->query("INSERT INTO claims (company_id, claim_no, client_id, period_from, period_to,
               currency, gross_amount, retention_amount, net_amount, state, version,
               invoice_no, receivable_id, created_at)
               VALUES ({$CO}, '{$MARK}-CL', {$CLI}, '2099-01-01', '2099-01-31',
                       'USD', 1000, 0, 1000, 'invoiced', 1, '{$MARK}-OLD', {$R_OLD}, NOW())");
-$CLM = intval($conn->insert_id);
-check($CLM > 0, 'ومستخلصٌ «مفوتر» مربوطٌ بالذمّة الأقدم');
+/* ◆ `insert_id` **لا يُصفَّر بإدراجٍ فاشل** — فيحمل معرّفَ آخرِ إدراجٍ ناجحٍ
+     (الذمّة) فيمرُّ `$CLM > 0` كذبًا ويُقرأ العطلُ بعد أسطر. فيُفحَص المُرجَع. */
+$clmOk = ($clmIns !== false) && ($conn->affected_rows === 1);
+$CLM = $clmOk ? intval($conn->insert_id) : 0;
+check($CLM > 0, 'ومستخلصٌ «مفوتر» مربوطٌ بالذمّة الأقدم'
+    . ($CLM > 0 ? '' : ' — رُدَّ الإدراج: ' . mb_substr((string) $conn->error, 0, 90)));
 
 // ═══ ① لا قبضَ بلا مرجع ═══
 head('① **لا قبضَ بلا مرجع** (§4 · §7)');
