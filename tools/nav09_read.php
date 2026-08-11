@@ -194,7 +194,9 @@ class Nav09Reader
 
 /* ── CLI ───────────────────────────────────────────────────────────────── */
 if (PHP_SAPI === 'cli' && realpath($argv[0] ?? '') === __FILE__) {
-    $file = 'C:/wamp64/www/ems/docs/files/NAV-09-current.xlsx';
+    /* ◆ المسارُ **مشتقٌّ من موضعِ الملفِّ** لا مثبَّتٌ لجهاز — والوثيقةُ في
+         المستودعِ نفسِه، فجذرُه يُحسَب ولا يُكتب. */
+    $file = dirname(__DIR__) . '/docs/files/NAV-09-current.xlsx';
     foreach ($argv as $a) { if (strpos($a, '--file=') === 0) { $file = substr($a, 7); } }
     $d = Nav09Reader::load($file);
     $mode = in_array('--depts', $argv, true) ? 'depts' : (in_array('--check', $argv, true) ? 'check' : 'summary');

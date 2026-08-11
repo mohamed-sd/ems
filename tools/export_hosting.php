@@ -18,8 +18,35 @@ $user = ems_env('DB_MIGRATOR_USER', ems_env('DB_USER'));
 $pass = ems_env('DB_MIGRATOR_PASS', ems_env('DB_PASS'));
 $db   = ems_env('DB_NAME', 'equipation_manage');
 
-$dumpBin = 'C:\\wamp64\\bin\\mariadb\\mariadb11.4.9\\bin\\mariadb-dump.exe';
-if (!is_file($dumpBin)) { fwrite(STDERR, "✘ mariadb-dump غير موجود: $dumpBin\n"); exit(1); }
+/* ◆ **مسارُ المُخرِج يُبحَث عنه ولا يُثبَّت.** كان مثبَّتًا على
+     `mariadb11.4.9` — فترقيةُ MariaDB تُميت الأداةَ، وأيُّ جهازٍ آخرَ يفشل.
+     ويُقبل تجاوزٌ بمتغيّرِ بيئةٍ أولًا، ثم تُمسَح تثبيتاتُ WAMP بالترتيبِ
+     التنازلي، ثم يُجرَّب الاسمُ المجرَّدُ من PATH. (`portability_test`.) */
+$dumpBin = (string) getenv('EMS_MARIADB_DUMP');
+if ($dumpBin === '' || !is_file($dumpBin)) {
+    /* ◆ **وجذرُ التثبيتِ مشتقٌّ من مُنفِّذِ PHP نفسِه** لا مكتوبًا:
+         `PHP_BINARY` = «…/bin/php/php8.3.28/php.exe» ⇒ مجلَّدُ `bin` ثلاثةَ
+         مستوياتٍ فوقَه. فالأداةُ تعمل على أيِّ تثبيتٍ وبأيِّ نسخةٍ، ولا يبقى
+         في الشيفرةِ مسارُ جهازٍ بعينه. */
+    $binRoot = dirname(PHP_BINARY, 3);            // …/bin
+    $dumpBin = '';
+    foreach (array('mariadb', 'mysql') as $engine) {
+        foreach (array('mariadb-dump.exe', 'mysqldump.exe', 'mariadb-dump', 'mysqldump') as $exe) {
+            $found = glob($binRoot . '/' . $engine . '/*/bin/' . $exe);
+            if ($found) { rsort($found); $dumpBin = $found[0]; break 2; }
+        }
+    }
+}
+if ($dumpBin === '' || !is_file($dumpBin)) {
+    /* ولا يُستسلَم قبل تجربةِ PATH — فبيئاتُ لينكس تحمله فيه */
+    $probe = @shell_exec('mariadb-dump --version 2>&1');
+    if ($probe !== null && stripos((string) $probe, 'dump') !== false) { $dumpBin = 'mariadb-dump'; }
+}
+if ($dumpBin === '') {
+    fwrite(STDERR, "✘ لم يُوجد mariadb-dump — مرّرْ مسارَه في EMS_MARIADB_DUMP\n");
+    exit(1);
+}
+fwrite(STDOUT, "المُخرِج: {$dumpBin}\n");
 
 $desktop = getenv('USERPROFILE') . '\\Desktop';
 if (!is_dir($desktop)) { $desktop = dirname(__DIR__); }

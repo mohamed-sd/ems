@@ -9,7 +9,11 @@
  * التشغيل: php database/seeds/uat0001/extract_workbooks.php [مجلد المصنفات]
  */
 
-$srcDir = $argv[1] ?? 'C:/Users/User/Downloads';
+/* ◆ **لا مسارَ مطلقًا لجهازِ مطوِّرٍ في شيفرةٍ متتبَّعة** (`portability_test`):
+     مسارٌ كهذا يعمل على جهازٍ واحدٍ ويصمت على غيره. فالافتراضُ يصير مجلَّدَ
+     الملفاتِ في المستودعِ نفسِه، ويُمرَّر غيرُه وسيطًا أو بمتغيّرِ بيئة. */
+$srcDir = $argv[1]
+       ?? (getenv('EMS_WORKBOOKS_DIR') ?: dirname(__DIR__, 3) . '/docs/files');
 $outDir = dirname(__DIR__, 3) . '/storage/uat_import';
 if (!is_dir($outDir) && !@mkdir($outDir, 0777, true)) {
     fwrite(STDERR, "تعذّر إنشاء $outDir\n");

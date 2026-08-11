@@ -15,7 +15,10 @@
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
 $APPLY = in_array('--apply', $argv, true);
 $ROOT = dirname(__DIR__);
-$PHP = 'C:/wamp64/bin/php/php8.2.30/php.exe';
+/* ◆ المُنفِّذُ **من العمليةِ الجاريةِ** لا مسارًا مثبَّتًا: نسخةُ PHP تتغيّر
+     (8.2.30 لم تكن موجودةً أصلًا في وقتٍ ما) والمسارُ المثبَّتُ يُميت الأداةَ
+     على أيِّ جهازٍ آخر. و`PHP_BINARY` هو النمطُ المعتمَدُ في المستودع. */
+$PHP = PHP_BINARY;
 
 $SKIP_DIRS = array('app', 'includes', 'database', 'tools', 'tests', 'vendor', 'docs', 'storage',
     'logs', 'node_modules', '.git', '.claude', 'worktrees', 'chats', 'emsreports');
