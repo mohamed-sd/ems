@@ -201,14 +201,89 @@ ac('AC-05', 'صفر شاشة طويلة بلا مناظر (تصييرٌ حيٌّ
     "{$longOk}/{$LONG_N} صُيِّرت بجدولٍ حقيقيٍّ وأعمدةٍ فوقَ الصفرِ ومنتقي منظرٍ فعّال"
     . (empty($longMiss) ? '' : ' — الناقص: ' . implode(' · ', array_slice($longMiss, 0, 6))));
 
-/* ══ AC-06 · صفرُ حقلٍ حساسٍ يُرسَل لغير المخوَّل ══════════════════════════ */
-$polCount = (int) one($db, "SELECT COUNT(*) FROM scr_sensitive_fields
-    WHERE company_id = {$CO} AND (table_name LIKE 'fin%' OR table_name LIKE 'gov%')");
+/* ══ AC-06 · صفرُ حقلٍ حساسٍ يُرسَل لغير المخوَّل ══════════════════════════
+   ◆ INJ-0242 — **الشرطُ السابقُ كان عدَّ صفوفٍ لا فحصَ تبنٍّ:**
+       ac('AC-06', …, $polCount >= 20 && $readLog, …)
+     أي «هل سُجِّلت عشرون سياسةً وهل الجدولُ موجود؟». وكلا الشرطين يتحقق بمجردِ
+     **بذرِ بياناتٍ وإنشاءِ جدول** — ولا يفحص شاشةً واحدةً ولا نداءَ حارسٍ واحدًا.
+     فالمعيارُ يمرُّ أخضرَ وحقلٌ حساسٌ يُطبع لغيرِ المخوَّلِ على الشاشة.
+   ◆ والبديلُ فحصُ **تبنٍّ**: لكلِّ حقلٍ مسجَّلٍ يُبحث عن أسطحِ الإنتاجِ التي
+     تُصيّره، ويُشترط أن تنادي `SensitiveFieldGuard::canRead` أو
+     `ems_log_sensitive_read`. وسطحٌ يعرضه بلا حارسٍ = مخالفة.
+   ◆ **وهذا سيُسقط AC-06 اليوم** — وذلك عينُ المطلوب: «يرسب ما دام هناك حقلٌ
+     تصيّره شاشتُه بلا نداءِ حارس». وبوابةٌ تنزل من 15/15 إلى 14/15 **بصدقٍ**
+     أنفعُ من خمسةَ عشرَ كاذبة. */
 $readLog = one($db, "SELECT COUNT(*) FROM information_schema.tables
     WHERE table_schema = DATABASE() AND table_name = 'sensitive_read_log'") === '1';
-ac('AC-06', 'صفر حقل حساس يُرسَل لغير المخوَّل', $polCount >= 20 && $readLog,
-    "سياساتُ الحقول الحساسة المالية المسجَّلة: {$polCount} (11 لجداول M-10 + 8 لمرحلة التحليل) · سجلُّ الاطّلاع "
-    . ($readLog ? 'حيّ' : 'غائب') . ' · و37 شاشةً حساسةً في v5');
+
+/** أسطحُ الإنتاجِ وحدَها — لا أدواتٌ ولا اختباراتٌ ولا بذور. */
+if (!function_exists('m10_prod_surfaces')) {
+    function m10_prod_surfaces($ROOT)
+    {
+        static $cache = null;
+        if ($cache !== null) { return $cache; }
+        $skip = array('/vendor/', '/storage/', '/.claude/', '/node_modules/', '/tools/',
+                      '/tests/', '/docs/', '/database/', '/.git/');
+        $out = array();
+        $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
+        foreach ($it as $f) {
+            if ($f->getExtension() !== 'php') { continue; }
+            $p = str_replace('\\', '/', $f->getPathname());
+            foreach ($skip as $s) { if (strpos($p, $s) !== false) { continue 2; } }
+            $out[ltrim(substr($p, strlen($ROOT)), '/')] = (string) file_get_contents($p);
+        }
+        $cache = $out;
+        return $out;
+    }
+}
+$surf = m10_prod_surfaces($ROOT);
+$GUARD_RE = '/SensitiveFieldGuard::canRead|ems_log_sensitive_read/u';
+
+/* الحقولُ التي تشترط سياستُها تسجيلَ الاطّلاع — أشدُّها إلزامًا */
+$fields = array();
+$rs = $db->query("SELECT table_name, field_name, log_views_flag FROM scr_sensitive_fields
+                   WHERE status LIKE '%معتمد%'");
+while ($rs && ($r = $rs->fetch_assoc())) {
+    $t = trim((string) $r['table_name']); $fl = trim((string) $r['field_name']);
+    if ($t === '' || $fl === '' || mb_strlen($fl) < 4) { continue; }   // أسماءٌ قصيرةٌ تُطابق عرضًا
+    $fields[$t . '.' . $fl] = array($t, $fl, trim((string) $r['log_views_flag']));
+}
+$viol = array(); $checked = 0; $guarded = 0;
+foreach ($fields as $key => $f) {
+    list($tbl, $fld, $logFlag) = $f;
+    $checked++;
+    /* ◆ **تضييقٌ لازم:** أولُ صياغةٍ اشترطت ذكرَ الحقلِ **واسمِ جدولِه** في
+         الملف، فأبلغت 13 مخالفةً فيها `users.password ← admin/companies/action.php`
+         و`employees.phone ← api/controllers/board.php` — وتلك **إنشاءُ حساباتٍ
+         لا تصييرُ حقلٍ حساس**. وهو بعينُه «الفاحصُ الأوسعُ من معياره يُنتج دَينًا
+         وهميًّا يُنفَق عليه عملٌ حقيقيّ».
+       ◆ فالشرطُ الآن **إخراجٌ فعليّ**: اسمُ الحقلِ داخلَ سياقِ طباعةٍ
+         (`echo` · `<?=` · `htmlspecialchars`) أو داخلَ قائمةِ `SELECT` على
+         جدولِه — لا مجردَ ورودِه في الملف.
+       ◆ **ولا يقيس:** الحقلَ المُصيَّرَ عبر مُصيِّرٍ تصريحيٍّ يقرأ اسمَه من
+         البيانات (`u13_screen_kit`) — فذاك لا يذكر الاسمَ نصًّا. فما تُبلّغه
+         هذه الأداةُ **حدٌّ أدنى** لا حصرٌ تام. */
+    $renderers = array();
+    foreach ($surf as $rel => $src) {
+        if (strpos($src, $fld) === false || strpos($src, $tbl) === false) { continue; }
+        $q = preg_quote($fld, '/');
+        $printed = preg_match('/(?:echo|<\?=|htmlspecialchars|number_format)[^;\n]{0,120}' . $q . '/u', $src)
+                || preg_match('/' . $q . '[^;\n]{0,80}(?:\?>|<\/td>)/u', $src);
+        $selected = preg_match('/SELECT[^;]{0,600}\b' . $q . '\b[^;]{0,600}FROM\s+`?' . preg_quote($tbl, '/') . '`?/is', $src);
+        if (!$printed && !$selected) { continue; }
+        $renderers[] = $rel;
+    }
+    if (!$renderers) { continue; }   // لا سطحَ يُصيّره — لا مخالفةَ ولا تبنٍّ
+    $bad = array();
+    foreach ($renderers as $rel) { if (!preg_match($GUARD_RE, $surf[$rel])) { $bad[] = $rel; } }
+    if ($bad) { $viol[] = $key . ' → ' . implode('، ', array_slice($bad, 0, 2)) . (count($bad) > 2 ? ' +' . (count($bad) - 2) : ''); }
+    else { $guarded++; }
+}
+ac('AC-06', 'صفر حقل حساس يُصيَّر بلا نداءِ حارس (فحصُ تبنٍّ لا عدُّ صفوف)',
+    empty($viol) && $readLog,
+    'حقولٌ معتمدةٌ مفحوصة: ' . $checked . ' · مُصيَّرةٌ بحارس: ' . $guarded
+    . ' · **بلا حارس: ' . count($viol) . '** · سجلُّ الاطّلاع ' . ($readLog ? 'حيّ' : 'غائب')
+    . (empty($viol) ? '' : ' — ' . implode(' | ', array_slice($viol, 0, 4))));
 
 /* ══ AC-07 · الغلافُ الحاكم CM-00 ═════════════════════════════════════════ */
 $newScreens = array('Finance/entitlement.php', 'Finance/gov_dept_fin.php',
