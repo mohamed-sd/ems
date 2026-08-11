@@ -34,12 +34,50 @@ if ($suite === 'all') {
     sort($files);
 }
 
-$green = 0; $red = 0; $lines = array();
+/* ═══════════════════════════════════════════════════════════════════════════
+ * INJ-0149 — حِمى الملفاتِ الحساسةِ حولَ كلِّ اختبار
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ كارثةٌ وقعت فعلًا وسُجِّلت في ترويسةِ `.env` نفسِه: «tests/proof_failclosed.php
+ *   يكتب في .env ومسارُ استرجاعه غيرُ آمن؛ تشغيلُ حزمة الانحدار كاملةً دمّر
+ *   الملفَّ (13,052 بايتًا من المسافات · صفر سطر)». أي أن **مشغِّلَ الاختبارات
+ *   أهلك إعداداتَ النظام**.
+ * ◆ فلا يُبنى مشغِّلٌ ثانٍ (سجلّان متنازعان أسوأُ من واحدٍ ناقص) — بل يُحمى هذا:
+ *   تُلتقط بصمةُ كلِّ ملفٍّ حساسٍ **قبل** كلِّ اختبارٍ وتُقابَل **بعده**؛ فإن
+ *   تغيّر ولم يُستعَد **يُستعاد من البصمةِ فورًا** ويُعلَن الاختبارُ الذي مسَّه.
+ * ◆ والحمايةُ لكلِّ اختبارٍ لا لكلِّ الجولة: فمن يُفسد يُسمَّى، ولا يُنتظر آخرُ
+ *   الحزمةِ ليُكتشف الفساد.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$ROOTP = dirname($dir);
+$GUARDED = array($ROOTP . '/.env', $ROOTP . '/.env.example', $ROOTP . '/composer.json');
+$snapshot = static function () use ($GUARDED) {
+    $s = array();
+    foreach ($GUARDED as $g) { if (is_file($g)) { $s[$g] = (string) file_get_contents($g); } }
+    return $s;
+};
+$verify = static function (array $snap, $testName, array &$lines) {
+    $harmed = array();
+    foreach ($snap as $path => $orig) {
+        if (!is_file($path) || (string) file_get_contents($path) !== $orig) {
+            file_put_contents($path, $orig);
+            $harmed[] = basename($path);
+        }
+    }
+    if ($harmed) {
+        $lines[] = '      ⚠ الاختبارُ «' . $testName . '» مسَّ ملفًّا محميًّا فاستُعيد فورًا: '
+                 . implode('، ', $harmed) . ' — أصلِح الاختبارَ لا الحِمى';
+    }
+    return $harmed;
+};
+
+$green = 0; $red = 0; $lines = array(); $harmedBy = array();
 foreach ($files as $t) {
     $path = $dir . '/' . $t . '.php';
     if (!is_file($path)) { $lines[] = sprintf('  %-42s  MISSING', $t); $red++; continue; }
+    $snap = $snapshot();
     $out = array(); $code = 0;
     exec('"' . $php . '" "' . $path . '" 2>&1', $out, $code);
+    $h = $verify($snap, $t, $lines);
+    if ($h) { $harmedBy[$t] = $h; }
     $txt = implode("\n", $out);
     $p = 0; $f = 0;
     // صيغتان مستعملتان في الحزم: «N نجاح · M فشل» و«N ناجح · M فاشل»
@@ -58,4 +96,13 @@ foreach ($files as $t) {
 echo implode("\n", $lines) . "\n";
 echo str_repeat('─', 70) . "\n";
 echo 'خضراء: ' . $green . ' · حمراء: ' . $red . ' · المجموع: ' . count($files) . "\n";
-exit($red > 0 ? 1 : 0);
+if ($harmedBy) {
+    echo 'اختباراتٌ مسَّت ملفاتٍ محميةً (استُعيدت): ' . count($harmedBy) . ' — '
+       . implode('، ', array_keys($harmedBy)) . "\n";
+} else {
+    echo "الملفاتُ المحميةُ سليمةٌ — صفرُ اختبارٍ مسَّ `.env` أو `composer.json`\n";
+}
+/* ◆ عقدُ رمزِ الخروجِ مُعلَنٌ (اختبارُ قبولِ INJ-0149): **صفرٌ إن نجح الكلُّ
+     وواحدٌ إن سقط واحد** — ومسُّ ملفٍّ محميٍّ يُسقط الجولةَ أيضًا، فالإفسادُ
+     فشلٌ ولو نجحت تأكيداتُ الاختبار. */
+exit(($red > 0 || $harmedBy) ? 1 : 0);

@@ -1,5 +1,27 @@
 {
     "require": {
         "phpoffice/phpspreadsheet": "^5.4"
+    },
+    "scripts": {
+        "test": "php tests/_regression.php core",
+        "test:all": "php tests/_regression.php all",
+        "gate": "php tools/fix_gate.php",
+        "gate:ui": "php tools/fix_ui_gate.php",
+        "gate:negative": "php tools/fix_negative_tests.php",
+        "gate:screens": "php tools/screen_registry_gate.php",
+        "verify": [
+            "@test",
+            "@gate",
+            "@gate:negative",
+            "@gate:screens"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "حزمةُ الانحدارِ الأساسية — تُرجع 0 إن نجح الكلُّ و1 إن سقط واحدٌ أو مُسَّ ملفٌّ محميّ",
+        "test:all": "كلُّ ملفاتِ tests/*_test.php",
+        "gate": "بوابةُ FIX البنيوية",
+        "gate:negative": "البوابةُ السلبية — تُفسد كلَّ مفحوصٍ وتشترط رسوبَ فاحصِه",
+        "gate:screens": "جردُ الشاشات — صفرُ فرقٍ بين الأسطحِ الحيةِ وسجلِّ الوحدات",
+        "verify": "الأمرُ الواحدُ لخطِّ التسليم: انحدارٌ + ثلاثُ بوابات، يتوقف عند أولِ سقوط"
     }
 }
