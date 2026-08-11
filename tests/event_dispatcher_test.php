@@ -64,8 +64,17 @@ if (isset($argv[1]) && $argv[1] === '--child') {
     $consumer = (string) $argv[2];
     $crashAfter = isset($argv[3]) && $argv[3] !== '0' ? intval($argv[3]) : null;
     $max = isset($argv[4]) ? intval($argv[4]) : 3;
+    /* ◆ **التصاعدُ الزمنيُّ كان يمنع قياسَ العزل.** `EventDispatcher::$backoff`
+         افتراضُه **true**، فأولُ فشلٍ يضع `next_retry_at = NOW()+2 دقيقة` وكلُّ
+         دورةٍ بعدَه **تنكسر** على «محاولةٌ غير مستحقةٍ بعد» — فيبقى العدّادُ عند
+         1 ولا تُستنفَد المحاولاتُ أبدًا، فيُقرأ «لا عزلَ في الرسائل الميتة»
+         عطلًا في المُوزِّع **وهو سلوكُه المقصود**. والعزلُ مستقلٌّ عن **موعدِ**
+         المحاولةِ، فيُضغَط الزمنُ بإطفاءِ التصاعدِ لهذا التدقيقِ وحدَه — ويُقاس
+         التصاعدُ نفسُه بتدقيقٍ صريحٍ قبلَه. */
+    $backoff = !isset($argv[5]) || $argv[5] !== '0';
     $conn = db();
-    $d = new EventDispatcher($conn, array('max_attempts' => $max, 'crash_after_event' => $crashAfter));
+    $d = new EventDispatcher($conn, array('max_attempts' => $max, 'crash_after_event' => $crashAfter,
+                                          'backoff' => $backoff));
     $d->register($consumer, make_handler($consumer));
     $stats = $d->runOnce();
     echo json_encode($stats), "\n";
@@ -86,10 +95,11 @@ $CX = "k4t_cx_{$PID}"; $PS = "k4t_ps_{$PID}"; $FX = "k4t_fx_{$PID}";
 $PHP_BIN = PHP_BINARY;
 $SELF = __FILE__;
 
-function spawn($consumer, $crashAfter = 0, $max = 3)
+function spawn($consumer, $crashAfter = 0, $max = 3, $backoff = 1)
 {
     global $PHP_BIN, $SELF;
-    $cmd = escapeshellarg($PHP_BIN) . ' ' . escapeshellarg($SELF) . " --child {$consumer} {$crashAfter} {$max} 2>&1";
+    $bo = $backoff ? '1' : '0';
+    $cmd = escapeshellarg($PHP_BIN) . ' ' . escapeshellarg($SELF) . " --child {$consumer} {$crashAfter} {$max} {$bo} 2>&1";
     exec($cmd, $out, $code);
     // آخر سطرٍ غير فارغ = JSON الإحصاءات (تحذيرات تحميل الإضافات قد تسبقه في الدمج)
     $last = '';
@@ -166,7 +176,21 @@ echo "── تدقيق 2: الحدث السام → Dead-Letter بعد الاس
 $eP = publish_source($conn, 2, true);                // سامّ لمستهلك ps
 $eN = publish_source($conn, 3);                      // سليم بعده مباشرة
 $startPs = cursor_of($conn, $PS);
-for ($run = 1; $run <= 4; $run++) { spawn($PS, 0, 3); }
+// ── ② أ: التصاعدُ الزمنيُّ حقيقيٌّ — دورةٌ بالتصاعدِ تُؤجِّل ولا تُكرِّر فورًا ──
+spawn($PS, 0, 3, 1);
+$d1 = $conn->query("SELECT attempts, next_retry_at FROM ems_event_deliveries
+                     WHERE consumer='{$PS}' AND event_id={$eP['id']}")->fetch_assoc();
+$deferred = $d1 !== null && intval($d1['attempts']) === 1 && !empty($d1['next_retry_at'])
+         && strtotime((string) $d1['next_retry_at']) > time();
+spawn($PS, 0, 3, 1);   // دورةٌ ثانيةٌ بالتصاعد: يجب أن تنكسر على «غيرُ مستحقةٍ بعد»
+$d2 = $conn->query("SELECT attempts FROM ems_event_deliveries
+                     WHERE consumer='{$PS}' AND event_id={$eP['id']}")->fetch_assoc();
+ok('التصاعدُ الزمنيُّ يُؤجِّل: محاولةٌ واحدةٌ وموعدٌ في المستقبل، ودورةٌ ثانيةٌ لا تزيدها'
+   . ' (' . ($d1 ? $d1['attempts'] . ' ⇒ ' . ($d2 ? $d2['attempts'] : '—') : '—') . ')',
+   $deferred && $d2 !== null && intval($d2['attempts']) === 1);
+
+// ── ② ب: والعزلُ يقع باستنفادِ المحاولات — يُضغَط الزمنُ بإطفاءِ التصاعدِ وحدَه ──
+for ($run = 1; $run <= 4; $run++) { spawn($PS, 0, 3, 0); }
 $dlq = $conn->query("SELECT attempts FROM ems_event_dead_letter WHERE consumer='{$PS}' AND event_id={$eP['id']}")->fetch_assoc();
 ok('السامّ في الرسائل الميتة بعد استنفاد 3 محاولات', $dlq !== null && intval($dlq['attempts']) === 3);
 ok('العامل واصل خلف السامّ (السليم التالي عولج)', derived_count($conn, 'k4ps', $eN['id']) === 1);
