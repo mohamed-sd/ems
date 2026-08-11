@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-11 12:23:51
--- الجداول: 549 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-11 15:05:49
+-- الجداول: 550 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -12706,6 +12706,12 @@ CREATE TABLE `unit_entries` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `legacy_dup_exempt` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'DEC-C: صفٌّ في مجموعةِ تصادمٍ (معدة×تاريخ×وردية) موروثةٍ قبل عتبة الدرع 2026-08-05 — استثناءٌ تاريخيٌّ معلَنٌ لا يُدمج ولا يُحذف',
+  `client_match_state` enum('pending','matched','mismatched','client_data_unavailable','client_response_overdue') NOT NULL DEFAULT 'pending' COMMENT 'TS-04 — نتيجةُ مطابقةِ نسخةِ العميل',
+  `client_match_at` datetime DEFAULT NULL COMMENT 'TS-04 — لحظةُ حسمِ المطابقة',
+  `client_match_by` int(10) unsigned DEFAULT NULL COMMENT 'TS-04 — يدُ من حسمها',
+  `client_match_ref` varchar(120) DEFAULT NULL COMMENT 'TS-04 — مرجعُ دليلِ المطابقة',
+  `client_decision` enum('pending','accepted','disputed') NOT NULL DEFAULT 'pending' COMMENT 'TS-16 — قرارُ العميلِ على هذا المدخلِ وحدَه (القبولُ الجزئيُّ لكلِّ مدخل)',
+  `dispute_ref` varchar(120) DEFAULT NULL COMMENT 'TS-16 — مرجعُ ملفِّ الاختلافِ — إلزاميٌّ عند النزاع',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_entry_no` (`company_id`,`entry_no`),
   UNIQUE KEY `uq_sync` (`company_id`,`sync_uuid`),
@@ -12715,8 +12721,33 @@ CREATE TABLE `unit_entries` (
   KEY `ix_parties` (`company_id`,`supplier_entity_id`,`operator_employee_id`),
   KEY `ix_qty_billable` (`company_id`,`qty_billable`),
   KEY `ix_ue_plan_keys` (`contract_line_id`,`plan_period_id`),
-  KEY `ix_ue_site` (`operational_site_id`)
+  KEY `ix_ue_site` (`operational_site_id`),
+  KEY `idx_ue_match` (`client_match_state`),
+  KEY `idx_ue_cdec` (`client_decision`),
+  CONSTRAINT `chk_ue_match_evidence` CHECK (`client_match_state` = 'pending' or `client_match_at` is not null and `client_match_by` is not null),
+  CONSTRAINT `chk_ue_dispute_ref` CHECK (`client_decision` <> 'disputed' or `dispute_ref` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.1 — سجلّ الواقعة: مصدر الحقيقة الوحيد للوحدة التشغيلية';
+
+-- ── Table: unit_match_overrides ──
+CREATE TABLE `unit_match_overrides` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `entry_id` int(10) unsigned NOT NULL COMMENT 'المدخلُ المشمول',
+  `reason` varchar(300) NOT NULL COMMENT 'TS-05-ب ① السبب',
+  `evidence_ref` varchar(160) DEFAULT NULL COMMENT 'TS-05-ب ② الدليلُ المتاح',
+  `decided_by` int(10) unsigned NOT NULL COMMENT 'TS-05-ب ③ مَن أصدره',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'TS-05-ب ④ التاريخُ والوقت',
+  `scope_note` varchar(300) NOT NULL COMMENT 'TS-05-ب ⑤ نطاقُ الوحداتِ المشمولة',
+  `allows` enum('primary_only','billing') NOT NULL COMMENT 'TS-05-ب ⑥ أيسمح بالأثرِ الأوليِّ فقط أم بالفوترة',
+  `match_state_at_decision` enum('pending','matched','mismatched','client_data_unavailable','client_response_overdue') NOT NULL COMMENT 'TS-05-ب ⑦ حالُ المطابقةِ لحظةَ القرار — فلا يُعاد تفسيرُه لاحقًا',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_umo_entry` (`entry_id`),
+  KEY `idx_umo_co` (`company_id`),
+  CONSTRAINT `fk_umo_entry` FOREIGN KEY (`entry_id`) REFERENCES `unit_entries` (`id`),
+  CONSTRAINT `chk_umo_fields` CHECK (`reason` <> '' and `scope_note` <> '' and `decided_by` > 0),
+  CONSTRAINT `chk_umo_not_matched` CHECK (`match_state_at_decision` <> 'matched')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='TS-05 — قرارُ تجاوزِ مطابقةِ العميلِ بسبعةِ حقولٍ إلزامية';
 
 -- ── Table: unit_party_awards ──
 CREATE TABLE `unit_party_awards` (
