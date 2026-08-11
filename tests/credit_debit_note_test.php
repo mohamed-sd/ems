@@ -80,9 +80,12 @@ $conn->query("INSERT INTO claim_lines (company_id, claim_id, source_kind, source
                 work_date, qty, unit_price, amount, dispute_flag)
               VALUES ({$CO}, {$CLAIM}, 'timesheet', 999001, '2094-01-05', 10, 100, 1000.00, 0)");
 $LINE = (int) $conn->insert_id;
+/* INJ-0036: الذمّةُ تشير إلى فاتورةٍ صادرةٍ حقيقية — والبذرةُ تشبه الواقع */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI = seed_source_invoice($conn, $CO, $inv, 1, 1000.00, 'USD', $CLAIM);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-                project_id, amount, collected, state)
-              VALUES ({$CO}, 1, 'invoice', '{$inv}', 1, 1000.00, 0, 'open')");
+                source_doc_id, project_id, amount, collected, state)
+              VALUES ({$CO}, 1, 'invoice', '{$inv}', {$TI}, 1, 1000.00, 0, 'open')");
 $RECV = (int) $conn->insert_id;
 $conn->query("UPDATE claims SET receivable_id={$RECV} WHERE id={$CLAIM}");
 // حقيقةُ فوترةٍ للأصل — ليُعلَّق بها نسبُ العكس

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-11 15:05:49
+-- المصدر: equipation_manage · التوليد: 2026-08-11 15:46:03
 -- الجداول: 550 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -5080,6 +5080,8 @@ CREATE TABLE `fin_receivables` (
   `customer_entity_id` int(11) NOT NULL COMMENT 'clients.id (مرجع مرن)',
   `doc_type` enum('invoice','statement') NOT NULL,
   `doc_ref` varchar(60) DEFAULT NULL,
+  `source_doc_id` int(10) unsigned DEFAULT NULL COMMENT 'INJ-0036: معرِّفُ المستندِ المعتمَد — tax_invoices.id أو fin_client_statements.id حسب doc_type',
+  `legacy_no_ref` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'موروثٌ بلا مستندٍ مقابل — يُعلَن ولا يُمحى (نمط M-11)',
   `project_id` int(11) DEFAULT NULL,
   `amount` decimal(16,2) NOT NULL,
   `currency` varchar(8) NOT NULL DEFAULT '' COMMENT 'عملةُ الذمّة — كانت مجهولةً قبل P-08',
@@ -5099,7 +5101,9 @@ CREATE TABLE `fin_receivables` (
   PRIMARY KEY (`id`),
   KEY `ix_fin_recv_customer` (`company_id`,`customer_entity_id`),
   KEY `ix_fin_recv_state` (`company_id`,`state`),
-  KEY `ix_fin_recv_deleted` (`is_deleted`)
+  KEY `ix_fin_recv_deleted` (`is_deleted`),
+  KEY `idx_recv_source_doc` (`doc_type`,`source_doc_id`),
+  CONSTRAINT `chk_recv_source_doc` CHECK (`source_doc_id` is not null or `legacy_no_ref` = 1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_request_documents ──

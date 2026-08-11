@@ -66,9 +66,12 @@ $CLI = intval($conn->insert_id);
 check($CLI > 0, 'عميلٌ مبذور');
 
 $mkRecv = function ($ref, $amount, $due) use ($conn, $CO, $CLI, $MARK) {
+    /* INJ-0036: لا ذمّةَ بلا فاتورةٍ صادرةٍ تقابلها */
+    require_once __DIR__ . '/_source_doc_seed.php';
+    $ti = seed_source_invoice($conn, $CO, $MARK . '-' . $ref, $CLI, $amount, 'USD', 0);
     $ok = $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type,
-                        doc_ref, amount, collected, state, due_date, created_at)
-                        VALUES ({$CO}, {$CLI}, 'invoice', '{$MARK}-{$ref}', {$amount}, 0, 'open',
+                        doc_ref, source_doc_id, amount, collected, state, due_date, created_at)
+                        VALUES ({$CO}, {$CLI}, 'invoice', '{$MARK}-{$ref}', {$ti}, {$amount}, 0, 'open',
                                 '{$due}', NOW())");
     if (!$ok) { fwrite(STDOUT, '  ! ' . $conn->error . "\n"); return 0; }
     return intval($conn->insert_id);

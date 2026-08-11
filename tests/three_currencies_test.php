@@ -88,9 +88,12 @@ check(mb_strpos($three['note'], 'لا تُجمع في رقم') !== false,
 head('② **وذمّةٌ بلا عملةٍ لا يُخصَّص لها** — وهو ما كانت عليه البنيةُ قبل P-08');
 
 $CLIENT = 1;
+/* INJ-0036: كلُّ ذمّةِ بذرٍ تشير إلى فاتورةٍ صادرةٍ حقيقية */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI_X = seed_source_invoice($conn, $CO, 'INV-X-' . $MARK, $CLIENT, 1000, 'USD', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, currency, collected, due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-X-{$MARK}', {$PRJ}, 1000, '', 0,
+              source_doc_id, project_id, amount, currency, collected, due_date, state, created_at)
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-X-{$MARK}', {$TI_X}, {$PRJ}, 1000, '', 0,
                       '2089-03-31', 'open', NOW())");
 $RX = intval($conn->insert_id);
 $conn->query("INSERT INTO fin_payments (company_id, payment_no, direction, party_type, party_ref,
@@ -108,10 +111,11 @@ head('★★★ **معيارُ §9-⑨: الذمةُ تُطفأ بالمعادل
 // ذمّةٌ بالجنيه 10,000,000 اعتُرف بها بسعرٍ مجمَّد · وقبضٌ بالدولار
 $RATE = (float) FX::rateOf('SDG', '2089-02-01');
 check($RATE !== null && $RATE > 0, 'سعرُ الجنيه إلى الأساس: ' . $RATE);
+$TI_SDG = seed_source_invoice($conn, $CO, 'INV-SDG-' . $MARK, $CLIENT, 10000000, 'SDG', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              source_doc_id, project_id, amount, currency, fx_rate_recognized, base_amount, collected,
               due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-SDG-{$MARK}', {$PRJ}, 10000000, 'SDG',
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-SDG-{$MARK}', {$TI_SDG}, {$PRJ}, 10000000, 'SDG',
                       {$RATE}, ROUND(10000000*{$RATE},2), 0, '2089-03-31', 'open', NOW())");
 $RS = intval($conn->insert_id);
 
@@ -149,10 +153,11 @@ check($n === 0, 'وبسعرٍ واحدٍ لم يتغيّر ⇒ **صفرُ فرق
 
 // والآن ذمّةٌ اعتُرف بها بسعرٍ **أعلى** ثم قُبضت بسعر اليوم ⇒ فرقٌ محقق
 $OLD = $RATE * 1.20;
+$TI_OLD = seed_source_invoice($conn, $CO, 'INV-OLD-' . $MARK, $CLIENT, 6000000, 'SDG', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              source_doc_id, project_id, amount, currency, fx_rate_recognized, base_amount, collected,
               due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-OLD-{$MARK}', {$PRJ}, 6000000, 'SDG',
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-OLD-{$MARK}', {$TI_OLD}, {$PRJ}, 6000000, 'SDG',
                       {$OLD}, ROUND(6000000*{$OLD},2), 0, '2089-03-31', 'open', NOW())");
 $RO = intval($conn->insert_id);
 $conn->query("INSERT INTO fin_payments (company_id, payment_no, direction, party_type, party_ref,

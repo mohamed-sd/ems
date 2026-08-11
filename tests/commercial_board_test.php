@@ -113,10 +113,13 @@ $conn->query("INSERT INTO unit_entries (company_id, entry_no, entry_date, projec
                       'ton', 150, 'contract', 0, 'sales_approved', 1, 1, NOW(), NOW())");
 
 // مفوترٌ 3,000 ومحصَّلٌ 1,800
+/* INJ-0036: الذمّةُ تشير إلى فاتورةٍ صادرةٍ حقيقية */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI_CB = seed_source_invoice($conn, $CO, 'INV-' . $MARK, 1, 3000, 'USD', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              source_doc_id, project_id, amount, currency, fx_rate_recognized, base_amount, collected,
               due_date, state, created_at)
-              VALUES ({$CO}, 1, 'invoice', 'INV-{$MARK}', {$PRJ}, 3000, 'USD', 1.0, 3000, 1800,
+              VALUES ({$CO}, 1, 'invoice', 'INV-{$MARK}', {$TI_CB}, {$PRJ}, 3000, 'USD', 1.0, 3000, 1800,
                       '2094-04-30', 'partial', NOW())");
 $RID = intval($conn->insert_id);
 $conn->query("INSERT INTO claims (company_id, claim_no, contract_id, client_id, project_id,

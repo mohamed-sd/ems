@@ -94,9 +94,12 @@ $i2 = TIS::issueForClaim($conn, $gate, $CO, $C2, array(), $ACTOR);
 check($i1['ok'] && $i2['ok'], 'وفاتورتان ضريبيتان');
 
 // تحصيلٌ مخصَّصٌ لذمّة الفاتورة الأولى
+/* INJ-0036: الذمّةُ تشير إلى فاتورةٍ صادرةٍ حقيقية */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI_CS = seed_source_invoice($conn, $CO, $MARK . '-R1', $CL_A, 1000, 'USD', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              amount, collected, state, created_at)
-              VALUES ({$CO}, {$CL_A}, 'invoice', '{$MARK}-R1', 1000, 0, 'open', NOW())");
+              source_doc_id, amount, collected, state, created_at)
+              VALUES ({$CO}, {$CL_A}, 'invoice', '{$MARK}-R1', {$TI_CS}, 1000, 0, 'open', NOW())");
 $R1 = intval($conn->insert_id);
 // M-05: **قبضٌ بلا مرجعٍ بنكيٍّ مستحيلٌ بنيويًّا** — والبذرُ يحترم القيدَ الجديد.
 $okP = $conn->query("INSERT INTO fin_payments (company_id, payment_no, direction, party_type,

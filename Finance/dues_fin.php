@@ -114,6 +114,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     $amount   = round(floatval($_POST['r_amount'] ?? 0), 2);
     $due_date = trim($_POST['due_date'] ?? '') ?: null;
     if ($cust <= 0 || $amount <= 0) { ems_gov_flash_redirect('dues_fin.php', 'بيانات الذمّة غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
+    /* ══ INJ-0036 — «المالُ أثرٌ لا مصدر».
+         كان `doc_ref` نصًّا حرًّا لا يُتحقَّق منه، فتُفتح ذمّةٌ على فاتورةٍ لا
+         وجودَ لها ثم يُبنى عليها تحصيلٌ في الخزينة (`payments_fin.php`).
+         والمرجعُ الآن **يُحَلُّ إلى مفتاحِ مستندٍ معتمَدٍ قائمٍ لهذه الشركة**،
+         وإلا رُدَّ 422. (والقاعدةُ تحرس البنيةَ بـ`chk_recv_source_doc`،
+         وهذا يحرس المعنى: قائمٌ · لهذه الشركةِ · وبحالةٍ معتمَدة.) */
+    require_once __DIR__ . '/../includes/receivable_source_guard.php';
+    /* ◆ `$company_id` مقروءةٌ من سياقِ الجلسةِ في السطر 15 — وهي نفسُها التي
+         تحقنها البوابةُ في الصف. والسوبرُ بلا شركةٍ يُردُّ هنا: لا تُقاس شركةُ
+         المستندِ بلا شركةٍ تُقارَن بها، ولا يُقرأ الغيابُ إذنًا. */
+    $__src = ems_receivable_resolve_source($conn, (int) $company_id, $doc_type, $doc_ref);
+    if (empty($__src['ok'])) {
+        ems_gov_flash_redirect(ems_flash_to('dues_fin.php', '+❌'), $__src['reason'],
+            'GOV-REF-422', '');
+        exit();
+    }
     // P-08: **الذمّةُ بعملتها** — والافتراضُ عملةُ الأساس مُعلَنًا في الشاشة
     require_once __DIR__ . '/../app/Services/Finance/FxSettlementService.php';
     require_once __DIR__ . '/../includes/fx.php';
@@ -123,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     $r_rate = \App\Services\Finance\FxSettlementService::rateOf($r_cur, date('Y-m-d'));
     fin_gate($is_super_admin)->insert('fin_receivables', array(
         'customer_entity_id' => $cust, 'doc_type' => $doc_type, 'doc_ref' => $doc_ref,
+        'source_doc_id' => (int) $__src['source_doc_id'],   // INJ-0036: مفتاحٌ لا نصّ
         'amount' => $amount, 'currency' => $r_cur,
         'fx_rate_recognized' => $r_rate,
         'base_amount' => ($r_rate === null) ? null : round($amount * $r_rate, 2),
@@ -300,6 +317,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               </tr></thead>
                 <tbody>
                 <?php
+                require_once __DIR__ . '/../includes/receivable_source_guard.php';
                 $recv_rows = fin_gate($is_super_admin)->scopedQuery(
                     array('scope' => array('r' => 'fin_receivables'), 'enrich' => array('c' => 'clients')),
                     "SELECT r.*, c.client_name FROM fin_receivables r
@@ -315,7 +333,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "</div></td>";
                     echo "<td>" . htmlspecialchars((string)($row['client_name'] ?? ('#' . $row['customer_entity_id']))) . "</td>";
                     echo "<td>" . ($row['doc_type'] === 'statement' ? 'مستخلص' : 'فاتورة') . "</td>";
-                    echo "<td>" . htmlspecialchars((string)($row['doc_ref'] ?? '')) . "</td>";
+                    /* INJ-0036 ② — «وكلُّ ذمّةٍ تفتح فاتورتَها بنقرة».
+                       والموروثُ (`legacy_no_ref`) يُعرَض **موسومًا** لا مربوطًا:
+                       رابطٌ إلى مستندٍ لا وجودَ له يُقرأ «موجودٌ» وهو ليس كذلك. */
+                    $__ref  = htmlspecialchars((string)($row['doc_ref'] ?? ''));
+                    $__link = ems_receivable_source_link($row['doc_type'], $row['source_doc_id'] ?? 0);
+                    if ($__link !== null) {
+                        echo "<td><a href='" . htmlspecialchars($__link) . "' title='افتح المستندَ المصدر'>"
+                           . $__ref . " <i class='fas fa-external-link-alt fa-xs'></i></a></td>";
+                    } elseif (!empty($row['legacy_no_ref'])) {
+                        echo "<td>{$__ref} <span class='badge badge-warning' "
+                           . "title='موروثٌ بلا مستندٍ مقابل — يُعلَن ولا يُمحى'>بلا مستند</span></td>";
+                    } else {
+                        echo "<td>{$__ref}</td>";
+                    }
                     echo "<td>" . number_format((float)$row['amount'], 2) . "</td>";
                     echo "<td>" . number_format((float)$row['collected'], 2) . "</td>";
                     echo "<td>" . number_format((float)$row['outstanding'], 2) . "</td>";

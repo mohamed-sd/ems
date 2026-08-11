@@ -80,16 +80,20 @@ $conn->query("INSERT INTO contract_payment_schedule
 $MST = intval($conn->insert_id);
 
 $CLIENT = 1;
+/* INJ-0036: كلُّ ذمّةِ بذرٍ تشير إلى فاتورةٍ صادرةٍ حقيقية */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI_A = seed_source_invoice($conn, $CO, 'INV-A-' . $MARK, $CLIENT, 3000, 'USD', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              source_doc_id, project_id, amount, currency, fx_rate_recognized, base_amount, collected,
               due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-A-{$MARK}', {$PRJ}, 3000, 'USD', 1.0, 3000, 0,
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-A-{$MARK}', {$TI_A}, {$PRJ}, 3000, 'USD', 1.0, 3000, 0,
                       '2088-03-31', 'open', NOW())");
 $R1 = intval($conn->insert_id);
+$TI_B = seed_source_invoice($conn, $CO, 'INV-B-' . $MARK, $CLIENT, 2000, 'USD', 0);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-              project_id, amount, currency, fx_rate_recognized, base_amount, collected,
+              source_doc_id, project_id, amount, currency, fx_rate_recognized, base_amount, collected,
               due_date, state, created_at)
-              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-B-{$MARK}', {$PRJ}, 2000, 'USD', 1.0, 2000, 0,
+              VALUES ({$CO}, {$CLIENT}, 'invoice', 'INV-B-{$MARK}', {$TI_B}, {$PRJ}, 2000, 'USD', 1.0, 2000, 0,
                       '2088-04-30', 'open', NOW())");
 $R2 = intval($conn->insert_id);
 check($CID > 0 && $ADV > 0 && $MST > 0 && $R1 > 0 && $R2 > 0,

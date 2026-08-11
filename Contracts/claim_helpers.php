@@ -1159,10 +1159,24 @@ if (!function_exists('claim_approve')) {
             if ($ex) {
                 $recvId = intval($ex['id']);
             } else {
+                /* ══ INJ-0036 — الذمّةُ تحمل **مفتاحَ** فاتورتها لا نصَّ رقمِها.
+                     ويُحَلُّ بالحارسِ نفسِه الذي يحرس المسارَ اليدويّ — فقاعدةُ
+                     الحلِّ **واحدةٌ لا اثنتان**، وإلا افترق المساران بمرور الوقت.
+                     (والفاتورةُ صدرت قبل سطرين ⇒ الحلُّ يجدها حتمًا؛ وإن لم
+                     يجدها فذاك عطلٌ يجب أن يوقفَ الذمّةَ لا أن يُتجاوز.) */
+                require_once __DIR__ . '/../includes/receivable_source_guard.php';
+                $srcDoc = ems_receivable_resolve_source($conn, (int) $company, 'invoice', $invoiceNo);
+                if (empty($srcDoc['ok'])) {
+                    $out['status'] = 'blocked';
+                    $out['code']   = (int) $srcDoc['code'];
+                    $out['reason'] = 'تعذّر ربطُ الذمّةِ بفاتورتها — ' . $srcDoc['reason'];
+                    return $out;
+                }
                 $recvId = intval($gate->insert('fin_receivables', array(
                     'customer_entity_id' => intval($c['client_id']),
                     'doc_type'           => 'invoice',
                     'doc_ref'            => $invoiceNo,
+                    'source_doc_id'      => (int) $srcDoc['source_doc_id'],
                     'project_id'         => !empty($c['project_id']) ? intval($c['project_id']) : null,
                     'amount'             => round($net + $taxAmount, 2),
                     // P-08: **الذمّةُ بعملتها وسعرِها المجمَّد** — ذمّةٌ بلا عملةٍ
