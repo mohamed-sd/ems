@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 05:27:46
--- الجداول: 550 · المناظير: 4
+-- المصدر: equipation_manage · التوليد: 2026-08-12 00:56:22
+-- الجداول: 549 · المناظير: 5
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -990,62 +990,6 @@ CREATE TABLE `client_contract_lines` (
   CONSTRAINT `ck_ccl_share` CHECK (`resource_share_total` >= 0 and `resource_share_total` <= 100),
   CONSTRAINT `ck_ccl_span` CHECK (`valid_to` is null or `valid_to` >= `valid_from`),
   CONSTRAINT `ck_ccl_tax_ref` CHECK (`tax_status` <> _utf8mb4'taxable' or `tax_code_id` is not null)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ── Table: client_contracts ──
-CREATE TABLE `client_contracts` (
-  `id` int(11) DEFAULT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_signing_date` date DEFAULT NULL,
-  `grace_period_days` int(11) DEFAULT NULL,
-  `contract_duration_months` int(11) DEFAULT NULL,
-  `contract_duration_days` int(11) DEFAULT NULL,
-  `equip_shifts_contract` int(11) DEFAULT NULL,
-  `shift_contract` int(11) DEFAULT NULL,
-  `equip_total_contract_daily` int(11) DEFAULT NULL,
-  `total_contract_permonth` int(11) DEFAULT NULL,
-  `total_contract_units` int(11) DEFAULT NULL,
-  `actual_start` date DEFAULT NULL,
-  `actual_end` date DEFAULT NULL,
-  `transportation` mediumtext DEFAULT NULL,
-  `accommodation` mediumtext DEFAULT NULL,
-  `place_for_living` mediumtext DEFAULT NULL,
-  `workshop` mediumtext DEFAULT NULL,
-  `hours_monthly_target` int(11) DEFAULT NULL,
-  `forecasted_contracted_hours` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `daily_work_hours` varchar(20) DEFAULT NULL,
-  `daily_operators` varchar(20) DEFAULT NULL,
-  `first_party` varchar(255) DEFAULT NULL,
-  `second_party` varchar(255) DEFAULT NULL,
-  `witness_one` varchar(255) DEFAULT NULL,
-  `witness_two` varchar(255) DEFAULT NULL,
-  `price_currency_contract` varchar(20) DEFAULT NULL,
-  `paid_contract` varchar(100) DEFAULT NULL,
-  `payment_time` varchar(50) DEFAULT NULL,
-  `guarantees` mediumtext DEFAULT NULL,
-  `retention_pct` decimal(5,2) DEFAULT NULL,
-  `advance_recovery_pct` decimal(5,2) DEFAULT NULL,
-  `payment_date` date DEFAULT NULL,
-  `contract_status` enum('مسودة','تفاوض','معتمد','موقَّع','نافذ','قيد التنفيذ','معلَّق','معدَّل','مجدَّد','منتهٍ','مقفل','مصفّى') DEFAULT NULL,
-  `pause_state_before` enum('مسودة','تفاوض','معتمد','موقَّع','نافذ','قيد التنفيذ','معلَّق','معدَّل','مجدَّد','منتهٍ','مقفل','مصفّى') DEFAULT NULL,
-  `pause_reason` mediumtext DEFAULT NULL,
-  `pause_date` date DEFAULT NULL,
-  `resume_date` date DEFAULT NULL,
-  `termination_type` varchar(50) DEFAULT NULL,
-  `termination_reason` mediumtext DEFAULT NULL,
-  `merged_with` int(11) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL,
-  `is_deleted` tinyint(1) DEFAULT NULL,
-  `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` int(11) DEFAULT NULL,
-  `project_id` int(11) DEFAULT NULL,
-  `site_id` int(11) DEFAULT NULL,
-  `readiness_state` enum('لم يبدأ','جارٍ','مجتاز') DEFAULT NULL,
-  `primary_scope_id` int(10) unsigned DEFAULT NULL,
-  `primary_site_id` int(11) DEFAULT NULL,
-  `primary_scope_name` varchar(190) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: clients ──
@@ -13589,6 +13533,10 @@ CREATE TABLE `workspace_views` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_wv` (`user_id`,`screen`,`view_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── View: client_contracts ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `client_contracts` AS select `c`.`id` AS `id`,`c`.`company_id` AS `company_id`,`c`.`contract_signing_date` AS `contract_signing_date`,`c`.`grace_period_days` AS `grace_period_days`,`c`.`contract_duration_months` AS `contract_duration_months`,`c`.`contract_duration_days` AS `contract_duration_days`,`c`.`equip_shifts_contract` AS `equip_shifts_contract`,`c`.`shift_contract` AS `shift_contract`,`c`.`equip_total_contract_daily` AS `equip_total_contract_daily`,`c`.`total_contract_permonth` AS `total_contract_permonth`,`c`.`total_contract_units` AS `total_contract_units`,`c`.`actual_start` AS `actual_start`,`c`.`actual_end` AS `actual_end`,`c`.`transportation` AS `transportation`,`c`.`accommodation` AS `accommodation`,`c`.`place_for_living` AS `place_for_living`,`c`.`workshop` AS `workshop`,`c`.`hours_monthly_target` AS `hours_monthly_target`,`c`.`forecasted_contracted_hours` AS `forecasted_contracted_hours`,`c`.`created_at` AS `created_at`,`c`.`updated_at` AS `updated_at`,`c`.`daily_work_hours` AS `daily_work_hours`,`c`.`daily_operators` AS `daily_operators`,`c`.`first_party` AS `first_party`,`c`.`second_party` AS `second_party`,`c`.`witness_one` AS `witness_one`,`c`.`witness_two` AS `witness_two`,`c`.`price_currency_contract` AS `price_currency_contract`,`c`.`paid_contract` AS `paid_contract`,`c`.`payment_time` AS `payment_time`,`c`.`guarantees` AS `guarantees`,`c`.`retention_pct` AS `retention_pct`,`c`.`advance_recovery_pct` AS `advance_recovery_pct`,`c`.`payment_date` AS `payment_date`,`c`.`contract_status` AS `contract_status`,`c`.`pause_state_before` AS `pause_state_before`,`c`.`pause_reason` AS `pause_reason`,`c`.`pause_date` AS `pause_date`,`c`.`resume_date` AS `resume_date`,`c`.`termination_type` AS `termination_type`,`c`.`termination_reason` AS `termination_reason`,`c`.`merged_with` AS `merged_with`,`c`.`status` AS `status`,`c`.`is_deleted` AS `is_deleted`,`c`.`deleted_at` AS `deleted_at`,`c`.`deleted_by` AS `deleted_by`,`c`.`project_id` AS `project_id`,`c`.`site_id` AS `site_id`,`c`.`readiness_state` AS `readiness_state`,`c`.`signing_authority_ref` AS `signing_authority_ref`,`cos`.`id` AS `primary_scope_id`,`cos`.`site_id` AS `primary_site_id`,`cos`.`scope_name` AS `primary_scope_name` from (`contracts` `c` left join `contract_operational_sites` `cos` on(`cos`.`contract_id` = `c`.`id` and `cos`.`is_primary` = 1 and coalesce(`cos`.`is_deleted`,0) = 0));
 
 -- ── View: v_org_unit_heads ──
 SET collation_connection = 'utf8mb4_unicode_ci';

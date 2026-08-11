@@ -983,8 +983,44 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 } else {
                   // إضافة
                   $contract_data['project_id'] = $posted_project_id;
+                  /* ══ **العقدُ يُنسَب إلى موقعٍ من نقطةِ إنشائه.**
+                       ثابتٌ يحرسه `sites_entity_test`: «كلُّ العقودِ القائمةِ
+                       مربوطةٌ بموقع». وكانت هذه الشاشةُ **لا تكتب `site_id`
+                       مطلقًا** (صفرُ ذكرٍ للعمودِ في الملفِّ كلِّه) ولا تفتح
+                       نطاقًا تشغيليًّا — فالعقدُ يُنشأ بلا موقعٍ في **أيٍّ** من
+                       التمثيلين. (مقيسٌ: ثمانيةُ عقودٍ بلا `site_id` وبصفرِ
+                       نطاق، ومشروعُها **له** موقعٌ افتراضيٌّ قائم.)
+                     ◆ والموقعُ **مشتقٌّ لا مُختار**: افتراضيُّ مشروعِ العقد.
+                       وإن لم يكن للمشروعِ افتراضيٌّ يبقى `null` — فلا يُخترع. */
+                  if ($posted_project_id > 0) {
+                      try {
+                          $__ds = $contracts_gate->selectOne('sites', array(
+                              'columns' => array('id'),
+                              'where'   => array('project_id' => (int) $posted_project_id,
+                                                 'is_default' => 1),
+                          ));
+                          if ($__ds && (int) $__ds['id'] > 0) {
+                              $contract_data['site_id'] = (int) $__ds['id'];
+                          }
+                      } catch (\Throwable $t) {
+                          error_log('contract default site (project ' . $posted_project_id . '): ' . $t->getMessage());
+                      }
+                  }
                   $contract_id = (int) $contracts_gate->insert('contracts', $contract_data);
                   $result = $contract_id > 0;
+                  /* والنطاقُ الرئيسُ يُفتح من النقطةِ نفسِها — فالتمثيلان
+                     يُكتبان معًا ولا يفترقان بمرورِ الوقت. */
+                  if ($result && !empty($contract_data['site_id'])) {
+                      try {
+                          require_once dirname(__DIR__) . '/app/Services/Contract/ContractSiteService.php';
+                          \App\Services\Contract\ContractSiteService::add(
+                              $conn, $contracts_gate, $company_id, $contract_id,
+                              array('site_id' => (int) $contract_data['site_id'], 'is_primary' => 1),
+                              isset($current_user_id) ? (int) $current_user_id : 0);
+                      } catch (\Throwable $t) {
+                          error_log('contract primary scope #' . $contract_id . ': ' . $t->getMessage());
+                      }
+                  }
                 }
               } catch (\Throwable $e) {
                 $result = false;
