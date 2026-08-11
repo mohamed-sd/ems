@@ -1165,15 +1165,50 @@ if ($only === null || $only === 9) {
     chk(9, '⑨-03', 'ولكلِّ شاشةٍ منحةُ قراءةٍ لدورِها المالك',
         !$noGrant, $noGrant ? implode(' · ', array_slice($noGrant, 0, 5)) : "$N منحة");
 
-    /* ⑨-04 وكلُّها في قائمةِ دورِها — فالمبنيُّ الذي لا يُبلَغ كالمعدوم. */
-    $noNav = array();
+    /* ⑨-04 وكلُّها في قائمةِ دورِها — فالمبنيُّ الذي لا يُبلَغ كالمعدوم.
+       ═══════════════════════════════════════════════════════════════════════
+       ◆ INJ-0032 · INJ-0502 — **الفحصُ كان يشهد على غيرِ بابِه.** كان نصُّه:
+             SELECT COUNT(*) FROM nav_items WHERE route='../{$rel}' AND active=1
+         أي يشترط البادئةَ `../` — وهي عينُها ما يجعل الصفَّ **غيرَ قابلٍ
+         للتصييرِ أصلًا**. فكان يقيس وجودَ صفٍّ بصيغةٍ معطوبةٍ لا **بلوغَ**
+         الشاشةِ من القائمة.
+       ◆ وقياسُ اليومِ يكشف أثرًا أخطرَ من ذلك: هجرةُ INJ-0061 أزالت البادئةَ من
+         كلِّ الصفوفِ وأضافت قيدًا يمنع عودتَها — فصار **صفرُ صفٍّ** ببادئة `../`،
+         وهذا الفحصُ **يرسب على الأربعين وواحد** جميعًا وهي سليمةٌ تمامًا.
+         **إصلاحٌ صحيحٌ كسر فاحصًا اعتمد على الشكلِ المعطوب.**
+       ◆ فيُعاد بناؤه على المصدرِ الذي تقرؤه القائمةُ نفسُها: `getUnifiedNavItems`
+         — ثلاثةُ شروطٍ لكلِّ شاشة:
+           ① مسارُها **يظهر في مخرَجِ الدالة** لدورِ مالكها (بلوغٌ لا وجود).
+           ② ولها بابٌ (`door`) أو مرحلةٌ (`stage_no` من مجموعتها) — فلا تسقط
+              في «أخرى» بلا موضع.
+           ③ ولا يبدأ مسارُها بـ`../` — فالقيدُ في القاعدةِ يمنعه، والفاحصُ
+              يشهد له لا يعتمد عليه.
+       ◆ ولا يُقارَن بـ`nav_items.stage_no` — لا وجودَ لهذا العمود؛ المرحلةُ في
+         `link_groups.stage_no` وتصلها الدالةُ بـLEFT JOIN. (قِيس لا افتُرض.) */
+    require_once $ROOT . '/includes/unified_nav.php';
+    $noNav = array(); $noDoor = array(); $relPrefix = array();
+    $navCache = array();
     foreach ($MAN as $s) {
         $rel = $s['dir'] . '/' . $s['file'];
-        if ((int) one($db, "SELECT COUNT(*) FROM nav_items
-                             WHERE route='../" . $db->real_escape_string($rel) . "' AND active=1") < 1) { $noNav[] = $rel; }
+        $role = (int) $s['role'];
+        if (!isset($navCache[$role])) {
+            $navCache[$role] = function_exists('getUnifiedNavItems') ? (array) getUnifiedNavItems($db, $role) : array();
+        }
+        $hit = null;
+        foreach ($navCache[$role] as $it) {
+            if (isset($it['route']) && (string) $it['route'] === $rel) { $hit = $it; break; }
+        }
+        if ($hit === null) { $noNav[] = $rel . ' (دور ' . $role . ')'; continue; }
+        $door = isset($hit['door']) ? trim((string) $hit['door']) : '';
+        $stage = isset($hit['stage_no']) ? trim((string) $hit['stage_no']) : '';
+        if ($door === '' && $stage === '') { $noDoor[] = $rel . ' (بلا بابٍ ولا مرحلة)'; }
+        if (strpos((string) $hit['route'], '../') === 0) { $relPrefix[] = $rel; }
     }
-    chk(9, '⑨-04', 'وكلُّ شاشةٍ في قائمةِ دورِها — فالمبنيُّ الذي لا يُبلَغ كالمعدوم',
-        !$noNav, $noNav ? implode(' · ', array_slice($noNav, 0, 5)) : "$N عنصرًا");
+    $bad9 = array_merge($noNav, $noDoor, $relPrefix);
+    chk(9, '⑨-04', 'وكلُّ شاشةٍ **تُبلَغ** من قائمةِ دورِها ببابٍ أو مرحلةٍ ومسارٍ غيرِ نسبيّ',
+        !$bad9,
+        $bad9 ? implode(' · ', array_slice($bad9, 0, 5))
+              : "$N شاشةً بلغت قائمةَ دورِها (بلوغٌ من `getUnifiedNavItems` لا وجودُ صفّ)");
 
     /* ⑨-05 ولكلٍّ أساسٌ ومرجعٌ في سجلِّ الشاشاتِ الحاكمة. */
     $noBasis = (int) one($db, "SELECT COUNT(*) FROM gov_governing_screens
