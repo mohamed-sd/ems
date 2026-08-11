@@ -83,7 +83,19 @@ $spec31 = array('id','company_id','entry_no','entry_date','project_id','contract
     'qty','record_basis','capacity_flag','shift','source_ref','txn_ref','note','state',
     'revision_no','current_round','revises_entry_id','revision_kind','superseded_by_id','converted_at',
     'event_id','entered_by','sync_uuid','created_at','updated_at');
-check(array_keys($e) === $spec31, 'unit_entries: أعمدة §3.1 حرفًا بحرف + current_round (ترحيل UX-03 §8.2)');
+/* ══ **تطابقٌ حاصرٌ على جدولٍ ينمو = رسوبٌ بكلِّ ترحيلٍ مشروع.**
+     كان الشرطُ `array_keys($e) === $spec31` — أي **نفيٌ لا احتواء**: أيُّ عمودٍ
+     يُضاف يُرسِبه. والجدولُ نما بترحيلاتٍ مسجَّلةٍ لاحقةٍ (CAP-01 · M-24 حكمُ
+     الكمية · TS-04 مطابقةُ العميل) ولا عمودَ من §3.1 ناقص.
+   ⇒ يُقاس **الاحتواءُ والترتيبُ**: كلُّ أعمدةِ §3.1 موجودةٌ وبترتيبها فيما
+     بينها. فالسقفُ باقٍ (لا عمودَ من المواصفةِ يُحذف ولا يُزاح)، والنمو
+     المشروعُ يمرُّ ويُعلَن عددُه. */
+$missing31 = array_values(array_diff($spec31, array_keys($e)));
+$order31   = array_values(array_intersect(array_keys($e), $spec31)) === $spec31;
+check($missing31 === array() && $order31,
+    'unit_entries: كلُّ أعمدة §3.1 موجودةٌ وبترتيبها (ونمَت '
+    . (count($e) - count($spec31)) . ' أعمدةَ ترحيلاتٍ مسجَّلة)'
+    . ($missing31 ? ' — الناقص: ' . implode(' · ', $missing31) : ''));
 
 // الحالات الثلاث عشرة — البند الذي كان «approval_level tinyint لا غير»
 $states13 = array('draft','submitted','site_approved','parties_review','parties_approved',

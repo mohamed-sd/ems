@@ -98,7 +98,23 @@ check($eqHit !== null, "التقط تجاوز المعدة {$EQ} يوم {$DAY} �
 check($eqHit !== null && (float) $eqHit['measured'] === 28.00,
     'قاسه 28 ساعةً بالضبط (لا تقريبًا ولا تقديرًا) — الطاقة 20');
 check($eqHit !== null && (int) $eqHit['rows_n'] === 3, 'من ثلاثة صفوفٍ حيّة');
-check(count($scanEq) === 1, 'تجاوزُ آلاتٍ واحدٌ في البيانات التاريخية — مطابقٌ للمقيس');
+/* ══ **إحصاءٌ مجمَّدٌ على جدولٍ مشترَكٍ نما من 220 صفًّا إلى 48,746.**
+     كان `count($scanEq) === 1` — رقمَ يومِ كُتب الفحص. وبذرةُ UAT وحدَها أضافت
+     آلافَ مجموعاتِ تجاوزٍ **داخلَ نافذةِ «التاريخي» نفسِها**، فمُرشِّحُ
+     `LEGACY_BEFORE` لا يحجبها. والحارسُ سليمٌ: التقط المرساةَ 28.00 من ثلاثةِ
+     صفوفٍ كما يُثبته الفحصانِ قبلَه.
+   ⇒ يُقاس العددُ **بحسابٍ مستقلٍّ حيٍّ للمجموعةِ نفسِها** — فالحكمُ يصير
+     «الماسحُ يرى كلَّ تجاوزٍ ولا يرى ما ليس تجاوزًا»، وهو ثابتٌ لا يتعفّن.
+     (ولا يُكتب العددُ الجديدُ مكانَ القديمِ — ذاك تجميدٌ ثانٍ.) */
+$eqLimit = \App\Services\Unit\CapacityGuard::limits()['equipment'];
+$expEq = (int) $conn->query("SELECT COUNT(*) c FROM (
+            SELECT `operator`, `date`, ROUND(SUM(total_work_hours), 2) m
+              FROM timesheet
+             WHERE company_id = {$CO} AND `date` < '{$LEGACY_BEFORE}'
+             GROUP BY `operator`, `date` HAVING m > {$eqLimit}) y")->fetch_assoc()['c'];
+check(count($scanEq) === $expEq,
+    'الماسحُ رأى كلَّ تجاوزِ آلاتٍ تاريخيٍّ ولا شيءَ سواه: '
+    . count($scanEq) . ' = ' . $expEq . ' (محسوبًا مستقلًّا)');
 
 $empHit = null;
 foreach ($scanOp as $row) {
@@ -106,8 +122,17 @@ foreach ($scanOp as $row) {
 }
 check($empHit !== null && (float) $empHit['measured'] === 18.00,
     "التقط الموظف {$EMP_A} في اليوم نفسه: 18 ساعةً وطاقتُه 10");
-check(count($scanOp) === 17,
-    'التقط سبعة عشر تجاوزًا للمشغّلين تاريخيًّا — العدد المقيس فعلًا (§3.10 ذكر 22؛ المقيس 17)');
+/* الجذرُ نفسُه: `=== 17` رقمٌ لُقِّح مرةً بـ«المقيس فعلًا» فتعفّن ثانيةً. */
+$opLimit = \App\Services\Unit\CapacityGuard::limits()['operator'];
+$expOp = (int) $conn->query("SELECT COUNT(*) c FROM (
+            SELECT employee_id, `date`, ROUND(SUM(total_work_hours), 2) m
+              FROM timesheet
+             WHERE company_id = {$CO} AND employee_id IS NOT NULL AND employee_id <> ''
+               AND `date` < '{$LEGACY_BEFORE}'
+             GROUP BY employee_id, `date` HAVING m > {$opLimit}) y")->fetch_assoc()['c'];
+check(count($scanOp) === $expOp,
+    'والماسحُ رأى كلَّ تجاوزِ مشغّلٍ تاريخيٍّ ولا شيءَ سواه: '
+    . count($scanOp) . ' = ' . $expOp . ' (محسوبًا مستقلًّا)');
 
 // ═══ ② الواقعة الحقيقية تُعاد في المصدر الجديد ═══
 head('② الواقعة تُدخَل — والحارس «لا يمنع إدخالَه» (§3.10)');

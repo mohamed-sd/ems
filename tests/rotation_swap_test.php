@@ -47,7 +47,30 @@ $conn->set_charset('utf8mb4');
 $CO = 4; $ACTOR = 999901;
 $gate = new TenantDb($conn, TenantContext::forSystem($CO, $ACTOR, '', true));
 
+/* ══ **الكنسُ كان معلَّقًا على العقدِ فسقط مع العقد.**
+     كان يجد عقودَه بـ`first_party LIKE 'H04T%'` ثم يكنس حاوياتِ كلِّ عقد. فإذا
+     مات العقدُ أو هبط `contract_id` إلى صفرٍ صارت **صفوفُ الجولةِ الميتةِ خارجَ
+     متناولِ الكنسِ إلى الأبد** — فيصدُّ `uq_container_no` كلَّ جولةٍ تالية
+     **بحقٍّ**، ويُقرأ رفضُ حارسٍ صحيحٍ عطلًا في المنتج.
+   ⇒ يُكنس **بالنطاقِ المحجوزِ في `container_no`** أولًا (وهو وسمُ الصفِّ نفسِه
+     لا حقلٌ في جدولٍ آخر)، ثم بالعقدِ كما كان — فالجولةُ **تشفي نفسَها**. */
 $teardown = function () use ($conn) {
+    $scope = "(c.container_no LIKE 'H04T-%' OR c.container_no LIKE 'SWP-%')";
+    $conn->query("DELETE sw FROM container_swaps sw JOIN op_containers c
+                    ON c.id IN (sw.container_id, sw.to_container_id) WHERE {$scope}");
+    $conn->query("DELETE rr FROM operator_rotations rr JOIN op_containers c
+                    ON c.id = rr.container_id WHERE {$scope}");
+    $conn->query("DELETE cc FROM container_consumption cc JOIN op_containers c
+                    ON c.id = cc.container_id WHERE {$scope}");
+    /* ومُشيرٌ خامس: `substitute_coverages.covered_seat_id` (`fk_cov_seat`) */
+    $conn->query("DELETE sc FROM substitute_coverages sc JOIN op_containers c
+                    ON c.id = sc.covered_seat_id WHERE {$scope}");
+    foreach (array('مشغّل', 'معدة', 'نوع', 'مورد', 'رئيسية') as $lvl) {
+        $conn->query("DELETE FROM op_containers
+                       WHERE level = '{$lvl}'
+                         AND (container_no LIKE 'H04T-%' OR container_no LIKE 'SWP-%')");
+    }
+
     $ids = array();
     $r = $conn->query("SELECT id FROM contracts WHERE first_party LIKE 'H04T%'");
     if ($r) { while ($row = $r->fetch_assoc()) { $ids[] = intval($row['id']); } }

@@ -46,11 +46,41 @@ function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 $conn = $GLOBALS['conn'];
 $conn->set_charset('utf8mb4');
 $CO = 4; $ACTOR = 999901; $PRJ = 990041;
+/* ══ **وسمٌ فريدٌ لكلِّ جولةٍ لا ثابتٌ يتصادم.**
+     كان الوسمُ `H05T-` ثابتًا، وفي القاعدةِ حاوياتٌ بهذا الرقمِ نفسِه
+     **تشير إليها ثلاثةُ صفوفِ تغطيةٍ مبذورةٍ** (`substitute_coverages`
+     · `MNT/2026/318-320`). فكنسُ الفاحصِ يُردُّ بمفتاحٍ أجنبيّ، ولو نجح
+     لأهلك بيانةً مبذورة — والطريقان كلاهما خطأ. والوسمُ الفريدُ يمنع
+     التصادمَ من أصلِه ويجعل كنسَ الجولةِ يمسُّ ما صنعته وحدَه. */
+$MK = "H05T" . getmypid();
 $gate = new TenantDb($conn, TenantContext::forSystem($CO, $ACTOR, '', true));
 
-$teardown = function () use ($conn, $PRJ) {
+/* ══ الجذرُ نفسُه كما في `rotation_swap_test`: الكنسُ معلَّقٌ على العقدِ، فإذا
+     مات العقدُ أو هبط `contract_id` إلى صفرٍ صارت صفوفُ الجولةِ الميتةِ خارجَ
+     متناولِ الكنس، فيصدُّ `uq_container_no` كلَّ جولةٍ تالية **بحقّ**.
+   ⇒ الكنسُ بالنطاقِ المحجوزِ في `container_no` أولًا ثم بالعقد. */
+$teardown = function () use ($conn, $PRJ, $MK) {
+    $scope = "(c.container_no LIKE '{$MK}-%' OR c.container_no LIKE 'SWP-%')";
+    $conn->query("DELETE sw FROM container_swaps sw JOIN op_containers c
+                    ON c.id IN (sw.container_id, sw.to_container_id) WHERE {$scope}");
+    $conn->query("DELETE rr FROM operator_rotations rr JOIN op_containers c
+                    ON c.id = rr.container_id WHERE {$scope}");
+    $conn->query("DELETE cc FROM container_consumption cc JOIN op_containers c
+                    ON c.id = cc.container_id WHERE {$scope}");
+    /* ◆ **ومُشيرٌ خامسٌ كان يحجب الكنسَ صمتًا**: `substitute_coverages`
+         (`fk_cov_seat` على `covered_seat_id` — **لا** `container_id`). وقياسي
+         الأولُ فحصه بالعمودِ الخطأ فعاد صفرًا، فبدا أن لا مانعَ والمانعُ قائم.
+         الأسماءُ تُقاس من `information_schema` لا تُقاس بالحدس. */
+    $conn->query("DELETE sc FROM substitute_coverages sc JOIN op_containers c
+                    ON c.id = sc.covered_seat_id WHERE {$scope}");
+    foreach (array('مشغّل', 'معدة', 'نوع', 'مورد', 'رئيسية') as $lvl) {
+        $conn->query("DELETE FROM op_containers
+                       WHERE level = '{$lvl}'
+                         AND (container_no LIKE '{$MK}-%' OR container_no LIKE 'SWP-%')");
+    }
+
     $ids = array();
-    $r = $conn->query("SELECT id FROM contracts WHERE first_party LIKE 'H05T%'");
+    $r = $conn->query("SELECT id FROM contracts WHERE first_party LIKE '{$MK}%'");
     if ($r) { while ($row = $r->fetch_assoc()) { $ids[] = intval($row['id']); } }
     foreach ($ids as $cid) {
         $conn->query("DELETE sw FROM container_swaps sw JOIN op_containers c ON c.id = sw.container_id
@@ -62,6 +92,8 @@ $teardown = function () use ($conn, $PRJ) {
         }
         $conn->query("DELETE FROM contracts WHERE id = {$cid}");
     }
+    /* والمشروعُ المِسباريُّ يُكنس بمعرِّفِه المحجوز — بعد عقودِه لا قبلها */
+    $conn->query("DELETE FROM project WHERE id = {$PRJ} AND name = 'مشروعُ جسِّ H05T'");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -75,32 +107,46 @@ $er = $conn->query("SELECT id FROM employees WHERE company_id = {$CO} ORDER BY i
 while ($row = $er->fetch_assoc()) { $emps[] = intval($row['id']); }
 list($OP_A, $OP_C) = $emps;
 $EQ = intval($conn->query("SELECT id FROM equipments WHERE company_id = {$CO} LIMIT 1")->fetch_assoc()['id']);
-$conn->query("INSERT INTO contracts (company_id, contract_signing_date, first_party) VALUES ({$CO}, '2026-01-01', 'H05T')");
+/* ══ **معرِّفُ المشروعِ المحجوزُ لم يكن موجودًا أصلًا.**
+     `$PRJ = 990041` معرِّفٌ محجوزٌ للجسّ — و`op_containers.project_id` **بلا
+     مفتاحٍ أجنبيّ** فتقبله الحاويات، أمّا `contracts.project_id` فمفتاحٌ
+     أجنبيٌّ **إلزاميّ** (`fk_contracts_project`) فيرفضه. فكان العقدُ يُردُّ،
+     ويعود `insert_id = 0`، فتتساقط حاوياتُ الشجرةِ كلُّها (مفتاحُها
+     `contract_id`) ثم ينفجر إدراجُ التناوبِ على `container_id = 0`.
+   ⇒ يُبذر المشروعُ بمعرِّفِه المحجوزِ **صراحةً** فتبقى العزلةُ قائمةً ولا
+     تُستعمل بيانةٌ حقيقية، ويُكنس مع الجولة. */
+$conn->query("INSERT IGNORE INTO project (id, company_id, name, client, location, total, status)
+              VALUES ({$PRJ}, {$CO}, 'مشروعُ جسِّ H05T', '—', '—', '0', 1)");
+if ($conn->errno) { fwrite(STDOUT, '  ⚠ بذرُ المشروع: ' . mb_substr($conn->error, 0, 110) . "\n"); }
+
+$conn->query("INSERT INTO contracts (company_id, project_id, contract_signing_date, first_party)
+              VALUES ({$CO}, {$PRJ}, '2026-01-01', '{$MK}')");
 $CID = intval($conn->insert_id);
+if ($CID <= 0) { fwrite(STDOUT, '  ⚠ تعذّر بذرُ العقد: ' . mb_substr($conn->error, 0, 120) . "\n"); }
 $conn->query("INSERT INTO op_containers (company_id, container_no, level, parent_id, contract_id, unit_type,
     cap_qty, allocated_qty, consumed_qty, project_id, valid_from, state, origin, created_by)
-    VALUES ({$CO}, 'H05T-ROOT', 'رئيسية', NULL, {$CID}, 'hour', 1000, 300, 0, {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
+    VALUES ({$CO}, '{$MK}-ROOT', 'رئيسية', NULL, {$CID}, 'hour', 1000, 300, 0, {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
 $ROOT = intval($conn->insert_id);
 $conn->query("INSERT INTO op_containers (company_id, container_no, level, parent_id, contract_id, unit_type,
     cap_qty, allocated_qty, consumed_qty, project_id, valid_from, state, origin, created_by)
-    VALUES ({$CO}, 'H05T-SUP', 'مورد', {$ROOT}, {$CID}, 'hour', 300, 300, 0, {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
+    VALUES ({$CO}, '{$MK}-SUP', 'مورد', {$ROOT}, {$CID}, 'hour', 300, 300, 0, {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
 $SUPC = intval($conn->insert_id);
 $conn->query("INSERT INTO op_containers (company_id, container_no, level, parent_id, contract_id, unit_type,
     cap_qty, allocated_qty, consumed_qty, equipment_id, role_kind, project_id, valid_from, state, origin, created_by)
-    VALUES ({$CO}, 'H05T-EQ', 'معدة', {$SUPC}, {$CID}, 'hour', 300, 300, 0, {$EQ}, 'أساسية', {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
+    VALUES ({$CO}, '{$MK}-EQ', 'معدة', {$SUPC}, {$CID}, 'hour', 300, 300, 0, {$EQ}, 'أساسية', {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
 $EQC = intval($conn->insert_id);
 $conn->query("INSERT INTO op_containers (company_id, container_no, level, parent_id, contract_id, unit_type,
     cap_qty, allocated_qty, consumed_qty, operator_employee_id, role_kind, shift_no, project_id, valid_from, state, origin, created_by)
-    VALUES ({$CO}, 'H05T-OPC', 'مشغّل', {$EQC}, {$CID}, 'hour', 300, 0, 120, {$OP_C}, 'أساسي', 1, {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
+    VALUES ({$CO}, '{$MK}-OPC', 'مشغّل', {$EQC}, {$CID}, 'hour', 300, 0, 120, {$OP_C}, 'أساسي', 1, {$PRJ}, '2041-01-01', 'نشطة', 'عقد', {$ACTOR})");
 $OPCC = intval($conn->insert_id);
 $conn->query("INSERT INTO op_containers (company_id, container_no, level, parent_id, contract_id, unit_type,
     cap_qty, allocated_qty, consumed_qty, operator_employee_id, role_kind, shift_no, project_id, valid_from, state, origin, created_by)
-    VALUES ({$CO}, 'H05T-OPA', 'مشغّل', {$EQC}, {$CID}, 'hour', 0, 0, 0, {$OP_A}, 'بديل أول', 1, {$PRJ}, '2041-01-01', 'معلَّقة', 'عقد', {$ACTOR})");
+    VALUES ({$CO}, '{$MK}-OPA', 'مشغّل', {$EQC}, {$CID}, 'hour', 0, 0, 0, {$OP_A}, 'بديل أول', 1, {$PRJ}, '2041-01-01', 'معلَّقة', 'عقد', {$ACTOR})");
 $OPCA = intval($conn->insert_id);
 $gate->insert('operator_rotations', array(
     'container_id' => $OPCC, 'operator_employee_id' => $OP_C,
     'cycle_on_days' => 60, 'cycle_off_days' => 30, 'cycle_start' => '2041-01-01',
-    'note' => 'H05T', 'created_by' => $ACTOR,
+    'note' => $MK, 'created_by' => $ACTOR,
 ));
 check($ROOT && $EQC && $OPCC && $OPCA, "الشجرةُ قائمة (eq {$EQC} · C نشطة 300/120 · A صفريةٌ معلَّقة)");
 
