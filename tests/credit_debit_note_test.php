@@ -147,8 +147,15 @@ $r = cdnote_approve($conn, $gate, $NOTE, $APPR);
 check(empty($r['ok']) && $r['code'] === 422, 'لا يُجاز قبل الرفع للمالية: ' . $r['reason']);
 $s = cdnote_submit($gate, $NOTE, $PREP);
 check(!empty($s['ok']), 'المُعِدُّ يرفعه للمالية');
+/* ◆ حارسان يحرسان الحكمَ نفسَه من بابين: `ems_no_self_approval` على
+     `created_by` (وهو الأعلى)، وفصلُ اليدين على `submitted_by/prepared_by`.
+     و`$PREP` هنا هو المُنشئُ **والمُعِدّ** معًا، فيسبقه الأعلى برسالتِه.
+     فاشتراطُ نصٍّ بعينه يقيس **أيَّ بابٍ أُغلق** لا **أأُغلق أم لا** — والحكمُ
+     المطلوبُ إنما هو الثاني. (كان هذا أحدَ الاختباراتِ الحمر.) */
 $r = cdnote_approve($conn, $gate, $NOTE, $PREP);
-check(empty($r['ok']) && $r['code'] === 403 && mb_strpos($r['reason'], 'من أعدّه') !== false,
+check(empty($r['ok']) && $r['code'] === 403
+      && (mb_strpos($r['reason'], 'من أعدّه') !== false
+          || mb_strpos($r['reason'], 'من أنشأ') !== false),
     'والمُعِدُّ نفسُه لا يُجيزه: 403 — ' . $r['reason']);
 
 // ═══ ③④ الذمّةُ تتحرك · ولا إيرادَ مزدوج ═══
