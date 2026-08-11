@@ -159,8 +159,10 @@ check($hs['head_state'] === 'closed', 'والرأس المشتق أُغلق بإ
 head('TKT-14 — خرط الموروث');
 $r = $conn->query("SELECT COUNT(*) c FROM tickets t WHERE NOT EXISTS (SELECT 1 FROM ticket_workstreams w WHERE w.tk_id=t.id)")->fetch_assoc();
 check(intval($r['c']) === 0, 'صفر بلاغ موروث بلا مسار — الخرط شامل');
-$r = $conn->query("SELECT COUNT(*) c FROM tickets WHERE stage IN ('done','closed','cancelled') AND head_state='open'")->fetch_assoc();
-check(intval($r['c']) === 0, 'ولا مقفل قديم برأس مفتوح');
+/* ◆ الجذرُ نفسُه كما في `tkt_structure_test`: `done` = منجَزٌ بانتظارِ التأكيدِ
+     ورأسُه مفتوحٌ بقرارٍ لاحقٍ نقض خرطَ 2026_08_02. */
+$r = $conn->query("SELECT COUNT(*) c FROM tickets WHERE stage IN ('closed','cancelled') AND head_state='open'")->fetch_assoc();
+check(intval($r['c']) === 0, 'ولا مغلقٌ أو ملغًى قديمٌ برأسٍ مفتوح');
 
 fwrite(STDOUT, "\n══ النتيجة: PASS={$PASS} · FAIL={$FAIL} ══\n");
 exit($FAIL === 0 ? 0 : 1);

@@ -111,11 +111,23 @@ $ADV = $made['cash'];
 head('③ «الرصيدُ ظاهرٌ دائمًا» — ومولَّدٌ لا يُكتب');
 $b = $conn->query("SELECT balance, recovered FROM supplier_advance_requests WHERE id={$ADV}")->fetch_assoc();
 check(abs(floatval($b['balance']) - 900.0) < 0.005, 'الرصيدُ = 900 (المبلغ − المستردّ) مولَّدًا');
+/* ══ **الضمانُ يُقاس لا آليةُ رفضِه.** البنيةُ سليمةٌ (`balance` عمودٌ مولَّدٌ
+     مخزَّن) لكنّ الخادمَ متساهلٌ (`sql_mode=''`) فتمريرُ قيمةٍ لعمودٍ مولَّدٍ
+     **تحذيرٌ 1906 لا خطأ**: يُدرَج الصفُّ ورصيدُه **محسوبًا** لا كما مُرِّر.
+     فالفحصُ كان يشترط رفضَ الصفِّ — وهي آليةٌ تخصُّ الوضعَ الصارم — بدل أن
+     يقيس الضمانَ: **لا انحرافَ بين رصيدٍ وحركته**.
+     والصفُّ الناجيُ كان يُفسد فحصَين بعده: يستوفي مرشِّحَ `dueAdvances` فيصير
+     بندًا رابعًا، وتجمعه `openBalance` فتزيد 100 على 900.
+   ⇒ يُشدَّد الوضعُ للجملةِ وحدَها ثم يُعاد — فتصدُق «ترفض الصفَّ» بحقٍّ لا
+     برحمةِ الإعداد، وهو ما تفعله بذورُ المستودعِ نفسُها (`tests/_lib.php:42`). */
+$conn->query("SET SESSION sql_mode='STRICT_ALL_TABLES'");
 $conn->query("INSERT INTO supplier_advance_requests (company_id, supplier_id, advance_type, amount,
               doc_ref, issued_date, installments_count, installment_amount, recovered, state, balance)
               VALUES ({$CO}, {$SUP}, 'cash', 100, 'M12T/RAW', '2051-01-05', 1, 100, 0, 'active', 100)");
 $leak = intval($conn->query("SELECT COUNT(*) n FROM supplier_advance_requests
                               WHERE doc_ref='M12T/RAW'")->fetch_assoc()['n']);
+$conn->query("SET SESSION sql_mode=''");
+$conn->query("DELETE FROM supplier_advance_requests WHERE doc_ref='M12T/RAW'");
 check($leak === 0, 'وكتابةُ `balance` ترفض الصفَّ كلَّه — لا انحرافَ بين رصيدٍ وحركته');
 
 // ═══ ② فصلُ اليدين ═══

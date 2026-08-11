@@ -30,7 +30,11 @@ function head($m) { echo "\n── {$m}\n"; }
 head('① عزل عدة الاختبار — التراكب لا الملف الحي');
 check(ems_env('EMS_PROBE_SAFETY') === 'overlay_wins', 'قيمة التراكب مقروءة عبر ems_env');
 check(file_get_contents($ROOT . '/.env') === $envBytesBefore, '.env الحي بايت-مطابق — صفر كتابة فيه');
-$child = shell_exec('php -r "require ' . var_export($ROOT . '/includes/env.php', true) . '; echo ems_env(\'EMS_PROBE_SAFETY\', \'none\');"');
+/* ◆ **المُنفِّذُ بمسارِه لا باسمِه المجرَّد**: `php` يعتمد على PATH، وPATH على
+     هذا الجهازِ يشير إلى مجلَّدَين محذوفَين — فتموت العمليةُ الفرعيةُ قبل أن
+     تقيسَ شيئًا فيُقرأ عطلٌ في المنتج **والمنتجُ سليم**. والنمطُ المعتمَدُ في
+     المستودعِ حاضرٌ سلفًا: `tests/sec_full_belt.php:67` يستعمل `PHP_BINARY`. */
+$child = shell_exec(escapeshellarg(PHP_BINARY) . ' -r "require ' . var_export($ROOT . '/includes/env.php', true) . '; echo ems_env(\'EMS_PROBE_SAFETY\', \'none\');"');
 check(trim((string) $child) === 'overlay_wins', 'التراكب يورَّث للعمليات الفرعية (المسابير) عبر البيئة');
 
 head('② النسخة الاحتياطية الآلية قبل أي تعديل');
@@ -54,7 +58,7 @@ check(is_readable($keyFile) && strpos($keyFile, $ROOT) === false, 'المفتا�
 $latest = end($encs);
 $restored = $ROOT . '/.env.restored_probe';
 @unlink($restored);
-shell_exec('php ' . escapeshellarg($ROOT . '/scripts/secrets_backup.php') . ' --restore ' . escapeshellarg($latest) . ' ' . escapeshellarg($restored));
+shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($ROOT . '/scripts/secrets_backup.php') . ' --restore ' . escapeshellarg($latest) . ' ' . escapeshellarg($restored));
 check(is_readable($restored) && strpos(file_get_contents($restored), 'DB_NAME=') !== false, 'الاستعادة من المشفَّرة تعمل فعلًا — لا وعدًا');
 @unlink($restored);
 $gi = file_get_contents($ROOT . '/.gitignore');

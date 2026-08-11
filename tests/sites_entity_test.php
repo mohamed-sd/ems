@@ -136,7 +136,11 @@ check(intval($r->fetch_assoc()['c']) === 3, 'روابطُ التنقل للأد�
 $scr = file_get_contents(dirname(__DIR__) . '/Projects/sites.php');
 check(strpos($scr, "m.code = ?") !== false && strpos($scr, 'الصلاحيةُ صارمة') !== false,
       'الشاشةُ بصلاحيةٍ صارمة (الكودُ الحرفي وغيابُه منع)');
-check(strpos($scr, 'is_default') !== false && strpos($scr, 'لا+يُعطَّل') !== false,
+/* ◆ **علامةُ زائدٍ حرفيةٌ موضعَ المسافة** — أثرُ نسخٍ من نصٍّ مُرمَّزٍ للروابط
+     (space→+)، فبحثُ السلسلةِ لا يطابق النصَّ في المنتجِ أبدًا والحارسُ قائمٌ
+     فعلًا. ويُقاس **المنعُ** لا التعليقُ: رمزُ الردِّ وشرطُه معًا. */
+check(strpos($scr, 'is_default') !== false
+      && strpos($scr, 'GOV-FAIL-409') !== false,
       'حارسُ «الافتراضيُّ لا يُعطَّل» قائم');
 check(strpos($scr, 'ems_audit_change') !== false, 'الحفظُ موصولٌ بسجل التدقيق (N-02)');
 check(strpos($scr, 'scopedQuery') !== false && strpos($scr, '{TENANT_SCOPE}') !== false,

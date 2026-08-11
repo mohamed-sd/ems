@@ -61,8 +61,13 @@ foreach (array('head_state','confidentiality','operational_summary','private_det
     $r = $conn->query("SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='tickets' AND column_name='{$col}'");
     check($r && $r->num_rows === 1, "العمود {$col}");
 }
-$r = $conn->query("SELECT COUNT(*) c FROM tickets WHERE stage IN ('done','closed','cancelled') AND head_state='open'")->fetch_assoc();
-check(intval($r['c']) === 0, 'خرط الموروث: المقفل قديمًا head_state=closed');
+/* ◆ **تعريفُ «المغلق» نُقض بقرارٍ لاحقٍ مسجَّل**: كان الخرطُ يعدُّ
+     `done` مغلقًا (هجرة 2026_08_02)، ثم قُرِّر صراحةً أن `done` = **منجَزٌ
+     بانتظارِ التأكيد** ورأسُه **مفتوح**. فالصفُّ المخالفُ الوحيدُ صحيحٌ بحقّ،
+     والفحصُ يحمل التعريفَ المتجاوَز. و`head_state` عمودٌ **مشتقٌّ** لا مصدرُ
+     حقيقةٍ (تعليقُ `schema.sql`) — فالمقياسُ مجموعةُ المراحلِ النافذة. */
+$r = $conn->query("SELECT COUNT(*) c FROM tickets WHERE stage IN ('closed','cancelled') AND head_state='open'")->fetch_assoc();
+check(intval($r['c']) === 0, 'خرط الموروث: المغلقُ أو الملغى head_state=closed (و`done` منجَزٌ برأسٍ مفتوح)');
 
 head('⑥ UQ المسار على (البلاغ×النوع×التسلسل)');
 $tk = intval($conn->query("SELECT id FROM tickets ORDER BY id LIMIT 1")->fetch_assoc()['id']);
