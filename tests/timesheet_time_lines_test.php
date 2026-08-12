@@ -88,9 +88,16 @@ foreach ($rows as $r) {
 check(count($linesRows) === 44, 'بسطور زمن: ' . count($linesRows) . '/44');
 check(count($oldRows) === 6, 'بالطراز القديم: ' . count($oldRows) . '/6');
 
+/* ══ `shift_hours` **ليس عمودَ توزيعٍ يُشتقُّ من السطور** ═══════════════════════
+   الأحدَ عشرَ الباقيةُ توزيعُ زمنٍ يشتقُّه الخادمُ من سطورِ السجلِّ القانوني، أما
+   `shift_hours` فـ**زمنُ الورديةِ من عقدِ التشغيل** (`Timesheet/timesheet.php`)
+   ولا يُشتقُّ من سطرٍ — فمطالبتُه بالمطابقةِ تطلب من الخادمِ اشتقاقَ ما ليس له
+   مصدرٌ في السطور. وذاك عقدٌ مقصودٌ يحرسه `tests/writer_flip_test.php`.
+   ⇒ يُرفع من قائمةِ المقارنة (فتصير 44 × 11 = 484)، ويبقى الأحدَ عشرَ حكمًا
+     صارمًا: أيُّ عمودٍ يخالف اشتقاقَه يسقط الفحص. */
 $colKeys = array('executed_hours', 'standby_hours', 'dependence_hours', 'maintenance_fault',
                  'hr_fault', 'marketing_fault', 'ts_supplier_stop_hours', 'ts_planned_stop_hours',
-                 'ts_force_majeure_hours', 'other_fault_hours', 'total_fault_hours', 'shift_hours');
+                 'ts_force_majeure_hours', 'other_fault_hours', 'total_fault_hours');
 $diffs = array();
 foreach ($linesRows as $r) {
     // سطورُ السجل القانوني الفعلية لهذا الصف
