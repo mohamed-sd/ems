@@ -28,19 +28,60 @@ $SKIP = array_merge(UAT_FORBIDDEN, [
     'guard_policies', 'guard_override_policies', 'policy_rules', 'financing_models', 'ems_event_consumers',
     'uat_runs', 'uat_evidence', 'fin_financial_periods', 'stop_reason_codes', 'units_of_measure',
     'fin_currencies', 'fin_fx_rates', 'shift_period_defs', 'org_assignment_types', 'sod_conflicts',
-    /* ══ دفاترُ «تمتلئ من الدورةِ التشغيلية» — بذرُها يُفسد الشاهدَ نفسَه ═══════
-       `docs/uat/UAT_DATA_POPULATION_MANIFEST_ar.md:28-30` يُدرج هذه الثلاثةَ تحت
-       «**هذه لا تُبذر**: تمتلئ حين تمرّ الدورةُ من الشاشات، **وامتلاؤها هو
-       الشاهد**». وكان المِلءُ العامُّ يُدرجها فأنشأ **20 مراجعةَ سعرٍ ملفَّقةً**
-       على عقودِ الشركة 4 الحقيقية: `period_key` يحمل **جملةً عربيةً** مبتورةً
-       («وفق المعتمد في م…») بدل مفتاحِ فترة، و`created_by = approved_by = 4`
-       أي **مراجعةٌ أجاز صاحبُها نفسَه** — وهو ما يمنعه
-       `PriceAdjustmentService.php:455` صراحةً (ولا قيدَ في القاعدةِ يمنعه،
-       فالباذرُ يتجاوز الخدمةَ فيتجاوز الحارس). ومنها مراجعةٌ على البند #1 من
-       العقد 1 (سعرُه الأساسيُّ 10.00) تُعلن 250.50.
-       ⇒ تُستثنى، وإلا أعاد كلُّ تشغيلٍ التلويثَ. */
-    'contract_price_terms', 'contract_price_revisions', 'contract_price_index_readings',
 ]);
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   دفاترُ «تمتلئ من الدورةِ التشغيلية» — تُقرأ من **المانفستِ نفسِه** لا تُنسَخ
+   ───────────────────────────────────────────────────────────────────────────
+   `docs/uat/UAT_DATA_POPULATION_MANIFEST_ar.md` قسمُ **ج** يُدرج 84 جدولًا تحت
+   «**هذه لا تُبذر**: تمتلئ حين تمرّ الدورةُ من الشاشات والنقاط الرسمية،
+   **وامتلاؤها هو الشاهد**». وهذا المِلءُ العامُّ كان يجهلها فأدخلها — والقياسُ
+   وجد **888 صفًّا ملفَّقًا في 53 جدولًا منها**، وفيها دفاترُ مالٍ حقيقية:
+   `contract_advances` · `guarantees` · `credit_debit_notes` ·
+   `payroll_deductions` · `employee_advances` · `worker_settlement` ·
+   `bank_statements` و`bank_statement_lines` و`bank_recon_matches` ·
+   `fin_tax_returns` · `intercompany_loans` · `waivers_reversals`.
+
+   والعطبُ ليس في العددِ بل في **نوعِ ما كُتب**: المِلءُ العامُّ يضع نصَّ ملاحظةٍ
+   في أيِّ عمودِ نصٍّ لا يعرف اسمَه، فصار في `supplier_contract_lines.unit`
+   جملةٌ («وفق المعتمد في محضر الإدارة · UA») — أي **سطرُ عقدٍ لا يستطيع محرِّكُ
+   الفوترةِ تسعيرَه**؛ وفي `contract_price_revisions.period_key` جملةٌ بدل مفتاحِ
+   فترة، مع `created_by = approved_by` أي **إجازةٌ من صاحبِ الطلب** وهي ممنوعةٌ
+   في `PriceAdjustmentService` ولا قيدَ في القاعدةِ يسندها — لأن الباذرَ يكتب
+   خامًا فيتجاوز الخدمةَ فيتجاوز الحارس.
+
+   ⇒ تُقرأ القائمةُ من المانفستِ **وقتَ التشغيل** فلا تتخلّف عنه أبدًا. وإن لم
+     يُقرأ المانفستُ **يُوقَف المِلءُ** — فالبذرُ بلا معرفةِ المُحرَّمِ هو الذي
+     أحدث هذا كلَّه، والصمتُ عنه أخطرُ من التوقف.
+   ═══════════════════════════════════════════════════════════════════════════ */
+$manifestPath = dirname(__DIR__, 3) . '/docs/uat/UAT_DATA_POPULATION_MANIFEST_ar.md';
+$cycleOnly = array();
+if (is_file($manifestPath)) {
+    $mdoc = (string) file_get_contents($manifestPath);
+    $from = strpos($mdoc, '## ج ·');
+    if ($from !== false) {
+        $to  = strpos($mdoc, '## ', $from + 4);
+        $sec = substr($mdoc, $from, ($to === false ? strlen($mdoc) : $to) - $from);
+        if (preg_match_all('~`([a-z0-9_]+)`~', $sec, $mm)) {
+            $cycleOnly = array_values(array_unique($mm[1]));
+        }
+    }
+}
+if (count($cycleOnly) < 50) {
+    fwrite(STDERR, "\n✘ لم تُقرأ قائمةُ «تمتلئ من الدورة» من المانفست ("
+        . count($cycleOnly) . " جدولًا) — أُوقف المِلءُ العامُّ صونًا للدفاتر.\n"
+        . "   المانفست: " . $manifestPath . "\n");
+    exit(1);
+}
+/* ◆ **وثغرةٌ في المانفستِ تُسدُّ هنا ويُعلَن أمرُها**: `supplier_contract_closures`
+   مُدرَجٌ في القسم ج، أما **`supplier_contracts` و`supplier_contract_lines`
+   فغائبان** — وهما محكومان بـ`SupplierContractService` و`unit` فيهما مفرداتٌ
+   مُعرَّفة (`UNIT_LABELS`). فأدخلهما المِلءُ العامُّ وكتب **نصَّ ملاحظةٍ في عمودِ
+   الوحدة**: 14 سطرًا من 20 وحدتُها جملةٌ عربيةٌ لا يعرفها محرِّكُ الفوترة. */
+$SKIP = array_values(array_unique(array_merge($SKIP, $cycleOnly, array(
+    'supplier_contracts', 'supplier_contract_lines',
+))));
+fwrite(STDOUT, '  · مُستثنًى بحكمِ المانفست (قسم ج): ' . count($cycleOnly) . " جدولًا\n");
 
 // ── معاجمُ توليدٍ عربيةٌ من واقع القطاع ──────────────────────────────────────
 $PERSONS = ['عثمان الطاهر إدريس', 'الصادق مكي عبد الرحمن', 'بابكر النور الأمين', 'الطيب موسى دفع الله',
