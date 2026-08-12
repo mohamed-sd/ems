@@ -147,7 +147,7 @@ INJ-0145	P2	لا	غيرُ مقيس
 INJ-0146	P2	لا	غيرُ مقيس	
 INJ-0147	P2	لا	غيرُ مقيس	
 INJ-0148	P2	لا	غيرُ مقيس	
-INJ-0149	P2	نعم	مُغلقٌ بشاهد	tests/_regression.php · tools/fix_runner_tests.php
+INJ-0149	P2	نعم	مُغلقٌ بشاهد	tests/regression_exit_contract_test.php · tests/_regression.php · tools/fix_runner_tests.php · tools/fix_status_report.php
 INJ-0150	P2	نعم	غيرُ مقيس	
 INJ-0151	P2	نعم	غيرُ مقيس	
 INJ-0152	P2	نعم	غيرُ مقيس	
