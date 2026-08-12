@@ -130,12 +130,27 @@ $r = OFS::openAdvance($conn, $gate, $CO, array(
     'person_id' => $A, 'amount' => 0, 'doc_ref' => 'H094T/1', 'issued_date' => '2049-04-01'), $AUTHOR);
 check(!$r['ok'] && $r['code'] === 422, 'ومبلغٌ صفريٌّ → 422');
 
+/* ══ الحكم: «الرصيدُ لا ينحرف عن حركته» — ويُقاس **بالضمانةِ لا بأثرِها الجانبي**.
+     كان الفحصُ يشترط أن **يُرفض الصفُّ كلُّه** عند كتابةِ العمودِ المولَّد. والمقيسُ
+     أن مارياDB **لا ترفض** بل **تتجاهل القيمةَ المُمرَّرةَ وتخزّن المحسوبة**
+     (`balance` = `amount` − `recovered`): أُدرج رصيدٌ كاذبٌ 9999 على 500−100
+     فخُزِّن **400**. والرفضُ يقع في الوضعِ الصارمِ وحدَه، و`sql_mode` **فارغٌ**
+     في هذا الخادم.
+     ⇒ فالحكمُ **محفوظٌ فعلًا** والفاحصُ كان يقيس آليةً لا ضمانة. وقياسُ الضمانةِ
+       أقوى: يُمرَّر كذبٌ ويُثبَت أن المخزَّنَ هو المحسوبُ لا الكذب — وهذا يبقى
+       صادقًا في الوضعين الصارمِ والمتساهلِ معًا.
+     (و`sql_mode` الفارغُ ديْنٌ يُعلَن: تشديدُه قرارُ بيئةٍ أثرُه واسع.) */
 $conn->query("INSERT INTO employee_advances (company_id, person_id, advance_type, amount, doc_ref,
               issued_date, installments_count, installment_amount, recovered, state, balance)
-              VALUES ({$CO}, {$A}, 'cash', 500, 'H094T/RAW', '2049-04-01', 1, 500, 0, 'active', 500)");
-$rawLeak = intval($conn->query("SELECT COUNT(*) n FROM employee_advances
-                                 WHERE doc_ref='H094T/RAW'")->fetch_assoc()['n']);
-check($rawLeak === 0, 'وكتابةُ `balance` (عمودٌ **مولَّد**) ترفض الصفَّ كلَّه — الرصيدُ لا ينحرف عن حركته');
+              VALUES ({$CO}, {$A}, 'cash', 500, 'H094T/RAW', '2049-04-01', 1, 500, 100, 'active', 9999)");
+$raw = $conn->query("SELECT amount, recovered, balance FROM employee_advances
+                      WHERE doc_ref='H094T/RAW'")->fetch_assoc();
+$rawOk = $raw
+      && abs((float) $raw['balance'] - ((float) $raw['amount'] - (float) $raw['recovered'])) < 0.005
+      && abs((float) $raw['balance'] - 9999.0) > 0.005;
+check($rawOk, 'الرصيدُ لا ينحرف عن حركته: مُرِّر 9999 فخُزِّن '
+      . ($raw ? number_format((float) $raw['balance'], 2) : '—') . ' = المبلغُ − المستردّ (عمودٌ مولَّد)');
+$conn->query("DELETE FROM employee_advances WHERE doc_ref='H094T/RAW'");
 
 // السلفتان السليمتان
 $r = OFS::openAdvance($conn, $gate, $CO, array(

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 03:59:59
+-- المصدر: equipation_manage · التوليد: 2026-08-12 04:14:38
 -- الجداول: 550 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -80,7 +80,8 @@ CREATE TABLE `achievement_snapshots` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_snap` (`capacity_id`,`period_from`,`period_to`),
   KEY `ix_snap_person` (`person_id`),
-  CONSTRAINT `fk_snap_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`)
+  CONSTRAINT `fk_snap_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`),
+  CONSTRAINT `ck_snap_window` CHECK (`period_to` >= `period_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: action_events ──
@@ -493,7 +494,8 @@ CREATE TABLE `asset_hour_reconciliations` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`rec_id`),
-  UNIQUE KEY `uq_ahr` (`company_id`,`equipment_id`,`period`)
+  UNIQUE KEY `uq_ahr` (`company_id`,`equipment_id`,`period`),
+  CONSTRAINT `ck_ahr_explained` CHECK (`state` <> _utf8mb4'explained' or `explanation` is not null and `explained_by` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_ownership_shares ──
@@ -521,7 +523,8 @@ CREATE TABLE `asset_ownership_shares` (
   PRIMARY KEY (`share_id`),
   KEY `ix_aos_asset` (`company_id`,`asset_kind`,`asset_id`,`valid_from`),
   KEY `ix_aos_financier` (`financier_entity_id`),
-  CONSTRAINT `fk_aos_financier` FOREIGN KEY (`financier_entity_id`) REFERENCES `legal_entities` (`entity_id`)
+  CONSTRAINT `fk_aos_financier` FOREIGN KEY (`financier_entity_id`) REFERENCES `legal_entities` (`entity_id`),
+  CONSTRAINT `ck_aos_pct` CHECK (`percent` > 0 and `percent` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: assignment_audit ──
@@ -661,7 +664,9 @@ CREATE TABLE `bank_recon_matches` (
   UNIQUE KEY `uq_recon_line` (`statement_line_id`) COMMENT 'مضاهاةٌ واحدةٌ لكل سطرِ بنك — ولا سطرَ يُطابَق مرتين',
   KEY `ix_recon_payment` (`company_id`,`payment_id`),
   KEY `ix_recon_state` (`company_id`,`state`),
-  CONSTRAINT `fk_recon_line` FOREIGN KEY (`statement_line_id`) REFERENCES `bank_statement_lines` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_recon_line` FOREIGN KEY (`statement_line_id`) REFERENCES `bank_statement_lines` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_recon_decided` CHECK (`state` not in (_utf8mb4'resolved',_utf8mb4'rejected') or `decided_by` is not null),
+  CONSTRAINT `ck_recon_diff_reason` CHECK (`state` <> _utf8mb4'open_difference' or `difference_reason` is not null and `difference_reason` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: bank_statement_lines ──
@@ -683,7 +688,8 @@ CREATE TABLE `bank_statement_lines` (
   UNIQUE KEY `uq_bank_line_key` (`company_id`,`line_key`) COMMENT 'إعادةُ استيراد الملف نفسِه **لا تُنشئ سطرًا ثانيًا**',
   KEY `ix_bank_line_stmt` (`statement_id`,`line_no`),
   KEY `ix_bank_line_match` (`company_id`,`match_state`,`txn_date`),
-  CONSTRAINT `fk_bank_line_stmt` FOREIGN KEY (`statement_id`) REFERENCES `bank_statements` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_bank_line_stmt` FOREIGN KEY (`statement_id`) REFERENCES `bank_statements` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_bank_line_amount` CHECK (`amount` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: bank_statements ──
@@ -710,7 +716,9 @@ CREATE TABLE `bank_statements` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_bank_statement` (`company_id`,`bank_account_id`,`statement_ref`) COMMENT 'كشفٌ واحدٌ لمرجعه في الحساب — إعادةُ الاستيراد تُعيده لا تُكرره',
-  KEY `ix_stmt_period` (`company_id`,`bank_account_id`,`period_from`,`period_to`)
+  KEY `ix_stmt_period` (`company_id`,`bank_account_id`,`period_from`,`period_to`),
+  CONSTRAINT `ck_stmt_closed` CHECK (`state` <> _utf8mb4'closed' or `closed_at` is not null and `closed_by` is not null),
+  CONSTRAINT `ck_stmt_span` CHECK (`period_to` >= `period_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: capacity_consumption_ledger ──
@@ -747,7 +755,9 @@ CREATE TABLE `capacity_consumption_ledger` (
   KEY `ix_led_coverage` (`coverage_id`),
   KEY `ix_led_reverses` (`reverses_led_id`),
   CONSTRAINT `fk_led_reverses` FOREIGN KEY (`reverses_led_id`) REFERENCES `capacity_consumption_ledger` (`led_id`),
-  CONSTRAINT `ck_led_qty_positive` CHECK (`qty` >= 0)
+  CONSTRAINT `ck_led_qty_positive` CHECK (`qty` >= 0),
+  CONSTRAINT `ck_led_enums_not_empty` CHECK (`effect_type` <> _utf8mb4'' and `effect_target_type` <> _utf8mb4'' and `measure_code` <> _utf8mb4''),
+  CONSTRAINT `ck_led_reversal_ref` CHECK (`effect_type` = _utf8mb4'reversal' and `reverses_led_id` is not null or `effect_type` <> _utf8mb4'reversal' and `reverses_led_id` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: capacity_financial_event_links ──
@@ -894,7 +904,10 @@ CREATE TABLE `claim_lines` (
   KEY `ix_cl_source` (`source_kind`,`source_ref`) COMMENT 'يكشف أي وحدةٍ استُخلصت في أكثر من مستخلص (حارسٌ في الاختبار)',
   KEY `ix_claim_lines_event` (`event_id`),
   KEY `ix_cl_plan_keys` (`contract_line_id`,`plan_period_id`),
-  CONSTRAINT `fk_claim_line_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`)
+  CONSTRAINT `fk_claim_line_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`),
+  CONSTRAINT `ck_dispute_evidence` CHECK (`dispute_state` = _utf8mb4'none' or `dispute_reason` is not null and `dispute_reason` <> _utf8mb4'' and `dispute_doc_ref` is not null and `dispute_doc_ref` <> _utf8mb4''),
+  CONSTRAINT `ck_dispute_flag_mirror` CHECK (`dispute_flag` = case when `dispute_state` = _utf8mb4'open' then 1 when `dispute_state` = _utf8mb4'resolved' and `resolution` = _utf8mb4'upheld' then 1 else 0 end),
+  CONSTRAINT `ck_dispute_resolution` CHECK (`dispute_state` <> _utf8mb4'resolved' or `resolution` is not null and `resolved_by` is not null and `resolution_note` is not null and `resolution_note` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: claims ──
@@ -970,7 +983,13 @@ CREATE TABLE `client_contract_lines` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ccl_line_no` (`company_id`,`contract_id`,`line_no`),
   UNIQUE KEY `uq_ccl_source` (`contract_id`,`source_commitment_id`,`valid_from`) COMMENT 'التزامٌ واحدٌ بسريانٍ واحد — «نسختان لا تكديس»',
-  KEY `ix_ccl_lookup` (`company_id`,`contract_id`,`state`,`valid_from`,`valid_to`)
+  KEY `ix_ccl_lookup` (`company_id`,`contract_id`,`state`,`valid_from`,`valid_to`),
+  CONSTRAINT `ck_ccl_planned` CHECK (`qty_planned_total` >= 0 and `qty_planned_total` <= `qty_contracted`),
+  CONSTRAINT `ck_ccl_price` CHECK (`unit_price` > 0),
+  CONSTRAINT `ck_ccl_qty` CHECK (`qty_contracted` > 0),
+  CONSTRAINT `ck_ccl_share` CHECK (`resource_share_total` >= 0 and `resource_share_total` <= 100),
+  CONSTRAINT `ck_ccl_span` CHECK (`valid_to` is null or `valid_to` >= `valid_from`),
+  CONSTRAINT `ck_ccl_tax_ref` CHECK (`tax_status` <> _utf8mb4'taxable' or `tax_code_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: client_contracts ──
@@ -1245,7 +1264,8 @@ CREATE TABLE `contract_baseline` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cb_version` (`contract_id`,`version`),
   KEY `ix_cb_state` (`company_id`,`state`),
-  CONSTRAINT `ck_cb_actors` CHECK ((`state` <> _utf8mb4'reviewed' or `reviewed_by` is not null and `reviewed_at` is not null) and (`state` not in (_utf8mb4'approved',_utf8mb4'locked') or `approved_by` is not null and `approved_at` is not null) and (`state` <> _utf8mb4'locked' or `locked_by` is not null and `locked_at` is not null and `fingerprint` is not null))
+  CONSTRAINT `ck_cb_actors` CHECK ((`state` <> _utf8mb4'reviewed' or `reviewed_by` is not null and `reviewed_at` is not null) and (`state` not in (_utf8mb4'approved',_utf8mb4'locked') or `approved_by` is not null and `approved_at` is not null) and (`state` <> _utf8mb4'locked' or `locked_by` is not null and `locked_at` is not null and `fingerprint` is not null)),
+  CONSTRAINT `ck_cb_counts` CHECK (`comp_lines` >= 0 and `comp_plan_months` >= 0 and `comp_plan_sealed` >= 0 and `comp_resource_rows` >= 0 and `comp_payment_rows` >= 0 and `comp_sites` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_commitments ──
@@ -1350,7 +1370,9 @@ CREATE TABLE `contract_guarantees` (
   CONSTRAINT `ck_cg_nature` CHECK (`kind` = _utf8mb4'cash_retention' and `nature` = _utf8mb4'asset' or `kind` <> _utf8mb4'cash_retention' and `nature` = _utf8mb4'off_balance'),
   CONSTRAINT `ck_cg_deduct` CHECK (`deductible_from_claim` = 0 or `kind` = _utf8mb4'cash_retention'),
   CONSTRAINT `ck_cg_dates` CHECK (`kind` = _utf8mb4'cash_retention' and (`due_release_date` is not null or `release_condition` is not null) or `kind` <> _utf8mb4'cash_retention' and `expiry_date` is not null),
-  CONSTRAINT `ck_cg_state_reason` CHECK (`state` not in (_utf8mb4'released',_utf8mb4'called',_utf8mb4'expired') or `state_reason` is not null)
+  CONSTRAINT `ck_cg_state_reason` CHECK (`state` not in (_utf8mb4'released',_utf8mb4'called',_utf8mb4'expired') or `state_reason` is not null),
+  CONSTRAINT `ck_cg_amount` CHECK (`amount` >= 0),
+  CONSTRAINT `ck_cg_percent` CHECK (`percent_value` is null or `percent_value` >= 0 and `percent_value` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_hour_policies ──
@@ -1400,7 +1422,8 @@ CREATE TABLE `contract_hour_policies` (
   KEY `ix_lookup_obligation` (`company_id`,`party_scope`,`contract_ref`,`obligation_type`,`ops_state`),
   KEY `ix_policy_state` (`company_id`,`party_scope`,`policy_state`),
   KEY `ix_policy_superseded` (`superseded_by`),
-  CONSTRAINT `ck_chp_superseded` CHECK (`policy_state` <> _utf8mb4'superseded' or `superseded_by` is not null)
+  CONSTRAINT `ck_chp_superseded` CHECK (`policy_state` <> _utf8mb4'superseded' or `superseded_by` is not null),
+  CONSTRAINT `ck_chp_expired_note` CHECK (`policy_state` <> _utf8mb4'expired' or `state_note` is not null and `state_note` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_lifecycle_events ──
@@ -1454,7 +1477,8 @@ CREATE TABLE `contract_monthly_plan` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cmp_month` (`line_id`,`plan_version`,`period_month`) COMMENT 'شهرٌ واحدٌ لكل (بند × نسخة) — لا تكديسَ ولا ازدواج',
   KEY `ix_cmp_lookup` (`company_id`,`contract_id`,`plan_version`,`period_month`),
-  CONSTRAINT `fk_cmp_line` FOREIGN KEY (`line_id`) REFERENCES `client_contract_lines` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_cmp_line` FOREIGN KEY (`line_id`) REFERENCES `client_contract_lines` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_cmp_qty` CHECK (`qty_planned` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_notes ──
@@ -1532,7 +1556,10 @@ CREATE TABLE `contract_operational_sites` (
   KEY `ix_cos_lookup` (`company_id`,`contract_id`,`state`),
   KEY `ix_cos_site` (`company_id`,`site_id`),
   KEY `fk_cos_site` (`site_id`),
-  CONSTRAINT `fk_cos_site` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`)
+  CONSTRAINT `fk_cos_site` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`),
+  CONSTRAINT `ck_cos_closed` CHECK (`state` <> _utf8mb4'closed' or `close_reason` is not null and `close_reason` <> _utf8mb4''),
+  CONSTRAINT `ck_cos_name` CHECK (`scope_name` <> _utf8mb4''),
+  CONSTRAINT `ck_cos_span` CHECK (`start_date` is null or `end_date` is null or `end_date` >= `start_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_payment_schedule ──
@@ -1576,7 +1603,12 @@ CREATE TABLE `contract_payment_schedule` (
   KEY `ix_cps_lookup` (`company_id`,`contract_id`,`state`,`due_date`),
   KEY `ix_cps_live` (`contract_id`,`effective_to`),
   CONSTRAINT `ck_cps_treatment` CHECK (`advance_type` is null and `treatment` is null or `advance_type` = _utf8mb4'recoverable' and `treatment` = _utf8mb4'liability' or `advance_type` = _utf8mb4'non_refundable_booking' and `treatment` = _utf8mb4'revenue' or `advance_type` = _utf8mb4'milestone_earned' and `treatment` = _utf8mb4'revenue' or `advance_type` = _utf8mb4'mobilization' and `treatment` is not null and `treatment_basis` is not null),
-  CONSTRAINT `ck_cps_advance_link` CHECK (`advance_id` is null or `treatment` = _utf8mb4'liability')
+  CONSTRAINT `ck_cps_advance_link` CHECK (`advance_id` is null or `treatment` = _utf8mb4'liability'),
+  CONSTRAINT `ck_cps_advance_type` CHECK ((`payment_kind` <> _utf8mb4'advance' or `advance_type` is not null) and (`payment_kind` = _utf8mb4'advance' or `advance_type` is null)),
+  CONSTRAINT `ck_cps_amounts` CHECK (`amount_expected` >= 0 and `received_amount` >= 0 and `received_amount` <= `amount_expected`),
+  CONSTRAINT `ck_cps_due` CHECK (`due_date` is not null or `due_condition` is not null),
+  CONSTRAINT `ck_cps_percent` CHECK ((`amount_basis` <> _utf8mb4'percent' or `percent_value` is not null and `percent_value` > 0 and `percent_value` <= 100) and (`percent_value` is null or `percent_value` >= 0 and `percent_value` <= 100)),
+  CONSTRAINT `ck_cps_window` CHECK (`effective_to` is null or `effective_to` >= `effective_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_penalty_assessments ──
@@ -1671,7 +1703,9 @@ CREATE TABLE `contract_price_index_readings` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_price_index_reading` (`company_id`,`index_code`,`reading_date`)
+  UNIQUE KEY `uq_price_index_reading` (`company_id`,`index_code`,`reading_date`),
+  CONSTRAINT `ck_price_index_ref` CHECK (char_length(trim(`source_ref`)) > 0),
+  CONSTRAINT `ck_price_index_value` CHECK (`value` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_price_revisions ──
@@ -1731,7 +1765,11 @@ CREATE TABLE `contract_price_terms` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_price_term_scope` (`contract_id`,`contract_item_id`,`trigger_kind`,`valid_from`),
   KEY `ix_price_term_co` (`company_id`,`contract_id`,`state`),
-  CONSTRAINT `fk_price_term_contract` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`)
+  CONSTRAINT `fk_price_term_contract` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
+  CONSTRAINT `ck_price_term_base` CHECK (`base_index` > 0),
+  CONSTRAINT `ck_price_term_cap` CHECK (`cap_percent` is null or `cap_percent` > 0),
+  CONSTRAINT `ck_price_term_pass` CHECK (`pass_through_percent` > 0 and `pass_through_percent` <= 100),
+  CONSTRAINT `ck_price_term_threshold` CHECK (`threshold_percent` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_resource_plan ──
@@ -1771,7 +1809,13 @@ CREATE TABLE `contract_resource_plan` (
   KEY `ix_crp_lookup` (`company_id`,`contract_id`,`state`),
   KEY `ix_crp_type` (`equipment_type_id`),
   CONSTRAINT `fk_crp_line` FOREIGN KEY (`line_id`) REFERENCES `client_contract_lines` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_crp_type` FOREIGN KEY (`equipment_type_id`) REFERENCES `equipments_types` (`id`)
+  CONSTRAINT `fk_crp_type` FOREIGN KEY (`equipment_type_id`) REFERENCES `equipments_types` (`id`),
+  CONSTRAINT `ck_crp_counts` CHECK (`count_basic` >= 0 and `count_backup` >= 0 and `shifts_per_day` >= 1 and `shifts_per_day` <= 4 and `hours_per_shift` >= 0 and `hours_per_shift` <= 24 and `operators_count` >= 0 and `supervisors_count` >= 0 and `technicians_count` >= 0 and `assistants_count` >= 0),
+  CONSTRAINT `ck_crp_ended` CHECK (`state` <> _utf8mb4'ended' or `end_reason` is not null),
+  CONSTRAINT `ck_crp_productive` CHECK (`share_kind` <> _utf8mb4'productive' or `capacity_share_percent` > 0),
+  CONSTRAINT `ck_crp_share` CHECK (`capacity_share_percent` >= 0 and `capacity_share_percent` <= 100),
+  CONSTRAINT `ck_crp_window` CHECK (`valid_to` is null or `valid_to` >= `valid_from`),
+  CONSTRAINT `ck_crp_zero_share` CHECK (`share_kind` = _utf8mb4'productive' or `capacity_share_percent` = 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_snapshots ──
@@ -1929,7 +1973,8 @@ CREATE TABLE `coverage_settlement_lines` (
   PRIMARY KEY (`ln_id`),
   KEY `ix_csl_cov` (`cov_id`,`party`),
   KEY `ix_csl_company` (`company_id`,`settlement_ref`),
-  CONSTRAINT `fk_csl_cov` FOREIGN KEY (`cov_id`) REFERENCES `substitute_coverages` (`cov_id`)
+  CONSTRAINT `fk_csl_cov` FOREIGN KEY (`cov_id`) REFERENCES `substitute_coverages` (`cov_id`),
+  CONSTRAINT `ck_csl_enums_not_empty` CHECK (`party` <> _utf8mb4'' and `effect` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: credit_debit_notes ──
@@ -2054,7 +2099,8 @@ CREATE TABLE `deduction_proposals` (
   UNIQUE KEY `uq_dp_source` (`person_id`,`period`,`source`,`source_ref`),
   KEY `ix_dp_state` (`company_id`,`period`,`state`),
   CONSTRAINT `chk_ded_prop_two_hands` CHECK (`approved_by` is null or `proposed_by` is null or `approved_by` <> `proposed_by`),
-  CONSTRAINT `chk_ded_prop_review_hand` CHECK (`approved_by` is null or `reviewed_by` is null or `approved_by` <> `reviewed_by`)
+  CONSTRAINT `chk_ded_prop_review_hand` CHECK (`approved_by` is null or `reviewed_by` is null or `approved_by` <> `reviewed_by`),
+  CONSTRAINT `ck_dp_posted_needs_approval` CHECK (`state` <> _utf8mb4'Posted' or `approvals_ref` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: deduction_types ──
@@ -2068,7 +2114,8 @@ CREATE TABLE `deduction_types` (
   `requires_approval` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'دائمًا 1 — لا خصم آلي الترحيل في أي إدارة',
   PRIMARY KEY (`ded_id`),
   KEY `ix_dt_policy` (`policy_id`),
-  CONSTRAINT `fk_dt_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`)
+  CONSTRAINT `fk_dt_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`),
+  CONSTRAINT `ck_dt_approval` CHECK (`requires_approval` = 1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: dept_policies ──
@@ -2243,7 +2290,11 @@ CREATE TABLE `employee_advances` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_adv_person_state` (`person_id`,`state`),
-  KEY `ix_adv_co` (`company_id`,`state`)
+  KEY `ix_adv_co` (`company_id`,`state`),
+  CONSTRAINT `ck_adv_amount` CHECK (`amount` > 0),
+  CONSTRAINT `ck_adv_doc` CHECK (char_length(trim(`doc_ref`)) > 0),
+  CONSTRAINT `ck_adv_inst` CHECK (`installments_count` >= 1 and `installment_amount` > 0),
+  CONSTRAINT `ck_adv_recovered` CHECK (`recovered` >= 0 and `recovered` <= `amount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_contract_amendments ──
@@ -2309,7 +2360,9 @@ CREATE TABLE `employee_contracts` (
   KEY `fk_ec_pay_model` (`pay_model_id`),
   CONSTRAINT `fk_ec_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
   CONSTRAINT `fk_ec_pay_model` FOREIGN KEY (`pay_model_id`) REFERENCES `pay_models` (`id`),
-  CONSTRAINT `fk_ec_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`)
+  CONSTRAINT `fk_ec_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
+  CONSTRAINT `ck_ec_eos_days` CHECK (`eos_days_per_year` is null or `eos_days_per_year` > 0),
+  CONSTRAINT `ck_ec_leave_days` CHECK (`leave_days_per_year` is null or `leave_days_per_year` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_final_settlement_lines ──
@@ -2363,7 +2416,12 @@ CREATE TABLE `employee_final_settlements` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_final_settlement` (`contract_id`) COMMENT '«بمفتاح (العقد × التصفية) لا يتكرر»',
   KEY `ix_final_settlement` (`company_id`,`employee_id`,`state`),
-  CONSTRAINT `fk_fs_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_fs_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_fs_approved` CHECK (`state` <> _utf8mb4'approved' or `approved_by` is not null and `clearance_doc` is not null and `clearance_doc` <> _utf8mb4''),
+  CONSTRAINT `ck_fs_cancel` CHECK (`state` <> _utf8mb4'cancelled' or `cancel_reason` is not null and `cancel_reason` <> _utf8mb4''),
+  CONSTRAINT `ck_fs_hands` CHECK (`approved_by` is null or `prepared_by` is null or `approved_by` <> `prepared_by`),
+  CONSTRAINT `ck_fs_net` CHECK (`net_amount` >= 0),
+  CONSTRAINT `ck_fs_offset` CHECK (`advances_offset` >= 0 and `advances_remaining` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: employee_roles ──
@@ -2686,7 +2744,8 @@ CREATE TABLE `entity_ownership` (
   PRIMARY KEY (`own_id`),
   KEY `ix_eo_owned` (`owned_entity_id`,`valid_from`),
   KEY `ix_eo_owner` (`owner_type`,`owner_id`),
-  CONSTRAINT `fk_eo_owned` FOREIGN KEY (`owned_entity_id`) REFERENCES `legal_entities` (`entity_id`)
+  CONSTRAINT `fk_eo_owned` FOREIGN KEY (`owned_entity_id`) REFERENCES `legal_entities` (`entity_id`),
+  CONSTRAINT `ck_eo_pct` CHECK (`percent` > 0 and `percent` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: entity_roles ──
@@ -2901,7 +2960,8 @@ CREATE TABLE `evaluations` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_eval` (`capacity_id`,`period_from`,`period_to`),
-  CONSTRAINT `fk_eval_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`)
+  CONSTRAINT `fk_eval_capacity` FOREIGN KEY (`capacity_id`) REFERENCES `user_capacities` (`id`),
+  CONSTRAINT `ck_eval_approved` CHECK (`state` <> _utf8mb4'Approved' or `approved_by` is not null and `approved_at` is not null and `final_score` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: event_consumers ──
@@ -3859,7 +3919,9 @@ CREATE TABLE `fin_collection_allocations` (
   KEY `fk_alloc_receivable` (`receivable_id`),
   CONSTRAINT `fk_alloc_payment` FOREIGN KEY (`payment_id`) REFERENCES `fin_payments` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_alloc_receivable` FOREIGN KEY (`receivable_id`) REFERENCES `fin_receivables` (`id`),
-  CONSTRAINT `ck_alloc_target` CHECK (`target_ref` > 0 and (`target_kind` = _utf8mb4'invoice' and `receivable_id` is not null and `target_ref` = `receivable_id` or `target_kind` <> _utf8mb4'invoice' and `receivable_id` is null))
+  CONSTRAINT `ck_alloc_target` CHECK (`target_ref` > 0 and (`target_kind` = _utf8mb4'invoice' and `receivable_id` is not null and `target_ref` = `receivable_id` or `target_kind` <> _utf8mb4'invoice' and `receivable_id` is null)),
+  CONSTRAINT `ck_alloc_amount` CHECK (`amount` > 0),
+  CONSTRAINT `ck_alloc_fx` CHECK (`amount_target` >= 0 and `base_amount` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_contract_fields ──
@@ -4348,7 +4410,8 @@ CREATE TABLE `fin_financial_events` (
   KEY `ix_ffe_source_line` (`company_id`,`entity_type`,`entity_id`,`source_line_id`,`source_doc_version`),
   KEY `fk_ffe_period` (`fiscal_period_id`),
   CONSTRAINT `fk_ffe_period` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fin_financial_periods` (`id`),
-  CONSTRAINT `fk_ffe_root` FOREIGN KEY (`root_event_id`) REFERENCES `ems_business_events` (`id`)
+  CONSTRAINT `fk_ffe_root` FOREIGN KEY (`root_event_id`) REFERENCES `ems_business_events` (`id`),
+  CONSTRAINT `ck_ffe_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_financial_periods ──
@@ -4447,7 +4510,9 @@ CREATE TABLE `fin_fx_differences` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fxd_source` (`kind`,`source_kind`,`source_ref`),
-  KEY `ix_fxd_lookup` (`company_id`,`kind`,`occurred_on`)
+  KEY `ix_fxd_lookup` (`company_id`,`kind`,`occurred_on`),
+  CONSTRAINT `ck_fxd_amount` CHECK (`amount` <> 0),
+  CONSTRAINT `ck_fxd_currency` CHECK (`functional_currency` <> _utf8mb4'' and `from_currency` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_fx_rates ──
@@ -4593,7 +4658,9 @@ CREATE TABLE `fin_maint_provision_rules` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mprov_rule` (`company_id`,`equipment_id`,`equipment_type`,`basis`,`effective_from`),
-  KEY `ix_mprov_rule_lookup` (`company_id`,`state`,`effective_from`,`effective_to`)
+  KEY `ix_mprov_rule_lookup` (`company_id`,`state`,`effective_from`,`effective_to`),
+  CONSTRAINT `ck_mprov_rate` CHECK (`rate` > 0),
+  CONSTRAINT `ck_mprov_span` CHECK (`effective_to` is null or `effective_to` >= `effective_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_maint_provisions ──
@@ -4616,7 +4683,9 @@ CREATE TABLE `fin_maint_provisions` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_maint_provision` (`company_id`,`equipment_id`,`period_ref`) COMMENT '«بمفتاح (المعدة × الفترة)» بنيويًّا',
   KEY `ix_mprov_period` (`company_id`,`period_ref`),
-  KEY `ix_mprov_event` (`event_id`)
+  KEY `ix_mprov_event` (`event_id`),
+  CONSTRAINT `ck_mprov_amount` CHECK (`amount` >= 0),
+  CONSTRAINT `ck_mprov_rule_src` CHECK (`amount` = 0 or `rule_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_margin_analysis ──
@@ -4943,7 +5012,8 @@ CREATE TABLE `fin_payments` (
   KEY `ix_fin_pay_dir` (`company_id`,`direction`),
   KEY `ix_fin_pay_state` (`company_id`,`state`),
   KEY `ix_fin_pay_deleted` (`is_deleted`),
-  CONSTRAINT `ck_pay_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2))
+  CONSTRAINT `ck_pay_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2)),
+  CONSTRAINT `ck_fp_allocated` CHECK (`allocated_amount` >= 0 and `allocated_amount` <= `amount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_posting_matrix ──
@@ -5253,7 +5323,8 @@ CREATE TABLE `fin_requests` (
   KEY `ix_req_parent` (`parent_request_id`),
   KEY `ix_req_settlement` (`settlement_id`),
   CONSTRAINT `fk_req_parent` FOREIGN KEY (`parent_request_id`) REFERENCES `fin_requests` (`id`),
-  CONSTRAINT `fk_req_settlement` FOREIGN KEY (`settlement_id`) REFERENCES `settlements` (`id`)
+  CONSTRAINT `fk_req_settlement` FOREIGN KEY (`settlement_id`) REFERENCES `settlements` (`id`),
+  CONSTRAINT `chk_party_payment_needs_settlement` CHECK (`request_type` not in (_utf8mb4'supplier_payment',_utf8mb4'employee_payment',_utf8mb4'settlement') or `settlement_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_role_migration ──
@@ -5410,7 +5481,8 @@ CREATE TABLE `fin_tax_returns` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_tax_return` (`company_id`,`period_ref`) COMMENT '«بمفتاح الفترة»',
-  KEY `ix_tax_return_state` (`company_id`,`state`)
+  KEY `ix_tax_return_state` (`company_id`,`state`),
+  CONSTRAINT `ck_taxret_filed` CHECK (`state` <> _utf8mb4'filed' or `filed_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_tax_transactions ──
@@ -5547,7 +5619,8 @@ CREATE TABLE `financing_deviations` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`dev_id`),
   UNIQUE KEY `uq_fd_subject` (`company_id`,`dev_type`,`subject_ref`),
-  KEY `ix_fd_state` (`company_id`,`state`,`priority`)
+  KEY `ix_fd_state` (`company_id`,`state`,`priority`),
+  CONSTRAINT `ck_fd_close_needs_decision` CHECK (`state` <> _utf8mb4'closed' or `decision` is not null and `decision_doc_ref` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: financing_installments ──
@@ -6520,7 +6593,8 @@ CREATE TABLE `intercompany_loans` (
   KEY `fk_icl_lender` (`lender_entity_id`),
   KEY `fk_icl_borrower` (`borrower_entity_id`),
   CONSTRAINT `fk_icl_borrower` FOREIGN KEY (`borrower_entity_id`) REFERENCES `legal_entities` (`entity_id`),
-  CONSTRAINT `fk_icl_lender` FOREIGN KEY (`lender_entity_id`) REFERENCES `legal_entities` (`entity_id`)
+  CONSTRAINT `fk_icl_lender` FOREIGN KEY (`lender_entity_id`) REFERENCES `legal_entities` (`entity_id`),
+  CONSTRAINT `ck_icl_not_self` CHECK (`lender_entity_id` <> `borrower_entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: job_titles ──
@@ -6639,7 +6713,9 @@ CREATE TABLE `meter_readings` (
   UNIQUE KEY `uq_meter_reading_day` (`equipment_id`,`meter_type`,`reading_date`),
   KEY `ix_meter_latest` (`equipment_id`,`meter_type`,`chain_no`,`reading_date`),
   KEY `ix_meter_co` (`company_id`,`reading_date`),
-  CONSTRAINT `fk_meter_reading_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`)
+  CONSTRAINT `fk_meter_reading_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`),
+  CONSTRAINT `ck_meter_reset_doc` CHECK (`is_reset` = 0 or `reset_doc_ref` is not null and char_length(trim(`reset_doc_ref`)) > 0),
+  CONSTRAINT `ck_meter_value` CHECK (`value` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_breakdown ──
@@ -6958,7 +7034,8 @@ CREATE TABLE `monthly_performance` (
   UNIQUE KEY `uq_mp_seat_period` (`company_id`,`container_id`,`period`),
   KEY `ix_mp_contract` (`company_id`,`contract_id`,`period`),
   KEY `fk_mp_container` (`container_id`),
-  CONSTRAINT `fk_mp_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`)
+  CONSTRAINT `fk_mp_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`),
+  CONSTRAINT `ck_mp_hours` CHECK (`contract_hours` >= 0 and `executed_hours` >= 0 and `standby_hours` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: monthly_performance_downtime ──
@@ -6981,7 +7058,8 @@ CREATE TABLE `monthly_performance_downtime` (
   KEY `fk_mpd_obligation` (`obligation_id`),
   CONSTRAINT `fk_mpd_obligation` FOREIGN KEY (`obligation_id`) REFERENCES `contract_obligations` (`id`),
   CONSTRAINT `fk_mpd_perf` FOREIGN KEY (`perf_id`) REFERENCES `monthly_performance` (`id`),
-  CONSTRAINT `fk_mpd_reason` FOREIGN KEY (`reason_code`) REFERENCES `stop_reason_codes` (`code`)
+  CONSTRAINT `fk_mpd_reason` FOREIGN KEY (`reason_code`) REFERENCES `stop_reason_codes` (`code`),
+  CONSTRAINT `ck_mpd_hours` CHECK (`hours` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav09_action_alias ──
@@ -7136,7 +7214,8 @@ CREATE TABLE `op_containers` (
   CONSTRAINT `fk_oc_parent_obl` FOREIGN KEY (`parent_id`, `obl_id`) REFERENCES `op_containers` (`id`, `obl_id`),
   CONSTRAINT `ck_container_alloc` CHECK (`allocated_qty` >= 0 and `allocated_qty` <= `cap_qty`),
   CONSTRAINT `ck_container_consumed` CHECK (`consumed_qty` >= 0 and `consumed_qty` <= `cap_qty`),
-  CONSTRAINT `ck_container_parent` CHECK (`level` = 'رئيسية' and `parent_id` is null or `level` <> 'رئيسية' and `parent_id` is not null)
+  CONSTRAINT `ck_container_parent` CHECK (`level` = 'رئيسية' and `parent_id` is null or `level` <> 'رئيسية' and `parent_id` is not null),
+  CONSTRAINT `ck_container_cap` CHECK (`cap_qty` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: operations ──
@@ -7338,7 +7417,8 @@ CREATE TABLE `ownership_access_grants` (
   `revoked_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`grant_id`),
-  KEY `ix_oag_person` (`company_id`,`person_id`,`permission_code`,`state`)
+  KEY `ix_oag_person` (`company_id`,`person_id`,`permission_code`,`state`),
+  CONSTRAINT `ck_oag_value_strict` CHECK (`permission_code` <> _utf8mb4'ownership.purchase_value' or `reason` is not null and `valid_from` is not null and `valid_to` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: pay_components ──
@@ -7412,7 +7492,8 @@ CREATE TABLE `payroll_absence_types` (
   `conduct_violation` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'A2: مخالفة سلوكية تُسجَّل — أثر ثانٍ مستقل',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_absence_type` (`company_id`,`event_type`),
-  UNIQUE KEY `uq_absence_code` (`company_id`,`code`)
+  UNIQUE KEY `uq_absence_code` (`company_id`,`code`),
+  CONSTRAINT `ck_absence_pct` CHECK (`deduct_percent` >= 0 and `deduct_percent` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_deductions ──
@@ -7432,7 +7513,10 @@ CREATE TABLE `payroll_deductions` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_payroll_deduction` (`run_id`,`person_id`,`source_type`,`source_id`),
   KEY `ix_deduction_run` (`run_id`),
-  CONSTRAINT `fk_deduction_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_deduction_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_deduction_amount` CHECK (`amount` >= 0),
+  CONSTRAINT `ck_deduction_doc` CHECK (char_length(trim(`doc_ref`)) > 0),
+  CONSTRAINT `ck_deduction_src` CHECK (`source_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_lines ──
@@ -7507,7 +7591,8 @@ CREATE TABLE `payroll_runs` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_payroll_run_key` (`company_id`,`period_from`,`period_to`,`category_filter`),
-  KEY `ix_payroll_run_state` (`company_id`,`state`)
+  KEY `ix_payroll_run_state` (`company_id`,`state`),
+  CONSTRAINT `ck_payroll_run_period` CHECK (`period_to` >= `period_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_settings ──
@@ -7520,7 +7605,8 @@ CREATE TABLE `payroll_settings` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_payroll_settings_co` (`company_id`)
+  UNIQUE KEY `uq_payroll_settings_co` (`company_id`),
+  CONSTRAINT `ck_protection_pct` CHECK (`protection_percent` is null or `protection_percent` >= 0 and `protection_percent` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: payroll_time_inputs ──
@@ -7538,7 +7624,9 @@ CREATE TABLE `payroll_time_inputs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_time_input` (`run_id`,`person_id`,`kind`),
   KEY `ix_time_input_co` (`company_id`,`run_id`),
-  CONSTRAINT `fk_time_input_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_time_input_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_time_input_doc` CHECK (char_length(trim(`doc_ref`)) > 0),
+  CONSTRAINT `ck_time_input_qty` CHECK (`qty` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: perm_shadow_diffs ──
@@ -7635,7 +7723,8 @@ CREATE TABLE `permission_exceptions` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`ex_id`),
   KEY `idx_ex_person` (`company_id`,`person_id`,`state`),
-  KEY `idx_ex_expiry` (`state`,`valid_to`)
+  KEY `idx_ex_expiry` (`state`,`valid_to`),
+  CONSTRAINT `chk_bg_24h` CHECK (`is_break_glass` = 0 or timestampdiff(HOUR,`valid_from`,`valid_to`) <= 24)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: permission_review_cycles ──
@@ -8698,7 +8787,8 @@ CREATE TABLE `rfq_awards` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_award` (`line_id`,`supplier_id`) COMMENT 'ترسيةٌ واحدةٌ لكل (بند × مورد)',
   KEY `ix_rfq_award` (`company_id`,`rfq_id`),
-  CONSTRAINT `fk_rfq_award_line` FOREIGN KEY (`line_id`) REFERENCES `rfq_lines` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_rfq_award_line` FOREIGN KEY (`line_id`) REFERENCES `rfq_lines` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_rfq_award_qty` CHECK (`qty_awarded` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: rfq_lines ──
@@ -8716,7 +8806,9 @@ CREATE TABLE `rfq_lines` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_line` (`rfq_id`,`commitment_id`) COMMENT 'التزامٌ واحدٌ = بندٌ واحدٌ في الطلب — لا اشتقاقَ مضاعف',
   KEY `ix_rfq_line` (`company_id`,`rfq_id`),
-  CONSTRAINT `fk_rfq_line_rfq` FOREIGN KEY (`rfq_id`) REFERENCES `supplier_rfqs` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_rfq_line_rfq` FOREIGN KEY (`rfq_id`) REFERENCES `supplier_rfqs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_rfq_line_award` CHECK (`qty_awarded` >= 0 and `qty_awarded` <= `qty_required`),
+  CONSTRAINT `ck_rfq_line_qty` CHECK (`qty_required` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: rfq_quotes ──
@@ -8737,7 +8829,8 @@ CREATE TABLE `rfq_quotes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_quote` (`line_id`,`supplier_id`) COMMENT 'عرضٌ واحدٌ لكل (بند × مورد) — والتعديلُ استبدالٌ لا تكديس',
   KEY `ix_rfq_quote` (`company_id`,`rfq_id`,`supplier_id`),
-  CONSTRAINT `fk_rfq_quote_line` FOREIGN KEY (`line_id`) REFERENCES `rfq_lines` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_rfq_quote_line` FOREIGN KEY (`line_id`) REFERENCES `rfq_lines` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_rfq_quote_price` CHECK (`unit_price` > 0 and `qty_offered` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: risk_acceptances ──
@@ -10679,7 +10772,8 @@ CREATE TABLE `seat_assignments` (
   KEY `fk_sa_container` (`container_id`),
   KEY `ix_sa_supplier_line` (`supplier_contract_line_id`),
   CONSTRAINT `fk_sa_container` FOREIGN KEY (`container_id`) REFERENCES `op_containers` (`id`),
-  CONSTRAINT `ck_sa_standby_zero` CHECK (`activation_state` = _utf8mb4'active' or coalesce(`planned_qty_month`,0) = 0 and coalesce(`planned_qty_total`,0) = 0)
+  CONSTRAINT `ck_sa_standby_zero` CHECK (`activation_state` = _utf8mb4'active' or coalesce(`planned_qty_month`,0) = 0 and coalesce(`planned_qty_total`,0) = 0),
+  CONSTRAINT `ck_sa_dates` CHECK (`date_to` is null or `date_to` >= `date_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: sec_actions ──
@@ -11044,7 +11138,9 @@ CREATE TABLE `substitute_coverages` (
   KEY `ix_cov_seat` (`company_id`,`covered_seat_id`,`valid_from`),
   KEY `ix_cov_supplier` (`company_id`,`covering_supplier_id`,`state`),
   KEY `fk_cov_seat` (`covered_seat_id`),
-  CONSTRAINT `fk_cov_seat` FOREIGN KEY (`covered_seat_id`) REFERENCES `op_containers` (`id`)
+  CONSTRAINT `fk_cov_seat` FOREIGN KEY (`covered_seat_id`) REFERENCES `op_containers` (`id`),
+  CONSTRAINT `ck_cov_dates` CHECK (`valid_to` >= `valid_from`),
+  CONSTRAINT `ck_cov_reason_governed` CHECK (`reason_code` <> _utf8mb4'' and `level` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: super_admin_password_resets ──
@@ -11088,7 +11184,9 @@ CREATE TABLE `supplier_advance_recoveries` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sadv_recovery` (`advance_id`,`settlement_id`),
   KEY `ix_sadv_rec_settlement` (`settlement_id`),
-  CONSTRAINT `fk_sadv_rec_advance` FOREIGN KEY (`advance_id`) REFERENCES `supplier_advance_requests` (`id`)
+  CONSTRAINT `fk_sadv_rec_advance` FOREIGN KEY (`advance_id`) REFERENCES `supplier_advance_requests` (`id`),
+  CONSTRAINT `ck_sadv_rec_amount` CHECK (`amount` > 0),
+  CONSTRAINT `ck_sadv_rec_doc` CHECK (char_length(trim(`doc_ref`)) > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_advance_requests ──
@@ -11119,7 +11217,10 @@ CREATE TABLE `supplier_advance_requests` (
   KEY `ix_sadv_supplier_state` (`supplier_id`,`state`),
   KEY `ix_sadv_co` (`company_id`,`state`),
   CONSTRAINT `fk_sadv_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`),
-  CONSTRAINT `ck_sadv_inst` CHECK (`installments_count` >= 1 and `installment_amount` > 0)
+  CONSTRAINT `ck_sadv_inst` CHECK (`installments_count` >= 1 and `installment_amount` > 0),
+  CONSTRAINT `ck_sadv_amount` CHECK (`amount` > 0),
+  CONSTRAINT `ck_sadv_doc` CHECK (char_length(trim(`doc_ref`)) > 0),
+  CONSTRAINT `ck_sadv_recovered` CHECK (`recovered` >= 0 and `recovered` <= `amount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_capacity ──
@@ -11145,7 +11246,10 @@ CREATE TABLE `supplier_capacity` (
   KEY `ix_sup_capacity_eq` (`company_id`,`equipment_id`,`state`),
   KEY `fk_sup_capacity_equipment` (`equipment_id`),
   CONSTRAINT `fk_sup_capacity_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_sup_capacity_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`)
+  CONSTRAINT `fk_sup_capacity_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`),
+  CONSTRAINT `ck_sup_capacity_daily` CHECK (`theoretical_daily` > 0),
+  CONSTRAINT `ck_sup_capacity_readiness` CHECK (`min_readiness_percent` is null or `min_readiness_percent` > 0 and `min_readiness_percent` <= 100),
+  CONSTRAINT `ck_sup_capacity_replace` CHECK (`replace_hours` is null or `replace_hours` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_charge_rules ──
@@ -11169,7 +11273,9 @@ CREATE TABLE `supplier_charge_rules` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_charge_rule` (`contract_id`,`charge_type`,`valid_from`),
   KEY `ix_charge_rule_co` (`company_id`,`contract_id`,`state`),
-  CONSTRAINT `fk_charge_rule_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_charge_rule_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_charge_rule_cap` CHECK (`cap` is null or `cap` > 0),
+  CONSTRAINT `ck_charge_rule_rate` CHECK (`pricing` = _utf8mb4'cost' or `rate` is not null and `rate` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contract_closures ──
@@ -11200,7 +11306,9 @@ CREATE TABLE `supplier_contract_closures` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_closure` (`contract_id`) COMMENT 'تصفيةٌ واحدةٌ للعقد — «بمفتاح (العقد × التصفية)»',
   KEY `ix_sup_closure` (`company_id`,`supplier_id`,`state`),
-  CONSTRAINT `fk_sup_closure_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_sup_closure_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_sup_closure_doc` CHECK (`state` <> _utf8mb4'closed' or `clearance_doc` is not null and `clearance_doc` <> _utf8mb4''),
+  CONSTRAINT `ck_sup_closure_release` CHECK (`guarantee_released_at` is null or `guarantee_due_ref` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contract_lines ──
@@ -11236,7 +11344,8 @@ CREATE TABLE `supplier_contract_lines` (
   KEY `ix_sup_line_co` (`company_id`,`contract_id`),
   KEY `ix_sup_line_obl` (`contract_obligation_ref`),
   CONSTRAINT `fk_sup_line_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `ck_sup_line_standby` CHECK (`standby_basis` = _utf8mb4'none' and `standby_rate` is null or `standby_basis` <> _utf8mb4'none' and `standby_rate` is not null and `standby_rate` > 0)
+  CONSTRAINT `ck_sup_line_standby` CHECK (`standby_basis` = _utf8mb4'none' and `standby_rate` is null or `standby_basis` <> _utf8mb4'none' and `standby_rate` is not null and `standby_rate` > 0),
+  CONSTRAINT `ck_sup_line_price` CHECK (`unit_price` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_contract_notes ──
@@ -11282,7 +11391,10 @@ CREATE TABLE `supplier_contracts` (
   KEY `ix_sup_contract_co_state` (`company_id`,`state`),
   KEY `ix_sup_contract_client` (`client_contract_id`),
   CONSTRAINT `fk_sup_contract_client` FOREIGN KEY (`client_contract_id`) REFERENCES `contracts` (`id`),
-  CONSTRAINT `fk_sup_contract_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`)
+  CONSTRAINT `fk_sup_contract_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`),
+  CONSTRAINT `ck_sup_advance_payment` CHECK (`advance_payment` is null or `advance_payment` > 0),
+  CONSTRAINT `ck_sup_guarantee_amount` CHECK (`performance_guarantee` is null or `performance_guarantee` > 0),
+  CONSTRAINT `ck_sup_guarantee_days` CHECK (`performance_guarantee` is null or `guarantee_retention_days` is not null and `guarantee_retention_days` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_evaluation_lines ──
@@ -11301,7 +11413,8 @@ CREATE TABLE `supplier_evaluation_lines` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_eval_line` (`evaluation_id`,`indicator`),
-  CONSTRAINT `fk_sup_eval_line` FOREIGN KEY (`evaluation_id`) REFERENCES `supplier_evaluations` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_sup_eval_line` FOREIGN KEY (`evaluation_id`) REFERENCES `supplier_evaluations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_sup_eval_ratio` CHECK (`ratio` is null or `ratio` >= 0 and `ratio` <= 1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_evaluation_weights ──
@@ -11317,7 +11430,9 @@ CREATE TABLE `supplier_evaluation_weights` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_sup_eval_weight` (`company_id`,`indicator`)
+  UNIQUE KEY `uq_sup_eval_weight` (`company_id`,`indicator`),
+  CONSTRAINT `ck_sup_eval_scale` CHECK (`scale_max` is null or `scale_max` > 0),
+  CONSTRAINT `ck_sup_eval_weight` CHECK (`weight` > 0 and `weight` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_evaluations ──
@@ -11342,7 +11457,10 @@ CREATE TABLE `supplier_evaluations` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sup_eval_period` (`supplier_id`,`period_from`,`period_to`),
   KEY `ix_sup_eval` (`company_id`,`supplier_id`,`state`,`period_to`),
-  CONSTRAINT `fk_sup_eval_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_sup_eval_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_sup_eval_decided` CHECK (`state` <> _utf8mb4'decided' or `renewal_flag` is not null and `decided_by` is not null),
+  CONSTRAINT `ck_sup_eval_period` CHECK (`period_to` >= `period_from`),
+  CONSTRAINT `ck_sup_eval_reason` CHECK (`renewal_flag` is null or `renewal_flag` <> _utf8mb4'not_eligible' or `decision_note` is not null and `decision_note` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_penalty_rules ──
@@ -11370,7 +11488,10 @@ CREATE TABLE `supplier_penalty_rules` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_penalty_rule` (`contract_id`,`kind`,`valid_from`),
   KEY `ix_penalty_rule_co` (`company_id`,`contract_id`,`state`),
-  CONSTRAINT `fk_sup_penalty_rule_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_sup_penalty_rule_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ck_penalty_rule_cap` CHECK (`cap_percent` is null or `cap_percent` > 0 and `cap_percent` <= 100),
+  CONSTRAINT `ck_penalty_rule_override` CHECK (`inherits_attribution` = 1 or `override_reason` is not null and char_length(trim(`override_reason`)) > 0),
+  CONSTRAINT `ck_penalty_rule_rate` CHECK (`rate` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplier_rfqs ──
@@ -11396,7 +11517,9 @@ CREATE TABLE `supplier_rfqs` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_no` (`company_id`,`rfq_no`),
-  KEY `ix_rfq_contract` (`company_id`,`client_contract_id`,`state`)
+  KEY `ix_rfq_contract` (`company_id`,`client_contract_id`,`state`),
+  CONSTRAINT `ck_rfq_awarded` CHECK (`state` not in (_utf8mb4'awarded',_utf8mb4'contracted') or `awarded_by` is not null),
+  CONSTRAINT `ck_rfq_cancel` CHECK (`state` <> _utf8mb4'cancelled' or `cancel_reason` is not null and `cancel_reason` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: suppliercontractequipments ──
@@ -11465,7 +11588,8 @@ CREATE TABLE `suppliers` (
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_suppliers_is_deleted` (`is_deleted`)
+  KEY `idx_suppliers_is_deleted` (`is_deleted`),
+  CONSTRAINT `ck_sup_bank_verified` CHECK (`bank_verified_at` is null or `bank_account_no` is not null and `bank_account_no` <> _utf8mb4'' and `bank_doc_ref` is not null and `bank_doc_ref` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: supplierscontracts ──
@@ -11640,7 +11764,10 @@ CREATE TABLE `tax_invoices` (
   UNIQUE KEY `uq_tax_seq` (`company_id`,`serial_year`,`serial_seq`),
   KEY `ix_tax_claim` (`claim_id`),
   KEY `ix_tax_client` (`company_id`,`client_id`,`state`),
-  CONSTRAINT `fk_tax_invoice_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`)
+  CONSTRAINT `fk_tax_invoice_claim` FOREIGN KEY (`claim_id`) REFERENCES `claims` (`id`),
+  CONSTRAINT `ck_tax_cancel` CHECK (`state` <> _utf8mb4'cancelled' or `cancel_reason` is not null and `cancel_reason` <> _utf8mb4''),
+  CONSTRAINT `ck_tax_ref` CHECK (`tax_amount` = 0 or `tax_code` is not null and `tax_code` <> _utf8mb4'' and `tax_rate` is not null),
+  CONSTRAINT `ck_tax_total` CHECK (`total_amount` = `net_amount` + `tax_amount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: template_permission_dims ──
@@ -12442,7 +12569,8 @@ CREATE TABLE `transfer_orders` (
   CONSTRAINT `fk_to_from` FOREIGN KEY (`from_location_id`) REFERENCES `trs_locations` (`id`),
   CONSTRAINT `fk_to_req` FOREIGN KEY (`request_id`) REFERENCES `transfer_requests` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_to_to` FOREIGN KEY (`to_location_id`) REFERENCES `trs_locations` (`id`),
-  CONSTRAINT `fk_to_type` FOREIGN KEY (`transfer_type_id`) REFERENCES `transfer_types` (`id`)
+  CONSTRAINT `fk_to_type` FOREIGN KEY (`transfer_type_id`) REFERENCES `transfer_types` (`id`),
+  CONSTRAINT `ck_order_tariff_source` CHECK (`tariff_amount` is null or `tariff_id` is not null and `tariff_currency` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_permits ──
@@ -12520,7 +12648,10 @@ CREATE TABLE `transfer_tariffs` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_transfer_tariff` (`company_id`,`supplier_id`,`transfer_type_id`,`from_location_id`,`to_location_id`,`pricing_model`,`effective_from`) COMMENT 'تعرفةٌ واحدةٌ لمفتاحها في تاريخها — والجديدُ بسريانٍ جديد',
-  KEY `ix_tariff_lookup` (`company_id`,`state`,`effective_from`,`effective_to`)
+  KEY `ix_tariff_lookup` (`company_id`,`state`,`effective_from`,`effective_to`),
+  CONSTRAINT `ck_tariff_limits` CHECK (`min_amount` is null or `max_amount` is null or `min_amount` <= `max_amount`),
+  CONSTRAINT `ck_tariff_rate` CHECK (`rate` > 0),
+  CONSTRAINT `ck_tariff_span` CHECK (`effective_to` is null or `effective_to` >= `effective_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: transfer_types ──
@@ -12686,7 +12817,8 @@ CREATE TABLE `unit_effects` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`pe_id`),
   UNIQUE KEY `uq_ue_effect` (`company_id`,`source_unit_id`,`domain`,`effect_kind`,`stage`),
-  KEY `ix_ue_stage` (`company_id`,`stage`,`state`,`period`)
+  KEY `ix_ue_stage` (`company_id`,`stage`,`state`,`period`),
+  CONSTRAINT `ck_ue_financial_posted` CHECK (`stage` <> _utf8mb4'financial' or `state` <> _utf8mb4'Posted' or `approved_by` is not null and `fin_event_ref` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: unit_entries ──
@@ -12921,7 +13053,11 @@ CREATE TABLE `user_capacities` (
   KEY `ix_uc_account_state` (`account_id`,`state`),
   KEY `ix_uc_person` (`person_id`),
   KEY `ix_uc_company` (`company_id`),
-  KEY `ix_uc_scope` (`scope_type`,`scope_id`)
+  KEY `ix_uc_scope` (`scope_type`,`scope_id`),
+  CONSTRAINT `ck_uc_scope` CHECK (`scope_type` = _utf8mb4'company' or `scope_id` is not null),
+  CONSTRAINT `ck_uc_source` CHECK (`source_type` <> _utf8mb4'contract' or `source_id` is not null),
+  CONSTRAINT `ck_uc_state` CHECK (`state` = _utf8mb4'active' or `state_reason` is not null and `state_at` is not null),
+  CONSTRAINT `ck_uc_window` CHECK (`valid_to` is null or `valid_to` >= `valid_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: users ──
