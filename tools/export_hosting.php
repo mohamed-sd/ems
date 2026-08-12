@@ -115,7 +115,32 @@ $tail = stream_get_contents($fh);
 fclose($fh);
 $complete = strpos($tail, 'Dump completed') !== false;
 
+/* ◆ **بوابةُ إعادةِ التشغيل**: كلُّ قادحٍ يُنشَأ يجب أن يسبقَه إسقاطُه. عدمُ
+     التكافؤ يعني دمبًا ينفجر عند أيِّ استيرادٍ ثانٍ — فلا يُسلَّم. */
+$parity = ($trg['create'] === $trg['drop']);
+
+/* ملفُّ التفريغِ المرافق: يُنفَّذ في الاستضافة قبل الدمب فيمحو بقايا محاولةٍ
+   منقطعة (قوادحُ ومناظرُ وجداولُ الدمبِ وحدَها — لا يمسُّ ما ليس فيه). */
+$reset = preg_replace('/\.sql$/', '_RESET_FIRST.sql', $out);
+$objs['table'] = array_values(array_unique($objs['table']));
+$objs['view']  = array_values(array_unique($objs['view']));
+$rs  = "-- EMS · تفريغُ قاعدةِ الاستضافة قبل الاستيراد\n";
+$rs .= "-- نُفِّذْ هذا الملفَ أولًا ثم استورد: " . basename($out) . "\n";
+$rs .= "-- " . count($objs['trigger']) . " قادحًا · " . count($objs['view']) . " منظرًا · " . count($objs['table']) . " جدولًا\n";
+$rs .= "SET FOREIGN_KEY_CHECKS=0;\n";
+foreach ($objs['trigger'] as $t) { $rs .= "DROP TRIGGER IF EXISTS `$t`;\n"; }
+foreach ($objs['view'] as $v)    { $rs .= "DROP VIEW IF EXISTS `$v`;\n"; }
+foreach ($objs['table'] as $t)   { $rs .= "DROP TABLE IF EXISTS `$t`;\n"; }
+$rs .= "SET FOREIGN_KEY_CHECKS=1;\n";
+if ($complete && $parity) { file_put_contents($reset, $rs); } else { @unlink($reset); }
+
 fwrite(STDOUT, "② عُقّم في الطريق: {$counts['definer']} DEFINER · {$counts['security']} SQL SECURITY · {$counts['collate']} ترتيب 0900\n");
 fwrite(STDOUT, "③ الحجم: " . number_format($bytes) . " بايت · " . ($complete ? "الاكتمال مثبت (Dump completed)" : "⚠ لم يُعثر على ختم الاكتمال — لا ترفعه") . "\n");
-fwrite(STDOUT, ($complete ? "✔ الملف الجاهز للرفع:\n   $out\n" : "✘ أعد المحاولة\n"));
-exit($complete ? 0 : 1);
+fwrite(STDOUT, "④ القوادح: {$trg['create']} إنشاءً مقابل {$trg['drop']} إسقاطًا · " . ($parity ? "معادُ التشغيل" : "✘ غيرُ متكافئٍ — الاستيرادُ الثاني سينفجر بـ#1359") . "\n");
+if ($complete && $parity) {
+    fwrite(STDOUT, "✔ الملف الجاهز للرفع:\n   $out\n");
+    fwrite(STDOUT, "  ومعه للتفريغ أولًا (اختياريٌّ إن كانت القاعدةُ فارغة):\n   $reset\n");
+} else {
+    fwrite(STDOUT, "✘ أعد المحاولة\n");
+}
+exit(($complete && $parity) ? 0 : 1);

@@ -88,8 +88,11 @@ class BankReconService
                     'period_from' => $from, 'period_to' => $to,
                     'opening_balance' => round((float) (isset($head['opening_balance']) ? $head['opening_balance'] : 0), 2),
                     'closing_balance' => round((float) (isset($head['closing_balance']) ? $head['closing_balance'] : 0), 2),
+                    /* ◆ لا حرفَ مغروزًا: عملةُ **الحسابِ** ثم الأساسُ (كان 'SDG'
+                         والأساسُ USD و19 من 20 حسابًا بالدولار). */
                     'currency' => isset($head['currency']) && $head['currency'] !== ''
-                                  ? (string) $head['currency'] : 'SDG',
+                                  ? (string) $head['currency']
+                                  : self::accountCurrency($gate, $acc),
                     'state' => 'imported',
                     'note' => isset($head['note']) ? mb_substr((string) $head['note'], 0, 200) : null,
                     'created_by' => (int) $actor ?: null,
@@ -560,12 +563,73 @@ class BankReconService
             'idempotency_key'   => 'recon_adj:' . (int) $matchId,
             'legacy_event_type' => 'settlement',
             'amount'            => round(abs($diff), 2),
-            'currency'          => 'SDG',
+            /* ◆ عملةُ الفرقِ من حسابِ كشفِه — لا حرفٌ مغروز */
+            'currency'          => self::matchCurrency($conn, $companyId, $matchId),
             'notes'             => 'قيدُ تسويةِ فرقٍ بنكيٍّ — مضاهاة #' . (int) $matchId,
             'payload'           => array('match_id' => (int) $matchId, 'difference' => $diff,
                                          'decision_note' => $why),
         ));
         return (is_array($res) && isset($res['id'])) ? (int) $res['id'] : null;
+    }
+
+    /**
+     * عملةُ حسابٍ بنكيٍّ — **مُشتقَّةٌ لا مغروزةٌ**.
+     * ═══════════════════════════════════════════════════════════════════════
+     * كان في هذه الخدمةِ موضعان بـ`'SDG'` حرفًا: سقوطُ عملةِ الكشفِ عند
+     * الاستيرادِ (`import()`)، وعملةُ حدثِ تسويةِ الفرقِ (`publishAdjustment()`).
+     * والعملةُ الأساسُ في هذه القاعدةِ **USD** (`admin_companies.currency='USD'`
+     * و`fin_currencies.is_base=1` على USD)، و**19 من 20** حسابًا بالدولار
+     * وواحدٌ بالجنيه — فالحرفُ المغروزُ كان يُخطئ في الغالبِ لا في النادر.
+     *
+     * والسلسلةُ: **عملةُ الحسابِ** (فالكشفُ كشفُ حسابٍ بعينه) ⇒ فعملةُ الأساسِ
+     * من مصدرِها الواحدِ `ems_fx_base_currency()` ⇒ فنُلٌّ **مُعلَنٌ** لا حرفٌ
+     * مخترَع. ولا يُستنسخ منطقُ العملةِ هنا: الأساسُ يُقرأ من `includes/fx.php`.
+     * ═══════════════════════════════════════════════════════════════════════
+     * @return string|null رمزُ العملةِ أو null إن تعذّر — والنُّلُّ يُعلَن ولا يُخترع له بديل
+     */
+    private static function accountCurrency($gate, $accountId)
+    {
+        $acc = null;
+        if ((int) $accountId > 0) {
+            try {
+                $acc = $gate->selectOne('fin_bank_accounts', array(
+                    'columns' => array('currency'), 'where' => array('id' => (int) $accountId)));
+            } catch (\Throwable $t) {
+                ems_catch_ignored($t, __METHOD__, 'قراءةٌ فاشلةٌ تُعامَل كغيابٍ — تُجرَّب عملةُ الأساس');
+                $acc = null;
+            }
+        }
+        if (is_array($acc) && isset($acc['currency']) && trim((string) $acc['currency']) !== '') {
+            return (string) $acc['currency'];
+        }
+        if (!function_exists('ems_fx_base_currency')) {
+            $fx = dirname(__DIR__, 3) . '/includes/fx.php';
+            if (is_file($fx)) { require_once $fx; }
+        }
+        if (function_exists('ems_fx_base_currency')) {
+            $base = ems_fx_base_currency();
+            if ($base !== null && trim((string) $base) !== '') { return (string) $base; }
+        }
+        return null;
+    }
+
+    /** عملةُ مضاهاةٍ — من حسابِ كشفِها، فالفرقُ بعملةِ الحسابِ لا بعملةٍ مفترَضة */
+    private static function matchCurrency($conn, $companyId, $matchId)
+    {
+        $q = $conn->query("SELECT s.bank_account_id
+                             FROM bank_recon_matches m
+                             JOIN bank_statement_lines l ON l.id = m.statement_line_id
+                             JOIN bank_statements s ON s.id = l.statement_id
+                            WHERE m.id = " . (int) $matchId
+                          . " AND m.company_id = " . (int) $companyId);
+        /* ◆ ويُفحَص المُرجَعُ: `config.php` يضبط mysqli على عدمِ الرمي فالفشلُ
+             يعود false صامتًا — ولو قُرئ صفرًا لعادت العملةُ نُلًّا بلا سببٍ مُبيَّن. */
+        if ($q === false || $q->num_rows === 0) { return null; }
+        $row = $q->fetch_assoc();
+        $gate = null;
+        try { $gate = ems_tenant_db(); } catch (\Throwable $t) { $gate = null; }
+        if ($gate === null) { return null; }
+        return self::accountCurrency($gate, (int) $row['bank_account_id']);
     }
 
     private static function audit($conn, $companyId, $actor, $action, $rowId, $before, $after)
