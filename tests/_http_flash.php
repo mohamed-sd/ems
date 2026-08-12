@@ -66,7 +66,35 @@ if (!function_exists('ems_flash_page_text')) {
         }
         $body = (string) call_user_func($get, $to);
         if ($body === '') { return ''; }
-        return (string) preg_replace('~\s+~u', ' ', strip_tags($body));
+
+        /* ══ **`strip_tags` تمحو جسمَ `<script>` كلَّه — وفيه الوميضُ.**
+             هذا هو **الجذرُ المقيسُ** لفشلِ كلِّ قراءاتِ الوميضِ في المسابير:
+             الصفحةُ تُجلَب كاملةً (**61,442 بايتًا** مقيسة) والرسالةُ فيها بنصِّها
+             العربيِّ الصريح، ثم يُرجِع `strip_tags` **58 حرفًا فقط** — لأن
+             `inheader.php:145` يبثُّ الوميضَ **داخلَ `<script>`** حمولةً JSON
+             (`window.EmsAlert.show({text:…})`)، وPHP تُسقط `<script>` **بمحتواه**.
+             فيُقرأ «لا رسالة» والرسالةُ حاضرةٌ في البايتات.
+           ⇒ تُقرأ الرسالةُ من **الجسمِ الخام** بمصدرَيها المعلَنَين في
+             `inheader.php`: حمولةُ `"text":"…"` أوّلًا، ثم لافتةُ `<noscript>`
+             الاحتياطية، ثم نصُّ الصفحةِ المنقَّى لِما ليس وميضًا. */
+        $parts = array();
+        if (preg_match_all('~"text"\s*:\s*"((?:[^"\\\\]|\\\\.)*)"~', $body, $fm)) {
+            foreach ($fm[1] as $t) {
+                $parts[] = str_replace(array('\\/', '\\"', '\\\\'), array('/', '"', '\\'), $t);
+            }
+        }
+        if (preg_match_all('~<noscript>(.*?)</noscript>~is', $body, $nm)) {
+            foreach ($nm[1] as $blk) { $parts[] = html_entity_decode(strip_tags($blk), ENT_QUOTES, 'UTF-8'); }
+        }
+        $plain = strip_tags($body);
+        $parts[] = $plain;
+
+        $joined = implode(' · ', $parts);
+        /* وضغطُ الفراغاتِ بـ`u` يُرجِع `NULL` على بايتٍ غيرِ صالح — فيُجَسُّ المُرجَع. */
+        $out = preg_replace('~\s+~u', ' ', $joined);
+        if ($out === null) { $out = preg_replace('~\s+~', ' ', $joined); }
+        if ($out === null) { $out = $joined; }
+        return (string) $out;
     }
 }
 
