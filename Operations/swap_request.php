@@ -59,6 +59,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         mysqli_stmt_bind_param($ins, 'isssd', $seat, $reason, $until, $level, $est_h);
         if (mysqli_stmt_execute($ins)) {
             $covId = mysqli_stmt_insert_id($ins);
+            /* INJ-0139 — أثرُ تدقيقٍ لكلِّ فعلٍ كاتبٍ في وحدةِ التشغيل.
+               و«قبل» هنا **مصفوفةٌ خاويةٌ بحقٍّ**: الصفُّ يُنشأ من عدمٍ، فكلُّ
+               حقلٍ تغييرٌ من نُلٍّ — وهو ما يحسبه المُوصِلُ المشتركُ نفسُه. */
+            /* ◆ يُحمَّل المُوصِلُ عند موضعِ الاستعمال — وإلا كان الشرطُ كاذبًا
+                 دائمًا فيُتخطّى التدقيقُ صامتًا. */
+            require_once __DIR__ . '/../includes/audit_trail.php';
+            {
+                ems_audit_change($conn, 'operations', 'swap_request.php', 'create',
+                    (int) $covId,
+                    array(),
+                    array('covered_seat_id' => $seat, 'reason_code' => $reason,
+                          'valid_to' => $until, 'level' => $level,
+                          'estimated_hours' => $est_h, 'state' => 'Pending'),
+                    array('company_id' => $company_id,
+                          'user_id' => intval($_SESSION['user']['id'] ?? 0),
+                          'note' => 'طلبُ تبديلِ تغطيةٍ — بانتظارِ الاعتماد'));
+            }
             // البندُ يظهر في صندوق الاعتماد الجامع عبر مجمِّعه (ApprovalsInboxService
             // يقرأ substitute_coverages بحالة Pending) — لا رسائلَ ولا جدولَ وسيطًا.
             $msg = "أُرسل الطلبُ #$covId — بانتظار موافقة القوى التشغيلية ثم الإدارة المعنية";

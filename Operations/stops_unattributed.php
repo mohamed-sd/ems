@@ -27,11 +27,45 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['assign_ts']))
     $dept = trim($_POST['fault_department'] ?? '');
     if ($dept === '') { $msg = 'الجهةُ المسؤولةُ إلزامية (422)'; }
     else {
+        /* ═══════════════════════════════════════════════════════════════════
+         * INJ-0139 — «كلُّ فعلٍ كاتبٍ في وحدةِ التشغيلِ يُنتج صفَّ تدقيقٍ واحدًا
+         * يحمل الجدولَ والمعرّفَ والقيمةَ **قبل وبعد**».
+         * ◆ والمقيسُ أنَّ `Operations/` كان بـ**صفرِ** نداءٍ لـ`ems_audit_change`
+         *   بينما 259 ملفًّا في المستودعِ تناديه — فإسنادُ مسؤوليةِ توقفٍ (وهو
+         *   قرارٌ يُحمّل إدارةً تكلفةً) كان يقع **بلا أثرٍ يُراجَع**.
+         * ◆ والقيمةُ «قبل» **تُقرأ من الصفِّ** لا تُفترض نُلًّا: الشرطُ يسمح
+         *   بالإسنادِ على فارغٍ أو نُلٍّ، فالفرقُ بينهما أثرٌ حقيقيٌّ يُسجَّل.
+         * ◆ ولا يُسجَّل إلا **عند وقوعِ تغييرٍ فعليٍّ** (`affected_rows > 0`) —
+         *   فإعادةُ الإسنادِ نفسِه لا تكتب صفَّ ضوضاء.
+         * ═══════════════════════════════════════════════════════════════════ */
+        $beforeDept = null;
+        $pre = mysqli_prepare($conn, 'SELECT fault_department FROM timesheet WHERE id = ? AND company_id = ?');
+        if ($pre) {
+            mysqli_stmt_bind_param($pre, 'ii', $tid, $company_id);
+            mysqli_stmt_execute($pre);
+            $pr = mysqli_stmt_get_result($pre);
+            if ($pr && ($prow = mysqli_fetch_assoc($pr))) { $beforeDept = $prow['fault_department']; }
+            mysqli_stmt_close($pre);
+        }
         $st = mysqli_prepare($conn, "UPDATE timesheet SET fault_department = ? WHERE id = ? AND company_id = ?
                                      AND (fault_department IS NULL OR fault_department = '')");
         mysqli_stmt_bind_param($st, 'sii', $dept, $tid, $company_id);
         mysqli_stmt_execute($st);
-        $msg = mysqli_stmt_affected_rows($st) > 0 ? "أُسند التوقفُ #$tid إلى «{$dept}»" : 'مُسندٌ من قبل (409)';
+        $changed = mysqli_stmt_affected_rows($st) > 0;
+        /* ◆ **يُحمَّل المُوصِلُ عند موضعِ الاستعمال** كما تفعل بقيةُ الشاشات
+             (`admin/permissions/role_permissions.php:88` نمطًا). ولولا ذلك لكان
+             `function_exists` **كاذبًا دائمًا** فيُتخطّى التدقيقُ صامتًا — وهو
+             عينُ «حارسٍ قائمٍ نصًّا غائبٍ فعلًا». */
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        if ($changed) {
+            ems_audit_change($conn, 'operations', 'stops_unattributed.php', 'assign_fault_department',
+                $tid,
+                array('fault_department' => $beforeDept),
+                array('fault_department' => $dept),
+                array('company_id' => $company_id, 'user_id' => $uid,
+                      'note' => 'إسنادُ مسؤوليةِ توقفٍ غيرِ مُسنَد'));
+        }
+        $msg = $changed ? "أُسند التوقفُ #$tid إلى «{$dept}»" : 'مُسندٌ من قبل (409)';
     }
 }
 
