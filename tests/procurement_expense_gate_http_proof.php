@@ -91,6 +91,13 @@ preg_match('~name="csrf_token"\s+value="([^"]+)"~', $b, $m);
 pg_req($BASE . '/login.php', $jar, array('username' => 'مشتريات', 'password' => '12345678',
     'csrf_token' => isset($m[1]) ? $m[1] : ''));
 
+/* §15.6: الوجهةُ المخزنيةُ **بلا مخزنِ إدخالٍ** رصيدٌ لا يتحرك — فالشاشةُ
+   ترفضها برسالةٍ صريحة («حدد مخزن الإدخال»)، وكان البذرُ يُعلن الوجهةَ مخزنًا
+   ولا يسمّي المخزن. والمخزنُ **يُقاس** من `proc_warehouse` لا يُفترض رقمًا. */
+$wh = $db->query("SELECT id FROM proc_warehouse WHERE company_id={$CO} AND type='مخزن'
+                   AND COALESCE(is_deleted,0)=0 AND status=1 ORDER BY id LIMIT 1")->fetch_assoc();
+$WH = $wh ? intval($wh['id']) : 0;
+check($WH > 0, 'ومخزنُ إدخالٍ قائمٌ لِتُقبَل الوجهةُ المخزنية (#' . $WH . ')');
 list($code, $h, $page) = pg_req($BASE . '/Procurement/receipt_custody_proc.php', $jar);
 check($code === 200, "شاشةُ الاستلام تُفتح بحساب المشتريات (HTTP {$code})");
 preg_match('~name="csrf_token"\s+value="([^"]+)"~', $page, $tk);
@@ -113,7 +120,7 @@ list($code, $h, $b) = pg_req($BASE . '/Procurement/receipt_custody_proc.php', $j
     'action' => 'save', 'csrf_token' => $token,
     'holder_name' => 'أمين المستودع', 'receipt_date' => date('Y-m-d'),
     'supplier_id' => 3, 'order_id' => $OID,
-    'receipt_location' => 'المستودع', 'expected_destination' => 'مخزن', 'state' => 'مستلَمة',
+    'receipt_location' => 'المستودع', 'expected_destination' => 'مخزن', 'warehouse_id' => $WH, 'state' => 'مستلَمة',
     'line_item_name' => array('فلتر زيت'), 'line_qty' => array(8), 'line_item_id' => array(''),
 ));
 check($code === 302, "الاستلامُ الجزئي حُفظ (HTTP {$code})");
@@ -130,7 +137,7 @@ list($code, $h, $b) = pg_req($BASE . '/Procurement/receipt_custody_proc.php', $j
     'action' => 'save', 'id' => $rcId, 'csrf_token' => $token,
     'holder_name' => 'أمين المستودع', 'receipt_date' => date('Y-m-d'),
     'supplier_id' => 3, 'order_id' => $OID,
-    'receipt_location' => 'المستودع', 'expected_destination' => 'مخزن', 'state' => 'مستلَمة',
+    'receipt_location' => 'المستودع', 'expected_destination' => 'مخزن', 'warehouse_id' => $WH, 'state' => 'مستلَمة',
     'line_item_name' => array('فلتر زيت'), 'line_qty' => array(20), 'line_item_id' => array(''),
 ));
 check($code === 302, "تعديلُ الاستلام إلى الكمية الكاملة حُفظ (HTTP {$code})");
@@ -154,7 +161,7 @@ pg_req($BASE . '/Procurement/receipt_custody_proc.php', $jar, array(
     'action' => 'save', 'id' => $rcId, 'csrf_token' => $token,
     'holder_name' => 'أمين المستودع', 'receipt_date' => date('Y-m-d'),
     'supplier_id' => 3, 'order_id' => $OID,
-    'receipt_location' => 'المستودع', 'expected_destination' => 'مخزن', 'state' => 'مستلَمة',
+    'receipt_location' => 'المستودع', 'expected_destination' => 'مخزن', 'warehouse_id' => $WH, 'state' => 'مستلَمة',
     'line_item_name' => array('فلتر زيت'), 'line_qty' => array(20), 'line_item_id' => array(''),
 ));
 check($evCount() === 1, 'حفظٌ ثالثٌ للاستلام → يبقى صفٌّ واحدٌ في الدفتر');

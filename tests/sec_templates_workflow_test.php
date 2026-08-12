@@ -24,16 +24,23 @@ $conn = $GLOBALS['conn'];
 $conn->set_charset('utf8mb4');
 $CO = 4;
 $MARK = 'TW9T' . getmypid();
+/* **وعائلةُ الوسمِ لا وسمُ الشوطِ.** الكنسُ بـ`%{$MARK}%` أعمى عمّا تركه شوطٌ
+   سابقٌ أخفق كنسُه، والقياسُ وجد **53 دورةَ مراجعةٍ** متراكمةً (32 موقَّعةً و21
+   مُصعَّدة). وتراكمُها ليس زينةً: فتحُ دورةٍ جديدةٍ يُردُّ فيعود `cycle_id = 0`
+   — وهو ما رأته `sec_full_belt` (سقطت ستةُ فحوصٍ فيها بينما يمرُّ الفاحصُ
+   وحدَه). فالكنسُ بالعائلةِ `TW9T` يجعل الشوطَ يشفي ما أفسده سابقُه. */
+$FAMILY = 'TW9T';
 
-$teardown = function () use ($conn, $MARK) {
+$teardown = function () use ($conn, $MARK, $FAMILY) {
+    if ($FAMILY === '') { return; }   // وسمٌ فارغٌ ⇒ لا كنسَ (صونًا للبيانات)
     foreach (array(
-        "DELETE l FROM permission_review_lines l JOIN permission_review_cycles c ON c.cycle_id=l.cycle_id WHERE c.period LIKE '%{$MARK}%'",
-        "DELETE FROM permission_review_cycles WHERE period LIKE '%{$MARK}%'",
-        "DELETE s FROM permission_approval_steps s JOIN permission_change_requests r ON r.req_id=s.req_id WHERE r.reason LIKE '%{$MARK}%'",
-        "DELETE FROM permission_change_requests WHERE reason LIKE '%{$MARK}%'",
-        "DELETE FROM permission_audit_events WHERE reason LIKE '%{$MARK}%' OR request_ref LIKE '%{$MARK}%'",
-        "DELETE tp FROM template_permissions tp JOIN permission_template_versions v ON v.ver_id=tp.template_version_id WHERE v.change_reason LIKE '%{$MARK}%'",
-        "DELETE FROM permission_template_versions WHERE change_reason LIKE '%{$MARK}%'",
+        "DELETE l FROM permission_review_lines l JOIN permission_review_cycles c ON c.cycle_id=l.cycle_id WHERE c.period LIKE '%{$FAMILY}%'",
+        "DELETE FROM permission_review_cycles WHERE period LIKE '%{$FAMILY}%'",
+        "DELETE s FROM permission_approval_steps s JOIN permission_change_requests r ON r.req_id=s.req_id WHERE r.reason LIKE '%{$FAMILY}%'",
+        "DELETE FROM permission_change_requests WHERE reason LIKE '%{$FAMILY}%'",
+        "DELETE FROM permission_audit_events WHERE reason LIKE '%{$FAMILY}%' OR request_ref LIKE '%{$FAMILY}%'",
+        "DELETE tp FROM template_permissions tp JOIN permission_template_versions v ON v.ver_id=tp.template_version_id WHERE v.change_reason LIKE '%{$FAMILY}%'",
+        "DELETE FROM permission_template_versions WHERE change_reason LIKE '%{$FAMILY}%'",
         "UPDATE founding_mode SET enabled=0, ends_at=NULL, started_at=NULL WHERE mode='permission_test'",
     ) as $q) { $conn->query($q); }
 };
