@@ -158,7 +158,31 @@ if (!function_exists('cmp03_stage_insert')) {
         $st->bind_param('isssis', $cid, $can, $json, $stt, $u, $who);
         $ok = $st->execute();
         if (!$ok) { error_log('cmp03_stage_insert: execute فشل — ' . $st->error); }
+        $newId = $ok ? (int) $conn->insert_id : 0;
         $st->close();
+        /* ═══════════════════════════════════════════════════════════════════
+         * INJ-0162 — «كلُّ تعديلٍ على مورد أو عقده أو **حسابه البنكي** يُنتج صفَّ
+         * تدقيقٍ بالحقولِ المتغيرةِ وقيمتيها والفاعلِ والوقت».
+         * ◆ **المقيسُ**: `cmp03_store_update` و`cmp03_store_reverse` تُدقّقان،
+         *   و**هذه الدالةُ لا** — فشاشةُ الحساباتِ البنكيةِ للموردين
+         *   (`Suppliers/supplier_bank.php:102`) تكتب من هنا **بصفرِ تدقيق**
+         *   (grep على «audit» في الشاشةِ ⇒ صفر)، وفي `cmp03_screen_rows` عشرةُ
+         *   صفوفٍ لها وفي `activity_logs` **لا صفَّ واحدٌ** يخصُّها.
+         * ◆ والعلاجُ **في الطبقةِ لا في الشاشة** — وترويسةُ `cmp03_store_audit`
+         *   تقول ذلك نصًّا (CS-09: «التدقيقُ من طبقةٍ مشتركةٍ لا من الشاشة»).
+         *   فإصلاحُ الدالةِ يُصلح **كلَّ** شاشةٍ تُدرج من هذا الباب، لا شاشةً واحدة.
+         * ◆ و«قبل» **خاويةٌ بحقٍّ**: الصفُّ يُنشأ من عدمٍ فكلُّ حقلٍ تغييرٌ من نُلٍّ.
+         * ◆ ولا يُدقَّق إدراجٌ فشل — فأثرٌ لواقعةٍ لم تقع أسوأُ من غيابِ الأثر.
+         * ═══════════════════════════════════════════════════════════════════ */
+        if ($ok && function_exists('cmp03_store_audit')) {
+            $changed = array();
+            foreach ($payload as $k => $v) {
+                $changed[(string) $k] = array('before' => null, 'after' => $v);
+            }
+            $changed['status'] = array('before' => null, 'after' => $stt);
+            cmp03_store_audit($conn, $cid, $can, 'cmp03_screen_rows', $newId,
+                              'create', $changed, $u, $who);
+        }
         return (bool) $ok;
     }
 }
