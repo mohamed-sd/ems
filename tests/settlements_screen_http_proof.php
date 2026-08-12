@@ -357,6 +357,16 @@ $r = $db->query("SELECT COUNT(*) c FROM ems_business_events be
                                      WHERE s.settlement_no = be.source_ref)");
 check(intval($r->fetch_assoc()['c']) === 0, 'ولا حدثَ يتيمٌ في الدفتر');
 
+/* ── INJ-0192 · الافتراضُ المُصرَّحُ ────────────────────────────────────────────
+   يفترض هذا المِسبارُ قيدَ `ck_dues_debit_source` (يُمرّر `source_doc_type` وحتى
+   `source_doc_id` في كلِّ خصمٍ) ولا يُثبته — ورفعُ القيدِ من القاعدةِ أبقاه
+   أخضرَ (exit=0). والمُقرِّرُ مشترَكٌ لا منسوخ. */
+require_once __DIR__ . '/_dues_source_guard.php';
+$g = ems_assert_dues_source_guard($db, $CO);
+fwrite(STDOUT, "\n── قيدُ «لا خصمَ بلا مستندِ مصدرٍ» (INJ-0192)\n");
+foreach ($g['lines'] as $l) { fwrite(STDOUT, $l . "\n"); }
+$PASS += $g['pass']; $FAIL += $g['fail'];
+
 fwrite(STDOUT, "\n══════════════════════════════════════════════\n");
 fwrite(STDOUT, "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n");
 exit($FAIL > 0 ? 1 : 0);

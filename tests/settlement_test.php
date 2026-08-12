@@ -319,6 +319,18 @@ check(intval($r->fetch_assoc()['c']) === 0, 'ولا ذمّةَ اختبار');
 $r = $conn->query("SELECT COUNT(*) c FROM ems_business_events WHERE source_ref LIKE 'STL-2092-%'");
 check(intval($r->fetch_assoc()['c']) === 0, 'ولا حدثَ اختبارٍ في الدفتر');
 
+/* ── INJ-0192 · الافتراضُ المُصرَّحُ ────────────────────────────────────────────
+   هذا الفاحصُ **يفترض** قيدَ `ck_dues_debit_source`: يُمرّر `source_doc_type`
+   في كلِّ خصمٍ يُدرجه. وافتراضٌ غيرُ مُصرَّحٍ **يمتثل ولا يحرس** — رُفع القيدُ
+   من القاعدةِ فعلًا فبقي هذا الفاحصُ أخضرَ (exit=0)، أي شهد لبنيةٍ زالت.
+   والمُقرِّرُ **مشترَكٌ في ملفٍّ واحدٍ** لا منسوخٌ ثلاثًا — فأربعةُ تعريفاتٍ لمعنًى
+   واحدٍ تتفرّق عند أوّلِ تعديلٍ، وهو عينُ الداءِ الذي كُتبت له هذه الحزمة. */
+require_once __DIR__ . '/_dues_source_guard.php';
+$g = ems_assert_dues_source_guard($conn, $CO);
+fwrite(STDOUT, "\n── قيدُ «لا خصمَ بلا مستندِ مصدرٍ» (INJ-0192)\n");
+foreach ($g['lines'] as $l) { fwrite(STDOUT, $l . "\n"); }
+$PASS += $g['pass']; $FAIL += $g['fail'];
+
 fwrite(STDOUT, "\n══════════════════════════════════════════════\n");
 fwrite(STDOUT, "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n");
 exit($FAIL > 0 ? 1 : 0);

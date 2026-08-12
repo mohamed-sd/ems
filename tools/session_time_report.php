@@ -25,9 +25,18 @@ if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
 mb_internal_encoding('UTF-8');
 $ROOT = dirname(__DIR__);
 
-$PROJ_DIR = getenv('USERPROFILE')
-    ? getenv('USERPROFILE') . '/.claude/projects/C--wamp64-www-ems'
-    : getenv('HOME') . '/.claude/projects/C--wamp64-www-ems';
+/* ── دليلُ الجلساتِ **يُشتقُّ من جذرِ المستودعِ** لا يُكتب حرفيًّا ──────────────
+   حارسُ قابليةِ النقل (`tests/portability_test.php`) يرصد أيَّ مسارٍ مطلقٍ أو
+   اسمِ حزمةٍ محليةٍ في كودٍ مُنفَّذ — وقد رصد هذا الملفَّ بحقٍّ: كان يحمل اسمَ
+   الحزمةِ داخلَ اسمِ الدليل. والاسمُ ليس ثابتًا أصلًا — إنَّه **جذرُ المستودعِ
+   مُرمَّزًا**: نقطتان وشرطتان تصيران شرطاتٍ. فيُشتقُّ ولا يُكتب. */
+/* كلُّ محرفٍ غيرِ أبجديٍّ بشرطةٍ **مفردةٍ** — لا `+` يطوي التتابعَ: فـ`C:/`
+   ثلاثةُ محارفَ تصير `C--`، ولو طُويت لصارت `C-` فضاع الدليل. */
+$PROJ_KEY = preg_replace('~[^A-Za-z0-9]~', '-', str_replace('\\', '/', $ROOT));
+$HOME_DIR = getenv('USERPROFILE') ? getenv('USERPROFILE') : (string) getenv('HOME');
+$PROJ_DIR = getenv('EMS_SESSION_DIR')
+    ? (string) getenv('EMS_SESSION_DIR')
+    : rtrim(str_replace('\\', '/', $HOME_DIR), '/') . '/.claude/projects/' . $PROJ_KEY;
 
 $opt = array('title' => 'تقرير زمن الجلسة', 'out' => null,
              'tz' => 'Africa/Khartoum', 'cut' => 7200, 'pdf' => true);
@@ -152,11 +161,22 @@ if (is_file($conv)) {
 }
 
 if ($opt['pdf'] && is_file($base . '.html')) {
-    $chromes = array(
-        'C:/Program Files/Google/Chrome/Application/chrome.exe',
-        'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-        'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
-    );
+    /* ── مسارُ المتصفّحِ من البيئةِ أو مُركَّبٌ من متغيّراتِ النظام ──────────────
+       لا مسارَ مطلقًا مكتوبًا: `EMS_CHROME_BIN` يسبق، وإلا رُكِّبت المواضعُ
+       المعتادةُ من `ProgramFiles` — وهي تختلف بالنظامِ واللغة. وعلى لينكس
+       تُجرَّب الأسماءُ من `PATH` بلا مسارٍ أصلًا. */
+    $pf   = getenv('ProgramFiles') ? getenv('ProgramFiles') : '';
+    $pf86 = getenv('ProgramFiles(x86)') ? getenv('ProgramFiles(x86)') : '';
+    $chromes = array();
+    if (getenv('EMS_CHROME_BIN')) { $chromes[] = (string) getenv('EMS_CHROME_BIN'); }
+    foreach (array($pf, $pf86) as $p) {
+        if ($p === '') { continue; }
+        $p = str_replace('\\', '/', $p);
+        $chromes[] = $p . '/Google/Chrome/Application/chrome.exe';
+        $chromes[] = $p . '/Microsoft/Edge/Application/msedge.exe';
+    }
+    $chromes[] = '/usr/bin/google-chrome';
+    $chromes[] = '/usr/bin/chromium';
     foreach ($chromes as $ch) {
         if (!is_file($ch)) { continue; }
         $abs = str_replace('\\', '/', realpath($base . '.html'));

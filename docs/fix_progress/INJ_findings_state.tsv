@@ -190,8 +190,8 @@ INJ-0188	P2	نعم	غيرُ مقيس
 INJ-0189	P2	لا	غيرُ مقيس	
 INJ-0190	P2	لا	غيرُ مقيس	
 INJ-0191	P2	نعم	غيرُ مقيس	
-INJ-0192	P2	نعم	غيرُ مقيس	
-INJ-0193	P2	نعم	مُغلقٌ بشاهد	tools/fix_od19_probe.php · tools/fix_status_report.php
+INJ-0192	P2	نعم	مُغلقٌ بشاهد	tests/employee_settlement_test.php · tests/settlements_screen_http_proof.php · tests/settlement_test.php · tests/_dues_source_guard.php · tools/fix_status_report.php
+INJ-0193	P2	نعم	مُغلقٌ بشاهد	tests/_dues_source_guard.php · tools/fix_od19_probe.php · tools/fix_status_report.php
 INJ-0194	P2	نعم	غيرُ مقيس	
 INJ-0195	P2	نعم	غيرُ مقيس	
 INJ-0196	P2	نعم	غيرُ مقيس	
