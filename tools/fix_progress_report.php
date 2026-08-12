@@ -280,10 +280,19 @@ $classify = function ($id, array $witness, array $cover, array $closedList)
     if (isset($closedList[$id])) { return 'مُغلقٌ بشاهد'; }
     if (isset($witness[$id])) {
         if (!$LIVE) { return 'مُغلقٌ بشاهد'; }
-        foreach (array_keys($witness[$id]) as $f) {
-            if (isset($greenFiles[$f]) && $greenFiles[$f]) { return 'مُغلقٌ بشاهد'; }
+        /* ◆ **كلُّ شواهدِه خضراءُ لا أحدُها.** أوّلُ صياغةٍ أغلقت البندَ إن وُجد
+             شاهدٌ أخضرُ واحدٌ ولو كان له شاهدٌ أحمر — فبقي «مفتوح = 0» مع أنَّ
+             عشرةً من اثنين وأربعين مِسبارًا حمراء. وذلك **تسامحٌ يُقرأ إنجازًا**.
+             فالبندُ لا يُغلق إلا إن كان **كلُّ** مِسبارٍ يذكره أخضرَ؛ وأحمرُ
+             واحدٌ يجعله مفتوحًا — ومِسبارٌ لم يُشغَّل لا يَحسم فيُتخطّى. */
+        $anyRed = false; $anyGreen = false;
+        foreach (array_keys($witness[$id]) as $wf) {
+            if (!isset($greenFiles[$wf])) { continue; }   /* لم يُشغَّل — لا يَحسم */
+            if ($greenFiles[$wf]) { $anyGreen = true; } else { $anyRed = true; }
         }
-        return 'مفتوح';        /* له مِسبارٌ وهو أحمرُ الآن */
+        if ($anyRed) { return 'مفتوح'; }
+        if ($anyGreen) { return 'مُغلقٌ بشاهد'; }
+        return 'مُغطًّى';       /* له شاهدٌ لم يُشغَّل — لا يُدَّعى إغلاقُه */
     }
     if (isset($cover[$id])) { return 'مُغطًّى'; }
     return 'غيرُ مقيس';
