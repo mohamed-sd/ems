@@ -289,14 +289,27 @@ list($code, $page) = req(BASE . '/Timesheet/timesheet.php?type=1');
 preg_match('/name="csrf_token"\s+value="([^"]+)"/', $page, $m);
 $csrfTs = isset($m[1]) ? $m[1] : $csrf;
 
-$okN = 0; $failN = 0;
+$okN = 0; $failN = 0; $capN = 0;
 foreach ($plan as $idx => $p) {
     list($op, $day, $shift, $type, $emp, $spec) = $p;
     $row = mkRow($op, $OPS[$op]['eq'], $day, $shift, $type, $emp, $spec);
     $row['csrf_token'] = $csrfTs;
     list($c, $b) = req(BASE . '/Timesheet/timesheet.php?type=' . $type, $row);
-    if ($c === 200 && strpos($b, 'تم الحفظ بنجاح') !== false) { $okN++; }
-    else {
+    /* ◆ **تجاوزُ الطاقةِ نجاحٌ مقصودٌ لا فشل.** المخططُ يصنع عمدًا زوجَ ورديّاتٍ
+         يتجاوز الحدَّ اليوميَّ (11+11=22 والحدُّ 20) لأن `unit_reconcile_test`
+         يشترط وجودَه نصًّا: «المعدة 24 يوم 2027-02-14 … واقعتاها معلَّمتان».
+         والشاشةُ تحفظ الصفَّ **وتُنذر**، فرسالتُها «حُفظ مع تجاوز طاقة» —
+         وكان يُعدُّ فشلًا فتخرج البذرةُ بـ1 مع أن بيانتَها تامّةٌ (50 صفًّا
+         و50 مرآة)، فيُقرأ رمزُ خروجِها عطلًا وهو حكمٌ يعمل. */
+    $saved   = ($c === 200 && strpos($b, 'تم الحفظ بنجاح') !== false);
+    $savedCap = ($c === 200 && strpos($b, 'حُفظ مع تجاوز طاقة') !== false);
+    if ($saved || $savedCap) {
+        $okN++;
+        if ($savedCap) {
+            $capN++;
+            fwrite(STDOUT, "  ◆ صف #" . ($idx + 1) . " op={$op} {$day} {$shift}: حُفظ **بتجاوزٍ مقصود** — يقيسه الفاحص\n");
+        }
+    } else {
         $failN++;
         preg_match("/alert\('([^']{0,120})/", $b, $em);
         fwrite(STDOUT, "  ✘ صف #" . ($idx + 1) . " op={$op} {$day} {$shift}: " . (isset($em[1]) ? $em[1] : "HTTP {$c}") . "\n");
@@ -307,7 +320,7 @@ $tsAfter = (int) $db->query("SELECT COUNT(*) c FROM timesheet")->fetch_assoc()['
 $inWin = (int) $db->query("SELECT COUNT(*) c FROM timesheet WHERE `date` BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'")->fetch_assoc()['c'];
 $mirN  = (int) $db->query("SELECT COUNT(*) c FROM unit_entries WHERE entry_date BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'")->fetch_assoc()['c'];
 
-fwrite(STDOUT, "\nحُفظ {$okN} · فشل {$failN}\n");
+fwrite(STDOUT, "\nحُفظ {$okN} (منها {$capN} بتجاوزٍ مقصود) · فشل {$failN}\n");
 fwrite(STDOUT, "timesheet: {$tsBefore} → {$tsAfter} (في النافذة {$inWin})\n");
 fwrite(STDOUT, "المرايا في unit_entries: {$mirN}\n");
 fwrite(STDOUT, "\nالمطابقة:  php tests/unit_reconcile_test.php\n");
