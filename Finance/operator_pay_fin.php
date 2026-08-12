@@ -68,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
         'is_active'   => $rate > 0 ? 1 : 0,
     ), array('effect_type' => 'employee_due'));
     $msg = $rate > 0
-        ? 'تم+ضبط+معدّل+مستحق+المشغّل+وتفعيله+✅'
-        : 'تم+إفراغ+المعدّل+—+مستحق+المشغّل+معطّل+الآن+✅';
+        ? 'تم ضبط معدّل مستحق المشغّل وتفعيله ✅'
+        : 'تم إفراغ المعدّل — مستحق المشغّل معطّل الآن ✅';
     ems_gov_flash_redirect('operator_pay_fin.php', "$msg", 'GOV-INFO-200', ''); exit();
 }
 

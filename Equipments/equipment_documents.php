@@ -66,9 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_doc'])) {
     $alertDays = max(0, min(365, intval($_POST['alert_days'] ?? 30)));
 
     $err = null;
-    if ($subjectId <= 0)  { $err = 'اختر+المعدة+أو+المشغّل'; }
-    elseif ($docType === '') { $err = 'اختر+نوع+الوثيقة'; }
-    elseif ($expiry !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry)) { $err = 'تاريخ+الانتهاء+غير+صحيح'; }
+    if ($subjectId <= 0)  { $err = 'اختر المعدة أو المشغّل'; }
+    elseif ($docType === '') { $err = 'اختر نوع الوثيقة'; }
+    elseif ($expiry !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry)) { $err = 'تاريخ الانتهاء غير صحيح'; }
     if ($err !== null) { ems_gov_flash_redirect('equipment_documents.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     $row = array(

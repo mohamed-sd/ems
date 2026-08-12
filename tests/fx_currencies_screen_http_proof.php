@@ -84,7 +84,31 @@ if ($db->connect_error) { fwrite(STDERR, "DB: {$db->connect_error}\n"); exit(1);
 $db->set_charset('utf8mb4');
 
 $CO    = 4;
-$CODE  = 'QAR';                      // عملةُ اختبارٍ غيرُ مستعملةٍ في أي بيانات
+/* ══ **«غيرُ مستعملةٍ في أي بيانات» افتراضٌ تعفَّن.** كان الرمزُ `QAR` مكتوبًا
+     بتعليقٍ يقول إنه غيرُ مستعمل — ثم صار في بياناتٍ حقيقيةٍ (مستحقٌّ بـ2853.50
+     QAR)، وعلى `fin_dues` مفتاحٌ أجنبيٌّ `fk_dues_currency` **يمنع حذفَ عملةٍ
+     مرجوعٍ إليها بحقّ**. فكان الكنسُ الاستباقيُّ **يرمي استثناءً** فينفجر المسبارُ
+     قبل أيِّ قياسٍ (وهو ما جعل عدّادَه غيرَ مقروء).
+   ⇒ الرمزُ **يُقاس ولا يُفترض**: يُختار أوّلُ مرشَّحٍ لا يشير إليه صفٌّ واحدٌ في
+     أيِّ جدولٍ فيه عمودُ عملة — فلا يتعفَّن الافتراضُ مهما نمت البيانات. */
+$CODE = null;
+$curCols = array();
+$__q = $db->query("SELECT table_name, column_name FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND column_name IN ('currency','currency_code')");
+while ($__q && ($__c = $__q->fetch_assoc())) { $curCols[] = $__c; }
+foreach (array('TSR', 'ZZT', 'XQT', 'QQT', 'VVT') as $__cand) {
+    $used = false;
+    foreach ($curCols as $__c) {
+        $t = $__c['table_name']; $col = $__c['column_name'];
+        if ($t === 'fin_currencies' || $t === 'fin_fx_rates') { continue; }   // جدولا التعريفِ نفسُهما
+        $r = $db->query("SELECT 1 FROM `{$t}` WHERE `{$col}` = '{$__cand}' LIMIT 1");
+        if ($r && $r->num_rows > 0) { $used = true; break; }
+    }
+    if (!$used) { $CODE = $__cand; break; }
+}
+if ($CODE === null) { fwrite(STDERR, "لا رمزَ عملةٍ غيرَ مستعملٍ بين المرشَّحين\n"); exit(1); }
+fwrite(STDOUT, "     · رمزُ العملةِ المقيسُ غيرَ مستعمل: {$CODE}\n");
 $FROM  = '2091-01-01';
 $RATE  = 0.25;
 $MARK  = 'FXP' . getmypid();
@@ -242,19 +266,32 @@ list($c, $h, $b) = fx_req($SCR, $jar2);
 check($c === 200, 'القارئُ يفتح الشاشة');
 check(strpos($b, 'سعرُ صرفٍ جديد') === false, '★ ولا يرى نموذجَ الإضافة');
 
-// لا نموذجَ في صفحته ⇒ **لا رمزَ حمايةٍ أصلًا** — فالطلبُ المزوَّر يسقط عند
-// الحارس المركزي (403) قبل بلوغ فحص الصلاحية. حاجزان لا حاجزٌ واحد.
+// **مقيسٌ**: رمزُ الحمايةِ سِمةُ **جلسةٍ** لا سِمةُ صلاحية — مركزيٌّ يُحقَن في كلِّ
+// نموذجٍ، وصفحةُ القارئِ فيها نموذجان (فلترةٌ وغيرُها) فيحمل رمزًا صحيحًا.
+// فلا يُقاس المنعُ بغيابِ الرمز. وحملُه له **شرطُ صحةِ الفحصِ التالي**: بلا رمزٍ
+// يُردُّ الطلبُ عند حارسِ CSRF فلا نعلم هل حارسُ الصلاحيةِ يعمل أصلًا.
 preg_match('~name="csrf_token"\s+value="([^"]+)"~', $b, $tk2);
-check(!isset($tk2[1]), '★ ولا يُمنح رمزَ حمايةٍ أصلًا — فلا يملك تكوينَ طلبٍ مقبول');
+$tokR = isset($tk2[1]) ? $tk2[1] : '';
+check($tokR !== '', '★ ورمزُ الحمايةِ سِمةُ جلسةٍ لا صلاحيةٍ — فالقارئُ يملكه (فالردُّ التالي ردُّ صلاحيةٍ لا ردُّ رمزٍ)');
 
 list($c, $h, $b) = fx_req($SCR, $jar2, array(
-    'add_rate' => '1', 'csrf_token' => isset($tk2[1]) ? $tk2[1] : '',
+    'add_rate' => '1', 'csrf_token' => $tokR,
     'currency_code' => $CODE,
     'rate_to_base' => '9.99', 'effective_from' => '2091-08-01',
 ));
-$msg = fx_msg($h);
-$refused = ($c === 403) || (strpos($msg, 'لا توجد صلاحية') !== false);
-check($refused, "ومحاولتُه تُردّ صراحةً لا صمتًا (رمز {$c})");
+// **حارسُ الكتابةِ المركزيُّ يسبق فحصَ الشاشةِ نفسِها**: يرمي إلى الداشبورد برمزِ
+// `GOV-PERM-403-WRITE` ونصِّ «صلاحيةُ العرضِ لا تكفي لتغيير البيانات» — والداشبوردُ
+// يوجّه بدورِه إلى لوحةِ الدور، فتُتبَع السلسلةُ كلُّها لقراءةِ الوميض.
+// الأصلُ هو **دليلُ الشاشةِ** لا جِذرُ التطبيق: `../main/dashboard.php` تُحَلُّ من
+// `…/ems/Finance` فتصير `…/ems/main/dashboard.php`. ولو حُلَّت من الجذرِ لخرجت
+// من التطبيقِ كلِّه (`…/main/dashboard.php`) فجاء جسمٌ خاويًا وقُرئ «لا رسالة».
+$msg = ems_flash_text_following($h, dirname($SCR), $jar2);
+if (trim($msg) === '') { $msg = fx_msg($h); }
+$refused = ($c === 403)
+        || (strpos($msg, 'GOV-PERM-403') !== false)
+        || (strpos($msg, 'لا تملك صلاحية الكتابة') !== false)
+        || (strpos($msg, 'لا توجد صلاحية') !== false);
+check($refused, "★ ويردُّه حارسُ الكتابةِ المركزيُّ — صلاحيةُ العرضِ لا تكفي للكتابة (رمز {$c} · " . mb_substr($msg, 0, 80) . ')');
 $r = $db->query("SELECT COUNT(*) c FROM fin_fx_rates WHERE currency_code='{$CODE}' AND effective_from='2091-08-01'");
 check(intval($r->fetch_assoc()['c']) === 0, 'ولا صفَّ كُتب');
 

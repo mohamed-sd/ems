@@ -94,11 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
     $cur   = trim(strval($_POST['currency'] ?? 'SDG'));
 
     $err = null;
-    if ($emp <= 0)                        { $err = 'اختر+المشغّل'; }
-    elseif (!isset($MODELS[$model]))      { $err = 'اختر+نموذج+العمل'; }
-    elseif (!isset($BASES[$basis]))       { $err = 'اختر+أساس+الاستحقاق'; }
-    elseif ($rateRaw === '' || !is_numeric($rateRaw) || (float) $rateRaw <= 0) { $err = 'المعدّل+رقمٌ+موجبٌ+إلزامي'; }
-    elseif ($cur === '')                  { $err = 'العملة+إلزامية'; }
+    if ($emp <= 0)                        { $err = 'اختر المشغّل'; }
+    elseif (!isset($MODELS[$model]))      { $err = 'اختر نموذج العمل'; }
+    elseif (!isset($BASES[$basis]))       { $err = 'اختر أساس الاستحقاق'; }
+    elseif ($rateRaw === '' || !is_numeric($rateRaw) || (float) $rateRaw <= 0) { $err = 'المعدّل رقمٌ موجبٌ إلزامي'; }
+    elseif ($cur === '')                  { $err = 'العملة إلزامية'; }
     if ($err !== null) { ems_gov_flash_redirect('operator_pay_policies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     $optNum = function ($k) {

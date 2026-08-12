@@ -288,7 +288,7 @@ if (isset($_GET['advance_id'])) {
             if ($jid > 0) {
                 $jrow = ems_tenant_db()->selectOne('fin_journal_entries', array('columns' => array('entry_no'), 'where' => array('id' => $jid)));
                 $jno = $jrow ? $jrow['entry_no'] : ('#' . $jid);
-                $auto_msg = '+وتولّد+القيد+' . urlencode($jno) . '+آليًا';
+                $auto_msg = ' وتولّد القيد ' . $jno . ' آليًا';
                 fin_notify($conn, $company_id, 'finance_manager', 'قيد آلي ' . $jno . ' جاهز للترحيل (من ' . $event['event_no'] . ')', 'journal_form_fin.php');
             }
         }

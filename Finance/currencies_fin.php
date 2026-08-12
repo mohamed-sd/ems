@@ -75,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_currency'])) {
     $sym  = trim(strval($_POST['symbol'] ?? ''));
 
     $err = null;
-    if ($code === '' || !preg_match('/^[A-Z]{3}$/', $code)) { $err = 'الرمز+ثلاثةُ+أحرفٍ+لاتينية+(ISO)'; }
-    elseif ($name === '')                                   { $err = 'اسمُ+العملة+إلزامي'; }
+    if ($code === '' || !preg_match('/^[A-Z]{3}$/', $code)) { $err = 'الرمز ثلاثةُ أحرفٍ لاتينية (ISO)'; }
+    elseif ($name === '')                                   { $err = 'اسمُ العملة إلزامي'; }
     if ($err !== null) { ems_gov_flash_redirect('currencies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     try {
@@ -116,11 +116,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
 
     $known = ems_fx_currencies();
     $err = null;
-    if (!isset($known[$code]))                       { $err = 'اختر+عملةً+مسجَّلة'; }
-    elseif ($rateRaw === '')                         { $err = 'السعرُ+إلزامي'; }
-    elseif ($rate === null)                          { $err = 'السعرُ+رقمٌ+—+يُقبل+الكسرُ+العشري+(مثال+0.00166667)'; }
-    elseif ($rate <= 0)                              { $err = 'السعرُ+رقمٌ+موجب'; }
-    elseif ($from === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $err = 'تاريخُ+السريان+إلزامي'; }
+    if (!isset($known[$code]))                       { $err = 'اختر عملةً مسجَّلة'; }
+    elseif ($rateRaw === '')                         { $err = 'السعرُ إلزامي'; }
+    elseif ($rate === null)                          { $err = 'السعرُ رقمٌ — يُقبل الكسرُ العشري (مثال 0.00166667)'; }
+    elseif ($rate <= 0)                              { $err = 'السعرُ رقمٌ موجب'; }
+    elseif ($from === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $err = 'تاريخُ السريان إلزامي'; }
     if ($err !== null) { ems_gov_flash_redirect('currencies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     try {
@@ -134,9 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
         ));
         $co = $is_super_admin ? $company_id : $company_id;
         $done = fx_revalue_pending($conn, $co, $code);
-        $msg = 'سُجّل+السعر+✅';
+        $msg = 'سُجّل السعر ✅';
         if ($done['events'] > 0 || $done['dues'] > 0) {
-            $msg .= '+—+وقُيّم+' . intval($done['events']) . '+حدثًا+و' . intval($done['dues']) . '+ذمّة';
+            $msg .= ' — وقُيّم ' . intval($done['events']) . ' حدثًا و' . intval($done['dues']) . ' ذمّة';
         }
         ems_gov_flash_redirect('currencies_fin.php', "{$msg}", 'GOV-INFO-200', '');
     } catch (\Throwable $t) {

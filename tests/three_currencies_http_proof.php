@@ -101,9 +101,16 @@ fwrite(STDOUT, "\n══ برهانُ HTTP — الشاشة 166 · الفروق�
 head('البذر — ذمّةٌ بالجنيه بسعرِ اعترافٍ أعلى · وسندٌ بالدولار');
 $RATE = 0.000185;
 $OLD  = $RATE * 1.20;
+/* ◆ **لا ذمّةَ بلا فاتورةٍ صادرةٍ تقابلها** (INJ-0036): القيدُ `chk_recv_source_doc`
+     نُصِّب في القاعدة، فبذرٌ يُغفل `source_doc_id` **يُردُّ برميِ استثناءٍ** فينفجر
+     المسبارُ قبل أيِّ قياس. والمساعدُ الجاهزُ `_source_doc_seed.php` يُنشئ الفاتورةَ
+     المصدرَ ويُرجِع معرّفَها — وهو النمطُ المعتمَدُ في `collection_control_test`. */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI = seed_source_invoice($db, $CO, 'H-' . $MARK, 1, 8000000, 'SDG', 0);
 $db->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-            amount, currency, fx_rate_recognized, base_amount, collected, due_date, state, created_at)
-            VALUES ({$CO}, 1, 'invoice', 'INV-H-{$MARK}', 8000000, 'SDG', {$OLD},
+            source_doc_id, amount, currency, fx_rate_recognized, base_amount, collected,
+            due_date, state, created_at)
+            VALUES ({$CO}, 1, 'invoice', 'INV-H-{$MARK}', {$TI}, 8000000, 'SDG', {$OLD},
                     ROUND(8000000*{$OLD},2), 0, '2090-03-31', 'open', NOW())");
 $R = intval($db->insert_id);
 $db->query("INSERT INTO fin_payments (company_id, payment_no, direction, party_type, party_ref,

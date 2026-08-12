@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (\App\Core\TenantGateException $e) {
             error_log('transfer_requests state refused: ' . $e->getMessage());
         }
-        $msg = ($action === 'approve') ? 'تم+اعتماد+الطلب+✅' : 'تم+رفض+الطلب+✅';
+        $msg = ($action === 'approve') ? 'تم اعتماد الطلب ✅' : 'تم رفض الطلب ✅';
         ems_gov_flash_redirect('transfer_requests.php', "$msg", 'GOV-INFO-200', ''); exit();
     }
 

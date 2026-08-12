@@ -35,16 +35,22 @@ if (!function_exists('ems_flash_location')) {
 }
 
 if (!function_exists('ems_flash_url_msg')) {
-    /** الرسالةُ من مُعامَلِ العنوان — لشاشاتٍ تضعها هناك فعلًا. */
+    /**
+     * الرسالةُ من مُعامَلِ العنوان — لشاشاتٍ تضعها هناك فعلًا.
+     *
+     * **و`+` يُفكُّ إلى فراغ.** الشاشاتُ تبني المُعامَلَ بـ`urlencode` فيصير الفراغُ
+     * `+`، فقُرئت رسالةٌ صحيحةٌ هكذا: «سُجّل+السعر+✅+—+وقُيّم+2+حدثًا» ولم تطابق
+     * إبرةَ الفاحصِ ذاتَ الفراغات. فيُستخرَج المُعامَلُ خامًا ويُفَكُّ بـ`urldecode`
+     * (تفكُّ `%xx` **و`+`** معًا) — لا بـ`rawurldecode` التي تُبقي `+` حرفًا.
+     */
     function ems_flash_url_msg($headers)
     {
         $to = ems_flash_location($headers);
         if ($to === '') { return ''; }
         $q = (string) parse_url($to, PHP_URL_QUERY);
         if ($q === '') { return ''; }
-        $p = array();
-        parse_str($q, $p);
-        return isset($p['msg']) ? (string) $p['msg'] : '';
+        if (preg_match('~(?:^|&)msg=([^&]*)~', $q, $m)) { return urldecode($m[1]); }
+        return '';
     }
 }
 
@@ -95,6 +101,57 @@ if (!function_exists('ems_flash_page_text')) {
         if ($out === null) { $out = preg_replace('~\s+~', ' ', $joined); }
         if ($out === null) { $out = $joined; }
         return (string) $out;
+    }
+}
+
+if (!function_exists('ems_flash_text_following')) {
+    /**
+     * نصُّ الوميضِ حين يكون التوجيهُ **أكثرَ من خَطوة**.
+     *
+     * ردُّ الحوكمةِ لا يعود دائمًا إلى الشاشةِ نفسِها: حارسُ الكتابةِ المركزيُّ
+     * يرمي إلى `../main/dashboard.php`، **والداشبورد يوجّه بدورِه** إلى لوحةِ
+     * الدورِ (مقيسٌ: القارئُ المالي ينتهي إلى `Finance/cfo_daily_board_fin.php`).
+     * فمن يتبع خَطوةً واحدةً يقرأ صفحةَ توجيهٍ خاويةً ويحكم «لا رسالة» — والرسالةُ
+     * تنتظره عند نهايةِ السلسلة. فتُتبَع السلسلةُ كلُّها بجرَّةِ الجلسةِ نفسِها.
+     *
+     * @param string $headers ترويسةُ الاستجابةِ الحاملةِ Location
+     * @param string $dirBase أصلُ المسارِ النسبيّ
+     * @param string $jarFile جرَّةُ الجلسة — بها وحدَها يُقرأ الوميض
+     */
+    function ems_flash_text_following($headers, $dirBase, $jarFile)
+    {
+        $to = ems_flash_location($headers);
+        if ($to === '') { return ''; }
+        if (strpos($to, 'http') !== 0) {
+            $to = rtrim((string) $dirBase, '/') . '/' . ltrim($to, '/');
+        }
+        $ch = curl_init($to);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => false,
+            CURLOPT_COOKIEJAR => $jarFile, CURLOPT_COOKIEFILE => $jarFile,
+            CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 8, CURLOPT_TIMEOUT => 60,
+        ));
+        $body = (string) curl_exec($ch);
+        curl_close($ch);
+        if ($body === '') { return ''; }
+
+        /* الجسمُ الخامُ — لأن `strip_tags` تمحو جسمَ `<script>` وفيه الوميض */
+        $parts = array();
+        if (preg_match_all('~"text"\s*:\s*"((?:[^"\\\\]|\\\\.)*)"~', $body, $fm)) {
+            foreach ($fm[1] as $t) {
+                $parts[] = str_replace(array('\\/', '\\"', '\\\\'), array('/', '"', '\\'), $t);
+            }
+        }
+        if (preg_match_all('~"code"\s*:\s*"([^"]*)"~', $body, $cm)) {
+            foreach ($cm[1] as $t) { $parts[] = $t; }
+        }
+        if (preg_match_all('~<noscript>(.*?)</noscript>~is', $body, $nm)) {
+            foreach ($nm[1] as $blk) { $parts[] = html_entity_decode(strip_tags($blk), ENT_QUOTES, 'UTF-8'); }
+        }
+        $joined = implode(' · ', $parts);
+        $out = preg_replace('~\s+~u', ' ', $joined);
+        if ($out === null) { $out = preg_replace('~\s+~', ' ', $joined); }
+        return (string) ($out === null ? $joined : $out);
     }
 }
 

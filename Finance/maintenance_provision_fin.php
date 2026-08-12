@@ -54,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
     ), array('effect_type' => 'metric_update'));
 
     $msg = $rate > 0
-        ? 'تم+ضبط+معدّل+مخصّص+الصيانة+وتفعيله+(' . rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.') . '/ساعة)+✅'
-        : 'تم+إفراغ+المعدّل+—+مخصّص+الصيانة+معطّل+الآن+✅';
+        ? 'تم ضبط معدّل مخصّص الصيانة وتفعيله (' . rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.') . '/ساعة)+✅'
+        : 'تم إفراغ المعدّل — مخصّص الصيانة معطّل الآن ✅';
     ems_gov_flash_redirect('maintenance_provision_fin.php', "$msg", 'GOV-INFO-200', ''); exit();
 }
 
