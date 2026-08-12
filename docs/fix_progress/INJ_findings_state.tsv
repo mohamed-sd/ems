@@ -59,7 +59,7 @@ INJ-0057	P1	نعم	غيرُ مقيس
 INJ-0058	P1	نعم	غيرُ مقيس	
 INJ-0059	P1	نعم	مُغلقٌ بشاهد	tests/sec_structure_test.php · tests/unified_nav_test.php
 INJ-0060	P1	نعم	غيرُ مقيس	
-INJ-0061	P1	نعم	مُغلقٌ بشاهد	tools/fix_nav_href_probe.php · tools/fix_od19_probe.php · tools/fix_status_report.php · tools/fix_u13_nav_tests.php · tools/u13_gate.php
+INJ-0061	P1	نعم	مُغلقٌ بشاهد	tests/fixc_finance_nav_test.php · tools/fix_nav_href_probe.php · tools/fix_od19_probe.php · tools/fix_status_report.php · tools/fix_u13_nav_tests.php · tools/u13_gate.php
 INJ-0062	P1	نعم	مُغلقٌ بشاهد	tools/fix_status_report.php · tools/guard_adoption_gate.php
 INJ-0063	P1	نعم	غيرُ مقيس	
 INJ-0064	P1	نعم	غيرُ مقيس	
