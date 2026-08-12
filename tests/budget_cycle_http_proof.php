@@ -26,6 +26,14 @@ function check($c, $m) { $c ? ok($m) : bad($m); }
 function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 
 function bg_req($url, $jar, $post = null) {
+    /* الرمزُ المركزيُّ: الحارسُ يقبله في الحقولِ أو الترويسة، والمسبارُ
+       يبني الحقولَ يدويًّا فلا يحمله ⇒ 403 صامتٌ يُقرأ فشلًا في المنتج. */
+    if ($post !== null) {
+        require_once __DIR__ . '/_http_flash.php';
+        $post = ems_http_with_csrf($post, $url, $jar);
+    }
+    $GLOBALS['__ems_last_url'] = $url;   // لحلِّ Location النسبيّ
+    $GLOBALS['__ems_last_jar'] = $jar;   // الجرَّةُ وسيطٌ صريحٌ لا حالةٌ عامّة
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true,
@@ -50,12 +58,21 @@ function bg_login($user, $jar) {
     return bg_req($BASE . '/login.php', $jar, array('username' => $user, 'password' => '12345678',
         'csrf_token' => isset($m[1]) ? $m[1] : ''));
 }
+/* ══ **الرسالةُ وميضُ جلسةٍ لا مُعامَلُ عنوان.** `ems_gov_flash_redirect`
+     (`includes/permissions_helper.php:139`) يخزّن النصَّ في
+     `$_SESSION['ems_flash_gov']` ويوجّه **بعنوانٍ مجرَّد** — فقراءةُ `?msg=`
+     تعود فارغةً **دائمًا** فيُقرأ صمتُها فشلًا، والمنتجُ نفَّذ الفعلَ وكتب
+     رسالتَه حيث ينبغي. ويبقى المُعامَلُ مقروءًا **أوّلًا** لأن شاشاتٍ أخرى
+     (المشتريات · الفتراتُ الماليةُ · تسوياتُ الموردين) تضعها فيه فعلًا. */
 function bg_msg($h) {
-    if (preg_match('~Location:\s*(\S+)~i', $h, $m)) {
-        parse_str((string) parse_url(trim($m[1]), PHP_URL_QUERY), $p);
-        return isset($p['msg']) ? $p['msg'] : '';
-    }
-    return '';
+    require_once __DIR__ . '/_http_flash.php';
+    $__dir = isset($GLOBALS['__ems_last_url'])
+        ? preg_replace('~/[^/]*(\?.*)?$~', '', (string) $GLOBALS['__ems_last_url'])
+        : '';
+    return ems_flash_or_msg($h, $__dir, function ($u) {
+        $r = bg_req($u, $GLOBALS['__ems_last_jar'], null);
+        return is_array($r) ? (string) $r[count($r) - 1] : (string) $r;
+    });
 }
 /** رمزُ الحماية المركزي يُحقن في الصفحة — يُقرأ منها ويُرسل مع كل POST. */
 function bg_token($jar) {

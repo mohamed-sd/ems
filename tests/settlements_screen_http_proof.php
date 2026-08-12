@@ -28,6 +28,12 @@ function check($c, $m) { $c ? ok($m) : bad($m); }
 function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 
 function sq_req($url, $jar, $post = null) {
+    /* الرمزُ المركزيُّ: الحارسُ يقبله في الحقولِ أو الترويسة، والمسبارُ
+       يبني الحقولَ يدويًّا فلا يحمله ⇒ 403 صامتٌ يُقرأ فشلًا في المنتج. */
+    if ($post !== null) {
+        require_once __DIR__ . '/_http_flash.php';
+        $post = ems_http_with_csrf($post, $url, $jar);
+    }
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true,

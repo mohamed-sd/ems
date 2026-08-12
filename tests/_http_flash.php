@@ -83,3 +83,47 @@ if (!function_exists('ems_flash_or_msg')) {
         return ems_flash_page_text($headers, $dirBase, $get);
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   الرمزُ المركزيُّ لجلسةِ مسبارٍ — يُقرأ من الصفحةِ مرةً ويُخزَّن لجرَّتِها
+   ───────────────────────────────────────────────────────────────────────────
+   الحارسُ المركزيُّ (`includes/security.php:404`) يقبل `$_POST['csrf_token']`
+   **أو** ترويسةَ `X-CSRF-Token`. والمسابيرُ تبني حقولَ الطلبِ **يدويًّا** فلا
+   تحمل أيَّهما — فتُردُّ 403 ويُقرأ صمتُها فشلًا في المنتج. والرمزُ **واحدٌ لكلِّ
+   جلسة**، فيُقرأ مرةً لكلِّ جرَّةٍ ويُعاد استعمالُه.
+   ═══════════════════════════════════════════════════════════════════════════ */
+if (!function_exists('ems_http_csrf_token')) {
+    function ems_http_csrf_token($url, $jarFile)
+    {
+        static $cache = array();
+        $k = (string) $jarFile;
+        if (isset($cache[$k]) && $cache[$k] !== '') { return $cache[$k]; }
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => false,
+            CURLOPT_COOKIEJAR => $jarFile, CURLOPT_COOKIEFILE => $jarFile,
+            CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => 40,
+        ));
+        $body = (string) curl_exec($ch);
+        curl_close($ch);
+
+        $tok = '';
+        if (preg_match('~name="csrf_token"\s+value="([^"]+)"~', $body, $m)) { $tok = $m[1]; }
+        elseif (preg_match('~<meta\s+name="csrf-token"\s+content="([^"]+)"~i', $body, $m)) { $tok = $m[1]; }
+        $cache[$k] = $tok;
+        return $tok;
+    }
+}
+
+if (!function_exists('ems_http_with_csrf')) {
+    /** يُضيف الرمزَ المركزيَّ إلى حقولِ طلبٍ لا تحمله — وإلا تُركت كما هي. */
+    function ems_http_with_csrf($post, $url, $jarFile)
+    {
+        if (!is_array($post)) { return $post; }
+        if (isset($post['csrf_token']) && $post['csrf_token'] !== '') { return $post; }
+        $t = ems_http_csrf_token($url, $jarFile);
+        if ($t !== '') { $post['csrf_token'] = $t; }
+        return $post;
+    }
+}
