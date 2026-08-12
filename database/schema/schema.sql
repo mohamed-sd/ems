@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 15:15:00
+-- المصدر: equipation_manage · التوليد: 2026-08-12 18:11:25
 -- الجداول: 548 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -1700,7 +1700,7 @@ CREATE TABLE `contract_price_terms` (
   `threshold_percent` decimal(6,3) NOT NULL DEFAULT 0.000 COMMENT 'عتبةُ التفعيل — دونها لا تعديل',
   `pass_through_percent` decimal(6,3) NOT NULL DEFAULT 100.000 COMMENT 'كم من تغيّر المؤشر يدخل السعر',
   `cap_percent` decimal(6,3) DEFAULT NULL COMMENT 'سقفُ المراجعة الواحدة — NULL = بلا سقفٍ مكتوب',
-  `periodicity` enum('monthly','quarterly','semiannual','annual') NOT NULL DEFAULT 'quarterly',
+  `periodicity` enum('daily','monthly','quarterly','semiannual','annual') NOT NULL DEFAULT 'quarterly' COMMENT 'دوريةُ المراجعة — daily سريانُه يومُه نفسُه بقرارِ المالك 2026-08-12',
   `valid_from` date NOT NULL,
   `valid_to` date DEFAULT NULL,
   `state` enum('active','ended') NOT NULL DEFAULT 'active',

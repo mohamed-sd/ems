@@ -32,6 +32,11 @@ while (ob_get_level() > 0) { ob_end_clean(); }
 
 $CO = 4;
 $ACTOR = 1;
+/* معتمِدٌ **غيرُ المُنشئ**: حارسُ «من أنشأ لا يعتمد» بنيويٌّ في
+   `PriceAdjustmentService::approve()`، وحارسٌ ثانٍ يردُّ الاعتمادَ بفاعلٍ صفريّ
+   («لا يُسجَّل أثرٌ بلا صاحب»). ونسيتُ تعريفَه في أوّلِ شوطٍ فصار صفرًا فرُدَّت
+   ستُّ اعتماداتٍ — **الحارسُ أمسكَ خطئي أنا**، وهذا عينُ ما بُني له. */
+$APPROVER = 2;
 $_SESSION['user'] = array('id' => $ACTOR, 'role' => '1', 'company_id' => $CO, 'name' => 'uat0002 seed');
 $conn = $GLOBALS['conn'];
 $gate = ems_tenant_db();
@@ -64,6 +69,9 @@ $MARKED = array(
     'contract_advances'   => 'doc_ref',
     'contract_guarantees' => 'instrument_ref',
     'credit_debit_notes'  => 'doc_ref',
+    /* التسعيرُ اليوميُّ: الوسمُ في رمزِ المؤشرِ وفي مرجعِ قرارِ التسعير */
+    'contract_price_terms' => 'index_code',
+    'contract_price_index_readings' => 'source_ref',
 );
 $BEFORE = array();
 foreach ($MARKED as $tbl => $col) {
@@ -158,6 +166,81 @@ foreach ($claims as $cl) {
         $reasons[$i % count($reasons)], $ref, null, $ref, $ACTOR);
     $note('credit_debit_notes', !empty($res['ok']), isset($res['reason']) ? $res['reason'] : '');
     $i++;
+}
+
+/* ══ ④ تسعيرٌ يوميٌّ من الإدارةِ المالية — قرارُ المالك 2026-08-12 ═══════════════
+     «مصدرُها التحديثُ الوقتيُّ للأسعارِ **من الإدارةِ المالية** لكلِّ عمليةٍ بشكلِ
+      تسعيرٍ لكلِّ معاملةٍ، مع إمكانيةِ تحديدِ السعرِ **لليومِ بشكلٍ يوميّ**.»
+     ⇒ فلا مؤشرَ خارجيًّا يُقرأ منه: الماليةُ تُدخِل سعرَ اليومِ بمرجعِ قرارِها،
+       والمحرِّكُ يُولّد مراجعةً سريانُها **يومُها نفسُه**، وسعرُ المعاملةِ يتبعُ
+       يومَها. والثمانيةُ الملفَّقةُ أُزيلت بهجرةِ 2027_03_17 (رمزُ المؤشرِ كان
+       رقمَ عقدٍ · وبندُها غيرَ موجودٍ · ومُنشئُها NULL). */
+require_once $ROOT . '/app/Services/Contract/PriceAdjustmentService.php';
+$PAS = 'App\Services\Contract\PriceAdjustmentService';
+
+/* بنودُ عقودٍ **حقيقيةٌ** بسعرٍ أساسيٍّ — لا تُخترع بنود */
+$priceItems = array();
+$r = $conn->query("SELECT ce.id, ce.contract_id, ce.equip_price
+                     FROM contractequipments ce
+                     JOIN contracts c ON c.id = ce.contract_id
+                    WHERE c.company_id = {$CO} AND ce.equip_price > 0
+                    ORDER BY ce.id LIMIT 3");
+while ($r && ($x = $r->fetch_assoc())) { $priceItems[] = $x; }
+$o('  بنودُ عقدٍ للتسعيرِ اليوميّ: ' . count($priceItems));
+
+/* ثلاثةُ أيامٍ متتاليةٍ بأسعارٍ متحرِّكةٍ — كما تُسعّر الماليةُ فعلًا */
+$priceDays = array(
+    array('2026-08-10', 100.00, 'سعرُ اليومِ — لا تغييرَ عن المرجع'),
+    array('2026-08-11', 108.50, 'ارتفاعُ الجازولينِ — قرارُ تسعيرٍ يوميٌّ من الإدارةِ المالية'),
+    array('2026-08-12', 114.25, 'استمرارُ الارتفاعِ — قرارُ تسعيرٍ يوميٌّ من الإدارةِ المالية'),
+);
+foreach ($priceItems as $k => $it) {
+    $code = $MARK . '-FUEL-' . (int) $it['id'];
+    if (!$APPLY) { $note('contract_price_terms', true, ''); $note('contract_price_index_readings', true, ''); continue; }
+
+    /* ﴾أ﴾ بندُ تسعيرٍ **يوميٌّ** — والعطالةُ بجسِّ الرمز (الخدمةُ بلا مفتاحِ عطالة) */
+    $exists = $gate->selectOne('contract_price_terms', array(
+        'columns' => array('id'), 'where' => array('index_code' => $code)));
+    if ($exists === null) {
+        $t = $PAS::saveTerm($conn, $gate, $CO, (int) $it['contract_id'], array(
+            'contract_item_id' => (int) $it['id'], 'trigger_kind' => 'fuel',
+            'index_code' => $code, 'base_index' => 100.00, 'base_date' => '2026-08-01',
+            'threshold_percent' => 0.00, 'pass_through_percent' => 100.00,
+            'periodicity' => 'daily', 'valid_from' => '2026-08-01',
+        ), $ACTOR);
+        $note('contract_price_terms', !empty($t['ok']), isset($t['reason']) ? $t['reason'] : '');
+        if (empty($t['ok'])) { continue; }
+    } else { $note('contract_price_terms', 'exists', ''); }
+
+    /* ﴾ب﴾ سعرُ كلِّ يومٍ بمرجعِ قرارِه — والقراءةُ واقعةٌ لا تُكرَّر (409 عاطلةٌ) */
+    foreach ($priceDays as $d) {
+        $rr = $PAS::recordIndexReading($conn, $gate, $CO, array(
+            'index_code' => $code, 'reading_date' => $d[0], 'value' => $d[1],
+            'source_ref' => $MARK . '-FIN-' . str_replace('-', '', $d[0]) . '-' . (int) $it['id'],
+            'note' => $d[2],
+        ), $ACTOR);
+        if (!empty($rr['ok'])) { $note('contract_price_index_readings', true, ''); }
+        elseif ((int) (isset($rr['code']) ? $rr['code'] : 0) === 409) {
+            $note('contract_price_index_readings', 'exists', '');
+        } else { $note('contract_price_index_readings', false, isset($rr['reason']) ? $rr['reason'] : ''); }
+    }
+
+    /* ﴾ج﴾ المراجعةُ لكلِّ يومٍ ثم اعتمادُها **بمعتمِدٍ غيرِ المُنشئ** — فحارسُ
+           «من أنشأ لا يعتمد» بنيويٌّ، ولو استعملتُ الفاعلَ نفسَه لرُدِدتُ 403. */
+    foreach (array('2026-08-11', '2026-08-12') as $day) {
+        $ap = $PAS::applyDue($conn, $gate, $CO, (int) $it['contract_id'], $day, $ACTOR, 'user');
+        $n = isset($ap['created']) ? (int) $ap['created'] : 0;
+        if ($n > 0) { $note('contract_price_revisions', true, ''); }
+        else { $note('contract_price_revisions', 'exists', ''); }
+    }
+    $q = $conn->query("SELECT r.id FROM contract_price_revisions r
+                         JOIN contract_price_terms t ON t.id = r.term_id
+                        WHERE r.company_id = {$CO} AND r.approved_at IS NULL
+                          AND t.index_code = '" . $conn->real_escape_string($code) . "'");
+    while ($q && ($x = $q->fetch_assoc())) {
+        $a = $PAS::approve($conn, $gate, $CO, (int) $x['id'], $APPROVER);
+        $note('contract_price_revisions (اعتماد)', !empty($a['ok']), isset($a['reason']) ? $a['reason'] : '');
+    }
 }
 
 /* ── التقرير ─────────────────────────────────────────────────────────────── */

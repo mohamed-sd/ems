@@ -28,7 +28,12 @@ class PriceAdjustmentService
     /** المحفِّزاتُ الثلاثة المسمّاة في §2-③ — مرآةُ ENUM `trigger_kind`. */
     const TRIGGERS = array('fuel', 'inflation', 'fx');
 
-    const PERIODICITIES = array('monthly', 'quarterly', 'semiannual', 'annual');
+    /**
+     * دوريّاتُ المراجعة. **و`daily` أُضيفت بقرارِ المالك 2026-08-12**: «مصدرُها
+     * التحديثُ الوقتيُّ للأسعارِ من الإدارةِ المالية … مع إمكانيةِ تحديدِ السعرِ
+     * لليومِ بشكلٍ يوميّ» — فلا مؤشرَ خارجيًّا منشورًا، والماليةُ هي المصدر.
+     */
+    const PERIODICITIES = array('daily', 'monthly', 'quarterly', 'semiannual', 'annual');
 
     /** ملحقُ السعر — النوعُ القائمُ سلفًا في ENUM `contract_amendments`. */
     const AMEND_TYPE = 'تغيير أسعار';
@@ -175,6 +180,16 @@ class PriceAdjustmentService
             $out['reason'] = 'مرجعُ المستند إلزامي — رقمٌ بلا مرجعٍ يحرّك مالًا تلفيقٌ (عقيدة ⑦)';
             return $out;
         }
+        /* ◆ **ولا سعرَ بلا مُسعِّرٍ مُعرَّف.** قرارُ المالك 2026-08-12 يجعل المصدرَ
+             «التحديثَ الوقتيَّ للأسعارِ **من الإدارةِ المالية**» — فهويةُ من سعّر
+             جوهرُ الحقيقةِ لا حاشيتُها. وكان `created_by => (int)$actor ?: null`
+             يكتب نُلًّا صامتًا على فاعلٍ صفريّ، فيصير السعرُ بلا صاحب — وهو عينُ
+             ما أُغلق في `applyDue`/`approve` بعمودِ منشإٍ وقيدَين. */
+        if ((int) $actor <= 0) {
+            $out['code'] = 403;
+            $out['reason'] = 'تسعيرٌ بلا مُسعِّرٍ مُعرَّفٍ — لا يُسجَّل سعرٌ بلا صاحب';
+            return $out;
+        }
         try {
             $out['reading_id'] = (int) $gate->insert('contract_price_index_readings', array(
                 'index_code' => $code, 'reading_date' => $date, 'value' => $value,
@@ -259,6 +274,11 @@ class PriceAdjustmentService
         $ts = strtotime((string) $date);
         $y = (int) date('Y', $ts); $m = (int) date('n', $ts);
         switch ((string) $periodicity) {
+            /* اليوميُّ: مفتاحُ الدورةِ هو اليومُ نفسُه (10 محارفَ في varchar(16)) —
+               فلكلِّ يومٍ مراجعةٌ واحدةٌ لكلِّ (شرطٍ × بندٍ) بحكمِ المفتاحِ الفريد
+               `uq_price_revision_period_item`، وهو عينُ ما يمنع تكرارَ تسعيرِ
+               اليومِ الواحدِ مرتين. */
+            case 'daily':      return date('Y-m-d', $ts);
             case 'monthly':    return sprintf('%04d-%02d', $y, $m);
             case 'semiannual': return $y . '-H' . ($m <= 6 ? 1 : 2);
             case 'annual':     return (string) $y;
@@ -277,6 +297,14 @@ class PriceAdjustmentService
         $ts = strtotime((string) $date);
         $y = (int) date('Y', $ts); $m = (int) date('n', $ts);
         switch ((string) $periodicity) {
+            /* ◆ **اليوميُّ يسري يومَه نفسَه — لا غدًا.** والقاعدةُ أعلاه («يسري
+                 بعدَ الفترة») وُضعت للدوريّاتِ الخشنةِ لئلا تُعاد فوترةُ فترةٍ
+                 جرت وقائعُها. ولو طُبِّقت على اليوميِّ لصار «سعرُ اليوم» ساريًا
+                 غدًا — وهو نقضُ قرارِ المالك 2026-08-12 نصًّا.
+               ◆ و«لا رجعية» تبقى محفوظةً بآليةٍ أخرى لا بهذا التأخير:
+                 `effectivePrice()` يختار آخرَ مراجعةٍ معتمَدةٍ سريانُها ≤ يومِ
+                 الواقعة — فواقعةُ أمسِ تبقى بسعرِ أمسِ ولو سُجِّل اليومَ سعرٌ جديد. */
+            case 'daily':      return date('Y-m-d', $ts);
             case 'monthly':    return date('Y-m-d', mktime(0, 0, 0, $m + 1, 1, $y));
             case 'semiannual': return $m <= 6 ? sprintf('%04d-07-01', $y) : sprintf('%04d-01-01', $y + 1);
             case 'annual':     return sprintf('%04d-01-01', $y + 1);

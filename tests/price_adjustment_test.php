@@ -226,10 +226,44 @@ $op = PAS::effectivePrice($conn, $CO, intval($otherItem['contract_id']), intval(
                           '2026-07-30', floatval($otherItem['equip_price']));
 check(abs($op - floatval($otherItem['equip_price'])) < 0.001,
       'بندٌ بلا شرطٍ ولا مراجعةٍ يعود أساسَه حرفيًّا (' . $otherItem['equip_price'] . ')');
-$liveRevisions = intval($conn->query("SELECT COUNT(*) n FROM contract_price_revisions r
-    JOIN contracts c ON c.id = r.contract_id WHERE c.first_party NOT LIKE 'M09T%'
-       OR c.first_party IS NULL")->fetch_assoc()['n']);
-check($liveRevisions === 0, 'صفرُ مراجعةٍ على أي عقدٍ حيٍّ ⇒ صفرُ سعرٍ تغيّر في الإنتاج');
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **كان هنا**: `check($liveRevisions === 0, 'صفرُ مراجعةٍ على أي عقدٍ حيٍّ')`.
+ *   وكان صادقًا **لأنَّ الميزةَ كانت بلا بيانات** — أي أنه قياسٌ خاويٌّ يحرس
+ *   الغيابَ لا الصحّة. وقرارُ المالك 2026-08-12 («الماليةُ تُسعّر يوميًّا … تسعيرٌ
+ *   لكلِّ معاملة») جعل للمراجعاتِ وجودًا **بالتصميم**، فصار القياسُ يرسب على
+ *   ميزةٍ تعمل كما أُمِرت.
+ * ◆ فلا يُحذف بل **يُبدَّل بقانونٍ يصمد مع وجودِ البيانات**: لا يُشترط عددٌ، بل
+ *   تُشترط سلامةُ كلِّ مراجعةٍ حيّةٍ في ثلاثةِ أوجهٍ — ولأوّلِ مرةٍ للقياسِ ما
+ *   يقيسه (6 مراجعاتٍ حيّةٍ)، فهو غيرُ خاوٍ.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+head('⑨ قانونُ المراجعاتِ الحيّةِ — لا عددٌ يُشترط بل سلامةٌ');
+$LIVE = "FROM contract_price_revisions r JOIN contracts c ON c.id = r.contract_id
+          WHERE (c.first_party NOT LIKE 'M09T%' OR c.first_party IS NULL)";
+$cnt = function ($extra) use ($conn, $LIVE) {
+    $r = $conn->query("SELECT COUNT(*) n {$LIVE} {$extra}");
+    return $r ? (int) $r->fetch_assoc()['n'] : -1;
+};
+$live = $cnt('');
+fwrite(STDOUT, "   مراجعاتٌ حيّةٌ تحت القياس: {$live}\n");
+
+/* ① لا اعتمادَ بلا معتمِدٍ مُعرَّف */
+check($cnt("AND r.approved_at IS NOT NULL AND (r.approved_by IS NULL OR r.approved_by <= 0)") === 0,
+      'كلُّ معتمَدةٍ حيّةٍ لها معتمِدٌ مُعرَّفٌ — لا أثرَ بلا صاحب');
+/* ② الفصلُ بنيويٌّ: بشريُّ المنشإِ لا يعتمدُه مُنشئُه */
+check($cnt("AND r.approved_at IS NOT NULL AND r.created_origin = 'user'
+            AND r.created_by = r.approved_by") === 0,
+      'ولا معتمَدةً اعتمدها مُنشئُها — «من أنشأ لا يعتمد»');
+/* ③ سعرٌ جديدٌ لا يُكتب إلا على نتيجةٍ حرّكت سعرًا */
+check($cnt("AND r.new_price IS NOT NULL
+            AND r.outcome NOT IN ('amended','capped')") === 0,
+      'ولا سعرَ جديدًا على نتيجةٍ لم تحرّك سعرًا');
+/* ④ واليوميُّ سريانُه مفتاحُه — فلا مراجعةٌ تُزحزح أثرَها بنفسها */
+check($cnt("AND r.term_id IN (SELECT id FROM contract_price_terms WHERE periodicity = 'daily')
+            AND r.effective_from <> r.period_key") === 0,
+      'واليوميُّ سريانُه = مفتاحُه (قرارُ المالك) — فلا تُزحزح مراجعةٌ أثرَها');
+/* ◆ وغيرُ خاوٍ: لو كان `$live === 0` لصدَقت الأربعةُ تحصيلَ حاصل — فيُعلَن */
+check($live > 0,
+      'وللقياسِ ما يقيسه (' . $live . ' مراجعةً حيّةً) — وإلا فالأربعةُ أعلاه خواء');
 
 // ═══ ⑨ الصرفُ من مصدره ═══
 head('⑨ `fx` يقرأ fin_fx_rates — مصدرَ الحقيقة الواحد');
