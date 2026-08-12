@@ -67,19 +67,33 @@ $r = $conn->query("SELECT 1 FROM information_schema.columns
                      AND column_name = 'head_person_id'");
 check($r && $r->num_rows === 0, 'org_units بلا عمود head_person_id — الاشتقاق لا الكتابة (ORG-02)');
 
-head('② البذور');
+/* ══ **إحصاءٌ مجمَّدٌ لا ثابت.** كانت هذه الفحوصُ تشترط أعدادًا بعينها (14 وحدةً
+     · 8 أنواعٍ موقعيةٍ · 9 أنواعِ أذوناتٍ · 24 صفَّ مصفوفة) — وهي **أعدادُ
+     البذرةِ يومَ كُتب الفاحص**. والهيكلُ التنظيميُّ ينمو بطبيعته: صارت الوحداتُ
+     22 · والأنواعُ الموقعيةُ 9 (التاسعُ `site_movement_mgr` **بقرارِ مالكٍ
+     صريحٍ** في هجرة `2027_02_13`) · وأنواعُ الأذوناتِ 20.
+     فكانت أربعةُ فحوصٍ ترسب **لأن النظامَ نما**، لا لأن حكمًا انكسر — وهذا
+     يُقرأ عطلًا فيُطارَد، أو يُهمَل فيُهمَل معه ما يجاوره.
+   ⇒ **الحكمُ يُقاس والإحصاءُ يُعلَن**:
+     · الأرقامُ الموثَّقةُ تصير **حدًّا أدنى** — نموٌّ يمرُّ، و**نقصٌ عن الموثَّقِ
+       يرسب** (فحذفُ نوعٍ أو وحدةٍ عطلٌ حقيقيّ).
+     · والثابتُ الحقيقيُّ يُقاس بنفسِه: «كلُّ موقعيٍّ يلزمه خطٌّ وظيفيّ» =
+       `sf === s` لا `sf === 8` — فيصدُق عند كلِّ عددٍ ويرسب عند أولِ مخالف.
+       (وهو الآن **9/9 صحيح** — وكان يرسب على رقمٍ لا على حكم.) */
+head('② البذور — حدٌّ أدنى موثَّقٌ وثوابتُ بنيةٍ تُقاس بنفسها');
 $r = $conn->query("SELECT COUNT(*) c FROM org_units WHERE company_id = {$CO}")->fetch_assoc();
-check(intval($r['c']) === 14, "الوحدات 14 (وُجد {$r['c']})");
+check(intval($r['c']) >= 14, "الوحدات ≥ 14 الموثَّقة (وُجد {$r['c']})");
 $r = $conn->query("SELECT SUM(level='central') c, SUM(level='site') s,
                           SUM(level='site' AND requires_functional_line=1) sf
                    FROM org_assignment_types")->fetch_assoc();
-check(intval($r['c']) === 5, "الأنواع المركزية 5 (وُجد {$r['c']})");
-check(intval($r['s']) === 8, "الأنواع الموقعية 8 (وُجد {$r['s']})");
-check(intval($r['sf']) === 8, 'كل موقعي requires_functional_line=1 (§2⑦)');
+check(intval($r['c']) >= 5, "الأنواع المركزية ≥ 5 الموثَّقة (وُجد {$r['c']})");
+check(intval($r['s']) >= 8, "الأنواع الموقعية ≥ 8 الموثَّقة (وُجد {$r['s']})");
+check(intval($r['sf']) === intval($r['s']),
+    'كل موقعي requires_functional_line=1 (§2⑦) — ' . intval($r['sf']) . '/' . intval($r['s']));
 $r = $conn->query("SELECT COUNT(*) c FROM permit_types")->fetch_assoc();
-check(intval($r['c']) === 9, "أنواع الأذونات 9 (وُجد {$r['c']})");
+check(intval($r['c']) >= 9, "أنواع الأذونات ≥ 9 الموثَّقة (وُجد {$r['c']})");
 $r = $conn->query("SELECT COUNT(*) c FROM permit_required_approvals")->fetch_assoc();
-check(intval($r['c']) === 24, "مصفوفة الموافقات 24 صفًّا (وُجد {$r['c']})");
+check(intval($r['c']) >= 24, "مصفوفة الموافقات ≥ 24 صفًّا الموثَّقة (وُجد {$r['c']})");
 $r = $conn->query("SELECT COUNT(*) c FROM permit_required_approvals r
                    JOIN permit_types p ON p.permit_type_code = r.permit_type_code
                    WHERE r.seq_no = 1 AND r.approver_role <> 'movement'

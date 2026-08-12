@@ -45,21 +45,43 @@ foreach ($tables as $t) {
     check($r && $r->num_rows === 1, $t);
 }
 
-head('② الأسلاف تُوسَّع ولا تُهدم');
+/* ══ **عنوانُ القسمِ نفسُه يقول الحكم: «تُوسَّع ولا تُهدم».** وكانت الفحوصُ
+     تشترط أعدادًا بعينها — إحصاءَ يومِ كُتب الفاحصُ لا حكمًا. والنظامُ نما
+     بقرارِ مالكٍ وبعملٍ لاحق: `job_titles` 16 ← 23 (أدوارُ المخاطر) ·
+     `user_capacities` 30 ← 76 · `positions` 0 ← 20 · القوالبُ 42 ← 68.
+     فأربعةُ فحوصٍ ترسب **لأن الأسلافَ تُوسَّع** — وهو عينُ ما يُثبته القسم.
+   ⇒ الحكمُ يُقاس والإحصاءُ يُعلَن:
+     · **لا نقصانَ عن الموثَّق** — فهدمُ صفٍّ عطلٌ حقيقيٌّ يرسب.
+     · و**كلُّ مسمًّى نشطٍ مرمَّزٌ كاملًا** = `مرمَّز === نشط` لا `=== 16`؛ وهو
+       ثابتٌ يصدُق عند كلِّ عددٍ ويرسب عند أولِ مخالف.
+       (وقد كشف هذا الحكمُ عطلَين حقيقيَّين أُصلحا في هجرة `2027_02_15`:
+        ثلاثةُ أدوارِ مخاطرَ بلا عائلةٍ لأن `fam_risk` لم تكن في القاموس ·
+        وأربعةُ صفوفٍ **ليست مسمّياتٍ أصلًا** — أسماءُ أشخاصٍ ورمزٌ يشير إلى
+        ذاتِه — حُجرت بالإطفاءِ والإعلان.) */
+head('② الأسلاف تُوسَّع ولا تُهدم — لا نقصانَ عن الموثَّق');
 $r = $conn->query("SELECT COUNT(*) c FROM job_titles")->fetch_assoc();
-check(intval($r['c']) === 16, 'job_titles ما زال 16 صفًّا (DEC-SEC-H)');
-$r = $conn->query("SELECT COUNT(*) c FROM job_titles WHERE title_code IS NOT NULL AND family_code IS NOT NULL AND level_code IS NOT NULL")->fetch_assoc();
-check(intval($r['c']) === 16, 'الـ16 مرمّزة بالعائلة والمستوى (★مسودة D1)');
+check(intval($r['c']) >= 16, "job_titles ≥ 16 الموثَّقة (DEC-SEC-H) — وُجد {$r['c']}");
+$r = $conn->query("SELECT COUNT(*) t,
+                     SUM(title_code IS NOT NULL AND family_code IS NOT NULL
+                         AND level_code IS NOT NULL) k
+                   FROM job_titles WHERE COALESCE(active,1) = 1")->fetch_assoc();
+check(intval($r['k']) === intval($r['t']),
+    'كلُّ مسمًّى **نشطٍ** مرمَّزٌ بالعائلة والمستوى (★مسودة D1) — '
+    . intval($r['k']) . '/' . intval($r['t']));
 foreach (array('user_capacities' => 30, 'exception_requests' => 0, 'positions' => 0) as $t => $n) {
     $r = $conn->query("SELECT COUNT(*) c FROM {$t}")->fetch_assoc();
-    check(intval($r['c']) === $n, "{$t} كما كان ({$n})");
+    check(intval($r['c']) >= $n, "{$t} ≥ {$n} الموثَّقة (وُجد {$r['c']})");
 }
 
 head('③ البذور');
 $r = $conn->query("SELECT SUM(layer='relation') r, SUM(layer='family') f, SUM(layer='level') l FROM hr_dictionaries")->fetch_assoc();
-check(intval($r['r']) === 6 && intval($r['f']) === 13 && intval($r['l']) === 7, "القواميس 6/13/7 (وُجد {$r['r']}/{$r['f']}/{$r['l']})");
+/* ◆ والقواميسُ كذلك تُوسَّع: عائلةُ «المخاطر» (`fam_risk`) أُضيفت في هجرة
+     `2027_02_15` تطبيقًا لسابقةِ `INJ-0059` (المخاطرُ مجالٌ أولُ الدرجة لا
+     دَفينةٌ تحت الحوكمة) — فصارت العوائلُ 14. والحكمُ **لا نقصان**. */
+check(intval($r['r']) >= 6 && intval($r['f']) >= 13 && intval($r['l']) >= 7,
+    "القواميس ≥ 6/13/7 الموثَّقة (وُجد {$r['r']}/{$r['f']}/{$r['l']})");
 $r = $conn->query("SELECT COUNT(*) c FROM permission_templates")->fetch_assoc();
-check(intval($r['c']) === 42, "قوالب الهوية 42 (وُجد {$r['c']})");
+check(intval($r['c']) >= 42, "قوالب الهوية ≥ 42 الموثَّقة (وُجد {$r['c']})");
 $r = $conn->query("SELECT COUNT(*) c FROM permission_templates WHERE tpl_kind='relation' AND is_ceiling=1")->fetch_assoc();
 check(intval($r['c']) === 6, 'قوالب العلاقة الست سقوف (is_ceiling=1)');
 $r = $conn->query("SELECT COUNT(*) c FROM sod_conflicts")->fetch_assoc();
