@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 04:45:27
+-- المصدر: equipation_manage · التوليد: 2026-08-12 05:14:55
 -- الجداول: 550 · المناظير: 4
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -5013,7 +5013,8 @@ CREATE TABLE `fin_payments` (
   KEY `ix_fin_pay_state` (`company_id`,`state`),
   KEY `ix_fin_pay_deleted` (`is_deleted`),
   CONSTRAINT `ck_pay_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2)),
-  CONSTRAINT `ck_fp_allocated` CHECK (`allocated_amount` >= 0 and `allocated_amount` <= `amount`)
+  CONSTRAINT `ck_fp_allocated` CHECK (`allocated_amount` >= 0 and `allocated_amount` <= `amount`),
+  CONSTRAINT `ck_collection_bank_ref` CHECK (`direction` <> 'collection' or `bank_ref` is not null and `bank_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_posting_matrix ──

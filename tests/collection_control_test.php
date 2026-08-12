@@ -48,7 +48,16 @@ $teardown = function () use ($conn, $MARK) {
     $conn->query("DELETE a FROM fin_collection_allocations a
                     JOIN fin_receivables r ON r.id = a.receivable_id
                    WHERE r.doc_ref LIKE '{$MARK}%'");
-    $conn->query("DELETE FROM fin_payments WHERE bank_ref LIKE '{$MARK}%'");
+    /* ◆ **عطلُ كنسٍ مقيسٌ ومُكلِّف**: كان الحذفُ بـ`bank_ref LIKE '{MARK}%'`
+         وحدَه — والصفُّ الذي يصنعه الفحصُ لإثباتِ الثغرةِ (`{MARK}-LEAK`)
+         `bank_ref` فيه **NULL بالتصميم**، فلا يطابقه الشرطُ أبدًا. فتراكمت
+         **ستةٌ وعشرون** صفَّ تحصيلٍ بلا مرجعٍ بنكيٍّ في قاعدةٍ ماليةٍ حقيقيةٍ
+         على مدى جولاتٍ، وحجبت قيدَ `ck_collection_bank_ref` عن الإضافةِ في
+         هجرةِ الترميمِ الجماعيّ — أي أن **كنسًا ناقصًا منع حارسًا ماليًّا من
+         العمل**. (حُذفت في `2027_02_14` بعد إثباتِ أنها بلا تخصيصٍ ولا حدث.)
+       ⇒ الحذفُ بـ`payment_no` أيضًا — وهو وسمُ الصفِّ نفسِه لا حقلٌ اختياريّ. */
+    $conn->query("DELETE FROM fin_payments WHERE bank_ref LIKE '{$MARK}%'
+                    OR payment_no LIKE '{$MARK}%'");
     $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE '{$MARK}%'");
     $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$MARK}%'");
     $conn->query("DELETE FROM clients WHERE client_name LIKE '%{$MARK}%'");
