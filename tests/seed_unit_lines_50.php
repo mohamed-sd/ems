@@ -55,7 +55,11 @@ function req($url, $post = null, array $headers = array()) {
     return array($code, $body);
 }
 
+require_once __DIR__ . '/_fk_sweep.php';
+
 function purge(mysqli $db) {
+    /* تقريرُ الكنسِ يُجمَع مرةً ويُعلَن — والكنسُ يُقاس لا يُوعَد */
+    $swept = array();
     $from = WIN_FROM; $to = WIN_TO;
     $ids = array();
     $r = $db->query("SELECT id FROM timesheet WHERE `date` BETWEEN '{$from}' AND '{$to}'");
@@ -65,15 +69,22 @@ function purge(mysqli $db) {
     while ($x = $r->fetch_row()) { $mir[] = (int) $x[0]; }
     if ($mir) {
         $inM = implode(',', $mir);
-        $db->query("DELETE FROM ems_business_events WHERE entity_type='unit_entry' AND entity_id IN ({$inM})");
-        $db->query("DELETE FROM unit_approvals WHERE entry_id IN ({$inM})");
-        $db->query("DELETE FROM unit_capacity_flags WHERE entry_id IN ({$inM})");
-        $db->query("DELETE FROM unit_time_log WHERE entry_id IN ({$inM})");
-        $db->query("DELETE FROM unit_entries WHERE id IN ({$inM})");
+        /* ◆ **الأبناءُ من القاعدةِ لا بيدٍ** — كانت هنا ثلاثةُ أسماءٍ مكتوبةٍ
+             يدويًّا و`unit_match_overrides` غائبٌ، فمات الكنسُ في **منتصفه**
+             بـ«Cannot delete or update a parent row» فبقيت النافذةُ نصفَ نظيفةٍ.
+             وحذفُ حقيقةِ الأعمالِ نفسِه يجرُّ `fin_financial_events.root_event_id`
+             — فالإسقاطُ الماليُّ يُكنَس قبل الحقيقة (ADR-15). انظر `_fk_sweep.php`. */
+        ems_fk_delete_where($db, 'ems_business_events',
+            "entity_type='unit_entry' AND entity_id IN ({$inM})", $swept);
+        if (!ems_fk_delete($db, 'unit_entries', $mir, $swept)) {
+            fwrite(STDERR, "✘ كنسُ المرايا لم يكتمل — أُوقف البذرَ صونًا للنافذة\n");
+            exit(1);
+        }
     }
     if ($ids) {
         $in = implode(',', $ids);
-        $db->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id IN ({$in})");
+        ems_fk_delete_where($db, 'ems_business_events',
+            "entity_type='timesheet' AND entity_id IN ({$in})", $swept);
         $db->query("DELETE FROM timesheet_approval_notes WHERE timesheet_id IN ({$in})");
         $db->query("DELETE FROM timesheet_approvals WHERE timesheet_id IN ({$in})");
         $db->query("DELETE FROM timesheet_failure_hours WHERE timesheet_id IN ({$in})");

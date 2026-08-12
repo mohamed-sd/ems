@@ -43,23 +43,32 @@ function req($url, $post = null) {
     return array($c, $b);
 }
 
+require_once __DIR__ . '/_fk_sweep.php';
+
 function purge(mysqli $db) {
+    /* تقريرُ الكنسِ يُجمَع في مكانٍ واحدٍ ليُعلَن مرةً — والكنسُ يُقاس لا يُوعَد */
+    $swept = array();
     $ids = array(); $mir = array();
     $r = $db->query("SELECT id FROM timesheet WHERE `date` BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'");
     while ($x = $r->fetch_row()) { $ids[] = (int) $x[0]; }
     $r = $db->query("SELECT id FROM unit_entries WHERE entry_date BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'");
     while ($x = $r->fetch_row()) { $mir[] = (int) $x[0]; }
     if ($mir) {
+        /* ◆ الأبناءُ من القاعدةِ لا بيدٍ — `unit_match_overrides` كان غائبًا عن
+             القائمةِ اليدويةِ فمات الكنسُ في منتصفه (انظر `tests/_fk_sweep.php`). */
         $in = implode(',', $mir);
-        $db->query("DELETE FROM ems_business_events WHERE entity_type='unit_entry' AND entity_id IN ({$in})");
-        $db->query("DELETE FROM unit_approvals WHERE entry_id IN ({$in})");
-        $db->query("DELETE FROM unit_capacity_flags WHERE entry_id IN ({$in})");
-        $db->query("DELETE FROM unit_time_log WHERE entry_id IN ({$in})");
-        $db->query("DELETE FROM unit_entries WHERE id IN ({$in})");
+        ems_fk_delete_where($db, 'ems_business_events',
+            "entity_type='unit_entry' AND entity_id IN ({$in})", $swept);
+        if (!ems_fk_delete($db, 'unit_entries', $mir, $swept)) {
+            fwrite(STDERR, "✘ كنسُ المرايا لم يكتمل — أُوقف البذرَ صونًا للنافذة\n");
+            exit(1);
+        }
+        fwrite(STDOUT, '  · كُنست المرايا وذريّتُها: ' . ems_fk_sweep_report($swept) . "\n");
     }
     if ($ids) {
         $in = implode(',', $ids);
-        $db->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id IN ({$in})");
+        ems_fk_delete_where($db, 'ems_business_events',
+            "entity_type='timesheet' AND entity_id IN ({$in})", $swept);
         $db->query("DELETE FROM timesheet_approval_notes WHERE timesheet_id IN ({$in})");
         $db->query("DELETE FROM timesheet_approvals WHERE timesheet_id IN ({$in})");
         $db->query("DELETE FROM timesheet_failure_hours WHERE timesheet_id IN ({$in})");

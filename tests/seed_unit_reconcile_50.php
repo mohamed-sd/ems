@@ -61,8 +61,12 @@ function req($url, $post = null, array $headers = array()) {
     return array($code, $body);
 }
 
+require_once __DIR__ . '/_fk_sweep.php';
+
 // ═══ الكنس — النافذة وحدها ═══
 function purge(mysqli $db) {
+    /* تقريرُ الكنسِ يُجمَع مرةً ويُعلَن — والكنسُ يُقاس لا يُوعَد */
+    $swept = array();
     $from = WIN_FROM; $to = WIN_TO;
     $ids = array();
     $r = $db->query("SELECT id FROM timesheet WHERE `date` BETWEEN '{$from}' AND '{$to}'");
@@ -81,15 +85,29 @@ function purge(mysqli $db) {
 
     if ($mir) {
         $inM = implode(',', $mir);
-        $db->query("DELETE FROM ems_business_events WHERE entity_type='unit_entry' AND entity_id IN ({$inM})");
-        $db->query("DELETE FROM unit_approvals     WHERE entry_id IN ({$inM})");
-        $db->query("DELETE FROM unit_capacity_flags WHERE entry_id IN ({$inM})");
-        $db->query("DELETE FROM unit_time_log      WHERE entry_id IN ({$inM})");
-        $db->query("DELETE FROM unit_entries       WHERE id IN ({$inM})");
+        /* ═══════════════════════════════════════════════════════════════════
+         * ◆ **الأبناءُ يُشتقّون من القاعدةِ لا يُسمَّون بيدٍ.**
+         * كان هنا ثلاثةُ أسماءٍ مكتوبةٍ يدويًّا و`unit_match_overrides` **غائبٌ**
+         * — فحين أنشأ `unit_reconcile_test` صفوفَ تجاوزٍ صار هذا الكنسُ يموت
+         * بـ«Cannot delete or update a parent row» في **منتصفِ** التنظيف، فتبقى
+         * النافذةُ نصفَ نظيفةٍ وتتضاعف عدّاداتُ الفاحص (1⇒3 · 2⇒3 · 3⇒6).
+         * وهو فخٌّ **دائريّ**: الفاحصُ يُنشئ ما يمنع بذرتَه من التنظيف، فكلُّ
+         * جولةٍ تُفسد التي بعدها. ولا يُحَلُّ بإضافةِ اسمٍ رابعٍ — لأنَّ خامسًا
+         * سيُضاف غدًا فيعود العطبُ صامتًا.
+         * ═══════════════════════════════════════════════════════════════════ */
+        ems_fk_delete_where($db, 'ems_business_events',
+            "entity_type='unit_entry' AND entity_id IN ({$inM})", $swept);
+        $swept = array();
+        if (!ems_fk_delete($db, 'unit_entries', $mir, $swept)) {
+            fwrite(STDERR, "✘ كنسُ المرايا لم يكتمل — أُوقف البذرَ صونًا للنافذة\n");
+            exit(1);
+        }
+        fwrite(STDOUT, '  · كُنست المرايا وذريّتُها: ' . ems_fk_sweep_report($swept) . "\n");
     }
     if ($ids) {
         $in = implode(',', $ids);
-        $db->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id IN ({$in})");
+        ems_fk_delete_where($db, 'ems_business_events',
+            "entity_type='timesheet' AND entity_id IN ({$in})", $swept);
         $db->query("DELETE FROM timesheet_approval_notes WHERE timesheet_id IN ({$in})");
         $db->query("DELETE FROM timesheet_approvals WHERE timesheet_id IN ({$in})");
         $db->query("DELETE FROM timesheet_failure_hours WHERE timesheet_id IN ({$in})");
