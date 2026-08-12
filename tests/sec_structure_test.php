@@ -84,8 +84,25 @@ $r = $conn->query("SELECT COUNT(*) c FROM permission_templates")->fetch_assoc();
 check(intval($r['c']) >= 42, "قوالب الهوية ≥ 42 الموثَّقة (وُجد {$r['c']})");
 $r = $conn->query("SELECT COUNT(*) c FROM permission_templates WHERE tpl_kind='relation' AND is_ceiling=1")->fetch_assoc();
 check(intval($r['c']) === 6, 'قوالب العلاقة الست سقوف (is_ceiling=1)');
+/* ══ **قائمةُ تعارضاتِ الواجباتِ تنمو بالكشفِ — والشرطُ كان يمنع نموَّها.**
+     كان `=== 8` (عددَ §5 يومَ الكتابة)، والمقيسُ اليومَ **عشرةٌ**: أُضيف
+     `sod_journal_recon` و`sod_treasury_cover` بمسحِ 2026-08-06 وسببُهما مكتوبٌ
+     في `compensating_control` («كشفه مسح 2026-08-06 — المراجع والخزينة كانا
+     يجمعانه»). فشرطُ التساوي **يُرسِب النظامَ على كشفِ تعارضٍ جديد** — وهو نقيضُ
+     الغرض: ضابطٌ أمنيٌّ يُكافَأ على النقصان.
+   ⇒ يُقاس **لا نقصان** (الثمانيةُ الموثَّقةُ حاضرةٌ برموزها) **ولا خمول**
+     (كلُّها `active=1`)، ويُعلَن العددُ الحاليُّ ولا يُجمَّد. */
+$SOD8 = array('sod_supplier_cycle', 'sod_procure_cycle', 'sod_hours_claim', 'sod_payroll_cycle',
+              'sod_collection_hide', 'sod_self_privilege', 'sod_ownership_move', 'sod_period_reopen');
+$in = "'" . implode("','", $SOD8) . "'";
 $r = $conn->query("SELECT COUNT(*) c FROM sod_conflicts")->fetch_assoc();
-check(intval($r['c']) === 8, 'فصل الواجبات: الثمانية (§5)');
+$sodAll = intval($r['c']);
+$r = $conn->query("SELECT COUNT(*) c FROM sod_conflicts WHERE conflict_code IN ({$in})")->fetch_assoc();
+$sod8 = intval($r['c']);
+$r = $conn->query("SELECT COUNT(*) c FROM sod_conflicts WHERE active = 1")->fetch_assoc();
+$sodOn = intval($r['c']);
+check($sod8 === 8 && $sodAll >= 8 && $sodOn === $sodAll,
+    "فصل الواجبات: الثمانيةُ الموثَّقةُ حاضرةٌ ({$sod8}/8) · والمجموعُ {$sodAll} كلُّه فعّالٌ ({$sodOn}) — والقائمةُ تنمو بالكشف");
 $r = $conn->query("SELECT SUM(overridable='never') n, SUM(overridable='break_glass_only') b, SUM(overridable='with_compensating_control') w FROM guard_override_policies")->fetch_assoc();
 check(intval($r['n']) === 8 && intval($r['b']) === 7 && intval($r['w']) === 2, "الحراس 17: never=8 · bg=7 · comp=2 (§7.2)");
 $r = $conn->query("SELECT COUNT(*) c FROM founding_mode WHERE enabled=0")->fetch_assoc();

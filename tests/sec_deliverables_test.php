@@ -32,17 +32,30 @@ foreach ($files as $f => $marker) {
     }
 }
 
-// D1: العائلات الثلاث عشرة والمسميات الـ16 كلها معلَّمة
+/* الاتصالُ يُفتح **قبل** أوّلِ قياسٍ يحتاجه (كان يُفتح عند D2 وحدَها). */
+require_once dirname(__DIR__) . '/includes/env.php';
+$db = new mysqli(ems_env('DB_HOST'), ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'));
+$db->set_charset('utf8mb4');
+
+// D1: العائلات الثلاث عشرة والمسميات معلَّمة
 $d1 = file_get_contents($D . '/SEC-D1_dictionary_draft_ar.md');
 check(substr_count($d1, '|') > 0 && preg_match_all('/^\|\d+\|`/m', $d1) === 13 || substr_count($d1, 'tickets') >= 1, 'D1: العائلات الثلاث عشرة');
-check(substr_count($d1, 'JT-') === 16, 'D1: المسميات الستة عشر (وُجد ' . substr_count($d1, 'JT-') . ')');
+/* ══ **المُخرَجُ مولَّدٌ من الحيّ — فيُقاس بمطابقتِه للحيّ لا برقمِ يومِ الكتابة.**
+     كان الشرطُ `=== 16` (مسمياتُ الوظائفِ يومَها)، والمقيسُ الآن 23 لأن
+     المسمياتَ نمت بقرارات. و`tools/sec01_deliverables.php` يولّد الملفَّ من
+     القاعدةِ مباشرةً — فأيُّ رقمٍ مجمَّدٍ يُرسِب **نموًّا مشروعًا** ويُخفي ما
+     يهمُّ فعلًا: أن يكون الملفُّ **صورةً صادقةً** لما في القاعدة. */
+/* نطاقُ العدِّ **من المولِّدِ نفسِه**: `tools/sec01_deliverables.php:69` يسرد
+   `job_titles ORDER BY id` بلا مُرشِّح — فيُقاس المجموعُ لا المُفعَّل. (والعمودُ
+   `active` لا `is_active` — سؤالٌ عن عمودٍ لا وجودَ له يردُّ صمتًا يُقرأ عطلًا.) */
+$jtDb = intval($db->query("SELECT COUNT(*) c FROM job_titles")->fetch_assoc()['c']);
+$jtFile = substr_count($d1, 'JT-');
+check($jtFile > 0 && $jtFile === $jtDb,
+    "D1: المسمياتُ في المُخرَجِ = الحيُّ في القاعدة ({$jtFile}/{$jtDb})");
 check(substr_count($d1, '★') > 30, 'D1: الاستنتاجات معلَّمة ★ (' . substr_count($d1, '★') . ')');
 
 // D2: صف لكل (دور × موديول)
 $lines = count(file($D . '/SEC-D2_matrix_208x25.csv'));
-require_once dirname(__DIR__) . '/includes/env.php';
-$db = new mysqli(ems_env('DB_HOST'), ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'));
-$db->set_charset('utf8mb4');
 $expect = intval($db->query("SELECT (SELECT COUNT(*) FROM roles) * (SELECT COUNT(*) FROM modules) c")->fetch_assoc()['c']);
 check($lines === $expect + 1, "D2: {$expect} صفًّا (+رأس) — وُجد " . ($lines - 1));
 $head = fgets(fopen($D . '/SEC-D2_matrix_208x25.csv', 'r'));
@@ -52,7 +65,10 @@ foreach (array('screen_view', 'return_for_fix', 'reverse', 'delete_draft', 'gran
 
 // D3: 25 دورًا
 $d3 = file_get_contents($D . '/SEC-D3_roles_map_ar.md');
-check(preg_match_all('/^\| \d+ \|/m', $d3) === 25, 'D3: 25 صف دور');
+/* المُخرَجُ مولَّدٌ: صفُّ دورٍ لكلِّ دورٍ في القاعدة — والأدوارُ نمت 25 ⇒ 35. */
+$rolesDb = intval($db->query("SELECT COUNT(*) c FROM roles")->fetch_assoc()['c']);
+$rolesFile = preg_match_all('/^\| \d+ \|/m', $d3);
+check($rolesFile === $rolesDb, "D3: صفوفُ الأدوارِ في المُخرَجِ = الأدوارُ في القاعدة ({$rolesFile}/{$rolesDb})");
 
 // D5: المصالحة تحمل قرارًا لكل صف
 $csv = file($D . '/SEC-D5_screens_reconciliation.csv');

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 05:06:46
+-- المصدر: equipation_manage · التوليد: 2026-08-12 05:28:26
 -- الجداول: 549 · المناظير: 5
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -5884,7 +5884,8 @@ CREATE TABLE `founding_mode` (
   `closed_at` datetime DEFAULT NULL,
   `closure_ref` varchar(120) DEFAULT NULL,
   PRIMARY KEY (`mode_id`),
-  UNIQUE KEY `uq_fm_mode` (`mode`)
+  UNIQUE KEY `uq_fm_mode` (`mode`),
+  CONSTRAINT `chk_fm_ends` CHECK (`enabled` = 0 or `ends_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: gov_approval_decisions ──
