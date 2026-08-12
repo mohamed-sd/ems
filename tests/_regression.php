@@ -82,8 +82,20 @@ $verify = static function (array $snap, $testName, array &$lines) {
  *   المُشغِّلَ يرى شرطَه. وتُشغَّل **مرةً** قبلَ الجولةِ لا قبلَ كلِّ اختبار.
  * ◆ ولا تُحسَب في الخضراءِ ولا الحمراء — فهي بذرةٌ لا فاحص.
  * ═══════════════════════════════════════════════════════════════════════════ */
+/* ◆ **ثلاثُ بذورٍ لا واحدة** — وكلُّها كانت مهملةً فتُقرأ حُمرتُها عيبًا:
+     `seed_unit_reconcile_50` معلَنٌ في **ترويسةِ** `unit_reconcile_test` نصًّا
+     («بعد seed_unit_reconcile_50.php») — و`unit_reconcile` كان 5/15 فصار
+     **19/1** بتشغيلِها وحدَها. و`seed_operator_gap_50` غيرُ معلَنٍ في أيِّ
+     ترويسةٍ ووُجد بالمسحِ — و`operator_due_policy` 19/2 ← **21/0** و
+     `qty_attribution` 23/2 ← **34/0**.
+   ◆ **والترتيبُ يهمّ**: نوافذُ البذورِ متعامدةٌ بقصدٍ (2027-03 للسطور ·
+     2027-02 للمطابقة)، فبذرةٌ تكنس نافذةَ أختِها لا تفعل — لكنّ
+     `unit_cycle_reseed` (أداةٌ لا بذرةُ حزمة) **يمحو الثلاثَ** لأنه يُفرِغ
+     الجدولَ كلَّه؛ فمن شغّله يُعيد هذه بعده. مدوَّنٌ هنا لا في ذاكرةِ أحد. */
 $SEEDS = array(
-    'seed_unit_lines_50' => 'approval_box_test · timesheet_time_lines_test · qty_attribution_test',
+    'seed_unit_lines_50'     => 'approval_box_test · timesheet_time_lines_test',
+    'seed_unit_reconcile_50' => 'unit_reconcile_test',
+    'seed_operator_gap_50'   => 'operator_due_policy_test · qty_attribution_test',
 );
 $seedLines = array();
 if ($suite === 'all') {

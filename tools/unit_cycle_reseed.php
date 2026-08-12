@@ -224,14 +224,49 @@ if ($seedN > 0) {
     $flush($db, $batch, $appr);
     echo "    ✔ اعتماداتُ محطاتٍ: {$appr}\n";
 
-    /* سجلُّ الوقتِ التفصيليّ — سطرٌ لكلِّ مدخلٍ بحالةٍ تشغيليةٍ واقعية */
-    $OPS = array('actual_work', 'actual_work', 'actual_work', 'standby', 'tech_breakdown');
+    /* ══ سجلُّ الوقتِ التفصيليّ — **بإسنادٍ كامل** ═══════════════════════════
+         ◆ **عيبٌ مقيسٌ في الصياغةِ الأولى**: بذرت ثلاثَ حالاتٍ تشغيليةٍ فقط
+           (`actual_work`·`standby`·`tech_breakdown`) و**كلَّ الأسطرِ بـ
+           `resp_party = 'none'`** و`supplier_entity_id = NULL`. فصارت عشرةُ
+           آلافِ سطرٍ بلا مسؤولٍ عن توقفٍ — وعائلةٌ من الفواحصِ تسقط لأنها
+           تقيس فراغًا، و`INJ-0019` (إسنادُ التوقفات) لا يُثبَت ولا يُنقَض.
+           وحارسُ `E-07` (`EMS_RESP_PARTY_STRICT=enforce`) يرفض توقفًا بمسؤولٍ
+           `none` — فكان `tech_breakdown` بلا مسؤولٍ **مخالفًا للحكمِ الحيّ**.
+
+         ◆ **والإسنادُ ليس عشوائيًّا**: كلُّ حالةِ توقفٍ تحمل **مسؤولَها
+           المنطقيَّ** و**نوعَ التزامِه**، ومَن مسؤولُه الموردُ يحمل **كيانَ
+           موردٍ حقيقيًّا** — وإلا كان الإسنادُ اسمًا بلا طرف.
+
+         ◆ ولا يُبذر `plan_period_id`: **لا سجلَّ فتراتٍ في القاعدة**
+           (`contract_plan_periods` غيرُ موجود ولا مفتاحَ أجنبيًّا للعمود)،
+           فبذرُ رقمٍ فيه اختراعُ مرجعٍ لا وجودَ له. يُعلَن ديْنًا. */
+    $OPS = array(
+        /* ops_state          resp_party      obligation_type        */
+        array('actual_work',        'company', null),
+        array('actual_work',        'company', null),
+        array('actual_work',        'company', null),
+        array('standby',            'client',  'access_road'),
+        array('tech_breakdown',     'company', 'equipment_readiness'),
+        array('supplier_stop',      'supplier', 'fuel'),
+        array('client_stop',        'client',  'loading_equipment'),
+        array('operator_stop',      'operator', 'operators'),
+        array('fuel_logistics_stop', 'supplier', 'fuel'),
+        array('planned_stop',       'planned', 'permits_safety'),
+        array('force_majeure',      'force_majeure', 'force_majeure'),
+    );
+    /* كياناتُ موردينَ حقيقيةٌ — مقيسةٌ لا مفترَضة */
+    $SUP = array();
+    $rsS = $db->query('SELECT id FROM suppliers WHERE COALESCE(is_deleted,0)=0 ORDER BY id LIMIT 6');
+    while ($rsS && ($x = $rsS->fetch_row())) { $SUP[] = (int) $x[0]; }
+    if (!$SUP) { $SUP = array(1); }
+
     $batchL = array();
     $flushL = static function ($db, &$b, &$logs) {
         if (!$b) { return; }
         if (!$db->query('INSERT INTO unit_time_log
                 (company_id, log_date, shift, project_id, equipment_id, operator_employee_id,
-                 hours, ops_state, entry_id) VALUES ' . implode(',', $b))) {
+                 hours, ops_state, resp_party, obligation_type, supplier_entity_id,
+                 decided_by, decided_at, entry_id) VALUES ' . implode(',', $b))) {
             fwrite(STDERR, 'سجلُّ الوقت: ' . $db->error . "\n");
             exit(1);
         }
@@ -241,12 +276,21 @@ if ($seedN > 0) {
     $rs = $db->query("SELECT id, entry_date, shift, project_id, equipment_id, operator_employee_id, qty
                         FROM unit_entries WHERE company_id={$CO} ORDER BY id DESC LIMIT {$seedN}");
     $k = 0;
+    $DECIDER = 4;   // مديرُ الموقع — يدُ الإسنادِ في محطتِه
     while ($rs && ($x = $rs->fetch_assoc())) {
-        $ops = $OPS[$k % count($OPS)];
+        list($ops, $resp, $obl) = $OPS[$k % count($OPS)];
         $h = number_format((float) $x['qty'], 2, '.', '');
         $sh = $x['shift'] !== null ? "'" . $x['shift'] . "'" : 'NULL';
         $oe = $x['operator_employee_id'] !== null ? (int) $x['operator_employee_id'] : 'NULL';
-        $batchL[] = "({$CO}, '{$x['entry_date']}', {$sh}, {$x['project_id']}, {$x['equipment_id']}, {$oe}, {$h}, '{$ops}', {$x['id']})";
+        $oblSql = ($obl === null) ? 'NULL' : "'" . $obl . "'";
+        /* المسؤولُ «مورد» يلزمه **كيانُ مورد** — وإلا كان الإسنادُ اسمًا بلا طرف */
+        $supSql = ($resp === 'supplier') ? (string) $SUP[$k % count($SUP)] : 'NULL';
+        /* واليدُ والوقتُ يُدوَّنان لكلِّ توقفٍ مُسنَد — لا إسنادَ بلا مَن ومتى */
+        $isStop = ($ops !== 'actual_work' && $ops !== 'standby');
+        $decBy  = $isStop ? (string) $DECIDER : 'NULL';
+        $decAt  = $isStop ? "'" . $x['entry_date'] . " 18:00:00'" : 'NULL';
+        $batchL[] = "({$CO}, '{$x['entry_date']}', {$sh}, {$x['project_id']}, {$x['equipment_id']}, {$oe}, "
+                  . "{$h}, '{$ops}', '{$resp}', {$oblSql}, {$supSql}, {$decBy}, {$decAt}, {$x['id']})";
         if (count($batchL) >= 500) { $flushL($db, $batchL, $logs); }
         $k++;
     }
@@ -266,5 +310,28 @@ while ($rs && ($x = $rs->fetch_row())) { echo '      ' . str_pad($x[0], 20) . $x
 $n = q1($db, "SELECT COUNT(*) FROM unit_entries e WHERE e.state <> 'draft' AND e.state <> 'submitted'
                AND NOT EXISTS (SELECT 1 FROM unit_approvals a WHERE a.entry_id = e.id)");
 echo '    ◆ مدخلاتٌ تجاوزت المسودةَ بلا أيِّ اعتمادِ محطة: ' . ($n ? $n[0] : '?') . "\n";
+
+/* ══ إثباتُ الإسناد — الحكمُ الذي وُجدت هذه البذرةُ لأجله ═════════════════ */
+echo "\n⑤ إثباتُ الإسناد\n";
+$rs = $db->query("SELECT ops_state, resp_party, COUNT(*) c, COUNT(supplier_entity_id) sup,
+                         COUNT(decided_by) dec_by
+                    FROM unit_time_log GROUP BY ops_state, resp_party ORDER BY c DESC");
+while ($rs && ($x = $rs->fetch_assoc())) {
+    echo '    ' . str_pad($x['ops_state'], 22) . str_pad($x['resp_party'], 16)
+       . 'عدد: ' . str_pad($x['c'], 7) . 'بمورد: ' . str_pad($x['sup'], 7)
+       . 'بيدٍ: ' . $x['dec_by'] . "\n";
+}
+$bad = q1($db, "SELECT COUNT(*) FROM unit_time_log
+                 WHERE ops_state IN ('tech_breakdown','supplier_stop','operator_stop','client_stop',
+                                     'fuel_logistics_stop','planned_stop','force_majeure')
+                   AND (resp_party IS NULL OR resp_party = 'none')");
+echo '    ◆ توقفاتٌ بلا مسؤولٍ (E-07 يرفضها): ' . ($bad ? $bad[0] : '?') . "\n";
+$noSup = q1($db, "SELECT COUNT(*) FROM unit_time_log
+                   WHERE resp_party = 'supplier' AND supplier_entity_id IS NULL");
+echo '    ◆ مسؤوليةُ موردٍ بلا كيانِ مورد: ' . ($noSup ? $noSup[0] : '?') . "\n";
+$noHand = q1($db, "SELECT COUNT(*) FROM unit_time_log
+                    WHERE ops_state <> 'actual_work' AND ops_state <> 'standby'
+                      AND (decided_by IS NULL OR decided_at IS NULL)");
+echo '    ◆ توقفٌ مُسنَدٌ بلا يدٍ أو وقت: ' . ($noHand ? $noHand[0] : '?') . "\n";
 echo "\n" . str_repeat('═', 70) . "\n";
 exit(0);
