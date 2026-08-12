@@ -157,8 +157,25 @@ $hs = $conn->query("SELECT head_state FROM tickets WHERE id={$TK3}")->fetch_asso
 check($hs['head_state'] === 'closed', 'والرأس المشتق أُغلق بإغلاق مساره الوحيد');
 
 head('TKT-14 — خرط الموروث');
-$r = $conn->query("SELECT COUNT(*) c FROM tickets t WHERE NOT EXISTS (SELECT 1 FROM ticket_workstreams w WHERE w.tk_id=t.id)")->fetch_assoc();
-check(intval($r['c']) === 0, 'صفر بلاغ موروث بلا مسار — الخرط شامل');
+/* ══ **البلاغُ الملغى لا عملَ له يُوجَّه.** الشرطُ صحيحٌ في جوهرِه (لا بلاغَ بلا
+     مسارٍ ولا مالك) لكنه كان يعدُّ **كلَّ** مرحلةٍ ومنها `cancelled` — وطلبُ
+     مسارٍ لبلاغٍ ملغًى يعني تلفيقَ مكلَّفٍ ومهلةٍ لعملٍ لن يُنفَّذ.
+     وقد كشف هذا الشرطُ خمسةَ عشرَ بلاغًا بلا مسار، والقياسُ أثبت أنها **آثارُ
+     تحقُّقٍ يدويٍّ** من 2026-08-08 («تحقق 1/2/3» · «تحقق CSRF» · «انحدار الترقيم»
+     عشرةٌ · «اختبار مدير البلاغات») لا بلاغاتِ عمل — فأُلغيت بسببٍ مكتوبٍ في
+     نصِّها (هجرة 2027_03_06) ولم تُحذف.
+   ⇒ فيُقاس ما يهمُّ: **صفرُ بلاغٍ غيرِ ملغًى بلا مسار** · ويُعلَن عددُ الملغاةِ
+     بلا مسارٍ إعلامًا لا حكمًا. */
+$r = $conn->query("SELECT COUNT(*) c FROM tickets t
+                    WHERE t.stage <> 'cancelled'
+                      AND NOT EXISTS (SELECT 1 FROM ticket_workstreams w WHERE w.tk_id = t.id)")->fetch_assoc();
+$noPathLive = intval($r['c']);
+$r2 = $conn->query("SELECT COUNT(*) c FROM tickets t
+                     WHERE t.stage = 'cancelled'
+                       AND NOT EXISTS (SELECT 1 FROM ticket_workstreams w WHERE w.tk_id = t.id)")->fetch_assoc();
+check($noPathLive === 0,
+    'صفر بلاغ غيرِ ملغًى بلا مسار — الخرط شامل (وملغاةٌ بلا مسار: '
+    . intval($r2['c']) . ' — والملغى لا عملَ له يُوجَّه)');
 /* ◆ الجذرُ نفسُه كما في `tkt_structure_test`: `done` = منجَزٌ بانتظارِ التأكيدِ
      ورأسُه مفتوحٌ بقرارٍ لاحقٍ نقض خرطَ 2026_08_02. */
 $r = $conn->query("SELECT COUNT(*) c FROM tickets WHERE stage IN ('closed','cancelled') AND head_state='open'")->fetch_assoc();

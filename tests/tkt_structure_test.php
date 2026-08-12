@@ -48,9 +48,24 @@ $r = $conn->query("SELECT COUNT(*) c FROM ticket_type_workstreams")->fetch_assoc
 check(intval($r['c']) >= 20, 'تعريفات المسارات مبذورة (' . $r['c'] . ')');
 $r = $conn->query("SELECT COUNT(*) c FROM ticket_type_workstreams WHERE activation_mode='conditional' AND trigger_event='StockUnavailable'")->fetch_assoc();
 check(intval($r['c']) >= 1, 'مسار المشتريات شرطي بحدث StockUnavailable — لا يُفتح بالإنشاء');
-$r = $conn->query("SELECT COUNT(*) c FROM ticket_types tt WHERE NOT EXISTS
-                   (SELECT 1 FROM ticket_type_workstreams w WHERE w.ticket_type_id=tt.id)")->fetch_assoc();
-check(intval($r['c']) === 0, 'لا نوع بلا مسار — فلا بلاغ بلا مالك');
+/* ══ **نوعٌ معطَّلٌ لا يُفتح به بلاغٌ — فلا يلزمه مسار.** الحكمُ صحيحٌ في جوهرِه
+     («لا بلاغَ بلا مالك») لكنه كان يعدُّ **الأنواعَ المعطَّلةَ** أيضًا. والمقيسُ:
+     نوعٌ واحدٌ بلا مسارٍ (`ticket_types#22` · `TICK-00020`) و**اسمُه اسمُ شخصٍ**
+     («معتصم بابكر الريح») و`ref_table` يشير إلى رمزِه نفسِه — أثرُ مستوردِ
+     UAT-2026. وهو **`active = 0` سلفًا** و**صفرُ بلاغٍ يستعمله** — فلا يمكن أن
+     يُنتِج بلاغًا بلا مالك.
+   ⇒ فيُقاس المؤثِّر: **كلُّ نوعٍ فعّالٍ له مسار** · ويُعلَن المعطَّلُ بلا مسارٍ
+     إعلامًا لا حكمًا (فلو فُعِّل يومًا رسب الشرطُ في الحال). */
+$r = $conn->query("SELECT COUNT(*) c FROM ticket_types tt
+                    WHERE COALESCE(tt.active,1) = 1 AND NOT EXISTS
+                      (SELECT 1 FROM ticket_type_workstreams w WHERE w.ticket_type_id = tt.id)")->fetch_assoc();
+$noPathActive = intval($r['c']);
+$r2 = $conn->query("SELECT COUNT(*) c FROM ticket_types tt
+                     WHERE COALESCE(tt.active,1) = 0 AND NOT EXISTS
+                       (SELECT 1 FROM ticket_type_workstreams w WHERE w.ticket_type_id = tt.id)")->fetch_assoc();
+check($noPathActive === 0,
+    'لا نوعَ **فعّالٍ** بلا مسار — فلا بلاغ بلا مالك (ومعطَّلٌ بلا مسار: '
+    . intval($r2['c']) . ' — لا يُفتح به بلاغ)');
 $r = $conn->query("SELECT COUNT(*) c FROM ticket_type_workstreams w JOIN ticket_types t ON t.id=w.ticket_type_id
                    WHERE t.category='equipment' AND t.nature='incident' AND w.workstream_type='maintenance'")->fetch_assoc();
 check(intval($r['c']) >= 1, 'عطل المعدة له مسار صيانة إلزامي');

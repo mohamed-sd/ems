@@ -96,6 +96,13 @@ head('HTTP — الشاشات الثلاث للدور 24');
 $BASE = 'http://localhost/ems';
 $jar = sys_get_temp_dir() . '/tkt14.jar'; @unlink($jar);
 $rq = function ($url, $post = null) use ($jar) {
+    /* الرمزُ المركزيُّ: `Tickets/` داخلَ `CSRF_ENFORCE_PATHS`، والحارسُ يقيس
+       `$_POST['csrf_token']` أو ترويسةَ `X-CSRF-Token`. والمسبارُ يبني الحقولَ
+       يدويًّا فلا يحمل أيَّهما ⇒ **403 صامتٌ** يُقرأ فشلًا في الشاشة. */
+    if ($post !== null) {
+        require_once __DIR__ . '/_http_flash.php';
+        $post = ems_http_with_csrf($post, $url, $jar);
+    }
     $ch = curl_init($url);
     curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true,
         CURLOPT_COOKIEJAR => $jar, CURLOPT_COOKIEFILE => $jar, CURLOPT_TIMEOUT => 40));
