@@ -12,7 +12,9 @@
  *   ⑦ صفر مرجع لأعمدة المالك في شاشات التشغيل الثلاث والتصدير (فحص قارئين).
  * التشغيل: php tests/n21_ownership_confidentiality_test.php
  * ═══════════════════════════════════════════════════════════════════════════
- */
+  * ⇐ شواهدُ أحكامٍ: FIXA-0011-ب · FIXA-0011-ج · FIXC-0079-ب · FIXC-0079-ج
+ * (رُبطت بمراجعةٍ خصمٍ 2026-08-12 — الحجّةُ وسببُ قبولِها في docs/fix_progress/BINDINGS.md)
+*/
 
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);

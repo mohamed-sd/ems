@@ -17,7 +17,9 @@
  *
  * التشغيل: php tests/dues_source_doc_test.php — رمز الخروج 0/1.
  * ═══════════════════════════════════════════════════════════════════════════
- */
+  * ⇐ شواهدُ أحكامٍ: INJ-0175
+ * (رُبطت بمراجعةٍ خصمٍ 2026-08-12 — الحجّةُ وسببُ قبولِها في docs/fix_progress/BINDINGS.md)
+*/
 
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);

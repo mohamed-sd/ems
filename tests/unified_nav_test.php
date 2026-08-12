@@ -6,7 +6,9 @@
  * ④ حالات UX-01 §10.4 القابلة للفحص آليًّا (بابٌ فارغ لا يُعرض · علَمُ
  * الرجوع · صلاحيةٌ غائبة تخفي العنصر).
  * التشغيل: php tests/unified_nav_test.php — رمز الخروج 0/1.
- */
+  * ⇐ شواهدُ أحكامٍ: FIXC-0007
+ * (رُبطت بمراجعةٍ خصمٍ 2026-08-12 — الحجّةُ وسببُ قبولِها في docs/fix_progress/BINDINGS.md)
+*/
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 

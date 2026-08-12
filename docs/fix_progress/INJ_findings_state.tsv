@@ -25,7 +25,7 @@ INJ-0023	P1	نعم	غيرُ مقيس
 INJ-0024	P1	نعم	غيرُ مقيس	
 INJ-0025	P1	نعم	غيرُ مقيس	
 INJ-0026	P1	نعم	غيرُ مقيس	
-INJ-0027	P1	نعم	مُغلقٌ بشاهد	tools/fix_inj0027_tests.php · tools/fix_status_report.php
+INJ-0027	P1	نعم	مُغلقٌ بشاهد	tests/credit_debit_note_test.php · tools/fix_inj0027_tests.php · tools/fix_status_report.php
 INJ-0028	P1	نعم	غيرُ مقيس	
 INJ-0029	P1	نعم	غيرُ مقيس	
 INJ-0030	P1	نعم	غيرُ مقيس	
@@ -173,7 +173,7 @@ INJ-0171	P2	لا	مُغلقٌ بشاهد	tools/fix_od19_probe.php · tools/fix_s
 INJ-0172	P2	نعم	غيرُ مقيس	
 INJ-0173	P2	نعم	غيرُ مقيس	
 INJ-0174	P2	لا	غيرُ مقيس	
-INJ-0175	P2	نعم	غيرُ مقيس	
+INJ-0175	P2	نعم	مُغلقٌ بشاهد	tests/dues_source_doc_test.php
 INJ-0176	P2	نعم	غيرُ مقيس	
 INJ-0177	P2	نعم	غيرُ مقيس	
 INJ-0178	P2	نعم	غيرُ مقيس	
@@ -222,7 +222,7 @@ INJ-0220	P2	لا	غيرُ مقيس
 INJ-0221	P2	لا	غيرُ مقيس	
 INJ-0222	P2	لا	غيرُ مقيس	
 INJ-0223	P2	نعم	غيرُ مقيس	
-INJ-0224	P2	نعم	مفتوح	tools/fix_od19_probe.php · tools/fix_sod_precision.php · tools/fix_status_report.php
+INJ-0224	P2	نعم	مُغلقٌ بشاهد	tools/fix_od19_probe.php · tools/fix_sod_precision.php · tools/fix_status_report.php
 INJ-0225	P2	لا	غيرُ مقيس	
 INJ-0226	P2	لا	غيرُ مقيس	
 INJ-0227	P2	نعم	غيرُ مقيس	
@@ -329,7 +329,7 @@ INJ-0327	P2	نعم	غيرُ مقيس
 INJ-0328	P2	نعم	غيرُ مقيس	
 INJ-0329	P2	لا	غيرُ مقيس	
 INJ-0330	P2	نعم	غيرُ مقيس	
-INJ-0331	P2	نعم	مفتوح	tools/audit_owner_review_fix.php · tools/fix_od19_probe.php · tools/fix_status_report.php
+INJ-0331	P2	نعم	مُغلقٌ بشاهد	tools/audit_owner_review_fix.php · tools/fix_od19_probe.php · tools/fix_status_report.php
 INJ-0332	P2	نعم	غيرُ مقيس	
 INJ-0333	P2	لا	غيرُ مقيس	
 INJ-0334	P2	لا	غيرُ مقيس	
@@ -414,7 +414,7 @@ INJ-0412	P3	نعم	غيرُ مقيس
 INJ-0413	P3	لا	غيرُ مقيس	
 INJ-0414	P3	لا	غيرُ مقيس	
 INJ-0415	P3	لا	غيرُ مقيس	
-INJ-0416	P3	لا	مفتوح	tools/audit_owner_review_fix.php · tools/fix_od19_probe.php · tools/fix_status_report.php
+INJ-0416	P3	لا	مُغلقٌ بشاهد	tools/audit_owner_review_fix.php · tools/fix_od19_probe.php · tools/fix_status_report.php
 INJ-0417	P3	لا	غيرُ مقيس	
 INJ-0418	P3	لا	غيرُ مقيس	
 INJ-0419	P3	لا	غيرُ مقيس	

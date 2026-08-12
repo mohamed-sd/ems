@@ -16,7 +16,9 @@
  * يبذر عالَمَه المستقلَّ ويكنسه — لا يمسّ صفًّا حقيقيًّا.
  * التشغيل: php tests/attribution_reversal_test.php
  * ═══════════════════════════════════════════════════════════════════════════
- */
+  * ⇐ شواهدُ أحكامٍ: FIXA-0008-ب
+ * (رُبطت بمراجعةٍ خصمٍ 2026-08-12 — الحجّةُ وسببُ قبولِها في docs/fix_progress/BINDINGS.md)
+*/
 
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 ini_set('display_errors', '1');

@@ -9,7 +9,9 @@
  * (معدة×تاريخ×وردية×فترة)، والمكرر يُرَدّ duplicate ولا يوقف الدفعة.
  * التشغيل: php tests/n07_n08_api_contract_test.php (يتطلب Apache حيًّا)
  * ═══════════════════════════════════════════════════════════════════════════
- */
+  * ⇐ شواهدُ أحكامٍ: FIXA-0008-ب · FIXA-0008-ج
+ * (رُبطت بمراجعةٍ خصمٍ 2026-08-12 — الحجّةُ وسببُ قبولِها في docs/fix_progress/BINDINGS.md)
+*/
 
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);

@@ -4,7 +4,9 @@
  * تدقيقات المستخدم الثلاثة: حقن فشلٍ وسط المعاملة (صفر يتيم) · رفض كل حقلٍ
  * إلزاميٍّ على حدة · العطالة بإعادة نشرٍ فعلية على مستوى الدالة.
  * التشغيل: php tests/event_publisher_test.php — رمز الخروج 0/1.
- */
+  * ⇐ شواهدُ أحكامٍ: FIXA-0005-ب · FIXA-0005-ج · FIXA-0008-ب · FIXC-0073-ب · FIXC-0073-ج · FIXC-0076-ب
+ * (رُبطت بمراجعةٍ خصمٍ 2026-08-12 — الحجّةُ وسببُ قبولِها في docs/fix_progress/BINDINGS.md)
+*/
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
