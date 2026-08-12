@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 18:11:25
+-- المصدر: equipation_manage · التوليد: 2026-08-12 18:49:27
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -488,7 +488,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (440,'إيكوبيشن | شجرة حسابات العميل','movement/client_tree.php',1,NULL,0,0,'fa fa-file-lines',900),
 (441,'إيكوبيشن | غرفة عمليات التشغيل','movement/move_oprators.php',6,NULL,0,0,'fa fa-file-lines',900),
 (442,'حوكمة الإدارة (عام)','Governance/gov_dept.php',NULL,NULL,0,0,'',0),
-(443,'اختيار المشروع','Equipments/select_project.php',NULL,NULL,0,0,'fa fa-diagram-project',995);
+(443,'اختيار المشروع','Equipments/select_project.php',NULL,NULL,0,0,'fa fa-diagram-project',995),
+(444,'التسعير اليومي','Finance/daily_pricing_fin.php',17,NULL,0,0,'fa fa-calendar-day',0);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -1194,7 +1195,6 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (893,17,153,1,0,0,0),
 (895,12,154,1,1,1,0),
 (896,1,154,1,0,0,0),
-(897,17,154,1,0,0,0),
 (898,7,155,1,1,1,0),
 (899,11,155,1,1,0,0),
 (900,3,155,1,0,0,0),
@@ -1295,9 +1295,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1019,21,182,1,0,0,0),
 (1020,22,182,1,0,0,0),
 (1029,4,183,1,0,1,0),
-(1030,15,183,1,0,0,0);
+(1030,15,183,1,0,0,0),
+(1031,15,184,1,0,1,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(1031,15,184,1,0,1,0),
 (1032,4,184,1,0,0,0),
 (1033,4,185,1,0,0,0),
 (1034,15,185,1,0,0,0),
@@ -1496,9 +1496,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1295,26,214,1,0,0,0),
 (1296,1,213,1,1,1,0),
 (1297,19,213,1,1,1,0),
-(1304,1,215,1,1,1,0);
+(1304,1,215,1,1,1,0),
+(1305,1,216,1,1,1,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(1305,1,216,1,1,1,0),
 (1306,1,217,1,1,1,0),
 (1307,1,218,1,1,1,0),
 (1311,6,216,1,0,0,0),
@@ -1697,9 +1697,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1526,21,251,1,0,0,0),
 (1527,22,251,1,0,0,0),
 (1536,1,252,1,0,0,0),
-(1537,2,252,1,0,0,0);
+(1537,2,252,1,0,0,0),
+(1538,3,252,1,0,0,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(1538,3,252,1,0,0,0),
 (1539,4,252,1,0,0,0),
 (1540,5,252,1,0,0,0),
 (1541,6,252,1,0,0,0),
@@ -1898,9 +1898,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1742,8,276,1,0,0,0),
 (1743,3,276,1,1,1,0),
 (1744,10,276,1,0,0,0),
-(1745,26,276,1,0,0,0);
+(1745,26,276,1,0,0,0),
+(1746,26,277,1,0,0,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(1746,26,277,1,0,0,0),
 (1747,15,277,1,1,1,0),
 (1748,15,278,1,1,1,0),
 (1749,1,279,1,0,0,0),
@@ -2099,9 +2099,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1942,21,309,1,0,0,0),
 (1943,22,309,1,0,0,0),
 (1944,23,310,1,1,1,0),
-(1945,23,311,1,1,1,0);
+(1945,23,311,1,1,1,0),
+(1946,23,312,1,1,1,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(1946,23,312,1,1,1,0),
 (1947,27,313,1,0,0,0),
 (1948,4,313,1,1,1,0),
 (1949,27,314,1,1,1,0),
@@ -2300,9 +2300,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2142,21,353,1,0,0,0),
 (2143,22,353,1,0,0,0),
 (2144,9,353,1,0,0,0),
-(2145,28,353,1,0,0,0);
+(2145,28,353,1,0,0,0),
+(2146,15,353,1,0,0,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(2146,15,353,1,0,0,0),
 (2147,17,354,1,1,1,0),
 (2148,18,354,1,0,0,0),
 (2149,19,354,1,0,0,0),
@@ -2501,9 +2501,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2342,8,402,1,0,0,0),
 (2343,9,402,1,0,0,0),
 (2344,10,402,1,0,0,0),
-(2345,11,402,1,0,0,0);
+(2345,11,402,1,0,0,0),
+(2346,12,402,1,0,0,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(2346,12,402,1,0,0,0),
 (2347,13,402,1,0,0,0),
 (2348,14,402,1,0,0,0),
 (2349,15,402,1,0,0,0),
@@ -2702,9 +2702,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2542,19,435,1,0,0,0),
 (2543,17,435,1,0,0,0),
 (2544,18,435,1,0,0,0),
-(2545,22,435,1,0,0,0);
+(2545,22,435,1,0,0,0),
+(2546,21,435,1,0,0,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(2546,21,435,1,0,0,0),
 (2547,20,435,1,0,0,0),
 (2548,27,435,1,0,0,0),
 (2549,10,435,1,0,0,0),
@@ -2903,9 +2903,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2746,2,425,1,0,0,0),
 (2747,8,425,1,0,0,0),
 (2748,6,425,1,0,0,0),
-(2749,4,425,1,0,0,0);
+(2749,4,425,1,0,0,0),
+(2750,5,425,1,0,0,0);
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
-(2750,5,425,1,0,0,0),
 (2751,12,425,1,0,0,0),
 (2752,6,430,1,0,0,0),
 (2753,7,430,1,0,0,0),
@@ -2949,7 +2949,10 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2791,29,228,1,0,0,0),
 (2792,30,228,1,0,0,0),
 (2793,34,228,1,0,0,0),
-(2794,35,228,1,0,0,0);
+(2794,35,228,1,0,0,0),
+(2795,17,444,1,1,1,0),
+(2796,19,444,1,1,1,0),
+(2797,12,444,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
