@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 12:11:12
+-- المصدر: equipation_manage · التوليد: 2026-08-12 12:59:02
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -4491,32 +4491,32 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (840,6,'DAILY',2088,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',50,NULL,'admin/org_assignments.php',1,'2026-08-03 08:47:42','2026-08-12 04:45:04'),
 (844,15,'REC',129,223,'معالج إعداد الموظف','admin/sec_employee_wizard.php','fa fa-user-plus',14,NULL,'admin/sec_employee_wizard.php',1,'2026-08-02 02:24:13','2026-08-12 04:45:04'),
 (847,24,'DAILY',2104,226,'تقرير من يتأخر ومن لا يستجيب','Tickets/watchtower.php','fa fa-broadcast-tower',50,NULL,'Tickets/watchtower.php',1,'2026-08-03 08:47:42','2026-08-12 04:45:04'),
-(849,22,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(850,21,'HOME',170,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(851,20,'HOME',162,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(852,19,'HOME',154,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(853,18,'HOME',146,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(854,14,'HOME',114,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(855,11,'HOME',90,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:45:04'),
-(856,10,'HOME',82,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(857,8,'HOME',74,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(858,7,'HOME',66,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41');
+(849,22,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(850,21,'HOME',170,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(851,20,'HOME',162,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(852,19,'HOME',154,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(853,18,'HOME',146,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(854,14,'HOME',114,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(855,11,'HOME',90,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(856,10,'HOME',82,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(857,8,'HOME',74,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(858,7,'HOME',66,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28');
 INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `label_ar`, `route`, `icon`, `sort_order`, `counter_source`, `permission_code`, `active`, `created_at`, `updated_at`) VALUES
-(859,26,'HOME',210,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(860,25,'HOME',202,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(861,24,'HOME',194,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(862,23,'HOME',186,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(863,17,'HOME',138,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(864,16,'HOME',130,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(865,15,'HOME',122,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(866,13,'HOME',106,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(867,12,'HOME',98,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(868,6,'HOME',58,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(869,5,'HOME',50,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(870,4,'HOME',42,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(871,3,'HOME',34,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(872,2,'HOME',26,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
-(873,1,'HOME',18,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 04:34:41'),
+(859,26,'HOME',210,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(860,25,'HOME',202,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(861,24,'HOME',194,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(862,23,'HOME',186,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(863,17,'HOME',138,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(864,16,'HOME',130,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(865,15,'HOME',122,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(866,13,'HOME',106,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(867,12,'HOME',98,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(868,6,'HOME',58,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(869,5,'HOME',50,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(870,4,'HOME',42,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(871,3,'HOME',34,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(872,2,'HOME',26,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
+(873,1,'HOME',18,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-02 03:09:29','2026-08-12 12:55:28'),
 (880,6,'DAILY',2088,247,'اعتماد الوحدات التشغيلية','Approvals/hours_approval.php','fa fa-check-double',50,NULL,'Approvals/hours_approval.php',0,'2026-08-03 08:47:42','2026-08-06 04:15:45'),
 (881,6,'REC',60,149,'حاويات العقود','Operations/containers.php','fa fa-boxes-stacked',48,NULL,'Operations/containers.php',0,'2026-08-02 03:11:23','2026-08-06 00:14:05'),
 (883,6,'DAILY',2088,150,'مواقع التنفيذ','Projects/sites.php','fa fa-map-location-dot',50,NULL,'Projects/sites.php',0,'2026-08-03 08:47:42','2026-08-06 00:14:05'),
@@ -5741,13 +5741,13 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7105,3,'DAILY',3858,402,'صندوقُ موافقاتي — ما ينتظر يدي','Approvals/requests.php','fa fa-list-check',900,NULL,'Approvals/requests.php',1,'2026-08-10 20:06:17','2026-08-12 03:32:18'),
 (7106,4,'DAILY',3859,402,'صندوقُ موافقاتي — ما ينتظر يدي','Approvals/requests.php','fa fa-list-check',900,NULL,'Approvals/requests.php',1,'2026-08-10 20:06:17','2026-08-12 03:32:18'),
 (7107,19,'DAILY',3937,402,'صندوقُ موافقاتي — ما ينتظر يدي','Approvals/requests.php','fa fa-list-check',900,NULL,'Approvals/requests.php',1,'2026-08-10 20:06:17','2026-08-12 03:32:18'),
-(7133,9,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02'),
-(7134,27,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02'),
-(7135,28,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02'),
-(7136,29,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02'),
-(7137,30,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02'),
-(7138,34,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02'),
-(7139,35,'HOME',178,228,'الرئيسية','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 04:36:02');
+(7133,9,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
+(7134,27,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
+(7135,28,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
+(7136,29,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
+(7137,30,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
+(7138,34,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
+(7139,35,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

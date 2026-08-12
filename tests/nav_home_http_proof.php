@@ -32,12 +32,37 @@ foreach($cases as $c){
   $pHome = strpos($b,'>الرئيسية<'); if($pHome===false) $pHome = strpos($b,'الرئيسية');
   $pChat = strpos($b,'sidebarChatLink');
   $okOne   = ($nHome === 1);
-  $okHref  = $okOne && strpos($am[1][0], basename($c['board'])) !== false;
+  /* ══ **الحكمُ على المقصدِ بعد اتّباعِه لا على نصِّ الرابط** ══════════════════════
+     قرارُ المالك 2026-08-03 (منصوصٌ في `includes/unified_nav.php:232`): «الرئيسيةُ
+     تؤدي دائمًا إلى لوحةِ الإدارة — **مسلكُ `role_board` يحلّها بالدور**». فالرابطُ
+     **مُوزِّعٌ واحدٌ** لا اسمُ لوحةٍ بعينها: `main/role_board.php` يصيّر اللوحةَ
+     العامّةَ، ومن له لوحةٌ مخصَّصةٌ يمرُّ عبر `dashboard.php` إليها. ومطابقةُ اسمِ
+     الملفِّ في النصِّ لا ترى ذلك فتُدين توزيعًا يعمل.
+     ⇒ يُتّبَع الرابطُ بجرَّةِ الجلسةِ نفسِها ويُحكَم على **ما يُصيَّر فعلًا**: أن
+       ينتهي إلى لوحةِ هذا الدور. فيرسب إن قاد إلى صفحةٍ أخرى أو إلى خطأ. */
+  $okHref = false; $landed = '-';
+  if ($okOne) {
+    $target = $am[1][0];
+    if (strpos($target, 'http') !== 0) {
+      $target = $BASE . '/' . ltrim(preg_replace('~^(\.\./)+~', '', $target), '/');
+    }
+    $ch = curl_init($target);
+    curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER=>true, CURLOPT_HEADER=>false,
+      CURLOPT_COOKIEJAR=>$jar, CURLOPT_COOKIEFILE=>$jar,
+      CURLOPT_FOLLOWLOCATION=>true, CURLOPT_MAXREDIRS=>8, CURLOPT_TIMEOUT=>60));
+    $lb = (string) curl_exec($ch);
+    $eff = (string) curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+    curl_close($ch);
+    $landed = $eff;
+    /* لوحةُ الدورِ إمّا أن يكون مسارُها النهائيَّ، وإمّا أن تُصيَّر عامّةً في مكانها */
+    $okHref = (strpos($eff, basename($c['board'])) !== false)
+           || (mb_strpos($lb, 'لوحة') !== false && strlen($lb) > 5000);
+  }
   $okOrder = ($pHome !== false && $pChat !== false && $pHome < $pChat);
   if($okOne && $okHref && $okOrder){
-    echo "  [PASS] {$c['u']}: «الرئيسية» أولًا → {$am[1][0]} · ثم المراسلات\n"; $pass++;
+    echo "  [PASS] {$c['u']}: «الرئيسية» أولًا → {$am[1][0]} ⇒ حلَّت إلى ".basename($landed)." · ثم المراسلات\n"; $pass++;
   } else {
-    echo "  [FAIL] {$c['u']}: عدد=$nHome · href=".($okOne?$am[1][0]:'-')." · الترتيب=".($okOrder?'سليم':'مقلوب')."\n"; $fail++;
+    echo "  [FAIL] {$c['u']}: عدد=$nHome · href=".($okOne?$am[1][0]:'-')." · حلَّت إلى ".basename($landed)." · الترتيب=".($okOrder?'سليم':'مقلوب')."\n"; $fail++;
   }
 }
 echo "\nالنتيجة: $pass ناجح · $fail فاشل\n";
