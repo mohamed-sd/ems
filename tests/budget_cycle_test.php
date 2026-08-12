@@ -44,9 +44,14 @@ $mk = function ($dept, $state = 'draft') use ($conn, $CO, $MARK, &$seeded) {
     static $i = 0; $i++;
     $no = 'TST-BG-' . $MARK . '-' . $i;
     $fy = 2090 + $i;                    // سنواتٌ بعيدةٌ لا تلامس موازناتك
+    /* ◆ **المنشئُ يجب أن يتمايز عن يدِ الجلسة.** كانت البذرةُ تكتب
+         `created_by = 1` وجلسةُ الفاحصِ هي المستخدمُ **1** نفسُه — فحارسُ «من
+         أنشأ لا يعتمد» يرفض كلَّ إجازةٍ **بحقّ**، فسقطت ستةُ فحوصٍ تقيس
+         الإجازةَ وهي سليمةٌ في المنتج. فمنشئٌ مِسباريٌّ متمايزٌ (999801) يجعل
+         الفاحصَ يقيس بوابةَ الإدارةِ المالية لا حارسَ الذات. */
     $st = $conn->prepare("INSERT INTO fin_budgets (company_id, budget_no, dept_module, period_type,
               fiscal_year, total_revenue, total_expense, state, created_by, created_at)
-              VALUES (?, ?, ?, 'annual', ?, 1000, 2000, ?, 1, NOW())");
+              VALUES (?, ?, ?, 'annual', ?, 1000, 2000, ?, 999801, NOW())");
     $st->bind_param('issis', $CO, $no, $dept, $fy, $state);
     $st->execute();
     $id = $conn->insert_id;
@@ -122,13 +127,26 @@ check(fin_budget_is_approver('13', false) === false, 'ومديرُ الصيان�
 check(fin_budget_is_approver('16', false) === false, 'ولا مديرُ المشتريات');
 
 // وهذا فحصٌ حتميٌّ للاشتقاق: القائمةُ من `roles.parent_role_id` لا من نصٍّ مكتوب
+/* ══ **الفحصُ كان ينقض نفسَه**: يشترط أن القائمةَ «مشتقَّةٌ بالتبعية لا مكتوبةٌ
+     يدويًّا» — **ويكتبها يدويًّا** بستةِ أرقامٍ مجمَّدة. وأسرةُ المالية نمت
+     بـ`update0013` (31 رئيسُ الحسابات · 34 منفذُ المدفوعاتِ البنكية ·
+     35 معدُّ المطابقةِ البنكية) فصار الأبناءُ ثمانيةً — فرسبت القائمةُ
+     الصحيحةُ على قائمةٍ متجاوَزة.
+   ⇒ يُقاس **بالقاعدةِ نفسِها**: الأبُ 17 وكلُّ أبنائه في `roles` — فمن يُضاف
+     غدًا يدخل بلا تعديلِ فاحص، وهو عينُ ما يدّعيه الفحص. */
 $__ap = fin_budget_approver_roles();
 sort($__ap);
-check($__ap === array('17', '18', '19', '20', '21', '22'),
-    '★ والقائمةُ مشتقَّةٌ بالتبعية (17 وأبناؤه) لا مكتوبةً يدويًّا');
+$__want = array(strval(EMS_ROLE_FINANCE_DEPT));
+$__kids = $conn->query('SELECT id FROM roles WHERE parent_role_id = ' . intval(EMS_ROLE_FINANCE_DEPT));
+while ($__kids && ($__k = $__kids->fetch_row())) { $__want[] = strval($__k[0]); }
+sort($__want);
+check($__ap === $__want,
+    '★ والقائمةُ مشتقَّةٌ بالتبعية (17 وأبناؤه = ' . count($__want) . ' دورًا) لا مكتوبةً يدويًّا');
 
 $r = fin_budget_transition($conn, $b1, 'approve', '18', 60, false);
-check($r['status'] === 'ok', '★ ومعاونٌ ماليٌّ (18) يُجيز فعلًا لا شكلًا');
+check($r['status'] === 'ok', '★ ومعاونٌ ماليٌّ (18) يُجيز فعلًا لا شكلًا — '
+    . $r['status'] . ($r['reason'] !== '' ? ': ' . $r['reason'] : '')
+    . ' · حالُ الموازنة قبله: ' . $stateOf($b1)['state']);
 check($stateOf($b1)['state'] === 'approved', 'فصارت معتمدة');
 
 // تُعاد إلى «مرفوعة» لإكمال بقية الفحوص على الحالة نفسها

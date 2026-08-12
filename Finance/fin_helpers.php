@@ -1328,13 +1328,30 @@ if (!function_exists('fin_budget_approver_roles')) {
     {
         static $cache = null;
         if ($cache !== null) { return $cache; }
-        $cache = array(strval(EMS_ROLE_CFO));
+        /* ══ **عيبٌ مقيسٌ: الاشتقاقُ كان من دورٍ لا من أسرة.**
+             كانت تشتقُّ أبناءَ `EMS_ROLE_CFO` — وقيمتُه `'32'` («المدير المالي
+             ط٢» من `update0013`)، **وهو دورٌ ورقةٌ لا أبٌ لأحد**. فالاستعلامُ
+             يعود فارغًا دائمًا والقائمةُ تبقى عنصرًا واحدًا (`'32'`)، فلا
+             الدورُ 19 (مديرُ الإدارةِ المالية) يُجيز ولا معاونوه — أي أن
+             «التوسعةَ» بقرارِ المالك 2026-07-28 **لم تنفُذ قطُّ**.
+             وأسرةُ المالية في `roles` أبوها **`17` «إدارة المالية»**
+             (level 1 · parent NULL) وأبناؤها 18·19·20·21·22.
+             ورأسُ `includes/roles.php` يشرح اللبسَ بنفسه: «الاسمُ القديمُ
+             `EMS_ROLE_CFO` كان يسمّي الإدارةَ مديرًا — وهو اللبسُ نفسُه»؛
+             فحين أُعيد ترقيمُه إلى 32 بقيت هذه الدالةُ على الاسمِ القديمِ
+             بمعناه الجديد.
+           ⇒ الاشتقاقُ من `EMS_ROLE_FINANCE_DEPT` = الأسرةُ لا الورقة. */
+        $cache = array(strval(EMS_ROLE_FIN_DEPT_MGR));
         try {
             // `roles` جدولٌ عالميٌّ (T_GLOBAL) — قراءةٌ بلا نطاق
             $rows = ems_tenant_db()->select('roles', array(
-                'columns' => array('id'), 'where' => array('parent_role_id' => intval(EMS_ROLE_CFO)),
+                'columns' => array('id'),
+                'where'   => array('parent_role_id' => intval(EMS_ROLE_FINANCE_DEPT)),
             ));
             foreach ($rows as $r) { $cache[] = strval($r['id']); }
+            /* والأبُ نفسُه (إدارةُ المالية) داخلُ الأسرةِ لا خارجَها */
+            $cache[] = strval(EMS_ROLE_FINANCE_DEPT);
+            $cache = array_values(array_unique($cache));
         } catch (\Throwable $t) {
             error_log('fin budget approver roles: ' . $t->getMessage());
             $cache = array_map('strval', EMS_ROLES_FINANCE);   // احتياطٌ ثابتٌ لا يفتح بابًا زائدًا
