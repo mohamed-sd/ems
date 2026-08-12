@@ -298,9 +298,26 @@ check(preg_match('/جاهزٌ للفوترة ولم يُفوتر — (\d+) يو�
 
 list($pc, $ppage) = req(BASE . '/Contracts/claims.php?pending=1');
 check($pc === 200, 'وشاشةُ المستخلصات بالمرشِّح `pending` صُيِّرت (200)');
-$rowsShown = preg_match_all('/CLM-\d{4}-\d{4}/u', $ppage, $pm);
-check($rowsShown === $cntPending,
-    "وعددُ صفوفها = عدّادُ المعلَّقة: {$rowsShown} = {$cntPending}");
+/* ◆ **الحكمُ بالهويّةِ لا بنمطِ الترقيم.** كان العدُّ بـ`/CLM-\d{4}-\d{4}/`،
+     وذاك نمطٌ **لا يطابق ترقيمَ النظام** أصلًا: الأرقامُ الحقيقيةُ
+     `CLM-20260298` (شرطةٌ واحدةٌ وثمانيةُ أرقام)، ومستخلَصُ الفاحصِ نفسِه
+     `{$MARK}-1`. فكان يعدُّ ما لا يقصده ويُسقط ما يقصده — ويُدين شاشةً تعرض
+     صفوفَها كلَّها.
+   ⇒ تُقرأ أرقامُ المعلَّقةِ من القاعدةِ بنفسِ شرطِ العدّاد (`draft`/`review`)
+     ويُطلَب **حضورُ كلِّ رقمٍ منها في الصفحة**. فالحكمُ يرسب إن غاب صفٌّ
+     واجبٌ — وهو ما لا يفعله عدُّ نمطٍ مخترَع. */
+$pendNos = array();
+$pr = $db->query("SELECT claim_no FROM claims
+                   WHERE company_id={$CO} AND COALESCE(is_deleted,0)=0
+                     AND state IN ('draft','review')");
+while ($pr && ($px = $pr->fetch_assoc())) { $pendNos[] = (string) $px['claim_no']; }
+$missingRows = array();
+foreach ($pendNos as $no) {
+    if (mb_strpos($ppage, $no) === false) { $missingRows[] = $no; }
+}
+check(count($pendNos) === $cntPending && !$missingRows,
+    'وكلُّ معلَّقٍ في القاعدةِ معروضٌ في صفحتها: ' . count($pendNos) . " = {$cntPending}"
+    . ($missingRows ? ' · غائبٌ عن الصفحة: ' . implode('، ', $missingRows) : ''));
 check(mb_strpos($ppage, 'معلَّقة') !== false, 'ومرشِّحُ «معلَّقة» معروضٌ في شريط المرشِّحات');
 
 fwrite(STDOUT, "\n══════════════════════════════════════════════════\n");

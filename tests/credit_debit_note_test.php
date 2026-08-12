@@ -42,11 +42,25 @@ $conn = $GLOBALS['conn'];
 $gate = ems_tenant_db();
 $CO   = 4;
 $MARK = 'CDN' . getmypid();
+/* **وعائلةُ الوسمِ لا وسمُ الشوطِ.** الكنسُ بـ`{$MARK}%` أعمى عمّا تركه شوطٌ
+   سابقٌ أخفق كنسُه — والقياسُ وجد مستخلَصَين باقيَين (`CDN21492-C1/C2`) أحدُهما
+   `draft` فظهر في **عدّادِ المستخلصاتِ المعلَّقةِ** وأربكَ فاحصًا آخر. فيُكنس
+   بالعائلةِ `CDN%` (وترقيمُ النظامِ `CLM-%` فلا تلتبس به). */
+$FAMILY = 'CDN';
 $PREP = 921;   // مُعِدٌّ وهمي
 $APPR = 922;   // مُجيزٌ وهمي
 
 // ── الكنس: الإسقاطُ قبل الجذر (FK على root_event_id) ──────────────────────
-$cleanup = function () use ($conn, $MARK) {
+/* ⚠️ **`$FAMILY` وسيطٌ لا بدَّ منه في الالتقاط.** لو غاب عن `use` صار داخلَ
+   الإغلاقِ متغيِّرًا غيرَ معرَّفٍ، فينهار `LIKE '{$FAMILY}%'` إلى `LIKE '%'` —
+   أي **كنسٌ لكلِّ مستخلَصٍ في النظام**. (جُسَّ: لم يُهلك شيئًا لأن المفاتيحَ
+   الأجنبيةَ ردَّت الحذفَ صامتةً — نجاةٌ بالقيدِ لا بالقصد.) فيُلتقط صريحًا
+   ويُجَسُّ أنه غيرُ فارغٍ قبل أيِّ حذف. */
+$cleanup = function () use ($conn, $MARK, $FAMILY) {
+    if ($FAMILY === '' || $MARK === '') {
+        fwrite(STDERR, "  ⚠️ وسمٌ فارغٌ — أُلغي الكنسُ كلُّه صونًا للبيانات\n");
+        return;
+    }
     /* ══ الكنسُ بالوسمِ **وبالفترةِ المحجوزة** معًا.
          العيبُ المقيس: الوسمُ `CDN<pid>` **لكلِّ عمليةٍ على حدة**، فجولةٌ تنفجر
          تترك مستخلصَها بوسمِ pid آخرَ فلا يمسّه كنسُ الجولةِ التالية — و
@@ -66,11 +80,21 @@ $cleanup = function () use ($conn, $MARK) {
                    WHERE contract_id = 5 AND period_from LIKE '2094-%'");
     $conn->query("DELETE FROM claims WHERE contract_id = 5 AND period_from LIKE '2094-%'");
     $conn->query("DELETE FROM credit_debit_notes WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$MARK}%') x)");
+                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%') x)");
     $conn->query("DELETE FROM claim_lines WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$MARK}%') x)");
-    $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE 'INV-{$MARK}%'");
-    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$MARK}%'");
+                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%') x)");
+    /* **والفاتورةُ الضريبيةُ تشير إلى المستخلَصِ** (`tax_invoices.claim_id`) —
+       وهي من بذرِ هذا الفاحصِ نفسِه (`seed_source_invoice`) استجابةً لِـINJ-0036.
+       ولم تكن تُكنَس، فكان `DELETE FROM claims` **يُردُّ صامتًا** بمفتاحها فيبقى
+       مستخلَصان لكلِّ شوطٍ — أحدُهما `draft` فيدخل عدّادَ المعلَّقةِ ويُربك
+       فاحصًا آخر. المُشيرُ قبلَ المُشارِ إليه. */
+    $conn->query("DELETE FROM tax_invoices WHERE claim_id IN
+                    (SELECT id FROM (SELECT id FROM claims
+                       WHERE claim_no LIKE '{$FAMILY}%') x)");
+    $conn->query("DELETE FROM tax_invoices WHERE serial_no LIKE 'INV-{$FAMILY}%'");
+    $conn->query("UPDATE claims SET receivable_id = NULL WHERE claim_no LIKE '{$FAMILY}%'");
+    $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE 'INV-{$FAMILY}%'");
+    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$FAMILY}%'");
     $orphan = "SELECT id FROM (SELECT id, source_ref FROM ems_business_events) be
                 WHERE (be.source_ref LIKE '{$MARK}%' OR be.source_ref LIKE 'CDN-%')
                   AND NOT EXISTS (SELECT 1 FROM (SELECT note_no FROM credit_debit_notes) n
