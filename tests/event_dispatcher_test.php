@@ -121,6 +121,33 @@ $conn->query("DELETE FROM ems_event_consumers WHERE consumer LIKE 'k4t_%'");
 $conn->query("DELETE FROM ems_event_deliveries WHERE consumer LIKE 'k4t_%'");
 $conn->query("DELETE FROM ems_event_dead_letter WHERE consumer LIKE 'k4t_%'");
 
+/* ══ **تهيئةُ المؤشِّرِ عند الرأس — وإلا قاس الفاحصُ استهلاكَ تراكمٍ لا حكمَه.**
+     العيبُ المقيس: الفاحصُ يحذف مستهلكيه فيبدؤون من **صفر**
+     (`cursor_event_id NOT NULL DEFAULT 0`)، وفي الجذر **23,353 حدثًا** والعاملُ
+     يعالج **مئةً** في الجولة — فيلزمه 234 جولةً ليبلغ الحدثَ الذي نشره الفاحصُ
+     قبل سطرين. فلا يقع الانهيارُ المحقون، ولا يُعاد تسليمٌ، ولا يتقدّم مؤشِّرٌ
+     ⇒ **أحدَ عشرَ فحصًا تسقط وكلُّها تقيس دلالاتِ الانهيارِ والاستئنافِ لا
+     الطاقةَ الاستيعابية**. (مقيسٌ: طفلٌ مُشغَّلٌ يدويًّا أرجع
+     `processed:100 · cursor:6613` ولم ينهر.)
+   ⇒ يُسنَد المؤشِّرُ إلى **أحدثِ حدثٍ قائمٍ قبلَ نشرِ أحداثِ الفاحص** — فيصير
+     المنشورُ التاليَ مباشرةً ويُقاس الحكمُ في جولةٍ واحدة. ولا يُلمَس مستهلكٌ
+     إنتاجيّ: الأسماءُ `k4t_<pid>` للفاحصِ وحدَه. */
+/* ◆ **والمؤشِّرُ في فضاءِ `fin_financial_events` لا الجذرِ المحايد**: هذا الفاحصُ
+     ينشر بـ`EventPublisher::publish` (القناةُ القديمة) و`EventDispatcher` يقرأ
+     `fin_financial_events` حصرًا. وأولُ صياغةٍ لي أخذت `MAX` من
+     `ems_business_events` (23353) — وهو **أعلى من أقصى معرِّفٍ في الدفتر**،
+     فتجاوز المستهلكُ كلَّ شيءٍ ولم يعالج حدثًا. الجدولُ يُقاس لا يُفترض. */
+$__head = (int) $conn->query('SELECT COALESCE(MAX(id),0) FROM fin_financial_events')->fetch_row()[0];
+foreach (array($CX, $PS, $FX) as $__cx) {
+    $st = $conn->prepare("INSERT INTO ems_event_consumers (consumer, enabled, cursor_event_id)
+                          VALUES (?, 1, ?)
+                          ON DUPLICATE KEY UPDATE cursor_event_id = VALUES(cursor_event_id), enabled = 1");
+    $st->bind_param('si', $__cx, $__head);
+    $st->execute();
+    $st->close();
+}
+fwrite(STDOUT, "  ○ مؤشِّرُ المستهلكينَ الثلاثةِ عند الرأس #{$__head} — يُقاس الحكمُ لا التراكم\n");
+
 try {
 
 echo "── تدقيق 1: exactly-once بالأثر — انهيار حقيقي بين المعالجة والـCursor ──\n";

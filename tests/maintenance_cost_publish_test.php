@@ -43,6 +43,18 @@ $MARK = 'MNTCOST_' . getmypid();
 $ctx  = TenantContext::forSystem($CO, $ACTOR, 'maintenance cost publish test', true);
 $gate = new TenantDb($conn, $ctx);
 $GLOBALS['__ems_tenant_db_override'] = $gate;   // لا يُستعمل — البوابة تُبنى من الجلسة
+/* ══ **والفاحصُ كان يعترف بذلك ثم لا يفعل شيئًا حياله.**
+     `mnt_publish_order_cost` تنادي `ems_tenant_db()` داخلَها، وهي تُبنى من
+     **`TenantContext::fromSession()`** وتُخزَّن ساكنًا (config.php:537-549).
+     فبلا جلسةٍ تفشل البوابةُ **بحقّ**: `TenantGate: no tenant in context
+     (fail-closed)` — وترجع الدالةُ `'failed'` فتسقط ثمانيةُ فحوصٍ تقيس النشرَ
+     والعطالةَ، **والحارسُ سليمٌ والبيئةُ ناقصة**. (مقيسٌ من سجلِّ الأخطاء:
+     ثلاثةُ أسطرٍ «no tenant in context» لأوامرَ 207 و208 و99999999.)
+   ⇒ تُبذر جلسةٌ كما تفعل سائرُ الفواحصِ التي تمرُّ ببوابةِ المستأجر — **قبلَ**
+     أولِ نداء، لأن البوابةَ تُخزَّن ساكنًا فأولُ بناءٍ يحكم الجولةَ كلَّها. */
+if (session_status() !== PHP_SESSION_ACTIVE) { @session_start(); }
+$_SESSION['user'] = array('id' => $ACTOR, 'role' => '13', 'company_id' => $CO,
+                          'name' => 'maintenance cost publish test');
 
 $scalar = function ($sql, $params = array()) use ($conn) {
     $st = $conn->prepare($sql);
