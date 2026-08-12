@@ -93,15 +93,25 @@ check(count($basis2['ownership_split']) === 1 && $basis2['ownership_split'][0]['
       'وأصل بلا حصص مسجَّلة: سطر واحد للمستأجر — السلوك القائم لا يتغير');
 
 head('F12 — إعادة تقييم الرصيد المفتوح (فرق غير محقق بسطره)');
+/* ══ **عملةُ برهانٍ محجوزةٌ — لا USD الحقيقية** ══════════════════════════════
+   `revalueOutstanding` **مسحُ شركةٍ كامل** بحكمِ تصميمِه: كلُّ عمليةٍ حيةٍ
+   برصيدٍ موجبٍ بعملةٍ غيرِ الوظيفية. وللشركة 4 **78 عمليةً حقيقيةً** (69 دولارًا
+   و9 ريالاتٍ قطرية) — فخريطةُ أسعارٍ بـUSD تجعل المولَّدَ 70 لا 1 أبدًا،
+   **وتكتب 69 فرقَ عملةٍ غيرَ محقَّقٍ على عملياتٍ حقيقيةٍ في كلِّ شوط**.
+   والمنتجُ يعمل كما هو مُواصَف؛ الخللُ أن البرهانَ يمسُّ جمهورَ الإنتاج.
+   ⇒ تُبذر العمليةُ بـ`XTS` — رمزُ ISO 4217 **المحجوزُ للاختبار** (مقيسٌ: صفرُ
+     استعمالٍ في القاعدة، ولا مفتاحَ ولا قيدَ على العمود). فلا سعرَ لـUSD/QAR
+     في الخريطةِ فتُتخطّى الـ78 كلُّها، ويبقى `created === 1` **حكمًا دقيقًا**
+     يرسب إن توقّف المسحُ أو رُدَّ الإدراجُ أو أبلغ العدَّادُ زورًا. */
 $conn->query("INSERT INTO financing_operations (company_id, op_code, financier_entity_id, model_code, currency, capital, outstanding_balance, state, created_by)
-              VALUES ({$CO}, '{$MARK}-OP', {$FA}, 'fixed_yield', 'USD', 10000, 10000, 'active', 1)");
+              VALUES ({$CO}, '{$MARK}-OP', {$FA}, 'fixed_yield', 'XTS', 10000, 10000, 'active', 1)");
 $OP = (int) $conn->insert_id;
-$r = FS::revalueOutstanding($conn, $CO, '2026-08', array('USD' => array('old' => 600.0, 'new' => 650.0)), 'SDG', 1);
-check($r['ok'] && $r['created'] === 1, 'رصيد 10000 USD مفتوح أُعيد تقييمه (600→650)');
+$r = FS::revalueOutstanding($conn, $CO, '2026-08', array('XTS' => array('old' => 600.0, 'new' => 650.0)), 'SDG', 1);
+check($r['ok'] && $r['created'] === 1, 'رصيد 10000 XTS مفتوح أُعيد تقييمه (600→650) — وحدَه لا 78 عمليةً حقيقية');
 $q = $conn->query("SELECT kind, amount, rate_from, rate_to FROM fin_fx_differences WHERE source_kind='revaluation' AND source_ref={$OP} AND note LIKE 'finrev:%'")->fetch_assoc();
 check($q && $q['kind'] === 'unrealized' && abs((float) $q['amount'] - 500000.0) < 0.01,
       'فرق **غير محقق** بسطره: 10000 × (650−600) = 500000 — لا مدموجًا في تكلفة التمويل');
-$r2 = FS::revalueOutstanding($conn, $CO, '2026-08', array('USD' => array('old' => 600.0, 'new' => 650.0)), 'SDG', 1);
+$r2 = FS::revalueOutstanding($conn, $CO, '2026-08', array('XTS' => array('old' => 600.0, 'new' => 650.0)), 'SDG', 1);
 check($r2['created'] === 0, 'وإعادة التقييم للفترة نفسها عاطلة — لا فرق مكرر');
 $q = $conn->query("SELECT COUNT(*) c FROM fin_fx_differences WHERE source_kind='revaluation' AND source_ref={$OP} AND note LIKE 'finrev:%'")->fetch_assoc();
 check((int) $q['c'] === 1, 'سطر واحد للفترة');

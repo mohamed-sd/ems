@@ -48,13 +48,46 @@ $r = $conn->query("SELECT COUNT(*) c FROM unit_time_log WHERE ops_state='actual_
 check(intval($r->fetch_assoc()['c']) > 0, 'العملُ الفعليُّ يبقى بلا مسؤولٍ بحق — ليس توقفًا');
 
 // ═══ ② الردمُ من المصفوفة ═══
-head('② الصفّان التاريخيان بحكم مصفوفة عقدهما (5)');
-$x = $conn->query("SELECT resp_party, obligation_type FROM unit_time_log WHERE id=1925")->fetch_assoc();
-check($x && $x['resp_party'] === 'client' && $x['obligation_type'] === 'fuel',
-      'صف 1925: fuel_logistics_stop → حكمُ العقد 5 لبند fuel = client (لا تخمين)');
-$x = $conn->query("SELECT resp_party, obligation_type FROM unit_time_log WHERE id=1926")->fetch_assoc();
-check($x && $x['resp_party'] === 'company' && $x['obligation_type'] === 'equipment_readiness',
-      'صف 1926: tech_breakdown → حكمُ equipment_readiness = company');
+/* ══ **الأثرُ يُقرأ من سجلِّه لا من مفتاحٍ صلب** ═══════════════════════════════
+   كان الحكمُ مثبَّتًا على `unit_time_log.id = 1925/1926` — صفَّي بذرٍ من
+   2026-07-28 ردمهما `seeds/e07_stop_resp_backfill`. وقد **حُذفا بقرارِ مالكٍ**
+   مع دورةِ الوحدةِ كلِّها (`tools/unit_cycle_reseed.php` — تفريغٌ وإعادةُ بذر).
+   فالاستعلامُ يعود فارغًا والفحصُ يسقط — لا لأن الردمَ أخطأ بل لأن **المفتاحَ
+   الصلبَ لا ينجو من إعادةِ بذرٍ مشروعة**.
+   ⇒ يُقرأ **سجلُّ الردمِ نفسُه** (`activity_logs` بقيمِ قبل/بعد) ويُعاد الحكمُ
+     عليه بمصفوفةِ عقدِه المقروءةِ من القاعدة: أي أن كلَّ ردمٍ مسجَّلٍ يجب أن
+     يطابق حكمَ المصفوفةِ حرفيًّا. فيرسب إن ردم أحدُهم خلافَ المصفوفة، وينجو من
+     أيِّ إعادةِ ترقيمٍ أو إعادةِ بذر. */
+head('② أثرُ الردم يحمل حكمَ مصفوفة عقدِه (لا تخمين · لا مفتاحٍ صلب)');
+$aud = $conn->query("SELECT record_id, old_value, new_value FROM activity_logs
+                      WHERE screen_name='seeds/e07_stop_resp_backfill'
+                        AND action_type='backfill' ORDER BY record_id")->fetch_all(MYSQLI_ASSOC);
+check(count($aud) >= 2, 'سجلُّ الردمِ يحمل صفَّين على الأقل: ' . count($aud));
+$judged = 0; $wrong = array();
+$stq = $conn->prepare("SELECT obligor FROM contract_obligations
+                        WHERE client_contract_id = ? AND obligation_type = ?
+                          AND COALESCE(is_deleted,0) = 0 LIMIT 1");
+foreach ($aud as $a) {
+    $nv = json_decode((string) $a['new_value'], true);
+    if (!is_array($nv)) { continue; }
+    $ot = isset($nv['obligation_type']) ? (string) $nv['obligation_type'] : '';
+    $rp = isset($nv['resp_party']) ? (string) $nv['resp_party'] : '';
+    $cid = isset($nv['contract_id']) ? (int) $nv['contract_id'] : 5;
+    if ($ot === '' || $rp === '') { continue; }
+    $stq->bind_param('is', $cid, $ot);
+    $stq->execute();
+    $res = $stq->get_result();
+    $row = $res ? $res->fetch_assoc() : null;
+    $judged++;
+    if (!$row || (string) $row['obligor'] !== $rp) {
+        $wrong[] = '#' . $a['record_id'] . " {$ot}: رُدم «{$rp}» والمصفوفةُ «"
+                 . ($row ? $row['obligor'] : 'لا بند') . '»';
+    }
+}
+$stq->close();
+check($judged >= 2 && !$wrong,
+    "كلُّ ردمٍ مسجَّلٍ يطابق حكمَ مصفوفةِ عقدِه ({$judged} حُكم"
+    . ($wrong ? ' · خلافٌ: ' . implode(' · ', $wrong) : '') . ')');
 // حكمُ المصدر مطابقٌ فعلًا لمصفوفة العقد 5 (تحصينُ الاختبار من ردمٍ أعمى)
 $m = $conn->query("SELECT obligation_type, obligor FROM contract_obligations
                    WHERE client_contract_id=5 AND obligation_type IN ('fuel','equipment_readiness')

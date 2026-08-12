@@ -127,11 +127,24 @@ foreach (array(array($tsIds[0], '2027-11-02', 8.0), array($tsIds[1], '2027-11-03
 }
 
 $cleanup = function () use ($db, $CLIENT, $PROJ, $CONTRACT, $OP, $tsIds, $revIds) {
+    /* ⚠️ **كلُّ حذفٍ يُفحَص مُرجَعُه.** `mysqli_report(MYSQLI_REPORT_OFF)` أعلى الملفِّ
+       يجعل الحذفَ المرفوضَ بمفتاحٍ أجنبيٍّ يعود `false` **في صمتٍ تام** — وهو ما
+       أبقى مستخلَصًا مفوترًا يتيمًا في كلِّ شوطٍ لِستةَ عشرَ شوطًا. */
+    $q = function ($sql) use ($db) {
+        if ($db->query($sql) === false) {
+            fwrite(STDERR, '  ⚠ كنسٌ أخفق: ' . $db->error . "\n     " . preg_replace('~\s+~', ' ', $sql) . "\n");
+        }
+    };
+    /* والفاتورةُ الضريبيةُ ابنةُ المستخلصِ بـRESTRICT (`fk_tax_invoice_claim`):
+       تُنشئها إجازةُ المستخلصِ نفسُها (`TaxInvoiceService::issueForClaim`)، ولم
+       تكن تُكنَس — فيُردُّ حذفُ الأبِ صامتًا. المُشيرُ قبلَ المُشارِ إليه. */
+    $q("DELETE FROM tax_invoices WHERE claim_id IN (SELECT id FROM (SELECT id FROM claims
+          WHERE contract_id=" . intval($CONTRACT) . ") x)");
     $db->query("DELETE r FROM fin_receivables r JOIN claims c ON c.invoice_no = r.doc_ref WHERE c.contract_id=" . intval($CONTRACT));
     $db->query("DELETE FROM fin_financial_events WHERE entity_type='claim' AND entity_id IN (SELECT id FROM claims WHERE contract_id=" . intval($CONTRACT) . ")");
     $db->query("DELETE FROM ems_business_events WHERE entity_type='claim' AND entity_id IN (SELECT id FROM claims WHERE contract_id=" . intval($CONTRACT) . ")");
     $db->query("DELETE FROM claim_lines WHERE claim_id IN (SELECT id FROM claims WHERE contract_id=" . intval($CONTRACT) . ")");
-    $db->query("DELETE FROM claims WHERE contract_id=" . intval($CONTRACT));
+    $q("DELETE FROM claims WHERE contract_id=" . intval($CONTRACT));
     // الإسقاطُ قبل الجذر: الروابطُ ثم القيودُ ثم حقائقُها
     $db->query("DELETE FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref IN ("
         . implode(',', array_map('intval', $tsIds)) . ")");
@@ -262,11 +275,38 @@ cs_login('مديرمالي', $jar2);
 list($code, $h, $page2) = cs_req($BASE . '/Contracts/claims.php', $jar2);
 check($code === 200, 'المديرُ الماليُّ يفتح الشاشة عرضًا');
 check(strpos($page2, 'توليد مستخلص الفترة') === false, '★ ولا يرى نموذجَ التوليد (بلا can_add)');
+/* ══ **الرمزُ المركزيُّ سِمةُ جلسةٍ — ورمزُ جلسةٍ أخرى يُردُّ قبل حارسِ الصلاحية** ══
+   كان الطلبُ يُرسل `$gcsrf` — الرمزَ المحصودَ من صفحةِ **المبيعات** (جرَّة `$jar`)
+   إلى جلسةِ **المدير المالي** (جرَّة `$jar2`). والرمزُ واحدٌ لكلِّ جلسةٍ
+   (`includes/security.php` يقارنه بـ`$_SESSION['csrf_token']`)، و`/Contracts/`
+   داخلَ `CSRF_ENFORCE_PATHS` — فيُردُّ الطلبُ **403 بلا ترويسةِ `Location`**
+   عند `config.php` **قبل أن يبلغ شيءٌ من `claims.php`**. فلا وميضَ يُتبَع،
+   و`cs_msg()` تعود فراغًا، فيُقرأ الصمتُ «لم تُرفض بالصلاحية» — والطلبُ لم يصل
+   إلى حارسِ الصلاحيةِ أصلًا. أي أن الفحصَ كان يقيس حارسَ CSRF ويحسبه حارسَ صلاحية.
+   ⇒ يُقرأ رمزُ **جلسةِ المدير المالي** من صفحتِه (الحاقنُ المركزيُّ يبثُّ
+     `window.csrfToken` في كلِّ صفحةٍ ولو خلت من نموذج)، ويُثبَت أنه **يخالف**
+     رمزَ المبيعات — وإلا فالجرَّتان جلسةٌ واحدةٌ وفصلُ الأدوارِ في البرهان وهمٌ.
+     ويُضاف حكمان يمنعان قراءةَ 403 رفضًا: أن يبلغ الطلبُ الشاشةَ (302) وأن لا
+     يُولد مستخلَصٌ ثانٍ. و`clm_csrf` يبقى قديمًا **عن قصد**: `claims.php:65`
+     يفحص الصلاحيةَ **قبل** `:66` رمزَ الشاشة، وصفحةُ دورٍ بلا `can_add` لا تحمله. */
+if (!preg_match('~window\.csrfToken\s*=\s*"([^"]+)"~', $page2, $g2)) {
+    preg_match('~name="csrf_token"\s+value="([^"]+)"~', $page2, $g2);
+}
+$gcsrf2 = isset($g2[1]) ? $g2[1] : '';
+check($gcsrf2 !== '' && $gcsrf2 !== $gcsrf,
+    'ورمزُ الجلسةِ المركزيُّ للمدير الماليِّ مقروءٌ ومستقلٌّ عن رمزِ المبيعات');
+$claimsBefore = (int) $db->query("SELECT COUNT(*) FROM claims WHERE contract_id=" . intval($CONTRACT))
+                        ->fetch_row()[0];
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $jar2, array(
-    'action' => 'generate', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf,
+    'action' => 'generate', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf2,
     'contract_id' => $CONTRACT, 'period_from' => '2027-12-01', 'period_to' => '2027-12-31',
 ));
+check($code === 302, "★ والطلبُ بلغ الشاشةَ لا الحارسَ المركزيَّ (HTTP {$code})");
 check(strpos(cs_msg($h), 'صلاحية') !== false, 'ومحاولةُ التوليد تُرفض بالصلاحية');
+$claimsAfter = (int) $db->query("SELECT COUNT(*) FROM claims WHERE contract_id=" . intval($CONTRACT))
+                       ->fetch_row()[0];
+check($claimsAfter === $claimsBefore,
+    "★ ولا مستخلصَ وُلد بلا صلاحية (قبل {$claimsBefore} · بعد {$claimsAfter})");
 
 $cleanup();
 check((int) $db->query("SELECT COUNT(*) FROM claims WHERE contract_id=" . intval($CONTRACT))->fetch_row()[0] === 0,
