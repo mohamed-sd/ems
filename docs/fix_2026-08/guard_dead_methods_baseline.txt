@@ -1,0 +1,55 @@
+# خطُّ سقّاطةِ دوالِّ الحراسةِ الميتة — INJ-0239
+# مُولَّدٌ: php tools/guard_adoption_gate.php --list-dead   ·   2026-08-12
+# القاعدة: **لا نموّ**. اسمٌ ليس هنا يُحجب البوابةَ (رمزُ خروجٍ 1).
+# ومن يُتبنَّى يُرفَع من هنا ليُحكِم الخطُّ على ما بقي.
+# ولا يُضاف اسمٌ لتمريرِ بوابةٍ — ذلك نقضُ الغرضِ كلِّه.
+
+BreakGlassService::grant
+BreakGlassService::review
+EntityGovernanceService::addOwnership
+EntityGovernanceService::enablePattern
+EntityGovernanceService::setCompleteness
+EntityGovernanceService::transferOwnership
+EventDispatcher::register
+EventDispatcher::runOnce
+ExceptionService::approve
+ExceptionService::create
+FieldGovernor::assertNotInherited
+FieldGovernor::canEdit
+FieldGovernor::onParentChange
+FieldGovernor::scanUnclassified
+FoundingModeService::activate
+FoundingModeService::closeProtocol
+FoundingModeService::discoveryActive
+InternalAuditService::deliverReport
+OwnershipDomainGuard::fetchEquipmentOwnership
+OwnershipDomainGuard::filterColumns
+PermSourceService::shadowCompare
+PermissionChangeWorkflow::open
+PermissionReviewService::decideLine
+PermissionReviewService::sign
+PermissionTemplateService::amendVersion
+PositionService::activate
+PositionService::securitySuspend
+ProcessedOperations::isProcessed
+SensitiveFieldGuard::filterRow
+StateMachine::apply
+StateMachine::currentState
+TenantDb::count
+TenantDb::deleteChild
+TenantDb::deleteRow
+TenantDb::forAllTenants
+TenantDb::insert
+TenantDb::replaceChildren
+TenantDb::runInTransaction
+TenantDb::scopedQuery
+TenantDb::select
+TenantDb::selectOne
+TenantDb::softDelete
+TenantDb::update
+UnitStateChangeService::apply
+UnitStateChangeService::approveStep
+UnitStateChangeService::emergencyApply
+UnitStateChangeService::gmLoadReview
+UnitStateChangeService::request
+UnitStateChangeService::sweepEmergency

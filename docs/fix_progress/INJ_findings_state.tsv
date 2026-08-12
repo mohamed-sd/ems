@@ -237,7 +237,7 @@ INJ-0235	P2	لا	غيرُ مقيس
 INJ-0236	P2	لا	غيرُ مقيس	
 INJ-0237	P2	لا	غيرُ مقيس	
 INJ-0238	P2	لا	غيرُ مقيس	
-INJ-0239	P2	نعم	غيرُ مقيس	
+INJ-0239	P2	نعم	مُغلقٌ بشاهد	tests/guard_adoption_ratchet_test.php · tests/_regression.php · tools/fix_status_report.php · tools/guard_adoption_gate.php
 INJ-0240	P2	نعم	غيرُ مقيس	
 INJ-0241	P2	نعم	مُغلقٌ بشاهد	tools/fix_m10_gate_tests.php · tools/fix_status_report.php
 INJ-0242	P2	نعم	مُغلقٌ بشاهد	tools/fix_m10_gate_tests.php · tools/fix_status_report.php · tools/m10_ac_gate.php
