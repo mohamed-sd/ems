@@ -256,13 +256,30 @@ head('⑤ تبديلٌ بلا سببٍ يُرَدّ');
        كانت مجمَّدةً من شوطٍ سابقٍ لم يُرجِع ما جمّد.
      · رصيدُها صفر ⇒ «رصيدُ الحاوية صفرٌ — لا شيءَ يُنقل» (422) — وH-04 **نقلٌ**
        فلا معنى له بلا رصيد. وأوراقُ «مشغّل» في العقد 5 كلُّها صفرُ رصيد (مقيسٌ).
-   ⇒ فتُختار قابلةُ استبدالٍ **في العقد · نشطةٌ · برصيدٍ موجب**، ويُقاس مستواها
-     ليُختار الحائزُ الداخلُ من جدولِه الصحيح (`equipments` أو `employees`). */
+     · **رصيدُها الحرُّ صفر** ⇒ «لا رصيدَ حرًّا يُنقل (… موزَّعةٌ على أبنائها …)»:
+       أوراقُ العقد 5 الحقيقيةُ **موزَّعةٌ بالكامل** على أبنائها، فلا حرَّ فيها.
+       وما كان يُنجِح هذا الفحصَ سابقًا كان **بقايا فاحصٍ** (30 حاويةً · 18,700
+       وحدةً وهميّةً) أُزيلت بالهجرة 2027_03_11 — فالفحصُ كان يقف على رملٍ.
+   ⇒ فالشوطُ **يبني قابلَ الاستبدالِ بنفسِه من الشاشةِ نفسِها**: حصةُ معدةٍ تحت
+     حاويةِ مورّدِ البرهانِ التي وُلدت في ④ — بسقفٍ حرٍّ كلِّه. فلا يعتمد على
+     بياناتِ إنتاجٍ ولا على بقايا، ويُكنس مع شجرتِه في نهايةِ الشوط. */
+$SUP99 = $conn->query("SELECT id, cap_qty FROM op_containers
+                       WHERE parent_id=" . (int) $main['id'] . " AND supplier_id={$SUP}
+                         AND is_deleted=0 ORDER BY id DESC LIMIT 1")->fetch_assoc();
+check($SUP99 !== null, 'وحاويةُ مورّدِ البرهانِ حاضرةٌ لِتُبنى تحتها ورقةٌ');
+$EQREF = $conn->query("SELECT id FROM equipments WHERE company_id={$CO} ORDER BY id LIMIT 1")->fetch_assoc();
+if ($SUP99 && $EQREF) {
+    list(, $hEq) = c_req($URL, array('cnt_action' => 'allocate', 'contract_id' => $C5,
+        'parent_id' => (int) $SUP99['id'], 'child_level' => 'معدة', 'child_ref' => (int) $EQREF['id'],
+        'qty' => 60, 'role_kind' => 'أساسية', 'cnt_csrf' => $CSRF));
+    check(mb_strpos(c_msg($hEq), 'خُصّصت الحصة') !== false, 'وحصةُ معدةٍ (60) بُنيت تحتها للاستبدالِ عليها');
+}
 $leaf = $conn->query("SELECT id, level, remaining_qty, equipment_id, operator_employee_id
                       FROM op_containers
                       WHERE contract_id={$C5} AND is_deleted=0 AND state='نشطة'
-                        AND level IN ('معدة','مشغّل') AND remaining_qty > 0
-                      ORDER BY remaining_qty DESC, id LIMIT 1")->fetch_assoc();
+                        AND level IN ('معدة','مشغّل')
+                        AND ROUND(cap_qty - consumed_qty - allocated_qty, 2) > 0
+                      ORDER BY id DESC LIMIT 1")->fetch_assoc();
 check($leaf !== null, 'وللعقد قابلةُ استبدالٍ نشطةٌ برصيدٍ موجب');
 $SWAP_LVL = $leaf ? (string) $leaf['level'] : 'مشغّل';
 $HOLD_COL = ($SWAP_LVL === 'معدة') ? 'equipment_id' : 'operator_employee_id';

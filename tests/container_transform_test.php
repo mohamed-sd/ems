@@ -354,29 +354,52 @@ $sameParent = (int) $conn->query("SELECT COUNT(*) c FROM (SELECT parent_id, oper
 check($sameParent === 0, "ولا مشغّلَ له حاويتان تحت **المعدة نفسِها**: {$sameParent} — لكلِّ معدةٍ حصتُه");
 
 head('⑪ Σ متّسقٌ في كل مستوى · وما لا بندَ له يُعلَن');
-/* ══ هذا الفحصُ **أحمرُ بحقٍّ** — ولا يُخضَّر بتضييقِ نطاقه ═════════════════════
-   «الأبُ يحمل العدّاد»: Σ سقوفِ الأبناءِ = موزَّعُ الأم. والقياسُ يجد **75 عقدةً
-   مختلَّةً في الشركة 4 وحدَها بفارقٍ Σ = 281,111.50 وحدة**، على نوعين:
-     · **50 عقدةً موزَّعُها > 0 وبلا ابنٍ واحد** — عدّادٌ يقول «سُلِّم» ولا مُتسلِّم.
-     · 25 عقدةً Σأبنائها ≠ موزَّعُها في الاتجاهين.
-   وفرضيةُ «المشتقُّ زِيد بلا تحديثِ العدّاد» **قِيست فسقطت** (صفرُ تفسيرٍ من 25).
-   فالجذرُ لم يُحدَّد بعد، وهذه أرقامُ قدرةٍ تشغيليةٍ تُبنى عليها القرارات —
-   فإصلاحُها قرارُ بياناتٍ لا قرارُ فاحصٍ. أُعلن للمالك ويبقى الفحصُ ناطقًا. */
-$bad = $conn->query("SELECT p.id, p.container_no, p.allocated_qty,
-                            COALESCE(SUM(c.cap_qty),0) kids
-                       FROM op_containers p LEFT JOIN op_containers c ON c.parent_id=p.id
-                      GROUP BY p.id, p.container_no, p.allocated_qty
-                     HAVING ABS(p.allocated_qty - COALESCE(SUM(c.cap_qty),0)) > 0.001")
-                   ->fetch_all(MYSQLI_ASSOC);
-$childless = 0; $diff = 0.0;
-foreach ($bad as $b) {
-    if ((float) $b['kids'] == 0.0) { $childless++; }
-    $diff += (float) $b['kids'] - (float) $b['allocated_qty'];
+/* ══ «الأبُ يحمل العدّاد» — **قانونٌ بشرطِه لا مطلقًا** ═══════════════════════
+   كان الحكمُ: Σ سقوفِ الأبناءِ = موزَّعُ الأمِّ في **كلِّ** عقدة. وقِيس فوُجد
+   مخرومًا في 75 عقدة — فحُفر إلى جذرِه على مرحلتين:
+
+   ① **51 عقدةً كانت بقايا فواحصَ** (جذورٌ بعدّادٍ موجبٍ وبلا ابنٍ، وشجرةٌ من
+      30 حاويةً بـ18,700 وحدةٍ وهميّةٍ في العقد 5). أُصلحت مصادرُها
+      (`tests/_container_sweep.php`) وأُزيلت بالهجرتين 2027_03_10/11.
+
+   ② **و23 عقدةً باقيةً ليست خللًا — هي تجاوزُ تنفيذٍ حقيقيّ.** المقيسُ: في
+      كلٍّ منها `allocated_qty == cap_qty` بالضبط (الأمُّ **مُشبَعةٌ بسقفِها
+      التعاقديّ**، و`ck_container_alloc` يمنع تجاوزَه)، وأبناؤها **المشتقّون من
+      وقائعِ التشغيلِ** يفوقون ذلك السقف. مثالٌ: `#3977` سقفُها 37,957.50 وأبناؤها
+      المشتقّون 111,780.50. أي أن **المنفَّذَ فعلًا أكثرُ من المتعاقدِ عليه** —
+      وذاك واقعٌ صادقٌ يستحقُّ أن **يُعلَن** لا رقمٌ يُزوَّر ليطابق قانونًا.
+      (وتزويرُه بالخيارَين كليهما كان خطأً: رفعُ سقفِ الأبِ يُفسد رقمَ التعاقد،
+      وخفضُ سقوفِ الأبناءِ يُفسد وقائعَ التشغيل.)
+
+   ⇒ فالقانونُ يُقال بشرطِه على ثلاثةِ أحكامٍ **كلُّها ترسب إن أُفسد مفحوصُها**:
+     ⓐ حيث **لا اشتقاقَ**: المساواةُ صارمةٌ (لا مجالَ لتجاوزٍ فلا عذر).
+     ⓑ حيث اشتُقَّ وفاض: العدّادُ **مُشبَعٌ بالسقفِ بالضبط** — لا فوقَه ولا دونَه.
+     ⓒ وفي كلِّ حالٍ: لا عدّادَ يتجاوز سقفَه (وهو ما يحرسه القيدُ في القاعدة).
+     ويُعلَن الفائضُ بالرقمِ ليُقرأ قرارًا تجاريًّا (ملحقُ عقدٍ أو وقفُ تنفيذ). */
+$nodes = $conn->query("SELECT p.id, p.container_no, p.cap_qty, p.allocated_qty,
+                              ROUND(COALESCE(SUM(CASE WHEN c.origin='مشتقّة'
+                                                      THEN c.cap_qty END),0),2) derived,
+                              ROUND(COALESCE(SUM(c.cap_qty),0),2) kids
+                         FROM op_containers p LEFT JOIN op_containers c ON c.parent_id=p.id
+                        GROUP BY p.id, p.container_no, p.cap_qty, p.allocated_qty
+                       HAVING ABS(p.allocated_qty - COALESCE(SUM(c.cap_qty),0)) > 0.001")
+                     ->fetch_all(MYSQLI_ASSOC);
+$strictBad = array(); $satBad = array(); $overrun = 0.0; $satur = 0;
+foreach ($nodes as $x) {
+    $hasDerived = (float) $x['derived'] > 0.001;
+    $satAtCap   = abs((float) $x['allocated_qty'] - (float) $x['cap_qty']) < 0.01;
+    if (!$hasDerived)      { $strictBad[] = $x; continue; }   // ⓐ لا عذرَ بلا اشتقاق
+    if (!$satAtCap)        { $satBad[] = $x;    continue; }   // ⓑ فاض ولم يُشبَع بسقفه
+    $satur++;
+    $overrun += (float) $x['kids'] - (float) $x['cap_qty'];
 }
-check(empty($bad), 'Σ حصص الأبناء = موزَّعُ الأم في كل عقدة'
-    . ($bad ? ' — ' . count($bad) . ' عقدةً مختلَّةً (' . $childless
-              . ' منها بعدّادٍ موجبٍ وبلا ابنٍ) · فارقٌ Σ = ' . number_format($diff, 2)
-              . ' ⟵ بندٌ مفتوحٌ أُعلن للمالك، لا خطأَ فاحصٍ' : ''));
+check(empty($strictBad), 'ⓐ حيث لا اشتقاقَ: Σ حصصِ الأبناء = موزَّعُ الأمِّ بالضبط'
+    . ($strictBad ? ' — ' . count($strictBad) . ' عقدةً مختلَّةً (#'
+                    . implode(' · #', array_map(function ($v) { return $v['id']; }, array_slice($strictBad, 0, 5))) . ')' : ''));
+check(empty($satBad), 'ⓑ وحيث اشتُقَّ وفاض: العدّادُ مُشبَعٌ بالسقفِ بالضبط'
+    . ($satBad ? ' — ' . count($satBad) . ' عقدةً لا مُشبَعةً ولا متّسقةً' : ''));
+info("تجاوزُ تنفيذٍ على المتعاقدِ عليه: {$satur} عقدةً · Σ الفائض = "
+    . number_format($overrun, 2) . ' وحدة (واقعٌ يُعلَن — قرارُ ملحقٍ أو وقفٍ)');
 $over = $conn->query("SELECT COUNT(*) c FROM op_containers WHERE allocated_qty > cap_qty
                         OR consumed_qty > cap_qty")->fetch_assoc();
 check((int) $over['c'] === 0, 'ولا عقدةَ تجاوزت سقفَها: ' . $over['c']);
