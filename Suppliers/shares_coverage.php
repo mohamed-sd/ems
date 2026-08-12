@@ -12,6 +12,16 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ◆ **الحجبُ قبلَ الاستعلامِ لا بعده.** كان هذا السطحُ يعتمد على insidebar.php
+//   وحدَه (السطرُ 40)، والاستعلامُ الأولُ يقع قبلَه — فبياناتُ الموردين
+//   والحاوياتِ ودفترِ القدراتِ تُقرأ كاملةً لحسابٍ محرومٍ ثم يُعاد التوجيهُ
+//   برسالةِ «لا صلاحية». والدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في
+//   **متى**. (INJ-0454: «يُمنع … **قبل تنفيذ أيِّ استعلام**» — وهو ما أغفله
+//   قياسٌ اكتفى بنتيجةِ HTTP، فالنتيجةُ كانت 302 والقراءةُ قد تمّت.)
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $rows = array();
 $r = mysqli_query($conn,

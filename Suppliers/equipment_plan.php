@@ -11,6 +11,14 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+// ◆ **الحجبُ قبلَ الاستعلامِ لا بعده** — كما في `suppliers.php` بذاتِ التعليل.
+//   كان الاعتمادُ على insidebar.php (السطرُ 37) والاستعلامانِ يقعان قبلَه، فقائمةُ
+//   الموردين وخططُ معداتِهم تُقرأ لحسابٍ محرومٍ ثم يُعاد التوجيه. الدالةُ نفسُها
+//   ولا تغييرَ في مَن يُمنع — التغييرُ في **متى** (INJ-0454).
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $sup = intval($_GET['supplier_id'] ?? 0);
 
