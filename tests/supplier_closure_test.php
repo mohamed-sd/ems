@@ -50,13 +50,24 @@ $gate  = ems_tenant_db();
 $CO    = 4;
 $ACTOR = 999851;
 $MARK  = 'M18T' . getmypid();
+/* **وعائلةُ الوسمِ لا وسمُ الشوطِ وحدَه.** الوسمُ بـ`getmypid()` يجعل كلَّ شوطٍ
+   أعمى عمّا تركه سابقُه: فإن أخفق كنسُ شوطٍ بقيت صفوفُه إلى الأبد. والقياسُ
+   وجد **78 حاويةً** بهذه العائلةِ ما زالت في القاعدة (51 جذرًا و39 ابنًا)،
+   لأن `DELETE … LIKE '{$MARK}%'` كان يستهدف الجذرَ وابنَه **في جملةٍ واحدة**
+   فيردُّه `fk_container_parent` صامتًا (mysqli لا يرمي هنا) — فيُحذف الابنُ
+   ويبقى الجذرُ بعدّادٍ موزَّعٍ 1000 **وبلا ابنٍ واحد**، وهو بذاته 51 من
+   75 خللًا في ثابتِ «الأبُ يحمل العدّاد». */
+$FAMILY = 'M18T';
 
-$teardown = function () use ($conn, $MARK) {
+$teardown = function () use ($conn, $MARK, $FAMILY) {
     $conn->query("DELETE d FROM fin_dues d JOIN suppliers s ON s.id = d.party_ref
                    WHERE d.party_type='supplier' AND s.name LIKE '%{$MARK}%'");
     $conn->query("DELETE c FROM supplier_contract_closures c JOIN suppliers s ON s.id = c.supplier_id
                    WHERE s.name LIKE '%{$MARK}%'");
-    $conn->query("DELETE FROM op_containers WHERE container_no LIKE '{$MARK}%'");
+    /* الحاوياتُ: **الأبناءُ قبلَ الآباءِ · بعائلةِ الوسمِ · بمُرجَعٍ مفحوصٍ ·
+       وبسلسلةِ المُشيرين الثلاثيةِ** — كلُّها في الكنسِ المشترَك. */
+    require_once __DIR__ . '/_container_sweep.php';
+    ems_sweep_container_family($conn, $FAMILY . '%');
     $conn->query("DELETE a FROM supplier_advance_requests a JOIN suppliers s ON s.id = a.supplier_id
                    WHERE s.name LIKE '%{$MARK}%'");
     $ids = array();

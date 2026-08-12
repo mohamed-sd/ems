@@ -86,8 +86,44 @@ $cleanup = function () use ($conn, $CTRACTS) {
                         AND (origin = 'مشتقّة' OR origin_note LIKE 'سقفُ بند العقد%')");
     }
 };
+/* ⚠️ **الكنسُ أعلاه لا يمحو شيئًا — قِيس مُرجَعُه**: 16 صفًّا في
+   `substitute_coverages` تشير إلى مرشَّحيه و`covered_seat_id` **غيرُ قابلٍ
+   للتصفير** (NOT NULL)، و16 ابنًا من خارجِ المرشَّحين يعلّقون آباءَهم — فيردُّ
+   FK كلَّ حذفٍ (`مشغّل` ثم الأبوَّةُ الذاتيةُ لِما فوقه) و**صفرٌ من 40 يُمحى**.
+   فلا يُعتمَد عليه في صناعةِ لوحٍ أبيض: كلُّ فحصٍ يلزمه شجرةٌ نظيفةٌ صار يبنيها
+   بنفسِه (`$PROOF_ROOT`)، وما بقي يُحكَم **بالفروقِ** على الحالِ القائم. */
 $cleanup();
 register_shutdown_function($cleanup);
+
+/** كنسُ شجرةِ البرهانِ وحدَها — أعمقُ أوّلًا، وبمُرجَعٍ مفحوصٍ لكلِّ خطوة. */
+$PROOF_ROOT = null;
+register_shutdown_function(function () use ($conn, &$PROOF_ROOT) {
+    if (!$PROOF_ROOT) { return; }
+    $ids = array((int) $PROOF_ROOT);
+    /* الذريّةُ بالتنازل — الشجرةُ أربعةُ مستوياتٍ على الأكثر */
+    for ($depth = 0; $depth < 5; $depth++) {
+        $in = implode(',', $ids);
+        $r  = $conn->query("SELECT id FROM op_containers WHERE parent_id IN ({$in}) AND id NOT IN ({$in})");
+        $new = array();
+        while ($r && $row = $r->fetch_assoc()) { $new[] = (int) $row['id']; }
+        if (!$new) { break; }
+        $ids = array_merge($ids, $new);
+    }
+    $in = implode(',', $ids);
+    foreach (array(
+        "DELETE FROM container_consumption WHERE container_id IN ({$in})",
+        "DELETE FROM container_swaps WHERE container_id IN ({$in}) OR to_container_id IN ({$in})",
+        "DELETE FROM operator_rotations WHERE container_id IN ({$in})",
+    ) as $sql) {
+        if ($conn->query($sql) === false) { fwrite(STDERR, '  ⚠️ كنسٌ فشل: ' . $conn->error . "\n"); }
+    }
+    /* الأبناءُ قبلَ الآباءِ — بعكسِ ترتيبِ الاكتشاف */
+    foreach (array_reverse($ids) as $id) {
+        if ($conn->query("DELETE FROM op_containers WHERE id = " . (int) $id) === false) {
+            fwrite(STDERR, '  ⚠️ كنسُ حاويةٍ فشل (#' . $id . '): ' . $conn->error . "\n");
+        }
+    }
+});
 // ⚠️ الكنسُ يمحو حاوياتٍ **حقيقيةً** مولَّدةً للعقود الأربعة — فيُعاد
 // توليدُها بعد الحزمة. والتوليدُ حتميٌّ وعطِلٌ بنيويًّا، فالإعادةُ تُرجع الحالةَ
 // كما كانت بلا تخمين.
@@ -160,9 +196,35 @@ check($n === 2, "ولا رئيسيةَ ثالثة: {$n}");
 
 // ═══ ④ قيدُ Σ والذريّة ═══
 head('④ قيدُ Σ — رسالةٌ تسمّي المتاحَ والمطلوب · ولا كتابةَ عند الرفض');
-$M = $mains[0];
-$MID = (int) $M['id'];
-$cap = (float) $M['cap_qty'];
+/* ══ حاويةٌ رئيسيةٌ **من صنعِ الفاحصِ** لا رئيسيةُ العقدِ الحقيقية ══════════════
+   كانت ④⑤⑥ تعمل على `$mains[0]` — رئيسيةِ العقد 5 الحقيقيةِ التي تحمل شجرةَ
+   المشروعِ بثمانيةَ عشرَ ابنًا. فـ«ولا ابنٌ كُتب: 0» كان يعدُّ **أبناءَ الإنتاجِ**
+   فيسقط دائمًا، والتخصيصُ الناجحُ (1000) كان **يكتب في بياناتٍ حقيقيةٍ** كلَّ شوط
+   ويُنفخ `allocated_qty` بلا رجعة. والفاحصُ يفحص خدمةَ التخصيصِ والخصمِ — لا
+   يلزمه عقدٌ حقيقيٌّ، يلزمه **شجرةٌ يملكها**.
+   ⇒ تُبنى رئيسيةٌ مستقلةٌ بسقفٍ معلومٍ، وعليها تُبرهن ④⑤⑥، وتُكنس بذاتها في
+     النهايةِ (بلا مُعالٍ خارجيٍّ فلا مفتاحَ يردُّ حذفَها).                        */
+$PROOF_NOTE = 'برهانُ التحوّل — شجرةٌ مؤقتةٌ تُكنس';
+$MID = (int) $gate->insert('op_containers', array(
+    'container_no'     => 'TRX-' . getmypid() . '-' . substr((string) microtime(true), -6),
+    'level'            => 'رئيسية',
+    'parent_id'        => null,
+    'contract_id'      => $C5,
+    /* **بلا بندٍ**: `uq_main_per_item` (company · item · level) يمنع رئيسيةً
+       ثانيةً لبندٍ له رئيسيتُه — وهو قيدٌ سليمٌ يُصان لا يُحتال عليه. ورئيسيةُ
+       البرهانِ لا تمثّل بندًا فتُترك بلا بند (الفريدُ يقبل تعدُّدَ الأصفار). */
+    'contract_item_id' => null,
+    'unit_type'        => (string) $mains[0]['unit_type'],
+    'cap_qty'          => 5000.00,
+    'valid_from'       => date('Y-m-d'),
+    'state'            => 'نشطة',
+    'origin'           => 'عقد',
+    'origin_note'      => $PROOF_NOTE,
+    'created_by'       => 1,
+));
+check($MID > 0, "ورئيسيةُ البرهانِ بُنيت #{$MID} بسقف 5000");
+$PROOF_ROOT = $MID;
+$cap = 5000.00;
 $before = $conn->query("SELECT allocated_qty FROM op_containers WHERE id={$MID}")->fetch_assoc();
 $r = OTS::allocate($conn, $gate, $CO, $MID, 'مورد', 8, $cap + 1);
 check(empty($r['ok']) && $r['code'] === 422, 'تخصيصٌ فوق السقف: مرفوض');
@@ -219,23 +281,42 @@ $r = OTS::consume($conn, $gate, $CO, $OPC, -50.00, 'test:e1:rev', array('source_
 check(!empty($r['ok']), 'وردٌّ سالبٌ بمفتاحٍ آخر: مقبول — حركةٌ عاكسةٌ لا حذف');
 $row = $conn->query("SELECT consumed_qty FROM op_containers WHERE id={$OPC}")->fetch_assoc();
 check((float) $row['consumed_qty'] == 0.00, 'والمستهلَكُ عاد صفرًا: ' . $row['consumed_qty']);
-$rows = (int) $conn->query("SELECT COUNT(*) c FROM container_consumption")->fetch_assoc()['c'];
-check($rows === 2, "وسجلُّ الاستهلاك صفّان (خصمٌ وردّ) لا صفرٌ: {$rows}");
+/* وسجلُّ الاستهلاكِ **لشجرةِ البرهانِ وحدَها** — العددُ المطلقُ كان يعدُّ سجلَّ
+   الإنتاجِ كلَّه فيسقط على أيِّ نظامٍ فيه استهلاكٌ حقيقيّ. */
+$rows = (int) $conn->query("SELECT COUNT(*) c FROM container_consumption
+                            WHERE container_id IN ({$MID},{$SUPC},{$EQC},{$OPC})
+                              AND container_id = {$OPC}")->fetch_assoc()['c'];
+check($rows === 2, "وسجلُّ استهلاكِ ورقةِ البرهانِ صفّان (خصمٌ وردّ) لا صفرٌ: {$rows}");
 
 // ═══ ⑦⑧⑨⑩⑪ التوليدُ الرجعي ═══
 head('⑦ التوليدُ الرجعيُّ — مشتقٌّ وموسومٌ بذلك');
-$cleanup();
+/* المحكومُ عليه: **ما يُنشئه التوليدُ** — لا كلُّ فرعٍ في العقد. فالعقد 5 يحمل
+   36 فرعًا `origin='عقد'` بُنيت يدويًّا لشجرةِ المشروع، ومطالبتُها بوسمِ «مشتقّة»
+   خطأُ جمهورٍ لا عطبُ منتج (كان يُقرأ «17 من 53» فيُدين منتجًا سليمًا).
+   ⇒ يُرصَد أقصى مُعرِّفٍ قبلَ النداء: كلُّ ما وُلد بعده **يجب** أن يكون مشتقًّا
+     موسومًا. ويُضاف حكمٌ على الجمهورِ القائم: لا مشتقَّ بلا ملاحظة. */
+$maxBefore = (int) $conn->query("SELECT COALESCE(MAX(id),0) m FROM op_containers")->fetch_assoc()['m'];
 $d = OTS::deriveFromOperations($conn, $gate, $CO, $C5, 1);
 check(!empty($d['ok']), 'وقع التوليدُ الرجعي');
 info('المولَّد: ' . json_encode($d['created'], JSON_UNESCAPED_UNICODE));
+$bornBad = (int) $conn->query("SELECT COUNT(*) c FROM op_containers
+                               WHERE id > {$maxBefore} AND level<>'رئيسية'
+                                 AND (origin <> 'مشتقّة' OR origin_note IS NULL OR origin_note='')")
+                      ->fetch_assoc()['c'];
+$bornAll = (int) $conn->query("SELECT COUNT(*) c FROM op_containers
+                               WHERE id > {$maxBefore} AND level<>'رئيسية'")->fetch_assoc()['c'];
+check($bornBad === 0,
+    "**وكلُّ فرعٍ وُلد بهذا النداءِ موسومٌ «مشتقّة» بملاحظته**: {$bornAll} وُلد · {$bornBad} بلا وسم");
 $derived = $conn->query("SELECT COUNT(*) c FROM op_containers
                           WHERE contract_id={$C5} AND level<>'رئيسية' AND origin='مشتقّة'")->fetch_assoc();
-$all = $conn->query("SELECT COUNT(*) c FROM op_containers
-                      WHERE contract_id={$C5} AND level<>'رئيسية'")->fetch_assoc();
-check((int) $derived['c'] === (int) $all['c'] && (int) $all['c'] > 0,
-    '**وكلُّ فرعٍ مولَّدٍ موسومٌ «مشتقّة»**: ' . $derived['c'] . ' من ' . $all['c']);
+check((int) $derived['c'] > 0, 'ومشتقّاتُ العقد قائمةٌ وموسومةٌ: ' . $derived['c']);
+/* الحكمُ على مشتقّاتِ **العقدِ المفحوصِ** — كان بلا نطاقٍ فعدَّ 46 صفًّا: 39 منها
+   بـ`contract_id = 0` (بلا عقدٍ أصلًا) و7 في العقد 7، وكلُّها من عهدٍ سابق.
+   ومشتقّاتُ العقد 5 كلُّها موسومةٌ بملاحظتها (17/17 مقيسٌ) — فالمنتجُ يسمُ ما
+   يشتقُّه، والصفوفُ بلا عقدٍ بندٌ مفتوحٌ أُعلن للمالك لا عطبٌ في هذا المسار. */
 $noNote = (int) $conn->query("SELECT COUNT(*) c FROM op_containers
-                               WHERE origin='مشتقّة' AND (origin_note IS NULL OR origin_note='')")
+                               WHERE contract_id={$C5} AND origin='مشتقّة'
+                                 AND (origin_note IS NULL OR origin_note='')")
                      ->fetch_assoc()['c'];
 check($noNote === 0, "ولكلٍّ ملاحظتُه («من أين اشتُقّ»): {$noNote} بلا ملاحظة");
 $unack = (int) $conn->query("SELECT COUNT(*) c FROM op_containers
@@ -273,25 +354,59 @@ $sameParent = (int) $conn->query("SELECT COUNT(*) c FROM (SELECT parent_id, oper
 check($sameParent === 0, "ولا مشغّلَ له حاويتان تحت **المعدة نفسِها**: {$sameParent} — لكلِّ معدةٍ حصتُه");
 
 head('⑪ Σ متّسقٌ في كل مستوى · وما لا بندَ له يُعلَن');
-$bad = $conn->query("SELECT p.id, p.container_no, p.allocated_qty, COALESCE(SUM(c.cap_qty),0) kids
+/* ══ هذا الفحصُ **أحمرُ بحقٍّ** — ولا يُخضَّر بتضييقِ نطاقه ═════════════════════
+   «الأبُ يحمل العدّاد»: Σ سقوفِ الأبناءِ = موزَّعُ الأم. والقياسُ يجد **75 عقدةً
+   مختلَّةً في الشركة 4 وحدَها بفارقٍ Σ = 281,111.50 وحدة**، على نوعين:
+     · **50 عقدةً موزَّعُها > 0 وبلا ابنٍ واحد** — عدّادٌ يقول «سُلِّم» ولا مُتسلِّم.
+     · 25 عقدةً Σأبنائها ≠ موزَّعُها في الاتجاهين.
+   وفرضيةُ «المشتقُّ زِيد بلا تحديثِ العدّاد» **قِيست فسقطت** (صفرُ تفسيرٍ من 25).
+   فالجذرُ لم يُحدَّد بعد، وهذه أرقامُ قدرةٍ تشغيليةٍ تُبنى عليها القرارات —
+   فإصلاحُها قرارُ بياناتٍ لا قرارُ فاحصٍ. أُعلن للمالك ويبقى الفحصُ ناطقًا. */
+$bad = $conn->query("SELECT p.id, p.container_no, p.allocated_qty,
+                            COALESCE(SUM(c.cap_qty),0) kids
                        FROM op_containers p LEFT JOIN op_containers c ON c.parent_id=p.id
-                      GROUP BY p.id HAVING ABS(p.allocated_qty - kids) > 0.001")->fetch_all(MYSQLI_ASSOC);
-check(empty($bad), 'Σ حصص الأبناء = موزَّعُ الأم في كل عقدة' . ($bad ? ' (' . count($bad) . ' خلل)' : ''));
+                      GROUP BY p.id, p.container_no, p.allocated_qty
+                     HAVING ABS(p.allocated_qty - COALESCE(SUM(c.cap_qty),0)) > 0.001")
+                   ->fetch_all(MYSQLI_ASSOC);
+$childless = 0; $diff = 0.0;
+foreach ($bad as $b) {
+    if ((float) $b['kids'] == 0.0) { $childless++; }
+    $diff += (float) $b['kids'] - (float) $b['allocated_qty'];
+}
+check(empty($bad), 'Σ حصص الأبناء = موزَّعُ الأم في كل عقدة'
+    . ($bad ? ' — ' . count($bad) . ' عقدةً مختلَّةً (' . $childless
+              . ' منها بعدّادٍ موجبٍ وبلا ابنٍ) · فارقٌ Σ = ' . number_format($diff, 2)
+              . ' ⟵ بندٌ مفتوحٌ أُعلن للمالك، لا خطأَ فاحصٍ' : ''));
 $over = $conn->query("SELECT COUNT(*) c FROM op_containers WHERE allocated_qty > cap_qty
                         OR consumed_qty > cap_qty")->fetch_assoc();
 check((int) $over['c'] === 0, 'ولا عقدةَ تجاوزت سقفَها: ' . $over['c']);
 
 $rec = OTS::reconciliation($gate, $CO, $C5);
-check(count($rec['derived_pending']) > 0, 'تقريرُ المطابقة يُعلن المشتقّاتِ: ' . count($rec['derived_pending']));
+/* **يُقاس المعلَّقُ ثم يُطابَق التقريرُ عليه** — لا يُفترض وجودُ معلَّقٍ دائمًا.
+   مشتقّاتُ العقد 5 تُقَرُّ في المسارِ الطبيعيِّ (وفواحصُ أخرى تُقرّها)، فالمطالبةُ
+   بـ«معلَّقٍ > 0» تُدين تقريرًا صادقًا يقول «لا معلَّق». والمحكومُ عليه أن يُعلن
+   التقريرُ **ما هو معلَّقٌ فعلًا** بالعدد نفسِه. */
+$pendDb = (int) $conn->query("SELECT COUNT(*) c FROM op_containers
+                              WHERE contract_id={$C5} AND origin='مشتقّة'
+                                AND origin_ack_by IS NULL AND is_deleted=0")->fetch_assoc()['c'];
+check(count($rec['derived_pending']) === $pendDb,
+    "تقريرُ المطابقة يُعلن المشتقّاتِ المعلَّقةَ بعددها: {$pendDb} في القاعدة · "
+    . count($rec['derived_pending']) . ' في التقرير');
 check(count($rec['unmatched_units']) > 0,
     'ويُعلن الوحداتِ بلا بند (طن · متر): ' . count($rec['unmatched_units']));
 $units = array();
 foreach ($rec['unmatched_units'] as $u) { $units[(string) $u['unit_type']] = true; }
 check(isset($units['ton']) && isset($units['meter']) && !isset($units['hour']),
     'وهما الطنُّ والمترُ وحدهما (والساعةُ لها بندُها) — ولم تُخترع لهما حاوية: ' . implode(' · ', array_keys($units)));
+/* **بنطاقِ العقدِ المفحوص**: الحكمُ هو «لا تُخترع حاويةٌ لوحدةٍ لا بندَ لها **في
+   هذا العقد**». وكان بلا نطاقٍ فعدَّ 97 حاويةً بالطنِّ والمترِ في عقودٍ أخرى
+   (2111–2120) — وتلك **مشروعةٌ**: 12 رئيسيةً منها مولَّدةٌ من بنودٍ وحدتُها طنٌّ
+   أو مترٌ فعلًا (`contractequipments.equip_unit`). فالنطاقُ هو الفرقُ بين حكمٍ
+   على المنتجِ وحكمٍ على بياناتِ عقودٍ لا شأنَ للفحصِ بها. */
 $phantom = (int) $conn->query("SELECT COUNT(*) c FROM op_containers
-                                WHERE unit_type IN ('ton','meter')")->fetch_assoc()['c'];
-check($phantom === 0, "وصفرُ حاويةٍ بالطن أو المتر: {$phantom} — لا تخترع ما لا بندَ له");
+                                WHERE contract_id={$C5} AND unit_type IN ('ton','meter')")
+                      ->fetch_assoc()['c'];
+check($phantom === 0, "وصفرُ حاويةٍ بالطن أو المتر في العقد {$C5}: {$phantom} — لا تخترع ما لا بندَ له");
 
 // الإقرار
 head('إقرارُ حصةٍ مشتقّة');

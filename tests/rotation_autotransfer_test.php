@@ -73,10 +73,19 @@ $teardown = function () use ($conn, $PRJ, $MK) {
          الأسماءُ تُقاس من `information_schema` لا تُقاس بالحدس. */
     $conn->query("DELETE sc FROM substitute_coverages sc JOIN op_containers c
                     ON c.id = sc.covered_seat_id WHERE {$scope}");
+    /* وبعائلةِ الوسمِ كذلك — `{$scope}` يعرف وسمَ هذا الشوطِ وحدَه، وبقايا
+       الأشواطِ السابقةِ يحجبها المُشيرُ نفسُه فتبقى إلى الأبد. والسلسلةُ ثلاثُ
+       طبقاتٍ يعرفها الكنسُ المشترَك. */
+    require_once __DIR__ . '/_container_sweep.php';
+    ems_sweep_container_family($conn, 'H05T%');
+    ems_sweep_container_family($conn, 'SWP-%');
     foreach (array('مشغّل', 'معدة', 'نوع', 'مورد', 'رئيسية') as $lvl) {
+        /* بعائلةِ الوسمِ (`H05T%`) لا بوسمِ الشوطِ وحدَه: الوسمُ بـ`getmypid()`
+           يجعل الشوطَ أعمى عمّا تركه سابقُه، والقياسُ وجد أربعَ حاوياتٍ باقيةً
+           من أشواطٍ أخفق كنسُها. */
         $conn->query("DELETE FROM op_containers
                        WHERE level = '{$lvl}'
-                         AND (container_no LIKE '{$MK}-%' OR container_no LIKE 'SWP-%')");
+                         AND (container_no LIKE 'H05T%' OR container_no LIKE 'SWP-%')");
     }
 
     $ids = array();

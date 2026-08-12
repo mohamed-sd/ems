@@ -57,6 +57,14 @@ $teardown = function () use ($conn) {
         $conn->query("DELETE FROM op_containers WHERE contract_id = {$cid}");
         $conn->query("DELETE FROM contracts WHERE id = {$cid}");
     }
+    /* **وبعائلةِ الوسمِ أيضًا**: الكنسُ بـ`contract_id` وحدَه لا يمسّ حاويةً
+       وُلدت بعقدٍ = 0 (أو بقيت بعد حذفِ عقدها) — والقياسُ وجد **22 حاويةً**
+       بهذه العائلةِ باقيةً من أشواطٍ سابقة، نصفُها جذورٌ بعدّادٍ موزَّعٍ وبلا
+       ابنٍ فتُحسب خللًا في ثابتِ «الأبُ يحمل العدّاد». والأبناءُ قبلَ الآباء. */
+    /* والسلسلةُ ثلاثُ طبقاتٍ (تسويةُ التغطيةِ ← التغطيةُ ← الحاوية) والمفتاحُ
+       الأبويُّ ذاتيٌّ — فالكنسُ في مكانٍ واحدٍ يعرفها كلَّها. */
+    require_once __DIR__ . '/_container_sweep.php';
+    ems_sweep_container_family($conn, 'M10T_%');
 };
 register_shutdown_function($teardown);
 $teardown();
