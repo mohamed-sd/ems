@@ -113,9 +113,22 @@ foreach ($plan as $p) {
             or die('✘ position: ' . mysqli_error($conn) . "\n");
         $posId = mysqli_insert_id($conn); $nq++;
     }
-    // ③ الوصلة — الحلقةُ التي كانت مكسورة
-    mysqli_query($conn, "UPDATE users SET position_id = {$posId} WHERE id = " . (int) $u['id'])
-        or die('✘ link: ' . mysqli_error($conn) . "\n");
+    /* ══ ③ **الوصلةُ أُوقفت — كانت تكتب معرِّفَ جدولٍ آخر.**
+         `$posId` أعلاه معرِّفُ `person_positions.p_id`، والقارئُ
+         `ems_user_effective_role()` (`includes/positions.php:47`) يصل
+         `positions p ON p.id = u.position_id` ويقرأ منه `role_id` — **وهما
+         جدولان مختلفان**: `person_positions` لا `role_id` فيه أصلًا.
+         فكانت 49 وصلةً تحمل معرِّفاتٍ في مدى 124-172 و`positions.id` مداه
+         314-333 ⇒ **صفرُ وصلةٍ تحلُّ**، والجسرُ ميتٌ يرتدُّ إلى `users.role`.
+         (صُفِّرت في هجرة `2027_03_05` ونُصِّب `fk_users_position` فصارت كتابةُ
+          معرِّفٍ غريبٍ **مستحيلةً بنيويًّا** — لو بقي هذا السطرُ لمات بالمفتاح.)
+
+       ⇒ ويبقى الجسرُ **مبنيًّا غيرَ مُتبنًّى** كما ينصُّ
+         `tests/position_bridge_test.php` («جميعُ المستخدمين الحقيقيين بلا منصب
+         = سلوكُهم القائم بلا أيِّ تغيير») — وقاعدةُ MD-05: البناءُ ليس تبنّيًا.
+       ⇒ وأيُّ الجدولين يملك «منصبَ المستخدم» **قرارُ مالكٍ** لا يُحسم في أداة.
+         فمتى حُسم: يُوصَل هنا معرِّفُ `positions` (لا `person_positions`). */
+    $nl = 0;   // لا وصلةَ تُكتب — والعددُ يُعلَن صفرًا لا يُخفى
     $nl++;
 }
 $out("\nطُبِّق: أشخاصٌ جدد {$np} · مواقعُ جديدة {$nq} · وصلاتٌ {$nl}\n");

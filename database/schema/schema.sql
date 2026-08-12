@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 05:28:26
+-- المصدر: equipation_manage · التوليد: 2026-08-12 05:36:51
 -- الجداول: 549 · المناظير: 5
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -13046,6 +13046,7 @@ CREATE TABLE `users` (
   KEY `idx_users_position` (`position_id`),
   KEY `ix_users_supplier` (`supplier_entity_id`),
   CONSTRAINT `fk_users_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_users_position` FOREIGN KEY (`position_id`) REFERENCES `positions` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_users_supplier` FOREIGN KEY (`supplier_entity_id`) REFERENCES `suppliers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

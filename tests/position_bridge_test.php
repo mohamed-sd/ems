@@ -72,9 +72,27 @@ $conn->query("UPDATE positions SET is_deleted=0, deleted_at=NULL, company_id=5 W
 $eff = ems_user_effective_role($conn, $uid);
 ok('منصب من شركة أخرى → رفض + fallback (عزل)', $eff['role'] === '6' && $eff['source'] === 'role_x_company');
 $conn->query("UPDATE positions SET company_id=4 WHERE id={$posId}");
-$conn->query("UPDATE users SET position_id=999999999 WHERE id={$uid}");
-$eff = ems_user_effective_role($conn, $uid);
-ok('position_id يتيم (لا صف) → fallback', $eff['role'] === '6' && $eff['source'] === 'role');
+/* ══ **الضمانةُ صارت أقوى: اليتيمُ لم يعد ممكنًا.** كان هذا يفتعل
+     `position_id = 999999999` ليُثبت أن القارئَ **يرتدُّ** — وهو ارتدادٌ صحيحٌ
+     لكنه علاجُ عَرَض. ومنذ نُصِّب `fk_users_position` (هجرة 2027_03_05 — بعد أن
+     كُشف أن 49 وصلةً كانت تحمل معرِّفَ `person_positions` لا `positions`) صار
+     المرجعُ اليتيمُ **مستحيلًا بنيويًّا**.
+   ⇒ فيُقاس الأقوى: **الكتابةُ نفسُها مردودة**. وإن غاب المفتاحُ يومًا رجع
+     المقياسُ إلى الارتدادِ — فلا يُفقد الحكمُ في الحالتين. */
+$fkOn = (int) $conn->query("SELECT COUNT(*) c FROM information_schema.key_column_usage
+                            WHERE table_schema = DATABASE() AND table_name = 'users'
+                              AND column_name = 'position_id'
+                              AND referenced_table_name = 'positions'")->fetch_assoc()['c'];
+$orphanWrite = @$conn->query("UPDATE users SET position_id=999999999 WHERE id={$uid}");
+if ($fkOn > 0) {
+    ok('position_id يتيم **مستحيلٌ بنيويًّا** (fk_users_position يردُّه) — أقوى من الارتداد',
+       $orphanWrite === false);
+    $conn->query("UPDATE users SET position_id={$posId} WHERE id={$uid}");
+} else {
+    $eff = ems_user_effective_role($conn, $uid);
+    ok('position_id يتيم (لا صف) → fallback (ولا مفتاحَ أجنبيًّا — يُعلَن)',
+       $eff['role'] === '6' && $eff['source'] === 'role');
+}
 
 echo "── 6) صفر أثر على القائم: كل مستخدمي النظام position_id=NULL ──\n";
 $nulls = intval($conn->query("SELECT COUNT(*) FROM users WHERE position_id IS NULL AND username NOT LIKE 'K6TEST%'")->fetch_row()[0]);
