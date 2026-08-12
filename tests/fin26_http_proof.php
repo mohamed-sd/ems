@@ -8,7 +8,8 @@
  *   ② الشاشتان 210/211 ترجعان 200 بمحتواهما.
  *   ③ sensitive_read_log كتب سطر اطّلاع للفتحين (اللوحة والسجل).
  *   ④ مستخدم من الدور نفسه **بلا منحة** (مسبار مؤقت): الباب لا يُصيَّر في
- *      قائمته، وشاشة 210 ترد 403 — fail-closed حيًّا.
+ *      قائمته، وشاشة 210 **تُحجب بلا تصيير** (302 إلى الداشبورد بوميضِ
+ *      `GOV-PERM-403` — الحارسُ فوقَ معالجِ الكتابة) — fail-closed حيًّا.
  *   ⑤ شاشة المنح 213 (بجلسة الدور 19): المنح من الشاشة يقع بسطر توقيعه،
  *      والإلغاء بسببه يعلّم لا يحذف.
  * ثم يكنس كل ما بذر. التشغيل: php tests/fin26_http_proof.php (يتطلب Apache حيًّا)
@@ -105,7 +106,7 @@ $n = $db->query("SELECT COUNT(*) c FROM sensitive_read_log WHERE person_id = {$F
                   AND element_code = 'ownership.financiers_registry' AND result = 'allowed' AND at >= '{$T0}'")->fetch_assoc();
 check(intval($n['c']) >= 1, 'وفتح سجل الممولين بسطر اطّلاع');
 
-head('④ مستخدم الدور بلا منحة — الباب لا يُصيَّر وشاشته 403');
+head('④ مستخدم الدور بلا منحة — الباب لا يُصيَّر وشاشتُه محجوبةٌ بلا تصيير');
 $hash = password_hash('12345678', PASSWORD_BCRYPT);
 // قاعدة الدخول: لا حساب بلا موظف مُسنَد — فالمسبار بموظف مسبار مؤقت يُكنس معه
 $db->query("INSERT INTO employees (name, company_id, phone, employment_classification, status)
@@ -124,10 +125,36 @@ list($c, $h, $b) = f26_req($BASE . '/Financing/financing_board.php', $jar2);
 check($c === 200 && strpos($b, 'بوابة المجال المقيَّد') !== false, 'لوحته (مسكنه) تفتح بإعلان الحجب — ولا رقم يُجلب');
 check(strpos($b, 'financiers_registry.php?') === false && strpos($b, 'سجل الممولين') === false,
     'باب FIN غير مُصيَّر في قائمته أصلًا — لا معطَّلًا ولا مخفيَّ المحتوى');
+/* ══ **المضمونُ منعُ التصييرِ لا رقمُ الحالة** ═════════════════════════════════
+   هذه الشاشاتُ تُحرَس بـ`enforce_current_page_view_permission` (تصليبُ
+   RF-02/CS-01: نُقل الحارسُ **فوقَ معالجِ الكتابةِ** فصار يوجّه إلى الداشبورد
+   قبل أن يُصيَّر حرفٌ). فالردُّ **302 لا 403** — والفاحصُ كان يطلب رقمًا لم يبقَ
+   المعمارُ يقوله، فيُدين حجبًا يعمل.
+   والمقيسُ أن الحجبَ **حقيقيٌّ**: جسمُ الردِّ **118 بايتًا** بلا «سجل الممولين»
+   ولا `<table>` ولا `financier_id`، والوميضُ يحمل `GOV-PERM-403` بنصِّه:
+   «باب التمويل خلف بوابة المجال المقيَّد: الرؤية بمنحة فردية لا بالعضوية».
+   ⇒ فيُحكَم على الجوهر: **لا محتوى يُصيَّر · والرفضُ مُعلَنٌ برمزه**. ويقبل
+     الحكمُ 403 أيضًا لو رجع المعمارُ إليه — فلا يعمى عن أيِّ الطريقتين.       */
+if (!function_exists('f26_refused')) {
+    function f26_refused($code, $body, $headers, $jar, $needles = array())
+    {
+        if ((int) $code === 403) { return true; }
+        if ((int) $code !== 302) { return false; }
+        foreach (array_merge(array('<table', 'financier_id'), $needles) as $n) {
+            if (mb_strpos((string) $body, $n) !== false) { return false; }   // محتوًى تسرَّب
+        }
+        require_once __DIR__ . '/_http_flash.php';
+        $txt = ems_flash_text_following($headers, $GLOBALS['BASE'] . '/Financing', $jar);
+        return mb_strpos($txt, 'GOV-PERM-403') !== false
+            || mb_strpos($txt, 'المجال المقيَّد') !== false
+            || mb_strpos($txt, 'لا توجد صلاحية') !== false;
+    }
+}
 list($c, $h, $b) = f26_req($BASE . '/Financing/financiers_registry.php', $jar2);
-check($c === 403, "وقصْد الشاشة 210 مباشرة يرد 403 [{$c}]");
+check(f26_refused($c, $b, $h, $jar2, array('سجل الممولين')),
+    "وقصْد الشاشة 210 مباشرة **يُحجب بلا تصيير** [{$c} · جسمٌ " . strlen($b) . ' بايتًا]');
 list($c, $h, $b) = f26_req($BASE . '/Financing/financing_operation_new.php', $jar2);
-check($c === 403, "و211 كذلك 403 [{$c}]");
+check(f26_refused($c, $b, $h, $jar2), "و211 كذلك محجوبةٌ بلا تصيير [{$c}]");
 
 head('⑤ شاشة المنح 213 بجلسة الدور 19 — منح بتوقيع وإلغاء بتعليم');
 $jar3 = $TMP . '/fin26_gov.cookie';
@@ -150,11 +177,14 @@ list($c, $h, $b) = f26_req($BASE . '/Governance/ownership_grants.php', $jar3, ar
 $g = $db->query("SELECT state FROM ownership_access_grants WHERE grant_id = {$gid}")->fetch_assoc();
 check($c === 200 && $g && $g['state'] === 'revoked', 'الإلغاء بسببه علّم الحالة revoked — والصف باقٍ للتدقيق');
 list($c, $h, $b) = f26_req($BASE . '/Financing/financiers_registry.php', $jar2);
-check($c === 403, 'وبعد الإلغاء عاد 403 فورًا — fail-closed حي');
+check(f26_refused($c, $b, $h, $jar2, array('سجل الممولين')),
+    'وبعد الإلغاء عاد الحجبُ فورًا — fail-closed حي [' . $c . ']');
 
 // شاشة المنح محجوبة عن الدور 26 نفسه
 list($c, $h, $b) = f26_req($BASE . '/Governance/ownership_grants.php', $jar);
-check($c === 403, 'وشاشة المنح 213 ترد 403 لحساب «تمويل» نفسه — المانح غير الممنوح');
+/* وشاشةُ المنحِ في `Governance/` فأصلُ حلِّ التوجيهِ دليلُها لا `Financing` */
+check(f26_refused($c, $b, $h, $jar, array('منح المجال المقيَّد')),
+    'وشاشة المنح 213 محجوبةٌ عن حساب «تمويل» نفسه — المانح غير الممنوح [' . $c . ']');
 
 @unlink($jar); @unlink($jar2); @unlink($jar3);
 echo PHP_EOL . "══ النتيجة: {$PASS} ناجحة · {$FAIL} فاشلة ══" . PHP_EOL;
