@@ -548,9 +548,11 @@ foreach ($seed['claims'] as $id) {
 foreach ($seed['ts'] as $id) {
     $root->query("DELETE FROM fin_cost_records WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_cost_records')");
     $root->query("DELETE FROM fin_dues WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_dues')");
-    $root->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_financial_events')");
     $root->query("DELETE FROM unit_party_awards WHERE source_kind='timesheet' AND source_ref=$id");
     $root->query("DELETE FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id");
+    /* الرابطُ يُحذف قبلَ حدثِه: `fk_fel_event` (RESTRICT) يردُّ حذفَ حدثٍ
+       ما زال رابطٌ يشير إليه — هجرة 2027_02_18. */
+    $root->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_financial_events')");
     // إسقاطُ الحقيقة المحايدة (equipment.hour_logged) — قبل جذرها لا بعده
     $root->query("DELETE FROM fin_financial_events WHERE entity_type='timesheet' AND entity_id=$id");
     $root->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id=$id");

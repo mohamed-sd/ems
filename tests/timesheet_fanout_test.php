@@ -298,13 +298,24 @@ $root->query("DELETE FROM contract_hour_policies WHERE contract_ref=$c_sdg AND c
 }
 
 // ── تنظيف كامل (الأثر ثم مصادره ثم عالَم البذر) ──
+/* ══ **الرابطُ يُحذف قبلَ حدثِه.** صار على `fin_event_links.event_id` مفتاحٌ
+     أجنبيٌّ حقيقيٌّ (`fk_fel_event` · `ON DELETE RESTRICT` — هجرة 2027_02_18)،
+     فحذفُ حدثٍ ما زال رابطٌ يشير إليه **يُردّ**. وكان الكنسُ يحذف الأحداثَ ثم
+     الروابطَ، ولا يفحص مُرجَعَ حذفِه — فبقيت أربعةُ أحداثٍ وأربعُ حقائقِ جذرٍ
+     (والجذرُ محجوبٌ بدورِه لأن `fin_financial_events.root_event_id` يشير إليه).
+   ⇒ الترتيبُ: الأبناءُ عبر الروابطِ · **ثم الروابط** · ثم الأحداثُ **بهويتِها**
+     (لا بالروابطِ التي حُذفت) · ثم الجذر. */
 foreach ($seed['ts'] as $id) {
     $root->query("DELETE FROM fin_cost_records WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_cost_records')");
     $root->query("DELETE FROM fin_dues WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_dues')");
-    $root->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id AND target_table='fin_financial_events')");
     // أحكام الأطراف: صفٌّ لكل طرفٍ ورابطٌ واحدٌ للأثر — التنظيف بمفتاح المصدر
     $root->query("DELETE FROM unit_party_awards WHERE source_kind='timesheet' AND source_ref=$id");
+    // الروابطُ أوّلًا: بمرجعِها الأبويِّ وبأحداثِها معًا (رابطٌ من أبٍ آخرَ قد يشير إليها)
     $root->query("DELETE FROM fin_event_links WHERE parent_kind='timesheet' AND parent_ref=$id");
+    $root->query("DELETE FROM fin_event_links WHERE event_id IN
+                    (SELECT id FROM fin_financial_events WHERE entity_type='timesheet' AND entity_id=$id)");
+    // ثم الأحداثُ بهويتِها — والروابطُ لم تبقَ لتحجبها
+    $root->query("DELETE FROM fin_financial_events WHERE entity_type='timesheet' AND entity_id=$id");
     $root->query("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id=$id");
     $root->query("DELETE FROM timesheet WHERE id=$id");
 }
@@ -317,10 +328,20 @@ foreach ($seed['equip'] as $id) { $root->query("DELETE FROM equipments WHERE id=
 foreach ($seed['project'] as $id) { $root->query("DELETE FROM project WHERE id=$id"); }
 foreach ($seed['supplier'] as $id) { $root->query("DELETE FROM suppliers WHERE id=$id"); }
 
+/* ◆ **شاهدٌ لا يسمّي انزياحَه لا يُشخَّص**: كان الحكمُ خمسَ مقارناتٍ في سطرٍ
+     واحدٍ فيُقرأ «العدّاداتُ لم تعد» بلا اسمِ العدّادِ ولا مقدارِه — فيُبحَث عن
+     التسريبِ في خمسةِ جداولَ بالتخمين. فيُعلَن **أيُّها** انزاح وبكم. */
 $cf = counts($conn);
-ok('teardown: العدّادات عادت لخط الأساس',
-    $cf['events'] === $c0['events'] && $cf['dues'] === $c0['dues'] && $cf['costs'] === $c0['costs']
-    && $cf['links'] === $c0['links'] && $cf['roots'] === $c0['roots']);
+$__drift = array();
+foreach (array('events' => 'أحداث', 'dues' => 'مستحقات', 'costs' => 'تكاليف',
+               'links' => 'روابط', 'roots' => 'حقائقُ الجذر') as $__k => $__ar) {
+    if ($cf[$__k] !== $c0[$__k]) {
+        $__drift[] = $__ar . ': ' . $c0[$__k] . ' ⇒ ' . $cf[$__k]
+                   . ' (' . sprintf('%+d', $cf[$__k] - $c0[$__k]) . ')';
+    }
+}
+ok('teardown: العدّادات عادت لخط الأساس' . ($__drift ? ' — انزياح: ' . implode(' · ', $__drift) : ''),
+    $__drift === array());
 
 echo str_repeat('═', 50) . "\n";
 echo "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n";

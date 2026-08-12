@@ -178,8 +178,10 @@ $conn->query("UPDATE fin_effect_map SET is_active=0, param_value=0 WHERE company
 foreach ($unitIds as $uid) {
     $conn->query("DELETE FROM fin_cost_records WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='unit_record' AND parent_ref=$uid AND target_table='fin_cost_records')");
     $conn->query("DELETE FROM fin_dues WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='unit_record' AND parent_ref=$uid AND target_table='fin_dues')");
-    $conn->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='unit_record' AND parent_ref=$uid AND target_table='fin_financial_events')");
     $conn->query("DELETE FROM fin_event_links WHERE parent_kind='unit_record' AND parent_ref=$uid");
+    /* الرابطُ يُحذف قبلَ حدثِه: `fk_fel_event` (RESTRICT) يردُّ حذفَ حدثٍ
+       ما زال رابطٌ يشير إليه — هجرة 2027_02_18. */
+    $conn->query("DELETE FROM fin_financial_events WHERE id IN (SELECT target_id FROM fin_event_links WHERE parent_kind='unit_record' AND parent_ref=$uid AND target_table='fin_financial_events')");
     $conn->query("DELETE FROM fin_unit_records WHERE id=$uid");
 }
 $conn->query("DELETE FROM fin_financial_events WHERE source_ref='$MARK' OR notes LIKE '%$MARK%'");
