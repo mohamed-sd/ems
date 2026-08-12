@@ -47,12 +47,43 @@ $gate = ems_tenant_db();
 $CO = 4;
 $C5 = 5;
 
-$cleanup = function () use ($conn) {
-    $conn->query("DELETE FROM container_consumption");
-    $conn->query("DELETE FROM container_swaps");
-    $conn->query("DELETE FROM operator_rotations");
-    foreach (array('مشغّل', 'معدة', 'مورد', 'رئيسية') as $lv) {
-        $conn->query("DELETE FROM op_containers WHERE level='{$lv}'");
+/* ══ **الكنسُ كان يمحو الجدولَ كلَّه — ثم صار يفشل صمتًا.**
+     كان: `DELETE FROM op_containers WHERE level='…'` بلا شرطِ عقدٍ ولا مشروع
+     — أي **كلُّ حاوياتِ النظام**، وتعليقُ الفاحصِ يعترف: «الكنسُ يمحو حاوياتٍ
+     حقيقيةً … فيُعاد توليدُها». وذاك كان يعمل حين كانت الفواحصُ المجاورةُ
+     تنفجر مبكرًا فلا تُنشئ مراجعَ.
+     **والآن `container_pilot_test` و`daily_plan_test` يكتملان** فيُنشئان
+     `daily_plan_lines` تشير إلى الحاويات، فيُردُّ الحذفُ بمفتاحٍ أجنبيٍّ
+     (`Cannot delete or update a parent row`) ويبقى الجدولُ كما هو — فيقرأ
+     الفاحصُ «رئيسيتان موجودتان سلفًا» فيرسب هو، **ولو نجح الحذفُ لأهلك
+     شجرةَ المشروعِ الرائدِ فأرسب جارَيه**. أي أن الطريقين كليهما خطأ.
+   ⇒ الكنسُ **بالمرجعِ الذي يصنعه الفاحصُ وحدَه**: `origin_note` يحمل
+     «سقفُ بند العقد #…» للمولَّدِ من `generateMain`، و`decision_ref`/`origin`
+     للمشتقّ. فيُمحى ما وُلِّد للعقودِ الأربعةِ التي يعمل عليها **دون** ما بُني
+     يدويًّا لشجرةِ مشروعٍ (وهو ما لا يحمل هذا الأثر).
+     والتوابعُ تُمحى **بترتيبِ المفاتيح** أولًا وإلا رُدَّ الحذفُ. */
+$CTRACTS = array(5, 2, 4, 7);
+$cleanup = function () use ($conn, $CTRACTS) {
+    $in = implode(',', array_map('intval', $CTRACTS));
+    /* الحاوياتُ المولَّدةُ آليًّا لهذه العقود — لا ما بُني لشجرةِ مشروع */
+    $sel = "SELECT id FROM (SELECT id FROM op_containers
+              WHERE contract_id IN ({$in})
+                AND (origin = 'مشتقّة' OR origin_note LIKE 'سقفُ بند العقد%')) x";
+    /* التوابعُ بترتيبِ المفاتيح */
+    $conn->query("DELETE FROM container_consumption WHERE container_id IN ({$sel})");
+    $conn->query("DELETE FROM container_swaps WHERE container_id IN ({$sel})
+                    OR to_container_id IN ({$sel})");
+    $conn->query("DELETE FROM operator_rotations WHERE container_id IN ({$sel})");
+    $conn->query("UPDATE daily_plan_lines SET equipment_container_id = NULL
+                   WHERE equipment_container_id IN ({$sel})");
+    $conn->query("UPDATE daily_plan_lines SET operator_container_id = NULL
+                   WHERE operator_container_id IN ({$sel})");
+    $conn->query("UPDATE monthly_performance SET container_id = NULL WHERE container_id IN ({$sel})");
+    $conn->query("UPDATE seat_assignments SET container_id = NULL WHERE container_id IN ({$sel})");
+    /* الأبناءُ قبلَ الآباءِ — من الأعمقِ إلى الجذر */
+    foreach (array('مشغّل', 'معدة', 'نوع', 'مورد', 'رئيسية') as $lv) {
+        $conn->query("DELETE FROM op_containers WHERE level='{$lv}' AND contract_id IN ({$in})
+                        AND (origin = 'مشتقّة' OR origin_note LIKE 'سقفُ بند العقد%')");
     }
 };
 $cleanup();
@@ -89,8 +120,18 @@ if ($notEff) {
 
 // ═══ ② السقفُ من بند العقد ═══
 head('② السقفُ من `equip_total_contract` حصرًا');
+/* ◆ **الثابتُ لا العذرية.** كان الفحصُ يشترط `created === 2` — أي جدولًا
+     عذراءَ على **عقدٍ حقيقيٍّ** (العقد 5 يحمل شجرةَ المشروع 4 بسبعٍ وعشرينَ
+     ورقة، وجذورُها `origin='عقد'` لا تُكنس لأنها ليست من صنعِ الفاحص).
+     والثابتُ المقصودُ هو أن **للعقدِ رئيسيتين بعددِ بنوده**، والتوليدُ **عطِلٌ**
+     — وهو ما يفحصه الفاحصُ نفسُه بعد أسطر («التوليدُ الثاني صفرُ جديد»).
+   ⇒ يُقاس `created + existing` — فيصدُق على جدولٍ عذراءَ وعلى قائمٍ معًا،
+     ولا يشترط محوَ بياناتٍ حقيقيةٍ ليمرّ. */
 $r = OTS::generateMain($conn, $gate, $CO, $C5, 1);
-check(!empty($r['ok']) && $r['created'] === 2, 'العقد 5: رئيسيتان (بندان): ' . $r['created']);
+$__mains = (int) $r['created'] + (int) (isset($r['existing']) ? $r['existing'] : 0);
+check(!empty($r['ok']) && $__mains === 2,
+    'العقد 5: رئيسيتان بعددِ بنوده: ' . $__mains
+    . ' (وُلِّد ' . (int) $r['created'] . ' · قائمٌ ' . (int) (isset($r['existing']) ? $r['existing'] : 0) . ')');
 $mains = $conn->query("SELECT c.id, c.contract_item_id, c.cap_qty, c.unit_type, c.origin, i.equip_total_contract, i.equip_type
                          FROM op_containers c
                          JOIN contractequipments i ON i.id=c.contract_item_id
