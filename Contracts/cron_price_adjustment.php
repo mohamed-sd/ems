@@ -46,7 +46,10 @@ foreach (explode(',', $raw) as $c) {
     $co = (int) $row['company_id'];
     $gate = new TenantDb($conn, TenantContext::forSystem($co, 0, '', true));
 
-    $r = PAS::applyDue($conn, $gate, $co, $cid, $date, 0);
+    /* ◆ **يُصرّح بمنشئه**: كان يمرّر actor=0 فيُكتب `created_by` نُلًّا، والنُّلُّ
+         يعني «آلةً» بالحادثِ لا بالتصريح — فيسكت حارسُ «من أنشأ لا يعتمد» على
+         كلِّ صفوفِ الكرون. فالآن المنشأُ مُعلَنٌ في العمودِ وفي قيدِ القاعدة. */
+    $r = PAS::applyDue($conn, $gate, $co, $cid, $date, 0, 'system');
     $made += (int) $r['created']; $skipped += (int) $r['skipped'];
     $kinds = array();
     foreach ($r['rows'] as $x) { $kinds[] = (string) $x['outcome']; }

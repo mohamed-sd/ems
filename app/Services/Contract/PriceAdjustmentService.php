@@ -367,9 +367,29 @@ class PriceAdjustmentService
      *
      * @return array{ok:bool,created:int,skipped:int,rows:array}
      */
-    public static function applyDue($conn, $gate, $companyId, $contractId, $asOf, $actor)
+    /**
+     * @param string $origin 'user' لفعلِ إنسانٍ (فيلزمه معرِّفٌ موجب) أو
+     *   'system' لشوطِ كرونٍ بلا إنسان. **مُصرَّحٌ لا مُستنتَجٌ من صفرِ الفاعل**:
+     *   كان `created_by = (int)$actor ?: null` يجعل النُّلَّ يعني «آلةً» بالحادثِ،
+     *   فجلسةٌ مكسورةٌ بـ`uid = 0` تُنتج ذاتَ النُّلِّ ويُعطَّل حارسُ الفصلِ في
+     *   `approve()` صامتًا. فصار المنشأُ يُعلَن، ومنشأُ الإنسانِ بلا معرِّفٍ يُردّ.
+     */
+    public static function applyDue($conn, $gate, $companyId, $contractId, $asOf, $actor, $origin = 'user')
     {
         $out = array('ok' => true, 'created' => 0, 'skipped' => 0, 'rows' => array());
+        $origin = ($origin === 'system') ? 'system' : 'user';
+        /* ◆ **fail-closed**: منشأُ إنسانٍ بلا معرِّفٍ لا يُكتب — لأنَّ أثرَه لا
+             يُفرَّق عن أثرِ الآلةِ فيسقط حارسُ «من أنشأ لا يعتمد» بلا صوت. */
+        if ($origin === 'user' && (int) $actor <= 0) {
+            return array('ok' => false, 'created' => 0, 'skipped' => 0, 'rows' => array(),
+                         'code' => 403,
+                         'reason' => 'فعلُ إنسانٍ بلا معرِّفٍ — لا يُكتب. (الكرونُ يُصرّح origin=system)');
+        }
+        if ($origin === 'system' && (int) $actor > 0) {
+            return array('ok' => false, 'created' => 0, 'skipped' => 0, 'rows' => array(),
+                         'code' => 422,
+                         'reason' => 'منشأٌ آليٌّ بمعرِّفِ إنسانٍ — تصريحٌ متناقض');
+        }
         $proposals = self::evaluate($conn, $gate, $companyId, $contractId, $asOf);
         foreach ($proposals as $p) {
             $exists = array();
@@ -387,7 +407,11 @@ class PriceAdjustmentService
 
             $revId = null; $amdId = null;
             try {
-                $gate->runInTransaction(function ($g) use ($conn, $p, $contractId, $companyId, $actor, &$revId, &$amdId) {
+                /* ◆ `$origin` **في قائمةِ `use`**: بدونه يصل المُغلَقةَ غيرَ معرَّفٍ
+                     فيُكتب `created_origin = ''`، و`sql_mode` خاويةٌ فالـENUM يبتلع
+                     الخارجَ عن مداه صامتًا ⇒ ينكسر القيدُ ويفشل الإدراجُ بلا صوت.
+                     (وقع فعلًا: تسعةُ فروعٍ في `price_adjustment_test` سقطت.) */
+                $gate->runInTransaction(function ($g) use ($conn, $p, $contractId, $companyId, $actor, $origin, &$revId, &$amdId) {
                     // الملحقُ لا يُولَّد إلا حين يتحرك سعرٌ فعلًا — والامتناعُ
                     // يُسجَّل مراجعةً بسببه بلا ملحقٍ فارغ.
                     if (in_array($p['outcome'], array('amended', 'capped'), true)) {
@@ -418,6 +442,7 @@ class PriceAdjustmentService
                         'outcome' => $p['outcome'], 'amendment_id' => $amdId,
                         'note' => mb_substr((string) $p['note'], 0, 255),
                         'created_by' => (int) $actor ?: null,
+                        'created_origin' => $origin,
                     ));
                     return true;
                 }, 'M-09 price revision term#' . $p['term_id']);
@@ -452,7 +477,22 @@ class PriceAdjustmentService
             $out['reason'] = 'مراجعةٌ لم تحرّك سعرًا (' . $rev['outcome'] . ') — لا شيءَ يُعتمد';
             return $out;
         }
-        if ((int) $rev['created_by'] > 0 && (int) $rev['created_by'] === (int) $actor) {
+        /* ◆ **لا اعتمادَ بلا معتمِدٍ مُعرَّف.** كان `approved_by => (int)$actor ?: null`
+             يسجّل «اعتُمد» بمعتمِدٍ نُلٍّ — أثرٌ بلا صاحب. فيُردُّ الآن، ويُثبِّته
+             القيدُ `chk_price_rev_approver_known` في القاعدةِ كذلك. */
+        if ((int) $actor <= 0) {
+            $out['code'] = 403; $out['reason'] = 'اعتمادٌ بلا معتمِدٍ مُعرَّفٍ — لا يُسجَّل أثرٌ بلا صاحب'; return $out;
+        }
+        /* ◆ حارسُ الفصلِ — **بالمنشإِ المُصرَّحِ لا بموجَبيةِ المعرِّف.** كان شرطُه
+             `created_by > 0` فكان يسكت على كلِّ صفٍّ نُلِّ المُنشئ، وصفوفُ الكرونِ
+             كذلك كلُّها (يمرّر actor=0 فيُكتب نُلًّا) — حارسٌ قائمٌ نصًّا غائبٌ فعلًا. */
+        $origin = isset($rev['created_origin']) ? (string) $rev['created_origin'] : 'user';
+        if ($origin === 'user' && (int) $rev['created_by'] <= 0) {
+            $out['code'] = 409;
+            $out['reason'] = 'مُنشئٌ مجهولٌ على صفٍّ بشريِّ المنشإ — لا يُعتمد حتى يُعرَف';
+            return $out;
+        }
+        if ($origin === 'user' && (int) $rev['created_by'] === (int) $actor) {
             $out['code'] = 403; $out['reason'] = 'من أنشأ لا يعتمد — الفصلُ بنيويٌّ لا اختياري'; return $out;
         }
         try {

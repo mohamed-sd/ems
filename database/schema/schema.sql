@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 12:59:02
+-- المصدر: equipation_manage · التوليد: 2026-08-12 15:15:00
 -- الجداول: 548 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -1674,6 +1674,7 @@ CREATE TABLE `contract_price_revisions` (
   `approved_at` datetime DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
+  `created_origin` enum('user','system') NOT NULL DEFAULT 'user' COMMENT 'منشأُ الصفِّ مُصرَّحًا: user=إنسانٌ بمعرِّفٍ موجب · system=كرونٌ بلا إنسان',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_price_revision_period_item` (`term_id`,`period_key`,`contract_item_id`),
@@ -1681,7 +1682,9 @@ CREATE TABLE `contract_price_revisions` (
   KEY `fk_price_revision_amd` (`amendment_id`),
   KEY `ix_price_revision_term` (`term_id`),
   CONSTRAINT `fk_price_revision_amd` FOREIGN KEY (`amendment_id`) REFERENCES `contract_amendments` (`id`),
-  CONSTRAINT `fk_price_revision_term` FOREIGN KEY (`term_id`) REFERENCES `contract_price_terms` (`id`)
+  CONSTRAINT `fk_price_revision_term` FOREIGN KEY (`term_id`) REFERENCES `contract_price_terms` (`id`),
+  CONSTRAINT `chk_price_rev_origin_actor` CHECK (`created_origin` = 'user' and `created_by` is not null and `created_by` > 0 or `created_origin` = 'system' and `created_by` is null),
+  CONSTRAINT `chk_price_rev_approver_known` CHECK (`approved_at` is null or `approved_by` is not null and `approved_by` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: contract_price_terms ──
