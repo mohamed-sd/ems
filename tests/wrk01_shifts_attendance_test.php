@@ -42,8 +42,26 @@ register_shutdown_function($teardown);
 $teardown();
 
 head('القاموس — الرموز الأحد عشر بأثرها الخماسي');
-$q = $conn->query("SELECT COUNT(*) c FROM payroll_absence_types WHERE company_id=4 AND code IS NOT NULL AND active=1")->fetch_assoc();
-check((int) $q['c'] === 11, 'الرموز 1·0·10·11·ST·S·M·A1·A2·EM·UP كلها في القاموس الموحَّد (' . $q['c'] . ')');
+/* ◆ **العدُّ لا يُسمّي — والتسميةُ تكشف.** كان الحكمُ `COUNT(*) === 11`، فلما صار
+     العددُ 12 قال «12» ولم يقل **مَن** الثاني عشر. والقياسُ كشفه: صفٌّ برمزِ
+     `PAYR` عنوانُه **«أنس الفاتح إبراهيم» — موظفٌ حقيقيٌّ (#60)**، أي اسمُ شخصٍ
+     في قاموسِ رموزِ الحضور (توقيعُ إدراجٍ منزاحِ الأعمدة). عُزل بالهجرة
+     2027_03_12 بعد إثباتِ أن الرمزَ **غيرُ مستعملٍ في القاعدةِ كلِّها**.
+   ⇒ فيُحكَم بـ**المجموعتين**: لا ناقصَ من المعلَنِ ولا زائدَ عليه — فيُسمّى
+     الشاذُّ إن ظهر، ويرسب الفحصُ إن غاب رمزٌ واجبٌ (وذاك ما لا يكشفه العدُّ). */
+$DECLARED = array('1', '0', '10', '11', 'ST', 'S', 'M', 'A1', 'A2', 'EM', 'UP');
+$live = array();
+$r = $conn->query("SELECT code, label_ar FROM payroll_absence_types
+                    WHERE company_id=4 AND code IS NOT NULL AND active=1");
+while ($r && ($x = $r->fetch_assoc())) { $live[(string) $x['code']] = (string) $x['label_ar']; }
+$missing = array_values(array_diff($DECLARED, array_keys($live)));
+$extra   = array_values(array_diff(array_keys($live), $DECLARED));
+check(!$missing && !$extra,
+    'الرموز ' . implode('·', $DECLARED) . ' كلها في القاموس الموحَّد ولا زائدَ عليها ('
+    . count($live) . ($missing ? ' · ناقصٌ: ' . implode('،', $missing) : '')
+    . ($extra ? ' · زائدٌ: ' . implode('،', array_map(function ($c) use ($live) {
+          return $c . '=«' . mb_substr($live[$c], 0, 24) . '»';
+      }, $extra)) : '') . ')');
 $q = $conn->query("SELECT COUNT(*) c FROM payroll_absence_types WHERE company_id=4 AND code='A2' AND deducts=1 AND conduct_violation=1")->fetch_assoc();
 check((int) $q['c'] === 1, 'A2: يُخصم يومًا بيوم **ومخالفة سلوكية** — أثران لا أثر واحد');
 $q = $conn->query("SELECT COUNT(*) c FROM payroll_absence_types WHERE company_id=4 AND code='A1' AND deducts=0")->fetch_assoc();

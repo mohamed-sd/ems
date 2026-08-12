@@ -66,6 +66,10 @@ $MARK = 'P12H' . getmypid();
 $teardown = function () use ($db, $MARK) {
     $db->query("DELETE u FROM unit_entries u JOIN contracts c ON c.id = u.contract_id
                  WHERE c.first_party LIKE '%{$MARK}%'");
+    /* المُشيرُ قبلَ المُشارِ إليه: المستخلَصُ يشير إلى الذمّةِ والفاتورةُ إلى
+       المستخلَص — فيُفصَل الوصلُ أوّلًا ثم تُحذف الفاتورةُ ثم المستخلَصُ ثم الذمّة. */
+    $db->query("UPDATE claims SET receivable_id = NULL WHERE claim_no LIKE '%{$MARK}%'");
+    $db->query("DELETE FROM tax_invoices WHERE serial_no LIKE '%{$MARK}%'");
     $db->query("DELETE FROM claims WHERE claim_no LIKE '%{$MARK}%'");
     $db->query("DELETE FROM fin_receivables WHERE doc_ref LIKE '%{$MARK}%'");
     $db->query("DELETE p FROM contract_monthly_plan p JOIN contracts c ON c.id = p.contract_id
@@ -106,17 +110,38 @@ $db->query("INSERT INTO unit_entries (company_id, entry_no, entry_date, project_
             revision_no, current_round, created_at, updated_at)
             VALUES ({$CO}, 'UE-{$MARK}', '2095-03-10', {$PRJ}, {$CID},
                     {$LID}, {$MAR}, 'ton', 1500, 'contract', 0, 'sales_approved', 1, 1, NOW(), NOW())");
-$db->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-            project_id, amount, currency, fx_rate_recognized, base_amount, collected,
-            due_date, state, created_at)
-            VALUES ({$CO}, 1, 'invoice', 'INV-{$MARK}', {$PRJ}, 12000, 'USD', 1.0, 12000, 9000,
-                    '2095-04-30', 'partial', NOW())");
-$RID = intval($db->insert_id);
+/* ══ **الذمّةُ لا تُفتح بلا مستندٍ يقابلها** — والبذرُ يُرتَّب لذلك ══════════════
+   `chk_recv_source_doc` (`source_doc_id IS NOT NULL OR legacy_no_ref = 1`) صار
+   قيدًا في القاعدة (INJ-0036)، وهذا البذرُ كُتب قبله فكان يفتح ذمّةً بلا مصدرٍ
+   **فينفجر الفاحصُ كلُّه** عند أوّلِ سطرٍ. و`legacy_no_ref = 1` **لا يصلح هنا**:
+   معناه «صفٌّ موروثٌ يُعلن أن لا مرجعَ له» — وهذا صفٌّ جديدٌ يُولد الآن، فوسمُه
+   بالموروثِ تلفيقٌ يُفسد معنى العَلَم نفسِه.
+   و`ems_receivable_source_registry()` يُلزم النوعَ `invoice` بفاتورةٍ ضريبيةٍ
+   **صادرةٍ** (`tax_invoices.state='issued'`) يطابق `serial_no` مرجعَ الذمّة.
+
+   والمراجعُ **دائرةٌ**: الذمّةُ ⟶ الفاتورةُ ⟶ المستخلَصُ ⟶ الذمّة. فتُكسر
+   بترتيبِ البذرِ لا بتعطيلِ قيد: مستخلَصٌ بلا ذمّةٍ (العمودُ يقبل NULL) ⟶
+   فاتورةٌ صادرةٌ عليه ⟶ ذمّةٌ تشير إليها ⟶ ثم يُوصَل المستخلَصُ بذمّته.        */
 $db->query("INSERT INTO claims (company_id, claim_no, contract_id, client_id, project_id,
             period_from, period_to, currency, gross_amount, retention_amount, net_amount,
-            tax_amount, state, version, receivable_id, created_at)
+            tax_amount, state, version, created_at)
             VALUES ({$CO}, 'CLM-{$MARK}', {$CID}, 1, {$PRJ}, '2095-03-01', '2095-03-31',
-                    'USD', 12000, 0, 12000, 0, 'invoiced', 1, {$RID}, NOW())");
+                    'USD', 12000, 0, 12000, 0, 'invoiced', 1, NOW())");
+$CLM = intval($db->insert_id);
+
+$db->query("INSERT INTO tax_invoices (company_id, claim_id, client_id, serial_no, serial_year,
+            serial_seq, currency, net_amount, total_amount, state, issued_at, created_at)
+            VALUES ({$CO}, {$CLM}, 1, 'INV-{$MARK}', 2095, " . (getmypid() % 100000) . ",
+                    'USD', 12000, 12000, 'issued', NOW(), NOW())");
+$TXI = intval($db->insert_id);
+
+$db->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
+            source_doc_id, project_id, amount, currency, fx_rate_recognized, base_amount,
+            collected, due_date, state, created_at)
+            VALUES ({$CO}, 1, 'invoice', 'INV-{$MARK}', {$TXI}, {$PRJ}, 12000, 'USD', 1.0, 12000,
+                    9000, '2095-04-30', 'partial', NOW())");
+$RID = intval($db->insert_id);
+$db->query("UPDATE claims SET receivable_id = {$RID} WHERE id = {$CLM}");
 check($CID > 0 && $LID > 0,
       "عقدٌ #{$CID} — مخطَّطٌ 20,000 · منفَّذٌ 15,000 · مفوترٌ 12,000 · محصَّلٌ 9,000");
 

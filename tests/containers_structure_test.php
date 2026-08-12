@@ -159,8 +159,23 @@ $conn->query("UPDATE op_containers SET consumed_qty=100.00 WHERE id={$OP}");
 head('⑧ `remaining_qty` مولَّدٌ لا يُكتب');
 $r = $conn->query("SELECT cap_qty, consumed_qty, remaining_qty FROM op_containers WHERE id={$OP}")->fetch_assoc();
 check((float) $r['remaining_qty'] == 150.00, 'المتبقي محسوبٌ من القاعدة: ' . $r['remaining_qty']);
+/* ◆ **المضمونُ أن الرقمَ لا يُفرَض — لا أن المحرِّكَ يصيح.** كان الحكمُ «الكتابةُ
+     تُردُّ بخطأ»، و**القياسُ يقول غيرَ ذلك**: `sql_mode` في هذا النظامِ **فارغٌ**،
+     فإسنادُ قيمةٍ إلى عمودٍ مولَّدٍ يُخفَّض من خطأٍ (1906) إلى **تحذيرٍ** ويُهمَل
+     الإسناد — `errno = 0` و`warning_count = 1`. فالفاحصُ كان يطلب صياحًا لا
+     يصيحه المحرِّكُ بهذه التهيئة، ويُدين ضمانةً **قائمةً**.
+   ⇒ يُحكَم على الضمانةِ نفسِها: القيمةُ **لا تتغيّر** بعد محاولةِ الكتابة، فتبقى
+     مشتقّةً من `cap − consumed` وحدَه. وهذا حكمٌ يصحُّ على المحرِّكَين: إن صاح
+     رُدَّت الكتابةُ، وإن أهمل بقيت القيمة. ويُعلَن التحذيرُ لأنه الدليلُ على أن
+     الإسنادَ **لم يُطبَّق** لا على أنه نجح. */
+$before = $conn->query("SELECT remaining_qty FROM op_containers WHERE id={$OP}")->fetch_assoc();
 $e = tryQ($conn, "UPDATE op_containers SET remaining_qty=999 WHERE id={$OP}");
-check($e !== '', 'والكتابةُ إليه مرفوضة — فلا مصدرانِ للرقم الواحد');
+$after = $conn->query("SELECT remaining_qty FROM op_containers WHERE id={$OP}")->fetch_assoc();
+check((float) $after['remaining_qty'] == (float) $before['remaining_qty']
+      && (float) $after['remaining_qty'] != 999.00,
+    'والكتابةُ إليه لا تُغيّره — فلا مصدرانِ للرقم الواحد ('
+    . ($e !== '' ? 'رُدَّت بخطأ' : 'أُهملت بتحذيرٍ · sql_mode فارغ') . ': '
+    . $before['remaining_qty'] . ' ⇒ ' . $after['remaining_qty'] . ')');
 
 // ═══ ⑤ الشجرةُ لا تُعلَّق في الهواء ═══
 head('⑤ الشجرةُ لا تُعلَّق في الهواء');
