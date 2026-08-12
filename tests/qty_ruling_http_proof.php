@@ -32,11 +32,18 @@ function info($m) { fwrite(STDOUT, "     · {$m}\n"); }
 
 function q_req($url, $post = null) {
     global $JAR;
+    $GLOBALS['__ems_last_url'] = $url;   // لحلِّ Location النسبيّ عند قراءةِ الوميض
     $ch = curl_init($url);
     curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true,
         CURLOPT_COOKIEJAR => $JAR, CURLOPT_COOKIEFILE => $JAR,
         CURLOPT_FOLLOWLOCATION => false, CURLOPT_TIMEOUT => 40));
     if ($post !== null) {
+        /* الحارسُ المركزيُّ (`includes/security.php:404`) يفحص كلَّ POST ويطلب
+           `csrf_token` أو ترويسةَ `X-CSRF-Token`. والشاشةُ تبثُّ الرمزَ بـ
+           `csrf_field()`، والفاحصُ يبني حقولَه يدويًّا فلا يحمله — فتُردُّ 403
+           ويُقرأ صمتُها «لم يُكتب شيءٌ» فيُتَّهم منتجٌ سليم. */
+        require_once __DIR__ . '/_http_flash.php';
+        $post = ems_http_with_csrf($post, $url, $JAR);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
     }
@@ -46,12 +53,16 @@ function q_req($url, $post = null) {
     curl_close($ch);
     return array($c, substr($raw, 0, $hs), substr($raw, $hs));
 }
+/** الرسالةُ في وميضِ الجلسةِ أو في العنوان — يُقرأ الاثنان (انظر `_http_flash.php`). */
 function q_msg($h) {
-    if (preg_match('~Location:\s*(\S+)~i', $h, $m)) {
-        parse_str((string) parse_url(trim($m[1]), PHP_URL_QUERY), $p);
-        return isset($p['msg']) ? $p['msg'] : '';
-    }
-    return '';
+    require_once __DIR__ . '/_http_flash.php';
+    $dir = isset($GLOBALS['__ems_last_url'])
+        ? preg_replace('~/[^/]*(\?.*)?$~', '', (string) $GLOBALS['__ems_last_url'])
+        : '';
+    return ems_flash_or_msg($h, $dir, function ($u) {
+        list(, , $b) = q_req($u, null);
+        return (string) $b;
+    });
 }
 
 $conn = $GLOBALS['conn'];

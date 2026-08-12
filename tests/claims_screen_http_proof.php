@@ -28,6 +28,8 @@ function check($c, $m) { $c ? ok($m) : bad($m); }
 function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 
 function cs_req($url, $jar, $post = null) {
+    $GLOBALS['__ems_last_url'] = $url;   // لحلِّ Location النسبيّ عند قراءةِ الوميض
+    $GLOBALS['__ems_last_jar'] = $jar;   // الجرَّةُ وسيطٌ صريحٌ — يُحفَظ للقراءةِ التالية
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true,
@@ -52,13 +54,20 @@ function cs_login($user, $jar) {
     return cs_req($BASE . '/login.php', $jar, array('username' => $user, 'password' => '12345678',
         'csrf_token' => isset($m[1]) ? $m[1] : ''));
 }
+/**
+ * رسالةُ الشاشةِ لا تسكن العنوانَ دائمًا: `ems_gov_flash_redirect` يخزّنها في
+ * الجلسةِ ويوجّه **بعنوانٍ مجرَّدٍ بلا `?msg=`**. فقراءةُ المُعامَلِ وحدَها تجد
+ * فراغًا وتحكم على منتجٍ سليمٍ بالفشل. والمساعدُ المشترَكُ يقرأ الاثنين.
+ */
 function cs_msg($headers) {
-    if (preg_match('~Location:\s*(\S+)~i', $headers, $m)) {
-        $q = parse_url(trim($m[1]), PHP_URL_QUERY);
-        parse_str((string) $q, $p);
-        return isset($p['msg']) ? $p['msg'] : '';
-    }
-    return '';
+    require_once __DIR__ . '/_http_flash.php';
+    $dir = isset($GLOBALS['__ems_last_url'])
+        ? preg_replace('~/[^/]*(\?.*)?$~', '', (string) $GLOBALS['__ems_last_url'])
+        : '';
+    return ems_flash_or_msg($headers, $dir, function ($u) {
+        list(, , $b) = cs_req($u, $GLOBALS['__ems_last_jar'], null);
+        return (string) $b;
+    });
 }
 
 $env = array();

@@ -68,11 +68,26 @@ class RotationSwapService
         catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $refRow'); $refRow = null; }
         if (!$refRow) { $out['code'] = 422; $out['reason'] = 'الحائزُ الداخل غيرُ موجودٍ في نطاقك'; return $out; }
 
-        // المتبقي = الرصيدُ الحي — «لا تُفقد وحدةٌ ولا تُحتسب مرتين»
-        $remaining = round((float) $c['cap_qty'] - (float) $c['consumed_qty'], 2);
+        /* المتبقي = الرصيدُ **الحرُّ** — «لا تُفقد وحدةٌ ولا تُحتسب مرتين»
+           ─────────────────────────────────────────────────────────────────────
+           كان الحسابُ `cap − consumed` وحدَه، و**يتجاهل `allocated_qty`**: أي ما
+           سُلّم سلفًا إلى حاوياتٍ ابنةٍ تبقى معلَّقةً بالخارجةِ لا تنتقل معها.
+           فحاويةُ معدةٍ سقفُها 600 وزّعت 300 على مشغّليها ولم تستهلك شيئًا كانت
+           تُعطي البديلةَ **600** والأبناءُ ما زالوا يحملون 300 — فيصير من سقفٍ
+           واحدٍ 900، وهو نقضُ الثابتِ الذي تعلنه هذه الخدمةُ نفسُها.
+           والأثرُ المقيسُ كان أفدح: التجميدُ على `cap = consumed` يُخفِق في
+           `ck_container_alloc` (`allocated <= cap`) فتُلغى المعاملةُ كلُّها —
+           **19 حاويةً حيةً لا تقبل الاستبدالَ أصلًا** (مقيسٌ).
+           ⇒ فالمنقولُ هو الحرُّ وحدَه، والخارجةُ تُجمَّد على ما استهلكت **وما
+             سلّمت**: `keep = consumed + allocated`. فيُحفظ Σ جبرًا:
+             `keep + free = cap` بلا فقدٍ ولا تكرار. */
+        $allocated = round((float) $c['allocated_qty'], 2);
+        $keep      = round((float) $c['consumed_qty'] + $allocated, 2);
+        $remaining = round((float) $c['cap_qty'] - $keep, 2);
         if ($remaining <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'رصيدُ الحاوية صفرٌ (' . $c['cap_qty'] . ' مستهلكةٌ ' . $c['consumed_qty'] . ') — لا شيءَ يُنقل';
+            $out['reason'] = 'لا رصيدَ حرًّا يُنقل (سقف ' . $c['cap_qty'] . ' · مستهلكةٌ '
+                           . $c['consumed_qty'] . ' · موزَّعةٌ على أبنائها ' . $allocated . ')';
             return $out;
         }
 
@@ -92,14 +107,16 @@ class RotationSwapService
         $toId = null; $swapId = null;
         try {
             $gate->runInTransaction(function ($g) use ($c, $containerId, $level, $holderCol, $inRef, $outRef,
-                                                       $remaining, $sibling, $reason, $docRef, $actor, $date,
+                                                       $remaining, $keep, $sibling, $reason, $docRef, $actor, $date,
                                                        &$toId, &$swapId) {
-                // ① الخارجةُ تُجمَّد عند رصيدها: **تُقفل على المستهلَك** (cap=consumed)
-                //   — فمتبقّيها انتقل ولم يعد لها؛ وإعادةُ تفعيلها لاحقًا (عودةُ
-                //   التناوب) تضيف العائدَ وحدَه فلا يتضاعف رصيدٌ أبدًا.
+                // ① الخارجةُ تُجمَّد عند رصيدها: **تُقفل على ما استهلكت وما سلّمت**
+                //   (`cap = consumed + allocated`) — فالحرُّ وحدَه انتقل، وحصصُ
+                //   أبنائها تبقى مغطّاةً بسقفها فلا يُنقَض `ck_container_alloc`.
+                //   وإعادةُ تفعيلها لاحقًا (عودةُ التناوب) تضيف العائدَ وحدَه فلا
+                //   يتضاعف رصيدٌ أبدًا.
                 $g->update('op_containers', array(
                     'state' => 'معلَّقة', 'valid_to' => $date,
-                    'cap_qty' => round((float) $c['consumed_qty'], 2),
+                    'cap_qty' => $keep,
                     'close_reason' => mb_substr('استبدالٌ: ' . $reason, 0, 200),
                 ), array('id' => $containerId));
 
