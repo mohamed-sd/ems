@@ -66,9 +66,18 @@ fwrite(STDOUT, "\n══ M-10 — توليدُ صفوف الالتزام من ا
 // ═══ بذرٌ صوري ═══
 head('البذر — عقدٌ صوريٌّ بالتزام وقودٍ معتمدٍ وجذرِ حاوية');
 $gate = new TenantDb($conn, TenantContext::forSystem($CO, $ACTOR, '', true));
-$ok = $conn->query("INSERT INTO contracts (company_id, contract_signing_date, first_party, forecasted_contracted_hours)
-                    VALUES ({$CO}, '2026-01-01', '{$MARK}', 1000)");
+/* ◆ **عيبٌ مقيس**: `contracts.project_id` عمودٌ **إلزاميٌّ بمفتاحٍ أجنبيٍّ**
+     إلى `project(id)` (`fk_contracts_project`)، وكانت البذرةُ تُغفله فيهبط
+     إلى صفرٍ فترفضه القاعدةُ: «Cannot add or update a child row». فيعود
+     `insert_id = 0` ويتساقط كلُّ ما بعده (13 فحصًا) — والعطلُ في البذرةِ
+     لا في الحكمِ المفحوص. فيُؤخذ مشروعٌ حقيقيٌّ لهذه الشركة. */
+$PRJ = (int) $conn->query("SELECT id FROM project WHERE company_id={$CO} ORDER BY id LIMIT 1")
+                  ->fetch_row()[0];
+$ok = $conn->query("INSERT INTO contracts (company_id, project_id, contract_signing_date,
+                      first_party, forecasted_contracted_hours)
+                    VALUES ({$CO}, {$PRJ}, '2026-01-01', '{$MARK}', 1000)");
 $CID = intval($conn->insert_id);
+if (!$ok) { fwrite(STDOUT, '  ⚠ ' . mb_substr($conn->error, 0, 120) . "\n"); }
 check($ok === true && $CID > 0, "عقدٌ صوري #{$CID} (يُكنس في النهاية)");
 $conn->query("INSERT INTO contract_obligations
     (company_id, client_contract_id, obligation_type, obligor, effect_on_billing,

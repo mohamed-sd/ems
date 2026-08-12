@@ -62,9 +62,22 @@ fwrite(STDOUT, "\n══ M-01 — دفترُ الدفعة المقدَّمة ═
 
 // عقدُ الاختبار: قائمٌ بعملةٍ معروفة (لا يُنشأ عقدٌ وهميٌّ — نستعمل عقدًا حقيقيًّا
 // **ولا نكتب فيه شيئًا**؛ كلُّ ما نكتبه صفوفُ دفعاتٍ موسومةٌ تُكنس)
-$C = $conn->query("SELECT id, price_currency_contract, advance_recovery_pct
-                     FROM contracts WHERE company_id={$CO} AND price_currency_contract IS NOT NULL
-                     ORDER BY id LIMIT 1")->fetch_assoc();
+/* ◆ **عيبُ عزلٍ مقيس**: كان يأخذ **أولَ** عقدٍ بعملةٍ معروفةٍ ثم يفترض في
+     الفحصِ الأولِ أنه «عقدٌ بلا قبضٍ مسجَّل ⇒ استقطاعُه صفر». والواقعُ أن
+     العقدَ الأولَ عليه مقدَّمٌ حقيقيٌّ (استقطاعُه 100 لا صفر، ورصيدُه يحمل
+     كسرَ 0.50)، فسقط الفحصُ الأولُ ثم تساقط كلُّ ما بُني على رصيدٍ مفترَض.
+     ⇒ يُشترط **صفرُ مقدَّمٍ** على العقدِ المختار: الفاحصُ يقيس ما يدّعيه. */
+$C = $conn->query("SELECT c.id, c.price_currency_contract, c.advance_recovery_pct
+                     FROM contracts c
+                    WHERE c.company_id={$CO} AND c.price_currency_contract IS NOT NULL
+                      AND NOT EXISTS (SELECT 1 FROM contract_advances a
+                                       WHERE a.contract_id = c.id AND COALESCE(a.is_deleted,0)=0)
+                    ORDER BY c.id LIMIT 1")->fetch_assoc();
+if (!$C) {
+    fwrite(STDOUT, "\n⚠ لا عقدَ بعملةٍ معروفةٍ **وبلا مقدَّمٍ مسجَّل** — الفحصُ الأولُ\n"
+        . "   يشترط عقدًا نظيفًا، ولا يُقاس على عقدٍ عليه مقدَّمٌ قائم.\n");
+    exit(1);
+}
 $CID = (int) $C['id'];
 info("العقدُ المستعمَل للقياس: #{$CID} · عملتُه {$C['price_currency_contract']}");
 $ledgerBefore = (int) $conn->query("SELECT COUNT(*) c FROM fin_financial_events")->fetch_assoc()['c'];
