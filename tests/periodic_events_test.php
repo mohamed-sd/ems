@@ -71,17 +71,23 @@ head('البذر — معدةٌ بوحداتٍ معتمدةٍ ومسودة · و
 
 // معدةٌ حقيقيةٌ من الأسطول (لا تُنشأ معدةٌ اختبارية — القراءةُ تكفي)
 $EQ = intval($conn->query("SELECT id FROM equipments ORDER BY id LIMIT 1")->fetch_assoc()['id']);
-$mkUnit = function ($state, $qty, $type, $n) use ($conn, $CO, $EQ, $MARK, $PER) {
+/* ◆ **يومٌ واحدٌ لا يحمل ثلاثَ وقائعَ لمعدةٍ واحدة.** كان البذرُ يضع الثلاثةَ في
+     `{$PER}-10` نفسِه، فردَّ القيدُ `ق-18` الثانيةَ والثالثةَ («تكرار
+     معدة×تاريخ×وردية مرفوضٌ بنيويًّا») — **وهو حارسٌ محقٌّ**: معدةٌ واحدةٌ لا
+     تعمل ورديتين في يومٍ بسجلَّين. فتُبذَر في **أيامٍ متمايزةٍ داخل الفترةِ
+     نفسِها** — والمقصودُ من القياسِ محفوظٌ حرفيًّا: 40+20 معتمدةً و100 غيرَ
+     معتمدةٍ في الشهرِ الواحد. */
+$mkUnit = function ($state, $qty, $type, $n, $day) use ($conn, $CO, $EQ, $MARK, $PER) {
     $conn->query("INSERT INTO unit_entries (company_id, entry_no, entry_date, equipment_id,
                   unit_type, qty, record_basis, state, created_at, updated_at)
-                  VALUES ({$CO}, 'UE-{$MARK}-{$n}', '{$PER}-10', {$EQ}, '{$type}', {$qty},
+                  VALUES ({$CO}, 'UE-{$MARK}-{$n}', '{$PER}-{$day}', {$EQ}, '{$type}', {$qty},
                           'contract', '{$state}', NOW(), NOW())");
     if ($conn->error) { fwrite(STDOUT, '  ! ' . $conn->error . "\n"); return 0; }
     return intval($conn->insert_id);
 };
-$U1 = $mkUnit('sales_approved', 40, 'hour', 1);   // معتمدة
-$U2 = $mkUnit('parties_approved', 20, 'hour', 2); // معتمدة
-$U3 = $mkUnit('submitted', 100, 'hour', 3);       // **مسودةٌ لا تُخصَّص**
+$U1 = $mkUnit('sales_approved', 40, 'hour', 1, '10');    // معتمدة
+$U2 = $mkUnit('parties_approved', 20, 'hour', 2, '11');  // معتمدة
+$U3 = $mkUnit('submitted', 100, 'hour', 3, '12');        // **مسودةٌ لا تُخصَّص**
 check($EQ > 0 && $U1 > 0 && $U2 > 0 && $U3 > 0,
       "معدةٌ #{$EQ} بثلاث وحدات (40 + 20 معتمدة · و100 غيرُ معتمدة)");
 

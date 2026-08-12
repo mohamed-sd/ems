@@ -83,8 +83,13 @@ $r = $conn->query("SELECT COUNT(*) c FROM information_schema.KEY_COLUMN_USAGE
 check($r && intval($r->fetch_assoc()['c']) === 3, 'FK → employees + project + pay_models');
 $r = $conn->query("SELECT COUNT(*) c FROM pay_models WHERE is_active = 1");
 check($r && intval($r->fetch_assoc()['c']) === 15, 'الكتالوجُ المحكوم: 15 نموذجًا (CON-01 §3.1)');
+/* ◆ **الكتالوجُ هو الحيُّ منه.** السطرُ أعلاه يقيس المحكومَ بـ`is_active = 1`،
+     وهذا كان يقرأ **كلَّ** صفوفِ الجدولِ — فأيُّ صفٍّ معطَّلٍ يكسره وإن كان
+     الكتالوجُ سليمًا. وقد وقع: خمسةُ صفوفٍ `label_ar` فيها **أسماءُ أشخاصٍ**
+     كتبها مستوردٌ (عينُ عطبِ `job_titles`) حُجزت معطَّلةً بوسمِ `quarantined_`
+     (هجرة 2027_02_28) — فهي شاهدٌ على ما جرى لا عضوٌ في الكتالوج. */
 $codes = array();
-$r = $conn->query("SELECT code FROM pay_models ORDER BY id");
+$r = $conn->query("SELECT code FROM pay_models WHERE is_active = 1 ORDER BY id");
 while ($row = $r->fetch_assoc()) { $codes[] = $row['code']; }
 $expected = array('fixed_only','fixed_allowances','fixed_incentive','incentive_only','hourly','daily',
                   'per_shift','per_trip','per_ton','per_meter','lump_sum','commission','performance_bonus','composite','other');
