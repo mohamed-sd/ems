@@ -107,15 +107,42 @@ class ContractSignedEffects
             $party = trim((string) ($c['second_party'] ?? ''));
             $actor = (int) ($ctx['actor'] ?? 0);
 
+            /* ══ **إدراجٌ مباشرٌ كان يترك حقلين يملؤهما الناشرُ دائمًا**: هذا
+                 الصفُّ يُكتب بـ`INSERT` صريحٍ لا عبر `EventPublisher`، فخلا من
+                 `occurred_at` (نصٌّ فارغٌ) ومن `fiscal_period_id` (NULL) — فقرأ
+                 `fes_event_contract_test` «حدثٌ بلا فترةٍ مالية» **بحقّ**، وحدثٌ
+                 بلا فترةٍ لا يدخل إقفالًا ولا ميزانَ فترةٍ فيصير مالًا خارجَ
+                 الزمن. والتاريخُ **يُشتقُّ من توقيعِ العقدِ** لا من لحظةِ الكتابة،
+                 والفترةُ بالقاعدةِ نفسِها التي يستعملها الناشرُ
+                 (`EventPublisher::resolvePeriodId`: شهرٌ يحوي التاريخ). */
+            $signed = trim((string) ($c['contract_signing_date'] ?? ''));
+            $occurredAt = ($signed !== '' && $signed !== '0000-00-00')
+                ? gmdate('Y-m-d H:i:s', strtotime($signed)) : gmdate('Y-m-d H:i:s');
+            $periodId = null;
+            $ps = mysqli_prepare($conn, "SELECT id FROM fin_financial_periods
+                    WHERE company_id = ? AND period_type = 'month'
+                      AND ? BETWEEN start_date AND end_date LIMIT 1");
+            if ($ps) {
+                $pDate = substr($occurredAt, 0, 10);
+                mysqli_stmt_bind_param($ps, 'is', $companyId, $pDate);
+                if (mysqli_stmt_execute($ps)) {
+                    $pr = mysqli_stmt_get_result($ps);
+                    $prow = $pr ? mysqli_fetch_assoc($pr) : null;
+                    if ($prow) { $periodId = (int) $prow['id']; }
+                }
+                mysqli_stmt_close($ps);
+            }
+
             $st = mysqli_prepare($conn, "INSERT INTO fin_financial_events
                 (company_id, event_no, event_type, event_key, category, source_module,
                  source_ref, entity_type, entity_id, amount, quantity, unit, currency,
-                 contract_id, state, created_by)
+                 contract_id, state, occurred_at, fiscal_period_id, created_by)
                 VALUES (?, ?, 'enterprise', 'contract.commitment', 'commercial', 'sales',
-                        ?, 'contract', ?, ?, ?, 'hour', ?, ?, 'draft', ?)");
+                        ?, 'contract', ?, ?, ?, 'hour', ?, ?, 'draft', ?, ?, ?)");
             $srcRef = 'contract:' . $contractId;
-            mysqli_stmt_bind_param($st, 'issiddsii',
-                $companyId, $no, $srcRef, $contractId, $amount, $qty, $currency, $contractId, $actor);
+            mysqli_stmt_bind_param($st, 'issiddsisii',
+                $companyId, $no, $srcRef, $contractId, $amount, $qty, $currency, $contractId,
+                $occurredAt, $periodId, $actor);
             if (mysqli_stmt_execute($st)) {
                 $out['commitment_id'] = (int) mysqli_insert_id($conn);
                 mysqli_stmt_close($st);

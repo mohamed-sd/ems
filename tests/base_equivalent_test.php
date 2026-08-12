@@ -21,6 +21,7 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+require_once __DIR__ . '/_guard_env.php';   // ems_test_is_check_violation: رقمُ القيدِ بالمحرِّك
 require_once dirname(__DIR__) . '/config.php';
 // سياق مستأجر للبوابة (EMS_TENANT_GATE=enforce): الحزم تحاكي جلسة حقيقية لا GUEST
 $_SESSION['user'] = array('id' => 1, 'role' => '19', 'company_id' => 4, 'name' => 'fes test');
@@ -108,8 +109,11 @@ $r1 = EventPublisher::publish($conn, array(
 ));
 check($r1['id'] > 0, "نُشر حدثُ الاختبار #{$r1['id']}");
 $okq = $conn->query("UPDATE fin_financial_events SET base_amount = 999999.99 WHERE id = " . intval($r1['id']));
-check($okq === false && $conn->errno === 3819,
-    'تحريفُ المعادل عن ROUND(amount×fx) يُرفض CHECK: ' . $conn->errno);
+/* رقمُ خرقِ `CHECK` **يختلف بالمحرِّك**: 3819 في MySQL و4025 في MariaDB — وكان
+   الشرطُ 3819 حرفيًّا على مارياDB فيرسب **والقيدُ يمنع فعلًا**. (`_guard_env.php`) */
+check($okq === false && ems_test_is_check_violation($conn->errno),
+    'تحريفُ المعادل عن ROUND(amount×fx) يُرفض CHECK: '
+    . ems_test_check_errno_label($conn->errno));
 
 // ═══ ③ الناشر ═══
 head('③ الناشرُ يحسب الثلاثية عند النشر');

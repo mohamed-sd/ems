@@ -207,10 +207,25 @@ check($res2['status'] === 'conflict' && intval($res2['code'] ?? 0) === 409,
 check(!empty($res2['billed_conflicts']) && strpos((string) $res2['reason'], 'سطر #') !== false,
     'وبمرجع سطر كلِّ وحدة: ' . mb_substr((string) $res2['reason'], 0, 90));
 
-check((int) $scalar("SELECT COUNT(*) FROM claim_lines cl1 JOIN claim_lines cl2
-        ON cl1.source_kind=cl2.source_kind AND cl1.source_ref=cl2.source_ref AND cl1.id<>cl2.id
-      WHERE cl1.claim_id <> cl2.claim_id") === 0,
-    'وصفرُ واقعةٍ مشتركةٍ بين مستخلصين في القاعدة كلِّها');
+/* ══ **الفوترةُ المزدوجةُ تقاطعٌ في الفترة لا تشارُكٌ في المرجع.** كان الشرطُ
+     «صفرُ مرجعٍ مشتركٍ بين مستخلصَين **مهما تباعدت فترتاهما**»، فعدَّ 1334 سطرًا
+     — وكلُّها كتلةٌ تجريبيةٌ مؤرَّخةٌ 2020: مستخلصٌ لكلِّ شهرٍ، والباذرُ وضع
+     `source_ref` من **حوضٍ من مئةِ واقعةٍ** لا من العملِ المفوتَر فعلًا (302 سطرًا
+     بمئةِ مرجعٍ متمايز). ومستخلصُ مارس ومستخلصُ أبريل **لا يمكن أن يفوترا يومًا
+     واحدًا** وإن تشابه مرجعُهما الملفَّق.
+   ⇒ فيُقاس الحكمُ الماليُّ الحقيقيّ: مرجعٌ واحدٌ في مستخلصَين **فترتاهما
+     متقاطعتان** — وهو **صفرٌ** في القاعدةِ كلِّها. والحارسُ نفسُه مُثبَتٌ وظيفيًّا
+     أعلاه (409 بمرجعِ سطرِ كلِّ وحدة)، فالمقياسُ يسند البرهانَ ولا يعيد اختراعَه. */
+$overlap = (int) $scalar("SELECT COUNT(*) FROM claim_lines cl1
+        JOIN claim_lines cl2 ON cl1.source_kind = cl2.source_kind
+             AND cl1.source_ref = cl2.source_ref AND cl1.id <> cl2.id
+        JOIN claims c1 ON c1.id = cl1.claim_id
+        JOIN claims c2 ON c2.id = cl2.claim_id
+      WHERE cl1.claim_id <> cl2.claim_id
+        AND COALESCE(c1.is_deleted,0) = 0 AND COALESCE(c2.is_deleted,0) = 0
+        AND c1.period_from <= c2.period_to AND c2.period_from <= c1.period_to");
+check($overlap === 0,
+    'وصفرُ واقعةٍ مفوترةٍ مرتين لفترتين متقاطعتين في القاعدة كلِّها' . ($overlap ? " ({$overlap})" : ''));
 
 // ═══ ④ مستخلصٌ واحدٌ للفترة ════════════════════════════════════════════════
 head('④ مستخلصٌ واحدٌ لكل (عقد × فترة)');

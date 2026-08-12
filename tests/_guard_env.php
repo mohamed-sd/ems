@@ -69,3 +69,28 @@ if (!function_exists('ems_test_env_override')) {
         return file_put_contents($overlayFile, $out) !== false;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   رمزُ خطأِ خرقِ قيدِ `CHECK` — **يختلف بالمحرِّك ولا يُكتب رقمًا واحدًا**
+   ───────────────────────────────────────────────────────────────────────────
+   `MySQL 8` يردُّ **3819** (`ER_CHECK_CONSTRAINT_VIOLATED`) و`MariaDB` يردُّ
+   **4025** (`ER_CONSTRAINT_FAILED`). وفاحصانِ في هذا المستودعِ كانا يشترطان
+   3819 حرفيًّا على محرِّكِ MariaDB — **فيرسبان والحارسُ يعمل**: الكتابةُ مردودةٌ
+   فعلًا وبقيدٍ، والرقمُ وحدَه مختلف. ومع دخولِ 136 قاعدةَ عملٍ إلى طبقةِ المنعِ
+   صار الرقمُ يُقاس في مواضعَ كثيرة، فيُعلَن **مرةً واحدةً** هنا.
+   ═══════════════════════════════════════════════════════════════════════════ */
+if (!function_exists('ems_test_is_check_violation')) {
+    /** أهو خرقُ قيدِ `CHECK` على أيِّ المحرِّكين؟ */
+    function ems_test_is_check_violation($errno)
+    {
+        return in_array((int) $errno, array(3819, 4025), true);
+    }
+    /** نصُّ إعلانٍ يذكر الرقمَ ومحرِّكَه — فلا يُقرأ رقمٌ مجرَّدٌ بلا معنى. */
+    function ems_test_check_errno_label($errno)
+    {
+        $e = (int) $errno;
+        if ($e === 4025) { return '4025 (MariaDB · ER_CONSTRAINT_FAILED)'; }
+        if ($e === 3819) { return '3819 (MySQL · ER_CHECK_CONSTRAINT_VIOLATED)'; }
+        return (string) $e;
+    }
+}

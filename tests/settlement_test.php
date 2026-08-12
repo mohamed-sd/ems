@@ -221,8 +221,11 @@ $conn->query("INSERT INTO fin_requests (company_id, request_no, request_type, so
               beneficiary_type, amount, currency, created_at)
               VALUES ({$CO}, 'TSTREQ-{$MARK}', 'supplier_payment', 'suppliers',
               'supplier', 500, 'USD', NOW())");
-check($conn->errno === 3819,
-    '★ دفعُ موردٍ بلا مرجعِ تسويةٍ يُرفض بنيويًّا (errno=' . $conn->errno . ')');
+/* رقمُ خرقِ `CHECK` **يختلف بالمحرِّك**: 3819 في MySQL و4025 في MariaDB — وكان
+   الشرطُ 3819 حرفيًّا على مارياDB فيرسب **والحارسُ يعمل**. (`_guard_env.php`) */
+check(ems_test_is_check_violation($conn->errno),
+    '★ دفعُ موردٍ بلا مرجعِ تسويةٍ يُرفض بنيويًّا (errno='
+    . ems_test_check_errno_label($conn->errno) . ')');
 
 $conn->query("INSERT INTO fin_requests (company_id, request_no, request_type, source_module,
               beneficiary_type, amount, currency, created_at)
