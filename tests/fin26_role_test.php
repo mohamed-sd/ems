@@ -59,8 +59,18 @@ $q = $conn->query("SELECT n.door, n.route, n.module_id, m.id mid FROM nav_items 
                     LEFT JOIN modules m ON m.id = n.module_id
                    WHERE n.role_id = 26 AND n.active = 1");
 while ($x = $q->fetch_assoc()) { $nav[$x['route']] = $x; }
-check(isset($nav['Financing/financing_board.php']) && $nav['Financing/financing_board.php']['door'] === 'HOME',
-    'صف HOME «الرئيسية» يفتح لوحته (الشاشة 214)');
+/* ◆ **توقُّعٌ سبقَ توحيدَ القوائم**: كان يشترط لوحةَ التمويلِ في بابِ `HOME`.
+     والمقيسُ أن `HOME` فيه `main/my_workspace.php` في **25 دورًا** — وهو
+     العقدُ الموحَّد — و`unified_nav_test` يشترط «صفٌّ واحدٌ لكلِّ دورٍ نشط» في
+     بابِ الرئيسية. فنقلُ اللوحةِ إلى `HOME` يجعل للدور 26 صفَّين فيُرسِب
+     فاحصًا آخرَ **بحقّ**: توقُّعانِ متناقضانِ لا عيبٌ واحد.
+   ⇒ يُقاس المعنى: بابُ الرئيسيةِ **صفٌّ واحدٌ موحَّد**، ولوحةُ الدورِ حاضرةٌ
+     في بيتِها `DAILY` كما هي `main/role_board.php` عنده. */
+check(isset($nav['main/my_workspace.php']) && $nav['main/my_workspace.php']['door'] === 'HOME',
+    'بابُ الرئيسيةِ موحَّدٌ: مساحةُ عملي (العقدُ نفسُه في 25 دورًا)');
+check(isset($nav['Financing/financing_board.php'])
+      && $nav['Financing/financing_board.php']['door'] === 'DAILY',
+    'ولوحةُ التمويلِ (214) حاضرةٌ في بيتِها `DAILY` — لوحةُ دورٍ لا بابُ رئيسية');
 check(isset($nav['Financing/financiers_registry.php']) && $nav['Financing/financiers_registry.php']['door'] === 'FIN', 'FIN: سجل الممولين (210)');
 check(isset($nav['Financing/financing_operation_new.php']) && $nav['Financing/financing_operation_new.php']['door'] === 'FIN', 'FIN: إنشاء عملية تمويل (211)');
 check(isset($nav['Reports/approval_lag_report.php']) && $nav['Reports/approval_lag_report.php']['door'] === 'REP', 'REP: مؤشر 212');
