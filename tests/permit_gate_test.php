@@ -78,12 +78,53 @@ $mk = function ($person, $type, $unit) use ($conn, $CO, $SITE, $today, $to, $DEC
             array('line_type' => 'functional', 'reports_to_assignment_id' => 0))));
     return $r;
 };
-// خطا التبعية يحتاجان مرجعًا — أنشئ مركزيًّا أولًا بلا خطوط
-$rc = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9300,
-    'assignment_type_code' => 'maintenance_mgr', 'org_unit_id' => $mntUnit,
-    'scope_type' => 'site_group', 'scope_id' => 0, 'valid_from' => $today, 'valid_to' => $to,
-    'decided_by_person_id' => $DECIDER, 'decision_ref' => $MARK));
-$CEN = $rc['asg_id'];
+/* ══ خطا التبعية يحتاجان مرجعًا — ويُعاد استعمالُ القائمِ لا يُنشأ ثانٍ.
+     **العيبُ المقيس**: الخدمةُ تحرس «تكليفٌ واحدٌ في أيِّ لحظةٍ للنوعِ والنطاقِ
+     نفسيهما» (409)، وفي القاعدةِ تكليفٌ مركزيٌّ قائمٌ لـ`maintenance_mgr` على
+     `site_group 0` (#145) **من بياناتِ النظامِ لا من بقايا فاحص**. فكانت
+     البذرةُ تُنشئ ثانيًا فتُردّ، فيعود `asg_id = 0`، فتفشل خطوطُ التبعيةِ
+     كلُّها ويتساقط عشرةُ فحوصٍ — **والحارسُ يعمل بحقٍّ والبذرةُ هي المخطئة**.
+   ⇒ يُبحَث عن القائمِ أولًا، ولا يُنشأ إلا إن لم يكن. */
+/* ◆ **والمفتاحُ اسمُه `asg_id` لا `id`** — مقيسٌ من `SHOW COLUMNS`. (وكان أولُ
+     بحثٍ لي بـ`id` فعاد فارغًا فقُرئ «لا تكليفَ مركزيًّا» وهو قائم.) */
+$findCen = function () use ($conn, $CO) {
+    $q = $conn->query("SELECT asg_id FROM org_assignments
+                        WHERE company_id = {$CO} AND assignment_type_code = 'maintenance_mgr'
+                          AND scope_type = 'site_group' AND scope_id = 0
+                          AND state IN ('active','suspended')
+                        ORDER BY asg_id LIMIT 1");
+    $x = $q ? $q->fetch_row() : null;
+    return $x ? (int) $x[0] : 0;
+};
+/* ◆ **كنسُ بقايا الجولاتِ الميتةِ بالأشخاصِ المحجوزين لا بالوسمِ وحدَه.**
+     الوسمُ `PGT<pid>` لكلِّ عمليةٍ على حدة، فجولةٌ تنفجر تترك تكليفَها بوسمِ
+     pid آخرَ فلا يمسّه كنسُ الجولةِ التالية — وحارسُ «تكليفٌ واحدٌ في أيِّ
+     لحظةٍ للنوعِ والنطاق» يرفض حينها **بحقّ** فيتساقط عشرةُ فحوص. وقع فعلًا:
+     التكليفُ #353 (شخص 9301 · وسم PGT3360) عطّل الفاحصَ حتى مُحي.
+     والأشخاصُ 9300-9303 محجوزون لهذا الفاحصِ وحدَه، فكنسُهم آمنٌ ويجعله
+     **يشفي نفسَه**. */
+/* ◆ **وأربعةُ مفاتيحَ تشير إلى `org_assignments` كلُّها بـ`asg_id`** — مقيسةٌ
+     من `information_schema`: `assignment_audit` · `assignment_capabilities` ·
+     و`assignment_reporting_lines` بعمودَين (`asg_id` **و**`reports_to_assignment_id`).
+     فحذفُ الأبِ قبلَ أبنائه يُردُّ بمفتاحٍ أجنبيّ، والحذفُ بعمودٍ اسمُه
+     `assignment_id` يرمي «Unknown column». فالكنسُ **بالترتيبِ وبالأسماءِ
+     المقيسة**: الأبناءُ أولًا (وبالعمودَين معًا) ثم الأب. */
+$__probeAsg = "SELECT asg_id FROM (SELECT asg_id FROM org_assignments
+                 WHERE person_id BETWEEN 9300 AND 9303) x";
+$conn->query("DELETE FROM assignment_reporting_lines
+               WHERE asg_id IN ({$__probeAsg}) OR reports_to_assignment_id IN ({$__probeAsg})");
+$conn->query("DELETE FROM assignment_capabilities WHERE asg_id IN ({$__probeAsg})");
+$conn->query("DELETE FROM assignment_audit WHERE asg_id IN ({$__probeAsg})");
+$conn->query('DELETE FROM org_assignments WHERE person_id BETWEEN 9300 AND 9303');
+$CEN = $findCen();
+if ($CEN <= 0) {
+    $rc = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9300,
+        'assignment_type_code' => 'maintenance_mgr', 'org_unit_id' => $mntUnit,
+        'scope_type' => 'site_group', 'scope_id' => 0, 'valid_from' => $today, 'valid_to' => $to,
+        'decided_by_person_id' => $DECIDER, 'decision_ref' => $MARK));
+    $CEN = isset($rc['asg_id']) ? (int) $rc['asg_id'] : 0;
+    if ($CEN <= 0) { $CEN = $findCen(); }
+}
 $fix = function ($r) use ($conn, $CEN) {
     return $r;
 };
@@ -94,7 +135,9 @@ $rMov = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9301,
     'reporting_lines' => array(
         array('line_type' => 'operational', 'reports_to_assignment_id' => $CEN),
         array('line_type' => 'functional', 'reports_to_assignment_id' => $CEN))));
-check($rMov['ok'], 'بُذر مدير حركة الموقع (9301)');
+check($rMov['ok'], 'بُذر مدير حركة الموقع (9301) — '
+    . (empty($rMov['ok']) ? ($rMov['code'] . ': ' . $rMov['reason'] . ' · CEN=' . $CEN
+        . ' · unit=' . $unitId . ' · site=' . $SITE) : 'ok'));
 $rMnt = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9302,
     'assignment_type_code' => 'site_maintenance_officer', 'org_unit_id' => $mntUnit,
     'scope_type' => 'site', 'scope_id' => $SITE, 'valid_from' => $today, 'valid_to' => $to,
@@ -122,7 +165,8 @@ check(!$r['ok'] && $r['code'] === 403, 'شخص بلا تكليف يوافق عن
 
 head('③ اكتمال التسلسل → approved');
 $r = PG::approve($conn, $REQ, 9301, 'approve');
-check($r['ok'] && $r['state'] === 'pending', 'الحركة وافقت (1/3)');
+check($r['ok'] && $r['state'] === 'pending', 'الحركة وافقت (1/3) — '
+    . (empty($r['ok']) ? ($r['code'] . ': ' . $r['reason']) : ('state=' . $r['state'])));
 $r = PG::approve($conn, $REQ, $FLEET, 'approve');
 check($r['ok'] && $r['state'] === 'pending', 'الأسطول وافق (2/3) — دور موازٍ بusers.role');
 $r = PG::approve($conn, $REQ, 9302, 'approve');

@@ -25,7 +25,15 @@ class PermitGate
 {
     /** المجال الوظيفي → أنواع التكليف الحاملة له (موقعيًّا فمركزيًّا). */
     private static $roleAssignmentTypes = array(
-        'movement' => array('site_manager'),
+        /* ◆ **مجالُ الحركةِ كان يُسند إلى `site_manager` وحدَه** — فمن يحمل
+             تكليفَ حركةِ الموقعِ صراحةً لا يستطيع أن يوافق عن مجالِه، ويقع
+             القرارُ على مديرِ الموقعِ بالنيابةِ دائمًا.
+             وقد سُجِّل `site_movement_mgr` نوعًا بقرارِ المالك (هجرة
+             `2027_02_13`) — ونوعٌ مسجَّلٌ لا يحرسه أحدٌ **بناءٌ بلا تبنٍّ**
+             (MD-05). فيُقدَّم على مديرِ الموقعِ كما تفعل سائرُ المجالات:
+             الموقعيُّ أولًا ثم مَن يغطّيه.
+             و`site_manager` يبقى في القائمةِ — فلا يُكسر ما يعمل. */
+        'movement' => array('site_movement_mgr', 'site_manager'),
         'maintenance' => array('site_maintenance_officer', 'maintenance_mgr'),
         'operators' => array('site_operators_officer', 'operators_mgr'),
         'warehouse' => array('site_warehouse_keeper', 'warehouse_mgr'),
