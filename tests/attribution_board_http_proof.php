@@ -28,6 +28,8 @@ function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 function info($m) { fwrite(STDOUT, "     · {$m}\n"); }
 
 function ab_req($url, $jar, $post = null) {
+    $GLOBALS['__ems_last_url'] = $url;   // لحلِّ Location النسبيّ
+    $GLOBALS['__ems_last_jar'] = $jar;   // جرَّةُ الجلسةِ لقراءةِ الوميض
     /* الرمزُ المركزيُّ: الحارسُ يقبله في الحقولِ أو الترويسة، والمسبارُ
        يبني الحقولَ يدويًّا فلا يحمله ⇒ 403 صامتٌ يُقرأ فشلًا في المنتج. */
     if ($post !== null) {
@@ -58,13 +60,24 @@ function ab_login($user, $jar) {
     return ab_req($BASE . '/login.php', $jar, array('username' => $user, 'password' => '12345678',
         'csrf_token' => isset($m[1]) ? $m[1] : ''));
 }
+/**
+ * رسالةُ الشاشةِ **لا تسكن العنوانَ دائمًا**: `ems_gov_flash_redirect` يخزّنها
+ * في الجلسةِ ويوجّه بعنوانٍ بلا `?msg=`. فقراءةُ المُعامَلِ وحدَها تجد فراغًا
+ * وتحكم على منتجٍ **نفَّذ الفعلَ فعلًا** بالفشل (مقيسٌ: الصفُّ كُتب والرسالةُ
+ * قُرئت فارغةً). والمساعدُ المشترَك يقرأ الاثنين.
+ * والأصلُ **دليلُ الشاشةِ** لا جِذرُ التطبيق: `Location` نسبيٌّ
+ * (`…php?contract=2`) فيُحَلُّ من دليلِ آخرِ طلبٍ، وإلا خرج عن المسارِ فجاء
+ * جسمٌ خاويًا.
+ */
 function ab_msg($headers) {
-    if (preg_match('~Location:\s*(\S+)~i', $headers, $m)) {
-        $q = parse_url(trim($m[1]), PHP_URL_QUERY);
-        parse_str((string) $q, $p);
-        return isset($p['msg']) ? $p['msg'] : '';
-    }
-    return '';
+    require_once __DIR__ . '/_http_flash.php';
+    $dir = isset($GLOBALS['__ems_last_url'])
+        ? preg_replace('~/[^/]*(\?.*)?$~', '', (string) $GLOBALS['__ems_last_url'])
+        : '';
+    return ems_flash_or_msg($headers, $dir, function ($u) {
+        $r = ab_req($u, $GLOBALS['__ems_last_jar'], null);
+        return is_array($r) ? (string) $r[count($r) - 1] : (string) $r;
+    });
 }
 
 require_once dirname(__DIR__) . '/includes/env.php';

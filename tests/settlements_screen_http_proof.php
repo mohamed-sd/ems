@@ -28,6 +28,8 @@ function check($c, $m) { $c ? ok($m) : bad($m); }
 function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 
 function sq_req($url, $jar, $post = null) {
+    $GLOBALS['__ems_last_url'] = $url;   // لحلِّ Location النسبيّ
+    $GLOBALS['__ems_last_jar'] = $jar;   // جرَّةُ الجلسةِ لقراءةِ الوميض
     /* الرمزُ المركزيُّ: الحارسُ يقبله في الحقولِ أو الترويسة، والمسبارُ
        يبني الحقولَ يدويًّا فلا يحمله ⇒ 403 صامتٌ يُقرأ فشلًا في المنتج. */
     if ($post !== null) {
@@ -62,13 +64,24 @@ function sq_tok($body) {
     preg_match('~name="csrf_token"\s+value="([^"]+)"~', $body, $m);
     return isset($m[1]) ? $m[1] : '';
 }
+/**
+ * رسالةُ الشاشةِ **لا تسكن العنوانَ دائمًا**: `ems_gov_flash_redirect` يخزّنها
+ * في الجلسةِ ويوجّه بعنوانٍ بلا `?msg=`. فقراءةُ المُعامَلِ وحدَها تجد فراغًا
+ * وتحكم على منتجٍ **نفَّذ الفعلَ فعلًا** بالفشل (مقيسٌ: الصفُّ كُتب والرسالةُ
+ * قُرئت فارغةً). والمساعدُ المشترَك يقرأ الاثنين.
+ * والأصلُ **دليلُ الشاشةِ** لا جِذرُ التطبيق: `Location` نسبيٌّ
+ * (`…php?contract=2`) فيُحَلُّ من دليلِ آخرِ طلبٍ، وإلا خرج عن المسارِ فجاء
+ * جسمٌ خاويًا.
+ */
 function sq_msg($headers) {
-    if (preg_match('~Location:\s*(\S+)~i', $headers, $m)) {
-        $q = parse_url(trim($m[1]), PHP_URL_QUERY);
-        parse_str((string) $q, $p);
-        return isset($p['msg']) ? $p['msg'] : '';
-    }
-    return '';
+    require_once __DIR__ . '/_http_flash.php';
+    $dir = isset($GLOBALS['__ems_last_url'])
+        ? preg_replace('~/[^/]*(\?.*)?$~', '', (string) $GLOBALS['__ems_last_url'])
+        : '';
+    return ems_flash_or_msg($headers, $dir, function ($u) {
+        $r = sq_req($u, $GLOBALS['__ems_last_jar'], null);
+        return is_array($r) ? (string) $r[count($r) - 1] : (string) $r;
+    });
 }
 
 require_once dirname(__DIR__) . '/includes/env.php';
@@ -97,6 +110,11 @@ $cleanup = function () use ($db, $MARK) {
     $db->query("DELETE FROM fin_financial_events WHERE root_event_id IN ({$orphan})");
     $db->query("DELETE FROM ems_business_events WHERE id IN ({$orphan})");
     $db->query("DELETE FROM fin_dues WHERE period_ref = '2093-05'");
+    /* وثائقُ المورد قبلَ المورد — ووسمُها في `doc_number` فيُكنس ما بُذر وحدَه */
+    $db->query("DELETE FROM equipment_documents
+                 WHERE subject_type = 'supplier' AND doc_no LIKE 'DOC-{$MARK}%'");
+    $db->query("DELETE d FROM equipment_documents d JOIN suppliers s ON s.id = d.subject_id
+                 WHERE d.subject_type = 'supplier' AND s.name LIKE '%{$MARK}%'");
     $db->query("DELETE FROM suppliers WHERE name LIKE '%{$MARK}%'");
 };
 $cleanup();
@@ -104,6 +122,31 @@ $cleanup();
 // مورّدٌ صافيه سالبٌ عمدًا: استحقاقٌ 400 وتحميلُ وقودٍ 1000 (بالدولار — له سعر)
 $db->query("INSERT INTO suppliers (company_id, name, created_at) VALUES ({$CO}, 'موردُ {$MARK}', NOW())");
 $SUP = $db->insert_id;
+/* ══ **موردٌ صالحٌ للدفعِ لا موردٌ عارٍ** ═══════════════════════════════════════
+   `SupplierDocumentService::gateFor` بوابةٌ حيةٌ تمنع إجازةَ تسويةٍ لموردٍ:
+     · `bank_verified_at IS NULL` ⇒ «الحسابُ البنكيُّ غيرُ موثَّق — ودفعٌ إلى
+       حسابٍ غيرِ موثَّقٍ خطرٌ لا إجراء»، و
+     · تنقصه الوثيقتان النظاميتان (`REQUIRED_DOC_TYPES`): **سجل تجاري** و
+       **شهادة ضريبية** (تُقرآن من `equipment_documents` بـ`subject_type='supplier'`).
+   والبذرُ كان يخلق موردًا **عاريًا** ثم يطلب إجازةَ تسويتِه — فتردُّه البوابةُ
+   بحقٍّ، فسقط أحدَ عشرَ فحصًا على منتجٍ يعمل كما يجب. والبوابةُ **لا تُعطَّل**
+   لأن تعطيلَها يُخفي حارسًا ماليًّا حقيقيًّا؛ بل يُستكمل المورد كما يُستكمل في
+   الواقعِ قبل أيِّ دفع. وتواريخُ الصلاحيةِ في المستقبلِ فلا «منتهية» تُحجب.  */
+/* و`ck_sup_bank_verified` في القاعدةِ يُلزم **مستندَ التوثيق** مع تاريخِه:
+   `bank_verified_at IS NULL OR (bank_account_no <> '' AND bank_doc_ref <> '')`
+   — أي «لا توثيقَ بلا مستندٍ يقابله»، وهو القيدُ نفسُه في كلِّ هذا النظام. */
+$db->query("UPDATE suppliers
+               SET bank_account_no = 'ACC-{$MARK}',
+                   bank_doc_ref    = 'BNK-DOC-{$MARK}',
+                   bank_verified_at = NOW(),
+                   bank_verified_by = 1
+             WHERE id = {$SUP}");
+foreach (array('سجل تجاري', 'شهادة ضريبية') as $__i => $__dt) {
+    $db->query("INSERT INTO equipment_documents (company_id, subject_type, subject_id, doc_type,
+                    doc_no, issue_date, expiry_date, created_at)
+                VALUES ({$CO}, 'supplier', {$SUP}, '{$__dt}',
+                        'DOC-{$MARK}-{$__i}', '2026-01-01', '2099-12-31', NOW())");
+}
 // M-11: الخصمُ يلزمه مصدرٌ (قيدُ `ck_dues_debit_source` في القاعدة) — والوقودُ
 // يُبذر بسند صرفٍ كما يقع في الواقع (قرارُ المالك: «لا جدولَ وقودٍ لكن نعم جدولُ صرف»).
 $mk = function ($dir, $type, $amt) use ($db, $CO, $SUP, $PER) {
@@ -245,6 +288,20 @@ head('⑥-ب الصافي الموجب يولّد طلبَ دفعٍ برابطه
 
 $db->query("INSERT INTO suppliers (company_id, name, created_at) VALUES ({$CO}, 'دائنُ {$MARK}', NOW())");
 $SUP2 = $db->insert_id;
+/* والمورّدُ الثاني يُستكمل كالأوّلِ — فطلبُ الدفعِ الآليُّ يمرُّ ببوابةِ المستندات
+   نفسِها، ولا معنى لبرهانِ «تولّد طلبُ دفعٍ» على موردٍ لا يجوز الدفعُ له. */
+$db->query("UPDATE suppliers
+               SET bank_account_no = 'ACC2-{$MARK}',
+                   bank_doc_ref    = 'BNK-DOC2-{$MARK}',
+                   bank_verified_at = NOW(),
+                   bank_verified_by = 1
+             WHERE id = {$SUP2}");
+foreach (array('سجل تجاري', 'شهادة ضريبية') as $__i => $__dt) {
+    $db->query("INSERT INTO equipment_documents (company_id, subject_type, subject_id, doc_type,
+                    doc_no, issue_date, expiry_date, created_at)
+                VALUES ({$CO}, 'supplier', {$SUP2}, '{$__dt}',
+                        'DOC-{$MARK}-2{$__i}', '2026-01-01', '2099-12-31', NOW())");
+}
 $st = $db->prepare("INSERT INTO fin_dues (company_id, party_type, party_ref, due_type, direction,
                     amount, currency, period_ref, created_by, created_at)
                     VALUES (?, 'supplier', ?, 'hours', 'credit', 900.00, 'USD', ?, 1, NOW())");
