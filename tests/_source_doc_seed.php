@@ -36,6 +36,31 @@ if (!function_exists('seed_source_invoice')) {
         $st->close();
         if ($row) { return (int) $row['id']; }
 
+        /* ◆ **عيبٌ مقيسٌ في هذه الدالةِ نفسِها**: `tax_invoices.claim_id` مفتاحٌ
+             أجنبيٌّ **إلزاميٌّ** إلى `claims(id)`، وتمريرُ صفرٍ يرفضه
+             `Cannot add or update a child row` فتفشل البذرةُ ويُقرأ فشلُها
+             عيبًا في الفاحص. فإن لم يُمرَّر مستخلصٌ يُختار مستخلصٌ حقيقيٌّ
+             لهذه الشركة. (وكذلك `client_id`.) */
+        $claimId = (int) $claimId;
+        if ($claimId <= 0) {
+            $q = $conn->query("SELECT id, client_id FROM claims WHERE company_id = {$company}
+                                ORDER BY id DESC LIMIT 1");
+            $cr = $q ? $q->fetch_assoc() : null;
+            if ($cr) {
+                $claimId = (int) $cr['id'];
+                if ((int) $clientId <= 0) { $clientId = (int) $cr['client_id']; }
+            }
+        }
+        if ($claimId <= 0) {
+            fwrite(STDERR, "seed_source_invoice: لا مستخلصَ في الشركة {$company} — لا تُبذر فاتورة\n");
+            return 0;
+        }
+        if ((int) $clientId <= 0) {
+            $q = $conn->query("SELECT client_id FROM claims WHERE id = {$claimId}");
+            $cr = $q ? $q->fetch_row() : null;
+            $clientId = $cr ? (int) $cr[0] : 1;
+        }
+
         /* رقمٌ تسلسليٌّ في فراغٍ لا يصطدم بالحقيقي */
         $year = (int) date('Y');
         $seq  = (int) $conn->query("SELECT COALESCE(MAX(serial_seq), 900000) + 1 FROM tax_invoices

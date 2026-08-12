@@ -32,14 +32,23 @@ $dup = $conn->query("INSERT INTO nav_items (role_id, door, label_ar, route, sort
                      SELECT role_id, door, label_ar, route, sort_order FROM nav_items WHERE role_id = 1 LIMIT 1");
 ok('القيد الفريد (دور×مسار) يرفض التكرار', $dup === false && stripos($conn->error, 'Duplicate') !== false);
 
-// DEC-01 ②: الأبواب ثمانية بقرار صريح — أُضيف GOV (الحوكمة) وFIN (التمويل
-// خلف بوابة المجال المقيَّد)؛ ودمجُهما كان يضع مستويَي سرية تحت سقف واحد.
-ok('أبواب العناصر كلها من الثمانية المشروعة (DEC-01 ②)',
-    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE door NOT IN ('HOME','DAILY','APPR','REC','REP','GOV','FIN','SET')")->fetch_row()[0]) === 0);
-
+/* DEC-01 ②: كانت الأبواب **ثمانية** بقرار صريح — أُضيف GOV (الحوكمة) وFIN
+   (التمويل خلف بوابة المجال المقيَّد)؛ ودمجُهما كان يضع مستويَي سرية تحت سقف
+   واحد.
+   ◆ **وصارت تسعة**: `RISK` سُجِّل 2026-08-10 تحت `INJ-0059` في
+     `unifiedNavDoors()` وفي تعليقه رفضٌ صريحٌ لطيّه تحت GOV. والواقع يوافق
+     الشيفرة: 80 صفًّا في **18 دورًا**. فاشتراطُ ثمانيةٍ هنا **توقُّعٌ متعفِّنٌ**
+     يُرسِب مواصفةً نافذة — لا عيبًا في المنتج.
+   ◆ **ولا يُكتب العددُ رقمًا مرةً ثانية**: المصدرُ الواحد هو `unifiedNavDoors()`،
+     فيُقاس المخزونُ **به** لا بقائمةٍ منسوخةٍ تتعفّن مرةً أخرى.
+     (والقاعدةُ تحرسه أيضًا بـ`chk_nav_door` — رُمِّم بتسعةٍ في `2027_02_05`.) */
 $__d = unifiedNavDoors();
-ok('قاموس الأبواب ثمانية وفيه الحوكمة والتمويل',
-    count($__d) === 8 && isset($__d['GOV']) && isset($__d['FIN']));
+$__list = "'" . implode("','", array_keys($__d)) . "'";
+ok('أبواب العناصر كلها من القاموس الحيِّ (DEC-01 ② + INJ-0059)',
+    intval($conn->query("SELECT COUNT(*) FROM nav_items WHERE door NOT IN ({$__list})")->fetch_row()[0]) === 0);
+
+ok('قاموس الأبواب تسعةٌ وفيه الحوكمة والتمويل والمخاطر',
+    count($__d) === 9 && isset($__d['GOV']) && isset($__d['FIN']) && isset($__d['RISK']));
 
 ok('صفر مسارٍ مكرر داخل قائمة أي دور',
     intval($conn->query("SELECT COUNT(*) FROM (SELECT role_id, route FROM nav_items GROUP BY role_id, route HAVING COUNT(*) > 1) d")->fetch_row()[0]) === 0);

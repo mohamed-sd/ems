@@ -47,6 +47,24 @@ $APPR = 922;   // مُجيزٌ وهمي
 
 // ── الكنس: الإسقاطُ قبل الجذر (FK على root_event_id) ──────────────────────
 $cleanup = function () use ($conn, $MARK) {
+    /* ══ الكنسُ بالوسمِ **وبالفترةِ المحجوزة** معًا.
+         العيبُ المقيس: الوسمُ `CDN<pid>` **لكلِّ عمليةٍ على حدة**، فجولةٌ تنفجر
+         تترك مستخلصَها بوسمِ pid آخرَ فلا يمسّه كنسُ الجولةِ التالية — و
+         `uq_claim_period (company_id, contract_id, period_from, period_to)`
+         يحجز الفترةَ فيفشل كلُّ إدراجٍ بعده **صمتًا** (`insert_id = 0`) ثم
+         ينفجر النشرُ على `entity_id = 0`. وقع فعلًا: صفٌّ من 15:42 عطّل
+         الفاحصَ حتى مُحي يدويًّا.
+         وسنةُ 2094 محجوزةٌ للجسِّ في هذا الفاحصِ حصرًا، فكنسُها آمنٌ ويجعله
+         **يشفي نفسَه** بدل أن يحتاج يدًا. */
+    $conn->query("DELETE FROM credit_debit_notes WHERE claim_id IN
+                    (SELECT id FROM (SELECT id FROM claims
+                       WHERE contract_id = 5 AND period_from LIKE '2094-%') x)");
+    $conn->query("DELETE FROM claim_lines WHERE claim_id IN
+                    (SELECT id FROM (SELECT id FROM claims
+                       WHERE contract_id = 5 AND period_from LIKE '2094-%') x)");
+    $conn->query("UPDATE claims SET receivable_id = NULL
+                   WHERE contract_id = 5 AND period_from LIKE '2094-%'");
+    $conn->query("DELETE FROM claims WHERE contract_id = 5 AND period_from LIKE '2094-%'");
     $conn->query("DELETE FROM credit_debit_notes WHERE claim_id IN
                     (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$MARK}%') x)");
     $conn->query("DELETE FROM claim_lines WHERE claim_id IN
