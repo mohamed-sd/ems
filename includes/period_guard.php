@@ -110,17 +110,48 @@ if (!function_exists('ems_period_close_blockers')) {
             }
         }
 
-        // ③ فروقُ مطابقةٍ بنكيةٍ مفتوحة — الجدولُ يُبنى في H-13؛ غيابُه = صفرٌ معلَن
+        /* ③ فروقُ مطابقةٍ بنكيةٍ مفتوحة — الجدولُ يُبنى في H-13؛ غيابُه = صفرٌ معلَن
+         * ═══════════════════════════════════════════════════════════════════
+         * ◆ **كان هذا الحارسُ ميتًا ولم يشتعل قطُّ.** خمسةُ أسماءٍ خاطئةٍ في
+         *   استعلامٍ واحد — قِيست بـ`SHOW COLUMNS` لا بالحدس:
+         *     `m.status`      ⇒ العمودُ `m.state`
+         *     `'Difference'`  ⇒ قيمةُ الـENUM `'open_difference'`
+         *     `m.line_id`     ⇒ `m.statement_line_id`
+         *     `l.line_id`     ⇒ `l.id`
+         *     `l.value_date`  ⇒ `l.txn_date`
+         *   و`config.php` يضبط mysqli على **عدمِ الرمي**، فالاستعلامُ يعود
+         *   `false` صامتًا و`$n` يصير 0 — فيُقرأ «لا فروقَ مفتوحة» وهو خطأُ
+         *   استعلامٍ. أي أنَّ فترةً كان يمكن إقفالُها وفيها فروقٌ بنكيةٌ مفتوحة.
+         * ◆ **وموضعان يسجّلان الفرقَ لا واحد**: `bank_recon_matches.state` (سجلُّ
+         *   المطابقة) و`bank_statement_lines.match_state` (وسمُ السطر). فسطرٌ
+         *   موسومٌ `difference` بلا صفِّ مطابقةٍ فرقٌ مفتوحٌ كذلك — فيُحسَب
+         *   الاثنان **بلا تكرارِ عدٍّ** (`NOT EXISTS` على الثاني).
+         * ◆ ويُفحَص مُرجَعُ الاستعلامِ: `null` تعني **فشلًا يُعلَن** لا صفرًا يُسكَت
+         *   عنه — فحارسٌ لا يعرف أنه أعمى أخطرُ من حارسٍ غائب.
+         * ═══════════════════════════════════════════════════════════════════ */
         $t = $conn->query("SHOW TABLES LIKE 'bank_recon_matches'");
         if ($t && $t->num_rows > 0) {
-            $r = $conn->query("SELECT COUNT(*) c FROM bank_recon_matches m
-                JOIN bank_statement_lines l ON l.line_id = m.line_id
-                WHERE m.company_id = {$companyId} AND m.status = 'Difference'
-                  AND l.value_date BETWEEN '{$s}' AND '{$e}'");
-            $n = $r ? intval($r->fetch_assoc()['c']) : 0;
-            if ($n > 0) {
-                $blockers[] = array('label' => 'فروقُ مطابقةٍ بنكيةٍ مفتوحة', 'count' => $n,
-                                    'link' => 'bank_recon_fin.php');
+            $q = $conn->query("SELECT
+                  (SELECT COUNT(*) FROM bank_recon_matches m
+                     JOIN bank_statement_lines l2 ON l2.id = m.statement_line_id
+                    WHERE m.company_id = {$companyId} AND m.state = 'open_difference'
+                      AND l2.txn_date BETWEEN '{$s}' AND '{$e}')
+                + (SELECT COUNT(*) FROM bank_statement_lines l
+                    WHERE l.company_id = {$companyId} AND l.match_state = 'difference'
+                      AND l.txn_date BETWEEN '{$s}' AND '{$e}'
+                      AND NOT EXISTS (SELECT 1 FROM bank_recon_matches m2
+                                       WHERE m2.statement_line_id = l.id)) AS c");
+            if ($q === false) {
+                /* الفشلُ يُعلَن حاجبًا — فلا يُقفَل دورٌ ماليٌّ بحارسٍ أعمى */
+                $blockers[] = array(
+                    'label' => 'تعذّر فحصُ فروقِ المطابقةِ البنكية — يُعالَج قبل الإقفال',
+                    'count' => -1, 'link' => 'bank_recon_fin.php');
+            } else {
+                $n = intval($q->fetch_assoc()['c']);
+                if ($n > 0) {
+                    $blockers[] = array('label' => 'فروقُ مطابقةٍ بنكيةٍ مفتوحة', 'count' => $n,
+                                        'link' => 'bank_recon_fin.php');
+                }
             }
         }
         return $blockers;

@@ -56,7 +56,12 @@ fwrite(STDOUT, "① التصدير من القاعدة الحية ($db @ $host:$
 $cmd = '"' . $dumpBin . '"'
      . ' --host=' . escapeshellarg($host) . ' --port=' . $port
      . ' --user=' . escapeshellarg($user) . ' --password=' . escapeshellarg($pass)
-     . ' --default-character-set=utf8mb4 --single-transaction --triggers --routines --events'
+    /* ◆ **`--add-drop-trigger` ليس زينة**: الدمبُ يحمل 554 `DROP TABLE IF EXISTS`
+         و12 `DROP VIEW IF EXISTS` وصفرَ `DROP TRIGGER` — فكلُّ كائنٍ فيه معادُ
+         التشغيلِ إلا القوادح. فإن انقطع استيرادٌ ثم استُؤنف (وهوستينجر يقطع
+         بمهلةِ PHP ويستأنف بإزاحةِ استعلاماتٍ تتزحلق) انفجر أولُ قادحٍ يمرُّ
+         مرتين بـ#1359 «Trigger already exists» وتوقّف ما بعده. */
+     . ' --default-character-set=utf8mb4 --single-transaction --triggers --add-drop-trigger --routines --events'
      . ' --skip-lock-tables ' . escapeshellarg($db);
 
 $proc = proc_open($cmd, array(1 => array('pipe', 'w'), 2 => array('pipe', 'w')), $pipes);
@@ -64,6 +69,8 @@ if (!is_resource($proc)) { fwrite(STDERR, "✘ تعذر تشغيل المصدّ�
 
 $dst = fopen($out, 'wb');
 $counts = array('definer' => 0, 'security' => 0, 'collate' => 0);
+$trg = array('create' => 0, 'drop' => 0);
+$objs = array('table' => array(), 'view' => array(), 'trigger' => array());
 $bytes = 0;
 while (($line = fgets($pipes[1])) !== false) {
     $n = 0;
@@ -73,6 +80,17 @@ while (($line = fgets($pipes[1])) !== false) {
     $counts['security'] += $n;
     $line = str_replace(array('utf8mb4_0900_ai_ci', 'utf8mb4_0900_as_cs'), 'utf8mb4_unicode_ci', $line, $n);
     $counts['collate'] += $n;
+    /* جردُ الكائنات في الطريق — منه بوابةُ القوادح وملفُّ التفريغ المرافق */
+    if (preg_match('~^(?:/\*!\d+ CREATE\*/.*?TRIGGER|CREATE\s+TRIGGER)\s+(`[^`]+`|[\w$]+)~i', $line, $m)) {
+        $trg['create']++;
+        $objs['trigger'][] = trim($m[1], '`');
+    } elseif (preg_match('~^(?:/\*!\d+ )?DROP TRIGGER~i', $line)) {
+        $trg['drop']++;
+    } elseif (preg_match('~^DROP TABLE IF EXISTS `([^`]+)`~', $line, $m)) {
+        $objs['table'][] = $m[1];
+    } elseif (preg_match('~^(?:/\*!\d+ )?DROP VIEW IF EXISTS `([^`]+)`~i', $line, $m)) {
+        $objs['view'][] = $m[1];
+    }
     $bytes += fwrite($dst, $line);
 }
 $err = stream_get_contents($pipes[2]);
