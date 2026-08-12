@@ -227,10 +227,23 @@ check($still >= 9, "★★ و**النصُّ الأصليُّ باقٍ في {$sti
 $review = CGS::pendingReview($gate);
 check(count($review) > 0,
       '★★ و**كلُّ منقولٍ يحمل `needs_review`** — الآلةُ تقترح والمالكُ يُقرّ (' . count($review) . ' صفًّا)');
+/* ══ **«لا أصلَ بالصدفة» ليست «لا أصلَ أبدًا».** كان الشرطُ `nature='asset'` = 0
+     على كلِّ منقولٍ من نصّ — وهو **مستحيلٌ بنيويًّا**: القيدُ `ck_cg_nature` في
+     القاعدةِ يفرض `kind='cash_retention' ⇔ nature='asset'` والعكسَ. فمحتجَزٌ
+     نقديٌّ **أصلٌ حقًّا** (مالٌ يعود إلينا) لا أصلٌ بالصدفة، والافتراضُ الآمنُ
+     «خارجَ الميزانية» يخصُّ ما عداه. فسبعُ محتجَزاتٍ نقديةٍ مشتقّةٍ من نصٍّ كانت
+     تُقرأ خرقًا وهي **موافقةٌ لقاعدةِ القاعدةِ حرفيًّا**.
+   ⇒ فيُقاس المقصودُ: صفرُ منقولٍ صار أصلًا **ونوعُه لا يقتضيه** — فيبقى الحكمُ
+     حارسًا على الصدفةِ، ويمرُّ ما تحكمه القاعدةُ. */
 $asset = intval($conn->query("SELECT COUNT(*) c FROM contract_guarantees
-                               WHERE source_text IS NOT NULL AND nature='asset'")->fetch_assoc()['c']);
+                               WHERE source_text IS NOT NULL AND nature = 'asset'
+                                 AND kind <> 'cash_retention'")->fetch_assoc()['c']);
+$assetOk = intval($conn->query("SELECT COUNT(*) c FROM contract_guarantees
+                                 WHERE source_text IS NOT NULL AND nature = 'asset'
+                                   AND kind = 'cash_retention'")->fetch_assoc()['c']);
 check($asset === 0,
-      '★★★ و**صفرُ منقولٍ صار أصلًا** — والافتراضُ الآمن «خارجَ الميزانية»: لا يصير شيءٌ أصلًا بالصدفة');
+      '★★★ و**صفرُ منقولٍ صار أصلًا ونوعُه لا يقتضيه** — لا يصير شيءٌ أصلًا بالصدفة'
+      . " (والمحتجَزُ النقديُّ أصلٌ بقيدِ `ck_cg_nature`: {$assetOk})");
 $pledge = intval($conn->query("SELECT COUNT(*) c FROM contract_guarantees
                                 WHERE source_text LIKE '%رهن%' AND kind='pledge'")->fetch_assoc()['c']);
 check($pledge > 0, "و«رهن سيارة» صُنّف **رهنًا** ({$pledge} صفًّا) — بمطابقةٍ حرفيةٍ لا تخمين");

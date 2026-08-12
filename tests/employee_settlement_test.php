@@ -249,8 +249,20 @@ $old = $conn->query("SELECT SUM(rp.can_add)+SUM(rp.can_edit)+SUM(rp.can_delete) 
                        FROM role_permissions rp JOIN modules m ON m.id=rp.module_id
                       WHERE m.code='Workforce/worker_settlement.php'")->fetch_assoc();
 check(intval($old['w']) === 0, 'والمسارُ اليدويُّ القديم أُحيل إلى العرض (صفرُ منحةِ كتابة)');
+/* ══ **الشرطُ كان يناقض عنوانَه.** العنوانُ يقول «**لم يُقطع عملٌ قائم** —
+     والجدولُ **باقٍ بحاله**»، والشرطُ كان `=== 0` أي **يطلب جدولًا فارغًا** —
+     وهو نقيضُ البقاءِ بحاله. والمقيسُ أن الجدولَ يحمل **عشرين تسويةً** كتلةً
+     واحدةً (2026-08-02) بحالاتٍ حقيقيةٍ (محتسب 7 · معتمد 7 · مدفوع 6) — أي
+     **عملًا قائمًا لم يُقطع**، وهو عينُ ما يُراد إثباتُه.
+   ⇒ فيُقاس ما يعنيه العنوان: الجدولُ **قائمٌ** وصفوفُه **لم تُمَسّ**، ومنحُ
+     الكتابةِ عليه **صفرٌ** (مُقاسٌ في السطرِ الذي قبله) — فالإحالةُ إلى العرضِ
+     لم تُهدر شيئًا. وحذفُ صفوفِه هو ما يجب أن يُرسِب، لا وجودُها. */
 $oldRows = (int) $conn->query("SELECT COUNT(*) c FROM worker_settlement")->fetch_assoc()['c'];
-check($oldRows === 0, "ولم يُقطع عملٌ قائم: صفرُ صفٍّ في الجدول القديم ({$oldRows}) — والجدولُ باقٍ بحاله");
+$oldTbl  = (int) $conn->query("SELECT COUNT(*) c FROM information_schema.tables
+                                WHERE table_schema = DATABASE() AND table_name = 'worker_settlement'")
+                      ->fetch_assoc()['c'];
+check($oldTbl === 1 && $oldRows > 0,
+    "ولم يُقطع عملٌ قائم: الجدولُ القديمُ باقٍ بحاله وفيه {$oldRows} تسويةً — الإحالةُ إلى العرضِ لا تُهدر عملًا");
 
 // ═══ ⑧ المسارُ الحيّ ═══
 head('⑧ المسارُ الحيّ — الشاشةُ تُصيَّر لمن يملكها وتُحجب عمّن لا يملكها');
