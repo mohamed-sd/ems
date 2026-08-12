@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 05:47:07
--- الجداول: 549 · المناظير: 5
+-- المصدر: equipation_manage · التوليد: 2026-08-12 05:53:24
+-- الجداول: 548 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -12693,14 +12693,6 @@ CREATE TABLE `uat_runs` (
   KEY `idx_uat_phase` (`company_id`,`phase`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-01: جولات التجربة — التحصين قبل كل تجربة';
 
--- ── Table: unified_fault_taxonomy ──
-CREATE TABLE `unified_fault_taxonomy` (
-  `code` varchar(10) DEFAULT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  `equipment_type` tinyint(1) DEFAULT NULL,
-  `source` varchar(13) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- ── Table: unit_approvals ──
 CREATE TABLE `unit_approvals` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13542,6 +13534,9 @@ CREATE TABLE `workspace_views` (
 -- ── View: client_contracts ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `client_contracts` AS select `c`.`id` AS `id`,`c`.`company_id` AS `company_id`,`c`.`contract_signing_date` AS `contract_signing_date`,`c`.`grace_period_days` AS `grace_period_days`,`c`.`contract_duration_months` AS `contract_duration_months`,`c`.`contract_duration_days` AS `contract_duration_days`,`c`.`equip_shifts_contract` AS `equip_shifts_contract`,`c`.`shift_contract` AS `shift_contract`,`c`.`equip_total_contract_daily` AS `equip_total_contract_daily`,`c`.`total_contract_permonth` AS `total_contract_permonth`,`c`.`total_contract_units` AS `total_contract_units`,`c`.`actual_start` AS `actual_start`,`c`.`actual_end` AS `actual_end`,`c`.`transportation` AS `transportation`,`c`.`accommodation` AS `accommodation`,`c`.`place_for_living` AS `place_for_living`,`c`.`workshop` AS `workshop`,`c`.`hours_monthly_target` AS `hours_monthly_target`,`c`.`forecasted_contracted_hours` AS `forecasted_contracted_hours`,`c`.`created_at` AS `created_at`,`c`.`updated_at` AS `updated_at`,`c`.`daily_work_hours` AS `daily_work_hours`,`c`.`daily_operators` AS `daily_operators`,`c`.`first_party` AS `first_party`,`c`.`second_party` AS `second_party`,`c`.`witness_one` AS `witness_one`,`c`.`witness_two` AS `witness_two`,`c`.`price_currency_contract` AS `price_currency_contract`,`c`.`paid_contract` AS `paid_contract`,`c`.`payment_time` AS `payment_time`,`c`.`guarantees` AS `guarantees`,`c`.`retention_pct` AS `retention_pct`,`c`.`advance_recovery_pct` AS `advance_recovery_pct`,`c`.`payment_date` AS `payment_date`,`c`.`contract_status` AS `contract_status`,`c`.`pause_state_before` AS `pause_state_before`,`c`.`pause_reason` AS `pause_reason`,`c`.`pause_date` AS `pause_date`,`c`.`resume_date` AS `resume_date`,`c`.`termination_type` AS `termination_type`,`c`.`termination_reason` AS `termination_reason`,`c`.`merged_with` AS `merged_with`,`c`.`status` AS `status`,`c`.`is_deleted` AS `is_deleted`,`c`.`deleted_at` AS `deleted_at`,`c`.`deleted_by` AS `deleted_by`,`c`.`project_id` AS `project_id`,`c`.`site_id` AS `site_id`,`c`.`readiness_state` AS `readiness_state`,`c`.`signing_authority_ref` AS `signing_authority_ref`,`cos`.`id` AS `primary_scope_id`,`cos`.`site_id` AS `primary_site_id`,`cos`.`scope_name` AS `primary_scope_name` from (`contracts` `c` left join `contract_operational_sites` `cos` on(`cos`.`contract_id` = `c`.`id` and `cos`.`is_primary` = 1 and coalesce(`cos`.`is_deleted`,0) = 0));
+
+-- ── View: unified_fault_taxonomy ──
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS select distinct `fc`.`main_category_code` AS `code`,`fc`.`main_category_name` AS `name`,`fc`.`equipment_type` AS `equipment_type`,'failure_codes' AS `source` from `failure_codes` `fc` where `fc`.`main_category_code` is not null and `fc`.`main_category_code` <> '';
 
 -- ── View: v_org_unit_heads ──
 SET collation_connection = 'utf8mb4_unicode_ci';

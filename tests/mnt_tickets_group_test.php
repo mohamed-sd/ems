@@ -39,12 +39,26 @@ head('M-31 — التصنيفُ الموحّد: جدولٌ واحدٌ + View + �
 
 $v = $conn->query("SELECT COUNT(*) n FROM unified_fault_taxonomy")->fetch_assoc();
 check(intval($v['n']) >= 80, '★ الواجهةُ الموحّدة `unified_fault_taxonomy` حيّةٌ (' . $v['n'] . ' فئة)');
+/* ══ **القاموسُ هو الفعّالُ منه.** الحكمُ صحيحٌ (سبعٌ موصولةٌ و«غير ذلك» بلا كودٍ
+     مخترَع) لكنه كان يعدُّ **كلَّ** الصفوفِ ومنها المحتجَزة. والمقيسُ: اثنا عشرَ
+     صفًّا أسماؤها **أسماءُ أشخاصٍ** (`TICK-00009`…`TICK-00020`) و`failure_main_code`
+     فيها **يشير إلى رمزِ الصفِّ نفسِه** — أثرُ مستوردِ UAT-2026 (عينُ ما عُولج في
+     `job_titles` و`pay_models` و`ticket_types`). حُجزت معطَّلةً وصُفِّر مرجعُها
+     الكاذبُ (هجرة 2027_03_08) ولم تُحذف.
+   ⇒ فيُقاس الفعّالُ: سبعٌ موصولةٌ وواحدٌ معلَنٌ بلا وصلة · ويُضاف حكمٌ أقوى:
+     **كلُّ وصلةٍ تشير إلى فئةٍ موجودةٍ في `failure_codes`** — فمرجعٌ ذاتيٌّ كاذبٌ
+     يرسب حتى لو كان العددُ سبعًا. */
 $mapped = intval($conn->query("SELECT COUNT(*) n FROM ticket_categories
-                                WHERE failure_main_code IS NOT NULL")->fetch_assoc()['n']);
+                                WHERE COALESCE(active,1) = 1 AND failure_main_code IS NOT NULL")->fetch_assoc()['n']);
 $orphan = intval($conn->query("SELECT COUNT(*) n FROM ticket_categories
-                                WHERE failure_main_code IS NULL")->fetch_assoc()['n']);
-check($mapped === 7 && $orphan === 1,
-      '★★ سبعةُ تصنيفاتٍ وُصلت دلاليًّا و«غير ذلك» **موروثٌ معلَنٌ بلا كودٍ مخترَع**');
+                                WHERE COALESCE(active,1) = 1 AND failure_main_code IS NULL")->fetch_assoc()['n']);
+$badLink = intval($conn->query("SELECT COUNT(*) n FROM ticket_categories c
+                                 WHERE c.failure_main_code IS NOT NULL
+                                   AND NOT EXISTS (SELECT 1 FROM failure_codes f
+                                                    WHERE f.main_category_code = c.failure_main_code)")->fetch_assoc()['n']);
+check($mapped === 7 && $orphan === 1 && $badLink === 0,
+      '★★ سبعةُ تصنيفاتٍ فعّالةٍ وُصلت دلاليًّا و«غير ذلك» **موروثٌ معلَنٌ بلا كودٍ مخترَع**'
+      . " (موصول={$mapped} · معلَن={$orphan} · وصلةٌ لفئةٍ معدومة={$badLink})");
 check(is_file(dirname(__DIR__) . '/docs/reports/m31_taxonomy_reconciliation.md'),
       '★ وتقريرُ المطابقة في docs/reports — التعبئةُ الرجعيةُ موثَّقة');
 
