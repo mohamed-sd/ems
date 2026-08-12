@@ -56,8 +56,25 @@ function jp_text($s) {
     return trim(preg_replace('~\s+~u', ' ', html_entity_decode(strip_tags($s), ENT_QUOTES, 'UTF-8')));
 }
 
-/** الحالة → اسمُ المرحلة المضاءة (خريطة finreq_journey نفسُها — نظيرٌ مستقل) */
-function jp_expected_stage($state, $hasEvent, $isCollection) {
+/**
+ * الحالة → اسمُ المرحلة المضاءة (خريطة finreq_journey نفسُها — نظيرٌ مستقل)
+ *
+ * ══ و«معلّق» **وقفةٌ لا نهاية** — والخريطةُ كانت تُسقطه فتطلب إعتامَ الشريط ═══
+ * كانت الحالةُ `suspended` تسقط إلى `return null` أي «لا مرحلةَ مضاءة»، والمنتجُ
+ * **يُضيء عن قصد**: `_finreq_helpers.php:749` يعرّف مجموعةَ التوقفِ
+ * (`rejected · withdrawn · cancelled · expired · merged`) و**يستثني `suspended`
+ * صراحةً**، و:758 يحسب مرحلتَه، و:790 يمنحها `current` لأن `$isStopped` كاذب،
+ * و**:831-833 يضيف لافتةً خاصةً** («الطلب معلَّق · الرحلةُ متوقفةٌ مؤقتًا بقرارِ
+ * الإدارةِ المالية حتى الاستئناف»). فالوقفةُ **مُعلَنةٌ بلافتتها ومكانُها مُضاءٌ
+ * معها** — وهذا أنفعُ للمستخدمِ من شريطٍ رماديٍّ يخفي أين توقّف.
+ * ويشهد لذلك حارسٌ آخرُ في المستودع: `tests/journey_bar_test.php:178-182` يُعدّد
+ * حالاتِ التوقفِ الأربعَ ويُسقط `suspended` **عن قصد**. والحالتان (فرعُ المنتجِ
+ * وهذه الخريطة) وُلدتا في اللقطةِ الأولى نفسِها — فالخريطةُ لم تُطابق المنتجَ
+ * يومًا، ولم يظهر الخللُ إلا حين وُجد صفٌّ معلَّقٌ في القاعدة.
+ * ⇒ يُضاف الفرعُ نظيرًا لـ:758، ويُضاف حكمٌ على **اللافتة** بعدَه — فلا يكفي أن
+ *   تُضاء المرحلةُ الصحيحةُ، بل يجب أن يُخبَر المستخدمُ أن الرحلةَ موقوفة.
+ */
+function jp_expected_stage($state, $hasEvent, $isCollection, $hasStamp = false) {
     switch ($state) {
         case 'draft': case 'returned':  return 'الإنشاء والإرسال';
         case 'under_review':            return 'اعتماد الإدارة';
@@ -65,8 +82,11 @@ function jp_expected_stage($state, $hasEvent, $isCollection) {
         case 'approved':                return 'القيد';
         case 'posted':                  return $isCollection ? 'التحصيل' : 'الصرف';
         case 'paid': case 'collected':  return 'الإغلاق';
+        case 'suspended':               return $hasEvent ? 'الاعتماد المالي'
+                                             : ($hasStamp ? 'اعتماد الإدارة' : 'الإنشاء والإرسال');
     }
-    return null;   // ختاميةٌ أو متوقفة — لا مرحلةَ مضاءة
+    /* closed/archived (اكتمال) · rejected/withdrawn/cancelled/expired/merged (توقفٌ: is-off) */
+    return null;
 }
 
 // المتوقَّع يُقرأ من القاعدة لا يُثبَّت نصًّا — فلا يكذب البرهانُ إن تغيّرت البيانات
@@ -80,8 +100,15 @@ if ($db->connect_errno) { fwrite(STDERR, "FATAL: db connect\n"); exit(1); }
 $db->set_charset('utf8mb4');
 
 $cases = array();
+/* `has_stamp` من أنواعِ الوقائعِ نفسِها التي يقرؤها المنتج (`finreq_journey`) —
+   فمرحلةُ المعلَّقِ بلا حدثٍ ماليٍّ تتبع وجودَ بصمةٍ سابقةٍ في سجلِّ الطلب. */
 $res = $db->query(
-    "SELECT r.id, r.request_no, r.state, r.event_id, r.request_type, u.username
+    "SELECT r.id, r.request_no, r.state, r.event_id, r.request_type, u.username,
+            EXISTS(SELECT 1 FROM fin_request_events e
+                    WHERE e.request_id = r.id
+                      AND (e.event_type IN ('submit','resubmit','dept_approve','publish')
+                           OR (e.event_type = 'system'
+                               AND e.new_value IN ('approved','posted','paid','collected','closed')))) AS has_stamp
        FROM fin_requests r JOIN users u ON u.id = r.created_by
       ORDER BY r.id");
 while ($res && ($row = $res->fetch_assoc())) { $cases[] = $row; }
@@ -110,7 +137,8 @@ foreach ($cases as $c) {
     foreach ($st as $s) {
         if (strpos($s[1], 'is-current') !== false) { $currentLabel = trim($s[2]); break; }
     }
-    $want = jp_expected_stage($c['state'], !empty($c['event_id']), $c['request_type'] === 'collection');
+    $want = jp_expected_stage($c['state'], !empty($c['event_id']),
+        $c['request_type'] === 'collection', !empty($c['has_stamp']));
 
     if ($want === null) {
         check($currentLabel === null, "{$tag}: حالةٌ ختاميةٌ/متوقفة — لا مرحلةَ مضاءة");
@@ -119,6 +147,20 @@ foreach ($cases as $c) {
 
     check($currentLabel === $want,
         "{$tag}: المضاءة «" . ($currentLabel !== null ? $currentLabel : '—') . "» = المتوقع «{$want}»");
+
+    /* والوقفةُ **تُعلَن نصًّا** لا تُفهم من إضاءةٍ وحدَها: إضاءةُ المرحلةِ بلا
+       لافتةٍ تعني «العملُ جارٍ هنا» وهو كذبٌ على المستخدم. فيُطلَب الاثنان. */
+    if ($c['state'] === 'suspended') {
+        /* ⚠️ يُقرأ **الجسمُ الخام** لا مُخرَجُ `jp_text()`: تلك تُمرِّر الصفحةَ كلَّها
+           (63 ك.ب مقيسة) عبر `preg_replace('~\s+~u', …)`، وهذه تُرجِع **NULL** على
+           أوّلِ بايتٍ غيرِ صالحٍ في UTF-8 فيصير النصُّ فراغًا ويسقط أيُّ بحثٍ فيه.
+           (قِيس: اللافتةُ حاضرةٌ في الجسمِ الخام وغائبةٌ عن مُخرَجِ الدالة.) */
+        $blk = preg_match('~<div class="ems-journey-banner[^"]*">(.*?)</div>~s', $b, $bm) ? $bm[1] : '';
+        check($blk !== '' && mb_strpos($b, 'الطلب معلَّق') !== false,
+            "{$tag}: والوقفةُ مُعلَنةٌ بلافتتها — لا إضاءةٌ صامتة");
+        check(mb_strpos($b, 'الاستئناف') !== false,
+            "{$tag}: وتقول إنها تنتظر الاستئناف — وقفةٌ لا نهاية");
+    }
 
     if (preg_match('~<div class="ems-journey-next">(.*?)</div>~s', $b, $n)) {
         $t = jp_text($n[1]);

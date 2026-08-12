@@ -141,18 +141,26 @@ check(stageAt($r2, 3)['note'] === '0 من 2',
 
 // ═══ ② الوقائعُ الحيّة ═══
 head('② الوقائعُ الحيّة — المرحلةُ تتبع الحالةَ الفعلية');
-$live = $conn->query(
-    "SELECT e.*, (SELECT COUNT(*) FROM unit_approvals a WHERE a.entry_id=e.id) apps
-       FROM unit_entries e WHERE e.company_id={$CO}
-        AND e.state IN ('submitted','parties_approved','sales_approved')
-      ORDER BY FIELD(e.state,'submitted','parties_approved','sales_approved'), e.id
-      LIMIT 300")->fetch_all(MYSQLI_ASSOC);
+/* ══ **عيّنةٌ لكلِّ حالةٍ — لا نافذةٌ واحدةٌ تبتلعها حالةٌ واحدة** ═══════════════
+   كان الاستعلامُ واحدًا بـ`ORDER BY FIELD(state,…) LIMIT 300`، والنيّةُ أن يُرى
+   مثالٌ من كلِّ حالةٍ من الثلاث. والمقيسُ أن الحالاتِ الثلاثَ **كلَّها موجودةٌ
+   بكثرة** (submitted 1336 · parties_approved 1503 · sales_approved 1500) —
+   لكن الترتيبَ يضع `submitted` أوّلًا فتملأ **الثلاثَ مئةً كلَّها**، فلا يرى
+   الحلقةُ إلا حالةً واحدة. أي أن الفاحصَ كان يسقط **لأن البياناتِ كثيرةٌ** لا
+   لأنها ناقصة — والنافذةُ تضيق كلَّما نما النظام.
+   ⇒ استعلامٌ **محدودٌ لكلِّ حالةٍ على حِدة**: نموُّ حالةٍ لا يُجوِّع أخرى، ويبقى
+     الحكمُ ناطقًا (يرسب ويُسمّي الحالةَ الغائبةَ إن خلت فعلًا). */
+$LIVE_STATES = array('submitted', 'parties_approved', 'sales_approved');
 $seen = array();
-foreach ($live as $e) {
-    if (isset($seen[$e['state']])) { continue; }
-    $seen[$e['state']] = $e;
+foreach ($LIVE_STATES as $st) {
+    $row = $conn->query("SELECT e.* FROM unit_entries e
+                          WHERE e.company_id={$CO} AND e.state='{$st}'
+                          ORDER BY e.id LIMIT 1")->fetch_assoc();
+    if ($row) { $seen[$st] = $row; }
 }
-check(count($seen) === 3, 'ثلاثُ حالاتٍ حيّةٍ للاختبار: ' . implode(' · ', array_keys($seen)));
+$missingStates = array_values(array_diff($LIVE_STATES, array_keys($seen)));
+check(count($seen) === 3, 'ثلاثُ حالاتٍ حيّةٍ للاختبار: ' . implode(' · ', array_keys($seen))
+    . ($missingStates ? ' · غائبٌ: ' . implode(' · ', $missingStates) : ''));
 
 $expectCurrent = array('submitted' => 1, 'parties_approved' => 4, 'sales_approved' => 5);
 foreach ($seen as $state => $e) {
@@ -169,12 +177,19 @@ foreach ($seen as $state => $e) {
     check($cur === $exp, "«{$state}» (#{$e['entry_no']}) عند المرحلة {$cur} (المتوقَّع {$exp})");
 }
 // الواقعةُ المكتملةُ أطرافُها: عدّادٌ منتهٍ لا «1 من 2»
-$pa = $seen['parties_approved'];
-$paApps = $conn->query("SELECT stage, decision, round_no, decided_at, note FROM unit_approvals
-                          WHERE entry_id=" . intval($pa['id']) . " ORDER BY id")->fetch_all(MYSQLI_ASSOC);
-$paJ = unit_journey(null, $pa, $paApps);
-check(stageAt($paJ, 3)['status'] === 'done', 'ومرحلةُ الأطراف منجَزةٌ لمن اكتملت بطاقاتُه');
-check(isset(stageAt($paJ, 3)['at']), 'ولها زمنٌ من السجل الإلحاقي: ' . (stageAt($paJ, 3)['at'] ?? '—'));
+/* وغيابُ حالةٍ يُعلَن إخفاقًا **ولا يُسقط بقيةَ الفحوصِ بخطأٍ قاتل**: كان
+   `$seen['parties_approved']` يُقرأ بلا جسٍّ، فثغرةٌ في حالةٍ واحدةٍ تُعمي الفاحصَ
+   عمّا بعدها. */
+if (!isset($seen['parties_approved'])) {
+    bad('لا واقعةً مكتملةَ الأطراف حيّةً — تعذّر فحصُ إنجاز مرحلة الأطراف');
+} else {
+    $pa = $seen['parties_approved'];
+    $paApps = $conn->query("SELECT stage, decision, round_no, decided_at, note FROM unit_approvals
+                              WHERE entry_id=" . intval($pa['id']) . " ORDER BY id")->fetch_all(MYSQLI_ASSOC);
+    $paJ = unit_journey(null, $pa, $paApps);
+    check(stageAt($paJ, 3)['status'] === 'done', 'ومرحلةُ الأطراف منجَزةٌ لمن اكتملت بطاقاتُه');
+    check(isset(stageAt($paJ, 3)['at']), 'ولها زمنٌ من السجل الإلحاقي: ' . (stageAt($paJ, 3)['at'] ?? '—'));
+}
 
 // ═══ ⑦ التوقفُ والوقفة ═══
 head('⑦ التوقفُ يُطفئ ما بعده · والوقفةُ لا تُرجع');

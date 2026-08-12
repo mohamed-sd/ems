@@ -28,6 +28,18 @@ $SKIP = array_merge(UAT_FORBIDDEN, [
     'guard_policies', 'guard_override_policies', 'policy_rules', 'financing_models', 'ems_event_consumers',
     'uat_runs', 'uat_evidence', 'fin_financial_periods', 'stop_reason_codes', 'units_of_measure',
     'fin_currencies', 'fin_fx_rates', 'shift_period_defs', 'org_assignment_types', 'sod_conflicts',
+    /* ══ دفاترُ «تمتلئ من الدورةِ التشغيلية» — بذرُها يُفسد الشاهدَ نفسَه ═══════
+       `docs/uat/UAT_DATA_POPULATION_MANIFEST_ar.md:28-30` يُدرج هذه الثلاثةَ تحت
+       «**هذه لا تُبذر**: تمتلئ حين تمرّ الدورةُ من الشاشات، **وامتلاؤها هو
+       الشاهد**». وكان المِلءُ العامُّ يُدرجها فأنشأ **20 مراجعةَ سعرٍ ملفَّقةً**
+       على عقودِ الشركة 4 الحقيقية: `period_key` يحمل **جملةً عربيةً** مبتورةً
+       («وفق المعتمد في م…») بدل مفتاحِ فترة، و`created_by = approved_by = 4`
+       أي **مراجعةٌ أجاز صاحبُها نفسَه** — وهو ما يمنعه
+       `PriceAdjustmentService.php:455` صراحةً (ولا قيدَ في القاعدةِ يمنعه،
+       فالباذرُ يتجاوز الخدمةَ فيتجاوز الحارس). ومنها مراجعةٌ على البند #1 من
+       العقد 1 (سعرُه الأساسيُّ 10.00) تُعلن 250.50.
+       ⇒ تُستثنى، وإلا أعاد كلُّ تشغيلٍ التلويثَ. */
+    'contract_price_terms', 'contract_price_revisions', 'contract_price_index_readings',
 ]);
 
 // ── معاجمُ توليدٍ عربيةٌ من واقع القطاع ──────────────────────────────────────

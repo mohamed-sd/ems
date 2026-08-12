@@ -95,8 +95,14 @@ $cleanup = function () use ($conn, $MARK, $FAMILY) {
     $conn->query("UPDATE claims SET receivable_id = NULL WHERE claim_no LIKE '{$FAMILY}%'");
     $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE 'INV-{$FAMILY}%'");
     $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$FAMILY}%'");
+    /* ⚠️ **`'CDN-%'` بشرطةٍ لا يطابق `CDN13344-C1`** — فأوسامُ هذا الفاحصِ
+       `CDN<pid>-C1` بلا شرطةٍ بعد البادئة. فبقيت **15 حقيقةَ فوترةٍ يتيمةً**
+       (`billing.claim.invoiced` بألفٍ لكلٍّ) في **دفترِ الحقائقِ المحايد**
+       تشير إلى مستخلصاتٍ محذوفة — أي 15,000 وحدةً من فوترةٍ لا سندَ لها في
+       السجلِّ الذي تُبنى عليه كلُّ الإسقاطات. والوسمُ بـ`{$MARK}` وحدَه يُبقي
+       ما تركه شوطٌ آخر. فيُكنَس **بالعائلةِ** `{$FAMILY}%`. */
     $orphan = "SELECT id FROM (SELECT id, source_ref FROM ems_business_events) be
-                WHERE (be.source_ref LIKE '{$MARK}%' OR be.source_ref LIKE 'CDN-%')
+                WHERE be.source_ref LIKE '{$FAMILY}%'
                   AND NOT EXISTS (SELECT 1 FROM (SELECT note_no FROM credit_debit_notes) n
                                    WHERE n.note_no = be.source_ref)
                   AND NOT EXISTS (SELECT 1 FROM (SELECT claim_no FROM claims) c

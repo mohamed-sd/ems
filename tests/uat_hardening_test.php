@@ -36,8 +36,28 @@ check(is_dir(dirname(__DIR__) . '/database/backups'), 'مجلد اللقطات �
 check(mb_strpos($repSrc, 'الاستعادة مختبَرة لا موصوفة') !== false, 'الاسترجاع منفَّذ فعلًا لا موصوف (④/⑤)');
 
 head('UAT-03 — أدوار حقيقية ووضع اختبار الصلاحيات');
-$roles = intval($conn->query("SELECT COUNT(*) c FROM roles")->fetch_assoc()['c']);
-check($roles === 25, "حسابات الأدوار الحقيقية متاحة ({$roles} دورًا)");
+/* ══ العددُ يُشتقُّ من بذرةِ المرجعِ **ولا يُجمَّد** ═══════════════════════════════
+   كان الحكمُ `=== 25` — لقطةَ 2026-08-02. والأدوارُ نمت مشروعًا إلى **35**
+   (30–35 أدوارٌ ماليةٌ وحوكميةٌ: رئيسُ الحسابات · المدير المالي · المراجع
+   الداخلي · مشرف المخاطر · منفّذ المدفوعات · معدّ المطابقة البنكية). ورفعُ
+   الرقمِ إلى 35 يُعيد العطبَ نفسَه عند الدورِ 36.
+   ⇒ يُقاس ما **تشحنه بذرةُ المرجعِ** (`database/schema/seed_reference.sql`)
+     ويُطلَب: لا دورَ مرجعيٍّ اختفى، ولا الجدولُ الحيُّ أصغرُ من المشحون.
+     فيبقى أحمرَ عند كلِّ إخفاقٍ حقيقيٍّ (دورٌ حُذف أو أُعيد ترقيمُه · جدولٌ
+     أصغرُ من المرجع · بذرةٌ خاويةٌ أو غيرُ مقروءة) ويخضرُّ على النموِّ المشروعِ. */
+$live = array();
+$q = $conn->query("SELECT id FROM roles");
+while ($q && ($x = $q->fetch_assoc())) { $live[strval($x['id'])] = true; }
+$seedIds = array();
+$seedFile = dirname(__DIR__) . '/database/schema/seed_reference.sql';
+if (is_file($seedFile) && preg_match('/INSERT INTO `roles`[^;]+;/us', file_get_contents($seedFile), $m)) {
+    preg_match_all('/\((\d+)\s*,/', $m[0], $mm);
+    $seedIds = array_values(array_unique($mm[1]));
+}
+$missingRoles = array_values(array_diff($seedIds, array_keys($live)));
+check(count($seedIds) >= 25 && count($live) >= count($seedIds) && empty($missingRoles),
+    'حسابات الأدوار الحقيقية متاحة (' . count($live) . ' دورًا حيًّا · ' . count($seedIds)
+    . ' في بذرةِ المرجع' . (empty($missingRoles) ? '' : ' · ناقصٌ: ' . implode('،', $missingRoles)) . ')');
 $fm = $conn->query("SELECT COUNT(*) c FROM founding_mode WHERE mode='permission_test'")->fetch_assoc();
 check(intval($fm['c']) === 1, 'وضع اختبار الصلاحيات جاهز (founding_mode)');
 
