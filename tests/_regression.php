@@ -69,6 +69,35 @@ $verify = static function (array $snap, $testName, array &$lines) {
     return $harmed;
 };
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * البذورُ المُعلَنةُ — شرطٌ مسبقٌ يُشغَّل مرةً قبلَ الجولة
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **عيبٌ مقيسٌ في المُشغِّلِ نفسِه**: `tests/seed_unit_lines_50.php` شرطٌ مسبقٌ
+ *   لثلاثةِ فواحصَ على الأقل — و`approval_box_test` يقول ذلك **نصًّا** عند
+ *   فشله («شغّل seed_unit_lines_50.php أولًا»). والمُشغِّلُ لا يجمع إلا
+ *   `*_test.php`، فالبذرةُ لا تُشغَّل قطُّ ⇒ ثلاثةُ فواحصَ حمراءُ **بترتيبٍ لا
+ *   بعيب**. والقياسُ: بتشغيلِ البذرةِ صار `approval_box` 0/0 ← **21/0** و
+ *   `timesheet_time_lines` 8/9 ← **15/2** و`qty_attribution` 23/2 ← **33/1**.
+ * ◆ فالبذرةُ تُعلَن هنا **بالاسمِ ومَن يحتاجها** لا تُخفى في وثيقة: مَن يقرأ
+ *   المُشغِّلَ يرى شرطَه. وتُشغَّل **مرةً** قبلَ الجولةِ لا قبلَ كلِّ اختبار.
+ * ◆ ولا تُحسَب في الخضراءِ ولا الحمراء — فهي بذرةٌ لا فاحص.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$SEEDS = array(
+    'seed_unit_lines_50' => 'approval_box_test · timesheet_time_lines_test · qty_attribution_test',
+);
+$seedLines = array();
+if ($suite === 'all') {
+    foreach ($SEEDS as $seed => $needBy) {
+        $sp = $dir . '/' . $seed . '.php';
+        if (!is_file($sp)) { $seedLines[] = '  ⚠ بذرةٌ مُعلَنةٌ غيرُ موجودة: ' . $seed; continue; }
+        $so = array(); $sc = 0;
+        exec('"' . $php . '" "' . $sp . '" 2>&1', $so, $sc);
+        $seedLines[] = '  ' . ($sc === 0 ? '✔' : '✘') . ' بذرة ' . $seed
+                     . ' (شرطُ: ' . $needBy . ')' . ($sc === 0 ? '' : ' — رمزُ خروج ' . $sc);
+    }
+}
+if ($seedLines) { echo "البذورُ المُعلَنةُ — شرطٌ مسبق:\n" . implode("\n", $seedLines) . "\n\n"; }
+
 $green = 0; $red = 0; $lines = array(); $harmedBy = array(); $unreadableList = array();
 foreach ($files as $t) {
     $path = $dir . '/' . $t . '.php';

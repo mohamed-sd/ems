@@ -94,6 +94,25 @@ $leaf = $conn->query("SELECT c.id, c.contract_id, c.operator_employee_id, e.equi
                         FROM op_containers c JOIN op_containers e ON e.id = c.parent_id
                        WHERE c.project_id = 10 AND c.level='مشغّل' AND c.is_deleted=0 AND c.state='نشطة'
                        LIMIT 1")->fetch_assoc();
+/* ══ الشرطُ الأولُ غيرُ مستوفٍ — يُعلَن ولا يُنفَجر به.
+     المقيس: `.env` يعلن `EMS_CONTAINER_GATE=10` (مشروع صافولا) رائدًا،
+     و**المشروعُ 10 بلا حاويةٍ واحدة** (صفرُ صفٍّ في `op_containers`)، فيما
+     المشروعُ 4 يحمل شجرةً كاملةً بسبعٍ وعشرين ورقة.
+     وكان الفاحصُ يمضي فيستعمل `$leaf['id']` على null ⇒ تحذيران ثم إدراجٌ
+     بـ`container_id = 0` يرفضه `fk_rotation_container` ⇒ **طالٌ يقتل الجولةَ
+     كلَّها فيُبلَّغ `0/0`**، ويُخفي أحدَ عشرَ فحصًا ناجحًا وحُمرةً واحدةً صادقة.
+     والصوابُ: الفحصُ الذي يقيس الشرطَ يبقى أحمرَ (فالنقصُ حقيقيّ) —
+     والفحوصُ التي تعتمد عليه **تُعلَن غيرَ مقيسةٍ باسمها** لا تُبتلع.
+     ⇒ وهذا قرارُ مالكٍ معلَن: أيُبنى لشجرةِ المشروع 10، أم يُنقل العلمُ إلى
+       مشروعٍ مستوفٍ (4)؟ لا يُخترع أيٌّ منهما هنا. */
+if (!$leaf) {
+    fwrite(STDOUT, "\n  ⚠ الرائدُ (المشروع 10) بلا شجرةِ حاويات — الفحوصُ المعتمدةُ عليه\n"
+        . "     **غيرُ مقيسةٍ** ولا تُحسَب نجاحًا: بوابةُ monitor · سجلُّ would_block ·\n"
+        . "     حمولةُ السجل · ومقبضُ الدورات. والشرطُ الأولُ أحمرُ أعلاه بحق.\n"
+        . "     قرارُ مالك: تُبنى شجرةُ المشروع 10، أم يُنقل EMS_CONTAINER_GATE إلى 4؟\n");
+    fwrite(STDOUT, "\n══ النتيجة: {$PASS} نجاح · {$FAIL} فشل ══\n");
+    exit($FAIL > 0 ? 1 : 0);
+}
 $before = intval($conn->query("SELECT COUNT(*) c FROM activity_logs
                                WHERE screen_name='container_gate' AND action_type='would_block'")->fetch_assoc()['c']);
 $cg = CG::assertReady($gate, array(
