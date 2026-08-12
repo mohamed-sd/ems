@@ -46,7 +46,8 @@ $MARK = 'CDN' . getmypid();
    سابقٌ أخفق كنسُه — والقياسُ وجد مستخلَصَين باقيَين (`CDN21492-C1/C2`) أحدُهما
    `draft` فظهر في **عدّادِ المستخلصاتِ المعلَّقةِ** وأربكَ فاحصًا آخر. فيُكنس
    بالعائلةِ `CDN%` (وترقيمُ النظامِ `CLM-%` فلا تلتبس به). */
-$FAMILY = 'CDN';
+$FAMILY = 'CDN';   /* ويُطابَق بـREGEXP '^CDN[0-9]' — فـLIKE 'CDN%' يبتلع
+   وسمَ المسبارِ الشقيقِ `CDNH<pid>` فيمحو بذرَه من تحته. */
 $PREP = 921;   // مُعِدٌّ وهمي
 $APPR = 922;   // مُجيزٌ وهمي
 
@@ -80,9 +81,9 @@ $cleanup = function () use ($conn, $MARK, $FAMILY) {
                    WHERE contract_id = 5 AND period_from LIKE '2094-%'");
     $conn->query("DELETE FROM claims WHERE contract_id = 5 AND period_from LIKE '2094-%'");
     $conn->query("DELETE FROM credit_debit_notes WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%') x)");
+                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no REGEXP '^{$FAMILY}[0-9]') x)");
     $conn->query("DELETE FROM claim_lines WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%') x)");
+                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no REGEXP '^{$FAMILY}[0-9]') x)");
     /* **والفاتورةُ الضريبيةُ تشير إلى المستخلَصِ** (`tax_invoices.claim_id`) —
        وهي من بذرِ هذا الفاحصِ نفسِه (`seed_source_invoice`) استجابةً لِـINJ-0036.
        ولم تكن تُكنَس، فكان `DELETE FROM claims` **يُردُّ صامتًا** بمفتاحها فيبقى
@@ -90,11 +91,11 @@ $cleanup = function () use ($conn, $MARK, $FAMILY) {
        فاحصًا آخر. المُشيرُ قبلَ المُشارِ إليه. */
     $conn->query("DELETE FROM tax_invoices WHERE claim_id IN
                     (SELECT id FROM (SELECT id FROM claims
-                       WHERE claim_no LIKE '{$FAMILY}%') x)");
-    $conn->query("DELETE FROM tax_invoices WHERE serial_no LIKE 'INV-{$FAMILY}%'");
-    $conn->query("UPDATE claims SET receivable_id = NULL WHERE claim_no LIKE '{$FAMILY}%'");
-    $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE 'INV-{$FAMILY}%'");
-    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$FAMILY}%'");
+                       WHERE claim_no REGEXP '^{$FAMILY}[0-9]') x)");
+    $conn->query("DELETE FROM tax_invoices WHERE serial_no REGEXP '^INV-{$FAMILY}[0-9]'");
+    $conn->query("UPDATE claims SET receivable_id = NULL WHERE claim_no REGEXP '^{$FAMILY}[0-9]'");
+    $conn->query("DELETE FROM fin_receivables WHERE doc_ref REGEXP '^INV-{$FAMILY}[0-9]'");
+    $conn->query("DELETE FROM claims WHERE claim_no REGEXP '^{$FAMILY}[0-9]'");
     /* ⚠️ **`'CDN-%'` بشرطةٍ لا يطابق `CDN13344-C1`** — فأوسامُ هذا الفاحصِ
        `CDN<pid>-C1` بلا شرطةٍ بعد البادئة. فبقيت **15 حقيقةَ فوترةٍ يتيمةً**
        (`billing.claim.invoiced` بألفٍ لكلٍّ) في **دفترِ الحقائقِ المحايد**

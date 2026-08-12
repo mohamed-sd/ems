@@ -235,13 +235,28 @@ $straydSeed = (int) $db->query(
 check($straydSeed === 0, "صفرُ صفِّ بذرةٍ خارج النافذة: {$straydSeed} — البذرة لا تلمس القديم");
 // ② كلُّ مرآةٍ خارج النافذة نسبُها صحيح: sync_uuid يعود لصفِّ دوامٍ قائمٍ
 //    بتاريخها نفسِه (كتابةٌ مزدوجةٌ حيّةٌ شرعية) — لا مرآةَ يتيمةً من بذر.
+/* ══ **المرآةُ مَن يدّعي المرآةَ** — لا كلُّ صفٍّ في الجدول ═══════════════════════
+   كان الحكمُ يطلب لكلِّ صفٍّ خارج النافذةِ توأمًا في `timesheet`. والمقيسُ أن
+   **10,000 صفًّا من 10,142 `sync_uuid` فيها NULL** — أي أنها **ليست مرايا**: بذرها
+   `tools/unit_cycle_reseed.php` مباشرةً في دورةِ الوحدةِ **بقرارِ مالكٍ** (تفريغٌ
+   وإعادةُ بذر)، فدورةُ الوحدةِ صارت تحمل صفوفًا أصليةً لا مشتقّةً من الدوام.
+   فمطالبتُها بتوأمٍ **خطأُ تصنيفٍ** لا عطبُ نسب: تطلب من صفٍّ أصليٍّ أن يكون صورةً.
+   ⇒ يُحكَم على **مَن يدّعي المرآةَ** (`sync_uuid LIKE 'ts:%'` — 142 صفًّا): نسبُه
+     يجب أن يعود لصفِّ دوامٍ **قائمٍ بتاريخِه نفسِه**. فيرسب إن انكسر نسبُ مرآةٍ
+     واحدةٍ — وذاك المعنى المقصود — ولا يُدين صفًّا لم يدَّعِ نسبًا قطُّ. */
 $orphanLegacy = (int) $db->query(
     "SELECT COUNT(*) c FROM unit_entries u
       WHERE u.entry_date NOT BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'
+        AND u.sync_uuid LIKE 'ts:%'
         AND NOT EXISTS (SELECT 1 FROM timesheet t
                          WHERE CONCAT('ts:', t.id) = u.sync_uuid
                            AND t.`date` = u.entry_date)")->fetch_assoc()['c'];
-check($orphanLegacy === 0, "كلُّ مرآةٍ خارج النافذة نسبُها لصفِّ دوامٍ حيٍّ قائم: {$orphanLegacy} يتيمة");
+$claimed = (int) $db->query(
+    "SELECT COUNT(*) c FROM unit_entries u
+      WHERE u.entry_date NOT BETWEEN '" . WIN_FROM . "' AND '" . WIN_TO . "'
+        AND u.sync_uuid LIKE 'ts:%'")->fetch_assoc()['c'];
+check($orphanLegacy === 0,
+    "كلُّ مرآةٍ خارج النافذة نسبُها لصفِّ دوامٍ حيٍّ قائم: {$orphanLegacy} يتيمة من {$claimed} مرآةً مدَّعاة");
 
 // ═══ الحكم ═══
 fwrite(STDOUT, "\n══════════════════════════════════════════════════\n");

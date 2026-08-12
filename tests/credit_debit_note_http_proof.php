@@ -82,13 +82,31 @@ $conn = $GLOBALS['conn'];
 $CO = 4;
 $MARK = 'CDNH' . getmypid();
 
-$cleanup = function () use ($conn, $MARK) {
-    $conn->query("DELETE FROM credit_debit_notes WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$MARK}%') x)");
-    $conn->query("DELETE FROM claim_lines WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$MARK}%') x)");
-    $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE 'INV-{$MARK}%'");
-    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$MARK}%'");
+/* ══ **بعائلةِ الوسمِ وبالفترةِ المحجوزةِ معًا — وإلا شوطٌ واحدٌ يقتل كلَّ ما بعده** ══
+   الكنسُ بـ`{$MARK}%` (وسمُ pid هذا الشوطِ) يجعل كلَّ شوطٍ أعمى عمّا تركه سابقُه.
+   والمقيسُ: صفٌّ باقٍ `CDNH19528-C1` يحجز **عقدَ 5 وفترةَ 2095-01**، و
+   `uq_claim_period (company, contract, period_from, period_to)` يردُّ كلَّ إدراجٍ
+   بعده **صمتًا** (`insert_id = 0`) فتتساقط أربعةَ عشرَ فحصًا على منتجٍ سليم —
+   ولذلك كان المسبارُ أخضرَ منفردًا وأحمرَ في المسحِ الشامل.
+   ⇒ يُكنَس بالعائلةِ `CDNH` **وبالفترةِ المحجوزةِ لهذا المسبارِ حصرًا** (2095 على
+     العقد 5) — فيشفي نفسَه بدل أن يحتاج يدًا. والفاتورةُ الضريبيةُ قبلَ
+     المستخلصِ (`fk_tax_invoice_claim` بـRESTRICT). */
+$FAMILY = 'CDNH';
+$cleanup = function () use ($conn, $MARK, $FAMILY) {
+    if ($FAMILY === '') { return; }
+    $sel = "SELECT id FROM (SELECT id FROM claims
+              WHERE claim_no LIKE '{$FAMILY}%'
+                 OR (contract_id = 5 AND period_from LIKE '2095-%')) x";
+    $conn->query("DELETE FROM credit_debit_notes WHERE claim_id IN ({$sel})");
+    $conn->query("DELETE FROM claim_lines WHERE claim_id IN ({$sel})");
+    $conn->query("DELETE FROM tax_invoices WHERE claim_id IN ({$sel})");
+    $conn->query("DELETE FROM tax_invoices WHERE serial_no LIKE 'INV-{$FAMILY}%'");
+    $conn->query("UPDATE claims SET receivable_id = NULL
+                   WHERE claim_no LIKE '{$FAMILY}%'
+                      OR (contract_id = 5 AND period_from LIKE '2095-%')");
+    $conn->query("DELETE FROM fin_receivables WHERE doc_ref LIKE 'INV-{$FAMILY}%'");
+    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$FAMILY}%'
+                     OR (contract_id = 5 AND period_from LIKE '2095-%')");
     $orphan = "SELECT id FROM (SELECT id, entity_type, entity_id FROM ems_business_events) be
                 WHERE be.entity_type='credit_debit_note'
                   AND NOT EXISTS (SELECT 1 FROM (SELECT id FROM credit_debit_notes) n
@@ -110,9 +128,14 @@ $CLAIM = (int) $conn->insert_id;
 $conn->query("INSERT INTO claim_lines (company_id, claim_id, source_kind, source_ref,
                 work_date, qty, unit_price, amount, dispute_flag)
               VALUES ({$CO}, {$CLAIM}, 'timesheet', 999002, '2095-01-05', 20, 100, 2000.00, 0)");
+/* INJ-0036: `chk_recv_source_doc` يمنع ذمّةً بلا مستندٍ يقابلها — والبذرُ كان
+   يفتحها عاريةً فيُردُّ الإدراجُ صامتًا (`insert_id = 0`) ثم يقرأ الفحصُ صفًّا لا
+   وجودَ له. فتُبذَر فاتورةٌ ضريبيةٌ صادرةٌ أوّلًا كما يقع في الواقع. */
+require_once __DIR__ . '/_source_doc_seed.php';
+$TI = seed_source_invoice($conn, $CO, $inv, 1, 2000.00, 'USD', $CLAIM);
 $conn->query("INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref,
-                project_id, amount, collected, state)
-              VALUES ({$CO}, 1, 'invoice', '{$inv}', 1, 2000.00, 0, 'open')");
+                source_doc_id, project_id, amount, collected, state)
+              VALUES ({$CO}, 1, 'invoice', '{$inv}', {$TI}, 1, 2000.00, 0, 'open')");
 $RECV = (int) $conn->insert_id;
 $conn->query("UPDATE claims SET receivable_id={$RECV} WHERE id={$CLAIM}");
 

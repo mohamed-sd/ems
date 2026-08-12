@@ -25,6 +25,8 @@ function check($c, $m) { $c ? ok($m) : bad($m); }
 function head($m) { fwrite(STDOUT, "\n── {$m}\n"); }
 
 function tw_req($url, $jar, $post = null) {
+    $GLOBALS['__ems_last_url'] = $url;   // لحلِّ Location النسبيّ
+    $GLOBALS['__ems_last_jar'] = $jar;   // جرَّةُ الجلسةِ لقراءةِ الوميض
     /* الرمزُ المركزيُّ: الحارسُ يقبله في الحقولِ أو الترويسة، والمسبارُ
        يبني الحقولَ يدويًّا فلا يحمله ⇒ 403 صامتٌ يُقرأ فشلًا في المنتج. */
     if ($post !== null) {
@@ -118,9 +120,15 @@ check($code === 302, "المطابقةُ نُفِّذت (HTTP {$code})");
 $po = $db->query("SELECT match_state, invoice_amount FROM proc_order WHERE id=" . intval($OID))->fetch_assoc();
 check($po && $po['match_state'] === 'var_pending', 'حالةُ المطابقة «فرقٌ ينتظر قرارًا»');
 check($dues() === 0, '★ ولا دَينَ — 600 فوق سماح 80');
-preg_match('~Location:\s*(\S+)~i', $h, $loc);
-check(isset($loc[1]) && strpos(urldecode($loc[1]), 'فرقٌ فوق السماح') !== false,
-    'والرسالةُ تشرح للمستخدم سببَ الوقف');
+/* الرسالةُ تُقرأ بالمساعدِ المشترَك: بعضُ المسالكِ تضعها في العنوان وبعضُها في
+   وميضِ الجلسة — وقراءةُ أحدِهما وحدَه تجد فراغًا وتحكم على منتجٍ نفَّذ الفعل. */
+require_once __DIR__ . '/_http_flash.php';
+$twMsg = ems_flash_or_msg($h, dirname($GLOBALS['__ems_last_url']), function ($u) use ($jar) {
+    $r = tw_req($u, $jar, null);
+    return is_array($r) ? (string) $r[count($r) - 1] : (string) $r;
+});
+check(mb_strpos($twMsg, 'فرقٌ فوق السماح') !== false,
+    'والرسالةُ تشرح للمستخدم سببَ الوقف: ' . mb_substr($twMsg, 0, 70));
 
 // ═══ ② الفاتورة الصحيحة ═══════════════════════════════════════════════════
 head('② الفاتورة الصحيحة → دَينُ المورد');

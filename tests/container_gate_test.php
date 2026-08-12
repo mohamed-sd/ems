@@ -129,9 +129,26 @@ check(isset($kinds2['no_container']) && mb_strpos($kinds2['no_container']['href'
     'ورابطُه إلى حاويات عقدها: ' . ($kinds2['no_container']['href'] ?? '—'));
 
 // مشغّلٌ له حاويةٌ ولا دورةَ تناوب
+/* ══ الورقةُ تُختار **بسعةٍ تكفي الخصمَ** لا بـ`LIMIT 1` ══════════════════════════
+   كان الاختيارُ أوّلَ ورقةِ مشغّلٍ في المشروع بلا شرطِ سعة، فوقع على `#3662`
+   **سقفُها صفرٌ** (مقيسٌ: Σ سقوفِ أبناءِ أمِّها 122.50 يطابق موزَّعَها بالضبط، أي
+   أن صفرَها أصليٌّ لا أثرُ تجميد). والخصمُ بعدها يطلب 5 ساعاتٍ من صفرٍ فيعود
+   `levels = 0` — فتسقط ستةُ فحوصٍ على بوابةٍ ترفض بحقٍّ: **لا خصمَ من سعةٍ لا
+   توجد**. وهو عينُ عيبِ `LIMIT 1` الذي أسقط فواحصَ أخرى اليوم.
+   ⇒ تُشترَط سعةٌ متبقيةٌ تكفي الكميةَ المخصومةَ (5) **في السلسلةِ كلِّها**، وتُرتَّب
+     الأوفرُ أوّلًا — فيُقاس ما يدّعيه الفحصُ: أن الخصمَ يقع على أربعةِ مستويات. */
 $leafRow = $conn->query("SELECT o.id, o.operator_employee_id, o.contract_id, e.equipment_id
-                           FROM op_containers o JOIN op_containers e ON e.id=o.parent_id
-                          WHERE o.level='مشغّل' AND o.project_id={$SITE} LIMIT 1")->fetch_assoc();
+                           FROM op_containers o
+                           JOIN op_containers e ON e.id = o.parent_id
+                           JOIN op_containers s ON s.id = e.parent_id
+                           JOIN op_containers m ON m.id = s.parent_id
+                          WHERE o.level = 'مشغّل' AND o.project_id={$SITE}
+                            AND COALESCE(o.is_deleted,0) = 0
+                            AND ROUND(o.cap_qty - o.consumed_qty, 2) >= 5
+                            AND ROUND(e.cap_qty - e.consumed_qty, 2) >= 5
+                            AND ROUND(s.cap_qty - s.consumed_qty, 2) >= 5
+                            AND ROUND(m.cap_qty - m.consumed_qty, 2) >= 5
+                          ORDER BY (o.cap_qty - o.consumed_qty) DESC LIMIT 1")->fetch_assoc();
 if ($leafRow) {
     $conn->query("DELETE FROM operator_rotations WHERE container_id=" . (int) $leafRow['id']);
     $r = $probe("echo json_encode(App\\Services\\Operations\\ContainerGate::assertReady(\$gate, array("
