@@ -266,7 +266,9 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       if ($__nav_unified && isset($conn)) {
         // ── المصدر الموحّد: بابٌ واحدٌ محكوم بدل المصادر الخمسة ──
         require_once __DIR__ . '/includes/finreq_badges.php';
-        $__un_badges = ems_finreq_nav_badges($conn);           // مفاتيحها أكواد الشاشات = المسارات
+        /* E-20: الشاراتُ المعمَّمةُ من `nav_items.counter_source` **مع** المثبَّتة —
+           العمودُ كان يُكتَب ولا يُقرأ، فلا شارةَ تظهر لأيِّ صفٍّ يحمل مفتاحًا. */
+        $__un_badges = ems_nav_all_badges($conn, $_SESSION['user']['role']); // مفاتيحها أكواد الشاشات = المسارات
         if ($hoursApprovalPendingCount > 0) {
           $__un_badges['Approvals/hours_approval.php'] = $hoursApprovalPendingCount;
         }
@@ -278,7 +280,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
         // المسارُ القديم (السوبر ومن خارج العلم): المراسلاتُ ثابتةٌ في صدر القائمة
         echo $__sb_chats_li;
         require_once __DIR__ . '/includes/finreq_badges.php';
-        $__fr_badges = ems_finreq_nav_badges($conn);
+        $__fr_badges = ems_nav_all_badges($conn, $_SESSION['user']['role']);
         $__sb_links  = getDynamicNavLinks($conn, $_SESSION['user']['role']);
         $__sb_groups = getNavGroups($conn, $_SESSION['user']['role']);
         $__sb_tree   = buildNavTree($__sb_links, $__sb_groups);

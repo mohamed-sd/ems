@@ -43,11 +43,15 @@ $gate = ems_tenant_db();
 $CO   = 4;
 $MARK = 'ADVT' . getmypid();
 
-$cleanup = function () use ($conn, $MARK) {
-    $conn->query("DELETE FROM contract_advances WHERE doc_ref LIKE '{$MARK}%'");
+/* بعائلةِ الوسمِ `ADVT` لا بوسمِ الشوطِ وحدَه: الوسمُ بـ`getmypid()` يجعل كلَّ شوطٍ
+   أعمى عمّا تركه سابقٌ أخفق كنسُه، فتتراكم مستخلصاتٌ ومقدَّماتٌ تُربك عقدَ القياس. */
+$FAMILY = 'ADVT';
+$cleanup = function () use ($conn, $MARK, $FAMILY) {
+    if ($FAMILY === '') { return; }   // وسمٌ فارغٌ ⇒ لا كنسَ (صونًا للبيانات)
+    $conn->query("DELETE FROM contract_advances WHERE doc_ref LIKE '{$FAMILY}%'");
     $conn->query("DELETE FROM claim_lines WHERE claim_id IN
-                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$MARK}%') x)");
-    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$MARK}%'");
+                    (SELECT id FROM (SELECT id FROM claims WHERE claim_no LIKE '{$FAMILY}%') x)");
+    $conn->query("DELETE FROM claims WHERE claim_no LIKE '{$FAMILY}%'");
     $orphan = "SELECT id FROM (SELECT id, entity_type, entity_id FROM ems_business_events) be
                 WHERE be.entity_type='contract_advance'
                   AND NOT EXISTS (SELECT 1 FROM (SELECT id FROM contract_advances) a
@@ -67,19 +71,24 @@ fwrite(STDOUT, "\n══ M-01 — دفترُ الدفعة المقدَّمة ═
      العقدَ الأولَ عليه مقدَّمٌ حقيقيٌّ (استقطاعُه 100 لا صفر، ورصيدُه يحمل
      كسرَ 0.50)، فسقط الفحصُ الأولُ ثم تساقط كلُّ ما بُني على رصيدٍ مفترَض.
      ⇒ يُشترط **صفرُ مقدَّمٍ** على العقدِ المختار: الفاحصُ يقيس ما يدّعيه. */
-$C = $conn->query("SELECT c.id, c.price_currency_contract, c.advance_recovery_pct
-                     FROM contracts c
-                    WHERE c.company_id={$CO} AND c.price_currency_contract IS NOT NULL
-                      AND NOT EXISTS (SELECT 1 FROM contract_advances a
-                                       WHERE a.contract_id = c.id AND COALESCE(a.is_deleted,0)=0)
-                    ORDER BY c.id LIMIT 1")->fetch_assoc();
-if (!$C) {
-    fwrite(STDOUT, "\n⚠ لا عقدَ بعملةٍ معروفةٍ **وبلا مقدَّمٍ مسجَّل** — الفحصُ الأولُ\n"
-        . "   يشترط عقدًا نظيفًا، ولا يُقاس على عقدٍ عليه مقدَّمٌ قائم.\n");
+/* و**عقدان** لا عقدٌ واحد: الأولُ للسقفِ والاستقطاع، والثاني لشذوذِ تقريرِ
+   المطابقةِ في ⑥ — فالشذوذُ يُبذَر ويُكنَس ولا يُستعار من عطبٍ حيٍّ قد يزول. */
+$Cs = array();
+$rs = $conn->query("SELECT c.id, c.price_currency_contract, c.advance_recovery_pct
+                      FROM contracts c
+                     WHERE c.company_id={$CO} AND c.price_currency_contract IS NOT NULL
+                       AND NOT EXISTS (SELECT 1 FROM contract_advances a
+                                        WHERE a.contract_id = c.id AND COALESCE(a.is_deleted,0)=0)
+                     ORDER BY c.id LIMIT 2");
+while ($rs && ($x = $rs->fetch_assoc())) { $Cs[] = $x; }
+if (count($Cs) < 2) {
+    fwrite(STDOUT, "\n⚠ يلزم **عقدان** بعملةٍ معروفةٍ وبلا مقدَّمٍ مسجَّل: أحدُهما للسقف\n"
+        . "   والآخرُ لشذوذِ تقرير المطابقة — ولا يُقاس على عقدٍ عليه مقدَّمٌ قائم.\n");
     exit(1);
 }
-$CID = (int) $C['id'];
-info("العقدُ المستعمَل للقياس: #{$CID} · عملتُه {$C['price_currency_contract']}");
+$C = $Cs[0]; $CID = (int) $C['id'];
+$C2 = $Cs[1]; $CID2 = (int) $C2['id'];
+info("عقدُ القياس #{$CID} · عقدُ الشذوذ #{$CID2} · عملتُهما {$C['price_currency_contract']}");
 $ledgerBefore = (int) $conn->query("SELECT COUNT(*) c FROM fin_financial_events")->fetch_assoc()['c'];
 
 // ═══ ① النزيفُ توقّف ═══
@@ -200,19 +209,41 @@ check(round($sum, 2) == 500.00, 'ومجموعُهما يطابق المستهل�
 $tbl = $conn->query("SHOW TABLES LIKE 'advance_consumption'")->num_rows;
 check($tbl === 0, 'وصفرُ جدولِ استهلاكٍ موازٍ — المصدرُ واحد');
 
-// ═══ ⑥ تقريرُ المطابقة على البيانات الحيّة ═══
+/* ═══ ⑥ تقريرُ المطابقة — **على شذوذٍ يبذره الفاحصُ ويكنسه** ═══════════════════
+   كان مثبَّتًا على أثرِ عطبٍ حيٍّ (العقد 5 · استردادُ 12.50 بلا قبض)، وذاك الأثرُ
+   زال من وجهَين مستقلَّين — وكلٌّ منهما وحدَه يكفي لإسقاطِه:
+     · `claim_lines` أُفرِغ بالكامل (صفرُ صفٍّ · العدّادُ يقول إن 3147 صفًّا وُجدت
+       يومًا)، فالسطرُ الذي يعدُّه الفحصُ (‎-12.50) لم يبقَ له وجود.
+     · والعقدُ 5 صار عليه **قبضٌ مسجَّلٌ** فلا شذوذَ فيه أصلًا.
+   والخصلةُ المُختبَرةُ ملكُ **الدالةِ** لا ملكُ صفٍّ حيّ: أن التقريرَ يُعلن
+   استردادًا بلا قبضٍ، ويصنّفه `no_receipt`، **ولا يمسّ البند**. فتُبذَر بالوسمِ
+   وتُكنَس به — فلا يعود الفحصُ رهينةَ بياناتٍ تتغيّر بحقٍّ. */
 head('⑥ تقريرُ المطابقة — يُعلن ولا يمسّ');
+check((float) advance_balance($gate, $CID2)['received'] == 0.00,
+    "عقدُ الشذوذ #{$CID2} بلا قبضٍ مسجَّل — شرطُ القياس");
+$cnoX = $MARK . '-C3';
+$conn->query("INSERT INTO claims (company_id, claim_no, contract_id, period_from, period_to,
+                currency, gross_amount, net_amount, tax_amount, state, version)
+              VALUES ({$CO}, '{$cnoX}', {$CID2}, '2094-04-01','2094-04-30','USD', 100, 87.50, 0, 'draft', 1)");
+$CLX = (int) $conn->insert_id;
+$conn->query("INSERT INTO claim_lines (company_id, claim_id, source_kind, source_ref,
+                work_date, qty, unit_price, amount, dispute_flag)
+              VALUES ({$CO}, {$CLX}, 'advance_recovery', {$CID2}, '2094-04-30', 1, -12.50, -12.50, 0)");
+check($CLX > 0, "بُذر شذوذٌ: استردادُ 12.50 على عقدٍ بلا قبض (مستخلص #{$CLX})");
+
 $rep = advance_reconciliation($gate);
-$five = null;
-foreach ($rep as $r) { if ((int) $r['contract_id'] === 5) { $five = $r; } }
-check($five !== null, 'العقد 5 معلَنٌ في التقرير');
-check($five !== null && (float) $five['recovered'] == 12.50 && (float) $five['received'] == 0.0,
-    'باسترداده 12.50 وصفرِ قبضٍ مسجَّل: ' . ($five ? $five['gap'] : '—'));
-check($five !== null && $five['kind'] === 'no_receipt'
-      && mb_strpos($five['label'], 'ينتظر قرار المالك') !== false,
-    'وبوسمه: ' . ($five['label'] ?? '—'));
+$anom = null;
+foreach ($rep as $r) { if ((int) $r['contract_id'] === $CID2) { $anom = $r; } }
+check($anom !== null, "العقدُ {$CID2} معلَنٌ في التقرير — استردادٌ بلا قبض");
+check($anom !== null && (float) $anom['recovered'] == 12.50
+      && (float) $anom['received'] == 0.00 && (float) $anom['gap'] == 12.50,
+    'باسترداده 12.50 وصفرِ قبضٍ مسجَّل · الفرقُ ' . ($anom ? $anom['gap'] : '—'));
+check($anom !== null && $anom['kind'] === 'no_receipt'
+      && mb_strpos($anom['label'], 'ينتظر قرار المالك') !== false,
+    'وبوسمه: ' . ($anom['label'] ?? '—'));
 $untouched = $conn->query("SELECT COUNT(*) c FROM claim_lines
-                            WHERE source_kind='advance_recovery' AND amount=-12.50")->fetch_assoc();
+                            WHERE claim_id={$CLX} AND source_kind='advance_recovery'
+                              AND amount=-12.50")->fetch_assoc();
 check((int) $untouched['c'] === 1, 'وبندُ الـ12.50 **قائمٌ كما هو** — لا مسحَ ولا تعديل');
 
 // وعقدُ الاختبار منضبطٌ فلا يظهر

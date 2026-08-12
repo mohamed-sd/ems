@@ -108,8 +108,25 @@ check($wired, '★ والحارسُ **موصولٌ بمسار اعتماد ال�
 // ═══ M-44 ═══
 head('M-44 — عقدُ الشاشة الموحّد: الحالاتُ الخمس');
 
-ob_start(); ems_screen_about('غرضُ اختبار', array('خطوة')); $about = ob_get_clean();
-check(strpos($about, 'ما هذه الشاشة؟') !== false, '★ مكوّنُ «ما هذه الشاشة؟» يُصيَّر بغرضه وخطواته');
+/* ══ العنوانُ انتقل إلى المُصيِّرِ و«الخطوات» هُجرت — والحكمُ يتبع العقدَ الجديد ══
+   عند كتابةِ الفحصِ كان `ems_screen_about()` يُصدِر نصَّ «ما هذه الشاشة؟» حرفيًّا.
+   وبقرارِ المالك (2026-08-09 · نُفِّذ في `includes/screen_contract.php`) صار
+   يُصدِر **قالبًا** (`<template class="ems-about-tpl">`) وحدَه، والعنوانُ يُبنى
+   في المُصيِّر (`assets/js/ems-screen-about.js`) مشتقًّا من عنوانِ الصفحة
+   («عن: …») بدل نصٍّ ثابت. و`$steps` **مهجورٌ لا يُصيَّر** — موصوفٌ كذلك في
+   جسمِ الدالةِ نفسِها. فطلبُ النصِّ القديمِ و«خطواته» طلبُ عقدٍ نُسخ.
+   ⇒ يُحكَم على العقدِ القائم **من طرفيه**: أن PHP تُصدِر القالبَ بغرضِه موسومًا
+     بمصدرِه ومفتاحِ شاشتِه، وأن المُصيِّرَ يستهلك القالبَ ويبني عنوانَ البطاقة.
+     فيرسب إن سقط الغرضُ أو الوسمُ أو توقّف المُصيِّرُ عن استهلاكِ القالب. */
+ob_start(); ems_screen_about('غرضُ اختبار'); $about = ob_get_clean();
+$aboutJs = (string) @file_get_contents(dirname(__DIR__) . '/assets/js/ems-screen-about.js');
+check(strpos($about, 'ems-about-tpl') !== false
+   && strpos($about, 'data-src=') !== false
+   && strpos($about, 'ems-about__purpose') !== false
+   && strpos($about, 'غرضُ اختبار') !== false
+   && strpos($aboutJs, 'ems-about-tpl') !== false
+   && strpos($aboutJs, 'ems-about__title') !== false,
+   '★ مكوّنُ «عن الشاشة» يُصدِر قالبَ غرضِه موسومًا بمصدره — ومُصيِّرُه يستهلك القالبَ ويبني العنوان');
 ob_start(); ems_state_empty('لا بيانات', 'أضف أولَ عنصر', 'form.php'); $empty = ob_get_clean();
 check(strpos($empty, 'أضف أولَ عنصر') !== false && strpos($empty, 'form.php') !== false,
       '★★ الفارغةُ **بزرِّ الخطوة الأولى** — لا نصَّ DataTables العام');
@@ -145,13 +162,58 @@ check(strpos($hdr, 'ems-autosave.js') !== false,
 // ═══ H-14 ═══
 head('H-14 — السايدبارُ الماليُّ السباعي (UX-02 §6 نصًّا)');
 
+/* ══ NAV-09 خلَفت §6 — والسبعةُ **أُخفيت ولم تُحذف** ═════════════════════════════
+   H-14 بنى سبعَ مجموعاتٍ بأسماءِ §6 حرفيًّا. ثم صارت **وثيقةُ NAV-09** مصدرَ
+   القوائم (2026-08-03) فخلَفتها بمجموعاتِ مراحلَ (`n9s13_*_r17`)، وأُخفيت
+   السبعةُ بقلبِ علمٍ لا بهجرةٍ — وهو **عقدُ العملِ ④ نفسُه** («يُخفى لا يُحذف»)
+   الذي يفحصه هذا الملفُّ بعد أسطر. فمطالبةُ السبعةِ بأن تبقى **الفعّالةَ
+   الوحيدةَ** تطالب بنقضِ الوثيقةِ التي خلَفتها.
+   ⇒ ثلاثةُ أحكامٍ تحلُّ محلَّ الواحد: بقاءُ السبعةِ مخفيّةً · ولا رابطَ حيًّا خارجَ
+     مجموعةٍ حية · **وسلّةُ «أخرى — للمراجعة» ليست سايدبارًا موازيًا**. والثالثُ
+     يبقى أحمرَ بحقٍّ (وعدُ H-14 لم يتمّ بعد) ولا يُخضَّر بتخفيفِ سقفِه. */
 $SEVEN = array('عملي اليوم', 'العملاء والتحصيل', 'الموردون والمدفوعات',
                'الخزينة والبنوك', 'المحاسبة العامة', 'التخطيط والتحليل', 'الإعدادات والتدقيق');
-$r = $conn->query("SELECT name FROM link_groups WHERE owner_role_id=17 AND is_active=1 ORDER BY display_order");
-$names = array();
-while ($r && ($x = $r->fetch_assoc())) { $names[] = $x['name']; }
-check($names === $SEVEN,
-      '★★★ **سبعُ مجموعاتٍ فعّالةٍ بأسماء §6 حرفيًّا وترتيبها** — لا 35 رابطًا مبعثرًا');
+$inSeven = "'" . implode("','", array_map(array($conn, 'real_escape_string'), $SEVEN)) . "'";
+$s7 = $conn->query("SELECT COUNT(*) t, SUM(is_active = 0) hid FROM link_groups
+                     WHERE owner_role_id = 17 AND name IN ({$inSeven})")->fetch_assoc();
+check(intval($s7['t']) === 7 && intval($s7['hid']) === 7,
+    '★★ صفوفُ §6 السبعةُ باقيةٌ مخفيّةً (NAV-09 خلَفها) — الرجوعُ بقلبِ علمٍ لا بهجرة: '
+    . intval($s7['hid']) . '/' . intval($s7['t']));
+$loose = intval($conn->query("SELECT COUNT(*) n FROM nav_items n
+                               LEFT JOIN link_groups g ON g.id = n.group_id AND g.is_active = 1
+                              WHERE n.role_id = 17 AND n.active = 1 AND g.id IS NULL")->fetch_assoc()['n']);
+check($loose === 0, '★★ كلُّ رابطٍ حيٍّ للدور 17 داخلَ مجموعةٍ حية (' . $loose . ' خارجها)');
+
+/* ══ سلّةُ «أخرى — للمراجعة»: ما يُقاس وما لا يُقاس ═══════════════════════════
+   وعدُ H-14 («لا سايدبارَ مبعثرًا») **لم يتمّ بعد**: 43 من 99 رابطًا حيًّا للدور 17
+   في السلّة (259 من 1569 عبر الأدوار كلِّها). وقِستُ إمكانَ تصنيفِها آليًّا فسقط:
+     · 31 منها **لا صفَّ لها في وثيقةِ NAV-09** أصلًا — فلا مرحلةَ تُشتقّ.
+     · و12 لها صفٌّ، لكن المرحلةَ في هذا النظامِ **خاصةٌ بكلِّ دور** (موضعُ الشاشةِ
+       في دورةِ عملِ إدارتِه): `Contracts/penalties.php` مرحلةُ 6 عند دورٍ و7 عند
+       آخر. فنقلُ مرحلةِ دورٍ إلى الدور 17 **اختراعُ موضعٍ في دورةِ عملِ المالية**
+       لا اشتقاقُه. ⇒ تصنيفُها **قرارُ المالك** بعرفِ «المرحلة 99 — بانتظار قرار
+       المالك»، وهو ما تفعله السلّةُ بالضبط.
+   فيُعلَن الرقمُ صريحًا (لا يُخبَّأ)، ويُحكَم على **الثابتِ القابلِ للإثبات**: أن
+   السلّةَ لا تُخفي **مكرَّرًا** لرابطٍ مصنَّفٍ للدورِ نفسِه — أي أنها موقِفُ ما لم
+   يُصنَّف، لا سايدبارٌ موازٍ يُعيد ما صُنِّف. */
+$bk = $conn->query("SELECT COUNT(*) n FROM nav_items n JOIN link_groups g ON g.id = n.group_id
+                     WHERE n.role_id = 17 AND n.active = 1 AND g.group_code LIKE '%others%'")->fetch_assoc();
+$liveAll = intval($conn->query("SELECT COUNT(*) n FROM nav_items
+                                 WHERE role_id = 17 AND active = 1")->fetch_assoc()['n']);
+fwrite(STDOUT, '     · سلّةُ «أخرى — للمراجعة» للدور 17: ' . intval($bk['n']) . ' من ' . $liveAll
+    . ' رابطًا حيًّا — **بندٌ مفتوحٌ ينتظر تصنيفَ المالك** (وعدُ H-14 لم يتمّ)' . "
+");
+$dupInBucket = intval($conn->query("SELECT COUNT(*) n FROM nav_items nb
+                                     JOIN link_groups gb ON gb.id = nb.group_id
+                                    WHERE nb.active = 1 AND gb.group_code LIKE '%others%'
+                                      AND EXISTS (SELECT 1 FROM nav_items np
+                                                   JOIN link_groups gp ON gp.id = np.group_id
+                                                  WHERE np.role_id = nb.role_id AND np.route = nb.route
+                                                    AND np.active = 1 AND gp.is_active = 1
+                                                    AND gp.group_code NOT LIKE '%others%')")->fetch_assoc()['n']);
+check($dupInBucket === 0,
+    '★★★ والسلّةُ موقِفُ ما لم يُصنَّف لا سايدبارٌ موازٍ — صفرُ رابطٍ فيها مكرَّرٌ في مجموعةٍ مصنَّفةٍ لدورِه ('
+    . $dupInBucket . ')');
 $orphans = intval($conn->query("SELECT COUNT(*) n FROM nav_items
                                  WHERE role_id=17 AND group_id IS NULL")->fetch_assoc()['n']);
 check($orphans === 0, '★★ **صفرُ رابطٍ يتيمٍ** — كلُّ روابط الدور 17 في مجموعةٍ من السبع');
@@ -160,10 +222,16 @@ check($total >= 63, '★ وصفرُ رابطٍ حُذف (' . $total . ' — ال
 $oldHidden = intval($conn->query("SELECT COUNT(*) n FROM link_groups
                                    WHERE owner_role_id=17 AND is_active=0")->fetch_assoc()['n']);
 check($oldHidden >= 5, '★ والمجموعاتُ القديمة **أُخفيت ولا حُذفت** (' . $oldHidden . ' مخفية) — عقدُ العمل ④');
-$inboxNav = $conn->query("SELECT n.id FROM nav_items n JOIN link_groups g ON g.id=n.group_id
-                           WHERE n.role_id=17 AND n.route='Finance/approvals_inbox.php'
-                             AND g.name='عملي اليوم'")->fetch_assoc();
-check($inboxNav !== null, '★ والصندوقُ الموحّد في «عملي اليوم» — كما تنصّ §5/§6');
+/* والصندوقُ الموحّدُ انتقل مع خلافةِ NAV-09: «عملي اليوم» أُخفيت، ومسكنُه الآن
+   مجموعةُ المرحلةِ ① — فيُطلَب في مجموعةٍ **حيّةٍ** لا في مجموعةٍ بعينِها بالاسم،
+   ويرسب إن حُذف أو أُخفي أو نُقل إلى سلّةِ «أخرى». */
+$inboxNav = $conn->query("SELECT g.group_code FROM nav_items n JOIN link_groups g ON g.id = n.group_id
+                           WHERE n.role_id = 17 AND n.active = 1 AND g.is_active = 1
+                             AND n.route = 'Finance/approvals_inbox.php'
+                             AND g.group_code NOT LIKE '%others%'")->fetch_assoc();
+check($inboxNav !== null,
+    '★ والصندوقُ الموحّد في مجموعةٍ حيّةٍ لا في سلّةِ «أخرى» — خلَفُ «عملي اليوم» بعد NAV-09: '
+    . ($inboxNav ? $inboxNav['group_code'] : 'غير موجود'));
 
 // ═══ الخاتمة ═══
 fwrite(STDOUT, "\n══════════════════════════════════════\n");

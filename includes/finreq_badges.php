@@ -154,3 +154,136 @@ if (!function_exists('ems_finreq_nav_badges')) {
         return $out;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   E-20 · شاراتٌ من `nav_items.counter_source` — تعميمُ العدّادِ فعلًا
+   ───────────────────────────────────────────────────────────────────────────
+   **العطبُ الذي يعالجه هذا القسم**: العمودُ `counter_source` كان **يُكتَب ولا
+   يُقرأ**. `includes/unified_nav.php:72` يجلبه في الاستعلام، لكن التصييرَ يبني
+   الشارةَ من `$badges[$it['route']]` — مصفوفةٍ تأتي من خارجٍ بثلاثةِ مساراتٍ
+   **مثبَّتةٍ نصًّا** في `ems_finreq_nav_badges` أعلاه. فالعمودُ بيانٌ ميتٌ في
+   مسارِ العرض: خمسةُ صفوفٍ تحمل مفتاحًا صحيحًا ولا شارةَ تظهر لأحدٍ منها.
+   أي أن حكمَ E-20 («تعميمُ العدّادات») **لم يُسلَّم**، وإن بدا مُسلَّمًا لأن
+   العمودَ موجودٌ ومملوء.
+
+   ⇒ هنا يُقرأ العمودُ: قاموسٌ يربط كلَّ مفتاحٍ بدالةِ عدٍّ، ثم تُقرأ صفوفُ
+     الدورِ ويُبنى `route => count`. فمن يضيف مفتاحًا في `nav_items` تظهر شارتُه
+     بلا لمسِ شيفرةِ التصيير — وذاك معنى «التعميم».
+
+   ◆ والعدُّ **مرةً واحدةً لكلِّ مفتاحٍ** ولو تكرّر المفتاحُ في أدوارٍ وصفوفٍ.
+   ◆ ولا تتعطّل القائمةُ بأيِّ فشلٍ هنا: كلُّ عدٍّ في `try` وحدَه، وإخفاقُه
+     يُسقط شارتَه لا الشجرةَ كلَّها.
+   ═══════════════════════════════════════════════════════════════════════════ */
+if (!function_exists('ems_nav_counter_dictionary')) {
+    /**
+     * قاموسُ مفاتيحِ العدّ. المفتاحُ نفسُه المستعمل في `nav_items.counter_source`
+     * (وفي `includes/role_board.php:500` للوحاتِ الأدوار — مصدرٌ واحدٌ للتسمية).
+     *
+     * @return array<string,callable> مفتاح ⇒ دالةٌ تُرجِع عددًا صحيحًا
+     */
+    function ems_nav_counter_dictionary()
+    {
+        return array(
+            /* البلاغاتُ المتأخرةُ على إدارةِ المستخدم */
+            'dept_tickets_late' => function ($g) {
+                return (int) $g->count('tickets', array(
+                    'whereRaw' => "state IN ('open','in_progress') AND due_at IS NOT NULL AND due_at < NOW()",
+                    'params' => array(),
+                ));
+            },
+            /* أيامُ عملٍ تنتظر اعتمادَ سلسلةِ الساعات */
+            'hours_approval' => function ($g) {
+                return (int) $g->count('unit_entries', array(
+                    'whereRaw' => "state IN ('submitted','site_approved','parties_review')",
+                    'params' => array(),
+                ));
+            },
+            /* وقائعُ وحدةٍ تنتظر اعتمادًا (غرفةُ العمليات) */
+            'units_pending_approval' => function ($g) {
+                return (int) $g->count('unit_entries', array(
+                    'whereRaw' => "state = 'submitted'", 'params' => array(),
+                ));
+            },
+            /* صندوقُ الإدارةِ للطلباتِ المالية */
+            'finreq_dept_inbox' => function ($g) {
+                return (int) $g->count('fin_requests', array(
+                    'whereRaw' => "state = 'under_review'", 'params' => array(),
+                ));
+            },
+            /* ── مفاتيحُ E-20 الثلاثةُ التي لم تكن تُقرأ ── */
+            'tickets_open' => function ($g) {
+                return (int) $g->count('tickets', array(
+                    'whereRaw' => "state IN ('open','in_progress')", 'params' => array(),
+                ));
+            },
+            'finreq_pending' => function ($g) {
+                return (int) $g->count('fin_requests', array(
+                    'whereRaw' => "state IN ('under_review','pending_approval')", 'params' => array(),
+                ));
+            },
+            'claims_unbilled' => function ($g) {
+                return (int) $g->count('claims', array(
+                    'whereRaw' => "COALESCE(is_deleted,0) = 0 AND state IN ('draft','review')",
+                    'params' => array(),
+                ));
+            },
+        );
+    }
+}
+
+if (!function_exists('ems_nav_counter_badges')) {
+    /**
+     * شاراتُ الدورِ من `counter_source` — `route => count`.
+     *
+     * @param mysqli   $conn   (يُقبل للتوافق؛ العدُّ يمرُّ ببوابةِ العزل)
+     * @param int|null $roleId الدورُ المطلوب — وإلا دورُ الجلسة
+     */
+    function ems_nav_counter_badges($conn, $roleId = null)
+    {
+        $out = array();
+        if (!isset($_SESSION['user']['id']) || !function_exists('ems_tenant_db')) { return $out; }
+        $role = ($roleId === null) ? strval($_SESSION['user']['role'] ?? '') : strval($roleId);
+        if ($role === '') { return $out; }
+        $dict = ems_nav_counter_dictionary();
+        try {
+            $g = ($role === '-1')
+                ? ems_tenant_db()->forAllTenants('nav counter badges super')
+                : ems_tenant_db();
+            $rows = $g->select('nav_items', array(
+                'columns' => array('route', 'counter_source'),
+                'whereRaw' => "role_id = ? AND active = 1 AND counter_source IS NOT NULL AND counter_source <> ''",
+                'params' => array(intval($role)),
+            ));
+            $memo = array();
+            foreach ($rows as $r) {
+                $key = trim(strval($r['counter_source']));
+                $route = trim(strval($r['route']));
+                if ($key === '' || $route === '' || !isset($dict[$key])) { continue; }
+                if (!array_key_exists($key, $memo)) {
+                    try { $memo[$key] = (int) call_user_func($dict[$key], $g); }
+                    catch (\Throwable $t) {
+                        ems_catch_ignored($t, __METHOD__, 'شارةٌ واحدةٌ تسقط ولا تُسقط الشجرة');
+                        $memo[$key] = 0;
+                    }
+                }
+                if ($memo[$key] > 0) { $out[$route] = $memo[$key]; }
+            }
+        } catch (\Throwable $t) {
+            ems_catch_ignored($t, __METHOD__, 'شاراتٌ فقط — الواجهة لا تتأثر بأي فشل');
+        }
+        return $out;
+    }
+}
+
+if (!function_exists('ems_nav_all_badges')) {
+    /**
+     * كلُّ الشارات: المثبَّتةُ لطلباتِ المالية **+** المعمَّمةُ من `counter_source`.
+     * والمثبَّتةُ تُرجَّح عند التعارضِ (فهي أدقُّ: مبنيةٌ على توجيهِ الإدارةِ نفسِه).
+     */
+    function ems_nav_all_badges($conn, $roleId = null)
+    {
+        $generic = ems_nav_counter_badges($conn, $roleId);
+        $fixed   = ems_finreq_nav_badges($conn);
+        return array_merge($generic, $fixed);
+    }
+}

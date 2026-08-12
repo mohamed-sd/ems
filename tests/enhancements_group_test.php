@@ -42,16 +42,43 @@ check($vis === 0, '★ صفرُ ظهورٍ لنصّ «المروحة» في أس
 head('E-04 — متابعةُ الانحراف من الميزانية لا رابطًا مستقلًّا');
 check(strpos(src('Finance/budget_form_fin.php'), 'variance_monitor_fin.php') !== false,
       '★ الرابطُ من رأس شاشة الميزانية');
-$v = intval($conn->query("SELECT COUNT(*) n FROM nav_items WHERE role_id=17
-                           AND route='Finance/variance_monitor_fin.php' AND active=1")->fetch_assoc()['n']);
-check($v === 0, '★ وصفُّه في سايدبار 17 **أُخفي لا حُذف** (active=0)');
+/* ══ **سلطةٌ أحدثُ نسخت هذا الإخفاء** ═══════════════════════════════════════
+   E-04 أخفى صفَّ الشاشةِ من سايدبار 17 (2026-08-01). ثم صارت **وثيقةُ NAV-09
+   مصدرَ القوائم** (2026-08-03): `nav09_file_map` يُسنِد `variance.php` إلى
+   `Finance/variance_monitor_fin.php` بحالةِ `mapped`، و`tools/nav09_import.php`
+   يُدرج كلَّ صفٍّ في الوثيقةِ بـ`active = 1` **ويُعيد تفعيلَ ما أخفته يدٌ**.
+   فمطالبةُ الصفِّ بأن يبقى مخفيًّا **تطالب بنقضِ الوثيقة** — بل ولو أُعيد إخفاؤه
+   لَسقطت بوابةُ التسليم `nav09_verify` التي تقارن صفوفَ `n9s%` الحيّةَ بالوثيقةِ
+   صفًّا بصف.
+   ⇒ يُحكَم على الخصلةِ الباقيةِ من E-04: الرابطُ من رأسِ شاشةِ الميزانيةِ قائمٌ
+     (أُثبت أعلاه)، **وصفُّ السايدبار من الوثيقةِ لا رابطًا يدويًّا** — أي أن
+     مجموعتَه تحمل بادئةَ `n9s`. فيرسب إن اختفى الصفُّ، ويرسب إن أضافته يدٌ
+     خارجَ الوثيقة. */
+$g17 = $conn->query("SELECT lg.group_code FROM nav_items ni
+                       JOIN link_groups lg ON lg.id = ni.group_id
+                      WHERE ni.role_id = 17
+                        AND ni.route = 'Finance/variance_monitor_fin.php'
+                        AND ni.active = 1")->fetch_assoc();
+check($g17 && strpos((string) $g17['group_code'], 'n9s') === 0,
+    '★ وصفُّه في سايدبار 17 **من وثيقة NAV-09** (n9s%) لا رابطًا يدويًّا — E-04 نُسخ بالوثيقة: '
+    . ($g17 ? $g17['group_code'] : 'لا صفّ'));
 
 head('E-05 — «المعاونون» إلى مدير الصلاحيات');
-$a = intval($conn->query("SELECT COUNT(*) n FROM nav_items WHERE role_id=17
-                           AND route='main/project_users.php' AND active=1")->fetch_assoc()['n']);
+/* ◆ **وشقُّ الإخفاءِ من 17 أعاده المالكُ بقرارٍ** (2026-08-09 ·
+   `2027_01_03_team_group_project_users.php`): «فريقُ العمل» في الأدوارِ الرئيسيةِ
+   كلِّها. فالمطالبةُ بغيابِه عن 17 تطالب بنقضِ قرارٍ صريح.
+   ⇒ يبقى الحكمُ على تسليمِ E-05 الحقيقيِّ الذي لم يُنقَض: ظهورُه لمدير
+     الصلاحيات (15) **بصفٍّ واحدٍ** في مجموعةِ فريقِ العمل — فيرسب إن فُقد
+     الرابطُ أو تكرَّر أو خرج من مجموعتِه. */
 $b = intval($conn->query("SELECT COUNT(*) n FROM nav_items WHERE role_id=15
                            AND route='main/project_users.php' AND active=1")->fetch_assoc()['n']);
-check($a === 0 && $b === 1, '★ أُخفي من 17 وظهر لـ15 — النقلُ إخفاءٌ وإضافةٌ لا حذف');
+$g15 = $conn->query("SELECT lg.group_code FROM nav_items ni
+                       JOIN link_groups lg ON lg.id = ni.group_id
+                      WHERE ni.role_id = 15 AND ni.route = 'main/project_users.php'
+                        AND ni.active = 1")->fetch_assoc();
+check($b === 1 && $g15 && strpos((string) $g15['group_code'], 'team') !== false,
+    '★ «المعاونون» ظهر لمدير الصلاحيات بصفٍّ واحدٍ في مجموعةِ فريقِ العمل — إضافةٌ لا حذف'
+    . ' (وصفُّ الدور 17 أُعيد بقرار المالك 2026-08-09): ' . ($g15 ? $g15['group_code'] : 'لا مجموعة'));
 
 head('E-06 — أعمارُ الذمم 30/60/90 ملوّنةً في شاشات الذمم');
 check(strpos(src('Contracts/collections.php'), 'badge-danger') !== false
