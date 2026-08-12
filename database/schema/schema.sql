@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 04:53:02
+-- المصدر: equipation_manage · التوليد: 2026-08-12 05:06:46
 -- الجداول: 549 · المناظير: 5
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -10712,7 +10712,7 @@ CREATE TABLE `seat_assignments` (
   `created_by` int(10) unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `active_open_seat_key` varchar(40) GENERATED ALWAYS AS (if(`state` = _utf8mb4'active' and `date_to` is null and (`assignment_role` <> _utf8mb4'xD8xA7xD8xADxD8xAAxD9x8AxD8xA7xD8xB7xD9x8A' or `activation_state` = _utf8mb4'active'),concat(`company_id`,_utf8mb4':',`container_id`),NULL)) STORED COMMENT 'CAP-01 §4-⑥/C4: تخصيصٌ مفتوحٌ فعّالٌ واحدٌ لكل مقعد — والاحتياطيُّ pending خارج القيد؛ التداخلُ المدَّدُ بحارس الخدمة',
+  `active_open_seat_key` varchar(40) GENERATED ALWAYS AS (if(`state` = 'active' and `date_to` is null and (`assignment_role` + 0 <> 2 or `activation_state` = 'active'),concat(`company_id`,':',`container_id`),NULL)) STORED COMMENT 'CAP-01 §4-⑥/C4: تخصيصٌ مفتوحٌ فعّالٌ واحدٌ لكل مقعد — والاحتياطيُّ pending خارج القيد (الرتبةُ 2 = احتياطي · تعبيرٌ ASCII لئلا تُشوَّه حرفيةٌ عربيةٌ في تطبيقٍ قادم)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_sa_active_open` (`active_open_seat_key`),
   KEY `ix_sa_seat` (`company_id`,`container_id`,`date_from`),
