@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 21:43:25
+-- المصدر: equipation_manage · التوليد: 2026-08-12 23:47:51
 -- الجداول: 548 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -7088,8 +7088,8 @@ CREATE TABLE `nav_items` (
   KEY `ix_nav_group` (`group_id`),
   KEY `ix_nav_module` (`module_id`),
   CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
-  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0),
-  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK'))
+  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: nav_redirects ──

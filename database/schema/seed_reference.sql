@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-12 21:43:25
+-- المصدر: equipation_manage · التوليد: 2026-08-12 23:47:51
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -5704,7 +5704,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7004,33,'GOV',3929,384,'ردود الإدارات على الملاحظات','Audit/iaf_responses.php','fa fa-circle-dot',14,NULL,'Audit/iaf_responses.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7005,33,'GOV',3929,379,'الكون الرقابي','Audit/iaf_universe.php','fa fa-circle-dot',15,NULL,'Audit/iaf_universe.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7006,33,'GOV',3929,382,'أوراق العمل والأدلة','Audit/iaf_workpapers.php','fa fa-circle-dot',16,NULL,'Audit/iaf_workpapers.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
-(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-12 01:40:30'),
+(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-12 22:56:28'),
 (7008,33,'DAILY',3930,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-circle-dot',2,NULL,'Finance/acc_backflow.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7009,33,'DAILY',3930,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-circle-dot',3,NULL,'Finance/acc_my_day.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7010,33,'DAILY',3930,368,'مصفوفة التوجيه لمحاسبي التخصصات','Finance/acc_routing_matrix.php','fa fa-circle-dot',4,NULL,'Finance/acc_routing_matrix.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
