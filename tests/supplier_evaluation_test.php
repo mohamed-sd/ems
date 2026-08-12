@@ -59,24 +59,32 @@ $r = $conn->query("SELECT indicator, weight, scale_max, note FROM supplier_evalu
                     WHERE company_id={$CO}");
 while ($r && ($x = $r->fetch_assoc())) { $savedWeights[] = $x; }
 
-$teardown = function () use ($conn, $MARK, $CO, $savedWeights) {
+/* ══ **الكنسُ بعائلةِ الوسمِ لا بجولةٍ واحدة.** الوسمُ يحمل رقمَ العملية، فكلُّ
+     جولةٍ تكنس صفوفَها وتترك صفوفَ سابقتِها — **وسطورُ الزمنِ هي مصدرُ الجاهزيةِ
+     والتغطيةِ نفسُه**، فجولتانِ ناجيتانِ تُضاعفان ساعاتِ الفترةِ وبطاقاتِ الطاقة،
+     فتتحرَّك النتيجةُ المحسوبةُ عن شواهدِها (91.11 ⇒ 91.33 ⇒ 91.56 مع كلِّ جولة)
+     — فيُقرأ **انحرافُ حسابٍ** في خدمةٍ سليمةٍ وسببُه بقايا. */
+$FAMILY = 'M17T';
+$teardown = function () use ($conn, $MARK, $FAMILY, $CO, $savedWeights) {
+  foreach (array($MARK, $FAMILY) as $tag) {
     $conn->query("DELETE l FROM supplier_evaluation_lines l
                     JOIN supplier_evaluations e ON e.id = l.evaluation_id
                     JOIN suppliers s ON s.id = e.supplier_id
-                   WHERE s.name LIKE '%{$MARK}%'");
+                   WHERE s.name LIKE '%{$tag}%'");
     $conn->query("DELETE e FROM supplier_evaluations e JOIN suppliers s ON s.id = e.supplier_id
-                   WHERE s.name LIKE '%{$MARK}%'");
-    $conn->query("DELETE FROM tickets WHERE ticket_no LIKE '{$MARK}%'");
-    $conn->query("DELETE FROM unit_time_log WHERE cause_note LIKE '{$MARK}%'");
+                   WHERE s.name LIKE '%{$tag}%'");
+    $conn->query("DELETE FROM tickets WHERE ticket_no LIKE '{$tag}%'");
+    $conn->query("DELETE FROM unit_time_log WHERE cause_note LIKE '{$tag}%'");
     $ids = array();
-    $r = $conn->query("SELECT id FROM supplier_contracts WHERE notes LIKE '{$MARK}%'");
+    $r = $conn->query("SELECT id FROM supplier_contracts WHERE notes LIKE '{$tag}%'");
     if ($r) { while ($x = $r->fetch_assoc()) { $ids[] = intval($x['id']); } }
     foreach ($ids as $cid) {
         $conn->query("DELETE FROM supplier_capacity WHERE contract_id = {$cid}");
         $conn->query("DELETE FROM supplier_contract_lines WHERE contract_id = {$cid}");
         $conn->query("DELETE FROM supplier_contracts WHERE id = {$cid}");
     }
-    $conn->query("DELETE FROM suppliers WHERE name LIKE '%{$MARK}%'");
+    $conn->query("DELETE FROM suppliers WHERE name LIKE '%{$tag}%'");
+  }
     // إعادةُ الأوزان إلى ما كانت عليه بالضبط
     $conn->query("DELETE FROM supplier_evaluation_weights WHERE company_id={$CO}");
     foreach ($savedWeights as $w) {
@@ -164,9 +172,20 @@ check(!$r['ok'] && $r['code'] === 423 && mb_strpos($r['reason'], 'لا تقيي�
 // ═══ ① لا نتيجةَ بلا وزنٍ مكتوب ═══
 head('① **لا نتيجةَ بلا وزنٍ مكتوب** (§4)');
 
+/* ══ **الفاحصُ يصنع شرطَه ولا يفترضه في الحيّ.** الأوزانُ **إعدادٌ مشتركٌ
+     للشركة**، والكنسُ يُعيد المحفوظَ منها (وهو صوابٌ: لا يكسر إعدادًا حيًّا).
+     فإن كانت الشركةُ تحمل أوزانًا — وهي تحملها فعلًا: الخمسةُ بمجموعِ 100 —
+     فحالةُ «بلا أوزان» **لا تقع أبدًا**، فيرسب الشرطُ ويُقرأ عطلًا في حارسٍ
+     يعمل. فتُخلى الأوزانُ **لهذه القياسةِ وحدَها** ثم تُكتب بعدها (السطورُ
+     التالية تكتبها أصلًا)، والمحفوظُ يعود في الكنسِ كما كان بالضبط. */
+$conn->query("DELETE FROM supplier_evaluation_weights WHERE company_id={$CO}");
+$wNow = (int) $conn->query("SELECT COUNT(*) c FROM supplier_evaluation_weights
+                             WHERE company_id={$CO}")->fetch_assoc()['c'];
+check($wNow === 0, 'وشرطُ القياسِ مهيَّأ: صفرُ وزنٍ مكتوبٍ للشركة (والمحفوظُ يعود في الكنس)');
 $r = SES::generate($conn, $gate, $CO, $SUP1, '2094-05-01', '2094-05-31', $ACTOR);
 check(!$r['ok'] && $r['code'] === 422 && mb_strpos($r['reason'], 'انطباعٌ برقم') !== false,
-      'بلا أوزانٍ مكتوبةٍ ⇒ **422** — «النتيجةُ بلا وزنٍ انطباعٌ برقم»');
+      'بلا أوزانٍ مكتوبةٍ ⇒ **422** — «النتيجةُ بلا وزنٍ انطباعٌ برقم»'
+      . ($r['ok'] ? ' (مرَّ!)' : ' — ' . $r['code'] . ': ' . mb_substr((string) $r['reason'], 0, 60)));
 
 $r = SES::saveWeight($conn, $gate, $CO, array('indicator' => 'punctuality', 'weight' => 10), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422 && mb_strpos($r['reason'], '§4-التقييم') !== false,
