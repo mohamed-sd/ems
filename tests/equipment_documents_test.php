@@ -74,9 +74,25 @@ foreach ($mig as $x) { $m[$x['migrated_from']] = (int) $x['n']; }
 check(($m['equipments.license'] ?? 0) === 13, 'رخصُ المعدات: ' . ($m['equipments.license'] ?? 0) . '/13');
 check(($m['equipment_operators.license'] ?? 0) === 26, 'رخصُ المشغّلين: ' . ($m['equipment_operators.license'] ?? 0) . '/26');
 check(($m['employees.identity'] ?? 0) === 26, 'هوياتُ الموظفين: ' . ($m['employees.identity'] ?? 0) . '/26');
-$expiredMig = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
-    WHERE migrated_from IS NOT NULL AND status='منتهية'")->fetch_assoc()['c'];
-check($expiredMig === 63, "الموسومةُ منتهيةً عند الترحيل: {$expiredMig}/63 — الأزمةُ المقيسة صارت مرئية");
+/* ══ العمودُ `status` **إداريٌّ لا حقيقة** — والحقيقةُ تاريخُ الانتهاء ═══════════
+   كان الحكمُ `=== 63`: لقطةَ يومِ البناء (2026-07-27). ثم غيّرت **عمليتان
+   مأذونتان** ذلك العمودَ بحقٍّ: بذرةُ المالك `doc_expiry_activation.php`
+   (2026-07-29 — «اجعل ثمانيةً منتهيةً وجدِّد الباقي») وتواريخُ ق-15 التجريبية
+   (2026-08-06)، فصار 34. أي أن الفحصَ كان يطالب بأن **لا يُجدَّد شيءٌ أبدًا**.
+   ⇒ يُحكَم على ثوابتِ الترحيلِ التي تحمي مستخدمًا: أن التاريخَ نُقل كاملًا، وأن
+     منه منتهيًا **حقيقةً اليوم**، وأن **لا وثيقةَ منتهيةٍ مخفيّةٌ** عن المؤشرات
+     (محذوفةً أو ملغاةً). فيرسب إن أسقط الترحيلُ تاريخًا أو صفًّا، أو أُخفيت
+     منتهيةٌ عن المؤشرات — ويخضرُّ على التجديدِ المشروع. */
+$migDated = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
+    WHERE migrated_from IS NOT NULL AND expiry_date IS NOT NULL")->fetch_assoc()['c'];
+$migExpiredNow = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
+    WHERE migrated_from IS NOT NULL AND expiry_date IS NOT NULL AND expiry_date < CURDATE()")->fetch_assoc()['c'];
+$migHidden = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
+    WHERE migrated_from IS NOT NULL AND expiry_date IS NOT NULL AND expiry_date < CURDATE()
+      AND (COALESCE(is_deleted,0) <> 0 OR status = 'ملغاة')")->fetch_assoc()['c'];
+check($migDated === 65 && $migExpiredNow > 0 && $migHidden === 0,
+    "الترحيلُ نقل التاريخَ كاملًا ({$migDated}/65) ومنه منتهيةٌ حقيقةً اليوم {$migExpiredNow}"
+    . " بلا مخفيّةٍ ({$migHidden}/0)");
 // النسخةُ لا تُرحَّل مرتين: employees.license_expiry_date مطابقٌ لسجل التأهيل 26/26
 $dupCheck = (int) $db->query("SELECT COUNT(*) c FROM employees e
     JOIN equipment_operators eo ON eo.employee_id = e.id
@@ -162,10 +178,26 @@ check($still === 50, "التكرار لم يكتب صفًّا: {$still}/50");
 // ═══ ⑤ التحذير حيّ في التايم شيت ═══
 head('⑤ التحذير: القائمةُ توسم — والحفظُ يمرّ (قرار المالك)');
 check(login('محمد'), 'دخول «محمد» (إدارة التشغيل)');
-// قائمة السائقين لتشغيلٍ سائقُه منتهي الرخصة (المرحَّلة تكفي: 25 منتهية)
-list($c, $dr) = req(BASE . '/Timesheet/get_drivers.php?operation_id=4&shift=D', null,
+/* التشغيلُ **يُشتقُّ من القاعدة** لا يُثبَّت رقمًا: «التشغيل 4» كان صالحًا حتى نُقل
+   تاريخُ رخصةِ مشغّلِه بق-15 فصار ساريًا — فيسقط فحصٌ على منتجٍ يوسم كما يجب.
+   والرسالةُ تَعِد «بتاريخها»، فيُطلَب **التاريخُ نفسُه** لا مجردَ الكلمة. */
+$drv = $db->query("SELECT o.id op_id, IF(ed.shift_type='N','N','D') sh, e.id emp_id,
+        (SELECT MAX(dd.expiry_date) FROM equipment_documents dd
+          WHERE dd.company_id=4 AND dd.subject_type='operator' AND dd.doc_type='رخصة قيادة'
+            AND COALESCE(dd.is_deleted,0)=0 AND dd.subject_id=e.id) exp
+      FROM operations o
+      JOIN equipment_drivers ed ON ed.equipment_id=o.equipment AND ed.status=1 AND ed.company_id=4
+      JOIN employees e ON e.id=ed.employee_id AND e.status=1 AND e.company_id=4
+     WHERE o.company_id=4 AND e.employee_type IN ('سائق/مشغّل','مبنشر','مساعد')
+     HAVING exp IS NOT NULL AND exp < CURDATE() ORDER BY o.id LIMIT 1")->fetch_assoc();
+check($drv !== null, 'وُجد تشغيلٌ سائقُه منتهي الرخصة (شرطُ القياس — لا تأكيدَ فارغ)');
+$drOp = $drv ? (int) $drv['op_id'] : 0;
+$drSh = $drv ? $drv['sh'] : 'D';
+$drExp = $drv ? (string) $drv['exp'] : '';
+list($c, $dr) = req(BASE . '/Timesheet/get_drivers.php?operation_id=' . $drOp . '&shift=' . $drSh, null,
     array('X-Requested-With: XMLHttpRequest', 'Referer: ' . BASE . '/Timesheet/timesheet.php?type=1'));
-check(strpos($dr, 'رخصة منتهية') !== false, 'قائمةُ السائقين توسم «⚠ رخصة منتهية» بتاريخها');
+check($drExp !== '' && strpos($dr, 'رخصة منتهية ' . $drExp) !== false,
+    "قائمةُ السائقين توسم «⚠ رخصة منتهية» بتاريخها ({$drExp}) في التشغيل {$drOp}");
 
 // حفظُ يومٍ لمشغّلٍ منتهي الرخصة — يمرّ برسالةٍ فيها التنبيه
 list(, $pg3) = req(BASE . '/Timesheet/timesheet.php?type=1');
@@ -220,13 +252,24 @@ $srcId = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
 
 check(mb_strpos($hb, 'رخصُ قيادةٍ منتهية') !== false, "بطاقةُ «رخصُ قيادةٍ منتهية» ظاهرة (المصدر {$srcLic})");
 check(mb_strpos($hb, 'هوياتٌ منتهية') !== false, "بطاقةُ «هوياتٌ منتهية» ظاهرة (المصدر {$srcId})");
-// الرقمُ المعروض = المصدرُ نفسُه (لا تقريبَ ولا تلفيق)
-$licShown = false; $idShown = false;
-$pL = mb_strpos($hb, 'رخصُ قيادةٍ منتهية');
-if ($pL !== false) { $licShown = (mb_strpos(mb_substr($hb, max(0, $pL - 400), 420), '>' . $srcLic . '<') !== false); }
-$pI = mb_strpos($hb, 'هوياتٌ منتهية');
-if ($pI !== false) { $idShown = (mb_strpos(mb_substr($hb, max(0, $pI - 400), 420), '>' . $srcId . '<') !== false); }
-check($licShown && $idShown, "الرقمان المعروضان = المصدر حرفيًّا ({$srcLic} · {$srcId})");
+/* ══ الرقمُ يُقرأ من **بطاقتِه** لا من 400 حرفٍ قبلَ عنوانها ══════════════════
+   كان البحثُ يمسح 400 حرفًا **قبلَ** العنوان عن `>13<`. والمكوِّنُ يضع القيمةَ
+   **بعدَ** العنوان وبصيغةٍ أخرى (مقيسٌ):
+     `<div class="ems-kpi-title">… العنوان</div><div class="ems-kpi-value">13 <small>سجل</small></div>`
+   فلا الجهةُ صحيحةٌ ولا الشكل — فيسقط الفحصُ على بطاقةٍ تعرض الرقمَ الصحيح.
+   ⇒ يُقتطَع من العنوانِ إلى أوّلِ `ems-kpi-value` بعده ويُؤخَذ الرقمُ منه. ويبقى
+     ناطقًا: بطاقةٌ غائبةٌ أو صنفٌ مُعاد التسميةِ أو رقمٌ مخالفٌ ⇒ `null` ≠ عددٌ. */
+$kpiVal = function ($html, $label) {
+    $p = mb_strpos($html, $label);
+    if ($p === false) { return null; }
+    $tail = mb_substr($html, $p, 400);
+    return preg_match('~ems-kpi-value"\s*>\s*([0-9]+)~u', $tail, $mm) ? (int) $mm[1] : null;
+};
+$licShown = $kpiVal($hb, 'رخصُ قيادةٍ منتهية');
+$idShown  = $kpiVal($hb, 'هوياتٌ منتهية');
+check($licShown === $srcLic && $idShown === $srcId,
+    "الرقمان المعروضان = المصدر حرفيًّا ({$srcLic} · {$srcId}) — المعروض ("
+    . var_export($licShown, true) . ' · ' . var_export($idShown, true) . ')');
 
 // «توشك» مهمّةٌ تختفي عند الصفر — سلوكٌ مقصودٌ موثَّق في main/role_board.php
 $srcSoon = (int) $db->query("SELECT COUNT(*) c FROM equipment_documents
