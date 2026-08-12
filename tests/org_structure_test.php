@@ -125,16 +125,33 @@ $r = $conn->query("INSERT INTO org_assignments (company_id, person_id, assignmen
 check($r === false, 'valid_to = NULL يُرفض — لا تكليف مفتوح المدة (§2④)');
 
 head('⑤ ORG-02 — الرأس مشتق من التكليف النافذ');
-$maintUnit = intval($conn->query("SELECT unit_id FROM org_units WHERE company_id={$CO} AND unit_code='maintenance'")->fetch_assoc()['unit_id']);
+/* ══ البرهانُ على وحدةٍ **بلا رأسٍ قائم** — لا مزاحمةً لتكليفٍ حقيقيّ ══════════
+   كان البرهانُ على وحدةِ **الصيانة**، وفيها تكليفٌ مركزيٌّ حقيقيٌّ نافذٌ (`#145`
+   للشخص 58 · `OPS-2026-100` إلى 2027-07-31) — فرأسُها المشتقُّ **58 لا 9100**،
+   وإنهاءُ تكليفِ الفاحصِ لا يُسقط رأسًا يملكه غيرُه. فالفحصُ كان يقيس وحدةً
+   مأهولةً ويطلب منها أن تُطيع تكليفَه — فأدان اشتقاقًا صحيحًا.
+   ⇒ تُختار وحدةٌ **رأسُها NULL الآن** (مقيسٌ: أكثرُ الوحداتِ كذلك)، فيُبرهَن
+     الاشتقاقُ صعودًا (NULL ⟶ شخصُ الفاحص) ونزولًا (⟶ NULL بعد الإنهاء). وهذا
+     يرسب عند إفسادِ مفحوصِه: لو لم يكن الرأسُ مشتقًّا لَما تغيّر بتغيُّرِ التكليف. */
+$hUnit = 0;
+$rq = $conn->query("SELECT u.unit_id FROM org_units u
+                     LEFT JOIN v_org_unit_heads v ON v.unit_id = u.unit_id
+                    WHERE u.company_id={$CO} AND v.head_person_id IS NULL
+                    ORDER BY u.unit_id LIMIT 1");
+if ($rq && ($x = $rq->fetch_assoc())) { $hUnit = (int) $x['unit_id']; }
+check($hUnit > 0, "ووحدةٌ بلا رأسٍ قائمٍ للبرهان (#{$hUnit})");
+/* نطاقُ موقعٍ لا `site_group` — فـ`site_manager` حرٌّ في نطاقِ الموقعِ ولا يزاحم */
 $conn->query("INSERT INTO org_assignments (company_id, person_id, assignment_type_code,
     org_unit_id, scope_type, scope_id, valid_from, valid_to, decided_by_person_id, decision_ref, state)
-    VALUES ({$CO}, 9100, 'maintenance_mgr', {$maintUnit}, 'site_group', 0,
+    VALUES ({$CO}, 9100, 'site_manager', {$hUnit}, 'site', {$siteId},
             CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), 1, '{$MARK}', 'active')");
 $asg = intval($conn->insert_id);
-$r = $conn->query("SELECT head_person_id FROM v_org_unit_heads WHERE unit_id = {$maintUnit}")->fetch_assoc();
-check(intval($r['head_person_id']) === 9100, 'رأس الصيانة يُشتق من التكليف النافذ');
+check($asg > 0, 'وتكليفُ رأسٍ أُدرج للبرهان (#' . $asg . ') ' . ($asg ? '' : $conn->error));
+$r = $conn->query("SELECT head_person_id FROM v_org_unit_heads WHERE unit_id = {$hUnit}")->fetch_assoc();
+check(intval($r['head_person_id']) === 9100,
+    'رأسُ الوحدةِ يُشتق من التكليف النافذ (صار ' . ($r['head_person_id'] ?? 'NULL') . ')');
 $conn->query("UPDATE org_assignments SET state = 'ended' WHERE asg_id = {$asg}");
-$r = $conn->query("SELECT head_person_id FROM v_org_unit_heads WHERE unit_id = {$maintUnit}")->fetch_assoc();
+$r = $conn->query("SELECT head_person_id FROM v_org_unit_heads WHERE unit_id = {$hUnit}")->fetch_assoc();
 check($r['head_person_id'] === null, 'إنهاء التكليف يُسقط الرأس في اللحظة نفسها — لا عمود مكتوب');
 
 head('⑥ المفتاح الطبيعي للتكليف');

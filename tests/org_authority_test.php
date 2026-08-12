@@ -98,14 +98,34 @@ $r = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignm
     'reporting_lines' => array(array('line_type' => 'operational', 'reports_to_assignment_id' => 0))));
 check(!$r['ok'] && $r['code'] === 422, 'خط تبعية واحد → 422');
 
-// تكليف مرجعي مركزي يُروى إليه الخطان
-$rc = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9200, 'assignment_type_code' => 'maintenance_mgr',
-    'org_unit_id' => $unitId, 'scope_type' => 'site_group', 'scope_id' => 0,
-    'valid_from' => $today, 'valid_to' => $plus1y, 'decided_by_person_id' => $DECIDER,
-    'decision_ref' => $MARK,
-    'capabilities' => array(array('code' => 'maintenance.approve'))));
-check($rc['ok'], "تكليف مركزي مرجعي أُنشئ (#{$rc['asg_id']})");
-$CENTRAL = $rc['asg_id'];
+/* ══ التكليفُ المركزيُّ **يُوجَد أو يُنشأ** — لا يُكرَّر ══════════════════════════
+   الخدمةُ تحرس «**تكليفٌ واحدٌ في أي لحظة** للنوع والنطاق نفسيهما» (409). وفي
+   الإنتاجِ تكليفٌ مركزيٌّ حقيقيٌّ قائمٌ لهذا النوعِ والنطاق: `#145` للشخص 58
+   بمرجعِ قرارٍ `OPS-2026-100` نافذٌ إلى 2027-07-31. فمحاولةُ إنشاءِ ثانٍ **تُردُّ
+   بحقٍّ** — وكان الفاحصُ يقرأ الردَّ عطبًا، فيُدين حارسًا يمنع ازدواجَ السلطة
+   (وهو بالضبط ما يجب أن يمنعه).
+   ⇒ يُبحَث عن المركزيِّ النافذِ أوّلًا ويُتَّخذ هدفًا لخطوطِ التبعية — فذاك
+     الواقعُ الذي يُبرهن عليه؛ ولا يُنشأ إلا إن لم يكن (فيصحُّ على قاعدةٍ عذراءَ
+     وعلى قاعدةٍ فيها إنتاجٌ معًا، ولا يزاحم بياناتٍ حقيقية).                    */
+$exists = $conn->query("SELECT asg_id, person_id FROM org_assignments
+                         WHERE company_id={$CO} AND assignment_type_code='maintenance_mgr'
+                           AND scope_type='site_group' AND state='active'
+                           AND valid_from <= '{$today}' AND valid_to >= '{$today}'
+                         ORDER BY asg_id LIMIT 1")->fetch_assoc();
+if ($exists) {
+    $CENTRAL = (int) $exists['asg_id'];
+    check($CENTRAL > 0, "تكليفٌ مركزيٌّ نافذٌ قائمٌ يُتَّخذ مرجعًا (#{$CENTRAL} للشخص {$exists['person_id']})"
+        . ' — والحارسُ يمنع ثانيًا للنوعِ والنطاقِ نفسيهما');
+} else {
+    $rc = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9200, 'assignment_type_code' => 'maintenance_mgr',
+        'org_unit_id' => $unitId, 'scope_type' => 'site_group', 'scope_id' => 0,
+        'valid_from' => $today, 'valid_to' => $plus1y, 'decided_by_person_id' => $DECIDER,
+        'decision_ref' => $MARK,
+        'capabilities' => array(array('code' => 'maintenance.approve'))));
+    check($rc['ok'], "تكليف مركزي مرجعي أُنشئ (#{$rc['asg_id']})"
+        . ($rc['ok'] ? '' : ' — رمز ' . ($rc['code'] ?? '؟') . ': ' . mb_substr((string) ($rc['reason'] ?? ''), 0, 150)));
+    $CENTRAL = $rc['asg_id'];
+}
 
 $r1 = ASV::create($conn, array('company_id' => $CO, 'person_id' => 9201, 'assignment_type_code' => 'site_manager',
     'org_unit_id' => $unitId, 'scope_type' => 'site', 'scope_id' => $SITE_A,
