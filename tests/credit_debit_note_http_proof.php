@@ -58,12 +58,24 @@ function n_login($who, $user) {
 function n_csrf($body) {
     return preg_match('~name="clm_csrf"\s+value="([^"]+)"~', $body, $m) ? $m[1] : '';
 }
+/* ◆ **رمزان لا رمز**: الشاشةُ تحقن رمزَها `clm_csrf` **والرمزَ المركزيَّ**
+     `csrf_token`، والحارسُ المركزيُّ (ADR-05) يقيس المركزيَّ حصرًا — فطلبٌ برمزِ
+     الشاشةِ وحدَه يُردُّ **403 بلا وميضٍ ولا جسم**، فيُقرأ صمتُه فشلًا في الفعل. */
+function n_gcsrf($body) {
+    return preg_match('~name="csrf_token"\s+value="([^"]+)"~', $body, $m) ? $m[1] : '';
+}
+/* ══ **الرسالةُ وميضُ جلسةٍ لا مُعامَلُ عنوان.** `Contracts/*` توجّه عبر
+     `ems_gov_flash_redirect` الذي يخزّن النصَّ في `$_SESSION['ems_flash_gov']`
+     ويوجّه **بعنوانٍ مجرَّد** — فقراءةُ `?msg=` تعود فارغةً **دائمًا** ويُقرأ
+     صمتُها فشلًا. ويبقى المُعامَلُ مقروءًا أوّلًا لأن شاشاتٍ أخرى (المشتريات ·
+     الفتراتُ الماليةُ · تسوياتُ الموردين) تضع الرسالةَ فيه فعلًا. */
 function n_msg($h) {
-    if (preg_match('~Location:\s*(\S+)~i', $h, $m)) {
-        parse_str((string) parse_url(trim($m[1]), PHP_URL_QUERY), $p);
-        return isset($p['msg']) ? $p['msg'] : '';
-    }
-    return '';
+    require_once __DIR__ . '/_http_flash.php';
+    global $BASE;
+    return ems_flash_or_msg($h, $BASE . '/Contracts', function ($u) {
+        list(, , $b) = n_req($u);
+        return $b;
+    });
 }
 
 $conn = $GLOBALS['conn'];
@@ -127,19 +139,19 @@ else {
     head('② السببُ والمستندُ إلزامان من الشاشة');
     list(, $h2) = n_req($BASE . '/Contracts/claims.php', array(
         'action' => 'note_create', 'claim_id' => $CLAIM, 'note_kind' => 'credit',
-        'amount' => '300', 'reason' => '', 'doc_ref' => 'D-1', 'clm_csrf' => $csrf));
+        'amount' => '300', 'reason' => '', 'doc_ref' => 'D-1', 'clm_csrf' => $csrf, 'csrf_token' => n_gcsrf($p1)));
     check(mb_strpos(n_msg($h2), 'سببُ الإشعار إلزامي') !== false,
         'بلا سبب: يُردّ برسالته — ' . mb_substr(n_msg($h2), 0, 60));
 
     list(, $h3) = n_req($BASE . '/Contracts/claims.php', array(
         'action' => 'note_create', 'claim_id' => $CLAIM, 'note_kind' => 'credit',
-        'amount' => '300', 'reason' => 'مبالغةٌ في الفوترة', 'doc_ref' => '', 'clm_csrf' => $csrf));
+        'amount' => '300', 'reason' => 'مبالغةٌ في الفوترة', 'doc_ref' => '', 'clm_csrf' => $csrf, 'csrf_token' => n_gcsrf($p1)));
     check(mb_strpos(n_msg($h3), 'المستند') !== false, 'وبلا مستند: يُردّ كذلك');
 
     // الإنشاءُ الصحيح
     $post = array('action' => 'note_create', 'claim_id' => $CLAIM, 'note_kind' => 'credit',
                   'amount' => '300', 'reason' => 'مبالغةٌ في الفوترة', 'doc_ref' => 'DOC-77',
-                  'clm_csrf' => $csrf);
+                  'clm_csrf' => $csrf, 'csrf_token' => n_gcsrf($p1));
     list(, $h4) = n_req($BASE . '/Contracts/claims.php', $post);
     check(mb_strpos(n_msg($h4), 'أُنشئ الإشعار') !== false, 'وبهما معًا: أُنشئ — ' . mb_substr(n_msg($h4), 0, 60));
 
@@ -154,7 +166,7 @@ else {
     $NOTE = (int) $conn->query("SELECT id FROM credit_debit_notes WHERE claim_id={$CLAIM} LIMIT 1")
                        ->fetch_assoc()['id'];
     list(, $h6) = n_req($BASE . '/Contracts/claims.php', array(
-        'action' => 'note_submit', 'note_id' => $NOTE, 'clm_csrf' => $csrf));
+        'action' => 'note_submit', 'note_id' => $NOTE, 'clm_csrf' => $csrf, 'csrf_token' => n_gcsrf($p1)));
     check(mb_strpos(n_msg($h6), 'رُفع الإشعارُ للمالية') !== false, 'ورُفع للمالية');
 
     // ═══ ③ مَن أنشأ لا يعتمد ═══
@@ -162,7 +174,7 @@ else {
     list($c7, , $p7) = n_req($BASE . '/Contracts/claims.php?open=' . $CLAIM);
     check(mb_strpos($p7, 'note_approve') === false, 'المبيعاتُ لا ترى زرَّ الإجازة في الشاشة');
     list(, $h7) = n_req($BASE . '/Contracts/claims.php', array(
-        'action' => 'note_approve', 'note_id' => $NOTE, 'clm_csrf' => n_csrf($p7)));
+        'action' => 'note_approve', 'note_id' => $NOTE, 'clm_csrf' => n_csrf($p7), 'csrf_token' => n_gcsrf($p7)));
     check(mb_strpos(n_msg($h7), 'صلاحيةُ المالية') !== false,
         'وفعلُها يُردّ ولو أُرسل يدويًّا — ' . mb_substr(n_msg($h7), 0, 60));
     $stNow = $conn->query("SELECT state FROM credit_debit_notes WHERE id={$NOTE}")->fetch_assoc();
@@ -174,7 +186,7 @@ else {
     list($c8, , $p8) = n_req($BASE . '/Contracts/claims.php?open=' . $CLAIM);
     check($c8 === 200 && mb_strpos($p8, 'note_approve') !== false, 'والماليةُ ترى زرَّ الإجازة');
     list(, $h8) = n_req($BASE . '/Contracts/claims.php', array(
-        'action' => 'note_approve', 'note_id' => $NOTE, 'clm_csrf' => n_csrf($p8)));
+        'action' => 'note_approve', 'note_id' => $NOTE, 'clm_csrf' => n_csrf($p8), 'csrf_token' => n_gcsrf($p8)));
     check(mb_strpos(n_msg($h8), 'تحرّكت ذمّةُ العميل') !== false,
         'وأُجيز — ' . mb_substr(n_msg($h8), 0, 80));
 

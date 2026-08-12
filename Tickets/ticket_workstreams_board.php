@@ -144,6 +144,7 @@ include '../insidebar.php';
                     <td>
                     <?php if ($can_edit && $w['activation_state'] === 'opened' && !in_array($w['ws_state'], array('closed', 'admin_closed'), true)): ?>
                         <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                             <input type="hidden" name="tk" value="<?php echo $tk; ?>">
                             <input type="hidden" name="ws_id" value="<?php echo intval($w['ws_id']); ?>">
                             <?php if ($w['ws_state'] === 'new'): ?>

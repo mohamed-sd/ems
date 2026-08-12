@@ -244,6 +244,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> سعرُ صرفٍ جديد</h5>
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="add_rate" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
@@ -367,6 +368,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             عملةُ الأساس تُعلَن في بيانات الشركة ولا تُختار هنا — وما يُسجَّل هنا يُقاس بها.
         </p>
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="add_currency" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_232_537f9">الرمز (ISO) *</label>

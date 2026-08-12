@@ -197,6 +197,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($can_add || $can_edit): ?>
     <form method="post" class="allforms" id="termForm">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="pt_action" value="save_term">
         <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
         <input type="hidden" name="term_id" id="f_term_id" value="">
@@ -322,6 +323,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-import"></i> قراءةُ مؤشرٍ بمرجعها</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="pt_action" value="add_reading">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
@@ -361,6 +363,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card-body">
         <?php if ($can_edit): ?>
         <form method="post" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="pt_action" value="run_review">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div><label for="emsf_88_50f0f">تاريخ المراجعة</label>
@@ -382,6 +385,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php if ($can_edit && $rv['approved_at'] === null
                                   && in_array((string)$rv['outcome'], array('amended','capped'), true)): ?>
                             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="pt_action" value="approve_revision">
                                 <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
                                 <input type="hidden" name="revision_id" value="<?php echo intval($rv['id']); ?>">

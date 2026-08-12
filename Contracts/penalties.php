@@ -256,7 +256,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </div>
             <?php if ($can_approve && $held > 0 && $ret_ended && !$ret_released): ?>
                 <form method="post" action="" class="pen-inline"
-                      onsubmit="return confirm('ردُّ ضمان حسن التنفيذ كاملًا (<?php echo pen_n($held); ?>)؟\n\nيُنشأ مستخلصٌ ختاميٌّ مسودةٌ ببندٍ موجب، ولا يصير مالًا حتى تُجيزه يدٌ ثانية.\nولا خصمَ للغرامات المعلّقة — خُصمت في مستخلصاتها.')">
+                      onsubmit="return confirm('ردُّ ضمان حسن التنفيذ كاملًا (<?php echo pen_n($held); ?>
+        <?php echo csrf_field(); ?>)؟\n\nيُنشأ مستخلصٌ ختاميٌّ مسودةٌ ببندٍ موجب، ولا يصير مالًا حتى تُجيزه يدٌ ثانية.\nولا خصمَ للغرامات المعلّقة — خُصمت في مستخلصاتها.')">
                     <input type="hidden" name="pen_action" value="release_retention">
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
@@ -266,6 +267,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <?php endif; ?>
             <?php if ($can_assess): ?>
                 <form method="post" action="" class="pen-inline">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="pen_action" value="assess">
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
@@ -355,6 +357,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <td class="pen-small">
                                 <?php if ($can_assess && $a['state'] === 'computed'): ?>
                                     <form method="post" action="" class="pen-inline">
+        <?php echo csrf_field(); ?>
                                         <input type="hidden" name="pen_action" value="review">
                                         <input type="hidden" name="aid" value="<?php echo intval($a['id']); ?>">
                                         <input type="hidden" name="contract" value="<?php echo $sel; ?>">
@@ -366,6 +369,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <?php if ($can_approve && $a['state'] === 'reviewed'): ?>
                                     <form method="post" action="" class="pen-inline"
                                           onsubmit="return confirm('إجازةُ هذا البند؟ سيُنشر قيدُه في الدفتر ويظهر في المستخلص.')">
+        <?php echo csrf_field(); ?>
                                         <input type="hidden" name="pen_action" value="approve">
                                         <input type="hidden" name="aid" value="<?php echo intval($a['id']); ?>">
                                         <input type="hidden" name="contract" value="<?php echo $sel; ?>">
@@ -394,6 +398,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div id="penWaive" class="pen-modal" hidden>
         <form method="post" action="" class="pen-modal-card">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="pen_action" value="waive">
             <input type="hidden" name="aid" id="penWaiveId" value="">
             <input type="hidden" name="contract" value="<?php echo $sel; ?>">

@@ -210,12 +210,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php if ($can_edit): ?>
         <div style="display:flex;gap:8px;margin-top:12px">
             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="pal_action" value="dry">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i>
                     اعرض المرشَّح <strong>(بلا كتابة)</strong></button>
             </form>
             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="pal_action" value="link_all">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-link"></i>
@@ -240,6 +242,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$u['state']); ?></td>
                     <td><?php if ($can_edit): ?>
                         <form method="post" style="display:flex;gap:4px">
+        <?php echo csrf_field(); ?>
                             <input type="hidden" name="pal_action" value="link_one">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_kind" value="unit">

@@ -161,6 +161,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php fin_msg_banner(); ?>
 
     <form id="finForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء ميزانية</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section">
@@ -261,7 +262,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ob_start();
                         // ① رفعٌ من الإدارة — مسودةً كانت أو معادة
                         if ($can_edit && $mine && !$is_approver && in_array($st, fin_budget_editable_states(), true)) {
-                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفعُ الموازنة للمالية؟ لن تستطيع تعديلَ بنودها بعده.\")'>"
+                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفعُ الموازنة للمالية؟ لن تستطيع تعديلَ بنودها بعده.\")'>
+        <?php echo csrf_field(); ?>"
                                . "<input type='hidden' name='bg_action' value='submit'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<button type='submit' class='action-btn edit' title='رفعٌ للمالية'><i class='fas fa-paper-plane'></i></button></form>";
@@ -270,11 +272,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         //    المرفوعة وحدها، وبشرط ألّا يكون القسمُ قسمَه هو.
                         $self_owned = fin_budget_self_owned($ctx['role'], strval($row['dept_module']), $is_super_admin);
                         if ($is_approver && $st === 'submitted' && $can_edit && !$self_owned) {
-                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"إجازةُ الموازنة كمرجعٍ حاكم؟\")'>"
+                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"إجازةُ الموازنة كمرجعٍ حاكم؟\")'>
+        <?php echo csrf_field(); ?>"
                                . "<input type='hidden' name='bg_action' value='approve'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<button type='submit' class='action-btn edit' title='إجازة'><i class='fas fa-gavel'></i></button></form>";
-                            echo "<form method='post' style='display:inline' onsubmit='var r=prompt(\"سببُ الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>"
+                            echo "<form method='post' style='display:inline' onsubmit='var r=prompt(\"سببُ الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>
+        <?php echo csrf_field(); ?>"
                                . "<input type='hidden' name='bg_action' value='return'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<input type='hidden' name='reason' value=''>"

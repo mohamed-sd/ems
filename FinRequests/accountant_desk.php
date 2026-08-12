@@ -93,6 +93,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                 <?php endif; ?>
                 <form action="request_actions.php" method="post" class="allforms allforms-visible">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="acct_forward">
                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                     <div class="form-grid">
@@ -131,6 +132,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </form>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="return_request">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
@@ -139,6 +141,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </form>
                     <?php if (intval($r['duplicate_flag']) === 1): ?>
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="merge">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">

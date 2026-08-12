@@ -127,6 +127,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم رمز -->
     <form id="codeForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-percent"></i> رمز ضريبة</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_264_b25b3">الكود <span class="required">*</span></label><input type="text" name="tax_code" required placeholder="VAT15" id="emsf_264_b25b3"></div>
@@ -141,6 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم حركة -->
     <form id="txForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-receipt"></i> حركة ضريبية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_268_d88f3">النوع</label><select name="direction" id="emsf_268_d88f3"><option value="output">مخرجات (مبيعات)</option><option value="input">مدخلات (مشتريات)</option></select></div>

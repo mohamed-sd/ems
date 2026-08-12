@@ -230,6 +230,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php fin_msg_banner(); ?>
 
     <form id="finForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء قيد (مدين = دائن)</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section">

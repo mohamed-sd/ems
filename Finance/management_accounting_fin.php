@@ -101,6 +101,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php fin_msg_banner(); ?>
 
     <form id="centerForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-sitemap"></i> مركز تكلفة/ربح</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_391_76b8e">الكود <span class="required">*</span></label><input type="text" name="center_code" required id="emsf_391_76b8e"></div>
@@ -115,6 +116,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <form id="allocForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-arrows-turn-to-dots"></i> تخصيص داخلي / تسوية بينية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_396_be607">النوع</label><select name="alloc_type" id="emsf_396_be607"><?php foreach ($alloc_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>

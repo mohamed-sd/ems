@@ -204,6 +204,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
 
         <form method="post" class="ems-form">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="rp_action" value="save">
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <div class="form-group" style="max-width:280px;margin-bottom:12px">
@@ -303,6 +304,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td style="white-space:normal"><?php echo htmlspecialchars((string)($r['end_reason'] ?? '—')); ?></td>
                     <td><?php if ($can_edit && (string)$r['state'] !== 'ended'): ?>
                         <form method="post" style="display:flex;gap:4px">
+        <?php echo csrf_field(); ?>
                             <input type="hidden" name="rp_action" value="end_row">
                             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">

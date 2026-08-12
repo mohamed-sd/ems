@@ -119,6 +119,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php if ($can_ask_exception): ?>
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;align-items:center;"
                           onsubmit="var x=prompt('مبرّر التنفيذ الطارئ (يقرؤه المدير المالي):');if(!x)return false;this.reason.value=x;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="exception_request">
                         <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                         <input type="hidden" name="back" value="request_form.php">
@@ -155,6 +156,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
                 <?php if ($__can_split): ?>
                     <form action="request_actions.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:10px;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="split_request">
                         <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                         <input type="hidden" name="back" value="request_form.php">
@@ -181,7 +183,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <i class="fa fa-arrow-up"></i> اضغط زر <strong>«إنشاء طلب مالي»</strong> أعلى الصفحة لفتح النموذج.
         </div>
     <?php endif; ?>
-    <form id="finreqForm" action="request_actions.php" method="post" class="allforms<?php echo $form_visible ? ' allforms-visible' : ''; ?>">
+    <form id="finreqForm" action="request_actions.php" method="post" class="allforms<?php echo $form_visible ? ' allforms-visible' : ''; ?>
+        <?php echo csrf_field(); ?>">
         <input type="hidden" name="action" value="<?php echo $req ? 'update_draft' : 'create'; ?>">
         <?php if ($req): ?><input type="hidden" name="id" value="<?php echo intval($req['id']); ?>"><?php endif; ?>
         <div class="card">
@@ -336,6 +339,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </table>
                 <?php if ($editable || $req['state'] === 'under_review'): ?>
                 <form action="request_actions.php" method="post" enctype="multipart/form-data" class="allforms allforms-visible" style="margin-top:10px;">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="attach_doc">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <div class="form-grid">
@@ -388,6 +392,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td>
                                 <?php if ($editable): ?>
                                 <form action="request_actions.php" method="post" style="display:inline;">
+        <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="delete_line">
                                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                                     <input type="hidden" name="line_id" value="<?php echo intval($L['id']); ?>">
@@ -402,6 +407,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </table>
                 <?php if ($editable): ?>
                 <form action="request_actions.php" method="post" class="allforms allforms-visible">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="add_line">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <div class="form-grid">
@@ -422,12 +428,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-header"><h5><i class="fa fa-paper-plane"></i> الإرسال والسحب</h5></div>
             <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;">
                 <form action="request_actions.php" method="post">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="<?php echo $req['state'] === 'returned' ? 'resubmit' : 'submit'; ?>">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <input type="hidden" name="back" value="request_form.php">
                     <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> <?php echo $req['state'] === 'returned' ? 'إعادة الإرسال بالرقم نفسه' : 'إرسال للمراجعة الإدارية'; ?></button>
                 </form>
                 <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="withdraw">
                     <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                     <input type="hidden" name="back" value="request_form.php">

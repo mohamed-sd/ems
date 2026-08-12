@@ -185,6 +185,7 @@ include __DIR__ . '/../includes/page_header.php';
           <!-- FN-03 · FIXC-0017: فعلان محروسان بالعقدِ السبعيّ — لا رابطٌ يُحيل
                إلى شاشةٍ أخرى ثم يُقال «الاعتمادُ عبر الخدمة». -->
           <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="approve_pe" value="<?= $eid ?>">
             <label class="visually-hidden" for="eg_dm_<?= $eid ?>">مدير الإدارة المعتمِد</label>
             <input id="eg_dm_<?= $eid ?>" type="number" name="dept_manager_id" required min="1"
@@ -195,6 +196,7 @@ include __DIR__ . '/../includes/page_header.php';
             <button class="action-btn" type="submit"><i class="fa fa-check"></i> اعتمد</button>
           </form>
           <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="reject_pe" value="<?= $eid ?>">
             <label class="visually-hidden" for="eg_rc_<?= $eid ?>">سببُ الرد</label>
             <select id="eg_rc_<?= $eid ?>" name="reason_code" required class="form-control form-control-sm" style="max-width:190px">

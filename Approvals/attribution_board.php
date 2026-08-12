@@ -324,6 +324,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </p>
                     <?php if ($can_decide): ?>
                     <form method="post" action="" class="atb-qty-form">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="atb_action" value="rule_qty">
                         <input type="hidden" name="entry_id" value="<?php echo $eid; ?>">
                         <select name="qty_billable" class="atb-qty-select">
@@ -341,6 +342,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
 
                 <form method="post" action="">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="atb_action" value="decide">
                     <input type="hidden" name="entry_id" value="<?php echo $eid; ?>">
                     <div class="table-container">
@@ -435,6 +437,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- نموذجُ الاعتراض والحسم — POST عاديٌّ لا AJAX (فلا حاجةَ لتسجيلٍ في action_guard) -->
     <div id="atbModal" class="atb-modal" hidden>
         <form method="post" action="" class="atb-modal-card">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="atb_action" id="atbAct" value="object">
             <input type="hidden" name="line_id" id="atbLine" value="">
             <h5 id="atbTitle"><i class="fas fa-flag"></i> اعتراضٌ على الإسناد</h5>

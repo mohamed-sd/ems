@@ -98,6 +98,7 @@ include '../insidebar.php';
     <div class="card-body">
         <?php foreach ($dupFound as $d): ?>
         <form method="post" style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <?php echo csrf_field(); ?>
             <?php foreach ($ctx as $k => $v) { echo '<input type="hidden" name="ctx_' . htmlspecialchars($k) . '" value="' . htmlspecialchars((string) $v) . '">'; } ?>
             <input type="hidden" name="tk_save" value="1">
             <input type="hidden" name="type_code" value="<?php echo htmlspecialchars($_POST['type_code'] ?? ''); ?>">
@@ -107,6 +108,7 @@ include '../insidebar.php';
         </form>
         <?php endforeach; ?>
         <form method="post">
+        <?php echo csrf_field(); ?>
             <?php foreach ($ctx as $k => $v) { echo '<input type="hidden" name="ctx_' . htmlspecialchars($k) . '" value="' . htmlspecialchars((string) $v) . '">'; } ?>
             <input type="hidden" name="tk_save" value="1">
             <input type="hidden" name="skip_dup_check" value="1">
@@ -127,6 +129,7 @@ include '../insidebar.php';
     </div></div>
 
     <form method="post" class="allforms allforms-visible">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="tk_save" value="1">
         <?php foreach ($ctx as $k => $v) { echo '<input type="hidden" name="ctx_' . htmlspecialchars($k) . '" value="' . htmlspecialchars((string) $v) . '">'; } ?>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">

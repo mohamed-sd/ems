@@ -392,6 +392,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <?php if ($can_approve && $draft_count > 0): ?>
                 <form method="post" action="" class="obl-inline-form"
                       onsubmit="return confirm('إجازةُ كل المسودات؟ المُجازُ نافذٌ لا يُعدَّل بعدها.')">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="approve_action" value="all">
                     <input type="hidden" name="client_contract_id" value="<?php echo $sel_contract; ?>">
                     <button type="submit" class="btn-primary"><i class="fas fa-stamp"></i> إجازةُ كل المسودات (<?php echo $draft_count; ?>)</button>
@@ -401,6 +402,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if ($can_fill): ?>
         <form id="oblForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة بندِ التزام</span></h5>
             </div>
@@ -501,6 +503,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                         <?php if ($can_approve && !$approved): ?>
                                             <form method="post" action="" class="obl-inline-form"
                                                   onsubmit="return confirm('إجازةُ هذا البند؟ المُجازُ نافذٌ لا يُعدَّل.')">
+        <?php echo csrf_field(); ?>
                                                 <input type="hidden" name="approve_action" value="one">
                                                 <input type="hidden" name="obligation_id" value="<?php echo intval($r['id']); ?>">
                                                 <input type="hidden" name="client_contract_id" value="<?php echo $sel_contract; ?>">

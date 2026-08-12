@@ -106,6 +106,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     <?php fin_msg_banner(); ?>
 
     <form id="finForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة أصل ثابت</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_199_0b09d">الكود <span class="required">*</span></label><input type="text" name="code" required id="emsf_199_0b09d"></div>

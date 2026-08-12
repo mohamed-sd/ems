@@ -246,6 +246,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> سياسة جديدة</h5>
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="add_policy" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
@@ -383,7 +384,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         if ($ps === 'draft') {
                             $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success' style='text-decoration:none;padding:5px 10px;' onclick=\"return confirm('تفعيلُ السياسة؟ ما يُخلِفه سريانُها من سياساتٍ نافذةٍ يُغلق عند يومٍ قبله.');\"><i class='fas fa-play'></i> فعّل</a>";
                         } elseif ($ps === 'active' || $ps === 'superseded') {
-                            $act = "<form method='post' style='display:flex;gap:6px;align-items:center;'>"
+                            $act = "<form method='post' style='display:flex;gap:6px;align-items:center;'>
+        <?php echo csrf_field(); ?>"
                                  . "<input type='hidden' name='expire_policy' value='1'>"
                                  . "<input type='hidden' name='policy_id' value='" . intval($p['id']) . "'>"
                                  . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سببُ الإنهاء' style='width:150px;'>"

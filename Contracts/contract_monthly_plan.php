@@ -207,6 +207,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php endif; ?>
 
         <form method="post" class="ems-form">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="mp_action" value="save">
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <input type="hidden" name="plan_version" value="<?php echo $VER; ?>">
@@ -249,6 +250,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php if ($can_edit): ?>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="mp_action" value="seal">
                 <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
                 <input type="hidden" name="plan_version" value="<?php echo $VER; ?>">

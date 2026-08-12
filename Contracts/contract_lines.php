@@ -225,6 +225,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php if ($can_edit): ?>
                     <td><?php if ((string)$l['state'] === 'active'): ?>
                         <form method="post" style="display:flex;gap:4px;flex-wrap:wrap">
+        <?php echo csrf_field(); ?>
                             <input type="hidden" name="cl_action" value="reprice">
                             <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
@@ -244,6 +245,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($can_add): ?>
     <form method="post" class="ems-form" style="margin-top:14px">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="cl_action" value="add">
         <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
         <div class="form-grid">

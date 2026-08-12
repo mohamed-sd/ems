@@ -219,6 +219,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         echo htmlspecialchars((string)($r['source_text'] ?? '—')); ?></small></td>
                     <td><?php if ($can_edit && !in_array((string)$r['state'], array('released','called'), true)): ?>
                         <form method="post" style="display:flex;gap:4px">
+        <?php echo csrf_field(); ?>
                             <input type="hidden" name="g_action" value="state">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="gid" value="<?php echo intval($r['id']); ?>">
@@ -239,6 +240,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if ($can_edit): ?>
         <form method="post" class="ems-form" style="margin-top:14px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="g_action" value="add">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6><i class="fa fa-plus"></i> أداةُ ضمانٍ جديدة —

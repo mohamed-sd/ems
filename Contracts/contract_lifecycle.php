@@ -208,6 +208,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if ($can_edit): ?>
         <form method="post" class="ems-form" style="margin-top:14px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="lc_action" value="record">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6><i class="fa fa-plus"></i> سجّل واقعةً — <strong>وأثرُها يُكتب من الجدول لا من الطلب</strong></h6>

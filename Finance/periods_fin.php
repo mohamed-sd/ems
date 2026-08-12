@@ -166,6 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php fin_msg_banner(); ?>
 
     <form id="finForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء فترة مالية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_262_63abd">السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required value="<?php echo date('Y'); ?>" id="emsf_262_63abd"></div>

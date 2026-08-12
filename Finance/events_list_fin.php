@@ -365,6 +365,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم إضافة/تعديل -->
     <form id="finForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء / تعديل حدث مالي</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="f_id" value="">

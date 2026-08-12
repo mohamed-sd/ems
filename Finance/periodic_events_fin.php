@@ -119,6 +119,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 'tax_return'   => array('الإقرارُ الضريبي', 'fa-percent'),
             ) as $k => $v): ?>
             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="per_action" value="<?php echo $k; ?>">
                 <input type="hidden" name="period" value="<?php echo htmlspecialchars($period); ?>">
                 <button type="submit" class="btn-primary"><i class="fa <?php echo $v[1]; ?>"></i>
@@ -133,6 +134,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> قاعدةُ مخصصِ صيانةٍ جديدة</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="per_action" value="add_rule">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_255_f7046">معدةٌ بعينها <small>— 0 = الأعمّ</small></label>

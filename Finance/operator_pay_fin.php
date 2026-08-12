@@ -138,6 +138,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <?php if ($can_edit): ?>
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;margin-top:10px;">
+        <?php echo csrf_field(); ?>
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
                     <label for="emsf_239_29635">معدّل مستحق المشغّل لكل ساعة (SDG)</label>

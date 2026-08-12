@@ -154,6 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <strong>لأقدم فاتورةٍ أولًا</strong> ما لم تُحدَّد ذمّةٌ بعينها — <strong>وكلُّ تخصيصٍ سطرٌ يُرى</strong>.
         </p>
         <form method="post" class="ems-form">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="col_action" value="record">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_23_0534f">العميل <span style="color:#c00">*</span></label>
@@ -413,6 +414,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <?php if ($can_add && $payInfo['unallocated'] > 0.004): ?>
         <form method="post" class="ems-form">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="col_action" value="allocate">
             <input type="hidden" name="payment_id" value="<?php echo $PAY; ?>">
             <?php for ($i = 0; $i < 3; $i++): ?>

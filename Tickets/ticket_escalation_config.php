@@ -86,6 +86,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <form id="tktForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل مستوى تصعيد</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="e_id" value="">

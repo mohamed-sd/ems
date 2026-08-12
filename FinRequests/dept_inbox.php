@@ -92,6 +92,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
                     <?php if ($can_recommend): ?>
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="return_request">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">
@@ -101,6 +102,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endif; ?>
                     <?php if ($can_approve): ?>
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="dept_approve">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">
@@ -109,6 +111,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </button>
                     </form>
                     <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="reject">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">

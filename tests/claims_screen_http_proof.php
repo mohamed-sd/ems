@@ -146,15 +146,21 @@ list($code, $h, $page) = cs_req($BASE . '/Contracts/claims.php', $jar);
 check($code === 200, "شاشةُ المستخلصات تُفتح بحساب المبيعات (HTTP {$code})");
 check(strpos($page, 'توليد مستخلص') !== false, 'وفيها نموذجُ التوليد');
 check(strpos($page, 'حوّلتها المالية') !== false, 'وسطرُ الرحلة يبدأ من الأيام التي حوّلتها المالية');
+/* ◆ **رمزان لا رمز.** الشاشةُ تحقن رمزَها `clm_csrf` **والرمزَ المركزيَّ**
+     `csrf_token` معًا، والحارسُ المركزيُّ (ADR-05) يقيس **المركزيَّ** حصرًا.
+     فطلبٌ يحمل رمزَ الشاشةِ وحدَه يُردُّ **403** بلا وميضٍ ولا جسمٍ يُقرأ —
+     فيُقرأ صمتُه «لم يُنفَّذ الفعل» والفعلُ **لم يبدأ أصلًا**. */
 preg_match('~name="clm_csrf"\s+value="([^"]+)"~', $page, $tk);
 $csrf = isset($tk[1]) ? $tk[1] : '';
+preg_match('~name="csrf_token"\s+value="([^"]+)"~', $page, $gk);
+$gcsrf = isset($gk[1]) ? $gk[1] : '';
 check($csrf !== '', 'ورمزُ الحماية مضمَّن');
 
 // ═══ ① التوليد ════════════════════════════════════════════════════════════
 head('① التوليد من الشاشة — بلا إدخالِ كمية');
 
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $jar, array(
-    'action' => 'generate', 'clm_csrf' => $csrf,
+    'action' => 'generate', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf,
     'contract_id' => $CONTRACT, 'period_from' => '2027-11-01', 'period_to' => '2027-11-30',
 ));
 check($code === 302, "التوليدُ نُفِّذ (HTTP {$code})");
@@ -181,13 +187,13 @@ head('③ الرفعُ من المبيعات ثم الإجازةُ من الما
 
 // المبيعاتُ لا تُجيز ما أنشأت (can_edit سُحبت من الدور 12)
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $jar, array(
-    'action' => 'approve', 'clm_csrf' => $csrf, 'id' => intval($claim['id']), 'tax_code' => 'VAT15',
+    'action' => 'approve', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf, 'id' => intval($claim['id']), 'tax_code' => 'VAT15',
 ));
 check(strpos(cs_msg($h), 'من أنشأه') !== false,
     '★ المبيعاتُ مُنعت من الإجازة: ' . mb_substr(cs_msg($h), 0, 60));
 
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $jar, array(
-    'action' => 'submit', 'clm_csrf' => $csrf, 'id' => intval($claim['id']),
+    'action' => 'submit', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf, 'id' => intval($claim['id']),
 ));
 check(strpos(cs_msg($h), 'بانتظار إجازة المالية') !== false, 'ورفعتها للمالية: ' . mb_substr(cs_msg($h), 0, 60));
 
@@ -198,9 +204,11 @@ list($code, $h, $fpage) = cs_req($BASE . '/Contracts/claims.php', $fjar);
 check($code === 200, 'ومديرُ الإدارة المالية يفتح الشاشة (HTTP ' . $code . ')');
 preg_match('~name="clm_csrf"\s+value="([^"]+)"~', $fpage, $ftk);
 $fcsrf = isset($ftk[1]) ? $ftk[1] : '';
+preg_match('~name="csrf_token"\s+value="([^"]+)"~', $fpage, $fgk);
+$fgcsrf = isset($fgk[1]) ? $fgk[1] : '';
 $evBefore = (int) $db->query("SELECT COUNT(*) FROM fin_financial_events")->fetch_row()[0];
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $fjar, array(
-    'action' => 'approve', 'clm_csrf' => $fcsrf, 'id' => intval($claim['id']), 'tax_code' => 'VAT15',
+    'action' => 'approve', 'clm_csrf' => $fcsrf, 'csrf_token' => $fgcsrf, 'id' => intval($claim['id']), 'tax_code' => 'VAT15',
 ));
 check($code === 302, "الإجازةُ نُفِّذت (HTTP {$code})");
 $msg = cs_msg($h);
@@ -229,7 +237,7 @@ check($rc && intval($rc['customer_entity_id']) === $CLIENT, 'باسم العمي
 head('④ إعادةُ التوليد للفترة نفسها');
 
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $jar, array(
-    'action' => 'generate', 'clm_csrf' => $csrf,
+    'action' => 'generate', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf,
     'contract_id' => $CONTRACT, 'period_from' => '2027-11-01', 'period_to' => '2027-11-30',
 ));
 $msg = cs_msg($h);
@@ -246,7 +254,7 @@ list($code, $h, $page2) = cs_req($BASE . '/Contracts/claims.php', $jar2);
 check($code === 200, 'المديرُ الماليُّ يفتح الشاشة عرضًا');
 check(strpos($page2, 'توليد مستخلص الفترة') === false, '★ ولا يرى نموذجَ التوليد (بلا can_add)');
 list($code, $h, $b) = cs_req($BASE . '/Contracts/claims.php', $jar2, array(
-    'action' => 'generate', 'clm_csrf' => $csrf,
+    'action' => 'generate', 'clm_csrf' => $csrf, 'csrf_token' => $gcsrf,
     'contract_id' => $CONTRACT, 'period_from' => '2027-12-01', 'period_to' => '2027-12-31',
 ));
 check(strpos(cs_msg($h), 'صلاحية') !== false, 'ومحاولةُ التوليد تُرفض بالصلاحية');

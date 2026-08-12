@@ -124,6 +124,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars(($t['cat_name'] !== null ? $t['cat_name'] : '؟') . ' / ' . ($t['type_name'] !== null ? $t['type_name'] : '؟'), ENT_QUOTES, 'UTF-8') ?></td>
         <td>
           <form method="post" style="display:flex;gap:6px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="classify_tk" value="<?= intval($t['id']) ?>">
             <select name="category_id" class="form-control form-control-sm" required style="max-width:130px">
               <option value="">— الفئة —</option>

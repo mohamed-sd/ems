@@ -161,6 +161,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fa fa-plus-circle"></i> إضافة/تعديل توجيه إدارة</h5></div>
         <div class="card-body">
             <form method="post" class="allforms allforms-visible">
+        <?php echo csrf_field(); ?>
                 <div class="form-grid">
                     <div>
                         <label for="emsf_316_4d667">الإدارة *</label>

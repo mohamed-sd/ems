@@ -98,6 +98,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php fin_msg_banner(); ?>
 
     <form id="unitForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-building-columns"></i> وحدة مالية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_320_a5811">الكود <span class="required">*</span></label><input type="text" name="unit_code" required placeholder="gl / ar / ap / treasury" id="emsf_320_a5811"></div>
@@ -110,6 +111,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <form id="acctForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-user-tie"></i> محاسب إدارة (تبعيّة مزدوجة)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_323_77a22">الموظف المحاسب <span class="required">*</span></label><select name="employee_id" required id="emsf_323_77a22"><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>

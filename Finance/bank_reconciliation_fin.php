@@ -261,6 +261,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </p>
         <?php if ($can_edit): ?>
         <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="h13" value="import">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_207_78620">الحساب البنكي <span class="required">*</span></label>
@@ -336,11 +337,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if ($can_edit && (string)$h13_head['state'] !== 'closed'): ?>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="h13" value="automatch">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> مضاهاةٌ آلية</button>
             </form>
             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="h13" value="close">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-lock"></i> أقفل الكشف</button>
@@ -399,6 +402,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php $mid = intval($l['match_id']); $mrs = (string)($l['match_row_state'] ?? ''); ?>
                         <?php if ($mid > 0 && $mrs === 'matched' && $ms === 'difference'): ?>
                             <form method="post" style="display:flex;gap:4px">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="h13" value="open_diff">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
@@ -407,6 +411,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </form>
                         <?php elseif ($mid > 0 && $mrs === 'open_difference'): ?>
                             <form method="post" style="display:flex;gap:4px;flex-wrap:wrap">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="h13" value="resolve">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
@@ -416,6 +421,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </form>
                         <?php elseif ($ms !== 'matched'): ?>
                             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="h13" value="accept">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
@@ -459,6 +465,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 
     <form id="acctForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-building-columns"></i> حساب بنكي</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_214_ebac3">اسم الحساب <span class="required">*</span></label><input type="text" name="acct_name" required id="emsf_214_ebac3"></div>
@@ -473,6 +480,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($sel_acct > 0): ?>
     <form id="lineForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="bank_account_id" value="<?php echo $sel_acct; ?>">
         <div class="card-header"><h5><i class="fas fa-file-lines"></i> بند كشف حساب</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">

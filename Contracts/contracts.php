@@ -1182,13 +1182,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 if ($can_edit) {
                     $cid = intval($row['id']);
                     if (in_array(\App\Services\Contract\ContractStateMachine::NEGOTIATION, $csm_allowed, true)) {
-                        $csm_cell .= "<form method='post' style='display:inline'>"
+                        $csm_cell .= "<form method='post' style='display:inline'>
+        <?php echo csrf_field(); ?>"
                           . "<input type='hidden' name='csm_submit_id' value='{$cid}'>"
                           . "<button class='action-btn' type='submit' title='رفعٌ للتفاوض'>"
                           . "<i class='fa fa-arrow-up'></i> تفاوض</button></form> ";
                     }
                     if (in_array(\App\Services\Contract\ContractStateMachine::APPROVED, $csm_allowed, true)) {
-                        $csm_cell .= "<form method='post' style='display:inline'>"
+                        $csm_cell .= "<form method='post' style='display:inline'>
+        <?php echo csrf_field(); ?>"
                           . "<input type='hidden' name='csm_approve_id' value='{$cid}'>"
                           . "<button class='action-btn' type='submit' title='اعتمادٌ ضمنَ السقف'>"
                           . "<i class='fa fa-check'></i> اعتماد</button></form>";

@@ -210,6 +210,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if (!$rows && $can_edit): ?>
         <form method="post" class="ems-form" style="margin-bottom:16px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="ps_action" value="generate">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6 style="margin:0 0 10px"><i class="fa fa-wand-magic-sparkles"></i>
@@ -293,6 +294,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)($r['collection_ref'] ?? '—')); ?></td>
                     <td><?php if ($can_edit && (float) $r['remaining_amount'] > 0.004): ?>
                         <form method="post" style="display:flex;gap:4px">
+        <?php echo csrf_field(); ?>
                             <input type="hidden" name="ps_action" value="receive">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">
@@ -310,6 +312,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php if ($can_edit): ?>
         <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px">
             <form method="post" class="ems-form" style="flex:1;min-width:340px">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="add_row">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <h6><i class="fa fa-plus"></i> سطرٌ يدويّ — <strong>للمعالم والدفعات الخاصة</strong></h6>
@@ -349,6 +352,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </form>
 
             <form method="post" class="ems-form" style="min-width:280px">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="new_version">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <h6><i class="fa fa-code-branch"></i> نسخةٌ جديدةٌ بملحق</h6>
@@ -361,6 +365,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </form>
 
             <form method="post" style="align-self:flex-end">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="refresh">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> حدّث الحالات</button>

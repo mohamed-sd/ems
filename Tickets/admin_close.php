@@ -115,6 +115,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($t['stage'], ENT_QUOTES, 'UTF-8') ?></td>
         <td>
           <form method="post" style="display:flex;gap:6px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="aclose_tk" value="<?= intval($t['id']) ?>">
             <input type="text" name="reason" class="form-control form-control-sm" placeholder="السببُ المكتوب" style="max-width:170px" required aria-label="السببُ المكتوب">
             <input type="number" name="duplicate_of" class="form-control form-control-sm" placeholder="مكررٌ من #" style="max-width:110px" aria-label="مكررٌ من #">

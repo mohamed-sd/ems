@@ -146,6 +146,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <span style="color:#6b4e2a;"><?php echo htmlspecialchars($last_reason); ?></span>
                 <form action="request_actions.php" method="post" style="display:flex;gap:6px;"
                       onsubmit="var x=prompt('سبب الاعتماد (للتدقيق):');if(!x)return false;this.reason.value=x;">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="exception_decide">
                     <input type="hidden" name="decision" value="approve">
                     <input type="hidden" name="id" value="<?php echo intval($xq['id']); ?>">
@@ -154,6 +155,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </form>
                 <form action="request_actions.php" method="post" style="display:flex;gap:6px;"
                       onsubmit="var x=prompt('سبب الرفض:');if(!x)return false;this.reason.value=x;">
+        <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="exception_decide">
                     <input type="hidden" name="decision" value="deny">
                     <input type="hidden" name="id" value="<?php echo intval($xq['id']); ?>">
@@ -213,6 +215,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php if ($is_super || $role === '17'): ?>
                                 <?php if (in_array($r['state'], array('under_review', 'pending_approval'), true)): ?>
                                 <form action="request_actions.php" method="post" style="display:inline;" onsubmit="var x=prompt('سبب التعليق (إلزامي):');if(!x)return false;this.reason.value=x;">
+        <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="suspend">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="back" value="finance_gateway.php">
@@ -222,6 +225,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php endif; ?>
                                 <?php if ($r['state'] === 'suspended'): ?>
                                 <form action="request_actions.php" method="post" style="display:inline;">
+        <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="resume">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="back" value="finance_gateway.php">
@@ -230,6 +234,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php endif; ?>
                                 <?php if ($r['state'] === 'pending_approval'): ?>
                                 <form action="request_actions.php" method="post" style="display:inline;" onsubmit="var x=prompt('سبب الإلغاء (إلزامي — وبعد الولادة تُعالَج آثاره في D04):');if(!x)return false;this.reason.value=x;">
+        <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="cancel">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="back" value="finance_gateway.php">

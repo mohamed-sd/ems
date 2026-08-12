@@ -185,6 +185,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td style="white-space:normal">
                         <?php if (intval($s['is_primary']) !== 1 && (string)$s['state'] !== 'closed'): ?>
                             <form method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="cs_action" value="primary">
                                 <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                                 <input type="hidden" name="scope_id" value="<?php echo intval($s['id']); ?>">
@@ -193,6 +194,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php endif; ?>
                         <?php if ((string)$s['state'] !== 'closed'): ?>
                             <form method="post" style="display:flex;gap:4px;margin-top:4px">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="cs_action" value="close">
                                 <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                                 <input type="hidden" name="scope_id" value="<?php echo intval($s['id']); ?>">
@@ -212,6 +214,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if ($can_add): ?>
         <form method="post" class="ems-form" style="margin-top:14px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="cs_action" value="add">
             <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
             <div class="form-grid">

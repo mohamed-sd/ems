@@ -238,6 +238,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <?php if ($can_edit && (string)$openInv['state'] === 'issued'): ?>
         <form method="post" class="ems-form" style="margin-top:14px">
+        <?php echo csrf_field(); ?>
             <input type="hidden" name="ti_action" value="cancel">
             <input type="hidden" name="invoice_id" value="<?php echo intval($openInv['id']); ?>">
             <div class="form-grid">

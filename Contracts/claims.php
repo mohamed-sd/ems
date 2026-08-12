@@ -336,6 +336,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_add): ?>
     <form id="procForm" action="claims.php" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-wand-magic-sparkles"></i> توليد مستخلص الفترة</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="action" value="generate">
@@ -475,6 +476,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 · مستند <?php echo clm_e($l['dispute_doc_ref']); ?></small>
                             <?php if ($can_approve): ?>
                             <form method="post" style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                 <input type="hidden" name="action" value="dispute_resolve">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
@@ -494,6 +496,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <small><?php echo clm_e($l['resolution_note']); ?></small>
                         <?php elseif ($can_add): ?>
                             <form method="post" style="display:flex;gap:6px;flex-wrap:wrap">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                 <input type="hidden" name="action" value="dispute_raise">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
@@ -563,6 +566,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php if ($can_approve): ?>
             <form action="claims.php" method="post" class="allforms allforms-visible"
                   style="box-shadow:none;padding:0;margin-top:8px">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="advance_record">
                 <input type="hidden" name="contract_id" value="<?php echo $adv_cid; ?>">
                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -634,6 +638,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td style="white-space:nowrap">
                             <?php if ($can_add && (string) $n['state'] === 'draft'): ?>
                             <form action="claims.php" method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_submit">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -644,6 +649,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php if ($can_approve && (string) $n['state'] === 'review'): ?>
                             <form action="claims.php" method="post" style="display:inline"
                                   onsubmit="return confirm('إجازةُ الإشعار تحرّك ذمّةَ العميل بمقداره. متابعة؟');">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_approve">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -653,6 +659,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php endif; ?>
                             <?php if ($can_add && in_array((string) $n['state'], array('draft', 'review'), true)): ?>
                             <form action="claims.php" method="post" style="display:inline">
+        <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_cancel">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -672,6 +679,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php if ($can_add && in_array((string) $open_claim['state'], $invoiced_states, true)): ?>
             <form action="claims.php" method="post" class="allforms allforms-visible"
                   style="box-shadow:none;padding:0;margin-top:12px">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="note_create">
                 <input type="hidden" name="claim_id" value="<?php echo $open_id; ?>">
                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -753,6 +761,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php if ($can_add && (string)$c['state'] === 'draft'): ?>
                                     <form action="claims.php" method="post" style="display:inline"
                                           onsubmit="return confirm('رفعُ المستخلص للمالية يقفل تعديلَه عندك. متابعة؟');">
+        <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="submit">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
                                         <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -763,6 +772,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php if ($can_approve && (string)$c['state'] === 'review'): ?>
                                     <form action="claims.php" method="post" style="display:inline"
                                           onsubmit="return confirm('إجازةُ المستخلص تولّد فاتورةً ضريبيةً وتفتح ذمّةً على العميل. متابعة؟');">
+        <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="approve">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
                                         <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
@@ -780,6 +790,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php if ($can_add && in_array((string)$c['state'], array('draft', 'review'), true)): ?>
                                     <form action="claims.php" method="post" style="display:inline"
                                           onsubmit="return confirm('إلغاءُ المستخلص يردّ وقائعَه للاستخلاص. متابعة؟');">
+        <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="cancel">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
                                         <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">

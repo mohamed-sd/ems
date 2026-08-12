@@ -197,12 +197,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php if ($can_edit): ?>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
             <?php if (!$cur): ?>
-            <form method="post"><input type="hidden" name="bl_action" value="open">
+            <form method="post">
+        <?php echo csrf_field(); ?><input type="hidden" name="bl_action" value="open">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-folder-open"></i> افتح خطَّ الأساس</button>
             </form>
             <?php else: ?>
             <form method="post" style="display:flex;gap:6px;align-items:flex-end">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="state">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <div class="form-group"><label for="emsf_48_99ab5">إلى حال</label>
@@ -215,6 +217,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <button type="submit" class="btn-primary"><i class="fa fa-forward"></i> انتقل</button>
             </form>
             <form method="post" style="display:flex;gap:6px;align-items:flex-end">
+        <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="amend">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <div class="form-group"><label for="emsf_50_55026">سببُ الملحق <span style="color:#c00">*</span></label>

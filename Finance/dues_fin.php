@@ -171,6 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم مستحق -->
     <form id="dueForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-hand-holding-dollar"></i> إضافة مستحق (مورد/موظف)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="d_ptype">نوع الطرف <span class="required">*</span></label>
@@ -213,6 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم ذمّة عميل -->
     <form id="recvForm" action="" method="post" class="allforms">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-file-invoice"></i> إضافة ذمّة عميل</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_376_24d3e">العميل <span class="required">*</span></label>
