@@ -37,28 +37,25 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $co = $is_super_admin && $company_id <= 0 ? 4 : $company_id;
 $items = array();
 
-/* ① سلسلة الوحدة: الحالات الوسيطة التي حلقتُها القادمة بيد دور المستخدم */
-$stageRoles = array(
-    'submitted'        => array('5', '6'),        // اعتماد الموقع
-    'site_approved'    => array('1'),             // التشغيل
-    'parties_review'   => array('2', '4'),        // الموردون والقوى
-    'parties_approved' => array('12'),            // المبيعات/العقود
-    'sales_approved'   => array('17', '19'),      // المالية — التحويل
-);
-$myStages = array();
-foreach ($stageRoles as $stage => $roles) {
-    if ($is_super_admin || in_array($role, $roles, true)) { $myStages[] = $stage; }
-}
+/* ① سلسلة الوحدة: الحالات الوسيطة التي حلقتُها القادمة بيد دور المستخدم.
+     ◆ وخريطةُ «المرحلةُ ⇒ الأدوارُ» كانت مكتوبةً هنا وفي البلاطةِ معًا — وهي
+       عينُ العيبِ الذي يُصلحه هذا التغيير. فرُفعت، ومحلُّها
+       `ems_approvals_stage_roles()` في المصدرِ الواحد. */
+/* ◆ الشروطُ الثلاثةُ من **مصدرٍ واحدٍ** يقرأه العادُّ (بلاطةُ «موافقاتي») وهذا
+     العارضُ سواءً — INJ-0587. ولا يُكتب شرطٌ هنا بيدٍ ثانية. */
+require_once __DIR__ . '/../includes/approvals_inbox_scope.php';
+$__w   = ems_approvals_inbox_where($conn, $co, $uid, $role, $is_super_admin);
+$__cnt = ems_approvals_inbox_counts($conn, $co, $uid, $role, $is_super_admin);
+$__cap = ems_approvals_inbox_cap();
+$myStages = ems_approvals_my_stages($role, $is_super_admin);
 if ($myStages) {
-    $in = "'" . implode("','", $myStages) . "'";
     $r = mysqli_query($conn,
         "SELECT ue.id, ue.entry_no, ue.entry_date, ue.state, ue.qty, ue.unit_type,
                 p.name AS project_name, DATEDIFF(CURDATE(), ue.entry_date) age_d
            FROM unit_entries ue
            LEFT JOIN project p ON p.id = ue.project_id
-          WHERE ue.company_id = {$co} AND ue.state IN ({$in})
-            AND NOT " . ems_uc_prechain_sql('ue') . "
-          ORDER BY ue.entry_date ASC LIMIT 60");
+          WHERE " . $__w['unit_entries'] . "
+          ORDER BY ue.entry_date ASC LIMIT " . (int) $__cap);
     $stageAr = array('submitted' => 'اعتماد الموقع', 'site_approved' => 'مطابقة التشغيل',
                      'parties_review' => 'أحكام الأطراف', 'parties_approved' => 'اعتماد العقود',
                      'sales_approved' => 'التحويل المالي');
@@ -78,9 +75,8 @@ if ($myStages) {
 $r = mysqli_query($conn,
     "SELECT rq.id, rq.request_no, rq.title, rq.status, rq.submitted_at, rq.sla_due_at, rt.name_ar
        FROM requests rq JOIN request_types rt ON rt.code = rq.request_type_code
-      WHERE rq.company_id = {$co} AND rq.current_holder_user_id = {$uid}
-        AND rq.status IN ('submitted','routed','in_approval','approved')
-      ORDER BY rq.sla_due_at ASC LIMIT 60");
+      WHERE " . $__w['requests'] . "
+      ORDER BY rq.sla_due_at ASC LIMIT " . (int) $__cap);
 while ($r && ($x = mysqli_fetch_assoc($r))) {
     $late = $x['sla_due_at'] !== null && strtotime($x['sla_due_at']) < time();
     $items[] = array(
@@ -95,9 +91,8 @@ while ($r && ($x = mysqli_fetch_assoc($r))) {
 $r = mysqli_query($conn,
     "SELECT al.id, al.source_kind, al.source_ref, al.action_code, al.step_no, al.sla_due_at
        FROM approval_links al
-      WHERE al.company_id = {$co} AND al.status = 'pending'
-        AND (al.approver_user_id = {$uid} OR (al.approver_user_id IS NULL AND al.approver_role = '" . mysqli_real_escape_string($conn, $role) . "'))
-      ORDER BY al.sla_due_at IS NULL, al.sla_due_at ASC LIMIT 60");
+      WHERE " . $__w['approval_links'] . "
+      ORDER BY al.sla_due_at IS NULL, al.sla_due_at ASC LIMIT " . (int) $__cap);
 while ($r && ($x = mysqli_fetch_assoc($r))) {
     $late = $x['sla_due_at'] !== null && strtotime($x['sla_due_at']) < time();
     $items[] = array(
@@ -130,7 +125,22 @@ include '../insidebar.php';
         <p class="text-muted" style="margin:0 0 10px">
             <i class="fas fa-inbox"></i> <strong>صندوقٌ واحدٌ لكل ما ينتظر قرارك</strong> —
             والقرارُ يقع في شاشة صاحبه بحارسه (WF-01): كلُّ سطرٍ يقفز لموضع الفعل، ولا سطرَ بلا إجراء (IAM-019).
-            <span class="badge bg-warning"><?php echo count($items); ?> بانتظارك</span>
+            <?php /* ⑤ **لا يُكذَبُ بالسقف.** كان يُعرَض عددُ السطورِ المقصوصةِ على
+                     ستِّينَ لكلِّ مكوِّنٍ فيقرأه المستخدمُ مجموعًا كاملًا، ورقمُ
+                     البلاطةِ هو المجموعُ الصادق — فيختلفان بلا سببٍ ظاهر
+                     (INJ-0587). فالآن يُعلَن الاثنان: الصادقُ ثم المعروض. */ ?>
+            <span class="badge bg-warning"><?php echo (int) $__cnt['total']; ?> بانتظارك</span>
+            <?php if (count($items) < (int) $__cnt['total']): ?>
+                <span class="badge bg-secondary" title="سقفُ العرضِ <?php echo (int) $__cap; ?> سطرًا لكلِّ منبعٍ — والرقمُ أعلاه هو المجموعُ الكامل">
+                    يُعرَض <?php echo count($items); ?> منها
+                </span>
+            <?php endif; ?>
+            <?php if ((int) $__cnt['untyped'] > 0): ?>
+                <?php /* ② على حاملِها فعلٌ ونوعُها غيرُ مسجَّلٍ فلا سطرَ لها — تُعلَن ولا تُدفَن */ ?>
+                <span class="badge bg-danger" title="طلباتٌ عليك فيها فعلٌ ونوعُها غيرُ مسجَّلٍ في request_types فلا يُمكن عرضُها — تحتاج تسجيلَ نوعِها">
+                    <?php echo (int) $__cnt['untyped']; ?> بنوعٍ غيرِ مسجَّلٍ لا تُعرَض
+                </span>
+            <?php endif; ?>
         </p>
         <div class="table-responsive">
         <table class="alltables display" id="approvalsInboxTable">

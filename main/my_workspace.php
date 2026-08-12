@@ -25,24 +25,16 @@ $q1 = function ($sql) use ($conn) { $r = $conn->query($sql); $x = $r ? $r->fetch
 $myTasks = $q1("SELECT COUNT(*) FROM work_items WHERE company_id = {$company_id}
                  AND assigned_user_id = {$uid}
                  AND status NOT IN ('closed_accepted','cancelled','rejected')");
-// موافقاتي = صندوق الاعتماد الموحد الثلاثي (طلبٌ بحَملي + خطوةُ approval_links + حلقةُ سلسلةٍ بدوري)
-$myApprovals = $q1("SELECT COUNT(*) FROM requests WHERE company_id = {$company_id}
-                     AND current_holder_user_id = {$uid}
-                     AND status IN ('submitted','routed','in_approval','approved')")
-             + $q1("SELECT COUNT(*) FROM approval_links WHERE company_id = {$company_id}
-                     AND status = 'pending' AND approver_user_id = {$uid}");
+/* موافقاتي = صندوقُ الاعتمادِ الموحَّدِ الثلاثيُّ (طلبٌ بحَملي + خطوةُ
+   approval_links + حلقةُ سلسلةٍ بدوري).
+   ◆ **ولا يُحسَب هنا بنصٍّ ثانٍ.** كان يُحسَب، فتفرَّق عن الصندوقِ في خمسةِ
+     مواضعَ — منها أنَّ السوبرَ يُدرَج له 7,342 صفَّ مرحلةٍ وتعدُّ بلاطتُه 1,501.
+     فصار العددُ والعرضُ يقرآن `includes/approvals_inbox_scope.php` وحدَه
+     (INJ-0587: «الرقمُ على البلاطةِ = عددُ صفوفِ الصندوقِ بالضبط، لكلِّ دور»). */
 $role = strval($_SESSION['user']['role'] ?? '');
-$stageRoles = array('submitted' => array('5','6'), 'site_approved' => array('1'),
-                    'parties_review' => array('2','4'), 'parties_approved' => array('12'),
-                    'sales_approved' => array('17','19'));
-$myStages = array();
-foreach ($stageRoles as $stg => $rr) { if (in_array($role, $rr, true)) { $myStages[] = $stg; } }
-if ($myStages) {
-    $in = "'" . implode("','", $myStages) . "'";
-    $myApprovals += $q1("SELECT COUNT(*) FROM unit_entries ue
-                          WHERE ue.company_id = {$company_id} AND ue.state IN ({$in})
-                            AND NOT (ue.state='converted' AND ue.converted_at IS NULL)");
-}
+require_once __DIR__ . '/../includes/approvals_inbox_scope.php';
+$__apx = ems_approvals_inbox_counts($conn, $company_id, $uid, $role, $role === '-1');
+$myApprovals = $__apx['total'];
 $myRequests = $q1("SELECT COUNT(*) FROM requests WHERE company_id = {$company_id}
                     AND requester_user_id = {$uid} AND status NOT IN ('closed','cancelled','rejected')")
             + $q1("SELECT COUNT(*) FROM fin_requests WHERE company_id = {$company_id}

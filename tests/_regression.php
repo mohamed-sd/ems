@@ -25,6 +25,9 @@ $core = array(
     'supplier_documents_test', 'tax_invoice_test', 'client_statement_test',
     'collection_control_test', 'claim_dispute_test', 'claims_test', 'unified_nav_test',
     'csrf_client_helper_test', 'fin26_role_test',
+    /* INJ-0587 — رقمُ بلاطةِ «موافقاتي» = صفوفُ صندوقِها، على HTML لا على
+       الدالتين وحدَهما؛ ويُثبِت عدمَ خوائه بزرعِ رابطٍ موجَّهٍ بدورٍ. */
+    'approvals_inbox_parity_test',
 );
 
 $files = $core;
