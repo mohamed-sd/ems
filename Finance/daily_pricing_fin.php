@@ -310,7 +310,12 @@ include '../insidebar.php';
                             <?php echo csrf_field(); ?>
                             <input type="hidden" name="run_day" value="1">
                             <input type="hidden" name="contract_id" value="<?php echo (int) $t['contract_id']; ?>">
-                            <input type="date" name="day" value="<?php echo $TODAY; ?>" style="max-width:150px">
+                            <?php /* AC-U7: حقلٌ داخلَ خليةِ جدولٍ لا يسعه `label for` بلا كسرِ
+                                     تخطيطِ الصف — فيُوسَم وصفيًّا، وهو ما يقبله المعيارُ نصًّا
+                                     («بعنوانٍ أو وسمٍ وصفيّ»). وكان الحقلَ الوحيدَ الناقصَ في
+                                     الشجرةِ كلِّها: 3859 من 3860. */ ?>
+                            <input type="date" name="day" value="<?php echo $TODAY; ?>" style="max-width:150px"
+                                   aria-label="يومُ توليدِ سعرِ العقد" title="يومُ توليدِ سعرِ العقد">
                             <button type="submit" class="btn btn-sm btn-outline-primary">ولّد</button>
                         </form>
                         <?php else: ?>—<?php endif; ?>

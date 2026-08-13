@@ -307,6 +307,23 @@
         });
     }
 
+    /* أفي هذه الصفحةِ تهيئةُ DataTable يدويةٌ؟ — يُفحص المستندُ **مرّةً واحدةً**
+       ويُخزَّن. فوجودُها يجعل خروجَ الجداولِ مشروعًا: تهيئتان على جدولٍ واحدٍ
+       تتصادمان، والتصادمُ أسوأُ من الجمود. وعند الشكِّ: امتناعٌ لا إقدام. */
+    var _manualDT = null;
+    function pageHasManualDT() {
+        if (_manualDT !== null) return _manualDT;
+        _manualDT = false;
+        try {
+            var s = document.getElementsByTagName('script');
+            for (var i = 0; i < s.length; i++) {
+                if (s[i].src) continue;                 /* الخارجيُّ لا يُقرأ نصُّه */
+                if (/\.DataTable\s*\(\s*\{/.test(s[i].textContent || '')) { _manualDT = true; break; }
+            }
+        } catch (e) { _manualDT = true; }
+        return _manualDT;
+    }
+
     function initializeMissingDataTables() {
         if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return;
         var $ = window.jQuery;
@@ -319,8 +336,33 @@
             var $table = $(table);
             ensureUnifiedTableClass(table);
             if (table.classList.contains('dtr-details')) return;
-            if (table.classList.contains('no-datatable')) return;
-            if (table.dataset.noDt) return;
+            /* ═══════════════════════════════════════════════════════════════
+             * الخروجُ من العُدَّةِ صار **استشاريًّا** لا قاطعًا
+             * ═══════════════════════════════════════════════════════════════
+             * ◆ **المقيس**: 175 ملفًّا يخرج بـ`no-datatable`/`data-no-dt`، منها
+             *   **69 بتهيئةٍ يدويةٍ** (`.DataTable({…})` في الصفحةِ نفسِها) —
+             *   وخروجُها **مشروعٌ** وإلا تصادمت تهيئتان — و**106 بلا تهيئةٍ
+             *   إطلاقًا**: جداولُ بياناتٍ حقيقيةٌ بـ`thead` سليمٍ وصفوفٍ من
+             *   الخادم، تحمل صنفَ `alltables display nowrap` الذي هو اصطلاحُ
+             *   DataTables نفسُه. فخروجُها **افتراضٌ منسوخٌ لا سببٌ تقنيّ** —
+             *   وهو جذرُ سبعةٍ وعشرين بندًا في السجلِّ الجامع.
+             * ◆ **والعلاجُ في العُدَّةِ لا في 106 شاشات**: إصلاحٌ يُكتب في ملفِّ
+             *   شاشةٍ يعود في الشاشةِ التالية.
+             * ◆ **وبابُ الخروجِ يبقى مفتوحًا صريحًا**: `data-no-dt="hard"` أو
+             *   صنفُ `ems-no-enhance` يمنعان قطعًا — فمن له سببٌ يُصرّح به.
+             * ◆ ولا يُلمَس جدولٌ في صفحةٍ فيها تهيئةٌ يدوية: التصادمُ أسوأُ من
+             *   الجمود. والفحصُ للمستندِ مرّةً واحدةً ويُخزَّن.
+             * ◆ وكلُّ الحرّاسِ البنيويةِ أدناه تبقى سارية.
+             * ── مقيسٌ حيًّا على `Operations/containers.php` ────────────────
+             *   قبل: جداولُ مُهيَّأةٌ 0 · بحثٌ 0 · ترقيمٌ 0 · ترويسةُ فرزٍ 0 · تصديرٌ 0
+             *   بعد: جداولُ مُهيَّأةٌ 2 · بحثٌ 2 · ترقيمٌ 2 · ترويسةُ فرزٍ 47 · تصديرٌ 2
+             *   وتمريرُ الجسمِ الأفقيُّ 1065 بكسل **قبل وبعد** — عيبٌ قائمٌ
+             *   سلفًا لا مقايضةٌ أحدثها هذا التغيير.
+             * ═══════════════════════════════════════════════════════════════ */
+            if (table.dataset.noDt === 'hard') return;
+            if (table.classList.contains('ems-no-enhance')) return;
+            if ((table.classList.contains('no-datatable') || !!table.dataset.noDt)
+                && pageHasManualDT()) return;
             if (table.dataset.emsDtSkip === '1') return; // فُحص سابقاً وتقرّر استثناؤه
             if (!table.tHead || !table.tBodies || !table.tBodies.length) return;
             if ($.fn.dataTable.isDataTable(table)) return;
