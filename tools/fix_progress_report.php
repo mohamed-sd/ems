@@ -229,22 +229,27 @@ $say('── ④ الدليلُ: مِسبارٌ يذكر المعرِّفَ (ش�
 $WITNESS_DIRS = array('tests', 'tools');
 $COVER_DIRS   = array('app', 'includes', 'database/migrations', 'docs/owf01');
 
-$injWitness = fpr_code_mentions($ROOT, '~INJ-\d{4}~', $WITNESS_DIRS);
+/* ── شواهدُ الملاحظاتِ من **المصدرِ المشترَك** لا من الذكرِ المجرَّد ──────────
+   كان هذا السطرُ يبحث عن `INJ-####` **في أيِّ موضعٍ** من ملفِّ مِسبار، فحُسِب
+   **INJ-0416 مُغلقًا** وهو **موقوفٌ عمدًا** — لأنَّ ثلاثةَ ملفاتٍ تذكره
+   **مثالًا على الموقوف** في نثرِ ترويساتِها؛ وكذلك INJ-0331. فالذكرُ يقلب
+   المعنى إلى ضدِّه. والمصدرُ الآن واحدٌ لكلتا الأداتين:
+   `includes/fix_closure_source.php` — الوسمُ الصريحُ وحدَه. */
+require_once $ROOT . '/includes/fix_closure_source.php';
+$injWitness = array();
+foreach (ems_fix_mentions($ROOT) as $__id => $__files) {
+    foreach ($__files as $__f) { $injWitness[$__id][str_replace($ROOT . '/', '', $__f)] = true; }
+}
 $injCover   = fpr_code_mentions($ROOT, '~INJ-\d{4}~', $COVER_DIRS);
 $fixWitness = fpr_code_mentions($ROOT, '~FIX[ABC]-\d{4}(?:-\S)?~u', $WITNESS_DIRS);
 $fixCover   = fpr_code_mentions($ROOT, '~FIX[ABC]-\d{4}(?:-\S)?~u', $COVER_DIRS);
 
-/* قائمةُ الإغلاقِ المشهودةِ — تُقرأ من مصدرِها لا تُنسخ */
+/* ── لا قائمةَ إغلاقٍ منفصلةٌ بعدُ ─────────────────────────────────────────
+   كانت تُنتزَع من مصفوفةٍ مثبَّتةٍ في `tools/fix_status_report.php` — فكان في
+   النظامِ **مصدران** لسؤالٍ واحد. أُزيلت المصفوفةُ وصار المصدرُ واحدًا
+   (الوسمُ الصريحُ)، فلم يبقَ ما يُنتزَع: الإغلاقُ كلُّه من `$injWitness`. */
 $closedDeclared = array();
-$statusTool = $ROOT . '/tools/fix_status_report.php';
-if (is_file($statusTool)) {
-    $src = (string) file_get_contents($statusTool);
-    if (preg_match('~\$CLOSED\s*=\s*array\((.*?)\n\);~s', $src, $m)
-        && preg_match_all("~'(INJ-\d{4})'~", $m[1], $mm)) {
-        foreach ($mm[1] as $id) { $closedDeclared[$id] = true; }
-    }
-}
-$say('   قائمةُ الإغلاقِ المشهودةِ (من tools/fix_status_report.php): ' . count($closedDeclared));
+$say('   شواهدُ موسومةٌ صراحةً (المصدرُ الواحد): ' . count($injWitness));
 $say('   معرِّفاتٌ يذكرها مِسبارٌ — ملاحظاتٌ: ' . count($injWitness) . ' · أحكامٌ: ' . count($fixWitness));
 
 /* ── خُضرةُ المسابيرِ حيًّا (بـ--live) ──────────────────────────────────────── */
