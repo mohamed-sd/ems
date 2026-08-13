@@ -56,7 +56,39 @@ if (!$canGovern) {
 }
 $ppOrg = check_page_permissions($conn, 'admin/org_structure.php');
 $canOrg = $is_super || !empty($ppOrg['can_edit']) || !empty($ppOrg['can_add']);
-$ppGovGov = check_page_permissions($conn, 'Governance/gov_dept_gov.php');
+/* ═══════════════════════════════════════════════════════════════════════════
+ * نطاقُ التصديقِ — مُعمَّمٌ على الإداراتِ بسجلٍّ مُتحقَّقٍ لا بنصٍّ من الطلب
+ * ⇐ INJ-0123 · INJ-0201 · INJ-0211 · INJ-0230 · INJ-0266 · INJ-0337 ·
+ *   INJ-0355 · INJ-0372 · INJ-0485
+ * ───────────────────────────────────────────────────────────────────────────
+ * كان الأمرانِ مثبَّتَينِ على `gov_dept_gov`: الإذنُ يُقاس على شاشةِ حوكمةِ
+ * الحوكمةِ وحدَها، والنطاقُ يُكتب `'gov_dept_gov:'` حرفيًّا في المعالج. فكلُّ
+ * غلافِ حوكمةٍ جديدٍ كان — لو بُني — **يُسجّل تصديقَه تحتَ إدارةٍ أخرى**،
+ * ويُصدّق عليه مَن يملك شاشةً غيرَ شاشتِه.
+ *
+ * ◆ والنطاقُ **لا يُؤخذ من الطلبِ نصًّا**: يُقرأ اسمُ الغلافِ من `$_POST` ثم
+ *   يُطابَق على **سجلِّ الشاشاتِ الحيِّ** (`modules.code`) — فما ليس شاشةً
+ *   مسجَّلةً يُردُّ. ونمطُ الاسمِ محصورٌ بـ`gov_dept_[a-z]{2,8}` فلا يمرُّ مسار.
+ * ◆ **والإذنُ يُقاس على الشاشةِ المطلوبةِ نفسِها** لا على شاشةٍ ثابتة — فمديرُ
+ *   المخازنِ يصدّق على فريقِه ولا يصدّق على فريقِ المالية.
+ * ◆ والافتراضُ عند غيابِ المعلمةِ يبقى `gov_dept_gov` — فلا يُكسَر نداءٌ قائم.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$attestScope = trim((string) ($_POST['gov_scope'] ?? 'gov_dept_gov'));
+if (!preg_match('~^gov_dept_[a-z]{2,8}$~', $attestScope)) { $attestScope = 'gov_dept_gov'; }
+/* المطابقةُ على اسمِ الملفِّ في أيِّ مجلدٍ — فأغلفةُ الحوكمةِ موزّعةٌ على مجلداتِ
+   إداراتها (Finance/gov_dept_fin.php · Risk/gov_dept_rsk.php …) */
+$attestScreen = null;
+$__like = '%/' . $attestScope . '.php';
+$__st = $conn->prepare('SELECT code FROM modules WHERE code LIKE ? LIMIT 1');
+$__st->bind_param('s', $__like);
+$__st->execute();
+if ($__row = $__st->get_result()->fetch_assoc()) { $attestScreen = (string) $__row['code']; }
+$__st->close();
+if ($attestScreen === null) {
+    $attestScope  = 'gov_dept_gov';
+    $attestScreen = 'Governance/gov_dept_gov.php';
+}
+$ppGovGov = check_page_permissions($conn, $attestScreen);
 $canAttest = $is_super || !empty($ppGovGov['can_view']);
 
 /* §9-1: الصفةُ من المسمى الحي */
@@ -113,8 +145,9 @@ try {
 
         case 'gov_attest': // gov.gov.attest — يشهد ولا يمنح
             if (!$canAttest) { throw new \RuntimeException('GOV-403: التصديقُ لمدير الإدارة'); }
+            /* النطاقُ من السجلِّ المُتحقَّقِ أعلاه — لا نصًّا من الطلبِ ولا ثابتًا */
             $r = RiskService::attestAccessReview($conn, $company_id,
-                'gov_dept_gov:' . gmdate('Y-m'), (int) ($_POST['headcount'] ?? 0),
+                $attestScope . ':' . gmdate('Y-m'), (int) ($_POST['headcount'] ?? 0),
                 trim((string) ($_POST['note'] ?? '')) . ' — بصفة: ' . $actorCapacity, $uid);
             $out = array('ok' => true) + $r;
             break;

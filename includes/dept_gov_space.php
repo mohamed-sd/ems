@@ -135,12 +135,24 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; ?>
         </ul>
     </div>
-    <?php else: ?>
+    <?php elseif (!empty($GOV_DEPT['sod_queries'])): ?>
     <div class="ems-card" style="padding:10px;margin:10px 0;border-inline-start:4px solid #198754">
         <strong style="color:#146c43">✔ صفر خرق لفصل الواجبات</strong>
         <span style="font-size:.82rem;opacity:.8"> — الأزواجُ المقيسة: <?php
             echo htmlspecialchars(implode(' · ', array_map(function ($s) { return $s['title']; }, $GOV_DEPT['sod_queries'])));
         ?>.</span>
+    </div>
+    <?php else: ?>
+    <?php /* ── «صفرُ خرقٍ» يلزمه قياسٌ ────────────────────────────────────────
+         كان الفرعُ الأخضرُ يُصيَّر أيضًا حين تكون `sod_queries` **خاويةً** —
+         فيُعلن «✔ صفر خرق» وقائمةُ «الأزواج المقيسة» بعدَه فارغة. وهي طمأنينةٌ
+         عن شيءٍ **لم يُقَس**، وهي أسوأُ من غيابِ اللوحة: القارئُ يقرأ براءةً حيث
+         لا حكم. فصار الفرعُ الأخضرُ مشروطًا بوجودِ قياسٍ واحدٍ على الأقل، وهذه
+         حالةٌ ثالثةٌ **تُعلن الصمتَ صمتًا**. */ ?>
+    <div class="ems-card" style="padding:10px;margin:10px 0;border-inline-start:4px solid #6c757d">
+        <strong style="color:#5a6268">○ لا قياسَ معلَنٌ لفصل الواجبات في هذه الإدارة</strong>
+        <span style="font-size:.82rem;opacity:.8"> — و«لا قياس» ليست «صفرَ خرق»:
+            الأزواجُ المتعارضةُ تُعرَّف بعقود الإدارة ثم تُقاس على الحسابات الحية.</span>
     </div>
     <?php endif; ?>
 
@@ -251,6 +263,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 function govDeptAttest() {
     var fd = new FormData();
     fd.append('do', 'gov_attest');
+    /* نطاقُ التصديقِ يُرسَل صراحةً — والمعالجُ **يُطابقه على سجلِّ الشاشات** ثم
+       يقيس الإذنَ على الشاشةِ نفسِها؛ فلا يُصدَّق باسمِ إدارةٍ أخرى. */
+    fd.append('gov_scope', '<?php echo htmlspecialchars($GOV_DEPT['attest_scope'], ENT_QUOTES, 'UTF-8'); ?>');
     fd.append('headcount', '<?php echo count($team); ?>');
     fd.append('note', document.getElementById('govAttestNote').value || '');
     if (window.csrfToken) { fd.append('csrf_token', window.csrfToken); }

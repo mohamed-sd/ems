@@ -56,6 +56,7 @@ Equipments/get_contract_stats.php,N,"واجهة AJAX","ليست شاشة — ي�
 Equipments/get_equipment_details.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Equipments/get_mine_contracts.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Equipments/get_model_data.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
+Equipments/gov_dept_flt.php,Y,"شاشة مسجَّلة",تبقى
 Equipments/manage_failure_codes.php,Y,"شاشة مسجَّلة",تبقى
 Equipments/meter_readings.php,Y,"شاشة مسجَّلة",تبقى
 Equipments/select_project.php,Y,"شاشة مسجَّلة",تبقى
@@ -146,6 +147,7 @@ FinRequests/requests_reports.php,Y,"شاشة مسجَّلة",تبقى
 FinRequests/routing_admin.php,Y,"شاشة مسجَّلة",تبقى
 Fleet/cron_doc_expiry_escalation.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Fleet/readiness_board.php,Y,"شاشة مسجَّلة",تبقى
+Fleet/readiness_cert.php,Y,"شاشة مسجَّلة",تبقى
 Governance/access_review.php,Y,"شاشة مسجَّلة",تبقى
 Governance/activation_patterns.php,Y,"شاشة مسجَّلة",تبقى
 Governance/break_glass.php,Y,"شاشة مسجَّلة",تبقى
@@ -164,6 +166,7 @@ Governance/licenses_guarantees.php,Y,"شاشة مسجَّلة",تبقى
 Governance/ownership_grants.php,Y,"شاشة مسجَّلة",تبقى
 Governance/perm_explain.php,Y,"شاشة مسجَّلة",تبقى
 Governance/portal_users.php,Y,"شاشة مسجَّلة",تبقى
+Governance/read_log.php,Y,"شاشة مسجَّلة",تبقى
 Governance/sensitive_fields.php,Y,"شاشة مسجَّلة",تبقى
 Governance/signing_authority.php,Y,"شاشة مسجَّلة",تبقى
 Governance/state_machines.php,Y,"شاشة مسجَّلة",تبقى
@@ -174,6 +177,7 @@ Maintenance/failure_report.php,Y,"شاشة مسجَّلة",تبقى
 Maintenance/get_breakdown_count.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Maintenance/get_open_orders_count.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Maintenance/get_project_equipment.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
+Maintenance/gov_dept_mnt.php,Y,"شاشة مسجَّلة",تبقى
 Maintenance/inspections.php,Y,"شاشة مسجَّلة",تبقى
 Maintenance/master_data.php,Y,"شاشة مسجَّلة",تبقى
 Maintenance/mnt_helpers.php,N,معالج/كرون/مساعد,"ليست شاشة"
@@ -201,7 +205,10 @@ Operations/distribution_space.php,Y,"شاشة مسجَّلة",تبقى
 Operations/equipment_quota.php,Y,"شاشة مسجَّلة",تبقى
 Operations/fleet_calendar.php,Y,"شاشة مسجَّلة",تبقى
 Operations/fleet_utilization.php,Y,"شاشة مسجَّلة",تبقى
+Operations/gov_dept_ops.php,Y,"شاشة مسجَّلة",تبقى
+Operations/gov_dept_sit.php,Y,"شاشة مسجَّلة",تبقى
 Operations/monthly_close.php,Y,"شاشة مسجَّلة",تبقى
+Operations/monthly_plan.php,Y,"شاشة مسجَّلة",تبقى
 Operations/operations_room.php,Y,"شاشة مسجَّلة",تبقى
 Operations/production.php,Y,"شاشة مسجَّلة",تبقى
 Operations/shift_log.php,Y,"شاشة مسجَّلة",تبقى
@@ -216,6 +223,8 @@ Operations/unbilled.php,Y,"شاشة مسجَّلة",تبقى
 Operations/unit_perf.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/consumption_rate.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/dashboard_proc.php,Y,"شاشة مسجَّلة",تبقى
+Procurement/gov_dept_inv.php,Y,"شاشة مسجَّلة",تبقى
+Procurement/gov_dept_prc.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/issue_proc.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/items_proc.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/master_data_proc.php,Y,"شاشة مسجَّلة",تبقى
@@ -230,6 +239,7 @@ Procurement/stock_proc.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/supplier_card_proc.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/suppliers_proc.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/warehouse_board.php,Y,"شاشة مسجَّلة",تبقى
+Procurement/warehouses.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/wh_count.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/wh_receipt.php,Y,"شاشة مسجَّلة",تبقى
 Procurement/wh_returns.php,Y,"شاشة مسجَّلة",تبقى
@@ -238,6 +248,7 @@ Suppliers/equipment_plan.php,Y,"شاشة مسجَّلة",تبقى
 Suppliers/get_mine_contracts.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Suppliers/get_project_hours.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
 Suppliers/get_supplier_contract_equipments.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
+Suppliers/quota_approval_minutes.php,Y,"شاشة مسجَّلة",تبقى
 Suppliers/rfq_requests.php,Y,"شاشة مسجَّلة",تبقى
 Suppliers/settlements.php,Y,"شاشة مسجَّلة",تبقى
 Suppliers/shares_coverage.php,Y,"شاشة مسجَّلة",تبقى
@@ -261,13 +272,17 @@ Tickets/cron_tickets.php,N,معالج/كرون/مساعد,"ليست شاشة"
 Tickets/dept_inbox.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/dept_inbox_map.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 Tickets/get_tickets_count.php,N,"واجهة AJAX","ليست شاشة — يغطيها action_guard"
+Tickets/gov_dept_crp.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/inquiry.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/intake_classify.php,Y,"شاشة مسجَّلة",تبقى
+Tickets/my_tickets.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_categories_config.php,Y,"شاشة مسجَّلة",تبقى
+Tickets/ticket_close.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_contextual_open.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_dashboard.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_escalation_config.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_form.php,Y,"شاشة مسجَّلة",تبقى
+Tickets/ticket_kpi.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_recurrence.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_sla_config.php,Y,"شاشة مسجَّلة",تبقى
 Tickets/ticket_types_config.php,Y,"شاشة مسجَّلة",تبقى
@@ -290,6 +305,7 @@ Timesheet/timesheet_type.php,Y,"شاشة مسجَّلة",تبقى
 Timesheet/ts_driver_filter.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 Timesheet/view_timesheet.php,Y,"شاشة مسجَّلة",تبقى
 Transport/cron_transfer.php,N,معالج/كرون/مساعد,"ليست شاشة"
+Transport/gov_dept_trp.php,Y,"شاشة مسجَّلة",تبقى
 Transport/transfer_arrival.php,Y,"شاشة مسجَّلة",تبقى
 Transport/transfer_close_cost.php,Y,"شاشة مسجَّلة",تبقى
 Transport/transfer_cost_rules_config.php,Y,"شاشة مسجَّلة",تبقى
@@ -309,6 +325,8 @@ Workforce/deductions.php,Y,"شاشة مسجَّلة",تبقى
 Workforce/employee_advances.php,Y,"شاشة مسجَّلة",تبقى
 Workforce/employee_settlements.php,Y,"شاشة مسجَّلة",تبقى
 Workforce/final_settlement.php,Y,"شاشة مسجَّلة",تبقى
+Workforce/gov_dept_hrm.php,Y,"شاشة مسجَّلة",تبقى
+Workforce/gov_dept_wrk.php,Y,"شاشة مسجَّلة",تبقى
 Workforce/housing_units.php,Y,"شاشة مسجَّلة",تبقى
 Workforce/op_codes.php,Y,"شاشة مسجَّلة",تبقى
 Workforce/op_monthly.php,Y,"شاشة مسجَّلة",تبقى
@@ -379,6 +397,7 @@ Financing/fin_models.php,Y,"شاشة مسجَّلة",تبقى
 Financing/financiers_registry.php,Y,"شاشة مسجَّلة",تبقى
 Financing/financing_board.php,Y,"شاشة مسجَّلة",تبقى
 Financing/financing_operation_new.php,Y,"شاشة مسجَّلة",تبقى
+Financing/gov_dept_cap.php,Y,"شاشة مسجَّلة",تبقى
 Financing/installments.php,Y,"شاشة مسجَّلة",تبقى
 Financing/operation_profile.php,Y,"شاشة مسجَّلة",تبقى
 Financing/owners_registry.php,Y,"شاشة مسجَّلة",تبقى
@@ -447,6 +466,7 @@ Portal/contract_review.php,Y,"شاشة مسجَّلة",تبقى
 Portal/dept_achievement.php,Y,"شاشة مسجَّلة",تبقى
 Portal/dept_board.php,Y,"شاشة مسجَّلة",تبقى
 Portal/founding_mode.php,Y,"شاشة مسجَّلة",تبقى
+Portal/gov_dept_ceo.php,Y,"شاشة مسجَّلة",تبقى
 Portal/journey_action.php,N,"★شاشة غير مسجَّلة محتملة","★تسجيل أو تصنيف — يُحسم قبل قلب الحارس (§11.2-⑧)"
 Portal/my_achievement.php,Y,"شاشة مسجَّلة",تبقى
 Portal/my_certificate.php,Y,"شاشة مسجَّلة",تبقى
@@ -512,3 +532,15 @@ Audit/iaf_access_log.php,Y,"★موديول بلا ملف على القرص","�
 Audit/iaf_competencies.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
 Audit/iaf_authorities.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
 Audit/iaf_quality.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_cap.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_crp.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_flt.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_hrm.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_inv.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_mnt.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_ops.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_prc.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_sit.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_trp.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_wrk.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"
+Risk/risk_dept_ceo.php,Y,"★موديول بلا ملف على القرص","★أرشفة أو تصحيح مسار"

@@ -60,6 +60,7 @@ $core = array(
        ويُشترط صفٌّ واحدٌ بالمعرّفِ والقيمتين، وصفرُ ضوضاءٍ عند اللاتغيير. */
     'operations_audit_trail_test',
     'supplier_audit_trail_test',
+    'dept_space_screens_test',
 );
 
 $files = $core;

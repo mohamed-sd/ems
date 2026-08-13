@@ -1,0 +1,48 @@
+<?php
+/**
+ * Financing/gov_dept_cap.php — حوكمة التمويل والملكية
+ * ─────────────────────────────────────────────────────────────────────────
+ * ظهورٌ نطاقيٌّ لمكوّن «حوكمة الإدارة» الواحد على التمويل والملكية:
+ * حساباتُها وصلاحياتُ شاشاتِها وفصلُ واجباتِها وسجلاتُ تدقيقها
+ * (INJAZ-CORE-01 §12-1 الباب ١١ — «مكوّنٌ واحدٌ لا نسخةٌ لكلٍّ»).
+ * قراءةٌ لا كتابة، والفعلُ الكاتبُ الوحيدُ تصديقُ مراجعةِ الوصول — يشهد ولا
+ * يمنح، ونطاقُه `gov_dept_cap` يُطابَق على سجلِّ الشاشاتِ في المعالج.
+ *
+ * ◆ عدّادُ الأحداثِ مقصورٌ على `source_module = 'financing'` — فما ظهر صفرًا
+ *   يعني «لا حدثَ منشورٌ باسمِ هذه الإدارة»، لا «لا أحداثَ في النظام».
+ * ◆ ولا قياسَ فصلِ واجباتٍ معلَنًا بعدُ لهذه الإدارة — والمكوّنُ يُعلن ذلك
+ *   صراحةً ولا يعرض «صفرَ خرق»، فبراءةٌ عمّا لم يُقَس أخطرُ من غيابِ اللوحة.
+ */
+require_once __DIR__ . '/../includes/session_bootstrap.php';
+session_start();
+if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
+include '../config.php';
+require_once __DIR__ . '/../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/screen_contract.php';
+
+$current_role   = strval($_SESSION['user']['role'] ?? '');
+$is_super_admin = ($current_role === '-1');
+$company_id     = intval($_SESSION['user']['company_id'] ?? 0);
+if (!$is_super_admin && $company_id <= 0) { header('Location: ../login.php'); exit(); }
+
+$__pp = check_page_permissions($conn, 'Financing/gov_dept_cap.php');
+if (!$is_super_admin && empty($__pp['can_view'])) {
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض حوكمة الإدارة', 'GOV-PERM-403', 'صلاحيات الحوكمة يمنحها مدير الصلاحيات');
+}
+ems_shell_axes($__pp);
+
+$GOV_DEPT = array(
+    'title'           => 'حوكمة التمويل والملكية',
+    'icon'            => 'fa fa-scale-balanced',
+    'module_like'     => array('Financing/'),
+    'team_roles'      => array(26),
+    'sensitive_like'  => 'fin%',
+    'events_module'   => 'financing',
+    'attest_endpoint' => '../Governance/gov_m14_actions.php',
+    'attest_code'     => 'gov.cap.attest',
+    'attest_scope'    => 'gov_dept_cap',
+    /* لا قياسَ فصلِ واجباتٍ معرَّفًا بعقودِ هذه الإدارة — يُعلَن ولا يُلفَّق */
+    'sod_queries'     => array(),
+);
+
+require __DIR__ . '/../includes/dept_gov_space.php';
