@@ -105,25 +105,47 @@ if (!function_exists('ems_absorb_url_msg')) {
      * تُستدعى مرةً واحدةً عند تحميلِ هذا الملفِّ (يشمل كلَّ شاشةٍ حيةٍ عبر
      * insidebar.php) — ولا تحذف شيفرةً قائمة، بل تُصيّرها خاملةً بلا ضرر.
      */
+    /* ── INJ-0492 · نصُّ الرابطِ **يُطرح ولا يُعرض** ─────────────────────────────
+         كان الماصُّ ينقل نصَّ `?msg=` إلى وميضِ الجلسةِ ثم يُعرض — فنقل موضعَ
+         العرضِ ولم يُزل الثغرة: أيُّ رابطٍ مُعدَّلٍ بـ`?msg=✅ تم الحفظ بنجاح`
+         يُظهر رسالةَ نجاحٍ **لم يقع فعلُها**. والنصُّ مهرَّبٌ فليس المخاطرُ حقنًا
+         بل **انتحالَ حكمِ النظام** — وهو أخطرُ على الثقةِ من زخرفةٍ مكسورة.
+         فصار النصُّ يُنزع ويُهمَل، والرسائلُ الحقيقيةُ تُودَع الجلسةَ عند مصدرِها
+         بـ`ems_flash_set()` قبل التحويل. */
     function ems_absorb_url_msg()
     {
         if (PHP_SAPI === 'cli') { return; }
-        if (empty($_GET['msg']) || !is_scalar($_GET['msg'])) { return; }
-        $txt = trim((string) $_GET['msg']);
-        unset($_GET['msg'], $_REQUEST['msg']);
-        if ($txt === '' || session_status() !== PHP_SESSION_ACTIVE) { return; }
-        $code = 'GOV-INFO-200';
-        if (mb_strpos($txt, '✅') !== false) { $code = 'GOV-OK-200'; }
-        elseif (mb_strpos($txt, 'صلاحي') !== false) { $code = 'GOV-PERM-403'; }
-        elseif (mb_strpos($txt, '❌') !== false) { $code = 'GOV-FAIL-409'; }
+        if (!isset($_GET['msg'])) { return; }
+        unset($_GET['msg'], $_REQUEST['msg']);   /* يُنزع فلا تجده كتلةٌ قديمة */
+    }
+    ems_absorb_url_msg();
+}
+
+if (!function_exists('ems_flash_set')) {
+    /**
+     * INJ-0492 — إيداعُ رسالةِ النظامِ **الجلسةَ** قبل التحويل، بدلَ حملِها في
+     * الرابط. تُقرأ مرةً واحدةً في الحاملِ المركزيِّ ثم تُمحى، فلا تبقى بعد
+     * التحديثِ الأول — وهو الشقُّ الثالثُ من نصِّ القبول.
+     */
+    function ems_flash_set($text, $code = null, $hint = '')
+    {
+        if (PHP_SAPI === 'cli') { return; }
+        $txt = trim((string) $text);
+        if ($txt === '') { return; }
+        if (session_status() !== PHP_SESSION_ACTIVE) { return; }
+        if ($code === null) {
+            $code = 'GOV-INFO-200';
+            if (mb_strpos($txt, '✅') !== false || mb_strpos($txt, '✔') !== false) { $code = 'GOV-OK-200'; }
+            elseif (mb_strpos($txt, 'صلاحي') !== false) { $code = 'GOV-PERM-403'; }
+            elseif (mb_strpos($txt, '❌') !== false || mb_strpos($txt, 'خطأ') !== false) { $code = 'GOV-FAIL-409'; }
+        }
         if (!isset($_SESSION['ems_flash_gov']) || !is_array($_SESSION['ems_flash_gov'])) {
             $_SESSION['ems_flash_gov'] = array();
         }
         $_SESSION['ems_flash_gov'][] = array(
-            'text' => $txt, 'code' => $code, 'hint' => '', 'at' => time(),
+            'text' => $txt, 'code' => (string) $code, 'hint' => (string) $hint, 'at' => time(),
         );
     }
-    ems_absorb_url_msg();
 }
 
 if (!function_exists('ems_gov_flash_redirect')) {

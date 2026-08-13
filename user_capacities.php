@@ -27,7 +27,9 @@ $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['use
 $uid            = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    /* INJ-0492: التحويلُ إلى شاشةِ الدخول — والوميضُ لا يعبرها بالضرورة.
+       فالرسالةُ **برمزٍ** يملك `login.php` نصَّه، لا بنصٍّ في الرابط. */
+    header('Location: login.php?m=nocompany');
     exit();
 }
 
@@ -53,7 +55,8 @@ if ($is_super_admin) {
 $can_view = $can_view || $uid > 0;
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('user capacities super') : ems_tenant_db();
-$redirect = function ($msg) { header("Location: user_capacities.php?msg=" . rawurlencode($msg)); exit(); };
+/* INJ-0492: الرسالةُ إلى الجلسةِ لا إلى الرابط — فلا يُطبع نصٌّ من `$_GET` */
+$redirect = function ($msg) { ems_flash_set($msg); header('Location: user_capacities.php'); exit(); };
 
 // ── الأفعال ─────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

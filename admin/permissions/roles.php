@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'name' => $name, 'parent_role_id' => $parent_role_id, 'level' => $level,
                     'role_scope' => $role_scope, 'status' => $status, 'created_at' => date('Y-m-d H:i:s')));
             }
-            header("Location: roles.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
+            ems_flash_set('تم البحفاظ على البيانات بنجاح ✔');
+            header("Location: roles.php");
             exit;
         } catch (\Throwable $t) {
             error_log('admin/permissions/roles save: ' . $t->getMessage());
@@ -68,16 +69,19 @@ if (isset($_GET['delete_id'])) {
     catch (\Throwable $t) { error_log('admin/permissions/roles child: ' . $t->getMessage()); }
 
     if ($children > 0) {
-        header("Location: roles.php?msg=لا+يمكن+حذف+هذا+الدور+لأنه+يمتلك+أدوار+فرعية+❌");
+        ems_flash_set('لا يمكن حذف هذا الدور لأنه يمتلك أدوار فرعية ❌');
+        header("Location: roles.php");
     } else {
         // [مُستثنى موثَّق — حذف صف مرجعٍ عام] لا قناة حذفٍ للمراجع العامة بعد (deleteRow
         // حكرٌ على جداول المستأجر) — يبقى خامًا بهوية الكونسول المصادَق عليها.
         $stmt = $conn->prepare("DELETE FROM `roles` WHERE `id` = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
-            header("Location: roles.php?msg=تم+حذف+الدور+بنجاح+✔");
+            ems_flash_set('تم حذف الدور بنجاح ✔');
+            header("Location: roles.php");
         } else {
-            header("Location: roles.php?msg=حدث+خطأ+في+الحذف+❌");
+            ems_flash_set('حدث خطأ في الحذف ❌');
+            header("Location: roles.php");
         }
     }
     exit;

@@ -71,7 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (\Throwable $t) { error_log('admin/plans toggle: ' . $t->getMessage()); }
             $msg = 'success:تم تغيير الحالة';
         }
-        header('Location: ' . super_admin_url('plans') . '?msg=' . urlencode($msg));
+        ems_flash_set($msg);
+        header('Location: ' . super_admin_url('plans'));
         exit;
     }
 }

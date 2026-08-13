@@ -73,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'name' => $name, 'owner_role_id' => $owner_role_id, 'icon' => $icon,
                     'display_order' => $display_order, 'is_active' => $is_active),
                     array('id' => (int) $_POST['edit_id']));
-                header('Location: link_groups.php?msg=تم+حفظ+المجموعة+بنجاح+✔');
+                ems_flash_set('تم حفظ المجموعة بنجاح ✔');
+                header('Location: link_groups.php');
                 exit;
             }
 
@@ -86,7 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mp_pg->insert('link_groups', array(
                     'name' => $name, 'owner_role_id' => $owner_role_id, 'icon' => $icon,
                     'display_order' => $display_order, 'is_active' => $is_active));
-                header('Location: link_groups.php?msg=تم+حفظ+المجموعة+بنجاح+✔');
+                ems_flash_set('تم حفظ المجموعة بنجاح ✔');
+                header('Location: link_groups.php');
                 exit;
             }
         } catch (\Throwable $t) {
@@ -104,9 +106,11 @@ if (isset($_GET['delete_id'])) {
     $stmt = $conn->prepare('DELETE FROM `link_groups` WHERE `id` = ?');
     $stmt->bind_param('i', $id);
     if ($stmt->execute()) {
-        header('Location: link_groups.php?msg=تم+حذف+المجموعة+وعادت+روابطها+للمستوى+الأعلى+✔');
+        ems_flash_set('تم حذف المجموعة وعادت روابطها للمستوى الأعلى ✔');
+        header('Location: link_groups.php');
     } else {
-        header('Location: link_groups.php?msg=حدث+خطأ+في+الحذف+❌');
+        ems_flash_set('حدث خطأ في الحذف ❌');
+        header('Location: link_groups.php');
     }
     exit;
 }

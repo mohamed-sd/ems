@@ -28,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // صلاحية الاعتماد = صلاحية تعديل المعدات (دور الأسطول)
 $perm = check_page_permissions($conn, 'equipments_fleet');
 if (empty($perm['can_edit'])) {
-    header('Location: ' . $return_url . $sep . 'msg=' . urlencode('❌ لا توجد صلاحية لاعتماد الكرت'));
+    ems_flash_set('❌ لا توجد صلاحية لاعتماد الكرت');
+    header('Location: ' . $return_url);
     exit();
 }
 
@@ -50,9 +51,11 @@ if ($equipment_id > 0 && db_table_has_column($conn, 'equipments', 'card_state'))
             'card_approved_at' => date('Y-m-d H:i:s'),
         ), array('id' => $equipment_id), "card_state <> 'active'");
     } catch (\Throwable $e) { /* غير مملوك/سياق ناقص → لا تغيير، والرسالة كالأصل */ }
-    header('Location: ' . $return_url . $sep . 'msg=' . urlencode('✅ تم اعتماد الكرت'));
+    ems_flash_set('✅ تم اعتماد الكرت');
+    header('Location: ' . $return_url);
     exit();
 }
 
-header('Location: ' . $return_url . $sep . 'msg=' . urlencode('تعذّر اعتماد الكرت'));
+ems_flash_set('تعذّر اعتماد الكرت');
+header('Location: ' . $return_url);
 exit();

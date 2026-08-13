@@ -43,7 +43,8 @@ if (isset($_GET['delete']) && isset($_GET['csrf_token'])) {
         
         if ($stmt) {
             log_security_event('RECORD_DELETED', "Deleted record ID: $id");
-            header("Location: secure_page_example.php?msg=تم+الحذف+بنجاح");
+            ems_flash_set('تم الحذف بنجاح');
+            header("Location: secure_page_example.php");
             exit;
         }
     }
@@ -150,7 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($stmt) {
                 log_security_event('RECORD_UPDATED', "Updated record ID: $id, Name: $name");
-                header("Location: secure_page_example.php?msg=تم+التعديل+بنجاح");
+                ems_flash_set('تم التعديل بنجاح');
+                header("Location: secure_page_example.php");
                 exit;
             } else {
                 $errors[] = 'حدث خطأ أثناء التعديل';
@@ -169,7 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt) {
                 $new_id = mysqli_insert_id($conn);
                 log_security_event('RECORD_CREATED', "Created record ID: $new_id, Name: $name");
-                header("Location: secure_page_example.php?msg=تمت+الإضافة+بنجاح");
+                ems_flash_set('تمت الإضافة بنجاح');
+                header("Location: secure_page_example.php");
                 exit;
             } else {
                 $errors[] = 'حدث خطأ أثناء الإضافة';

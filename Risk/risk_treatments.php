@@ -58,7 +58,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <td><?php echo htmlspecialchars((string) $t['action_owner']); ?></td>
                 <td><?php echo $t['due_date']; ?></td>
                 <td><span class="badge badge-<?php echo $t['state'] === 'verified' ? 'success' : ($t['state'] === 'overdue' ? 'danger' : 'secondary'); ?>"><?php echo $t['state']; ?></span></td>
-                <td><?php echo htmlspecialchars(mb_substr((string) $t['done_evidence'], 0, 50)) ?: '—'; ?></td>
+                <?php /* INJ-0576: الدليلُ والمرجعُ والمرفقُ معًا — فالمتحقِّقُ لا
+                         يقبل ما لا يستطيع فتحَه. والمرفقُ رابطٌ لا نصٌّ مبتور. */ ?>
+                <td>
+                    <?php $__ev = trim((string) ($t['done_evidence'] ?? '')); ?>
+                    <?php echo $__ev !== '' ? htmlspecialchars(mb_substr($__ev, 0, 50)) : '—'; ?>
+                    <?php if (!empty($t['done_ref'])): ?>
+                        <div class="text-muted" style="font-size:.8rem">مرجع:
+                            <?php echo htmlspecialchars((string) $t['done_ref']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($t['done_attachment'])): ?>
+                        <div><a class="ems-evid-link" href="<?php echo htmlspecialchars((string) $t['done_attachment']); ?>"
+                                target="_blank" rel="noopener"><i class="fas fa-paperclip"></i> المرفق</a></div>
+                    <?php endif; ?>
+                </td>
                 <td>
                     <?php if (in_array($t['state'], array('planned', 'in_progress', 'overdue'), true) && ((int) $t['action_owner_user_id'] === $uid || $canVerify)): ?>
                     <button class="btn btn-sm btn-secondary treatDone" data-id="<?php echo (int) $t['id']; ?>">إنجاز بدليل</button>
@@ -72,6 +85,29 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </table>
     </div></div>
 </div>
+
+<?php /* INJ-0576: موضعُ إدخالِ دليلِ الإنجاز — عنوانٌ وثلاثةُ حقولٍ وردٌّ في موضعِه */ ?>
+<dialog id="treatDoneDlg" style="max-width:520px;width:92%;border:1px solid var(--c-e5e7eb,#e5e7eb);border-radius:10px;padding:18px">
+    <h3 style="margin:0 0 4px">إنجازُ المعالجةِ بدليل</h3>
+    <p class="text-muted" style="font-size:.85rem;margin:0 0 12px">
+        الإغلاقُ بقبولِ المتحقِّق لا بالتنفيذ. أدخل دليلًا مقروءًا (عشرةُ محارفَ فأكثر)
+        أو مرفقًا ومرجعًا يدلّان على المستند.</p>
+    <label style="display:block;margin-bottom:8px">دليلُ التنفيذ
+        <textarea name="done_evidence" class="form-control" rows="3"
+                  placeholder="ما الذي نُفِّذ ومتى وأين"></textarea></label>
+    <label style="display:block;margin-bottom:8px">رابطُ المرفق
+        <input type="text" name="done_attachment" class="form-control"
+               placeholder="../uploads/… أو رابطُ مستند"></label>
+    <label style="display:block;margin-bottom:8px">المرجع
+        <input type="text" name="done_ref" class="form-control"
+               placeholder="رقمُ مستندٍ أو أمرِ عمل"></label>
+    <div id="treatDoneErr" style="color:var(--danger-deep,#7F1D1D);font-size:.85rem;min-height:1.2em"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-start;margin-top:10px">
+        <button type="button" id="treatDoneSend" class="btn btn-primary">حفظُ الدليل</button>
+        <button type="button" id="treatDoneCancel" class="btn btn-secondary">إلغاء</button>
+    </div>
+</dialog>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     function post(d, cb) {
@@ -80,14 +116,44 @@ document.addEventListener('DOMContentLoaded', function () {
         if (window.csrfToken) { fd.append('csrf_token', window.csrfToken); }
         fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); }).then(cb);
     }
+    /* ── INJ-0576 · نموذجٌ بثلاثةِ حقولٍ بدلَ `prompt()` ───────────────────────
+         `prompt()` سطرٌ واحدٌ بلا عنوانٍ ولا تحقُّقٍ ولا موضعٍ للمرفقِ والمرجع —
+         ولا يُنسخ منه ولا يُلصق فيه بسهولة. والنموذجُ يجمع الثلاثةَ ويُظهر ردَّ
+         الخادمِ في موضعِه بدلَ `alert`. */
+    var dlg = document.getElementById('treatDoneDlg');
+    var dlgErr = document.getElementById('treatDoneErr');
+    var curId = null;
     document.querySelectorAll('.treatDone').forEach(function (b) {
         b.addEventListener('click', function () {
-            var txt = prompt('دليل الإنجاز:');
-            if (!txt) { return; }
-            post({ do: 'treatment_progress', treatment_id: b.dataset.id, state: 'done', done_evidence: txt },
-                function (j) { if (j.ok) { location.reload(); } else { alert(j.msg || ''); } });
+            curId = b.dataset.id;
+            dlgErr.textContent = '';
+            dlg.querySelector('[name=done_evidence]').value = '';
+            dlg.querySelector('[name=done_attachment]').value = '';
+            dlg.querySelector('[name=done_ref]').value = '';
+            if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
         });
     });
+    var sendBtn = document.getElementById('treatDoneSend');
+    if (sendBtn) {
+        sendBtn.addEventListener('click', function () {
+            dlgErr.textContent = '';
+            post({
+                do: 'treatment_progress', treatment_id: curId, state: 'done',
+                done_evidence:   dlg.querySelector('[name=done_evidence]').value,
+                done_attachment: dlg.querySelector('[name=done_attachment]').value,
+                done_ref:        dlg.querySelector('[name=done_ref]').value
+            }, function (j) {
+                if (j.ok) { location.reload(); }
+                else { dlgErr.textContent = (j.code ? j.code + ' — ' : '') + (j.msg || 'تعذَّر الحفظ'); }
+            });
+        });
+    }
+    var cancelBtn = document.getElementById('treatDoneCancel');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            if (typeof dlg.close === 'function') { dlg.close(); } else { dlg.removeAttribute('open'); }
+        });
+    }
     document.querySelectorAll('.treatVerify').forEach(function (b) {
         b.addEventListener('click', function () {
             post({ do: 'treatment_verify', treatment_id: b.dataset.id },

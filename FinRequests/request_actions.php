@@ -25,7 +25,8 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('fin request actions super') 
 
 function finreq_redirect($to, $msg)
 {
-    header('Location: ' . $to . (strpos($to, '?') === false ? '?' : '&') . 'msg=' . urlencode($msg));
+    ems_flash_set($msg);
+    header('Location: ' . $to);
     exit();
 }
 

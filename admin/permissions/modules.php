@@ -93,7 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'group_id' => $group_id,
                     'is_link' => $is_link, 'icon' => $icon, 'display_order' => $display_order,
                     'is_quick' => $mp_is_quick), array('id' => (int) $_POST['edit_id']));
-                header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
+                ems_flash_set('تم البحفاظ على البيانات بنجاح ✔');
+                header("Location: modules.php");
                 exit;
             } else {
                 // التحقق من عدم تكرار نفس الصفحة لنفس الدور (قراءة عبر البوابة)
@@ -107,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'group_id' => $group_id,
                         'is_link' => $is_link, 'icon' => $icon, 'display_order' => $display_order,
                         'is_quick' => $mp_is_quick));
-                    header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
+                    ems_flash_set('تم البحفاظ على البيانات بنجاح ✔');
+                    header("Location: modules.php");
                     exit;
                 }
             }
@@ -125,9 +127,11 @@ if (isset($_GET['delete_id'])) {
     $stmt = $conn->prepare("DELETE FROM `modules` WHERE `id` = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
-        header("Location: modules.php?msg=تم+حذف+الصفحة+بنجاح+✔");
+        ems_flash_set('تم حذف الصفحة بنجاح ✔');
+        header("Location: modules.php");
     } else {
-        header("Location: modules.php?msg=حدث+خطأ+في+الحذف+❌");
+        ems_flash_set('حدث خطأ في الحذف ❌');
+        header("Location: modules.php");
     }
     exit;
 }

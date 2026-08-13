@@ -81,6 +81,9 @@ $core = array(
     'wide_table_views_test',           /* INJ-0493 — الجداولُ الطويلةُ ومناظرُها */
     'filter_bar_period_test',          /* INJ-0497 · 0543 · 0561 · 0564 · 0556 — الشريطُ وفلترُ الفترة */
     'contracts_tables_test',           /* INJ-0146 — جداولُ العقودِ وترويسةٌ ثابتة */
+    /* حملةُ الواجهةِ · الموجةُ السادسة */
+    'risk_treatment_evidence_test',    /* INJ-0576 — دليلُ الإنجازِ يُقرأ أو يُوثَّق */
+    'url_message_spoof_test',          /* INJ-0492 — لا رسالةَ نجاحٍ يصنعها الرابط */
 );
 
 $files = $core;

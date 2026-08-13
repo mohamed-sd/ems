@@ -329,11 +329,31 @@ try {
             $newState = (string) $_POST['state'];
             if (!in_array($newState, array('in_progress', 'done'), true)) { throw new \RuntimeException('RSK-422'); }
             $evid = $_POST['done_evidence'] ?? null;
-            if ($newState === 'done' && trim((string) $evid) === '') {
-                throw new \RuntimeException('RSK-422: الإنجاز بدليل — والإغلاق بقبول المتحقق');
+            /* ── INJ-0576 · دليلٌ يُقرأ لا حرفٌ يملأ الحقل ────────────────────────
+                 كان الشرطُ «ليس فارغًا» وحدَه — فنقطةٌ واحدةٌ «.» تُغلق معالجةَ خطر،
+                 والمتحقِّقُ يجد حقلًا فيه رمزٌ لا يُخبره بشيء. فيُشترط الآن:
+                   ① نصٌّ ذو **معنًى**: عشرةُ محارفَ فأكثر وفيها حروفٌ أو أرقام،
+                   ② **أو** مرفقٌ حقيقيٌّ ومرجعٌ يدلّان على المستندِ خارجَ النظام.
+                 والرمزُ مميَّزٌ (`RSK-EVID-422`) فيُقتبس في البلاغِ ولا يُخلط بغيره. */
+            $att = trim((string) ($_POST['done_attachment'] ?? ''));
+            $ref = trim((string) ($_POST['done_ref'] ?? ''));
+            if ($newState === 'done') {
+                $txt = trim((string) $evid);
+                $letters = preg_match_all('~[\p{L}\p{N}]~u', $txt);
+                $meaningful = (mb_strlen($txt) >= 10 && $letters >= 6);
+                $documented = ($att !== '' && $ref !== '');
+                if (!$meaningful && !$documented) {
+                    throw new \RuntimeException('RSK-EVID-422: الإنجاز بدليلٍ مقروءٍ '
+                        . '(عشرةُ محارفَ فأكثر) أو بمرفقٍ ومرجع — والإغلاق بقبول المتحقق');
+                }
             }
-            $st = $conn->prepare('UPDATE risk_treatments SET state = ?, done_evidence = COALESCE(?, done_evidence) WHERE id = ? AND company_id = ?');
-            $st->bind_param('ssii', $newState, $evid, $tid, $company_id);
+            $st = $conn->prepare('UPDATE risk_treatments
+                                     SET state = ?,
+                                         done_evidence   = COALESCE(?, done_evidence),
+                                         done_attachment = COALESCE(NULLIF(?, \'\'), done_attachment),
+                                         done_ref        = COALESCE(NULLIF(?, \'\'), done_ref)
+                                   WHERE id = ? AND company_id = ?');
+            $st->bind_param('ssssii', $newState, $evid, $att, $ref, $tid, $company_id);
             $st->execute();
             $st->close();
             RiskEvents::fire($conn, $company_id, 'RiskTreatmentProgressed', $tid, array(

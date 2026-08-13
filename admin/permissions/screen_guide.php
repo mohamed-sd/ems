@@ -56,7 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_id'])) {
                 'title_ar'    => $title,
                 'source'      => 'authored',
             ), array('id' => $id));
-            header('Location: screen_guide.php?msg=' . rawurlencode('حُفظ التعريف ✔'));
+            ems_flash_set('حُفظ التعريف ✔');
+        header('Location: screen_guide.php');
             exit;
         } catch (\Throwable $t) {
             error_log('admin/permissions/screen_guide save: ' . $t->getMessage());

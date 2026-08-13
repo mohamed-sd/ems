@@ -56,11 +56,13 @@ if (isset($_GET['toggle_id'])) {
         $row = $mp_nav->selectOne('nav_items', array('columns' => array('id', 'role_id', 'active'), 'where' => array('id' => $id)));
         if ($row) {
             $mp_nav->update('nav_items', array('active' => intval($row['active']) === 1 ? 0 : 1), array('id' => $id));
-            header('Location: nav_items.php?role_id=' . intval($row['role_id']) . '&msg=' . urlencode(intval($row['active']) === 1 ? 'عُطّل العنصر — لن يظهر في القائمة ✔' : 'فُعّل العنصر — يظهر لمن يملك صلاحية العرض ✔'));
+            ems_flash_set(intval($row['active']) === 1 ? 'عُطّل العنصر — لن يظهر في القائمة ✔' : 'فُعّل العنصر — يظهر لمن يملك صلاحية العرض ✔');
+            header('Location: nav_items.php?role_id=' . intval($row['role_id']));
             exit;
         }
     } catch (\Throwable $t) { error_log('admin nav toggle: ' . $t->getMessage()); }
-    header('Location: nav_items.php?role_id=' . $selected_role_id . '&msg=' . urlencode('حدث خطأ في التبديل ❌'));
+    ems_flash_set('حدث خطأ في التبديل ❌');
+    header('Location: nav_items.php?role_id=' . $selected_role_id);
     exit;
 }
 
@@ -75,10 +77,12 @@ if (isset($_GET['delete_id'])) {
         $stmt = $conn->prepare('DELETE FROM `nav_items` WHERE `id` = ?');
         $stmt->bind_param('i', $id);
         $stmt->execute();
-        header('Location: nav_items.php?role_id=' . $rid . '&msg=' . urlencode('حُذف العنصر من قائمة الدور ✔'));
+        ems_flash_set('حُذف العنصر من قائمة الدور ✔');
+        header('Location: nav_items.php?role_id=' . $rid);
     } catch (\Throwable $t) {
         error_log('admin nav delete: ' . $t->getMessage());
-        header('Location: nav_items.php?role_id=' . $rid . '&msg=' . urlencode('حدث خطأ في الحذف ❌'));
+        ems_flash_set('حدث خطأ في الحذف ❌');
+        header('Location: nav_items.php?role_id=' . $rid);
     }
     exit;
 }
@@ -133,7 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if (!empty($_POST['edit_id'])) {
                 $mp_nav->update('nav_items', $data, array('id' => (int) $_POST['edit_id']));
-                header('Location: nav_items.php?role_id=' . $role_id . '&msg=' . urlencode('حُفظ العنصر ✔'));
+                ems_flash_set('حُفظ العنصر ✔');
+                header('Location: nav_items.php?role_id=' . $role_id);
                 exit;
             }
             $dup = $mp_nav->selectOne('nav_items', array('columns' => array('id'),
@@ -142,7 +147,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error_msg = 'هذا المسار موجودٌ في قائمة الدور مسبقًا — لا تكرار ❌';
             } else {
                 $mp_nav->insert('nav_items', $data);
-                header('Location: nav_items.php?role_id=' . $role_id . '&msg=' . urlencode('أُضيف العنصر لقائمة الدور ✔'));
+                ems_flash_set('أُضيف العنصر لقائمة الدور ✔');
+                header('Location: nav_items.php?role_id=' . $role_id);
                 exit;
             }
         } catch (\Throwable $t) {
