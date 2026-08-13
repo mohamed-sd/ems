@@ -57,6 +57,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         القاعدة المحورية: <b>المتاح = الرصيد المادي − المحجوز</b>. الأرصدة هنا محسوبة من حركات المخزون الفعلية (الوارد + المرتجع − المصروف)، لا من رقمٍ مخزَّن.
     </div>
 
+    <?php
+    /* ── INJ-0561 · فلترُ الفترةِ والمخزنِ **من الخادم** ────────────────────────
+         لم يكن في أيِّ شاشةِ مخازنَ فلترُ فترةٍ رغم أن كلَّ حركةٍ تحمل `moved_at`
+         — فالرصيدُ المعروضُ مجموعُ الدهرِ كلِّه، ولا سبيلَ لسؤالِ «ما رصيدُ هذا
+         الشهر؟». والترشيحُ هنا **في `WHERE` لا في المتصفح**: يعود المطابقُ وحدَه.
+         وعدّادُ الفلاترِ وزرُّ التفريغِ يبنيهما شريطُ العُدَّةِ آليًّا (INJ-0497). */
+    $__pFrom = isset($_GET['from']) && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['from']) ? $_GET['from'] : '';
+    $__pTo   = isset($_GET['to'])   && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['to'])   ? $_GET['to']   : '';
+    $__pWh   = isset($_GET['wh']) ? (int) $_GET['wh'] : 0;
+    $__pWhere = '';
+    if ($__pFrom !== '') { $__pWhere .= " AND m.moved_at >= '" . $conn->real_escape_string($__pFrom) . " 00:00:00'"; }
+    if ($__pTo   !== '') { $__pWhere .= " AND m.moved_at <= '" . $conn->real_escape_string($__pTo)   . " 23:59:59'"; }
+    if ($__pWh   >  0)   { $__pWhere .= ' AND m.warehouse_id = ' . $__pWh; }
+    $__whList = array();
+    $__wr = $conn->prepare('SELECT id, name FROM proc_warehouse WHERE company_id = ? ORDER BY name');
+    $__wr->bind_param('i', $company_id);
+    $__wr->execute();
+    $__wres = $__wr->get_result();
+    while ($__wx = $__wres->fetch_assoc()) { $__whList[] = $__wx; }
+    $__wr->close();
+    ?>
+    <form method="get" class="filter" data-ems-period="1">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترةُ الحركاتِ والمخزن</div>
+        <div class="filter-body">
+            <div class="filter-field"><label for="stkFrom">من تاريخ</label>
+                <input type="date" id="stkFrom" name="from" class="form-control" value="<?php echo htmlspecialchars($__pFrom); ?>"></div>
+            <div class="filter-field"><label for="stkTo">إلى تاريخ</label>
+                <input type="date" id="stkTo" name="to" class="form-control" value="<?php echo htmlspecialchars($__pTo); ?>"></div>
+            <div class="filter-field"><label for="stkWh">المخزن</label>
+                <select id="stkWh" name="wh" class="form-control">
+                    <option value="">— كلُّ المخازن —</option>
+                    <?php foreach ($__whList as $__w): ?>
+                    <option value="<?php echo (int) $__w['id']; ?>"<?php echo ((int) $__w['id'] === $__pWh ? ' selected' : ''); ?>><?php
+                        echo htmlspecialchars($__w['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                    <?php endforeach; ?>
+                </select></div>
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+            </div>
+        </div>
+    </form>
+
     <div class="card"><div class="card-body">
         <div class="table-container">
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
@@ -112,7 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                          FROM proc_stock_move m
                          LEFT JOIN proc_item it ON it.id = m.item_id
                          LEFT JOIN proc_warehouse w ON w.id = m.warehouse_id
-                         WHERE {TENANT_SCOPE}
+                         WHERE {TENANT_SCOPE}" . $__pWhere . "
                          GROUP BY m.item_id, m.warehouse_id, it.code, it.name, it.category, it.uom,
                                   it.min_qty, it.max_qty, it.is_critical, it.avg_cost, w.name
                          ORDER BY item_name ASC"

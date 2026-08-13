@@ -49,6 +49,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <?php trs_msg_banner(); ?>
 
+    <?php
+    /* ── INJ-0543 · فلترُ الفترةِ **من الخادم** ─────────────────────────────────
+         الفلاترُ الخمسةُ القائمةُ تُبنى قيمُها من محتوى الصفحةِ المُصيَّرة (الدالةُ
+         `fill`) — أي أنها ترشّح **ما وصل** لا ما في القاعدة. فقيمةٌ لا تظهر في
+         الصفحةِ الحاليةِ لا يمكن الترشيحُ بها أصلًا، ولا فلترَ فترةٍ ألبتّة رغم
+         أن لكلِّ أمرٍ `planned_date`.
+         فيُضاف مدى تاريخٍ يُطبَّق في `WHERE` — يعود من الخادمِ ما يقع فيه وحدَه.
+         وعدّادُ «الفلاترِ المفعَّلة» وزرُّ التفريغِ يبنيهما شريطُ الفلاترِ المشتركُ
+         في العُدَّةِ آليًّا على هذا النموذجِ (INJ-0497). */
+    $__from = isset($_GET['from']) && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['from']) ? $_GET['from'] : '';
+    $__to   = isset($_GET['to'])   && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['to'])   ? $_GET['to']   : '';
+    $__dateWhere = '';
+    if ($__from !== '') { $__dateWhere .= " AND o.planned_date >= '" . $conn->real_escape_string($__from) . "'"; }
+    if ($__to   !== '') { $__dateWhere .= " AND o.planned_date <= '" . $conn->real_escape_string($__to)   . "'"; }
+    ?>
+    <form method="get" class="filter" data-ems-period="1">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترةُ التاريخِ المخطط</div>
+        <div class="filter-body">
+            <div class="filter-field"><label for="fFrom">من تاريخ</label>
+                <input type="date" id="fFrom" name="from" class="form-control" value="<?php echo htmlspecialchars($__from); ?>"></div>
+            <div class="filter-field"><label for="fTo">إلى تاريخ</label>
+                <input type="date" id="fTo" name="to" class="form-control" value="<?php echo htmlspecialchars($__to); ?>"></div>
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق الفترة</button>
+            </div>
+        </div>
+    </form>
+
     <div class="filter">
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
         <div class="filter-body">
@@ -124,7 +152,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      LEFT JOIN project p ON p.id = o.project_id
                      LEFT JOIN trs_locations fl ON fl.id = o.from_location_id
                      LEFT JOIN trs_locations tl ON tl.id = o.to_location_id
-                     WHERE {TENANT_SCOPE}
+                     WHERE {TENANT_SCOPE}" . $__dateWhere . "
                      ORDER BY o.id DESC"
                 );
                 { foreach ($order_rows as $row) {

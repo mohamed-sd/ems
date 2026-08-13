@@ -282,8 +282,12 @@ if (!function_exists('ems_shell_axes')) {
         $measured = is_array($perms);
         $canView = $measured ? !empty($perms['can_view']) : true;
         $canWrite = $measured && (!empty($perms['can_edit']) || !empty($perms['can_add']) || !empty($perms['can_delete']));
+        /* INJ-0497: المحورُ `data` كان ثابتًا `'data'` في كلِّ شاشةٍ ولكلِّ حالة —
+           يُبذر ولا يُقرأ ولا يتغيّر، فلا يحمل خبرًا. والحكمُ في نصِّ القبولِ
+           صريح: «كلُّ محورٍ مبذورٍ له قارئٌ — **وإلا فقد أُزيل**». فأُزيل.
+           (حالةُ البياناتِ الحقيقيةُ يديرها `EmsScreenShell` في المتصفحِ حيث
+           تُعرف فعلًا: تحميلٌ · فارغٌ · لا نتائجَ · خطأ.) */
         $ax = array(
-            'data' => 'data',
             'permission' => !$measured ? 'unmeasured' : ($canWrite ? 'full' : ($canView ? 'partial' : 'none')),
             'edit' => $canWrite ? 'editable' : 'readonly',
             'connection' => 'online',

@@ -111,6 +111,21 @@ $ok(count($titles) === count(array_unique($titles)),
     'ولا عنوانَ تكرَّر بعد القشر — فالقشرُ لم يدمج مرحلتين في اسمٍ واحد',
     'مكرَّرٌ: ' . implode(' · ', array_diff_assoc($titles, array_unique($titles))));
 
+/* ── ④ INJ-0517 · والترتيبُ بالمراحلِ باقٍ كما هو ──────────────────────────
+     نصُّ القبول شقّان: «لا ترقيمَ لفظيّ» **و«يبقى ترتيبُ المجموعات بالمراحل
+     كما هو»**. فإزالةُ الترقيمِ لا تجوز أن تخلط الترتيب: تُقرأ مفاتيحُ
+     المجموعاتِ من المُخرَجِ الحيِّ (`data-group-key="stage-<دور>-<رقم>"`)
+     ويُشترط تصاعُدُ أرقامِها كما تُصيَّر. */
+$order = array();
+if (preg_match_all('~data-group-key="stage-\d+-(\d+)"~', $live, $mk)) {
+    foreach ($mk[1] as $sn) { $order[] = (int) $sn; }
+}
+$sorted = $order;
+sort($sorted, SORT_NUMERIC);
+$ok(count($order) >= 6, 'وقُرئت مفاتيحُ المراحلِ من المُخرَجِ الحيِّ (' . count($order) . ')');
+$ok($order === $sorted, '**وترتيبُ المجموعاتِ بالمراحلِ تصاعديٌّ كما هو** — القشرُ لم يخلطه',
+    'المُصيَّر: ' . implode(',', $order));
+
 $say('');
 $say("PASS={$PASS} · FAIL={$FAIL}");
 exit($FAIL === 0 ? 0 : 1);

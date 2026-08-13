@@ -1177,3 +1177,30 @@ body.ems-site .ems-auto-buttons {
   margin: 0 0 8px;
 }
 body.ems-site .ems-auto-buttons .dt-buttons { float: none; margin: 0; }
+
+/* ═══ INJ-0146 · ترويسةٌ ثابتةٌ عند التمرير لكلِّ جدولِ بيانات ═══════════════
+   نصُّ القبول: «كلُّ جدولٍ في وحدة العقود فيه بحثٌ وفرزٌ وترقيمٌ **وترويسةٌ
+   ثابتةٌ عند التمرير**». والبحثُ والفرزُ والترقيمُ تُوفّرها العُدَّةُ المركزية،
+   أمَّا الترويسةُ الثابتةُ فلم يكن لها قاعدةٌ واحدةٌ في المستودعِ كلِّه:
+   `position: sticky` الوحيدةُ كانت على شريطٍ علويٍّ لا على ترويسةِ جدول.
+
+   ◆ ولا تلوينَ جديدًا: خلفيةُ `thead th` أصلًا معتمةٌ بـ`!important` أعلاه —
+     فالثباتُ لا يُظهر الصفوفَ من خلفها.
+   ◆ والإزاحةُ من رمزٍ يضبطه العُدَّةُ من ارتفاعِ الشريطِ العلويِّ الحقيقيِّ
+     (يختلف بين الحاسوبِ والهاتف) — لا رقمًا مكتوبًا يخطئ في أحدهما. */
+table thead th,
+.table thead th,
+table.dataTable thead th,
+.dataTables_scrollHead table thead th {
+    /* `!important` هنا ضرورةٌ لا عادة: `dataTables.css` يضع `position:relative`
+       على `th` لأيقوناتِ الفرز، وهو أخصُّ فيهزم القاعدةَ العامة. */
+    position: sticky !important;
+    top: var(--ems-sticky-top, 0px);
+    z-index: 3;
+}
+/* الطباعةُ لا تُمرَّر — والثباتُ فيها يكرّر الترويسةَ في غير موضعها */
+@media print {
+    table thead th,
+    .table thead th,
+    table.dataTable thead th { position: static; }
+}

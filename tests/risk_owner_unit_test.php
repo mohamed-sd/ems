@@ -43,7 +43,11 @@ $sweep = function () use ($conn, $TAG) {
     while ($r && ($x = $r->fetch_row())) { $ids[] = (int) $x[0]; }
     $n = 0;
     foreach ($ids as $id) {
-        @$conn->query('DELETE FROM risk_events WHERE risk_id = ' . $id);
+        /* ◆ مقصدُ `RiskEvents::fire` هو الجذرُ المحايدُ `ems_business_events` —
+             ولا وجودَ لجدولٍ اسمُه `risk_events`. فالكنسُ الذي كان يقصده كان
+             يخفق صامتًا خلفَ `@`، فتتراكم حقائقُ الجولاتِ لكياناتٍ مكنوسة. */
+        $conn->query("DELETE FROM ems_business_events
+                       WHERE source_module = 'risk' AND entity_type = 'risk' AND entity_id = " . $id);
         if ($conn->query('DELETE FROM risk_register WHERE id = ' . $id)) { $n += $conn->affected_rows; }
     }
     return $n;

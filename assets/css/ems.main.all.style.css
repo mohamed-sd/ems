@@ -12696,7 +12696,12 @@ body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_
 body.ems-site .main table.dataTable thead > tr > th.sorting,
 body.ems-site .main table.dataTable thead > tr > th.sorting_asc,
 body.ems-site .main table.dataTable thead > tr > th.sorting_desc {
-  position: relative !important;
+  /* INJ-0146: كان `relative !important` هنا يهزم قاعدةَ الترويسةِ الثابتةِ
+     في `ems-tables.css`. و`sticky` قيمةٌ **موضَّعةٌ** أيضًا، فتبقى أيقوناتُ
+     الفرزِ المطلقةُ (::before/::after) على حالها — والثباتُ يعمل. */
+  position: sticky !important;
+  top: var(--ems-sticky-top, 0px) !important;
+  z-index: 3 !important;
   vertical-align: middle !important;
   min-height: 44px !important;
   min-width: 88px !important;

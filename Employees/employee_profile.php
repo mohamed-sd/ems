@@ -732,17 +732,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         /* UI-DEF-07 (L4): لا رسمَ بمحاورَ افتراضيةٍ وبياناتٍ صفرية — حالةٌ
            فارغةٌ مفسَّرةٌ بدلَه (emsChartGuard يستعمل EmsUI متى حضر). */
+        /* INJ-0238 · INJ-0432: كان الحارسُ مكتوبًا هنا نسخةً محليةً — وهو نفسُه
+           ما تشتكي منه الملاحظة (مكوّنٌ مشتركٌ بمتبنّينَ قلائل). صار يفوّض
+           للمكوّنِ المركزيِّ `EmsUI.chartGuard`، ويبقى ارتدادٌ أدنى إن لم
+           يُحمَّل — بلا بناءِ مظهرٍ ثانٍ. */
         function emsChartGuard(ctx, hasData, renderFn) {
+            if (window.EmsUI && typeof EmsUI.chartGuard === 'function') {
+                return EmsUI.chartGuard(ctx, hasData, renderFn);
+            }
             if (hasData) { return renderFn(); }
             var host = ctx && ctx.parentNode ? ctx.parentNode : null;
-            if (!host) { return null; }
-            if (window.EmsUI && EmsUI.emptyState) {
-                host.innerHTML = '';
-                host.appendChild(EmsUI.emptyState({ reason: 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية' }));
-            } else {
-                host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">'
-                    + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
-            }
+            if (host) { host.setAttribute('data-ems-chart-state', 'empty'); }
             return null;
         }
 

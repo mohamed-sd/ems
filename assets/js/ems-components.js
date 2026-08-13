@@ -496,6 +496,46 @@
         return el;
     };
 
+    /* ── INJ-0432 · حارسُ الرسومِ المركزيّ ────────────────────────────────────
+         لوحاتُ النظامِ تنشئ `new Chart(...)` مباشرةً. وفي ذلك عيبان:
+           ① **بلا بيانات**: يُرسم مخططٌ بمحاورَ افتراضيةٍ وأعمدةٍ صفرية — رقمٌ
+              عارٍ يوهم أن هناك قياسًا، والصوابُ حالةٌ فارغةٌ مُعلَنة.
+           ② **بلا مكتبة**: `if (typeof Chart === 'undefined') setTimeout(draw,150)`
+              يعيد المحاولةَ **إلى الأبد**، فتبقى المساحةُ بيضاءَ بلا تفسيرٍ ولا
+              نهاية. والمكتبةُ قد تُحجب بمانعِ إعلاناتٍ أو شبكةٍ مقطوعة.
+         فصار الحارسُ مكوّنًا واحدًا: انتظارٌ **محدود**، ثم حالةٌ فارغةٌ من
+         `EmsUI.emptyState` — وبقيةُ اللوحةِ مُصيَّرةٌ خادميًّا فلا تتأثر أصلًا. */
+    EmsUI.chartGuard = function (canvas, hasData, renderFn, opts) {
+        opts = opts || {};
+        var host = canvas && canvas.parentNode ? canvas.parentNode : null;
+        var show = function (reason) {
+            if (!host) { return null; }
+            host.innerHTML = '';
+            host.appendChild(EmsUI.emptyState({ reason: reason }));
+            host.setAttribute('data-ems-chart-state', 'empty');
+            return null;
+        };
+        if (!hasData) {
+            return show(opts.emptyReason || 'لا بيانات في الفترة المعروضة — الرسمُ لا يُعرض بمحاورَ افتراضية');
+        }
+        var waited = 0, step = 150, limit = opts.timeoutMs || 3000;
+        var tick = function () {
+            if (typeof window.Chart !== 'undefined') {
+                if (host) { host.setAttribute('data-ems-chart-state', 'drawn'); }
+                try { return renderFn(); } catch (e) {
+                    return show('تعذَّر رسمُ المخطط — والبياناتُ ظاهرةٌ في الجدولِ أدناه');
+                }
+            }
+            waited += step;
+            if (waited >= limit) {
+                return show(opts.blockedReason
+                    || 'مكتبةُ الرسمِ لم تُحمَّل — بقيةُ اللوحةِ تعمل، والأرقامُ ظاهرةٌ في بطاقاتها');
+            }
+            setTimeout(tick, step);
+        };
+        return tick();
+    };
+
     window.EmsUI = EmsUI;
 
     /* لغة UI-12 لجداول DataTables المهيأة بعدنا (تكامل غير كاسر):

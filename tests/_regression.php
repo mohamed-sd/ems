@@ -76,6 +76,11 @@ $core = array(
     'nav_stage_label_test',            /* INJ-0570 — عنوانُ المرحلةِ يصف لا يَعُدّ */
     'deny_page_component_test',        /* INJ-0500 — صفحةُ حجبٍ واحدةٌ برمزٍ ومسارٍ ومقاس */
     'shell_color_tokens_test',         /* INJ-0496 — صفرُ لونٍ صلبٍ في القشرة */
+    /* حملةُ الواجهةِ · الموجةُ الرابعة */
+    'empty_state_adoption_test',       /* INJ-0238 · INJ-0432 — الحالةُ الفارغةُ مكوّنٌ واحد */
+    'wide_table_views_test',           /* INJ-0493 — الجداولُ الطويلةُ ومناظرُها */
+    'filter_bar_period_test',          /* INJ-0497 · 0543 · 0561 · 0564 · 0556 — الشريطُ وفلترُ الفترة */
+    'contracts_tables_test',           /* INJ-0146 — جداولُ العقودِ وترويسةٌ ثابتة */
 );
 
 $files = $core;

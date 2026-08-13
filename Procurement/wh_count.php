@@ -63,13 +63,21 @@ if ($__pc['run'] && $__pc['ok']) {
 $whs = array(); $rows = array();
 $r = mysqli_query($conn, "SELECT id, name FROM proc_warehouse WHERE company_id=$company_id ORDER BY name");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $whs[] = $x;
+/* INJ-0561: مدى تاريخِ الحركاتِ — يُطبَّق في شرطِ الوصلِ لا في `WHERE` لأنَّ
+   الوصلَ يساريّ: شرطٌ في `WHERE` يُقصي الأصنافَ بلا حركةٍ في الفترة، وهي
+   معلومةٌ مطلوبةٌ في الجرد (رصيدٌ دفتريٌّ صفر). */
+$__cFrom = isset($_GET['from']) && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['from']) ? $_GET['from'] : '';
+$__cTo   = isset($_GET['to'])   && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['to'])   ? $_GET['to']   : '';
+$__cJoin = '';
+if ($__cFrom !== '') { $__cJoin .= " AND m.moved_at >= '" . $conn->real_escape_string($__cFrom) . " 00:00:00'"; }
+if ($__cTo   !== '') { $__cJoin .= " AND m.moved_at <= '" . $conn->real_escape_string($__cTo)   . " 23:59:59'"; }
 if ($wh > 0) {
     $r = mysqli_query($conn,
         "SELECT i.id, i.name,
                 COALESCE(SUM(CASE WHEN m.move_type IN ('استلام','تحويل وارد','مرتجع','تسوية زيادة') THEN m.qty
                                   WHEN m.move_type IN ('صرف','تحويل صادر','تسوية عجز') THEN -m.qty ELSE 0 END),0) AS book
          FROM proc_item i
-         LEFT JOIN proc_stock_move m ON m.item_id = i.id AND m.warehouse_id = $wh AND m.company_id = $company_id
+         LEFT JOIN proc_stock_move m ON m.item_id = i.id AND m.warehouse_id = $wh AND m.company_id = $company_id{$__cJoin}
          WHERE i.company_id = $company_id
          GROUP BY i.id, i.name HAVING book <> 0 OR COUNT(m.id) > 0
          ORDER BY i.name");
@@ -95,11 +103,25 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <form method="get" class="ems-form" style="display:flex;gap:10px;align-items:end;margin-bottom:14px">
-    <div><label for="emsf_1349_f75ee">المخزن</label><select name="wh" class="form-control" onchange="this.form.submit()" id="emsf_1349_f75ee"><option value="">—</option>
-      <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>" <?= $w['id'] == $wh ? 'selected' : '' ?>><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
+  <?php /* INJ-0561: كان الترشيحُ بالمخزنِ وحدَه — بلا فترةٍ رغم أن كلَّ حركةٍ
+           تحمل `moved_at`. فأُضيف مدى تاريخٍ يُطبَّق في وصلِ الحركاتِ نفسِه،
+           وعدّادُ الفلاترِ وزرُّ التفريغِ من شريطِ العُدَّةِ المشترك. */ ?>
+  <form method="get" class="filter" data-ems-period="1">
+    <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> المخزنُ وفترةُ الحركات</div>
+    <div class="filter-body">
+      <div class="filter-field"><label for="emsf_1349_f75ee">المخزن</label>
+        <select name="wh" class="form-control" id="emsf_1349_f75ee"><option value="">—</option>
+        <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>" <?= $w['id'] == $wh ? 'selected' : '' ?>><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
+      <div class="filter-field"><label for="wcFrom">من تاريخ</label>
+        <input type="date" id="wcFrom" name="from" class="form-control" value="<?= htmlspecialchars($__cFrom, ENT_QUOTES, 'UTF-8') ?>"></div>
+      <div class="filter-field"><label for="wcTo">إلى تاريخ</label>
+        <input type="date" id="wcTo" name="to" class="form-control" value="<?= htmlspecialchars($__cTo, ENT_QUOTES, 'UTF-8') ?>"></div>
+      <div class="filter-actions"><button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button></div>
+    </div>
   </form>
-  <?php if ($wh > 0): ?>
+  <?php /* INJ-0564: كان الجدولُ لا يُصيَّر إلا بعد اختيارِ مخزنٍ — فالشاشةُ تُفتح
+           بلا جدولٍ ولا تفسير. صار يُصيَّر دائمًا: الحالةُ الفارغةُ المشتركةُ
+           تشرح ما ينقص (اختيارُ مخزن). */ ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم الصنف</th><th>الدفتري (محسوبٌ من الحركات)</th><th>الفعليُّ المجرود</th><th>سبب الفرق</th><th>قرار التسوية</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -150,5 +172,4 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endforeach; ?>
     </tbody>
   </table>
-  <?php endif; ?>
 </div>

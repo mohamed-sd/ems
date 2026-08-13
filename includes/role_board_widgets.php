@@ -81,9 +81,28 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
 
     <script id="rbPulseInit">
     (function () {
+        /* INJ-0432: كان `setTimeout(draw,150)` يعيد المحاولةَ إلى الأبد إن حُجبت
+           مكتبةُ الرسم — مساحةٌ بيضاءُ بلا تفسيرٍ ولا نهاية. وكان يرسم بمحاورَ
+           افتراضيةٍ عند صفرِ بيانات. الحارسُ المركزيُّ يعالج الحالتين. */
+        var __rbCanvas = document.getElementById('rbPulse');
+        var __rbIn  = <?php echo json_encode($rb_pulse['in']); ?>;
+        var __rbOut = <?php echo json_encode($rb_pulse['out']); ?>;
+        var __rbHas = false;
+        for (var __i = 0; __i < __rbIn.length; __i++) {
+            if (Number(__rbIn[__i]) || Number(__rbOut[__i])) { __rbHas = true; break; }
+        }
         function draw() {
-            if (typeof Chart === 'undefined') { return setTimeout(draw, 150); }
-            new Chart(document.getElementById('rbPulse'), {
+            if (window.EmsUI && typeof window.EmsUI.chartGuard === 'function') {
+                return window.EmsUI.chartGuard(__rbCanvas, __rbHas, drawChart,
+                    { emptyReason: 'لا حركةَ مسجَّلةً في هذه الفترة — الرسمُ لا يُعرض بمحاورَ افتراضية' });
+            }
+            /* المكوّنُ لم يُحمَّل بعد — انتظارٌ **محدود** لا لانهائيّ */
+            if (!draw._n) { draw._n = 0; }
+            if (++draw._n > 20) { return; }
+            return setTimeout(draw, 150);
+        }
+        function drawChart() {
+            return new Chart(__rbCanvas, {
                 type: 'bar',
                 data: {
                     labels: <?php echo json_encode($rb_pulse['labels']); ?>,

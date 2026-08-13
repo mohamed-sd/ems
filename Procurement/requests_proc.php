@@ -232,6 +232,42 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
 
     <?php proc_msg_banner(); ?>
 
+    <?php
+    /* ── INJ-0556 · فلترُ الفترةِ والإدارةِ الطالبةِ من الخادم ─────────────────── */
+    $__rqFrom = isset($_GET['from']) && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['from']) ? $_GET['from'] : '';
+    $__rqTo   = isset($_GET['to'])   && preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $_GET['to'])   ? $_GET['to']   : '';
+    $__rqDept = isset($_GET['dept']) ? trim((string) $_GET['dept']) : '';
+    $__rqDepts = array();
+    $__dr = $conn->prepare("SELECT DISTINCT requesting_dept FROM proc_request
+                             WHERE company_id = ? AND requesting_dept IS NOT NULL AND requesting_dept <> ''
+                             ORDER BY requesting_dept");
+    $__dr->bind_param('i', $company_id);
+    $__dr->execute();
+    $__dres = $__dr->get_result();
+    while ($__dx = $__dres->fetch_row()) { $__rqDepts[] = (string) $__dx[0]; }
+    $__dr->close();
+    if ($__rqDept !== '' && !in_array($__rqDept, $__rqDepts, true)) { $__rqDept = ''; }
+    ?>
+    <form method="get" class="filter" data-ems-period="1">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترةُ الإنشاءِ والإدارةُ الطالبة</div>
+        <div class="filter-body">
+            <div class="filter-field"><label for="rqFrom">من تاريخ</label>
+                <input type="date" id="rqFrom" name="from" class="form-control" value="<?php echo htmlspecialchars($__rqFrom, ENT_QUOTES, 'UTF-8'); ?>"></div>
+            <div class="filter-field"><label for="rqTo">إلى تاريخ</label>
+                <input type="date" id="rqTo" name="to" class="form-control" value="<?php echo htmlspecialchars($__rqTo, ENT_QUOTES, 'UTF-8'); ?>"></div>
+            <div class="filter-field"><label for="rqDept">الإدارة الطالبة</label>
+                <select id="rqDept" name="dept" class="form-control">
+                    <option value="">— كلُّ الإدارات —</option>
+                    <?php foreach ($__rqDepts as $__d): ?>
+                    <option value="<?php echo htmlspecialchars($__d, ENT_QUOTES, 'UTF-8'); ?>"<?php
+                        echo ($__d === $__rqDept ? ' selected' : ''); ?>><?php
+                        echo htmlspecialchars($__d, ENT_QUOTES, 'UTF-8'); ?></option>
+                    <?php endforeach; ?>
+                </select></div>
+            <div class="filter-actions"><button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button></div>
+        </div>
+    </form>
+
     <?php if ($can_add): ?>
     <form method="post" style="margin-bottom:12px">
         <input type="hidden" name="action" value="generate_needs">
@@ -385,10 +421,20 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                     <?php
                     // ترطيب ثنائي: الطلبات ثم عدّ سطورها بجلبٍ واحد
                     $gv = proc_gate($is_super_admin);
-                    $request_rows = $gv->select('proc_request', array(
+                    /* INJ-0556: كان الترشيحُ بحثًا نصيًّا عامًّا في المتصفحِ على
+                       الصفحةِ المُحمَّلةِ وحدَها — فما لم يُحمَّل لا يُرشَّح. صار مدى
+                       التاريخِ والإدارةُ الطالبةُ في الاستعلامِ نفسِه، والعمودان
+                       `created_at` و`requesting_dept` موجودان أصلًا في `proc_request`. */
+                    $__reqWhere = array();
+                    if ($__rqFrom !== '') { $__reqWhere[] = "created_at >= '" . $conn->real_escape_string($__rqFrom) . " 00:00:00'"; }
+                    if ($__rqTo   !== '') { $__reqWhere[] = "created_at <= '" . $conn->real_escape_string($__rqTo)   . " 23:59:59'"; }
+                    if ($__rqDept !== '') { $__reqWhere[] = "requesting_dept = '" . $conn->real_escape_string($__rqDept) . "'"; }
+                    $__reqOpts = array(
                         'columns' => array('id', 'code', 'need_source', 'op_classification', 'priority', 'state', 'fin_approval_state', 'created_at'),
                         'orderBy' => 'id DESC',
-                    ));
+                    );
+                    if ($__reqWhere) { $__reqOpts['whereRaw'] = implode(' AND ', $__reqWhere); }
+                    $request_rows = $gv->select('proc_request', $__reqOpts);
                     $line_counts = array();
                     if (!empty($request_rows)) {
                         $rids = array();

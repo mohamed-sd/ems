@@ -11,7 +11,9 @@
  *                  INJ-0495 · INJ-0526 · INJ-0527 · INJ-0542 · INJ-0546 · INJ-0569
  *                  INJ-0421 · INJ-0341 · INJ-0459 · INJ-0491 · INJ-0518 · INJ-0577
  *                  INJ-0593 · INJ-0498 · INJ-0547 · INJ-0572 · INJ-0570
- *                  INJ-0500 · INJ-0496
+ *                  INJ-0500 · INJ-0496 · INJ-0238 · INJ-0432 · INJ-0493
+ *                  INJ-0497 · INJ-0543 · INJ-0561 · INJ-0564 · INJ-0556 · INJ-0517
+ *                  INJ-0146
  *
  * ── النطاق ────────────────────────────────────────────────────────────────
  * ثمانيةٌ وستون معرِّفًا نوعُها `UX/UI Defect` وحالتُها ليست «مُغلقٌ بشاهد».
@@ -178,17 +180,23 @@ $login = function ($user) use ($jar, $BASE) {
     $b = (string) curl_exec($ch); curl_close($ch);
     return mb_strpos($b, 'name="password"') === false;
 };
-$userOfRole = function ($role) use ($conn, $CO) {
+/* ◆ **كلُّ** حساباتِ الدورِ لا أوّلُها: كان يُختار أوّلُ حسابٍ بالمعرِّف،
+     فإن لم تكن كلمتُه القياسيةَ أُعلن «لا حسابَ عارض» — وفي الدورِ حسابٌ
+     آخرُ يعمل. (وقع فعلًا في دورِ النقل 23: `transport_mgr` يفشل و«مشرف
+     النقل» يدخل — فبندانِ أُعلنا غيرَ مقيسين وهما مقيسان.) */
+$usersOfRole = function ($role) use ($conn, $CO) {
+    $out = array();
     $st = $conn->prepare("SELECT username FROM users
-                           WHERE role = ? AND company_id = ? AND username <> '' ORDER BY id LIMIT 1");
+                           WHERE role = ? AND company_id = ? AND username <> '' ORDER BY id");
     $r = (string) $role;
     $st->bind_param('si', $r, $CO);
     $st->execute();
-    $x = $st->get_result()->fetch_row();
+    $res = $st->get_result();
+    while ($res && ($x = $res->fetch_row())) { $out[] = (string) $x[0]; }
     $st->close();
-    return $x ? (string) $x[0] : '';
+    return $out;
 };
-$viewerOf = function ($rel) use ($conn, $userOfRole) {
+$viewerOf = function ($rel) use ($conn, $usersOfRole, $login) {
     $st = $conn->prepare('SELECT rp.role_id FROM role_permissions rp
                             JOIN modules m ON m.id = rp.module_id
                            WHERE m.code = ? AND rp.can_view = 1 ORDER BY rp.role_id');
@@ -196,11 +204,38 @@ $viewerOf = function ($rel) use ($conn, $userOfRole) {
     $st->execute();
     $res = $st->get_result();
     while ($res && ($x = $res->fetch_row())) {
-        $u = $userOfRole((int) $x[0]);
-        if ($u !== '') { $st->close(); return array($u, (int) $x[0]); }
+        foreach ($usersOfRole((int) $x[0]) as $u) {
+            if ($login($u)) { $st->close(); return array($u, (int) $x[0]); }
+        }
     }
     $st->close();
     return array('', 0);
+};
+
+/* ── مُلمِحاتُ الرابطِ لشاشاتٍ تحتاج مُعامَلًا ─────────────────────────────
+ شاشةُ بطاقةٍ أو مقارنةٍ تُفتح بلا مُعامَلٍ فتعرض منتقيًا لا جدولًا — فإعلانُ
+ «صفرُ جدولٍ» عنها قياسٌ لرابطٍ خاطئٍ لا حكمٌ على الشاشة. والمُعامَلُ يُشتقُّ
+ من القاعدةِ الحيّةِ لا يُخترَع. */
+$urlHint = function ($rel) use ($conn, $CO) {
+    $one = function ($sql) use ($conn) {
+        $r = $conn->query($sql);
+        if ($r && ($x = $r->fetch_row())) { return (int) $x[0]; }
+        return 0;
+    };
+    if ($rel === 'Suppliers/supplier_profile.php') {
+        $id = $one("SELECT id FROM suppliers WHERE company_id = {$CO} ORDER BY id DESC LIMIT 1");
+        return $id ? '?id=' . $id : '';
+    }
+    if ($rel === 'Procurement/rfq_compare_award.php') {
+        $id = $one("SELECT r.id FROM supplier_rfqs r JOIN rfq_lines l ON l.rfq_id = r.id
+                      WHERE r.company_id = {$CO} ORDER BY r.id DESC LIMIT 1");
+        return $id ? '?rfq=' . $id : '';
+    }
+    if ($rel === 'Procurement/wh_count.php') {
+        $id = $one("SELECT id FROM proc_warehouse WHERE company_id = {$CO} ORDER BY id LIMIT 1");
+        return $id ? '?wh=' . $id : '';
+    }
+    return '';
 };
 
 /* ── العُدَّةُ نفسُها: شرطٌ مسبقٌ يُقاس مرّةً ─────────────────────────────────
@@ -275,6 +310,26 @@ $BY_WITNESS = array(
  'ستُّ صفحاتِ حجبٍ مبنيةٍ بيدٍ بلا رمزٍ ولا مسارٍ ⇒ **مكوّنٌ واحدٌ** برمزٍ ومسارٍ و`viewport`'),
     'INJ-0496' => array('shell_color_tokens_test', 'includes/topbar.php',
  'ألوانٌ صلبةٌ في القشرةِ ⇒ **صفرٌ** · 127 إشارةَ رمزٍ كلُّها معرَّفة'),
+    'INJ-0238' => array('empty_state_adoption_test', 'assets/js/ui-unification.js',
+ 'متبنّو المكوّنِ ١٣ من ٣٤٦ والعُدَّةُ نفسُها ليست منهم ⇒ **٩٣٫٩٪** (351/374) بنداءٍ مركزيّ'),
+    'INJ-0432' => array('empty_state_adoption_test', 'includes/role_board_widgets.php',
+ 'محاولةٌ أبديةٌ عند حجبِ مكتبةِ الرسمِ ورسمٌ بمحاورَ افتراضيةٍ ⇒ **حارسٌ مركزيٌّ** بانتظارٍ محدودٍ وحالةٍ مُعلَنة'),
+    'INJ-0493' => array('wide_table_views_test', 'assets/js/ui-unification.js',
+ '١٦٥ جدولًا ≥٢٠ عمودًا وصفرُ مناظرَ محفوظةٍ ⇒ **١٦٥ مؤهَّلةً** ومنظرٌ يعبر الخروجَ والدخول (مقيسٌ في متصفح)'),
+    'INJ-0497' => array('filter_bar_period_test', 'assets/js/ui-unification.js',
+ '`.ems-filterbar` بصفرِ مستهلكٍ ومحوران بلا قارئ ⇒ **٦١ شاشةً** و٥/٥ محاورَ لها قُرّاء'),
+    'INJ-0543' => array('filter_bar_period_test', 'Transport/transfer_orders_list.php',
+ 'فلاترُ من محتوى الصفحةِ بلا فترة ⇒ **٢٠ ⇒ ٠ ⇒ ١٨** بفلترٍ من الخادم وعدّادٍ وزرِّ تفريغ'),
+    'INJ-0561' => array('filter_bar_period_test', 'Procurement/stock_proc.php',
+ 'صفرُ فلترِ فترةٍ في المخازن ⇒ **١١ ⇒ ٠** في المخزون و**٨ ⇒ ٠** في الجرد'),
+    'INJ-0564' => array('filter_bar_period_test', 'Procurement/wh_count.php',
+ 'لا جدولَ حتى يُختار مخزن ⇒ **يُصيَّر دائمًا** فتشرح الحالةُ الفارغةُ ما ينقص'),
+    'INJ-0556' => array('filter_bar_period_test', 'Procurement/requests_proc.php',
+ 'بحثٌ نصيٌّ في المتصفحِ بلا فترةٍ ولا إدارة ⇒ **١٨ ⇒ ٠** بالفترةِ و**١٨ ⇒ ١١** بالإدارةِ الطالبة'),
+    'INJ-0517' => array('nav_stage_label_test', 'includes/unified_nav.php',
+ 'ترقيمٌ لفظيٌّ في عناوينِ مجموعاتِ ٢٨ دورًا ⇒ **صفرٌ** والترتيبُ بالمراحلِ تصاعديٌّ كما هو'),
+    'INJ-0146' => array('contracts_tables_test', 'Contracts/contracts.php',
+ '١٨ جدولًا ساكنًا بلا بحثٍ ولا فرزٍ ولا ترويسةٍ ثابتة ⇒ **٢٧/٢٧ ترويسةً `sticky`** عند 78px (مقيسٌ في متصفح)'),
     'INJ-0498' => array('ui_consistency_scan_test', 'emsreports/reports/_report_template.php',
         'نسختا بوتستراب متعارضتان ⇒ **نسخةٌ واحدةٌ** في الشفرةِ الحية (RTL=0)'),
 );
@@ -387,14 +442,14 @@ foreach ($todo as $id => $r) {
         continue;
     }
     list($u, $role) = $viewerOf($rel);
-    if ($u === '' || !$login($u)) {
+    if ($u === '') {
         $rows[] = array($id, $rel, $fam, '—', '—', 'غيرُ مقيس',
             'لا حسابَ لدورٍ يملك عرضَ الشاشة — فلا تصييرَ يُقاس');
         $unmeasured++;
         $say(sprintf('  ○ %-10s %-30s لا حسابَ عارض', $id, mb_substr($rel, 0, 28)));
         continue;
     }
-    $res = $http($BASE . '/' . $rel);
+    $res = $http($BASE . '/' . $rel . $urlHint($rel));
     if ($res['code'] !== 200) {
         $rows[] = array($id, $rel, $fam, 'دور ' . $role, 'HTTP ' . $res['code'], 'غيرُ مقيس',
             'الشاشةُ لم تُصيَّر (الرمز ' . $res['code'] . ')');

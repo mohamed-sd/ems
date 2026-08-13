@@ -1037,11 +1037,31 @@
     })();
 
     /* تركيباتُ CM-00 المرئية: القراءةُ فقط تُخفي أفعالَ الكتابة · والقديمةُ تعلن عمرَها */
+    /* ── INJ-0497 · لكلِّ محورٍ مبذورٍ قارئٌ — وإلا فقد أُزيل ─────────────────
+         كانت المحاورُ خمسةً تُبذر ويُقرأ منها **اثنان** (`edit` يُخفي أفعالَ
+         الكتابة · `freshness` يُظهر لافتةَ القِدَم). و`permission` و`connection`
+         تُبذران بلا أثرٍ مرئيٍّ واحد — إعلانُ حالةٍ لا يراها أحد.
+         فصار لكلٍّ قارئُه: الصلاحيةُ الجزئيةُ تُعطّل أفعالَ الكتابة ظاهرةً
+         بتفسيرِها، وانقطاعُ الاتصالِ يُعلن بلافتةٍ لحظية. (والمحورُ `data` كان
+         ثابتًا لا يتغيّر — أُزيل من البذرِ لأنَّه لا يحمل خبرًا.) */
     function bootShellCss() {
         var css = 'body[data-ax-edit="readonly"] .ems-write-action,body[data-ax-edit="locked"] .ems-write-action{display:none !important}' +
             'body[data-ax-freshness="stale"] #emsAxStale,body[data-ax-freshness="cached"] #emsAxStale{display:block}' +
             '#emsAxStale{display:none;position:fixed;bottom:14px;left:14px;z-index:99997;background:#8a6d00;color:#fff;' +
-            'padding:8px 14px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}';
+            'padding:8px 14px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}' +
+            /* AX-2 الصلاحية: الجزئيةُ والمعدومةُ تُعطّلان أفعالَ الكتابةِ ظاهرةً */
+            'body[data-ax-permission="partial"] .ems-write-action,body[data-ax-permission="none"] .ems-write-action' +
+            '{opacity:.45;pointer-events:none;cursor:not-allowed}' +
+            'body[data-ax-permission="none"] #emsAxPerm{display:block}' +
+            '#emsAxPerm{display:none;position:fixed;top:0;inset-inline-start:0;z-index:99996;background:#7F1D1D;color:#fff;' +
+            'padding:6px 14px;font-size:.82rem}' +
+            /* AX-4 الاتصال: الانقطاعُ يُعلن لحظيًّا لا صامتًا */
+            'body[data-ax-connection="offline"] #emsAxOffline,body[data-ax-connection="sync-failed"] #emsAxOffline{display:block}' +
+            '#emsAxOffline{display:none;position:fixed;bottom:54px;left:14px;z-index:99997;background:#1e3a5f;color:#fff;' +
+            'padding:8px 14px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}' +
+            /* AX-1 البيانات: لا تصديرَ لجدولٍ فارغ — فعلٌ ميتٌ يُدرَّب المستخدمُ على تجاهله */
+            'body[data-ax-data="empty"] .ems-xlsx-btn,body[data-ax-data="no-results"] .ems-xlsx-btn' +
+            '{opacity:.4;pointer-events:none}';
         var st = document.createElement('style');
         st.textContent = css;
         document.head.appendChild(st);
@@ -1049,6 +1069,92 @@
         stale.id = 'emsAxStale';
         stale.textContent = 'البياناتُ المعروضةُ ليست لحظية — حدّث الشاشةَ عند عودة الاتصال';
         document.body.appendChild(stale);
+        var off = document.createElement('div');
+        off.id = 'emsAxOffline';
+        off.textContent = 'لا اتصالَ بالشبكة — ما تكتبه الآن يُحفظ محليًّا ويُرسَل عند العودة';
+        document.body.appendChild(off);
+        var perm = document.createElement('div');
+        perm.id = 'emsAxPerm';
+        perm.textContent = 'عرضٌ بلا صلاحيةِ كتابةٍ في هذه الشاشة';
+        document.body.appendChild(perm);
+    }
+
+    /* ══ INJ-0497 · INJ-0543 · INJ-0561 — شريطُ الفلاترِ المشترك ══════════════
+       `.ems-filterbar` مبنيٌّ بالكاملِ في `assets/css/ems-shell.css` (رأسٌ ·
+       عدّادُ المفعَّلِ · زرُّ تفريغ) و**بصفرِ مستهلك**. ومكوّنٌ بصفرِ مستهلكٍ
+       ليس مكوّنًا — هو شفرةٌ ميتة.
+       فيتبنّاه العُدَّةُ: كلُّ نموذجِ ترشيحٍ (`GET` أو نموذجٌ فيه حقولُ بحثٍ
+       وتواريخَ وقوائم) يُلَفُّ بالشريط، ويُحسب فيه **عددُ الفلاترِ المفعَّلة**،
+       ويُعرض زرُّ تفريغٍ يمسحها ويعيد الطلب. فيصير لكلِّ شاشةٍ فيها ترشيحٌ
+       عدّادٌ ومخرجٌ — بصفرِ تعديلٍ في ملفِّ شاشة. */
+    function emsFilterFormIsFilter(form) {
+        if (!form || form.getAttribute('data-ems-filterbar') === 'off') { return false; }
+        var m = (form.getAttribute('method') || 'get').toLowerCase();
+        if (m !== 'get') { return false; }                 /* نماذجُ الكتابةِ ليست ترشيحًا */
+        var fields = form.querySelectorAll('input:not([type=hidden]):not([type=submit]), select, textarea');
+        if (fields.length < 2) { return false; }           /* حقلٌ واحدٌ ليس شريطَ فلاتر */
+        if (form.closest('table')) { return false; }
+        return true;
+    }
+    function emsFilterActiveCount(form) {
+        var n = 0;
+        var fields = form.querySelectorAll('input:not([type=hidden]):not([type=submit]):not([type=button]), select');
+        for (var i = 0; i < fields.length; i++) {
+            var f = fields[i];
+            if (f.type === 'checkbox' || f.type === 'radio') { if (f.checked) { n++; } continue; }
+            var v = (f.value || '').trim();
+            if (f.tagName === 'SELECT') { if (f.selectedIndex > 0 && v !== '' && v !== '0') { n++; } continue; }
+            if (v !== '' && v !== '0') { n++; }
+        }
+        return n;
+    }
+    function bootFilterBars() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+            var f = forms[i];
+            if (f.getAttribute('data-ems-fb') === '1') { continue; }
+            if (!emsFilterFormIsFilter(f)) { continue; }
+            f.setAttribute('data-ems-fb', '1');
+            f.classList.add('ems-filterbar', 'open');
+
+            var head = document.createElement('div');
+            head.className = 'ems-filterbar-head';
+            var label = document.createElement('span');
+            label.textContent = 'الترشيح';
+            var count = document.createElement('span');
+            count.className = 'ems-filter-count';
+            var clear = document.createElement('button');
+            clear.type = 'button';
+            clear.className = 'ems-filter-clear';
+            clear.textContent = 'تفريغُ الفلاتر';
+            head.appendChild(label);
+            head.appendChild(count);
+            head.appendChild(clear);
+            f.insertBefore(head, f.firstChild);
+
+            (function (form, countEl) {
+                function refresh() {
+                    var n = emsFilterActiveCount(form);
+                    countEl.textContent = n + (n === 1 ? ' فلترٌ مفعَّل' : ' فلاتر مفعَّلة');
+                    form.classList.toggle('has-active', n > 0);
+                    form.setAttribute('data-ems-filter-count', String(n));
+                }
+                form.addEventListener('input', refresh);
+                form.addEventListener('change', refresh);
+                clear.addEventListener('click', function () {
+                    var fields = form.querySelectorAll('input:not([type=hidden]):not([type=submit]):not([type=button]), select');
+                    for (var k = 0; k < fields.length; k++) {
+                        var fl = fields[k];
+                        if (fl.type === 'checkbox' || fl.type === 'radio') { fl.checked = false; }
+                        else if (fl.tagName === 'SELECT') { fl.selectedIndex = 0; }
+                        else { fl.value = ''; }
+                    }
+                    refresh();
+                    try { form.submit(); } catch (e) { /* نموذجٌ بلا إرسال */ }
+                });
+                refresh();
+            })(f, count);
+        }
     }
 
     /* ── Boot ───────────────────────────────────────────────── */
@@ -1196,41 +1302,70 @@
             // زرُّ إنشاءٍ قائمٌ في الصفحة — يُعاد استعمالُه ولا يُخترَع
             var addBtn = document.querySelector('a[href*="add"], a[href*="new"], a[href*="create"], .btn-primary, [data-ems-action="add"]');
 
-            var tr = document.createElement('tr');
-            tr.className = 'ems-state-empty';
-            var td = document.createElement('td');
-            td.colSpan = cols;
-            td.style.textAlign = 'center';
-            td.style.padding = '34px 16px';
-            td.style.color = '#6b7280';
-
-            var title = document.createElement('div');
-            title.style.fontWeight = '700';
-            title.style.marginBottom = '6px';
-            title.textContent = filtered ? 'لا نتائجَ مطابقة' : 'لا بياناتٍ بعد';
-
-            var hint = document.createElement('div');
-            hint.style.fontSize = '14px';
-            hint.textContent = filtered
-                ? 'الفلترُ الحاليُّ لا يطابق أيَّ سجلّ — وسّعْ المدى أو امسحِ البحث.'
-                : 'لم يُسجَّل شيءٌ في هذه الشاشة حتى الآن.';
-
-            td.appendChild(title);
-            td.appendChild(hint);
-
-            if (!filtered && addBtn && addBtn.getAttribute('href')) {
-                var a = document.createElement('a');
-                a.href = addBtn.getAttribute('href');
-                a.textContent = 'إضافةُ أولِ سجل';
-                a.style.display = 'inline-block';
-                a.style.marginTop = '12px';
-                a.className = addBtn.className || '';
-                td.appendChild(a);
+            /* ── INJ-0238 · الحالةُ الفارغةُ من **المكوّنِ المشترك** ──────────────
+                 `EmsUI.emptyState` و`EmsUI.noResults` موجودان ويعملان في
+                 `assets/js/ems-components.js` — ومتبنّوهما ١٣ شاشةً من ٣٤٦.
+                 وكانت هذه الدالةُ نفسُها **من غيرِ المتبنّين**: تبني عنوانًا
+                 وتلميحًا وزرًّا بيدها، بألوانٍ صلبةٍ وحشوةٍ خاصة. فنسختان
+                 لحالةٍ واحدةٍ تتفرَّقان — وهو عينُ العيبِ المُشتكى منه.
+                 فصارت تنادي المكوّنَ: كلُّ جدولٍ في النظامِ يتبنّاه من هنا
+                 بصفرِ تعديلٍ في ملفِّ شاشة. */
+            var stateEl = null;
+            if (window.EmsUI) {
+                if (filtered && typeof window.EmsUI.noResults === 'function') {
+                    stateEl = window.EmsUI.noResults({ onClear: function () { emsClearFilters(scope, tb); } });
+                } else if (!filtered && typeof window.EmsUI.emptyState === 'function') {
+                    stateEl = window.EmsUI.emptyState({
+                        reason: 'لم يُسجَّل شيءٌ في هذه الشاشة حتى الآن.',
+                        createHref: (addBtn && addBtn.getAttribute('href')) ? addBtn.getAttribute('href') : '',
+                        createLabel: 'إضافةُ أولِ سجل'
+                    });
+                }
+            }
+            /* المكوّنُ غيرُ محمَّلٍ ⇒ **لا تُبنى نسخةٌ ثانيةٌ بيدٍ**: تُترك الخليةُ
+               بسطرٍ واحدٍ صريحٍ بدلَ اختراعِ مظهرٍ ثالث. */
+            if (!stateEl) {
+                stateEl = document.createElement('div');
+                stateEl.className = 'ems-state ems-state-empty';
+                stateEl.textContent = filtered ? 'لا نتائجَ مطابقة' : 'لا بياناتٍ بعد';
             }
 
+            /* INJ-0497 · محورُ البياناتِ يُكتب من مصدرِه الحيِّ هنا: هذا الموضعُ
+               وحدَه يعرف «فارغٌ» من «لا نتائجَ لبحثك» — فالخادمُ لا يعرفهما. */
+            try {
+                if (window.EmsScreenShell) {
+                    window.EmsScreenShell.set('data', filtered ? 'no-results' : 'empty');
+                }
+            } catch (eAx) { /* المحورُ إرشادٌ — لا يُسقط الشاشة */ }
+
+            var tr = document.createElement('tr');
+            tr.className = 'ems-state-empty-row';
+            tr.setAttribute('data-ems-empty-src', window.EmsUI ? 'EmsUI' : 'fallback');
+            var td = document.createElement('td');
+            td.colSpan = cols;
+            td.appendChild(stateEl);
             tr.appendChild(td);
             body.appendChild(tr);
         }
+    }
+
+    /* تفريغُ الفلاترِ المحيطةِ بالجدول — مسارُ الخروجِ الذي يَعِد به «لا نتائج» */
+    function emsClearFilters(scope, tableEl) {
+        var ctrls = (scope || document).querySelectorAll('input[type=search], input[type=text], input[type=date], select');
+        var changed = false;
+        for (var i = 0; i < ctrls.length; i++) {
+            var c = ctrls[i];
+            if (c.closest('table') === tableEl) { continue; }
+            if (c.tagName === 'SELECT') {
+                if (c.selectedIndex !== 0) { c.selectedIndex = 0; changed = true; }
+            } else if ((c.value || '') !== '') { c.value = ''; changed = true; }
+            if (changed) {
+                try { c.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { /* متصفحٌ قديم */ }
+                try { c.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) { /* متصفحٌ قديم */ }
+            }
+        }
+        var f = tableEl && tableEl.closest('form');
+        if (f && changed) { try { f.submit(); } catch (e) { /* نموذجٌ بلا إرسال */ } }
     }
 
     /* ══ AC-U5 · SH-06 — منتقي المناظرِ للشاشاتِ العريضة ══════════════════
@@ -1455,6 +1590,30 @@
         try { bootSavedViews(); } catch (eSv) { /* المنتقي لا يُسقط الجدول */ }
         try { bootFiveStates(); } catch (eFs) { /* لا يعطل التوحيد */ }
         try { bootShellCss(); window.EmsScreenShell.seed(); } catch (eSh) { /* CM-00 لا يعطل القائم */ }
+        try { bootFilterBars(); } catch (eFb) { /* شريطُ الفلاترِ لا يُسقط الشاشة */ }
+        try { bootStickyOffset(); } catch (eSt) { /* الإزاحةُ تحسينٌ لا شرط */ }
+    }
+
+    /* ── INJ-0146 · إزاحةُ الترويسةِ الثابتةِ من الشريطِ العلويِّ الحقيقيّ ────────
+         `position: sticky; top: 0` يُلصق الترويسةَ بأعلى النافذةِ — **تحتَ** الشريطِ
+         العلويِّ الثابتِ فتختفي خلفه. والارتفاعُ يختلف بين الحاسوبِ والهاتف، فلا
+         يصحُّ رقمٌ مكتوب: يُقاس من العنصرِ نفسِه ويُعاد قياسُه عند تغيُّرِ المقاس. */
+    function bootStickyOffset() {
+        var apply = function () {
+            var bar = document.querySelector('.ems-topbar, header.ems-topbar, .topbar');
+            var h = 0;
+            if (bar) {
+                var cs = window.getComputedStyle(bar);
+                if (cs.position === 'fixed' || cs.position === 'sticky') { h = bar.offsetHeight || 0; }
+            }
+            document.documentElement.style.setProperty('--ems-sticky-top', h + 'px');
+        };
+        apply();
+        var t = null;
+        window.addEventListener('resize', function () {
+            if (t) { clearTimeout(t); }
+            t = setTimeout(apply, 150);
+        });
     }
 
     if (document.readyState === 'loading') {
