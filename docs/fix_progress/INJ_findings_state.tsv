@@ -142,7 +142,7 @@ INJ-0140	P2	لا	غيرُ مقيس
 INJ-0141	P2	لا	غيرُ مقيس	
 INJ-0142	P2	نعم	غيرُ مقيس	
 INJ-0143	P2	نعم	غيرُ مقيس	
-INJ-0144	P2	لا	غيرُ مقيس	
+INJ-0144	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0145	P2	لا	غيرُ مقيس	
 INJ-0146	P2	لا	غيرُ مقيس	
 INJ-0147	P2	لا	غيرُ مقيس	
@@ -185,11 +185,11 @@ INJ-0183	P2	لا	غيرُ مقيس
 INJ-0184	P2	لا	غيرُ مقيس	
 INJ-0185	P2	لا	غيرُ مقيس	
 INJ-0186	P2	لا	غيرُ مقيس	
-INJ-0187	P2	لا	غيرُ مقيس	
+INJ-0187	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0188	P2	نعم	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0189	P2	لا	غيرُ مقيس	
-INJ-0190	P2	لا	غيرُ مقيس	
-INJ-0191	P2	نعم	غيرُ مقيس	
+INJ-0190	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
+INJ-0191	P2	نعم	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0192	P2	نعم	مُغلقٌ بشاهد	tests/dues_source_doc_test.php
 INJ-0193	P2	نعم	مُغلقٌ بشاهد	tools/fix_od19_probe.php
 INJ-0194	P2	نعم	غيرُ مقيس	
@@ -218,7 +218,7 @@ INJ-0216	P2	نعم	غيرُ مقيس
 INJ-0217	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0218	P2	نعم	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0219	P2	نعم	مُغلقٌ بشاهد	tools/fix_inj0219_tests.php
-INJ-0220	P2	لا	غيرُ مقيس	
+INJ-0220	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0221	P2	لا	غيرُ مقيس	
 INJ-0222	P2	لا	غيرُ مقيس	
 INJ-0223	P2	نعم	غيرُ مقيس	
@@ -233,7 +233,7 @@ INJ-0231	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0232	P2	لا	غيرُ مقيس	
 INJ-0233	P2	نعم	غيرُ مقيس	
 INJ-0234	P2	لا	غيرُ مقيس	
-INJ-0235	P2	لا	غيرُ مقيس	
+INJ-0235	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0236	P2	لا	غيرُ مقيس	
 INJ-0237	P2	لا	غيرُ مقيس	
 INJ-0238	P2	لا	غيرُ مقيس	
@@ -269,7 +269,7 @@ INJ-0267	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0268	P2	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0269	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0270	P2	نعم	غيرُ مقيس	
-INJ-0271	P2	لا	غيرُ مقيس	
+INJ-0271	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0272	P2	نعم	غيرُ مقيس	
 INJ-0273	P2	نعم	غيرُ مقيس	
 INJ-0274	P2	نعم	غيرُ مقيس	
@@ -285,14 +285,14 @@ INJ-0283	P2	نعم	غيرُ مقيس
 INJ-0284	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0285	P2	لا	غيرُ مقيس	
 INJ-0286	P2	لا	غيرُ مقيس	
-INJ-0287	P2	لا	غيرُ مقيس	
+INJ-0287	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0288	P2	نعم	غيرُ مقيس	
 INJ-0289	P2	نعم	غيرُ مقيس	
 INJ-0290	P2	لا	غيرُ مقيس	
 INJ-0291	P2	نعم	غيرُ مقيس	
 INJ-0292	P2	نعم	غيرُ مقيس	
 INJ-0293	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
-INJ-0294	P2	لا	غيرُ مقيس	
+INJ-0294	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0295	P2	نعم	غيرُ مقيس	
 INJ-0296	P2	نعم	غيرُ مقيس	
 INJ-0297	P2	نعم	غيرُ مقيس	
@@ -436,7 +436,7 @@ INJ-0434	P3	لا	غيرُ مقيس
 INJ-0435	P3	لا	غيرُ مقيس	
 INJ-0436	P3	لا	غيرُ مقيس	
 INJ-0437	P3	لا	غيرُ مقيس	
-INJ-0438	P3	لا	غيرُ مقيس	
+INJ-0438	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0439	P3	لا	غيرُ مقيس	
 INJ-0440	P3	لا	غيرُ مقيس	
 INJ-0441	P3	لا	غيرُ مقيس	
@@ -448,9 +448,9 @@ INJ-0446	P3	لا	غيرُ مقيس
 INJ-0447	P3	لا	غيرُ مقيس	
 INJ-0448	P3	لا	غيرُ مقيس	
 INJ-0449	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0450	P3	لا	غيرُ مقيس	
+INJ-0450	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0451	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0452	P3	لا	غيرُ مقيس	
+INJ-0452	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0453	P3	لا	غيرُ مقيس	
 INJ-0454	P3	نعم	غيرُ مقيس	
 INJ-0455	P3	لا	غيرُ مقيس	
@@ -458,9 +458,9 @@ INJ-0456	P3	لا	غيرُ مقيس
 INJ-0457	P3	لا	غيرُ مقيس	
 INJ-0458	P3	لا	غيرُ مقيس	
 INJ-0459	P3	لا	غيرُ مقيس	
-INJ-0460	P3	لا	غيرُ مقيس	
+INJ-0460	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0461	P3	لا	غيرُ مقيس	
-INJ-0462	P3	لا	غيرُ مقيس	
+INJ-0462	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0463	P3	نعم	غيرُ مقيس	
 INJ-0464	P3	لا	غيرُ مقيس	
 INJ-0465	P3	لا	غيرُ مقيس	
@@ -472,11 +472,11 @@ INJ-0470	P3	لا	غيرُ مقيس
 INJ-0471	P3	لا	مُغلقٌ بشاهد	tools/fix_od19_probe.php
 INJ-0472	P3	نعم	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0473	P3	لا	غيرُ مقيس	
-INJ-0474	P3	لا	غيرُ مقيس	
+INJ-0474	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0475	P3	لا	غيرُ مقيس	
 INJ-0476	P3	لا	غيرُ مقيس	
 INJ-0477	P3	لا	غيرُ مقيس	
-INJ-0478	P3	لا	غيرُ مقيس	
+INJ-0478	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0479	P3	نعم	غيرُ مقيس	
 INJ-0480	P3	نعم	غيرُ مقيس	
 INJ-0481	P3	لا	غيرُ مقيس	
@@ -525,7 +525,7 @@ INJ-0523	P3	لا	غيرُ مقيس
 INJ-0524	P3	لا	غيرُ مقيس	
 INJ-0525	P3	لا	غيرُ مقيس	
 INJ-0526	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0527	P3	لا	غيرُ مقيس	
+INJ-0527	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0528	P3	لا	غيرُ مقيس	
 INJ-0529	P3	نعم	غيرُ مقيس	
 INJ-0530	P3	لا	غيرُ مقيس	

@@ -213,17 +213,31 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         $title = trim((string) $sItems[0]['stage_title']);
         if ($title === '') { $title = $stageNo === 0 ? 'اللوحة والمساحة' : "المرحلة $stageNo"; }
         $key = 'stage-' . $roleId . '-' . $stageNo;
-        // قرارُ المالك (2026-08-02) يخصص حكمَ ١٣: البدءُ مطويًّا بالكامل —
-        // والوصولُ محفوظٌ بأكورديون «مجموعةٌ واحدةٌ مفتوحة» في insidebar.
-        $openDefault = false;
+        /* ═══════════════════════════════════════════════════════════════════
+         * INJ-0527 — المراحلُ ٠ و١ و٢ تبدأ **مفتوحةً** وما بعدها مطويّ
+         * ═══════════════════════════════════════════════════════════════════
+         * ◆ **المقيسُ**: كان `$openDefault = false` ثابتًا فتبدأ **كلُّ** مجموعةٍ
+         *   مطويّةً — فمديرُ الصيانةِ يفتح النظامَ على ستِّ مجموعاتٍ مغلقةٍ ولا
+         *   يرى رابطًا واحدًا حتى يضغط.
+         * ◆ **وحكمُ الملفِّ نفسِه يخالف ذلك** (السطر 201): «المراحلُ ٠ و١ و٢
+         *   مفتوحةٌ وما بعدها مطويّ». فكان في الملفِّ الواحدِ **قاعدةٌ مكتوبةٌ
+         *   وسلوكٌ يناقضها** — والسلوكُ هو ما يراه المستخدم.
+         * ◆ ولا يُمَسُّ حفظُ الاختيار: `insidebar.php` يحفظ المفتوحَ في
+         *   `localStorage` (OPEN_KEY)، فهذا **الافتراضُ عند أوّلِ زيارةٍ** فقط
+         *   ومَن طوى مرحلةً بقيت مطويّةً له.
+         * ═══════════════════════════════════════════════════════════════════ */
+        $openDefault = ($stageNo >= 0 && $stageNo <= 2);
         $icon = ems_nav_stage_icon($stageNo, $title); // أيقونة معبِّرة من عنوان المرحلة لا واحدة موحّدة
 
         $total = 0;
         foreach ($sItems as $it) { if (isset($badges[$it['route']])) { $total += intval($badges[$it['route']]); } }
         $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
 
-        echo '<li class="nav-group" data-group-key="' . $key . '">' . "\n";
-        echo '  <button type="button" class="nav-group-head" aria-expanded="false"'
+        /* ◆ والقيمةُ **تُستعمل فعلًا**: كانت تُحسب ثم يُكتب `aria-expanded="false"`
+             حرفيًّا فلا أثرَ لها — متغيّرٌ مُهمَلٌ يُوهم أنَّ القاعدةَ مطبَّقة. */
+        echo '<li class="nav-group' . ($openDefault ? ' open' : '') . '" data-group-key="' . $key . '"'
+           . ($openDefault ? ' data-ems-open-default="1"' : '') . '>' . "\n";
+        echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($openDefault ? 'true' : 'false') . '"'
            . ' aria-controls="navgrp-' . $key . '">'
            . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";

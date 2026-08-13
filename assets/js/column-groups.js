@@ -143,11 +143,40 @@
   Controller.prototype.applyGroup = function (group, refresh) {
     var visible = this.state[group] !== false;
 
-    if (this.mode === 'classic') {
+    /* ═══════════════════════════════════════════════════════════════════════
+     * INJ-0144 — الوضعُ يُقرأ من **الواقعِ** لا من الإعداد
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **المقيسُ**: شاشاتٌ تُهيِّئ هذا المكوّنَ بـ`mode: 'classic'` وجدولُها
+     *   **مُهيَّأٌ بـDataTables فعلًا**. فالإخفاءُ يقع بصنفِ CSS ولا يمسُّ الجدولَ:
+     *   العمودُ يبقى في البحثِ والفرزِ والتصديرِ وإن غاب عن العين، ويمكن إخفاءُ
+     *   **كلِّ** الأعمدةِ فيصير الجدولُ خاويًا.
+     * ◆ **والعلاجُ في المكوّنِ لا في الشاشات**: إعدادٌ مكتوبٌ بيدٍ يخطئ، والواقعُ
+     *   لا يخطئ — فإن وجدنا جدولًا مُهيَّأً استعملنا مسارَ DataTables مهما قال
+     *   الإعداد. وإصلاحُ الإعدادِ في كلِّ شاشةٍ يعود في الشاشةِ التالية.
+     * ◆ ويبقى مسارُ `classic` عاملًا لجداولَ غيرِ مُهيَّأةٍ حقًّا.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    var liveTables = [];
+    try { liveTables = this.tables().filter(function (dt) { return dt && dt.columns; }); } catch (e) { liveTables = []; }
+    var useDt = (this.mode === 'datatable') || liveTables.length > 0;
+
+    if (!useDt) {
       asArray(this.scope.querySelectorAll('.group-' + group)).forEach(function (el) {
         el.classList.toggle('group-hidden', !visible);
       });
     } else {
+      /* ◆ وتُبطَل آليةُ الصنفِ داخلَ الجداولِ المُهيَّأةِ **بقاعدةٍ واحدة**، لا
+           بنزعِ الصنفِ من الخلايا: DataTables يحتفظ بعُقَدِ الخلايا في ذاكرتِه
+           ويُعيد إدراجَها عند كلِّ رسمٍ **بأصنافِها الأصلية** — فالنزعُ يُمحى بعد
+           لحظة (قِيس: 510 ثم 867 خليةً يعود إليها الصنف). ولو بقيت الآليتان
+           لاجتمعتا على خليةٍ واحدةٍ فيبقى عمودٌ أُعيد إظهارُه مخفيًّا بالصنف،
+           ويُقرأ العطلُ «الزرُّ لا يعمل».
+           والقاعدةُ أخصُّ (`table.dataTable .group-hidden`) فتغلب، وتُحقن مرّةً. */
+      if (!document.getElementById('ems-cg-dt-override')) {
+        var st = document.createElement('style');
+        st.id = 'ems-cg-dt-override';
+        st.textContent = 'table.dataTable .group-hidden{display:table-cell !important}';
+        document.head.appendChild(st);
+      }
       this.dtSetVisible(group, visible);
       if (refresh !== false) this.dtRefresh();
     }

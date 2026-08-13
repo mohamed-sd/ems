@@ -248,10 +248,29 @@
                         cell.classList.add('ems-gov-empty');
                     } else {
                         cell.textContent = v;
+                        th.dataset.emsHasValue = '1';   /* لهذا العمودِ مصدرٌ فعلًا */
                     }
                 }
             }
         });
+        /* ═══════════════════════════════════════════════════════════════════
+         * عمودٌ محقونٌ **بلا مصدرٍ إطلاقًا** — يُخفى ابتداءً ولا يُحذف
+         * ═══════════════════════════════════════════════════════════════════
+         * ◆ **المقيسُ في السجل**: رؤوسٌ بـ`data-fn` بلا مفتاحِ مصدر — 19 في
+         *   `payments_fin.php` · 19 في `journal_form_fin.php` · 29 في
+         *   `equipments.php` … فتصير **كلُّ** خليةٍ فيها «—». عمودٌ كلُّ خلاياه
+         *   شرطةٌ ليس بيانًا: يُوسّع الجدولَ ويزاحم ما يُقرأ.
+         * ◆ **ولا يُحذف**: الرأسُ مطلبٌ موثَّقٌ في وثيقةِ الأعمدة، وحذفُه يمحو
+         *   أثرَ المطلب. فيُوسَم `data-ems-nosource` ويُخفى ابتداءً، ويبقى
+         *   **متاحًا في منتقي الأعمدة** موسومًا «بلا مصدر» — فمن أراد رؤيتَه
+         *   رآه، ومن أراد قراءةَ الجدولِ قرأه.
+         * ◆ وهذا يوفّق بين توصيةِ المالك ③ («العمودُ بلا مصدرٍ يظهر بمكانه
+         *   فارغًا» — فهو موجودٌ ومُعلَن) وبين العيبِ المسجَّل (لا يزاحم).
+         * ═══════════════════════════════════════════════════════════════════ */
+        for (var gi = 0; gi < govIdx.length; gi++) {
+            var h = headerRow.cells[govIdx[gi]];
+            if (!h.dataset.emsHasValue) { h.dataset.emsNosource = '1'; }
+        }
     }
 
     /* ── جدولٌ كالإكسل: كل الأعمدة جنبًا إلى جنبٍ وتمريرٌ أفقي ──────────
@@ -485,6 +504,270 @@
         return name.replace(/[\\\/\[\]\*\?:]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 28) || 'تصدير';
     }
 
+    /* ═══════════════════════════════════════════════════════════════════════
+     * منتقي الأعمدةِ والمناظرِ المحفوظة — مكوّنٌ مركزيٌّ واحد
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **المقيسُ في السجلِّ الجامع**: «بلا زرِّ إظهارِ كلِّ الأعمدةِ ولا منتقي
+     *   مناظرَ» متكرِّرًا في كلِّ مجلد — الموظفون 8 شبكاتٍ · الحوكمة 17 ·
+     *   البلاغات 14 · الصيانة 8 · القوى التشغيلية 22 · المالية 42. وهو **حاجةٌ
+     *   واحدةٌ** تتكرّر لا 111 عيبًا منفصلًا.
+     * ◆ **ولا تابعَ خارجيًّا**: إضافةُ `buttons.colVis` غيرُ موجودةٍ في المستودع،
+     *   ولم أُنزّلها — بُنيت هنا بأربعينَ سطرًا فنملك تسميتَها العربيةَ واتجاهَها،
+     *   ولا يزيد وزنُ الصفحةِ بملفِّ بائعٍ جديد.
+     * ◆ **والإخفاءُ بـ`column().visible()`** لا بصنفِ CSS: الأخيرُ يخفي الخليةَ
+     *   ويُبقيها في التصدير والفرزِ والبحث — وهو عينُ عيبِ `EmsColumnGroups`
+     *   بوضعِ `classic` المسجَّلِ في السجل.
+     * ◆ **وحدٌّ أدنى للأعمدة**: لا يُسمح بإخفاءِ كلِّ الأعمدةِ فيصير الجدولُ
+     *   خاويًا — عمودٌ واحدٌ يبقى دائمًا، ويُعلَن السببُ للمستخدم.
+     * ◆ **والمناظرُ في `localStorage` بمفتاحٍ للشاشةِ والجدول** — فلا يتسرّب
+     *   منظرُ شاشةٍ إلى أخرى. ولا تُخزَّن بيانات: أسماءُ الأعمدةِ الظاهرةِ فقط.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    function emsViewKey(tableEl) {
+        var idx = 0;
+        try {
+            var all = document.querySelectorAll('table');
+            for (var i = 0; i < all.length; i++) { if (all[i] === tableEl) { idx = i; break; } }
+        } catch (e) {}
+        return 'ems.views:' + location.pathname + ':' + idx;
+    }
+    function emsViewsLoad(key) {
+        try { return JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { return {}; }
+    }
+    function emsViewsSave(key, obj) {
+        try { localStorage.setItem(key, JSON.stringify(obj)); return true; } catch (e) { return false; }
+    }
+    function emsColHead(api, i) {
+        var th = api.column(i).header();
+        var t = th ? (th.textContent || '').trim() : '';
+        return t || ('عمود ' + (i + 1));
+    }
+    /** يبني شريطَ «الأعمدة» و«المناظر» ويُلحقه بالوعاءِ المركزيّ. */
+    function buildColumnsAndViews(api, tableEl, host) {
+        var $ = window.jQuery;
+        var key = emsViewKey(tableEl);
+        /* ◆ **عددُ الأعمدةِ بـ`count()` لا بـ`nodes()`**: الأخيرُ يعدُّ **الخلايا**،
+             فجدولٌ بلا صفوفٍ (صفحةٌ فارغةٌ أو ترقيمٌ على صفحةٍ خالية) يُعطي صفرًا
+             فلا يُبنى منتقٍ — وقد قِيس ذلك على `Finance/payments_fin.php`. */
+        var nCols = 0;
+        try { nCols = api.columns().count(); } catch (e) { nCols = 0; }
+        if (!nCols) { tableEl.dataset.emsTools = ''; return; }
+
+        /* ── منتقي الأعمدة ── */
+        var det = document.createElement('details');
+        det.className = 'ems-colvis';
+        det.style.cssText = 'display:inline-block;position:relative;vertical-align:middle;margin-inline-end:6px';
+        var sum = document.createElement('summary');
+        sum.textContent = '🧩 الأعمدة';
+        sum.style.cssText = 'cursor:pointer;list-style:none;padding:4px 10px;border:1px solid var(--ems-line,#ccc);'
+                          + 'border-radius:6px;font-size:.85rem;user-select:none;background:var(--ems-panel,#fff)';
+        det.appendChild(sum);
+        var panel = document.createElement('div');
+        panel.style.cssText = 'position:absolute;z-index:1200;inset-inline-start:0;top:100%;min-width:220px;max-height:320px;'
+                            + 'overflow:auto;background:var(--ems-panel,#fff);border:1px solid var(--ems-line,#ccc);'
+                            + 'border-radius:8px;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.14)';
+        det.appendChild(panel);
+
+        var note = document.createElement('div');
+        note.style.cssText = 'font-size:.74rem;opacity:.75;margin-bottom:6px';
+        note.textContent = 'عمودٌ واحدٌ يبقى ظاهرًا دائمًا — جدولٌ بلا أعمدةٍ لا يُقرأ.';
+        panel.appendChild(note);
+
+        var allBtn = document.createElement('button');
+        allBtn.type = 'button';
+        allBtn.textContent = 'إظهار كل الأعمدة';
+        allBtn.style.cssText = 'display:block;width:100%;margin-bottom:8px;padding:4px;font-size:.8rem;cursor:pointer';
+        panel.appendChild(allBtn);
+
+        /* ◆ الأعمدةُ **بلا مصدرٍ** تُخفى ابتداءً — وتبقى في القائمةِ موسومةً.
+             ويُخفى **مرّةً واحدةً**: لو أعاد المستخدمُ إظهارَها فاختيارُه أولى. */
+        var nosource = [];
+        for (var q = 0; q < nCols; q++) {
+            var hh = api.column(q).header();
+            if (hh && hh.dataset && hh.dataset.emsNosource === '1') { nosource.push(q); }
+        }
+        /* ◆ **تُخفى دفعةً واحدةً لا عمودًا عمودًا**: كلُّ نداءِ `visible()` يُعيد
+             حسابَ الجدولِ ورسمَه. وقد قِيس: 19 عمودًا × 1119 صفًّا في
+             `payments_fin.php` = تسعةَ عشرَ إعادةَ رسمٍ **علّقت المتصفّحَ**
+             حتى انتهت مهلةُ الأداة. فالمعلمةُ الثانيةُ `false` تؤجّل الحساب،
+             ثم يُضبط ويُرسم **مرّةً واحدةً**. */
+        if (nosource.length && tableEl.dataset.emsNosourceHidden !== '1') {
+            api.columns(nosource).visible(false, false);
+            try { api.columns.adjust().draw(false); } catch (e) {}
+            tableEl.dataset.emsNosourceHidden = '1';
+        }
+
+        var boxes = [];
+        for (var i = 0; i < nCols; i++) {
+            (function (ci) {
+                var lab = document.createElement('label');
+                lab.style.cssText = 'display:flex;gap:6px;align-items:center;font-size:.82rem;padding:2px 0;cursor:pointer';
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = api.column(ci).visible();
+                cb.addEventListener('change', function () {
+                    var visCount = 0;
+                    for (var k = 0; k < boxes.length; k++) { if (boxes[k].checked) { visCount++; } }
+                    if (visCount === 0) {          /* الحدُّ الأدنى — لا جدولَ خاويًا */
+                        cb.checked = true;
+                        note.style.color = 'var(--ems-warn,#b58900)';
+                        return;
+                    }
+                    note.style.color = '';
+                    api.column(ci).visible(cb.checked, false);
+                    try { api.columns.adjust().draw(false); } catch (e) {}
+                });
+                boxes.push(cb);
+                lab.appendChild(cb);
+                var sp = document.createElement('span');
+                sp.textContent = emsColHead(api, ci);
+                lab.appendChild(sp);
+                if (nosource.indexOf(ci) >= 0) {
+                    var tag = document.createElement('span');
+                    tag.textContent = 'بلا مصدر';
+                    tag.title = 'عمودٌ مطلوبٌ في وثيقةِ الأعمدةِ ولم يُوصَل بمصدرِ بيانٍ بعدُ — مُخفًى ابتداءً ولم يُحذف.';
+                    tag.style.cssText = 'margin-inline-start:auto;font-size:.68rem;opacity:.7;'
+                                      + 'border:1px solid currentColor;border-radius:99px;padding:0 5px';
+                    lab.appendChild(tag);
+                }
+                panel.appendChild(lab);
+            })(i);
+        }
+        allBtn.addEventListener('click', function () {
+            for (var k = 0; k < boxes.length; k++) { boxes[k].checked = true; }
+            api.columns().visible(true, false);          /* دفعةً — لا رسمٌ لكلِّ عمود */
+            try { api.columns.adjust().draw(false); } catch (e) {}
+            note.style.color = '';
+        });
+        host.appendChild(det);
+
+        /* ── منتقي المناظرِ المحفوظة ── */
+        var wrap = document.createElement('span');
+        wrap.className = 'ems-views';
+        wrap.style.cssText = 'display:inline-flex;gap:4px;align-items:center;vertical-align:middle';
+        var sel = document.createElement('select');
+        sel.setAttribute('aria-label', 'منظرٌ محفوظ');
+        sel.title = 'منظرٌ محفوظ';
+        sel.style.cssText = 'font-size:.82rem;padding:3px 6px;border:1px solid var(--ems-line,#ccc);border-radius:6px;max-width:150px';
+        var nameIn = document.createElement('input');
+        nameIn.type = 'text';
+        nameIn.placeholder = 'اسم المنظر';
+        nameIn.setAttribute('aria-label', 'اسم المنظر الجديد');
+        nameIn.style.cssText = 'font-size:.82rem;padding:3px 6px;border:1px solid var(--ems-line,#ccc);border-radius:6px;width:104px';
+        var saveB = document.createElement('button');
+        saveB.type = 'button'; saveB.textContent = '💾';
+        saveB.title = 'احفظ الأعمدةَ الظاهرةَ منظرًا باسمه';
+        saveB.setAttribute('aria-label', 'حفظ المنظر');
+        saveB.style.cssText = 'cursor:pointer;padding:3px 7px;border:1px solid var(--ems-line,#ccc);border-radius:6px';
+        var delB = document.createElement('button');
+        delB.type = 'button'; delB.textContent = '🗑';
+        delB.title = 'احذف المنظرَ المختار';
+        delB.setAttribute('aria-label', 'حذف المنظر');
+        delB.style.cssText = 'cursor:pointer;padding:3px 7px;border:1px solid var(--ems-line,#ccc);border-radius:6px';
+
+        function refill() {
+            var v = emsViewsLoad(key);
+            sel.innerHTML = '';
+            var o0 = document.createElement('option');
+            o0.value = ''; o0.textContent = '— منظر —';
+            sel.appendChild(o0);
+            Object.keys(v).forEach(function (n) {
+                var o = document.createElement('option');
+                o.value = n; o.textContent = n;
+                sel.appendChild(o);
+            });
+        }
+        refill();
+        sel.addEventListener('change', function () {
+            if (!sel.value) return;
+            var v = emsViewsLoad(key)[sel.value];
+            if (!v || !v.cols) return;
+            var on = [], off = [];
+            for (var k = 0; k < boxes.length; k++) {
+                var show = v.cols.indexOf(k) >= 0;
+                boxes[k].checked = show;
+                (show ? on : off).push(k);
+            }
+            if (on.length) { api.columns(on).visible(true, false); }
+            if (off.length) { api.columns(off).visible(false, false); }
+            try { api.columns.adjust().draw(false); } catch (e) {}
+        });
+        saveB.addEventListener('click', function () {
+            var n = (nameIn.value || '').trim();
+            if (!n) { nameIn.focus(); return; }
+            var v = emsViewsLoad(key);
+            var cols = [];
+            for (var k = 0; k < boxes.length; k++) { if (boxes[k].checked) { cols.push(k); } }
+            v[n] = { cols: cols };
+            if (emsViewsSave(key, v)) { nameIn.value = ''; refill(); sel.value = n; }
+        });
+        delB.addEventListener('click', function () {
+            if (!sel.value) return;
+            var v = emsViewsLoad(key);
+            delete v[sel.value];
+            emsViewsSave(key, v);
+            refill();
+        });
+        wrap.appendChild(sel); wrap.appendChild(nameIn); wrap.appendChild(saveB); wrap.appendChild(delB);
+        host.appendChild(wrap);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+     * شريطُ الأدواتِ **مستقلٌّ عن مَن هيَّأ الجدول**
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ التهيئةُ شيءٌ والأدواتُ شيءٌ آخر: صفحةٌ تُهيِّئ جدولَها بنفسها **يجب**
+     *   أن تخرج من تهيئتِنا (التصادمُ)، لكنَّها **لا تُحرَم** من منتقي الأعمدةِ
+     *   والمناظر — فإضافةُ زرٍّ إلى جدولٍ مُهيَّأٍ سلفًا لا تُهيّئه مرّتين.
+     * ◆ وقد قِيس: تسعةُ بنودٍ في السجلِّ بقيت مفتوحةً لأنَّ الدالةَ كانت تخرج
+     *   مبكّرًا حين يوجد زرُّ تصديرٍ من الشاشة، فلا يُبنى المنتقيان.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    function ensureTableTools(tableEl) {
+        var $ = window.jQuery;
+        if (!$ || !$.fn.dataTable || !$.fn.dataTable.isDataTable(tableEl)) return;
+        var api = $(tableEl).DataTable();
+        var container = null;
+        try { container = api.table().container(); } catch (e) { container = null; }
+        /* ◆ **الوعاءُ قد يزول ثم يعود**: صفحةٌ تُهيِّئ جدولَها بنفسها بعد مرورِنا
+             تهدم الوعاءَ وتبنيه، فيصير `container()` فارغًا لحظتَها. فلا تُوسَم
+             العلامةُ إلا عند نجاحٍ حقيقيّ — وإلا استسلمنا لجدولٍ سيصير جاهزًا
+             بعد جزءٍ من الثانية. وقد قِيس: جدولٌ من اثنين بقي بلا منتقٍ لهذا. */
+        /* ◆ ومرساةٌ بديلةٌ حين يُفَكُّ وعاءُ DataTables: `unwrapStaleScrollers`
+             يُخرج الجدولَ إلى `.ems-xscroll` فيعود `container()` فارغًا وإن كان
+             الجدولُ مُهيَّأً. فيُرسى الشريطُ على أقربِ وعاءِ عرضٍ — والجدولُ لا
+             يُحرَم من أدواتِه لأنَّ غلافَه تغيّر. */
+        if (!container && tableEl.parentElement) {
+            container = tableEl.closest('.table-container') || tableEl.closest('.card-body')
+                     || tableEl.parentElement.parentElement || tableEl.parentElement;
+        }
+        if (!container) { tableEl.dataset.emsTools = ''; return; }
+        /* ◆ **العلامةُ على الجدولِ لا على الوعاء**: الوعاءُ قد يتغيّر (فكُّ غلافِ
+             التمريرِ ثم إعادتُه) فيُبنى منتقٍ ثانٍ في وعاءٍ جديدٍ والأوّلُ باقٍ —
+             وقد قِيس: منتقيانِ لجدولٍ واحدٍ على `payments_fin.php`. فعلامةُ
+             «بُني» لا تُمحى أبدًا، وعلامةُ «حاولنا» تُمحى لإعادةِ المحاولة. */
+        if (tableEl.dataset.emsToolsBuilt === '1') {
+            /* بُني سلفًا — يُنقل إلى الوعاءِ الحاليِّ إن زال عنه */
+            if (!container.querySelector('.ems-colvis')) {
+                var old = document.querySelector('.ems-colvis[data-ems-for="' + (tableEl.dataset.emsToolsId || '') + '"]');
+                if (old && old.parentElement) { container.insertBefore(old.parentElement, container.firstChild); }
+            }
+            return;
+        }
+        tableEl.dataset.emsTools = '1';
+        var host = container.querySelector('.ems-auto-buttons');
+        if (!host) {
+            host = document.createElement('div');
+            host.className = 'ems-auto-buttons';
+            container.insertBefore(host, container.firstChild);
+        }
+        if (host.querySelector('.ems-colvis')) { return; }   /* عاطلةٌ: لا تكرار */
+        try {
+            var tid = 't' + Math.floor(Date.now() % 1e7) + '_' + Math.floor(Math.random() * 1e5);
+            tableEl.dataset.emsToolsId = tid;
+            buildColumnsAndViews(api, tableEl, host);
+            var built = host.querySelector('.ems-colvis');
+            if (built) { built.setAttribute('data-ems-for', tid); tableEl.dataset.emsToolsBuilt = '1'; }
+        } catch (e) { /* لا يُعطّل الجدول */ }
+    }
+
     function ensureExcelButton(tableEl) {
         var $ = window.jQuery;
         if (!$ || !$.fn.dataTable || !$.fn.dataTable.isDataTable(tableEl)) return;
@@ -545,6 +828,21 @@
     function attachExcelButtons() {
         var $ = window.jQuery;
         if (!$ || !$.fn || !$.fn.dataTable) return;
+        /* ◆ **منتقيا الأعمدةِ والمناظرِ لكلِّ جدولٍ مُهيَّأ** — ولو هيَّأته الشاشةُ
+             بنفسها. لا يعتمدان على مكتبةِ الأزرارِ ولا على تحميلٍ خارجيّ، فيُبنيان
+             فورًا بلا انتظارِ تابع. */
+        var toolsPass = function () {
+            $('table').each(function () {
+                if ($.fn.dataTable.isDataTable(this)) {
+                    try { ensureTableTools(this); } catch (e) { /* لا يعطل الصفحة */ }
+                }
+            });
+        };
+        toolsPass();
+        /* ◆ ومرورٌ متأخّرٌ مرّتين: تهيئةُ الشاشةِ الخاصةُ قد تقع **بعدنا** فتهدم
+             الوعاءَ وتبنيه. والمرورُ عاطلٌ (يتخطّى ما بُني) فلا ضررَ في تكرارِه. */
+        setTimeout(toolsPass, 400);
+        setTimeout(toolsPass, 1500);
         var pending = [];
         $('table').each(function () {
             if ($.fn.dataTable.isDataTable(this) && this.dataset.emsXlsx !== '1' && this.dataset.emsXlsx !== 'own') {
