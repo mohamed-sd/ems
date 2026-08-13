@@ -254,9 +254,31 @@ if (!function_exists('ems_shell_axes')) {
      */
     function ems_shell_axes($perms = null, array $override = array())
     {
-        /* لا يُدَّعى ما لم يُقَس: شاشةٌ لم تمرِّر صلاحياتِها المحلولةَ لا يُنسب
-           إليها حكمُ صلاحيةٍ — المحورُ يعلن «غيرُ مقيس» فيُطوى في سطرِ السياقِ
-           بدلَ أن يُعرض «قراءة» بلا مصدر. */
+        /* ── INJ-0547 · INJ-0572 — المحورُ يُقاس هنا حين لا تُمرَّر الصلاحيات ──
+             «لا يُدَّعى ما لم يُقَس» قاعدةٌ صحيحة، لكنَّها طُبِّقت بالامتناعِ عن
+             القياس: **مئةٌ وتسعون شاشةً** تنادي `ems_shell_axes(null)` — فمحورُ
+             الصلاحيةِ «غيرُ مقيس» في عامّةِ النظامِ لا في حالاتٍ نادرة، ولا يرى
+             المستخدمُ «قراءةٌ فقط» ولا «بلا صلاحية» في أيٍّ منها.
+
+             والصلاحيةُ **معلومةٌ أصلًا**: محرّكُ الصلاحياتِ يحلُّها من مسارِ
+             السكربتِ في كلِّ طلب. فتُسأل هنا مرةً واحدةً (مخزَّنةً للطلب) بدلَ
+             انتظارِ مئةٍ وتسعين شاشةً تمرّرها بيدها.
+
+             ◆ وشاشةٌ **لا تُحَلُّ إلى موديول** تبقى «غيرُ مقيس» عمدًا: المحرّكُ
+               يردُّ منعًا كاملًا لغيرِ المسجَّل، وعرضُ «بلا صلاحية» على صفحةٍ
+               صُيِّرت فعلًا **كذبٌ مطمئنّ**. فالقياسُ يُقبل حين يوجد تسجيلٌ فقط. */
+        if (!is_array($perms) && isset($GLOBALS['conn']) && !empty($_SESSION['user'])
+            && function_exists('get_current_page_permissions')) {
+            if (!array_key_exists('EMS_AX_PERMS', $GLOBALS)) {
+                $resolved = null;
+                try {
+                    $r = get_current_page_permissions($GLOBALS['conn']);
+                    if (is_array($r) && !empty($r['id'])) { $resolved = $r; }
+                } catch (\Throwable $t) { $resolved = null; }
+                $GLOBALS['EMS_AX_PERMS'] = $resolved;
+            }
+            if (is_array($GLOBALS['EMS_AX_PERMS'])) { $perms = $GLOBALS['EMS_AX_PERMS']; }
+        }
         $measured = is_array($perms);
         $canView = $measured ? !empty($perms['can_view']) : true;
         $canWrite = $measured && (!empty($perms['can_edit']) || !empty($perms['can_add']) || !empty($perms['can_delete']));

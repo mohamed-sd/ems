@@ -71,6 +71,11 @@ $core = array(
     'report_button_placement_test',  /* INJ-0518 — الزرُّ داخلَ الجسدِ لا بعد </html> */
     'risk_owner_unit_test',          /* INJ-0577 — الإدارةُ المالكةُ قائمةٌ مُتحقَّقة */
     'ui_consistency_scan_test',      /* INJ-0593 · INJ-0498 — رؤوسٌ عربيةٌ ونسخةُ بوتستراب واحدة */
+    /* حملةُ الواجهةِ · الموجتانِ الثانيةُ والثالثة */
+    'shell_axes_measured_test',        /* INJ-0547 · INJ-0572 — محورُ الصلاحيةِ مقيسٌ ومميِّز */
+    'nav_stage_label_test',            /* INJ-0570 — عنوانُ المرحلةِ يصف لا يَعُدّ */
+    'deny_page_component_test',        /* INJ-0500 — صفحةُ حجبٍ واحدةٌ برمزٍ ومسارٍ ومقاس */
+    'shell_color_tokens_test',         /* INJ-0496 — صفرُ لونٍ صلبٍ في القشرة */
 );
 
 $files = $core;

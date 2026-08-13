@@ -227,7 +227,7 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
                     <a href="<?php echo htmlspecialchars($ems_tb_portal, ENT_QUOTES, 'UTF-8'); ?>"><i class="fas fa-id-card"></i> بوابتي</a>
                     <a href="<?php echo htmlspecialchars($ems_tb_profile, ENT_QUOTES, 'UTF-8'); ?>"><i class="far fa-user"></i> الملف الشخصي</a>
                     <a href="<?php echo htmlspecialchars($ems_tb_settings, ENT_QUOTES, 'UTF-8'); ?>"><i class="fas fa-gear"></i> الإعدادات</a>
-                    <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" style="color:#b91c1c"><i class="fas fa-power-off"></i> تسجيل الخروج</a>
+                    <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" style="color:var(--danger-deep)"><i class="fas fa-power-off"></i> تسجيل الخروج</a>
                 </div>
             </div>
         </div>
@@ -239,8 +239,8 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
             position: absolute; top: -4px; inset-inline-end: -4px;
             min-width: 18px; height: 18px; padding: 0 5px;
             display: inline-flex; align-items: center; justify-content: center;
-            background: #dc2626; color: #fff; font-size: .68rem; font-weight: 800;
-            border-radius: 999px; line-height: 1; box-shadow: 0 0 0 2px rgba(255,255,255,.85);
+            background: var(--c-state-danger); color: var(--white); font-size: .68rem; font-weight: 800;
+            border-radius: 999px; line-height: 1; box-shadow: 0 0 0 2px var(--c-surface);
         }
     </style>
     <script>

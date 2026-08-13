@@ -70,10 +70,10 @@ class SupplierPortalGuard
         if (!self::isRestricted($sessionUser)) { return; }
         if (self::isPortalScreen($relativeScript)) { return; }
         self::log403($conn, $sessionUser, strval($relativeScript), 0, 'portal_404_out_of_scope');
-        http_response_code(404);
-        header('Content-Type: text/html; charset=UTF-8');
-        echo '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="font-family:sans-serif;text-align:center;padding:60px">'
-           . '<h2>404 — الصفحة غير موجودة</h2><p>هذا المسارُ خارج حسابك.</p></body></html>';
+        require_once dirname(__DIR__, 3) . '/includes/deny_page.php';
+        ems_deny_page('PORTAL-404', 'الصفحةُ خارجَ حسابك',
+            'حسابُك حسابُ بوابةِ مورّد، وهذا المسارُ ليس ضمنَ شاشاتِ البوابة.',
+            array('status' => 404));
         exit;
     }
 
@@ -230,10 +230,9 @@ class SupplierPortalGuard
         if (!self::isRestricted($sessionUser)) { return null; }
         $v = self::assertSupplier($conn, $sessionUser, $requestedSupplierId, $screen);
         if (!$v['ok']) {
-            http_response_code(403);
-            header('Content-Type: text/html; charset=UTF-8');
-            echo '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>403</title></head><body style="font-family:sans-serif;text-align:center;padding:60px">'
-               . '<h2>403 — خارجَ نطاق حسابك</h2><p>' . htmlspecialchars($v['reason']) . '</p></body></html>';
+            require_once dirname(__DIR__, 3) . '/includes/deny_page.php';
+            ems_deny_page('PORTAL-403', 'خارجَ نطاقِ حسابك',
+                (string) $v['reason'], array('status' => 403));
             exit;
         }
         return $v['supplier_id'];

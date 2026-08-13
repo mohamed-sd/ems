@@ -10,7 +10,8 @@
  *                  INJ-0451 · INJ-0452 · INJ-0460 · INJ-0462 · INJ-0474 · INJ-0478
  *                  INJ-0495 · INJ-0526 · INJ-0527 · INJ-0542 · INJ-0546 · INJ-0569
  *                  INJ-0421 · INJ-0341 · INJ-0459 · INJ-0491 · INJ-0518 · INJ-0577
- *                  INJ-0593 · INJ-0498
+ *                  INJ-0593 · INJ-0498 · INJ-0547 · INJ-0572 · INJ-0570
+ *                  INJ-0500 · INJ-0496
  *
  * ── النطاق ────────────────────────────────────────────────────────────────
  * ثمانيةٌ وستون معرِّفًا نوعُها `UX/UI Defect` وحالتُها ليست «مُغلقٌ بشاهد».
@@ -264,6 +265,16 @@ $BY_WITNESS = array(
         'رقمٌ حرٌّ يُحفظ كما هو ⇒ **قائمةُ ١٦ وحدةً عربيةً** ورفضٌ 422 لما سواها'),
     'INJ-0593' => array('ui_consistency_scan_test', 'Procurement/items_proc.php',
         '٥ رؤوسٍ لاتينيةٍ بلا عربيٍّ ⇒ **صفرٌ** من ٥٢٢ ترويسةً في ٢٠ ملفًّا'),
+    'INJ-0547' => array('shell_axes_measured_test', 'Transport/transfer_in_transit.php',
+ 'محورُ الصلاحيةِ «غيرُ مقيس» في ١٩٠ شاشةً ⇒ **مقيسٌ ومميِّز**: 101 نموذجَ كتابةٍ لمحرِّرٍ · 2 لقارئ'),
+    'INJ-0572' => array('shell_axes_measured_test', 'Operations/stops_unattributed.php',
+ 'الشاشاتُ السبعُ المولَّدةُ بمحاورَ فارغةٍ ⇒ الثمانُ مقيسةٌ · والحجبُ برمزِ `GOV-PERM-403`'),
+    'INJ-0570' => array('nav_stage_label_test', 'includes/unified_nav.php',
+ '«رابعًا ثمّ سادسًا» يوهم نقصًا ⇒ **297 عنوانًا وصفيًّا** بصفرِ ترقيمٍ لفظيّ'),
+    'INJ-0500' => array('deny_page_component_test', 'includes/deny_page.php',
+ 'ستُّ صفحاتِ حجبٍ مبنيةٍ بيدٍ بلا رمزٍ ولا مسارٍ ⇒ **مكوّنٌ واحدٌ** برمزٍ ومسارٍ و`viewport`'),
+    'INJ-0496' => array('shell_color_tokens_test', 'includes/topbar.php',
+ 'ألوانٌ صلبةٌ في القشرةِ ⇒ **صفرٌ** · 127 إشارةَ رمزٍ كلُّها معرَّفة'),
     'INJ-0498' => array('ui_consistency_scan_test', 'emsreports/reports/_report_template.php',
         'نسختا بوتستراب متعارضتان ⇒ **نسخةٌ واحدةٌ** في الشفرةِ الحية (RTL=0)'),
 );
@@ -272,6 +283,30 @@ $rows = array(); $pass = 0; $unmeasured = 0;
 $say('── القياسُ على مُخرَجِ HTTP');
 foreach ($todo as $id => $r) {
     $fam = $famOf($r);
+    /* ── بندٌ له **شاهدٌ مُشغَّلٌ باسمه** ──────────────────────────────────────
+         لا يكفي أن يوجد الملفُّ: يُشغَّل الفاحصُ ويُقرأ رمزُ خروجِه. فوجودُ ملفٍّ
+         اسمُه «شاهد» ليس شهادةً (MD-05: «البناءُ ليس تبنّيًا»). */
+    if (isset($BY_WITNESS[$id])) {
+        $t = $BY_WITNESS[$id];
+        if (!isset($witnessRun[$t[0]])) {
+            $cmd = escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tests/' . $t[0] . '.php');
+            $o = array(); $rc = 1;
+            @exec($cmd . ' 2>&1', $o, $rc);
+            $witnessRun[$t[0]] = array('rc' => (int) $rc, 'out' => implode("\n", $o));
+        }
+        $w = $witnessRun[$t[0]];
+        if ($w['rc'] === 0) {
+            $rows[] = array($id, $t[1], $fam, 'شاهدٌ مُشغَّل', $t[2], 'مُغلقٌ بشاهد', '');
+            $pass++;
+            $say(sprintf('  ✔ %-10s %-30s شاهدٌ أخضرُ: %s', $id, mb_substr($t[1], 0, 28), $t[0]));
+        } else {
+            $rows[] = array($id, $t[1], $fam, 'شاهدٌ مُشغَّل', 'رمزُ الخروج ' . $w['rc'],
+                'غيرُ مقيس', 'الشاهدُ `' . $t[0] . '` أحمر');
+            $unmeasured++;
+            $say(sprintf('  ✘ %-10s %-30s شاهدٌ أحمر: %s', $id, mb_substr($t[1], 0, 28), $t[0]));
+        }
+        continue;
+    }
     /* الشاشةُ من الرابط */
     $rel = null; $folder = null;
     if (preg_match('~localhost/ems/([A-Za-z0-9_/\-]+\.php)~', $r['url'], $m)
@@ -324,30 +359,6 @@ foreach ($todo as $id => $r) {
             $rows[] = array($id, 'includes/unified_nav.php', 'سايدبار — افتراضُ الفتح', '—', '—',
                 'غيرُ مقيس', 'الافتراضُ ما زال «الكلُّ مطويّ»');
             $unmeasured++;
-        }
-        continue;
-    }
-    /* ── بندٌ له **شاهدٌ مُشغَّلٌ باسمه** ──────────────────────────────────────
-         لا يكفي أن يوجد الملفُّ: يُشغَّل الفاحصُ ويُقرأ رمزُ خروجِه. فوجودُ ملفٍّ
-         اسمُه «شاهد» ليس شهادةً (MD-05: «البناءُ ليس تبنّيًا»). */
-    if (isset($BY_WITNESS[$id])) {
-        $t = $BY_WITNESS[$id];
-        if (!isset($witnessRun[$t[0]])) {
-            $cmd = escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tests/' . $t[0] . '.php');
-            $o = array(); $rc = 1;
-            @exec($cmd . ' 2>&1', $o, $rc);
-            $witnessRun[$t[0]] = array('rc' => (int) $rc, 'out' => implode("\n", $o));
-        }
-        $w = $witnessRun[$t[0]];
-        if ($w['rc'] === 0) {
-            $rows[] = array($id, $t[1], $fam, 'شاهدٌ مُشغَّل', $t[2], 'مُغلقٌ بشاهد', '');
-            $pass++;
-            $say(sprintf('  ✔ %-10s %-30s شاهدٌ أخضرُ: %s', $id, mb_substr($t[1], 0, 28), $t[0]));
-        } else {
-            $rows[] = array($id, $t[1], $fam, 'شاهدٌ مُشغَّل', 'رمزُ الخروج ' . $w['rc'],
-                'غيرُ مقيس', 'الشاهدُ `' . $t[0] . '` أحمر');
-            $unmeasured++;
-            $say(sprintf('  ✘ %-10s %-30s شاهدٌ أحمر: %s', $id, mb_substr($t[1], 0, 28), $t[0]));
         }
         continue;
     }

@@ -467,13 +467,11 @@ function ems_enforce_csrf_protection() {
             JSON_UNESCAPED_UNICODE
         );
     } else {
-        header('Content-Type: text/html; charset=UTF-8');
-        echo '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>فشل التحقق الأمني</title></head>'
-            . '<body style="font-family:Cairo,Arial;text-align:center;padding:50px;background:#f5f5f5">'
-            . '<div style="background:#fff;max-width:520px;margin:0 auto;padding:40px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1)">'
-            . '<h1 style="color:#dc2626">⛔ فشل التحقق الأمني</h1>'
-            . '<p>انتهت صلاحية الجلسة أو الطلب غير موثوق. يرجى تحديث الصفحة والمحاولة مجدداً.</p>'
-            . '</div></body></html>';
+        require_once __DIR__ . '/deny_page.php';
+        ems_deny_page('CSRF-403', 'فشل التحقق الأمني',
+            'انتهت صلاحية الجلسة أو أن الطلب غير موثوق. حدِّث الصفحة وأعد المحاولة.',
+            array('status' => 403,
+                  'hint' => 'إن تكرر الأمر فأرفق الرمزَ والمسارَ أدناه في بلاغك.'));
     }
     exit();
 }
@@ -708,29 +706,11 @@ function require_role($allowed_roles) {
     $user_role = $_SESSION['user']['role'] ?? null;
 
     if (!in_array($user_role, $allowed_roles) && $user_role != '-1') { // -1 = مدير النظام
-        $dashboardUrl = ems_url('main/dashboard.php');
-        die('
-            <!DOCTYPE html>
-            <html lang="ar" dir="rtl">
-            <head>
-                <meta charset="UTF-8">
-                <title>غير مصرح</title>
-                <style>
-                    body { font-family: Cairo, Arial; text-align: center; padding: 50px; background: #f5f5f5; }
-                    .error { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    h1 { color: #dc2626; }
-                    a { color: #0c1c3e; text-decoration: none; background: #e8b800; padding: 10px 30px; border-radius: 5px; display: inline-block; margin-top: 20px; }
-                </style>
-            </head>
-            <body>
-                <div class="error">
-                    <h1>⛔ غير مصرح لك بالوصول</h1>
-                    <p>ليس لديك صلاحية للوصول إلى هذه الصفحة</p>
-                    <a href="' . $dashboardUrl . '">← العودة للصفحة الرئيسية</a>
-                </div>
-            </body>
-            </html>
-        ');
+        require_once __DIR__ . '/deny_page.php';
+        ems_deny_page('GOV-ROLE-403', 'غير مصرح لك بالوصول',
+            'دورُك الحاليُّ لا يملك صلاحيةَ فتحِ هذه الشاشة.',
+            array('status' => 403, 'exit_url' => ems_url('main/dashboard.php')));
+        exit;
     }
 }
 
@@ -749,29 +729,11 @@ function check_ownership($resource_id, $user_field = 'project_id') {
     }
 
     if ($user_value != $resource_id) {
-        $dashboardUrl = ems_url('main/dashboard.php');
-        die('
-            <!DOCTYPE html>
-            <html lang="ar" dir="rtl">
-            <head>
-                <meta charset="UTF-8">
-                <title>غير مصرح</title>
-                <style>
-                    body { font-family: Cairo, Arial; text-align: center; padding: 50px; background: #f5f5f5; }
-                    .error { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    h1 { color: #dc2626; }
-                    a { color: #0c1c3e; text-decoration: none; background: #e8b800; padding: 10px 30px; border-radius: 5px; display: inline-block; margin-top: 20px; }
-                </style>
-            </head>
-            <body>
-                <div class="error">
-                    <h1>⛔ غير مصرح لك بالوصول</h1>
-                    <p>لا يمكنك الوصول إلى هذا المحتوى</p>
-                    <a href="' . $dashboardUrl . '">← العودة للصفحة الرئيسية</a>
-                </div>
-            </body>
-            </html>
-        ');
+        require_once __DIR__ . '/deny_page.php';
+        ems_deny_page('GOV-OWNER-403', 'غير مصرح لك بالوصول',
+            'هذا المحتوى يخصُّ جهةً غيرَ التي يرتبط بها حسابُك.',
+            array('status' => 403, 'exit_url' => ems_url('main/dashboard.php')));
+        exit;
     }
 
     return true;
@@ -805,27 +767,12 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
     $_SESSION[$key]['count']++;
 
     if ($_SESSION[$key]['count'] > $max_attempts) {
-        header('HTTP/1.1 429 Too Many Requests');
-        die('
-            <!DOCTYPE html>
-            <html lang="ar" dir="rtl">
-            <head>
-                <meta charset="UTF-8">
-                <title>محاولات كثيرة</title>
-                <style>
-                    body { font-family: Cairo, Arial; text-align: center; padding: 50px; background: #f5f5f5; }
-                    .error { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    h1 { color: #dc2626; }
-                </style>
-            </head>
-            <body>
-                <div class="error">
-                    <h1>⏱️ محاولات كثيرة جداً</h1>
-                    <p>لقد تجاوزت الحد المسموح من المحاولات. يرجى الانتظار قليلاً.</p>
-                </div>
-            </body>
-            </html>
-        ');
+        require_once __DIR__ . '/deny_page.php';
+        ems_deny_page('RATE-429', 'محاولاتٌ كثيرةٌ جدًّا',
+            'تجاوزتَ الحدَّ المسموحَ من المحاولات على هذا الإجراء. انتظر قليلًا ثم أعد المحاولة.',
+            array('status' => 429, 'hint' => 'الحدُّ ' . (int) $max_attempts
+                . ' محاولةً كلَّ ' . (int) $time_window . ' ثانية.'));
+        exit;
     }
 }
 

@@ -209,6 +209,30 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
  * وضعُ المراحل (NAV-09 حكم ١٣): المرحلةُ رأسُ طيٍّ والمجموعاتُ عناوينُ داخلها —
  * «المراحلُ ٠ و١ و٢ مفتوحةٌ وما بعدها مطويّ» · و«أخرى» (99) ذيلٌ مطويٌّ للمراجعة.
  */
+/* ── INJ-0570 · عنوانُ المرحلةِ وصفيٌّ لا مُرقَّمٌ لفظيًّا ──────────────────────
+     ١١٨ عنوانًا من ١٥٣ يبدأ بترتيبٍ لفظيّ («أولًا:» … «سابعًا:»). والرقمُ اللفظيُّ
+     يَعِد المستخدمَ بتسلسلٍ متصل — فحين لا يملك دورٌ مرحلةً بعينها يقرأ
+     «رابعًا ثمّ سادسًا» فيظنُّ **نقصًا في دورتِه**. ودورُ «إدارة الموقع» (٦)
+     مثالُه الحيُّ: ١·٢·٣·٤ ثمّ ٦·٧ — والخامسةُ لا وجودَ لها في دورتِه أصلًا.
+
+     والعلاجُ ليس اختراعَ مرحلةٍ خامسةٍ ولا إعادةَ ترقيمِ الأدوارِ الثلاثين — بل
+     **إزالةُ الوعدِ**: العنوانُ يصف الخطوةَ ولا يَعُدُّها. والتسلسلُ الحقيقيُّ
+     محفوظٌ في `stage_no` للترتيبِ لا للعرض.
+
+     ويُقشَّر عند العرضِ لا في البيانات: صفٌّ جديدٌ بترقيمٍ لفظيٍّ يُقشَّر هو
+     أيضًا — فلا يعود العيبُ بإدخالِ بيانٍ جديد. */
+function ems_nav_stage_label($rawTitle, $stageNo) {
+    $title = trim((string) $rawTitle);
+    if ($title !== '') {
+        $ord = 'أولًا|أولاً|ثانيًا|ثانياً|ثالثًا|ثالثاً|رابعًا|رابعاً|خامسًا|خامساً|'
+             . 'سادسًا|سادساً|سابعًا|سابعاً|ثامنًا|ثامناً|تاسعًا|تاسعاً|عاشرًا|عاشراً';
+        $stripped = preg_replace('~^\s*(?:' . $ord . ')\s*[:：\-–—]\s*~u', '', $title);
+        if (is_string($stripped) && trim($stripped) !== '') { $title = trim($stripped); }
+    }
+    if ($title === '') { $title = ((int) $stageNo === 0) ? 'اللوحة والمساحة' : 'المرحلة ' . (int) $stageNo; }
+    return $title;
+}
+
 function printStageNav($roleId, array $items, $basePrefix = '../', $badges = array()) {
     $byStage = array();
     foreach ($items as $it) { $byStage[intval($it['stage_no'])][] = $it; }
@@ -219,8 +243,7 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
             return (intval($a['group_order']) - intval($b['group_order']))
                 ?: (intval($a['sort_order']) - intval($b['sort_order']));
         });
-        $title = trim((string) $sItems[0]['stage_title']);
-        if ($title === '') { $title = $stageNo === 0 ? 'اللوحة والمساحة' : "المرحلة $stageNo"; }
+        $title = ems_nav_stage_label((string) $sItems[0]['stage_title'], $stageNo);
         $key = 'stage-' . $roleId . '-' . $stageNo;
         /* ═══════════════════════════════════════════════════════════════════
          * INJ-0527 — المراحلُ ٠ و١ و٢ تبدأ **مفتوحةً** وما بعدها مطويّ
