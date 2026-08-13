@@ -3,8 +3,8 @@ INJ-0001	P0	نعم	مُغلقٌ بشاهد	tools/fix_inj_tests.php
 INJ-0002	P0	نعم	غيرُ مقيس	
 INJ-0003	P0	نعم	مُغلقٌ بشاهد	tools/fix_inj_tests.php
 INJ-0004	P0	نعم	مُغلقٌ بشاهد	tools/fix_inj_tests.php
-INJ-0005	P0	نعم	غيرُ مقيس	
-INJ-0006	P0	نعم	غيرُ مقيس	
+INJ-0005	P0	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
+INJ-0006	P0	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
 INJ-0007	P0	نعم	غيرُ مقيس	
 INJ-0008	P0	نعم	مُغطًّى	
 INJ-0009	P0	نعم	غيرُ مقيس	
@@ -33,14 +33,14 @@ INJ-0031	P1	نعم	غيرُ مقيس
 INJ-0032	P1	نعم	مُغلقٌ بشاهد	tools/fix_u13_nav_tests.php
 INJ-0033	P1	نعم	غيرُ مقيس	
 INJ-0034	P1	نعم	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
-INJ-0035	P1	نعم	غيرُ مقيس	
+INJ-0035	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
 INJ-0036	P1	نعم	مُغلقٌ بشاهد	tools/fix_inj0036_tests.php
 INJ-0037	P1	نعم	غيرُ مقيس	
 INJ-0038	P1	نعم	غيرُ مقيس	
-INJ-0039	P1	نعم	غيرُ مقيس	
-INJ-0040	P1	نعم	غيرُ مقيس	
-INJ-0041	P1	نعم	غيرُ مقيس	
-INJ-0042	P1	نعم	غيرُ مقيس	
+INJ-0039	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
+INJ-0040	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
+INJ-0041	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
+INJ-0042	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
 INJ-0043	P1	نعم	غيرُ مقيس	
 INJ-0044	P1	نعم	غيرُ مقيس	
 INJ-0045	P1	نعم	غيرُ مقيس	
@@ -65,7 +65,7 @@ INJ-0063	P1	نعم	غيرُ مقيس
 INJ-0064	P1	نعم	غيرُ مقيس	
 INJ-0065	P1	نعم	غيرُ مقيس	
 INJ-0066	P1	نعم	غيرُ مقيس	
-INJ-0067	P1	نعم	غيرُ مقيس	
+INJ-0067	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
 INJ-0068	P1	نعم	غيرُ مقيس	
 INJ-0069	P1	نعم	غيرُ مقيس	
 INJ-0070	P1	نعم	غيرُ مقيس	
@@ -97,7 +97,7 @@ INJ-0095	P1	نعم	غيرُ مقيس
 INJ-0096	P1	نعم	غيرُ مقيس	
 INJ-0097	P1	نعم	غيرُ مقيس	
 INJ-0098	P1	نعم	غيرُ مقيس	
-INJ-0099	P1	نعم	غيرُ مقيس	
+INJ-0099	P1	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php
 INJ-0100	P1	نعم	غيرُ مقيس	
 INJ-0101	P1	نعم	غيرُ مقيس	
 INJ-0102	P1	نعم	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php

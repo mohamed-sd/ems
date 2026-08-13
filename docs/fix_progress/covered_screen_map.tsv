@@ -1,0 +1,58 @@
+INJ	screen	action	perm	trigger	tables	kind	evidence
+INJ-0002	Procurement/rfq_compare_award.php	proc.rfq.award	can_add	award_quote	rfq_awards,supplier_rfqs	write	rfq_awards:INSERT@17 · supplier_rfqs:nav09_action_map
+INJ-0005	includes/permissions_helper.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0006	excel.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0008	—					no_file	الرابطُ لا يشير إلى ملفٍّ حيّ
+INJ-0009	Transport/transfer_close_cost.php	trs.transfer.close_with_cost	can_edit	close_id	transfer_orders,transfer_events,transfer_cost_lines	write	transfer_orders:nav09_action_map · transfer_events:nav09_action_map · transfer_cost_lines:nav09_action_map
+INJ-0010	Procurement/rfq_compare_award.php	proc.rfq.award	can_add	award_quote	rfq_awards,supplier_rfqs	write	rfq_awards:INSERT@17 · supplier_rfqs:nav09_action_map
+INJ-0011	Procurement/wh_transfer.php	proc.stock.warehouse_transfer	can_edit	item_id	proc_stock_move	write	proc_stock_move:nav09_action_map
+INJ-0012	Procurement/wh_count.php	proc.stock.count_adjust	can_edit	adjust_item	proc_stock_move	write	proc_stock_move:nav09_action_map
+INJ-0014	Portal/ceo_contracts.php				exec_contract_signings	write	exec_contract_signings:INSERT@110
+INJ-0016	Portal/ceo_approvals.php				exec_approvals	write	exec_approvals:INSERT@95
+INJ-0017	Portal/ceo_approvals.php				exec_approvals	write	exec_approvals:INSERT@95
+INJ-0018	Portal/project_charter.php				exec_project_charters,project,fin_cost_centers,sites	write	exec_project_charters:INSERT@124 · project:INSERT@193 · fin_cost_centers:INSERT@204 · sites:INSERT@215
+INJ-0022	Operations/stops_unattributed.php			assign_ts	timesheet	write	timesheet:UPDATE@50
+INJ-0023	Operations/production.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0024	Approvals/hours_approval.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0025	Operations/cron_wfm_engine.php				recurring_tasks,work_delegations,work_escalations,scr_access_review	write	recurring_tasks:UPDATE@78 · work_delegations:UPDATE@87 · work_escalations:INSERT@115 · scr_access_review:INSERT@268
+INJ-0028	Contracts/penalties.php			pen_action		no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0030	Clients/rate_books.php				rate_books,rate_book_lines	write	rate_books:gate@109 · rate_book_lines:gate@153
+INJ-0035	Finance/payments_fin.php			direction	fin_payments,fin_dues,fin_receivables	write	fin_payments:gate@95 · fin_dues:gate@97 · fin_receivables:gate@105
+INJ-0039	Finance/events_list_fin.php			event_type	fin_financial_events	write	fin_financial_events:gate@180
+INJ-0040	Finance/journal_form_fin.php			posting_date	fin_journal_entries,fin_financial_events,fin_journal_lines	write	fin_journal_entries:gate@82 · fin_financial_events:gate@87 · fin_journal_lines:gate@199
+INJ-0041	Finance/payments_fin.php			direction	fin_payments,fin_dues,fin_receivables	write	fin_payments:gate@95 · fin_dues:gate@97 · fin_receivables:gate@105
+INJ-0042	Finance/periods_fin.php			fiscal_year	fin_financial_periods,fin_closing_items	write	fin_financial_periods:gate@58 · fin_closing_items:gate@102
+INJ-0044	Financing/owners_registry.php				action_execution_log	write	action_execution_log:INSERT@33
+INJ-0050	Financing/owners_registry.php				action_execution_log	write	action_execution_log:INSERT@33
+INJ-0051	Financing/owners_registry.php				action_execution_log	write	action_execution_log:INSERT@33
+INJ-0052	Financing/installments.php			pay_inst	financing_installments	write	financing_installments:UPDATE@45
+INJ-0053	Financing/financing_operation_new.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0056	Employees/employee_contract_actions_handler.php				drivercontracts,driver_contract_notes,drivercontractequipments	write	drivercontracts:gate@44 · driver_contract_notes:gate@70 · drivercontractequipments:gate@330
+INJ-0057	Employees/employees.php			name	employees	write	employees:gate@158
+INJ-0058	Governance/break_glass.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0063	Governance/break_glass.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0065	Governance/sensitive_fields.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0066	Governance/signing_authority.php				signing_authorities	write	signing_authorities:INSERT@70
+INJ-0067	includes/action_guard.php	auto				no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0071	Tickets/ticket_workstreams_board.php			ws_action		no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0075	Maintenance/return_to_service.php			rts_order	mnt_order,equipments	write	mnt_order:UPDATE@34 · equipments:UPDATE@35
+INJ-0076	Maintenance/orders.php			action	mnt_order_labor,mnt_order_part,mnt_order,mnt_breakdown	write	mnt_order_labor:gate@137 · mnt_order_part:gate@152 · mnt_order:gate@184 · mnt_breakdown:gate@376
+INJ-0077	Timesheet/timesheet.php			operator	timesheet_failure_hours,timesheet,unit_entries	write	timesheet_failure_hours:gate@182 · timesheet:gate@502 · unit_entries:gate@586
+INJ-0080	Timesheet/timesheet.php			operator	timesheet_failure_hours,timesheet,unit_entries	write	timesheet_failure_hours:gate@182 · timesheet:gate@502 · unit_entries:gate@586
+INJ-0081	Approvals/hours_approval_handler.php				timesheet_approvals,timesheet_approval_notes	write	timesheet_approvals:gate@177 · timesheet_approval_notes:gate@363
+INJ-0082	—					no_file	الرابطُ لا يشير إلى ملفٍّ حيّ
+INJ-0087	Transport/transfer_arrival.php	trs.transfer.confirm_delivery	can_edit	deliver_id	transfer_delivery_docs,transfer_events	write	transfer_delivery_docs:nav09_action_map · transfer_events:nav09_action_map
+INJ-0089	Procurement/requests_proc.php			need_source	proc_request	write	proc_request:gate@116
+INJ-0093	Procurement/po_match.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0095	Procurement/rfq_compare_award.php	proc.rfq.award	can_add	award_quote	rfq_awards,supplier_rfqs	write	rfq_awards:INSERT@17 · supplier_rfqs:nav09_action_map
+INJ-0098	Procurement/wh_returns.php	proc.stock.return_to_warehouse	can_add	issue_line	proc_stock_move	write	proc_stock_move:nav09_action_map
+INJ-0099	Finance/approvals_inbox.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0100	Procurement/issue_proc.php			holder_name	proc_issue,proc_issue_line,proc_stock_move,proc_custody	write	proc_issue:gate@135 · proc_issue_line:gate@156 · proc_stock_move:gate@161 · proc_custody:gate@170
+INJ-0101	Operations/daily_plan.php			dp_action		no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0103	Procurement/requests_proc.php			need_source	proc_request	write	proc_request:gate@116
+INJ-0104	Timesheet/timesheet.php			operator	timesheet_failure_hours,timesheet,unit_entries	write	timesheet_failure_hours:gate@182 · timesheet:gate@502 · unit_entries:gate@586
+INJ-0106	Operations/stops_unattributed.php			assign_ts	timesheet	write	timesheet:UPDATE@50
+INJ-0107	Approvals/hours_approval.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0110	Risk/risk_acceptance.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0111	Risk/risk_board.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر
+INJ-0112	Risk/dept_risk_space.php					no_write	لا معالجَ كتابةٍ في المصدر — يُقاس بأثرٍ آخر

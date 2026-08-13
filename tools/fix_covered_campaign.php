@@ -4,6 +4,9 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * ⇐ تكليفُ حملةِ الأدلةِ الثانية (2026-08-13)
  *
+ * ⇐ شواهدُ أحكامٍ: INJ-0005 · INJ-0006 · INJ-0035 · INJ-0039 · INJ-0040 · INJ-0041
+ *                  INJ-0042 · INJ-0067 · INJ-0099
+ *
  * ── الفجوةُ التي تُغلقها ────────────────────────────────────────────────────
  * سبعٌ وخمسون ملاحظةً نوعُها `Permission Gap` أو `Governance Gap` بخطورةِ P0/P1.
  * آليتُها المشتركةُ مُصلَحةٌ بشاهدٍ مُشغَّلٍ (AC-P1A · AC-P1B في `fix_gate.php`)
@@ -63,6 +66,20 @@ foreach ($argv as $a) {
 $lines = array();
 $say = function ($s = '') use (&$lines) { fwrite(STDOUT, $s . "\n"); $lines[] = $s; };
 
+/* ما تدّعي هذه الأداةُ الشهادةَ له — يُقرأ من وسمِ ترويستِها مرّةً واحدة */
+$SELF_CLAIMED = array();
+$__head = mb_substr((string) file_get_contents(__FILE__), 0, 6000);
+if (preg_match('~شواهدُ أحكامٍ\s*:(.{0,1600})~su', $__head, $__m)) {
+    $__keep = array();
+    foreach (preg_split('~\r?\n~', $__m[1]) as $__i => $__l) {
+        if ($__i > 0 && !preg_match('~\bINJ-\d{4}\b~', $__l)) { break; }
+        $__keep[] = $__l;
+    }
+    if (preg_match_all('~\bINJ-\d{4}\b~', implode("\n", $__keep), $__m2)) {
+        $SELF_CLAIMED = array_values(array_unique($__m2[0]));
+    }
+}
+
 /* ══ ① اشتقاقُ القائمة ═══════════════════════════════════════════════════ */
 $state = array();
 $tsvState = $ROOT . '/docs/fix_progress/INJ_findings_state.tsv';
@@ -85,7 +102,10 @@ while (($l = fgets($fh)) !== false) {
     if (!in_array(trim($c[10]), array('P0', 'P1'), true)) { continue; }
     $id = trim($c[0]);
     $st = isset($state[$id]) ? $state[$id] : 'غيرُ مقيس';
-    if ($st === 'مُغلقٌ بشاهد') { continue; }
+    /* ◆ **المُغلقُ بشاهدِ هذه الأداةِ يبقى مُقاسًا** — وإلا خرج من القائمةِ فصار
+         ادّعاؤها غيرَ قابلٍ للنقض: تُغلق بندًا ثم لا تراه أبدًا، فلا يكشفها
+         إفسادُ مفحوصِه. فما تدّعي الشهادةَ له يُعاد قياسُه في كلِّ جولة. */
+    if ($st === 'مُغلقٌ بشاهد' && !in_array($id, $SELF_CLAIMED, true)) { continue; }
     if ($ONLY && !in_array($id, $ONLY, true)) { continue; }
     $todo[$id] = array('kind' => trim($c[9]), 'sev' => trim($c[10]), 'dept' => trim($c[3]),
                        'screen' => trim($c[4]), 'url' => trim($c[5]), 'test' => trim($c[20]),
@@ -170,6 +190,28 @@ $rolesOf = function ($rel) use ($conn) {
     $st->close();
     return $out;
 };
+/* ── خريطةُ الإسناد — جداولُ الأثرِ ومُقدِحاتُ المعالجِ لكلِّ بند ────────────────
+     اختبارُ القبولِ يشترط «صفرَ أثرٍ» **ولا يُسمّي الجدول**. والسجلُّ الجامعُ
+     دليلُ تدقيقٍ لا يُحرَّر، فالإسنادُ في ملفٍّ صريحٍ مبنيٍّ بـ
+     `tools/fix_covered_map_build.php` من **مصدرِ الشاشةِ نفسِه** (INSERT/UPDATE
+     برقمِ السطر · وشروطُ `$_POST` التي تفتح المعالج) ومن
+     `nav09_action_map.writes_text` — لا بتخمين. */
+$MAP = array();
+$mapFile = $ROOT . '/docs/fix_progress/covered_screen_map.tsv';
+if (is_file($mapFile)) {
+    $first = true;
+    foreach (file($mapFile) as $ln) {
+        if ($first) { $first = false; continue; }
+        $p = explode("\t", rtrim($ln, "\r\n"));
+        if (count($p) < 7) { continue; }
+        $MAP[trim($p[0])] = array('screen' => trim($p[1]), 'action' => trim($p[2]),
+            'perm' => trim($p[3]),
+            'triggers' => array_values(array_filter(explode(',', trim($p[4])))),
+            'tables' => array_values(array_filter(explode(',', trim($p[5])))),
+            'kind' => trim($p[6]));
+    }
+}
+
 /* الجداولُ المسمّاةُ في نصِّ اختبارِ القبول — وتُقبَل الموجودةُ فقط */
 $tablesOf = function ($txt) use ($conn) {
     $out = array();
@@ -257,12 +299,29 @@ foreach ($todo as $id => $r) {
         $say(sprintf('  ○ %-10s %-32s لا مسارَ يُقاس', $id, mb_substr($r['screen'], 0, 30)));
         continue;
     }
+    $mp = isset($MAP[$id]) ? $MAP[$id] : null;
     $roles = $rolesOf($rel);
     if (!$roles['edit']) {
-        $rows[] = array($id, $r['dept'], $rel, '—', 'غيرُ مقيس',
-            'لا دورَ بصلاحيةِ كتابةٍ على الشاشة — فلا شوطَ مخوَّلَ يُقارَن به');
-        $unmeasured++;
-        $say(sprintf('  ○ %-10s %-32s لا دورَ كاتبًا', $id, mb_substr($rel, 0, 30)));
+        /* ── «لا دورَ كاتبًا» **نتيجةٌ لا عائقُ قياس** — تُحسم بالدليل ────────────
+             (أ) الشاشةُ **بلا معالجِ كتابةٍ في مصدرِها** ⇒ قراءةٌ بالتصميم،
+                 والاختبارُ نفسُه هو الشاهد: صفرُ دورٍ يملك `can_edit` على شاشةٍ
+                 لا تكتب — مُقاسٌ لا مُدَّعًى.
+             (ب) الشاشةُ **تكتب** ولا دورَ يملك الكتابةَ ⇒ **فجوةُ صلاحياتٍ
+                 حقيقية** تُعلَن بندًا مستقلًّا. ولا يُمنح شيءٌ من عندي —
+                 المنحُ قرارُ مالكِ نطاقٍ لا قرارُ مبرمج. */
+        if ($mp && $mp['kind'] === 'no_write') {
+            $rows[] = array($id, $r['dept'], $rel, 'صفرُ دورٍ كاتب', 'مُغلقٌ بشاهد', '');
+            $pass++;
+            $say(sprintf('  ✔ %-10s %-32s قراءةٌ بالتصميم — صفرُ دورٍ كاتبٍ على شاشةٍ لا تكتب',
+                 $id, mb_substr($rel, 0, 30)));
+        } else {
+            $tbl = $mp ? implode(',', $mp['tables']) : '؟';
+            $rows[] = array($id, $r['dept'], $rel, '—', 'غيرُ مقيس',
+                '**فجوةُ صلاحياتٍ مستقلّة**: الشاشةُ تكتب في (' . $tbl . ') ولا دورَ يملك `can_edit` — '
+                . 'منحةٌ ناقصةٌ تحتاج قرارَ مالكِ نطاقٍ، ولا تُمنح من المبرمج');
+            $unmeasured++;
+            $say(sprintf('  ⚑ %-10s %-32s فجوةُ منحٍ: تكتب ولا كاتبَ لها', $id, mb_substr($rel, 0, 30)));
+        }
         continue;
     }
     /* ── الطرفُ المقارَنُ به: دورٌ بـ**عرضٍ بلا كتابة** حصرًا ────────────────────
@@ -294,6 +353,8 @@ foreach ($todo as $id => $r) {
         continue;
     }
     $tables = $tablesOf($r['test']);
+    /* والخريطةُ تُكمِل ما لم يُسمَّ نصًّا */
+    if ($mp) { $tables = array_values(array_unique(array_merge($tables, $mp['tables']))); }
 
     /* ── الشوطُ ①: **حصادُ النموذجِ** من الحسابِ المخوَّل ── */
     $form = null;
@@ -308,9 +369,8 @@ foreach ($todo as $id => $r) {
          أصلًا — فيُقرأ تحويلٌ لسببٍ آخرَ **رفضَ صلاحيةٍ** وهو ليس كذلك.
          وقد قِيس هذا الفخُّ: بلا المُقدِحِ كان الوميضُ خاليًا من `GOV-PERM-403`،
          ومعه ظهر الرمزُ صريحًا. والقراءةُ من مصدرِ الشاشةِ **نقلٌ لا اختراع**. */
-    $src = (string) @file_get_contents($ROOT . '/' . $rel);
-    if ($form !== null && preg_match_all("~'trigger'\s*=>\s*'([A-Za-z0-9_]+)'~", $src, $tg)) {
-        foreach (array_unique($tg[1]) as $tf) {
+    if ($form !== null && $mp && $mp['triggers']) {
+        foreach ($mp['triggers'] as $tf) {
             if (!isset($form[$tf]) || $form[$tf] === '') { $form[$tf] = '1'; }
         }
     }
@@ -332,7 +392,7 @@ foreach ($todo as $id => $r) {
     /* ── الشوطُ ②: إعادةُ إرسالِه من **غيرِ المخوَّل** ──
          ورمزُ الجلسةِ **من جلستِه هو** — يُسحب من اللوحةِ لأنَّه قد يُحجَب عن
          الشاشةِ نفسِها؛ ورمزُ غيرِه لا يصلح فالرمزُ لكلِّ جلسةٍ على حدة. */
-    $p1 = null; $delta = 0; $unknownTable = false;
+    $p1 = null; $delta = 0; $unknownTable = false; $p1Denied = false;
     if ($login($uView)) {
         $dash = $http($BASE . '/main/dashboard.php', null, true);
         $tok1 = $csrfOf($dash['body']);
@@ -340,6 +400,23 @@ foreach ($todo as $id => $r) {
         if ($tok1 !== null) { $send['csrf_token'] = $tok1; }
         $before = $countRows($tables);
         $p1 = $http($BASE . '/' . $rel, $send);
+        /* ── الوميضُ يُقرأ **فورًا وفي جلستِه** · و**الرمزُ هو المُميِّزُ لا الوجهة**
+             ◆ كان الحكمُ يُقيَّم بعد الأشواطِ الثلاثةِ — أي بعد تبديلِ الجلسةِ إلى
+               الحسابِ المخوَّل — فيقرأ لوحةَ ذاك لا وميضَ هذا. والوميضُ يُستهلك
+               عند أوّلِ قراءةٍ فلا يصحُّ متأخرًا ولا من جلسةٍ أخرى.
+             ◆ وظننتُ الرفضَ يُحوِّل إلى اللوحةِ دائمًا فقصرتُ الفحصَ عليها، فسقط
+               ثلاثةَ عشرَ بندًا **يردُّها النظامُ فعلًا**: التحويلُ يعود **إلى
+               الشاشةِ نفسِها** (نمطُ PRG) والوميضُ يحمل `GOV-PERM-403`.
+             ◆ والوجهةُ قد تكون نسبيةً فتُبنى مطلقةً — وإلا فشل الطلبُ وقُرئ
+               الخواءُ نفيًا. */
+        if ($p1['code'] === 403) { $p1Denied = true; }
+        elseif ($p1['code'] >= 300 && $p1['code'] < 400) {
+            $abs = (strpos($p1['loc'], 'http') === 0)
+                 ? $p1['loc']
+                 : ($BASE . '/' . ltrim(str_replace('../', '', (string) $p1['loc']), '/'));
+            $land = $http($abs, null, true);
+            $p1Denied = (bool) preg_match('~GOV-PERM-403~', $land['body']);
+        }
         $after = $countRows($tables);
         foreach ($before as $t => $v) {
             if ($v === null || $after[$t] === null) { $unknownTable = true; continue; }
@@ -358,7 +435,14 @@ foreach ($todo as $id => $r) {
         $p2NoTok = $http($BASE . '/' . $rel, $bare);
         $form2 = $form;
         if ($tok2 !== null) { $form2['csrf_token'] = $tok2; }
-        foreach ($tables as $t) { $writtenRanges[$t] = true; }
+        /* ── مدى المعرِّفاتِ **قبل** الشوطِ المخوَّل ──────────────────────────
+             الوسمُ النصيُّ (`COVCAMP`) لا يمسك صفوفًا كتبها **نموذجُ الشاشةِ
+             نفسُه**: قيمُه من الصفحةِ لا من عندي، فلا حقلَ يحمل الوسم — ولذلك
+             أعلن الكنسُ «صفرَ صفٍّ» وهو لا يعرف ما كُتب. فيُلتقط `MAX(id)`
+             قبل الشوطِ ويُكنس ما فوقه بعده. */
+        foreach ($maxIds($tables) as $t => $mx) {
+            if ($mx !== null && !array_key_exists($t, $writtenRanges)) { $writtenRanges[$t] = (int) $mx; }
+        }
         $p2 = $http($BASE . '/' . $rel, $form2);
     }
 
@@ -376,33 +460,31 @@ foreach ($todo as $id => $r) {
          جسمَ `<script>` وفيه الرسالة. وهكذا يُميَّز رفضُ **الصلاحية** من
          `CSRF-403` (عطلُ حماية) ومن `ACT-403` (فعلٌ غيرُ مسجَّل) — وخلطُها
          يُنتج خضرةً كاذبة. */
-    $isDeny = function ($resp) use ($http, $BASE) {
-        if ($resp === null) { return false; }
-        if ($resp['code'] === 403) { return true; }
-        if ($resp['code'] < 300 || $resp['code'] >= 400) { return false; }
-        $t = basename((string) parse_url($resp['loc'], PHP_URL_PATH));
-        if ($t !== 'dashboard.php' && $t !== 'login.php') { return false; }
-        $land = $http($resp['loc'] !== '' ? $resp['loc'] : ($BASE . '/main/dashboard.php'), null, true);
-        return (mb_strpos($land['body'], 'GOV-PERM-403') !== false);
-    };
-    $denied  = $isDeny($p1);
-    $allowed = ($p2 !== null) && !$isDeny($p2);
+    $denied  = $p1Denied;      /* حُسم فورًا وفي جلستِه أعلاه */
+    /* والعبورُ: أيُّ ردٍّ ليس رفضَ صلاحيةٍ — و`302` إلى الشاشةِ نفسِها عبورٌ (PRG) */
+    $allowed = ($p2 !== null) && !($p2['code'] === 403);
     $csrfSane = ($p2NoTok !== null) && ($p2NoTok['code'] === 403);
 
-    $ok = $denied && $delta === 0 && $allowed && !$unknownTable;
+    /* ── والشوطُ الثالثُ **شرطُ إغلاقٍ لا ملحوظة** ────────────────────────────
+         كان غيابُه يُذيَّل بملحوظةٍ ويُغلَق البندُ — وهو قياسٌ جزئيٌّ يُقدَّم
+         كاملًا. فبلا إثباتِ أنَّ الطلبَ **بلا رمزِ جلسةٍ يُردُّ 403 من طبقةِ
+         الحماية**، لا يُعرَف أنَّ الردَّ الأصليَّ حكمُ صلاحيةٍ لا عطلُ CSRF. */
+    $ok = $denied && $delta === 0 && $allowed && !$unknownTable && $csrfSane;
     $witness = 'دور ' . $rView . ' ⇒ ' . ($p1 ? $p1['code'] : '—')
              . ' · دور ' . $rEdit . ' ⇒ ' . ($p2 ? $p2['code'] : '—')
+             . ' · بلا رمزٍ ⇒ ' . ($p2NoTok ? $p2NoTok['code'] : '—')
              . ' · Δ=' . $delta;
     if ($ok) {
-        $rows[] = array($id, $r['dept'], $rel, $uView . ' / ' . $uEdit, 'مُغلقٌ بشاهد',
-            $csrfSane ? '' : 'ملحوظة: لم يُثبَت ردُّ الطلبِ بلا رمزِ جلسةٍ — فالتمييزُ بين عطلِ الحمايةِ وحكمِ الصلاحيةِ ناقص');
+        $rows[] = array($id, $r['dept'], $rel, $uView . ' / ' . $uEdit, 'مُغلقٌ بشاهد', '');
         $pass++;
         $say(sprintf('  ✔ %-10s %-32s %s', $id, mb_substr($rel, 0, 30), $witness));
     } else {
-        $why = !$denied ? 'لم يُردَّ طلبُ حسابِ العرضِ (الرمز ' . ($p1 ? $p1['code'] : '—') . ')'
+        $why = !$denied ? 'لم يُردَّ طلبُ حسابِ العرضِ بـ`GOV-PERM-403` (الرمز ' . ($p1 ? $p1['code'] : '—') . ')'
              : ($delta !== 0 ? '**أثرٌ في القاعدةِ رغمَ الرفض**: Δ=' . $delta . ' في ' . implode(',', $tables)
              : ($unknownTable ? 'تعذّرت قراءةُ أحدِ الجداولِ المسمّاة'
-             : 'لم يعبر الحسابُ المخوَّلُ (الرمز ' . ($p2 ? $p2['code'] : '—') . ') — فالمنعُ شللٌ عامٌّ لا حكمُ صلاحية'));
+             : (!$allowed ? 'لم يعبر الحسابُ المخوَّلُ (الرمز ' . ($p2 ? $p2['code'] : '—') . ') — فالمنعُ شللٌ عامٌّ لا حكمُ صلاحية'
+             : 'الشوطُ الثالثُ لم يُثبِت: طلبٌ بلا رمزِ جلسةٍ أعطى ' . ($p2NoTok ? $p2NoTok['code'] : '—')
+               . ' لا 403 — فلا يُميَّز حكمُ الصلاحيةِ من عطلِ الحماية')));
         $rows[] = array($id, $r['dept'], $rel, $uView . ' / ' . $uEdit, 'غيرُ مقيس', $why);
         $unmeasured++;
         $say(sprintf('  ✘ %-10s %-32s %s', $id, mb_substr($rel, 0, 30), mb_substr($why, 0, 44)));
@@ -414,7 +496,8 @@ foreach ($todo as $id => $r) {
 $say('');
 $say('── الكنس (عائلةُ ' . $FAMILY . ')');
 $swept = 0; $unswept = array();
-foreach (array_keys($writtenRanges) as $t) {
+foreach ($writtenRanges as $t => $mx) {
+    /* ① الوسمُ النصيُّ — يمسك ما كتبتُه بقيمةٍ من عندي */
     $cols = array();
     $q = $conn->query("SHOW COLUMNS FROM `{$t}`");
     while ($q && ($x = $q->fetch_assoc())) { $cols[] = $x['Field']; }
@@ -422,13 +505,21 @@ foreach (array_keys($writtenRanges) as $t) {
     foreach ($cols as $cn) {
         if (preg_match('~(note|notes|remark|desc|description|reason|title|name|ref)~i', $cn)) { $textCols[] = $cn; }
     }
-    if (!$textCols) { continue; }
-    $whr = array();
-    foreach ($textCols as $cn) { $whr[] = "`{$cn}` LIKE '%{$FAMILY}%'"; }
-    $sql = "DELETE FROM `{$t}` WHERE " . implode(' OR ', $whr);
-    $okDel = $conn->query($sql);
+    if ($textCols) {
+        $whr = array();
+        foreach ($textCols as $cn) { $whr[] = "`{$cn}` LIKE '%{$FAMILY}%'"; }
+        $okDel = $conn->query("DELETE FROM `{$t}` WHERE " . implode(' OR ', $whr));
+        if ($okDel === false) { $unswept[] = $t . '/وسم (' . $conn->error . ')'; }
+        else { $swept += max(0, $conn->affected_rows); }
+    }
+    /* ② ومدى المعرِّفات — يمسك ما كتبه **نموذجُ الشاشةِ** بقيمِه هو */
+    if ($mx === null) { continue; }
+    $n = $conn->query("SELECT COUNT(*) FROM `{$t}` WHERE id > " . (int) $mx);
+    $extra = $n ? (int) $n->fetch_row()[0] : 0;
+    if ($extra <= 0) { continue; }
+    $okDel = $conn->query("DELETE FROM `{$t}` WHERE id > " . (int) $mx);
     if ($okDel === false) {                      /* FK يردُّ صامتًا — يُفحص المُرجَع */
-        $unswept[] = $t . ' (' . $conn->error . ')';
+        $unswept[] = $t . '/مدى id>' . (int) $mx . ' (' . $extra . ' صفًّا · ' . $conn->error . ')';
         continue;
     }
     $swept += max(0, $conn->affected_rows);
@@ -465,16 +556,8 @@ if ($MD !== null) {
 }
 
 /* ══ ⑤ عقدُ رمزِ الخروج — وإلا صادقت على نفسِها (GT-01) ═══════════════════ */
-$claimed = array();
-$head = mb_substr((string) file_get_contents(__FILE__), 0, 6000);
-if (preg_match('~شواهدُ أحكامٍ\s*:(.{0,1600})~su', $head, $mm)) {
-    $keep = array();
-    foreach (preg_split('~\r?\n~', $mm[1]) as $i => $l2) {
-        if ($i > 0 && !preg_match('~\bINJ-\d{4}\b~', $l2)) { break; }
-        $keep[] = $l2;
-    }
-    if (preg_match_all('~\bINJ-\d{4}\b~', implode("\n", $keep), $m3)) { $claimed = array_unique($m3[0]); }
-}
+/* القائمةُ نفسُها التي أبقت المُغلقَ داخلَ القياسِ أعلاه — قراءةٌ واحدةٌ لا اثنتان */
+$claimed = $SELF_CLAIMED;
 $broke = array();
 foreach ($rows as $x) { if (in_array($x[0], $claimed, true) && $x[4] !== 'مُغلقٌ بشاهد') { $broke[] = $x[0]; } }
 if ($claimed) {
