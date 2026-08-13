@@ -29,10 +29,17 @@ $L = array();
 function o($s = '') { global $L; $L[] = $s; echo $s . "\n"; }
 
 /* ══ القوائمُ والقواعدُ تُقرأ من مصدرِها الواحد ═══════════════════════════ */
-$rep = (string) file_get_contents($ROOT . '/tools/fix_status_report.php');
-$CLOSED = array();
-if (preg_match('/\$CLOSED\s*=\s*array\((.*?)\n\);/s', $rep, $m)) {
-    if (preg_match_all("/'(INJ-\d+)'/", $m[1], $cm)) { $CLOSED = array_unique($cm[1]); }
+/* ── الإغلاقُ من **المصدرِ الواحد** لا من مصفوفةٍ مُزالة ─────────────────────
+   كان هذا السطرُ ينتزع مصفوفةً مثبَّتةً من `fix_status_report.php`. وقد أُزيلت
+   تلك المصفوفةُ (توحيدُ المصدرين · 2026-08-13) فصار الانتزاعُ يعود **خاويًا**
+   وتُعلن الأداةُ **صفرًا** — وهو أخطرُ من عطلٍ ظاهرٍ لأنَّه رقمٌ يبدو قياسًا.
+   فالمصدرُ الآن واحدٌ لكلِّ الأدوات: الوسمُ الصريحُ على القرص. */
+require_once $ROOT . '/includes/fix_closure_source.php';
+$__c = ems_fix_closed_ids($ROOT, false);
+$CLOSED = $__c['mentioned'];
+if (!$CLOSED) {
+    fwrite(STDERR, "✘ صفرُ شواهدَ موسومةٍ — يُوقَف بدل إعلانِ صفرٍ يبدو قياسًا\n");
+    exit(2);
 }
 $COVERED_KINDS = array('Permission Gap', 'Governance Gap');
 $EASY_KINDS   = array('Wrong Label', 'Broken Button', 'Wrong Sidebar Placement', 'Missing Evidence');
