@@ -245,7 +245,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>اسم الصنف</th><th>الفئة</th><th>طبيعة المادة</th>
-                    <th>وحدة القياس</th><th>قطعة حرجة؟</th><th>Min</th><th>Max</th><th>مخزون الأمان</th><th>مدة التوريد بالأيام</th>
+                    <th>وحدة القياس</th><th>قطعة حرجة؟</th><th title="Min">الحدّ الأدنى</th><th title="Max">الحدّ الأقصى</th><th>مخزون الأمان</th><th>مدة التوريد بالأيام</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم الصنف</th>
                     <th class="ems-fn-th" data-fn="1">الموديل أو العائلة المخدومة</th>

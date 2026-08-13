@@ -62,6 +62,22 @@ if ($rfq > 0) {
                               WHERE q.rfq_id = $rfq AND q.company_id = $company_id
                               ORDER BY q.unit_price");
     if ($r) while ($x = mysqli_fetch_assoc($r)) $quotes[] = $x;
+    /* ◆ INJ-0341: والترتيبُ **بالمعادلِ** لا بالسعرِ الخام — فترتيبُ القاعدةِ
+         يخلط عملاتٍ فيُقدِّم الأغلى. ويقع في PHP لأنَّ سعرَ الصرفِ في
+         `includes/fx.php` لا في جملةِ SQL. */
+    require_once __DIR__ . '/../includes/fx.php';
+    if (function_exists('ems_fx_to_base') && count($quotes) > 1) {
+        $__eq = function ($row) {
+            $amt = floatval($row['unit_price']);
+            $v = ems_fx_to_base($amt, (string) $row['currency']);
+            return (is_array($v) && !empty($v['ok']) && is_numeric($v['base'])) ? floatval($v['base']) : $amt;
+        };
+        usort($quotes, function ($a, $b) use ($__eq) {
+            $ea = $__eq($a); $eb = $__eq($b);
+            if ($ea === $eb) { return 0; }
+            return ($ea < $eb) ? -1 : 1;
+        });
+    }
 }
 
 $page_title = 'مقارنة العروض والترسية';
@@ -124,11 +140,60 @@ include __DIR__ . '/../includes/page_header.php';
               </tr></thead>
     <tbody>
     <?php if (empty($quotes)): ?><tr><td colspan="7" class="text-center text-muted">لا عروضَ مقدَّمةً لهذا الطلب</td></tr><?php endif; ?>
-    <?php $best = $quotes ? floatval($quotes[0]['unit_price']) : 0;
-    foreach ($quotes as $q): $isBest = floatval($q['unit_price']) <= $best; ?>
+    <?php
+    /* ═══════════════════════════════════════════════════════════════════════
+     * INJ-0341 — «الأدنى» تُحسب على **المعادلِ الموحَّدِ** لا على السعرِ الخام
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **العطلُ المقيس**: كان الفرزُ `ORDER BY q.unit_price` والمقارنةُ
+     *   `unit_price <= $best` — والسعرُ **خامٌّ بعملتِه**. فعرضٌ بعملةٍ منخفضةِ
+     *   القيمةِ يُوسَم «الأدنى» وهو الأغلى فعلًا، و`<=` تمنح الشارةَ لكلِّ
+     *   المتساوين فتظهر على صفوفٍ عدّة. وهذا **أخطرُ من عيبِ عرض**: القرارُ
+     *   الأهمُّ في الوحدةِ (اختيارُ الأرخص) يُبنى على مقارنةٍ خاطئة.
+     * ◆ **والعلاجُ بمحوّلٍ قائمٍ لا جديد**: `includes/fx.php::ems_fx_to_base`
+     *   (الأساسُ من `admin_companies` · base = amount × rate).
+     * ◆ ويُعرض **المعادلُ** إلى جانبِ السعرِ الخام فيرى المقرِّرُ على أيِّ أساسٍ
+     *   قُورن — ولا رقمَ بلا عملة.
+     * ◆ والشارةُ **لواحدٍ فقط**: أقلُّ معادلٍ ومعرِّفُه — فتساوي معادلين
+     *   احتمالٌ بعيدٌ، وعندَه يُوسَم الأوّلُ ترتيبًا ولا تتعدّد الشارة.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    require_once __DIR__ . '/../includes/fx.php';
+    $baseCur = function_exists('ems_fx_base_currency') ? ems_fx_base_currency() : '';
+    /* ◆ و`ems_fx_to_base` تُرجع **مصفوفةً معلَنةً** (`ok · rate · base · reason`)
+         لا رقمًا — والتعاملُ معها كرقمٍ يُنتج صفرًا صامتًا فيُوسَم الأوّلُ دائمًا
+         «الأدنى». فالنتيجةُ تُقرأ من `base` عند `ok`، وعند التعذُّرِ يُستعمل
+         الخامُّ **ويُعلَن** ولا يُخفى الفشلُ خلف رقم. */
+    $eqOf = function ($q) {
+        $amt = floatval($q['unit_price']);
+        if (!function_exists('ems_fx_to_base')) { return array($amt, false); }
+        $v = ems_fx_to_base($amt, (string) $q['currency']);
+        if (is_array($v) && !empty($v['ok']) && is_numeric($v['base'])) { return array(floatval($v['base']), true); }
+        return array($amt, false);
+    };
+    $bestId = null; $bestEq = null;
+    foreach ($quotes as $q) {
+        list($e, ) = $eqOf($q);
+        if ($bestEq === null || $e < $bestEq) { $bestEq = $e; $bestId = $q['id']; }
+    }
+    foreach ($quotes as $q):
+        list($eq, $eqOk) = $eqOf($q);
+        $isBest = ($bestId !== null && $q['id'] === $bestId); ?>
       <tr<?= $isBest ? ' style="background:#f0fff4"' : '' ?>>
         <td><?= htmlspecialchars($q['supplier'], ENT_QUOTES, 'UTF-8') ?><?= $isBest ? ' <span class="badge" style="background:#198754">الأدنى</span>' : '' ?></td>
-        <td><?= number_format(floatval($q['unit_price']), 2) ?> <?= htmlspecialchars($q['currency'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= number_format(floatval($q['unit_price']), 2) ?> <?= htmlspecialchars($q['currency'], ENT_QUOTES, 'UTF-8') ?>
+            <?php if ((string) $q['currency'] !== (string) $baseCur): ?>
+              <?php if ($eqOk): ?>
+              <div class="ems-eq-base" style="font-size:.76rem;opacity:.75"
+                   title="المعادلُ بعملةِ الدفاترِ — وعليه تُحسب «الأدنى»">
+                ≈ <?= number_format($eq, 2) ?> <?= htmlspecialchars((string) $baseCur, ENT_QUOTES, 'UTF-8') ?>
+              </div>
+              <?php else: ?>
+              <div class="ems-eq-none" style="font-size:.76rem;color:#b58900"
+                   title="لا سعرَ صرفٍ مسجَّلٌ لهذه العملةِ في تاريخِ اليوم — فالمقارنةُ على السعرِ الخامّ">
+                ⚠ بلا سعرِ صرف — قُورن خامًّا
+              </div>
+              <?php endif; ?>
+            <?php endif; ?>
+        </td>
         <td><?= floatval($q['qty_offered']) ?></td>
         <td><?= intval($q['readiness_days']) ?></td>
         <td><?= htmlspecialchars($q['record_rating'] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>

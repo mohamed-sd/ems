@@ -25,9 +25,12 @@ if (isset($_SESSION['user'])) {
 
 if (isset($_SESSION['user'])) {
   require_once dirname(__FILE__) . '/includes/report_button.php';
+  // INJ-0518: كان `register_shutdown_function` يضع الزرَّ **بعد** `</html>`.
+  // صار المُخرَجُ محجوزًا والزرُّ يُحقن قبل `</body>` — القرارُ متأخرٌ كما كان،
+  // والموضعُ داخلَ الجسد. (التفصيلُ في `includes/report_button.php`.)
   if (empty($GLOBALS['__ems_rb_shutdown'])) {
     $GLOBALS['__ems_rb_shutdown'] = true;
-    register_shutdown_function('ems_report_button_fallback');
+    ems_report_button_capture();
   }
 }
 ?>

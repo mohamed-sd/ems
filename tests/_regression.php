@@ -61,6 +61,16 @@ $core = array(
     'operations_audit_trail_test',
     'supplier_audit_trail_test',
     'dept_space_screens_test',
+    /* INJ-0341 — شارةُ «الأدنى» في مقارنةِ العروضِ بالمعادلِ الموحَّدِ لا بالسعرِ
+       الخام: عرضٌ بعملةٍ منخفضةِ القيمةِ كان يُوسَم الأدنى وهو الأغلى فعلًا،
+       و`<=` تمنحها لكلِّ المتساوين. والحالةُ مزروعةٌ بأرقامِ القاعدةِ الحيّة. */
+    'rfq_lowest_badge_test',
+    /* حملةُ الواجهةِ · الموجةُ الأولى — ستةُ عيوبٍ جذرُها واحدٌ لكلٍّ منها */
+    'nav_landing_anchor_test',       /* INJ-0459 — مِرساةُ الرابطِ في وجهتِها */
+    'nav_doors_integrity_test',      /* INJ-0491 — مصدرٌ واحدٌ لترتيبِ الأبواب */
+    'report_button_placement_test',  /* INJ-0518 — الزرُّ داخلَ الجسدِ لا بعد </html> */
+    'risk_owner_unit_test',          /* INJ-0577 — الإدارةُ المالكةُ قائمةٌ مُتحقَّقة */
+    'ui_consistency_scan_test',      /* INJ-0593 · INJ-0498 — رؤوسٌ عربيةٌ ونسخةُ بوتستراب واحدة */
 );
 
 $files = $core;

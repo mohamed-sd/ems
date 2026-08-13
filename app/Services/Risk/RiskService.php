@@ -256,7 +256,24 @@ class RiskService
         $srt = $d['scope_ref_type'] ?? null; $sri = !empty($d['scope_ref_id']) ? (int) $d['scope_ref_id'] : null;
         $et = $d['entity_type'] ?? null; $ei = !empty($d['entity_id']) ? (int) $d['entity_id'] : null;
         $rc = (string) ($d['root_cause'] ?? '');
+        /* ── INJ-0577 · الوحدةُ المالكةُ تُتحقَّق لا تُقبل رقمًا ─────────────────
+             كان الحقلُ رقمًا حرًّا في الشاشة و`(int)` في الخدمة — فأيُّ رقمٍ يُحفظ:
+             وحدةُ شركةٍ أخرى، أو رقمٌ لا وجودَ له. والوصلُ `LEFT JOIN org_units`
+             يبتلع الخطأَ صامتًا فيظهر الخطرُ بمالكٍ فارغٍ لا بخطأ.
+             فيُرفض هنا كلُّ ما ليس وحدةً نشطةً **لهذا الكيان**. */
         $ou = !empty($d['owner_unit_id']) ? (int) $d['owner_unit_id'] : null;
+        if ($ou !== null) {
+            $chk = $db->prepare('SELECT unit_id FROM org_units
+                                  WHERE unit_id = ? AND company_id = ? AND COALESCE(active,1) = 1');
+            $chk->bind_param('ii', $ou, $companyId);
+            $chk->execute();
+            $found = (bool) $chk->get_result()->fetch_row();
+            $chk->close();
+            if (!$found) {
+                return array('id' => 0, 'duplicates' => array(), 'error' => 'RSK-UNIT-422',
+                    'hint' => 'الإدارة المالكة ليست وحدةً نشطةً في هيكل هذا الكيان');
+            }
+        }
         $rowner = !empty($d['risk_owner_user_id']) ? (int) $d['risk_owner_user_id'] : null;
         $st->bind_param('isissssisisiisi', $companyId, $code, $ruId, $title, $desc, $scopeType,
             $srt, $sri, $et, $ei, $rc, $ou, $rowner, $key, $userId);

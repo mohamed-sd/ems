@@ -13,7 +13,12 @@
  */
 
 if (!function_exists('ems_report_button')) {
-    function ems_report_button(array $ctx, $label = 'أبلغ عن مشكلة')
+    /**
+     * نصُّ الزرِّ **سلسلةً** لا طباعةً — لأنَّ الاحتياطيَّ يُبنى داخلَ مُعالِجِ
+     * حجزِ المُخرَج، وPHP **تمنع** فتحَ حجزٍ جديدٍ داخلَ المُعالِج (فأوّلُ صياغةٍ
+     * بنَتِ الزرَّ بـ`ob_start()` هناك فخرجت الصفحةُ **صفرَ بايت** كاملةً).
+     */
+    function ems_report_button_html(array $ctx, $label = 'أبلغ عن مشكلة')
     {
         $fields = '';
         foreach (array('screen', 'site_id', 'equipment_id', 'contract_id', 'project_id',
@@ -23,14 +28,19 @@ if (!function_exists('ems_report_button')) {
                     . htmlspecialchars((string) $ctx[$k]) . '">';
             }
         }
-        $GLOBALS['__ems_rb_rendered'] = true; // يُعلم الاحتياطيَّ العالميَّ فلا يزدوج
         // النموذج POST عادي إلى نقطة الفتح السياقي — السياق محمول لا مُدخَل
-        echo '<form method="post" action="' . htmlspecialchars(ems_report_button_base()) . '/Tickets/ticket_contextual_open.php"'
+        return '<form method="post" action="' . htmlspecialchars(ems_report_button_base()) . '/Tickets/ticket_contextual_open.php"'
             . ' style="display:inline" class="ems-report-btn-secondary">'
             . $fields
             . '<button type="submit" class="action-btn" title="' . htmlspecialchars($label) . '"'
             . ' style="color:#c0392b"><i class="fas fa-bullhorn"></i> ' . htmlspecialchars($label) . '</button>'
             . '</form>';
+    }
+
+    function ems_report_button(array $ctx, $label = 'أبلغ عن مشكلة')
+    {
+        $GLOBALS['__ems_rb_rendered'] = true; // يُعلم الاحتياطيَّ العالميَّ فلا يزدوج
+        echo ems_report_button_html($ctx, $label);
     }
 
     /** جذر التطبيق نسبيًّا من عمق الشاشة (شاشاتنا كلها على عمق مجلد واحد). */
@@ -47,10 +57,40 @@ if (!function_exists('ems_report_button')) {
      */
     function ems_report_button_fallback()
     {
-        if (!empty($GLOBALS['__ems_rb_rendered'])) { return; } // شاشةٌ لها زرُّها الغني
+        if (!empty($GLOBALS['__ems_rb_rendered'])) { return ''; } // شاشةٌ لها زرُّها الغني
         $screen = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
-        echo '<div style="position:fixed;bottom:14px;left:14px;z-index:1050" class="ems-report-fallback">';
-        ems_report_button(array('screen' => $screen), 'أبلغ عن مشكلة');
-        echo '</div>';
+        return '<div style="position:fixed;bottom:14px;inset-inline-end:14px;z-index:1050;direction:rtl"'
+            . ' class="ems-report-fallback">'
+            . ems_report_button_html(array('screen' => $screen), 'أبلغ عن مشكلة')
+            . '</div>';
+    }
+
+    /**
+     * ── INJ-0518 · الحقنُ **داخلَ الجسدِ** لا بعد `</html>` ────────────────────
+     * كان الزرُّ يُبثُّ بـ`register_shutdown_function`، أي **بعد** انتهاءِ تنفيذِ
+     * السكربت — فيقع نصُّه بعد وسمِ `</html>` الختامي في كلِّ شاشة. والمتصفحُ
+     * يتسامح فيُظهره، لكنَّ المستندَ غيرُ سليمٍ ومدقّقاتُ الوصوليةِ والطباعةِ
+     * والقارئاتُ الآليةُ تتعثّر به.
+     *
+     * والسببُ الذي فرض التأجيلَ حقيقيّ: «هل استدعت الشاشةُ زرًّا سياقيًّا أغنى؟»
+     * لا يُعرف إلا بعد تصييرِها كلِّها. فالحلُّ ليس نقلَ النداءِ إلى أعلى الصفحة
+     * — بل **حجزُ المُخرَجِ** وحقنُ الزرِّ قبل `</body>` عند الإفراغ: القرارُ
+     * يبقى متأخرًا، والموضعُ يصير صحيحًا.
+     *
+     * وشرطُ الحقنِ وجودُ `</body>`: مُخرَجٌ بلا جسدٍ (JSON · تنزيلٌ · تحويل)
+     * **لا يُحقن فيه شيء** — فالعيبُ الأصليُّ كان الإلحاقَ بلا شرط.
+     */
+    function ems_report_button_capture()
+    {
+        if (!empty($GLOBALS['__ems_rb_capturing'])) { return; }
+        $GLOBALS['__ems_rb_capturing'] = true;
+        ob_start(function ($html) {
+            if (!empty($GLOBALS['__ems_rb_rendered'])) { return $html; }
+            $pos = strripos($html, '</body>');
+            if ($pos === false) { return $html; }   // بلا جسدٍ ⇒ بلا حقن
+            $btn = ems_report_button_fallback();
+            if ($btn === '') { return $html; }
+            return substr($html, 0, $pos) . $btn . substr($html, $pos);
+        });
     }
 }

@@ -9,6 +9,8 @@
  *                  INJ-0377 · INJ-0431 · INJ-0433 · INJ-0438 · INJ-0449 · INJ-0450
  *                  INJ-0451 · INJ-0452 · INJ-0460 · INJ-0462 · INJ-0474 · INJ-0478
  *                  INJ-0495 · INJ-0526 · INJ-0527 · INJ-0542 · INJ-0546 · INJ-0569
+ *                  INJ-0421 · INJ-0341 · INJ-0459 · INJ-0491 · INJ-0518 · INJ-0577
+ *                  INJ-0593 · INJ-0498
  *
  * ── النطاق ────────────────────────────────────────────────────────────────
  * ثمانيةٌ وستون معرِّفًا نوعُها `UX/UI Defect` وحالتُها ليست «مُغلقٌ بشاهد».
@@ -245,6 +247,27 @@ $say($kitSoft ? '  ✔ الخروجُ استشاريٌّ في `ui-unification.js
               : '  ✘ العُدَّةُ لا تحمل الإصلاحَ — كلُّ قياسٍ بعده بلا معنى');
 $say('');
 
+/* ── بنودٌ أُغلقت بشاهدٍ باسمِها: المعرِّفُ ⇒ (الفاحصُ · الموضعُ · ما قيس) ────
+     ويُشغَّل الفاحصُ فعلًا ويُقرأ رمزُ خروجِه — لا يُكتفى بوجودِ ملفِّه. */
+$PHPBIN = defined('PHP_BINARY') && PHP_BINARY !== '' ? PHP_BINARY : 'php';
+$witnessRun = array();
+$BY_WITNESS = array(
+    'INJ-0341' => array('rfq_lowest_badge_test', 'Procurement/rfq_compare_award.php',
+        'شارةُ «الأدنى» بالسعرِ الخام ⇒ **بالمعادلِ الموحَّد** — 1000 SDG ≈ 0.19 أرخصُ من 100 USD'),
+    'INJ-0459' => array('nav_landing_anchor_test', 'includes/unified_nav.php',
+        '٥٤ رابطًا بمِرساةٍ **بلا وجودٍ في وجهتِها** ⇒ 13/13 مقيسةً حيّةً موجودة'),
+    'INJ-0491' => array('nav_doors_integrity_test', 'includes/unified_nav.php',
+        'ترتيبُ الأبوابِ سلسلةٌ مكتوبةٌ بثمانيةٍ مقابلَ تسعةٍ معرَّفةٍ ⇒ **مصدرٌ واحد**'),
+    'INJ-0518' => array('report_button_placement_test', 'includes/report_button.php',
+        'الزرُّ بعد `</html>` في ٦ شاشاتٍ ⇒ **داخلَ الجسدِ قبل `</body>`** بلا ازدواج'),
+    'INJ-0577' => array('risk_owner_unit_test', 'Risk/risk_register.php',
+        'رقمٌ حرٌّ يُحفظ كما هو ⇒ **قائمةُ ١٦ وحدةً عربيةً** ورفضٌ 422 لما سواها'),
+    'INJ-0593' => array('ui_consistency_scan_test', 'Procurement/items_proc.php',
+        '٥ رؤوسٍ لاتينيةٍ بلا عربيٍّ ⇒ **صفرٌ** من ٥٢٢ ترويسةً في ٢٠ ملفًّا'),
+    'INJ-0498' => array('ui_consistency_scan_test', 'emsreports/reports/_report_template.php',
+        'نسختا بوتستراب متعارضتان ⇒ **نسخةٌ واحدةٌ** في الشفرةِ الحية (RTL=0)'),
+);
+
 $rows = array(); $pass = 0; $unmeasured = 0;
 $say('── القياسُ على مُخرَجِ HTTP');
 foreach ($todo as $id => $r) {
@@ -291,7 +314,7 @@ foreach ($todo as $id => $r) {
         }
         continue;
     }
-    if ($id === 'INJ-0527') {
+    if ($id === 'INJ-0527' || $id === 'INJ-0421') {
         if ($navOpen) {
             $rows[] = array($id, 'includes/unified_nav.php', 'سايدبار — افتراضُ الفتح', 'كلُّ دور',
                 'كلُّ المراحلِ مطويّة ⇒ **٠ و١ و٢ مفتوحةٌ** والباقي مطويّ', 'مُغلقٌ بشاهد', '');
@@ -301,6 +324,30 @@ foreach ($todo as $id => $r) {
             $rows[] = array($id, 'includes/unified_nav.php', 'سايدبار — افتراضُ الفتح', '—', '—',
                 'غيرُ مقيس', 'الافتراضُ ما زال «الكلُّ مطويّ»');
             $unmeasured++;
+        }
+        continue;
+    }
+    /* ── بندٌ له **شاهدٌ مُشغَّلٌ باسمه** ──────────────────────────────────────
+         لا يكفي أن يوجد الملفُّ: يُشغَّل الفاحصُ ويُقرأ رمزُ خروجِه. فوجودُ ملفٍّ
+         اسمُه «شاهد» ليس شهادةً (MD-05: «البناءُ ليس تبنّيًا»). */
+    if (isset($BY_WITNESS[$id])) {
+        $t = $BY_WITNESS[$id];
+        if (!isset($witnessRun[$t[0]])) {
+            $cmd = escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tests/' . $t[0] . '.php');
+            $o = array(); $rc = 1;
+            @exec($cmd . ' 2>&1', $o, $rc);
+            $witnessRun[$t[0]] = array('rc' => (int) $rc, 'out' => implode("\n", $o));
+        }
+        $w = $witnessRun[$t[0]];
+        if ($w['rc'] === 0) {
+            $rows[] = array($id, $t[1], $fam, 'شاهدٌ مُشغَّل', $t[2], 'مُغلقٌ بشاهد', '');
+            $pass++;
+            $say(sprintf('  ✔ %-10s %-30s شاهدٌ أخضرُ: %s', $id, mb_substr($t[1], 0, 28), $t[0]));
+        } else {
+            $rows[] = array($id, $t[1], $fam, 'شاهدٌ مُشغَّل', 'رمزُ الخروج ' . $w['rc'],
+                'غيرُ مقيس', 'الشاهدُ `' . $t[0] . '` أحمر');
+            $unmeasured++;
+            $say(sprintf('  ✘ %-10s %-30s شاهدٌ أحمر: %s', $id, mb_substr($t[1], 0, 28), $t[0]));
         }
         continue;
     }

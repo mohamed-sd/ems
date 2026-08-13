@@ -68,6 +68,15 @@ function unifiedNavEnabled($roleId, $csv = null) {
  */
 function getUnifiedNavItems($conn, $roleId) {
     $roleId = intval($roleId);
+    /* ── INJ-0491 · مصدرٌ واحدٌ لترتيبِ الأبواب ──────────────────────────────
+       كان الترتيبُ سلسلةً مكتوبةً في SQL بثمانيةِ أبوابٍ بينما `unifiedNavDoors()`
+       تُعرّف تسعة — فبابُ `RISK` خارجَ السلسلة. و`FIELD` تُعيد **صفرًا** لما لا
+       تجده، والصفرُ يسبق الواحد: فأيُّ صفِّ RISK يخرج من مجموعةٍ مرحليةٍ يقفز
+       **قبل الرئيسية**. (واليومَ لا يقع الأثرُ لأنَّ صفوفَ RISK الثمانين كلَّها
+       داخلَ مجموعاتٍ مرحلية، فلا تبلغ حلقةَ الأبواب — عيبٌ نائمٌ لا معدوم.)
+       ويُشتقُّ الترتيبُ الآن من التعريفِ نفسِه: مصدرٌ واحدٌ لا اثنان يتفرَّقان. */
+    $doorOrder = implode(',', array_map(function ($d) { return "'" . $d . "'"; },
+        array_keys(unifiedNavDoors())));
     $sql = "SELECT n.door, n.group_id, n.label_ar, n.route, n.icon, n.sort_order,
                    n.counter_source, g.name AS group_name,
                    g.stage_no, g.stage_title, g.display_order AS group_order
@@ -81,7 +90,7 @@ function getUnifiedNavItems($conn, $roleId) {
                         WHERE p.module_id = n.module_id AND p.role_id = n.role_id AND p.can_view = 1
                     )
                   )
-            ORDER BY FIELD(n.door,'HOME','DAILY','APPR','REC','REP','GOV','FIN','SET'), n.sort_order, n.id";
+            ORDER BY FIELD(n.door,{$doorOrder}), n.sort_order, n.id";
     $items = array();
     $res = mysqli_query($conn, $sql);
     if ($res) { while ($row = mysqli_fetch_assoc($res)) { $items[] = $row; } }
@@ -290,9 +299,43 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
     }
 }
 
+/* ── مراسي الوصول · INJ-0459 ─────────────────────────────────────────────────
+   بعضُ روابطِ القوائمِ تحمل مِرساةً في آخرها (`Finance/approvals_inbox.php#n9g32i3`)
+   تُميّز عنصرَ قائمةٍ عن آخرَ يقصد **الشاشةَ نفسَها** من مرحلةٍ أخرى. وكانت
+   المِراسُ الثمانُ والسبعون كلُّها **بلا وجودٍ في وجهاتها**: المتصفحُ يبتلع
+   الجزءَ صامتًا فلا ينتقل ولا يُنبِّه. تُبَثُّ هنا مرةً واحدةً لكلِّ عنصرٍ
+   يقصد الشاشةَ الحالية — إصلاحٌ في العُدَّةِ لا في ثمانٍ وسبعين شاشة.
+   (السجلُّ ذكر أربعةَ روابطَ في دور ٣؛ والقياسُ الحيُّ أعطى ٧٨ عبرَ الأدوار.) */
+function emsNavLandingAnchors(array $items) {
+    $cur = basename((string) (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : ''));
+    $dir = basename(dirname((string) (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '')));
+    $out = array();
+    foreach ($items as $it) {
+        $route = isset($it['route']) ? (string) $it['route'] : '';
+        if (strpos($route, '#') === false) { continue; }
+        $parts = explode('#', $route, 2);
+        $frag  = trim($parts[1]);
+        /* مِرساةٌ غيرُ صالحةٍ كمعرِّفٍ لا تُبَثُّ — فمعرِّفٌ مشوَّهٌ أسوأُ من غيابه */
+        if ($frag === '' || !preg_match('~^[A-Za-z][A-Za-z0-9_\-]*$~', $frag)) { continue; }
+        $path = ltrim(preg_replace('~^(\.\./)+~', '', $parts[0]), '/');
+        if (basename($path) !== $cur) { continue; }
+        $pdir = basename(dirname($path));
+        if ($pdir !== '.' && $pdir !== '' && $pdir !== $dir) { continue; }
+        $out[$frag] = true;
+    }
+    if (!$out) { return 0; }
+    echo '<div class="ems-nav-landing" aria-hidden="true" style="height:0;overflow:hidden">';
+    foreach (array_keys($out) as $frag) {
+        echo '<span id="' . htmlspecialchars($frag, ENT_QUOTES, 'UTF-8') . '" style="scroll-margin-top:96px"></span>';
+    }
+    echo '</div>';
+    return count($out);
+}
+
 function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array(), $afterHome = '') {
     $items = getUnifiedNavItems($conn, $roleId);
     if (empty($items)) { return false; }
+    emsNavLandingAnchors($items);
 
     // NAV-09: للدور المولَّد (مجموعاتٌ مرحلية) وضعُ المراحل يلغي كرومَ الأبواب،
     // وما بقي بلا مرحلةٍ (ثوابتُ قديمة) يُطبع بأبوابه بعده.

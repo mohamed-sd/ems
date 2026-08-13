@@ -134,6 +134,14 @@ try {
                 'owner_unit_id' => $_POST['owner_unit_id'] ?? null,
                 'risk_owner_user_id' => $_POST['risk_owner_user_id'] ?? null,
             ), $uid, !empty($_POST['force_duplicate']));
+            // INJ-0577: وحدةٌ مالكةٌ خارجَ هيكلِ الكيان تُردُّ 422 صراحةً — لا
+            // «نجاحٌ بمالكٍ فارغ». والتكرارُ يبقى 200 بمرشَّحاتِه كما كان.
+            if (isset($r['error']) && $r['error'] === 'RSK-UNIT-422') {
+                http_response_code(422);
+                echo json_encode(array('ok' => false, 'code' => 'RSK-UNIT-422',
+                    'msg' => $r['hint']), JSON_UNESCAPED_UNICODE);
+                exit;
+            }
             $out = array('ok' => ($r['id'] > 0)) + $r;
             break;
 

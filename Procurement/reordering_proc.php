@@ -226,8 +226,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-container">
             <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الصنف</th><th>المخزن</th><th>Min</th><th>Max</th>
-                    <th>ROP</th><th>مخزون الأمان</th><th>الوضع</th>
+                    <th>الإجراءات</th><th>الصنف</th><th>المخزن</th><th title="Min">الحدّ الأدنى</th><th title="Max">الحدّ الأقصى</th>
+                    <th title="ROP — Re-Order Point">نقطة إعادة الطلب</th><th>مخزون الأمان</th><th>الوضع</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>

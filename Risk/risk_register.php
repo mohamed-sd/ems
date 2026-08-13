@@ -16,6 +16,16 @@ ems_shell_axes($__pp);
 $view = risk_current_view('risk_register');
 
 $units = risk_units_list($conn, $company_id);
+/* INJ-0577: وحداتُ هيكلِ الكيانِ لقائمةِ «الإدارة المالكة» — أسماءٌ عربيةٌ لا أرقام */
+$orgUnits = array();
+$__ou = $conn->prepare('SELECT unit_id, unit_code, name_ar FROM org_units
+                         WHERE company_id = ? AND COALESCE(active,1) = 1
+                         ORDER BY layer, unit_code');
+$__ou->bind_param('i', $company_id);
+$__ou->execute();
+$__our = $__ou->get_result();
+while ($__x = $__our->fetch_assoc()) { $orgUnits[] = $__x; }
+$__ou->close();
 $scopeSql = risk_scope_sql($RISK_FULL, $RISK_ORG_UNIT);
 
 $fUnit  = isset($_GET['ru']) ? intval($_GET['ru']) : 0;
@@ -199,7 +209,17 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <div class="col-md-4"><label>النطاق<select name="scope_type" class="form-control">
                     <option>إداري</option><option>مؤسسي</option><option>مشروعي</option><option>موقعي</option>
                 </select></label></div>
-                <div class="col-md-4"><label>الإدارة المالكة (وحدة الهيكل)<input name="owner_unit_id" type="number" class="form-control" placeholder="unit_id" aria-label="unit_id"></label></div>
+                <?php /* INJ-0577: كان رقمًا حرًّا يُحفظ عن ظهرِ قلب — صار قائمةَ
+                         وحداتِ هذا الكيانِ بأسمائها العربية، والخادمُ يرفض ما
+                         سواها بـ422 (لا يكفي ترشيحُ الواجهةِ وحدَه). */ ?>
+                <div class="col-md-4"><label>الإدارة المالكة (وحدة الهيكل)
+                    <select name="owner_unit_id" class="form-control" aria-label="الإدارة المالكة">
+                        <option value="">— بلا إدارةٍ مالكة —</option>
+                        <?php foreach ($orgUnits as $ou): ?>
+                        <option value="<?= (int) $ou['unit_id'] ?>"><?= htmlspecialchars($ou['name_ar']) ?><?php
+                            if ($ou['unit_code'] !== '') { echo ' · ' . htmlspecialchars($ou['unit_code']); } ?></option>
+                        <?php endforeach; ?>
+                    </select></label></div>
                 <div class="col-md-4"><label>السبب الجذري *<input name="root_cause" class="form-control" required></label></div>
                 <div class="col-md-12"><label>الوصف<textarea name="description" class="form-control"></textarea></label></div>
             </div>

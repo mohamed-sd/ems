@@ -46,7 +46,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1'
 if (!checkReportPermission($conn, $REPORT_CODE, $roleId)) {
     ?><!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">
     <title>غير مصرح</title>
-    <link rel="stylesheet" href="/ems/assets/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
     </head><body style="background:#f0f2f8;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Cairo,sans-serif;">
@@ -1283,7 +1283,7 @@ $exportQs = http_build_query(array_filter($_GET, function($v){ return $v !== '';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo rr($page_title); ?> — إيكوبيشن</title>
-<link rel="stylesheet" href="/ems/assets/css/bootstrap.rtl.min.css">
+<link rel="stylesheet" href="/ems/assets/css/bootstrap.min.css">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
