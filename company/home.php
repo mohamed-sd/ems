@@ -9,14 +9,8 @@ $isManager = ($role === '1');
 $planName = isset($_SESSION['plan_modules']['plan_name']) ? $_SESSION['plan_modules']['plan_name'] : 'غير محددة';
 $companyName = isset($user['company_name']) ? $user['company_name'] : '';
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الشركة | EMS</title>
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<?php require_once __DIR__ . '/../includes/public_shell.php';
+ems_public_head('بوابة الشركة | EMS'); ?>
     <style>
         :root { --ink:#102443; --ink2:#30527f; --gold:#d6a700; --line:rgba(16,36,67,.1); }
         *{box-sizing:border-box}

@@ -14,15 +14,8 @@ header("X-Frame-Options: SAMEORIGIN");
 header("X-XSS-Protection: 1; mode=block");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 header("Permissions-Policy: camera=(), microphone=(), geolocation=()");
-?><!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>منصة إنجاز | إدارة التعدين في السودان</title>
-<meta name="description" content="منصة إنجاز — نظام SaaS متخصص لإدارة شركات التعدين والمناجم والمعدات الثقيلة والعقود في السودان.">
-<meta name="robots" content="index, follow">
-<link rel="preconnect" href="/ems/assets/css/local-fonts.css">
+?><?php require_once __DIR__ . '/includes/public_shell.php';
+ems_public_head('منصة إنجاز | إدارة التعدين في السودان', array('icons' => false, 'extra' => "  <meta name=\"description\" content=\"منصة إنجاز — نظام SaaS متخصص لإدارة شركات التعدين والمناجم والمعدات الثقيلة والعقود في السودان.\">\n  <meta name=\"robots\" content=\"index, follow\">")); ?>
 <link rel="preconnect" href="/ems/assets/css/local-fonts.css" crossorigin>
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <style>

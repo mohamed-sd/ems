@@ -302,7 +302,7 @@ ob_start(); ?>>
             <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=export', ENT_QUOTES, 'UTF-8'); ?>" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
                 <i class="fas fa-file-export"></i> تصدير Excel
             </a>
-            <button type="button" class="btn" data-ems-excel-import="equipments" data-ems-excel-title="المعدات" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
+            <button type="button" class="btn eq-1" data-ems-excel-import="equipments" data-ems-excel-title="المعدات">
                 <i class="fas fa-file-import"></i> استيراد Excel
             </button>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
@@ -465,7 +465,7 @@ include __DIR__ . '/../includes/page_header.php';
                             }
                             ?>
                         </select>
-                        <small style="color:#777">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
+                        <small class="eq-2">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
                     </div>
                     <?php endif; ?>
 
@@ -834,7 +834,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
                 </div>
 
-                <div class="filters-summary" id="filtersSummary" style="display: none;">
+                <div class="filters-summary eq-3" id="filtersSummary">
                     <span class="summary-icon"><i class="fas fa-check-circle"></i></span>
                     <span class="summary-text"></span>
                 </div>
@@ -1057,14 +1057,14 @@ include __DIR__ . '/../includes/page_header.php';
                                                 // ── كرت المعدة: شارة الحالة + اعتماد ──
                                                 $card_state = isset($row['card_state']) ? $row['card_state'] : 'active';
                                                 if ($card_state === 'active') {
-                                                    echo "<span class='badge-available' title='كرت معتمد' style='margin-inline-start:4px'><i class='fas fa-id-card'></i> نشط</span>";
+                                                    echo "<span class='badge-available' title='كرت معتمد' data-ems-c='eq-4'><i class='fas fa-id-card'></i> نشط</span>";
                                                 } else {
-                                                    echo "<span class='badge-busy' title='كرت مسودة' style='margin-inline-start:4px'><i class='fas fa-id-card'></i> مسودة</span>";
+                                                    echo "<span class='badge-busy' title='كرت مسودة' data-ems-c='eq-4'><i class='fas fa-id-card'></i> مسودة</span>";
                                                     if ($can_edit) {
                                                         echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">"
                                                             . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
                                                             . "<input type='hidden' name='return' value='equipments.php'>"
-                                                            . "<button type='submit' class='action-btn' style='color:#1f9d55' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
+                                                            . "<button type='submit' class='action-btn' data-ems-c='eq-5' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
                                                             . "</form>";
                                                     }
                                                 }
@@ -1401,7 +1401,7 @@ include __DIR__ . '/../includes/page_header.php';
                 title: 'بيانات المعدة',
                 icon: 'fas fa-truck-monster',
                 sections: [{ title: 'تحميل البيانات', icon: 'fas fa-spinner',
-                    html: '<div style="padding:20px;text-align:center;color:var(--t2)"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>' }],
+                    html: '<div class="eq-6"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>' }],
                 actions: equipmentActions(equipmentId)
             });
 
@@ -1413,7 +1413,7 @@ include __DIR__ . '/../includes/page_header.php';
                 success: function(response) {
                     if (!response.success || !response.data) {
                         EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
-                            html: '<div style="padding:16px;text-align:center;color:#c0392b">تعذر تحميل البيانات</div>' });
+                            html: '<div class="eq-7">تعذر تحميل البيانات</div>' });
                         return;
                     }
                     EmsDetailsModal.open({
@@ -1425,7 +1425,7 @@ include __DIR__ . '/../includes/page_header.php';
                 },
                 error: function() {
                     EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
-                        html: '<div style="padding:16px;text-align:center;color:#c0392b">تعذر الاتصال بالخادم</div>' });
+                        html: '<div class="eq-7">تعذر الاتصال بالخادم</div>' });
                 }
             });
         });
@@ -1436,201 +1436,6 @@ include __DIR__ . '/../includes/page_header.php';
         // Toggle Form Functionality
     })();
 </script>
-
-<style>
-/* نظام الفلترة الاحترافي */
-.filters-container {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 22px;
-    box-shadow: var(--shadow-sm);
-}
-
-.filters-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--border);
-}
-
-.filters-header h6 {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.filters-header h6 i {
-    color: var(--gold);
-    font-size: 1.2rem;
-}
-
-.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 18px;
-    background: var(--red-soft);
-    color: var(--red);
-    border: 1.5px solid rgba(220,38,38,.18);
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all var(--ease);
-    font-family: 'Cairo', sans-serif;
-}
-
-.btn-secondary:hover {
-    background: var(--red);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 16px rgba(220,38,38,.35);
-}
-
-.btn-secondary {
-    animation: btnClearPulse 0.3s ease;
-}
-
-@keyframes btnClearPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-}
-
-.filters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-bottom: 12px;
-}
-
-.filter-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.filter-item label {
-    font-weight: 700;
-    color: var(--txt);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.88rem;
-}
-
-.filter-item label i {
-    color: var(--gold);
-}
-
-.filter-select {
-    padding: 11px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 0.92rem;
-    font-family: 'Cairo', sans-serif;
-    transition: all var(--ease);
-    background: var(--surface);
-    color: var(--txt);
-    cursor: pointer;
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px var(--gold-soft);
-}
-
-.filter-select:hover {
-    border-color: var(--navy);
-}
-
-.filters-summary {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    background: var(--blue-soft);
-    border: 1.5px solid rgba(37,99,235,.25);
-    border-radius: var(--radius);
-    margin-top: 16px;
-    animation: slideDown 0.3s ease;
-}
-
-.filters-summary .summary-icon {
-    flex-shrink: 0;
-    color: var(--blue);
-    font-size: 1.1rem;
-}
-
-.filters-summary .summary-text {
-    color: var(--blue);
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .filters-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filters-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .btn-secondary {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-#importExcelModal input[type="file"]:hover {
-    border-color: #94a3b8;
-    background: #f1f5f9;
-}
-
-#importExcelModal button[type="submit"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(22,163,74,0.35);
-}
-
-#importExcelModal button[type="button"]:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-}
-</style>
 
 </div> <!-- closing main div -->
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>

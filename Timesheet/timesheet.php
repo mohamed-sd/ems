@@ -227,6 +227,30 @@ if ($session_project_id <= 0) {
 
 // Handle POST submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
+  /* ── INJ-0378 · عطالةُ الإرسالِ من صندوقِ الميدان ──────────────────────────
+       الإدخالُ بلا شبكةٍ يُحفظ محليًّا ثم يُعاد إرسالُه عند عودتها. وقد يُعاد
+       أكثرَ من مرةٍ (شبكةٌ متذبذبةٌ · لسانانِ مفتوحان) — فالمفتاحُ الذي ولّده
+       العميلُ مرةً واحدةً يُختم هنا: أوّلُ وصولٍ يكتب، وما بعده يُعلَن «مُطبَّقٌ
+       سلفًا» ولا يكتب صفًّا ثانيًا. وغيابُ المفتاحِ لا يغيّر المسارَ العادي. */
+  $__tsIdemRaw = trim((string) ($_POST['ems_idem'] ?? ''));
+  $__tsIdemKey = '';
+  if ($__tsIdemRaw !== '') {
+    require_once __DIR__ . '/../includes/post_contract.php';
+    $__tsIdemKey = sha1('ts.entry.save|' . (int) ($_SESSION['user']['company_id'] ?? 0) . '|' . $__tsIdemRaw);
+    $__ck = $conn->prepare('SELECT result_ref FROM ems_post_idempotency WHERE idem_key = ? LIMIT 1');
+    if ($__ck) {
+      $__ck->bind_param('s', $__tsIdemKey);
+      $__ck->execute();
+      $__seen = $__ck->get_result()->fetch_assoc();
+      $__ck->close();
+      if ($__seen) {
+        $__tp = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
+        echo "<script>alert('↺ هذا الإدخالُ مُطبَّقٌ سلفًا — لم يُكتب مرتين');"
+           . "window.location.href='timesheet.php?type=" . $__tp . "';</script>";
+        exit;
+      }
+    }
+  }
   $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
   $posted_fault_items_json = isset($_POST['fault_items_json']) ? $_POST['fault_items_json'] : '[]';
 
@@ -537,20 +561,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           if (!empty($svc_res['blocked'])) {
             echo '<div style="max-width:760px;margin:40px auto;padding:20px;border:1px solid #fca5a5;'
                . 'border-radius:12px;background:#fef2f2;font-family:Tajawal,sans-serif;direction:rtl">';
-            echo '<h3 style="margin:0 0 6px;color:#b91c1c">لم يُسجَّل يومُ العمل — حاوياتُ الموقع لم تكتمل</h3>';
-            echo '<p style="margin:0 0 14px;color:#7f1d1d;line-height:1.9">'
-               . 'الوحدةُ لا تُسجَّل في موقعٍ لم تكتمل حاوياتُه. وهذا ما ينقص، ولكلٍّ موضعُ إصلاحه:</p><ul style="line-height:2.1">';
+            echo '<h3 data-ems-c="ts-1">لم يُسجَّل يومُ العمل — حاوياتُ الموقع لم تكتمل</h3>';
+            echo '<p data-ems-c="ts-2">'
+               . 'الوحدةُ لا تُسجَّل في موقعٍ لم تكتمل حاوياتُه. وهذا ما ينقص، ولكلٍّ موضعُ إصلاحه:</p><ul data-ems-c="ts-3">';
             foreach ($svc_res['blocked'] as $b) {
-              echo '<li style="margin-bottom:8px">'
+              echo '<li data-ems-c="ts-4">'
                  . '<strong>' . htmlspecialchars((string) $b['text'], ENT_QUOTES, 'UTF-8') . '</strong><br>'
                  . '<a href="' . htmlspecialchars((string) $b['href'], ENT_QUOTES, 'UTF-8') . '" '
                  . 'style="color:#1d4ed8;font-weight:700">'
                  . htmlspecialchars((string) $b['label'], ENT_QUOTES, 'UTF-8') . ' ↗</a></li>';
             }
-            echo '</ul><div style="margin-top:16px;display:flex;gap:10px">'
+            echo '</ul><div data-ems-c="ts-5">'
                . '<a href="javascript:history.back()" style="padding:8px 16px;background:#e5e7eb;'
                . 'border-radius:8px;color:#111;text-decoration:none">رجوعٌ للنموذج</a></div>';
-            echo '<p style="margin:14px 0 0;font-size:13px;color:#7f1d1d">'
+            echo '<p data-ems-c="ts-6">'
                . 'بياناتُ اليوم لم تُفقد — ارجع وأكمل بعد الإصلاح.</p></div>';
             exit;
           }
@@ -667,6 +691,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
       } catch (\Throwable $dwT) {
         error_log('unit dual-write mirror ts#' . $saved_timesheet_id . ': ' . $dwT->getMessage());
       }
+    }
+
+    /* INJ-0378: يُختم المفتاحُ **بعد** نجاحِ الحفظِ لا قبلَه — فختمٌ قبل الكتابةِ
+       يبتلع إدخالًا فشل ولا يُعاد. */
+    if ($__tsIdemKey !== '' && function_exists('ems_pc_idem_mark')) {
+      ems_pc_idem_mark($conn, $__tsIdemKey, 'ts.entry.save',
+        'timesheet#' . (int) (isset($saved_timesheet_id) ? $saved_timesheet_id : 0));
     }
 
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
@@ -807,74 +838,6 @@ try {
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
-<style>
-  /* Counter Input Group Styling */
-  .counter-input-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f8f9fa;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    width: 100%;
-    max-width: 400px;
-  }
-
-  .counter-field {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-
-  .counter-field input {
-    width: 100%;
-    padding: 8px 6px;
-    text-align: center;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #0c1c3e;
-    background: white;
-    transition: all 0.3s ease;
-  }
-
-  .counter-field input:focus {
-    outline: none;
-    border-color: var(--gold, #e8b800);
-    box-shadow: 0 0 0 3px rgba(232, 184, 0, 0.1);
-  }
-
-  .counter-field span {
-    font-size: 11px;
-    color: #6c757d;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .counter-separator {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--navy, #0c1c3e);
-    margin: 0 4px;
-    padding-bottom: 18px;
-  }
-
-  /* Remove spinner arrows for counter inputs */
-  .counter-field input[type="number"]::-webkit-inner-spin-button,
-  .counter-field input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .counter-field input[type="number"] {
-    -moz-appearance: textfield;
-  }
-</style>
-
 <div class="main timesheet-entry-page ems-unified-page-shell">
 
   <?php
@@ -894,7 +857,7 @@ try {
 
   <?php /* UI-16 (UXR-0063): شريحة المزامنة ظاهرة دائمًا في الشاشة الميدانية —
            تقرأ محور الاتصال من الغلاف الحاكم CM-00 وتتحدث مع online/offline. */ ?>
-  <div id="tsSyncChip" style="margin:0 2px 10px"></div>
+  <div id="tsSyncChip" class="ts-7"></div>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       if (window.EmsUI) { document.getElementById('tsSyncChip').appendChild(EmsUI.syncChip()); }
@@ -903,22 +866,22 @@ try {
 
   <?php if ($ts_day_total > 0): ?>
   <!-- UX-03 §5.1: عدّادُ اليوم — «بطاقةُ المعدة تتلوّن منجزةً وعدّادُ المتبقي ينقص» -->
-  <div class="card" style="margin-bottom:12px;">
-    <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;">
-      <span style="font-weight:700;font-size:15px;">
+  <div class="card ts-8">
+    <div class="card-body ts-9">
+      <span class="ts-10">
         <i class="fas fa-clipboard-check" style="color:<?php echo $ts_day_done >= $ts_day_total ? '#16a34a' : '#d97706'; ?>;"></i>
         تايم شيت اليوم: سُجّل <?php echo $ts_day_done; ?> من <?php echo $ts_day_total; ?> معدةً نشطة
         <?php if ($ts_day_done < $ts_day_total): ?>
-          — <span style="color:#d97706;">متبقٍ <?php echo $ts_day_total - $ts_day_done; ?></span>
+          — <span class="ts-11">متبقٍ <?php echo $ts_day_total - $ts_day_done; ?></span>
         <?php else: ?>
-          — <span style="color:#16a34a;">اكتمل اليوم ✓</span>
+          — <span class="ts-12">اكتمل اليوم ✓</span>
         <?php endif; ?>
       </span>
-      <div style="flex:1;min-width:140px;max-width:340px;background:#e5e7eb;border-radius:6px;height:10px;overflow:hidden;">
+      <div class="ts-13">
         <div style="width:<?php echo $ts_day_total > 0 ? round($ts_day_done * 100 / $ts_day_total) : 0; ?>%;height:100%;background:<?php echo $ts_day_done >= $ts_day_total ? '#16a34a' : '#f0b429'; ?>;"></div>
       </div>
       <?php if (!empty($ts_day_missing)): ?>
-        <span style="color:#6b7280;font-size:13px;">
+        <span class="ts-14">
           الغائبة: <?php echo htmlspecialchars(implode(' · ', $ts_day_missing)); ?><?php echo ($ts_day_total - $ts_day_done) > count($ts_day_missing) ? ' …' : ''; ?>
         </span>
       <?php endif; ?>
@@ -926,7 +889,11 @@ try {
   </div>
   <?php endif; ?>
 
-  <form id="projectForm" action="" method="post" class="allforms">
+  <?php /* INJ-0378: نموذجُ إدخالِ الورديةِ موسومٌ لصندوقِ الإرسالِ دونَ اتصال —
+           الميدانُ يعمل حيث لا شبكة: يُحفظ محليًّا، وتُعلَن «بانتظار المزامنة»،
+           وعند عودةِ الشبكةِ يُرسَل **مرةً واحدةً** بمفتاحِ عطالتِه. */ ?>
+  <form id="projectForm" action="" method="post" class="allforms"
+        data-ems-outbox="1" data-ems-outbox-label="إدخالُ ورديةٍ">
     <?php if ($_GET['type'] == "1") {
       // نوع المعدة كان حفار
       ?>
@@ -945,7 +912,7 @@ try {
               </select>
             </div>
             <div>
-              <label for="emsf_1502_07ad4">المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <label for="emsf_1502_07ad4">المرجع الميداني <span class="ts-15">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
               <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1502_07ad4">
             </div>
             <div>
@@ -1027,15 +994,14 @@ try {
                  `.form-grid > div { display:block !important }`، فتخسر أمامه
                  القيمةُ السطرية العادية وكذلك jQuery .hide()/.show(). ولهذا
                  يبدّل الجافاسكربت العرضَ بـsetProperty(...,'important'). -->
-            <div id="billing_qty_block" style="grid-column:1/-1; display:none !important; margin:16px 0 8px;
-                 border:2px solid #d4a017; border-radius:10px; padding:14px 16px; background:#fffdf5;">
-              <h3 style="text-align:right; color:#8a6d00; margin:0 0 10px; font-weight:700; font-size:1rem;">
+            <div id="billing_qty_block" class="ts-16">
+              <h3 class="ts-17">
                 <i class="fas fa-file-invoice-dollar"></i> الكمية المفوترة —
-                <span id="billing_unit_label" style="color:#b8860b;"></span>
+                <span id="billing_unit_label" class="ts-18"></span>
               </h3>
-              <div id="billing_qty_fields" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
-                <div id="billing_field_meter" style="display:none;">
-                  <label>عدد الأمتار المنفذة <span style="color:#c00;">*</span></label>
+              <div id="billing_qty_fields" class="ts-19">
+                <div id="billing_field_meter" class="ts-20">
+                  <label>عدد الأمتار المنفذة <span class="ts-21">*</span></label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1064,33 +1030,30 @@ try {
                  `.form-grid > div { display:block !important }`، فتخسر أمامه
                  القيمةُ السطرية العادية وكذلك jQuery .hide()/.show(). ولهذا
                  يبدّل الجافاسكربت العرضَ بـsetProperty(...,'important'). -->
-            <div id="billing_qty_block" style="grid-column:1/-1; display:none !important; margin:16px 0 8px;
-                 border:2px solid #d4a017; border-radius:10px; padding:14px 16px; background:#fffdf5;">
-              <h3 style="text-align:right; color:#8a6d00; margin:0 0 10px; font-weight:700; font-size:1rem;">
+            <div id="billing_qty_block" class="ts-16">
+              <h3 class="ts-17">
                 <i class="fas fa-file-invoice-dollar"></i> الكمية المفوترة —
-                <span id="billing_unit_label" style="color:#b8860b;"></span>
+                <span id="billing_unit_label" class="ts-18"></span>
               </h3>
-              <div id="billing_qty_fields" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
-                <div id="billing_field_meter" style="display:none;">
-                  <label>عدد الأمتار المنفذة <span style="color:#c00;">*</span></label>
+              <div id="billing_qty_fields" class="ts-19">
+                <div id="billing_field_meter" class="ts-20">
+                  <label>عدد الأمتار المنفذة <span class="ts-21">*</span></label>
                   <input type="number" step="0.01" min="0" name="meters_count" id="billing_meters_count" value="0">
                 </div>
-                <div id="billing_field_ton" style="display:none;">
-                  <label for="billing_tons_count">عدد الأطنان المنفذة <span style="color:#c00;">*</span></label>
+                <div id="billing_field_ton" class="ts-20">
+                  <label for="billing_tons_count">عدد الأطنان المنفذة <span class="ts-21">*</span></label>
                   <input type="number" step="0.01" min="0" name="tons_count" id="billing_tons_count" value="0">
                 </div>
               </div>
-              <p id="billing_hint" style="margin:10px 0 0; font-size:.86rem; color:#8a6d00;"></p>
+              <p id="billing_hint" class="ts-22"></p>
             </div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               ساعات العمل </h3>
 
             <div>
               <label for="executed_hours">الساعات المنفذة (محسوبة تلقائياً)</label>
-              <input type="number" name="executed_hours" id="executed_hours" value="0" readonly
-                style="background-color: #f0f0f0; cursor: not-allowed;">
+              <input type="number" name="executed_hours" id="executed_hours" value="0" readonly class="ts-24">
             </div>
             <div>
               <label for="bucket_hours">ساعات جردل</label>
@@ -1124,31 +1087,29 @@ try {
               <label for="emsf_1503_c406e">ملاحظات ساعات العمل</label>
               <textarea name="work_notes" id="emsf_1503_c406e"></textarea>
             </div>
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               ساعات الاعطال </h3>
 
             <!-- ⚠️ تنبيه مهم للمستخدم -->
-            <div
-              style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
-              <div style="display: flex; align-items: start; gap: 12px;">
-                <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
-                <div style="flex: 1;">
-                  <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى
+            <div class="ts-25">
+              <div class="ts-26">
+                <div class="ts-27">⚠️</div>
+                <div class="ts-28">
+                  <h4 class="ts-29">⚠️ تنبيه مهم - يرجى
                     القراءة</h4>
-                  <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                  <p class="ts-30">
                     <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
-                    <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
+                    <strong class="ts-31">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
                       تماماً:</strong>
                   </p>
-                  <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                  <ul class="ts-32">
                     <li><strong>عطل HR</strong></li>
                     <li><strong>عطل صيانة</strong></li>
                     <li><strong>عطل تسويق</strong></li>
                     <li><strong>عطل اعتماد</strong></li>
                     <li><strong>ساعات أعطال أخرى</strong></li>
                   </ul>
-                  <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                  <p class="ts-33">
                     ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
                   </p>
                 </div>
@@ -1245,45 +1206,38 @@ try {
               <input type="text" name="counter_diff" id="counter_diff_display" readonly>
               <input type="hidden" id="counter_diff" />
             </div>
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               الاعطال </h3>
 
             <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة) -->
-            <div
-              style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+            <div class="ts-35">
+              <div class="ts-36">
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_event_type">📋 نوع الحدث</label>
-                  <select id="fc_event_type"
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                  <label for="fc_event_type" class="ts-37">📋 نوع الحدث</label>
+                  <select id="fc_event_type" class="ts-38">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_main_cat">🔧 الفئة الرئيسية</label>
-                  <select id="fc_main_cat" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_main_cat" class="ts-37">🔧 الفئة الرئيسية</label>
+                  <select id="fc_main_cat" disabled class="ts-39">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_sub_cat">⚙️ الجزء / السبب</label>
-                  <select id="fc_sub_cat" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_sub_cat" class="ts-37">⚙️ الجزء / السبب</label>
+                  <select id="fc_sub_cat" disabled class="ts-39">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_detail">📝 تفصيل العطل</label>
-                  <select id="fc_detail" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_detail" class="ts-37">📝 تفصيل العطل</label>
+                  <select id="fc_detail" disabled class="ts-39">
                     <option value="">-- اختر التفصيل --</option>
                   </select>
                 </div>
               </div>
-              <div id="fc_code_display_add"
-                style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+              <div id="fc_code_display_add" class="ts-40">
                 <strong>كود العطل:</strong> <span id="fc_code_text_add"></span>
               </div>
             </div>
@@ -1295,31 +1249,29 @@ try {
             <input type="hidden" name="fault_details" id="fault_details" />
             <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-            <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
-                <button type="button" id="addFaultBtn"
-                  style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+
+            <div class="ts-41">
+              <div class="ts-42">
+                <strong class="ts-43">الأعطال المضافة لهذا التايم شيت</strong>
+                <button type="button" id="addFaultBtn" class="ts-44">+
                   إضافة العطل الحالي</button>
               </div>
-              <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
+              <div class="ts-45">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
                 اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
-              <div style="overflow:auto;">
-                <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+              <div class="ts-46">
+                <table class="ts-47">
                   <thead>
-                    <tr style="background:#f8f9fa;">
-                      <th style="padding:6px; border:1px solid #e9ecef;">كود المعدة</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                    <tr class="ts-48">
+                      <th class="ts-49">كود المعدة</th>
+                      <th class="ts-49">نوع الحدث</th>
+                      <th class="ts-49">الفئة</th>
+                      <th class="ts-49">الجزء</th>
+                      <th class="ts-49">التفصيل</th>
+                      <th class="ts-49">إجراء</th>
                     </tr>
                   </thead>
                   <tbody id="faultsSelectedBody">
                     <tr>
-                      <td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا
+                      <td colspan="6" class="ts-50">لا
                         توجد أعطال مضافة بعد</td>
                     </tr>
                   </tbody>
@@ -1327,13 +1279,12 @@ try {
               </div>
             </div>
 
-            <div style="grid-column: 1/-1;">
+            <div class="ts-51">
               <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               ساعات عمل المشغل </h3>
 
             <div>
@@ -1368,7 +1319,7 @@ try {
 
             <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-            <button type="submit" style="margin-top: 20px;">
+            <button type="submit" class="ts-52">
               <i class="fas fa-save"></i> حفظ الساعات
             </button>
 
@@ -1393,7 +1344,7 @@ try {
               </select>
             </div>
             <div>
-              <label for="emsf_1505_4eb0d">المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <label for="emsf_1505_4eb0d">المرجع الميداني <span class="ts-15">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
               <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1505_4eb0d">
             </div>
             <div>
@@ -1506,8 +1457,7 @@ try {
             <div></div>
             <div></div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               الساعات </h3>
             <div>
               <label>الساعات المنفذة</label>
@@ -1526,8 +1476,7 @@ try {
             <div></div>
             <div></div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               الساعات </h3>
             <div>
               <label>الساعات المنفذة</label>
@@ -1544,8 +1493,7 @@ try {
 
             <div>
               <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
-              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly
-                style="background-color: #f0f0f0; cursor: not-allowed;">
+              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly class="ts-24">
             </div>
             <div>
               <label for="standby_hours">ساعات الاستعداد (بسبب العميل)</label>
@@ -1565,8 +1513,7 @@ try {
             </div>
 
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               🚚 الأوزان والنقلات </h3>
             <div>
               <label for="transport_type">🔄 نوع النقل</label>
@@ -1587,31 +1534,29 @@ try {
 
 
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               ساعات الاعطال </h3>
 
             <!-- ⚠️ تنبيه مهم للمستخدم -->
-            <div
-              style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
-              <div style="display: flex; align-items: start; gap: 12px;">
-                <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
-                <div style="flex: 1;">
-                  <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى
+            <div class="ts-25">
+              <div class="ts-26">
+                <div class="ts-27">⚠️</div>
+                <div class="ts-28">
+                  <h4 class="ts-29">⚠️ تنبيه مهم - يرجى
                     القراءة</h4>
-                  <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                  <p class="ts-30">
                     <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
-                    <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
+                    <strong class="ts-31">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
                       تماماً:</strong>
                   </p>
-                  <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                  <ul class="ts-32">
                     <li><strong>عطل HR</strong></li>
                     <li><strong>عطل صيانة</strong></li>
                     <li><strong>عطل تسويق</strong></li>
                     <li><strong>عطل اعتماد</strong></li>
                     <li><strong>ساعات أعطال أخرى</strong></li>
                   </ul>
-                  <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                  <p class="ts-33">
                     ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
                   </p>
                 </div>
@@ -1694,51 +1639,44 @@ try {
             <div></div>
 
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               الاعطال </h3>
 
             <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم التعديل) -->
-            <div
-              style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+            <div class="ts-35">
+              <div class="ts-36">
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_event_type_edit">📋 نوع الحدث</label>
-                  <select id="fc_event_type_edit"
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                  <label for="fc_event_type_edit" class="ts-37">📋 نوع الحدث</label>
+                  <select id="fc_event_type_edit" class="ts-38">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_main_cat_edit">🔧 الفئة الرئيسية</label>
-                  <select id="fc_main_cat_edit" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_main_cat_edit" class="ts-37">🔧 الفئة الرئيسية</label>
+                  <select id="fc_main_cat_edit" disabled class="ts-39">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_sub_cat_edit">⚙️ الجزء / السبب</label>
-                  <select id="fc_sub_cat_edit" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_sub_cat_edit" class="ts-37">⚙️ الجزء / السبب</label>
+                  <select id="fc_sub_cat_edit" disabled class="ts-39">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
 
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_detail_edit">📝 تفصيل العطل</label>
-                  <select id="fc_detail_edit" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_detail_edit" class="ts-37">📝 تفصيل العطل</label>
+                  <select id="fc_detail_edit" disabled class="ts-39">
                     <option value="">-- اختر التفصيل --</option>
                   </select>
                 </div>
 
               </div>
 
-              <div id="fc_code_display_edit"
-                style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+              <div id="fc_code_display_edit" class="ts-40">
                 <strong>كود العطل:</strong> <span id="fc_code_text_edit"></span>
               </div>
             </div>
@@ -1750,31 +1688,29 @@ try {
             <input type="hidden" name="fault_details" id="fault_details" />
             <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-            <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
-                <button type="button" id="addFaultBtn"
-                  style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+
+            <div class="ts-41">
+              <div class="ts-42">
+                <strong class="ts-43">الأعطال المضافة لهذا التايم شيت</strong>
+                <button type="button" id="addFaultBtn" class="ts-44">+
                   إضافة العطل الحالي</button>
               </div>
-              <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
+              <div class="ts-45">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
                 اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
-              <div style="overflow:auto;">
-                <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+              <div class="ts-46">
+                <table class="ts-47">
                   <thead>
-                    <tr style="background:#f8f9fa;">
-                      <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                    <tr class="ts-48">
+                      <th class="ts-49">الكود</th>
+                      <th class="ts-49">نوع الحدث</th>
+                      <th class="ts-49">الفئة</th>
+                      <th class="ts-49">الجزء</th>
+                      <th class="ts-49">التفصيل</th>
+                      <th class="ts-49">إجراء</th>
                     </tr>
                   </thead>
                   <tbody id="faultsSelectedBody">
                     <tr>
-                      <td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا
+                      <td colspan="6" class="ts-50">لا
                         توجد أعطال مضافة بعد</td>
                     </tr>
                   </tbody>
@@ -1782,14 +1718,13 @@ try {
               </div>
             </div>
 
-            <div style="grid-column: 1/-1;">
+            <div class="ts-51">
               <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
 
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               ساعات عمل المشغل </h3>
 
 
@@ -1822,7 +1757,7 @@ try {
 
             <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-            <button type="submit" style="margin-top: 20px;">
+            <button type="submit" class="ts-52">
               <i class="fas fa-save"></i> حفظ الساعات
             </button>
 
@@ -1847,7 +1782,7 @@ try {
               </select>
             </div>
             <div>
-              <label for="emsf_1508_b0080">المرجع الميداني <span style="color:#888;font-size:.8em">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
+              <label for="emsf_1508_b0080">المرجع الميداني <span class="ts-15">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
               <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1508_b0080">
             </div>
             <div>
@@ -1921,8 +1856,7 @@ try {
               </div>
             </div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               ساعات العمل </h3>
 
             <div>
@@ -1947,8 +1881,7 @@ try {
               </div>
             </div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               ساعات العمل </h3>
 
             <div>
@@ -1966,8 +1899,7 @@ try {
             </div>
             <div>
               <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
-              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly
-                style="background-color: #f0f0f0; cursor: not-allowed;">
+              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly class="ts-24">
             </div>
             <div>
               <label for="standby_hours">ساعات الاستعداد (بسبب العميل)</label>
@@ -1985,8 +1917,7 @@ try {
               <label for="emsf_1509_43bac">ملاحظات ساعات العمل</label>
               <textarea name="work_notes" id="emsf_1509_43bac"></textarea>
             </div>
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               📏 الأمتار </h3>
             <div>
               <label for="meters_type">🔧 نوع الأمتار</label>
@@ -1999,8 +1930,7 @@ try {
             </div>
             <div>
               <label for="meters_count">📐 عدد الأمتار (محسوبة تلقائياً)</label>
-              <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly
-                style="background-color: #f0f0f0; cursor: not-allowed;">
+              <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly class="ts-24">
             </div>
             <div>
               <label for="drilling_holes_count">⛏️ عدد الحفر المخرمة</label>
@@ -2010,31 +1940,29 @@ try {
               <label for="drilling_depth">📊 أعماق الحفر (متر)</label>
               <input type="number" step="0.01" name="drilling_depth" id="drilling_depth" value="0" placeholder="0.00">
             </div>
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+            <h3 class="ts-23">
               ساعات الاعطال </h3>
 
             <!-- ⚠️ تنبيه مهم للمستخدم -->
-            <div
-              style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
-              <div style="display: flex; align-items: start; gap: 12px;">
-                <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
-                <div style="flex: 1;">
-                  <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى
+            <div class="ts-25">
+              <div class="ts-26">
+                <div class="ts-27">⚠️</div>
+                <div class="ts-28">
+                  <h4 class="ts-29">⚠️ تنبيه مهم - يرجى
                     القراءة</h4>
-                  <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                  <p class="ts-30">
                     <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
-                    <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
+                    <strong class="ts-31">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
                       تماماً:</strong>
                   </p>
-                  <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                  <ul class="ts-32">
                     <li><strong>عطل HR</strong></li>
                     <li><strong>عطل صيانة</strong></li>
                     <li><strong>عطل تسويق</strong></li>
                     <li><strong>عطل اعتماد</strong></li>
                     <li><strong>ساعات أعطال أخرى</strong></li>
                   </ul>
-                  <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                  <p class="ts-33">
                     ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
                   </p>
                 </div>
@@ -2131,45 +2059,38 @@ try {
               <input type="text" name="counter_diff" id="counter_diff_display" readonly>
               <input type="hidden" id="counter_diff" />
             </div>
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               الاعطال </h3>
 
             <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة 2) -->
-            <div
-              style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+            <div class="ts-35">
+              <div class="ts-36">
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_event_type_f3">📋 نوع الحدث</label>
-                  <select id="fc_event_type_f3"
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                  <label for="fc_event_type_f3" class="ts-37">📋 نوع الحدث</label>
+                  <select id="fc_event_type_f3" class="ts-38">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_main_cat_f3">🔧 الفئة الرئيسية</label>
-                  <select id="fc_main_cat_f3" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_main_cat_f3" class="ts-37">🔧 الفئة الرئيسية</label>
+                  <select id="fc_main_cat_f3" disabled class="ts-39">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_sub_cat_f3">⚙️ الجزء / السبب</label>
-                  <select id="fc_sub_cat_f3" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_sub_cat_f3" class="ts-37">⚙️ الجزء / السبب</label>
+                  <select id="fc_sub_cat_f3" disabled class="ts-39">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
                 <div>
-                  <label style="font-size:0.85rem; font-weight:600;" for="fc_detail_f3">📝 تفصيل العطل</label>
-                  <select id="fc_detail_f3" disabled
-                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                  <label for="fc_detail_f3" class="ts-37">📝 تفصيل العطل</label>
+                  <select id="fc_detail_f3" disabled class="ts-39">
                     <option value="">-- اختر التفصيل --</option>
                   </select>
                 </div>
               </div>
-              <div id="fc_code_display_f3"
-                style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+              <div id="fc_code_display_f3" class="ts-40">
                 <strong>كود العطل:</strong> <span id="fc_code_text_f3"></span>
               </div>
             </div>
@@ -2181,31 +2102,29 @@ try {
             <input type="hidden" name="fault_details" id="fault_details" />
             <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-            <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
-                <button type="button" id="addFaultBtn"
-                  style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+
+            <div class="ts-41">
+              <div class="ts-42">
+                <strong class="ts-43">الأعطال المضافة لهذا التايم شيت</strong>
+                <button type="button" id="addFaultBtn" class="ts-44">+
                   إضافة العطل الحالي</button>
               </div>
-              <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
+              <div class="ts-45">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
                 اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
-              <div style="overflow:auto;">
-                <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+              <div class="ts-46">
+                <table class="ts-47">
                   <thead>
-                    <tr style="background:#f8f9fa;">
-                      <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
-                      <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                    <tr class="ts-48">
+                      <th class="ts-49">الكود</th>
+                      <th class="ts-49">نوع الحدث</th>
+                      <th class="ts-49">الفئة</th>
+                      <th class="ts-49">الجزء</th>
+                      <th class="ts-49">التفصيل</th>
+                      <th class="ts-49">إجراء</th>
                     </tr>
                   </thead>
                   <tbody id="faultsSelectedBody">
                     <tr>
-                      <td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا
+                      <td colspan="6" class="ts-50">لا
                         توجد أعطال مضافة بعد</td>
                     </tr>
                   </tbody>
@@ -2213,13 +2132,12 @@ try {
               </div>
             </div>
 
-            <div style="grid-column: 1/-1;">
+            <div class="ts-51">
               <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
 
-            <h3
-              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+            <h3 class="ts-34">
               ساعات عمل المشغل </h3>
 
             <div>
@@ -2256,7 +2174,7 @@ try {
 
             <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-            <button type="submit" style="margin-top: 20px;">
+            <button type="submit" class="ts-52">
               <i class="fas fa-save"></i> حفظ الساعات
             </button>
 
@@ -2266,7 +2184,7 @@ try {
     <?php } ?>
   </form>
   <div class="card">
-    <div style="padding: 5px;background: var(--card-bg, #f8f9fa); border-bottom: 1px solid var(--border, #dee2e6);">
+    <div class="ts-53">
       <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
     </div>
     <div class="card-body table-container">
@@ -2335,29 +2253,29 @@ try {
             }
 
             $shiftBadge = $row['shift'] == "D"
-              ? "<span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span>"
-              : "<span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fas fa-moon'></i> مسائية</span>";
+              ? "<span data-ems-c='ts-54'><i class='fas fa-sun'></i> صباحية</span>"
+              : "<span data-ems-c='ts-55'><i class='fas fa-moon'></i> مسائية</span>";
 
             $id = intval($row['id']);
             echo "<tr>";
-            echo "<td><span style='font-weight: 600;'>" . $row_index . "</span></td>";
-            echo "<td><span style='font-weight: 700; color: #1f2937;'>" . $id . "</span></td>";
-            echo "<td><span style='font-weight: 600; color: #2980b9;'>" . htmlspecialchars($row['eq_code'], ENT_QUOTES, 'UTF-8') . " - " . htmlspecialchars($row['eq_name'], ENT_QUOTES, 'UTF-8') . "</span></td>";
+            echo "<td><span data-ems-c='ts-56'>" . $row_index . "</span></td>";
+            echo "<td><span data-ems-c='ts-57'>" . $id . "</span></td>";
+            echo "<td><span data-ems-c='ts-58'>" . htmlspecialchars($row['eq_code'], ENT_QUOTES, 'UTF-8') . " - " . htmlspecialchars($row['eq_name'], ENT_QUOTES, 'UTF-8') . "</span></td>";
             echo "<td>" . htmlspecialchars($row['date'], ENT_QUOTES, 'UTF-8') . "</td>";
             echo "<td>" . $shiftBadge . "</td>";
-            echo "<td><span style='background: #e8f5e9; font-weight: 600; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['executed_hours']) . "</span></td>";
-            echo "<td><span style='background: #e8f5e9; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['bucket_hours']) . "</span></td>";
-            echo "<td><span style='background: #e8f5e9; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['jackhammer_hours']) . "</span></td>";
-            echo "<td><span style='background: #e8f5e9; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['extra_hours']) . "</span></td>";
-            echo "<td><span style='background: #fff3e0; font-weight: 600; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['standby_hours']) . "</span></td>";
-            echo "<td><span style='background: #fff3e0; font-weight: 600; color: #d63031; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['total_fault_hours']) . "</span></td>";
-            echo "<td><span style='background: #e3f2fd; font-weight: 700; color: #2980b9; font-size: 1.05rem; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . $totalwork . "</span></td>";
-            echo "<td><span style='background: #ffebee; font-weight: 700; color: #c0392b; font-size: 1.05rem; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . $totalall . "</span></td>";
-            echo "<td><div style='text-align: center;'>" . $status . "</div></td>";
-            echo "<td><div style='white-space: nowrap; text-align: center;'>"
-              . "<a href='javascript:void(0)' class='editBtn' data-id='" . $id . "' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px;'><i class='fas fa-edit'></i></a>"
-              . "<a href='delete_timesheet.php?id=" . $id . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px;'><i class='fas fa-trash'></i></a>"
-              . "<a href='timesheet_details.php?id=" . $id . "' title='عرض التفاصيل' style='color: #8e44ad; font-size: 1.1rem; margin: 0 3px;'><i class='fas fa-eye'></i></a>"
+            echo "<td><span data-ems-c='ts-59'>" . floatval($row['executed_hours']) . "</span></td>";
+            echo "<td><span data-ems-c='ts-60'>" . floatval($row['bucket_hours']) . "</span></td>";
+            echo "<td><span data-ems-c='ts-60'>" . floatval($row['jackhammer_hours']) . "</span></td>";
+            echo "<td><span data-ems-c='ts-60'>" . floatval($row['extra_hours']) . "</span></td>";
+            echo "<td><span data-ems-c='ts-61'>" . floatval($row['standby_hours']) . "</span></td>";
+            echo "<td><span data-ems-c='ts-62'>" . floatval($row['total_fault_hours']) . "</span></td>";
+            echo "<td><span data-ems-c='ts-63'>" . $totalwork . "</span></td>";
+            echo "<td><span data-ems-c='ts-64'>" . $totalall . "</span></td>";
+            echo "<td><div data-ems-c='ts-65'>" . $status . "</div></td>";
+            echo "<td><div data-ems-c='ts-66'>"
+              . "<a href='javascript:void(0)' class='editBtn' data-id='" . $id . "' title='تعديل' data-ems-c='ts-67'><i class='fas fa-edit'></i></a>"
+              . "<a href='delete_timesheet.php?id=" . $id . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' data-ems-c='ts-68'><i class='fas fa-trash'></i></a>"
+              . "<a href='timesheet_details.php?id=" . $id . "' title='عرض التفاصيل' data-ems-c='ts-69'><i class='fas fa-eye'></i></a>"
               . "</div></td>";
             echo "</tr>";
 
@@ -2995,18 +2913,18 @@ try {
 
       body.empty();
       if (!faultItems.length) {
-        body.append('<tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>');
+        body.append('<tr><td colspan="6" class="ts-50">لا توجد أعطال مضافة بعد</td></tr>');
       } else {
         $.each(faultItems, function (i, item) {
           var rowHtml = '' +
             '<tr>' +
-            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.full_code || '') + '</td>' +
-            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.event_type_name || '') + '</td>' +
-            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.main_category_name || '') + '</td>' +
-            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.sub_category || '') + '</td>' +
-            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.failure_detail || '') + '</td>' +
-            '<td style="padding:6px; border:1px solid #e9ecef; text-align:center;">' +
-            '<button type="button" class="removeFaultBtn" data-index="' + i + '" style="padding:4px 8px; border-radius:4px; border:1px solid #dc3545; background:#fff; color:#dc3545;">حذف</button>' +
+            '<td class="ts-49">' + (item.full_code || '') + '</td>' +
+            '<td class="ts-49">' + (item.event_type_name || '') + '</td>' +
+            '<td class="ts-49">' + (item.main_category_name || '') + '</td>' +
+            '<td class="ts-49">' + (item.sub_category || '') + '</td>' +
+            '<td class="ts-49">' + (item.failure_detail || '') + '</td>' +
+            '<td class="ts-70">' +
+            '<button type="button" class="removeFaultBtn ts-71" data-index="' + i + '">حذف</button>' +
             '</td>' +
             '</tr>';
           body.append(rowHtml);
@@ -3318,18 +3236,6 @@ try {
      الشاشة) فلا ينكسر قارئٌ واحد؛ والخادمُ يعيد الاشتقاقَ بنفسه ولا يثق
      بهذا الحساب — هذه نسخةُ العرض فقط.
      ═══════════════════════════════════════════════════════════════════ -->
-<style>
-  #tsLinesBox { border: 2px solid #f0b429; border-radius: 10px; margin: 14px 0; background: #fffdf5; }
-  #tsLinesBox .tsl-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #f3e8c8;
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  #tsLinesBox table { width: 100%; border-collapse: collapse; }
-  #tsLinesBox th, #tsLinesBox td { padding: 6px 8px; text-align: right; border-bottom: 1px solid #f3ead1; }
-  #tsLinesBox input, #tsLinesBox select { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; }
-  #tsLinesBox .tsl-sum { padding: 8px 14px; color: #374151; font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
-  .tsl-state-actual  { border-right: 4px solid #16a34a !important; }
-  .tsl-state-standby { border-right: 4px solid #2563eb !important; }
-  .tsl-state-stop    { border-right: 4px solid #6b7280 !important; }
-</style>
 <script>
 (function () {
   'use strict';
@@ -3401,13 +3307,13 @@ try {
       var undistributed = Math.round((shiftVal - sum) * 100) / 100;
       sumEl.innerHTML = '<span>الوردية: <b>' + shiftVal.toFixed(2) + '</b> س</span>'
         + '<span>مجموعُ السطور: <b>' + sum.toFixed(2) + '</b></span>'
-        + '<span style="color:#16a34a;">فعلي: <b>' + col.executed_hours.toFixed(2) + '</b></span>'
-        + '<span style="color:#2563eb;">استعداد: <b>' + (col.standby_hours + col.dependence_hours).toFixed(2) + '</b></span>'
-        + '<span style="color:#6b7280;">توقف: <b>' + faults.toFixed(2) + '</b></span>'
+        + '<span class="ts-12">فعلي: <b>' + col.executed_hours.toFixed(2) + '</b></span>'
+        + '<span class="ts-72">استعداد: <b>' + (col.standby_hours + col.dependence_hours).toFixed(2) + '</b></span>'
+        + '<span class="ts-73">توقف: <b>' + faults.toFixed(2) + '</b></span>'
         + (undistributed > 0
-            ? '<span style="color:#d97706;">غيرُ موزَّع: <b>' + undistributed.toFixed(2) + '</b></span>'
+            ? '<span class="ts-11">غيرُ موزَّع: <b>' + undistributed.toFixed(2) + '</b></span>'
             : (undistributed < 0
-                ? '<span style="color:#dc2626;">تجاوزَ الوردية بـ<b>' + Math.abs(undistributed).toFixed(2) + '</b></span>'
+                ? '<span class="ts-74">تجاوزَ الوردية بـ<b>' + Math.abs(undistributed).toFixed(2) + '</b></span>'
                 : ''));
     }
   }
@@ -3421,15 +3327,15 @@ try {
       var stDef = STATES.filter(function (s) { return s.v === l.ops_state; })[0] || STATES[0];
       tr.className = 'tsl-state-' + stDef.cls;
       tr.innerHTML =
-        '<td style="width:110px;"><input type="number" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
-        + '<td style="width:190px;"><select data-i="' + i + '" data-k="ops_state">'
+        '<td class="ts-75"><input type="number" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
+        + '<td class="ts-76"><select data-i="' + i + '" data-k="ops_state">'
         + STATES.map(function (s) { return '<option value="' + s.v + '"' + (s.v === l.ops_state ? ' selected' : '') + '>' + s.t + '</option>'; }).join('')
         + '</select></td>'
-        + '<td style="width:130px;"><select data-i="' + i + '" data-k="resp_party">'
+        + '<td class="ts-77"><select data-i="' + i + '" data-k="resp_party">'
         + RESPS.map(function (r) { return '<option value="' + r.v + '"' + (r.v === l.resp_party ? ' selected' : '') + '>' + r.t + '</option>'; }).join('')
         + '</select></td>'
         + '<td><input type="text" maxlength="190" placeholder="المرجع/السبب (WO-5511…)" value="' + (l.cause_note || '') + '" data-i="' + i + '" data-k="cause_note" aria-label="المرجع/السبب (WO-5511…)"></td>'
-        + '<td style="width:44px;text-align:center;"><a href="#" data-del="' + i + '" style="color:#dc2626;"><i class="fas fa-trash"></i></a></td>';
+        + '<td class="ts-78"><a href="#" data-del="' + i + '" class="ts-74"><i class="fas fa-trash"></i></a></td>';
       tb.appendChild(tr);
     });
     recompute();
@@ -3443,15 +3349,15 @@ try {
     var box = document.createElement('div');
     box.id = 'tsLinesBox';
     box.innerHTML =
-      '<div class="tsl-head"><i class="fas fa-stream" style="color:#b8860b;"></i> توزيعُ زمن الوردية سطورًا '
-      + '<span style="font-weight:400;color:#6b7280;font-size:13px;">(كلُّ سطرٍ: ساعات · حالة · مسؤول · مرجع — والخاناتُ القديمة تُملأ تلقائيًّا)</span>'
-      + '<button type="button" id="tslAdd" class="btn-primary" style="margin-inline-start:auto;padding:6px 14px;"><i class="fas fa-plus"></i> سطر زمن</button></div>'
+      '<div class="tsl-head"><i class="fas fa-stream ts-18"></i> توزيعُ زمن الوردية سطورًا '
+      + '<span class="ts-79">(كلُّ سطرٍ: ساعات · حالة · مسؤول · مرجع — والخاناتُ القديمة تُملأ تلقائيًّا)</span>'
+      + '<button type="button" id="tslAdd" class="btn-primary ts-80"><i class="fas fa-plus"></i> سطر زمن</button></div>'
       // ق-4 «الكاتبُ يقترح والمشرفُ يعتمد»: هذا العمودُ **اقتراحٌ** مشتقٌّ من
       // حالة الساعة، والقرارُ في «لوحة الإسناد اليومي» حيث يُسنَد كلُّ توقفٍ إلى
       // بندِ التزامٍ من مصفوفة العقد ومنه تُشتق الأحكامُ الثلاثة (CON-02 §5).
       + '<table><thead><tr><th>ساعات التشغيل</th><th>الحالة</th><th>المسؤول <small>(مقترح)</small></th><th>المرجع/السبب</th><th></th></tr></thead>'
       + '<tbody id="tslBody"></tbody></table>'
-      + '<div class="tsl-sum" id="tslSum"><span style="color:#9ca3af;">لا سطورَ بعد — الإدخالُ القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
+      + '<div class="tsl-sum" id="tslSum"><span class="ts-81">لا سطورَ بعد — الإدخالُ القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
     grid.parentElement.insertBefore(box, grid);
 
     box.addEventListener('click', function (e) {

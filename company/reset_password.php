@@ -11,13 +11,8 @@ if (company_is_logged_in()) {
 
 $error = 'تم إلغاء إعادة تعيين كلمة المرور عبر الروابط. لاستعادة الوصول، يرجى التواصل مباشرة مع إدارة الشركة عبر البريد الإلكتروني أو رقم الهاتف المعتمد.';
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إعادة تعيين كلمة المرور | EMS Company</title>
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<?php require_once __DIR__ . '/../includes/public_shell.php';
+ems_public_head('إعادة تعيين كلمة المرور | EMS Company', array('icons' => false)); ?>
     <style>
         body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; background:linear-gradient(135deg,#edf2f8,#f7f2e8); font-family:'Cairo',sans-serif; color:#102443; }
         .card { width:100%; max-width:520px; background:#fff; border-radius:22px; padding:30px; box-shadow:0 22px 56px rgba(16,36,67,0.14); }

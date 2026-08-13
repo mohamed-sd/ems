@@ -109,14 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $csrf = generate_csrf_token();
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>طلب اشتراك جديد | EMS</title>
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<?php require_once __DIR__ . '/../includes/public_shell.php';
+ems_public_head('طلب اشتراك جديد | EMS'); ?>
     <style>
         :root {
             --ink: #102443;

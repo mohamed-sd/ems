@@ -243,13 +243,8 @@ if ($qList) {
 
 $csrf = generate_csrf_token();
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة فريق الشركة | EMS</title>
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<?php require_once __DIR__ . '/../includes/public_shell.php';
+ems_public_head('إدارة فريق الشركة | EMS', array('icons' => false)); ?>
     <style>
         :root { --ink:#102443; --ink2:#30527f; --line:rgba(16,36,67,.1); --ok:#0f8a5f; --danger:#c0392b; }
         *{box-sizing:border-box}

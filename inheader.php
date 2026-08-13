@@ -62,6 +62,22 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/ems-alerts.css<?php echo ems_css_ver('ems-alerts.css'); ?>">
     <!-- قشرة التطبيق الموحدة (UXR-01 · AS-01..08) — تُحمَّل بعد الهوية فتحكم القياسات -->
     <link rel="stylesheet" href="/ems/assets/css/ems-shell.css<?php echo ems_css_ver('ems-shell.css'); ?>">
+    <!-- INJ-0442: أنماطُ الشاشاتِ الخاصةُ — تُحمَّل **آخرًا** كما كانت كتلُها
+         داخلَ الصفحة، فالنقلُ لا يغيّر مَن يغلب مَن. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-screens.css<?php echo ems_css_ver('ems-screens.css'); ?>">
+    <!-- INJ-0378 · INJ-0548: صندوقُ الإرسالِ دونَ اتصالٍ وعاملُ الخدمة —
+         الطابورُ يعمل على النماذجِ الموسومةِ صراحةً وحدَها، والعاملُ يخزّن
+         الأصولَ الساكنةَ لا صفحاتِ PHP (صفحةٌ محفوظةٌ ببياناتٍ قديمةٍ أخطرُ
+         من غيابها). -->
+    <script src="/ems/assets/js/ems-outbox.js<?php $__objs=__DIR__.'/assets/js/ems-outbox.js'; echo is_file($__objs)?('?v='.filemtime($__objs)):''; ?>" defer></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/ems/sw.js', { scope: '/ems/' })
+                .catch(function () { /* بلا عاملِ خدمةٍ يبقى النظامُ عاملًا — تحسينٌ لا شرط */ });
+        });
+    }
+    </script>
     <!-- نظام الرسائل الموحّد — بلا defer عمدًا: 50 رسالةً يطبعها الخادمُ داخل
          <script>alert(…)</script> في متن الصفحة، ولو تأخّر التقاطُ alert()
          لسبقتنا وخرجت بنافذة المتصفح الحاجزة. التوستُ يُصفُّ حتى يجهز body. -->

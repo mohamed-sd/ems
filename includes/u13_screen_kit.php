@@ -280,17 +280,7 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
         </form>
         <?php endforeach; ?>
     </div></div>
-    <style>
-    .u13-act{margin-bottom:10px}
-    .u13-act-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;
-      padding:10px 12px;border:1px solid var(--ems-border,#e3e5e8);border-radius:10px}
-    .u13-act-title{min-width:230px;flex:1}
-    .u13-act-field{display:flex;flex-direction:column;gap:4px;min-width:170px}
-    .u13-act-field label{font-size:.82em;opacity:.75}
-    .u13-act-field input{padding:6px 10px;border:1px solid var(--ems-border,#d8dbe0);
-      border-radius:7px;font-family:inherit}
-    </style>
-    <?php endif; ?>
+<?php endif; ?>
 
     <?php if (!empty($U13['intro'])): ?>
     <div class="card"><div class="card-body" style="padding:12px 16px">
@@ -364,12 +354,6 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
     </div></div>
 </div>
 
-<style>
-.u13-views{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.u13-views .btn-secondary{border:1px solid var(--ems-border,#d8dbe0);background:transparent;border-radius:8px;
-  padding:6px 14px;cursor:pointer;font-size:.9em;font-family:inherit;color:inherit}
-.u13-views .btn-secondary.is-active{background:var(--ems-primary,#f5c518);border-color:transparent;font-weight:600;color:#111}
-</style>
 <script>
 (function () {
     /* CM-09/CM-10: المنظرُ يُخفي أعمدةَ غيرِه — و«إظهار كل الأعمدة» يعيدها.

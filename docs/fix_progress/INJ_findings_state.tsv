@@ -144,7 +144,7 @@ INJ-0142	P2	نعم	غيرُ مقيس
 INJ-0143	P2	نعم	غيرُ مقيس	
 INJ-0144	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0145	P2	لا	غيرُ مقيس	
-INJ-0146	P2	لا	غيرُ مقيس	
+INJ-0146	P2	لا	مُغلقٌ بشاهد	tests/contracts_tables_test.php
 INJ-0147	P2	لا	غيرُ مقيس	
 INJ-0148	P2	لا	غيرُ مقيس	
 INJ-0149	P2	نعم	مُغلقٌ بشاهد	tests/regression_exit_contract_test.php
@@ -156,7 +156,7 @@ INJ-0154	P2	لا	غيرُ مقيس
 INJ-0155	P2	نعم	غيرُ مقيس	
 INJ-0156	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0157	P2	لا	غيرُ مقيس	
-INJ-0158	P2	لا	غيرُ مقيس	
+INJ-0158	P2	لا	مُغلقٌ بشاهد	tests/supplier_kpi_cards_test.php
 INJ-0159	P2	نعم	غيرُ مقيس	
 INJ-0160	P2	نعم	غيرُ مقيس	
 INJ-0161	P2	نعم	غيرُ مقيس	
@@ -234,9 +234,9 @@ INJ-0232	P2	لا	غيرُ مقيس
 INJ-0233	P2	نعم	غيرُ مقيس	
 INJ-0234	P2	لا	غيرُ مقيس	
 INJ-0235	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0236	P2	لا	غيرُ مقيس	
-INJ-0237	P2	لا	غيرُ مقيس	
-INJ-0238	P2	لا	غيرُ مقيس	
+INJ-0236	P2	لا	مُغلقٌ بشاهد	tests/shell_entries_test.php
+INJ-0237	P2	لا	مُغلقٌ بشاهد	tests/inline_styles_test.php
+INJ-0238	P2	لا	مُغلقٌ بشاهد	tests/empty_state_adoption_test.php
 INJ-0239	P2	نعم	مُغلقٌ بشاهد	tests/guard_adoption_ratchet_test.php
 INJ-0240	P2	نعم	غيرُ مقيس	
 INJ-0241	P2	نعم	مُغلقٌ بشاهد	tools/fix_m10_gate_tests.php
@@ -339,7 +339,7 @@ INJ-0337	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · to
 INJ-0338	P2	لا	غيرُ مقيس	
 INJ-0339	P2	لا	غيرُ مقيس	
 INJ-0340	P2	لا	غيرُ مقيس	
-INJ-0341	P2	لا	غيرُ مقيس	
+INJ-0341	P2	لا	مُغلقٌ بشاهد	tests/rfq_lowest_badge_test.php
 INJ-0342	P2	نعم	غيرُ مقيس	
 INJ-0343	P2	نعم	غيرُ مقيس	
 INJ-0344	P2	نعم	غيرُ مقيس	
@@ -376,7 +376,7 @@ INJ-0374	P2	نعم	غيرُ مقيس
 INJ-0375	P2	نعم	غيرُ مقيس	
 INJ-0376	P2	نعم	غيرُ مقيس	
 INJ-0377	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0378	P2	لا	غيرُ مقيس	
+INJ-0378	P2	لا	مُغلقٌ بشاهد	tests/offline_outbox_test.php
 INJ-0379	P2	نعم	غيرُ مقيس	
 INJ-0380	P2	نعم	غيرُ مقيس	
 INJ-0381	P2	نعم	غيرُ مقيس	
@@ -430,7 +430,7 @@ INJ-0428	P3	لا	غيرُ مقيس
 INJ-0429	P3	لا	غيرُ مقيس	
 INJ-0430	P3	لا	غيرُ مقيس	
 INJ-0431	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0432	P3	لا	غيرُ مقيس	
+INJ-0432	P3	لا	مُغلقٌ بشاهد	tests/empty_state_adoption_test.php
 INJ-0433	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0434	P3	لا	غيرُ مقيس	
 INJ-0435	P3	لا	غيرُ مقيس	
@@ -439,8 +439,8 @@ INJ-0437	P3	لا	غيرُ مقيس
 INJ-0438	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0439	P3	لا	غيرُ مقيس	
 INJ-0440	P3	لا	غيرُ مقيس	
-INJ-0441	P3	لا	غيرُ مقيس	
-INJ-0442	P3	لا	غيرُ مقيس	
+INJ-0441	P3	لا	مُغلقٌ بشاهد	tests/contracts_layout_test.php
+INJ-0442	P3	لا	مُغلقٌ بشاهد	tests/inline_styles_test.php
 INJ-0443	P3	لا	مُغلقٌ بشاهد	tools/fix_od19_probe.php
 INJ-0444	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0445	P3	لا	غيرُ مقيس	
@@ -457,7 +457,7 @@ INJ-0455	P3	لا	غيرُ مقيس
 INJ-0456	P3	لا	غيرُ مقيس	
 INJ-0457	P3	لا	غيرُ مقيس	
 INJ-0458	P3	لا	غيرُ مقيس	
-INJ-0459	P3	لا	غيرُ مقيس	
+INJ-0459	P3	لا	مُغلقٌ بشاهد	tests/nav_landing_anchor_test.php
 INJ-0460	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0461	P3	لا	غيرُ مقيس	
 INJ-0462	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
@@ -489,17 +489,17 @@ INJ-0487	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0488	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0489	P3	لا	غيرُ مقيس	
 INJ-0490	P3	لا	غيرُ مقيس	
-INJ-0491	P3	لا	غيرُ مقيس	
-INJ-0492	P3	نعم	غيرُ مقيس	
-INJ-0493	P3	لا	غيرُ مقيس	
+INJ-0491	P3	لا	مُغلقٌ بشاهد	tests/nav_doors_integrity_test.php
+INJ-0492	P3	نعم	مُغلقٌ بشاهد	tests/url_message_spoof_test.php
+INJ-0493	P3	لا	مُغلقٌ بشاهد	tests/wide_table_views_test.php
 INJ-0494	P3	نعم	مُغلقٌ بشاهد	tools/screen_registry_gate.php
 INJ-0495	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0496	P3	لا	غيرُ مقيس	
-INJ-0497	P3	لا	غيرُ مقيس	
-INJ-0498	P3	لا	غيرُ مقيس	
-INJ-0499	P3	لا	غيرُ مقيس	
-INJ-0500	P3	لا	غيرُ مقيس	
-INJ-0501	P3	لا	غيرُ مقيس	
+INJ-0496	P3	لا	مُغلقٌ بشاهد	tests/shell_color_tokens_test.php
+INJ-0497	P3	لا	مُغلقٌ بشاهد	tests/filter_bar_period_test.php
+INJ-0498	P3	لا	مُغلقٌ بشاهد	tests/ui_consistency_scan_test.php
+INJ-0499	P3	لا	مُغلقٌ بشاهد	tests/template_layers_test.php
+INJ-0500	P3	لا	مُغلقٌ بشاهد	tests/deny_page_component_test.php
+INJ-0501	P3	لا	مُغلقٌ بشاهد	tests/inline_styles_test.php
 INJ-0502	P3	نعم	مُغلقٌ بشاهد	tools/fix_u13_nav_tests.php
 INJ-0503	P3	نعم	غيرُ مقيس	
 INJ-0504	P3	نعم	غيرُ مقيس	
@@ -515,8 +515,8 @@ INJ-0513	P3	لا	غيرُ مقيس
 INJ-0514	P3	لا	غيرُ مقيس	
 INJ-0515	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0516	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
-INJ-0517	P3	لا	غيرُ مقيس	
-INJ-0518	P3	لا	غيرُ مقيس	
+INJ-0517	P3	لا	مُغلقٌ بشاهد	tests/nav_stage_label_test.php
+INJ-0518	P3	لا	مُغلقٌ بشاهد	tests/report_button_placement_test.php
 INJ-0519	P3	نعم	غيرُ مقيس	
 INJ-0520	P3	نعم	غيرُ مقيس	
 INJ-0521	P3	لا	غيرُ مقيس	
@@ -541,12 +541,12 @@ INJ-0539	P3	لا	غيرُ مقيس
 INJ-0540	P3	لا	غيرُ مقيس	
 INJ-0541	P3	لا	غيرُ مقيس	
 INJ-0542	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0543	P3	لا	غيرُ مقيس	
+INJ-0543	P3	لا	مُغلقٌ بشاهد	tests/filter_bar_period_test.php
 INJ-0544	P3	لا	مُغلقٌ بشاهد	tools/fix_od19_probe.php
 INJ-0545	P3	لا	غيرُ مقيس	
 INJ-0546	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0547	P3	لا	غيرُ مقيس	
-INJ-0548	P3	لا	غيرُ مقيس	
+INJ-0547	P3	لا	مُغلقٌ بشاهد	tests/shell_axes_measured_test.php
+INJ-0548	P3	لا	مُغلقٌ بشاهد	tests/offline_outbox_test.php
 INJ-0549	P3	نعم	غيرُ مقيس	
 INJ-0550	P3	لا	غيرُ مقيس	
 INJ-0551	P3	لا	غيرُ مقيس	
@@ -554,28 +554,28 @@ INJ-0552	P3	لا	غيرُ مقيس
 INJ-0553	P3	لا	غيرُ مقيس	
 INJ-0554	P3	لا	غيرُ مقيس	
 INJ-0555	P3	لا	غيرُ مقيس	
-INJ-0556	P3	لا	غيرُ مقيس	
+INJ-0556	P3	لا	مُغلقٌ بشاهد	tests/filter_bar_period_test.php
 INJ-0557	P3	لا	غيرُ مقيس	
 INJ-0558	P3	نعم	غيرُ مقيس	
 INJ-0559	P3	لا	غيرُ مقيس	
 INJ-0560	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
-INJ-0561	P3	لا	غيرُ مقيس	
+INJ-0561	P3	لا	مُغلقٌ بشاهد	tests/filter_bar_period_test.php
 INJ-0562	P3	لا	غيرُ مقيس	
 INJ-0563	P3	لا	غيرُ مقيس	
-INJ-0564	P3	لا	غيرُ مقيس	
+INJ-0564	P3	لا	مُغلقٌ بشاهد	tests/filter_bar_period_test.php
 INJ-0565	P3	نعم	غيرُ مقيس	
 INJ-0566	P3	لا	غيرُ مقيس	
 INJ-0567	P3	لا	غيرُ مقيس	
 INJ-0568	P3	لا	غيرُ مقيس	
 INJ-0569	P3	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
-INJ-0570	P3	لا	غيرُ مقيس	
-INJ-0571	P3	لا	غيرُ مقيس	
-INJ-0572	P3	لا	غيرُ مقيس	
+INJ-0570	P3	لا	مُغلقٌ بشاهد	tests/nav_stage_label_test.php
+INJ-0571	P3	لا	مُغلقٌ بشاهد	tests/inline_styles_test.php
+INJ-0572	P3	لا	مُغلقٌ بشاهد	tests/shell_axes_measured_test.php
 INJ-0573	P3	نعم	غيرُ مقيس	
 INJ-0574	P3	لا	غيرُ مقيس	
 INJ-0575	P3	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
-INJ-0576	P3	لا	غيرُ مقيس	
-INJ-0577	P3	لا	غيرُ مقيس	
+INJ-0576	P3	لا	مُغلقٌ بشاهد	tests/risk_treatment_evidence_test.php
+INJ-0577	P3	لا	مُغلقٌ بشاهد	tests/risk_owner_unit_test.php
 INJ-0578	P3	لا	غيرُ مقيس	
 INJ-0579	P3	لا	غيرُ مقيس	
 INJ-0580	P3	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
@@ -591,6 +591,6 @@ INJ-0589	P3	نعم	مُغلقٌ بشاهد	tools/fix_od19_probe.php
 INJ-0590	P3	لا	غيرُ مقيس	
 INJ-0591	P4	لا	غيرُ مقيس	
 INJ-0592	P4	لا	غيرُ مقيس	
-INJ-0593	P4	لا	غيرُ مقيس	
+INJ-0593	P4	لا	مُغلقٌ بشاهد	tests/ui_consistency_scan_test.php
 INJ-0594	P4	لا	غيرُ مقيس	
 INJ-0595	P4	لا	غيرُ مقيس	

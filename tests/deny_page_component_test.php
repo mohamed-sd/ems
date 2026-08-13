@@ -43,7 +43,12 @@ foreach (array('includes', 'app') as $dir) {
         FilesystemIterator::SKIP_DOTS));
     foreach ($it as $p) {
         $path = $p->getPathname();
-        if (substr($path, -4) !== '.php' || strpos($path, 'deny_page.php') !== false) { continue; }
+        /* ◆ مداخلُ القشرةِ المعتمدةُ تُصدر المستندَ **بحكمِها** (INJ-0236): صفحةُ
+             الحجبِ ومدخلُ ما قبلَ الدخول. المقصودُ هنا صفحةُ حجبٍ **مبنيةٌ بيدٍ**
+             خارجَ المكوّن، لا كلُّ مُصدِرِ مستند. */
+        if (substr($path, -4) !== '.php'
+            || strpos($path, 'deny_page.php') !== false
+            || strpos($path, 'public_shell.php') !== false) { continue; }
         $src = (string) @file_get_contents($path);
         if (stripos($src, '<!DOCTYPE') !== false) {
             $hand[] = str_replace($ROOT . DIRECTORY_SEPARATOR, '', $path);

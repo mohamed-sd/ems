@@ -567,7 +567,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display nowrap alltables suppliers-table-nowrap" style="width:100%;">
+                <table id="projectsTable" class="display nowrap alltables suppliers-table-nowrap sup-1">
                     <thead>
                         <tr>
                             <th> الإجراءات</th>
@@ -666,7 +666,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 $action_btns .= "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف هذا المورد؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                             }
                             // عقود المورد — زرّ إجراء مدمج من عمود «عقود المورد» (مع عدد العقود)
-                            $action_btns .= "<a href='supplierscontracts.php?id=" . intval($row['id']) . "' class='action-btn view supplierContractsBtn' title='عقود المورد'><i class='fas fa-file-contract'></i><span style='font-size:11px;font-weight:700;margin-inline-start:3px;'>" . intval($row['num_contracts']) . "</span></a>";
+                            $action_btns .= "<a href='supplierscontracts.php?id=" . intval($row['id']) . "' class='action-btn view supplierContractsBtn' title='عقود المورد'><i class='fas fa-file-contract'></i><span data-ems-c='sup-2'>" . intval($row['num_contracts']) . "</span></a>";
                             $action_btns .= "</div></td>";
 
                             echo $action_btns;
@@ -897,114 +897,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     })();
 </script>
 
-<style>
-    .suppliers-main .stats-section {
-        border: 1px solid var(--bdr);
-        border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2) 100%);
-        box-shadow: var(--sh);
-        padding: 14px;
-        margin-bottom: 14px;
-    }
-
-    .suppliers-main .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(170px, 1fr));
-        gap: 12px;
-    }
-
-    .suppliers-main .stats-card {
-        background: var(--s1);
-        border: 1px solid var(--bdr);
-        border-radius: 12px;
-        padding: 12px;
-        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .suppliers-main .stats-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--or), var(--or2));
-        opacity: .9;
-    }
-
-    .suppliers-main .stats-card .stats-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-
-    .suppliers-main .stats-card .stats-title {
-        margin-top: 10px;
-        color: var(--t2);
-        font-size: .82rem;
-        font-weight: 700;
-    }
-
-    .suppliers-main .stats-card .stats-value {
-        margin-top: 7px;
-        color: var(--t1);
-        font-size: 1.62rem;
-        line-height: 1;
-        font-weight: 900;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .suppliers-main .stats-primary .stats-icon { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
-    .suppliers-main .stats-success .stats-icon { background: rgba(22, 163, 74, .14); color: #15803d; }
-    .suppliers-main .stats-danger .stats-icon { background: rgba(220, 38, 38, .14); color: #b91c1c; }
-    .suppliers-main .stats-purple .stats-icon { background: rgba(124, 58, 237, .14); color: #6d28d9; }
-    .suppliers-main .stats-cyan .stats-icon { background: rgba(8, 145, 178, .14); color: #0e7490; }
-    .suppliers-main .stats-orange .stats-icon { background: rgba(217, 119, 6, .14); color: #b45309; }
-
-    #projectsTable.suppliers-table-nowrap,
-    #projectsTable.suppliers-table-nowrap th,
-    #projectsTable.suppliers-table-nowrap td {
-        white-space: nowrap;
-    }
-
-    .suppliers-main .suppliers-contracts-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        text-decoration: none;
-    }
-
-    .suppliers-main .suppliers-contracts-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        font-size: .8rem;
-        font-weight: 800;
-        color: #fff;
-        background: linear-gradient(135deg, #1f4f7a, #2f6fa5);
-    }
-
-    @media (max-width: 900px) {
-        .suppliers-main .stats-grid {
-            grid-template-columns: repeat(2, minmax(150px, 1fr));
-        }
-    }
-
-    @media (max-width: 560px) {
-        .suppliers-main .stats-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 

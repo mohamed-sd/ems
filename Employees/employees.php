@@ -226,227 +226,6 @@ include("../inheader.php");
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/ems.main.all.style.css">
 
-<style>
-    .equipments-fleet-main .form-section {
-        margin-bottom: 14px;
-        border: 1px solid var(--bdr);
-        border-radius: var(--rl);
-        background: linear-gradient(180deg, var(--s1) 0%, #fffbf5 100%);
-        box-shadow: var(--sh);
-        overflow: hidden;
-    }
-
-    .equipments-fleet-main .form-section-header {
-        background: linear-gradient(135deg, var(--s0), #2a1b0c);
-        color: #fff;
-        padding: 12px 14px;
-        font-weight: 800;
-        font-size: .95rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        user-select: none;
-        transition: all .2s ease;
-        border-bottom: 1px solid rgba(255, 207, 144, .18);
-    }
-
-    .equipments-fleet-main .form-section-header:hover {
-        filter: brightness(1.04);
-    }
-
-    .equipments-fleet-main .form-section-header i {
-        color: #1a1a1a;
-    }
-
-    .equipments-fleet-main .form-section-header .toggle-icon {
-        /* السهم في أقصى اليسار، والشارة الرقمية بجانبه مباشرة */
-        order: 100;
-        margin-right: 0;
-        margin-left: 0;
-        color: #000;
-        font-size: 1rem;
-        transition: transform .25s ease;
-    }
-
-    /* شارة الرقم التلقائية (نظام الفورم الموحّد) تلتصق بالسهم في أقصى اليسار،
-       فلا يبقى أي رقم عائم في منتصف رأس البلوك */
-    .equipments-fleet-main .form-section-header::after {
-        order: 99;
-        margin-right: auto;
-        margin-left: 0;
-    }
-
-    .equipments-fleet-main .form-section-header.collapsed .toggle-icon {
-        transform: rotate(-90deg);
-    }
-
-    .equipments-fleet-main .form-section-body {
-        padding: 14px;
-        max-height: 1000px;
-        overflow: hidden;
-        transition: max-height .25s ease;
-    }
-
-    .equipments-fleet-main .form-section-body.collapsed {
-        max-height: 0;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-
-    .equipments-fleet-main .checkbox-group {
-        background: var(--s2);
-        padding: 14px;
-        border-radius: var(--r);
-        border: 1px solid var(--bdr);
-    }
-
-    .equipments-fleet-main .checkbox-group label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 10px;
-        margin-bottom: 6px;
-        background: #fff;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all .2s ease;
-        border: 1px solid transparent;
-    }
-
-    .equipments-fleet-main .checkbox-group label:hover {
-        background: var(--s3);
-        border-color: rgba(247, 147, 26, .2);
-        transform: translateX(-2px);
-    }
-
-    .equipments-fleet-main .checkbox-group input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        accent-color: var(--or);
-    }
-
-    /* شارة تصنيف مسار التوظيف — نفس هيئة .status-pill المعتمدة، وألوانها
-       تُحقن سطريًّا لكل قيمة لأنها دلالةُ مرحلةٍ لا حالةَ تفعيل. */
-    .emp-class-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 11px;
-        border-radius: 999px;
-        font-size: .74rem;
-        font-weight: 800;
-        white-space: nowrap;
-        border: 1px solid rgba(0, 0, 0, .06);
-    }
-
-    .emp-class-pill.emp-class-none {
-        background: #f9fafb;
-        color: #9ca3af;
-        font-weight: 700;
-    }
-
-    .link-alert-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        margin-right: 6px;
-        padding: 2px 9px;
-        border-radius: 999px;
-        background: linear-gradient(135deg, #fff7d6, #ffe8bf);
-        color: #7c2d12;
-        border: 1px solid rgba(217, 119, 6, 0.28);
-        font-size: .72rem;
-        font-weight: 800;
-        box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
-        animation: linkAlertPulse 1.6s ease-in-out infinite;
-        vertical-align: middle;
-    }
-
-    .link-alert-chip i {
-        color: #b45309;
-        font-size: .75rem;
-    }
-
-    @keyframes linkAlertPulse {
-        0%,
-        100% {
-            transform: translateY(0);
-            box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
-        }
-
-        50% {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28);
-        }
-    }
-
-    /* خلفية الجزء الرئيسي بيضاء */
-    .main.drivers-main {
-        background: #fff;
-    }
-
-    /* أيقونات حقول الفورم سوداء */
-    .equipments-fleet-main .form-section-body label i,
-    .equipments-fleet-main .form-section-body > div > label i {
-        color: #1a1a1a;
-    }
-
-    /* عمود الإجراءات: نفس هوية أزرار جدول العرض في صفحة المشاريع (شكل دوائر ذهبية) */
-    .drivers-main .action-btns {
-        display: flex;
-        gap: 6px;
-        justify-content: center;
-        flex-wrap: nowrap;
-    }
-
-    .drivers-main .action-btns .action-btn {
-        width: 34px;
-        height: 34px;
-        margin: 0;
-        padding: 0;
-        border-radius: 8px;
-        font-size: .9rem;
-        border: 1px solid rgba(247, 147, 26, .28);
-        background: linear-gradient(135deg, #fff8ec 0%, #fffaf2 100%);
-        color: #9a7b00;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-    }
-
-    .drivers-main .action-btns .action-btn:hover {
-        color: #fff;
-        background: linear-gradient(135deg, #f7931a 0%, #d97706 100%);
-        border-color: rgba(247, 147, 26, .7);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
-    }
-
-    .drivers-main .action-btns .action-btn.history {
-        border-color: rgba(111, 66, 193, .22);
-        background: rgba(111, 66, 193, .10);
-        color: #6f42c1;
-    }
-
-    .drivers-main .action-btns .action-btn.history:hover {
-        background: #6f42c1;
-        color: #fff;
-        border-color: rgba(111, 66, 193, .6);
-    }
-
-    .drivers-main .action-btns .action-btn.delete {
-        border-color: rgba(220, 38, 38, .25);
-        background: rgba(220, 38, 38, .08);
-        color: #dc2626;
-    }
-
-    .drivers-main .action-btns .action-btn.delete:hover {
-        background: linear-gradient(135deg, #dc2626 0%, #a01818 100%);
-        color: #fff;
-        border-color: rgba(220, 38, 38, .6);
-    }
-</style>
-
 <?php
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -502,8 +281,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label for="name"><i class="fas fa-user"></i> اسم المشغل/السائق <span
-                                        style="color: red;">*</span></label>
+                                <label for="name"><i class="fas fa-user"></i> اسم المشغل/السائق <span class="emp-1">*</span></label>
                                 <input type="text" name="name" id="name" placeholder="مثال: محمد أحمد علي" required />
                             </div>
                             <div>
@@ -516,7 +294,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="text" name="nickname" id="nickname" placeholder="مثال: أبو محمد" />
                             </div>
                             <div>
-                                <label for="employee_type"><i class="fas fa-user-tag"></i> نوع الموظف <span style="color: red;">*</span></label>
+                                <label for="employee_type"><i class="fas fa-user-tag"></i> نوع الموظف <span class="emp-1">*</span></label>
                                 <select name="employee_type" id="employee_type" onchange="emsToggleEmpType()" required>
                                     <?php foreach (ems_employee_types() as $__et) {
                                         echo '<option value="' . htmlspecialchars($__et, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($__et, ENT_QUOTES, 'UTF-8') . '</option>';
@@ -525,7 +303,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
                             <div>
                                 <label for="job_title_id"><i class="fas fa-id-badge"></i> المسمى الوظيفي
-                                    <a href="job_titles.php" target="_blank" title="إدارة المسميات" style="font-size:.75rem;margin-inline-start:6px;"><i class="fas fa-gear"></i></a>
+                                    <a href="job_titles.php" target="_blank" title="إدارة المسميات" class="emp-2"><i class="fas fa-gear"></i></a>
                                 </label>
                                 <select name="job_title_id" id="job_title_id">
                                     <option value="">— اختر المسمى الوظيفي —</option>
@@ -538,7 +316,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
                             <div>
                                 <label for="employee_role_id"><i class="fas fa-people-arrows"></i> دور الموظف
-                                    <a href="employee_roles.php" target="_blank" title="إدارة الأدوار" style="font-size:.75rem;margin-inline-start:6px;"><i class="fas fa-gear"></i></a>
+                                    <a href="employee_roles.php" target="_blank" title="إدارة الأدوار" class="emp-2"><i class="fas fa-gear"></i></a>
                                 </label>
                                 <select name="employee_role_id" id="employee_role_id">
                                     <option value="">— اختر الدور —</option>
@@ -632,7 +410,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
-                        <p style="margin:6px 0;color:#555;line-height:1.9;">
+                        <p class="emp-3">
                             <i class="fas fa-circle-info"></i>
                             بيانات رخصة القيادة والمعدات المتخصّصة باتت تُدار من صفحة
                             <a href="equipment_operators.php" target="_blank"><strong>السائقون والمشغّلون</strong></a>
@@ -672,7 +450,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="سيد حرفة (أكثر من 10 سنوات)">سيد حرفة (أكثر من 10 سنوات)</option>
                                 </select>
                             </div>
-                            <div style="grid-column: 1 / -1;">
+                            <div class="emp-4">
                                 <label for="certificates"><i class="fas fa-graduation-cap"></i> الشهادات والتدريبات</label>
                                 <textarea name="certificates" id="certificates" rows="3"
                                     placeholder="مثال: شهادة تشغيل حفارات من معهد التعدين، دورة السلامة الصناعية"></textarea>
@@ -770,7 +548,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     placeholder="مثال: 1500" />
                             </div>
                             <?php else: ?>
-                            <div class="alert alert-warning" style="grid-column:1/-1">
+                            <div class="alert alert-warning emp-5">
                                 <i class="fa fa-lock"></i> قسمُ الأجورِ محجوبٌ — يُفتح بمنحٍ صريحٍ على عنصرِ
                                 <code>card.payroll</code> من لوحة الظهور (M-14 · SCN-872).
                             </div>
@@ -793,8 +571,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="email" name="email" id="email" placeholder="operator@example.com" />
                             </div>
                             <div>
-                                <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف الأساسي <span
-                                        style="color: red;">*</span></label>
+                                <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف الأساسي <span class="emp-1">*</span></label>
                                 <input type="tel" name="phone" id="phone" placeholder="+249-9-123-4567" required />
                             </div>
                             <div>
@@ -802,7 +579,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="tel" name="phone_alternative" id="phone_alternative"
                                     placeholder="+249-9-765-4321" />
                             </div>
-                            <div style="grid-column: 1 / -1;">
+                            <div class="emp-4">
                                 <label for="address"><i class="fas fa-map-marker-alt"></i> العنوان</label>
                                 <textarea name="address" id="address" rows="2"
                                     placeholder="مثال: شارع النيل، الخرطوم"></textarea>
@@ -888,7 +665,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="قيد الفحص">⏳ قيد الفحص</option>
                                 </select>
                             </div>
-                            <div style="grid-column: 1 / -1;">
+                            <div class="emp-4">
                                 <label for="health_issues"><i class="fas fa-notes-medical"></i> المشاكل الصحية المعروفة</label>
                                 <textarea name="health_issues" id="health_issues" rows="2"
                                     placeholder="مثال: ضعف البصر الطفيف، مشاكل الظهر"></textarea>
@@ -916,12 +693,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="text" name="employment_duration" id="employment_duration"
                                     placeholder="مثال: 3 سنوات" />
                             </div>
-                            <div style="grid-column: 1 / -1;">
+                            <div class="emp-4">
                                 <label for="reference_contact"><i class="fas fa-user-friends"></i> مرجع للاتصال</label>
                                 <input type="text" name="reference_contact" id="reference_contact"
                                     placeholder="مثال: محمود أحمد - مدير الأسطول (09-123-4567)" />
                             </div>
-                            <div style="grid-column: 1 / -1;">
+                            <div class="emp-4">
                                 <label for="general_notes"><i class="fas fa-comment-dots"></i> ملاحظات عامة</label>
                                 <textarea name="general_notes" id="general_notes" rows="3"
                                     placeholder="مثال: مشغل موثوق وذو كفاءة عالية، يحتاج إلى تدريب على السلامة"></textarea>
@@ -949,14 +726,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="مستقيل">🚪 مستقيل</option>
                                     <option value="مفصول">⛔ مفصول</option>
                                 </select>
-                                <small style="color:#666; display:block; margin-top:5px;">
+                                <small class="emp-6">
                                     <i class="fas fa-info-circle"></i>
                                     مسار التوظيف من التقديم إلى الاعتماد — مستقلٌّ عن حالة المشغل التشغيلية
                                 </small>
                             </div>
                             <div>
-                                <label for="employee_status"><i class="fas fa-info-circle"></i> حالة المشغل <span
-                                        style="color: red;">*</span></label>
+                                <label for="employee_status"><i class="fas fa-info-circle"></i> حالة المشغل <span class="emp-1">*</span></label>
                                 <select name="employee_status" id="employee_status" required>
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="نشط"> نشط</option>
@@ -971,8 +747,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="date" name="start_date" id="start_date" />
                             </div>
                             <div>
-                                <label for="status"><i class="fas fa-power-off"></i> حالة النظام <span
-                                        style="color: red;">*</span></label>
+                                <label for="status"><i class="fas fa-power-off"></i> حالة النظام <span class="emp-1">*</span></label>
                                 <select name="status" id="status" required>
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="1">✅ مفعل</option>
@@ -1164,7 +939,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         if (!empty($row['project_name'])) {
                             $project_display = htmlspecialchars($row['project_name']);
                             if (!empty($row['project_code'])) {
-                                $project_display .= " <code style='font-size:0.7rem;'>" . htmlspecialchars($row['project_code']) . "</code>";
+                                $project_display .= " <code data-ems-c='emp-7'>" . htmlspecialchars($row['project_code']) . "</code>";
                             }
                         }
 

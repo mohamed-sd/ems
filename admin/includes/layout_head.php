@@ -50,34 +50,43 @@ $_admin_nav = [
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo e($page_title ?? ''); ?> | لوحة الإدارة العليا</title>
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<?php /* ── INJ-0501 · مجموعةُ رموزٍ **واحدة** ────────────────────────────────────
+         كانت لوحةُ الإدارةِ العليا تُعرّف `:root` خاصًّا بها بثمانيةَ عشرَ رمزًا،
+         ولا تعرف `design-tokens.css` أصلًا — فتغييرُ رمزٍ لونيٍّ في المنتجِ لا
+         يبلغها، ويصير للنظامِ الواحدِ هويتان. صارت تُحمّل ملفَّ الرموزِ نفسَه،
+         وأسماؤها المحليةُ **مشتقّةٌ** منه لا مكتوبةً حروفًا. */ ?>
+<link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
 <link href="/ems/assets/css/brand-identity.css" rel="stylesheet">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <style>
 /* ═══════════════════════════ TOKENS ═══════════════════════════ */
+/* أسماءٌ محليةٌ **مشتقّةٌ** من `design-tokens.css` — لا حروفَ ألوانٍ هنا.
+   وما لا نظيرَ له في المنتجِ (ألوانُ السايدبارِ الداكنِ ومقاساتُه) عُرِّف هناك
+   في قسمِ لوحةِ الإدارةِ — فالمصدرُ ملفٌّ واحدٌ لا اثنان. */
 :root {
-    --sb-bg:       #0b1933;
-    --sb-bd:       rgba(255,255,255,0.065);
-    --sb-text:     rgba(255,255,255,0.68);
-    --sb-hover:    rgba(255,255,255,0.055);
-    --sb-act-bg:   rgba(214,167,0,0.13);
-    --sb-act-clr:  #f0c040;
-    --sb-act-bd:   rgba(214,167,0,0.45);
-    --sb-w:        260px;
-    --tb-h:        62px;
-    --ink:         #0f2240;
-    --ink-2:       #35557f;
-    --muted:       #64748b;
-    --line:        rgba(15,34,64,0.085);
-    --surface:     #f0f4fa;
-    --card:        #ffffff;
-    --gold:        #d6a700;
-    --blue:        #2563eb;
-    --red:         #dc2626;
-    --green:       #059669;
-    --orange:      #d97706;
-    --radius:      13px;
-    --shadow:      0 2px 14px rgba(15,34,64,0.07);
-    --shadow-md:   0 6px 28px rgba(15,34,64,0.10);
+    --sb-bg:       var(--c-admin-sb-bg);
+    --sb-bd:       var(--c-admin-sb-bd);
+    --sb-text:     var(--c-admin-sb-text);
+    --sb-hover:    var(--c-admin-sb-hover);
+    --sb-act-bg:   var(--c-admin-sb-act-bg);
+    --sb-act-clr:  var(--c-admin-sb-act-clr);
+    --sb-act-bd:   var(--c-admin-sb-act-bd);
+    --sb-w:        var(--c-admin-sb-w);
+    --tb-h:        var(--c-admin-tb-h);
+    --ink:         var(--c-admin-ink);
+    --ink-2:       var(--c-admin-ink-2);
+    --muted:       var(--c-admin-muted);
+    --line:        var(--c-admin-line);
+    --surface:     var(--c-admin-surface);
+    --card:        var(--c-surface);
+    --gold:        var(--c-admin-gold);
+    --blue:        var(--c-state-info);
+    --red:         var(--c-state-danger);
+    --green:       var(--c-admin-green);
+    --orange:      var(--c-badge-warning-a);
+    --radius:      var(--c-admin-radius);
+    --shadow:      var(--c-admin-shadow);
+    --shadow-md:   var(--c-admin-shadow-md);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }

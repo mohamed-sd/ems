@@ -166,7 +166,29 @@
       panel.parentNode.insertBefore(bar, panel);
     }
 
-    if (!wasSeen(key)) { show(panel); }                // أولُ فتحٍ يشرح
+    /* ── INJ-0441 · الشرحُ لا يسبق البياناتِ في شاشةِ بيانات ────────────────────
+         «أولُ فتحٍ يشرح» قاعدةٌ صحيحةٌ في شاشةِ نموذجٍ أو لوحة. أمَّا شاشةُ
+         **جدول** فالمستخدمُ جاءها ليقرأ صفوفَها: بطاقةُ الشرحِ المفتوحةُ تدفع
+         الجدولَ إلى 31.5٪ من ارتفاعِ الصفحة (مقيسٌ على شاشةِ العقود)، ونصُّ
+         القبولِ يشترط ألّا يتجاوز 30٪.
+         فالبطاقةُ تبقى مطويّةً حيث يوجد جدولُ بيانات، وزرُّها في الرأسِ يُبرَز
+         بنبضةٍ واحدةٍ ليُعرف مكانُه — فالشرحُ متاحٌ بضغطةٍ لا مفقود. */
+    var hasDataTable = false;
+    try {
+        var tbs = document.querySelectorAll('table');
+        for (var ti = 0; ti < tbs.length; ti++) {
+            if (tbs[ti].querySelector('thead th')) { hasDataTable = true; break; }
+        }
+    } catch (eDt) { hasDataTable = false; }
+
+    if (!wasSeen(key)) {
+        if (hasDataTable) {
+            var hintBtn = document.getElementById(BTN_ID);
+            if (hintBtn) { hintBtn.classList.add('ems-about-btn--hint'); }
+        } else {
+            show(panel);                                // شاشةٌ بلا جدول: أولُ فتحٍ يشرح
+        }
+    }
 
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !panel.hidden) { hide(panel, key); }

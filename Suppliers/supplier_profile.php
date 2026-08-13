@@ -156,13 +156,89 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </div>
     </div>
 
+    <?php
+    /* ── INJ-0158 · بطاقاتُ المؤشرِ بعقدِها السباعيِّ ────────────────────────────
+         كانت ستُّ بطاقاتٍ تعرض **رقمًا عاريًا وتسميةً** فقط: بلا وحدةٍ ولا فترةٍ
+         ولا مقارنةٍ ولا حالةٍ ولا مصدرٍ ولا رابطِ تعمّق. ورقمٌ لا يُتعمَّق فيه
+         لا يُقرَّر عليه. والمكوّنُ `ems_kpi_card` قائمٌ ويرفض التصييرَ بأقلَّ من
+         السبعةِ — فالحكمُ يصير بالبناءِ لا بالمراجعة. */
+    require_once __DIR__ . '/../includes/kpi_card.php';
+    $__sid = (int) $supplier['id'];
+    $__now = 'لحظي (' . date('Y-m-d H:i') . ')';
+    /* ── والمخوَّلُ جزئيًّا لا يجد الحقولَ الحساسةَ في **استجابةِ الخادم** ────────
+         إخفاءٌ بـCSS ليس منعًا: الرقمُ يبقى في المصدرِ يقرؤه كلُّ من فتح
+         «عرضَ المصدر». فبطاقتا الساعاتِ (المتعاقَدُ عليه والمُشغَّلُ فعلًا) —
+         وهما أساسُ الفوترة — **لا تُصيَّران أصلًا** لمن لا يملك عرضَ مصدرِهما. */
+    $__mayOpen = function ($code) use ($conn) {
+        $role = isset($_SESSION['user']['role']) ? (string) $_SESSION['user']['role'] : '';
+        if ($role === '-1') { return true; }
+        $st = $conn->prepare('SELECT 1 FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
+                               WHERE m.code = ? AND rp.role_id = ? AND rp.can_view = 1 LIMIT 1');
+        $rid = (int) $role;
+        $st->bind_param('si', $code, $rid);
+        $st->execute();
+        $found = (bool) $st->get_result()->fetch_row();
+        $st->close();
+        return $found;
+    };
+    $__mayHours     = $__mayOpen('Timesheet/view_timesheet.php');
+    $__mayContracts = $__mayOpen('Suppliers/supplierscontracts.php');
+    $__cards = array(
+        array('title' => 'عدد المعدات', 'value' => $equipments_count, 'unit' => 'معدة',
+              'period' => $__now, 'status' => $equipments_count > 0 ? 'ok' : 'warn',
+              'drill' => '../Equipments/equipments.php?supplier=' . $__sid,
+              'icon' => 'fa-truck', 'scope' => 'المعداتُ المرتبطةُ بهذا المورّد'),
+        array('title' => 'عدد العقود', 'value' => $contracts_count, 'unit' => 'عقد',
+              'period' => $__now, 'status' => $contracts_count > 0 ? 'ok' : 'warn',
+              'drill' => 'supplierscontracts.php?supplier=' . $__sid,
+              'icon' => 'fa-file-contract', 'scope' => 'كلُّ العقودِ المسجَّلةِ له'),
+        array('title' => 'العقود النشطة', 'value' => $active_contracts, 'unit' => 'عقد',
+              'period' => $__now, 'status' => $active_contracts > 0 ? 'ok' : 'warn',
+              'comparison' => 'من ' . (int) $contracts_count . ' عقدًا مسجَّلًا',
+              'drill' => 'supplierscontracts.php?supplier=' . $__sid . '&state=active',
+              'icon' => 'fa-circle-check', 'scope' => 'العقودُ السارية'),
+        array('title' => 'المشاريع المرتبطة', 'value' => $projects_count, 'unit' => 'مشروع',
+              'period' => $__now, 'status' => $projects_count > 0 ? 'ok' : 'neutral',
+              'drill' => '../Projects/sites.php?supplier=' . $__sid,
+              'icon' => 'fa-diagram-project', 'scope' => 'المشاريعُ التي يعمل فيها'),
+        array('title' => 'إجمالي ساعات العقود', 'value' => number_format($total_hours, 0),
+              'unit' => 'ساعة', 'period' => $__now, 'status' => 'neutral',
+              'drill' => 'supplierscontracts.php?supplier=' . $__sid,
+              'icon' => 'fa-hourglass-half', 'scope' => 'المُتعاقَدُ عليه'),
+        array('title' => 'ساعات التشغيل الفعلية', 'value' => number_format($timesheet_hours, 0),
+              'unit' => 'ساعة', 'period' => $__now,
+              'status' => ($total_hours > 0 && $timesheet_hours < $total_hours * 0.5) ? 'warn' : 'ok',
+              'comparison' => $total_hours > 0
+                    ? ('من ' . number_format($total_hours, 0) . ' متعاقَدًا ('
+                       . round($timesheet_hours * 100 / max(1, $total_hours)) . '٪)')
+                    : '',
+              'drill' => '../Timesheet/view_timesheet.php?supplier=' . $__sid,
+              'icon' => 'fa-clock', 'scope' => 'المُسجَّلُ في التايم شيت'),
+    );
+    ?>
+    <?php
+    /* الحقولُ الحساسةُ تُنزع من المصفوفةِ قبل التصيير — لا تُخفى بعده */
+    if (!$__mayContracts) {
+        $__cards = array_values(array_filter($__cards, function ($c) {
+            return $c['title'] !== 'إجمالي ساعات العقود';
+        }));
+    }
+    if (!$__mayHours) {
+        $__cards = array_values(array_filter($__cards, function ($c) {
+            return $c['title'] !== 'ساعات التشغيل الفعلية';
+        }));
+    }
+    ?>
     <div class="profile-grid">
-        <div class="profile-card"><div class="kpi"><?php echo $equipments_count; ?></div><div class="label">عدد المعدات</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $contracts_count; ?></div><div class="label">عدد العقود</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $active_contracts; ?></div><div class="label">العقود النشطة</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $projects_count; ?></div><div class="label">المشاريع المرتبطة</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo number_format($total_hours, 0); ?></div><div class="label">إجمالي ساعات العقود</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo number_format($timesheet_hours, 0); ?></div><div class="label">ساعات التشغيل الفعلية</div></div>
+        <?php foreach ($__cards as $__c) { echo ems_kpi_card($__c); } ?>
+        <?php if (!$__mayHours || !$__mayContracts): ?>
+        <div class="ems-kpi-card ems-kpi-warn" role="note">
+            <div class="ems-kpi-title">بطاقاتٌ محجوبةٌ عن دورك</div>
+            <div class="ems-kpi-value"><small>ساعاتُ العقودِ والتشغيلِ تُعرض لمن يملك
+                عرضَ مصدرِها — ولا تُرسَل في استجابةِ الخادمِ لغيرِه.</small></div>
+            <div class="ems-kpi-meta"><span>GOV-PERM-403</span><span>اطلبِ المنحَ من مدير الصلاحيات</span></div>
+        </div>
+        <?php endif; ?>
     </div>
 
     <div class="card" style="margin-bottom:14px;">

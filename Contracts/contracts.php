@@ -686,8 +686,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <!-- كرّر .filter-field بقدر ما تريد من الحقول -->
         <div class="filter-actions">
           <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
-          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php"
-              style="text-decoration: none; color: inherit;"><i class="fa fa-rotate-right"></i></a></button>
+          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php" class="ct-1"><i class="fa fa-rotate-right"></i></a></button>
         </div>
       </div>
     </div>
@@ -1182,14 +1181,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 if ($can_edit) {
                     $cid = intval($row['id']);
                     if (in_array(\App\Services\Contract\ContractStateMachine::NEGOTIATION, $csm_allowed, true)) {
-                        $csm_cell .= "<form method='post' style='display:inline'>
+                        $csm_cell .= "<form method='post' data-ems-c='ct-2'>
         <?php echo csrf_field(); ?>"
                           . "<input type='hidden' name='csm_submit_id' value='{$cid}'>"
                           . "<button class='action-btn' type='submit' title='رفعٌ للتفاوض'>"
                           . "<i class='fa fa-arrow-up'></i> تفاوض</button></form> ";
                     }
                     if (in_array(\App\Services\Contract\ContractStateMachine::APPROVED, $csm_allowed, true)) {
-                        $csm_cell .= "<form method='post' style='display:inline'>
+                        $csm_cell .= "<form method='post' data-ems-c='ct-2'>
         <?php echo csrf_field(); ?>"
                           . "<input type='hidden' name='csm_approve_id' value='{$cid}'>"
                           . "<button class='action-btn' type='submit' title='اعتمادٌ ضمنَ السقف'>"
@@ -1328,75 +1327,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
   </script>
 
-  <style>
-    .contracts-main .table-container,
-    .contracts-main .contracts-table-wrap {
-      overflow-x: auto;
-    }
-
-    #projectsTable.contracts-table-nowrap,
-    #projectsTable.contracts-table-nowrap th,
-    #projectsTable.contracts-table-nowrap td {
-      white-space: nowrap;
-    }
-
-    #projectsTable .action-btns {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-    }
-
-    #projectsTable .action-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      font-size: .85rem;
-      transition: all .2s ease;
-    }
-
-    #projectsTable .action-btn.view {
-      background: rgba(232, 184, 0, .18);
-      color: #9a7b00;
-    }
-
-    #projectsTable .action-btn.edit {
-      background: rgba(12, 28, 62, .08);
-      color: #0c1c3e;
-    }
-
-    #projectsTable .action-btn.delete {
-      background: rgba(220, 38, 38, .12);
-      color: #b91c1c;
-    }
-
-    #projectsTable .action-btn.view:hover {
-      background: #e8b800;
-      color: #0c1c3e;
-      transform: translateY(-2px);
-    }
-
-    #projectsTable .action-btn.edit:hover {
-      background: #0c1c3e;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-    #projectsTable .action-btn.delete:hover {
-      background: #dc2626;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-  </style>
-
-  <script>
+<script>
     const $el = (sel) => document.querySelector(sel);
     let equipmentIndex = 1;
 

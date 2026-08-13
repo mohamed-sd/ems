@@ -27,7 +27,11 @@ $__pc = ems_post_contract($conn, array(
     'action'  => 'trs.transfer.confirm_delivery',
     'perm'    => 'can_edit',
     'trigger' => 'deliver_id',
-    'idem'    => array('order' => intval($_POST['deliver_id'] ?? 0)),
+    /* INJ-0548: مفتاحُ العطالةِ يضمُّ **مفتاحَ العميلِ** (`ems_idem`) — فإعادةُ
+       الإرسالِ من صندوقِ الميدانِ بعد عودةِ الشبكةِ تحمل المفتاحَ نفسَه، فيعرف
+       الخادمُ أنَّها هي هي ولا يكتب مرتين. وغيابُه لا يضرُّ المسارَ العادي. */
+    'idem'    => array('order' => intval($_POST['deliver_id'] ?? 0),
+                       'cli'   => trim((string) ($_POST['ems_idem'] ?? ''))),
     'validate' => function (array $in) {
         $oid = intval($in['deliver_id'] ?? 0);
         $wit = trim($in['witness_name'] ?? '');
@@ -108,7 +112,11 @@ include __DIR__ . '/../includes/page_header.php';
         <td>
           <?php if (!$o['doc_ref']): ?>
           <?php $rid = intval($o['id']); ?>
-          <form method="post" style="display:flex;gap:6px;flex-wrap:wrap">
+          <?php /* INJ-0548: نموذجُ «وصلت» موسومٌ لصندوقِ الإرسالِ دونَ اتصال —
+                   بلا شبكةٍ يُحفظ محليًّا ويُعلَن «بانتظار المزامنة»، وعند العودةِ
+                   يُرسَل مرةً واحدةً بمفتاحِ عطالتِه. */ ?>
+          <form method="post" class="ta-arrival-form" data-ems-outbox="1"
+                data-ems-outbox-label="تأكيدُ وصول">
             <input type="hidden" name="deliver_id" value="<?= $rid ?>">
             <label class="visually-hidden" for="dlv_wit_<?= $rid ?>">شاهدُ التسليم</label>
             <input id="dlv_wit_<?= $rid ?>" type="text" name="witness_name" required

@@ -196,15 +196,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <i class="fas fa-shield-halved"></i> التغطية التعاقدية — الالتزامُ والموردون والمعداتُ والفجوةُ بالساعات
                 </a>
             </div>
-            <style>
-                .cd-coverage-tab { margin: 6px 0 14px; }
-                .cd-coverage-link { display: inline-flex; align-items: center; gap: 8px;
-                    padding: 10px 18px; border-radius: 10px; font-weight: 800;
-                    background: #fff8e6; border: 1px solid #d9b44a; color: #6b5200; text-decoration: none; }
-                .cd-coverage-link:hover { background: #fdeeba; }
-            </style>
-
-            <!-- ===== SUMMARY CARDS ===== -->
+<!-- ===== SUMMARY CARDS ===== -->
             <div class="cards-grid">
 
                 <!-- حالة العقد -->
@@ -312,12 +304,14 @@ include __DIR__ . '/../includes/page_header.php';
                     <div class="section-header-icon"><i class="fas fa-hand-holding-dollar"></i></div>
                     <h4>الدفعةُ المقدَّمة — الرصيدُ التراكمي</h4>
                 </div>
-                <div style="padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-bottom:14px">
-                    <p style="margin:0 0 8px;line-height:1.9;color:#78350f">
+                <div class="cd-1">
+                    <p class="cd-2">
                         <strong>المقبوض:</strong> <?php echo number_format($adv_bal['received'], 2); ?>
                         · <strong>المستهلَك:</strong> <?php echo number_format($adv_bal['recovered'], 2); ?>
                         · <strong>المتبقي:</strong>
-                        <strong style="color:<?php echo ($adv_bal['balance'] < 0) ? '#b91c1c' : '#15803d'; ?>">
+                        <?php /* INJ-0442: اللونُ صار صنفًا — فالحكمُ (سالبٌ/موجب) يبقى في
+                                 الشفرةِ واللونُ في ورقةِ الأنماطِ برموزِ النظام. */ ?>
+                        <strong class="<?php echo ($adv_bal['balance'] < 0) ? 'cd-bal-neg' : 'cd-bal-pos'; ?>">
                             <?php echo number_format($adv_bal['balance'], 2); ?></strong>
                         <?php if ($adv_bal['balance'] < 0): ?>
                             <br><i class="fas fa-triangle-exclamation"></i>
@@ -329,12 +323,12 @@ include __DIR__ . '/../includes/page_header.php';
                         <?php endif; ?>
                     </p>
                     <?php if ($adv_recv): ?>
-                    <div style="overflow-x:auto">
-                    <table class="table table-sm" style="width:100%;font-size:13px">
+                    <div class="cd-3">
+                    <table class="table table-sm cd-4">
                         <thead><tr><th>سندُ القبض</th><th>التاريخ</th><th>المبلغ</th><th>المستند</th><th>الحالة</th></tr></thead>
                         <tbody>
                         <?php foreach ($adv_recv as $a): ?>
-                            <tr<?php echo ((string) $a['state'] === 'cancelled') ? ' style="opacity:.55"' : ''; ?>>
+                            <tr<?php echo ((string) $a['state'] === 'cancelled') ? ' data-ems-c="cd-5"' : ''; ?>>
                                 <td><code><?php echo htmlspecialchars((string) $a['advance_no']); ?></code></td>
                                 <td><?php echo htmlspecialchars((string) $a['received_date']); ?></td>
                                 <td><?php echo number_format((float) $a['amount'], 2) . ' ' . htmlspecialchars((string) $a['currency']); ?></td>
@@ -347,9 +341,9 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
                     <?php endif; ?>
                     <?php if ($adv_sch): ?>
-                    <p style="margin:10px 0 4px;font-weight:700;color:#78350f">جدولُ الاستهلاك</p>
-                    <div style="overflow-x:auto">
-                    <table class="table table-sm" style="width:100%;font-size:13px">
+                    <p class="cd-6">جدولُ الاستهلاك</p>
+                    <div class="cd-3">
+                    <table class="table table-sm cd-4">
                         <thead><tr><th>المستخلص</th><th>الفترة</th><th>المستهلَك</th><th>حالتُه</th></tr></thead>
                         <tbody>
                         <?php foreach ($adv_sch as $s): ?>
@@ -364,7 +358,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </table>
                     </div>
                     <?php else: ?>
-                        <p style="margin:8px 0 0;color:#78350f">لم يُستهلك منها شيءٌ بعد.</p>
+                        <p class="cd-7">لم يُستهلك منها شيءٌ بعد.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -594,7 +588,7 @@ include __DIR__ . '/../includes/page_header.php';
                     معدات العقد
                     <?php
                     if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-                        echo "<span style='font-size: 13px; opacity: 0.75; font-weight: 500;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
+                        echo "<span data-ems-c='cd-8'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
                     }
                     ?>
                 </h4>
@@ -645,7 +639,7 @@ include __DIR__ . '/../includes/page_header.php';
                             $i = 1;
                             foreach ($equipments as $equip) {
                                 echo "<tr>";
-                                echo "<td><strong style='color:var(--text-muted);'>" . $i . "</strong></td>";
+                                echo "<td><strong data-ems-c='cd-9'>" . $i . "</strong></td>";
                                 $equipTypeLabel = isset($equipmentTypeMap[(int) $equip['equip_type']])
                                     ? $equipmentTypeMap[(int) $equip['equip_type']]
                                     : $equip['equip_type'];
@@ -657,9 +651,9 @@ include __DIR__ . '/../includes/page_header.php';
                                 echo "<td><span class='badge-shifts'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
                                 echo "<td>" . $equip['shift_hours'] . "</td>";
                                 echo "<td>" . $equip['equip_total_month'] . "</td>";
-                                echo "<td><strong style='color:var(--primary);'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
+                                echo "<td><strong data-ems-c='cd-10'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
                                 echo "<td>" . $equip['equip_unit'] . "</td>";
-                                echo "<td><strong style='color:var(--primary);'>" . $equip['equip_total_contract'] . "</strong></td>";
+                                echo "<td><strong data-ems-c='cd-10'>" . $equip['equip_total_contract'] . "</strong></td>";
                                 echo "<td><span class='price-chip'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</span></td>";
                                 echo "<td>" . $equip['equip_operators'] . "</td>";
                                 echo "<td>" . $equip['equip_supervisors'] . "</td>";
@@ -767,22 +761,16 @@ include __DIR__ . '/../includes/page_header.php';
                                     $action_type = 'ملاحظة عامة';
                                 }
 
-                                $badge_colors = [
-                                    'primary'   => 'background: linear-gradient(135deg, #1a3a6e 0%, #2a5298 100%);',
-                                    'secondary' => 'background: linear-gradient(135deg, #475569 0%, #334155 100%);',
-                                    'warning'   => 'background: linear-gradient(135deg, #d97706 0%, #b45309 100%);',
-                                    'success'   => 'background: linear-gradient(135deg, #059669 0%, #047857 100%);',
-                                    'danger'    => 'background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);',
-                                    'purple'    => 'background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);',
-                                    'info'      => 'background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);'
-                                ];
+                                /* INJ-0442: الخريطةُ صارت **أصنافًا** لا حروفَ ألوان —
+                                   والتدرّجاتُ في `ems-screens.css` برموزِ النظام. */
+                                $badge_class = 'cd-badge-' . preg_replace('~[^a-z]~', '', (string) $action_badge);
 
                                 echo "<tr>";
-                                echo "<td><strong style='color:var(--text-muted);'>" . $j . "</strong></td>";
-                                echo "<td><span class='action-badge-pill' style='" . $badge_colors[$action_badge] . "'>" . $action_icon . " " . $action_type . "</span></td>";
-                                echo "<td style='text-align: right; max-width: 300px;'>" . $note_text . "</td>";
-                                echo "<td><i class='fas fa-user' style='color:var(--primary); margin-left:5px;'></i>" . ($note['user_name'] ?? 'غير محدد') . "</td>";
-                                echo "<td><i class='far fa-clock' style='margin-left: 0.5rem; color:var(--text-muted);'></i>" . $note['created_at'] . "</td>";
+                                echo "<td><strong data-ems-c='cd-9'>" . $j . "</strong></td>";
+                                echo "<td><span class='action-badge-pill " . $badge_class . "'>" . $action_icon . " " . $action_type . "</span></td>";
+                                echo "<td data-ems-c='cd-11'>" . $note_text . "</td>";
+                                echo "<td><i class='fas fa-user' data-ems-c='cd-12'></i>" . ($note['user_name'] ?? 'غير محدد') . "</td>";
+                                echo "<td><i class='far fa-clock' data-ems-c='cd-13'></i>" . $note['created_at'] . "</td>";
                                 echo "</tr>";
                                 $j++;
                             }
@@ -991,20 +979,20 @@ include __DIR__ . '/../includes/page_header.php';
                                 <i class="fas fa-question-circle"></i> كيف تريد معالجة أيام الإيقاف؟
                             </div>
                             <div class="pause-option" onclick="selectPauseOption(this, 'extend')">
-                                <div class="form-check" style="padding-right: 1.8rem; pointer-events: none;">
-                                    <input class="form-check-input" type="radio" name="pauseHandling" id="extendContract" value="extend" checked style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
-                                    <label class="form-check-label" for="extendContract" style="cursor: pointer;">
-                                        <span style="color: var(--success); font-weight: 700;"><i class="fas fa-plus-circle"></i> تمديد العقد</span>
-                                        <small style="display: block; color: var(--text-muted); font-weight: normal; margin-top: 3px;">سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف</small>
+                                <div class="form-check cd-14">
+                                    <input class="form-check-input cd-15" type="radio" name="pauseHandling" id="extendContract" value="extend" checked>
+                                    <label class="form-check-label cd-16" for="extendContract">
+                                        <span class="cd-17"><i class="fas fa-plus-circle"></i> تمديد العقد</span>
+                                        <small class="cd-18">سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف</small>
                                     </label>
                                 </div>
                             </div>
                             <div class="pause-option" onclick="selectPauseOption(this, 'deduct')">
-                                <div class="form-check" style="padding-right: 1.8rem; pointer-events: none;">
-                                    <input class="form-check-input" type="radio" name="pauseHandling" id="deductFromContract" value="deduct" style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
-                                    <label class="form-check-label" for="deductFromContract" style="cursor: pointer;">
-                                        <span style="color: var(--danger); font-weight: 700;"><i class="fas fa-minus-circle"></i> خصم من العقد</span>
-                                        <small style="display: block; color: var(--text-muted); font-weight: normal; margin-top: 3px;">سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف</small>
+                                <div class="form-check cd-14">
+                                    <input class="form-check-input cd-15" type="radio" name="pauseHandling" id="deductFromContract" value="deduct">
+                                    <label class="form-check-label cd-16" for="deductFromContract">
+                                        <span class="cd-19"><i class="fas fa-minus-circle"></i> خصم من العقد</span>
+                                        <small class="cd-18">سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف</small>
                                     </label>
                                 </div>
                             </div>
@@ -1147,7 +1135,7 @@ include __DIR__ . '/../includes/page_header.php';
                                                 echo "</tr>";
                                             }
                                         } else {
-                                            echo "<tr><td colspan='5' style='text-align: center; color: #999;'>لا توجد معدات</td></tr>";
+                                            echo "<tr><td colspan='5' data-ems-c='cd-20'>لا توجد معدات</td></tr>";
                                         }
                                         ?>
                                     </tbody>
@@ -1159,7 +1147,7 @@ include __DIR__ . '/../includes/page_header.php';
                             <div class="equip-section-title selected">
                                 <i class="fa fa-cube"></i> معدات العقد المختار
                             </div>
-                            <div id="selectedContractEquipments" style="min-height: 80px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;">
+                            <div id="selectedContractEquipments" class="cd-21">
                                 اختر عقداً لعرض معداته
                             </div>
                         </div>
@@ -1915,7 +1903,7 @@ include __DIR__ . '/../includes/page_header.php';
             const selectedContractId = $(this).val();
 
             if (!selectedContractId) {
-                $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
+                $('#selectedContractEquipments').html('<p class="cd-20">اختر عقداً لعرض معداته</p>');
                 return;
             }
 
@@ -1928,7 +1916,7 @@ include __DIR__ . '/../includes/page_header.php';
                     if (response.success) {
                         let html = '';
                         if (response.equipments.length > 0) {
-                            html = '<table class="table table-sm table-bordered" style="font-size:13px;">';
+                            html = '<table class="table table-sm table-bordered cd-22">';
                             html += '<thead class="table-light"><tr>';
                             html += '<th>نوع المعدة</th>';
                             html += '<th>الحجم</th>';
@@ -1950,16 +1938,16 @@ include __DIR__ . '/../includes/page_header.php';
 
                             html += '</tbody></table>';
                         } else {
-                            html = '<p style="text-align: center; color: #999;">لا توجد معدات لهذا العقد</p>';
+                            html = '<p class="cd-20">لا توجد معدات لهذا العقد</p>';
                         }
                         $('#selectedContractEquipments').html(html);
                     } else {
-                        $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ: ' + response.message + '</p>');
+                        $('#selectedContractEquipments').html('<p class="cd-23">خطأ: ' + response.message + '</p>');
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error('الخطأ:', error);
-                    $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ في تحميل المعدات</p>');
+                    $('#selectedContractEquipments').html('<p class="cd-23">خطأ في تحميل المعدات</p>');
                 }
             });
         });
@@ -1979,7 +1967,7 @@ include __DIR__ . '/../includes/page_header.php';
             });
             bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
             $('#mergeWithId').val('');
-            $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
+            $('#selectedContractEquipments').html('<p class="cd-20">اختر عقداً لعرض معداته</p>');
         });
 
         function goBack() {

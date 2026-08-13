@@ -162,15 +162,8 @@ $errH = !empty($error) ? htmlspecialchars($error, ENT_QUOTES | ENT_SUBSTITUTE, '
 $postU = isset($_POST['username']) ? htmlspecialchars($_POST['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
 $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>إيكويبيشن - تسجيل الدخول</title>
-  <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<?php require_once __DIR__ . '/includes/public_shell.php';
+ems_public_head('إيكويبيشن - تسجيل الدخول'); ?>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
