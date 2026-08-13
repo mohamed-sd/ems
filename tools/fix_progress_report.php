@@ -236,9 +236,18 @@ $COVER_DIRS   = array('app', 'includes', 'database/migrations', 'docs/owf01');
    المعنى إلى ضدِّه. والمصدرُ الآن واحدٌ لكلتا الأداتين:
    `includes/fix_closure_source.php` — الوسمُ الصريحُ وحدَه. */
 require_once $ROOT . '/includes/fix_closure_source.php';
+/* ◆ المفتاحُ **نسبيٌّ بشرطاتٍ أماميةٍ** — و`$ROOT` على ويندوز يأتي بشرطاتٍ
+     خلفيةٍ (`dirname(__DIR__)`)، فاقتطاعُه بلا تطبيعٍ يفشل صامتًا فتبقى
+     المفاتيحُ مطلقةً؛ فلا يُطابقها حلقةُ تشغيلِ المسابيرِ (تشترط
+     `^(tests|tools)/`) فلا يُشغَّل شيءٌ ويسقط **كلُّ** بندٍ إلى «مُغطًّى».
+     وقد وقع ذلك فعلًا: الوضعُ الساكنُ أعطى 81 والحيُّ **صفرًا**. */
+$__rootFwd = rtrim(str_replace('\\', '/', $ROOT), '/') . '/';
 $injWitness = array();
 foreach (ems_fix_mentions($ROOT) as $__id => $__files) {
-    foreach ($__files as $__f) { $injWitness[$__id][str_replace($ROOT . '/', '', $__f)] = true; }
+    foreach ($__files as $__f) {
+        $__rel = str_replace($__rootFwd, '', str_replace('\\', '/', $__f));
+        $injWitness[$__id][$__rel] = true;
+    }
 }
 $injCover   = fpr_code_mentions($ROOT, '~INJ-\d{4}~', $COVER_DIRS);
 $fixWitness = fpr_code_mentions($ROOT, '~FIX[ABC]-\d{4}(?:-\S)?~u', $WITNESS_DIRS);
