@@ -14,6 +14,13 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+/* ── INJ-0530 · نقطةُ ردٍّ كانت تُعيد بيانَ المعداتِ لكلِّ مسجَّل ────────────────
+     كان الفحصُ الوحيدُ «هل توجد جلسة؟» — فأيُّ مستخدمٍ في النظام، ولو بلا أيِّ
+     منحةٍ على الصيانة، يقرأ معداتِ أيِّ مشروع. والحارسُ المعتمَدُ يورّث الصلاحيةَ
+     من الشاشةِ الأم ويردُّ 403 **ويُسجّل المحاولةَ** — فالرفضُ نفسُه أثرٌ يُراجَع. */
+require_once __DIR__ . '/../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/handler_guard.php';
+ems_guard_handler($conn, 'Maintenance/orders.php', 'view');
 require_once __DIR__ . '/mnt_helpers.php';
 
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;

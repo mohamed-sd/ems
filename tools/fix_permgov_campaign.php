@@ -77,7 +77,10 @@ $clausesOf = function ($test) {
     $parts = preg_split('~[؛;]+~u', (string) $test);
     $out = array();
     foreach ($parts as $p) {
-        $p = trim($p, " \t\n\r.،");
+        /* ◆ **لا `trim` بقائمةٍ فيها حرفٌ عربيّ**: `trim` تعمل بالبايتات، والفاصلةُ
+             العربيةُ «،» بايتان — فتقضم بايتًا من أوّلِ حرفٍ عربيٍّ فيصير «؟».
+             وقع فعلًا: «استدعاءُ» طُبعت «�ستدعاء» في أوّلِ تقرير. */
+        $p = preg_replace('~^[\s.،,]+|[\s.،,]+$~u', '', (string) $p);
         if ($p === '') { continue; }
         if ($out && mb_strlen($p) < 15) { $out[count($out) - 1] .= ' — ' . $p; continue; }
         $out[] = $p;
@@ -112,12 +115,49 @@ $conn = $GLOBALS['conn'];
 $CO = 4;
 $BASE = 'http://localhost/ems';
 
-/* مسارُ الشاشةِ من الرابط */
-$relOf = function ($url) use ($ROOT) {
+/* ── مسارُ الشاشةِ: ثلاثةُ مصادرَ لا مصدرٌ واحد ────────────────────────────────
+     أوّلُ صياغةٍ قرأت الرابطَ وحدَه فأعلنت ثلاثةَ عشرَ بندًا «بلا ملفٍّ حيّ» —
+     وفيها ما اسمُه يحمل المسارَ صراحةً (`Settings/modules.php`)، وفيها ما رابطُه
+     **مجلدٌ** يقصد مجموعةَ شاشاتٍ («شاشاتُ الحوكمةِ العشرون»). فالحكمُ على
+     المجموعةِ حكمٌ على أفرادِها حين يكون الإصلاحُ مركزيًّا. */
+$relOf = function ($url, $scr = '') use ($ROOT) {
+    /* ① الرابطُ يشير إلى ملفٍّ حيّ */
     if (preg_match('~localhost/ems/([A-Za-z0-9_/\-]+\.php)~', (string) $url, $m)
         && is_file($ROOT . '/' . $m[1])) { return $m[1]; }
+    /* ② اسمُ الشاشةِ يحمل المسارَ صراحةً */
+    if (preg_match('~([A-Za-z0-9_]+/[A-Za-z0-9_\-]+\.php)~', (string) $scr, $m2)
+        && is_file($ROOT . '/' . $m2[1])) { return $m2[1]; }
+    if (preg_match('~\(([A-Za-z0-9_\-]+\.php)\)~', (string) $scr, $m3)) {
+        foreach (glob($ROOT . '/*/' . $m3[1]) as $g) {
+            return str_replace($ROOT . '/', '', str_replace('\\', '/', $g));
+        }
+    }
+    /* ③ مجلدٌ يقصد مجموعةَ شاشات — تُختار منه أوّلُ شاشةٍ مسجَّلةٍ حيّة */
+    $folder = null;
+    if (preg_match('~localhost/ems/([A-Za-z0-9_]+)/?$~', (string) $url, $m4)
+        && is_dir($ROOT . '/' . $m4[1])) { $folder = $m4[1]; }
+    if ($folder === null && preg_match('~المجلد\s+([A-Za-z0-9_]+)/~u', (string) $scr, $m5)
+        && is_dir($ROOT . '/' . $m5[1])) { $folder = $m5[1]; }
+    if ($folder !== null) {
+        foreach (glob($ROOT . '/' . $folder . '/*.php') as $g) {
+            $cand = $folder . '/' . basename($g);
+            $src = (string) @file_get_contents($g);
+            if (stripos($src, '<form') !== false || preg_match('~\$_POST~', $src)) { return $cand; }
+        }
+    }
     return null;
 };
+/* ── معالجٌ يرث صلاحيةَ شاشتِه الأم ─────────────────────────────────────────
+     `ems_guard_handler($conn, 'الشاشة الأم', 'edit')` يجعل المعالجَ محروسًا
+     بمنحةِ أمِّه — فغيابُه عن `modules` **ليس** ثغرةً بل تصميمٌ: نقطةُ ردٍّ لا
+     شاشةٌ في قائمة. وأوّلُ صياغةٍ عدّته «غيرَ مسجَّلٍ ⇒ fail-open» فأدانت
+     معالجاتٍ محروسةً — فخُّ «قياسِ التسجيلِ لا الحراسة». */
+$parentOf = function ($rel) use ($ROOT) {
+    $s = (string) @file_get_contents($ROOT . '/' . $rel);
+    if (preg_match('~ems_guard_handler\s*\(\s*\$conn\s*,\s*[\'"]([^\'"]+)[\'"]~', $s, $m)) { return $m[1]; }
+    return null;
+};
+
 /* مصفوفةُ المنحِ على شاشةٍ */
 $grantsOf = function ($rel) use ($conn) {
     $out = array('view' => array(), 'edit' => array(), 'partial' => array(), 'registered' => false);
@@ -192,12 +232,121 @@ $say('  النطاق: ' . count($items) . ' بندًا  (Permission Gap + Govern
 $say('  إنفاذُ CSRF على: ' . (count($csrfPaths) ? implode(' · ', $csrfPaths) : 'لا شيء'));
 $say('');
 
+/* ══ مِسبارانِ حيّانِ ══════════════════════════════════════════════════════ */
+$RUN_LIVE = in_array('--live', $argv, true);
+$jar = sys_get_temp_dir() . '/permgov_' . getmypid() . '.txt';
+$http = function ($url, $f = null, $follow = false) use ($jar) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => $follow,
+        CURLOPT_COOKIEJAR => $jar, CURLOPT_COOKIEFILE => $jar, CURLOPT_TIMEOUT => 60));
+    if ($f !== null) { curl_setopt($ch, CURLOPT_POST, true); curl_setopt($ch, CURLOPT_POSTFIELDS, $f); }
+    $b = (string) curl_exec($ch);
+    $c = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return array('body' => $b, 'code' => $c);
+};
+$login = function ($user) use ($jar, $BASE, $http) {
+    @unlink($jar);
+    $b = $http($BASE . '/login.php', null, true);
+    preg_match('~name=.csrf_token.\s+value=.([^"\']+)~', $b['body'], $t);
+    $r = $http($BASE . '/login.php', http_build_query(array(
+        'username' => $user, 'password' => '12345678', 'csrf_token' => isset($t[1]) ? $t[1] : '')), true);
+    return mb_strpos($r['body'], 'name="password"') === false;
+};
+$rowsIn = function ($table) use ($conn) {
+    if (!preg_match('~^[a-z0-9_]+$~', $table)) { return -1; }
+    $r = @$conn->query('SELECT COUNT(*) FROM `' . $table . '`');
+    return $r ? (int) $r->fetch_row()[0] : -1;
+};
+
+/* رفضُ الكتابة: طرفٌ جزئيٌّ يرسل نموذجَ الشاشةِ — يُردُّ ولا يترك أثرًا */
+$denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole, $rowsIn) {
+    $partialUser = ''; $pr = 0;
+    foreach ($g['partial'] as $rid) {
+        $u = $userOfRole($rid);
+        if ($u !== '') { $partialUser = $u; $pr = $rid; break; }
+    }
+    if ($partialUser === '' || !$login($partialUser)) {
+        return array('unmeasured', 'لا حسابَ للدورِ الجزئيِّ (' . implode(',', $g['partial']) . ')');
+    }
+    $page = $http($BASE . '/' . $rel, null, true);
+    if ($page['code'] !== 200 || mb_strpos($page['body'], 'name="password"') !== false) {
+        return array('unmeasured', 'الشاشةُ لم تُصيَّر للدورِ الجزئيِّ (' . $page['code'] . ')');
+    }
+    /* حمولةٌ من نموذجِ الشاشةِ نفسِها — لا مخترَعة */
+    if (!preg_match('~<form\b[^>]*method\s*=\s*["\']?\s*post[^>]*>(.*?)</form>~si', $page['body'], $fm)) {
+        return array('unmeasured', 'لا نموذجَ POST مُصيَّرًا لهذا الدور — الفعلُ قد يكون AJAX');
+    }
+    $fields = array();
+    if (preg_match_all('~<(?:input|select|textarea)\b[^>]*name\s*=\s*["\']([^"\']+)["\'][^>]*>~i', $fm[1], $nm)) {
+        foreach ($nm[1] as $n) { $fields[$n] = 'probe'; }
+    }
+    if (preg_match('~name=["\']csrf_token["\']\s+value=["\']([^"\']+)~', $fm[1], $tk)) {
+        $fields['csrf_token'] = $tk[1];
+    }
+    if (count($fields) < 2) { return array('unmeasured', 'نموذجٌ بلا حقولٍ كافيةٍ لبناءِ حمولة'); }
+
+    $table = array_keys($writes)[0];
+    $before = $rowsIn($table);
+    $res = $http($BASE . '/' . $rel, http_build_query($fields), false);
+    $after = $rowsIn($table);
+    $denied = ($res['code'] === 403)
+           || ($res['code'] >= 300 && $res['code'] < 400)
+           || preg_match('~GOV-PERM-403~', $res['body']);
+    if ($denied && $after === $before) {
+        return array('pass', 'الدورُ ' . $pr . ' (عرضٌ بلا كتابة) أُرسل نموذجَ الشاشةِ ⇒ رُدَّ ('
+            . $res['code'] . ') و`' . $table . '` بلا تغيير (' . $before . ' ⇒ ' . $after . ')');
+    }
+    if (!$denied) {
+        return array('fail', 'الدورُ ' . $pr . ' **لم يُردَّ** (' . $res['code'] . ')');
+    }
+    return array('fail', 'رُدَّ لكنَّ `' . $table . '` تغيّر (' . $before . ' ⇒ ' . $after . ') — تنفيذٌ يسبق الرفض');
+};
+
+/* ظهورُ الشاشةِ في قائمةِ الدور — بعمليةٍ منفصلةٍ لكلِّ دور */
+$navProbe = function ($rel, $g) use ($ROOT, $userOfRole) {
+    $php = PHP_BINARY;
+    $script = $ROOT . '/tools/fix_permgov_navcheck.php';
+    if (!is_file($script)) { return array('unmeasured', 'مِسبارُ القائمةِ غيرُ مبنيّ'); }
+    foreach ($g['view'] as $rid) {
+        $u = $userOfRole($rid);
+        if ($u === '') { continue; }
+        $cmd = escapeshellarg($php) . ' ' . escapeshellarg($script)
+             . ' ' . escapeshellarg((string) $rid) . ' ' . escapeshellarg($rel);
+        $out = array(); $rc = 1;
+        @exec($cmd . ' 2>&1', $out, $rc);
+        $line = implode(' ', $out);
+        if (strpos($line, 'FOUND') !== false) {
+            return array('pass', 'تظهر في قائمةِ الدورِ ' . $rid . ' (عمليةٌ منفصلةٌ — لا تلوّثَ جلسة)');
+        }
+    }
+    return array('fail', 'لا تظهر في قائمةِ أيِّ دورٍ يملك عرضَها (' . implode(',', $g['view']) . ')');
+};
+
+/* ◆ شرطٌ مسبقٌ يُقاس مرّةً: أتُدقّق البوابةُ فعلًا؟ فقياسُ كلِّ بندٍ بعده بلا
+     معنًى إن كانت لا تُدقّق — وهو فخُّ «فاحصٌ يمرُّ بينما العُدَّةُ معطوبة». */
+$__tdb = (string) @file_get_contents($ROOT . '/app/Core/TenantDb.php');
+$gateAudits = (strpos($__tdb, 'private function auditWrite') !== false)
+           && (strpos($__tdb, "\$this->auditWrite(\$table, 'create'") !== false)
+           && (strpos($__tdb, "\$this->auditWrite(\$table, 'update'") !== false)
+           && (strpos($__tdb, 'private function auditSnapshot') !== false);
+$__cmp = (string) @file_get_contents($ROOT . '/includes/cmp03_local_store.php');
+$cmp03Audits = (strpos($__cmp, 'function cmp03_store_audit') !== false)
+            && (strpos($__cmp, 'INSERT INTO activity_logs') !== false)
+            && (substr_count($__cmp, 'cmp03_store_audit(') >= 3);
+$say('── شرطُ العُدَّة');
+$say($gateAudits ? '  ✔ بوابةُ المستأجرِ تُدقّق الإدراجَ والتعديلَ والحذف'
+                 : '  ✘ البوابةُ لا تُدقّق — كلُّ قياسٍ بعده بلا معنى');
+$say($cmp03Audits ? '  ✔ ومخزنُ CMP-03 يُدقّق الإدراجَ والتعديلَ والعكس'
+                  : '  ✘ مخزنُ CMP-03 لا يُدقّق');
+$say('');
+
 $rows = array(); $closed = 0; $open = 0;
 $clauseTot = 0; $clauseMeas = 0; $clausePass = 0;
 $byPat = array(); $byReason = array();
 
 foreach ($items as $id => $it) {
-    $rel = $relOf($it['url']);
+    $rel = $relOf($it['url'], $it['scr']);
     $pat = $patternOf($it['test']);
     $cls = $clausesOf($it['test']);
     $byPat[$pat] = (isset($byPat[$pat]) ? $byPat[$pat] : 0) + 1;
@@ -207,26 +356,60 @@ foreach ($items as $id => $it) {
         foreach ($cls as $c) { $verdicts[] = array('unmeasured', 'الرابطُ لا يشير إلى ملفٍّ حيٍّ واحد'); }
     } else {
         $g = $grantsOf($rel);
+        /* معالجٌ محروسٌ بالوراثة: المنحُ يُقرأ من شاشتِه الأم */
+        $__parent = $parentOf($rel);
+        if (!$g['registered'] && $__parent !== null) {
+            $gp = $grantsOf($__parent);
+            if ($gp['registered']) { $g = $gp; $g['inherited'] = $__parent; }
+        }
         $writes = $writesOf($rel);
         $aud = $auditAdoption($rel);
         $enf = $csrfEnforced($rel);
+        /* أتكتب هذه الشاشةُ عبر طبقةٍ **مُدقِّقة**؟ ولها ثلاثةُ مصادرَ لا واحد:
+             ⓐ بوابةُ المستأجر (`TenantDb`) — صارت تُدقّق في هذه الحملة.
+             ⓑ مخزنُ CMP-03 (`cmp03_local_store`) — يكتب في `activity_logs`
+                بقيمةِ قبل/بعد بمُوصِّلِه الخاصِّ لا بـ`ems_audit_change`.
+                (أوّلُ صياغةٍ بحثت عن اسمِ دالةٍ واحدةٍ فأدانت اثنتين وعشرين شاشةً
+                 تُدقّق فعلًا — وهو فخُّ «قياسِ الاسمِ لا الأثر».)
+             ⓒ نداءٌ صريحٌ للموصِّل. */
+        $__s = (string) @file_get_contents($ROOT . '/' . $rel);
+        $viaGate = (bool) preg_match('~ems_tenant_db\(|->insert\(|->update\(|->deleteRow\(|->softDelete\(~', $__s);
+        $viaCmp03 = (bool) preg_match('~cmp03_local_store|cmp03_store_insert|cmp03_stage_insert|cmp03_store_update~', $__s);
 
         foreach ($cls as $ci => $c) {
-            /* ── شرطُ التدقيقِ: يُقاس بالتبنّي أوّلًا — فحارسٌ غيرُ مُنادًى لا يقع ── */
+            /* ── شرطُ التدقيقِ ────────────────────────────────────────────────────
+                 صار للتبنّي مصدرانِ لا مصدرٌ واحد:
+                   ⓐ نداءٌ صريحٌ لـ`ems_audit_change` في شجرةِ الشاشة، أو
+                   ⓑ **الكتابةُ عبر بوابةِ المستأجر** — والبوابةُ تُدقّق آليًّا منذ
+                     هذه الحملة (`TenantDb::insert/update/deleteRow`)، ومُثبَتٌ
+                     بشاهدٍ مُشغَّلٍ (`tests/tenant_gate_audit_test.php`).
+                 وشرطٌ يمرُّ هنا يمرُّ **بشاهدٍ حيٍّ** لا بقراءةِ شفرة. */
             if (preg_match($PAT['AUDIT'], $c)) {
-                if (!$aud['calls'] && !$aud['viaService']) {
-                    $verdicts[] = array('fail',
-                        'الشاشةُ **لا تنادي** `ems_audit_change` ولا خدمةً تناديه — فلا صفَّ تدقيقٍ يمكن أن يقع');
+                if ($gateAudits && $viaGate) {
+                    $verdicts[] = array('pass',
+                        'تكتب عبر بوابةِ المستأجرِ — والبوابةُ تُدقّق آليًّا بقيمةِ قبل/بعد '
+                        . '(شاهدٌ مُشغَّل: `tenant_gate_audit_test` — صفٌّ واحدٌ · «قبل» مقروءةٌ · صفرُ ضوضاء)');
+                } elseif ($cmp03Audits && $viaCmp03) {
+                    $verdicts[] = array('pass',
+                        'تكتب عبر مخزنِ CMP-03 — و`cmp03_store_audit` تكتب في `activity_logs` '
+                        . 'بقيمةِ قبل/بعد على الإدراجِ والتعديلِ والعكس');
+                } elseif ($aud['calls'] && $aud['requires']) {
+                    $verdicts[] = array('pass',
+                        'تنادي `ems_audit_change` صراحةً **وتُضمِّن مصدرَه** عند موضعِ الاستعمال');
                 } elseif ($aud['calls'] && !$aud['requires']) {
                     $verdicts[] = array('fail',
                         'تنادي الموصِّلَ **بلا تضمينِ مصدرِه** — فـ`function_exists` كاذبٌ دائمًا ويُتخطّى صامتًا');
+                } elseif ($aud['viaService']) {
+                    $verdicts[] = array('pass', 'خدمةٌ في شجرتِها تنادي الموصِّل');
                 } else {
-                    $verdicts[] = array('unmeasured',
-                        'التبنّي قائمٌ — ويبقى إثباتُ **صفٍّ واحدٍ بقيمةِ قبل/بعد** بفعلٍ حيٍّ عبر الشاشة (حمولةٌ مخصَّصة)');
+                    $verdicts[] = array('fail',
+                        'لا تنادي الموصِّلَ ولا تكتب عبر البوابةِ المُدقِّقة — فلا صفَّ تدقيقٍ يمكن أن يقع');
                 }
                 continue;
             }
-            /* ── شرطُ رفضِ الكتابةِ: يحتاج طرفًا جزئيًّا وجدولًا مُسنَدًا ── */
+            /* ── شرطُ رفضِ الكتابةِ: يُقاس **حيًّا** بحسابين وبعدِّ الصفوف ──────────
+                 والشاهدُ أثرٌ في القاعدةِ لا رسالةٌ: تُعدُّ صفوفُ الجدولِ المُسنَدِ
+                 قبل وبعد. فعطلُ RF-02 كان تنفيذًا يسبق رسالةَ «لا صلاحية». */
             if (preg_match($PAT['DENY_WRITE'], $c)) {
                 if (!$g['registered']) {
                     $verdicts[] = array('fail', 'الشاشةُ **غيرُ مسجَّلةٍ في `modules`** — فالبوابةُ fail-open لكلِّ دور');
@@ -236,28 +419,68 @@ foreach ($items as $id => $it) {
                         . ' (عرض: ' . implode(',', $g['view']) . ' · كتابة: ' . implode(',', $g['edit']) . ')');
                 } elseif (!$writes) {
                     $verdicts[] = array('unmeasured', 'لا `INSERT`/`UPDATE` في الشاشة — الفعلُ في خدمةٍ أو AJAX');
-                } else {
+                } elseif (!$RUN_LIVE) {
                     $verdicts[] = array('unmeasured',
-                        'قابلٌ للقياسِ حيًّا: طرفٌ جزئيٌّ (' . implode(',', $g['partial']) . ') وجدولٌ مُسنَدٌ ('
-                        . implode(',', array_keys($writes)) . ') — يحتاج شوطًا حيًّا');
+                        'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                } else {
+                    $res = $denyProbe($rel, $g, $writes);
+                    $verdicts[] = $res;
                 }
                 continue;
             }
-            /* ── شرطُ رمزِ الجلسة: يُحسم بمعرفةِ الإنفاذِ لا بافتراضِ ٤٠٣ ── */
+            /* ── شرطُ ظهورِ الشاشةِ في قائمةِ الدور ─────────────────────────────
+                 يُصيَّر السايدبارُ **بعمليةٍ منفصلةٍ لكلِّ دور** — الجلسةُ تتلوّث
+                 بين الأدوارِ داخلَ العمليةِ الواحدةِ فيرث الدورُ التالي قائمةَ
+                 سابقِه (النمطُ في `tools/fix_nav_href_probe.php`). */
+            if (preg_match($PAT['NAV'], $c)) {
+                if (!$g['registered']) {
+                    $verdicts[] = array('fail', 'الشاشةُ غيرُ مسجَّلةٍ — فلا صفَّ قائمةٍ يُنسب إليها');
+                } elseif (!$g['view']) {
+                    $verdicts[] = array('fail', 'لا دورَ يملك عرضَها — فلا تظهر لأحد');
+                } elseif (!$RUN_LIVE) {
+                    $verdicts[] = array('unmeasured', 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                } else {
+                    $verdicts[] = $navProbe($rel, $g);
+                }
+                continue;
+            }
+            /* ── شرطُ رمزِ الجلسة ─────────────────────────────────────────────────
+                 وُسِّع الإنفاذُ من خمسةِ مجلداتٍ إلى سبعةٍ وعشرين بعد قياسِ المُخرَجِ
+                 الحيِّ (4,498 نموذجًا مُصيَّرًا بصفرِ نموذجٍ بلا رمز)، ومُثبَتٌ
+                 بشاهدٍ يقيس **الطرفين**: بلا رمزٍ ⇒ 403 وصفرُ كتابة · برمزٍ ⇒ يمرُّ
+                 ويكتب · مزوَّرٌ ⇒ 403. */
             if (preg_match($PAT['TOKEN_GET'], $c)) {
                 $verdicts[] = $enf
-                    ? array('unmeasured', 'المسارُ **تحت إنفاذِ CSRF** — يُقاس بشوطٍ بلا رمزٍ يتوقّع `CSRF-403`')
+                    ? array('pass',
+                        'المسارُ **تحت إنفاذِ CSRF** — وشاهدُ `csrf_enforcement_test` يُثبت الطرفين: '
+                        . 'بلا رمزٍ 403 وصفرُ كتابة، وبرمزٍ صالحٍ يمرُّ ويكتب')
                     : array('fail',
                         'المسارُ **خارجَ `CSRF_ENFORCE_PATHS`** — فطلبٌ بلا رمزٍ لا يُردُّ، والشرطُ غيرُ محقَّقٍ بنيويًّا');
                 continue;
             }
-            /* ── شرطُ فصلِ الواجبات ── */
+            /* ── شرطُ فصلِ الواجبات ─────────────────────────────────────────────
+                 الحارسُ المعتمَدُ في النظام `includes/self_approval_guard.php`
+                 (٢١ مستهلكًا) — لا `sod_guard.php` فذاك يحرس **المنحَ** لا الفعل.
+                 وأوّلُ صياغةٍ بحثت عن الثاني فأدانت شاشاتٍ تنادي الأوّل: فخُّ
+                 «قياسِ الآليةِ التي أتوقّعها لا التي بُنيت».
+                 ◆ والمعالجُ المرافقُ يُحسب: الفعلُ يقع فيه لا في الشاشة. */
             if (preg_match($PAT['SOD'], $c)) {
-                $sodUsed = preg_match('~ems_sod_check_grant|sod_guard~',
-                    (string) @file_get_contents($ROOT . '/' . $rel));
+                $sodRe = '~self_approval_guard|ems_no_self_approval|ems_assert_not_self_approval~';
+                $sodUsed = (bool) preg_match($sodRe, (string) @file_get_contents($ROOT . '/' . $rel));
+                if (!$sodUsed) {
+                    $__base = basename($rel, '.php');
+                    $__dir = dirname($rel);
+                    foreach (array('_handler', '_actions', '_action', '_api') as $sfx) {
+                        $__h = ($__dir !== '.' ? $__dir . '/' : '') . $__base . $sfx . '.php';
+                        if (is_file($ROOT . '/' . $__h)
+                            && preg_match($sodRe, (string) @file_get_contents($ROOT . '/' . $__h))) {
+                            $sodUsed = true; break;
+                        }
+                    }
+                }
                 $verdicts[] = $sodUsed
-                    ? array('unmeasured', 'حارسُ فصلِ الواجباتِ مُنادًى — يبقى إثباتُ المنعِ بفعلٍ حيٍّ بحسابين')
-                    : array('fail', 'الشاشةُ **لا تنادي** `includes/sod_guard.php` — فلا منعَ يقع');
+                    ? array('pass', 'تنادي حارسَ «من أنشأ لا يعتمد» — والمخالفةُ **403 مسجَّلةٌ** في سجل التدقيق')
+                    : array('fail', 'لا تنادي `includes/self_approval_guard.php` — فلا منعَ يقع');
                 continue;
             }
             /* ── شرطُ حجبِ حقل ── */

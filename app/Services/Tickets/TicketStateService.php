@@ -12,9 +12,29 @@
 namespace App\Services\Tickets;
 
 require_once __DIR__ . '/WorkstreamActivator.php';
+/* ── INJ-0071 · أثرُ انتقالِ حالةِ المسار ────────────────────────────────────────
+     كلُّ انتقالٍ هنا يغيّر حالةَ بلاغٍ — ومَن غيّرها ومتى ومن أيِّ حالةٍ إلى أيّ
+     كان يضيع. والمصدرُ مُضمَّنٌ **هنا** عند موضعِ الاستعمالِ لا في الشاشة، وإلا
+     كان `function_exists` كاذبًا حين تُستدعى الخدمةُ من مسارٍ آخر. */
+require_once dirname(dirname(dirname(__DIR__))) . '/includes/audit_trail.php';
 
 class TicketStateService
 {
+    /** أثرُ انتقالِ حالةٍ — لا يرمي أبدًا، ولا يُسجَّل إلا عند تغيُّرٍ فعليّ. */
+    private static function auditState(\mysqli $conn, $wsId, $from, $to, $extra = array())
+    {
+        try {
+            if (!function_exists('ems_audit_change')) { return; }
+            if ($conn->affected_rows <= 0) { return; }
+            $uid = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0;
+            $co  = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
+            ems_audit_change($conn, 'tickets', 'ticket_workstreams', 'state_transition', (int) $wsId,
+                array_merge(array('state' => $from), array()),
+                array_merge(array('state' => $to), $extra),
+                array('company_id' => $co, 'user_id' => $uid));
+        } catch (\Throwable $e) { error_log('ticket state audit: ' . $e->getMessage()); }
+    }
+
     /** استلام المسار — مهلة الإنجاز تُقاس من هنا. */
     public static function receive(\mysqli $conn, $wsId, $personId)
     {
@@ -22,6 +42,7 @@ class TicketStateService
         $conn->query("UPDATE ticket_workstreams SET state = 'received', received_at = NOW(),
                       assignee_person_id = COALESCE(assignee_person_id, " . intval($personId) . ")
                       WHERE ws_id = {$wsId} AND state = 'new'");
+        self::auditState($conn, $wsId, 'new', 'received', array('assignee' => intval($personId)));
         return array('ok' => $conn->affected_rows === 1, 'code' => 200);
     }
 
@@ -29,6 +50,7 @@ class TicketStateService
     {
         $wsId = intval($wsId);
         $conn->query("UPDATE ticket_workstreams SET state = 'in_progress' WHERE ws_id = {$wsId} AND state IN ('received','reopened')");
+        self::auditState($conn, $wsId, 'received', 'in_progress');
         return array('ok' => $conn->affected_rows === 1, 'code' => 200);
     }
 
@@ -48,6 +70,7 @@ class TicketStateService
         $stmt->execute();
         $stmt->close();
         $conn->query("UPDATE ticket_workstreams SET state = 'on_hold' WHERE ws_id = {$wsId}");
+        self::auditState($conn, $wsId, 'in_progress', 'on_hold', array('reason' => (string) $reasonCode));
         return array('ok' => true, 'code' => 200, 'reason' => 'عُلِّق — والمهلة واقفة ما دام السبب قائمًا');
     }
 

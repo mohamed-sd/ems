@@ -33,6 +33,15 @@ if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ
 mysqli_query($conn, "INSERT INTO action_execution_log (company_id, action_code, person_id, subject_ref, result)
                      VALUES ($company_id, 'ownership.registry.view', $uid, 'owners_registry', 'allowed')");
 
+/* ── INJ-0051 · وفي **سجلِّ الاطّلاعِ على الحقولِ الحساسة** أيضًا ─────────────────
+     نصُّ القبول: «كلُّ فتحٍ للشاشة يكتب سطرًا في `sensitive_read_log` بالكود
+     المقروء». و`action_execution_log` سجلُّ أفعالٍ لا سجلُّ اطّلاع — وشاشةُ
+     المراجعةِ `Governance/read_log.php` تقرأ الثاني لا الأول. فيُكتب فيهما معًا:
+     الأوّلُ لأثرِ الفعل، والثاني لمن يراجع من اطّلع على اسمِ المالك. */
+require_once __DIR__ . '/../includes/sensitive_read_log.php';
+ems_log_sensitive_read($conn, 'owner_name', 'owners_registry:' . $company_id,
+    'Financing/owners_registry.php');
+
 $rows = array();
 $r = mysqli_query($conn,
     "SELECT r.equipment_id, e.name eq_name, r.owner_type owner_kind, r.actual_owner_name owner_ref, r.note ownership_note,

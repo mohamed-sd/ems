@@ -83,14 +83,55 @@ $screens = array(
     'Maintenance/inspections.php', 'Finance/accountants_fin.php',
     'Financing/financing_board.php', 'Maintenance/get_project_equipment.php',
 );
-$viaGate = 0; $notVia = array();
+/* ◆ والمعيارُ **مسارُ أثرٍ لكلِّ كاتبٍ** لا «الكلُّ عبر البوابة»: للأثرِ في هذا
+     النظامِ أربعةُ مسالكَ مشروعةٍ — البوابةُ · مخزنُ CMP-03 · نداءٌ صريحٌ
+     للموصِّلِ (في الشاشةِ أو خدمتِها أو معالجِها) · وسجلُّ الاطّلاعِ للحقلِ
+     الحسّاس. وشاشةٌ **قارئةٌ لا تكتب** لا يلزمها أثرُ كتابةٍ أصلًا — فاشتراطُه
+     عليها يُرسِب الفاحصَ على غيرِ عيب.
+     (أوّلُ صياغةٍ اشترطت «12 من 16 عبر البوابة» فرسبت — وهي عتبةٌ اخترعتُها
+      لا معيارٌ من نصِّ القبول.) */
+$auditPath = function ($rel) use ($ROOT) {
+    $p = $ROOT . '/' . $rel;
+    $s = (string) @file_get_contents($p);
+    if ($s === '') { return 'مفقود'; }
+    if (preg_match('~ems_tenant_db\(|->insert\(|->update\(|->deleteRow\(|->softDelete\(~', $s)) { return 'بوابة'; }
+    if (preg_match('~cmp03_local_store|cmp03_store_insert|cmp03_stage_insert~', $s)) { return 'cmp03'; }
+    if (preg_match('~ems_audit_change\s*\(~', $s)) { return 'نداءٌ صريح'; }
+    if (preg_match('~ems_log_sensitive_read\s*\(|INSERT INTO sensitive_read_log~i', $s)) { return 'سجلُّ اطّلاع'; }
+    /* الخدماتُ والمعالجاتُ التي تناديها الشاشة */
+    if (preg_match_all('~(?:require_once|include)[^;\n]*[\'"]([^\'"]+\.php)[\'"]~', $s, $m)) {
+        foreach ($m[1] as $inc) {
+            /* `__DIR__ . '/../app/…'` يُلتقط مبدوءًا بشرطةٍ — فتُنزع أوّلًا وإلا
+               فشل قصُّ `../` وبقي المسارُ خارجَ الجذر. */
+            $cand = $ROOT . '/' . ltrim(preg_replace('~^(\.\./)+~', '', ltrim($inc, '/')), '/');
+            if (is_file($cand) && preg_match('~ems_audit_change\s*\(~', (string) @file_get_contents($cand))) {
+                return 'خدمة';
+            }
+        }
+    }
+    $b = basename($rel, '.php'); $d = dirname($rel);
+    foreach (array('_handler', '_actions') as $sx) {
+        $h = $ROOT . '/' . ($d !== '.' ? $d . '/' : '') . $b . $sx . '.php';
+        if (is_file($h) && preg_match('~ems_audit_change\s*\(|ems_tenant_db\(~', (string) @file_get_contents($h))) {
+            return 'معالج';
+        }
+    }
+    /* أهي قارئةٌ أصلًا؟ */
+    if (!preg_match('~INSERT\s+INTO|UPDATE\s+`?[a-z_]+`?\s+SET|->insert\(|->update\(~i', $s)
+        && !preg_match('~REQUEST_METHOD.{0,20}POST~', $s)) { return 'قارئة'; }
+    return '';
+};
+$paths = array(); $bare = array();
 foreach ($screens as $rel) {
-    $s = (string) @file_get_contents($ROOT . '/' . $rel);
-    if (preg_match('~ems_tenant_db\(|->insert\(|->update\(|->deleteRow\(|->softDelete\(~', $s)) { $viaGate++; }
-    else { $notVia[] = $rel; }
+    $p = $auditPath($rel);
+    $paths[$p] = (isset($paths[$p]) ? $paths[$p] : 0) + 1;
+    if ($p === '') { $bare[] = $rel; }
 }
-$ok($viaGate >= 12, "و{$viaGate} من " . count($screens) . " شاشةً تكتب عبر البوابة — فالإصلاحُ يبلغها",
-    'خارجَها: ' . implode(' · ', array_slice($notVia, 0, 4)));
+$desc = array();
+foreach ($paths as $k => $v) { if ($k !== '') { $desc[] = $k . '=' . $v; } }
+$ok(empty($bare),
+    '**لكلِّ شاشةٍ من الستَّ عشرةَ مسارُ أثرٍ** (' . implode(' · ', $desc) . ')',
+    'بلا مسارٍ: ' . implode(' · ', $bare));
 
 /* ── ③ القياسُ الحيُّ: فعلٌ حقيقيٌّ عبر الشاشةِ ثم استعادةُ الأثر ───────────── */
 $jar = sys_get_temp_dir() . '/gateaudit_' . getmypid() . '.txt';

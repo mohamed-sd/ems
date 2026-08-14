@@ -65,6 +65,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resolve_variance') {
     if (!$can_edit) { ems_gov_flash_redirect('po_match.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $rid = intval($_POST['order_id'] ?? 0);
+    /* ── INJ-0093 · «من سجّل الفاتورةَ لا يحسم فرقَها» ──────────────────────────
+         الصلاحيةُ وحدَها لا تكفي: قد يملك الشخصُ حقَّ المطابقةِ وحقَّ الحسمِ معًا
+         بحقٍّ — ويبقى ممنوعًا من الجمعِ بينهما **على الأمرِ نفسِه**. والمُسجِّلُ
+         محفوظٌ في `matched_by`. والحارسُ هو المعتمَدُ في النظام (٢١ مستهلكًا)
+         ويُسجّل الرفضَ ٤٠٣ في سجل التدقيق — فالمحاولةُ نفسُها أثرٌ يُراجَع. */
+    require_once __DIR__ . '/../includes/self_approval_guard.php';
+    $__matcher = 0;
+    $__q = $conn->prepare('SELECT matched_by FROM proc_order WHERE id = ? LIMIT 1');
+    if ($__q) {
+        $__q->bind_param('i', $rid);
+        $__q->execute();
+        $__x = $__q->get_result()->fetch_row();
+        $__q->close();
+        if ($__x) { $__matcher = (int) $__x[0]; }
+    }
+    $__sod = ems_no_self_approval($conn, $__matcher, (int) $current_user_id,
+        'حسمُ فرقِ مطابقةِ الأمر #' . $rid, (int) $company_id);
+    if ($__sod !== null) {
+        ems_gov_flash_redirect('po_match.php', $__sod['reason'], 'SOD-403',
+            'يلزم شخصٌ آخرُ غيرُ من سجّل الفاتورة');
+        exit();
+    }
     $res = proc_match_resolve($conn, $rid, $_POST['decision'] ?? '', $_POST['reason'] ?? '', $current_user_id);
     if ($res['status'] === 'resolved') {
         $msg = 'حُسم الفرقُ (' . ($_POST['decision'] ?? '') . ')' . ($res['due_id'] ? ' — ذمة #' . $res['due_id'] : '') . ' ✅';
