@@ -95,6 +95,20 @@ class RfqAwardService
             $up->close();
 
             $this->conn->commit();
+            /* ── INJ-0002 · أثرُ الترسيةِ يقع بعد **نجاحِ المعاملة** ─────────────────
+                 الترسيةُ قرارٌ مالٌّ يختار موردًا ويلزم النظامَ بسعره — فلا تقع بلا
+                 سطرِ تدقيقٍ يحمل مَن رسّى وعلى مَن وبأيِّ سعرٍ وبأيِّ سبب. والمصدرُ
+                 مُضمَّنٌ عند موضعِ الاستعمالِ لا في رأسِ الملفّ. */
+            try {
+                require_once dirname(dirname(dirname(__DIR__))) . '/includes/audit_trail.php';
+                if (function_exists('ems_audit_change')) {
+                    ems_audit_change($this->conn, 'procurement', 'rfq_awards', 'award', $awardId,
+                        array(),
+                        array('rfq_id' => $rfqId, 'quote_id' => $quoteId, 'supplier_id' => $supplier,
+                              'unit_price' => $price, 'currency' => $cur, 'reason' => $reason),
+                        array('company_id' => $companyId, 'user_id' => $actorId));
+                }
+            } catch (\Throwable $ae) { error_log('rfq award audit: ' . $ae->getMessage()); }
             return array('ok' => true, 'award_id' => $awardId,
                 'msg' => 'رُسّي العرضُ #' . $quoteId . ' بسببٍ موثَّق — الترسية #' . $awardId);
         } catch (\Throwable $e) {

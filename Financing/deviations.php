@@ -36,11 +36,33 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['close_dev']))
     $doc = trim($_POST['decision_doc'] ?? '');
     if ($dec === '') { $msg = 'القرارُ إلزاميٌّ — الانحرافُ يُغلق بقرارٍ لا بصمت (422)'; }
     else {
+        /* ── INJ-0206 · «قبل» تُقرأ من الصفِّ قبل الكتابة ────────────────────────
+             الكتابةُ هنا مباشرةٌ لا عبر بوابةِ المستأجرِ (التي صارت تُدقّق آليًّا)،
+             فيُنادى الموصِّلُ صراحةً. والمصدرُ **مُضمَّنٌ عند موضعِ الاستعمال**،
+             وإلا كان `function_exists` كاذبًا دائمًا فيُتخطّى التدقيقُ صامتًا. */
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        $__before = array();
+        $__q = mysqli_prepare($conn, 'SELECT state, decision, decision_doc_ref FROM financing_deviations
+                                       WHERE dev_id = ? AND company_id = ?');
+        mysqli_stmt_bind_param($__q, 'ii', $did, $company_id);
+        mysqli_stmt_execute($__q);
+        $__r = mysqli_stmt_get_result($__q);
+        if ($__r && ($__row = mysqli_fetch_assoc($__r))) { $__before = $__row; }
+        mysqli_stmt_close($__q);
+
         $st = mysqli_prepare($conn, "UPDATE financing_deviations SET state='closed', decision=?, decision_doc_ref=?,
                                      closed_by=?, closed_at=NOW() WHERE dev_id=? AND company_id=? AND state<>'closed'");
         mysqli_stmt_bind_param($st, 'ssiii', $dec, $doc, $uid, $did, $company_id);
         mysqli_stmt_execute($st);
-        $msg = mysqli_stmt_affected_rows($st) > 0 ? "أُغلق الانحرافُ #$did بقراره" : 'مغلقٌ من قبل (409)';
+        $__aff = mysqli_stmt_affected_rows($st);
+        /* ولا يُسجَّل إلا عند تغيّرٍ فعليّ — فإغلاقُ مغلقٍ لا يكتب أثرًا */
+        if ($__aff > 0) {
+            ems_audit_change($conn, 'financing', 'financing_deviations', 'close', $did,
+                $__before,
+                array('state' => 'closed', 'decision' => $dec, 'decision_doc_ref' => $doc),
+                array('company_id' => $company_id, 'user_id' => $uid));
+        }
+        $msg = $__aff > 0 ? "أُغلق الانحرافُ #$did بقراره" : 'مغلقٌ من قبل (409)';
     }
 }
 

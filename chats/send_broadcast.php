@@ -121,6 +121,23 @@ foreach ($recipient_ids as $receiver_id) {
     }
 }
 
+/* ── INJ-0253 · بثٌّ جماعيٌّ يترك أثرًا واحدًا لا أثرًا لكلِّ مستلِم ──────────────
+     رسالةٌ تُرسَل إلى عشراتٍ دفعةً هي **فعلٌ واحد**. فيُسجَّل صفُّ تدقيقٍ واحدٌ
+     يحمل عددَ المستلِمين ونصَّ الرسالةِ مبتورًا — لا صفٌّ لكلِّ مستلِمٍ فيغرق
+     السجلُّ ويصير أقربَ إلى الضوضاءِ منه إلى المراجعة. */
+if ($inserted_count > 0) {
+    try {
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        if (function_exists('ems_audit_change')) {
+            ems_audit_change($conn, 'chat', 'messages', 'broadcast', (int) $sender_id,
+                array(),
+                array('recipients' => $inserted_count, 'failed' => $failed_count,
+                      'message' => mb_substr((string) $message, 0, 200)),
+                array('company_id' => (int) $safe_company, 'user_id' => (int) $sender_id));
+        }
+    } catch (\Throwable $e) { error_log('broadcast audit: ' . $e->getMessage()); }
+}
+
 // النتيجة
 if ($inserted_count > 0) {
     $message_text = $inserted_count === 1

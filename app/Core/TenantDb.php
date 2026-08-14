@@ -136,7 +136,63 @@ class TenantDb
         }
         $sql = 'INSERT INTO `' . $table . '` (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $marks) . ')';
         $this->run($sql, $params);
-        return $this->conn->insert_id;
+        $newId = $this->conn->insert_id;
+        $this->auditWrite($table, 'create', (int) $newId, array(), $data);
+        return $newId;
+    }
+
+    /* ── سجلُّ التدقيقِ في **البوابة** لا في الشاشات ──────────────────────────────
+         قِيس أنَّ سبعَ عشرةَ شاشةً يطلب اختبارُ قبولِها «صفَّ تدقيقٍ بقيمةِ قبل/بعد»
+         ولا تنادي `ems_audit_change` في شجرةِ تضمينِها كلِّها — بينما كلُّها تكتب
+         عبر هذه البوابة (`$gate->insert/update/deleteRow`). فالإصلاحُ هنا مرةً
+         واحدةً ينال كلَّ كاتبٍ يعبرها اليوم ومستقبلًا — وهو عينُ ما تفعله البوابةُ
+         أصلًا بالعزلِ وحصانةِ الأحداث.
+
+         وثلاثةُ ضوابطَ مقصودة:
+           ① **لا يُسجَّل إلا عند تغيّرٍ فعليّ** — فالضوضاءُ تُفسد المراجعةَ كما
+              يُفسدها الغياب.
+           ② **جداولُ السجلاتِ نفسُها مستثناةٌ** — وإلا سجّل السجلُّ نفسَه بلا نهاية.
+           ③ **لا يرمي أبدًا** — فشلُ التدقيقِ لا يقطع عملَ المستخدم؛ وغيابُه يظهر
+              في الشواهدِ فلا يبقى صامتًا. */
+    private static $AUDIT_SKIP = array(
+        'activity_logs', 'sensitive_read_log', 'action_execution_log',
+        'ems_business_events', 'security_log', 'login_attempts', 'sessions',
+    );
+
+    private function auditWrite($table, $action, $recordId, array $old, array $new)
+    {
+        try {
+            if (in_array($table, self::$AUDIT_SKIP, true)) { return; }
+            if (!function_exists('ems_audit_change')) {
+                $p = dirname(dirname(__DIR__)) . '/includes/audit_trail.php';
+                if (is_file($p)) { require_once $p; }
+            }
+            if (!function_exists('ems_audit_change')) { return; }
+            ems_audit_change($this->conn, 'tenant_gate', $table, $action, (int) $recordId,
+                $old, $new, array(
+                    'company_id' => $this->ctx->companyId(),
+                    'user_id'    => $this->ctx->userId(),
+                ));
+        } catch (\Throwable $e) {
+            error_log('TenantDb audit: ' . $e->getMessage());
+        }
+    }
+
+    /** القيمُ **قبل** التعديل — تُقرأ من الصفِّ لا تُفترض نُلًّا. */
+    private function auditSnapshot($table, array $cols, $cond, array $condParams)
+    {
+        $out = array();
+        try {
+            if (in_array($table, self::$AUDIT_SKIP, true) || empty($cols)) { return $out; }
+            $safe = array();
+            foreach ($cols as $c) { $this->assertIdent($c); $safe[] = '`' . $c . '`'; }
+            $sql = 'SELECT `id`, ' . implode(', ', $safe) . ' FROM `' . $table . '` WHERE ' . $cond . ' LIMIT 50';
+            $res = $this->run($sql, $condParams);
+            while ($res && ($r = $res->fetch_assoc())) { $out[(int) $r['id']] = $r; }
+        } catch (\Throwable $e) {
+            /* جدولٌ بلا `id` أو عمودٌ محسوب — التدقيقُ يسقط ولا يقطع الكتابة */
+        }
+        return $out;
     }
 
     /** تحديث صفوف ضمن نطاق العزل. تغيير company_id ممنوع (إلا crossTenant).
@@ -198,8 +254,23 @@ class TenantDb
             }
         }
 
+        /* لقطةُ «قبل» تُؤخذ **قبل** الكتابةِ وبالأعمدةِ المتغيّرةِ وحدَها */
+        $before = $this->auditSnapshot($table, array_keys($data), $cond, $condParams);
+
         $sql = 'UPDATE `' . $table . '` SET ' . implode(', ', $sets) . ' WHERE ' . $cond;
-        return (int) $this->run($sql, array_merge($params, $condParams));
+        $affected = (int) $this->run($sql, array_merge($params, $condParams));
+
+        /* ولا يُسجَّل إلا عند تغيّرٍ فعليّ — `affected_rows` هي الحكم */
+        if ($affected > 0 && $before) {
+            foreach ($before as $rid => $row) {
+                $old = array();
+                foreach ($data as $col => $_) {
+                    if (array_key_exists($col, $row)) { $old[$col] = $row[$col]; }
+                }
+                $this->auditWrite($table, 'update', (int) $rid, $old, $data);
+            }
+        }
+        return $affected;
     }
 
     /**
@@ -237,6 +308,14 @@ class TenantDb
     {
         $id = intval($id);
         $def = $this->requireTable($table, true /* strict — لا عبور مراقبةٍ للحذف أبدًا */);
+        /* صورةُ الصفِّ **قبل** زواله — فحذفٌ بلا أثرٍ لا يُراجَع */
+        $auditBefore = array();
+        try {
+            if (!in_array($table, self::$AUDIT_SKIP, true)) {
+                $rs = $this->conn->query('SELECT * FROM `' . $table . '` WHERE `id` = ' . $id . ' LIMIT 1');
+                if ($rs && ($rr = $rs->fetch_assoc())) { $auditBefore = $rr; }
+            }
+        } catch (\Throwable $e) { /* التدقيقُ يسقط ولا يمنع الحذف */ }
         if (!empty($def['soft'])) {
             $this->deny('deleteRow refused (table has soft delete — use softDelete)', $table);
         }
@@ -266,6 +345,10 @@ class TenantDb
         }
         $deleted = $stmt->affected_rows;
         $stmt->close();
+
+        if ($deleted > 0 && $auditBefore) {
+            $this->auditWrite($table, 'delete', $id, $auditBefore, array('__deleted' => 1));
+        }
 
         if (function_exists('log_security_event')) {
             log_security_event('tenant_gate_delete_row',

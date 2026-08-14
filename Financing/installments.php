@@ -49,7 +49,19 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pay_inst'])) 
                     GREATEST(0, o.capital - COALESCE((SELECT SUM(amount_principal) FROM financing_installments
                                                       WHERE op_id = o.op_id AND state = 'paid'), 0))
                     WHERE o.op_id = " . intval($inst['op_id']));
-            if ($ok1 && $ok2) { mysqli_commit($conn); $msg = "سُدّد القسطُ #$iid بمرجع $ref — والرصيدُ أُعيد حسابُه"; }
+            if ($ok1 && $ok2) {
+                mysqli_commit($conn);
+                /* ── INJ-0052 · «كلُّ سدادٍ يترك سطرَ تدقيق» ───────────────────────
+                     الكتابةُ مباشرةٌ لا عبر البوابةِ المُدقِّقة، فيُنادى الموصِّلُ
+                     صراحةً بعد **نجاحِ المعاملةِ** لا قبلَها — فأثرٌ لسدادٍ أُلغي
+                     أسوأُ من غيابه. والمصدرُ مُضمَّنٌ عند موضعِ الاستعمال. */
+                require_once __DIR__ . '/../includes/audit_trail.php';
+                ems_audit_change($conn, 'financing', 'financing_installments', 'pay', (int) $iid,
+                    array('state' => 'due', 'payment_ref' => null, 'paid_date' => null),
+                    array('state' => 'paid', 'payment_ref' => $ref, 'paid_date' => date('Y-m-d')),
+                    array('company_id' => $company_id, 'user_id' => $uid));
+                $msg = "سُدّد القسطُ #$iid بمرجع $ref — والرصيدُ أُعيد حسابُه";
+            }
             else { mysqli_rollback($conn); $msg = 'فشلت المعاملةُ فأُلغيت: ' . mysqli_error($conn); }
         } else { $msg = 'قسطٌ غيرُ مستحقٍّ أو مسدَّدٌ من قبل (409)'; }
     }
