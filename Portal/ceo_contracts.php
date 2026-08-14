@@ -167,6 +167,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             . ' على العقد ' . $row['contract_no'] . ' · تُقفل بمستند معالجةٍ أولًا ❌');
     }
 
+    /* ══ INJ-0014 · سقفُ التفويضِ والتصعيدُ التلقائيّ ══════════════════════════
+         نصُّ القبول: «نائبٌ بسقف 100,000 يوقّع عقدًا بـ 90,000 ⇒ يُقبل **ويُسجَّل
+         مرجعُ تفويضه**؛ ويوقّع عقدًا بـ 150,000 ⇒ يُرفض **ويُصعَّد تلقائيًّا**
+         لصندوق الرئيس».
+
+         و`AuthorityGuard::sign()` **مبنيٌّ كاملًا** منذ LEG-01: يقرأ سقفَ
+         `signing_authorities` ويردُّ 409 فوقَه، ويمنع اعتمادَ الذاتِ 403، ويكتب
+         سطرَ توقيعٍ في `approval_signatures`. لكنَّ هذه الشاشةَ **لم تكن تناديه**
+         — فالسقفُ مبنيٌّ وغيرُ متبنًّى (عيبُ MD-05).
+
+         والناقصُ الوحيدُ في الحارسِ هو **التصعيد**: يرفض ولا يرفع. فالرفعُ هنا:
+         صفٌّ في صندوقِ اعتمادِ الرئيس (`exec_approvals`) يحمل المبلغَ والسقفَ
+         والفارقَ ومن حاول — فالتجاوزُ يصير طلبًا لا رفضًا صامتًا. */
+    require_once dirname(__DIR__) . '/app/Core/AuthorityGuard.php';
+    $__amt = ($row['amount'] !== null && $row['amount'] !== '') ? (float) $row['amount'] : null;
+    $__sig = \App\Core\AuthorityGuard::sign($conn, array(
+        'document_type'        => 'exec_contract_signing',
+        'document_id'          => $rowId,
+        'step'                 => 'sign',
+        'person_id'            => $uid,
+        'company_id'           => $company_id,
+        'amount'               => $__amt,
+        'created_by_person_id' => (int) ($row['created_by'] ?? 0),
+    ));
+    if (!$__sig['ok']) {
+        /* فوق السقفِ ⇒ يُصعَّد إلى صندوقِ الرئيس بدل أن يُرفض ويُنسى */
+        if ((int) $__sig['code'] === 409) {
+            $__esc = $conn->prepare("INSERT INTO exec_approvals
+                (company_id, request_no, received_date, doc_type, document, requesting_dept,
+                 raise_reason, amount, currency, status, source_kind, created_by, created_by_name)
+                VALUES (?, ?, CURDATE(), 'عقد', ?, 'مكتب الرئيس التنفيذي والنواب',
+                        ?, ?, ?, 'قيد المراجعة', 'escalation', ?, ?)");
+            if ($__esc) {
+                $__rq  = 'ESC-' . $rowId . '-' . date('ymdHis');
+                $__doc = 'عقد ' . (string) ($row['contract_no'] ?? ('#' . $rowId));
+                $__why = 'تجاوزُ سقفِ التفويض — ' . $__sig['reason'];
+                $__cur = (string) ($row['currency'] ?? '');
+                $__nm  = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
+                $__amtS = (string) ($row['amount'] ?? '');
+                /* ثمانِ علاماتٍ ⇐ ثمانيةُ مُعامَلات: `company_id` أوّلُها */
+                $__esc->bind_param('isssssis', $company_id, $__rq, $__doc, $__why,
+                    $__amtS, $__cur, $uid, $__nm);
+                $__esc->execute();
+                $__esc->close();
+            }
+            $goBack('SIGN-CAP-409: ' . $__sig['reason'] . ' — **رُفع الطلبُ إلى صندوقِ اعتمادِ الرئيس** ⤴');
+        }
+        $goBack('SIGN-AUTH-' . $__sig['code'] . ': ' . $__sig['reason'] . ' ❌');
+    }
+    /* ومرجعُ التفويضِ يُسجَّل مع التوقيعِ لا يُترك نصًّا حرًّا */
+    if (!empty($__sig['auth_id'])) { $authorityRef = 'تفويض #' . (int) $__sig['auth_id']; }
+
     // العقد الحقيقي المرتبط: التوقيع عبر آلة الحالة — نقطة الخنق وأثرها الرباعي
     if ($linkContract > 0) {
         require_once dirname(__DIR__) . '/app/Core/TenantDb.php';

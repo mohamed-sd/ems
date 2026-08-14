@@ -176,13 +176,67 @@ class FinancingService
         foreach (array('op_code', 'financier_entity_id', 'currency', 'capital') as $f) {
             if (!isset($a[$f]) || $a[$f] === '') { $out['code'] = 422; $out['reason'] = 'حقل إلزامي: ' . $f; return $out; }
         }
-        $stmt = $conn->prepare(
-            'INSERT INTO financing_operations (company_id, op_code, financier_entity_id, model_code, currency, signed_date, capital, purchase_value, down_payment, profit_rate, profit_amount, installments_no, installment_amount, outstanding_balance, maturity_date, state, created_by)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, \'active\', ?)');
+        /* ══ INJ-0053 · سقفُ التفويضِ يحكم **حالةَ** العمليةِ لا رسالتَها ══════════
+             نصُّ القبول: «إنشاءُ عمليةٍ فوق سقف الدور **لا يجعلها نافذةً** بل
+             معلَّقةً بتصعيدٍ لمن يعلوه؛ وكلُّ عمليةٍ نافذةٍ تحمل مرجعَ تفويضِ
+             معتمِدها».
+
+             والمقيسُ قبلَه: كلُّ عمليةٍ تُنشأ `'active'` مهما بلغ رأسُ المال.
+             فالسقفُ لم يكن يُقرأ أصلًا — و`AuthorityGuard` مبنيٌّ منذ LEG-01
+             بتسعةِ مستهلكين ليس فيهم هذه الخدمة (عيبُ MD-05).
+
+             ◆ والحكمُ **في الخدمةِ لا في الشاشة**: هي مَخنَقُ إنشاءِ العمليات،
+               فأيُّ نافذةٍ أخرى تنشئ عمليةً تنال القيدَ نفسَه. */
         $companyId = intval($companyId);
+        $capital = (float) $a['capital'];
+        /* المصدرُ يُضمَّن **قبل** أوّلِ نداءٍ للصنف — لا داخلَ الشرطِ بعده */
+        require_once dirname(dirname(__DIR__)) . '/Core/AuthorityGuard.php';
+        $entityId = \App\Core\AuthorityGuard::tenantEntity($conn, $companyId);
+        $authRef = null; $escRef = null; $newState = 'active';
+        $capMsg = '';
+        if ($entityId) {
+            $sig = \App\Core\AuthorityGuard::sign($conn, array(
+                'document_type' => 'financing_operation',
+                'document_id'   => 0,          /* لم يُنشأ بعد — التوقيعُ على المبلغ */
+                'step'          => 'create',
+                'person_id'     => intval($actor),
+                'company_id'    => $companyId,
+                'entity_id'     => $entityId,
+                'amount'        => $capital,
+            ));
+            if (!empty($sig['ok']) && !empty($sig['auth_id'])) {
+                $authRef = 'AUTH-' . (int) $sig['auth_id'];
+            } elseif ((int) $sig['code'] === 409) {
+                /* فوقَ السقفِ: **معلَّقةٌ** لا نافذة — والتصعيدُ صفٌّ حقيقيّ */
+                $newState = 'draft';
+                $capMsg = ' — ' . $sig['reason'];
+                $esc = $conn->prepare("INSERT INTO exec_approvals
+                    (company_id, request_no, received_date, doc_type, document, requesting_dept,
+                     raise_reason, amount, currency, status, source_kind, created_by, created_by_name)
+                    VALUES (?, ?, CURDATE(), 'عملية تمويل', ?, 'التمويل والملكية',
+                            ?, ?, ?, 'قيد المراجعة', 'escalation', ?, ?)");
+                if ($esc) {
+                    $rq  = 'ESC-FIN-' . date('ymdHis') . '-' . intval($actor);
+                    $doc = 'عمليةُ تمويلٍ ' . (string) $a['op_code'];
+                    $why = 'تجاوزُ سقفِ التفويضِ عند الإنشاء' . $capMsg;
+                    $amtS = (string) $capital;
+                    $curS = (string) $a['currency'];
+                    $act2 = intval($actor);
+                    $nm  = 'منشئُ العملية #' . $act2;
+                    /* ثمانِ علاماتٍ في العبارةِ ⇐ ثمانيةُ مُعامَلات: `company_id`
+                       أوّلُها — وقد سقط في أوّلِ صياغةٍ فرمى `ArgumentCountError`. */
+                    $esc->bind_param('isssssis', $companyId, $rq, $doc, $why, $amtS, $curS, $act2, $nm);
+                    if ($esc->execute()) { $escRef = $rq; }
+                    $esc->close();
+                }
+            }
+        }
+
+        $stmt = $conn->prepare(
+            'INSERT INTO financing_operations (company_id, op_code, financier_entity_id, model_code, currency, signed_date, capital, purchase_value, down_payment, profit_rate, profit_amount, installments_no, installment_amount, outstanding_balance, maturity_date, state, created_by, authority_ref, escalated_to)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $code = (string) $a['op_code']; $fid = intval($a['financier_entity_id']);
         $cur = (string) $a['currency']; $signed = isset($a['signed_date']) ? (string) $a['signed_date'] : date('Y-m-d');
-        $capital = (float) $a['capital'];
         $pv = isset($a['purchase_value']) ? (float) $a['purchase_value'] : null;
         $dp = isset($a['down_payment']) ? (float) $a['down_payment'] : 0.0;
         $pr = isset($a['profit_rate']) ? (float) $a['profit_rate'] : null;
@@ -192,12 +246,21 @@ class FinancingService
         $outstanding = round($capital - $dp + (float) ($pa !== null ? $pa : 0), 2);
         $mat = isset($a['maturity_date']) ? (string) $a['maturity_date'] : null;
         $act = intval($actor);
-        $stmt->bind_param('isisssdddddiddsi', $companyId, $code, $fid, $mc, $cur, $signed, $capital, $pv, $dp, $pr, $pa, $ni, $ia, $outstanding, $mat, $act);
+        $stmt->bind_param('isisssdddddiddssiss', $companyId, $code, $fid, $mc, $cur, $signed, $capital,
+            $pv, $dp, $pr, $pa, $ni, $ia, $outstanding, $mat, $newState, $act, $authRef, $escRef);
         if (!$stmt->execute()) { $out['code'] = 422; $out['reason'] = $stmt->error; $stmt->close(); return $out; }
         $out['op_id'] = intval($stmt->insert_id);
         $stmt->close();
         $out['ok'] = true; $out['code'] = 201;
-        $out['reason'] = 'عملية ' . $code . ' (' . $mc . ' — ' . $model['accounting_recognition'] . ') نافذة برصيد ' . $outstanding;
+        $out['state'] = $newState;
+        $out['authority_ref'] = $authRef;
+        $out['escalated_to'] = $escRef;
+        /* الرسالةُ تقول الحالةَ الحقيقيةَ — «نافذة» على معلَّقةٍ خداعٌ للمستخدم */
+        $out['reason'] = ($newState === 'active')
+            ? ('عملية ' . $code . ' (' . $mc . ' — ' . $model['accounting_recognition'] . ') نافذة برصيد '
+               . $outstanding . ($authRef !== null ? ' · بمرجع تفويض ' . $authRef : ''))
+            : ('عملية ' . $code . ' **معلَّقةٌ ولم تنفذ**' . $capMsg
+               . ($escRef !== null ? ' · رُفعت لصندوق الاعتماد الأعلى (' . $escRef . ')' : ''));
         return $out;
     }
 

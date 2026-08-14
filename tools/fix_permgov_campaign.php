@@ -525,6 +525,57 @@ foreach ($items as $id => $it) {
                     : array('fail', 'الشاشةُ **لا تنادي** `FieldGovernor` — فالحقلُ يُرسَل للجميع');
                 continue;
             }
+            /* ── شرطُ السقفِ والتصعيد ────────────────────────────────────────────
+                 `AuthorityGuard::sign()` مبنيٌّ منذ LEG-01 ويردُّ 409 فوقَ
+                 `amount_cap` — والناقصُ كان **تبنّيَه** و**التصعيدَ** بعده.
+                 فيُقاس الأمران معًا: أتنادي الشاشةُ/الخدمةُ الحارسَ؟ وأتُصعِّد؟
+                 ومُثبَتانِ بشاهدين مُشغَّلين يزرعان تفويضًا حقيقيًّا بسقفٍ. */
+            if (preg_match($PAT['CAP'], $c)) {
+                $capSrc = (string) @file_get_contents($ROOT . '/' . $rel);
+                $callsGuard = (strpos($capSrc, 'AuthorityGuard::sign(') !== false);
+                if (!$callsGuard) {
+                    /* والخدمةُ التي تناديها الشاشةُ تُحسب — الحكمُ قد يكون فيها */
+                    if (preg_match_all('~(?:require_once|include)[^;\n]*[\'"]([^\'"]+\.php)[\'"]~', $capSrc, $mm)) {
+                        foreach ($mm[1] as $inc) {
+                            $p = $ROOT . '/' . ltrim(preg_replace('~^(\.\./)+~', '', $inc), '/');
+                            if (is_file($p) && strpos((string) @file_get_contents($p), 'AuthorityGuard::sign(') !== false) {
+                                $callsGuard = true; break;
+                            }
+                        }
+                    }
+                }
+                $escalates = (strpos($capSrc, "'escalation'") !== false)
+                          || (strpos($capSrc, 'escalated_to') !== false);
+                if (!$escalates && $callsGuard) {
+                    if (preg_match_all('~(?:require_once|include)[^;\n]*[\'"]([^\'"]+\.php)[\'"]~', $capSrc, $mm2)) {
+                        foreach ($mm2[1] as $inc) {
+                            $p = $ROOT . '/' . ltrim(preg_replace('~^(\.\./)+~', '', $inc), '/');
+                            if (is_file($p) && strpos((string) @file_get_contents($p), "'escalation'") !== false) {
+                                $escalates = true; break;
+                            }
+                        }
+                    }
+                }
+                if ($callsGuard && $escalates) {
+                    $verdicts[] = array('pass',
+                        'تنادي `AuthorityGuard::sign()` (سقفٌ ⇒ 409) **وتُصعِّد** إلى صندوقِ الاعتمادِ الأعلى — '
+                        . 'مُثبَتٌ بشاهدَي `authority_cap_escalation_test` و`cap_state_guard_test`');
+                } elseif ($callsGuard) {
+                    $verdicts[] = array('fail', 'تنادي حارسَ السقفِ لكنّها **ترفض بلا تصعيد** — والرفضُ الصامتُ يُضيع الطلب');
+                } else {
+                    $verdicts[] = array('fail', 'لا تنادي `AuthorityGuard::sign()` — فالسقفُ مبنيٌّ وغيرُ متبنًّى');
+                }
+                continue;
+            }
+            /* ── شرطُ الحالةِ المحكومةِ التي لا تُملى من النموذج ─────────────────── */
+            if (preg_match($PAT['STATE_GUARD'], $c)) {
+                $stSrc = (string) @file_get_contents($ROOT . '/' . $rel);
+                $guarded = (bool) preg_match('~may_finance_approve|\$__mayFin|\bactorRole\b|role\'\] \?\? \'\'\) !== \'9\'~', $stSrc);
+                $verdicts[] = $guarded
+                    ? array('pass', 'الحالةُ تُحسب في الخادمِ بحسبِ صلاحيةِ الفاعلِ لا تُقرأ من النموذج')
+                    : array('fail', 'الحالةُ تُقرأ من النموذجِ كما وردت — فيُمليها مُرسِلُ الطلب');
+                continue;
+            }
             /* ── ما عدا ذلك ── */
             $verdicts[] = array('unmeasured', 'نمطُ «' . $pat . '» — لا مقياسَ آليًّا في هذه الجولة');
         }

@@ -39,6 +39,32 @@ $priorities     = proc_priorities();
 $states         = proc_request_states();
 $fin_states     = array('بانتظار', 'معتمد مالياً', 'مرفوض');
 
+/* ── INJ-0089 · مَن يملك ضبطَ «الاعتماد المالي»؟ ─────────────────────────────
+     ليست صلاحيةَ هذه الشاشةِ بل صلاحيةَ **المالية**: من يملك الكتابةَ على
+     صندوقِ الاعتماداتِ المالية. فطالبُ الشراءِ قد يملك `can_edit` هنا بحقٍّ
+     ويبقى ممنوعًا من إعلانِ طلبِه معتمدًا ماليًّا.
+     ◆ والسوبرُ استثناءٌ مُعلَن، والدالةُ تُحسب مرةً واحدةً لكلِّ طلبٍ (static). */
+if (!function_exists('ems_proc_may_finance_approve')) {
+    function ems_proc_may_finance_approve(mysqli $conn, $uid)
+    {
+        static $cache = null;
+        if ($cache !== null) { return $cache; }
+        if (strval($_SESSION['user']['role'] ?? '') === '-1') { return $cache = true; }
+        $role = intval($_SESSION['user']['role'] ?? 0);
+        if ($role <= 0) { return $cache = false; }
+        $st = $conn->prepare("SELECT 1 FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
+                               WHERE rp.role_id = ? AND rp.can_edit = 1
+                                 AND m.code IN ('Finance/approvals_inbox.php', 'FinRequests/requests.php')
+                               LIMIT 1");
+        if (!$st) { return $cache = false; }
+        $st->bind_param('i', $role);
+        $st->execute();
+        $cache = (bool) $st->get_result()->fetch_row();
+        $st->close();
+        return $cache;
+    }
+}
+
 // ── ③ توليدُ الاحتياج الآن: جسرُ الصيانة + كنّاسُ حدود الطلب — يدويًّا ──
 // (القناةُ الدورية cron_proc_replenish.php؛ والزرُّ لمن لا ينتظر الساعة)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_needs') {
@@ -72,7 +98,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
     $equipment_id = ($_POST['equipment_id'] ?? '') !== '' ? intval($_POST['equipment_id']) : null;
     $project_id   = ($_POST['project_id'] ?? '') !== '' ? intval($_POST['project_id']) : null;
     $priority     = trim($_POST['priority'] ?? 'عادي');
-    $fin_state    = trim($_POST['fin_approval_state'] ?? 'بانتظار');
+    /* ── INJ-0089 · الحالةُ الماليةُ ليست حقلًا في نموذجِ الطالب ─────────────────
+         نصُّ القبول: «محاولةُ الطالبِ ضبطَ الحالة المالية بنفسه غيرُ ممكنةٍ
+         (الحقلُ **غيرُ موجودٍ في نموذجه**)». وكان في النموذجِ قائمةٌ منسدلةٌ
+         مفتوحةٌ لكلِّ من يكتب — فيُعلن الطالبُ طلبَه «معتمدًا ماليًّا» بنفسه.
+         والنزعُ من الواجهةِ وحدَه لا يكفي: الطلبُ يُصنَع بأداةٍ خارجَ المتصفح.
+         فيُتجاهل الحقلُ في **الخادمِ** لمن لا يملك الاعتمادَ المالي. */
+    $__mayFin = ems_proc_may_finance_approve($conn, $current_user_id);
+    $fin_state    = $__mayFin ? trim($_POST['fin_approval_state'] ?? 'بانتظار') : 'بانتظار';
+    if (!$__mayFin && isset($_POST['fin_approval_state'])
+        && trim((string) $_POST['fin_approval_state']) !== 'بانتظار') {
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        ems_audit_change($conn, 'procurement', 'proc_request', 'fin_state_refused', 0,
+            array(), array('attempted' => trim((string) $_POST['fin_approval_state'])),
+            array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
+    }
     $state        = trim($_POST['state'] ?? 'مسودة');
     $notes        = trim($_POST['notes'] ?? '');
 
@@ -346,6 +386,9 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?php /* INJ-0089: الحقلُ لمن يملك الاعتمادَ المالي وحدَه — والطالبُ
+                             يرى حالتَه قراءةً لا قائمةً يختار منها. */ ?>
+                    <?php if (ems_proc_may_finance_approve($conn, $current_user_id)): ?>
                     <div class="form-group">
                         <label>حالة الاعتماد المالي</label>
                         <select name="fin_approval_state">
@@ -354,6 +397,15 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?php else: ?>
+                    <div class="form-group">
+                        <label>حالة الاعتماد المالي</label>
+                        <div class="ems-readonly-value">
+                            <?php echo htmlspecialchars($edit ? (string) $edit['fin_approval_state'] : 'بانتظار'); ?>
+                            <small class="text-muted">— يضبطها الاعتمادُ الماليُّ لا مُقدِّمُ الطلب</small>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     <div class="form-group" style="grid-column:1/-1">
                         <label>ملاحظات</label>
                         <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
