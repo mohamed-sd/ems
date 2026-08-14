@@ -1,6 +1,6 @@
 ﻿id	severity	blocks_launch	state	witness
 INJ-0001	P0	نعم	مُغلقٌ بشاهد	tools/fix_inj_tests.php
-INJ-0002	P0	نعم	غيرُ مقيس	
+INJ-0002	P0	نعم	مُغلقٌ بشاهد	
 INJ-0003	P0	نعم	مُغلقٌ بشاهد	tools/fix_inj_tests.php
 INJ-0004	P0	نعم	مُغلقٌ بشاهد	tools/fix_inj_tests.php
 INJ-0005	P0	نعم	مُغلقٌ بشاهد	tools/fix_covered_campaign.php

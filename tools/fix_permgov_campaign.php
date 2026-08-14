@@ -205,6 +205,34 @@ $writesOf = function ($rel) use ($ROOT) {
     }
     return $t;
 };
+/* ── مسلكُ الأثرِ: أربعةٌ مشروعةٌ لا اثنان ────────────────────────────────────
+     ويطابق ما يقيسه الشاهدُ المُشغَّل `tests/tenant_gate_audit_test.php` حرفًا
+     بحرف — فأداةُ الحملةِ وشاهدُها لا يختلفان في تعريفِ «مُدقَّق». */
+$auditPathOf = function ($rel) use ($ROOT) {
+    $s = (string) @file_get_contents($ROOT . '/' . $rel);
+    if ($s === '') { return ''; }
+    if (preg_match('~ems_tenant_db\(|->insert\(|->update\(|->deleteRow\(|->softDelete\(~', $s)) { return 'بوابة'; }
+    if (preg_match('~cmp03_local_store|cmp03_store_insert|cmp03_stage_insert~', $s)) { return 'cmp03'; }
+    if (preg_match('~ems_audit_change\s*\(~', $s)) { return 'نداءٌ صريح'; }
+    if (preg_match('~ems_log_sensitive_read\s*\(|INSERT INTO sensitive_read_log~i', $s)) { return 'سجلُّ اطّلاع'; }
+    if (preg_match_all('~(?:require_once|include)[^;\n]*[\'"]([^\'"]+\.php)[\'"]~', $s, $m)) {
+        foreach ($m[1] as $inc) {
+            $cand = $ROOT . '/' . ltrim(preg_replace('~^(\.\./)+~', '', ltrim($inc, '/')), '/');
+            if (is_file($cand) && preg_match('~ems_audit_change\s*\(~', (string) @file_get_contents($cand))) {
+                return 'خدمة';
+            }
+        }
+    }
+    $b = basename($rel, '.php'); $d = dirname($rel);
+    foreach (array('_handler', '_actions') as $sx) {
+        $h = $ROOT . '/' . ($d !== '.' ? $d . '/' : '') . $b . $sx . '.php';
+        if (is_file($h) && preg_match('~ems_audit_change\s*\(|ems_tenant_db\(~', (string) @file_get_contents($h))) {
+            return 'معالج';
+        }
+    }
+    return '';
+};
+
 /* هل الشاشةُ تنادي موصِّلَ التدقيقِ فعلًا — وتُضمِّن مصدرَه؟ */
 $auditAdoption = function ($rel) use ($ROOT) {
     $s = (string) @file_get_contents($ROOT . '/' . $rel);
@@ -385,7 +413,11 @@ foreach ($items as $id => $it) {
                      بشاهدٍ مُشغَّلٍ (`tests/tenant_gate_audit_test.php`).
                  وشرطٌ يمرُّ هنا يمرُّ **بشاهدٍ حيٍّ** لا بقراءةِ شفرة. */
             if (preg_match($PAT['AUDIT'], $c)) {
-                if ($gateAudits && $viaGate) {
+                $__ap = $auditPathOf($rel);
+                if ($__ap !== '' && $__ap !== 'بوابة') {
+                    $verdicts[] = array('pass', 'مسلكُ الأثرِ: ' . $__ap
+                        . ' — ومعيارُه هو معيارُ الشاهدِ المُشغَّل نفسِه');
+                } elseif ($gateAudits && $viaGate) {
                     $verdicts[] = array('pass',
                         'تكتب عبر بوابةِ المستأجرِ — والبوابةُ تُدقّق آليًّا بقيمةِ قبل/بعد '
                         . '(شاهدٌ مُشغَّل: `tenant_gate_audit_test` — صفٌّ واحدٌ · «قبل» مقروءةٌ · صفرُ ضوضاء)');
