@@ -238,6 +238,11 @@ if (isset($_GET['edit_id']) && $can_edit) {
     }
 }
 
+/* INJ-0347: قرارُ رؤيةِ التكلفةِ يُحسب مرةً للصفحةِ — لا لكلِّ سطرٍ فيغرق السجل */
+require_once __DIR__ . '/../includes/field_visibility.php';
+$__seeCost = ems_may_see_field($conn, 'po.sensitive_cols', 'proc_order:' . date('Ymd'),
+    'Procurement/orders_proc.php');
+
 $page_title = 'إيكوبيشن | أوامر الشراء';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -362,8 +367,17 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                         <tr>
                             <td><?php echo htmlspecialchars((string)$__l['doc_no']); ?></td>
                             <td><?php echo htmlspecialchars((string)$__l['cost_type']); ?></td>
+                            <?php /* INJ-0347: مبالغُ التكلفةِ المُحمَّلةِ لا تعبر بلا منحة —
+                                     «حسابٌ بلا منحٍ **لا يتلقى قيمَ الأعمدة الحسّاسة في
+                                     استجابة HTML أصلًا**، وكلُّ اطّلاعٍ مخوَّلٍ يُنتج صفًّا
+                                     في سجل الاطّلاع». */ ?>
+                            <?php if ($__seeCost): ?>
                             <td><?php echo number_format((float)$__l['amount'], 2) . ' ' . htmlspecialchars((string)$__l['currency']); ?></td>
                             <td><?php echo number_format((float)$__l['base_amount'], 2); ?></td>
+                            <?php else: ?>
+                            <td class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</td>
+                            <td class="ems-field-withheld">—</td>
+                            <?php endif; ?>
                             <td><small><?php echo htmlspecialchars((string)$__l['created_at']); ?></small></td>
                             <td>
                                 <?php if ($can_edit): ?>

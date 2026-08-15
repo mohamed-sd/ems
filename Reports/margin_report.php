@@ -49,6 +49,12 @@ foreach ($rows as $x) {
     if ($byContract[$cid] > 1) { $multiCurrency[$cid] = true; }
 }
 
+/* INJ-0150: قرارُ رؤيةِ الهامشِ يُحسب مرةً للصفحةِ كلِّها — لا لكلِّ صفٍّ،
+   وإلا كُتب سطرُ اطّلاعٍ لكلِّ سطرٍ في الجدولِ فأغرق السجل. */
+require_once __DIR__ . '/../includes/field_visibility.php';
+$__seeMargin = ems_may_see_field($conn, 'contract.margin', 'margin_report:' . date('Ymd'),
+    'Reports/margin_report.php');
+
 $page_title = 'إيكوبيشن | هامش الواقعة والعقد';
 // CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -112,13 +118,26 @@ include '../insidebar.php';
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$x['currency']); ?></td>
                     <td><?php echo intval($x['events_n']); ?></td>
+                    <?php /* ── INJ-0150 · السعرُ والهامشُ لا يعبرانِ بلا منحةٍ فردية ──────
+                             نصُّ القبول: «دورٌ بلا منحةٍ فرديةٍ **لا يجد حقولَ السعر
+                             والهامش في استجابة الخادم**؛ وكلُّ اطّلاعٍ مخوَّلٍ يكتب
+                             صفًّا في سجل الاطّلاع». والهامشُ أشدُّ رقمٍ في النظام:
+                             يكشف ما يُربَح على كلِّ عميلٍ ومورّد. */ ?>
+                    <?php if ($__seeMargin): ?>
                     <td><?php echo htmlspecialchars((string)$x['revenue']); ?></td>
                     <td><?php echo htmlspecialchars((string)$x['supplier_cost']); ?></td>
                     <td><?php echo htmlspecialchars((string)$x['operator_cost']); ?></td>
-                    <td><strong style="<?php echo $x['margin'] < 0 ? 'color:#c00' : 'color:#0a7'; ?>">
+                    <td><strong class="<?php echo $x['margin'] < 0 ? 'cd-bal-neg' : 'cd-bal-pos'; ?>">
                         <?php echo htmlspecialchars((string)$x['margin']); ?></strong></td>
                     <td><?php echo $x['margin_pct'] !== null
                         ? htmlspecialchars($x['margin_pct'] . '٪') : '—'; ?></td>
+                    <?php else: ?>
+                    <td class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</td>
+                    <td class="ems-field-withheld">—</td>
+                    <td class="ems-field-withheld">—</td>
+                    <td class="ems-field-withheld">—</td>
+                    <td class="ems-field-withheld">—</td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             </tbody></table></div>

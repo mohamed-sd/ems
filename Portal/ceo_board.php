@@ -76,6 +76,34 @@ $COLDB = array_merge(array(null), $DB_FIELDS);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
     $in = array();
     foreach ($DB_FIELDS as $i => $col) { $in[$col] = trim((string) ($_POST['f' . $i] ?? '')); }
+
+    /* ══ INJ-0118 · لا مسارَ إدخالٍ يدويٍّ لمؤشرٍ ماليّ ═══════════════════════════
+         نصُّ القبول: «كلُّ رقمٍ في لوحة القمة قابلٌ للنقر ويفتح مصدرَه، **ولا
+         يوجد في الشاشة مسارُ إدخالٍ يدويٍّ لأيِّ مؤشرٍ مالي**».
+         والمقيسُ قبلَه: كلُّ مؤشراتِ اللوحةِ — الإيرادُ المعترَفُ والتحصيلُ
+         والذممُ المتأخرةُ والهامشُ والتزاماتُ التمويل — تُكتب **بأصابعِ
+         المستخدمِ** وتُحفظ بحالةِ «معتمد» مباشرة. فرقمٌ يُقرَّر عليه في أعلى
+         الهرمِ مصدرُه حقلُ نصٍّ لا دفترُ حسابات.
+         ◆ ولا يُحذف الجدولُ: اللقطةُ تبقى **مشتقّةً** من مصادرِها. والمُدخَلُ
+           هنا يُرفض برمزٍ محكومٍ ويُسجَّل — فالمحاولةُ نفسُها أثرٌ يُراجَع. */
+    $__FIN_KPI = array('portfolio_value', 'recognized_revenue', 'collection',
+        'overdue_receivables', 'expected_cashflow', 'financing_commitments', 'margin_pct');
+    $__typed = array();
+    foreach ($__FIN_KPI as $__k) {
+        if (isset($in[$__k]) && trim((string) $in[$__k]) !== '') { $__typed[] = $__k; }
+    }
+    if ($__typed) {
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        ems_audit_change($conn, 'governance', 'exec_board_snapshots', 'manual_kpi_refused', 0,
+            array(), array('fields' => implode(',', $__typed)),
+            array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
+        ems_gov_flash_redirect(basename(__FILE__),
+            'GOV-KPI-409: مؤشراتُ اللوحةِ تُشتقُّ من مصادرِها ولا تُكتب يدويًّا — '
+            . 'المرفوض: ' . implode(' · ', $__typed) . ' ❌',
+            'GOV-FAIL-409', 'افتحِ الرقمَ من مصدرِه: الإيرادُ من الدفتر والتحصيلُ من المقبوضات');
+        exit();
+    }
+
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الفارغ NULL من هنا لا NULLIF في SQL — خلطُ الترتيبات على اتصال الويب يرفضها
     foreach ($in as $k => $v) { if ($v === '') { $in[$k] = null; } }

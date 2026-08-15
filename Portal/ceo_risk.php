@@ -82,6 +82,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     foreach ($DB_FIELDS as $i => $col) { $in[$col] = trim((string) ($_POST['f' . $i] ?? '')); }
     $status = trim((string) ($_POST['f15'] ?? '')) ?: 'مسودة';
 
+    /* ══ INJ-0130 · الحسمُ حالةٌ يحكمها الدورُ لا يُمليها النموذج ══════════════
+         نصُّ القبول: «مستخدمٌ بدور غير 9 يحفظ قرارًا بحالة «محسوم» ⇒ **يُرفض**؛
+         والدورُ 9 وحدَه يستطيع الحسم».
+         وكانت الحالةُ تُقرأ من `f15` كما وردت — فأيُّ حسابٍ يملك الكتابةَ يعلن
+         قرارَه «محسومًا» بنفسِه. والحقلُ في النموذجِ ليس حارسًا: الطلبُ يُصنَع
+         بأداةٍ خارجَ المتصفح. فالحكمُ **في الخادم**، والرفضُ برمزٍ محكومٍ
+         (`GOV-DECIDE-403`) لا برسالةٍ حرّة. */
+    $__DECISIVE = array('محسوم', 'معتمد', 'نافذ', 'مقفل');
+    $__mayDecide = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
+    if (!$__mayDecide && in_array($status, $__DECISIVE, true)) {
+        require_once __DIR__ . '/../includes/audit_trail.php';
+        ems_audit_change($conn, 'governance', 'exec_decisions', 'decide_refused', 0,
+            array(), array('attempted_status' => $status, 'role' => strval($_SESSION['user']['role'] ?? '')),
+            array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
+        ems_gov_flash_redirect(basename(__FILE__),
+            'GOV-DECIDE-403: حسمُ القرارِ للإدارةِ التنفيذيةِ وحدَها — حُفظ طلبُك «مسودةً» ولم يُحسم ❌',
+            'GOV-PERM-403', 'ارفعه للإدارةِ التنفيذيةِ لتحسمه');
+        exit();
+    }
+
     // ═══ BR-CEO-04: القرارُ المحسوم لا يُقبل بلا جهةٍ مكلَّفةٍ ومهلةِ تنفيذ ═══
     // الحسمُ بتاريخ قرارٍ أو حالةٍ حاسمة، والمسودةُ وقيدُ الدراسة خارج الشرط.
     $decisive = ($in['decision_date'] !== '')
